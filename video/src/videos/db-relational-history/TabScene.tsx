@@ -236,7 +236,7 @@ export const TabScene: React.FC = () => {
         from="exactly-one"
         to="zero-or-many"
         at={upbringingAt + 6}
-        color="var(--ds-blue-ink)"
+        color={BLUE_INK}
         width={2.4 + refuse * 2}
       />
       <Tag x={1070} y={y(700)} at={labAt - 2} out={refusesAt + 4} size={23} color={INK}>

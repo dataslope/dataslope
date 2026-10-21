@@ -15,7 +15,7 @@ export const RANDOM = BAR;
 export const RANDOM_INK = BLUE_INK;
 export const EASY = ACCENT;
 export const EASY_INK = ACCENT_INK;
-/** The population's bars: a warm grey that sits back from the estimates. */
+/** The population's bars: a grey that sits back from the estimates. */
 export const RAW = `color-mix(in srgb, ${INK_SOFT} 34%, ${PAPER})`;
 /** One customer in a sample, drawn as a dot. */
 export const DOT = `color-mix(in srgb, ${INK} 72%, transparent)`;

@@ -1,9 +1,9 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
+import { ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import type { Truth } from "./data";
 
@@ -16,12 +16,12 @@ import type { Truth } from "./data";
  */
 
 export const TRUTH = {
-  true: { word: "true", lamp: ds("green", 500), ink: "var(--ds-green-ink)" },
-  false: { word: "false", lamp: ds("red", 500), ink: "var(--ds-red-ink)" },
+  true: { word: "true", lamp: ds("green", 500), ink: inkOf.green },
+  false: { word: "false", lamp: ds("red", 500), ink: ACCENT_INK },
   unknown: {
     word: "unknown",
     lamp: ds("yellow", 500),
-    ink: "var(--ds-amber-ink)",
+    ink: inkOf.yellow,
   },
 } as const;
 export const truthKey = (v: Truth) => (v === null ? "unknown" : v ? "true" : "false");
@@ -29,12 +29,12 @@ export const UNKNOWN_INK = TRUTH.unknown.ink;
 /** A wash behind whatever is unknown: the amber lamp, thinned. */
 export const UNKNOWN_WASH = `color-mix(in srgb, ${ds("yellow", 400)} 55%, transparent)`;
 
-/** The listing's tinted paper and the token inks: brand ink steps only. */
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+/** The listing's grey card, and the token inks from `inkOf` (theme/brand.ts). */
+export const LISTING_PAPER = ds("gray", 50);
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  number: ds("teal", 700),
-  string: ds("green", 800),
+  keyword: inkOf.purple,
+  number: inkOf.teal,
+  string: inkOf.green,
   punct: INK_SOFT,
   op: INK,
   name: INK,

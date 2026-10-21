@@ -6,7 +6,6 @@ import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, label, note, PAPER }
 import { Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { FIXED_ORDER, FLAT, MISSED_ORDER, NEW_EMAIL, OLD_EMAIL, rowsChanged } from "./data";
 import { Chip, Drift, Headline, lerp, Listing, Mark, pulse, X0 } from "./parts";
@@ -146,7 +145,7 @@ export const CostScene: React.FC = () => {
                       background:
                         split > 0.5
                           ? `color-mix(in srgb, ${ACCENT} ${Math.round(10 + stepped * 16)}%, ${PAPER})`
-                          : `color-mix(in srgb, ${ds("yellow", 50)} 55%, ${PAPER})`,
+                          : PAPER,
                       opacity: shown,
                       transform: `scale(${1 + stepped * 0.025})`,
                     }}

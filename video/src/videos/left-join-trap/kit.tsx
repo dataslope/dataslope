@@ -1,9 +1,9 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { ACCENT, ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import type { Value } from "./data";
 
@@ -17,21 +17,21 @@ import type { Value } from "./data";
 
 /** NULL takes the amber "look here" ink everywhere: in the code, in the
  *  tables and in the notes. */
-export const NULL_INK = "var(--ds-amber-ink)";
+export const NULL_INK = inkOf.yellow;
 export const NULL_RING = NULL_INK;
 /** What survives, and what was lost by mistake. */
-export const KEPT_INK = "var(--ds-green-ink)";
+export const KEPT_INK = inkOf.green;
 export const KEPT_WASH = `color-mix(in srgb, ${ds("green", 200)} 60%, transparent)`;
 export const LOST = ACCENT;
 export const LOST_INK = ACCENT_INK;
 export const LOST_WASH = `color-mix(in srgb, ${ds("red", 200)} 55%, transparent)`;
 
-/** The listing's tinted paper and the token inks: brand ink steps only. */
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+/** The listing's grey card, and the token inks from `inkOf` (theme/brand.ts). */
+export const LISTING_PAPER = ds("gray", 50);
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  number: ds("teal", 700),
-  string: ds("green", 800),
+  keyword: inkOf.purple,
+  number: inkOf.teal,
+  string: inkOf.green,
   punct: INK_SOFT,
   op: INK,
   name: INK,

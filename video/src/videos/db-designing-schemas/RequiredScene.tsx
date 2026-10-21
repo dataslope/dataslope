@@ -95,7 +95,7 @@ export const RequiredScene: React.FC = () => {
             padding: "14px 22px",
             borderTop: `2px solid ${INK}`,
             borderBottom: `1px solid ${HAIRLINE}`,
-            background: `color-mix(in srgb, ${ds("yellow", 200)} 34%, transparent)`,
+            background: ds("gray", 50),
             fontFamily: MONO,
             fontSize: 26,
             lineHeight: 1.5,

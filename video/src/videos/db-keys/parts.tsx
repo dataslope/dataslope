@@ -19,7 +19,7 @@ import {
   note,
 } from "../../editorial/style";
 import { Ink, type Pt } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -42,7 +42,7 @@ export const BODY_Y = 346;
 /** The page's right margin. */
 export const RIGHT = 1824;
 
-// ── Colors: brand ink steps and the editorial palette only ───────────────────
+// ── Colors: inkOf (theme/brand.ts) and the editorial palette only ────────────
 
 export const MARK = HIGHLIGHT;
 export const MARK_BAD = `color-mix(in srgb, ${ACCENT} 26%, transparent)`;
@@ -51,7 +51,7 @@ export const KEY = BAR;
 export const KEY_INK = BLUE_INK;
 export const MARK_KEY = `color-mix(in srgb, ${BAR} 20%, transparent)`;
 export const OK = ds("green", 600);
-export const OK_INK = "var(--ds-green-ink)";
+export const OK_INK = inkOf.green;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -229,11 +229,11 @@ export const Tag: React.FC<{ children: React.ReactNode; color?: string; size?: n
 
 // ── SQL ──────────────────────────────────────────────────────────────────────
 
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+export const LISTING_PAPER = ds("gray", 50);
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  string: ds("green", 800),
-  number: ds("orange", 700),
+  keyword: inkOf.purple,
+  string: inkOf.green,
+  number: inkOf.orange,
   punct: INK_SOFT,
   name: INK,
 } as const;

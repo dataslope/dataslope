@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { BLUE_INK, fmt, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -318,7 +318,7 @@ export const DivisorScene: React.FC = () => {
             <Tag x={sx(V, DIVISOR.sigma2) + 14} y={y(BAR_N) - h(34) - 26} opacity={ease(frame, lowAt - 2, 10)} color={STAT_INK} size={23} bold align="left">
               about {Math.round(DIVISOR.lowPct)}% low
             </Tag>
-            <Tag x={sx(V, DIVISOR.byN1 * n1Grow) + 16} y={y(BAR_N1) - 15} opacity={ease(frame, byN1At + 2, 10)} color={"var(--ds-blue-ink)"} size={24} bold align="left">
+            <Tag x={sx(V, DIVISOR.byN1 * n1Grow) + 16} y={y(BAR_N1) - 15} opacity={ease(frame, byN1At + 2, 10)} color={BLUE_INK} size={24} bold align="left">
               <span style={TABULAR}>{counted(frame, byN1At, 0, DIVISOR.byN1, 1, 22)}</span>
             </Tag>
             <Pulse x={sx(V, DIVISOR.sigma2)} y={y(BAR_N1)} at={landsAt + 4} color={INK} r={8} />

@@ -4,7 +4,7 @@ import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, type Pt } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { inkOf } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import { DEPT_COLOR, DEPT_INK, type Dept, type Row } from "./data";
 
@@ -49,9 +49,9 @@ const KEY_W = 120;
 /* ── Code ── */
 
 const TOKEN_INK = {
-  string: ds("green", 800),
-  call: ds("purple", 700),
-  number: ds("orange", 700),
+  string: inkOf.green,
+  call: inkOf.purple,
+  number: inkOf.orange,
   punct: INK_SOFT,
   name: INK,
 } as const;

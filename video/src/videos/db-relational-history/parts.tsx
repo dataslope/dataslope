@@ -20,7 +20,7 @@ import {
   PAPER,
 } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -467,7 +467,7 @@ export const PaperPage: React.FC<{
         opacity: p * (1 - o) * (1 - d),
         transform: `translate(${(1 - p) * 40 - o * 30}px, 0) rotate(${(1 - p) * 1.5 - 0.6}deg)`,
         transformOrigin: "50% 50%",
-        background: `color-mix(in srgb, ${ds("yellow", 50)} 70%, ${PAPER})`,
+        background: PAPER,
         border: `1.5px solid ${HAIRLINE}`,
         borderRadius: 3,
         boxSizing: "border-box",
@@ -715,11 +715,11 @@ export const cellCenter = (x: number, top: number, widths: readonly number[], he
 
 // ── SQL ──────────────────────────────────────────────────────────────────────
 
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+export const LISTING_PAPER = ds("gray", 50);
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  string: ds("green", 800),
-  number: ds("orange", 700),
+  keyword: inkOf.purple,
+  string: inkOf.green,
+  number: inkOf.orange,
   punct: INK_SOFT,
   name: INK,
 } as const;

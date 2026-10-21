@@ -5,7 +5,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { FIRST_DDL_LINE } from "./data";
@@ -88,7 +88,7 @@ export const OpenScene: React.FC = () => {
               padding: "14px 22px",
               borderTop: `2px solid ${INK}`,
               borderBottom: `1px solid ${HAIRLINE}`,
-              background: `color-mix(in srgb, ${ds("yellow", 200)} 34%, transparent)`,
+              background: ds("gray", 50),
               opacity: ease(frame, couldAt - 6, 12),
               clipPath: `inset(0 ${(1 - ease(frame, couldAt - 6, 16)) * 100}% 0 0)`,
               fontFamily: MONO,
@@ -99,7 +99,7 @@ export const OpenScene: React.FC = () => {
           >
             <Strike at={guessAt} top="0.5em">
               <span>
-                <span style={{ color: ds("purple", 700), fontWeight: 700 }}>{shown.slice(0, 12)}</span>
+                <span style={{ color: inkOf.purple, fontWeight: 700 }}>{shown.slice(0, 12)}</span>
                 <span style={{ color: INK }}>{shown.slice(12)}</span>
               </span>
             </Strike>

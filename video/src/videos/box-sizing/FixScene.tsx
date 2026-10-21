@@ -6,6 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
+import { inkOf } from "../../theme/brand";
 import { BORDER_BOX, BOX, CONTENT_BOX, FILLED, ILLUSTRATIONS, ROW, UNIVERSAL, VIDEO } from "./data";
 import { Dim, DimLabel, Fig, Listing, listingHeight, Mono } from "./kit";
 import { CODE, column, Column, LINES, LIST_TOP, LIST_W, ROW_X, RowFrame, rowGeometry } from "./row";
@@ -14,7 +15,7 @@ const RULE_X = 1180;
 const RULE_W = 580;
 const RULE_CODE = 28;
 const RULE = ["*, *::before, *::after {", `  box-sizing: ${UNIVERSAL.col};`, "}"] as const;
-const OK_INK = "var(--ds-green-ink)";
+const OK_INK = inkOf.green;
 
 /**
  * Fix, shrink, rule: the same row under border-box. Each 50% now measures to

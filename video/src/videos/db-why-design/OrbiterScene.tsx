@@ -6,7 +6,6 @@ import { ACCENT, ACCENT_INK, body, fmt, HAIRLINE, INK, INK_SOFT, label, note, PA
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { LBF_S } from "./data";
 import { Arrow, Drift, FIG_Y, Headline, LISTING_PAPER, Mark, pulse, Spot, X0 } from "./parts";
@@ -75,7 +74,7 @@ export const OrbiterScene: React.FC = () => {
           gap: 6,
           borderRadius: 8,
           border: `2px solid ${INK}`,
-          background: `color-mix(in srgb, ${ds("yellow", 50)} 55%, ${PAPER})`,
+          background: PAPER,
         }}
       >
         <div style={label(21, INK_SOFT)}>{who}</div>

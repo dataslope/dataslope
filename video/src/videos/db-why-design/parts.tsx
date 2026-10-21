@@ -7,7 +7,7 @@ import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -283,7 +283,7 @@ export const Chip: React.FC<{
         padding: "10px 18px",
         borderRadius: 10,
         border: `2px solid ${glow > 0 ? `color-mix(in srgb, ${ACCENT} ${Math.round(glow * 100)}%, ${INK})` : INK}`,
-        background: `color-mix(in srgb, ${ds("yellow", 50)} 55%, ${PAPER})`,
+        background: PAPER,
         opacity: p * (1 - o) * (1 - d),
         transform: `translate(${(1 - p) * 16 + o * 16}px, ${0}px) scale(${1 + glow * 0.04})`,
         transformOrigin: "50% 50%",
@@ -300,11 +300,11 @@ export const Chip: React.FC<{
 // ── SQL, after WhyNormalization's kit ────────────────────────────────────────
 
 /** The listing's tinted paper and the SQL token inks. */
-export const LISTING_PAPER = `color-mix(in srgb, ${ds("yellow", 200)} 34%, ${PAPER})`;
+export const LISTING_PAPER = ds("gray", 50);
 const TOKEN_INK = {
-  keyword: ds("purple", 700),
-  string: ds("green", 800),
-  number: ds("orange", 700),
+  keyword: inkOf.purple,
+  string: inkOf.green,
+  number: inkOf.orange,
   comment: INK_SOFT,
   punct: INK_SOFT,
   name: INK,

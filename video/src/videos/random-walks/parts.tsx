@@ -4,17 +4,17 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HAIRLINE, headline, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, headline, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /** Walk a in blue, walk b in orange: neither is the page's red accent. The
  *  ink steps are for text. */
 export const COLOR = { a: ds("blue", 500), b: ds("orange", 500) } as const;
-export const COLOR_INK = { a: "var(--ds-blue-ink)", b: ds("orange", 700) } as const;
+export const COLOR_INK = { a: BLUE_INK, b: inkOf.orange } as const;
 /** The verdict colors of the last figure: fails and passes. */
-export const PASS_INK = "var(--ds-green-ink)";
+export const PASS_INK = inkOf.green;
 
 /** Figs. 1 and 2 share one chart, so walk a stays put across the cut. Y
  *  values are layout coordinates, mapped through `useLayout().y()`. */

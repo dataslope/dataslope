@@ -1,24 +1,25 @@
 import type React from "react";
-import { colors, ds } from "../theme/brand";
+import { colors, ds, inkOf } from "../theme/brand";
 import { SANS } from "../theme/fonts";
 import { SERIF } from "./fonts";
 
 /**
  * The palette of a magazine's science pages, built only from brand ramps:
- * a plain white page, a warm near-black ink, one brand blue for data and one
- * red accent for whatever the narration is pointing at. Everything drawn in
- * the page's color (halos, masks, cards that hide what is behind them) reads
- * PAPER, so the page is this one token.
+ * a plain white page, the site's near-black ink, one brand blue for data and
+ * one red accent for whatever the narration is pointing at. Everything drawn
+ * in the page's color (halos, masks, cards that hide what is behind them)
+ * reads PAPER, so the page is this one token. Type in a hue reads `inkOf`
+ * (theme/brand.ts), which is the brand 500 itself for blue and red.
  */
 export const PAPER = colors.page;
-export const INK = `color-mix(in srgb, ${ds("gray", 900)} 86%, ${ds("yellow", 900)})`;
-export const INK_SOFT = `color-mix(in srgb, ${ds("gray", 600)} 80%, ${ds("yellow", 800)})`;
+export const INK = colors.ink;
+export const INK_SOFT = colors.inkSoft;
 export const HAIRLINE = `color-mix(in srgb, ${INK} 55%, transparent)`;
 
 export const BAR = ds("blue", 500);
 export const ACCENT = ds("red", 500);
-export const ACCENT_INK = "var(--ds-red-ink)";
-export const BLUE_INK = "var(--ds-blue-ink)";
+export const ACCENT_INK = inkOf.red;
+export const BLUE_INK = inkOf.blue;
 export const HIGHLIGHT = `color-mix(in srgb, ${ds("yellow", 400)} 80%, transparent)`;
 
 /** Display headlines, in the variant's face (typefaces.ts). Sizes are
