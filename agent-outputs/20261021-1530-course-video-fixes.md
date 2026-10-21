@@ -2,7 +2,7 @@
 
 **Follows:** [the review](20261021-0551-course-video-review.md) of the 18 course unit videos (378 findings: 24 P1, 156 P2, 198 P3).
 **Result:** 362 fixed, 16 partly fixed, none skipped (359, 18 and 1 at the end of the fix pass; the three decisions in [After the fix pass](#after-the-fix-pass) closed the rest). Every video passes `check:frames`, `check:motion` and `check:sync`, and the package passes `typecheck`, `lint`, `npm test` (57/57) and `check:cues`.
-**Voice:** only new or reworded sentences were voiced, at the user's request: 52 beats, about 5,340 characters in all, each sent on its own. No take was recorded again (`takes/` is unchanged). An audit of every course video's `alignment.json` against the pre-fix commit finds no beat whose audio changed while its text stayed the same. Five beat splits were cut from the existing takes with `narrate --recut` and sent nothing.
+**Voice:** only new or reworded sentences were voiced, at the user's request: 52 beats, about 5,340 characters in all, each sent on its own. No take was recorded again (`takes/` is unchanged). An audit of every course video's `alignment.json` against the pre-fix commit finds no beat whose audio changed while its text stayed the same. Five beat splits were cut from the existing takes with `narrate --recut` and sent nothing. After the pass, with the user's go-ahead, 13 more beats whose words did not change were re-voiced slowly (about 1,230 characters; see [After the fix pass](#after-the-fix-pass)).
 
 ## Shared changes
 
@@ -54,10 +54,6 @@ All are fixed. The ones whose fix is worth knowing:
 
 Each report in [`20261021-course-video-review/`](20261021-course-video-review/) is the list of findings; the reasons below are the agents', checked by the coordinator.
 
-**Left for a voicing decision.** Each of these needs a beat re-voiced whose words don't change, which the user ruled out:
-- Stats-6: the 53 s from the rate interval to the formula hand-off still runs at about 3 words a second (longer pauses and two new beats were added).
-- Stats-9: the 13.4 s `sin` beat stays one beat; the missing reasoning is a new beat after it.
-
 **Layout limits.**
 - DbDesign-1: the program chips can't sit under the building's four doors.
 - DbDesign-6: chips and errors stay at 20 and 22 px (24 px collides with neighbouring tables).
@@ -72,26 +68,34 @@ Each report in [`20261021-course-video-review/`](20261021-course-video-review/) 
 - Stats-8 shows "d = 0.009" before naming Cohen's d, with its definition on the line beneath.
 - Stats-5 does not give Gallup's 1936 sample size: the lesson has none and the sources disagree (50,000 against 125,000).
 
-**Skipped.** DbDesign-3's figure numbering (finding 12) is a series-wide call, not a per-video fix. See decision 1 below.
+## After the fix pass
 
-## Decisions for the user
+The fix pass left three decisions with the user. All three are settled.
 
-1. **Figure numbering in Database Design.** Units 1, 3, 7, 8 and 9 number their figures; Units 2, 4, 5 and 6 don't. In the fix pass DbDesign-6 dropped its two lone numbers, DbDesign-4 dropped its lone "Fig. 1", and DbDesign-8 numbered all of its own. Pick one rule for the course. (The Statistics course numbers every figure.)
-2. **New material beyond the lessons.** It was all run or sourced, but it is new. Confirm or cut:
-   - DbDesign-3: two `devices` rows (the lesson has no devices data), run through PGlite.
-   - DbDesign-9: a POSTQUEL query and a "your own types" panel, from Stonebraker and Rowe's memo M85/95 (already in the script's sources).
-   - Stats-4: a dashed negative-binomial outline for "real counts swing wider", labelled as the video's illustration.
-   - DbDesign-1: a notation key on Fig. 3 and Fig. 4.
-3. **Kit follow-ups (optional).**
-   - DbDesign-1's notation key (`FigKey`, `EndGlyph`) could move to `editorial/erd.tsx`, so DbDesign-2 and -3 could show the same key.
-   - `NextLine` could take a no-prefix option, which Unit 5's merged `Bridge` re-implements.
-4. **The two fast stretches** above, if re-voicing unchanged beats becomes acceptable.
+1. **Figure numbering: every video numbers its figures.** Database Design Units 2, 4, 5 and 6 had none, so each now labels its figures "Fig. N" with a title, numbered in order of first appearance. Each label arrives with its figure and leaves or dims with it. Where a video already had a plain caption, the caption became the title. Room was made by moving a figure 18 to 74 px down where a label needed its own line. No narration changed.
+   - DbDesign-2 Entities: 12 figures.
+   - DbDesign-4 Keys: 12 figures.
+   - DbDesign-5 RelationshipPatterns: 20 figures. Each part's closing preview of the next shape is one of Fig. 2's four panels returning, so it is labelled "Fig. 2" again.
+   - DbDesign-6 Constraints: 14 figures.
+
+   A returning figure keeps its number, as DbDesign-7's Fig. 1 already did. Both courses now follow one rule, and DbDesign-3's finding 12 is fixed with it.
+2. **New material beyond the lessons: kept.** The user accepted all four additions (the DbDesign-3 `devices` rows, DbDesign-9's POSTQUEL query and types panel, Stats-4's negative-binomial outline, DbDesign-1's notation key).
+3. **The two fast stretches: re-voiced slowly.** The words are unchanged. The beats were re-voiced with ElevenLabs' `[slowly]` audio tag, because `eleven_v4_turbo` ignores the `speed` setting. That is 13 beats, each voiced on its own, about 1,230 characters; no take was recorded again.
+   - **Stats-6:** the rate interval to the formula hand-off (nine beats) went from 2.9-3.2 words a second to 2.5-2.8.
+   - **Stats-9:** `sin` is split at its sentence break into `sin` and `tilt`, and `sin`, `tilt`, `luck` and `lie` are slowed the same way.
+   - **Sync:** a beat voiced on its own used to start its alignment at the tag, not at the first sound. `narrate` now places such a beat's first word from the audio, and `narrate --onsets` re-places existing beats with no API call. `check:sync` passes both videos (worst +0.11 s and +0.07 s).
+   - **Motion:** the slower `sin` beat left Stats-9's wall scene still for 3.0 s, so the wall now thickens on "between them". `check:motion` passes both videos (longest still 2.3 s and 2.8 s).
+
+**Optional kit follow-ups, not done:**
+- DbDesign-1's notation key (`FigKey`, `EndGlyph`) could move to `editorial/erd.tsx`, so DbDesign-2 and -3 could show the same key.
+- `NextLine` could take a no-prefix option, which Unit 5's merged `Bridge` re-implements.
+- DbDesign-2 widened `FigLabel` locally (its `Fig` in `kit.tsx`) so a title can hold `<Mono>` code. The shared `FigLabel` could take that.
 
 ## Sound effects
 
 Agents added and moved effects beside the animations they belong to, each cued from the same frame as its animation. `check:mix` (informational; about 15 LU under the narration reads as subtle) measured every video after the fixes:
 
-- **Statistics:** effects 19.2 to 21.4 LU under the narration; speech a median 22 to 25 dB above them where both sound.
+- **Statistics:** effects 19.3 to 21.4 LU under the narration; speech a median 22 to 25 dB above them where both sound. (Stats-6 and Stats-9 were measured again after their slow re-voice: 19.3 and 19.6 LU under.)
 - **Database Design:** 21.7 to 24.8 LU under; speech a median 25 to 28 dB above.
 
 No video's effects are louder than the series' subtle bar. The quietest margin, the 5th percentile of speech over effects, is 6.0 dB, in the merged Unit 5 video.
