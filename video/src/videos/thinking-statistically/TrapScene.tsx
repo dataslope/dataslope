@@ -63,6 +63,8 @@ export const TrapScene: React.FC = () => {
   const integersAt = n.word("pandas", "integers");
   const averagesAt = n.word("pandas", "averages");
   const fortyAt = n.word("pandas", "Forty-eight");
+  const sevenAt = n.word("pandas", "seven hundred");
+  const fiftyFiveAt = n.word("pandas", "fifty-five");
   const placeAt = n.word("place", "place");
   const labelsAt = n.word("place", "labels");
   const slideAt = n.beat("double").from - 12;
@@ -84,6 +86,10 @@ export const TrapScene: React.FC = () => {
   const lit = ease(frame, typeAt - 4, 12);
   const storedLit = ease(frame, storedAt - 2, 12);
   const shift = SHIFT * (1 - ease(frame, slideAt, 20));
+  // The mean as pandas prints it, written out as it is read: the thousands
+  // on "Forty-eight", the rest on "seven hundred", the cents after. No
+  // count-up through values pandas never printed.
+  const meanText = ZIPS.zipMean.toFixed(2);
   const priceIn = ease(frame, priceAt - 8, 14);
   const columns = [
     { name: "zip_code", dtype: ZIPS.dtypes.zip_code, values: ZIPS.zips.map(String), at: zipAt - 6, step: 4 },
@@ -177,12 +183,12 @@ export const TrapScene: React.FC = () => {
       <Ink at={averagesAt - 4} dur={14} style={{ left: COL[0] + shift, top: y(MEAN_Y), whiteSpace: "nowrap" }}>
         <span style={mono(22, INK_SOFT)}>.mean()</span>
       </Ink>
-      {/* The average, written out as it is read: no count-up through values
-          pandas never printed. */}
-      <Ink at={fortyAt - 4} dur={30} style={{ left: COL[0] + shift, top: y(MEAN_Y + 40), whiteSpace: "nowrap" }}>
+      <Ink at={fortyAt - 4} dur={16} style={{ left: COL[0] + shift, top: y(MEAN_Y + 40), whiteSpace: "nowrap" }}>
         <span style={mono(40, STAT_INK, 700)}>
           <Strike at={placeAt - 2} top="0.62em">
-            {ZIPS.zipMean.toFixed(2)}
+            {meanText.slice(0, -6)}
+            <span style={{ opacity: ease(frame, sevenAt - 4, 10) }}>{meanText.slice(-6, -3)}</span>
+            <span style={{ opacity: ease(frame, fiftyFiveAt + 10, 10) }}>{meanText.slice(-3)}</span>
           </Strike>
         </span>
       </Ink>

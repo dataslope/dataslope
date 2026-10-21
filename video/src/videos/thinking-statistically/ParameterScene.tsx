@@ -135,6 +135,8 @@ export const ParameterScene: React.FC = () => {
   const closeAt = n.word("miss", "Close");
   const missAt = n.word("price", "miss");
   const errorAt = n.word("price", "estimation error");
+  const mistakeAt = n.word("price", "mistake");
+  const priceAt = n.word("price", "price");
   const partAt = n.word("price", "seeing only part");
   const turnAt = n.beat("twenty-in").from;
   const missAgainAt = n.word("twenty-in", "miss");
@@ -157,8 +159,8 @@ export const ParameterScene: React.FC = () => {
   const barX = sx(XS, KNOWN.xBar);
   const tick = ease(frame, averageAt - 4, 12);
   const tickH = lerp(h(44), h(ROW_ONE.TICK), m);
-  // The miss, swelling each time it is named again.
-  const missSwell = pulse(frame, missAt - 2, 20) + pulse(frame, missAgainAt - 2, 20);
+  // The miss, swelling each time it is named again ("isn't a mistake" too).
+  const missSwell = pulse(frame, missAt - 2, 20) + pulse(frame, mistakeAt - 2, 20) + pulse(frame, missAgainAt - 2, 20);
 
   return (
     <AbsoluteFill>
@@ -169,7 +171,7 @@ export const ParameterScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={fiftyAt - 6} level={-32} />
       <Sfx name="el-tap" at={averageAt - 4} level={-27} />
       <Sfx name="el-pencil" at={closeAt - 2} level={-34} />
-      <Sfx name="el-pencil" at={partAt - 2} level={-35} />
+      <Sfx name="el-pencil" at={priceAt - 4} level={-35} />
       <Sfx name="el-whoosh" at={morphAt} level={-34} />
       <Sfx name="el-sprinkle" at={describesAt - 2} level={-35} />
       <Sfx name="el-sprinkle" at={computeAt + 6} level={-35} />
@@ -252,7 +254,7 @@ export const ParameterScene: React.FC = () => {
         sd={KNOWN.sigma}
         base={base}
         height={y(BASE) - y(LABEL_Y + 66)}
-        at={partAt - 4}
+        at={priceAt - 4}
         out={usuallyAt - 2}
         dur={30}
       />
@@ -343,7 +345,7 @@ export const ParameterScene: React.FC = () => {
           width={2.6 + missSwell * 2.4}
         />
         {/* It makes way for the population on "the price of seeing only part". */}
-        <Note at={closeAt + 2} x={barX + 16} y={stripY + h(44)} out={partAt - 6}>
+        <Note at={closeAt + 2} x={barX + 16} y={stripY + h(44)} out={priceAt - 6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             off by{" "}
             <b style={{ color: STAT_INK }}>
