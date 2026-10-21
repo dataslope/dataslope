@@ -58,6 +58,8 @@ export const RobustScene: React.FC = () => {
   const firstAt = n.word("iqr", "first quartile");
   const thirdAt = n.word("iqr", "third");
   const fourteenAt = n.word("iqr", "fourteen");
+  const quarterAt = n.word("iqr", "a quarter");
+  const threeQuartersAt = n.word("iqr", "three quarters");
   const whateverAt = n.word("iqr", "whatever");
   const topAt = n.word("iqr", "top earner");
   const madAt = n.word("mad", "median absolute deviation");
@@ -228,6 +230,15 @@ export const RobustScene: React.FC = () => {
           <Tag x={q3x} y={strip + BOX_H / 2 + 50} opacity={ease(frame, thirdAt - 2, 12) * (1 - sticks)} size={21}>
             Q3 {fmt(ROBUST.q3, 2)}
           </Tag>
+          {/* What a quartile is: how far up the sorted incomes it sits. */}
+          <Tag x={q1x} y={strip + BOX_H / 2 + 78} opacity={ease(frame, quarterAt - 4, 12) * (1 - sticks)} color={INK_SOFT} size={20}>
+            ¼ of the way up
+          </Tag>
+          <Tag x={q3x} y={strip + BOX_H / 2 + 78} opacity={ease(frame, threeQuartersAt - 4, 12) * (1 - sticks)} color={INK_SOFT} size={20}>
+            ¾ of the way up
+          </Tag>
+          <Pulse x={q1x} y={strip} at={quarterAt - 2} color={INK} r={8} />
+          <Pulse x={q3x} y={strip} at={threeQuartersAt - 2} color={INK} r={8} />
           <Bracket x0={q1x} x1={q3x} y={strip - BOX_H / 2 - 16} at={fourteenAt - 6} out={typicalAt - 6} up color={INK} />
           <Tag x={(q1x + q3x) / 2} y={strip - BOX_H / 2 - 64} opacity={ease(frame, fourteenAt - 2, 12) * (1 - ease(frame, typicalAt - 6, 10))} size={23} bold>
             IQR {fmt(ROBUST.iqr, 1)}

@@ -61,8 +61,11 @@ export const OutlierScene: React.FC = () => {
   const whyAt = n.word("verdict", "why");
   const decideAt = n.word("verdict", "decide");
   const actAt = KINDS.map((k) => n.word("verdict", k.actWord));
-  const fencesSitAt = n.word("rules", "quartiles");
+  const fencesSitAt = n.word("rules", "fences sit");
+  const halfIqrAt = n.word("rules", "one and a half");
+  const zRuleWordAt = n.word("rules", "z-score rule");
   const zRuleAt = n.word("rules", "three standard deviations");
+  const fromMeanAt = n.word("rules", "mean");
   const lookAt = n.word("plot-in", "look");
 
   const strip = y(STRIP);
@@ -132,7 +135,7 @@ export const OutlierScene: React.FC = () => {
         <Tag x={fenceX - 10} y={strip - JIT - 100} opacity={ease(frame, fencesAt, 12)} size={21} bold align="right">
           <div style={{ textAlign: "right" }}>
             <div>box-plot fence</div>
-            <div style={{ fontWeight: 500, opacity: ease(frame, fencesSitAt - 6, 12) }}>
+            <div style={{ fontWeight: 500, opacity: ease(frame, halfIqrAt - 4, 12) }}>
               Q3 + 1.5 × IQR = <span style={TABULAR}>{fmt(OUTLIERS.upper, 1)}</span>
             </div>
           </div>
@@ -174,6 +177,12 @@ export const OutlierScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Pulse x={sx(X, 200)} y={ySpread(at(200))} at={kindAt[2] - 2} color={DATA} r={7} />
+        {/* Each rule pointed at as it is defined. */}
+        <Pulse x={fenceX} y={strip - JIT - 40} at={fencesSitAt - 2} color={INK} r={6} />
+        <Pulse x={zX} y={strip - JIT - 40} at={zRuleWordAt - 2} color={STAT} r={6} />
+        {OUTLIERS.zFlagged.map((v, k) => (
+          <Pulse key={`m${v}`} x={sx(X, v)} y={ySpread(at(v))} at={fromMeanAt - 2 + k * 4} color={STAT} r={R + 13} />
+        ))}
         {OUTLIERS.iqrFlagged.map((v, k) => (
           <Pulse key={v} x={sx(X, v)} y={ySpread(at(v))} at={sixOfAt - 2 + k * 2} color={INK} r={R + 6} />
         ))}

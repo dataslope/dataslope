@@ -170,7 +170,7 @@ export const PowerScene: React.FC = () => {
       {/* ── One experiment: what "a real effect of half an SD" looks like ── */}
       {oneIn > 0 && oneOut < 1 ? (
         <div style={{ position: "absolute", inset: 0, opacity: 1 - oneOut }}>
-          <Ink at={plantAt - 6} dur={14} style={{ left: 1160, top: y(330), whiteSpace: "nowrap" }}>
+          <Ink at={plantAt - 6} dur={14} style={{ left: 1160, top: y(ONE.base) - h(ONE.tall) - 130, whiteSpace: "nowrap" }}>
             <Label size={22} color={INK_SOFT}>
               One experiment
             </Label>

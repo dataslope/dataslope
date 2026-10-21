@@ -52,6 +52,8 @@ export const DivisorScene: React.FC = () => {
   const aroundAt = n.word("small", "around");
   const smallAt = n.word("small", "small");
   const underAt = n.word("small", "underestimate");
+  const divideByAt = n.word("small", "Divide by n");
+  const numberAt = n.word("small", "number of values");
   const measuredFrom = n.beat("measured").from;
   const fourAt = n.word("measured", "four thousand");
   const byNAt = n.word("measured", "dividing by n", { nth: 1 });
@@ -250,8 +252,18 @@ export const DivisorScene: React.FC = () => {
             Around its own mean, the <Mark at={smallAt + 2}>smallest</Mark> it can be.
           </span>
         </Ink>
-        <Ink at={underAt - 4} dur={16} style={{ left: 1330, top: y(750), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, STAT_INK), fontWeight: 600, ...halo }}>Divided by n, too small.</span>
+        <div style={{ position: "absolute", left: 1330, top: y(750), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...note(23, STAT_INK), fontWeight: 600 }}>
+          <Ink at={divideByAt - 4} dur={14} style={{ position: "relative" }}>
+            <span style={halo}>Divided by n,</span>
+          </Ink>
+          <Ink at={underAt - 4} dur={14} style={{ position: "relative" }}>
+            <span style={halo}>too small.</span>
+          </Ink>
+        </div>
+        <Ink at={numberAt - 4} dur={16} style={{ left: 1330, top: y(750) + 38, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK_SOFT), ...halo }}>
+            n, the number of values: here, {DIVISOR.five.length}
+          </span>
         </Ink>
         <Sfx name="el-pop" at={growAt - 2} level={-31} />
       </div>

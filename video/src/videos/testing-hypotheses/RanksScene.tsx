@@ -254,7 +254,7 @@ export const RanksScene: React.FC = () => {
             the means
           </Label>
         </Note>
-        <Note at={p033At - 4} x={rankX(MEAN_RANK[1]) + 16} y={y(RANK_Y) - 116}>
+        <Note at={p033At - 4} x={rankX(MEAN_RANK[1]) + 16} y={y(RANK_Y) - 128}>
           <span style={{ ...note(26, DATA_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
             Mann-Whitney, p = {fmt(MWU.mwuP, 3)}
           </span>
@@ -264,7 +264,7 @@ export const RanksScene: React.FC = () => {
             average ranks, A and B
           </Label>
         </Note>
-        <Note at={standsAt - 4} x={RX1} y={y(RANK_Y) - 76} align="right">
+        <Note at={standsAt - 4} x={RX1} y={y(RANK_Y) - 70} align="right">
           <span style={{ ...label(22, STAT_INK), ...halo, display: "inline-block", transform: `scale(${1 + 0.06 * farGlow})`, transformOrigin: "100% 50%" }}>
             the six monsters: ranks {Math.min(...OUT_RANKS)} to {Math.max(...OUT_RANKS)}
           </span>

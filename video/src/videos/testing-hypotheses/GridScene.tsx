@@ -14,7 +14,7 @@ const ROW_Y = [400, 610];
 const ROW_H = 190;
 const ROW_LABEL_X = 160;
 /** Where a cell's tick sits, from the cell's left edge: just past its word. */
-const TICK_AFTER = { correct: 230, power: 196 };
+const TICK_AFTER = { correct: 212, power: 196 };
 
 /**
  * The truth crossed with the decision: four outcomes, a false alarm at rate
