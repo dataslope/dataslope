@@ -89,13 +89,17 @@ export const SplitScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      {/* ── Sound: the bars, the splits levelling and stepping, the halves ── */}
+      {/* ── Sound: the bars, the splits levelling and stepping, the coins and
+           the halves, the churned ringed, the 80% ── */}
       <Sfx name="el-pop" at={barAt - 6} level={-30} />
       <Sfx name="el-whoosh" at={sameAt - 6} level={-34} />
       <Sfx name="el-whoosh" at={jumpsAt - 4} level={-33} />
       <Sfx name="el-pencil" at={gapAt - 4} level={-34} />
       <Sfx name="el-sprinkle" at={halfAt - 2} level={-34} />
       <Sfx name="el-tap" at={oneInAt - 4} level={-28} />
+      <Sfx name="el-pop" at={tenAt - 2} level={-31} />
+      <Sfx name="el-pencil" at={revAllAt - 4} level={-34} />
+      <Sfx name="el-tap" at={revEightyAt - 4} level={-28} />
 
       <Headline top={y(150)} first="Does the plan" second="change the chance?" firstAt={splitFrom - 6} secondAt={barAt + 2} out={jumpsAt - 8} />
       <Headline top={y(150)} first="Plan and churn" second="are dependent." firstAt={jumpsAt - 2} secondAt={dependentAt - 4} out={indepWordAt - 8} />
@@ -313,7 +317,7 @@ export const SplitScene: React.FC = () => {
           </React.Fragment>
         ))}
       </div>
-      <Note at={revEightyAt + 18} x={RIGHT} y={y(868)}>
+      <Note at={revEightyAt + 18} x={RIGHT} y={y(876)}>
         <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>Same 120, a different whole.</span>
       </Note>
     </AbsoluteFill>

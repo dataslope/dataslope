@@ -4,12 +4,12 @@ import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { mulberry32, RATE } from "./data";
-import { Count, DATA, EST, EST_INK, FADED, Headline, IntervalBar, PHat, Rule, Svg } from "./parts";
+import { Count, DATA, EST, EST_INK, FADED, Headline, IntervalBar, Marked, PHat, Rule, Svg } from "./parts";
 
 const COLS = 75;
 const ROWS = RATE.n / COLS;
@@ -54,6 +54,8 @@ export const RateScene: React.FC = () => {
   const itselfAt = n.word("rate-se", "itself");
   const tenthsAt = n.word("rate-se", "seven tenths");
   const noSpreadAt = n.word("rate-z", "no separate spread");
+  const noTAt = n.word("rate-z", "no t");
+  const usualAt = n.word("rate-z", "usual choice");
   const normalAt = n.word("rate-z", "normal's value");
   const stepAt = n.word("rate-ci", "Step");
   const nineSixAt = n.word("rate-ci", "one point nine six");
@@ -143,8 +145,12 @@ export const RateScene: React.FC = () => {
       <Note at={noSpreadAt - 4} x={COL} y={y(500)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           No separate spread to estimate
-          <span style={{ opacity: ease(frame, normalAt - 4, 10) }}>
-            , so no t: the normal’s <b style={{ color: INK }}>{fmt(RATE.z)}</b>
+          <span style={{ opacity: ease(frame, noTAt - 4, 10) }}>, so no t</span>
+          <span style={{ opacity: ease(frame, usualAt - 4, 10) }}>
+            : the normal’s{" "}
+            <Marked at={normalAt - 2} color={HIGHLIGHT}>
+              <b style={{ color: INK }}>{fmt(RATE.z)}</b>
+            </Marked>
           </span>
         </span>
       </Note>

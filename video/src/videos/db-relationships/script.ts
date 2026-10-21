@@ -18,18 +18,19 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *   2. Cardinality ("both" to "translate"), after cardinality.mdx: asked in
  *      both directions, one-to-many, the key on the many side; crow's-foot
  *      notation, each end read from the box outward (the maximum next to the
- *      box, the minimum farther out), the four ends with the lesson's own
- *      examples, feet at both ends for many-to-many; and the marks changing
- *      the schema, with the UNIQUE rule that turns many into at most one.
+ *      box, the minimum farther out), then a line read from one box to the
+ *      end at the other, the four ends with the lesson's own examples, feet
+ *      at both ends for many-to-many; and the marks changing the schema, with
+ *      the UNIQUE rule that turns many into at most one.
  *   3. Reading a diagram ("shop" to "next"), after reading-er-diagrams.mdx:
  *      the shop model read line by line as sentences, a sentence that sounds
  *      wrong as a design fault, and the foreign keys as the query's joins.
  *      It ends on Unit 4's opening: every line lands on one row because each
  *      row has a name nothing else shares, a key.
  *
- * Left on the page: the DDL, the composite key of order_items (Unit 4's
- * subject), the junction table's construction (Unit 5's), Chinook, and the
- * quizzes.
+ * Left on the page: the DDL, the composite key of order_items beyond a
+ * one-line note (Unit 4's subject), the junction table's construction (Unit
+ * 5's), Chinook, and the quizzes.
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
@@ -60,6 +61,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     unique constraint "badges_employee_id_key"', DETAIL 'Key
  *     (employee_id)=(1) already exists.', and badges still holds one row.
  *     employees ||--o{ devices and ||--o| badges are the lesson's diagram.
+ *     The lesson has no SQL for devices; check.mjs builds it to the
+ *     diagram's columns and stores devices 20 and 21 for employee 1, the two
+ *     rows that "share an employee id".
  *   - reading-er-diagrams: its shop model and its three sentences; its
  *     query returns Ada, order 101, line 1 Notebook quantity 2 and line 2 Pen
  *     quantity 3, "two notebooks and three pens"; Postgres lists exactly the

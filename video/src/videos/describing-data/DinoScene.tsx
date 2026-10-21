@@ -168,7 +168,7 @@ export const DinoScene: React.FC = () => {
                 <line x1={c.x0 - 4} x2={c.x0 + c.w + 4} y1={c.y0 + c.h + 4} y2={c.y0 + c.h + 4} stroke={HAIRLINE} strokeWidth={1.2} />
                 <line x1={c.x0 - 4} x2={c.x0 - 4} y1={c.y0 - 4} y2={c.y0 + c.h + 4} stroke={HAIRLINE} strokeWidth={1.2} />
                 {lit > 0 ? (
-                  <rect x={c.x0 - 10} y={c.y0 - 10} width={c.w + 20} height={c.h + 20} rx={6} fill="none" stroke={STAT} strokeWidth={2.6} opacity={lit} />
+                  <rect x={c.x0 - 7} y={c.y0 - 7} width={c.w + 14} height={c.h + 14} rx={6} fill="none" stroke={STAT} strokeWidth={2.6} opacity={lit} />
                 ) : null}
               </Svg>
               <Tag x={c.x0 + c.w / 2} y={c.y0 + c.h + 12} opacity={a} color={lit > 0.5 ? STAT_INK : INK_SOFT} size={20} bold={lit > 0.5}>

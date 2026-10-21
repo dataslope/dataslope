@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { DIE, num } from "./data";
-import { Big, Count, DATA, GOLD, GOLD_DEEP, GOLD_INK, Headline, Kicker, lerp, Pulse, Spot, STAT, STAT_INK, Svg, Sweep } from "./parts";
+import { Big, Count, DATA, GOLD_DEEP, GOLD_INK, Headline, Kicker, lerp, Pulse, Spot, STAT, STAT_INK, Svg, Sweep } from "./parts";
 
 /** The pmf: faces 1 to 6, a probability of 1 drawn 760 px tall. */
 const PMF = { x0: 240, pitch: 150, barW: 92, base: 690, unit: 760 } as const;
@@ -211,7 +211,7 @@ export const DieScene: React.FC = () => {
           </div>
         </React.Fragment>
       ))}
-      <Pulse x={fxv(DIE.mode)} y={base - h(PMF.unit * 0.25)} at={thatsSixAt - 4} r={40} color={GOLD} />
+      <Pulse x={fxv(DIE.mode)} y={base - h(PMF.unit * 0.25)} at={thatsSixAt - 4} r={40} color={GOLD_DEEP} />
       <Note at={likeliestAt} x={fxv(DIE.mode) - PMF.barW / 2 - 18} y={base - h(PMF.unit * 0.25) - 15} align="right">
         <span style={{ ...note(22, GOLD_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           the likeliest roll<span style={{ opacity: ease(frame, thatsSixAt - 4, 10) }}>: six</span>

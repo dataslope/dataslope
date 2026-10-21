@@ -45,7 +45,9 @@ const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }>
  * Part 2, one codebase under three names: POSTGRES (1986, built to be
  * extended, after Ingres, speaking POSTQUEL), Postgres95 (1994, Yu and Chen
  * give it SQL) and PostgreSQL (1996, kept going by volunteers), with the
- * name said the official way and the way everyone says it.
+ * name said the official way and the way everyone says it. Until the second
+ * card arrives, its columns show what POSTGRES was for (types you add) and
+ * what it lacked (one question in POSTQUEL, and in SQL).
  */
 export const PostgresScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -93,10 +95,10 @@ export const PostgresScene: React.FC = () => {
   const open = ease(frame, afterAt - 2, 14) * (1 - ease(frame, catchAt - 4, 14));
   const syllable = (i: number) => sayAt + ((butAt - sayAt) * i) / SYLLABLES.length;
 
-  // While POSTGRES stands alone, the two columns it will hand on to show what
-  // it was for: the types a conventional system came with and two it let you
-  // add, then the language it spoke beside the one that had won. Both clear
-  // before Postgres95 arrives.
+  // While POSTGRES stands alone, the two empty columns show what it was for:
+  // the types a commercial system came with and two it let you add, then
+  // the language it spoke beside the one that had won. Both clear before
+  // Postgres95 takes the middle column.
   const AX = XS[1];
   const asideOut = ninetyFourAt - 10;
   const SYL_TOP = TOP + H + 22;

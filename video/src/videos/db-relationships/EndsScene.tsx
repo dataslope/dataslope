@@ -283,6 +283,8 @@ export const EndsScene: React.FC = () => {
   const circleZeroAt = n.word("min", "circle means zero");
   const barOne2At = n.word("min", "bar means one");
   const oneFrom = n.beat("one").from;
+  const oneBoxAt = n.word("one", "one box");
+  const readAt = n.word("one", "read");
   const otherAt = n.word("one", "other box");
   const m2mTo = n.beat("m2m").to;
   const keyHits = KEY_HITS.map((k) => ({ glyph: k.glyph, at: n.word(k.beat, k.word) }));
@@ -310,17 +312,24 @@ export const EndsScene: React.FC = () => {
     const top = y(ROW_Y + i * ROW_STEP);
     const left = entityLayout({ x: LEFT_X, y: top, width: LEFT_W, name: r.left, columns: [] });
     const right = entityLayout({ x: RIGHT_X, y: top, width: RIGHT_W, name: r.right, columns: [] });
-    // The first row waits for the magnified ends to clear.
-    const start = i === 0 ? n.beat(r.beat).from + 10 : n.beat(r.beat).from;
+    // The first row waits for the magnified ends to clear, and is staged on
+    // the rule it demonstrates: its box on "one box", the line read across
+    // to the other box, and that end drawn as it is named.
+    const first = i === 0;
+    const start = first ? n.beat(r.beat).from + 10 : n.beat(r.beat).from;
     return {
       ...r,
       top,
       left,
       right,
       start,
+      leftAt: first ? oneBoxAt - 4 : start - 8,
+      rightAt: first ? readAt - 2 : start - 4,
+      lineAt: first ? readAt + 2 : start,
+      lineDur: first ? 26 : 14,
       // Never before its own line has started to draw. The first row's far
       // end arrives as the narration points at it ("the other box").
-      marksAt: Math.max(i === 0 ? otherAt : n.word(r.beat, r.marks), start + 8),
+      marksAt: Math.max(first ? otherAt : n.word(r.beat, r.marks), start + 8),
       readingAt: n.word(r.beat, r.readAt),
       exAt: n.word(r.beat, r.exampleAt),
       next: i + 1 < ROWS.length ? n.beat(ROWS[i + 1].beat).from : m2mTo + 30,
@@ -414,14 +423,14 @@ export const EndsScene: React.FC = () => {
             <React.Fragment key={r.beat}>
               <Glow c={endC} r={34} at={r.marksAt - 2} out={r.next} />
               {both ? <Glow c={[a[0] + 20, a[1]]} r={34} at={r.marksAt + 4} out={r.next} /> : null}
-              <Entity layout={r.left} at={r.start - 8} />
-              <Entity layout={r.right} at={r.start - 4} />
+              <Entity layout={r.left} at={r.leftAt} />
+              <Entity layout={r.right} at={r.rightAt} />
               <Link
                 name={`${r.left.name} to ${r.right.name}`}
                 points={[a, b]}
-                at={r.start}
-                dur={14}
-                from={{ kind: r.from, at: both ? r.marksAt + 4 : r.start + 8 }}
+                at={r.lineAt}
+                dur={r.lineDur}
+                from={{ kind: r.from, at: both ? r.marksAt + 4 : r.lineAt + 8 }}
                 to={{ kind: r.to, at: r.marksAt }}
               />
               <Ink at={r.readingAt - 2} dur={14} style={{ left: TEXT_X, top: r.top - 6, whiteSpace: "nowrap" }}>

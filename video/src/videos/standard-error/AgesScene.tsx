@@ -33,7 +33,7 @@ const PITCH = 19;
 const R = 8;
 /** The two brackets and the bell over them, about 25px of clear space
  *  between each row of labels. */
-const SD_Y = 500;
+const SD_Y = 490;
 const SE_Y = 420;
 const BELL_BASE = 398;
 const BELL_H = 50;

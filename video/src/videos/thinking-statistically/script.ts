@@ -46,7 +46,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     (five vanilla, two chocolate, three strawberry), whose mode is vanilla;
  *     the "Encoding traps" block's four zip codes, stored by pandas as int64,
  *     with mean 48,755.25, "forty-eight thousand, seven hundred and
- *     fifty-five"; its $42.50 price doubled is $85.00.
+ *     fifty-five"; its $42.50 price doubled is $85.00. On screen only:
+ *     that frame's price median, $14.12, beside its mean of $18.93, and the
+ *     ordered-categorical block's plan sizes, S/L/M/M/L/S/M, median M.
  *   - The claims without a number are the lessons' own: nominal data has no
  *     order and ordinal data has uneven gaps; a dtype is storage, not
  *     meaning; labels get counts and the mode, ranks a median, quantities a
@@ -116,7 +118,7 @@ export const script: NarrationScript = {
     {
       id: "process",
       text: "Behind every dataset is a process like this one. Customers deciding, machines running, demand rising and falling.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.7,
     },
     {
       id: "output",

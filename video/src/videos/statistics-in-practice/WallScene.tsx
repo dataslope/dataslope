@@ -153,6 +153,7 @@ export const WallScene: React.FC = () => {
   const tiltedAt = n.word("sin", "tilted");
   const luckFrom = n.beat("luck").from;
   const luckAt = n.word("luck", "lead is luck");
+  const evidenceAt = n.word("luck", "evidence");
   const pValueAt = n.word("lie", "p-value");
   const lieAt = n.word("lie", "lie");
   const liePhraseAt = n.word("lie", "suggested");
@@ -287,11 +288,16 @@ export const WallScene: React.FC = () => {
       <Ink at={tiltedAt - 4} dur={14} style={{ left: 1004, top: y(CARD_TO.y) + 74, whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, STAT_INK), fontWeight: 650 }}>tilted before it runs:</span>
       </Ink>
-      <Ink at={luckFrom - 2} dur={14} style={{ left: 1004, top: y(CARD_TO.y) + 108, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, STAT_INK) }}>
-          part of its lead is <Marker at={luckAt - 2}>luck</Marker>
-        </span>
-      </Ink>
+      <div style={{ position: "absolute", left: 1004, top: y(CARD_TO.y) + 108, display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...note(22, STAT_INK) }}>
+        <Ink at={luckFrom - 2} dur={14} style={{ position: "relative" }}>
+          <span style={{ ...note(22, STAT_INK) }}>
+            part of its lead is <Marker at={luckAt - 2}>luck,</Marker>
+          </span>
+        </Ink>
+        <Ink at={evidenceAt - 6} dur={14} style={{ position: "relative" }}>
+          <span style={{ ...note(22, STAT_INK) }}>counted as evidence</span>
+        </Ink>
+      </div>
 
       <div style={{ position: "absolute", left: 160, top: y(830), display: "flex", gap: "0.36em", whiteSpace: "nowrap", opacity: 1 - 0.6 * ease(frame, fromAt - 4, 14) }}>
         <Ink at={pValueAt - 6} dur={18} style={{ position: "relative" }}>

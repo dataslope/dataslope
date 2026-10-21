@@ -26,6 +26,8 @@ export const TabScene: React.FC = () => {
   const compileAt = n.word("tab", "Compile");
   const wasmAt = n.word("tab", "WebAssembly");
   const pgliteAt = n.word("tab", "PGlite");
+  const runningAt = n.word("tab", "running");
+  const browserAt = n.word("tab", "browser");
   const everyAt = n.word("tab", "every query");
   const courseAt = n.word("tab", "course");
   const askAt = n.word("version", "Ask");
@@ -103,7 +105,9 @@ export const TabScene: React.FC = () => {
       <Sfx name="el-scratch" at={refusesAt - 2} level={-30} />
       <Sfx name="el-chime" at={doesAt + 8} level={-32} />
 
-      <Headline at={compileAt - 4} lead="Postgres, in your browser." out={keptAt - 6} />
+      {/* The tab and the build chain open the scene on "Compile"; the headline
+          lands on the words it repeats. */}
+      <Headline at={runningAt - 6} lead="Postgres, in your browser." out={keptAt - 6} />
       <Headline at={keptAt - 2} lead="It kept its upbringing." out={takesAt - 6} />
       <Headline at={takesAt - 2} lead="It takes your rules" turn="seriously." turnAt={seriouslyAt - 4} out={knowAt - 6} />
       <Headline at={knowAt - 2} lead="Now you know" turn="why this one does." turnAt={knowAt + 8} />
@@ -178,7 +182,8 @@ export const TabScene: React.FC = () => {
                 border: `1.5px solid ${HAIRLINE}`,
                 borderBottom: "none",
                 ...label(20, INK),
-                transform: `scale(${1 + pulse(frame, courseAt - 2, 18) * 0.08})`,
+                // "in your browser" and "this course": the tab the reader has open.
+                transform: `scale(${1 + (pulse(frame, browserAt - 2, 18) + pulse(frame, courseAt - 2, 18)) * 0.08})`,
               }}
             >
               PGlite, in this tab

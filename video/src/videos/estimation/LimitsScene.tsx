@@ -41,6 +41,7 @@ export const LimitsScene: React.FC = () => {
   const limitsFrom = n.beat("limits").from;
   const informationAt = n.word("limits", "information");
   const reusesAt = n.word("limits", "reuses");
+  const haveAt = n.word("limits", "data you have");
   const biasedAt = n.word("biased", "biased sample");
   const carriesAt = n.word("biased", "carries");
   const confidentAt = n.word("biased", "confident");
@@ -74,7 +75,7 @@ export const LimitsScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the biased waits, their pile, the wall at the maximum, the spikes, the close ── */}
-      <Sfx name="el-sprinkle" at={biasedAt - 4} level={-34} />
+      <Sfx name="el-sprinkle" at={haveAt - 4} level={-34} />
       <Sfx name="el-sprinkle" at={carriesAt - 4} level={-35} />
       <Sfx name="el-tap" at={wrongAt - 4} level={-28} />
       <Sfx name="el-pencil" at={neverAt - 4} level={-33} />
@@ -102,7 +103,9 @@ export const LimitsScene: React.FC = () => {
           fill={`color-mix(in srgb, ${INK_SOFT} 10%, transparent)`}
         />
         {BIASED.values.map((v, j) => {
-          const a = ease(frame, biasedAt - 4 + j * 0.3, 7);
+          // "the data you have": the sample arrives as it is named; the band
+          // that shows what it never recorded follows on "biased".
+          const a = ease(frame, haveAt - 4 + j * 0.3, 7);
           if (a <= 0) return null;
           return <circle key={j} cx={sx(XL, v)} cy={y(L_STRIP) + h((JIT[j] - 0.5) * 30)} r={5.5 * a} fill={DATA} stroke={PAPER} strokeWidth={1} opacity={0.85} />;
         })}

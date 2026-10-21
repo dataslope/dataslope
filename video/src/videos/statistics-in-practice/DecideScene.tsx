@@ -68,6 +68,7 @@ export const DecideScene: React.FC = () => {
   const moneyAt = n.word("matter", "money");
   const littleAt = n.word("verdict", "as little as");
   const onlyAt = n.word("verdict", "only if");
+  const worthAt = n.word("verdict", "worth it");
   const testAt = n.word("tiny", "big enough test");
   const eightAt = n.word("tiny", "eight percent");
   const ohTwoAt = n.word("tiny", "point oh two");
@@ -217,7 +218,9 @@ export const DecideScene: React.FC = () => {
         <span style={{ ...note(22, INK_SOFT) }}>not math</span>
       </Ink>
       <Ink at={onlyAt - 4} dur={16} style={{ left: COL[1], top: y(OURS) + 58, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>ship only if 1 point is worth it</span>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>
+          ship only if <Marker at={worthAt - 4}>1 point is worth it</Marker>
+        </span>
       </Ink>
       <Cross x={COL[1] + 16} y={y(HUGE)} at={worthlessAt - 4} />
       <Ink at={worthlessAt - 2} dur={12} style={{ left: COL[1] + 46, top: y(HUGE) - 16, whiteSpace: "nowrap" }}>

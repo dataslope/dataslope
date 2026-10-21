@@ -88,8 +88,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     differ.
  *   - The close is the callout "The thread connecting half of these": the
  *     analysis was shaped by the data instead of decided in advance. It
- *     names five traps, three of them in this video, hence "three of these
- *     traps"; the cure is "decide first, then look, then confirm on fresh
+ *     names five traps, three of them in this video, hence "of these traps,
+ *     three"; the cure is "decide first, then look, then confirm on fresh
  *     data".
  *
  * Written for the ear: short spoken sentences, no symbols or parentheses,
@@ -340,7 +340,7 @@ export const script: NarrationScript = {
     {
       id: "close",
       scene: true,
-      text: "Three of these traps share one flaw. The analysis was shaped by the data, instead of decided in advance.",
+      text: "Of these traps, three share one flaw. The analysis was shaped by the data, instead of decided in advance.",
       pauseAfter: 0.7,
     },
     { id: "next", text: "The cure is the same each time... decide what you'll test, before you look." },

@@ -43,8 +43,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *   - "The schema shapes everything built on it" (initSql and starterCode
  *     verbatim): which customers bought a notebook returns one row, Ada
  *     Lovelace, ada@example.com (she bought notebooks in orders 101 and
- *     103, so DISTINCT folds them). The free-text note "Ada bought 2
- *     notebooks and 5 pens" is the lesson's.
+ *     103, so DISTINCT folds them). It is the lesson's second dataset, not
+ *     the flat table's: the same names, but here Grace Hopper's one order
+ *     (102) is a backpack, so Fig. 4 is "another shop" and Fig. 5 says so.
+ *     The free-text note "Ada bought 2 notebooks and 5 pens" is the
+ *     lesson's, and is one order (101) in this shop.
  *   - design-and-data-quality opens on bad data that "starts as one missing
  *     email, one misspelled status, one order pointing to no customer". The
  *     video's three rows are its own, one per rule the shop schema already
@@ -64,7 +67,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     in lb-sec instead of the specified and expected units of Newton-sec",
  *     so the small-force changes were "low by a factor of 4.45"; the
  *     periapsis came to 57 km, "too low for spacecraft survival". 4.45 is
- *     also check.mjs's 0.45359237 kg times 9.80665 m/s², 4.448.
+ *     also check.mjs's 0.45359237 kg times 9.80665 m/s², 4.448: read as
+ *     newton-seconds, every pound-force-second value came out "about four
+ *     and a half times too small" ("unit"). "A column named for its unit"
+ *     is design-and-data-quality's "a clear name like total_cents or
+ *     mass_kg" that says what a number means.
  *
  * Written for Drew's voice, casual and curious: short spoken sentences, no
  * symbols or parentheses, numbers as words, contractions, questions the next

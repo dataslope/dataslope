@@ -208,7 +208,7 @@ export const CasesScene: React.FC = () => {
             [1, "1"],
           ] as const
         ).map(([p, t]) => (
-          <text key={p} x={CH.x0 - 12} y={fy(p) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}>
+          <text key={p} x={CH.x0 - 12} y={fy(p) + 8} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
             {t}
           </text>
         ))}
