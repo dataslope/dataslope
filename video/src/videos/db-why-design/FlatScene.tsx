@@ -6,7 +6,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { ADA, F, FIXED_ROW, FLAT, GROUPED, GROUPED_ADA, MISSED_ROW, NEW_EMAIL } from "./data";
+import { ADA, F, FIXED_ROW, FLAT, GROUPED, GROUPED_ADA, MISSED_ROW, NEW_EMAIL, rowsChanged } from "./data";
 import {
   DbTable,
   Drift,
@@ -42,10 +42,10 @@ export const FlatScene: React.FC = () => {
 
   // ── Cues ──
   const hookFrom = n.beat("hook").from;
+  const databaseAt = n.word("hook", "database");
   const rarelyAt = n.word("hook", "rarely");
   const dayAt = n.word("hook", "day");
-  const oneTableAt = n.word("table", "One");
-  const fieldAt = n.word("table", "every");
+  const everyAt = n.word("table", "every");
   const ordersAt = n.word("table", "orders");
   const worksAt = n.word("table", "screen");
   const adaAt = n.word("twice", "Ada's");
@@ -84,6 +84,7 @@ export const FlatScene: React.FC = () => {
       {rowAts.map((t, i) => (
         <Sfx key={i} name="el-tap" at={t} level={-29} />
       ))}
+      <Sfx name="el-pencil" at={everyAt - 4} level={-37} />
       <Sfx name="el-pencil" at={changesAt - 4} level={-34} />
       <Sfx name="el-pop" at={swapAt} level={-29} />
       <Sfx name="el-scratch" at={twoAt + 4} level={-31} />
@@ -93,13 +94,19 @@ export const FlatScene: React.FC = () => {
       <Headline lead="One person," turn="two emails." at={twoAt - 2} turnAt={twoAt + 8} />
 
       <Drift from={hookFrom} to={end} amount={0.016} origin="40% 60%">
-        <FigLabel n="1" title="One table for everything" at={oneTableAt - 4} x={X0} y={y(FIG_Y)} />
+        {/* The table and its columns from the first mention of a database; its rows with "a few orders". */}
+        <FigLabel n="1" title="One table for everything" at={databaseAt - 4} x={X0} y={y(FIG_Y)} />
+        <Note at={databaseAt + 4} x={g.x + g.width} y={y(FIG_Y) + 3} align="right">
+          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, whiteSpace: "nowrap" }}>{FLAT.table}</span>
+        </Note>
         <DbTable
           g={g}
           cols={FLAT.cols}
           rows={FLAT.rows.map((cells, i) => ({ cells, at: rowAts[i] }))}
-          at={fieldAt - 4}
+          at={databaseAt}
           numeric={[F.id, F.qty]}
+          // "every field in it": the column titles light one after another.
+          headMarks={FLAT.cols.map((_, j) => ({ col: j, at: everyAt - 4 + j * 4, out: ordersAt - 6 }))}
           swaps={[{ row: FIXED_ROW, col: F.email, at: swapAt, value: NEW_EMAIL }]}
           marks={[
             ...adaRows.map((r, k) => ({ row: r, col: F.name, at: adaAt + k * 5, out: changesAt })),
@@ -129,8 +136,9 @@ export const FlatScene: React.FC = () => {
           marks={[{ line: 2, at: oneOhOneAt - 2 }]}
         />
         <Ink at={swapAt + 4} dur={14} style={{ left: RIGHT_X, top: replyTop, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-          <span style={label(21, INK_SOFT)}>Postgres replies</span>
+          <span style={label(21, INK_SOFT)}>Postgres replied</span>
           <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: INK }}>UPDATE {FLAT.updated}</span>
+          <span style={note(21, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
         </Ink>
         <Note at={missesAt + 2} x={RIGHT_X} y={replyTop + 58}>
           <div style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>Order {FLAT.rows[MISSED_ROW][F.id]} still has the old one.</div>

@@ -1,13 +1,14 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead } from "../../components/arrow";
+import { type Cardinality, MARKER, markerLength, relationEnd } from "../../components/crowsfoot";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -520,6 +521,8 @@ export const tableGeometry = ({
 export type TableRow = { cells: readonly TCell[]; at: number; dimAt?: number };
 export type CellMark = { row: number; col: number; at: number; out?: number; color?: string };
 export type CellSwap = { row: number; col: number; at: number; value: string; color?: string };
+/** A wash over a column's title, swept on `at` and lifted on `out`. */
+export type HeadMark = { col: number; at: number; out?: number };
 
 /** A soft left-to-right wipe for inline text, the Ink reveal's mask. */
 const wipe = (p: number): React.CSSProperties => {
@@ -588,7 +591,8 @@ export const DbTable: React.FC<{
   colInk?: Readonly<Record<number, string>>;
   marks?: readonly CellMark[];
   swaps?: readonly CellSwap[];
-}> = ({ g, cols, rows, at, out, dim, numeric = [], colInk = {}, marks = [], swaps = [] }) => {
+  headMarks?: readonly HeadMark[];
+}> = ({ g, cols, rows, at, out, dim, numeric = [], colInk = {}, marks = [], swaps = [], headMarks = [] }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 16);
   const o = out === undefined ? 0 : ease(frame, out, 12);
@@ -613,11 +617,29 @@ export const DbTable: React.FC<{
       <div style={{ position: "absolute", left: g.x, top: g.top + g.headH - 1, width: g.width * p, height: 1, background: HAIRLINE }} />
       <div style={{ position: "absolute", left: g.x, top: bottom - 1, width: g.width * p, height: 1.5, background: INK }} />
       <Ink at={at + 2} dur={14} style={{ left: g.x, top: g.top, width: g.width, height: g.headH, display: "flex", alignItems: "center" }}>
-        {cols.map((c, j) => (
-          <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}>
-            {c}
-          </div>
-        ))}
+        {cols.map((c, j) => {
+          const hm = headMarks.find((m) => m.col === j);
+          const w = hm ? ease(frame, hm.at, 10) : 0;
+          const lift = hm?.out === undefined ? 0 : ease(frame, hm.out, 12);
+          return (
+            <div key={c} style={{ ...cellBox(j), fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: INK_SOFT }}>
+              <span style={{ position: "relative", display: "inline-block" }}>
+                {w > 0 && lift < 1 ? (
+                  <span
+                    style={{
+                      position: "absolute",
+                      inset: "0.02em -0.28em",
+                      background: MARK,
+                      clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
+                      opacity: 1 - lift,
+                    }}
+                  />
+                ) : null}
+                <span style={{ position: "relative" }}>{c}</span>
+              </span>
+            </div>
+          );
+        })}
       </Ink>
       {rows.map((r, i) => {
         const top = g.rowTop(i);
@@ -756,6 +778,107 @@ export const RowBracket: React.FC<{ x: number; y0: number; y1: number; at: numbe
         strokeLinejoin="round"
         pathLength={1}
         strokeDasharray={`${p} 1`}
+      />
+    </Svg>
+  );
+};
+
+// ── A diagram's key ──────────────────────────────────────────────────────────
+
+/** A column badge as an entity box sets it (editorial/erd.tsx): bold, in the
+ *  key blue. */
+export const Badge: React.FC<{ children: React.ReactNode; size?: number }> = ({ children, size = 20 }) => (
+  <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: size, color: BLUE_INK, whiteSpace: "nowrap" }}>{children}</span>
+);
+
+/** A relationship end as the diagrams draw it (crowsfoot.ts), on a short
+ *  stub of line meeting an entity's edge on the right. */
+export const EndGlyph: React.FC<{ kind: Cardinality }> = ({ kind }) => {
+  const h = 30;
+  const mid = h / 2;
+  const w = Math.ceil(markerLength(kind) + 20);
+  const m = relationEnd([w - 2, mid], [0, mid], kind, MARKER);
+  return (
+    <svg width={w} height={h} style={{ overflow: "visible", flex: "none" }}>
+      <line x1={0} y1={mid} x2={w - 2} y2={mid} stroke={INK} strokeWidth={2.4} strokeLinecap="round" />
+      <line x1={w - 1} y1={2} x2={w - 1} y2={h - 2} stroke={INK} strokeWidth={2} />
+      {m.lines.map(([a, b], i) => (
+        <line key={i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} stroke={INK} strokeWidth={2.4} strokeLinecap="round" />
+      ))}
+      {m.rings.map((r, i) => (
+        <circle key={i} cx={r.c[0]} cy={r.c[1]} r={r.r} fill={PAPER} stroke={INK} strokeWidth={2.4} />
+      ))}
+    </svg>
+  );
+};
+
+/** One entry of a figure's key: a badge or a relationship end, and what it
+ *  means, arriving on `at` (the word that says it). */
+export type KeyEntry = { at: number; badge?: string; end?: Cardinality; text: string };
+
+/**
+ * A figure's key, at the right end of its label line (where a legend goes),
+ * ending at `right`. Each entry arrives on its own cue, so the notation is
+ * read as the narration reaches what it marks. `top` is a page y.
+ */
+export const FigKey: React.FC<{ entries: readonly KeyEntry[]; right: number; top: number }> = ({ entries, right, top }) => {
+  const frame = useCurrentFrame();
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        width: right,
+        top,
+        height: 30,
+        display: "flex",
+        justifyContent: "flex-end",
+        alignItems: "center",
+        gap: 30,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {entries.map((e) => {
+        const p = ease(frame, e.at, 12);
+        return (
+          <span
+            key={e.text}
+            style={{ display: "inline-flex", alignItems: "center", gap: 9, opacity: p, transform: `translateY(${(1 - p) * 6}px)` }}
+          >
+            {e.badge ? <Badge>{e.badge}</Badge> : null}
+            {e.end ? <EndGlyph kind={e.end} /> : null}
+            <span style={{ ...note(21, INK_SOFT) }}>{e.text}</span>
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
+/** A square bracket on the left of what it spans, opening toward it. Its two
+ *  ends move to `y0`/`y1` as they change, so one bracket can widen its reach. */
+export const SpanBracket: React.FC<{ x: number; y0: number; y1: number; at: number; color?: string; dashed?: boolean; opacity?: number }> = ({
+  x,
+  y0,
+  y1,
+  at,
+  color = ACCENT,
+  dashed = false,
+  opacity = 1,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 12);
+  if (p <= 0 || opacity <= 0) return null;
+  return (
+    <Svg opacity={p * opacity}>
+      <path
+        d={`M${x + 12},${y0} H${x} V${y1} H${x + 12}`}
+        fill="none"
+        stroke={color}
+        strokeWidth={3}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        strokeDasharray={dashed ? "7 7" : undefined}
       />
     </Svg>
   );

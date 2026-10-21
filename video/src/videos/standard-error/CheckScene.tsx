@@ -19,6 +19,7 @@ import {
   label,
   note,
   PAPER,
+  TABULAR,
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -26,7 +27,8 @@ import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { CHECK, histogram, mulberry32 } from "./data";
 import { Marked, Span } from "./parts";
-import { Marker } from "../sampling/emphasis";
+import { Marker, swell } from "../sampling/emphasis";
+import { useFigNumber } from "../sampling/merged";
 
 /** One x-axis for both figures, so an average falls straight down from the
  *  population to the place it lands, and the pile's width compares with the
@@ -66,10 +68,10 @@ export const CheckScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
+  const fig = useFigNumber();
 
   // ── Cues ──
   const checkFrom = n.beat("check").from;
-  const popAt = n.word("pop", "population");
   const twentyFiveAt = n.word("pop", "twenty-five");
   const drawAt = n.word("pop", "Draw");
   const averageAt = n.word("pop", "average");
@@ -83,7 +85,12 @@ export const CheckScene: React.FC = () => {
   const closeAt = n.word("match", "Close");
   // The stage is set as the check is announced; and once one sample's
   // shortcut lands close, the ten thousand repeats ease back.
+  // The population is on the page from the scene's first beat, so "let's
+  // check it" is not spoken over the headline alone.
+  const stageAt = checkFrom + 4;
   const checkItAt = n.word("check", "check it");
+  // "Here's a population": the bars swell as it is named.
+  const populationAt = n.word("pop", "population");
   const repeatingAt = n.word("match", "repeating");
   const notNeeded = 1 - 0.6 * ease(frame, repeatingAt - 2, 22);
 
@@ -117,7 +124,7 @@ export const CheckScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the population, a sample, the first average landing, the
           thousands, the two spreads ── */}
-      <Sfx name="el-pop" at={popAt - 4} level={-30} />
+      <Sfx name="el-pop" at={stageAt} level={-30} />
       <Sfx name="el-sprinkle" at={drawAt} level={-34} />
       <Sfx name="el-tap" at={steps[0].d + DROP} level={-28} />
       <Sfx name="el-sprinkle" at={fastFrom} level={-33} />
@@ -125,7 +132,7 @@ export const CheckScene: React.FC = () => {
       <Sfx name="el-tap" at={sevenAt - 2} level={-29} />
 
       <div style={{ position: "absolute", left: 92, top: y(112), display: "flex", gap: "0.26em", ...headline(56), whiteSpace: "nowrap" }}>
-        <Ink at={checkFrom - 6} dur={20} style={{ position: "relative" }}>
+        <Ink at={checkItAt - 6} dur={20} style={{ position: "relative" }}>
           Check it the long way:
         </Ink>
         <Ink at={thousandAt - 4} dur={18} style={{ position: "relative", ...headline(56, true), color: ACCENT_INK }}>
@@ -134,17 +141,17 @@ export const CheckScene: React.FC = () => {
       </div>
 
       {/* ── Fig. 3: the population ── */}
-      <FigLabel n="3" title={`A population of ${CHECK.popSize.toLocaleString("en-US")} values, centered on ${CHECK.mu}`} at={checkItAt - 4} x={160} y={y(200)} />
+      <FigLabel n={fig(3)} title={`A population of ${CHECK.popSize.toLocaleString("en-US")} values, centered on ${CHECK.mu}`} at={stageAt - 4} x={160} y={y(200)} />
       <Bars
         counts={CHECK.popHist.counts}
         lo={CHECK.popHist.lo}
         bin={CHECK.popHist.bin}
         scale={X}
         base={y(POP_BASE)}
-        unit={h(POP_UNIT)}
-        grow={(i) => ease(frame, popAt - 4 + Math.abs(i - 25) * 0.6, 14)}
+        unit={h(POP_UNIT) * swell(frame, populationAt - 2, 0.12, 20)}
+        grow={(i) => ease(frame, stageAt + Math.abs(i - 25) * 0.6, 14)}
       />
-      <Axis scale={X} base={y(POP_BASE)} ticks={TICKS} at={checkItAt} />
+      <Axis scale={X} base={y(POP_BASE)} ticks={TICKS} at={stageAt - 2} />
       <Span
         x0={sx(X, CHECK.mu - CHECK.sigma)}
         x1={sx(X, CHECK.mu + CHECK.sigma)}
@@ -165,7 +172,7 @@ export const CheckScene: React.FC = () => {
       </Note>
 
       {/* ── Fig. 4: the averages ── */}
-      <FigLabel n="4" title={`The average of each sample of ${CHECK.n}`} at={drawAt - 4} x={160} y={y(568)} />
+      <FigLabel n={fig(4)} title={`The average of each sample of ${CHECK.n}`} at={drawAt - 4} x={160} y={y(568)} />
       <Axis scale={X} base={y(MEANS_BASE)} ticks={TICKS} at={drawAt - 2} />
       <div style={{ position: "absolute", inset: 0, opacity: notNeeded }}>
         <Bars
@@ -201,7 +208,7 @@ export const CheckScene: React.FC = () => {
         <div
           style={{
             ...headline(104),
-            fontVariantNumeric: "tabular-nums lining-nums",
+            ...TABULAR,
             marginTop: 6,
             color: k >= CHECK.samples ? INK : ACCENT_INK,
           }}
@@ -216,7 +223,7 @@ export const CheckScene: React.FC = () => {
         <div style={label(20, INK_SOFT)}>Spread of the {CHECK.samples.toLocaleString("en-US")} averages</div>
       </Ink>
       <Ink at={fiveAt - 2} dur={14} style={{ left: COL, top: y(612), display: "flex", alignItems: "baseline", gap: 16 }}>
-        <span style={{ ...headline(64), color: ACCENT_INK, fontVariantNumeric: "tabular-nums lining-nums" }}>
+        <span style={{ ...headline(64), color: ACCENT_INK, ...TABULAR }}>
           <Marked at={fiveAt + 6} color={HIGHLIGHT}>
             {fmt(CHECK.measured)}
           </Marked>
@@ -225,10 +232,13 @@ export const CheckScene: React.FC = () => {
       </Ink>
       <Ink at={oneAt - 4} dur={14} style={{ left: COL, top: y(708), width: 384 }}>
         <div style={{ height: 1, background: HAIRLINE, marginBottom: 16 }} />
-        <div style={label(20, INK_SOFT)}>From one sample, s ÷ √{CHECK.n}</div>
+        {/* The sample's own s, which stands in for σ: where 3.67 comes from. */}
+        <div style={label(20, INK_SOFT)}>
+          One sample: s = {fmt(CHECK.oneSampleSd)}, ÷ √{CHECK.n}
+        </div>
       </Ink>
       <Ink at={sevenAt - 2} dur={14} style={{ left: COL, top: y(772), display: "flex", alignItems: "baseline", gap: 16 }}>
-        <span style={{ ...headline(64), fontVariantNumeric: "tabular-nums lining-nums" }}>
+        <span style={{ ...headline(64), ...TABULAR }}>
           <Marker at={closeAt - 2}>{fmt(CHECK.estimated)}</Marker>
         </span>
         <span style={{ ...body(28, true) }}>estimated</span>

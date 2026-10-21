@@ -102,6 +102,9 @@ out["lln"] = {
     "maxOffEarly": r(np.abs(running_prop[:100] - 0.5).max(), 3),
     "maxOffLate": r(np.abs(running_prop[999:] - 0.5).max(), 3),
     "first10": [int(f) for f in flips[:10]],
+    # The run's first five heads in a row, as the flip it starts on (1-based):
+    # where the video puts the gambler's-fallacy streak on the chart.
+    "streakFrom": next(k for k in range(n - 4) if flips[k : k + 5].all()) + 1,
 }
 say(
     f"  lln: first ten flips {flips[:10].tolist()}, widest miss before 100 flips "

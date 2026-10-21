@@ -2,9 +2,10 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
+import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Head, KEY_INK, Kicker, Pulse, Spot, Tag } from "./parts";
+import { Drift, FIG_ABOVE, Head, KEY_INK, Kicker, Pulse, Spot, Tag } from "./parts";
 
 /**
  * Part 1 opens: one customer, many orders, as the lesson's own ER diagram
@@ -19,7 +20,6 @@ export const OneManyScene: React.FC = () => {
   const customerAt = n.word("many", "customer", { nth: 1 });
   const ordersAt = n.word("many", "lots of orders");
   const belongsAt = n.word("many", "belongs");
-  const justOneAt = n.word("many", "just one");
   const barsAt = n.word("ends", "Two bars");
   const exactlyAt = n.word("ends", "exactly one");
   const footAt = n.word("ends", "crow's foot");
@@ -29,7 +29,7 @@ export const OneManyScene: React.FC = () => {
 
   const customers = useEntityLayout({
     x: 200,
-    y: y(450),
+    y: y(440),
     width: 380,
     name: "customers",
     columns: [
@@ -40,7 +40,7 @@ export const OneManyScene: React.FC = () => {
   });
   const orders = useEntityLayout({
     x: 1060,
-    y: y(430),
+    y: y(440),
     width: 420,
     name: "orders",
     columns: [
@@ -68,8 +68,11 @@ export const OneManyScene: React.FC = () => {
       <Spot id="db-relationship-patterns-basket" at={ordersAt + 4} left={1560} top={y(66)} width={270} height={270} />
 
       <Drift from={belongsAt} to={holdsAt + 60} scale={0.02} origin={[midX, y(600)]}>
+        <FigLabel n="3" title="Customers and orders, as an ER diagram" at={customerAt - 6} x={customers.x} y={customers.top - FIG_ABOVE} />
         <Entity layout={customers} at={customerAt - 4} />
-        <Entity layout={orders} at={ordersAt - 2} marks={{ customer_id: { at: justOneAt, tone: "key" } }} />
+        {/* No wash on customer_id here: "which table holds the link?" is
+            asked at the end of this scene and answered in the next. */}
+        <Entity layout={orders} at={ordersAt - 2} />
         <Relation
           name="customers places orders"
           points={[c, [midX, c[1]], [midX, o[1]], o]}

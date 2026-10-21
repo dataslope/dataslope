@@ -23,7 +23,7 @@ import { useLayout } from "../../editorial/layout";
 import {
   ACCENT,
   ACCENT_INK,
-  BAR,
+  BLUE_INK,
   body,
   fmt,
   headline,
@@ -32,8 +32,11 @@ import {
   note,
   PAPER,
   label,
+  TABULAR,
 } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
+import { ds } from "../../theme/brand";
+import { useFigNumber } from "../sampling/merged";
 import { PartName } from "../sampling/PartName";
 
 /** One x-axis for both figures, so an average falls straight down from the
@@ -50,6 +53,10 @@ const STRIP_Y = 470;
 const TICKS = [0, 10, 20, 30, 40, 50];
 const MEDIAN = [...WAITS].sort((a, b) => a - b)[POP_SIZE / 2];
 const N30 = SPREADS[1];
+/** Raw values are blue, a sample's in a deeper blue; a statistic (each
+ *  average, and the pile of them) takes the accent, as in the parts of
+ *  Unit 5 on either side of this one. */
+const SAMPLE_FILL = ds("blue", 800);
 
 /** Seeded vertical jitter for the sampled dots, so they read as a strip. */
 const JITTER = (() => {
@@ -78,6 +85,7 @@ export const BuildScene: React.FC = () => {
   const { fps } = useVideoConfig();
   const n = useNarration();
   const { y, h, pts } = useLayout();
+  const fig = useFigNumber();
 
   // ── Cues ──
   const lopsidedAt = n.word("hook", "lopsided");
@@ -107,7 +115,9 @@ export const BuildScene: React.FC = () => {
   const m = ease(frame, morphAt, 26);
   const popBase = lerp(860, 420, m);
   const popUnit = lerp(400, 190, m) / POP_MAX;
-  const p1Out = morphAt - 6;
+  // The finished first figure (average, spread) holds a second after the
+  // sentence that reads it; "center" carries the pause.
+  const p1Out = morphAt - 4;
 
   // ── The first three samples, choreographed; then two thousand ──
   const steps = [
@@ -210,7 +220,7 @@ export const BuildScene: React.FC = () => {
 
       {/* FIG. 1 label: under the headline, then at the top of the page. */}
       <FigLabel
-        n="1"
+        n={fig(1)}
         title="Ten thousand coffee shop waits, in minutes"
         at={14}
         x={160}
@@ -303,7 +313,7 @@ export const BuildScene: React.FC = () => {
       {active >= 0 ? <SampleDots step={steps[active]} index={active} /> : null}
       {fastSample >= 0 ? <FastDots index={fastSample} /> : null}
 
-      <FigLabel n="2" title="The average wait in each sample of 30" at={figTwoAt} x={160} y={y(560)} />
+      <FigLabel n={fig(2)} title="The average wait in each sample of 30" at={figTwoAt} x={160} y={y(560)} />
       <Axis scale={X} base={y(MEANS_BASE)} ticks={TICKS} at={figTwoAt} opacity={meansFig} format={minutes} />
       <Bars
         counts={counts}
@@ -312,7 +322,8 @@ export const BuildScene: React.FC = () => {
         scale={X}
         base={y(MEANS_BASE)}
         unit={h(unit)}
-        overlay={frame < fastTo + 6 ? { counts: recent, color: ACCENT } : undefined}
+        color={ACCENT}
+        overlay={frame < fastTo + 6 ? { counts: recent, color: ds("red", 800) } : undefined}
       />
       {steps.map((st, i) => (
         <FallingBlock key={i} step={st} index={i} drop={DROP} />
@@ -324,9 +335,9 @@ export const BuildScene: React.FC = () => {
         <div
           style={{
             ...headline(124),
-            fontVariantNumeric: "tabular-nums lining-nums",
+            ...TABULAR,
             marginTop: 6,
-            color: k >= SAMPLE_COUNT ? INK : BAR,
+            color: k >= SAMPLE_COUNT ? INK : ACCENT_INK,
           }}
         >
           {k.toLocaleString("en-US")}
@@ -347,21 +358,31 @@ export const BuildScene: React.FC = () => {
         count={SAMPLE_COUNT}
         bin={MEAN_BIN}
         at={bellAt - 2}
-        color={ACCENT}
+        color={INK}
+        width={2.4}
       />
       <BrassBell at={bellAt} />
-      <Leader
-        points={pts([
-          [sx(X, N30.center), MEANS_BASE],
-          [sx(X, N30.center), 236],
-        ])}
-        at={centeredAt - 2}
-        dur={18}
-        dot={false}
-        color={ACCENT}
-        width={2}
-        dash="7 6"
-      />
+      {/* The pile's center, up through the population: broken where it would
+          cross Fig. 2's title and Fig. 1's tick labels. */}
+      {[
+        [MEANS_BASE, 598],
+        [552, 456],
+        [420, 236],
+      ].map(([from, to], i) => (
+        <Leader
+          key={i}
+          points={pts([
+            [sx(X, N30.center), from],
+            [sx(X, N30.center), to],
+          ])}
+          at={centeredAt - 2 + i * 4}
+          dur={14}
+          dot={false}
+          color={INK}
+          width={2}
+          dash="7 6"
+        />
+      ))}
       <Note at={centeredAt + 4} x={sx(X, N30.center) + 14} y={y(512)}>
         <span style={note(23, ACCENT_INK)}>
           <b>Centered on {fmt(N30.center)} min.</b>{" "}
@@ -406,8 +427,8 @@ const SpreadArrow: React.FC<{ from: number; to: number; y: number; at: number; o
 
 type Step = { s: number; c: number; d: number; stagger: number; collapse: number };
 
-/** One sample of thirty as red dots under the population, which then slide
- *  together into their average. */
+/** One sample of thirty as deep-blue dots under the population, which then
+ *  slide together into their average and turn the accent as they meet. */
 const SampleDots: React.FC<{ step: Step; index: number }> = ({ step, index }) => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
@@ -429,7 +450,7 @@ const SampleDots: React.FC<{ step: Step; index: number }> = ({ step, index }) =>
               cx={x}
               cy={y(lerp(STRIP_Y + JITTER[j] * 44, STRIP_Y + 22, c))}
               r={6.5 * appear}
-              fill={ACCENT}
+              fill={c > 0.5 ? ACCENT : SAMPLE_FILL}
               stroke={PAPER}
               strokeWidth={1.5}
               opacity={1 - c * 0.7}
@@ -440,7 +461,7 @@ const SampleDots: React.FC<{ step: Step; index: number }> = ({ step, index }) =>
       {index === 0 ? (
         <>
           <Note at={step.s + 4} x={1180} y={y(STRIP_Y + 62)} out={step.c}>
-            <span style={label(20, ACCENT_INK)}>30 customers, picked at random</span>
+            <span style={label(20, BLUE_INK)}>30 customers, picked at random</span>
           </Note>
           <div
             style={{
@@ -465,9 +486,9 @@ const SampleDots: React.FC<{ step: Step; index: number }> = ({ step, index }) =>
 const FastDots: React.FC<{ index: number }> = ({ index }) => {
   const { y } = useLayout();
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 0.55 }}>
+    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 0.7 }}>
       {SAMPLES_30[index].values.map((v, j) => (
-        <circle key={j} cx={sx(X, Math.min(v, 50))} cy={y(STRIP_Y + JITTER[j] * 44)} r={5} fill={ACCENT} />
+        <circle key={j} cx={sx(X, Math.min(v, 50))} cy={y(STRIP_Y + JITTER[j] * 44)} r={5} fill={SAMPLE_FILL} />
       ))}
     </svg>
   );

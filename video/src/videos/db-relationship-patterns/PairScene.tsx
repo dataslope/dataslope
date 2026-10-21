@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, INK, label } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { ACCENT_INK, INK, label, TABULAR } from "../../editorial/style";
+import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { JT } from "./data";
@@ -12,6 +12,7 @@ import {
   DbTable,
   Drift,
   ErrorBox,
+  FIG_ABOVE,
   HEAD_H,
   Head,
   KEY,
@@ -33,8 +34,9 @@ const TABLE_Y = 410;
 const LIST_X = 860;
 const LIST_W = 900;
 const LIST_SIZE = 24;
-/** Six rows fit under the headline at this height (before `h()`). */
-const TABLE_ROW_H = 56;
+/** Seven rows (four shown, the rows left out, Linus's twice) fit under the
+ *  headline at this height (before `h()`). */
+const TABLE_ROW_H = 52;
 
 /**
  * Part 3 opens: in a junction table the pair of foreign keys is the primary
@@ -68,7 +70,9 @@ export const PairScene: React.FC = () => {
     headH: h(HEAD_H),
     rowH: h(TABLE_ROW_H),
   });
-  const linus = JT.rows.length;
+  // The rows the table leaves out, between the four shown and Linus's.
+  const elided = JT.rows.length;
+  const linus = elided + 1;
   const listTop = y(TABLE_Y);
   const listH = listingHeight(JT.insertSql.length, LIST_SIZE);
   const lineAt = JT.insertSql.map((_, i) => enrollAt - 2 + i * 4);
@@ -80,6 +84,10 @@ export const PairScene: React.FC = () => {
   const by = g.top - 14;
   const mid = (bx0 + bx1) / 2;
   const count = frame >= rowAt ? JT.after : JT.before;
+  // The table's name sits over its "primary key" tag; both figures' labels
+  // share one line above it.
+  const nameY = g.top - 100;
+  const figY = nameY - FIG_ABOVE;
 
   return (
     <AbsoluteFill>
@@ -113,7 +121,8 @@ export const PairScene: React.FC = () => {
             primary key
           </span>
         </Ink>
-        <Caption at={from - 2} x={g.x} y={g.top - 100}>
+        <FigLabel n="9" title="Two columns, one primary key" at={from - 4} x={g.x} y={figY} />
+        <Caption at={from - 2} x={g.x} y={nameY}>
           enrollments
         </Caption>
         <DbTable
@@ -121,6 +130,7 @@ export const PairScene: React.FC = () => {
           cols={JT.rowCols}
           rows={[
             ...JT.rows.map((cells, i) => ({ cells, at: from + 2 + i * 4 })),
+            { cells: [], note: `… ${JT.before - JT.rows.length} more rows`, at: from + 2 + elided * 4 },
             { cells: JT.linusRow, at: rowAt - 2, grow: true },
             { cells: JT.linusRow, at: againAt + 8, grow: true, ghostAt: noAt, strikeAt: existsAt + 6 },
           ]}
@@ -142,10 +152,13 @@ export const PairScene: React.FC = () => {
           bands={[{ row: linus, at: rowAt + 4, color: MARK_OK }]}
         />
         <Ink at={identityAt} dur={14} style={{ left: g.x, top: g.rowTop(linus + 2) + 22, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, frame >= rowAt ? OK_INK : INK), fontWeight: 600 }}>{count} rows in all</span>
+          <span style={{ ...label(22, frame >= rowAt ? OK_INK : INK), fontWeight: 600 }}>
+            <span style={TABULAR}>{count}</span> rows in all
+          </span>
         </Ink>
 
         {/* ── The lesson's challenge, run twice ── */}
+        <FigLabel n="10" title="The lesson's challenge, run twice" at={enrollAt - 8} x={LIST_X} y={figY} />
         <Caption at={enrollAt - 6} x={LIST_X} y={listTop - 48}>
           Enroll Linus in Math
         </Caption>

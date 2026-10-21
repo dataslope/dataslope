@@ -4,9 +4,11 @@ import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, halo, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
-import { useMergedPart } from "../sampling/merged";
+import { Bridge } from "../sampling/Bridge";
+import { Marker, swell } from "../sampling/emphasis";
+import { useFigNumber } from "../sampling/merged";
 import { Sfx } from "../../sound/Sfx";
 import { CLOSE, shapeOf, TRUE_MEAN, type Spread } from "./data";
 import { Arrow, Bracket, between, EASY, EASY_INK, RANDOM_INK, TruthLine } from "./parts";
@@ -28,13 +30,11 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 /** Spreads morph on a log scale, so the squeeze reads as steady. */
 const lerpLog = (a: number, b: number, t: number) => Math.exp(lerp(Math.log(a), Math.log(b), t));
 
-type State = { center: number; spread: number; lo: number; hi: number; shape: number[] };
-const stateOf = (s: Spread, shape: number[]): State => ({ center: s.center, spread: s.spread, lo: s.lo, hi: s.hi, shape });
+type State = { center: number; spread: number; shape: number[] };
+const stateOf = (s: Spread, shape: number[]): State => ({ center: s.center, spread: s.spread, shape });
 const mix = (a: State, b: State, t: number): State => ({
   center: lerp(a.center, b.center, t),
   spread: lerpLog(a.spread, b.spread, t),
-  lo: lerp(a.lo - a.center, b.lo - b.center, t) + lerp(a.center, b.center, t),
-  hi: lerp(a.hi - a.center, b.hi - b.center, t) + lerp(a.center, b.center, t),
   shape: a.shape.map((v, i) => lerp(v, b.shape[i], t)),
 });
 const WIDE = stateOf(CLOSE.wide, SHAPES.wide);
@@ -48,18 +48,20 @@ const MOVED = stateOf(CLOSE.moved, SHAPES.moved);
 export const CloseScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
-  const merged = useMergedPart();
+  const fig = useFigNumber();
   const { y } = useLayout();
 
   const twoFrom = n.beat("two").from;
   const varianceAt = n.word("variance", "Variance");
   const scatterAt = n.word("variance", "scatter");
-  const squeezeFrom = n.beat("squeeze").from;
   const shrinksAt = n.word("squeeze", "shrinks");
   const biasAt = n.word("bias", "Bias");
   const centeredAt = n.word("bias", "centered");
-  const leavesAt = n.word("bias", "leaves");
+  // While each definition is said, the words it turns on: "the next" sample,
+  // the "more data" each sample now has, and the bias left "right where it was".
+  const theNextAt = n.word("variance", "the next");
+  const moreDataAt = n.word("bias", "more data");
+  const whereItWasAt = n.word("bias", "right where it was");
   const methodFrom = n.beat("method").from;
   const betterAt = n.word("method", "better");
   const movesAt = n.word("method", "moves");
@@ -71,7 +73,9 @@ export const CloseScene: React.FC = () => {
   const survivedAt = n.word("next", "survived");
   const back = (at: number) => 1 - 0.62 * ease(frame, at, 22);
 
-  const squeeze = ease(frame, squeezeFrom - 2, 30);
+  // The pile tightens as "shrinks" is said, so the first spread has been up
+  // for the whole of the variance beat and its pause first.
+  const squeeze = ease(frame, shrinksAt, 30);
   const move = ease(frame, betterAt - 4, 30);
   const s = move > 0 ? mix(NARROW, MOVED, move) : mix(WIDE, NARROW, squeeze);
   const color = between(move);
@@ -90,14 +94,19 @@ export const CloseScene: React.FC = () => {
 
   const truthX = sx(X, TRUE_MEAN);
   const centerX = sx(X, s.center);
-  const loX = sx(X, s.lo);
-  const hiX = sx(X, s.hi);
+  // One standard deviation either side of the center: the number printed
+  // beside it, so the bracket can be read against the axis.
+  const loX = sx(X, s.center - s.spread);
+  const hiX = sx(X, s.center + s.spread);
   const bracketY = top - 26;
   // Numbers are the measured ones at either end of a morph, never a value
   // in between: the label switches at the halfway point.
   const shownSpread = move > 0.5 ? MOVED.spread : squeeze > 0.5 ? NARROW.spread : WIDE.spread;
+  // To the nearest point, as RepeatScene prints it: the bias is the same "about
+  // ten" at every size, and 10.03 against 9.94 read as if it were shrinking.
   const bias = NARROW.center - TRUE_MEAN;
-  const perSample = move > 0.5 ? "5,000 customers, at random" : squeeze > 0.5 ? "5,000 customers, the easy way" : "200 customers, the easy way";
+  const perSample = move > 0.5 || squeeze > 0.5 ? "5,000 customers" : "200 customers";
+  const method = move > 0.5 ? "at random" : "the easy way";
 
   return (
     <AbsoluteFill>
@@ -105,7 +114,7 @@ export const CloseScene: React.FC = () => {
           and a better method slides it home, where the conclusion rings. */}
       <Sfx name="slide" at={twoFrom + 4} level={-37} />
       <Sfx name="swish" at={scatterAt - 4} level={-34} />
-      <Sfx name="tighten" at={squeezeFrom - 2} level={-33} />
+      <Sfx name="tighten" at={shrinksAt} level={-33} />
       <Sfx name="swish-long" at={biasAt + 2} level={-35} />
       <Sfx name="slide" at={betterAt - 4} level={-33} />
       <Sfx name="chime" at={movesAt - 2} level={-29} />
@@ -116,7 +125,11 @@ export const CloseScene: React.FC = () => {
         </Ink>
         <Note at={twoFrom + 10} x={96} y={y(258)}>
           <span style={{ ...body(32, true), color: INK }}>
-            Each sample: <span key={perSample}>{perSample}</span>
+            Each sample:{" "}
+            <Marker at={moreDataAt} out={methodFrom}>
+              {perSample}
+            </Marker>
+            , {method}
           </span>
         </Note>
       </div>
@@ -130,14 +143,19 @@ export const CloseScene: React.FC = () => {
           Only a better method moves the center.
         </Ink>
       </div>
-      {merged ? null : (
-        <NextLine at={nextAt} x={1000} y={y(278)} width={720}>
-          the data that survived.
-        </NextLine>
-      )}
+      <Bridge
+        x={1000}
+        y={y(278)}
+        width={720}
+        next={{ at: nextAt, text: "the data that survived." }}
+        merged={[
+          { at: someAt, text: "Some data is biased before you sample it," },
+          { at: nextAt - 4, text: "because it only kept what survived." },
+        ]}
+      />
 
       <div style={{ position: "absolute", inset: 0, opacity: back(someAt) }}>
-        <FigLabel n="6" title="Where 400 sample averages land" at={twoFrom} x={160} y={y(330)} />
+        <FigLabel n={fig(6)} title="Where 400 sample averages land" at={twoFrom} x={160} y={y(330)} />
         <Axis scale={X} base={y(BASE)} ticks={[66, 68, 70, 72, 74, 76, 78, 80, 82, 84]} at={twoFrom} />
         <TruthLine x={truthX} bottom={y(BASE)} top={y(BIAS_Y + 6)} at={twoFrom + 4} />
         <div
@@ -195,16 +213,14 @@ export const CloseScene: React.FC = () => {
           }}
         >
           <div style={label(21, INK)}>Variance</div>
-          <div style={note(22, INK_SOFT)}>
-            spread <b style={{ color: INK }}>{fmt(shownSpread)}</b>
-          </div>
-          <div style={{ ...note(22, RANDOM_INK), marginTop: 4, opacity: ease(frame, betterAt + 18, 12) }}>
-            bias <b>+{fmt(MOVED.center - TRUE_MEAN)}</b>
-          </div>
+          <div style={{ ...note(24, INK), fontWeight: 700 }}>&plusmn; {fmt(shownSpread)}</div>
+          <div style={note(20, INK_SOFT)}>one standard deviation</div>
         </div>
         <Note at={varianceAt} x={640} y={y(600)} out={biasAt}>
           <div style={{ ...body(30, true), color: INK }}>how far one sample&rsquo;s</div>
-          <div style={{ ...body(30, true), color: INK }}>average strays from the next</div>
+          <div style={{ ...body(30, true), color: INK }}>
+            average <Marker at={theNextAt - 2}>strays from the next</Marker>
+          </div>
         </Note>
 
         {/* Bias: the offset. */}
@@ -226,19 +242,36 @@ export const CloseScene: React.FC = () => {
             textAlign: "center",
             whiteSpace: "nowrap",
             opacity: ease(frame, biasAt + 4, 12) * (1 - ease(frame, betterAt + 8, 10)),
+            transform: `scale(${swell(frame, whereItWasAt - 2, 0.1, 20)})`,
             ...halo,
           }}
         >
           <span style={{ ...label(24, ink) }}>Bias </span>
           <span style={{ ...note(24, ink), fontWeight: 700 }}>
-            +{fmt(bias)} points
+            +{fmt(bias, 0)} points
           </span>
         </div>
-        <Note at={movesAt + 2} x={sx(X, NARROW.hi) + 20} y={y(BASE - 140)}>
+        {/* Once the method has moved it: the bias left, beside the truth. */}
+        <div
+          style={{
+            position: "absolute",
+            left: truthX + 12,
+            top: y(BIAS_Y + 8),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, betterAt + 18, 12),
+            ...halo,
+          }}
+        >
+          <span style={note(21, RANDOM_INK)}>bias </span>
+          <span style={{ ...note(22, RANDOM_INK), fontWeight: 700 }}>+{fmt(MOVED.center - TRUE_MEAN)} points</span>
+        </div>
+        <Note at={movesAt + 2} x={sx(X, CLOSE.narrow.hi) + 20} y={y(BASE - 140)}>
           <div style={{ ...note(21, EASY_INK), ...halo }}>the easy way,</div>
           <div style={{ ...note(21, EASY_INK), ...halo }}>still at {fmt(NARROW.center)}</div>
         </Note>
-        <Note at={leavesAt} x={640} y={y(600)} out={methodFrom}>
+        {/* Up as "centered" is said, and kept until the pile starts to move,
+            which would cross it. */}
+        <Note at={centeredAt} x={640} y={y(600)} out={betterAt - 4}>
           <div style={{ ...body(30, true), color: INK }}>where the averages</div>
           <div style={{ ...body(30, true), color: EASY_INK }}>center, right or wrong</div>
         </Note>

@@ -72,7 +72,6 @@ export const BinScene: React.FC = () => {
   const binsFrom = n.beat("bins").from;
   const histAt = n.word("bins", "histogram's");
   const knobAt = n.word("bins", "knob");
-  const sameAt = n.word("bins", "SAME");
   const fiveAt = n.word("bins", "five bins");
   const twentyAt = n.word("bins", "twenty");
   const eightyAt = n.word("bins", "eighty");
@@ -129,7 +128,7 @@ export const BinScene: React.FC = () => {
         Bin width is a <Mark at={knobAt - 2}>knob</Mark>.
       </Ink>
 
-      <FigLabel n="12" title="One thousand values, the same in every panel" at={sameAt - 4} x={160} y={y(330)} />
+      <FigLabel n="12" title="One thousand values, the same in every panel" at={histAt - 4} x={160} y={y(330)} />
 
       {/* ── The knob ── */}
       {knobIn > 0 ? (

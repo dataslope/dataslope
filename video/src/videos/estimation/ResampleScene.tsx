@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, HAIRLINE, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, HAIRLINE, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { BOOT, histogram, jitter } from "./data";
-import { Bracket, DATA, EST, EST_INK, Headline, IntervalBar, Kicker, lerp, Marked, pulse, Rule, Spot, Strike, Svg } from "./parts";
+import { Bracket, DATA, EST, EST_INK, Headline, IntervalBar, Kicker, lerp, Marked, pulse, Rule, Spot, Svg } from "./parts";
 
 /** Fig. 7: the sixty waits, and one resample of them stacked below. */
 const X: XScale = { lo: 0, hi: 20, x0: 160, x1: 1760 };
@@ -60,6 +60,7 @@ export const ResampleScene: React.FC = () => {
   const existAt = n.word("bootstrap", "exist");
   const bootstrapsAt = n.word("trick", "bootstrap's");
   const treatAt = n.word("trick", "treat");
+  const yourSampleAt = n.word("trick", "your sample");
   const populationAt = n.word("trick", "population");
   const sixtyAt = n.word("waits", "sixty");
   const skewedAt = n.word("waits", "skewed");
@@ -108,13 +109,13 @@ export const ResampleScene: React.FC = () => {
   const hollow = ease(frame, notAt - 4, 12);
   const tails = ease(frame, middleAt - 2, 14);
   const center = BOOT.mean;
-  const seY = y(HIST_BASE) - h(HIST_H * 0.55);
+  const seY = y(HIST_BASE) + 50;
 
   return (
     <AbsoluteFill>
       {/* ── Sound: the boot, the sixty waits, the first resample, the first average, the pile, the cuts ── */}
       <Sfx name="el-pop" at={bootstrapsAt - 6} level={-30} />
-      <Sfx name="el-sprinkle" at={sixtyAt - 4} level={-33} />
+      <Sfx name="el-sprinkle" at={yourSampleAt - 4} level={-33} />
       <Sfx name="el-sprinkle" at={drawAt} level={-35} />
       <Sfx name="el-tap" at={draws[0].fall + 10} level={-28} />
       <Sfx name="el-sprinkle" at={fastFrom} level={-33} />
@@ -135,27 +136,33 @@ export const ResampleScene: React.FC = () => {
         </span>
       </Note>
 
-      {/* The mean's own formula, which a median does not get. */}
-      <Ink at={formulaWordAt - 4} dur={14} out={treatAt - 8} style={{ left: 1100, top: y(262), whiteSpace: "nowrap" }}>
-        <div style={label(20, INK_SOFT)}>a mean’s standard error</div>
-        <div style={{ ...headline(48), marginTop: 6, opacity: 1 - 0.6 * ease(frame, existAt - 2, 12) }}>
-          <Strike at={existAt - 2}>s ÷ √n</Strike>
+      {/* The mean's own formula, which stands, beside the median's, which
+          doesn't exist. */}
+      <Ink at={formulaWordAt - 4} dur={14} out={treatAt - 8} style={{ left: 1100, top: y(262), whiteSpace: "nowrap", display: "flex", gap: 64 }}>
+        <div>
+          <div style={label(20, INK_SOFT)}>a mean’s standard error</div>
+          <div style={{ ...headline(48), marginTop: 6 }}>s ÷ √n</div>
+        </div>
+        <div style={{ opacity: ease(frame, uglyAt - 4, 12) }}>
+          <div style={label(20, INK_SOFT)}>a median’s</div>
+          <div style={{ ...headline(48), marginTop: 6, color: EST_INK, opacity: ease(frame, existAt - 4, 12) }}>?</div>
         </div>
       </Ink>
 
       {/* ── Fig. 7: the waits, and a resample ── */}
-      <FigLabel n="7" title={`${BOOT.n} customer wait times, in minutes`} at={sixtyAt - 8} x={160} y={y(262)} />
+      <FigLabel n="7" title={`${BOOT.n} customer wait times, in minutes`} at={yourSampleAt - 8} x={160} y={y(262)} />
       <Svg>
         {BOOT.values.map((v, j) => {
-          const a = ease(frame, sixtyAt - 4 + j * 0.35, 7);
+          const a = ease(frame, yourSampleAt - 4 + j * 0.35, 7);
           if (a <= 0) return null;
           const never = BOOT.timesDrawn[j] === 0 ? hollow : 0;
+          const counted = 1 + 0.3 * pulse(frame, sixtyAt - 2 + j * 0.3, 16);
           return (
             <circle
               key={j}
               cx={sx(X, v)}
               cy={y(STRIP) + h((JIT[j] - 0.5) * 30)}
-              r={6.5 * a}
+              r={6.5 * a * counted}
               fill={never > 0 ? `color-mix(in srgb, ${DATA} ${Math.round(100 - 85 * never)}%, ${PAPER})` : DATA}
               stroke={never > 0 ? DATA : PAPER}
               strokeWidth={never > 0 ? 1.8 : 1.2}
@@ -164,8 +171,9 @@ export const ResampleScene: React.FC = () => {
           );
         })}
       </Svg>
-      <Axis scale={X} base={y(AXIS1)} ticks={[0, 5, 10, 15, 20]} at={sixtyAt - 6} />
-      <Note at={skewedAt - 2} x={sx(X, 14)} y={y(STRIP) - 44}>
+      <Axis scale={X} base={y(AXIS1)} ticks={[0, 5, 10, 15, 20]} at={yourSampleAt - 6} />
+      {/* Above the tail's dots, clear of the 15.2-minute wait under it. */}
+      <Note at={skewedAt - 2} x={sx(X, 14)} y={y(STRIP) - 80}>
         <span style={{ ...note(22, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>a long tail to the right</span>
       </Note>
 
@@ -176,13 +184,14 @@ export const ResampleScene: React.FC = () => {
           <span style={{ opacity: ease(frame, replacementAt - 4, 10) }}>, with replacement</span>
         </span>
       </Ink>
-      <Note at={twiceAt - 2} x={1240} y={y(RES_BASE) - 64} out={averageAt}>
+      {/* Right of the 15.2-minute stack, over a stretch resample 1 leaves empty. */}
+      <Note at={twiceAt - 2} x={1420} y={y(RES_BASE) - 64} out={averageAt}>
         <span style={{ ...note(22, INK), ...halo, whiteSpace: "nowrap" }}>
           drawn twice: {BOOT.timesDrawn.filter((t) => t === 2).length}
           <span style={{ opacity: ease(frame, threeAt - 2, 10) }}>, three times: {BOOT.timesDrawn.filter((t) => t === 3).length}</span>
         </span>
       </Note>
-      <Note at={notAt - 2} x={1240} y={y(RES_BASE) - 30} out={averageAt}>
+      <Note at={notAt - 2} x={1420} y={y(RES_BASE) - 30} out={averageAt}>
         <span style={{ ...note(22, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>never drawn: {BOOT.neverDrawn}, hollow above</span>
       </Note>
 
@@ -222,7 +231,12 @@ export const ResampleScene: React.FC = () => {
       <Ink at={distributionAt - 4} dur={14} style={{ left: sx(XZ, 8.12), top: y(HIST_BASE) - h(HIST_H * 0.55), whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, EST_INK), fontWeight: 650 }}>the bootstrap distribution</span>
       </Ink>
-      <Bracket x0={sx(XZ, center - BOOT.bootSe)} x1={sx(XZ, center + BOOT.bootSe)} y={seY} at={spreadAt - 2} color={PAPER} width={3} />
+      {/* The spread the narration reads out: one standard error either side of
+          the middle, under the axis where it can be seen. */}
+      <Bracket x0={sx(XZ, center - BOOT.bootSe)} x1={sx(XZ, center + BOOT.bootSe)} y={seY} at={spreadAt - 2} color={INK} width={2.4} up />
+      <Note at={fourEightAt - 2} x={sx(XZ, center + BOOT.bootSe) + 10} y={seY - 14}>
+        <span style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>±1 SE</span>
+      </Note>
       <Rule x={sx(XZ, BOOT.lo)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 56} at={sixOneAt - 4} color={INK} width={2.2} />
       <Rule x={sx(XZ, BOOT.hi)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 56} at={eightOhAt - 4} color={INK} width={2.2} />
       <IntervalBar x0={sx(XZ, BOOT.lo)} x1={sx(XZ, BOOT.hi)} y={y(HIST_BASE) - h(HIST_H) - 50} at={sixOneAt} dur={18} color={INK} width={4} tick={10} />
@@ -241,7 +255,7 @@ export const ResampleScene: React.FC = () => {
       {/* ── Right column: the count, and the two standard errors ── */}
       <div style={{ position: "absolute", left: COL, top: y(560), opacity: ease(frame, averageAt - 4, 12) }}>
         <div style={label(21, INK_SOFT)}>Resamples</div>
-        <div style={{ ...headline(72), fontVariantNumeric: "tabular-nums lining-nums", marginTop: 4, color: k >= BOOT.B ? INK : EST_INK }}>
+        <div style={{ ...headline(72), ...TABULAR, marginTop: 4, color: k >= BOOT.B ? INK : EST_INK }}>
           {k.toLocaleString("en-US")}
         </div>
       </div>

@@ -47,7 +47,7 @@ which), and each renders at 4K: 3840x2160.
 ### The editorial videos
 
 The eighteen editorial videos share one look, the shared editorial kit in
-`src/editorial/`: warm paper, numbered figures with Inter
+`src/editorial/`: a plain white page, numbered figures with Inter
 labels, ink-wipe reveals, watercolor spot illustrations, and Source Serif 4
 headlines with no burned-in captions. That setting was chosen from a
 side-by-side trial of five faces with and without captions. A new video in
@@ -65,17 +65,11 @@ Two props keep the alternatives a click away in the Studio's props panel:
   (`src/editorial/layout.ts`). Scenes therefore pass every vertical position
   through `useLayout().y()` and every vertical length through `h()`.
 
-The paper's grain is two full-frame SVG noise filters (`PaperSource` in
-`src/editorial/ui.tsx`), but a page never draws them. Drawn live they made
-every frame about three times slower to render (450 frames at 1080p: 125 s
-against 42 s; 150 frames at 4K: 148 s against 37 s), for a picture that
-never changes. `<Paper>` shows `public/editorial/paper@1x.webp` instead, or
-`paper@2x.webp` whenever the render is scaled up, so a 4K render gets grain
-at full resolution rather than a stretched 1080p copy. Both are lossless, and
-a page renders the same either way: identical pixels in the frames checked,
-apart from antialiasing on a few edge pixels of BaseRate's 10,000-dot grid.
-Re-run `npm run paper` after changing `PaperSource`, `PAPER`, `INK` or the
-yellow tone.
+The page is plain white (`PAPER` in `src/editorial/style.ts`, the brand's
+`--ds-white`), with no texture. It was warm paper with a printed grain until
+2026-10-21, when white read cleaner. Everything drawn in the page's color
+(text halos, masks, cards that hide what is behind them, ERD boxes) uses
+`PAPER`, so a change of page is that one token.
 
 ## Quick start
 
@@ -112,9 +106,8 @@ and fails if any illustration is drawn across more device pixels than it has
 (or if an arrowhead sits on a bend; see "What goes on screen").
 `<Illustration>` logs the figure as it loads, so the check sees exactly what a
 render does. All 37 pass. LlmTemperature's thermometer was drawn larger than
-its pixels, and is now drawn at exactly the size they cover. The paper grain has a 2x image of
-its own (see the editorial section), and text, SVG, patterns and the logo are
-vector.
+its pixels, and is now drawn at exactly the size they cover. Text, SVG,
+patterns and the logo are vector.
 
 ## How a video is put together
 
@@ -269,7 +262,7 @@ ThinkingStatistically is the worked example.
   (`n.beat(id).from`), or it plays under the logo. The first beat is
   `scene: true`, since a cut is cued from it.
 - **It has its own sound**: `el-logo`, an airy rise into a bell, peaking at
-  -21 dBFS with nothing under it but paper, and a pencil stroke for the
+  -21 dBFS with nothing under it, and a pencil stroke for the
   hairline.
 
 ### A video in a series leads into the next
@@ -405,6 +398,21 @@ not the first sound: a breath clears a plain loudness bar, and Estimation's
 first voiced frame (-27 dB from the take's loudest, set against all 906
 recorded beats) and walks back over the
 word's own soft attack (-30 dB) for at most 120 ms.
+
+A beat voiced on its own gets the same placement, from its own file. Before
+it did, a beat that opened on an audio tag cued early by the time the tag
+had taken: Estimation's `[slowly]` beats ran up to 0.25 s out in
+`check:sync`. `npm run narrate -- <video> --onsets --only a,b` places the
+first word of beats already voiced, from the files on disk, with no API
+call.
+
+**Slowing a beat down.** `eleven_v4_turbo` ignores the API's `speed` voice
+setting (0.7 and 0.85 both came back at normal pace). The `[slowly]` audio
+tag works: the same sentence went from about 3.0 to about 2.4 words a
+second, and `[calmly]` or `[thoughtfully]` barely changed it. A tag is never
+spoken and is left out of the captions, so it changes the delivery and not
+the words. Stats-6's rate-to-test stretch and Stats-9's "keep a wall" beats
+are voiced this way.
 
 **What is committed.** Everything a render needs, and the master it came
 from:
@@ -627,7 +635,7 @@ seed, a size and a palette given as brand token names (`"blue"`,
 `"teal-300"`, `"transparent"`), so no hex value is written by hand. Use
 patterns sparingly: a band on the title or end card, or one transition. Never
 put one behind text the viewer has to read. None of the editorial videos uses
-one (the paper is the page's only texture), but `<Pattern>` and this script
+one (the page is plain white), but `<Pattern>` and this script
 stay for a video that does.
 
 ## Checks

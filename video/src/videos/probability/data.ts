@@ -47,6 +47,9 @@ export const LLN = {
   after100: m.lln.after100,
   after5000: m.lln.after5000,
   maxOffLate: m.lln.maxOffLate,
+  /** The flip this run's first five heads in a row start on (21: flips 21
+   *  to 25, which lift the share to its high of 56%). */
+  streakFrom: m.lln.streakFrom,
 };
 /** The share after `k` flips, read off the kept path. */
 export const llnAt = (k: number) => LLN.path.find(([n]) => n === k)?.[1] ?? NaN;
@@ -103,6 +106,9 @@ export const DIE = {
   variance: m.spread.var,
   sd: m.spread.sd,
   squares: m.spread.squares as readonly number[],
+  /** Each face's chance times its squared distance from 4.5: the six terms
+   *  that add up to the variance. */
+  varTerms: m.spread.terms as readonly number[],
 };
 
 export const WARRANTY = m.warranty;

@@ -47,8 +47,13 @@ export const TestScene: React.FC = () => {
   const includesAt = n.word("straddle", "includes zero");
   const eightAgainAt = n.word("eight", "eight");
   const bigAt = n.word("eight", "big effect");
-  const proofAt = n.word("eight", "proof");
-  const moreDataAt = n.word("eight", "more data");
+  const proofAt = n.word("proof", "proof");
+  const moreDataAt = n.word("proof", "more data");
+  const togetherAt = n.word("pair", "go together");
+  const pairTestAt = n.word("pair", "test");
+  const rejectsAt = n.word("pair", "rejects");
+  const pairIntervalAt = n.word("pair", "ninety-five percent interval");
+  const leavesOutAt = n.word("pair", "leaves out");
   const viewsAt = n.word("views", "two views");
   const oneThingAt = n.word("views", "one thing");
   const onlyAt = n.word("views", "only");
@@ -90,7 +95,7 @@ export const TestScene: React.FC = () => {
         />
       </Svg>
 
-      <FigLabel n="6" title="95% intervals for a difference between two groups" at={testFrom - 2} x={160} y={y(262)} />
+      <FigLabel n="6" title="95% intervals for a difference in two groups’ means, two examples" at={testFrom - 2} x={160} y={y(262)} />
       <Axis scale={X} base={y(AXIS)} ticks={[-4, 0, 4, 8, 12, 16, 20]} format={(v) => (v < 0 ? `−${-v}` : String(v))} at={testFrom} />
       <Rule
         x={zeroX}
@@ -99,7 +104,7 @@ export const TestScene: React.FC = () => {
         at={leavesAt - 4}
         dur={18}
         color={INK}
-        width={2.4 + 1.6 * (pulse(frame, includesAt - 2, 18) + pulse(frame, noEffectAt - 2, 18))}
+        width={2.4 + 1.6 * (pulse(frame, leavesOutAt - 2, 18) + pulse(frame, includesAt - 2, 18) + pulse(frame, noEffectAt - 2, 18))}
         dash="7 6"
       />
       <Note at={leavesAt} x={zeroX + 12} y={y(318)}>
@@ -135,6 +140,17 @@ export const TestScene: React.FC = () => {
           <Marked at={fiveAt - 2} color={HIGHLIGHT}>
             5% level
           </Marked>
+        </span>
+      </Note>
+      {/* Why 5% goes with 95%: the test and the interval draw the same line. */}
+      <Note at={togetherAt - 4} x={sx(X, clear.lo)} y={y(ROW1) + 60}>
+        <span style={{ ...note(21, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>
+          a{" "}
+          <Marked at={pairTestAt - 2} color={HIGHLIGHT}>
+            5% test
+          </Marked>{" "}
+          <span style={{ opacity: ease(frame, rejectsAt - 4, 10) }}>rejects exactly what</span>
+          <span style={{ opacity: ease(frame, pairIntervalAt - 4, 10) }}> a 95% interval leaves out</span>
         </span>
       </Note>
 

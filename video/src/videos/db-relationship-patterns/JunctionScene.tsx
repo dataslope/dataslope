@@ -2,10 +2,11 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
+import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MTM } from "./data";
-import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_KEY, Pulse, Tag, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_KEY, Pulse, Tag, tableGeometry } from "./parts";
 
 const ERD_Y = 330;
 const ROWS_Y = 572;
@@ -92,6 +93,8 @@ export const JunctionScene: React.FC = () => {
       <Head lead="Every pairing gets a row:" leadAt={from - 6} turn="a junction table." turnAt={junctionAt - 2} />
 
       <Drift from={pairingAt} to={nameAt + 50} scale={0.016} origin={[960, y(560)]}>
+        {/* One figure: the diagram, and under its middle box the rows it holds. */}
+        <FigLabel n="8" title="Students and courses, linked through enrollments" at={from - 6} x={students.x} y={students.top - FIG_ABOVE} />
         <Entity layout={students} at={from - 4} />
         <Entity layout={courses} at={from + 2} />
         <Entity
@@ -120,7 +123,7 @@ export const JunctionScene: React.FC = () => {
 
         {/* ── The rows: one per pairing ── */}
         <Caption at={adaMathAt - 6} x={g.x} y={g.top - 44}>
-          enrollments, one row per pairing
+          enrollments
         </Caption>
         <DbTable
           g={g}
@@ -143,8 +146,8 @@ export const JunctionScene: React.FC = () => {
             {p.name} in {p.title}
           </Tag>
         ))}
-        <Tag at={nameAt - 10} x={g.x} y={g.rowTop(rows.length) + 18} italic size={22}>
-          all {MTM.enrollments} pairings, {MTM.enrollments} rows
+        <Tag at={junctionAt + 6} x={g.x} y={g.rowTop(rows.length) + 18} italic size={22}>
+          one row per pairing: {MTM.enrollments} in all
         </Tag>
         <Pulse x={enrollments.x + enrollments.width / 2} y={enrollments.top + enrollments.head / 2} at={nameAt} r={46} color={KEY_INK} />
       </Drift>

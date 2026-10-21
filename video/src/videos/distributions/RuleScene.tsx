@@ -3,21 +3,21 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { fmt, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
-import { normalPdf, RULE } from "./data";
-import { ASK, ASK_FILL, ASK_INK, areaD, askNote, Centered, Count, Curve, curveD, DIST, Drift, Head, lerp, pulse, Svg } from "./parts";
+import { normalCdf, normalPdf, RULE } from "./data";
+import { ASK, ASK_FILL, ASK_INK, areaD, askNote, Centered, Curve, curveD, DIST, Drift, Head, lerp, pulse, Svg } from "./parts";
 
 /** Standard deviations from the mean, -4 to 4. */
 const X: XScale = { lo: -4, hi: 4, x0: 260, x1: 1660 };
-const BASE = 660;
+const BASE = 680;
 const TALL = 260;
-const SCORE_Y = 760;
+const SCORE_Y = 780;
 /** Each band's bracket height, widest highest. */
-const BRACKET_Y = [380, 340, 300];
+const BRACKET_Y = [400, 364, 328];
 
 /**
  * Part 3, second scene: the empirical rule as three nested bands, each swept
@@ -83,6 +83,8 @@ export const RuleScene: React.FC = () => {
       />
 
       <Drift from={ruleFrom} to={n.beat("z-in").to + 40} origin="50% 45%">
+        <FigLabel n="10" title="Any normal, in standard deviations" at={ruleFrom - 4} x={160} y={y(262)} />
+
         {/* The bands, widest underneath, each sweeping out from the mean. */}
         <Svg>
           {[...BANDS].reverse().map((b) => {
@@ -116,20 +118,23 @@ export const RuleScene: React.FC = () => {
         </Svg>
         <Curve d={curveD(pdf, -4, 4, X, py)} at={ruleFrom - 6} dur={24} />
 
-        {/* The brackets and their shares. */}
+        {/* The brackets and their shares. Each share rides the bracket's
+            right end and is the true share inside it as it opens, so it
+            never shows a number the bracket doesn't hold. */}
         {BANDS.map((b, i) => {
           const p = ease(frame, b.at + 8, 14);
           if (p <= 0) return null;
           const yy = y(BRACKET_Y[i]);
           const x0 = lerp(sx(X, 0), sx(X, -b.k), p);
           const x1 = lerp(sx(X, 0), sx(X, b.k), p);
+          const share = p >= 1 ? RULE.within[i] : 100 * (normalCdf(b.k * p) - normalCdf(-b.k * p));
           return (
             <React.Fragment key={b.k}>
               <Svg>
                 <path d={`M${x0},${yy + 10} L${x0},${yy} L${x1},${yy} L${x1},${yy + 10}`} fill="none" stroke={INK} strokeWidth={1.8} />
               </Svg>
-              <div style={{ position: "absolute", left: sx(X, b.k) + 14, top: yy - 16, ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-                <Count at={b.at + 4} dur={18} to={RULE.within[i]} digits={2} suffix="%" />
+              <div style={{ position: "absolute", left: x1 + 14, top: yy - 16, opacity: ease(frame, b.at + 8, 6), ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <span style={TABULAR}>{fmt(share, 2)}</span>%
               </div>
             </React.Fragment>
           );

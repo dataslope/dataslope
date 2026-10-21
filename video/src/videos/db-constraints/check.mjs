@@ -195,6 +195,7 @@ INSERT INTO users (email) VALUES ('ada@example.com');
 INSERT INTO profiles (user_id, display_name) VALUES (1, 'Ada');`,
     {
       second: "INSERT INTO profiles (user_id, display_name) VALUES (1, 'Ada again');",
+      after: "SELECT id, user_id, display_name FROM profiles ORDER BY id;",
     },
   ),
 

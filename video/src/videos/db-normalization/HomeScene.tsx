@@ -1,14 +1,15 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CUSTOMERS, JOINED, MUG, ORDERS, PRODUCTS, SPLIT_TAGS } from "./data";
-import { DbTable, Fig, FIG_Y, HEAD_H, Headline, KEY_INK, MARK_KEY, ROW_H, tableGeometry, X0 } from "./kit";
-import { Drift, Fade, Reply, SmallArrow } from "./parts";
+import { CUSTOMERS, F, FLAT, JOINED, MUG, ORDERS, PRODUCTS, SPLIT_TAGS } from "./data";
+import { DbTable, Fig, FIG_Y, HEAD_H, Headline, KEY, KEY_INK, MARK_KEY, Mono, ROW_H, tableGeometry, X0 } from "./kit";
+import { Drift, Fade, InlineArrow, Reply, Svg } from "./parts";
 
 const ENTITY_Y = 340;
 const DATA_Y = 566;
@@ -17,15 +18,18 @@ const OX = 760;
 const PX = 1420;
 const JOIN_X = 520;
 const JOIN_Y = 600;
+/** Where Fig. 1's table waits while the rule is stated. */
+const FLAT_Y = 404;
 const LADDER_Y = 836;
-const LADDER_STEP = 310;
 
-/** The lesson's path of normal forms, in its own words. */
-const LADDER = [
-  { name: "UNF", gist: "repeating groups" },
-  { name: "1NF", gist: "one value per cell" },
-  { name: "2NF", gist: "the whole key" },
-  { name: "3NF", gist: "nothing but the key" },
+/** The normal forms, by name only: what 2NF and 3NF ask for is the oath's job. */
+const LADDER = ["1NF", "2NF", "3NF"] as const;
+
+/** orders_flat's columns, grouped by the table each one moves to. */
+const HOMES = [
+  { name: "orders", cols: [F.id] },
+  { name: "customers", cols: [F.name, F.email] },
+  { name: "products", cols: [F.product, F.price] },
 ] as const;
 
 /**
@@ -40,6 +44,7 @@ export const HomeScene: React.FC = () => {
 
   const from = n.beat("home").from;
   const ruleAt = n.word("home", "rule");
+  const everyAt = n.word("home", "Every fact");
   const homeAt = n.word("home", "one home");
   const customersAt = n.word("tables", "Customers");
   const productsAt = n.word("tables", "products");
@@ -108,6 +113,10 @@ export const HomeScene: React.FC = () => {
   const grace = CUSTOMERS.rows.findIndex((r) => r[1] === "Grace");
   const graceOrder = ORDERS.rows.findIndex((r) => r[1] === CUSTOMERS.rows[grace][0]);
   const jg = tableGeometry({ x: JOIN_X, top: y(JOIN_Y), cols: JOINED.cols, rows: JOINED.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
+  const fg = tableGeometry({ x: X0, top: y(FLAT_Y), cols: FLAT.cols, rows: FLAT.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
+  // Fig. 1 holds the page while the rule is stated, and gives way to the
+  // three tables its columns become.
+  const flatOut = customersAt - 14;
 
   return (
     <AbsoluteFill>
@@ -118,10 +127,40 @@ export const HomeScene: React.FC = () => {
       <Sfx name="el-whoosh" at={joinAt - 6} level={-33} />
       <Sfx name="el-sprinkle" at={stepsAt} level={-34} />
 
+      <Sfx name="el-pencil" at={everyAt} level={-35} />
       <Headline kicker="Why normalize" lead="One fact," turn="one home." at={from - 6} turnAt={ruleAt} underlineAt={homeAt} />
 
       <Drift from={from} to={end + 40} amount={0.012} origin="50% 40%">
-        <Fig n="2" at={from} y={y(FIG_Y)}>
+        {/* The flat table once more, its columns grouped by the home each
+            fact gets: those groups are the three tables that follow. */}
+        <Fade out={flatOut}>
+          <Fig n="1" at={from - 30} y={y(FIG_Y)}>
+            <Mono>orders_flat</Mono>, every fact in one table
+          </Fig>
+          <DbTable
+            g={fg}
+            cols={FLAT.cols}
+            rows={FLAT.rows.map((cells) => ({ cells, at: from - 30 }))}
+            at={from - 30}
+            numeric={[F.id, F.price]}
+          />
+          {HOMES.map((home, k) => {
+            const first = home.cols[0];
+            const last = home.cols[home.cols.length - 1];
+            return (
+              <HomeBracket
+                key={home.name}
+                name={home.name}
+                x0={fg.xs[first] + 8}
+                x1={fg.xs[last] + fg.widths[last] - 8}
+                y={fg.top - 14}
+                at={everyAt + 4 + k * 8}
+              />
+            );
+          })}
+        </Fade>
+
+        <Fig n="2" at={customersAt - 6} y={y(FIG_Y)}>
           The same facts, each stored once
         </Fig>
 
@@ -153,8 +192,9 @@ export const HomeScene: React.FC = () => {
           dim={wideAt}
         />
 
-        {/* Their rows, and the three changes, one row each. */}
-        <Fade out={wideAt}>
+        {/* Their rows, and the three changes, one row each, held until the
+            join is asked for. */}
+        <Fade out={joinAt - 16}>
           <DbTable
             g={cg}
             cols={CUSTOMERS.cols}
@@ -200,7 +240,8 @@ export const HomeScene: React.FC = () => {
           <Reply at={waitAt - 2} x={pg.x} y={pg.bottom(PRODUCTS.rows.length + 1) + 16}>
             {SPLIT_TAGS.insert}
           </Reply>
-          <Reply at={outlivesAt - 2} x={og.x} y={og.bottom(ORDERS.rows.length - 1) + 16}>
+          {/* After Grace's order has closed up, so the chip sits under the new rule. */}
+          <Reply at={graceAt + 34} x={og.x} y={og.bottom(ORDERS.rows.length - 1) + 16}>
             {SPLIT_TAGS.delete}
           </Reply>
         </Fade>
@@ -221,39 +262,79 @@ export const HomeScene: React.FC = () => {
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>stored nowhere.</div>
         </Note>
 
-        {/* The path the normal forms take, starting with one cell. */}
-        <Ink at={formsAt - 2} dur={14} style={{ left: X0, top: y(LADDER_Y) - 34, whiteSpace: "nowrap" }}>
+        {/* The path the normal forms take, starting with one cell: the
+            names only, since only the first is explained here. */}
+        <Ink at={formsAt - 2} dur={14} style={{ left: X0, top: y(LADDER_Y) - 40, whiteSpace: "nowrap" }}>
           <span style={label(21, INK_SOFT)}>The normal forms</span>
         </Ink>
-        <HighlightStep at={cellAt} x={X0 + LADDER_STEP} y={y(LADDER_Y)} />
-        {LADDER.map((s, k) => {
-          const lit = s.name === "1NF";
-          return (
-            <React.Fragment key={s.name}>
-              <Ink at={stepsAt + k * 6} dur={14} style={{ left: X0 + k * LADDER_STEP, top: y(LADDER_Y), whiteSpace: "nowrap" }}>
-                <span style={{ display: "inline-flex", alignItems: "baseline", gap: 12 }}>
-                  <span style={{ ...label(26, lit ? BLUE_INK : INK), fontWeight: 700 }}>{s.name}</span>
-                  <span style={{ ...note(21, INK_SOFT) }}>{s.gist}</span>
-                </span>
+        <div style={{ position: "absolute", left: X0 - 12, top: y(LADDER_Y), display: "flex", alignItems: "center", gap: 16 }}>
+          {LADDER.map((name, k) => (
+            <React.Fragment key={name}>
+              {k > 0 ? <InlineArrow at={stepsAt + k * 6 - 2} /> : null}
+              <Ink at={stepsAt + k * 6} dur={14} style={{ position: "relative" }}>
+                <Step name={name} litAt={k === 0 ? cellAt : undefined} />
               </Ink>
-              {k < LADDER.length - 1 ? (
-                <SmallArrow
-                  from={[X0 + (k + 1) * LADDER_STEP - 34, y(LADDER_Y) + 17]}
-                  to={[X0 + (k + 1) * LADDER_STEP - 14, y(LADDER_Y) + 17]}
-                  at={stepsAt + k * 6 + 6}
-                />
-              ) : null}
             </React.Fragment>
-          );
-        })}
+          ))}
+        </div>
       </Drift>
     </AbsoluteFill>
   );
 };
 
-/** The first step lit as the narration names it: a wash under "1NF". */
-const HighlightStep: React.FC<{ at: number; x: number; y: number }> = ({ at, x, y }) => (
-  <Ink at={at - 2} dur={12} style={{ left: x - 12, top: y - 6, width: 276, height: 42 }}>
-    <div style={{ width: "100%", height: "100%", borderRadius: 6, background: `color-mix(in srgb, ${BAR} 14%, transparent)`, border: `1.5px solid ${INK}` }} />
-  </Ink>
-);
+/**
+ * One normal form on the path. The first is lit as the narration reaches it,
+ * a wash and an outline, with what it asks for set under it, so lighting it
+ * moves nothing beside it.
+ */
+const Step: React.FC<{ name: string; litAt?: number }> = ({ name, litAt }) => {
+  const frame = useCurrentFrame();
+  const lit = litAt === undefined ? 0 : ease(frame, litAt - 2, 12);
+  return (
+    <span
+      style={{
+        position: "relative",
+        display: "inline-block",
+        padding: "2px 12px",
+        borderRadius: 6,
+        border: `1.5px solid color-mix(in srgb, ${INK} ${Math.round(lit * 100)}%, transparent)`,
+        background: `color-mix(in srgb, ${BAR} ${Math.round(lit * 14)}%, transparent)`,
+      }}
+    >
+      <span style={{ ...label(26, lit > 0 ? BLUE_INK : INK), fontWeight: 700 }}>{name}</span>
+      {litAt !== undefined ? (
+        <span style={{ position: "absolute", left: 12, top: "100%", marginTop: 10, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: lit }}>
+          one value per cell
+        </span>
+      ) : null}
+    </span>
+  );
+};
+
+/** A bracket over a group of columns, drawn in from both ends to meet in the
+ *  middle, named for the table those columns move to. */
+const HomeBracket: React.FC<{ name: string; x0: number; x1: number; y: number; at: number }> = ({ name, x0, x1, y, at }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 14);
+  if (p <= 0) return null;
+  const mid = (x0 + x1) / 2;
+  return (
+    <>
+      <Svg>
+        <path
+          d={`M${x0},${y + 10} L${x0},${y} L${mid + (x0 - mid) * (1 - p)},${y} M${x1},${y + 10} L${x1},${y} L${mid + (x1 - mid) * (1 - p)},${y}`}
+          fill="none"
+          stroke={KEY}
+          strokeWidth={2.6}
+          strokeLinejoin="round"
+          opacity={p}
+        />
+      </Svg>
+      <Ink at={at + 4} dur={12} style={{ left: x0, top: y - 40, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(22, BLUE_INK) }}>
+          <Mono>{name}</Mono>
+        </span>
+      </Ink>
+    </>
+  );
+};

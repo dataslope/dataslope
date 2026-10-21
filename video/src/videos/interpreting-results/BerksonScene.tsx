@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -27,8 +27,8 @@ export const BerksonScene: React.FC = () => {
   const from = n.beat("berkson").from;
 
   // ── Cues ──
-  const populationAt = n.word("berkson", "population");
   const relationshipAt = n.word("berkson", "relationship");
+  const populationAt = n.word("berkson", "population");
   const abilityAt = n.word("berkson", "ability");
   const addAt = n.word("rule", "add up");
   const unrelatedAt = n.word("berkson", "unrelated");
@@ -49,6 +49,7 @@ export const BerksonScene: React.FC = () => {
   const px = (p: { x0: number; x1: number }, v: number) => p.x0 + ((v - DOM[0]) / (DOM[1] - DOM[0])) * (p.x1 - p.x0);
   const py = (v: number) => bottom - ((v - DOM[0]) / (DOM[1] - DOM[0])) * (bottom - top);
   const pick = ease(frame, barAt + 4, 12);
+  const stream = Math.max(0.4, (populationAt + 4 - (relationshipAt - 4)) / 60);
   const admittedAbility = BERKSON.admitted.map((i) => BERKSON.ability[i]);
   const fx0 = Math.min(...admittedAbility);
   const fx1 = Math.max(...admittedAbility);
@@ -73,7 +74,7 @@ export const BerksonScene: React.FC = () => {
           {title}: {r}
         </span>
       </Ink>
-      <Note at={abilityAt} x={(p.x0 + p.x1) / 2} y={bottom + 14} from="up">
+      <Note at={p === ALL ? abilityAt : at + 4} x={(p.x0 + p.x1) / 2} y={bottom + 14} from="up">
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>ability</span>
       </Note>
       {p === ALL ? (
@@ -87,7 +88,7 @@ export const BerksonScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the applicants, the bar, the admitted crossing over, the line ── */}
-      <Sfx name="el-sprinkle" at={populationAt - 6} level={-33} />
+      <Sfx name="el-sprinkle" at={relationshipAt - 4} level={-33} />
       <Sfx name="el-pop" at={admitAt - 6} level={-30} />
       <Sfx name="el-pencil" at={barAt - 6} level={-33} />
       <Sfx name="el-whoosh" at={getInAt - 8} level={-33} />
@@ -115,11 +116,11 @@ export const BerksonScene: React.FC = () => {
         {axes(ALL, from - 4, "Everyone", DATA_INK, unrelatedAt - 4, <>r = {signed(BERKSON.rAll)}</>)}
         {axes(
           IN,
-          relationshipAt - 4,
+          getInAt - 8,
           "Admitted only",
           STAT_INK,
           getInAt - 4,
-          <span style={{ opacity: ease(frame, correlationAt - 2, 8) }}>
+          <span style={{ opacity: ease(frame, minusAt - 6, 8), ...TABULAR }}>
             <Count from={BERKSON.rAll} to={BERKSON.rIn} at={minusAt - 6} dur={18} format={(v) => `r = ${signed(v)}`} />
           </span>,
         )}
@@ -142,7 +143,8 @@ export const BerksonScene: React.FC = () => {
         <Svg>
           {BERKSON.ability.map((a, i) => {
             const b = BERKSON.interview[i];
-            const appear = ease(frame, populationAt - 6 + (i % 60) * 0.4, 8);
+            // The applicants stream in from "relationship" through "population".
+            const appear = ease(frame, relationshipAt - 4 + (i % 60) * stream, 8);
             if (appear <= 0) return null;
             const inside = BERKSON.admittedSet.has(i);
             const order = inside ? BERKSON.admitted.indexOf(i) : 0;
@@ -156,8 +158,8 @@ export const BerksonScene: React.FC = () => {
                   cx={x}
                   cy={yy}
                   r={4.6 * appear}
-                  fill={inside ? STAT : pick > 0 ? RAW : DOT}
-                  opacity={inside ? lerp(0.6, 0.9, pick) : lerp(0.75, 0.5, pick)}
+                  fill={pick > 0 ? (inside ? STAT : RAW) : DOT}
+                  opacity={lerp(0.75, inside ? 0.9 : 0.5, pick)}
                   stroke={inside && pick > 0 ? PAPER : undefined}
                   strokeWidth={0.8}
                 />

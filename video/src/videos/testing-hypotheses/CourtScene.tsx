@@ -14,7 +14,10 @@ const TEST_X = 1130;
 const RIGHT = 1790;
 const HEAD_Y = 316;
 const ROW_Y0 = 380;
-const ROW_STEP = 104;
+const ROW_STEP = 120;
+/** A row's sub-line and its rule, below the row's top: clear of the 32px label above and the rule below. */
+const SUB_DY = 58;
+const RULE_DY = 100;
 
 /**
  * The courtroom: each part of a trial and the part of a test it stands for,
@@ -80,7 +83,7 @@ export const CourtScene: React.FC = () => {
 
       <Head a="The null is on trial." at={courtFrom - 4} />
       <Spot id="testing-hypotheses-gavel" at={courtFrom - 400} left={GAVEL.left} top={y(GAVEL.top)} width={GAVEL.width} height={GAVEL.height} />
-      <Ink at={evidenceAt - 2} dur={14} style={{ left: TEST_X, top: rowY(0) + 52, whiteSpace: "nowrap" }}>
+      <Ink at={evidenceAt - 2} dur={14} style={{ left: TEST_X, top: rowY(0) + SUB_DY, whiteSpace: "nowrap" }}>
         <Label size={22} color={INK_SOFT} weight={520}>
           until the evidence says otherwise
         </Label>
@@ -130,7 +133,7 @@ export const CourtScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: COURT_X,
-                top: rowY(i) + 84,
+                top: rowY(i) + RULE_DY,
                 width: RIGHT - COURT_X,
                 height: 1,
                 background: HAIRLINE,
@@ -139,10 +142,13 @@ export const CourtScene: React.FC = () => {
             />
           </React.Fragment>
         ))}
-        {/* Set before the trial: the rule the next scene follows. */}
-        <Ink at={beforeAt - 2} dur={14} style={{ left: TEST_X, top: rowY(1) + 52, whiteSpace: "nowrap" }}>
+        {/* What alpha is, and the rule the next scene follows: set before the trial. */}
+        <Ink at={fiveAt + 4} dur={14} style={{ left: TEST_X, top: rowY(1) + SUB_DY, whiteSpace: "nowrap" }}>
           <Label size={22} color={INK_SOFT} weight={520}>
-            <Mark at={beginsAt - 2}>set before the trial begins</Mark>
+            your false-alarm risk,{" "}
+            <span style={{ opacity: ease(frame, beforeAt - 2, 12) }}>
+              <Mark at={beginsAt - 2}>set before the trial begins</Mark>
+            </span>
           </Label>
         </Ink>
 

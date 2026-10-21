@@ -8,7 +8,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { mulberry32 } from "./data";
-import { FAINT, GOLD_INK, Headline, Kicker, lerp, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, FAINT, GOLD_INK, Headline, Kicker, lerp, ROOM, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 const DOOR = { x: [200, 520, 840], w: 240, top: 410, h: 360 } as const;
 /** The letters that poured in, as a small heap of envelopes. */
@@ -40,11 +40,13 @@ const Door: React.FC<{ x: number; top: number; w: number; h: number; at: number;
   return (
     <>
       <Svg opacity={p}>
-        {/* The frame, and the dark room behind the leaf. */}
+        {/* The frame, and the dark room behind the leaf: dark enough that an
+            open door never reads as a closed one. */}
         <rect x={x - 8} y={top - 8} width={w + 16} height={h + 8} rx={10} fill="none" stroke={INK} strokeWidth={2.4} />
-        <rect x={x} y={top} width={w} height={h} fill={`color-mix(in srgb, ${INK} 16%, ${PAPER})`} />
+        <rect x={x} y={top} width={w} height={h} fill={ROOM} />
         <rect x={x} y={top} width={leaf} height={h} rx={4} fill={FAINT} stroke={INK} strokeWidth={2} />
-        <circle cx={x + leaf - 26 * (leaf / w)} cy={top + h * 0.54} r={8 * (leaf / w)} fill={INK} />
+        {/* The knob goes with the swing, before the leaf is edge on. */}
+        {open < 0.5 ? <circle cx={x + leaf - 26 * (leaf / w)} cy={top + h * 0.54} r={8 * (leaf / w)} fill={INK} opacity={1 - open * 2} /> : null}
         {pick > 0 ? (
           <rect x={x - 18} y={top - 18} width={w + 36} height={h + 28} rx={16} fill="none" stroke={STAT} strokeWidth={4} opacity={pick} />
         ) : null}
@@ -129,7 +131,7 @@ export const DoorsScene: React.FC = () => {
       </Note>
       {/* What the open door shows. */}
       <Note at={goatAt} x={DOOR.x[2] + DOOR.w * 0.58} y={top + dh * 0.44} from="up">
-        <span style={{ ...label(28, INK), display: "inline-block", transform: "translateX(-50%)" }}>goat</span>
+        <span style={{ ...label(28, PAPER), display: "inline-block", transform: "translateX(-50%)" }}>goat</span>
       </Note>
       <Ink at={hostAt - 2} dur={14} style={{ left: DOOR.x[0], top: top + dh + 80, whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK_SOFT) }}>The host knows where the car is, and opens a door with a goat.</span>
@@ -137,15 +139,17 @@ export const DoorsScene: React.FC = () => {
       <Svg>
         {draw > 0 ? (
           <>
-            <path d={cubicPath(arc)} fill="none" stroke={STAT} strokeWidth={3} strokeLinecap="round" pathLength={1} strokeDasharray={`${draw} 1`} />
+            {/* Switching in the blue the next scene gives it; your pick (and
+                staying) keeps the red. */}
+            <path d={cubicPath(arc)} fill="none" stroke={DATA} strokeWidth={3} strokeLinecap="round" pathLength={1} strokeDasharray={`${draw} 1`} />
             {draw > 0.85 ? (
-              <path d={arrowHead(shown, 16, 9)} fill="none" stroke={STAT} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+              <path d={arrowHead(shown, 16, 9)} fill="none" stroke={DATA} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
             ) : null}
           </>
         ) : null}
       </Svg>
       <Note at={switchAt} x={(x1 + x2) / 2} y={ay - 30} from="up">
-        <span style={{ ...body(32, true), color: STAT_INK, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>switch?</span>
+        <span style={{ ...body(32, true), color: DATA_INK, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>switch?</span>
       </Note>
 
       {/* ── The column, and the letters ── */}
@@ -155,7 +159,8 @@ export const DoorsScene: React.FC = () => {
       </Ink>
       <Ink at={yesAt - 2} dur={16} style={{ left: 1250, top: y(658), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK }}>
-          &ldquo;Switch.<span style={{ opacity: ease(frame, twoAt - 4, 12) }}> It wins two times in three.&rdquo;</span>
+          {/* Her advice, not her words, so no quotation marks. */}
+          Switch:<span style={{ opacity: ease(frame, twoAt - 4, 12) }}> it wins two times in three.</span>
         </span>
       </Ink>
       <Svg>

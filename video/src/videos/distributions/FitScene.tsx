@@ -68,15 +68,15 @@ export const FitScene: React.FC = () => {
       <Head parts={[{ text: "Estimate the parameters.", at: fitFrom - 4 }]} out={alwaysAt - 8} />
       <Head
         parts={[
-          { text: "Numbers back", at: alwaysAt - 4 },
-          { text: "aren't proof of a fit.", at: answerAt - 6, italic: true },
+          { text: "Every fit answers.", at: alwaysAt - 4 },
+          { text: "Not every fit fits.", at: answerAt - 6, italic: true },
         ]}
       />
 
       <Spot id="distributions-dress-form" at={handAt - 4} left={1560} top={y(88)} width={220} height={300} />
 
       <Drift from={fitFrom} to={n.beat("always").to + 40}>
-        <FigLabel n="11" title={`${FIT.n} measurements, and a normal fitted to them`} at={realAt - 6} x={160} y={y(300)} />
+        <FigLabel n="13" title={`${FIT.n} simulated measurements, and a normal fitted to them`} at={realAt - 6} x={160} y={y(300)} />
         <Axis scale={X} base={base} ticks={[55, 60, 65, 70, 75, 80, 85, 90]} at={realAt - 6} />
         <KBars
           ks={ks.map((v) => (v - FIT.lo) / FIT.bin)}
@@ -107,8 +107,8 @@ export const FitScene: React.FC = () => {
           <span style={label(22, INK_SOFT)}>The parameters</span>
         </Ink>
         {[
-          { name: "mean", value: FIT.loc, digits: 2, at: knowAt, p: mean, yy: 474 },
-          { name: "spread", value: FIT.scale, digits: 2, at: knowAt + 6, p: spread, yy: 524 },
+          { name: "mean", value: FIT.loc, truth: FIT.trueLoc, digits: 2, at: knowAt, p: mean, yy: 474 },
+          { name: "spread", value: FIT.scale, truth: FIT.trueScale, digits: 2, at: knowAt + 6, p: spread, yy: 524 },
         ].map((r) => (
           <Ink key={r.name} at={r.at} dur={14} style={{ left: PANEL_X, top: y(r.yy), whiteSpace: "nowrap" }}>
             <span style={{ ...note(30, INK), fontWeight: 600 }}>
@@ -120,6 +120,8 @@ export const FitScene: React.FC = () => {
               ) : (
                 <span style={{ color: INK_SOFT, display: "inline-block", transform: `scale(${1 + unknown * 0.3})` }}>?</span>
               )}
+              {/* What the sample was drawn from, so the fit can be checked. */}
+              <span style={{ ...note(22, INK_SOFT), marginLeft: 14, opacity: ease(frame, spreadAt + 24, 12) }}>(true {r.truth})</span>
             </span>
           </Ink>
         ))}

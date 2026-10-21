@@ -4,13 +4,14 @@ import { ease } from "../../components/motion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, body, INK, note } from "../../editorial/style";
-import { Ink, NextLine, Note } from "../../editorial/ui";
+import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FLAT } from "./data";
 import {
   CARD_Y,
   DbTable,
+  FIG_Y,
   Head,
   HEAD_H,
   Kicker,
@@ -102,6 +103,7 @@ export const BridgeScene: React.FC = () => {
         <span style={{ ...body(34, true), color: INK }}>Constraints stop bad values, not bad structure.</span>
       </Ink>
 
+      <FigLabel n="14" title="A flat table that passes every rule" at={open - 4} x={X0} y={y(FIG_Y)} />
       <Entity
         layout={card}
         at={open - 2}

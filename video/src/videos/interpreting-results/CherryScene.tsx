@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, halo, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -100,7 +100,7 @@ export const CherryScene: React.FC = () => {
           ))}
         </Svg>
         {[80, 100, 120].map((v) => (
-          <div key={v} style={{ position: "absolute", right: 1920 - X0 + 12, top: py(v) - 13, opacity: ease(frame, from + 2, 12), ...note(20, INK_SOFT) }}>
+          <div key={v} style={{ position: "absolute", right: 1920 - X0 + 12, top: py(v) - 13, opacity: ease(frame, from + 2, 12), ...note(20, INK_SOFT), ...TABULAR }}>
             {v}
           </div>
         ))}
@@ -189,9 +189,10 @@ export const CherryScene: React.FC = () => {
             </Note>
           </React.Fragment>
         ))}
-        <Note at={falseAt - 4} x={ZX[3] + ZW + 70} y={y(700)}>
+        {/* What the bars alone say, as they land; what they leave out, on "real". */}
+        <Note at={thoseAt + 8} x={ZX[3] + ZW + 70} y={y(700)}>
           <span style={{ ...body(36, true), color: STAT_INK, whiteSpace: "nowrap" }}>a breakout?</span>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, realAt - 4, 12) }}>
             missing: the other {S.length - WANDER.length} months
           </div>
         </Note>

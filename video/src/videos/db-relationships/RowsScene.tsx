@@ -14,8 +14,8 @@ import { Drift, Headline, Kicker, Link, pulse, Query } from "./parts";
 const BOX_Y = 310;
 const CUST_X = 240;
 const ORD_X = 1180;
-const CAPTION_Y = 556;
-const TABLE_Y = 592;
+const CAPTION_Y = 584;
+const TABLE_Y = 620;
 const HEAD_H = 52;
 const ROW_H = 62;
 
@@ -71,13 +71,8 @@ export const RowsScene: React.FC = () => {
   const otmTo = n.beat("one-to-many").to;
 
   // ── The diagram ──
-  const cust = useEntityLayout({
-    x: CUST_X,
-    y: y(BOX_Y),
-    width: 340,
-    name: "customers",
-    columns: [{ name: "id", key: "PK" }, { name: "name" }],
-  });
+  // The line runs from customers.id to orders.customer_id, the key that
+  // holds it, so customers sits one row lower to keep the line level.
   const ord = useEntityLayout({
     x: ORD_X,
     y: y(BOX_Y),
@@ -85,8 +80,15 @@ export const RowsScene: React.FC = () => {
     name: "orders",
     columns: [{ name: "id", key: "PK" }, { name: "customer_id", key: "FK" }],
   });
-  const a = cust.anchor("right");
-  const b = ord.anchor("left");
+  const cust = useEntityLayout({
+    x: CUST_X,
+    y: y(BOX_Y) + ord.row,
+    width: 340,
+    name: "customers",
+    columns: [{ name: "id", key: "PK" }, { name: "name" }],
+  });
+  const a = cust.anchor("right", "id");
+  const b = ord.anchor("left", "customer_id");
   const lineY = a[1];
   const lineSwell = pulse(frame, ideaAt, 22) + pulse(frame, bareAt, 22);
 
@@ -147,15 +149,10 @@ export const RowsScene: React.FC = () => {
           layout={cust}
           at={rowsFrom - 6}
           rowGap={3}
-          marks={{ id: { at: idAt, tone: "key" }, name: { at: adaIdAt, tone: "note" } }}
+          marks={{ id: { at: idAt, tone: "key" } }}
         />
-        <Entity
-          layout={ord}
-          at={rowsFrom - 2}
-          rowGap={3}
-          rowAt={{ customer_id: keyAt - 2 }}
-          marks={{ customer_id: { at: carriesAt, tone: "key" } }}
-        />
+        {/* The row the line lands on lights as the link is called a key. */}
+        <Entity layout={ord} at={rowsFrom - 2} rowGap={3} marks={{ customer_id: { at: keyAt, tone: "key" } }} />
         <Link
           name="customers places orders"
           points={[a, b]}

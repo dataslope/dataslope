@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, HAIRLINE, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -86,7 +86,9 @@ export const MedianScene: React.FC = () => {
       </Headline>
 
       {/* ── Fig. 9: the incomes ── */}
-      <FigLabel n="9" title={`${MEDIAN.n} incomes, in thousands of dollars`} at={incomesAt - 8} x={160} y={y(262)} />
+      {/* Set higher than the other figure labels, so the median's label under it
+          keeps a row's clearance. */}
+      <FigLabel n="9" title={`${MEDIAN.n} incomes, in thousands of dollars`} at={incomesAt - 8} x={160} y={y(240)} />
       <Svg>
         {MEDIAN.values.map((v, j) => {
           const a = ease(frame, incomesAt - 6 + j * 0.2, 7);
@@ -167,7 +169,7 @@ export const MedianScene: React.FC = () => {
       {/* ── Right column: the count, then the interval ── */}
       <div style={{ position: "absolute", left: COL, top: y(560), opacity: ease(frame, pileAt - 6, 12) }}>
         <div style={label(21, INK_SOFT)}>Resamples</div>
-        <div style={{ ...headline(72), fontVariantNumeric: "tabular-nums lining-nums", marginTop: 4, color: k >= MEDIAN.B ? INK : EST_INK }}>
+        <div style={{ ...headline(72), ...TABULAR, marginTop: 4, color: k >= MEDIAN.B ? INK : EST_INK }}>
           {k.toLocaleString("en-US")}
         </div>
       </div>

@@ -27,14 +27,13 @@ export const NullScene: React.FC = () => {
 
   // ── Cues ──
   const nullFrom = n.beat("null").from;
+  const boringAt = n.word("null", "boring");
   const nothingAt = n.word("null", "nothing");
   const nullAt = n.word("null", "null hypothesis");
   const altAt = n.word("null", "alternative");
   const realAt = n.word("null", "real effect");
-  const surpriseFrom = n.beat("surprise").from;
   const ifAt = n.word("surprise", "If");
   const surprisingAt = n.word("surprise", "surprising");
-  const nullAgainAt = n.word("surprise", "null");
   const soundsAt = n.word("court-in", "sounds");
   const veryAt = n.word("verdict", "Very");
   const rejectAt = n.word("verdict", "reject", { nth: 1 });
@@ -87,18 +86,19 @@ export const NullScene: React.FC = () => {
       <Sfx name="el-pencil" at={ordinaryAt - 2} level={-35} />
       <Sfx name="el-pop" at={trialAt - 4} level={-30} />
 
-      <Head a="Start from the boring answer." at={nullFrom - 4} out={surpriseFrom - 6} />
-      <Head a="If the null were true," b="would this surprise you?" at={surpriseFrom} bAt={surprisingAt - 8} size={72} />
+      {/* The headline stays put: the question itself is the box on the right. */}
+      <Head a="Start from the boring answer." at={nullFrom - 4} />
 
+      {/* The boring answer arrives as it is named; its line on "nothing". */}
       {card(
         330,
-        nothingAt,
-        nullAgainAt,
+        boringAt,
+        nullAt,
         <>
           <H0 />, the null hypothesis
         </>,
-        "Nothing is going on: both checkouts convert the same.",
-        nullAt + 4,
+        "Nothing is going on: no difference at all.",
+        nothingAt,
       )}
       {card(
         530,
@@ -123,12 +123,15 @@ export const NullScene: React.FC = () => {
           border: `2px solid ${INK}`,
           borderRadius: 10,
           background: PAPER,
-          opacity: ease(frame, surpriseFrom - 2, 14) * (1 - 0.45 * ease(frame, soundsAt - 4, 14)),
+          // The box and its question arrive together, so it is never an empty frame.
+          opacity: ease(frame, ifAt - 4, 14) * (1 - 0.45 * ease(frame, soundsAt - 4, 14)),
         }}
       >
-        <div style={{ opacity: ease(frame, ifAt - 4, 12) }}>
+        <div>
           <span style={{ ...body(36, true), color: INK }}>
-            If <H0 /> were true, would data like mine be <Mark at={surprisingAt}>surprising?</Mark>
+            If <H0 /> were true,
+            <br />
+            would data like mine be <Mark at={surprisingAt}>surprising?</Mark>
           </span>
         </div>
       </div>

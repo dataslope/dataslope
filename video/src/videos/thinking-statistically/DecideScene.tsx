@@ -6,7 +6,7 @@ import { body, fmt, headline, HAIRLINE, INK, INK_SOFT, label, note } from "../..
 import { Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { FLAVORS, ZIPS } from "./data";
+import { FLAVORS, PLANS, ZIPS } from "./data";
 import { Mark, STAT_INK } from "./parts";
 
 const COLS = [160, 640, 1180];
@@ -46,11 +46,13 @@ export const DecideScene: React.FC = () => {
   const skewAt = n.word("next", "skew");
   const centerAt = n.word("next", "center");
 
-  // Each row's summary arrives on the word that names it, its example just after.
+  // Each row's summary arrives on the word that names it, its example just
+  // after. "Labels" are every categorical column, as in KindsScene's tree, so
+  // nominal or ordinal; "Ranks", the ordered ones, also get a median.
   const ROWS = [
     {
       kind: "Labels",
-      scale: "nominal",
+      scale: "nominal or ordinal",
       summary: "Counts, the most common value",
       example: `flavor: ${FLAVORS.mode}`,
       at: labelsAt,
@@ -60,8 +62,9 @@ export const DecideScene: React.FC = () => {
     {
       kind: "Ranks",
       scale: "ordinal",
-      summary: "A median",
-      example: `a 1 to 5 rating: median ${fmt(ZIPS.ratingMedian, 1)}`,
+      summary: "Also a median",
+      // A median that is one of the sizes, never a point between two.
+      example: `plan size: median ${PLANS.median}`,
       at: ranksAt,
       sumAt: medianAt - 4,
       exAt: medianAt + 6,
@@ -87,7 +90,9 @@ export const DecideScene: React.FC = () => {
   // "center" the whole table does, leaving the line to what comes next.
   const focus = ease(frame, realAt - 2, 18) * 0.6;
   const close = 1 - ease(frame, centerAt - 2, 30) * 0.6;
-  const rowOp = (i: number) => (i === 2 ? 1 : 1 - focus) * close;
+  // The quantity's row stays: its mean beside its median is the picture
+  // "skew can pull it off center" leaves on screen.
+  const rowOp = (i: number) => (i === 2 ? 1 : (1 - focus) * close);
 
   return (
     <AbsoluteFill>
@@ -123,12 +128,11 @@ export const DecideScene: React.FC = () => {
                     {r.kind}
                   </Mark>
                 </Mark>
-              ) : i === 0 ? (
-                <Mark at={twoCatAt} out={chiAt + 24}>
+              ) : (
+                // "Two categorical columns": every label, ranked or not.
+                <Mark at={twoCatAt + i * 4} out={chiAt + 24}>
                   {r.kind}
                 </Mark>
-              ) : (
-                r.kind
               )}
             </span>
             <span style={{ ...note(22, INK_SOFT), marginLeft: 14 }}>{r.scale}</span>
@@ -150,6 +154,12 @@ export const DecideScene: React.FC = () => {
           </Ink>
           <Ink at={r.exAt} dur={14} style={{ left: COLS[2], top: rowY(i) + 14, whiteSpace: "nowrap" }}>
             <span style={{ ...note(28, STAT_INK), fontWeight: 650 }}>{r.example}</span>
+            {i === 2 ? (
+              // "Not always": the typical price, well below the mean.
+              <span style={{ ...note(28, INK), fontWeight: 650, opacity: ease(frame, notAlwaysAt - 2, 12) }}>
+                , median ${fmt(ZIPS.priceMedian)}
+              </span>
+            ) : null}
           </Ink>
           <div
             style={{

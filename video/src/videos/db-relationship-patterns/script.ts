@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -80,6 +81,7 @@ export const script: NarrationScript = {
   voice: "drew",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     // ── 0. The shapes ─────────────────────────────────────────────────────
@@ -134,13 +136,13 @@ export const script: NarrationScript = {
       text: "A student takes lots of courses, and a course has lots of students. Ada takes Math and History. Grace takes Math and Art.",
       pauseAfter: 0.35,
     },
-    { id: "tangle", text: "The links cross, because neither side is the parent.", pauseAfter: 0.4 },
+    { id: "tangle", text: "The links cross, because neither side is the parent.", pauseAfter: 0.8 },
     {
       id: "slot",
       text: "Give students a course ID, and Ada's row has room for one. Math fits... so where does History go?",
-      pauseAfter: 0.35,
+      pauseAfter: 0.9,
     },
-    { id: "flip", text: "Flip it, and Math has room for one student. Where does Grace go?", pauseAfter: 0.4 },
+    { id: "flip", text: "Flip it, and Math has room for one student. Where does Grace go?", pauseAfter: 0.8 },
     { id: "one-side", text: "One foreign key always forces one side to be one." },
     {
       id: "pairing",
@@ -171,10 +173,12 @@ export const script: NarrationScript = {
       id: "once",
       text: "Enroll Linus in Math, and that's row forty-nine. Try it again? Postgres says no: that key already exists.",
     },
+    // One sentence of the take each, so the new idea lands before its first
+    // counter-example: cut from the same take, not voiced again.
+    { id: "grade", scene: true, text: "The row can hold facts of its own, too, like a grade.", pauseAfter: 0.8 },
     {
-      id: "grade",
-      scene: true,
-      text: "The row can hold facts of its own, too, like a grade. Not on students, though: Ada got a B in Math and a C in History.",
+      id: "not-students",
+      text: "Not on students, though: Ada got a B in Math and a C in History.",
       pauseAfter: 0.35,
     },
     { id: "course", text: "Not on courses either: Math gave Ada a B, and Grace a C.", pauseAfter: 0.4 },

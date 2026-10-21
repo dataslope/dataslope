@@ -252,7 +252,8 @@ export const TableScene: React.FC = () => {
           </span>
         </Ink>
       ))}
-      <Note at={conditionAt + 4} x={CHIP_X} y={y(ROW_Y.paid) - 96}>
+      {/* After the first "|" it explains is on screen. */}
+      <Note at={sixAt + 4} x={CHIP_X} y={y(ROW_Y.paid) - 96}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           The bar reads &ldquo;given&rdquo;: churn, given a paid plan.
         </span>

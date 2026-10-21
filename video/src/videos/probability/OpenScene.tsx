@@ -150,7 +150,8 @@ export const OpenScene: React.FC = () => {
                   top: y(PANEL.base - PANEL.tall * 0.55),
                   transform: `translate(-50%, -50%) scale(${lerp(0.7, 1, ease(frame, needAt - 2, 14))})`,
                   opacity: ease(frame, needAt - 2, 14) * (1 - panelsOut),
-                  ...headline(120, true),
+                  // Small enough to sit inside its bar's dashed outline.
+                  ...headline(96, true),
                   color: STAT_INK,
                 }}
               >
@@ -167,7 +168,8 @@ export const OpenScene: React.FC = () => {
       </Note>
 
       {/* ── One half, for one flip ── */}
-      <Ink at={oneHalfAt - 4} dur={18} style={{ left: 160, top: y(290), whiteSpace: "nowrap", opacity: 1 - defDim * 0.4 }}>
+      {/* On the same baseline as "One flip" beside it. */}
+      <Ink at={oneHalfAt - 4} dur={18} style={{ left: 160, top: y(300), whiteSpace: "nowrap", opacity: 1 - defDim * 0.4 }}>
         <span style={{ ...note(24, INK_SOFT), display: "block", marginBottom: 8 }}>Probability of heads</span>
         <span style={{ ...headline(128), color: INK }}>½</span>
       </Ink>

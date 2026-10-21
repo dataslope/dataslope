@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, USERS } from "./data";
-import { Bracket, DATA, EST, EST_INK, Headline, IntervalBar, Kicker, lerp, Marked, pulse, Rule, Slot, Svg, XBar } from "./parts";
+import { Bracket, DATA, EST, EST_INK, Headline, IntervalBar, Kicker, Marked, pulse, Rule, Slot, Svg, XBar } from "./parts";
 
 /** Fig. 1: every user's monthly spend. */
 const X: XScale = { lo: 10, hi: 90, x0: 160, x1: 1240 };
@@ -20,7 +20,7 @@ const BASE = 836;
 const BELL_H = 150;
 const BAR_Y = 640;
 /** The inset: the two critical values on a scale of their own. */
-const C: XScale = { lo: 1.9, hi: 2.1, x0: 1380, x1: 1740 };
+const C: XScale = { lo: 1.9, hi: 2.1, x0: 1340, x1: 1700 };
 const C_Y = 470;
 
 const JIT = jitter(61, USERS.n);
@@ -40,6 +40,7 @@ export const BuildScene: React.FC = () => {
   // ── Cues ──
   const hookFrom = n.beat("hook").from;
   const twoNumbersAt = n.word("hook", "two numbers");
+  const dataAt = n.word("hook", "data");
   const estimateAt = n.word("hook", "estimate");
   const seWordAt = n.word("hook", "standard error");
   const fiftyAt = n.word("users", "Fifty users");
@@ -57,7 +58,7 @@ export const BuildScene: React.FC = () => {
   const multiplyAt = n.word("margin", "Multiply");
   const whyAt = n.word("why", "Why");
   const buildingAt = n.word("means-in", "Building");
-  const tDistAt = n.word("why", "t-distribution");
+  const tDistAt = n.word("why-t", "t-distribution");
   const slipEndAt = n.word("means-in", "slip", { edge: "end" });
   const criticalAt = n.word("margin", "critical value");
   const twoOhOneAt = n.word("margin", "two point oh one");
@@ -68,20 +69,15 @@ export const BuildScene: React.FC = () => {
   const fiftyTwoAt = n.word("interval", "fifty-two");
   const usualAt = n.word("why", "usual");
   const nineSixAt = n.word("why", "one point nine six");
-  const spreadAt = n.word("why", "spread");
-  const sameAt = n.word("why", "same fifty");
-  const widensAt = n.word("why", "widens");
-  const payAt = n.word("why", "pay");
+  const spreadAt = n.word("why-t", "spread");
+  const sameAt = n.word("why-t", "same fifty");
+  const widensAt = n.word("why-t", "widens");
+  const payAt = n.word("why-t", "pay");
   const easyAt = n.word("means-in", "easy");
   const meansAt = n.word("means-in", "means");
 
   const mx = sx(Z, USERS.xBar);
   const zx = (v: number) => sx(Z, v);
-  // The interval's ends: drawn at the t width, narrowed to the normal's on
-  // "one point nine six", and widened back on "widens".
-  const narrow = ease(frame, nineSixAt + 2, 14) * (1 - ease(frame, widensAt - 2, 16));
-  const lo = lerp(USERS.lo, USERS.zLo, narrow);
-  const hi = lerp(USERS.hi, USERS.zHi, narrow);
 
   const zoomIn = ease(frame, anotherAt - 4, 18);
   const bell = ease(frame, elseAt - 6, 20);
@@ -127,7 +123,7 @@ export const BuildScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the fifty users, their average, the bell, the margin, the interval, the t ── */}
-      <Sfx name="el-sprinkle" at={fiftyAt - 4} level={-33} />
+      <Sfx name="el-sprinkle" at={dataAt - 4} level={-33} />
       <Sfx name="el-tap" at={fortyNineAt - 4} level={-28} />
       <Sfx name="el-pencil" at={elseAt - 6} level={-34} />
       <Sfx name="el-pop" at={threeAt - 4} level={-30} />
@@ -172,7 +168,7 @@ export const BuildScene: React.FC = () => {
       </Ink>
 
       {/* ── Fig. 1: the fifty users ── */}
-      <FigLabel n="1" title={`${USERS.n} users' monthly spend, in dollars`} at={fiftyAt - 8} x={160} y={y(362)} />
+      <FigLabel n="1" title={`${USERS.n} users' monthly spend, in dollars`} at={dataAt - 8} x={160} y={y(362)} />
       <Svg>
         <rect
           x={sx(X, Z.lo)}
@@ -183,14 +179,16 @@ export const BuildScene: React.FC = () => {
           opacity={0.45}
         />
         {USERS.values.map((v, j) => {
-          const a = ease(frame, fiftyAt - 4 + j * 0.45, 7);
+          const a = ease(frame, dataAt - 4 + j * 0.45, 7);
           if (a <= 0) return null;
+          // They arrive on "from the data", and swell once as "Fifty users" names them.
+          const named = 1 + 0.3 * pulse(frame, fiftyAt - 2 + j * 0.3, 16);
           return (
-            <circle key={j} cx={sx(X, v)} cy={y(STRIP) + h((JIT[j] - 0.5) * 44)} r={7 * a} fill={DATA} stroke={PAPER} strokeWidth={1.4} opacity={0.85} />
+            <circle key={j} cx={sx(X, v)} cy={y(STRIP) + h((JIT[j] - 0.5) * 44)} r={7 * a * named} fill={DATA} stroke={PAPER} strokeWidth={1.4} opacity={0.85} />
           );
         })}
       </Svg>
-      <Axis scale={X} base={y(AXIS1)} ticks={[10, 30, 50, 70, 90]} at={fiftyAt - 6} format={(v) => `$${v}`} />
+      <Axis scale={X} base={y(AXIS1)} ticks={[10, 30, 50, 70, 90]} at={dataAt - 6} format={(v) => `$${v}`} />
       <Rule
         x={sx(X, USERS.xBar)}
         y0={y(STRIP) + h(38)}
@@ -217,7 +215,7 @@ export const BuildScene: React.FC = () => {
       />
       <Note at={sameAt - 4} x={sx(X, USERS.xBar + USERS.s) + 16} y={y(STRIP) - h(44) - 16} out={easyAt}>
         <span style={{ ...note(22, INK), ...halo, whiteSpace: "nowrap" }}>
-          s = {money(USERS.s)}, from the same {USERS.n}
+          spread s = {money(USERS.s)}, from the same {USERS.n}
         </span>
       </Note>
 
@@ -231,7 +229,7 @@ export const BuildScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={elseAt + 4} x={zx(USERS.xBar - 2.3 * USERS.se) - 10} y={y(BASE) - h(BELL_H * 0.4)} align="right" from="right">
-        <span style={{ ...note(22, EST_INK), ...halo, whiteSpace: "nowrap" }}>where another {USERS.n} might average</span>
+        <span style={{ ...note(22, EST_INK), ...halo, whiteSpace: "nowrap" }}>how much an average wobbles</span>
       </Note>
       <Rule x={mx} y0={y(BASE)} y1={y(BAR_Y) - h(26)} at={fortyNineAt - 2} color={EST} width={3.2} opacity={zoomIn} />
 
@@ -251,8 +249,8 @@ export const BuildScene: React.FC = () => {
 
       {/* The interval itself, on both figures. */}
       <IntervalBar
-        x0={zx(lo)}
-        x1={zx(hi)}
+        x0={zx(USERS.lo)}
+        x1={zx(USERS.hi)}
         y={y(BAR_Y)}
         at={stepAt - 2}
         dur={22}
@@ -260,20 +258,6 @@ export const BuildScene: React.FC = () => {
         width={4 + 4 * pulse(frame, buildingAt - 2, 20)}
         tick={14}
       />
-      <IntervalBar
-        x0={zx(USERS.zLo)}
-        x1={zx(USERS.zHi)}
-        y={y(BAR_Y) + h(30)}
-        at={nineSixAt}
-        out={payAt + 6}
-        color={INK_SOFT}
-        width={2}
-        tick={8}
-        dash="6 5"
-      />
-      <Note at={nineSixAt + 4} x={zx(USERS.zHi) + 12} y={y(BAR_Y) + h(30) - 15} out={payAt + 6}>
-        <span style={{ ...note(20, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>with 1.96</span>
-      </Note>
       <Note at={fortySixAt} x={zx(USERS.lo) - 14} y={y(BAR_Y) - 16} align="right" from="right">
         <span style={{ ...note(26, INK), fontWeight: 700, ...halo }}>{money(USERS.lo)}</span>
       </Note>
@@ -295,9 +279,9 @@ export const BuildScene: React.FC = () => {
           normal {fmt(USERS.zCrit)}
         </span>
       </Note>
-      <Rule x={sx(C, USERS.tCrit)} y0={y(C_Y)} y1={y(C_Y) - h(40)} at={tDistAt - 2} color={EST} width={4} out={meansAt - 8} />
+      <Rule x={sx(C, USERS.tCrit)} y0={y(C_Y)} y1={y(C_Y) - h(40)} at={tDistAt - 2} color={EST} width={4 + 3 * pulse(frame, widensAt - 2, 18)} out={meansAt - 8} />
       <Note at={tDistAt} x={sx(C, USERS.tCrit) + 8} y={y(C_Y) - h(40) - 30} from="up" out={meansAt - 8}>
-        <span style={{ ...note(20, EST_INK), fontWeight: 700, whiteSpace: "nowrap" }}>t, {USERS.n - 1} df: {fmt(USERS.tCrit)}</span>
+        <span style={{ ...note(20, EST_INK), fontWeight: 700, whiteSpace: "nowrap" }}>t-distribution: {fmt(USERS.tCrit)}</span>
       </Note>
 
       {/* The turn: what the 95% means. */}

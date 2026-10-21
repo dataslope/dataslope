@@ -40,11 +40,15 @@ import { type Cell, ILLUSTRATIONS, VIDEO } from "./data";
 export const X0 = 120;
 export const KICKER_Y = 112;
 export const HEAD_Y = 150;
-/** The schema card's top, on the left. */
-export const CARD_Y = 370;
+/** The schema card's top, on the left: low enough that a scene's figure
+ *  sits in the middle of the page rather than under the headline. */
+export const CARD_Y = 420;
+/** A figure's "Fig. N" line: on its own row, 50px over the card and table
+ *  tops, so its descenders clear them by about 25px. */
+export const FIG_Y = CARD_Y - 50;
 /** The data table's left edge and top, on the right. */
 export const TABLE_X = 1000;
-export const TABLE_Y = 370;
+export const TABLE_Y = 420;
 /** Table heights before `h()`. */
 export const HEAD_H = 52;
 export const ROW_H = 64;
@@ -320,7 +324,8 @@ export const Pill: React.FC<{
   strikeAt?: number;
   out?: number;
   dim?: number;
-}> = ({ x, y, at, children, pulses = [], strikeAt, out, dim }) => {
+  size?: number;
+}> = ({ x, y, at, children, pulses = [], strikeAt, out, dim, size = TAG_SIZE }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -338,7 +343,7 @@ export const Pill: React.FC<{
         lineHeight: 1.2,
       }}
     >
-      <Code size={TAG_SIZE}>{children}</Code>
+      <Code size={size}>{children}</Code>
     </div>
   );
   return (
@@ -388,7 +393,9 @@ export type Chip = {
  * A constraint's tags beside an entity's row: small pills of SQL that ink in
  * on their cues, one after another to the right of the box, level with the
  * row they guard. With `span`, the tags sit at the middle of two rows, and a
- * bracket from the box's edge joins them: a rule over two columns.
+ * bracket from the box's edge joins them: a rule over two columns. A tag set
+ * on two lines is taller than its row, so it hangs from the row's top instead
+ * of centring on it, which would push it up into the row above.
  */
 export const RuleTags: React.FC<{
   layout: EntityLayout;
@@ -403,6 +410,7 @@ export const RuleTags: React.FC<{
   const i1 = span ? layout.columns.findIndex((c) => c.name === span) : i0;
   if (i0 < 0 || i1 < 0) throw new Error(`No row ${row}${span ? ` or ${span}` : ""} in ${layout.name}`);
   const mid = (layout.rows[i0].mid + layout.rows[i1].mid) / 2;
+  const tall = !span && chips.some((c) => c.code.includes("\n"));
   const gone = out === undefined ? 0 : ease(frame, out, 10);
   const dimmed = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   const first = Math.min(...chips.map((c) => c.at));
@@ -429,8 +437,8 @@ export const RuleTags: React.FC<{
         style={{
           position: "absolute",
           left: layout.right + (bracket ? 30 : 14),
-          top: mid,
-          transform: "translateY(-50%)",
+          top: tall ? layout.rows[i0].top + 4 : mid,
+          transform: tall ? undefined : "translateY(-50%)",
           display: "flex",
           gap: TAG_GAP,
           alignItems: "center",
@@ -775,7 +783,9 @@ export const DbTable: React.FC<{
                 style={{
                   position: "absolute",
                   left: g.x + PAD / 2,
-                  top: top + hgt / 2 - 1.5,
+                  // Above the middle, where a minus sign and a date's
+                  // hyphens sit, so the struck value still reads.
+                  top: top + hgt * 0.42 - 1.5,
                   width: (g.width - PAD) * strike,
                   height: 3,
                   borderRadius: 2,
@@ -798,6 +808,19 @@ export const DbTable: React.FC<{
  * one. `name` (the constraint the message names) is swept with the
  * highlighter on `nameAt`, as the narration says which rule broke.
  */
+/** Text with every hyphenated run (a date, "not-null") kept on one line, so
+ *  a wrapped message never breaks a value at its hyphen. */
+const unbroken = (text: string): React.ReactNode =>
+  text.split(/(\S*-\S*)/).map((part, i) =>
+    i % 2 ? (
+      <span key={i} style={{ whiteSpace: "nowrap" }}>
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+
 export const ErrorBox: React.FC<{
   x: number;
   top: number;
@@ -818,12 +841,12 @@ export const ErrorBox: React.FC<{
   const msg =
     k >= 0 && nameAt !== undefined ? (
       <>
-        {message.slice(0, k)}
+        {unbroken(message.slice(0, k))}
         <Mark at={nameAt}>{quoted}</Mark>
-        {message.slice(k + quoted!.length)}
+        {unbroken(message.slice(k + quoted!.length))}
       </>
     ) : (
-      message
+      unbroken(message)
     );
   return (
     <Ink at={at} dur={16} out={out} style={{ left: x, top, width, opacity: 1 - dimmed }}>
@@ -851,7 +874,7 @@ export const ErrorBox: React.FC<{
           <div style={{ color: INK_SOFT, opacity: detailAt === undefined ? 1 : ease(frame, detailAt, 12) }}>
             <span style={{ fontWeight: 600 }}>DETAIL:</span>
             {"  "}
-            {detail}
+            {unbroken(detail)}
           </div>
         ) : null}
       </div>

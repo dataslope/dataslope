@@ -168,8 +168,8 @@ export const UniformScene: React.FC = () => {
           );
         })}
       </Svg>
-      {/* Row numbers: every fifth, and the one that fires. */}
-      {[0, 4, 9, 14, 19].map((i) => (
+      {/* Row numbers: every fifth, but none next to the one that fires, which is labelled itself. */}
+      {[0, 4, 9, 14, 19].filter((i) => Math.abs(i - HIT) > 1).map((i) => (
         <div
           key={i}
           style={{
@@ -195,13 +195,14 @@ export const UniformScene: React.FC = () => {
       >
         test {HIT + 1}
       </div>
-      <Note at={pointAt - 2} x={sx(TX, TWENTY.p[HIT]) + 22} y={y(T_ROW0 + HIT * T_DY) - 17}>
-        <span style={{ ...note(24, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>p = {fmt(TWENTY.p[HIT], 3)}</span>
-      </Note>
-      <Note at={discoveryAt - 4} x={sx(TX, TWENTY.p[HIT]) + 22} y={y(T_ROW0 + HIT * T_DY) + 18}>
-        <Label size={22} color={STAT_INK} weight={520} style={halo}>
-          reported as a discovery
-        </Label>
+      {/* On the hit's own row, past the 0.05 line: no other dot shares it. */}
+      <Note at={pointAt - 2} x={sx(TX, 0.05) + 24} y={y(T_ROW0 + HIT * T_DY) - 16}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+          p = {fmt(TWENTY.p[HIT], 3)}
+          <span style={{ ...note(22, STAT_INK), fontWeight: 520, opacity: ease(frame, discoveryAt - 4, 12) }}>
+            {" "}· reported as a discovery
+          </span>
+        </span>
       </Note>
       <Note at={nothingAt} x={TX.x1} y={y(T_BASE) + 44} align="right">
         <Label size={21} color={INK_SOFT} weight={520}>

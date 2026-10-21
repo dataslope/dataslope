@@ -14,7 +14,8 @@
     "adaAgain": "-- No pointers, no navigation: rows connect because values match.\nSELECT\n  o.id AS order_id,\n  o.total\nFROM\n  orders o\n  JOIN customers c ON c.id = o.customer_id\nWHERE\n  c.name = 'Ada';",
     "listingAgain": "SELECT o.id AS order_id, o.total\nFROM orders o\nJOIN customers c ON c.id = o.customer_id\nWHERE c.name = 'Ada';",
     "bad": "INSERT INTO orders VALUES (131, 25, 40.00);",
-    "countAfterBad": "SELECT count(*) AS orders FROM orders;"
+    "countAfterBad": "SELECT count(*) AS orders FROM orders;",
+    "twin": "SELECT * FROM orders WHERE customer_id = 1;"
   },
   "results": {
     "customers": {
@@ -251,6 +252,25 @@
       "rows": [
         {
           "orders": 30
+        }
+      ]
+    },
+    "twin": {
+      "fields": [
+        "id",
+        "customer_id",
+        "total"
+      ],
+      "rows": [
+        {
+          "id": 125,
+          "customer_id": 1,
+          "total": "31.00"
+        },
+        {
+          "id": 101,
+          "customer_id": 1,
+          "total": "15.00"
         }
       ]
     }

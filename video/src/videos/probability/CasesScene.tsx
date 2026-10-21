@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { arrowHead, cubicPath, sampleCubic, type Cubic } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { MONTY } from "./data";
-import { DATA, DATA_INK, FAINT, GOLD, GOLD_INK, Headline, lerp, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, FAINT, GOLD, GOLD_INK, Headline, lerp, ROOM, STAT, STAT_INK, Svg } from "./parts";
 
 /** The three cases, one row each: where the car is, given you picked door 1. */
 const ROWS = [350, 530, 710];
@@ -43,9 +43,9 @@ export const CasesScene: React.FC = () => {
   const oneInAt = n.word("cases", "one time in three");
   const otherAt = n.word("goat", "other two times");
   const goatAt = n.word("goat", "picked a goat");
-  const hasToAt = n.word("goat", "has to open");
-  const shutAt = n.word("goat", "leaves shut");
-  const hasCarAt = n.word("goat", "has the car");
+  const hasToAt = n.word("forced", "has to open");
+  const shutAt = n.word("forced", "leaves shut");
+  const hasCarAt = n.word("forced", "has the car");
   const randomAt = n.word("knows", "isn't random");
   const dependsAt = n.word("knows", "depends");
   const infoAt = n.word("knows", "information");
@@ -63,7 +63,14 @@ export const CasesScene: React.FC = () => {
   const rvInFrom = n.beat("rv-in").from;
   const averageAt = n.word("rv-in", "average them");
 
-  const rowAt = [pickAt - 4, otherAt - 2, otherAt + 8];
+  const rowAt = [pickAt - 4, otherAt - 2, goatAt - 6];
+  // While the cases are the only figure they are drawn larger, in the middle;
+  // they move to the left half as the chart of games arrives beside them.
+  const zoom = 1 - ease(frame, randomAt - 24, 18);
+  const ZOOM = 1.2;
+  const caseBox = { x: [160, 1010], y: [y(ROWS[0]) - 7, y(ROWS[2]) + h(MINI.h) + 35] } as const;
+  const tx = (960 - ZOOM * (caseBox.x[0] + caseBox.x[1]) / 2) * zoom;
+  const ty = (y(620) - ZOOM * (caseBox.y[0] + caseBox.y[1]) / 2) * zoom;
   // Where the car is, flashed in every case as the narration says it decides the host's door.
   const carFlash = ease(frame, whereAt - 2, 6) * (1 - ease(frame, whereAt + 12, 14));
   const opensAt = [hasToAt - 2, hasToAt + 2, hasToAt + 6];
@@ -95,6 +102,14 @@ export const CasesScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, averageAt - 4, 14) * 0.6 }}>
 
       {/* ── The three cases ── */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          transformOrigin: "0 0",
+          transform: zoom > 0 ? `translate(${tx}px, ${ty}px) scale(${lerp(1, ZOOM, zoom)})` : undefined,
+        }}
+      >
       {CASES.map((c, r) => {
         const at = rowAt[r];
         const ry = y(ROWS[r]);
@@ -115,7 +130,7 @@ export const CasesScene: React.FC = () => {
                 const leaf = lerp(MINI.w, MINI.w * 0.18, isOpen);
                 return (
                   <g key={d}>
-                    <rect x={x} y={ry} width={MINI.w} height={h(MINI.h)} fill={d === c.car ? GOLD : `color-mix(in srgb, ${INK} 14%, ${PAPER})`} />
+                    <rect x={x} y={ry} width={MINI.w} height={h(MINI.h)} fill={d === c.car ? GOLD : ROOM} />
                     <rect
                       x={x}
                       y={ry}
@@ -157,6 +172,7 @@ export const CasesScene: React.FC = () => {
           </React.Fragment>
         );
       })}
+      </div>
       <Note at={randomAt} x={160} y={y(868)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           The host&apos;s door <b>depends</b>
@@ -166,9 +182,7 @@ export const CasesScene: React.FC = () => {
       </Note>
 
       {/* ── A hundred thousand games ── */}
-      <Ink at={randomAt - 6} dur={14} style={{ left: CH.x0, top: y(282), whiteSpace: "nowrap" }}>
-        <span style={label(23, INK)}>Win rate so far, over {MONTY.trials.toLocaleString("en-US")} games</span>
-      </Ink>
+      <FigLabel n="7" title={`Win rate so far, over ${MONTY.trials.toLocaleString("en-US")} games`} at={randomAt - 6} x={CH.x0} y={y(268)} />
       <Svg opacity={axis}>
         <line x1={CH.x0} x2={CH.x1} y1={y(CH.base) + 0.5} y2={y(CH.base) + 0.5} stroke={INK} strokeWidth={1.6} />
         {[1, 10, 100, 1000, 10_000, 100_000].map((k) => (
@@ -179,12 +193,23 @@ export const CasesScene: React.FC = () => {
             </text>
           </g>
         ))}
+        <text x={CH.x1} y={y(CH.base) + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+          games played (log scale)
+        </text>
         {[1 / 3, 2 / 3].map((p) => (
           <line key={p} x1={CH.x0} x2={CH.x1} y1={fy(p)} y2={fy(p)} stroke={INK} strokeWidth={1.6} strokeDasharray="6 6" opacity={0.7} />
         ))}
-        {[0, 0.5, 1].map((p) => (
-          <text key={p} x={CH.x0 - 12} y={fy(p) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
-            {p === 0 ? "0" : p === 1 ? "1" : "½"}
+        {/* The ticks name the two guides, the rates the lines settle on. */}
+        {(
+          [
+            [0, "0"],
+            [1 / 3, "⅓"],
+            [2 / 3, "⅔"],
+            [1, "1"],
+          ] as const
+        ).map(([p, t]) => (
+          <text key={p} x={CH.x0 - 12} y={fy(p) + 8} textAnchor="end" style={{ fontFamily: SANS, fontSize: 24, fontWeight: 500, fill: INK_SOFT }}>
+            {t}
           </text>
         ))}
       </Svg>
@@ -198,18 +223,18 @@ export const CasesScene: React.FC = () => {
       </Svg>
       <Note at={stayAt - 2} x={CH.x1 - 4} y={fy(MONTY.stay) + 12} align="right">
         <span style={{ ...note(24, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-          stay <span style={{ opacity: ease(frame, thirtyAt - 4, 10) }}>{fmt(liveStay * 100, 1)}%</span>
+          stay <span style={{ opacity: ease(frame, thirtyAt - 4, 10), ...TABULAR }}>{fmt(liveStay * 100, 1)}%</span>
         </span>
       </Note>
       <Note at={switchAt - 2} x={CH.x1 - 4} y={fy(MONTY.switch) - 46} align="right">
         <span style={{ ...note(24, DATA_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-          switch <span style={{ opacity: ease(frame, sixtyAt - 4, 10) }}>{fmt((1 - liveStay) * 100, 1)}%</span>
+          switch <span style={{ opacity: ease(frame, sixtyAt - 4, 10), ...TABULAR }}>{fmt((1 - liveStay) * 100, 1)}%</span>
         </span>
       </Note>
       {/* How many games have been played, counting up as the lines run. */}
       <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 6, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>games </span>
-        <span style={{ ...note(34, INK), fontWeight: 700 }}>{Math.round(K).toLocaleString("en-US")}</span>
+        <span style={{ ...note(34, INK), fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
       </div>
 
       </div>

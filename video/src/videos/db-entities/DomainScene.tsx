@@ -1,16 +1,20 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { INK_SOFT, note } from "../../editorial/style";
+import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BANANA, CHECK_SQL, LOOSE, LOOSE_IN, LOOSE_OUT } from "./data";
-import { DbTable, ErrorBox, HEAD_H, Listing, ROW_H, tableGeometry } from "./kit";
+import { DbTable, ErrorBox, Fig, FIG_GAP, HEAD_H, Listing, Mono, ROW_H, tableGeometry } from "./kit";
 import { Bracket, Drift, Headline, OK_INK, OK_WASH, STAT_INK } from "./parts";
 
 const S = 1.3;
+/** Where the loose table ends up, beside the CHECK listing. */
 const LOOSE_X = 130;
+/** Where it sits while it is the only figure: nearer the middle of the page,
+ *  so the right half isn't left empty. It glides left on "narrow it". */
+const LOOSE_FROM_X = 640;
 const RIGHT_X = 600;
 const RIGHT_W = 1200;
 
@@ -20,6 +24,7 @@ const RIGHT_W = 1200;
  * four, only "shipped" gets in, and "banana" is refused by name.
  */
 export const DomainScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
@@ -53,8 +58,18 @@ export const DomainScene: React.FC = () => {
   const statusLine = CHECK_SQL.findIndex((l) => l.includes("status IN"));
   const totalLine = CHECK_SQL.findIndex((l) => l.includes("total_cents >="));
   const listTop = y(372);
-  const bananaTop = y(640);
-  const errorTop = y(718);
+  // Low enough for Fig. 8's label to sit on its own line under the CHECKs.
+  const bananaTop = y(664);
+  const errorTop = y(742);
+  /** The error box's height: its padding and two lines of 21px mono. */
+  const errorBottom = errorTop + 34 + 2 * 21 * 1.5 + 8;
+  // "So narrow it": the table moves aside, then the listing comes in on "Four statuses".
+  const glide = interpolate(frame, [narrowAt - 6, narrowAt + 22], [LOOSE_FROM_X - LOOSE_X, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.sin),
+  });
+  const listAt = Math.max(fourAt - 8, narrowAt + 14);
 
   return (
     <AbsoluteFill>
@@ -70,57 +85,68 @@ export const DomainScene: React.FC = () => {
         <Headline lead="Text takes anything." leadAt={from - 6} turn="So narrow it." turnAt={narrowAt - 4} />
 
         {/* ── status as plain text ── */}
-        <Ink at={textAt - 4} dur={14} style={{ left: LOOSE_X, top: top - 46, whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>status as plain text</span>
-        </Ink>
-        <div style={{ position: "absolute", left: LOOSE_X, top, transform: `scale(${S})`, transformOrigin: "0 0" }}>
-          <DbTable
-            g={g}
-            cols={LOOSE.cols}
-            rows={LOOSE.rows.map((cells, i) => ({
-              cells,
-              at: spellAt[i] - 2,
-              strikeAt: LOOSE_OUT.includes(i) ? getsAt + LOOSE_OUT.indexOf(i) * 4 : undefined,
-              dimAt: LOOSE_OUT.includes(i) ? getsAt + 14 : undefined,
-            }))}
-            at={textAt - 2}
-            numeric={[0]}
-            bands={LOOSE_IN.map((row) => ({ row, at: onlyAt, color: OK_WASH }))}
-          />
-        </div>
-        <Note at={anythingAt - 2} out={spellAt[0] - 2} x={looseRight + 30} y={rowsTop + 10}>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Anything goes in</span>
-        </Note>
-        <Bracket x={looseRight + 14} y0={rowsTop + 6} y1={rowsBottom - 6} at={sameAt - 2} out={narrowAt - 4} />
-        <Note at={sameAt + 4} out={narrowAt - 4} x={looseRight + 42} y={(rowsTop + rowsBottom) / 2 - 30}>
-          <span style={{ ...note(23, STAT_INK), whiteSpace: "nowrap" }}>
-            {LOOSE.distinct} values.
-            <br />
-            The same state?
-          </span>
-        </Note>
-        {LOOSE_IN.map((row) => (
-          <Note key={row} at={onlyAt + 6} x={looseRight + 30} y={top + g.rowMid(row) * S - 15}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>gets in</span>
+        <div style={{ position: "absolute", inset: 0, transform: `translateX(${glide}px)` }}>
+          <Fig n="6" at={textAt - 4} x={LOOSE_X} y={top - FIG_GAP}>
+            <Mono>status</Mono> as plain text
+          </Fig>
+          <div style={{ position: "absolute", left: LOOSE_X, top, transform: `scale(${S})`, transformOrigin: "0 0" }}>
+            <DbTable
+              g={g}
+              cols={LOOSE.cols}
+              rows={LOOSE.rows.map((cells, i) => ({
+                cells,
+                at: spellAt[i] - 2,
+                strikeAt: LOOSE_OUT.includes(i) ? getsAt + LOOSE_OUT.indexOf(i) * 4 : undefined,
+                dimAt: LOOSE_OUT.includes(i) ? getsAt + 14 : undefined,
+              }))}
+              at={textAt - 2}
+              numeric={[0]}
+              bands={LOOSE_IN.map((row) => ({ row, at: onlyAt, color: OK_WASH }))}
+            />
+          </div>
+          <Note at={anythingAt - 2} out={spellAt[0] - 2} x={looseRight + 30} y={rowsTop + 10}>
+            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Anything goes in</span>
           </Note>
-        ))}
+          {/* The question holds through the pause, and leaves as the table moves aside. */}
+          <Bracket x={looseRight + 14} y0={rowsTop + 6} y1={rowsBottom - 6} at={sameAt - 2} out={narrowAt + 6} />
+          <Note at={sameAt + 4} out={narrowAt + 6} x={looseRight + 42} y={(rowsTop + rowsBottom) / 2 - 30}>
+            <span style={{ ...note(23, STAT_INK), whiteSpace: "nowrap" }}>
+              {LOOSE.distinct} values.
+              <br />
+              The same state?
+            </span>
+          </Note>
+          {LOOSE_IN.map((row) => (
+            <Note key={row} at={onlyAt + 6} x={looseRight + 30} y={top + g.rowMid(row) * S - 15}>
+              <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>gets in</span>
+            </Note>
+          ))}
+        </div>
 
         {/* ── The narrow domain: the lesson's two CHECKs ── */}
+        <Fig n="7" at={listAt - 2} x={RIGHT_X} y={listTop - FIG_GAP}>
+          <Mono>status</Mono> and <Mono>total_cents</Mono>, narrowed by <Mono>CHECK</Mono>
+        </Fig>
         <Listing
           lines={CHECK_SQL}
           x={RIGHT_X}
           top={listTop}
           width={RIGHT_W}
           size={24}
-          at={narrowAt - 6}
-          lineAt={CHECK_SQL.map((_, i) => (i <= statusLine ? (i === statusLine ? fourAt : narrowAt - 2) : i < totalLine ? totalAt - 2 : zeroAt - 4))}
+          at={listAt}
+          lineAt={CHECK_SQL.map((_, i) => (i <= statusLine ? (i === statusLine ? fourAt + 2 : listAt + 2) : i < totalLine ? totalAt - 2 : zeroAt - 4))}
           marks={[
             { line: statusLine, at: fourAt + 8, out: totalAt },
             { line: totalLine, at: zeroAt, out: onlyAt },
+            // The rule banana broke: the same yellow as its name in the error.
+            { line: statusLine, at: ruleAt + 4 },
           ]}
         />
 
         {/* ── banana, and the rule it broke ── */}
+        <Fig n="8" at={bananaAt - 10} x={RIGHT_X} y={bananaTop - FIG_GAP}>
+          Inserting the status banana, and Postgres&apos;s answer
+        </Fig>
         <Listing
           lines={[BANANA.sql]}
           x={RIGHT_X}
@@ -140,6 +166,10 @@ export const DomainScene: React.FC = () => {
           mark={BANANA.error.constraint ?? undefined}
           markAt={ruleAt}
         />
+        {/* Where that name came from: the CHECK above has none of its own. */}
+        <Note at={ruleAt + 12} x={RIGHT_X + RIGHT_W - 22} y={errorBottom + 18} align="right" from="up">
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Named by Postgres: table, column, check</span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

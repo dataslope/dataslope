@@ -5,7 +5,7 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -37,7 +37,8 @@ export const ExpandScene: React.FC = () => {
   const contractAt = n.word("contract", "contract");
   const removeAt = n.word("contract", "remove");
 
-  const users = useEntityLayout({ x: 120, y: y(380), width: 300, ...ASSIGN.users });
+  // users.id level with tasks.owner_id (one row below tasks' first), so "owns" runs straight.
+  const users = useEntityLayout({ x: 120, y: y(376), width: 300, ...ASSIGN.users });
   const tasks = useEntityLayout({ x: 720, y: y(330), width: 330, ...ASSIGN.tasks });
   const tasksAfter = useEntityLayout({ x: 720, y: y(330), width: 330, ...ASSIGN.tasksAfter });
   const assignees = useEntityLayout({ x: 720, y: y(660), width: 330, ...ASSIGN.assignees });
@@ -74,7 +75,12 @@ export const ExpandScene: React.FC = () => {
     }
     return path[path.length - 1];
   };
-  const swapAt = removeAt + 14;
+  // Once owner_id is struck, tasks closes up over it: the two-row box is
+  // already whole underneath and the old one fades off it, rather than a
+  // fresh box building itself.
+  const swapAt = removeAt + 12;
+  /** Frames each owner takes to move across. */
+  const TRAVEL = 45;
 
   const phases = [
     { at: expandAt, title: "Expand", detail: "add the new table beside the old" },
@@ -87,7 +93,7 @@ export const ExpandScene: React.FC = () => {
       <Sfx name="el-pop" at={newTableAt - 2} level={-29} />
       <Sfx name="el-pencil" at={newTableAt + 8} level={-35} />
       {Array.from({ length: MOVED }, (_, i) => (
-        <Sfx key={i} name="el-whoosh" at={dataAt + i * 8} level={-34} />
+        <Sfx key={i} name="el-whoosh" at={dataAt + i * 12} level={-34} />
       ))}
       <Sfx name="el-scratch" at={removeAt} level={-30} />
       {phases.map((p, i) => (
@@ -99,16 +105,21 @@ export const ExpandScene: React.FC = () => {
         One owner becomes
       </Head>
 
+      <FigLabel n="5" title="One owner, then a team of assignees" at={expandFrom + 4} x={120} y={y(262)} />
       <Entity layout={users} at={expandFrom + 2} />
-      {frame < swapAt + 12 ? (
-        <Entity
-          layout={tasks}
-          at={expandFrom + 6}
-          marks={{ owner_id: { at: ownerAt - 2, tone: "key", out: nothingAt - 4 } }}
-          out={swapAt}
-        />
+      {/* The contracted tasks and its line, whole from the moment they show, under the old ones. */}
+      {frame >= swapAt ? (
+        <>
+          <Entity layout={tasksAfter} at={swapAt - 24} rowAt={{ id: swapAt - 24, title: swapAt - 24 }} />
+          <Relation name="tasks have assignees, after" points={hasAfter} from="exactly-one" to="zero-or-many" at={swapAt - 24} />
+        </>
       ) : null}
-      <Entity layout={tasksAfter} at={swapAt} />
+      <Entity
+        layout={tasks}
+        at={expandFrom + 6}
+        marks={{ owner_id: { at: ownerAt - 2, tone: "key", out: nothingAt - 4 } }}
+        out={swapAt}
+      />
       <RowWash e={tasks} rows={[1]} at={nothingAt - 2} out={swapAt} color={`color-mix(in srgb, var(--ds-red-400) 40%, ${PAPER})`} />
       <RowStrike e={tasks} index={1} at={removeAt} out={swapAt} />
       <Relation name="users own tasks" points={owns} from="exactly-one" to="zero-or-many" at={expandFrom + 14} label="owns" out={removeAt + 6} />
@@ -116,7 +127,6 @@ export const ExpandScene: React.FC = () => {
       {/* ── Expand: the new table beside the old column ── */}
       <Entity layout={assignees} at={newTableAt - 2} rowGap={6} />
       <Relation name="tasks have assignees" points={has} from="exactly-one" to="zero-or-many" at={newTableAt + 8} out={swapAt} />
-      <Relation name="tasks have assignees, after" points={hasAfter} from="exactly-one" to="zero-or-many" at={swapAt} dur={10} />
       <Relation
         name="users assigned"
         points={assigned}
@@ -132,7 +142,7 @@ export const ExpandScene: React.FC = () => {
 
       {/* ── Move: each owner becomes that task's first assignee ── */}
       {Array.from({ length: MOVED }, (_, i) => {
-        const t = ease(frame, dataAt + i * 8, 26);
+        const t = ease(frame, dataAt + i * 12, TRAVEL);
         if (t <= 0 || t >= 1) return null;
         const [px, py] = along(t);
         return (

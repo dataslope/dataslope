@@ -15,6 +15,8 @@
 //            tables", run only to check its rows against that drawing (they
 //            disagree: see the report in script.ts).
 //   - badges: cardinality.mdx, "Uniqueness turns many into at-most-one".
+//   - devices: cardinality.mdx's diagram (employees ||--o{ devices), which has
+//            no SQL in the lesson: two devices sharing employee 1.
 //   - model: reading-er-diagrams.mdx, "Querying through the diagram".
 /* global console, URL */
 import { PGlite } from "@electric-sql/pglite";
@@ -131,6 +133,26 @@ INSERT INTO badges VALUES (10, 1);`);
   // The lesson's starter: a second badge for Ada.
   await run(db, "secondBadge", "INSERT INTO badges VALUES (11, 1);");
   await run(db, "badgesAfter", "SELECT * FROM badges;");
+  await db.close();
+}
+
+// ── devices: the many end of the same diagram (cardinality.mdx) ──────────────
+// The lesson draws employees ||--o{ devices but gives it no SQL, so this is
+// built to the diagram's columns: a plain foreign key, no UNIQUE, and two of
+// Ada's devices to show rows sharing her id.
+{
+  const db = new PGlite();
+  await db.exec(`CREATE TABLE employees (
+  id   INTEGER PRIMARY KEY,
+  name TEXT NOT NULL
+);
+CREATE TABLE devices (
+  id          INTEGER PRIMARY KEY,
+  employee_id INTEGER NOT NULL REFERENCES employees(id)
+);
+INSERT INTO employees VALUES (1, 'Ada');`);
+  await run(db, "devicesInsert", "INSERT INTO devices VALUES (20, 1), (21, 1);");
+  await run(db, "devices", "SELECT id, employee_id FROM devices ORDER BY id;");
   await db.close();
 }
 

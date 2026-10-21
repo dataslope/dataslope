@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -17,18 +18,19 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *   2. Cardinality ("both" to "translate"), after cardinality.mdx: asked in
  *      both directions, one-to-many, the key on the many side; crow's-foot
  *      notation, each end read from the box outward (the maximum next to the
- *      box, the minimum farther out), the four ends with the lesson's own
- *      examples, feet at both ends for many-to-many; and the marks changing
- *      the schema, with the UNIQUE rule that turns many into at most one.
+ *      box, the minimum farther out), then a line read from one box to the
+ *      end at the other, the four ends with the lesson's own examples, feet
+ *      at both ends for many-to-many; and the marks changing the schema, with
+ *      the UNIQUE rule that turns many into at most one.
  *   3. Reading a diagram ("shop" to "next"), after reading-er-diagrams.mdx:
  *      the shop model read line by line as sentences, a sentence that sounds
  *      wrong as a design fault, and the foreign keys as the query's joins.
  *      It ends on Unit 4's opening: every line lands on one row because each
  *      row has a name nothing else shares, a key.
  *
- * Left on the page: the DDL, the composite key of order_items (Unit 4's
- * subject), the junction table's construction (Unit 5's), Chinook, and the
- * quizzes.
+ * Left on the page: the DDL, the composite key of order_items beyond a
+ * one-line note (Unit 4's subject), the junction table's construction (Unit
+ * 5's), Chinook, and the quizzes.
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
@@ -59,6 +61,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     unique constraint "badges_employee_id_key"', DETAIL 'Key
  *     (employee_id)=(1) already exists.', and badges still holds one row.
  *     employees ||--o{ devices and ||--o| badges are the lesson's diagram.
+ *     The lesson has no SQL for devices; check.mjs builds it to the
+ *     diagram's columns and stores devices 20 and 21 for employee 1, the two
+ *     rows that "share an employee id".
  *   - reading-er-diagrams: its shop model and its three sentences; its
  *     query returns Ada, order 101, line 1 Notebook quantity 2 and line 2 Pen
  *     quantity 3, "two notebooks and three pens"; Postgres lists exactly the
@@ -75,6 +80,7 @@ export const script: NarrationScript = {
   voice: "drew",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     // ── Part 1. What a relationship is ────────────────────────────────────
@@ -120,18 +126,25 @@ export const script: NarrationScript = {
       text: "Crow's-foot notation draws those answers right onto the line. Every end gets two marks.",
       pauseAfter: 0.35,
     },
-    { id: "max", text: "Next to the box is the most. A bar means one, and a crow's foot means many.", pauseAfter: 0.3 },
-    { id: "min", text: "Farther out is the least. A circle means zero, and a bar means one.", pauseAfter: 0.5 },
-    { id: "one", text: "Two bars, exactly one. A profile belongs to one user.", pauseAfter: 0.3 },
-    { id: "zero-or-one", text: "A bar and a circle, zero or one. An employee gets one parking pass, at most.", pauseAfter: 0.3 },
-    { id: "one-or-many", text: "A foot and a bar, one or many. An order holds at least one item.", pauseAfter: 0.3 },
-    { id: "zero-or-many", text: "A foot and a circle, zero or many. A customer might not have ordered yet.", pauseAfter: 0.4 },
+    // The key is new notation: a breath after each half, and a longer one to
+    // read the finished Fig. 3 before the table of ends replaces it.
+    { id: "max", text: "Next to the box is the most. A bar means one, and a crow's foot means many.", pauseAfter: 1.0 },
+    { id: "min", text: "Farther out is the least. A circle means zero, and a bar means one.", pauseAfter: 1.6 },
+    {
+      id: "one",
+      text: "Start at one box, and read the end at the other box. Two bars, exactly one. A profile belongs to one user.",
+      pauseAfter: 0.7,
+    },
+    { id: "zero-or-one", text: "A bar and a circle, zero or one. An employee gets one parking pass, at most.", pauseAfter: 0.7 },
+    { id: "one-or-many", text: "A foot and a bar, one or many. An order holds at least one item.", pauseAfter: 0.7 },
+    { id: "zero-or-many", text: "A foot and a circle, zero or many. A customer might not have ordered yet.", pauseAfter: 0.7 },
     { id: "m2m", text: "And feet at both ends? That's many-to-many, like students and courses." },
     {
       id: "schema",
       scene: true,
       text: "And those marks change the schema. Many devices per employee? Then device rows can share an employee id.",
-      pauseAfter: 0.35,
+      // Holds Ada's two devices, both employee 1, before the badges replace them.
+      pauseAfter: 0.9,
     },
     { id: "badge", text: "But one badge, at most? Then no employee id can show up twice.", pauseAfter: 0.35 },
     { id: "reject", text: "Give Ada a second badge... and Postgres says NO.", pauseAfter: 0.5 },
@@ -141,7 +154,7 @@ export const script: NarrationScript = {
     {
       id: "shop",
       scene: true,
-      text: "So let's read one, properly. A little shop: customers, orders, order items, products. Read each line as a sentence.",
+      text: "So let's read one, properly. A little shop: customers, orders, products, and order items, which tie each order to its products. Read each line as a sentence.",
       pauseAfter: 0.4,
     },
     { id: "s1", text: "One customer places zero or many orders.", pauseAfter: 0.3 },
@@ -151,7 +164,7 @@ export const script: NarrationScript = {
     {
       id: "joins",
       text: "Then follow the keys. Each one is a join, so the diagram maps out the query. Ada, her order, its lines, their products.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.8,
     },
     { id: "result", text: "Two notebooks and three pens.", pauseAfter: 0.7 },
     {

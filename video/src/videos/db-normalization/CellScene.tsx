@@ -199,7 +199,13 @@ export const CellScene: React.FC = () => {
             </span>
           </div>
         ) : null}
-        <ErrorBox x={edge + 220} top={gb.rowTop(ghost) - 6} width={600} at={fitAt + 2} message={FOURTH.message} />
+        {/* Fig. 3 gave Grace one number; this row is a new attempt, with four. */}
+        <Note at={fourthAt} x={gb.x} y={gb.bottom(COLUMNS.rows.length + 1) + 18}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Grace, with four numbers</span>
+        </Note>
+        {/* Postgres refuses as the fourth number arrives, so the refusal is up
+            for the rest of the beat and the hold after it. */}
+        <ErrorBox x={edge + 220} top={gb.rowTop(ghost) - 6} width={600} at={fourthAt + 6} message={FOURTH.message} />
       </Drift>
     </AbsoluteFill>
   );

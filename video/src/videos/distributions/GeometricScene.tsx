@@ -13,9 +13,10 @@ import { ASK, askNote, Bracket, code, Count, DIST, Drift, Head, KBars, lerp, pul
 const X: XScale = { lo: 0.5, hi: 20.5, x0: 160, x1: 1500 };
 const BASE = 840;
 const TALL = 380;
-/** The five calls, one of which closes. */
-const CALLS_X = 1560;
-const CALLS_Y = 420;
+/** Each call's chance of a sale, as a pie: one fifth of it. */
+const PIE_X = 1650;
+const PIE_Y = 430;
+const PIE_R = 46;
 
 /**
  * Part 1, third scene: calls until the first sale. The geometric
@@ -33,7 +34,6 @@ export const GeometricScene: React.FC = () => {
   const successAt = n.word("geometric", "first success");
   const callAt = n.word("geometric", "sales call");
   const fiveAt = n.word("geometric", "one time in five");
-  const untilAt = n.word("geometric", "calls until");
   const geometricAt = n.word("geometric", "geometric");
   const averageAt = n.word("five", "On average");
   const callsAt = n.word("five", "five calls");
@@ -44,7 +44,11 @@ export const GeometricScene: React.FC = () => {
 
   const unit = h(TALL) / Math.max(...GEOMETRIC.pmf);
   const base = y(BASE);
-  const barAt = (i: number) => lerp(untilAt - 4, geometricAt + 4, i / (GEOMETRIC.k.length - 1));
+  // The bars grow while the question is put ("Count the tries until the
+  // first success"), so the scene doesn't open on an empty axis.
+  const barAt = (i: number) => lerp(triesAt - 4, successAt + 24, i / (GEOMETRIC.k.length - 1));
+  const pie = ease(frame, callAt - 4, 12);
+  const wedge = ease(frame, fiveAt - 2, 16);
   const askAt = (k: number) => elevenAt - 4 + (k - GEOMETRIC.moreThan - 1) * 1.2;
   const firstX = sx(X, 1);
   const meanX = sx(X, GEOMETRIC.mean);
@@ -56,8 +60,8 @@ export const GeometricScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the five calls, the bars, the average, the first bar, the tail ── */}
-      <Sfx name="el-tap" at={fiveAt} level={-30} />
-      <Sfx name="el-sprinkle" at={untilAt - 4} level={-34} />
+      <Sfx name="el-sprinkle" at={triesAt - 4} level={-34} />
+      <Sfx name="el-tap" at={fiveAt - 2} level={-30} />
       <Sfx name="el-pencil" at={callsAt - 4} level={-34} />
       <Sfx name="el-tap" at={oneAt - 4} level={-28} />
       <Sfx name="el-pop" at={elevenAt - 4} level={-30} />
@@ -75,30 +79,30 @@ export const GeometricScene: React.FC = () => {
           <span style={code(21, INK_SOFT)}>geom({GEOMETRIC.p})</span>
         </Note>
 
-        {/* One call in five closes. */}
-        <Svg>
-          {[0, 1, 2, 3, 4].map((i) => {
-            const a = ease(frame, callAt - 2 + i * 3, 8);
-            if (a <= 0) return null;
-            const red = i === 2 ? ease(frame, fiveAt, 10) : 0;
-            return (
-              <circle
-                key={i}
-                cx={CALLS_X + 20 + i * 38}
-                cy={y(CALLS_Y)}
-                r={13 * a}
-                fill={red > 0 ? `color-mix(in srgb, ${ASK} ${red * 100}%, ${PAPER})` : PAPER}
-                stroke={red > 0.5 ? ASK : INK_SOFT}
+        {/* Each call: a one-in-five chance of a sale. */}
+        {pie > 0 ? (
+          <Svg opacity={pie}>
+            <circle cx={PIE_X} cy={y(PIE_Y)} r={PIE_R * pie} fill={PAPER} stroke={INK_SOFT} strokeWidth={2.2} />
+            {wedge > 0 ? (
+              <path
+                d={(() => {
+                  const a = -Math.PI / 2 + 2 * Math.PI * GEOMETRIC.p * wedge;
+                  const r = PIE_R * pie;
+                  return `M${PIE_X},${y(PIE_Y)} L${PIE_X},${y(PIE_Y) - r} A${r},${r} 0 0 1 ${PIE_X + r * Math.cos(a)},${y(PIE_Y) + r * Math.sin(a)} Z`;
+                })()}
+                fill={ASK}
+                stroke={ASK}
                 strokeWidth={2.2}
+                strokeLinejoin="round"
               />
-            );
-          })}
-        </Svg>
-        <Note at={fiveAt + 4} x={CALLS_X} y={y(CALLS_Y + 26)}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>one call in five closes</span>
+            ) : null}
+          </Svg>
+        ) : null}
+        <Note at={fiveAt + 4} x={PIE_X} y={y(PIE_Y) + PIE_R + 16} style={{ transform: "translateX(-50%)" }}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>each call: a 1-in-5 chance</span>
         </Note>
 
-        <Axis scale={X} base={base} ticks={[1, 5, 10, 15, 20]} at={successAt - 4} />
+        <Axis scale={X} base={base} ticks={[1, 5, 10, 15, 20]} at={triesAt - 10} />
         <KBars
           ks={GEOMETRIC.k}
           values={GEOMETRIC.pmf}

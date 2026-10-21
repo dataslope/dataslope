@@ -1,3 +1,4 @@
+import type { EntityColumn } from "../../editorial/erd";
 import r from "./results.json";
 
 // Every table, row, count and message the video shows, read from
@@ -37,9 +38,14 @@ export const FLAT = {
   update: r.flat.update.sql.split("\n"),
   /** Rows the UPDATE changed: Postgres's "UPDATE 1". */
   updated: r.flat.update.affectedRows,
+  /** The table's name, as the UPDATE names it. */
+  table: r.flat.update.sql.match(/^UPDATE (\w+)/)![1],
   /** Ada's distinct emails afterwards. */
   adaEmails: r.flat.adaEmails,
 };
+/** What an "UPDATE n" reply means, in words. */
+export const rowsChanged = (rows: number) => `(${rows} ${rows === 1 ? "row" : "rows"} changed)`;
+
 /** Column indexes of the flat table, so the scenes name what they point at. */
 export const F = {
   id: FLAT.cols.indexOf("order_id"),
@@ -70,17 +76,19 @@ export const GROUPED_ADA = GROUPED.rows.flatMap((row, i) => (row[0] === ADA ? [i
 type Col = { column_name: string; data_type: string };
 type Key = { table_name: string; column_name: string; constraint_type: string };
 
+/** A column's badge: primary key, foreign key, unique (UK, as the lessons'
+ *  ER diagrams mark `email UK`), or two at once. */
+const badge = (pk: boolean, fk: boolean, unique: boolean): EntityColumn["key"] =>
+  pk && fk ? "PK, FK" : pk ? "PK" : fk && unique ? "FK, UK" : fk ? "FK" : unique ? "UK" : undefined;
+
 /** An entity box's columns, as the catalog lists them, keys marked. */
-const entityColumns = (cols: Col[], keys: Key[], table: string) =>
+const entityColumns = (cols: Col[], keys: Key[], table: string): EntityColumn[] =>
   cols.map((c) => {
     const kinds = keys.filter((k) => k.table_name === table && k.column_name === c.column_name).map((k) => k.constraint_type);
-    const pk = kinds.includes("PRIMARY KEY");
-    const fk = kinds.includes("FOREIGN KEY");
     return {
       name: c.column_name,
       type: c.data_type,
-      key: pk && fk ? ("PK, FK" as const) : pk ? ("PK" as const) : fk ? ("FK" as const) : undefined,
-      unique: kinds.includes("UNIQUE"),
+      key: badge(kinds.includes("PRIMARY KEY"), kinds.includes("FOREIGN KEY"), kinds.includes("UNIQUE")),
     };
   });
 
@@ -99,6 +107,17 @@ export const NOTEBOOK = {
   lines: text(r.shop.notebookLines as Table),
 };
 
+/**
+ * Every order line in this shop, with its customer and product. The shop is
+ * the lesson's second dataset, not Fig. 1's: the same names, but here Grace
+ * Hopper's one order is a backpack, so she is rightly not in the answer.
+ */
+const LINES = text(r.shop.orderLines as Table);
+/** What each customer outside the answer bought instead. */
+export const OTHERS = [...new Set(LINES.map((l) => l[1] as string))]
+  .filter((who) => !NOTEBOOK.rows.some((row) => row[0] === who))
+  .map((who) => ({ who, bought: [...new Set(LINES.filter((l) => l[1] === who).map((l) => (l[2] as string).toLowerCase()))] }));
+
 /** The free-text order the lesson sets against the clean schema. */
 export const NOTE_TEXT = "Ada bought 2 notebooks and 5 pens";
 /** The product's name as the products table stores it. */
@@ -110,10 +129,25 @@ export type Refusal = {
   message: string;
   detail: string | null;
   constraint: string | null;
+  table: string;
+  /** The broken rule as the catalog defines it: "UNIQUE (email)". */
+  def: string;
 };
 const REF = r.shop.refused as Record<"duplicate" | "zero" | "orphan", Refusal>;
 /** The three bad rows, in the order the narration names them. */
 export const REFUSED: readonly Refusal[] = [REF.duplicate, REF.zero, REF.orphan];
+
+/** The rule a row broke, as the diagrams mark it: a badge (UK, FK) or the
+ *  CHECK, and the column or condition, from the catalog's definition. */
+export const ruleTag = ({ def, table }: Refusal): { badge: string; text: string } => {
+  const unique = def.match(/^UNIQUE \((\w+)\)$/);
+  if (unique) return { badge: "UK", text: `${table}.${unique[1]}` };
+  const fk = def.match(/^FOREIGN KEY \((\w+)\)/);
+  if (fk) return { badge: "FK", text: `${table}.${fk[1]}` };
+  const check = def.match(/^CHECK \(\((.+)\)\)$/);
+  if (check) return { badge: "CHECK", text: check[1] };
+  throw new Error(`no tag for ${def}`);
+};
 /** What the tables hold after all three: exactly what they held. */
 export const COUNTS_AFTER = r.shop.countsAfter;
 

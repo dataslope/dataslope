@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, TEST } from "./data";
-import { Arrow, Big, DATA, DATA_INK, Headline, lerp, SOFT, STAT, STAT_INK, Strike, Svg, Sweep } from "./parts";
+import { Arrow, Big, DATA, DATA_INK, Headline, Held, lerp, SOFT, STAT, STAT_INK, Strike, Svg, Sweep } from "./parts";
 
 /** The two-bar comparison: the share of positives who are sick, once and
  *  twice tested. Both bars are the whole of their positives. */
@@ -60,7 +60,7 @@ export const BayesScene: React.FC = () => {
   const closing = ease(frame, doorsInFrom - 4, 18) * 0.45;
 
   // The neglect bars: who takes the test.
-  const BAR = { x0: 420, w: 1300, h: 40, y: [742, 800] } as const;
+  const BAR = { x0: 420, w: 1300, h: 40, y: [764, 820] } as const;
   const healthyW = BAR.w;
   const sickW = Math.max(4, (BAR.w * TEST.sick) / TEST.healthy);
 
@@ -97,30 +97,37 @@ export const BayesScene: React.FC = () => {
       <Headline top={y(150)} first="Test the positives again," second="and it flips." firstAt={retestFrom - 2} secondAt={nineInTenAt - 4} out={doorsInFrom - 6} />
 
       <div style={{ opacity: 1 - phaseOut }}>
-        {/* ── Two conditionals ── */}
-        <Ink at={sickPeopleAt - 6} dur={16} style={{ left: 160, top: y(300), whiteSpace: "nowrap" }}>
+        {/* ── Two conditionals: both are on the page as "backwards" is said,
+             and each number arrives with its own words. ── */}
+        <Ink at={inverseFrom + 4} dur={16} style={{ left: 160, top: y(300), whiteSpace: "nowrap" }}>
           <div style={label(23, INK_SOFT)}>Among the sick</div>
           <div style={{ ...note(32, INK), marginTop: 10 }}>
             P(positive <span style={{ color: INK_SOFT }}>| sick</span>)
           </div>
-          <Big size={92} color={DATA_INK}>
-            {pct(TEST.sensitivity)}
-          </Big>
+          <div>
+            <Held at={sickPeopleAt - 6}>
+              <Big size={92} color={DATA_INK}>
+                {pct(TEST.sensitivity)}
+              </Big>
+            </Held>
+          </div>
         </Ink>
         <Ink at={notAt - 4} dur={12} style={{ left: 640, top: y(392), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>is not</span>
         </Ink>
-        <Ink at={positivesAt - 6} dur={16} style={{ left: 860, top: y(300), whiteSpace: "nowrap" }}>
+        <Ink at={backwardsAt - 4} dur={16} style={{ left: 860, top: y(300), whiteSpace: "nowrap" }}>
           <div style={label(23, INK_SOFT)}>Among the positives</div>
           <div style={{ ...note(32, INK), marginTop: 10 }}>
             P(sick <span style={{ color: INK_SOFT }}>| positive</span>)
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: 28 }}>
-            <Big size={92} color={INK_SOFT}>
-              <Strike at={areSickEnd - 2} top="0.5em">
-                {pct(TEST.sensitivity)}
-              </Strike>
-            </Big>
+            <Held at={positivesAt - 6}>
+              <Big size={92} color={INK_SOFT}>
+                <Strike at={areSickEnd - 2} top="0.5em">
+                  {pct(TEST.sensitivity)}
+                </Strike>
+              </Big>
+            </Held>
             <span style={{ opacity: ease(frame, areSickEnd + 4, 12) }}>
               <Big size={92} color={STAT_INK} italic>
                 {pct(TEST.treePpv)}
@@ -131,11 +138,12 @@ export const BayesScene: React.FC = () => {
 
         {/* Bayes' rule takes you from one to the other. */}
         <Arrow from={[200, y(490)]} to={[1080, y(490)]} at={oneAt - 4} dur={18} color={STAT} width={3.4} />
-        {/* ── Bayes' rule, and the base rate ── */}
-        <Ink at={bayesAt - 4} dur={18} style={{ left: 160, top: y(560), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(34, INK) }}>
-            <Sweep at={oneAt - 2}>P(sick | +)</Sweep> ={" "}
-            <Sweep at={otherAt - 2}>P(+ | sick)</Sweep> ×{" "}
+        {/* ── Bayes' rule, and the base rate. "One" is the test's own rate,
+             what the arrow starts from; "the other" is the one you want. ── */}
+        <Ink at={bayesAt - 4} dur={18} style={{ left: 160, top: y(540), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK) }}>
+            <Sweep at={Math.max(otherAt - 2, oneAt + 10)}>P(sick | positive)</Sweep> ={" "}
+            <Sweep at={oneAt - 2}>P(positive | sick)</Sweep> ×{" "}
             <span style={{ position: "relative", display: "inline-block" }}>
               <Sweep at={baseAt - 2} color={`color-mix(in srgb, ${DATA} 35%, transparent)`}>
                 P(sick)
@@ -156,10 +164,10 @@ export const BayesScene: React.FC = () => {
                 the base rate, 1 in {num(TEST.oneIn)}
               </span>
             </span>{" "}
-            ÷ P(+)
+            ÷ P(positive)
           </span>
         </Ink>
-        <Note at={beforeAt} x={160} y={y(624)}>
+        <Note at={beforeAt} x={160} y={y(600)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             = {TEST.sensitivity} × {TEST.baseRate} ÷ {fmt(TEST.pPos, 5)} ={" "}
             <b style={{ color: STAT_INK }}>
@@ -167,9 +175,15 @@ export const BayesScene: React.FC = () => {
             </b>
           </span>
         </Note>
+        {/* Where the 0.01098 comes from: the tree's positives, sick or not. */}
+        <Note at={beforeAt + 12} x={160} y={y(654)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            P(positive) = {num(TEST.positives)} / {num(TEST.population)}: everyone who tests positive
+          </span>
+        </Note>
 
         {/* ── Who takes the test ── */}
-        <FigLabel n="5" title={`Who takes the test, of ${num(TEST.population)}`} at={healthyAt - 6} x={160} y={y(690)} />
+        <FigLabel n="5" title={`Who takes the test, of ${num(TEST.population)}`} at={healthyAt - 6} x={160} y={y(712)} />
         {(
           [
             ["Don't have it", TEST.healthy, healthyW, SOFT, INK_SOFT],
@@ -195,20 +209,21 @@ export const BayesScene: React.FC = () => {
             <b>{num(TEST.healthy / TEST.sick)}</b> to 1
           </span>
         </Note>
-        <Ink at={falseAt - 4} dur={14} style={{ left: 1100, top: y(560), whiteSpace: "nowrap" }}>
+        {/* Right of the rule, clear of its widest line. */}
+        <Ink at={falseAt - 4} dur={14} style={{ left: 1240, top: y(540), whiteSpace: "nowrap" }}>
           <span style={{ ...note(24, INK) }}>
-            1% of {num(TEST.healthy)} is <b style={{ color: STAT_INK }}>{num(TEST.fp)}</b> false alarms
-            <span style={{ opacity: ease(frame, realAt - 4, 10) }}>
-              , against <b style={{ color: DATA_INK }}>{TEST.tp}</b> real cases
-            </span>
+            1% of {num(TEST.healthy)} is <b style={{ color: STAT_INK }}>{num(TEST.fp)}</b> false alarms,
           </span>
+          <div style={{ ...note(24, INK), marginTop: 8, opacity: ease(frame, realAt - 4, 10) }}>
+            against <b style={{ color: DATA_INK }}>{TEST.tp}</b> real cases
+          </div>
         </Ink>
-        <Ink at={swampAt - 4} dur={14} style={{ left: 1100, top: y(604), whiteSpace: "nowrap" }}>
+        <Ink at={swampAt - 4} dur={14} style={{ left: 1240, top: y(612), whiteSpace: "nowrap" }}>
           <Big size={72} color={STAT_INK} italic>
             {Math.round(TEST.fp / TEST.tp)} to 1
           </Big>
         </Ink>
-        <Ink at={neglectAt - 4} dur={16} style={{ left: 160, top: y(866), whiteSpace: "nowrap" }}>
+        <Ink at={neglectAt - 4} dur={16} style={{ left: 160, top: y(890), whiteSpace: "nowrap" }}>
           <span style={{ ...body(34), color: INK }}>
             <span style={{ background: `linear-gradient(transparent 55%, ${HIGHLIGHT} 55%, ${HIGHLIGHT} 92%, transparent 92%)` }}>
               Base-rate neglect

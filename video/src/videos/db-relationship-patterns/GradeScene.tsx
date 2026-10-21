@@ -1,17 +1,25 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
+import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK } from "../../editorial/style";
+import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { courseId, JT, studentId } from "./data";
-import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_BAD, ROW_H, Tag, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_BAD, ROW_H, Tag, tableGeometry } from "./parts";
 
 const LEFT_X = 120;
 const RIGHT_X = 820;
 const STUDENTS_Y = 400;
 const COURSES_Y = 640;
+/** The next shape, glimpsed under the junction rows: one table split in two,
+ *  Fig. 2's one-to-one panel again, low enough to leave its label room. */
+const PREVIEW_X = 820;
+const PREVIEW_Y = 800;
+const PREVIEW_W = 280;
+const PREVIEW_GAP = 280;
 
 /**
  * A grade is a fact about the pairing: it cannot sit on students (Ada has a
@@ -27,9 +35,9 @@ export const GradeScene: React.FC = () => {
   const from = n.beat("grade").from;
   const factsAt = n.word("grade", "facts");
   const gradeAt = n.word("grade", "a grade");
-  const notStudentsAt = n.word("grade", "Not on students");
-  const bMathAt = n.word("grade", "B in Math");
-  const cHistAt = n.word("grade", "C in History");
+  const notStudentsAt = n.word("not-students", "Not on students");
+  const bMathAt = n.word("not-students", "B in Math");
+  const cHistAt = n.word("not-students", "C in History");
   const notCoursesAt = n.word("course", "Not on courses");
   const adaBAt = n.word("course", "Ada a B");
   const graceCAt = n.word("course", "Grace a C");
@@ -37,6 +45,8 @@ export const GradeScene: React.FC = () => {
   const adaMathAt = n.word("belongs", "Ada in Math");
   const ownRowAt = n.word("belongs", "own row");
   const nextAt = n.word("one-in", "next shape");
+  const splitsAt = n.word("one-in", "splits");
+  const inTwoAt = n.word("one-in", "in two");
 
   // The junction's rows, joined to both parents (the lesson's own query).
   const COLS = JT.joinCols;
@@ -59,6 +69,14 @@ export const GradeScene: React.FC = () => {
   const cRow = [String(courseId("Math")), "Math", gradeOf("Ada", "Math")];
   const cg = tableGeometry({ x: LEFT_X, top: y(COURSES_Y), cols: cCols, rows: [cRow], extra: [["", "", mathGrades]], headH: h(HEAD_H), rowH: h(ROW_H) });
   const leftDim = 1 - ease(frame, belongsAt, 14) * 0.5;
+  // Both figures' labels share one line, over the tables' names.
+  const figY = jg.top - 48 - FIG_ABOVE;
+
+  // "Splits one thing in two": a users box, and a second box sliding out
+  // from under it, the line between them drawn with the next part's ends.
+  const whole = useEntityLayout({ x: PREVIEW_X, y: y(PREVIEW_Y), width: PREVIEW_W, name: "users", columns: [] });
+  const part = useEntityLayout({ x: PREVIEW_X + PREVIEW_W + PREVIEW_GAP, y: y(PREVIEW_Y), width: PREVIEW_W, name: "user_profiles", columns: [] });
+  const apart = ease(frame, inTwoAt - 6, 18);
 
   return (
     <AbsoluteFill>
@@ -69,6 +87,8 @@ export const GradeScene: React.FC = () => {
       <Sfx name="el-tap" at={adaBAt} level={-29} />
       <Sfx name="el-scratch" at={graceCAt + 10} level={-31} />
       <Sfx name="el-pop" at={adaMathAt} level={-29} />
+      <Sfx name="el-whoosh" at={inTwoAt - 6} level={-35} />
+      <Sfx name="el-pencil" at={inTwoAt + 10} level={-34} />
 
       <Kicker at={from - 10}>Junction tables</Kicker>
       <Head lead="A fact about the pairing" leadAt={from - 6} turn="lives on its row." turnAt={ownRowAt - 6} />
@@ -77,6 +97,7 @@ export const GradeScene: React.FC = () => {
       <Drift from={nextAt} to={n.beat("wide").from} scale={0.03} origin={[960, y(560)]}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, nextAt, 16) * 0.55 }}>
           {/* ── The junction's rows, with their grades ── */}
+          <FigLabel n="11" title="Grades on the junction rows" at={from - 4} x={jg.x} y={figY} />
           <Caption at={from - 2} x={jg.x} y={jg.top - 48}>
             enrollments, joined to students and courses
           </Caption>
@@ -99,6 +120,7 @@ export const GradeScene: React.FC = () => {
 
           {/* ── Not on students ── */}
           <div style={{ position: "absolute", inset: 0, opacity: leftDim }}>
+            <FigLabel n="12" title="A grade column on students, then on courses" at={notStudentsAt - 6} x={sg.x} y={figY} />
             <Caption at={notStudentsAt - 4} x={sg.x} y={sg.top - 48}>
               students
             </Caption>
@@ -143,6 +165,21 @@ export const GradeScene: React.FC = () => {
         </div>
       </Drift>
       </Drift>
+
+      {/* ── The next shape, glimpsed: one table splitting in two ── */}
+      <FigLabel n="2" title="One to one" at={splitsAt - 6} x={whole.x} y={whole.top - FIG_ABOVE} />
+      <div style={{ position: "absolute", inset: 0, transform: `translateX(${(apart - 1) * (PREVIEW_W + PREVIEW_GAP)}px)` }}>
+        <Entity layout={part} at={inTwoAt - 6} />
+      </div>
+      <Entity layout={whole} at={splitsAt - 4} />
+      <Relation
+        name="users to user_profiles"
+        points={[whole.anchor("right"), part.anchor("left")]}
+        from="exactly-one"
+        to="zero-or-one"
+        at={inTwoAt + 10}
+        dur={14}
+      />
     </AbsoluteFill>
   );
 };

@@ -24,7 +24,8 @@ import {
   VIDEO,
   type Sample,
 } from "./data";
-import { Bracket, DOT, EASY, EASY_INK, RANDOM, RANDOM_INK, RAW, TruthLine, Underline } from "./parts";
+import { Bracket, DOT, EASY, EASY_INK, HAPPY, RANDOM, RANDOM_INK, RAW, TruthLine, Underline } from "./parts";
+import { useFigNumber } from "../sampling/merged";
 import { PartName } from "../sampling/PartName";
 
 /** Fig. 1: every score from 0 to 100, across the page. */
@@ -77,6 +78,7 @@ export const SampleScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const n = useNarration();
+  const fig = useFigNumber();
   const { y, h } = useLayout();
 
   // ── Cues ──
@@ -175,7 +177,7 @@ export const SampleScene: React.FC = () => {
       ) : null}
 
       <FigLabel
-        n="1"
+        n={fig(1)}
         title={`Satisfaction scores of ${POP_SIZE.toLocaleString("en-US")} customers`}
         at={customersAt - 8}
         x={160}
@@ -265,7 +267,7 @@ export const SampleScene: React.FC = () => {
       <SampleDots {...steps.easy} />
 
       {/* ── Fig. 2: the averages ── */}
-      <FigLabel n="2" title="Each sample's average" at={fig2At} x={160} y={y(612)} />
+      <FigLabel n={fig(2)} title="Each sample's average" at={fig2At} x={160} y={y(612)} />
       <Axis
         scale={X2}
         base={y(FIG2_BASE)}
@@ -344,7 +346,8 @@ export const SampleScene: React.FC = () => {
 };
 
 /** Dashed hairlines from the stretch of Fig. 1 that Fig. 2 enlarges down to
- *  Fig. 2's ends. */
+ *  Fig. 2's ends. They stop above the strip of sample dots and pick up again
+ *  below it, so they never run through the customers. */
 const ZoomFan: React.FC<{ at: number; base: number }> = ({ at, base }) => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
@@ -355,10 +358,15 @@ const ZoomFan: React.FC<{ at: number; base: number }> = ({ at, base }) => {
   const from = STRIP_Y + STRIP_H + 10;
   const to = FIG2_TOP - 4;
   const line = { stroke: INK_SOFT, strokeWidth: 1.2, strokeDasharray: "3 6", opacity: 0.8 };
+  const above = y(STRIP_Y) - 10;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: p }}>
-      <line x1={a} x2={a} y1={y(base) + 4} y2={y(from)} {...line} />
-      <line x1={b} x2={b} y1={y(base) + 4} y2={y(from)} {...line} />
+      {above > y(base) + 4 ? (
+        <>
+          <line x1={a} x2={a} y1={y(base) + 4} y2={above} {...line} />
+          <line x1={b} x2={b} y1={y(base) + 4} y2={above} {...line} />
+        </>
+      ) : null}
       <line x1={a} y1={y(from)} x2={a + (X2.x0 - a) * p} y2={y(from + (to - from) * p)} {...line} />
       <line x1={b} y1={y(from)} x2={b + (X2.x1 - b) * p} y2={y(from + (to - from) * p)} {...line} />
     </svg>
@@ -366,7 +374,7 @@ const ZoomFan: React.FC<{ at: number; base: number }> = ({ at, base }) => {
 };
 
 /** `tint`: from when the sample's happy customers (above THRESHOLD) take the
- *  easy way's color, a sweep from the threshold up. */
+ *  band's yellow, a sweep from the threshold up. */
 type Step = { sample: Sample; s: number; c: number; d: number; out: number; tint?: number };
 
 /** One sample of 500 as dots under the population, which then slide together
@@ -387,7 +395,7 @@ const SampleDots: React.FC<Step> = ({ sample, s, c, out, tint }) => {
         const x = lerp(sx(X1, v), mx, collapse);
         const cy = lerp(STRIP_Y + JITTER[j] * STRIP_H, STRIP_Y + STRIP_H / 2, collapse);
         const warm = tint !== undefined && v > THRESHOLD ? ease(frame, tint + (v - THRESHOLD) * 0.7, 10) : 0;
-        const fill = warm > 0 ? `color-mix(in srgb, ${EASY} ${Math.round(warm * 85)}%, ${DOT})` : DOT;
+        const fill = warm > 0 ? `color-mix(in srgb, ${HAPPY} ${Math.round(warm * 100)}%, ${DOT})` : DOT;
         return <circle key={j} cx={x} cy={y(cy)} r={3.6 * appear} fill={fill} opacity={1 - collapse * 0.6} />;
       })}
     </svg>

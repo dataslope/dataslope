@@ -110,9 +110,13 @@ export const FlavorScene: React.FC = () => {
 
       <FigLabel n="6" title="Ten answers, as the survey stores them" at={tenAt - 6} x={160} y={y(380)} />
 
-      {/* ── The ten answers ── */}
+      {/* ── The ten answers. The first of each code arrives as the codebook
+           reads it out (the data puts them first: 1, 2, 3); the other seven
+           on "Ten people answer". ── */}
       {FLAVORS.answers.map((code, i) => {
-        const a = ease(frame, tenAt - 2 + i * 2.5, 10);
+        const first = FLAVORS.answers.indexOf(code) === i;
+        const later = FLAVORS.answers.slice(0, i).filter((c, j) => FLAVORS.answers.indexOf(c) !== j).length;
+        const a = first ? ease(frame, codeAt[code - 1] - 2, 10) : ease(frame, tenAt - 2 + later * 2.5, 10);
         if (a <= 0) return null;
         // "those numbers", and "a quantity": each code swells in turn.
         const read = pulse(frame, numbersAt - 2 + i * 1.4, 14) + pulse(frame, quantityAt - 2 + i * 1.4, 14);
@@ -145,10 +149,13 @@ export const FlavorScene: React.FC = () => {
             >
               {code}
             </div>
+            {/* Centred under its chip, whatever the name's width. */}
             <div
               style={{
-                marginTop: 10,
-                textAlign: "center",
+                position: "absolute",
+                left: "50%",
+                top: CHIP + 10,
+                transform: "translateX(-50%)",
                 whiteSpace: "nowrap",
                 ...note(21, asLabels > 0.5 ? INK : INK_SOFT),
                 fontWeight: lerp(500, 600, asLabels),
@@ -163,7 +170,7 @@ export const FlavorScene: React.FC = () => {
 
       {/* The computer's view of the column: integers, as pandas stores them. */}
       <Ink at={computerAt - 4} dur={14} style={{ left: 1478, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
-        <div style={label(20, INK_SOFT)}>stored as</div>
+        <div style={label(20, INK_SOFT)}>stored as whole numbers</div>
         <div
           style={{
             marginTop: 8,

@@ -153,6 +153,10 @@ const EMPLOYEES = ok("srRows").rows.map(
 );
 export const employee = (name: string) => EMPLOYEES.find((e) => e.name === name)!;
 const depth = ok("srDepth").rows[0];
+/** The lesson's self-join, its FROM clause on one line:
+ *  "employees e LEFT JOIN employees m ON m.id = e.manager_id". */
+const joinSql = sqlLines("srJoin").map((l) => l.trim());
+const joinFrom = joinSql.slice(joinSql.indexOf("FROM") + 1, joinSql.indexOf("ORDER BY")).join(" ");
 export const SR = {
   employees: EMPLOYEES.length,
   rowCols: ["id", "name", "title", "manager_id"] as const,
@@ -161,6 +165,7 @@ export const SR = {
   depth: depth.depth as number,
   joinCols: ok("srJoin").fields,
   joinRows: cells("srJoin"),
+  joinFrom,
   /** The first four rows as the self-join reads them: id, name, manager_id. */
   aliasCols: ["id", "name", "manager_id"] as const,
   firstRows: EMPLOYEES.slice(0, 4).map((e): Cell[] => [String(e.id), e.name, e.managerId === null ? null : String(e.managerId)]),

@@ -2,17 +2,23 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { ACCENT_INK, body, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { WALLET } from "./data";
-import { Drift, Headline, Mark, Spot, Strike, Svg } from "./parts";
+import { Drift, FIG_Y, Headline, Mark, Spot, Strike, Svg } from "./parts";
 
-/** The timeline, 1938 to 1943, on the right of the wallet. */
+/** The timeline, 1938 to 1943, on the right of the wallet: Fig. 6, its
+ *  label at FIG_Y and the top of its dot cloud clear of it. */
 const T0 = 900;
 const T1 = 1640;
-const LINE_Y = 400;
+const LINE_Y = 474;
+/** Under the chart: its credit, then what broke, then the moral. */
+const SOURCE_Y = 668;
+const UNIQUE_Y = 690;
+const PERMANENT_Y = 762;
+const MORAL_Y = 836;
 const DOTS = 64;
 
 /** mulberry32: a tiny seeded PRNG, for laying the dots out. */
@@ -48,7 +54,6 @@ export const WalletScene: React.FC = () => {
   // ── Cues ──
   const from = n.beat("wallet").from;
   const yearAt = n.word("wallet", "nineteen thirty-eight");
-  const makerAt = n.word("wallet", "wallet maker");
   const lockportAt = n.word("wallet", "Lockport");
   const sampleAt = n.word("wallet", "sample");
   const everyAt = n.word("wallet", "every wallet");
@@ -72,8 +77,7 @@ export const WalletScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the wallet, the people taking the number up, the count, the strikes ── */}
-      <Sfx name="el-pop" at={makerAt - 2} level={-30} />
-      <Sfx name="el-pencil" at={yearAt - 4} level={-35} />
+      <Sfx name="el-pop" at={yearAt - 2} level={-30} />
       <Sfx name="el-sprinkle" at={adoptedAt} level={-33} />
       <Sfx name="el-tap" at={fiveAt - 4} level={-27} />
       <Sfx name="el-scratch" at={uniqueAt + 2} level={-30} />
@@ -81,9 +85,11 @@ export const WalletScene: React.FC = () => {
 
       <Drift from={from} to={end + 50} origin="40% 50%">
         <Headline lead="One number," turn="thousands of people." at={from - 6} turnAt={fiveAt - 4} />
-        <Spot id="db-keys-wallet" at={makerAt - 4} left={100} top={y(300)} width={640} height={427} />
+        {/* The wallet arrives with the year, so 1938 never stands alone. */}
+        <Spot id="db-keys-wallet" at={yearAt - 4} left={100} top={y(300)} width={640} height={427} />
 
         {/* ── 1938 to 1943 ── */}
+        <FigLabel n="6" title="One Social Security number, 1938 to 1943" at={yearAt - 6} x={T0} y={y(FIG_Y)} />
         <Svg>
           <line
             x1={T0}
@@ -114,6 +120,10 @@ export const WalletScene: React.FC = () => {
             );
           })}
         </Svg>
+        {/* What a dot is, at the cloud's thin end. */}
+        <Ink at={adoptedAt} dur={14} style={{ left: T0 + 30, top: y(LINE_Y) - h(26) - h(70) - 46, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(20, INK_SOFT) }}>people using the number</span>
+        </Ink>
         <Ink at={yearAt - 4} dur={14} style={{ left: T0 - 4, top: y(LINE_Y) + 22, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(44) }}>1938</span>
         </Ink>
@@ -133,7 +143,7 @@ export const WalletScene: React.FC = () => {
         </Ink>
         <Note at={fiveAt - 6} x={T1 + 60} y={y(LINE_Y) + 96} align="right">
           <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-            <div style={{ ...headline(68), color: ACCENT_INK, fontVariantNumeric: "tabular-nums lining-nums" }}>
+            <div style={{ ...headline(68), color: ACCENT_INK, ...TABULAR }}>
               {count.toLocaleString("en-US")}
             </div>
             <div style={{ ...note(22, INK), opacity: ease(frame, usingAt - 4, 10) }}>people using it, that year</div>
@@ -141,24 +151,24 @@ export const WalletScene: React.FC = () => {
         </Note>
 
         {/* ── What broke ── */}
-        <Note at={uniqueAt - 4} x={T0} y={y(662)}>
+        <Note at={uniqueAt - 4} x={T0} y={y(UNIQUE_Y)}>
           <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={uniqueAt + 2}>Unique</Strike>
             <span style={{ opacity: ease(frame, sharedAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> shared by thousands</span>
           </div>
         </Note>
-        <Note at={permanentAt - 4} x={T0} y={y(734)}>
+        <Note at={permanentAt - 4} x={T0} y={y(PERMANENT_Y)}>
           <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={permanentAt + 2}>Permanent</Strike>
             <span style={{ opacity: ease(frame, cancelledAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> cancelled</span>
           </div>
         </Note>
-        <Ink at={betsAt - 6} dur={20} style={{ left: 120, top: y(818), whiteSpace: "nowrap" }}>
+        <Ink at={betsAt - 6} dur={20} style={{ left: 120, top: y(MORAL_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>
             A natural key bets on <Mark at={controlAt - 6}>promises you don&apos;t control.</Mark>
           </span>
         </Ink>
-        <Ink at={fiveAt + 10} dur={14} style={{ right: 1920 - 1824, top: y(610), whiteSpace: "nowrap" }}>
+        <Ink at={fiveAt + 10} dur={14} style={{ right: 1920 - 1824, top: y(SOURCE_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...label(19, INK_SOFT), fontWeight: 500 }}>Figures: {WALLET.source}</span>
         </Ink>
       </Drift>

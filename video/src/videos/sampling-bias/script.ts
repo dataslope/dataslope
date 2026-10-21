@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 
 /**
  * Narration for "Bigger and biased is still biased" (16:9), after
@@ -57,6 +58,7 @@ export const script: NarrationScript = {
   id: "sampling-bias",
   voice: "hope",
   leadIn: 0.5,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     {
@@ -132,12 +134,12 @@ export const script: NarrationScript = {
     { id: "result", text: "Roosevelt got sixty-two and a half, and won every state but two.", pauseAfter: 0.45 },
     { id: "lesson", text: "Two point four million answers couldn't fix who was answering.", pauseAfter: 0.6 },
     { id: "two", scene: true, text: "So every estimate can miss in two ways.", pauseAfter: 0.3 },
-    { id: "variance", text: "Variance is the scatter from one sample to the next.", pauseAfter: 0.2 },
-    { id: "squeeze", text: "More data shrinks it.", pauseAfter: 0.45 },
+    { id: "variance", text: "Variance is the scatter from one sample to the next.", pauseAfter: 0.7 },
+    { id: "squeeze", text: "More data shrinks it.", pauseAfter: 0.9 },
     {
       id: "bias",
       text: "Bias is where the scatter is centered, and more data leaves it right where it was.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.8,
     },
     { id: "method", text: "Only a better method moves the center.", pauseAfter: 0.7 },
     {

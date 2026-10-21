@@ -1,6 +1,21 @@
 {
   "sql": {
-    "store": "CREATE TABLE customers (\n    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n    email TEXT NOT NULL UNIQUE,\n    full_name TEXT NOT NULL\n);\n\nCREATE TABLE products (\n    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    name TEXT NOT NULL,\n    current_price NUMERIC(10, 2) NOT NULL CHECK (current_price >= 0),\n    active BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE categories (\n    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n    name TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE product_categories (\n    product_id INT NOT NULL REFERENCES products(id),\n    category_id INT NOT NULL REFERENCES categories(id),\n    PRIMARY KEY (product_id, category_id)\n);\n\nCREATE TABLE orders (\n    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n    customer_id INT NOT NULL REFERENCES customers(id),\n    ordered_at TIMESTAMP NOT NULL,\n    status TEXT NOT NULL CHECK (status IN ('placed', 'paid', 'shipped', 'cancelled'))\n);\n\nCREATE TABLE order_items (\n    order_id INT NOT NULL REFERENCES orders(id),\n    product_id INT NOT NULL REFERENCES products(id),\n    quantity INT NOT NULL CHECK (quantity > 0),\n    unit_price NUMERIC(10, 2) NOT NULL CHECK (unit_price >= 0),\n    PRIMARY KEY (order_id, product_id)\n);\n\nINSERT INTO customers (email, full_name) VALUES\n    ('ana@example.com', 'Ana Rivera'),\n    ('ben@example.com', 'Ben Cho');\n\nINSERT INTO products (sku, name, current_price) VALUES\n    ('MUG-001', 'Postgres Mug', 12.00),\n    ('TEE-001', 'Schema T-Shirt', 24.00);\n\nINSERT INTO categories (name) VALUES\n    ('drinkware'),\n    ('apparel'),\n    ('featured');\n\nINSERT INTO product_categories (product_id, category_id) VALUES\n    (1, 1),\n    (1, 3),\n    (2, 2),\n    (2, 3);\n\nINSERT INTO orders (customer_id, ordered_at, status) VALUES\n    (1, '2025-04-10 14:00', 'paid');\n\nINSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES\n    (1, 1, 2, 10.00),\n    (1, 2, 1, 24.00);"
+    "store": "CREATE TABLE customers (\n    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n    email TEXT NOT NULL UNIQUE,\n    full_name TEXT NOT NULL\n);\n\nCREATE TABLE products (\n    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    name TEXT NOT NULL,\n    current_price NUMERIC(10, 2) NOT NULL CHECK (current_price >= 0),\n    active BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE categories (\n    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n    name TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE product_categories (\n    product_id INT NOT NULL REFERENCES products(id),\n    category_id INT NOT NULL REFERENCES categories(id),\n    PRIMARY KEY (product_id, category_id)\n);\n\nCREATE TABLE orders (\n    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,\n    customer_id INT NOT NULL REFERENCES customers(id),\n    ordered_at TIMESTAMP NOT NULL,\n    status TEXT NOT NULL CHECK (status IN ('placed', 'paid', 'shipped', 'cancelled'))\n);\n\nCREATE TABLE order_items (\n    order_id INT NOT NULL REFERENCES orders(id),\n    product_id INT NOT NULL REFERENCES products(id),\n    quantity INT NOT NULL CHECK (quantity > 0),\n    unit_price NUMERIC(10, 2) NOT NULL CHECK (unit_price >= 0),\n    PRIMARY KEY (order_id, product_id)\n);\n\nINSERT INTO customers (email, full_name) VALUES\n    ('ana@example.com', 'Ana Rivera'),\n    ('ben@example.com', 'Ben Cho');\n\nINSERT INTO products (sku, name, current_price) VALUES\n    ('MUG-001', 'Postgres Mug', 12.00),\n    ('TEE-001', 'Schema T-Shirt', 24.00);\n\nINSERT INTO categories (name) VALUES\n    ('drinkware'),\n    ('apparel'),\n    ('featured');\n\nINSERT INTO product_categories (product_id, category_id) VALUES\n    (1, 1),\n    (1, 3),\n    (2, 2),\n    (2, 3);\n\nINSERT INTO orders (customer_id, ordered_at, status) VALUES\n    (1, '2025-04-10 14:00', 'paid');\n\nINSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES\n    (1, 1, 2, 10.00),\n    (1, 2, 1, 24.00);",
+    "oneStep": "ALTER TABLE tasks ADD COLUMN priority TEXT NOT NULL;"
+  },
+  "tried": {
+    "duplicateLine": [
+      "1",
+      "1",
+      "1",
+      "12.00"
+    ],
+    "zeroQuantity": [
+      "2",
+      "1",
+      "0",
+      "12.00"
+    ]
   },
   "results": {
     "columns_customers": {
@@ -370,12 +385,159 @@
         "constraint": "orders_status_check"
       }
     },
-    "zeroQuantity": {
+    "wide": {
+      "ok": true,
+      "fields": [
+        "id",
+        "email",
+        "full_name",
+        "id",
+        "customer_id",
+        "ordered_at",
+        "status",
+        "order_id",
+        "product_id",
+        "quantity",
+        "unit_price",
+        "id",
+        "sku",
+        "name",
+        "current_price",
+        "active",
+        "id",
+        "name"
+      ],
+      "rows": [
+        [
+          1,
+          "ana@example.com",
+          "Ana Rivera",
+          1,
+          1,
+          "2025-04-10 14:00:00",
+          "paid",
+          1,
+          1,
+          2,
+          "10.00",
+          1,
+          "MUG-001",
+          "Postgres Mug",
+          "12.00",
+          "true",
+          1,
+          "drinkware"
+        ],
+        [
+          1,
+          "ana@example.com",
+          "Ana Rivera",
+          1,
+          1,
+          "2025-04-10 14:00:00",
+          "paid",
+          1,
+          1,
+          2,
+          "10.00",
+          1,
+          "MUG-001",
+          "Postgres Mug",
+          "12.00",
+          "true",
+          3,
+          "featured"
+        ],
+        [
+          1,
+          "ana@example.com",
+          "Ana Rivera",
+          1,
+          1,
+          "2025-04-10 14:00:00",
+          "paid",
+          1,
+          2,
+          1,
+          "24.00",
+          2,
+          "TEE-001",
+          "Schema T-Shirt",
+          "24.00",
+          "true",
+          2,
+          "apparel"
+        ],
+        [
+          1,
+          "ana@example.com",
+          "Ana Rivera",
+          1,
+          1,
+          "2025-04-10 14:00:00",
+          "paid",
+          1,
+          2,
+          1,
+          "24.00",
+          2,
+          "TEE-001",
+          "Schema T-Shirt",
+          "24.00",
+          "true",
+          3,
+          "featured"
+        ],
+        [
+          2,
+          "ben@example.com",
+          "Ben Cho",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ],
+      "affected": 0
+    },
+    "lessonZeroQuantity": {
       "ok": false,
       "error": {
         "message": "new row for relation \"order_items\" violates check constraint \"order_items_quantity_check\"",
         "code": "23514",
         "detail": "Failing row contains (1, 1, 0, 12.00).",
+        "constraint": "order_items_quantity_check"
+      }
+    },
+    "benOrder": {
+      "ok": true,
+      "fields": [
+        "id"
+      ],
+      "rows": [
+        {
+          "id": 2
+        }
+      ],
+      "affected": 1
+    },
+    "zeroQuantity": {
+      "ok": false,
+      "error": {
+        "message": "new row for relation \"order_items\" violates check constraint \"order_items_quantity_check\"",
+        "code": "23514",
+        "detail": "Failing row contains (2, 1, 0, 12.00).",
         "constraint": "order_items_quantity_check"
       }
     },
@@ -761,6 +923,48 @@
         {
           "column_name": "name",
           "is_nullable": "NO"
+        }
+      ],
+      "affected": 0
+    },
+    "trackerLabels": {
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 0
+    },
+    "trackerTaskLabels": {
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 0
+    },
+    "trackerHistory": {
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 0
+    },
+    "trackerV5Tables": {
+      "ok": true,
+      "fields": [
+        "table_name"
+      ],
+      "rows": [
+        {
+          "table_name": "labels"
+        },
+        {
+          "table_name": "projects"
+        },
+        {
+          "table_name": "task_history"
+        },
+        {
+          "table_name": "task_labels"
+        },
+        {
+          "table_name": "tasks"
         }
       ],
       "affected": 0

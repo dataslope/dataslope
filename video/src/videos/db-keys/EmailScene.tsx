@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
 import { INK_SOFT, label } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { NATURAL, SURROGATE } from "./data";
@@ -12,6 +12,7 @@ import {
   Drift,
   ElbowArrow,
   ErrorBox,
+  FIG_Y,
   Headline,
   KEY_INK,
   Listing,
@@ -98,7 +99,7 @@ export const EmailScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the tables, the refusal, the swap, the update going through ── */}
-      <Sfx name="el-whoosh" at={keyAt - 6} level={-34} />
+      <Sfx name="el-whoosh" at={from} level={-34} />
       <Sfx name="el-pencil" at={orderAt} level={-34} />
       <Sfx name="el-tap" at={refusesAt} level={-28} />
       <Sfx name="el-whoosh" at={swapAt + 4} level={-34} />
@@ -108,28 +109,28 @@ export const EmailScene: React.FC = () => {
       <Drift from={from} to={n.beat("fk-in").to + 50}>
         <Headline lead="When the key itself" turn="has to change." at={from - 6} turnAt={changesAt - 4} />
 
-        {/* ── Email as the key ── */}
-        <Ink at={keyAt - 6} dur={12} out={swapAt} style={{ left: X0, top: y(300), whiteSpace: "nowrap" }}>
-          <span style={label(26, INK_SOFT)}>Email as the key</span>
-        </Ink>
-        <TableName g={natUsers} at={keyAt - 6} out={swapAt}>
+        {/* ── Fig. 7, email as the key: it leaves on the swap, with its tables,
+            a beat early so it is gone before Fig. 8 inks into its place ── */}
+        <FigLabel n="7" title="Email as the key" at={from - 4} x={X0} y={y(FIG_Y)} out={swapAt - 2} />
+        {/* The two empty tables open the scene; the rows come with "email the key". */}
+        <TableName g={natUsers} at={from} out={swapAt}>
           users
         </TableName>
         <DataTable
           g={natUsers}
           cols={natUserCols}
-          at={keyAt - 6}
+          at={from}
           rows={[{ cells: NATURAL.users.rows[0], at: keyAt }]}
           marks={[{ row: 0, col: 0, at: oldAt - 4, color: MARK }]}
           out={swapAt}
         />
-        <TableName g={natOrders} at={keyAt + 4} out={swapAt}>
+        <TableName g={natOrders} at={from + 6} out={swapAt}>
           orders
         </TableName>
         <DataTable
           g={natOrders}
           cols={natOrderCols}
-          at={keyAt + 4}
+          at={from + 6}
           rows={[{ cells: NATURAL.orders.rows[0], at: keyAt + 10 }]}
           marks={[{ row: 0, col: 1, at: orderAt, color: MARK_KEY }]}
           out={swapAt}
@@ -144,13 +145,14 @@ export const EmailScene: React.FC = () => {
           message={NATURAL.change.message}
           detail={NATURAL.change.detail}
           mark={{ text: NATURAL.change.detail.slice(NATURAL.change.detail.indexOf("is still")), at: orderAt + 4 }}
+          // The message names a foreign key constraint, a term Part 3 teaches:
+          // set back, so the DETAIL line carries the point.
+          quiet
           out={swapAt}
         />
 
-        {/* ── A surrogate key ── */}
-        <Ink at={swapAt + 4} dur={12} style={{ left: X0, top: y(300), whiteSpace: "nowrap" }}>
-          <span style={label(26, INK_SOFT)}>A surrogate key</span>
-        </Ink>
+        {/* ── Fig. 8, a surrogate key: the same tables, keyed on user_id ── */}
+        <FigLabel n="8" title="A surrogate key" at={swapAt + 4} x={X0} y={y(FIG_Y)} />
         <TableName g={surUsers} at={swapAt + 4}>
           users
         </TableName>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { useMergedPart } from "../sampling/merged";
+import { useFigNumber, useMergedPart } from "../sampling/merged";
 import { Marker, swell } from "../sampling/emphasis";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { histogram, SPREADS, WAIT_SD } from "./data";
@@ -21,6 +21,8 @@ import {
   INK_SOFT,
   note,
   label,
+  PAPER,
+  TABULAR,
 } from "../../editorial/style";
 import { FigLabel, Ink, Leader, NextLine, Note } from "../../editorial/ui";
 
@@ -53,6 +55,7 @@ export const SpreadScene: React.FC = () => {
   // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
   const merged = useMergedPart();
   const { y: Y, h, pts } = useLayout();
+  const fig = useFigNumber();
   const start = n.beat("spread").from;
   const spreadAt = n.word("spread", "spread");
   const tenAt = n.word("spread", "ten");
@@ -93,7 +96,7 @@ export const SpreadScene: React.FC = () => {
           the tighter the pile.
         </Ink>
       </div>
-      <FigLabel n="5" title="Average wait, samples of 5, 30 and 100" at={start - 8} x={120} y={Y(196)} />
+      <FigLabel n={fig(5)} title="Average wait, samples of 5, 30 and 100" at={start - 8} x={120} y={Y(196)} />
 
       {ROWS.map((r, i) => {
         const at = start - 10 + i * 6;
@@ -117,6 +120,7 @@ export const SpreadScene: React.FC = () => {
               scale={X}
               base={Y(r.base)}
               unit={h(r.unit)}
+              color={ACCENT}
               grow={(k) => ease(frame, at + Math.abs(k * BIN - 10) * 0.9, 12)}
             />
             <Axis
@@ -129,11 +133,14 @@ export const SpreadScene: React.FC = () => {
             />
             {b > 0 ? (
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
-                <g stroke={said > 0 ? ACCENT : INK} strokeWidth={2 + said * 1.2}>
-                  <line x1={x0} x2={x0 + (x1 - x0) * b} y1={Y(y)} y2={Y(y)} />
-                  <line x1={x0} x2={x0} y1={Y(y) - 8} y2={Y(y) + 8} />
-                  {b >= 1 ? <line x1={x1} x2={x1} y1={Y(y) - 8} y2={Y(y) + 8} /> : null}
-                </g>
+                {/* A paper underlay, so the bracket reads across the pile. */}
+                {[PAPER, said > 0 ? ACCENT_INK : INK].map((stroke, k) => (
+                  <g key={k} stroke={stroke} strokeWidth={2 + said * 1.2 + (k === 0 ? 5 : 0)} strokeLinecap="round">
+                    <line x1={x0} x2={x0 + (x1 - x0) * b} y1={Y(y)} y2={Y(y)} />
+                    <line x1={x0} x2={x0} y1={Y(y) - 8} y2={Y(y) + 8} />
+                    {b >= 1 ? <line x1={x1} x2={x1} y1={Y(y) - 8} y2={Y(y) + 8} /> : null}
+                  </g>
+                ))}
               </svg>
             ) : null}
             <Note at={bracketAt + 8} x={x1 + 12} y={Y(y) - 13}>
@@ -151,7 +158,7 @@ export const SpreadScene: React.FC = () => {
         at={tenAt - 4}
         dur={16}
         dot={false}
-        color={ACCENT}
+        color={INK}
         width={2}
         dash="7 6"
       />
@@ -166,6 +173,8 @@ export const SpreadScene: React.FC = () => {
           <span style={{ ...label(19, INK_SOFT), position: "absolute", left: COLS[1] - TABLE_X }}>
             Simulated spread
           </span>
+          {/* σ is defined by the rule below: its column heading waits for
+              "square root", with the values under it. */}
           <span
             style={{
               position: "absolute",
@@ -174,6 +183,7 @@ export const SpreadScene: React.FC = () => {
               ...body(28, true),
               color: INK,
               whiteSpace: "nowrap",
+              opacity: ease(frame, rootAt - 4, 12),
             }}
           >
             σ ÷ √n
@@ -220,7 +230,7 @@ export const SpreadScene: React.FC = () => {
                 top: top(8),
                 opacity: said,
                 ...headline(40),
-                fontVariantNumeric: "tabular-nums lining-nums",
+                ...TABULAR,
                 // "That spread": the three, one after another.
                 transformOrigin: "left center",
                 transform: `scale(${swell(frame, thatSpreadAt - 2 + i * 5, 0.14, 20)})`,
@@ -237,7 +247,7 @@ export const SpreadScene: React.FC = () => {
                 transform: `translateX(${(1 - theory) * 14}px)`,
                 ...headline(40),
                 color: ACCENT_INK,
-                fontVariantNumeric: "tabular-nums lining-nums",
+                ...TABULAR,
               }}
             >
               {fmt(r.theory)}
@@ -266,7 +276,8 @@ export const SpreadScene: React.FC = () => {
             ...note(21, INK_SOFT),
             marginTop: 8,
             transformOrigin: "left center",
-            transform: `scale(${swell(frame, deviationAt - 2, 0.1, 22)})`,
+            // A slow swell, held through the end of the closing sentence.
+            transform: `scale(${swell(frame, deviationAt - 2, 0.1, 44)})`,
           }}
         >
           <Marker at={deviationAt - 2}>σ, the population&apos;s spread</Marker>, is {fmt(WAIT_SD)} min.

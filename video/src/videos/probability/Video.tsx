@@ -20,8 +20,12 @@ import { Exit } from "./parts";
 const LEAD = 8;
 /** Frames each scene stays up into the next, so cuts cross-fade. */
 const OVERLAP = 6;
-/** Frames before a cut that a scene starts easing out. */
-const EXIT = 36;
+/** Frames before a cut that a scene starts easing out. With the script's
+ *  2.2 s scene gap this holds each finished scene 1.3 s after its last word;
+ *  at 36 frames it held 0.7 s, too short to read a bridge's last line. */
+const EXIT = 18;
+/** How long the easing out takes: it ends just as the cross-fade does. */
+const EXIT_DUR = 24;
 
 /**
  * "Probability" (16:9), Unit 3 of the Statistics course, on the editorial
@@ -63,7 +67,7 @@ const Scenes: React.FC = () => {
         const next = scenes[i + 1];
         return (
           <Scene key={id} from={cut(id)} to={next ? until(cut(next[0])) : durationInFrames + OVERLAP} fade={6}>
-            <Exit at={next ? cut(next[0]) - EXIT : null}>
+            <Exit at={next ? cut(next[0]) - EXIT : null} dur={EXIT_DUR}>
               <Body />
             </Exit>
           </Scene>

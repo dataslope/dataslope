@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, fmt, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -21,12 +21,13 @@ import {
   lerp,
   pulse,
   Spot,
+  stepD,
   Svg,
   Sweep,
   VRule,
 } from "./parts";
 
-/** The strip: the simulation's first 24 hours, a ticket per arrival. */
+/** The strip: one typical day of the simulation, a ticket per arrival. */
 const STRIP_X0 = 178;
 const STRIP_STEP = 37.5;
 const STRIP_BASE = 440;
@@ -96,6 +97,7 @@ export const PoissonScene: React.FC = () => {
       <Sfx name="el-tap" at={eightAt - 2} level={-28} />
       <Sfx name="el-sprinkle" at={simulateAt - 2} level={-33} />
       <Sfx name="el-pencil" at={meanAt - 4} level={-34} />
+      <Sfx name="el-pencil" at={clumpingAt - 4} level={-35} />
 
       <Head parts={[{ text: "A rate, not a number of tries.", at: poissonFrom - 4 }]} out={meanAt - 8} />
       <Head
@@ -113,7 +115,7 @@ export const PoissonScene: React.FC = () => {
           {/* ── Fig. 3: the tickets, hour by hour ── */}
           <FigLabel n="3" title="A help desk's tickets, hour by hour" at={deskAt - 4} x={160} y={y(290)} />
           <Svg>
-            {POISSON.firstHours.map((count, i) =>
+            {POISSON.dayHours.map((count, i) =>
               Array.from({ length: count }, (_, j) => {
                 const a = ease(frame, hourAt(i) + j * 1.2, 8);
                 if (a <= 0) return null;
@@ -142,7 +144,7 @@ export const PoissonScene: React.FC = () => {
               strokeWidth={1.4}
             />
           </Svg>
-          {POISSON.firstHours.map((count, i) => (
+          {POISSON.dayHours.map((count, i) => (
             <Centered
               key={i}
               x={STRIP_X0 + i * STRIP_STEP}
@@ -156,7 +158,7 @@ export const PoissonScene: React.FC = () => {
           <Note at={countAt + 10} x={STRIP_X0 - 22} y={y(STRIP_BASE) + 40}>
             <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
               tickets in each hour
-              <span style={{ opacity: ease(frame, hoursEnd, 12) }}>, the first 24 of {fmt(POISSON.hours, 0)} simulated</span>
+              <span style={{ opacity: ease(frame, hoursEnd, 12) }}>: 24 of the {fmt(POISSON.hours, 0)} simulated</span>
             </span>
           </Note>
 
@@ -197,8 +199,8 @@ export const PoissonScene: React.FC = () => {
           <Note at={spikeAt - 2} x={tailX0 - 40} y={tailY - h(44)}>
             <span style={{ ...askNote(23), whiteSpace: "nowrap", opacity: 1 - spikeFlash * 0.4 }}>{POISSON.atLeast} or more: a spike</span>
           </Note>
-          <VRule x={mx} bottom={base} top={base - h(TALL + 24)} at={meanAt - 4} />
-          <Note at={meanAt} x={mx + 34} y={base - h(TALL + 22)}>
+          <VRule x={mx} bottom={base} top={base - h(TALL + 54)} at={meanAt - 4} />
+          <Note at={meanAt} x={mx + 34} y={base - h(TALL + 52)}>
             <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>mean {POISSON.mean}</span>
           </Note>
 
@@ -225,7 +227,7 @@ export const PoissonScene: React.FC = () => {
           </Ink>
           <Note at={simulateAt} x={PANEL_X} y={y(624)}>
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-              {fmt(Math.round(POISSON.hours * sims), 0)} hours, a tick for each count
+              <span style={TABULAR}>{fmt(Math.round(POISSON.hours * sims), 0)}</span> hours, a tick for each count
             </span>
           </Note>
           <Ink at={varianceAt - 4} dur={14} style={{ left: PANEL_X, top: y(690), whiteSpace: "nowrap" }}>
@@ -237,11 +239,29 @@ export const PoissonScene: React.FC = () => {
             <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>real variance far above the mean?</span>
           </Note>
           <Note at={clumpingAt - 2} x={PANEL_X} y={y(770)}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>events are clumping, and spikes</span>
+            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 10 }}>
+              <svg width={40} height={8} style={{ overflow: "visible" }}>
+                <line x1={0} x2={40} y1={4} y2={4} stroke={ASK} strokeWidth={2.6} strokeDasharray="8 6" />
+              </svg>
+              events are clumping, and spikes
+            </span>
           </Note>
           <Note at={understateAt - 2} x={PANEL_X} y={y(800)}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>come more often than this says</span>
           </Note>
+          {/* A count with the same mean that clumps: three times the variance,
+              and far more hours of eight or more. */}
+          <Svg opacity={ease(frame, clumpingAt - 4, 14)}>
+            <path
+              d={stepD(POISSON.clumped, X, (v) => base - v * unit)}
+              fill="none"
+              stroke={ASK}
+              strokeWidth={2.6}
+              strokeDasharray="8 6"
+              strokeLinejoin="round"
+              style={{ clipPath: `inset(-20px ${(1 - ease(frame, clumpingAt - 4, 24)) * 100}% -20px -20px)` }}
+            />
+          </Svg>
           <Svg opacity={spikeFlash}>
             <rect x={tailX0 - 6} y={tailY - h(4)} width={tailX1 - tailX0 + 12} height={base - tailY + h(8)} fill="none" stroke={ASK} strokeWidth={2} rx={6} />
           </Svg>

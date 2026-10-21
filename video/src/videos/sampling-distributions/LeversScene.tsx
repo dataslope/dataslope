@@ -19,10 +19,12 @@ import {
   INK_SOFT,
   label,
   note,
+  TABULAR,
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { BIGGER, ILLUSTRATIONS, MORE, peak, type LeverRow, VIDEO } from "./data";
 import { blend, Bracket, money } from "./parts";
+import { useFigNumber } from "../sampling/merged";
 
 const BASE = 600;
 const HEIGHT = 220;
@@ -58,11 +60,11 @@ export const LeversScene: React.FC = () => {
   const { fps } = useVideoConfig();
   const n = useNarration();
   const { y } = useLayout();
+  const fig = useFigNumber();
 
   const trapFrom = n.beat("trap").from;
   const waysAt = n.word("trap", "two ways");
   const moreSamplesAt = n.word("trap", "more samples");
-  const biggerOnesAt = n.word("trap", "bigger");
   const fiveHundredAt = n.word("more", "five hundred");
   const thirtyTwoAt = n.word("more", "thirty-two thousand");
   const staysAt = n.word("more", "stays");
@@ -83,7 +85,10 @@ export const LeversScene: React.FC = () => {
   const bigger: PanelSpec = {
     rows: BIGGER,
     scale: RIGHT,
-    times: [biggerOnesAt, ...between(tenAt + 4, sixFortyAt).slice(1)],
+    // Its first state is samples of ten, wider than the forty on the left:
+    // it waits for "ten", so the panel never shows a wide pile under
+    // "bigger" while the narration is still on the other lever.
+    times: [tenAt, ...between(tenAt + 4, sixFortyAt).slice(1)],
     head: "Customers per sample",
     value: (r) => String(r.n),
   };
@@ -114,10 +119,10 @@ export const LeversScene: React.FC = () => {
       {ILLUSTRATIONS ? <Levers at={waysAt} fps={fps} /> : null}
 
       <div style={{ opacity: 1 - dimLeft * 0.7 }}>
-        <FigLabel n="5" title="More samples, 40 customers each" at={trapFrom} x={LEFT.x0} y={y(300)} />
+        <FigLabel n={fig(5)} title="More samples, 40 customers each" at={trapFrom} x={LEFT.x0} y={y(300)} />
         <Panel spec={more} hold={staysAt} axisAt={trapFrom + 2} />
       </div>
-      <FigLabel n="6" title="Bigger samples, 4,000 of them" at={trapFrom + 8} x={RIGHT.x0} y={y(300)} />
+      <FigLabel n={fig(6)} title="Bigger samples, 4,000 samples at each size" at={trapFrom + 8} x={RIGHT.x0} y={y(300)} />
       <Panel spec={bigger} hold={fallsAt} axisAt={trapFrom + 10} />
 
       {/* In real life there is one sample: the left lever is not there. */}
@@ -223,7 +228,7 @@ const Panel: React.FC<{ spec: PanelSpec; hold: number; axisAt: number }> = ({ sp
                 opacity: rowIn,
                 ...headline(36),
                 color: ACCENT_INK,
-                fontVariantNumeric: "tabular-nums lining-nums",
+                ...TABULAR,
               }}
             >
               {fmt(r.sd)}
@@ -247,7 +252,8 @@ const Levers: React.FC<{ at: number; fps: number }> = ({ at, fps }) => {
       style={{
         position: "absolute",
         left: 1560,
-        top: y(96),
+        // Clear of Fig. 6's label row under it.
+        top: y(76),
         width: 240,
         height: 240,
         opacity: p,

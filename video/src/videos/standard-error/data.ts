@@ -73,6 +73,8 @@ export const CHECK = {
   measured: m.check.trueSamplingSd,
   /** One sample's own s / root n. */
   estimated: m.check.estimatedSe,
+  /** That sample's standard deviation, s (ddof 1). */
+  oneSampleSd: m.check.oneSampleSd,
   /** sigma / root n, the theory. */
   theory: m.check.sigmaOverRootN,
   meansCenter: m.check.meansMean,

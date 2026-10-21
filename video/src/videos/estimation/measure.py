@@ -128,11 +128,10 @@ out["users"] = {
 rng = np.random.default_rng(7)
 MU_TRUE, SIGMA, N_COV, N_INTERVALS = 100.0, 15.0, 40, 100
 intervals = []
-first = None
+samples = []
 for i in range(N_INTERVALS):
     smp = rng.normal(MU_TRUE, SIGMA, size=N_COV)
-    if first is None:
-        first = smp
+    samples.append(smp)
     se_i = smp.std(ddof=1) / np.sqrt(N_COV)
     lo, hi = stats.t.interval(0.95, df=N_COV - 1, loc=smp.mean(), scale=se_i)
     intervals.append({"lo": r(lo, 3), "hi": r(hi, 3), "mean": r(smp.mean(), 3), "covers": bool(lo <= MU_TRUE <= hi)})
@@ -140,6 +139,13 @@ covers = np.array([iv["covers"] for iv in intervals])
 n_miss = int((~covers).sum())
 say(f"{N_INTERVALS - n_miss} of {N_INTERVALS} intervals covered mu.")
 say(f"Coverage = {100 * covers.mean():.0f}% (target: 95%).")
+# The video builds its first interval slowly, from its forty dots, before
+# misses have been mentioned, so that one has to be a hit: the stack starts
+# at the first sample whose interval covers mu and takes the rest in order,
+# wrapping round. The lesson's first sample happens to miss; it is drawn last.
+start = next(i for i, iv in enumerate(intervals) if iv["covers"])
+intervals = intervals[start:] + intervals[:start]
+first = samples[start]
 out["coverage"] = {
     "seed": 7,
     "mu": MU_TRUE,

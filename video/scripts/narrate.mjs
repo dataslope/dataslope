@@ -9,6 +9,7 @@
  *   node scripts/narrate.mjs <video> --only n,star   just these beats
  *   node scripts/narrate.mjs <video> --force         new takes of the lot
  *   node scripts/narrate.mjs <video> --recut         re-cut the kept takes
+ *   node scripts/narrate.mjs <video> --onsets --only a,b   re-place beats' first words, no API call
  *   node scripts/narrate.mjs <video> --dry-run       show what would be sent
  *
  * A script is recorded in TAKES, one request each, and every take is cut into
@@ -49,7 +50,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { speechOnset } from "./lib/onset.mjs";
+import { loudestFrame, speechOnset } from "./lib/onset.mjs";
 
 const OUTPUT_FORMAT = "mp3_44100_128";
 const API = "https://api.elevenlabs.io/v1";
@@ -176,6 +177,26 @@ if (flag("--recut")) {
   console.log(`${video}: re-cutting ${plan.length} kept take${plan.length > 1 ? "s" : ""} (voice ${voiceName}, model ${model})`);
   const beats = { ...existing.beats };
   for (let k = 0; k < plan.length; k++) Object.assign(beats, cutTake(keptTake(k), k));
+  saveAlignment(beats);
+  console.log(`Done. Check the new timing with: npm run cues -- ${video}`);
+  process.exit(0);
+}
+
+// Beats voiced on their own before their first word was placed from the
+// sound: place it now, from the files already on disk.
+if (flag("--onsets")) {
+  if (!only) {
+    console.error("--onsets re-places the beats named with --only.");
+    process.exit(1);
+  }
+  const beats = { ...existing.beats };
+  for (const id of only) {
+    if (!beats[id]) {
+      console.error(`${id} has no audio yet; voice it first.`);
+      process.exit(1);
+    }
+    beats[id] = placeOnset(id, beats[id]);
+  }
   saveAlignment(beats);
   console.log(`Done. Check the new timing with: npm run cues -- ${video}`);
   process.exit(0);
@@ -475,6 +496,35 @@ function cutTake(take, k) {
   return beats;
 }
 
+/**
+ * A beat voiced on its own gets the correction a beat cut from a take gets:
+ * its first letter moves to the first speech in its file. After an audio tag
+ * such as [slowly] the character times put the word up to 0.3 s late (the
+ * tag is given time the voice spends on the word), so a cue on the beat's
+ * first word fired early against the sound: Estimation's [slowly] beats were
+ * up to 0.25 s out in check:sync until this was added.
+ */
+function placeOnset(id, entry) {
+  const samples = decode(join(VIDEO_ROOT, "public", entry.audio));
+  const text = entry.alignment.characters.join("");
+  const first = letterAt(text, 0, text.length, false);
+  const starts = [...entry.alignment.character_start_times_seconds];
+  const ends = [...entry.alignment.character_end_times_seconds];
+  const onset = speechOnset(samples, SAMPLE_RATE, 0, starts[first] + 0.3, loudestFrame(samples, SAMPLE_RATE));
+  if (onset === null) return entry;
+  const moved = onset - starts[first];
+  if (Math.abs(moved) > 0.08) console.log(`  · ${id}: first word starts ${moved.toFixed(2)} s from its character time`);
+  starts[first] = Math.min(onset, ends[first]);
+  for (let j = 0; j < first; j++) {
+    starts[j] = Math.min(starts[j], onset);
+    ends[j] = Math.min(ends[j], onset);
+  }
+  return {
+    ...entry,
+    alignment: { ...entry.alignment, character_start_times_seconds: starts, character_end_times_seconds: ends },
+  };
+}
+
 async function voiceBeats(beats) {
   for (const beat of single) {
     const i = script.beats.indexOf(beat);
@@ -489,7 +539,7 @@ async function voiceBeats(beats) {
     );
     const audio = `narration/${script.id}/${beat.id}.mp3`;
     writeFileSync(join(VIDEO_ROOT, "public", audio), Buffer.from(r.audio_base64, "base64"));
-    beats[beat.id] = { text: beat.text, audio, alignment: r.alignment };
+    beats[beat.id] = placeOnset(beat.id, { text: beat.text, audio, alignment: r.alignment });
     console.log(`  ✓ ${beat.id.padEnd(14)} ${r.alignment.character_end_times_seconds.at(-1).toFixed(2)} s`);
     // Saved after every beat, so an interrupted run keeps what it paid for.
     saveAlignment(beats);

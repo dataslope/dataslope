@@ -23,6 +23,7 @@ import { AGE_DOTS, AGES } from "./data";
 import { Rule, Span } from "./parts";
 import { PartName } from "../sampling/PartName";
 import { Marker, swell } from "../sampling/emphasis";
+import { useFigNumber } from "../sampling/merged";
 
 /** One-year bins, so each column of dots is one year of age. */
 const X: XScale = { lo: 10, hi: 80, x0: 160, x1: 1760 };
@@ -30,9 +31,11 @@ const TICKS = [10, 20, 30, 40, 50, 60, 70, 80];
 const BASE = 772;
 const PITCH = 19;
 const R = 8;
-const SD_Y = 476;
-const SE_Y = 404;
-const BELL_BASE = 382;
+/** The two brackets and the bell over them, about 25px of clear space
+ *  between each row of labels. */
+const SD_Y = 490;
+const SE_Y = 420;
+const BELL_BASE = 398;
 const BELL_H = 50;
 
 const years = (v: number) => (v === 80 ? "80 years" : String(v));
@@ -48,6 +51,7 @@ export const AgesScene: React.FC = () => {
   const { fps } = useVideoConfig();
   const n = useNarration();
   const { y } = useLayout();
+  const fig = useFigNumber();
 
   // ── Cues ──
   const deviationAt = n.word("hook", "deviation");
@@ -58,6 +62,9 @@ export const AgesScene: React.FC = () => {
   const oneSampleAt = n.word("move", "one sample");
   const spreadAt = n.word("hook", "spread");
   const takeAt = n.word("sd", "Take");
+  // The ages arrive on "Both measure a spread", so the hook is not spoken
+  // over an empty page.
+  const agesAt = spreadAt;
   const dataAt = n.word("sd", "spread of the data");
   const halfAt = n.word("sd", "ten and a half");
   const averageAt = n.word("move", "average");
@@ -76,7 +83,7 @@ export const AgesScene: React.FC = () => {
       {/* ── Sound (merged video only; the standalone has sfx off): the ages, the
           standard deviation, the other samples' averages, the standard error,
           its bell ── */}
-      <Sfx name="el-sprinkle" at={takeAt} level={-34} />
+      <Sfx name="el-sprinkle" at={agesAt} level={-34} />
       <Sfx name="el-pencil" at={dataAt} level={-34} />
       <Sfx name="el-sprinkle" at={differentAt} level={-35} />
       <Sfx name="el-pencil" at={howFarAt} level={-34} />
@@ -126,11 +133,11 @@ export const AgesScene: React.FC = () => {
       </div>
 
       {/* ── Fig. 1: the ages ── */}
-      <FigLabel n="1" title={`Ages of ${AGES.n} customers, in years`} at={takeAt - 6} x={160} y={y(330)} />
-      <Axis scale={X} base={y(BASE)} ticks={TICKS} at={takeAt - 6} format={years} />
+      <FigLabel n={fig(1)} title={`Ages of ${AGES.n} customers, in years`} at={agesAt - 6} x={160} y={y(330)} />
+      <Axis scale={X} base={y(BASE)} ticks={TICKS} at={agesAt - 6} format={years} />
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
         {AGE_DOTS.map((d, i) => {
-          const p = pop(frame, takeAt + i * 0.2, fps, 16);
+          const p = pop(frame, agesAt + i * 0.2, fps, 16);
           if (p <= 0.01) return null;
           const cx = sx(X, d.bin + 0.5);
           return (
@@ -176,7 +183,8 @@ export const AgesScene: React.FC = () => {
         );
       })}
       <Rule x={mx} y0={y(BASE)} y1={y(SE_Y)} at={averageAt - 2} dur={16} color={ACCENT} width={2.6} dash="7 6" />
-      <Note at={averageAt + 6} x={sx(X, AGES.mean - AGES.se) - 16} y={y(SE_Y) - 16} align="right">
+      {/* Never spoken: it gives way when the standard error takes the row. */}
+      <Note at={averageAt + 6} x={sx(X, AGES.mean - AGES.se) - 16} y={y(SE_Y) - 16} align="right" out={howFarAt}>
         <span style={{ ...note(23, ACCENT_INK), fontWeight: 600 }}>average {fmt(AGES.mean)}</span>
       </Note>
       <Note at={differentAt + 8} x={160} y={y(826)}>

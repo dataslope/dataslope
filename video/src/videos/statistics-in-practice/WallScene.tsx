@@ -32,7 +32,10 @@ const THUMBS: { title: string; slice?: Slice; corr?: boolean }[] = [
 const DAY_THUMB = 2;
 /** The middle of Friday's bar in the "by day" slice. */
 const FRI_X = THUMB_X[DAY_THUMB] + (THUMB_W / SLICES.day.length) * (SLICES.day.findIndex((s) => s.key === "Fri") + 0.5);
-const SEALED = { x0: 1060, x1: 1390, y0: 500, y1: 628 };
+/** Set below the two lines under the trap's cross ("tilted", "luck"). */
+const SEALED = { x0: 1060, x1: 1390, y0: 540, y1: 668 };
+/** The column the notes beside the sealed data start in, right of the check. */
+const NOTE_X = 1458;
 const SEALED_JIT = jitter(77, 48);
 
 /** The card that carries the lead from one side of the wall to the other. */
@@ -120,7 +123,8 @@ const Thumb: React.FC<{ x: number; y: number; t: number; title: string; slice?: 
  * The two jobs: exploring (every slice you like; out come questions) and
  * confirming (one hypothesis, stated first, tested once on unseen data; out
  * comes a claim), with a wall between them, and the trap of carrying the
- * test back across it.
+ * test back across it: Friday was picked for looking best, so part of its
+ * lead is luck the test would count as evidence.
  */
 export const WallScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -141,12 +145,17 @@ export const WallScene: React.FC = () => {
   const onceAt = n.word("confirm", "once");
   const nobodyAt = n.word("confirm", "nobody");
   const claimAt = n.word("confirm", "claim");
-  const keepAt = n.word("sin", "Keep a wall");
+  // The wall thickens on what it is for, "between them", which also breaks
+  // the slowed beat's still before "crossing".
+  const betweenAt = n.word("sin", "between them");
   const crossingAt = n.word("sin", "crossing");
   const suggestedAt = n.word("sin", "suggested");
-  const pickedAt = n.word("sin", "picked");
-  const veryAt = n.word("sin", "very bills");
-  const tiltedAt = n.word("sin", "tilted");
+  const pickedAt = n.word("tilt", "picked");
+  const veryAt = n.word("tilt", "very bills");
+  const tiltedAt = n.word("tilt", "tilted");
+  const luckFrom = n.beat("luck").from;
+  const luckAt = n.word("luck", "lead is luck");
+  const evidenceAt = n.word("luck", "evidence");
   const pValueAt = n.word("lie", "p-value");
   const lieAt = n.word("lie", "lie");
   const liePhraseAt = n.word("lie", "suggested");
@@ -174,9 +183,10 @@ export const WallScene: React.FC = () => {
       <Sfx name="el-whoosh" at={oneAt - 8} level={-33} />
       <Sfx name="el-pencil" at={crossingAt - 4} level={-33} />
       <Sfx name="el-tap" at={tiltedAt - 2} level={-28} />
+      <Sfx name="el-pencil" at={luckFrom - 2} level={-35} />
 
       <Headline lead="Two jobs," turn="with a wall between." at={jobsFrom - 6} turnAt={confirmFrom - 6} />
-      <Wall x={WALL_X} top={y(WALL_TOP)} bottom={y(WALL_BOTTOM)} at={jobsFrom - 8} width={lerp(9, 15, ease(frame, keepAt - 4, 12))} />
+      <Wall x={WALL_X} top={y(WALL_TOP)} bottom={y(WALL_BOTTOM)} at={jobsFrom - 8} width={lerp(9, 15, ease(frame, betweenAt - 4, 12))} />
 
       {/* ── Exploring ── */}
       <div style={{ position: "absolute", inset: 0, opacity: leftDim }}>
@@ -212,6 +222,7 @@ export const WallScene: React.FC = () => {
           </Svg>
         ) : null}
         <Ring x={FRI_X} y={y(THUMB_Y[0]) + h(THUMB_H) - 18} at={pickedAt} r0={16} r1={70} />
+        <Ring x={FRI_X} y={y(THUMB_Y[0]) + h(THUMB_H) - 18} at={luckAt - 2} r0={16} r1={70} />
       </div>
 
       {/* ── Confirming ── */}
@@ -244,11 +255,11 @@ export const WallScene: React.FC = () => {
           })}
         </Svg>
       ) : null}
-      <Check x={1416} y={y(540)} at={onceAt - 4} />
-      <Ink at={onceAt - 2} dur={14} style={{ left: 1458, top: y(540) - 18, whiteSpace: "nowrap" }}>
+      <Check x={NOTE_X - 42} y={y(SEALED.y0 + 40)} at={onceAt - 4} />
+      <Ink at={onceAt - 2} dur={14} style={{ left: NOTE_X, top: y(SEALED.y0 + 40) - 18, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK), fontWeight: 600 }}>tested once</span>
       </Ink>
-      <Ink at={nobodyAt - 4} dur={14} style={{ left: 1416, top: y(590) - 6, whiteSpace: "nowrap" }}>
+      <Ink at={nobodyAt - 4} dur={14} style={{ left: NOTE_X, top: y(SEALED.y0 + 90) - 6, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>on data nobody has seen</span>
       </Ink>
       <Ring x={(SEALED.x0 + SEALED.x1) / 2} y={(y(SEALED.y0) + y(SEALED.y1)) / 2} at={freshAt - 2} r0={60} r1={190} color={BAR} dur={26} />
@@ -275,9 +286,20 @@ export const WallScene: React.FC = () => {
       <Ink at={veryAt - 4} dur={14} style={{ left: THUMB_X[DAY_THUMB], top: y(THUMB_Y[0]) + h(THUMB_H) + 36, whiteSpace: "nowrap" }}>
         <span style={{ ...note(24, STAT_INK), fontWeight: 650 }}>picked for looking best</span>
       </Ink>
-      <Ink at={tiltedAt - 4} dur={14} style={{ left: 990, top: y(CARD_TO.y) + 60, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(24, STAT_INK), fontWeight: 650 }}>tilted before it runs</span>
+      {/* Below and right of the cross, whose lower arm ends at x 988, 60 px under the card's top. */}
+      <Ink at={tiltedAt - 4} dur={14} style={{ left: 1004, top: y(CARD_TO.y) + 74, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 650 }}>tilted before it runs:</span>
       </Ink>
+      <div style={{ position: "absolute", left: 1004, top: y(CARD_TO.y) + 108, display: "flex", gap: "0.3em", whiteSpace: "nowrap", ...note(22, STAT_INK) }}>
+        <Ink at={luckFrom - 2} dur={14} style={{ position: "relative" }}>
+          <span style={{ ...note(22, STAT_INK) }}>
+            part of its lead is <Marker at={luckAt - 2}>luck,</Marker>
+          </span>
+        </Ink>
+        <Ink at={evidenceAt - 6} dur={14} style={{ position: "relative" }}>
+          <span style={{ ...note(22, STAT_INK) }}>counted as evidence</span>
+        </Ink>
+      </div>
 
       <div style={{ position: "absolute", left: 160, top: y(830), display: "flex", gap: "0.36em", whiteSpace: "nowrap", opacity: 1 - 0.6 * ease(frame, fromAt - 4, 14) }}>
         <Ink at={pValueAt - 6} dur={18} style={{ position: "relative" }}>

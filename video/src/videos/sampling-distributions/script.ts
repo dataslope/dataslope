@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 
 /**
  * Narration for "The three distributions to keep apart" (16:9), Unit 5,
@@ -47,6 +48,7 @@ export const script: NarrationScript = {
   id: "sampling-distributions",
   voice: "hope",
   leadIn: 0.5,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     {

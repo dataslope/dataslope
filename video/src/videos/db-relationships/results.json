@@ -179,6 +179,32 @@
       ],
       "affected": 0
     },
+    "devicesInsert": {
+      "sql": "INSERT INTO devices VALUES (20, 1), (21, 1);",
+      "ok": true,
+      "fields": [],
+      "rows": [],
+      "affected": 2
+    },
+    "devices": {
+      "sql": "SELECT id, employee_id FROM devices ORDER BY id;",
+      "ok": true,
+      "fields": [
+        "id",
+        "employee_id"
+      ],
+      "rows": [
+        {
+          "id": 20,
+          "employee_id": 1
+        },
+        {
+          "id": 21,
+          "employee_id": 1
+        }
+      ],
+      "affected": 0
+    },
     "path": {
       "sql": "SELECT\n  c.name AS customer,\n  o.id AS order_id,\n  oi.line_number,\n  p.name AS product,\n  oi.quantity\nFROM\n  customers c\n  JOIN orders o ON o.customer_id = c.id\n  JOIN order_items oi ON oi.order_id = o.id\n  JOIN products p ON p.id = oi.product_id\nORDER BY\n  o.id,\n  oi.line_number;",
       "ok": true,

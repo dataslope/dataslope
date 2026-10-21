@@ -1,25 +1,31 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
+import { endSymbols, MARKER } from "../../components/crowsfoot";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { headline, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink, Leader, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ERD } from "./data";
-import { Drift, Mark, pulse, Pulse, STAT_INK, Svg } from "./parts";
+import { Fig, KEY_INK } from "./kit";
+import { BoxPulse, Drift, Mark, pulse, Pulse, STAT_INK, Svg } from "./parts";
 
 const CUSTOMERS_X = 220;
 const ORDERS_X = 1180;
 const TOP = 470;
+/** Fig. 12's label: its own line over "an entity", well under the headline. */
+const FIG_Y = 350;
 
 /**
  * The lesson's customers-and-orders diagram, built as it is named: the boxes,
- * the facts inside, the line, the key markers, then the line read end to
- * end. Columns, types and keys are what Postgres stored for the lesson's
- * DDL. It closes on the bridge to Unit 3: the lines carry as much meaning as
- * the boxes.
+ * the facts inside, the line, the key markers (the foreign key is what the
+ * line stands for), then the line read end to end: start at a box, and the
+ * far end says how many. Each end's label lands as its count is spoken, and
+ * the symbols are decoded last, one by one. Columns, types and keys are what
+ * Postgres stored for the lesson's DDL. It closes on the bridge to Unit 3:
+ * the lines carry as much meaning as the boxes.
  */
 export const ErdScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -28,7 +34,6 @@ export const ErdScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("pieces").from;
-  const diagramAt = n.word("pieces", "diagram");
   const threeAt = n.word("pieces", "three pieces");
   const boxesAt = n.word("pieces", "Boxes");
   const factsAt = n.word("pieces", "facts");
@@ -36,13 +41,24 @@ export const ErdScene: React.FC = () => {
   const relAt = n.word("pieces", "relationships");
   const pkAt = n.word("keys", "PK");
   const primaryAt = n.word("keys", "primary key");
+  const identifiesAt = n.word("keys", "identifies each row");
   const fkAt = n.word("keys", "FK");
   const foreignAt = n.word("keys", "foreign key");
+  const custIdAt = n.word("keys", "customer ID");
+  const theIdAt = n.word("keys", "the ID");
+  const standsAt = n.word("keys", "line stands for");
   const readAt = n.word("line", "read the line");
   const oneAt = n.word("line", "One customer", { nth: 1 });
-  const zeroAt = n.word("line", "zero or many");
+  const zeroAt = n.word("line", "zero or many", { nth: 1 });
   const eachAt = n.word("line", "each order");
-  const exactlyAt = n.word("line", "exactly one");
+  const exactlyAt = n.word("line", "exactly one", { nth: 1 });
+  // The ends decoded: each counts the box it touches.
+  const touchesAt = n.word("line", "Each end");
+  const barsAt = n.word("line", "two bars");
+  const oneKeyAt = n.word("line", "exactly one", { nth: 2 });
+  const circleAt = n.word("line", "a circle");
+  const footAt = n.word("line", "crow's foot");
+  const manyKeyAt = n.word("line", "zero or many", { nth: 2 });
   const lookAt = n.word("next", "look");
   const oneLineAt = n.word("next", "one line");
   const aloneAt = n.word("next", "alone");
@@ -65,13 +81,26 @@ export const ErdScene: React.FC = () => {
   const b = orders.anchor("left", ERD.fk.col);
   const lineY = a[1];
   const midX = (a[0] + b[0]) / 2;
+  // Each end's symbols, from the same layout the markers are drawn with.
+  const oneEnd = endSymbols(a, b, "exactly-one");
+  const manyEnd = endSymbols(b, a, "zero-or-many");
+  const barsX = (oneEnd.near[0] + oneEnd.far![0]) / 2;
+  const footX = b[0] - MARKER / 2;
+  const row = (layout: typeof customers, name: string) => {
+    const i = layout.columns.findIndex((c) => c.name === name);
+    return { x: layout.x, y: layout.rows[i].top, width: layout.width, height: layout.row };
+  };
 
   const rowsAt = (cols: readonly { name: string }[], start: number) =>
     Object.fromEntries(cols.map((c, i) => [c.name, start + i * 4]));
   const pkCols = (cols: readonly { name: string; key?: string }[]) => cols.filter((c) => c.key?.includes("PK"));
 
   // "Read the line": a highlighter laid under it, swelling again as it is named.
-  const glow = ease(frame, readAt - 2, 14) * (1 - ease(frame, eachAt + 30, 20)) + pulse(frame, lookAt, 40) + ease(frame, oneLineAt, 16) * 0.8;
+  const glow =
+    pulse(frame, standsAt - 2, 40) +
+    ease(frame, readAt - 2, 14) * (1 - ease(frame, eachAt + 30, 20)) +
+    pulse(frame, lookAt, 40) +
+    ease(frame, oneLineAt, 16) * 0.8;
   const boxSwell = pulse(frame, boxesEndAt - 2, 26);
   const tagsOut = pkAt - 6;
 
@@ -85,7 +114,7 @@ export const ErdScene: React.FC = () => {
       <Sfx name="el-chime" at={n.beat("line").to + 6} level={-32} />
       <Sfx name="el-pencil" at={betweenAt} level={-35} />
 
-      <Drift from={foreignAt + 10} to={end + 80} scale={0.025} origin={[960, 520]}>
+      <Drift from={primaryAt} to={end + 80} scale={0.025} origin={[960, 520]}>
         {/* ── Headline: three pieces, named one by one ── */}
         <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
           <Ink at={from - 6} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
@@ -139,9 +168,9 @@ export const ErdScene: React.FC = () => {
           labelPos={[midX - 30, lineY - 40]}
         />
 
-        <Ink at={diagramAt - 4} dur={16} style={{ left: CUSTOMERS_X, top: y(330), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>The lesson&apos;s diagram: customers and orders</span>
-        </Ink>
+        <Fig n="12" at={boxesAt - 6} x={CUSTOMERS_X} y={y(FIG_Y)}>
+          The lesson&apos;s diagram: customers and orders
+        </Fig>
 
         {/* The three pieces, tagged as they are named. */}
         <Note at={boxesAt + 2} out={tagsOut} x={CUSTOMERS_X} y={customers.top - 52}>
@@ -169,18 +198,36 @@ export const ErdScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* Reading the line from each end. */}
-        <Pulse x={a[0] + 10} y={lineY} at={oneAt} color={INK} />
-        <Pulse x={b[0] - 12} y={lineY} at={zeroAt} color={INK} />
-        <Pulse x={a[0] + 10} y={lineY} at={exactlyAt} color={INK} />
-        <Note at={oneAt + 2} x={a[0] + 8} y={lineY + 30} from="up">
+        {/* "The column that identifies each row": both primary keys. */}
+        <BoxPulse {...row(customers, ERD.fk.refCol)} at={identifiesAt} color={KEY_INK} />
+        <BoxPulse {...row(orders, "id")} at={identifiesAt + 4} color={KEY_INK} />
+
+        {/* The foreign key is the line: an order's customer_id holds a customers id. */}
+        <BoxPulse {...row(orders, ERD.fk.col)} at={custIdAt} color={STAT_INK} />
+        <BoxPulse {...row(customers, ERD.fk.refCol)} at={theIdAt + 4} color={STAT_INK} />
+
+        {/* Reading the line: start at a box, and the far end says how many. */}
+        <BoxPulse x={customers.x} y={customers.y} width={customers.width} height={customers.head} at={oneAt} />
+        <Pulse x={footX} y={lineY} at={zeroAt} r={8} grow={18} color={INK} />
+        <BoxPulse x={orders.x} y={orders.y} width={orders.width} height={orders.head} at={eachAt} />
+        <Pulse x={barsX} y={lineY} at={exactlyAt} r={8} grow={18} color={INK} />
+        <Note at={exactlyAt - 2} x={a[0] + 28} y={lineY + 30} from="up">
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <Mark at={exactlyAt}>exactly one</Mark>
+            <Mark at={oneKeyAt}>exactly one</Mark>
           </span>
         </Note>
-        <Note at={zeroAt + 2} x={b[0] - 8} y={lineY + 30} from="up" align="right">
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>zero or many</span>
+        <Note at={zeroAt + 2} x={b[0] - 28} y={lineY + 30} from="up" align="right">
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <Mark at={manyKeyAt}>zero or many</Mark>
+          </span>
         </Note>
+
+        {/* Decoding the ends: each counts the box it touches. */}
+        <Pulse x={barsX} y={lineY} at={touchesAt} r={8} grow={18} color={STAT_INK} />
+        <Pulse x={footX} y={lineY} at={touchesAt + 4} r={8} grow={18} color={STAT_INK} />
+        <Pulse x={barsX} y={lineY} at={barsAt} r={8} grow={18} color={STAT_INK} />
+        <Pulse x={manyEnd.far![0]} y={lineY} at={circleAt} r={6} grow={14} color={STAT_INK} />
+        <Pulse x={manyEnd.near[0]} y={lineY} at={footAt} r={8} grow={18} color={STAT_INK} />
 
         <Note at={aloneAt - 4} x={midX} y={lineY - 96} from="up">
           <span style={{ ...note(23, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>

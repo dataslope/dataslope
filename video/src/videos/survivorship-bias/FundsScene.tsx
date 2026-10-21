@@ -3,13 +3,14 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, body, fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, body, fmt, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BIN_HI, BIN_LO, BIN_W, COUNTS, countBelow, FUNDS, meanAbove } from "./data";
 import { Swatch } from "./parts";
-import { countTo, flash } from "../sampling/emphasis";
+import { countTo, flash, swell } from "../sampling/emphasis";
+import { useFigNumber } from "../sampling/merged";
 
 const X: XScale = { lo: BIN_LO, hi: BIN_HI, x0: 160, x1: 1760 };
 const BASE = 860;
@@ -30,6 +31,7 @@ const LINE_TOP = 262;
 export const FundsScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  const fig = useFigNumber();
   const { y, h } = useLayout();
 
   const start = n.beat("funds").from;
@@ -79,7 +81,7 @@ export const FundsScene: React.FC = () => {
       <Sfx name="el-tap" at={sevenAt - 2} level={-29} />
 
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
-        <Ink at={start - 10} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={closeAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Close the funds that lost,
         </Ink>
         <Ink
@@ -91,7 +93,7 @@ export const FundsScene: React.FC = () => {
         </Ink>
       </div>
       <FigLabel
-        n="2"
+        n={fig(2)}
         title={`Annual returns of ${FUNDS.n.toLocaleString("en-US")} simulated mutual funds`}
         at={start - 8}
         x={120}
@@ -161,7 +163,7 @@ export const FundsScene: React.FC = () => {
           style={{
             ...headline(96),
             marginTop: 6,
-            fontVariantNumeric: "tabular-nums lining-nums",
+            ...TABULAR,
             color: frame >= fifteenAt - 2 ? ACCENT_INK : INK,
             transformOrigin: "0% 60%",
             transform: `scale(${1 + 0.08 * Math.sin(Math.PI * Math.min(1, Math.max(0, (frame - fifteenAt) / 14)))})`,
@@ -193,8 +195,26 @@ export const FundsScene: React.FC = () => {
         <div style={label(20, INK_SOFT)}>All {FUNDS.n.toLocaleString("en-US")} funds</div>
         <div style={{ ...note(30, INK), fontWeight: 700 }}>{fmt(FUNDS.trueAvg)}%</div>
       </Note>
-      <Note at={averageAt} x={sx(X, FUNDS.survivorAvg) + 16} y={y(LINE_TOP + 4)}>
-        <div style={label(20, ACCENT_INK)}>The {FUNDS.open.toLocaleString("en-US")} still open</div>
+      {/* Named from the moment it appears, and riding along with it as the
+          sweep moves it: red is the biased number, never "still open". */}
+      <div
+        style={{
+          position: "absolute",
+          left: survX + 16,
+          top: y(LINE_TOP + 4),
+          opacity: closedBins > 0 ? ease(frame, sweepFrom, 10) : 0,
+          whiteSpace: "nowrap",
+        }}
+      >
+        <div
+          style={{
+            ...label(20, ACCENT_INK),
+            transformOrigin: "left center",
+            transform: `scale(${swell(frame, averageAt - 2, 0.12, 22)})`,
+          }}
+        >
+          Average of those left
+        </div>
         <div
           style={{
             ...note(30, ACCENT_INK),
@@ -204,7 +224,7 @@ export const FundsScene: React.FC = () => {
         >
           {fmt(countTo(frame, sevenAt - 2, Math.max(10, sixFiveEnd - sevenAt + 2), FUNDS.trueAvg, FUNDS.survivorAvg))}%
         </div>
-      </Note>
+      </div>
       <Note at={notOneAt - 2} x={sx(X, FUNDS.survivorAvg) + 16} y={y(LINE_TOP + 86)}>
         <span style={note(21, INK_SOFT)}>
           <b style={{ color: ACCENT_INK }}>+{fmt(FUNDS.inflation)} points</b>

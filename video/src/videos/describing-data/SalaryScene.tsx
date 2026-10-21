@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
+import { fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -77,7 +77,8 @@ export const SalaryScene: React.FC = () => {
   const ceoDrop = ease(frame, millionAt - 8, 14);
 
   // The mean and the median: where they stand, and when they move.
-  const meanV = lerp(lerp(SALARIES.values[0], SALARIES.mean, ease(frame, meanAt - 4, 44)), SALARIES.ceoMean, ease(frame, leapsAt, 30));
+  // The mean is inked where it stands; it only moves when the CEO moves it.
+  const meanV = lerp(SALARIES.mean, SALARIES.ceoMean, ease(frame, leapsAt, 30));
   const medianV = lerp(SALARIES.median, SALARIES.ceoMedian, ease(frame, fiftyFiveAt - 6, 16));
   const meanIn = ease(frame, meanAt - 4, 12);
   const medianIn = ease(frame, middleValueAt - 4, 12);
@@ -91,10 +92,12 @@ export const SalaryScene: React.FC = () => {
   const fulcrumV = lerp(SALARIES.ceoMean, SALARIES.mean, back);
   const tilt = 3.2 * ease(frame, heavyAt - 2, 14) * (1 - ease(frame, slidesAt + 6, 24));
   const fx = xOf(fulcrumV);
-  /** The plank's labels step back while it tips, so nothing level sits on a tilted line. */
-  const level = 1 - tilt / 3.2;
+  /** The plank's labels are gone before it tips and back once it is level,
+   *  so nothing level ever sits on a tilted line. */
+  const level = Math.min(1, Math.max(0, 1 - ease(frame, heavyAt - 14, 10) + ease(frame, slidesAt + 30, 12)));
   const meanLine = 1 - ease(frame, balanceAt - 4, 10) + ease(frame, slidesAt + 26, 12);
-  const medianDim = 1 - 0.75 * (ease(frame, balanceAt - 4, 10) - ease(frame, slidesAt + 20, 12));
+  /** The median steps out while the balance is shown, so the fulcrum stands alone. */
+  const medianDim = 1 - (ease(frame, balanceAt - 4, 10) - ease(frame, slidesAt + 30, 12));
 
   // Each salary's figure, until the axis is too tight for them.
   const valuesIn = ease(frame, fortyAt - 6, 14) * (1 - ease(frame, ceoAt - 4, 10));
@@ -149,7 +152,7 @@ export const SalaryScene: React.FC = () => {
       <Drift from={tenAt} to={tailAt + 40} scale={0.022} origin={[960, base]}>
         {/* The empty stretch the mean ends up in. */}
         {gapBand > 0 ? (
-          <Svg opacity={gapBand * (1 - ease(frame, balanceAt - 6, 12) * 0.6)}>
+          <Svg opacity={gapBand * (1 - ease(frame, balanceAt - 6, 12))}>
             <rect
               x={rightmost + 22}
               y={base - h(150)}
@@ -245,7 +248,7 @@ export const SalaryScene: React.FC = () => {
           </Svg>
         ) : null}
         <Tag x={xOf(medianV)} y={base + h(72)} opacity={medianLabel * medianDim} size={23} bold>
-          Median {fmt(medianV, 1)}k
+          Median <span style={TABULAR}>{fmt(medianV, 1)}</span>k
         </Tag>
 
         {/* The mean, in red, above it. */}
@@ -255,7 +258,7 @@ export const SalaryScene: React.FC = () => {
           </Svg>
         ) : null}
         <Tag x={xOf(meanV)} y={base - h(118) - 36} opacity={meanIn * Math.min(1, meanLine)} color={STAT_INK} size={23} bold knockout>
-          Mean {fmt(meanV, 1)}k
+          Mean <span style={TABULAR}>{fmt(meanV, 1)}</span>k
         </Tag>
 
         {/* The balance point. */}

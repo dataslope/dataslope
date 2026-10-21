@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -70,6 +71,7 @@ export const script: NarrationScript = {
   voice: "drew",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     // ── Part 1. Why constraints ───────────────────────────────────────────
@@ -161,7 +163,7 @@ export const script: NarrationScript = {
       text: "Ada signs up. Then a second account tries her email, with a new username.",
       pauseAfter: 0.3,
     },
-    { id: "dup", text: "Duplicate key, refused. One email, one account.", pauseAfter: 0.4 },
+    { id: "dup", text: "Refused, because email is marked unique. One email, one account.", pauseAfter: 0.8 },
     {
       id: "many",
       text: "The primary key already keeps rows distinct. Unique guards everything else that can't repeat.",
@@ -174,12 +176,10 @@ export const script: NarrationScript = {
       text: "A student takes many courses, and a course has many students. So both IDs repeat... but each pair only once.",
       pauseAfter: 0.35,
     },
-    { id: "again", text: "Enroll student one in course ten a second time, and it bounces.", pauseAfter: 0.4 },
-    {
-      id: "oneone",
-      text: "Put unique on a foreign key, and each user gets at most one profile. That's one to one.",
-      pauseAfter: 0.5,
-    },
+    // The refusal holds before the figure clears for the one-to-one ERD.
+    { id: "again", text: "Enroll student one in course ten a second time, and it bounces.", pauseAfter: 1.5 },
+    { id: "oneone", text: "Put unique on a foreign key, and each user gets at most one profile." },
+    { id: "second", text: "A second profile for user one bounces. That's one to one.", pauseAfter: 0.8 },
     { id: "check-in", text: "That covers missing and repeated. What about values that are just wrong?" },
 
     // ── Part 5. Rules about values ────────────────────────────────────────
@@ -187,12 +187,13 @@ export const script: NarrationScript = {
       id: "check",
       scene: true,
       text: "That's a check: a true or false test that every row has to pass. Price zero or more was one.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.8,
     },
-    { id: "banana", text: "Status has to be draft, active, or archived. So banana? Nope.", pauseAfter: 0.4 },
+    // The refusal holds before the products figure clears for events.
+    { id: "banana", text: "Status has to be draft, active, or archived. So banana? Nope.", pauseAfter: 1.5 },
     {
       id: "dates",
-      text: "It can compare columns, too. An event can't end before it starts, so this backwards conference never gets in.",
+      text: "It can compare columns, too. An event has to end after it starts, so this backwards conference never gets in.",
       pauseAfter: 0.5,
     },
     {

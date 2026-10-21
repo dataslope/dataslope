@@ -130,7 +130,9 @@ export const Code: React.FC<{ line: string; size?: number }> = ({ line, size }) 
 
 // ── The printed listing ──────────────────────────────────────────────────────
 
-export type LineMark = { line: number; at: number; out?: number; color?: string };
+/** A wash behind a listing line; `from` and `to` (character offsets) mark
+ *  only that span of it, such as one comparison in a WHERE. */
+export type LineMark = { line: number; at: number; out?: number; color?: string; from?: number; to?: number };
 
 export type ListingGeometry = { size: number; lineH: number; padY: number; gutter: number };
 export const listingGeometry = (size: number): ListingGeometry => ({
@@ -204,16 +206,18 @@ export const Listing: React.FC<{
         const w = ease(frame, m.at, 12);
         const o = m.out === undefined ? 0 : ease(frame, m.out, 10);
         if (w <= 0 || o >= 1) return null;
+        const start = m.from ?? 0;
+        const chars = (m.to ?? lines[m.line].length) - start;
         return (
           <div
             key={i}
             style={{
               position: "absolute",
-              left: g.gutter + size * 0.42,
+              // In em of the code's own size, so it spans the characters.
+              left: `calc(${g.gutter}px + ${0.42 + start * 0.6}em)`,
               top: g.padY + m.line * g.lineH + g.lineH * 0.12,
               height: g.lineH * 0.76,
-              // In em of the code's own size, so it spans the characters.
-              width: `${(lines[m.line].length * 0.6 + 0.7) * w}em`,
+              width: `${(chars * 0.6 + 0.7) * w}em`,
               fontSize: size,
               background: m.color ?? MARK,
               opacity: 1 - o,
@@ -721,17 +725,35 @@ export const ErrorBox: React.FC<{
       <div>
         <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
         {"  "}
-        {message}
+        <Unbroken text={message} />
       </div>
       {detail ? (
         <div style={{ color: INK_SOFT }}>
           <span style={{ fontWeight: 600 }}>DETAIL:</span>
           {"  "}
-          {detail}
+          <Unbroken text={detail} />
         </div>
       ) : null}
     </div>
   </Ink>
+);
+
+/**
+ * Text that may wrap only at its spaces: a hyphenated word ("not-null",
+ * "555-1000)") is kept whole, where the browser would break after its hyphen.
+ */
+const Unbroken: React.FC<{ text: string }> = ({ text }) => (
+  <>
+    {text.split(/(\S*-\S*)/).map((part, i) =>
+      i % 2 ? (
+        <span key={i} style={{ whiteSpace: "nowrap" }}>
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    )}
+  </>
 );
 
 // ── Marks drawn on the page ──────────────────────────────────────────────────

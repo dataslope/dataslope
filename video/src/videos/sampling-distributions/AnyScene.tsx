@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { useMergedPart } from "../sampling/merged";
+import { useFigNumber, useMergedPart } from "../sampling/merged";
 import { Axis, Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { ds } from "../../theme/brand";
@@ -29,6 +29,9 @@ import { flash, Marker, swell } from "../sampling/emphasis";
 /** One axis for the population and all three statistics. */
 const X: XScale = { lo: 0, hi: 300, x0: 330, x1: 1490 };
 const TICKS = [0, 50, 100, 150, 200, 250, 300];
+/** The lesson's "incomes, say" carries no unit; this video reads it in
+ *  thousands of dollars (a mean near 40), marked on the last tick. */
+const thousands = (v: number) => (v === 300 ? "$300k" : String(v));
 const ROW_X = 118;
 const COL_CENTER = 1540;
 const COL_SPREAD = 1670;
@@ -50,11 +53,16 @@ export const AnyScene: React.FC = () => {
   // In the merged Unit 5 video the spoken bridge leads straight on: no "Next" line.
   const merged = useMergedPart();
   const { y, h } = useLayout();
+  const fig = useFigNumber();
 
-  const anyFrom = n.beat("any").from;
-  const meanFirstAt = n.word("any", "mean");
+  const meanAt = n.word("any", "The mean");
   const everyAt = n.word("any", "Every statistic");
+  const takeAt = n.word("kinds", "Take");
   const lopsidedAt = n.word("kinds", "lopsided");
+  // No empty axes ahead of their data: the population's row arrives on "Take
+  // samples of sixty from a lopsided population", each statistic's row as it
+  // is named. Until then the heading carries the beat.
+  const popAt = takeAt + 2;
   const statAt = [n.word("kinds", "mean"), n.word("kinds", "median"), n.word("kinds", "maximum")];
   const centerAt = n.word("own", "center");
   const widthAt = n.word("own", "width");
@@ -70,7 +78,7 @@ export const AnyScene: React.FC = () => {
   const meanRow = ease(frame, meanShapeAt - 2, 22);
   const surprise = flash(frame, surpriseAt - 2, 26);
   // Built and pointed at as the narration names each part.
-  const sixtyAt = n.word("kinds", "samples of sixty");
+
   const incomesAt = n.word("kinds", "incomes");
   const wideAt = n.word("own", "wide");
   const thatWidthAt = n.word("name", "that width");
@@ -82,14 +90,16 @@ export const AnyScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the population, each statistic's pile, the widths, the name ── */}
-      <Sfx name="el-pop" at={lopsidedAt - 4} level={-30} />
+      <Sfx name="el-pop" at={popAt} level={-30} />
       {statAt.map((at, r) => (
         <Sfx key={r} name="el-pop" at={at - 2} level={-30} />
       ))}
       <Sfx name="el-tap" at={widthAt} level={-29} />
       <Sfx name="el-pencil" at={seAt - 2} level={-34} />
 
-      <Ink at={anyFrom - 12} dur={20} style={{ left: 112, top: y(112), ...headline(64), whiteSpace: "nowrap" }}>
+      {/* After "One last thing.", with "The mean isn't special": the claim the
+          heading makes, and no stretch of a finished page while it is said. */}
+      <Ink at={meanAt - 6} dur={20} style={{ left: 112, top: y(112), ...headline(64), whiteSpace: "nowrap" }}>
         Every statistic has
       </Ink>
       <Ink
@@ -114,9 +124,9 @@ export const AnyScene: React.FC = () => {
       )}
 
       <FigLabel
-        n="7"
+        n={fig(7)}
         title={`Samples of ${ANY_N} from a lopsided population, ${ANY_SAMPLES.toLocaleString("en-US")} of each`}
-        at={sixtyAt - 4}
+        at={takeAt - 2}
         x={X.x0}
         y={y(290)}
       />
@@ -164,7 +174,7 @@ export const AnyScene: React.FC = () => {
       />
 
       {/* The population. */}
-      <Ink at={lopsidedAt - 4} dur={14} style={{ left: ROW_X, top: y(POP_ROW.base - 44) }}>
+      <Ink at={popAt} dur={14} style={{ left: ROW_X, top: y(POP_ROW.base - 44) }}>
         <span style={{ ...body(32, true), color: INK }}>Population</span>
       </Ink>
       <Bars
@@ -175,9 +185,9 @@ export const AnyScene: React.FC = () => {
         base={y(POP_ROW.base)}
         unit={h(POP_ROW.height / peak(LOPSIDED.hist)) * swell(frame, tailAt - 2, 0.14, 22)}
         color={POP_FILL}
-        grow={(i) => ease(frame, lopsidedAt - 4 + i * 0.4, 12)}
+        grow={(i) => ease(frame, popAt + i * 0.4, 12)}
       />
-      <Axis scale={X} base={y(POP_ROW.base)} ticks={[]} at={meanFirstAt + 2} />
+      <Axis scale={X} base={y(POP_ROW.base)} ticks={[]} at={takeAt} />
       <Note at={lopsidedAt + 6} x={sx(X, 120)} y={y(POP_ROW.base - 62)}>
         <span style={{ ...note(22, INK_SOFT), ...halo }}>
           <Marker at={tailAt - 2}>a long tail to the right</Marker>
@@ -195,7 +205,7 @@ export const AnyScene: React.FC = () => {
         const bracketY = y(base - STAT_H * AT_SD);
         return (
           <React.Fragment key={s.key}>
-            <Ink at={meanFirstAt + 6 + r * 6} dur={14} style={{ left: ROW_X, top: y(base - 44) }}>
+            <Ink at={at - 8} dur={14} style={{ left: ROW_X, top: y(base - 44) }}>
               <span
                 style={{
                   ...body(32, true),
@@ -220,7 +230,8 @@ export const AnyScene: React.FC = () => {
               scale={X}
               base={y(base)}
               ticks={last ? TICKS : []}
-              at={meanFirstAt + 8 + r * 6}
+              format={thousands}
+              at={at - 6}
               size={20}
             />
             <Rule

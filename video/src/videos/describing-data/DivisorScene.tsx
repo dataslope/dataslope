@@ -3,19 +3,22 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { DIVISOR, sumSquaresAround } from "./data";
-import { DATA, Drift, lerp, Mark, Pulse, STAT, STAT_INK, Svg, Tag, counted } from "./parts";
+import { Bracket, DATA, Drift, lerp, Mark, Pulse, STAT, STAT_INK, Svg, Tag, counted } from "./parts";
 
 /** The five values, on a line where a unit is 20 px, so a square's side is its distance. */
 const X: XScale = { lo: -26, hi: 16, x0: 360, x1: 1200 };
 const K = (X.x1 - X.x0) / (X.hi - X.lo);
 const AXIS = 860;
 const R = 10;
+/** "−5.3": a signed value with a real minus. */
+const signed = (v: number, digits = 1) => (v < 0 ? `−${fmt(-v, digits)}` : fmt(v, digits));
+
 /** The averages over 4,000 samples. */
 const V: XScale = { lo: 0, hi: 120, x0: 420, x1: 1560 };
 const BAR_N = 560;
@@ -38,7 +41,6 @@ export const DivisorScene: React.FC = () => {
   const nineAt = n.word("divisor", "nine");
   const wildAt = n.word("robust-in", "single wild value");
   const tenAt = n.word("divisor", "ten");
-  const growWordAt = n.word("truth", "grow");
   const ownAt = n.word("divisor", "own mean");
   const closerAt = n.word("closest", "closer");
   const otherAt = n.word("closest", "any other number");
@@ -50,6 +52,8 @@ export const DivisorScene: React.FC = () => {
   const aroundAt = n.word("small", "around");
   const smallAt = n.word("small", "small");
   const underAt = n.word("small", "underestimate");
+  const divideByAt = n.word("small", "Divide by n");
+  const numberAt = n.word("small", "number of values");
   const measuredFrom = n.beat("measured").from;
   const fourAt = n.word("measured", "four thousand");
   const byNAt = n.word("measured", "dividing by n", { nth: 1 });
@@ -65,14 +69,20 @@ export const DivisorScene: React.FC = () => {
   const weaknessAt = n.word("robust-in", "weakness");
   const swampAt = n.word("robust-in", "swamp");
 
-  // Where the squares are measured from: the sample's mean, a wiggle either
-  // side of it, out to the truth and back.
-  const wig = ease(frame, otherAt - 4, 10) * (1 - ease(frame, otherAt + 34, 12));
-  const wiggle = 4.2 * Math.sin(((frame - otherAt) / 22) * Math.PI * 2) * wig;
+  // Where the squares are measured from: the sample's mean, then another
+  // center swung either side of it (the sample's mean stays marked, so the
+  // moving line is never mistaken for it), out to the truth and back.
+  const wig = ease(frame, otherAt - 4, 12) * (1 - ease(frame, otherAt + 62, 14));
+  const wiggle = 4.2 * Math.sin(((frame - otherAt + 4) / 44) * Math.PI * 2) * wig;
   const toTruth = ease(frame, insteadAt - 2, 30) * (1 - ease(frame, aroundAt - 2, 26));
   const c = lerp(DIVISOR.fiveMean, 0, toTruth) + wiggle;
   const cx = sx(X, c);
+  const meanX = sx(X, DIVISOR.fiveMean);
   const base = y(AXIS);
+  /** How far the center has left the sample's mean: red there, ink anywhere else. */
+  const away = Math.max(wig, toTruth);
+  const centerColor = `color-mix(in srgb, ${INK} ${(away * 100).toFixed(1)}%, ${STAT})`;
+  const centerName = toTruth > 0.5 ? "the true mean" : wig > 0.05 ? "another center" : "the sample mean";
 
   const dotsIn = (i: number) => ease(frame, distancesAt - 6 + i * 3, 10);
   const sticks = ease(frame, ownAt - 2, 14);
@@ -109,7 +119,7 @@ export const DivisorScene: React.FC = () => {
       </div>
 
       {/* The two divisors the headline asks about. */}
-      <div style={{ position: "absolute", left: 1330, top: y(330), opacity: 1 - phaseB, whiteSpace: "nowrap", display: "flex", gap: 22, alignItems: "baseline" }}>
+      <div style={{ position: "absolute", left: 1330, top: y(330), opacity: (1 - phaseB) * (1 - ease(frame, fiveAt - 4, 12)), whiteSpace: "nowrap", display: "flex", gap: 22, alignItems: "baseline" }}>
         <span style={{ ...note(30, STAT_INK), fontWeight: 700, opacity: ease(frame, nineAt - 4, 12) }}>12 ÷ 9</span>
         <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, tenAt - 4, 12) }}>not 12 ÷ 10</span>
       </div>
@@ -131,9 +141,9 @@ export const DivisorScene: React.FC = () => {
                     y={base - d}
                     width={d}
                     height={d}
-                    fill={toTruth > 0.5 ? INK : STAT}
+                    fill={centerColor}
                     opacity={0.1}
-                    stroke={toTruth > 0.5 ? INK : STAT}
+                    stroke={centerColor}
                     strokeWidth={1.6}
                     strokeOpacity={0.7}
                   />
@@ -174,17 +184,24 @@ export const DivisorScene: React.FC = () => {
             true mean 0
           </Tag>
 
-          {/* Where the distances are measured from. */}
+          {/* Where the distances are measured from: the sample's mean stays
+              marked in red; the center they are measured from moves in ink. */}
           {sticks > 0 ? (
             <Svg>
-              <line x1={cx} x2={cx} y1={base + 18} y2={base - (base - y(470)) * sticks} stroke={toTruth > 0.5 ? INK : STAT} strokeWidth={3.4} strokeLinecap="round" />
+              <line x1={meanX} x2={meanX} y1={base + 18} y2={base - (base - y(470)) * sticks} stroke={STAT} strokeWidth={3.4} strokeLinecap="round" />
+              {away > 0.01 ? (
+                <line x1={cx} x2={cx} y1={base + 18} y2={y(430)} stroke={INK} strokeWidth={3.4} strokeLinecap="round" opacity={away} />
+              ) : null}
               {DIVISOR.five.map((v, i) => (
-                <line key={i} x1={cx} x2={lerp(cx, sx(X, v), sticks)} y1={base - R - 1} y2={base - R - 1} stroke={STAT} strokeWidth={2} opacity={0.6} />
+                <line key={i} x1={cx} x2={lerp(cx, sx(X, v), sticks)} y1={base - R - 1} y2={base - R - 1} stroke={centerColor} strokeWidth={2} opacity={0.6} />
               ))}
             </Svg>
           ) : null}
-          <Tag x={cx - 10} y={y(470) - 8} opacity={sticks * (1 - ease(frame, insteadAt - 4, 8) + ease(frame, aroundAt + 22, 10))} color={STAT_INK} size={21} bold align="right">
-            sample mean {fmt(DIVISOR.fiveMean, 1)}
+          <Tag x={meanX - 10} y={y(470) - 8} opacity={sticks} color={STAT_INK} size={21} bold align="right" knockout>
+            sample mean <span style={TABULAR}>{signed(DIVISOR.fiveMean)}</span>
+          </Tag>
+          <Tag x={cx} y={y(430) - 34} opacity={wig} size={21} bold>
+            another center
           </Tag>
 
           <Svg>
@@ -205,15 +222,29 @@ export const DivisorScene: React.FC = () => {
           ))}
         </Drift>
 
-        {/* The total of the squares, live. */}
+        {/* The total of the squares, live, against what the sample's mean gives. */}
         <Ink at={closerAt - 2} dur={16} style={{ left: 1330, top: y(500), whiteSpace: "nowrap" }}>
           <div style={{ ...label(23, INK), fontWeight: 560 }}>Sum of the squares</div>
-          <div style={{ ...note(64, toTruth > 0.5 ? INK : STAT_INK), fontWeight: 700, marginTop: 6 }}>{fmt(ss, 1)}</div>
-          <div style={{ ...note(24, INK), fontWeight: 600, marginTop: 4, opacity: ease(frame, growWordAt - 2, 12) * toTruth }}>
-            {fmt(DIVISOR.ssAroundTruth - DIVISOR.ssAroundMean, 1)} more than around its own mean
+          <div
+            style={{
+              ...note(64, `color-mix(in srgb, ${INK} ${(away * 100).toFixed(1)}%, ${STAT_INK})`),
+              ...TABULAR,
+              fontWeight: 700,
+              marginTop: 6,
+            }}
+          >
+            {fmt(ss, 1)}
           </div>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 2 }}>
-            measured from {toTruth > 0.5 ? "the true mean" : "the sample mean"}
+          <div style={{ ...note(22, INK_SOFT), marginTop: 2 }}>measured from {centerName}</div>
+          <div
+            style={{
+              ...note(22, STAT_INK),
+              fontWeight: 600,
+              marginTop: 8,
+              opacity: ease(frame, otherAt - 4, 12) * (1 - ease(frame, aroundAt + 22, 12)),
+            }}
+          >
+            from the sample mean: <span style={TABULAR}>{fmt(DIVISOR.ssAroundMean, 1)}</span>, the least
           </div>
         </Ink>
         <Ink at={smallAt - 2} dur={16} style={{ left: 1330, top: y(700), whiteSpace: "nowrap" }}>
@@ -221,8 +252,18 @@ export const DivisorScene: React.FC = () => {
             Around its own mean, the <Mark at={smallAt + 2}>smallest</Mark> it can be.
           </span>
         </Ink>
-        <Ink at={underAt - 4} dur={16} style={{ left: 1330, top: y(750), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, STAT_INK), fontWeight: 600, ...halo }}>Divided by n, too small.</span>
+        <div style={{ position: "absolute", left: 1330, top: y(750), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...note(23, STAT_INK), fontWeight: 600 }}>
+          <Ink at={divideByAt - 4} dur={14} style={{ position: "relative" }}>
+            <span style={halo}>Divided by n,</span>
+          </Ink>
+          <Ink at={underAt - 4} dur={14} style={{ position: "relative" }}>
+            <span style={halo}>too small.</span>
+          </Ink>
+        </div>
+        <Ink at={numberAt - 4} dur={16} style={{ left: 1330, top: y(750) + 38, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK_SOFT), ...halo }}>
+            n, the number of values: here, {DIVISOR.five.length}
+          </span>
         </Ink>
         <Sfx name="el-pop" at={growAt - 2} level={-31} />
       </div>
@@ -271,11 +312,14 @@ export const DivisorScene: React.FC = () => {
               by n − 1
             </Tag>
             <Tag x={sx(V, DIVISOR.byN * nGrow) + 16} y={y(BAR_N) - 15} opacity={ease(frame, byNAt, 10)} color={STAT_INK} size={24} bold align="left" knockout>
-              {counted(frame, byNAt - 2, 0, DIVISOR.byN, 1, 22)}
-              <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, lowAt - 4, 10) }}>, about {Math.round(DIVISOR.lowPct)}% low</span>
+              <span style={TABULAR}>{counted(frame, byNAt - 2, 0, DIVISOR.byN, 1, 22)}</span>
+            </Tag>
+            <Bracket x0={sx(V, DIVISOR.byN)} x1={sx(V, DIVISOR.sigma2)} y={y(BAR_N) - h(34) - 12} at={lowAt - 6} color={STAT} />
+            <Tag x={sx(V, DIVISOR.sigma2) + 14} y={y(BAR_N) - h(34) - 26} opacity={ease(frame, lowAt - 2, 10)} color={STAT_INK} size={23} bold align="left">
+              about {Math.round(DIVISOR.lowPct)}% low
             </Tag>
             <Tag x={sx(V, DIVISOR.byN1 * n1Grow) + 16} y={y(BAR_N1) - 15} opacity={ease(frame, byN1At + 2, 10)} color={"var(--ds-blue-ink)"} size={24} bold align="left">
-              {counted(frame, byN1At, 0, DIVISOR.byN1, 1, 22)}
+              <span style={TABULAR}>{counted(frame, byN1At, 0, DIVISOR.byN1, 1, 22)}</span>
             </Tag>
             <Pulse x={sx(V, DIVISOR.sigma2)} y={y(BAR_N1)} at={landsAt + 4} color={INK} r={8} />
             </div>
@@ -312,7 +356,7 @@ export const DivisorScene: React.FC = () => {
             );
           })}
           <Ink at={disagreeAt - 4} dur={16} style={{ left: 260, top: y(800), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, INK_SOFT) }}>The same ten values, two answers</span>
+            <span style={{ ...label(22, INK_SOFT) }}>x: the ten salaries of Fig. 1, two answers</span>
           </Ink>
           <Ink at={weaknessAt - 4} dur={16} style={{ left: 260, top: y(915), whiteSpace: "nowrap" }}>
             <span style={{ ...note(24, INK), ...halo }}>

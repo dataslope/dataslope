@@ -37,6 +37,11 @@ export type NarrationScript = {
    *  video whose cuts start 8 frames early. Raise it for a video whose exits
    *  start earlier than that (a wipe, or text that fades ahead of the cut). */
   sceneGap?: number;
+  /** The least silence after any beat, in seconds: a floor under every
+   *  `pauseAfter`, so a script can't run one idea into the next. The course
+   *  videos set COURSE_MIN_PAUSE (editorial/course.ts). Unset, a beat's own
+   *  `pauseAfter` (or 0.35 s) stands. */
+  minPause?: number;
   /** About how many characters one take holds before the next scene starts a
    *  new one (src/narration/takes.ts). Defaults to TAKE_CHARS. */
   takeChars?: number;

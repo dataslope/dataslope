@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { body, fmt, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
-import { LLN, llnAt, llnRange } from "./data";
+import { LLN, llnAt, llnRange, pct } from "./data";
 import { Coin, DATA, DATA_INK, Headline, lerp, Pulse, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 /** The chart: flips on a log axis, 1 to 5,000; the share of heads, 0 to 1. */
@@ -21,6 +21,15 @@ const MEM = { x0: 1530, pitch: 58, y: 430, r: 21 } as const;
 const EARLY = llnRange(10, 100);
 const LATE = llnRange(1000, LLN.n);
 const FOUR = llnAt(4);
+/** How far the share strays after a thousand flips, rounded up to the half
+ *  point the narration says ("a point and a half"): 0.014 is within 1.5. */
+const LATE_BOUND = Math.ceil(LLN.maxOffLate * 200) / 2;
+/** This run's first five heads in a row, flips 21 to 25: where the side
+ *  panel's streak lands on the chart. They lift the share to its high. */
+const STREAK = Array.from({ length: 5 }, (_, i) => LLN.streakFrom + i);
+const STREAK_END = STREAK[STREAK.length - 1];
+/** The streak's coins, landed in a row above the flips they were. */
+const LANDED = { r: 20, pitch: 46, lift: 64 } as const;
 
 /**
  * Part 1, the law of large numbers: the lesson's running share of heads over
@@ -96,9 +105,9 @@ export const LawScene: React.FC = () => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const swampK = 10 ** lerp(Math.log10(5), LOG_HI, swamp);
+  const swampK = 10 ** lerp(Math.log10(STREAK_END), LOG_HI, swamp);
   const swampD = LLN.path
-    .filter(([k]) => k >= 5 && k <= swampK)
+    .filter(([k]) => k >= STREAK_END && k <= swampK)
     .map(([k, v], i) => `${i ? "L" : "M"}${fx(k).toFixed(1)},${fy(v).toFixed(1)}`)
     .join(" ");
 
@@ -107,6 +116,11 @@ export const LawScene: React.FC = () => {
   const early = ease(frame, fortyAt - 2, 14);
   const late = ease(frame, pointAt - 4, 14);
   const fly = ease(frame, paidAt - 4, 22);
+  // The streak's own stretch of the line, marked as its coins land over it.
+  const streakMark = ease(frame, paidAt + 14, 12);
+  const streakD = STREAK.map((k, i) => `${i ? "L" : "M"}${fx(k).toFixed(1)},${fy(llnAt(k)).toFixed(1)}`).join(" ");
+  const landX = (fx(STREAK[0]) + fx(STREAK_END)) / 2;
+  const landY = fy(llnAt(STREAK_END)) - LANDED.lift;
   const dimLine = ease(frame, swampedAt - 6, 12);
   const chartBack = ease(frame, memoryFrom - 2, 14) * 0.3 * (1 - ease(frame, paidAt - 4, 12)) + ease(frame, changeAt - 2, 14) * 0.55;
 
@@ -124,7 +138,7 @@ export const LawScene: React.FC = () => {
       <Headline top={y(150)} first="The law of" second="large numbers." firstAt={lawAt - 4} secondAt={lawAt + 6} out={tableInFrom - 6} />
       <Headline top={y(150)} first="Most chances change" second="once you know more." firstAt={tableInFrom - 2} secondAt={learnAt - 4} />
 
-      <FigLabel n="1" title={`Heads so far, over ${LLN.n.toLocaleString("en-US")} flips of a fair coin`} at={llnFrom} x={CH.x0} y={y(268)} />
+      <FigLabel n="1" title={`Share of heads so far, in a new run of ${LLN.n.toLocaleString("en-US")} flips`} at={llnFrom} x={CH.x0} y={y(268)} />
 
       {/* ── Axes ── */}
       <Svg opacity={1 - chartBack}>
@@ -139,13 +153,13 @@ export const LawScene: React.FC = () => {
             </g>
           ))}
           <text x={CH.x1} y={y(CH.base) + 64} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 650, fill: INK_SOFT }}>
-            flips so far
+            flips so far (log scale)
           </text>
           {[0, 0.25, 0.5, 0.75, 1].map((p) => (
             <g key={p}>
               <line x1={CH.x0 - 6} x2={CH.x0} y1={fy(p)} y2={fy(p)} stroke={INK} strokeWidth={1.2} />
               <text x={CH.x0 - 14} y={fy(p) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT }}>
-                {p === 0 ? "0" : p === 1 ? "1" : fmt(p, 2).replace(/^0/, "")}
+                {pct(p)}
               </text>
             </g>
           ))}
@@ -185,14 +199,18 @@ export const LawScene: React.FC = () => {
           <path d={d} fill="none" stroke={DATA} strokeWidth={4} strokeLinejoin="round" strokeLinecap="round" opacity={1 - dimLine * 0.55} />
         ) : null}
         {swamp > 0 ? <path d={swampD} fill="none" stroke={DATA} strokeWidth={5.5} strokeLinejoin="round" strokeLinecap="round" /> : null}
+        {/* Flips 21 to 25, the streak, in the accent once its coins are over it. */}
+        {streakMark > 0 ? (
+          <path d={streakD} fill="none" stroke={STAT} strokeWidth={7} strokeLinejoin="round" strokeLinecap="round" opacity={streakMark} />
+        ) : null}
         {/* The head of the line, while it is still being drawn. */}
-        {drawn && head && K < LLN.n ? <circle cx={fx(head[0])} cy={fy(head[1])} r={9} fill={DATA} stroke="var(--ds-white)" strokeWidth={2.5} /> : null}
+        {drawn && head && reach < LOG_HI - 1e-6 ? <circle cx={fx(head[0])} cy={fy(head[1])} r={9} fill={DATA} stroke="var(--ds-white)" strokeWidth={2.5} /> : null}
         {/* Four flips in: three quarters. */}
         <circle cx={fx(4)} cy={fy(FOUR)} r={7 * ease(frame, quartersAt - 4, 8)} fill={STAT} />
       </Svg>
       <Pulse x={fx(4)} y={fy(FOUR)} at={quartersAt - 4} />
       <Note at={quartersAt} x={fx(4) + 16} y={fy(FOUR) - 46}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>4 flips: {fmt(FOUR)}</span>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>4 flips: {pct(FOUR)}</span>
       </Note>
       {/* What the line has reached, read out as it is drawn. */}
       {drawn ? (
@@ -209,13 +227,13 @@ export const LawScene: React.FC = () => {
           }}
         >
           <span style={note(22, INK_SOFT)}>after</span>
-          <span style={{ ...note(34, INK), fontWeight: 700 }}>{Math.round(K).toLocaleString("en-US")}</span>
+          <span style={{ ...note(34, INK), fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
           <span style={note(22, INK_SOFT)}>flips:</span>
-          <span style={{ ...note(34, DATA_INK), fontWeight: 700 }}>{head ? fmt(head[1], 2) : ""}</span>
+          <span style={{ ...note(34, DATA_INK), fontWeight: 700, ...TABULAR }}>{head ? pct(head[1]) : ""}</span>
         </div>
       ) : null}
       <Note at={fiveAt} x={CH.x1 + 12} y={fy(0.5) - 15}>
-        <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>½</span>
+        <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>true {pct(0.5)}</span>
       </Note>
 
       {/* The early band's ends, said aloud. */}
@@ -228,7 +246,7 @@ export const LawScene: React.FC = () => {
       </Note>
       <Note at={pointAt} x={fx(1000)} y={fy(LATE.hi) - 74} from="up">
         <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-          within {fmt(LLN.maxOffLate * 100, 1)} points of ½
+          within {fmt(LATE_BOUND, 1)} points of {pct(0.5)}
         </span>
       </Note>
 
@@ -245,29 +263,41 @@ export const LawScene: React.FC = () => {
       </Ink>
 
       {/* ── The gambler's fallacy, beside the chart ── */}
-      <Ink at={balanceAt - 4} dur={14} out={paidAt + 8} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y - 92), whiteSpace: "nowrap" }}>
+      <Ink at={balanceAt - 4} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y - 92), whiteSpace: "nowrap" }}>
         <span style={label(22, INK)}>Five heads in a row</span>
       </Ink>
       {Array.from({ length: 5 }, (_, i) => {
         const x0 = MEM.x0 + i * MEM.pitch;
         const y0 = y(MEM.y);
-        // On "paid back" the streak flies into the first flips of the chart.
-        const tx = fx(1 + i);
-        const ty = fy(llnAt(1 + i));
+        // On "paid back" a copy of the streak flies to where this run really
+        // had five heads in a row, flips 21 to 25, and lands in a row over
+        // them; the panel keeps its own, set back.
+        const tx = landX + (i - 2) * LANDED.pitch;
+        const ty = landY;
         return (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              transform: `translate(${lerp(0, tx - x0, fly)}px, ${lerp(0, ty - y0, fly)}px)`,
-            }}
-          >
-            <Coin x={x0} y={y0} heads at={rowAt - 4 + i * 3} r={lerp(MEM.r, 9, fly)} />
-          </div>
+          <React.Fragment key={i}>
+            <Coin x={x0} y={y0} heads at={rowAt - 4 + i * 3} r={MEM.r} dim={fly * 0.7} />
+            {fly > 0 ? (
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  transform: `translate(${lerp(0, tx - x0, fly)}px, ${lerp(0, ty - y0, fly)}px)`,
+                }}
+              >
+                <Coin x={x0} y={y0} heads at={rowAt - 4 + i * 3} r={lerp(MEM.r, LANDED.r, fly)} />
+              </div>
+            ) : null}
+          </React.Fragment>
         );
       })}
+      <Leader points={[[landX, landY + LANDED.r + 8], [landX, fy(llnAt(STREAK[2])) - 12]]} at={paidAt + 14} dur={10} color={STAT} />
+      <Note at={paidAt + 16} x={landX + 2 * LANDED.pitch + LANDED.r + 14} y={landY - 15}>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          flips {STREAK[0]} to {STREAK_END}
+        </span>
+      </Note>
       <Ink at={fiftyAt - 6} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 52), whiteSpace: "nowrap" }}>
         <span style={note(22, INK_SOFT)}>The next flip</span>
         <div style={{ ...headline(64, true), color: STAT_INK, marginTop: 6 }}>still ½</div>

@@ -102,7 +102,7 @@ export const ExtentScene: React.FC = () => {
 
       <Drift from={extentFrom} to={n.beat("next").to + 60} amount={0.02}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - settle }}>
-        <FigLabel n="14" title={`${RANGE.n} values, and the normal fitted to them`} at={extentFrom} x={160} y={y(300)} />
+        <FigLabel n="16" title={`${RANGE.n} values, and the normal fitted to them`} at={extentFrom} x={160} y={y(300)} />
 
         {/* Where there is no data. */}
         <Svg opacity={noData * (0.55 + noDataGlow * 0.45)}>
@@ -128,7 +128,7 @@ export const ExtentScene: React.FC = () => {
         <Svg opacity={tailGlow}>
           <path d={curveD(pdf, RANGE.max, 220, X, py)} fill="none" stroke={ASK} strokeWidth={7} strokeLinecap="round" />
         </Svg>
-        <Axis scale={X} base={base} ticks={[40, 80, 100, 120, 160, 200]} at={extentFrom} />
+        <Axis scale={X} base={base} ticks={[40, 60, 80, 100, 120, 140, 160, 180, 200]} at={extentFrom} />
 
         {/* The four hundred values. */}
         <Svg>

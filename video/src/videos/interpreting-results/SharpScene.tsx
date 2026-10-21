@@ -140,7 +140,8 @@ export const SharpScene: React.FC = () => {
           </span>
         </Note>
         <Note at={aimedAt - 2} x={WX0 + WW + 24} y={top + 108}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>chance alone: about {fmt(SHOTS.expected, 1)}</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>if the target came first,</span>
+          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>about {fmt(SHOTS.expected, 1)} by chance</div>
         </Note>
         <Note at={lookingAt - 2} x={160} y={top + wh + 30}>
           <span style={{ ...label(24, INK), whiteSpace: "nowrap", ...halo }}>

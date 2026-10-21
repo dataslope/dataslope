@@ -8,13 +8,15 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, USERS } from "./data";
-import { Bracket, DATA, EST, FADED, IntervalBar, Marked, Mu, pulse, Rule, Strike, Svg, XBar } from "./parts";
+import { Bracket, DATA, EST, FADED, IntervalBar, Marked, Mu, pulse, Rule, Strike, Svg } from "./parts";
 
 const LEFT = 160;
 /** The mini figures, right of the quotes. */
 const NARROW: XScale = { lo: 40, hi: 60, x0: 1000, x1: 1760 };
 const WIDE: XScale = { lo: 10, hi: 90, x0: 1000, x1: 1760 };
-const ROWS = [170, 410, 650];
+/** Row tops. The third sits low enough that the divider above it clears the
+ *  caption under Misreading 2's bracket by about 25px. */
+const ROWS = [170, 400, 670];
 
 const JIT = jitter(61, USERS.n);
 const money = (v: number) => `$${fmt(v)}`;
@@ -114,7 +116,7 @@ export const MisreadScene: React.FC = () => {
       <Rule x={muX} y0={y(ROWS[0] + 130)} y1={y(ROWS[0] + 20)} at={neverAt} dur={16} color={INK} width={2.4} dash="7 6" />
       <Note at={movesAt} x={muX - 12} y={y(ROWS[0] + 2)} align="right" from="right">
         <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
-          here <Mu /> is ${USERS.mu}: fixed
+          the true mean, <Mu /> = ${USERS.mu}: fixed
         </span>
       </Note>
       <Note at={randomAt - 2} x={sx(NARROW, USERS.hi) + 18} y={y(ROWS[0] + 56)}>
@@ -194,7 +196,7 @@ export const MisreadScene: React.FC = () => {
       <Bracket x0={sx(WIDE, USERS.twoSdLo)} x1={sx(WIDE, USERS.twoSdHi)} y={y(ROWS[1] + 186)} at={averageAt} color={DATA} up width={2.4} />
       <Note at={personAt - 4} x={(sx(WIDE, USERS.twoSdLo) + sx(WIDE, USERS.twoSdHi)) / 2} y={y(ROWS[1] + 194)} from="up">
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
-          where the people are: <XBar /> ± 2s holds {USERS.insideTwoSd} of {USERS.n}
+          where the people are: {USERS.insideTwoSd} of {USERS.n} within two spreads of the average
         </span>
       </Note>
 

@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout, type EntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import type { Pt } from "../../editorial/ui";
+import { FigLabel, type Pt } from "../../editorial/ui";
 import type { Cardinality } from "../../components/crowsfoot";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OTM } from "./data";
-import { Caption, DbTable, Drift, HEAD_H, Head, KEY_INK, KeyArrow, Kicker, MARK_KEY, Pulse, ROW_H, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, KeyArrow, Kicker, MARK_KEY, Pulse, ROW_H, tableGeometry } from "./parts";
 
 /** The four panels: left edges, each panel PANEL wide. */
 const PANEL_X = [120, 560, 1000, 1440];
@@ -16,7 +16,9 @@ const BOX_W = 300;
 const TITLE_Y = 400;
 const TOP_Y = 470;
 const BOTTOM_Y = 720;
-const SELF_Y = 570;
+/** The self-reference's box sits level with the other panels' top boxes,
+ *  the same distance under its caption. */
+const SELF_Y = TOP_Y;
 /** How far the self-reference's loop runs out from its box. */
 const LOOP = 72;
 
@@ -92,11 +94,12 @@ export const ShapesScene: React.FC = () => {
       ))}
       <Sfx name="el-pencil" at={selfAt} level={-33} />
 
-      <Kicker at={from - 10}>Four shapes</Kicker>
+      <Kicker at={from - 10}>The shapes</Kicker>
       <Head lead="Links come in" leadAt={linksAt - 4} turn="a few shapes." turnAt={shapesAt - 4} />
 
       {/* ── With keys, one row can point at another ── */}
       <Drift from={rowAt} to={pairOut + 10} scale={0.035} origin={[960, y(520)]}>
+      <FigLabel n="1" title="An order pointing at its customer" at={keysAt - 4} x={cg.x} y={cg.top - 44 - FIG_ABOVE} out={pairOut} />
       <DbTable g={cg} cols={["id", "name"]} rows={[{ cells: CUSTOMER.slice(0, 2), at: rowAt }]} at={keysAt} numeric={[0]} colInk={{ 0: KEY_INK }} out={pairOut} />
       <DbTable
         g={og}
@@ -121,6 +124,14 @@ export const ShapesScene: React.FC = () => {
 
       {/* ── The four shapes ── */}
       <Drift from={otmAt} to={n.beat("names").to + 50} scale={0.018} origin={[960, y(600)]}>
+        {/* One figure in four panels; each panel keeps its own title. */}
+        <FigLabel
+          n="2"
+          title="The four shapes a relationship takes"
+          at={otmAt - 8}
+          x={PANEL_X[0] + (PANEL - BOX_W) / 2}
+          y={y(TITLE_Y) - FIG_ABOVE}
+        />
         {(
           [
             ["One to many", otmAt],

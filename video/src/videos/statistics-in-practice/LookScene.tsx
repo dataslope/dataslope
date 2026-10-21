@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BAR, body, fmt, halo, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, body, fmt, halo, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -11,7 +11,7 @@ import { DAY_NAMES, DAYS, jitter, TIPS } from "./data";
 import { Headline, Kicker, lerp, Marker, Ring, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 /** The bills: tip as a share of the bill, 0 to 45%. One bill (71%) runs off
- *  the end and is pinned there, labelled. */
+ *  the end and is pinned past a break in the axis, labelled from the start. */
 const X: XScale = { lo: 0, hi: 45, x0: 330, x1: 1230 };
 /** Each day's average (then median), enlarged. */
 const X2: XScale = { lo: 13, hi: 20, x0: 1410, x1: 1790 };
@@ -20,6 +20,8 @@ const ALL_Y = 565;
 const AXIS = 770;
 const JIT = 26;
 const OFF_END = X.x1 + 34;
+/** The bill pinned past the axis break. */
+const PINNED = TIPS.billPct.findIndex((v) => v > X.hi);
 
 const JIT_ALL = jitter(91, TIPS.rows);
 const JIT_ROW = jitter(92, TIPS.rows);
@@ -33,7 +35,8 @@ const pct = (v: number) => `${fmt(v)}%`;
 /**
  * Part 1 opens on Unit 8's bridge as a puzzle, then looks: 244 bills, split
  * by day; Friday's average leads, on only nineteen bills, with the widest
- * wobble; the median crowns Sunday instead. A lead, not a finding.
+ * wobble, wide enough to overlap every other day; the median crowns Sunday
+ * instead. A lead, not a finding.
  */
 export const LookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -51,13 +54,17 @@ export const LookScene: React.FC = () => {
   const restaurantAt = n.word("bills", "restaurant");
   const tipAt = n.word("bills", "tip");
   const splitAt = n.word("days", "Split");
-  const standsAt = n.word("days", "stands out");
+  // The averages arrive just before Friday is named as the best of them.
+  const standsAt = n.word("days", "and Friday");
   const fridayAt = n.word("days", "Friday");
   const seventeenAt = n.word("days", "seventeen");
   const fifteenAt = n.word("days", "fifteen");
   const nineteenAt = n.word("few", "nineteen");
   const fewFridayAt = n.word("few", "Friday");
   const wobblesAt = n.word("few", "wobbles");
+  const fromAt = n.word("wobble", "fifteen");
+  const toAt = n.word("wobble", "nineteen");
+  const overlapAt = n.word("wobble", "overlapping");
   const medianAt = n.word("median", "median");
   const sundayAt = n.word("median", "Sunday");
   const findingAt = n.word("lead", "finding");
@@ -73,6 +80,15 @@ export const LookScene: React.FC = () => {
   const band = ease(frame, fridayAt - 6, 12) * (1 - ease(frame, findingAt - 6, 14));
   const bandRow = lerp(ROW_Y[FRI], ROW_Y[SUN], ease(frame, sundayAt - 6, 16));
   const whisk = ease(frame, wobblesAt - 6, 16) * (1 - ease(frame, medianAt - 6, 12));
+  // Friday's interval, carried down across every other day's.
+  const overlap = ease(frame, overlapAt - 4, 18);
+  const fri = TIPS.byDay.Fri;
+  // The pinned bill, wherever the split has carried it.
+  const pinnedY = lerp(
+    y(ALL_Y) + h((JIT_ALL[PINNED] - 0.5) * 2 * JIT * 1.6),
+    y(ROW_Y[TIPS.billDay[PINNED]]) + h((JIT_ROW[PINNED] - 0.5) * 2 * JIT),
+    split(PINNED),
+  );
   const dimRows = ease(frame, nineteenAt - 4, 12) * (1 - ease(frame, medianAt - 6, 12));
   const figDim = 1 - 0.55 * ease(frame, jobsAt - 4, 16);
 
@@ -89,6 +105,7 @@ export const LookScene: React.FC = () => {
       <Sfx name="el-whoosh" at={splitAt - 4} level={-33} />
       <Sfx name="el-tap" at={fridayAt - 6} level={-28} />
       <Sfx name="el-pencil" at={wobblesAt - 6} level={-34} />
+      <Sfx name="el-whoosh" at={overlapAt - 4} level={-36} />
       <Sfx name="el-whoosh" at={medianAt - 2} level={-34} />
 
       <Kicker at={hookFrom - 10}>Exploring, then confirming</Kicker>
@@ -128,6 +145,13 @@ export const LookScene: React.FC = () => {
           format={(v) => `${v}%`}
           at={countAt - 6}
         />
+        {/* The break in the axis, and the stretch past it where the 71% bill is pinned. */}
+        <Svg opacity={ease(frame, countAt + 10, 12)}>
+          <line x1={X.x1 + 14} x2={OFF_END + 22} y1={y(AXIS) + 0.5} y2={y(AXIS) + 0.5} stroke={INK} strokeWidth={1.6} />
+          {[0, 7].map((dx) => (
+            <line key={dx} x1={X.x1 + 3 + dx} x2={X.x1 + 9 + dx} y1={y(AXIS) + 8} y2={y(AXIS) - 8} stroke={INK} strokeWidth={1.6} strokeLinecap="round" />
+          ))}
+        </Svg>
         <Note at={tipAt} x={X.x1} y={y(AXIS) + 40} align="right">
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>tip, as a share of the bill</span>
         </Note>
@@ -162,8 +186,10 @@ export const LookScene: React.FC = () => {
             );
           })}
         </Svg>
-        <Note at={splitAt + 16} x={OFF_END - 10} y={y(ROW_Y[SUN]) - 46} from="up">
-          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>{Math.round(TIPS.max)}%</span>
+        <Note at={countAt + 4 + PINNED * 0.12} x={OFF_END} y={pinnedY - 44} from="up">
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+            {Math.round(TIPS.max)}%
+          </span>
         </Note>
 
         {/* ── Row labels, and each day's count ── */}
@@ -216,6 +242,19 @@ export const LookScene: React.FC = () => {
           <span style={{ ...label(24, INK), fontWeight: 560 }}>Median tip, by day</span>
         </Ink>
         <Axis scale={X2} base={y(AXIS)} ticks={[14, 16, 18, 20]} format={(v) => `${v}%`} at={standsAt - 8} />
+        {whisk * overlap > 0 ? (
+          <Svg opacity={whisk}>
+            <rect
+              x={sx(X2, fri.mean - fri.half)}
+              y={lerp(y(ROW_Y[FRI]) - 12, y(ROW_Y[0]) - 52, overlap)}
+              width={sx(X2, fri.mean + fri.half) - sx(X2, fri.mean - fri.half)}
+              height={lerp(24, y(ROW_Y[3]) - y(ROW_Y[0]) + 82, overlap)}
+              rx={8}
+              fill={STAT}
+              opacity={0.12}
+            />
+          </Svg>
+        ) : null}
         {whisk > 0 ? (
           <Svg opacity={whisk}>
             {DAYS.map((d, k) => {
@@ -234,6 +273,8 @@ export const LookScene: React.FC = () => {
             })}
           </Svg>
         ) : null}
+        <Ring x={sx(X2, fri.mean - fri.half)} y={y(ROW_Y[FRI])} at={fromAt - 2} r0={8} r1={34} />
+        <Ring x={sx(X2, fri.mean + fri.half)} y={y(ROW_Y[FRI])} at={toAt - 2} r0={8} r1={34} />
         <Note at={wobblesAt + 4} out={medianAt - 6} x={X2.x0} y={y(AXIS) + 44}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>how far each average could wobble</span>
         </Note>
@@ -271,6 +312,7 @@ export const LookScene: React.FC = () => {
                 opacity: a,
                 whiteSpace: "nowrap",
                 ...note(21, lead ? STAT_INK : INK_SOFT),
+                ...TABULAR,
                 fontWeight: lead ? 700 : 500,
                 ...halo,
               }}

@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -19,8 +20,12 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *      cell, and when a fact is an entity of its own.
  *   3. Entity-relationship diagrams ("chen" to "next"), after
  *      entity-relationship-diagrams.mdx: Chen's 1976 model, the three pieces,
- *      the PK and FK markers, and reading the customers-orders line. It ends
- *      on Unit 3's question: the lines carry as much meaning as the boxes.
+ *      the PK and FK markers (the foreign key is what the line stands for),
+ *      reading the customers-orders line, and what its two ends mean: each
+ *      counts the box it touches, two bars exactly one, a circle and a
+ *      crow's foot zero or many (components/crowsfoot.ts draws them so). It
+ *      ends on Unit 3's question: the lines carry as much meaning as the
+ *      boxes.
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
@@ -76,6 +81,7 @@ export const script: NarrationScript = {
   voice: "drew",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     // ── Part 1. Entities ──────────────────────────────────────────────────
@@ -96,9 +102,10 @@ export const script: NarrationScript = {
       id: "type",
       scene: true,
       text: "Now, an entity is a TYPE of thing. The type becomes a table, and each real one, a row.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
-    { id: "ada", text: "Customers is the table. Ada is one row, because she's one real customer.", pauseAfter: 0.35 },
+    // Long enough for customers to glide aside before products arrives.
+    { id: "ada", text: "Customers is the table. Ada is one row, because she's one real customer.", pauseAfter: 0.9 },
     { id: "apart", text: "Products get their own table. A product has a price... and a customer doesn't.", pauseAfter: 0.5 },
     { id: "attrs-in", text: "So what do you need to remember about each one?" },
 
@@ -109,19 +116,23 @@ export const script: NarrationScript = {
       text: "Those facts are attributes. An order has a status, a total, and the date it was placed. Each becomes a column.",
       pauseAfter: 0.35,
     },
-    { id: "domain", text: "And every column has a domain, the values it's allowed to hold." },
+    {
+      id: "domain",
+      text: "And every column has a domain, the values it's allowed to hold. An integer holds whole numbers, a date holds calendar dates, and text holds any text at all.",
+    },
     {
       id: "loose",
       scene: true,
       text: "Say status is just text. Then anything goes in. Sent, shipped, ship in capitals, done... which ones mean the same?",
-      pauseAfter: 0.45,
+      pauseAfter: 1.0,
     },
     {
       id: "narrow",
-      text: "So narrow it. Four statuses, and no total below zero. Of those four spellings, only shipped gets in.",
+      text: "So narrow it. Four statuses, and no total below zero. Of the spellings we tried, only shipped gets in.",
       pauseAfter: 0.4,
     },
-    { id: "banana", text: "And the status banana? Refused, with the name of the rule it broke." },
+    // Held past the scene gap, so the error and the name's source can be read.
+    { id: "banana", text: "And the status banana? Refused, with the name of the rule it broke.", pauseAfter: 2.0 },
     {
       id: "claims",
       scene: true,
@@ -136,12 +147,12 @@ export const script: NarrationScript = {
       id: "atomic",
       scene: true,
       text: "Keep one value per cell, too. Pack two phone numbers into one, and searching for either finds nothing.",
-      pauseAfter: 0.4,
+      pauseAfter: 1.0,
     },
     {
       id: "entity-or",
       text: "And a fact with details of its own, or lots of copies, like saved addresses? That's an entity too.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.7,
     },
     { id: "erd-in", text: "Boxes and facts. Time to draw them." },
 
@@ -159,11 +170,15 @@ export const script: NarrationScript = {
       text: "An entity-relationship diagram has three pieces. Boxes are entities, the facts inside are attributes, and lines are relationships.",
       pauseAfter: 0.35,
     },
-    { id: "keys", text: "PK marks a primary key, and FK a foreign key.", pauseAfter: 0.4 },
+    {
+      id: "keys",
+      text: "PK marks the primary key, the column that identifies each row. FK marks a foreign key: each order's customer ID holds the ID of the customer who placed it. That's what the line stands for.",
+      pauseAfter: 0.8,
+    },
     {
       id: "line",
-      text: "Now read the line. One customer places zero or many orders, and each order belongs to exactly one customer.",
-      pauseAfter: 0.7,
+      text: "Now read the line. One customer places zero or many orders, and each order belongs to exactly one customer. Each end counts the box it touches: two bars for exactly one, a circle and a crow's foot for zero or many.",
+      pauseAfter: 0.9,
     },
     {
       id: "next",

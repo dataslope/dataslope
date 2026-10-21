@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -14,7 +14,7 @@ import { Drift, Mark, Pulse, STAT, STAT_INK, Svg, Tag, count } from "./parts";
 const X: XScale = { lo: -12, hi: 12, x0: 300, x1: 1500 };
 const EDGE = 12;
 const COL = 0.25;
-const ROWS = { normal: 585, heavy: 835 } as const;
+const ROWS = { normal: 585, heavy: 815 } as const;
 const BODY_H = 165;
 const DOT_R = 4.6;
 const DOT_STEP = 10.5;
@@ -91,17 +91,17 @@ export const TailScene: React.FC = () => {
           })}
         </Svg>
         {beyondLo.length ? (
-          <Tag x={X.x0} y={base + 14} opacity={ease(frame, dotsAt + spread, 12)} color={INK_SOFT} size={20} align="left">
+          <Tag x={X.x0} y={base + 48} opacity={ease(frame, dotsAt + spread, 12)} color={INK_SOFT} size={20} align="left">
             {beyondLo.length} more past −12, out to {fmt(beyondLo[0], 0).replace("-", "−")}
           </Tag>
         ) : null}
         {beyondHi.length ? (
-          <Tag x={X.x1} y={base + 14} opacity={ease(frame, dotsAt + spread, 12)} color={INK_SOFT} size={20} align="right">
+          <Tag x={X.x1} y={base + 48} opacity={ease(frame, dotsAt + spread, 12)} color={INK_SOFT} size={20} align="right">
             {beyondHi.length} more past +12, out to +{fmt(beyondHi[beyondHi.length - 1], 0)}
           </Tag>
         ) : null}
         <div style={{ position: "absolute", left: 1570, top: base - h(120), opacity: ease(frame, dotsAt - 2, 10), whiteSpace: "nowrap" }}>
-          <div style={{ ...note(56, STAT_INK), fontWeight: 700, lineHeight: 1 }}>{shown}</div>
+          <div style={{ ...note(56, STAT_INK), ...TABULAR, fontWeight: 700, lineHeight: 1 }}>{shown}</div>
           <div style={{ ...note(21, INK_SOFT), marginTop: 8 }}>of {t.n.toLocaleString("en-US")} beyond 4 SD</div>
         </div>
       </React.Fragment>
@@ -125,7 +125,7 @@ export const TailScene: React.FC = () => {
         Heavy tails make <Mark at={routineAt}>rare routine</Mark>.
       </Ink>
 
-      <FigLabel n="9" title="Twenty thousand draws each, in standard deviations from the mean" at={twentyAt - 6} x={160} y={y(320)} />
+      <FigLabel n="9" title="Twenty thousand draws each, in standard deviations from the mean" at={twentyAt - 6} x={160} y={y(330)} />
 
       <Drift from={tailsFrom} to={mistakeAt + 40} scale={0.02} origin={[900, y(ROWS.heavy)]}>
         {/* Beyond four SD, either side. */}
@@ -146,7 +146,7 @@ export const TailScene: React.FC = () => {
           beyond 4 SD
         </Tag>
         {[-12, -8, -4, 0, 4, 8, 12].map((v) => (
-          <Tag key={v} x={sx(X, v)} y={y(ROWS.heavy) + 44} opacity={ease(frame, heavyAt, 14)} color={INK_SOFT} size={20}>
+          <Tag key={v} x={sx(X, v)} y={y(ROWS.heavy) + 10} opacity={ease(frame, heavyAt, 14)} color={INK_SOFT} size={20}>
             {v > 0 ? `+${v}` : v < 0 ? `−${-v}` : "0"}
           </Tag>
         ))}

@@ -245,30 +245,67 @@
         "constraint_name": "products_name_key"
       }
     ],
+    "orderLines": {
+      "fields": [
+        "order_id",
+        "customer",
+        "product",
+        "quantity"
+      ],
+      "rows": [
+        [
+          101,
+          "Ada Lovelace",
+          "Notebook",
+          2
+        ],
+        [
+          101,
+          "Ada Lovelace",
+          "Pen",
+          5
+        ],
+        [
+          102,
+          "Grace Hopper",
+          "Backpack",
+          1
+        ],
+        [
+          103,
+          "Ada Lovelace",
+          "Notebook",
+          1
+        ]
+      ]
+    },
     "refused": {
       "duplicate": {
-        "sql": "INSERT INTO customers VALUES (4, 'Ada L.', 'ada@example.com');",
+        "sql": "INSERT INTO customers (id, name, email) VALUES (4, 'Ada L.', 'ada@example.com');",
         "code": "23505",
         "message": "duplicate key value violates unique constraint \"customers_email_key\"",
         "detail": "Key (email)=(ada@example.com) already exists.",
         "constraint": "customers_email_key",
-        "table": "customers"
+        "table": "customers",
+        "def": "UNIQUE (email)"
       },
       "zero": {
-        "sql": "INSERT INTO order_items VALUES (102, 10, 0);",
+        "sql": "INSERT INTO order_items (order_id, product_id, quantity) VALUES (102, 10, 0);",
         "code": "23514",
         "message": "new row for relation \"order_items\" violates check constraint \"order_items_quantity_check\"",
         "detail": "Failing row contains (102, 10, 0).",
         "constraint": "order_items_quantity_check",
-        "table": "order_items"
+        "table": "order_items",
+        "def": "CHECK ((quantity > 0))"
       },
       "orphan": {
-        "sql": "INSERT INTO orders VALUES (104, 99, DATE '2025-03-04');",
+        "sql": "INSERT INTO orders (id, customer_id, ordered_on) VALUES (104, 99, DATE '2025-03-04');",
         "code": "23503",
         "message": "insert or update on table \"orders\" violates foreign key constraint \"orders_customer_id_fkey\"",
         "detail": "Key (customer_id)=(99) is not present in table \"customers\".",
         "constraint": "orders_customer_id_fkey",
-        "table": "orders"
+        "table": "orders",
+        "def": "FOREIGN KEY (customer_id) REFERENCES customers(id)"
       }
     },
     "countsAfter": {

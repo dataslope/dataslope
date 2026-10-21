@@ -592,7 +592,7 @@ Short tutorial videos live in `video/`, a separate Remotion package with its
 own `npm install`, `typecheck`, `lint` and `test`. The site's `tsconfig.json`
 and ESLint config ignore it, so nothing there reaches the site's build.
 `video/README.md` is the runbook. Every video is drawn in one look, the
-**editorial** style in `video/src/editorial/` (warm paper, numbered figures,
+**editorial** style in `video/src/editorial/` (a white page, numbered figures,
 ink-wipe reveals, watercolor spot art): a new one wraps its scenes in
 `<EditorialPage>` and registers with `EDITORIAL_DEFAULTS`. These rules carry
 over from the rest of this file:

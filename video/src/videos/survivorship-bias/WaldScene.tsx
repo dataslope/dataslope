@@ -8,6 +8,7 @@ import {
   BAR,
   BLUE_INK,
   body,
+  HAIRLINE,
   headline,
   HIGHLIGHT,
   INK,
@@ -21,6 +22,7 @@ import { Sfx } from "../../sound/Sfx";
 import { PARTS, pct, type PartKey, WALD } from "./data";
 import { PART_HI, Plane, SKIN, Swatch } from "./parts";
 import { swell } from "../sampling/emphasis";
+import { useFigNumber } from "../sampling/merged";
 
 /** Rows of the table, one per part, in the memo's order. */
 const ROW_Y = (i: number) => 380 + i * 122;
@@ -30,6 +32,8 @@ const BX0 = 1170;
 const PX = 9.5;
 const VALUE_X = 1572;
 const EST_X = 1800;
+/** The hairline that keeps Wald's estimates apart from the two shares. */
+const RULE_X = 1670;
 /** Bars sit this far above and below the row's centre line. */
 const GAP = 10;
 const THICK = 24;
@@ -47,6 +51,7 @@ export const WaldScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const n = useNarration();
+  const fig = useFigNumber();
   const { y } = useLayout();
 
   const start = n.beat("example").from;
@@ -57,6 +62,8 @@ export const WaldScene: React.FC = () => {
   const quarterAt = n.word("engines", "quarter");
   const fewerAt = n.word("engines", "fewer");
   const fuselageAt = n.word("fuselage", "fuselage");
+  // The other three rows' bars, once the engines have had their beat.
+  const restAt = fuselageAt - 4;
   const missingAt = n.word("missing", "missing");
   const neverAt = n.word("missing", "never came back");
   const numbersAt = n.word("estimate", "numbers");
@@ -91,6 +98,7 @@ export const WaldScene: React.FC = () => {
       <Sfx name="el-pop" at={start} level={-30} />
       <Sfx name="el-pop" at={enginesAt + 4} level={-30} />
       <Sfx name="el-pop" at={fewerAt} level={-30} />
+      <Sfx name="el-pop" at={restAt} level={-30} />
       <Sfx name="el-pencil" at={missingAt} level={-33} />
       <Sfx name="el-tap" at={thirtyNineAt} level={-28} />
       <Sfx name="el-pencil" at={arentAt - 6} level={-34} />
@@ -108,7 +116,7 @@ export const WaldScene: React.FC = () => {
           {WALD.returned} come back.
         </Ink>
       </div>
-      <FigLabel n="1" title="The worked example in Wald's 1943 memos" at={start} x={120} y={y(196)} />
+      <FigLabel n={fig(1)} title="The worked example in Wald's 1943 memos" at={start} x={120} y={y(196)} />
       <Note at={enginesAt} x={1800} y={y(196) + 2} align="right" from="right">
         <span style={{ ...note(21, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10 }}>
           <Swatch kind="area" /> share of the plane
@@ -147,9 +155,16 @@ export const WaldScene: React.FC = () => {
         const band = focus(p.key);
         // Room in the engines' band for the "missing" line under its bars.
         const extra = i === 0 ? ease(frame, missingAt, 10) * 34 : 0;
-        const areaGrow = ease(frame, enginesAt + 4 + i * 4, 16);
-        const holesGrow = ease(frame, fewerAt + i * 4, 16);
+        // The engines' two bars first, while the engines are talked about;
+        // the other three rows as the narration moves on to the fuselage.
+        const areaAt = i === 0 ? enginesAt + 4 : restAt + (i - 1) * 4;
+        const hitsAt = i === 0 ? fewerAt : restAt + 8 + (i - 1) * 4;
+        const areaGrow = ease(frame, areaAt, 16);
+        const holesGrow = ease(frame, hitsAt, 16);
         const estAt = i === 0 ? thirtyNineAt : i === 1 ? fuselage2At : fiveAt + 8 + (i - 2) * 5;
+        // The two estimates the narration reads, in the accent; the others
+        // stay quiet, so 39 and 5 are what the column says.
+        const spoken = i < 2;
         const holesSwell =
           (p.key === "fuselage" ? swell(frame, shareAt - 2, 0.35, 22) : 1) * swell(frame, hitAt - 2 + i * 4, 0.3, 22);
         return (
@@ -190,14 +205,21 @@ export const WaldScene: React.FC = () => {
                 />
               ) : null}
             </svg>
-            <Note at={quarterAt + i * 3} x={VALUE_X} y={c - GAP - THICK / 2 - 13}>
+            <Note at={i === 0 ? quarterAt : areaAt + 6} x={VALUE_X} y={c - GAP - THICK / 2 - 13}>
               <span style={note(20, INK_SOFT)}>{pct(p.areaShare)}</span>
             </Note>
-            <Note at={fewerAt + 10 + i * 4} x={VALUE_X} y={c + GAP + THICK / 2 - 13}>
+            <Note at={hitsAt + 10} x={VALUE_X} y={c + GAP + THICK / 2 - 13}>
               <span style={{ ...note(20, BLUE_INK), fontWeight: 650 }}>{pct(p.hitShare)}</span>
             </Note>
-            <Note at={estAt} x={EST_X} y={c - 22} align="right" from="right">
-              <span style={{ ...note(34, ACCENT_INK), fontWeight: 700 }}>{pct(p.downedByOneHit)}</span>
+            {/* A chance, not a share: "39 in 100", as it is said, so the
+                column does not read as a third set of shares. */}
+            <Note at={estAt} x={EST_X} y={c - 24} align="right" from="right">
+              <span style={{ whiteSpace: "nowrap" }}>
+                <span style={{ ...note(spoken ? 34 : 30, spoken ? ACCENT_INK : INK_SOFT), fontWeight: 700 }}>
+                  {Math.round(p.downedByOneHit * 100)}
+                </span>
+                <span style={note(20, INK_SOFT)}> in 100</span>
+              </span>
             </Note>
           </React.Fragment>
         );
@@ -232,7 +254,18 @@ export const WaldScene: React.FC = () => {
         </span>
       </Note>
 
-      {/* Wald's estimate, a statistic, in the accent. */}
+      {/* Wald's estimate, a statistic, in the accent, ruled off from the
+          shares of what came back. */}
+      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
+        <line
+          x1={RULE_X}
+          x2={RULE_X}
+          y1={y(ROW_Y(0) - 50)}
+          y2={y(ROW_Y(0) - 50) + (y(ROW_Y(PARTS.length - 1) + 50) - y(ROW_Y(0) - 50)) * ease(frame, numbersAt - 4, 16)}
+          stroke={HAIRLINE}
+          strokeWidth={1.4}
+        />
+      </svg>
       <Note at={numbersAt} x={EST_X} y={y(262)} align="right" from="right">
         <div style={label(20, ACCENT_INK)}>Wald's estimate:</div>
         <div style={label(20, INK_SOFT)}>chance one hit downs it</div>

@@ -16,6 +16,7 @@ const X: XScale = { lo: LO - 0.5, hi: HI + 0.5, x0: 220, x1: 1700 };
 const BASE = 790;
 const TALL = 380;
 const MAX = Math.max(...COIN.counts);
+const COUNT_X = 1764;
 
 /**
  * The p-value built by hand: 100,000 runs of a fair coin pile up into the
@@ -164,27 +165,29 @@ export const CoinScene: React.FC = () => {
               </span>
             </Note>
           ))}
+          {/* Left-aligned right of the 38 line, over bars that stay low there. */}
           <Leader
             points={[
-              [midX - 300, y(BASE) - h(TALL * 0.78) + 30],
+              [mirX + 266, y(BASE) - h(TALL * 0.78) + 16],
               [midX - 80, y(BASE) - h(TALL * 0.6)],
             ]}
             at={nullAt}
             dur={12}
           />
-          <Note at={nullAt - 2} x={midX - 300} y={y(BASE) - h(TALL * 0.78)} align="right">
+          <Note at={nullAt - 2} x={mirX + 22} y={y(BASE) - h(TALL * 0.78)}>
             <Label size={24} style={halo}>
               the null distribution
             </Label>
           </Note>
 
           {/* The count of runs at least that far out, and the share they make. */}
-          <Note at={farOutAt} x={X.x1} y={y(BASE) - h(TALL * 0.4)} align="right">
+          {/* Right-aligned past the axis end, so the count clears the 62 line. */}
+          <Note at={farOutAt} x={COUNT_X} y={y(BASE) - h(TALL * 0.4)} align="right">
             <span style={{ ...note(24, STAT_INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>
               <Count at={farOutAt} to={COIN.upper + COIN.lower} dur={26} /> runs at least 12 out
             </span>
           </Note>
-          <Note at={twoAt - 2} x={X.x1} y={y(BASE) - h(TALL * 0.4) + 40} align="right">
+          <Note at={twoAt - 2} x={COUNT_X} y={y(BASE) - h(TALL * 0.4) + 40} align="right">
             <span
               style={{
                 ...note(40, STAT_INK),

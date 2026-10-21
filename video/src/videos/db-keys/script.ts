@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -99,6 +100,7 @@ export const script: NarrationScript = {
   voice: "drew",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     // ── Part 1. Primary keys ──────────────────────────────────────────────
@@ -141,9 +143,10 @@ export const script: NarrationScript = {
     {
       id: "pair",
       text: "Neither ID is unique, but the pair is: seven in forty-two, only once.",
-      pauseAfter: 0.4,
+      // The refusal is on screen: room to read it before the next rule.
+      pauseAfter: 1.2,
     },
-    { id: "stable", text: "And a key should almost never change, because other tables point at it.", pauseAfter: 0.3 },
+    { id: "stable", text: "And a key should almost never change, because other tables point at it.", pauseAfter: 0.8 },
     { id: "kinds-in", text: "So what should a key be?" },
 
     // ── Part 2. Natural or surrogate ──────────────────────────────────────
@@ -192,12 +195,12 @@ export const script: NarrationScript = {
       id: "fk",
       scene: true,
       text: "An order belongs to a customer, so it stores the customer's key, in customer ID. That's a foreign key.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.8,
     },
     {
       id: "parent",
       text: "The table it points at is the parent. The one holding the pointer is the child.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.7,
     },
     { id: "many", text: "It lives on the many side, and it copies nothing else. Just the ID." },
 
@@ -219,17 +222,18 @@ export const script: NarrationScript = {
       id: "delete",
       scene: true,
       text: "Referential integrity means every pointer points at something real. So deleting a parent forces a choice.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
     {
       id: "restrict",
       text: "Restrict blocks it. Ada Co still has an invoice, so the account stays.",
-      pauseAfter: 0.35,
+      // Each rule gets a breath before the next column is drawn.
+      pauseAfter: 0.8,
     },
     {
       id: "cascade",
       text: "Cascade takes the children along. Delete the spam post, and BOTH its comments go too.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.8,
     },
     {
       id: "setnull",

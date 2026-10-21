@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -20,7 +21,7 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
  *
- * Facts from a run. Every table, query, reply and error on screen ran in
+ * Facts from a run. Every table, SQL statement, reply and error on screen ran in
  * PGlite 0.5.8 (PostgreSQL 18.3 in WASM) by check.mjs into results.json,
  * which data.ts reads, on the lesson's own tables (its 24 customers and 30
  * orders, "Connected by value, not by pointer"):
@@ -32,6 +33,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     the same query returns the same two rows, in the same order;
  *   - SELECT version() answers "PostgreSQL 18.3 (PGlite 0.5.8) on
  *     wasm32-unknown-emscripten, ...";
+ *   - SELECT * FROM orders WHERE customer_id = 1 returns Ada's two orders
+ *     (Fig. 6's SQL, beside the same question in POSTQUEL);
  *   - an order for customer 25 is refused: insert or update on table
  *     "orders" violates foreign key constraint "orders_customer_id_fkey"
  *     (23503), Key (customer_id)=(25) is not present in table "customers".
@@ -52,8 +55,10 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     from the IBM Research Laboratory, San Jose (the paper's own masthead).
  *     Its first sentence is the pull quote: "Future users of large data
  *     banks must be protected from having to know how the data is organized
- *     in the machine." Its section 1.2.1 names "ordering dependence", the
- *     shuffle the video runs. Turing Award 1981 (ACM).
+ *     in the machine (the internal representation)." The video stops at
+ *     "machine" and marks the cut with an ellipsis. Its section 1.2.1 names
+ *     "ordering dependence", the shuffle the video runs. Turing Award 1981
+ *     (ACM).
  *   - System R at IBM San Jose: Chamberlin and Boyce joined it in 1973 and
  *     designed SEQUEL ("SEQUEL: A Structured English Query Language", ACM
  *     SIGFIDET workshop, Ann Arbor, May 1974); "because of a trademark
@@ -81,7 +86,14 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     inGRES)" (Stonebraker and Rowe, "The Design of POSTGRES", ERL memo
  *     M85/95); implementation began in 1986 (PostgreSQL documentation,
  *     "A Brief History of PostgreSQL"); its language was POSTQUEL. The same
- *     memo dates Ingres's implementation to 1975 to 1977.
+ *     memo dates Ingres's implementation to 1975 to 1977. Fig. 6's two
+ *     asides come from it too: "A conventional DBMS has a small set of
+ *     built-in data types", its own built-ins being "integers, floating
+ *     point, fixed length character strings", while applications need
+ *     "geometric data types for CAD/CAM or a latitude and longitude position
+ *     data type"; and POSTQUEL keeps QUEL's retrieve, as in its own
+ *     "retrieve (POLYGON.all) where POLYGON.id = 10", which the video writes
+ *     against the lesson's orders. The SQL twin beside it ran in check.mjs.
  *   - "In 1994, Andrew Yu and Jolly Chen added an SQL language interpreter
  *     to POSTGRES", released as Postgres95; "By 1996 ... we chose a new
  *     name, PostgreSQL", with version numbers starting at 6.0 (the same
@@ -105,6 +117,7 @@ export const script: NarrationScript = {
   voice: "drew",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.8,
   beats: [
     // ── Part 1. The relational revolution ─────────────────────────────────
@@ -134,7 +147,8 @@ export const script: NarrationScript = {
       id: "codd",
       scene: true,
       text: "Then, in June nineteen seventy, Ted Codd, a British-born mathematician at IBM, published an idea that sounds almost too plain.",
-      pauseAfter: 0.35,
+      // A breath on the idea before the tables arrive under "Keep".
+      pauseAfter: 0.8,
     },
     {
       id: "values",
@@ -146,7 +160,13 @@ export const script: NarrationScript = {
       text: "So the database can store rows any way it likes. Shuffle them on disk, ask again... the SAME two orders.",
       pauseAfter: 0.4,
     },
-    { id: "independence", text: "Codd called that data independence. A program says what it wants... not where to walk." },
+    {
+      id: "independence",
+      text: "Codd called that data independence. A program says what it wants... not where to walk.",
+      // Holds Codd's first sentence, which is shown and not read aloud, long
+      // enough to read before the scene changes.
+      pauseAfter: 2.4,
+    },
 
     {
       id: "doubt",
@@ -177,7 +197,12 @@ export const script: NarrationScript = {
       pauseAfter: 0.4,
     },
     { id: "ibm", text: "IBM's own arrived in eighty-one... the year Codd won the Turing Award.", pauseAfter: 0.6 },
-    { id: "berkeley-in", text: "But IBM wasn't the only one reading Codd." },
+    {
+      id: "berkeley-in",
+      text: "But IBM wasn't the only one reading Codd.",
+      // Holds the retitled Fig. 4 and the Berkeley lane's "QUEL, not SQL".
+      pauseAfter: 2.0,
+    },
 
     // ── Part 2. From Ingres to PostgreSQL ─────────────────────────────────
     {
@@ -186,9 +211,13 @@ export const script: NarrationScript = {
       text: "At Berkeley, Michael Stonebraker and Eugene Wong built a relational system of their own, called Ingres.",
       pauseAfter: 0.35,
     },
+    { id: "tape", text: "Its code went out for the cost of a tape.", pauseAfter: 0.7 },
     {
-      id: "tape",
-      text: "Its code went out for the cost of a tape, and its people seeded an industry, all the way to Microsoft SQL Server.",
+      id: "industry",
+      text: "And its people seeded an industry... Sybase, and from it, Microsoft SQL Server.",
+      // Holds the finished family tree: the card lines under Sybase and SQL
+      // Server are on screen, not read aloud.
+      pauseAfter: 2.2,
     },
 
     {
@@ -218,7 +247,12 @@ export const script: NarrationScript = {
     {
       id: "upbringing",
       text: "And it kept its upbringing. Raised in a lab and then by volunteers, not a sales team, it says no to rows that break your rules.",
-      pauseAfter: 0.7,
+      pauseAfter: 0.8,
+    },
+    {
+      id: "refuse",
+      text: "Ask it to store an order for customer twenty-five, who doesn't exist... and it refuses.",
+      pauseAfter: 0.9,
     },
     {
       id: "close",

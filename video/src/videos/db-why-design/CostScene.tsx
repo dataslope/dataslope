@@ -8,8 +8,8 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { FIXED_ORDER, FLAT, MISSED_ORDER, NEW_EMAIL, OLD_EMAIL } from "./data";
-import { Chip, Drift, Headline, lerp, Mark, MARK_BAD, pulse, X0 } from "./parts";
+import { FIXED_ORDER, FLAT, MISSED_ORDER, NEW_EMAIL, OLD_EMAIL, rowsChanged } from "./data";
+import { Chip, Drift, Headline, lerp, Listing, Mark, pulse, X0 } from "./parts";
 
 /** The programs that touch the table: the lesson's own list ("the web app,
  *  the admin dashboard, the import job, the reporting script"). */
@@ -22,6 +22,13 @@ const CARD_H = 96;
 /** The one fact, and the two copies it became. */
 const ONE_Y = 548;
 const COPY_Y = [474, 622];
+/** The rushed update, where Fig. 1's scene left it, until the programs arrive. */
+const LISTING_X = 1150;
+const LISTING_Y = 345;
+/** The notes beside Postgres's reply. */
+const NOTE_X = X0 + 590;
+/** The anomaly's name, below "The data stays." under the copies. */
+const ANOMALY_Y = 840;
 
 /**
  * Why the anomaly is the design's fault: the update was legal and Postgres
@@ -40,7 +47,6 @@ export const CostScene: React.FC = () => {
   const exactlyAt = n.word("legal", "exactly");
   const toldAt = n.word("legal", "told");
   const designAt = n.word("design", "design");
-  const oneFactAt = n.word("design", "one");
   const copiesAt = n.word("design", "copies");
   const programAt = n.word("design", "program");
   const stepAt = n.word("design", "step");
@@ -60,7 +66,10 @@ export const CostScene: React.FC = () => {
     { order: FIXED_ORDER, email: NEW_EMAIL },
     { order: MISSED_ORDER, email: OLD_EMAIL },
   ];
-  const cardIn = ease(frame, oneFactAt - 4, 14);
+  // The fact arrives as "the design" is named, so the page is never bare.
+  const cardIn = ease(frame, designAt - 2, 14);
+  // Both copies hold the old email until "in step": then the update reaches one.
+  const diverged = ease(frame, stepAt - 2, 10);
   const outlive = pulse(frame, outlivesAt, 24);
   const chipY = (i: number) => y(CHIP_Y[i]);
   const rewritten = (i: number) => rewriteAt - 2 + i * 5;
@@ -79,25 +88,43 @@ export const CostScene: React.FC = () => {
 
       <Drift from={legalFrom} to={end} amount={0.018} origin="45% 55%">
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, dimAll, 20) * 0.6 }}>
+          {/* The update itself, carried over from Fig. 1's scene, until the programs need the room. */}
+          <Listing
+            lines={FLAT.update}
+            x={LISTING_X}
+            top={y(LISTING_Y)}
+            width={630}
+            size={22}
+            at={legalFrom - 30}
+            lineAt={FLAT.update.map(() => legalFrom - 30)}
+            marks={[{ line: 2, at: legalFrom - 30 }]}
+            out={programAt - 16}
+          />
           {/* What Postgres said to the rushed update. */}
           <Ink at={legalFrom - 4} dur={16} style={{ left: X0, top: y(300), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
             <span style={label(22, INK_SOFT)}>Postgres replied</span>
             <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 600, color: INK }}>
               <Mark at={toldAt - 2}>UPDATE {FLAT.updated}</Mark>
             </span>
+            <span style={note(22, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
           </Ink>
-          <Note at={illegalAt} x={X0 + 470} y={y(300) + 4}>
+          <Note at={illegalAt} x={NOTE_X} y={y(300) + 4}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>No error, no warning.</span>
           </Note>
-          <Note at={exactlyAt + 2} x={X0 + 470} y={y(300) + 40} dim={designAt}>
+          <Note at={exactlyAt + 2} x={NOTE_X} y={y(300) + 40} dim={designAt}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Exactly what it was told.</span>
           </Note>
-          {/* The fact, and the copies it became. */}
+          {/* The fact, and the copies it became. The second copy is drawn first, so it
+              slides out from under the first rather than over its text. */}
           {cardIn > 0
-            ? copies.map((c, k) => {
+            ? [1, 0].map((k) => {
+                const c = copies[k];
                 const shown = k === 0 ? cardIn : split;
                 if (shown <= 0) return null;
                 const stepped = pulse(frame, handAt + k * 6, 20) + outlive;
+                const one = k === 0 && split < 0.5;
+                // Copy 101 takes the new email at "in step"; until then both say the same.
+                const swap = k === 0 && !one ? diverged : 0;
                 return (
                   <div
                     key={k}
@@ -115,14 +142,18 @@ export const CostScene: React.FC = () => {
                       gap: 6,
                       borderRadius: 8,
                       border: `2px solid ${split > 0.5 ? ACCENT : INK}`,
-                      background: split > 0.5 ? `color-mix(in srgb, ${MARK_BAD} ${Math.round(40 + stepped * 60)}%, ${PAPER})` : `color-mix(in srgb, ${ds("yellow", 50)} 55%, ${PAPER})`,
+                      // Opaque, so the copy underneath never shows through.
+                      background:
+                        split > 0.5
+                          ? `color-mix(in srgb, ${ACCENT} ${Math.round(10 + stepped * 16)}%, ${PAPER})`
+                          : `color-mix(in srgb, ${ds("yellow", 50)} 55%, ${PAPER})`,
                       opacity: shown,
                       transform: `scale(${1 + stepped * 0.025})`,
                     }}
                   >
-                    <div style={label(20, INK_SOFT)}>{k === 0 && split < 0.5 ? "Ada's email: one fact" : `copy on order ${c.order}`}</div>
+                    <div style={label(20, INK_SOFT)}>{one ? "Ada's email: one fact" : `copy on order ${c.order}`}</div>
                     <div style={{ fontFamily: MONO, fontSize: 26, color: INK, fontWeight: 600 }}>
-                      {k === 0 && split < 0.5 ? OLD_EMAIL : c.email}
+                      <span style={{ opacity: swap < 0.5 ? 1 - 2 * swap : 2 * swap - 1 }}>{swap < 0.5 ? OLD_EMAIL : c.email}</span>
                     </div>
                   </div>
                 );
@@ -159,21 +190,22 @@ export const CostScene: React.FC = () => {
           </Note>
 
           {/* Its name. */}
-          <Ink at={anomalyAt - 2} dur={18} style={{ left: X0, top: y(790), whiteSpace: "nowrap" }}>
+          <Ink at={anomalyAt - 2} dur={18} style={{ left: X0, top: y(ANOMALY_Y), whiteSpace: "nowrap" }}>
             <span style={{ ...headline(54, true), color: ACCENT_INK }}>The update anomaly</span>
           </Ink>
           <div
             style={{
               position: "absolute",
               left: X0,
-              top: y(790) + 70,
+              top: y(ANOMALY_Y) + 70,
               width: 520 * ease(frame, anomalyAt + 8, 16),
               height: 4,
               borderRadius: 2,
               background: ACCENT,
             }}
           />
-          <Note at={outlivesAt + 4} x={X0 + CARD_W + 40} y={y(COPY_Y[1]) + h(CARD_H) + 20}>
+          {/* Under the copies it means. */}
+          <Note at={outlivesAt + 4} x={X0} y={y(COPY_Y[1]) + h(CARD_H) + 18}>
             <span style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>The data stays.</span>
           </Note>
           <Note at={tomorrowAt} x={CHIP_X} y={chipY(0) - 52}>

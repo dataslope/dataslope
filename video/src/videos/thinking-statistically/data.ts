@@ -111,11 +111,19 @@ export const ZIPS = {
   zips: m.zips.zips as readonly number[],
   dtypes: m.zips.dtypes as Record<string, string>,
   zipMean: m.zips.zipMean,
-  ratingMedian: m.zips.ratingMedian,
   prices: m.zips.prices as readonly number[],
   priceMean: m.zips.priceMean,
+  /** The middle price, which the mean is pulled past. */
+  priceMedian: m.zips.priceMedian,
   price: m.zips.price,
   priceDoubled: m.zips.priceDoubled,
   zip: m.zips.zip,
   zipDoubled: m.zips.zipDoubled,
+};
+
+/** The lesson's ordered plan sizes, S/M/L, and their median: a real size. */
+export const PLANS = {
+  plans: m.plans.plans as readonly string[],
+  order: m.plans.order as readonly string[],
+  median: m.plans.median,
 };

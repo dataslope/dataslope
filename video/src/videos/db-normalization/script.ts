@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -78,6 +79,7 @@ export const script: NarrationScript = {
   voice: "drew",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     // ── Part 1. Why normalize ─────────────────────────────────────────────
@@ -118,7 +120,8 @@ export const script: NarrationScript = {
     {
       id: "once",
       text: "Now Ada's email is one row to change, the mug can wait for its first order, and Grace outlives hers.",
-      pauseAfter: 0.45,
+      // The three one-row answers are on screen together; let them be read.
+      pauseAfter: 1.2,
     },
     { id: "join", text: "Need the wide view back? A join rebuilds it, any time.", pauseAfter: 0.6 },
     { id: "forms-in", text: "Normal forms get you there in steps, starting with what fits in a cell." },
@@ -128,17 +131,18 @@ export const script: NarrationScript = {
       id: "cell",
       scene: true,
       text: "First normal form means one value per cell. Here's Ada, with two phone numbers in one.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
     {
       id: "search",
-      text: "Ask who has five five five, two thousand... and Postgres finds nobody. It's buried in a string.",
+      text: "Ask who has five five five, twenty-two hundred... and Postgres finds nobody. It's buried in a string.",
       pauseAfter: 0.45,
     },
     {
       id: "columns",
       text: "Phone one, two and three instead? That's a repeating group, with a ceiling. A fourth number won't fit.",
-      pauseAfter: 0.6,
+      // Holds the finished figure and Postgres's refusal before the cut.
+      pauseAfter: 2.2,
     },
     {
       id: "child",
@@ -149,7 +153,7 @@ export const script: NarrationScript = {
     {
       id: "plain",
       text: "Now a search is a plain equals, Linus can have none at all, and a unique constraint stops Ada's number going in twice.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.2,
     },
     { id: "depend-in", text: "So each cell holds one value. But what does each value depend on?" },
 
@@ -158,7 +162,7 @@ export const script: NarrationScript = {
       id: "pair",
       scene: true,
       text: "Second normal form is about keys with two parts, like this pair: order and product.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
     {
       id: "whole",
@@ -169,7 +173,7 @@ export const script: NarrationScript = {
     {
       id: "partial",
       text: "That's a partial dependency. It copies the name onto every line, so a rename changes two rows.",
-      pauseAfter: 0.5,
+      pauseAfter: 1.2,
     },
     {
       id: "move",
@@ -188,21 +192,22 @@ export const script: NarrationScript = {
     {
       id: "detour",
       text: "Order ID gives you customer ID, which gives you the city. A dependency with a detour: transitive.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.9,
     },
     {
       id: "moves",
       text: "Same disease. Ada moves to Oxford, the update misses a row, and she lives in two cities.",
       pauseAfter: 0.45,
     },
-    { id: "extract", text: "Give customers their own table, and she moves exactly once.", pauseAfter: 0.6 },
+    // Holds Fig. 9, the one-row update and the orders it changed, before the cut.
+    { id: "extract", text: "Give customers their own table, and she moves exactly once.", pauseAfter: 2.8 },
     {
       id: "oath",
       scene: true,
       text: "There's an old oath for this. Every non-key column depends on the key, the whole key, and nothing but the key.",
       pauseAfter: 0.4,
     },
-    { id: "halves", text: "The whole key is second normal form. Nothing but the key is third.", pauseAfter: 0.4 },
+    { id: "halves", text: "The whole key is second normal form. Nothing but the key is third.", pauseAfter: 0.8 },
     {
       id: "kent",
       text: "William Kent put it that way in nineteen eighty-three. Somebody later added... so help me Codd.",
@@ -222,7 +227,7 @@ export const script: NarrationScript = {
       text: "Two orders on January tenth, thirty-two fifty. One on the eleventh, twelve dollars.",
       pauseAfter: 0.4,
     },
-    { id: "denorm", text: "That's denormalization. Duplicating on purpose, so a read gets simpler.", pauseAfter: 0.45 },
+    { id: "denorm", text: "That's denormalization. Duplicating on purpose, so a read gets simpler.", pauseAfter: 0.8 },
     {
       id: "stale",
       text: "But add four dollars to that last order, and the summary still says twelve. It's gone stale.",

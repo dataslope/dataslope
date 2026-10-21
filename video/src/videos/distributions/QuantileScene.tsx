@@ -3,17 +3,22 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, halo, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { expCdf, QUANTILE } from "./data";
-import { Arrow, ASK, askNote, Centered, code, Curve, curveD, DIST, Drift, Head, lerp, Svg, YTicks } from "./parts";
+import { expCdf, expPdf, QUANTILE } from "./data";
+import { areaD, Arrow, ASK, ASK_FILL, askNote, Centered, clamp01, code, curveD, DIST, Drift, Head, lerp, pulse, Svg, YTicks } from "./parts";
 
 const X: XScale = { lo: 0, hi: 1000, x0: 200, x1: 1280 };
 const BASE = 820;
 const TALL = 440;
 const PANEL_X = 1400;
+/** The density inset: the same response times, whose area left of a moment
+ *  is the curve's height at that moment. */
+const IN: XScale = { lo: 0, hi: 1000, x0: PANEL_X, x1: PANEL_X + 360 };
+const IN_BASE = 560;
+const IN_TALL = 140;
 
 /**
  * Part 2's close: the question turned round. The share of requests finished
@@ -32,7 +37,8 @@ export const QuantileScene: React.FC = () => {
   const avgAt = n.word("quantile", "two hundred milliseconds");
   const ninetyAt = n.word("quantile", "ninety-five percent");
   const plotAt = n.word("across", "Plot");
-  const momentEnd = n.word("across", "moment", { edge: "end" });
+  const areaAt = n.word("across", "area to its left");
+  const densityEnd = n.word("across", "density", { edge: "end" });
   const acrossAt = n.word("across", "Go across");
   const downAt = n.word("across", "down");
   const msAt = n.word("across", "five hundred");
@@ -46,8 +52,17 @@ export const QuantileScene: React.FC = () => {
   const f = (x: number) => expCdf(x, scale);
   const base = y(BASE);
   const py = (v: number) => base - v * h(TALL);
-  const draw = ease(frame, plotAt - 4, momentEnd - plotAt + 20);
+  // The curve is revealed up to the tracer, so the dot always sits on its
+  // end; the inset's area fills to the same moment.
+  const draw = ease(frame, plotAt - 4, densityEnd - plotAt + 10);
   const cursor = lerp(0, 1000, draw);
+  const pdf = (x: number) => expPdf(x, scale);
+  const inBase = y(IN_BASE);
+  const ipy = (v: number) => inBase - (v / pdf(0)) * h(IN_TALL);
+  const inset = ease(frame, responseAt - 2, 20);
+  const areaGlow = pulse(frame, areaAt - 4, 26);
+  const readout = 1 - clamp01((f(cursor) - 0.85) / 0.05);
+  const asked = ease(frame, acrossAt - 2, 14);
   const qx = sx(X, QUANTILE.ppf);
   const qy = py(QUANTILE.p);
   const across = ease(frame, acrossAt - 2, 18);
@@ -98,7 +113,24 @@ export const QuantileScene: React.FC = () => {
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>a time, not a chance</span>
           </Note>
 
-          <Curve d={curveD(f, 0, 1000, X, py)} at={plotAt - 4} dur={momentEnd - plotAt + 20} />
+          {draw > 0 ? (
+            <Svg>
+              <defs>
+                <clipPath id="dist-quantile-reveal">
+                  <rect x={0} y={0} width={sx(X, cursor) + 1} height={1080} />
+                </clipPath>
+              </defs>
+              <path
+                d={curveD(f, 0, 1000, X, py)}
+                fill="none"
+                stroke={DIST}
+                strokeWidth={3.2}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                clipPath="url(#dist-quantile-reveal)"
+              />
+            </Svg>
+          ) : null}
           {draw > 0 && draw < 1 ? (
             <>
               <Svg>
@@ -109,13 +141,14 @@ export const QuantileScene: React.FC = () => {
                   position: "absolute",
                   left: sx(X, cursor) + 14,
                   top: py(f(cursor)) + 12,
+                  opacity: readout,
                   ...note(22, INK),
                   fontWeight: 600,
                   whiteSpace: "nowrap",
                   ...halo,
                 }}
               >
-                by {Math.round(cursor)} ms: {Math.round(f(cursor) * 100)}%
+                by <span style={TABULAR}>{Math.round(cursor)}</span> ms: <span style={TABULAR}>{Math.round(f(cursor) * 100)}</span>%
               </div>
             </>
           ) : null}
@@ -135,30 +168,57 @@ export const QuantileScene: React.FC = () => {
             <span style={{ ...askNote(34), whiteSpace: "nowrap" }}>{fmt(QUANTILE.ppf, 0)} ms</span>
           </Note>
 
+          {/* The density the curve sums up: its area left of the tracer is the
+              curve's height there, and 95% of it is what 599 ms reads back. */}
+          <Ink at={responseAt - 2} dur={14} style={{ left: PANEL_X, top: y(IN_BASE - IN_TALL - 56), whiteSpace: "nowrap" }}>
+            <span style={label(21, INK_SOFT)}>The density of response times</span>
+          </Ink>
+          <Svg opacity={inset}>
+            {draw > 0 ? (
+              <path
+                d={areaD(pdf, 0, cursor, IN, ipy, 80)}
+                fill={`color-mix(in srgb, ${DIST} ${22 + areaGlow * 28}%, transparent)`}
+                opacity={1 - asked}
+              />
+            ) : null}
+            {asked > 0 ? <path d={areaD(pdf, 0, QUANTILE.ppf, IN, ipy, 80)} fill={ASK_FILL} opacity={asked} /> : null}
+            <path d={curveD(pdf, 0, 1000, IN, ipy, 80)} fill="none" stroke={DIST} strokeWidth={2.6} strokeLinejoin="round" />
+            <line x1={IN.x0} x2={IN.x1} y1={inBase + 0.5} y2={inBase + 0.5} stroke={INK} strokeWidth={1.4} />
+            {draw > 0 && draw < 1 ? (
+              <line x1={sx(IN, cursor)} x2={sx(IN, cursor)} y1={inBase} y2={ipy(pdf(cursor)) - 6} stroke={DIST} strokeWidth={2} />
+            ) : null}
+            {asked > 0 ? (
+              <line x1={sx(IN, QUANTILE.ppf)} x2={sx(IN, QUANTILE.ppf)} y1={inBase} y2={ipy(pdf(QUANTILE.ppf)) - 10} stroke={ASK} strokeWidth={2.2} opacity={asked} />
+            ) : null}
+          </Svg>
+          <Note at={areaAt - 2} x={PANEL_X} y={inBase + 14} out={acrossAt - 4}>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>shaded: the share finished</span>
+          </Note>
+          <Note at={msAt - 2} x={PANEL_X} y={inBase + 14}>
+            <span style={{ ...askNote(21), whiteSpace: "nowrap" }}>95% of the area lies left of {fmt(QUANTILE.ppf, 0)} ms</span>
+          </Note>
+
           {/* The two directions. */}
-          <Ink at={quantileAt - 2} dur={14} style={{ left: PANEL_X, top: y(470), whiteSpace: "nowrap" }}>
+          <Ink at={quantileAt - 2} dur={14} style={{ left: PANEL_X, top: y(620), whiteSpace: "nowrap" }}>
             <span style={label(22, INK_SOFT)}>Two directions</span>
           </Ink>
-          <Ink at={quantileAt + 4} dur={14} style={{ left: PANEL_X, top: y(510), whiteSpace: "nowrap" }}>
+          <Ink at={quantileAt + 4} dur={14} style={{ left: PANEL_X, top: y(658), whiteSpace: "nowrap" }}>
             <span style={code(24, INK)}>cdf</span>
             <span style={{ ...note(23, INK_SOFT), marginLeft: 12 }}>a time → a share</span>
           </Ink>
-          <Ink at={backwardsAt - 6} dur={14} style={{ left: PANEL_X, top: y(556), whiteSpace: "nowrap" }}>
+          <Ink at={backwardsAt - 6} dur={14} style={{ left: PANEL_X, top: y(700), whiteSpace: "nowrap" }}>
             <span style={code(24, ASK)}>ppf</span>
             <span style={{ ...note(23, INK), marginLeft: 12, fontWeight: 600 }}>a share → a time</span>
           </Ink>
-          <Ink at={backwardsAt + 6} dur={14} style={{ left: PANEL_X, top: y(612), whiteSpace: "nowrap" }}>
+          <Ink at={backwardsAt + 6} dur={14} style={{ left: PANEL_X, top: y(744), whiteSpace: "nowrap" }}>
             <span style={code(22, INK_SOFT)}>
               ppf({QUANTILE.p}) = {fmt(QUANTILE.ppf, 1)}
             </span>
           </Ink>
-          <Ink at={cutoffAt - 4} dur={14} style={{ left: PANEL_X, top: y(680), whiteSpace: "nowrap" }}>
-            <span style={{ ...body(30, true), color: INK }}>a cutoff,</span>
+          <Ink at={cutoffAt - 4} dur={14} style={{ left: PANEL_X, top: y(800), whiteSpace: "nowrap" }}>
+            <span style={{ ...body(30, true), color: INK }}>a cutoff, or a promise:</span>
           </Ink>
-          <Ink at={promiseAt - 4} dur={14} style={{ left: PANEL_X, top: y(722), whiteSpace: "nowrap" }}>
-            <span style={{ ...body(30, true), color: INK }}>or a promise:</span>
-          </Ink>
-          <Ink at={promiseAt + 6} dur={14} style={{ left: PANEL_X, top: y(766), whiteSpace: "nowrap" }}>
+          <Ink at={promiseAt + 6} dur={14} style={{ left: PANEL_X, top: y(846), whiteSpace: "nowrap" }}>
             <span style={{ ...askNote(23) }}>95% within {fmt(QUANTILE.ppf, 0)} ms</span>
           </Ink>
         </div>

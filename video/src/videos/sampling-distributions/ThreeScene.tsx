@@ -21,6 +21,7 @@ import {
   label,
   note,
   PAPER,
+  TABULAR,
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import {
@@ -38,6 +39,8 @@ import {
 } from "./data";
 import { Bracket, money, POP_FILL, Rule, SAMPLE_FILL } from "./parts";
 import { flash, swell } from "../sampling/emphasis";
+import { useFigNumber } from "../sampling/merged";
+import { SANS } from "../../theme/fonts";
 
 // ── Layout, in the page's layout coordinates (through y() and h()) ──────────
 
@@ -60,7 +63,13 @@ const SAMPLE_BIN = 5;
 const STEP = 18;
 const BLOCK = 16;
 
-/** Row 3, the averages, in $1 bins. */
+/** Row 3, the averages, in $1 bins. They pile up on an axis of their own,
+ *  $40 to $60, as the hook drew them, and zoom out to the shared axis on "one
+ *  axis": that is the reveal the line promises. Both axes center on $50, so
+ *  the pile stays put and narrows. */
+const ZOOM_LO = 40;
+const ZOOM_HI = 60;
+const ZOOM_TICKS = [40, 45, 50, 55, 60];
 const MEANS_LABEL = 662;
 const MEANS_BASE = 880;
 const MEANS_H = 160;
@@ -96,8 +105,15 @@ const JITTER = (() => {
 })();
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const meanBinLeft = (v: number) => sx(X, Math.floor(v / MEAN_BIN) * MEAN_BIN) + 1;
-const MEAN_W = sx(X, MEAN_BIN) - sx(X, 0) - 2;
+/** Row 3's axis, `z` of the way from its own $40-$60 out to the shared one.
+ *  The span grows geometrically, so the zoom moves at an even pace. */
+const pileScale = (z: number): XScale => {
+  const mid = (ZOOM_LO + ZOOM_HI) / 2;
+  const span = (ZOOM_HI - ZOOM_LO) * ((X.hi - X.lo) / (ZOOM_HI - ZOOM_LO)) ** z;
+  return { lo: mid - span / 2, hi: mid + span / 2, x0: X.x0, x1: X.x1 };
+};
+const meanBinLeft = (s: XScale, v: number) => sx(s, Math.floor(v / MEAN_BIN) * MEAN_BIN) + 1;
+const meanW = (s: XScale) => sx(s, MEAN_BIN) - sx(s, 0) - 2;
 const meansHist = (k: number) => histogram(PILE.means.slice(0, k), 30, 70, MEAN_BIN);
 
 /** Brackets sit where a bell is one standard deviation wide: at 61% of its
@@ -115,6 +131,7 @@ export const ThreeScene: React.FC = () => {
   const { fps } = useVideoConfig();
   const n = useNarration();
   const { y, h } = useLayout();
+  const fig = useFigNumber();
 
   // ── Cues ──
   const popFrom = n.beat("pop").from;
@@ -210,6 +227,10 @@ export const ThreeScene: React.FC = () => {
 
   // ── Compare phase ──
   const emphasis = ease(frame, widthsAt - 2, 12);
+  // "On one axis": row 3 zooms out from its own $40-$60 to the shared axis.
+  const zoomAt = oneAxisAt - 4;
+  const z = ease(frame, zoomAt, 26);
+  const PX = pileScale(z);
 
   return (
     <AbsoluteFill>
@@ -223,7 +244,8 @@ export const ThreeScene: React.FC = () => {
         <Sfx key={i} name="el-tap" at={st.d + DROP} level={-29} />
       ))}
       <Sfx name="el-sprinkle" at={fastFrom} level={-33} />
-      <Sfx name="el-pencil" at={oneAxisAt - 4} level={-34} />
+      <Sfx name="el-whoosh" at={zoomAt} level={-34} />
+      <Sfx name="el-pencil" at={zoomAt + 16} level={-34} />
 
       {/* ══ Phase 1: the population, at full size ══ */}
       <Ink at={popFrom - 12} dur={14} out={p1Out} style={{ left: 96, top: y(112) }}>
@@ -242,7 +264,7 @@ export const ThreeScene: React.FC = () => {
         y(lerp(POP_BIG.label, POP_ROW.label, m)),
         theseAt - 2,
         <FigLabel
-          n="2"
+          n={fig(2)}
           title="The population: a million customers' spend"
           at={popFrom - 6}
           x={150}
@@ -320,7 +342,7 @@ export const ThreeScene: React.FC = () => {
         150,
         y(SAMPLE_LABEL),
         theseAt + 4,
-        <FigLabel n="3" title={`One sample of ${N} customers`} at={sampleFrom} x={150} y={y(SAMPLE_LABEL)} />,
+        <FigLabel n={fig(3)} title={`One sample of ${N} customers`} at={sampleFrom} x={150} y={y(SAMPLE_LABEL)} />,
       )}
       <Axis scale={X} base={y(SAMPLE_BASE)} ticks={TICKS} format={money} at={sampleFrom + 2} />
       <SampleBlocks pickAt={pickAt} fallAt={randomAt + 2} popBase={y(popBase)} rippleAt={[eachAt, yourDataAt]} />
@@ -364,7 +386,7 @@ export const ThreeScene: React.FC = () => {
         <div
           style={{
             ...headline(104),
-            fontVariantNumeric: "tabular-nums lining-nums",
+            ...TABULAR,
             marginTop: 6,
             color: k >= SAMPLE_COUNT ? INK : ACCENT_INK,
           }}
@@ -382,21 +404,29 @@ export const ThreeScene: React.FC = () => {
         150,
         y(MEANS_LABEL),
         theseAt + 10,
-        <FigLabel n="4" title={`The average of each sample of ${N}`} at={thirdFrom} x={150} y={y(MEANS_LABEL)} />,
+        <FigLabel n={fig(4)} title={`The average of each sample of ${N}`} at={thirdFrom} x={150} y={y(MEANS_LABEL)} />,
       )}
-      <Axis scale={X} base={y(MEANS_BASE)} ticks={TICKS} format={money} at={thirdFrom + 2} />
-      <Bars
-        counts={counts}
-        lo={30}
-        bin={MEAN_BIN}
-        scale={X}
-        base={y(MEANS_BASE)}
-        unit={h(unit) * swell(frame, oneAverageAt - 2, 0.12, 22)}
-        color={ACCENT}
-        gap={2}
-        overlay={frame < fastTo + 6 ? { counts: recent, color: ds("red", 800) } : undefined}
-      />
+      {/* Its own axis while it is built, said in the label row's free end. */}
+      <Note at={thirdFrom + 8} x={X.x1} y={y(MEANS_LABEL) + 2} align="right" from="right" out={zoomAt}>
+        <span style={note(22, INK_SOFT)}>on its own axis, zoomed in</span>
+      </Note>
+      <PileAxis scale={PX} z={z} base={y(MEANS_BASE)} at={thirdFrom + 2} />
+      {/* Clipped to the axis: on $40-$60 a rare far average has no room. */}
+      <div style={{ position: "absolute", inset: 0, clipPath: `inset(0 ${1920 - X.x1 - 2}px 0 ${X.x0 - 2}px)` }}>
+        <Bars
+          counts={counts}
+          lo={30}
+          bin={MEAN_BIN}
+          scale={PX}
+          base={y(MEANS_BASE)}
+          unit={h(unit) * swell(frame, oneAverageAt - 2, 0.12, 22)}
+          color={ACCENT}
+          gap={2}
+          overlay={frame < fastTo + 6 ? { counts: recent, color: ds("red", 800) } : undefined}
+        />
+      </div>
       <Averaging
+        px={PX}
         averageAt={averageAt}
         numberAt={numberAt}
         blockAt={blockAt}
@@ -405,14 +435,14 @@ export const ThreeScene: React.FC = () => {
         thatAverageAt={thatAverageAt}
       />
       {steps.map((st, i) => (
-        <StripSample key={i} index={i + 1} step={st} popBase={y(popBase)} />
+        <StripSample key={i} index={i + 1} step={st} popBase={y(popBase)} px={PX} />
       ))}
       {fastSample >= 1 ? <FastDots index={fastSample} /> : null}
       <Note at={thousandAt} x={RX} y={y(752)} from="up" out={piledAt + 10}>
         <span style={note(22, INK_SOFT)}>each a different {N} of the million</span>
       </Note>
       <Rule
-        x={sx(X, PILE.mean)}
+        x={sx(PX, PILE.mean)}
         y0={y(MEANS_BASE)}
         y1={y(MEANS_BASE - MEANS_H - 14)}
         at={fiftyAt - 4}
@@ -421,19 +451,19 @@ export const ThreeScene: React.FC = () => {
         width={2}
       />
       <Bracket
-        x0={sx(X, PILE.mean - PILE.sd)}
-        x1={sx(X, PILE.mean + PILE.sd)}
+        x0={sx(PX, PILE.mean - PILE.sd)}
+        x1={sx(PX, PILE.mean + PILE.sd)}
         y={y(MEANS_BASE - MEANS_H * AT_SD)}
         at={underAt - 2}
         color={ACCENT}
         width={2.6 + emphasis}
       />
-      <Note at={underAt + 2} x={sx(X, PILE.mean + PILE.sd) + 14} y={y(MEANS_BASE - MEANS_H * AT_SD) - 15}>
+      <Note at={underAt + 2} x={sx(PX, PILE.mean + PILE.sd) + 14} y={y(MEANS_BASE - MEANS_H * AT_SD) - 15}>
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, ...halo }}>± ${fmt(PILE.sd)}</span>
       </Note>
 
       {/* ══ Phase 4: one axis, three widths ══ */}
-      <Gridlines at={oneAxisAt - 4} top={y(POP_ROW.base - POP_ROW.height - 6)} bottom={y(MEANS_BASE)} />
+      <Gridlines at={zoomAt + 16} top={y(POP_ROW.base - POP_ROW.height - 6)} bottom={y(MEANS_BASE)} />
       <div
         style={{
           position: "absolute",
@@ -561,13 +591,14 @@ const SampleBlocks: React.FC<{ pickAt: number; fallAt: number; popBase: number; 
 /** "Average those forty": a red copy of each block slides into the average,
  *  which becomes one block and falls into row 3. */
 const Averaging: React.FC<{
+  px: XScale;
   averageAt: number;
   numberAt: number;
   blockAt: number;
   dollarsAt: number;
   becomesAt: number;
   thatAverageAt: number;
-}> = ({ averageAt, numberAt, blockAt, dollarsAt, becomesAt, thatAverageAt }) => {
+}> = ({ px, averageAt, numberAt, blockAt, dollarsAt, becomesAt, thatAverageAt }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const c = ease(frame, averageAt, 18);
@@ -607,9 +638,9 @@ const Averaging: React.FC<{
         {formed > 0 && frame < blockAt ? (
           // A dot, until "becomes": then the block it will fall as, over its bin.
           <rect
-            x={lerp(mx, meanBinLeft(SAMPLE.mean) + MEAN_W / 2, becoming) - lerp(10 * formed, MEAN_W / 2, becoming)}
+            x={lerp(mx, meanBinLeft(px, SAMPLE.mean) + meanW(px) / 2, becoming) - lerp(10 * formed, meanW(px) / 2, becoming)}
             y={y(MERGE_Y) - lerp(10 * formed, h(EARLY) / 2, becoming)}
-            width={lerp(20 * formed, MEAN_W, becoming)}
+            width={lerp(20 * formed, meanW(px), becoming)}
             height={lerp(20 * formed, h(EARLY), becoming)}
             rx={lerp(10 * formed, 0, becoming)}
             fill={ACCENT}
@@ -618,7 +649,7 @@ const Averaging: React.FC<{
           />
         ) : null}
         {frame >= blockAt ? (
-          <rect x={meanBinLeft(SAMPLE.mean)} y={y(top)} width={MEAN_W} height={h(EARLY)} fill={ACCENT} />
+          <rect x={meanBinLeft(px, SAMPLE.mean)} y={y(top)} width={meanW(px)} height={h(EARLY)} fill={ACCENT} />
         ) : null}
       </svg>
       <div
@@ -629,6 +660,7 @@ const Averaging: React.FC<{
           opacity: labelIn,
           whiteSpace: "nowrap",
           ...note(26, ACCENT_INK),
+          ...TABULAR,
           fontWeight: 700,
           ...halo,
           transformOrigin: "left center",
@@ -673,7 +705,7 @@ type Step = { s: number; c: number; d: number };
 
 /** A later sample: its customers light up on the population, slide together
  *  into their average, and the average falls into row 3. */
-const StripSample: React.FC<{ index: number; step: Step; popBase: number }> = ({ index, step, popBase }) => {
+const StripSample: React.FC<{ index: number; step: Step; popBase: number; px: XScale }> = ({ index, step, popBase, px }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const values = sampleValues(index);
@@ -710,7 +742,15 @@ const StripSample: React.FC<{ index: number; step: Step; popBase: number }> = ({
           })
         : null}
       {formed > 0 ? (
-        <rect x={meanBinLeft(mean)} y={top} width={MEAN_W} height={h(EARLY) * formed} fill={ACCENT} />
+        // Forms in its bin on the population's axis, and slides into its bin
+        // on row 3's own axis as it falls.
+        <rect
+          x={lerp(meanBinLeft(X, mean), meanBinLeft(px, mean), t)}
+          y={top}
+          width={lerp(meanW(X), meanW(px), t)}
+          height={h(EARLY) * formed}
+          fill={ACCENT}
+        />
       ) : null}
     </svg>
   );
@@ -723,10 +763,59 @@ const FastDots: React.FC<{ index: number }> = ({ index }) => {
   const values = sampleValues(index);
   if (!values) return null;
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: 0.6 }}>
+    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
       {values.map((v, j) => (
-        <circle key={j} cx={sx(X, Math.max(0, Math.min(100, v)))} cy={y(stripY(j))} r={5} fill={SAMPLE_FILL} />
+        <circle
+          key={j}
+          cx={sx(X, Math.max(0, Math.min(100, v)))}
+          cy={y(stripY(j))}
+          r={5.5}
+          fill={SAMPLE_FILL}
+          stroke={PAPER}
+          strokeWidth={1.5}
+        />
       ))}
+    </svg>
+  );
+};
+
+/** Row 3's axis: one baseline, and its own ticks ($40 to $60) handing over to
+ *  the shared ones as it zooms out. A tick is shown only while it is on the
+ *  axis. The marks match the kit's Axis. */
+const PileAxis: React.FC<{ scale: XScale; z: number; base: number; at: number }> = ({ scale, z, base, at }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 16);
+  const t = ease(frame, at + 6, 12);
+  const sets = [
+    { ticks: ZOOM_TICKS, opacity: t * (1 - z) },
+    { ticks: TICKS, opacity: t * z },
+  ];
+  return (
+    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+      <line x1={scale.x0} x2={scale.x0 + (scale.x1 - scale.x0) * p} y1={base + 0.5} y2={base + 0.5} stroke={INK} strokeWidth={1.6} />
+      {sets.map(({ ticks, opacity }, k) =>
+        opacity > 0 ? (
+          <g key={k} opacity={opacity}>
+            {ticks.map((v) => {
+              const x = sx(scale, v);
+              if (x < scale.x0 - 1 || x > scale.x1 + 1) return null;
+              return (
+                <g key={v}>
+                  <line x1={x} x2={x} y1={base + 1} y2={base + 7} stroke={INK} strokeWidth={1.2} />
+                  <text
+                    x={x}
+                    y={base + 26}
+                    textAnchor="middle"
+                    style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
+                  >
+                    {money(v)}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+        ) : null,
+      )}
     </svg>
   );
 };

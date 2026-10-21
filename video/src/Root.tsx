@@ -1,10 +1,9 @@
 import React from "react";
-import { Composition, Folder, Still } from "remotion";
+import { Composition, Folder } from "remotion";
 import "./theme/brand";
 import "./theme/fonts";
 import { narratedMetadata } from "./narration/metadata";
 import { EDITORIAL_DEFAULTS, type EditorialProps } from "./editorial/Page";
-import { H as PAGE_H, PaperSource, W as PAGE_W } from "./editorial/ui";
 import { ErdKit } from "./editorial/ErdKit";
 // Database Design with PostgreSQL, one video per unit.
 import { DbWhyDesign } from "./videos/db-why-design/Video";
@@ -510,8 +509,6 @@ export const RemotionRoot: React.FC = () => (
     <Folder name="Assets">
       {/* The ERD kit (editorial/erd.tsx) on one page, for review. */}
       <Composition id="ErdKit" component={ErdKit} width={1920} height={1080} fps={FPS} durationInFrames={150} />
-      {/* The editorial page's grain, rendered to public/editorial/ by `npm run paper`. */}
-      <Still id="PaperTexture" component={PaperSource} width={PAGE_W} height={PAGE_H} />
     </Folder>
   </>
 );

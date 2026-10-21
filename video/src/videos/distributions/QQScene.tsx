@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -28,6 +28,9 @@ const TOP = 360;
 const PLOT_H = 440;
 /** How many points at each end count as the tails. */
 const TAIL = 36;
+/** One point built in full before the rest arrive: the data's 90th
+ *  percentile against the model's (plotting position 0.899). */
+const ONE = 359;
 
 /**
  * Part 4, second scene: the check. A Q-Q plot pairs the data's sorted
@@ -64,6 +67,7 @@ export const QQScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: each panel's points arriving, the bend turning red ── */}
+      <Sfx name="el-tap" at={quantilesAt - 2} level={-31} />
       <Sfx name="el-pencil" at={rightAt - 4} level={-35} />
       <Sfx name="el-sprinkle" at={pointsAt - 6} level={-34} />
       <Sfx name="el-sprinkle" at={skewedAt - 4} level={-34} />
@@ -81,13 +85,15 @@ export const QQScene: React.FC = () => {
           const X = scaleFor(p);
           const py = yFor(p);
           const qq = QQ_PLOTS[p.key];
-          const at = pi === 0 ? quantilesAt - 4 : skewedAt - 8;
+          // The first panel's frame arrives as the plot is named, so the
+          // scene doesn't open on its headline alone.
+          const at = pi === 0 ? plotAt - 2 : skewedAt - 8;
           const axes = ease(frame, at, 14);
           const diag = ease(frame, pi === 0 ? rightAt - 4 : skewedAt - 6, 18);
           const reveal = (i: number) => ease(frame, start[p.key] + (i / qq.sample.length) * span[p.key], 6);
           return (
             <React.Fragment key={p.key}>
-              <FigLabel n={String(12 + pi)} title={p.title} at={at} x={p.x0 - 60} y={y(300)} />
+              <FigLabel n={String(14 + pi)} title={p.title} at={at} x={p.x0 - 60} y={y(300)} />
               <Svg opacity={axes}>
                 <line x1={p.x0} x2={p.x0 + SIZE} y1={bottom + 0.5} y2={bottom + 0.5} stroke={INK} strokeWidth={1.5} />
                 <line x1={p.x0 - 0.5} x2={p.x0 - 0.5} y1={top} y2={bottom} stroke={INK} strokeWidth={1.5} />
@@ -132,9 +138,7 @@ export const QQScene: React.FC = () => {
                       cy={py(s)}
                       r={4.6 * a}
                       fill={red > 0 ? `color-mix(in srgb, ${ASK} ${red * 100}%, ${DIST})` : DIST}
-                      stroke={PAPER}
-                      strokeWidth={0.8}
-                      opacity={0.85}
+                      stroke="none"
                     />
                   );
                 })}
@@ -142,6 +146,44 @@ export const QQScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+
+        {/* One point, read off both axes: the data's 90th percentile, up,
+            against where the model puts it, across. */}
+        {(() => {
+          const p = PANELS[0];
+          const X = scaleFor(p);
+          const py = yFor(p);
+          const qq = QQ_PLOTS.normal;
+          const cx = sx(X, qq.theoretical[ONE]);
+          const cy = py(qq.sample[ONE]);
+          const up = ease(frame, quantilesAt - 2, 14);
+          const across = ease(frame, modelsAt - 4, 14);
+          // The guides go once every point is in, before "on the line" lands
+          // across the vertical one; the ringed point stays.
+          const guides = 1 - ease(frame, lineEnd - 14, 12);
+          return (
+            <>
+              <Svg opacity={guides}>
+                {up > 0 ? (
+                  <line x1={p.x0} x2={lerp(p.x0, cx, up)} y1={cy} y2={cy} stroke={ASK} strokeWidth={1.8} strokeDasharray="2 5" strokeLinecap="round" />
+                ) : null}
+                {across > 0 ? (
+                  <line x1={cx} x2={cx} y1={bottom} y2={lerp(bottom, cy, across)} stroke={ASK} strokeWidth={1.8} strokeDasharray="2 5" strokeLinecap="round" />
+                ) : null}
+              </Svg>
+              <Svg opacity={up}>
+                <circle cx={cx} cy={cy} r={7} fill={ASK} />
+                <circle cx={cx} cy={cy} r={12} fill="none" stroke={ASK} strokeWidth={2} />
+              </Svg>
+              <Note at={quantilesAt} x={p.x0 + 12} y={cy - 40} out={lineEnd - 14}>
+                <span style={{ ...askNote(21), whiteSpace: "nowrap", ...halo }}>data&apos;s 90th percentile: {fmt(qq.sample[ONE], 1)}</span>
+              </Note>
+              <Note at={modelsAt} x={cx + 14} y={bottom - 40} out={lineEnd - 14}>
+                <span style={{ ...askNote(21), whiteSpace: "nowrap", ...halo }}>the model&apos;s: {fmt(qq.theoretical[ONE], 1)}</span>
+              </Note>
+            </>
+          );
+        })()}
 
         {/* Axis titles, shared by both panels. */}
         <Ink at={modelsAt - 2} dur={14} style={{ left: 220, top: bottom + h(52), whiteSpace: "nowrap" }}>
@@ -158,10 +200,11 @@ export const QQScene: React.FC = () => {
         <Note at={tailsAt - 4} x={sx(scaleFor(PANELS[1]), 62)} y={yFor(PANELS[1])(112)} align="right">
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the upper tail runs away</span>
         </Note>
-        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), 50)} y={yFor(PANELS[1])(12)}>
-          <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>and the lower tail, too</span>
+        {/* Just above the lower tail's points, left of the line. */}
+        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), -17)} y={yFor(PANELS[1])(46)}>
+          <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the lower tail, too</span>
         </Note>
-        <Note at={costlyAt - 2} x={sx(scaleFor(PANELS[1]), 50)} y={yFor(PANELS[1])(12) + 36}>
+        <Note at={costlyAt - 2} x={sx(scaleFor(PANELS[1]), 62)} y={yFor(PANELS[1])(112) + 36} align="right">
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>where the costly mistakes live</span>
         </Note>
       </Drift>

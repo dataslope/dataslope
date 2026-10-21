@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { POWER, POWER_BY_N } from "./data";
-import { Arrow, Count, DATA, DATA_INK, DATA_WASH, Greek, Head, Label, lerp, pct, pulse, RAW, STAT, STAT_INK, Svg } from "./parts";
+import { Arrow, Bracket, Count, curvePath, DATA, DATA_INK, Greek, Head, Label, lerp, pct, phi, pulse, RAW, STAT, STAT_INK, Svg } from "./parts";
 
 /** The 2,000 experiments, fifty to a row. */
 const GRID_X = 160;
@@ -20,6 +20,11 @@ const CELL_H = 10.5;
 const L: XScale = { lo: Math.log2(10), hi: Math.log2(320), x0: 1110, x1: 1740 };
 const P_BASE = 800;
 const P_TALL = 400;
+/** One experiment, beside the grid until the seesaw takes its place: the two
+ *  groups' populations, half an SD apart (px per SD, centre x, page base). */
+const ONE = { sd: 88, cx: 1420, base: 700, tall: 200 };
+/** The 80-100% design target: a faint ink tint, so labels inside it read. */
+const TARGET_WASH = `color-mix(in srgb, ${INK} 6%, transparent)`;
 
 /**
  * Power counted: 2,000 experiments with a real 0.5 effect at 30 per group,
@@ -44,13 +49,12 @@ export const PowerScene: React.FC = () => {
   const reallyAt = n.word("coinflip", "really there");
   const fixedAt = n.word("trade", "sample fixed");
   const designedAt = n.word("target", "designed");
-  const countingAt = n.word("sim", "counting");
-  const catchesAt = n.word("more", "catches", { nth: 1 });
   const timeAt = n.word("more", "time");
   const studiesAt = n.word("target", "Studies");
   const lowerAt = n.word("trade", "Lower");
   const missAt = n.word("trade", "miss");
   const pushingAt = n.word("trade", "pushing");
+  const testAt = n.word("sim", "test thirty");
   const upAt = n.word("trade", "up");
   const onlyAt = n.word("more", "Only");
   const fortyAt = n.word("more", "Forty");
@@ -83,13 +87,22 @@ export const PowerScene: React.FC = () => {
   const at40 = pulse(frame, sixtyAt - 2, 26);
   const at80 = pulse(frame, ninetyAt - 2, 26);
   const target = ease(frame, designedAt - 4, 20);
-  const shadeTo = lerp(10, 40, ease(frame, catchesAt - 2, 16)) + 40 * ease(frame, eightyAt - 2, 16);
   const zone = ease(frame, studiesAt - 2, 14);
+  // Fig. 13's own run (30 per group, 47.5%), marked on the curve once it is drawn.
+  const runIn = ease(frame, onlyAt + 34, 12);
+
+  // One experiment: the two populations, a real 0.5 SD apart, until the seesaw.
+  const oneIn = ease(frame, plantAt - 4, 22);
+  const oneOut = ease(frame, lowerAt - 10, 12);
+  const ox = (z: number) => ONE.cx + z * ONE.sd;
+  const oy = (v: number) => y(ONE.base) - h(ONE.tall) * (v / phi(0));
+  const shift = POWER.effect;
   const timeGlow = pulse(frame, timeAt - 2, 24);
 
   return (
     <AbsoluteFill>
       {/* ── Sound: the runs pouring in, the share, the seesaw, the curve ── */}
+      <Sfx name="el-pencil" at={plantAt - 4} level={-36} />
       <Sfx name="el-sprinkle" at={repeatAt - 2} level={-32} />
       <Sfx name="el-sprinkle" at={repeatAt + 34} level={-34} />
       <Sfx name="el-tap" at={fortySevenAt - 4} level={-28} />
@@ -98,17 +111,18 @@ export const PowerScene: React.FC = () => {
       <Sfx name="el-pencil" at={targetAt - 4} level={-35} />
 
       <Head a="Power," b="by counting." at={simFrom - 6} bAt={plantAt - 4} out={onlyAt - 8} />
-      <Head a="Only more data" b="shrinks both." at={onlyAt - 4} bAt={onlyAt + 10} />
+      {/* The figure holds alpha at 5%, so the headline names the seesaw it escapes rather than claiming "both". */}
+      <Head a="Only more data" b="escapes the seesaw." at={onlyAt - 4} bAt={onlyAt + 10} />
 
-      {/* ── Fig. 11: 2,000 experiments with a real effect ── */}
-      <FigLabel n="12" title="2,000 experiments, each one square" at={simFrom} x={GRID_X} y={y(300)} />
+      {/* ── Fig. 13: 2,000 experiments with a real effect ── */}
+      <FigLabel n="13" title="2,000 experiments, each one square" at={simFrom} x={GRID_X} y={y(300)} />
       <Ink at={halfAt - 4} dur={14} style={{ left: GRID_X, top: y(300) + 40, whiteSpace: "nowrap" }}>
         <Label size={21} color={INK_SOFT} weight={520}>
           a real effect of {POWER.effect} SD
           <span style={{ opacity: ease(frame, thirtyAt - 2, 10) }}>, {POWER.n} per group</span>
         </Label>
       </Ink>
-      <Svg opacity={0.35 * ease(frame, countingAt - 2, 12)}>
+      <Svg opacity={0.35 * ease(frame, repeatAt - 2, 12)}>
         <rect x={GRID_X} y={y(GRID_Y) + 22} width={COLS * CELL_W - 2.5} height={40 * CELL_H - 2.5} fill={RAW} />
       </Svg>
       <Svg>
@@ -134,7 +148,7 @@ export const PowerScene: React.FC = () => {
           <span style={{ color: INK_SOFT, marginLeft: 22 }}>of {fmt(done, 0)} runs</span>
         </Label>
       </div>
-      <Note at={fortySevenAt - 4} x={GRID_X + 40} y={y(GRID_Y) + 22 + 40 * CELL_H + 64}>
+      <Note at={fortySevenAt - 4} x={GRID_X} y={y(GRID_Y) + 22 + 40 * CELL_H + 64}>
         <span
           style={{
             ...note(40, DATA_INK),
@@ -153,9 +167,56 @@ export const PowerScene: React.FC = () => {
         </span>
       </Note>
 
+      {/* ── One experiment: what "a real effect of half an SD" looks like ── */}
+      {oneIn > 0 && oneOut < 1 ? (
+        <div style={{ position: "absolute", inset: 0, opacity: 1 - oneOut }}>
+          <Ink at={plantAt - 6} dur={14} style={{ left: 1160, top: y(ONE.base) - h(ONE.tall) - 130, whiteSpace: "nowrap" }}>
+            <Label size={22} color={INK_SOFT}>
+              One experiment
+            </Label>
+          </Ink>
+          <Svg opacity={oneIn}>
+            <line x1={1130} x2={1760} y1={y(ONE.base)} y2={y(ONE.base)} stroke={INK} strokeWidth={1.6} />
+            <path d={curvePath(phi, -3.3, 3.3, ox, oy, y(ONE.base))} fill={RAW} opacity={0.75} />
+            <path d={curvePath(phi, -3.3, 3.3, (z) => ox(z + shift), oy, y(ONE.base))} fill={DATA} opacity={0.45} />
+            <line x1={ox(0)} x2={ox(0)} y1={y(ONE.base)} y2={oy(phi(0)) - 8} stroke={INK_SOFT} strokeWidth={2.4} />
+            <line x1={ox(shift)} x2={ox(shift)} y1={y(ONE.base)} y2={oy(phi(0)) - 8} stroke={DATA} strokeWidth={2.4} />
+          </Svg>
+          <Note at={plantAt + 6} x={ox(-1.4) - 10} y={oy(phi(1.4)) - 34} align="right">
+            <Label size={21} color={INK_SOFT} weight={520}>
+              control
+            </Label>
+          </Note>
+          <Note at={plantAt + 10} x={ox(1.4 + shift) + 10} y={oy(phi(1.4)) - 34}>
+            <Label size={21} color={DATA_INK} weight={520}>
+              treatment
+            </Label>
+          </Note>
+          <Bracket x0={ox(0)} x1={ox(shift)} y={oy(phi(0)) - 22} at={halfAt - 2} color={STAT} up width={2.6} />
+          <Note at={halfAt + 2} x={ox(shift / 2)} y={oy(phi(0)) - 74} from="up">
+            <span style={{ display: "inline-block", transform: "translateX(-50%)" }}>
+              <Label size={22} color={STAT_INK}>
+                a real gap of {POWER.effect} SD
+              </Label>
+            </span>
+          </Note>
+          <Note at={testAt - 2} x={1160} y={y(ONE.base) + 16}>
+            <Label size={22} color={INK}>
+              {POWER.n} drawn from each, then one t-test
+            </Label>
+          </Note>
+          <Arrow from={[1140, y(GRID_Y) + 22 + 20 * CELL_H]} to={[GRID_X + COLS * CELL_W + 22, y(GRID_Y) + 22 + 20 * CELL_H]} at={repeatAt - 2} color={INK_SOFT} />
+          <Note at={repeatAt + 6} x={1030} y={y(GRID_Y) + 22 + 20 * CELL_H - 44} from="up">
+            <span style={{ display: "inline-block", transform: "translateX(-50%)" }}>
+              <Label size={22}>× {fmt(POWER.runs, 0)}</Label>
+            </span>
+          </Note>
+        </div>
+      ) : null}
+
       {/* ── The seesaw: alpha down, beta up ── */}
       <div style={{ position: "absolute", inset: 0, opacity: schematic }}>
-        <Ink at={fixedAt - 4} dur={14} style={{ left: 1150, top: y(330), whiteSpace: "nowrap" }}>
+        <Ink at={fixedAt - 4} dur={14} style={{ left: 1150, top: SEE_BASE - h(260), whiteSpace: "nowrap" }}>
           <Label size={22} color={INK_SOFT}>
             With the sample fixed
           </Label>
@@ -179,8 +240,8 @@ export const PowerScene: React.FC = () => {
         <Arrow from={[1555, SEE_BASE - bH - 16]} to={[1555, SEE_BASE - bH - 70]} at={upAt - 6} color={INK} width={2.4} />
       </div>
 
-      {/* ── Fig. 12: power against the sample size ── */}
-      <FigLabel n="13" title={`Power to catch the same ${POWER_BY_N.effect} effect`} at={onlyAt + 2} x={L.x0 - 40} y={y(300)} />
+      {/* ── Fig. 14: power against the sample size ── */}
+      <FigLabel n="14" title={`Power to catch the same ${POWER_BY_N.effect} effect`} at={onlyAt + 2} x={L.x0 - 40} y={y(300)} />
       <Axis
         scale={L}
         base={y(P_BASE)}
@@ -189,6 +250,11 @@ export const PowerScene: React.FC = () => {
         at={onlyAt + 2}
         opacity={1 - schematic}
       />
+      <Ink at={onlyAt + 8} dur={14} style={{ left: L.x0 - 40, top: y(300) + 40, whiteSpace: "nowrap" }}>
+        <Label size={21} color={INK_SOFT} weight={520}>
+          <Greek>α</Greek> held at 5% throughout
+        </Label>
+      </Ink>
       <Note at={onlyAt + 6} x={L.x1} y={y(P_BASE) + 40} align="right">
         <Label size={21} color={INK_SOFT} weight={520}>
           per group
@@ -198,30 +264,7 @@ export const PowerScene: React.FC = () => {
         {[0.25, 0.5, 0.75, 1].map((v) => (
           <line key={v} x1={L.x0} x2={L.x1} y1={py(v)} y2={py(v)} stroke={HAIRLINE} strokeWidth={1} opacity={0.3} />
         ))}
-        {zone > 0 ? <rect x={L.x0} y={py(1)} width={L.x1 - L.x0} height={py(0.8) - py(1)} fill={DATA_WASH} opacity={zone} /> : null}
-        {shadeTo > 10 ? (
-          <path
-            d={(() => {
-              const pts = POWER_BY_N.sizes
-                .map((s, i) => [s, POWER_BY_N.power[i]] as const)
-                .filter(([s]) => s <= shadeTo);
-              const last = pts[pts.length - 1];
-              const next = POWER_BY_N.sizes.findIndex((s) => s > last[0]);
-              // Interpolate to the shaded edge, on the log axis the curve is drawn on.
-              const edge =
-                next > 0 && shadeTo > last[0]
-                  ? (() => {
-                      const s1 = POWER_BY_N.sizes[next];
-                      const f = (Math.log2(shadeTo) - Math.log2(last[0])) / (Math.log2(s1) - Math.log2(last[0]));
-                      return [[shadeTo, lerp(last[1], POWER_BY_N.power[next], f)] as const];
-                    })()
-                  : [];
-              const all = [...pts, ...edge];
-              return `M${px(all[0][0])},${py(0)} ${all.map(([s, p]) => `L${px(s).toFixed(1)},${py(p).toFixed(1)}`).join(" ")} L${px(all[all.length - 1][0])},${py(0)}Z`;
-            })()}
-            fill={DATA_WASH}
-          />
-        ) : null}
+        {zone > 0 ? <rect x={L.x0} y={py(1)} width={L.x1 - L.x0} height={py(0.8) - py(1)} fill={TARGET_WASH} opacity={zone} /> : null}
         {target > 0 ? (
           <line x1={L.x0} x2={L.x0 + (L.x1 - L.x0) * target} y1={py(0.8)} y2={py(0.8)} stroke={INK} strokeWidth={2.2} strokeDasharray="8 6" />
         ) : null}
@@ -240,6 +283,9 @@ export const PowerScene: React.FC = () => {
           const glow = s === 40 ? at40 : s === 80 ? at80 : 0;
           return <circle key={s} cx={px(s)} cy={py(POWER_BY_N.power[i])} r={(7 + 5 * glow) * a} fill={DATA} stroke={PAPER} strokeWidth={2} />;
         })}
+        {runIn > 0 ? (
+          <circle cx={px(POWER.n)} cy={py(POWER.power)} r={8 * runIn} fill={PAPER} stroke={DATA_INK} strokeWidth={2.6} />
+        ) : null}
       </Svg>
       {[0.25, 0.5, 0.75, 1].map((v) => (
         <div
@@ -255,7 +301,8 @@ export const PowerScene: React.FC = () => {
       ].map(([s, at, shareAt]) => {
         const i = POWER_BY_N.sizes.indexOf(s);
         return (
-          <Note key={s} at={at - 2} x={px(s) + 16} y={py(POWER_BY_N.power[i]) + 4}>
+          // Above-left of each dot: the curve arrives from below-left.
+          <Note key={s} at={at - 2} x={px(s) - 16} y={py(POWER_BY_N.power[i]) - 40} align="right">
             <span
               style={{
                 ...note(24, DATA_INK),
@@ -264,7 +311,7 @@ export const PowerScene: React.FC = () => {
                 whiteSpace: "nowrap",
                 display: "inline-block",
                 transform: s === 40 ? `scale(${1 + 0.12 * timeGlow})` : undefined,
-                transformOrigin: "0 50%",
+                transformOrigin: "100% 50%",
               }}
             >
               {s} per group<span style={{ opacity: ease(frame, shareAt - 2, 10) }}>: {pct(POWER_BY_N.power[i], 0)}</span>
@@ -272,6 +319,11 @@ export const PowerScene: React.FC = () => {
           </Note>
         );
       })}
+      <Note at={onlyAt + 38} x={px(POWER.n) + 14} y={py(POWER.power) + 6}>
+        <Label size={21} color={DATA_INK} weight={520} style={halo}>
+          Fig. 13&apos;s run, {POWER.n} per group
+        </Label>
+      </Note>
       <Note at={targetAt} x={L.x1} y={py(0.8) + 12} align="right">
         <Label size={21} color={INK} style={halo}>
           the usual target, 80%

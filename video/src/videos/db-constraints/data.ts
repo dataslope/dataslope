@@ -151,7 +151,14 @@ export const PAIR = {
   attempt: ["1", "10"] as Cell[],
 };
 
-export const ONE_TO_ONE = { refusal: refused("oneToOne", "second") };
+/** Ada's profile, then a second one for user 1, which UNIQUE refuses. */
+export const ONE_TO_ONE = {
+  cols: fields("oneToOne", "after"),
+  rows: okRows("oneToOne", "after"),
+  refusal: refused("oneToOne", "second"),
+  attempt: ["", "1", "Ada again"] as Cell[],
+};
+if (!step("oneToOne", "second").sql.includes("(1, 'Ada again')")) throw new Error("check.mjs no longer sends 'Ada again'");
 
 // ── Part 5. CHECK (check-constraints) ───────────────────────────────────────
 

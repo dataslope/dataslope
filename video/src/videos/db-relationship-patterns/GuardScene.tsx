@@ -3,26 +3,30 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK } from "../../editorial/style";
-import { NextLine } from "../../editorial/ui";
+import { FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SR } from "./data";
 import {
   Caption,
+  Code,
   DbTable,
   Drift,
+  FIG_ABOVE,
   HEAD_H,
   Head,
   KEY_INK,
   KeyArrow,
   Kicker,
   Listing,
+  Mark,
   MARK,
   MARK_BAD,
   MARK_KEY,
   Pulse,
   Reply,
   ROW_H,
+  Tag,
   tableGeometry,
 } from "./parts";
 
@@ -30,8 +34,15 @@ const TABLES_Y = 410;
 const E_X = 120;
 const M_X = 640;
 const RESULT_X = 1010;
-const LIST_Y = 720;
+/** The UPDATE sits well clear of the tables above it, with its own figure
+ *  label between, so it reads as a statement of its own rather than as
+ *  their footer. */
+const LIST_Y = 790;
 const LIST_SIZE = 24;
+/** The bridge, under the command tag that answers the UPDATE. */
+const NEXT_Y = 870;
+/** The join itself, in the mono face, over the two tables it reads. */
+const JOIN_SIZE = 21;
 
 /**
  * The closing scene: the table joined to itself, once as the employee and
@@ -46,7 +57,7 @@ export const GuardScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("alias").from;
-  const itselfAt = n.word("alias", "itself");
+  const joinAt = n.word("alias", "join", { nth: 1 });
   const asEmployeeAt = n.word("alias", "as employee");
   const asManagerAt = n.word("alias", "as manager");
   const leftAt = n.word("alias", "left join");
@@ -77,7 +88,11 @@ export const GuardScene: React.FC = () => {
   const ada = 0;
 
   const listTop = y(LIST_Y);
+  // The join's label sits over the join itself, the line of SQL above the tables.
+  const joinY = top - 104;
   const settle = 1 - ease(frame, linksAt, 18) * 0.35;
+  // "employees e LEFT JOIN employees m ON …", with LEFT JOIN marked when it is said.
+  const [eSide, mSide] = SR.joinFrom.split(" LEFT JOIN ");
 
   return (
     <AbsoluteFill>
@@ -97,15 +112,30 @@ export const GuardScene: React.FC = () => {
       <Drift from={from} to={constraintsAt + 40} scale={0.014} origin={[960, y(560)]}>
       <Drift from={constraintsAt - 12} to={n.durationInFrames} scale={0.03} origin={[960, y(560)]}>
         <div style={{ position: "absolute", inset: 0, opacity: settle }}>
-          {/* ── e and m: one table, read twice ── */}
+          {/* ── The join: one table, named twice, and the match. One figure:
+              the SQL, both readings of the table, and what the join returns. ── */}
+          <FigLabel n="19" title="Employees joined to themselves" at={from - 4} x={E_X} y={joinY - FIG_ABOVE} />
+          <Ink at={joinAt + 2} dur={18} style={{ left: E_X, top: joinY, whiteSpace: "nowrap", display: "flex" }}>
+            <Code line={`${eSide} `} size={JOIN_SIZE} />
+            <Mark at={leftAt}>
+              <Code line="LEFT JOIN" size={JOIN_SIZE} />
+            </Mark>
+            <Code line={` ${mSide}`} size={JOIN_SIZE} />
+          </Ink>
+
+          {/* ── e and m: one table, read twice. The table is up from the
+              scene's first word, then named for its first role. ── */}
+          <Caption at={from} x={eg.x} y={top - 48} out={asEmployeeAt - 8}>
+            employees
+          </Caption>
           <Caption at={asEmployeeAt - 2} x={eg.x} y={top - 48}>
             e, the employee
           </Caption>
           <DbTable
             g={eg}
             cols={eCols}
-            rows={rows.map((cells, i) => ({ cells, at: itselfAt + i * 3 }))}
-            at={itselfAt - 4}
+            rows={rows.map((cells, i) => ({ cells, at: from + 6 + i * 3 }))}
+            at={from}
             numeric={[0, MGR]}
             colInk={{ 0: KEY_INK, [MGR]: KEY_INK }}
             marks={[
@@ -150,8 +180,12 @@ export const GuardScene: React.FC = () => {
             bands={[{ row: ada, at: keepsAt, out: checksAt, color: MARK }]}
             swaps={[{ row: ada, col: 2, at: updatedAt, value: SR.joinAfter[0][2] ?? "", color: ACCENT_INK }]}
           />
+          <Tag at={keepsAt + 8} x={rg.x} y={rg.rowTop(rows.length) + 18} italic size={22} out={whatIfAt - 4}>
+            an inner join would drop Ada
+          </Tag>
 
           {/* ── What the key does not check ── */}
+          <FigLabel n="20" title="The update the foreign key lets through" at={whatIfAt - 6} x={E_X} y={listTop - FIG_ABOVE} />
           <Listing
             lines={SR.updateSql}
             x={E_X}
@@ -168,7 +202,7 @@ export const GuardScene: React.FC = () => {
         </div>
       </Drift>
       </Drift>
-      <NextLine at={constraintsAt - 2} x={RESULT_X} y={y(820)} width={700}>
+      <NextLine at={constraintsAt - 2} x={RESULT_X} y={y(NEXT_Y)} width={700}>
         constraints.
       </NextLine>
     </AbsoluteFill>

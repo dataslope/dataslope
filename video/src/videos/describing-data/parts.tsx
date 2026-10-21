@@ -244,7 +244,9 @@ export const Tag: React.FC<{
         fontFamily: label().fontFamily,
         fontSize: size,
         fontWeight: bold ? 700 : 560,
-        fontVariantNumeric: "tabular-nums lining-nums",
+        // Lining figures only: tabular ones set Inter's hyphen a digit wide
+        // ("Heavy - tailed"). A number that counts takes TABULAR on its span.
+        fontVariantNumeric: "lining-nums",
         color,
         lineHeight: 1.2,
         ...(knockout ? { background: PAPER, padding: "0 6px", borderRadius: 4 } : {}),

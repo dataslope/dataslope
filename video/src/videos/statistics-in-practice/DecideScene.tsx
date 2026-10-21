@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
+import { body, fmt, HAIRLINE, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EXPERIMENT, TINY } from "./data";
@@ -13,7 +13,10 @@ import { Check, Cross, Headline, Marker, Ring, STAT, STAT_INK, Svg } from "./par
 const X: XScale = { lo: -0.5, hi: 3.5, x0: 160, x1: 1060 };
 const BASE = 836;
 const OURS = 500;
-const HUGE = 690;
+const HUGE = 660;
+/** The huge test's interval, magnified under its row: 0 to 0.04 points. */
+const ZOOM: XScale = { lo: 0, hi: 0.04, x0: 360, x1: 960 };
+const ZOOM_FRAME = { x0: 330, x1: 1000 };
 const COL = [1160, 1440];
 const HEAD_Y = 384;
 const pp = (v: number) => v * 100;
@@ -43,8 +46,12 @@ const Interval: React.FC<{ lo: number; hi: number; mid: number; y: number; t: nu
 
 /**
  * The decision, on two questions: significant (the interval clears zero) and
- * big enough to matter (a question about money). The lesson's huge test
- * passes the first and fails the second.
+ * big enough to matter (a question about money). This test passes the first,
+ * and the second turns on its interval's low end, about one point: ship only
+ * if that is worth it (ab-testing, "Decide": the CI's lower bound against
+ * the level that justifies the rollout). The lesson's huge test passes the
+ * first and fails the second; its interval is a sliver beside zero at this
+ * scale, so it is magnified underneath to show it clear.
  */
 export const DecideScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -59,6 +66,9 @@ export const DecideScene: React.FC = () => {
   const zeroAt = n.word("decide", "zero");
   const bigAt = n.word("matter", "big enough");
   const moneyAt = n.word("matter", "money");
+  const littleAt = n.word("verdict", "as little as");
+  const onlyAt = n.word("verdict", "only if");
+  const worthAt = n.word("verdict", "worth it");
   const testAt = n.word("tiny", "big enough test");
   const eightAt = n.word("tiny", "eight percent");
   const ohTwoAt = n.word("tiny", "point oh two");
@@ -70,6 +80,10 @@ export const DecideScene: React.FC = () => {
   const shipAt = n.word("permit", "ship");
 
   const ours = ease(frame, decideFrom - 6, 16);
+  const zoomIn = ease(frame, ohTwoAt + 2, 16);
+  const zoomBar = ease(frame, ohTwoAt + 10, 18);
+  const zoomTop = y(HUGE) + 52;
+  const zoomRow = zoomTop + 58;
   const huge = ease(frame, eightAt - 4, 14);
   const lift = pp(EXPERIMENT.absLift);
   const sigDim = 1 - 0.5 * ease(frame, shipAt - 6, 14);
@@ -79,6 +93,8 @@ export const DecideScene: React.FC = () => {
       {/* ── Sound: each answer as it lands, and the huge test's sliver ── */}
       <Sfx name="el-tap" at={yesAt - 4} level={-28} />
       <Sfx name="el-pencil" at={moneyAt - 4} level={-34} />
+      <Sfx name="el-tap" at={littleAt - 2} level={-30} />
+      <Sfx name="el-whoosh" at={ohTwoAt + 2} level={-35} />
       <Sfx name="el-pop" at={eightAt - 4} level={-30} />
       <Sfx name="el-tap" at={realAt - 4} level={-29} />
       <Sfx name="el-scratch" at={worthlessAt - 4} level={-30} />
@@ -111,6 +127,13 @@ export const DecideScene: React.FC = () => {
         </span>
       </Note>
       <Ring x={sx(X, pp(EXPERIMENT.ciLow))} y={y(OURS)} at={zeroAt - 4} />
+      {/* Its low end: what the size question turns on. */}
+      <Ring x={sx(X, pp(EXPERIMENT.ciLow))} y={y(OURS)} at={littleAt - 2} r1={56} />
+      <Note at={littleAt} x={sx(X, pp(EXPERIMENT.ciLow))} y={y(OURS) + 58}>
+        <span style={{ ...note(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
+          but it could be as little as +{fmt(pp(EXPERIMENT.ciLow))}
+        </span>
+      </Note>
 
       {/* ── The lesson's huge test ── */}
       <Ink at={testAt - 4} dur={14} style={{ left: 320, top: y(HUGE) - 62, whiteSpace: "nowrap" }}>
@@ -128,19 +151,44 @@ export const DecideScene: React.FC = () => {
       ) : null}
       <Interval lo={pp(TINY.ciLow)} hi={pp(TINY.ciHigh)} mid={pp(TINY.pB - TINY.pA)} y={y(HUGE)} t={huge} min={8} />
       <Ring x={sx(X, pp(TINY.pB - TINY.pA))} y={y(HUGE)} at={ohTwoAt - 4} r1={70} />
-      <Leader
-        points={[
-          [sx(X, 0.5), y(HUGE) + 4],
-          [sx(X, pp(TINY.pB - TINY.pA)) + 10, y(HUGE)],
-        ]}
-        at={ohTwoAt}
-        dur={10}
-        color={STAT}
-        dot={false}
-      />
-      <Note at={ohTwoAt + 2} x={sx(X, 0.5) + 10} y={y(HUGE) - 12}>
-        <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
-          {fmt(pp(TINY.ciLow), 3)} to {fmt(pp(TINY.ciHigh), 3)} points: it clears zero too
+
+      {/* ── The sliver, magnified: 0 to 0.04 points, where it clears zero ── */}
+      {zoomIn > 0 ? (
+        <Svg opacity={zoomIn}>
+          {/* The zoom's sides, from the sliver to the frame. */}
+          <path
+            d={`M${sx(X, pp(TINY.ciLow))},${y(HUGE) + 16} L${ZOOM_FRAME.x0},${zoomTop} M${sx(X, pp(TINY.ciHigh))},${y(HUGE) + 16} L${ZOOM_FRAME.x1},${zoomTop}`}
+            fill="none"
+            stroke={HAIRLINE}
+            strokeWidth={1.2}
+          />
+          <rect x={ZOOM_FRAME.x0} y={zoomTop} width={ZOOM_FRAME.x1 - ZOOM_FRAME.x0} height={86} rx={8} fill={PAPER} stroke={HAIRLINE} strokeWidth={1.2} />
+          <line x1={sx(ZOOM, 0)} x2={sx(ZOOM, 0)} y1={zoomTop + 36} y2={zoomTop + 78} stroke={INK} strokeWidth={1.8} strokeDasharray="6 5" />
+        </Svg>
+      ) : null}
+      <Note at={ohTwoAt + 6} x={sx(ZOOM, 0) - 10} y={zoomRow - 14} align="right">
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>0</span>
+      </Note>
+      {zoomBar > 0 ? (
+        <Svg>
+          {(() => {
+            const c = sx(ZOOM, pp(TINY.pB - TINY.pA));
+            const a = c + (sx(ZOOM, pp(TINY.ciLow)) - c) * zoomBar;
+            const b = c + (sx(ZOOM, pp(TINY.ciHigh)) - c) * zoomBar;
+            return (
+              <>
+                <line x1={a} x2={b} y1={zoomRow} y2={zoomRow} stroke={STAT} strokeWidth={6} strokeLinecap="round" />
+                <line x1={a} x2={a} y1={zoomRow - 14} y2={zoomRow + 14} stroke={STAT} strokeWidth={3.5} strokeLinecap="round" />
+                <line x1={b} x2={b} y1={zoomRow - 14} y2={zoomRow + 14} stroke={STAT} strokeWidth={3.5} strokeLinecap="round" />
+                <circle cx={c} cy={zoomRow} r={8} fill={STAT} stroke={PAPER} strokeWidth={2} />
+              </>
+            );
+          })()}
+        </Svg>
+      ) : null}
+      <Note at={sigAt - 6} x={sx(ZOOM, 0) + 22} y={zoomTop + 6}>
+        <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          magnified: {fmt(pp(TINY.ciLow), 3)} to {fmt(pp(TINY.ciHigh), 3)} points, clear of zero too
         </span>
       </Note>
 
@@ -168,6 +216,11 @@ export const DecideScene: React.FC = () => {
       </Ink>
       <Ink at={moneyAt + 6} dur={16} style={{ left: COL[1], top: y(OURS) + 16, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>not math</span>
+      </Ink>
+      <Ink at={onlyAt - 4} dur={16} style={{ left: COL[1], top: y(OURS) + 58, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>
+          ship only if <Marker at={worthAt - 4}>1 point is worth it</Marker>
+        </span>
       </Ink>
       <Cross x={COL[1] + 16} y={y(HUGE)} at={worthlessAt - 4} />
       <Ink at={worthlessAt - 2} dur={12} style={{ left: COL[1] + 46, top: y(HUGE) - 16, whiteSpace: "nowrap" }}>

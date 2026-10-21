@@ -78,10 +78,11 @@ export const PairsScene: React.FC = () => {
       <Sfx name="el-whoosh" at={collapsesAt - 6} level={-33} />
       <Sfx name="el-tap" at={tenAt - 2} level={-28} />
 
-      <Head a="Pair" b="what's paired." at={pairsFrom - 6} bAt={ownAt - 6} />
+      {/* The first half stands alone while the second waits for "own change". */}
+      <Head a="Before and after:" b="pair them." at={pairsFrom - 6} bAt={ownAt - 6} />
 
       <div style={{ position: "absolute", inset: 0, opacity: outDim }}>
-        <FigLabel n="16" title={`Blood pressure of ${PAIRED.n} patients, before and after`} at={looksAt - 4} x={160} y={y(280)} />
+        <FigLabel n="17" title={`Blood pressure of ${PAIRED.n} patients, before and after`} at={looksAt - 4} x={160} y={y(280)} />
 
         {/* ── Two columns of the same people ── */}
         <Svg opacity={ease(frame, patientsAt - 4, 14)}>
@@ -94,6 +95,9 @@ export const PairsScene: React.FC = () => {
             {v}
           </div>
         ))}
+        <div style={{ position: "absolute", right: 1920 - 214, top: vy(174) - 13, opacity: ease(frame, patientsAt + 4, 12), ...label(21, INK_SOFT) }}>
+          mmHg
+        </div>
         {[
           ["Before", beforeAt],
           ["After", afterAt],
@@ -150,10 +154,12 @@ export const PairsScene: React.FC = () => {
             return <line key={c} x1={COL[c] - 80 * a} x2={COL[c] + 80 * a} y1={vy(m)} y2={vy(m)} stroke={STAT} strokeWidth={4} strokeLinecap="round" />;
           })}
         </Svg>
-        {/* The spread between people, which the unpaired test counts as noise. */}
-        <VBracket x={COL[0] - 92} y0={vy(Math.max(...PAIRED.before))} y1={vy(Math.min(...PAIRED.before))} at={differencesAt - 2} color={INK} />
-        <VBracket x={COL[1] + 92} y0={vy(Math.max(...PAIRED.after))} y1={vy(Math.min(...PAIRED.after))} at={differencesAt + 4} color={INK} right />
-        <Note at={drownAt - 2} x={COL[1] + 112} y={vy(150) - 30}>
+        {/* The spread between people, which the unpaired test counts as noise.
+            Pairing takes it out of the test, so it goes on "collapses" (and
+            no longer runs through "their own control"). */}
+        <VBracket x={COL[0] - 92} y0={vy(Math.max(...PAIRED.before))} y1={vy(Math.min(...PAIRED.before))} at={differencesAt - 2} out={collapsesAt - 6} color={INK} />
+        <VBracket x={COL[1] + 92} y0={vy(Math.max(...PAIRED.after))} y1={vy(Math.min(...PAIRED.after))} at={differencesAt + 4} out={collapsesAt - 6} color={INK} right />
+        <Note at={drownAt - 2} x={COL[1] + 112} y={vy(150) - 30} out={collapsesAt - 6}>
           <Label size={21} color={INK_SOFT} weight={520} style={{ whiteSpace: "normal", display: "inline-block", width: 200 }}>
             the spread between people
           </Label>
@@ -164,8 +170,8 @@ export const PairsScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* ── Fig. 16: the changes alone ── */}
-        <FigLabel n="17" title="Each patient's own change, before minus after" at={ownAt + 4} x={D.x0} y={y(400)} />
+        {/* ── Fig. 18: the changes alone ── */}
+        <FigLabel n="18" title="Each patient's own change, before minus after" at={ownAt + 4} x={D.x0} y={y(400)} />
         <Axis scale={D} base={y(D_AXIS)} ticks={[0, 5, 10, 15, 20]} at={ownAt + 6} />
         <Note at={ownAt + 10} x={D.x1} y={y(D_AXIS) + 40} align="right">
           <Label size={21} color={INK_SOFT} weight={520}>

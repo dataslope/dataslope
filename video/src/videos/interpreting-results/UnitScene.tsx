@@ -2,13 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { DISTRICTS, signed } from "./data";
-import { Count, DATA, DATA_INK, Drift, Headline, lerp, Marker, partial, Ring, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, Drift, Headline, lerp, Marker, partial, Ring, STAT_INK, Svg } from "./parts";
 
 const XD = [10, 86] as const;
 const YD = [24, 94] as const;
@@ -54,6 +54,8 @@ export const UnitScene: React.FC = () => {
   const personAt = n.word("people", "person by person");
   const sevenAt = n.word("people", "zero point zero seven");
   const averagesAt = n.word("people", "averages");
+  const olderAt = n.word("older", "older district");
+  const richerAt = n.word("older", "richer people");
   const bothAt = n.word("both-true", "Both");
   const districtsAt = n.word("both-true", "districts");
   const peopleAt = n.word("both-true", "people");
@@ -86,7 +88,7 @@ export const UnitScene: React.FC = () => {
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>{xTitle}</span>
       </Note>
       {[40, 60, 80].map((v) => (
-        <div key={v} style={{ position: "absolute", right: 1920 - p.x0 + 10, top: py(v) - 13, opacity: ease(frame, at + 4, 12), ...note(20, INK_SOFT) }}>
+        <div key={v} style={{ position: "absolute", right: 1920 - p.x0 + 10, top: py(v) - 13, opacity: ease(frame, at + 4, 12), ...note(20, INK_SOFT), ...TABULAR }}>
           {v}%
         </div>
       ))}
@@ -108,7 +110,7 @@ export const UnitScene: React.FC = () => {
         out={nameAt - 8}
         parts={[
           { text: "Districts correlate.", at: nineAt - 6 },
-          { text: "People barely do.", at: sevenAt - 6, italic: true },
+          { text: "Inside one, people barely do.", at: sevenAt - 6, italic: true },
         ]}
       />
       <Headline
@@ -137,7 +139,8 @@ export const UnitScene: React.FC = () => {
           <>
             <Marker at={peopleAt - 2}>People</Marker>, within a district
             <span style={{ opacity: ease(frame, sevenAt - 6, 8) }}>
-              : r = <Count from={0} to={DISTRICTS.rWithin} at={sevenAt - 6} dur={16} format={(v) => signed(v)} />
+              : r = <span style={TABULAR}>{signed(DISTRICTS.rWithin)}</span>
+              <span style={{ ...note(21, INK_SOFT), marginLeft: 10, opacity: ease(frame, averagesAt - 4, 10) }}>averaged over the six</span>
             </span>
           </>,
           STAT_INK,
@@ -193,6 +196,9 @@ export const UnitScene: React.FC = () => {
           })}
         </Svg>
         <Ring x={IND.x0 + 250} y={(top + bottom) / 2} at={averagesAt - 2} r0={40} r1={200} />
+        {/* The richest district: high on both averages, flat inside. */}
+        <Ring x={means[5][0]} y={means[5][1]} at={olderAt - 2} color={HUES[5]} r0={22} r1={80} />
+        <Ring x={px(IND, FITS[5].mx)} y={py(FITS[5].my)} at={richerAt - 2} color={HUES[5]} r0={30} r1={110} />
         {means.map(([mx, my], k) => (
           <Ring key={k} x={mx} y={my} at={dotAt(k) + 2} color={HUES[k]} r0={20} r1={64} />
         ))}
@@ -210,10 +216,6 @@ export const UnitScene: React.FC = () => {
         )}
         <Ring x={AGG.x0 + 230} y={top - 30} at={quoteAt - 2} color={DATA} r0={20} r1={90} />
         <Ring x={IND.x0 + 330} y={top - 30} at={quoteAt + 4} r0={20} r1={90} />
-        <Note at={sevenAt + 4} x={IND.x1 + 24} y={top + 30}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>on average,</span>
-          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>across the six</div>
-        </Note>
         <Note at={bothAt - 2} x={IND.x1 + 24} y={bottom - 80}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>same data,</span>
           <div style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>different unit</div>

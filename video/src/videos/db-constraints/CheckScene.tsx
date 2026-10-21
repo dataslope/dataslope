@@ -3,7 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { body, INK } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DATES, STATUS } from "./data";
@@ -11,6 +11,7 @@ import {
   CARD_Y,
   DbTable,
   ErrorBox,
+  FIG_Y,
   Head,
   HEAD_H,
   Kicker,
@@ -95,6 +96,7 @@ export const CheckScene: React.FC = () => {
       <Sfx name="el-tap" at={soAt - 2} level={-28} />
       <Sfx name="el-scratch" at={nopeAt + 2} level={-30} />
       <Sfx name="el-whoosh" at={outA} level={-34} />
+      <Sfx name="el-pencil" at={columnsAt + 12} level={-34} />
       <Sfx name="el-scratch" at={neverAt + 2} level={-30} />
 
       <Kicker at={open - 10}>Rules about values</Kicker>
@@ -105,6 +107,7 @@ export const CheckScene: React.FC = () => {
       <Head lead="It can compare columns, too." at={compareAt - 6} />
 
       {/* ── products: a price range and a list of statuses ── */}
+      <FigLabel n="11" title="Checks on a price and a status" at={checkAt - 4} x={X0} y={y(FIG_Y)} out={outA} />
       <Entity layout={card} at={checkAt - 2} out={outA} />
       <RuleTags layout={card} row="price" chips={[{ code: "CHECK (price >= 0)", at: priceAt - 2, pulses: [oneAt] }]} out={outA} />
       <RuleTags
@@ -148,12 +151,15 @@ export const CheckScene: React.FC = () => {
       />
 
       {/* ── events: two columns, one test ── */}
-      <Entity layout={events} at={compareAt - 2} />
+      {/* The two date rows arrive on "columns", and the rule over them once
+          both are drawn, so the bracket never spans empty paper. */}
+      <FigLabel n="12" title="A check that compares two dates" at={compareAt - 2} x={X0} y={y(FIG_Y)} />
+      <Entity layout={events} at={compareAt - 2} rowAt={{ start_date: columnsAt - 2, end_date: columnsAt + 3 }} />
       <RuleTags
         layout={events}
         row="start_date"
         span="end_date"
-        chips={[{ code: "CHECK (end_date > start_date)", at: columnsAt - 2, pulses: [neverAt + 4] }]}
+        chips={[{ code: "CHECK (end_date > start_date)", at: columnsAt + 12, pulses: [endAt, neverAt + 4] }]}
       />
       <DbTable
         g={gd}

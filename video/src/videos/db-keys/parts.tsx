@@ -384,7 +384,10 @@ export const ErrorBox: React.FC<{
   out?: number;
   /** Highlight a phrase of the DETAIL line from a frame on. */
   mark?: { text: string; at: number };
-}> = ({ x, top, width, at, message, detail, detailAt, size = 21, dim, out, mark }) => {
+  /** Set the message line back, so the DETAIL carries the point (a message
+   *  that names a term the video has not taught yet). */
+  quiet?: boolean;
+}> = ({ x, top, width, at, message, detail, detailAt, size = 21, dim, out, mark, quiet = false }) => {
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   const detailIn = detailAt === undefined ? 1 : ease(frame, detailAt, 12);
@@ -410,7 +413,7 @@ export const ErrorBox: React.FC<{
         <div>
           <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
           {"  "}
-          {message}
+          <span style={{ opacity: quiet ? 0.32 : 1 }}>{message}</span>
         </div>
         {detail ? (
           <div style={{ color: INK_SOFT, opacity: detailIn }}>
@@ -434,20 +437,30 @@ export const ErrorBox: React.FC<{
   );
 };
 
-/** The command tag Postgres answers a statement with: "INSERT 0 1". */
-export const Reply: React.FC<{ x: number; top: number; at: number; tag: string; size?: number; out?: number; dim?: number }> = ({
-  x,
-  top,
-  at,
-  tag,
-  size = 22,
-  out,
-  dim,
-}) => {
+/**
+ * The command tag Postgres answers a statement with: "INSERT 0 1". A `gloss`
+ * beside it says what the count means, inking in on `glossAt`.
+ */
+export const Reply: React.FC<{
+  x: number;
+  top: number;
+  at: number;
+  tag: string;
+  size?: number;
+  out?: number;
+  dim?: number;
+  gloss?: React.ReactNode;
+  glossAt?: number;
+}> = ({ x, top, at, tag, size = 22, out, dim, gloss, glossAt }) => {
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   return (
-    <Ink at={at} dur={14} out={out} style={{ left: x, top, whiteSpace: "nowrap", opacity: 1 - d }}>
+    <Ink
+      at={at}
+      dur={14}
+      out={out}
+      style={{ left: x, top, whiteSpace: "nowrap", opacity: 1 - d, display: "flex", alignItems: "center", gap: 16 }}
+    >
       <div
         style={{
           borderLeft: `4px solid ${OK}`,
@@ -461,6 +474,9 @@ export const Reply: React.FC<{ x: number; top: number; at: number; tag: string; 
       >
         {tag}
       </div>
+      {gloss ? (
+        <span style={{ ...note(20, INK_SOFT), opacity: ease(frame, glossAt ?? at + 8, 10) }}>{gloss}</span>
+      ) : null}
     </Ink>
   );
 };
@@ -469,6 +485,8 @@ export const Reply: React.FC<{ x: number; top: number; at: number; tag: string; 
 
 /** JetBrains Mono's advance, in em: every glyph is this wide. */
 const ADVANCE = 0.6;
+/** A header tag ("PK", "UNIQUE"): the 19px floor, the smallest type on screen. */
+const TAG_SIZE = 19;
 
 export type Col = {
   name: string;
@@ -509,7 +527,7 @@ export const tableGeometry = ({ x, top, cols, rows, extra = [], headH, rowH, hea
   const widths = cols.map((c, i) =>
     Math.ceil(
       Math.max(
-        c.name.length * ADVANCE * headSize + (c.tag ? c.tag.text.length * 11 + 34 : 0),
+        c.name.length * ADVANCE * headSize + (c.tag ? c.tag.text.length * TAG_SIZE * 0.66 + 36 : 0),
         ...all.map((r) => (r[i] ?? "").length * ADVANCE * bodySize),
       ) +
         2 * pad,
@@ -687,7 +705,7 @@ export const DataTable: React.FC<{
             {c.name}
             {c.tag ? (
               <span style={{ opacity: ease(frame, c.tag.at, 10), transform: `scale(${0.8 + 0.2 * ease(frame, c.tag.at, 10)})` }}>
-                <Tag color={c.tag.color ?? KEY_INK} size={17}>
+                <Tag color={c.tag.color ?? KEY_INK} size={TAG_SIZE}>
                   {c.tag.text}
                 </Tag>
               </span>
@@ -747,9 +765,9 @@ export const DataTable: React.FC<{
                 style={{
                   position: "absolute",
                   left: g.x + 2,
-                  top: top + 5,
+                  top: top + 7,
                   width: width - 4,
-                  height: Math.max(0, hgt - 10),
+                  height: Math.max(0, hgt - 16),
                   boxSizing: "border-box",
                   border: `2px dashed ${ACCENT}`,
                   opacity: (r.ghost ? shownAt : outline) * (1 - dimmed) * (1 - collapse),

@@ -16,6 +16,7 @@ import {
   label,
   note,
   PAPER,
+  TABULAR,
 } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -23,6 +24,7 @@ import { Sfx } from "../../sound/Sfx";
 import { SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, LAW, seAt, VIDEO } from "./data";
 import { Rule } from "./parts";
+import { useFigNumber } from "../sampling/merged";
 
 const X: XScale = { lo: 0, hi: 1600, x0: 200, x1: 1100 };
 const TICKS = [0, 400, 800, 1200, 1600];
@@ -57,6 +59,7 @@ export const CostScene: React.FC = () => {
   const { fps } = useVideoConfig();
   const n = useNarration();
   const { y } = useLayout();
+  const fig = useFigNumber();
 
   // ── Cues ──
   const costFrom = n.beat("cost").from;
@@ -79,11 +82,12 @@ export const CostScene: React.FC = () => {
     { n: 1600, at: sixteenAt, labelAt: sixteenAt + 6, align: "right" as const },
   ];
 
+  // At least 45px between one group's caption and the next.
   const groups = [
-    { side: 1, at: hundredAt, x: 1200 },
-    { side: 2, at: fourAt, x: 1300 },
-    { side: 4, at: sixteenAt, x: 1418 },
-    { side: 10, at: tenthAt, x: 1576 },
+    { side: 1, at: hundredAt, x: 1160 },
+    { side: 2, at: fourAt, x: 1290 },
+    { side: 4, at: sixteenAt, x: 1420 },
+    { side: 10, at: tenthAt, x: 1560 },
   ];
 
   return (
@@ -119,7 +123,7 @@ export const CostScene: React.FC = () => {
       ) : null}
 
       {/* ── Fig. 5: the curve ── */}
-      <FigLabel n="5" title={`Standard error by sample size, when the data spreads by ${LAW.sigma}`} at={curveFrom - 8} x={160} y={y(276)} />
+      <FigLabel n={fig(5)} title={`Standard error by sample size, when the data spreads by ${LAW.sigma}`} at={curveFrom - 8} x={160} y={y(276)} />
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: ease(frame, curveFrom - 8, 14) }}>
         {GRID.map((g) => (
           <g key={g}>
@@ -190,7 +194,7 @@ export const CostScene: React.FC = () => {
       </Note>
 
       {/* ── The squares ── */}
-      <Ink at={hundredAt - 4} dur={14} style={{ left: 1200, top: y(484) }}>
+      <Ink at={hundredAt - 4} dur={14} style={{ left: groups[0].x, top: y(484) }}>
         <span style={label(20, INK_SOFT)}>Each square is {PEOPLE} people</span>
       </Ink>
       {groups.map((g) => (
@@ -202,7 +206,7 @@ export const CostScene: React.FC = () => {
         const at = g.side === 10 ? timesAt : g.at + 4;
         return (
           <Note key={g.side} at={at} x={g.x} y={y(SQ_BASE) + 14}>
-            <div style={{ ...headline(30), fontVariantNumeric: "tabular-nums lining-nums" }}>{thousands(people)}</div>
+            <div style={{ ...headline(30), ...TABULAR }}>{thousands(people)}</div>
             <div style={{ ...note(20, ACCENT_INK), fontWeight: 600, marginTop: 2 }}>error {fmt(se, 1)}</div>
           </Note>
         );

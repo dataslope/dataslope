@@ -30,7 +30,10 @@ export const HookScene: React.FC = () => {
 
   const yearAt = n.word("hook", "1943");
   const waldAt = n.word("hook", "Abraham Wald");
-  const wartimeAt = n.word("hook", "wartime");
+  const whichAt = n.word("hook", "Which parts");
+  // The bomber comes in with the year, so the page has its picture while the
+  // question is set up; the headline inks as the question is asked.
+  const planeAt = yearAt;
   const bomberAt = n.word("hook", "bomber");
   const vulnerableAt = n.word("hook", "vulnerable");
   const evidenceAt = n.word("evidence", "evidence");
@@ -43,7 +46,7 @@ export const HookScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound (merged video only; the standalone has sfx off) ── */}
-      <Sfx name="el-pop" at={wartimeAt - 4} level={-30} />
+      <Sfx name="el-pop" at={planeAt - 4} level={-30} />
       <Sfx name="el-pencil" at={vulnerableAt} level={-33} />
       <Sfx name="el-sprinkle" at={evidenceAt} level={-34} />
       <Sfx name="el-whoosh" at={homeAt} level={-34} />
@@ -59,7 +62,7 @@ export const HookScene: React.FC = () => {
           </span>
         </span>
       </Ink>
-      <Ink at={yearAt} dur={20} style={{ left: 92, top: y(156), ...headline(84), whiteSpace: "nowrap" }}>
+      <Ink at={whichAt - 4} dur={20} style={{ left: 92, top: y(156), ...headline(84), whiteSpace: "nowrap" }}>
         Which parts of a bomber
       </Ink>
       <Ink at={bomberAt} dur={20} style={{ left: 92, top: y(246), ...headline(84), whiteSpace: "nowrap" }}>
@@ -97,8 +100,8 @@ export const HookScene: React.FC = () => {
             top: y(118),
             width: 660,
             height: 350,
-            opacity: pop(frame, wartimeAt - 4, fps, 16),
-            transform: `translate(${(1 - pop(frame, wartimeAt - 4, fps, 16)) * 60}px, ${bob(frame, 6, 120)}px)`,
+            opacity: pop(frame, planeAt - 4, fps, 16),
+            transform: `translate(${(1 - pop(frame, planeAt - 4, fps, 16)) * 60}px, ${bob(frame, 6, 120)}px)`,
           }}
         />
       ) : null}

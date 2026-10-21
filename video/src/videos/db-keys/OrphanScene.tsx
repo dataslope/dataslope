@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK_SOFT, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -13,6 +13,7 @@ import {
   DataTable,
   Drift,
   ErrorBox,
+  FIG_Y,
   Headline,
   KEY_INK,
   KeyArrow,
@@ -26,7 +27,8 @@ import {
   X0,
 } from "./parts";
 
-const SQL_Y = 330;
+/** The statements open Fig. 10, under its label at FIG_Y. */
+const SQL_Y = 340;
 const SIZE = 24;
 const TABLE_Y = 560;
 const CUSTOMERS_X = 1180;
@@ -97,6 +99,9 @@ export const OrphanScene: React.FC = () => {
 
       <Drift from={from} to={end + 50}>
         <Headline lead="No parent," turn="no child." at={from - 6} turnAt={rejectedAt - 4} />
+
+        {/* The two statements, the tables they write to, and the refusal: one figure. */}
+        <FigLabel n="10" title="Two orders, checked against customers" at={from - 4} x={X0} y={y(FIG_Y)} />
 
         <Listing
           lines={lines}

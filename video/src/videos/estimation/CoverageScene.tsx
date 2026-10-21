@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, normalPdf, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, halo, headline, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, halo, headline, HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -14,7 +14,7 @@ import { DATA, EST, EST_INK, Headline, lerp, pulse, Spot, Svg } from "./parts";
 const XP: XScale = { lo: 55, hi: 145, x0: 160, x1: 1240 };
 const POP_BASE = 410;
 const POP_H = 110;
-const STRIP = 456;
+const STRIP = 464;
 /** The hundred intervals, on an axis zoomed about the same 100. */
 const XI: XScale = { lo: 86, hi: 114, x0: 160, x1: 1240 };
 const ROW0 = 562;
@@ -22,7 +22,7 @@ const PITCH = 2.72;
 const AXIS = 846;
 const COL = 1340;
 /** The one the narration calls yours: a hit near the middle of the stack. */
-const YOURS = 37;
+const YOURS = 36;
 
 const JIT = jitter(70, COVERAGE.n);
 
@@ -119,7 +119,8 @@ export const CoverageScene: React.FC = () => {
       </Headline>
 
       {/* ── Fig. 3: the population ── */}
-      <FigLabel n="3" title={`A population whose true mean is ${COVERAGE.mu}`} at={populationAt - 8} x={160} y={y(250)} />
+      <FigLabel n="3" title={`A population whose true mean is ${COVERAGE.mu}`} at={populationAt - 8} out={seeAt - 6} x={160} y={y(250)} />
+      <FigLabel n="3" title="A population whose true mean you can’t see" at={seeAt + 2} x={160} y={y(250)} />
       <Svg opacity={popOut}>
         {popGrown > 0 ? (
           <>
@@ -127,7 +128,6 @@ export const CoverageScene: React.FC = () => {
             <path d={popPath} fill="none" stroke={DATA} strokeWidth={2.6} opacity={Math.min(1, popGrown * 4)} />
           </>
         ) : null}
-        <line x1={XP.x0} x2={XP.x1} y1={y(POP_BASE)} y2={y(POP_BASE)} stroke={INK} strokeWidth={1.4} opacity={ease(frame, populationAt - 6, 12)} />
         {/* The first sample: forty values, gathered into one interval. */}
         {COVERAGE.first.map((v, j) => {
           const a = ease(frame, drawAt - 2 + j * 0.3, 6);
@@ -147,9 +147,19 @@ export const CoverageScene: React.FC = () => {
         })}
       </Svg>
 
+      {/* Fig. 3's own scale, so the zoom in Fig. 4 below is a visible change of
+          scale, not the same axis. No label at 100: the truth line stands there,
+          and the axis leaves with the population once the truth is hidden. */}
+      <Axis scale={XP} base={y(POP_BASE)} ticks={[55, 70, 85, 115, 130, 145]} at={populationAt - 6} opacity={1 - ease(frame, seeAt - 8, 10)} />
+
       {/* ── Fig. 4: a hundred intervals ── */}
       <FigLabel n="4" title={`A 95% interval from each sample of ${COVERAGE.n}`} at={buildAt - 6} x={160} y={y(500)} />
-      <Axis scale={XI} base={y(AXIS)} ticks={[86, 93, 100, 107, 114]} at={buildAt - 4} />
+      <Note at={buildAt} x={XI.x1} y={y(500) + 2} align="right" from="right">
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          zoomed in: {XI.lo} to {XI.hi}
+        </span>
+      </Note>
+      <Axis scale={XI} base={y(AXIS)} ticks={[86, 93, 100, 107, 114]} at={buildAt - 4} opacity={1 - 0.75 * hidden} />
       <Svg>
         {COVERAGE.intervals.map((iv, i) => {
           const at = rowAt(i);
@@ -225,18 +235,18 @@ export const CoverageScene: React.FC = () => {
       {/* ── Right column: the tally ── */}
       <div style={{ position: "absolute", left: COL, top: y(250), opacity: ease(frame, buildAt - 4, 12) }}>
         <div style={label(21, INK_SOFT)}>Intervals drawn</div>
-        <div style={{ ...headline(88), fontVariantNumeric: "tabular-nums lining-nums", marginTop: 4 }}>{drawn}</div>
+        <div style={{ ...headline(88), ...TABULAR, marginTop: 4 }}>{drawn}</div>
       </div>
       <Ink at={ninetyFourAt - 4} dur={14} style={{ left: COL, top: y(400), width: 420 }}>
         <div style={{ height: 1, background: HAIRLINE, marginBottom: 14 }} />
         <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-          <span style={{ ...headline(60), fontVariantNumeric: "tabular-nums lining-nums" }}>{COVERAGE.hits}</span>
+          <span style={{ ...headline(60), ...TABULAR }}>{COVERAGE.hits}</span>
           <span style={{ ...body(28, true), color: INK, opacity: ease(frame, catchAt - 2, 10) }}>catch the true mean</span>
         </div>
       </Ink>
       <Ink at={sixAt - 4} dur={14} style={{ left: COL, top: y(500), width: 420 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-          <span style={{ ...headline(60), color: EST_INK, fontVariantNumeric: "tabular-nums lining-nums" }}>{COVERAGE.misses}</span>
+          <span style={{ ...headline(60), color: EST_INK, ...TABULAR }}>{COVERAGE.misses}</span>
           <span style={{ ...body(28, true), color: EST_INK }}>miss it</span>
         </div>
       </Ink>

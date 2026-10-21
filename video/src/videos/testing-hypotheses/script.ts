@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -87,6 +88,7 @@ export const script: NarrationScript = {
   voice: "hope",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.0,
   // A touch over the default 1.6, so each finished figure holds a moment longer.
   sceneGap: 1.7,
@@ -156,12 +158,13 @@ export const script: NarrationScript = {
     {
       id: "tstat",
       text: "The test statistic measures the gap in units of noise. Here, t is minus two point two four.",
-      pauseAfter: 0.35,
+      // A breath before the p-value, the hardest idea of the scene.
+      pauseAfter: 0.8,
     },
     {
       id: "pval",
       text: "If the claim were true, a gap at least this big would turn up three percent of the time. That's the p-value.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.9,
     },
     {
       id: "reject",
@@ -219,7 +222,7 @@ export const script: NarrationScript = {
     {
       id: "swap",
       text: "The chance of the data, given the null, isn't the chance of the null, given the data. Swap them, and you've made the prosecutor's fallacy.",
-      pauseAfter: 0.4,
+      pauseAfter: 1.0,
     },
     { id: "size", text: "Nor is it the size of an effect. Hold a tiny effect fixed, and only grow the sample.", pauseAfter: 0.3 },
     {
@@ -257,7 +260,8 @@ export const script: NarrationScript = {
     {
       id: "peek",
       text: "Peeking at a running experiment, and stopping when p dips under point zero five, does the same thing, one look at a time.",
-      pauseAfter: 0.35,
+      // Holds the finished peeking figure and its count before the cure replaces it.
+      pauseAfter: 1.2,
     },
     {
       id: "cure",
@@ -280,10 +284,12 @@ export const script: NarrationScript = {
     {
       id: "typeone",
       text: "Reject a null that's true, and that's a false alarm, a Type One error. Its rate is alpha.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
-    { id: "typetwo", text: "Miss an effect that's real, and that's a Type Two error, with rate beta.", pauseAfter: 0.35 },
+    { id: "typetwo", text: "Miss an effect that's real, and that's a Type Two error, with rate beta.", pauseAfter: 0.7 },
     { id: "power", text: "The cell beside it is power: the chance of catching an effect that's really there." },
+    // Added after the take, voiced on its own: the cell prints 1 − β.
+    { id: "minus-beta", text: "So power is one minus beta." },
     {
       id: "sim",
       scene: true,
@@ -379,8 +385,10 @@ export const script: NarrationScript = {
     {
       id: "ftest",
       text: "Its F statistic is the spread between the group means, over the spread within the groups.",
-      pauseAfter: 0.35,
+      pauseAfter: 0.7,
     },
+    // Added after the take, voiced on its own: the baseline that makes twelve mean something.
+    { id: "fone", text: "With no real difference, F hovers near one." },
     {
       id: "warehouses",
       text: "Three warehouses' delivery times give an F of twelve. At least one of them differs... but ANOVA won't say which.",
@@ -400,6 +408,7 @@ export const script: NarrationScript = {
     {
       id: "related",
       text: "Chi-square adds up how far every cell strays from what was expected. Here it's about twelve, with a p of point zero zero three.",
+      pauseAfter: 0.9,
     },
     { id: "corr-in", text: "And when both columns are numbers, you ask whether they move together." },
 
@@ -408,7 +417,7 @@ export const script: NarrationScript = {
       id: "corr",
       scene: true,
       text: "A correlation runs from minus one to one. Pearson's r measures how close the points sit to a straight line.",
-      pauseAfter: 0.3,
+      pauseAfter: 0.7,
     },
     {
       id: "curve",
@@ -435,7 +444,7 @@ export const script: NarrationScript = {
       text: "Mann-Whitney ranks the values instead, and finds the shift. p is point zero three three.",
       pauseAfter: 0.35,
     },
-    { id: "line", text: "A rank doesn't care how far out an outlier is, only where it stands in line.", pauseAfter: 0.7 },
+    { id: "line", text: "A rank doesn't care how far out an outlier is, only where it stands in line.", pauseAfter: 1.4 },
     {
       id: "next",
       text: "Every test here answers one narrow question: could the effect be zero? Not how big it is... or whether it means what it seems to.",

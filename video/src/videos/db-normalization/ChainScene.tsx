@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
@@ -13,7 +14,9 @@ import {
   FIG_Y,
   HEAD_H,
   Headline,
+  KEY,
   Listing,
+  MARK,
   MARK_BAD,
   MARK_KEY,
   Mono,
@@ -21,13 +24,15 @@ import {
   tableGeometry,
   X0,
 } from "./kit";
-import { DepArrow, Drift, Fade, pulse, Reply } from "./parts";
+import { DepArrow, Drift, Fade, Notation, pulse, Reply, Svg } from "./parts";
 
 const TABLE_Y = 430;
 const RIGHT = 980;
 const LIST_SIZE = 22;
 const TWO_Y = 626;
 const ERD_Y = 400;
+/** Fig. 9's join, in the right half: every order, and the city it now shows. */
+const JOIN_X = 1250;
 
 /**
  * Third normal form: orders_bad carries each customer's city, which depends
@@ -48,7 +53,6 @@ export const ChainScene: React.FC = () => {
   const customerAt = n.word("chain", "customer");
   const givesAt = n.word("detour", "gives", { nth: 1 });
   const cityToo = n.word("detour", "city");
-  const detourAt = n.word("detour", "detour");
   const transitiveAt = n.word("detour", "transitive");
   const sameAt = n.word("moves", "Same disease");
   const adaAt = n.word("moves", "Ada moves");
@@ -77,7 +81,16 @@ export const ChainScene: React.FC = () => {
   const ada = CITY_BAD.rows.map((r, i) => (r[K.name] === "Ada" ? i : -1)).filter((i) => i >= 0);
   const tg = tableGeometry({ x: RIGHT, top: y(TWO_Y), cols: CITY_TWO.cols, rows: CITY_TWO.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const twoAda = CITY_TWO.rows.map((r, i) => (r[1] === "Ada" ? i : -1)).filter((i) => i >= 0);
-  const oxfordOrders = CITY_JOIN.rows.filter((r) => r[2] === NEW_CITY).length;
+  // The key, bracketed as Fig. 6 brackets its pair.
+  const bracketL = g.xs[K.order] + 8;
+  const bracketR = g.xs[K.order] + g.widths[K.order] - 8;
+  const bracketY = g.top - 14;
+  const bracketIn = ease(frame, orderIdAt - 2, 14);
+  // Fig. 9's payoff: the join, showing every order with the city it now has.
+  const JOIN_COLS = 3;
+  const joined = CITY_JOIN.rows.map((r) => r.slice(0, JOIN_COLS));
+  const jg = tableGeometry({ x: JOIN_X, top: y(ERD_Y), cols: CITY_JOIN.cols.slice(0, JOIN_COLS), rows: joined, headH: h(HEAD_H), rowH: h(ROW_H) });
+  const oxford = joined.map((r, i) => (r[2] === NEW_CITY ? i : -1)).filter((i) => i >= 0);
   const orderSwell = Math.max(pulse(frame, orderIdAt, 24), pulse(frame, orderAt, 24));
   const sameSwell = pulse(frame, sameAt, 24);
 
@@ -116,7 +129,7 @@ export const ChainScene: React.FC = () => {
       <Sfx name="el-whoosh" at={giveAt - 4} level={-34} />
       <Sfx name="el-tap" at={onceAt - 2} level={-28} />
 
-      <Headline kicker="Third normal form" lead="A dependency" turn="with a detour." at={from - 6} turnAt={detourAt - 4} underlineAt={transitiveAt} />
+      <Headline kicker="Third normal form" lead="A dependency" turn="with a detour." at={from - 6} turnAt={givesAt - 4} underlineAt={transitiveAt} />
 
       <Drift from={from} to={end + 40} amount={0.012} origin="35% 55%">
         <Fade out={giveAt - 4} slide={40}>
@@ -158,27 +171,56 @@ export const ChainScene: React.FC = () => {
               }}
             />
           ))}
-          <Ink at={orderIdAt - 2} dur={12} style={{ left: g.x + 4, top: g.top - 46, whiteSpace: "nowrap" }}>
+          <Svg opacity={bracketIn}>
+            <path
+              d={`M${bracketL},${bracketY + 10} L${bracketL},${bracketY} L${bracketR},${bracketY} L${bracketR},${bracketY + 10}`}
+              fill="none"
+              stroke={KEY}
+              strokeWidth={2.6}
+              strokeLinejoin="round"
+              pathLength={1}
+              strokeDasharray={`${bracketIn} 1`}
+            />
+          </Svg>
+          <Ink at={orderIdAt - 2} dur={12} style={{ left: g.x + 4, top: g.top - 104, whiteSpace: "nowrap" }}>
             <span style={label(21, BLUE_INK)}>the key</span>
           </Ink>
-          <Note at={customerAt + 6} x={g.x} y={bottom + 92}>
+          {/* What the narration says about the city, in the right column
+              until the update's listing takes its place. */}
+          <Note at={customerAt + 6} out={adaAt - 10} x={RIGHT} y={g.top}>
             <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
               <Mono>customer_city</Mono> is a fact about the customer
             </span>
           </Note>
 
-          {/* order_id gives customer_id, which gives the city. */}
-          <DepArrow from={[center(K.order), bottom + 8]} to={[center(K.customer), bottom + 6]} level={bottom + 56} at={givesAt - 2} />
+          {/* order_id gives customer_id, which gives the city: one path, both
+              legs over the titles. */}
+          <DepArrow from={[center(K.order), bracketY]} to={[center(K.customer) - 14, g.top - 6]} level={g.top - 44} at={givesAt - 2} color={BLUE_INK} />
           <DepArrow from={[center(K.customer) + 14, g.top - 6]} to={[center(K.city), g.top - 6]} level={g.top - 82} at={cityToo - 4} color={ACCENT} />
+          {/* The name hangs off customer_id too (the lesson draws both); it is
+              not the path being followed, so it goes underneath, quietly. */}
           <DepArrow
-            from={[center(K.customer) - 14, g.top - 6]}
-            to={[center(K.name), g.top - 6]}
-            level={g.top - 44}
-            at={cityToo + 4}
+            from={[center(K.customer), bottom + 8]}
+            to={[center(K.name), bottom + 6]}
+            level={bottom + 50}
+            at={cityToo + 8}
             color={INK_SOFT}
             width={2}
           />
-          <Ink at={transitiveAt - 2} dur={14} style={{ left: center(K.name) + 40, top: g.top - 124, whiteSpace: "nowrap" }}>
+          {/* The same path written out, and named. */}
+          <Notation
+            x={RIGHT}
+            y={g.top - 150}
+            parts={[
+              // "The key is the order ID": the path starts from the key.
+              { text: CITY_BAD.cols[K.order], at: orderIdAt + 4 },
+              { arrow: BLUE_INK, at: givesAt + 4 },
+              { text: CITY_BAD.cols[K.customer], at: givesAt + 10 },
+              { arrow: ACCENT, at: cityToo - 2 },
+              { text: CITY_BAD.cols[K.city], at: cityToo + 4 },
+            ]}
+          />
+          <Ink at={transitiveAt - 2} dur={14} style={{ left: RIGHT, top: g.top - 98, whiteSpace: "nowrap" }}>
             <span style={{ ...label(22, ACCENT_INK) }}>a transitive dependency</span>
           </Ink>
 
@@ -236,11 +278,24 @@ export const ChainScene: React.FC = () => {
           <Reply at={onceAt - 2} x={X0 + 470} y={customers.bottom + 48}>
             {CITY_GOOD.tag}
           </Reply>
-          <Note at={onceAt + 6} x={X0 + 470} y={customers.bottom + 106}>
+          <Note at={onceAt + 18} x={X0 + 470} y={customers.bottom + 106}>
             <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-              and all {oxfordOrders} of her orders show {NEW_CITY}
+              and {oxford.length === 2 ? "both" : `all ${oxford.length}`} of her orders now show {NEW_CITY}
             </span>
           </Note>
+
+          {/* The orders, joined to their customer: Ada's two say Oxford. */}
+          <Ink at={onceAt + 2} dur={12} style={{ left: jg.x, top: jg.top - 44, whiteSpace: "nowrap" }}>
+            <span style={label(22, INK_SOFT)}>orders joined to customers</span>
+          </Ink>
+          <DbTable
+            g={jg}
+            cols={CITY_JOIN.cols.slice(0, JOIN_COLS)}
+            rows={joined.map((cells, i) => ({ cells, at: onceAt + 6 + i * 4 }))}
+            at={onceAt + 2}
+            numeric={[0]}
+            marks={oxford.map((row, k) => ({ row, col: 2, at: onceAt + 18 + k * 5, color: MARK }))}
+          />
         </Fade>
       </Drift>
     </AbsoluteFill>

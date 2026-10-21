@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { ADA, CUSTOMERS, ORDERS_OF } from "./data";
-import { Cross, Headline, lerp, Mark, pulse, RecordNode, Spot, Strike, Svg, Wire } from "./parts";
+import { Cross, Headline, lerp, Mark, pulse, RecordNode, Spot, Strike, Svg, Tag, Wire } from "./parts";
 
 const NODE_H = 62;
 const NODE_TEXT = 26;
@@ -46,7 +46,6 @@ export const BeforeScene: React.FC = () => {
   // ── Cues ──
   const treesFrom = n.beat("trees").from;
   const treesAt = n.word("trees", "trees");
-  const imsAt = n.word("trees", "IMS");
   const saturnAt = n.word("trees", "Saturn Five");
   const filedAt = n.word("trees", "filed");
   const parentAt = n.word("trees", "parent");
@@ -162,7 +161,11 @@ export const BeforeScene: React.FC = () => {
   const steps = STEPS(first.name, firstOrders[0], firstOrders[1]);
   const stepAt = [topAt - 4, followsAt, pointersAt, downAt];
 
-  // Network databases: more pointers, between customers and along orders.
+  // Network databases: more pointers. Each customer points on to the next,
+  // and each order to the next order number (101, 102, 103; 125, 126, 127:
+  // the lesson's orders in between belong to customers the tree leaves out).
+  // They stay at full strength until the file is reorganized.
+  const webDim = reorgAt - 6;
   const webLinks: { points: Pt[]; at: number }[] = [
     { points: [[SLOT_X[0] + PARENT_W / 2, PARENT_Y], [SLOT_X[1] - PARENT_W / 2, PARENT_Y]], at: webAt - 6 },
     { points: [[SLOT_X[1] + PARENT_W / 2, PARENT_Y], [SLOT_X[2] - PARENT_W / 2, PARENT_Y]], at: webAt - 2 },
@@ -201,11 +204,12 @@ export const BeforeScene: React.FC = () => {
       <Headline at={knowAt - 2} lead="The program had to know" turn="the route." turnAt={routeAt - 4} out={reorgAt - 6} />
       <Headline at={reorgAt} lead="Reorganize the file," turn="and it breaks." turnAt={breaksAt - 4} />
 
-      <FigLabel n="1" title="Every record filed under its parent, as IMS stored them" at={treesAt - 2} x={600} y={y(290)} />
+      <FigLabel n="1" title="Every record filed under its parent, as IMS stored them" at={treesAt - 2} x={96} y={y(290)} out={networkAt - 6} />
+      <FigLabel n="1" title="The same records, with a network database's extra pointers" at={networkAt - 2} x={96} y={y(290)} />
 
       {/* ── The rocket IMS was built for, then the program that walks the tree ── */}
-      <Spot id="db-relational-history-rocket" at={saturnAt - 6} out={startsAt - 4} left={170} top={y(320)} width={180} height={430} />
-      <Ink at={imsAt - 2} dur={14} out={startsAt - 4} style={{ left: 96, top: y(724), whiteSpace: "nowrap" }}>
+      <Spot id="db-relational-history-rocket" at={saturnAt - 6} out={startsAt - 4} left={172} top={y(340)} width={176} height={410} />
+      <Ink at={saturnAt - 4} dur={14} out={startsAt - 4} style={{ left: 96, top: y(724), whiteSpace: "nowrap" }}>
         <div style={{ ...label(22, INK) }}>IBM&apos;s IMS, first shipped 1967</div>
         <div style={{ ...body(23, true), marginTop: 6 }}>built to track Saturn V parts</div>
       </Ink>
@@ -248,8 +252,20 @@ export const BeforeScene: React.FC = () => {
         <Wire key={`t${i}`} points={twin(i)} at={parentAt + i * 3} />
       ))}
       {webLinks.map((l, i) => (
-        <Wire key={`w${i}`} points={l.points} at={l.at} dur={16} color={INK_SOFT} dash="6 5" width={2} dim={knowAt + 4} />
+        <Wire key={`w${i}`} points={l.points} at={l.at} dur={16} color={INK_SOFT} dash="6 5" width={2} dim={webDim} />
       ))}
+      <Tag x={(SLOT_X[0] + SLOT_X[1]) / 2} y={PARENT_Y - 40} at={webAt} dim={webDim} align="center" size={20}>
+        next customer
+      </Tag>
+      <Tag
+        x={SLOT_X[0] + CHILD_DX[0] - CHILD_W / 2}
+        y={CHILD_Y + NODE_H / 2 + 62}
+        at={webAt + 10}
+        dim={webDim}
+        size={20}
+      >
+        next order number
+      </Tag>
 
       {/* ── The route, walked: a red trail under the records ── */}
       {cursorIn > 0 ? (
@@ -315,10 +331,11 @@ export const BeforeScene: React.FC = () => {
           <circle cx={cx} cy={cy} r={10 + routeSwell * 4} fill={ACCENT} stroke="var(--ds-red-ink)" strokeWidth={2} />
         </Svg>
       ) : null}
-      <Cross x={nx} y={childTopY - 26} at={breaksAt - 2} />
+      {/* Where the route now ends: 127, which is not one of Ada's orders. */}
+      <Cross x={nx - CHILD_W / 2 + 16} y={CHILD_Y} at={breaksAt - 2} size={22} />
 
       {/* The web of extra pointers, and the rule that held. */}
-      <div style={{ position: "absolute", left: 600, top: y(842), display: "flex", gap: "0.3em", ...note(22, INK_SOFT) }}>
+      <div style={{ position: "absolute", left: 96, top: y(842), display: "flex", gap: "0.3em", ...note(22, INK_SOFT) }}>
         <Ink at={networkAt - 2} dur={14} out={reorgAt - 6} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Network databases: more pointers,
         </Ink>

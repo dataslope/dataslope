@@ -14,7 +14,7 @@ const OVERLAP = 6;
 
 /**
  * "The Central Limit Theorem" (16:9), as a print magazine's science pages:
- * warm paper, Source Serif 4 headlines, and numbered figures drawn from a
+ * a white page, Source Serif 4 headlines, and numbered figures drawn from a
  * seeded simulation (data.ts).
  *
  * The page, its face and its captions setting come from the shared editorial

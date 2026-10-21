@@ -41,7 +41,8 @@ export const AdmitScene: React.FC = () => {
   const yearAt = n.word("admit", "nineteen seventy-three");
   const famousAt = n.word("admit", "famous");
   const admissionsAt = n.word("admit", "admissions");
-  const twoDeptsAt = n.word("admit", "two departments");
+  const twoDeptsAt = n.word("admit", "two made-up departments");
+  const madeUpAt = n.word("admit", "made-up");
   const womenWordAt = n.word("overall", "women");
   const sixtyAt = n.word("split", "sixty");
   const fiftyFiveAt = n.word("overall", "fifty-five");
@@ -61,13 +62,15 @@ export const AdmitScene: React.FC = () => {
   const hardOneAt = n.word("mix", "hard one");
   const menMixAt = n.word("mix", "Six hundred of the men");
   const easyOneAt = n.word("mix", "easy one");
+  const turnsAt = n.word("drag", "three in four");
+  const dragsAt = n.word("drag", "drags");
+  const womensTotalAt = n.word("drag", "total");
   const nameAt = n.word("name", "Simpson's paradox");
   const lurkAt = n.word("name", "lurking");
   const deptAt = n.word("name", "department");
   const unevenAt = n.word("name", "unevenly");
   const groupsAt = n.word("name", "groups");
   const totalAt = n.word("ask", "total");
-  const overAt = n.word("ask", "averaging over");
   const slopeAt = n.word("confound-in", "slope");
   const end = n.beat("confound-in").to;
 
@@ -78,13 +81,16 @@ export const AdmitScene: React.FC = () => {
     { name: "Hard", sub: "department", cells: DEPTS[1], at: { men: hardAt + 2, women: againAt - 4 }, gapAt: bothAt + 4 },
   ];
   const grid = ease(frame, from - 2, 16);
-  const mixLit = (g: Group) => ease(frame, g === "women" ? sevenAt - 6 : menMixAt - 6, 10) * (1 - ease(frame, nameAt - 6, 12) * 0.5);
+  // Where each group applied: lit as it is read, set back for the name, and
+  // lit again on "unevenly".
+  const mixLit = (g: Group) =>
+    ease(frame, g === "women" ? sevenAt - 6 : menMixAt - 6, 10) * (1 - ease(frame, nameAt - 6, 12) * 0.5 * (1 - ease(frame, unevenAt - 4, 12)));
 
   return (
     <AbsoluteFill>
       {/* ── Sound: each dot as it lands, the mix, the name ── */}
       {rows.flatMap((r) => (["men", "women"] as const).map((g) => <Sfx key={`${r.name}-${g}`} name="el-tap" at={r.at[g]} level={-29} />))}
-      <Sfx name="el-pencil" at={overAt - 6} level={-34} />
+      <Sfx name="el-pencil" at={dragsAt - 4} level={-34} />
       <Sfx name="el-chime" at={n.beat("ask").to + 6} level={-32} />
 
       <Kicker at={from - 10}>Simpson&apos;s paradox and confounding</Kicker>
@@ -100,22 +106,23 @@ export const AdmitScene: React.FC = () => {
       <Headline
         top={y(150)}
         parts={[
-          { text: "A lurking variable:", at: lurkAt - 4 },
-          { text: "the department.", at: unevenAt - 10, italic: true },
+          { text: "Simpson's paradox:", at: nameAt - 4 },
+          { text: "a lurking variable.", at: lurkAt - 4, italic: true },
         ]}
       />
       <Note at={from - 4} x={92} y={y(176)}>
         <span style={{ ...body(52, true), color: INK, whiteSpace: "nowrap", opacity: 1 - ease(frame, bothAt - 10, 8) }}>
           Who gets in?
           <span style={{ ...label(24, INK_SOFT), marginLeft: 24, opacity: ease(frame, yearAt - 2, 10) }}>
-            The famous case: Berkeley, 1973
+            The famous case: Berkeley, 1973.
           </span>
+          <span style={{ ...label(24, INK), marginLeft: 10, opacity: ease(frame, madeUpAt - 2, 10) }}>These numbers are made up.</span>
         </span>
       </Note>
 
       <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.45 * ease(frame, slopeAt - 8, 18) }}>
       <Drift from={totalAt} to={end + 30} amount={0.02} origin={[960, 600]}>
-        <FigLabel n="6" title="Share admitted, in two departments" at={famousAt - 4} x={160} y={y(262)} />
+        <FigLabel n="6" title="Share admitted, two made-up departments" at={famousAt - 4} x={160} y={y(262)} />
         <Note at={admissionsAt - 2} x={1760} y={y(262) + 2} align="right" from="right">
           <span style={{ ...note(21, INK_SOFT), display: "inline-flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
             {(["men", "women"] as const).map((g) => (
@@ -171,14 +178,17 @@ export const AdmitScene: React.FC = () => {
           })}
         </Svg>
 
-        {/* The total, drawn from the departments it averages over. */}
-        <Svg opacity={ease(frame, overAt - 4, 14) * 0.7}>
+        {/* The total, drawn from the departments it averages over: the
+            women's on "drags", the men's after. */}
+        <Svg>
           {(["men", "women"] as const).flatMap((g) =>
             DEPTS.map((d, k) => {
               const share = d[g].applied / POOLED[g].applied;
-              return (
+              const t = ease(frame, g === "women" ? dragsAt - 4 : womensTotalAt + 4, 14);
+              return t <= 0 ? null : (
                 <line
                   key={`${g}-${k}`}
+                  opacity={0.7 * t}
                   x1={px(POOLED[g].rate)}
                   y1={rowY(0)}
                   x2={px(d[g].rate)}
@@ -307,13 +317,18 @@ export const AdmitScene: React.FC = () => {
           <Ring key={g} x={px(POOLED[g].rate)} y={rowY(0)} at={groupsAt - 2} color={GROUP_COLOR[g]} r0={radius(700)} r1={radius(700) + 40} />
         ))}
 
+        <Note at={dragsAt + 2} x={px(0.72)} y={rowY(0) + 40}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>line width: share of each group&apos;s applicants</span>
+        </Note>
+        <Ring x={px(DEPTS[1].women.rate)} y={rowY(2)} at={turnsAt - 2} color={GROUP_COLOR.women} r0={radius(600)} r1={radius(600) + 50} />
+
         {/* Where each group applied. */}
-        <Note at={sevenAt - 2} out={overAt - 8} x={px(DEPTS[1].women.rate) + radius(600) + 76} y={rowY(2) + 26}>
+        <Note at={sevenAt - 2} x={px(DEPTS[1].women.rate) + radius(600) + 76} y={rowY(2) + 26}>
           <span style={{ ...note(22, GROUP_INK.women), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
             {DEPTS[1].women.applied} of {POOLED.women.applied} women applied here
           </span>
         </Note>
-        <Note at={menMixAt - 2} out={overAt - 8} x={px(DEPTS[0].men.rate) - radius(600) - 24} y={rowY(1) + 34} align="right">
+        <Note at={menMixAt - 2} x={px(DEPTS[0].men.rate) - radius(600) - 24} y={rowY(1) + 34} align="right">
           <span style={{ ...note(22, GROUP_INK.men), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
             {DEPTS[0].men.applied} of {POOLED.men.applied} men applied here
           </span>

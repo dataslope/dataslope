@@ -20,6 +20,7 @@ import {
   Head,
   Label,
   lerp,
+  pct,
   phi,
   pulse,
   STAT,
@@ -184,7 +185,7 @@ export const StepsScene: React.FC = () => {
       <Axis scale={X} base={y(AXIS)} ticks={[4000, 6000, 8000, 10000]} format={(v) => fmt(v, 0)} at={stepsFrom + 2} />
       {band > 0 ? (
         <Svg>
-          <rect x={claimX - 34} y={y(STRIP) - h(64)} width={68} height={y(AXIS) - y(STRIP) + h(64)} fill={STAT_WASH} opacity={band} />
+          <rect x={claimX - 34} y={y(STRIP) - h(52)} width={68} height={y(AXIS) - y(STRIP) + h(52)} fill={STAT_WASH} opacity={band} />
         </Svg>
       ) : null}
       <Svg>
@@ -231,8 +232,8 @@ export const StepsScene: React.FC = () => {
 
       {/* ── Fig. 4: the gap, in standard errors ── */}
       <FigLabel n="4" title="The gap, measured in units of noise" at={statAt - 4} x={Z.x0} y={y(600)} />
-      <Bracket x0={zMean} x1={zClaim} y={y(Z_BASE) + 30} at={gapAt - 2} color={STAT} width={3} />
-      <Note at={gapAt + 4} x={(zMean + zClaim) / 2} y={y(Z_BASE) + 44} from="up">
+      <Bracket x0={zMean} x1={zClaim} y={y(Z_BASE) + 52} at={gapAt - 2} color={STAT} width={3} />
+      <Note at={gapAt + 4} x={(zMean + zClaim) / 2} y={y(Z_BASE) + 66} from="up">
         <span
           style={{
             display: "inline-block",
@@ -254,22 +255,25 @@ export const StepsScene: React.FC = () => {
           return <line key={k} x1={x} x2={x} y1={y(Z_BASE) - 10 * show} y2={y(Z_BASE) + 12 * show} stroke={INK} strokeWidth={2} />;
         })}
       </Svg>
-      {[1, 2].map((k) => (
+      {/* The ruler's numbers, under it and clear of the curve: the claim, then one and two standard errors below it. */}
+      {[0, 1, 2].map((k) => (
         <div
           key={k}
           style={{
             position: "absolute",
             left: sx(Z, STEPS.claimed - k * se),
-            top: y(Z_BASE) - 44,
+            top: y(Z_BASE) + 16,
             transform: "translateX(-50%)",
-            opacity: ease(frame, noiseAt + k * 5, 10) * (1 - 0.7 * curveIn),
-            ...note(20, INK_SOFT),
+            opacity: ease(frame, noiseAt + k * 5, 10),
+            ...note(20, k === 0 ? INK : INK_SOFT),
+            fontWeight: k === 0 ? 650 : 500,
+            whiteSpace: "nowrap",
           }}
         >
-          −{k}
+          {k === 0 ? steps(STEPS.claimed) : `−${k}`}
         </div>
       ))}
-      <Note at={noiseAt + 6} x={Z.x0} y={y(Z_BASE) + 92}>
+      <Note at={noiseAt + 6} x={Z.x0} y={y(Z_BASE) + 106}>
         <Label size={21} color={INK_SOFT} weight={520}>
           one notch = one standard error, {steps(se)} steps
         </Label>
@@ -325,17 +329,23 @@ export const StepsScene: React.FC = () => {
           <line x1={zMean} x2={zMean} y1={y(Z_BASE)} y2={y(Z_BASE) - h(110) * tails} stroke={STAT} strokeWidth={3.5} />
         </Svg>
       ) : null}
+      <Note at={ifAt + 4} x={zClaim + 130} y={y(Z_BASE) - h(Z_PEAK) - 4}>
+        <Label size={21} color={INK_SOFT} weight={520} style={halo}>
+          averages of {STEPS.n}, if {steps(STEPS.claimed)} were true
+        </Label>
+      </Note>
       <Note at={threeAt - 2} x={zMirror + 16} y={y(Z_BASE) - h(110)}>
         <span style={{ ...note(30, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>p = {fmt(STEPS.p, 3)}</span>
       </Note>
-      <Note at={eitherAt - 2} x={zMirror + 16} y={y(Z_BASE) - h(110) + 44}>
+      {/* The p-value as the narration says it. */}
+      <Note at={threeAt + 6} x={zMirror + 16} y={y(Z_BASE) - h(110) + 42}>
         <Label size={21} color={STAT_INK} weight={520} style={halo}>
-          both tails count
+          {pct(STEPS.p)} of the time
         </Label>
       </Note>
-      <Note at={trueMeanAt - 2} x={meanX - 14} y={y(STRIP) + h(30) + 2} align="right">
-        <Label size={21} color={INK_SOFT} weight={520} style={halo}>
-          the true mean: still unknown
+      <Note at={eitherAt - 2} x={zMirror + 16} y={y(Z_BASE) - h(110) + 74}>
+        <Label size={21} color={STAT_INK} weight={520} style={halo}>
+          both tails count
         </Label>
       </Note>
       <Ink at={underAt - 4} dur={14} style={{ left: STEP_X + 44, top: y(STEP_Y0 + 4 * STEP_DY) + 40, whiteSpace: "nowrap" }}>
@@ -344,6 +354,11 @@ export const StepsScene: React.FC = () => {
             {fmt(STEPS.p, 3)} is under {STEPS.alpha}: reject the null
           </Label>
         </div>
+      </Ink>
+      <Ink at={trueMeanAt - 2} dur={14} style={{ left: STEP_X + 44, top: y(STEP_Y0 + 4 * STEP_DY) + 76, whiteSpace: "nowrap" }}>
+        <Label size={21} color={INK_SOFT} weight={520}>
+          not because we know the true mean
+        </Label>
       </Ink>
     </AbsoluteFill>
   );

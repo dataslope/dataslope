@@ -1,13 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import type { Pt } from "../../components/arrow";
+import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { BADGES, SECOND_BADGE, SECOND_BADGE_ROW, SECOND_BADGE_SQL } from "./data";
+import { BADGES, DEVICES, EMPLOYEES, SECOND_BADGE, SECOND_BADGE_ROW, SECOND_BADGE_SQL } from "./data";
 import { DbTable, ErrorBox, Fig, KEY_INK, Listing, MARK, MARK_KEY, Mono, tableGeometry } from "./kit";
 import { Drift, Glow, Headline, Kicker, Mark, pulse, Spot } from "./parts";
 
@@ -47,6 +48,7 @@ export const BadgeScene: React.FC = () => {
   const rejectFrom = n.beat("reject").from;
   const secondAt = n.word("reject", "second badge");
   const noAt = n.word("reject", "NO");
+  const adaAt = n.word("reject", "Ada");
   const neverAt = n.word("translate", "never sees");
   const translateAt = n.word("translate", "translate");
   const keysAt = n.word("translate", "keys");
@@ -75,18 +77,26 @@ export const BadgeScene: React.FC = () => {
     name: "badges",
     columns: [{ name: "id", key: "PK" }, { name: "employee_id", key: "FK, UK" }],
   });
+  // Both lines leave employees on its key side: the header, and the id row
+  // (never `name`, which no foreign key points at). Each elbow sits clear of
+  // the label above or below the line's first stretch.
   const e1 = emp.anchor("right");
   const d1 = dev.anchor("left");
-  const e2 = emp.anchor("right", "name");
+  const e2 = emp.anchor("right", "id");
   const b1 = bad.anchor("left");
-  const devLine: Pt[] = [e1, [525, e1[1]], [525, d1[1]], d1];
-  const badLine: Pt[] = [e2, [550, e2[1]], [550, b1[1]], b1];
+  const devLine: Pt[] = [e1, [572, e1[1]], [572, d1[1]], d1];
+  const badLine: Pt[] = [e2, [575, e2[1]], [575, b1[1]], b1];
   const devEnd: Pt = [d1[0] - 22, d1[1]];
   const badEnd: Pt = [b1[0] - 20, b1[1]];
 
   // ── Ada's second badge ──
   const cols = ["id", "employee_id"];
   const tg = tableGeometry({ x: RIGHT_X, top: y(TABLE_Y), cols, rows: [...BADGES.rows, SECOND_BADGE_ROW], headH: h(52), rowH: h(62) });
+  // Ada's devices first, in the same place: two rows, one employee id. They
+  // give way to the badges as the narration turns to them.
+  const dg = tableGeometry({ x: RIGHT_X, top: y(TABLE_Y), cols: DEVICES.cols, rows: DEVICES.rows, headH: h(52), rowH: h(62) });
+  const devicesOut = ease(frame, badgeFrom + 2, 10);
+  const [adaId, adaName] = EMPLOYEES.rows[0];
   const errPulse = pulse(frame, constraintsAt, 22);
 
   return (
@@ -122,7 +132,7 @@ export const BadgeScene: React.FC = () => {
           to="zero-or-many"
           at={perAt - 6}
           label="assigned"
-          labelPos={[438, e1[1] - 36]}
+          labelPos={[458, e1[1] - 38]}
         />
         <Relation
           name="employees receive badges"
@@ -131,20 +141,42 @@ export const BadgeScene: React.FC = () => {
           to="zero-or-one"
           at={oneBadgeAt + 2}
           label="receives"
-          labelPos={[440, b1[1] + 8]}
+          labelPos={[462, e2[1] + 10]}
         />
 
         {/* ── What each end becomes ── */}
-        <Ink at={keysAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y), whiteSpace: "nowrap" }}>
+        {/* Each arrives as its end is turned into a rule, and is named again
+            on "keys and constraints". */}
+        <Ink at={shareAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...body(32, true), color: INK }}>Zero or many:</span>
-          <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>a foreign key</span>
+          <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>
+            <Mark at={keysAt}>a foreign key</Mark>
+          </span>
         </Ink>
-        <Ink at={constraintsAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y + 50), whiteSpace: "nowrap" }}>
+        <Ink at={twiceAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y + 50), whiteSpace: "nowrap" }}>
           <span style={{ ...body(32, true), color: INK }}>Zero or one:</span>
           <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>
             a foreign key, and <Mark at={constraintsAt + 8}>unique</Mark>
           </span>
         </Ink>
+
+        {/* ── Ada's devices: two rows can share her id ── */}
+        <AbsoluteFill style={{ opacity: 1 - devicesOut }}>
+          <Ink at={devicesAt + 4} dur={14} style={{ left: RIGHT_X, top: y(CAPTION_Y) }}>
+            <span style={label(24, INK)}>
+              <Mono>devices</Mono>
+            </span>
+          </Ink>
+          <DbTable
+            g={dg}
+            cols={DEVICES.cols}
+            rows={DEVICES.rows.map((cells, i) => ({ cells, at: perAt + 2 + i * 5 }))}
+            at={devicesAt + 4}
+            numeric={[0, 1]}
+            colInk={{ 1: KEY_INK }}
+            marks={DEVICES.rows.map((_, i) => ({ row: i, col: 1, at: shareAt + i * 5, color: MARK }))}
+          />
+        </AbsoluteFill>
 
         {/* ── The table, and the badge Postgres refuses ── */}
         <Listing
@@ -177,6 +209,12 @@ export const BadgeScene: React.FC = () => {
             { row: 1, col: 1, at: secondAt + 10, color: MARK_KEY },
           ]}
         />
+        {/* Who employee 1 is: the Ada the narration names. */}
+        <Ink at={adaAt - 2} dur={14} style={{ left: tg.x + tg.width + 28, top: tg.rowTop(0), height: tg.rowH, display: "flex", alignItems: "center" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            employee {adaId}, {adaName}
+          </span>
+        </Ink>
         <ErrorBox
           x={RIGHT_X}
           top={y(ERROR_Y)}

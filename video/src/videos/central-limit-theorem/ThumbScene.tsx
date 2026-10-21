@@ -8,6 +8,8 @@ import { histogram, INCOME_MEANS, MEANS_30, mean, SAMPLE_COUNT, sd, skew } from 
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, body, fmt, halo, headline, INK, INK_SOFT, note, label } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
+import { useFigNumber } from "../sampling/merged";
+import { Marker, swell } from "../sampling/emphasis";
 
 const X0 = 980;
 const X1 = 1780;
@@ -60,6 +62,7 @@ export const ThumbScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h, pts } = useLayout();
+  const fig = useFigNumber();
   const start = n.beat("thumb").from;
   const thirtyAt = n.word("thumb", "thirty");
   const alwaysAt = n.word("thumb", "always");
@@ -70,18 +73,26 @@ export const ThumbScene: React.FC = () => {
   const lopsidedAt = n.word("heavy", "lopsided");
   const hundredsAt = n.word("heavy", "hundreds");
   const bellAt = n.word("heavy", "bell");
+  const closerAt = n.word("closer", "three hundred");
+  // "...much closer to a bell": the finding is marked as it is read, and the
+  // curve it is closer to swells on "bell".
+  const muchAt = n.word("closer", "much closer");
+  const closerBellAt = n.word("closer", "bell");
   const strike = ease(frame, thumbAt, 12);
 
   // When each row arrives, its curve draws, and its finding is tagged.
   const cues = [
     { at: thirtyAt, curve: alwaysAt, tag: enoughAt },
     { at: heavyAt, curve: lopsidedAt - 6, tag: lopsidedAt },
-    { at: hundredsAt, curve: bellAt - 8, tag: bellAt },
+    // The samples of 300 arrive on "HUNDREDS", and their finding is read
+    // out in its own sentence.
+    { at: hundredsAt, curve: bellAt - 8, tag: closerAt },
   ];
   const tags = [
-    { head: "Mild skew: fine at 30", tone: INK, sub: (r: (typeof ROWS)[number]) => `skewness ${fmt(r.skew, 1)}` },
+    // The first tag says what skewness measures, in the narration's word.
+    { head: "Mild skew: fine at 30", tone: INK, sub: (r: (typeof ROWS)[number]) => `lopsidedness (skewness) ${fmt(r.skew, 1)}` },
     { head: "Still lopsided at 30", tone: INK, sub: (r: (typeof ROWS)[number]) => `skewness ${fmt(r.skew, 1)}; a bell is 0` },
-    { head: "Close to the bell at 300", tone: ACCENT_INK, sub: (r: (typeof ROWS)[number]) => `skewness ${fmt(r.skew, 1)}` },
+    { head: "Much closer to a bell at 300", tone: ACCENT_INK, sub: (r: (typeof ROWS)[number]) => `skewness ${fmt(r.skew, 1)}` },
   ];
 
   return (
@@ -132,7 +143,7 @@ export const ThumbScene: React.FC = () => {
         enough.”
       </Ink>
       <Note at={alwaysAt + 2} x={200} y={y(358)}>
-        <span style={note(22, INK_SOFT)}>the n ≥ 30 rule</span>
+        <span style={note(22, INK_SOFT)}>the 30-or-more rule</span>
       </Note>
       <Ink at={thumbAt - 2} dur={18} style={{ left: 196, top: y(432), ...headline(50) }}>
         A rule of thumb,
@@ -147,7 +158,7 @@ export const ThumbScene: React.FC = () => {
         </div>
       </Ink>
 
-      <FigLabel n="4" title="Averages against the normal curve" at={start - 12} x={X0} y={y(104)} />
+      <FigLabel n={fig(4)} title="Averages against the normal curve, each on its own scale" at={start - 12} x={X0} y={y(104)} />
       {ROWS.map((r, i) => {
         const c = cues[i];
         const t = tags[i];
@@ -161,7 +172,9 @@ export const ThumbScene: React.FC = () => {
             </Ink>
             {r.off > 0 ? (
               <Note at={c.tag + 8} x={X1} y={y(r.top + 6)} align="right">
-                <span style={note(20, INK_SOFT)}>{r.off} averages run past the right edge</span>
+                <span style={note(20, INK_SOFT)}>
+                  {r.off} {r.off === 1 ? "average runs" : "averages run"} past the right edge
+                </span>
               </Note>
             ) : null}
             <Bars
@@ -171,6 +184,7 @@ export const ThumbScene: React.FC = () => {
               scale={r.scale}
               base={y(r.base)}
               unit={h(r.unit)}
+              color={ACCENT}
               grow={(b) => ease(frame, c.at + b * 0.6, 12)}
             />
             <Axis scale={r.scale} base={y(r.base)} ticks={r.ticks} format={r.format} at={c.at - 4} size={20} />
@@ -183,8 +197,8 @@ export const ThumbScene: React.FC = () => {
               count={SAMPLE_COUNT}
               bin={r.bin}
               at={c.curve}
-              color={ACCENT}
-              width={2.6}
+              color={INK}
+              width={2.4 * (i === 2 ? swell(frame, closerBellAt - 2, 0.6, 20) : 1)}
             />
             {i === 1 ? (
               <Leader
@@ -196,7 +210,9 @@ export const ThumbScene: React.FC = () => {
               />
             ) : null}
             <Note at={c.tag} x={tagX} y={y(r.base - 150)}>
-              <div style={{ ...label(19, t.tone), ...halo }}>{t.head}</div>
+              <div style={{ ...label(19, t.tone), ...halo }}>
+                {i === 2 ? <Marker at={muchAt - 2}>{t.head}</Marker> : t.head}
+              </div>
               <div style={{ ...note(20, INK_SOFT), ...halo }}>{t.sub(r)}</div>
             </Note>
           </React.Fragment>

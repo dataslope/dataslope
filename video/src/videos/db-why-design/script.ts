@@ -1,4 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
+import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
 import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
@@ -42,8 +43,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *   - "The schema shapes everything built on it" (initSql and starterCode
  *     verbatim): which customers bought a notebook returns one row, Ada
  *     Lovelace, ada@example.com (she bought notebooks in orders 101 and
- *     103, so DISTINCT folds them). The free-text note "Ada bought 2
- *     notebooks and 5 pens" is the lesson's.
+ *     103, so DISTINCT folds them). It is the lesson's second dataset, not
+ *     the flat table's: the same names, but here Grace Hopper's one order
+ *     (102) is a backpack, so Fig. 4 is "another shop" and Fig. 5 says so.
+ *     The free-text note "Ada bought 2 notebooks and 5 pens" is the
+ *     lesson's, and is one order (101) in this shop.
  *   - design-and-data-quality opens on bad data that "starts as one missing
  *     email, one misspelled status, one order pointing to no customer". The
  *     video's three rows are its own, one per rule the shop schema already
@@ -63,7 +67,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     in lb-sec instead of the specified and expected units of Newton-sec",
  *     so the small-force changes were "low by a factor of 4.45"; the
  *     periapsis came to 57 km, "too low for spacecraft survival". 4.45 is
- *     also check.mjs's 0.45359237 kg times 9.80665 m/s², 4.448.
+ *     also check.mjs's 0.45359237 kg times 9.80665 m/s², 4.448: read as
+ *     newton-seconds, every pound-force-second value came out "about four
+ *     and a half times too small" ("unit"). "A column named for its unit"
+ *     is design-and-data-quality's "a clear name like total_cents or
+ *     mass_kg" that says what a number means.
  *
  * Written for Drew's voice, casual and curious: short spoken sentences, no
  * symbols or parentheses, numbers as words, contractions, questions the next
@@ -75,6 +83,7 @@ export const script: NarrationScript = {
   voice: "drew",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
   leadIn: INTRO_LEAD_IN,
+  minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   beats: [
     // ── Part 1. What a shortcut costs ─────────────────────────────────────
@@ -88,7 +97,7 @@ export const script: NarrationScript = {
     {
       id: "change",
       text: "Then she changes it. A rushed update fixes order one-oh-one... and misses the other.",
-      pauseAfter: 0.45,
+      pauseAfter: 0.8,
     },
     {
       id: "confident",
@@ -105,7 +114,7 @@ export const script: NarrationScript = {
       text: "The problem is the design. Ada's email stopped being one fact and became copies, and every program has to keep them in step... by hand, forever.",
       pauseAfter: 0.45,
     },
-    { id: "anomaly", text: "That's called an update anomaly.", pauseAfter: 0.4 },
+    { id: "anomaly", text: "That's called an update anomaly.", pauseAfter: 0.9 },
     {
       id: "outlives",
       text: "And you can rewrite code tomorrow... but data outlives code.",
@@ -123,21 +132,21 @@ export const script: NarrationScript = {
     {
       id: "questions",
       text: "Which things become tables? Which facts become columns? Which rows need an identity? Which tables point to which? And which values must be present, unique, or limited?",
-      pauseAfter: 0.45,
+      pauseAfter: 0.9,
     },
     { id: "sql", text: "SQL is just how you write the answers down. It isn't the design." },
     {
       id: "library",
       scene: true,
       text: "[curious] Take a library. Is a book the title in the catalog... or the copy on the shelf?",
-      pauseAfter: 0.45,
+      pauseAfter: 0.9,
     },
     {
       id: "copies",
       text: "Three copies of one title each have their own barcode, and get lent out separately.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.9,
     },
-    { id: "loan", text: "So a loan points at a copy, not a title.", pauseAfter: 0.4 },
+    { id: "loan", text: "So a loan points at a copy, not a title.", pauseAfter: 0.9 },
     { id: "means", text: "No SQL manual can tell you that. It's about what your system MEANS.", pauseAfter: 0.6 },
     { id: "buys-in", text: "And answers like that pay off later." },
 
@@ -148,10 +157,12 @@ export const script: NarrationScript = {
       text: "With customers, orders, order items and products in their own tables, it's a short walk along links the design already drew.",
       pauseAfter: 0.35,
     },
-    { id: "answer", text: "One name comes back. Ada Lovelace.", pauseAfter: 0.5 },
+    { id: "answer", text: "One name comes back. Ada Lovelace.", pauseAfter: 1.0 },
     {
       id: "sentence",
       text: "Store each order as a sentence, Ada bought two notebooks and five pens, and that question becomes a project.",
+      // Holds the finished figure: four chores to read under the sentence.
+      pauseAfter: 2.8,
     },
     {
       id: "gate",
@@ -159,18 +170,25 @@ export const script: NarrationScript = {
       text: "Design also decides what gets in. Bad data starts small. A customer entered twice. A quantity of zero. An order for a customer who isn't there.",
       pauseAfter: 0.4,
     },
-    { id: "refused", text: "Here, each one bounces, and Postgres names the rule it broke.", pauseAfter: 0.45 },
+    { id: "refused", text: "Here, each one bounces, and Postgres names the rule it broke.", pauseAfter: 1.1 },
     {
       id: "building",
       text: "That rule lives in the schema, so it doesn't guard one app's front door. It guards the whole building.",
+      pauseAfter: 2.0,
     },
     {
       id: "orbiter",
       scene: true,
       text: "Even a type is a rule. In nineteen ninety-nine, NASA lost the Mars Climate Orbiter because one program wrote pound-force seconds and another read newton-seconds.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.7,
     },
-    { id: "factor", text: "The numbers were just numbers. Nothing said which.", pauseAfter: 0.7 },
+    { id: "factor", text: "The numbers were just numbers. Nothing said which.", pauseAfter: 0.6 },
+    // What a column would have said: the unit in its name. Voiced after the take.
+    {
+      id: "unit",
+      text: "Read as newton-seconds, every value came out about four and a half times too small. A column named for its unit would have said which.",
+      pauseAfter: 0.8,
+    },
     { id: "next", text: "So where does a good design start? By naming the things your data is about." },
   ],
 };
