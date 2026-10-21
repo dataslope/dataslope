@@ -53,6 +53,7 @@ export const ChiScene: React.FC = () => {
   const whetherAt = n.word("corr-in", "whether");
   const bothAt = n.word("corr-in", "both columns");
   const mobileAt = n.word("expected", "mobile");
+  const togetherAt = n.word("corr-in", "together");
 
   const rowY = (i: number) => y(ROW_Y0 + i * ROW_DY);
   /** When each cell's observed count arrives: the two spoken first, the rest on "adds up". */
@@ -237,7 +238,7 @@ export const ChiScene: React.FC = () => {
       </div>
       <Ink at={bothAt - 4} dur={18} style={{ left: 160, top: y(892), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK }}>
-          Two columns of <Mark at={bothNumbersAt - 2}>numbers</Mark>: do they move together?
+          Two columns of <Mark at={bothNumbersAt - 2}>numbers</Mark>: do they <Mark at={togetherAt - 2}>move together?</Mark>
         </span>
       </Ink>
     </AbsoluteFill>

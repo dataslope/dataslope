@@ -6,7 +6,7 @@ import { body, HAIRLINE, INK, INK_SOFT, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { DATA_INK, DATA_WASH, Greek, H0, Head, Kicker, Label, pulse, STAT_INK, STAT_WASH, Tick } from "./parts";
+import { DATA_INK, DATA_WASH, Greek, H0, Head, Kicker, Label, Mark, pulse, STAT_INK, STAT_WASH, Tick } from "./parts";
 
 const COL_X = [620, 1200];
 const COL_W = 560;
@@ -40,17 +40,19 @@ export const GridScene: React.FC = () => {
   const powerAt = n.word("power", "power");
   const catchingAt = n.word("power", "catching");
   const thereAt = n.word("power", "really there");
+  const oneMinusAt = n.word("minus-beta", "one minus");
+  const minusBetaAt = n.word("minus-beta", "beta");
 
   const cellY = (r: number) => y(ROW_Y[r]);
   const cellH = h(ROW_H);
   const frameIn = (k: number) => ease(frame, fourAt - 4 + k * 4, 12);
 
   /** One cell of the grid, its wash coming in on `at`. */
-  const cell = (r: number, c: number, k: number, wash: string | null, at: number, glowAt: number) => {
+  const cell = (r: number, c: number, k: number, wash: string | null, at: number, glowAt: number, glowAt2?: number) => {
     const f = frameIn(k);
     if (f <= 0) return null;
     const w = wash ? ease(frame, at, 14) : 0;
-    const g = pulse(frame, glowAt, 26);
+    const g = pulse(frame, glowAt, 26) + (glowAt2 === undefined ? 0 : pulse(frame, glowAt2, 26));
     return (
       <div
         style={{
@@ -122,8 +124,8 @@ export const GridScene: React.FC = () => {
       {/* ── The four cells ── */}
       {cell(0, 0, 0, null, 0, thereAt + 4)}
       {cell(0, 1, 1, STAT_WASH, alarmAt - 4, alphaAt)}
-      {cell(1, 0, 2, STAT_WASH, missAt - 4, betaAt)}
-      {cell(1, 1, 3, DATA_WASH, powerAt - 4, catchingAt + 6)}
+      {cell(1, 0, 2, STAT_WASH, missAt - 4, betaAt, minusBetaAt)}
+      {cell(1, 1, 3, DATA_WASH, powerAt - 4, catchingAt + 6, oneMinusAt)}
 
       {text(0, 1, 0, alarmAt - 4, <span style={{ ...body(40, true), color: STAT_INK }}>A false alarm</span>)}
       {text(0, 1, 1, typeOneAt - 4, <Label size={26}>Type I error</Label>)}
@@ -157,7 +159,9 @@ export const GridScene: React.FC = () => {
         2,
         catchingAt + 8,
         <Label size={26} color={DATA_INK}>
-          1 − <Greek>β</Greek>
+          <Mark at={oneMinusAt - 2}>
+            1 − <Greek>β</Greek>
+          </Mark>
         </Label>,
       )}
 

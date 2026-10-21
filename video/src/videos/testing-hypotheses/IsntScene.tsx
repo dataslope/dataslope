@@ -78,6 +78,8 @@ export const IsntScene: React.FC = () => {
   const nwx = (z: number) => NW.cx + z * NW.sd;
   const nwy = (v: number) => y(NW.base) - h(NW.peak) * (v / phi(0));
   const thirdGlow = pulse(frame, fourAt, 24);
+  // "...and it prints as zero": the two rows that print 0.0000 swell together.
+  const zeroGlow = pulse(frame, n.word("collapse", "as zero"), 26);
 
   return (
     <AbsoluteFill>
@@ -222,7 +224,8 @@ export const IsntScene: React.FC = () => {
                   opacity: a * (loud ? 1 : 0.7),
                   ...note(30, r.p < 0.05 ? STAT_INK : INK),
                   fontWeight: 700,
-                  transform: i === 0 ? `scale(${1 + 0.12 * firstGlow})` : i === 2 ? `scale(${1 + 0.12 * thirdGlow})` : undefined,
+                  transform:
+                    i === 0 ? `scale(${1 + 0.12 * firstGlow})` : i === 2 ? `scale(${1 + 0.12 * thirdGlow})` : i >= 3 ? `scale(${1 + 0.12 * zeroGlow})` : undefined,
                   transformOrigin: "0 50%",
                 }}
               >
