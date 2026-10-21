@@ -43,8 +43,10 @@ export type EntitySpec = {
   columns: readonly EntityColumn[];
 };
 
-/** Box metrics before the layout's `h()`. */
-export const ENTITY = { head: 56, row: 46, width: 380, pad: 18, gap: 16 };
+/** Box metrics before the layout's `h()`. `border` is the box's outline,
+ *  which sits outside the header and rows rather than inside them: drawn
+ *  inside, it took 4px off the bottom of the last row, clipped by the box. */
+export const ENTITY = { head: 56, row: 46, width: 380, pad: 18, gap: 16, border: 2 };
 
 /** The key column's width: wide enough for the entity's widest key (a pair
  *  like "PK, FK" needs about 66px at 19px bold), and none at all when it has
@@ -60,10 +62,10 @@ export function entityLayout(spec: EntitySpec, h: (v: number) => number = (v) =>
   const row = h(ENTITY.row);
   const width = spec.width ?? ENTITY.width;
   const rows = spec.columns.map((_, i) => {
-    const top = spec.y + head + i * row;
+    const top = spec.y + ENTITY.border + head + i * row;
     return { top, mid: top + row / 2 };
   });
-  const height = head + spec.columns.length * row;
+  const height = 2 * ENTITY.border + head + spec.columns.length * row;
   const index = (r: number | string) => (typeof r === "number" ? r : spec.columns.findIndex((c) => c.name === r));
   return {
     ...spec,
@@ -130,7 +132,7 @@ export const Entity: React.FC<{
   const rowIn = rowTimes.map((t) => ease(frame, t, 10));
   // The box grows to the last row that has started to arrive.
   const filled = rowIn.reduce((n, p, i) => (p > 0 ? Math.max(n, i + p) : n), 0);
-  const height = layout.head + filled * layout.row;
+  const height = 2 * ENTITY.border + layout.head + filled * layout.row;
   const dimmed = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   const badge = badgeWidth(layout.columns);
   return (
@@ -144,7 +146,7 @@ export const Entity: React.FC<{
         opacity: shown * (1 - gone) * (1 - dimmed),
         transform: `translateY(${(1 - shown) * 10}px)`,
         background: BOX_FILL,
-        border: `2px solid ${INK}`,
+        border: `${ENTITY.border}px solid ${INK}`,
         borderRadius: 6,
         overflow: "hidden",
         boxSizing: "border-box",
@@ -153,6 +155,8 @@ export const Entity: React.FC<{
       <div
         style={{
           height: layout.head,
+          // Its rule inside the header, so the first row starts below it.
+          boxSizing: "border-box",
           display: "flex",
           alignItems: "center",
           padding: `0 ${ENTITY.pad}px`,
