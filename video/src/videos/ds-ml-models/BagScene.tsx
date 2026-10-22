@@ -85,8 +85,8 @@ export const BagScene: React.FC = () => {
         {ENS.trees.map((t, i) => (
           <Curve key={i} points={line(t)} x={bag.x} y={bag.y} at={sideAt + i * 5} dur={14} color={INK_SOFT} width={1.6} dim={oneAt} opacity={0.7} clip={boxes[0]} />
         ))}
-        <Note at={bootAt} x={LEFTS[0] + 14} y={y(TOP) + h(10)} dim={oneAt}>
-          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>each tree on a bootstrap sample: rows drawn with replacement</span>
+        <Note at={bootAt} x={LEFTS[0] + PW} y={y(TOP) - h(40)} align="right" from="right">
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>gray: trees on bootstrap samples</span>
         </Note>
         <Curve points={line(ENS.one)} x={bag.x} y={bag.y} at={oneAt + 2} dur={22} color={ACCENT} width={2.2} dim={twoHAt + 4} clip={boxes[0]} />
         <Curve points={line(ENS.bag)} x={bag.x} y={bag.y} at={avgAt} dur={22} color={OK} width={3.6 + 2 * pulse(frame, twoHAt, 22)} clip={boxes[0]} />
@@ -116,8 +116,8 @@ export const BagScene: React.FC = () => {
         <Curve points={line(ENS.stages["1"])} x={boost.x} y={boost.y} at={afterAt} dur={16} color={C0} width={2.6} dim={tenAt} clip={boxes[1]} />
         <Curve points={line(ENS.stages["10"])} x={boost.x} y={boost.y} at={tenAt} dur={18} color={C0} width={2.6} dim={hundredAt + 4} clip={boxes[1]} />
         <Curve points={line(ENS.stages["100"])} x={boost.x} y={boost.y} at={hundredAt} dur={20} color={OK} width={3.6} clip={boxes[1]} />
-        <Note at={wrongAt} x={LEFTS[1] + 14} y={y(TOP) + h(10)} out={tenAt}>
-          <span style={{ ...label(19, ACCENT_INK), whiteSpace: "nowrap" }}>what the first tree still gets wrong: the next one fits that</span>
+        <Note at={wrongAt} x={LEFTS[1] + PW} y={y(TOP) - h(40)} align="right" from="right" out={tenAt}>
+          <span style={{ ...label(19, ACCENT_INK), whiteSpace: "nowrap" }}>red: what the next tree is fitted to</span>
         </Note>
         {[
           { at: crudeAt, k: "1" as const, name: "after 1 tree", color: BLUE_INK },

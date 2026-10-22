@@ -180,7 +180,7 @@ export const script: NarrationScript = {
     {
       id: "kmeans",
       scene: true,
-      text: "Question eight. What is k-means clustering? Place k centers, assign each point to the nearest one, move each center to the mean of its points, and repeat until nothing moves. These three centers all start in one group. After one move, two of them jump to the other groups, and on the third pass, it settles.",
+      text: "Question eight. What is k-means clustering? Place k centers, assign each point to the nearest one, move each center to the mean of its points, and repeat until nothing moves. These three centers all start in one group. After one move, two of them jump toward the other groups, and on the third pass, it settles.",
       pauseAfter: 0.6,
     },
     {

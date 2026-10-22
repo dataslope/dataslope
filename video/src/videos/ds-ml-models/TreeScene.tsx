@@ -12,11 +12,11 @@ import { at, Axes, C0, C1, Drift, Mark, OK, OK_INK, pulse, type Scale, Svg } fro
 
 const LEFT = 160;
 const WIDTH = 900;
-const BASE = 640;
+const BASE = 612;
 const STEP = 15;
 const DOT = 6.4;
-const GINI_TOP = 712;
-const GINI_H = 150;
+const GINI_TOP = 734;
+const GINI_H = 136;
 const COL = 1180;
 const COL_W = 640;
 
@@ -227,15 +227,10 @@ export const TreeScene: React.FC = () => {
           y={y(330)}
           w={320}
           at={giniAt}
-          lines={[`${TREE.width.length} flowers`, "50 · 50", <>Gini {fmt(TREE.parent, 2)}</>]}
+          lines={[`${TREE.width.length} flowers`, "50 · 50", <Mark key="g" at={halfAt + 2}>Gini {fmt(TREE.parent, 2)}</Mark>]}
         />
         <Note at={chanceAt} x={COL + 160} y={y(330) + h(128)} width={320}>
           <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>chance two random flowers differ</span>
-        </Note>
-        <Note at={halfAt} x={COL + 500} y={y(330) + h(82)}>
-          <Mark at={halfAt + 2}>
-            <span style={{ ...note(22, INK), fontWeight: 650, ...TABULAR }}>0.5</span>
-          </Mark>
         </Note>
         <Svg opacity={ease(frame, bestAt, 12)}>
           <path d={`M${COL + 320},${y(330) + h(168)} L${COL + 150},${y(560)}`} stroke={INK} strokeWidth={1.6} fill="none" />

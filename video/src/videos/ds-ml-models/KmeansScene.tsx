@@ -16,9 +16,9 @@ const YLIM: [number, number] = [-10.6, 13];
 const CH_X = 1080;
 const CH_W = 700;
 const ELBOW_TOP = 372;
-const ELBOW_H = 230;
-const SIL_TOP = 700;
-const SIL_H = 130;
+const ELBOW_H = 210;
+const SIL_TOP = 736;
+const SIL_H = 112;
 
 const LABELS = KMEANS.steps.map((s) => s.labels.split("").map(Number));
 /** Where the three starting centers sit together. */
@@ -210,7 +210,7 @@ export const KmeansScene: React.FC = () => {
         <Note at={threeAt} x={at(ex, 3) + 6} y={at(ey, best.inertia) - h(58)}>
           <span style={{ ...note(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{fmt(best.inertia, 0)}: the elbow</span>
         </Note>
-        <Note at={barelyAt} x={at(ex, 5)} y={at(ey, KMEANS.elbow[4].inertia) - h(46)}>
+        <Note at={barelyAt} x={at(ex, 5.6)} y={at(ey, KMEANS.elbow[5].inertia) - h(76)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>then barely moves</span>
         </Note>
         <Note at={elbowAt} x={CH_X + CH_W} y={y(ELBOW_TOP) - h(52)} align="right" from="right">
@@ -221,8 +221,8 @@ export const KmeansScene: React.FC = () => {
         <Note at={silAt} x={CH_X} y={y(SIL_TOP) - h(54)}>
           <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>silhouette score</span>
         </Note>
-        <Note at={nearerAt} x={CH_X + 210} y={y(SIL_TOP) - h(52)}>
-          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>how much nearer a point is to its own cluster than to the next</span>
+        <Note at={nearerAt} x={CH_X + 190} y={y(SIL_TOP) - h(52)}>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>how much nearer a point sits to its own cluster</span>
         </Note>
         {KMEANS.elbow
           .filter((e) => e.silhouette !== null)

@@ -114,10 +114,10 @@ export const LogitScene: React.FC = () => {
         <Axes x={sx} y={sy} xTicks={[10, 15, 20, 25, 30]} yTicks={[0, 0.5, 1]} yFormat={(v) => String(v)} xTitle="mean radius" yTitle="probability of malignant" at={radiusAt} />
 
         <Points xs={LOGIT.radius} ys={JITTER} labels={LOGIT.label} sx={sx} sy={sy} at={tumorsAt} spread={22} r={4.5} opacity={0.55} />
-        <Note at={tumorsAt + 8} x={box.left + 16} y={at(sy, 1) - h(46)}>
+        <Note at={tumorsAt + 8} x={box.left + box.width - 16} y={at(sy, 1) - h(40)} align="right" from="right">
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>{LOGIT.malignant} malignant, at 1</span>
         </Note>
-        <Note at={tumorsAt + 14} x={box.left + box.width - 16} y={at(sy, 0) + h(14)} align="right" from="right">
+        <Note at={tumorsAt + 14} x={box.left + box.width - 16} y={at(sy, 0) - h(40)} align="right" from="right">
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>{LOGIT.n - LOGIT.malignant} benign, at 0</span>
         </Note>
 
@@ -142,13 +142,13 @@ export const LogitScene: React.FC = () => {
         <Note at={belowAt} x={box.left + 16} y={at(sy, yLo) - h(42)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>below 0: {LOGIT.linBelow} tumors</span>
         </Note>
-        <Note at={aboveAt} x={box.left + box.width - 16} y={at(sy, yHi) + h(12)} align="right" from="right">
+        <Note at={aboveAt} x={box.left + 16} y={at(sy, yHi) + h(12)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>above 1: {LOGIT.linAbove} tumors</span>
         </Note>
         <Svg opacity={ease(frame, r28At + 2, 10)}>
           <circle cx={at(sx, 28)} cy={at(sy, at28)} r={8} fill={ACCENT} />
         </Svg>
-        <Note at={r28At + 4} x={at(sx, 28) - 18} y={at(sy, at28) + h(14)} align="right" from="up">
+        <Note at={r28At + 4} x={at(sx, 28) - 22} y={at(sy, at28) - h(44)} align="right" from="up">
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{fmt(at28, 2)} at radius 28</span>
         </Note>
 

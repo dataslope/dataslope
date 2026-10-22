@@ -94,22 +94,22 @@ export const HookScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Note at={unseenAt} x={LEFTS[0] + 120} y={y(TOP) + h(PH) + h(36)} dim={lineAt}>
+        <Note at={unseenAt} x={LEFTS[0]} y={y(TOP) + h(PH) + h(80)} dim={lineAt}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>on the {MOONS.nTest} points they haven&apos;t seen</span>
         </Note>
 
         <Spot id="ds-ml-models-raccoon" at={from + 6} left={1500} top={y(300)} width={360} height={360} />
 
         {/* ── The round, in one line ── */}
-        <Note at={fifteenAt - 2} x={X0} y={y(770)} dim={lineAt}>
+        <Note at={fifteenAt - 2} x={X0} y={y(800)} dim={lineAt}>
           <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>15 questions:</span>
         </Note>
-        <Note at={elevenAt - 2} x={X0 + 236} y={y(770)} dim={lineAt}>
+        <Note at={elevenAt - 2} x={X0 + 236} y={y(800)} dim={lineAt}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b style={{ color: BLUE_INK }}>11</b> with a model fitted on screen
           </span>
         </Note>
-        <Note at={fourAt - 2} x={X0 + 750} y={y(770)} dim={lineAt}>
+        <Note at={fourAt - 2} x={X0 + 750} y={y(800)} dim={lineAt}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b>4</b> in a sentence each, at the end
           </span>

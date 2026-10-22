@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CURSE, PCA, pct } from "./data";
@@ -64,7 +64,7 @@ export const PcaScene: React.FC = () => {
   const sb = { left: SCREE.left, top: y(SCREE.top), width: SCREE.width, height: h(SCREE.height) };
   const bw = 110;
   const barX = (i: number) => sb.left + 40 + i * 150;
-  const barY: Scale = { lo: 0, hi: 0.8, a: sb.top + sb.height, b: sb.top };
+  const barY: Scale = { lo: 0, hi: 1, a: sb.top + sb.height, b: sb.top };
   const barAt = [oneAt, twoAt, twoAt + 6, twoAt + 10];
   const cum2 = PCA.cumulative[1];
 
@@ -192,12 +192,14 @@ export const PcaScene: React.FC = () => {
           <circle cx={at(lx, Math.log10(2))} cy={at(ly, r2)} r={8 * ease(frame, twoDAt + 6, 10)} fill={C0} />
           <circle cx={at(lx, 3)} cy={at(ly, r1000)} r={9 * ease(frame, almostAt, 10)} fill={ACCENT_INK} />
         </Svg>
-        <Note at={sixtyAt} x={at(lx, Math.log10(2)) + 16} y={at(ly, r2) - h(60)}>
+        <Leader points={[[cb.left + 70, at(ly, 0.52)], [at(lx, Math.log10(2)), at(ly, r2) - 10]]} at={sixtyAt + 4} color={BLUE_INK} dot={false} />
+        <Note at={sixtyAt} x={cb.left + 30} y={at(ly, 0.62)}>
           <span style={{ ...note(24, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
-            2 dimensions: {fmt(r2, 3)}, about 1/{Math.round(1 / r2)}
+            2 dimensions: {fmt(r2, 3)}, about 1/{Math.round(1 / r2 / 10) * 10}
           </span>
         </Note>
-        <Note at={almostAt} x={at(lx, 3) - 16} y={at(ly, r1000) + h(18)} align="right" from="right">
+        <Leader points={[[at(lx, 2.85), at(ly, 0.6)], [at(lx, 3) - 6, at(ly, r1000) + 10]]} at={almostAt + 4} color={ACCENT_INK} dot={false} />
+        <Note at={almostAt} x={at(lx, 3) - 16} y={at(ly, 0.6)} align="right" from="right">
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>1,000 dimensions: {fmt(r1000, 2)}</span>
         </Note>
 

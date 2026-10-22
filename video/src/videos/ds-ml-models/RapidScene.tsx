@@ -252,7 +252,9 @@ export const RapidScene: React.FC = () => {
 
         {/* ── The bridge: a line, a cut, a distance ── */}
         <Svg>
-          <line x1={gx} y1={gy + 40} x2={gx + 120 * draw(lineAt)} y2={gy + 40 - 50 * draw(lineAt)} stroke={BAR} strokeWidth={4} strokeLinecap="round" />
+          {draw(lineAt) > 0 ? (
+            <line x1={gx} y1={gy + 40} x2={gx + 120 * draw(lineAt)} y2={gy + 40 - 50 * draw(lineAt)} stroke={BAR} strokeWidth={4} strokeLinecap="round" />
+          ) : null}
           <path
             d={`M${gx + 200},${gy + 40} L${gx + 240},${gy + 40} L${gx + 240},${gy} L${gx + 300},${gy} L${gx + 300},${gy - 16} L${gx + 330},${gy - 16}`}
             fill="none"

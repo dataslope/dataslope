@@ -18,8 +18,8 @@ const COLS = [
   { name: "customer ID", w: 190 },
   { name: "churned", w: 130 },
 ];
-const ROW = 40;
-const BARS_TOP = 620;
+const ROW = 36;
+const BARS_TOP = 640;
 const BAR_ROW = 58;
 const BAR_X = X0 + 190;
 const BAR_W = 520;
@@ -157,9 +157,11 @@ export const ShapScene: React.FC = () => {
         <Note at={asked + 6} x={X0 + 580} y={y(TABLE_TOP) + 5 * h(ROW) + h(8)}>
           <span style={{ ...label(18, INK_SOFT), whiteSpace: "nowrap" }}>distinct values</span>
         </Note>
-        <Note at={madeAt} x={X0} y={y(TABLE_TOP) - h(40)}>
+        <Note at={madeAt} x={X0 + 720} y={y(TABLE_TOP) + h(4)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-            made up for this video: {SHAP.n.toLocaleString("en-US")} customers
+            made up for this video,
+            <br />
+            {SHAP.n.toLocaleString("en-US")} customers
           </span>
         </Note>
         <Note at={nothingAt + 4} x={colX[3] + 10} y={y(TABLE_TOP) - h(40)} from="up">
