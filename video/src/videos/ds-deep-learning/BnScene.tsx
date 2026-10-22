@@ -49,7 +49,9 @@ export const BnScene: React.FC = () => {
     { text: "inference: running averages", at: n.word("bn-why", "At inference it uses running averages") },
     { text: "transformers: layer norm, per example", at: n.word("bn-why", "Transformers use layer norm") },
   ];
-  const shapeAt = n.word("arch-in", "the shape of the network itself");
+  const archInAt = n.word("arch-in", "The last two long ones");
+  // The page clears on the bridge's last word, so the gap before question 11 stays short.
+  const shapeAt = n.beat("arch-in").to - 4;
   const end = n.beat("arch-in").to;
 
   const pos = (line: number, v: number) => LEFT + ((v - LINES[line].lo) / (LINES[line].hi - LINES[line].lo)) * (RIGHT - LEFT);
@@ -150,7 +152,9 @@ export const BnScene: React.FC = () => {
             <Note key={r.text} at={r.at - 2} x={WHY_X} y={y(WHY_Y) + i * h(WHY_ROW)}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Tick at={r.at + 2} size={24} color={i < 3 ? OK : INK_SOFT} />
-                <span style={{ ...note(24, i < 3 ? INK : INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{r.text}</span>
+                <span style={{ ...note(24, i < 3 ? INK : INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+                  {i === reasons.length - 1 ? <Mark at={archInAt}>{r.text}</Mark> : r.text}
+                </span>
               </div>
             </Note>
           ))}

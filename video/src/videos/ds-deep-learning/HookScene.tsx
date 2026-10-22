@@ -81,7 +81,7 @@ export const HookScene: React.FC = () => {
         <Kicker at={from}>Data scientist interview prep</Kicker>
         <Headline lead="Not train one," turn="explain one." at={trainAt - 4} turnAt={explainAt - 4} size={72} />
 
-        <Spot id="ds-deep-learning-octopus" at={from + 6} left={1230} top={y(250)} width={580} height={560} />
+        <Spot id="ds-deep-learning-octopus" at={from + 6} left={1260} top={y(270)} width={510} height={500} />
 
         {/* ── The network ── */}
         <Svg opacity={netO}>

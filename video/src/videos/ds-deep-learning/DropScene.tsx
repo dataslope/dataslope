@@ -61,7 +61,9 @@ export const DropScene: React.FC = () => {
   const toyAt = n.word("decay-adam", "On the toy network");
   const holdsAt = n.word("decay-adam", "it holds validation loss at point one one");
   const climbedAt = n.word("decay-adam", "where it had climbed");
-  const stackAt = n.word("bn-in", "steadies the whole stack");
+  const bnInAt = n.word("bn-in", "Then, a layer");
+  // The page clears on the bridge's last word, so the gap before question 10 stays short.
+  const stackAt = n.beat("bn-in").to - 4;
   const end = n.beat("bn-in").to;
 
   const q8Out = q9At - 6;
@@ -228,7 +230,7 @@ export const DropScene: React.FC = () => {
             plain: {OVERFIT.endVal.toFixed(2)}
           </Tagline>
           <Tagline x={at(xs, 4000) - 260} y={at(ys, OVERFIT.decayEndVal) + h(12)} at={holdsAt + 4} size={20} color={OK_INK}>
-            weight decay: {OVERFIT.decayEndVal.toFixed(2)}
+            <Mark at={bnInAt}>weight decay: {OVERFIT.decayEndVal.toFixed(2)}</Mark>
           </Tagline>
         </Fade>
       </Drift>
