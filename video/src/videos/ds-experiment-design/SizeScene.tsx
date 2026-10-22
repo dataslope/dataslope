@@ -32,7 +32,7 @@ export const SizeScene: React.FC = () => {
   const inputsAt = n.word("size", "From four inputs");
   const inputAts = [
     n.word("size", "the baseline rate"),
-    n.word("size", "the M D E"),
+    n.word("size", "the MDE"),
     n.word("size", "alpha, and power") - 2,
     n.word("size", "and power"),
   ];
@@ -45,7 +45,7 @@ export const SizeScene: React.FC = () => {
   const halveAt = n.word("size-n", "Halve the lift");
   const oneAt = n.word("size-n", "fourteen thousand seven hundred fifty-two");
   const fourAt = n.word("size-n", "nearly four times as many");
-  const squaredAt = n.word("size-n", "one over the M D E squared");
+  const squaredAt = n.word("size-n", "one over the MDE squared");
   const directionAt = n.word("sides-in", "which direction counts");
   const clearAt = n.beat("sides-in").to - 6;
 

@@ -53,7 +53,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     99th percentile loses 48% of its variance; six heavy users among
  *     twenty land five or six in one arm with probability 0.219.
  *
- * Written for Drew's ear: "A B" for A/B, "A A" for A/A, "M D E", "S P R T".
+ * Written for Drew's ear: "A B" for A/B and "A A" for A/A; every other
+ * initialism in plain caps (MDE, SPRT, CUPED), which he reads as one unit,
+ * and none opens a sentence after "A" (the series' acronym rule).
  */
 export const script: NarrationScript = {
   id: "ds-experiment-design",
@@ -126,12 +128,12 @@ export const script: NarrationScript = {
     {
       id: "size",
       scene: true,
-      text: "Question six. How do you calculate the sample size for an A B test? From four inputs: the baseline rate, the M D E, or minimum detectable effect, alpha, and power. Only the baseline comes from data. The other three are choices.",
+      text: "Question six. How do you calculate the sample size for an A B test? From four inputs: the baseline rate, the MDE, or minimum detectable effect, alpha, and power. Only the baseline comes from data. The other three are choices.",
       pauseAfter: 0.6,
     },
     {
       id: "size-n",
-      text: "Ten percent convert today, and you want to catch a two-point lift. The page's formula says three thousand eight hundred forty-three users per arm. Halve the lift to one point, and it's fourteen thousand seven hundred fifty-two, nearly four times as many. The sample grows with one over the M D E squared.",
+      text: "Ten percent convert today, and you want to catch a two-point lift. The page's formula says three thousand eight hundred forty-three users per arm. Halve the lift to one point, and it's fourteen thousand seven hundred fifty-two, nearly four times as many. The sample grows with one over the MDE squared.",
       pauseAfter: 0.7,
     },
     { id: "sides-in", text: "A test also has to say which direction counts." },
@@ -167,7 +169,7 @@ export const script: NarrationScript = {
     {
       id: "sprt",
       scene: true,
-      text: "Question ten. What is a sequential probability ratio test? An S P R T tracks the likelihood ratio between two hypotheses, no effect and the effect you designed for, against boundaries fixed before the start. Cross the top line, and you conclude there's an effect. Cross the bottom, and there isn't. In between, you keep going.",
+      text: "Question ten. What is a sequential probability ratio test? An SPRT tracks the likelihood ratio between two hypotheses, no effect and the effect you designed for, against boundaries fixed before the start. Cross the top line, and you conclude there's an effect. Cross the bottom, and there isn't. In between, you keep going.",
       pauseAfter: 0.6,
     },
     {
