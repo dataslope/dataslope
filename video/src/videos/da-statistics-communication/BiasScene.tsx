@@ -38,6 +38,8 @@ export const BiasScene: React.FC = () => {
   const qAt = n.word("bias", "Question");
   const textAt = n.word("bias", "What is sampling bias");
   const usersAt = n.word("bias-who", "your app's users");
+  // The users arrive as the question ends, so it never sits on the question alone.
+  const distortAt = n.word("bias", "distort results");
   const leftAt = n.word("bias-who", "everyone who already left");
   const quarterAt = n.word("bias-who", "nearly a quarter");
   const survivorAt = n.word("bias-who", "survivorship bias");
@@ -55,7 +57,7 @@ export const BiasScene: React.FC = () => {
   const fixAt = n.word("bias-bigger", "The fix is the design");
   const end = n.beat("metric-in").to;
 
-  const barP = ease(frame, usersAt - 4, 18);
+  const barP = ease(frame, distortAt - 4, 18);
   const churnP = ease(frame, leftAt, 14);
   const churnX = BAR_X + BAR_W * (1 - BIAS.churned);
   const pct = `${fmt(BIAS.churned * 100, 1)}%`;
@@ -85,7 +87,7 @@ export const BiasScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── Who the survey can reach ── */}
-        <Note at={usersAt - 4} x={120} y={y(BAR_Y) + h(6)}>
+        <Note at={distortAt - 4} x={120} y={y(BAR_Y) + h(6)}>
           <span style={{ ...label(23, INK), whiteSpace: "nowrap", ...TABULAR }}>{BIAS.users.toLocaleString("en-US")} users</span>
         </Note>
         <div

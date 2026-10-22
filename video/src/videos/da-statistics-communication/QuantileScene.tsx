@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AMOUNTS } from "./data";
-import { Bracket, Drift, MARK_BAD, MARK_OK, OK_INK, Svg, X0 } from "./parts";
+import { Bracket, Drift, Mark, MARK_BAD, MARK_OK, OK_INK, Svg, X0 } from "./parts";
 
 const CELL = 96;
 const STRIP_X = 330;
@@ -93,6 +93,8 @@ export const QuantileScene: React.FC = () => {
   const ninetyAt = n.word("quantile-def", "about ninety percent");
   const quartilesAt = n.word("quantile-def", "Quartiles cut");
   const thirteenAt = n.word("quantile-cuts", "thirteen amounts");
+  // The amounts arrive as question 6 finishes, so it never sits on the question alone.
+  const asked6 = n.beat("quantile").to;
   const q1At = n.word("quantile-cuts", "Q one is ten");
   const medAt = n.word("quantile-cuts", "the median twelve");
   const q3At = n.word("quantile-cuts", "Q three thirteen");
@@ -115,6 +117,8 @@ export const QuantileScene: React.FC = () => {
   const hideAt = n.word("outlier-mask", "hide themselves");
   const lookAt = n.word("outlier-look", "look before you delete");
   const typoAt = n.word("outlier-look", "a typo");
+  const lastThreeAt = n.word("present-in", "The last three");
+  const loudAt = n.word("present-in", "saying it out loud");
   const end = n.beat("present-in").to;
 
   const S = AMOUNTS.sorted;
@@ -155,6 +159,8 @@ export const QuantileScene: React.FC = () => {
       <Sfx name="el-scratch" at={threeAt + 4} level={-32} />
 
       <Drift from={from} to={end + 40}>
+        {/* On the bridge to question 8 the takeaway is marked, then the page clears. */}
+        <AbsoluteFill style={{ opacity: 1 - ease(frame, loudAt + 6, 36) }}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={out6}>
           What are percentiles and quartiles?
         </QuestionCard>
@@ -184,21 +190,23 @@ export const QuantileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={lookAt - 2} x={X0} y={y(286)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>Look before you delete:</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <Mark at={lastThreeAt}>Look before you delete:</Mark>
+          </span>
         </Note>
         <Note at={typoAt - 2} x={X0} y={y(328)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>an outlier can be a typo, or the most important row you have</span>
         </Note>
 
         {/* ── Thirteen amounts, in order ── */}
-        <Note at={thirteenAt - 2} x={X0} y={top + cellH / 2 - 16}>
+        <Note at={Math.min(asked6 - 6, thirteenAt) - 2} x={X0} y={top + cellH / 2 - 16}>
           <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>amount</span>
         </Note>
         <Row
           values={S.map((s) => String(s.v))}
           top={top}
           height={cellH}
-          at={(i) => thirteenAt + i * 2}
+          at={(i) => Math.min(asked6 - 6, thirteenAt) + i * 2}
           marks={[
             { i: lo, at: betweenAt, out: out6, color: HIGHLIGHT },
             { i: lo + 1, at: betweenAt + 4, out: out6, color: HIGHLIGHT },
@@ -311,6 +319,7 @@ export const QuantileScene: React.FC = () => {
         <Note at={hideAt - 2} x={STRIP_X + 840} y={zTop + cellH + h(62)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>the outliers hide themselves</span>
         </Note>
+        </AbsoluteFill>
       </Drift>
     </AbsoluteFill>
   );

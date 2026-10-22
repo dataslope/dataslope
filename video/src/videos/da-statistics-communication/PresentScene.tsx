@@ -66,6 +66,8 @@ export const PresentScene: React.FC = () => {
   const from = n.beat("present").from;
   const qAt = n.word("present", "Question");
   const textAt = n.word("present", "How do you present");
+  // The blank slide arrives as question 8 ends; the answer fills it in.
+  const asked = n.beat("present").to;
   const leadAt = n.word("present-lead", "Lead with the answer");
   const methodAt = n.word("present-lead", "not the method");
   const titleAt = n.word("present-lead", "takeaway in the title");
@@ -99,7 +101,7 @@ export const PresentScene: React.FC = () => {
   const sy = y(SLIDE.y);
   const sw = SLIDE.w;
   const sh = h(SLIDE.h);
-  const slideP = ease(frame, titleAt - 8, 16);
+  const slideP = ease(frame, asked - 6, 16);
   const pad = 40;
   const axis: Scale = { lo: 0, hi: 20, a: sx + pad + 20, b: sx + sw - pad - 20 };
   const chartY = sy + h(210);
