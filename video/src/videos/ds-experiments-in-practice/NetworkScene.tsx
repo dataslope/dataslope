@@ -71,7 +71,7 @@ export const NetworkScene: React.FC = () => {
   const qAt = n.word("network", "Question seven");
   const textAt = n.word("network", "What are network effects and interference");
   const assumesAt = n.word("network", "A standard test assumes");
-  const sutvaAt = n.word("network", "That's S U T V A");
+  const sutvaAt = n.word("network", "That's SUTVA");
   const stableAt = n.word("network", "the stable unit treatment value assumption");
   const halfAt = n.word("network", "Give a sharing feature to half the users");
   const reachAt = n.word("network", "reaches the other half");

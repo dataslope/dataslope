@@ -56,8 +56,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "r-meta": the winner's-curse chart's question, computed exactly: at 20%
  *     power the significant estimates average 2.24 times the truth.
  *
- * Written for Drew's ear: "A B test" is spelled, as are "S R M", "A T E",
- * "A T T", "D I D" and "S U T V A"; numbers as they are said.
+ * Written for Drew's ear: "A B test" is spelled; every other initialism is
+ * written in plain caps (SRM, SUTVA, DiD, ATE, ATT), never letter-spaced, and
+ * no sentence starts with "A" right before one; numbers as they are said.
  */
 export const script: NarrationScript = {
   id: "ds-experiments-in-practice",
@@ -95,7 +96,7 @@ export const script: NarrationScript = {
     },
     {
       id: "srm-test",
-      text: "A chi-square test asks whether chance could do that. Here chi-square is sixteen, and p is about one in sixteen thousand. That's a sample ratio mismatch, an S R M. Four thousand nine hundred sixty against five thousand forty would be chance: p is point four two.",
+      text: "A chi-square test asks whether chance could do that. Here chi-square is sixteen, and p is about one in sixteen thousand. That's a sample ratio mismatch, an SRM. Four thousand nine hundred sixty against five thousand forty would be chance: p is point four two.",
       pauseAfter: 0.6,
     },
     {
@@ -160,7 +161,7 @@ export const script: NarrationScript = {
     {
       id: "network",
       scene: true,
-      text: "Question seven. What are network effects and interference? A standard test assumes one user's treatment can't change another user's outcome. That's S U T V A, the stable unit treatment value assumption. Give a sharing feature to half the users, and what they share reaches the other half: control gets treated too, and the difference shrinks. So randomize groups that rarely touch: clusters of friends, or whole cities.",
+      text: "Question seven. What are network effects and interference? A standard test assumes one user's treatment can't change another user's outcome. That's SUTVA, the stable unit treatment value assumption. Give a sharing feature to half the users, and what they share reaches the other half: control gets treated too, and the difference shrinks. So randomize groups that rarely touch: clusters of friends, or whole cities.",
       pauseAfter: 0.7,
     },
     {
@@ -184,7 +185,7 @@ export const script: NarrationScript = {
     },
     {
       id: "did-math",
-      text: "In this simulation, the treated city's weekly sign-ups rose eight point nine after the policy. The comparison city rose two point four over the same weeks, with no policy at all. The difference of those differences, D I D for short, is six point five, close to the true effect of six. It rests on parallel trends: without the policy, the two lines would have kept moving together.",
+      text: "In this simulation, the treated city's weekly sign-ups rose eight point nine after the policy. The comparison city rose two point four over the same weeks, with no policy at all. The difference of those differences, DiD for short, is six point five, close to the true effect of six. It rests on parallel trends: without the policy, the two lines would have kept moving together.",
       pauseAfter: 0.8,
     },
 
@@ -197,7 +198,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-ate",
-      text: "The average treatment effect, A T E, is averaged over everyone. The average treatment effect on the treated, A T T, only over those who actually got it. A randomized test makes them match. Observational data can pull them apart.",
+      text: "The average treatment effect, ATE, is averaged over everyone. The average treatment effect on the treated, ATT, only over those who actually got it. A randomized test makes them match. Observational data can pull them apart.",
     },
     {
       id: "r-long",

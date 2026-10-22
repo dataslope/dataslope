@@ -20,7 +20,7 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 
 const Ate: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
-  const ateAt = c.w("r-ate", "The average treatment effect, A T E");
+  const ateAt = c.w("r-ate", "The average treatment effect, ATE");
   const attAt = c.w("r-ate", "The average treatment effect on the treated");
   const gotAt = c.w("r-ate", "only over those who actually got it");
   const matchAt = c.w("r-ate", "A randomized test makes them match");
@@ -216,7 +216,7 @@ export const RapidScene: React.FC = () => {
   const nextAt = n.word("next", "Next:");
 
   const items: RapidItem[] = [
-    { n: 11, label: "ATE or ATT", at: n.word("r-ate", "The average treatment effect, A T E"), body: <Ate c={c} /> },
+    { n: 11, label: "ATE or ATT", at: n.word("r-ate", "The average treatment effect, ATE"), body: <Ate c={c} /> },
     { n: 12, label: "Long-running experiments", at: n.word("r-long", "Long-running experiments drift"), body: <Long c={c} /> },
     { n: 13, label: "A holdback", at: n.word("r-holdback", "A holdback keeps"), body: <Holdback c={c} /> },
     { n: 14, label: "Meta-analysis", at: n.word("r-meta", "a meta-analysis pools"), body: <Meta c={c} /> },
