@@ -160,7 +160,7 @@ The longest video, and the one whose figures carry the most: every chart it argu
 
 **Draws on:** SimpsonsParadox. Stats-7 TestingHypotheses and Stats-9 StatisticsInPractice teach testing and an A/B test end to end; numbers and figures should agree with theirs.
 
-### 8. AI-assisted analysis (9 questions, ~6.5 min)
+### 8. AI-assisted analysis (9 questions, ~6.5 min; built at 5:19)
 
 **Deep dives**
 1. How the interview changed: rounds with and without AI allowed
