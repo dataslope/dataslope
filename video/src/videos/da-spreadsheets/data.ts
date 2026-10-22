@@ -13,7 +13,7 @@ export const VIDEO = "da-spreadsheets";
  * Whether public/images/da-spreadsheets/ holds the watercolor from
  * illustrations.json. Every frame is laid out with room for it either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export type Value = number | string | boolean | { error: string } | null;
 /** One computed cell: where it is, the formula in it (Excel's spelling), and what it shows. */
