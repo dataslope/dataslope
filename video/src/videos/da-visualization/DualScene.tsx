@@ -65,6 +65,8 @@ export const DualScene: React.FC = () => {
   // The bridge: the two misleading drawings dimmed, the honest summary marked.
   const bridgeAt = n.beat("dash-in").from;
   const end = n.beat("dash-in").to;
+  // The bridge clears the page on its last words, so it never holds still into the cut.
+  const clearAt = n.word("dash-in", "end up on");
 
   const base = y(BASE);
   const top = y(TOP);
@@ -94,7 +96,8 @@ export const DualScene: React.FC = () => {
       <Sfx name="el-scratch" at={fallAt} level={-32} />
       <Sfx name="el-scratch" at={collapseAt - 4} level={-32} />
 
-      <Drift from={from} to={end + 40}>
+      <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 18) }}>
+        <Drift from={from} to={end + 40}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} out={out9} size={60}>
           What is a <Mark at={dualAxisAt + 2}>dual-axis chart</Mark>, and what&apos;s{" "}
           <Mark at={riskAt} color={MARK_BAD}>
@@ -193,7 +196,8 @@ export const DualScene: React.FC = () => {
         <Verdict ok={false} x={RIGHT.x0} y={miniBase + h(14)} at={collapseAt - 6}>
           a collapse that never happened
         </Verdict>
-      </Drift>
+        </Drift>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };
