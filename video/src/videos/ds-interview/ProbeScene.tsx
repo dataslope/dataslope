@@ -10,7 +10,7 @@ import { Drift, Headline, Kicker, Mono, X0 } from "./parts";
 const COL_W = 316;
 const GAP = 20;
 const TOP = 290;
-const COL_H = 500;
+const COL_H = 460;
 
 type Item = { at: number; text: React.ReactNode };
 

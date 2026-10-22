@@ -9,7 +9,7 @@ import { Sfx } from "../../sound/Sfx";
 import { VIDEO } from "./data";
 import { Drift, Headline, Hero, Kicker, OK, OK_INK } from "./parts";
 
-const ROUTE_Y = 560;
+const ROUTE_Y = 590;
 const FIRST = 210;
 const STEP = 380;
 const TITLE_W = 340;
