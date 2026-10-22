@@ -139,7 +139,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** a hedgehog.
 
-### 2. Probability (14 questions, ~7 min)
+### 2. Probability (14 questions, ~7 min, built at 7:44)
 
 **Deep dives**
 1. Conditional probability and Bayes' theorem (2)
