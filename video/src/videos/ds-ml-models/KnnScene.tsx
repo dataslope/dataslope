@@ -3,14 +3,44 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import {
+  ACCENT_INK,
+  BLUE_INK,
+  INK,
+  INK_SOFT,
+  PAPER,
+  TABULAR,
+  label,
+  note,
+} from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { KNN, MOONS, VOTE } from "./data";
-import { at, type Box, C0, C1, CLASS, Drift, Frame, Mark, OK_INK, PanelTitle, Points, Regions, scales, Svg, X0 } from "./parts";
+import {
+  at,
+  type Box,
+  C0,
+  C1,
+  CLASS,
+  Drift,
+  Frame,
+  Mark,
+  OK_INK,
+  PanelTitle,
+  Points,
+  Regions,
+  scales,
+  Svg,
+  X0,
+} from "./parts";
 
-const BIG: Omit<Box, "top" | "height"> & { top: number; height: number } = { left: X0 + 20, width: 720, top: 340, height: 497 };
+const BIG: Omit<Box, "top" | "height"> & { top: number; height: number } = {
+  left: X0 + 20,
+  width: 720,
+  top: 340,
+  height: 497,
+};
 const PW = 520;
 const PH = 359;
 const LEFTS = [X0 + 20, X0 + 570, X0 + 1120];
@@ -18,7 +48,11 @@ const TOP = 350;
 const COL = 1000;
 
 const Dot: React.FC<{ color: string }> = ({ color }) => (
-  <svg width={16} height={16} style={{ display: "inline-block", verticalAlign: "-1px" }}>
+  <svg
+    width={16}
+    height={16}
+    style={{ display: "inline-block", verticalAlign: "-1px" }}
+  >
     <circle cx={8} cy={8} r={7} fill={color} />
   </svg>
 );
@@ -60,17 +94,44 @@ export const KnnScene: React.FC = () => {
   const end = n.beat("kmeans-in").to;
 
   // ── One new point and its vote ──
-  const big: Box = { left: BIG.left, top: y(BIG.top), width: BIG.width, height: h(BIG.height) };
+  const big: Box = {
+    left: BIG.left,
+    top: y(BIG.top),
+    width: BIG.width,
+    height: h(BIG.height),
+  };
   const { x: bx, y: by } = scales(big, MOONS.xlim, MOONS.ylim);
   const out1 = tradeAt - 2;
   const qx = at(bx, VOTE.q[0]);
   const qy = at(by, VOTE.q[1]);
-  const ringR = (at(bx, VOTE.q[0] + VOTE.radius) - qx) * ease(frame, closestAt, 16);
+  const ringR =
+    (at(bx, VOTE.q[0] + VOTE.radius) - qx) * ease(frame, closestAt, 16);
 
   const panels = [
-    { k: "1" as const, at: oneAt, score: newOnesAt, under: varianceAt, tag: "high variance", tagInk: ACCENT_INK },
-    { k: "15" as const, at: fifteenAt, score: ninetyThreeAt, under: cvAt, tag: "", tagInk: OK_INK },
-    { k: "75" as const, at: seventyFiveAt, score: eightySevenAt, under: biasAt, tag: "high bias", tagInk: ACCENT_INK },
+    {
+      k: "1" as const,
+      at: oneAt,
+      score: newOnesAt,
+      under: varianceAt,
+      tag: "high variance",
+      tagInk: ACCENT_INK,
+    },
+    {
+      k: "15" as const,
+      at: fifteenAt,
+      score: ninetyThreeAt,
+      under: cvAt,
+      tag: "",
+      tagInk: OK_INK,
+    },
+    {
+      k: "75" as const,
+      at: seventyFiveAt,
+      score: eightySevenAt,
+      under: biasAt,
+      tag: "high bias",
+      tagInk: ACCENT_INK,
+    },
   ];
 
   return (
@@ -91,38 +152,92 @@ export const KnnScene: React.FC = () => {
 
         {/* ── One new point ── */}
         <Frame box={big} at={keepAt - 4} out={out1} />
-        <Points xs={MOONS.x} ys={MOONS.y} labels={MOONS.label} sx={bx} sy={by} at={keepAt} spread={18} r={6} out={out1} />
+        <Points
+          xs={MOONS.x}
+          ys={MOONS.y}
+          labels={MOONS.label}
+          sx={bx}
+          sy={by}
+          at={keepAt}
+          spread={18}
+          r={6}
+          out={out1}
+        />
         <Svg opacity={ease(frame, closestAt, 12) * (1 - ease(frame, out1, 10))}>
-          <circle cx={qx} cy={qy} r={Math.max(0, ringR)} fill="none" stroke={INK} strokeWidth={1.6} strokeDasharray="5 6" />
+          <circle
+            cx={qx}
+            cy={qy}
+            r={Math.max(0, ringR)}
+            fill="none"
+            stroke={INK}
+            strokeWidth={1.6}
+            strokeDasharray="5 6"
+          />
           {VOTE.neighbors.map((i, j) => {
             const p = ease(frame, closestAt + 4 + j, 8);
             const nx = at(bx, MOONS.x[i]);
             const ny = at(by, MOONS.y[i]);
             return (
               <g key={i}>
-                <line x1={qx} y1={qy} x2={qx + (nx - qx) * p} y2={qy + (ny - qy) * p} stroke={CLASS[MOONS.label[i]]} strokeWidth={2} opacity={0.8} />
-                <circle cx={nx} cy={ny} r={9 * ease(frame, voteAt + j, 8)} fill="none" stroke={CLASS[MOONS.label[i]]} strokeWidth={2.4} />
+                <line
+                  x1={qx}
+                  y1={qy}
+                  x2={qx + (nx - qx) * p}
+                  y2={qy + (ny - qy) * p}
+                  stroke={CLASS[MOONS.label[i]]}
+                  strokeWidth={2}
+                  opacity={0.8}
+                />
+                <circle
+                  cx={nx}
+                  cy={ny}
+                  r={9 * ease(frame, voteAt + j, 8)}
+                  fill="none"
+                  stroke={CLASS[MOONS.label[i]]}
+                  strokeWidth={2.4}
+                />
               </g>
             );
           })}
         </Svg>
         <Svg opacity={ease(frame, newAt, 10) * (1 - ease(frame, out1, 10))}>
-          <circle cx={qx} cy={qy} r={11} fill={PAPER} stroke={INK} strokeWidth={3} />
+          <circle
+            cx={qx}
+            cy={qy}
+            r={11}
+            fill={PAPER}
+            stroke={INK}
+            strokeWidth={3}
+          />
           <circle cx={qx} cy={qy} r={4} fill={INK} />
         </Svg>
 
         <Note at={keepAt} x={COL} y={y(350)} out={out1}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>keeps all {MOONS.nTrain} training points</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            keeps all {MOONS.nTrain} training points
+          </span>
         </Note>
         <Note at={newAt} x={COL} y={y(410)} out={out1}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            a new point <span style={{ opacity: ease(frame, closestAt, 10) }}>→ its k closest</span>{" "}
+            a new point{" "}
+            <span style={{ opacity: ease(frame, closestAt, 10) }}>
+              → its k closest
+            </span>{" "}
             <span style={{ opacity: ease(frame, voteAt, 10) }}>→ a vote</span>
           </span>
         </Note>
         <Note at={tenAt - 2} x={COL} y={y(490)} out={out1}>
-          <span style={{ ...note(34, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
-            k = 15: <Dot color={C1} /> {VOTE.ones} <span style={{ color: INK_SOFT }}>against</span> <Dot color={C0} /> {VOTE.zeros}
+          <span
+            style={{
+              ...note(34, INK),
+              fontWeight: 650,
+              whiteSpace: "nowrap",
+              ...TABULAR,
+            }}
+          >
+            k = 15: <Dot color={C1} /> {VOTE.ones}{" "}
+            <span style={{ color: INK_SOFT }}>against</span> <Dot color={C0} />{" "}
+            {VOTE.zeros}
           </span>
         </Note>
         <Note at={tenAt + 10} x={COL} y={y(560)} out={out1}>
@@ -131,41 +246,110 @@ export const KnnScene: React.FC = () => {
           </span>
         </Note>
         <Note at={noTrainAt} x={COL} y={y(660)} out={out1}>
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>no training step,</span>
+          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
+            no training step,
+          </span>
         </Note>
         <Note at={slowAt} x={COL} y={y(700)} out={out1}>
-          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>but slow to predict on large data</span>
+          <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>
+            but slow to predict on large data
+          </span>
         </Note>
 
         {/* ── What k does to the border ── */}
         {panels.map((p, i) => {
-          const box: Box = { left: LEFTS[i], top: y(TOP), width: PW, height: h(PH) };
+          const box: Box = {
+            left: LEFTS[i],
+            top: y(TOP),
+            width: PW,
+            height: h(PH),
+          };
           const { x, y: sy } = scales(box, MOONS.xlim, MOONS.ylim);
           const m = KNN[p.k];
           return (
             <React.Fragment key={p.k}>
-              <PanelTitle x={box.left} y={box.top - 42} at={p.at - 4} color={INK}>
+              <PanelTitle
+                x={box.left}
+                y={box.top - 42}
+                at={p.at - 4}
+                color={INK}
+              >
                 k = {p.k}
               </PanelTitle>
               <Regions grid={m.grid} box={box} at={p.at} dur={18} />
               <Frame box={box} at={tradeAt} />
-              <Points xs={MOONS.x} ys={MOONS.y} labels={MOONS.label} sx={x} sy={sy} at={tradeAt + i * 3} spread={12} r={4.5} out={withoutAt + 2} />
-              <Points xs={MOONS.x} ys={MOONS.y} sx={x} sy={sy} at={withoutAt} spread={10} r={4.5} color={INK_SOFT} opacity={0.75} />
-              <Note at={p.score - 2} x={box.left} y={box.top + box.height + h(14)}>
-                <span style={{ ...note(25, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
-                  {p.k === "1" ? `training ${Math.round(m.train * 100)}% · ` : ""}new {Math.round(m.test * 100)}%
+              <Points
+                xs={MOONS.x}
+                ys={MOONS.y}
+                labels={MOONS.label}
+                sx={x}
+                sy={sy}
+                at={tradeAt + i * 3}
+                spread={12}
+                r={4.5}
+                out={withoutAt + 2}
+              />
+              <Points
+                xs={MOONS.x}
+                ys={MOONS.y}
+                sx={x}
+                sy={sy}
+                at={withoutAt}
+                spread={10}
+                r={4.5}
+                color={INK_SOFT}
+                opacity={0.75}
+              />
+              <Note
+                at={p.score - 2}
+                x={box.left}
+                y={box.top + box.height + h(14)}
+              >
+                <span
+                  style={{
+                    ...note(25, BLUE_INK),
+                    fontWeight: 650,
+                    whiteSpace: "nowrap",
+                    ...TABULAR,
+                  }}
+                >
+                  {p.k === "1"
+                    ? `training ${Math.round(m.train * 100)}% · `
+                    : ""}
+                  new {Math.round(m.test * 100)}%
                 </span>
               </Note>
               {p.tag ? (
-                <Note at={p.under} x={box.left} y={box.top + box.height + h(56)}>
-                  <span style={{ ...note(25, p.tagInk), fontWeight: 650, whiteSpace: "nowrap" }}>{p.tag}</span>
+                <Note
+                  at={p.under}
+                  x={box.left}
+                  y={box.top + box.height + h(56)}
+                >
+                  <span
+                    style={{
+                      ...note(25, p.tagInk),
+                      fontWeight: 650,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {p.tag}
+                  </span>
                 </Note>
               ) : null}
             </React.Fragment>
           );
         })}
         <Note at={patchAt} x={LEFTS[0] + 14} y={y(TOP) + h(10)} out={fifteenAt}>
-          <span style={{ ...label(19, INK), whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>every point owns a patch</span>
+          <span
+            style={{
+              ...label(19, INK),
+              whiteSpace: "nowrap",
+              background: PAPER,
+              padding: "0 6px",
+            }}
+          >
+            every point owns a patch
+          </span>
         </Note>
         <Note at={cvAt} x={LEFTS[0]} y={y(TOP) + h(PH) + h(104)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>

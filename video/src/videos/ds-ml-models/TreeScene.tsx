@@ -3,12 +3,33 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
+import {
+  HAIRLINE,
+  INK,
+  INK_SOFT,
+  PAPER,
+  TABULAR,
+  fmt,
+  label,
+  note,
+} from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TREE } from "./data";
-import { at, Axes, C0, C1, Drift, Mark, OK, OK_INK, pulse, type Scale, Svg } from "./parts";
+import {
+  at,
+  Axes,
+  C0,
+  C1,
+  Drift,
+  Mark,
+  OK,
+  OK_INK,
+  pulse,
+  type Scale,
+  Svg,
+} from "./parts";
 
 const LEFT = 160;
 const WIDTH = 900;
@@ -23,7 +44,9 @@ const COL_W = 640;
 /** Each flower's column (its width to one decimal) and its height in the stack. */
 const STACK = (() => {
   const seen = new Map<string, number>();
-  const order = TREE.width.map((w, i) => ({ w, l: TREE.label[i], i })).sort((a, b) => a.w - b.w || a.l - b.l);
+  const order = TREE.width
+    .map((w, i) => ({ w, l: TREE.label[i], i }))
+    .sort((a, b) => a.w - b.w || a.l - b.l);
   const pos: { w: number; l: number; k: number }[] = [];
   for (const o of order) {
     const key = o.w.toFixed(1);
@@ -44,7 +67,14 @@ const sides = (t: number) => {
   return { left, right };
 };
 
-const NodeBox: React.FC<{ x: number; y: number; w: number; at: number; lines: React.ReactNode[]; lit?: number }> = ({ x, y, w, at: from, lines, lit = 0 }) => {
+const NodeBox: React.FC<{
+  x: number;
+  y: number;
+  w: number;
+  at: number;
+  lines: React.ReactNode[];
+  lit?: number;
+}> = ({ x, y, w, at: from, lines, lit = 0 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 14);
   if (p <= 0) return null;
@@ -65,7 +95,15 @@ const NodeBox: React.FC<{ x: number; y: number; w: number; at: number; lines: Re
       }}
     >
       {lines.map((l, i) => (
-        <div key={i} style={{ ...note(i === 0 ? 24 : 22, i === 0 ? INK : INK_SOFT), fontWeight: i === 0 ? 650 : 500, whiteSpace: "nowrap", ...TABULAR }}>
+        <div
+          key={i}
+          style={{
+            ...note(i === 0 ? 24 : 22, i === 0 ? INK : INK_SOFT),
+            fontWeight: i === 0 ? 650 : 500,
+            whiteSpace: "nowrap",
+            ...TABULAR,
+          }}
+        >
           {l}
         </div>
       ))}
@@ -109,7 +147,12 @@ export const TreeScene: React.FC = () => {
   const sx: Scale = { lo: 0.95, hi: 2.55, a: LEFT, b: LEFT + WIDTH };
   const base = y(BASE);
   const sy: Scale = { lo: 0, hi: 1, a: base, b: base - 10 };
-  const gy: Scale = { lo: 0, hi: 0.5, a: y(GINI_TOP) + h(GINI_H), b: y(GINI_TOP) };
+  const gy: Scale = {
+    lo: 0,
+    hi: 0.5,
+    a: y(GINI_TOP) + h(GINI_H),
+    b: y(GINI_TOP),
+  };
   const first = TREE.curve[0][0];
   const last = TREE.curve[TREE.curve.length - 1][0];
   const best = TREE.best[0];
@@ -118,7 +161,10 @@ export const TreeScene: React.FC = () => {
   // over every candidate and back to the best one.
   const tries = [1.25, 1.55, 2.05];
   const triesP = (frame - triesAt) / Math.max(1, purestAt - triesAt);
-  const tryCut = tries[Math.min(tries.length - 1, Math.max(0, Math.floor(triesP * tries.length)))];
+  const tryCut =
+    tries[
+      Math.min(tries.length - 1, Math.max(0, Math.floor(triesP * tries.length)))
+    ];
   const sweepEnd = bestAt - 12;
   const sweep = ease(frame, slideAt + 4, Math.max(1, sweepEnd - slideAt - 4));
   const settle = ease(frame, sweepEnd, 16);
@@ -143,7 +189,14 @@ export const TreeScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── The flowers, stacked by petal width ── */}
-        <Axes x={sx} y={sy} xTicks={[1, 1.5, 2, 2.5]} xFormat={(v) => fmt(v, 1)} xTitle="petal width (cm)" at={triesAt - 4} />
+        <Axes
+          x={sx}
+          y={sy}
+          xTicks={[1, 1.5, 2, 2.5]}
+          xFormat={(v) => fmt(v, 1)}
+          xTitle="petal width (cm)"
+          at={triesAt - 4}
+        />
         <Svg>
           {STACK.map((d, i) => {
             const s = ease(frame, triesAt - 2 + (i / STACK.length) * 16, 8);
@@ -163,7 +216,15 @@ export const TreeScene: React.FC = () => {
           })}
         </Svg>
         <Note at={speciesAt} x={LEFT} y={y(330)}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap", display: "flex", gap: 26, alignItems: "center" }}>
+          <span
+            style={{
+              ...label(22, INK),
+              whiteSpace: "nowrap",
+              display: "flex",
+              gap: 26,
+              alignItems: "center",
+            }}
+          >
             <span style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <svg width={14} height={14}>
                 <circle cx={7} cy={7} r={6} fill={C0} />
@@ -176,49 +237,113 @@ export const TreeScene: React.FC = () => {
               </svg>
               virginica
             </span>
-            <span style={{ color: INK_SOFT, fontWeight: 500 }}>{TREE.width.length} iris flowers</span>
+            <span style={{ color: INK_SOFT, fontWeight: 500 }}>
+              {TREE.width.length} iris flowers
+            </span>
           </span>
         </Note>
 
         {/* The cut, and the count on each side of it. */}
         <Svg opacity={cutOn}>
-          <line x1={at(sx, cut)} x2={at(sx, cut)} y1={y(380)} y2={y(GINI_TOP) + h(GINI_H)} stroke={INK} strokeWidth={2.4} strokeDasharray="7 6" />
+          <line
+            x1={at(sx, cut)}
+            x2={at(sx, cut)}
+            y1={y(380)}
+            y2={y(GINI_TOP) + h(GINI_H)}
+            stroke={INK}
+            strokeWidth={2.4}
+            strokeDasharray="7 6"
+          />
         </Svg>
-        <Note at={triesAt + 6} x={at(sx, cut) - 14} y={y(366)} align="right" from="up">
+        <Note
+          at={triesAt + 6}
+          x={at(sx, cut) - 14}
+          y={y(366)}
+          align="right"
+          from="up"
+        >
           <span style={{ ...label(21, INK), ...TABULAR, whiteSpace: "nowrap" }}>
-            <b style={{ color: C0 }}>{counts.left[0]}</b> · <b style={{ color: C1 }}>{counts.left[1]}</b>
+            <b style={{ color: C0 }}>{counts.left[0]}</b> ·{" "}
+            <b style={{ color: C1 }}>{counts.left[1]}</b>
           </span>
         </Note>
         <Note at={triesAt + 6} x={at(sx, cut) + 14} y={y(366)} from="up">
           <span style={{ ...label(21, INK), ...TABULAR, whiteSpace: "nowrap" }}>
-            <b style={{ color: C0 }}>{counts.right[0]}</b> · <b style={{ color: C1 }}>{counts.right[1]}</b>
+            <b style={{ color: C0 }}>{counts.right[0]}</b> ·{" "}
+            <b style={{ color: C1 }}>{counts.right[1]}</b>
           </span>
         </Note>
 
         {/* ── The weighted Gini of every cut ── */}
-        <Axes x={sx} y={gy} xTicks={[]} yTicks={[0, 0.25, 0.5]} yFormat={(v) => fmt(v, 2)} yTitle="weighted Gini of the two sides" at={slideAt} size={18} />
+        <Axes
+          x={sx}
+          y={gy}
+          xTicks={[]}
+          yTicks={[0, 0.25, 0.5]}
+          yFormat={(v) => fmt(v, 2)}
+          yTitle="weighted Gini of the two sides"
+          at={slideAt}
+          size={18}
+        />
         <Svg opacity={ease(frame, slideAt, 10)}>
           <defs>
             <clipPath id="tree-gini-reveal">
-              <rect x={LEFT} y={y(GINI_TOP) - 10} width={at(sx, reveal) - LEFT + 2} height={h(GINI_H) + 20} />
+              <rect
+                x={LEFT}
+                y={y(GINI_TOP) - 10}
+                width={at(sx, reveal) - LEFT + 2}
+                height={h(GINI_H) + 20}
+              />
             </clipPath>
           </defs>
           <path
             clipPath="url(#tree-gini-reveal)"
-            d={TREE.curve.map(([t, g], i) => `${i ? "L" : "M"}${at(sx, t).toFixed(1)},${at(gy, g).toFixed(1)}`).join(" ")}
+            d={TREE.curve
+              .map(
+                ([t, g], i) =>
+                  `${i ? "L" : "M"}${at(sx, t).toFixed(1)},${at(gy, g).toFixed(1)}`,
+              )
+              .join(" ")}
             fill="none"
             stroke={C0}
             strokeWidth={3}
             strokeLinejoin="round"
           />
-          <circle cx={at(sx, best)} cy={at(gy, TREE.best[1])} r={9 * okLit + 4 * pulse(frame, lowestAt, 18)} fill={OK} />
+          <circle
+            cx={at(sx, best)}
+            cy={at(gy, TREE.best[1])}
+            r={9 * okLit + 4 * pulse(frame, lowestAt, 18)}
+            fill={OK}
+          />
         </Svg>
-        <Note at={lowestAt} x={at(sx, best) + 16} y={at(gy, TREE.best[1]) - h(40)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{fmt(TREE.best[1], 2)}, the lowest</span>
+        <Note
+          at={lowestAt}
+          x={at(sx, best) + 16}
+          y={at(gy, TREE.best[1]) - h(40)}
+        >
+          <span
+            style={{
+              ...note(24, OK_INK),
+              fontWeight: 700,
+              whiteSpace: "nowrap",
+              ...TABULAR,
+            }}
+          >
+            {fmt(TREE.best[1], 2)}, the lowest
+          </span>
         </Note>
 
-        <Note at={purestAt} x={LEFT + WIDTH} y={y(330)} align="right" from="right" out={irisAt}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>purest: each side as close to one species as it gets</span>
+        <Note
+          at={purestAt}
+          x={LEFT + WIDTH}
+          y={y(330)}
+          align="right"
+          from="right"
+          out={irisAt}
+        >
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            purest: each side as close to one species as it gets
+          </span>
         </Note>
 
         {/* ── The split, as a tree ── */}
@@ -227,17 +352,51 @@ export const TreeScene: React.FC = () => {
           y={y(330)}
           w={320}
           at={giniAt}
-          lines={[`${TREE.width.length} flowers`, "50 · 50", <Mark key="g" at={halfAt + 2}>Gini {fmt(TREE.parent, 2)}</Mark>]}
+          lines={[
+            `${TREE.width.length} flowers`,
+            "50 · 50",
+            <Mark key="g" at={halfAt + 2}>
+              Gini {fmt(TREE.parent, 2)}
+            </Mark>,
+          ]}
         />
         <Note at={chanceAt} x={COL + 160} y={y(330) + h(128)} width={320}>
-          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>chance two random flowers differ</span>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
+            chance two random flowers differ
+          </span>
         </Note>
         <Svg opacity={ease(frame, bestAt, 12)}>
-          <path d={`M${COL + 320},${y(330) + h(168)} L${COL + 150},${y(560)}`} stroke={INK} strokeWidth={1.6} fill="none" />
-          <path d={`M${COL + 320},${y(330) + h(168)} L${COL + 490},${y(560)}`} stroke={INK} strokeWidth={1.6} fill="none" />
+          <path
+            d={`M${COL + 320},${y(330) + h(168)} L${COL + 150},${y(560)}`}
+            stroke={INK}
+            strokeWidth={1.6}
+            fill="none"
+          />
+          <path
+            d={`M${COL + 320},${y(330) + h(168)} L${COL + 490},${y(560)}`}
+            stroke={INK}
+            strokeWidth={1.6}
+            fill="none"
+          />
         </Svg>
-        <Note at={bestAt} x={COL + 320} y={y(330) + h(176)} align="left" from="up" style={{ transform: "translateX(-50%)" }}>
-          <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR, background: PAPER, padding: "2px 8px" }}>
+        <Note
+          at={bestAt}
+          x={COL + 320}
+          y={y(330) + h(176)}
+          align="left"
+          from="up"
+          style={{ transform: "translateX(-50%)" }}
+        >
+          <span
+            style={{
+              ...note(23, INK),
+              fontWeight: 650,
+              whiteSpace: "nowrap",
+              ...TABULAR,
+              background: PAPER,
+              padding: "2px 8px",
+            }}
+          >
             petal width ≤ {fmt(best, 2)}?
           </span>
         </Note>
@@ -249,7 +408,8 @@ export const TreeScene: React.FC = () => {
           lit={okLit}
           lines={[
             <>
-              <b style={{ color: C0 }}>{TREE.left.versicolor}</b> · <b style={{ color: C1 }}>{TREE.left.virginica}</b>
+              <b style={{ color: C0 }}>{TREE.left.versicolor}</b> ·{" "}
+              <b style={{ color: C1 }}>{TREE.left.virginica}</b>
             </>,
             <>Gini {fmt(TREE.left.gini, 2)}</>,
           ]}
@@ -262,24 +422,47 @@ export const TreeScene: React.FC = () => {
           lit={okLit}
           lines={[
             <>
-              <b style={{ color: C0 }}>{TREE.right.versicolor}</b> · <b style={{ color: C1 }}>{TREE.right.virginica}</b>
+              <b style={{ color: C0 }}>{TREE.right.versicolor}</b> ·{" "}
+              <b style={{ color: C1 }}>{TREE.right.virginica}</b>
             </>,
             <>Gini {fmt(TREE.right.gini, 2)}</>,
           ]}
         />
         <Note at={fallsAt} x={COL} y={y(560) + h(104)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>weighted: {fmt(TREE.best[1], 2)}</span>
+          <span
+            style={{
+              ...note(25, OK_INK),
+              fontWeight: 650,
+              whiteSpace: "nowrap",
+              ...TABULAR,
+            }}
+          >
+            weighted: {fmt(TREE.best[1], 2)}
+          </span>
         </Note>
         <Svg opacity={ease(frame, repeatAt, 14)}>
           {[COL + 150, COL + 490].flatMap((cx) =>
             [-70, 70].map((dx) => (
-              <path key={`${cx}${dx}`} d={`M${cx},${y(560) + h(92)} L${cx + dx},${y(760)}`} stroke={INK_SOFT} strokeWidth={1.4} strokeDasharray="4 6" fill="none" />
+              <path
+                key={`${cx}${dx}`}
+                d={`M${cx},${y(560) + h(92)} L${cx + dx},${y(760)}`}
+                stroke={INK_SOFT}
+                strokeWidth={1.4}
+                strokeDasharray="4 6"
+                fill="none"
+              />
             )),
           )}
         </Svg>
         {[COL + 150, COL + 490].flatMap((cx, j) =>
           [-70, 70].map((dx, k) => (
-            <Note key={`${cx}${dx}`} at={repeatAt + 4 + (j * 2 + k) * 3} x={cx + dx - 18} y={y(764)} from="up">
+            <Note
+              key={`${cx}${dx}`}
+              at={repeatAt + 4 + (j * 2 + k) * 3}
+              x={cx + dx - 18}
+              y={y(764)}
+              from="up"
+            >
               <span style={{ ...label(24, INK_SOFT) }}>…</span>
             </Note>
           )),
@@ -290,7 +473,16 @@ export const TreeScene: React.FC = () => {
           </span>
         </Note>
         <Svg opacity={pulse(frame, overAt, 26)}>
-          <rect x={COL - 8} y={y(552)} width={COL_W + 16} height={h(110)} rx={12} fill="none" stroke={OK} strokeWidth={3} />
+          <rect
+            x={COL - 8}
+            y={y(552)}
+            width={COL_W + 16}
+            height={h(110)}
+            rx={12}
+            fill="none"
+            stroke={OK}
+            strokeWidth={3}
+          />
         </Svg>
       </Drift>
     </AbsoluteFill>

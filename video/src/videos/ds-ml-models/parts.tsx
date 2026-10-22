@@ -47,13 +47,21 @@ export const C1 = ds("purple", 500);
 export const C2 = ds("teal", 500);
 export const CLASS = [C0, C1, C2] as const;
 /** The regions behind them: the same hues, washed out. */
-export const TINT = [ds("blue", 100), ds("purple", 100), ds("teal", 100)] as const;
+export const TINT = [
+  ds("blue", 100),
+  ds("purple", 100),
+  ds("teal", 100),
+] as const;
 
 /** A plot's box in page pixels. */
 export type Box = { left: number; top: number; width: number; height: number };
 
 /** The two scales that put data limits onto a box (y grows upward). */
-export const scales = (box: Box, xlim: readonly [number, number], ylim: readonly [number, number]): { x: Scale; y: Scale } => ({
+export const scales = (
+  box: Box,
+  xlim: readonly [number, number],
+  ylim: readonly [number, number],
+): { x: Scale; y: Scale } => ({
   x: { lo: xlim[0], hi: xlim[1], a: box.left, b: box.left + box.width },
   y: { lo: ylim[0], hi: ylim[1], a: box.top + box.height, b: box.top },
 });
@@ -103,10 +111,25 @@ export const Regions: React.FC<{
     }
   });
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: opacity * (1 - o) * (1 - d) }}>
+    <svg
+      width={1920}
+      height={1080}
+      style={{
+        position: "absolute",
+        inset: 0,
+        overflow: "visible",
+        opacity: opacity * (1 - o) * (1 - d),
+      }}
+    >
       <defs>
         <clipPath id={`r${id}`}>
-          <rect x={box.left} y={box.top} width={box.width * p} height={box.height} rx={6} />
+          <rect
+            x={box.left}
+            y={box.top}
+            width={box.width * p}
+            height={box.height}
+            rx={6}
+          />
         </clipPath>
       </defs>
       <g clipPath={`url(#r${id})`}>{rects}</g>
@@ -115,14 +138,37 @@ export const Regions: React.FC<{
 };
 
 /** A plot box's frame: a hairline rectangle, drawn on `at`. */
-export const Frame: React.FC<{ box: Box; at: number; out?: number; color?: string }> = ({ box, at: from, out, color = INK_SOFT }) => {
+export const Frame: React.FC<{
+  box: Box;
+  at: number;
+  out?: number;
+  color?: string;
+}> = ({ box, at: from, out, color = INK_SOFT }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 14);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: 0.55 * p * (1 - o) }}>
-      <rect x={box.left} y={box.top} width={box.width} height={box.height} fill="none" stroke={color} strokeWidth={1.2} rx={6} />
+    <svg
+      width={1920}
+      height={1080}
+      style={{
+        position: "absolute",
+        inset: 0,
+        overflow: "visible",
+        opacity: 0.55 * p * (1 - o),
+      }}
+    >
+      <rect
+        x={box.left}
+        y={box.top}
+        width={box.width}
+        height={box.height}
+        fill="none"
+        stroke={color}
+        strokeWidth={1.2}
+        rx={6}
+      />
     </svg>
   );
 };
@@ -145,19 +191,52 @@ export const Points: React.FC<{
   dim?: number;
   color?: string;
   opacity?: number;
-}> = ({ xs, ys, labels, sx, sy, at: from, spread = 16, r = 6, out, dim, color, opacity = 0.9 }) => {
+}> = ({
+  xs,
+  ys,
+  labels,
+  sx,
+  sy,
+  at: from,
+  spread = 16,
+  r = 6,
+  out,
+  dim,
+  color,
+  opacity = 0.9,
+}) => {
   const frame = useCurrentFrame();
   const o = out === undefined ? 0 : ease(frame, out, 10);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.7;
   if (o >= 1) return null;
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: (1 - o) * (1 - d) }}>
+    <svg
+      width={1920}
+      height={1080}
+      style={{
+        position: "absolute",
+        inset: 0,
+        overflow: "visible",
+        opacity: (1 - o) * (1 - d),
+      }}
+    >
       {xs.map((x, i) => {
         const s = ease(frame, from + (i / Math.max(1, xs.length)) * spread, 8);
         if (s <= 0) return null;
         const rad = typeof r === "number" ? r : r[i];
         const fill = color ?? CLASS[labels ? labels[i] : 0];
-        return <circle key={i} cx={at(sx, x)} cy={at(sy, ys[i])} r={rad * s} fill={fill} opacity={opacity} stroke={PAPER} strokeWidth={1.4} />;
+        return (
+          <circle
+            key={i}
+            cx={at(sx, x)}
+            cy={at(sy, ys[i])}
+            r={rad * s}
+            fill={fill}
+            opacity={opacity}
+            stroke={PAPER}
+            strokeWidth={1.4}
+          />
+        );
       })}
     </svg>
   );
@@ -181,7 +260,20 @@ export const Curve: React.FC<{
   dash?: string;
   clip?: Box;
   opacity?: number;
-}> = ({ points, x, y, at: from, dur = 24, out, dim, color, width = 3, dash, clip, opacity = 1 }) => {
+}> = ({
+  points,
+  x,
+  y,
+  at: from,
+  dur = 24,
+  out,
+  dim,
+  color,
+  width = 3,
+  dash,
+  clip,
+  opacity = 1,
+}) => {
   const frame = useCurrentFrame();
   const id = useId().replace(/:/g, "");
   const p = ease(frame, from, dur);
@@ -189,16 +281,34 @@ export const Curve: React.FC<{
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.75;
   if (p <= 0 || o >= 1) return null;
   const px = points.map(([a, b]) => [at(x, a), at(y, b)] as const);
-  const path = px.map(([a, b], i) => `${i ? "L" : "M"}${a.toFixed(1)},${b.toFixed(1)}`).join(" ");
+  const path = px
+    .map(([a, b], i) => `${i ? "L" : "M"}${a.toFixed(1)},${b.toFixed(1)}`)
+    .join(" ");
   // A dashed line cannot also be drawn by its dash array, so it wipes in
   // behind a growing clip instead.
   const x0 = clip ? clip.left : 0;
-  const wipe = dash ? px[0][0] + (px[px.length - 1][0] - px[0][0]) * p : undefined;
+  const wipe = dash
+    ? px[0][0] + (px[px.length - 1][0] - px[0][0]) * p
+    : undefined;
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: opacity * (1 - o) * (1 - d) }}>
+    <svg
+      width={1920}
+      height={1080}
+      style={{
+        position: "absolute",
+        inset: 0,
+        overflow: "visible",
+        opacity: opacity * (1 - o) * (1 - d),
+      }}
+    >
       <defs>
         <clipPath id={`c${id}`}>
-          <rect x={x0} y={clip ? clip.top : 0} width={(wipe ?? (clip ? clip.left + clip.width : 1920)) - x0} height={clip ? clip.height : 1080} />
+          <rect
+            x={x0}
+            y={clip ? clip.top : 0}
+            width={(wipe ?? (clip ? clip.left + clip.width : 1920)) - x0}
+            height={clip ? clip.height : 1080}
+          />
         </clipPath>
       </defs>
       <g clipPath={`url(#c${id})`}>
@@ -218,28 +328,46 @@ export const Curve: React.FC<{
 };
 
 /** Fades its children in from `from` and, optionally, out from `out`. */
-export const Fade: React.FC<{ from: number; out?: number; children: React.ReactNode }> = ({ from, out, children }) => {
+export const Fade: React.FC<{
+  from: number;
+  out?: number;
+  children: React.ReactNode;
+}> = ({ from, out, children }) => {
   const frame = useCurrentFrame();
-  const o = ease(frame, from, 8) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
-  return o > 0 ? <AbsoluteFill style={{ opacity: o }}>{children}</AbsoluteFill> : null;
+  const o =
+    ease(frame, from, 8) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  return o > 0 ? (
+    <AbsoluteFill style={{ opacity: o }}>{children}</AbsoluteFill>
+  ) : null;
 };
 
 /** A small title over a panel, in the chart face. */
-export const PanelTitle: React.FC<{ x: number; y: number; at: number; out?: number; dim?: number; color?: string; children: React.ReactNode }> = ({
-  x,
-  y,
-  at: from,
-  out,
-  dim,
-  color = INK_SOFT,
-  children,
-}) => {
+export const PanelTitle: React.FC<{
+  x: number;
+  y: number;
+  at: number;
+  out?: number;
+  dim?: number;
+  color?: string;
+  children: React.ReactNode;
+}> = ({ x, y, at: from, out, dim, color = INK_SOFT, children }) => {
   const frame = useCurrentFrame();
-  const o = ease(frame, from, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  const o =
+    ease(frame, from, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
   if (o <= 0) return null;
   return (
-    <div style={{ position: "absolute", left: x, top: y, whiteSpace: "nowrap", opacity: o * (1 - d), ...label(22, color), fontWeight: 650 }}>
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        whiteSpace: "nowrap",
+        opacity: o * (1 - d),
+        ...label(22, color),
+        fontWeight: 650,
+      }}
+    >
       {children}
     </div>
   );

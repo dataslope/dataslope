@@ -2,12 +2,34 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import {
+  BLUE_INK,
+  HIGHLIGHT,
+  INK,
+  INK_SOFT,
+  TABULAR,
+  label,
+  note,
+} from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HOOK, MOONS } from "./data";
-import { type Box, Drift, Frame, Headline, Kicker, PanelTitle, Points, pulse, Regions, scales, Spot, Svg, X0 } from "./parts";
+import {
+  type Box,
+  Drift,
+  Frame,
+  Headline,
+  Kicker,
+  PanelTitle,
+  Points,
+  pulse,
+  Regions,
+  scales,
+  Spot,
+  Svg,
+  X0,
+} from "./parts";
 
 const PW = 440;
 const PH = 304;
@@ -32,7 +54,11 @@ export const HookScene: React.FC = () => {
   const treeAt = n.word("hook", "A decision tree cuts");
   const knnAt = n.word("hook", "Nearest neighbors bends");
   const unseenAt = n.word("hook", "On points they haven't seen");
-  const scoreAt = [n.word("hook", "eighty-two"), n.word("hook", "eighty-nine"), n.word("hook", "ninety-three")];
+  const scoreAt = [
+    n.word("hook", "eighty-two"),
+    n.word("hook", "eighty-nine"),
+    n.word("hook", "ninety-three"),
+  ];
   const eachAt = n.word("plan", "how each one draws its border");
   const pickAt = n.word("plan", "when you'd pick it");
   const fifteenAt = n.word("plan", "fifteen questions");
@@ -60,22 +86,57 @@ export const HookScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>Data scientist interview prep</Kicker>
-        <Headline lead="Same points," turn="three borders." at={pointsAt - 4} turnAt={borderAt - 4} size={72} />
+        <Headline
+          lead="Same points,"
+          turn="three borders."
+          at={pointsAt - 4}
+          turnAt={borderAt - 4}
+          size={72}
+        />
 
         {panels.map((p, i) => {
-          const box: Box = { left: LEFTS[i], top: y(TOP), width: PW, height: h(PH) };
+          const box: Box = {
+            left: LEFTS[i],
+            top: y(TOP),
+            width: PW,
+            height: h(PH),
+          };
           const { x, y: sy } = scales(box, MOONS.xlim, MOONS.ylim);
           const lit = i === 0 ? ease(frame, lineAt - 2, 10) : 0;
           const dim = i === 0 ? undefined : lineAt;
-          const flash = pulse(frame, eachAt + i * 5, 18) + pulse(frame, pickAt + i * 5, 18) * 0.6;
+          const flash =
+            pulse(frame, eachAt + i * 5, 18) +
+            pulse(frame, pickAt + i * 5, 18) * 0.6;
           return (
             <React.Fragment key={p.name}>
-              <PanelTitle x={box.left} y={box.top - 42} at={p.at - 4} dim={dim} color={INK}>
+              <PanelTitle
+                x={box.left}
+                y={box.top - 42}
+                at={p.at - 4}
+                dim={dim}
+                color={INK}
+              >
                 {p.name}
               </PanelTitle>
-              <Regions grid={p.model.grid} box={box} at={p.at} dur={20} dim={dim} />
+              <Regions
+                grid={p.model.grid}
+                box={box}
+                at={p.at}
+                dur={20}
+                dim={dim}
+              />
               <Frame box={box} at={pointsAt - 6} />
-              <Points xs={MOONS.x} ys={MOONS.y} labels={MOONS.label} sx={x} sy={sy} at={pointsAt + i * 3} spread={18} r={5} dim={dim} />
+              <Points
+                xs={MOONS.x}
+                ys={MOONS.y}
+                labels={MOONS.label}
+                sx={x}
+                sy={sy}
+                at={pointsAt + i * 3}
+                spread={18}
+                r={5}
+                dim={dim}
+              />
               <Svg opacity={Math.max(lit, Math.min(1, flash))}>
                 <rect
                   x={box.left - 6}
@@ -88,21 +149,53 @@ export const HookScene: React.FC = () => {
                   strokeWidth={8}
                 />
               </Svg>
-              <Note at={scoreAt[i] - 2} x={box.left} y={box.top + box.height + h(18)} dim={dim}>
-                <span style={{ ...note(44, BLUE_INK), fontWeight: 700, ...TABULAR }}>{Math.round(p.model.test * 100)}%</span>
+              <Note
+                at={scoreAt[i] - 2}
+                x={box.left}
+                y={box.top + box.height + h(18)}
+                dim={dim}
+              >
+                <span
+                  style={{ ...note(44, BLUE_INK), fontWeight: 700, ...TABULAR }}
+                >
+                  {Math.round(p.model.test * 100)}%
+                </span>
               </Note>
             </React.Fragment>
           );
         })}
-        <Note at={unseenAt} x={LEFTS[0]} y={y(TOP) + h(PH) + h(80)} dim={lineAt}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>on the {MOONS.nTest} points they haven&apos;t seen</span>
+        <Note
+          at={unseenAt}
+          x={LEFTS[0]}
+          y={y(TOP) + h(PH) + h(80)}
+          dim={lineAt}
+        >
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            on the {MOONS.nTest} points they haven&apos;t seen
+          </span>
         </Note>
 
-        <Spot id="ds-ml-models-raccoon" at={from + 6} left={1548} top={y(336)} width={340} height={266} />
+        <Spot
+          id="ds-ml-models-raccoon"
+          at={from + 6}
+          left={1548}
+          top={y(336)}
+          width={340}
+          height={266}
+        />
 
         {/* ── The round, in one line ── */}
         <Note at={fifteenAt - 2} x={X0} y={y(800)} dim={lineAt}>
-          <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>15 questions:</span>
+          <span
+            style={{
+              ...note(30, INK),
+              fontWeight: 650,
+              whiteSpace: "nowrap",
+              ...TABULAR,
+            }}
+          >
+            15 questions:
+          </span>
         </Note>
         <Note at={elevenAt - 2} x={X0 + 236} y={y(800)} dim={lineAt}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap", ...TABULAR }}>
