@@ -158,10 +158,11 @@ export const CupedScene: React.FC = () => {
             average {CUPED.meanY.toFixed(2)} → {CUPED.meanAdj.toFixed(2)}, <b style={{ color: OK_INK }}>unchanged</b>
           </span>
         </Note>
-        <Note at={noiseAt} x={COL_X} y={y(790)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
-            only the noise shrinks<span style={{ opacity: ease(frame, halfAt - 2, 10) }}>: same power, under half the users</span>
-          </span>
+        <Note at={noiseAt} x={COL_X} y={y(786)}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>only the noise shrinks:</span>
+        </Note>
+        <Note at={halfAt - 2} x={COL_X} y={y(826)}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>same power, under half the users</span>
         </Note>
       </Drift>
     </AbsoluteFill>

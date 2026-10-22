@@ -39,10 +39,12 @@ const Sensitive: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={sensAt - 2} x={R_X + 40} y={c.y(330)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
           <b>sensitive</b>: moves reliably when the treatment works
-          <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, smallAt, 10) }}>, so it detects small effects</span>
         </span>
       </Note>
-      <Note at={robustAt - 2} x={R_X + 40} y={c.y(384)}>
+      <Note at={smallAt} x={R_X + 64} y={c.y(370)}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>so it can detect small effects</span>
+      </Note>
+      <Note at={robustAt - 2} x={R_X + 40} y={c.y(418)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
           <b>robust</b>: hard to game
           <span style={{ opacity: ease(frame, outlierAt - 4, 10) }}>, not thrown by outliers</span>
@@ -51,7 +53,7 @@ const Sensitive: React.FC<{ c: Ctx }> = ({ c }) => {
       {rows.map((r, i) => {
         const p = ease(frame, r.at - 2, 14);
         if (p <= 0) return null;
-        const top = c.y(470) + i * c.h(96);
+        const top = c.y(490) + i * c.h(96);
         return (
           <React.Fragment key={r.text}>
             <div style={{ position: "absolute", left: R_X + 40, top, ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: p }}>{r.text}</div>
@@ -106,8 +108,8 @@ const Strata: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={splitsAt - 2} x={R_X + 40} y={c.y(330)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          group users first<span style={{ ...note(24, INK_SOFT), opacity: ease(frame, likeAt, 10) }}> (country, device)</span>
-          <span style={{ opacity: ease(frame, insideAt - 2, 10) }}>, then randomize inside each group</span>
+          group first<span style={{ ...note(24, INK_SOFT), opacity: ease(frame, likeAt, 10) }}> (country, device)</span>
+          <span style={{ opacity: ease(frame, insideAt - 2, 10) }}>, then randomize within each</span>
         </span>
       </Note>
       <Note at={sixAt} x={R_X + 40} y={c.y(390)}>
@@ -122,14 +124,18 @@ const Strata: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={fiveAt} x={R_X + 40} y={c.y(546)}>
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
           {heavyB} of {STRATA.heavy} heavy users in B
-          <span style={{ opacity: ease(frame, oneInFiveAt - 2, 10) }}>: five or six in one arm about 1 time in 5 ({pct(STRATA.lopsided, 1)})</span>
         </span>
       </Note>
-      <Note at={stratAt - 2} x={R_X + 40} y={c.y(614)}>
+      <Note at={oneInFiveAt - 2} x={R_X + 40} y={c.y(580)}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+          a coin does that about 1 time in 5 ({pct(STRATA.lopsided, 1)})
+        </span>
+      </Note>
+      <Note at={stratAt - 2} x={R_X + 40} y={c.y(636)}>
         <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>stratified</span>
       </Note>
-      <Users arms={stratified} top={c.y(680)} at={stratAt} />
-      <Note at={stratAt + 10} x={R_X + 40} y={c.y(716)}>
+      <Users arms={stratified} top={c.y(700)} at={stratAt} />
+      <Note at={stratAt + 10} x={R_X + 40} y={c.y(736)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>three heavy users in each arm</span>
       </Note>
     </>

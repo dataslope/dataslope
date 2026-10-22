@@ -20,6 +20,8 @@ const PEAK = 230;
 const Z = 4;
 
 const density = (z: number) => Math.exp(-0.5 * z * z) / Math.sqrt(2 * Math.PI);
+/** A difference in points, signed and to two places. */
+const signed = (v: number) => (v < 0 ? `−${(-v).toFixed(2)}` : `+${v.toFixed(2)}`);
 
 /** One null curve with its rejection region shaded: both tails, or one. */
 const NullPanel: React.FC<{ left: number; two: boolean; at: number; tailAt: number }> = ({ left, two, at: from, tailAt }) => {
@@ -86,11 +88,9 @@ export const SidesScene: React.FC = () => {
   const marginAt = n.word("noninf", "a margin set in advance");
   const checkoutAt = n.word("noninf", "Say a cheaper checkout");
   const halfAt = n.word("noninf", "at most half a point");
-  const bigAt = n.word("noninf", "At sixty thousand users per arm");
   const bigRunsAt = n.word("noninf", "runs from minus point two nine");
   const clearOfAt = n.word("noninf", "clear of the margin");
   const smallAt = n.word("noninf", "At six thousand");
-  const zeroAt = n.word("noninf", "contains zero");
   const pastAt = n.word("noninf", "reaches past minus one");
   const notWorseAt = n.word("noninf", "Not significant isn't the same");
   const liveAt = n.word("peek-in", "the test goes live");
@@ -103,8 +103,8 @@ export const SidesScene: React.FC = () => {
   const xs: Scale = { lo: -1.5, hi: 1.5, a: 330, b: 1530 };
   const ys: Scale = { lo: 0, hi: 1, a: y(760), b: y(380) };
   const intervals = [
-    { iv: NONINF.big, at: bigAt, drawAt: bigRunsAt, top: 500, color: OK, ink: OK_INK, text: `${NONINF.big.n.toLocaleString("en-US")} per arm: clear of the margin`, textAt: clearOfAt },
-    { iv: NONINF.small, at: smallAt, drawAt: smallAt + 2, top: 620, color: INK_SOFT, ink: ACCENT_INK, text: `${NONINF.small.n.toLocaleString("en-US")} per arm: contains 0, reaches past −1`, textAt: pastAt },
+    { iv: NONINF.big, drawAt: bigRunsAt, top: 490, color: OK, ink: OK_INK, verdict: "clear of the margin", verdictAt: clearOfAt },
+    { iv: NONINF.small, drawAt: smallAt + 2, top: 620, color: INK_SOFT, ink: ACCENT_INK, verdict: "contains 0, but reaches past −1", verdictAt: pastAt },
   ];
 
   return (
@@ -201,22 +201,15 @@ export const SidesScene: React.FC = () => {
                 <line x1={hi} x2={hi} y1={y(r.top) - h(14)} y2={y(r.top) + h(14)} stroke={r.color} strokeWidth={3} />
                 <circle cx={mid} cy={y(r.top)} r={9} fill={r.color} />
               </Svg>
-              <Note at={r.textAt} x={at(xs, r.iv.hi) + 24} y={y(r.top) - h(18)}>
-                <span style={{ ...note(25, r.ink), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>{r.text}</span>
+              <Note at={r.drawAt + 4} x={at(xs, r.iv.lo)} y={y(r.top) + h(24)}>
+                <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
+                  {r.iv.n.toLocaleString("en-US")} per arm: {signed(r.iv.lo)} to {signed(r.iv.hi)}
+                  <b style={{ color: r.ink, opacity: ease(frame, r.verdictAt - 2, 10) }}>, {r.verdict}</b>
+                </span>
               </Note>
             </React.Fragment>
           );
         })}
-        <Note at={zeroAt} x={at(xs, NONINF.small.lo)} y={y(656)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-            {`${NONINF.small.lo}`.replace("-", "−")} to +{NONINF.small.hi}
-          </span>
-        </Note>
-        <Note at={bigRunsAt + 6} x={at(xs, NONINF.big.lo)} y={y(536)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-            {`${NONINF.big.lo}`.replace("-", "−")} to +{NONINF.big.hi}
-          </span>
-        </Note>
         <Note at={notWorseAt - 2} x={330} y={y(820)}>
           <span style={{ ...note(32, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Mark at={liveAt - 6}>not significant ≠ not worse</Mark>

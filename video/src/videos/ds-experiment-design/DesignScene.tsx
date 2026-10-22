@@ -163,16 +163,13 @@ export const DesignScene: React.FC = () => {
         })}
 
         {/* Question 2: three tests a primary metric has to pass. */}
+        <div style={{ position: "absolute", left: RIGHT_X, top: y(310), display: "flex", gap: 14 }}>
         {criteria.map((c, i) => {
           const p = ease(frame, c.at - 2, 10);
-          if (p <= 0) return null;
           return (
             <div
               key={c.text}
               style={{
-                position: "absolute",
-                left: RIGHT_X + i * 270,
-                top: y(310),
                 padding: "6px 14px",
                 borderRadius: 6,
                 border: `2px solid ${INK}`,
@@ -188,6 +185,7 @@ export const DesignScene: React.FC = () => {
             </div>
           );
         })}
+        </div>
         {candidates.map((c, i) => {
           const p = ease(frame, c.at - 2, 12);
           if (p <= 0) return null;

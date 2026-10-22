@@ -108,7 +108,7 @@ export const SprtScene: React.FC = () => {
           <circle cx={at(xs, SPRT.examples.effect.n)} cy={at(ys, SPRT.upper)} r={9 * ease(frame, concludeAt, 10)} fill={OK} />
           <circle cx={at(xs, SPRT.examples.none.n)} cy={at(ys, SPRT.lower)} r={9 * ease(frame, bottomAt + 18, 10)} fill={INK} />
         </Svg>
-        <Note at={betweenAt} x={BOX.left + 20} y={at(ys, 1.1)}>
+        <Note at={betweenAt} x={BOX.left + 20} y={at(ys, 2.7)}>
           <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>in between: keep going</span>
         </Note>
 

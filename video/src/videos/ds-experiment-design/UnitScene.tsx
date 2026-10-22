@@ -118,19 +118,17 @@ export const UnitScene: React.FC = () => {
         <Note at={assignedAt} x={X0} y={y(300)}>
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>assigned to a group:</span>
         </Note>
+        <div style={{ position: "absolute", left: X0 + 250, top: y(294), display: "flex", gap: 12 }}>
         {[
           { text: "user", at: userAt, main: true },
           { text: "session", at: sessionAt, main: false },
           { text: "device", at: sessionAt + 6, main: false },
-        ].map((c, i) => {
+        ].map((c) => {
           const p = ease(frame, c.at - 2, 10);
           return (
             <div
               key={c.text}
               style={{
-                position: "absolute",
-                left: X0 + 250 + i * 150,
-                top: y(294),
                 padding: "4px 14px",
                 borderRadius: 6,
                 border: `2px solid ${c.main ? OK : INK_SOFT}`,
@@ -146,13 +144,14 @@ export const UnitScene: React.FC = () => {
             </div>
           );
         })}
+        </div>
 
         <Requests top={y(410)} at={userAt + 6} mixed={false} label="by user" />
-        <Note at={userAt + 22} x={X0 + 560} y={y(420)}>
+        <Note at={userAt + 22} x={X0 + 610} y={y(420)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one version</span>
         </Note>
         <Requests top={y(520)} at={requestAt} mixed label="by request" />
-        <Note at={bothAt} x={X0 + 560} y={y(530)}>
+        <Note at={bothAt} x={X0 + 610} y={y(530)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>both versions</span>
         </Note>
         <Note at={diluteAt} x={X0} y={y(620)}>
