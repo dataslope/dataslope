@@ -51,7 +51,7 @@ Order follows the track (`content/interview/data-analyst/meta.json`), so each vi
 
 Every video stays under the 9,500-character cap the Statistics course set for a unit video (about 12.4 minutes); Visualization and Pandas are the closest.
 
-### 0. The Data Analyst interview (~2 min)
+### 0. The Data Analyst interview (~2 min; built at 1:34)
 
 From `index.mdx`: what the loop looks like (a live SQL screen or a take-home, a few spreadsheet and statistics questions, a "how would you analyze X?" discussion), the four things interviewers probe (SQL fluency, aggregation and framing, communication, tools), what AI has changed (checking beats writing, responsible use, BI tools that answer in plain language, rounds with and without AI allowed), and how the series works: deep dives, then a rapid-fire round, with practice on each page.
 
@@ -101,7 +101,7 @@ The Statistics course videos teach these ideas from scratch (Stats-2 DescribingD
 
 As built, percentiles and quartiles come before outliers, so the IQR fences are drawn on the quartiles the viewer has just seen, and the three communication questions share one finding (the page's 12% lift, 8% to 16%) on one slide. Numbers come from `check.mjs` in Pyodide with pandas 3.0.2, NumPy and SciPy; the confounder, the survey, the metric and the rapid round's draws are the video's own seeded data, and the outlier and variance figures are the page's.
 
-### 4. Advanced SQL (20 questions, ~8 min)
+### 4. Advanced SQL (20 questions, ~8 min; built at 6:36)
 
 **Deep dives**
 1. What a window function is: `OVER` against `GROUP BY`, and `PARTITION BY` against `ORDER BY` (2)
