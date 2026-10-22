@@ -28,6 +28,8 @@ import { script as dbRelationalHistoryScript } from "./videos/db-relational-hist
 // Interview prep, Data Analyst: one video per topic page.
 import { DaSql } from "./videos/da-sql/Video";
 import { script as daSqlScript } from "./videos/da-sql/script";
+import { DaPandas } from "./videos/da-pandas/Video";
+import { script as daPandasScript } from "./videos/da-pandas/script";
 import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
 import { ListVsSet } from "./videos/list-vs-set/Video";
@@ -520,6 +522,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(daSqlScript)}
+      />
+      <Composition
+        id="DataAnalyst-2-Pandas"
+        component={DaPandas}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daPandasScript)}
       />
     </Folder>
     <Folder name="Assets">
