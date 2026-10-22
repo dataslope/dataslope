@@ -40,6 +40,8 @@ import { DaAdvancedSql } from "./videos/da-advanced-sql/Video";
 import { script as daAdvancedSqlScript } from "./videos/da-advanced-sql/script";
 import { DaAiAssisted } from "./videos/da-ai-assisted/Video";
 import { script as daAiAssistedScript } from "./videos/da-ai-assisted/script";
+import { DsInterview } from "./videos/ds-interview/Video";
+import { script as dsInterviewScript } from "./videos/ds-interview/script";
 import { DsStatistics } from "./videos/ds-statistics/Video";
 import { script as dsStatisticsScript } from "./videos/ds-statistics/script";
 import { DsProbability } from "./videos/ds-probability/Video";
@@ -641,6 +643,16 @@ export const RemotionRoot: React.FC = () => (
       />
     </Folder>
     <Folder name="Interview-Data-Scientist">
+      <Composition
+        id="DataScientist-0-Interview"
+        component={DsInterview}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsInterviewScript)}
+      />
       <Composition
         id="DataScientist-1-Statistics"
         component={DsStatistics}
