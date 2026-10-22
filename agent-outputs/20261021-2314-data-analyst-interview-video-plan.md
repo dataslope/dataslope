@@ -127,7 +127,7 @@ As built, percentiles and quartiles come before outliers, so the IQR fences are 
 
 **Rapid-fire:** `SUMIF`/`SUMIFS`; `COUNTIF`/`COUNTIFS`; cleaning messy text; splitting and joining text; how dates are stored; conditional formatting; named ranges; finding and removing duplicates.
 
-### 6. Data visualization (22 questions, ~11.5 min)
+### 6. Data visualization (22 questions, ~11.5 min; built at 9:45)
 
 **Deep dives**
 1. Choosing a chart for the question
