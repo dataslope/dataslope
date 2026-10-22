@@ -52,6 +52,8 @@ import { DsDeepLearning } from "./videos/ds-deep-learning/Video";
 import { script as dsDeepLearningScript } from "./videos/ds-deep-learning/script";
 import { DsExperimentDesign } from "./videos/ds-experiment-design/Video";
 import { script as dsExperimentDesignScript } from "./videos/ds-experiment-design/script";
+import { DsExperimentsInPractice } from "./videos/ds-experiments-in-practice/Video";
+import { script as dsExperimentsInPracticeScript } from "./videos/ds-experiments-in-practice/script";
 import { DaAbTesting } from "./videos/da-ab-testing/Video";
 import { script as daAbTestingScript } from "./videos/da-ab-testing/script";
 import { DaVisualization } from "./videos/da-visualization/Video";
@@ -690,6 +692,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(dsExperimentDesignScript)}
+      />
+      <Composition
+        id="DataScientist-7-ExperimentsInPractice"
+        component={DsExperimentsInPractice}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsExperimentsInPracticeScript)}
       />
     </Folder>
     <Folder name="Assets">
