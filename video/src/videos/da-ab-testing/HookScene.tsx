@@ -84,7 +84,7 @@ export const HookScene: React.FC = () => {
         <Kicker at={from}>Data analyst interview prep</Kicker>
         <Headline lead="Two versions," turn="one honest reading." at={teamsAt - 4} turnAt={readingAt - 4} size={70} />
 
-        <Spot id="da-ab-testing-fox" at={from + 4} left={1150} top={y(290)} width={640} height={460} />
+        <Spot id="da-ab-testing-fox" at={from + 4} left={1150} top={y(290)} width={600} height={450} />
 
         {/* ── One stream of users, split by a coin ── */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>

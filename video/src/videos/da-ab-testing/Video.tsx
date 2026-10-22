@@ -31,11 +31,11 @@ const OVERLAP = 6;
 const SCENES: [string, React.FC][] = [
   ["hook", HookScene],
   ["metric", MetricScene],
-  ["funnel", FunnelScene],
+  ["funnel-in", FunnelScene],
   ["abtest", AbtestScene],
   ["signif", SignifScene],
   ["power", PowerScene],
-  ["peek", PeekScene],
+  ["peek-in", PeekScene],
   ["simpson", SimpsonScene],
   ["rapid-in", RapidScene],
 ];

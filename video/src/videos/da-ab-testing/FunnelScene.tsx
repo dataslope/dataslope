@@ -25,8 +25,9 @@ const LIST_Y = 724;
 const count = (v: number) => v.toLocaleString("en-US");
 
 /**
- * Questions 4 and 5. The page's funnel, 42,000 landings to 3,900 purchases,
- * as bars: overall conversion, then the step conversion beside each stage,
+ * Questions 4 and 5. The page's funnel, 42,000 landings to 3,900 purchases:
+ * its stages name themselves as the bridge line says where users drop out,
+ * then the bars, overall conversion, then the step conversion beside each stage,
  * then the people lost, where the top looks worst only because it is the
  * top. For question 5 the lost column gives way to LAG's: each stage's
  * previous count slides down onto its own row, and the query that does it
@@ -37,7 +38,8 @@ export const FunnelScene: React.FC = () => {
   const n = useNarration();
   const { y, h } = useLayout();
 
-  const from = n.beat("funnel").from;
+  const from = n.beat("funnel-in").from;
+  const namesAt = n.word("funnel-in", "where users drop out");
   const qAt = n.word("funnel", "Question four");
   const textAt = n.word("funnel", "What is a funnel");
   const stepsAt = n.word("funnel-steps", "the ordered steps");
@@ -119,12 +121,13 @@ export const FunnelScene: React.FC = () => {
         {stages.map((s, i) => {
           const at = stepsAt + i * 5;
           const p = ease(frame, at, 14);
-          if (p <= 0) return null;
+          const named = ease(frame, namesAt + i * 4, 12);
+          if (named <= 0) return null;
           const w = (s.users / top) * BAR_MAX;
           const yy = rowY(i);
           return (
             <React.Fragment key={s.stage}>
-              <div style={{ position: "absolute", left: X0, top: yy, height: rowH, display: "flex", alignItems: "center", opacity: p, ...note(25, INK), whiteSpace: "nowrap" }}>
+              <div style={{ position: "absolute", left: X0, top: yy, height: rowH, display: "flex", alignItems: "center", opacity: named, ...note(25, INK), whiteSpace: "nowrap" }}>
                 {s.stage}
               </div>
               <div

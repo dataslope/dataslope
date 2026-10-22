@@ -46,6 +46,7 @@ export const AbtestScene: React.FC = () => {
   const from = n.beat("abtest").from;
   const qAt = n.word("abtest", "Question six");
   const textAt = n.word("abtest", "What is the purpose");
+  const asked = n.beat("abtest").to;
   const controlledAt = n.word("abtest-why", "a controlled experiment");
   const assignAt = n.word("abtest-why", "Assign users at random");
   const controlAt = n.word("abtest-why", "to control, A");
@@ -119,11 +120,13 @@ export const AbtestScene: React.FC = () => {
         <Note at={controlledAt - 2} x={X0} y={y(TOP) - h(24)} out={out6}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>a controlled experiment</span>
         </Note>
-        <Svg opacity={ease(frame, assignAt - 2, 12) * (1 - ease(frame, out6, 10))}>
+        <Svg opacity={ease(frame, asked - 4, 12) * (1 - ease(frame, out6, 10))}>
           <circle cx={userX} cy={forkY} r={26} fill={INK_SOFT} opacity={0.25} />
           <text x={userX} y={forkY + 58} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 600, fill: INK_SOFT }}>
             users
           </text>
+        </Svg>
+        <Svg opacity={ease(frame, assignAt - 2, 12) * (1 - ease(frame, out6, 10))}>
           <text x={userX + 136} y={forkY + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: INK_SOFT }}>
             at random
           </text>

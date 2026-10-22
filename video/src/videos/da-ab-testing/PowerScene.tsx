@@ -10,7 +10,7 @@ import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ERRORS, SAMPLE } from "./data";
-import { A_COLOR, at, B_COLOR, B_INK, curvePath, Drift, OK, OK_INK, Phi, type Scale, Svg, WARM, WARM_INK, X0 } from "./parts";
+import { A_COLOR, at, B_COLOR, B_INK, curvePath, Drift, Mark, OK, OK_INK, Phi, type Scale, Svg, WARM, WARM_INK, X0 } from "./parts";
 
 const TOP = 330;
 /** Question 10's bars: users per arm for each lift. */
@@ -37,6 +37,10 @@ export const PowerScene: React.FC = () => {
   const from = n.beat("power").from;
   const qAt = n.word("power", "Question ten");
   const textAt = n.word("power", "Why does sample size matter");
+  // The question is long, so each half is lit as it is asked.
+  const sizeAt = n.word("power", "sample size matter");
+  const askedMdeAt = n.word("power", "minimum detectable effect");
+  const answerAt = n.beat("power-mde").from;
   const shrinkAt = n.word("power-mde", "Bigger samples shrink");
   const mdeAt = n.word("power-mde", "the minimum detectable effect");
   const pickAt = n.word("power-mde", "Pick it before launch");
@@ -103,7 +107,15 @@ export const PowerScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} out={out10} size={60}>
-          Why does sample size matter, and what is a minimum detectable effect?
+          Why does{" "}
+          <Mark at={sizeAt} out={answerAt}>
+            sample size
+          </Mark>{" "}
+          matter, and what is a{" "}
+          <Mark at={askedMdeAt} out={answerAt}>
+            minimum detectable effect
+          </Mark>
+          ?
         </QuestionCard>
         <QuestionCard n={11} at={q11At} textAt={q11TextAt - 2} out={q12At - 4} size={60}>
           What are Type I and Type II errors?

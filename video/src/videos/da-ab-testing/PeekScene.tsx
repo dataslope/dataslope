@@ -25,7 +25,11 @@ export const PeekScene: React.FC = () => {
   const n = useNarration();
   const { y, h } = useLayout();
 
-  const from = n.beat("peek").from;
+  const from = n.beat("peek-in").from;
+  // The bridge line sets out the empty chart: its axes once the test is
+  // running, the line a p-value has to cross at the urge to look.
+  const runningAt = n.word("peek-in", "once the test is running");
+  const urgeAt = n.word("peek-in", "the urge to look");
   const qAt = n.word("peek", "Question thirteen");
   const textAt = n.word("peek", "What is peeking");
   const identicalAt = n.word("peek-run", "both arms are identical");
@@ -71,7 +75,7 @@ export const PeekScene: React.FC = () => {
           </span>
         </Note>
 
-        <Svg opacity={ease(frame, identicalAt, 14)}>
+        <Svg opacity={ease(frame, runningAt, 14)}>
           {/* The stretch from 2,000 on, shaded as the narration names it. */}
           <rect
             x={at(xs, secondCross) - 8}
@@ -82,10 +86,20 @@ export const PeekScene: React.FC = () => {
             opacity={0.7}
           />
           <line x1={CHART.x0} x2={CHART.x1} y1={y(CHART.base)} y2={y(CHART.base)} stroke={INK} strokeWidth={1.6} />
-          <line x1={CHART.x0} x2={CHART.x1} y1={alphaY} y2={alphaY} stroke={ACCENT} strokeWidth={1.6} strokeDasharray="6 6" />
-          <text x={CHART.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: ACCENT_INK }}>
-            0.05
-          </text>
+          <g opacity={ease(frame, urgeAt, 12)}>
+            <line
+              x1={CHART.x0}
+              x2={CHART.x0 + (CHART.x1 - CHART.x0) * ease(frame, urgeAt, 20)}
+              y1={alphaY}
+              y2={alphaY}
+              stroke={ACCENT}
+              strokeWidth={1.6}
+              strokeDasharray="6 6"
+            />
+            <text x={CHART.x1 + 14} y={alphaY + 7} style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: ACCENT_INK }}>
+              0.05
+            </text>
+          </g>
           {[0, 0.2, 0.4].map((t) => (
             <text key={t} x={CHART.x0 - 14} y={at(ys, t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, fill: INK_SOFT }}>
               {t === 0 ? "0" : t.toFixed(1)}
