@@ -158,7 +158,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** a rabbit.
 
-### 3. Machine learning I: training and evaluating (15 questions, ~8 min)
+### 3. Machine learning I: training and evaluating (15 questions, ~8 min; built at 8:29)
 
 **Deep dives**
 1. The bias–variance trade-off, and detecting and fixing overfitting (2)
