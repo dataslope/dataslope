@@ -71,7 +71,7 @@ export const LoopScene: React.FC = () => {
         <Kicker at={from}>Data analyst interview prep</Kicker>
         <Headline lead="The interview," turn="in three parts." at={from + 4} turnAt={threeAt - 2} size={72} />
 
-        <Card i={0} at={sqlAt} title="a SQL screen">
+        <Card i={0} at={sqlAt} title="A SQL screen">
           <div style={{ fontFamily: MONO, fontSize: 24, color: INK, lineHeight: 1.6, fontVariantLigatures: "none" }}>
             <div>
               <span style={{ color: BLUE_INK, fontWeight: 600 }}>SELECT</span> region, SUM(amount)
