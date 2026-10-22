@@ -190,7 +190,7 @@ export const HookScene: React.FC = () => {
               key={r.count}
               style={{
                 position: "absolute",
-                left: X0 + i * 560,
+                left: X0 + i * 700,
                 top: y(MID_Y) + LANE + 150,
                 display: "flex",
                 alignItems: "baseline",
