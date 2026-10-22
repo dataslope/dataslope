@@ -26,6 +26,8 @@ import { script as dbDesigningSchemasScript } from "./videos/db-designing-schema
 import { DbRelationalHistory } from "./videos/db-relational-history/Video";
 import { script as dbRelationalHistoryScript } from "./videos/db-relational-history/script";
 // Interview prep, Data Analyst: one video per topic page.
+import { DaInterview } from "./videos/da-interview/Video";
+import { script as daInterviewScript } from "./videos/da-interview/script";
 import { DaSql } from "./videos/da-sql/Video";
 import { script as daSqlScript } from "./videos/da-sql/script";
 import { DaPandas } from "./videos/da-pandas/Video";
@@ -525,6 +527,16 @@ export const RemotionRoot: React.FC = () => (
       />
     </Folder>
     <Folder name="Interview-Data-Analyst">
+      <Composition
+        id="DataAnalyst-0-Interview"
+        component={DaInterview}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daInterviewScript)}
+      />
       <Composition
         id="DataAnalyst-1-Sql"
         component={DaSql}
