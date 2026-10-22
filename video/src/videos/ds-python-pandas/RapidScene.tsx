@@ -55,7 +55,8 @@ const Line: React.FC<{ at: number; top: number; x?: number; children: React.Reac
 /** 10. Series.map, DataFrame.apply, DataFrame.map: what each works on. */
 const MapBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const S = QUICK.mapCode;
-  const g = geoOf(S, R_X, c.y(560), c.h, { rowH: 50 });
+  const listTop = c.y(548);
+  const g = geoOf(S, R_X, listTop + listingHeight(S.lines.length, 18) + c.h(24), c.h, { rowH: 46 });
   return (
     <>
       <Line at={c.w("r-map", "Series map")} top={c.y(370)}>
@@ -67,7 +68,7 @@ const MapBody: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={c.w("r-map", "Data frame map")} top={c.y(478)}>
         <Mono color={BLUE_INK}>DataFrame.map</Mono> every cell
       </Line>
-      <Listing lines={S.lines} x={R_X + 340} top={c.y(560)} width={640} size={18} at={c.w("r-map", "from a function or a lookup")} />
+      <Listing lines={S.lines} x={R_X} top={listTop} width={900} size={18} at={c.w("r-map", "from a function or a lookup")} />
       <DataTable
         g={g}
         cols={colsOf(S, { code: { ink: BLUE_INK } })}
@@ -117,11 +118,11 @@ const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const S = QUICK.select;
   const at = c.w("r-case", "use NumPy select");
   const listH = listingHeight(S.lines.length, SIZE);
-  const g = geoOf(S, R_X, c.y(370) + listH + c.h(26), c.h, { rowH: 48 });
+  const g = geoOf(S, R_X, c.y(370) + listH + c.h(70), c.h, { rowH: 48 });
   const size = S.cols.indexOf("size");
   const B = QUICK.bare;
   const bx = R_X + 480;
-  const bg = geoOf(B, bx, c.y(370) + listH + c.h(26), c.h, { rowH: 48 });
+  const bg = geoOf(B, bx, c.y(370) + listH + c.h(70), c.h, { rowH: 48 });
   const kept = B.rows.flatMap((r, i) => (/^\d+$/.test(r[1]) ? [i] : []));
   const caseAt = c.w("r-case", "Pandas has case when too");
   const oldAt = c.w("r-case", "keep their old value");
@@ -135,7 +136,7 @@ const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
         rows={S.rows.map((cells, i) => ({ cells, at: at + 10 + i * 2 }))}
         marks={S.rows.map((_, row) => ({ row, col: size, at: c.w("r-case", "a list of conditions") + row * 2, color: MARK_KEY }))}
       />
-      <Note at={caseAt} x={bx} y={c.y(370) + listH + c.h(26) - c.h(40)}>
+      <Note at={caseAt} x={bx} y={bg.top - c.h(40)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           <Mono>case_when</Mono>, with no default
         </span>

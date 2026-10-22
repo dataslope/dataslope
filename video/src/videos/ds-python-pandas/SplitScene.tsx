@@ -204,7 +204,7 @@ export const SplitScene: React.FC = () => {
         <Note at={frameAt + 4} x={namedX} y={ng.rowTop(N.rows.length) + h(22)}>
           <Tag size={22}>DataFrame</Tag>
         </Note>
-        <Note at={resetAt} x={oneX} y={y(744)}>
+        <Note at={resetAt} x={X0} y={y(744)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             the regions are the index, until <Mono color={BLUE_INK}>.reset_index()</Mono>
           </span>

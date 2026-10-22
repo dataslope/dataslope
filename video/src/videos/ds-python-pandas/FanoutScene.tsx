@@ -9,7 +9,6 @@ import { Sfx } from "../../sound/Sfx";
 import { FANOUT } from "./data";
 import {
   colsOf,
-  Console,
   DataTable,
   Drift,
   ErrorBox,
@@ -20,6 +19,7 @@ import {
   Mark,
   MARK_BAD,
   MARK_KEY,
+  Mono,
   TableName,
   X0,
 } from "./parts";
@@ -169,10 +169,14 @@ export const FanoutScene: React.FC = () => {
 
         {/* ── The guards ── */}
         <Listing lines={U.lines} x={X0} top={uTop} width={620} size={SIZE} at={uniqueAt} />
-        <Console lines={[U.value]} x={X0 + 640} top={uTop + 4} width={130} at={uniqueAt + 10} marks={[{ line: 0, at: uniqueAt + 16, color: MARK_BAD }]} />
+        <Note at={uniqueAt + 10} x={X0 + 640} y={uTop + h(12)}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            → <Mark at={uniqueAt + 16} color={MARK_BAD}><Mono>{U.value}</Mono></Mark>
+          </span>
+        </Note>
         <Listing lines={V.lines} x={X0} top={vTop} width={880} size={SIZE} at={validateAt - 4} marks={[{ line: 1, at: validateAt + 6, color: MARK_KEY }]} />
-        <ErrorBox x={X0} top={eTop} width={880} at={raisesAt} kind={V.kind} message={V.message} size={20} />
-        <Note at={afterAt} x={X0} y={eTop + h(118)}>
+        <ErrorBox x={X0} top={eTop} width={960} at={raisesAt} kind={V.kind} message={V.message} size={19} />
+        <Note at={afterAt} x={X0} y={eTop + h(96)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
             after a merge: <Mark at={afterAt + 8} out={gapsAt + 4}>{nAfter} rows, where you expected {nBefore}</Mark>
           </span>

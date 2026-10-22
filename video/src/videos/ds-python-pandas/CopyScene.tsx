@@ -152,7 +152,7 @@ export const CopyScene: React.FC = () => {
           ]}
           swaps={north.map((row, k) => ({ row, col: amount, at: zeroAt + k * 4, value: L.rows[row][amount], color: OK_INK }))}
         />
-        <TableName g={sg} at={selectAt + 6} out={outChain}>
+        <TableName g={sg} at={selectAt + 6} out={neverAt + 10}>
           the selection, <Mark at={copyMayAt}>a copy</Mark>
         </TableName>
         <DataTable

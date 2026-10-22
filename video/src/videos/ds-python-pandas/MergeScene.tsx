@@ -99,14 +99,14 @@ export const MergeScene: React.FC = () => {
         />
 
         {/* ── merge, then join ── */}
-        <TableName g={cg} at={mergeAt} out={joinAt + 6}>
+        <TableName g={cg} at={mergeAt} out={indexAt + 2}>
           customers
         </TableName>
         <DataTable
           g={cg}
           cols={colsOf(C, { customer_id: { ink: BLUE_INK } })}
           at={mergeAt}
-          out={joinAt + 6}
+          out={indexAt + 2}
           rows={C.rows.map((cells, i) => ({ cells, at: mergeAt + 4 + i * 2 }))}
         />
         <TableName g={cig} at={indexAt - 2} out={outMatch}>

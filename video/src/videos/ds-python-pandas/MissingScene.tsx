@@ -10,7 +10,6 @@ import { Sfx } from "../../sound/Sfx";
 import { MISSING } from "./data";
 import {
   colsOf,
-  Console,
   DataTable,
   Drift,
   geoOf,
@@ -66,7 +65,7 @@ export const MissingScene: React.FC = () => {
   const amount = F.cols.indexOf("amount");
   const gaps = F.rows.flatMap((r, i) => (r[amount] === "NaN" ? [i] : []));
   const S = MISSING.isnaSum;
-  const sg = geoOf(S, ISNA_X, y(TOP) + listingHeight(1, SIZE) + h(40), h, { rowH: 54 });
+  const sg = geoOf(S, ISNA_X, y(TOP) + listingHeight(1, SIZE) + h(40), h, { rowH: 54, headH: 14 });
   const filled = MISSING.filled;
 
   // The empty column: ten cells, six of them gaps.
@@ -116,7 +115,11 @@ export const MissingScene: React.FC = () => {
           <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>never with equals</span>
         </Note>
         <Listing lines={MISSING.nanEq.lines} x={EQ_X} top={y(TOP)} width={300} size={SIZE} at={neverAt} />
-        <Console lines={[MISSING.nanEq.value]} x={EQ_X + 320} top={y(TOP) + 2} width={110} at={itselfAt - 4} marks={[{ line: 0, at: itselfAt + 4, color: MARK_BAD }]} />
+        <Note at={itselfAt - 4} x={EQ_X + 316} y={y(TOP) + h(12)}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            → <Mark at={itselfAt + 4} color={MARK_BAD}><Mono>{MISSING.nanEq.value}</Mono></Mark>
+          </span>
+        </Note>
 
         {/* ── Handle ── */}
         <Note at={dropAt} x={ISNA_X} y={y(FILL_Y) - h(48)}>
