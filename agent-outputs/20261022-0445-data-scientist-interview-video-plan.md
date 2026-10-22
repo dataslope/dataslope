@@ -180,7 +180,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** a beaver.
 
-### 4. Machine learning II: models and features (15 questions, ~8 min)
+### 4. Machine learning II: models and features (15 questions, ~8 min; built at 9:34)
 
 **Deep dives**
 1. Logistic regression: how it turns a score into a probability, and why not linear regression for a binary target (2)
