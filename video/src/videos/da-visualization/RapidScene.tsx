@@ -213,7 +213,7 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
 const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const at0 = c.w("r-tools", "Tableau, Power BI and Looker");
-  const biAt = c.w("r-tools", "B I tools");
+  const biAt = c.w("r-tools", "BI tools");
   const busAt = c.w("r-tools", "business intelligence");
   const transfersAt = c.w("r-tools", "What transfers");
   const framingAt = c.w("r-tools", "framing the question");

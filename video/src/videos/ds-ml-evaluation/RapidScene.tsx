@@ -23,9 +23,9 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 /** The page's five misses as a share of the total, added as they are and squared first. */
 const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
-  const rmseAt = c.w("r-metrics", "R M S E");
+  const rmseAt = c.w("r-metrics", "RMSE");
   const dominateAt = c.w("r-metrics", "big misses dominate");
-  const maeAt = c.w("r-metrics", "M A E, mean absolute error");
+  const maeAt = c.w("r-metrics", "MAE, mean absolute error");
   const r2At = c.w("r-metrics", "R squared is the share");
   const valuesAt = c.w("r-metrics", "they come to");
   const misses = METRICS.true.map((t, i) => Math.abs(t - METRICS.pred[i]));
@@ -101,7 +101,7 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
-  const at0 = c.w("r-xent", "Cross-entropy or M S E");
+  const at0 = c.w("r-xent", "Cross-entropy or MSE");
   const predictAt = c.w("r-xent", "Predict point oh one");
   const sqAt = c.w("r-xent", "squared error charges");
   const xentAt = c.w("r-xent", "Cross-entropy charges");

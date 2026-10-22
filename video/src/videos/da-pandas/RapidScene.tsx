@@ -155,7 +155,7 @@ const Counts: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Dates: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-dates", "To datetime");
-  const dtAt = c.w("r-dates", "the D T accessor");
+  const dtAt = c.w("r-dates", "the DT accessor");
   const yearAt = c.w("r-dates", "the year");
   const monthAt = c.w("r-dates", "the month");
   const dayAt = c.w("r-dates", "the day's name");

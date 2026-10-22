@@ -20,8 +20,9 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const VIDEOS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "src", "videos");
-/** `.word("beat", "phrase")`, optionally followed by an options object. */
-const CUE = /\.word\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*(?:,\s*\{([^}]*)\})?/g;
+/** `.word("beat", "phrase")`, optionally followed by an options object, or the
+ *  rapid rounds' `c.w("beat", "phrase")` shorthand for it. */
+const CUE = /\.(?:word|w)\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*(?:,\s*\{([^}]*)\})?/g;
 
 /** Returns { ambiguous, missing }, each a list of { file, line, beat, phrase, times? }. */
 export async function scanCues(videos = VIDEOS) {

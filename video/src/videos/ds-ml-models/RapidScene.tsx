@@ -162,7 +162,7 @@ const Scale13: React.FC<{ c: Ctx }> = ({ c }) => {
         needed for distances or gradient descent:
       </Line>
       <Line
-        at={c.w("r-scale", "K N N, k-means")}
+        at={c.w("r-scale", "KNN, k-means")}
         top={c.y(400)}
         color={INK_SOFT}
         size={23}
