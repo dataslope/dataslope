@@ -36,6 +36,8 @@ import { DaSpreadsheets } from "./videos/da-spreadsheets/Video";
 import { script as daSpreadsheetsScript } from "./videos/da-spreadsheets/script";
 import { DaAdvancedSql } from "./videos/da-advanced-sql/Video";
 import { script as daAdvancedSqlScript } from "./videos/da-advanced-sql/script";
+import { DaAiAssisted } from "./videos/da-ai-assisted/Video";
+import { script as daAiAssistedScript } from "./videos/da-ai-assisted/script";
 import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
 import { ListVsSet } from "./videos/list-vs-set/Video";
@@ -568,6 +570,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(daSpreadsheetsScript)}
+      />
+      <Composition
+        id="DataAnalyst-8-AiAssisted"
+        component={DaAiAssisted}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daAiAssistedScript)}
       />
     </Folder>
     <Folder name="Assets">
