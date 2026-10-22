@@ -64,7 +64,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     own five dates resample by week to 180, 170 and 70.
  *
  * Written for Drew's ear, as in the Data Analyst series: "ag" for agg, "lock"
- * for loc, "is N A" for isna, "D type" for dtype, "D T" for the dt accessor.
+ * for loc, "is NA" for isna, "data type" for dtype, "DT" for the dt
+ * accessor. Initialisms are written in plain caps, never letter-spaced, so
+ * Drew reads each as one unit (the series rule from 2026-10-22).
  */
 export const script: NarrationScript = {
   id: "ds-python-pandas",
@@ -100,7 +102,7 @@ export const script: NarrationScript = {
     },
     {
       id: "vector-time",
-      text: "On a million rows, timed in WebAssembly, the way this page runs Python, the loop takes several hundred milliseconds. The vectorized line takes about one. That's hundreds of times faster. Write a loop only when no vectorized version exists.",
+      text: "On a million rows, timed in WebAssembly, the way this page runs Python, the loop takes several hundred milliseconds. The vectorized line takes about one millisecond. That's hundreds of times faster. Write a loop only when no vectorized version exists.",
       pauseAfter: 0.8,
     },
     { id: "split-in", text: "Next, the pattern under every groupby." },
@@ -119,7 +121,7 @@ export const script: NarrationScript = {
     },
     {
       id: "split-returns",
-      text: "On its own, groupby returns a data frame group by object, and nothing is computed yet. Sum one column, and you get a Series, indexed by region. Name several aggregates in ag, and you get a data frame. Either way, the regions are the index until you reset it.",
+      text: "On its own, groupby returns a data frame group by object, and nothing is aggregated yet. Sum one column, and you get a Series, indexed by region. Name several aggregates in ag, and you get a data frame. Either way, the regions are the index until you reset it.",
       pauseAfter: 0.8,
     },
 
@@ -132,7 +134,7 @@ export const script: NarrationScript = {
     },
     {
       id: "shapes-three",
-      text: "Ag reduces each group to one value: three regions, three rows. Transform hands each group's answer back to every row: five rows in, five out. Apply is the fallback for anything else. Here it returns the largest order in each region, a whole row per group. It's the most flexible of the three, and the slowest.",
+      text: "Ag reduces each group to one value: three regions, three rows. Transform hands each group's answer back to every row: five rows in, five out. Apply is the fallback for anything else. Here it returns the largest order in each region, a row per group. It's the most flexible of the three, and the slowest.",
       pauseAfter: 0.8,
     },
     {
@@ -183,7 +185,7 @@ export const script: NarrationScript = {
     },
     {
       id: "missing-detect",
-      text: "Detect it with is N A, where N A stands for not available. Summed, it counts the gaps: one region, two amounts. Never test with equals. N a N, short for not a number, isn't equal even to itself.",
+      text: "Detect it with is NA, where NA stands for not available. Summed, it counts the gaps: one region, two amounts. Never test with equals. A missing number is stored as not a number, and that isn't equal even to itself.",
       pauseAfter: 0.8,
     },
     {
@@ -255,11 +257,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-cat",
-      text: "The category D type, short for data type, stores each distinct string once, and a small code per row. Three hundred regions drop from eight thousand nine hundred bytes to four hundred eighteen.",
+      text: "The category data type stores each distinct string once, and a small code per row. Three hundred regions drop from eight thousand nine hundred bytes to four hundred eighteen.",
     },
     {
       id: "r-dates",
-      text: "And for dates, to datetime parses them, the D T accessor, short for datetime, reaches their parts, and resample groups them by time. By week, a hundred eighty, one seventy, and seventy.",
+      text: "And for dates, to datetime parses them, the DT accessor, short for datetime, reaches their parts, and resample groups them by time. By week, a hundred eighty, one seventy, and seventy.",
       pauseAfter: 0.9,
     },
     {

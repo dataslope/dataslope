@@ -202,7 +202,7 @@ const DatesBody: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={c.w("r-dates", "to datetime parses them")} top={c.y(370)}>
         <Mono color={BLUE_INK}>pd.to_datetime</Mono> parses
       </Line>
-      <Line at={c.w("r-dates", "the D T accessor")} x={R_X + 330} top={c.y(370)}>
+      <Line at={c.w("r-dates", "the DT accessor")} x={R_X + 330} top={c.y(370)}>
         <Mono color={BLUE_INK}>.dt</Mono> reaches the parts
       </Line>
       <Line at={c.w("r-dates", "resample groups them by time")} x={R_X + 680} top={c.y(370)}>

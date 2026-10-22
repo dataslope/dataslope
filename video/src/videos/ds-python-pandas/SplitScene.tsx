@@ -35,7 +35,7 @@ const SIZE = 20;
  * Question 2 on the page's six rows. First as three columns: split (one
  * small frame per region, the rows banded as they leave), apply (a sum beside
  * each), combine (the sums as one Series, East 50, North 240, South 150).
- * Then what groupby returns: on its own a DataFrameGroupBy that has computed
+ * Then what groupby returns: on its own a DataFrameGroupBy that has aggregated
  * nothing, one column summed a Series, named aggregates a DataFrame, the
  * regions as the index of both.
  */
@@ -58,7 +58,7 @@ export const SplitScene: React.FC = () => {
   ];
   const aloneAt = n.word("split-returns", "On its own");
   const objAt = n.word("split-returns", "a data frame group by object");
-  const nothingAt = n.word("split-returns", "nothing is computed yet");
+  const nothingAt = n.word("split-returns", "nothing is aggregated yet");
   const oneAt = n.word("split-returns", "Sum one column");
   const seriesAt = n.word("split-returns", "a Series");
   const nameAt = n.word("split-returns", "Name several aggregates");
@@ -177,7 +177,7 @@ export const SplitScene: React.FC = () => {
         </Note>
         <Note at={nothingAt} x={X0} y={objTop + listingHeight(1, SIZE) + h(96)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-            <Mark at={nothingAt + 6}>nothing computed yet</Mark>
+            <Mark at={nothingAt + 6}>nothing aggregated yet</Mark>
           </span>
         </Note>
 

@@ -48,7 +48,7 @@ export const MissingScene: React.FC = () => {
   const qAt = n.word("missing", "Question");
   const textAt = n.word("missing", "How do you detect");
   const asked = n.beat("missing").to;
-  const detectAt = n.word("missing-detect", "Detect it with is N A");
+  const detectAt = n.word("missing-detect", "Detect it with is NA");
   const summedAt = n.word("missing-detect", "Summed, it counts the gaps");
   const oneAt = n.word("missing-detect", "one region");
   const twoAt = n.word("missing-detect", "two amounts");

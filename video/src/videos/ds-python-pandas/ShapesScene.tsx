@@ -32,7 +32,7 @@ const LISTING_Y = 716;
  * Questions 3 and 4 on the page's five rows (the frame DA Part 2 used, so
  * the share agrees). Three answers side by side, each the shape it returns:
  * agg three rows, transform five (level with the rows it came from), apply a
- * whole row per group. Then question 4 grows two columns on the frame
+ * row per group. Then question 4 grows two columns on the frame
  * itself: each region's total from transform, and the share, North's 100
  * being 62.5% of 160.
  */
@@ -50,7 +50,7 @@ export const ShapesScene: React.FC = () => {
   const fiveAt = n.word("shapes-three", "five rows in, five out");
   const applyAt = n.word("shapes-three", "Apply is the fallback");
   const largestAt = n.word("shapes-three", "the largest order in each region");
-  const rowAt = n.word("shapes-three", "a whole row per group");
+  const rowAt = n.word("shapes-three", "a row per group");
   const slowAt = n.word("shapes-three", "and the slowest");
   const q4At = n.word("pct", "Question four");
   const q4TextAt = n.word("pct", "How do you compute");
