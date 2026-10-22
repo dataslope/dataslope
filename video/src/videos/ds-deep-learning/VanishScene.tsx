@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { VANISH } from "./data";
 import { Axes, Drift, Fade, Mark, OK_INK, type Scale, Svg, Tagline, WARM, WARM_INK } from "./parts";
 
-const BOX = { left: 230, right: 1000, top: 360, bottom: 800 };
+const BOX = { left: 230, right: 1000, top: 384, bottom: 806 };
 const FIX_X = 1180;
 const FIX_Y = 372;
 const FIX_ROW = 64;
@@ -90,7 +90,7 @@ export const VanishScene: React.FC = () => {
               yTitle="the gradient's size"
               at={productAt - 4}
             />
-            <Tagline x={120} y={y(296)} at={quarterAt} size={24} color={ACCENT_INK}>
+            <Tagline x={120} y={y(290)} at={quarterAt} size={24} color={ACCENT_INK}>
               the sigmoid&apos;s slope: <Mark at={quarterAt + 4}>at most 0.25</Mark>, so × 0.25 a layer
             </Tagline>
             <Svg>
