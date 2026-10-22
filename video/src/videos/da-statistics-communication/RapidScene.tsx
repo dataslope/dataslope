@@ -244,6 +244,9 @@ const Normal: React.FC<{ c: Ctx }> = ({ c }) => {
           in {RAPID.normal.draws.toLocaleString("en-US")} draws
         </span>
       </Note>
+      <Note at={setAt + 4} x={R_X + 800} y={c.y(470) + 3 * c.h(64) + c.h(36)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>SD: standard deviation</span>
+      </Note>
     </>
   );
 };

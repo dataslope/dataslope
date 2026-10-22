@@ -207,7 +207,7 @@ export const script: NarrationScript = {
     },
     {
       id: "missing-find",
-      text: "First, find it. Is N A, summed, counts the gaps in each column: one region, two amounts.",
+      text: "First, find it. Is N A, where N A means not available, summed, counts the gaps in each column: one region, two amounts.",
       pauseAfter: 0.7,
     },
     {
@@ -328,7 +328,7 @@ export const script: NarrationScript = {
     { id: "r-counts", text: "Value counts counts each value. Normalize turns the counts into shares: North is half." },
     {
       id: "r-dates",
-      text: "To datetime parses the dates. Then the D T accessor gives you the year, the month, or the day's name.",
+      text: "To datetime parses the dates. Then the D T accessor, short for datetime, gives you the year, the month, or the day's name.",
     },
     { id: "r-resample", text: "Resample is a groupby for time. By month end, January sums to three hundred." },
     {
@@ -344,7 +344,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-csv",
-      text: "Read CSV and to CSV. Pass index equals false, or the index comes back as an unnamed column. Excel works the same way.",
+      text: "Read CSV and to CSV, for comma-separated values. Pass index equals false, or the index comes back as an unnamed column. Excel works the same way.",
     },
     { id: "r-query", text: "Query filters with a string, and an at sign brings in a variable." },
     {

@@ -216,7 +216,7 @@ export const script: NarrationScript = {
     },
     {
       id: "fanout-fix",
-      text: "The fix is the grain. Count the items per order first, in a C T E, then join. One row per order, and the total's back to one fifty.",
+      text: "The fix is the grain. Count the items per order first, in a C T E, a common table expression, then join. One row per order, and the total's back to one fifty.",
       pauseAfter: 0.7,
     },
 

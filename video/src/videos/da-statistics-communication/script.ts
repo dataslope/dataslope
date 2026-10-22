@@ -126,7 +126,7 @@ export const script: NarrationScript = {
     },
     {
       id: "corr-fixed",
-      text: "Hold temperature fixed, and the link all but vanishes: point zero eight. To argue a cause, you need an experiment, like an A B test, or a careful causal design.",
+      text: "Hold temperature fixed, and the link all but vanishes: point zero eight. To argue a cause, you need an experiment, like an A B test, where random groups see version A or version B, or a careful causal design.",
       pauseAfter: 0.7,
     },
 
@@ -216,7 +216,7 @@ export const script: NarrationScript = {
     },
     {
       id: "quantile-cuts",
-      text: "Here are thirteen amounts, in order. Q one is ten, the median twelve, Q three thirteen. Between them, the I Q R: three.",
+      text: "Here are thirteen amounts, in order. The first quartile, Q one, is ten. The median is twelve, and the third quartile, Q three, is thirteen. Between them is the interquartile range, the I Q R: three.",
       pauseAfter: 0.7,
     },
     {

@@ -95,10 +95,10 @@ export const QuantileScene: React.FC = () => {
   const thirteenAt = n.word("quantile-cuts", "thirteen amounts");
   // The amounts arrive as question 6 finishes, so it never sits on the question alone.
   const asked6 = n.beat("quantile").to;
-  const q1At = n.word("quantile-cuts", "Q one is ten");
-  const medAt = n.word("quantile-cuts", "the median twelve");
-  const q3At = n.word("quantile-cuts", "Q three thirteen");
-  const iqrAt = n.word("quantile-cuts", "the I Q R");
+  const q1At = n.word("quantile-cuts", "Q one");
+  const medAt = n.word("quantile-cuts", "The median is twelve");
+  const q3At = n.word("quantile-cuts", "Q three");
+  const iqrAt = n.word("quantile-cuts", "the interquartile range");
   const p90At = n.word("quantile-p90", "a hundred fifty-four point eight");
   const nobodyAt = n.word("quantile-p90", "an amount nobody spent");
   const betweenAt = n.word("quantile-p90", "between fourteen and one ninety");
@@ -233,7 +233,7 @@ export const QuantileScene: React.FC = () => {
         })}
         <Bracket x0={xAt(pos(0.25))} x1={xAt(pos(0.75))} y={bottom + h(88)} at={iqrAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            IQR = Q3 − Q1 = <b>{fmt(AMOUNTS.iqr, 0)}</b>
+            interquartile range (IQR) = Q3 − Q1 = <b>{fmt(AMOUNTS.iqr, 0)}</b>
           </span>
         </Bracket>
 
