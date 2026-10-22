@@ -1,0 +1,93 @@
+{
+  "runtime": "Pyodide / Python 3.14.2 / NumPy 2.4.6 / SciPy 1.18.0",
+  "size": {
+    "p": 0.8,
+    "n": [
+      50,
+      100,
+      200,
+      500,
+      1000,
+      2000
+    ],
+    "half": [
+      0.1109,
+      0.0784,
+      0.0554,
+      0.0351,
+      0.0248,
+      0.0175
+    ],
+    "at100": {
+      "lo": 0.7216,
+      "hi": 0.8784,
+      "half": 0.0784
+    },
+    "two": {
+      "n": 100,
+      "a": 0.79,
+      "b": 0.82,
+      "aCI": [
+        0.7102,
+        0.8698
+      ],
+      "bCI": [
+        0.7447,
+        0.8953
+      ]
+    }
+  },
+  "pair": {
+    "n": 500,
+    "bothPass": 385,
+    "aOnly": 10,
+    "bOnly": 25,
+    "bothFail": 80,
+    "aPass": 395,
+    "bPass": 410,
+    "aRate": 0.79,
+    "bRate": 0.82,
+    "discordant": 35,
+    "z": 1.197,
+    "pUnpaired": 0.2312,
+    "pMcNemar": 0.0167
+  },
+  "judge": {
+    "cells": {
+      "passPass": 85,
+      "passFail": 5,
+      "failPass": 5,
+      "failFail": 5
+    },
+    "po": 0.9,
+    "pe": 0.82,
+    "kappa": 0.4444,
+    "above": 0.08,
+    "room": 0.18,
+    "alwaysPass": {
+      "po": 0.9,
+      "kappa": 0
+    }
+  },
+  "prev": {
+    "sens": 0.9,
+    "spec": 0.95,
+    "obs": 0.2,
+    "prev": 0.17647,
+    "tickets": 1000000,
+    "flagged": 200000,
+    "trueComplaints": 176471,
+    "caught": 158824,
+    "missed": 17647,
+    "falseAlarms": 41176,
+    "notComplaints": 823529
+  },
+  "notebook": {
+    "rows": 10000,
+    "afterJoin": 6700,
+    "lost": 0.33,
+    "segments": 20,
+    "anyFalse": 0.6415
+  },
+  "bank": 110
+}
