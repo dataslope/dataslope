@@ -157,11 +157,9 @@ export const ShapScene: React.FC = () => {
         <Note at={asked + 6} x={X0 + 580} y={y(TABLE_TOP) + 5 * h(ROW) + h(8)}>
           <span style={{ ...label(18, INK_SOFT), whiteSpace: "nowrap" }}>distinct values</span>
         </Note>
-        <Note at={madeAt} x={X0 + 720} y={y(TABLE_TOP) + h(4)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-            made up for this video,
-            <br />
-            {SHAP.n.toLocaleString("en-US")} customers
+        <Note at={madeAt} x={X0} y={y(TABLE_TOP) + 6 * h(ROW) + h(6)}>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+            made up for this video: {SHAP.n.toLocaleString("en-US")} customers
           </span>
         </Note>
         <Note at={nothingAt + 4} x={colX[3] + 10} y={y(TABLE_TOP) - h(40)} from="up">
@@ -263,8 +261,8 @@ export const ShapScene: React.FC = () => {
             exact Shapley values: every subset of the 4 features, computed in NumPy
           </span>
         </Note>
-        <Note at={lastAt} x={BAR_X + barScale(sh[3]) + 60} y={y(BARS_TOP) + 3 * h(BAR_ROW) + h(24)}>
-          <span style={{ ...label(19, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>last, by SHAP</span>
+        <Note at={lastAt} x={BAR_X + barScale(sh[3]) + 120} y={y(BARS_TOP) + 3 * h(BAR_ROW) + h(24)}>
+          <span style={{ ...label(19, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>← last, by SHAP</span>
         </Note>
       </Drift>
     </AbsoluteFill>
