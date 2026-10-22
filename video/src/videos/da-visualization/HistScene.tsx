@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BINS, TICKETS } from "./data";
-import { BarSet, Drift, PanelTitle, pulse, Verdict, XTicks, YTicks } from "./parts";
+import { BarSet, Drift, Mark, PanelTitle, pulse, Verdict, XTicks, YTicks } from "./parts";
 
 const LEFT = { x0: 150, x1: 760, lo: 0, hi: 160 };
 const RIGHT = { x0: 960, x1: 1760, lo: 0, hi: 120 };
@@ -59,6 +59,9 @@ export const HistScene: React.FC = () => {
   const rulesAt = n.word("bins-rule", "Rules of thumb");
   const startAt = n.word("bins-rule", "a place to start");
   const reportAt = n.word("bins-rule", "Report the shape");
+  // The bridge: the takeaway marked, the two wrong widths dimmed.
+  const bridgeAt = n.beat("axis-in").from;
+  const liesAt = n.word("axis-in", "a chart lies");
   const end = n.beat("axis-in").to;
 
   const out4 = q5At - 4;
@@ -160,7 +163,7 @@ export const HistScene: React.FC = () => {
         <PanelTitle x={PANELS[0].x0} y={y(P_TOP) - h(66)} at={fiveAt - 2}>
           Bins {wide.width} wide
         </PanelTitle>
-        <BarSet values={wide.density} {...p(0)} at={fiveAt} step={2} fill={1} edge />
+        <BarSet values={wide.density} {...p(0)} at={fiveAt} step={2} fill={1} edge dim={liesAt - 6} />
         <XTicks ticks={[2, 12, 22]} x0={PANELS[0].x0} x1={PANELS[0].x1} lo={BINS.domain[0]} hi={BINS.domain[1]} y={y(P_BASE) + 26} at={fiveAt + 4} />
         <Verdict ok={false} x={PANELS[0].x0} y={y(P_BASE) + h(52)} at={fuseAt + 4}>
           one peak where there are two
@@ -169,7 +172,7 @@ export const HistScene: React.FC = () => {
         <PanelTitle x={PANELS[2].x0} y={y(P_TOP) - h(66)} at={quarterAt - 2}>
           Bins {narrow.width} wide
         </PanelTitle>
-        <BarSet values={narrow.density} {...p(2)} at={quarterAt} step={0.25} fill={1} />
+        <BarSet values={narrow.density} {...p(2)} at={quarterAt} step={0.25} fill={1} dim={liesAt - 2} />
         <XTicks ticks={[2, 12, 22]} x0={PANELS[2].x0} x1={PANELS[2].x1} lo={BINS.domain[0]} hi={BINS.domain[1]} y={y(P_BASE) + 26} at={quarterAt + 4} />
         <Verdict ok={false} x={PANELS[2].x0} y={y(P_BASE) + h(52)} at={spikesAt + 2}>
           spikes, not a shape
@@ -191,7 +194,9 @@ export const HistScene: React.FC = () => {
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, startAt, 10) }}>a place to start, not a verdict</span>
         </Note>
         <Note at={reportAt + 4} x={PANELS[2].x0} y={y(P_BASE) + h(110)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>report the shape that survives</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <Mark at={bridgeAt + 2}>report the shape that survives</Mark>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

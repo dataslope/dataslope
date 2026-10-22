@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CHERRY, DUAL, INVERTED, MISSING } from "./data";
 import { OK, QuestionCard } from "../../editorial/interview";
-import { CATS, Drift, LineSet, PanelTitle, Verdict, YTicks } from "./parts";
+import { CATS, Drift, LineSet, Mark, MARK_BAD, PanelTitle, Verdict, YTicks } from "./parts";
 
 const LEFT = { x0: 220, x1: 800 };
 const RIGHT = { x0: 1100, x1: 1680 };
@@ -39,6 +39,8 @@ export const DualScene: React.FC = () => {
   const from = n.beat("dual").from;
   const qAt = n.word("dual", "Question");
   const textAt = n.word("dual", "What is a dual-axis chart");
+  const dualAxisAt = n.word("dual", "dual-axis chart");
+  const riskAt = n.word("dual", "the risk");
   const asked = n.beat("dual").to;
   const twoAt = n.word("dual-show", "Two series on two y axes");
   const climbsAt = n.word("dual-show", "revenue that climbs");
@@ -60,6 +62,8 @@ export const DualScene: React.FC = () => {
   const fallAt = n.word("other-more", "draws as a fall");
   const zerosAt = n.word("other-more", "filled with zeros");
   const collapseAt = n.word("other-more", "never happened");
+  // The bridge: the two misleading drawings dimmed, the honest summary marked.
+  const bridgeAt = n.beat("dash-in").from;
   const end = n.beat("dash-in").to;
 
   const base = y(BASE);
@@ -92,7 +96,11 @@ export const DualScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} out={out9} size={60}>
-          What is a dual-axis chart, and what&apos;s the risk?
+          What is a <Mark at={dualAxisAt + 2}>dual-axis chart</Mark>, and what&apos;s{" "}
+          <Mark at={riskAt} color={MARK_BAD}>
+            the risk
+          </Mark>
+          ?
         </QuestionCard>
         <QuestionCard n={10} at={q10At} textAt={q10TextAt - 2} size={60}>
           What other ways do charts mislead?
@@ -147,7 +155,9 @@ export const DualScene: React.FC = () => {
         </svg>
         <LineSet values={C.values} x0={DECADE.x0} x1={DECADE.x1} base={y(DECADE.base)} top={y(DECADE.top)} lo={70} hi={120} at={cherryAt - 2} color={CATS[0]} dots={false} width={2.6} edges />
         <Note at={decadeAt - 2} x={DECADE.x1 - 320} y={y(DECADE.top) - h(56)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>the decade: {C.decadePct}% net change</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
+            <Mark at={bridgeAt + 30}>the decade: {C.decadePct}% net change</Mark>
+          </span>
         </Note>
         <Note at={upAt - 2} x={cx(C.window.end) + 16} y={y(DECADE.top) - h(4)}>
           <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>the window: up {C.windowPct}%</span>
@@ -166,6 +176,7 @@ export const DualScene: React.FC = () => {
           lo={INVERTED.domain[1]}
           hi={INVERTED.domain[0]}
           at={invertedAt}
+          dim={bridgeAt + 14}
           color={ACCENT}
           labels={INVERTED.years.map((yr, i) => (i % 2 ? "" : String(yr)))}
           labelSize={15}
@@ -177,7 +188,7 @@ export const DualScene: React.FC = () => {
         <PanelTitle x={RIGHT.x0} y={miniTop - h(48)} at={zerosAt - 4}>
           Four missing days, as zeros
         </PanelTitle>
-        <LineSet values={zeros} x0={RIGHT.x0} x1={RIGHT.x1} base={miniBase} top={miniTop} lo={0} hi={80} at={zerosAt - 2} color={ACCENT} dots={false} width={2.4} edges />
+        <LineSet values={zeros} x0={RIGHT.x0} x1={RIGHT.x1} base={miniBase} top={miniTop} lo={0} hi={80} at={zerosAt - 2} color={ACCENT} dots={false} width={2.4} edges dim={bridgeAt + 4} />
         <LineSet values={gapped} x0={RIGHT.x0} x1={RIGHT.x1} base={miniBase} top={miniTop} lo={0} hi={80} at={collapseAt} color={OK} dots={false} axis={false} width={2.8} edges />
         <Verdict ok={false} x={RIGHT.x0} y={miniBase + h(14)} at={collapseAt - 6}>
           a collapse that never happened

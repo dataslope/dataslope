@@ -7,7 +7,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BASELINE, TRUNCATION } from "./data";
-import { BarSet, Drift, LineSet, PanelTitle, pulse, Verdict, YTicks } from "./parts";
+import { BarSet, Drift, LineSet, Mark, PanelTitle, pulse, Verdict, YTicks } from "./parts";
 
 const LEFT = { x0: 210, x1: 820 };
 const RIGHT = { x0: 1080, x1: 1690 };
@@ -45,6 +45,9 @@ export const AxisScene: React.FC = () => {
   const tallAt = n.word("baseline-show", "two and a half times as tall");
   const asLineAt = n.word("baseline-show", "As a line");
   const labelAt = n.word("baseline-show", "label the axis");
+  // The bridge: the rule marked, the misleading bars dimmed.
+  const bridgeAt = n.beat("log-in").from;
+  const axisAt = n.word("log-in", "choice of axis");
   const end = n.beat("log-in").to;
 
   const base = y(BASE);
@@ -118,7 +121,7 @@ export const AxisScene: React.FC = () => {
           at={yearAt - 4}
           color={lift > 0.05 ? INK : INK_SOFT}
         />
-        <BarSet values={B.score} labels={B.months.map((m) => m[0])} x0={LEFT.x0} x1={LEFT.x1} base={base} top={top} lo={B.floor} hi={98} at={asBarsAt - 2} step={1} labelSize={16} />
+        <BarSet values={B.score} labels={B.months.map((m) => m[0])} x0={LEFT.x0} x1={LEFT.x1} base={base} top={top} lo={B.floor} hi={98} at={asBarsAt - 2} step={1} labelSize={16} dim={axisAt - 4} />
         <Verdict ok={false} x={LEFT.x0} y={base + h(50)} at={tallAt}>
           a {fmt(B.risePct, 1)}% rise, the last bar {fmt(B.barRatio, 2)} times as tall
         </Verdict>
@@ -140,7 +143,9 @@ export const AxisScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>axis from {B.floor}: zoomed in, and labeled</span>
         </Note>
         <Note at={labelAt - 2} x={LEFT.x0} y={base + h(96)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>either way, label the axis</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <Mark at={bridgeAt + 2}>either way, label the axis</Mark>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>
