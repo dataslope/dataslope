@@ -222,7 +222,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** an octopus.
 
-### 6. Experimentation I: designing the test (14 questions, ~7.5 min)
+### 6. Experimentation I: designing the test (14 questions, ~7.5 min; built at 8:13)
 
 **Deep dives**
 1. Designing an A/B test for a new feature, and choosing its primary metric (2)
