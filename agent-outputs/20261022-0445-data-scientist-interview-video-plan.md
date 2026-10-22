@@ -116,7 +116,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** an otter.
 
-### 1. Statistics (19 questions, ~11.5 min)
+### 1. Statistics (19 questions, ~11.5 min; built at 10:25)
 
 **Deep dives**
 1. Parameter vs. statistic, standard error vs. standard deviation, and the sampling distribution (3)
