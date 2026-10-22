@@ -8,7 +8,7 @@
 export const VIDEO = "ds-interview";
 
 /** The otter is generated through the Batch API; this waits on its import. */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export type Part = { n: number; title: string; questions: number; video: string; hero: string };
 
