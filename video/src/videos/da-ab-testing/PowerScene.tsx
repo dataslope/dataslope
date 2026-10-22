@@ -173,12 +173,13 @@ export const PowerScene: React.FC = () => {
 
         {/* ── Questions 11 and 12: no effect, and an effect placed for 80% power ── */}
         <Svg opacity={curvesP}>
-          <path d={curvePath(zs, base, height, 0, zs.lo, zs.hi)} fill="none" stroke={INK_SOFT} strokeWidth={2.4} />
-          <path d={curvePath(zs, base, height, ERRORS.shift, zs.lo, zs.hi)} fill="none" stroke={B_COLOR} strokeWidth={2.8} />
-          <path d={curvePath(zs, base, height, 0, crit, zs.hi, true)} fill={ACCENT} opacity={0.8 * alphaP} />
-          <path d={curvePath(zs, base, height, 0, zs.lo, -crit, true)} fill={ACCENT} opacity={0.8 * alphaP} />
+          {/* Fills first, alpha's tails over the power they sit inside, then the outlines. */}
           <path d={curvePath(zs, base, height, ERRORS.shift, zs.lo, crit, true)} fill={WARM} opacity={0.6 * betaP} />
           <path d={curvePath(zs, base, height, ERRORS.shift, crit, zs.hi, true)} fill={OK} opacity={0.45 * powerP} />
+          <path d={curvePath(zs, base, height, 0, crit, zs.hi, true)} fill={ACCENT} opacity={0.85 * alphaP} />
+          <path d={curvePath(zs, base, height, 0, zs.lo, -crit, true)} fill={ACCENT} opacity={0.85 * alphaP} />
+          <path d={curvePath(zs, base, height, 0, zs.lo, zs.hi)} fill="none" stroke={INK_SOFT} strokeWidth={2.4} />
+          <path d={curvePath(zs, base, height, ERRORS.shift, zs.lo, zs.hi)} fill="none" stroke={B_COLOR} strokeWidth={2.8} />
           <line x1={CURVES.x0} x2={CURVES.x1} y1={base} y2={base} stroke={INK} strokeWidth={1.4} />
           <line x1={at(zs, crit)} x2={at(zs, crit)} y1={base - height - 14} y2={base} stroke={INK} strokeWidth={2} strokeDasharray="6 5" />
           <text x={at(zs, 0)} y={base + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: INK_SOFT }}>
@@ -206,7 +207,7 @@ export const PowerScene: React.FC = () => {
         <Note at={alphaAt + 4} x={at(zs, ERRORS.crit) + 30} y={base - h(70)}>
           <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>α {fmt(alphaNow * 100, 1)}%</span>
         </Note>
-        <Note at={betaAt + 4} x={at(zs, ERRORS.crit) - 120} y={base - h(110)}>
+        <Note at={betaAt + 4} x={at(zs, ERRORS.crit) - 14} y={base - h(34)} align="right">
           <span style={{ ...label(20, WARM_INK), whiteSpace: "nowrap", ...TABULAR }}>β {fmt(betaNow * 100, 1)}%</span>
         </Note>
         <Note at={minusAt - 2} x={X0} y={y(TOP)}>
@@ -247,7 +248,7 @@ export const PowerScene: React.FC = () => {
         {SAMPLE.curves.map((c, i) => {
           const mid = c.rows.find(([, p]) => p >= 0.5) ?? c.rows[0];
           return (
-            <Note key={c.to} at={risesAt + 10 + i * 6} x={at(lx, Math.log10(mid[0])) - 150} width={140} y={at(pys, 0.5) - h(14)} align="right">
+            <Note key={c.to} at={risesAt + 10 + i * 6} x={at(lx, Math.log10(mid[0])) - 12} width={140} y={at(pys, 0.5) - h(14)} align="right">
               <span style={{ ...label(18, inks[i] === A_COLOR ? BLUE_INK : INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>→ {Math.round(c.to * 100)}%</span>
             </Note>
           );

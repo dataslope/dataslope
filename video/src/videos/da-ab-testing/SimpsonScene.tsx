@@ -129,7 +129,7 @@ export const SimpsonScene: React.FC = () => {
         <Note at={losesAt + 6} x={POOLED_X} y={pg.rowTop(Pd.rows.length) + h(26)} out={out14}>
           <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>and loses overall</span>
         </Note>
-        <Note at={givenAt + 4} x={POOLED_X} y={pg.rowTop(Pd.rows.length) + h(80)} out={out14} width={640}>
+        <Note at={givenAt + 4} x={POOLED_X} y={pg.rowTop(Pd.rows.length) + h(80)} out={out14} width={720}>
           <span style={{ ...note(25, INK), ...TABULAR }}>
             {largeA} of A&apos;s {totalA} patients had large stones, the hard cases
           </span>

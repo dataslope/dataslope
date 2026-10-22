@@ -68,10 +68,12 @@ export const SignifScene: React.FC = () => {
   const growTo = twoThousandAt + 10;
   const shown = (i: number) => ease(frame, growFrom + ((growTo - growFrom) * i) / (sizes.length - 1), 10);
   const callouts = [
-    { size: 10, at: tenAt, color: INK },
-    { size: PRACTICAL.cross, at: twoHundredAt, color: OK_INK },
-    { size: 2000, at: twoThousandAt, color: OK_INK },
-  ];
+    // Each label sits clear of what is near its dot: the axis title by the
+    // first, the 0.05 label by the last.
+    { size: 10, at: tenAt, color: INK, place: "right" },
+    { size: PRACTICAL.cross, at: twoHundredAt, color: OK_INK, place: "above" },
+    { size: 2000, at: twoThousandAt, color: OK_INK, place: "left" },
+  ] as const;
 
   // ── Question 9 ──
   const ls: Scale = { lo: 0, hi: 4, a: LIFT.x0, b: LIFT.x1 };
@@ -138,7 +140,17 @@ export const SignifScene: React.FC = () => {
         {callouts.map((c) => {
           const p = PRACTICAL.rows.find(([s]) => s === c.size)?.[1] ?? 0;
           return (
-            <Note key={c.size} at={c.at + 4} x={px(c.size) - 100} width={200} y={ppy(p) - h(52)} out={out8} from="up" style={{ textAlign: "center" }}>
+            <Note
+              key={c.size}
+              at={c.at + 4}
+              x={c.place === "right" ? px(c.size) + 20 : c.place === "left" ? px(c.size) - 16 : px(c.size) - 100}
+              width={c.place === "above" ? 200 : undefined}
+              y={c.place === "right" ? ppy(p) - h(17) : ppy(p) - h(c.place === "left" ? 66 : 52)}
+              align={c.place === "left" ? "right" : "left"}
+              out={out8}
+              from="up"
+              style={c.place === "above" ? { textAlign: "center" } : undefined}
+            >
               <span style={{ ...note(24, c.color), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>p {pText(p)}</span>
             </Note>
           );
@@ -157,10 +169,13 @@ export const SignifScene: React.FC = () => {
         <Note at={rangeAt - 2} x={X0} y={y(TOP)} width={860}>
           <span style={{ ...note(28, INK) }}>
             &ldquo;The new version lifts conversion by <b style={{ color: B_INK }}>about {Math.round(EXPERIMENT.lift[0])} points</b>
-            <span style={{ opacity: ease(frame, betweenAt - 2, 10) }}>
-              . We&apos;re confident the true lift is between {Math.round(EXPERIMENT.ci[0])} and {Math.round(EXPERIMENT.ci[1])}.
-            </span>
-            &rdquo;
+            {frame < betweenAt - 2 ? (
+              <>&rdquo;</>
+            ) : (
+              <span style={{ opacity: ease(frame, betweenAt - 2, 10) }}>
+                . We&apos;re confident the true lift is between {Math.round(EXPERIMENT.ci[0])} and {Math.round(EXPERIMENT.ci[1])}.&rdquo;
+              </span>
+            )}
           </span>
         </Note>
         <Svg opacity={ease(frame, twoAt - 2, 12)}>

@@ -115,7 +115,7 @@ export const PeekScene: React.FC = () => {
           </g>
           <circle cx={at(xs, PEEK.planned)} cy={at(ys, PEEK.final)} r={9 * finalP} fill={OK} />
         </Svg>
-        <Note at={eightHundredAt + 2} x={at(xs, firstCross) + 14} y={alphaY + h(18)}>
+        <Note at={eightHundredAt + 2} x={at(xs, firstCross) - 40} width={80} y={y(CHART.base) + h(9)} from="up" style={{ textAlign: "center" }}>
           <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>{firstCross.toLocaleString("en-US")}</span>
         </Note>
         <Note at={againAt + 10} x={at(xs, secondCross)} y={y(CHART.top) - h(36)}>
@@ -126,7 +126,7 @@ export const PeekScene: React.FC = () => {
         <Note at={stoppedAt + 4} x={at(xs, firstCross) + 56} y={y(CHART.top) + h(26)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>&ldquo;Significant! Ship it.&rdquo;</span>
         </Note>
-        <Note at={finalAt + 2} x={at(xs, PEEK.planned) - 230} width={220} y={at(ys, PEEK.final) - h(64)} align="right">
+        <Note at={finalAt + 2} x={at(xs, PEEK.planned) - 20} width={260} y={at(ys, PEEK.final) + h(16)} align="right">
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>planned: p = {fmt(PEEK.final, 2)}</span>
         </Note>
         <Note at={fixAt - 2} x={X0 + 980} y={y(CHART.top) - h(84)}>

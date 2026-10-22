@@ -173,7 +173,7 @@ const Novelty: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={fourteenAt - 2} x={at(x, 1) + 20} y={at(y, novelty[0]) - c.h(18)}>
         <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(novelty[0], 0)}%</span>
       </Note>
-      <Note at={fourteenAt + 8} x={at(x, 1) + 20} y={at(y, durable[0]) - c.h(46)}>
+      <Note at={fourteenAt + 8} x={at(x, 1) + 20} y={at(y, durable[0]) + c.h(8)}>
         <span style={{ ...note(26, OK_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{fmt(durable[0], 0)}%</span>
       </Note>
       <Note at={fadesAt + 20} x={at(x, last) + 16} y={at(y, novelty[last - 1]) - c.h(16)}>
@@ -243,7 +243,8 @@ const Cohorts: React.FC<{ c: Ctx }> = ({ c }) => {
         <circle cx={at(x, W)} cy={at(y, jan.rows[W])} r={9 * dotP(janAt)} fill={ds("blue", COHORT_STEPS[0])} stroke={INK} strokeWidth={1.5} />
         <circle cx={at(x, W)} cy={at(y, may.rows[W])} r={9 * dotP(mayAt)} fill={ds("blue", COHORT_STEPS[K.length - 1])} />
       </Svg>
-      <Note at={janAt} x={at(x, W) + 16} y={at(y, jan.rows[W]) + c.h(6)}>
+      {/* Left of the dot, under the curve: to its right the curve runs on through the label. */}
+      <Note at={janAt} x={at(x, W) - 16} y={at(y, jan.rows[W]) + c.h(6)} align="right">
         <span style={{ ...note(24, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
           {jan.key}: {fmt(jan.rows[W], 0)}%
         </span>

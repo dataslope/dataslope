@@ -124,7 +124,7 @@ export const AbtestScene: React.FC = () => {
           <text x={userX} y={forkY + 58} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 600, fill: INK_SOFT }}>
             users
           </text>
-          <text x={userX + 150} y={forkY - 12} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: INK_SOFT }}>
+          <text x={userX + 136} y={forkY + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: INK_SOFT }}>
             at random
           </text>
         </Svg>
@@ -266,7 +266,7 @@ export const AbtestScene: React.FC = () => {
         <Note at={nothingAt + 2} x={NULL.x0} y={base - height - h(46)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>gaps a do-nothing change would give, in standard errors</span>
         </Note>
-        <Note at={threeAt - 4} x={zx - 300} width={300} y={base - height * 0.55 - h(70)} align="right">
+        <Note at={threeAt - 4} x={zx - 16} width={300} y={base - height * 0.55 - h(70)} align="right">
           <span style={{ ...note(25, B_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>ours: z = {fmt(EXPERIMENT.z)}</span>
           <br />
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>p = {EXPERIMENT.p}</span>
