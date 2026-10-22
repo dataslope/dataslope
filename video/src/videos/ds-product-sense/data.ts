@@ -13,7 +13,7 @@ export const VIDEO = "ds-product-sense";
  * Whether public/images/ds-product-sense/ holds the watercolor from
  * illustrations.json. Every frame is laid out with room for it either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export const HOOK = results.hook;
 export const LEAD = results.lead;
