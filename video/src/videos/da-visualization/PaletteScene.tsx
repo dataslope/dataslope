@@ -134,8 +134,8 @@ export const PaletteScene: React.FC = () => {
   const pY = (v: number) => pBase - (v / 100) * (pBase - pTop);
   const lines = (p: (typeof PANELS)[number], at: number) => (
     <>
-      <LineSet values={mobile.values} x0={p.x0} x1={p.x1} base={pBase} top={pTop} lo={0} hi={100} at={at} color={OK} dots={false} out={out16} edges />
-      <LineSet values={retail.values} x0={p.x0} x1={p.x1} base={pBase} top={pTop} lo={0} hi={100} at={at + 4} color={ACCENT} dots={false} axis={false} out={out16} edges />
+      <LineSet values={mobile.values} x0={p.x0} x1={p.x1} base={pBase} top={pTop} lo={0} hi={100} at={at} color={OK} dots={false} edges />
+      <LineSet values={retail.values} x0={p.x0} x1={p.x1} base={pBase} top={pTop} lo={0} hi={100} at={at + 4} color={ACCENT} dots={false} axis={false} edges />
     </>
   );
   const legend = (p: (typeof PANELS)[number], at: number) => (
