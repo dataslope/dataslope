@@ -42,6 +42,8 @@ import { DaAiAssisted } from "./videos/da-ai-assisted/Video";
 import { script as daAiAssistedScript } from "./videos/da-ai-assisted/script";
 import { DsProbability } from "./videos/ds-probability/Video";
 import { script as dsProbabilityScript } from "./videos/ds-probability/script";
+import { DsMlEvaluation } from "./videos/ds-ml-evaluation/Video";
+import { script as dsMlEvaluationScript } from "./videos/ds-ml-evaluation/script";
 import { DaAbTesting } from "./videos/da-ab-testing/Video";
 import { script as daAbTestingScript } from "./videos/da-ab-testing/script";
 import { DaVisualization } from "./videos/da-visualization/Video";
@@ -630,6 +632,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(dsProbabilityScript)}
+      />
+      <Composition
+        id="DataScientist-3-MlEvaluation"
+        component={DsMlEvaluation}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsMlEvaluationScript)}
       />
     </Folder>
     <Folder name="Assets">
