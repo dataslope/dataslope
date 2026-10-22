@@ -11,7 +11,7 @@ import { Sfx } from "../../sound/Sfx";
 import { SIZE } from "./data";
 import { at, Axes, Curve, Drift, Mark, pulse, type Scale, Svg, WARM, WARM_INK, X0 } from "./parts";
 
-const BOX = { left: 170, right: 1060, top: 490, bottom: 820 };
+const BOX = { left: 170, right: 1060, top: 512, bottom: 820 };
 const COL_X = 1180;
 const N_MAX = 30000;
 

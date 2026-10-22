@@ -143,7 +143,7 @@ export const PeekScene: React.FC = () => {
             stop at either<span style={{ opacity: ease(frame, noiseAt, 8) }}>: you&apos;ve shipped noise</span>
           </span>
         </Note>
-        <Note at={finalAt} x={at(xs, PEEK.planned) - 260} y={at(ys, PEEK.final) - h(54)} width={250} align="right">
+        <Note at={finalAt} x={at(xs, PEEK.planned) - 270} y={at(ys, PEEK.final) + h(16)} width={250} align="right">
           <span style={{ ...note(25, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
             planned end: {PEEK.final.toFixed(2)}
           </span>
@@ -179,7 +179,11 @@ export const PeekScene: React.FC = () => {
                   opacity: 0.85,
                 }}
               />
-              <Note at={valueAts[i]} x={xr(r.r.rate) + 12} y={top + h(36)}>
+              {/* The 5% a single look promises, marked across this bar only. */}
+              <Svg opacity={ease(frame, valueAts[0], 12)}>
+                <line x1={xr(0.05)} x2={xr(0.05)} y1={top + h(28)} y2={top + h(78)} stroke={INK} strokeWidth={1.8} strokeDasharray="4 5" />
+              </Svg>
+              <Note at={valueAts[i]} x={Math.max(xr(r.r.rate), xr(0.05) + 6) + 12} y={top + h(36)}>
                 <span style={{ ...note(25, bad ? ACCENT_INK : BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
                   {pct(r.r.rate, 1)}
                 </span>
@@ -187,10 +191,7 @@ export const PeekScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Svg opacity={ease(frame, valueAts[0], 12)}>
-          <line x1={xr(0.05)} x2={xr(0.05)} y1={y(450)} y2={y(830)} stroke={INK} strokeWidth={1.8} strokeDasharray="4 6" />
-        </Svg>
-        <Note at={valueAts[0] + 4} x={xr(0.05) - 80} y={y(836)} width={160} style={{ textAlign: "center" }}>
+        <Note at={valueAts[0] + 4} x={xr(0.05) - 80} y={y(812)} width={160} style={{ textAlign: "center" }}>
           <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>5% promised</span>
         </Note>
       </Drift>

@@ -218,24 +218,17 @@ export const UnitScene: React.FC = () => {
                   borderRadius: 3,
                 }}
               />
-              <Note at={b.valAt} x={xOf(b.v) + 14} y={y(b.top) + h(42)}>
+              {/* The 5% a test promises, marked across this bar only, so no label sits under it. */}
+              <Svg opacity={promise}>
+                <line x1={xOf(0.05)} x2={xOf(0.05)} y1={y(b.top) + h(32)} y2={y(b.top) + h(88)} stroke={INK} strokeWidth={2} strokeDasharray="4 5" />
+              </Svg>
+              <Note at={b.valAt} x={Math.max(xOf(b.v), xOf(0.05) + 6) + 14} y={y(b.top) + h(42)}>
                 <span style={{ ...note(30, b.ink), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{pct(b.v, 1)} significant</span>
               </Note>
             </React.Fragment>
           );
         })}
-        <Svg opacity={promise}>
-          <line
-            x1={xOf(0.05)}
-            x2={xOf(0.05)}
-            y1={y(550)}
-            y2={y(550) + (y(780) - y(550)) * promise}
-            stroke={INK}
-            strokeWidth={2}
-            strokeDasharray="5 6"
-          />
-        </Svg>
-        <Note at={promiseAt + 2} x={xOf(0.05) - 100} y={y(786)} width={200} style={{ textAlign: "center" }}>
+        <Note at={promiseAt + 2} x={xOf(0.05) - 100} y={y(774)} width={200} style={{ textAlign: "center" }}>
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>5% promised</span>
         </Note>
         <Note at={orderAt} x={RIGHT_X} y={y(830)}>

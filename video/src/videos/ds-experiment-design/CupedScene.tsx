@@ -55,7 +55,7 @@ export const CupedScene: React.FC = () => {
   const halfAt = n.word("cuped-var", "less than half the users");
   const end = n.beat("cuped-var").to;
 
-  const xs: Scale = { lo: 0, hi: 20, a: BOX.left, b: BOX.right };
+  const xs: Scale = { lo: -2, hi: 20, a: BOX.left, b: BOX.right };
   const ys: Scale = { lo: -2, hi: 16, a: y(BOX.bottom), b: y(BOX.top) };
   const shown = ease(frame, beforeAt - 2, 20);
   const adjust = ease(frame, thetaAt + 6, 36);
@@ -122,7 +122,7 @@ export const CupedScene: React.FC = () => {
         <Svg opacity={meanP}>
           <line x1={BOX.left} x2={BOX.right} y1={at(ys, CUPED.meanY)} y2={at(ys, CUPED.meanY)} stroke={OK} strokeWidth={2.4} strokeDasharray="8 6" />
         </Svg>
-        <Note at={predictsAt + 4} x={at(xs, 15.5)} y={at(ys, lineAt(15.5)) - h(56)} out={thetaAt + 6}>
+        <Note at={predictsAt + 4} x={at(xs, -1)} y={at(ys, 15)} out={thetaAt + 6}>
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>slope θ = {CUPED.theta}</span>
         </Note>
 

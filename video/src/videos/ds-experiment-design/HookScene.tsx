@@ -10,15 +10,15 @@ import { Sfx } from "../../sound/Sfx";
 import { Drift, Headline, Kicker, Mark, OK, OK_INK, pulse, Spot, X0 } from "./parts";
 import { mulberry32 } from "../da-statistics-communication/parts";
 
-const LINE_Y = 640;
+const LINE_Y = 600;
 const LAUNCH_X = 1040;
 const LINE_END = 1800;
-const CHIP_Y = 500;
-const CHIP_W = 170;
-const CHIP_GAP = 12;
+const CHIP_Y = 460;
+const CHIP_W = 176;
+const CHIP_GAP = 10;
 const CHIP_H = 66;
 const DOTS_X = 1110;
-const DOTS_Y = 520;
+const DOTS_Y = 480;
 
 /** The five things settled before launch, in the order the hook names them. */
 const DECISIONS = [
@@ -61,7 +61,8 @@ export const HookScene: React.FC = () => {
   const clearAt = n.beat("design-in").to - 6;
 
   const lineP = ease(frame, startAt + 4, 24);
-  const wash = ease(frame, lostAt, 14) * (1 - 0.5 * ease(frame, roundAt, 16));
+  const washIn = ease(frame, lostAt, 14);
+  const wash = washIn * (1 - 0.5 * ease(frame, roundAt, 16));
   const drop = ease(frame, settledAt, 14);
   const clear = 1 - ease(frame, clearAt, 10);
 
@@ -85,7 +86,7 @@ export const HookScene: React.FC = () => {
           <rect
             x={X0 - 14}
             y={y(LINE_Y) - h(170)}
-            width={(LAUNCH_X - X0 + 14) * wash}
+            width={(LAUNCH_X - X0 + 14) * washIn}
             height={h(170)}
             fill={HIGHLIGHT}
             opacity={0.45 * wash}
@@ -180,7 +181,7 @@ export const HookScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...note(23, INK),
+                ...note(21, INK),
                 fontWeight: 650,
                 whiteSpace: "nowrap",
                 opacity: p,
@@ -192,21 +193,21 @@ export const HookScene: React.FC = () => {
           );
         })}
         <Note at={undoAt - 2} x={DOTS_X} y={y(LINE_Y) + h(70)}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a mistake there is hard to undo here</span>
+          <span style={{ ...note(27, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a mistake is hard to undo once it's live</span>
         </Note>
 
         {/* The round. */}
-        <Note at={fourteenAt - 2} x={X0} y={y(740)}>
+        <Note at={fourteenAt - 2} x={X0} y={y(720)}>
           <span style={{ ...note(34, INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
             <Mark at={roundAt}>The design round</Mark>: 14 questions
           </span>
         </Note>
-        <Note at={elevenAt - 2} x={X0} y={y(798)}>
+        <Note at={elevenAt - 2} x={X0} y={y(778)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b style={{ color: BLUE_INK }}>11</b> worked through on <span style={{ opacity: ease(frame, simAt - 2, 10) }}>simulated experiments</span>
           </span>
         </Note>
-        <Note at={briefAt - 2} x={X0} y={y(842)}>
+        <Note at={briefAt - 2} x={X0} y={y(822)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b style={{ color: OK_INK }}>3</b> brief ones at the end
           </span>
