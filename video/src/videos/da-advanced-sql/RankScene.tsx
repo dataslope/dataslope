@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
@@ -20,6 +21,7 @@ import {
   rowsAt,
   TableName,
   X0,
+  Mark,
 } from "./parts";
 
 const TOP = 330;
@@ -37,13 +39,15 @@ const TOPN_LIST_W = 650;
  * without the wrapping query.
  */
 export const RankScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
   const from = n.beat("rank").from;
   const qAt = n.word("rank", "Question");
   const textAt = n.word("rank", "How do row number");
-  const asked = n.beat("rank").to;
+  // The table arrives on the question's last words, as the series does.
+  const asked = n.word("rank", "dense rank") + 4;
   const eightyEightAt = n.word("rank-ties", "eighty-eight");
   const eightyFiveAt = n.word("rank-ties", "four have eighty-five");
   const rnAt = n.word("rank-three", "Row number gives every row");
@@ -65,6 +69,8 @@ export const RankScene: React.FC = () => {
   const filtersAt = n.word("qualify", "filters on a window function");
   const noWrapAt = n.word("qualify", "no wrapping query");
   const supportAt = n.word("qualify", "DuckDB, Snowflake and BigQuery");
+  const bridgeAt = n.beat("frame-in").from;
+  const clearAt = n.word("frame-in", "most often get wrong") + 6;
   const end = n.beat("frame-in").to;
 
   // ── Question 3 ──
@@ -99,6 +105,8 @@ export const RankScene: React.FC = () => {
       <Sfx name="el-pop" at={noWrapAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
+        {/* On the bridge to the next scene the takeaway is marked, then the page clears. */}
+        <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} out={out3} size={60}>
           How do <QMono>ROW_NUMBER</QMono>, <QMono>RANK</QMono>, and <QMono>DENSE_RANK</QMono> differ?
         </QuestionCard>
@@ -216,7 +224,9 @@ export const RankScene: React.FC = () => {
         <DataTable g={rng} cols={colsOf(q)} at={filtersAt + 4} rows={rowsAt(q.rows, filtersAt + 8)} />
         <Note at={noWrapAt} x={TOPN_LIST_X} y={y(TOP) + listingHeight(q.lines.length, 19) + h(24)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            like <QMono>HAVING</QMono>, for a window function
+            <Mark at={bridgeAt}>
+              like <QMono>HAVING</QMono>, for a window function
+            </Mark>
           </span>
         </Note>
         <Note at={supportAt - 2} x={TOPN_LIST_X} y={y(TOP) + listingHeight(q.lines.length, 19) + h(68)}>
@@ -228,6 +238,7 @@ export const RankScene: React.FC = () => {
         <Note at={onlyAt + 6} x={X0} y={pg.rowTop(P.rows.length) + h(56)} out={useRankAt}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>only one makes it</span>
         </Note>
+        </AbsoluteFill>
       </Drift>
     </AbsoluteFill>
   );

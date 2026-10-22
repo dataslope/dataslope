@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
@@ -22,6 +23,7 @@ import {
   rowsAt,
   TableName,
   X0,
+  Mark,
 } from "./parts";
 
 const TOP = 340;
@@ -39,13 +41,15 @@ const LIST_W = 760;
  * widened.
  */
 export const FrameScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
   const from = n.beat("frame").from;
   const qAt = n.word("frame", "Question");
   const textAt = n.word("frame", "What is a window frame");
-  const asked = n.beat("frame").to;
+  // The payments arrive on the question's second half, as the series does.
+  const asked = n.word("frame", "how do rows and range differ") + 4;
   const sliceAt = n.word("frame-def", "the slice of rows");
   const sameDayAt = n.word("frame-def", "fall on the same day");
   const rowsAt0 = n.word("frame-rows", "Rows counts physical rows");
@@ -67,6 +71,8 @@ export const FrameScene: React.FC = () => {
   const ownAt = n.word("last", "the row's own amount");
   const widenAt = n.word("last", "Widen the frame");
   const realAt = n.word("last", "the real last day");
+  const bridgeAt = n.beat("running-in").from;
+  const clearAt = n.word("running-in", "every analyst") + 6;
   const end = n.beat("running-in").to;
 
   const P = FRAME.payments;
@@ -103,6 +109,8 @@ export const FrameScene: React.FC = () => {
       <Sfx name="el-pop" at={realAt} level={-32} />
 
       <Drift from={from} to={end + 40}>
+        {/* On the bridge to the next scene the takeaway is marked, then the page clears. */}
+        <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={q7At - 4} size={60}>
           What is a window frame, and how do <QMono>ROWS</QMono> and <QMono>RANGE</QMono> differ?
         </QuestionCard>
@@ -238,8 +246,11 @@ export const FrameScene: React.FC = () => {
           marks={LW.rows.map((_, row) => ({ row, col: lc, at: realAt + row * 3, color: MARK_OK }))}
         />
         <Note at={realAt + 8} x={1000} y={lwg.rowTop(LW.rows.length) + h(20)}>
-          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>the real last day: {LW.rows[0][lc]}</span>
+          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>
+            <Mark at={bridgeAt}>the real last day: {LW.rows[0][lc]}</Mark>
+          </span>
         </Note>
+        </AbsoluteFill>
       </Drift>
     </AbsoluteFill>
   );
