@@ -319,7 +319,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** a seal.
 
-### 11. LLM evaluation (9 questions, ~6.5 min)
+### 11. LLM evaluation (9 questions, ~6.5 min; built at 7:17)
 
 **Deep dives**
 1. How Data Scientist interviews have changed with AI
