@@ -40,6 +40,8 @@ import { DaAdvancedSql } from "./videos/da-advanced-sql/Video";
 import { script as daAdvancedSqlScript } from "./videos/da-advanced-sql/script";
 import { DaAiAssisted } from "./videos/da-ai-assisted/Video";
 import { script as daAiAssistedScript } from "./videos/da-ai-assisted/script";
+import { DsProbability } from "./videos/ds-probability/Video";
+import { script as dsProbabilityScript } from "./videos/ds-probability/script";
 import { DaAbTesting } from "./videos/da-ab-testing/Video";
 import { script as daAbTestingScript } from "./videos/da-ab-testing/script";
 import { DaVisualization } from "./videos/da-visualization/Video";
@@ -616,6 +618,18 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(daVisualizationScript)}
+      />
+    </Folder>
+    <Folder name="Interview-Data-Scientist">
+      <Composition
+        id="DataScientist-2-Probability"
+        component={DsProbability}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsProbabilityScript)}
       />
     </Folder>
     <Folder name="Assets">
