@@ -13,7 +13,7 @@ export const VIDEO = "da-pandas";
  * Whether public/images/da-pandas/ holds the watercolor from
  * illustrations.json. Every frame is laid out with room for it either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type FrameValue = {
   kind: "frame";
