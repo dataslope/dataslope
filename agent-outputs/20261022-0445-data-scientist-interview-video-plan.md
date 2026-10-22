@@ -302,7 +302,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** a badger.
 
-### 10. SQL (15 questions, ~7 min)
+### 10. SQL (15 questions, ~7 min; built at 6:21)
 
 **Deep dives**
 1. INNER vs. LEFT JOIN for a retention query, and churn as an anti-join: the users who did not come back are the point (2)
