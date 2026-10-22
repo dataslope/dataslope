@@ -108,7 +108,7 @@ export const HookScene: React.FC = () => {
         <Note at={startAt + 16} x={LAUNCH_X - 60} y={y(LINE_Y) + h(22)} width={120} style={{ textAlign: "center" }}>
           <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>launch</span>
         </Note>
-        <Note at={startAt + 18} x={LINE_END - 200} y={y(LINE_Y) + h(22)} width={200} align="right">
+        <Note at={startAt + 18} x={LINE_END} y={y(LINE_Y) + h(22)} width={200} align="right">
           <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>live</span>
         </Note>
 

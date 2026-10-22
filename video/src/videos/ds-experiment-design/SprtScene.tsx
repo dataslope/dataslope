@@ -96,10 +96,10 @@ export const SprtScene: React.FC = () => {
           <line x1={BOX.left} x2={BOX.left + (BOX.right - BOX.left) * bounds} y1={at(ys, SPRT.upper)} y2={at(ys, SPRT.upper)} stroke={OK} strokeWidth={2.6} strokeDasharray="8 6" />
           <line x1={BOX.left} x2={BOX.left + (BOX.right - BOX.left) * bounds} y1={at(ys, SPRT.lower)} y2={at(ys, SPRT.lower)} stroke={INK} strokeWidth={2.6} strokeDasharray="8 6" />
         </Svg>
-        <Note at={boundsAt + 6} x={BOX.right - 330} y={at(ys, SPRT.upper) - h(40)} width={320} align="right">
+        <Note at={boundsAt + 6} x={BOX.right - 6} y={at(ys, SPRT.upper) - h(40)} width={320} align="right">
           <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>stop: an effect ({SPRT.upper.toFixed(2)})</span>
         </Note>
-        <Note at={boundsAt + 10} x={BOX.right - 330} y={at(ys, SPRT.lower) + h(10)} width={320} align="right">
+        <Note at={boundsAt + 10} x={BOX.right - 6} y={at(ys, SPRT.lower) + h(18)} width={320} align="right">
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>stop: no effect (−{(-SPRT.lower).toFixed(2)})</span>
         </Note>
         <Curve points={effect} x={xs} y={ys} at={topAt - 2} dur={Math.max(20, concludeAt - topAt + 6)} color={BAR} width={2.6} />

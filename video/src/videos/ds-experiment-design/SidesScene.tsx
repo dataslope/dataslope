@@ -188,7 +188,7 @@ export const SidesScene: React.FC = () => {
           <rect x={xs.a} y={y(400)} width={at(xs, -NONINF.margin) - xs.a} height={y(760) - y(400)} fill={ACCENT} opacity={0.08} />
           <line x1={at(xs, -NONINF.margin)} x2={at(xs, -NONINF.margin)} y1={y(400)} y2={y(760)} stroke={ACCENT} strokeWidth={2.6} strokeDasharray="7 6" />
         </Svg>
-        <Note at={halfAt + 4} x={at(xs, -NONINF.margin) - 300} y={y(404)} width={290} align="right">
+        <Note at={halfAt + 4} x={at(xs, -NONINF.margin) - 12} y={y(404)} width={290} align="right">
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>margin −{NONINF.margin}: worse than this</span>
         </Note>
         {intervals.map((r) => {

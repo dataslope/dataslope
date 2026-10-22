@@ -130,7 +130,7 @@ export const PeekScene: React.FC = () => {
             <circle cx={at(xs, PEEK.planned)} cy={at(ys, PEEK.final)} r={10 * ease(frame, finalAt - 2, 10)} fill={BLUE_INK} />
           ) : null}
         </Svg>
-        <Note at={dipAt} x={BOX.right - 160} y={at(ys, 0.05) - h(36)} width={150} align="right">
+        <Note at={dipAt} x={BOX.right} y={at(ys, 0.05) - h(36)} width={150} align="right">
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>p = 0.05</span>
         </Note>
         {crossings.map((c) => (
@@ -143,7 +143,7 @@ export const PeekScene: React.FC = () => {
             stop at either<span style={{ opacity: ease(frame, noiseAt, 8) }}>: you&apos;ve shipped noise</span>
           </span>
         </Note>
-        <Note at={finalAt} x={at(xs, PEEK.planned) - 270} y={at(ys, PEEK.final) + h(16)} width={250} align="right">
+        <Note at={finalAt} x={at(xs, PEEK.planned) - 14} y={at(ys, PEEK.final) + h(16)} width={250} align="right">
           <span style={{ ...note(25, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
             planned end: {PEEK.final.toFixed(2)}
           </span>
