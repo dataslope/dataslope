@@ -110,7 +110,7 @@ Every video is under the 9,500-character cap (about 12.4 minutes). Statistics is
 
 Below, **Draws on** lists what can be borrowed: the page's own charts (`charts/<slug>.mjs`, already in the brand colors and reviewed in `/dashboard/admin/charts`), course videos in `video/src/videos/`, and Data Analyst scenes. **Facts** says which engine computes each number and what cannot be computed honestly. The Python engine is the site's Pyodide, **314.0.7** (Python 3.14.2), which ships NumPy 2.4.6, pandas 3.0.2, SciPy 1.18.0, scikit-learn 1.8.0, statsmodels 0.14.6, XGBoost 2.1.4 and LightGBM 4.6.0, and has **no** PyTorch, TensorFlow or SHAP. The SQL engine is DuckDB-Wasm 1.32.0, the one the SQL page's `<SqlCodeBlock dialect="duckdb">` blocks run.
 
-### 0. The Data Scientist interview (~2 min)
+### 0. The Data Scientist interview (~2 min; built at 1:58)
 
 From `index.mdx`: what the loop looks like (probability and statistics questions, a modeling case such as "how would you predict X?", an A/B-test design discussion, and usually a Python/pandas or SQL screen), the five things interviewers probe (statistics and probability, modeling, experimentation, coding, communication), what AI has changed (evaluating LLM features as a measurement problem, experiments where the treatment itself varies, checking work an assistant wrote, rounds with and without AI allowed), and how the series runs: deep dives, then a rapid round, with practice on each page.
 
