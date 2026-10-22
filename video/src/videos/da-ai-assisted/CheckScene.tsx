@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, ElbowArrow, X0 } from "./parts";
 
-const LIST_Y = 330;
+const LIST_Y = 350;
 const PITCH = 70;
 const FIG_X = 1100;
 
@@ -55,6 +55,8 @@ export const CheckScene: React.FC = () => {
   const qAt = n.word("check", "Question");
   const textAt = n.word("check", "An assistant wrote a query");
   const readAt = n.word("check-read", "Read it as if");
+  // The first line arrives as the question ends, so it never sits alone.
+  const asked = n.beat("check").to;
   const steps = [
     { at: n.word("check-read", "State the grain"), text: "State the grain: what one row means" },
     { at: n.word("check-read", "Check row counts"), text: "Check row counts across every join" },
@@ -88,7 +90,7 @@ export const CheckScene: React.FC = () => {
           An assistant wrote a query, and your manager wants the number today. How do you check it?
         </QuestionCard>
 
-        <Note at={readAt - 2} x={X0} y={top - h(56)}>
+        <Note at={Math.min(readAt, asked) - 6} x={X0} y={top - h(56)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>read it as if a new colleague wrote it:</span>
         </Note>
         {steps.map((s, i) => {

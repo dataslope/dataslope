@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Mark, MARK_OK, OK_INK, Strike, X0 } from "./parts";
 
-const KINDS_Y = 330;
+const KINDS_Y = 350;
 const REPORT_Y = 470;
 const RULE_Y = 760;
 const KIND_W = 540;
@@ -29,6 +29,8 @@ export const HallucinateScene: React.FC = () => {
   const qAt = n.word("hallucinate", "Question");
   const textAt = n.word("hallucinate", "What is a hallucinated insight");
   const claimAt = n.word("hallucinate-what", "a claim the data doesn't support");
+  // The first line arrives as the question ends, so it never sits alone.
+  const asked = n.beat("hallucinate").to;
   const kinds = [
     { at: n.word("hallucinate-what", "a trend that isn't there"), text: "a trend that isn't there" },
     { at: n.word("hallucinate-what", "a number nobody computed"), text: "a number nobody computed" },
@@ -61,7 +63,7 @@ export const HallucinateScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── Three kinds of claim with nothing under them ── */}
-        <Note at={claimAt - 2} x={X0} y={y(KINDS_Y) - h(48)}>
+        <Note at={Math.min(claimAt, asked) - 6} x={X0} y={y(KINDS_Y) - h(48)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a claim the data doesn&apos;t support:</span>
         </Note>
         {kinds.map((k, i) => {

@@ -10,9 +10,9 @@ import { Sfx } from "../../sound/Sfx";
 import { BOUNDARY, RATIOS } from "./data";
 import { colsOf, DataTable, Drift, geoOf, Listing, listingHeight, MARK_BAD, MARK_OK, Mono, rowsAt, TableName, X0 } from "./parts";
 
-const TOP = 330;
-const LIST_X = 1170;
-const LIST_SIZE = 16;
+const TOP = 350;
+const LIST_X = 1120;
+const LIST_SIZE = 18;
 const BAD = `color-mix(in srgb, ${ACCENT_INK} 22%, transparent)`;
 
 /**
@@ -31,7 +31,8 @@ export const MistakesScene: React.FC = () => {
   const qAt = n.word("mistakes", "Question");
   const textAt = n.word("mistakes", "What mistakes do");
   const sameAt = n.word("mistakes-same", "The same ones people make");
-  const boundaryAt = n.word("mistakes-same", "the date boundary");
+  // The orders arrive as the question ends, so it never sits alone.
+  const asked = n.beat("mistakes").to;
   const betweenAt = n.word("mistakes-between", "between the first and the thirty-first");
   const midnightAt = n.word("mistakes-between", "midnight at its start");
   const goneAt = n.word("mistakes-between", "the rest of that day is gone");
@@ -89,20 +90,20 @@ export const MistakesScene: React.FC = () => {
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={60}>
           What mistakes do AI-generated queries make most often?
         </QuestionCard>
-        <Note at={sameAt - 2} x={X0} y={y(TOP) - h(62)} out={outA}>
+        <Note at={sameAt - 2} x={X0} y={y(TOP) - h(92)} out={outA}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the ones people make, said with more confidence</span>
         </Note>
 
         {/* ── The date boundary, on the page's nine orders ── */}
-        <TableName g={kg} at={boundaryAt - 4} out={outA}>
+        <TableName g={kg} at={asked - 6} out={outA}>
           orders
         </TableName>
         <DataTable
           g={kg}
           cols={colsOf(K, { assistant: { at: betweenAt, ink: BLUE_INK }, half_open: { at: halfOpenAt, ink: BLUE_INK } })}
-          at={boundaryAt - 4}
+          at={asked - 6}
           out={outA}
-          rows={K.rows.map((cells, i) => ({ cells, at: boundaryAt + i * 2, dimAt: i === cancelled ? totalAt - 4 : undefined }))}
+          rows={K.rows.map((cells, i) => ({ cells, at: asked - 2 + i * 2, dimAt: i === cancelled ? totalAt - 4 : undefined }))}
           bands={lost.map((row, k) => ({ row, at: goneAt + k * 4, color: BAD }))}
           marks={[
             ...lost.map((row, k) => ({ row, col: asst, at: goneAt + 6 + k * 4, color: MARK_BAD })),

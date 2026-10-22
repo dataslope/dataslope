@@ -120,7 +120,8 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       {box(R_X, T, askAt - 2, <>&ldquo;Which region grew fastest?&rdquo;</>, 330)}
-      <Note at={askAt + 2} x={R_X} y={T + c.h(74)}>
+      {/* The question wraps to two lines, so its label sits clear below the box. */}
+      <Note at={askAt + 2} x={R_X} y={T + c.h(108)}>
         <span style={{ ...label(18, INK_SOFT), whiteSpace: "nowrap" }}>a question in plain words (an example)</span>
       </Note>
       <ElbowArrow points={[[R_X + 336, T + c.h(32)], [layerX - 8, T + c.h(32)]]} at={askAt + 6} color={INK_SOFT} width={2.4} />

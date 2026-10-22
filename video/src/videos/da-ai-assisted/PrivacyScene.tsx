@@ -55,6 +55,9 @@ export const PrivacyScene: React.FC = () => {
   const qAt = n.word("privacy", "Question");
   const textAt = n.word("privacy", "What data should never");
   const approvedAt = n.word("privacy-never", "hasn't approved");
+  // Each question's first line arrives as the question ends, so neither sits alone.
+  const asked5 = n.beat("privacy").to;
+  const asked6 = n.beat("takehome").to;
   const never = [
     { at: n.word("privacy-never", "customer personal data"), text: "customer personal data" },
     { at: n.word("privacy-never", "credentials"), text: "credentials" },
@@ -114,7 +117,7 @@ export const PrivacyScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── Question 5: never, and instead ── */}
-        <Note at={approvedAt - 2} x={X0} y={top - h(54)} out={out5}>
+        <Note at={Math.min(approvedAt, asked5) - 6} x={X0} y={top - h(54)} out={out5}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>anything your company hasn&apos;t approved for that tool:</span>
         </Note>
         {never.map((v, i) => (
@@ -135,7 +138,7 @@ export const PrivacyScene: React.FC = () => {
         </Note>
 
         {/* ── Question 6: what for, what not, how checked ── */}
-        <Note at={ownAt - 2} x={X0} y={top - h(54)}>
+        <Note at={Math.min(ownAt, asked6) - 6} x={X0} y={top - h(54)}>
           <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>Be specific, and own the result:</span>
         </Note>
         {cols.map((c) => (

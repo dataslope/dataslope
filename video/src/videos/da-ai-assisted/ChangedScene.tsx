@@ -68,6 +68,8 @@ export const ChangedScene: React.FC = () => {
   const qAt = n.word("changed", "Question");
   const textAt = n.word("changed", "How has the data analyst");
   const coreAt = n.word("changed-core", "The live SQL screen");
+  // The center box arrives as the question ends, so it never sits alone.
+  const asked = n.beat("changed").to;
   const offAt = n.word("changed-core", "usually A I off");
   const fluencyAt = n.word("changed-core", "fluency still matters");
   const aroundAt = n.word("changed-around", "Around it");
@@ -106,7 +108,7 @@ export const ChangedScene: React.FC = () => {
           y={coreY}
           w={CORE.w}
           h={h(CORE.h)}
-          at={coreAt - 4}
+          at={Math.min(coreAt, asked) - 6}
           strong
           title="The live SQL screen"
           sub={
