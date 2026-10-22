@@ -30,6 +30,8 @@ import { DaSql } from "./videos/da-sql/Video";
 import { script as daSqlScript } from "./videos/da-sql/script";
 import { DaPandas } from "./videos/da-pandas/Video";
 import { script as daPandasScript } from "./videos/da-pandas/script";
+import { DaStatisticsCommunication } from "./videos/da-statistics-communication/Video";
+import { script as daStatisticsCommunicationScript } from "./videos/da-statistics-communication/script";
 import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
 import { ListVsSet } from "./videos/list-vs-set/Video";
@@ -532,6 +534,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(daPandasScript)}
+      />
+      <Composition
+        id="DataAnalyst-3-StatisticsCommunication"
+        component={DaStatisticsCommunication}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daStatisticsCommunicationScript)}
       />
     </Folder>
     <Folder name="Assets">

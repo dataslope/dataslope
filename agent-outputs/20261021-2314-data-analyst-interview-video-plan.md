@@ -70,7 +70,7 @@ From `index.mdx`: what the loop looks like (a live SQL screen or a take-home, a 
 
 **Draws on:** LeftJoinTrap and SqlNullTrap (below).
 
-### 2. Pandas (30 questions, ~11.5 min)
+### 2. Pandas (30 questions, ~11.5 min; built at 8:54)
 
 **Deep dives**
 1. `loc` against `iloc`, and boolean filtering (2)
@@ -85,7 +85,7 @@ From `index.mdx`: what the loop looks like (a live SQL screen or a take-home, a 
 
 **Draws on:** PandasGroupby.
 
-### 3. Statistics & communication (14 questions, ~8.5 min)
+### 3. Statistics & communication (14 questions, ~8.5 min; built at 8:02)
 
 **Deep dives**
 1. The median instead of the mean, on skewed data
@@ -98,6 +98,8 @@ From `index.mdx`: what the loop looks like (a live SQL screen or a take-home, a 
 **Rapid-fire:** variance and standard deviation; the mode; the normal distribution; population against sample.
 
 The Statistics course videos teach these ideas from scratch (Stats-2 DescribingData, Stats-8 InterpretingResults); this one stays at the length of an interview answer and may borrow their figures.
+
+As built, percentiles and quartiles come before outliers, so the IQR fences are drawn on the quartiles the viewer has just seen, and the three communication questions share one finding (the page's 12% lift, 8% to 16%) on one slide. Numbers come from `check.mjs` in Pyodide with pandas 3.0.2, NumPy and SciPy; the confounder, the survey, the metric and the rapid round's draws are the video's own seeded data, and the outlier and variance figures are the page's.
 
 ### 4. Advanced SQL (20 questions, ~8 min)
 
