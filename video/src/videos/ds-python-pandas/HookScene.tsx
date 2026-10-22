@@ -149,7 +149,7 @@ export const HookScene: React.FC = () => {
           </Strike>
         </Note>
 
-        <Spot id="ds-python-pandas-badger" at={fourteenAt + 8} left={1060} top={y(300)} width={720} height={540} />
+        <Spot id="ds-python-pandas-badger" at={fourteenAt + 8} left={1100} top={y(320)} width={640} height={500} />
       </Drift>
     </AbsoluteFill>
   );
