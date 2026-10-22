@@ -68,8 +68,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     26 billion at weight spread 1, to 2.6e-10 at 0.01, and to 0.76 under
  *     He initialization; 10,000 examples in batches of 32 are 313 iterations.
  *
- * Written for Drew's ear, as in Parts 1 to 4: initialisms spelled with
- * spaces (S G D, R M S prop, C N N), and decimals as said ("point eight").
+ * Written for Drew's ear: initialisms in plain caps (SGD, RMSProp, CNN,
+ * LSTM), which he reads as one unit where spaced letters each took a stress
+ * (the acronym rule of 2026-10-22, src/narration/acronyms.test.ts); no
+ * sentence opens on "A" before an initialism; decimals as said ("point
+ * eight").
  */
 export const script: NarrationScript = {
   id: "ds-deep-learning",
@@ -166,12 +169,12 @@ export const script: NarrationScript = {
     {
       id: "opt",
       scene: true,
-      text: "Question six. Compare S G D, momentum, R M S prop, and Adam. Stochastic gradient descent, S G D, steps against the gradient of each mini-batch. In a narrow valley like this one, plain steps zigzag across the steep walls and creep along the floor.",
+      text: "Question six. Compare SGD, momentum, RMSProp, and Adam. Stochastic gradient descent, SGD, steps against the gradient of each mini-batch. In a narrow valley like this one, plain steps zigzag across the steep walls and creep along the floor.",
       pauseAfter: 0.6,
     },
     {
       id: "opt-rest",
-      text: "Momentum keeps a running velocity, so it builds speed along the floor and damps the zigzag. R M S prop, root mean square propagation, divides each parameter's step by the recent size of its gradients, so the steep direction and the shallow one move at a similar pace. Adam, adaptive moment estimation, does both, which is why it's the usual default.",
+      text: "Momentum keeps a running velocity, so it builds speed along the floor and damps the zigzag. RMSProp, root mean square propagation, divides each parameter's step by the recent size of its gradients, so the steep direction and the shallow one move at a similar pace. Adam, adaptive moment estimation, does both, which is why it's the usual default.",
       pauseAfter: 0.6,
     },
     {
@@ -201,7 +204,7 @@ export const script: NarrationScript = {
     },
     {
       id: "decay",
-      text: "Question nine. What is weight decay, and how does it relate to L two regularization? Weight decay shrinks every weight a little toward zero on each step. For plain S G D, that's the same update as adding an L two penalty to the loss: one step of each lands on exactly the same weights.",
+      text: "Question nine. What is weight decay, and how does it relate to L two regularization? Weight decay shrinks every weight a little toward zero on each step. For plain SGD, that's the same update as adding an L two penalty to the loss: one step of each lands on exactly the same weights.",
       pauseAfter: 0.6,
     },
     {
@@ -229,12 +232,12 @@ export const script: NarrationScript = {
     {
       id: "arch",
       scene: true,
-      text: "Question eleven. When do you use a C N N, an R N N, or a transformer? A convolutional neural network slides one small filter across a grid, looking for the same pattern everywhere, so it suits images and audio.",
+      text: "Question eleven. When do you use a CNN, an RNN, or a transformer? A convolutional neural network slides one small filter across a grid, looking for the same pattern everywhere, so it suits images and audio.",
       pauseAfter: 0.5,
     },
     {
       id: "arch-rnn",
-      text: "A recurrent neural network reads a sequence one step at a time, carrying a hidden state forward. It fits ordered data, but it's slow, and it forgets over long spans. Gated versions like the L S T M, long short-term memory, forget less.",
+      text: "A recurrent neural network reads a sequence one step at a time, carrying a hidden state forward. It fits ordered data, but it's slow, and it forgets over long spans. Gated versions like the LSTM, long short-term memory, forget less.",
       pauseAfter: 0.5,
     },
     {

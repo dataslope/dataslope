@@ -44,7 +44,7 @@ export const ArchScene: React.FC = () => {
 
   const from = n.beat("arch").from;
   const qAt = n.word("arch", "Question eleven");
-  const textAt = n.word("arch", "When do you use a C N N");
+  const textAt = n.word("arch", "When do you use a CNN");
   const cnnAt = n.word("arch", "A convolutional neural network");
   const slidesAt = n.word("arch", "slides one small filter across a grid");
   const sameAt = n.word("arch", "the same pattern everywhere");
@@ -54,7 +54,7 @@ export const ArchScene: React.FC = () => {
   const hiddenAt = n.word("arch-rnn", "carrying a hidden state forward");
   const slowAt = n.word("arch-rnn", "but it's slow");
   const forgetsAt = n.word("arch-rnn", "forgets over long spans");
-  const lstmAt = n.word("arch-rnn", "Gated versions like the L S T M");
+  const lstmAt = n.word("arch-rnn", "Gated versions like the LSTM");
   const tfAt = n.word("arch-tf", "A transformer relates");
   const onceAt = n.word("arch-tf", "every position to every other at once");
   const longAt = n.word("arch-tf", "handles long-range context");

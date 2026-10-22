@@ -36,14 +36,14 @@ export const OptScene: React.FC = () => {
 
   const from = n.beat("opt").from;
   const qAt = n.word("opt", "Question six");
-  const textAt = n.word("opt", "Compare S G D");
+  const textAt = n.word("opt", "Compare SGD");
   const sgdAt = n.word("opt", "Stochastic gradient descent");
   const batchAt = n.word("opt", "the gradient of each mini-batch");
   const valleyAt = n.word("opt", "In a narrow valley");
   const zigAt = n.word("opt", "zigzag across the steep walls");
   const creepAt = n.word("opt", "creep along the floor");
   const momAt = n.word("opt-rest", "Momentum keeps a running velocity");
-  const rmsAt = n.word("opt-rest", "R M S prop, root mean square propagation");
+  const rmsAt = n.word("opt-rest", "RMSProp, root mean square propagation");
   const paceAt = n.word("opt-rest", "move at a similar pace");
   const adamAt = n.word("opt-rest", "Adam, adaptive moment estimation");
   const defaultAt = n.word("opt-rest", "the usual default");

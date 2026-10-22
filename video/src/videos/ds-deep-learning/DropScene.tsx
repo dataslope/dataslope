@@ -53,7 +53,7 @@ export const DropScene: React.FC = () => {
   const q9At = n.word("decay", "Question nine");
   const q9TextAt = n.word("decay", "What is weight decay");
   const shrinksAt = n.word("decay", "shrinks every weight a little");
-  const sgdAt = n.word("decay", "For plain S G D");
+  const sgdAt = n.word("decay", "For plain SGD");
   const penaltyAt = n.word("decay", "adding an L two penalty");
   const sameAt = n.word("decay", "lands on exactly the same weights");
   const adamAt = n.word("decay-adam", "With Adam the two differ");
