@@ -15,8 +15,8 @@ const T0 = 8 * 60 + 30;
 const T1 = 15 * 60;
 const AX_X0 = 170;
 const AX_X1 = 1760;
-const AXIS_Y = 420;
-const TABLE_TOP = 540;
+const AXIS_Y = 400;
+const TABLE_TOP = 500;
 const SQL_X = 760;
 
 const minutes = (hhmm: string) => {
@@ -64,7 +64,7 @@ export const SessionScene: React.FC = () => {
   const totalHits = SESSION.perUser.rows.reduce((a, r) => a + Number(r[2]), 0);
   const totalSessions = SESSION.perUser.rows.reduce((a, r) => a + Number(r[1]), 0);
 
-  const g = geoOf(S, X0, y(TABLE_TOP), h, { rowH: 40, headH: 42, bodySize: 22, headSize: 19 });
+  const g = geoOf(S, X0, y(TABLE_TOP), h, { rowH: 38, headH: 42, bodySize: 22, headSize: 19 });
   const axisIn = ease(frame, groupsAt, 16);
 
   return (
@@ -171,7 +171,7 @@ export const SessionScene: React.FC = () => {
           x={SQL_X}
           top={y(TABLE_TOP)}
           width={1060}
-          size={15}
+          size={14}
           at={lagAt - 4}
           marks={[
             { line: 3, at: lagAt + 6 },

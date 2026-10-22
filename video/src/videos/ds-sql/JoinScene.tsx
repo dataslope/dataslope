@@ -15,6 +15,7 @@ const FEB_X = X0 + 230;
 const SQL_X = 600;
 const SIZE = 21;
 const CHIP_X = 1380;
+const CHURN_X = 1420;
 
 /** A big percentage with its label, for the retention each join counts. */
 const Chip: React.FC<{ at: number; out?: number; x: number; y: number; value: string; color: string; children: React.ReactNode }> = ({
@@ -83,7 +84,7 @@ export const JoinScene: React.FC = () => {
   const ig = geoOf(RETAIN.inner, SQL_X, resTop, h, { rowH: 44 });
   const lg = geoOf(RETAIN.left, SQL_X, resTop, h, { rowH: 44 });
   const leftNulls = RETAIN.left.rows.flatMap((r, i) => (r[1] === "null" ? [i] : []));
-  const cg = geoOf(RETAIN.churn, CHIP_X, y(TOP) + h(40), h, { rowH: 44 });
+  const cg = geoOf(RETAIN.churn, CHURN_X, y(TOP) + h(40), h, { rowH: 44 });
   const pct = (t: { rows: string[][] }) => `${Math.round(Number(t.rows[0][0]) * 100)}%`;
 
   const lineIn = ease(frame, innerAt + 6, 16);
@@ -189,7 +190,7 @@ export const JoinScene: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            left: CHIP_X,
+            left: CHURN_X,
             top: y(TOP) - h(4),
             ...label(21, INK_SOFT),
             whiteSpace: "nowrap",
@@ -199,7 +200,7 @@ export const JoinScene: React.FC = () => {
           churned
         </div>
         <DataTable g={cg} cols={colsOf(RETAIN.churn, { user_id: { ink: BLUE_INK } })} at={usersAt - 4} rows={rowsAt(RETAIN.churn.rows, usersAt, 4)} />
-        <Note at={existsAt} x={CHIP_X} y={cg.rowTop(RETAIN.churn.rows.length) + h(22)}>
+        <Note at={existsAt} x={CHURN_X} y={cg.rowTop(RETAIN.churn.rows.length) + h(22)}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 10, ...note(24, INK), whiteSpace: "nowrap" }}>
             <QMono>NOT EXISTS</QMono>: the same three
             <Tick at={existsAt + 8} size={24} color={OK} />

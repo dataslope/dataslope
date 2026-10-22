@@ -22,14 +22,13 @@ const RES_X = 1080;
 const px = (ms: number) => AX_X0 + ((Math.log(ms) - Math.log(LO)) / (Math.log(HI) - Math.log(LO))) * (AX_X1 - AX_X0);
 
 /** A labelled marker standing on the strip. */
-const Marker: React.FC<{ at: number; out?: number; ms: number; y: number; color: string; children: React.ReactNode; above?: boolean }> = ({
+const Marker: React.FC<{ at: number; out?: number; ms: number; y: number; color: string; children: React.ReactNode }> = ({
   at,
   out,
   ms,
   y,
   color,
   children,
-  above = true,
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
@@ -43,7 +42,7 @@ const Marker: React.FC<{ at: number; out?: number; ms: number; y: number; color:
         style={{
           position: "absolute",
           left: x + 10,
-          top: above ? y - 74 : y + 30,
+          top: y - 74,
           ...note(24, color),
           fontWeight: 650,
           whiteSpace: "nowrap",
@@ -156,7 +155,7 @@ export const PctScene: React.FC = () => {
         >
           {faster.length} of {sorted.length} are faster
         </div>
-        <Marker at={medAt} ms={cont} y={sy} color={OK_INK} above={false} out={whyAt}>
+        <Marker at={medAt} ms={cont} y={sy} color={OK_INK} out={whyAt}>
           median {cont}
         </Marker>
         <Marker at={p90At + 4} ms={p90} y={sy} color={OK_INK}>
@@ -166,7 +165,7 @@ export const PctScene: React.FC = () => {
           style={{
             position: "absolute",
             left: px(p90) + 10,
-            top: sy + h(30),
+            top: sy + h(80),
             ...note(22, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, nineAt, 12),
@@ -176,12 +175,12 @@ export const PctScene: React.FC = () => {
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, tailAt, 14) }}>
           <path
-            d={`M${px(p90)},${sy - 30} L${px(p90)},${sy - 40} L${px(HI)},${sy - 40} L${px(HI)},${sy - 30}`}
+            d={`M${px(p90)},${sy - 100} L${px(p90)},${sy - 110} L${px(HI)},${sy - 110} L${px(HI)},${sy - 100}`}
             fill="none"
             stroke={ACCENT}
             strokeWidth={2.6}
           />
-          <text x={(px(p90) + px(HI)) / 2} y={sy - 52} textAnchor="middle" style={{ ...label(19, ACCENT_INK), fontWeight: 700 }}>
+          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={{ ...label(19, ACCENT_INK), fontWeight: 700 }}>
             the slow tail
           </text>
         </svg>

@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { RATE } from "./data";
 import { colsOf, DataTable, Drift, ErrorBox, geoOf, Listing, listingHeight, MARK_BAD, MARK_OK, OK_INK, rowsAt, Strike, X0 } from "./parts";
 
-const TOP = 340;
+const TOP = 330;
 const PG_SIZE = 20;
 const DUCK_X = 960;
 const DUCK_SIZE = 18;
@@ -50,7 +50,7 @@ export const RateScene: React.FC = () => {
   const sessions = S.cols.indexOf("sessions");
   const empty = S.rows.flatMap((r, i) => (Number(r[sessions]) === 0 ? [i] : []));
   const sTop = y(TOP) + h(40) + listingHeight(S.lines.length, DUCK_SIZE) + h(18);
-  const sg = geoOf(S, DUCK_X, sTop, h, { rowH: 38, headH: 40, bodySize: 22, headSize: 19 });
+  const sg = geoOf(S, DUCK_X, sTop, h, { rowH: 36, headH: 38, bodySize: 22, headSize: 19 });
 
   // ── Postgres, left: the bare division, then integer division ──
   const pgTop = y(TOP) + h(40);
@@ -95,9 +95,11 @@ export const RateScene: React.FC = () => {
             ...empty.map((row, k) => ({ row, col: rate, at: cAt + 4 + k * 4, color: MARK_OK })),
           ]}
         />
-        <Note at={duckAt} x={DUCK_X} y={sg.rowTop(S.rows.length) + h(12)} out={intAt}>
+        <Note at={duckAt} x={X0} y={pgTop + h(250)} out={intAt}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            DuckDB&rsquo;s bare <QMono>0 / 0</QMono> is already null; <QMono>NULLIF</QMono> is the habit that travels
+            DuckDB&rsquo;s bare <QMono>0 / 0</QMono> is already null:
+            <br />
+            <QMono>NULLIF</QMono> is the habit that travels
           </span>
         </Note>
 
@@ -116,7 +118,7 @@ export const RateScene: React.FC = () => {
           message={RATE.pgBare.message}
           size={22}
         />
-        <Note at={coalesceAt} x={X0} y={pgTop + h(250)} out={intAt}>
+        <Note at={coalesceAt} x={X0} y={pgTop + h(340)} out={intAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Strike at={coalesceAt + 10}>
               <QMono>COALESCE(rate, 0)</QMono>

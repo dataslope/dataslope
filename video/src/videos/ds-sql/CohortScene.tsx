@@ -12,7 +12,7 @@ import { COHORT } from "./data";
 import { colsOf, DataTable, Drift, geoOf, Listing, MARK_OK, rowsAt, TableName, X0 } from "./parts";
 
 const TOP = 350;
-const SQL_X = 560;
+const SQL_X = 640;
 const SIZE = 16;
 const GRID_X = 640;
 const GRID_TOP = 420;
@@ -103,7 +103,7 @@ export const CohortScene: React.FC = () => {
             { line: 11, at: countAt + 4, color: MARK_OK },
           ]}
         />
-        <Note at={cohortAt + 2} x={SQL_X + 920} y={y(TOP) + h(28)} out={divideAt}>
+        <Note at={cohortAt + 2} x={SQL_X + 900} y={y(TOP) + h(28)} out={divideAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             each user&rsquo;s
             <br />
