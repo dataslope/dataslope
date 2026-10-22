@@ -13,7 +13,7 @@ export const VIDEO = "ds-deep-learning";
  * Whether public/images/ds-deep-learning/ holds the watercolor from
  * illustrations.json. Every frame is laid out with room for it either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type Pair = [number, number];
 
