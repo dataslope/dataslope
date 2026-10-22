@@ -264,7 +264,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** a turtle.
 
-### 8. Product sense & metrics (14 questions, ~7 min)
+### 8. Product sense & metrics (14 questions, ~7 min; built at 7:23)
 
 **Deep dives**
 1. A north-star metric, and the guardrails beside it (2, with Experimentation's guardrail question)
