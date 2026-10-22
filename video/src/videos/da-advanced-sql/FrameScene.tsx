@@ -72,7 +72,7 @@ export const FrameScene: React.FC = () => {
   const widenAt = n.word("last", "Widen the frame");
   const realAt = n.word("last", "the real last day");
   const bridgeAt = n.beat("running-in").from;
-  const clearAt = n.word("running-in", "every analyst") + 6;
+  const clearAt = n.word("running-in", "asked to write") + 2;
   const end = n.beat("running-in").to;
 
   const P = FRAME.payments;

@@ -43,7 +43,8 @@ export const WindowScene: React.FC = () => {
   const from = n.beat("window").from;
   const qAt = n.word("window", "Question");
   const textAt = n.word("window", "What is a window function");
-  const asked = n.beat("window").to;
+  // The sales arrive on the question's second half, as the series does.
+  const asked = n.word("window", "how does the over clause work") + 4;
   const groupAt = n.word("window-group", "Group by collapses rows");
   const northAt = n.word("window-group", "North four twenty-five");
   const southAt = n.word("window-group", "South six forty");
@@ -63,7 +64,7 @@ export const WindowScene: React.FC = () => {
   const againAt = n.word("partition-rank", "starts again at one for South");
   const firstAt = n.word("partition-rank", "both come first");
   const bridgeAt = n.beat("rank-in").from;
-  const clearAt = n.word("rank-in", "to ranking") + 6;
+  const clearAt = n.word("rank-in", "and to ties") + 2;
   const end = n.beat("rank-in").to;
 
   // The six sales, banded by region.

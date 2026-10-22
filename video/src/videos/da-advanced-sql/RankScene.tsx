@@ -70,7 +70,7 @@ export const RankScene: React.FC = () => {
   const noWrapAt = n.word("qualify", "no wrapping query");
   const supportAt = n.word("qualify", "DuckDB, Snowflake and BigQuery");
   const bridgeAt = n.beat("frame-in").from;
-  const clearAt = n.word("frame-in", "most often get wrong") + 6;
+  const clearAt = n.word("frame-in", "the frame") + 2;
   const end = n.beat("frame-in").to;
 
   // ── Question 3 ──
