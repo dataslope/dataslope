@@ -144,7 +144,7 @@ As built, percentiles and quartiles come before outliers, so the IQR fences are 
 
 The longest video, and the one whose figures carry the most: every chart it argues about is drawn, good version beside bad.
 
-### 7. A/B testing & metrics (19 questions, ~9.5 min)
+### 7. A/B testing & metrics (19 questions, ~9.5 min; built at 9:05)
 
 **Deep dives**
 1. What makes a good metric: primary, guardrail and vanity metrics, and the north star (3)
