@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { DISTS, pct } from "./data";
 import { DATA, DATA_LIGHT, Drift, math, Svg, V } from "./parts";
 
-const PANEL = { x0: 120, w: 300, gap: 42, top: 400, height: 230 };
+const PANEL = { x0: 120, w: 300, gap: 42, top: 400, height: 300 };
 const panelX = (i: number) => PANEL.x0 + i * (PANEL.w + PANEL.gap);
 
 /** A probability mass function as bars, filling a panel's width. */

@@ -137,7 +137,17 @@ export const TestScene: React.FC = () => {
         </Svg>
         {edges.map(({ a, b, at: t, text, mark }, i) =>
           text ? (
-            <Note key={i} at={t + 6} x={(a.x + a.w + b.x) / 2 - 60} width={120} y={(mid(a) + mid(b)) / 2 - (a === ROOT ? 52 : 50)} from="up" style={{ textAlign: "center" }}>
+            <Note
+              key={i}
+              at={t + 6}
+              // A straight edge takes its label centred above it; the curve out
+              // of the root takes it to the left of its midpoint, clear of the line.
+              x={a === ROOT ? a.x + a.w - 42 : (a.x + a.w + b.x) / 2 - 60}
+              width={a === ROOT ? 64 : 120}
+              y={a === ROOT ? (mid(a) + mid(b)) / 2 - 30 : (mid(a) + mid(b)) / 2 - 50}
+              from="up"
+              style={{ textAlign: a === ROOT ? "right" : "center" }}
+            >
               <span style={{ ...label(24, INK), ...TABULAR }}>
                 <Mark at={mark}>{text}</Mark>
               </span>
@@ -164,7 +174,7 @@ export const TestScene: React.FC = () => {
         <Note at={sensAt + 2} x={TP.x} y={y(TP.y) - BOX_H / 2 - 40}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>sensitivity, on the sick</span>
         </Note>
-        <Note at={fpAt + 2} x={FP.x} y={y(FP.y) + BOX_H / 2 + 12}>
+        <Note at={fpAt + 2} x={WELL.x} y={y(FP.y) + BOX_H / 2 + 14}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>false-positive rate, on the healthy</span>
         </Note>
         <Note at={baseAt + 2} x={ROOT.x} y={y(ROOT.y) - BOX_H / 2 - 40}>

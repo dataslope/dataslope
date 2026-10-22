@@ -104,7 +104,7 @@ export const IndepScene: React.FC = () => {
           </span>
         </Ink>
         <Note at={claimAt} x={X0} y={y(540)} out={out4}>
-          <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>A claim to justify. It breaks with</span>
+          <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>A claim to justify. These break it:</span>
         </Note>
         <Note at={visitsAt} x={X0 + 24} y={y(600)} out={out4}>
           <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>repeat visits by the same user</span>

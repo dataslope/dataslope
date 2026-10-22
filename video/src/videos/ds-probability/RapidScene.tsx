@@ -33,8 +33,8 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
   const zeroAt = w("r-cov", "zero correlation");
   const lineAt = w("r-cov", "rules out a straight line");
 
-  const xs: Scale = { lo: 145, hi: 200, a: SCATTER.left, b: SCATTER.right };
-  const ys: Scale = { lo: 35, hi: 110, a: y(SCATTER.base), b: y(SCATTER.top) };
+  const xs: Scale = { lo: 135, hi: 200, a: SCATTER.left, b: SCATTER.right };
+  const ys: Scale = { lo: 40, hi: 100, a: y(SCATTER.base), b: y(SCATTER.top) };
   const dots = COV.points.map(([hcm, kg], i) => ({ x: at(xs, hcm), y: at(ys, kg), at: startAt + 2 + (i % 40) * 0.5 }));
   const scale = { x0: SIDE, x1: SIDE + 400, y: y(560) };
   const rX = scale.x0 + ((COV.rCm + 1) / 2) * (scale.x1 - scale.x0);
@@ -44,7 +44,7 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
 
   return (
     <>
-      <Axes x={xs} y={ys} xTicks={[150, 175, 200]} yTicks={[50, 100]} xTitle="height, cm" yTitle="weight, kg" at={startAt} size={18} />
+      <Axes x={xs} y={ys} xTicks={[140, 160, 180, 200]} yTicks={[50, 75, 100]} xTitle="height, cm" yTitle="weight, kg" at={startAt} size={18} />
       <Dots dots={dots} r={4.5} opacity={0.6} />
       <Note at={startAt + 6} x={SIDE} y={y(390)}>
         <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>covariance</span>
