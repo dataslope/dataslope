@@ -13,7 +13,7 @@ import { Drift, FormulaBar, Headline, Kicker, MARK, MARK_OK, Sheet, sheetGeometr
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
-const BAR_W = 960;
+const BAR_W = 1040;
 const TOP = 320;
 const LIST_TOP = 330;
 const ROW = 50;
@@ -34,7 +34,8 @@ const Slot: React.FC<{ c: Ctx; k: number; cell: Cell; at: number; resultAt: numb
     result={money && typeof cell.value === "number" ? cell.value.toFixed(2) : shown(cell)}
     resultAt={resultAt}
     tone="ok"
-    size={21}
+    // A long formula sets a little smaller, so it fits the bar.
+    size={(cell.formula ?? "").length > 54 ? 18 : 21}
   />
 );
 

@@ -153,9 +153,11 @@ export const RefsScene: React.FC = () => {
         {R.relative.map((c, i) => (
           <RangeBox key={c.ref} g={g} r0={i + 2} r1={i + 2} c0={2} c1={2} at={relAt(i)} out={i < 2 ? relAt(i + 1) : mixedAt} color={ds("green", 600)} />
         ))}
-        <RangeBox g={g} r0={2} r1={2} c0={5} c1={5} at={f2At} out={mixedAt} color={ACCENT} dash />
+        {/* What each pasted copy reads: F2, then F3, both empty. */}
+        <RangeBox g={g} r0={2} r1={2} c0={5} c1={5} at={relAt(1)} out={relAt(2)} color={ACCENT} dash />
+        <RangeBox g={g} r0={3} r1={3} c0={5} c1={5} at={relAt(2)} out={mixedAt} color={ACCENT} dash />
         <Note at={f2At + 4} x={g.right + 30} y={g.rowTop(2)} out={out7}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>F2 is empty: no tax</span>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>F2 and F3 are empty: no tax</span>
         </Note>
 
         {/* The cross-tab's SUMIFS, filled from G2 to I4: $F and $1 each lock one side. */}

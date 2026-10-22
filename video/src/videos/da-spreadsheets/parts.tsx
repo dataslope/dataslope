@@ -93,7 +93,8 @@ export const sheetGeometry = ({
   };
 };
 
-export type CellFill = { r: number; c: number; at: number; out?: number; color: string };
+/** A cell filled from `at` to `out`; `inserted` fills the opened column's cell instead. */
+export type CellFill = { r: number; c: number; at: number; out?: number; color: string; inserted?: boolean };
 export type CellSwap = { r: number; c: number; at: number; value: string; color?: string };
 /** A column that opens between two others, pushing the rest right. */
 export type ColumnInsert = { c: number; at: number; width: number; values: readonly string[] };
@@ -196,14 +197,15 @@ export const Sheet: React.FC<{
       {fills.map((f, i) => {
         const fp = ease(frame, f.at, 12) * (f.out === undefined ? 1 : 1 - ease(frame, f.out, 10));
         if (fp <= 0) return null;
+        const inCol = f.inserted && insert;
         return (
           <div
             key={i}
             style={{
               position: "absolute",
-              left: xOf(f.c) + 1,
+              left: (inCol ? g.xs[insert.c] : xOf(f.c)) + 1,
               top: g.rowTop(f.r) + 1,
-              width: g.widths[f.c] - 2,
+              width: (inCol ? insert.width : g.widths[f.c]) - 2,
               height: g.rowH - 2,
               background: f.color,
               opacity: fp,

@@ -109,7 +109,7 @@ export const ToolScene: React.FC = () => {
       <Sfx name="el-scratch" at={dropsAt} level={-30} />
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} out={out9}>
+        <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} out={out9} size={58}>
           When should you use a spreadsheet, and when SQL or a database?
         </QuestionCard>
         <QuestionCard n={10} at={q10At} textAt={q10TextAt - 2}>

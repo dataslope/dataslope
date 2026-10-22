@@ -12,10 +12,10 @@ import { type Cell, isError, LOOKUPS, printed, screen } from "./data";
 import { Drift, ElbowArrow, FormulaBar, MARK, MARK_BAD, MARK_OK, RangeBox, Sheet, sheetGeometry, X0 } from "./parts";
 
 const SHEET_Y = 400;
-const ROW = 46;
-const BAR_X = 640;
-const BAR_W = 1120;
-const INSERT_W = 116;
+const ROW = 56;
+const BAR_X = 730;
+const BAR_W = 1060;
+const INSERT_W = 140;
 
 /** A product's price as the sheet formats it. */
 const money = (v: unknown) => (typeof v === "number" ? v.toFixed(2) : String(v));
@@ -70,7 +70,7 @@ export const LookupScene: React.FC = () => {
 
   const L = LOOKUPS;
   const A = L.after;
-  const g = sheetGeometry({ x: X0, top: y(SHEET_Y), widths: [96, 124, 90], rows: 5, rowH: h(ROW) });
+  const g = sheetGeometry({ x: X0, top: y(SHEET_Y), widths: [116, 150, 106], rows: 5, rowH: h(ROW) });
   const products = L.products.map((r, i) => r.map((v, c) => (i > 0 && c === 2 ? money(v) : String(v))));
   const category = L.inserted.map((r) => printed(r[2]));
   const ins = { c: 2, at: insertAt, width: INSERT_W, values: category };
@@ -108,11 +108,12 @@ export const LookupScene: React.FC = () => {
           at={asked - 8}
           cellAt={(r) => asked - 6 + (r - 1) * 3}
           bold={(r) => r === 1}
+          size={25}
           insert={ins}
           fills={[
             { r: mug, c: 0, at: firstColAt, out: onlyRightAt, color: MARK },
             { r: mug, c: 2, at: nineAt - 2, out: insertAt, color: MARK_OK },
-            { r: mug, c: 2, at: kitchenAt - 2, out: q4At, color: MARK_BAD },
+            { r: mug, c: 2, at: kitchenAt - 2, out: q4At, color: MARK_BAD, inserted: true },
           ]}
         />
         <Note at={skuAt - 2} x={X0} y={g.bottom + h(18)}>
@@ -154,8 +155,8 @@ export const LookupScene: React.FC = () => {
         <RangeBox g={g} r0={2} r1={5} c0={0} c1={2} at={firstColAt + 4} out={onlyRightAt} />
         <ElbowArrow
           points={[
-            [g.colMid(0) + 30, g.rowMid(mug)],
-            [g.xs[2] + 14, g.rowMid(mug)],
+            [g.colMid(0) + 30, g.rowTop(mug) + g.rowH * 0.86],
+            [g.xs[2] + 14, g.rowTop(mug) + g.rowH * 0.86],
           ]}
           at={rightAt}
           color={ds("blue", 500)}
@@ -212,8 +213,8 @@ export const LookupScene: React.FC = () => {
         <RangeBox g={g} r0={2} r1={5} c0={0} c1={0} at={indexAt} out={rangesAt} color={ds("purple", 500)} />
         <ElbowArrow
           points={[
-            [g.xs[1] + 20, g.rowMid(mug)],
-            [g.xs[0] + 16, g.rowMid(mug)],
+            [g.xs[1] + 20, g.rowTop(mug) + g.rowH * 0.86],
+            [g.xs[0] + 16, g.rowTop(mug) + g.rowH * 0.86],
           ]}
           at={leftAt}
           color={ds("purple", 500)}
