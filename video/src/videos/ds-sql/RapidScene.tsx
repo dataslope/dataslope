@@ -260,7 +260,7 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <DataTable g={g} cols={colsOf(P, { mobile: { ink: BLUE_INK }, desktop: { ink: BLUE_INK } })} at={desktopAt + 4} rows={rowsAt(P.rows, regionAt)} />
-      <Note at={at + 10} x={g.right + 24} y={g.rowTop(0)}>
+      <Note at={desktopAt + 6} x={g.right + 24} y={g.rowTop(0)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           the video&rsquo;s own
           <br />
@@ -300,7 +300,7 @@ const Count: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={reachAt} x={R_X} y={g.rowTop(1) + c.h(16)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>volume against reach</span>
       </Note>
-      <Note at={at + 10} x={g.right + 24} y={g.rowTop(0)}>
+      <Note at={eightAt} x={g.right + 24} y={g.rowTop(0)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           the video&rsquo;s own
           <br />8 page views
