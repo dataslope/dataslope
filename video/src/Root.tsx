@@ -58,6 +58,8 @@ import { DsProductSense } from "./videos/ds-product-sense/Video";
 import { script as dsProductSenseScript } from "./videos/ds-product-sense/script";
 import { DsPythonPandas } from "./videos/ds-python-pandas/Video";
 import { script as dsPythonPandasScript } from "./videos/ds-python-pandas/script";
+import { DsSql } from "./videos/ds-sql/Video";
+import { script as dsSqlScript } from "./videos/ds-sql/script";
 import { DaAbTesting } from "./videos/da-ab-testing/Video";
 import { script as daAbTestingScript } from "./videos/da-ab-testing/script";
 import { DaVisualization } from "./videos/da-visualization/Video";
@@ -726,6 +728,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(dsPythonPandasScript)}
+      />
+      <Composition
+        id="DataScientist-10-Sql"
+        component={DsSql}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsSqlScript)}
       />
     </Folder>
     <Folder name="Assets">
