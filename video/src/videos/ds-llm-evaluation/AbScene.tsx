@@ -105,7 +105,7 @@ export const AbScene: React.FC = () => {
   const end = n.beat("prev-in").to;
 
   // Panel 3's timeline: a test from start to end, the model updated midway.
-  const TL = { x0: COL[0] + 40, x1: COL[0] + 700, y: y(ROW[1]) + 110 };
+  const TL = { x0: COL[0] + 40, x1: COL[0] + 700, y: y(ROW[1]) + 132 };
   const run = ease(frame, pinAt, 30);
   const mid = (TL.x0 + TL.x1) / 2;
   const changed = ease(frame, updateAt + 6, 12);
@@ -202,7 +202,7 @@ export const AbScene: React.FC = () => {
         <Note at={pinAt + 4} x={TL.x0} y={TL.y - 70}>
           <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>the test, start to finish, one model name</span>
         </Note>
-        <Note at={updateAt + 6} x={mid + 12} y={TL.y - 70} from="right">
+        <Note at={updateAt + 6} x={mid + 12} y={TL.y - 44} from="right">
           <span style={{ ...label(19, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>updated under the same name</span>
         </Note>
         <Note at={halfAt} x={TL.x0} y={TL.y + 50}>

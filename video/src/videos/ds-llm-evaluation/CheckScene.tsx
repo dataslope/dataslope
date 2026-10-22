@@ -135,7 +135,7 @@ export const CheckScene: React.FC = () => {
 
         {/* The checks. */}
         {items.map((it, i) => (
-          <Note key={it.text} at={it.at - 2} x={LIST_X} y={y(LIST_TOP) + i * h(LIST_ROW)}>
+          <Note key={it.text} at={it.at - 2} x={LIST_X} y={y(LIST_TOP) + i * h(LIST_ROW) + (i > 2 ? h(36) : 0)}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <Tick at={it.at + 6} size={26} />
               <span style={{ ...note(27, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{it.text}</span>
@@ -145,13 +145,14 @@ export const CheckScene: React.FC = () => {
         <Note at={skewAt} x={LIST_X + 40} y={y(LIST_TOP) + 2 * h(LIST_ROW) + h(38)}>
           <span style={{ ...label(20, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
             a t-test on skewed revenue
+            <br />
             <span style={{ opacity: ease(frame, twentyAt - 2, 10) }}>
-              ; {NOTEBOOK.segments} segments, no correction:{" "}
+              {NOTEBOOK.segments} segments, no correction:{" "}
               <b style={{ color: ACCENT_INK, opacity: ease(frame, sixtyAt - 2, 10) }}>{pct(NOTEBOOK.anyFalse)} chance of a false alarm</b>
             </span>
           </span>
         </Note>
-        <Note at={reproAt - 2} x={LIST_X} y={y(LIST_TOP) + 5 * h(LIST_ROW) + h(30)}>
+        <Note at={reproAt - 2} x={LIST_X} y={y(LIST_TOP) + 5 * h(LIST_ROW) + h(60)}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <Tick at={reproAt + 6} size={30} />
             <span style={{ ...note(30, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>

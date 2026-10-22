@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { DATA, Drift, Mark, X0 } from "./parts";
 
 const BASE_Y = 700;
-const BLOCK_W = 360;
+const BLOCK_W = 330;
 const BLOCK_GAP = 24;
 const LAYER_H = 62;
 const LAYER_GAP = 14;

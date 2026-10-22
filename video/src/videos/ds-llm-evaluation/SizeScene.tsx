@@ -11,7 +11,7 @@ import { ds } from "../../theme/brand";
 import { num, PAIR, pct, SIZE } from "./data";
 import { at, BAD, DATA, Drift, madeUp, Mark, MARK_BAD, MARK_OK, OK_INK, type Scale, Strike, X0 } from "./parts";
 
-const CHART = { x0: X0 + 70, x1: 840, top: 370, bottom: 730 };
+const CHART = { x0: X0 + 70, x1: 840, top: 430, bottom: 740 };
 /** The narration's pointer, for the two cells it points at. */
 const POINT = ds("yellow", 600);
 const TABLE = { x: 1010, top: 420, cw: 190, rh: 76, head: 150 };
@@ -55,7 +55,7 @@ export const SizeScene: React.FC = () => {
   const end = n.beat("size-strat").to;
 
   const xs: Scale = { lo: -0.5, hi: SIZE.n.length - 0.5, a: CHART.x0, b: CHART.x1 };
-  const ys: Scale = { lo: 0.6, hi: 1.0, a: y(CHART.bottom), b: y(CHART.top) };
+  const ys: Scale = { lo: 0.65, hi: 0.95, a: y(CHART.bottom), b: y(CHART.top) };
   const hundred = SIZE.n.indexOf(100);
   const three = ease(frame, threeAt + 2, 12);
 
@@ -152,15 +152,18 @@ export const SizeScene: React.FC = () => {
         <Note at={beatsAt + 2} x={CHART.x0 - 40} y={y(CHART.bottom) + h(84)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>items in the eval set · 95% interval around an 80% pass rate</span>
         </Note>
-        <Note at={rangeAt - 2} x={at(xs, hundred) + 66} y={at(ys, SIZE.at100.hi) - h(24)}>
+        <Note at={rangeAt - 2} x={CHART.x0 - 40} y={y(CHART.top) - h(110)}>
           <span style={{ ...note(28, BLUE_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+            at 100 items:{" "}
             <Mark at={rangeAt + 6} out={habitsAt}>
               {pct(SIZE.at100.lo)} to {pct(SIZE.at100.hi)}
             </Mark>
           </span>
         </Note>
-        <Note at={threeAt + 6} x={at(xs, hundred) + 66} y={at(ys, SIZE.p + 0.03) + h(4)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a 3-point change can&apos;t show</span>
+        <Note at={threeAt + 6} x={CHART.x0 - 40} y={y(CHART.top) - h(66)}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ display: "inline-block", width: 14, height: 22, background: BAD, verticalAlign: "-3px", marginRight: 10 }} />a 3-point change can&apos;t show
+          </span>
         </Note>
 
         {/* The second half: the same 500 items under both versions. */}

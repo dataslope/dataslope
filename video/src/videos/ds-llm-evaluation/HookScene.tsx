@@ -136,7 +136,7 @@ export const HookScene: React.FC = () => {
           <span style={label(22, INK_SOFT)}>you already know</span>
         </Note>
         {known.map((c, i) => (
-          <Chip key={c.text} x={X0 + i * 270} y={y(ROW_KNOW)} at={c.at - 2} size={28} ink={BLUE_INK}>
+          <Chip key={c.text} x={X0 + [0, 260, 470, 618][i]} y={y(ROW_KNOW)} at={c.at - 2} size={28} ink={BLUE_INK}>
             {c.text}
           </Chip>
         ))}
@@ -144,7 +144,7 @@ export const HookScene: React.FC = () => {
           <span style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>what&apos;s new</span>
         </Note>
         {fresh.map((c, i) => (
-          <Chip key={c.text} x={X0 + [0, 330, 790][i]} y={y(ROW_NEW)} at={c.at - 2} size={28} ink={ACCENT_INK}>
+          <Chip key={c.text} x={X0 + [0, 290, 708][i]} y={y(ROW_NEW)} at={c.at - 2} size={28} ink={ACCENT_INK}>
             {c.text}
           </Chip>
         ))}
