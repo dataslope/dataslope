@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CONDITIONS, type Cell, PIVOT, printed, REFERENCES, TEXT } from "./data";
-import { Drift, FormulaBar, Headline, Kicker, MARK, MARK_OK, Sheet, sheetGeometry, X0 } from "./parts";
+import { Drift, FormulaBar, Headline, Kicker, MARK, MARK_OK, Sheet, sheetGeometry, Spot, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -253,6 +253,7 @@ export const RapidScene: React.FC = () => {
   const from = n.beat("rapid-in").from;
   const lastAt = n.word("rapid-in", "The last eight");
   const cellAt = n.word("rapid-in", "a single cell");
+  const tableAt = n.word("next", "A good table");
   const nextAt = n.word("next", "Next");
   const end = n.beat("next").from;
 
@@ -290,9 +291,10 @@ export const RapidScene: React.FC = () => {
           at={cellAt}
           end={end}
         />
-        <Fade from={dupesAt - 6}>
+        <Fade from={dupesAt - 6} dim={tableAt}>
           <Dupes c={c} />
         </Fade>
+        <Spot id="da-spreadsheets-marmot" at={from + 6} left={1630} top={y(100)} width={150} height={150} />
 
         <NextLine at={nextAt} x={R_X} y={y(850)} width={960}>
           data visualization
@@ -302,8 +304,9 @@ export const RapidScene: React.FC = () => {
   );
 };
 
-const Fade: React.FC<{ from: number; children: React.ReactNode }> = ({ from, children }) => {
+/** Fades its children in from `from`, and sets them back from `dim`. */
+const Fade: React.FC<{ from: number; dim?: number; children: React.ReactNode }> = ({ from, dim, children }) => {
   const frame = useCurrentFrame();
-  const o = ease(frame, from, 8);
+  const o = ease(frame, from, 8) * (dim === undefined ? 1 : 1 - 0.55 * ease(frame, dim, 16));
   return o > 0 ? <AbsoluteFill style={{ opacity: o }}>{children}</AbsoluteFill> : null;
 };

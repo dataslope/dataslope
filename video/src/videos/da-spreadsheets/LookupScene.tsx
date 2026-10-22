@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { type Cell, isError, LOOKUPS, printed, screen } from "./data";
-import { Drift, ElbowArrow, FormulaBar, MARK, MARK_BAD, MARK_OK, RangeBox, Sheet, sheetGeometry, X0 } from "./parts";
+import { Drift, ElbowArrow, FormulaBar, Mark, MARK, MARK_BAD, MARK_OK, Mono, RangeBox, Sheet, sheetGeometry, X0 } from "./parts";
 
 const SHEET_Y = 400;
 const ROW = 56;
@@ -39,7 +39,6 @@ export const LookupScene: React.FC = () => {
   const from = n.beat("lookup").from;
   const qAt = n.word("lookup", "Question");
   const textAt = n.word("lookup", "What is V lookup");
-  const asked = n.beat("lookup").to;
   const vertAt = n.word("lookup-what", "short for vertical lookup");
   const firstColAt = n.word("lookup-what", "the first column of a range");
   const rightAt = n.word("lookup-what", "a column to its right");
@@ -66,6 +65,8 @@ export const LookupScene: React.FC = () => {
   const arraysAt = n.word("xlookup", "a lookup array and a return array");
   const exactAt = n.word("xlookup", "Exact match by default");
   const notFoundAt = n.word("xlookup", "says not found");
+  const forgetAt = n.word("approx-in", "the argument everyone forgets");
+  const limitsAt = n.word("lookup", "what are its limits");
   const end = n.beat("approx-in").to;
 
   const L = LOOKUPS;
@@ -105,8 +106,8 @@ export const LookupScene: React.FC = () => {
         <Sheet
           g={g}
           values={products}
-          at={asked - 8}
-          cellAt={(r) => asked - 6 + (r - 1) * 3}
+          at={limitsAt - 4}
+          cellAt={(r) => limitsAt - 2 + (r - 1) * 3}
           bold={(r) => r === 1}
           size={25}
           insert={ins}
@@ -247,6 +248,7 @@ export const LookupScene: React.FC = () => {
           result={result(A.xlookupLeft)}
           resultAt={exactAt - 4}
           tone="ok"
+          dim={forgetAt}
         />
         <FormulaBar
           x={BAR_X}
@@ -257,7 +259,16 @@ export const LookupScene: React.FC = () => {
           result={result(A.xlookupMissing)}
           resultAt={notFoundAt - 2}
           tone={isError(A.xlookupMissing.value) ? "bad" : "ok"}
+          dim={forgetAt}
         />
+        {/* The bridge: the argument question 6 is about. */}
+        <Note at={forgetAt} x={BAR_X} y={slot(3) + h(30)}>
+          <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+            the fourth argument: <Mark at={forgetAt + 10}>
+              <Mono>FALSE</Mono>
+            </Mark>
+          </span>
+        </Note>
         <Note at={notFoundAt + 6} x={BAR_X} y={slot(2) - h(6)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>no IFERROR around it</span>
         </Note>

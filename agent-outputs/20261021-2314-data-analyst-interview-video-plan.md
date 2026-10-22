@@ -115,7 +115,7 @@ As built, percentiles and quartiles come before outliers, so the IQR fences are 
 
 **Draws on:** WindowFunctions.
 
-### 5. Excel & spreadsheets (18 questions, ~7.5 min)
+### 5. Excel & spreadsheets (18 questions, ~7.5 min; built at 7:18)
 
 **Deep dives**
 1. Pivot tables, and building a revenue-by-region-and-month cross-tab (2)

@@ -33,7 +33,8 @@ export const RefsScene: React.FC = () => {
   const from = n.beat("refs").from;
   const qAt = n.word("refs", "Question");
   const textAt = n.word("refs", "Explain absolute");
-  const asked = n.beat("refs").to;
+  // The sheet arrives while the question is still being read.
+  const relativeAt = n.word("refs", "relative and mixed");
   const shiftsAt = n.word("refs-fill", "A relative reference shifts");
   const staysAt = n.word("refs-fill", "stays put");
   const fillAt = n.word("refs-fill", "Fill down");
@@ -123,8 +124,8 @@ export const RefsScene: React.FC = () => {
         <Sheet
           g={g}
           values={sheet}
-          at={asked - 8}
-          cellAt={(r, c) => (r === 1 || c === 0 || c >= 4 ? asked - 6 + r : c === 1 ? absAt(r - 2) + 6 : relAt(r - 2) + 6)}
+          at={relativeAt - 4}
+          cellAt={(r, c) => (r === 1 || c === 0 || c >= 4 ? relativeAt - 2 + r * 2 : c === 1 ? absAt(r - 2) + 6 : relAt(r - 2) + 6)}
           bold={(r) => r === 1}
           ink={(r, c) => (c === 2 && r > 2 ? ACCENT_INK : undefined)}
           fills={[
