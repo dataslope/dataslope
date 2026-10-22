@@ -41,7 +41,7 @@ export const CltScene: React.FC = () => {
   const from = n.beat("clt").from;
   const qAt = n.word("clt", "Question");
   const textAt = n.word("clt", "Why does the Central Limit Theorem");
-  const cltAt = n.word("clt", "the C L T");
+  const cltAt = n.word("clt", "the CLT");
   const saysAt = n.word("clt", "It says the mean");
   const finiteAt = n.word("clt", "as long as its variance is finite");
   const panelAt = [n.word("clt", "One draw"), n.word("clt", "Average five"), n.word("clt", "Average thirty")];
@@ -59,8 +59,8 @@ export const CltScene: React.FC = () => {
   const tenAt = n.word("lln", "five point nine");
   const hundredAt = n.word("lln", "five point three six");
   const twoKAt = n.word("lln", "five point one one");
-  const whereAt = n.word("lln", "The L L N says where");
-  const shapeAt = n.word("lln", "The C L T says what shape");
+  const whereAt = n.word("lln", "The LLN says where");
+  const shapeAt = n.word("lln", "The CLT says what shape");
   const clearAt = n.word("estimate-in", "estimating from it") + 4;
   const end = n.beat("estimate-in").to;
 

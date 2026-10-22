@@ -39,7 +39,7 @@ export const MleScene: React.FC = () => {
   const from = n.beat("mle").from;
   const qAt = n.word("mle", "Question");
   const textAt = n.word("mle", "What is maximum likelihood");
-  const mleAt = n.word("mle", "or M L E");
+  const mleAt = n.word("mle", "or MLE");
   const chooseAt = n.word("mle", "Choose the parameter");
   const clicksAt = n.word("mle", "Twelve clicks in forty views");
   const everyAt = n.word("mle", "across every possible click rate");

@@ -54,7 +54,7 @@ export const LoopScene: React.FC = () => {
 
   const from = n.beat("loop").from;
   const threeAt = n.word("loop", "three parts");
-  const sqlAt = n.word("loop", "A SQL screen");
+  const sqlAt = n.word("loop", "a SQL screen");
   const takeAt = n.word("loop", "live or as a take-home");
   const sheetAt = n.word("loop", "spreadsheets and statistics");
   const talkAt = n.word("loop", "a conversation");
@@ -71,7 +71,7 @@ export const LoopScene: React.FC = () => {
         <Kicker at={from}>Data analyst interview prep</Kicker>
         <Headline lead="The interview," turn="in three parts." at={from + 4} turnAt={threeAt - 2} size={72} />
 
-        <Card i={0} at={sqlAt} title="A SQL screen">
+        <Card i={0} at={sqlAt} title="a SQL screen">
           <div style={{ fontFamily: MONO, fontSize: 24, color: INK, lineHeight: 1.6, fontVariantLigatures: "none" }}>
             <div>
               <span style={{ color: BLUE_INK, fontWeight: 600 }}>SELECT</span> region, SUM(amount)

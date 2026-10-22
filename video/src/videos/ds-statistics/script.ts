@@ -77,8 +77,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     = 0.57, 0.08 with temperature held fixed.
  *
  * Written for Drew's ear, as the Data Analyst series is: numbers as they are
- * said, and every abbreviation expanded the first time (S E, C L T, L L N,
- * M L E, C I, C T R, ANOVA).
+ * said, and every abbreviation expanded the first time (SE, CLT, LLN,
+ * MLE, CI, CTR, ANOVA).
  */
 export const script: NarrationScript = {
   id: "ds-statistics",
@@ -109,7 +109,7 @@ export const script: NarrationScript = {
     },
     {
       id: "se",
-      text: "Question two. What is the standard error, or S E, and how does it differ from the standard deviation? The standard deviation is the spread of single values: about five here. The standard error is the spread of a statistic, like the mean, from one sample to the next. For independent draws, it's the standard deviation over the square root of n: about point seven, for samples of fifty.",
+      text: "Question two. What is the standard error, or SE, and how does it differ from the standard deviation? The standard deviation is the spread of single values: about five here. The standard error is the spread of a statistic, like the mean, from one sample to the next. For independent draws, it's the standard deviation over the square root of n: about point seven, for samples of fifty.",
       pauseAfter: 0.6,
     },
     {
@@ -127,7 +127,7 @@ export const script: NarrationScript = {
     {
       id: "clt",
       scene: true,
-      text: "Question four. Why does the Central Limit Theorem, the C L T, matter? It says the mean of many independent draws is close to normal, whatever shape the data has, as long as its variance is finite. One draw is as lopsided as the population. Average five, and the skew falls by half. Average thirty, and it halves again.",
+      text: "Question four. Why does the Central Limit Theorem, the CLT, matter? It says the mean of many independent draws is close to normal, whatever shape the data has, as long as its variance is finite. One draw is as lopsided as the population. Average five, and the skew falls by half. Average thirty, and it halves again.",
       pauseAfter: 0.6,
     },
     {
@@ -137,7 +137,7 @@ export const script: NarrationScript = {
     },
     {
       id: "lln",
-      text: "Question five. What is the Law of Large Numbers, the L L N, and how does it differ from the C L T? As a sample grows, its mean settles on the population's. One running average: five point nine after ten draws, five point three six after a hundred, five point one one after two thousand. The L L N says where the mean ends up. The C L T says what shape its uncertainty takes on the way.",
+      text: "Question five. What is the Law of Large Numbers, the LLN, and how does it differ from the CLT? As a sample grows, its mean settles on the population's. One running average: five point nine after ten draws, five point three six after a hundred, five point one one after two thousand. The LLN says where the mean ends up. The CLT says what shape its uncertainty takes on the way.",
       pauseAfter: 0.7,
     },
     { id: "estimate-in", text: "With one sample in hand, the next three are about estimating from it." },
@@ -146,12 +146,12 @@ export const script: NarrationScript = {
     {
       id: "mle",
       scene: true,
-      text: "Question six. What is maximum likelihood estimation, or M L E? Choose the parameter that makes the data you saw most probable. Twelve clicks in forty views: across every possible click rate, the likelihood peaks at point three, the share you saw. Ten times the data keeps the peak and narrows the curve. Its width is the precision.",
+      text: "Question six. What is maximum likelihood estimation, or MLE? Choose the parameter that makes the data you saw most probable. Twelve clicks in forty views: across every possible click rate, the likelihood peaks at point three, the share you saw. Ten times the data keeps the peak and narrows the curve. Its width is the precision.",
       pauseAfter: 0.6,
     },
     {
       id: "mle-more",
-      text: "For a normal mean, the M L E is just the sample mean, and logistic regression is fit the same way, by maximizing the likelihood of the labels.",
+      text: "For a normal mean, the MLE is just the sample mean, and logistic regression is fit the same way, by maximizing the likelihood of the labels.",
       pauseAfter: 0.7,
     },
     {
@@ -164,7 +164,7 @@ export const script: NarrationScript = {
     {
       id: "ci",
       scene: true,
-      text: "Question eight. What does a ninety-five percent confidence interval, or C I, actually mean? It describes the procedure, not one interval. Take a hundred samples, build an interval from each, and about ninety-five of them catch the true mean. Here, ninety-four do, and six miss.",
+      text: "Question eight. What does a ninety-five percent confidence interval, or CI, actually mean? It describes the procedure, not one interval. Take a hundred samples, build an interval from each, and about ninety-five of them catch the true mean. Here, ninety-four do, and six miss.",
       pauseAfter: 0.6,
     },
     {
@@ -183,7 +183,7 @@ export const script: NarrationScript = {
     },
     {
       id: "ctr",
-      text: "Question ten. State the null and alternative hypotheses for an A B test on click-through rate, or C T R. The null: the two rates are equal. The alternative: they differ, for a two-sided test, or the new one is higher, for a one-sided test. Pick it before you look. Two-sided is the safer default, because it catches a change in either direction.",
+      text: "Question ten. State the null and alternative hypotheses for an A B test on click-through rate, or CTR. The null: the two rates are equal. The alternative: they differ, for a two-sided test, or the new one is higher, for a one-sided test. Pick it before you look. Two-sided is the safer default, because it catches a change in either direction.",
       pauseAfter: 0.7,
     },
     {

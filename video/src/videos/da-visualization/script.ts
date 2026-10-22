@@ -26,14 +26,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * words for how the video is split and for the quick round.
  *
  * Every abbreviation is spelled out the first time it is spoken (asked for on
- * 2026-10-22): B I is business intelligence.
+ * 2026-10-22): BI is business intelligence.
  *
  * No series intro yet (decided 2026-10-21): the first scene opens at frame 0.
  *
  * Facts. Every number is the page's own chart data, computed by check.mjs into
  * results.json, which data.ts reads:
  *   - the encoding ranking: color about 3 times the error of position.
- *   - five shares, 31, 24, 22.5, 14 and 8.5 percent: S U V and truck 1.5
+ *   - five shares, 31, 24, 22.5, 14 and 8.5 percent: SUV and truck 1.5
  *     points apart.
  *   - 420 tickets: by channel, Email 149 down to Social 41; by hours to
  *     resolve, in two-hour bins.
@@ -112,7 +112,7 @@ export const script: NarrationScript = {
     },
     {
       id: "pie",
-      text: "Question three. When is a pie chart appropriate? For a few slices of one whole, two to four. Here are five shares. On the pie, S U V and truck look the same.",
+      text: "Question three. When is a pie chart appropriate? For a few slices of one whole, two to four. Here are five shares. On the pie, SUV and truck look the same.",
       pauseAfter: 0.6,
     },
     {
@@ -321,7 +321,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-tools",
-      text: "Tableau, Power BI and Looker are all B I tools, for business intelligence. Tableau is built for exploring, Power BI fits the Microsoft stack, and Looker defines metrics as code. What transfers is framing the question and checking the numbers.",
+      text: "Tableau, Power BI and Looker are all BI tools, for business intelligence. Tableau is built for exploring, Power BI fits the Microsoft stack, and Looker defines metrics as code. What transfers is framing the question and checking the numbers.",
     },
     {
       id: "r-scatter",

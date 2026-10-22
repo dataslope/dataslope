@@ -54,10 +54,10 @@ export const AiScene: React.FC = () => {
   const rows = [
     { at: n.word("ai", "You're now as likely"), text: <>Checking a query an assistant wrote, as often as writing one</> },
     { at: n.word("ai", "responsibly"), text: <>Using these tools responsibly</> },
-    { at: n.word("ai", "B I tools answer"), text: <>BI tools that answer in plain language, on top of clean metrics</> },
+    { at: n.word("ai", "BI tools answer"), text: <>BI tools that answer in plain language, on top of clean metrics</> },
     { at: n.word("ai", "the live SQL round"), text: <>The live SQL round, usually AI-off</> },
   ];
-  const offAt = n.word("ai", "A I-off");
+  const offAt = n.word("ai", "AI-off");
   const askAt = n.word("ai", "ask the recruiter");
   const end = n.beat("ai").to;
 

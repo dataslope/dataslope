@@ -70,13 +70,13 @@ export const ChangedScene: React.FC = () => {
   const coreAt = n.word("changed-core", "The live SQL screen");
   // The center box arrives as the question ends, so it never sits alone.
   const asked = n.beat("changed").to;
-  const offAt = n.word("changed-core", "usually A I off");
+  const offAt = n.word("changed-core", "usually AI off");
   const fluencyAt = n.word("changed-core", "fluency still matters");
   const aroundAt = n.word("changed-around", "Around it");
   const ring = [
     { at: n.word("changed-around", "verifying a query"), title: "Verifying a query", sub: "an assistant wrote this; is it right?" },
     { at: n.word("changed-around", "what you would and wouldn't share"), title: "Responsible use", sub: "what you'd share with a tool, and saying so" },
-    { at: n.word("changed-around", "the A I features in B I tools"), title: "AI in BI tools", sub: "Power BI, Tableau, Looker" },
+    { at: n.word("changed-around", "the AI features in BI tools"), title: "AI in BI tools", sub: "Power BI, Tableau, Looker" },
     { at: n.word("changed-around", "deeper follow-ups on take-homes"), title: "Take-home follow-ups", sub: "why this filter, why this grain" },
   ];
   const biAt = n.word("changed-around", "business intelligence tools");

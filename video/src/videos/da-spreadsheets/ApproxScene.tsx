@@ -44,7 +44,7 @@ export const ApproxScene: React.FC = () => {
   const codesAt = n.word("approx-trap", "silently wrong for codes");
   const leaveAt = n.word("approx-trap", "Leave off false");
   const notExistAt = n.word("approx-trap", "which doesn't exist");
-  const naAt = n.word("approx-trap", "Instead of N A");
+  const naAt = n.word("approx-trap", "Instead of NA");
   const lampAt = n.word("approx-trap", "the lamp's price");
   const unsortedAt = n.word("approx-trap", "On unsorted data");
   const end = n.beat("refs-in").to;

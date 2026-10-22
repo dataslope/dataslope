@@ -58,7 +58,7 @@ export const PcaScene: React.FC = () => {
 
   const from = n.beat("pca").from;
   const qAt = n.word("pca", "Question nine");
-  const textAt = n.word("pca", "What is P C A");
+  const textAt = n.word("pca", "What is PCA");
   const asked = n.word("pca", "Principal component analysis finds");
   const directionsAt = n.word("pca", "the directions");
   const mostAt = n.word("pca", "varies most");

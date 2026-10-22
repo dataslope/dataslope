@@ -29,7 +29,7 @@ export const CteScene: React.FC = () => {
 
   const from = n.beat("cte").from;
   const qAt = n.word("cte", "Question");
-  const textAt = n.word("cte", "A C T E");
+  const textAt = n.word("cte", "use a CTE");
   const namedAt = n.word("cte-what", "named step");
   const useAt = n.word("cte-what", "use it");
   const q10At = n.word("cte-correlated", "Question ten");
@@ -85,7 +85,7 @@ export const CteScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} out={q10At - 4}>
-          A <Mono>CTE</Mono> or a subquery?
+          Should you use a <Mono>CTE</Mono> or a subquery?
         </QuestionCard>
         <QuestionCard n={10} at={q10At} textAt={q10TextAt - 2}>
           What&apos;s a correlated subquery?

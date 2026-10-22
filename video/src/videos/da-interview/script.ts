@@ -18,7 +18,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * built videos answer; 110 multiple-choice questions, counted in
  * multiple-choice-questions.mdx.
  *
- * Written for Drew's ear: "A I" and "B I" are spelled out the first time.
+ * Written for Drew's ear: "AI" and "BI" are spelled out the first time.
  */
 export const script: NarrationScript = {
   id: "da-interview",
@@ -29,25 +29,25 @@ export const script: NarrationScript = {
     {
       id: "loop",
       scene: true,
-      text: "A data analyst interview usually comes in three parts. A SQL screen, live or as a take-home. A few questions on spreadsheets and statistics. And a conversation that starts with: how would you analyze this?",
+      text: "A data analyst interview usually comes in three parts. First, a SQL screen, live or as a take-home. A few questions on spreadsheets and statistics. And a conversation that starts with: how would you analyze this?",
       pauseAfter: 0.8,
     },
     {
       id: "probe",
       scene: true,
-      text: "Under all three, interviewers check four things. SQL fluency. Framing: the right grain, nulls handled, nothing counted twice after a join. Communication: your assumptions, your caveats, and what you'd check next. And tools: a spreadsheet, and a B I tool, short for business intelligence, like Tableau, Power BI or Looker.",
+      text: "Under all three, interviewers check four things. SQL fluency. Framing: the right grain, nulls handled, nothing counted twice after a join. Communication: your assumptions, your caveats, and what you'd check next. And tools: a spreadsheet, and a BI tool, short for business intelligence, like Tableau, Power BI or Looker.",
       pauseAfter: 0.8,
     },
     {
       id: "ai",
       scene: true,
-      text: "A I, artificial intelligence, has changed some of it. You're now as likely to check a query an assistant wrote as to write one. You'll be asked how you use these tools responsibly. B I tools answer questions in plain language, but only on top of clean metrics. And the live SQL round is usually A I-off, so ask the recruiter about each round.",
+      text: "AI, artificial intelligence, has changed some of it. You're now as likely to check a query an assistant wrote as to write one. You'll be asked how you use these tools responsibly. BI tools answer questions in plain language, but only on top of clean metrics. And the live SQL round is usually AI-off, so ask the recruiter about each round.",
       pauseAfter: 0.8,
     },
     {
       id: "series",
       scene: true,
-      text: "This series follows the track, one video per topic page, from SQL to A I-assisted analysis: a hundred and fifty-six questions in all. Each video works through the questions that need a figure, then takes the rest quickly.",
+      text: "This series follows the track, one video per topic page, from SQL to AI-assisted analysis: a hundred and fifty-six questions in all. Each video works through the questions that need a figure, then takes the rest quickly.",
       pauseAfter: 0.6,
     },
     {

@@ -193,17 +193,17 @@ export const script: NarrationScript = {
     {
       id: "auc",
       scene: true,
-      text: "Question nine. What is ROC-AUC, and when is PR-AUC preferred? The ROC curve, for receiver operating characteristic, plots the true positive rate against the false positive rate at every threshold. The AUC is the area under the curve: point five is chance, one is perfect. Here it's point nine four. The PR curve plots precision against recall, and its area here is only point four five.",
+      text: "Question nine. What is ar-oh-see ay-you-see, and when is pee-ar ay-you-see preferred? The ROC curve, for receiver operating characteristic, plots the true positive rate against the false positive rate at every threshold. The AUC is the area under the curve: point five is chance, one is perfect. Here it's point nine four. The PR curve plots precision against recall, and its area here is only point four five.",
       pauseAfter: 0.6,
     },
     {
       id: "auc-balance",
-      text: "Same model, same scores, but keep only as many negatives as positives. ROC-AUC barely moves. PR-AUC jumps to point nine four. The false positive rate divides by every negative, so a flood of easy ones flatters the ROC curve. When positives are rare, PR-AUC is the honest one.",
+      text: "Same model, same scores, but keep only as many negatives as positives. ar-oh-see ay-you-see barely moves. pee-ar ay-you-see jumps to point nine four. The false positive rate divides by every negative, so a flood of easy ones flatters the ROC curve. When positives are rare, pee-ar ay-you-see is the honest one.",
       pauseAfter: 0.7,
     },
     {
       id: "imbalance",
-      text: "Question ten. How do you handle class imbalance? Start by ignoring accuracy: calling every case negative is already ninety-eight percent accurate. Weight the rare class in the loss, and at a threshold of point five, recall goes from twenty-seven percent to eighty-six, while precision falls from sixty-seven to eleven. Or move the threshold, or resample, and judge the result by PR-AUC or F one.",
+      text: "Question ten. How do you handle class imbalance? Start by ignoring accuracy: calling every case negative is already ninety-eight percent accurate. Weight the rare class in the loss, and at a threshold of point five, recall goes from twenty-seven percent to eighty-six, while precision falls from sixty-seven to eleven. Or move the threshold, or resample, and judge the result by pee-ar ay-you-see or F one.",
       pauseAfter: 0.7,
     },
 
@@ -234,7 +234,7 @@ export const script: NarrationScript = {
     },
     {
       id: "gd-sgd",
-      text: "Stochastic gradient descent, S G D, steps on one example at a time. Mini-batches use a few. And Adam adapts the step for each parameter.",
+      text: "Stochastic gradient descent, SGD, steps on one example at a time. Mini-batches use a few. And Adam adapts the step for each parameter.",
       pauseAfter: 0.8,
     },
 
@@ -247,11 +247,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-metrics",
-      text: "R M S E, root mean squared error, squares each miss before averaging, so big misses dominate. M A E, mean absolute error, stays in the target's units and shrugs off outliers. R squared is the share of variance explained: one is perfect, zero is no better than the mean. On the page's five predictions, they come to point three four, point three, and point nine five.",
+      text: "RMSE, root mean squared error, squares each miss before averaging, so big misses dominate. MAE, mean absolute error, stays in the target's units and shrugs off outliers. R squared is the share of variance explained: one is perfect, zero is no better than the mean. On the page's five predictions, they come to point three four, point three, and point nine five.",
     },
     {
       id: "r-xent",
-      text: "Cross-entropy or M S E, mean squared error, for a classifier? Predict point oh one for a true positive: squared error charges point nine eight. Cross-entropy charges four point six, and keeps climbing the more confidently wrong you are.",
+      text: "Cross-entropy or MSE, mean squared error, for a classifier? Predict point oh one for a true positive: squared error charges point nine eight. Cross-entropy charges four point six, and keeps climbing the more confidently wrong you are.",
     },
     {
       id: "r-select",

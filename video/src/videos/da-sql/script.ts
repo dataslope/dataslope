@@ -216,7 +216,7 @@ export const script: NarrationScript = {
     },
     {
       id: "fanout-fix",
-      text: "The fix is the grain. Count the items per order first, in a C T E, a common table expression, then join. One row per order, and the total's back to one fifty.",
+      text: "The fix is the grain. Count the items per order first, in a CTE, a common table expression, then join. One row per order, and the total's back to one fifty.",
       pauseAfter: 0.7,
     },
 
@@ -296,12 +296,12 @@ export const script: NarrationScript = {
     {
       id: "cte",
       scene: true,
-      text: "Question nine. A C T E or a subquery?",
+      text: "Question nine. Should you use a CTE or a subquery?",
       pauseAfter: 0.6,
     },
     {
       id: "cte-what",
-      text: "A C T E is a named step, written once at the top, with WITH. Then you can use it as often as you like.",
+      text: "Think of a CTE as a named step, written once at the top, with WITH. Then you can use it as often as you like.",
       pauseAfter: 0.7,
     },
     {
@@ -321,7 +321,7 @@ export const script: NarrationScript = {
     },
     {
       id: "cte-same",
-      text: "And a C T E gets the same three by working out each average once, then joining. Easier to read, and easier to check.",
+      text: "And a CTE gets the same three by working out each average once, then joining. Easier to read, and easier to check.",
       pauseAfter: 0.7,
     },
 

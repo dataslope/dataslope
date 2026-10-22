@@ -40,13 +40,13 @@ export const MissingScene: React.FC = () => {
   const qAt = n.word("missing", "Question");
   const textAt = n.word("missing", "How do you");
   const asked = n.beat("missing").to;
-  const isnaAt = n.word("missing-find", "Is N A");
+  const isnaAt = n.word("missing-find", "Is NA");
   const oneRegionAt = n.word("missing-find", "one region");
   const equalsAt = n.word("missing-equals", "Not with equals");
   const zeroAt = n.word("missing-equals", "finds zero");
-  const dropAt = n.word("missing-choose", "Drop N A");
+  const dropAt = n.word("missing-choose", "Drop NA");
   const twoRowsAt = n.word("missing-choose", "keeps two rows");
-  const fillAt = n.word("missing-choose", "Fill N A with zero");
+  const fillAt = n.word("missing-choose", "Fill NA with zero");
   const fourAt = n.word("missing-choose", "all four");
   const meansAt = n.word("missing-choose", "really means zero");
   const q10At = n.word("fill", "Question ten");

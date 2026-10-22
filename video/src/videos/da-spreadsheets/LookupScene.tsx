@@ -46,8 +46,8 @@ export const LookupScene: React.FC = () => {
   const nineAt = n.word("lookup-what", "nine dollars");
   const onlyRightAt = n.word("lookup-limits", "It only looks right");
   const skuAt = n.word("lookup-limits", "stock-keeping unit");
-  const searchAt = n.word("lookup-limits", "searches the S K U column");
-  const naAt = n.word("lookup-limits", "comes back N A");
+  const searchAt = n.word("lookup-limits", "searches the SKU column");
+  const naAt = n.word("lookup-limits", "comes back NA");
   const typedAt = n.word("lookup-limits", "column number is typed in");
   const insertAt = n.word("lookup-limits", "Insert a category column");
   const kitchenAt = n.word("lookup-limits", "comes back as kitchen");
@@ -56,7 +56,7 @@ export const LookupScene: React.FC = () => {
   const matchAt = n.word("index", "Match finds the position");
   const indexAt = n.word("index", "Index returns what sits");
   const leftAt = n.word("index", "find mug among the names");
-  const skuBackAt = n.word("index", "return its S K U");
+  const skuBackAt = n.word("index", "return its SKU");
   const rangesAt = n.word("index", "points at ranges");
   const stillAt = n.word("index", "still costs nine");
   const q5At = n.word("xlookup", "Question five");

@@ -104,7 +104,7 @@ export const ShapScene: React.FC = () => {
   const finalAt = n.word("shap-values", "point four seven five");
   const rankAt = n.word("shap-values", "Averaged over customers");
   const firstAt = n.word("shap-values", "the plan first");
-  const lastAt = n.word("shap-values", "the I D last");
+  const lastAt = n.word("shap-values", "the ID last");
   const end = n.beat("shap-values").to;
 
   // ── The table ──

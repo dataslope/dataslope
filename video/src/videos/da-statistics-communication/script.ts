@@ -60,7 +60,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     50 averaging 52.1, 51.8 and 51.1.
  *
  * Written for Drew's ear, as in Parts 1 and 2. Numbers are written as they
- * are said; "I Q R" is spelled for the interquartile range, and "Q one" and
+ * are said; "IQR" is spelled for the interquartile range, and "Q one" and
  * "Q three" for the quartiles.
  */
 export const script: NarrationScript = {
@@ -216,7 +216,7 @@ export const script: NarrationScript = {
     },
     {
       id: "quantile-cuts",
-      text: "Here are thirteen amounts, in order. The first quartile, Q one, is ten. The median is twelve, and the third quartile, Q three, is thirteen. Between them is the interquartile range, the I Q R: three.",
+      text: "Here are thirteen amounts, in order. The first quartile, Q one, is ten. The median is twelve, and the third quartile, Q three, is thirteen. Between them is the interquartile range, the IQR: three.",
       pauseAfter: 0.7,
     },
     {
@@ -231,7 +231,7 @@ export const script: NarrationScript = {
     },
     {
       id: "outlier-iqr",
-      text: "The I Q R rule puts a fence one and a half I Q Rs past each quartile: here, at five and a half and seventeen and a half. Two hundred and one ninety are outside.",
+      text: "The IQR rule puts a fence one and a half IQRs past each quartile: here, at five and a half and seventeen and a half. Two hundred and one ninety are outside.",
       pauseAfter: 0.7,
     },
     {

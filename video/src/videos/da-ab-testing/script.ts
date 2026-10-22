@@ -65,7 +65,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     charts/retention-curve-plateau.mjs, 51.0% and 50.7% at week two, 31.0%
  *     and 1.7% at week twelve.
  *
- * Written for Drew's ear: "A B test" is spelled, as are "M D E" and "A I";
+ * Written for Drew's ear: "A B test" is spelled, as are "MDE" and "AI";
  * "Type one" and "Type two"; numbers as they are said.
  */
 export const script: NarrationScript = {
@@ -203,7 +203,7 @@ export const script: NarrationScript = {
     },
     {
       id: "power-mde",
-      text: "Bigger samples shrink the standard error, so smaller effects become detectable. The M D E, the minimum detectable effect, is the smallest lift you want to be able to catch. Pick it before launch, along with power and significance, and the sample size follows.",
+      text: "Bigger samples shrink the standard error, so smaller effects become detectable. The MDE, the minimum detectable effect, is the smallest lift you want to be able to catch. Pick it before launch, along with power and significance, and the sample size follows.",
       pauseAfter: 0.7,
     },
     {
@@ -291,7 +291,7 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "An assistant can now draft every one of these answers in seconds. Knowing which drafts to trust is the last round. Next: A I-assisted analysis.",
+      text: "An assistant can now draft every one of these answers in seconds. Knowing which drafts to trust is the last round. Next: AI-assisted analysis.",
     },
   ],
 };

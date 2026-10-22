@@ -70,7 +70,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     index=False reads back with an "Unnamed: 0" column.
  *
  * Written for Drew's ear, as in Part 1. Method names are written as they are
- * said: "lock" and "eye lock" for loc and iloc, "ag" for agg, "is N A" for
+ * said: "lock" and "eye lock" for loc and iloc, "ag" for agg, "is NA" for
  * isna, "not a number" for NaN, "D types" for dtypes.
  */
 export const script: NarrationScript = {
@@ -207,7 +207,7 @@ export const script: NarrationScript = {
     },
     {
       id: "missing-find",
-      text: "First, find it. Is N A, where N A means not available, summed, counts the gaps in each column: one region, two amounts.",
+      text: "First, find it. Is NA, where NA means not available, summed, counts the gaps in each column: one region, two amounts.",
       pauseAfter: 0.7,
     },
     {
@@ -217,7 +217,7 @@ export const script: NarrationScript = {
     },
     {
       id: "missing-choose",
-      text: "Then drop or fill, depending on why it's missing. Drop N A on amount keeps two rows. Fill N A with zero keeps all four, but only if missing really means zero.",
+      text: "Then drop or fill, depending on why it's missing. Drop NA on amount keeps two rows. Fill NA with zero keeps all four, but only if missing really means zero.",
       pauseAfter: 0.8,
     },
     {
@@ -328,7 +328,7 @@ export const script: NarrationScript = {
     { id: "r-counts", text: "Value counts counts each value. Normalize turns the counts into shares: North is half." },
     {
       id: "r-dates",
-      text: "To datetime parses the dates. Then the D T accessor, short for datetime, gives you the year, the month, or the day's name.",
+      text: "To datetime parses the dates. Then the DT accessor, short for datetime, gives you the year, the month, or the day's name.",
     },
     { id: "r-resample", text: "Resample is a groupby for time. By month end, January sums to three hundred." },
     {

@@ -75,11 +75,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     a hundred background rows; the SHAP library is not in Pyodide) rank
  *     the plan first and the ID last. The customer shown: 0.503 on average,
  *     +0.183 for the monthly plan, -0.217 for 56 months, 0.475 in all.
- *   - quick: K N N on scikit-learn's wine set scores 69.1% unscaled and
+ *   - quick: KNN on scikit-learn's wine set scores 69.1% unscaled and
  *     94.9% standardized (five-fold), a tree 88.8% both ways; the page's
  *     one-hot colors; RFE keeps five of the thirty tumor features.
  *
- * Written for Drew's ear: numbers as they are said, "K N N" spelled, and
+ * Written for Drew's ear: numbers as they are said, "KNN" spelled, and
  * every abbreviation spelled and expanded the first time.
  */
 export const script: NarrationScript = {
@@ -166,7 +166,7 @@ export const script: NarrationScript = {
     {
       id: "knn",
       scene: true,
-      text: "Question seven. How does k-nearest neighbors, or K N N, make predictions? It keeps every training point. For a new one, it finds the k closest, and takes a vote. Here, fifteen neighbors, ten against five. There's no training step, but prediction is slow on large data.",
+      text: "Question seven. How does k-nearest neighbors, or KNN, make predictions? It keeps every training point. For a new one, it finds the k closest, and takes a vote. Here, fifteen neighbors, ten against five. There's no training step, but prediction is slow on large data.",
       pauseAfter: 0.6,
     },
     {
@@ -194,12 +194,12 @@ export const script: NarrationScript = {
     {
       id: "pca",
       scene: true,
-      text: "Question nine. What is P C A? Principal component analysis finds the directions in which the data varies most, each at right angles to the last, and projects the data onto the first few. On the four iris measurements, scaled first, one component holds seventy-three percent of the variance, and two hold ninety-six. Four columns become two, and the species still separate. It needs centered data, and it only finds straight-line structure.",
+      text: "Question nine. What is PCA? Principal component analysis finds the directions in which the data varies most, each at right angles to the last, and projects the data onto the first few. On the four iris measurements, scaled first, one component holds seventy-three percent of the variance, and two hold ninety-six. Four columns become two, and the species still separate. It needs centered data, and it only finds straight-line structure.",
       pauseAfter: 0.7,
     },
     {
       id: "curse",
-      text: "Question ten. What is the curse of dimensionality? As dimensions grow, space empties out. Scatter a thousand random points. In two dimensions, a point's nearest neighbor is about sixty times closer than its farthest. In a thousand dimensions, the nearest is almost as far as the farthest. Distances stop telling points apart, and K N N and k-means suffer first. The fixes: fewer dimensions, through P C A or feature selection, and regularization.",
+      text: "Question ten. What is the curse of dimensionality? As dimensions grow, space empties out. Scatter a thousand random points. In two dimensions, a point's nearest neighbor is about sixty times closer than its farthest. In a thousand dimensions, the nearest is almost as far as the farthest. Distances stop telling points apart, and KNN and k-means suffer first. The fixes: fewer dimensions, through PCA or feature selection, and regularization.",
       pauseAfter: 0.7,
     },
     { id: "shap-in", text: "The last deep dive: which features mattered." },
@@ -213,12 +213,12 @@ export const script: NarrationScript = {
     },
     {
       id: "shap-id",
-      text: "Here's a made-up churn table, with a customer I D that means nothing at all. Impurity importance gives the I D forty percent, four times the plan, which really does drive churn.",
+      text: "Here's a made-up churn table, with a customer ID that means nothing at all. Impurity importance gives the ID forty percent, four times the plan, which really does drive churn.",
       pauseAfter: 0.7,
     },
     {
       id: "shap-values",
-      text: "SHAP splits each prediction fairly among the features, using game theory. This customer starts from the average, point five oh. The monthly plan adds point one eight, fifty-six months of tenure takes away point two two, and the other two bring it to point four seven five. Averaged over customers, SHAP ranks the plan first and the I D last.",
+      text: "SHAP splits each prediction fairly among the features, using game theory. This customer starts from the average, point five oh. The monthly plan adds point one eight, fifty-six months of tenure takes away point two two, and the other two bring it to point four seven five. Averaged over customers, SHAP ranks the plan first and the ID last.",
       pauseAfter: 0.8,
     },
 
@@ -235,7 +235,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-scale",
-      text: "Scale features for anything built on distances or gradient descent: K N N, k-means, support vector machines and linear models. On the wine data, K N N goes from sixty-nine percent to ninety-five once the features are standardized. A tree scores eighty-nine either way.",
+      text: "Scale features for anything built on distances or gradient descent: KNN, k-means, support vector machines and linear models. On the wine data, KNN goes from sixty-nine percent to ninety-five once the features are standardized. A tree scores eighty-nine either way.",
     },
     {
       id: "r-encode",

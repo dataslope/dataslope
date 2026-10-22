@@ -53,10 +53,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     are over 150; ava@example.com appears twice.
  *
  * Written for Drew's ear: function names as they are said ("V lookup",
- * "if N A", "sum ifs"), SKUs as "P one oh two", and #N/A as "N A".
+ * "if NA", "sum ifs"), SKUs as "P one oh two", and #N/A as "NA".
  *
  * Abbreviations are spelled out the first time they are said (decided
- * 2026-10-22): "stock-keeping unit, its S K U", "N A: not available", and a
+ * 2026-10-22): "stock-keeping unit, its SKU", "NA: not available", and a
  * function whose name doesn't say what it is gets a phrase ("V lookup, short
  * for vertical lookup", "the newer lookup"). The scenes gloss the same terms
  * on screen where a label uses one (sku, #N/A, #REF!).
@@ -119,12 +119,12 @@ export const script: NarrationScript = {
     },
     {
       id: "lookup-limits",
-      text: "It only looks right. Ask it for the mug's stock-keeping unit, its S K U, and it searches the S K U column for the word mug, and comes back N A: not available. And that column number is typed in. Insert a category column, and column three is now the category: the mug's price comes back as kitchen.",
+      text: "It only looks right. Ask it for the mug's stock-keeping unit, its SKU, and it searches the SKU column for the word mug, and comes back NA: not available. And that column number is typed in. Insert a category column, and column three is now the category: the mug's price comes back as kitchen.",
       pauseAfter: 0.8,
     },
     {
       id: "index",
-      text: "Question four. How does index match work, and why is it more robust? Match finds the position of a value in one range. Index returns what sits at that position in another. So it can look left: find mug among the names, and return its S K U. And it points at ranges, not a column number, so after the insert the price range moves with the data, and P one oh two still costs nine.",
+      text: "Question four. How does index match work, and why is it more robust? Match finds the position of a value in one range. Index returns what sits at that position in another. So it can look left: find mug among the names, and return its SKU. And it points at ranges, not a column number, so after the insert the price range moves with the data, and P one oh two still costs nine.",
       pauseAfter: 0.8,
     },
     {
@@ -148,7 +148,7 @@ export const script: NarrationScript = {
     },
     {
       id: "approx-trap",
-      text: "And it's silently wrong for codes like these. Leave off false, and look up P one oh five, which doesn't exist. Instead of N A, you get the lamp's price: twenty-four dollars. On unsorted data, it gets worse.",
+      text: "And it's silently wrong for codes like these. Leave off false, and look up P one oh five, which doesn't exist. Instead of NA, you get the lamp's price: twenty-four dollars. On unsorted data, it gets worse.",
       pauseAfter: 0.8,
     },
     { id: "refs-in", text: "Then, what happens when you copy a formula." },
@@ -184,7 +184,7 @@ export const script: NarrationScript = {
     },
     {
       id: "iferror-trap",
-      text: "But it hides every error the same way. A key with a stray space, and a formula that asks for a fourth column the table doesn't have, both come back unknown. Fix the cause first, and catch only what you expect. If N A catches only the not-available error: it takes the missing key, and lets the broken formula show.",
+      text: "But it hides every error the same way. A key with a stray space, and a formula that asks for a fourth column the table doesn't have, both come back unknown. Fix the cause first, and catch only what you expect. If NA catches only the not-available error: it takes the missing key, and lets the broken formula show.",
       pauseAfter: 0.8,
     },
     { id: "tool-in", text: "Two questions about when not to use a spreadsheet at all." },

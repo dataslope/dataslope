@@ -56,7 +56,7 @@ export const RefsScene: React.FC = () => {
   const fourthAt = n.word("iferror-trap", "a fourth column");
   const bothAt = n.word("iferror-trap", "both come back unknown");
   const causeAt = n.word("iferror-trap", "Fix the cause first");
-  const ifnaAt = n.word("iferror-trap", "If N A catches only");
+  const ifnaAt = n.word("iferror-trap", "If NA catches only");
   const showAt = n.word("iferror-trap", "lets the broken formula show");
   const end = n.beat("tool-in").to;
 

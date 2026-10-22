@@ -227,6 +227,30 @@ Timing comes from one of two places:
   covers is timed from it and its audio plays at that moment. Nothing in the
   scenes changes.
 
+### Writing initialisms for the voice
+
+How an initialism is written decides how the voice says it. These rules were
+measured on Drew with pitch tracking and speech-to-text, and
+`src/narration/acronyms.test.ts` enforces the first two:
+
+- **Plain caps, never letter-spaced.** Write CLT, PCA and SGD, not "C L T".
+  Letters written with spaces between them are each read as their own word,
+  and the voice stresses one of them. PCA swung 10.3 semitones written spaced
+  and 4.2 written plain, at the same speed. Speech-to-text confirms the plain
+  forms are still spelled out: ATE is not read as "eight". "A B test" and
+  "A A test" are the exception, because "A/B" is read "A slash B".
+- **No sentence opens "A SQL …".** A capital "A" in front of an initialism
+  is read as the letter "ay" (0.16 s, against 0.04 s for the same "a"
+  mid-sentence). Reword it: "First, a SQL screen", "Think of a CTE as …".
+- **Respell a compound phonetically.** ROC-AUC takes 1.8 to 2.0 s in every
+  written form, with a pitch accent on the R. Written "ar-oh-see
+  ay-you-see", it takes about 1.3 s. Captions are off in the editorial
+  videos, so the respelling never reaches the screen. The cue phrases quote
+  the respelling, and the on-screen text keeps the usual form.
+
+A single take varies by a few tenths of a second. If one beat comes out slow,
+`npm run narrate -- <video> --only <beat>` records that beat again on its own.
+
 ### Time to take a scene in
 
 A beat that a scene opens on is marked `scene: true`. The timeline then

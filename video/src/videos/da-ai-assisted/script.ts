@@ -26,7 +26,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * series ends on a closing line rather than a "Next:" bridge.
  *
  * Abbreviations are spelled out the first time they are spoken (asked for on
- * 2026-10-22): A I, B I, L L M.
+ * 2026-10-22): AI, BI, LLM.
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
@@ -47,7 +47,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - the question bank holds 110 questions (counted in
  *     multiple-choice-questions.mdx).
  *
- * Written for Drew's ear: "A I", "B I", "L L M" and "SQL" as said; money as
+ * Written for Drew's ear: "AI", "BI", "LLM" and "SQL" as said; money as
  * "four oh five fifty".
  */
 export const script: NarrationScript = {
@@ -60,7 +60,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Most analysts now draft queries with an A I assistant, artificial intelligence that writes code from a plain request. Interviewers know it, and it has changed what they test: less can you write this query, more can you tell whether it's right.",
+      text: "Most analysts now draft queries with an AI assistant, artificial intelligence that writes code from a plain request. Interviewers know it, and it has changed what they test: less can you write this query, more can you tell whether it's right.",
       pauseAfter: 0.6,
     },
     {
@@ -74,22 +74,22 @@ export const script: NarrationScript = {
     {
       id: "changed",
       scene: true,
-      text: "Question one. How has the data analyst interview changed with A I?",
+      text: "Question one. How has the data analyst interview changed with AI?",
       pauseAfter: 0.6,
     },
     {
       id: "changed-core",
-      text: "The live SQL screen is still the center of it, and it's usually A I off, so fluency still matters.",
+      text: "The live SQL screen is still the center of it, and it's usually AI off, so fluency still matters.",
       pauseAfter: 0.6,
     },
     {
       id: "changed-around",
-      text: "Around it, expect questions on verifying a query, on what you would and wouldn't share with a tool, on the A I features in B I tools, business intelligence tools like Power B I, Tableau and Looker, and deeper follow-ups on take-homes.",
+      text: "Around it, expect questions on verifying a query, on what you would and wouldn't share with a tool, on the AI features in BI tools, business intelligence tools like Power BI, Tableau and Looker, and deeper follow-ups on take-homes.",
       pauseAfter: 0.7,
     },
     {
       id: "changed-ask",
-      text: "Ask the recruiter whether A I is allowed in each round. Policies differ, and they change often.",
+      text: "Ask the recruiter whether AI is allowed in each round. Policies differ, and they change often.",
       pauseAfter: 0.7,
     },
 
@@ -120,7 +120,7 @@ export const script: NarrationScript = {
     {
       id: "mistakes",
       scene: true,
-      text: "Question three. What mistakes do A I generated queries make most often?",
+      text: "Question three. What mistakes do AI generated queries make most often?",
       pauseAfter: 0.6,
     },
     {
@@ -176,7 +176,7 @@ export const script: NarrationScript = {
     {
       id: "privacy",
       scene: true,
-      text: "Question five. What data should never go into an A I tool?",
+      text: "Question five. What data should never go into an AI tool?",
       pauseAfter: 0.6,
     },
     {
@@ -191,7 +191,7 @@ export const script: NarrationScript = {
     },
     {
       id: "takehome",
-      text: "Question six. Walk me through how you used A I on this take-home.",
+      text: "Question six. Walk me through how you used AI on this take-home.",
       pauseAfter: 0.6,
     },
     {
@@ -218,11 +218,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-bi",
-      text: "A I in B I tools lets anyone ask a question in plain words, but it only answers correctly on top of defined metrics and clean, documented tables. So the analyst's job moves to building and checking those.",
+      text: "AI in BI tools lets anyone ask a question in plain words, but it only answers correctly on top of defined metrics and clean, documented tables. So the analyst's job moves to building and checking those.",
     },
     {
       id: "r-llm",
-      text: "And to sort five thousand survey answers with an L L M, a large language model: fix the categories first, hand-label a hundred or two to measure it, keep the settings the same for every batch, and quote real answers, not its paraphrases.",
+      text: "And to sort five thousand survey answers with an LLM, a large language model: fix the categories first, hand-label a hundred or two to measure it, keep the settings the same for every batch, and quote real answers, not its paraphrases.",
       pauseAfter: 0.9,
     },
     {

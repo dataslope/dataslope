@@ -70,9 +70,9 @@ export const AucScene: React.FC = () => {
 
   const from = n.beat("auc").from;
   const qAt = n.word("auc", "Question");
-  const textAt = n.word("auc", "What is ROC-AUC");
-  const rocWordAt = n.word("auc", "is ROC-AUC");
-  const prWordAt = n.word("auc", "is PR-AUC preferred");
+  const textAt = n.word("auc", "What is ar-oh-see ay-you-see");
+  const rocWordAt = n.word("auc", "is ar-oh-see ay-you-see");
+  const prWordAt = n.word("auc", "is pee-ar ay-you-see preferred");
   const asked = n.word("auc", "The ROC curve");
   const rateAt = n.word("auc", "plots the true positive rate");
   const areaAt = n.word("auc", "The AUC is the area");
@@ -82,7 +82,7 @@ export const AucScene: React.FC = () => {
   const onlyAt = n.word("auc", "only point four five");
   const sameAt = n.word("auc-balance", "Same model, same scores");
   const movesAt = n.word("auc-balance", "barely moves");
-  const jumpsAt = n.word("auc-balance", "PR-AUC jumps");
+  const jumpsAt = n.word("auc-balance", "pee-ar ay-you-see jumps");
   const floodAt = n.word("auc-balance", "The false positive rate divides");
   const honestAt = n.word("auc-balance", "the honest one");
   const q10At = n.word("imbalance", "Question ten");
