@@ -44,6 +44,18 @@ const PathFrame: React.FC<{ b: Box; at: number }> = ({ b, at: from }) => {
   );
 };
 
+/** A hairline crossing a path panel left to right: the penalty being raised. */
+const Sweep: React.FC<{ b: Box; p: number; o: number }> = ({ b, p, o }) => {
+  const { y } = useLayout();
+  if (p <= 0 || o <= 0) return null;
+  const x = b.left + (b.right - b.left) * p;
+  return (
+    <Svg opacity={o}>
+      <line x1={x} x2={x} y1={y(b.top) - 6} y2={y(b.bottom)} stroke={INK} strokeWidth={2} strokeDasharray="2 5" />
+    </Svg>
+  );
+};
+
 /**
  * Questions 3 and 4 on scikit-learn's diabetes set, ten measurements
  * standardized: the same ten coefficients along a rising penalty, under ridge
@@ -65,8 +77,6 @@ export const RegScene: React.FC = () => {
   const lassoNameAt = n.word("reg", "L one, called lasso");
   const tenAt = n.word("reg-paths", "ten measurements");
   const raiseAt = n.word("reg-paths", "Raise the penalty");
-  const ridgeAt = n.word("reg-paths", "ridge shrinks all ten together");
-  const lassoAt = n.word("reg-paths", "Lasso drives them to exactly zero");
   const oneTimeAt = n.word("reg-paths", "one at a time");
   const strengthAt = n.word("reg-paths", "At this strength");
   const sevenAt = n.word("reg-paths", "it keeps seven");
@@ -87,9 +97,11 @@ export const RegScene: React.FC = () => {
   const clipOf = (b: Box): Box => ({ left: b.left - 6, right: b.right + 6, top: y(b.top) - 6, bottom: y(b.bottom) + 6 });
   const path = (rows: number[][], j: number) => REG.logAlpha.map((a, i) => [a, rows[i][j]] as const);
   const pickX = (b: Box) => at(xs(b), REG.pickLog);
-  const lassoDur = 46;
-  const span = REG.logAlpha[REG.logAlpha.length - 1] - REG.logAlpha[0];
-  const passAt = (i: number) => lassoAt + 2 + (lassoDur * (REG.logAlpha[i] - REG.logAlpha[0])) / span;
+  // The zeros are ringed one at a time, left to right, as the narration says so.
+  const order = DEATHS.map((d, j) => ({ d, j })).filter((o) => o.d < REG.lasso.length).sort((a, b) => a.d - b.d);
+  const ringAt = (j: number) => oneTimeAt - 8 + order.findIndex((o) => o.j === j) * 4;
+  const sweep = ease(frame, raiseAt, 44);
+  const sweepO = sweep > 0 && sweep < 1 ? 1 : 1 - ease(frame, raiseAt + 44, 10);
   const pickP = ease(frame, strengthAt, 14);
   const pick = (j: number) => {
     const i = REG.logAlpha.findIndex((a) => a >= REG.pickLog);
@@ -99,9 +111,12 @@ export const RegScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-pencil" at={ridgeAt + 2} level={-34} />
-      <Sfx name="el-pencil" at={lassoAt + 2} level={-34} />
-      {DEATHS.map((d, j) => (d < REG.lasso.length ? <Sfx key={j} name="el-tap" at={passAt(d)} level={-40} /> : null))}
+      <Sfx name="el-pencil" at={ridgeNameAt + 2} level={-34} />
+      <Sfx name="el-pencil" at={lassoNameAt + 2} level={-34} />
+      <Sfx name="el-whoosh" at={raiseAt} level={-38} />
+      {order.map((o) => (
+        <Sfx key={o.j} name="el-tap" at={ringAt(o.j)} level={-40} />
+      ))}
       <Sfx name="el-pop" at={sevenAt} level={-32} />
       <Sfx name="el-scratch" at={keepsOneAt + 4} level={-34} />
       <Sfx name="el-pop" at={enetAt + 4} level={-32} />
@@ -127,14 +142,15 @@ export const RegScene: React.FC = () => {
         </Note>
 
         {/* ── Ridge: everything shrinks, nothing leaves ── */}
-        <Fade from={ridgeNameAt - 6} out={keepsOneAt}>
+        <Fade from={bothAt - 6} out={keepsOneAt}>
           <PanelTitle x={RIDGE.left} y={y(RIDGE.top) - h(48)} at={ridgeNameAt - 2} color={INK}>
             L2, ridge: penalizes the squares
           </PanelTitle>
-          <PathFrame b={RIDGE} at={raiseAt - 4} />
+          <PathFrame b={RIDGE} at={bothAt} />
           {REG.features.map((f, j) => (
-            <Curve key={f} points={path(REG.ridge, j)} x={xs(RIDGE)} y={ys(RIDGE)} at={ridgeAt + j * 0.6} dur={40} color={BAR} width={2.6} clip={clipOf(RIDGE)} />
+            <Curve key={f} points={path(REG.ridge, j)} x={xs(RIDGE)} y={ys(RIDGE)} at={ridgeNameAt + j * 0.6} dur={40} color={BAR} width={2.6} clip={clipOf(RIDGE)} />
           ))}
+          <Sweep b={RIDGE} p={sweep} o={sweepO} />
           <Svg opacity={pickP}>
             <line x1={pickX(RIDGE)} x2={pickX(RIDGE)} y1={y(RIDGE.top)} y2={y(RIDGE.bottom)} stroke={HIGHLIGHT} strokeWidth={10} />
           </Svg>
@@ -147,8 +163,9 @@ export const RegScene: React.FC = () => {
         <PanelTitle x={LASSO.left} y={y(LASSO.top) - h(48)} at={lassoNameAt - 2} color={INK} out={end - 8}>
           L1, lasso: penalizes the absolute values
         </PanelTitle>
-        <Fade from={raiseAt - 6} out={end - 8}>
-          <PathFrame b={LASSO} at={raiseAt - 2} />
+        <Fade from={bothAt - 6} out={end - 8}>
+          <PathFrame b={LASSO} at={bothAt + 4} />
+          <Sweep b={LASSO} p={sweep} o={sweepO} />
           <Svg opacity={pickP}>
             <line x1={pickX(LASSO)} x2={pickX(LASSO)} y1={y(LASSO.top)} y2={y(LASSO.bottom)} stroke={HIGHLIGHT} strokeWidth={10} />
           </Svg>
@@ -156,7 +173,7 @@ export const RegScene: React.FC = () => {
             const lit = j === S1 || j === S2;
             return (
               <React.Fragment key={f}>
-                <Curve points={path(REG.lasso, j)} x={xs(LASSO)} y={ys(LASSO)} at={lassoAt + 2} dur={lassoDur} color={BAR} width={2.6} clip={clipOf(LASSO)} dim={lit ? undefined : cholAt} />
+                <Curve points={path(REG.lasso, j)} x={xs(LASSO)} y={ys(LASSO)} at={lassoNameAt + 2} dur={40} color={BAR} width={2.6} clip={clipOf(LASSO)} dim={lit ? undefined : cholAt} />
                 {lit ? (
                   <Curve points={path(REG.lasso, j)} x={xs(LASSO)} y={ys(LASSO)} at={cholAt + (j === S2 ? 6 : 0)} dur={22} color={WARM} width={4} clip={clipOf(LASSO)} />
                 ) : null}
@@ -167,7 +184,7 @@ export const RegScene: React.FC = () => {
           <Svg>
             {DEATHS.map((d, j) => {
               if (d >= REG.lasso.length) return null;
-              const p = ease(frame, passAt(d), 8);
+              const p = ease(frame, ringAt(j), 8);
               const lit = j === S1 || j === S2;
               const fade = lit ? 1 : 1 - ease(frame, cholAt, 14) * 0.7;
               return (
@@ -175,7 +192,7 @@ export const RegScene: React.FC = () => {
                   key={j}
                   cx={at(xs(LASSO), REG.logAlpha[d])}
                   cy={at(ys(LASSO), 0)}
-                  r={7 * p * (1 + 0.5 * pulse(frame, oneTimeAt + j * 2, 14))}
+                  r={7 * p * (1 + 0.6 * pulse(frame, ringAt(j), 14))}
                   fill="none"
                   stroke={lit && frame >= cholAt ? WARM : ACCENT}
                   strokeWidth={2.6}

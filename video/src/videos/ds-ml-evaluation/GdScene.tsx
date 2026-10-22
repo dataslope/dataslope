@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GD } from "./data";
-import { Drift, OK, OK_INK, PanelTitle } from "./parts";
+import { Drift, Mark, OK, OK_INK, PanelTitle } from "./parts";
 
 const W = 470;
 const LEFTS = [150, 725, 1300];
@@ -78,12 +78,11 @@ const Bowl: React.FC<{ run: Run; drawAt: number; startAt: number; out: number }>
 /**
  * Question 12, on the page's own chart (charts/gradient-descent-lr): x² from
  * 8 at three learning rates, drawn as a ball stepping in a bowl. 0.25 halves
- * the distance every step; 0.004 is still at 6.55 after 25 steps; 1.05
+ * the distance every step; 0.004 is still at 6.54 after 25 steps; 1.05
  * overshoots further every step and leaves the bowl. Then SGD, mini-batches
  * and Adam in one line each.
  */
 export const GdScene: React.FC = () => {
-  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
@@ -145,7 +144,7 @@ export const GdScene: React.FC = () => {
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             each step:{" "}
             <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600 }}>
-              x ← x − <span style={{ opacity: ease(frame, sizeAt - 4, 10), color: OK_INK }}>rate</span> × gradient
+              x ← x − <Mark at={sizeAt - 2}>rate</Mark> × gradient
             </span>
           </span>
         </Note>

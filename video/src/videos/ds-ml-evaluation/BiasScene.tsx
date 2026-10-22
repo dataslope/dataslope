@@ -64,7 +64,6 @@ export const BiasScene: React.FC = () => {
   const fy: Scale = { lo: -2, hi: 2, a: y(FIT.bottom), b: y(FIT.top) };
   const fitBox: Box = { left: FIT.left - 10, right: FIT.right + 10, top: y(FIT.top) - 10, bottom: y(FIT.bottom) + 10 };
   const curve = (d: "1" | "3" | "9") => BIAS.grid.map((g, i) => [g, BIAS.curves[d][i]] as const);
-  const end1 = BIAS.curves["1"][BIAS.curves["1"].length - 1];
   const dots = BIAS.points.map(([px, py], i) => ({ x: at(fx, px), y: at(fy, py), at: pointsAt + i * 1.2 }));
 
   // ── The errors ──
@@ -111,13 +110,13 @@ export const BiasScene: React.FC = () => {
           <Curve points={curve("1")} x={fx} y={fy} at={lineAt + 2} dur={18} color={ACCENT} width={3} dash="10 8" clip={fitBox} dim={nineAt} />
           <Curve points={curve("9")} x={fx} y={fy} at={nineAt + 2} dur={34} color={ACCENT} width={3} clip={fitBox} dim={threeAt} />
           <Curve points={curve("3")} x={fx} y={fy} at={threeAt} dur={24} color={OK} width={4} clip={fitBox} />
-          <Note at={biasAt - 2} x={FIT.right - 10} y={at(fy, end1) - h(56)} align="right" dim={nineAt}>
+          <Note at={biasAt - 2} x={FIT.left} y={y(FIT.bottom) + h(14)} dim={nineAt}>
             <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>degree 1: bias</span>
           </Note>
-          <Note at={varianceAt - 2} x={FIT.left} y={y(FIT.bottom) + h(14)} dim={threeAt}>
+          <Note at={varianceAt - 2} x={FIT.left + 210} y={y(FIT.bottom) + h(14)} dim={threeAt}>
             <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>degree 9: variance</span>
           </Note>
-          <Note at={threeAt + 2} x={FIT.left + 300} y={y(FIT.bottom) + h(14)}>
+          <Note at={threeAt + 2} x={FIT.left + 470} y={y(FIT.bottom) + h(14)}>
             <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>degree 3: between them</span>
           </Note>
         </Fade>
@@ -137,7 +136,7 @@ export const BiasScene: React.FC = () => {
         />
         <Curve points={trainPts} x={ex} y={ey} at={trainAt} dur={26} color={BAR} width={3.4} clip={errBox} dots={6} />
         <Curve points={valPts} x={ex} y={ey} at={valAt} dur={climbAt + 10 - valAt} color={INK} width={3.4} clip={errBox} dots={6} />
-        <Note at={trainAt + 16} x={at(ex, 3.6)} y={at(ey, BIAS.train[3]) + h(8)}>
+        <Note at={trainAt + 16} x={at(ex, 5.6)} y={at(ey, BIAS.train[5]) - h(40)}>
           <span style={{ ...note(23, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>training error</span>
         </Note>
         <Note at={climbAt} x={at(ex, 6.6) - 20} y={at(ey, BIAS.val[6]) - h(16)} align="right">
@@ -146,7 +145,7 @@ export const BiasScene: React.FC = () => {
         <Svg opacity={bestP}>
           <circle cx={bestX} cy={bestY} r={(13 + 6 * swell) * bestP} fill="none" stroke={OK} strokeWidth={3.4} />
         </Svg>
-        <Note at={bestAt - 2} x={bestX - 40} y={bestY + h(24)}>
+        <Note at={bestAt - 2} x={bestX - 24} y={bestY + h(30)} align="right">
           <span style={{ ...note(25, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>lowest: degree 3</span>
         </Note>
 

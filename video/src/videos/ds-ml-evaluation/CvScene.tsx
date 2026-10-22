@@ -281,7 +281,7 @@ export const CvScene: React.FC = () => {
           />
           <Note at={peekAt + 8} x={valSeg.left + 40} y={barTop - h(130)}>
             <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>
-              <Strike at={flatterAt - 4} color={ACCENT}>
+              <Strike at={flatterAt - 4} color={ACCENT} top="0.78em">
                 choosing by the test score
               </Strike>
             </span>

@@ -195,7 +195,7 @@ export const AucScene: React.FC = () => {
         <Fade from={q10At + 6} out={end - 8}>
           <Note at={ignoreAt - 2} x={ROC.left} y={y(300)}>
             <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
-              <Strike at={ignoreAt + 6} color={ACCENT}>
+              <Strike at={ignoreAt + 6} color={ACCENT} top="0.78em">
                 accuracy
               </Strike>
               <span style={{ opacity: ease(frame, negAt - 2, 10) }}>

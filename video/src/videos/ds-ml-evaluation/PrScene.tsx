@@ -100,14 +100,14 @@ export const PrScene: React.FC = () => {
           xFormat={(v) => v.toFixed(1)}
           yFormat={(v) => `${v * 100}%`}
           xTitle="threshold"
-          at={casesAt}
+          at={precAt - 6}
         />
-        <Curve points={precision} x={xs} y={ys} at={casesAt + 6} dur={24} color={BAR} width={3.6} clip={clip} />
-        <Curve points={recall} x={xs} y={ys} at={casesAt + 10} dur={24} color={WARM} width={3.6} clip={clip} />
-        <Note at={casesAt + 24} x={at(xs, 0.5) + 30} y={at(ys, rates(0.5).precision) - h(44)}>
+        <Curve points={precision} x={xs} y={ys} at={precAt + 2} dur={24} color={BAR} width={3.6} clip={clip} />
+        <Curve points={recall} x={xs} y={ys} at={recAt + 2} dur={24} color={WARM} width={3.6} clip={clip} />
+        <Note at={precAt + 20} x={PLOT.right + 14} y={at(ys, precision[precision.length - 1][1]) - h(14)}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 650 }}>precision</span>
         </Note>
-        <Note at={casesAt + 28} x={at(xs, 0.5) + 30} y={at(ys, rates(0.5).recall) + h(10)}>
+        <Note at={recAt + 20} x={PLOT.right + 14} y={at(ys, recall[recall.length - 1][1]) - h(16)}>
           <span style={{ ...label(21, WARM_INK), fontWeight: 650 }}>recall</span>
         </Note>
         <Svg opacity={mP}>

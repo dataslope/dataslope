@@ -113,12 +113,6 @@ export const CalScene: React.FC = () => {
           <circle cx={wx} cy={wy} r={16 * ringP} fill="none" stroke={ACCENT} strokeWidth={3} />
           <line x1={wx} x2={wx} y1={wy - 18} y2={at(ys, w.pred[k]) + 4} stroke={ACCENT} strokeWidth={1.6} strokeDasharray="3 5" />
         </Svg>
-        <Note at={nineAt} x={wx + 24} y={wy - h(62)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
-            scored {fmt(w.pred[k])}: {fmt(w.obs[k] * 100, 1)}% positive
-          </span>
-        </Note>
-
         {/* ── The key, in the order the narration names them ── */}
         <Note at={plainAt} x={NOTE_X} y={y(400)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
@@ -130,7 +124,12 @@ export const CalScene: React.FC = () => {
             <b style={{ color: ACCENT_INK }}>class-weighted</b>: far below it
           </span>
         </Note>
-        <Note at={boughtAt - 2} x={NOTE_X} y={y(560)}>
+        <Note at={nineAt} x={NOTE_X} y={y(512)}>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
+            scored {fmt(w.pred[k])}: {fmt(w.obs[k] * 100, 1)}% positive
+          </span>
+        </Note>
+        <Note at={boughtAt - 2} x={NOTE_X} y={y(586)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             The weights bought recall
             <span style={{ opacity: ease(frame, brokeAt - 2, 10) }}>
@@ -139,14 +138,14 @@ export const CalScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={fitAt - 2} x={NOTE_X} y={y(660)}>
+        <Note at={fitAt - 2} x={NOTE_X} y={y(676)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>recalibrated</b> on held-out data
           </span>
           <br />
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, plattAt - 2, 10) }}>Platt scaling or isotonic regression</span>
         </Note>
-        <Note at={lineAt - 2} x={NOTE_X} y={y(780)}>
+        <Note at={lineAt - 2} x={NOTE_X} y={y(792)}>
           <span style={{ ...note(30, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={lineAt + 4}>back on the line</Mark>
           </span>

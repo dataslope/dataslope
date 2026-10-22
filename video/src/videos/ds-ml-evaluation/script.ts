@@ -66,7 +66,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the plain model's 0.85 bin is 80% positive; the weighted model's is
  *     8.5% positive; recalibrated with Platt scaling, 81%.
  *   - "gd", the page's own chart: x² from 8. At 0.25 the distance halves each
- *     step; at 0.004 it is still 6.55 after 25 steps; at 1.05 each step
+ *     step; at 0.004 it is still 6.54 after 25 steps; at 1.05 each step
  *     multiplies it by 1.1 and flips its sign.
  *   - quick: the page's five predictions give RMSE 0.344, MAE 0.300 and
  *     R-squared 0.954; a prediction of 0.01 for a true positive costs 0.98 in

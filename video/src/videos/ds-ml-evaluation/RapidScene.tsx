@@ -131,13 +131,16 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
         <circle cx={at(xs, LOSS.at)} cy={at(ys, LOSS.sqAt)} r={8 * ease(frame, sqAt, 10)} fill={BAR} />
         <circle cx={at(xs, LOSS.at)} cy={at(ys, LOSS.xentAt)} r={8 * ease(frame, xentAt, 10)} fill={ACCENT} />
       </Svg>
-      <Note at={sqAt + 2} x={at(xs, LOSS.at) + 20} y={at(ys, LOSS.sqAt) - c.h(36)}>
-        <span style={{ ...note(25, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>squared error {fmt(LOSS.sqAt)}</span>
+      <Note at={predictAt} x={box.right + 30} y={c.y(box.top) + c.h(10)}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>predict {LOSS.at} for a true positive:</span>
       </Note>
-      <Note at={xentAt + 2} x={at(xs, LOSS.at) + 20} y={at(ys, LOSS.xentAt) - c.h(16)}>
-        <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>cross-entropy {fmt(LOSS.xentAt)}</span>
+      <Note at={sqAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(56)}>
+        <span style={{ ...note(26, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>squared error {fmt(LOSS.sqAt)}</span>
       </Note>
-      <Note at={climbAt} x={box.right + 30} y={c.y(box.top) + c.h(40)}>
+      <Note at={xentAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(100)}>
+        <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>cross-entropy {fmt(LOSS.xentAt)}</span>
+      </Note>
+      <Note at={climbAt} x={box.right + 30} y={c.y(box.top) + c.h(170)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>more confidently wrong:</span>
         <br />
         <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>it keeps climbing</span>
