@@ -62,7 +62,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     80,000 (2.4 each): saves down 4%, users down a fifth.
  *   - competing metrics: the page's own +5% sessions and +2% unsubscribes.
  *
- * Written for Drew's ear: "D A U", "A B".
+ * Written for Drew's ear: initialisms in plain caps ("DAU"), "A B" as the one exception, and no sentence opening on "A" before an initialism.
  */
 export const script: NarrationScript = {
   id: "ds-product-sense",
@@ -145,7 +145,7 @@ export const script: NarrationScript = {
     {
       id: "drop",
       scene: true,
-      text: "Question six. Walk me through diagnosing a sudden eight percent drop in daily active users, D A U. First: is it real? A logging change, a broken pipeline, or a holiday can make that shape on its own.",
+      text: "Question six. Walk me through diagnosing a sudden eight percent drop in daily active users, DAU. First: is it real? A logging change, a broken pipeline, or a holiday can make that shape on its own.",
       pauseAfter: 0.6,
     },
     {

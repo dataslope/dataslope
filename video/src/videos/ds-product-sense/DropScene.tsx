@@ -30,7 +30,7 @@ export const DropScene: React.FC = () => {
   const from = n.beat("drop").from;
   const qAt = n.word("drop", "Question");
   const textAt = n.word("drop", "Walk me through diagnosing");
-  const dauAt = n.word("drop", "D A U");
+  const dauAt = n.word("drop", "DAU");
   const realAt = n.word("drop", "is it real?");
   const fakes = [
     { text: "a logging change", at: n.word("drop", "A logging change") },
