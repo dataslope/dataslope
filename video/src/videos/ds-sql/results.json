@@ -1,0 +1,1834 @@
+{
+  "figures": {
+    "retain": {
+      "setup": "CREATE TABLE active_jan AS SELECT * FROM (VALUES (1), (2), (3), (4), (5), (6)) AS t(user_id);\nCREATE TABLE active_feb AS SELECT * FROM (VALUES (2), (3), (5), (7)) AS t(user_id);",
+      "steps": {
+        "jan": {
+          "sql": "SELECT user_id FROM active_jan ORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ],
+            [
+              6
+            ]
+          ]
+        },
+        "feb": {
+          "sql": "SELECT user_id FROM active_feb ORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id"
+          ],
+          "rows": [
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              5
+            ],
+            [
+              7
+            ]
+          ]
+        },
+        "inner": {
+          "sql": "SELECT a.user_id, b.user_id AS feb\nFROM active_jan a\nJOIN active_feb b ON b.user_id = a.user_id\nORDER BY a.user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "feb"
+          ],
+          "rows": [
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              5,
+              5
+            ]
+          ]
+        },
+        "left": {
+          "sql": "SELECT a.user_id, b.user_id AS feb\nFROM active_jan a\nLEFT JOIN active_feb b ON b.user_id = a.user_id\nORDER BY a.user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "feb"
+          ],
+          "rows": [
+            [
+              1,
+              null
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              null
+            ],
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              null
+            ]
+          ]
+        },
+        "innerRate": {
+          "sql": "SELECT COUNT(b.user_id) * 1.0 / COUNT(*) AS retention\nFROM active_jan a\nJOIN active_feb b ON b.user_id = a.user_id;",
+          "ok": true,
+          "columns": [
+            "retention"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "leftRate": {
+          "sql": "SELECT COUNT(b.user_id) * 1.0 / COUNT(*) AS retention\nFROM active_jan a\nLEFT JOIN active_feb b ON b.user_id = a.user_id;",
+          "ok": true,
+          "columns": [
+            "retention"
+          ],
+          "rows": [
+            [
+              0.5
+            ]
+          ]
+        },
+        "churn": {
+          "sql": "SELECT a.user_id\nFROM active_jan a\nLEFT JOIN active_feb b ON b.user_id = a.user_id\nWHERE b.user_id IS NULL;   -- active in Jan, gone in Feb",
+          "ok": true,
+          "columns": [
+            "user_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              4
+            ],
+            [
+              6
+            ]
+          ]
+        },
+        "notExists": {
+          "sql": "SELECT a.user_id\nFROM active_jan a\nWHERE NOT EXISTS (\n  SELECT 1 FROM active_feb b WHERE b.user_id = a.user_id\n)\nORDER BY a.user_id;",
+          "ok": true,
+          "columns": [
+            "user_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              4
+            ],
+            [
+              6
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "rate": {
+      "setup": "CREATE TABLE funnel AS SELECT * FROM (VALUES\n  ('A', 1000, 120), ('B', 800, 96), ('C', 0, 0),\n  ('D', 1240, 173), ('E', 640, 51), ('F', 0, 0),\n  ('G', 2100, 315), ('H', 480, 24), ('I', 1560, 218),\n  ('J', 920, 110), ('K', 0, 0), ('L', 1380, 152),\n  ('M', 760, 68), ('N', 1900, 247), ('O', 540, 43),\n  ('P', 1120, 179), ('Q', 860, 60), ('R', 1440, 216),\n  ('S', 700, 35), ('T', 1680, 269), ('U', 0, 0),\n  ('V', 980, 127), ('W', 1260, 88), ('X', 820, 106)\n) AS t(variant, sessions, conversions);",
+      "steps": {
+        "page": {
+          "sql": "SELECT\n  variant,\n  sessions,\n  conversions,\n  ROUND(conversions * 1.0 / NULLIF(sessions, 0), 4) AS conversion_rate\nFROM funnel\nORDER BY variant;",
+          "ok": true,
+          "columns": [
+            "variant",
+            "sessions",
+            "conversions",
+            "conversion_rate"
+          ],
+          "rows": [
+            [
+              "A",
+              1000,
+              120,
+              0.12
+            ],
+            [
+              "B",
+              800,
+              96,
+              0.12
+            ],
+            [
+              "C",
+              0,
+              0,
+              null
+            ],
+            [
+              "D",
+              1240,
+              173,
+              0.1395
+            ],
+            [
+              "E",
+              640,
+              51,
+              0.0797
+            ],
+            [
+              "F",
+              0,
+              0,
+              null
+            ],
+            [
+              "G",
+              2100,
+              315,
+              0.15
+            ],
+            [
+              "H",
+              480,
+              24,
+              0.05
+            ],
+            [
+              "I",
+              1560,
+              218,
+              0.1397
+            ],
+            [
+              "J",
+              920,
+              110,
+              0.1196
+            ],
+            [
+              "K",
+              0,
+              0,
+              null
+            ],
+            [
+              "L",
+              1380,
+              152,
+              0.1101
+            ],
+            [
+              "M",
+              760,
+              68,
+              0.0895
+            ],
+            [
+              "N",
+              1900,
+              247,
+              0.13
+            ],
+            [
+              "O",
+              540,
+              43,
+              0.0796
+            ],
+            [
+              "P",
+              1120,
+              179,
+              0.1598
+            ],
+            [
+              "Q",
+              860,
+              60,
+              0.0698
+            ],
+            [
+              "R",
+              1440,
+              216,
+              0.15
+            ],
+            [
+              "S",
+              700,
+              35,
+              0.05
+            ],
+            [
+              "T",
+              1680,
+              269,
+              0.1601
+            ],
+            [
+              "U",
+              0,
+              0,
+              null
+            ],
+            [
+              "V",
+              980,
+              127,
+              0.1296
+            ],
+            [
+              "W",
+              1260,
+              88,
+              0.0698
+            ],
+            [
+              "X",
+              820,
+              106,
+              0.1293
+            ]
+          ]
+        },
+        "firstSix": {
+          "sql": "SELECT variant, sessions, conversions,\n  ROUND(conversions * 1.0 / NULLIF(sessions, 0), 4) AS conversion_rate\nFROM funnel\nWHERE variant IN ('A', 'B', 'C', 'D', 'E', 'F')\nORDER BY variant;",
+          "ok": true,
+          "columns": [
+            "variant",
+            "sessions",
+            "conversions",
+            "conversion_rate"
+          ],
+          "rows": [
+            [
+              "A",
+              1000,
+              120,
+              0.12
+            ],
+            [
+              "B",
+              800,
+              96,
+              0.12
+            ],
+            [
+              "C",
+              0,
+              0,
+              null
+            ],
+            [
+              "D",
+              1240,
+              173,
+              0.1395
+            ],
+            [
+              "E",
+              640,
+              51,
+              0.0797
+            ],
+            [
+              "F",
+              0,
+              0,
+              null
+            ]
+          ]
+        },
+        "bare": {
+          "sql": "SELECT variant, conversions / sessions AS rate\nFROM funnel\nWHERE variant IN ('A', 'B', 'C', 'D', 'E', 'F')\nORDER BY variant;",
+          "ok": true,
+          "columns": [
+            "variant",
+            "rate"
+          ],
+          "rows": [
+            [
+              "A",
+              0.12
+            ],
+            [
+              "B",
+              0.12
+            ],
+            [
+              "C",
+              null
+            ],
+            [
+              "D",
+              0.13951612903225807
+            ],
+            [
+              "E",
+              0.0796875
+            ],
+            [
+              "F",
+              null
+            ]
+          ]
+        },
+        "zeros": {
+          "sql": "SELECT COUNT(*) AS no_sessions FROM funnel WHERE sessions = 0;",
+          "ok": true,
+          "columns": [
+            "no_sessions"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        },
+        "coalesced": {
+          "sql": "SELECT variant,\n  COALESCE(conversions * 1.0 / NULLIF(sessions, 0), 0) AS rate\nFROM funnel\nWHERE variant IN ('A', 'B', 'C', 'D', 'E', 'F')\nORDER BY variant;",
+          "ok": true,
+          "columns": [
+            "variant",
+            "rate"
+          ],
+          "rows": [
+            [
+              "A",
+              0.12
+            ],
+            [
+              "B",
+              0.12
+            ],
+            [
+              "C",
+              0
+            ],
+            [
+              "D",
+              0.13951612903225807
+            ],
+            [
+              "E",
+              0.0796875
+            ],
+            [
+              "F",
+              0
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "ratePg": {
+      "setup": "CREATE TABLE funnel AS SELECT * FROM (VALUES\n  ('A', 1000, 120), ('B', 800, 96), ('C', 0, 0),\n  ('D', 1240, 173), ('E', 640, 51), ('F', 0, 0),\n  ('G', 2100, 315), ('H', 480, 24), ('I', 1560, 218),\n  ('J', 920, 110), ('K', 0, 0), ('L', 1380, 152),\n  ('M', 760, 68), ('N', 1900, 247), ('O', 540, 43),\n  ('P', 1120, 179), ('Q', 860, 60), ('R', 1440, 216),\n  ('S', 700, 35), ('T', 1680, 269), ('U', 0, 0),\n  ('V', 980, 127), ('W', 1260, 88), ('X', 820, 106)\n) AS t(variant, sessions, conversions);",
+      "steps": {
+        "bare": {
+          "sql": "SELECT variant, conversions / sessions AS rate\nFROM funnel\nWHERE variant IN ('A', 'B', 'C', 'D', 'E', 'F')\nORDER BY variant;",
+          "ok": false,
+          "error": "ERROR: division by zero"
+        },
+        "truncated": {
+          "sql": "SELECT variant, conversions / sessions AS rate\nFROM funnel\nWHERE variant IN ('A', 'B')\nORDER BY variant;",
+          "ok": true,
+          "columns": [
+            "variant",
+            "rate"
+          ],
+          "rows": [
+            [
+              "A",
+              "0"
+            ],
+            [
+              "B",
+              "0"
+            ]
+          ]
+        },
+        "fixed": {
+          "sql": "SELECT variant,\n  ROUND(conversions * 1.0 / NULLIF(sessions, 0), 4) AS rate\nFROM funnel\nWHERE variant IN ('A', 'B', 'C', 'D', 'E', 'F')\nORDER BY variant;",
+          "ok": true,
+          "columns": [
+            "variant",
+            "rate"
+          ],
+          "rows": [
+            [
+              "A",
+              "0.1200"
+            ],
+            [
+              "B",
+              "0.1200"
+            ],
+            [
+              "C",
+              null
+            ],
+            [
+              "D",
+              "0.1395"
+            ],
+            [
+              "E",
+              "0.0797"
+            ],
+            [
+              "F",
+              null
+            ]
+          ]
+        }
+      },
+      "version": "18"
+    },
+    "cohort": {
+      "setup": "CREATE TABLE activity AS SELECT * FROM (VALUES\n  (1, DATE '2024-01-15'),\n  (1, DATE '2024-02-20'),\n  (1, DATE '2024-03-25'),\n  (1, DATE '2024-04-06'),\n  (2, DATE '2024-01-22'),\n  (2, DATE '2024-02-03'),\n  (2, DATE '2024-03-08'),\n  (2, DATE '2024-04-13'),\n  (3, DATE '2024-01-05'),\n  (3, DATE '2024-02-10'),\n  (3, DATE '2024-03-15'),\n  (4, DATE '2024-01-12'),\n  (4, DATE '2024-02-17'),\n  (5, DATE '2024-01-19'),\n  (5, DATE '2024-02-24'),\n  (5, DATE '2024-03-05'),\n  (5, DATE '2024-04-10'),\n  (6, DATE '2024-01-26'),\n  (6, DATE '2024-02-07'),\n  (7, DATE '2024-01-09'),\n  (8, DATE '2024-01-16'),\n  (9, DATE '2024-02-04'),\n  (9, DATE '2024-03-09'),\n  (9, DATE '2024-04-14'),\n  (10, DATE '2024-02-11'),\n  (10, DATE '2024-03-16'),\n  (10, DATE '2024-04-21'),\n  (11, DATE '2024-02-18'),\n  (11, DATE '2024-03-23'),\n  (12, DATE '2024-02-25'),\n  (13, DATE '2024-02-08'),\n  (13, DATE '2024-03-13'),\n  (13, DATE '2024-04-18'),\n  (14, DATE '2024-02-15'),\n  (15, DATE '2024-03-03'),\n  (15, DATE '2024-04-08'),\n  (16, DATE '2024-03-10'),\n  (16, DATE '2024-04-15'),\n  (17, DATE '2024-03-17'),\n  (18, DATE '2024-03-24'),\n  (18, DATE '2024-04-05'),\n  (19, DATE '2024-03-07'),\n  (20, DATE '2024-04-19'),\n  (21, DATE '2024-04-26'),\n  (22, DATE '2024-04-09'),\n  (23, DATE '2024-04-16')\n) AS t(user_id, event_date);",
+      "steps": {
+        "rows": {
+          "sql": "SELECT COUNT(*) AS events, COUNT(DISTINCT user_id) AS users FROM activity;",
+          "ok": true,
+          "columns": [
+            "events",
+            "users"
+          ],
+          "rows": [
+            [
+              46,
+              23
+            ]
+          ]
+        },
+        "sample": {
+          "sql": "SELECT user_id, event_date FROM activity ORDER BY user_id, event_date LIMIT 6;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "event_date"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-15"
+            ],
+            [
+              1,
+              "2024-02-20"
+            ],
+            [
+              1,
+              "2024-03-25"
+            ],
+            [
+              1,
+              "2024-04-06"
+            ],
+            [
+              2,
+              "2024-01-22"
+            ],
+            [
+              2,
+              "2024-02-03"
+            ]
+          ]
+        },
+        "page": {
+          "sql": "WITH first_seen AS (\n  SELECT user_id, DATE_TRUNC('month', MIN(event_date)) AS cohort\n  FROM activity\n  GROUP BY user_id\n),\nlabeled AS (\n  SELECT a.user_id, f.cohort,\n    DATE_DIFF('month', f.cohort, DATE_TRUNC('month', a.event_date)) AS month_offset\n  FROM activity a\n  JOIN first_seen f USING (user_id)\n)\nSELECT cohort, month_offset, COUNT(DISTINCT user_id) AS retained\nFROM labeled\nGROUP BY cohort, month_offset\nORDER BY cohort, month_offset;",
+          "ok": true,
+          "columns": [
+            "cohort",
+            "month_offset",
+            "retained"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              0,
+              8
+            ],
+            [
+              "2024-01-01",
+              1,
+              6
+            ],
+            [
+              "2024-01-01",
+              2,
+              4
+            ],
+            [
+              "2024-01-01",
+              3,
+              3
+            ],
+            [
+              "2024-02-01",
+              0,
+              6
+            ],
+            [
+              "2024-02-01",
+              1,
+              4
+            ],
+            [
+              "2024-02-01",
+              2,
+              3
+            ],
+            [
+              "2024-03-01",
+              0,
+              5
+            ],
+            [
+              "2024-03-01",
+              1,
+              3
+            ],
+            [
+              "2024-04-01",
+              0,
+              4
+            ]
+          ]
+        },
+        "rates": {
+          "sql": "WITH first_seen AS (\n  SELECT user_id, DATE_TRUNC('month', MIN(event_date)) AS cohort\n  FROM activity\n  GROUP BY user_id\n),\nlabeled AS (\n  SELECT a.user_id, f.cohort,\n    DATE_DIFF('month', f.cohort, DATE_TRUNC('month', a.event_date)) AS month_offset\n  FROM activity a\n  JOIN first_seen f USING (user_id)\n),\ncounts AS (\n  SELECT cohort, month_offset, COUNT(DISTINCT user_id) AS retained\n  FROM labeled\n  GROUP BY cohort, month_offset\n)\nSELECT cohort, month_offset, retained,\n  ROUND(100.0 * retained / FIRST_VALUE(retained) OVER (\n    PARTITION BY cohort ORDER BY month_offset), 0) AS pct\nFROM counts\nORDER BY cohort, month_offset;",
+          "ok": true,
+          "columns": [
+            "cohort",
+            "month_offset",
+            "retained",
+            "pct"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              0,
+              8,
+              100
+            ],
+            [
+              "2024-01-01",
+              1,
+              6,
+              75
+            ],
+            [
+              "2024-01-01",
+              2,
+              4,
+              50
+            ],
+            [
+              "2024-01-01",
+              3,
+              3,
+              38
+            ],
+            [
+              "2024-02-01",
+              0,
+              6,
+              100
+            ],
+            [
+              "2024-02-01",
+              1,
+              4,
+              67
+            ],
+            [
+              "2024-02-01",
+              2,
+              3,
+              50
+            ],
+            [
+              "2024-03-01",
+              0,
+              5,
+              100
+            ],
+            [
+              "2024-03-01",
+              1,
+              3,
+              60
+            ],
+            [
+              "2024-04-01",
+              0,
+              4,
+              100
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "sessions": {
+      "setup": "CREATE TABLE hits AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2024-01-01 09:00:00'), (1, TIMESTAMP '2024-01-01 09:10:00'),\n  (1, TIMESTAMP '2024-01-01 09:25:00'), (1, TIMESTAMP '2024-01-01 11:00:00'),\n  (1, TIMESTAMP '2024-01-01 11:15:00'), (1, TIMESTAMP '2024-01-01 14:40:00'),\n  (2, TIMESTAMP '2024-01-01 09:05:00'), (2, TIMESTAMP '2024-01-01 09:20:00'),\n  (2, TIMESTAMP '2024-01-01 09:45:00'), (2, TIMESTAMP '2024-01-01 13:00:00'),\n  (2, TIMESTAMP '2024-01-01 13:20:00'), (3, TIMESTAMP '2024-01-01 08:30:00'),\n  (3, TIMESTAMP '2024-01-01 08:55:00'), (3, TIMESTAMP '2024-01-01 12:10:00'),\n  (3, TIMESTAMP '2024-01-01 12:35:00'), (3, TIMESTAMP '2024-01-01 18:00:00'),\n  (4, TIMESTAMP '2024-01-01 10:00:00'), (4, TIMESTAMP '2024-01-01 10:20:00'),\n  (4, TIMESTAMP '2024-01-01 10:45:00'), (4, TIMESTAMP '2024-01-01 16:05:00'),\n  (5, TIMESTAMP '2024-01-01 07:15:00'), (5, TIMESTAMP '2024-01-01 07:40:00'),\n  (5, TIMESTAMP '2024-01-01 15:30:00'), (5, TIMESTAMP '2024-01-01 15:50:00')\n) AS t(user_id, ts);",
+      "steps": {
+        "page": {
+          "sql": "WITH gaps AS (\n  SELECT user_id, ts,\n    CASE\n      WHEN ts - LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) > INTERVAL '30 minutes'\n        OR LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) IS NULL\n      THEN 1 ELSE 0\n    END AS is_new_session\n  FROM hits\n)\nSELECT user_id, ts,\n  SUM(is_new_session) OVER (PARTITION BY user_id ORDER BY ts) AS session_id\nFROM gaps\nORDER BY user_id, ts;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "ts",
+            "session_id"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01 09:00:00",
+              "1"
+            ],
+            [
+              1,
+              "2024-01-01 09:10:00",
+              "1"
+            ],
+            [
+              1,
+              "2024-01-01 09:25:00",
+              "1"
+            ],
+            [
+              1,
+              "2024-01-01 11:00:00",
+              "2"
+            ],
+            [
+              1,
+              "2024-01-01 11:15:00",
+              "2"
+            ],
+            [
+              1,
+              "2024-01-01 14:40:00",
+              "3"
+            ],
+            [
+              2,
+              "2024-01-01 09:05:00",
+              "1"
+            ],
+            [
+              2,
+              "2024-01-01 09:20:00",
+              "1"
+            ],
+            [
+              2,
+              "2024-01-01 09:45:00",
+              "1"
+            ],
+            [
+              2,
+              "2024-01-01 13:00:00",
+              "2"
+            ],
+            [
+              2,
+              "2024-01-01 13:20:00",
+              "2"
+            ],
+            [
+              3,
+              "2024-01-01 08:30:00",
+              "1"
+            ],
+            [
+              3,
+              "2024-01-01 08:55:00",
+              "1"
+            ],
+            [
+              3,
+              "2024-01-01 12:10:00",
+              "2"
+            ],
+            [
+              3,
+              "2024-01-01 12:35:00",
+              "2"
+            ],
+            [
+              3,
+              "2024-01-01 18:00:00",
+              "3"
+            ],
+            [
+              4,
+              "2024-01-01 10:00:00",
+              "1"
+            ],
+            [
+              4,
+              "2024-01-01 10:20:00",
+              "1"
+            ],
+            [
+              4,
+              "2024-01-01 10:45:00",
+              "1"
+            ],
+            [
+              4,
+              "2024-01-01 16:05:00",
+              "2"
+            ],
+            [
+              5,
+              "2024-01-01 07:15:00",
+              "1"
+            ],
+            [
+              5,
+              "2024-01-01 07:40:00",
+              "1"
+            ],
+            [
+              5,
+              "2024-01-01 15:30:00",
+              "2"
+            ],
+            [
+              5,
+              "2024-01-01 15:50:00",
+              "2"
+            ]
+          ]
+        },
+        "userOne": {
+          "sql": "SELECT strftime(ts, '%H:%M') AS time,\n  DATE_DIFF('minute', LAG(ts) OVER (ORDER BY ts), ts) AS gap_min\nFROM hits\nWHERE user_id = 1\nORDER BY ts;",
+          "ok": true,
+          "columns": [
+            "time",
+            "gap_min"
+          ],
+          "rows": [
+            [
+              "09:00",
+              null
+            ],
+            [
+              "09:10",
+              10
+            ],
+            [
+              "09:25",
+              15
+            ],
+            [
+              "11:00",
+              95
+            ],
+            [
+              "11:15",
+              15
+            ],
+            [
+              "14:40",
+              205
+            ]
+          ]
+        },
+        "userOneSteps": {
+          "sql": "WITH g AS (\n  SELECT ts, DATE_DIFF('minute', LAG(ts) OVER (ORDER BY ts), ts) AS gap_min\n  FROM hits WHERE user_id = 1\n),\nf AS (\n  SELECT *, CASE WHEN gap_min IS NULL OR gap_min > 30 THEN 1 ELSE 0 END AS is_new\n  FROM g\n)\nSELECT strftime(ts, '%H:%M') AS time, gap_min, is_new,\n  SUM(is_new) OVER (ORDER BY ts) AS session_id\nFROM f\nORDER BY ts;",
+          "ok": true,
+          "columns": [
+            "time",
+            "gap_min",
+            "is_new",
+            "session_id"
+          ],
+          "rows": [
+            [
+              "09:00",
+              null,
+              1,
+              "1"
+            ],
+            [
+              "09:10",
+              10,
+              0,
+              "1"
+            ],
+            [
+              "09:25",
+              15,
+              0,
+              "1"
+            ],
+            [
+              "11:00",
+              95,
+              1,
+              "2"
+            ],
+            [
+              "11:15",
+              15,
+              0,
+              "2"
+            ],
+            [
+              "14:40",
+              205,
+              1,
+              "3"
+            ]
+          ]
+        },
+        "perUser": {
+          "sql": "WITH gaps AS (\n  SELECT user_id, ts,\n    CASE WHEN ts - LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) > INTERVAL '30 minutes'\n      OR LAG(ts) OVER (PARTITION BY user_id ORDER BY ts) IS NULL THEN 1 ELSE 0 END AS is_new_session\n  FROM hits\n)\nSELECT user_id, SUM(is_new_session) AS sessions, COUNT(*) AS hits\nFROM gaps\nGROUP BY user_id\nORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "sessions",
+            "hits"
+          ],
+          "rows": [
+            [
+              1,
+              "3",
+              6
+            ],
+            [
+              2,
+              "2",
+              5
+            ],
+            [
+              3,
+              "3",
+              5
+            ],
+            [
+              4,
+              "2",
+              4
+            ],
+            [
+              5,
+              "2",
+              4
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "pct": {
+      "setup": "CREATE TABLE requests AS SELECT * FROM (VALUES\n  (95), (110), (120), (130), (140), (150), (180), (190), (210), (260), (900), (2400)\n) AS t(ms);",
+      "steps": {
+        "values": {
+          "sql": "SELECT ms FROM requests ORDER BY ms;",
+          "ok": true,
+          "columns": [
+            "ms"
+          ],
+          "rows": [
+            [
+              95
+            ],
+            [
+              110
+            ],
+            [
+              120
+            ],
+            [
+              130
+            ],
+            [
+              140
+            ],
+            [
+              150
+            ],
+            [
+              180
+            ],
+            [
+              190
+            ],
+            [
+              210
+            ],
+            [
+              260
+            ],
+            [
+              900
+            ],
+            [
+              2400
+            ]
+          ]
+        },
+        "mean": {
+          "sql": "SELECT ROUND(AVG(ms), 1) AS mean FROM requests;",
+          "ok": true,
+          "columns": [
+            "mean"
+          ],
+          "rows": [
+            [
+              407.1
+            ]
+          ]
+        },
+        "slower": {
+          "sql": "SELECT COUNT(*) AS faster_than_mean FROM requests WHERE ms < (SELECT AVG(ms) FROM requests);",
+          "ok": true,
+          "columns": [
+            "faster_than_mean"
+          ],
+          "rows": [
+            [
+              10
+            ]
+          ]
+        },
+        "median": {
+          "sql": "SELECT\n  ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ms), 1) AS median_cont,\n  PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY ms) AS median_disc\nFROM requests;",
+          "ok": true,
+          "columns": [
+            "median_cont",
+            "median_disc"
+          ],
+          "rows": [
+            [
+              165,
+              150
+            ]
+          ]
+        },
+        "p90": {
+          "sql": "SELECT\n  ROUND(PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY ms), 1) AS p90_cont,\n  PERCENTILE_DISC(0.9) WITHIN GROUP (ORDER BY ms) AS p90_disc\nFROM requests;",
+          "ok": true,
+          "columns": [
+            "p90_cont",
+            "p90_disc"
+          ],
+          "rows": [
+            [
+              836,
+              900
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "having": {
+      "setup": "CREATE TABLE events AS SELECT * FROM (VALUES\n  (1, 'North', 120.0), (2, 'South', 80.0), (3, 'North', 60.0),\n  (4, 'East', 200.0), (5, 'South', 90.0), (6, 'North', 75.0),\n  (7, 'West', 145.0), (8, 'East', 95.0), (9, 'South', 130.0),\n  (10, 'North', 210.0), (11, 'West', 40.0), (12, 'East', 175.0),\n  (13, 'South', 65.0), (14, 'North', 88.0), (15, 'West', 62.0),\n  (16, 'East', 45.0), (17, 'South', 105.0), (18, 'North', 99.0),\n  (19, 'West', 155.0), (20, 'East', 185.0), (21, 'South', 70.0),\n  (22, 'North', 143.0), (23, 'West', 118.0), (24, 'East', 52.0)\n) AS t(id, region, amount);",
+      "steps": {
+        "page": {
+          "sql": "SELECT region, COUNT(*) AS n, SUM(amount) AS revenue\nFROM events\nWHERE amount > 0          -- row filter, before grouping\nGROUP BY region\nHAVING COUNT(*) >= 2      -- group filter, after aggregation\nORDER BY revenue DESC;",
+          "ok": true,
+          "columns": [
+            "region",
+            "n",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "North",
+              7,
+              "795.0"
+            ],
+            [
+              "East",
+              6,
+              "752.0"
+            ],
+            [
+              "South",
+              6,
+              "540.0"
+            ],
+            [
+              "West",
+              5,
+              "520.0"
+            ]
+          ]
+        },
+        "inWhere": {
+          "sql": "SELECT region, COUNT(*) AS n\nFROM events\nWHERE COUNT(*) >= 2\nGROUP BY region;",
+          "ok": false,
+          "error": "Binder Error: WHERE clause cannot contain aggregates!"
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "window": {
+      "setup": "CREATE TABLE sales AS SELECT * FROM (VALUES\n  ('North', 'Ava', 100), ('North', 'Ben', 140), ('North', 'Cy', 120),\n  ('North', 'Dana', 175), ('North', 'Eli', 85), ('North', 'Fay', 210),\n  ('South', 'Di', 90), ('South', 'Ed', 130), ('South', 'Gil', 165),\n  ('South', 'Hana', 75), ('South', 'Ira', 145), ('South', 'Jo', 110),\n  ('East', 'Kim', 200), ('East', 'Lars', 95), ('East', 'Mira', 155),\n  ('East', 'Ned', 130), ('East', 'Ola', 70), ('East', 'Pax', 185),\n  ('West', 'Quin', 115), ('West', 'Rae', 160), ('West', 'Sol', 45),\n  ('West', 'Tao', 195), ('West', 'Uma', 105), ('West', 'Val', 140)\n) AS t(region, rep, amount);",
+      "steps": {
+        "rows": {
+          "sql": "SELECT COUNT(*) AS n FROM sales;",
+          "ok": true,
+          "columns": [
+            "n"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "grouped": {
+          "sql": "SELECT region, SUM(amount) AS region_total\nFROM sales\nGROUP BY region\nORDER BY region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "region_total"
+          ],
+          "rows": [
+            [
+              "East",
+              "835"
+            ],
+            [
+              "North",
+              "830"
+            ],
+            [
+              "South",
+              "715"
+            ],
+            [
+              "West",
+              "760"
+            ]
+          ]
+        },
+        "windowed": {
+          "sql": "SELECT region, rep, amount,\n  SUM(amount) OVER (PARTITION BY region) AS region_total\nFROM sales\nORDER BY region, rep;",
+          "ok": true,
+          "columns": [
+            "region",
+            "rep",
+            "amount",
+            "region_total"
+          ],
+          "rows": [
+            [
+              "East",
+              "Kim",
+              200,
+              "835"
+            ],
+            [
+              "East",
+              "Lars",
+              95,
+              "835"
+            ],
+            [
+              "East",
+              "Mira",
+              155,
+              "835"
+            ],
+            [
+              "East",
+              "Ned",
+              130,
+              "835"
+            ],
+            [
+              "East",
+              "Ola",
+              70,
+              "835"
+            ],
+            [
+              "East",
+              "Pax",
+              185,
+              "835"
+            ],
+            [
+              "North",
+              "Ava",
+              100,
+              "830"
+            ],
+            [
+              "North",
+              "Ben",
+              140,
+              "830"
+            ],
+            [
+              "North",
+              "Cy",
+              120,
+              "830"
+            ],
+            [
+              "North",
+              "Dana",
+              175,
+              "830"
+            ],
+            [
+              "North",
+              "Eli",
+              85,
+              "830"
+            ],
+            [
+              "North",
+              "Fay",
+              210,
+              "830"
+            ],
+            [
+              "South",
+              "Di",
+              90,
+              "715"
+            ],
+            [
+              "South",
+              "Ed",
+              130,
+              "715"
+            ],
+            [
+              "South",
+              "Gil",
+              165,
+              "715"
+            ],
+            [
+              "South",
+              "Hana",
+              75,
+              "715"
+            ],
+            [
+              "South",
+              "Ira",
+              145,
+              "715"
+            ],
+            [
+              "South",
+              "Jo",
+              110,
+              "715"
+            ],
+            [
+              "West",
+              "Quin",
+              115,
+              "760"
+            ],
+            [
+              "West",
+              "Rae",
+              160,
+              "760"
+            ],
+            [
+              "West",
+              "Sol",
+              45,
+              "760"
+            ],
+            [
+              "West",
+              "Tao",
+              195,
+              "760"
+            ],
+            [
+              "West",
+              "Uma",
+              105,
+              "760"
+            ],
+            [
+              "West",
+              "Val",
+              140,
+              "760"
+            ]
+          ]
+        },
+        "topN": {
+          "sql": "WITH ranked AS (\n  SELECT *, ROW_NUMBER() OVER (\n    PARTITION BY region ORDER BY amount DESC) AS rn\n  FROM sales\n)\nSELECT region, rep, amount, rn\nFROM ranked\nWHERE rn <= 2\nORDER BY region, rn;",
+          "ok": true,
+          "columns": [
+            "region",
+            "rep",
+            "amount",
+            "rn"
+          ],
+          "rows": [
+            [
+              "East",
+              "Kim",
+              200,
+              1
+            ],
+            [
+              "East",
+              "Pax",
+              185,
+              2
+            ],
+            [
+              "North",
+              "Fay",
+              210,
+              1
+            ],
+            [
+              "North",
+              "Dana",
+              175,
+              2
+            ],
+            [
+              "South",
+              "Gil",
+              165,
+              1
+            ],
+            [
+              "South",
+              "Ira",
+              145,
+              2
+            ],
+            [
+              "West",
+              "Tao",
+              195,
+              1
+            ],
+            [
+              "West",
+              "Rae",
+              160,
+              2
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "rank": {
+      "setup": "CREATE TABLE scores AS SELECT * FROM (VALUES\n  ('Ana', 300), ('Ben', 250), ('Cy', 250), ('Dee', 200)\n) AS t(name, points);",
+      "steps": {
+        "ranks": {
+          "sql": "SELECT name, points,\n  ROW_NUMBER() OVER (ORDER BY points DESC) AS row_number,\n  RANK()       OVER (ORDER BY points DESC) AS rank,\n  DENSE_RANK() OVER (ORDER BY points DESC) AS dense_rank\nFROM scores\nORDER BY points DESC, name;",
+          "ok": true,
+          "columns": [
+            "name",
+            "points",
+            "row_number",
+            "rank",
+            "dense_rank"
+          ],
+          "rows": [
+            [
+              "Ana",
+              300,
+              1,
+              1,
+              1
+            ],
+            [
+              "Ben",
+              250,
+              2,
+              2,
+              2
+            ],
+            [
+              "Cy",
+              250,
+              3,
+              2,
+              2
+            ],
+            [
+              "Dee",
+              200,
+              4,
+              4,
+              3
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "txns": {
+      "setup": "CREATE TABLE txns AS SELECT * FROM (VALUES\n  (DATE '2024-01-01', 100), (DATE '2024-01-02', 250),\n  (DATE '2024-01-03', 75),  (DATE '2024-01-04', 180),\n  (DATE '2024-01-05', 320), (DATE '2024-01-06', 140),\n  (DATE '2024-01-07', 95),  (DATE '2024-01-08', 210),\n  (DATE '2024-01-09', 60),  (DATE '2024-01-10', 275),\n  (DATE '2024-01-11', 130), (DATE '2024-01-12', 185),\n  (DATE '2024-01-13', 340), (DATE '2024-01-14', 55),\n  (DATE '2024-01-15', 220), (DATE '2024-01-16', 165),\n  (DATE '2024-01-17', 90),  (DATE '2024-01-18', 300),\n  (DATE '2024-01-19', 125), (DATE '2024-01-20', 240),\n  (DATE '2024-01-21', 70),  (DATE '2024-01-22', 195),\n  (DATE '2024-01-23', 155), (DATE '2024-01-24', 280)\n) AS t(day, amount);",
+      "steps": {
+        "dod": {
+          "sql": "SELECT day, amount,\n  amount - LAG(amount) OVER (ORDER BY day) AS dod_change\nFROM txns\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount",
+            "dod_change"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              100,
+              null
+            ],
+            [
+              "2024-01-02",
+              250,
+              150
+            ],
+            [
+              "2024-01-03",
+              75,
+              -175
+            ],
+            [
+              "2024-01-04",
+              180,
+              105
+            ],
+            [
+              "2024-01-05",
+              320,
+              140
+            ],
+            [
+              "2024-01-06",
+              140,
+              -180
+            ],
+            [
+              "2024-01-07",
+              95,
+              -45
+            ],
+            [
+              "2024-01-08",
+              210,
+              115
+            ],
+            [
+              "2024-01-09",
+              60,
+              -150
+            ],
+            [
+              "2024-01-10",
+              275,
+              215
+            ],
+            [
+              "2024-01-11",
+              130,
+              -145
+            ],
+            [
+              "2024-01-12",
+              185,
+              55
+            ],
+            [
+              "2024-01-13",
+              340,
+              155
+            ],
+            [
+              "2024-01-14",
+              55,
+              -285
+            ],
+            [
+              "2024-01-15",
+              220,
+              165
+            ],
+            [
+              "2024-01-16",
+              165,
+              -55
+            ],
+            [
+              "2024-01-17",
+              90,
+              -75
+            ],
+            [
+              "2024-01-18",
+              300,
+              210
+            ],
+            [
+              "2024-01-19",
+              125,
+              -175
+            ],
+            [
+              "2024-01-20",
+              240,
+              115
+            ],
+            [
+              "2024-01-21",
+              70,
+              -170
+            ],
+            [
+              "2024-01-22",
+              195,
+              125
+            ],
+            [
+              "2024-01-23",
+              155,
+              -40
+            ],
+            [
+              "2024-01-24",
+              280,
+              125
+            ]
+          ]
+        },
+        "running": {
+          "sql": "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total\nFROM txns\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount",
+            "running_total"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              100,
+              "100"
+            ],
+            [
+              "2024-01-02",
+              250,
+              "350"
+            ],
+            [
+              "2024-01-03",
+              75,
+              "425"
+            ],
+            [
+              "2024-01-04",
+              180,
+              "605"
+            ],
+            [
+              "2024-01-05",
+              320,
+              "925"
+            ],
+            [
+              "2024-01-06",
+              140,
+              "1065"
+            ],
+            [
+              "2024-01-07",
+              95,
+              "1160"
+            ],
+            [
+              "2024-01-08",
+              210,
+              "1370"
+            ],
+            [
+              "2024-01-09",
+              60,
+              "1430"
+            ],
+            [
+              "2024-01-10",
+              275,
+              "1705"
+            ],
+            [
+              "2024-01-11",
+              130,
+              "1835"
+            ],
+            [
+              "2024-01-12",
+              185,
+              "2020"
+            ],
+            [
+              "2024-01-13",
+              340,
+              "2360"
+            ],
+            [
+              "2024-01-14",
+              55,
+              "2415"
+            ],
+            [
+              "2024-01-15",
+              220,
+              "2635"
+            ],
+            [
+              "2024-01-16",
+              165,
+              "2800"
+            ],
+            [
+              "2024-01-17",
+              90,
+              "2890"
+            ],
+            [
+              "2024-01-18",
+              300,
+              "3190"
+            ],
+            [
+              "2024-01-19",
+              125,
+              "3315"
+            ],
+            [
+              "2024-01-20",
+              240,
+              "3555"
+            ],
+            [
+              "2024-01-21",
+              70,
+              "3625"
+            ],
+            [
+              "2024-01-22",
+              195,
+              "3820"
+            ],
+            [
+              "2024-01-23",
+              155,
+              "3975"
+            ],
+            [
+              "2024-01-24",
+              280,
+              "4255"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "latest": {
+      "setup": "CREATE TABLE orders AS SELECT * FROM (VALUES\n  (1, 10, DATE '2024-01-05', 120.0), (2, 10, DATE '2024-02-01', 60.0),\n  (3, 20, DATE '2024-01-20', 80.0),  (4, 30, DATE '2024-01-02', 45.0),\n  (5, 30, DATE '2024-03-10', 90.0),  (6, 20, DATE '2024-04-01', 30.0),\n  (7, 40, DATE '2024-01-11', 210.0), (8, 40, DATE '2024-02-18', 75.0),\n  (9, 50, DATE '2024-01-27', 165.0), (10, 50, DATE '2024-03-02', 55.0),\n  (11, 60, DATE '2024-01-08', 95.0), (12, 60, DATE '2024-02-25', 140.0),\n  (13, 70, DATE '2024-01-16', 185.0), (14, 70, DATE '2024-04-05', 40.0),\n  (15, 80, DATE '2024-01-23', 130.0), (16, 80, DATE '2024-03-19', 70.0),\n  (17, 90, DATE '2024-01-30', 250.0), (18, 90, DATE '2024-02-12', 85.0),\n  (19, 100, DATE '2024-01-14', 110.0), (20, 100, DATE '2024-03-27', 65.0),\n  (21, 110, DATE '2024-01-19', 175.0), (22, 110, DATE '2024-04-09', 50.0),\n  (23, 120, DATE '2024-01-04', 200.0), (24, 120, DATE '2024-02-29', 35.0)\n) AS t(id, customer_id, order_date, amount);",
+      "steps": {
+        "latest": {
+          "sql": "WITH ranked AS (\n  SELECT *, ROW_NUMBER() OVER (\n    PARTITION BY customer_id ORDER BY order_date DESC) AS rn\n  FROM orders\n)\nSELECT customer_id, order_date, amount\nFROM ranked\nWHERE rn = 1\nORDER BY customer_id;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "order_date",
+            "amount"
+          ],
+          "rows": [
+            [
+              10,
+              "2024-02-01",
+              "60.0"
+            ],
+            [
+              20,
+              "2024-04-01",
+              "30.0"
+            ],
+            [
+              30,
+              "2024-03-10",
+              "90.0"
+            ],
+            [
+              40,
+              "2024-02-18",
+              "75.0"
+            ],
+            [
+              50,
+              "2024-03-02",
+              "55.0"
+            ],
+            [
+              60,
+              "2024-02-25",
+              "140.0"
+            ],
+            [
+              70,
+              "2024-04-05",
+              "40.0"
+            ],
+            [
+              80,
+              "2024-03-19",
+              "70.0"
+            ],
+            [
+              90,
+              "2024-02-12",
+              "85.0"
+            ],
+            [
+              100,
+              "2024-03-27",
+              "65.0"
+            ],
+            [
+              110,
+              "2024-04-09",
+              "50.0"
+            ],
+            [
+              120,
+              "2024-02-29",
+              "35.0"
+            ]
+          ]
+        },
+        "rows": {
+          "sql": "SELECT COUNT(*) AS orders, COUNT(DISTINCT customer_id) AS customers FROM orders;",
+          "ok": true,
+          "columns": [
+            "orders",
+            "customers"
+          ],
+          "rows": [
+            [
+              24,
+              12
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "pivot": {
+      "setup": "CREATE TABLE traffic AS SELECT * FROM (VALUES\n  ('North', 'mobile', 120), ('North', 'desktop', 80),\n  ('South', 'mobile', 95),  ('South', 'desktop', 140),\n  ('East', 'mobile', 60),   ('East', 'desktop', 70)\n) AS t(region, device, sessions);",
+      "steps": {
+        "pivot": {
+          "sql": "SELECT\n  region,\n  SUM(CASE WHEN device = 'mobile' THEN sessions ELSE 0 END) AS mobile,\n  SUM(CASE WHEN device = 'desktop' THEN sessions ELSE 0 END) AS desktop\nFROM traffic\nGROUP BY region\nORDER BY region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "mobile",
+            "desktop"
+          ],
+          "rows": [
+            [
+              "East",
+              "60",
+              "70"
+            ],
+            [
+              "North",
+              "120",
+              "80"
+            ],
+            [
+              "South",
+              "95",
+              "140"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "count": {
+      "setup": "CREATE TABLE views AS SELECT * FROM (VALUES\n  (1, 11), (2, 11), (3, 12), (4, NULL), (5, 13), (6, 12), (7, NULL), (8, 14)\n) AS t(view_id, user_id);",
+      "steps": {
+        "counts": {
+          "sql": "SELECT\n  COUNT(*)                AS all_rows,\n  COUNT(user_id)          AS signed_in,\n  COUNT(DISTINCT user_id) AS people\nFROM views;",
+          "ok": true,
+          "columns": [
+            "all_rows",
+            "signed_in",
+            "people"
+          ],
+          "rows": [
+            [
+              8,
+              6,
+              4
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    }
+  }
+}
