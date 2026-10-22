@@ -12,7 +12,7 @@ export const VIDEO = "ds-probability";
  * Whether public/images/ds-probability/ holds the watercolor from
  * illustrations.json. Every frame is laid out with room for it either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** "1/3" as a number. */
 const frac = (s: string) => {
