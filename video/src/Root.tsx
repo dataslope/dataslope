@@ -56,6 +56,8 @@ import { DsExperimentsInPractice } from "./videos/ds-experiments-in-practice/Vid
 import { script as dsExperimentsInPracticeScript } from "./videos/ds-experiments-in-practice/script";
 import { DsProductSense } from "./videos/ds-product-sense/Video";
 import { script as dsProductSenseScript } from "./videos/ds-product-sense/script";
+import { DsPythonPandas } from "./videos/ds-python-pandas/Video";
+import { script as dsPythonPandasScript } from "./videos/ds-python-pandas/script";
 import { DaAbTesting } from "./videos/da-ab-testing/Video";
 import { script as daAbTestingScript } from "./videos/da-ab-testing/script";
 import { DaVisualization } from "./videos/da-visualization/Video";
@@ -714,6 +716,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(dsProductSenseScript)}
+      />
+      <Composition
+        id="DataScientist-9-PythonPandas"
+        component={DsPythonPandas}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsPythonPandasScript)}
       />
     </Folder>
     <Folder name="Assets">
