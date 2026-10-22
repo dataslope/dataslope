@@ -1,0 +1,780 @@
+{
+  "engine": "HyperFormula 3.5.0",
+  "figures": {
+    "pivot": {
+      "orders": [
+        [
+          "id",
+          "region",
+          "month",
+          "revenue"
+        ],
+        [
+          1,
+          "North",
+          "2024-01",
+          120
+        ],
+        [
+          2,
+          "South",
+          "2024-01",
+          80
+        ],
+        [
+          3,
+          "North",
+          "2024-02",
+          150
+        ],
+        [
+          4,
+          "East",
+          "2024-01",
+          95
+        ],
+        [
+          5,
+          "South",
+          "2024-02",
+          110
+        ],
+        [
+          6,
+          "North",
+          "2024-03",
+          200
+        ],
+        [
+          7,
+          "East",
+          "2024-02",
+          60
+        ],
+        [
+          8,
+          "South",
+          "2024-03",
+          140
+        ],
+        [
+          9,
+          "North",
+          "2024-03",
+          90
+        ],
+        [
+          10,
+          "East",
+          "2024-03",
+          175
+        ]
+      ],
+      "regions": [
+        "North",
+        "South",
+        "East"
+      ],
+      "months": [
+        "2024-01",
+        "2024-02",
+        "2024-03"
+      ],
+      "grid": [
+        [
+          {
+            "sheet": "orders",
+            "ref": "G2",
+            "formula": "=SUMIFS($D$2:$D$11,$B$2:$B$11,$F2,$C$2:$C$11,G$1)",
+            "value": 120
+          },
+          {
+            "sheet": "orders",
+            "ref": "H2",
+            "formula": "=SUMIFS($D$2:$D$11,$B$2:$B$11,$F2,$C$2:$C$11,H$1)",
+            "value": 150
+          },
+          {
+            "sheet": "orders",
+            "ref": "I2",
+            "formula": "=SUMIFS($D$2:$D$11,$B$2:$B$11,$F2,$C$2:$C$11,I$1)",
+            "value": 290
+          }
+        ],
+        [
+          {
+            "sheet": "orders",
+            "ref": "G3",
+            "formula": "=SUMIFS($D$2:$D$11,$B$2:$B$11,$F3,$C$2:$C$11,G$1)",
+            "value": 80
+          },
+          {
+            "sheet": "orders",
+            "ref": "H3",
+            "formula": "=SUMIFS($D$2:$D$11,$B$2:$B$11,$F3,$C$2:$C$11,H$1)",
+            "value": 110
+          },
+          {
+            "sheet": "orders",
+            "ref": "I3",
+            "formula": "=SUMIFS($D$2:$D$11,$B$2:$B$11,$F3,$C$2:$C$11,I$1)",
+            "value": 140
+          }
+        ],
+        [
+          {
+            "sheet": "orders",
+            "ref": "G4",
+            "formula": "=SUMIFS($D$2:$D$11,$B$2:$B$11,$F4,$C$2:$C$11,G$1)",
+            "value": 95
+          },
+          {
+            "sheet": "orders",
+            "ref": "H4",
+            "formula": "=SUMIFS($D$2:$D$11,$B$2:$B$11,$F4,$C$2:$C$11,H$1)",
+            "value": 60
+          },
+          {
+            "sheet": "orders",
+            "ref": "I4",
+            "formula": "=SUMIFS($D$2:$D$11,$B$2:$B$11,$F4,$C$2:$C$11,I$1)",
+            "value": 175
+          }
+        ]
+      ],
+      "countGrid": [
+        [
+          {
+            "sheet": "orders",
+            "ref": "G2",
+            "formula": "=COUNTIFS($B$2:$B$11,$F2,$C$2:$C$11,G$1)",
+            "value": 1
+          },
+          {
+            "sheet": "orders",
+            "ref": "H2",
+            "formula": "=COUNTIFS($B$2:$B$11,$F2,$C$2:$C$11,H$1)",
+            "value": 1
+          },
+          {
+            "sheet": "orders",
+            "ref": "I2",
+            "formula": "=COUNTIFS($B$2:$B$11,$F2,$C$2:$C$11,I$1)",
+            "value": 2
+          }
+        ],
+        [
+          {
+            "sheet": "orders",
+            "ref": "G3",
+            "formula": "=COUNTIFS($B$2:$B$11,$F3,$C$2:$C$11,G$1)",
+            "value": 1
+          },
+          {
+            "sheet": "orders",
+            "ref": "H3",
+            "formula": "=COUNTIFS($B$2:$B$11,$F3,$C$2:$C$11,H$1)",
+            "value": 1
+          },
+          {
+            "sheet": "orders",
+            "ref": "I3",
+            "formula": "=COUNTIFS($B$2:$B$11,$F3,$C$2:$C$11,I$1)",
+            "value": 1
+          }
+        ],
+        [
+          {
+            "sheet": "orders",
+            "ref": "G4",
+            "formula": "=COUNTIFS($B$2:$B$11,$F4,$C$2:$C$11,G$1)",
+            "value": 1
+          },
+          {
+            "sheet": "orders",
+            "ref": "H4",
+            "formula": "=COUNTIFS($B$2:$B$11,$F4,$C$2:$C$11,H$1)",
+            "value": 1
+          },
+          {
+            "sheet": "orders",
+            "ref": "I4",
+            "formula": "=COUNTIFS($B$2:$B$11,$F4,$C$2:$C$11,I$1)",
+            "value": 1
+          }
+        ]
+      ]
+    },
+    "conditions": {
+      "sumif": {
+        "sheet": "orders",
+        "ref": "F1",
+        "formula": "=SUMIF(B2:B11,\"North\",D2:D11)",
+        "value": 560
+      },
+      "sumifs": {
+        "sheet": "orders",
+        "ref": "F2",
+        "formula": "=SUMIFS(D2:D11,B2:B11,\"North\",C2:C11,\"2024-03\")",
+        "value": 290
+      },
+      "countifs": {
+        "sheet": "orders",
+        "ref": "F3",
+        "formula": "=COUNTIFS(B2:B11,\"North\",D2:D11,\">100\")",
+        "value": 3
+      },
+      "averageif": {
+        "sheet": "orders",
+        "ref": "F4",
+        "formula": "=AVERAGEIF(B2:B11,\"North\",D2:D11)",
+        "value": 140
+      },
+      "total": {
+        "sheet": "orders",
+        "ref": "F5",
+        "formula": "=SUM(D2:D11)",
+        "value": 1220
+      },
+      "over150": [
+        {
+          "sheet": "orders",
+          "ref": "G2",
+          "formula": "=D2>150",
+          "value": false
+        },
+        {
+          "sheet": "orders",
+          "ref": "G3",
+          "formula": "=D3>150",
+          "value": false
+        },
+        {
+          "sheet": "orders",
+          "ref": "G4",
+          "formula": "=D4>150",
+          "value": false
+        },
+        {
+          "sheet": "orders",
+          "ref": "G5",
+          "formula": "=D5>150",
+          "value": false
+        },
+        {
+          "sheet": "orders",
+          "ref": "G6",
+          "formula": "=D6>150",
+          "value": false
+        },
+        {
+          "sheet": "orders",
+          "ref": "G7",
+          "formula": "=D7>150",
+          "value": true
+        },
+        {
+          "sheet": "orders",
+          "ref": "G8",
+          "formula": "=D8>150",
+          "value": false
+        },
+        {
+          "sheet": "orders",
+          "ref": "G9",
+          "formula": "=D9>150",
+          "value": false
+        },
+        {
+          "sheet": "orders",
+          "ref": "G10",
+          "formula": "=D10>150",
+          "value": false
+        },
+        {
+          "sheet": "orders",
+          "ref": "G11",
+          "formula": "=D11>150",
+          "value": true
+        }
+      ],
+      "textTotal": {
+        "sheet": "orders",
+        "ref": "F5",
+        "formula": "=SUM(D2:D11)",
+        "value": 1070
+      },
+      "textCell": {
+        "sheet": "orders",
+        "ref": "F6",
+        "formula": "=ISTEXT(D4)",
+        "value": true
+      }
+    },
+    "lookups": {
+      "products": [
+        [
+          "sku",
+          "name",
+          "price"
+        ],
+        [
+          "P-101",
+          "Notebook",
+          4.5
+        ],
+        [
+          "P-102",
+          "Mug",
+          9
+        ],
+        [
+          "P-103",
+          "Pen",
+          1.25
+        ],
+        [
+          "P-104",
+          "Lamp",
+          24
+        ]
+      ],
+      "tiers": [
+        [
+          "from",
+          "discount"
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          0.05
+        ],
+        [
+          500,
+          0.1
+        ],
+        [
+          1000,
+          0.15
+        ]
+      ],
+      "vlookup": {
+        "sheet": "calc",
+        "ref": "A1",
+        "formula": "=VLOOKUP(\"P-102\",products!A2:C5,3,FALSE)",
+        "value": 9
+      },
+      "leftward": {
+        "sheet": "calc",
+        "ref": "A2",
+        "formula": "=VLOOKUP(\"Mug\",products!A2:C5,1,FALSE)",
+        "value": {
+          "error": "#N/A"
+        }
+      },
+      "indexMatchSku": {
+        "sheet": "calc",
+        "ref": "A3",
+        "formula": "=INDEX(products!A2:A5,MATCH(\"Mug\",products!B2:B5,0))",
+        "value": "P-102"
+      },
+      "indexMatchPrice": {
+        "sheet": "calc",
+        "ref": "A4",
+        "formula": "=INDEX(products!C2:C5,MATCH(\"P-102\",products!A2:A5,0))",
+        "value": 9
+      },
+      "xlookupMissing": {
+        "sheet": "calc",
+        "ref": "A5",
+        "formula": "=XLOOKUP(\"P-109\",products!A2:A5,products!C2:C5,\"Not found\")",
+        "value": "Not found"
+      },
+      "xlookupLeft": {
+        "sheet": "calc",
+        "ref": "A6",
+        "formula": "=XLOOKUP(\"Mug\",products!B2:B5,products!A2:A5)",
+        "value": "P-102"
+      },
+      "exact": {
+        "sheet": "calc",
+        "ref": "A7",
+        "formula": "=VLOOKUP(\"P-105\",products!A2:C5,3,FALSE)",
+        "value": {
+          "error": "#N/A"
+        }
+      },
+      "approxId": {
+        "sheet": "calc",
+        "ref": "A8",
+        "formula": "=VLOOKUP(\"P-105\",products!A2:C5,3)",
+        "value": 24
+      },
+      "approxTier": {
+        "sheet": "calc",
+        "ref": "A9",
+        "formula": "=VLOOKUP(640,tiers!A2:B5,2,TRUE)",
+        "value": 0.1
+      },
+      "iferrorFound": {
+        "sheet": "calc",
+        "ref": "A10",
+        "formula": "=IFERROR(VLOOKUP(\"P-102\",products!A2:C5,2,FALSE),\"Unknown\")",
+        "value": "Mug"
+      },
+      "iferrorMissing": {
+        "sheet": "calc",
+        "ref": "A11",
+        "formula": "=IFERROR(VLOOKUP(\"P-109\",products!A2:C5,2,FALSE),\"Unknown\")",
+        "value": "Unknown"
+      },
+      "iferrorSpace": {
+        "sheet": "calc",
+        "ref": "A12",
+        "formula": "=IFERROR(VLOOKUP(\"P-102 \",products!A2:C5,2,FALSE),\"Unknown\")",
+        "value": "Unknown"
+      },
+      "iferrorBroken": {
+        "sheet": "calc",
+        "ref": "A13",
+        "formula": "=IFERROR(VLOOKUP(\"P-102\",products!A2:C5,4,FALSE),\"Unknown\")",
+        "value": "Unknown"
+      },
+      "broken": {
+        "sheet": "calc",
+        "ref": "A14",
+        "formula": "=VLOOKUP(\"P-102\",products!A2:C5,4,FALSE)",
+        "value": {
+          "error": "#REF!"
+        }
+      },
+      "ifnaFound": {
+        "sheet": "calc",
+        "ref": "A15",
+        "formula": "=IFNA(VLOOKUP(\"P-102\",products!A2:C5,2,FALSE),\"Unknown\")",
+        "value": "Mug"
+      },
+      "ifnaMissing": {
+        "sheet": "calc",
+        "ref": "A16",
+        "formula": "=IFNA(VLOOKUP(\"P-109\",products!A2:C5,2,FALSE),\"Unknown\")",
+        "value": "Unknown"
+      },
+      "ifnaSpace": {
+        "sheet": "calc",
+        "ref": "A17",
+        "formula": "=IFNA(VLOOKUP(\"P-102 \",products!A2:C5,2,FALSE),\"Unknown\")",
+        "value": "Unknown"
+      },
+      "ifnaBroken": {
+        "sheet": "calc",
+        "ref": "A18",
+        "formula": "=IFNA(VLOOKUP(\"P-102\",products!A2:C5,4,FALSE),\"Unknown\")",
+        "value": {
+          "error": "#REF!"
+        }
+      },
+      "inserted": [
+        [
+          "sku",
+          "name",
+          "category",
+          "price"
+        ],
+        [
+          "P-101",
+          "Notebook",
+          "Paper",
+          4.5
+        ],
+        [
+          "P-102",
+          "Mug",
+          "Kitchen",
+          9
+        ],
+        [
+          "P-103",
+          "Pen",
+          "Paper",
+          1.25
+        ],
+        [
+          "P-104",
+          "Lamp",
+          "Home",
+          24
+        ]
+      ],
+      "after": {
+        "vlookup": {
+          "sheet": "calc",
+          "ref": "A1",
+          "formula": "=VLOOKUP(\"P-102\",products!A2:D5,3,FALSE)",
+          "value": "Kitchen"
+        },
+        "leftward": {
+          "sheet": "calc",
+          "ref": "A2",
+          "formula": "=VLOOKUP(\"Mug\",products!A2:D5,1,FALSE)",
+          "value": {
+            "error": "#N/A"
+          }
+        },
+        "indexMatchSku": {
+          "sheet": "calc",
+          "ref": "A3",
+          "formula": "=INDEX(products!A2:A5,MATCH(\"Mug\",products!B2:B5,0))",
+          "value": "P-102"
+        },
+        "indexMatchPrice": {
+          "sheet": "calc",
+          "ref": "A4",
+          "formula": "=INDEX(products!D2:D5,MATCH(\"P-102\",products!A2:A5,0))",
+          "value": 9
+        },
+        "xlookupMissing": {
+          "sheet": "calc",
+          "ref": "A5",
+          "formula": "=XLOOKUP(\"P-109\",products!A2:A5,products!D2:D5,\"Not found\")",
+          "value": "Not found"
+        },
+        "xlookupLeft": {
+          "sheet": "calc",
+          "ref": "A6",
+          "formula": "=XLOOKUP(\"Mug\",products!B2:B5,products!A2:A5)",
+          "value": "P-102"
+        },
+        "exact": {
+          "sheet": "calc",
+          "ref": "A7",
+          "formula": "=VLOOKUP(\"P-105\",products!A2:D5,3,FALSE)",
+          "value": {
+            "error": "#N/A"
+          }
+        },
+        "approxId": {
+          "sheet": "calc",
+          "ref": "A8",
+          "formula": "=VLOOKUP(\"P-105\",products!A2:D5,3)",
+          "value": "Home"
+        },
+        "approxTier": {
+          "sheet": "calc",
+          "ref": "A9",
+          "formula": "=VLOOKUP(640,tiers!A2:B5,2,TRUE)",
+          "value": 0.1
+        },
+        "iferrorFound": {
+          "sheet": "calc",
+          "ref": "A10",
+          "formula": "=IFERROR(VLOOKUP(\"P-102\",products!A2:D5,2,FALSE),\"Unknown\")",
+          "value": "Mug"
+        },
+        "iferrorMissing": {
+          "sheet": "calc",
+          "ref": "A11",
+          "formula": "=IFERROR(VLOOKUP(\"P-109\",products!A2:D5,2,FALSE),\"Unknown\")",
+          "value": "Unknown"
+        },
+        "iferrorSpace": {
+          "sheet": "calc",
+          "ref": "A12",
+          "formula": "=IFERROR(VLOOKUP(\"P-102 \",products!A2:D5,2,FALSE),\"Unknown\")",
+          "value": "Unknown"
+        },
+        "iferrorBroken": {
+          "sheet": "calc",
+          "ref": "A13",
+          "formula": "=IFERROR(VLOOKUP(\"P-102\",products!A2:D5,4,FALSE),\"Unknown\")",
+          "value": 9
+        },
+        "broken": {
+          "sheet": "calc",
+          "ref": "A14",
+          "formula": "=VLOOKUP(\"P-102\",products!A2:D5,4,FALSE)",
+          "value": 9
+        },
+        "ifnaFound": {
+          "sheet": "calc",
+          "ref": "A15",
+          "formula": "=IFNA(VLOOKUP(\"P-102\",products!A2:D5,2,FALSE),\"Unknown\")",
+          "value": "Mug"
+        },
+        "ifnaMissing": {
+          "sheet": "calc",
+          "ref": "A16",
+          "formula": "=IFNA(VLOOKUP(\"P-109\",products!A2:D5,2,FALSE),\"Unknown\")",
+          "value": "Unknown"
+        },
+        "ifnaSpace": {
+          "sheet": "calc",
+          "ref": "A17",
+          "formula": "=IFNA(VLOOKUP(\"P-102 \",products!A2:D5,2,FALSE),\"Unknown\")",
+          "value": "Unknown"
+        },
+        "ifnaBroken": {
+          "sheet": "calc",
+          "ref": "A18",
+          "formula": "=IFNA(VLOOKUP(\"P-102\",products!A2:D5,4,FALSE),\"Unknown\")",
+          "value": 9
+        }
+      }
+    },
+    "references": {
+      "rows": [
+        [
+          "amount",
+          "tax",
+          null,
+          null,
+          "rate",
+          0.08
+        ],
+        [
+          100
+        ],
+        [
+          250
+        ],
+        [
+          80
+        ]
+      ],
+      "absolute": [
+        {
+          "sheet": "sheet",
+          "ref": "B2",
+          "formula": "=A2*$F$1",
+          "value": 8
+        },
+        {
+          "sheet": "sheet",
+          "ref": "B3",
+          "formula": "=A3*$F$1",
+          "value": 20
+        },
+        {
+          "sheet": "sheet",
+          "ref": "B4",
+          "formula": "=A4*$F$1",
+          "value": 6.4
+        }
+      ],
+      "relative": [
+        {
+          "sheet": "sheet",
+          "ref": "C2",
+          "formula": "=A2*F1",
+          "value": 8
+        },
+        {
+          "sheet": "sheet",
+          "ref": "C3",
+          "formula": "=A3*F2",
+          "value": 0
+        },
+        {
+          "sheet": "sheet",
+          "ref": "C4",
+          "formula": "=A4*F3",
+          "value": 0
+        }
+      ],
+      "named": [
+        {
+          "sheet": "sheet",
+          "ref": "D2",
+          "formula": "=A2*TaxRate",
+          "value": 8
+        },
+        {
+          "sheet": "sheet",
+          "ref": "D3",
+          "formula": "=A3*TaxRate",
+          "value": 20
+        },
+        {
+          "sheet": "sheet",
+          "ref": "D4",
+          "formula": "=A4*TaxRate",
+          "value": 6.4
+        }
+      ]
+    },
+    "text": {
+      "clean": {
+        "sheet": "calc",
+        "ref": "A1",
+        "formula": "=PROPER(TRIM(\"  aVA smith \"))",
+        "value": "Ava Smith"
+      },
+      "username": {
+        "sheet": "calc",
+        "ref": "A2",
+        "formula": "=LEFT(\"ava.smith@example.com\",FIND(\"@\",\"ava.smith@example.com\")-1)",
+        "value": "ava.smith"
+      },
+      "join": {
+        "sheet": "calc",
+        "ref": "A3",
+        "formula": "=TEXTJOIN(\" \",TRUE,\"Ava\",\"\",\"Smith\")",
+        "value": "Ava Smith"
+      },
+      "serial": {
+        "sheet": "calc",
+        "ref": "A4",
+        "formula": "=DATE(2024,3,1)",
+        "value": 45352
+      },
+      "days": {
+        "sheet": "calc",
+        "ref": "A5",
+        "formula": "=DATE(2024,3,31)-DATE(2024,3,1)",
+        "value": 30
+      },
+      "datevalue": {
+        "sheet": "calc",
+        "ref": "A6",
+        "formula": "=DATEVALUE(\"2024-03-01\")",
+        "value": 45352
+      },
+      "emails": [
+        "email",
+        "ava@example.com",
+        "ben@example.com",
+        "ava@example.com",
+        "cy@example.com"
+      ],
+      "repeated": [
+        {
+          "sheet": "emails",
+          "ref": "B2",
+          "formula": "=COUNTIF($A$2:$A$5,A2)>1",
+          "value": true
+        },
+        {
+          "sheet": "emails",
+          "ref": "B3",
+          "formula": "=COUNTIF($A$2:$A$5,A3)>1",
+          "value": false
+        },
+        {
+          "sheet": "emails",
+          "ref": "B4",
+          "formula": "=COUNTIF($A$2:$A$5,A4)>1",
+          "value": true
+        },
+        {
+          "sheet": "emails",
+          "ref": "B5",
+          "formula": "=COUNTIF($A$2:$A$5,A5)>1",
+          "value": false
+        }
+      ]
+    }
+  }
+}
