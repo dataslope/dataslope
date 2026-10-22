@@ -11,7 +11,8 @@ import { DID, fixed } from "./data";
 import { at, Axes, CONTROL, Curve, Drift, Mark, OK_INK, pulse, type Scale, TREAT, X0 } from "./parts";
 
 const PLOT = { x0: 200, x1: 1240, top: 420, base: 820 };
-const SUM_X = 1350;
+const SUM_X = 1430;
+const SUM_W = 420;
 
 /**
  * Question 10. Two simulated cities over twelve weeks; a policy starts in the
@@ -122,7 +123,7 @@ export const DidScene: React.FC = () => {
         <Note at={notAt + 8} x={at(x, 12.4) + 12} y={at(yS, DID.control[11]) - 16}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 750, whiteSpace: "nowrap" }}>comparison city</span>
         </Note>
-        <Note at={simAt} x={PLOT.x0} y={y(PLOT.top) - h(54)}>
+        <Note at={simAt} x={PLOT.x0 - 100} y={y(PLOT.base) + h(44)}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>simulated</span>
         </Note>
 
@@ -132,9 +133,9 @@ export const DidScene: React.FC = () => {
           { text: "comparison city", v: DID.controlChange, at: compAt + 6, ink: INK_SOFT },
         ].map((r, i) => (
           <Note key={r.text} at={r.at} x={SUM_X} y={y(500) + i * h(60)}>
-            <span style={{ display: "inline-flex", width: 460, justifyContent: "space-between", ...note(27, r.ink), fontWeight: 700, ...TABULAR }}>
+            <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", ...note(27, r.ink), fontWeight: 700, ...TABULAR }}>
               <span>{r.text}</span>
-              <span>{i ? "− " : ""}{fixed(r.v, 1, true)}</span>
+              <span>{i ? `− ${fixed(r.v, 1)}` : fixed(r.v, 1, true)}</span>
             </span>
           </Note>
         ))}
@@ -142,10 +143,10 @@ export const DidScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>(with no policy at all)</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          <line x1={SUM_X} x2={SUM_X + 460 * ease(frame, diffAt, 12)} y1={y(500) + h(140)} y2={y(500) + h(140)} stroke={INK} strokeWidth={2} />
+          <line x1={SUM_X} x2={SUM_X + SUM_W * ease(frame, diffAt, 12)} y1={y(500) + h(140)} y2={y(500) + h(140)} stroke={INK} strokeWidth={2} />
         </svg>
         <Note at={diffAt + 4} x={SUM_X} y={y(500) + h(156)}>
-          <span style={{ display: "inline-flex", width: 460, justifyContent: "space-between", alignItems: "baseline", ...TABULAR }}>
+          <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", alignItems: "baseline", ...TABULAR }}>
             <span style={{ ...note(28, OK_INK), fontWeight: 750 }}>DID</span>
             <span style={{ ...note(40, OK_INK), fontWeight: 800, display: "inline-block", transform: `scale(${1 + 0.08 * big})` }}>
               <Mark at={sixFiveAt + 2}>{fixed(DID.did, 1, true)}</Mark>
@@ -155,7 +156,7 @@ export const DidScene: React.FC = () => {
         <Note at={trueAt} x={SUM_X} y={y(500) + h(226)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>true effect in the simulation: +{DID.truth}</span>
         </Note>
-        <Note at={parallelAt} x={SUM_X} y={y(780)} width={460}>
+        <Note at={parallelAt} x={SUM_X} y={y(780)} width={SUM_W}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 700 }}>
             It rests on parallel trends<span style={{ fontWeight: 500, opacity: ease(frame, togetherAt - 6, 10) }}>: without the policy, the lines move together</span>
           </span>

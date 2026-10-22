@@ -11,7 +11,7 @@ import { Sfx } from "../../sound/Sfx";
 import { NOVELTY } from "./data";
 import { at, Axes, Curve, Drift, OK_INK, type Scale, WARM, WARM_INK, X0 } from "./parts";
 
-const PLOT = { x0: 210, x1: 1180, top: 400, base: 800 };
+const PLOT = { x0: 210, x1: 1180, top: 440, base: 810 };
 const SKETCH = { x0: 1380, x1: 1780, mid: 580, amp: 90 };
 
 /**

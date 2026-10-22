@@ -116,13 +116,13 @@ export const SimpsonScene: React.FC = () => {
                 }}
               />
               {[
-                { text: `${count(m.mobile)} mobile`, left: X0 + 12, w: wm },
-                { text: `${count(m.desktop)} desktop`, left: X0 + wm + 12, w: wd },
+                { text: `${count(m.mobile)} mobile`, left: X0 + 12, w: wm, ink: INK },
+                { text: `${count(m.desktop)} desktop`, left: X0 + wm + 12, w: wd, ink: PAPER },
               ].map((s) =>
                 s.w > 150 ? (
                   <div
                     key={s.text}
-                    style={{ position: "absolute", left: s.left, top: top + h(30) + h(MIX_H) / 2 - 13, ...label(20, PAPER), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR, opacity: ease(frame, m.at + 10, 10) }}
+                    style={{ position: "absolute", left: s.left, top: top + h(30) + h(MIX_H) / 2 - 13, ...label(20, s.ink), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR, opacity: ease(frame, m.at + 10, 10) }}
                   >
                     {s.text}
                   </div>

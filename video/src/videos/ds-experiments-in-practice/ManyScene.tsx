@@ -12,8 +12,8 @@ import { FAMILY, METRICS } from "./data";
 import { at, Axes, CONTROL, Curve, Drift, OK, OK_INK, PanelTitle, type Scale, TREAT, WARM, WARM_INK, X0 } from "./parts";
 
 const LEFT = { x0: 190, x1: 720, top: 420, base: 800 };
-const RIGHT = { x0: 930, x1: 1460, top: 420, base: 800 };
-const LEGEND_X = 1510;
+const RIGHT = { x0: 900, x1: 1370, top: 420, base: 800 };
+const LEGEND_X = 1420;
 
 /** log10, for the p-value axis. */
 const lg = (v: number) => Math.log10(v);
@@ -77,8 +77,8 @@ export const ManyScene: React.FC = () => {
   const leftDim = ease(frame, tenAt, 14) * 0.55;
 
   const legend = [
-    { color: INK, dash: "6 5", text: `under 0.05: ${METRICS.counts.raw} kept, ${METRICS.counts.rawFalse} false`, at: fiveAt + 4, ink: INK },
-    { color: WARM, dash: undefined, text: `Bonferroni, 0.05 ÷ ${m}: keeps ${METRICS.counts.bonferroni}`, at: keepsTwoAt, ink: WARM_INK },
+    { color: INK, dash: "6 5", text: `under 0.05: keeps ${METRICS.counts.raw}, ${METRICS.counts.rawFalse} false`, at: fiveAt + 4, ink: INK },
+    { color: WARM, dash: undefined, text: `Bonferroni (0.05 ÷ ${m}): keeps ${METRICS.counts.bonferroni}`, at: keepsTwoAt, ink: WARM_INK },
     { color: OK, dash: undefined, text: `Benjamini-Hochberg: keeps ${METRICS.counts.bh}`, at: keepsThreeAt, ink: OK_INK },
   ];
 
@@ -113,7 +113,7 @@ export const ManyScene: React.FC = () => {
             <circle cx={at(kx, 1)} cy={at(ky, FAMILY.p[0])} r={7 * ease(frame, twentyAt, 8)} fill={ACCENT} />
             <circle cx={at(kx, 20)} cy={at(ky, FAMILY.at20)} r={9 * ease(frame, sixtyAt, 8)} fill={ACCENT} />
           </svg>
-          <Note at={twentyAt + 2} x={at(kx, 1) + 14} y={at(ky, FAMILY.p[0]) - 40}>
+          <Note at={twentyAt + 2} x={at(kx, 1) + 16} y={at(ky, FAMILY.p[0]) - 6}>
             <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, ...TABULAR }}>5%</span>
           </Note>
           <Note at={sixtyAt} x={at(kx, 20) - 90} y={at(ky, FAMILY.at20) - 48}>
@@ -166,7 +166,7 @@ export const ManyScene: React.FC = () => {
               );
             })}
           </svg>
-          <Note at={realAt + 2} x={RIGHT.x0 + 10} y={y(RIGHT.base) - 46}>
+          <Note at={realAt + 2} x={RIGHT.x0 + 10} y={y(RIGHT.top) + 4}>
             <span style={{ ...label(20, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
               <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 7, background: TREAT, marginRight: 8 }} />
               really moved
@@ -183,7 +183,7 @@ export const ManyScene: React.FC = () => {
               <svg width={44} height={10} style={{ overflow: "visible", flexShrink: 0 }}>
                 <line x1={0} x2={44} y1={5} y2={5} stroke={l.color} strokeWidth={l.dash ? 2 : 3} strokeDasharray={l.dash} />
               </svg>
-              <span style={{ ...note(23, l.ink), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{l.text}</span>
+              <span style={{ ...note(22, l.ink), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{l.text}</span>
             </span>
           </Note>
         ))}

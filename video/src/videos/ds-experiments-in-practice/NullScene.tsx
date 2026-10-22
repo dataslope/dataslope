@@ -98,7 +98,7 @@ export const NullScene: React.FC = () => {
             </text>
           </g>
         </svg>
-        <Note at={halfAt + 6} x={at(x, NOSIG.worth) + 12} y={y(476)}>
+        <Note at={halfAt + 6} x={at(x, -NOSIG.worth)} y={y(470) - h(36)}>
           <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>± half a point: the smallest lift worth having</span>
         </Note>
 

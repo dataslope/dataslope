@@ -46,13 +46,17 @@ export const HookScene: React.FC = () => {
 
   const [a, b] = SRM.bad.observed;
   const ROWS = [
-    { key: "users", name: "Users per arm", value: `${count(a)} · ${count(b)}`, at: splitAt + 4, flag: sizeAt, note: "not the size you asked for" },
+    { key: "users", name: "Users per arm", value: "", at: splitAt, flag: sizeAt, note: "not the size you asked for" },
     { key: "lift", name: "Conversion lift", value: `+${NOVELTY.novelty[0].toFixed(1)}%`, at: wonAt - 2, flag: undefined, note: "" },
     { key: "week", name: "Data from", value: "week 1", at: readoutAt + 8, flag: weekAt, note: "only week one" },
     { key: "metric", name: "Metric", value: "best of 10", at: readoutAt + 12, flag: bestAt, note: "the best of ten metrics" },
   ];
 
-  const cardP = ease(frame, readoutAt - 4, 14);
+  const cardP = ease(frame, startAt + 4, 14);
+  // The live count climbs to the page's split while the split is described.
+  const climb = ease(frame, splitAt, Math.max(30, readoutAt - splitAt));
+  const users = `${count(Math.round((a * climb) / 10) * 10)} · ${count(Math.round((b * climb) / 10) * 10)}`;
+  const live = 0.45 + 0.55 * Math.abs(Math.sin(frame / 9));
   const look = pulse(frame, closerAt, 22);
   const stamp = pop(frame, shipAt, fps, 12);
   const stampStrike = ease(frame, nothingAt + 2, 12);
@@ -94,6 +98,10 @@ export const HookScene: React.FC = () => {
         >
           <div style={{ height: HEAD_H, display: "flex", alignItems: "center", padding: "0 24px", borderBottom: `1px solid ${HAIRLINE}` }}>
             <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>New checkout · A/B test readout</span>
+            <span style={{ marginLeft: 18, display: "inline-flex", alignItems: "center", gap: 8, ...label(20, OK_INK), fontWeight: 700 }}>
+              <span style={{ width: 10, height: 10, borderRadius: 5, background: OK, opacity: live }} />
+              live
+            </span>
           </div>
           {ROWS.map((r, i) => {
             const p = ease(frame, r.at, 10);
@@ -126,7 +134,7 @@ export const HookScene: React.FC = () => {
                     ...TABULAR,
                   }}
                 >
-                  {r.value}
+                  {r.key === "users" ? users : r.value}
                   {r.key === "lift" ? (
                     <span
                       style={{
