@@ -8,7 +8,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CHURN, EXCL, pct } from "./data";
-import { DATA, DATA_LIGHT, DieFace, Drift, Given, lerp, math, Strike, Svg, V, X0 } from "./parts";
+import { Clear, DATA, DATA_LIGHT, DieFace, Drift, Given, lerp, Mark, math, Strike, Svg, V, X0 } from "./parts";
 
 const BARS = { top: 360, height: 420, w: 230, xs: [1010, 1370] };
 const DISC = { y: 560, r: 150, xs: [300, 640] };
@@ -49,6 +49,8 @@ export const IndepScene: React.FC = () => {
   const dropsAt = n.word("excl-die", "drops the second");
   const toZeroAt = n.word("excl-die", "to zero");
   const farAt = n.word("excl-die", "as far from independent");
+  const bridgeAt = n.word("expect-in", "the two numbers");
+  const clearAt = n.word("expect-in", "random variable");
   const end = n.beat("expect-in").to;
 
   const out4 = q5At - 4;
@@ -81,9 +83,6 @@ export const IndepScene: React.FC = () => {
       <Drift from={from} to={end + 40}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} out={out4} size={60}>
           What does it mean for two events to be independent?
-        </QuestionCard>
-        <QuestionCard n={5} at={q5At} textAt={q5TextAt - 2} size={60}>
-          How is that different from mutually exclusive?
         </QuestionCard>
 
         {/* ── Question 4 ── */}
@@ -169,70 +168,77 @@ export const IndepScene: React.FC = () => {
           </Note>
         ))}
 
-        {/* ── Question 5: can't happen together ── */}
-        <Svg opacity={ease(frame, cantAt - 6, 14)}>
-          {DISC.xs.map((x, i) => {
-            // The discs start overlapping and move apart as "can't happen together" is said.
-            const cx = lerp((DISC.xs[0] + DISC.xs[1]) / 2 + (i === 0 ? -90 : 90), x, disjoint);
-            const lit = i === 0 ? oneLit : 0;
-            return (
-              <circle
-                key={x}
-                cx={cx}
-                cy={y(DISC.y)}
-                r={DISC.r}
-                fill={`color-mix(in srgb, ${HIGHLIGHT} ${lit * 100}%, color-mix(in srgb, ${DATA} 12%, ${PAPER}))`}
-                stroke={i === 1 ? `color-mix(in srgb, ${INK_SOFT} ${twoGone * 100}%, ${DATA})` : DATA}
-                strokeWidth={2.5}
-                opacity={i === 1 ? 1 - 0.55 * twoGone : 1}
-              />
-            );
-          })}
-        </Svg>
-        {DISC.xs.map((x, i) => (
-          <DieFace
-            key={x}
-            value={i + 1}
-            x={x - 55}
-            y={y(DISC.y) - 55}
-            size={110}
-            at={cantAt + 8 + i * 4}
-            opacity={i === 1 ? 1 - 0.6 * twoGone : 1}
-            ink={i === 1 && twoGone > 0.5 ? INK_SOFT : INK}
-          />
-        ))}
-        <Note at={zeroAt} x={1040} y={y(380)}>
-          <span style={math(46)}>
-            <P>
-              <V>A</V> and <V>B</V>
-            </P>{" "}
-            = 0
-          </span>
-        </Note>
-        <Note at={dropsAt} x={1040} y={y(500)}>
-          <span style={math(42)}>
-            <P>two</P> = <Strike at={toZeroAt}>{EXCL.pTwo}</Strike>
-          </span>
-        </Note>
-        <Note at={toZeroAt - 2} x={1040} y={y(570)}>
-          <span style={math(42, ACCENT_INK)}>
-            <P>
-              two
-              <Given />
-              one
-            </P>{" "}
-            = {EXCL.pTwoGivenOne}
-          </span>
-        </Note>
-        <Note at={farAt} x={1040} y={y(670)}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>as far from independent as it gets</span>
-        </Note>
-        <Svg opacity={ease(frame, twoAt + 6, 10)}>
-          <g stroke={ACCENT} strokeWidth={6} strokeLinecap="round">
-            <line x1={DISC.xs[1] - 70} y1={y(DISC.y) - 70} x2={DISC.xs[1] + 70} y2={y(DISC.y) + 70} />
-            <line x1={DISC.xs[1] + 70} y1={y(DISC.y) - 70} x2={DISC.xs[1] - 70} y2={y(DISC.y) + 70} />
-          </g>
-        </Svg>
+        {/* ── Question 5: can't happen together, cleared on the bridge ── */}
+        <Clear at={clearAt}>
+          <QuestionCard n={5} at={q5At} textAt={q5TextAt - 2} size={60}>
+            How is that different from mutually exclusive?
+          </QuestionCard>
+          <Svg opacity={ease(frame, cantAt - 6, 14)}>
+            {DISC.xs.map((x, i) => {
+              // The discs start overlapping and move apart as "can't happen together" is said.
+              const cx = lerp((DISC.xs[0] + DISC.xs[1]) / 2 + (i === 0 ? -90 : 90), x, disjoint);
+              const lit = i === 0 ? oneLit : 0;
+              return (
+                <circle
+                  key={x}
+                  cx={cx}
+                  cy={y(DISC.y)}
+                  r={DISC.r}
+                  fill={`color-mix(in srgb, ${HIGHLIGHT} ${lit * 100}%, color-mix(in srgb, ${DATA} 12%, ${PAPER}))`}
+                  stroke={i === 1 ? `color-mix(in srgb, ${INK_SOFT} ${twoGone * 100}%, ${DATA})` : DATA}
+                  strokeWidth={2.5}
+                  opacity={i === 1 ? 1 - 0.55 * twoGone : 1}
+                />
+              );
+            })}
+          </Svg>
+          {DISC.xs.map((x, i) => (
+            <DieFace
+              key={x}
+              value={i + 1}
+              x={x - 55}
+              y={y(DISC.y) - 55}
+              size={110}
+              at={cantAt + 8 + i * 4}
+              opacity={i === 1 ? 1 - 0.6 * twoGone : 1}
+              ink={i === 1 && twoGone > 0.5 ? INK_SOFT : INK}
+            />
+          ))}
+          <Note at={zeroAt} x={1040} y={y(380)}>
+            <span style={math(46)}>
+              <P>
+                <V>A</V> and <V>B</V>
+              </P>{" "}
+              = 0
+            </span>
+          </Note>
+          <Note at={dropsAt} x={1040} y={y(500)}>
+            <span style={math(42)}>
+              <P>two</P> = <Strike at={toZeroAt}>{EXCL.pTwo}</Strike>
+            </span>
+          </Note>
+          <Note at={toZeroAt - 2} x={1040} y={y(570)}>
+            <span style={math(42, ACCENT_INK)}>
+              <P>
+                two
+                <Given />
+                one
+              </P>{" "}
+              = {EXCL.pTwoGivenOne}
+            </span>
+          </Note>
+          <Note at={farAt} x={1040} y={y(670)}>
+            <span style={{ ...note(30, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+              <Mark at={bridgeAt}>as far from independent as it gets</Mark>
+            </span>
+          </Note>
+          <Svg opacity={ease(frame, twoAt + 6, 10)}>
+            <g stroke={ACCENT} strokeWidth={6} strokeLinecap="round">
+              <line x1={DISC.xs[1] - 70} y1={y(DISC.y) - 70} x2={DISC.xs[1] + 70} y2={y(DISC.y) + 70} />
+              <line x1={DISC.xs[1] + 70} y1={y(DISC.y) - 70} x2={DISC.xs[1] - 70} y2={y(DISC.y) + 70} />
+            </g>
+          </Svg>
+        </Clear>
       </Drift>
     </AbsoluteFill>
   );

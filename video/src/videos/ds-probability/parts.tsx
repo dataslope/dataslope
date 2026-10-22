@@ -108,6 +108,15 @@ export const Frac: React.FC<{ top: React.ReactNode; bottom: React.ReactNode; gap
   </span>
 );
 
+/** Everything inside fades off the page from `at`: a bridge clearing a
+ *  finished figure on its last words, so the cut lands on an empty page. */
+export const Clear: React.FC<{ at: number; children: React.ReactNode }> = ({ at: from, children }) => {
+  const frame = useCurrentFrame();
+  const o = ease(frame, from, 14);
+  if (o >= 1) return null;
+  return <div style={{ position: "absolute", inset: 0, opacity: 1 - o, transform: `translateY(${-o * 8}px)` }}>{children}</div>;
+};
+
 // ── A die face ───────────────────────────────────────────────────────────────
 
 const PIPS: Record<number, [number, number][]> = {

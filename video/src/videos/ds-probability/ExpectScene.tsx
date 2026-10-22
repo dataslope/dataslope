@@ -8,7 +8,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DIE, HATS, pct } from "./data";
-import { DATA, DATA_LIGHT, DieFace, Drift, Frac, Mark, math, OK, OK_INK, Person, pulse, Svg, V, X0 } from "./parts";
+import { Clear, DATA, DATA_LIGHT, DieFace, Drift, Frac, Mark, math, OK, OK_INK, Person, pulse, Svg, V, X0 } from "./parts";
 
 const BEAM = { x0: 170, pitch: 150, y: 540, face: 92 };
 const SQ = { x0: 1150, pitch: 108, w: 72, base: 780, unit: 46 };
@@ -54,6 +54,8 @@ export const ExpectScene: React.FC = () => {
   const shufflesAt = n.word("linear-hats", "A hundred thousand shuffles");
   const varAt = n.word("linear-var", "Variance only adds up");
   const uncorrAt = n.word("linear-var", "uncorrelated");
+  const nowAt = n.word("dist-in", "Now");
+  const nameAt = n.word("dist-in", "asked to name");
   const end = n.beat("dist-in").to;
 
   const out6 = q7At - 4;
@@ -78,9 +80,6 @@ export const ExpectScene: React.FC = () => {
       <Drift from={from} to={end + 40}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={out6} size={60}>
           Define expectation and variance.
-        </QuestionCard>
-        <QuestionCard n={7} at={q7At} textAt={q7TextAt - 2} size={60}>
-          What is linearity of expectation, and why is it so useful?
         </QuestionCard>
 
         {/* ── Question 6: the die on a beam ── */}
@@ -173,106 +172,113 @@ export const ExpectScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* ── Question 7: linearity, and ten hats ── */}
-        <Ink at={sumAt} dur={18} style={{ left: X0, top: y(320) }}>
-          <span style={math(54)}>
-            <E>
-              <V>X</V> + <V>Y</V>
-            </E>{" "}
-            ={" "}
-            <E>
-              <V>X</V>
-            </E>{" "}
-            +{" "}
-            <E>
-              <V>Y</V>
-            </E>
-          </span>
-        </Ink>
-        <Note at={evenWhenAt} x={X0 + 640} y={y(334)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>even when the parts depend on each other</span>
-        </Note>
+        {/* ── Question 7: linearity, and ten hats, cleared on the bridge ── */}
+        <Clear at={nameAt}>
+          <QuestionCard n={7} at={q7At} textAt={q7TextAt - 2} size={60}>
+            What is linearity of expectation, and why is it so useful?
+          </QuestionCard>
+          <Ink at={sumAt} dur={18} style={{ left: X0, top: y(320) }}>
+            <span style={math(54)}>
+              <E>
+                <V>X</V> + <V>Y</V>
+              </E>{" "}
+              ={" "}
+              <E>
+                <V>X</V>
+              </E>{" "}
+              +{" "}
+              <E>
+                <V>Y</V>
+              </E>
+            </span>
+          </Ink>
+          <Note at={evenWhenAt} x={X0 + 640} y={y(334)}>
+            <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>even when the parts depend on each other</span>
+          </Note>
 
-        <Svg opacity={ease(frame, tenAt - 4, 12)}>
-          {SHUFFLE.map((hat, i) => {
-            const x = HATS_ROW.x0 + i * HATS_ROW.pitch;
-            const py = y(HATS_ROW.y);
-            const drop = ease(frame, randomAt + i * 2, 12);
-            const match = hat === i;
-            const ring = match ? ease(frame, ownAt, 12) : 0;
-            return (
-              <g key={i}>
-                {ring > 0 ? <circle cx={x} cy={py - 6} r={44} fill="none" stroke={OK} strokeWidth={4} opacity={ring} /> : null}
-                <Person x={x} y={py} size={64} color={DATA} />
-                <g transform={`translate(${x},${py - 48 - (1 - drop) * 60})`} opacity={drop}>
-                  <rect x={-22} y={-18} width={44} height={22} rx={5} fill={match && ring > 0.5 ? OK : PAPER} stroke={INK} strokeWidth={2} />
-                  <rect x={-30} y={2} width={60} height={6} rx={3} fill={INK} />
-                  <text x={0} y={-1} textAnchor="middle" style={{ ...label(15, match && ring > 0.5 ? PAPER : INK), fontWeight: 700 }}>
-                    {hat + 1}
+          <Svg opacity={ease(frame, tenAt - 4, 12)}>
+            {SHUFFLE.map((hat, i) => {
+              const x = HATS_ROW.x0 + i * HATS_ROW.pitch;
+              const py = y(HATS_ROW.y);
+              const drop = ease(frame, randomAt + i * 2, 12);
+              const match = hat === i;
+              const ring = match ? ease(frame, ownAt, 12) : 0;
+              return (
+                <g key={i}>
+                  {ring > 0 ? <circle cx={x} cy={py - 6} r={44} fill="none" stroke={OK} strokeWidth={4} opacity={ring} /> : null}
+                  <Person x={x} y={py} size={64} color={DATA} />
+                  <g transform={`translate(${x},${py - 48 - (1 - drop) * 60})`} opacity={drop}>
+                    <rect x={-22} y={-18} width={44} height={22} rx={5} fill={match && ring > 0.5 ? OK : PAPER} stroke={INK} strokeWidth={2} />
+                    <rect x={-30} y={2} width={60} height={6} rx={3} fill={INK} />
+                    <text x={0} y={-1} textAnchor="middle" style={{ ...label(15, match && ring > 0.5 ? PAPER : INK), fontWeight: 700 }}>
+                      {hat + 1}
+                    </text>
+                  </g>
+                  <text x={x} y={py + 50} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 700 }}>
+                    {i + 1}
                   </text>
                 </g>
-                <text x={x} y={py + 50} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 700 }}>
-                  {i + 1}
-                </text>
-              </g>
-            );
-          })}
-        </Svg>
-        {SHUFFLE.map((_, i) => (
-          <Note key={i} at={chanceAt + i} x={HATS_ROW.x0 + i * HATS_ROW.pitch - 40} width={80} y={y(HATS_ROW.y) + 70} from="up" style={{ textAlign: "center" }}>
-            <span style={{ ...math(28, INK) }}>
-              <Frac top="1" bottom="10" gap={2} />
+              );
+            })}
+          </Svg>
+          {SHUFFLE.map((_, i) => (
+            <Note key={i} at={chanceAt + i} x={HATS_ROW.x0 + i * HATS_ROW.pitch - 40} width={80} y={y(HATS_ROW.y) + 70} from="up" style={{ textAlign: "center" }}>
+              <span style={{ ...math(28, INK) }}>
+                <Frac top="1" bottom="10" gap={2} />
+              </span>
+            </Note>
+          ))}
+          <Note at={oneAt} x={X0} y={y(HATS_ROW.y + 175)}>
+            <span style={{ ...math(40, OK_INK) }}>
+              <Mark at={nowAt + 2}>10 × 1/10 = 1 match, on average</Mark>
             </span>
           </Note>
-        ))}
-        <Note at={oneAt} x={X0} y={y(HATS_ROW.y + 175)}>
-          <span style={{ ...math(40, OK_INK) }}>10 × 1/10 = 1 match, on average</span>
-        </Note>
 
-        {/* The video's own 100,000 shuffles. */}
-        <Svg opacity={ease(frame, shufflesAt, 12)}>
-          {HATS.share.map((s, k) => {
-            const p = ease(frame, shufflesAt + 2 + k * 2, 14);
-            const hh = h(s * HIST.unit) * p;
-            return <rect key={k} x={HIST.x0 + k * HIST.pitch} y={y(HIST.base) - hh} width={HIST.w} height={hh} rx={3} fill={DATA} opacity={0.85} />;
-          })}
-          <line x1={HIST.x0 - 16} x2={HIST.x0 + 5 * HIST.pitch + HIST.w + 16} y1={y(HIST.base)} y2={y(HIST.base)} stroke={INK} strokeWidth={1.6} />
-          <line
-            x1={HIST.x0 + HATS.mean * HIST.pitch + HIST.w / 2}
-            x2={HIST.x0 + HATS.mean * HIST.pitch + HIST.w / 2}
-            y1={y(HIST.base) + 4}
-            y2={y(HIST.base) - h(0.47 * HIST.unit) * ease(frame, shufflesAt + 14, 16)}
-            stroke={OK}
-            strokeWidth={3.5}
-          />
-        </Svg>
-        {HATS.share.map((s, k) => (
-          <React.Fragment key={k}>
-            <Note at={shufflesAt + 4 + k * 2} x={HIST.x0 + k * HIST.pitch} width={HIST.w} y={y(HIST.base) + 10} from="up" style={{ textAlign: "center" }}>
-              <span style={{ ...label(22, INK_SOFT), ...TABULAR }}>{k}</span>
-            </Note>
-            {s > 0.05 ? (
-              <Note at={shufflesAt + 10 + k * 2} x={HIST.x0 + k * HIST.pitch - 20} width={HIST.w + 40} y={y(HIST.base) - h(s * HIST.unit) - 32} from="up" style={{ textAlign: "center" }}>
-                <span style={{ ...label(20, INK), ...TABULAR }}>{pct(s)}</span>
+          {/* The video's own 100,000 shuffles. */}
+          <Svg opacity={ease(frame, shufflesAt, 12)}>
+            {HATS.share.map((s, k) => {
+              const p = ease(frame, shufflesAt + 2 + k * 2, 14);
+              const hh = h(s * HIST.unit) * p;
+              return <rect key={k} x={HIST.x0 + k * HIST.pitch} y={y(HIST.base) - hh} width={HIST.w} height={hh} rx={3} fill={DATA} opacity={0.85} />;
+            })}
+            <line x1={HIST.x0 - 16} x2={HIST.x0 + 5 * HIST.pitch + HIST.w + 16} y1={y(HIST.base)} y2={y(HIST.base)} stroke={INK} strokeWidth={1.6} />
+            <line
+              x1={HIST.x0 + HATS.mean * HIST.pitch + HIST.w / 2}
+              x2={HIST.x0 + HATS.mean * HIST.pitch + HIST.w / 2}
+              y1={y(HIST.base) + 4}
+              y2={y(HIST.base) - h(0.47 * HIST.unit) * ease(frame, shufflesAt + 14, 16)}
+              stroke={OK}
+              strokeWidth={3.5}
+            />
+          </Svg>
+          {HATS.share.map((s, k) => (
+            <React.Fragment key={k}>
+              <Note at={shufflesAt + 4 + k * 2} x={HIST.x0 + k * HIST.pitch} width={HIST.w} y={y(HIST.base) + 10} from="up" style={{ textAlign: "center" }}>
+                <span style={{ ...label(22, INK_SOFT), ...TABULAR }}>{k}</span>
               </Note>
-            ) : null}
-          </React.Fragment>
-        ))}
-        <Note at={shufflesAt + 2} x={HIST.x0 - 16} y={y(HIST.base) + 46}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>matches in a shuffle</span>
-        </Note>
-        <Note at={shufflesAt + 18} x={HIST.x0 + HATS.mean * HIST.pitch + HIST.w / 2 + 14} y={y(HIST.base) - h(0.47 * HIST.unit) - 4}>
-          <span style={{ ...label(23, OK_INK), ...TABULAR, whiteSpace: "nowrap" }}>average {HATS.mean}</span>
-        </Note>
+              {s > 0.05 ? (
+                <Note at={shufflesAt + 10 + k * 2} x={HIST.x0 + k * HIST.pitch - 20} width={HIST.w + 40} y={y(HIST.base) - h(s * HIST.unit) - 32} from="up" style={{ textAlign: "center" }}>
+                  <span style={{ ...label(20, INK), ...TABULAR }}>{pct(s)}</span>
+                </Note>
+              ) : null}
+            </React.Fragment>
+          ))}
+          <Note at={shufflesAt + 2} x={HIST.x0 - 16} y={y(HIST.base) + 46}>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>matches in a shuffle</span>
+          </Note>
+          <Note at={shufflesAt + 18} x={HIST.x0 + HATS.mean * HIST.pitch + HIST.w / 2 + 14} y={y(HIST.base) - h(0.47 * HIST.unit) - 4}>
+            <span style={{ ...label(23, OK_INK), ...TABULAR, whiteSpace: "nowrap" }}>average {HATS.mean}</span>
+          </Note>
 
-        <Note at={varAt} x={X0} y={y(HATS_ROW.y + 250)}>
-          <span style={{ ...math(32, INK) }}>
-            Var(<V>X</V> + <V>Y</V>) = Var(<V>X</V>) + Var(<V>Y</V>)
-          </span>
-          <span style={{ ...note(26, INK), fontWeight: 600, marginLeft: 16, whiteSpace: "nowrap" }}>
-            only when <Mark at={uncorrAt}>uncorrelated</Mark>
-          </span>
-        </Note>
+          <Note at={varAt} x={X0} y={y(HATS_ROW.y + 250)}>
+            <span style={{ ...math(32, INK) }}>
+              Var(<V>X</V> + <V>Y</V>) = Var(<V>X</V>) + Var(<V>Y</V>)
+            </span>
+            <span style={{ ...note(26, INK), fontWeight: 600, marginLeft: 16, whiteSpace: "nowrap" }}>
+              only when <Mark at={uncorrAt}>uncorrelated</Mark>
+            </span>
+          </Note>
+        </Clear>
       </Drift>
     </AbsoluteFill>
   );
