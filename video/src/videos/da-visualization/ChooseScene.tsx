@@ -60,7 +60,7 @@ const Glyph: React.FC<{ kind: string; x: number; y: number; p: number }> = ({ ki
 /**
  * Question 1. Five kinds of question down the left, each meeting its chart
  * as it is named; then the encoding ranking the choice rests on, from
- * position (1.0) to colour (3.0), the error each carries relative to position.
+ * position (1.0) to color (3.0), the error each carries relative to position.
  */
 export const ChooseScene: React.FC = () => {
   const frame = useCurrentFrame();

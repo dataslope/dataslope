@@ -9,7 +9,7 @@
 // imported; where a spec keeps its data private, the same inputs are restated
 // here with the same seeds and the same generator, so the video draws what
 // the page draws. Everything the narration quotes (ratios, percentages, the
-// correlation) is computed below, not typed. The colour-blind matrix is the
+// correlation) is computed below, not typed. The colorblind matrix is the
 // one the page's colorblind-safe chart applies, composed into one linear map.
 /* global console, URL */
 import { writeFileSync } from "node:fs";
@@ -253,7 +253,7 @@ out.cherry = {
 // The page's Viénot, Brettel & Mollon deuteranope transform is linear in
 // linear RGB, so it composes into one 3x3 matrix: the columns are the images
 // of pure linear red, green and blue. An SVG feColorMatrix applies it in
-// linear RGB, on the brand colours, without a single hex value in a scene.
+// linear RGB, on the brand colors, without a single hex value in a scene.
 {
   const map = ([r, g, b]) => {
     const L = 17.8824 * r + 43.5161 * g + 4.11935 * b;

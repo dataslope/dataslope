@@ -65,12 +65,12 @@ const Swatch: React.FC<{ color: string }> = ({ color }) => (
 /**
  * Questions 15, 16 and 17. The three palette families, each on a strip (the
  * page's ticket channels in four hues, one blue from light to dark, orange
- * and blue meeting at a neutral gray), and one series in colour over three
- * in gray. Ten groups on the eight-colour palette this video uses, where the
- * ninth and tenth come round to the first two colours, then the tail folded
+ * and blue meeting at a neutral gray), and one series in color over three
+ * in gray. Ten groups on the eight-color palette this video uses, where the
+ * ninth and tenth come round to the first two colors, then the tail folded
  * into "other" and the same channels as small panels. Last, two lines in red
  * and green, then the same two through the page's deuteranope simulation
- * (an SVG colour matrix computed in check.mjs), then labelled and in gray.
+ * (an SVG color matrix computed in check.mjs), then labelled and in gray.
  */
 export const PaletteScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -112,7 +112,7 @@ export const PaletteScene: React.FC = () => {
   const familyAt = [catAt, seqAt, divAt];
   const center = pulse(frame, centerAt, 30);
 
-  // Question 15's accent chart: the page's four channels, one in colour.
+  // Question 15's accent chart: the page's four channels, one in color.
   const accTop = y(ACC.top);
   const accBase = y(ACC.base);
   const [mobile, , , retail] = PARTS.channels;
@@ -403,7 +403,7 @@ export const PaletteScene: React.FC = () => {
         </Verdict>
 
         <PanelTitle x={PANELS[2].x0} y={pTop - h(56)} at={cueAt - 4}>
-          Labelled, then in grayscale
+          With labels, in grayscale
         </PanelTitle>
         <div style={{ position: "absolute", inset: 0, filter: `grayscale(${gray})` }}>
           {lines(PANELS[2], cueAt - 2)}

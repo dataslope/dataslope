@@ -10,7 +10,7 @@ export const VIDEO = "da-visualization";
  * Whether public/images/da-visualization/ holds the watercolor from
  * illustrations.json. Every frame is laid out with room for it either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 const R = results;
 
@@ -53,7 +53,7 @@ export const DASHBOARD = R.dashboard;
 export const STORY = R.story;
 export const ANNOTATION = R.annotation;
 
-/** 17. The page's deuteranope simulation as one linear-RGB colour matrix. */
+/** 17. The page's deuteranope simulation as one linear-RGB color matrix. */
 export const DEUTERANOPE = R.deuteranope.matrix.join(" ");
 
 /** The quick ones. */

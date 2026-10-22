@@ -32,7 +32,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *
  * Facts. Every number is the page's own chart data, computed by check.mjs into
  * results.json, which data.ts reads:
- *   - the encoding ranking: colour about 3 times the error of position.
+ *   - the encoding ranking: color about 3 times the error of position.
  *   - five shares, 31, 24, 22.5, 14 and 8.5 percent: S U V and truck 1.5
  *     points apart.
  *   - 420 tickets: by channel, Email 149 down to Social 41; by hours to

@@ -55,7 +55,7 @@ export type BarSetProps = {
   labelSize?: number;
   out?: number;
   dim?: number;
-  /** A paper-coloured edge round each bar, so touching bars stay countable. */
+  /** A paper-colored edge round each bar, so touching bars stay countable. */
   edge?: boolean;
 };
 
@@ -297,7 +297,7 @@ export const Pie: React.FC<{
 };
 
 /**
- * A version's verdict, in the series' colours: a green tick for the chart
+ * A version's verdict, in the series' colors: a green tick for the chart
  * that answers the question, a red cross for the one that misleads, with a
  * few words beside it.
  */
