@@ -5,6 +5,7 @@ import "./theme/fonts";
 import { narratedMetadata } from "./narration/metadata";
 import { EDITORIAL_DEFAULTS, type EditorialProps } from "./editorial/Page";
 import { ErdKit } from "./editorial/ErdKit";
+import { InterviewKit } from "./editorial/interview";
 // Database Design with PostgreSQL, one video per unit.
 import { DbWhyDesign } from "./videos/db-why-design/Video";
 import { script as dbWhyDesignScript } from "./videos/db-why-design/script";
@@ -24,6 +25,9 @@ import { DbDesigningSchemas } from "./videos/db-designing-schemas/Video";
 import { script as dbDesigningSchemasScript } from "./videos/db-designing-schemas/script";
 import { DbRelationalHistory } from "./videos/db-relational-history/Video";
 import { script as dbRelationalHistoryScript } from "./videos/db-relational-history/script";
+// Interview prep, Data Analyst: one video per topic page.
+import { DaSql } from "./videos/da-sql/Video";
+import { script as daSqlScript } from "./videos/da-sql/script";
 import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
 import { ListVsSet } from "./videos/list-vs-set/Video";
@@ -506,9 +510,23 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(dbRelationalHistoryScript)}
       />
     </Folder>
+    <Folder name="Interview-Data-Analyst">
+      <Composition
+        id="DataAnalyst-1-Sql"
+        component={DaSql}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daSqlScript)}
+      />
+    </Folder>
     <Folder name="Assets">
       {/* The ERD kit (editorial/erd.tsx) on one page, for review. */}
       <Composition id="ErdKit" component={ErdKit} width={1920} height={1080} fps={FPS} durationInFrames={150} />
+      {/* The interview kit (editorial/interview.tsx): a question card and a rapid-fire list. */}
+      <Composition id="InterviewKit" component={InterviewKit} width={1920} height={1080} fps={FPS} durationInFrames={150} />
     </Folder>
   </>
 );

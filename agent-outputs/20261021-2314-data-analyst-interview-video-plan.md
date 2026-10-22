@@ -55,7 +55,7 @@ Every video stays under the 9,500-character cap the Statistics course set for a 
 
 From `index.mdx`: what the loop looks like (a live SQL screen or a take-home, a few spreadsheet and statistics questions, a "how would you analyze X?" discussion), the four things interviewers probe (SQL fluency, aggregation and framing, communication, tools), what AI has changed (checking beats writing, responsible use, BI tools that answer in plain language, rounds with and without AI allowed), and how the series works: deep dives, then a rapid-fire round, with practice on each page.
 
-### 1. SQL (24 questions, ~10 min)
+### 1. SQL (24 questions, ~10 min; built at 7:57)
 
 **Deep dives**
 1. `WHERE` against `HAVING`, and the order a query actually runs in (2 questions)
@@ -206,6 +206,14 @@ The process is the course videos' (`video/README.md`, and "Making each video" in
 ## Pilot
 
 **Video 1, SQL, first.** It is the round nearly every loop has, it draws on two existing videos, and its facts are all DuckDB queries, so it exercises the interview kit, the rapid-fire round and the DuckDB `check.mjs` together. Review its frames and timeline the way the October review did before building the other eight.
+
+**Built (2026-10-22):** `DataAnalyst-1-Sql`, 7:57, voiced by Drew in four takes (6,148 characters), in `video/src/videos/da-sql/`. It came in under the ~10 min estimate because the rapid-fire round runs at about 7 s a question. What the pilot settled for the series:
+
+- **The scenes draw their own figures** in the editorial kit rather than embedding LeftJoinTrap and SqlNullTrap: the trap and NULL questions are two scenes each in the same tables and colors as the rest of the video. Those videos stay as they are.
+- **Questions are numbered, figures are not.** The kicker says "Question 5"; a figure is titled by its table names. A "Fig. 3" beside a "Question 5" would be two counters for one thing.
+- **One meaning per color, for every role:** red is the trap, the wrong answer or the error; green is the right answer; yellow is what the narration points at; blue is data. Written down in `video/src/editorial/interview.tsx`.
+- **A table arrives as the question finishes being read**, not on the first word that names it, so no scene sits on its question alone for more than a breath.
+- **The rapid-fire round is one scene**: a numbered list down the left, ticked as it goes, and each answer on the right. Two questions that share a figure (clustered indexes, then indexes and writes) hold one figure across both rather than cross-fading it into a copy of itself.
 
 ## Decisions
 
