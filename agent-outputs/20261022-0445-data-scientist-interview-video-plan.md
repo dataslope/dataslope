@@ -243,7 +243,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** a heron.
 
-### 7. Experimentation II: experiments in practice (14 questions, ~6.5 min)
+### 7. Experimentation II: experiments in practice (14 questions, ~6.5 min; built at 7:23)
 
 **Deep dives**
 1. Sample ratio mismatch: a 50/50 split that comes back lopsided, and the chi-square test that says whether chance explains it
