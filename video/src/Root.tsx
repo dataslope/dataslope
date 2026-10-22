@@ -40,6 +40,8 @@ import { DaAiAssisted } from "./videos/da-ai-assisted/Video";
 import { script as daAiAssistedScript } from "./videos/da-ai-assisted/script";
 import { DaAbTesting } from "./videos/da-ab-testing/Video";
 import { script as daAbTestingScript } from "./videos/da-ab-testing/script";
+import { DaVisualization } from "./videos/da-visualization/Video";
+import { script as daVisualizationScript } from "./videos/da-visualization/script";
 import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
 import { ListVsSet } from "./videos/list-vs-set/Video";
@@ -592,6 +594,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(daAbTestingScript)}
+      />
+      <Composition
+        id="DataAnalyst-6-Visualization"
+        component={DaVisualization}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daVisualizationScript)}
       />
     </Folder>
     <Folder name="Assets">
