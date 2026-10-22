@@ -7,7 +7,7 @@ import results from "./results.json" with { type: "json" };
 export const VIDEO = "ds-ml-models";
 
 /** The raccoon is imported (illustrations.json → public/images/ds-ml-models). */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type Grid = { grid: string[]; test: number };
 

@@ -98,7 +98,7 @@ export const HookScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>on the {MOONS.nTest} points they haven&apos;t seen</span>
         </Note>
 
-        <Spot id="ds-ml-models-raccoon" at={from + 6} left={1500} top={y(300)} width={360} height={360} />
+        <Spot id="ds-ml-models-raccoon" at={from + 6} left={1548} top={y(336)} width={340} height={266} />
 
         {/* ── The round, in one line ── */}
         <Note at={fifteenAt - 2} x={X0} y={y(800)} dim={lineAt}>
