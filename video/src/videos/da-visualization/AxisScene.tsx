@@ -19,7 +19,7 @@ const TOP = 430;
  * zero, nearly equal and honest, then from 94, where the top bar stands 50
  * times as tall as the bottom one. Then a year of scores on an axis from 92:
  * as bars a 3.6% rise draws the last bar 2.55 times as tall as the first; as
- * a line it is a slope, which is fine, with the axis labelled.
+ * a line it is a slope, which is fine, with the axis labeled.
  */
 export const AxisScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -40,7 +40,6 @@ export const AxisScene: React.FC = () => {
   const q7TextAt = n.word("baseline", "So is a non-zero baseline");
   const barsRuleAt = n.word("baseline", "That rule is for bars");
   const positionAt = n.word("baseline", "by position, not length");
-  const zoomAt = n.word("baseline", "zooming in is fine");
   const yearAt = n.word("baseline-show", "a year of scores");
   const asBarsAt = n.word("baseline-show", "As bars");
   const tallAt = n.word("baseline-show", "two and a half times as tall");
@@ -137,8 +136,8 @@ export const AxisScene: React.FC = () => {
         <Verdict ok x={RIGHT.x0} y={base + h(50)} at={asLineAt + 10}>
           a slope you can read
         </Verdict>
-        <Note at={zoomAt} x={RIGHT.x0} y={base + h(96)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>axis from {B.floor}: zoomed in, and labelled</span>
+        <Note at={asLineAt + 16} x={RIGHT.x0} y={base + h(96)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>axis from {B.floor}: zoomed in, and labeled</span>
         </Note>
         <Note at={labelAt - 2} x={LEFT.x0} y={base + h(96)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>either way, label the axis</span>

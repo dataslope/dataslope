@@ -151,11 +151,11 @@ export const LineSet: React.FC<{
     } else run.push([xAt(i), yOf(v, lo, hi, base, top)]);
   });
   if (run.length) runs.push(run);
-  const reach = x0 + (x1 - x0) * p;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: (1 - o) * (1 - d) }}>
       {axis ? <line x1={x0} x2={x0 + (x1 - x0) * ease(frame, from, 14)} y1={base + 0.5} y2={base + 0.5} stroke={INK} strokeWidth={1.6} /> : null}
-      <g style={{ clipPath: `inset(-40px ${1920 - reach}px -40px 0px)` }}>
+      {/* A basic shape on an SVG group is measured against the group's own box. */}
+      <g style={{ clipPath: `inset(-40px ${(1 - p) * 100}% -40px 0px)` }}>
         {runs.map((r, k) => (
           <path key={k} d={r.map(([x, y], i) => `${i ? "L" : "M"}${x},${y}`).join(" ")} fill="none" stroke={color} strokeWidth={width} strokeLinejoin="round" strokeLinecap="round" />
         ))}
@@ -186,7 +186,9 @@ export const YTicks: React.FC<{
   out?: number;
   grid?: boolean;
   color?: string;
-}> = ({ ticks, x, x1, base, top, lo, hi, at: from, format = String, out, grid = false, color = INK_SOFT }) => {
+  /** Which side of `x` the numbers sit on; "right" for a second y axis. */
+  side?: "left" | "right";
+}> = ({ ticks, x, x1, base, top, lo, hi, at: from, format = String, out, grid = false, color = INK_SOFT, side = "left" }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -198,7 +200,7 @@ export const YTicks: React.FC<{
         return (
           <g key={t}>
             {grid && x1 !== undefined ? <line x1={x} x2={x1} y1={y} y2={y} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} /> : null}
-            <text x={x - 10} y={y + 6} textAnchor="end" style={{ ...tickText(17), fill: color }}>
+            <text x={side === "left" ? x - 10 : x + 10} y={y + 6} textAnchor={side === "left" ? "end" : "start"} style={{ ...tickText(17), fill: color }}>
               {format(t)}
             </text>
           </g>

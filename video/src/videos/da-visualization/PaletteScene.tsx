@@ -48,7 +48,7 @@ const GROUPS = 10;
 /** Small panels, one channel each. */
 const SMALL = { x0: 1440, w: 170, gap: 26, top: 610, hgt: 96, vgap: 34 };
 
-/** Question 17: as most see it, as a deuteranope sees it, labelled in gray. */
+/** Question 17: as most see it, as a deuteranope sees it, labeled in gray. */
 const PANELS = [
   { x0: 180, x1: 600 },
   { x0: 760, x1: 1180 },
@@ -70,7 +70,7 @@ const Swatch: React.FC<{ color: string }> = ({ color }) => (
  * ninth and tenth come round to the first two colors, then the tail folded
  * into "other" and the same channels as small panels. Last, two lines in red
  * and green, then the same two through the page's deuteranope simulation
- * (an SVG color matrix computed in check.mjs), then labelled and in gray.
+ * (an SVG color matrix computed in check.mjs), then labeled and in gray.
  */
 export const PaletteScene: React.FC = () => {
   const frame = useCurrentFrame();

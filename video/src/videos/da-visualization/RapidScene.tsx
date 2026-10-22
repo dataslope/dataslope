@@ -299,11 +299,9 @@ const Scatter: React.FC<{ c: Ctx }> = ({ c }) => {
       <Svg>
         <line x1={x0} x2={x0} y1={base} y2={top} stroke={INK} strokeWidth={1.6} opacity={ease(frame, at0 - 4, 10)} />
         <line x1={x0} x2={x1} y1={base} y2={base} stroke={INK} strokeWidth={1.6} opacity={ease(frame, at0 - 4, 10)} />
-        <g style={{ clipPath: `inset(${top}px ${1920 - x1}px ${1080 - base}px ${x0}px)` }}>
-          {SCATTER.points.slice(0, count).map(([x, y], i) => (
-            <circle key={i} cx={px(x)} cy={py(y)} r={4} fill={BAR} opacity={alpha} />
-          ))}
-        </g>
+        {SCATTER.points.slice(0, count).map(([x, y], i) => (
+          <circle key={i} cx={px(x)} cy={py(y)} r={4} fill={BAR} opacity={alpha} />
+        ))}
       </Svg>
       <Note at={pileAt - 2} x={R_X + 580} y={c.y(400)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>two continuous variables, one dot each</span>
@@ -347,7 +345,6 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
   const yOf = (v: number, i: number) => base - (v / scale(i)) * (base - top);
   const cum = channels.map((_, k) => totals.map((_, i) => channels.slice(0, k + 1).reduce((s, ch) => s + ch.values[i], 0)));
   const reveal = ease(frame, stackAt - 2, 22);
-  const reach = x0 + (x1 - x0) * reveal;
   const web = channels.findIndex((ch) => ch.key === "Web");
   const webLift = pulse(frame, hidesAt, 40);
   const L = { x0: R_X + 600, x1: R_X + 920 };
@@ -356,7 +353,7 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Svg opacity={ease(frame, at0 - 2, 10)}>
         <line x1={x0} x2={x1} y1={base + 0.5} y2={base + 0.5} stroke={INK} strokeWidth={1.6} />
-        <g style={{ clipPath: `inset(0px ${1920 - reach}px 0px 0px)` }}>
+        <g style={{ clipPath: `inset(-10px ${(1 - reveal) * 100}% -10px 0px)` }}>
           {channels.map((ch, k) => {
             const upper = cum[k].map((v, i) => `${xAt(i)},${yOf(v, i)}`);
             const lower = (k ? cum[k - 1] : totals.map(() => 0)).map((v, i) => `${xAt(i)},${yOf(v, i)}`).reverse();

@@ -12,7 +12,7 @@ import { Drift, LineSet, PanelTitle, Verdict, YTicks } from "./parts";
 
 const GRID = { x: 200, y: 340, w: 168, hgt: 128, gap: 14 };
 const CREEP = { x0: 1100, x1: 1660, base: 760, top: 440, hi: 45 };
-const CARD = { y: 340, w: 620, hgt: 430 };
+const CARD = { y: 360, w: 620, hgt: 290 };
 const CARDS_X = [220, 1080];
 
 /**
@@ -108,7 +108,7 @@ export const DashScene: React.FC = () => {
               }}
             >
               {lead ? (
-                <span style={{ ...headline(24 + 10 * big), color: INK, whiteSpace: "nowrap" }}>key metric</span>
+                <span style={{ ...headline(20 + 6 * big), color: INK, whiteSpace: "nowrap" }}>key metric</span>
               ) : null}
               <span style={{ ...label(20, share * shade > 0.55 ? PAPER : INK), opacity: shade, ...TABULAR }}>
                 {fmt(c.share * 100, 0)}%

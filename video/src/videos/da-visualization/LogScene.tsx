@@ -24,7 +24,7 @@ const LOG_HI = 4;
  * Question 8. The page's two series, twelve periods: 4,000 growing 6% a
  * period and 40 growing 35%. On a linear axis the small one lies along the
  * floor; on a log axis both are straight lines and the faster one is the
- * steeper, with the scale labelled.
+ * steeper, with the scale labeled.
  */
 export const LogScene: React.FC = () => {
   const frame = useCurrentFrame();

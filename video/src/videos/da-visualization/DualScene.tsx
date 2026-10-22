@@ -103,11 +103,13 @@ export const DualScene: React.FC = () => {
           Right axis fitted to the metric
         </PanelTitle>
         <YTicks ticks={[100, 200, 300]} x={LEFT.x0} base={base} top={top} lo={100} hi={300} at={twoAt - 2} out={out9} color={CATS[0]} />
+        <YTicks ticks={[38, 42, 46]} x={LEFT.x1} side="right" base={base} top={top} lo={DUAL.fitted[0]} hi={DUAL.fitted[1]} at={nothingAt - 4} out={out9} color={CATS[3]} />
         {dualLine(LEFT.x0, LEFT.x1, DUAL.fitted as [number, number], nothingAt - 2)}
         <PanelTitle x={RIGHT.x0} y={top - h(60)} at={zeroAt - 4} out={out9}>
           Right axis from zero
         </PanelTitle>
         <YTicks ticks={[100, 200, 300]} x={RIGHT.x0} base={base} top={top} lo={100} hi={300} at={zeroAt - 2} out={out9} color={CATS[0]} />
+        <YTicks ticks={[0, 25, 50]} x={RIGHT.x1} side="right" base={base} top={top} lo={DUAL.zero[0]} hi={DUAL.zero[1]} at={zeroAt - 2} out={out9} color={CATS[3]} />
         {dualLine(RIGHT.x0, RIGHT.x1, DUAL.zero as [number, number], zeroAt)}
         <div style={{ position: "absolute", left: LEFT.x0, top: base + h(28), ...label(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, nothingAt, 10) * (1 - ease(frame, out9, 10)) }}>
           <Swatch color={CATS[0]} /> revenue
