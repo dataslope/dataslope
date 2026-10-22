@@ -242,9 +242,8 @@ export const RapidScene: React.FC = () => {
             Every answer assumed someone chose <b style={{ color: BLUE_INK, opacity: ease(frame, testAt, 10) }}>what to test</b>
             <span style={{ opacity: ease(frame, countAt, 10) }}>
               {" "}
-              and <b style={{ color: WARM_INK }}>what to count</b>
+              and <b style={{ color: WARM_INK }}>what to count</b>.
             </span>
-            .
           </span>
         </Note>
         <Note at={roundAt} x={X0} y={y(LIST_TOP) + 4 * h(ROW) + h(90)}>

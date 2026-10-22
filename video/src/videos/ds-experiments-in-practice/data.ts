@@ -13,7 +13,7 @@ export const VIDEO = "ds-experiments-in-practice";
  * Whether public/images/ds-experiments-in-practice/ holds the watercolor from
  * illustrations.json. Every frame is laid out with room for it either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type Srm = { observed: [number, number]; expected: number; chi2: number; p: number };
 
