@@ -84,7 +84,7 @@ export const LoopScene: React.FC = () => {
         </Card>
         <Card i={1} at={sheetAt} title="Spreadsheets and statistics">
           <div style={{ ...note(26, INK), lineHeight: 1.5 }}>a few questions each:</div>
-          <div style={{ ...note(24, INK_SOFT), lineHeight: 1.5 }}>a pivot table, a lookup, a median, a p-value</div>
+          <div style={{ ...note(24, INK_SOFT), lineHeight: 1.5 }}>a pivot table, a lookup, a median, a p&#8209;value</div>
         </Card>
         <Card i={2} at={talkAt} title="A conversation">
           <div style={{ ...headline(34, true), color: INK, opacity: ease(frame, analyzeAt - 2, 14) }}>
