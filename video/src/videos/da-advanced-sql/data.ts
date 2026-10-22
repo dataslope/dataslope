@@ -13,7 +13,7 @@ export const VIDEO = "da-advanced-sql";
  * Whether public/images/da-advanced-sql/ holds the watercolor from
  * illustrations.json. Every frame is laid out with room for it either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type Value = string | number | boolean | null;
 type Step = { sql: string; ok: boolean; columns?: string[]; rows?: Value[][]; error?: string };
