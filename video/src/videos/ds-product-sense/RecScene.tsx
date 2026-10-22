@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -165,7 +165,7 @@ export const RecScene: React.FC = () => {
         </Note>
         {[
           { at: fifteenAt, n: SAMPLE.perArm, text: `${pct(SAMPLE.base)} → ${pct(SAMPLE.lift)}`, ink: BLUE_INK, fill: DATA },
-          { at: halfAt, n: SAMPLE.perArmHalf, text: `${pct(SAMPLE.base)} → ${pct(SAMPLE.halfLift, 1)}`, ink: ACCENT_INK, fill: ACCENT },
+          { at: halfAt, n: SAMPLE.perArmHalf, text: `${pct(SAMPLE.base)} → ${pct(SAMPLE.halfLift, 1)}`, ink: BLUE_INK, fill: DATA },
         ].map((b, i) => {
           const p = ease(frame, (i === 0 ? fifteenAt : fourAt) - 4, 18);
           const top = y(SIZE.top) + i * h(SIZE.gap);
@@ -180,7 +180,12 @@ export const RecScene: React.FC = () => {
               <Note at={(i === 0 ? fifteenAt : fourAt) + 8} x={RIGHT_X + 170 + (SIZE.w * b.n) / longest + 14} y={top + h(4)} out={out8}>
                 <span style={{ ...label(22, b.ink), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
                   {num(b.n)}
-                  {i === 1 ? ` (${SAMPLE.ratio.toFixed(1)}×)` : ""}
+                  {i === 1 ? (
+                    <>
+                      {" "}
+                      <Mark at={fourAt + 10}>({SAMPLE.ratio.toFixed(1)}×)</Mark>
+                    </>
+                  ) : null}
                 </span>
               </Note>
             </React.Fragment>

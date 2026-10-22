@@ -13,7 +13,7 @@ import { at, Axes, Bracket, Clear, DATA, Drift, madeUp, Mark, type Scale, Svg, V
 
 const CHART = { x0: X0 + 70, x1: 1060, top: 360, bottom: 740 };
 const SIDE_X = 1180;
-const BARS = { top: 470, h: 250, w: 120 };
+const BARS = { top: 520, h: 200, w: 120 };
 
 /** A weekly line, drawn up to week `upTo` (fractional weeks ease along). */
 const Line: React.FC<{ xs: Scale; ys: Scale; values: readonly number[]; upTo: number; color: string; width?: number }> = ({
@@ -157,10 +157,10 @@ export const LeadScene: React.FC = () => {
           <Line xs={xs} ys={ys} values={LEAD.leading} upTo={leadUp} color={DATA} />
           <Line xs={xs} ys={ys} values={LEAD.lagging} upTo={lagUp} color={WARM} />
         </Svg>
-        <Note at={leadDefAt + 10} x={at(xs, 1)} y={at(ys, LEAD.leading[0]) - h(48)} out={out3}>
+        <Note at={leadDefAt + 10} x={at(xs, 8)} y={at(ys, 0.36) - h(50)} out={out3}>
           <span style={{ ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>week-one cooking</span>
         </Note>
-        <Note at={lagDefAt + 10} x={at(xs, 1)} y={at(ys, LEAD.lagging[0]) - h(48)} out={out3}>
+        <Note at={lagDefAt + 10} x={at(xs, 6)} y={at(ys, 0.22) + h(18)} out={out3}>
           <span style={{ ...label(22, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>month-three retention</span>
         </Note>
         <VLine
@@ -229,12 +229,12 @@ export const LeadScene: React.FC = () => {
               <span style={{ opacity: ease(frame, earlyAt, 10) }}>, and some close before it&apos;s solved</span>
             </span>
           </Note>
-          <Note at={closeAt - 2} x={X0} y={y(BARS.top) - h(10)}>
+          <Note at={closeAt - 2} x={X0} y={y(BARS.top) - h(96)}>
             <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>median time to close</span>
           </Note>
           <Bar x={X0 + 30} base={base} height={GOODHART.closeHoursWas * hourScale} at={closeAt} color={DATA} value={`${GOODHART.closeHoursWas} h`} name="before" ink={BLUE_INK} />
           <Bar x={X0 + 210} base={base} height={GOODHART.closeHoursNow * hourScale} at={threeAt - 2} color={DATA} value={`${GOODHART.closeHoursNow} h`} name="after" ink={BLUE_INK} />
-          <Note at={reopenAt - 2} x={760} y={y(BARS.top) - h(10)}>
+          <Note at={reopenAt - 2} x={760} y={y(BARS.top) - h(96)}>
             <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
               <Mark at={handsAt} color={`color-mix(in srgb, ${ACCENT} 22%, transparent)`}>
                 tickets reopened
@@ -243,10 +243,10 @@ export const LeadScene: React.FC = () => {
           </Note>
           <Bar x={790} base={base} height={GOODHART.reopenWas * pctScale} at={reopenAt} color={ACCENT} value={`${GOODHART.reopenWas}%`} name="before" ink={ACCENT_INK} />
           <Bar x={970} base={base} height={GOODHART.reopenNow * pctScale} at={fifteenAt - 2} color={ACCENT} value={`${GOODHART.reopenNow}%`} name="after" ink={ACCENT_INK} />
-          <Note at={counterAt} x={1210} y={y(BARS.top) + h(60)}>
+          <Note at={counterAt} x={1210} y={y(BARS.top) + h(40)}>
             <span style={{ ...note(30, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>← the counter-metric</span>
           </Note>
-          <Note at={counterAt + 6} x={1210} y={y(BARS.top) + h(110)}>
+          <Note at={counterAt + 6} x={1210} y={y(BARS.top) + h(90)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>that catches it</span>
           </Note>
           <Note at={closeAt} x={X0} y={base + h(56)}>

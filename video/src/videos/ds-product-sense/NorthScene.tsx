@@ -186,7 +186,7 @@ export const NorthScene: React.FC = () => {
           <Note at={gamedAt - 2} x={X0} y={y(RAIL.top) + h(150)}>
             <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>almost any single number can be gamed:</span>
           </Note>
-          <Note at={sendAt} x={X0 + 560} y={y(RAIL.top) + h(150)}>
+          <Note at={sendAt} x={X0 + 600} y={y(RAIL.top) + h(150)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               more notifications →{" "}
               <span style={{ color: BLUE_INK, fontWeight: 650, opacity: ease(frame, climbAt, 10) }}>sessions ▲</span>
@@ -195,7 +195,7 @@ export const NorthScene: React.FC = () => {
           </Note>
           <Svg opacity={ease(frame, leaveAt + 4, 12)}>
             <path
-              d={`M ${X0 + 900} ${y(RAIL.top) + h(150) + 4} Q ${X0 + 860} ${y(RAIL.top) + h(110)} ${X0 + 790} ${y(RAIL.top) + h(104)}`}
+              d={`M ${X0 + 950} ${y(RAIL.top) + h(150) + 4} Q ${X0 + 890} ${y(RAIL.top) + h(110)} ${X0 + 800} ${y(RAIL.top) + h(104)}`}
               fill="none"
               stroke={ACCENT}
               strokeWidth={2.4}

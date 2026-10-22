@@ -221,7 +221,7 @@ export const RapidScene: React.FC = () => {
       <Drift from={from} to={n.beat("next").to + 40} scale={0.015}>
         <Kicker at={from}>Questions 12 to 14</Kicker>
         <Headline lead="Three left," turn="each about a number you already have." at={threeAt - 4} turnAt={eachAt - 4} size={60} />
-        <Spot id="da-sql-stopwatch" video="da-sql" at={from + 6} left={1660} top={y(300)} width={130} height={140} />
+        <Spot id="da-sql-stopwatch" video="da-sql" at={from + 6} left={1640} top={y(112)} width={130} height={140} />
 
         <RapidFire items={items} x={X0} top={y(LIST_TOP) + h(40)} rowH={h(ROW)} width={600} at={eachAt} end={end} />
 
