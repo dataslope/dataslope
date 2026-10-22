@@ -79,7 +79,7 @@ export const HookScene: React.FC = () => {
       <Drift from={0} to={n.beat("design-in").to + 20}>
         <Kicker at={startAt}>Data scientist interview prep · Experimentation I</Kicker>
         <Headline lead="An A/B test can be lost" turn="before launch." at={startAt + 2} turnAt={beforeAt - 2} size={72} />
-        <Spot id="ds-experiment-design-heron" at={startAt + 10} left={1470} top={y(268)} width={330} height={220} />
+        <Spot id="ds-experiment-design-heron" at={startAt + 10} left={1500} top={y(236)} width={300} height={227} />
 
         {/* The timeline: before launch, the launch, live. */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>

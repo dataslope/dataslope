@@ -12,7 +12,7 @@ export const VIDEO = "ds-experiment-design";
  * Whether public/images/ds-experiment-design/ holds the watercolor from
  * illustrations.json. Every frame is laid out with room for it either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 type Pair = [number, number];
 
