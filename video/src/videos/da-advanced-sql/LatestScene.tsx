@@ -183,7 +183,7 @@ export const LatestScene: React.FC = () => {
           rows={rowsAt(S.rows, joinAt)}
           bands={zeros.map((row, k) => ({ row, at: zerosAt + k * 4, color: MARK_OK }))}
         />
-        <Note at={zerosAt + 8} x={sg.right + 24} y={sg.rowTop(zeros[0]) + 4}>
+        <Note at={zerosAt + 8} x={SPINE_RESULT_X} y={sg.rowTop(S.rows.length) + h(16)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>back, as 0</span>
         </Note>
       </Drift>

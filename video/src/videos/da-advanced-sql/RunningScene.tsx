@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -128,9 +128,6 @@ export const RunningScene: React.FC = () => {
           <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
           </div>
-        </Note>
-        <Note at={lastAt + 6} x={g.right + 20} y={g.rowTop(last) + 8}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>day {B.rows.length}</span>
         </Note>
       </Drift>
     </AbsoluteFill>
