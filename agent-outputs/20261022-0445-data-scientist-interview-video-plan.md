@@ -285,7 +285,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** a squirrel.
 
-### 9. Python & pandas (14 questions, ~5.5 min)
+### 9. Python & pandas (14 questions, ~5.5 min; built at 6:51)
 
 **Deep dives**
 1. Why vectorization beats a Python loop
