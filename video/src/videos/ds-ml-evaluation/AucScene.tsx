@@ -71,6 +71,8 @@ export const AucScene: React.FC = () => {
   const from = n.beat("auc").from;
   const qAt = n.word("auc", "Question");
   const textAt = n.word("auc", "What is ROC-AUC");
+  const rocWordAt = n.word("auc", "is ROC-AUC");
+  const prWordAt = n.word("auc", "is PR-AUC preferred");
   const asked = n.word("auc", "The ROC curve");
   const rateAt = n.word("auc", "plots the true positive rate");
   const areaAt = n.word("auc", "The AUC is the area");
@@ -121,7 +123,7 @@ export const AucScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} out={q10At - 4} size={60}>
-          What is ROC-AUC, and when is PR-AUC preferred?
+          What is <Mark at={rocWordAt + 4}>ROC-AUC</Mark>, and when is <Mark at={prWordAt + 4}>PR-AUC</Mark> preferred?
         </QuestionCard>
         <QuestionCard n={10} at={q10At} textAt={q10TextAt - 2} out={end - 6} size={60}>
           How do you handle class imbalance?
