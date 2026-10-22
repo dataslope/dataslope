@@ -67,7 +67,7 @@ export const SeriesScene: React.FC = () => {
 
       <Drift from={from} to={end + 40} scale={0.015}>
         <Kicker at={from}>The series</Kicker>
-        <Headline lead="Eleven videos," turn="in the track's order." at={from + 2} turnAt={orderAt} size={64} />
+        <Headline lead="In the track's order," turn="eleven videos." at={orderAt - 4} turnAt={elevenAt} size={64} />
 
         {pairs.map((pr) => {
           const q = ease(frame, pr.at, 14) * (1 - ease(frame, figureAt - 6, 14));
