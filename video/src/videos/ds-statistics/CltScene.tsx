@@ -41,6 +41,7 @@ export const CltScene: React.FC = () => {
   const from = n.beat("clt").from;
   const qAt = n.word("clt", "Question");
   const textAt = n.word("clt", "Why does the Central Limit Theorem");
+  const cltAt = n.word("clt", "the C L T");
   const saysAt = n.word("clt", "It says the mean");
   const finiteAt = n.word("clt", "as long as its variance is finite");
   const panelAt = [n.word("clt", "One draw"), n.word("clt", "Average five"), n.word("clt", "Average thirty")];
@@ -122,7 +123,7 @@ export const CltScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} out={q5At - 4} size={60}>
-          Why does the Central Limit Theorem (CLT) matter?
+          Why does the Central Limit Theorem <Mark at={cltAt}>(CLT)</Mark> matter?
         </QuestionCard>
         <QuestionCard n={5} at={q5At} textAt={q5TextAt - 2} size={56}>
           What is the Law of Large Numbers (LLN), and how does it differ from the CLT?

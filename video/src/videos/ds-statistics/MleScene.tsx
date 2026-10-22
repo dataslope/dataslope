@@ -39,6 +39,7 @@ export const MleScene: React.FC = () => {
   const from = n.beat("mle").from;
   const qAt = n.word("mle", "Question");
   const textAt = n.word("mle", "What is maximum likelihood");
+  const mleAt = n.word("mle", "or M L E");
   const chooseAt = n.word("mle", "Choose the parameter");
   const clicksAt = n.word("mle", "Twelve clicks in forty views");
   const everyAt = n.word("mle", "across every possible click rate");
@@ -90,7 +91,7 @@ export const MleScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={mleOut} size={60}>
-          What is maximum likelihood estimation (MLE)?
+          What is maximum likelihood estimation <Mark at={mleAt + 4}>(MLE)</Mark>?
         </QuestionCard>
         <QuestionCard n={7} at={q7At} textAt={q7TextAt - 2} size={60}>
           What makes an estimator unbiased?

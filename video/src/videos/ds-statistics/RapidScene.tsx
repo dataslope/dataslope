@@ -51,10 +51,10 @@ const Bayes: React.FC<{ c: Ctx }> = ({ c }) => {
       <Axes x={s} y={{ lo: 0, hi: 1, a: base, b: base - c.h(250) }} xTicks={[0.1, 0.12, 0.14, 0.16, 0.18]} xFormat={(v) => `${Math.round(v * 100)}%`} xTitle="conversion rate" at={pageAt} size={18} />
       <Curve points={pts(BAYES.a)} at={pageAt + 6} dur={20} color={INK_SOFT} width={3} fill={`color-mix(in srgb, ${INK_SOFT} 10%, transparent)`} base={base} />
       <Curve points={pts(BAYES.b)} at={bAt} dur={20} color={BAR} width={3} fill={`color-mix(in srgb, ${BAR} 14%, transparent)`} base={base} />
-      <Note at={pageAt + 8} x={at(s, 0.121) - 10} y={base - c.h(300)} align="right">
+      <Note at={pageAt + 8} x={at(s, 0.121) - 10} y={base - c.h(282)} align="right">
         <span style={{ ...noteText(22, INK_SOFT), ...TABULAR }}>A: 120 in 1,000</span>
       </Note>
-      <Note at={bAt + 4} x={at(s, 0.151) + 10} y={base - c.h(300)}>
+      <Note at={bAt + 4} x={at(s, 0.151) + 10} y={base - c.h(282)}>
         <span style={{ ...noteText(22, BLUE_INK), ...TABULAR }}>B: 150 in 1,000</span>
       </Note>
       <Note at={distAt} x={R_X + 30} y={c.y(836)}>
