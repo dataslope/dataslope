@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -18,7 +18,7 @@ const LINES = [
   { y: 600, lo: -2.5, hi: 2.5, ticks: [-2, -1, 0, 1, 2] },
   { y: 780, lo: -2.5, hi: 5, ticks: [-2, 0, 2, 4] },
 ];
-const WHY_X = 1220;
+const WHY_X = 1300;
 const WHY_Y = 380;
 const WHY_ROW = 64;
 
@@ -46,8 +46,8 @@ export const BnScene: React.FC = () => {
     { text: "steadier training", at: n.word("bn-why", "It steadies training") },
     { text: "larger learning rates", at: n.word("bn-why", "tolerates larger learning rates") },
     { text: "the starting weights matter less", at: n.word("bn-why", "makes the starting weights matter less") },
-    { text: "at inference: running averages, not the batch", at: n.word("bn-why", "At inference it uses running averages") },
-    { text: "transformers: layer norm, within each example", at: n.word("bn-why", "Transformers use layer norm") },
+    { text: "inference: running averages", at: n.word("bn-why", "At inference it uses running averages") },
+    { text: "transformers: layer norm, per example", at: n.word("bn-why", "Transformers use layer norm") },
   ];
   const shapeAt = n.word("arch-in", "the shape of the network itself");
   const end = n.beat("arch-in").to;
@@ -146,23 +146,11 @@ export const BnScene: React.FC = () => {
           </Tagline>
 
           {/* ── Why it helps ── */}
-          <div
-            style={{
-              position: "absolute",
-              left: WHY_X - 14,
-              top: y(WHY_Y) + 3 * h(WHY_ROW) - 6,
-              width: 600,
-              height: 2 * h(WHY_ROW),
-              borderRadius: 6,
-              background: HIGHLIGHT,
-              opacity: 0.35 * ease(frame, reasons[3].at - 2, 10) * (1 - ease(frame, reasons[4].at + 30, 12)),
-            }}
-          />
           {reasons.map((r, i) => (
             <Note key={r.text} at={r.at - 2} x={WHY_X} y={y(WHY_Y) + i * h(WHY_ROW)}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Tick at={r.at + 2} size={24} color={i < 3 ? OK : INK_SOFT} />
-                <span style={{ ...note(25, i < 3 ? INK : INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{r.text}</span>
+                <span style={{ ...note(24, i < 3 ? INK : INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{r.text}</span>
               </div>
             </Note>
           ))}

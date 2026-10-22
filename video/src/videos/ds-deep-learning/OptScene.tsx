@@ -11,7 +11,7 @@ import { OPT, type Optimizer } from "./data";
 import { Drift, Fade, Mark, OK, OK_INK, Tagline, WARM, WARM_INK } from "./parts";
 
 const BOX = { left: 150, right: 1130, top: 360, bottom: 770 };
-const DOM = { x0: -9, x1: 1.5, y0: -1.6, y1: 1.6 };
+const DOM = { x0: -9, x1: 2, y0: -1.6, y1: 1.6 };
 const LEG_X = 1230;
 const LEG_Y = 366;
 const LEG_ROW = 96;
@@ -143,13 +143,16 @@ export const OptScene: React.FC = () => {
           <Tagline x={px(OPT.start[0]) - 30} y={py(OPT.start[1]) - h(44)} at={valleyAt + 2} size={21} color={INK}>
             start
           </Tagline>
-          <Tagline x={px(0) - 50} y={py(0) + h(16)} at={valleyAt + 6} size={21} color={INK}>
+          <Tagline x={px(0) - 50} y={py(0) + h(58)} at={valleyAt + 6} size={21} color={INK}>
             the bottom
           </Tagline>
           <Note at={zigAt - 2} x={BOX.left} y={y(BOX.top) - h(48)}>
             <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
               plain steps: <Mark at={zigAt + 2}>zigzag across</Mark>, <span style={{ opacity: ease(frame, creepAt - 2, 10) }}>creep along</span>
             </span>
+          </Note>
+          <Note at={paceAt - 2} x={BOX.left + 560} y={y(BOX.top) - h(48)}>
+            <span style={{ ...note(24, WARM_INK), whiteSpace: "nowrap" }}>RMSProp: both directions at a similar pace</span>
           </Note>
           <Tagline x={BOX.left} y={y(BOX.bottom) + h(14)} at={valleyAt + 8} size={19}>
             a made-up valley; 50 steps each, each at a learning rate that suits it
@@ -173,7 +176,6 @@ export const OptScene: React.FC = () => {
                 <Note at={nameAt[r.key] + 4} x={LEG_X + 48} y={top + h(40)}>
                   <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
                     {r.key === "sgd" ? <span style={{ opacity: ease(frame, batchAt - 2, 10) }}>a step per mini-batch</span> : r.what}
-                    {r.key === "rmsprop" ? <span style={{ opacity: ease(frame, paceAt, 10) }}>, a step per parameter</span> : null}
                   </span>
                 </Note>
                 <Note at={(r.key === "sgd" ? threeAt : otherAt + (i - 1) * 4) - 2} x={1720} y={top} align="right" width={180}>

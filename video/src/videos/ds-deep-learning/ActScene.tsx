@@ -16,8 +16,10 @@ const TANH = ds("purple", 500);
 const TANH_INK = inkOf.purple;
 const LEG_X = 980;
 const LEG_Y = 352;
-const LEG_ROW = 62;
-const SOFT_Y = 700;
+const LEG_ROW = 80;
+const SOFT_Y = 720;
+/** The sigmoid's flat ends, marked under the curve. */
+const FLAT = `color-mix(in srgb, ${ds("red", 500)} 30%, transparent)`;
 
 /**
  * Question 3 on one plot from -5 to 5: sigmoid with its flat ends marked,
@@ -79,8 +81,8 @@ export const ActScene: React.FC = () => {
         </QuestionCard>
 
         <Axes x={xs} y={ys} xTicks={[-4, -2, 0, 2, 4]} yTicks={[-1, 0, 1, 2, 3]} xTitle="input z" yTitle="output" at={sigAt - 6} />
-        <Curve points={tails[0]} x={xs} y={ys} at={flatAt} dur={10} color={ACCENT} width={10} clip={clip} />
-        <Curve points={tails[1]} x={xs} y={ys} at={flatAt + 4} dur={10} color={ACCENT} width={10} clip={clip} />
+        <Curve points={tails[0]} x={xs} y={ys} at={flatAt} dur={10} color={FLAT} width={12} clip={clip} />
+        <Curve points={tails[1]} x={xs} y={ys} at={flatAt + 4} dur={10} color={FLAT} width={12} clip={clip} />
         <Curve points={sig} x={xs} y={ys} at={sigAt} dur={26} color={BAR} width={3.6} clip={clip} />
         <Curve points={pts(ACT.tanh)} x={xs} y={ys} at={tanhAt} dur={26} color={TANH} width={3.6} clip={clip} />
         <Curve points={pts(ACT.leaky)} x={xs} y={ys} at={leakyAt} dur={22} color={OK} width={3} dash="8 7" clip={clip} />
@@ -104,14 +106,14 @@ export const ActScene: React.FC = () => {
             </div>
           </Note>
         ))}
-        <Tagline x={LEG_X + 60} y={y(LEG_Y) + 2 * h(LEG_ROW) + h(36)} at={zeroesAt + 2} out={legendOut} size={20}>
+        <Tagline x={LEG_X + 60} y={y(LEG_Y) + 2 * h(LEG_ROW) + h(38)} at={zeroesAt + 2} out={legendOut} size={20}>
           passes positives, zeroes the rest
         </Tagline>
-        <Tagline x={LEG_X + 60} y={y(LEG_Y) + 1 * h(LEG_ROW) + h(36)} at={centeredAt} out={legendOut} size={20}>
+        <Tagline x={LEG_X + 60} y={y(LEG_Y) + 1 * h(LEG_ROW) + h(38)} at={centeredAt} out={legendOut} size={20}>
           the same shape, centered
         </Tagline>
         <Svg opacity={ease(frame, defaultAt, 10) * (1 - ease(frame, legendOut, 10))}>
-          <rect x={LEG_X - 14} y={y(LEG_Y) + 2 * h(LEG_ROW) - 10} width={760} height={h(LEG_ROW) + 8} rx={6} fill="none" stroke={OK} strokeWidth={2} />
+          <rect x={LEG_X - 14} y={y(LEG_Y) + 2 * h(LEG_ROW) - 12} width={760} height={h(LEG_ROW) - 4} rx={6} fill="none" stroke={OK} strokeWidth={2} />
         </Svg>
 
         {/* ── Softmax: three scores into probabilities ── */}

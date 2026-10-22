@@ -118,7 +118,7 @@ export const NeuronScene: React.FC = () => {
               width={2}
               head={12}
             />
-            <Tagline x={IN_X + IN_W + 60} y={box(IN_Y[i]) - h(40) + (i - 1) * 8} at={timesAt + i * 3} out={q1Out} size={22} color={INK}>
+            <Tagline x={IN_X + IN_W + 40} y={i === 2 ? box(IN_Y[i]) + h(10) : box(IN_Y[i]) - h(36)} at={timesAt + i * 3} out={q1Out} size={22} color={INK}>
               × {NEURON.w[i]} <span style={{ color: BLUE_INK }}>= {sn(NEURON.products[i])}</span>
             </Tagline>
           </React.Fragment>

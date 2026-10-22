@@ -86,7 +86,7 @@ export const script: NarrationScript = {
     },
     {
       id: "plan",
-      text: "Twelve of this page's fifteen questions get opened up on networks small enough to show every number, worked by hand in NumPy. Three quick ones close it.",
+      text: "Of the fifteen questions in this video, twelve get opened up on networks small enough to show every number, worked by hand in NumPy. Three quick ones close it.",
       pauseAfter: 0.7,
     },
     { id: "neuron-in", text: "The smallest piece first." },
@@ -149,7 +149,7 @@ export const script: NarrationScript = {
     {
       id: "vanish",
       scene: true,
-      text: "Question five. What causes vanishing and exploding gradients? That backward sweep is a long product. The sigmoid's slope is a quarter at most, so ten sigmoid layers shrink the gradient by a quarter to the tenth: less than one in a million. The early layers barely learn. Factors above one compound the other way. One and a half, ten times over, is fifty-seven, and the gradient explodes.",
+      text: "Question five. What causes vanishing and exploding gradients? That backward sweep is a long product. The sigmoid's slope is a quarter at most, so ten sigmoid layers shrink the gradient by a quarter to the tenth: less than one in a million. The early layers barely learn. Factors above one compound the other way. One and a half, ten times over, is almost fifty-eight, and the gradient explodes.",
       pauseAfter: 0.6,
     },
     {

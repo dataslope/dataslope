@@ -90,7 +90,7 @@ export const VanishScene: React.FC = () => {
               yTitle="the gradient's size"
               at={productAt - 4}
             />
-            <Tagline x={BOX.left + 20} y={y(BOX.top) - h(4)} at={quarterAt} size={22} color={ACCENT_INK}>
+            <Tagline x={120} y={y(296)} at={quarterAt} size={24} color={ACCENT_INK}>
               the sigmoid&apos;s slope: <Mark at={quarterAt + 4}>at most 0.25</Mark>, so × 0.25 a layer
             </Tagline>
             <Svg>
@@ -130,20 +130,20 @@ export const VanishScene: React.FC = () => {
                 opacity={late}
               />
             </Svg>
-            <Note at={millionAt} x={px(10) - 470} y={py(VANISH.ten) + h(40)}>
+            <Note at={millionAt} x={px(0.3)} y={py(1e-5)}>
               <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
                 0.25<sup>10</sup> = {VANISH.ten.toFixed(8)}: under one in a million
               </span>
             </Note>
-            <Note at={earlyAt + 2} x={px(7.5) - 10} y={py(VANISH.ten) - h(78)}>
+            <Note at={earlyAt + 2} x={px(0.3)} y={py(1e-5) + h(40)}>
               <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>the early layers barely learn</span>
             </Note>
-            <Note at={explodesAt - 2} x={px(10) - 300} y={py(VANISH.tenBig) - h(48)}>
+            <Note at={explodesAt - 2} x={px(10) - 330} y={py(VANISH.tenBig) - h(50)}>
               <span style={{ ...note(25, WARM_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
                 1.5<sup>10</sup> = {VANISH.tenBig}: it explodes
               </span>
             </Note>
-            <Tagline x={px(5) - 20} y={py(1.5 ** 5) - h(46)} at={aboveAt} size={21} color={WARM_INK}>
+            <Tagline x={px(3)} y={py(1.5 ** 3) + h(14)} at={aboveAt} size={21} color={WARM_INK}>
               × 1.5 a layer
             </Tagline>
           </div>

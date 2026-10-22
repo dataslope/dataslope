@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OVERFIT } from "./data";
-import { at, Axes, Curve, Dots, Drift, Mark, OK, OK_INK, type Scale, Tagline, VLine } from "./parts";
+import { at, Axes, Curve, Dots, Drift, Mark, OK, OK_INK, type Scale, Svg, Tagline, VLine } from "./parts";
 
 const LOSS = { left: 180, right: 1000, top: 380, bottom: 800 };
 const FIT = { left: 1130, right: 1760, top: 380, bottom: 640 };
@@ -96,7 +96,10 @@ export const OverfitScene: React.FC = () => {
           validation
         </Tagline>
         <Dots dots={[{ x: at(xs, O.bestEpoch), y: at(ys, O.bestVal), at: lowAt }]} r={9} color={OK} opacity={1} />
-        <Note at={lowAt + 2} x={at(xs, O.bestEpoch) + 20} y={at(ys, O.bestVal) + h(14)}>
+        <Svg opacity={ease(frame, lowAt + 2, 10)}>
+          <line x1={at(xs, O.bestEpoch) + 6} y1={at(ys, O.bestVal) - 10} x2={at(xs, 300)} y2={at(ys, 0.163)} stroke={OK} strokeWidth={1.6} />
+        </Svg>
+        <Note at={lowAt + 2} x={at(xs, 300) + 6} y={at(ys, 0.163) - h(30)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
             lowest: {O.bestVal.toFixed(3)}, epoch {O.bestEpoch}
           </span>
@@ -115,7 +118,7 @@ export const OverfitScene: React.FC = () => {
           dash="6 6"
           width={2.4}
           label={<span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>stop here</span>}
-          labelY={y(LOSS.top) - 30}
+          labelY={at(ys, 0.285)}
         />
         <div
           style={{

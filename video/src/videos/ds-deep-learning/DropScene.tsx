@@ -21,8 +21,9 @@ const R3 = 592;
 const SUM_X = CX + 8 * CW + 50;
 
 // ── Question 9 ──
-const ROW_A = 470;
-const ROW_B = 590;
+/** Weight decay first, as it is described first; the L2 penalty under it. */
+const ROW_A = 590;
+const ROW_B = 470;
 const VAL = { left: 1200, right: 1760, top: 400, bottom: 720 };
 
 /**
@@ -169,7 +170,7 @@ export const DropScene: React.FC = () => {
           </Note>
           <Cells
             values={[DECAY.l2.map((v) => num(v, 3))]}
-            x={560}
+            x={400}
             y={y(ROW_A)}
             w={120}
             h={h(52)}
@@ -185,7 +186,7 @@ export const DropScene: React.FC = () => {
           </Note>
           <Cells
             values={[DECAY.decay.map((v) => num(v, 3))]}
-            x={560}
+            x={400}
             y={y(ROW_B)}
             w={120}
             h={h(52)}
@@ -193,7 +194,7 @@ export const DropScene: React.FC = () => {
             size={24}
             look={() => ({ tint: { color: CELL_OK, at: sameAt + 4 } })}
           />
-          <Note at={sameAt + 4} x={940} y={(y(ROW_A) + y(ROW_B)) / 2 + h(10)}>
+          <Note at={sameAt + 4} x={790} y={(y(ROW_A) + y(ROW_B)) / 2 + h(10)}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Tick at={sameAt + 8} size={26} />
               <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>identical</span>

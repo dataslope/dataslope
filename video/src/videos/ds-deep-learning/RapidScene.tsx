@@ -152,7 +152,7 @@ const Epoch: React.FC<{ c: Ctx }> = ({ c }) => {
         <rect
           x={bar.x}
           y={bar.y - 6}
-          width={seg}
+          width={Math.max(seg, 14)}
           height={bar.h + 12}
           fill="none"
           stroke={OK}

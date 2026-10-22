@@ -46,8 +46,8 @@ export const HookScene: React.FC = () => {
   const backAt = n.word("hook", "the error travels back");
   const deepAt = n.word("hook", "in a deep enough stack");
   const fadesAt = n.word("hook", "fades to almost nothing");
-  const twelveAt = n.word("plan", "Twelve of this page's");
-  const smallAt = n.word("plan", "networks small enough");
+  const twelveAt = n.word("plan", "Of the fifteen questions");
+  const smallAt = n.word("plan", "twelve get opened up");
   const numpyAt = n.word("plan", "worked by hand in NumPy");
   const quickAt = n.word("plan", "Three quick ones");
   const firstAt = n.word("neuron-in", "The smallest piece first");
@@ -119,7 +119,7 @@ export const HookScene: React.FC = () => {
           {LAYERS.map((count, l) =>
             Array.from({ length: count }, (_, i) => {
               const p = ease(frame, from + 4 + l * 4 + i * 1.5, 12);
-              const isPicked = l === 1 && i === 1;
+              const isPicked = l === 1 && i === 0;
               return (
                 <g key={`${l}-${i}`}>
                   {isPicked && picked > 0 ? <circle cx={LX[l]} cy={y(nodeY(l, i))} r={(R + 12) * picked} fill={HIGHLIGHT} /> : null}

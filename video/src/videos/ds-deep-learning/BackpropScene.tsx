@@ -138,10 +138,10 @@ export const BackpropScene: React.FC = () => {
         </Note>
 
         {/* ── The forward pass, left to right ── */}
-        <Tagline x={OPS[0].x} y={y(ROW) - h(44)} width={OPS[0].w} align="center" at={thisAt - 4} size={21} color={BLUE_INK}>
+        <Tagline x={OPS[0].x + OPS[0].w / 2} y={y(ROW) - h(44)} width={OPS[0].w + 160} align="center" at={thisAt - 4} size={21} color={BLUE_INK}>
           w = {B.w}, x = {B.x}, b = {num(B.b, 1)}
         </Tagline>
-        <Tagline x={OPS[2].x} y={y(ROW) - h(44)} width={OPS[2].w} align="center" at={thisAt} size={21} color={BLUE_INK}>
+        <Tagline x={OPS[2].x + OPS[2].w / 2} y={y(ROW) - h(44)} width={OPS[2].w} align="center" at={thisAt} size={21} color={BLUE_INK}>
           target y = {B.y}
         </Tagline>
         {OPS.map((op, i) => (
