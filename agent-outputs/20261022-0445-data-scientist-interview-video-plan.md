@@ -201,7 +201,7 @@ From `index.mdx`: what the loop looks like (probability and statistics questions
 
 **Hero:** a raccoon.
 
-### 5. Deep learning (15 questions, ~7 min)
+### 5. Deep learning (15 questions, ~7 min; built at 9:55)
 
 **Deep dives**
 1. What a neuron computes, and why the activations must be non-linear: two linear layers are one linear layer (2)
