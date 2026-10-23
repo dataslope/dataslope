@@ -189,8 +189,10 @@ export const Chip: React.FC<{
   ink?: string;
   dim?: number;
   mono?: boolean;
+  /** Frames at which the chip swells briefly, as the narration names it. */
+  bump?: number | readonly number[];
   style?: React.CSSProperties;
-}> = ({ text, at, size = 26, strike, drop, mark, markOut, tone, toneAt, ink = INK, dim, mono, style }) => {
+}> = ({ text, at, size = 26, strike, drop, mark, markOut, tone, toneAt, ink = INK, dim, mono, bump, style }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const s = strike === undefined ? 0 : ease(frame, strike, 10);
@@ -199,6 +201,7 @@ export const Chip: React.FC<{
   const tn = tone === undefined ? 0 : toneAt === undefined ? 1 : ease(frame, toneAt, 12);
   const dm = dim === undefined ? 0 : ease(frame, dim, 12);
   const est = (text.length * CHAR_EM + 1.4) * size + 4;
+  const swell = bump === undefined ? 0 : Math.max(...(typeof bump === "number" ? [bump] : bump).map((b) => pulse(frame, b, 16)));
   const gone = d >= 1;
   return (
     <span
@@ -210,7 +213,7 @@ export const Chip: React.FC<{
         marginRight: gone ? 0 : `${(1 - d) * 0.42}em`,
         overflow: d > 0 ? "hidden" : undefined,
         opacity: p * (1 - d) * (1 - dm * 0.6),
-        transform: `translateY(${(1 - p) * 10}px)`,
+        transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.14 * swell})`,
         fontSize: size,
         ...style,
       }}

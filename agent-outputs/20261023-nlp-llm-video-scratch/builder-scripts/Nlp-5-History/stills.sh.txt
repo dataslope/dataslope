@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# usage: stills.sh f1 f2 ... ; renders from the prebuilt bundle via the queue
+S=/tmp/claude-0/-home-user-dataslope/2a3cc9a3-7547-5d18-88e1-2b54dd0db0d9/scratchpad
+cd /home/user/dataslope/video
+export REMOTION_BROWSER_EXECUTABLE=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
+for f in "$@"; do
+  out/render-slot.sh npx remotion still $S/Nlp-5-History/bundle Nlp-5-History out/Nlp-5-History-f$f.png --frame=$f --scale=1 --log=error 2>&1 | grep -v "^$" | tail -2
+done

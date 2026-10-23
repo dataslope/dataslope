@@ -7,7 +7,7 @@ import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CORPUS, COUNTS, THE } from "./data";
-import { FIG_Y, Headline, INK, INK_SOFT, Kicker, X0 } from "./parts";
+import { FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, pulse, X0 } from "./parts";
 import { colMid, colX, DocTable, tableBottom, tableGeo } from "./tfidf";
 
 const SLIP_Y = 334;
@@ -40,6 +40,8 @@ export const CountsScene: React.FC = () => {
   const leadsAt = n.word("counts", "leads every row");
   const twoAt = n.word("counts", "with two");
   const sameAt = n.word("same", "same in every row");
+  const cantAt = n.word("same", "can't tell");
+  const apartAt = n.word("same", "apart");
 
   return (
     <AbsoluteFill>
@@ -63,7 +65,12 @@ export const CountsScene: React.FC = () => {
         </Ink>
       ))}
 
-      <DocTable g={G} at={rawAt - 6} frame={ease(frame, leadsAt - 2, 16)} />
+      <DocTable
+        g={G}
+        at={rawAt - 6}
+        frame={ease(frame, leadsAt - 2, 16)}
+        glow={(i, j) => (j === THE ? pulse(frame, sameAt + i * 5, 22) : COUNTS[i][j] > 0 ? pulse(frame, cantAt + i * 6 + j, 20) * 0.6 : 0)}
+      />
 
       <Leader
         points={[
@@ -87,7 +94,7 @@ export const CountsScene: React.FC = () => {
       {SAME ? (
         <Ink at={sameAt - 2} dur={20} style={{ left: X0, top: y(VERDICT_Y), width: 1400 }}>
           <div style={{ ...body(36, true), color: INK, lineHeight: 1.25 }}>
-            The same in all three rows, so this column can’t tell the documents apart.
+            The same in all three rows, so this column can’t tell the documents <Mark at={apartAt - 2}>apart.</Mark>
           </div>
         </Ink>
       ) : null}

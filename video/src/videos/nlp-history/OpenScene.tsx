@@ -110,6 +110,8 @@ export const OpenScene: React.FC = () => {
   const guessingAt = n.word("hook", "Guessing");
   const rareAt = n.word("hook", "Giving rare words");
   const olderAt = n.word("hook", "much older");
+  const weightAt = n.word("hook", "extra weight");
+  const theseAt = n.word("hook", "These ideas");
   const lookAt = n.word("hook", "look");
   const youngestAt = n.word("age", "youngest");
   const fiftyAt = n.word("age", "over fifty");
@@ -148,7 +150,7 @@ export const OpenScene: React.FC = () => {
       <Sfx name="el-whoosh" at={firstAt - 4} level={-34} />
 
       <Headline
-        at={olderAt - 4}
+        at={theseAt - 2}
         lead="Older than"
         turn={<Mark at={lookAt}>they look.</Mark>}
         turnAt={olderAt + 6}
@@ -180,7 +182,7 @@ export const OpenScene: React.FC = () => {
                 top={c.top}
                 axis={AXIS}
                 at={c.at}
-                swell={isOldest ? pulse(frame, firstAt - 2, 24) : 0}
+                swell={isOldest ? pulse(frame, firstAt - 2, 24) : c.story === "sparck" ? pulse(frame, weightAt - 2, 22) : 0}
                 dim={isOldest ? undefined : soAt - 2}
               />
             </React.Fragment>

@@ -1,0 +1,38 @@
+import re, string
+from nltk.tokenize import word_tokenize, sent_tokenize, TweetTokenizer
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+text = "I don't think Mr. Lee's plan will work, but we'll see!"
+print("split():        ", text.split())
+print("word_tokenize():", word_tokenize(text))
+text = "Dr. Lee earned 2.5 million. He smiled. Wasn't that great?"
+naive = text.split(".")
+print("Naive", len(naive), naive)
+print("sent", sent_tokenize(text))
+tweet = "Loving #NLP @dataslope, this is sooo cool!!! :)"
+print(word_tokenize(tweet)); print(TweetTokenizer().tokenize(tweet))
+words = ["The", "the", "THE", "Dog", "dog", "DOG"]
+print(len(set(words)), set(words), len(set(w.lower() for w in words)))
+print("US".lower(), "WHO".lower(), "Apple".lower())
+text = "Hello, World! It's a GREAT day... isn't it?"
+print([w for w in text.split() if w.isalpha()])
+table = str.maketrans("", "", string.punctuation)
+a2 = [w.translate(table) for w in text.lower().split()]; print([w for w in a2 if w])
+print(re.findall(r"[a-z]+", text.lower()))
+stop = stopwords.words("english"); print(len(stop), stop[:25], "the" in stop, "python" in stop)
+s = set(stop)
+t = "The quick brown fox jumps over the lazy dog in the park"
+tokens = [x.lower() for x in word_tokenize(t)]; content=[x for x in tokens if x not in s]
+print(tokens, content, len(tokens)-len(content), len(tokens))
+for w in ["not", "no", "nor", "never", "but", "against", "don't", "won't"]: print(w, w in s)
+review = "The movie was not good at all"
+tokens = [x.lower() for x in word_tokenize(review)]; print(tokens, [x for x in tokens if x not in s])
+base=s; keep={"not","no","nor","never","but"}; add={"movie","film","watch"}; custom=(base-keep)|add
+print("not" in custom, "movie" in custom, "the" in custom)
+st = PorterStemmer()
+for w in ["run","runs","running","ran","study","studies","studying","happy","happily","happiness","organization","organize","organ"]: print(w, st.stem(w))
+lm = WordNetLemmatizer()
+for w in ["running", "ran", "studies", "better", "was"]: print(w, lm.lemmatize(w))
+print(lm.lemmatize("running", pos="v"), lm.lemmatize("ran", pos="v"), lm.lemmatize("studies", pos="v"), lm.lemmatize("was", pos="v"), lm.lemmatize("better", pos="a"))
+for w in ["studies", "studying", "happily", "better", "was", "mice", "feet"]: print(w, st.stem(w), lm.lemmatize(w, pos="v"), lm.lemmatize(w))
+print("very" in s)

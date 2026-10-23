@@ -120,8 +120,9 @@ export const PipelineScene: React.FC = () => {
           }}
         />
 
-        {/* "A fixed sequence of steps": one faint rule per step, in order. */}
-        {PIPE.stages.map((s, k) => (
+        {/* "A fixed sequence of steps": a faint rule between each step and
+            the next, drawn in order. */}
+        {PIPE.stages.slice(0, -1).map((s, k) => (
           <div
             key={`rule-${s.name}`}
             style={{

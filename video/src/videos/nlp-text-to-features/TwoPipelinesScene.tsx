@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
@@ -32,12 +33,14 @@ const isDroppedBySentiment = (w: string) => PIPE.stop.has(w) && !PIPE.keep.has(w
  * them ("not", "good").
  */
 export const TwoPipelinesScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y } = useLayout();
 
   // ── Cues ──
   const start = n.beat("review").from;
   const sentenceAt = n.word("review", "The plot");
+  const readEnd = n.word("review", "brilliant", { edge: "end" });
   const topicAt = n.word("topic", "topic pipeline");
   const dropsAt = n.word("topic", "drops every stopword");
   const notButAt = n.word("topic", "not and but");
@@ -51,6 +54,13 @@ export const TwoPipelinesScene: React.FC = () => {
   const pairsAt = n.word("sentiment", "word pairs");
   const notGoodAt = n.word("sentiment", "not good");
   const unitAt = n.word("sentiment", "as a unit");
+  const leftWordAt: Record<string, number> = {
+    plot: n.word("topic", "plot"),
+    good: n.word("topic", "good"),
+    acting: n.word("topic", "acting"),
+    brilliant: n.word("topic", "brilliant"),
+  };
+  const read = interpolate(frame, [sentenceAt, readEnd], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   const topicStops = PIPE.alpha.map((w, k) => (isDroppedByTopic(w) ? k : -1)).filter((k) => k >= 0);
   const sentStops = PIPE.alpha.map((w, k) => (isDroppedBySentiment(w) ? k : -1)).filter((k) => k >= 0);
@@ -76,14 +86,27 @@ export const TwoPipelinesScene: React.FC = () => {
       </Headline>
       <FigLabel n="3" title="One review through two pipelines, from the lesson" at={start - 2} x={X0} y={y(FIG_Y)} />
 
-      {/* The review, as the lesson writes it. */}
+      {/* The review, as the lesson writes it, underlined as it is read. */}
       <Ink at={sentenceAt - 4} dur={22} style={{ left: X0, top: y(REVIEW_Y), ...body(42), color: INK, whiteSpace: "nowrap" }}>
-        {REVIEW_WORDS.map((w, k) => (
-          <React.Fragment key={k}>
-            {k > 0 ? " " : null}
-            {PIPE.keep.has(bare(w)) ? <Mark at={notButAt + (bare(w) === "but" ? 6 : 0)}>{w}</Mark> : w}
-          </React.Fragment>
-        ))}
+        <span style={{ position: "relative", display: "inline-block" }}>
+          {REVIEW_WORDS.map((w, k) => (
+            <React.Fragment key={k}>
+              {k > 0 ? " " : null}
+              {PIPE.keep.has(bare(w)) ? <Mark at={notButAt + (bare(w) === "but" ? 6 : 0)}>{w}</Mark> : w}
+            </React.Fragment>
+          ))}
+          <span
+            style={{
+              position: "absolute",
+              left: 0,
+              bottom: "-0.08em",
+              height: 2,
+              width: `${read * 100}%`,
+              background: INK_SOFT,
+              opacity: 1 - ease(frame, topicAt, 12),
+            }}
+          />
+        </span>
       </Ink>
 
       {/* ── The topic pipeline ── */}
@@ -102,6 +125,7 @@ export const TwoPipelinesScene: React.FC = () => {
               strike={i >= 0 ? dropsAt + i * 3 : undefined}
               drop={i >= 0 ? leftAt - 4 : undefined}
               mark={content.has(w) ? fineAt - 2 : undefined}
+              bump={i < 0 ? leftWordAt[w] : undefined}
               markOut={feelingAt - 4}
               tone={w === "good" ? LOST : undefined}
               toneAt={feelingAt}

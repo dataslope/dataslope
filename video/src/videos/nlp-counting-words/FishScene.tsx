@@ -53,8 +53,8 @@ export const FishScene: React.FC = () => {
       {/* ── Sound: each sentence, the two tags ── */}
       <Sfx name="el-whoosh" at={rows[0].at} level={-35} />
       <Sfx name="el-whoosh" at={rows[1].at} level={-35} />
-      <Sfx name="el-pop" at={nnAt - 2} level={-29} />
-      <Sfx name="el-pop" at={vbpAt - 2} level={-29} />
+      <Sfx name="el-pop" at={nnAt - 2} level={-33} />
+      <Sfx name="el-pop" at={vbpAt - 2} level={-33} />
 
       <Kicker at={from - 10}>Tagging words</Kicker>
       <Headline at={spellingAt - 4} second={jobsAt - 2} italic="two jobs.">

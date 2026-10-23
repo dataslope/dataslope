@@ -1,0 +1,26 @@
+// Scratch (gitignored): registers Llm-1-Tokens alone, exactly as Root.tsx does, so
+// its builder can render and check it while other videos are mid-edit.
+// Use: VIDEO_ENTRY=out/entries/Llm-1-Tokens.tsx npm run check:frames -- Llm-1-Tokens
+//      npx remotion still out/entries/Llm-1-Tokens.tsx Llm-1-Tokens out/x.png --frame=300
+import React from "react";
+import { Composition, registerRoot } from "remotion";
+import "../../src/theme/brand";
+import "../../src/theme/fonts";
+import { narratedMetadata } from "../../src/narration/metadata";
+import { EDITORIAL_DEFAULTS, type EditorialProps } from "../../src/editorial/Page";
+import { LlmTokens } from "../../src/videos/llm-tokens/Video";
+import { script } from "../../src/videos/llm-tokens/script";
+
+const Root: React.FC = () => (
+  <Composition
+    id="Llm-1-Tokens"
+    component={LlmTokens}
+    width={1920}
+    height={1080}
+    fps={30}
+    durationInFrames={30 * 60}
+    defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+    calculateMetadata={narratedMetadata<EditorialProps>(script)}
+  />
+);
+registerRoot(Root);

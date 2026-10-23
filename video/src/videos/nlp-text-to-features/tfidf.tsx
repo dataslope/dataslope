@@ -14,6 +14,11 @@ import { COUNTS, DF, IDF, MAX_COUNT, MAX_TFIDF, N, num, OWNER, TFIDF, THE, VOCAB
  */
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+/** 0 → 1 → 0 over `dur` frames from `at`. */
+const swell = (frame: number, at: number, dur: number) => {
+  const t = (frame - at) / dur;
+  return t <= 0 || t >= 1 ? 0 : Math.sin(t * Math.PI) ** 2;
+};
 
 /** A table's geometry in layout units (y through `y()`, heights through
  *  `h()`). Columns run "the", then each document's own four words, with a
@@ -268,10 +273,11 @@ const Block: React.FC<{ g: TableGeo; i: number; p: number }> = ({ g, i, p }) => 
 };
 
 /** The multiplier row: each column's idf, under the documents. */
-export const IdfRow: React.FC<{ g: TableGeo; at: number }> = ({ g, at }) => {
+export const IdfRow: React.FC<{ g: TableGeo; at: number; lit?: readonly number[] }> = ({ g, at, lit = [] }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const p = ease(frame, at, 14);
+  const glow = Math.max(0, ...lit.map((t) => swell(frame, t, 26)));
   if (p <= 0) return null;
   const row = idfRow(g);
   const top = y(row.top);
@@ -306,10 +312,11 @@ export const IdfRow: React.FC<{ g: TableGeo; at: number }> = ({ g, at }) => {
           key={w}
           style={{
             position: "absolute",
-            left: colX(j),
-            width: g.colW,
+            left: colX(j) + PAD,
+            width: g.colW - 2 * PAD,
             top,
             height,
+            background: j === THE ? undefined : tint(glow * 0.7),
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

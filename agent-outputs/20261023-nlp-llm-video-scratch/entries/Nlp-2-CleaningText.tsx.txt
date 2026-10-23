@@ -1,0 +1,26 @@
+// Scratch (gitignored): registers Nlp-2-CleaningText alone, exactly as Root.tsx does, so
+// its builder can render and check it while other videos are mid-edit.
+// Use: VIDEO_ENTRY=out/entries/Nlp-2-CleaningText.tsx npm run check:frames -- Nlp-2-CleaningText
+//      npx remotion still out/entries/Nlp-2-CleaningText.tsx Nlp-2-CleaningText out/x.png --frame=300
+import React from "react";
+import { Composition, registerRoot } from "remotion";
+import "../../src/theme/brand";
+import "../../src/theme/fonts";
+import { narratedMetadata } from "../../src/narration/metadata";
+import { EDITORIAL_DEFAULTS, type EditorialProps } from "../../src/editorial/Page";
+import { NlpCleaningText } from "../../src/videos/nlp-cleaning-text/Video";
+import { script } from "../../src/videos/nlp-cleaning-text/script";
+
+const Root: React.FC = () => (
+  <Composition
+    id="Nlp-2-CleaningText"
+    component={NlpCleaningText}
+    width={1920}
+    height={1080}
+    fps={30}
+    durationInFrames={30 * 60}
+    defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+    calculateMetadata={narratedMetadata<EditorialProps>(script)}
+  />
+);
+registerRoot(Root);

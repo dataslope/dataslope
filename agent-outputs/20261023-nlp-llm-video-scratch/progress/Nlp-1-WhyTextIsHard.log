@@ -1,0 +1,10 @@
+06:07 started, reading brief
+06:11 art submitted (batch, 4 prompts)
+06:13 art imported (4 webp, all reviewed, no redraws)
+06:16 script drafted (49 beats, 3778 chars, est 273 s); measure.py + measurements.json done
+06:40 scenes built (9 scenes + intro); first stills reviewed, fixing layout
+06:59 review stills done, check:frames passed (estimate); voicing
+07:02 voiced: 3 takes, 3863 chars
+07:16 check:sync passed (worst +0.06 s, real)
+08:16 check:motion passed (longest still 2.5 s)
+08:33 check:frames passed (voiced; stretch 0.91, arrows 4.5 deg)

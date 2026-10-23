@@ -1,0 +1,11 @@
+import sys
+from PIL import Image, ImageDraw
+out, *fs = sys.argv[1:]
+s = 0.6
+ims = [Image.open(f).convert("RGB") for f in fs]
+w, h = int(1920 * s), int(1080 * s)
+sheet = Image.new("RGB", (w, h * len(ims) + 6 * (len(ims) - 1)), (120, 120, 120))
+for i, im in enumerate(ims):
+    sheet.paste(im.resize((w, h), Image.LANCZOS), (0, i * (h + 6)))
+    ImageDraw.Draw(sheet).text((8, i * (h + 6) + 4), fs[i].split("/")[-1], fill=(200, 0, 0))
+sheet.save(out)

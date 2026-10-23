@@ -1,0 +1,32 @@
+import numpy as np, os
+p = os.path.join(os.environ["NLTK_DATA"], "models/word2vec_sample/pruned.word2vec.txt")
+words=[]; vecs=[]
+with open(p, encoding="utf8") as f:
+    n, d = map(int, f.readline().split())
+    for line in f:
+        parts=line.rstrip().split(" ")
+        words.append(parts[0]); vecs.append(np.array(parts[1:], dtype=np.float32))
+V=np.vstack(vecs); idx={w:i for i,w in enumerate(words)}
+U=V/np.linalg.norm(V,axis=1,keepdims=True)
+def near(v,k=5,ex=()):
+    v=v/np.linalg.norm(v); s=U@v; o=np.argsort(-s)
+    return [(words[i], round(float(s[i]),4)) for i in o if words[i] not in ex][:k]
+q=U[idx['king']]-U[idx['man']]+U[idx['woman']]
+print(near(q,ex=('king','man','woman')))
+q2=V[idx['king']]-V[idx['man']]+V[idx['woman']]
+print(near(q2,ex=('king','man','woman')))
+print(near(q2,ex=()))
+for a,b in [('great','excellent'),('great','terrible'),('king','queen'),('man','woman'),('great','good')]:
+    print(a,b, float(U[idx[a]]@U[idx[b]]))
+print(near(U[idx['great']],8,ex=('great',)))
+print(near(U[idx['excellent']],8,ex=('excellent',)))
+# plane: gender axis g = woman-man, royalty axis r = king-man orthogonalised to g, origin man
+u=lambda w: U[idx[w]]
+g=u('woman')-u('man'); g/=np.linalg.norm(g)
+r=u('king')-u('man'); r=r-(r@g)*g; r/=np.linalg.norm(r)
+q=u('king')-u('man')+u('woman')
+for w in ['man','woman','king','queen','prince','princess','monarch']:
+    v=u(w)-u('man'); print(w, round(float(v@g),3), round(float(v@r),3))
+v=q-u('man'); print('query', round(float(v@g),3), round(float(v@r),3))
+rk=[w for w,_ in near(U[idx['great']],200,ex=('great',))]
+print('excellent rank among great neighbours', rk.index('excellent')+1 if 'excellent' in rk else None)

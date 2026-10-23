@@ -1,0 +1,12 @@
+06:07 started, reading brief
+06:12 art submitted (4 prompts, batch)
+06:14 measure.py written, all lesson blocks match the page
+06:16 script drafted (4,696 chars, 54 beats, 3 takes, est 330 s); art imported and reviewed (4 webp: tally, novel, fish, hats)
+06:34 scenes built (10 scenes, 15 figures), typechecking
+06:47 stills reviewed and fixed; typecheck, lint, check:cues, npm test (my folder) and check:frames pass on the estimate
+06:47 voicing started (4,775 chars, 3 takes)
+06:50 voiced: 3 takes, all 54 beats
+06:54 check:sync passed (worst +0.05 s, together)
+07:35 check:motion passed (longest still 2.8 s) after 14 motion fixes
+07:46 check:frames passed on the voiced timeline (largest stretch 0.90)
+08:44 check:mix: effects 20.4 LU under narration, closest 9.1 dB

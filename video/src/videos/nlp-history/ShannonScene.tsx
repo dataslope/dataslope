@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -13,13 +13,14 @@ import { DATA, DATA_INK, Headline, InlineArrow, Kicker, lerp, Mark, pulse, SOFT,
 
 /** The paper's first page: the journal and the month, the title, the author,
  *  then lines of text setting themselves one after another. */
-const PaperPage: React.FC<{ x: number; top: number; width: number; height: number; at: number; markAt: number; out: number }> = ({
+const PaperPage: React.FC<{ x: number; top: number; width: number; height: number; at: number; markAt: number; lineAt: number; out: number }> = ({
   x,
   top,
   width,
   height,
   at,
   markAt,
+  lineAt,
   out,
 }) => {
   const frame = useCurrentFrame();
@@ -60,11 +61,15 @@ const PaperPage: React.FC<{ x: number; top: number; width: number; height: numbe
       {Array.from({ length: lines }, (_, i) => {
         const w = ease(frame, at + 20 + i * 6, 12);
         const full = i === lines - 1 ? 0.5 : 0.88 + ((i * 37) % 10) / 100;
+        // The passage the narration points into: two lines, lit in turn.
+        const lit = i === 3 || i === 4 ? ease(frame, lineAt + (i - 3) * 8, 14) : 0;
         return (
-          <div
-            key={i}
-            style={{ position: "absolute", left: pad, top: 222 + i * 30, width: (width - 2 * pad) * full * w, height: 6, borderRadius: 3, background: SOFT }}
-          />
+          <React.Fragment key={i}>
+            {lit > 0 ? (
+              <div style={{ position: "absolute", left: pad - 6, top: 222 + i * 30 - 8, width: ((width - 2 * pad) * full + 12) * lit, height: 22, borderRadius: 4, background: HIGHLIGHT }} />
+            ) : null}
+            <div style={{ position: "absolute", left: pad, top: 222 + i * 30, width: (width - 2 * pad) * full * w, height: 6, borderRadius: 3, background: SOFT }} />
+          </React.Fragment>
         );
       })}
     </div>
@@ -130,6 +135,7 @@ export const ShannonScene: React.FC = () => {
   const from = n.beat("shannon").from;
   const theoryAt = n.word("shannon", "information theory");
   const guessAt = n.word("guess", "guess the next word");
+  const tuckedAt = n.word("guess", "Tucked inside");
   const beforeAt = n.word("guess", "the one before");
   const howOftenAt = n.word("guess", "how often");
   const followsAt = n.word("guess", "follows another");
@@ -217,7 +223,7 @@ export const ShannonScene: React.FC = () => {
       <Headline at={butAt - 2} lead="Could it ever" turn="hold a conversation?" turnAt={conversationAt - 8} />
 
       {/* ── The paper, then the book ── */}
-      <PaperPage x={96} top={y(330)} width={470} height={500} at={from - 4} markAt={theoryAt - 2} out={bookFrom - 2} />
+      <PaperPage x={96} top={y(330)} width={470} height={500} at={from - 4} markAt={theoryAt - 2} lineAt={tuckedAt} out={bookFrom - 2} />
       <Spot id="book" at={handAt - 4} out={sampleOut} left={110} top={y(430)} width={440} height={347} />
 
       {/* ── Fig. 4, Shannon's sample, word by word ── */}

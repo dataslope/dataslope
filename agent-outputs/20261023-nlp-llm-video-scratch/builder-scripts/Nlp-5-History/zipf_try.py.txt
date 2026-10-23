@@ -1,0 +1,11 @@
+from nltk.corpus import gutenberg
+from nltk.probability import FreqDist
+words = [w.lower() for w in gutenberg.words("austen-emma.txt") if w.isalpha()]
+fd = FreqDist(words)
+ranked = fd.most_common()
+print(f"{'rank':>4} {'word':12} {'freq':>6} {'rank*freq':>10}")
+for rank, (word, freq) in enumerate(ranked[:8], start=1):
+    print(f"{rank:>4} {word:12} {freq:>6} {rank * freq:>10}")
+print(len(words), len(fd), sum(1 for w,c in ranked if c==1))
+for r in [10,20,50,100,200,500,1000,2000,5000]:
+    print(r, ranked[r-1], r*ranked[r-1][1])

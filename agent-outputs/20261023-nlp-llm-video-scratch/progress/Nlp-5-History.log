@@ -1,0 +1,12 @@
+06:07 started, reading brief
+06:13 art submitted (4 prompts), facts in progress
+06:15 art imported, all 4 reviewed and kept
+06:22 script drafted (44 beats, 4004 chars), measure.py run
+06:44 scenes built (9 scenes), typecheck/lint/cues clean
+06:53 stills reviewed (round 2), fixes applied; npm test passes for my folder
+07:18 check:frames pass (estimate; 4 images, largest stretch 0.98)
+07:18 voicing started (4,007 chars, 3 takes)
+07:31 voiced: 3 takes, 44 beats, 4,007 chars, 311.8 s
+07:45 check:sync pass (worst +0.04 s, fix)
+08:13 check:motion run 1: 5 stretches >=3 s, fixed (headline/marks/labels on spoken words); re-running motion, frames, mix
+08:41 check:motion pass (longest still 2.5 s, 0:32.3 law); frames and mix queued

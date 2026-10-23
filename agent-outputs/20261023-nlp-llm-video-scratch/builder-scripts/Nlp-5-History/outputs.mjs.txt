@@ -1,0 +1,11 @@
+import { extractBlocks } from "/home/user/dataslope/scripts/lib/mdx-blocks.mjs";
+import { readFileSync } from "node:fs";
+const manifest = JSON.parse(readFileSync("/home/user/dataslope/lib/generated/block-outputs.json", "utf8"));
+function fnv1a(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}return h.toString(16).padStart(8,"0");}
+const blocks = extractBlocks("content/courses/natural-language-processing-python", "python").filter(b=>b.file.includes("interesting-discussions"));
+const all = manifest.entries ?? manifest;
+for (const b of blocks) {
+  const e = b.files.find(f=>f.filename===b.entry);
+  const key = fnv1a(`python\0${e.initCode ?? ""}\0${e.starterCode}`);
+  console.log("==", b.line, key, JSON.stringify(all[key] ?? null, null, 1)?.slice(0,2500));
+}

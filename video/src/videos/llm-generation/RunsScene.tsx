@@ -140,7 +140,7 @@ export const RunsScene: React.FC = () => {
       })}
 
       {/* Fig. 6: each pick is context for the next, so one difference carries on. */}
-      <FigLabel n="6" title="Why it compounds (schematic)" at={contextAt - 8} x={FX} y={y(236)} />
+      <FigLabel n="6" title="Why it compounds (schematic)" at={differentAt + 6} x={FX} y={y(236)} />
       <Svg opacity={ease(frame, agreeAt - 4, 10)}>
         <rect
           x={fxAt(0) - 10}
@@ -164,7 +164,7 @@ export const RunsScene: React.FC = () => {
       {[0, 1].map((branch) =>
         Array.from({ length: TRUNK + BRANCH }, (_, j) => {
           if (branch === 1 && j < TRUNK) return null;
-          const inAt = j < TRUNK ? contextAt - 6 + j * 4 : splitAt - 4 + (j - TRUNK) * 3;
+          const inAt = j < TRUNK ? differentAt + 10 + j * 4 : splitAt - 4 + (j - TRUNK) * 3;
           const p = ease(frame, inAt, 10);
           if (p <= 0) return null;
           const color = j < TRUNK ? ds("gray", 500) : branch === 0 ? HUE[0] : HUE[1];

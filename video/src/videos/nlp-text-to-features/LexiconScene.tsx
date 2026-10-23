@@ -53,6 +53,7 @@ export const LexiconScene: React.FC = () => {
     { title: "Positive", words: POSITIVE, color: POS, ink: POS_INK, at: posAt, sign: "+1", signAt: addAt },
     { title: "Negative", words: NEGATIVE, color: NEG, ink: NEG_INK, at: negAt, sign: "−1", signAt: takeAt },
   ];
+  const aside = ease(frame, rowAt[0] - 18, 22);
   const wrongIdx = NAIVE.findIndex((r) => r.steps.some((s) => s.token === "not"));
   const wrongMark = ease(frame, neverAt + 6, 12);
 
@@ -82,7 +83,8 @@ export const LexiconScene: React.FC = () => {
         It sees good,
       </Headline>
 
-      {/* ── Fig. 14: the lexicon ── */}
+      {/* ── Fig. 14: the lexicon. It is the whole page until the reviews arrive, then steps aside. ── */}
+      <div style={{ position: "absolute", inset: 0, transform: `translateX(${560 * (1 - aside)}px) scale(${1 + 0.22 * (1 - aside)})`, transformOrigin: `${X0}px ${y(FIG_Y)}px` }}>
       <FigLabel n="14" title="The lesson’s lexicon" at={listsAt - 4} x={X0} y={y(FIG_Y)} />
       {lists.map((l, c) => (
         <React.Fragment key={l.title}>
@@ -94,11 +96,13 @@ export const LexiconScene: React.FC = () => {
           </Ink>
           {l.words.map((w, k) => (
             <div key={w} style={{ position: "absolute", left: LEX_X[c], top: y(LEX_Y0 + k * LEX_STEP) }}>
-              <Chip text={w} size={24} at={l.at + k * 1.5} tone={l.color} />
+              <Chip text={w} size={24} at={l.at + k * 1.5} tone={l.color} bump={l.signAt - 2 + k * 2} />
             </div>
           ))}
         </React.Fragment>
       ))}
+
+      </div>
 
       {/* ── Fig. 15: the naive counter ── */}
       <FigLabel n="15" title="The naive counter, on the lesson’s three reviews" at={rowAt[0] - 8} x={FIG15_X} y={y(FIG_Y)} />

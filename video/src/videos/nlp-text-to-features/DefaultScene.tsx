@@ -55,6 +55,9 @@ export const DefaultScene: React.FC = () => {
   const theseAt = n.word("sklearn", "On these three");
   const topAt = n.word("sklearn", "stays on top");
   const callAt = n.word("decide-in", "makes a call");
+  const describeAt = n.word("decide-in", "describe");
+  // The figure steps back as the narration turns to Part 4.
+  const back = 1 - 0.55 * ease(frame, n.beat("decide-in").from, 20);
   const posAt = n.word("decide-in", "positive");
   const negAt = n.word("decide-in", "negative");
 
@@ -86,12 +89,13 @@ export const DefaultScene: React.FC = () => {
       <Sfx name="el-pencil" at={smoothsAt - 2} level={-35} />
       <Sfx name="el-tap" at={addsAt - 2} level={-28} />
       <Sfx name="el-sprinkle" at={theseAt} level={-34} />
-      <Sfx name="el-pop" at={callAt} level={-30} />
+      <Sfx name="el-pop" at={describeAt} level={-30} />
 
       <Kicker at={start - 10}>Weighting words</Kicker>
       <Headline at={start - 4} second={start + 10} size={62} italic="never reaches zero.">
         Scikit-learn’s default
       </Headline>
+      <div style={{ position: "absolute", inset: 0, opacity: back }}>
       <FigLabel n="13" title="One corpus, two idf formulas" at={start - 2} x={X0} y={y(FIG_Y)} />
 
       {/* Column heads and formulas. */}
@@ -210,8 +214,10 @@ export const DefaultScene: React.FC = () => {
         <span style={{ ...note(20, INK_SOFT), display: "block", width: 660 }}>Its defaults: raw counts for tf, then each row scaled to length one.</span>
       </Note>
 
+      </div>
+
       {/* ── The turn to Part 4 ── */}
-      <Spot id="gauge" at={callAt} left={X0} top={y(GAUGE_Y)} width={170} height={h(170)} />
+      <Spot id="gauge" at={describeAt} left={X0} top={y(GAUGE_Y)} width={170} height={h(170)} />
       <Ink at={callAt + 4} dur={16} style={{ left: X0 + 200, top: y(GAUGE_Y) + 50, ...body(40, true), color: INK, whiteSpace: "nowrap" }}>
         <Reveal at={posAt - 2} style={{ color: POS_INK }}>
           positive

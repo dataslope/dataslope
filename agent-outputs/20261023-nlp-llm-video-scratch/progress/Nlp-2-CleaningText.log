@@ -1,0 +1,11 @@
+2026-10-23T06:07:41Z started, reading brief
+2026-10-23T06:14:04Z art submitted (4 prompts, batch)
+2026-10-23T06:16:23Z art imported (4 webp, all checked by eye, no redraws)
+2026-10-23T06:20:07Z script drafted (63 beats, 5469 chars, 3 takes; estimate 6:27)
+2026-10-23T06:41:38Z scenes built (10 scenes, 17 figures); tsc+lint clean for folder
+2026-10-23T06:47:19Z stills reviewed (30 stills, layout fixes applied)
+2026-10-23T06:52:55Z voiced (3 takes, 5582 chars)
+2026-10-23T06:58:23Z check:sync pass (worst +0.08 s, look)
+2026-10-23T07:49:25Z motion fixes applied (two rounds); tsc+lint+check:cues clean; rerunning motion/frames/mix
+2026-10-23T08:21:11Z check:motion pass (longest still 2.5 s)
+2026-10-23T08:40:22Z check:frames pass (voiced)

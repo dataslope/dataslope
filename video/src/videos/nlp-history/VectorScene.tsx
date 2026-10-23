@@ -66,7 +66,10 @@ export const VectorScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("w2v").from;
-  const vecAt = n.word("w2v", "word to vec");
+  const mikolovAt = n.word("w2v", "Mikolov");
+  const vecWordAt = n.word("w2v", "vec");
+  const googleAt = n.word("w2v", "Google");
+  const releasedAt = n.word("w2v", "released");
   const pointAt = n.word("points", "point in space");
   const closeAt = n.word("points", "close together");
   const directionsAt = n.word("analogy", "directions");
@@ -78,6 +81,7 @@ export const VectorScene: React.FC = () => {
   const rememberAt = n.word("great", "Remember");
   const columnsAt = n.word("great", "unrelated columns");
   const neighborsAt = n.word("great", "neighbors");
+  const hereAt = n.word("great", "Here");
 
   // ── Fig. 11, the plane ──
   const OX = 300;
@@ -101,7 +105,8 @@ export const VectorScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound ── */}
-      <Sfx name="el-sprinkle" at={vecAt - 2} level={-33} />
+      <Sfx name="el-pop" at={mikolovAt} level={-32} />
+      <Sfx name="el-pop" at={releasedAt} level={-32} />
       <Sfx name="el-tap" at={kingAt} level={-29} />
       <Sfx name="el-pencil" at={manAt} level={-34} />
       <Sfx name="el-pencil" at={womanAt} level={-34} />
@@ -111,15 +116,15 @@ export const VectorScene: React.FC = () => {
       <Sfx name="el-tap" at={neighborsAt} level={-28} />
 
       <Kicker at={from - 6}>2013: Tomáš Mikolov and colleagues, Google</Kicker>
-      <Headline at={from + 2} lead="Words become" turn="points." turnAt={vecAt + 10} out={directionsAt - 6} />
+      <Headline at={from + 2} lead="Words become" turn="points." turnAt={from + 14} out={directionsAt - 6} />
       <Headline at={directionsAt - 2} lead="Directions" turn="mean something." turnAt={directionsAt + 8} />
 
       <FigLabel n="11" title="Four of its words, on one flat slice of its 300 dimensions" at={from + 2} x={96} y={y(290)} />
       {/* The four words, as points. */}
-      <WordDot x={man[0]} y={man[1]} word="man" at={vecAt - 2} dx={-20} dy={30} swell={pulse(frame, manAt, 20) + pulse(frame, pointAt, 18)} />
-      <WordDot x={woman[0]} y={woman[1]} word="woman" at={vecAt + 4} dx={18} dy={30} swell={pulse(frame, womanAt, 20) + pulse(frame, pointAt + 4, 18)} />
-      <WordDot x={king[0]} y={king[1]} word="king" at={vecAt + 10} dx={-20} dy={-26} swell={pulse(frame, kingAt, 20) + pulse(frame, pointAt + 8, 18)} />
-      <WordDot x={queen[0]} y={queen[1]} word="queen" at={vecAt + 16} dx={-20} dy={30} swell={pulse(frame, queenAt, 24) + pulse(frame, pointAt + 12, 18)} />
+      <WordDot x={man[0]} y={man[1]} word="man" at={mikolovAt} dx={-20} dy={30} swell={pulse(frame, manAt, 20) + pulse(frame, pointAt, 18)} />
+      <WordDot x={woman[0]} y={woman[1]} word="woman" at={googleAt} dx={18} dy={30} swell={pulse(frame, womanAt, 20) + pulse(frame, pointAt + 4, 18)} />
+      <WordDot x={king[0]} y={king[1]} word="king" at={releasedAt} dx={-20} dy={-26} swell={pulse(frame, kingAt, 20) + pulse(frame, pointAt + 8, 18)} />
+      <WordDot x={queen[0]} y={queen[1]} word="queen" at={vecWordAt} dx={-20} dy={30} swell={pulse(frame, queenAt, 24) + pulse(frame, pointAt + 12, 18)} />
       {/* Royal words sit apart from the rest: a wash behind king and queen. */}
       <Svg opacity={ease(frame, closeAt - 6, 14) * (1 - ease(frame, directionsAt, 14))}>
         <ellipse cx={(king[0] + queen[0]) / 2} cy={(king[1] + queen[1]) / 2} rx={150} ry={110} fill={DATA_WASH} />
@@ -174,6 +179,7 @@ export const VectorScene: React.FC = () => {
                 top: top + 8,
                 width: BARW * (w.sim / W2V.excellent[0].sim) * grow,
                 height: 30,
+                transform: isGreat ? `scaleY(${1 + pulse(frame, hereAt - 2, 20) * 0.5})` : undefined,
                 borderRadius: 4,
                 background: isGreat ? DATA : `color-mix(in srgb, ${DATA} 40%, transparent)`,
                 opacity: grow > 0 ? 1 : 0,

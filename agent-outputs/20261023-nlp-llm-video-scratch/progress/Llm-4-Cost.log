@@ -1,0 +1,10 @@
+06:07 started, reading brief
+06:10 art submitted (4 prompts, batch)
+06:15 art imported and reviewed (4/4 ok, no redraws); measure.py + measurements.json done (7 lesson blocks match site output)
+06:39 scenes built (10 scenes, 13 figs); first stills reviewed, layout fixes applied
+06:44 pre-voice review: lint/cues/npm test clean for llm-cost, stills reviewed, check:frames pass (stretch 0.86, arrows 0.0)
+06:55 voiced: 3 takes, 3885 chars
+07:02 check:sync pass (worst +0.03 s, estimate-in)
+07:27 npm test 59/59; check:mix 25.4 LU under; check:motion pass (2.8 s longest), re-running with margin tweaks
+07:43 check:motion pass (longest still 2.3 s)
+08:03 check:frames pass on voiced build (stretch 0.86, arrows 0.0); all checks done; report written

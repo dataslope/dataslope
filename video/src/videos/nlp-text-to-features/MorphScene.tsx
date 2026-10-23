@@ -97,6 +97,15 @@ export const MorphScene: React.FC = () => {
   const tieAt = n.word("tie", "sat tie");
   const onSaysAt = n.word("tie", "On says");
   const rareAt = n.word("tie", "just as rare");
+  const firstDocAt = n.word("tie", "first document");
+  const namedAt: Record<string, number> = {
+    cat: n.word("tie", "cat"),
+    mat: n.word("tie", "mat"),
+    on: n.word("tie", "on and sat"),
+    sat: n.word("tie", "sat tie"),
+  };
+  const rarityAt = n.word("tie", "rarity");
+  const frequentAt = n.word("rule", "frequent here");
 
   const ruleAt = n.beat("rule").from;
   const elsewhereAt = n.word("rule", "rare elsewhere");
@@ -112,8 +121,12 @@ export const MorphScene: React.FC = () => {
   const morph = (i: number, j: number) => ease(frame, turnAt(i, j), 16);
   const strike = (i: number, j: number) => (j === THE ? ease(frame, turnAt(i, j) + 12, 12) : 0);
   const block = (i: number) => (i === 0 ? ease(frame, tieAt - 6, 12) : 0);
+  const own = (i: number, j: number) => COUNTS[i][j] > 0 && j !== THE;
   const glow = (i: number, j: number) =>
-    (i === 0 && j === ON ? pulse(frame, onSaysAt - 2, 30) + pulse(frame, rareAt - 2, 30) : 0) + (j === THE ? pulse(frame, dropsAt + i * 3, 24) : 0);
+    (i === 0 && j === ON ? pulse(frame, onSaysAt - 2, 30) + pulse(frame, rareAt - 2, 30) : 0) +
+    (j === THE ? pulse(frame, dropsAt + i * 3, 24) : 0) +
+    (i === 0 && own(i, j) ? pulse(frame, firstDocAt + j * 2, 22) * 0.6 + pulse(frame, (namedAt[VOCAB[j]] ?? -99) - 2, 18) : 0) +
+    (own(i, j) ? pulse(frame, frequentAt - 2 + i * 4, 24) * 0.7 : 0);
 
   return (
     <AbsoluteFill>
@@ -144,7 +157,7 @@ export const MorphScene: React.FC = () => {
         glow={glow}
         sub={{ at: shareAt, text: (i) => `${spell(LENGTHS[i])} words` }}
       />
-      <IdfRow g={G} at={multiplyAt - 4} />
+      <IdfRow g={G} at={multiplyAt - 4} lit={[rarityAt - 2, elsewhereAt - 2]} />
 
       <Worked j={CAT} x={X0} top={y(EQ_Y)} at={catAt - 4} resultAt={catScoreAt - 2} color={INK} />
       <Worked j={THE} x={940} top={y(EQ_Y)} at={theAt - 4} resultAt={timesZeroAt} color={ACCENT_INK} />

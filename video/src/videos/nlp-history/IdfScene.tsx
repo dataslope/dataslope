@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { IDF } from "./data";
-import { DATA, DATA_INK, Headline, Kicker, Mark } from "./parts";
+import { DATA, DATA_INK, Headline, Kicker, Mark, pulse } from "./parts";
 
 /** mulberry32, for which documents hold each word: layout only, seeded. */
 function mulberry32(seed: number) {
@@ -65,6 +65,7 @@ export const IdfScene: React.FC = () => {
   const inverseAt = n.word("idf", "inverse document frequency");
   const tfidfAt = n.word("idf", "TF-IDF");
   const searchEnginesAt = n.word("idf", "search engines");
+  const todayAt = n.word("idf", "today");
   const lastAt = n.word("sparck-out", "last story");
   const decadesAt = n.word("sparck-out", "four decades");
 
@@ -88,6 +89,8 @@ export const IdfScene: React.FC = () => {
   const commonW = 1 + (IDF.common.weight - 1) * ease(frame, weighsTwoAt - 2, 18);
   const rareW = 1 + (IDF.rare.weight - 1) * ease(frame, sevenAt - 2, 24);
   const settle = ease(frame, lastAt - 2, 30);
+  // "The fewer documents": a ripple runs across the collection.
+  const wave = (c: number, r: number) => pulse(frame, fewerAt + (c + r) * 2, 16);
 
   const row = (top: number, at: number, name: string, color: string, inkColor: string, w: number, docs: React.ReactNode, docsAt: number) => {
     const bar = ease(frame, at, 14);
@@ -135,7 +138,17 @@ export const IdfScene: React.FC = () => {
 
       <Kicker at={from - 6}>1972: Karen Spärck Jones, Cambridge</Kicker>
       <Headline at={searchAt - 4} lead="Every match counted" turn="the same." turnAt={searchAt + 8} out={fixAt - 6} />
-      <Headline at={fixAt - 2} lead="The rarer the word," turn="the more it's worth." turnAt={worthAt - 8} out={lastAt - 8} />
+      <Headline
+        at={fixAt - 2}
+        lead="The rarer the word,"
+        turn={
+          <>
+            the more it&rsquo;s <Mark at={worthAt}>worth.</Mark>
+          </>
+        }
+        turnAt={fixAt + 12}
+        out={lastAt - 8}
+      />
       <Headline at={lastAt - 4} lead="The last story:" turn="four decades on." turnAt={decadesAt - 4} />
 
       {/* ── Fig. 10, her example collection ── */}
@@ -156,7 +169,11 @@ export const IdfScene: React.FC = () => {
             const fill = tr > 0 ? DATA : tc > 0 ? COMMON_INK : PAPER;
             const fillOpacity = tr > 0 ? tr : tc > 0 ? tc * 0.55 : 1;
             return (
-              <g key={i} opacity={p} transform={`translate(${x} ${top + (1 - p) * 8})`}>
+              <g
+                key={i}
+                opacity={p}
+                transform={`translate(${x} ${top + (1 - p) * 8 - wave(c, r) * 6})`}
+              >
                 <rect width={DW} height={DH} rx={3} fill={PAPER} stroke={ds("gray", 400)} strokeWidth={1.4} />
                 {fill !== PAPER ? <rect width={DW} height={DH} rx={3} fill={fill} opacity={fillOpacity} /> : null}
                 {[9, 16, 23].map((ly) => (
@@ -210,7 +227,9 @@ export const IdfScene: React.FC = () => {
         </Ink>
       </div>
       <Ink at={searchEnginesAt} style={{ left: RX, top: y(860), whiteSpace: "nowrap" }}>
-        <div style={{ ...label(23, INK_SOFT) }}>still weighting search results, half a century on</div>
+        <div style={{ ...label(23, INK_SOFT) }}>
+          still weighting search results, <Mark at={todayAt}>half a century on</Mark>
+        </div>
       </Ink>
     </AbsoluteFill>
   );

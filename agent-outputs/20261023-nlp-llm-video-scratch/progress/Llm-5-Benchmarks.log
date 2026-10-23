@@ -1,0 +1,10 @@
+06:07 started, reading brief
+06:10 read brief, README, plan, review, lessons, examples
+06:14 measure.py written, all 6 blocks match the page; art batch submitted (4 prompts)
+06:18 script drafted: 48 beats, 4,393 chars (cap 4,400), est 306 s
+06:43 scenes built (12 scenes, 15 figures); tsc+eslint clean; check:cues clean for folder
+06:59 stills reviewed (12 scenes, fixes applied); check:frames passed pre-art (14 arrows, 0 deg)
+07:11 voiced: 3 takes, 4,379 chars
+07:28 art imported via sync (4 webp); check:sync passed, worst +0.06 s (sat-tell)
+07:40 voiced stills reviewed with art
+08:16 check:frames passed (4 images max stretch 0.92, 15 arrows 0 deg); check:motion found one 3.0 s still (select), fixed

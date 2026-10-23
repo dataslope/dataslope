@@ -307,13 +307,13 @@ export const ParamsScene: React.FC = () => {
     x = s.x1;
     return s;
   });
-  const BY = y(420);
-  const BH = 84;
+  const BY = y(440);
+  const BH = 130;
 
   // Fig. 20.
-  const WY = y(760);
+  const WY = y(785);
   const DX = 1240;
-  const DY = y(890);
+  const DY = y(905);
 
   return (
     <AbsoluteFill>
@@ -393,10 +393,10 @@ export const ParamsScene: React.FC = () => {
           </Fade>
         );
       })}
-      <Fade at={fiftyAt - 2} style={{ left: segs[2].x0 + 24, top: BY + 20 }}>
+      <Fade at={fiftyAt - 2} style={{ left: segs[2].x0 + 28, top: BY + BH / 2 - 26 }}>
         <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 36, color: PAPER, ...TABULAR }}>{PARAMS.ffShare}%</span>
       </Fade>
-      <Note at={knowsAt - 4} x={X0} y={y(580)}>
+      <Note at={knowsAt - 4} x={X0} y={y(615)}>
         <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>
           Much of what it knows. <span style={{ opacity: ease(frame, noAt - 2, 10) }}>No fact database.</span>{" "}
           <span style={{ opacity: ease(frame, justAt - 2, 10) }}>
@@ -406,7 +406,7 @@ export const ParamsScene: React.FC = () => {
       </Note>
 
       {/* ── Fig. 20: width and depth ── */}
-      <FigLabel n="20" title="Width and depth" at={widthAt - 4} x={X0} y={y(670)} />
+      <FigLabel n="20" title="Width and depth" at={widthAt - 4} x={X0} y={y(698)} />
       <Fade at={widthAt - 2} style={{ left: X0, top: WY }}>
         <Strip cells={30} w={26} h={34} at={widthAt} frame={frame} strong />
       </Fade>

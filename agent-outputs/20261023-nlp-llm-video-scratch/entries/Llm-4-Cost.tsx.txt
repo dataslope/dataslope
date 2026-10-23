@@ -1,0 +1,26 @@
+// Scratch (gitignored): registers Llm-4-Cost alone, exactly as Root.tsx does, so
+// its builder can render and check it while other videos are mid-edit.
+// Use: VIDEO_ENTRY=out/entries/Llm-4-Cost.tsx npm run check:frames -- Llm-4-Cost
+//      npx remotion still out/entries/Llm-4-Cost.tsx Llm-4-Cost out/x.png --frame=300
+import React from "react";
+import { Composition, registerRoot } from "remotion";
+import "../../src/theme/brand";
+import "../../src/theme/fonts";
+import { narratedMetadata } from "../../src/narration/metadata";
+import { EDITORIAL_DEFAULTS, type EditorialProps } from "../../src/editorial/Page";
+import { LlmCost } from "../../src/videos/llm-cost/Video";
+import { script } from "../../src/videos/llm-cost/script";
+
+const Root: React.FC = () => (
+  <Composition
+    id="Llm-4-Cost"
+    component={LlmCost}
+    width={1920}
+    height={1080}
+    fps={30}
+    durationInFrames={30 * 60}
+    defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+    calculateMetadata={narratedMetadata<EditorialProps>(script)}
+  />
+);
+registerRoot(Root);

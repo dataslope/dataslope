@@ -1,0 +1,10 @@
+2026-10-23T06:07:37Z started, reading
+2026-10-23T06:14:33Z script drafted (5016 chars, 58 beats, est 353 s); measure.py run
+2026-10-23T06:14:33Z art submitted (4 prompts, batch)
+2026-10-23T06:36:09Z scenes built (14 scenes, 23 figures); typecheck, lint, check:cues clean for folder
+2026-10-23T06:55:41Z stills reviewed (14 scene ends + fixes); check:frames passed pre-voice (no art yet, arrows max 5.9 deg); voicing started (5054 chars, 3 takes)
+2026-10-23T06:58:51Z voiced (3 takes, 5054 chars)
+2026-10-23T07:18:00Z art imported (batch stalled 1 h at 0/4, cancelled; generated with sync; 4 WebPs reviewed, all kept)
+2026-10-23T07:59:07Z check:sync passed (worst +0.04 s); check:frames passed with art (stretch 0.92, arrows 0.0 deg); check:motion run 1 failed (12 stretches >= 3 s), fixed with word-cued motion
+2026-10-23T08:26:11Z check:motion passed (longest still 2.5 s)
+2026-10-23T08:26:24Z check:mix: effects 25.5 LU under narration, peak -21.1 dBFS (logo), speech median 27.1 dB above

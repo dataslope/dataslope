@@ -56,7 +56,11 @@ export const BlindScene: React.FC = () => {
   const biggestAt = n.word("common-in", "biggest counts");
   const leastAt = n.word("common-in", "say the least");
 
-  const stripGrow = ease(frame, tensAt - 2, 30);
+  const fixAt = n.word("common-in", "neat fix");
+  // The strip keeps running out to the right until "zero" is said.
+  const stripGrow = ease(frame, tensAt - 2, Math.max(30, zeroAt - tensAt));
+  // At "neat fix", the three panels step back for the turn line.
+  const back = 1 - 0.55 * ease(frame, fixAt - 4, 18);
   const px = PANEL_X;
 
   return (
@@ -75,6 +79,7 @@ export const BlindScene: React.FC = () => {
       </Headline>
       <FigLabel n="9" title="What the bag throws away" at={start - 2} x={X0} y={y(FIG_Y)} />
 
+      <div style={{ position: "absolute", inset: 0, opacity: back }}>
       {/* ── (a) Order: two sentences, one bag ── */}
       <Ink at={dogAt - 8} dur={12} style={{ left: px[0], top: y(HEAD_Y), ...label(24, INK), whiteSpace: "nowrap" }}>
         Order
@@ -181,7 +186,7 @@ export const BlindScene: React.FC = () => {
               {w}
             </Ink>
             {[0, 1, 2].map((r) => (
-              <ColumnCell key={r} at={at + 2 + r * 2} x={x + 30} top={y(SENT_Y + 64 + r * 64)} h={h(54)} />
+              <ColumnCell key={r} at={at + 2 + r * 2} x={x + 30} top={y(SENT_Y + 64 + r * 64)} h={h(54)} glow={meaningAt + k * 6 + r * 3} />
             ))}
           </React.Fragment>
         );
@@ -192,6 +197,8 @@ export const BlindScene: React.FC = () => {
       <Note at={meaningAt - 2} x={px[2]} y={y(SENT_Y + 316)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>nothing says they mean the same</span>
       </Note>
+
+      </div>
 
       {/* ── The turn: the commonest word wins every row ── */}
       <div style={{ position: "absolute", left: X0, top: y(COMMON_Y), display: "flex", alignItems: "center", gap: 18, whiteSpace: "nowrap" }}>
@@ -208,9 +215,10 @@ export const BlindScene: React.FC = () => {
 };
 
 /** An empty cell of a matrix column, drawn as an outline. */
-const ColumnCell: React.FC<{ at: number; x: number; top: number; h: number }> = ({ at, x, top, h }) => {
+const ColumnCell: React.FC<{ at: number; x: number; top: number; h: number; glow: number }> = ({ at, x, top, h, glow }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
+  const g = pulse(frame, glow, 20);
   return (
     <div
       style={{
@@ -221,7 +229,7 @@ const ColumnCell: React.FC<{ at: number; x: number; top: number; h: number }> = 
         height: h,
         boxSizing: "border-box",
         border: `1.5px solid ${CHIP_LINE}`,
-        background: tint(0.25),
+        background: tint(0.25 + 0.75 * g),
         opacity: p,
       }}
     />

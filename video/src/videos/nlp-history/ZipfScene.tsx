@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ZIPF } from "./data";
-import { DATA, DATA_INK, DATA_WASH, drift, Headline, Kicker, Mark, Svg, Tag } from "./parts";
+import { DATA, DATA_INK, DATA_WASH, drift, Headline, Kicker, Mark, pulse, Svg, Tag } from "./parts";
 
 /** The log-log frame: rank 1 to 10,000 across, count about 0.6 to 12,000 up. */
 const CX0 = 880;
@@ -39,12 +39,17 @@ export const ZipfScene: React.FC = () => {
   const overAt = n.word("law", "one over the rank");
   const lawAt = n.word("law", "Zipf's law");
   const heresAt = n.word("emma", "Here's");
+  const emmaAt = n.word("emma", "Emma");
+  const firstTwoAt = n.word("emma", "first two words");
   const roughAt = n.word("emma", "rough");
   const tieAt = n.word("emma", "almost tie");
   const hundredAt = n.word("tail", "a hundred words");
   const sixtyAt = n.word("tail", "sixty percent");
   const sevenAt = n.word("tail", "seven thousand");
   const onceAt = n.word("tail", "just once");
+  const differentAt = n.word("tail", "different words");
+  const fourAt = n.word("tail", "nearly four in ten");
+  const appearAt = n.word("tail", "appear");
   const nextAt = n.word("zipf-out", "Next");
   const predictAt = n.word("zipf-out", "predict");
 
@@ -69,7 +74,7 @@ export const ZipfScene: React.FC = () => {
   const lineFrom = ZIPF.lineC / 10 ** HI;
   const guide = ease(frame, overAt - 2, 30);
   const band = ease(frame, hundredAt - 2, 18);
-  const tail = ease(frame, onceAt - 6, 16);
+  const tail = ease(frame, fourAt - 2, 20);
   const hapax0 = lx(ZIPF.firstHapaxRank);
   const hapax1 = lx(ZIPF.distinct);
   const settle = drift(frame, nextAt, 1, 120);
@@ -85,7 +90,9 @@ export const ZipfScene: React.FC = () => {
       <Sfx name="el-pencil" at={roughAt} level={-35} />
       <Sfx name="el-whoosh" at={hundredAt - 2} level={-34} />
       <Sfx name="el-tap" at={sixtyAt} level={-28} />
-      <Sfx name="el-tap" at={onceAt - 4} level={-28} />
+      <Sfx name="el-tap" at={sevenAt - 2} level={-30} />
+      <Sfx name="el-pencil" at={fourAt - 2} level={-35} />
+      <Sfx name="el-tap" at={appearAt - 2} level={-29} />
 
       <Kicker at={from - 6}>The 1930s: George Zipf</Kicker>
       <Headline at={from + 2} lead="Zipf" turn="counted words." turnAt={from + 12} out={rankAt - 8} />
@@ -94,8 +101,8 @@ export const ZipfScene: React.FC = () => {
       <Headline at={nextAt - 2} lead="Next, counts become" turn="predictions." turnAt={predictAt - 6} />
 
       {/* ── Fig. 2, the lesson's table ── */}
-      <FigLabel n="2" title="A novel's most common words" at={from} x={96} y={y(290)} out={heresAt - 6} />
-      <FigLabel n="2" title="Emma's most common words" at={heresAt} x={96} y={y(290)} />
+      <FigLabel n="2" title="A novel's most common words" at={from} x={96} y={y(290)} out={heresAt - 2} />
+      <FigLabel n="2" title="Emma's most common words" at={emmaAt - 4} x={96} y={y(290)} />
       <div style={{ opacity: 1 - settle * 0.25 }}>
         {COLS.map((c, i) => (
           <Ink key={c.title} at={from + 4 + i * 3} dur={12} style={{ left: colX[i], top: TTOP, width: c.w, textAlign: c.align }}>
@@ -121,7 +128,7 @@ export const ZipfScene: React.FC = () => {
               {cell(
                 2,
                 <span style={{ ...note(28, DATA_INK), ...TABULAR, fontWeight: 600 }}>
-                  {isTop ? <Mark at={tieAt - 2 + i * 4}>{fmt(row.count, 0)}</Mark> : fmt(row.count, 0)}
+                  {isTop ? <Mark at={(i === 0 ? firstTwoAt : tieAt) - 2}>{fmt(row.count, 0)}</Mark> : fmt(row.count, 0)}
                 </span>,
               )}
             </React.Fragment>
@@ -149,7 +156,7 @@ export const ZipfScene: React.FC = () => {
           y1={ly(1)}
           y2={ly(1)}
           stroke={HIGHLIGHT}
-          strokeWidth={16}
+          strokeWidth={16 * (1 + pulse(frame, onceAt - 2, 20) * 0.6)}
           strokeLinecap="round"
           opacity={tail > 0 ? 1 : 0}
         />
@@ -174,7 +181,7 @@ export const ZipfScene: React.FC = () => {
           stroke={ACCENT}
           strokeWidth={2.6}
           pathLength={1}
-          strokeDasharray={`${ease(frame, tieAt - 4, 14)} 1`}
+          strokeDasharray={`${ease(frame, roughAt - 2, 14)} 1`}
         />
       </Svg>
       {TICKS.map((t) => (
@@ -187,6 +194,12 @@ export const ZipfScene: React.FC = () => {
           </div>
         </React.Fragment>
       ))}
+      <Svg opacity={ease(frame, sevenAt - 2, 10)}>
+        <line x1={hapax1} x2={hapax1} y1={CY1 - 8} y2={CY1 + 8} stroke={DATA} strokeWidth={3} />
+      </Svg>
+      <Tag x={hapax1} y={ly(1) - 44} at={sevenAt - 2} align="center" size={20} color={DATA_INK} weight={650} style={{ background: PAPER }}>
+        <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span>
+      </Tag>
       <Tag x={(CX0 + CX1) / 2} y={CY1 + 46} at={rankAt + 4} align="center" size={20} weight={600}>
         rank
       </Tag>
@@ -206,13 +219,13 @@ export const ZipfScene: React.FC = () => {
         {fmt(ZIPF.top100Share * 100, 0)}% of the book
       </Tag>
       {/* Left of the run, where the plot is empty, with a short lead to it. */}
-      <Svg opacity={ease(frame, onceAt, 12)}>
+      <Svg opacity={ease(frame, appearAt + 4, 12)}>
         <line x1={HAPAX_LABEL + 12} x2={hapax0 - 14} y1={ly(1) - 14} y2={ly(1)} stroke={INK} strokeWidth={1.6} />
       </Svg>
-      <Tag x={HAPAX_LABEL} y={ly(1) - 64} at={sevenAt} align="right" size={22} color={INK} weight={650}>
+      <Tag x={HAPAX_LABEL} y={ly(1) - 64} at={differentAt - 2} align="right" size={22} color={INK} weight={650}>
         <span style={TABULAR}>{fmt(ZIPF.hapaxes, 0)}</span> of <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span> words
       </Tag>
-      <Tag x={HAPAX_LABEL} y={ly(1) - 34} at={onceAt - 2} align="right" size={22} color={INK} weight={650}>
+      <Tag x={HAPAX_LABEL} y={ly(1) - 34} at={appearAt - 2} align="right" size={22} color={INK} weight={650}>
         appear once
       </Tag>
     </AbsoluteFill>

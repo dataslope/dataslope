@@ -162,6 +162,7 @@ export const BpeScene: React.FC = () => {
   const rowY = (i: number) => y(ROW0) + i * h(ROW_STEP);
   const corpus = WORDS.flatMap((w) => Array.from({ length: FREQS[w] }, () => w));
   const corpusStep = Math.max(3, (trainingAt - bpeFrom - 8) / corpus.length);
+  const lift = ease(frame, trainingAt + 6, 18);
   const rowIn = (i: number) => ease(frame, wordSaid[i] - 2, 12);
   const splitP = ease(frame, splitAt, 14);
   const markerP = ease(frame, markerAt - 2, 12);
@@ -209,6 +210,10 @@ export const BpeScene: React.FC = () => {
             color: INK_SOFT,
             whiteSpace: "nowrap",
             opacity: 1 - 0.5 * ease(frame, splitAt, 14),
+            // While it is the only thing on the page it is set large in the
+            // middle; on "training text" it moves up to its line over the rows.
+            transformOrigin: "0 0",
+            transform: `translateY(${(1 - lift) * h(150)}px) scale(${1 + 0.6 * (1 - lift)})`,
           }}
         >
           {/* The training text writes itself out word by word, up to "training text". */}
