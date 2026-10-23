@@ -57,6 +57,7 @@ export const BillsScene: React.FC = () => {
   const valueAt = [n.word("bills", "thirteen cents"), n.word("bills", "thirty-seven"), n.word("bills", "dollar nineteen")];
   const ratiosFrom = n.beat("ratios").from;
   const ratioAt = [n.word("ratios", "two point eight"), n.word("ratios", "three point two"), n.word("ratios", "three and a half")];
+  const longerAt = n.word("toward", "longer");
   const triangleAt = n.word("toward", "triangle");
   const towardAt = n.word("toward", "toward");
   const creepsAt = n.word("toward", "creeps");
@@ -167,7 +168,7 @@ export const BillsScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), ...TABULAR }}>{`×${r}`}</span>
         </Note>
       ))}
-      <Note at={triangleAt - 4} x={nx(2) - 100} y={y(NY) + 52} width={200} style={{ textAlign: "center" }}>
+      <Note at={longerAt + 6} x={nx(2) - 100} y={y(NY) + 52} width={200} style={{ textAlign: "center" }}>
         <span style={{ ...note(22, LINE_EDGE), fontWeight: 600, whiteSpace: "nowrap" }}>all rectangle</span>
       </Note>
       <Note at={triangleAt} x={nx(4) - 100} y={y(NY) + 52} width={200} style={{ textAlign: "center" }}>
@@ -179,7 +180,8 @@ export const BillsScene: React.FC = () => {
         return (
           <React.Fragment key={k}>
             <Svg>
-              <circle cx={nx(d.times)} cy={y(NY)} r={10 * p} fill={POINT} />
+              {/* "The longer the chat": the three swell in turn, left to right. */}
+              <circle cx={nx(d.times)} cy={y(NY)} r={10 * p + 6 * pulse(frame, longerAt - 2 + k * 9, 18)} fill={POINT} />
             </Svg>
             <Note at={ratioAt[k]} x={nx(d.times) - 90} y={y(NY) - 92} width={180} from="up" style={{ textAlign: "center" }}>
               <span style={{ display: "block", ...note(21, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>

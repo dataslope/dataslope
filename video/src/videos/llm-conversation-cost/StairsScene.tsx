@@ -106,6 +106,7 @@ export const StairsScene: React.FC = () => {
   const sameAt = n.word("split", "same every turn");
   const triAt = n.word("triangle", "triangle");
   const chatAt = n.word("triangle", "chat itself");
+  const againAndAt = n.word("triangle", "again and again");
   const nowAt = n.beat("double").from;
   const doubleAt = n.word("double", "double the turns");
   const longAt = n.word("double", "twice as long");
@@ -299,7 +300,16 @@ export const StairsScene: React.FC = () => {
         lineTint={lineTint}
         triTint={triTint}
         dividers={1 - clamp01(z * 4)}
-        flash={(t) => Math.max(pulse(frame, payAt + 2 + t * 0.9, 14), t === TURNS.length ? pulse(frame, fortyAt - 2, 24) : 0)}
+        flash={(t) =>
+          Math.max(
+            // "every one of those bars", and the chat "sent again and again"
+            pulse(frame, payAt + 2 + t * 0.9, 14),
+            pulse(frame, againAndAt - 4 + t * 0.9, 16) * 0.8,
+            t === TURNS.length ? pulse(frame, fortyAt - 2, 24) : 0,
+          )
+        }
+        // After turn forty is read: one new slice a turn, rippling up the stairs.
+        glow={(t) => pulse(frame, countAt + 34 + t * 1.1, 16)}
       />
 
       {/* Up close, turn one: the system prompt and the first message. */}
@@ -407,6 +417,16 @@ export const StairsScene: React.FC = () => {
           pathLength={1}
           strokeDasharray={`${ease(frame, triAt - 2, 22)} 1`}
           opacity={1 - ease(frame, nowAt - 4, 12)}
+        />
+      </Svg>
+      {/* "the same every turn": a shine runs along the rectangle, every turn of it. */}
+      <Svg opacity={pulse(frame, sameAt - 2, 46)}>
+        <rect
+          x={CHART.x0 + (x40 - CHART.x0 - 140) * clamp01((frame - sameAt + 2) / 46)}
+          y={L}
+          width={140}
+          height={full.base - L}
+          fill={`color-mix(in srgb, ${PAPER} 55%, transparent)`}
         />
       </Svg>
       <Note at={sameAt - 6} x={CHART.x0 + 18} y={L + (full.base - L) / 2 - 15}>
