@@ -71,7 +71,7 @@ export const ElizaScene: React.FC = () => {
       <Sfx name="el-tap" at={effectAt} level={-28} />
 
       <Kicker at={from - 6}>1966: Joseph Weizenbaum, MIT</Kicker>
-      <Headline at={from} lead="ELIZA" turn="played a therapist." turnAt={therapistAt - 4} out={noAt - 6} />
+      <Headline at={from} lead="ELIZA" turn={<>played a <Mark at={therapistAt}>therapist.</Mark></>} turnAt={from + 12} out={noAt - 6} />
       <Headline at={noAt - 2} lead="No understanding," turn="and yet." turnAt={yetAt - 2} out={effectAt - 8} />
       <Headline at={effectAt - 4} lead="The ELIZA" turn="effect." turnAt={effectAt + 4} />
 

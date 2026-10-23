@@ -76,6 +76,8 @@ export const MarketScene: React.FC = () => {
   const dollarAt = n.word("oversized", "dollar twenty");
   const sixtyAt = n.word("oversized", "sixty cents");
   const workloadAt = n.word("estimate-in", "workload");
+  const sheetAt = n.word("estimate-in", "price sheet");
+  const nowAt = n.word("estimate-in", "Now");
 
   const rowY = (i: number) => y(ROW_Y0 + i * ROW_DY);
   const rowAt = (i: number) => marketAt - 2 + i * 3;
@@ -112,7 +114,8 @@ export const MarketScene: React.FC = () => {
         The market,
       </Headline>
 
-      <Dim at={workloadAt - 4} to={0.4}>
+      {/* The turn: the sheet sets back slowly while the next question is asked. */}
+      <Dim at={nowAt - 4} to={0.4} dur={Math.max(16, workloadAt - nowAt + 46)}>
         {/* ── Fig. 5: the table ── */}
         <FigLabel n="5" title="Published rates, USD per million tokens" at={marketFrom + 2} x={X0} y={y(FIG_Y)} />
         {[
@@ -328,7 +331,7 @@ export const MarketScene: React.FC = () => {
         </Note>
         <Note at={dollarAt - 4} x={F6_X} y={y(AXIS_Y + 96)}>
           <span style={{ ...note(27, INPUT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
-            {usd(OVERSIZED.above)}
+            <Marked at={sheetAt - 2}>{usd(OVERSIZED.above)}</Marked>
             <span style={{ ...note(25, INK), fontWeight: 500 }}>, the whole request at {gpt6.inMult}x</span>
           </span>
         </Note>

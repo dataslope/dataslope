@@ -69,7 +69,7 @@ export const BagScene: React.FC = () => {
   const into = (k: number) => ease(frame, tipAt + 4 + k * 2, 14);
   const shake = Math.sin((frame - shakeAt) / 2.2) * 5 * (1 - ease(frame, shakeAt + 4, 22)) * (frame >= shakeAt ? 1 : 0);
   const slide = -420 * (1 - ease(frame, docsAt - 16, 24));
-  const mouth: [number, number] = [BAG.left + BAG.size * 0.42, y(BAG.top) + h(BAG.size) * 0.42];
+  const mouth: [number, number] = [BAG.left + BAG.size * 0.55, y(BAG.top) + h(BAG.size) * 0.4];
 
   // The cells of doc1 the narration names, by vocabulary column.
   const named: { col: number; at: number }[] = [

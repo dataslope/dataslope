@@ -132,7 +132,7 @@ export const IdfScene: React.FC = () => {
       <Sfx name="el-tap" at={tfidfAt} level={-28} />
 
       <Kicker at={from - 6}>1972: Karen Spärck Jones, Cambridge</Kicker>
-      <Headline at={searchAt - 4} lead="Every match counted" turn="the same." turnAt={muchAt - 2} out={fixAt - 6} />
+      <Headline at={searchAt - 4} lead="Every match counted" turn="the same." turnAt={searchAt + 8} out={fixAt - 6} />
       <Headline at={fixAt - 2} lead="The rarer the word," turn="the more it's worth." turnAt={worthAt - 8} />
 
       {/* ── Fig. 10, her example collection ── */}

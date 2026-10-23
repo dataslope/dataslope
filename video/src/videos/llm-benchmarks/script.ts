@@ -122,14 +122,16 @@ export const script: NarrationScript = {
       text: "Each is a fixed set of questions with known answers.",
       pauseAfter: 0.7,
     },
-    { id: "mmlu", text: "MMLU is multiple choice across fifty-seven subjects, from elementary math to law." },
+    { id: "mmlu", text: "MMLU is multiple choice across fifty-seven subjects, from elementary math to law.", pauseAfter: 0.7 },
     {
       id: "gpqa",
       text: "GPQA Diamond is graduate science: PhDs from other fields, even with the web, score about thirty-four percent.",
+      pauseAfter: 0.7,
     },
     {
       id: "swe",
       text: "SWE-bench hands over a real GitHub issue, and the patch has to pass the project's own tests.",
+      pauseAfter: 0.7,
     },
     {
       id: "arc",
@@ -161,6 +163,7 @@ export const script: NarrationScript = {
     {
       id: "sat-now",
       text: "Every frontier model clears ninety-two on MMLU. GPQA Diamond, built to replace it, has its leaders around ninety-five.",
+      pauseAfter: 0.7,
     },
     {
       id: "sat-fast",
@@ -270,7 +273,7 @@ export const script: NarrationScript = {
     {
       id: "props",
       text: "Next: score properties. Does it name the three facts, and stay under the limit?",
-      pauseAfter: 0.5,
+      pauseAfter: 0.6,
     },
     {
       id: "judge",

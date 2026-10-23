@@ -109,3 +109,19 @@ export const ORDER = {
 };
 
 export const STOPWORDS = m.stopwords;
+
+// ── What the narration says aloud ───────────────────────────────────────────
+// script.ts speaks these numbers as words; if a re-run of measure.py ever
+// changed one, the video would contradict itself, so it stops here instead.
+const SPOKEN: [string, number, number][] = [
+  ["sixty-two characters", HOOK.chars, 62],
+  ["eight pieces", SPLIT.pieces.length, 8],
+  ["twelve tokens", SPLIT.tokens.length, 12],
+  ["thirteen tokens", PIPE.stages[0].tokens.length, 13],
+  ["eleven left", PIPE.stages[2].tokens.length, 11],
+  ["five little words", dropped(3).length, 5],
+  ["six left", PIPE.stages[3].tokens.length, 6],
+];
+for (const [said, measured, expected] of SPOKEN) {
+  if (measured !== expected) throw new Error(`The narration says "${said}", but measure.py gives ${measured}`);
+}

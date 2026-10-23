@@ -13,7 +13,7 @@ export const VIDEO = "nlp-text-to-features";
  * Whether public/images/nlp-text-to-features/ holds the four watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 // ── Part 1. choosing-your-pipeline ───────────────────────────────────────────
 

@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA } from "./data";
-import { Bracket, DATA, Headline, Kicker, Marked, numStyle, Svg } from "./parts";
+import { Bracket, DATA, Headline, Kicker, Marked, numStyle, pulse, Svg } from "./parts";
 
 /** Fig. 4: the vocabulary as a hundred squares, on the left. */
 const WX = 130;
@@ -53,12 +53,21 @@ export const TailScene: React.FC = () => {
   const hapaxAt = n.word("hapax", "hapaxes");
   const twoInFiveAt = n.word("zipf", "two in five");
   const giantsAt = n.word("zipf", "giants");
-  const tailAt = n.word("zipf", "tail");
   const zipfAt = n.word("zipf", "Zipf's");
   const closesAt = n.word("grows", "never closes");
   const lastAt = n.word("grows", "last ten thousand");
   const newAt = n.word("grows", "hundred and eighty-eight");
   const topAt = n.word("top-in", "top");
+  const twoThousandAt = n.word("hapax", "two thousand seven hundred");
+  const longAt = n.word("zipf", "long");
+  const almostAt = n.word("zipf", "almost");
+  const tailGrowsAt = n.word("grows", "tail");
+  const beforeAt = n.word("grows", "before");
+  const tellAt = n.word("top-in", "tell");
+  const bookAt = n.word("top-in", "book");
+  // As each figure is done with, it steps back for the next.
+  const fig6Back = 1 - 0.6 * ease(frame, tellAt - 2, 14);
+  const fig4Back = 1 - 0.6 * ease(frame, bookAt - 2, 14);
 
   // ── Fig. 4 geometry ──
   const base = y(BASE);
@@ -98,7 +107,7 @@ export const TailScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={differentAt - 6} level={-32} />
       <Sfx name="el-whoosh" at={rankAt - 2} level={-34} />
       <Sfx name="el-pencil" at={topTenAt - 2} level={-34} />
-      <Sfx name="el-sprinkle" at={onceAt - 4} level={-31} />
+      <Sfx name="el-sprinkle" at={twoThousandAt} level={-31} />
       <Sfx name="el-pencil" at={closesAt - 4} level={-35} />
       <Sfx name="el-tap" at={newAt - 2} level={-27} />
 
@@ -107,7 +116,8 @@ export const TailScene: React.FC = () => {
         {`${fmt(EMMA.total, 0)} words,`}
       </Headline>
 
-      {/* Fig. 5: the vocabulary, a square for each hundredth of it. */}
+      {/* Fig. 4: the vocabulary, a square for each hundredth of it. */}
+      <div style={{ position: "absolute", inset: 0, opacity: fig4Back }}>
       <FigLabel n="4" title={`Emma's ${fmt(EMMA.distinct, 0)} different words`} at={sevenAt - 4} x={WX - 6} y={y(286)} />
       <Svg>
         {Array.from({ length: 100 }, (_, k) => {
@@ -116,7 +126,8 @@ export const TailScene: React.FC = () => {
           const p = ease(frame, cellAt(k), 8);
           if (p <= 0) return null;
           const once = k >= 100 - onceCells;
-          const turn = once ? ease(frame, onceAt - 4 + (k - (100 - onceCells)) * 0.6, 8) : 0;
+          // The hapaxes turn one square at a time as the count is read out.
+          const turn = once ? ease(frame, twoThousandAt + (k - (100 - onceCells)) * 2, 6) : 0;
           return (
             <rect
               key={k}
@@ -147,8 +158,9 @@ export const TailScene: React.FC = () => {
       <Note at={hapaxAt - 2} x={WX} y={cellTop + waffleSide + 88}>
         <div style={{ ...body(28, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>the hapaxes</div>
       </Note>
+      </div>
 
-      {/* Fig. 4: ranked by count. */}
+      {/* Fig. 5: ranked by count. */}
       <FigLabel n="5" title={`Emma's ${BARS} most common words, by count`} at={rankAt - 4} x={X0 - 10} y={y(286)} />
       <Svg>
         <line x1={X0 - 6} x2={X0 - 6 + (TAIL_X1 - X0 + 12) * ease(frame, rankAt - 4, 16)} y1={base + 0.5} y2={base + 0.5} stroke={INK} strokeWidth={1.6} />
@@ -167,6 +179,15 @@ export const TailScene: React.FC = () => {
             style={{ clipPath: `inset(0 ${(1 - tailP) * 100}% 0 0)` }}
           />
         ) : null}
+        {/* "a long, thin tail": a wash over it as it is named. */}
+        <rect
+          x={TAIL_X0 - 4}
+          y={base - h(70)}
+          width={TAIL_X1 - TAIL_X0 + 8}
+          height={h(70)}
+          fill={ACCENT}
+          opacity={0.16 * pulse(frame, longAt - 2, 36)}
+        />
         {tailP > 0 ? (
           <g opacity={ease(frame, otherEndAt - 4, 10)} stroke={INK_SOFT} strokeWidth={1.6}>
             <line x1={TAIL_X0 - 10} x2={TAIL_X0 - 2} y1={base + 8} y2={base - 8} />
@@ -189,17 +210,22 @@ export const TailScene: React.FC = () => {
         <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>the other {fmt(EMMA.distinct - BARS, 0)},</div>
         <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>squeezed in</div>
       </Note>
-      <Note at={tailAt - 2} x={X0 + 10 * PITCH + 10} y={bracketY + 44}>
+      <Note at={giantsAt - 6} x={X0 + 10 * PITCH + 10} y={bracketY + 44}>
         <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
-          <Marked at={giantsAt - 2}>A few giants</Marked>, a long tail:
+          <Marked at={giantsAt}>A few giants</Marked>
+          <span style={{ opacity: ease(frame, longAt - 2, 12) }}>, a long tail:</span>
         </div>
         <div style={{ ...body(30), color: ACCENT_INK, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, zipfAt - 2, 12) }}>Zipf&apos;s law</div>
+        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 8, opacity: ease(frame, almostAt - 2, 12) }}>
+          and almost every text has it
+        </div>
       </Note>
 
       {/* Fig. 6: the vocabulary still growing at the last page. */}
-      <FigLabel n="6" title="New words keep arriving" at={closesAt - 6} x={GX0 - 10} y={y(GBASE - GTALL - 64)} />
+      <div style={{ position: "absolute", inset: 0, opacity: fig6Back }}>
+      <FigLabel n="6" title="New words keep arriving" at={tailGrowsAt - 4} x={GX0 - 10} y={y(GBASE - GTALL - 64)} />
       <Svg>
-        <line x1={GX0} x2={GX0 + (GX1 - GX0) * ease(frame, closesAt - 6, 16)} y1={gBase + 0.5} y2={gBase + 0.5} stroke={INK} strokeWidth={1.6} />
+        <line x1={GX0} x2={GX0 + (GX1 - GX0) * ease(frame, tailGrowsAt - 4, 16)} y1={gBase + 0.5} y2={gBase + 0.5} stroke={INK} strokeWidth={1.6} />
         {drawP > 0 ? <path d={path} fill="none" stroke={DATA} strokeWidth={3.2} strokeLinejoin="round" strokeLinecap="round" /> : null}
         {lastP > 0 ? (
           <>
@@ -208,7 +234,7 @@ export const TailScene: React.FC = () => {
               y={gBase - gTall - 14}
               width={(gx(EMMA.total) - gx(lastFrom)) * lastP}
               height={gTall + 14}
-              fill={`color-mix(in srgb, ${ACCENT} 12%, ${PAPER})`}
+              fill={`color-mix(in srgb, ${ACCENT} ${Math.round(12 + 18 * pulse(frame, beforeAt - 2, 30))}%, ${PAPER})`}
             />
             <path d={lastPath} fill="none" stroke={ACCENT} strokeWidth={4} strokeLinecap="round" pathLength={1} strokeDasharray={`${lastP} 1`} />
           </>
@@ -227,7 +253,9 @@ export const TailScene: React.FC = () => {
         <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           <span style={numStyle(24, ACCENT_INK)}>+{EMMA.newAtEnd}</span> new
         </div>
-        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>in the last {fmt(EMMA.last, 0)}</div>
+      </Note>
+      <Note at={lastAt} x={GX1 + 18} y={gy(EMMA.distinct) + 28}>
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>in the last {fmt(EMMA.last, 0)}</div>
       </Note>
       <div
         style={{
@@ -237,9 +265,10 @@ export const TailScene: React.FC = () => {
           width: 1,
           height: gTall,
           background: HAIRLINE,
-          opacity: ease(frame, closesAt - 6, 12) * 0.6,
+          opacity: ease(frame, tailGrowsAt - 4, 12) * 0.6,
         }}
       />
+      </div>
     </AbsoluteFill>
   );
 };

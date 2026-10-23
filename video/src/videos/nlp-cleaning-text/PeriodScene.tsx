@@ -7,7 +7,7 @@ import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SENTENCES } from "./data";
-import { Chip, chipHeight, Headline, Kicker, LabelEnd, RawText, rowLayout, rowWidth, Tag, X0 } from "./parts";
+import { Chip, chipHeight, Headline, Kicker, LabelEnd, RawText, rowLayout, rowWidth, Tag, wordSpans, X0 } from "./parts";
 
 const SIZE = 40;
 const FIG3_Y = 300;
@@ -38,21 +38,22 @@ export const PeriodScene: React.FC = () => {
   const endAt = n.word("period", "end");
   const titleAt = n.word("period", "title");
   const decimalAt = n.word("period", "decimal");
-  const lee = n.beat("lee");
+  const allAt = n.word("lee", "all");
   const splitAt = n.word("naive", "Split");
   const fallsAt = n.word("naive", "falls");
   const fiveAt = n.word("naive", "five", { nth: 1 });
   const doctorAt = n.word("naive", "doctor");
   const insideAt = n.word("naive", "inside");
+  const twoAt = n.word("naive", "two");
   const questionAt = n.word("naive", "question");
   const nltkAt = n.word("punkt", "NLTK's");
-  const sentenceAt = n.word("punkt", "sentence");
+  const punktAt = n.word("punkt", "Punkt");
   const abbrAt = n.word("punkt", "abbreviations");
   const decimalsAt = n.word("punkt", "decimals");
   const returnsAt = n.word("punkt", "returns");
   const threeAt = n.word("punkt", "three");
   const cleanAt = n.word("punkt", "clean");
-  const rightAt = n.word("domain-in", "right");
+  const andAt = n.word("domain-in", "And");
   const readingAt = n.word("domain-in", "reading");
 
   // ── Geometry ──
@@ -69,10 +70,10 @@ export const PeriodScene: React.FC = () => {
   const dec = at("2.5", 1);
   const ends = [at("million.", 7), at("smiled.", 6)];
   const q = at("?", 0);
-  const fig3 = 1 - ease(frame, rightAt, 14) * 0.45;
+  const fig3 = 1 - ease(frame, andAt, 14) * 0.45;
   const fig4 = 1 - ease(frame, readingAt, 14) * 0.3;
   const blue = `color-mix(in srgb, ${BAR} 26%, transparent)`;
-  const one = (i: number, a: number, out?: number, color?: string) => ({ from: i, to: i + 1, at: a, out, color });
+  const one = (i: number, a: number, out?: number, color?: string, pulse?: number) => ({ from: i, to: i + 1, at: a, out, color, pulse });
 
   return (
     <AbsoluteFill>
@@ -105,11 +106,11 @@ export const PeriodScene: React.FC = () => {
           y={y(RAW_Y)}
           at={from + 4}
           size={SIZE}
-          read={{ from: n.word("lee", "Dr."), to: lee.to }}
+          words={wordSpans(SENTENCES.text).map((w) => ({ ...w, at: n.word("lee", w.word === "2.5" ? "two point five" : w.word) }))}
           marks={[
-            ...ends.map((i) => one(i, endAt, splitAt)),
-            one(dr, titleAt, splitAt),
-            one(dec, decimalAt, splitAt),
+            ...ends.map((i, k) => one(i, endAt, splitAt, undefined, allAt + 8 + k * 3)),
+            one(dr, titleAt, splitAt, undefined, allAt),
+            one(dec, decimalAt, splitAt, undefined, allAt + 4),
             one(q, questionAt, nltkAt),
             one(dr, abbrAt, undefined, blue),
             one(dec, decimalsAt, undefined, blue),
@@ -138,7 +139,7 @@ export const PeriodScene: React.FC = () => {
         <Tag at={doctorAt} x={gapX(0)} y={tagY} align="center">
           Dr. cut
         </Tag>
-        <Tag at={insideAt + 4} x={gapX(1)} y={tagY} align="center">
+        <Tag at={twoAt} x={gapX(1)} y={tagY} align="center">
           2.5 cut
         </Tag>
         <Tag at={questionAt} x={row[last].right - 20} y={tagY} align="right">
@@ -147,22 +148,22 @@ export const PeriodScene: React.FC = () => {
       </div>
 
       <div style={{ position: "absolute", inset: 0, opacity: fig4 }}>
-      {/* Fig. 4: Punkt's three sentences. */}
-      <FigLabel n="4" title="Punkt's sentences" at={nltkAt - 2} x={X0} y={y(FIG4_Y)} />
-      <LabelEnd
-        at={sentenceAt}
-        x={figRight}
-        y={y(FIG4_Y)}
-        call="sent_tokenize(text)"
-        count={`${SENTENCES.sentences.length} sentences`}
-        countAt={threeAt}
-      />
-      {SENTENCES.sentences.map((s, i) => (
-        <Chip key={i} text={s} x={row4[i].x} y={y(ROW4_Y)} at={row4At[i]} size={SIZE} tones={[{ at: cleanAt, tone: "good" }]} />
-      ))}
-      <Tag at={abbrAt} x={X0} y={y(ROW4_Y) + chipHeight(SIZE) + 12} color={BLUE_INK}>
-        knows abbreviations and decimals
-      </Tag>
+        {/* Fig. 4: Punkt's three sentences. */}
+        <FigLabel n="4" title="Punkt's sentences" at={nltkAt - 2} x={X0} y={y(FIG4_Y)} />
+        <LabelEnd
+          at={punktAt}
+          x={figRight}
+          y={y(FIG4_Y)}
+          call="sent_tokenize(text)"
+          count={`${SENTENCES.sentences.length} sentences`}
+          countAt={threeAt}
+        />
+        {SENTENCES.sentences.map((s, i) => (
+          <Chip key={i} text={s} x={row4[i].x} y={y(ROW4_Y)} at={row4At[i]} size={SIZE} tones={[{ at: cleanAt, tone: "good" }]} />
+        ))}
+        <Tag at={cleanAt + 6} x={X0} y={y(ROW4_Y) + chipHeight(SIZE) + 12} color={BLUE_INK}>
+          knows abbreviations and decimals
+        </Tag>
       </div>
       <Sfx name="el-pop" at={cleanAt} level={-32} />
     </AbsoluteFill>

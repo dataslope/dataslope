@@ -62,7 +62,7 @@ export const BillScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-tap" at={readAt - 2} level={-29} />
       <Sfx name="el-whoosh" at={payAt - 2} level={-34} />
-      <Sfx name="el-pop" at={total119At - 2} level={-30} />
+      <Sfx name="el-pop" at={total119At - 2} level={-34} />
       <Sfx name="el-whoosh" at={lowestAt - 2} level={-36} />
       <Sfx name="el-chime" at={n.beat("effort").to + 6} level={-33} />
 

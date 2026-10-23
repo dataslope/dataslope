@@ -49,6 +49,8 @@ export const StopScene: React.FC = () => {
   const filterAt = n.word("commonplace", "Filter");
   const topicAt = n.word("commonplace", "topic");
   const spellingAt = n.word("tag-in", "spelling");
+  const throughAt = n.word("commonplace", "through");
+  const onlyAt = n.word("tag-in", "only sees");
   const jobAt = n.word("tag-in", "job");
 
   const max = EMMA.withStop[0][1];
@@ -109,12 +111,20 @@ export const StopScene: React.FC = () => {
                     </Mono>
                   </span>
                 </Ink>
-                <HBar x={BAR_X(k)} y={rowY(i) + rowH * 0.18} w={(c / max) * SCALE} h={rowH * 0.64} at={at} color={dimmed > 0 ? FADED : undefined} />
+                <HBar
+                  x={BAR_X(k)}
+                  y={rowY(i) + rowH * 0.18}
+                  w={(c / max) * SCALE}
+                  h={rowH * 0.64}
+                  at={at}
+                  color={dimmed > 0 ? FADED : undefined}
+                  dim={k === 1 ? onlyAt - 2 + i * 2 : undefined}
+                />
                 <Note at={at + 6} x={BAR_X(k) + (c / max) * SCALE + 12} y={rowY(i)}>
                   <div style={{ height: rowH, display: "flex", alignItems: "center", ...numStyle(22, dimmed > 0.5 ? INK_SOFT : INK) }}>{fmt(c, 0)}</div>
                 </Note>
                 {k === 1 ? (
-                  <TagChip tag="?" family="other" cx={PANELS[k] + WORD_W - w.length * 0.6 * 26 - 40} y={rowY(i) + rowH * 0.12} at={jobAt - 2 + i * 3} size={20} />
+                  <TagChip tag="?" family="other" cx={PANELS[k] + WORD_W - w.length * 0.6 * 26 - 40} y={rowY(i) + (rowH - 32) / 2} at={jobAt - 2 + i * 3} size={20} />
                 ) : null}
               </React.Fragment>
             );
@@ -125,7 +135,7 @@ export const StopScene: React.FC = () => {
       <Note at={aboutAt - 2} x={PANELS[0]} y={rowY(6) + 10}>
         <div style={{ ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>Not one says what the book is about.</div>
       </Note>
-      <Note at={secondAt - 4} x={BAR_X(1) + 220} y={rowY(1)}>
+      <Note at={secondAt - 4} out={throughAt} x={BAR_X(1) + 220} y={rowY(1)}>
         <div style={{ height: rowH, display: "flex", alignItems: "center", ...body(30, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
           the heroine, second
         </div>

@@ -7,7 +7,7 @@ import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA } from "./data";
-import { Bracket, DATA, Headline, Kicker, Marked, numStyle, Svg } from "./parts";
+import { Bracket, DATA, Headline, Kicker, Marked, numStyle, pulse, Svg } from "./parts";
 
 const X0 = 170;
 const PITCH = 210;
@@ -54,7 +54,15 @@ export const SparseScene: React.FC = () => {
   const orderAt = n.word("sweet", "enough order");
   const commonAt = n.word("sweet", "common enough");
   const numbersAt = n.word("next", "numbers");
+  const listsAt = n.word("next", "lists");
+  const butAt = n.word("next", "But");
+  const nextAt = n.word("next", "next");
   const featuresAt = n.word("next", "features");
+  const everyAt = n.word("sparsity", "every word");
+  const biSaid = n.word("sweet", "bigrams");
+  const triSaid = n.word("sweet", "trigrams");
+  // Once the bridge is spoken, the chart steps back behind the next line.
+  const back = 1 - 0.55 * ease(frame, n.beat("next").to + 2, 30);
 
   const base = y(BASE);
   const tall = h(TALL);
@@ -76,6 +84,7 @@ export const SparseScene: React.FC = () => {
         Five in a row?
       </Headline>
 
+      <div style={{ position: "absolute", inset: 0, opacity: back }}>
       <FigLabel n="15" title="Emma's n-grams that appear only once" at={countAt - 4} x={X0 - 50} y={y(286)} />
       <Svg>
         <line x1={X0 - 40} x2={X0 - 40 + (PITCH * 5) * ease(frame, countAt - 2, 16)} y1={base + 0.5} y2={base + 0.5} stroke={INK} strokeWidth={1.6} />
@@ -96,6 +105,8 @@ export const SparseScene: React.FC = () => {
           return (
             <g key={s.n}>
               <rect x={barX(i)} y={base - hgt} width={BAR_W} height={hgt} fill={DATA} />
+              {/* "every word you add to the window": the longer windows swell in turn. */}
+              {i >= 2 ? <rect x={barX(i)} y={base - hgt} width={BAR_W} height={hgt} fill={PAPER} opacity={0.4 * pulse(frame, everyAt - 2 + (i - 2) * 8, 22)} /> : null}
               {lit > 0 ? <rect x={barX(i) - 6} y={base - hgt - 6} width={BAR_W + 12} height={hgt + 6} fill="none" stroke={INK} strokeWidth={2.4} opacity={lit} rx={4} /> : null}
             </g>
           );
@@ -110,7 +121,9 @@ export const SparseScene: React.FC = () => {
             <div style={{ ...numStyle(28, PAPER), textAlign: "center" }}>{Math.round(s.share * 100)}%</div>
           </Note>
           <Ink at={nameAts[i] - 4} dur={12} style={{ left: barX(i) - 30, width: BAR_W + 60, top: base + 12, textAlign: "center" }}>
-            <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{NAMES[i]}</div>
+            <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+              {i === 1 ? <Marked at={biSaid - 2}>{NAMES[i]}</Marked> : i === 2 ? <Marked at={triSaid - 2}>{NAMES[i]}</Marked> : NAMES[i]}
+            </div>
             <div style={{ ...label(20, INK_SOFT), fontWeight: 500, marginTop: 4, ...{ fontVariantNumeric: "lining-nums" } }}>n = {s.n}</div>
           </Ink>
         </React.Fragment>
@@ -122,7 +135,8 @@ export const SparseScene: React.FC = () => {
         </div>
       </Note>
 
-      {/* What the tall bars mean. */}
+      {/* What the tall bars mean; set back as the bridge begins. */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, butAt - 2, 14) }}>
       <Note at={oneAt - 2} x={NOTE_X} y={y(300)} from="right">
         <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>A count of one</div>
         <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>tells you almost nothing.</div>
@@ -138,12 +152,16 @@ export const SparseScene: React.FC = () => {
         <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 6 }}>enough order to help,</div>
         <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, commonAt - 2, 10) }}>common enough to count</div>
       </Note>
+      </div>
       <Note at={numbersAt - 2} x={NOTE_X} y={y(300) + 360} from="right">
-        <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>A model wants numbers.</div>
+        <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>A model wants numbers,</div>
+        <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap", opacity: ease(frame, listsAt - 2, 12) }}>not lists of words.</div>
       </Note>
 
-      <NextLine at={featuresAt - 8} x={X0 - 50} y={y(870)} width={1680}>
-        turning text into features
+      </div>
+
+      <NextLine at={nextAt - 8} x={X0 - 50} y={y(870)} width={1680}>
+        turning text into <Marked at={featuresAt - 2}>features</Marked>
       </NextLine>
     </AbsoluteFill>
   );

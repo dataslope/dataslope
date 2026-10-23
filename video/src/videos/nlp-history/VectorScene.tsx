@@ -111,7 +111,7 @@ export const VectorScene: React.FC = () => {
       <Sfx name="el-tap" at={neighborsAt} level={-28} />
 
       <Kicker at={from - 6}>2013: Tomáš Mikolov and colleagues, Google</Kicker>
-      <Headline at={from + 2} lead="Words become" turn="points." turnAt={pointAt} out={directionsAt - 6} />
+      <Headline at={from + 2} lead="Words become" turn="points." turnAt={vecAt + 10} out={directionsAt - 6} />
       <Headline at={directionsAt - 2} lead="Directions" turn="mean something." turnAt={directionsAt + 8} />
 
       <FigLabel n="11" title="Four of its words, on one flat slice of its 300 dimensions" at={from + 2} x={96} y={y(290)} />

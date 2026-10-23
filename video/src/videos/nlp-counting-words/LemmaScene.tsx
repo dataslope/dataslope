@@ -44,6 +44,12 @@ export const LemmaScene: React.FC = () => {
   const lemmatizeAt = n.word("recipe", "lemmatize");
   const accurateAt = n.word("recipe", "accurate");
   const oneAt = n.word("pairs-in", "one word");
+  const stillAt = n.word("pairs-in", "Still");
+  const soAt = n.word("untouched", "So");
+  const otherwiseAt = n.word("lemma", "otherwise");
+  const recipeWordAt = n.word("recipe", "recipe");
+  // The working steps back once the recipe is said, for the next idea.
+  const back = 1 - 0.65 * ease(frame, stillAt - 2, 16);
   const timeAt = n.word("pairs-in", "time");
 
   const words = LEMMA.tagged.map(([w]) => w);
@@ -104,12 +110,14 @@ export const LemmaScene: React.FC = () => {
           <Mono size={21} color={INK_SOFT}>
             WordNetLemmatizer
           </Mono>{" "}
-          <Marked at={nounAt - 2}>calls every word a noun</Marked> unless told otherwise
+          <Marked at={nounAt - 2}>calls every word a noun</Marked>
+          <span style={{ opacity: ease(frame, otherwiseAt - 4, 10) }}> unless told otherwise</span>
         </div>
       </Note>
 
       {/* Lemmas with the default noun. */}
-      {rowLabel("no tags", runnersAt - 6, "naive")}
+      <div style={{ position: "absolute", inset: 0, opacity: back }}>
+      {rowLabel("no tags", soAt - 2, "naive")}
       {LEMMA.naive.map((w, i) => (
         <Tile
           key={`n${i}`}
@@ -163,8 +171,11 @@ export const LemmaScene: React.FC = () => {
         </span>
       </Ink>
       <Note at={accurateAt - 2} x={COL_X} y={y(744) + 70}>
-        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>the accurate recipe</div>
+        <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          the accurate <Marked at={recipeWordAt - 2}>recipe</Marked>
+        </div>
       </Note>
+      </div>
     </AbsoluteFill>
   );
 };

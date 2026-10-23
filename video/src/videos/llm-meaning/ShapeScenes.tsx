@@ -471,7 +471,7 @@ export const ExpertsScene: React.FC = () => {
 
       <Kicker at={from - 10}>The shape of a transformer</Kicker>
       <Headline lead="Many experts," turn="a few at a time." at={from} turnAt={fewAt - 2} />
-      <Spot id="llm-meaning-drawers" at={splitAt - 4} left={X0} top={y(400)} width={340} height={340} />
+      <Spot id="llm-meaning-drawers" at={splitAt - 4} left={X0 + 40} top={y(380)} width={288} height={470} />
 
       {/* ── Fig. 21: experts, a few per token ── */}
       <FigLabel n="21" title="Experts, a few per token" at={expertsAt - 6} x={GX - 40} y={y(FIG_Y)} />

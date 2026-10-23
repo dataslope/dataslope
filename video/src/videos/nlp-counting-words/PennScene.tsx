@@ -55,10 +55,11 @@ export const PennScene: React.FC = () => {
     adv: n.word("letters", "R for"),
   };
   const patternsAt = n.word("extract", "patterns");
-  const talentedAt = n.word("extract", "talented");
+  const tagAt = n.word("extract", "Tag");
+  const keepAt = n.word("extract", "keep the tags");
   const startAt = n.word("extract", "start with N");
   const nounsAt = n.word("nouns", "nouns");
-  const engineerAt = n.word("nouns", "engineer");
+
   const jAt = n.word("adjectives", "J gives");
   const vAt = n.word("adjectives", "V gives");
   const rAt = n.word("adjectives", "R");
@@ -73,7 +74,7 @@ export const PennScene: React.FC = () => {
   const eTiles = flow(eWords, X0, y(546), 1800, ESIZE, 10, 0);
   const eChipY = y(546) + tileH(ESIZE) + 8;
   const ROW_ORDER: { fam: Family; prefix: string; name: string; at: number }[] = [
-    { fam: "noun", prefix: "N…", name: "nouns", at: engineerAt - 6 },
+    { fam: "noun", prefix: "N…", name: "nouns", at: n.word("nouns", "engineer") - 6 },
     { fam: "adj", prefix: "J…", name: "adjectives", at: jAt + 4 },
     { fam: "verb", prefix: "V…", name: "verbs", at: vAt + 4 },
     { fam: "adv", prefix: "R…", name: "adverbs", at: rAt + 2 },
@@ -81,6 +82,10 @@ export const PennScene: React.FC = () => {
   const rowLabelAt = [startAt - 4, jAt - 4, vAt - 4, rAt - 4];
   const sortedY = (k: number) => y(668) + k * 56;
   const rowX = X0 + 250;
+  // Each word of the sentence arrives as it is read out.
+  const wordAt = eWords.map((w, i) =>
+    i === 0 ? tagAt - 2 : w === "." ? n.word("extract", eWords[i - 1]) + 6 : n.word("extract", w) - 4,
+  );
   // Where each sorted word lands: in its row, after the ones before it.
   const landing = eWords.map((w, i) => {
     const fam = familyOf(ENGINEER.tagged[i][1]);
@@ -88,7 +93,9 @@ export const PennScene: React.FC = () => {
     if (k < 0) return null;
     const before = eWords.slice(0, i).filter((_, j) => familyOf(ENGINEER.tagged[j][1]) === fam);
     const x = rowX + before.reduce((s, b) => s + tileW(b, ESIZE) + 10, 0);
-    return { k, x, y: sortedY(k), at: ROW_ORDER[k].at + before.length * 4 };
+    // Each word leaves the sentence as the narration names it.
+    const beat = fam === "noun" ? "nouns" : "adjectives";
+    return { k, x, y: sortedY(k), at: n.word(beat, w) - 6 };
   });
 
   return (
@@ -97,9 +104,7 @@ export const PennScene: React.FC = () => {
       <Sfx name="el-tap" at={tagAts[0] - 2} level={-29} />
       <Sfx name="el-tap" at={tagAts[4] - 2} level={-29} />
       <Sfx name="el-pencil" at={firstLetterAt - 2} level={-35} />
-      {ROW_ORDER.map((r) => (
-        <Sfx key={r.fam} name="el-whoosh" at={r.at} level={-35} />
-      ))}
+      {landing.map((l, i) => (l ? <Sfx key={i} name="el-tap" at={l.at + 16} level={-31} /> : null))}
 
       <Kicker at={from - 10}>Tagging words</Kicker>
       <Headline at={pennAt - 4}>Penn Treebank tags</Headline>
@@ -167,7 +172,7 @@ export const PennScene: React.FC = () => {
         const land = landing[i];
         return (
           <React.Fragment key={i}>
-            <Tile text={t.text} x={t.x} y={t.y} size={ESIZE} at={talentedAt - 8 + i * 3} dim={land ? land.at : undefined} />
+            <Tile text={t.text} x={t.x} y={t.y} size={ESIZE} at={wordAt[i]} dim={land ? land.at : undefined} />
             {land ? (
               <Tile
                 text={t.text}
@@ -185,7 +190,7 @@ export const PennScene: React.FC = () => {
       })}
       {ENGINEER.tagged.map(([, tag], i) => {
         const t = eTiles[i];
-        return <TagChip key={i} tag={tag} family={familyOf(tag)} cx={t.x + t.w / 2} y={eChipY} at={talentedAt + 10 + i * 3} size={20} />;
+        return <TagChip key={i} tag={tag} family={familyOf(tag)} cx={t.x + t.w / 2} y={eChipY} at={keepAt - 2 + i * 2} size={20} />;
       })}
       {ROW_ORDER.map((r, k) => (
         <Note key={r.fam} at={rowLabelAt[k]} x={X0} y={sortedY(k)}>

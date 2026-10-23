@@ -6,7 +6,7 @@ import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { colors, ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -29,6 +29,7 @@ import { ILLUSTRATIONS, VIDEO } from "./data";
 export const X0 = 120;
 export const RIGHT = 1800;
 const KICKER_Y = 112;
+const INK_FAINT = colors.inkFaint;
 const HEAD_Y = 150;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -83,12 +84,20 @@ export const Headline: React.FC<{
   );
 };
 
+/** 0 → 1 → 0 over `dur` frames from `at`: a brief swell for something named
+ *  again once it is already on the page. */
+export const pulse = (frame: number, at: number, dur = 18) => {
+  const t = (frame - at) / dur;
+  return t <= 0 || t >= 1 ? 0 : Math.sin(t * Math.PI) ** 2;
+};
+
 /**
  * A raw string in the code face, quoted, with highlighter boxes laid behind
- * chosen characters (`marks`: character ranges, each from a frame) and an
- * underline that runs along it while it is read aloud (`read`). Positions
- * follow from JetBrains Mono's fixed advance, so a mark sits on its
- * characters in any face around it.
+ * chosen characters (`marks`: character ranges, each from a frame, swelling
+ * briefly on `pulse`). Given `words` (character ranges and the frame each is
+ * spoken), the string is set faint and each word inks to full strength as
+ * the narrator reads it. Positions follow from JetBrains Mono's fixed
+ * advance, so a mark sits on its characters in any face around it.
  */
 export const RawText: React.FC<{
   text: string;
@@ -96,16 +105,29 @@ export const RawText: React.FC<{
   y: number;
   at: number;
   size?: number;
-  marks?: readonly { from: number; to: number; at: number; out?: number; color?: string }[];
-  read?: { from: number; to: number };
+  marks?: readonly { from: number; to: number; at: number; out?: number; color?: string; pulse?: number }[];
+  words?: readonly { from: number; to: number; at: number }[];
   dim?: number;
-}> = ({ text, x, y, at, size = 32, marks = [], read, dim }) => {
+}> = ({ text, x, y, at, size = 32, marks = [], words, dim }) => {
   const frame = useCurrentFrame();
   const adv = 0.6 * size;
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
-  const r = read ? clamp01((frame - read.from) / Math.max(1, read.to - read.from)) : 0;
   // The opening quote takes one advance; the text starts after it.
-  const x0 = x + adv;
+  const lead = adv;
+  const inked = (i: number) => {
+    const w = words?.find((r) => i >= r.from && i < r.to);
+    return w ? ease(frame, w.at, 8) : words ? 0 : 1;
+  };
+  const body = words
+    ? [...text].map((c, i) => {
+        const k = inked(i);
+        return (
+          <span key={i} style={{ color: k >= 1 ? INK : `color-mix(in srgb, ${INK} ${(k * 100).toFixed(0)}%, ${INK_FAINT})` }}>
+            {c}
+          </span>
+        );
+      })
+    : text;
   return (
     <Ink at={at} dur={18} style={{ left: x, top: y, whiteSpace: "pre", opacity: 1 - d }}>
       <div style={{ position: "relative", fontFamily: MONO, fontSize: size, fontWeight: 500, lineHeight: 1.3, color: INK, fontVariantLigatures: "none" }}>
@@ -113,15 +135,16 @@ export const RawText: React.FC<{
           const p = ease(frame, m.at, 10);
           const o = m.out === undefined ? 0 : ease(frame, m.out, 12);
           if (p <= 0 || o >= 1) return null;
+          const sw = m.pulse === undefined ? 0 : pulse(frame, m.pulse, 20) * 8;
           return (
             <span
               key={i}
               style={{
                 position: "absolute",
-                left: x0 - x + m.from * adv - 3,
-                top: size * 0.1,
-                width: ((m.to - m.from) * adv + 6) * p,
-                height: size * 1.12,
+                left: lead + m.from * adv - 3 - sw,
+                top: size * 0.1 - sw,
+                width: ((m.to - m.from) * adv + 6) * p + 2 * sw,
+                height: size * 1.12 + 2 * sw,
                 background: m.color ?? HIGHLIGHT,
                 borderRadius: 4,
                 opacity: 1 - o,
@@ -130,24 +153,15 @@ export const RawText: React.FC<{
           );
         })}
         <span style={{ position: "relative", color: INK_SOFT }}>&quot;</span>
-        <span style={{ position: "relative" }}>{text}</span>
+        <span style={{ position: "relative" }}>{body}</span>
         <span style={{ position: "relative", color: INK_SOFT }}>&quot;</span>
-        {read && r > 0 ? (
-          <span
-            style={{
-              position: "absolute",
-              left: x0 - x,
-              top: size * 1.3,
-              width: text.length * adv * r,
-              height: 2,
-              background: `color-mix(in srgb, ${INK} 40%, transparent)`,
-            }}
-          />
-        ) : null}
       </div>
     </Ink>
   );
 };
+
+/** The character ranges of a text's space-separated words, in order. */
+export const wordSpans = (text: string) => [...text.matchAll(/\S+/g)].map((m) => ({ word: m[0], from: m.index ?? 0, to: (m.index ?? 0) + m[0].length }));
 
 /** A highlighter stroke laid under the words it wraps, swept on `at` and
  *  lifted on `out`. Sized in em and to the words, so it fits any face. */

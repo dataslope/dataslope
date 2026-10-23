@@ -156,7 +156,7 @@ export const TrophyScene: React.FC = () => {
           <Mark at={relevantAt}>how relevant</Mark> each one is.
         </div>
       </Note>
-      <Spot id="llm-meaning-trophy" at={whatAt - 6} left={1400} top={y(500)} width={390} height={260} />
+      <Spot id="llm-meaning-trophy" at={whatAt - 6} left={1420} top={y(470)} width={360} height={354} />
     </AbsoluteFill>
   );
 };

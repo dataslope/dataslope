@@ -37,7 +37,7 @@ export const GeorgetownScene: React.FC = () => {
   const fiveAt = n.word("hype", "five years");
   const threeAt = n.word("hype", "perhaps three");
   const twelveAt = n.word("alpac", "Twelve years later");
-  const reportAt = n.word("alpac", "government report");
+  const reportAt = n.word("alpac", "government committee");
   const noAt = n.word("alpac", "no prospect");
   const fundingAt = n.word("alpac", "funding dried up");
   const polishedAt = n.word("moral", "polished demo");

@@ -59,7 +59,11 @@ export const TweetScene: React.FC = () => {
   const keepAt = n.word("task", "keep");
   const unitsAt = n.word("task", "units");
   const caresAt = n.word("task", "cares");
+  const cleanAt = n.word("case-in", "clean");
   const waysAt = n.word("case-in", "ways");
+  const colonAt = n.word("default", "colon");
+  const bracketAt = n.word("default", "bracket");
+  const rightAt = n.word("task", "right");
 
   // ── Geometry ──
   const rowA = rowLayout(TWEET.default, X0, SIZE);
@@ -91,7 +95,11 @@ export const TweetScene: React.FC = () => {
   const whole = [find(TWEET.tweet, "#NLP"), find(TWEET.tweet, "@dataslope"), find(TWEET.tweet, ":)")];
   const tonesA = (i: number): ToneStep[] => (badA[i] !== undefined ? [{ at: badA[i], tone: "bad" }] : []);
   const tonesB = (i: number): ToneStep[] => (whole.includes(i) ? [{ at: wholeAt + whole.indexOf(i) * 4, tone: "good" }] : []);
-  const dim = 1 - ease(frame, waysAt, 14) * 0.45;
+  const dim = 1 - ease(frame, cleanAt, 14) * 0.45;
+  const noteDim = 1 - ease(frame, waysAt, 14) * 0.25;
+  const marksA = (i: number) =>
+    i === a.colon ? [{ at: colonAt, out: nltkAt }] : i === a.paren ? [{ at: bracketAt, out: nltkAt }] : [];
+  const marksB = (i: number) => (whole.includes(i) ? [{ at: rightAt + whole.indexOf(i) * 3, out: keepAt }] : []);
 
   return (
     <AbsoluteFill>
@@ -126,19 +134,19 @@ export const TweetScene: React.FC = () => {
           word_tokenize(tweet)
         </Sub>
         {TWEET.default.map((t, i) => (
-          <Chip key={i} text={t} x={rowA[i].x} y={y(ROWA_Y)} at={aAt[i]} size={SIZE} tones={tonesA(i)} />
+          <Chip key={i} text={t} x={rowA[i].x} y={y(ROWA_Y)} at={aAt[i]} size={SIZE} tones={tonesA(i)} marks={marksA(i)} />
         ))}
 
         <Sub at={nltkAt} y={y(SUBB_Y)}>
           TweetTokenizer().tokenize(tweet)
         </Sub>
         {TWEET.tweet.map((t, i) => (
-          <Chip key={i} text={t} x={rowB[i].x} y={y(ROWB_Y)} at={bAt[i]} size={SIZE} tones={tonesB(i)} />
+          <Chip key={i} text={t} x={rowB[i].x} y={y(ROWB_Y)} at={bAt[i]} size={SIZE} tones={tonesB(i)} marks={marksB(i)} />
         ))}
       </div>
 
       {/* The lesson's moral, as it is said. */}
-      <div style={{ position: "absolute", left: X0, top: y(NOTE_Y), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...body(38), color: INK }}>
+      <div style={{ position: "absolute", left: X0, top: y(NOTE_Y), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...body(38), color: INK, opacity: noteDim }}>
         <Ink at={keepAt - 2} dur={16} style={{ position: "relative" }}>
           Keep the{" "}
           <Mark at={unitsAt}>

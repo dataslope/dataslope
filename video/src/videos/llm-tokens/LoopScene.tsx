@@ -271,8 +271,9 @@ export const LoopScene: React.FC = () => {
         <React.Fragment key={k}>
           <Leader
             points={[
-              [RX + 160 + k * 40, y(470) + 290],
-              [o.x + 90, y(470) + h(318)],
+              // From just under the ball, clear of its trailing strand.
+              [RX + 80 + k * 40, y(470) + 312],
+              [o.x + 80, y(470) + h(318)],
             ]}
             at={o.at - 6}
             dur={12}

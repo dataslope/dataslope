@@ -6,7 +6,7 @@ import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { pieceOf, tokenOf, WORDS } from "./data";
-import { Chip, chipHeight, Headline, Kicker, LabelEnd, type MarkSpan, RawText, rowLayout, rowWidth, Spot, Tag, type ToneStep, X0 } from "./parts";
+import { Chip, chipHeight, Headline, Kicker, LabelEnd, type MarkSpan, RawText, rowLayout, rowWidth, Spot, Tag, type ToneStep, wordSpans, X0 } from "./parts";
 
 const SIZE = 34;
 const FIG1_Y = 306;
@@ -29,8 +29,6 @@ export const SplitScene: React.FC = () => {
   const hookFrom = n.beat("hook").from;
   const whereAt = n.word("hook", "where");
   const decisionAt = n.word("hook", "decision");
-  const sentence = n.beat("sentence");
-  const readFrom = n.word("sentence", "I");
   const splitAt = n.word("split", "split");
   const spacesAt = n.word("split", "spaces");
   const elevenAt = n.word("split", "eleven");
@@ -148,7 +146,7 @@ export const SplitScene: React.FC = () => {
         y={y(RAW_Y)}
         at={decisionAt}
         size={30}
-        read={{ from: readFrom, to: sentence.to }}
+        words={wordSpans(WORDS.text).map((w) => ({ ...w, at: n.word("sentence", w.word) }))}
       />
       {WORDS.split.map((w, i) => (
         <Chip

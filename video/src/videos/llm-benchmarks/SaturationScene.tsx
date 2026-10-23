@@ -69,7 +69,7 @@ export const SaturationScene: React.FC = () => {
       <Headline at={from - 6} second={topAt - 4} italic="Everyone near the top.">
         One, saturation.
       </Headline>
-      <Spot id="llm-benchmarks-gauge" at={topAt - 6} left={1500} top={y(118)} width={300} height={300} />
+      <Spot id="llm-benchmarks-gauge" at={topAt - 6} left={1530} top={y(110)} width={240} height={322} />
       <FigLabel n="5" title="Best published scores, 0 to 100" at={from + 4} x={X0} y={y(330)} />
 
       <Drift from={from} to={end} amount={0.012} origin="40% 60%">

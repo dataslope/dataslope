@@ -204,7 +204,7 @@ export const ShannonScene: React.FC = () => {
       <Sfx name="el-tap" at={ngramAt} level={-29} />
 
       <Kicker at={from - 6}>1948: Claude Shannon</Kicker>
-      <Headline at={from + 2} lead="The paper that founded" turn="information theory." turnAt={theoryAt - 4} out={guessAt - 8} />
+      <Headline at={from + 2} lead="The paper that founded" turn="information theory." turnAt={from + 12} out={guessAt - 8} />
       <Headline at={guessAt - 2} lead="Guess the next word" turn="from the one before." turnAt={beforeAt - 2} out={ngramAt - 6} />
       <Headline at={ngramAt - 2} lead="Count what follows:" turn="an n-gram model." turnAt={ngramAt + 6} />
 

@@ -430,9 +430,9 @@ export const Hairline: React.FC<{ x: number; y: number; w: number; at: number; o
 };
 
 /** A dimmer: children fade to `to` of their strength from `at`. */
-export const Dim: React.FC<{ at: number; to?: number; children: React.ReactNode }> = ({ at, to = 0.35, children }) => {
+export const Dim: React.FC<{ at: number; to?: number; dur?: number; children: React.ReactNode }> = ({ at, to = 0.35, dur = 16, children }) => {
   const frame = useCurrentFrame();
-  return <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, at, 16) * (1 - to) }}>{children}</div>;
+  return <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, at, dur) * (1 - to) }}>{children}</div>;
 };
 
 /** POINT's glow behind a row that the narration names: 0..1. */

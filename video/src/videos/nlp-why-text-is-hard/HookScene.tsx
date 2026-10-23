@@ -128,14 +128,14 @@ export const HookScene: React.FC = () => {
         {/* ── Fig. 1: the sentence and its questions. It holds the middle of
             the page alone, then rises to make room for Fig. 2. ── */}
         <div style={{ position: "absolute", inset: 0, transform: `translateY(${rise}px)` }}>
-        <FigLabel n="1" title="The lesson's opening sentence" at={sentenceAt - 8} x={X0} y={y(FIG_Y)} />
-        <Ink at={sentenceAt - 4} dur={22} style={{ left: X0, top: y(SENT_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(50), color: INK }}>
-            I <Asked at={qAt[0]} question="one word, or two?">can't</Asked> believe{" "}
-            <Asked at={qAt[1]} question="the end of a sentence?">Dr.</Asked> Smith's startup raised{" "}
-            <Asked at={qAt[2]} question="a word?">$2.5M,</Asked> it's unreal!
-          </span>
-        </Ink>
+          <FigLabel n="1" title="The lesson's opening sentence" at={sentenceAt - 8} x={X0} y={y(FIG_Y)} />
+          <Ink at={sentenceAt - 4} dur={22} style={{ left: X0, top: y(SENT_Y), whiteSpace: "nowrap" }}>
+            <span style={{ ...body(50), color: INK }}>
+              I <Asked at={qAt[0]} question="one word, or two?">can't</Asked> believe{" "}
+              <Asked at={qAt[1]} question="the end of a sentence?">Dr.</Asked> Smith's startup raised{" "}
+              <Asked at={qAt[2]} question="a word?">$2.5M,</Asked> it's unreal!
+            </span>
+          </Ink>
         </div>
 
         {/* ── Fig. 2: the same sentence as a computer gets it ── */}

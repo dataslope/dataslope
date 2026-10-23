@@ -87,8 +87,8 @@ export const ZipfScene: React.FC = () => {
       <Sfx name="el-tap" at={onceAt - 4} level={-28} />
 
       <Kicker at={from - 6}>The 1930s: George Zipf</Kicker>
-      <Headline at={from + 2} lead="Zipf" turn="counted words." turnAt={countedAt - 4} out={rankAt - 8} />
-      <Headline at={rankAt - 2} lead="Rank them, and the counts" turn="fall away." turnAt={overAt - 4} out={hundredAt - 6} />
+      <Headline at={from + 2} lead="Zipf" turn="counted words." turnAt={from + 12} out={rankAt - 8} />
+      <Headline at={rankAt - 2} lead="Rank them, and the counts" turn="fall away." turnAt={rankAt + 10} out={hundredAt - 6} />
       <Headline at={hundredAt - 2} lead="A few words do" turn="most of the work." turnAt={sixtyAt - 4} />
 
       {/* ── Fig. 2, the lesson's table ── */}
@@ -97,7 +97,7 @@ export const ZipfScene: React.FC = () => {
       <div style={{ opacity: 1 - settle * 0.25 }}>
         {COLS.map((c, i) => (
           <Ink key={c.title} at={from + 4 + i * 3} dur={12} style={{ left: colX[i], top: TTOP, width: c.w, textAlign: c.align }}>
-            <span style={{ ...label(21, INK_SOFT) }}>{c.title}</span>
+            <span style={{ ...label(21, INK_SOFT) }}>{c.title === "count" ? <Mark at={countedAt}>{c.title}</Mark> : c.title}</span>
           </Ink>
         ))}
         <Svg opacity={ease(frame, from + 6, 12)}>

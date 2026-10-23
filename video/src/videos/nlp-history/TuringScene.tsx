@@ -103,7 +103,7 @@ export const TuringScene: React.FC = () => {
 
   // ── The figure ──
   const BX = 1060;
-  const BW = 600;
+  const BW = 580;
   const BH = Math.round((BW * 971) / 1181);
   const BTOP = y(330);
   const doorA: [number, number] = [BX + 0.23 * BW, BTOP + BH * 0.94];

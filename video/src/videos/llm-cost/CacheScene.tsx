@@ -60,8 +60,10 @@ export const CacheScene: React.FC = () => {
   const sonnetAt = n.word("twentieth", "Sonnet");
   const tenCentsAt = n.word("twentieth", "ten cents");
   const halfAt = n.word("twentieth", "half a cent");
+  const catchAt = n.word("prefix", "catch");
   const exactAt = n.word("prefix", "exact");
   const stampAt = n.word("prefix", "timestamp");
+  const putAt = n.word("prefix", "Put");
   const byteAt = n.word("prefix", "changed byte");
   const afterAt = n.word("prefix", "everything after");
   const fullAt = n.word("prefix", "full price");
@@ -99,17 +101,19 @@ export const CacheScene: React.FC = () => {
         const x = rowX(i);
         const c = i === 2 ? cover(i) * (1 - lift) : cover(i);
         const glow = i > 0 ? pulse(frame, readAt + (i - 1) * 5, 22) : 0;
+        // Turn 3 lifts as the timestamp is about to land on it.
+        const lifted = i === 2 ? pulse(frame, putAt - 4, 26) : 0;
         return (
           <React.Fragment key={i}>
             {/* The prefix, at the input rate. */}
-            <HBar x={x} y={ry} w={PREFIX_W} h={rh} at={rowAt[i]} dur={18} fill={INPUT} />
+            <HBar x={x} y={ry - lifted * 10} w={PREFIX_W} h={rh} at={rowAt[i]} dur={18} fill={INPUT} />
             {/* The cache over it: read back, not recomputed. */}
             {c > 0 ? (
               <div
                 style={{
                   position: "absolute",
                   left: x,
-                  top: ry - 4,
+                  top: ry - 4 - lifted * 10,
                   width: PREFIX_W * c,
                   height: rh + 8,
                   borderRadius: 5,
@@ -177,11 +181,13 @@ export const CacheScene: React.FC = () => {
           position: "absolute",
           left: X0 - 6,
           top: rowY(1) - 10,
-          width: PREFIX_W + 12,
+          // Drawn out along the prefix on "catch", thickened on "exact".
+          width: (PREFIX_W + 12) * ease(frame, catchAt - 2, 30),
           height: rh + 20,
+          boxSizing: "border-box",
           borderRadius: 8,
-          border: `2px dashed ${INK}`,
-          opacity: ease(frame, exactAt - 2, 10) * (1 - ease(frame, stampAt + 8, 12)) * 0.8,
+          border: `${2 + pulse(frame, exactAt - 2, 24) * 2}px dashed ${INK}`,
+          opacity: ease(frame, catchAt - 2, 8) * (1 - ease(frame, stampAt + 8, 12)) * 0.8,
         }}
       />
 

@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, fmt, INK, INK_SOFT, label } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
@@ -26,6 +27,7 @@ const ROW_STEP = 54;
  * about machine learning and across Emma, stopword pairs left out.
  */
 export const OrderScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
@@ -44,13 +46,16 @@ export const OrderScene: React.FC = () => {
   const findsAt = n.word("phrases", "finds phrases");
   const linesAt = n.word("phrases", "three short");
   const topPairAt = n.word("phrases", "top pair");
-  const mlAt = n.word("phrases", "machine learning", { nth: 2 });
   const timesAt = n.word("phrases", "three times");
   const emmaAt = n.word("cast", "Emma");
   const stopwordAt = n.word("cast", "no stopword");
   const castAt = n.word("cast", "cast");
   const castAts = [n.word("cast", "Mister Knightley"), n.word("cast", "Missus Weston"), n.word("cast", "Mister Elton")];
   const fiveAt = n.word("bigger-in", "would five");
+  const ml1At = n.word("phrases", "machine learning", { nth: 1 });
+  const overAt = n.word("cast", "Over");
+  // Fig. 13 steps back as the counting starts over a whole book.
+  const back13 = 1 - 0.55 * ease(frame, overAt - 2, 16);
 
   // ── Fig. 13 ──
   const rowB = y(336);
@@ -69,7 +74,7 @@ export const OrderScene: React.FC = () => {
   const cast = EMMA.pairs.slice(0, 3);
   const mlUnit = 230 / ml[0][1];
   const castUnit = 300 / cast[0][1];
-  const mlAts = [mlAt, timesAt + 6, timesAt + 12];
+  const mlAts = [ml1At - 4, ml1At + 6, ml1At + 14];
 
   return (
     <AbsoluteFill>
@@ -88,6 +93,7 @@ export const OrderScene: React.FC = () => {
         Why bother?
       </Headline>
 
+      <div style={{ position: "absolute", inset: 0, opacity: back13 }}>
       <FigLabel n="13" title="Single words against bigrams" at={bAt - 6} x={X0} y={y(276)} />
       {bTiles.map((t, i) => (
         <Tile key={`b${i}`} text={t.text} x={t.x} y={t.y} size={SIZE} at={bAt - 4 + i * 3} dim={setsAt + 6} undim={bigramsAt - 6} />
@@ -140,6 +146,8 @@ export const OrderScene: React.FC = () => {
         </div>
       </Note>
 
+      </div>
+
       {/* Fig. 14: counted pairs. */}
       <FigLabel n="14" title="The most common bigrams" at={findsAt - 4} x={T1} y={y(560)} />
       <Ink at={linesAt - 2} dur={12} style={{ left: T1, top: y(560) + 46, whiteSpace: "nowrap" }}>
@@ -154,12 +162,16 @@ export const OrderScene: React.FC = () => {
           </Ink>
           <HBar x={T1 + WORD_W + 16} y={rowY(i) + rowH * 0.18} w={c * mlUnit} h={rowH * 0.64} at={mlAts[i]} />
           <Note at={mlAts[i] + 6} x={T1 + WORD_W + 28 + c * mlUnit} y={rowY(i)}>
-            <div style={{ height: rowH, display: "flex", alignItems: "center", ...numStyle(22, i === 0 ? ACCENT_INK : INK) }}>×{c}</div>
+            <div style={{ height: rowH, display: "flex", alignItems: "center", ...numStyle(22, i === 0 ? ACCENT_INK : INK) }}>
+              {i === 0 ? <Marked at={timesAt - 2}>×{c}</Marked> : `×${c}`}
+            </div>
           </Note>
         </React.Fragment>
       ))}
-      <Ink at={stopwordAt - 2} dur={12} style={{ left: T2, top: y(560) + 46, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK_SOFT), fontWeight: 600 }}>all of Emma, pairs with no stopword</span>
+      <Ink at={emmaAt - 2} dur={12} style={{ left: T2, top: y(560) + 46, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(22, INK_SOFT), fontWeight: 600 }}>
+          all of Emma<span style={{ opacity: ease(frame, stopwordAt - 2, 10) }}>, pairs with no stopword</span>
+        </span>
       </Ink>
       {cast.map(([p, c], i) => (
         <React.Fragment key={p}>

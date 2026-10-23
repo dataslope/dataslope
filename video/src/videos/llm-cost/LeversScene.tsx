@@ -62,6 +62,7 @@ export const LeversScene: React.FC = () => {
   const haikuAt = n.word("route-cost", "Haiku");
   const secondAt = n.word("cache", "Second");
   const neverAt = n.word("cache", "never changes");
+  const stableAt = n.word("cache", "stable prefix");
   const fortyAt = n.word("cache", "forty-turn chat");
   const dollarAt = n.word("cache", "dollar nineteen");
   const twentySixAt = n.word("cache", "twenty-six cents");
@@ -82,7 +83,9 @@ export const LeversScene: React.FC = () => {
     <>
       Route to the cheapest model that <Marked at={passesAt - 2}>passes</Marked>
     </>,
-    <>Cache the stable prefix</>,
+    <>
+      Cache the <Marked at={stableAt - 2}>stable prefix</Marked>
+    </>,
     <>Cut output, not input</>,
     <>
       Lower reasoning effort, to the lowest level that <Marked at={passesAt + 4}>passes</Marked>

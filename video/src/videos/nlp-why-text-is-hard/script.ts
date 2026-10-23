@@ -55,7 +55,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     is its table.
  *   - The pipeline: "The Cats are RUNNING quickly, and the dogs are barking
  *     loudly!" through the lesson's five steps: 13 tokens, 13 lowercased, 11
- *     cleaned, 6 after stopwords, then cat, running, quickly, dog, barking,
+ *     cleaned, 6 after stopwords (five dropped: the, are, and, the, are),
+ *     then cat, running, quickly, dog, barking,
  *     loudly. "running" stays as it is because the lemmatizer reads every
  *     word as a noun unless told otherwise (Unit 2's subject); the video
  *     shows it and does not comment. `tokens = [t.lower() for t in tokens]`
@@ -179,7 +180,7 @@ export const script: NarrationScript = {
     { id: "tokenized", text: "Tokenizing this sentence gives thirteen tokens, punctuation included.", pauseAfter: 0.6 },
     { id: "lowercased", text: "Lowercasing folds the capitals away.", pauseAfter: 0.6 },
     { id: "cleaned", text: "Cleaning drops the comma and the exclamation mark. Eleven left.", pauseAfter: 0.6 },
-    { id: "stopped", text: "Removing stopwords drops the, are and and. Six left.", pauseAfter: 0.6 },
+    { id: "stopped", text: "Removing stopwords drops five little words. Six left.", pauseAfter: 0.6 },
     { id: "lemmatized", text: "And lemmatizing turns cats into cat, and dogs into dog.", pauseAfter: 0.9 },
     {
       id: "list",

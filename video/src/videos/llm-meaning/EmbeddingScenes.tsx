@@ -279,7 +279,7 @@ export const IdsScene: React.FC = () => {
           <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>Ids are just labels.</div>
         </Note>
       </Fade>
-      <Spot id="llm-meaning-fruit" at={hookFrom + 6} out={fig1Out} left={1380} top={y(580)} width={400} height={267} />
+      <Spot id="llm-meaning-fruit" at={hookFrom + 6} out={fig1Out} left={1370} top={y(590)} width={420} height={243} />
 
       {/* ── Fig. 2: the embedding table, one row per id ── */}
       <Drift from={swapAt} to={end} amount={0.014} origin="30% 60%">

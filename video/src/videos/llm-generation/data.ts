@@ -12,7 +12,7 @@ export const VIDEO = "llm-generation";
  * Whether public/images/llm-generation/ holds the four watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 // ── 1. Sampling (sampling.mdx) ──────────────────────────────────────────────
 

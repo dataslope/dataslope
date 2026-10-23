@@ -277,7 +277,7 @@ export const CosineScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      <Spot id="llm-meaning-compass" at={angleAt - 6} left={1600} top={y(330)} width={220} height={220} />
+      <Spot id="llm-meaning-compass" at={angleAt - 6} left={1610} top={y(320)} width={200} height={240} />
     </AbsoluteFill>
   );
 };

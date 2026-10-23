@@ -12,7 +12,7 @@ export const VIDEO = "llm-benchmarks";
  * Whether public/images/llm-benchmarks/ holds the four watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 const pct = (x: number, digits = 1) => (x * 100).toFixed(digits);
 

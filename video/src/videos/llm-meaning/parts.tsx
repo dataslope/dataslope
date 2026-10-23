@@ -232,7 +232,9 @@ export const PathArrow: React.FC<{
   return (
     <Svg opacity={1 - o}>
       <path d={d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />
-      {p > 0.2 ? (
+      {/* The head waits for the last, straight segment: a tip still inside a
+          rounded corner would sit on a bend (arrow.ts). */}
+      {p > 0.99 ? (
         <path d={arrowHead(drawn, 15, 9)} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />
       ) : null}
     </Svg>

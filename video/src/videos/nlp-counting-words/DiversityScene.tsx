@@ -46,7 +46,8 @@ export const DiversityScene: React.FC = () => {
   const fallsAt = n.word("length", "falls");
   const growsAt = n.word("length", "grows");
   const comingAt = n.word("length", "coming back");
-  const emmaAt = n.word("emma-length", "Emma");
+  const janeAt = n.word("emma-length", "Jane");
+  const r100Said = n.word("emma-length", "first hundred");
   const r100 = n.word("emma-length", "zero point seven three");
   const r1k = n.word("emma-length", "first thousand");
   const r1kv = n.word("emma-length", "zero point four two");
@@ -74,7 +75,7 @@ export const DiversityScene: React.FC = () => {
   const rows = EMMA.byLength.map((r, i) => ({
     name: i === EMMA.byLength.length - 1 ? `all ${fmt(r.words, 0)}` : `first ${fmt(r.words, 0)}`,
     value: r.value,
-    at: [emmaAt, r1k, r10k, rAll][i] - 2,
+    at: [r100Said, r1k, r10k, rAll][i] - 2,
     valueAt: [r100, r1kv, r10kv, rAllv][i] - 2,
   }));
   const rowY = (i: number) => y(ROWS_Y) + i * h(ROW_STEP);
@@ -86,14 +87,14 @@ export const DiversityScene: React.FC = () => {
       <Sfx name="el-pencil" at={totalAt - 4} level={-34} />
       <Sfx name="el-tap" at={scoreAt - 2} level={-27} />
       <Sfx name="el-tap" at={perfectAt - 2} level={-28} />
-      <Sfx name="el-pop" at={emmaAt - 4} level={-30} />
+      <Sfx name="el-pop" at={janeAt - 4} level={-30} />
       {rows.map((r, i) => (
         <Sfx key={i} name="el-tap" at={r.valueAt} level={-29} />
       ))}
 
       <Kicker at={from - 10}>Counting words</Kicker>
       <Headline at={lexicalAt - 4}>Lexical diversity</Headline>
-      <Spot id="nlp-counting-words-novel" at={emmaAt - 4} left={1400} top={y(660)} width={380} height={244} />
+      <Spot id="nlp-counting-words-novel" at={janeAt - 4} left={1400} top={y(660)} width={380} height={244} />
 
       <FigLabel n="2" title="Different words over total words" at={ratioAt - 4} x={LEFT_X} y={y(270)} />
 
@@ -174,10 +175,9 @@ export const DiversityScene: React.FC = () => {
       />
       {rows.map((r, i) => (
         <React.Fragment key={r.name}>
-          <Ink at={i === 0 ? growsAt - 2 : r.at} dur={12} style={{ left: RX, top: rowY(i), height: h(40), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
+          <Ink at={growsAt - 2 + i * 5} dur={12} style={{ left: RX, top: rowY(i), height: h(40), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
             <span style={{ ...label(22, INK), fontWeight: 600 }}>
-              {i === rows.length - 1 ? <Marked at={novelAt - 2}>{r.name}</Marked> : r.name}{" "}
-              <span style={{ color: INK_SOFT, fontWeight: 500 }}>words</span>
+              <Marked at={r.at}>{r.name}</Marked> <span style={{ color: INK_SOFT, fontWeight: 500 }}>words</span>
             </span>
           </Ink>
           <HBar x={BAR_X + 1} y={rowY(i) + h(6)} w={r.value * BAR_W} h={h(28)} at={r.valueAt} />

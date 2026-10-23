@@ -12,7 +12,7 @@ export const VIDEO = "llm-meaning";
  * Whether public/images/llm-meaning/ holds the four watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export type Vec = readonly number[];
 

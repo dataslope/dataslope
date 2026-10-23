@@ -57,6 +57,9 @@ export const RequestScene: React.FC = () => {
   const haikuAt = n.word("volume", "Twenty-seven dollars");
   const fableAt = n.word("volume", "twenty-seven hundred");
   const apartAt = n.word("apart", "apart");
+  const sameTaskAt = n.word("apart", "Same task");
+  const sameTokensAt = n.word("apart", "same tokens");
+  const tokPulse = pulse(frame, sameTokensAt - 2, 22);
   const timesAt = n.word("apart", "hundred times");
 
   const tiers = REQUEST.tiers;
@@ -88,11 +91,29 @@ export const RequestScene: React.FC = () => {
       <FigLabel n="7" title="One support-bot request, on four tiers" at={supportAt - 6} x={X0} y={y(FIG_Y)} />
 
       {/* The request itself. */}
-      <HBar x={X0} y={y(TOKENS_Y)} w={REQUEST.in * PX_PER_TOKEN} h={h(30)} at={inAt - 4} dur={14} fill={INPUT} />
+      <HBar
+        x={X0}
+        y={y(TOKENS_Y)}
+        w={REQUEST.in * PX_PER_TOKEN}
+        h={h(30)}
+        at={inAt - 4}
+        dur={14}
+        fill={INPUT}
+        style={{ transform: `scaleY(${1 + tokPulse * 0.4})` }}
+      />
       <Note at={inAt} x={X0 + REQUEST.in * PX_PER_TOKEN + 14} y={y(TOKENS_Y) + h(15) - 16}>
         <span style={{ ...note(25, INPUT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.in)} in</span>
       </Note>
-      <HBar x={640} y={y(TOKENS_Y)} w={REQUEST.out * PX_PER_TOKEN} h={h(30)} at={outAt - 4} dur={12} fill={OUTPUT} />
+      <HBar
+        x={640}
+        y={y(TOKENS_Y)}
+        w={REQUEST.out * PX_PER_TOKEN}
+        h={h(30)}
+        at={outAt - 4}
+        dur={12}
+        fill={OUTPUT}
+        style={{ transform: `scaleY(${1 + tokPulse * 0.4})` }}
+      />
       <Note at={outAt} x={640 + REQUEST.out * PX_PER_TOKEN + 14} y={y(TOKENS_Y) + h(15) - 16}>
         <span style={{ ...note(25, OUTPUT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{int(REQUEST.out)} out</span>
       </Note>
@@ -116,7 +137,20 @@ export const RequestScene: React.FC = () => {
         return (
           <React.Fragment key={t.model}>
             <Note at={supportAt + 4 + i * 4} x={X0} y={ry}>
-              <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>{NAME[t.model]}</span>
+              {/* The same task on every tier: the names swell in turn as it is said. */}
+              <span
+                style={{
+                  ...note(28, INK),
+                  whiteSpace: "nowrap",
+                  display: "inline-block",
+                  transformOrigin: "0 60%",
+                  transform: `scale(${1 + pulse(frame, sameTaskAt - 2 + i * 4, 18) * 0.07})`,
+                }}
+              >
+                <Marked at={sameTaskAt - 2 + i * 4} out={sameTaskAt + 14 + i * 4}>
+                  {NAME[t.model]}
+                </Marked>
+              </span>
             </Note>
             <Note at={sonnetAt - 4 + i * 3} x={PER_R} y={ry} align="right">
               <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>

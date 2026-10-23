@@ -7,7 +7,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { LEMMAS } from "./data";
-import { Chip, chipHeight, chipWidth, Fade, Headline, Kicker, type MarkSpan, Spot, type ToneStep, X0 } from "./parts";
+import { Chip, chipHeight, chipWidth, Fade, Headline, Mark, Kicker, type MarkSpan, Spot, type ToneStep, X0 } from "./parts";
 
 const SIZE = 32;
 const FIG_Y = 300;
@@ -69,6 +69,9 @@ export const LemmaScene: React.FC = () => {
   const searchAt = n.word("choose", "search");
   const lemmatizeAt = n.word("choose", "Lemmatize");
   const realAt = n.word("choose", "real");
+  const speedAt = n.word("choose", "speed");
+  const machineAt = n.word("choose", "machine");
+  const rootAt = n.word("choose", "root");
 
   // ── Geometry ──
   const chipH = chipHeight(SIZE);
@@ -133,7 +136,7 @@ export const LemmaScene: React.FC = () => {
       {/* Fig. 16: which to reach for. */}
       <FigLabel n="16" title="Stem or lemma?" at={stemAt - 4} x={RIGHT_X} y={y(FIG_Y)} />
       <Card at={stemAt} y={y(CARD_Y[0])} title="Stem">
-        for speed, when only a machine sees the key
+        <Fade at={speedAt - 4}>for speed,</Fade> <Fade at={machineAt - 4}>when only a machine sees the key</Fade>
         <div style={{ marginTop: 10 }}>
           <Fade at={searchAt - 4}>
             <span style={label(22, INK_SOFT)}>like a search index</span>
@@ -141,7 +144,10 @@ export const LemmaScene: React.FC = () => {
         </div>
       </Card>
       <Card at={lemmatizeAt} y={y(CARD_Y[1])} title="Lemmatize">
-        when the root has to be a <span style={{ fontStyle: "italic" }}>real word</span>
+        <Fade at={rootAt - 6}>when the root has to be a</Fade>{" "}
+        <Mark at={realAt - 2}>
+          <span style={{ fontStyle: "italic" }}>real word</span>
+        </Mark>
       </Card>
       <Sfx name="el-pencil" at={realAt - 4} level={-36} />
     </AbsoluteFill>

@@ -158,7 +158,7 @@ export const ContaminationScene: React.FC = () => {
         </Tag>
       </Drift>
 
-      <Spot id="llm-benchmarks-elephant" at={memorizedAt - 6} left={1260} top={y(400)} width={540} height={360} />
+      <Spot id="llm-benchmarks-elephant" at={memorizedAt - 6} left={1330} top={y(372)} width={420} height={470} />
     </AbsoluteFill>
   );
 };

@@ -86,7 +86,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     from J. Hutchins, "The Georgetown-IBM experiment demonstrated in
  *     January 1954" (AMTA 2004 slides). The lesson's "a few dozen Russian
  *     sentences" is consistent; the video says "about sixty".
- *   - ALPAC: Language and Machines: Computers in Translation and Linguistics
+ *   - ALPAC, the Automatic Language Processing Advisory Committee that US
+ *     government agencies convened in 1964 ("a government committee"):
+ *     Language and Machines: Computers in Translation and Linguistics
  *     (National Academy of Sciences, 1966) found "no immediate or
  *     predictable prospect of useful machine translation" (p. 32), and US
  *     funding for machine translation largely ended (Hutchins, as above:
@@ -238,7 +240,7 @@ export const script: NarrationScript = {
     },
     {
       id: "alpac",
-      text: "Twelve years later, a government report saw no prospect of useful machine translation, and the funding dried up.",
+      text: "Twelve years later, a government committee saw no prospect of useful machine translation, and the funding dried up.",
       pauseAfter: 0.8,
     },
     { id: "moral", text: "A polished demo is not a working system.", pauseAfter: 1.0 },
