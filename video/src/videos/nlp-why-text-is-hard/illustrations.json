@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "nlp-why-text-is-hard-ribbon",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "one long strip of plain paper ribbon unspooling from a fat roll lying on its side and falling away in big loose tangled loops, the roll and the ribbon washed in soft yellow with blue shadows in the folds, the strip blank and unmarked along its whole length"
+    },
+    {
+      "id": "nlp-why-text-is-hard-telescope",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an old telescope on a sturdy three-legged wooden tripod, its long tube tilted up to the right, the tube painted deep blue with two broad yellow brass rings around it"
+    },
+    {
+      "id": "nlp-why-text-is-hard-trophy",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a tall shiny yellow-gold trophy cup with two big curved handles on a chunky square base, standing beside a small open blue carrying case lying on its back with its lid up, the case clearly far too small to hold the trophy"
+    },
+    {
+      "id": "nlp-why-text-is-hard-conveyor",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a short conveyor belt running left to right through three chunky boxy machines standing in a row, one blue, one red and one green, with a loose crumpled heap of paper on the belt at its left end and a neat stack of plain square yellow blocks on the belt at its right end"
+    }
+  ]
+}

@@ -1,0 +1,958 @@
+{
+  "meta": {
+    "python": "3.13.16",
+    "nltk": "3.9.4",
+    "numpy": "2.4.6",
+    "sklearn": "1.8.0",
+    "agreesWithPage": [
+      "pipeline: topic and sentiment features",
+      "bag of words: vocabulary",
+      "bag of words: document-term matrix",
+      "bag of words: count and binary vectors",
+      "tf-idf: idf of the, cat and comet",
+      "tf-idf: Doc 1's ranking",
+      "sentiment: naive results",
+      "sentiment: negation results"
+    ]
+  },
+  "pipeline": {
+    "review": "The plot was not good, but the acting was brilliant!",
+    "tokens": [
+      "The",
+      "plot",
+      "was",
+      "not",
+      "good",
+      ",",
+      "but",
+      "the",
+      "acting",
+      "was",
+      "brilliant",
+      "!"
+    ],
+    "alpha": [
+      "the",
+      "plot",
+      "was",
+      "not",
+      "good",
+      "but",
+      "the",
+      "acting",
+      "was",
+      "brilliant"
+    ],
+    "stopwordsInReview": [
+      "the",
+      "was",
+      "not",
+      "but",
+      "the",
+      "was"
+    ],
+    "topic": [
+      "plot",
+      "good",
+      "acting",
+      "brilliant"
+    ],
+    "sentiment": [
+      "plot",
+      "not",
+      "good",
+      "but",
+      "acting",
+      "brilliant"
+    ],
+    "bigrams": [
+      [
+        "plot",
+        "not"
+      ],
+      [
+        "not",
+        "good"
+      ],
+      [
+        "good",
+        "but"
+      ],
+      [
+        "but",
+        "acting"
+      ],
+      [
+        "acting",
+        "brilliant"
+      ]
+    ],
+    "keep": [
+      "but",
+      "never",
+      "no",
+      "nor",
+      "not"
+    ],
+    "keepOnStopList": [
+      "but",
+      "no",
+      "nor",
+      "not"
+    ],
+    "stopListSize": 198
+  },
+  "bag": {
+    "corpus": [
+      "the cat sat on the mat",
+      "the dog sat on the log",
+      "the cat and the dog played"
+    ],
+    "docs": [
+      [
+        "the",
+        "cat",
+        "sat",
+        "on",
+        "the",
+        "mat"
+      ],
+      [
+        "the",
+        "dog",
+        "sat",
+        "on",
+        "the",
+        "log"
+      ],
+      [
+        "the",
+        "cat",
+        "and",
+        "the",
+        "dog",
+        "played"
+      ]
+    ],
+    "vocab": [
+      "and",
+      "cat",
+      "dog",
+      "log",
+      "mat",
+      "on",
+      "played",
+      "sat",
+      "the"
+    ],
+    "rows": [
+      [
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        2
+      ],
+      [
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        2
+      ]
+    ],
+    "spam": {
+      "tokens": [
+        "free",
+        "free",
+        "free",
+        "winner",
+        "cheap"
+      ],
+      "vocab": [
+        "cheap",
+        "free",
+        "meeting",
+        "report",
+        "winner"
+      ],
+      "count": [
+        1,
+        3,
+        0,
+        0,
+        1
+      ],
+      "binary": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ]
+    },
+    "order": {
+      "sentences": [
+        "dog bites man",
+        "man bites dog"
+      ],
+      "vocab": [
+        "bites",
+        "dog",
+        "man"
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      "same": true
+    },
+    "doc1Counts": {
+      "cat": 1,
+      "mat": 1,
+      "on": 1,
+      "sat": 1,
+      "the": 2
+    },
+    "theEveryRow": [
+      2,
+      2,
+      2
+    ]
+  },
+  "tfidf": {
+    "corpus": [
+      "the cat sat on the mat",
+      "the dog ran in the park",
+      "the comet streaked across the sky"
+    ],
+    "docs": [
+      [
+        "the",
+        "cat",
+        "sat",
+        "on",
+        "the",
+        "mat"
+      ],
+      [
+        "the",
+        "dog",
+        "ran",
+        "in",
+        "the",
+        "park"
+      ],
+      [
+        "the",
+        "comet",
+        "streaked",
+        "across",
+        "the",
+        "sky"
+      ]
+    ],
+    "N": 3,
+    "lengths": [
+      6,
+      6,
+      6
+    ],
+    "vocab": [
+      "the",
+      "cat",
+      "sat",
+      "on",
+      "mat",
+      "dog",
+      "ran",
+      "in",
+      "park",
+      "comet",
+      "streaked",
+      "across",
+      "sky"
+    ],
+    "counts": [
+      [
+        2,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ]
+    ],
+    "df": [
+      3,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "idf": [
+      0.0,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098,
+      1.0986122886681098
+    ],
+    "tf": [
+      [
+        0.3333333333333333,
+        0.16666666666666666,
+        0.16666666666666666,
+        0.16666666666666666,
+        0.16666666666666666,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.3333333333333333,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.16666666666666666,
+        0.16666666666666666,
+        0.16666666666666666,
+        0.16666666666666666,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.3333333333333333,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.16666666666666666,
+        0.16666666666666666,
+        0.16666666666666666,
+        0.16666666666666666
+      ]
+    ],
+    "tfidf": [
+      [
+        0.0,
+        0.1831020481113516,
+        0.1831020481113516,
+        0.1831020481113516,
+        0.1831020481113516,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.1831020481113516,
+        0.1831020481113516,
+        0.1831020481113516,
+        0.1831020481113516,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.1831020481113516,
+        0.1831020481113516,
+        0.1831020481113516,
+        0.1831020481113516
+      ]
+    ],
+    "lessonDoc0Rounded": {
+      "cat": 0.183,
+      "mat": 0.183,
+      "on": 0.183,
+      "sat": 0.183,
+      "the": 0.0
+    },
+    "doc0Top": [
+      "cat",
+      "mat",
+      "on",
+      "sat"
+    ],
+    "theTfidfEveryRow": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "theCountEveryRow": [
+      2,
+      2,
+      2
+    ],
+    "maxOtherCount": 1,
+    "sklearnDefault": {
+      "call": "TfidfVectorizer()",
+      "idf": [
+        1.0,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454,
+        1.6931471805599454
+      ],
+      "rows": [
+        [
+          0.5085423203783267,
+          0.4305184979719882,
+          0.4305184979719882,
+          0.4305184979719882,
+          0.4305184979719882,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.5085423203783267,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.4305184979719882,
+          0.4305184979719882,
+          0.4305184979719882,
+          0.4305184979719882,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.5085423203783267,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.4305184979719882,
+          0.4305184979719882,
+          0.4305184979719882,
+          0.4305184979719882
+        ]
+      ],
+      "theTopsEveryRow": true
+    },
+    "maxAbsDiffHandVsSklearn": {
+      "counts": 0.0,
+      "idf": 2.220446049250313e-16,
+      "tfidf": 5.551115123125783e-17
+    }
+  },
+  "sentiment": {
+    "positive": [
+      "amazing",
+      "best",
+      "excellent",
+      "good",
+      "great",
+      "love",
+      "wonderful"
+    ],
+    "negative": [
+      "awful",
+      "bad",
+      "boring",
+      "hate",
+      "poor",
+      "terrible",
+      "worst"
+    ],
+    "negations": [
+      "n't",
+      "never",
+      "no",
+      "not"
+    ],
+    "reset": [
+      ".",
+      "!",
+      "?",
+      ",",
+      ";",
+      "but"
+    ],
+    "naive": [
+      {
+        "text": "I love this movie",
+        "steps": [
+          {
+            "token": "i",
+            "polarity": 0
+          },
+          {
+            "token": "love",
+            "polarity": 1
+          },
+          {
+            "token": "this",
+            "polarity": 0
+          },
+          {
+            "token": "movie",
+            "polarity": 0
+          }
+        ],
+        "score": 1,
+        "label": "positive"
+      },
+      {
+        "text": "This film is terrible",
+        "steps": [
+          {
+            "token": "this",
+            "polarity": 0
+          },
+          {
+            "token": "film",
+            "polarity": 0
+          },
+          {
+            "token": "is",
+            "polarity": 0
+          },
+          {
+            "token": "terrible",
+            "polarity": -1
+          }
+        ],
+        "score": -1,
+        "label": "negative"
+      },
+      {
+        "text": "It is not good",
+        "steps": [
+          {
+            "token": "it",
+            "polarity": 0
+          },
+          {
+            "token": "is",
+            "polarity": 0
+          },
+          {
+            "token": "not",
+            "polarity": 0
+          },
+          {
+            "token": "good",
+            "polarity": 1
+          }
+        ],
+        "score": 1,
+        "label": "positive"
+      }
+    ],
+    "negation": [
+      {
+        "text": "I love this movie",
+        "steps": [
+          {
+            "token": "i",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "love",
+            "role": "scored",
+            "polarity": 1,
+            "flag": false
+          },
+          {
+            "token": "this",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "movie",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          }
+        ],
+        "score": 1,
+        "label": "positive"
+      },
+      {
+        "text": "This film is terrible",
+        "steps": [
+          {
+            "token": "this",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "film",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "is",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "terrible",
+            "role": "scored",
+            "polarity": -1,
+            "flag": false
+          }
+        ],
+        "score": -1,
+        "label": "negative"
+      },
+      {
+        "text": "It is not good",
+        "steps": [
+          {
+            "token": "it",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "is",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "not",
+            "role": "negation",
+            "polarity": 0,
+            "flag": true
+          },
+          {
+            "token": "good",
+            "role": "flipped",
+            "polarity": -1,
+            "flag": false
+          }
+        ],
+        "score": -1,
+        "label": "negative"
+      },
+      {
+        "text": "This is not bad at all",
+        "steps": [
+          {
+            "token": "this",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "is",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "not",
+            "role": "negation",
+            "polarity": 0,
+            "flag": true
+          },
+          {
+            "token": "bad",
+            "role": "flipped",
+            "polarity": 1,
+            "flag": false
+          },
+          {
+            "token": "at",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "all",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          }
+        ],
+        "score": 1,
+        "label": "positive"
+      },
+      {
+        "text": "The plot was good but the acting was awful",
+        "steps": [
+          {
+            "token": "the",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "plot",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "was",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "good",
+            "role": "scored",
+            "polarity": 1,
+            "flag": false
+          },
+          {
+            "token": "but",
+            "role": "reset",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "the",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "acting",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "was",
+            "role": "word",
+            "polarity": 0,
+            "flag": false
+          },
+          {
+            "token": "awful",
+            "role": "scored",
+            "polarity": -1,
+            "flag": false
+          }
+        ],
+        "score": 0,
+        "label": "neutral"
+      }
+    ],
+    "sarcasm": {
+      "text": "Oh great, another delay.",
+      "steps": [
+        {
+          "token": "oh",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "great",
+          "role": "scored",
+          "polarity": 1,
+          "flag": false
+        },
+        {
+          "token": ",",
+          "role": "reset",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "another",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "delay",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": ".",
+          "role": "reset",
+          "polarity": 0,
+          "flag": false
+        }
+      ],
+      "score": 1,
+      "label": "positive"
+    },
+    "unknown": {
+      "text": "The brakes were unpredictable",
+      "steps": [
+        {
+          "token": "the",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "brakes",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "were",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "unpredictable",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        }
+      ],
+      "score": 0,
+      "label": "neutral"
+    },
+    "resetCheck": {
+      "Not great, but terrible": {
+        "withReset": -2,
+        "withoutReset": -2
+      },
+      "Not really, it was good": {
+        "withReset": 1,
+        "withoutReset": -1
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "nlp-history-booths",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "two small closed wooden booths standing side by side a short way apart, each a tall boxy cabinet with a plain shut door and a flat roof, one washed in blue and the other in warm yellow, joined at waist height by a short square red tube with one folded white paper note sliding through its middle"
+    },
+    {
+      "id": "nlp-history-computer",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "one big old room-sized computer from the 1950s seen from the front at a slight angle: two tall boxy steel cabinets in blue washes, the left one carrying two large round reels of magnetic tape side by side, the right one a neat grid of round indicator lamps in yellow and red, and a low wooden table in front holding a short stack of plain punched cards"
+    },
+    {
+      "id": "nlp-history-teletype",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an old teletype terminal standing on its own short metal stand: a chunky rounded machine washed in soft blue with a sloping keyboard of round keys, and one long ribbon of plain white paper rising out of its top and curling over in a single loose loop, beside a deep red armchair with plump cushions"
+    },
+    {
+      "id": "nlp-history-book",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a thick old hardcover book with a blue cloth cover lying open flat, its plain cream pages fanned slightly upward, a yellow pencil resting diagonally across the open pages and a small square stack of three blank white index cards beside it"
+    }
+  ]
+}

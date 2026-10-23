@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "nlp-cleaning-text-scissors",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a large pair of open tailor's scissors with deep blue handles, its two blades closing across a long curling paper ribbon washed in pale yellow, with three short cut pieces of the same plain ribbon lying loose beside it"
+    },
+    {
+      "id": "nlp-cleaning-text-clay",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a thick wooden rolling pin with red handles lying beside three soft lumps of clay, a tall crooked lump in blue, a squat lumpy one in yellow and a third already pressed into a smooth low round cake in green"
+    },
+    {
+      "id": "nlp-cleaning-text-sieve",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a round kitchen sieve with a long wooden handle, seen from slightly above, holding three large smooth stones in red, yellow and green, with a small heap of tiny pale blue pebbles just below it where they have fallen through the mesh"
+    },
+    {
+      "id": "nlp-cleaning-text-dictionary",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a thick closed dictionary lying flat, with a deep blue cloth cover and a red ribbon bookmark trailing from its pages, and a small pair of garden pruning shears with yellow handles resting open on top of it"
+    }
+  ]
+}
