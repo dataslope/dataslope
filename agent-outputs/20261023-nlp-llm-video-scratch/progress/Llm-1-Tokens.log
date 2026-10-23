@@ -11,3 +11,5 @@
 07:51 check:frames passed with art (largest stretch 0.68, arrows 5.4 deg)
 08:03 check:motion failed 3 stretches (bpe 4.8 s, corpus 3.0 s, chat 3.3 s): fixed, re-running
 08:33 check:motion passed (longest still 2.3 s)
+09:33 final check:motion passed (longest 2.3 s); tsc, npm test 59/59 clean
+09:37 check:mix 25.3 LU under; report written; done

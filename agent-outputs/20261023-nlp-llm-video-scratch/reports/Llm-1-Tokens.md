@@ -9,7 +9,14 @@ Composition `Llm-1-Tokens`, folder `video/src/videos/llm-tokens/`. Unit 1 of How
 
 ## Checks
 
-CHECKS_PLACEHOLDER
+All run on my entry (`VIDEO_ENTRY=out/entries/Llm-1-Tokens.tsx`) through `out/render-slot.sh`, on the final code.
+
+- **Typecheck** (`tsc --noEmit`): no errors in `src/videos/llm-tokens/` (the whole package exits 0). **Lint** (`eslint src/videos/llm-tokens`): clean.
+- **check:cues**: nothing for llm-tokens. **npm test**: 59 of 59 pass.
+- **check:frames**: pass. 4 illustrations, largest stretch 0.68 (none drawn past its pixels); 6 arrows, worst 5.4° of bend under a head. Run before voicing (art not in yet) and twice after, with the art.
+- **check:sync**: pass. 39 beats, worst +0.03 s (formats, at 4:08.3); every beat within ±0.12 s.
+- **check:motion**: pass. Longest still 2.3 s (counts-in, formats). The first run failed three stretches (2:18.8 bpe 4.8 s, 2:24.0 bpe/corpus 3.0 s, 4:55.3 chat/turns 3.3 s); fixed by writing the training text out word by word, set large until it moves up on "training text", and by drawing the chart's axis and turn numbers on "every turn". Preview kept at `out/Llm-1-Tokens-preview.mp4`.
+- **check:mix** (informational): effects -45.4 LUFS against narration -20.1 LUFS, **25.3 LU under**; effects peak -21.1 dBFS at 0:00.6 (the series intro's logo); where both sound, speech a median 28.1 dB above the effects (5th percentile 13.2 dB). Closest: 2:47.8 and 3:04.1, merge pops landing on "Merge" and "E and S", 8.8 and 10.4 dB in a 50 ms window, after I lowered the BPE merge pops from -28 to -31 (they were 5.8 and 7.4 dB).
 
 ## Scenes
 
@@ -53,4 +60,9 @@ Everything on screen comes from `measure.py` (run with the scratch pyenv: Python
 
 ## Left undone
 
-UNDONE_PLACEHOLDER
+Nothing required is left. Notes for the coordinator:
+
+- The art batch stalled (0 of 4 after an hour) and was cancelled and replaced by `sync`, as approved; the cancelled batch reported 0 completed, so it cannot bill a second set.
+- `tiktoken-cache` in the scratch folder now holds o200k_base, cl100k_base, p50k_base and r50k_base (fetched by tiktoken on first use). `measure.py` needs them (`TIKTOKEN_CACHE_DIR`).
+- Lesson discrepancies above are reported only; no lesson was edited.
+- I did not commit; `git status` shows my folders already captured in the coordinator's snapshot commits.
