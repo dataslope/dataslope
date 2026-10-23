@@ -1,12 +1,12 @@
 # Nlp-4-TextToFeatures: report
 
-Composition `Nlp-4-TextToFeatures`, folder `video/src/videos/nlp-text-to-features/`. Natural Language Processing with Python, Unit 4, "From text to features" (the plan's title, kept). Narrator Hope. Nothing committed.
+Composition `Nlp-4-TextToFeatures`, folder `video/src/videos/nlp-text-to-features/`. Natural Language Processing with Python, Unit 4, "From text to features" (the plan's title, kept). Narrator Hope. I committed nothing; the coordinator's snapshot commits already carry the folder.
 
 ## Length and voice
 
 - **Length:** 410.4 s (6:50), 49 beats, 927 words, 136 wpm overall (`npm run cues`).
 - **Voiced:** 5,016 characters (cap 6,200), 4 takes (1,286 / 1,589 / 1,512 / 629 characters), all on `eleven_v4_turbo`, voice `hope`. No `--force`, no beat voiced twice.
-- One seam fix, free: the take ran "It is not good... positive." together, so the cutter put the spoken "positive." at the end of `naive` and `wrong` started 0.49 s late in `check:sync`. I moved "positive." from the start of `wrong` to the end of `naive`. The joined take text is unchanged, so `narrate --recut` re-cut the kept takes with no API call.
+- One seam fix, free: the take ran "It is not good... positive." together, so the cutter left the spoken "positive." at the end of `naive`, and `check:sync` heard speech 0.49 s before `wrong`'s cue. I moved "positive." from the start of `wrong` to the end of `naive`. The joined take text is unchanged, so `narrate --recut` re-cut the kept takes with no API call.
 
 ## Checks
 
@@ -38,7 +38,7 @@ Preview with sound: `video/out/Nlp-4-TextToFeatures-preview.mp4`.
 9. **MorphScene**: Fig. 12, Fig. 10's table turning into TF-IDF in place; worked cat (1/6 x 1.10 = 0.18) and the (2/6 x 0 = 0); Doc 1's four-way tie, "on" included; headline turns into "Frequent here, rare elsewhere."
 10. **DefaultScene**: Fig. 13, textbook idf against scikit-learn's `TfidfVectorizer()` default (the 1.00, cat 1.69; Doc 1 bars, the 0.51 against 0.43); the turn to Part 4. Spot: gauge.
 11. **LexiconScene** (Part 4): Fig. 14, the lesson's 7 + 7 lexicon; Fig. 15, the naive counter on the lesson's three reviews, "It is not good" positive, struck, "never read" under "not".
-12. **FlagScene**: Fig. 16, the negation rule (flag on: not, no, never, n't; flag off: . ! ? , ; but); Fig. 17, three reviews token by token: −1 negative, +1 positive (flipped signs shown), 0 neutral.
+12. **FlagScene**: Fig. 16, the negation rule (flag on: not, no, never, n't; flag off: . ! ? , ; but); Fig. 17, three reviews token by token: "it is not good" built as the rule is described, then −1 negative, +1 positive (flipped signs shown), 0 neutral.
 13. **LimitsScene**: Fig. 18, sarcasm ("oh great, another delay" scores +1, struck), context (unpredictable in brakes / in a thriller), missing words (0, neutral); the baseline's three virtues; what learned models keep; the bridge: "IDF, 1972 · counting word pairs, 1948", then `NextLine` "how the field got here". Spot: gauge.
 
 **Illustrations** (`illustrations.json`, watercolor, `video-icon`): `nlp-text-to-features-toolbox`, `nlp-text-to-features-bag`, `nlp-text-to-features-balance`, `nlp-text-to-features-gauge`. All four looked right first time; no redraws. The Batch API job (`batch_6adafb18a3888190ab08f5f3194bcb90`, submitted 06:13) sat at 0 of 4 for an hour, so I cancelled it at 07:15 and generated with `sync` (about $0.02), then `--import`.
