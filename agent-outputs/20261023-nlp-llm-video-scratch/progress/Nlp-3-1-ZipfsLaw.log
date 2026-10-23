@@ -3,3 +3,4 @@
 2026-10-23T10:12:02Z art submitted (batch: sieve, balance)
 2026-10-23T10:40:01Z script drafted (1653 chars), scenes built; typecheck+lint clean; check:cues ok; stills queued
 2026-10-23T13:58:44Z resumed after usage pause; art batch stalled 3h46m at 0/2: cancelled, running sync fallback
+2026-10-23T14:00:21Z art imported (sieve, balance via sync fallback; batch cancelled); stills reviewed, fixes applied
