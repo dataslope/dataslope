@@ -566,7 +566,7 @@ export const BlendScene: React.FC = () => {
           rootAt={swapS}
         />
       </div>
-      <Note at={newAt - 2} x={X0} y={workY + 132}>
+      <Note at={newAt - 2} x={X0} y={workY + 150}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <span style={{ ...label(24, POINT_INK) }}>
             New vector for <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>

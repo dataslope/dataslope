@@ -9,7 +9,7 @@ import { Sfx } from "../../sound/Sfx";
 import { CONTEXT, SARCASM, signed, UNKNOWN, type Trace } from "./data";
 import { Chip, FIG_Y, Headline, INK, INK_SOFT, Kicker, LOST_INK, Mark, NEG, NEG_INK, POS, POS_INK, Reveal, Spot, Strike, TokenCol, TokenRow, X0 } from "./parts";
 
-const ROW_Y = { sarcasm: 342, context: 462, missing: 582 } as const;
+const ROW_Y = { sarcasm: 342, context: 456, missing: 594 } as const;
 const ROW_LABEL_W = 210;
 const CHIPS_X = X0 + ROW_LABEL_W;
 const SUM_X = 1100;
@@ -105,7 +105,7 @@ export const LimitsScene: React.FC = () => {
         verdictAt={thrillerAt}
         struck={thrillerAt + 10}
       />
-      <Note at={brakesAt + 2} x={CHIPS_X} y={y(ROW_Y.context) + 50}>
+      <Note at={brakesAt + 2} x={CHIPS_X} y={y(ROW_Y.context) + 86}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
           with <i>{CONTEXT.added}</i> added to the negative list, as brakes would want
         </span>
@@ -117,7 +117,7 @@ export const LimitsScene: React.FC = () => {
       {/* Missing words: in neither list, so worth nothing. */}
       {rowLabel("Missing words", missingAt - 4, ROW_Y.missing)}
       <TraceRow trace={UNKNOWN} top={y(ROW_Y.missing)} at={missingAt - 2} verdictAt={nothingAt} />
-      <Note at={nothingAt + 4} x={CHIPS_X} y={y(ROW_Y.missing) + 50}>
+      <Note at={nothingAt + 4} x={CHIPS_X} y={y(ROW_Y.missing) + 46}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
           in the lesson’s lists, <i>unpredictable</i> is in neither
         </span>

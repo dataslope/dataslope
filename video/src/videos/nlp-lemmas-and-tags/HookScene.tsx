@@ -8,13 +8,13 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { DEFAULT_POS, DEFAULTS } from "./data";
-import { Arrow, Chip, chipHeight, chipWidth, Fade, Headline, Kicker, rowLayout, Spot, Tag, X0 } from "./parts";
+import { Arrow, Chip, chipHeight, Fade, Headline, Kicker, rowLayout, Spot, Tag, X0 } from "./parts";
 
 const SIZE = 32;
 const ADV = 0.6 * SIZE;
 const FIG_Y = 300;
-const ROW_Y = 382;
-const STEP = 112;
+const ROW_Y = 392;
+const STEP = 136;
 /** The call's text runs from X0; the arrow and the result sit past the
  *  longest call with its default argument shown. */
 const GHOST = `, pos="${DEFAULT_POS}"`;
@@ -150,7 +150,7 @@ export const HookScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      <Tag at={dictionaryAt + 4} x={RESULT_X + chipWidth("running", SIZE) + 18} y={rowTop(0) + chipH / 2 - 15} color={INK} size={22}>
+      <Tag at={dictionaryAt + 4} x={RESULT_X} y={rowTop(0) + chipH + 12} color={INK} size={22}>
         already a dictionary form
       </Tag>
 

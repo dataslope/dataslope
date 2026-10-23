@@ -38,10 +38,10 @@ const STEPS = [
     how: `${one(TROPHY.query[0])}×${one(r0.key[0])} + ${one(TROPHY.query[1])}×${one(r0.key[1])}`,
     value: two(r0.dot),
   },
-  { name: "Scale", how: `÷ √2, that is ÷ ${ROOT.toFixed(3)}`, value: three(r0.score) },
+  { name: "Scale", how: `÷ √2, so ÷ ${ROOT.toFixed(3)}`, value: three(r0.score) },
   { name: "Raise e", how: `e to the ${three(r0.score)}`, value: three(r0.power) },
   { name: "Divide", how: `÷ ${three(TROPHY.total)}, the total`, value: three(r0.weight) },
-  { name: "Blend", how: "the weights times the values", value: TROPHY.output2.map((x) => x.toFixed(2)).join(", ") },
+  { name: "Blend", how: "weights × values", value: TROPHY.output2.map((x) => x.toFixed(2)).join(", ") },
 ];
 
 /** A seeded-looking but fixed pattern of lit cells for each head: schematic,
@@ -94,7 +94,7 @@ export const RecapScene: React.FC = () => {
       {[1, 2, 3].map((h) => (
         <Sfx key={`h${h}`} name="el-tap" at={headIn(h)} level={-30} />
       ))}
-      <Sfx name="el-chime" at={n.beat("heads").end + 12} level={-32} />
+      <Sfx name="el-chime" at={n.beat("heads").to + 12} level={-32} />
 
       <Kicker at={from - 10}>Attention, by hand</Kicker>
       <Headline lead="One attention weight," turn="five steps." at={from} turnAt={stepAt[0] - 4} />

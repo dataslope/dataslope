@@ -125,7 +125,8 @@ export const CurveScene: React.FC = () => {
 
   // ── Building the first twenty bars ──
   const barIn = (k: number) => ease(frame, rankAt - 2 + (k - 1) * 2, 12);
-  const built = ease(frame, rankAt - 2 + FIRST * 2, 1);
+  const buildEnd = rankAt - 2 + (FIRST - 1) * 2 + 12;
+  const built = frame >= buildEnd ? 1 : 0;
   const pitch = CW / win;
   const gap = pitch * 0.28;
   const gapCount = gap > 0.6 ? Math.min(Math.ceil(win), 420) : 0;
@@ -133,7 +134,7 @@ export const CurveScene: React.FC = () => {
   // ── Plain-view rank ticks, cross-fading as the window widens ──
   const tickSets = STEPS.map((s) => {
     const k = win / s;
-    const o = Math.min(ease(k, 2, 1), 1 - ease(k, 7, 1)) * ease(frame, plainAt, 14) * (1 - ease(frame, logAt - 4, 12));
+    const o = Math.min(ease(k, 2, 1), 1 - ease(k, 7, 1)) * ease(frame, countsAt + 6, 12) * (1 - ease(frame, logAt - 4, 12));
     const ticks: number[] = [];
     if (o > 0.01) for (let v = s; v < win; v += s) if (linX(v - 0.5) < CX1 - 90) ticks.push(v);
     return { s, o, ticks };
@@ -289,10 +290,10 @@ export const CurveScene: React.FC = () => {
       {LOG_TICKS.map((v, i) => (
         <React.Fragment key={`g${v}`}>
           <div style={{ position: "absolute", left: CX0 - 30, top: logY(v), transform: "translate(-100%, -50%)", opacity: logTicksO, ...note(20, INK_SOFT), ...TABULAR }}>
-            <Mark at={tenAt + i * 5}>{fmt(v, 0)}</Mark>
+            <Mark at={tenAt + i * 5} out={straightensAt}>{fmt(v, 0)}</Mark>
           </div>
           <div style={{ position: "absolute", left: logX(v), top: CY1 + 14, transform: "translateX(-50%)", opacity: logTicksO, ...note(20, INK_SOFT), ...TABULAR }}>
-            <Mark at={tenAt + i * 5}>{fmt(v, 0)}</Mark>
+            <Mark at={tenAt + i * 5} out={straightensAt}>{fmt(v, 0)}</Mark>
           </div>
         </React.Fragment>
       ))}

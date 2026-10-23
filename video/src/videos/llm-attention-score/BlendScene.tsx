@@ -80,8 +80,9 @@ export const BlendScene: React.FC = () => {
   const KU = 300;
   const K = (v: readonly number[]): Pt => [KO[0] + v[0] * KU, KO[1] - v[1] * KU];
   const turn = ease(frame, turnAt - 2, 30);
-  const angA = Math.atan2(A.query[1], A.query[0]);
-  const angB = Math.atan2(B.query[1], B.query[0]);
+  // Both queries point into the first quadrant, so the angle is atan(y / x).
+  const angA = Math.atan(A.query[1] / A.query[0]);
+  const angB = Math.atan(B.query[1] / B.query[0]);
   const lenA = Math.hypot(A.query[0], A.query[1]);
   const lenB = Math.hypot(B.query[0], B.query[1]);
   const ang = lerp(angA, angB, turn);
@@ -296,7 +297,12 @@ export const BlendScene: React.FC = () => {
       </Svg>
       {TOKENS.map((t, i) => {
         const [vx, vy] = V(VALUES[i]);
-        const pos = i === 0 ? { left: vx - 30, top: vy - 52 } : i === 1 ? { left: vx + 20, top: vy - 16 } : { left: vx + 16, top: vy + 8 };
+        const pos =
+          i === 0
+            ? { left: vx - 20, top: vy + 40, transform: "translateX(-100%)" }
+            : i === 1
+              ? { left: vx + 20, top: vy - 16 }
+              : { left: vx + 16, top: vy + 8 };
         return (
           <div key={t} style={{ position: "absolute", ...pos, opacity: ease(frame, valuesAt + i * 3, 10), ...label(21, VALUE_INK), whiteSpace: "nowrap", ...halo }}>
             value of <Mono>{t}</Mono>

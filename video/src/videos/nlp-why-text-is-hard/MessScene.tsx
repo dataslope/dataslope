@@ -65,6 +65,16 @@ export const MessScene: React.FC = () => {
   // As the narration turns to splitting, the rows it is not about step back.
   const back = ease(frame, splitAt - 2, 18);
   const TAGS = ["tokenize", "tokenize", "lowercase", "stem or lemmatize", "n-grams"];
+  // Where "reasons" and "roots" name each kind again.
+  const NAME_AGAIN = [
+    n.word("reasons", "Contractions"),
+    n.word("reasons", "punctuation"),
+    n.word("reasons", "casing"),
+    n.word("roots", "Word forms"),
+    n.word("roots", "multi-word units"),
+  ];
+  const rootAt = n.word("roots", "root");
+  const runsAt = n.word("roots", "runs of words");
   const NAMES = [
     { name: "Contractions", at: from - 2 },
     { name: "Punctuation", at: periodAt - 4 },
@@ -107,7 +117,12 @@ export const MessScene: React.FC = () => {
       ))}
       {NAMES.map((r, i) => (
         <Ink key={r.name} at={r.at} dur={14} style={{ left: X0, top: row(i) + 4, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(28, INK), fontWeight: 700 }}>{r.name}</span>
+          <span style={{ ...label(28, INK), fontWeight: 700 }}>
+            {/* Each kind is highlighted again as the narration names its step. */}
+            <Mark at={NAME_AGAIN[i]} out={NAME_AGAIN[i] + 40}>
+              {r.name}
+            </Mark>
+          </span>
         </Ink>
       ))}
 
@@ -168,11 +183,25 @@ export const MessScene: React.FC = () => {
 
       {/* 4. Word forms */}
       <div style={{ position: "absolute", ...ex(3), display: "flex", alignItems: "baseline", gap: 30, ...body(42), color: INK }}>
-        {["run", "runs", "running", "ran"].map((w, i) => (
-          <Ink key={w} at={formsAt[i] - 2} dur={10} style={{ position: "relative" }}>
-            <span>{w}</span>
-          </Ink>
-        ))}
+        {/* "Reducing each to a root": a rule gathers the four forms. */}
+        <div style={{ position: "relative", display: "flex", alignItems: "baseline", gap: 30 }}>
+          {["run", "runs", "running", "ran"].map((w, i) => (
+            <Ink key={w} at={formsAt[i] - 2} dur={10} style={{ position: "relative" }}>
+              <span>{w}</span>
+            </Ink>
+          ))}
+          <span
+            style={{
+              position: "absolute",
+              left: 0,
+              bottom: -6,
+              width: `${ease(frame, rootAt - 2, 16) * 100}%`,
+              height: 3,
+              background: INK,
+              borderRadius: 2,
+            }}
+          />
+        </div>
         <Ink at={ideaAt - 2} dur={14} style={{ position: "relative" }}>
           <Gloss>one idea</Gloss>
         </Ink>
@@ -182,7 +211,9 @@ export const MessScene: React.FC = () => {
       <div style={{ position: "absolute", ...ex(4), display: "flex", alignItems: "baseline", gap: 30, ...body(42), color: INK }}>
         <Ink at={yorkAt - 2} dur={14} style={{ position: "relative" }}>
           <span style={{ position: "relative", display: "inline-block" }}>
-            New York
+            <Mark at={runsAt - 2} out={runsAt + 44}>
+              New York
+            </Mark>
             <span
               style={{
                 position: "absolute",

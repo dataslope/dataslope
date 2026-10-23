@@ -17,7 +17,7 @@ const LAW_R = 430;
 const EMMA_R = 570;
 /** Each row's two bars, on one scale: the top word's count across BAR_W. */
 const BX0 = 620;
-const BAR_W = 1080;
+const BAR_W = 1020;
 const BAR_H = 15;
 
 /**
@@ -58,6 +58,8 @@ export const PredictScene: React.FC = () => {
   const tenth = EMMA.predict[9];
   const tenthLawX = BX0 + tenth.law * scale;
   const tenthEmmaX = BX0 + tenth.count * scale;
+  const tieX0 = BX0 + EMMA.predict[1].count * scale - 30;
+  const tieX1 = BX0 + EMMA.predict[0].count * scale + 14;
 
   return (
     <AbsoluteFill>
@@ -158,14 +160,14 @@ export const PredictScene: React.FC = () => {
           );
         })}
 
-        {/* The near tie: the top two counts, ringed. */}
+        {/* The near tie: the ends of the top two bars, ringed. */}
         <Svg opacity={ease(frame, tiesAt - 2, 12)}>
           <rect
-            x={EMMA_R - 92}
-            y={rowY(0) - 4}
-            width={104}
-            height={ROW + 40}
-            rx={20}
+            x={tieX0}
+            y={rowY(0) - 2}
+            width={tieX1 - tieX0}
+            height={ROW + 46}
+            rx={18}
             fill="none"
             stroke={POINT}
             strokeWidth={2.6}
@@ -173,13 +175,13 @@ export const PredictScene: React.FC = () => {
             strokeDasharray={`${ease(frame, tiesAt - 2, 16)} 1`}
           />
         </Svg>
-        <Tag x={EMMA_R + 26} y={rowY(0) + ROW * 0.5 + 2} at={tiesAt} size={21} color={POINT_INK} weight={650}>
+        <Tag x={tieX1 + 14} y={rowY(0) + ROW * 0.5 + 4} at={tiesAt} size={21} color={POINT_INK} weight={650}>
           nearly tied
         </Tag>
 
         {/* The tenth: the gap from prediction to count. */}
-        <Bracket x0={tenthLawX} x1={tenthEmmaX} y={rowY(9) - 2} at={fourAt - 2} color={POINT} tick={8} up={false} />
-        <Tag x={tenthEmmaX + 18} y={rowY(9) + 6} at={fourAt} size={22} color={POINT_INK} weight={700}>
+        <Bracket x0={tenthLawX} x1={tenthEmmaX} y={rowY(9) + 3 + 2 * BAR_H + 14} at={fourAt - 2} color={POINT} tick={9} up />
+        <Tag x={tenthEmmaX + 18} y={rowY(9) + 8} at={fourAt} size={22} color={POINT_INK} weight={700}>
           {(Math.round(EMMA.tenthOverLaw * 10) / 10).toFixed(1)}× the prediction
         </Tag>
       </div>

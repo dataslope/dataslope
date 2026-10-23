@@ -64,7 +64,7 @@ export const WeightsScene: React.FC = () => {
   const addUpAt = n.word("weights", "add up to one");
 
   const headY = y(385);
-  const rowY = (i: number) => y(470) + i * 100;
+  const rowY = (i: number) => y(450) + i * 88;
   const rows = TROPHY.rows;
   const scoreIn = (i: number) => rootTwoAt + 6 + i * 5;
   const powerIn = (i: number) => eachScoreAt + i * 5;
@@ -73,7 +73,7 @@ export const WeightsScene: React.FC = () => {
 
   // Fig. 6: the three e-powers end to end, then the same bar read as shares of one.
   const BX = X0;
-  const BY = y(790);
+  const BY = y(775);
   const BH = 64;
   const PX = 1120 / TROPHY.total;
   const bar = ease(frame, divideAt - 4, 18);
@@ -198,7 +198,10 @@ export const WeightsScene: React.FC = () => {
       {/* The two rules, on the right, as the narration states them. */}
       <Note at={dividedAt - 2} x={1390} y={headY - 4} width={430}>
         <div style={{ ...body(32), color: INK }}>
-          score = dot product ÷ <span style={{ fontFamily: MONO, fontWeight: 600 }}>√d</span>
+          score = dot product{" "}
+          <Mark at={squareAt}>
+            ÷ <span style={{ fontFamily: MONO, fontWeight: 600 }}>√d</span>
+          </Mark>
         </div>
         <div style={{ ...body(28), color: INK_SOFT, marginTop: 12, opacity: ease(frame, howManyAt - 2, 10) }}>
           <span style={{ fontFamily: MONO, fontWeight: 600, color: INK }}>d</span>: <Mark at={howManyAt}>how many numbers</Mark> a vector holds

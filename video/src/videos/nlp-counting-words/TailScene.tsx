@@ -183,11 +183,11 @@ export const TailScene: React.FC = () => {
         <rect x={onceFrom} y={base + 12} width={(X1 - onceFrom) * onceP} height={7} rx={2} fill={ACCENT} />
       </Svg>
       {RANK_TICKS.map((r) => (
-        <Ink key={r} at={rankAt + 10} dur={12} style={{ left: rx(r) - 40, width: 80, top: base + 22, textAlign: "center" }}>
+        <Ink key={r} at={rankAt + 10} dur={12} style={{ left: rx(r) - 40, width: 80, top: base + 30, textAlign: "center" }}>
           <span style={{ ...label(19, INK_SOFT), fontWeight: 500, ...{ fontVariantNumeric: "lining-nums" } }}>{fmt(r, 0)}</span>
         </Ink>
       ))}
-      <Note at={rankAt + 16} x={X1} y={base + 50} align="right">
+      <Note at={rankAt + 16} x={X1} y={base + 60} align="right">
         <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>rank, most common first</div>
       </Note>
       <Note at={rankAt + 4} x={X0 + 12} y={top - 12}>

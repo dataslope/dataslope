@@ -7,7 +7,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { RULE_EXAMPLES, TRACES, type Trace, WA } from "./data";
-import { Chip, chipHeight, Fade, Headline, Kicker, Mark, rowLayout, Tag, X0 } from "./parts";
+import { Chip, chipHeight, chipWidth, Fade, Headline, Kicker, Mark, rowLayout, Tag, X0 } from "./parts";
 
 const SIZE = 28;
 const FIG_Y = 286;
@@ -15,8 +15,8 @@ const HEAD_Y = 340;
 const ROW_Y = 424;
 const STEP = 78;
 const AS_X = 300;
-const COL = [480, 760, 1040];
-const RES_X = 1560;
+const COL = [500, 790, 1110];
+const RES_X = 1580;
 
 const faint: React.CSSProperties = { ...label(22, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" };
 const code: React.CSSProperties = { fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none" };
@@ -196,7 +196,7 @@ export const LookupScene: React.FC = () => {
         {/* The shortest survivor, or the word itself. */}
         <Chip text={t.result} x={RES_X} y={top} at={c.result} size={SIZE} marks={[{ at: c.result, out: c.result + 30 }]} />
         {t.unchanged ? (
-          <Tag at={c.result + 6} x={RES_X + 90} y={textTop(i) + 2} color={INK_SOFT} size={22}>
+          <Tag at={c.result + 6} x={RES_X + chipWidth(t.result, SIZE) + 16} y={textTop(i) + 2} color={INK_SOFT} size={22}>
             unchanged
           </Tag>
         ) : null}
@@ -235,7 +235,7 @@ export const LookupScene: React.FC = () => {
         word
       </Head>
       <Head x={AS_X} y={headY} at={from + 9}>
-        as a
+        part of speech
       </Head>
       <Head x={COL[0]} y={headY} n="1" nAt={threeAt} at={listAt}>
         Irregular forms

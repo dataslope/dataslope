@@ -31,6 +31,7 @@ export const MismatchScene: React.FC = () => {
   const from = n.beat("mismatch").from;
   const constructAt = n.word("mismatch", "construct mismatch");
   const carriesAt = n.word("mismatch", "carries over");
+  const performanceAt = n.word("mismatch", "performance");
   const yourTaskAt = n.word("mismatch", "your task");
   const theBenchmarkAt = n.word("mismatch", "the benchmark");
   const sweAt = n.word("transfer", "SWE-bench");
@@ -80,8 +81,8 @@ export const MismatchScene: React.FC = () => {
       <Drift from={from} to={askAt} amount={0.014} origin="30% 50%">
         <FigLabel n="8" title="A benchmark's task, and yours" at={constructAt - 2} out={out8} x={X0} y={y(296)} />
         {/* The kind of task a benchmark sets, and where its score does and doesn't carry. */}
-        <Tag at={constructAt + 4} out={out8} x={SRC.x} y={y(SRC.y) - 24} width={SRC.w}>
-          <Marked at={sweAt - 2}>repo-patch tasks, like SWE-bench</Marked>
+        <Tag at={constructAt + 4} out={out8} x={SRC.x} y={y(SRC.y) - 24} width={SRC.w} pulseAt={sweAt}>
+          <Marked at={performanceAt - 2}>repo-patch tasks, like SWE-bench</Marked>
         </Tag>
         {/* "...if your task looks like it": a place for your task, filled at "invoices". */}
         <Tag at={yourTaskAt - 2} out={invoicesAt - 4} x={DST_X} y={y(DST.invoices) - 24} color={INK_SOFT} dashed>

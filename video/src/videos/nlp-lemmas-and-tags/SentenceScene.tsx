@@ -9,7 +9,7 @@ import { Sfx } from "../../sound/Sfx";
 import { colors } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { FOUND, MAPPING, SENTENCE, tokenAt } from "./data";
-import { Chip, chipHeight, chipWidth, Headline, Kicker, Mark, rowLayout, Spot, X0 } from "./parts";
+import { Arrow, Chip, chipHeight, chipWidth, Headline, Kicker, Mark, rowLayout, Spot, X0 } from "./parts";
 
 const SIZE = 28;
 const CHIP_X = 340;
@@ -17,10 +17,11 @@ const GAP = 14;
 const FIG_Y = 286;
 /** Rows of Fig. 4: the words, their Penn tags, WordNet's part of speech;
  *  then, after a rule, the lemmas and Porter's stems. */
-const ROW_Y = [350, 432, 514, 626, 708];
+const ROW_Y = [356, 442, 528, 650, 736];
 const LEGEND_X = 1490;
 const LEGEND_Y = 350;
 const LEGEND_STEP = 58;
+const legendCode: React.CSSProperties = { fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, fontVariantLigatures: "none" };
 
 /**
  * A Penn tag whose letters after the first fade to faint on `cutAt`: the
@@ -100,6 +101,7 @@ export const SentenceScene: React.FC = () => {
   const tagFirstAt = n.word("close", "Tag first");
   const thenAt = n.word("close", "then lemmatize");
   const closeEnd = n.beat("close").to;
+  const lastAt = n.word("close", "lemmatize");
 
   // ── Geometry: one column per token, every row centred on it ──
   const cols = rowLayout(S.tokens, CHIP_X, SIZE, GAP);
@@ -195,7 +197,7 @@ export const SentenceScene: React.FC = () => {
           at={lemmaAt[i]}
           size={SIZE}
           tones={FOUND[i] ? [{ at: lemmaAt[i] + 6, tone: "good" }] : []}
-          marks={missed(i)}
+          marks={[...missed(i), ...(FOUND[i] ? [{ at: lastAt + i * 3, out: lastAt + i * 3 + 40 }] : [])]}
         />
       ))}
 
@@ -219,19 +221,23 @@ export const SentenceScene: React.FC = () => {
       <FigLabel n="5" title="First letter to WordNet" at={fourAt} x={LEGEND_X} y={y(FIG_Y)} />
       {MAPPING.map((m, k) => {
         const top = y(LEGEND_Y + k * LEGEND_STEP);
+        const at = legendAt[m.letter];
+        const mid = top + 19;
         return (
-          <Ink key={m.letter} at={legendAt[m.letter]} dur={12} style={{ left: LEGEND_X, top, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, fontVariantLigatures: "none", width: 64, display: "inline-block" }}>
-              {m.letter}
-            </span>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK_SOFT }}>→</span>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK }}>{m.pos}</span>
-            <span style={label(24, INK)}>
-              <Mark at={legendAt[m.letter]} out={legendAt[m.letter] + 24}>
-                {m.name}
-              </Mark>
-            </span>
-          </Ink>
+          <React.Fragment key={m.letter}>
+            <Ink at={at} dur={10} style={{ left: LEGEND_X, top, whiteSpace: "nowrap" }}>
+              <span style={legendCode}>{m.letter}</span>
+            </Ink>
+            <Arrow from={[LEGEND_X + 84, mid]} to={[LEGEND_X + 128, mid]} at={at + 4} dur={8} />
+            <Ink at={at + 8} dur={10} style={{ left: LEGEND_X + 146, top, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
+              <span style={legendCode}>{m.pos}</span>
+              <span style={label(24, INK)}>
+                <Mark at={at + 8} out={at + 32}>
+                  {m.name}
+                </Mark>
+              </span>
+            </Ink>
+          </React.Fragment>
         );
       })}
 

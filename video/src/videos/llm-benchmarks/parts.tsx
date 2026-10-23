@@ -441,8 +441,10 @@ export const Tag: React.FC<{
   fill?: string;
   dashed?: boolean;
   width?: number;
+  /** A brief swell when the tag is named again. */
+  pulseAt?: number;
   children: React.ReactNode;
-}> = ({ at, x, y, out, dim, color = INK, fill = PAPER, dashed = false, width, children }) => {
+}> = ({ at, x, y, out, dim, color = INK, fill = PAPER, dashed = false, width, pulseAt, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -461,7 +463,8 @@ export const Tag: React.FC<{
         border: `2px ${dashed ? "dashed" : "solid"} ${color}`,
         background: fill,
         opacity: p * (1 - o) * (1 - d),
-        transform: `translateX(${(1 - p) * -14}px)`,
+        transform: `translateX(${(1 - p) * -14}px) scale(${1 + (pulseAt === undefined ? 0 : pulse(frame, pulseAt, 18)) * 0.05})`,
+        transformOrigin: "0 50%",
         ...label(22, INK),
         fontWeight: 600,
         whiteSpace: "nowrap",

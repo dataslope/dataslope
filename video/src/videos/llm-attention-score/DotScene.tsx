@@ -39,7 +39,7 @@ import {
 /** The plot: 400 px a unit, the origin low on the left. */
 const U = 400;
 /** The ledger's columns. */
-const L = { chip: 790, key: 980, expr: 1190, result: 1560 };
+const L = { chip: 790, key: 980, expr: 1190, result: 1600 };
 const EXPR = 26;
 
 /** Rises on `a`, falls on `b`: a highlight held while a term is spoken. */
@@ -267,7 +267,7 @@ export const DotScene: React.FC = () => {
           Attention <Mark at={keepsAt}>keeps the lengths.</Mark>
         </div>
       </Note>
-      <Spot id="llm-attention-score-lock" at={arrowsAt} left={1590} top={y(720)} width={230} height={190} />
+      <Spot id="llm-attention-score-lock" at={arrowsAt} left={1590} top={y(745)} width={230} height={180} />
     </AbsoluteFill>
   );
 };

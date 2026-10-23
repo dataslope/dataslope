@@ -108,6 +108,9 @@ out["zipf"] = {
     "lineC": r(zipf_c, 1),
     # One over the rank, anchored on the top word: the second at half its count.
     "secondByLaw": round(ranked[0][1] / 2),
+    # ... and the tenth at a tenth: the real tenth word beside it.
+    "tenth": {"rank": 10, "word": ranked[9][0], "count": ranked[9][1]},
+    "tenthByLaw": round(ranked[0][1] / 10),
     "hapaxShare": r(hapaxes / len(fd)),
     "curve": curve,
 }

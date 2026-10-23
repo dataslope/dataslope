@@ -294,8 +294,8 @@ export const StairsScene: React.FC = () => {
       />
 
       {/* Up close, turn one: the system prompt and the first message. */}
-      <Leader points={[[ZX - 12, zoomed.ty(1000)], [zoomed.x(1) + zoomed.bar + 4, zoomed.ty(1000)]]} at={sysAt - 4} out={twoAt - 6} color={INK_SOFT} />
-      <Note at={sysAt - 2} out={twoAt - 6} x={ZX} y={zoomed.ty(1000) - 17}>
+      <Leader points={[[ZX - 12, zoomed.ty(SYSTEM / 2)], [zoomed.x(1) + zoomed.bar + 4, zoomed.ty(SYSTEM / 2)]]} at={sysAt - 4} out={twoAt - 6} color={INK_SOFT} />
+      <Note at={sysAt - 2} out={twoAt - 6} x={ZX} y={zoomed.ty(SYSTEM / 2) - 17}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
           system prompt, <b style={{ fontWeight: 650 }}>{int(SYSTEM)}</b> tokens
         </span>

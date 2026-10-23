@@ -7,7 +7,7 @@ import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA, pct } from "./data";
-import { DATA, DATA_INK, EMPTY, Headline, Mark, ONCE, ONCE_INK, POINT, POINT_INK, POINT_WASH, Svg, Tag } from "./kit";
+import { DATA, DATA_INK, EMPTY, Headline, Mark, ONCE, ONCE_INK, POINT, POINT_WASH, Svg, Tag } from "./kit";
 
 /** Every strip and bar spans the same width. */
 const SX0 = 110;
@@ -116,7 +116,7 @@ export const SharesScene: React.FC = () => {
             borderRadius: "4px 0 0 4px",
           }}
         />
-        <Tag x={SX0 + 14} y={aTop + 6} at={hundredAt + 4} size={21} color={POINT_INK} weight={650}>
+        <Tag x={SX0 + 14} y={aTop + 6} at={hundredAt + 4} size={21} color={INK} weight={650}>
           top 100 ranks: <Mark at={halfAt}>half the width</Mark>
         </Tag>
         <Svg opacity={ease(frame, from + 8, 12)}>
@@ -146,7 +146,7 @@ export const SharesScene: React.FC = () => {
             borderRadius: "4px 0 0 4px",
           }}
         />
-        <Tag x={plainX(100) + 16} y={bTop + 6} at={plainAt + 8} size={21} color={POINT_INK} weight={650}>
+        <Tag x={plainX(100) + 16} y={bTop + 6} at={plainAt + 8} size={21} color={INK} weight={650}>
           the same 100 ranks: <Mark at={pointAt}>{pct(EMMA.top100OfDistinct, 1)}</Mark>
         </Tag>
         <Svg opacity={ease(frame, from + 20, 12)}>

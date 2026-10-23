@@ -112,8 +112,10 @@ export const QuestionScene: React.FC = () => {
   const CELL = 30;
   const STRIP_N = 9;
   const VX = 650;
+  // "Short vectors" first, as blank cells; "tiny" collapses each to two.
   const collapse = ease(frame, tinyAt - 2, 22);
   const cells = lerp(6, 2, collapse);
+  const cellW = lerp(30, 72, collapse);
 
   return (
     <AbsoluteFill>
@@ -188,7 +190,7 @@ export const QuestionScene: React.FC = () => {
       <Fade at={everyAt + 6} style={{ left: itX + 22, top: R - 74 }}>
         <Tag size={21}>a weight for each</Tag>
       </Fade>
-      <Fade at={winAt} style={{ left: trX - 40, top: R - 136 }}>
+      <Fade at={winAt} style={{ left: (trX + itX) / 2 - 80, top: R - 134 }}>
         <span style={{ ...label(22, POINT_INK), whiteSpace: "nowrap" }}>the biggest?</span>
       </Fade>
       <Spot id="llm-meaning-trophy" at={trophyAt - 4} left={1440} top={y(390)} width={340} height={334} />
@@ -230,9 +232,9 @@ export const QuestionScene: React.FC = () => {
       {QKV.map((c, i) => (
         <React.Fragment key={c.name}>
           <Fade at={vectorsAt - 2 + i * 4} style={{ left: VX, top: rowY(i) }}>
-            <Cells values={c.values} numAt={twoAt + i * 4} cells={cells} cell={72} border={c.color} />
+            <Cells values={c.values} numAt={twoAt + i * 4} cells={cells} cell={cellW} border={c.color} />
           </Fade>
-          <Fade at={cardAt[i] - 4} style={{ left: VX + 190, top: rowY(i) + 6, display: "flex", alignItems: "baseline", gap: 22 }}>
+          <Fade at={cardAt[i] - 4} style={{ left: VX + 230, top: rowY(i) + 6, display: "flex", alignItems: "baseline", gap: 22 }}>
             <span style={{ ...label(28, c.ink), width: 92 }}>{c.name}</span>
             <span
               style={{

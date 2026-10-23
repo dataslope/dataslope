@@ -61,6 +61,9 @@ export const ZIPF = {
   lineC: m.zipf.lineC,
   /** Half the top word's count: where one over the rank puts the second word. */
   secondByLaw: m.zipf.secondByLaw,
+  /** The tenth word, and where one over the rank puts it (a tenth of the first). */
+  tenth: m.zipf.tenth as { rank: number; word: string; count: number },
+  tenthByLaw: m.zipf.tenthByLaw,
   /** The share of different words that appear once. */
   hapaxShare: m.zipf.hapaxShare,
   /** The first rank whose count is 1: every word from here on appears once. */

@@ -7,7 +7,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { billFor, DOUBLINGS, NAME, times, usd } from "./data";
-import { Bracket, COST, FIG_Y, HBar, Headline, INK, INK_SOFT, POINT, POINT_INK, SENT, Spot, X0 } from "./kit";
+import { Bracket, COST, FIG_Y, HBar, Headline, INK, INK_SOFT, LINE_EDGE, PAPER, POINT, POINT_INK, Spot, X0 } from "./kit";
 
 const TILE_X = 330;
 const TILE = 15;
@@ -89,7 +89,9 @@ export const HookScene: React.FC = () => {
                     width: TILE,
                     height: h(ROW_H),
                     borderRadius: 3,
-                    background: SENT,
+                    boxSizing: "border-box",
+                    border: `2px solid ${LINE_EDGE}`,
+                    background: PAPER,
                     opacity: p,
                   }}
                 />
@@ -122,8 +124,8 @@ export const HookScene: React.FC = () => {
       <Note at={doubleAt - 2} x={BILL_X + ghostW} y={rowY(1) + h(ROW_H) + 10} align="right">
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>if it just doubled</span>
       </Note>
-      <Bracket x0={BILL_X + ghostW + 2} x1={BILL_X + realW} y={rowY(1) - 12} at={doubleAt + 6} up={false} color={POINT} tick={-10} />
-      <Note at={doubleAt + 10} x={(BILL_X + ghostW + BILL_X + realW) / 2 - 8} y={rowY(1) - 52} from="up">
+      <Bracket x0={BILL_X + ghostW + 2} x1={BILL_X + realW} y={rowY(1) - 20} at={doubleAt + 6} color={POINT} tick={10} />
+      <Note at={doubleAt + 10} x={(BILL_X + ghostW + BILL_X + realW) / 2 - 8} y={rowY(1) - 62} from="up">
         <span style={{ ...note(30, POINT_INK), fontWeight: 700 }}>?</span>
       </Note>
     </AbsoluteFill>

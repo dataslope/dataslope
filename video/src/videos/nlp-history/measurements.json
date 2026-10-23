@@ -185,6 +185,12 @@
   "slope": -1.136,
   "lineC": 18719.8,
   "secondByLaw": 2620,
+  "tenth": {
+   "rank": 10,
+   "word": "she",
+   "count": 2340
+  },
+  "tenthByLaw": 524,
   "hapaxShare": 0.3869,
   "curve": [
    [

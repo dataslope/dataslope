@@ -40,6 +40,7 @@ export const ZipfScene: React.FC = () => {
   const countedAt = n.word("zipf", "counted words");
   const rankAt = n.word("law", "Rank", { nth: 1 });
   const halfAt = n.word("law", "half as often");
+  const tenthAt = n.word("law", "the tenth");
   const logAt = n.word("law", "log scales");
   const lineAt = n.word("law", "straight line");
   const lawAt = n.word("law", "Zipf's law");
@@ -84,7 +85,7 @@ export const ZipfScene: React.FC = () => {
   const hapax0 = lx(ZIPF.firstHapaxRank);
   const hapax1 = lx(ZIPF.distinct);
   const settle = drift(frame, nextAt, 1, 120);
-  const BARS_TOP = TTOP + 52 + 8 * ROW + 26;
+  const BARS_TOP = TTOP + 52 + 9 * ROW + 22;
   const BAR_W = 620;
   const bandX1 = lx(100);
 
@@ -143,6 +144,24 @@ export const ZipfScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+        {/* The tenth word, two rows on, and what the law expects of it. */}
+        {[
+          [0, <span key="r" style={{ ...note(25, INK_SOFT), ...TABULAR }}>{ZIPF.tenth.rank}</span>],
+          [1, <span key="w" style={{ ...note(26, INK), fontWeight: 600 }}>{ZIPF.tenth.word}</span>],
+          [2, <span key="c" style={{ ...note(26, DATA_INK), ...TABULAR, fontWeight: 600 }}>{fmt(ZIPF.tenth.count, 0)}</span>],
+        ].map(([k, el]) => (
+          <Ink key={k as number} at={tenthAt - 2} dur={12} style={{ left: colX[k as number], top: TTOP + 52 + 8 * ROW, width: COLS[k as number].w, textAlign: COLS[k as number].align }}>
+            {el as React.ReactNode}
+          </Ink>
+        ))}
+        <Ink at={tenthAt + 6} dur={14} style={{ left: colX[2] + COLS[2].w + 22, top: TTOP + 52 + 8 * ROW + 3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>
+            law: ≈ <span style={TABULAR}>{fmt(ZIPF.tenthByLaw, 0)}</span>
+          </span>
+        </Ink>
+        <Svg opacity={ease(frame, tenthAt - 2, 12)}>
+          <line x1={TX0} x2={colX[2] + COLS[2].w} y1={TTOP + 52 + 8 * ROW - 6} y2={TTOP + 52 + 8 * ROW - 6} stroke={HAIRLINE} strokeWidth={1.2} strokeDasharray="4 5" />
+        </Svg>
         {/* What one over the rank expects of the second word, beside what it got. */}
         <Ink at={halfAt - 2} dur={14} style={{ left: colX[2] + COLS[2].w + 22, top: TTOP + 52 + ROW + 3, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>

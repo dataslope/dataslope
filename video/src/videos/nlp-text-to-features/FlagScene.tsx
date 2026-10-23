@@ -112,7 +112,7 @@ export const FlagScene: React.FC = () => {
         })}
       </ChipRow>
       {/* The reset, run on a sentence: the lamp under each token is the flag after it. */}
-      <Ink at={exAt - 4} dur={12} style={{ left: X0, top: y(EX_Y) + 52, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+      <Ink at={exAt - 4} dur={12} style={{ left: X0, top: y(EX_Y) + 49, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
         flag
       </Ink>
       <TraceRow
@@ -210,7 +210,7 @@ const TraceRow: React.FC<{
               }
               below={
                 lamps ? (
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 26 }}>
                     <Lamp on={Boolean(s.flag)} at={tokenAt + 4} />
                     {sign}
                   </span>

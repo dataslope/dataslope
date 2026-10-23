@@ -191,12 +191,12 @@ export const BillsScene: React.FC = () => {
         );
       })}
       <Arrow
-        from={[nx(DOUBLINGS[2].times) + 18, y(NY) - 26]}
-        to={[nx(4) - 8, y(NY) - 26]}
+        from={[nx(DOUBLINGS[2].times) + 14, y(NY)]}
+        to={[nx(4) - 4, y(NY)]}
         at={creepsAt - 2}
         dur={22}
         color={POINT}
-        width={2.4}
+        width={3.2}
       />
     </AbsoluteFill>
   );
