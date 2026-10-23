@@ -98,13 +98,15 @@ export const CacheScene: React.FC = () => {
 
       {ROW_Y.map((_, i) => {
         const ry = rowY(i);
+        // Turn 3 with a timestamp is a second case: the clean turns step back when it lands.
+        const stepBack = i < 2 ? 1 - 0.5 * ease(frame, stampAt, 14) : 1;
         const x = rowX(i);
         const c = i === 2 ? cover(i) * (1 - lift) : cover(i);
         const glow = i > 0 ? pulse(frame, readAt + (i - 1) * 5, 22) : 0;
         // Turn 3 lifts as the timestamp is about to land on it.
         const lifted = i === 2 ? pulse(frame, putAt - 4, 26) : 0;
         return (
-          <React.Fragment key={i}>
+          <div key={i} style={{ position: "absolute", inset: 0, opacity: stepBack }}>
             {/* The prefix, at the input rate. */}
             <HBar x={x} y={ry - lifted * 10} w={PREFIX_W} h={rh} at={rowAt[i]} dur={18} fill={INPUT} />
             {/* The cache over it: read back, not recomputed. */}
@@ -133,15 +135,17 @@ export const CacheScene: React.FC = () => {
             <Ink at={rowAt[i] + 8} dur={12} style={{ left: x + PREFIX_W + TAIL_W + 22, top: ry + rh / 2 - 15, whiteSpace: "nowrap" }}>
               <span style={label(22, INK_SOFT)}>turn {i + 1}</span>
             </Ink>
-          </React.Fragment>
+          </div>
         );
       })}
-      <Ink at={prefixWordAt - 2} dur={14} style={{ left: X0 + 18, top: rowY(0) + rh / 2 - 15, whiteSpace: "nowrap" }}>
-        <span style={label(23, PAPER)}>computed once</span>
-      </Ink>
-      <Note at={rowAt[0] + 18} x={X0 + PREFIX_W + 6} y={rowY(0) - 34}>
-        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>new message</span>
-      </Note>
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.5 * ease(frame, stampAt, 14) }}>
+        <Ink at={prefixWordAt - 2} dur={14} style={{ left: X0 + 18, top: rowY(0) + rh / 2 - 15, whiteSpace: "nowrap" }}>
+          <span style={label(23, PAPER)}>computed once</span>
+        </Ink>
+        <Note at={rowAt[0] + 18} x={X0 + PREFIX_W + 6} y={rowY(0) - 34}>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>new message</span>
+        </Note>
+      </div>
 
       {/* The timestamp at the top of turn 3's prompt. */}
       <div
@@ -170,7 +174,7 @@ export const CacheScene: React.FC = () => {
         {STAMP}
       </div>
       <Note at={byteAt - 2} x={X0} y={rowY(2) + rh + 14}>
-        <span style={{ ...note(23, POINT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>one changed byte, every turn</span>
+        <span style={{ ...note(23, POINT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a timestamp on top: new bytes every turn</span>
       </Note>
       <Note at={fullAt - 2} x={X0 + STAMP_W + PREFIX_W + TAIL_W + 22} y={rowY(2) + rh + 14} align="right">
         <span style={{ ...note(23, INPUT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>back to full price</span>
@@ -226,9 +230,24 @@ export const CacheScene: React.FC = () => {
           opacity: ease(frame, tenthAt, 10),
         }}
       />
-      <Note at={tenthAt + 2} x={PRICE_X + FULL_W * CACHE_FRACTION.haiku + 12} y={y(PRICE_ROW_Y[0]) + h(16) - 15}>
-        <span style={{ ...label(22, PAPER), whiteSpace: "nowrap" }}>a tenth</span>
-      </Note>
+      {/* …and the tenth itself, tinted and labelled inside the sliver. */}
+      <div
+        style={{
+          position: "absolute",
+          left: PRICE_X,
+          top: y(PRICE_ROW_Y[0]),
+          width: FULL_W * CACHE_FRACTION.haiku - 1.5,
+          height: h(32),
+          borderRadius: "3px 0 0 3px",
+          background: `color-mix(in srgb, ${INPUT} 30%, ${PAPER})`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: ease(frame, tenthAt, 10),
+        }}
+      >
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>a tenth</span>
+      </div>
       <Note at={twentiethAt + 2} x={PRICE_X + FULL_W * CACHE_FRACTION.sonnet + 130} y={y(PRICE_ROW_Y[1]) + h(16) - 16}>
         <span style={{ ...note(23, CACHED_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a twentieth</span>
       </Note>

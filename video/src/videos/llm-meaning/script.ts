@@ -181,9 +181,9 @@ export const script: NarrationScript = {
     {
       id: "search",
       scene: true,
-      text: "That's enough for a working search. Five tiny documents, each scored on four themes.",
-      pauseAfter: 0.4,
+      text: "That's enough for a working search.",
     },
+    { id: "docs", text: "Five tiny documents, each scored on four themes.", pauseAfter: 0.4 },
     { id: "query", text: "Now ask, how did the company perform financially?", pauseAfter: 0.5 },
     {
       id: "hit",
@@ -235,9 +235,9 @@ export const script: NarrationScript = {
     { id: "value", text: "And a value: what I hand over when I'm picked.", pauseAfter: 0.8 },
     {
       id: "scores",
-      text: "The pronoun's query is compared with every key, for one score each. Softmax turns the scores into weights that add up to one.",
-      pauseAfter: 0.8,
+      text: "The pronoun's query is compared with every key, for one score each.",
     },
+    { id: "softmax", text: "Softmax turns the scores into weights that add up to one.", pauseAfter: 0.8 },
     {
       id: "weights",
       text: "In the lesson's example, the pronoun puts point seven two of its attention on trophy.",
@@ -267,9 +267,9 @@ export const script: NarrationScript = {
     },
     {
       id: "square",
-      text: "There's a price. Every token scores every other one. Ten tokens make a hundred scores. Double the text, and it's four times the work.",
-      pauseAfter: 0.9,
+      text: "There's a price. Every token scores every other one.",
     },
+    { id: "ten", text: "Ten tokens make a hundred scores. Double the text, and it's four times the work.", pauseAfter: 0.9 },
     { id: "attn-in", text: "So let's put all the pieces in order." },
 
     // ── Part 4. The shape of a transformer ────────────────────────────────
@@ -294,9 +294,9 @@ export const script: NarrationScript = {
     },
     {
       id: "split",
-      text: "The embedding table holds half a billion, and the output layer as much again. Attention, about two.",
-      pauseAfter: 0.5,
+      text: "The embedding table holds half a billion, and the output layer as much again.",
     },
+    { id: "attn-share", text: "Attention, about two.", pauseAfter: 0.5 },
     {
       id: "ff",
       text: "The feed-forward networks hold three point eight billion. Fifty-four percent of the whole model.",

@@ -15,7 +15,6 @@ import {
   HBar,
   Headline,
   INPUT,
-  INPUT_INK,
   Marked,
   OUTPUT_INK,
   POINT,
@@ -41,6 +40,8 @@ const TABLE_R = 1236;
 const SIDE_X = 1310;
 const F6_X = 1300;
 const F6_R = 1800;
+const F6_THRESH_R = 1644;
+const F6_IN_R = 1726;
 const AXIS_Y = 672;
 
 /**
@@ -258,9 +259,9 @@ export const MarketScene: React.FC = () => {
         <FigLabel n="6" title="Length thresholds" at={thresholdAt - 4} x={F6_X} y={y(FIG_Y)} />
         {[
           ["Model", F6_X, "left"],
-          ["Threshold", 1652, "right"],
-          ["Input", 1726, "right"],
-          ["Output", F6_R, "right"],
+          ["Threshold", F6_THRESH_R, "right"],
+          ["In", F6_IN_R, "right"],
+          ["Out", F6_R, "right"],
         ].map(([t, x, a], k) => (
           <Note key={t as string} at={thresholdAt + k * 2} x={x as number} y={y(HEAD_Y)} align={a as "left" | "right"} from="up">
             <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
@@ -287,10 +288,10 @@ export const MarketScene: React.FC = () => {
               <Note at={at} x={F6_X} y={ry}>
                 <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>{t.model}</span>
               </Note>
-              <Note at={at + 2} x={1652} y={ry} align="right">
+              <Note at={at + 2} x={F6_THRESH_R} y={ry} align="right">
                 <span style={{ ...note(22, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(t.threshold)}</span>
               </Note>
-              <Note at={at + 3} x={1726} y={ry} align="right">
+              <Note at={at + 3} x={F6_IN_R} y={ry} align="right">
                 <span style={{ ...note(22, INK), fontWeight: t === gpt6 ? 700 : 500, whiteSpace: "nowrap" }}>
                   {t === gpt6 ? <Marked at={doubleAt - 2}>{`${t.inMult}x`}</Marked> : `${t.inMult}x`}
                 </span>
@@ -310,29 +311,34 @@ export const MarketScene: React.FC = () => {
           </span>
         </Ink>
         <HBar x={F6_X} y={y(AXIS_Y - 44)} w={axX(OVERSIZED.tokens) - F6_X} h={h(30)} at={promptAt - 4} dur={22} fill={INPUT} />
+        {/* Past the line, the WHOLE request reprices: the hatch floods every
+            token from the first, not just the ones beyond the line. */}
         <HBar
-          x={axX(OVERSIZED.threshold)}
+          x={F6_X}
           y={y(AXIS_Y - 44)}
-          w={axX(OVERSIZED.tokens) - axX(OVERSIZED.threshold)}
+          w={axX(OVERSIZED.tokens) - F6_X}
           h={h(30)}
-          at={promptAt + 14}
-          dur={8}
-          fill={`repeating-linear-gradient(135deg, ${POINT} 0 4px, transparent 4px 8px)`}
-          radius={0}
+          at={dollarAt - 4}
+          dur={20}
+          fill={`repeating-linear-gradient(135deg, ${POINT} 0 4px, transparent 4px 9px)`}
+          outline={POINT}
+          radius={3}
         />
         <Guide x={axX(OVERSIZED.threshold)} y0={y(AXIS_Y - 62)} y1={y(AXIS_Y) + 4} at={promptAt + 4} color={INK} />
         <Note at={promptAt + 8} x={axX(OVERSIZED.threshold) - 10} y={y(AXIS_Y) + 10} align="right">
           <span style={{ ...note(21, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>line at {int(OVERSIZED.threshold)}</span>
         </Note>
-        <Note at={promptAt + 20} x={F6_X} y={y(AXIS_Y + 50)}>
-          <span style={{ ...note(25, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
-            <Strike at={sixtyAt}>{usd(OVERSIZED.headline)}</Strike> at the headline rate
+        <Note at={dollarAt - 4} x={F6_X} y={y(AXIS_Y + 50)}>
+          <span style={{ ...note(27, POINT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+            <Marked at={sheetAt - 2}>{usd(OVERSIZED.above)}</Marked>
+            <span style={{ ...note(25, INK), fontWeight: 500 }}>
+              : all {int(OVERSIZED.tokens)} tokens at {gpt6.inMult}x
+            </span>
           </span>
         </Note>
-        <Note at={dollarAt - 4} x={F6_X} y={y(AXIS_Y + 96)}>
-          <span style={{ ...note(27, INPUT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
-            <Marked at={sheetAt - 2}>{usd(OVERSIZED.above)}</Marked>
-            <span style={{ ...note(25, INK), fontWeight: 500 }}>, the whole request at {gpt6.inMult}x</span>
+        <Note at={sixtyAt - 4} x={F6_X} y={y(AXIS_Y + 96)}>
+          <span style={{ ...note(25, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
+            not <Strike at={sixtyAt + 6}>{usd(OVERSIZED.headline)}</Strike> at the headline rate
           </span>
         </Note>
       </Dim>

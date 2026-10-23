@@ -98,8 +98,8 @@ const ChipRow: React.FC<{ words: readonly string[]; at: number; top: number; tag
 
 /**
  * Part 2 opens: what an NLP system does. The lesson's layers, characters to
- * counts, each shown on three words of the pipeline sentence (tokens,
- * lowercased, tagged by NLTK; the sentence's most common words), then the
+ * counts, each shown on the same three words of the pipeline sentence
+ * (tokens, lowercased, tagged by NLTK, counted), then the
  * caution that none of it understands anything.
  */
 export const LayersScene: React.FC = () => {
@@ -176,9 +176,9 @@ export const LayersScene: React.FC = () => {
           <ChipRow words={LAYERS.normalized} at={at[2] + 6} top={exTop} />
         </Layer>
         <Layer x={boxX(3)} top={top} height={height} at={at[3]} name="Tagged" gloss="part of speech">
-          <ChipRow words={LAYERS.normalized} at={at[3] + 6} top={exTop - 18} tags={LAYERS.tagNames} tagAt={speechAt} />
+          <ChipRow words={LAYERS.normalized} at={at[3] + 6} top={exTop} tags={LAYERS.tagNames} tagAt={speechAt} />
         </Layer>
-        <Layer x={boxX(4)} top={top} height={height} at={at[4]} name="Counts" gloss="frequencies, n-grams">
+        <Layer x={boxX(4)} top={top} height={height} at={at[4]} name="Counts" gloss="how often each appears">
           {LAYERS.counts.map(([w, c], i) => (
             <div
               key={w}
@@ -186,7 +186,7 @@ export const LayersScene: React.FC = () => {
                 position: "absolute",
                 left: 70,
                 width: BOX_W - 140,
-                top: exTop - 22 + i * 34,
+                top: exTop - 30 + i * 34,
                 display: "flex",
                 justifyContent: "space-between",
                 fontFamily: MONO,

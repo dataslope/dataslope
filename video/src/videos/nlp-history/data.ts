@@ -117,8 +117,8 @@ export const SECRETARY = "she asked me to leave the room";
 export const IDF = {
   N: m.idf.N,
   steps: m.idf.steps as readonly { from: number; to: number; weight: number }[],
-  common: m.idf.examples[0] as { docs: number; weight: number },
-  rare: m.idf.examples[1] as { docs: number; weight: number },
+  common: m.idf.examples[0] as { docs: number; weight: number; log2: number },
+  rare: m.idf.examples[1] as { docs: number; weight: number; log2: number },
 };
 
 // ── word2vec, 2013 ──────────────────────────────────────────────────────────

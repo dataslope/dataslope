@@ -81,7 +81,6 @@ export const SplitScene: React.FC = () => {
   const punctAt = n.word("fixed", "punctuation");
   const periodAt = n.word("fixed", "period");
   const realFrom = n.beat("real").from;
-  const problemAt = n.word("real", "real problem");
   const linerAt = n.word("real", "one-liner");
   const systemAt = n.word("do-in", "NLP system");
   const end = n.beat("layers").from;
@@ -115,7 +114,7 @@ export const SplitScene: React.FC = () => {
 
       <Kicker at={from - 10}>Splitting is not enough</Kicker>
       <Headline lead="Split it" turn="on the spaces?" at={from - 6} turnAt={from + 4} out={realFrom - 10} />
-      <Headline lead="A real problem," turn="not a one-liner." at={problemAt - 6} turnAt={linerAt - 6} />
+      <Headline lead="A real problem," turn="not a one-liner." at={realFrom - 4} turnAt={linerAt - 6} />
 
       <Drift from={from} to={end} amount={0.012} origin="50% 55%">
         <FigLabel n="6" title="The lesson's sentence, two ways" at={from + 2} x={X0} y={y(FIG_Y)} />
@@ -128,6 +127,9 @@ export const SplitScene: React.FC = () => {
             top: y(CODE_Y) + 12,
             height: 31,
             width: (SPLIT.text.length * ADVANCE * 26 + 6) * readP,
+            // Yellow later marks the tokens the tokenizer fixed, so this one
+            // lifts as soon as .split() starts cutting.
+            opacity: 1 - ease(frame, cutsAt, 12),
             background: MARK,
             mixBlendMode: "multiply",
             borderRadius: 4,

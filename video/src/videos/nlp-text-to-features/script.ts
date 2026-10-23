@@ -136,12 +136,9 @@ export const script: NarrationScript = {
       scene: true,
       text: "Every task chooses differently. Search wants stems. Topics want real words, so lemmas.",
     },
-    { id: "tasks-sent", text: "Sentiment keeps its stopwords.", pauseAfter: 0.6 },
-    {
-      id: "author",
-      text: "And to tell who wrote a text, the stopwords are the signal itself.",
-      pauseAfter: 0.9,
-    },
+    { id: "tasks-sent", text: "Sentiment keeps its negations.", pauseAfter: 0.6 },
+    { id: "author", text: "And to tell who wrote a text, the stopwords are the signal itself." },
+    { id: "author-why", text: "How often someone writes words like the, of and that is a fingerprint.", pauseAfter: 0.9 },
     {
       id: "ablate",
       text: "So don't guess. Change one step at a time, and measure on your own task. That's called an ablation.",
@@ -179,7 +176,7 @@ export const script: NarrationScript = {
     {
       id: "binary",
       scene: true,
-      text: "Sometimes all that matters is whether a word is there.",
+      text: "Sometimes all that matters is whether a word is there, as in short texts.",
     },
     { id: "binary-spam", text: "This spam says free three times.", pauseAfter: 0.6 },
     {
@@ -212,7 +209,7 @@ export const script: NarrationScript = {
     {
       id: "counts",
       scene: true,
-      text: "Here are three new documents: a cat on a mat, a dog in a park, a comet in the sky.",
+      text: "Here are three new documents: the cat sat on the mat, the dog ran in the park, the comet streaked across the sky.",
     },
     { id: "counts-lead", text: "By raw count, the word the leads every row, with two.", pauseAfter: 0.6 },
     {
@@ -224,8 +221,8 @@ export const script: NarrationScript = {
       id: "idf",
       scene: true,
       text: "TF-IDF weighs each word by how telling it is. Start with inverse document frequency: divide the number of documents by how many contain the word, then take the natural log.",
-      pauseAfter: 0.7,
     },
+    { id: "idf-log", text: "The log keeps a very rare word from swamping the rest.", pauseAfter: 0.8 },
     { id: "idf-the", text: "The word the is in all three. Three over three is one, and the log of one is zero.", pauseAfter: 0.8 },
     { id: "idf-cat", text: "Cat is in just one, so it gets the log of three, about one point one.", pauseAfter: 0.9 },
     {
@@ -247,14 +244,15 @@ export const script: NarrationScript = {
     {
       id: "rule",
       text: "So TF-IDF rewards words that are frequent here and rare elsewhere, with no stopword list at all.",
-      pauseAfter: 0.8,
     },
+    { id: "rule-twice", text: "Used twice in this document, cat would score twice as much.", pauseAfter: 0.8 },
     {
       id: "sklearn",
       scene: true,
       text: "One caution: that's the textbook formula. Scikit-learn's default smooths it and adds one, so the word the never reaches zero.",
     },
-    { id: "sklearn-top", text: "On these three documents, it even stays on top.", pauseAfter: 0.9 },
+    { id: "sklearn-why", text: "It also counts raw words, and scales each row to length one." },
+    { id: "sklearn-top", text: "On these three documents, it even stays on top.", pauseAfter: 1.4 },
     { id: "decide-in", text: "Counts and weights describe a text. The last step makes a call on one: is it positive, or negative?" },
 
     // ── Part 4. Rule-based sentiment ──────────────────────────────────────
@@ -290,6 +288,11 @@ export const script: NarrationScript = {
       id: "reset",
       text: "A comma, a full stop, or the word but switches it off again, so a not can't reach into the next clause.",
       pauseAfter: 0.7,
+    },
+    {
+      id: "reset-ex",
+      text: "Not really, it was good? The comma clears the flag first, so good stays plus one.",
+      pauseAfter: 1.0,
     },
     {
       id: "fixed",

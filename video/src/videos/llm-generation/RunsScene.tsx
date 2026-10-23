@@ -90,7 +90,7 @@ export const RunsScene: React.FC = () => {
               <span style={{ fontFamily: MONO }}>{t}</span> {pct(RUN_PROBS[i])}
             </span>
           ))}
-          <span style={note(21, INK_SOFT)}>from scores 1.0, 0.9 and 0.8, every pick of every run</span>
+          <span style={note(21, INK_SOFT)}>from scores 1.0, 0.9 and 0.8, on every pick</span>
         </span>
       </Note>
       {RUNS.map((run, k) => {

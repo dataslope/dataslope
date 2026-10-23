@@ -36,6 +36,9 @@ const TILE_H = 52;
 const TILES_Y = 752;
 const FRAME_FROM = 4;
 const tx = (pos: number) => X0 + pos * SLOT;
+/** A turn of the chat is history, so it takes Fig. 12's History teal. */
+const TURN = ds("teal", 500);
+const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 
 /**
  * Window, fill, edge: everything one request holds shares one budget (the
@@ -159,11 +162,12 @@ export const WindowScene: React.FC = () => {
       {Array.from({ length: TURNS }, (_, j) => {
         const pos = j - shift;
         const isNew = j >= SHOWN;
-        const inAt = isNew ? trimAt + (j - SHOWN) * 12 : edgeAt - 10 + j * 2;
-        const p = ease(frame, inAt, 12);
-        // Outside the window a turn is not dimmed: it is simply not there.
-        const outside = pos < FRAME_FROM - 0.5;
-        const vanish = outside ? (j < FRAME_FROM ? gone : ease(frame, trimAt + (j - FRAME_FROM + 1) * 14, 8)) : 0;
+        // A new turn appears as it slides into the window, never outside it.
+        const p = isNew ? clamp01((SHOWN - 0.4 - pos) / 0.5) : ease(frame, edgeAt - 10 + j * 2, 12);
+        // Outside the window a turn is not dimmed: it is simply not there. The
+        // oldest go on "not there"; the two the chat pushes out go as they cross
+        // the edge, before they reach the empty places.
+        const vanish = j < FRAME_FROM ? gone : clamp01((FRAME_FROM - 0.3 - pos) / 0.5);
         if (p <= 0 || vanish >= 1) return null;
         return (
           <div
@@ -175,14 +179,14 @@ export const WindowScene: React.FC = () => {
               width: TILE_W,
               height: th,
               boxSizing: "border-box",
-              background: tint(BAR, 22),
-              borderBottom: `4px solid ${BAR}`,
+              background: tint(TURN, 24),
+              borderBottom: `4px solid ${TURN}`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               opacity: p * (1 - vanish),
               transform: `scale(${1 - vanish * 0.4})`,
-              ...note(21, inkOf.blue),
+              ...note(21, inkOf.teal),
               fontWeight: 650,
             }}
           >
@@ -196,6 +200,9 @@ export const WindowScene: React.FC = () => {
           <rect x={tx(pos)} y={tilesY} width={TILE_W} height={th} fill="none" stroke={INK_SOFT} strokeWidth={1.4} strokeDasharray="4 5" />
         </Svg>
       ))}
+      <Note at={notThereAt + 6} out={beginningAt - 6} x={X0} y={tilesY + th + 18}>
+        <span style={{ ...note(22, INK_SOFT) }}>trimmed turns</span>
+      </Note>
       <Note at={beginningAt - 2} x={X0} y={tilesY + th + 18}>
         <span style={{ ...note(22, ACCENT_INK), fontWeight: 650 }}>its own beginning</span>
       </Note>

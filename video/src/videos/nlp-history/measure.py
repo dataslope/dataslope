@@ -178,7 +178,18 @@ for n in range(1, N + 1):
     else:
         steps[-1]["to"] = n
 say("  idf: Cranfield, N = 200: " + ", ".join(f"{s['from']}-{s['to']} docs -> {s['weight']}" for s in steps))
-out["idf"] = {"N": N, "steps": steps, "examples": [{"docs": 90, "weight": weight(90, N)}, {"docs": 3, "weight": weight(3, N)}]}
+# Her rule counts halvings, so it tracks log2(N / n) + 1 (the reviewer's
+# reading, and the bridge to the course's log(N / df)).
+approx = lambda n: r(math.log2(N / n) + 1, 2)  # noqa: E731
+say(f"  idf: log2(200/90) + 1 = {approx(90)}, log2(200/3) + 1 = {approx(3)}")
+out["idf"] = {
+    "N": N,
+    "steps": steps,
+    "examples": [
+        {"docs": 90, "weight": weight(90, N), "log2": approx(90)},
+        {"docs": 3, "weight": weight(3, N), "log2": approx(3)},
+    ],
+}
 
 # ── word2vec ────────────────────────────────────────────────────────────────
 path = os.path.join(os.environ["NLTK_DATA"], "models", "word2vec_sample", "pruned.word2vec.txt")

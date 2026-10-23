@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { body, HAIRLINE, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { COST, TIERS, usd } from "./data";
-import { A, A_INK, B, Drift, Headline, lerp, Marked, OK, OK_INK, pulse, Svg, Tag, TRAP, TRAP_INK, X0 } from "./parts";
+import { cents, COST, step, TIERS, usd } from "./data";
+import { A, A_INK, B, Drift, Headline, lerp, Marked, pulse, Svg, TRAP, TRAP_INK, X0 } from "./parts";
 
 const ROW_Y = [420, 506, 592, 678];
 const ACC = { x0: 330, x1: 830 };
@@ -19,9 +19,12 @@ const tierName = (s: string) => s[0].toUpperCase() + s.slice(1);
 /**
  * Cost beside accuracy (Fig. 15): the lesson's four tiers on one task, a
  * million requests a month at 700 tokens in and 25 out. Accuracy barely
- * moves, 91 to 95; the bill runs from $83 to $8,250. Opus buys one point
- * over Sonnet for twice the money, Fable nothing over Opus for two and a half
- * times. What decides it is what an error costs.
+ * moves, 91 to 95; the bill runs from $83 to $8,250. Each step up is marked
+ * with what it buys, then priced per error it avoids (data.ts STEPS): Sonnet's
+ * three points remove 30,000 errors for $1,567.50, about 5 cents each, so if a
+ * mistake costs even a minute of someone's time the cheap model is the
+ * expensive one. (The lesson draws the opposite conclusion from the same
+ * table; see script.ts.)
  */
 export const CostScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -41,11 +44,13 @@ export const CostScene: React.FC = () => {
   const fableAt = n.word("cost-gaps", "Fable");
   const nothingAt = n.word("cost-gaps", "nothing");
   const halfAt = n.word("cost-gaps", "two and a half times");
-  const errorAt = n.word("cost-error", "error costs");
-  const triageAt = n.word("cost-error", "minute of triage");
-  const winsAt = n.word("cost-error", "wins");
-  const customerAt = n.word("cost-error", "lost customer");
-  const doesntAt = n.word("cost-error", "doesn't");
+  const priceAt = n.word("cost-error", "price");
+  const sonnetAt = n.word("cost-error", "Sonnet's");
+  const threeAt = n.word("cost-error", "three points");
+  const thirtyAt = n.word("cost-error", "thirty thousand");
+  const fiveAt = n.word("cost-error", "five cents");
+  const minuteAt = n.word("cost-verdict", "minute");
+  const expensiveAt = n.word("cost-verdict", "expensive");
   const end = n.beat("end").from;
 
   const maxBill = Math.max(...TIERS.map((t) => t.monthly));
@@ -53,12 +58,13 @@ export const CostScene: React.FC = () => {
   const billX = (v: number) => BILL.x0 + ((BILL.x1 - BILL.x0) * v) / maxBill;
   const accAt = (i: number) => Math.round(lerp(ninetyOneAt - 4, ninetyFiveAt - 2, i / 3));
   const billAt = (i: number) => Math.round(lerp(millionAt - 4, monthAt + 6, i / 3));
-  const cheapWin = ease(frame, winsAt - 2, 12) * (1 - ease(frame, doesntAt - 2, 12));
   const sonnet = TIERS.findIndex((t) => t.name === "sonnet");
   const opus = TIERS.findIndex((t) => t.name === "opus");
   const fable = TIERS.findIndex((t) => t.name === "fable");
-  const extra = (a: number, b: number) => TIERS[b].accuracy - TIERS[a].accuracy;
-  const times = (a: number, b: number) => TIERS[b].monthly / TIERS[a].monthly;
+  const toSonnet = step("sonnet");
+  const toOpus = step("opus");
+  const toFable = step("fable");
+  const sonnetLit = ease(frame, sonnetAt - 2, 12);
 
   return (
     <AbsoluteFill>
@@ -69,8 +75,9 @@ export const CostScene: React.FC = () => {
       ))}
       <Sfx name="el-pencil" at={onePointAt - 2} level={-34} />
       <Sfx name="el-pencil" at={nothingAt - 2} level={-34} />
-      <Sfx name="el-tap" at={triageAt} level={-28} />
-      <Sfx name="el-tap" at={customerAt} level={-28} />
+      <Sfx name="el-pencil" at={threeAt - 2} level={-34} />
+      <Sfx name="el-tap" at={thirtyAt} level={-27} />
+      <Sfx name="el-tap" at={minuteAt} level={-28} />
 
       <Headline at={from - 6} second={besideAt - 4} italic="beside accuracy.">
         Put cost
@@ -95,32 +102,34 @@ export const CostScene: React.FC = () => {
           const a = ease(frame, accAt(i), 16);
           const b = ease(frame, billAt(i), 18);
           const isCheap = i === 0;
-          const glow = isCheap ? cheapWin : 0;
+          const lit = i === sonnet ? sonnetLit : 0;
+          const fill = `color-mix(in srgb, ${A} ${Math.round(lit * 100)}%, ${B})`;
+          const ink = lit > 0.5 ? A_INK : INK;
           return (
             <React.Fragment key={t.name}>
               <Ink at={accAt(i) - 4} dur={12} style={{ left: X0, top: ry - 17, whiteSpace: "nowrap" }}>
-                <span style={{ ...label(26, INK), fontWeight: 650 }}>{isCheap ? <Marked at={winsAt - 2} out={doesntAt}>{tierName(t.name)}</Marked> : tierName(t.name)}</span>
+                <span style={{ ...label(26, INK), fontWeight: 650 }}>
+                  {isCheap ? <Marked at={expensiveAt - 2} color={`color-mix(in srgb, ${TRAP} 30%, transparent)`}>{tierName(t.name)}</Marked> : tierName(t.name)}
+                </span>
               </Ink>
               <Svg>
-                <rect x={ACC.x0} y={ry - BAR_H / 2} width={(accX(t.accuracy) - ACC.x0) * a} height={BAR_H} rx={3} fill={isCheap ? A : B} opacity={0.9} />
+                <rect x={ACC.x0} y={ry - BAR_H / 2} width={(accX(t.accuracy) - ACC.x0) * a} height={BAR_H} rx={3} fill={fill} opacity={0.9} />
                 <rect
                   x={BILL.x0}
                   y={ry - BAR_H / 2}
                   width={Math.max(4, billX(t.monthly) - BILL.x0) * b}
                   height={BAR_H}
                   rx={3}
-                  fill={isCheap ? A : B}
+                  fill={fill}
                   opacity={0.9}
-                  stroke={glow > 0 ? OK : "none"}
-                  strokeWidth={3 * glow}
                 />
                 <line x1={X0} x2={BILL.x1 + 120} y1={ry + 38} y2={ry + 38} stroke={HAIRLINE} strokeWidth={0.8} opacity={0.5 * a} />
               </Svg>
               <Ink at={accAt(i) + 8} dur={10} style={{ left: accX(t.accuracy) + 12, top: ry - 16, whiteSpace: "nowrap" }}>
-                <span style={{ ...note(24, isCheap ? A_INK : INK), fontWeight: 650, ...TABULAR }}>{t.accuracy}%</span>
+                <span style={{ ...note(24, ink), fontWeight: 650, ...TABULAR }}>{t.accuracy}%</span>
               </Ink>
               <Ink at={billAt(i) + 10} dur={10} style={{ left: Math.max(BILL.x0 + 4, billX(t.monthly)) + 12, top: ry - 16, whiteSpace: "nowrap" }}>
-                <span style={{ ...note(24, isCheap ? A_INK : INK), fontWeight: 650, ...TABULAR }}>{usd(t.monthly)}</span>
+                <span style={{ ...note(24, ink), fontWeight: 650, ...TABULAR }}>{usd(t.monthly)}</span>
               </Ink>
             </React.Fragment>
           );
@@ -128,28 +137,49 @@ export const CostScene: React.FC = () => {
 
         {/* What each step up buys, on the row that pays for it. */}
         <Gain at={onePointAt - 2} x={accX(TIERS[opus].accuracy) + 86} y={y(ROW_Y[opus])} pulseAt={opusAt}>
-          +{extra(sonnet, opus)} point
+          +{toOpus.points} point
         </Gain>
         <Gain at={twiceAt - 2} x={billX(TIERS[opus].monthly) + 112} y={y(ROW_Y[opus])} pulseAt={twiceAt}>
-          {fmtTimes(times(sonnet, opus))} the cost
+          {fmtTimes(toOpus.times)} the cost
         </Gain>
         <Gain at={nothingAt - 2} x={accX(TIERS[fable].accuracy) + 86} y={y(ROW_Y[fable])} pulseAt={fableAt}>
-          +{extra(opus, fable)} points
+          +{toFable.points} points
         </Gain>
         <Gain at={halfAt - 2} x={billX(TIERS[fable].monthly) + 112} y={y(ROW_Y[fable])} pulseAt={halfAt}>
-          {fmtTimes(times(opus, fable))} the cost
+          {fmtTimes(toFable.times)} the cost
+        </Gain>
+        <Gain at={threeAt - 2} x={accX(TIERS[sonnet].accuracy) + 86} y={y(ROW_Y[sonnet])} pulseAt={threeAt}>
+          +{toSonnet.points} points
+        </Gain>
+        <Gain at={threeAt + 8} x={billX(TIERS[sonnet].monthly) + 112} y={y(ROW_Y[sonnet])} pulseAt={threeAt + 8}>
+          {fmtTimes(toSonnet.times)} the cost
         </Gain>
 
-        {/* What decides it. */}
-        <Ink at={errorAt - 4} dur={14} style={{ left: X0, top: y(790), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(26, INK), fontWeight: 600 }}>If an error costs</span>
+        {/* Each step priced per error it avoids, from the same table. */}
+        <Ink at={priceAt - 4} dur={14} style={{ left: X0, top: y(748), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK), fontWeight: 600 }}>
+            Sonnet over Haiku:{" "}
+            <span style={{ opacity: ease(frame, thirtyAt - 2, 10) }}>
+              <span style={TABULAR}>{toSonnet.avoided.toLocaleString("en-US")}</span> fewer errors a month for{" "}
+              <span style={TABULAR}>{usd(toSonnet.extra, 2)}</span>,
+            </span>{" "}
+            <span style={{ color: A_INK, fontWeight: 700, opacity: ease(frame, fiveAt - 2, 10) }}>
+              <Marked at={fiveAt}>about {cents(toSonnet.perError ?? 0)} each</Marked>
+            </span>
+          </span>
         </Ink>
-        <Tag at={triageAt - 2} x={X0 + 260} y={y(790) - 8} color={OK}>
-          <span style={{ color: OK_INK }}>a minute of triage: the cheap model wins</span>
-        </Tag>
-        <Tag at={customerAt - 2} x={X0 + 860} y={y(790) - 8} color={TRAP}>
-          <span style={{ color: TRAP_INK }}>a lost customer: it doesn&apos;t</span>
-        </Tag>
+        <Ink at={fiveAt + 14} dur={14} style={{ left: X0, top: y(748) + 44, whiteSpace: "nowrap" }}>
+          <span style={note(22, INK_SOFT)}>
+            Opus over Sonnet: <span style={TABULAR}>{toOpus.avoided.toLocaleString("en-US")}</span> fewer for{" "}
+            <span style={TABULAR}>{usd(toOpus.extra)}</span>, {cents(toOpus.perError ?? 0)} each. Fable over Opus: none fewer.
+          </span>
+        </Ink>
+        <Ink at={minuteAt - 4} dur={16} style={{ left: X0, top: y(840), whiteSpace: "nowrap" }}>
+          <span style={{ ...body(32, true), color: INK }}>
+            A minute of someone&apos;s time costs more than that:{" "}
+            <span style={{ color: TRAP_INK, opacity: ease(frame, expensiveAt - 6, 12) }}>the cheap model is the expensive one.</span>
+          </span>
+        </Ink>
       </Drift>
     </AbsoluteFill>
   );
@@ -172,7 +202,7 @@ const Gain: React.FC<{ at: number; x: number; y: number; pulseAt: number; align?
     <Ink at={at} dur={12} style={{ left: x, top: y - 15, whiteSpace: "nowrap" }}>
       <span
         style={{
-          ...note(22, TRAP_INK),
+          ...note(22, INK),
           fontWeight: 700,
           display: "inline-block",
           transform: `${align === "right" ? "translateX(-100%) " : ""}scale(${1 + pulse(frame, pulseAt + 4, 16) * 0.05})`,

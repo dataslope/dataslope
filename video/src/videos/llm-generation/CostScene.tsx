@@ -28,13 +28,13 @@ export const CostScene: React.FC = () => {
   const { y, h } = useLayout();
   const start = n.beat("costs").from;
   const payAt = n.word("costs", "pay");
-  const everyTurnAt = n.word("costs", "every turn");
+  const inputAt = n.word("costs", "every input token");
   const tenAt = n.word("costs", "ten turns");
   const fiveMAt = n.word("costs", "five million");
   const cacheAt = n.word("costs", "cache");
 
-  // The blocks land one turn at a time, from "every turn" to "ten turns".
-  const blockAt = (j: number) => everyTurnAt + ((tenAt - everyTurnAt) * j) / (MONEY.turns - 1);
+  // The blocks land one turn at a time, from "every input token" to "ten turns".
+  const blockAt = (j: number) => inputAt + ((tenAt - inputAt) * j) / (MONEY.turns - 1);
   const landed = Array.from({ length: MONEY.turns }, (_, j) => (frame >= blockAt(j) ? 1 : 0)).reduce<number>((a, b) => a + b, 0);
   const bh = h(BLOCK_H);
 
@@ -50,7 +50,7 @@ export const CostScene: React.FC = () => {
         <Headline lead="Filling it isn't free." turn="You pay every turn." at={start - 4} turnAt={payAt - 2} />
 
         {/* Fig. 14: the same document, billed again on every turn. */}
-        <FigLabel n="14" title="One 500,000-token document, resent on every turn" at={start} x={X0} y={y(240)} />
+        <FigLabel n="14" title="One 500,000-token document in a 1,000,000-token window, resent every turn" at={start} x={X0} y={y(240)} />
         {Array.from({ length: MONEY.turns }, (_, j) => {
           const s = pop(frame, blockAt(j), fps, 14);
           if (s <= 0.001) return null;
@@ -96,6 +96,9 @@ export const CostScene: React.FC = () => {
         ) : null}
         <Note at={cacheAt - 2} x={X0} y={y(BILL_Y) + 190}>
           <span style={{ ...note(26, INK) }}>unless a cache steps in</span>
+          <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>
+            A cache bills a repeated prefix at a tenth of the input price or less (Unit 4).
+          </div>
         </Note>
       </Drift>
       {/* Still the same full suitcase, packed again for every trip. */}

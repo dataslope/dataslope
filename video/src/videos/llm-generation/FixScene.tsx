@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -12,6 +12,12 @@ const LEFT_W = 740;
 const RIGHT_X = 960;
 const ROW_Y = (k: number) => 340 + k * 120;
 const ITEM_Y = (k: number) => 330 + k * 96;
+/** The lesson's reason under each of the first three fixes ("What actually reduces it"). */
+const GLOSS = [
+  "the fact is in the context, not the weights",
+  "a query you can run beats a number you must trust",
+  "a schema leaves no field to invent",
+] as const;
 
 /** A round badge: a tick, a cross, or a number. */
 const Badge: React.FC<{ kind: "yes" | "no" | number; at: number; x: number; y: number }> = ({ kind, at, x, y }) => {
@@ -51,6 +57,7 @@ export const FixScene: React.FC = () => {
   const start = n.beat("hedge").from;
   const hedgesAt = n.word("hedge-why", "more hedges");
   const landAt = n.word("hedge-why", "land");
+  const alikeAt = n.word("hedge-why", "alike");
   const wrongAt = n.word("hedge-why", "wrong answers");
   const insideAt = n.word("hedge-why", "nothing inside");
   const worksAt = n.word("works", "What works");
@@ -94,7 +101,7 @@ export const FixScene: React.FC = () => {
 
       {/* Fig. 10: what the instruction changes, and what it can't. */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - dimLeft }}>
-        <FigLabel n="10" title="What the instruction changes" at={hedgesAt - 8} x={X0} y={y(250)} />
+        <FigLabel n="10" title="What the instruction gets you" at={hedgesAt - 8} x={X0} y={y(250)} />
         <Badge kind="yes" at={hedgesAt - 2} x={X0 + 22} y={y(ROW_Y(0)) + 22} />
         <Ink at={hedgesAt - 2} dur={14} style={{ left: X0 + 64, top: y(ROW_Y(0)), width: LEFT_W - 64 }}>
           <div style={{ ...body(34), color: INK }}>
@@ -104,9 +111,12 @@ export const FixScene: React.FC = () => {
         <Badge kind="no" at={wrongAt - 2} x={X0 + 22} y={y(ROW_Y(1)) + 22} />
         <Ink at={landAt - 2} dur={14} style={{ left: X0 + 64, top: y(ROW_Y(1)), width: LEFT_W - 64 }}>
           <div style={{ ...body(34), color: INK }}>
-            Hedges that land on the <span style={{ color: ACCENT_INK }}>wrong answers</span>.
+            Hedges that pick out the <span style={{ color: ACCENT_INK }}>wrong answers</span>.
           </div>
         </Ink>
+        <Note at={alikeAt - 2} x={X0 + 64} y={y(ROW_Y(1)) + 50} width={LEFT_W - 64}>
+          <div style={{ ...body(28, true), color: INK }}>They land on right and wrong answers alike.</div>
+        </Note>
         <Note at={insideAt - 2} x={X0 + 64} y={y(ROW_Y(2)) + 4} width={LEFT_W - 64}>
           <div style={{ ...body(30, true), color: INK_SOFT }}>Nothing inside knows which answers are wrong.</div>
         </Note>
@@ -124,9 +134,23 @@ export const FixScene: React.FC = () => {
             <Badge kind={k + 1} at={itemAt[k] - 4} x={RIGHT_X + 22} y={y(ITEM_Y(k)) + 22} />
             <Ink at={itemAt[k] - 2} dur={14} style={{ left: RIGHT_X + 64, top: y(ITEM_Y(k)), width: 800 }}>
               <div style={{ ...body(34), color: INK, whiteSpace: "nowrap", transform: `scale(${1 + swell * 0.05})`, transformOrigin: "0 50%" }}>
-                {k === 3 ? <Marked at={eitherAt - 2}>{it}</Marked> : k === 0 ? <Marked at={pastingAt}>{it}</Marked> : it}
+                {k === 3 ? (
+                  <Marked at={eitherAt - 2} out={pastingAt - 4}>
+                    {it}
+                  </Marked>
+                ) : k === 0 ? (
+                  <Marked at={pastingAt}>{it}</Marked>
+                ) : (
+                  it
+                )}
               </div>
             </Ink>
+            {/* The lesson's reason for each fix, held until the cut. */}
+            {k < GLOSS.length ? (
+              <Note at={itemAt[k] + 8} x={RIGHT_X + 64} y={y(ITEM_Y(k)) + 48}>
+                <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{GLOSS[k]}</span>
+              </Note>
+            ) : null}
           </React.Fragment>
         );
       })}

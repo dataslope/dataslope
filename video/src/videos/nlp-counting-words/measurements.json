@@ -7754,35 +7754,40 @@
     "grams": 161600,
     "distinct": 7079,
     "once": 2739,
-    "share": 0.3869
+    "share": 0.3869,
+    "recur": 0.9831
    },
    {
     "n": 2,
     "grams": 161599,
     "distinct": 65867,
     "once": 47761,
-    "share": 0.7251
+    "share": 0.7251,
+    "recur": 0.7044
    },
    {
     "n": 3,
     "grams": 161598,
     "distinct": 130864,
     "once": 117513,
-    "share": 0.898
+    "share": 0.898,
+    "recur": 0.2728
    },
    {
     "n": 4,
     "grams": 161597,
     "distinct": 155176,
     "once": 150890,
-    "share": 0.9724
+    "share": 0.9724,
+    "recur": 0.0663
    },
    {
     "n": 5,
     "grams": 161596,
     "distinct": 160226,
     "once": 159113,
-    "share": 0.9931
+    "share": 0.9931,
+    "recur": 0.0154
    }
   ]
  },

@@ -114,7 +114,7 @@ export const script: NarrationScript = {
     { id: "token", text: "Each piece is a token: one meaningful unit of text." },
     {
       id: "token-kinds",
-      text: "Usually a word, but sometimes a number, a symbol, or a punctuation mark.",
+      text: "Usually a word, but sometimes a punctuation mark.",
       pauseAfter: 1.0,
     },
     { id: "sent-in", text: "One level up, the period itself gets tricky." },
@@ -133,7 +133,7 @@ export const script: NarrationScript = {
     { id: "naive", text: "Split that at every period, and it falls into five pieces." },
     {
       id: "naive-cut",
-      text: "It breaks after doctor, breaks inside two point five, and never notices the question mark.",
+      text: "It breaks after doctor, breaks inside two point five, and throws the periods away.",
       pauseAfter: 0.7,
     },
     {
@@ -185,13 +185,17 @@ export const script: NarrationScript = {
       text: "The first keeps only tokens made entirely of letters. So World is gone, because its exclamation mark came with it. You lose the word, not just the punctuation.",
       pauseAfter: 0.8,
     },
-    { id: "translate", text: "The second deletes the punctuation characters." },
+    { id: "translate", text: "The second lowercases the line, then deletes the punctuation characters." },
     {
       id: "shut",
       text: "The words survive, but contractions get glued shut: the apostrophe in it's is gone, and so is the one in isn't.",
       pauseAfter: 0.6,
     },
-    { id: "regex", text: "The third pulls out runs of letters, and splits isn't in two, at the apostrophe.", pauseAfter: 0.7 },
+    {
+      id: "regex",
+      text: "The third lowercases too, then pulls out runs of letters, and splits isn't in two, at the apostrophe.",
+      pauseAfter: 0.7,
+    },
     {
       id: "look",
       text: "Three sensible recipes, three different answers. So always look at what your cleaning actually did.",
@@ -199,8 +203,8 @@ export const script: NarrationScript = {
     },
     {
       id: "order",
-      text: "And strip it after you tokenize, never before, or the sentence tokenizer loses its clues.",
-      pauseAfter: 0.8,
+      text: "And strip punctuation after you tokenize, never before, or the sentence tokenizer loses its clues.",
+      pauseAfter: 1.2,
     },
     { id: "stop-in", text: "Next, the words that turn up everywhere." },
 
@@ -216,7 +220,7 @@ export const script: NarrationScript = {
       text: "They're called stopwords. NLTK's English list has a hundred and ninety-eight of them.",
       pauseAfter: 1.0,
     },
-    { id: "fox", text: "Filter a sentence against that list.", pauseAfter: 0.5 },
+    { id: "fox", text: "Filter a sentence against that list.", pauseAfter: 1.5 },
     {
       id: "removed",
       text: "Five of its twelve tokens drop out, and the seven left carry the meaning: quick brown fox, lazy dog, park.",
@@ -299,7 +303,7 @@ export const script: NarrationScript = {
       scene: true,
       text: "Look back at the four steps, and each one threw something away on purpose.",
     },
-    { id: "close-list", text: "The spaces. The capitals. The common words. The endings.", pauseAfter: 0.7 },
+    { id: "close-list", text: "The spaces. The capitals and the punctuation. The common words. The endings.", pauseAfter: 0.7 },
     {
       id: "needed",
       text: "Cleaning well means knowing what you threw away, and whether your task needed it.",

@@ -8,8 +8,8 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { A, A_INK, Arrow, B, Check, Cross, Drift, Headline, Marked, OK, OK_INK, Spot, Svg, Tag, TRAP, TRAP_INK, X0 } from "./parts";
 
-const SRC = { x: X0, y: 420, w: 420 };
-const DST_X = 720;
+const SRC = { x: X0, y: 420, w: 470 };
+const DST_X = 760;
 const DST = { coding: 372, invoices: 486 };
 const BOARD_Y = 622;
 const BOARD_STEP = 52;
@@ -30,7 +30,8 @@ export const MismatchScene: React.FC = () => {
   // ── Cues ──
   const from = n.beat("mismatch").from;
   const constructAt = n.word("mismatch", "construct mismatch");
-  const measuresAt = n.word("mismatch", "measures");
+  const carriesAt = n.word("mismatch", "carries over");
+  const yourTaskAt = n.word("mismatch", "your task");
   const theBenchmarkAt = n.word("mismatch", "the benchmark");
   const sweAt = n.word("transfer", "SWE-bench");
   const codingAt = n.word("transfer", "agentic coding");
@@ -63,7 +64,7 @@ export const MismatchScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the spot, the two arrows, the rank, the four questions ── */}
-      <Sfx name="el-pop" at={measuresAt - 6} level={-30} />
+      <Sfx name="el-pop" at={theBenchmarkAt - 4} level={-30} />
       <Sfx name="el-pencil" at={codingAt - 4} level={-34} />
       <Sfx name="el-scratch" at={invoicesAt + 4} level={-34} />
       <Sfx name="el-tap" at={bestAt} level={-27} />
@@ -71,17 +72,29 @@ export const MismatchScene: React.FC = () => {
         <Sfx key={i} name="el-tap" at={at - 2} level={-28} />
       ))}
 
-      <Headline at={from - 6} second={measuresAt - 8} italic="A benchmark measures the benchmark." size={56}>
+      <Headline at={from - 6} second={carriesAt - 4} italic="Does the score carry over?">
         Four, construct mismatch.
       </Headline>
       <Spot id="llm-benchmarks-sorter" at={theBenchmarkAt - 4} left={1390} top={y(330)} width={420} height={280} />
 
       <Drift from={from} to={askAt} amount={0.014} origin="30% 50%">
-        <FigLabel n="8" title="Does the score carry over?" at={constructAt - 2} out={out8} x={X0} y={y(296)} />
-        {/* SWE-bench's task, and where it does and doesn't carry. */}
-        <Tag at={sweAt - 4} out={out8} x={SRC.x} y={y(SRC.y) - 24} width={SRC.w}>
-          SWE-bench: fix a GitHub issue
+        <FigLabel n="8" title="A benchmark's task, and yours" at={constructAt - 2} out={out8} x={X0} y={y(296)} />
+        {/* The kind of task a benchmark sets, and where its score does and doesn't carry. */}
+        <Tag at={constructAt + 4} out={out8} x={SRC.x} y={y(SRC.y) - 24} width={SRC.w}>
+          <Marked at={sweAt - 2}>repo-patch tasks, like SWE-bench</Marked>
         </Tag>
+        {/* "...if your task looks like it": a place for your task, filled at "invoices". */}
+        <Tag at={yourTaskAt - 2} out={invoicesAt - 4} x={DST_X} y={y(DST.invoices) - 24} color={INK_SOFT} dashed>
+          <span style={{ color: INK_SOFT }}>your task?</span>
+        </Tag>
+        <Arrow
+          from={[SRC.x + SRC.w + 10, y(SRC.y) + 6]}
+          to={[DST_X - 12, y(DST.invoices)]}
+          at={yourTaskAt}
+          out={nothingAt - 4}
+          color={INK_SOFT}
+          dash="7 6"
+        />
         <Tag at={codingAt - 2} out={out8} x={DST_X} y={y(DST.coding) - 24} color={OK}>
           <span style={{ color: OK_INK }}>agentic coding</span>
         </Tag>
@@ -141,7 +154,7 @@ export const MismatchScene: React.FC = () => {
         <span style={{ ...body(40, true), color: TRAP_INK }}>No?</span>
       </Ink>
       <Arrow from={[1100, y(Q_Y[3]) + 2]} to={[1210, y(Q_Y[3]) + 2]} at={findAt - 6} dur={12} color={INK} />
-      <Ink at={findAt - 2} dur={14} style={{ left: 1230, top: y(Q_Y[3]) - 18, whiteSpace: "nowrap" }}>
+      <Ink at={findAt - 2} dur={14} style={{ left: 1230, top: y(Q_Y[3]) - 13, whiteSpace: "nowrap" }}>
         <span style={{ ...label(26, INK), fontWeight: 700, padding: "4px 12px", background: PAPER }}>find out yourself</span>
       </Ink>
     </AbsoluteFill>

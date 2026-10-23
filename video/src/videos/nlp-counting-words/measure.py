@@ -27,7 +27,8 @@ Two kinds of number:
    lexical diversity on the first 100, 1,000 and 10,000 words and the whole
    book; the rank-frequency curve; vocabulary growth; the top words with and
    without stopwords; the bigrams whose two words are both not stopwords;
-   and, for n = 1 to 5, the share of distinct n-grams seen only once.
+   and, for n = 1 to 5, the share of distinct n-grams seen only once and the
+   share of n-gram occurrences whose n-gram appears again in the book.
 
 Printed checks go to stderr.
 """
@@ -228,7 +229,20 @@ for n in [1, 2, 3, 4, 5]:
     grams = list(ngrams(words, n))
     gfd = FreqDist(grams)
     once = sum(1 for _, c in gfd.items() if c == 1)
-    sparsity.append({"n": n, "grams": len(grams), "distinct": len(gfd), "once": once, "share": r(once / len(gfd))})
+    # "share": of the distinct n-grams, how many occur once. "recur": of the
+    # n-grams as read (every occurrence), how many belong to one that occurs
+    # again somewhere in the book, 1 - once / grams: what a model counting
+    # them can actually reuse.
+    sparsity.append(
+        {
+            "n": n,
+            "grams": len(grams),
+            "distinct": len(gfd),
+            "once": once,
+            "share": r(once / len(gfd)),
+            "recur": r(1 - once / len(grams)),
+        }
+    )
 
 out["emma"] = {
     "file": "austen-emma.txt",
@@ -256,7 +270,7 @@ say(f"   without        {cfd.most_common(6)}")
 say(f"   pairs          {pairs.most_common(5)}")
 say(f"   new words in the last {LAST}: {new_at_end}")
 for s in sparsity:
-    say(f"   n={s['n']}: {s['distinct']} distinct, {s['once']} once ({s['share']:.3f})")
+    say(f"   n={s['n']}: {s['distinct']} distinct, {s['once']} once ({s['share']:.3f}); {s['recur']:.3f} of occurrences recur")
 
 # ── pos-tagging.mdx ─────────────────────────────────────────────────────────
 

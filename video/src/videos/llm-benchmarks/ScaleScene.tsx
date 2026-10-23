@@ -12,7 +12,7 @@ import { A, A_INK, B, B_INK, Bracket, Dot, Drift, Headline, pulse, Svg, Track, t
 const TX0 = 300;
 const TX1 = 1700;
 const MMLU_Y = 404;
-const ARC_Y = 790;
+const ARC_Y = 826;
 /** The zoom under MMLU's row: 90 to 96 points across 900px. */
 const ZOOM = { lo: 90, hi: 96, x0: 760, x1: 1660, y: 600 };
 const zx = (v: number) => ZOOM.x0 + ((v - ZOOM.lo) / (ZOOM.hi - ZOOM.lo)) * (ZOOM.x1 - ZOOM.x0);
@@ -31,12 +31,11 @@ export const ScaleScene: React.FC = () => {
   // ── Cues ──
   const from = n.beat("read").from;
   const sitsAt = n.word("read", "sits");
-  const scaleAt = n.word("read", "scale");
   const mmluAt = n.word("mmlu-gap", "MMLU");
   const aAt = n.word("mmlu-gap", "ninety-two point three");
   const bAt = n.word("mmlu-gap", "ninety-one point seven");
-  const labelAt = n.word("mmlu-gap", "label errors");
-  const capAt = n.word("mmlu-gap", "cap");
+  const labelAt = n.word("mmlu-gap", "answer keys");
+  const capAt = n.word("mmlu-gap", "most anyone");
   const ninetyFiveAt = n.word("mmlu-gap", "ninety-five");
   const sixAt = n.word("noise", "Six tenths");
   const ceilingAt = n.word("noise", "ceiling");
@@ -99,7 +98,7 @@ export const ScaleScene: React.FC = () => {
         </Svg>
         <Ink at={capAt - 2} dur={14} style={{ left: X(MMLU.ceiling) - 6, top: my - 78, whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, TRAP_INK), fontWeight: 600, display: "inline-block", transform: "translateX(-100%)" }}>
-            label errors cap it near {MMLU.ceiling}
+            wrong answer keys cap it near {MMLU.ceiling}
           </span>
         </Ink>
 
@@ -157,9 +156,9 @@ export const ScaleScene: React.FC = () => {
             {fmt(MMLU.ceiling - MMLU.a, 1)} to the ceiling
           </span>
         </Ink>
-        {/* The verdict, in the room left of the zoom. */}
-        <Ink at={noiseAt - 4} dur={18} style={{ left: X0 + 40, top: zy - 52, whiteSpace: "nowrap" }}>
-          <span style={{ ...body(52, true), color: TRAP_INK }}>Noise.</span>
+        {/* The verdict, under the gap it judges. */}
+        <Ink at={noiseAt - 4} dur={18} style={{ left: (zx(MMLU.b) + zx(MMLU.a)) / 2, top: zy + 50, whiteSpace: "nowrap" }}>
+          <span style={{ ...body(46, true), color: TRAP_INK, display: "inline-block", transform: "translateX(-50%)" }}>Noise.</span>
         </Ink>
 
         {/* "The first of four ways": the part ahead, one mark per pitfall. */}
@@ -168,7 +167,7 @@ export const ScaleScene: React.FC = () => {
             const p = ease(frame, fourAt - 2 + k * 4, 10);
             const lit = k === 0 ? ease(frame, misleadsAt - 2, 10) : 0;
             const cx = X0 + 58 + k * 50;
-            const cy = zy + 46;
+            const cy = zy - 6;
             return (
               <g key={k} opacity={p}>
                 <circle cx={cx} cy={cy} r={17} fill={lit > 0 ? TRAP : "none"} fillOpacity={lit} stroke={TRAP} strokeWidth={2.2} />
@@ -184,7 +183,7 @@ export const ScaleScene: React.FC = () => {
         <Ink at={arcAt - 6} dur={12} style={{ left: X0, top: ay - 17, whiteSpace: "nowrap" }}>
           <span style={{ ...label(26, INK), fontWeight: 700 }}>ARC-AGI-3</span>
         </Ink>
-        <Track x0={TX0} x1={TX1} y={ay} at={scaleAt} />
+        <Track x0={TX0} x1={TX1} y={ay} at={arcAt - 8} />
         <Svg>
           <Dot x={X(ARC3.b)} y={ay} at={arcB} r={12} color={B} />
           <Dot x={X(ARC3.a)} y={ay} at={arcA} r={12} color={A} />

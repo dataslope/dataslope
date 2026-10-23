@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline, INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
+import { ACCENT_INK, fmt, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -40,7 +40,9 @@ const COMMON_INK = ds("gray", 500);
  * much as a match on a rare one, and weights words by how few documents they
  * appear in. Her own example (Fig. 10): two hundred documents, a word in
  * ninety of them weighs 2 and a word in three weighs 7, by her rule
- * (measure.py). Then its name, the IDF in TF-IDF.
+ * (measure.py). The flat score of one point a match stays, dimmed, above
+ * each weight, and each weight carries what it approximates, log2(N / n) + 1,
+ * the bridge to the course's log(N / df). Then its name, the IDF in TF-IDF.
  */
 export const IdfScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -51,6 +53,8 @@ export const IdfScene: React.FC = () => {
   // ── Cues ──
   const from = n.beat("sparck").from;
   const searchAt = n.word("sparck", "search matched words");
+  const flawAt = n.word("sparck", "flaw");
+  const flawFrom = n.beat("flaw").from;
   const commonAt = n.word("flaw", "common word");
   const muchAt = n.word("flaw", "just as much");
   const rareAt = n.word("flaw", "rare one");
@@ -84,15 +88,29 @@ export const IdfScene: React.FC = () => {
   const RX = 1010;
   const BAR_X = 1010;
   const UNIT = 88;
-  const ROW_A = y(410);
-  const ROW_B = y(600);
-  const commonW = 1 + (IDF.common.weight - 1) * ease(frame, weighsTwoAt - 2, 18);
-  const rareW = 1 + (IDF.rare.weight - 1) * ease(frame, sevenAt - 2, 24);
+  const QUERY_Y = y(332);
+  const ROW_A = y(398);
+  const ROW_B = ROW_A + 206;
+  const commonW = IDF.common.weight * ease(frame, weighsTwoAt - 2, 18);
+  const rareW = IDF.rare.weight * ease(frame, sevenAt - 2, 24);
+  // The flat score, one point a match, steps back once her weights arrive.
+  const before = 1 - ease(frame, ninetyAt - 4, 14) * 0.65;
   const settle = ease(frame, lastAt - 2, 30);
   // "The fewer documents": a ripple runs across the collection.
   const wave = (c: number, r: number) => pulse(frame, fewerAt + (c + r) * 2, 16);
 
-  const row = (top: number, at: number, name: string, color: string, inkColor: string, w: number, docs: React.ReactNode, docsAt: number) => {
+  const row = (
+    top: number,
+    at: number,
+    name: string,
+    color: string,
+    inkColor: string,
+    w: number,
+    weightAt: number,
+    ex: { docs: number; weight: number; log2: number },
+    docs: React.ReactNode,
+    docsAt: number,
+  ) => {
     const bar = ease(frame, at, 14);
     return (
       <>
@@ -104,20 +122,21 @@ export const IdfScene: React.FC = () => {
         <Ink at={docsAt} style={{ left: RX, top: top + 38, whiteSpace: "nowrap" }}>
           <div style={{ ...label(22, INK_SOFT), fontWeight: 560 }}>{docs}</div>
         </Ink>
-        <div
-          style={{
-            position: "absolute",
-            left: BAR_X,
-            top: top + 78,
-            width: UNIT * w * bar,
-            height: 40,
-            borderRadius: 5,
-            background: color,
-            opacity: bar > 0 ? 1 : 0,
-          }}
-        />
-        <Ink at={at + 6} style={{ left: BAR_X + UNIT * w + 18, top: top + 74, whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(44), ...TABULAR, color: INK }}>{Math.round(w)}</span>
+        {/* One point a match: the flat score, before her weights. */}
+        <div style={{ position: "absolute", left: BAR_X, top: top + 74, width: UNIT * bar, height: 26, borderRadius: 4, background: color, opacity: bar > 0 ? before : 0 }} />
+        <Ink at={at + 6} style={{ left: BAR_X + UNIT + 16, top: top + 70, whiteSpace: "nowrap", opacity: before }}>
+          <span style={{ ...note(24, INK), ...TABULAR, fontWeight: 600 }}>1 point</span>
+        </Ink>
+        {/* Her weight, as a bar of its own under it. */}
+        <div style={{ position: "absolute", left: BAR_X, top: top + 110, width: UNIT * w, height: 34, borderRadius: 5, background: color, opacity: w > 0 ? 1 : 0 }} />
+        <Ink at={weightAt} style={{ left: BAR_X + UNIT * ex.weight + 18, top: top + 102, whiteSpace: "nowrap" }}>
+          <span style={{ ...headline(44), ...TABULAR, color: INK }}>{ex.weight}</span>
+        </Ink>
+        <Ink at={weightAt + 12} style={{ left: BAR_X, top: top + 152, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT) }}>
+            her weight, about log<sub style={{ fontSize: "0.7em" }}>2</sub>({IDF.N} ÷ {ex.docs}) + 1 ={" "}
+            <span style={TABULAR}>{fmt(ex.log2, 2)}</span>
+          </span>
         </Ink>
       </>
     );
@@ -137,7 +156,15 @@ export const IdfScene: React.FC = () => {
       <Sfx name="el-tap" at={tfidfAt} level={-28} />
 
       <Kicker at={from - 6}>1972: Karen Spärck Jones, Cambridge</Kicker>
-      <Headline at={searchAt - 4} lead="Every match counted" turn="the same." turnAt={searchAt + 8} out={fixAt - 6} />
+      <Headline
+        at={from + 2}
+        lead={
+          <>
+            A <Mark at={flawAt}>flaw</Mark> in how
+          </>
+        }
+        turn="search matched words." turnAt={from + 14} out={flawFrom - 6} />
+      <Headline at={flawFrom - 2} lead="Every match counted" turn="the same." turnAt={flawFrom + 10} out={fixAt - 6} />
       <Headline
         at={fixAt - 2}
         lead="The rarer the word,"
@@ -190,6 +217,14 @@ export const IdfScene: React.FC = () => {
           </div>
         </Ink>
 
+        <Ink at={searchAt - 2} dur={16} style={{ left: RX, top: QUERY_Y, whiteSpace: "nowrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, ...label(23, INK_SOFT) }}>
+            a search for
+            <span style={{ padding: "4px 14px", borderRadius: 18, border: `2px solid ${COMMON_INK}`, color: COMMON_INK, fontWeight: 650 }}>a common word</span>
+            and
+            <span style={{ padding: "4px 14px", borderRadius: 18, border: `2px solid ${DATA}`, color: DATA_INK, fontWeight: 650 }}>a rare word</span>
+          </div>
+        </Ink>
         {row(
           ROW_A,
           commonAt,
@@ -197,6 +232,8 @@ export const IdfScene: React.FC = () => {
           COMMON_INK,
           COMMON_INK,
           commonW,
+          weighsTwoAt + 4,
+          IDF.common,
           <>
             in <Mark at={ninetyAt}>{IDF.common.docs} of {IDF.N}</Mark> documents
           </>,
@@ -209,6 +246,8 @@ export const IdfScene: React.FC = () => {
           DATA,
           DATA_INK,
           rareW,
+          sevenAt + 4,
+          IDF.rare,
           <>
             in <Mark at={threeAt}>{IDF.rare.docs} of {IDF.N}</Mark> documents
           </>,

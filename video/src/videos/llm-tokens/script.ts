@@ -149,11 +149,10 @@ export const script: NarrationScript = {
       text: "And the model gets three ids: three oh two, sixteen eighteen, nineteen seven seven two.",
       pauseAfter: 0.8,
     },
-    {
-      id: "space",
-      text: "Put a space in front, the way it sits inside a sentence, and the whole word is one id.",
-      pauseAfter: 0.8,
-    },
+    // Split at its comma (cut from the take, nothing re-voiced), so the
+    // leading space gets a breath before its payoff.
+    { id: "space", text: "Put a space in front, the way it sits inside a sentence,", pauseAfter: 0.6 },
+    { id: "space-id", text: "and the whole word is one id.", pauseAfter: 0.8 },
     {
       id: "letters",
       text: "[curious] So how many R's are in strawberry? The model never saw the letters. It has to recall facts about the spelling, instead of looking.",
@@ -165,9 +164,10 @@ export const script: NarrationScript = {
       text: "For English, the rule of thumb is about four characters a token, or three quarters of a word. So a thousand tokens is roughly seven hundred and fifty words.",
       pauseAfter: 0.7,
     },
+    { id: "newer", text: "Newer tokenizers often do better.", pauseAfter: 0.6 },
     {
-      id: "newer",
-      text: "Newer tokenizers often do better. This one turns the lesson's opening, a hundred and ninety characters, into thirty-six tokens.",
+      id: "opening",
+      text: "This one turns the lesson's opening, a hundred and ninety characters, into thirty-six tokens.",
       pauseAfter: 0.8,
     },
     { id: "bpe-in", text: "But who decided where strawberry gets cut? Nobody did. The vocabulary was learned." },

@@ -43,7 +43,6 @@ export const ContaminationScene: React.FC = () => {
   const memorizedAt = n.word("memory", "memorized");
   const workAt = n.word("memory", "do the work");
   const sameAt = n.word("memory", "same high score");
-  const sankAt = n.word("swe-drop", "sank");
   const sweAt = n.word("swe-drop", "SWE-bench Verified");
   const februaryAt = n.word("swe-drop", "February");
   const reciteAt = n.word("swe-drop", "recite");
@@ -66,7 +65,7 @@ export const ContaminationScene: React.FC = () => {
       ))}
       <Sfx name="el-pop" at={memorizedAt - 4} level={-30} />
       <Sfx name="el-pencil" at={sameAt - 2} level={-34} />
-      <Sfx name="el-scratch" at={sankAt} level={-34} />
+      <Sfx name="el-scratch" at={sweAt + 10} level={-34} />
       <Sfx name="el-tap" at={privateAt - 2} level={-28} />
       <Sfx name="el-tap" at={newerAt - 2} level={-28} />
 

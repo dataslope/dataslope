@@ -22,7 +22,9 @@ const Red: React.FC<{ children: React.ReactNode }> = ({ children }) => <span sty
 /**
  * Part 1, the plainer mess: the lesson's five kinds, one row each, each
  * example inked on its words, and then the later step each one is the reason
- * for, at the right.
+ * for, at the right, inked as the narration reads it. Casing is the lesson's
+ * "a word capitalized only because it starts a sentence", which lowercasing
+ * fixes (its other example, Apple against apple, is one lowercasing breaks).
  */
 export const MessScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -39,27 +41,34 @@ export const MessScene: React.FC = () => {
   const endsAt = n.word("period", "ends");
   const doctorAt = n.word("period", "Doctor");
   const decimalAt = n.word("period", "decimal");
-  const companyAt = n.word("casing", "company");
-  const fruitAt = n.word("casing", "fruit");
+  const capitalAt = n.word("casing", "capital letter");
+  const sentenceAt = n.word("casing", "sentence");
+  const sameAt = n.word("casing", "new word");
   const formsAt = [n.word("forms", "Run"), n.word("forms", "runs"), n.word("forms", "running"), n.word("forms", "ran")];
   const ideaAt = n.word("forms", "one idea");
   const yorkAt = n.word("units", "New York");
   const placeAt = n.word("units", "one place");
   const twoAt = n.word("units", "two words");
-  const reasonAt = n.word("reasons", "reason");
   const splitAt = n.word("split-in", "split");
 
   const row = (i: number) => y(ROW_Y[i]);
-  const existsAt = n.word("reasons", "exists");
-  // The tags arrive one by one across the sentence that explains them.
-  const tagAt = (i: number) => reasonAt - 4 + (i * (existsAt + 10 - reasonAt)) / 4;
+  // Each tag inks as the narration reads it out.
+  const tokenizeAt = n.word("reasons", "tokenize");
+  const TAG_AT = [
+    tokenizeAt - 4,
+    tokenizeAt + 4,
+    n.word("reasons", "lowercase") - 4,
+    n.word("roots", "stem or lemmatize") - 4,
+    n.word("roots", "n-grams") - 4,
+  ];
+  const tagAt = (i: number) => TAG_AT[i];
   // As the narration turns to splitting, the rows it is not about step back.
   const back = ease(frame, splitAt - 2, 18);
-  const TAGS = ["tokenizing", "tokenizing", "lowercasing", "stemming, lemmatizing", "n-grams"];
+  const TAGS = ["tokenize", "tokenize", "lowercase", "stem or lemmatize", "n-grams"];
   const NAMES = [
     { name: "Contractions", at: from - 2 },
     { name: "Punctuation", at: periodAt - 4 },
-    { name: "Casing", at: companyAt - 8 },
+    { name: "Casing", at: capitalAt - 4 },
     { name: "Word forms", at: formsAt[0] - 4 },
     { name: "Multi-word units", at: yorkAt - 4 },
   ];
@@ -143,16 +152,17 @@ export const MessScene: React.FC = () => {
       </div>
 
       {/* 3. Casing */}
-      <div style={{ position: "absolute", ...ex(2), display: "flex", alignItems: "baseline", gap: 64, ...body(42), color: INK }}>
-        <Ink at={companyAt - 8} dur={14} style={{ position: "relative" }}>
+      <div style={{ position: "absolute", ...ex(2), display: "flex", alignItems: "baseline", gap: 44, ...body(42), color: INK }}>
+        <Ink at={capitalAt - 2} dur={14} style={{ position: "relative" }}>
           <span>
-            Apple <Gloss>the company</Gloss>
+            <Red>T</Red>he cat
           </span>
         </Ink>
-        <Ink at={fruitAt - 8} dur={14} style={{ position: "relative" }}>
-          <span>
-            apple <Gloss>the fruit</Gloss>
-          </span>
+        <Ink at={sentenceAt - 2} dur={14} style={{ position: "relative" }}>
+          <span>the cat</span>
+        </Ink>
+        <Ink at={sameAt - 4} dur={14} style={{ position: "relative" }}>
+          <Gloss>the same word</Gloss>
         </Ink>
       </div>
 

@@ -174,7 +174,7 @@ export const RequestScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      <Note at={nothingAt - 2} x={PER_R} y={rowY(tiers.length) - 18} align="right">
+      <Note at={nothingAt - 2} x={PER_R} y={rowY(tiers.length) - 8} align="right">
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>basically nothing</span>
       </Note>
 
@@ -182,12 +182,12 @@ export const RequestScene: React.FC = () => {
       <Bracket
         x0={BAR_X}
         x1={BAR_X + barW(maxV)}
-        y={rowY(tiers.length) - 22}
+        y={rowY(tiers.length) - 4}
         at={timesAt - 4}
         color={POINT}
         up
       />
-      <Ink at={apartAt - 6} dur={16} style={{ left: BAR_X + 220, top: rowY(tiers.length) - 6, whiteSpace: "nowrap" }}>
+      <Ink at={apartAt - 6} dur={16} style={{ left: BAR_X + 220, top: rowY(tiers.length) + 12, whiteSpace: "nowrap" }}>
         <span style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
           <span style={{ ...headline(54), color: POINT_INK }}>{Math.round(maxV / minV)}x</span>
           <span style={{ ...note(25, INK) }}>

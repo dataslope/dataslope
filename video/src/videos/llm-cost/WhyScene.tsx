@@ -11,6 +11,7 @@ import {
   Arrow,
   Bracket,
   Chip,
+  HBar,
   FIG_Y,
   Headline,
   INPUT,
@@ -29,6 +30,7 @@ const LEFT_ROWS = [452, 530];
 const RIGHT_X = 990;
 const RIGHT_ROW = 492;
 const COUNT_Y = 646;
+const METER_W = 240;
 
 /**
  * Why output costs more: the prompt goes through the model in one pass, all
@@ -53,6 +55,10 @@ export const WhyScene: React.FC = () => {
   const oneAt = n.word("serial", "one token");
   const ownAt = n.word("serial", "own pass");
   const modelAt = n.word("serial", "model");
+  const weightAt = n.word("weights", "every weight");
+  const elevenAt = n.word("weights", "eleven tokens");
+  const oneTokAt = n.word("weights", "or one");
+  const waitsAt = n.word("weights", "waits");
   const fiveAt = n.word("gap", "Five");
   const gapAt = n.word("gap", "gap");
 
@@ -159,13 +165,52 @@ export const WhyScene: React.FC = () => {
           </span>
         </div>
       ) : null}
-      <Note at={ownAt} x={RIGHT_X} y={y(COUNT_Y) + 44}>
+      <Note at={ownAt} x={RIGHT_X} y={y(COUNT_Y) + 44} out={weightAt - 6}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>each through the whole model</span>
       </Note>
 
+      {/* What a pass costs: every weight moved, for eleven tokens of work or one. */}
+      <Note at={weightAt - 2} x={X0} y={y(COUNT_Y) + 44}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>every weight moved once</span>
+      </Note>
+      <Note at={weightAt + 4} x={RIGHT_X} y={y(COUNT_Y) + 44}>
+        <span style={{ ...note(24, INK), ...TABULAR, whiteSpace: "nowrap" }}>every weight moved {answer.length} times</span>
+      </Note>
+      {[
+        { x: X0, share: 1, color: INPUT, at: elevenAt - 4, value: `${prompt.length} tokens` },
+        { x: RIGHT_X, share: 1 / prompt.length, color: OUTPUT, at: oneTokAt - 2, value: "1 token" },
+      ].map((m) => (
+        <React.Fragment key={m.x}>
+          <Note at={m.at - 4} x={m.x} y={y(COUNT_Y) + 88}>
+            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>work per pass</span>
+          </Note>
+          <div
+            style={{
+              position: "absolute",
+              left: m.x + 160,
+              top: y(COUNT_Y) + 92,
+              width: METER_W,
+              height: 22,
+              boxSizing: "border-box",
+              borderRadius: 4,
+              border: `2px dashed color-mix(in srgb, ${INK} 40%, transparent)`,
+              opacity: ease(frame, m.at - 4, 10),
+              transform: m.share < 1 ? `scale(${1 + pulse(frame, waitsAt - 4, 24) * 0.06})` : undefined,
+            }}
+          />
+          <HBar x={m.x + 160} y={y(COUNT_Y) + 92} w={METER_W * m.share} h={22} at={m.at} dur={14} fill={m.color} radius={4} />
+          <Note at={m.at + 6} x={m.x + 160 + METER_W + 14} y={y(COUNT_Y) + 88}>
+            <span style={{ ...note(22, INK), ...TABULAR, whiteSpace: "nowrap" }}>{m.value}</span>
+          </Note>
+        </React.Fragment>
+      ))}
+      <Note at={waitsAt - 4} x={RIGHT_X + 160 + METER_W + 110} y={y(COUNT_Y) + 88}>
+        <span style={{ ...note(22, OUTPUT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the rest waits</span>
+      </Note>
+
       {/* The gap the price reflects. */}
-      <Bracket x0={X0} x1={1760} y={y(COUNT_Y) + 104} at={fiveAt - 2} color={INK_SOFT} up />
-      <Ink at={gapAt - 6} dur={16} style={{ left: 640, top: y(COUNT_Y) + 124, whiteSpace: "nowrap" }}>
+      <Bracket x0={X0} x1={1760} y={y(COUNT_Y) + 148} at={fiveAt - 2} color={INK_SOFT} up />
+      <Ink at={gapAt - 6} dur={16} style={{ left: 640, top: y(COUNT_Y) + 166, whiteSpace: "nowrap" }}>
         <span style={{ ...body(36, true), color: INK }}>Five times the price: a real gap in the work.</span>
       </Ink>
     </AbsoluteFill>

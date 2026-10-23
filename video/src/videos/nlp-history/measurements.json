@@ -1837,11 +1837,13 @@
   "examples": [
    {
     "docs": 90,
-    "weight": 2
+    "weight": 2,
+    "log2": 2.15
    },
    {
     "docs": 3,
-    "weight": 7
+    "weight": 7,
+    "log2": 7.06
    }
   ]
  },

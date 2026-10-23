@@ -116,7 +116,7 @@ export const script: NarrationScript = {
       text: "Emma runs to a hundred and sixty-one thousand words, but only about seven thousand different ones.",
       pauseAfter: 0.6,
     },
-    { id: "giants", text: "Rank them by count, and the top ten alone make up over a fifth of the book.", pauseAfter: 0.8 },
+    { id: "giants", text: "Rank them by count, and the top ten alone make up over a fifth of the book.", pauseAfter: 1.0 },
     {
       id: "hapax",
       text: "At the other end, more than two thousand seven hundred words appear just once. They're called hapaxes.",
@@ -158,12 +158,8 @@ export const script: NarrationScript = {
       text: "NLTK's tagger learned from text that people tagged by hand. It calls the first fish NN, a noun, and the second VBP, a verb.",
       pauseAfter: 0.9,
     },
-    {
-      id: "penn",
-      scene: true,
-      text: "Those labels are Penn Treebank tags. The tall man reads books comes back as DT, JJ, NN, VBZ and NNS.",
-      pauseAfter: 0.5,
-    },
+    { id: "penn", scene: true, text: "Those labels are Penn Treebank tags.", pauseAfter: 0.6 },
+    { id: "tall", text: "The tall man reads books comes back as DT, JJ, NN, VBZ and NNS.", pauseAfter: 0.5 },
     { id: "meanings", text: "A determiner, an adjective, a noun, a present-tense verb, and a plural noun.", pauseAfter: 0.8 },
     {
       id: "letters",
@@ -192,11 +188,8 @@ export const script: NarrationScript = {
       text: "So in the runners were running and they had eaten well, running and eaten come back untouched.",
       pauseAfter: 0.6,
     },
-    {
-      id: "tagfirst",
-      text: "Tag first, hand each word its tag, and running becomes run, eaten becomes eat. Even were and had become be and have.",
-      pauseAfter: 0.9,
-    },
+    { id: "tagfirst", text: "Tag first, hand each word its tag, and running becomes run, eaten becomes eat.", pauseAfter: 0.6 },
+    { id: "even", text: "Even were and had become be and have.", pauseAfter: 0.9 },
     { id: "recipe", text: "Tag, then lemmatize: that's the accurate recipe.", pauseAfter: 0.9 },
     { id: "pairs-in", text: "Still, every step so far looks at one word at a time." },
 
@@ -208,11 +201,8 @@ export const script: NarrationScript = {
       text: "Slide a window two words wide along the quick brown fox jumps, one step at a time, so the windows overlap.",
       pauseAfter: 0.5,
     },
-    {
-      id: "formula",
-      text: "Five words give four bigrams, and three trigrams: the number of words, minus n, plus one.",
-      pauseAfter: 0.9,
-    },
+    { id: "formula", text: "Five words give four bigrams, and three trigrams:", pauseAfter: 0.8 },
+    { id: "rule", text: "the number of words, minus n, plus one.", pauseAfter: 0.9 },
     { id: "compare", scene: true, text: "Why bother? Compare the food was good with the food was not good.", pauseAfter: 0.5 },
     { id: "sets", text: "As sets of single words, they differ by one word: not.", pauseAfter: 0.6 },
     {

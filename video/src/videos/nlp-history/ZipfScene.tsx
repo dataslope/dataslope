@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR, fmt } from "../../editorial/style";
+import { ACCENT, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR, fmt } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ZIPF } from "./data";
-import { DATA, DATA_INK, DATA_WASH, drift, Headline, Kicker, Mark, pulse, Svg, Tag } from "./parts";
+import { DATA, DATA_INK, DATA_WASH, drift, Headline, Kicker, LISTING_PAPER, Mark, pulse, Svg, Tag } from "./parts";
 
 /** The log-log frame: rank 1 to 10,000 across, count about 0.6 to 12,000 up. */
 const CX0 = 880;
@@ -23,9 +23,12 @@ const HAPAX_LABEL = 1560;
 /**
  * Part 1, the 1930s: Zipf counted words. The lesson's own count of Emma
  * builds as a table (Fig. 2), then every one of its 7,079 words on log scales
- * (Fig. 3) beside a line of one over the rank. The top two words almost tie,
- * which the line does not promise; but the top hundred are 60% of the book,
- * and the long flat run at the bottom is every word that appears once.
+ * (Fig. 3) beside a line of one over the rank, which on log scales is
+ * straight. The law puts the second word at half the first (a ghost cell,
+ * 2,620), and the top two almost tie; but the top hundred are 60% of the
+ * book, and 39% of the different words appear once. Those two shares are also
+ * drawn on plain linear bars under the table, because the log rank axis
+ * gives the top hundred half its width and the once-only words a sliver.
  */
 export const ZipfScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -36,7 +39,9 @@ export const ZipfScene: React.FC = () => {
   const from = n.beat("zipf").from;
   const countedAt = n.word("zipf", "counted words");
   const rankAt = n.word("law", "Rank", { nth: 1 });
-  const overAt = n.word("law", "one over the rank");
+  const halfAt = n.word("law", "half as often");
+  const logAt = n.word("law", "log scales");
+  const lineAt = n.word("law", "straight line");
   const lawAt = n.word("law", "Zipf's law");
   const heresAt = n.word("emma", "Here's");
   const emmaAt = n.word("emma", "Emma");
@@ -60,7 +65,7 @@ export const ZipfScene: React.FC = () => {
   // ── The table ──
   const TX0 = 96;
   const TTOP = y(366);
-  const ROW = 54;
+  const ROW = 48;
   const COLS = [
     { title: "rank", w: 80, align: "right" as const },
     { title: "word", w: 170, align: "left" as const },
@@ -72,12 +77,15 @@ export const ZipfScene: React.FC = () => {
   const path = ZIPF.curve.map(([r, c], i) => `${i ? "L" : "M"}${lx(r).toFixed(1)},${ly(c).toFixed(1)}`).join(" ");
   const drawn = ease(frame, rankAt, 46);
   const lineFrom = ZIPF.lineC / 10 ** HI;
-  const guide = ease(frame, overAt - 2, 30);
+  const guide = ease(frame, lineAt - 2, 30);
+  const guideTo = ZIPF.distinct;
   const band = ease(frame, hundredAt - 2, 18);
   const tail = ease(frame, fourAt - 2, 20);
   const hapax0 = lx(ZIPF.firstHapaxRank);
   const hapax1 = lx(ZIPF.distinct);
   const settle = drift(frame, nextAt, 1, 120);
+  const BARS_TOP = TTOP + 52 + 8 * ROW + 26;
+  const BAR_W = 620;
   const bandX1 = lx(100);
 
   return (
@@ -85,7 +93,8 @@ export const ZipfScene: React.FC = () => {
       {/* ── Sound: the rows, the curve, the line, the band, the tail ── */}
       <Sfx name="el-sprinkle" at={from + 10} level={-33} />
       <Sfx name="el-pencil" at={rankAt} level={-34} />
-      <Sfx name="el-pencil" at={overAt - 2} level={-35} />
+      <Sfx name="el-tap" at={halfAt - 2} level={-30} />
+      <Sfx name="el-pencil" at={lineAt - 2} level={-35} />
       <Sfx name="el-tap" at={lawAt} level={-28} />
       <Sfx name="el-pencil" at={roughAt} level={-35} />
       <Sfx name="el-whoosh" at={hundredAt - 2} level={-34} />
@@ -114,7 +123,7 @@ export const ZipfScene: React.FC = () => {
         </Svg>
         {ZIPF.top.map((row, i) => {
           const at = from + 10 + i * 4;
-          const top = TTOP + 54 + i * ROW;
+          const top = TTOP + 52 + i * ROW;
           const isTop = i < 2; // the two that almost tie
           const cell = (k: number, children: React.ReactNode, extra?: React.CSSProperties) => (
             <Ink at={at} dur={12} style={{ left: colX[k], top, width: COLS[k].w, textAlign: COLS[k].align, ...extra }}>
@@ -123,18 +132,63 @@ export const ZipfScene: React.FC = () => {
           );
           return (
             <React.Fragment key={row.word}>
-              {cell(0, <span style={{ ...note(26, INK_SOFT), ...TABULAR }}>{row.rank}</span>)}
-              {cell(1, <span style={{ ...note(28, INK), fontWeight: 600 }}>{row.word}</span>)}
+              {cell(0, <span style={{ ...note(25, INK_SOFT), ...TABULAR }}>{row.rank}</span>)}
+              {cell(1, <span style={{ ...note(26, INK), fontWeight: 600 }}>{row.word}</span>)}
               {cell(
                 2,
-                <span style={{ ...note(28, DATA_INK), ...TABULAR, fontWeight: 600 }}>
+                <span style={{ ...note(26, DATA_INK), ...TABULAR, fontWeight: 600 }}>
                   {isTop ? <Mark at={(i === 0 ? firstTwoAt : tieAt) - 2}>{fmt(row.count, 0)}</Mark> : fmt(row.count, 0)}
                 </span>,
               )}
             </React.Fragment>
           );
         })}
+        {/* What one over the rank expects of the second word, beside what it got. */}
+        <Ink at={halfAt - 2} dur={14} style={{ left: colX[2] + COLS[2].w + 22, top: TTOP + 52 + ROW + 3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>
+            law: ≈ <span style={TABULAR}>{fmt(ZIPF.secondByLaw, 0)}</span>
+          </span>
+        </Ink>
       </div>
+
+      {/* ── The same two facts on plain, linear bars: shares of the whole ── */}
+      {[
+        {
+          at: sixtyAt - 4,
+          top: BARS_TOP,
+          share: ZIPF.top100Share,
+          color: DATA,
+          text: (
+            <>
+              Emma&rsquo;s <span style={TABULAR}>{fmt(ZIPF.words, 0)}</span> words: the top 100 make{" "}
+              <span style={{ color: DATA_INK }}>{fmt(ZIPF.top100Share * 100, 0)}%</span>
+            </>
+          ),
+        },
+        {
+          at: fourAt - 2,
+          top: BARS_TOP + 64,
+          share: ZIPF.hapaxShare,
+          color: HIGHLIGHT,
+          text: (
+            <>
+              its <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span> different words:{" "}
+              <span style={{ color: INK }}>{fmt(ZIPF.hapaxShare * 100, 0)}%</span> appear once
+            </>
+          ),
+        },
+      ].map((b, i) => {
+        const p = ease(frame, b.at + 6, 22);
+        return (
+          <React.Fragment key={i}>
+            <Ink at={b.at} dur={14} style={{ left: TX0, top: b.top, whiteSpace: "nowrap" }}>
+              <span style={{ ...label(21, INK_SOFT), fontWeight: 600 }}>{b.text}</span>
+            </Ink>
+            <div style={{ position: "absolute", left: TX0, top: b.top + 30, width: BAR_W, height: 20, borderRadius: 4, background: LISTING_PAPER, border: `1px solid ${HAIRLINE}`, opacity: ease(frame, b.at, 10), boxSizing: "border-box" }} />
+            <div style={{ position: "absolute", left: TX0, top: b.top + 30, width: BAR_W * b.share * p, height: 20, borderRadius: 4, background: b.color, opacity: p > 0 ? 1 : 0 }} />
+          </React.Fragment>
+        );
+      })}
 
       {/* ── Fig. 3, every word on log scales ── */}
       <FigLabel n="3" title="Every word in the book, ranked, on log scales" at={rankAt - 4} x={CX0 - 70} y={y(290)} />
@@ -164,8 +218,8 @@ export const ZipfScene: React.FC = () => {
         <line
           x1={lx(lineFrom)}
           y1={ly(10 ** HI)}
-          x2={lx(lineFrom) + (lx(10000) - lx(lineFrom)) * guide}
-          y2={ly(10 ** HI) + (ly(ZIPF.lineC / 10000) - ly(10 ** HI)) * guide}
+          x2={lx(lineFrom) + (lx(guideTo) - lx(lineFrom)) * guide}
+          y2={ly(10 ** HI) + (ly(ZIPF.lineC / guideTo) - ly(10 ** HI)) * guide}
           stroke={INK_SOFT}
           strokeWidth={2}
           strokeDasharray="8 7"
@@ -201,19 +255,19 @@ export const ZipfScene: React.FC = () => {
         <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span>
       </Tag>
       <Tag x={(CX0 + CX1) / 2} y={CY1 + 46} at={rankAt + 4} align="center" size={20} weight={600}>
-        rank
+        rank, <Mark at={logAt}>log scale</Mark>
       </Tag>
       <Tag x={CX0 - 6} y={CY0 - 50} at={rankAt + 4} size={20} weight={600}>
-        times it appears
+        times it appears, <Mark at={logAt + 4}>log scale</Mark>
       </Tag>
-      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 66} at={overAt + 6} size={21} color={INK_SOFT} weight={600} style={{ background: PAPER }}>
+      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 66} at={lineAt + 6} size={21} color={INK_SOFT} weight={600} style={{ background: PAPER }}>
         one over the rank
       </Tag>
       <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 98} at={lawAt - 2} size={22} color={INK} weight={700} style={{ background: PAPER }}>
         Zipf's law
       </Tag>
       <Tag x={lx(1) + 18} y={ly(14)} at={sixtyAt - 4} size={22} color={DATA_INK} weight={650}>
-        top 100 words:
+        top 100 of <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span> words:
       </Tag>
       <Tag x={lx(1) + 18} y={ly(14) + 30} at={sixtyAt - 2} size={22} color={DATA_INK} weight={650}>
         {fmt(ZIPF.top100Share * 100, 0)}% of the book

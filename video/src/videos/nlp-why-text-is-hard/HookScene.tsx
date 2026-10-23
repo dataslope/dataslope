@@ -64,7 +64,9 @@ const Asked: React.FC<{ at: number; question: string; children: React.ReactNode 
  * its three questions under the words they are about, Fig. 2 is the same
  * sentence as a computer gets it (62 characters, one cell each), and Fig. 3
  * is what NLP makes of it: word_tokenize's 16 tokens, each set under the
- * characters it came from, the spaces gone.
+ * characters it came from, the spaces gone. The narration then reads Fig. 3
+ * as the answer to the opening question, marking the tokens each clause is
+ * about (can't in two, Dr. whole, the dollar sign alone).
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -84,7 +86,14 @@ export const HookScene: React.FC = () => {
   const nlpFrom = n.beat("nlp").from;
   const turnsAt = n.word("nlp", "turns");
   const structureAt = n.word("nlp", "structure", { nth: 1 });
-  const computeAt = n.word("nlp", "compute");
+  const sixteenAt = n.word("sixteen", "sixteen");
+  // The answer, read off Fig. 3: which tokens each clause is about.
+  const answerAt: Record<string, number> = {
+    ca: n.word("sixteen", "can't"),
+    "n't": n.word("sixteen", "can't") + 4,
+    "Dr.": n.word("sixteen", "Doctor"),
+    $: n.word("sixteen", "dollar sign"),
+  };
   const hardAt = n.word("ambig-in", "hard");
   const end = n.beat("ambiguity").from;
 
@@ -116,9 +125,12 @@ export const HookScene: React.FC = () => {
       ))}
       <Sfx name="el-whoosh" at={nlpFrom - 6} level={-35} />
       <Sfx name="el-sprinkle" at={chipAt(0)} level={-31} />
+      <Sfx name="el-tap" at={sixteenAt - 2} level={-29} />
 
       <Kicker at={hookFrom - 10}>Text is unstructured</Kicker>
       <Headline lead="How many words" turn="are in this sentence?" at={hookFrom - 6} turnAt={howAt + 6} out={nlpFrom - 10} />
+      {/* The definition gets a headline of its own while it is spoken. */}
+      <Headline lead="Natural language processing" at={nlpFrom - 4} out={turnsAt - 10} />
       <Headline lead="NLP turns text" turn="into structure." at={turnsAt - 4} turnAt={structureAt - 4} />
 
       {/* The string, a ribbon: it arrives with "flat string". */}
@@ -189,12 +201,12 @@ export const HookScene: React.FC = () => {
 
         {/* ── Fig. 3: what NLP makes of it ── */}
         <FigLabel n="3" title="Structure a program can compute with" at={structureAt - 8} x={X0} y={y(TOK_LABEL_Y)} />
-        <Count value={HOOK.tokens.length} unit="tokens" at={computeAt - 2} x={1920 - X0} y={y(TOK_LABEL_Y) - 2} align="right" size={26} />
+        <Count value={HOOK.tokens.length} unit="tokens" at={sixteenAt - 2} x={1920 - X0} y={y(TOK_LABEL_Y) - 2} align="right" size={26} />
         {HOOK.tokens.map((t, i) => {
           const { start, end: stop } = SPANS[i];
           const mid = STRIP_X + ((start + stop) / 2) * CELL;
           const w = chipWidth(t, CHIP_SIZE);
-          return <Chip key={i} text={t} x={mid - w / 2} y={y(TOK_Y)} at={chipAt(i)} size={CHIP_SIZE} />;
+          return <Chip key={i} text={t} x={mid - w / 2} y={y(TOK_Y)} at={chipAt(i)} size={CHIP_SIZE} hl={answerAt[t]} />;
         })}
         {/* Under the strip, a faint tick from each token's characters. */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, structureAt, 14) * (1 - ease(frame, hardAt, 20)) * 0.5 }}>

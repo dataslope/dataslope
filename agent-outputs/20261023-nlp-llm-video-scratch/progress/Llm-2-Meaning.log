@@ -9,3 +9,4 @@
 2026-10-23T08:26:11Z check:motion passed (longest still 2.5 s)
 2026-10-23T08:26:24Z check:mix: effects 25.5 LU under narration, peak -21.1 dBFS (logo), speech median 27.1 dB above
 2026-10-23T09:24:33Z final: check:frames and check:motion re-run after last layout edit, both pass; report written
+2026-10-23T10:04:03Z fix pass started (review: 2 P1, 9 P2, 9 P3)
