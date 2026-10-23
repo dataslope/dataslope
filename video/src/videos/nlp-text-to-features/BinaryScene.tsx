@@ -34,6 +34,7 @@ export const BinaryScene: React.FC = () => {
   // ── Cues ──
   const start = n.beat("binary").from;
   const whetherAt = n.word("binary", "whether");
+  const shortAt = n.word("binary", "short texts");
   const spamAt = n.word("binary-spam", "This spam");
   const freeAt = n.word("binary-spam", "free");
   const threeAt = n.word("binary-spam", "three times");
@@ -75,6 +76,13 @@ export const BinaryScene: React.FC = () => {
           return <Chip key={k} text={w} size={34} at={spamAt + k * 2} mark={i >= 0 ? (i === 0 ? freeAt : threeAt - 4 + i * 4) : undefined} />;
         })}
       </ChipRow>
+
+      {/* When presence is enough, in the lesson's words. */}
+      <Note at={shortAt - 2} x={1140} y={y(SPAM_Y) + 12}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          for <Mark at={shortAt}>short texts</Mark>, presence is enough: less swayed by length
+        </span>
+      </Note>
 
       <Note at={whetherAt + 4} x={X0} y={y(HEAD_ROW_Y) + 4}>
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the lesson’s vocabulary</span>

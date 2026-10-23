@@ -36,8 +36,12 @@ ids that sort in course order:
 | --- | --- |
 | `Statistics` | `Stats-1-ThinkingStatistically` to `Stats-9-StatisticsInPractice`. Unit 5 is `Stats-5-Sampling`, one video made of its five parts, `Stats-5-1-SamplingBias` to `Stats-5-5-StandardError`, which also render on their own |
 | `Database-Design` | `DbDesign-1-WhyDesign` to `DbDesign-9-RelationalHistory` |
-| `How-LLMs-Work` | `Llm-1-Tokens` to `Llm-5-Benchmarks`, narrated by Drew |
-| `NLP-Python` | `Nlp-1-WhyTextIsHard` to `Nlp-5-History`, narrated by Hope |
+| `How-LLMs-Work` | `Llm-1-Tokens` to `Llm-5-Benchmarks`, narrated by Drew, with two deep dives: `Llm-2-1-AttentionScore` (one attention score worked through) and `Llm-4-1-ConversationCost` (why a chat's bill grows faster than the chat) |
+| `NLP-Python` | `Nlp-1-WhyTextIsHard` to `Nlp-5-History`, narrated by Hope, with two deep dives: `Nlp-2-1-LemmasAndTags` (lemmatizing needs the part of speech) and `Nlp-3-1-ZipfsLaw` (Zipf's law read off a log-log plot) |
+
+A deep dive (`Llm-2-1-…`) is a two-minute video on one idea its unit could
+only sketch, embedded at one lesson section beside the unit video. It has no
+series intro and no "Next" line, and sits after its unit in the Studio folder.
 
 A course video's id is not its folder name (`Stats-2-DescribingData` lives in
 `src/videos/describing-data/`). The check scripts take either; `remotion

@@ -67,6 +67,7 @@ export const MenuScene: React.FC = () => {
   const rowsAt = n.word("unit", "rows of numbers");
   const learnAt = n.word("unit", "learn from");
   const menuAt = n.word("menu", "a menu");
+  const choiceAt = n.word("menu", "a choice");
   const recipeAt = n.word("menu", "recipe");
   const tokenizeAt = n.word("steps", "tokenize");
   const questionAt = n.word("steps", "a question");
@@ -168,7 +169,7 @@ export const MenuScene: React.FC = () => {
           </Card>
         </React.Fragment>
       ))}
-      <Spot id="toolbox" at={menuAt} left={1460} top={y(452)} width={340} height={340} />
+      <Spot id="toolbox" at={choiceAt - 2} left={1460} top={y(452)} width={340} height={340} />
 
       {/* ── The one question, the lesson's callout ── */}
       <Note at={testAt - 2} x={X0} y={y(TEST_Y) - 38}>
