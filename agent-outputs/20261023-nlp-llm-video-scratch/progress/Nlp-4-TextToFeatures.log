@@ -10,3 +10,4 @@
 07:55 check:frames pass with art (largest stretch 0.69, arrows 0.0 deg); typecheck clean; check:motion queued
 08:08 check:motion first run: 11 stills >=3 s; added cue motion (reading underline, chip swells, glows, step-backs); rerunning
 08:35 check:motion pass (longest still 2.8 s); then: lexicon fills page then steps aside, first flag row built during flag beat; re-checking
+08:51 check:mix done (effects 21.2 LU under, peak -21.1 dBFS logo, median speech-over-fx 25.1 dB); final motion+frames running

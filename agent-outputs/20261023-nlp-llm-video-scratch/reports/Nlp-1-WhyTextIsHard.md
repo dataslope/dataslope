@@ -4,7 +4,7 @@
 
 ## Length, voice
 
-- **Length:** 5:17.8 (317.8 s, 9,526 frames) from `npm run cues` on the voiced timeline. That is about 50 s over the 4.5-minute target; the cap was met on paper (estimate 4:34), but Hope reads this script at 129 words a minute, slower than the estimate's 147. No beats were cut after voicing, so no voiced character went to waste; cutting to 4.5 minutes would mean dropping about six beats.
+- **Length:** 5:17.5 (317.5 s, 9,526 frames) from `npm run cues` on the voiced timeline. That is about 48 s over the 4.5-minute target; the character cap was met, and the estimate timeline ran 4:36, but Hope reads this script at 129 words a minute, slower than the estimate's 147. No beats were cut after voicing, so no voiced character went to waste; cutting to 4.5 minutes would mean dropping about six beats.
 - **Characters voiced:** 3,863 of the 4,000 cap, in **3 takes** (1,409 + 1,709 + 745), each recorded once. Nothing re-voiced, no `--force`.
 
 ## Checks
@@ -15,10 +15,10 @@
 | eslint `src/videos/nlp-why-text-is-hard` | clean |
 | `check:cues` | clean for my folder (other folders' failures are theirs) |
 | `npm test` | 59/59 pass |
-| `check:frames` | PASS_FRAMES |
+| `check:frames` | pass on the voiced timeline: 4 images, largest stretch 0.91; 5 arrows, worst 4.5° under the head; every cue names its occurrence |
 | `check:sync` | pass, worst +0.06 s (`real`, 2:34.7); 49 beats |
-| `check:motion` | PASS_MOTION |
-| `check:mix` | PASS_MIX |
+| `check:motion` | pass: nothing still for 3 s; longest still 2.5 s (1:49.5, units/reasons); 9 stretches of 2 s or more, 19.8 s in all. The first run failed 6 stretches (up to 4.8 s); fixed with a highlighter that follows the string as it is read, a wave along the tokens, tags spread across their sentence, rows dimming on the turn, a highlight on "looks fine", and a cursor hopping between tokens to the end. Preview kept at `video/out/Nlp-1-WhyTextIsHard-preview.mp4` |
+| `check:mix` (informational) | effects 20.3 LU under the narration (-45.2 against -24.9 LUFS), effects peak -21.1 dBFS (the logo, 0:00.6); speech a median 23.4 dB above the effects where both sound, 5th percentile 10.4 dB. Closest moment 4:17.2, 5.9 dB: the `el-pop` (-31) as the conveyor lands under "cleaning"; left at the README's level |
 
 ## Scenes
 
@@ -62,4 +62,7 @@ The lemmatized row shows "running" unchanged (the lemmatizer reads every word as
 
 ## Left undone
 
-LEFT_UNDONE
+- Nothing required is left. Two notes for the coordinator:
+  - The video runs 5:18 against the 4.5-minute target (see Length).
+  - After the last `check:motion` run, one cosmetic edit removed the faint rule under the pipeline's last row (it doubled the code strip's top rule). It draws at the same moment as the three rules that remain, so the motion result stands; `check:frames` and `check:mix` ran on the final code. `check:sync` is unaffected (no audio or timing changed after it).
+- Nothing was committed or pushed by me (the coordinator's snapshot `5dc572e` already contains the final files).

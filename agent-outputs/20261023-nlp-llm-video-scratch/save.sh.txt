@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Commit and push the builders' current work plus fresh copies of their
+# reports and progress logs. Usage: save.sh "<commit subject>" ["<body>"]
+set -e
+S=/tmp/claude-0/-home-user-dataslope/2a3cc9a3-7547-5d18-88e1-2b54dd0db0d9/scratchpad
+D=/home/user/dataslope/agent-outputs/20261023-nlp-llm-video-scratch
+cp $S/reports/*.md $D/reports/ 2>/dev/null || true
+cp $S/progress/*.log $D/progress/ 2>/dev/null || true
+cd /home/user/dataslope
+P=""
+for f in llm-tokens llm-meaning llm-generation llm-cost llm-benchmarks nlp-why-text-is-hard nlp-cleaning-text nlp-counting-words nlp-text-to-features nlp-history; do
+  for d in video/src/videos/$f video/public/images/$f video/public/narration/$f video/takes/$f; do [ -e $d ] && P="$P $d"; done
+done
+git add -A $P agent-outputs/20261023-nlp-llm-video-state.md agent-outputs/20261023-nlp-llm-video-scratch
+if git diff --cached --quiet; then echo "nothing to commit"; exit 0; fi
+git diff --cached --stat | tail -1
+BODY="${2:-The latest files, reports and progress logs from the builders.}"
+git commit -q -F - <<MSG
+$1
+
+$BODY
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_011WWHFvWR4omEuyWqKc1KJG
+MSG
+for i in 1 2 3 4; do git push -q 2>&1 && break || sleep $((2**i)); done
+git log --oneline -1

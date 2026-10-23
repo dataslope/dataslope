@@ -34,6 +34,7 @@ export const ScoreScene: React.FC = () => {
   const { y, h } = useLayout();
   const start = n.beat("hook").from;
   const scoreAt = n.word("hook", "score");
+  const everyAt = n.word("hook", "every token");
   const logitAt = n.word("hook", "logit");
   const pickAt = n.word("hook", "pick one");
   const sentenceAt = n.word("logits", "sentence");
@@ -75,7 +76,7 @@ export const ScoreScene: React.FC = () => {
       {TOKENS.map((_, i) => (
         <Sfx key={i} name="el-tap" at={scoreAt + i * 4} level={-30} />
       ))}
-      <Sfx name="el-pop" at={pickAt - 4} level={-31} />
+      <Sfx name="el-pop" at={start} level={-31} />
       <Sfx name="el-pencil" at={softAt} level={-35} />
       <Sfx name="el-whoosh" at={dividesAt} level={-36} />
       {[0, 1, 2].map((k) => (
@@ -101,9 +102,9 @@ export const ScoreScene: React.FC = () => {
         />
       </Ink>
       {/* The picker: a jar of slips, sized by their odds. */}
-      <Spot id="llm-generation-jar" at={pickAt - 4} left={1590} top={y(70)} width={250} height={h(250)} />
+      <Spot id="llm-generation-jar" at={start} left={1590} top={y(70)} width={250} height={h(250)} />
 
-      <FigLabel n="1" title="A score for each candidate token, and what softmax makes of it" at={scoreAt - 6} x={X0} y={y(330)} />
+      <FigLabel n="1" title="A score for each candidate token, and what softmax makes of it" at={everyAt - 4} x={X0} y={y(330)} />
 
       {/* Column heads. */}
       <Ink at={logitAt - 2} dur={14} style={{ left: ZERO - 80, top: y(380) }}>
@@ -150,7 +151,7 @@ export const ScoreScene: React.FC = () => {
         const scoreMark = i === 0 ? catAt : i === TOKENS.length - 1 ? rockAt : undefined;
         return (
           <React.Fragment key={i}>
-            <Ink at={scoreAt - 6 + i * 4} dur={12} style={{ left: 160, top: rowMid(i) - 24, height: 48, display: "flex", alignItems: "center" }}>
+            <Ink at={everyAt + i * 4} dur={12} style={{ left: 160, top: rowMid(i) - 24, height: 48, display: "flex", alignItems: "center" }}>
               <Tok i={i} />
             </Ink>
             <Svg>

@@ -8,3 +8,5 @@
 07:16 check:sync passed (worst +0.06 s, real)
 08:16 check:motion passed (longest still 2.5 s)
 08:33 check:frames passed (voiced; stretch 0.91, arrows 4.5 deg)
+08:51 check:mix done (20.3 LU under)
+08:53 report written

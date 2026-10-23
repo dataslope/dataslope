@@ -8,3 +8,4 @@
 07:12 art batch stalled 1 h at 0/4: cancelled, generating with sync
 07:23 art imported (4 WebPs, all kept); check:mix 25.3 LU under
 08:09 check:frames passed with art (largest stretch 0.97); motion running
+08:49 check:motion: one 3.0 s still in the hook (fixed: jar and token names now arrive on the first words); re-running
