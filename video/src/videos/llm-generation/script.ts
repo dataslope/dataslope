@@ -242,6 +242,7 @@ export const script: NarrationScript = {
     },
     {
       id: "middle",
+      scene: true,
       text: "And the model doesn't read it all equally well. Facts at the start and the end come back reliably. The middle sags. It's called lost in the middle.",
       pauseAfter: 0.8,
     },

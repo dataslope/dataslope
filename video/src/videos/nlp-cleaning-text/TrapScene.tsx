@@ -144,6 +144,7 @@ export const TrapScene: React.FC = () => {
   const notGoodAt = n.word("kept", "not good");
   const meaningAt = n.word("kept", "meaning");
   const oneAt = n.word("stem-in", "One", { nth: 1 });
+  const leftAt = n.word("stem-in", "left");
   const endingsAt = n.word("stem-in", "endings");
 
   // ── Geometry ──
@@ -264,6 +265,7 @@ export const TrapScene: React.FC = () => {
           tone="good"
           toneAt={notGoodAt}
           marks={{ not: notGoodAt, good: notGoodAt + 4 }}
+          marksOut={leftAt}
         />
         <Tag at={meaningAt - 4} x={keptRow[keptRow.length - 1].right + 26} y={y(KEPT_Y) + 14} size={24} color={BLUE_INK}>
           the meaning made it through

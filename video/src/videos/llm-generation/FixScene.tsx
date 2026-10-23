@@ -6,7 +6,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, label, PAPER } 
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, GOOD, GOOD_INK, Headline, Kicker, Marked, Mono, pulse, Svg, tint, X0 } from "./kit";
+import { Drift, GOOD, GOOD_INK, Headline, Kicker, Marked, Mono, pulse, Spot, Svg, tint, X0 } from "./kit";
 
 const LEFT_W = 740;
 const RIGHT_X = 960;
@@ -47,7 +47,7 @@ const Badge: React.FC<{ kind: "yes" | "no" | number; at: number; x: number; y: n
 export const FixScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
   const start = n.beat("hedge").from;
   const hedgesAt = n.word("hedge-why", "more hedges");
   const landAt = n.word("hedge-why", "land");
@@ -111,6 +111,9 @@ export const FixScene: React.FC = () => {
           <div style={{ ...body(30, true), color: INK_SOFT }}>Nothing inside knows which answers are wrong.</div>
         </Note>
       </div>
+
+      {/* The parrot again, hedging away, until the fixes take its place. */}
+      <Spot id="llm-generation-parrot" at={start - 2} out={worksAt - 14} left={1380} top={y(300)} width={400} height={h(440)} />
 
       {/* Fig. 11: what reduces it, the lesson's four in its order. */}
       <FigLabel n="11" title="What reduces it" at={worksAt - 2} x={RIGHT_X} y={y(250)} />

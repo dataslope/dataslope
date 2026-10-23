@@ -183,6 +183,10 @@ export const QkvScene: React.FC = () => {
   const queryAt = n.word("query-vec", "query");
   const keyAt = n.word("key", "key");
   const valueAt = n.word("value", "value");
+  const handAt = n.word("value", "hand over");
+  const pickedAt = n.word("value", "picked");
+  const pronounsAt = n.word("scores", "pronoun's");
+  const scoresQueryAt = n.word("scores", "query");
   const comparedAt = n.word("scores", "compared");
   const everyKeyAt = n.word("scores", "every key");
   const scoreAt = n.word("scores", "score", { nth: 1 });
@@ -191,6 +195,8 @@ export const QkvScene: React.FC = () => {
   const oneAt = n.word("scores", "add up to one");
   const exampleAt = n.word("weights", "example");
   const sevenAt = n.word("weights", "point seven two");
+  const attnWordAt = n.word("weights", "attention");
+  const trophyWordAt = n.word("weights", "trophy");
 
   const cardAt = [queryAt, keyAt, valueAt];
   const top0 = y(410);
@@ -222,34 +228,44 @@ export const QkvScene: React.FC = () => {
       {QKV_CARDS.map((c, i) => (
         <Fade key={c.name} at={cardAt[i] - 4} style={{ left: X0, top: y(410 + i * 150), width: 680 }}>
           <div style={{ display: "flex", alignItems: "stretch", gap: 22 }}>
-            <div style={{ width: 8, borderRadius: 4, background: c.color }} />
+            <div style={{ width: 8 + (i === 0 ? 6 * pulse(frame, scoresQueryAt, 30) : 0), borderRadius: 4, background: c.color }} />
             <div>
               <div style={{ ...label(26, c.ink) }}>{c.name}</div>
-              <div style={{ ...body(34, true), color: INK, marginTop: 8, whiteSpace: "nowrap" }}>{c.ask}</div>
+              <div style={{ ...body(34, true), color: INK, marginTop: 8, whiteSpace: "nowrap" }}>
+                {i === 2 ? (
+                  <>
+                    What I <Mark at={handAt}>hand over</Mark> when I&apos;m <Mark at={pickedAt}>picked.</Mark>
+                  </>
+                ) : (
+                  c.ask
+                )}
+              </div>
             </div>
           </div>
         </Fade>
       ))}
 
       {/* ── Fig. 13: the lesson's weights from "it" ── */}
-      <FigLabel n="13" title="Attention from “it”, in the lesson's example" at={comparedAt - 4} x={W_X.tok} y={y(FIG_Y)} />
+      <FigLabel n="13" title="Attention from “it”, in the lesson's example" at={pronounsAt - 4} x={W_X.tok} y={y(FIG_Y)} />
       <Fade at={comparedAt - 2} style={{ left: 0, top: y(360), width: 1920 }}>
         <span style={{ position: "absolute", left: W_X.tok, ...label(21, INK_SOFT) }}>Token</span>
         <span style={{ position: "absolute", left: W_X.score, ...label(21, INK_SOFT), opacity: ease(frame, scoreAt - 2, 10) }}>Score</span>
         <span style={{ position: "absolute", left: W_X.bar, ...label(21, INK_SOFT), opacity: ease(frame, weightsAt - 2, 10) }}>Weight</span>
       </Fade>
       {WEIGHTS.tokens.map((t, i) => {
-        const p = ease(frame, comparedAt + i * 2, 12);
+        const isIt = i === itRow;
+        const p = isIt ? ease(frame, pronounsAt, 12) : ease(frame, comparedAt + i * 2, 12);
         if (p <= 0) return null;
         const top = top0 + i * W_ROW;
-        const isIt = i === itRow;
         const isTrophy = t === "trophy";
         const keyMark = isIt ? 0 : ease(frame, everyKeyAt - 2 + i * 2, 10);
         const g = grow(i);
         const w = WEIGHTS.weights[i];
         const hot = isTrophy ? ease(frame, sevenAt - 2, 10) : 0;
+        const glow = isTrophy ? pulse(frame, attnWordAt, 30) : 0;
+        const back = isTrophy ? 0 : ease(frame, trophyWordAt, 14) * 0.6;
         return (
-          <div key={t} style={{ position: "absolute", left: 0, top, width: 1920, height: W_ROW, opacity: p }}>
+          <div key={t} style={{ position: "absolute", left: 0, top, width: 1920, height: W_ROW, opacity: p * (1 - back) }}>
             <div style={{ position: "absolute", left: W_X.tok, top: 4 }}>
               <TokenChip text={t} size={23} border={isIt ? QUERY : keyMark > 0.5 ? KEY : INK} color={isIt ? QUERY_INK : INK} />
             </div>
@@ -274,9 +290,9 @@ export const QkvScene: React.FC = () => {
                   style={{
                     position: "absolute",
                     left: W_X.bar,
-                    top: 12,
+                    top: 12 - 5 * glow,
                     width: Math.max(2, w * BAR_PX * g),
-                    height: 30,
+                    height: 30 + 10 * glow,
                     background: hot > 0 ? `color-mix(in srgb, ${POINT} ${Math.round(hot * 100)}%, ${DATA})` : DATA,
                     borderRadius: 3,
                   }}
@@ -375,6 +391,10 @@ export const BlendScene: React.FC = () => {
   const suitcaseAt = n.word("flip", "suitcase");
   const followsAt = n.word("flip", "follows");
   const differentAt = n.word("flip", "different", { nth: 1 });
+  const dotTrophyAt = n.word("dot", "trophy");
+  const blendPronounsAt = n.word("blend", "pronoun's");
+  const flipQuestionAt = n.word("flip", "question");
+  const answerAt = n.word("flip", "answer");
 
   const A = QKV.trophy;
   const B = QKV.suitcase;
@@ -418,7 +438,12 @@ export const BlendScene: React.FC = () => {
         <span style={{ ...label(24, QUERY_INK) }}>
           Query, from <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
         </span>
-        <span style={{ borderRadius: 8, boxShadow: `0 0 0 ${4 * pulse(frame, swapQ, 26)}px color-mix(in srgb, ${POINT} 40%, transparent)` }}>
+        <span
+          style={{
+            borderRadius: 8,
+            boxShadow: `0 0 0 ${5 * (pulse(frame, swapQ, 26) + pulse(frame, queryAt, 26) + pulse(frame, flipQuestionAt, 26))}px color-mix(in srgb, ${POINT} 40%, transparent)`,
+          }}
+        >
           <VectorCells values={frame < swapQ + 5 ? A.query : B.query} size={26} border={QUERY} fill={PAPER} />
         </span>
         <span style={{ opacity: ease(frame, swapQ + 4, 10), ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>pointed at suitcase</span>
@@ -452,7 +477,15 @@ export const BlendScene: React.FC = () => {
             <span style={{ position: "absolute", left: T_X.score, top: 14 }}>
               <Swap a={A.scores[i]} b={B.scores[i]} at={scoreAt + i * 4} swapAt={swapS + i * 3} />
             </span>
-            <span style={{ position: "absolute", left: T_X.weight, top: 14 }}>
+            <span
+              style={{
+                position: "absolute",
+                left: T_X.weight,
+                top: 14,
+                borderRadius: 6,
+                boxShadow: i === 0 ? `0 0 0 ${5 * pulse(frame, dotTrophyAt, 30)}px color-mix(in srgb, ${POINT} 35%, transparent)` : undefined,
+              }}
+            >
               <Swap a={A.weights[i]} b={B.weights[i]} at={weightsAt + 4 + i * 4} swapAt={swapW + i * 3} color={weightHot > 0.5 ? POINT_INK : INK} />
             </span>
           </div>
@@ -470,8 +503,8 @@ export const BlendScene: React.FC = () => {
       </Note>
 
       {/* ── Fig. 15: the blend, in the plane of the values ── */}
-      <FigLabel n="15" title="The new vector, a blend of the values" at={valuesAt - 6} x={1100} y={y(FIG_Y)} />
-      <Svg opacity={ease(frame, valuesAt - 4, 14)}>
+      <FigLabel n="15" title="The new vector, a blend of the values" at={blendPronounsAt - 4} x={1100} y={y(FIG_Y)} />
+      <Svg opacity={ease(frame, blendPronounsAt - 2, 14)}>
         <line x1={PX0} x2={PX0 + 10.6 * PU} y1={PY0} y2={PY0} stroke={LINE} strokeWidth={1.6} />
         <line x1={PX0} x2={PX0} y1={PY0} y2={PY0 - 10.6 * PU} stroke={LINE} strokeWidth={1.6} />
         <line x1={PX0} y1={PY0} x2={PX0 + 10 * PU} y2={PY0 - 10 * PU} stroke={FAINT} strokeWidth={1.4} strokeDasharray="5 7" />
@@ -510,6 +543,9 @@ export const BlendScene: React.FC = () => {
           const [vx, vy] = P(v);
           return <circle key={i} cx={vx} cy={vy} r={11} fill={VALUE} />;
         })}
+        {blendP > 0 && pulse(frame, answerAt, 30) > 0 ? (
+          <circle cx={ox} cy={oy} r={18 + 18 * pulse(frame, answerAt, 30)} fill="none" stroke={POINT} strokeWidth={2.6} opacity={pulse(frame, answerAt, 30)} />
+        ) : null}
         {blendP > 0 ? <circle cx={ox} cy={oy} r={13 + 5 * pulse(frame, towardAt, 24)} fill={POINT} /> : null}
       </Svg>
       {QKV.tokens.map((t, i) => {
@@ -596,7 +632,9 @@ export const HeadsScene: React.FC = () => {
   const hundredAt = n.word("square", "hundred");
   const doubleAt = n.word("square", "Double");
   const fourAt = n.word("square", "four");
-  const piecesAt = n.word("attn-in", "pieces");
+  const workAt = n.word("square", "work");
+  const soAt = n.word("attn-in", "So");
+  const putAt = n.word("attn-in", "put");
 
   // Fig. 16: four heads across, four layers up.
   const HX = X0 + 40;
@@ -638,7 +676,7 @@ export const HeadsScene: React.FC = () => {
             <HeadBox
               key={`${r}-${c}`}
               x={HX + c * (HW + GAP)}
-              y={baseY - HH - r * (HH + GAP) - 10 * pulse(frame, piecesAt + (3 - r) * 4 + c * 2, 22)}
+              y={baseY - HH - r * (HH + GAP) - 10 * pulse(frame, putAt + (3 - r) * 4 + c * 2, 22)}
               kind={c}
               at={layerAt(r) + c * 4}
               w={HW}
@@ -662,7 +700,7 @@ export const HeadsScene: React.FC = () => {
 
       {/* ── Fig. 17: every token against every other ── */}
       <FigLabel n="17" title="Every token scores every other one" at={everyAt - 4} x={GX} y={y(FIG_Y)} />
-      <Svg opacity={ease(frame, everyAt - 2, 12)}>
+      <Svg opacity={ease(frame, everyAt - 2, 12) * (1 - 0.5 * ease(frame, soAt, 16))}>
         {Array.from({ length: big.n * big.n }, (_, k) => {
           const r = Math.floor(k / big.n);
           const c = k % big.n;
@@ -692,7 +730,9 @@ export const HeadsScene: React.FC = () => {
       </div>
       <div style={{ position: "absolute", left: GX + big.n * CELL + 24, top: GY + big.n * CELL - 70, opacity: ease(frame, fourAt - 2, 10) }}>
         <div style={{ ...note(28, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{big.n} tokens:</div>
-        <div style={{ ...note(28, POINT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{big.scores} scores</div>
+        <div style={{ ...note(28, POINT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
+          <Mark at={workAt}>{big.scores} scores</Mark>
+        </div>
       </div>
     </AbsoluteFill>
   );

@@ -58,7 +58,7 @@ export const CloseScene: React.FC = () => {
       <Headline at={from - 6} second={outlivesAt - 4} italic="It outlives every model.">
         Build it once.
       </Headline>
-      <Spot id="llm-benchmarks-measure" at={onceAt - 6} left={1180} top={y(330)} width={600} height={400} />
+      <Spot id="llm-benchmarks-measure" at={onceAt - 6} left={1160} top={y(430)} width={620} height={360} />
 
       <Drift from={from} to={n.durationInFrames} amount={0.014} origin="30% 60%">
         {/* The harness's models come and go: the next launch, and its table, struck. */}

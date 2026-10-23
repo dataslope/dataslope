@@ -29,6 +29,7 @@ export const SaturationScene: React.FC = () => {
   // ── Cues ──
   const from = n.beat("saturation").from;
   const topAt = n.word("saturation", "top");
+  const everyoneAt = n.word("saturation", "everyone");
   const apartAt = n.word("saturation", "apart");
   const frontierAt = n.word("sat-now", "frontier");
   const ninetyTwoAt = n.word("sat-now", "ninety-two");
@@ -82,6 +83,22 @@ export const SaturationScene: React.FC = () => {
                 {v}
               </text>
             </g>
+          ))}
+        </Svg>
+
+        {/* Each row's empty track, 0 to 100, as "everyone scores" is said. */}
+        <Svg>
+          {[ROWS.mmlu, ROWS.gpqa, ROWS.hle].map((r, i) => (
+            <rect
+              key={r}
+              x={BX0}
+              y={ry(r) - BAR_H / 2}
+              width={(BX1 - BX0) * ease(frame, everyoneAt - 4 + i * 5, 18)}
+              height={BAR_H}
+              rx={3}
+              fill={FAINT}
+              opacity={0.55}
+            />
           ))}
         </Svg>
 

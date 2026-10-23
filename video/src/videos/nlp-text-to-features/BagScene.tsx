@@ -7,12 +7,12 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BOW } from "./data";
-import { Chip, FIG_Y, Headline, INK, INK_SOFT, Kicker, lerp, Mark, NumCell, pulse, Spot, X0 } from "./parts";
+import { Chip, ChipRow, FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, NumCell, pulse, Spot, X0 } from "./parts";
 
 /** Fig. 6, right: one document into the bag. */
 const BAG_X = 1180;
-const CHIPS_Y = 340;
-const BAG = { left: 1270, top: 400, size: 320 };
+const CHIPS_Y = 328;
+const BAG = { left: 1260, top: 380, size: 350 };
 const TALLY_Y = 790;
 /** Fig. 7, left: the three documents and their matrix. */
 const DOC_Y0 = 338;
@@ -29,8 +29,8 @@ const DTM_NOTE_Y = 818;
 const DOC = BOW.docs[0];
 const SIZE = 26;
 /** A chip's width as Chip estimates it, so the row can be laid out by hand. */
-const chipW = (w: string) => (w.length * 0.56 + 1.4) * SIZE + 4;
-const CHIP_X = DOC.reduce<number[]>((xs, w, k) => [...xs, k === 0 ? BAG_X : xs[k - 1] + chipW(DOC[k - 1]) + 11], []);
+const chipW = (w: string) => (w.length * 0.5 + 0.84) * SIZE + 3;
+const CHIP_X = DOC.reduce<number[]>((xs, w, k) => [...xs, k === 0 ? BAG_X : xs[k - 1] + chipW(DOC[k - 1]) + 0.42 * SIZE], []);
 /** Doc 1's tally: each distinct word and its count, in the vocabulary's order. */
 const TALLY = BOW.vocab.map((w, j) => ({ w, c: BOW.rows[0][j] })).filter((t) => t.c > 0);
 const MAX = Math.max(...BOW.rows.flat());
@@ -102,25 +102,27 @@ export const BagScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, transform: `rotate(${shake}deg)`, transformOrigin: `${mouth[0]}px ${mouth[1] + 120}px` }}>
         <Spot id="bag" at={bagAt} left={BAG.left} top={y(BAG.top)} width={BAG.size} height={h(BAG.size)} />
       </div>
-      {DOC.map((w, k) => {
-        const p = into(k);
-        const x = lerp(CHIP_X[k], mouth[0] - chipW(w) / 2, p);
-        const top = lerp(y(CHIPS_Y), mouth[1] - 20, p);
-        return (
-          <div
-            key={k}
-            style={{
-              position: "absolute",
-              left: x,
-              top,
-              transform: `scale(${1 - 0.6 * p}) rotate(${p * (k % 2 ? 24 : -18)}deg)`,
-              opacity: 1 - ease(frame, tipAt + 12 + k * 2, 8),
-            }}
-          >
-            <Chip text={w} size={SIZE} at={start + 2 + k * 2} />
-          </div>
-        );
-      })}
+      <ChipRow x={BAG_X} y={y(CHIPS_Y)}>
+        {DOC.map((w, k) => {
+          const p = into(k);
+          // Each chip heads for the bag's mouth from wherever the row put it;
+          // its own centre is estimated, which only moves where it vanishes.
+          const dx = (mouth[0] - (CHIP_X[k] + chipW(w) / 2)) * p;
+          const dy = (mouth[1] - (y(CHIPS_Y) + 20)) * p;
+          return (
+            <span
+              key={k}
+              style={{
+                display: "inline-flex",
+                transform: `translate(${dx}px, ${dy}px) scale(${1 - 0.6 * p}) rotate(${p * (k % 2 ? 24 : -18)}deg)`,
+                opacity: 1 - ease(frame, tipAt + 12 + k * 2, 8),
+              }}
+            >
+              <Chip text={w} size={SIZE} at={start + 2 + k * 2} />
+            </span>
+          );
+        })}
+      </ChipRow>
       <Note at={whichAt - 4} x={BAG_X} y={y(TALLY_Y) - 40}>
         <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>What the bag keeps</span>
       </Note>

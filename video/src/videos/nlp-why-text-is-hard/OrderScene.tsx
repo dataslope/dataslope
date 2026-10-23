@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { ORDER, STOPWORDS } from "./data";
-import { BAD_INK, Chip, chipWidth, FIG_Y, GOOD_INK, Headline, Kicker, Mark, X0 } from "./parts";
+import { BAD_INK, Chip, chipHeight, chipWidth, FIG_Y, GOOD_INK, Headline, Kicker, Mark, X0 } from "./parts";
 
 const SIZE = 30;
 const GAP = 14;
@@ -21,6 +21,10 @@ const CARD_X = 1290;
 const COL_W = ORDER.tokens.map((t) => chipWidth(t, SIZE));
 const COL_XS = COL_W.map((_, c) => COL_X0 + COL_W.slice(0, c).reduce((a, b) => a + b + GAP, 0));
 const ROW_RIGHT = COL_XS[COL_XS.length - 1] + COL_W[COL_W.length - 1];
+/** The gaps between the input's tokens, where the closing cursor stops. */
+const GAPS = COL_XS.slice(0, -1).map((x, c) => x + COL_W[c] + GAP / 2);
+/** Frames the cursor rests in each gap. */
+const HOP = 14;
 /** Words measure.py confirmed are on NLTK's list (and that "The" and "THE"
  *  are not). */
 const LISTED = Object.entries(STOPWORDS.has)
@@ -37,8 +41,10 @@ const ChipLine: React.FC<{
   strikeAt?: (c: number) => number | undefined;
   bad?: (c: number) => number | undefined;
   good?: number;
-  hl?: number;
-}> = ({ row, top, at, strikeAt, bad, good, hl }) => (
+  hl?: (i: number) => number | undefined;
+  hlOut?: number;
+  flash?: (c: number) => number | undefined;
+}> = ({ row, top, at, strikeAt, bad, good, hl, hlOut, flash }) => (
   <>
     {row.cols.map((c, i) => {
       const w = chipWidth(row.tokens[i], SIZE);
@@ -53,7 +59,9 @@ const ChipLine: React.FC<{
           strike={strikeAt?.(c)}
           bad={bad?.(c)}
           good={good}
-          hl={hl}
+          hl={hl?.(i)}
+          hlOut={hlOut}
+          flash={flash?.(c)}
         />
       );
     })}
@@ -61,11 +69,11 @@ const ChipLine: React.FC<{
 );
 
 /** A row's name at the left: the lane's letter, then the step. */
-const RowName: React.FC<{ lane?: string; text: string; at: number; top: number }> = ({ lane, text, at, top }) => (
+const RowName: React.FC<{ lane?: string; text: string; at: number; top: number; markAt?: number }> = ({ lane, text, at, top, markAt }) => (
   <Ink at={at} dur={14} style={{ left: X0, top: top + 10, whiteSpace: "nowrap" }}>
     <span style={{ ...label(24, INK), fontWeight: 600 }}>
       {lane ? <span style={{ fontWeight: 800, marginRight: 10 }}>{lane}</span> : <span style={{ display: "inline-block", width: 27 }} />}
-      {text}
+      {markAt === undefined ? text : <Mark at={markAt}>{text}</Mark>}
     </span>
   </Ink>
 );
@@ -99,7 +107,10 @@ export const OrderScene: React.FC = () => {
   const crashedAt = n.word("silent", "Nothing crashed");
   const wrongAt = n.word("silent", "wrong");
   const silentAt = n.word("silent", "silent");
+  const fineAt = n.word("silent", "looks fine");
+  const stepsAt = n.word("next", "these steps");
   const tokensAt = n.word("next", "tokens");
+  const endsAt = n.word("next", "word ends");
   const decidingAt = n.word("next", "deciding");
 
   const top = (v: number) => y(v);
@@ -176,23 +187,26 @@ export const OrderScene: React.FC = () => {
       ) : null}
 
       {/* ── Order A: lowercase, then filter ── */}
-      <RowName lane="A" text="lowercase" at={aLowerAt - 4} top={top(ROW_Y.a1)} />
+      <RowName lane="A" text="lowercase" at={aLowerAt - 4} top={top(ROW_Y.a1)} markAt={stepsAt} />
       <ChipLine row={ORDER.a.lowered} top={top(ROW_Y.a1)} at={aLowerAt} strikeAt={(c) => (isStop(c) ? goneAt - 8 + c * 2 : undefined)} />
-      <RowName text="then filter" at={aRemoveAt - 4} top={top(ROW_Y.a2)} />
+      <RowName text="then filter" at={aRemoveAt - 4} top={top(ROW_Y.a2)} markAt={stepsAt + 4} />
       <ChipLine row={ORDER.a.filtered} top={top(ROW_Y.a2)} at={goneAt + 2} good={endNearAt} />
       <Ink at={endNearAt + 2} dur={14} style={{ left: ROW_RIGHT + 40, top: top(ROW_Y.a2) + 8, whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: GOOD_INK }}>every the is gone</span>
       </Ink>
 
       {/* ── Order B: filter, then lowercase ── */}
-      <RowName lane="B" text="filter" at={bRemoveAt - 4} top={top(ROW_Y.b1)} />
+      <RowName lane="B" text="filter" at={bRemoveAt - 4} top={top(ROW_Y.b1)} markAt={stepsAt + 8} />
       <ChipLine row={ORDER.b.filtered} top={top(ROW_Y.b1)} at={bRemoveAt + 2} bad={(c) => (theCols.includes(c) ? slipAt + theCols.indexOf(c) * 3 : undefined)} />
-      <RowName text="then lowercase" at={listAt - 4} top={top(ROW_Y.b2)} />
+      <RowName text="then lowercase" at={listAt - 4} top={top(ROW_Y.b2)} markAt={stepsAt + 12} />
       <ChipLine
         row={ORDER.b.lowered}
         top={top(ROW_Y.b2)}
         at={noneAt - 10}
         bad={(c) => (theCols.includes(c) ? noneAt + 6 + theCols.indexOf(c) * 3 : undefined)}
+        hl={(i) => fineAt - 2 + i * 3}
+        hlOut={wrongAt + 6}
+        flash={(c) => (theCols.includes(c) ? wrongAt + theCols.indexOf(c) * 3 : undefined)}
       />
       <Ink at={crashedAt - 2} dur={14} style={{ left: ROW_RIGHT + 40, top: top(ROW_Y.b2) + 8, whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: BAD_INK }}>
@@ -203,6 +217,22 @@ export const OrderScene: React.FC = () => {
         <span style={{ ...note(22, INK_SOFT) }}>order bugs are silent</span>
       </Ink>
 
+      {/* "Where one word ends": a cursor hops from gap to gap along the
+          tokens, to the end of the video. */}
+      {frame >= endsAt ? (
+        <div
+          style={{
+            position: "absolute",
+            left: GAPS[Math.floor((frame - endsAt) / HOP) % GAPS.length] - 1.5,
+            top: top(IN_Y) - 6,
+            width: 3,
+            height: chipHeight(SIZE) + 12,
+            background: INK,
+            borderRadius: 2,
+            opacity: ease(frame, endsAt, 6),
+          }}
+        />
+      ) : null}
       <NextLine at={decidingAt - 4} x={X0} y={top(NEXT_Y)} width={1680}>
         cutting text into tokens
       </NextLine>

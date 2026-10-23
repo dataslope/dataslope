@@ -2,14 +2,14 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { BIGRAM, SHANNON_PAPER, SHANNON_SAMPLE } from "./data";
-import { DATA, DATA_INK, Headline, InlineArrow, Kicker, lerp, Mark, pulse, SOFT, Spot, Svg, Tick } from "./parts";
+import { DATA, DATA_INK, Headline, InlineArrow, Kicker, lerp, Mark, pulse, SOFT, Spot, Svg, Tick, Wire } from "./parts";
 
 /** The paper's first page: the journal and the month, the title, the author,
  *  then lines of text setting themselves one after another. */
@@ -132,6 +132,9 @@ export const ShannonScene: React.FC = () => {
   const guessAt = n.word("guess", "guess the next word");
   const beforeAt = n.word("guess", "the one before");
   const howOftenAt = n.word("guess", "how often");
+  const followsAt = n.word("guess", "follows another");
+  const bookFrom = n.beat("book").from;
+  const handAt = n.word("book", "by hand");
   const openAt = n.word("book", "open a book");
   const findAt = n.word("book", "find the word");
   const copyAt = n.word("book", "copy");
@@ -150,6 +153,7 @@ export const ShannonScene: React.FC = () => {
   const todayAt = n.word("ngram", "Today's language models");
   const countsAt = n.word("ngram", "far more than counts");
   const butAt = n.word("shannon-out", "But");
+  const conversationAt = n.word("shannon-out", "conversation");
 
   // ── Part A: the paper, then the book and the sample ──
   const SX = 640;
@@ -158,7 +162,7 @@ export const ShannonScene: React.FC = () => {
   const sampleOut = demoAt - 6;
   // Words 1 and 2 on "guess"; 3 to 10 one per step of the method; the rest
   // typed out once the sample is introduced.
-  const steps = [findAt, copyAt, lerp(copyAt, repeatAt, 0.5), repeatAt, repeatAt + 8, repeatAt + 16, repeatAt + 24, repeatAt + 32];
+  const steps = [openAt + 6, findAt, copyAt, lerp(copyAt, repeatAt, 0.5), repeatAt, repeatAt + 8, repeatAt + 16, repeatAt + 24];
   const wordAt = (i: number) => {
     if (i === 0) return beforeAt - 4;
     if (i === 1) return howOftenAt;
@@ -166,6 +170,8 @@ export const ShannonScene: React.FC = () => {
     return cameAt + 2 + (i - 10) * 2;
   };
   const SHOWN = 22;
+  /** JetBrains Mono's advance at the sample's 34px. */
+  const CHAR = 34 * 0.6;
   const read = SHANNON_SAMPLE.slice(0, 10).join(" ");
   const rest = SHANNON_SAMPLE.slice(10, SHOWN);
 
@@ -191,7 +197,8 @@ export const ShannonScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound ── */}
       <Sfx name="el-whoosh" at={from - 4} level={-34} />
-      <Sfx name="el-pop" at={openAt - 4} level={-30} />
+      <Sfx name="el-pop" at={handAt - 4} level={-30} />
+      <Sfx name="el-pencil" at={followsAt - 2} level={-35} />
       {steps.map((s, i) => (
         <Sfx key={i} name="el-tap" at={s} level={-31} />
       ))}
@@ -206,11 +213,12 @@ export const ShannonScene: React.FC = () => {
       <Kicker at={from - 6}>1948: Claude Shannon</Kicker>
       <Headline at={from + 2} lead="The paper that founded" turn="information theory." turnAt={from + 12} out={guessAt - 8} />
       <Headline at={guessAt - 2} lead="Guess the next word" turn="from the one before." turnAt={beforeAt - 2} out={ngramAt - 6} />
-      <Headline at={ngramAt - 2} lead="Count what follows:" turn="an n-gram model." turnAt={ngramAt + 6} />
+      <Headline at={ngramAt - 2} lead="Count what follows:" turn="an n-gram model." turnAt={ngramAt + 6} out={butAt - 6} />
+      <Headline at={butAt - 2} lead="Could it ever" turn="hold a conversation?" turnAt={conversationAt - 8} />
 
       {/* ── The paper, then the book ── */}
-      <PaperPage x={96} top={y(330)} width={470} height={500} at={from - 4} markAt={theoryAt - 2} out={openAt - 8} />
-      <Spot id="book" at={openAt - 4} out={sampleOut} left={110} top={y(430)} width={440} height={347} />
+      <PaperPage x={96} top={y(330)} width={470} height={500} at={from - 4} markAt={theoryAt - 2} out={bookFrom - 2} />
+      <Spot id="book" at={handAt - 4} out={sampleOut} left={110} top={y(430)} width={440} height={347} />
 
       {/* ── Fig. 4, Shannon's sample, word by word ── */}
       <FigLabel n="4" title="Shannon's sample, one word at a time, 1948" at={beforeAt - 6} x={SX} y={y(290)} out={sampleOut} />
@@ -243,6 +251,20 @@ export const ShannonScene: React.FC = () => {
           <span style={{ opacity: ease(frame, wordAt(SHOWN), 6), color: INK_SOFT }}>…</span>
         </span>
       </div>
+      {/* HEAD follows THE: a hook from the one word to the next, gone once the rest arrives. */}
+      <Wire
+        points={[
+          [SX + 1.5 * CHAR, STOP + 50],
+          [SX + 1.5 * CHAR, STOP + 70],
+          [SX + 6 * CHAR, STOP + 70],
+          [SX + 6 * CHAR, STOP + 48],
+        ]}
+        at={followsAt - 2}
+        dur={16}
+        out={cameAt}
+        color={ACCENT}
+        width={2.4}
+      />
       <Ink at={englishAt - 2} out={sampleOut} style={{ left: SX, top: y(720), whiteSpace: "nowrap" }}>
         <div style={{ ...headline(42, true), color: INK }}>
           Reads like English, <span style={{ color: ACCENT_INK }}>says nothing.</span>

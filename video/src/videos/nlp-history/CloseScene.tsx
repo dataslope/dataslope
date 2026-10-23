@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, headline, INK, INK_SOFT, label, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -35,6 +35,7 @@ const PLACE: Record<string, { tier: number; side: "left" | "right" }> = {
 export const CloseScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
+  const { durationInFrames } = n;
   const { y } = useLayout();
 
   // ── Cues ──
@@ -54,6 +55,7 @@ export const CloseScene: React.FC = () => {
   const fluentAt = n.word("warnings", "fluent text");
   const groundAt = n.word("end", "ground");
   const soAt = n.word("end", "So");
+  const behindAt = n.word("end", "left behind");
 
   const AXIS = y(560);
   const tierTop = (tier: number) => AXIS - 22 - tier * 44;
@@ -77,6 +79,13 @@ export const CloseScene: React.FC = () => {
   const LIST = y(680);
   const ROW = 56;
   const hold = drift(frame, soAt, 1, 200);
+  // A light runs the counting thread from Zipf to today under the last line,
+  // and each story's dot swells as it passes.
+  const runFrom = soAt;
+  const runTo = durationInFrames - 24;
+  const run = Math.min(1, Math.max(0, (frame - runFrom) / (runTo - runFrom)));
+  const runX = tx(storyYear("zipf")) + (tx(NOW) - tx(storyYear("zipf"))) * run;
+  const passing = (year: number) => (frame < runFrom ? 0 : Math.max(0, 1 - Math.abs(runX - tx(year)) / 34) * 0.9);
 
   return (
     <AbsoluteFill>
@@ -92,7 +101,8 @@ export const CloseScene: React.FC = () => {
       ))}
       <Sfx name="el-chime" at={n.beat("end").to + 8} level={-32} />
 
-      <Headline at={keptAt - 6} lead="Each idea kept" turn="the one beneath it." turnAt={beneathAt - 6} out={groundAt - 8} />
+      <Headline at={keptAt - 6} lead="Each idea kept" turn="the one beneath it." turnAt={beneathAt - 6} out={soAt - 6} />
+      <Headline at={soAt - 2} lead="Not a stage" turn="the field left behind." turnAt={behindAt - 8} out={groundAt - 8} />
       <Headline at={groundAt - 4} lead="The ground" turn="everything since is built on." turnAt={groundAt + 8} size={68} />
 
       <div style={{ transform: `translateY(${-hold * 6}px)` }}>
@@ -111,6 +121,9 @@ export const CloseScene: React.FC = () => {
             opacity={thread > 0 ? 0.85 : 0}
           />
         </Svg>
+        <Svg opacity={frame >= runFrom ? ease(frame, runFrom, 10) * (1 - ease(frame, runTo, 12)) : 0}>
+          <circle cx={runX} cy={AXIS} r={16} fill={HIGHLIGHT} />
+        </Svg>
         {STORIES.map((s, i) => {
           const place = PLACE[s.id];
           const top = tierTop(place.tier);
@@ -122,7 +135,7 @@ export const CloseScene: React.FC = () => {
           return (
             <React.Fragment key={s.id}>
               <Stem year={s.year} from={AXIS - 10} to={top + 30} at={at + 2} />
-              <YearDot year={s.year} y={AXIS} at={at} color={color} swell={swellOf(s.id)} />
+              <YearDot year={s.year} y={AXIS} at={at} color={color} swell={swellOf(s.id) + passing(s.year)} />
               <Ink
                 at={at + 4}
                 dur={14}

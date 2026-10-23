@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, INK, INK_SOFT, label } from "../../editorial/style";
+import { body, HAIRLINE, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -50,7 +50,11 @@ export const MessScene: React.FC = () => {
   const splitAt = n.word("split-in", "split");
 
   const row = (i: number) => y(ROW_Y[i]);
-  const tagAt = (i: number) => reasonAt + i * 5;
+  const existsAt = n.word("reasons", "exists");
+  // The tags arrive one by one across the sentence that explains them.
+  const tagAt = (i: number) => reasonAt - 4 + (i * (existsAt + 10 - reasonAt)) / 4;
+  // As the narration turns to splitting, the rows it is not about step back.
+  const back = ease(frame, splitAt - 2, 18);
   const TAGS = ["tokenizing", "tokenizing", "lowercasing", "stemming, lemmatizing", "n-grams"];
   const NAMES = [
     { name: "Contractions", at: from - 2 },
@@ -198,6 +202,17 @@ export const MessScene: React.FC = () => {
           </span>
         </Ink>
       ))}
+      <div
+        style={{
+          position: "absolute",
+          left: X0 - 10,
+          top: row(2) - 30,
+          width: 1720,
+          height: row(4) - row(2) + 96,
+          background: PAPER,
+          opacity: 0.6 * back,
+        }}
+      />
     </AbsoluteFill>
   );
 };

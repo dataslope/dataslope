@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, label } from "../../editorial/style";
@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { SPLIT } from "./data";
-import { BAD_INK, Chip, chipHeight, chipWidth, CodeStrip, Count, Drift, FIG_Y, Headline, Kicker, Svg, X0 } from "./parts";
+import { ADVANCE, BAD_INK, Chip, chipHeight, chipWidth, CodeStrip, Count, Drift, FIG_Y, Headline, Kicker, MARK, pulse, Svg, X0 } from "./parts";
 
 const SIZE = 30;
 const GAP = 22;
@@ -48,6 +48,8 @@ const TOK_XS = (() => {
 })();
 const pieceX = (i: number) => COL_XS[i] + (COLS[i].w - COLS[i].pw) / 2;
 const P = (w: string) => SPLIT.pieces.indexOf(w);
+/** Where the string starts in the listing's line: after `sentence = "`. */
+const STR_START = 'sentence = "'.length;
 const T = (w: string) => SPLIT.tokens.indexOf(w);
 
 /**
@@ -84,6 +86,10 @@ export const SplitScene: React.FC = () => {
   const systemAt = n.word("do-in", "NLP system");
   const end = n.beat("layers").from;
 
+  const readFrom = n.word("split", "I");
+  const readTo = n.word("split", "Jones", { edge: "end" });
+  const readP = interpolate(frame, [readFrom - 2, readTo], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const actuallyAt = n.word("do-in", "actually");
   const pieceAt = (i: number) => cutsAt + 2 + i * 3;
   const tokAt = (j: number) => tokenizerAt + 4 + SPLIT.tokenPiece[j] * 3 + j * 0.6;
   const ch = chipHeight(SIZE);
@@ -114,6 +120,19 @@ export const SplitScene: React.FC = () => {
       <Drift from={from} to={end} amount={0.012} origin="50% 55%">
         <FigLabel n="6" title="The lesson's sentence, two ways" at={from + 2} x={X0} y={y(FIG_Y)} />
         <CodeStrip line={`sentence = "${SPLIT.text}"`} x={X0} y={y(CODE_Y)} at={sentenceAt - 6} size={26} />
+        {/* The highlighter follows the narrator reading the string aloud. */}
+        <div
+          style={{
+            position: "absolute",
+            left: X0 + 26 * 0.8 + STR_START * ADVANCE * 26 - 3,
+            top: y(CODE_Y) + 12,
+            height: 31,
+            width: (SPLIT.text.length * ADVANCE * 26 + 6) * readP,
+            background: MARK,
+            mixBlendMode: "multiply",
+            borderRadius: 4,
+          }}
+        />
 
         {/* ── Row A: split() ── */}
         <Ink at={splitAt - 4} dur={14} style={{ left: X0, top: aTop + 8, whiteSpace: "nowrap" }}>
@@ -202,8 +221,12 @@ export const SplitScene: React.FC = () => {
           const hl =
             j === T("n't") ? negationAt - 2 : j === T(",") ? punctAt : j === T("!") ? punctAt + 4 : j === T("Mr.") ? periodAt - 4 : undefined;
           const hl2 = j === T("ca") ? cutsTwoAt : undefined;
+          // "What does an NLP system actually do?": a wave runs along the tokens.
+          const lift = -10 * pulse(frame, actuallyAt + j * 3, 18);
           return (
-            <Chip key={j} text={t} x={TOK_XS[j]} y={bTop} at={tokAt(j)} size={SIZE} hl={hl ?? hl2} />
+            <div key={j} style={{ position: "absolute", inset: 0, transform: `translateY(${lift}px)` }}>
+              <Chip text={t} x={TOK_XS[j]} y={bTop} at={tokAt(j)} size={SIZE} hl={hl ?? hl2} />
+            </div>
           );
         })}
       </Drift>

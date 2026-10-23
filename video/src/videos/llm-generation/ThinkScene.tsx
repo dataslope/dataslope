@@ -142,7 +142,7 @@ export const ThinkScene: React.FC = () => {
 
       <Kicker at={start - 6}>Reasoning models</Kicker>
       <Headline lead="It writes its working" turn="before it answers." at={start - 4} turnAt={beforeAt - 2} />
-      <Spot id="llm-generation-hourglass" at={start - 2} left={1610} top={y(52)} width={210} height={h(240)} />
+      <Spot id="llm-generation-hourglass" at={start - 2} left={1610} top={y(66)} width={210} height={h(240)} />
 
       <FigLabel n="18" title="A reasoning model's output (the lesson's transcript)" at={writesAt - 8} x={X0} y={y(240)} />
       <Ink at={writesAt - 4} dur={16} style={{ left: X0, top, width: BOX_W, height: boxH }}>

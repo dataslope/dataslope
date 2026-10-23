@@ -111,7 +111,7 @@ export const FamiliesScene: React.FC = () => {
 
         {/* ── GPQA Diamond: the bar PhDs from other fields reach ── */}
         <CardTitle x={CARD_X[1]} top={top} at={cardAt[1]} name="GPQA Diamond" />
-        <GpqaBar x={CARD_X[1] + 30} y={gy(120)} w={CARD_W - 60} at={phdAt} fill={thirtyAt} value={QUOTED.gpqaNonExpertPhd} />
+        <GpqaBar x={CARD_X[1] + 30} y={gy(150)} w={CARD_W - 60} at={phdAt} fill={thirtyAt} value={QUOTED.gpqaNonExpertPhd} />
         <Ink at={phdAt - 2} dur={12} style={{ left: CARD_X[1] + 30, top: gy(40) - 14, width: CARD_W - 60 }}>
           <span style={{ ...note(22, INK), lineHeight: 1.25 }}>PhDs from other fields,</span>
         </Ink>

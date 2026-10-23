@@ -114,6 +114,7 @@ export const BpeScene: React.FC = () => {
   // ── Cues ──
   const bpeFrom = n.beat("bpe").from;
   const handAt = n.word("bpe", "hand");
+  const trainingAt = n.word("corpus", "training");
   const wordSaid = [
     n.word("corpus", "Low"),
     n.word("corpus", "Lower"),
@@ -159,6 +160,8 @@ export const BpeScene: React.FC = () => {
   const tMerge = k > 0 ? ease(frame, mergeCue[k - 1] + 4, 10) : 1;
 
   const rowY = (i: number) => y(ROW0) + i * h(ROW_STEP);
+  const corpus = WORDS.flatMap((w) => Array.from({ length: FREQS[w] }, () => w));
+  const corpusStep = Math.max(3, (trainingAt - bpeFrom - 8) / corpus.length);
   const rowIn = (i: number) => ease(frame, wordSaid[i] - 2, 12);
   const splitP = ease(frame, splitAt, 14);
   const markerP = ease(frame, markerAt - 2, 12);
@@ -205,10 +208,16 @@ export const BpeScene: React.FC = () => {
             fontWeight: 500,
             color: INK_SOFT,
             whiteSpace: "nowrap",
-            opacity: ease(frame, bpeFrom + 4, 14) * (1 - 0.5 * ease(frame, splitAt, 14)),
+            opacity: 1 - 0.5 * ease(frame, splitAt, 14),
           }}
         >
-          {WORDS.flatMap((w) => Array.from({ length: FREQS[w] }, () => w)).join(" ")}
+          {/* The training text writes itself out word by word, up to "training text". */}
+          {corpus.map((w, i) => (
+            <span key={i} style={{ opacity: ease(frame, bpeFrom + 4 + i * corpusStep, 10) }}>
+              {i ? " " : ""}
+              {w}
+            </span>
+          ))}
         </div>
 
         {WORDS.map((w, i) => {

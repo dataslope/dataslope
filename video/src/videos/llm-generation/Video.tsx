@@ -6,6 +6,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { BillScene } from "./BillScene";
 import { CostScene } from "./CostScene";
 import { FixScene } from "./FixScene";
+import { MiddleScene } from "./MiddleScene";
 import { PlausibleScene } from "./PlausibleScene";
 import { ReturnsScene } from "./ReturnsScene";
 import { RiskScene } from "./RiskScene";
@@ -29,7 +30,7 @@ const OVERLAP = 6;
  *
  *   1. Sampling: ScoreScene, TempScene, TopPScene, RunsScene.
  *   2. Why models hallucinate: PlausibleScene, RiskScene, FixScene.
- *   3. Context windows: WindowScene, CostScene, SquareScene.
+ *   3. Context windows: WindowScene, CostScene, MiddleScene, SquareScene.
  *   4. Reasoning models: ThinkScene, ReturnsScene, BillScene (and the bridge
  *      to Unit 4).
  *
@@ -69,8 +70,11 @@ const Scenes: React.FC = () => {
       <Scene from={cut("window")} to={until(cut("costs"))} fade={6}>
         <WindowScene />
       </Scene>
-      <Scene from={cut("costs")} to={until(cut("square"))} fade={6}>
+      <Scene from={cut("costs")} to={until(cut("middle"))} fade={6}>
         <CostScene />
+      </Scene>
+      <Scene from={cut("middle")} to={until(cut("square"))} fade={6}>
+        <MiddleScene />
       </Scene>
       <Scene from={cut("square")} to={until(cut("think"))} fade={6}>
         <SquareScene />

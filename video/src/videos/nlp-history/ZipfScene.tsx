@@ -38,7 +38,7 @@ export const ZipfScene: React.FC = () => {
   const rankAt = n.word("law", "Rank", { nth: 1 });
   const overAt = n.word("law", "one over the rank");
   const lawAt = n.word("law", "Zipf's law");
-  const emmaAt = n.word("emma", "Emma");
+  const heresAt = n.word("emma", "Here's");
   const roughAt = n.word("emma", "rough");
   const tieAt = n.word("emma", "almost tie");
   const hundredAt = n.word("tail", "a hundred words");
@@ -46,6 +46,7 @@ export const ZipfScene: React.FC = () => {
   const sevenAt = n.word("tail", "seven thousand");
   const onceAt = n.word("tail", "just once");
   const nextAt = n.word("zipf-out", "Next");
+  const predictAt = n.word("zipf-out", "predict");
 
   const CY0 = y(380);
   const CY1 = y(840);
@@ -89,11 +90,12 @@ export const ZipfScene: React.FC = () => {
       <Kicker at={from - 6}>The 1930s: George Zipf</Kicker>
       <Headline at={from + 2} lead="Zipf" turn="counted words." turnAt={from + 12} out={rankAt - 8} />
       <Headline at={rankAt - 2} lead="Rank them, and the counts" turn="fall away." turnAt={rankAt + 10} out={hundredAt - 6} />
-      <Headline at={hundredAt - 2} lead="A few words do" turn="most of the work." turnAt={sixtyAt - 4} />
+      <Headline at={hundredAt - 2} lead="A few words do" turn="most of the work." turnAt={sixtyAt - 4} out={nextAt - 6} />
+      <Headline at={nextAt - 2} lead="Next, counts become" turn="predictions." turnAt={predictAt - 6} />
 
       {/* ── Fig. 2, the lesson's table ── */}
-      <FigLabel n="2" title="A novel's most common words" at={from} x={96} y={y(290)} out={emmaAt - 8} />
-      <FigLabel n="2" title="Emma's most common words" at={emmaAt - 2} x={96} y={y(290)} />
+      <FigLabel n="2" title="A novel's most common words" at={from} x={96} y={y(290)} out={heresAt - 6} />
+      <FigLabel n="2" title="Emma's most common words" at={heresAt} x={96} y={y(290)} />
       <div style={{ opacity: 1 - settle * 0.25 }}>
         {COLS.map((c, i) => (
           <Ink key={c.title} at={from + 4 + i * 3} dur={12} style={{ left: colX[i], top: TTOP, width: c.w, textAlign: c.align }}>

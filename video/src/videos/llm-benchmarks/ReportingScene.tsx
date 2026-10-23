@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { QUOTED, usd } from "./data";
-import { A, A_INK, Check, Drift, FAINT, Headline, Marked, OK, pulse, Svg, Tag, track, TRAP, TRAP_INK, X0 } from "./parts";
+import { A, A_INK, Arrow, Check, Drift, FAINT, Headline, Marked, OK, PANEL, pulse, Svg, Tag, track, TRAP, TRAP_INK, X0 } from "./parts";
 
 const BX0 = 440;
 const BX1 = 1440;
@@ -31,6 +31,8 @@ export const ReportingScene: React.FC = () => {
   // ── Cues ──
   const from = n.beat("select").from;
   const picksAt = n.word("select", "picks");
+  const launchAt = n.word("select", "launch post");
+  const arcAt = n.word("astra", "Arc AGI three");
   const benchmarksAt = n.word("select", "its benchmarks");
   const rivalsAt = n.word("select", "its rivals");
   const settingsAt = n.word("select", "its settings");
@@ -58,9 +60,9 @@ export const ReportingScene: React.FC = () => {
   ];
   const vendorDim = ease(frame, elseAt - 2, 14) * 0.55;
   const picks = [
-    { text: "its benchmarks", at: benchmarksAt - 2, x: X0 },
-    { text: "its rivals", at: rivalsAt - 2, x: X0 + 236 },
-    { text: "its settings", at: settingsAt - 2, x: X0 + 398 },
+    { text: "its benchmarks", at: benchmarksAt - 2, x: X0 + 250 },
+    { text: "its rivals", at: rivalsAt - 2, x: X0 + 486 },
+    { text: "its settings", at: settingsAt - 2, x: X0 + 648 },
   ];
 
   return (
@@ -76,9 +78,14 @@ export const ReportingScene: React.FC = () => {
         <Sfx key={i} name="el-tap" at={at + 2} level={-29} />
       ))}
 
-      <Headline at={from - 6} second={picksAt - 4} italic="What a launch post picks.">
+      <Headline at={from - 6} second={launchAt - 4} italic="What a launch post picks.">
         Three, selective reporting.
       </Headline>
+      {/* The launch post, and what it picks. */}
+      <Tag at={launchAt - 2} x={X0} y={y(300)} fill={PANEL}>
+        launch post
+      </Tag>
+      <Arrow from={[X0 + 172, y(300) + 24]} to={[X0 + 238, y(300) + 24]} at={picksAt - 4} dur={10} width={2} />
       {picks.map((p, i) => (
         <Tag key={p.text} at={p.at} x={p.x} y={y(300)} color={i === 2 ? TRAP : INK}>
           <span style={{ color: i === 2 ? TRAP_INK : INK }}>{p.text}</span>
@@ -135,8 +142,8 @@ export const ReportingScene: React.FC = () => {
               <Ink at={r.nameAt} dur={12} style={{ left: BX0, top: ry - 58, whiteSpace: "nowrap", opacity: 1 - dim }}>
                 <span style={{ ...label(24, INK), fontWeight: 650 }}>{r.name}</span>
               </Ink>
-              <Svg opacity={ease(frame, r.nameAt, 10) * (1 - dim)}>
-                <rect x={BX0} y={ry - 16} width={BX1 - BX0} height={32} rx={3} fill={FAINT} opacity={0.6} />
+              <Svg opacity={(1 - dim)}>
+                <rect x={BX0} y={ry - 16} width={(BX1 - BX0) * ease(frame, arcAt - 4 + i * 6, 18)} height={32} rx={3} fill={FAINT} opacity={0.6} />
                 <rect x={BX0} y={ry - 16} width={(X(r.v) - BX0) * grow} height={32} rx={3} fill={i === 1 ? TRAP : A} />
               </Svg>
               <Ink at={r.at + 6} dur={10} style={{ left: X(100) + 16, top: ry - 18, whiteSpace: "nowrap", opacity: 1 - dim }}>

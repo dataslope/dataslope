@@ -86,7 +86,8 @@ export const AmbiguityScene: React.FC = () => {
   const referentialAt = n.word("answer", "referential");
 
   const row = (i: number) => y(ROW_Y[i]);
-  const rules = [from + 2, from + 6, from + 10];
+  // The figure's frame draws itself across the opening sentence.
+  const rules = [from + 2, n.word("ambiguity", "resolve") - 4, n.word("ambiguity", "easily") - 4];
 
   return (
     <AbsoluteFill>
@@ -113,7 +114,7 @@ export const AmbiguityScene: React.FC = () => {
             position: "absolute",
             left: X0,
             top: y(r) - 26,
-            width: 1680 * ease(frame, rules[i], 16),
+            width: 1680 * ease(frame, rules[i], 26),
             height: 1,
             background: HAIRLINE,
             opacity: 0.5,

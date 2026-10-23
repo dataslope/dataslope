@@ -66,6 +66,7 @@ export const IdfScene: React.FC = () => {
   const tfidfAt = n.word("idf", "TF-IDF");
   const searchEnginesAt = n.word("idf", "search engines");
   const lastAt = n.word("sparck-out", "last story");
+  const decadesAt = n.word("sparck-out", "four decades");
 
   // ── The collection: 200 documents, 20 by 10 ──
   const COLS = 20;
@@ -123,6 +124,7 @@ export const IdfScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound ── */}
       <Sfx name="el-sprinkle" at={from + 6} level={-32} />
+      <Sfx name="el-sprinkle" at={from + 46} level={-34} />
       <Sfx name="el-pop" at={commonAt - 2} level={-31} />
       <Sfx name="el-pop" at={rareAt - 2} level={-31} />
       <Sfx name="el-sprinkle" at={ninetyAt - 2} level={-33} />
@@ -133,7 +135,8 @@ export const IdfScene: React.FC = () => {
 
       <Kicker at={from - 6}>1972: Karen Spärck Jones, Cambridge</Kicker>
       <Headline at={searchAt - 4} lead="Every match counted" turn="the same." turnAt={searchAt + 8} out={fixAt - 6} />
-      <Headline at={fixAt - 2} lead="The rarer the word," turn="the more it's worth." turnAt={worthAt - 8} />
+      <Headline at={fixAt - 2} lead="The rarer the word," turn="the more it's worth." turnAt={worthAt - 8} out={lastAt - 8} />
+      <Headline at={lastAt - 4} lead="The last story:" turn="four decades on." turnAt={decadesAt - 4} />
 
       {/* ── Fig. 10, her example collection ── */}
       <FigLabel n="10" title="Her example: a collection of 200 documents" at={from + 2} x={96} y={y(290)} />
@@ -144,7 +147,7 @@ export const IdfScene: React.FC = () => {
             const r = Math.floor(i / COLS);
             const x = GX + c * (DW + GAP_X);
             const top = GY + r * (DH + GAP_Y);
-            const p = Math.min(1, pop(frame, from + 6 + ((c + r) % 12), fps, 16));
+            const p = Math.min(1, pop(frame, from + 6 + (c + r) * 3, fps, 16));
             if (p <= 0.001) return null;
             const isCommon = common.has(i);
             const isRare = rare.has(i);

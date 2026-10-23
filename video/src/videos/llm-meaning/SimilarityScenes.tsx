@@ -88,6 +88,7 @@ export const CosineScene: React.FC = () => {
   const from = n.beat("ruler").from;
   const rulerAt = n.word("ruler", "ruler");
   const straightAt = n.word("ruler", "Straight-line");
+  const rulerAgainAt = n.word("length", "ruler");
   const longAt = n.word("length", "long");
   const lengthAt = n.word("length", "length");
   const commonAt = n.word("length", "common");
@@ -169,7 +170,7 @@ export const CosineScene: React.FC = () => {
           const t = 9 / Math.SQRT2;
           return (
             <g opacity={rulerP > 0 ? 1 : 0}>
-              <line x1={a[0]} y1={a[1]} x2={e[0]} y2={e[1]} stroke={INK} strokeWidth={2} strokeDasharray="8 6" />
+              <line x1={a[0]} y1={a[1]} x2={e[0]} y2={e[1]} stroke={INK} strokeWidth={2 + 3 * pulse(frame, rulerAgainAt, 30)} strokeDasharray="8 6" />
               <line x1={a[0] - t} y1={a[1] - t} x2={a[0] + t} y2={a[1] + t} stroke={INK} strokeWidth={2} />
               {rulerP > 0.98 ? <line x1={b[0] - t} y1={b[1] - t} x2={b[0] + t} y2={b[1] + t} stroke={INK} strokeWidth={2} /> : null}
             </g>
@@ -307,6 +308,8 @@ export const SearchScene: React.FC = () => {
   const earningsAt = n.word("hit", "earnings");
   const pointAt = n.word("hit", "point");
   const wordAt = n.word("hit", "word");
+  const questionAt = n.word("hit", "question");
+  const searchWordAt = n.word("meaning", "search");
   const meaningAt = n.word("meaning", "meaning");
   const textAt = n.word("meaning", "text");
 
@@ -350,7 +353,7 @@ export const SearchScene: React.FC = () => {
         if (p <= 0) return null;
         const top = rowY(i, d.text);
         const isTop = d.text === SEARCH.top;
-        const hi = isTop ? ease(frame, earningsAt - 2, 12) : 0;
+        const hi = isTop ? ease(frame, earningsAt - 2, 12) + 1.4 * pulse(frame, searchWordAt, 30) : 0;
         return (
           <div key={d.text} style={{ position: "absolute", left: 0, top, width: 1920, height: DOC_ROW, opacity: p }}>
             {hi > 0 ? (
@@ -434,6 +437,18 @@ export const SearchScene: React.FC = () => {
       </Fade>
       <Svg opacity={ease(frame, askAt - 4, 12)}>
         <line x1={X0} x2={1600} y1={QY - 52} y2={QY - 52} stroke={INK} strokeWidth={1.6} />
+        {/* "Not one word in common with the question": the question, outlined. */}
+        <rect
+          x={X0 - 14}
+          y={QY - 6}
+          width={1600 - X0 + 28}
+          height={58}
+          rx={8}
+          fill="none"
+          stroke={POINT}
+          strokeWidth={2.4}
+          opacity={pulse(frame, questionAt - 4, 40)}
+        />
       </Svg>
       <Note at={wordAt - 4} x={1640} y={top0 + 10}>
         <div style={{ ...note(24, POINT_INK), fontWeight: 650, width: 220, whiteSpace: "normal" }}>No word in common with the query</div>
@@ -504,6 +519,7 @@ export const BlindScene: React.FC = () => {
   const readsAt = n.word("rerank", "reads");
   const hitsAt = n.word("rerank", "hits");
   const vectorAt = n.word("sim-in", "vector");
+  const problemAt = n.word("sim-in", "problem");
   const nothingAt = n.word("sim-in", "nothing");
   const neighboursAt = n.word("sim-in", "neighbours");
 
@@ -530,6 +546,8 @@ export const BlindScene: React.FC = () => {
       <Headline lead="Where it breaks." at={from} out={closeAt - 8} />
       <Headline lead="Close isn't true," turn="or always useful." at={closeAt - 2} turnAt={usefulAt - 4} />
 
+      {/* The two figures step back as the narration turns to the next problem. */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, vectorAt - 2, 16) }}>
       {/* ── Fig. 9: two sentences, nearly the same vector ── */}
       <FigLabel n="9" title="The lesson's negation problem" at={blindAt - 2} x={X0} y={y(FIG_Y)} />
       <Fade at={drugAt - 4} style={{ left: 0, top: 0 }}>
@@ -560,10 +578,11 @@ export const BlindScene: React.FC = () => {
       </Box>
       <Arrow from={[pipeX[0] + 236, PY + 56]} to={[pipeX[1] - 8, PY + 56]} at={readsAt - 4} />
       <Arrow from={[pipeX[1] + 236, PY + 56]} to={[pipeX[2] - 8, PY + 56]} at={hitsAt} />
+      </div>
 
       {/* The turn: one word that means nothing on its own. */}
-      <Svg opacity={ease(frame, vectorAt - 4, 12)}>
-        <line x1={X0} x2={1800} y1={TY - 40} y2={TY - 40} stroke={LINE} strokeWidth={1.4} />
+      <Svg>
+        <line x1={X0} x2={X0 + (1800 - X0) * ease(frame, problemAt - 4, 22)} y1={TY - 40} y2={TY - 40} stroke={INK_SOFT} strokeWidth={1.6} />
       </Svg>
       <div style={{ position: "absolute", left: 0, top: TY, width: 1920, display: "flex", justifyContent: "center", alignItems: "center", gap: 16 }}>
         <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: INK_SOFT, opacity: around * 0.85, whiteSpace: "pre" }}>

@@ -114,6 +114,9 @@ export const PunctScene: React.FC = () => {
   };
   const chars = [...PUNCT.text];
   const apostrophes = chars.flatMap((c, i) => (c === "'" ? [i] : []));
+  /** The exclamation mark that took World down with it: the whole token
+   *  lights in the line as the narration says so. */
+  const bang = PUNCT.text.indexOf("World!") + "World".length;
   // Every punctuation character translate() deletes, and the marks a
   // sentence tokenizer reads as ends.
   const punctuation = chars.flatMap((c, i) => (/[!-/:-@[-`{-~]/.test(c) ? [i] : []));
@@ -142,6 +145,7 @@ export const PunctScene: React.FC = () => {
         at={lineAt - 4}
         size={SIZE}
         marks={[
+          { from: bang - "World".length, to: bang + 1, at: exclAt, out: secondAt },
           ...punctuation.map((i, k) => ({ from: i, to: i + 1, at: charactersAt + k, out: surviveAt })),
           ...apostrophes.map((i) => ({ from: i, to: i + 1, at: apostropheAt, out: lookAt })),
           ...ends.map((i, k) => ({ from: i, to: i + 1, at: cluesAt + k, out: everywhereAt, color: CLUE })),

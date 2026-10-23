@@ -40,6 +40,7 @@ export const PipelineScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("pipeline").from;
+  const sequenceAt = n.word("pipeline", "sequence");
   const outputAt = n.word("pipeline", "output");
   const inputAt = n.word("pipeline", "input");
   const tokenizingAt = n.word("tokenized", "Tokenizing");
@@ -119,6 +120,21 @@ export const PipelineScene: React.FC = () => {
           }}
         />
 
+        {/* "A fixed sequence of steps": one faint rule per step, in order. */}
+        {PIPE.stages.map((s, k) => (
+          <div
+            key={`rule-${s.name}`}
+            style={{
+              position: "absolute",
+              left: X0,
+              top: rowY(k) + 60,
+              width: 1680 * ease(frame, sequenceAt + k * 5, 18),
+              height: 1,
+              background: HAIRLINE,
+              opacity: 0.35,
+            }}
+          />
+        ))}
         {PIPE.stages.map((s, k) => (
           <React.Fragment key={s.name}>
             <Ink at={labelAt[k]} dur={14} style={{ left: X0, top: rowY(k) + 6, whiteSpace: "nowrap" }}>

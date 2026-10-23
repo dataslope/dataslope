@@ -37,6 +37,7 @@ export const ChatScene: React.FC = () => {
   const chatFrom = n.beat("chat").from;
   const resendsAt = n.word("chat", "resends");
   const historyAt = n.word("chat", "history");
+  const everyTurnAt = n.word("chat", "every turn");
   const tenAt = n.word("turns", "ten turns");
   const sevenAt = n.word("turns", "seven thousand");
   const fortyAt = n.word("turns", "forty-three thousand");
@@ -95,7 +96,6 @@ export const ChatScene: React.FC = () => {
           {/* The bars: turn by turn, the whole history again. */}
           {turns.map((t, i) => {
             const p = ease(frame, barAt(i), 12);
-            if (p <= 0) return null;
             const hh = barH(t.sent) * p;
             return (
               <React.Fragment key={t.turn}>
@@ -119,7 +119,7 @@ export const ChatScene: React.FC = () => {
                     top: base + 10,
                     textAlign: "center",
                     ...label(20, INK_SOFT),
-                    opacity: p,
+                    opacity: ease(frame, everyTurnAt + i * 3, 8),
                     ...TABULAR,
                   }}
                 >
@@ -128,9 +128,18 @@ export const ChatScene: React.FC = () => {
               </React.Fragment>
             );
           })}
-          <div style={{ position: "absolute", left: BAR_X - 10, top: base, width: chartRight - BAR_X + 20, height: 2, background: INK }} />
           <div
-            style={{ position: "absolute", left: BAR_X, top: base + 44, ...label(20, INK_SOFT), opacity: ease(frame, tenAt, 12), whiteSpace: "nowrap" }}
+            style={{
+              position: "absolute",
+              left: BAR_X - 10,
+              top: base,
+              width: (chartRight - BAR_X + 20) * ease(frame, chatFrom + 2, 18),
+              height: 2,
+              background: INK,
+            }}
+          />
+          <div
+            style={{ position: "absolute", left: BAR_X, top: base + 44, ...label(20, INK_SOFT), opacity: ease(frame, everyTurnAt, 12), whiteSpace: "nowrap" }}
           >
             turn
           </div>

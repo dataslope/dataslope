@@ -697,6 +697,8 @@ export const OrderScene: React.FC = () => {
   const firstAt = n.word("position", "first");
   const differentAt = n.word("position", "different");
   const lastAt = n.word("position", "last");
+  const nowAt = n.word("order-in", "Now");
+  const closenessAt = n.word("order-in", "closeness");
   const measureAt = n.word("order-in", "measure");
   const closeAt = n.word("order-in", "close", { nth: 1 });
 
@@ -743,7 +745,7 @@ export const OrderScene: React.FC = () => {
       {s1.map((t, i) => {
         const p = ease(frame, dogBitesAt - 4 + i * 5, 12);
         if (p <= 0) return null;
-        const ring = t.word === "dog" ? ease(frame, firstAt - 2, 12) : 0;
+        const ring = t.word === "dog" ? ease(frame, firstAt - 2, 12) + 0.6 * pulse(frame, closenessAt, 30) : 0;
         return (
           <Card key={`a${i}`} x={SLOT_X[i]} top={row1} word={t.word} vec={t.vec} to={p1[i].vec} swapAt={addInAt(i) + 6} ring={ring} opacity={p} />
         );
@@ -754,7 +756,7 @@ export const OrderScene: React.FC = () => {
         const fromSlot = slotOf(s1, t.word);
         const x = lerp(SLOT_X[fromSlot], SLOT_X[i], shuffle);
         const top = lerp(row1, row2, Math.min(1, shuffle * 1.6));
-        const ring = t.word === "dog" ? ease(frame, lastAt - 2, 12) : 0;
+        const ring = t.word === "dog" ? ease(frame, lastAt - 2, 12) + 0.6 * pulse(frame, closenessAt + 4, 30) : 0;
         return <Card key={`b${i}`} x={x} top={top} word={t.word} vec={t.vec} to={p2[i].vec} swapAt={addInAt(i) + 6} ring={ring} opacity={Math.min(1, shuffle * 3)} />;
       })}
 
@@ -779,7 +781,7 @@ export const OrderScene: React.FC = () => {
       </Note>
 
       {/* Where each token sits: the lesson's position signal, added slot by slot. */}
-      <Fade at={mixesAt + 2} style={{ left: 0, top: posRow, width: 1920 }}>
+      <Fade at={mixesAt + 2} dim={nowAt} style={{ left: 0, top: posRow, width: 1920 }}>
         <span style={{ position: "absolute", left: X0, top: 12, ...label(21, INK_SOFT) }}>+ position</span>
         {ORDER.position.map((v, i) => (
           <span key={i} style={{ position: "absolute", left: SLOT_X[i], transform: "translateX(-50%)", opacity: ease(frame, addInAt(i), 10) }}>

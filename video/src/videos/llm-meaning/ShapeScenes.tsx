@@ -277,6 +277,7 @@ export const ParamsScene: React.FC = () => {
 
   const from = n.beat("params").from;
   const sevenAt = n.word("params", "seven billion");
+  const parametersAt = n.word("params", "parameters");
   const liveAt = n.word("params", "live");
   const embAt = n.word("split", "embedding");
   const halfAt = n.word("split", "half");
@@ -286,6 +287,8 @@ export const ParamsScene: React.FC = () => {
   const ffAt = n.word("ff", "feed-forward");
   const threeAt = n.word("ff", "three point eight");
   const fiftyAt = n.word("ff", "Fifty-four");
+  const wholeAt = n.word("ff", "whole");
+  const muchAt = n.word("knowledge", "much");
   const knowsAt = n.word("knowledge", "knows");
   const noAt = n.word("knowledge", "no");
   const justAt = n.word("knowledge", "Just");
@@ -328,14 +331,35 @@ export const ParamsScene: React.FC = () => {
       {/* ── Fig. 19: the lesson's sums, as one bar ── */}
       <FigLabel n="19" title="Where the lesson's mid-sized model keeps its parameters" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={sevenAt - 2} style={{ left: BAR_X1, top: y(FIG_Y) + 2, transform: "translateX(-100%)" }}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>Total: {PARAMS.total.toFixed(2)} billion</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+          <Mark at={wholeAt}>Total: {PARAMS.total.toFixed(2)} billion</Mark>
+        </span>
       </Fade>
       <Svg>
-        <rect x={BAR_X0} y={BY} width={(BAR_X1 - BAR_X0) * ease(frame, liveAt - 10, 24)} height={BH} fill="none" stroke={LINE} strokeWidth={2} rx={4} />
+        {/* The empty bar, drawn as the parameters are named, washed as the narration asks where they live. */}
+        <rect
+          x={BAR_X0}
+          y={BY}
+          width={(BAR_X1 - BAR_X0) * ease(frame, liveAt - 8, 24)}
+          height={BH}
+          fill={DATA_TINT}
+          rx={4}
+        />
+        <rect
+          x={BAR_X0}
+          y={BY}
+          width={(BAR_X1 - BAR_X0) * ease(frame, parametersAt - 4, 24)}
+          height={BH}
+          fill="none"
+          stroke={INK_SOFT}
+          strokeWidth={2}
+          strokeDasharray="8 6"
+          rx={4}
+        />
         {segs.map((s, i) => {
           const p = ease(frame, s.at - 2, 16);
           if (p <= 0) return null;
-          const glow = i === 2 ? pulse(frame, fiftyAt, 30) : 0;
+          const glow = i === 2 ? pulse(frame, fiftyAt, 30) + pulse(frame, muchAt, 30) : 0;
           return (
             <rect
               key={s.name}
