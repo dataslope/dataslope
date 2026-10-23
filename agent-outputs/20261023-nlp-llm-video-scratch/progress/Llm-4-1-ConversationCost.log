@@ -6,3 +6,5 @@
 13:59 art imported (sync): goldfish 1131x1016, receipt 1280x1016, both look right
 14:30 stills reviewed and fixed (zoom timing, cache layout, labels); voicing
 14:31 voiced: 1 take, 1792 chars
+15:04 check:sync pass (worst +0.03 s), check:frames pass, check:mix 27.9 LU under; check:motion had 4 stills >=3 s, fixed, re-running
+15:08 check:motion pass (longest still 2.8 s); all checks done
