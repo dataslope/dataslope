@@ -1,0 +1,260 @@
+import React from "react";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
+import { RapidFire, type RapidItem } from "../../editorial/interview";
+import { type Layout, useLayout } from "../../editorial/layout";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label } from "../../editorial/style";
+import { NextLine, Note } from "../../editorial/ui";
+import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
+import { CORR } from "../da-statistics-communication/data";
+import { BAYES, RANKS } from "./data";
+import { at, Axes, Curve, Drift, Headline, Kicker, Mark, MARK_OK, mulberry32, noteText, OK_INK, type Scale, Spot, Strike, Svg, WARM, X0 } from "./parts";
+
+/** Where the answers go: right of the list. */
+const R_X = 800;
+const R_END = 1760;
+const LIST_TOP = 330;
+const ROW = 56;
+
+type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
+
+// ── 17. Frequentist and Bayesian ────────────────────────────────────────────
+
+const Bayes: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const freqAt = c.w("r-bayes", "A frequentist treats");
+  const bayesAt = c.w("r-bayes", "A Bayesian updates");
+  const pageAt = c.w("r-bayes", "On the page's A B test");
+  const bAt = c.w("r-bayes", "against a hundred and fifty");
+  const distAt = c.w("r-bayes", "a distribution for each rate");
+  const pctAt = c.w("r-bayes", "ninety-seven and a half percent");
+  const s: Scale = { lo: 0.08, hi: 0.2, a: R_X + 30, b: R_END - 40 };
+  const base = c.y(740);
+  const peak = Math.max(...BAYES.a, ...BAYES.b);
+  const pts = (v: readonly number[]) => BAYES.grid.map((g, i) => [at(s, g), base - (v[i] / peak) * c.h(250)] as const);
+  return (
+    <>
+      <Note at={freqAt} x={R_X} y={c.y(330)}>
+        <span style={{ ...noteText(25, INK) }}>
+          <b>frequentist</b>: the parameter is fixed, the data random
+        </span>
+      </Note>
+      <Note at={freqAt + 30} x={R_X + 24} y={c.y(372)}>
+        <span style={{ ...noteText(22, INK_SOFT) }}>p-values and confidence intervals</span>
+      </Note>
+      <Note at={bayesAt} x={R_X} y={c.y(424)}>
+        <span style={{ ...noteText(25, BLUE_INK) }}>
+          <b>Bayesian</b>: a prior, updated into a posterior
+        </span>
+      </Note>
+      <Axes x={s} y={{ lo: 0, hi: 1, a: base, b: base - c.h(250) }} xTicks={[0.1, 0.12, 0.14, 0.16, 0.18]} xFormat={(v) => `${Math.round(v * 100)}%`} xTitle="conversion rate" at={pageAt} size={18} />
+      <Curve points={pts(BAYES.a)} at={pageAt + 6} dur={20} color={INK_SOFT} width={3} fill={`color-mix(in srgb, ${INK_SOFT} 10%, transparent)`} base={base} />
+      <Curve points={pts(BAYES.b)} at={bAt} dur={20} color={BAR} width={3} fill={`color-mix(in srgb, ${BAR} 14%, transparent)`} base={base} />
+      <Note at={pageAt + 8} x={at(s, 0.121) - 10} y={base - c.h(282)} align="right">
+        <span style={{ ...noteText(22, INK_SOFT), ...TABULAR }}>A: 120 in 1,000</span>
+      </Note>
+      <Note at={bAt + 4} x={at(s, 0.151) + 10} y={base - c.h(282)}>
+        <span style={{ ...noteText(22, BLUE_INK), ...TABULAR }}>B: 150 in 1,000</span>
+      </Note>
+      <Note at={distAt} x={R_X + 30} y={c.y(836)}>
+        <span style={{ ...noteText(24, INK), ...TABULAR }}>
+          a distribution for each rate
+          <span style={{ opacity: ease(frame, pctAt - 2, 10) }}>
+            , and <Mark at={pctAt + 2} color={MARK_OK}>a {fmt(BAYES.pBetter * 100, 1)}% chance</Mark> B&apos;s is higher
+          </span>
+        </span>
+      </Note>
+    </>
+  );
+};
+
+// ── 18. Parametric and non-parametric ───────────────────────────────────────
+
+const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
+  const paraAt = c.w("r-param", "A parametric test assumes");
+  const nonAt = c.w("r-param", "A non-parametric one works on ranks");
+  const queuesAt = c.w("r-param", "Two support queues");
+  const monsterAt = c.w("r-param", "three monster tickets");
+  const tAt = c.w("r-param", "point seven two");
+  const uAt = c.w("r-param", "point oh three three");
+  // Ordinary tickets on a linear scale; the six monsters past a break.
+  const s: Scale = { lo: 10, hi: 60, a: R_X + 30, b: 1460 };
+  const far: Scale = { lo: 270, hi: 420, a: 1560, b: R_END - 20 };
+  const px = (v: number) => (v > 100 ? at(far, v) : at(s, v));
+  const rand = mulberry32(18);
+  const rows = [
+    { name: "queue A", values: RANKS.a, y: c.y(560), color: INK_SOFT },
+    { name: "queue B", values: RANKS.b, y: c.y(660), color: BAR },
+  ];
+  return (
+    <>
+      <Note at={paraAt} x={R_X} y={c.y(330)}>
+        <span style={{ ...noteText(25, INK) }}>
+          <b>parametric</b>: assumes a distribution, usually normal
+        </span>
+      </Note>
+      <Note at={nonAt} x={R_X} y={c.y(380)}>
+        <span style={{ ...noteText(25, INK) }}>
+          <b>non-parametric</b>: works on ranks
+        </span>
+      </Note>
+      <Svg opacity={ease(frame, queuesAt, 12)}>
+        {rows.map((r, k) => (
+          <g key={k}>
+            <line x1={s.a} x2={s.b} y1={r.y} y2={r.y} stroke={INK} strokeWidth={1.2} opacity={0.5} />
+            <line x1={far.a} x2={far.b} y1={r.y} y2={r.y} stroke={INK} strokeWidth={1.2} opacity={0.5} />
+            <text x={(s.b + far.a) / 2} y={r.y + 7} textAnchor="middle" style={{ ...label(22, INK_SOFT) }}>
+              //
+            </text>
+            {r.values.map((v, i) => {
+              const monster = v > 100;
+              const show = ease(frame, (monster ? monsterAt : queuesAt) + i * 0.3, 8);
+              return show > 0 ? (
+                <circle key={i} cx={px(v)} cy={r.y + (rand() - 0.5) * c.h(26)} r={(monster ? 8 : 6) * show} fill={monster ? ACCENT : r.color} opacity={0.85} />
+              ) : null;
+            })}
+          </g>
+        ))}
+      </Svg>
+      {rows.map((r) => (
+        <Note key={r.name} at={queuesAt} x={R_X + 30} y={r.y - c.h(52)}>
+          <span style={{ ...label(20, INK_SOFT) }}>{r.name}</span>
+        </Note>
+      ))}
+      <Note at={monsterAt + 4} x={R_END} y={c.y(470)} align="right">
+        <span style={{ ...noteText(22, ACCENT_INK) }}>three monster tickets each</span>
+      </Note>
+      <Note at={tAt - 4} x={R_X} y={c.y(740)}>
+        <span style={{ ...noteText(26, ACCENT_INK), ...TABULAR }}>
+          t-test: <Strike at={tAt + 8}>p = {fmt(RANKS.t, 2)}</Strike>
+          <span style={{ ...noteText(22, INK_SOFT), marginLeft: 14 }}>sees nothing</span>
+        </span>
+      </Note>
+      <Note at={uAt - 4} x={R_X} y={c.y(800)}>
+        <span style={{ ...noteText(26, OK_INK), ...TABULAR }}>
+          Mann-Whitney: <Mark at={uAt + 4} color={MARK_OK}>p = {fmt(RANKS.u, 3)}</Mark>
+          <span style={{ ...noteText(22, INK_SOFT), marginLeft: 14 }}>finds the shift</span>
+        </span>
+      </Note>
+    </>
+  );
+};
+
+// ── 19. Correlation and causation ───────────────────────────────────────────
+
+const Corr: React.FC<{ c: Ctx }> = ({ c }) => {
+  const corrAt = c.w("r-corr", "Correlation is two variables");
+  const causeAt = c.w("r-corr", "Causation is one changing");
+  const iceAt = c.w("r-corr", "Ice cream sales and drownings");
+  const rAt = c.w("r-corr", "point five seven");
+  const holdAt = c.w("r-corr", "Hold temperature fixed");
+  const partialAt = c.w("r-corr", "point oh eight");
+  const expAt = c.w("r-corr", "A cause takes an experiment");
+  const sx: Scale = { lo: 0, hi: 1, a: R_X + 40, b: 1400 };
+  const ice = CORR.days.map((d) => d[1]);
+  const drown = CORR.days.map((d) => d[2]);
+  const iceLo = Math.min(...ice);
+  const iceHi = Math.max(...ice);
+  const dHi = Math.max(...drown);
+  const base = c.y(770);
+  const rand = mulberry32(19);
+  const dots = CORR.days.map(([t, i, d]) => ({
+    x: at(sx, (i - iceLo) / (iceHi - iceLo)),
+    y: base - ((d + (rand() - 0.5) * 0.5 + 0.5) / (dHi + 1)) * c.h(300),
+    hot: t >= CORR.hot,
+  }));
+  const frame = useCurrentFrame();
+  return (
+    <>
+      <Note at={corrAt} x={R_X} y={c.y(330)}>
+        <span style={{ ...noteText(25, INK) }}>
+          <b>correlation</b>: two variables moving together
+        </span>
+      </Note>
+      <Note at={causeAt} x={R_X} y={c.y(376)}>
+        <span style={{ ...noteText(25, INK) }}>
+          <b>causation</b>: one changing the other
+        </span>
+      </Note>
+      <Axes x={sx} y={{ lo: 0, hi: 1, a: base, b: base - c.h(300) }} xTicks={[]} xTitle="ice cream sold" yTitle="drownings" at={iceAt} size={18} />
+      <Svg>
+        {dots.map((d, i) => {
+          const p = ease(frame, iceAt + 4 + i * 0.15, 8);
+          if (p <= 0) return null;
+          const warm = d.hot ? ease(frame, holdAt + 2, 12) : 0;
+          return <circle key={i} cx={d.x} cy={d.y} r={5.5 * p} fill={warm > 0 ? `color-mix(in srgb, ${WARM} ${warm * 100}%, ${BAR})` : BAR} opacity={0.7} />;
+        })}
+      </Svg>
+      <Note at={rAt} x={1440} y={c.y(560)}>
+        <span style={{ ...noteText(28, BLUE_INK), ...TABULAR }}>
+          <Strike at={partialAt} color={ACCENT}>r = {fmt(CORR.r, 2)}</Strike>
+        </span>
+      </Note>
+      <Note at={holdAt} x={1440} y={c.y(620)}>
+        <div style={{ ...noteText(22, INK_SOFT), lineHeight: 1.35 }}>
+          temperature
+          <br />
+          held fixed:{" "}
+          <span style={{ ...noteText(28, OK_INK), fontWeight: 650, opacity: ease(frame, partialAt - 2, 10), ...TABULAR }}>{fmt(CORR.partial, 2)}</span>
+        </div>
+      </Note>
+      <Note at={expAt} x={R_X} y={c.y(860)}>
+        <span style={{ ...noteText(24, OK_INK) }}>a cause takes an experiment, or a careful causal design</span>
+      </Note>
+    </>
+  );
+};
+
+/**
+ * The quick round, questions 17 to 19, each an either-or: frequentist or
+ * Bayesian on the page's A/B table, parametric or non-parametric on the
+ * course's two support queues, and correlation or causation on the Data
+ * Analyst statistics video's ice cream and drownings. Then the bridge into
+ * probability, with the hedgehog back.
+ */
+export const RapidScene: React.FC = () => {
+  const n = useNarration();
+  const { y, h } = useLayout();
+  const c: Ctx = { w: (b, p) => n.word(b, p), y, h };
+
+  const from = n.beat("rapid-in").from;
+  const coreAt = n.word("rapid-in", "That covers the core");
+  const leftAt = n.word("rapid-in", "three either-or questions");
+  const nextAt = n.word("next", "Next: probability");
+  const restsAt = n.word("next", "rests on probability");
+  const end = n.beat("next").from;
+
+  const items: RapidItem[] = [
+    { n: 17, label: "Frequentist or Bayesian?", beat: "r-bayes", body: <Bayes c={c} /> },
+    { n: 18, label: "Parametric or non-parametric?", beat: "r-param", body: <Ranks c={c} /> },
+    { n: 19, label: "Correlation or causation?", beat: "r-corr", body: <Corr c={c} /> },
+  ].map(({ beat, ...item }) => ({ ...item, at: n.beat(beat).from }));
+
+  return (
+    <AbsoluteFill>
+      <Sfx name="el-whoosh" at={from} level={-34} />
+      {items.map((item) => (
+        <Sfx key={item.n} name="el-tap" at={item.at} level={-34} />
+      ))}
+      <Sfx name="el-chime" at={nextAt} level={-34} />
+
+      <Drift from={from} to={n.beat("next").to + 40} scale={0.015}>
+        <Kicker at={from}>Questions 17 to 19</Kicker>
+        <Headline lead="That covers the core." turn="Three either-or questions." at={coreAt - 4} turnAt={leftAt - 4} size={62} />
+
+        <RapidFire items={items} x={X0} top={y(LIST_TOP) + h(40)} rowH={h(ROW)} width={600} at={leftAt} end={end} />
+
+        <Spot id="ds-statistics-hedgehog" at={restsAt} left={1180} top={y(360)} width={560} height={400} />
+        <NextLine at={nextAt} x={R_X} y={y(820)} width={940}>
+          probability
+        </NextLine>
+        <Note at={restsAt} x={R_X} y={y(760)}>
+          <span style={{ ...noteText(24, INK_SOFT) }}>every test here rests on probability</span>
+        </Note>
+      </Drift>
+    </AbsoluteFill>
+  );
+};
+

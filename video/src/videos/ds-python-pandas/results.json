@@ -1,0 +1,1893 @@
+{
+  "runtime": "Pyodide / Python 3.14.2 / pandas 3.0.2",
+  "figures": {
+    "fanout": {
+      "setup": "orders = pd.DataFrame({\"order_id\": [1, 2, 3, 4], \"customer_id\": [1, 2, 2, 3], \"amount\": [100, 80, 30, 55]})\ncustomers = pd.DataFrame({\n    \"customer_id\": [1, 2, 2, 3],\n    \"city\": [\"Lyon\", \"Oslo\", \"Bergen\", \"Porto\"],\n})",
+      "steps": {
+        "orders": {
+          "code": "orders",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "order_id",
+              "customer_id",
+              "amount"
+            ],
+            "rows": [
+              [
+                "1",
+                "1",
+                "100"
+              ],
+              [
+                "2",
+                "2",
+                "80"
+              ],
+              [
+                "3",
+                "2",
+                "30"
+              ],
+              [
+                "4",
+                "3",
+                "55"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "customers": {
+          "code": "customers",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "customer_id",
+              "city"
+            ],
+            "rows": [
+              [
+                "1",
+                "Lyon"
+              ],
+              [
+                "2",
+                "Oslo"
+              ],
+              [
+                "2",
+                "Bergen"
+              ],
+              [
+                "3",
+                "Porto"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "before": {
+          "code": "len(orders), int(orders['amount'].sum())",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "(4, 265)",
+            "str": "(4, 265)"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "merged": {
+          "code": "merged = orders.merge(customers, on=\"customer_id\", how=\"left\")\nmerged",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "indexName": null,
+            "columns": [
+              "order_id",
+              "customer_id",
+              "amount",
+              "city"
+            ],
+            "rows": [
+              [
+                "1",
+                "1",
+                "100",
+                "Lyon"
+              ],
+              [
+                "2",
+                "2",
+                "80",
+                "Oslo"
+              ],
+              [
+                "2",
+                "2",
+                "80",
+                "Bergen"
+              ],
+              [
+                "3",
+                "2",
+                "30",
+                "Oslo"
+              ],
+              [
+                "3",
+                "2",
+                "30",
+                "Bergen"
+              ],
+              [
+                "4",
+                "3",
+                "55",
+                "Porto"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "after": {
+          "code": "len(merged), int(merged['amount'].sum())",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "(6, 375)",
+            "str": "(6, 375)"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "unique": {
+          "code": "customers[\"customer_id\"].is_unique",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "False",
+            "str": "False"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "validate": {
+          "code": "orders.merge(customers, on=\"customer_id\", how=\"left\",\n             validate=\"many_to_one\")",
+          "ok": false,
+          "error": "MergeError: Merge keys are not unique in right dataset; not a many-to-one merge\n\nDuplicates in right:\n  customer_id\n           2 ...",
+          "stdout": "",
+          "warnings": []
+        },
+        "counts": {
+          "code": "customers[\"customer_id\"].value_counts()",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "count",
+            "index": [
+              "2",
+              "1",
+              "3"
+            ],
+            "indexName": "customer_id",
+            "values": [
+              "2",
+              "1",
+              "1"
+            ],
+            "dtype": "int64"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "plan": {
+      "setup": "questions = pd.DataFrame({\"pace\": [\"worked\"] * 9 + [\"quick\"] * 5})",
+      "steps": {
+        "size": {
+          "code": "questions.groupby(\"pace\", sort=False).size()",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": null,
+            "index": [
+              "worked",
+              "quick"
+            ],
+            "indexName": "pace",
+            "values": [
+              "9",
+              "5"
+            ],
+            "dtype": "int64"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "vector": {
+      "setup": "df = pd.DataFrame({\"price\": np.arange(1, 6), \"qty\": np.arange(5, 0, -1)})\nn = 1_000_000\nbig = pd.DataFrame({\"price\": np.arange(n) % 5 + 1, \"qty\": 5 - np.arange(n) % 5})\n\ndef _loop(frame):\n    revenue = []\n    for p, q in zip(frame[\"price\"], frame[\"qty\"]):\n        revenue.append(p * q)\n    return revenue\n\ndef _best(f, k):\n    ts = []\n    for _ in range(k):\n        t = time.perf_counter()\n        f()\n        ts.append(time.perf_counter() - t)\n    return min(ts)",
+      "steps": {
+        "frame": {
+          "code": "df",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "columns": [
+              "price",
+              "qty"
+            ],
+            "rows": [
+              [
+                "1",
+                "5"
+              ],
+              [
+                "2",
+                "4"
+              ],
+              [
+                "3",
+                "3"
+              ],
+              [
+                "4",
+                "2"
+              ],
+              [
+                "5",
+                "1"
+              ]
+            ],
+            "dtypes": [
+              "int32",
+              "int32"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "loop": {
+          "code": "revenue = []\nfor p, q in zip(df[\"price\"], df[\"qty\"]):\n    revenue.append(p * q)\ndf[\"revenue\"] = revenue\ndf",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "columns": [
+              "price",
+              "qty",
+              "revenue"
+            ],
+            "rows": [
+              [
+                "1",
+                "5",
+                "5"
+              ],
+              [
+                "2",
+                "4",
+                "8"
+              ],
+              [
+                "3",
+                "3",
+                "9"
+              ],
+              [
+                "4",
+                "2",
+                "8"
+              ],
+              [
+                "5",
+                "1",
+                "5"
+              ]
+            ],
+            "dtypes": [
+              "int32",
+              "int32",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "vectorized": {
+          "code": "df[\"revenue\"] = df[\"price\"] * df[\"qty\"]\ndf",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "columns": [
+              "price",
+              "qty",
+              "revenue"
+            ],
+            "rows": [
+              [
+                "1",
+                "5",
+                "5"
+              ],
+              [
+                "2",
+                "4",
+                "8"
+              ],
+              [
+                "3",
+                "3",
+                "9"
+              ],
+              [
+                "4",
+                "2",
+                "8"
+              ],
+              [
+                "5",
+                "1",
+                "5"
+              ]
+            ],
+            "dtypes": [
+              "int32",
+              "int32",
+              "int32"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "same": {
+          "code": "_loop(big) == list(big[\"price\"] * big[\"qty\"])",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "True",
+            "str": "True"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "loopMs": {
+          "code": "round(_best(lambda: _loop(big), 3) * 1000, 1)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "409.5",
+            "str": "409.5"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "vecMs": {
+          "code": "round(_best(lambda: big[\"price\"] * big[\"qty\"], 30) * 1000, 2)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "0.9",
+            "str": "0.9"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "split": {
+      "setup": "df = pd.DataFrame({\n    \"region\": [\"North\", \"South\", \"North\", \"East\", \"South\", \"North\"],\n    \"amount\": [100, 80, 80, 50, 70, 60],\n})",
+      "steps": {
+        "frame": {
+          "code": "df",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "North",
+                "100"
+              ],
+              [
+                "South",
+                "80"
+              ],
+              [
+                "North",
+                "80"
+              ],
+              [
+                "East",
+                "50"
+              ],
+              [
+                "South",
+                "70"
+              ],
+              [
+                "North",
+                "60"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "grouped": {
+          "code": "type(df.groupby(\"region\")).__name__",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "'DataFrameGroupBy'",
+            "str": "DataFrameGroupBy"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "one": {
+          "code": "df.groupby(\"region\")[\"amount\"].sum()",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "amount",
+            "index": [
+              "East",
+              "North",
+              "South"
+            ],
+            "indexName": "region",
+            "values": [
+              "50",
+              "240",
+              "150"
+            ],
+            "dtype": "int64"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "named": {
+          "code": "df.groupby(\"region\").agg(\n    total=(\"amount\", \"sum\"),\n    n=(\"amount\", \"size\"),\n    avg=(\"amount\", \"mean\"),\n)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "East",
+              "North",
+              "South"
+            ],
+            "indexName": "region",
+            "columns": [
+              "total",
+              "n",
+              "avg"
+            ],
+            "rows": [
+              [
+                "50",
+                "1",
+                "50.0"
+              ],
+              [
+                "240",
+                "3",
+                "80.0"
+              ],
+              [
+                "150",
+                "2",
+                "75.0"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "float64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "flat": {
+          "code": "df.groupby(\"region\", as_index=False)[\"amount\"].sum()",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "East",
+                "50"
+              ],
+              [
+                "North",
+                "240"
+              ],
+              [
+                "South",
+                "150"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "shapes": {
+      "setup": "df = pd.DataFrame({\n    \"region\": [\"North\", \"North\", \"South\", \"South\", \"East\"],\n    \"amount\": [100, 60, 80, 120, 50],\n})",
+      "steps": {
+        "frame": {
+          "code": "df",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "North",
+                "100"
+              ],
+              [
+                "North",
+                "60"
+              ],
+              [
+                "South",
+                "80"
+              ],
+              [
+                "South",
+                "120"
+              ],
+              [
+                "East",
+                "50"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "agg": {
+          "code": "df.groupby(\"region\")[\"amount\"].agg(\"sum\")",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "amount",
+            "index": [
+              "East",
+              "North",
+              "South"
+            ],
+            "indexName": "region",
+            "values": [
+              "50",
+              "160",
+              "200"
+            ],
+            "dtype": "int64"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "transform": {
+          "code": "df.groupby(\"region\")[\"amount\"].transform(\"sum\")",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "amount",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "values": [
+              "160",
+              "160",
+              "200",
+              "200",
+              "50"
+            ],
+            "dtype": "int64"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "apply": {
+          "code": "df.groupby(\"region\").apply(lambda g: g.nlargest(1, \"amount\"))",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "East 4",
+              "North 0",
+              "South 3"
+            ],
+            "indexName": null,
+            "columns": [
+              "amount"
+            ],
+            "rows": [
+              [
+                "50"
+              ],
+              [
+                "100"
+              ],
+              [
+                "120"
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "pct": {
+          "code": "df[\"pct_of_region\"] = (\n    df[\"amount\"] / df.groupby(\"region\")[\"amount\"].transform(\"sum\") * 100\n)\ndf.round(1)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount",
+              "pct_of_region"
+            ],
+            "rows": [
+              [
+                "North",
+                "100",
+                "62.5"
+              ],
+              [
+                "North",
+                "60",
+                "37.5"
+              ],
+              [
+                "South",
+                "80",
+                "40.0"
+              ],
+              [
+                "South",
+                "120",
+                "60.0"
+              ],
+              [
+                "East",
+                "50",
+                "100.0"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64",
+              "float64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "combine": {
+      "setup": "orders = pd.DataFrame({\"customer_id\": [1, 2, 2, 3], \"amount\": [100, 80, 30, 55]})\ncustomers = pd.DataFrame({\"customer_id\": [1, 2, 3, 4], \"name\": [\"Ava\", \"Ben\", \"Cy\", \"Di\"]})\nmarch = pd.DataFrame({\"customer_id\": [4, 1], \"amount\": [40, 70]})",
+      "steps": {
+        "orders": {
+          "code": "orders",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "customer_id",
+              "amount"
+            ],
+            "rows": [
+              [
+                "1",
+                "100"
+              ],
+              [
+                "2",
+                "80"
+              ],
+              [
+                "2",
+                "30"
+              ],
+              [
+                "3",
+                "55"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "customers": {
+          "code": "customers",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "customer_id",
+              "name"
+            ],
+            "rows": [
+              [
+                "1",
+                "Ava"
+              ],
+              [
+                "2",
+                "Ben"
+              ],
+              [
+                "3",
+                "Cy"
+              ],
+              [
+                "4",
+                "Di"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "merged": {
+          "code": "orders.merge(customers, on=\"customer_id\", how=\"left\")",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "customer_id",
+              "amount",
+              "name"
+            ],
+            "rows": [
+              [
+                "1",
+                "100",
+                "Ava"
+              ],
+              [
+                "2",
+                "80",
+                "Ben"
+              ],
+              [
+                "2",
+                "30",
+                "Ben"
+              ],
+              [
+                "3",
+                "55",
+                "Cy"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "joined": {
+          "code": "orders.join(customers.set_index(\"customer_id\"), on=\"customer_id\")",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "customer_id",
+              "amount",
+              "name"
+            ],
+            "rows": [
+              [
+                "1",
+                "100",
+                "Ava"
+              ],
+              [
+                "2",
+                "80",
+                "Ben"
+              ],
+              [
+                "2",
+                "30",
+                "Ben"
+              ],
+              [
+                "3",
+                "55",
+                "Cy"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "stacked": {
+          "code": "pd.concat([orders, march], ignore_index=True)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "indexName": null,
+            "columns": [
+              "customer_id",
+              "amount"
+            ],
+            "rows": [
+              [
+                "1",
+                "100"
+              ],
+              [
+                "2",
+                "80"
+              ],
+              [
+                "2",
+                "30"
+              ],
+              [
+                "3",
+                "55"
+              ],
+              [
+                "4",
+                "40"
+              ],
+              [
+                "1",
+                "70"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "missing": {
+      "setup": "df = pd.DataFrame({\"region\": [\"N\", \"S\", None, \"E\"], \"amount\": [100.0, np.nan, 80.0, np.nan]})",
+      "steps": {
+        "frame": {
+          "code": "df",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "N",
+                "100.0"
+              ],
+              [
+                "S",
+                "NaN"
+              ],
+              [
+                "NaN",
+                "80.0"
+              ],
+              [
+                "E",
+                "NaN"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "float64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "nanEq": {
+          "code": "np.nan == np.nan",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "False",
+            "str": "False"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "eqCount": {
+          "code": "int((df[\"amount\"] == np.nan).sum())",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "0",
+            "str": "0"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "isnaSum": {
+          "code": "df.isna().sum()",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": null,
+            "index": [
+              "region",
+              "amount"
+            ],
+            "indexName": null,
+            "values": [
+              "1",
+              "2"
+            ],
+            "dtype": "int64"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "mean": {
+          "code": "df[\"amount\"].mean()",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "np.float64(90.0)",
+            "str": "90.0"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "filled": {
+          "code": "df[\"amount\"] = df[\"amount\"].fillna(df[\"amount\"].mean())\ndf",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "N",
+                "100.0"
+              ],
+              [
+                "S",
+                "90.0"
+              ],
+              [
+                "NaN",
+                "80.0"
+              ],
+              [
+                "E",
+                "90.0"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "float64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "chained": {
+      "setup": "df = pd.DataFrame({\n    \"region\": [\"North\", \"South\", \"North\", \"East\"],\n    \"amount\": [100, 80, 120, 50],\n})",
+      "steps": {
+        "frame": {
+          "code": "df",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "North",
+                "100"
+              ],
+              [
+                "South",
+                "80"
+              ],
+              [
+                "North",
+                "120"
+              ],
+              [
+                "East",
+                "50"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "chained": {
+          "code": "df[df[\"region\"] == \"North\"][\"amount\"] = 0\ndf",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "North",
+                "100"
+              ],
+              [
+                "South",
+                "80"
+              ],
+              [
+                "North",
+                "120"
+              ],
+              [
+                "East",
+                "50"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": [
+            "ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment.\nSuch chained assignment never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).\n\nTry using '.loc[row_indexer, col_indexer] = value' instead, to perform the assignment in a single step.\n\nSee the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html#chained-assignment"
+          ]
+        },
+        "loc": {
+          "code": "df.loc[df[\"region\"] == \"North\", \"amount\"] = 0\ndf",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "North",
+                "0"
+              ],
+              [
+                "South",
+                "80"
+              ],
+              [
+                "North",
+                "0"
+              ],
+              [
+                "East",
+                "50"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "version": {
+          "code": "pd.__version__",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "'3.0.2'",
+            "str": "3.0.2"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "subset": {
+      "setup": "df = pd.DataFrame({\n    \"region\": [\"North\", \"South\", \"North\", \"East\"],\n    \"amount\": [100, 80, 120, 50],\n})",
+      "steps": {
+        "subset": {
+          "code": "subset = df[df[\"region\"] == \"North\"].copy()\nsubset[\"amount\"] = 0\nsubset",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "2"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "North",
+                "0"
+              ],
+              [
+                "North",
+                "0"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "parent": {
+          "code": "df",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "North",
+                "100"
+              ],
+              [
+                "South",
+                "80"
+              ],
+              [
+                "North",
+                "120"
+              ],
+              [
+                "East",
+                "50"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "reshape": {
+      "setup": "wide = pd.DataFrame({\n    \"user\": [\"a\", \"b\"],\n    \"q1\": [10, 20],\n    \"q2\": [15, 25],\n})",
+      "steps": {
+        "wide": {
+          "code": "wide",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1"
+            ],
+            "indexName": null,
+            "columns": [
+              "user",
+              "q1",
+              "q2"
+            ],
+            "rows": [
+              [
+                "a",
+                "10",
+                "15"
+              ],
+              [
+                "b",
+                "20",
+                "25"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "long": {
+          "code": "long = wide.melt(id_vars=\"user\", var_name=\"quarter\", value_name=\"sales\")\nlong",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "user",
+              "quarter",
+              "sales"
+            ],
+            "rows": [
+              [
+                "a",
+                "q1",
+                "10"
+              ],
+              [
+                "b",
+                "q1",
+                "20"
+              ],
+              [
+                "a",
+                "q2",
+                "15"
+              ],
+              [
+                "b",
+                "q2",
+                "25"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "back": {
+          "code": "long.pivot(index=\"user\", columns=\"quarter\", values=\"sales\")",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "a",
+              "b"
+            ],
+            "indexName": "user",
+            "columns": [
+              "q1",
+              "q2"
+            ],
+            "rows": [
+              [
+                "10",
+                "15"
+              ],
+              [
+                "20",
+                "25"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "map": {
+      "setup": "df = pd.DataFrame({\"region\": [\"North\", \"South\", \"East\"], \"amount\": [100, 80, 50]})",
+      "steps": {
+        "code": {
+          "code": "df[\"code\"] = df[\"region\"].map({\"North\": \"N\", \"South\": \"S\", \"East\": \"E\"})\ndf[\"code\"]",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "code",
+            "index": [
+              "0",
+              "1",
+              "2"
+            ],
+            "indexName": null,
+            "values": [
+              "N",
+              "S",
+              "E"
+            ],
+            "dtype": "str"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "label": {
+          "code": "df[\"label\"] = df.apply(lambda r: f\"{r['code']}:{r['amount']}\", axis=1)\ndf",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount",
+              "code",
+              "label"
+            ],
+            "rows": [
+              [
+                "North",
+                "100",
+                "N",
+                "N:100"
+              ],
+              [
+                "South",
+                "80",
+                "S",
+                "S:80"
+              ],
+              [
+                "East",
+                "50",
+                "E",
+                "E:50"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64",
+              "str",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "cells": {
+          "code": "df[[\"amount\"]].map(lambda x: x * 2)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2"
+            ],
+            "indexName": null,
+            "columns": [
+              "amount"
+            ],
+            "rows": [
+              [
+                "200"
+              ],
+              [
+                "160"
+              ],
+              [
+                "100"
+              ]
+            ],
+            "dtypes": [
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "chain": {
+      "setup": "df = pd.DataFrame({\n    \"region\": [\"North\", \"South\", \"North\", \"East\", \"South\"],\n    \"amount\": [100, -20, 80, 50, 70],\n})",
+      "steps": {
+        "result": {
+          "code": "(\n    df\n    .query(\"amount > 0\")\n    .assign(tax=lambda d: d[\"amount\"] * 0.08)\n    .groupby(\"region\", as_index=False)[\"tax\"].sum()\n)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "tax"
+            ],
+            "rows": [
+              [
+                "East",
+                "4.0"
+              ],
+              [
+                "North",
+                "14.4"
+              ],
+              [
+                "South",
+                "5.6"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "float64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "case": {
+      "setup": "df = pd.DataFrame({\"amount\": [50, 120, 600, 80, 550]})",
+      "steps": {
+        "select": {
+          "code": "conditions = [df[\"amount\"] >= 500, df[\"amount\"] >= 100]\nchoices = [\"Large\", \"Medium\"]\ndf[\"size\"] = np.select(conditions, choices, default=\"Small\")\ndf",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "columns": [
+              "amount",
+              "size"
+            ],
+            "rows": [
+              [
+                "50",
+                "Small"
+              ],
+              [
+                "120",
+                "Medium"
+              ],
+              [
+                "600",
+                "Large"
+              ],
+              [
+                "80",
+                "Small"
+              ],
+              [
+                "550",
+                "Large"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "caseWhen": {
+          "code": "pd.Series(\"Small\", index=df.index).case_when([\n    (df[\"amount\"] >= 500, \"Large\"),\n    (df[\"amount\"] >= 100, \"Medium\"),\n])",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": null,
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "values": [
+              "Small",
+              "Medium",
+              "Large",
+              "Small",
+              "Large"
+            ],
+            "dtype": "str"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "bare": {
+          "code": "df[\"amount\"].case_when([(df[\"amount\"] >= 500, \"Large\"), (df[\"amount\"] >= 100, \"Medium\")])",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "amount",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "values": [
+              "50",
+              "Medium",
+              "Large",
+              "80",
+              "Large"
+            ],
+            "dtype": "object"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "category": {
+      "setup": "df = pd.DataFrame({\n    \"region\": [\"North\", \"South\", \"East\", \"West\", \"North\", \"South\"] * 50,\n    \"amount\": list(range(300)),\n})\nsize = pd.Series([\"high\", \"low\", \"medium\", \"low\"])",
+      "steps": {
+        "before": {
+          "code": "int(df[\"region\"].memory_usage(deep=True, index=False))",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "8900",
+            "str": "8900"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "after": {
+          "code": "df[\"region\"] = df[\"region\"].astype(\"category\")\nint(df[\"region\"].memory_usage(deep=True, index=False))",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "418",
+            "str": "418"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "ordered": {
+          "code": "size = size.astype(pd.CategoricalDtype([\"low\", \"medium\", \"high\"], ordered=True))\nsize > \"low\"",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": null,
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "values": [
+              "True",
+              "False",
+              "True",
+              "False"
+            ],
+            "dtype": "bool"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "dates": {
+      "setup": "df = pd.DataFrame({\n    \"date\": [\"2026-01-05\", \"2026-01-07\", \"2026-01-13\", \"2026-01-15\", \"2026-01-21\"],\n    \"amount\": [100, 80, 120, 50, 70],\n})",
+      "steps": {
+        "parsed": {
+          "code": "df[\"date\"] = pd.to_datetime(df[\"date\"])\nstr(df[\"date\"].dtype)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "'datetime64[us]'",
+            "str": "datetime64[us]"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "weekday": {
+          "code": "df[\"date\"].dt.day_name()",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "date",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "values": [
+              "Monday",
+              "Wednesday",
+              "Tuesday",
+              "Thursday",
+              "Wednesday"
+            ],
+            "dtype": "str"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "weekly": {
+          "code": "df.set_index(\"date\")[\"amount\"].resample(\"W\").sum()",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "amount",
+            "index": [
+              "2026-01-11",
+              "2026-01-18",
+              "2026-01-25"
+            ],
+            "indexName": "date",
+            "values": [
+              "180",
+              "170",
+              "70"
+            ],
+            "dtype": "int64"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    }
+  }
+}

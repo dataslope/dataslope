@@ -1,0 +1,2095 @@
+{
+  "figures": {
+    "window": {
+      "setup": "CREATE TABLE sales (day DATE, region TEXT, amount INTEGER);\nINSERT INTO sales VALUES\n  ('2024-01-01', 'North', 100), ('2024-01-02', 'North', 250), ('2024-01-03', 'North', 75),\n  ('2024-01-01', 'South', 180), ('2024-01-02', 'South', 320), ('2024-01-03', 'South', 140);",
+      "steps": {
+        "table": {
+          "sql": "SELECT day, region, amount FROM sales ORDER BY region, day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "region",
+            "amount"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "North",
+              100
+            ],
+            [
+              "2024-01-02",
+              "North",
+              250
+            ],
+            [
+              "2024-01-03",
+              "North",
+              75
+            ],
+            [
+              "2024-01-01",
+              "South",
+              180
+            ],
+            [
+              "2024-01-02",
+              "South",
+              320
+            ],
+            [
+              "2024-01-03",
+              "South",
+              140
+            ]
+          ]
+        },
+        "grouped": {
+          "sql": "SELECT region, SUM(amount) AS total\nFROM sales\nGROUP BY region\nORDER BY region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "total"
+          ],
+          "rows": [
+            [
+              "North",
+              "425"
+            ],
+            [
+              "South",
+              "640"
+            ]
+          ]
+        },
+        "windowed": {
+          "sql": "SELECT day, region, amount,\n  SUM(amount) OVER (PARTITION BY region) AS total\nFROM sales\nORDER BY region, day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "region",
+            "amount",
+            "total"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "North",
+              100,
+              "425"
+            ],
+            [
+              "2024-01-02",
+              "North",
+              250,
+              "425"
+            ],
+            [
+              "2024-01-03",
+              "North",
+              75,
+              "425"
+            ],
+            [
+              "2024-01-01",
+              "South",
+              180,
+              "640"
+            ],
+            [
+              "2024-01-02",
+              "South",
+              320,
+              "640"
+            ],
+            [
+              "2024-01-03",
+              "South",
+              140,
+              "640"
+            ]
+          ]
+        },
+        "ranked": {
+          "sql": "SELECT day, region, amount,\n  RANK() OVER (PARTITION BY region\n               ORDER BY amount DESC) AS rnk\nFROM sales\nORDER BY region, rnk;",
+          "ok": true,
+          "columns": [
+            "day",
+            "region",
+            "amount",
+            "rnk"
+          ],
+          "rows": [
+            [
+              "2024-01-02",
+              "North",
+              250,
+              1
+            ],
+            [
+              "2024-01-01",
+              "North",
+              100,
+              2
+            ],
+            [
+              "2024-01-03",
+              "North",
+              75,
+              3
+            ],
+            [
+              "2024-01-02",
+              "South",
+              320,
+              1
+            ],
+            [
+              "2024-01-01",
+              "South",
+              180,
+              2
+            ],
+            [
+              "2024-01-03",
+              "South",
+              140,
+              3
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "rank": {
+      "setup": "CREATE TABLE results (name TEXT, score INTEGER);\nINSERT INTO results VALUES\n  ('Alice', 90), ('Bob', 85), ('Carol', 85), ('Dave', 80),\n  ('Erin', 97), ('Frank', 78), ('Grace', 91), ('Hugo', 85),\n  ('Iris', 72), ('Jonas', 88), ('Kira', 95), ('Leo', 64),\n  ('Mona', 80), ('Nils', 99), ('Otto', 76), ('Pia', 88),\n  ('Quinn', 69), ('Rui', 93), ('Sara', 85), ('Theo', 71),\n  ('Ulla', 82), ('Vik', 96), ('Wanda', 74), ('Yara', 88);",
+      "steps": {
+        "all": {
+          "sql": "SELECT name, score,\n  ROW_NUMBER() OVER (ORDER BY score DESC) AS rn,\n  RANK()       OVER (ORDER BY score DESC) AS rnk,\n  DENSE_RANK() OVER (ORDER BY score DESC) AS drnk\nFROM results;",
+          "ok": true,
+          "columns": [
+            "name",
+            "score",
+            "rn",
+            "rnk",
+            "drnk"
+          ],
+          "rows": [
+            [
+              "Nils",
+              99,
+              1,
+              1,
+              1
+            ],
+            [
+              "Erin",
+              97,
+              2,
+              2,
+              2
+            ],
+            [
+              "Vik",
+              96,
+              3,
+              3,
+              3
+            ],
+            [
+              "Kira",
+              95,
+              4,
+              4,
+              4
+            ],
+            [
+              "Rui",
+              93,
+              5,
+              5,
+              5
+            ],
+            [
+              "Grace",
+              91,
+              6,
+              6,
+              6
+            ],
+            [
+              "Alice",
+              90,
+              7,
+              7,
+              7
+            ],
+            [
+              "Yara",
+              88,
+              8,
+              8,
+              8
+            ],
+            [
+              "Jonas",
+              88,
+              9,
+              8,
+              8
+            ],
+            [
+              "Pia",
+              88,
+              10,
+              8,
+              8
+            ],
+            [
+              "Hugo",
+              85,
+              11,
+              11,
+              9
+            ],
+            [
+              "Carol",
+              85,
+              12,
+              11,
+              9
+            ],
+            [
+              "Sara",
+              85,
+              13,
+              11,
+              9
+            ],
+            [
+              "Bob",
+              85,
+              14,
+              11,
+              9
+            ],
+            [
+              "Ulla",
+              82,
+              15,
+              15,
+              10
+            ],
+            [
+              "Dave",
+              80,
+              16,
+              16,
+              11
+            ],
+            [
+              "Mona",
+              80,
+              17,
+              16,
+              11
+            ],
+            [
+              "Frank",
+              78,
+              18,
+              18,
+              12
+            ],
+            [
+              "Otto",
+              76,
+              19,
+              19,
+              13
+            ],
+            [
+              "Wanda",
+              74,
+              20,
+              20,
+              14
+            ],
+            [
+              "Iris",
+              72,
+              21,
+              21,
+              15
+            ],
+            [
+              "Theo",
+              71,
+              22,
+              22,
+              16
+            ],
+            [
+              "Quinn",
+              69,
+              23,
+              23,
+              17
+            ],
+            [
+              "Leo",
+              64,
+              24,
+              24,
+              18
+            ]
+          ]
+        },
+        "ordered": {
+          "sql": "SELECT name, score,\n  ROW_NUMBER() OVER (ORDER BY score DESC) AS rn,\n  RANK()       OVER (ORDER BY score DESC) AS rnk,\n  DENSE_RANK() OVER (ORDER BY score DESC) AS drnk\nFROM results\nORDER BY rn;",
+          "ok": true,
+          "columns": [
+            "name",
+            "score",
+            "rn",
+            "rnk",
+            "drnk"
+          ],
+          "rows": [
+            [
+              "Nils",
+              99,
+              1,
+              1,
+              1
+            ],
+            [
+              "Erin",
+              97,
+              2,
+              2,
+              2
+            ],
+            [
+              "Vik",
+              96,
+              3,
+              3,
+              3
+            ],
+            [
+              "Kira",
+              95,
+              4,
+              4,
+              4
+            ],
+            [
+              "Rui",
+              93,
+              5,
+              5,
+              5
+            ],
+            [
+              "Grace",
+              91,
+              6,
+              6,
+              6
+            ],
+            [
+              "Alice",
+              90,
+              7,
+              7,
+              7
+            ],
+            [
+              "Yara",
+              88,
+              8,
+              8,
+              8
+            ],
+            [
+              "Jonas",
+              88,
+              9,
+              8,
+              8
+            ],
+            [
+              "Pia",
+              88,
+              10,
+              8,
+              8
+            ],
+            [
+              "Hugo",
+              85,
+              11,
+              11,
+              9
+            ],
+            [
+              "Carol",
+              85,
+              12,
+              11,
+              9
+            ],
+            [
+              "Sara",
+              85,
+              13,
+              11,
+              9
+            ],
+            [
+              "Bob",
+              85,
+              14,
+              11,
+              9
+            ],
+            [
+              "Ulla",
+              82,
+              15,
+              15,
+              10
+            ],
+            [
+              "Dave",
+              80,
+              16,
+              16,
+              11
+            ],
+            [
+              "Mona",
+              80,
+              17,
+              16,
+              11
+            ],
+            [
+              "Frank",
+              78,
+              18,
+              18,
+              12
+            ],
+            [
+              "Otto",
+              76,
+              19,
+              19,
+              13
+            ],
+            [
+              "Wanda",
+              74,
+              20,
+              20,
+              14
+            ],
+            [
+              "Iris",
+              72,
+              21,
+              21,
+              15
+            ],
+            [
+              "Theo",
+              71,
+              22,
+              22,
+              16
+            ],
+            [
+              "Quinn",
+              69,
+              23,
+              23,
+              17
+            ],
+            [
+              "Leo",
+              64,
+              24,
+              24,
+              18
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "topN": {
+      "setup": "CREATE TABLE products (category TEXT, product TEXT, revenue INTEGER);\nINSERT INTO products VALUES\n  ('Books', 'Dune', 420), ('Books', 'Emma', 310), ('Books', 'Ulysses', 310), ('Books', 'Beloved', 150),\n  ('Games', 'Chess', 500), ('Games', 'Go', 260), ('Games', 'Risk', 180), ('Games', 'Uno', 90);",
+      "steps": {
+        "table": {
+          "sql": "SELECT category, product, revenue FROM products ORDER BY category, revenue DESC, product;",
+          "ok": true,
+          "columns": [
+            "category",
+            "product",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "Books",
+              "Dune",
+              420
+            ],
+            [
+              "Books",
+              "Emma",
+              310
+            ],
+            [
+              "Books",
+              "Ulysses",
+              310
+            ],
+            [
+              "Books",
+              "Beloved",
+              150
+            ],
+            [
+              "Games",
+              "Chess",
+              500
+            ],
+            [
+              "Games",
+              "Go",
+              260
+            ],
+            [
+              "Games",
+              "Risk",
+              180
+            ],
+            [
+              "Games",
+              "Uno",
+              90
+            ]
+          ]
+        },
+        "rowNumber": {
+          "sql": "WITH ranked AS (\n  SELECT *,\n    ROW_NUMBER() OVER (PARTITION BY category\n                       ORDER BY revenue DESC) AS rn\n  FROM products\n)\nSELECT * FROM ranked WHERE rn <= 2\nORDER BY category, rn;",
+          "ok": true,
+          "columns": [
+            "category",
+            "product",
+            "revenue",
+            "rn"
+          ],
+          "rows": [
+            [
+              "Books",
+              "Dune",
+              420,
+              1
+            ],
+            [
+              "Books",
+              "Emma",
+              310,
+              2
+            ],
+            [
+              "Games",
+              "Chess",
+              500,
+              1
+            ],
+            [
+              "Games",
+              "Go",
+              260,
+              2
+            ]
+          ]
+        },
+        "rank": {
+          "sql": "WITH ranked AS (\n  SELECT *,\n    RANK() OVER (PARTITION BY category\n                 ORDER BY revenue DESC) AS rn\n  FROM products\n)\nSELECT * FROM ranked WHERE rn <= 2\nORDER BY category, rn, product;",
+          "ok": true,
+          "columns": [
+            "category",
+            "product",
+            "revenue",
+            "rn"
+          ],
+          "rows": [
+            [
+              "Books",
+              "Dune",
+              420,
+              1
+            ],
+            [
+              "Books",
+              "Emma",
+              310,
+              2
+            ],
+            [
+              "Books",
+              "Ulysses",
+              310,
+              2
+            ],
+            [
+              "Games",
+              "Chess",
+              500,
+              1
+            ],
+            [
+              "Games",
+              "Go",
+              260,
+              2
+            ]
+          ]
+        },
+        "qualify": {
+          "sql": "SELECT *,\n  ROW_NUMBER() OVER (PARTITION BY category\n                     ORDER BY revenue DESC) AS rn\nFROM products\nQUALIFY rn <= 2\nORDER BY category, rn;",
+          "ok": true,
+          "columns": [
+            "category",
+            "product",
+            "revenue",
+            "rn"
+          ],
+          "rows": [
+            [
+              "Books",
+              "Dune",
+              420,
+              1
+            ],
+            [
+              "Books",
+              "Emma",
+              310,
+              2
+            ],
+            [
+              "Games",
+              "Chess",
+              500,
+              1
+            ],
+            [
+              "Games",
+              "Go",
+              260,
+              2
+            ]
+          ]
+        },
+        "inWhere": {
+          "sql": "SELECT *\nFROM products\nWHERE ROW_NUMBER() OVER (PARTITION BY category\n                         ORDER BY revenue DESC) <= 2;",
+          "ok": false,
+          "error": "Binder Error: WHERE clause cannot contain window functions!"
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "frame": {
+      "setup": "CREATE TABLE payments (id INTEGER, day DATE, amount INTEGER);\nINSERT INTO payments VALUES\n  (1, '2024-01-01', 100), (2, '2024-01-02', 250), (3, '2024-01-02', 75), (4, '2024-01-03', 180);",
+      "steps": {
+        "table": {
+          "sql": "SELECT id, day, amount FROM payments ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "day",
+            "amount"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01",
+              100
+            ],
+            [
+              2,
+              "2024-01-02",
+              250
+            ],
+            [
+              3,
+              "2024-01-02",
+              75
+            ],
+            [
+              4,
+              "2024-01-03",
+              180
+            ]
+          ]
+        },
+        "rows": {
+          "sql": "SELECT id, day, amount,\n  SUM(amount) OVER (ORDER BY day\n    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total\nFROM payments\nORDER BY day, total;",
+          "ok": true,
+          "columns": [
+            "id",
+            "day",
+            "amount",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01",
+              100,
+              "100"
+            ],
+            [
+              2,
+              "2024-01-02",
+              250,
+              "350"
+            ],
+            [
+              3,
+              "2024-01-02",
+              75,
+              "425"
+            ],
+            [
+              4,
+              "2024-01-03",
+              180,
+              "605"
+            ]
+          ]
+        },
+        "range": {
+          "sql": "SELECT id, day, amount,\n  SUM(amount) OVER (ORDER BY day\n    RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total\nFROM payments\nORDER BY day, id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "day",
+            "amount",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01",
+              100,
+              "100"
+            ],
+            [
+              2,
+              "2024-01-02",
+              250,
+              "425"
+            ],
+            [
+              3,
+              "2024-01-02",
+              75,
+              "425"
+            ],
+            [
+              4,
+              "2024-01-03",
+              180,
+              "605"
+            ]
+          ]
+        },
+        "defaulted": {
+          "sql": "SELECT id, day, amount,\n  SUM(amount) OVER (ORDER BY day) AS total\nFROM payments\nORDER BY day, id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "day",
+            "amount",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01",
+              100,
+              "100"
+            ],
+            [
+              2,
+              "2024-01-02",
+              250,
+              "425"
+            ],
+            [
+              3,
+              "2024-01-02",
+              75,
+              "425"
+            ],
+            [
+              4,
+              "2024-01-03",
+              180,
+              "605"
+            ]
+          ]
+        },
+        "whole": {
+          "sql": "SELECT id, day, amount,\n  SUM(amount) OVER () AS total\nFROM payments\nORDER BY day, id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "day",
+            "amount",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01",
+              100,
+              "605"
+            ],
+            [
+              2,
+              "2024-01-02",
+              250,
+              "605"
+            ],
+            [
+              3,
+              "2024-01-02",
+              75,
+              "605"
+            ],
+            [
+              4,
+              "2024-01-03",
+              180,
+              "605"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "last": {
+      "setup": "CREATE TABLE txns (day DATE, amount DECIMAL(8,2));\nINSERT INTO txns VALUES\n  ('2024-01-01', 100.00), ('2024-01-02', 250.00), ('2024-01-03', 75.00),\n  ('2024-01-04', 180.00), ('2024-01-05', 320.00), ('2024-01-06', 140.00),\n  ('2024-01-07', 95.00),  ('2024-01-08', 210.00), ('2024-01-09', 60.00),\n  ('2024-01-10', 275.00), ('2024-01-11', 130.00), ('2024-01-12', 185.00),\n  ('2024-01-13', 340.00), ('2024-01-14', 55.00),  ('2024-01-15', 220.00),\n  ('2024-01-16', 165.00), ('2024-01-17', 90.00),  ('2024-01-18', 300.00),\n  ('2024-01-19', 125.00), ('2024-01-20', 240.00), ('2024-01-21', 70.00),\n  ('2024-01-22', 195.00), ('2024-01-23', 155.00), ('2024-01-24', 280.00);",
+      "steps": {
+        "defaulted": {
+          "sql": "SELECT day, amount,\n  LAST_VALUE(amount) OVER (ORDER BY day) AS last\nFROM txns\nWHERE day <= DATE '2024-01-04'\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount",
+            "last"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "100.00",
+              "100.00"
+            ],
+            [
+              "2024-01-02",
+              "250.00",
+              "250.00"
+            ],
+            [
+              "2024-01-03",
+              "75.00",
+              "75.00"
+            ],
+            [
+              "2024-01-04",
+              "180.00",
+              "180.00"
+            ]
+          ]
+        },
+        "widened": {
+          "sql": "SELECT day, amount,\n  LAST_VALUE(amount) OVER (ORDER BY day\n    ROWS BETWEEN UNBOUNDED PRECEDING\n         AND UNBOUNDED FOLLOWING) AS last\nFROM txns\nWHERE day <= DATE '2024-01-04'\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount",
+            "last"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "100.00",
+              "180.00"
+            ],
+            [
+              "2024-01-02",
+              "250.00",
+              "180.00"
+            ],
+            [
+              "2024-01-03",
+              "75.00",
+              "180.00"
+            ],
+            [
+              "2024-01-04",
+              "180.00",
+              "180.00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "running": {
+      "setup": "CREATE TABLE txns (day DATE, amount DECIMAL(8,2));\nINSERT INTO txns VALUES\n  ('2024-01-01', 100.00), ('2024-01-02', 250.00), ('2024-01-03', 75.00),\n  ('2024-01-04', 180.00), ('2024-01-05', 320.00), ('2024-01-06', 140.00),\n  ('2024-01-07', 95.00),  ('2024-01-08', 210.00), ('2024-01-09', 60.00),\n  ('2024-01-10', 275.00), ('2024-01-11', 130.00), ('2024-01-12', 185.00),\n  ('2024-01-13', 340.00), ('2024-01-14', 55.00),  ('2024-01-15', 220.00),\n  ('2024-01-16', 165.00), ('2024-01-17', 90.00),  ('2024-01-18', 300.00),\n  ('2024-01-19', 125.00), ('2024-01-20', 240.00), ('2024-01-21', 70.00),\n  ('2024-01-22', 195.00), ('2024-01-23', 155.00), ('2024-01-24', 280.00);",
+      "steps": {
+        "both": {
+          "sql": "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg_3\nFROM txns\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount",
+            "running_total",
+            "moving_avg_3"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "100.00",
+              "100.00",
+              100
+            ],
+            [
+              "2024-01-02",
+              "250.00",
+              "350.00",
+              175
+            ],
+            [
+              "2024-01-03",
+              "75.00",
+              "425.00",
+              141.67
+            ],
+            [
+              "2024-01-04",
+              "180.00",
+              "605.00",
+              168.33
+            ],
+            [
+              "2024-01-05",
+              "320.00",
+              "925.00",
+              191.67
+            ],
+            [
+              "2024-01-06",
+              "140.00",
+              "1065.00",
+              213.33
+            ],
+            [
+              "2024-01-07",
+              "95.00",
+              "1160.00",
+              185
+            ],
+            [
+              "2024-01-08",
+              "210.00",
+              "1370.00",
+              148.33
+            ],
+            [
+              "2024-01-09",
+              "60.00",
+              "1430.00",
+              121.67
+            ],
+            [
+              "2024-01-10",
+              "275.00",
+              "1705.00",
+              181.67
+            ],
+            [
+              "2024-01-11",
+              "130.00",
+              "1835.00",
+              155
+            ],
+            [
+              "2024-01-12",
+              "185.00",
+              "2020.00",
+              196.67
+            ],
+            [
+              "2024-01-13",
+              "340.00",
+              "2360.00",
+              218.33
+            ],
+            [
+              "2024-01-14",
+              "55.00",
+              "2415.00",
+              193.33
+            ],
+            [
+              "2024-01-15",
+              "220.00",
+              "2635.00",
+              205
+            ],
+            [
+              "2024-01-16",
+              "165.00",
+              "2800.00",
+              146.67
+            ],
+            [
+              "2024-01-17",
+              "90.00",
+              "2890.00",
+              158.33
+            ],
+            [
+              "2024-01-18",
+              "300.00",
+              "3190.00",
+              185
+            ],
+            [
+              "2024-01-19",
+              "125.00",
+              "3315.00",
+              171.67
+            ],
+            [
+              "2024-01-20",
+              "240.00",
+              "3555.00",
+              221.67
+            ],
+            [
+              "2024-01-21",
+              "70.00",
+              "3625.00",
+              145
+            ],
+            [
+              "2024-01-22",
+              "195.00",
+              "3820.00",
+              168.33
+            ],
+            [
+              "2024-01-23",
+              "155.00",
+              "3975.00",
+              140
+            ],
+            [
+              "2024-01-24",
+              "280.00",
+              "4255.00",
+              210
+            ]
+          ]
+        },
+        "centered": {
+          "sql": "SELECT day, amount,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING), 2) AS centered_3\nFROM txns\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount",
+            "centered_3"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "100.00",
+              175
+            ],
+            [
+              "2024-01-02",
+              "250.00",
+              141.67
+            ],
+            [
+              "2024-01-03",
+              "75.00",
+              168.33
+            ],
+            [
+              "2024-01-04",
+              "180.00",
+              191.67
+            ],
+            [
+              "2024-01-05",
+              "320.00",
+              213.33
+            ],
+            [
+              "2024-01-06",
+              "140.00",
+              185
+            ],
+            [
+              "2024-01-07",
+              "95.00",
+              148.33
+            ],
+            [
+              "2024-01-08",
+              "210.00",
+              121.67
+            ],
+            [
+              "2024-01-09",
+              "60.00",
+              181.67
+            ],
+            [
+              "2024-01-10",
+              "275.00",
+              155
+            ],
+            [
+              "2024-01-11",
+              "130.00",
+              196.67
+            ],
+            [
+              "2024-01-12",
+              "185.00",
+              218.33
+            ],
+            [
+              "2024-01-13",
+              "340.00",
+              193.33
+            ],
+            [
+              "2024-01-14",
+              "55.00",
+              205
+            ],
+            [
+              "2024-01-15",
+              "220.00",
+              146.67
+            ],
+            [
+              "2024-01-16",
+              "165.00",
+              158.33
+            ],
+            [
+              "2024-01-17",
+              "90.00",
+              185
+            ],
+            [
+              "2024-01-18",
+              "300.00",
+              171.67
+            ],
+            [
+              "2024-01-19",
+              "125.00",
+              221.67
+            ],
+            [
+              "2024-01-20",
+              "240.00",
+              145
+            ],
+            [
+              "2024-01-21",
+              "70.00",
+              168.33
+            ],
+            [
+              "2024-01-22",
+              "195.00",
+              140
+            ],
+            [
+              "2024-01-23",
+              "155.00",
+              210
+            ],
+            [
+              "2024-01-24",
+              "280.00",
+              217.5
+            ]
+          ]
+        },
+        "lag": {
+          "sql": "SELECT day, amount,\n  LAG(amount) OVER (ORDER BY day) AS prev_day,\n  amount - LAG(amount) OVER (ORDER BY day) AS change\nFROM txns\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount",
+            "prev_day",
+            "change"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "100.00",
+              null,
+              null
+            ],
+            [
+              "2024-01-02",
+              "250.00",
+              "100.00",
+              "150.00"
+            ],
+            [
+              "2024-01-03",
+              "75.00",
+              "250.00",
+              "-175.00"
+            ],
+            [
+              "2024-01-04",
+              "180.00",
+              "75.00",
+              "105.00"
+            ],
+            [
+              "2024-01-05",
+              "320.00",
+              "180.00",
+              "140.00"
+            ],
+            [
+              "2024-01-06",
+              "140.00",
+              "320.00",
+              "-180.00"
+            ],
+            [
+              "2024-01-07",
+              "95.00",
+              "140.00",
+              "-45.00"
+            ],
+            [
+              "2024-01-08",
+              "210.00",
+              "95.00",
+              "115.00"
+            ],
+            [
+              "2024-01-09",
+              "60.00",
+              "210.00",
+              "-150.00"
+            ],
+            [
+              "2024-01-10",
+              "275.00",
+              "60.00",
+              "215.00"
+            ],
+            [
+              "2024-01-11",
+              "130.00",
+              "275.00",
+              "-145.00"
+            ],
+            [
+              "2024-01-12",
+              "185.00",
+              "130.00",
+              "55.00"
+            ],
+            [
+              "2024-01-13",
+              "340.00",
+              "185.00",
+              "155.00"
+            ],
+            [
+              "2024-01-14",
+              "55.00",
+              "340.00",
+              "-285.00"
+            ],
+            [
+              "2024-01-15",
+              "220.00",
+              "55.00",
+              "165.00"
+            ],
+            [
+              "2024-01-16",
+              "165.00",
+              "220.00",
+              "-55.00"
+            ],
+            [
+              "2024-01-17",
+              "90.00",
+              "165.00",
+              "-75.00"
+            ],
+            [
+              "2024-01-18",
+              "300.00",
+              "90.00",
+              "210.00"
+            ],
+            [
+              "2024-01-19",
+              "125.00",
+              "300.00",
+              "-175.00"
+            ],
+            [
+              "2024-01-20",
+              "240.00",
+              "125.00",
+              "115.00"
+            ],
+            [
+              "2024-01-21",
+              "70.00",
+              "240.00",
+              "-170.00"
+            ],
+            [
+              "2024-01-22",
+              "195.00",
+              "70.00",
+              "125.00"
+            ],
+            [
+              "2024-01-23",
+              "155.00",
+              "195.00",
+              "-40.00"
+            ],
+            [
+              "2024-01-24",
+              "280.00",
+              "155.00",
+              "125.00"
+            ]
+          ]
+        },
+        "weeks": {
+          "sql": "SELECT DATE_TRUNC('week', day) AS week,\n  COUNT(*) AS days,\n  SUM(amount) AS revenue\nFROM txns\nGROUP BY 1\nORDER BY 1;",
+          "ok": true,
+          "columns": [
+            "week",
+            "days",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              7,
+              "1160.00"
+            ],
+            [
+              "2024-01-08",
+              7,
+              "1255.00"
+            ],
+            [
+              "2024-01-15",
+              7,
+              "1210.00"
+            ],
+            [
+              "2024-01-22",
+              3,
+              "630.00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "latest": {
+      "setup": "CREATE TABLE events (user_id INTEGER, plan TEXT, updated_at DATE);\nINSERT INTO events VALUES\n  (1, 'free', '2024-01-03'), (1, 'pro', '2024-02-10'), (1, 'team', '2024-03-05'),\n  (2, 'free', '2024-01-20'), (2, 'pro', '2024-02-28'),\n  (3, 'free', '2024-02-14');",
+      "steps": {
+        "ranked": {
+          "sql": "SELECT *,\n  ROW_NUMBER() OVER (PARTITION BY user_id\n                     ORDER BY updated_at DESC) AS rn\nFROM events\nORDER BY user_id, rn;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "plan",
+            "updated_at",
+            "rn"
+          ],
+          "rows": [
+            [
+              1,
+              "team",
+              "2024-03-05",
+              1
+            ],
+            [
+              1,
+              "pro",
+              "2024-02-10",
+              2
+            ],
+            [
+              1,
+              "free",
+              "2024-01-03",
+              3
+            ],
+            [
+              2,
+              "pro",
+              "2024-02-28",
+              1
+            ],
+            [
+              2,
+              "free",
+              "2024-01-20",
+              2
+            ],
+            [
+              3,
+              "free",
+              "2024-02-14",
+              1
+            ]
+          ]
+        },
+        "kept": {
+          "sql": "WITH ranked AS (\n  SELECT *,\n    ROW_NUMBER() OVER (PARTITION BY user_id\n                       ORDER BY updated_at DESC) AS rn\n  FROM events\n)\nSELECT * FROM ranked WHERE rn = 1\nORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "plan",
+            "updated_at",
+            "rn"
+          ],
+          "rows": [
+            [
+              1,
+              "team",
+              "2024-03-05",
+              1
+            ],
+            [
+              2,
+              "pro",
+              "2024-02-28",
+              1
+            ],
+            [
+              3,
+              "free",
+              "2024-02-14",
+              1
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "spine": {
+      "setup": "CREATE TABLE sales (day DATE, amount INTEGER);\nINSERT INTO sales VALUES\n  ('2024-03-01', 100), ('2024-03-03', 250), ('2024-03-04', 75),\n  ('2024-03-06', 190), ('2024-03-07', 145), ('2024-03-10', 220),\n  ('2024-03-11', 80),  ('2024-03-12', 310), ('2024-03-15', 125),\n  ('2024-03-17', 265), ('2024-03-18', 95),  ('2024-03-20', 175),\n  ('2024-03-21', 240), ('2024-03-24', 60),  ('2024-03-25', 205),\n  ('2024-03-26', 130), ('2024-03-28', 285), ('2024-03-29', 110),\n  ('2024-03-31', 160), ('2024-04-02', 195), ('2024-04-03', 70),\n  ('2024-04-05', 250), ('2024-04-06', 140), ('2024-04-08', 300);",
+      "steps": {
+        "without": {
+          "sql": "SELECT day, amount\nFROM sales\nWHERE day <= DATE '2024-03-05'\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount"
+          ],
+          "rows": [
+            [
+              "2024-03-01",
+              100
+            ],
+            [
+              "2024-03-03",
+              250
+            ],
+            [
+              "2024-03-04",
+              75
+            ]
+          ]
+        },
+        "spine": {
+          "sql": "WITH spine AS (\n  SELECT unnest(generate_series(DATE '2024-03-01',\n    DATE '2024-03-05', INTERVAL 1 DAY))::DATE AS day\n)\nSELECT s.day, COALESCE(x.amount, 0) AS amount\nFROM spine s\nLEFT JOIN sales x ON x.day = s.day\nORDER BY s.day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount"
+          ],
+          "rows": [
+            [
+              "2024-03-01",
+              100
+            ],
+            [
+              "2024-03-02",
+              0
+            ],
+            [
+              "2024-03-03",
+              250
+            ],
+            [
+              "2024-03-04",
+              75
+            ],
+            [
+              "2024-03-05",
+              0
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "ntile": {
+      "setup": "CREATE TABLE customers (name TEXT, spend DECIMAL(8,2));\nINSERT INTO customers VALUES\n  ('Ava', 900), ('Ben', 720), ('Cy', 540), ('Di', 480),\n  ('Eve', 300), ('Finn', 260), ('Gus', 150), ('Hana', 90),\n  ('Iris', 1450), ('Jonas', 1120), ('Kira', 880), ('Leo', 815),\n  ('Mona', 640), ('Nils', 605), ('Otto', 570), ('Pia', 505),\n  ('Quinn', 430), ('Rui', 375), ('Sara', 340), ('Theo', 285),\n  ('Ulla', 230), ('Vik', 195), ('Wanda', 130), ('Yara', 45);",
+      "steps": {
+        "quartiles": {
+          "sql": "SELECT name, spend,\n  NTILE(4) OVER (ORDER BY spend DESC) AS spend_quartile\nFROM customers\nORDER BY spend DESC;",
+          "ok": true,
+          "columns": [
+            "name",
+            "spend",
+            "spend_quartile"
+          ],
+          "rows": [
+            [
+              "Iris",
+              "1450.00",
+              1
+            ],
+            [
+              "Jonas",
+              "1120.00",
+              1
+            ],
+            [
+              "Ava",
+              "900.00",
+              1
+            ],
+            [
+              "Kira",
+              "880.00",
+              1
+            ],
+            [
+              "Leo",
+              "815.00",
+              1
+            ],
+            [
+              "Ben",
+              "720.00",
+              1
+            ],
+            [
+              "Mona",
+              "640.00",
+              2
+            ],
+            [
+              "Nils",
+              "605.00",
+              2
+            ],
+            [
+              "Otto",
+              "570.00",
+              2
+            ],
+            [
+              "Cy",
+              "540.00",
+              2
+            ],
+            [
+              "Pia",
+              "505.00",
+              2
+            ],
+            [
+              "Di",
+              "480.00",
+              2
+            ],
+            [
+              "Quinn",
+              "430.00",
+              3
+            ],
+            [
+              "Rui",
+              "375.00",
+              3
+            ],
+            [
+              "Sara",
+              "340.00",
+              3
+            ],
+            [
+              "Eve",
+              "300.00",
+              3
+            ],
+            [
+              "Theo",
+              "285.00",
+              3
+            ],
+            [
+              "Finn",
+              "260.00",
+              3
+            ],
+            [
+              "Ulla",
+              "230.00",
+              4
+            ],
+            [
+              "Vik",
+              "195.00",
+              4
+            ],
+            [
+              "Gus",
+              "150.00",
+              4
+            ],
+            [
+              "Wanda",
+              "130.00",
+              4
+            ],
+            [
+              "Hana",
+              "90.00",
+              4
+            ],
+            [
+              "Yara",
+              "45.00",
+              4
+            ]
+          ]
+        },
+        "quartileSizes": {
+          "sql": "SELECT spend_quartile, COUNT(*) AS customers FROM (\n  SELECT NTILE(4) OVER (ORDER BY spend DESC) AS spend_quartile FROM customers\n) GROUP BY 1 ORDER BY 1;",
+          "ok": true,
+          "columns": [
+            "spend_quartile",
+            "customers"
+          ],
+          "rows": [
+            [
+              1,
+              6
+            ],
+            [
+              2,
+              6
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              6
+            ]
+          ]
+        },
+        "fifthSizes": {
+          "sql": "SELECT bucket, COUNT(*) AS customers FROM (\n  SELECT NTILE(5) OVER (ORDER BY spend DESC) AS bucket FROM customers\n) GROUP BY 1 ORDER BY 1;",
+          "ok": true,
+          "columns": [
+            "bucket",
+            "customers"
+          ],
+          "rows": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              5
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              5
+            ],
+            [
+              5,
+              4
+            ]
+          ]
+        },
+        "standing": {
+          "sql": "SELECT name, spend,\n  PERCENT_RANK() OVER (ORDER BY spend) AS pct_rank,\n  CUME_DIST()    OVER (ORDER BY spend) AS cume_dist\nFROM customers\nWHERE name IN ('Ava', 'Ben', 'Cy', 'Di', 'Eve')\nORDER BY spend;",
+          "ok": true,
+          "columns": [
+            "name",
+            "spend",
+            "pct_rank",
+            "cume_dist"
+          ],
+          "rows": [
+            [
+              "Eve",
+              "300.00",
+              0,
+              0.2
+            ],
+            [
+              "Di",
+              "480.00",
+              0.25,
+              0.4
+            ],
+            [
+              "Cy",
+              "540.00",
+              0.5,
+              0.6
+            ],
+            [
+              "Ben",
+              "720.00",
+              0.75,
+              0.8
+            ],
+            [
+              "Ava",
+              "900.00",
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "recursive": {
+      "setup": "CREATE TABLE emp (id INT, name TEXT, manager_id INT);\nINSERT INTO emp VALUES\n  (1,'CEO',NULL),\n  (2,'VP Eng',1), (3,'VP Sales',1), (4,'VP Finance',1),\n  (5,'Eng Mgr Platform',2), (6,'Eng Mgr Product',2), (7,'Eng Mgr Data',2),\n  (8,'Sales Dir East',3), (9,'Sales Dir West',3),\n  (10,'Controller',4),\n  (11,'Engineer A',5), (12,'Engineer B',5), (13,'Engineer C',6),\n  (14,'Engineer D',6), (15,'Engineer E',7), (16,'Engineer F',7),\n  (17,'AE East 1',8), (18,'AE East 2',8), (19,'AE West 1',9),\n  (20,'AE West 2',9), (21,'Accountant',10),\n  (22,'Intern Platform',11), (23,'Intern Data',15), (24,'Intern Product',13);",
+      "steps": {
+        "org": {
+          "sql": "WITH RECURSIVE org AS (\n  SELECT id, name, manager_id, 1 AS depth\n  FROM emp\n  WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.id, e.name, e.manager_id, o.depth + 1\n  FROM emp e\n  JOIN org o ON e.manager_id = o.id\n)\nSELECT * FROM org ORDER BY depth, id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "name",
+            "manager_id",
+            "depth"
+          ],
+          "rows": [
+            [
+              1,
+              "CEO",
+              null,
+              1
+            ],
+            [
+              2,
+              "VP Eng",
+              1,
+              2
+            ],
+            [
+              3,
+              "VP Sales",
+              1,
+              2
+            ],
+            [
+              4,
+              "VP Finance",
+              1,
+              2
+            ],
+            [
+              5,
+              "Eng Mgr Platform",
+              2,
+              3
+            ],
+            [
+              6,
+              "Eng Mgr Product",
+              2,
+              3
+            ],
+            [
+              7,
+              "Eng Mgr Data",
+              2,
+              3
+            ],
+            [
+              8,
+              "Sales Dir East",
+              3,
+              3
+            ],
+            [
+              9,
+              "Sales Dir West",
+              3,
+              3
+            ],
+            [
+              10,
+              "Controller",
+              4,
+              3
+            ],
+            [
+              11,
+              "Engineer A",
+              5,
+              4
+            ],
+            [
+              12,
+              "Engineer B",
+              5,
+              4
+            ],
+            [
+              13,
+              "Engineer C",
+              6,
+              4
+            ],
+            [
+              14,
+              "Engineer D",
+              6,
+              4
+            ],
+            [
+              15,
+              "Engineer E",
+              7,
+              4
+            ],
+            [
+              16,
+              "Engineer F",
+              7,
+              4
+            ],
+            [
+              17,
+              "AE East 1",
+              8,
+              4
+            ],
+            [
+              18,
+              "AE East 2",
+              8,
+              4
+            ],
+            [
+              19,
+              "AE West 1",
+              9,
+              4
+            ],
+            [
+              20,
+              "AE West 2",
+              9,
+              4
+            ],
+            [
+              21,
+              "Accountant",
+              10,
+              4
+            ],
+            [
+              22,
+              "Intern Platform",
+              11,
+              5
+            ],
+            [
+              23,
+              "Intern Data",
+              15,
+              5
+            ],
+            [
+              24,
+              "Intern Product",
+              13,
+              5
+            ]
+          ]
+        },
+        "levels": {
+          "sql": "WITH RECURSIVE org AS (\n  SELECT id, 1 AS depth FROM emp WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.id, o.depth + 1 FROM emp e JOIN org o ON e.manager_id = o.id\n)\nSELECT depth, COUNT(*) AS people FROM org GROUP BY depth ORDER BY depth;",
+          "ok": true,
+          "columns": [
+            "depth",
+            "people"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              3,
+              6
+            ],
+            [
+              4,
+              11
+            ],
+            [
+              5,
+              3
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "pivot": {
+      "setup": "CREATE TABLE sales (region TEXT, quarter TEXT, amount INTEGER);\nINSERT INTO sales VALUES\n  ('North','Q1',100), ('North','Q2',140), ('South','Q1',80),\n  ('South','Q2',120), ('North','Q1',60),  ('South','Q2',30),\n  ('East','Q1',95),   ('East','Q2',175),  ('West','Q1',110),\n  ('West','Q2',65),   ('North','Q2',85),  ('South','Q1',145),\n  ('East','Q1',40),   ('West','Q2',200),  ('North','Q1',75),\n  ('South','Q2',55),  ('East','Q2',130),  ('West','Q1',90),\n  ('North','Q2',115), ('South','Q1',35),  ('East','Q1',160),\n  ('West','Q2',105),  ('North','Q1',50),  ('South','Q2',185);",
+      "steps": {
+        "pivot": {
+          "sql": "SELECT\n  region,\n  SUM(CASE WHEN quarter = 'Q1' THEN amount ELSE 0 END) AS q1,\n  SUM(CASE WHEN quarter = 'Q2' THEN amount ELSE 0 END) AS q2\nFROM sales\nGROUP BY region\nORDER BY region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "q1",
+            "q2"
+          ],
+          "rows": [
+            [
+              "East",
+              "295",
+              "305"
+            ],
+            [
+              "North",
+              "285",
+              "340"
+            ],
+            [
+              "South",
+              "260",
+              "390"
+            ],
+            [
+              "West",
+              "200",
+              "370"
+            ]
+          ]
+        },
+        "unpivot": {
+          "sql": "WITH wide AS (\n  SELECT region,\n    SUM(CASE WHEN quarter = 'Q1' THEN amount ELSE 0 END) AS q1,\n    SUM(CASE WHEN quarter = 'Q2' THEN amount ELSE 0 END) AS q2\n  FROM sales GROUP BY region\n)\nSELECT region, 'q1' AS quarter, q1 AS amount FROM wide\nUNION ALL\nSELECT region, 'q2' AS quarter, q2 AS amount FROM wide\nORDER BY region, quarter;",
+          "ok": true,
+          "columns": [
+            "region",
+            "quarter",
+            "amount"
+          ],
+          "rows": [
+            [
+              "East",
+              "q1",
+              "295"
+            ],
+            [
+              "East",
+              "q2",
+              "305"
+            ],
+            [
+              "North",
+              "q1",
+              "285"
+            ],
+            [
+              "North",
+              "q2",
+              "340"
+            ],
+            [
+              "South",
+              "q1",
+              "260"
+            ],
+            [
+              "South",
+              "q2",
+              "390"
+            ],
+            [
+              "West",
+              "q1",
+              "200"
+            ],
+            [
+              "West",
+              "q2",
+              "370"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    }
+  }
+}

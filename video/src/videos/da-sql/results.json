@@ -1,0 +1,1888 @@
+{
+  "figures": {
+    "where": {
+      "setup": "CREATE TABLE orders (region TEXT, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  ('North', 120.00), ('South', 80.50), ('East', 200.00),\n  ('West', 50.25),   ('North', 60.00), ('South', 90.00),\n  ('East', 140.00),  ('West', 110.00), ('North', 75.50),\n  ('South', 65.00),  ('North', 145.75), ('East', 95.00),\n  ('West', 40.00),   ('South', 130.25), ('North', 88.00),\n  ('East', 175.50),  ('West', 62.75),   ('South', 105.00),\n  ('North', 210.00), ('East', 45.25),   ('West', 155.00),\n  ('South', 70.75),  ('North', 99.50),  ('East', 185.00);",
+      "steps": {
+        "rows": {
+          "sql": "SELECT COUNT(*) AS n FROM orders;",
+          "ok": true,
+          "columns": [
+            "n"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "table": {
+          "sql": "SELECT region, amount FROM orders ORDER BY rowid;",
+          "ok": true,
+          "columns": [
+            "region",
+            "amount"
+          ],
+          "rows": [
+            [
+              "North",
+              "120.00"
+            ],
+            [
+              "South",
+              "80.50"
+            ],
+            [
+              "East",
+              "200.00"
+            ],
+            [
+              "West",
+              "50.25"
+            ],
+            [
+              "North",
+              "60.00"
+            ],
+            [
+              "South",
+              "90.00"
+            ],
+            [
+              "East",
+              "140.00"
+            ],
+            [
+              "West",
+              "110.00"
+            ],
+            [
+              "North",
+              "75.50"
+            ],
+            [
+              "South",
+              "65.00"
+            ],
+            [
+              "North",
+              "145.75"
+            ],
+            [
+              "East",
+              "95.00"
+            ],
+            [
+              "West",
+              "40.00"
+            ],
+            [
+              "South",
+              "130.25"
+            ],
+            [
+              "North",
+              "88.00"
+            ],
+            [
+              "East",
+              "175.50"
+            ],
+            [
+              "West",
+              "62.75"
+            ],
+            [
+              "South",
+              "105.00"
+            ],
+            [
+              "North",
+              "210.00"
+            ],
+            [
+              "East",
+              "45.25"
+            ],
+            [
+              "West",
+              "155.00"
+            ],
+            [
+              "South",
+              "70.75"
+            ],
+            [
+              "North",
+              "99.50"
+            ],
+            [
+              "East",
+              "185.00"
+            ]
+          ]
+        },
+        "totals": {
+          "sql": "SELECT region, SUM(amount) AS revenue FROM orders GROUP BY region ORDER BY revenue DESC;",
+          "ok": true,
+          "columns": [
+            "region",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "East",
+              "840.75"
+            ],
+            [
+              "North",
+              "798.75"
+            ],
+            [
+              "South",
+              "541.50"
+            ],
+            [
+              "West",
+              "418.00"
+            ]
+          ]
+        },
+        "whereAggregate": {
+          "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE SUM(amount) > 600\nGROUP BY region;",
+          "ok": false,
+          "error": "Binder Error: WHERE clause cannot contain aggregates!"
+        },
+        "having": {
+          "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nGROUP BY region\nHAVING SUM(amount) > 600\nORDER BY revenue DESC;",
+          "ok": true,
+          "columns": [
+            "region",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "East",
+              "840.75"
+            ],
+            [
+              "North",
+              "798.75"
+            ]
+          ]
+        },
+        "bigRows": {
+          "sql": "SELECT COUNT(*) AS n FROM orders WHERE amount >= 100;",
+          "ok": true,
+          "columns": [
+            "n"
+          ],
+          "rows": [
+            [
+              11
+            ]
+          ]
+        },
+        "bigGroups": {
+          "sql": "SELECT region, COUNT(*) AS orders, SUM(amount) AS revenue FROM orders WHERE amount >= 100 GROUP BY region ORDER BY revenue DESC;",
+          "ok": true,
+          "columns": [
+            "region",
+            "orders",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "East",
+              4,
+              "700.50"
+            ],
+            [
+              "North",
+              3,
+              "475.75"
+            ],
+            [
+              "West",
+              2,
+              "265.00"
+            ],
+            [
+              "South",
+              2,
+              "235.25"
+            ]
+          ]
+        },
+        "both": {
+          "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE amount >= 100\nGROUP BY region\nHAVING SUM(amount) > 400\nORDER BY revenue DESC\nLIMIT 10;",
+          "ok": true,
+          "columns": [
+            "region",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "East",
+              "700.50"
+            ],
+            [
+              "North",
+              "475.75"
+            ]
+          ]
+        },
+        "plainAlias": {
+          "sql": "SELECT region, amount * 2 AS doubled FROM orders WHERE doubled > 400 ORDER BY doubled DESC;",
+          "ok": true,
+          "columns": [
+            "region",
+            "doubled"
+          ],
+          "rows": [
+            [
+              "North",
+              "420.00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "joins": {
+      "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00), (125, 25, 64.00);",
+      "steps": {
+        "customers": {
+          "sql": "SELECT id, name FROM customers ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Ava"
+            ],
+            [
+              2,
+              "Ben"
+            ],
+            [
+              3,
+              "Cy"
+            ],
+            [
+              4,
+              "Di"
+            ]
+          ]
+        },
+        "orders": {
+          "sql": "SELECT id, customer_id, amount FROM orders ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              1,
+              "120.00"
+            ],
+            [
+              102,
+              1,
+              "40.00"
+            ],
+            [
+              103,
+              2,
+              "80.00"
+            ],
+            [
+              104,
+              3,
+              "55.00"
+            ],
+            [
+              105,
+              3,
+              "45.00"
+            ],
+            [
+              106,
+              2,
+              "30.00"
+            ],
+            [
+              125,
+              25,
+              "64.00"
+            ]
+          ]
+        },
+        "inner": {
+          "sql": "SELECT c.name, o.id AS order_id, o.amount FROM customers c INNER JOIN orders o ON o.customer_id = c.id ORDER BY o.id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "order_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              "Ava",
+              101,
+              "120.00"
+            ],
+            [
+              "Ava",
+              102,
+              "40.00"
+            ],
+            [
+              "Ben",
+              103,
+              "80.00"
+            ],
+            [
+              "Cy",
+              104,
+              "55.00"
+            ],
+            [
+              "Cy",
+              105,
+              "45.00"
+            ],
+            [
+              "Ben",
+              106,
+              "30.00"
+            ]
+          ]
+        },
+        "left": {
+          "sql": "SELECT c.name, o.id AS order_id, o.amount FROM customers c LEFT JOIN orders o ON o.customer_id = c.id ORDER BY o.id NULLS LAST, c.id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "order_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              "Ava",
+              101,
+              "120.00"
+            ],
+            [
+              "Ava",
+              102,
+              "40.00"
+            ],
+            [
+              "Ben",
+              103,
+              "80.00"
+            ],
+            [
+              "Cy",
+              104,
+              "55.00"
+            ],
+            [
+              "Cy",
+              105,
+              "45.00"
+            ],
+            [
+              "Ben",
+              106,
+              "30.00"
+            ],
+            [
+              "Di",
+              null,
+              null
+            ]
+          ]
+        },
+        "right": {
+          "sql": "SELECT c.name, o.id AS order_id, o.amount FROM customers c RIGHT JOIN orders o ON o.customer_id = c.id ORDER BY o.id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "order_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              "Ava",
+              101,
+              "120.00"
+            ],
+            [
+              "Ava",
+              102,
+              "40.00"
+            ],
+            [
+              "Ben",
+              103,
+              "80.00"
+            ],
+            [
+              "Cy",
+              104,
+              "55.00"
+            ],
+            [
+              "Cy",
+              105,
+              "45.00"
+            ],
+            [
+              "Ben",
+              106,
+              "30.00"
+            ],
+            [
+              null,
+              125,
+              "64.00"
+            ]
+          ]
+        },
+        "full": {
+          "sql": "SELECT c.name, o.id AS order_id, o.amount FROM customers c FULL JOIN orders o ON o.customer_id = c.id ORDER BY o.id NULLS LAST, c.id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "order_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              "Ava",
+              101,
+              "120.00"
+            ],
+            [
+              "Ava",
+              102,
+              "40.00"
+            ],
+            [
+              "Ben",
+              103,
+              "80.00"
+            ],
+            [
+              "Cy",
+              104,
+              "55.00"
+            ],
+            [
+              "Cy",
+              105,
+              "45.00"
+            ],
+            [
+              "Ben",
+              106,
+              "30.00"
+            ],
+            [
+              null,
+              125,
+              "64.00"
+            ],
+            [
+              "Di",
+              null,
+              null
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "leftTrap": {
+      "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00);",
+      "steps": {
+        "joined": {
+          "sql": "SELECT c.name, o.amount FROM customers c LEFT JOIN orders o ON o.customer_id = c.id ORDER BY c.id, o.id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "amount"
+          ],
+          "rows": [
+            [
+              "Ava",
+              "120.00"
+            ],
+            [
+              "Ava",
+              "40.00"
+            ],
+            [
+              "Ben",
+              "80.00"
+            ],
+            [
+              "Ben",
+              "30.00"
+            ],
+            [
+              "Cy",
+              "55.00"
+            ],
+            [
+              "Cy",
+              "45.00"
+            ],
+            [
+              "Di",
+              null
+            ]
+          ]
+        },
+        "whereRight": {
+          "sql": "SELECT c.name, o.amount\nFROM customers c\nLEFT JOIN orders o\n  ON o.customer_id = c.id\nWHERE o.amount > 50\nORDER BY c.id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "amount"
+          ],
+          "rows": [
+            [
+              "Ava",
+              "120.00"
+            ],
+            [
+              "Ben",
+              "80.00"
+            ],
+            [
+              "Cy",
+              "55.00"
+            ]
+          ]
+        },
+        "inOn": {
+          "sql": "SELECT c.name, o.amount\nFROM customers c\nLEFT JOIN orders o\n  ON o.customer_id = c.id\n  AND o.amount > 50\nORDER BY c.id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "amount"
+          ],
+          "rows": [
+            [
+              "Ava",
+              "120.00"
+            ],
+            [
+              "Ben",
+              "80.00"
+            ],
+            [
+              "Cy",
+              "55.00"
+            ],
+            [
+              "Di",
+              null
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "fanout": {
+      "setup": "CREATE TABLE orders (order_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES (1, 100.00), (2, 50.00);\nCREATE TABLE order_items (order_id INTEGER, item TEXT);\nINSERT INTO order_items VALUES (1, 'A'), (1, 'B'), (1, 'C'), (2, 'D');",
+      "steps": {
+        "ordersTable": {
+          "sql": "SELECT order_id, amount FROM orders ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00"
+            ],
+            [
+              2,
+              "50.00"
+            ]
+          ]
+        },
+        "itemsTable": {
+          "sql": "SELECT order_id, item FROM order_items ORDER BY order_id, item;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "item"
+          ],
+          "rows": [
+            [
+              1,
+              "A"
+            ],
+            [
+              1,
+              "B"
+            ],
+            [
+              1,
+              "C"
+            ],
+            [
+              2,
+              "D"
+            ]
+          ]
+        },
+        "orders": {
+          "sql": "SELECT SUM(amount) AS revenue FROM orders;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "150.00"
+            ]
+          ]
+        },
+        "joined": {
+          "sql": "SELECT o.order_id, o.amount, i.item FROM orders o JOIN order_items i ON i.order_id = o.order_id ORDER BY i.item;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount",
+            "item"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00",
+              "A"
+            ],
+            [
+              1,
+              "100.00",
+              "B"
+            ],
+            [
+              1,
+              "100.00",
+              "C"
+            ],
+            [
+              2,
+              "50.00",
+              "D"
+            ]
+          ]
+        },
+        "inflated": {
+          "sql": "SELECT SUM(o.amount) AS revenue\nFROM orders o\nJOIN order_items i\n  ON i.order_id = o.order_id;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "350.00"
+            ]
+          ]
+        },
+        "fixed": {
+          "sql": "WITH items AS (\n  SELECT order_id, COUNT(*) AS n\n  FROM order_items GROUP BY order_id\n)\nSELECT SUM(o.amount) AS revenue,\n       SUM(items.n) AS items\nFROM orders o\nJOIN items ON items.order_id = o.order_id;",
+          "ok": true,
+          "columns": [
+            "revenue",
+            "items"
+          ],
+          "rows": [
+            [
+              "150.00",
+              "4"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "nulls": {
+      "setup": "CREATE TABLE orders (id INTEGER, discount INTEGER);\nINSERT INTO orders VALUES (1, 10), (2, NULL), (3, 5), (4, NULL), (5, 0), (6, 15);",
+      "steps": {
+        "table": {
+          "sql": "SELECT id, discount FROM orders ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "discount"
+          ],
+          "rows": [
+            [
+              1,
+              10
+            ],
+            [
+              2,
+              null
+            ],
+            [
+              3,
+              5
+            ],
+            [
+              4,
+              null
+            ],
+            [
+              5,
+              0
+            ],
+            [
+              6,
+              15
+            ]
+          ]
+        },
+        "equalsNull": {
+          "sql": "SELECT COUNT(*) FROM orders\nWHERE discount = NULL;",
+          "ok": true,
+          "columns": [
+            "count_star()"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "isNull": {
+          "sql": "SELECT COUNT(*) FROM orders\nWHERE discount IS NULL;",
+          "ok": true,
+          "columns": [
+            "count_star()"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "nullEqualsNull": {
+          "sql": "SELECT NULL = NULL AS same;",
+          "ok": true,
+          "columns": [
+            "same"
+          ],
+          "rows": [
+            [
+              null
+            ]
+          ]
+        },
+        "counts": {
+          "sql": "SELECT COUNT(*), COUNT(1), COUNT(discount),\n       AVG(discount),\n       AVG(COALESCE(discount, 0))\nFROM orders;",
+          "ok": true,
+          "columns": [
+            "count_star()",
+            "count(1)",
+            "count(discount)",
+            "avg(discount)",
+            "avg(COALESCE(discount, 0))"
+          ],
+          "rows": [
+            [
+              6,
+              6,
+              4,
+              7.5,
+              5
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "anti": {
+      "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00), (107, NULL, 25.00);",
+      "steps": {
+        "customers": {
+          "sql": "SELECT id, name FROM customers ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "name"
+          ],
+          "rows": [
+            [
+              1,
+              "Ava"
+            ],
+            [
+              2,
+              "Ben"
+            ],
+            [
+              3,
+              "Cy"
+            ],
+            [
+              4,
+              "Di"
+            ]
+          ]
+        },
+        "orders": {
+          "sql": "SELECT id, customer_id FROM orders ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "customer_id"
+          ],
+          "rows": [
+            [
+              101,
+              1
+            ],
+            [
+              102,
+              1
+            ],
+            [
+              103,
+              2
+            ],
+            [
+              104,
+              3
+            ],
+            [
+              105,
+              3
+            ],
+            [
+              106,
+              2
+            ],
+            [
+              107,
+              null
+            ]
+          ]
+        },
+        "notIn": {
+          "sql": "SELECT name FROM customers\nWHERE id NOT IN (\n  SELECT customer_id FROM orders\n);",
+          "ok": true,
+          "columns": [
+            "name"
+          ],
+          "rows": []
+        },
+        "notExists": {
+          "sql": "SELECT c.name FROM customers c\nWHERE NOT EXISTS (\n  SELECT 1 FROM orders o\n  WHERE o.customer_id = c.id\n);",
+          "ok": true,
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Di"
+            ]
+          ]
+        },
+        "leftNull": {
+          "sql": "SELECT c.name FROM customers c\nLEFT JOIN orders o\n  ON o.customer_id = c.id\nWHERE o.customer_id IS NULL;",
+          "ok": true,
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Di"
+            ]
+          ]
+        },
+        "notInGuarded": {
+          "sql": "SELECT name FROM customers WHERE id NOT IN (SELECT customer_id FROM orders WHERE customer_id IS NOT NULL);",
+          "ok": true,
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Di"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "distinct": {
+      "setup": "CREATE TABLE orders (order_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES (1, 100.00), (2, 50.00), (3, 50.00);\nCREATE TABLE order_items (order_id INTEGER, item TEXT);\nINSERT INTO order_items VALUES (1, 'A'), (1, 'B'), (1, 'C'), (2, 'D'), (3, 'E');",
+      "steps": {
+        "ordersTable": {
+          "sql": "SELECT order_id, amount FROM orders ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00"
+            ],
+            [
+              2,
+              "50.00"
+            ],
+            [
+              3,
+              "50.00"
+            ]
+          ]
+        },
+        "joined": {
+          "sql": "SELECT o.order_id, o.amount, i.item FROM orders o JOIN order_items i ON i.order_id = o.order_id ORDER BY o.order_id, i.item;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount",
+            "item"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00",
+              "A"
+            ],
+            [
+              1,
+              "100.00",
+              "B"
+            ],
+            [
+              1,
+              "100.00",
+              "C"
+            ],
+            [
+              2,
+              "50.00",
+              "D"
+            ],
+            [
+              3,
+              "50.00",
+              "E"
+            ]
+          ]
+        },
+        "joinedRows": {
+          "sql": "SELECT COUNT(*) AS n FROM orders o JOIN order_items i ON i.order_id = o.order_id;",
+          "ok": true,
+          "columns": [
+            "n"
+          ],
+          "rows": [
+            [
+              5
+            ]
+          ]
+        },
+        "distinctRows": {
+          "sql": "SELECT DISTINCT o.order_id, o.amount\nFROM orders o\nJOIN order_items i\n  ON i.order_id = o.order_id\nORDER BY o.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00"
+            ],
+            [
+              2,
+              "50.00"
+            ],
+            [
+              3,
+              "50.00"
+            ]
+          ]
+        },
+        "sumDistinct": {
+          "sql": "SELECT SUM(DISTINCT o.amount) AS revenue\nFROM orders o\nJOIN order_items i\n  ON i.order_id = o.order_id;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "150.00"
+            ]
+          ]
+        },
+        "truth": {
+          "sql": "SELECT SUM(amount) AS revenue FROM orders;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "200.00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "subqueries": {
+      "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00);",
+      "steps": {
+        "ordersTable": {
+          "sql": "SELECT id, customer_id, amount FROM orders ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              1,
+              "120.00"
+            ],
+            [
+              102,
+              1,
+              "40.00"
+            ],
+            [
+              103,
+              2,
+              "80.00"
+            ],
+            [
+              104,
+              3,
+              "55.00"
+            ],
+            [
+              105,
+              3,
+              "45.00"
+            ],
+            [
+              106,
+              2,
+              "30.00"
+            ]
+          ]
+        },
+        "averagesNamed": {
+          "sql": "SELECT c.name, AVG(o.amount) AS avg_amount FROM orders o JOIN customers c ON c.id = o.customer_id GROUP BY c.id, c.name ORDER BY c.id;",
+          "ok": true,
+          "columns": [
+            "name",
+            "avg_amount"
+          ],
+          "rows": [
+            [
+              "Ava",
+              80
+            ],
+            [
+              "Ben",
+              55
+            ],
+            [
+              "Cy",
+              50
+            ]
+          ]
+        },
+        "averages": {
+          "sql": "SELECT customer_id, AVG(amount) AS avg_amount FROM orders GROUP BY customer_id ORDER BY customer_id;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "avg_amount"
+          ],
+          "rows": [
+            [
+              1,
+              80
+            ],
+            [
+              2,
+              55
+            ],
+            [
+              3,
+              50
+            ]
+          ]
+        },
+        "overall": {
+          "sql": "SELECT AVG(amount) AS avg_amount FROM orders;",
+          "ok": true,
+          "columns": [
+            "avg_amount"
+          ],
+          "rows": [
+            [
+              61.666666666666664
+            ]
+          ]
+        },
+        "uncorrelated": {
+          "sql": "SELECT id, amount FROM orders\nWHERE amount > (\n  SELECT AVG(amount) FROM orders\n)\nORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              "120.00"
+            ],
+            [
+              103,
+              "80.00"
+            ]
+          ]
+        },
+        "correlated": {
+          "sql": "SELECT id, customer_id, amount\nFROM orders o\nWHERE amount > (\n  SELECT AVG(amount) FROM orders\n  WHERE customer_id = o.customer_id\n)\nORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              1,
+              "120.00"
+            ],
+            [
+              103,
+              2,
+              "80.00"
+            ],
+            [
+              104,
+              3,
+              "55.00"
+            ]
+          ]
+        },
+        "cte": {
+          "sql": "WITH avgs AS (\n  SELECT customer_id, AVG(amount) AS avg_amount\n  FROM orders GROUP BY customer_id\n)\nSELECT o.id, o.customer_id, o.amount\nFROM orders o\nJOIN avgs ON avgs.customer_id = o.customer_id\nWHERE o.amount > avgs.avg_amount\nORDER BY o.id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              1,
+              "120.00"
+            ],
+            [
+              103,
+              2,
+              "80.00"
+            ],
+            [
+              104,
+              3,
+              "55.00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "rapid": {
+      "setup": "CREATE TABLE employees (id INTEGER, name TEXT, manager_id INTEGER);\nINSERT INTO employees VALUES (1, 'Mona', NULL), (2, 'Gina', 1), (3, 'Bob', 1), (4, 'Sara', 2);\nCREATE TABLE store_a (city TEXT);\nINSERT INTO store_a VALUES ('Austin'), ('Boston');\nCREATE TABLE store_b (city TEXT);\nINSERT INTO store_b VALUES ('Boston'), ('Chicago');\nCREATE TABLE expected_products (product_id INTEGER);\nINSERT INTO expected_products VALUES (1), (2), (3), (4);\nCREATE TABLE received_products (product_id INTEGER);\nINSERT INTO received_products VALUES (1), (2), (4);\nCREATE TABLE tests (student TEXT, score INTEGER);\nINSERT INTO tests VALUES ('Ava', 95), ('Ben', NULL), ('Cy', 72);\nCREATE TABLE traffic (day INTEGER, discount INTEGER, revenue INTEGER, sessions INTEGER);\nINSERT INTO traffic VALUES (1, NULL, 500, 0), (2, 5, 300, 60);\nCREATE TABLE users (id INTEGER, email TEXT);\nINSERT INTO users VALUES (1, 'ada@example.com'), (2, 'bo@example.com'), (3, 'ada@example.com'), (4, 'cy@example.com'), (5, 'bo@example.com');\nCREATE TABLE regions (region TEXT);\nINSERT INTO regions VALUES ('North'), ('South'), ('East'), ('West');\nCREATE TABLE products (product_name TEXT);\nINSERT INTO products VALUES ('Mug'), ('Tee'), ('Cap');",
+      "steps": {
+        "employees": {
+          "sql": "SELECT id, name, manager_id FROM employees ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "name",
+            "manager_id"
+          ],
+          "rows": [
+            [
+              1,
+              "Mona",
+              null
+            ],
+            [
+              2,
+              "Gina",
+              1
+            ],
+            [
+              3,
+              "Bob",
+              1
+            ],
+            [
+              4,
+              "Sara",
+              2
+            ]
+          ]
+        },
+        "storeA": {
+          "sql": "SELECT city FROM store_a;",
+          "ok": true,
+          "columns": [
+            "city"
+          ],
+          "rows": [
+            [
+              "Austin"
+            ],
+            [
+              "Boston"
+            ]
+          ]
+        },
+        "storeB": {
+          "sql": "SELECT city FROM store_b;",
+          "ok": true,
+          "columns": [
+            "city"
+          ],
+          "rows": [
+            [
+              "Boston"
+            ],
+            [
+              "Chicago"
+            ]
+          ]
+        },
+        "expected": {
+          "sql": "SELECT product_id FROM expected_products ORDER BY product_id;",
+          "ok": true,
+          "columns": [
+            "product_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ]
+          ]
+        },
+        "received": {
+          "sql": "SELECT product_id FROM received_products ORDER BY product_id;",
+          "ok": true,
+          "columns": [
+            "product_id"
+          ],
+          "rows": [
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              4
+            ]
+          ]
+        },
+        "users": {
+          "sql": "SELECT id, email FROM users ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "ada@example.com"
+            ],
+            [
+              2,
+              "bo@example.com"
+            ],
+            [
+              3,
+              "ada@example.com"
+            ],
+            [
+              4,
+              "cy@example.com"
+            ],
+            [
+              5,
+              "bo@example.com"
+            ]
+          ]
+        },
+        "emailIndex": {
+          "sql": "SELECT email, id FROM users ORDER BY email, id;",
+          "ok": true,
+          "columns": [
+            "email",
+            "id"
+          ],
+          "rows": [
+            [
+              "ada@example.com",
+              1
+            ],
+            [
+              "ada@example.com",
+              3
+            ],
+            [
+              "bo@example.com",
+              2
+            ],
+            [
+              "bo@example.com",
+              5
+            ],
+            [
+              "cy@example.com",
+              4
+            ]
+          ]
+        },
+        "products": {
+          "sql": "SELECT product_name FROM products;",
+          "ok": true,
+          "columns": [
+            "product_name"
+          ],
+          "rows": [
+            [
+              "Mug"
+            ],
+            [
+              "Tee"
+            ],
+            [
+              "Cap"
+            ]
+          ]
+        },
+        "regions": {
+          "sql": "SELECT region FROM regions;",
+          "ok": true,
+          "columns": [
+            "region"
+          ],
+          "rows": [
+            [
+              "North"
+            ],
+            [
+              "South"
+            ],
+            [
+              "East"
+            ],
+            [
+              "West"
+            ]
+          ]
+        },
+        "selfJoin": {
+          "sql": "SELECT e.name AS employee, m.name AS manager\nFROM employees e\nLEFT JOIN employees m ON e.manager_id = m.id\nORDER BY e.id;",
+          "ok": true,
+          "columns": [
+            "employee",
+            "manager"
+          ],
+          "rows": [
+            [
+              "Mona",
+              null
+            ],
+            [
+              "Gina",
+              "Mona"
+            ],
+            [
+              "Bob",
+              "Mona"
+            ],
+            [
+              "Sara",
+              "Gina"
+            ]
+          ]
+        },
+        "union": {
+          "sql": "SELECT city FROM store_a\nUNION\nSELECT city FROM store_b\nORDER BY city;",
+          "ok": true,
+          "columns": [
+            "city"
+          ],
+          "rows": [
+            [
+              "Austin"
+            ],
+            [
+              "Boston"
+            ],
+            [
+              "Chicago"
+            ]
+          ]
+        },
+        "unionAll": {
+          "sql": "SELECT city FROM store_a\nUNION ALL\nSELECT city FROM store_b\nORDER BY city;",
+          "ok": true,
+          "columns": [
+            "city"
+          ],
+          "rows": [
+            [
+              "Austin"
+            ],
+            [
+              "Boston"
+            ],
+            [
+              "Boston"
+            ],
+            [
+              "Chicago"
+            ]
+          ]
+        },
+        "except": {
+          "sql": "SELECT product_id FROM expected_products\nEXCEPT\nSELECT product_id FROM received_products;",
+          "ok": true,
+          "columns": [
+            "product_id"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        },
+        "caseSizes": {
+          "sql": "SELECT amount, CASE\n  WHEN amount >= 500 THEN 'Large'\n  WHEN amount >= 100 THEN 'Medium'\n  ELSE 'Small' END AS order_size\nFROM (VALUES (620.00), (120.00), (50.25)) AS t(amount);",
+          "ok": true,
+          "columns": [
+            "amount",
+            "order_size"
+          ],
+          "rows": [
+            [
+              "620.00",
+              "Large"
+            ],
+            [
+              "120.00",
+              "Medium"
+            ],
+            [
+              "50.25",
+              "Small"
+            ]
+          ]
+        },
+        "caseEqualsNull": {
+          "sql": "SELECT student, CASE\n  WHEN score = NULL THEN 'Unknown'\n  WHEN score >= 90 THEN 'A'\n  ELSE 'Below A' END AS grade\nFROM tests ORDER BY student;",
+          "ok": true,
+          "columns": [
+            "student",
+            "grade"
+          ],
+          "rows": [
+            [
+              "Ava",
+              "A"
+            ],
+            [
+              "Ben",
+              "Below A"
+            ],
+            [
+              "Cy",
+              "Below A"
+            ]
+          ]
+        },
+        "caseIsNull": {
+          "sql": "SELECT student, CASE\n  WHEN score IS NULL THEN 'Unknown'\n  WHEN score >= 90 THEN 'A'\n  ELSE 'Below A' END AS grade\nFROM tests ORDER BY student;",
+          "ok": true,
+          "columns": [
+            "student",
+            "grade"
+          ],
+          "rows": [
+            [
+              "Ava",
+              "A"
+            ],
+            [
+              "Ben",
+              "Unknown"
+            ],
+            [
+              "Cy",
+              "Below A"
+            ]
+          ]
+        },
+        "coalesceNullif": {
+          "sql": "SELECT day,\n  COALESCE(discount, 0) AS safe_discount,\n  revenue / NULLIF(sessions, 0) AS per_session\nFROM traffic ORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "safe_discount",
+            "per_session"
+          ],
+          "rows": [
+            [
+              1,
+              0,
+              null
+            ],
+            [
+              2,
+              5,
+              5
+            ]
+          ]
+        },
+        "divideByZero": {
+          "sql": "SELECT revenue / sessions AS revenue_per_session FROM traffic ORDER BY day;",
+          "ok": true,
+          "columns": [
+            "revenue_per_session"
+          ],
+          "rows": [
+            [
+              null
+            ],
+            [
+              5
+            ]
+          ]
+        },
+        "dates": {
+          "sql": "SELECT EXTRACT(YEAR FROM DATE '2024-01-17') AS order_year,\n  DATE_TRUNC('month', DATE '2024-01-17') AS order_month,\n  DATE '2024-01-17' + INTERVAL '7 days' AS due_date;",
+          "ok": true,
+          "columns": [
+            "order_year",
+            "order_month",
+            "due_date"
+          ],
+          "rows": [
+            [
+              2024,
+              "2024-01-01",
+              "2024-01-24 00:00:00"
+            ]
+          ]
+        },
+        "strings": {
+          "sql": "SELECT UPPER(TRIM('  ada lovelace ')) AS clean_name,\n  LENGTH('ada@example.com') AS email_len,\n  SUBSTRING('ada@example.com', 1, 3) AS prefix,\n  'ada' || '@' || 'example.com' LIKE '%@example.com' AS matches;",
+          "ok": true,
+          "columns": [
+            "clean_name",
+            "email_len",
+            "prefix",
+            "matches"
+          ],
+          "rows": [
+            [
+              "ADA LOVELACE",
+              15,
+              "ada",
+              true
+            ]
+          ]
+        },
+        "duplicates": {
+          "sql": "SELECT email, COUNT(*) AS cnt FROM users\nGROUP BY email\nHAVING COUNT(*) > 1\nORDER BY email;",
+          "ok": true,
+          "columns": [
+            "email",
+            "cnt"
+          ],
+          "rows": [
+            [
+              "ada@example.com",
+              2
+            ],
+            [
+              "bo@example.com",
+              2
+            ]
+          ]
+        },
+        "rowNumbers": {
+          "sql": "SELECT id, email, ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) AS rn FROM users ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "email",
+            "rn"
+          ],
+          "rows": [
+            [
+              1,
+              "ada@example.com",
+              1
+            ],
+            [
+              2,
+              "bo@example.com",
+              1
+            ],
+            [
+              3,
+              "ada@example.com",
+              2
+            ],
+            [
+              4,
+              "cy@example.com",
+              1
+            ],
+            [
+              5,
+              "bo@example.com",
+              2
+            ]
+          ]
+        },
+        "dedupe": {
+          "sql": "WITH dupes AS (\n  SELECT id, ROW_NUMBER() OVER (\n    PARTITION BY email ORDER BY id) AS rn\n  FROM users)\nDELETE FROM users\nWHERE id IN (SELECT id FROM dupes WHERE rn > 1);",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "afterDedupe": {
+          "sql": "SELECT id, email FROM users ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "ada@example.com"
+            ],
+            [
+              2,
+              "bo@example.com"
+            ],
+            [
+              4,
+              "cy@example.com"
+            ]
+          ]
+        },
+        "crossJoin": {
+          "sql": "SELECT COUNT(*) FROM products CROSS JOIN regions;",
+          "ok": true,
+          "columns": [
+            "count_star()"
+          ],
+          "rows": [
+            [
+              12
+            ]
+          ]
+        },
+        "crossJoinThousand": {
+          "sql": "SELECT COUNT(*) FROM range(1000) a CROSS JOIN range(1000) b;",
+          "ok": true,
+          "columns": [
+            "count_star()"
+          ],
+          "rows": [
+            [
+              1000000
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "rollup": {
+      "setup": "CREATE TABLE orders AS SELECT * FROM (VALUES\n  (1,  'North', 'A', 120.00), (2,  'South', 'B',  80.50),\n  (3,  'East',  'A', 200.00), (4,  'West',  'C',  50.25),\n  (5,  'North', 'B',  60.00), (6,  'South', 'A',  90.00),\n  (7,  'East',  'C', 140.00), (8,  'West',  'B', 110.00),\n  (9,  'North', 'C',  75.50), (10, 'South', 'B',  65.00),\n  (11, 'North', 'A', 145.75), (12, 'East',  'B',  95.00),\n  (13, 'West',  'A',  40.00), (14, 'South', 'C', 130.25),\n  (15, 'North', 'B',  88.00), (16, 'East',  'A', 175.50),\n  (17, 'West',  'C',  62.75), (18, 'South', 'A', 105.00),\n  (19, 'North', 'C', 210.00), (20, 'East',  'B',  45.25),\n  (21, 'West',  'A', 155.00), (22, 'South', 'B',  70.75),\n  (23, 'North', 'A',  99.50), (24, 'East',  'C', 185.00)\n) AS t(id, region, category, amount);",
+      "steps": {
+        "rollup": {
+          "sql": "SELECT region, category, SUM(amount) AS revenue\nFROM orders\nGROUP BY ROLLUP (region, category)\nORDER BY region NULLS LAST, category NULLS LAST;",
+          "ok": true,
+          "columns": [
+            "region",
+            "category",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "East",
+              "A",
+              "375.50"
+            ],
+            [
+              "East",
+              "B",
+              "140.25"
+            ],
+            [
+              "East",
+              "C",
+              "325.00"
+            ],
+            [
+              "East",
+              null,
+              "840.75"
+            ],
+            [
+              "North",
+              "A",
+              "365.25"
+            ],
+            [
+              "North",
+              "B",
+              "148.00"
+            ],
+            [
+              "North",
+              "C",
+              "285.50"
+            ],
+            [
+              "North",
+              null,
+              "798.75"
+            ],
+            [
+              "South",
+              "A",
+              "195.00"
+            ],
+            [
+              "South",
+              "B",
+              "216.25"
+            ],
+            [
+              "South",
+              "C",
+              "130.25"
+            ],
+            [
+              "South",
+              null,
+              "541.50"
+            ],
+            [
+              "West",
+              "A",
+              "195.00"
+            ],
+            [
+              "West",
+              "B",
+              "110.00"
+            ],
+            [
+              "West",
+              "C",
+              "113.00"
+            ],
+            [
+              "West",
+              null,
+              "418.00"
+            ],
+            [
+              null,
+              null,
+              "2599.00"
+            ]
+          ]
+        },
+        "groupByAll": {
+          "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nGROUP BY ALL\nORDER BY revenue DESC;",
+          "ok": true,
+          "columns": [
+            "region",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "East",
+              "840.75"
+            ],
+            [
+              "North",
+              "798.75"
+            ],
+            [
+              "South",
+              "541.50"
+            ],
+            [
+              "West",
+              "418.00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    }
+  }
+}

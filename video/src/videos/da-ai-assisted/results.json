@@ -1,0 +1,279 @@
+{
+  "figures": {
+    "boundary": {
+      "setup": "CREATE TABLE orders AS SELECT * FROM (VALUES\n  (1, TIMESTAMP '2025-12-31 23:59:00', 75.00, 'completed'),\n  (2, TIMESTAMP '2026-01-01 00:00:00', 120.00, 'completed'),\n  (3, TIMESTAMP '2026-01-12 19:45:00', 95.50, 'completed'),\n  (4, TIMESTAMP '2026-01-18 11:30:00', 140.00, 'completed'),\n  (5, TIMESTAMP '2026-01-22 16:10:00', 33.25, 'cancelled'),\n  (6, TIMESTAMP '2026-01-31 00:00:00', 50.00, 'completed'),\n  (7, TIMESTAMP '2026-01-31 09:15:00', 310.00, 'completed'),\n  (8, TIMESTAMP '2026-01-31 18:40:00', 125.00, 'completed'),\n  (9, TIMESTAMP '2026-02-01 00:00:00', 99.00, 'completed')\n) AS t(order_id, order_ts, amount, status);",
+      "steps": {
+        "table": {
+          "sql": "SELECT order_id, order_ts, amount, status FROM orders ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_ts",
+            "amount",
+            "status"
+          ],
+          "rows": [
+            [
+              1,
+              "2025-12-31 23:59:00",
+              "75.00",
+              "completed"
+            ],
+            [
+              2,
+              "2026-01-01 00:00:00",
+              "120.00",
+              "completed"
+            ],
+            [
+              3,
+              "2026-01-12 19:45:00",
+              "95.50",
+              "completed"
+            ],
+            [
+              4,
+              "2026-01-18 11:30:00",
+              "140.00",
+              "completed"
+            ],
+            [
+              5,
+              "2026-01-22 16:10:00",
+              "33.25",
+              "cancelled"
+            ],
+            [
+              6,
+              "2026-01-31 00:00:00",
+              "50.00",
+              "completed"
+            ],
+            [
+              7,
+              "2026-01-31 09:15:00",
+              "310.00",
+              "completed"
+            ],
+            [
+              8,
+              "2026-01-31 18:40:00",
+              "125.00",
+              "completed"
+            ],
+            [
+              9,
+              "2026-02-01 00:00:00",
+              "99.00",
+              "completed"
+            ]
+          ]
+        },
+        "page": {
+          "sql": "SELECT\n  SUM(amount) FILTER (\n    WHERE order_ts BETWEEN '2026-01-01' AND '2026-01-31'\n  ) AS assistant_total,\n  SUM(amount) FILTER (\n    WHERE order_ts >= '2026-01-01' AND order_ts < '2026-02-01'\n  ) AS half_open_total\nFROM orders\nWHERE status = 'completed';",
+          "ok": true,
+          "columns": [
+            "assistant_total",
+            "half_open_total"
+          ],
+          "rows": [
+            [
+              "405.50",
+              "840.50"
+            ]
+          ]
+        },
+        "kept": {
+          "sql": "SELECT order_id, order_ts, amount, status,\n  order_ts BETWEEN '2026-01-01' AND '2026-01-31' AS assistant,\n  order_ts >= '2026-01-01' AND order_ts < '2026-02-01' AS half_open\nFROM orders\nORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_ts",
+            "amount",
+            "status",
+            "assistant",
+            "half_open"
+          ],
+          "rows": [
+            [
+              1,
+              "2025-12-31 23:59:00",
+              "75.00",
+              "completed",
+              false,
+              false
+            ],
+            [
+              2,
+              "2026-01-01 00:00:00",
+              "120.00",
+              "completed",
+              true,
+              true
+            ],
+            [
+              3,
+              "2026-01-12 19:45:00",
+              "95.50",
+              "completed",
+              true,
+              true
+            ],
+            [
+              4,
+              "2026-01-18 11:30:00",
+              "140.00",
+              "completed",
+              true,
+              true
+            ],
+            [
+              5,
+              "2026-01-22 16:10:00",
+              "33.25",
+              "cancelled",
+              true,
+              true
+            ],
+            [
+              6,
+              "2026-01-31 00:00:00",
+              "50.00",
+              "completed",
+              true,
+              true
+            ],
+            [
+              7,
+              "2026-01-31 09:15:00",
+              "310.00",
+              "completed",
+              false,
+              true
+            ],
+            [
+              8,
+              "2026-01-31 18:40:00",
+              "125.00",
+              "completed",
+              false,
+              true
+            ],
+            [
+              9,
+              "2026-02-01 00:00:00",
+              "99.00",
+              "completed",
+              false,
+              false
+            ]
+          ]
+        },
+        "assistant": {
+          "sql": "SELECT SUM(amount) AS january_revenue\nFROM orders\nWHERE status = 'completed'\n  AND order_ts BETWEEN '2026-01-01' AND '2026-01-31';",
+          "ok": true,
+          "columns": [
+            "january_revenue"
+          ],
+          "rows": [
+            [
+              "405.50"
+            ]
+          ]
+        },
+        "halfOpen": {
+          "sql": "SELECT SUM(amount) AS january_revenue\nFROM orders\nWHERE status = 'completed'\n  AND order_ts >= '2026-01-01' AND order_ts < '2026-02-01';",
+          "ok": true,
+          "columns": [
+            "january_revenue"
+          ],
+          "rows": [
+            [
+              "840.50"
+            ]
+          ]
+        },
+        "missed": {
+          "sql": "SELECT ROUND(100 * (1 - a / h), 1) AS missed_pct FROM (\n  SELECT\n    SUM(amount) FILTER (WHERE order_ts BETWEEN '2026-01-01' AND '2026-01-31') AS a,\n    SUM(amount) FILTER (WHERE order_ts >= '2026-01-01' AND order_ts < '2026-02-01') AS h\n  FROM orders WHERE status = 'completed'\n);",
+          "ok": true,
+          "columns": [
+            "missed_pct"
+          ],
+          "rows": [
+            [
+              51.8
+            ]
+          ]
+        },
+        "cutoff": {
+          "sql": "SELECT CAST('2026-01-31' AS TIMESTAMP) AS upper_bound;",
+          "ok": true,
+          "columns": [
+            "upper_bound"
+          ],
+          "rows": [
+            [
+              "2026-01-31 00:00:00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "ratios": {
+      "setup": "CREATE TABLE daily (day DATE, sessions INTEGER, conversions INTEGER);\nINSERT INTO daily VALUES ('2026-01-05', 10, 5), ('2026-01-06', 1000, 20);",
+      "steps": {
+        "table": {
+          "sql": "SELECT day, sessions, conversions,\n  ROUND(100.0 * conversions / sessions, 1) AS rate_pct\nFROM daily ORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "sessions",
+            "conversions",
+            "rate_pct"
+          ],
+          "rows": [
+            [
+              "2026-01-05",
+              10,
+              5,
+              50
+            ],
+            [
+              "2026-01-06",
+              1000,
+              20,
+              2
+            ]
+          ]
+        },
+        "averaged": {
+          "sql": "SELECT ROUND(AVG(100.0 * conversions / sessions), 1) AS avg_of_rates\nFROM daily;",
+          "ok": true,
+          "columns": [
+            "avg_of_rates"
+          ],
+          "rows": [
+            [
+              26
+            ]
+          ]
+        },
+        "pooled": {
+          "sql": "SELECT ROUND(100.0 * SUM(conversions) / SUM(sessions), 1) AS overall_rate\nFROM daily;",
+          "ok": true,
+          "columns": [
+            "overall_rate"
+          ],
+          "rows": [
+            [
+              2.5
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    }
+  },
+  "bank": 110
+}

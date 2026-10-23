@@ -5,6 +5,7 @@ import "./theme/fonts";
 import { narratedMetadata } from "./narration/metadata";
 import { EDITORIAL_DEFAULTS, type EditorialProps } from "./editorial/Page";
 import { ErdKit } from "./editorial/ErdKit";
+import { InterviewKit } from "./editorial/interview";
 // Database Design with PostgreSQL, one video per unit.
 import { DbWhyDesign } from "./videos/db-why-design/Video";
 import { script as dbWhyDesignScript } from "./videos/db-why-design/script";
@@ -24,6 +25,49 @@ import { DbDesigningSchemas } from "./videos/db-designing-schemas/Video";
 import { script as dbDesigningSchemasScript } from "./videos/db-designing-schemas/script";
 import { DbRelationalHistory } from "./videos/db-relational-history/Video";
 import { script as dbRelationalHistoryScript } from "./videos/db-relational-history/script";
+// Interview prep, Data Analyst: one video per topic page.
+import { DaInterview } from "./videos/da-interview/Video";
+import { script as daInterviewScript } from "./videos/da-interview/script";
+import { DaSql } from "./videos/da-sql/Video";
+import { script as daSqlScript } from "./videos/da-sql/script";
+import { DaPandas } from "./videos/da-pandas/Video";
+import { script as daPandasScript } from "./videos/da-pandas/script";
+import { DaStatisticsCommunication } from "./videos/da-statistics-communication/Video";
+import { script as daStatisticsCommunicationScript } from "./videos/da-statistics-communication/script";
+import { DaSpreadsheets } from "./videos/da-spreadsheets/Video";
+import { script as daSpreadsheetsScript } from "./videos/da-spreadsheets/script";
+import { DaAdvancedSql } from "./videos/da-advanced-sql/Video";
+import { script as daAdvancedSqlScript } from "./videos/da-advanced-sql/script";
+import { DaAiAssisted } from "./videos/da-ai-assisted/Video";
+import { script as daAiAssistedScript } from "./videos/da-ai-assisted/script";
+import { DsInterview } from "./videos/ds-interview/Video";
+import { script as dsInterviewScript } from "./videos/ds-interview/script";
+import { DsStatistics } from "./videos/ds-statistics/Video";
+import { script as dsStatisticsScript } from "./videos/ds-statistics/script";
+import { DsProbability } from "./videos/ds-probability/Video";
+import { script as dsProbabilityScript } from "./videos/ds-probability/script";
+import { DsMlEvaluation } from "./videos/ds-ml-evaluation/Video";
+import { script as dsMlEvaluationScript } from "./videos/ds-ml-evaluation/script";
+import { DsMlModels } from "./videos/ds-ml-models/Video";
+import { script as dsMlModelsScript } from "./videos/ds-ml-models/script";
+import { DsDeepLearning } from "./videos/ds-deep-learning/Video";
+import { script as dsDeepLearningScript } from "./videos/ds-deep-learning/script";
+import { DsExperimentDesign } from "./videos/ds-experiment-design/Video";
+import { script as dsExperimentDesignScript } from "./videos/ds-experiment-design/script";
+import { DsExperimentsInPractice } from "./videos/ds-experiments-in-practice/Video";
+import { script as dsExperimentsInPracticeScript } from "./videos/ds-experiments-in-practice/script";
+import { DsProductSense } from "./videos/ds-product-sense/Video";
+import { script as dsProductSenseScript } from "./videos/ds-product-sense/script";
+import { DsPythonPandas } from "./videos/ds-python-pandas/Video";
+import { script as dsPythonPandasScript } from "./videos/ds-python-pandas/script";
+import { DsSql } from "./videos/ds-sql/Video";
+import { script as dsSqlScript } from "./videos/ds-sql/script";
+import { DsLlmEvaluation } from "./videos/ds-llm-evaluation/Video";
+import { script as dsLlmEvaluationScript } from "./videos/ds-llm-evaluation/script";
+import { DaAbTesting } from "./videos/da-ab-testing/Video";
+import { script as daAbTestingScript } from "./videos/da-ab-testing/script";
+import { DaVisualization } from "./videos/da-visualization/Video";
+import { script as daVisualizationScript } from "./videos/da-visualization/script";
 import { CentralLimitTheorem } from "./videos/central-limit-theorem/Video";
 import { script as centralLimitTheoremScript } from "./videos/central-limit-theorem/script";
 import { ListVsSet } from "./videos/list-vs-set/Video";
@@ -506,9 +550,225 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(dbRelationalHistoryScript)}
       />
     </Folder>
+    <Folder name="Interview-Data-Analyst">
+      <Composition
+        id="DataAnalyst-0-Interview"
+        component={DaInterview}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daInterviewScript)}
+      />
+      <Composition
+        id="DataAnalyst-1-Sql"
+        component={DaSql}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daSqlScript)}
+      />
+      <Composition
+        id="DataAnalyst-2-Pandas"
+        component={DaPandas}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daPandasScript)}
+      />
+      <Composition
+        id="DataAnalyst-3-StatisticsCommunication"
+        component={DaStatisticsCommunication}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daStatisticsCommunicationScript)}
+      />
+      <Composition
+        id="DataAnalyst-4-AdvancedSql"
+        component={DaAdvancedSql}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daAdvancedSqlScript)}
+      />
+      <Composition
+        id="DataAnalyst-5-Spreadsheets"
+        component={DaSpreadsheets}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daSpreadsheetsScript)}
+      />
+      <Composition
+        id="DataAnalyst-8-AiAssisted"
+        component={DaAiAssisted}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daAiAssistedScript)}
+      />
+      <Composition
+        id="DataAnalyst-7-AbTesting"
+        component={DaAbTesting}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daAbTestingScript)}
+      />
+      <Composition
+        id="DataAnalyst-6-Visualization"
+        component={DaVisualization}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(daVisualizationScript)}
+      />
+    </Folder>
+    <Folder name="Interview-Data-Scientist">
+      <Composition
+        id="DataScientist-0-Interview"
+        component={DsInterview}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsInterviewScript)}
+      />
+      <Composition
+        id="DataScientist-1-Statistics"
+        component={DsStatistics}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsStatisticsScript)}
+      />
+      <Composition
+        id="DataScientist-2-Probability"
+        component={DsProbability}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsProbabilityScript)}
+      />
+      <Composition
+        id="DataScientist-3-MlEvaluation"
+        component={DsMlEvaluation}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsMlEvaluationScript)}
+      />
+      <Composition
+        id="DataScientist-4-MlModels"
+        component={DsMlModels}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsMlModelsScript)}
+      />
+      <Composition
+        id="DataScientist-5-DeepLearning"
+        component={DsDeepLearning}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsDeepLearningScript)}
+      />
+      <Composition
+        id="DataScientist-6-ExperimentDesign"
+        component={DsExperimentDesign}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsExperimentDesignScript)}
+      />
+      <Composition
+        id="DataScientist-7-ExperimentsInPractice"
+        component={DsExperimentsInPractice}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsExperimentsInPracticeScript)}
+      />
+      <Composition
+        id="DataScientist-8-ProductSense"
+        component={DsProductSense}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsProductSenseScript)}
+      />
+      <Composition
+        id="DataScientist-9-PythonPandas"
+        component={DsPythonPandas}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsPythonPandasScript)}
+      />
+      <Composition
+        id="DataScientist-10-Sql"
+        component={DsSql}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsSqlScript)}
+      />
+      <Composition
+        id="DataScientist-11-LlmEvaluation"
+        component={DsLlmEvaluation}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dsLlmEvaluationScript)}
+      />
+    </Folder>
     <Folder name="Assets">
       {/* The ERD kit (editorial/erd.tsx) on one page, for review. */}
       <Composition id="ErdKit" component={ErdKit} width={1920} height={1080} fps={FPS} durationInFrames={150} />
+      {/* The interview kit (editorial/interview.tsx): a question card and a rapid-fire list. */}
+      <Composition id="InterviewKit" component={InterviewKit} width={1920} height={1080} fps={FPS} durationInFrames={150} />
     </Folder>
   </>
 );
