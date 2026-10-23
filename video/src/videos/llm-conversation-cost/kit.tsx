@@ -385,7 +385,7 @@ export const Axes: React.FC<{
   const right = CHART.x0 + turns * CHART.slot + 10;
   const ticks = (step: number, upTo: number) => Array.from({ length: Math.floor(upTo / step) }, (_, i) => (i + 1) * step);
   const fine = 1 - clamp01(z * 3);
-  const coarse = clamp01(z * 1.6 - 0.6);
+  const coarse = clamp01(z * 2 - 0.8);
   const tick = (t: number, o: number, text: string) => {
     const ty = geo.ty(t);
     if (o <= 0.01 || ty < geo.top - 6) return null;
@@ -405,23 +405,27 @@ export const Axes: React.FC<{
       <text x={CHART.x0 - 22} y={geo.base + 7} textAnchor="end" style={axisText()}>
         0
       </text>
-      {ticks(1000, CHART.maxZ).map((t) => tick(t, fine, tokenLabel(t)))}
-      {ticks(10000, CHART.max).map((t) => tick(t, coarse, tokenLabel(t)))}
+      {/* Gridlines at whichever steps have room at this scale: 1k up close,
+          then 2k and 5k as the camera pulls back, 10k from afar. */}
+      {ticks(1000, CHART.max).map((t) => {
+        const o = Math.max(...[1000, 2000, 5000, 10000].filter((s) => t % s === 0).map((s) => clamp01((s * geo.k - 110) / 40)));
+        return tick(t, o, tokenLabel(t));
+      })}
       {/* Turn numbers: every turn up close, every tenth from afar. */}
       {[1, 2].map((t) => (
         <text key={`z${t}`} x={geo.x(t) + geo.bar / 2} y={geo.base + 32} textAnchor="middle" style={axisText(22)} opacity={fine}>
           turn {t}
         </text>
       ))}
-      {[1, 10, 20, 30, 40].filter((t) => t <= turns).map((t) => (
+      {[1, 10, 20, 30, 40].filter((t) => t <= turns && geo.x(t) + geo.bar <= right + 4).map((t) => (
         <text key={`f${t}`} x={geo.x(t) + geo.bar / 2} y={geo.base + 30} textAnchor="middle" style={axisText()} opacity={coarse}>
           {t}
         </text>
       ))}
-      <text x={right} y={geo.base + 62} textAnchor="end" style={axisText(20, 650)} opacity={coarse}>
+      <text x={right + 16} y={geo.base + 7} style={axisText(20, 650)} opacity={coarse}>
         turn
       </text>
-      <text x={CHART.x0 - 12} y={geo.top - 16} style={axisText(20, 650)}>
+      <text x={CHART.x0 - 12} y={geo.top - 36} style={axisText(20, 650)}>
         {title}
       </text>
     </Svg>

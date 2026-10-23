@@ -38,8 +38,8 @@ const REQUEST = [
   { text: "earlier turns", cached: true },
   { text: "the reply and your message", cached: false },
 ];
-const REQ_Y = 706;
-const REQ_STEP = 52;
+const REQ_Y = 440;
+const REQ_STEP = 46;
 
 /**
  * The cache: the same forty turns, drawn as what each turn's input costs, so
@@ -103,12 +103,19 @@ export const CacheScene: React.FC = () => {
       {/* ── Fig. 6 ── */}
       <FigLabel n="6" title={`Input each turn pays for, on ${NAME}`} at={from - 2} x={X0} y={y(FIG_Y)} />
       <div style={{ position: "absolute", right: 1920 - 1800, top: y(FIG_Y) + 2, display: "flex", gap: 30, alignItems: "center" }}>
-        <Key at={from} out={twentiethAt + 6} swatch={SENT}>
-          sent before
-        </Key>
-        <Key at={twentiethAt} swatch={CACHED}>
-          read from the cache
-        </Key>
+        {/* What was sent before becomes what is read from the cache, in one slot. */}
+        <span style={{ display: "inline-grid", justifyItems: "end" }}>
+          <span style={{ gridArea: "1 / 1" }}>
+            <Key at={from} out={twentiethAt - 2} swatch={SENT}>
+              sent before
+            </Key>
+          </span>
+          <span style={{ gridArea: "1 / 1" }}>
+            <Key at={twentiethAt + 4} swatch={CACHED}>
+              read from the cache
+            </Key>
+          </span>
+        </span>
         <Key at={from + 4} swatch={NEW}>
           new this turn
         </Key>
@@ -147,29 +154,29 @@ export const CacheScene: React.FC = () => {
       <Svg opacity={ease(frame, twentiethAt + 4, 16)}>
         <path d={ghost} fill="none" stroke={INK_SOFT} strokeWidth={1.8} strokeDasharray="6 6" />
       </Svg>
-      <Note at={flatAt - 4} x={right + 14} y={lastTop - 18}>
+      <Note at={flatAt - 4} x={right - 10} y={lastTop - 58} align="right">
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>without the cache</span>
       </Note>
-      <Note at={twentiethAt} x={RX} y={geo.base - 92} width={340}>
+      <Note at={twentiethAt} x={RX} y={geo.base - 112} width={360}>
         <span style={{ display: "block", ...note(24, CACHED_INK), fontWeight: 650 }}>a twentieth of the price</span>
         <span style={{ display: "block", ...note(21, INK_SOFT), ...TABULAR }}>
           {usd(PRICE.cached, 2)} a million, not {usd(PRICE.in, 2)}
         </span>
       </Note>
-      <Note at={newAt + 2} x={RX} y={geo.base - 152} width={340}>
-        <span style={{ ...note(24, NEW_INK), fontWeight: 650 }}>only the new slice at full price</span>
+      <Note at={newAt + 2} x={RX} y={geo.base - 206} width={360}>
+        <span style={{ ...note(24, NEW_INK), fontWeight: 650 }}>only the new slice pays full price</span>
       </Note>
 
       {/* Forty turns, with and without. */}
-      <Note at={fortyAt - 4} x={CHART.x0 + 60} y={y(420)}>
+      <Note at={fortyAt - 4} x={CHART.x0 + 90} y={y(528)}>
         <span style={{ ...label(24, INK_SOFT), ...TABULAR }}>{CACHE.turns} turns</span>
       </Note>
-      <Note at={dollarAt - 4} x={CHART.x0 + 60} y={y(420) + 40}>
+      <Note at={dollarAt - 4} x={CHART.x0 + 90} y={y(528) + 40}>
         <span style={{ ...headline(52), color: INK_SOFT, ...TABULAR, ...halo }}>
           <Strike at={centsAt - 4}>{usd(CACHE.plain)}</Strike>
         </span>
       </Note>
-      <Note at={centsAt - 2} x={CHART.x0 + 330} y={y(420) + 40}>
+      <Note at={centsAt - 2} x={CHART.x0 + 360} y={y(528) + 40}>
         <span style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(52), color: CACHED_INK, ...TABULAR, ...halo }}>{usd(CACHE.cached)}</span>
           <span style={{ ...note(26, INK), fontWeight: 650, ...TABULAR }}>{pct(CACHE.saved)} less</span>
@@ -211,10 +218,7 @@ export const CacheScene: React.FC = () => {
       <Note at={firstAt - 4} x={RX - 18} y={y(REQ_Y) + 6} align="right">
         <span style={{ ...note(22, INK), fontWeight: 650 }}>first</span>
       </Note>
-      <Note at={neverAt - 2} x={RX} y={y(REQ_Y + 3 * REQ_STEP) + 2} width={360}>
-        <span style={{ ...note(21, INK_SOFT) }}>whatever never changes goes first</span>
-      </Note>
-      <Note at={matchAt + 2} x={RX} y={y(REQ_Y + 3 * REQ_STEP) + 32} width={360}>
+      <Note at={matchAt + 2} x={RX} y={y(REQ_Y + 3 * REQ_STEP) + 2} width={360}>
         <span style={{ ...note(21, CACHED_INK), fontWeight: 600 }}>so the cache can match it</span>
       </Note>
     </AbsoluteFill>

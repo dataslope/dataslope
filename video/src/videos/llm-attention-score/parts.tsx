@@ -517,9 +517,9 @@ export const Cells: React.FC<{
   fill?: string;
   highlight?: readonly (number | undefined)[];
   highlightColor?: string;
-}> = ({ values, numAt = -Infinity, cells, size = 26, cell = 74, border = DATA, fill = PAPER, highlight, highlightColor = MARK }) => {
+}> = ({ values, numAt, cells, size = 26, cell = 74, border = DATA, fill = PAPER, highlight, highlightColor = MARK }) => {
   const frame = useCurrentFrame();
-  const show = ease(frame, numAt, 10);
+  const show = numAt === undefined ? 1 : ease(frame, numAt, 10);
   const n = cells ?? values.length;
   const all = Math.max(values.length, Math.ceil(n));
   return (

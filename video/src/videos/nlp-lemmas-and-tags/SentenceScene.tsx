@@ -241,7 +241,7 @@ export const SentenceScene: React.FC = () => {
         );
       })}
 
-      <Spot id="nlp-lemmas-and-tags-tags" at={from + 10} left={1500} top={y(620)} width={330} height={220} />
+      <Spot id="nlp-lemmas-and-tags-tags" at={from + 10} left={1510} top={y(650)} width={300} height={231} />
     </AbsoluteFill>
   );
 };

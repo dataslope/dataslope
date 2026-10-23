@@ -60,7 +60,7 @@ export const ElizaScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound ── */}
-      <Sfx name="el-pop" at={from} level={-30} />
+      <Sfx name="el-pop" at={from - 6} level={-30} />
       <Sfx name="el-tap" at={wroteAt} level={-30} />
       <Sfx name="el-pencil" at={needAt - 2} level={-34} />
       <Sfx name="el-pencil" at={handAt} level={-34} />

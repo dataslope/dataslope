@@ -41,12 +41,12 @@ Review: 0 P1, 7 P2, 8 P3. All seven P2s are fixed. Of the P3s, six are fixed and
 | typecheck, eslint (my folder) | clean |
 | `check:cues` | clean for my folder |
 | `npm test` | 59 of 59 pass |
-| `check:frames` | pass. Largest stretch 0.91; worst arrowhead bend 1.2°. Reshaping the goal arrow to land on the bracket first gave 18.5°; I reshaped it before the check |
+| `check:frames` | pass, re-run on the final code. Largest stretch 0.91; worst arrowhead bend 1.2° |
 | `check:sync` | pass, worst +0.04 s (`real`, 3:01.6), 52 beats. The new beats sit at sixteen +0.02, casing +0.01, reasons +0.02, roots +0.01, running +0.00, cleaning +0.01 |
-| `check:motion` | MOTION |
+| `check:motion` | pass: nothing still for 3 s; longest still 2.5 s (2:13.0 and 2:20.5, both in `roots`); 12 stretches of 2 s or more, 26.3 s in all. The first run after the fixes failed two Mess-scene stretches; see below. |
 | `check:mix` (informational) | effects 20.5 LU under the narration (−45.3 against −24.8 LUFS); effects peak −21.1 dBFS (the logo, 0:00.6). Speech sits a median 23.3 dB above the effects where both sound, 5th percentile 10.0 dB. The closest moment is 4:29.6, at 11.4 dB; the old 5.9 dB moment is gone. Measured before the last motion edits, which added no sound |
 
-Stills were re-taken at every changed place (frames 945, 1515, 3420, 4215, 4320, 4590, 5470, 6370, 7485, 8040, 8385, 8670, 9180, 9235) and I looked at each.
+Stills were re-taken at every changed place (frames 945, 1515, 3420, 3755, 4085, 4215, 4320, 4590, 5470, 6370, 7485, 8040, 8385, 8670, 9180, 9235) and I looked at each.
 
 ## New, noticed and fixed or left
 

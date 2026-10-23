@@ -146,7 +146,7 @@ export const OrderScene: React.FC = () => {
           praise has a lone not too
         </div>
       </Note>
-      <Note at={pairAt - 2} x={aGrams[notGood].x} y={rowA + tileH(SIZE) + tileH(CHIP) + 20}>
+      <Note at={pairAt - 2} x={aGrams[notGood].x} y={rowA + tileH(SIZE) + tileH(CHIP) + 28}>
         <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           the pair is what a model can learn is <Marked at={negativeAt - 2}>negative</Marked>
         </div>

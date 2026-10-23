@@ -616,7 +616,7 @@ export const BlendScene: React.FC = () => {
       </Note>
       <Note at={thatAt - 2} out={blendPronounsAt - 8} x={1100} y={y(560)} width={640}>
         <div style={{ ...note(26, INK_SOFT) }}>
-          Dividing by √{QKV.dim}, the square root of the vector size, keeps the scores small as vectors grow.
+          Dividing by √{QKV.dim}, the square root of the vector size, <Mark at={smallAt - 2}>keeps the scores small</Mark> as vectors grow.
         </div>
       </Note>
 

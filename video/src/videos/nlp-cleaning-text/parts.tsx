@@ -420,7 +420,7 @@ export const Chip: React.FC<{
                 position: "absolute",
                 left: "0.1em",
                 right: "0.1em",
-                bottom: "-0.08em",
+                bottom: "0.14em",
                 height: "0.22em",
                 border: `2px solid ${INK_FAINT}`,
                 borderTop: "none",

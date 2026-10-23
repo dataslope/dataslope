@@ -120,15 +120,15 @@ export const PennScene: React.FC = () => {
       {/* The two tags just read, held over while their source is named. */}
       {fishTags.map((tag, k) => (
         <React.Fragment key={tag}>
-          <Tile text="fish" x={LX} y={y(300) + k * 70} at={from - 4 + k * 4} size={26} out={thirtySixAt - 8} />
-          <TagChip tag={tag} family={familyOf(tag)} cx={LX + 160} y={y(300) + k * 70 + 4} at={from + k * 4} size={22} out={thirtySixAt - 8} />
-          <Note at={from + 4 + k * 4} out={thirtySixAt - 8} x={LX + 220} y={y(300) + k * 70 + 8}>
+          <Tile text="fish" x={X0} y={y(322) + k * 70} at={from - 4 + k * 4} size={26} out={tallAt - 14} />
+          <TagChip tag={tag} family={familyOf(tag)} cx={X0 + 160} y={y(322) + k * 70 + 4} at={from + k * 4} size={22} out={tallAt - 14} />
+          <Note at={from + 4 + k * 4} out={tallAt - 14} x={X0 + 220} y={y(322) + k * 70 + 8}>
             <div style={{ ...label(22, FAMILY[familyOf(tag)].ink), fontWeight: 600, whiteSpace: "nowrap" }}>{FAMILY[familyOf(tag)].name}</div>
           </Note>
         </React.Fragment>
       ))}
 
-      <FigLabel n="9" title="A sentence, tagged" at={from - 2} x={X0} y={y(266)} />
+      <FigLabel n="9" title="A sentence, tagged" at={tallAt - 8} x={X0} y={y(266)} />
       {tallTiles.map((t, i) => (
         <Tile
           key={i}

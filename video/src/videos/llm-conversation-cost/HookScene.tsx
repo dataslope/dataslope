@@ -15,7 +15,7 @@ const TILE_GAP = 3;
 const BILL_X = 1180;
 /** px per dollar: the 40-turn bill fills 440 px. */
 const PX = 440 / billFor(40).plain;
-const ROW = [470, 610];
+const ROW = [486, 646];
 const ROW_H = 56;
 const ROWS = [20, 40] as const;
 
@@ -61,10 +61,10 @@ export const HookScene: React.FC = () => {
       <FigLabel n="1" title={`Two chats, priced on ${NAME}`} at={from - 2} x={X0} y={y(FIG_Y)} />
 
       {/* Column heads. */}
-      <Note at={chatAt - 6} x={TILE_X} y={y(384)}>
+      <Note at={chatAt - 6} x={TILE_X} y={y(400)}>
         <span style={label(22, INK_SOFT)}>The chat, one block a turn</span>
       </Note>
-      <Note at={billAt - 6} x={BILL_X} y={y(384)}>
+      <Note at={billAt - 6} x={BILL_X} y={y(400)}>
         <span style={label(22, INK_SOFT)}>Its bill</span>
       </Note>
 
@@ -106,13 +106,13 @@ export const HookScene: React.FC = () => {
       })}
 
       {/* Twice the turns; three times the bill. */}
-      <Note at={twiceAt + 4} x={TILE_X} y={y(744)}>
+      <Note at={twiceAt + 4} x={TILE_X} y={y(790)}>
         <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(56), ...TABULAR }}>×2</span>
           <span style={note(24, INK_SOFT)}>the turns</span>
         </span>
       </Note>
-      <Note at={triplesAt - 2} x={BILL_X} y={y(744)}>
+      <Note at={triplesAt - 2} x={BILL_X} y={y(790)}>
         <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(56), color: POINT_INK, ...TABULAR }}>{times(doubling.times)}</span>
           <span style={note(24, INK_SOFT)}>the bill</span>
@@ -120,7 +120,7 @@ export const HookScene: React.FC = () => {
       </Note>
 
       {/* Where a doubled bill would stop, and the part past it. */}
-      <HBar x={BILL_X} y={rowY(1)} w={ghostW} h={h(ROW_H)} at={doubleAt - 6} dur={12} fill="transparent" outline={INK} dashed />
+      <HBar x={BILL_X} y={rowY(1)} w={ghostW} h={h(ROW_H)} at={doubleAt - 6} dur={12} fill="transparent" outline={PAPER} dashed />
       <Note at={doubleAt - 2} x={BILL_X + ghostW} y={rowY(1) + h(ROW_H) + 10} align="right">
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>if it just doubled</span>
       </Note>

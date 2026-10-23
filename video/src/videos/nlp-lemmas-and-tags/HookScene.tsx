@@ -181,10 +181,10 @@ export const HookScene: React.FC = () => {
         id="nlp-lemmas-and-tags-magnifier"
         at={oneWordAt}
         dim={lookupAt}
-        left={1210}
-        top={y(520)}
-        width={510}
-        height={340}
+        left={1250}
+        top={y(530)}
+        width={420}
+        height={346}
       />
     </AbsoluteFill>
   );

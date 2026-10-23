@@ -114,7 +114,8 @@ export const StairsScene: React.FC = () => {
   const fourAt = n.word("four", "four");
 
   // ── The camera: two turns up close, then all forty ──
-  const z = smooth((frame - climbFrom - 2) / (stairAt + 8 - climbFrom - 2));
+  const zAt = (f: number) => smooth((f - climbFrom - 2) / (stairAt + 8 - climbFrom - 2));
+  const z = zAt(frame);
   const geo = useGeo(z);
   const full = useGeo(1);
   const zoomed = useGeo(0);
@@ -123,7 +124,15 @@ export const StairsScene: React.FC = () => {
   // Each bar's arrival: turn one grows (its system prompt, then its
   // message); every later turn slides over from the turn before, the resend,
   // and its new slice drops on top.
-  const barAt = (t: number) => climbFrom + 6 + ((stairAt - climbFrom - 6) * (t - 3)) / (TURNS.length - 3);
+  // A later bar arrives once the camera has pulled back far enough for it
+  // to fit: the zoom at which its height fills the frame, found frame by frame.
+  const zFits = (sent: number) => Math.log(CHART.maxZ / sent) / Math.log(CHART.maxZ / CHART.max);
+  const barAt = (t: number) => {
+    const need = zFits(TURNS[t - 1].sent);
+    let f = climbFrom;
+    while (zAt(f) < need && f < stairAt + 8) f++;
+    return f - 3;
+  };
   const state = (t: number) => {
     if (t === 1) {
       const sys = SYSTEM / (SYSTEM + USER);
@@ -403,8 +412,9 @@ export const StairsScene: React.FC = () => {
       <Note at={sameAt - 6} x={CHART.x0 + 18} y={L + (full.base - L) / 2 - 15}>
         <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>the system prompt, the same every turn</span>
       </Note>
-      <Note at={chatAt - 2} out={doubleAt - 4} x={1010} y={L - 96}>
-        <span style={{ ...note(28, TRI_INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>the chat itself, resent</span>
+      <Leader points={[[700, L - 330], [930, L - 150]]} at={chatAt - 2} out={doubleAt - 4} color={TRI_INK} />
+      <Note at={chatAt} out={doubleAt - 4} x={440} y={L - 376}>
+        <span style={{ ...note(28, TRI_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the chat itself, resent</span>
       </Note>
 
       {/* The ledger: what each part does when the turns double. */}
@@ -475,7 +485,7 @@ export const StairsScene: React.FC = () => {
             <path
               key={i}
               d={poly(c.pts)}
-              fill={i === 0 ? "none" : `color-mix(in srgb, ${TRI} 16%, transparent)`}
+              fill={`color-mix(in srgb, ${TRI} 16%, transparent)`}
               stroke={TRI}
               strokeWidth={3}
               strokeLinejoin="round"

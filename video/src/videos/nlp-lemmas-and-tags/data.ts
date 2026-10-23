@@ -16,7 +16,7 @@ import m from "./measurements.json";
 export const VIDEO = "nlp-lemmas-and-tags";
 
 /** Whether public/images/nlp-lemmas-and-tags/ holds the two watercolors. */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 /** lemmatize(w) with no part of speech, on the lesson's first three words. */
 export const DEFAULTS: readonly { word: string; lemma: string }[] = m.defaults;
