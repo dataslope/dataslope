@@ -154,7 +154,7 @@ export const CacheScene: React.FC = () => {
       <Svg opacity={ease(frame, twentiethAt + 4, 16)}>
         <path d={ghost} fill="none" stroke={INK_SOFT} strokeWidth={1.8} strokeDasharray="6 6" />
       </Svg>
-      <Note at={flatAt - 4} x={right - 10} y={lastTop - 58} align="right">
+      <Note at={flatAt - 4} x={geo.x(33)} y={lastTop + 46} align="right">
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>without the cache</span>
       </Note>
       <Note at={twentiethAt} x={RX} y={geo.base - 112} width={360}>
