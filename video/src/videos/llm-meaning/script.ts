@@ -16,9 +16,12 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *      is the wrong tool, cosine similarity, the lesson's working semantic
  *      search, and where it breaks.
  *   3. Attention ("trophy" to "attn-in"), after attention-intuition.mdx: the
- *      trophy and the suitcase, query, key and value, the lesson's weights
- *      and its real two-number vectors, heads and layers, and the cost that
- *      grows with the square of the length.
+ *      trophy and the suitcase; query, key and value made from one token's
+ *      embedding; one score worked through on the lesson's real two-number
+ *      vectors (a dot product, divided by the square root of two, then
+ *      softmax); heads and layers; and the cost that grows with the square
+ *      of the length. How a score is computed is also its own deep dive, so
+ *      the unit names each step once and shows one worked line.
  *   4. The shape of a transformer ("path" to "next"), after
  *      the-shape-of-a-transformer.mdx: the full path of a prompt, where the
  *      parameters are, width and depth, mixture of experts, and the score for
@@ -32,7 +35,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  * printed when it re-ran the lessons' own code (NumPy 2.4.6 and tiktoken
  * 0.12.0, the site's Pyodide versions) into measurements.json, which data.ts
  * reads. The page's prepopulated outputs print the same numbers.
- *   - Ids are tiktoken o200k_base, the course's tokenizer: "berry" is 19772
+ *   - Ids are tiktoken o200k_base, the course's tokenizer (Fig. 1, and Fig.
+ *     17's "the cat sat on the mat", labelled so): "berry" is 19772
  *     ("nineteen seven seven two"), the id two below it, 19770, is " teeth",
  *     and " cherry" (with the space it has inside a sentence) is 60225
  *     ("sixty thousand two twenty-five"). "A few thousand numbers" and
@@ -43,33 +47,44 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     cat are kitten 0.100, dog 0.200, wolf 0.854 and truck 1.338, so
  *     "kitten's nearest, then dog ... truck's way over there". "Dimension
  *     1,847" and "the cat sat on the mat" are the lesson's.
- *   - Order: the lesson's dog, bites and man vectors sum to 1.5, 1.5 in both
- *     orders. Its position signal adds 0, 0.1 and 0.2 to the second number
- *     by slot, so dog first is 0.9, 0.2 and dog last is 0.9, 0.4 ("dog in the
- *     first slot gets a different vector from dog in the last"). The lesson
- *     then sums the positioned vectors too, and that sum is again the same
- *     for both sentences (1.5, 1.8 twice, as its page prints); the video
- *     shows the positioned vectors one by one instead, where the sentences
- *     really do differ, and never shows that sum.
+ *   - Order: the lesson's dog, bites and man vectors, the same three in both
+ *     orders, so as a bag (a set) the two sentences are identical ("treat
+ *     them as a bag of vectors"). Its position signal adds 0, 0.1 and 0.2 to
+ *     the second number by slot, so dog first is 0.9, 0.2 and dog last is
+ *     0.9, 0.4 ("dog in the first slot gets a different vector from dog in
+ *     the last"), and the two bags now differ. The lesson's prose and its
+ *     numbers disagree here, and the video follows the numbers: the lesson
+ *     demonstrates order-blindness with a sum and then sums the positioned
+ *     vectors too, which is again the same for both sentences (1.5, 1.8
+ *     twice, as its page prints). The video makes its case with the bag,
+ *     which position does change, and shows no sum.
  *   - similarity.mdx: short 1, 1 and long 5, 5 are 5.657 apart ("five point
  *     seven") with cosine 1.0; short against 1, -1 is cosine 0.0, at 90
  *     degrees; "length tracks token frequency" is the lesson's.
  *   - The lesson's search: five documents over finance, weather, sport and
- *     cooking; the finance query ("How did the company perform
+ *     cooking, hand-chosen stand-ins for real embeddings as the lesson says
+ *     ("minus a real embedding model"); the finance query ("How did the company perform
  *     financially?") ranks "Earnings beat analyst expectations" first at
  *     0.998 ("point nine nine eight"), which shares no word with it
  *     (asserted in measure.py), then the revenue line at 0.993. The negation
  *     example and the reranking step are the lesson's "Where this breaks";
  *     the lesson gives no score for them, so none is shown.
- *   - attention-intuition.mdx: the hand-set scores from "it" give trophy
- *     0.722 of the weight ("point seven two"). The real vectors: keys and
- *     values for trophy, suitcase and it, the query 1.0, 0.1, scores 0.721,
- *     0.283, 0.078 after dividing by the square root of two, weights 0.461
- *     ("point four six"), 0.297, 0.242, and the new vector 4.849, 3.214.
- *     The lesson's "change query to 0.2, 1.0" gives weights 0.293, 0.467,
- *     0.240 and 3.168, 4.910 ("the blend follows"). Ten tokens make a
- *     hundred scores and twenty make four hundred, the lesson's "doubling
- *     the input quadruples the attention work".
+ *   - attention-intuition.mdx, "Doing it properly, with real vectors", the
+ *     only attention numbers the video shows: "it"'s query 1.0, 0.1, key
+ *     0.1, 0.1 and value 1.0, 1.0 (Fig. 12); keys and values for trophy,
+ *     suitcase and it; the dot products 1.02, 0.40, 0.11 (trophy's written
+ *     out, 1.0 x 1.0 + 0.1 x 0.2); divided by the square root of two, the
+ *     key dimension, as the lesson's code does, 0.721, 0.283, 0.078; weights
+ *     0.461 ("point four six"), 0.297, 0.242, total 1.000; the new vector
+ *     4.849, 3.214. The lesson's "change query to 0.2, 1.0" gives suitcase
+ *     1.06 and 0.750, weights 0.293, 0.467, 0.240 and 3.168, 4.910 ("the
+ *     blend follows"). "Cosine similarity without dividing by the lengths"
+ *     is similarity.mdx's formula with its denominator taken away. The
+ *     lesson's first, hand-set example (trophy 0.722, from seven tokens
+ *     without "suitcase") is left out, so trophy has one weight on screen.
+ *     Ten tokens make a hundred scores, each token scoring itself too, and
+ *     twenty make four hundred, the lesson's "doubling the input quadruples
+ *     the attention work".
  *   - the-shape-of-a-transformer.mdx's mid-sized model (vocabulary 128,000,
  *     width 4,096, 32 layers, feed-forward 14,336): embedding table 0.52
  *     billion ("half a billion"), attention 2.15 ("about two"),
@@ -115,7 +130,9 @@ export const script: NarrationScript = {
     },
     {
       id: "vector",
-      text: "So the first thing the model does is swap each ID for a vector, a list of a few thousand numbers.",
+      // Re-voiced slowly in the fix pass: it and "embedding" define the unit's two core terms.
+      text: "[slowly] So the model swaps each ID for a vector: a list of a few thousand numbers.",
+      pauseAfter: 0.8,
     },
     {
       id: "embedding",
@@ -152,7 +169,7 @@ export const script: NarrationScript = {
     },
     { id: "order", scene: true, text: "And embeddings on their own can't see order.", pauseAfter: 0.4 },
     { id: "bites", text: "Dog bites man, and man bites dog, are the same three vectors, shuffled." },
-    { id: "set", text: "Add them up, and both sentences come out exactly the same.", pauseAfter: 0.7 },
+    { id: "set", text: "Treat them as a bag of vectors, and the two sentences are identical.", pauseAfter: 0.7 },
     {
       id: "position",
       text: "So the model mixes in where each token sits. Dog in the first slot gets a different vector from dog in the last.",
@@ -183,7 +200,7 @@ export const script: NarrationScript = {
       scene: true,
       text: "That's enough for a working search.",
     },
-    { id: "docs", text: "Five tiny documents, each scored on four themes.", pauseAfter: 0.4 },
+    { id: "docs", text: "Five tiny documents, hand-scored on four themes, standing in for real embeddings.", pauseAfter: 0.4 },
     { id: "query", text: "Now ask, how did the company perform financially?", pauseAfter: 0.5 },
     {
       id: "hit",
@@ -228,27 +245,29 @@ export const script: NarrationScript = {
     {
       id: "query-vec",
       scene: true,
-      text: "To do that, every token makes three vectors. A query: what am I looking for?",
+      text: "To do that, every token turns its embedding into three vectors. A query: what am I looking for?",
       pauseAfter: 0.5,
     },
     { id: "key", text: "A key: what do I offer?", pauseAfter: 0.5 },
     { id: "value", text: "And a value: what I hand over when I'm picked.", pauseAfter: 0.8 },
     {
       id: "scores",
+      scene: true,
       text: "The pronoun's query is compared with every key, for one score each.",
-    },
-    { id: "softmax", text: "Softmax turns the scores into weights that add up to one.", pauseAfter: 0.8 },
-    {
-      id: "weights",
-      text: "In the lesson's example, the pronoun puts point seven two of its attention on trophy.",
-      pauseAfter: 0.9,
-    },
-    { id: "real", scene: true, text: "Here's the actual arithmetic, on two-number vectors.", pauseAfter: 0.4 },
-    {
-      id: "dot",
-      text: "The query against each key gives a score, and softmax makes them weights. Point four six for trophy.",
       pauseAfter: 0.6,
     },
+    {
+      id: "dot",
+      text: "Multiply them number by number and add it up: that's a dot product. It's cosine similarity, without dividing by the lengths.",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "scale",
+      text: "Then it's divided by the square root of two, since each vector has two numbers. That keeps the scores small.",
+      pauseAfter: 0.8,
+    },
+    { id: "softmax", text: "Softmax turns the scores into weights that add up to one.", pauseAfter: 0.6 },
+    { id: "weights", text: "Point four six of the pronoun's attention goes to trophy.", pauseAfter: 0.9 },
     {
       id: "blend",
       text: "The pronoun's new vector is that blend of the values, pulled toward trophy's.",
@@ -267,7 +286,7 @@ export const script: NarrationScript = {
     },
     {
       id: "square",
-      text: "There's a price. Every token scores every other one.",
+      text: "There's a price. Every token scores every token, itself included.",
     },
     { id: "ten", text: "Ten tokens make a hundred scores. Double the text, and it's four times the work.", pauseAfter: 0.9 },
     { id: "attn-in", text: "So let's put all the pieces in order." },
@@ -294,7 +313,7 @@ export const script: NarrationScript = {
     },
     {
       id: "split",
-      text: "The embedding table holds half a billion, and the output layer as much again.",
+      text: "The embedding table holds half a billion, and the output layer, which scores every token, as much again.",
     },
     { id: "attn-share", text: "Attention, about two.", pauseAfter: 0.5 },
     {

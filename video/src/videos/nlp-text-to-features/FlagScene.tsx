@@ -6,15 +6,17 @@ import { label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { NEGATIONS, RESET, signed, traceOf, type Trace } from "./data";
-import { Chip, ChipRow, FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, NEG, NEG_INK, POS, POS_INK, Strike, TokenCol, TokenRow, X0 } from "./parts";
+import { NEGATIONS, RESET, RESET_EXAMPLE, signed, traceOf, type Trace } from "./data";
+import { Chip, ChipRow, CHIP_LINE, FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, NEG, NEG_INK, POS, POS_INK, Strike, TokenCol, TokenRow, X0 } from "./parts";
+import { ds } from "../../theme/brand";
 
-const RULE_ON_Y = 340;
-const RULE_OFF_Y = 412;
+const RULE_ON_Y = 334;
+const RULE_OFF_Y = 398;
 const RULE_CHIPS_X = 420;
-const FLIP_NOTE_Y = 478;
-const FIG17_Y = 540;
-const ROW_Y = [598, 712, 826];
+/** The reset example, under the rule, with the flag's lamp under each token. */
+const EX_Y = 462;
+const FIG17_Y = 574;
+const ROW_Y = [628, 742, 856];
 const SUM_X = 1170;
 const VERDICT_X = 1290;
 const CHIP = 26;
@@ -31,9 +33,12 @@ const inkFor = (l: string) => (l === "positive" ? POS_INK : l === "negative" ? N
 
 /**
  * The lesson's negation handling: a negation switches a flag on, the next
- * sentiment word flips its sign, punctuation and "but" switch it off. Then
- * three of the lesson's reviews, token by token: "not good" now negative,
- * "not bad at all" positive, and the mixed review netting to neutral.
+ * sentiment word flips its sign, punctuation and "but" switch it off. The
+ * reset runs on "Not really, it was good" (the video's own sentence: none of
+ * the lesson's examples needs it), with a lamp showing the flag after each
+ * token. Then three of the lesson's reviews, token by token: "not good" now
+ * negative, "not bad at all" positive, and the mixed review netting to
+ * neutral.
  */
 export const FlagScene: React.FC = () => {
   const n = useNarration();
@@ -44,12 +49,15 @@ export const FlagScene: React.FC = () => {
   const negationAt = n.word("flag", "A negation");
   const spokenAt = [n.word("flag", "not"), n.word("flag", "no"), n.word("flag", "never")];
   const onAt = n.word("flag", "switches it on");
-  const nextAt = n.word("flag", "next sentiment word");
   const flipsAt = n.word("flag", "flips its sign");
   const resetAt = { comma: n.word("reset", "A comma"), stop: n.word("reset", "full stop"), but: n.word("reset", "the word but") };
   const offAt = n.word("reset", "switches it off");
   const reachAt = n.word("reset", "can't reach");
   const clauseAt = n.word("reset", "next clause");
+  const exAt = n.word("reset-ex", "Not really");
+  const exGoodAt = n.word("reset-ex", "it was good");
+  const commaAt = n.word("reset-ex", "comma clears");
+  const plusOneAt = n.word("reset-ex", "plus one");
   const rowAt = [n.word("fixed", "it is not good"), n.word("fixed", "this is not bad at all"), n.word("mixed", "The plot was good")];
   const verdictAt = [n.word("fixed", "negative"), n.word("fixed", "positive"), n.word("mixed", "neutral")];
   const plusAt = n.word("mixed", "Plus one");
@@ -60,6 +68,8 @@ export const FlagScene: React.FC = () => {
       {/* ── Sound: the rule's two rows, each review, each verdict ── */}
       <Sfx name="el-pencil" at={negationAt - 4} level={-36} />
       <Sfx name="el-pencil" at={resetAt.comma - 4} level={-36} />
+      <Sfx name="el-tap" at={exAt - 2} level={-30} />
+      <Sfx name="el-tap" at={plusOneAt + 2} level={-28} />
       {rowAt.map((t, i) => (
         <Sfx key={i} name="el-tap" at={t - 4} level={-30} />
       ))}
@@ -101,16 +111,31 @@ export const FlagScene: React.FC = () => {
           );
         })}
       </ChipRow>
-      <Note at={nextAt - 2} x={X0} y={y(FLIP_NOTE_Y)}>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-          While it is on, the next sentiment word <Mark at={flipsAt - 2}>flips its sign</Mark>, and the flag goes off.
+      {/* The reset, run on a sentence: the lamp under each token is the flag after it. */}
+      <Ink at={exAt - 4} dur={12} style={{ left: X0, top: y(EX_Y) + 52, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+        flag
+      </Ink>
+      <TraceRow
+        trace={RESET_EXAMPLE}
+        x={RULE_CHIPS_X}
+        top={y(EX_Y)}
+        at={exAt - 2}
+        stagger={k => (k < 2 ? 0 : exGoodAt - exAt + (k - 2) * 2)}
+        verdictAt={plusOneAt + 4}
+        badgeAt={[plusOneAt]}
+        lamps
+        bumpComma={commaAt}
+      />
+      <Note at={plusOneAt + 14} x={VERDICT_X} y={y(EX_Y) + 48}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          with no reset: {signed(RESET_EXAMPLE.scoreWithoutReset)}, {RESET_EXAMPLE.labelWithoutReset}
         </span>
       </Note>
 
       {/* ── Fig. 17: three reviews, token by token ── */}
       {/* The first review demonstrates the rule as the flag beat describes it,
           and gets its verdict in the "fixed" beat with the second. */}
-      <FigLabel n="17" title="Three of the lesson’s reviews, token by token" at={negationAt - 6} x={X0} y={y(FIG17_Y)} />
+      <FigLabel n="17" title="Three of the lesson’s reviews, token by token" at={negationAt + 2} x={X0} y={y(FIG17_Y)} />
       {ROWS.map((r, i) => (
         <TraceRow
           key={r.text}
@@ -128,25 +153,45 @@ export const FlagScene: React.FC = () => {
 };
 
 /** One review, token by token: a negation marked, a flipped word showing its
- *  sign before and after, then the sum and the verdict. */
+ *  sign before and after, then the sum and the verdict. With `lamps`, a lamp
+ *  under each token shows the flag after it: lit while on, hollow when off. */
 const TraceRow: React.FC<{
   trace: Trace;
   top: number;
   at: number;
   verdictAt: number;
+  x?: number;
+  stagger?: (k: number) => number;
   badgeAt?: number[];
   markAt?: number;
   bump?: number;
-}> = ({ trace, top, at, verdictAt, badgeAt, markAt, bump }) => {
+  bumpComma?: number;
+  lamps?: boolean;
+}> = ({ trace, top, at, verdictAt, x = X0, stagger, badgeAt, markAt, bump, bumpComma, lamps }) => {
   const frame = useCurrentFrame();
   let scored = 0;
   return (
     <>
-      <TokenRow x={X0} top={top}>
+      <TokenRow x={x} top={top}>
         {trace.steps.map((s, k) => {
           const polar = s.polarity !== 0;
-          const badge = polar ? (badgeAt ? badgeAt[scored++] - 2 : at + k * 2 + 10) : 0;
+          const tokenAt = at + (stagger ? stagger(k) : k * 2);
+          const badge = polar ? (badgeAt ? badgeAt[scored++] - 2 : tokenAt + 10) : 0;
           const flipped = s.role === "flipped";
+          const sign = polar ? (
+            <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, badge, 10) }}>
+              {flipped ? (
+                <>
+                  <span style={{ color: s.polarity > 0 ? NEG_INK : POS_INK }}>
+                    <Strike at={badge + 6}>{signed(-s.polarity)}</Strike>
+                  </span>{" "}
+                  {signed(s.polarity)}
+                </>
+              ) : (
+                signed(s.polarity)
+              )}
+            </span>
+          ) : null;
           return (
             <TokenCol
               key={k}
@@ -154,29 +199,24 @@ const TraceRow: React.FC<{
                 <Chip
                   text={s.token}
                   size={CHIP}
-                  at={at + k * 2}
-                  mark={s.role === "negation" ? (markAt ?? at + k * 2 + 4) : undefined}
-                  bump={bump === undefined ? undefined : bump + k * 2}
+                  at={tokenAt}
+                  mark={s.role === "negation" ? (markAt ?? tokenAt + 4) : undefined}
+                  bump={bumpComma !== undefined && s.role === "reset" ? bumpComma : bump === undefined ? undefined : bump + k * 2}
                   tone={polar ? (s.polarity > 0 ? POS : NEG) : undefined}
                   toneAt={badge}
+                  mono={s.token.length === 1}
                   style={{ marginRight: 0 }}
                 />
               }
               below={
-                polar ? (
-                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, badge, 10) }}>
-                    {flipped ? (
-                      <>
-                        <span style={{ color: s.polarity > 0 ? NEG_INK : POS_INK }}>
-                          <Strike at={badge + 6}>{signed(-s.polarity)}</Strike>
-                        </span>{" "}
-                        {signed(s.polarity)}
-                      </>
-                    ) : (
-                      signed(s.polarity)
-                    )}
+                lamps ? (
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                    <Lamp on={Boolean(s.flag)} at={tokenAt + 4} />
+                    {sign}
                   </span>
-                ) : null
+                ) : (
+                  sign
+                )
               }
             />
           );
@@ -189,5 +229,26 @@ const TraceRow: React.FC<{
         {trace.label}
       </div>
     </>
+  );
+};
+
+/** The flag after a token: a lit yellow lamp while it is on, hollow when off. */
+const Lamp: React.FC<{ on: boolean; at: number }> = ({ on, at }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 10);
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        width: 16,
+        height: 16,
+        borderRadius: 999,
+        boxSizing: "border-box",
+        border: `2px solid ${on ? ds("yellow", 700) : CHIP_LINE}`,
+        background: on ? ds("yellow", 400) : "transparent",
+        opacity: p,
+        transform: `scale(${0.6 + 0.4 * p})`,
+      }}
+    />
   );
 };

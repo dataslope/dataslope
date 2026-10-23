@@ -225,7 +225,7 @@ export const CosineScene: React.FC = () => {
       </Note>
       <Reading x={1050} y={y(530)} at={sevenAt - 6} valueAt={sevenAt} name="Ruler" value={COSINE.euclid.toFixed(3)} />
       <Reading x={1050} y={y(600)} at={saysOneAt - 6} valueAt={saysOneAt} name="Cosine" value={COSINE.cosLong.toFixed(1)} color={POINT_INK} />
-      <Note at={fiveAt} out={sevenAt - 8} x={1050} y={y(560)}>
+      <Note at={fiveAt} out={sevenAt - 14} x={1050} y={y(560)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           Same direction; one is {COSINE.lengthRatio.toFixed(0)} times longer.
         </span>
@@ -300,8 +300,9 @@ export const SearchScene: React.FC = () => {
 
   const from = n.beat("search").from;
   const searchAt = n.word("search", "search");
-  const fiveAt = n.word("search", "Five");
-  const themesAt = n.word("search", "themes");
+  const fiveAt = n.word("docs", "Five");
+  const themesAt = n.word("docs", "themes");
+  const standingAt = n.word("docs", "standing");
   const askAt = n.word("query", "ask");
   const financiallyAt = n.word("query", "financially");
   const topAt = n.word("hit", "Top");
@@ -334,6 +335,9 @@ export const SearchScene: React.FC = () => {
       <Headline lead="It runs on meaning," turn="not on text." at={meaningAt - 4} turnAt={textAt - 2} />
 
       <FigLabel n="8" title="The lesson's documents, scored on four themes" at={searchAt} x={X0} y={y(FIG_Y)} />
+      <Fade at={standingAt - 2} style={{ left: 1600, top: y(FIG_Y) + 2, transform: "translateX(-100%)" }}>
+        <Tag size={21}>Hand-scored stand-ins for real embeddings</Tag>
+      </Fade>
       <Fade at={themesAt - 4} style={{ left: 0, top: y(366), width: 1920 }}>
         {SEARCH.axes.map((ax, i) => (
           <span key={ax} style={{ position: "absolute", left: THEME_X[i], transform: "translateX(-50%)", ...label(21, INK_SOFT), opacity: ease(frame, themesAt - 4 + i * 4, 10) }}>
@@ -355,7 +359,10 @@ export const SearchScene: React.FC = () => {
         const isTop = d.text === SEARCH.top;
         const hi = isTop ? ease(frame, earningsAt - 2, 12) + 1.4 * pulse(frame, searchWordAt, 30) : 0;
         return (
-          <div key={d.text} style={{ position: "absolute", left: 0, top, width: 1920, height: DOC_ROW, opacity: p }}>
+          <div
+            key={d.text}
+            style={{ position: "absolute", left: 0, top, width: 1920, height: DOC_ROW, opacity: p * (isTop ? 1 : 1 - 0.75 * Math.sin(Math.PI * sort)) }}
+          >
             {hi > 0 ? (
               <div
                 style={{
@@ -468,7 +475,7 @@ const Card: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }>
       border: `2px solid ${INK}`,
       borderRadius: 12,
       boxShadow: `0 6px 18px -10px color-mix(in srgb, ${INK} 40%, transparent)`,
-      ...body(34),
+      ...body(44),
       color: INK,
       whiteSpace: "nowrap",
       ...style,
@@ -492,11 +499,11 @@ const Box: React.FC<{ x: number; y: number; w: number; at: number; title: string
       style={{
         border: `2px solid ${accent ? POINT : INK}`,
         borderRadius: 12,
-        padding: "14px 18px 16px",
+        padding: "18px 22px 22px",
         background: accent ? `color-mix(in srgb, ${POINT} 6%, ${PAPER})` : PAPER,
       }}
     >
-      <div style={{ ...label(22, accent ? POINT_INK : INK) }}>{title}</div>
+      <div style={{ ...label(25, accent ? POINT_INK : INK) }}>{title}</div>
       {children ? <div style={{ marginTop: 10 }}>{children}</div> : null}
     </div>
   </Fade>
@@ -524,11 +531,11 @@ export const BlindScene: React.FC = () => {
   const neighboursAt = n.word("sim-in", "neighbours");
 
   const land = ease(frame, landAt - 2, 26);
-  const cardsTop = y(420);
+  const cardsTop = y(440);
 
   // The second pass, laid out left to right under the cards.
-  const PY = y(470);
-  const pipeX = [1010, 1290, 1570];
+  const PY = y(480);
+  const pipeX = [960, 1266, 1572];
 
   // The teaser: one word alone, then the words around it.
   const TY = y(800);
@@ -554,30 +561,30 @@ export const BlindScene: React.FC = () => {
         <Card style={{ left: X0, top: cardsTop }}>The drug is effective.</Card>
       </Fade>
       <Fade at={notAt - 8} style={{ left: 0, top: 0 }}>
-        <Card style={{ left: lerp(X0 + 40, X0 + 30, land), top: lerp(cardsTop + 150, cardsTop + 56, land) }}>
+        <Card style={{ left: lerp(X0 + 40, X0 + 34, land), top: lerp(cardsTop + 190, cardsTop + 70, land) }}>
           The drug is <span style={{ color: POINT_INK, fontWeight: 650, textDecoration: `underline 3px ${POINT}`, textUnderlineOffset: 6 }}>not</span>{" "}
           effective.
         </Card>
       </Fade>
-      <Note at={topOfAt} x={X0} y={cardsTop + 176}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Almost the same direction, opposite meanings.</span>
+      <Note at={topOfAt} x={X0} y={cardsTop + 210}>
+        <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Almost the same direction, opposite meanings.</span>
       </Note>
 
       {/* ── Fig. 10: a second pass reads what the search found ── */}
       <FigLabel n="10" title="A second pass reads the top hits" at={secondAt - 6} x={pipeX[0]} y={y(FIG_Y)} />
-      <Box x={pipeX[0]} y={PY} w={230} at={secondAt - 4} title="Nearest by cosine">
+      <Box x={pipeX[0]} y={PY} w={260} at={secondAt - 4} title="Nearest by cosine">
         {[0, 1, 2].map((i) => (
-          <div key={i} style={{ height: 14, marginTop: i ? 10 : 2, borderRadius: 4, background: DATA_TINT, border: `1.5px solid ${DATA}`, width: `${92 - i * 14}%` }} />
+          <div key={i} style={{ height: 18, marginTop: i ? 12 : 4, borderRadius: 4, background: DATA_TINT, border: `1.5px solid ${DATA}`, width: `${92 - i * 14}%` }} />
         ))}
       </Box>
-      <Box x={pipeX[1]} y={PY} w={230} at={readsAt - 4} title="A second pass" accent>
-        <div style={{ ...note(22, INK_SOFT) }}>reads each one</div>
+      <Box x={pipeX[1]} y={PY} w={260} at={readsAt - 4} title="A second pass" accent>
+        <div style={{ ...note(25, INK_SOFT) }}>reads each one</div>
       </Box>
-      <Box x={pipeX[2]} y={PY} w={200} at={hitsAt} title="The answer">
-        <div style={{ height: 14, marginTop: 2, borderRadius: 4, background: DATA_TINT, border: `1.5px solid ${DATA}`, width: "88%" }} />
+      <Box x={pipeX[2]} y={PY} w={220} at={hitsAt} title="The answer">
+        <div style={{ height: 18, marginTop: 4, borderRadius: 4, background: DATA_TINT, border: `1.5px solid ${DATA}`, width: "88%" }} />
       </Box>
-      <Arrow from={[pipeX[0] + 236, PY + 56]} to={[pipeX[1] - 8, PY + 56]} at={readsAt - 4} />
-      <Arrow from={[pipeX[1] + 236, PY + 56]} to={[pipeX[2] - 8, PY + 56]} at={hitsAt} />
+      <Arrow from={[pipeX[0] + 266, PY + 64]} to={[pipeX[1] - 8, PY + 64]} at={readsAt - 4} />
+      <Arrow from={[pipeX[1] + 266, PY + 64]} to={[pipeX[2] - 8, PY + 64]} at={hitsAt} />
       </div>
 
       {/* The turn: one word that means nothing on its own. */}

@@ -126,10 +126,13 @@ export const CaseScene: React.FC = () => {
             />
           );
         })}
-        <Arrow from={[X0 + leftW + 22, midY]} to={[TX - 26, midY]} at={lowerAt} />
-        <Ink at={lowerAt + 4} dur={12} style={{ left: X0 + leftW + 30, top: midY - 34, whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT }}>lower()</span>
-        </Ink>
+        {/* The arrow and its label step back while the chips fly over them. */}
+        <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.75 * (ease(frame, foldingAt, 8) - ease(frame, foldDone, 12)) }}>
+          <Arrow from={[X0 + leftW + 22, midY]} to={[TX - 26, midY]} at={lowerAt} />
+          <Ink at={lowerAt + 4} dur={12} style={{ left: X0 + leftW + 30, top: midY - 34, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT }}>lower()</span>
+          </Ink>
+        </div>
         <Tag at={distinctAt} x={X0} y={colBottom + 16} color={INK}>
           {CASE.distinct} distinct
         </Tag>

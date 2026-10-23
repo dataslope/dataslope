@@ -1,13 +1,13 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pop } from "../../components/motion";
+import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, kTokens, MONEY } from "./data";
-import { Drift, Headline, Kicker, Spot, tint, X0 } from "./kit";
+import { Drift, Headline, Kicker, Spot, Svg, tint, X0 } from "./kit";
 
 /** Fig. 14: one block per turn, the whole width of the page. */
 const BLOCK_Y = 320;
@@ -51,6 +51,12 @@ export const CostScene: React.FC = () => {
 
         {/* Fig. 14: the same document, billed again on every turn. */}
         <FigLabel n="14" title="One 500,000-token document in a 1,000,000-token window, resent every turn" at={start} x={X0} y={y(240)} />
+        {/* The ten turns' places, from the first word, filled as each turn is billed. */}
+        <Svg opacity={ease(frame, start, 12)}>
+          {Array.from({ length: MONEY.turns }, (_, j) => (
+            <rect key={j} x={X0 + j * BLOCK_PITCH} y={y(BLOCK_Y)} width={BLOCK_W} height={bh} fill="none" stroke={INK_SOFT} strokeWidth={1.4} strokeDasharray="4 5" />
+          ))}
+        </Svg>
         {Array.from({ length: MONEY.turns }, (_, j) => {
           const s = pop(frame, blockAt(j), fps, 14);
           if (s <= 0.001) return null;
@@ -102,7 +108,7 @@ export const CostScene: React.FC = () => {
         </Note>
       </Drift>
       {/* Still the same full suitcase, packed again for every trip. */}
-      <Spot id="llm-generation-suitcase" at={payAt - 4} left={1180} top={y(560)} width={560} height={h(300)} />
+      <Spot id="llm-generation-suitcase" at={start} left={1180} top={y(560)} width={560} height={h(300)} />
     </AbsoluteFill>
   );
 };

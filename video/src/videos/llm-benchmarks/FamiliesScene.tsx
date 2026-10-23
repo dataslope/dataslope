@@ -74,7 +74,7 @@ export const FamiliesScene: React.FC = () => {
       <Sfx name="el-tap" at={testsAt + 2} level={-27} />
       <Sfx name="el-pencil" at={gridAt - 2} level={-35} />
 
-      <Headline at={from - 6} second={answersAt - 4} italic="with known answers." size={62}>
+      <Headline at={from - 6} second={answersAt - 4} italic="with known answers.">
         A fixed set of questions
       </Headline>
       <FigLabel n="3" title="What four benchmarks ask" at={fixedAt - 2} x={X0} y={y(296)} />

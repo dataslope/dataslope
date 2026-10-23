@@ -15,3 +15,5 @@
 09:25 done; report at reports/Nlp-4-TextToFeatures.md
 10:02 fix pass started (0 P1, 6 P2, 10 P3)
 10:05 fix: split 4 beats (free recut), voicing 8 changed/new beats (540 chars)
+10:19 fix: #15 context row (CONTEXT trace), authorship fingerprint note, script header; running lint/typecheck/cues
+10:23 checks: lint ok, tsc ok, check:cues ok for this video, npm test 58/59 (fail is nlp-lemmas-and-tags cues); rendering 47 stills

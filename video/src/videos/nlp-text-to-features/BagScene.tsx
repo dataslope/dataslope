@@ -10,16 +10,19 @@ import { BOW } from "./data";
 import { Chip, ChipRow, FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, NumCell, pulse, Spot, X0 } from "./parts";
 
 /** Fig. 6, right: one document into the bag. */
-const BAG_X = 1180;
+/** Fig. 6 ends on the left, so the figures read left to right in order. */
+const BAG_X = X0;
 const CHIPS_Y = 328;
-const BAG = { left: 1260, top: 380, size: 350 };
+const BAG = { left: X0 + 80, top: 380, size: 350 };
 const TALLY_Y = 790;
 /** Fig. 7, left: the three documents and their matrix. */
 const DOC_Y0 = 338;
 const DOC_STEP = 52;
 const VOCAB_NOTE_Y = 506;
 const HEAD_ROW_Y = 552;
-const COL_X0 = 236;
+/** Fig. 7, right. */
+const FIG7_X = 820;
+const COL_X0 = FIG7_X + 116;
 const COL_W = 88;
 const ROW_Y0 = 598;
 const ROW_STEP = 68;
@@ -68,7 +71,7 @@ export const BagScene: React.FC = () => {
   // The words fly into the bag on "Tip", the bag shakes on "shake it".
   const into = (k: number) => ease(frame, tipAt + 4 + k * 2, 14);
   const shake = Math.sin((frame - shakeAt) / 2.2) * 5 * (1 - ease(frame, shakeAt + 4, 22)) * (frame >= shakeAt ? 1 : 0);
-  const slide = -420 * (1 - ease(frame, docsAt - 16, 24));
+  const slide = 640 * (1 - ease(frame, docsAt - 16, 24));
   const mouth: [number, number] = [BAG.left + BAG.size * 0.55, y(BAG.top) + h(BAG.size) * 0.4];
 
   // The cells of doc1 the narration names, by vocabulary column.
@@ -137,9 +140,9 @@ export const BagScene: React.FC = () => {
       </div>
 
       {/* ── Fig. 7: three documents, counted ── */}
-      <FigLabel n="7" title="Three tiny documents, counted" at={docsAt - 6} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="7" title="Three tiny documents, counted" at={docsAt - 6} x={FIG7_X} y={y(FIG_Y)} />
       {BOW.corpus.map((d, i) => (
-        <Ink key={i} at={docsAt - 2 + i * 5} dur={16} style={{ left: X0, top: y(DOC_Y0 + i * DOC_STEP), display: "flex", alignItems: "baseline", gap: 22, whiteSpace: "nowrap" }}>
+        <Ink key={i} at={docsAt - 2 + i * 5} dur={16} style={{ left: FIG7_X, top: y(DOC_Y0 + i * DOC_STEP), display: "flex", alignItems: "baseline", gap: 22, whiteSpace: "nowrap" }}>
           <span style={{ ...label(21, INK_SOFT), width: 60 }}>doc{i + 1}</span>
           <span style={{ ...body(32), color: INK }}>{d}</span>
         </Ink>
@@ -164,7 +167,7 @@ export const BagScene: React.FC = () => {
         const sweep = pulse(frame, sameAt + i * 6, 22);
         return (
           <React.Fragment key={i}>
-            <Ink at={at} dur={12} style={{ left: X0, top: y(ROW_Y0 + i * ROW_STEP) + h(ROW_H) / 2 - 14, ...label(22, INK) }}>
+            <Ink at={at} dur={12} style={{ left: FIG7_X, top: y(ROW_Y0 + i * ROW_STEP) + h(ROW_H) / 2 - 14, ...label(22, INK) }}>
               doc{i + 1}
             </Ink>
             {row.map((c, j) => {
@@ -189,13 +192,13 @@ export const BagScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      <Note at={dtmAt - 2} x={X0} y={y(DTM_NOTE_Y)}>
+      <Note at={dtmAt - 2} x={FIG7_X} y={y(DTM_NOTE_Y)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
           <Mark at={dtmAt}>A document-term matrix</Mark>
           <span style={{ color: INK_SOFT }}>: a row per document, a column per word</span>
         </span>
       </Note>
-      <Note at={sameAt - 2} x={X0} y={y(DTM_NOTE_Y) + 44}>
+      <Note at={sameAt - 2} x={FIG7_X} y={y(DTM_NOTE_Y) + 44}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Every row the same {BOW.vocab.length} columns, in the same order</span>
       </Note>
     </AbsoluteFill>

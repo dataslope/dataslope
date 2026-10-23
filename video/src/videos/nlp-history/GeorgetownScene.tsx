@@ -38,7 +38,7 @@ export const GeorgetownScene: React.FC = () => {
   const threeAt = n.word("hype", "perhaps three");
   const twelveAt = n.word("alpac", "Twelve years later");
   const reportAt = n.word("alpac", "government committee");
-  const noAt = n.word("alpac", "no prospect");
+  const noAt = n.word("alpac", "no near-term prospect");
   const fundingAt = n.word("alpac", "funding dried up");
   const polishedAt = n.word("moral", "polished demo");
   const systemAt = n.word("moral", "working system");
@@ -72,13 +72,27 @@ export const GeorgetownScene: React.FC = () => {
       <Sfx name="el-scratch" at={fundingAt} level={-33} />
 
       <Kicker at={from - 6}>1954: Georgetown University and IBM</Kicker>
-      <Headline at={translatingAt - 4} lead="Russian in," turn="English out." turnAt={englishAt - 4} out={polishedAt - 6} />
+      <Headline
+        at={from + 2}
+        lead={
+          <>
+            <Mark at={translatingAt}>Russian</Mark> in,
+          </>
+        }
+        turn={
+          <>
+            <Mark at={englishAt}>English</Mark> out.
+          </>
+        }
+        turnAt={from + 14}
+        out={polishedAt - 6}
+      />
       <Headline at={polishedAt - 2} lead="A polished demo" turn="is not a working system." turnAt={systemAt - 6} />
 
       <Spot id="computer" at={from - 2} left={1260} top={y(300)} width={500} height={399} />
 
       {/* ── Fig. 7, the demo in numbers ── */}
-      <FigLabel n="7" title={`The demo, ${DEMO.date}`} at={from + 4} x={96} y={y(290)} />
+      <FigLabel n="7" title={`The demo, ${DEMO.date}`} at={wordsAt - 8} x={96} y={y(290)} />
       <div style={{ opacity: 1 - ease(frame, twelveAt, 16) * 0.35 }}>
         {stat(96, wordsAt - 2, DEMO.words, "words")}
         {stat(400, rulesAt - 2, DEMO.rules, "grammar rules")}

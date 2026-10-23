@@ -139,7 +139,7 @@ export const TwoPipelinesScene: React.FC = () => {
         </span>
       </Note>
       {/* What the topic pipeline threw away, as it closes up. */}
-      <Note at={leftAt - 2} x={ROW_X - 120} y={y(DROPPED_Y) + 8}>
+      <Note at={leftAt - 2} x={X0} y={y(DROPPED_Y) + 8}>
         <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>dropped</span>
       </Note>
       <ChipRow x={ROW_X} y={y(DROPPED_Y)}>

@@ -38,6 +38,9 @@ export const pulse = (frame: number, at: number, dur = 18) => {
 export const DATA = BAR;
 /** A tint of the accent, for a wash behind words the narration points at. */
 export const MARK_BAD = `color-mix(in srgb, ${ACCENT} 24%, transparent)`;
+/** A neutral wash for words that come back (repeats), so red stays for what
+ *  the narration points at. */
+export const REPEAT_WASH = `color-mix(in srgb, ${INK_SOFT} 18%, transparent)`;
 /** Ink set back from the figure being talked about. */
 export const FADED = `color-mix(in srgb, ${INK_SOFT} 34%, ${PAPER})`;
 export const RULE = `color-mix(in srgb, ${INK} 22%, transparent)`;

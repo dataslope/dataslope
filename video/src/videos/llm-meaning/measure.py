@@ -35,8 +35,11 @@ can be read against it.
 - "weights" is attention-intuition.mdx, "Query, key, value": the hand-set
   relevance scores from "it" and the lesson's softmax.
 - "qkv" is attention-intuition.mdx, "Doing it properly, with real vectors":
-  keys, values and the query [1.0, 0.1], scaled by sqrt(2); then the
-  lesson's own suggestion, the query [0.2, 1.0], run the same way.
+  keys, values and the query [1.0, 0.1]; the dot product of the query with
+  each key (1.02, 0.40, 0.11), then divided by sqrt(2), the key dimension,
+  as the lesson's code does; then the lesson's own suggestion, the query
+  [0.2, 1.0], run the same way. "it"'s own query, key and value (the third
+  row) are what the video's Fig. 12 draws.
 - "cost" is attention-intuition.mdx, "The cost": n tokens make n * n scores.
 - "params" is the-shape-of-a-transformer.mdx, "What the parameters are": the
   lesson's mid-sized model (vocab 128,000, d_model 4096, 32 layers,
@@ -230,13 +233,15 @@ values = np.array([[10.0, 0.0], [0.0, 10.0], [1.0, 1.0]])
 
 
 def attend(q):
-    scores = keys @ q
-    scores = scores / np.sqrt(keys.shape[1])
+    dots = keys @ q  # the dot product of the query with each key
+    scores = dots / np.sqrt(keys.shape[1])
     w = softmax(scores)
     return {
         "query": q.tolist(),
+        "dots": [r(d) for d in dots],
         "scores": [r(s) for s in scores],
         "weights": [r(x) for x in w],
+        "weightSum": r(sum(r(x) for x in w), 3),  # the three weights as shown, added
         "output": [r(x) for x in w @ values],
     }
 
@@ -246,8 +251,10 @@ toward_suitcase = attend(np.array([0.2, 1.0]))
 echo("", "raw scores:  ", toward_trophy["scores"], "weights:", toward_trophy["weights"], "output:", toward_trophy["output"])
 echo("query [0.2, 1.0]:", toward_suitcase["scores"], toward_suitcase["weights"], toward_suitcase["output"])
 assert np.argmax(toward_trophy["weights"]) == 0 and np.argmax(toward_suitcase["weights"]) == 1
+assert toward_trophy["dots"] == [1.02, 0.4, 0.11], toward_trophy["dots"]
 out["qkv"] = {
     "tokens": qk_tokens,
+    "dim": int(keys.shape[1]),
     "keys": keys.tolist(),
     "values": values.tolist(),
     "trophy": toward_trophy,

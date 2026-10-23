@@ -35,12 +35,14 @@ export const SPACED: Piece = m.tokens.spaced;
 export const RS = m.tokens.rs;
 export const OPENING = m.tokens.opening;
 
-/** A few rows of the vocabulary, in id order: the strawberry pieces, the
- *  whole word with its space, and a word from Fig. 1. */
+/** A few rows of the vocabulary, in id order: Fig. 1's four candidates,
+ *  each a whole word with its leading space, and the two pieces o200k_base
+ *  cuts "Tokenization" into in the lesson's opening (Fig. 7). None of
+ *  strawberry's ids, which Fig. 5 reveals on their own words. */
+const tokenization = OPENING.pieces.filter((p) => p.text === " Token" || p.text === "ization");
 export const VOCAB_ROWS: (Piece & { kind: "word" | "piece" })[] = [
-  ...STRAWBERRY.map((p) => ({ ...p, kind: "piece" as const })),
-  { text: ` ${DIST[0].token}`, id: DIST[0].id, kind: "word" as const },
-  { ...SPACED, kind: "word" as const },
+  ...DIST.map((d) => ({ text: ` ${d.token}`, id: d.id, kind: "word" as const })),
+  ...tokenization.map((p) => ({ ...p, kind: "piece" as const })),
 ].sort((a, b) => a.id - b.id);
 
 // ── Part 3. building-a-tokenizer ─────────────────────────────────────────────
@@ -48,6 +50,8 @@ export const VOCAB_ROWS: (Piece & { kind: "word" | "piece" })[] = [
 export const WORDS = Object.keys(m.bpe.freqs);
 export const FREQS = m.bpe.freqs as Record<string, number>;
 export const FIRST_PAIRS = m.bpe.firstPairs;
+/** How many distinct neighbouring pairs the first count finds. */
+export const PAIR_TOTAL = m.bpe.pairTotal;
 /** Step 0 is the split into characters; step k is after merge k. */
 export const STEPS = m.bpe.steps as { merge: [string, string] | null; count: number | null; splits: Record<string, string[]> }[];
 export const MERGES = STEPS.slice(1).map((s) => ({ a: s.merge![0], b: s.merge![1], count: s.count! }));
@@ -61,6 +65,9 @@ export const unitsOf = (sym: string) => (sym.endsWith(END) ? sym.length - END.le
 
 export const SAMPLES = m.counts.samples;
 export const FORMATS = m.counts.formats;
+/** The three records as the tokenizer cuts them, key names marked. */
+export const JSON_PIECES: (Piece & { key: boolean })[] = m.counts.formats.json.pieces;
+export const CSV_PIECES: (Piece & { key: boolean })[] = m.counts.formats.csv.pieces;
 export const FAMILIES = m.counts.families.map((f) => ({
   ...f,
   json: (FORMATS.json as unknown as Record<string, number>)[f.encoding],

@@ -37,7 +37,7 @@ export const storyYear = (id: string) => STORIES.find((s) => s.id === id)!.year;
 
 /** The three course ideas the opening dates, and the story each comes from. */
 export const IDEAS = [
-  { story: "zipf", text: "Counting words" },
+  { story: "zipf", text: "Ranking word counts" },
   { story: "shannon", text: "Guessing the next word" },
   { story: "sparck", text: "Extra weight for rare words" },
 ] as const;
@@ -122,6 +122,15 @@ export const IDF = {
 };
 
 // ── word2vec, 2013 ──────────────────────────────────────────────────────────
+
+/** The paper behind word2vec, as arXiv lists it (1301.3781, v1 16 January
+ *  2013); the authors' affiliation is the paper's own (Google Inc.). */
+export const W2V_PAPER = {
+  date: "January 2013",
+  title: "Efficient Estimation of Word Representations in Vector Space",
+  authors: "Tomas Mikolov, Kai Chen, Greg Corrado, Jeffrey Dean",
+  place: "Google",
+};
 
 export const W2V = {
   words: m.w2v.words,

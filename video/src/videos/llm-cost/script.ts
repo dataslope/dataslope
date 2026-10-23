@@ -30,11 +30,17 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  * (lib/generated/block-outputs.json, all seven match), and computes every
  * number below with the functions those blocks define; data.ts reads its
  * measurements.json.
- *   - "rows": the five numbers are pricing-structure's table, verbatim on
- *     screen ("5 times input, sometimes more", "10% of input or less",
+ *   - "sheet", "rows": the lesson's "five numbers" are said as "five prices
+ *     ... always in the same proportions" (the October review: the table holds
+ *     relationships, not prices, so the narration promises proportions). They
+ *     are pricing-structure's table, verbatim on screen ("5 times input, sometimes more", "10% of input or less",
  *     "Slightly above input", "About 50% off"). "The ratios hardly move" is
  *     its "remarkably stable across vendors and across years".
- *   - "parallel", "serial", "gap": "Why output costs more than input". The
+ *   - "parallel", "serial", "weights", "gap": "Why output costs more than
+ *     input". "Weights" is its "The hardware spends most of its time moving
+ *     weights around rather than computing": every pass moves the whole
+ *     model, whether it carries the prompt's 11 tokens or one answer token,
+ *     and Fig. 3's "work per pass" meters are those counts, 11 against 1. The
  *     tokens drawn going in and coming out are o200k_base pieces of the
  *     video's own two lines, tokenized by measure.py (tiktoken 0.12.0).
  *   - "reuse", "twentieth": "Why cached input is so cheap" (the 50,000-token
@@ -54,7 +60,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     table's rows have one). The case is the lesson's own concept check, a
  *     300,000-token prompt against the GPT-6 family's 272,000-token line, on
  *     GPT-6.1 Sol ($2.00 input): $0.60 at the headline rate, $1.20 with the
- *     whole request at 2x.
+ *     whole request at 2x. Fig. 6 hatches every token of that bar, not the
+ *     28,000 past the line (the concept check's wrong answer).
  *   - "request" to "apart": estimating-cost, "A single request" (1,200 in,
  *     300 out): Sonnet $0.0054 ("about half a cent"); per 100,000 requests
  *     Haiku $27.00 and Fable $2,700.00, a factor of 100.
@@ -62,7 +69,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     `conversation_cost("sonnet", turns)` with its defaults (2,000-token
  *     system prompt, 150-token messages, 400-token replies): 10 turns
  *     $0.1325, 20 turns $0.3750, 40 turns $1.1900, the page's own table.
- *     Doubling 10 to 20 is x2.8 and 20 to 40 x3.2 ("roughly triples"). The
+ *     Doubling 10 to 20 is x2.8 and 20 to 40 x3.2 ("roughly triples, and it
+ *     keeps getting worse": the ratio grows with every doubling). "Sum": the
+ *     function adds each turn's whole history at the input rate plus each
+ *     reply at the output rate ("every one of these bars, plus each reply").
+ *     The
  *     bars are the input each turn sends: 2,150 tokens on turn 1, 23,600 on
  *     turn 40. The lesson's chart token-cost-stack draws the same idea with
  *     other numbers (400, 180, 320); the video keeps to the code block's, so
@@ -78,9 +89,14 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     "route-cost": its routing block (50,000 a day, 600 in, 15 out), Opus
  *     $4,050.00 a month and Haiku $101.25 ("a hundred and one"). "cache": the
  *     same 40-turn chat with `cached=True`, $1.19 to $0.2563 ("twenty-six
- *     cents"), 78% less, the page's table. "output": "a token saved on the
+ *     cents"), 78% less, the page's table. "cache-resend": the cached path
+ *     still sends the whole history each turn and bills what was sent last
+ *     turn at the cache rate, so the chat is resent in full and the stored
+ *     prefix is read back. "output": "a token saved on the
  *     output side is worth at least five saved on the input side".
- *     "effort": "Set it to the lowest level that passes your evaluation".
+ *     "effort": "Set it to the lowest level that passes your evaluation";
+ *     "the thinking budget" ties the setting to Fig. 9, which returns beside
+ *     it with its 20,000 and 0 rows (26.0x and 1.0x).
  *     "batch": "Roughly 50% off"; "nobody's waiting" is its concept check's
  *     "it works wherever nobody is waiting".
  *

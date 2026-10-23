@@ -40,6 +40,8 @@ export const BOW = {
   rows: m.bag.rows as readonly (readonly number[])[],
   spam: m.bag.spam,
   order: m.bag.order,
+  /** Two near-synonym reviews: they share only the word they have in common. */
+  meaning: m.bag.meaning,
 };
 export const BOW_THE = BOW.vocab.indexOf("the");
 
@@ -60,6 +62,10 @@ export const TF: readonly (readonly number[])[] = t.tf;
 export const TFIDF: readonly (readonly number[])[] = t.tfidf;
 export const THE = VOCAB.indexOf("the");
 export const CAT = VOCAB.indexOf("cat");
+/** Cat, had it appeared twice in Doc 1's six words: 2/6 times its idf. */
+export const TWICE = t.catTwice;
+/** The lesson's reason for the log: 1 in 10,000 weighs 10,000 without it. */
+export const LOG_EXAMPLE = t.logExample;
 /** Doc 1's words that tie for the top score, as the lesson names them. */
 export const DOC0_TOP: readonly string[] = t.doc0Top;
 
@@ -90,6 +96,11 @@ export const NAIVE: readonly Trace[] = s.naive;
 export const NEGATION: readonly Trace[] = s.negation;
 export const SARCASM: Trace = s.sarcasm;
 export const UNKNOWN: Trace = s.unknown;
+/** The video's reset example, with the flag's state after each token, and
+ *  its score with no reset tokens at all. */
+export const RESET_EXAMPLE: Trace & { scoreWithoutReset: number; labelWithoutReset: string } = s.resetExample;
+/** The context case: a thriller scored with "unpredictable" added to NEGATIVE. */
+export const CONTEXT: Trace & { added: string } = s.context;
 /** A negation-aware trace by its text. */
 export const traceOf = (text: string) => {
   const found = NEGATION.find((r) => r.text === text);

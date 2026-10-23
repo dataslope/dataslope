@@ -47,7 +47,6 @@ export const StemScene: React.FC = () => {
   const collapseAt = n.word("over", "collapse");
   const overAt = n.word("over", "over-stemming");
   const keyFrom = n.beat("key").from;
-  const keyAt = n.word("key", "key");
   const notWordAt = n.word("key", "word");
   const compareAt = n.word("key", "compare");
   const lookAt = n.word("lemma-in", "look");
@@ -98,7 +97,7 @@ export const StemScene: React.FC = () => {
 
       <Kicker at={from - 6}>Stems and lemmas</Kicker>
       <Headline lead="Four forms," turn="one word." at={from - 4} turnAt={fourAt} out={keyFrom} />
-      <Headline lead="A stem is a key," turn="not a word." at={keyAt - 6} turnAt={notWordAt - 2} />
+      <Headline lead="A stem is a key," turn="not a word." at={keyFrom + 8} turnAt={notWordAt - 2} />
       <Spot id="nlp-cleaning-text-dictionary" at={twoAt} left={1468} top={46} width={320} height={220} />
 
       <div style={{ position: "absolute", inset: 0, opacity: dim }}>

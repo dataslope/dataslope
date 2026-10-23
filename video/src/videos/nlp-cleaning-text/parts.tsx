@@ -368,7 +368,10 @@ export const Chip: React.FC<{
   opacity?: number;
   /** Replaces the text as drawn (the width still follows `text`). */
   display?: string;
-}> = ({ text, x, y, at, size = CHIP_SIZE, tones = [], marks = [], gone, strike, hot, out, opacity = 1, display }) => {
+  /** Draws a leading space as a faint open box, so the space a split left
+   *  behind reads as part of the string rather than as padding. */
+  showSpace?: boolean;
+}> = ({ text, x, y, at, size = CHIP_SIZE, tones = [], marks = [], gone, strike, hot, out, opacity = 1, display, showSpace }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 15);
@@ -408,7 +411,25 @@ export const Chip: React.FC<{
         fontVariantLigatures: "none",
       }}
     >
-      {hot ? (
+      {showSpace && shown.startsWith(" ") ? (
+        <span>
+          <span style={{ position: "relative" }}>
+            {" "}
+            <span
+              style={{
+                position: "absolute",
+                left: "0.1em",
+                right: "0.1em",
+                bottom: "-0.08em",
+                height: "0.22em",
+                border: `2px solid ${INK_FAINT}`,
+                borderTop: "none",
+              }}
+            />
+          </span>
+          {shown.slice(1)}
+        </span>
+      ) : hot ? (
         <span>
           {shown.slice(0, hot.from)}
           <span style={{ color: h > 0 ? `color-mix(in srgb, ${ACCENT_INK} ${(h * 100).toFixed(0)}%, ${INK})` : INK }}>

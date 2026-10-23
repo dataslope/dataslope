@@ -14,7 +14,8 @@ const SIZE = 28;
 const GAP = 10;
 const ROW0 = 372;
 const ROW_STEP = 70;
-const CTX_X = 176;
+/** The rows build on the right, once the ring has moved to the left. */
+const CTX_X = 960;
 /** Width of a chip of `text` at SIZE: JetBrains Mono advances 0.6 em. */
 const chipW = (text: string) => text.length * 0.6 * SIZE + 2 * Math.round(SIZE * 0.4) + 4;
 /** Each context chip's left edge, in a row. */
@@ -32,6 +33,10 @@ const ARROW_W = 40;
  *  weights, and what comes out of them. */
 const RX = 1140;
 const RING = { cx: 1450, cy: 590, r: 150 };
+/** Where the ring's centre ends up, left of the rows. */
+const RING_LEFT = 470;
+/** The left column, once the ring has gone: the plan, the weights. */
+const LX = X0;
 /** The three stations round the ring, clockwise from the top, in degrees. */
 const STATIONS = [-90, 30, 150];
 const ARC_GAP = 16;
@@ -84,16 +89,18 @@ export const LoopScene: React.FC = () => {
   const end = n.beat("token").from;
 
   // When each row's context lands, and when its next token is picked.
-  const ctxAt = [loopFrom, addsAt - 2, onAt - 10, the2At - 10, matAt - 10, doneAt - 12];
-  const nextAt = [tokenAt, longerAt, onAt, the2At, matAt, doneAt];
+  // The ring (Fig. 2) draws the loop alone while "loop" is spoken; the rows
+  // build on "again", one row on each word it names.
+  const nextAt = [catAt, satAt, onAt, the2At, matAt, doneAt];
+  const ctxAt = [theAt - 4, ...nextAt.slice(0, -1).map((t) => t + 4)];
+  // The ring starts in the middle of the page and moves aside for the rows.
+  const aside = ease(frame, theAt - 10, 18);
+  const ringShift = lerp(960, RING_LEFT, aside) - RING.cx;
   const rowY = (i: number) => y(ROW0) + i * h(ROW_STEP);
   const geo = LOOP.map((s) => lefts(s.context));
-  // "The, cat, sat": the first chips named as the beat runs through them.
+  // "So what is a token": the last row's chips, named one after another.
   const named = (i: number, j: number | "next") =>
-    (i === 0 && j === 0 ? pulse(frame, theAt - 2, 16) : 0) +
-    (i === 0 && j === "next" ? pulse(frame, catAt - 2, 16) : 0) +
-    (i === 1 && j === "next" ? pulse(frame, satAt - 2, 16) : 0) +
-    (i === LOOP.length - 1 && j !== "next" ? pulse(frame, whatAt - 4 + (j as number) * 3, 16) : 0);
+    i === LOOP.length - 1 && j !== "next" ? pulse(frame, whatAt - 4 + (j as number) * 3, 16) : 0;
 
   return (
     <AbsoluteFill>
@@ -111,7 +118,7 @@ export const LoopScene: React.FC = () => {
       <Headline lead="No plan," turn="no database." at={aPlanAt - 2} turnAt={databaseAt - 4} />
 
       <Drift from={loopFrom} to={end} amount={0.012} origin="30% 55%">
-        <FigLabel n="2" title="The lesson's toy model, one step a row" at={loopFrom} x={X0} y={y(FIG_Y)} />
+        <FigLabel n="3" title="The lesson's toy model, one step a row" at={theAt - 6} x={CTX_X - 50} y={y(FIG_Y)} />
 
         {LOOP.map((s, i) => {
           const g = geo[i];
@@ -130,7 +137,7 @@ export const LoopScene: React.FC = () => {
               <div
                 style={{
                   position: "absolute",
-                  left: X0,
+                  left: CTX_X - 50,
                   top: rowY(i) + 10,
                   ...label(21, INK_SOFT),
                   opacity: rowP,
@@ -172,8 +179,21 @@ export const LoopScene: React.FC = () => {
                 }}
               >
                 <ChipFace text={s.next} size={SIZE} focus={Math.max(focusNext, named(i, "next"), pulse(frame, eachStepAt + i * 5, 16))} />
-                {done ? <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the token that means done</span> : null}
               </div>
+              {done ? (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: g.right + 14 + ARROW_W + 14,
+                    top: rowY(i) + 54,
+                    ...note(22, INK_SOFT),
+                    whiteSpace: "nowrap",
+                    opacity: ease(frame, pickAt + 4, 10),
+                  }}
+                >
+                  the token that means done
+                </div>
+              ) : null}
             </React.Fragment>
           );
         })}
@@ -190,7 +210,8 @@ export const LoopScene: React.FC = () => {
 
       {/* Fig. 3: the same loop as a ring, until the plan's absence takes the column. */}
       <Out at={missingAt - 4}>
-        <FigLabel n="3" title="One step, repeated" at={tokenAt - 4} x={RX} y={y(FIG_Y)} />
+        <div style={{ position: "absolute", inset: 0, transform: `translateX(${ringShift}px)` }}>
+        <FigLabel n="2" title="One step, repeated" at={loopFrom} x={RX} y={y(FIG_Y)} />
         {STATIONS.map((a, i) => {
           const next = STATIONS[(i + 1) % STATIONS.length] + (i === STATIONS.length - 1 ? 360 : 0);
           return (
@@ -210,7 +231,7 @@ export const LoopScene: React.FC = () => {
           const px = RING.cx + RING.r * Math.cos(rad);
           const py = y(RING.cy + RING.r * Math.sin(rad));
           const at = [loopFrom, tokenAt, addsAt][i];
-          const glow = pulse(frame, [runsAt + 8, tokenAt, addsAt][i], 20);
+          const glow = pulse(frame, [longerAt, tokenAt, addsAt][i], 20);
           const text = ["run the model", "pick a token", "add it to the end"][i];
           const place: React.CSSProperties =
             i === 0
@@ -230,7 +251,7 @@ export const LoopScene: React.FC = () => {
           );
         })}
         {/* Each new token goes once round the ring. */}
-        {nextAt.slice(2).map((t, i) => {
+        {nextAt.slice(1).map((t, i) => {
           const p = (frame - (t - 12)) / 12;
           if (p <= 0 || p >= 1) return null;
           const a = ((-90 + 360 * p) * Math.PI) / 180;
@@ -240,10 +261,11 @@ export const LoopScene: React.FC = () => {
             </Svg>
           );
         })}
+        </div>
       </Out>
 
       {/* What the loop does not have. */}
-      <Note at={aPlanAt - 2} x={RX} y={y(FIG_Y) - 4} dim={databaseAt}>
+      <Note at={aPlanAt - 2} x={LX} y={y(FIG_Y) - 4} dim={databaseAt}>
         <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>Each step sees only the row it is on.</div>
         <div style={{ ...note(22, INK_SOFT), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, reasonableAt, 12) }}>
           The sentence comes from steps that were each reasonable,
@@ -254,8 +276,8 @@ export const LoopScene: React.FC = () => {
       </Note>
 
       {/* What it knows: the weights, a ball of many strands with no labelled drawer. */}
-      <Spot id="llm-tokens-yarn" at={knowsAt - 4} left={RX + 10} top={y(470)} width={300} height={300} />
-      <Note at={weightsAt - 2} x={RX + 340} y={y(470) + 40}>
+      <Spot id="llm-tokens-yarn" at={knowsAt - 4} left={LX + 10} top={y(470)} width={300} height={300} />
+      <Note at={weightsAt - 2} x={LX + 340} y={y(470) + 40}>
         <div style={{ ...body(32), color: INK, whiteSpace: "nowrap" }}>Its weights</div>
         <div style={{ ...note(22, INK_SOFT), marginTop: 8, whiteSpace: "nowrap", opacity: ease(frame, tunedAt, 12) }}>
           numbers tuned in training
@@ -265,16 +287,25 @@ export const LoopScene: React.FC = () => {
         </div>
       </Note>
       {[
-        { at: factAt, text: "a well known fact", x: RX + 10 },
-        { at: citationAt, text: "an invented citation", x: RX + 300 },
+        { at: factAt, text: "a well known fact", x: LX + 10 },
+        { at: citationAt, text: "an invented citation", x: LX + 300 },
       ].map((o, k) => (
         <React.Fragment key={k}>
           <Leader
-            points={[
-              // From just under the ball, clear of its trailing strand.
-              [RX + 80 + k * 40, y(470) + 312],
-              [o.x + 80, y(470) + h(318)],
-            ]}
+            points={
+              // From the ball's lower rim; the second bends down under the
+              // trailing strand rather than across it.
+              k === 0
+                ? [
+                    [LX + 115, y(470) + 206],
+                    [o.x + 90, y(470) + h(318)],
+                  ]
+                : [
+                    [LX + 142, y(470) + 208],
+                    [LX + 168, y(470) + 316],
+                    [o.x + 80, y(470) + h(318)],
+                  ]
+            }
             at={o.at - 6}
             dur={12}
             color={INK_SOFT}
@@ -295,7 +326,7 @@ export const LoopScene: React.FC = () => {
           </Note>
         </React.Fragment>
       ))}
-      <Note at={machineryAt - 2} x={RX + 10} y={y(470) + h(326) + 44}>
+      <Note at={machineryAt - 2} x={LX + 10} y={y(470) + h(326) + 44}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the same machinery, and just as sure</span>
       </Note>
     </AbsoluteFill>

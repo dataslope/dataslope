@@ -6,6 +6,7 @@ import { INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { int, NAME, PRICES, THINKING, usd } from "./data";
 import {
   Drift,
@@ -15,6 +16,7 @@ import {
   Headline,
   INPUT,
   Marked,
+  Svg,
   OUTPUT,
   OUTPUT_INK,
   POINT_INK,
@@ -29,6 +31,7 @@ const LABEL_R = 380;
 const BAR_X = 410;
 const BAR_MAX = 1060;
 const BAR_H = 36;
+const AXIS_TICKS = [0, 0.05, 0.1, 0.15, 0.2];
 
 /**
  * Thinking tokens are output tokens: the same Sonnet request, the same
@@ -74,6 +77,7 @@ export const ThinkScene: React.FC = () => {
   const markAt = [-1, -1, -1, elevenAt - 2, twentySixAt - 2];
   const ansX0 = BAR_X + px(inCost);
   const ansX1 = ansX0 + px(ansCost);
+  const axisY = rowY(rows.length - 1) + bh + 16;
 
   return (
     <AbsoluteFill>
@@ -88,14 +92,14 @@ export const ThinkScene: React.FC = () => {
       </Headline>
 
       <Drift from={thinkFrom} to={end} amount={0.012} origin="30% 60%">
-        <FigLabel n="9" title={`One ${NAME.sonnet} request, as its thinking grows`} at={thinkingAt - 4} x={X0} y={y(FIG_Y)} />
+        <FigLabel n="9" title={`Cost of one request on ${NAME.sonnet}`} at={thinkingAt - 4} x={X0} y={y(FIG_Y)} />
         {/* The legend, at the right end of the label line. */}
         {[
-          { name: `${int(THINKING.in)} in`, fill: INPUT, at: surpriseAt - 2 },
-          { name: `${int(THINKING.visible)}-token answer`, fill: OUTPUT, at: surpriseAt + 2 },
+          { name: `${int(THINKING.in)} in: ${usd(inCost, 3)}`, fill: INPUT, at: surpriseAt - 2 },
+          { name: `${int(THINKING.visible)}-token answer: ${usd(ansCost, 3)}`, fill: OUTPUT, at: surpriseAt + 2 },
           { name: "thinking, billed as output", fill: THINK_FILL, at: outputAt - 4 },
         ].map((k, i) => (
-          <Ink key={k.name} at={k.at} dur={12} style={{ left: [910, 1070, 1330][i], top: y(FIG_Y) + 2, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 10 }}>
+          <Ink key={k.name} at={k.at} dur={12} style={{ left: [860, 1086, 1446][i], top: y(FIG_Y) + 2, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 10 }}>
             <span
               style={{
                 width: 26,
@@ -151,9 +155,24 @@ export const ThinkScene: React.FC = () => {
         })}
 
         {/* The answer: the same 400 tokens in every row. */}
-        <Guide x={ansX0} y0={rowY(0) - 8} y1={rowY(rows.length - 1) + bh + 10} at={seeAt - 4} color={OUTPUT_INK} />
-        <Guide x={ansX1} y0={rowY(0) - 8} y1={rowY(rows.length - 1) + bh + 10} at={seeAt} color={OUTPUT_INK} />
-        <Note at={longerAt - 6} x={ansX0 - 30} y={rowY(rows.length - 1) + bh + 22}>
+        <Guide x={ansX0} y0={rowY(0) - 8} y1={axisY} at={seeAt - 4} color={OUTPUT_INK} />
+        <Guide x={ansX1} y0={rowY(0) - 8} y1={axisY} at={seeAt} color={OUTPUT_INK} />
+        {/* Bar length is dollars: an axis under the rows says so. */}
+        <Svg opacity={ease(frame, surpriseAt, 14)}>
+          <line x1={BAR_X} x2={BAR_X + BAR_MAX} y1={axisY} y2={axisY} stroke={INK} strokeWidth={1.4} />
+          {AXIS_TICKS.map((v) => (
+            <g key={v}>
+              <line x1={BAR_X + px(v)} x2={BAR_X + px(v)} y1={axisY} y2={axisY + 7} stroke={INK} strokeWidth={1.2} />
+              <text x={BAR_X + px(v)} y={axisY + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+                {usd(v)}
+              </text>
+            </g>
+          ))}
+          <text x={BAR_X + BAR_MAX + 18} y={axisY + 30} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+            cost per request
+          </text>
+        </Svg>
+        <Note at={longerAt - 6} x={ansX0 - 30} y={axisY + 50}>
           <span style={{ ...note(24, OUTPUT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same answer in every row</span>
         </Note>
         {/* The answer's slice glows down the rows as it is named again. */}

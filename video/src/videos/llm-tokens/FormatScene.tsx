@@ -7,57 +7,18 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { ENCODING, FAMILIES, FORMATS, num, PRICE, SAMPLES } from "./data";
-import { Drift, FIG_Y, FOCUS, FOCUS_INK, Headline, Out, pulse, TOKEN, TOKEN_TINT, TokenRun, X0 } from "./parts";
+import { CSV_PIECES, ENCODING, FAMILIES, FORMATS, JSON_PIECES, num, PRICE, SAMPLES } from "./data";
+import { Drift, FIG_Y, FOCUS, FOCUS_INK, Headline, Out, TOKEN, TokenRun, X0 } from "./parts";
 
 /** Fig. 12 and Fig. 14, on the left: rows of bars. */
 const LBAR = { labelW: 300, barX: X0 + 300, row0: 410, step: 84 };
-/** Fig. 13, on the right: one outlined cell per token. */
+/** The right column: the left one moved over. */
 const RX = 1040;
-const CELL = 26;
-const CELL_GAP = 6;
-const PER_ROW = 15;
-const JSON_Y = 410;
-const CSV_Y = 660;
-const EQ_Y = 808;
-
-/** A block of `count` token cells, filling in order from `at` over `dur`. */
-const Cells: React.FC<{ count: number; x: number; top: number; at: number; dur: number; focus?: number }> = ({
-  count,
-  x,
-  top,
-  at,
-  dur,
-  focus = 0,
-}) => {
-  const frame = useCurrentFrame();
-  return (
-    <>
-      {Array.from({ length: count }, (_, i) => {
-        const q = ease(frame, at + (i / count) * dur, 6);
-        if (q <= 0) return null;
-        return (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: x + (i % PER_ROW) * (CELL + CELL_GAP),
-              top: top + Math.floor(i / PER_ROW) * (CELL + CELL_GAP),
-              width: CELL,
-              height: CELL,
-              boxSizing: "border-box",
-              borderRadius: 6,
-              border: `2px solid ${focus > 0 ? `color-mix(in srgb, ${FOCUS} ${Math.round(focus * 100)}%, ${TOKEN})` : TOKEN}`,
-              background: TOKEN_TINT,
-              opacity: q,
-              transform: `scale(${0.7 + 0.3 * q})`,
-            }}
-          />
-        );
-      })}
-    </>
-  );
-};
+/** Fig. 13: the two texts, JSON then CSV beside it. */
+const TEXT_Y = 368;
+const CSV_DX = 430;
+/** Fig. 15: the price check. */
+const EQ_Y = 470;
 
 /** A horizontal bar with its value, grown on `at`. */
 const BarRow: React.FC<{
@@ -129,6 +90,8 @@ export const FormatScene: React.FC = () => {
   const hundredAt = n.word("models", "a hundred and twenty");
   const anthropicAt = n.word("models", "Anthropic");
   const percentAt = n.word("models", "thirty percent");
+  const modelsFrom = n.beat("models").from;
+  const priceFrom = n.beat("price").from;
   const cheaperAt = n.word("price", "cheaper");
   const moreAt = n.word("price", "thirty percent more");
   const fourAt = n.word("price", "four percent");
@@ -139,32 +102,45 @@ export const FormatScene: React.FC = () => {
   const prose = SAMPLES.find((s) => s.kind === "prose")!;
   const code = SAMPLES.find((s) => s.kind === "code")!;
   const perChar = 100;
-  const perToken = 3.3;
-  const jsonCells = FORMATS.json[ENCODING as "o200k_base"];
-  const csvCells = FORMATS.csv[ENCODING as "o200k_base"];
+  const perToken = 3.0;
+  const jsonCount = FORMATS.json[ENCODING as "o200k_base"];
+  const csvCount = FORMATS.csv[ENCODING as "o200k_base"];
   const top = Math.max(...FAMILIES.map((f) => f.json));
+  const keysLit = ease(frame, keyAt - 2, 10);
+
+  // Every figure is laid out in the left column; the right column is the
+  // same drawing moved over. Figures step left as the next one arrives, so
+  // they always read 12 | 13, then 13 | 14, then 14 | 15.
+  const SHIFT = RX - X0;
+  const fig13X = SHIFT * (1 - ease(frame, modelsFrom + 4, 18));
+  const fig14X = SHIFT * (1 - ease(frame, priceFrom + 6, 18));
+  const jsonInk = (i: number) => recordsAt + 2 + (i / JSON_PIECES.length) * Math.max(18, eightyAt - recordsAt - 2);
+  const csvInk = (i: number) => thirtyThreeAt - 8 + (i / CSV_PIECES.length) * 14;
 
   return (
     <AbsoluteFill>
-      {/* ── Sound: the bars, the cells filling, the four tokenizers, the sum ── */}
+      {/* ── Sound: the bars, the texts inking, the four tokenizers, the sum ── */}
       <Sfx name="el-tap" at={proseAt} level={-27} />
       <Sfx name="el-tap" at={pythonAt} level={-27} />
-      <Sfx name="el-sprinkle" at={eightyAt - 4} level={-32} />
-      <Sfx name="el-sprinkle" at={thirtyThreeAt - 4} level={-34} />
-      <Sfx name="el-whoosh" at={familyAt - 6} level={-36} />
+      <Sfx name="el-sprinkle" at={recordsAt + 2} level={-33} />
+      <Sfx name="el-sprinkle" at={thirtyThreeAt - 8} level={-34} />
+      <Sfx name="el-pencil" at={keyAt - 2} level={-35} />
+      <Sfx name="el-whoosh" at={modelsFrom + 4} level={-36} />
       {FAMILIES.map((_, i) => (
-        <Sfx key={i} name="el-tap" at={familyAt + i * 5} level={-29} />
+        <Sfx key={i} name="el-tap" at={familyAt + 10 + i * 5} level={-29} />
       ))}
+      <Sfx name="el-whoosh" at={priceFrom + 6} level={-36} />
       <Sfx name="el-tap" at={cheaperAt} level={-27} />
       <Sfx name="el-tap" at={moreAt} level={-27} />
       <Sfx name="el-tap" at={fourAt} level={-24} />
 
-      <Headline lead="Same content," turn="different counts." at={formatsFrom - 6} turnAt={textAt} />
+      <Headline lead="Different text," turn="different rates." at={formatsFrom - 6} turnAt={textAt} out={recordsAt - 12} />
+      <Headline lead="Same content," turn="different counts." at={recordsAt - 2} turnAt={eightyAt} />
 
       <Drift from={formatsFrom} to={end} amount={0.01} origin="45% 55%">
         {/* Fig. 12: characters per token, the lesson's two samples, counted;
             under each bar, its first repeat as the tokenizer cuts it. */}
-        <Out at={familyAt - 8}>
+        <Out at={modelsFrom - 6}>
           <FigLabel n="12" title="Characters a token, the lesson's samples" at={formatsFrom} x={X0} y={y(FIG_Y)} />
           {[
             { s: prose, at: proseAt, name: "English prose", said: halfAt },
@@ -191,75 +167,112 @@ export const FormatScene: React.FC = () => {
           ))}
         </Out>
 
-        {/* Fig. 14: the same JSON, counted by four tokenizers. */}
-        <FigLabel n="14" title="The same JSON, four tokenizers" at={familyAt - 2} x={X0} y={y(FIG_Y)} />
-        {FAMILIES.map((f, i) => {
-          const rare = f.json === top;
-          return (
-            <BarRow
-              key={f.encoding}
-              top={rowY(i)}
-              at={familyAt + i * 5}
-              width={f.json * perToken}
-              value={String(f.json)}
-              focus={rare ? ease(frame, hundredAt - 2, 10) : 0}
-            >
-              <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>{f.encoding}</div>
+        {/* Fig. 13: the lesson's three records, as JSON and as CSV, every
+            token drawn, the key names lit on "every key". */}
+        <Out at={priceFrom - 4}>
+          <div style={{ position: "absolute", inset: 0, transform: `translateX(${fig13X}px)` }}>
+            <FigLabel n="13" title="Three records, two formats" at={recordsAt - 4} x={X0} y={y(FIG_Y)} />
+            {[
+              { x: X0, name: "JSON", count: jsonCount, at: eightyAt },
+              { x: X0 + CSV_DX, name: "CSV", count: csvCount, at: thirtyThreeAt },
+            ].map((f) => (
               <div
-                style={{
-                  ...note(20, rare && frame > gptAt ? FOCUS_INK : INK_SOFT),
-                  whiteSpace: "nowrap",
-                  marginTop: 2,
-                }}
+                key={f.name}
+                style={{ position: "absolute", left: f.x, top: y(TEXT_Y), display: "flex", alignItems: "baseline", gap: 14, opacity: ease(frame, f.at - 2, 10) }}
               >
-                {f.model === "davinci" ? "GPT-3, davinci" : f.model === "text-davinci-003" ? f.model : f.model.toUpperCase().replace("GPT-4O", "GPT-4o")}
+                <span style={label(24, INK)}>{f.name}</span>
+                <span style={{ ...note(28, INK), fontWeight: 650, ...TABULAR }}>{f.count} tokens</span>
               </div>
-            </BarRow>
-          );
-        })}
-        <Note at={anthropicAt - 2} x={X0} y={rowY(FAMILIES.length) + h(10)}>
-          <div style={{ ...body(28), color: INK, whiteSpace: "nowrap" }}>
-            Anthropic: its tokenizer since Claude Opus 4.7 makes
-          </div>
-          <div style={{ ...body(28), color: INK, whiteSpace: "nowrap", opacity: ease(frame, percentAt - 2, 12) }}>
-            about <span style={{ color: FOCUS_INK }}>30% more tokens</span> for the same text
-          </div>
-          <div style={{ ...note(20, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>Anthropic, Pricing, October 2026, as the lesson cites it</div>
-        </Note>
-
-        {/* Fig. 13: three records, as JSON and as CSV. */}
-        <FigLabel n="13" title="Three records, two formats" at={recordsAt - 4} x={RX} y={y(FIG_Y)} />
-        <Cells count={jsonCells} x={RX} top={y(JSON_Y)} at={recordsAt + 2} dur={Math.max(18, eightyAt - recordsAt)} focus={pulse(frame, keyAt, 30)} />
-        <div style={{ position: "absolute", left: RX + PER_ROW * (CELL + CELL_GAP) + 22, top: y(JSON_Y), opacity: ease(frame, eightyAt - 2, 10) }}>
-          <div style={{ ...label(24, INK) }}>JSON</div>
-          <div style={{ ...note(30, INK), fontWeight: 650, ...TABULAR }}>{jsonCells} tokens</div>
-          <div style={{ ...note(20, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", opacity: ease(frame, keyAt - 2, 12) }}>every key,</div>
-          <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, keyAt - 2, 12) }}>on every record</div>
-        </div>
-        <Cells count={csvCells} x={RX} top={y(CSV_Y)} at={thirtyThreeAt - 8} dur={14} />
-        <div style={{ position: "absolute", left: RX + PER_ROW * (CELL + CELL_GAP) + 22, top: y(CSV_Y), opacity: ease(frame, thirtyThreeAt - 2, 10) }}>
-          <div style={{ ...label(24, INK) }}>CSV</div>
-          <div style={{ ...note(30, INK), fontWeight: 650, ...TABULAR }}>{csvCells} tokens</div>
-          <div style={{ ...note(20, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", opacity: ease(frame, keyAt - 2, 12) }}>keys once, in a header</div>
-        </div>
-
-        {/* The price check: cheaper per token, more tokens. */}
-        <div style={{ position: "absolute", left: RX, top: y(EQ_Y), display: "flex", alignItems: "flex-start", gap: 22 }}>
-          {[
-            { at: cheaperAt, v: PRICE.cheaper.toFixed(1), u: "the price a token" },
-            { at: moreAt, v: PRICE.more.toFixed(1), u: "the tokens" },
-            { at: fourAt, v: PRICE.product.toFixed(2), u: "the cost" },
-          ].map((c, i) => (
-            <React.Fragment key={i}>
-              {i > 0 ? (
-                <span style={{ ...headline(46), color: INK_SOFT, opacity: ease(frame, c.at - 4, 10) }}>{i === 1 ? "×" : "="}</span>
-              ) : null}
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", opacity: ease(frame, c.at - 2, 10) }}>
-                <span style={{ ...headline(52), color: i === 2 ? FOCUS_INK : INK, ...TABULAR }}>{c.v}</span>
-                <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", marginTop: 6 }}>{c.u}</span>
+            ))}
+            <div style={{ position: "absolute", left: X0, top: y(TEXT_Y) + 46, opacity: ease(frame, recordsAt, 8) }}>
+              <TokenRun
+                pieces={JSON_PIECES}
+                size={20}
+                width={420}
+                rowGap={2}
+                lineHeight={1.3}
+                faint={0}
+                inkAt={jsonInk}
+                focus={(i) => (JSON_PIECES[i].key ? keysLit : 0)}
+              />
+            </div>
+            <div style={{ position: "absolute", left: X0 + CSV_DX, top: y(TEXT_Y) + 46, opacity: ease(frame, thirtyThreeAt - 10, 8) }}>
+              <TokenRun
+                pieces={CSV_PIECES}
+                size={20}
+                width={360}
+                rowGap={2}
+                lineHeight={1.3}
+                faint={0}
+                inkAt={csvInk}
+                focus={(i) => (CSV_PIECES[i].key ? keysLit : 0)}
+              />
+            </div>
+            <Note at={keyAt} x={X0 + CSV_DX} y={y(TEXT_Y) + 46 + h(140)}>
+              <div style={{ ...note(22, FOCUS_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+                JSON: the {FORMATS.keys.length} keys on all {FORMATS.jsonKeyNames / FORMATS.keys.length} records
               </div>
-            </React.Fragment>
-          ))}
+              <div style={{ ...note(22, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>CSV: once, in a header</div>
+            </Note>
+          </div>
+        </Out>
+
+        {/* Fig. 14: the same JSON, counted by four tokenizers. */}
+        <div style={{ position: "absolute", inset: 0, transform: `translateX(${fig14X}px)` }}>
+          <FigLabel n="14" title="The same JSON, four tokenizers" at={familyAt + 6} x={X0} y={y(FIG_Y)} />
+          {FAMILIES.map((f, i) => {
+            const rare = f.json === top;
+            return (
+              <BarRow
+                key={f.encoding}
+                top={rowY(i)}
+                at={familyAt + 10 + i * 5}
+                width={f.json * perToken}
+                value={String(f.json)}
+                focus={rare ? ease(frame, hundredAt - 2, 10) : 0}
+              >
+                <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>{f.encoding}</div>
+                <div
+                  style={{
+                    ...note(20, rare && frame > gptAt ? FOCUS_INK : INK_SOFT),
+                    whiteSpace: "nowrap",
+                    marginTop: 2,
+                  }}
+                >
+                  {f.model === "davinci" ? "GPT-3, davinci" : f.model === "text-davinci-003" ? f.model : f.model.toUpperCase().replace("GPT-4O", "GPT-4o")}
+                </div>
+              </BarRow>
+            );
+          })}
+          <Note at={anthropicAt - 2} x={X0} y={rowY(FAMILIES.length) + h(10)}>
+            <div style={{ ...body(28), color: INK, whiteSpace: "nowrap" }}>Anthropic: its tokenizer since Claude Opus 4.7 makes</div>
+            <div style={{ ...body(28), color: INK, whiteSpace: "nowrap", opacity: ease(frame, percentAt - 2, 12) }}>
+              about <span style={{ color: FOCUS_INK }}>30% more tokens</span> for the same text
+            </div>
+            <div style={{ ...note(20, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>Anthropic, Pricing, October 2026, as the lesson cites it</div>
+          </Note>
+        </div>
+
+        {/* Fig. 15: the price check, cheaper per token but more tokens. */}
+        <div style={{ position: "absolute", inset: 0, transform: `translateX(${SHIFT}px)` }}>
+          <FigLabel n="15" title="Cheaper a token, dearer for the text" at={priceFrom + 10} x={X0} y={y(FIG_Y)} />
+          <div style={{ position: "absolute", left: X0, top: y(EQ_Y), display: "flex", alignItems: "flex-start", gap: 22 }}>
+            {[
+              { at: cheaperAt, v: PRICE.cheaper.toFixed(1), u: "the price a token" },
+              { at: moreAt, v: PRICE.more.toFixed(1), u: "the tokens" },
+              { at: fourAt, v: PRICE.product.toFixed(2), u: "the cost" },
+            ].map((c, i) => (
+              <React.Fragment key={i}>
+                {i > 0 ? (
+                  <span style={{ ...headline(56), color: INK_SOFT, opacity: ease(frame, c.at - 4, 10), marginTop: 10 }}>{i === 1 ? "×" : "="}</span>
+                ) : null}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", opacity: ease(frame, c.at - 2, 10) }}>
+                  <span style={{ ...headline(76), color: i === 2 ? FOCUS_INK : INK, ...TABULAR }}>{c.v}</span>
+                  <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 10 }}>{c.u}</span>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       </Drift>
     </AbsoluteFill>

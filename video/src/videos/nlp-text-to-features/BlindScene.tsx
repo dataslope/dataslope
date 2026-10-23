@@ -18,6 +18,9 @@ const STRIP_Y = 470;
 const COMMON_Y = 824;
 
 const ORDER = BOW.order;
+const MEANING = BOW.meaning;
+const MEANING_X0 = 1320;
+const MEANING_W = 140;
 const DOC1 = BOW.rows[0];
 /** The long, mostly empty row: doc1's nine counts at the front, its non-zero
  *  cells kept where they are, then column after empty column. */
@@ -177,25 +180,62 @@ export const BlindScene: React.FC = () => {
       <Ink at={greatAt - 8} dur={12} style={{ left: px[2], top: y(HEAD_Y), ...label(24, INK), whiteSpace: "nowrap" }}>
         No meaning
       </Ink>
-      {["great", "excellent"].map((w, k) => {
-        const at = k === 0 ? greatAt : excellentAt;
-        const x = px[2] + k * 260;
-        return (
-          <React.Fragment key={w}>
-            <Ink at={at - 4} dur={12} style={{ left: x, width: 200, top: y(SENT_Y), textAlign: "center", ...body(34), color: INK }}>
-              {w}
-            </Ink>
-            {[0, 1, 2].map((r) => (
-              <ColumnCell key={r} at={at + 2 + r * 2} x={x + 30} top={y(SENT_Y + 64 + r * 64)} h={h(54)} glow={meaningAt + k * 6 + r * 3} />
-            ))}
-          </React.Fragment>
-        );
-      })}
-      <Note at={unrelatedAt - 2} x={px[2]} y={y(SENT_Y + 270)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>two unrelated columns</span>
+      {/* Two reviews that mean the same thing, counted the lesson's way. */}
+      {MEANING.sentences.map((t, i) => (
+        <Ink
+          key={t}
+          at={(i === 0 ? greatAt : excellentAt) - 4}
+          dur={14}
+          style={{ left: px[2], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}
+        >
+          <span style={{ ...label(21, INK_SOFT), width: 22 }}>{"CD"[i]}</span>
+          <span style={{ ...body(34), color: INK }}>{t}</span>
+        </Ink>
+      ))}
+      {MEANING.vocab.map((w, j) => (
+        <Ink
+          key={w}
+          at={excellentAt + 6 + j * 2}
+          dur={10}
+          style={{ left: MEANING_X0 + j * MEANING_W, width: MEANING_W, top: y(MINI.headY), textAlign: "center", ...label(22, INK) }}
+        >
+          {w}
+        </Ink>
+      ))}
+      {MEANING.rows.map((row, i) => (
+        <React.Fragment key={i}>
+          <Ink at={excellentAt + 8 + i * 4} dur={10} style={{ left: px[2], top: y(MINI.rowY + i * MINI.step) + h(MINI.h) / 2 - 15, ...label(21, INK_SOFT) }}>
+            {"CD"[i]}
+          </Ink>
+          {row.map((c, j) => {
+            const shared = MEANING.shared.includes(MEANING.vocab[j]);
+            const glow = shared ? pulse(frame, meaningAt + i * 4, 22) : pulse(frame, unrelatedAt + j * 3 + i * 3, 20);
+            return (
+              <NumCell
+                key={j}
+                value={c}
+                at={excellentAt + 8 + i * 4 + j}
+                x={MEANING_X0 + j * MEANING_W + 4}
+                y={y(MINI.rowY + i * MINI.step)}
+                w={MEANING_W - 8}
+                h={h(MINI.h)}
+                heat={c * 0.6 + glow * 0.6}
+                size={28}
+                faint={c === 0}
+              />
+            );
+          })}
+        </React.Fragment>
+      ))}
+      <Note at={unrelatedAt - 2} x={px[2]} y={y(MINI.rowY + 2 * MINI.step) + 14}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <i>great</i> and <i>excellent</i>: two unrelated columns
+        </span>
       </Note>
-      <Note at={meaningAt - 2} x={px[2]} y={y(SENT_Y + 316)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>nothing says they mean the same</span>
+      <Note at={meaningAt - 2} x={px[2]} y={y(MINI.rowY + 2 * MINI.step) + 58}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          The two reviews share only <i>{MEANING.shared.join(", ")}</i>.
+        </span>
       </Note>
 
       </div>
@@ -211,27 +251,5 @@ export const BlindScene: React.FC = () => {
         </span>
       </div>
     </AbsoluteFill>
-  );
-};
-
-/** An empty cell of a matrix column, drawn as an outline. */
-const ColumnCell: React.FC<{ at: number; x: number; top: number; h: number; glow: number }> = ({ at, x, top, h, glow }) => {
-  const frame = useCurrentFrame();
-  const p = ease(frame, at, 10);
-  const g = pulse(frame, glow, 20);
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: x,
-        top,
-        width: 140,
-        height: h,
-        boxSizing: "border-box",
-        border: `1.5px solid ${CHIP_LINE}`,
-        background: tint(0.25 + 0.75 * g),
-        opacity: p,
-      }}
-    />
   );
 };

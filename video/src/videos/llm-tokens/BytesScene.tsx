@@ -57,6 +57,8 @@ export const BytesScene: React.FC = () => {
   const bytesCountAt = [oneByteAt, fifteenAt, eighteenAt, twelveBytesAt];
   const tokensAt = [mergesAt + 4, oneTokenAt, fourAt, twelveTokensAt];
   const rowY = (i: number) => y(ROW0) + i * h(ROW_STEP);
+  // Each row's characters-times-bytes line, on the words that give the rule.
+  const perCharAt = [oneByteAt, threeAt, threeAt + 6, tifinaghAt + 8];
   const last = GREETINGS.length - 1;
 
   return (
@@ -98,6 +100,10 @@ export const BytesScene: React.FC = () => {
               <div style={{ position: "absolute", left: X0, top: top + 2, opacity: p }}>
                 <div style={{ ...label(24, INK), whiteSpace: "nowrap" }}>{g.language}</div>
                 <div style={{ ...body(24, true), color: INK_SOFT, whiteSpace: "nowrap", marginTop: 2 }}>{g.romanized}</div>
+                {/* What the gaps between the squares mean: one character each. */}
+                <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, perCharAt[i], 12), ...TABULAR }}>
+                  {g.chars} {i === 0 ? "letters" : "characters"} × {perChar} {perChar === 1 ? "byte" : "bytes"}
+                </div>
               </div>
               {groups.map((gr, j) => {
                 const at = tokensAt[i] - 2 + (rare ? j * 2 : j * 3);

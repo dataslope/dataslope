@@ -57,10 +57,10 @@ const Scenes: React.FC = () => {
       <Scene from={cut("trophy")} to={until(cut("query-vec"))} fade={6}>
         <TrophyScene />
       </Scene>
-      <Scene from={cut("query-vec")} to={until(cut("real"))} fade={6}>
+      <Scene from={cut("query-vec")} to={until(cut("scores"))} fade={6}>
         <QkvScene />
       </Scene>
-      <Scene from={cut("real")} to={until(cut("heads"))} fade={6}>
+      <Scene from={cut("scores")} to={until(cut("heads"))} fade={6}>
         <BlendScene />
       </Scene>
       <Scene from={cut("heads")} to={until(cut("path"))} fade={6}>

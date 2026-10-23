@@ -93,13 +93,25 @@ export const TweetScene: React.FC = () => {
     [a.paren]: smiley2At + 3,
   };
   const whole = [find(TWEET.tweet, "#NLP"), find(TWEET.tweet, "@dataslope"), find(TWEET.tweet, ":)")];
-  const tonesA = (i: number): ToneStep[] => (badA[i] !== undefined ? [{ at: badA[i], tone: "bad" }] : []);
-  const tonesB = (i: number): ToneStep[] => (whole.includes(i) ? [{ at: wholeAt + whole.indexOf(i) * 4, tone: "good" }] : []);
+  // Each row's handling of the three units is marked as it is described, and
+  // both rows return to plain on "Neither one is wrong".
+  const tonesA = (i: number): ToneStep[] =>
+    badA[i] !== undefined ? [{ at: badA[i], tone: "bad" }, { at: neitherAt, tone: "plain" }] : [];
+  const tonesB = (i: number): ToneStep[] =>
+    whole.includes(i) ? [{ at: wholeAt + whole.indexOf(i) * 4, tone: "good" }, { at: neitherAt + 3, tone: "plain" }] : [];
   const dim = 1 - ease(frame, cleanAt, 14) * 0.45;
   const noteDim = 1 - ease(frame, waysAt, 14) * 0.25;
   const marksA = (i: number) =>
-    i === a.colon ? [{ at: colonAt, out: nltkAt }] : i === a.paren ? [{ at: bracketAt, out: nltkAt }] : [];
-  const marksB = (i: number) => (whole.includes(i) ? [{ at: rightAt + whole.indexOf(i) * 3, out: keepAt }] : []);
+    i === a.colon
+      ? [{ at: colonAt, out: nltkAt }]
+      : i === a.paren
+        ? [{ at: bracketAt, out: nltkAt }]
+        : i === a.hash || i === a.nlp
+          ? [{ at: rightAt, out: keepAt }]
+          : [];
+  // "The right tokens": one unit, the hashtag, lit in both rows, cut in two
+  // in one and whole in the other, neither marked wrong.
+  const marksB = (i: number) => (i === whole[0] ? [{ at: rightAt, out: keepAt }] : []);
 
   return (
     <AbsoluteFill>

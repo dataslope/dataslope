@@ -6,7 +6,7 @@ import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editoria
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CACHE_LEVER, int, NAME, OUTPUT_WORTH, ROUTE, usd } from "./data";
+import { CACHE_LEVER, int, NAME, OUTPUT_WORTH, PRICES, ROUTE, THINKING, usd } from "./data";
 import {
   Arrow,
   CACHED,
@@ -23,6 +23,7 @@ import {
   POINT_INK,
   pulse,
   Spot,
+  THINK_FILL,
   X0,
 } from "./parts";
 
@@ -37,6 +38,7 @@ const F12_MAX = 316;
 const F13_Y = 668;
 const F13_BAR_X = 1240;
 const F13_MAX = 420;
+const F9_MAX = 460;
 
 /**
  * Part 3: the lesson's six levers, in its order, each arriving on its
@@ -69,7 +71,15 @@ export const LeversScene: React.FC = () => {
   const thirdAt = n.word("output", "Third");
   const fiveAt = n.word("output", "five input");
   const fourthAt = n.word("effort", "Fourth");
+  const effortWordAt = n.word("effort", "reasoning effort");
+  const budgetAt = n.word("effort", "thinking budget");
+  const lowestAt = n.word("effort", "lowest level");
+  const resendAt = n.word("cache-resend", "resend");
+  const readsAt = n.word("cache-resend", "reads it back");
+  const allAt = n.word("cache-resend", "all");
+  const recognizesAt = n.word("cache-resend", "recognizes");
   const fifthAt = n.word("batch", "Fifth");
+  const nobodyAt = n.word("batch", "nobody's");
   const halfAt = n.word("batch", "half off");
   const thenAt = n.word("prompt", "only then");
   const twiceAt = n.word("passes", "twice");
@@ -90,7 +100,9 @@ export const LeversScene: React.FC = () => {
     <>
       Lower reasoning effort, to the lowest level that <Marked at={passesAt + 4}>passes</Marked>
     </>,
-    <>Batch anything not interactive</>,
+    <>
+      Batch anything <Marked at={nobodyAt - 2}>not interactive</Marked>
+    </>,
     <>Then optimize the prompt</>,
   ];
   const listY = (i: number) => y(LIST_Y0 + i * LIST_DY);
@@ -173,7 +185,45 @@ export const LeversScene: React.FC = () => {
 
       {/* ── The art, while no figure needs the right half ── */}
       <Spot id="levers" at={sixAt - 6} out={firstAt - 6} left={1130} top={y(318)} width={600} height={433} />
-      <Spot id="levers" at={thirdAt - 4} left={1130} top={y(318)} width={600} height={433} />
+      <Spot id="levers" at={figsOut + 12} out={effortWordAt - 8} left={1130} top={y(318)} width={600} height={433} />
+      <Spot id="levers" at={thenAt - 2} left={1130} top={y(318)} width={600} height={433} />
+
+      {/* ── Fig. 9 again, for lever 4: the thinking budget turned down ── */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, thenAt - 10, 10) }}>
+        <FigLabel n="9" title={`Cost of one request on ${NAME.sonnet}`} at={effortWordAt - 4} x={RX} y={y(FIG_Y)} />
+        {[
+          { row: THINKING.rows[THINKING.rows.length - 1], at: budgetAt - 4, y: 400, dim: lowestAt + 6 },
+          { row: THINKING.rows[0], at: lowestAt - 2, y: 540, dim: undefined },
+        ].map(({ row, at, y: ly, dim }) => {
+          const ry = y(ly);
+          const sonnet = PRICES.sonnet;
+          const inC = (THINKING.in / 1e6) * sonnet.in;
+          const ansC = (THINKING.visible / 1e6) * sonnet.out;
+          const thinkC = (row.thinking / 1e6) * sonnet.out;
+          const maxC = THINKING.rows[THINKING.rows.length - 1].cost;
+          const px = (v: number) => (v / maxC) * F9_MAX;
+          const fade = dim === undefined ? 1 : 1 - ease(frame, dim, 14) * 0.6;
+          return (
+            <div key={row.thinking} style={{ position: "absolute", inset: 0, opacity: fade }}>
+              <Note at={at} x={RX} y={ry - 40}>
+                <span style={{ ...note(25, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(row.thinking)} thinking tokens</span>
+              </Note>
+              <HBar x={RX} y={ry} w={px(inC)} h={h(40)} at={at} dur={6} fill={INPUT} radius={2} />
+              <HBar x={RX + px(inC)} y={ry} w={px(ansC)} h={h(40)} at={at + 2} dur={6} fill={OUTPUT} radius={2} />
+              {row.thinking > 0 ? (
+                <HBar x={RX + px(inC + ansC)} y={ry} w={px(thinkC)} h={h(40)} at={at + 4} dur={16} fill={THINK_FILL} radius={2} />
+              ) : null}
+              <Note at={at + 12} x={RX + px(inC + ansC + thinkC) + 14} y={ry + h(20) - 19}>
+                <span style={{ display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
+                  <span style={{ ...note(23, INK_SOFT), ...TABULAR }}>{usd(row.cost, 5)}</span>
+                  <span style={{ ...note(28, INK), fontWeight: 700, ...TABULAR }}>{row.times.toFixed(1)}x</span>
+                </span>
+              </Note>
+            </div>
+          );
+        })}
+        <Arrow from={[RX - 22, y(400) + 8]} to={[RX - 22, y(540) + 40]} at={lowestAt - 4} dur={14} color={POINT_INK} width={2.6} />
+      </div>
 
       {/* ── Fig. 12: one workload routed ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, figsOut, 12) }}>
@@ -210,6 +260,14 @@ export const LeversScene: React.FC = () => {
           </span>
         </Note>
 
+        {/* Still resent in full: the provider recognises the prefix and reads it back. */}
+        <Note at={resendAt - 4} x={RX} y={y(F13_Y + 168)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            every turn still sent in full
+            <span style={{ opacity: ease(frame, readsAt - 6, 12), color: CACHED_INK }}>, the prefix read back</span>
+          </span>
+        </Note>
+
         {/* ── Fig. 13: the 40-turn chat, cached ── */}
         <FigLabel n="13" title={`The ${CACHE_LEVER.turns}-turn chat, ${NAME.sonnet}`} at={fortyAt - 6} x={RX} y={y(F13_Y)} />
         {[
@@ -223,7 +281,17 @@ export const LeversScene: React.FC = () => {
               <Note at={r.at - 4} x={RX} y={ry}>
                 <span style={{ ...note(23, r.ink), fontWeight: 650, whiteSpace: "nowrap" }}>{r.name}</span>
               </Note>
-              <HBar x={F13_BAR_X} y={ry + 4} w={w} h={h(24)} at={r.at} dur={16} fill={r.fill} />
+              {/* "Resend it all" swells the full bar; "recognizes" swells the cached one. */}
+              <HBar
+                x={F13_BAR_X}
+                y={ry + 4}
+                w={w}
+                h={h(24)}
+                at={r.at}
+                dur={16}
+                fill={r.fill}
+                style={{ transform: `scaleY(${1 + pulse(frame, (i === 0 ? allAt : recognizesAt) - 2, 24) * 0.45})` }}
+              />
               <Note at={r.at + 6} x={F13_BAR_X + w + 12} y={ry}>
                 <span style={{ ...note(24, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
                   {usd(r.value)}

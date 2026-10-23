@@ -144,8 +144,16 @@ export const MonthScene: React.FC = () => {
                 </span>
               </Note>
               <Note at={codeAt - 2 + i * 3} x={PER_R} y={ry} align="right">
-                <span style={{ ...note(25, i === dear ? POINT_INK : INK), fontWeight: i === dear ? 700 : 500, ...TABULAR, whiteSpace: "nowrap" }}>
-                  {i === dear ? <Marked at={bigAt - 2}>{usd(r.per, 5)}</Marked> : usd(r.per, 5)}
+                {/* The decoy is red only until the real answer is named; then red belongs to that row alone. */}
+                <span
+                  style={{
+                    ...note(25, i === dear && frame < summariesAt - 4 ? POINT_INK : INK),
+                    fontWeight: i === dear && frame < summariesAt - 4 ? 700 : 500,
+                    ...TABULAR,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {i === dear ? <Marked at={bigAt - 2} out={summariesAt - 4}>{usd(r.per, 5)}</Marked> : usd(r.per, 5)}
                 </span>
               </Note>
               <HBar

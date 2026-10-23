@@ -102,20 +102,22 @@ export const TuringScene: React.FC = () => {
   const fourAt = n.word("turing-out", "Four years later");
 
   // ── The figure ──
-  const BX = 1060;
-  const BW = 580;
-  const BH = Math.round((BW * 971) / 1181);
-  const BTOP = y(330);
-  const doorA: [number, number] = [BX + 0.23 * BW, BTOP + BH * 0.94];
-  const doorB: [number, number] = [BX + 0.76 * BW, BTOP + BH * 0.94];
+  // Two booths standing apart (nlp-history-booths, 1303x879): no channel
+  // between them, so the judge's two lines are the only ones.
+  const BX = 1110;
+  const BW = 620;
+  const BH = Math.round((BW * 879) / 1303);
+  const BTOP = y(350);
+  const doorA: [number, number] = [BX + 0.2 * BW, BTOP + BH * 0.97];
+  const doorB: [number, number] = [BX + 0.8 * BW, BTOP + BH * 0.97];
   const JX = 300;
   const JTOP = y(470);
   const jOut: [number, number] = [JX + 270, JTOP + 70];
   const floor = BTOP + BH + 34;
   // A runs straight to the person's booth; B runs under it to the machine's.
-  const wireA = [jOut, [BX + 0.07 * BW, jOut[1]]] as const;
+  const wireA = [jOut, [BX + 0.03 * BW, jOut[1]]] as const;
   const wireB = [
-    [JX + 230, JTOP + 160],
+    [JX + 258, JTOP + 160],
     [JX + 330, JTOP + 160],
     [JX + 330, floor],
     [doorB[0], floor],

@@ -128,19 +128,20 @@ export const PathScene: React.FC = () => {
       <Kicker at={from - 10}>The shape of a transformer</Kicker>
       <Headline lead="The full path" turn="of a prompt." at={from} turnAt={from + 14} />
 
-      <FigLabel n="18" title="One block of a transformer, and the steps before it" at={from} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="17" title="One block of a transformer, and the steps before it" at={from} x={X0} y={y(FIG_Y)} />
       {/* Column titles. */}
       {(
         [
-          [X.text, "Text", textAt],
-          [X.ids, "Token ids", idsAt],
-          [X.emb, "Embedding + position", embeddingAt],
-          [X.att + 10, "Attention", mixesAt - 4],
-          [X.ff + 10, "Feed-forward", ffAt - 2],
+          [X.text, "Text", textAt, ""],
+          [X.ids, "Token ids", idsAt, "o200k_base"],
+          [X.emb, "Embedding + position", embeddingAt, ""],
+          [X.att + 10, "Attention", mixesAt - 4, ""],
+          [X.ff + 10, "Feed-forward", ffAt - 2, ""],
         ] as const
-      ).map(([x, t, at]) => (
-        <Fade key={t} at={at - 2} style={{ left: x, top: top0 - 76 }}>
+      ).map(([x, t, at, sub]) => (
+        <Fade key={t} at={at - 2} style={{ left: x, top: top0 - 84 }}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>{t}</span>
+          {sub ? <div style={{ ...note(19, INK_SOFT), marginTop: 2, whiteSpace: "nowrap" }}>{sub}</div> : null}
         </Fade>
       ))}
       {toks.map((t, i) => (
@@ -153,7 +154,13 @@ export const PathScene: React.FC = () => {
           </Fade>
           <Fade at={embeddingAt - 2 + i * 2} style={{ left: X.emb, top: rowY(i) + 6, display: "flex", alignItems: "center", gap: 10 }}>
             <Strip cells={8} at={embeddingAt + i * 2} frame={frame} />
-            <span style={{ ...note(20, POINT_INK), fontWeight: 650, opacity: ease(frame, positionAt + i * 2, 8), ...TABULAR }}>+{i + 1}</span>
+            {/* + its slot's position vector, drawn as a vector rather than a count. */}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6, opacity: ease(frame, positionAt + i * 2, 8) }}>
+              <span style={{ ...note(22, POINT_INK), fontWeight: 700 }}>+</span>
+              {[0, 1, 2].map((c) => (
+                <span key={c} style={{ width: 14, height: 30, borderRadius: 3, border: `1.5px solid ${POINT}`, background: PAPER }} />
+              ))}
+            </span>
           </Fade>
           {/* Feed-forward: each token through its own small box. */}
           <Fade at={aloneAt - 6 + i * 2} style={{ left: X.ff + 10, top: rowY(i) + 4 }}>
@@ -255,10 +262,19 @@ export const PathScene: React.FC = () => {
           The input, added back in
         </Tag>
       </Fade>
-      <Fade at={thirtyAt - 2} style={{ left: X.stack, top: blockBot - SLABS * 40 - 118 }}>
-        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 44, color: INK, ...TABULAR }}>×{PARAMS.layers}</div>
-        <div style={{ ...label(21, INK_SOFT), marginTop: 6, opacity: ease(frame, modelAt - 4, 10), whiteSpace: "nowrap" }}>in the lesson&apos;s</div>
-        <div style={{ ...label(21, INK_SOFT), opacity: ease(frame, modelAt - 4, 10), whiteSpace: "nowrap" }}>mid-sized model</div>
+      {/* On top of the stack, the output layer the parameter count will name. */}
+      <Fade at={modelAt - 2} style={{ left: X.stack, top: blockBot - SLABS * 40 - 66, width: 220 }}>
+        <div style={{ border: `2px solid ${INK}`, borderRadius: 8, padding: "6px 12px 8px", background: PAPER }}>
+          <div style={{ ...label(21, INK) }}>Output layer</div>
+          <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a score per token</div>
+        </div>
+      </Fade>
+      <Fade at={thirtyAt - 2} style={{ left: X.stack, top: blockBot + 14, display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 38, color: INK, ...TABULAR }}>×{PARAMS.layers}</div>
+        <div style={{ opacity: ease(frame, modelAt - 4, 10) }}>
+          <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>in the lesson&apos;s</div>
+          <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>mid-sized model</div>
+        </div>
       </Fade>
     </AbsoluteFill>
   );
@@ -283,7 +299,7 @@ export const ParamsScene: React.FC = () => {
   const halfAt = n.word("split", "half");
   const outputAt = n.word("split", "output");
   const againAt = n.word("split", "again");
-  const attnAt = n.word("split", "Attention");
+  const attnAt = n.word("attn-share", "Attention");
   const ffAt = n.word("ff", "feed-forward");
   const threeAt = n.word("ff", "three point eight");
   const fiftyAt = n.word("ff", "Fifty-four");
@@ -329,7 +345,7 @@ export const ParamsScene: React.FC = () => {
       <Headline lead="Most of them" turn="in feed-forward." at={fiftyAt - 4} turnAt={fiftyAt + 8} />
 
       {/* ── Fig. 19: the lesson's sums, as one bar ── */}
-      <FigLabel n="19" title="Where the lesson's mid-sized model keeps its parameters" at={from} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="18" title="Where the lesson's mid-sized model keeps its parameters" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={sevenAt - 2} style={{ left: BAR_X1, top: y(FIG_Y) + 2, transform: "translateX(-100%)" }}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
           <Mark at={wholeAt}>Total: {PARAMS.total.toFixed(2)} billion</Mark>
@@ -406,7 +422,7 @@ export const ParamsScene: React.FC = () => {
       </Note>
 
       {/* ── Fig. 20: width and depth ── */}
-      <FigLabel n="20" title="Width and depth" at={widthAt - 4} x={X0} y={y(698)} />
+      <FigLabel n="19" title="Width and depth" at={widthAt - 4} x={X0} y={y(698)} />
       <Fade at={widthAt - 2} style={{ left: X0, top: WY }}>
         <Strip cells={30} w={26} h={34} at={widthAt} frame={frame} strong />
       </Fade>
@@ -498,7 +514,7 @@ export const ExpertsScene: React.FC = () => {
       <Spot id="llm-meaning-drawers" at={splitAt - 4} left={X0 + 40} top={y(380)} width={288} height={470} />
 
       {/* ── Fig. 21: experts, a few per token ── */}
-      <FigLabel n="21" title="Experts, a few per token" at={expertsAt - 6} x={GX - 40} y={y(FIG_Y)} />
+      <FigLabel n="20" title="Experts, a few per token" at={expertsAt - 6} x={GX - 40} y={y(FIG_Y)} />
       <Svg>
         {Array.from({ length: 16 }, (_, i) => {
           const r = Math.floor(i / 4);
@@ -532,7 +548,7 @@ export const ExpertsScene: React.FC = () => {
       </Fade>
 
       {/* ── Fig. 22: DeepSeek-V3's two counts ── */}
-      <FigLabel n="22" title="DeepSeek-V3, as the lesson cites it" at={storesAt - 6} x={BX} y={y(FIG_Y)} />
+      <FigLabel n="21" title="DeepSeek-V3, as the lesson cites it" at={storesAt - 6} x={BX} y={y(FIG_Y)} />
       {(
         [
           ["Stored", ds3.total, sixAt],
@@ -579,14 +595,14 @@ export const TopScene: React.FC = () => {
   const somethingAt = n.word("next", "Something");
   const pickAt = n.word("next", "pick");
 
-  const last = PROMPT.tokens[PROMPT.tokens.length - 1];
   const VY = y(500);
   const LX = 1000;
   const ZERO = 1290;
   const UNIT = 110;
   const rowTop = (i: number) => y(400) + i * 72;
   // After "something still has to pick one", a marker hops among the four.
-  const hop = frame >= somethingAt ? Math.floor((frame - somethingAt) / 14) % LOGITS.tokens.length : -1;
+  // After "something still has to pick one", a marker weighs the two likeliest.
+  const hop = frame >= somethingAt ? Math.floor((frame - somethingAt) / 14) % 2 : -1;
 
   return (
     <AbsoluteFill>
@@ -599,15 +615,14 @@ export const TopScene: React.FC = () => {
       <Kicker at={from - 10}>The shape of a transformer</Kicker>
       <Headline lead="One score" turn="for every token." at={from} turnAt={scoreAt} />
 
-      <FigLabel n="23" title="At the top: a score for every token in the vocabulary" at={from} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="22" title="At the top: a score for every token in the vocabulary" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={lastAt - 4} style={{ left: X0, top: VY - 64 }}>
-        <span style={{ ...label(22, INK_SOFT) }}>The last token&apos;s vector</span>
+        <span style={{ ...label(22, INK_SOFT) }}>The last position&apos;s vector, after every block</span>
       </Fade>
       <Fade at={lastAt - 2} style={{ left: X0, top: VY, display: "flex", alignItems: "center", gap: 16 }}>
-        <TokenChip text={last.piece} size={26} />
-        <Strip cells={12} w={26} h={34} at={lastAt} frame={frame} strong />
+        <Strip cells={14} w={26} h={34} at={lastAt} frame={frame} strong />
       </Fade>
-      <Arrow from={[X0 + 520, VY + 20]} to={[LX - 30, VY + 20]} at={scoreAt - 4} />
+      <Arrow from={[X0 + 14 * 26 + 30, VY + 17]} to={[LX - 30, VY + 17]} at={scoreAt - 4} />
       <Fade at={scoreAt - 2} style={{ left: LX, top: y(350) }}>
         <span style={{ ...label(21, INK_SOFT) }}>Token</span>
         <span style={{ ...label(21, INK_SOFT), position: "absolute", left: ZERO - LX + 60 }}>Score</span>
@@ -657,7 +672,9 @@ export const TopScene: React.FC = () => {
         </span>
       </Fade>
       <Fade at={allAt + 8} style={{ left: LX, top: rowTop(LOGITS.tokens.length) + 56 }}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Four of them: the sampling lesson&apos;s example scores</span>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          Four example scores from the sampling lesson; {thousands(PARAMS.vocab)} is the mid-sized model&apos;s vocabulary
+        </span>
       </Fade>
       <NextLine at={pickAt - 4} x={X0} y={y(880)} width={1680}>
         choosing the next token

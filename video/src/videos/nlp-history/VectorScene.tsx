@@ -2,13 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { W2V } from "./data";
-import { DATA, DATA_INK, DATA_WASH, Headline, Kicker, Mark, pulse, Svg, Tag, Wire } from "./parts";
+import { W2V, W2V_PAPER } from "./data";
+import { DATA, DATA_INK, DATA_WASH, Headline, Kicker, Mark, pulse, SOFT, Svg, Tag, Wire } from "./parts";
 
 type Word = "man" | "woman" | "king" | "queen";
 
@@ -52,6 +52,66 @@ const WordDot: React.FC<{ x: number; y: number; word: string; at: number; dx: nu
   );
 };
 
+/** The arXiv paper's first page: its date, title, authors and where they
+ *  worked, each inking on the word that names it, then lines of text. */
+const PaperCard: React.FC<{
+  x: number;
+  top: number;
+  width: number;
+  height: number;
+  at: number;
+  dateAt: number;
+  authorAt: number;
+  placeAt: number;
+  titleMark: number;
+  out: number;
+}> = ({ x, top, width, height, at, dateAt, authorAt, placeAt, titleMark, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 16);
+  const o = ease(frame, out, 12);
+  if (p <= 0 || o >= 1) return null;
+  const pad = 28;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top,
+        width,
+        height,
+        opacity: p * (1 - o),
+        transform: `translate(${(1 - p) * 30 + o * 30}px, 0) rotate(${(1 - p) * 1.5 - 0.5}deg)`,
+        background: PAPER,
+        border: `1.5px solid ${HAIRLINE}`,
+        borderRadius: 3,
+        boxSizing: "border-box",
+      }}
+    >
+      <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span>arXiv</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, dateAt, 10) }}>{W2V_PAPER.date}</span>
+      </div>
+      <div style={{ position: "absolute", left: pad, right: pad, top: 52, height: 1.5, background: INK }} />
+      <Ink at={at + 6} dur={20} style={{ left: pad, top: 70, width: width - 2 * pad }}>
+        <div style={{ ...headline(30), lineHeight: 1.12 }}>
+          <Mark at={titleMark}>{W2V_PAPER.title}</Mark>
+        </div>
+      </Ink>
+      <Ink at={authorAt} dur={14} style={{ left: pad, top: 158, width: width - 2 * pad }}>
+        <div style={{ ...label(21, INK), lineHeight: 1.35 }}>{W2V_PAPER.authors}</div>
+      </Ink>
+      <Ink at={placeAt} dur={14} style={{ left: pad, top: 226, whiteSpace: "nowrap" }}>
+        <div style={{ ...label(21, INK_SOFT), fontWeight: 560 }}>{W2V_PAPER.place}</div>
+      </Ink>
+      {Array.from({ length: 5 }, (_, i) => {
+        const w = ease(frame, at + 14 + i * 6, 12);
+        const full = i === 4 ? 0.5 : 0.88 + ((i * 37) % 10) / 100;
+        return <div key={i} style={{ position: "absolute", left: pad, top: 280 + i * 30, width: (width - 2 * pad) * full * w, height: 6, borderRadius: 3, background: SOFT }} />;
+      })}
+    </div>
+  );
+};
+
 /**
  * Part 7, 2013: word2vec gives every word a point in space. Four of its words
  * on one flat slice of its 300 dimensions (Fig. 11): the step from man to
@@ -66,6 +126,7 @@ export const VectorScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("w2v").from;
+  const thirteenAt = n.word("w2v", "twenty thirteen");
   const mikolovAt = n.word("w2v", "Mikolov");
   const vecWordAt = n.word("w2v", "vec");
   const googleAt = n.word("w2v", "Google");
@@ -76,7 +137,7 @@ export const VectorScene: React.FC = () => {
   const kingAt = n.word("analogy", "king");
   const manAt = n.word("analogy", "take away man");
   const womanAt = n.word("analogy", "add woman");
-  const nearestAt = n.word("analogy", "nearest word");
+  const nearestAt = n.word("analogy", "nearest other word");
   const queenAt = n.word("analogy", "queen");
   const rememberAt = n.word("great", "Remember");
   const columnsAt = n.word("great", "unrelated columns");
@@ -95,6 +156,9 @@ export const VectorScene: React.FC = () => {
   const query = at("query");
   const ring = ease(frame, nearestAt - 2, 16);
 
+  /** "great" stands out once the narration says the two were unrelated. */
+  const isGreatAt = (word: string) => word === "great" && frame >= columnsAt;
+
   // ── Fig. 12, the nearest words to "excellent" ──
   const LX = 1080;
   const LTOP = y(400);
@@ -111,8 +175,8 @@ export const VectorScene: React.FC = () => {
       <Sfx name="el-pencil" at={manAt} level={-34} />
       <Sfx name="el-pencil" at={womanAt} level={-34} />
       <Sfx name="el-pop" at={nearestAt - 2} level={-30} />
-      <Sfx name="el-sprinkle" at={closeAt} level={-33} />
-      <Sfx name="el-pencil" at={rememberAt} level={-35} />
+      <Sfx name="el-sprinkle" at={rememberAt + 8} level={-33} />
+      <Sfx name="el-pencil" at={pointAt - 2} level={-35} />
       <Sfx name="el-tap" at={neighborsAt} level={-28} />
 
       <Kicker at={from - 6}>2013: Tomáš Mikolov and colleagues, Google</Kicker>
@@ -121,10 +185,10 @@ export const VectorScene: React.FC = () => {
 
       <FigLabel n="11" title="Four of its words, on one flat slice of its 300 dimensions" at={from + 2} x={96} y={y(290)} />
       {/* The four words, as points. */}
-      <WordDot x={man[0]} y={man[1]} word="man" at={mikolovAt} dx={-20} dy={30} swell={pulse(frame, manAt, 20) + pulse(frame, pointAt, 18)} />
-      <WordDot x={woman[0]} y={woman[1]} word="woman" at={googleAt} dx={18} dy={30} swell={pulse(frame, womanAt, 20) + pulse(frame, pointAt + 4, 18)} />
-      <WordDot x={king[0]} y={king[1]} word="king" at={releasedAt} dx={-20} dy={-26} swell={pulse(frame, kingAt, 20) + pulse(frame, pointAt + 8, 18)} />
-      <WordDot x={queen[0]} y={queen[1]} word="queen" at={vecWordAt} dx={-20} dy={30} swell={pulse(frame, queenAt, 24) + pulse(frame, pointAt + 12, 18)} />
+      <WordDot x={man[0]} y={man[1]} word="man" at={pointAt - 2} dx={-20} dy={30} swell={pulse(frame, manAt, 20)} />
+      <WordDot x={woman[0]} y={woman[1]} word="woman" at={pointAt + 4} dx={18} dy={30} swell={pulse(frame, womanAt, 20)} />
+      <WordDot x={king[0]} y={king[1]} word="king" at={pointAt + 10} dx={-20} dy={-26} swell={pulse(frame, kingAt, 20)} />
+      <WordDot x={queen[0]} y={queen[1]} word="queen" at={pointAt + 16} dx={-42} dy={30} swell={pulse(frame, queenAt, 24)} />
       {/* Royal words sit apart from the rest: a wash behind king and queen. */}
       <Svg opacity={ease(frame, closeAt - 6, 14) * (1 - ease(frame, directionsAt, 14))}>
         <ellipse cx={(king[0] + queen[0]) / 2} cy={(king[1] + queen[1]) / 2} rx={150} ry={110} fill={DATA_WASH} />
@@ -146,14 +210,17 @@ export const VectorScene: React.FC = () => {
         king − man + woman
       </Tag>
       <Tag x={queen[0] + 46} y={queen[1] + 4} at={nearestAt} size={23} color={INK} weight={650}>
-        nearest word: <span style={{ fontFamily: MONO, fontWeight: 500 }}>{W2V.analogy[0].word}</span>
+        nearest other word: <span style={{ fontFamily: MONO, fontWeight: 500 }}>{W2V.analogy[0].word}</span>
       </Tag>
       <Tag x={(man[0] + woman[0]) / 2} y={man[1] + 54} at={manAt + 8} align="center" size={20} color={INK_SOFT} weight={560}>
         one step, man to woman
       </Tag>
 
+      {/* ── The paper behind it, assembled as the narration names its parts ── */}
+      <PaperCard x={LX + 40} top={y(330)} width={580} height={450} at={from + 2} dateAt={thirteenAt} authorAt={mikolovAt} placeAt={googleAt} titleMark={vecWordAt} out={rememberAt - 8} />
+
       {/* ── Fig. 12 ── */}
-      <FigLabel n="12" title="The six words nearest to excellent" at={closeAt - 4} x={LX} y={y(290)} />
+      <FigLabel n="12" title="The six words nearest to excellent" at={rememberAt - 2} x={LX} y={y(290)} />
       <Ink at={rememberAt} style={{ left: LX, top: LTOP - 4, whiteSpace: "nowrap" }}>
         <div style={{ ...label(22, INK_SOFT) }}>
           in a bag of words, <span style={{ fontFamily: MONO, color: INK }}>great</span> and{" "}
@@ -161,8 +228,9 @@ export const VectorScene: React.FC = () => {
         </div>
       </Ink>
       {W2V.excellent.map((w, i) => {
-        const t = closeAt + i * 4;
-        const isGreat = w.word === "great";
+        const t = rememberAt + 8 + i * 4;
+        const blue = isGreatAt(w.word);
+        const isGreat = blue;
         const top = LTOP + 56 + i * ROW;
         const grow = ease(frame, t, 14);
         return (
@@ -188,7 +256,7 @@ export const VectorScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      <Tag x={BAR0} y={LTOP + 56 + 6 * ROW + 6} at={closeAt + 26} size={20} color={INK_SOFT}>
+      <Tag x={BAR0} y={LTOP + 56 + 6 * ROW + 6} at={rememberAt + 34} size={20} color={INK_SOFT}>
         bar: how close each word sits to excellent
       </Tag>
     </AbsoluteFill>

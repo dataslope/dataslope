@@ -2,14 +2,16 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { BLUE_INK, body, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO, SANS } from "../../theme/fonts";
-import { COST, QKV, WEIGHTS } from "./data";
+import { COST, QKV } from "./data";
 import {
+  Arrow,
   clamp01,
+  fix,
   PathArrow,
   DATA,
   DATA_TINT,
@@ -161,17 +163,18 @@ export const TrophyScene: React.FC = () => {
   );
 };
 
-// ═══ Scene 8: query, key, value, and the lesson's weights ══════════════════
+// ═══ Scene 8: query, key and value, made from one token's embedding ════════
 
-const QKV_CARDS = [
+const QKV_ROWS = [
   { name: "Query", ask: "What am I looking for?", color: QUERY, ink: QUERY_INK },
   { name: "Key", ask: "What do I offer?", color: KEY, ink: KEY_INK },
   { name: "Value", ask: "What I hand over when I'm picked.", color: VALUE, ink: VALUE_INK },
 ];
-
-const W_X = { tok: 960, score: 1170, bar: 1300 };
-const W_ROW = 58;
-const BAR_PX = 520;
+const STRIP_X = 220;
+const STRIP_CELLS = 9;
+const STRIP_W = 34;
+const VX = 720;
+const TX = 900;
 
 export const QkvScene: React.FC = () => {
   const n = useNarration();
@@ -179,179 +182,123 @@ export const QkvScene: React.FC = () => {
   const { y } = useLayout();
 
   const from = n.beat("query-vec").from;
+  const embeddingAt = n.word("query-vec", "embedding");
   const threeAt = n.word("query-vec", "three");
   const queryAt = n.word("query-vec", "query");
   const keyAt = n.word("key", "key");
   const valueAt = n.word("value", "value");
   const handAt = n.word("value", "hand over");
   const pickedAt = n.word("value", "picked");
-  const pronounsAt = n.word("scores", "pronoun's");
-  const scoresQueryAt = n.word("scores", "query");
-  const comparedAt = n.word("scores", "compared");
-  const everyKeyAt = n.word("scores", "every key");
-  const scoreAt = n.word("scores", "score", { nth: 1 });
-  const softmaxAt = n.word("scores", "Softmax");
-  const weightsAt = n.word("scores", "weights");
-  const oneAt = n.word("scores", "add up to one");
-  const exampleAt = n.word("weights", "example");
-  const sevenAt = n.word("weights", "point seven two");
-  const attnWordAt = n.word("weights", "attention");
-  const trophyWordAt = n.word("weights", "trophy");
 
-  const cardAt = [queryAt, keyAt, valueAt];
-  const top0 = y(410);
-  const itRow = WEIGHTS.tokens.length - 1;
-  const grow = (i: number) => ease(frame, softmaxAt + 6 + i * 3, 16);
+  const nameAt = [queryAt, keyAt, valueAt];
+  // The lesson's own numbers for "it": its query, and the key and value of its row.
+  const itRow = QKV.tokens.length - 1;
+  const vecs = [QKV.trophy.query, QKV.keys[itRow], QKV.values[itRow]];
+  const rowTop = (i: number) => y(400 + i * 140);
+  const stripTop = rowTop(1);
+  const stripMid = stripTop + 21;
+  const stripEnd = STRIP_X + STRIP_CELLS * STRIP_W;
+  const glow = pulse(frame, embeddingAt, 30);
 
   return (
     <AbsoluteFill>
-      {cardAt.map((t, i) => (
+      <Sfx name="el-pop" at={from + 4} level={-31} />
+      {[0, 1, 2].map((i) => (
+        <Sfx key={`a${i}`} name="el-pencil" at={threeAt + i * 4} level={-36} />
+      ))}
+      {nameAt.map((t, i) => (
         <Sfx key={i} name="el-tap" at={t} level={-25} />
       ))}
-      <Sfx name="el-pencil" at={everyKeyAt} level={-35} />
-      {WEIGHTS.tokens.map((_, i) => (
-        <Sfx key={`w${i}`} name="el-tap" at={softmaxAt + 6 + i * 3} level={-31} />
-      ))}
-      <Sfx name="el-tap" at={sevenAt} level={-23} />
 
       <Kicker at={from - 10}>Attention</Kicker>
       <div style={{ position: "absolute", left: 92, top: y(HEAD_Y), display: "flex", gap: "0.26em", ...headline(72) }}>
         {["Query,", "key,", "value."].map((w, i) => (
-          <Ink key={w} at={cardAt[i] - 4} dur={18} style={{ position: "relative", whiteSpace: "nowrap", color: QKV_CARDS[i].ink, fontStyle: i ? "italic" : "normal" }}>
+          <Ink key={w} at={nameAt[i] - 4} dur={18} style={{ position: "relative", whiteSpace: "nowrap", color: QKV_ROWS[i].ink, fontStyle: i ? "italic" : "normal" }}>
             {w}
           </Ink>
         ))}
       </div>
 
-      {/* ── Fig. 12: three vectors per token ── */}
-      <FigLabel n="12" title="Every token makes three vectors" at={threeAt - 4} x={X0} y={y(FIG_Y)} />
-      {QKV_CARDS.map((c, i) => (
-        <Fade key={c.name} at={cardAt[i] - 4} style={{ left: X0, top: y(410 + i * 150), width: 680 }}>
-          <div style={{ display: "flex", alignItems: "stretch", gap: 22 }}>
-            <div style={{ width: 8 + (i === 0 ? 6 * pulse(frame, scoresQueryAt, 30) : 0), borderRadius: 4, background: c.color }} />
-            <div>
-              <div style={{ ...label(26, c.ink) }}>{c.name}</div>
-              <div style={{ ...body(34, true), color: INK, marginTop: 8, whiteSpace: "nowrap" }}>
+      {/* ── Fig. 12: one token's embedding becomes three vectors ── */}
+      <FigLabel n="12" title="Three vectors, made from the embedding of “it”" at={from} x={X0} y={y(FIG_Y)} />
+      <Fade at={from + 2} style={{ left: X0, top: stripTop, display: "flex", alignItems: "center" }}>
+        <TokenChip text="it" size={26} />
+      </Fade>
+      <Fade at={from + 6} style={{ left: STRIP_X, top: stripTop - 2, display: "flex" }}>
+        {Array.from({ length: STRIP_CELLS }, (_, i) => (
+          <span
+            key={i}
+            style={{
+              width: STRIP_W - 4,
+              height: 44,
+              marginRight: 4,
+              borderRadius: 4,
+              border: `1.5px solid ${DATA}`,
+              background: `color-mix(in srgb, ${DATA} ${Math.round(22 + 30 * glow)}%, ${PAPER})`,
+            }}
+          />
+        ))}
+      </Fade>
+      <Note at={embeddingAt - 2} x={STRIP_X} y={stripTop - 40}>
+        <Tag size={21} color={BLUE_INK}>
+          Its embedding
+        </Tag>
+      </Note>
+      <Fade at={threeAt} style={{ left: VX, top: y(352) }}>
+        <Tag size={20}>The lesson&apos;s numbers for it</Tag>
+      </Fade>
+      {QKV_ROWS.map((r, i) => {
+        const top = rowTop(i);
+        const named = ease(frame, nameAt[i] - 2, 10);
+        return (
+          <React.Fragment key={r.name}>
+            <Arrow from={[stripEnd + 14, stripMid]} to={[VX - 18, top + 22]} at={threeAt + i * 4} color={r.color} width={2.6} />
+            <Fade at={threeAt + i * 4 + 6} style={{ left: VX, top }}>
+              <span style={{ position: "relative", display: "inline-block" }}>
+                <span style={{ opacity: 1 - named }}>
+                  <VectorCells values={[0, 0]} size={24} border={r.color} fill={PAPER} color="transparent" />
+                </span>
+                <span style={{ position: "absolute", left: 0, top: 0, opacity: named }}>
+                  <VectorCells values={vecs[i]} size={24} border={r.color} fill={PAPER} />
+                </span>
+              </span>
+            </Fade>
+            <Fade at={nameAt[i] - 4} style={{ left: TX, top: top - 10 }}>
+              <div style={{ ...label(26, r.ink) }}>{r.name}</div>
+              <div style={{ ...body(34, true), color: INK, marginTop: 6, whiteSpace: "nowrap" }}>
                 {i === 2 ? (
                   <>
                     What I <Mark at={handAt}>hand over</Mark> when I&apos;m <Mark at={pickedAt}>picked.</Mark>
                   </>
                 ) : (
-                  c.ask
+                  r.ask
                 )}
               </div>
-            </div>
-          </div>
-        </Fade>
-      ))}
-
-      {/* ── Fig. 13: the lesson's weights from "it" ── */}
-      <FigLabel n="13" title="Attention from “it”, in the lesson's example" at={pronounsAt - 4} x={W_X.tok} y={y(FIG_Y)} />
-      <Fade at={comparedAt - 2} style={{ left: 0, top: y(360), width: 1920 }}>
-        <span style={{ position: "absolute", left: W_X.tok, ...label(21, INK_SOFT) }}>Token</span>
-        <span style={{ position: "absolute", left: W_X.score, ...label(21, INK_SOFT), opacity: ease(frame, scoreAt - 2, 10) }}>Score</span>
-        <span style={{ position: "absolute", left: W_X.bar, ...label(21, INK_SOFT), opacity: ease(frame, weightsAt - 2, 10) }}>Weight</span>
-      </Fade>
-      {WEIGHTS.tokens.map((t, i) => {
-        const isIt = i === itRow;
-        const p = isIt ? ease(frame, pronounsAt, 12) : ease(frame, comparedAt + i * 2, 12);
-        if (p <= 0) return null;
-        const top = top0 + i * W_ROW;
-        const isTrophy = t === "trophy";
-        const keyMark = isIt ? 0 : ease(frame, everyKeyAt - 2 + i * 2, 10);
-        const g = grow(i);
-        const w = WEIGHTS.weights[i];
-        const hot = isTrophy ? ease(frame, sevenAt - 2, 10) : 0;
-        const glow = isTrophy ? pulse(frame, attnWordAt, 30) : 0;
-        const back = isTrophy ? 0 : ease(frame, trophyWordAt, 14) * 0.6;
-        return (
-          <div key={t} style={{ position: "absolute", left: 0, top, width: 1920, height: W_ROW, opacity: p * (1 - back) }}>
-            <div style={{ position: "absolute", left: W_X.tok, top: 4 }}>
-              <TokenChip text={t} size={23} border={isIt ? QUERY : keyMark > 0.5 ? KEY : INK} color={isIt ? QUERY_INK : INK} />
-            </div>
-            <span
-              style={{
-                position: "absolute",
-                left: W_X.score,
-                top: 12,
-                fontFamily: MONO,
-                fontWeight: 600,
-                fontSize: 24,
-                color: INK,
-                opacity: ease(frame, scoreAt + i * 2, 10),
-                ...TABULAR,
-              }}
-            >
-              {WEIGHTS.raw[i].toFixed(1)}
-            </span>
-            {g > 0 ? (
-              <>
-                <div
-                  style={{
-                    position: "absolute",
-                    left: W_X.bar,
-                    top: 12 - 5 * glow,
-                    width: Math.max(2, w * BAR_PX * g),
-                    height: 30 + 10 * glow,
-                    background: hot > 0 ? `color-mix(in srgb, ${POINT} ${Math.round(hot * 100)}%, ${DATA})` : DATA,
-                    borderRadius: 3,
-                  }}
-                />
-                <span
-                  style={{
-                    position: "absolute",
-                    left: W_X.bar + w * BAR_PX * g + 14,
-                    top: 12,
-                    fontFamily: MONO,
-                    fontWeight: 700,
-                    fontSize: 24,
-                    color: isTrophy && hot > 0.5 ? POINT_INK : INK,
-                    opacity: g,
-                    ...TABULAR,
-                  }}
-                >
-                  {w.toFixed(3)}
-                </span>
-              </>
-            ) : null}
-          </div>
+            </Fade>
+          </React.Fragment>
         );
       })}
-      <Svg opacity={ease(frame, oneAt - 4, 10)}>
-        <line x1={W_X.bar} x2={W_X.bar + BAR_PX} y1={top0 + 7 * W_ROW + 6} y2={top0 + 7 * W_ROW + 6} stroke={INK} strokeWidth={1.6} />
-      </Svg>
-      <Fade at={oneAt - 2} style={{ left: W_X.bar, top: top0 + 7 * W_ROW + 18, display: "flex", gap: 16, alignItems: "baseline" }}>
-        <span style={{ ...label(22, INK_SOFT) }}>Total</span>
-        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 26, color: INK, ...TABULAR }}>{WEIGHTS.sum.toFixed(1)}</span>
-      </Fade>
-      <Note at={exampleAt - 2} x={W_X.tok} y={top0 + 7 * W_ROW + 74}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Scores set by hand in the lesson</span>
-      </Note>
     </AbsoluteFill>
   );
 };
 
-// ═══ Scene 9: the real arithmetic, and the blend it makes ══════════════════
+// ═══ Scene 9: one score worked through, and the blend it makes ═════════════
 
-const T_X = { tok: X0, key: 310, value: 500, score: 720, weight: 860 };
+const T_X = { tok: X0, key: 310, value: 500, score: 700, weight: 890 };
 const T_ROW = 82;
 
-/** A number that changes in place: the old value, then the new one inked on
- *  `swapAt`, with a brief flash. */
-const Swap: React.FC<{ a: number; b: number; swapAt: number; digits?: number; color?: string; at: number; size?: number }> = ({
-  a,
-  b,
-  swapAt,
-  digits = 3,
+/** A number that changes in place through `steps`, each inked on its frame
+ *  with a brief flash; nothing shows before the first. */
+const Steps: React.FC<{ steps: readonly { at: number; value: number; digits: number }[]; color?: string; size?: number }> = ({
+  steps,
   color = INK,
-  at,
   size = 26,
 }) => {
   const frame = useCurrentFrame();
-  const p = ease(frame, at, 10);
-  const s = ease(frame, swapAt, 10);
-  const flash = pulse(frame, swapAt, 24);
-  if (p <= 0) return null;
+  const shown = [...steps].reverse().find((s) => frame >= s.at);
+  if (!shown) return null;
+  const p = ease(frame, steps[0].at, 10);
+  const flash = Math.max(...steps.map((s) => pulse(frame, s.at, 24)));
   return (
     <span
       style={{
@@ -365,8 +312,58 @@ const Swap: React.FC<{ a: number; b: number; swapAt: number; digits?: number; co
         ...TABULAR,
       }}
     >
-      {(s < 0.5 ? a : b).toFixed(digits)}
+      {shown.value.toFixed(shown.digits)}
     </span>
+  );
+};
+
+/** One score written out: the dot product of a query and a key, then the
+ *  division by the square root of the dimension. */
+const WorkedScore: React.FC<{
+  token: string;
+  q: readonly number[];
+  k: readonly number[];
+  dot: number;
+  score: number;
+  multiplyAt: number;
+  addAt: number;
+  equalsAt: number;
+  nameAt: number;
+  rootAt: number;
+}> = ({ token, q, k, dot, score, multiplyAt, addAt, equalsAt, nameAt, rootAt }) => {
+  const frame = useCurrentFrame();
+  const step = (at: number) => ({ opacity: ease(frame, at, 10) });
+  const named = ease(frame, nameAt, 12);
+  return (
+    <div style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap", fontFamily: MONO, fontWeight: 600, fontSize: 26, color: INK, ...TABULAR }}>
+      <span style={{ ...label(22, INK_SOFT), fontFamily: undefined }}>{token}:</span>
+      <span style={{ position: "relative", display: "inline-flex", gap: 14 }}>
+        <span style={step(multiplyAt)}>
+          <span style={{ color: QUERY_INK }}>{fix(q[0])}</span> × <span style={{ color: KEY_INK }}>{fix(k[0])}</span>
+        </span>
+        <span style={step(addAt)}>
+          + <span style={{ color: QUERY_INK }}>{fix(q[1])}</span> × <span style={{ color: KEY_INK }}>{fix(k[1])}</span>
+        </span>
+        <span style={step(equalsAt)}>= {dot.toFixed(2)}</span>
+        <span
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: "100%",
+            marginTop: 6,
+            borderTop: `2px solid ${POINT}`,
+            opacity: named,
+            textAlign: "center",
+          }}
+        >
+          <span style={{ ...label(20, POINT_INK) }}>a dot product</span>
+        </span>
+      </span>
+      <span style={step(rootAt)}>
+        ÷ √{QKV.dim} = <span style={{ color: POINT_INK }}>{score.toFixed(3)}</span>
+      </span>
+    </div>
   );
 };
 
@@ -375,24 +372,31 @@ export const BlendScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
 
-  const from = n.beat("real").from;
-  const arithmeticAt = n.word("real", "arithmetic");
-  const twoAt = n.word("real", "two-number");
-  const queryAt = n.word("dot", "query");
-  const keyAt = n.word("dot", "key");
-  const scoreAt = n.word("dot", "score");
-  const weightsAt = n.word("dot", "weights");
-  const pointAt = n.word("dot", "Point four six");
+  const from = n.beat("scores").from;
+  const queryAt = n.word("scores", "query");
+  const everyKeyAt = n.word("scores", "every key");
+  const scoreWordAt = n.word("scores", "score");
+  const multiplyAt = n.word("dot", "Multiply");
+  const addAt = n.word("dot", "add");
+  const dotProductAt = n.word("dot", "dot product");
+  const cosineAt = n.word("dot", "cosine");
+  const dividedAt = n.word("scale", "divided");
+  const rootAt = n.word("scale", "square root");
+  const smallAt = n.word("scale", "small");
+  const softmaxAt = n.word("softmax", "Softmax");
+  const weightsWordAt = n.word("softmax", "weights");
+  const oneAt = n.word("softmax", "one");
+  const pointAt = n.word("weights", "Point four six");
+  const trophyWAt = n.word("weights", "trophy");
   const newAt = n.word("blend", "new");
   const blendAt = n.word("blend", "blend");
   const valuesAt = n.word("blend", "values");
   const towardAt = n.word("blend", "toward");
+  const blendPronounsAt = n.word("blend", "pronoun's");
   const pointQAt = n.word("flip", "Point");
   const suitcaseAt = n.word("flip", "suitcase");
   const followsAt = n.word("flip", "follows");
   const differentAt = n.word("flip", "different", { nth: 1 });
-  const dotTrophyAt = n.word("dot", "trophy");
-  const blendPronounsAt = n.word("blend", "pronoun's");
   const flipQuestionAt = n.word("flip", "question");
   const answerAt = n.word("flip", "answer");
 
@@ -401,12 +405,14 @@ export const BlendScene: React.FC = () => {
   const swapQ = pointQAt + 6;
   const swapS = suitcaseAt + 4;
   const swapW = followsAt - 6;
+  const dotsAt = addAt + 10;
 
   const QY = y(390);
   const HY = y(500);
   const rowTop = (i: number) => y(550) + i * T_ROW;
+  const workY = rowTop(3) + 12;
 
-  // Fig. 15: the plane of values, 0 to 10 on each axis.
+  // Fig. 14: the plane of values, 0 to 10 on each axis.
   const PX0 = 1150;
   const PY0 = y(860);
   const PU = 44;
@@ -416,25 +422,32 @@ export const BlendScene: React.FC = () => {
   const w = A.weights.map((x, i) => lerp(x, B.weights[i], move));
   const [ox, oy] = P(out);
   const blendP = ease(frame, blendAt - 4, 18);
+  const flipLine = ease(frame, swapS, 12);
 
   return (
     <AbsoluteFill>
       <Sfx name="el-tap" at={queryAt} level={-26} />
+      <Sfx name="el-pencil" at={multiplyAt} level={-35} />
       {[0, 1, 2].map((i) => (
-        <Sfx key={i} name="el-tap" at={scoreAt + i * 4} level={-29} />
+        <Sfx key={i} name="el-tap" at={dotsAt + i * 4} level={-29} />
       ))}
-      <Sfx name="el-tap" at={pointAt} level={-23} />
+      <Sfx name="el-tap" at={rootAt} level={-26} />
+      {[0, 1, 2].map((i) => (
+        <Sfx key={`w${i}`} name="el-tap" at={weightsWordAt + i * 4} level={-29} />
+      ))}
+      <Sfx name="el-tap" at={pointAt} level={-24} />
       <Sfx name="el-pop" at={blendAt} level={-29} />
       <Sfx name="el-tap" at={swapQ} level={-25} />
       <Sfx name="el-whoosh" at={swapW} level={-33} />
 
       <Kicker at={from - 10}>Attention</Kicker>
-      <Headline lead="The real arithmetic," turn="on two numbers." at={from} turnAt={twoAt - 2} out={pointQAt - 8} />
+      <Headline lead="A score for every key." at={from} out={dotProductAt - 8} />
+      <Headline lead="A dot product," turn="then softmax." at={dotProductAt - 4} turnAt={softmaxAt - 2} out={pointQAt - 8} />
       <Headline lead="A different question," turn="a different blend." at={pointQAt - 4} turnAt={differentAt - 2} />
 
-      {/* ── Fig. 14: the lesson's keys, values and query ── */}
-      <FigLabel n="14" title="The lesson's real vectors" at={from} x={X0} y={y(FIG_Y)} />
-      <Fade at={arithmeticAt - 4} style={{ left: X0, top: QY, display: "flex", alignItems: "center", gap: 20 }}>
+      {/* ── Fig. 13: the lesson's keys, values and query, and the scores they make ── */}
+      <FigLabel n="13" title="The lesson's real vectors, three tokens of two numbers" at={from} x={X0} y={y(FIG_Y)} />
+      <Fade at={from + 2} style={{ left: X0, top: QY, display: "flex", alignItems: "center", gap: 20 }}>
         <span style={{ ...label(24, QUERY_INK) }}>
           Query, from <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
         </span>
@@ -448,34 +461,51 @@ export const BlendScene: React.FC = () => {
         </span>
         <span style={{ opacity: ease(frame, swapQ + 4, 10), ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>pointed at suitcase</span>
       </Fade>
-      <Fade at={arithmeticAt} style={{ left: 0, top: HY, width: 1100 }}>
+      <Fade at={from + 6} style={{ left: 0, top: HY, width: 1100 }}>
         <span style={{ position: "absolute", left: T_X.tok, ...label(21, INK_SOFT) }}>Token</span>
         <span style={{ position: "absolute", left: T_X.key, ...label(21, KEY_INK) }}>Key</span>
         <span style={{ position: "absolute", left: T_X.value, ...label(21, VALUE_INK) }}>Value</span>
-        <span style={{ position: "absolute", left: T_X.score, ...label(21, INK_SOFT), opacity: ease(frame, scoreAt - 2, 10) }}>Score</span>
-        <span style={{ position: "absolute", left: T_X.weight, ...label(21, INK_SOFT), opacity: ease(frame, weightsAt - 2, 10) }}>Weight</span>
+        <span style={{ position: "absolute", left: T_X.score, ...label(21, INK_SOFT), opacity: ease(frame, scoreWordAt - 2, 10) }}>
+          Score
+          <span style={{ marginLeft: 10, color: POINT_INK, opacity: ease(frame, dividedAt, 10) }}>÷ √{QKV.dim}</span>
+        </span>
+        <span style={{ position: "absolute", left: T_X.weight, ...label(21, INK_SOFT), opacity: ease(frame, weightsWordAt - 2, 10) }}>Weight</span>
       </Fade>
-      <Svg opacity={ease(frame, arithmeticAt, 12)}>
-        <line x1={X0} x2={1000} y1={HY + 36} y2={HY + 36} stroke={INK} strokeWidth={1.6} />
+      <Svg opacity={ease(frame, from + 6, 12)}>
+        <line x1={X0} x2={1010} y1={HY + 36} y2={HY + 36} stroke={INK} strokeWidth={1.6} />
       </Svg>
       {QKV.tokens.map((t, i) => {
-        const p = ease(frame, arithmeticAt + 2 + i * 4, 12);
+        const p = ease(frame, from + 8 + i * 4, 12);
         if (p <= 0) return null;
-        const keyGlow = pulse(frame, keyAt + i * 4, 22);
+        const keyGlow = pulse(frame, everyKeyAt + i * 4, 22);
         const weightHot = i === 0 ? ease(frame, pointAt - 2, 10) * (1 - ease(frame, swapW, 10)) : i === 1 ? ease(frame, swapW + 4, 10) : 0;
         return (
           <div key={t} style={{ position: "absolute", left: 0, top: rowTop(i), width: 1100, height: T_ROW, opacity: p }}>
             <div style={{ position: "absolute", left: T_X.tok, top: 8 }}>
               <TokenChip text={t} size={24} />
             </div>
-            <div style={{ position: "absolute", left: T_X.key, top: 6, borderRadius: 8, boxShadow: keyGlow > 0 ? `0 0 0 ${4 * keyGlow}px color-mix(in srgb, ${KEY} 45%, transparent)` : undefined }}>
+            <div
+              style={{
+                position: "absolute",
+                left: T_X.key,
+                top: 6,
+                borderRadius: 8,
+                boxShadow: keyGlow > 0 ? `0 0 0 ${4 * keyGlow}px color-mix(in srgb, ${KEY} 45%, transparent)` : undefined,
+              }}
+            >
               <VectorCells values={QKV.keys[i]} size={23} border={KEY} fill={PAPER} />
             </div>
             <div style={{ position: "absolute", left: T_X.value, top: 6 }}>
               <VectorCells values={QKV.values[i]} size={23} cell={70} border={VALUE} fill={PAPER} />
             </div>
             <span style={{ position: "absolute", left: T_X.score, top: 14 }}>
-              <Swap a={A.scores[i]} b={B.scores[i]} at={scoreAt + i * 4} swapAt={swapS + i * 3} />
+              <Steps
+                steps={[
+                  { at: dotsAt + i * 4, value: A.dots[i], digits: 2 },
+                  { at: rootAt + i * 3, value: A.scores[i], digits: 3 },
+                  { at: swapS + i * 3, value: B.scores[i], digits: 3 },
+                ]}
+              />
             </span>
             <span
               style={{
@@ -483,15 +513,60 @@ export const BlendScene: React.FC = () => {
                 left: T_X.weight,
                 top: 14,
                 borderRadius: 6,
-                boxShadow: i === 0 ? `0 0 0 ${5 * pulse(frame, dotTrophyAt, 30)}px color-mix(in srgb, ${POINT} 35%, transparent)` : undefined,
+                boxShadow: i === 0 ? `0 0 0 ${5 * pulse(frame, trophyWAt, 30)}px color-mix(in srgb, ${POINT} 35%, transparent)` : undefined,
               }}
             >
-              <Swap a={A.weights[i]} b={B.weights[i]} at={weightsAt + 4 + i * 4} swapAt={swapW + i * 3} color={weightHot > 0.5 ? POINT_INK : INK} />
+              <Steps
+                steps={[
+                  { at: weightsWordAt + i * 4, value: A.weights[i], digits: 3 },
+                  { at: swapW + i * 3, value: B.weights[i], digits: 3 },
+                ]}
+                color={weightHot > 0.5 ? POINT_INK : INK}
+              />
             </span>
           </div>
         );
       })}
-      <Note at={newAt - 2} x={X0} y={rowTop(3) + 24}>
+      <Svg opacity={ease(frame, oneAt - 4, 10)}>
+        <line x1={T_X.weight - 10} x2={T_X.weight + 110} y1={rowTop(3) - 6} y2={rowTop(3) - 6} stroke={INK} strokeWidth={1.4} />
+      </Svg>
+      <Fade at={oneAt - 2} style={{ left: T_X.weight - 74, top: rowTop(3) + 2, display: "flex", gap: 14, alignItems: "baseline" }}>
+        <span style={{ ...label(21, INK_SOFT) }}>Total</span>
+        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 26, color: INK, ...TABULAR }}>
+          {A.weightSum.toFixed(3)}
+        </span>
+      </Fade>
+
+      {/* One score written out: trophy's, then suitcase's once the query turns. */}
+      <div style={{ position: "absolute", left: X0, top: workY + 40, opacity: 1 - flipLine }}>
+        <WorkedScore
+          token="trophy"
+          q={A.query}
+          k={QKV.keys[0]}
+          dot={A.dots[0]}
+          score={A.scores[0]}
+          multiplyAt={multiplyAt}
+          addAt={addAt}
+          equalsAt={addAt + 8}
+          nameAt={dotProductAt}
+          rootAt={rootAt}
+        />
+      </div>
+      <div style={{ position: "absolute", left: X0, top: workY + 40, opacity: flipLine }}>
+        <WorkedScore
+          token="suitcase"
+          q={B.query}
+          k={QKV.keys[1]}
+          dot={B.dots[1]}
+          score={B.scores[1]}
+          multiplyAt={swapS}
+          addAt={swapS}
+          equalsAt={swapS}
+          nameAt={swapS}
+          rootAt={swapS}
+        />
+      </div>
+      <Note at={newAt - 2} x={X0} y={workY + 128}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <span style={{ ...label(24, POINT_INK) }}>
             New vector for <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
@@ -502,12 +577,23 @@ export const BlendScene: React.FC = () => {
         </div>
       </Note>
 
-      {/* ── Fig. 15: the blend, in the plane of the values ── */}
-      <FigLabel n="15" title="The new vector, a blend of the values" at={blendPronounsAt - 4} x={1100} y={y(FIG_Y)} />
+      {/* The tie to cosine, while the right half waits for the blend. */}
+      <Note at={cosineAt - 2} out={blendPronounsAt - 8} x={1100} y={y(400)} width={640}>
+        <div style={{ ...body(34), color: INK }}>
+          Cosine similarity is this <Mark at={cosineAt + 4}>dot product</Mark>, divided by both vectors&apos; lengths.
+        </div>
+      </Note>
+      <Note at={smallAt - 4} out={blendPronounsAt - 8} x={1100} y={y(560)} width={640}>
+        <div style={{ ...note(26, INK_SOFT) }}>
+          Dividing by √{QKV.dim}, the square root of the vector size, keeps the scores small as vectors grow.
+        </div>
+      </Note>
+
+      {/* ── Fig. 14: the blend, in the plane of the values ── */}
+      <FigLabel n="14" title="The new vector, a blend of the values" at={blendPronounsAt - 4} x={1100} y={y(FIG_Y)} />
       <Svg opacity={ease(frame, blendPronounsAt - 2, 14)}>
         <line x1={PX0} x2={PX0 + 10.6 * PU} y1={PY0} y2={PY0} stroke={LINE} strokeWidth={1.6} />
         <line x1={PX0} x2={PX0} y1={PY0} y2={PY0 - 10.6 * PU} stroke={LINE} strokeWidth={1.6} />
-        <line x1={PX0} y1={PY0} x2={PX0 + 10 * PU} y2={PY0 - 10 * PU} stroke={FAINT} strokeWidth={1.4} strokeDasharray="5 7" />
         {[0, 5, 10].map((v) => (
           <g key={v}>
             <text x={PX0 + v * PU} y={PY0 + 30} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
@@ -564,11 +650,11 @@ export const BlendScene: React.FC = () => {
               ...halo,
             }}
           >
-            {t}&apos;s value
+            value of <span style={{ fontFamily: MONO, fontWeight: 600 }}>{t}</span>
           </div>
         );
       })}
-      <div style={{ position: "absolute", left: ox + 22, top: oy - 44, opacity: blendP, ...label(22, POINT_INK), whiteSpace: "nowrap", ...halo }}>
+      <div style={{ position: "absolute", left: ox + 44, top: oy - 64, opacity: blendP, ...label(22, POINT_INK), whiteSpace: "nowrap", ...halo }}>
         new vector
       </div>
     </AbsoluteFill>
@@ -628,11 +714,12 @@ export const HeadsScene: React.FC = () => {
   const dozensAt = n.word("heads", "dozens");
   const priceAt = n.word("square", "price");
   const everyAt = n.word("square", "every", { nth: 1 });
-  const tenAt = n.word("square", "Ten");
-  const hundredAt = n.word("square", "hundred");
-  const doubleAt = n.word("square", "Double");
-  const fourAt = n.word("square", "four");
-  const workAt = n.word("square", "work");
+  const itselfAt = n.word("square", "itself");
+  const tenAt = n.word("ten", "Ten");
+  const hundredAt = n.word("ten", "hundred");
+  const doubleAt = n.word("ten", "Double");
+  const fourAt = n.word("ten", "four");
+  const workAt = n.word("ten", "work");
   const soAt = n.word("attn-in", "So");
   const putAt = n.word("attn-in", "put");
 
@@ -666,10 +753,10 @@ export const HeadsScene: React.FC = () => {
       <Kicker at={from - 10}>Attention</Kicker>
       <Headline lead="Many heads," turn="many layers." at={from} turnAt={stacksAt - 4} out={priceAt - 8} />
       <Headline lead="Twice the text," turn="four times the work." at={doubleAt - 4} turnAt={fourAt - 2} />
-      <Headline lead="Every token scores every other." at={priceAt - 2} out={doubleAt - 8} />
+      <Headline lead="Every token scores every token." at={priceAt - 2} out={doubleAt - 8} />
 
       {/* ── Fig. 16: heads side by side, layers stacked ── */}
-      <FigLabel n="16" title="Heads side by side, layers stacked" at={from} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="15" title="Heads side by side, layers stacked" at={from} x={X0} y={y(FIG_Y)} />
       <Svg>
         {[0, 1, 2, 3].map((r) =>
           [0, 1, 2, 3].map((c) => (
@@ -677,7 +764,7 @@ export const HeadsScene: React.FC = () => {
               key={`${r}-${c}`}
               x={HX + c * (HW + GAP)}
               y={baseY - HH - r * (HH + GAP) - 10 * pulse(frame, putAt + (3 - r) * 4 + c * 2, 22)}
-              kind={c}
+              kind={(c + r) % 4}
               at={layerAt(r) + c * 4}
               w={HW}
               h={HH}
@@ -685,7 +772,14 @@ export const HeadsScene: React.FC = () => {
           )),
         )}
       </Svg>
-      <Fade at={headsAt} style={{ left: HX, top: baseY + 16, width: 4 * HW + 3 * GAP, textAlign: "center" }}>
+      {/* How to read a head: rows are the token doing the looking, columns the token looked at. */}
+      <Fade at={sideAt + 6} style={{ left: HX, top: baseY + 4 }}>
+        <Tag size={20}>to →</Tag>
+      </Fade>
+      <Fade at={sideAt + 6} style={{ left: HX - 34, top: baseY - HH / 2 - 14, transform: "rotate(-90deg)", transformOrigin: "50% 50%" }}>
+        <Tag size={20}>from</Tag>
+      </Fade>
+      <Fade at={headsAt} style={{ left: HX, top: baseY + 38, width: 4 * HW + 3 * GAP, textAlign: "center" }}>
         <Tag size={22}>Heads, side by side</Tag>
       </Fade>
       <Fade at={dozensAt - 2} style={{ left: HX + 4 * (HW + GAP) + 6, top: baseY - 4 * (HH + GAP) + 10 }}>
@@ -699,7 +793,7 @@ export const HeadsScene: React.FC = () => {
       </Note>
 
       {/* ── Fig. 17: every token against every other ── */}
-      <FigLabel n="17" title="Every token scores every other one" at={everyAt - 4} x={GX} y={y(FIG_Y)} />
+      <FigLabel n="16" title="Every token scores every token, itself included" at={everyAt - 4} x={GX} y={y(FIG_Y)} />
       <Svg opacity={ease(frame, everyAt - 2, 12) * (1 - 0.5 * ease(frame, soAt, 16))}>
         {Array.from({ length: big.n * big.n }, (_, k) => {
           const r = Math.floor(k / big.n);
@@ -720,6 +814,21 @@ export const HeadsScene: React.FC = () => {
             />
           );
         })}
+        {/* "Itself included": the diagonal, each token scoring itself. */}
+        {Array.from({ length: small.n }, (_, k) => (
+          <rect
+            key={`d${k}`}
+            x={GX + k * CELL + 1.5}
+            y={GY + k * CELL + 1.5}
+            width={CELL - 3}
+            height={CELL - 3}
+            rx={2}
+            fill="none"
+            stroke={POINT}
+            strokeWidth={2.4}
+            opacity={ease(frame, itselfAt - 2 + k * 1.5, 8)}
+          />
+        ))}
         <rect x={GX} y={GY} width={small.n * CELL} height={small.n * CELL} fill="none" stroke={INK} strokeWidth={2} opacity={fill10} />
         <rect x={GX} y={GY} width={big.n * CELL} height={big.n * CELL} fill="none" stroke={INK} strokeWidth={2} opacity={fill20} />
       </Svg>

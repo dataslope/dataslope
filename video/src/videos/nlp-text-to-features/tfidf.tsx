@@ -98,6 +98,9 @@ export type TableProps = {
   block?: (i: number) => number;
   /** 0..1 per cell: a highlighter swell over it. */
   glow?: (i: number, j: number) => number;
+  /** 0..1 per cell: a count waiting to turn, set back so it is not read
+   *  against the scores beside it. */
+  wait?: (i: number, j: number) => number;
   /** A second line under each "Doc n", and when it appears. */
   sub?: { at: number; text: (i: number) => string };
 };
@@ -108,7 +111,7 @@ export type TableProps = {
  * weight visibly moves from the "the" column to the words that only one
  * document uses.
  */
-export const DocTable: React.FC<TableProps> = ({ g, at, morph, frame: frameIn = 0, frameBottom, strike, block, glow, sub }) => {
+export const DocTable: React.FC<TableProps> = ({ g, at, morph, frame: frameIn = 0, frameBottom, strike, block, glow, wait, sub }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const head = ease(frame, at, 14);
@@ -189,7 +192,11 @@ export const DocTable: React.FC<TableProps> = ({ g, at, morph, frame: frameIn = 
                     overflow: "hidden",
                   }}
                 >
-                  <Value text={String(count)} zero={count === 0} style={{ opacity: 1 - out, transform: `translateY(${-out * 18}px)` }} />
+                  <Value
+                    text={String(count)}
+                    zero={count === 0}
+                    style={{ opacity: (1 - out) * (1 - 0.6 * (wait ? clamp01(wait(i, j)) : 0)), transform: `translateY(${-out * 18}px)` }}
+                  />
                   <Value
                     text={num(score)}
                     zero={score === 0}

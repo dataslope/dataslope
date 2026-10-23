@@ -148,7 +148,7 @@ export const ElizaScene: React.FC = () => {
           opacity: 0.9 * (1 - settle * 0.3),
         }}
       />
-      <Tag x={PX} y={PTOP + PH + 30} at={noAt} size={23} color={ACCENT_INK} weight={650}>
+      <Tag x={PX} y={PTOP + PH + 34} at={noAt} size={23} color={ACCENT_INK} weight={650}>
         just patterns and canned replies
       </Tag>
 
@@ -164,7 +164,7 @@ export const ElizaScene: React.FC = () => {
       >
         &ldquo;{SECRETARY}&rdquo;
       </Quote>
-      <div style={{ position: "absolute", left: PX, top: y(840), display: "flex", gap: "0.3em", ...headline(36, true), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: PX, top: y(856), display: "flex", gap: "0.3em", ...headline(36, true), whiteSpace: "nowrap" }}>
         <Ink at={seeingAt - 2} style={{ position: "relative", color: INK }}>
           Reading real understanding
         </Ink>

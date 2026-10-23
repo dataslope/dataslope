@@ -6,8 +6,8 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, headline, label, not
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CAT, DF, IDF, N, num, THE, VOCAB } from "./data";
-import { FIG_Y, Headline, INK, INK_SOFT, Kicker, Spot, X0 } from "./parts";
+import { CAT, DF, IDF, LOG_EXAMPLE, N, num, THE, VOCAB } from "./data";
+import { FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, Spot, X0 } from "./parts";
 import { DocPips, dfText, Frac, V } from "./tfidf";
 
 /** Rows of Fig. 11, in layout units. */
@@ -56,6 +56,9 @@ export const IdfScene: React.FC = () => {
   const divideAt = n.word("idf", "divide");
   const howManyAt = n.word("idf", "how many contain");
   const lnAt = n.word("idf", "natural log");
+  const tfidfAt = n.beat("idf").from;
+  const logNoteAt = n.word("idf-log", "The log");
+  const rareAt = n.word("idf-log", "very rare word");
 
   const theFrom = n.beat("idf-the").from;
   const allAt = n.word("idf-the", "all three");
@@ -113,6 +116,24 @@ export const IdfScene: React.FC = () => {
       <FigLabel n="11" title="Inverse document frequency, as the lesson defines it" at={idfWordAt - 4} x={X0} y={y(FIG_Y)} />
       <Spot id="balance" at={tellingAt} left={1500} top={y(236)} width={260} height={h(260)} />
 
+      {/* The name, spelled out as it is said, before the idf half is built. */}
+      <Ink
+        at={tfidfAt - 2}
+        dur={18}
+        out={divideAt - 14}
+        style={{ left: X0, top: y(FORMULA_Y) + 30, ...body(40), color: INK, whiteSpace: "nowrap" }}
+      >
+        TF-IDF <span style={{ color: INK_SOFT }}>=</span> term frequency <span style={{ color: INK_SOFT }}>×</span> inverse document frequency
+      </Ink>
+
+      {/* Why the log: the lesson's 1 in 10,000. */}
+      <Note at={logNoteAt - 2} x={720} y={y(FORMULA_Y + 6) + 150}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          so a word in 1 of {LOG_EXAMPLE.N.toLocaleString("en-US")} documents weighs{" "}
+          <Mark at={rareAt - 2}>{LOG_EXAMPLE.ln.toFixed(1)}</Mark>, not {LOG_EXAMPLE.ratio.toLocaleString("en-US")}
+        </span>
+      </Note>
+
       {/* The formula, and what each symbol stands for. */}
       <Ink
         at={divideAt - 6}
@@ -143,7 +164,7 @@ export const IdfScene: React.FC = () => {
           ),
           text: "how many of them contain the word",
         },
-        { at: lnAt - 2, sym: <>ln</>, text: "the natural log, with no smoothing" },
+        { at: lnAt - 2, sym: <>ln</>, text: "the natural log" },
       ].map((d, k) => (
         <Note key={k} at={d.at} x={720} y={y(FORMULA_Y + 6) + k * 50}>
           <span style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>

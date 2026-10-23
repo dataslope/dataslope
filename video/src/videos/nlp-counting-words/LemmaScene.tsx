@@ -38,8 +38,9 @@ export const LemmaScene: React.FC = () => {
   const handAt = n.word("tagfirst", "hand");
   const runAt = n.word("tagfirst", "run");
   const eatAt = n.word("tagfirst", "eat");
-  const wereAt = n.word("tagfirst", "were");
-  const beAt = n.word("tagfirst", "be and have");
+  const firstLetterAt = n.word("tagfirst", "first letter");
+  const wereAt = n.word("even", "were");
+  const beAt = n.word("even", "be and have");
   const recipeAt = n.word("recipe", "Tag");
   const lemmatizeAt = n.word("recipe", "lemmatize");
   const accurateAt = n.word("recipe", "accurate");
@@ -83,6 +84,7 @@ export const LemmaScene: React.FC = () => {
       <Sfx name="el-tap" at={tagFirstAt - 2} level={-28} />
       <Sfx name="el-pop" at={runAt - 2} level={-30} />
       <Sfx name="el-pop" at={eatAt - 2} level={-30} />
+      <Sfx name="el-tap" at={firstLetterAt} level={-31} />
       <Sfx name="el-chime" at={n.beat("recipe").to + 4} level={-33} />
 
       <Kicker at={from - 10}>Tagging words</Kicker>
@@ -134,7 +136,11 @@ export const LemmaScene: React.FC = () => {
       {/* The tags. */}
       {rowLabel("tags", tagFirstAt - 6, "tags")}
       {LEMMA.tagged.map(([, tag], i) => (
-        <TagChip key={`t${i}`} tag={tag} family={familyOf(tag)} cx={cols.xs[i] + cols.widths[i] / 2} y={row("tags") + 4} at={tagFirstAt - 2 + i * 2} size={21} glow={changed[i] ? ease(frame, awareAt(i) - 8, 8) * (1 - ease(frame, awareAt(i) + 4, 10)) : 0} />
+        <TagChip
+          key={`t${i}`}
+          // Each tag is cut to its first letter, the part of speech WordNet takes.
+          tag={frame >= firstLetterAt + i * 2 ? tag[0] : tag}
+          family={familyOf(tag)} cx={cols.xs[i] + cols.widths[i] / 2} y={row("tags") + 4} at={tagFirstAt - 2 + i * 2} size={21} glow={changed[i] ? ease(frame, awareAt(i) - 8, 8) * (1 - ease(frame, awareAt(i) + 4, 10)) : 0} />
       ))}
 
       {/* Lemmas with each tag passed along. */}

@@ -71,7 +71,7 @@ export const LexiconScene: React.FC = () => {
       <Sfx name="el-scratch" at={neverAt + 6} level={-32} />
 
       <Kicker at={start - 10}>Rule-based sentiment</Kicker>
-      <Headline at={start - 4} second={start + 10} out={verdictAt[2] - 6} italic={
+      <Headline at={start - 4} second={start + 10} out={seesAt - 10} italic={
           <>
             and the <Mark at={signAt - 2}>sign</Mark> of their sum.
           </>

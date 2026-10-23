@@ -14,7 +14,7 @@ const BX1 = 1440;
 const ROW_Y = [560, 712];
 const ICON_X = X0;
 const ICON_W = 220;
-const ICON_H = 104;
+const ICON_H = 124;
 
 /**
  * Pitfall three, selective reporting (Fig. 7): what a launch post picks, then
@@ -117,16 +117,33 @@ export const ReportingScene: React.FC = () => {
                 />
                 <rect
                   x={ICON_X + 50}
-                  y={ry - 24}
+                  y={ry - 48}
                   width={ICON_W - 100}
-                  height={48}
+                  height={40}
                   rx={8}
                   fill={A}
                   opacity={ease(frame, modelAt - 2 + i * 3, 10)}
                 />
+                {/* What the harness carries from move to move: a short notes
+                    slip in ARC's, the whole reasoning trace in OpenAI's. */}
+                <g opacity={ease(frame, hiddenAt - 4 + i * 6, 12)}>
+                  <rect
+                    x={ICON_X + ICON_W / 2 - (i === 0 ? 34 : 92)}
+                    y={ry + 6}
+                    width={i === 0 ? 68 : 184}
+                    height={30}
+                    rx={5}
+                    fill={PAPER}
+                    stroke={i === 1 ? TRAP : INK_SOFT}
+                    strokeWidth={1.6}
+                  />
+                  <text x={ICON_X + ICON_W / 2} y={ry + 28} textAnchor="middle" style={{ ...label(19, i === 1 ? TRAP_INK : INK_SOFT), fill: i === 1 ? TRAP_INK : INK_SOFT }}>
+                    {i === 0 ? "notes" : "all its reasoning"}
+                  </text>
+                </g>
                 <text
                   x={ICON_X + ICON_W / 2}
-                  y={ry + 7}
+                  y={ry - 21}
                   textAnchor="middle"
                   style={{ ...label(21, PAPER), fontWeight: 700, fill: PAPER }}
                   opacity={ease(frame, modelAt + 2 + i * 3, 10)}
@@ -134,7 +151,7 @@ export const ReportingScene: React.FC = () => {
                   model
                 </text>
               </Svg>
-              <Ink at={harnessesAt + i * 5} dur={12} style={{ left: ICON_X, top: ry + ICON_H / 2 + 8, whiteSpace: "nowrap", opacity: 1 - dim }}>
+              <Ink at={harnessesAt + i * 5} dur={12} style={{ left: ICON_X, top: ry + ICON_H / 2 + 4, whiteSpace: "nowrap", opacity: 1 - dim }}>
                 <span style={note(21, INK_SOFT)}>harness</span>
               </Ink>
 
@@ -159,25 +176,28 @@ export const ReportingScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Ink at={hiddenAt - 2} dur={12} style={{ left: BX0 + 300, top: y(ROW_Y[1]) - 56, whiteSpace: "nowrap", opacity: 1 - vendorDim }}>
+        <Ink at={hiddenAt - 2} dur={12} style={{ left: BX0 + 330, top: y(ROW_Y[1]) - 56, whiteSpace: "nowrap", opacity: 1 - vendorDim }}>
           <span style={note(22, TRAP_INK)}>keeps its hidden reasoning between moves</span>
+        </Ink>
+        <Ink at={hiddenAt + 4} dur={12} style={{ left: BX0 + 330, top: y(ROW_Y[0]) - 56, whiteSpace: "nowrap" }}>
+          <span style={note(22, INK_SOFT)}>keeps only the notes the model chooses</span>
         </Ink>
 
         {/* Same model, same test, same week. */}
-        {[
-          { text: "same model", at: sameModelAt },
-          { text: "same test", at: sameTestAt },
-          { text: "same week", at: sameWeekAt },
-        ].map((s, i) => (
-          <React.Fragment key={s.text}>
-            <Svg>
-              <Check x={BX0 + 14 + i * 230} y={y(840) + 14} at={s.at} size={24} color={OK} />
-            </Svg>
-            <Ink at={s.at} dur={10} style={{ left: BX0 + 40 + i * 230, top: y(840), whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: BX0, top: y(840), display: "flex", gap: 48, whiteSpace: "nowrap" }}>
+          {[
+            { text: "same model", at: sameModelAt },
+            { text: "same test", at: sameTestAt },
+            { text: "same week", at: sameWeekAt },
+          ].map((s) => (
+            <span key={s.text} style={{ display: "inline-flex", alignItems: "center", gap: 10, opacity: ease(frame, s.at, 10) }}>
+              <svg width={30} height={30} style={{ overflow: "visible" }}>
+                <Check x={14} y={15} at={s.at} size={24} color={OK} />
+              </svg>
               <span style={{ ...note(24, INK), fontWeight: 600 }}>{s.text}</span>
-            </Ink>
-          </React.Fragment>
-        ))}
+            </span>
+          ))}
+        </div>
       </Drift>
     </AbsoluteFill>
   );

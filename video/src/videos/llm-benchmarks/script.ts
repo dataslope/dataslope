@@ -40,50 +40,71 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     what-benchmarks-measure's "How to read a score" block: MMLU 92.3
  *     against 91.7 under a ceiling of 95, GPQA Diamond 96.0 against 95.4, and
  *     ARC-AGI-3 62.7 against 30.2. "Six tenths of a point" is its gap of
- *     0.006; "label errors cap it near ninety-five" and "noise" are the
- *     lesson's prose. The block's own last line ("the same 0.6 point gap
- *     means very different things") is not used: see the report.
+ *     0.006; the cap near ninety-five from "documented label errors" (said
+ *     as "some of its answer keys are wrong") and "noise" are the lesson's
+ *     prose. The block's own last line ("the same 0.6 point gap means very
+ *     different things") is not used: its own output does not bear it out.
  *   - The families (Fig. 3) are the lesson's: MMLU, 57 subjects of multiple
  *     choice "from elementary mathematics to professional law"; GPQA
  *     Diamond, non-expert PhD holders with web access around 34%;
  *     SWE-bench Verified, real GitHub issues, passed by the repository's own
  *     tests; ARC-AGI-2's grid puzzles and ARC-AGI-3's interactive games.
- *   - Saturation (Fig. 5): every frontier system above 92% on MMLU, the
- *     ceiling near 95%; GPQA Diamond's leaders around 95%; Humanity's Last
- *     Exam under 10% at its January 2025 release and around 60% by September
- *     2026 ("twenty months later"); the three-point tell is
+ *   - Saturation (Fig. 5): every frontier system above 92% on MMLU and the
+ *     ceiling near 95%, so every frontier model sits inside those three
+ *     points (the band the tell's bracket spans); GPQA Diamond's leaders
+ *     around 95%, saturated by 2026 per the lesson, so its row is struck too;
+ *     Humanity's Last Exam under 10% at its January 2025 release and around
+ *     60% by September 2026 ("twenty months later"); the three-point tell is
  *     benchmark-pitfalls'.
  *   - Contamination (Fig. 6) is benchmark-pitfalls' first block, its four
- *     situations and what the score reports for each. SWE-bench Verified
- *     dropped in February 2026 after frontier models reproduced some
- *     reference fixes from memory; the defenses are the lesson's (private
- *     holdouts, monthly refreshes, date filtering).
+ *     situations and what the score reports for each. OpenAI stopped
+ *     reporting SWE-bench Verified in February 2026 after frontier models
+ *     reproduced some reference fixes from memory; the defenses are the
+ *     lesson's (private holdouts, monthly refreshes, date filtering).
  *   - The harness (Fig. 7): ARC Prize's run of GPT-6 Astra on ARC-AGI-3,
  *     September 2026, benchmark-pitfalls' "Selective reporting" and its
  *     footnote: 62.7% in ARC's standard harness ($26,098), 99.9% in OpenAI's
  *     ($18,817), "for less money".
  *   - Construct mismatch and the four questions (Figs. 8, 9) are
- *     benchmark-pitfalls' section 4 and "Reading a launch table well", its
- *     seven checks grouped under the four pitfalls.
- *   - How many examples (Fig. 10) is evaluating-for-your-task's simulation
+ *     benchmark-pitfalls' section 4 ("A benchmark measures performance on
+ *     the benchmark. Whether that transfers to your task depends entirely on
+ *     whether your task resembles it") and "Reading a launch table well", its
+ *     seven checks grouped under the four pitfalls. "Tasks like SWE-bench
+ *     still predict agentic coding" is what-benchmarks-measure's "the task
+ *     shape is still the right one", after the single public set lost trust.
+ *   - How many examples (Figs. 10 to 12) is evaluating-for-your-task's simulation
  *     (seed 7, 2,000 sets per size): true rates 80% and 65%; 20 examples
  *     rank them right 81.3% of the time ("about four times in five"), 50
  *     examples 94.2% ("ninety-four times in a hundred"). The two histograms
  *     are that run's own 2,000 pairs of scores at n = 20: the better model
  *     ahead in 1,626, tied in 155, behind in 219. "Pick on cost" is the
- *     lesson's advice after its true_b = 0.78 variant.
- *   - The harness (Fig. 11) is the lesson's block: ten tickets, two stand-in
+ *     lesson's advice after its true_b = 0.78 variant, which Fig. 12 draws
+ *     beside the main run (the same seed, re-run): a 2-point gap is ranked
+ *     right 37.5% of the time at 5 examples and only 59.5% at 100. The
+ *     lesson's own line "Twenty examples already identify a 15-point gap
+ *     almost always" disagrees with its 81.3%; the video follows the number.
+ *   - The harness (Fig. 13) is the lesson's block: ten tickets, two stand-in
  *     models; the cheap one 30%, the other 100%; every miss of the cheap one
  *     is "other".
- *   - Scoring without an exact answer (Fig. 12) is the lesson's three
- *     approaches, in its order; the judge's preference for longer answers is
- *     the lesson's.
- *   - Cost (Fig. 13) is the lesson's block: 700 tokens in, 25 out, a million
+ *   - Scoring without an exact answer (Fig. 14) is the lesson's three
+ *     approaches, in its order; "a summary" with "the three facts" and "the
+ *     length limit" is its example, and the judge's preference for longer
+ *     answers is the lesson's.
+ *   - Cost (Fig. 15) is the lesson's block: 700 tokens in, 25 out, a million
  *     requests a month; accuracies 91, 94, 95 and 95%, which the lesson calls
  *     illustrative ("say"); monthly $83, $1,650, $3,300 and $8,250. "One
  *     point for twice the money" and "two and a half times the price" are
- *     its printed lines; "a minute of triage" against "a lost customer" is
- *     its prose.
+ *     its printed lines.
+ *     THE VERDICT FOLLOWS THE NUMBERS, NOT THE LESSON. The lesson concludes
+ *     "If a misclassified ticket costs a minute of human triage, the cheap
+ *     model wins easily" (evaluating-for-your-task.mdx:182-184, echoed at
+ *     :300). Its own table says the opposite: measure.py prices each step up
+ *     per error it avoids. Haiku to Sonnet removes 30,000 errors a month
+ *     (9% to 6% of a million) for $1,567.50 more, about 5.2 cents an error;
+ *     Sonnet to Opus removes 10,000 for $1,650, 16.5 cents; Opus to Fable
+ *     none. A minute of anyone's time costs more than 5 cents, so at a
+ *     minute of triage the cheap model is the expensive one ("cost-error",
+ *     "cost-verdict", re-voiced and added in the fix pass).
  *   - The close is the lesson's callout "Build it once, use it forever":
  *     the harness outlives every model in it, and a new release is answered
  *     about your own task in an hour.

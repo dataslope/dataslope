@@ -13,3 +13,5 @@
 08:33 check:motion passed (longest still 2.3 s)
 09:33 final check:motion passed (longest 2.3 s); tsc, npm test 59/59 clean
 09:37 check:mix 25.3 LU under; report written; done
+10:09 fix pass resumed: space/newer split (recut, free); voicing hook, newer, rest (309 chars)
+10:10 voiced hook, newer, rest (309 chars)

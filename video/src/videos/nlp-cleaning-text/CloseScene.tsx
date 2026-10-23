@@ -20,7 +20,7 @@ const NEXT_Y = 760;
  *  own proportions so every spot is drawn at its true shape. */
 const STEPS = [
   { name: "Tokenize", art: "nlp-cleaning-text-scissors", aspect: 1459 / 998, lost: "the spaces", cue: "spaces" },
-  { name: "Normalize", art: "nlp-cleaning-text-clay", aspect: 1536 / 760, lost: "the capitals", cue: "capitals" },
+  { name: "Normalize", art: "nlp-cleaning-text-clay", aspect: 1536 / 760, lost: "the capitals and punctuation", cue: "capitals" },
   { name: "Remove stopwords", art: "nlp-cleaning-text-sieve", aspect: 998 / 1005, lost: "the common words", cue: "common" },
   { name: "Stem or lemmatize", art: "nlp-cleaning-text-dictionary", aspect: 1464 / 1009, lost: "the endings", cue: "endings" },
 ];
@@ -45,7 +45,7 @@ export const CloseScene: React.FC = () => {
   const from = n.beat("close").from;
   const fourAt = n.word("close", "four steps");
   const threwAt = n.word("close", "threw");
-  const lostAt = STEPS.map((s) => n.word("close", s.cue));
+  const lostAt = STEPS.map((s) => n.word("close-list", s.cue));
   const cleaningAt = n.word("needed", "Cleaning");
   const neededAt = n.word("needed", "needed");
   const countAt = n.word("next", "count");
@@ -83,7 +83,7 @@ export const CloseScene: React.FC = () => {
             </Ink>
             <Ink at={lostAt[i] - 2} dur={16} style={{ left: x, top: top + 22 + h + 64, whiteSpace: "nowrap" }}>
               <div style={note(21, INK_SOFT)}>threw away</div>
-              <div style={{ ...body(34), color: ACCENT_INK, marginTop: 4 }}>{s.lost}</div>
+              <div style={{ ...body(30), color: ACCENT_INK, marginTop: 4 }}>{s.lost}</div>
             </Ink>
           </React.Fragment>
         );

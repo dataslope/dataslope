@@ -197,8 +197,7 @@ export const IdsScene: React.FC = () => {
   const likeTeethAt = n.word("label", "teeth");
   const nonsenseAt = n.word("label", "nonsense");
   const labelAt = n.word("label", "labels");
-  const firstAt = n.word("vector", "first");
-  const swapAt = n.word("vector", "swap");
+  const swapAt = n.word("vector", "swaps");
   const vectorAt = n.word("vector", "vector");
   const fewAt = n.word("vector", "few");
   const embeddingAt = n.word("embedding", "embedding");
@@ -210,7 +209,8 @@ export const IdsScene: React.FC = () => {
   const ZY = y(790);
   const bx = idX(IDS.berry);
   const cx = idX(IDS.cherry);
-  const fig1Out = firstAt;
+  // Fig. 1 and its headline leave as the next ones arrive, so the two cross.
+  const fig1Out = swapAt - 4;
   const zoomP = ease(frame, downAt - 4, 16);
 
   // Fig. 2's rows, in page coordinates.
@@ -226,13 +226,13 @@ export const IdsScene: React.FC = () => {
       <Sfx name="el-tap" at={teethAt} level={-25} />
       <Sfx name="el-tap" at={sixtyAt} level={-25} />
       <Sfx name="el-pencil" at={numbersAt} level={-34} />
-      <Sfx name="el-whoosh" at={firstAt} level={-34} />
+      <Sfx name="el-whoosh" at={swapAt - 4} level={-34} />
       <Sfx name="el-tap" at={swapAt + 2} level={-25} />
       <Sfx name="el-pencil" at={fewAt - 2} level={-35} />
       <Sfx name="el-pencil" at={tableAt} level={-35} />
 
       <Kicker at={hookFrom - 10}>Embeddings</Kicker>
-      <Headline lead="Every token is a number." turn="The number means nothing." at={hookFrom} turnAt={nonsenseAt - 2} out={firstAt - 6} />
+      <Headline lead="Every token is a number." turn="The number means nothing." at={hookFrom} turnAt={nonsenseAt - 2} out={swapAt - 6} />
       <Headline lead="So swap each id" turn="for a vector." at={swapAt - 4} turnAt={vectorAt - 2} />
 
       {/* ── Fig. 1: three ids on the vocabulary's number line ── */}
@@ -251,6 +251,9 @@ export const IdsScene: React.FC = () => {
         </Svg>
         <Pin x={bx} base={LY} text="berry" id={IDS.berry} at={berryAt - 4} glow={pulse(frame, likeTeethAt - 14, 30)} />
         <Pin x={cx} base={LY} text=" cherry" id={IDS.cherry} at={cherryAt - 2} />
+        <Note at={cherryAt + 10} x={cx + 96} y={LY - 116}>
+          <Tag size={20}>· marks a leading space</Tag>
+        </Note>
         <Span x0={bx} x1={cx} y={LY - 150} at={numbersAt + 2} up>
           {thousands(IDS.cherry - IDS.berry)} apart
         </Span>
@@ -309,8 +312,8 @@ export const IdsScene: React.FC = () => {
         <Note at={embeddingAt - 2} x={CELLS_X} y={rowB - 62}>
           <span style={{ ...label(22, BLUE_INK) }}>Berry&apos;s embedding</span>
         </Note>
-        <Note at={learnedAt - 2} x={CELLS_X + CELLS * CELL_W + 50} y={y(360)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Learned in training</span>
+        <Note at={learnedAt - 2} x={CELLS_X} y={rowC + 70}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Every row learned in training</span>
         </Note>
       </Drift>
     </AbsoluteFill>
@@ -399,11 +402,11 @@ export const SpaceScene: React.FC = () => {
       <Sfx name="el-pop" at={dimensionAt} level={-31} />
 
       <Kicker at={from - 10}>Embeddings</Kicker>
-      <Headline lead="Nearby means related." turn="Nobody wrote it down." at={from} turnAt={nobodyAt - 2} out={catchAt - 8} />
+      <Headline lead="Nearby means related." turn="Nobody wrote it down." at={from} turnAt={nobodyAt - 2} out={realAt - 6} />
       <Headline lead="Real dimensions" turn="have no names." at={realAt - 4} turnAt={noNamesAt} />
 
       {/* ── Fig. 3: the lesson's table ── */}
-      <FigLabel n="3" title="The lesson's tiny embedding space" at={tinyAt - 6} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="4" title="The lesson's tiny embedding space" at={tinyAt - 6} x={X0} y={y(FIG_Y)} />
       <Fade at={tinyAt - 2} style={{ left: 0, top: y(366), width: 1000 }}>
         <div style={{ position: "relative", height: 30, ...label(21, INK_SOFT) }}>
           {SPACE.axes.map((ax, i) => (
@@ -511,7 +514,7 @@ export const SpaceScene: React.FC = () => {
       </Note>
 
       {/* ── Fig. 4: the same five words as points in the cube ── */}
-      <FigLabel n="4" title="The same words, as points" at={geometryAt} x={1060} y={y(FIG_Y)} />
+      <FigLabel n="3" title="The same words, as points" at={geometryAt} x={1060} y={y(FIG_Y)} />
       <Svg opacity={cubeP}>
         {CUBE.map(([a, b], i) => {
           const [x1, y1] = P(a);
@@ -623,12 +626,12 @@ export const SpaceScene: React.FC = () => {
           return <ellipse cx={cx + 36} cy={cy} rx={rx * s + 36} ry={ry * s} fill="none" stroke={DATA} strokeWidth={2} strokeDasharray="7 7" />;
         })()}
       </Svg>
-      <Note at={closeAt} out={tinyAt - 6} x={1060} y={y(840)}>
+      <Note at={closeAt} out={tinyAt - 6} x={X0} y={y(800)}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Close together, or <span style={{ opacity: ease(frame, farAt - 2, 10) }}>far apart.</span>
         </span>
       </Note>
-      <Note at={threeAt} out={measureAt - 4} x={1060} y={y(840)}>
+      <Note at={threeAt} out={measureAt - 4} x={X0} y={y(800)}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Three numbers per word, so three axes.</span>
       </Note>
     </AbsoluteFill>
@@ -690,8 +693,8 @@ export const OrderScene: React.FC = () => {
   const dogBitesAt = n.word("bites", "Dog", { nth: 1 });
   const manBitesAt = n.word("bites", "man", { nth: 2 });
   const shuffledAt = n.word("bites", "shuffled");
-  const addAt = n.word("set", "Add");
-  const sameAt = n.word("set", "same");
+  const bagAt = n.word("set", "bag");
+  const identicalAt = n.word("set", "identical");
   const mixesAt = n.word("position", "mixes");
   const sitsAt = n.word("position", "sits");
   const firstAt = n.word("position", "first");
@@ -720,9 +723,8 @@ export const OrderScene: React.FC = () => {
         <Sfx key={i} name="el-tap" at={dogBitesAt + i * 5} level={-26} />
       ))}
       <Sfx name="el-whoosh" at={manBitesAt - 6} level={-33} />
-      <Sfx name="el-tap" at={addAt + 4} level={-24} />
-      <Sfx name="el-tap" at={addAt + 10} level={-24} />
-      <Sfx name="el-pencil" at={sameAt} level={-34} />
+      <Sfx name="el-pencil" at={bagAt - 2} level={-34} />
+      <Sfx name="el-pencil" at={identicalAt - 2} level={-34} />
       {[0, 1, 2].map((i) => (
         <Sfx key={`p${i}`} name="el-tap" at={addInAt(i) + 6} level={-27} />
       ))}
@@ -760,29 +762,46 @@ export const OrderScene: React.FC = () => {
         return <Card key={`b${i}`} x={x} top={top} word={t.word} vec={t.vec} to={p2[i].vec} swapAt={addInAt(i) + 6} ring={ring} opacity={Math.min(1, shuffle * 3)} />;
       })}
 
-      <Note at={shuffledAt - 2} out={addAt + 4} x={SUM_X - 60} y={row2 + 66}>
+      <Note at={shuffledAt - 2} out={bagAt - 4} x={SUM_X - 60} y={row2 + 66}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The same three vectors, shuffled.</span>
       </Note>
-      {/* The order-blind sums, the same for both. */}
-      {[row1, row2].map((top, r) => (
-        <Fade key={r} at={addAt + 4 + r * 6} out={sumOut} style={{ left: SUM_X - 60, top: top + 62, display: "flex", alignItems: "center", gap: 18 }}>
-          <span style={{ ...note(30, INK_SOFT) }}>=</span>
-          <VectorCells values={ORDER.sum[r]} size={24} border={INK} fill={PAPER} />
-          <Tag size={20}>sum</Tag>
-        </Fade>
-      ))}
-      <Fade at={sameAt - 2} out={sumOut} style={{ left: SUM_X + 230, top: row1 + 70 }}>
+      {/* Each sentence as a bag of its vectors: the same bag twice, until position is added. */}
+      <Svg>
+        {[row1, row2].map((top, r) => {
+          const p = ease(frame, bagAt - 4 + r * 6, 18);
+          if (p <= 0) return null;
+          const x0 = SLOT_X[0] - 120;
+          const x1 = SLOT_X[2] + 120;
+          return (
+            <rect
+              key={r}
+              x={x0}
+              y={top - 16}
+              width={(x1 - x0) * p}
+              height={132}
+              rx={24}
+              fill="none"
+              stroke={INK_SOFT}
+              strokeWidth={2}
+              strokeDasharray="9 7"
+            />
+          );
+        })}
+      </Svg>
+      <Fade at={identicalAt - 4} out={sumOut} style={{ left: SLOT_X[2] + 140, top: row1 + 50 }}>
         <svg width={40} height={row2 - row1 + 10} style={{ overflow: "visible" }}>
           <path d={`M0,8 L18,8 L18,${row2 - row1} L0,${row2 - row1}`} fill="none" stroke={POINT} strokeWidth={2.4} />
         </svg>
       </Fade>
-      <Note at={sameAt + 2} out={sumOut} x={SUM_X + 270} y={row1 + 70 + (row2 - row1) / 2 - 16}>
-        <span style={{ ...note(26, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>exactly the same</span>
+      <Note at={identicalAt - 2} out={sumOut} x={SLOT_X[2] + 180} y={row1 + 50 + (row2 - row1) / 2 - 16}>
+        <span style={{ ...note(26, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>identical, as bags</span>
       </Note>
 
       {/* Where each token sits: the lesson's position signal, added slot by slot. */}
       <Fade at={mixesAt + 2} dim={nowAt} style={{ left: 0, top: posRow, width: 1920 }}>
-        <span style={{ position: "absolute", left: X0, top: 12, ...label(21, INK_SOFT) }}>+ position</span>
+        <span style={{ position: "absolute", left: X0, top: -36, ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          + position, added to both rows
+        </span>
         {ORDER.position.map((v, i) => (
           <span key={i} style={{ position: "absolute", left: SLOT_X[i], transform: "translateX(-50%)", opacity: ease(frame, addInAt(i), 10) }}>
             <VectorCells values={v} size={22} border={INK} fill={PAPER} />

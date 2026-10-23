@@ -116,7 +116,7 @@ export const OpenScene: React.FC = () => {
   const youngestAt = n.word("age", "youngest");
   const fiftyAt = n.word("age", "over fifty");
   const oldestAt = n.word("age", "oldest");
-  const hundredAt = n.word("age", "nearly a hundred");
+  const hundredAt = n.word("age", "over ninety");
   const soAt = n.word("order", "So");
   const firstAt = n.word("order", "oldest first");
 
@@ -159,7 +159,7 @@ export const OpenScene: React.FC = () => {
       <FigLabel n="1" title="Three ideas from this course, by the year they appeared" at={hookFrom - 2} x={96} y={y(290)} />
       <AbsoluteFill
         style={{
-          transform: `translateX(${-lean * 14}px) scale(${1 + zoom * 0.1})`,
+          transform: `translateX(${-lean * 14}px) scale(${1 + zoom * 0.06})`,
           transformOrigin: `${tx(zipfYear)}px ${AXIS}px`,
         }}
       >

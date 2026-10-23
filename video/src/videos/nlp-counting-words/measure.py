@@ -421,6 +421,8 @@ for pair, count in bigram_counts.most_common(3):
 ''',
 )
 out["phrases"] = {
+    # The block's three sentences, as the video shows them above the counts.
+    "sentences": [" ".join(sent.split()) for sent in nltk.sent_tokenize(ns["text"])],
     "tokens": ns["tokens"],
     "top3": [[" ".join(p), c] for p, c in ns["bigram_counts"].most_common(3)],
 }

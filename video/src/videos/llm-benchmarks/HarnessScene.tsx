@@ -62,7 +62,7 @@ export const HarnessScene: React.FC = () => {
       <Headline at={from - 6} second={loopAt - 2} italic="a loop.">
         The harness is just
       </Headline>
-      <FigLabel n="13" title="Ten tickets, two stand-in models" at={from} x={X0} y={y(282)} />
+      <FigLabel n="13" title="Ten tickets, two stand-in models (keyword rules, not real LLMs)" at={from} x={X0} y={y(282)} />
 
       <Drift from={from} to={end} amount={0.01} origin="40% 60%">
         {/* Header. */}
@@ -73,10 +73,10 @@ export const HarnessScene: React.FC = () => {
           <span style={label(21, INK_SOFT)}>right queue</span>
         </Ink>
         <Ink at={modelsAt - 4} dur={12} style={{ left: COL.cheap, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>cheap model</span>
+          <span style={label(21, INK_SOFT)}>cheap stand-in</span>
         </Ink>
         <Ink at={modelsAt} dur={12} style={{ left: COL.good, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
-          <span style={label(21, INK_SOFT)}>good model</span>
+          <span style={label(21, INK_SOFT)}>good stand-in</span>
         </Ink>
         <Svg opacity={ease(frame, from + 6, 12)}>
           <line x1={X0} x2={TABLE_X1} y1={y(HEAD_Y) + 16} y2={y(HEAD_Y) + 16} stroke={INK} strokeWidth={2} />
@@ -118,7 +118,7 @@ export const HarnessScene: React.FC = () => {
 
         {/* The two scores. */}
         <Ink at={threeAt - 2} dur={12} style={{ left: TOTAL_X, top: y(400), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>cheap model</span>
+          <span style={label(22, INK_SOFT)}>cheap stand-in</span>
         </Ink>
         <Ink at={thirtyAt - 2} dur={14} style={{ left: TOTAL_X, top: y(400) + 34, whiteSpace: "nowrap" }}>
           <span style={{ ...body(64), color: TRAP_INK, ...TABULAR }}>{HARNESS.cheap}%</span>
@@ -129,7 +129,7 @@ export const HarnessScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={otherAt - 2} dur={12} style={{ left: TOTAL_X, top: y(620), whiteSpace: "nowrap" }}>
-          <span style={label(22, INK_SOFT)}>good model</span>
+          <span style={label(22, INK_SOFT)}>good stand-in</span>
         </Ink>
         <Ink at={allTenAt - 2} dur={14} style={{ left: TOTAL_X, top: y(620) + 34, whiteSpace: "nowrap" }}>
           <span style={{ ...body(64), color: OK_INK, ...TABULAR }}>{HARNESS.good}%</span>

@@ -42,10 +42,10 @@ export const PeriodScene: React.FC = () => {
   const splitAt = n.word("naive", "Split");
   const fallsAt = n.word("naive", "falls");
   const fiveAt = n.word("naive", "five", { nth: 1 });
-  const doctorAt = n.word("naive", "doctor");
-  const insideAt = n.word("naive", "inside");
-  const twoAt = n.word("naive", "two");
-  const questionAt = n.word("naive", "question");
+  const doctorAt = n.word("naive-cut", "doctor");
+  const insideAt = n.word("naive-cut", "inside");
+  const twoAt = n.word("naive-cut", "two");
+  const periodsAt = n.word("naive-cut", "periods");
   const nltkAt = n.word("punkt", "NLTK's");
   const punktAt = n.word("punkt", "Punkt");
   const abbrAt = n.word("punkt", "abbreviations");
@@ -63,13 +63,14 @@ export const PeriodScene: React.FC = () => {
   const tagY = y(ROW_Y) + chipHeight(SIZE) + 12;
   const rowAt = SENTENCES.naive.map((_, i) => fallsAt + i * 4);
   const row4At = SENTENCES.sentences.map((_, i) => returnsAt + i * 5);
-  const last = SENTENCES.naive.length - 1;
+  /** The piece the narration's "throws the periods away" points at: "He
+   *  smiled" without the period it ended on. */
+  const smiled = SENTENCES.naive.findIndex((p) => p.trim() === "He smiled");
   const gapX = (i: number) => (row[i].right + row[i + 1].x) / 2;
 
   const dr = at("Dr.", 2);
   const dec = at("2.5", 1);
   const ends = [at("million.", 7), at("smiled.", 6)];
-  const q = at("?", 0);
   const fig3 = 1 - ease(frame, andAt, 14) * 0.45;
   const fig4 = 1 - ease(frame, readingAt, 14) * 0.3;
   const blue = `color-mix(in srgb, ${BAR} 26%, transparent)`;
@@ -111,7 +112,6 @@ export const PeriodScene: React.FC = () => {
             ...ends.map((i, k) => one(i, endAt, splitAt, undefined, allAt + 8 + k * 3)),
             one(dr, titleAt, splitAt, undefined, allAt),
             one(dec, decimalAt, splitAt, undefined, allAt + 4),
-            one(q, questionAt, nltkAt),
             one(dr, abbrAt, undefined, blue),
             one(dec, decimalsAt, undefined, blue),
           ]}
@@ -129,11 +129,11 @@ export const PeriodScene: React.FC = () => {
                 ? [{ at: doctorAt, tone: "bad" }]
                 : i === 1 || i === 2
                   ? [{ at: insideAt, tone: "bad" }]
-                  : i === last
-                    ? [{ at: questionAt, tone: "bad" }]
+                  : i === smiled
+                    ? [{ at: periodsAt, tone: "bad" }]
                     : []
             }
-            hot={i === last ? { from: w.length - 1, to: w.length, at: questionAt } : undefined}
+            showSpace
           />
         ))}
         <Tag at={doctorAt} x={gapX(0)} y={tagY} align="center">
@@ -142,8 +142,8 @@ export const PeriodScene: React.FC = () => {
         <Tag at={twoAt} x={gapX(1)} y={tagY} align="center">
           2.5 cut
         </Tag>
-        <Tag at={questionAt} x={row[last].right - 20} y={tagY} align="right">
-          ? never seen as an end
+        <Tag at={periodsAt} x={row[smiled].mid} y={tagY} align="center">
+          period gone
         </Tag>
       </div>
 

@@ -36,6 +36,7 @@ export const ScoringScene: React.FC = () => {
   const compareAt = n.word("freetext", "compare");
   const nextAt = n.word("props", "Next");
   const propertiesAt = n.word("props", "properties");
+  const summaryAt = n.word("props", "summary");
   const factsAt = n.word("props", "three facts");
   const limitAt = n.word("props", "limit");
   const lastAt = n.word("judge", "Last");
@@ -99,10 +100,13 @@ export const ScoringScene: React.FC = () => {
           <span style={{ ...note(24, INK) }}>fields you can compare exactly</span>
         </Ink>
 
-        {/* 2. Properties of the text, each a yes or no. */}
+        {/* 2. Properties of the text, each a yes or no: here, of a summary. */}
+        <Ink at={summaryAt - 2} dur={12} style={{ left: COL_X[1] + 30, top: y(TITLE_Y) + 46, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT), fontStyle: "italic" }}>of a summary</span>
+        </Ink>
         {[
           { text: "names the three facts", at: factsAt },
-          { text: "stays under the limit", at: limitAt },
+          { text: "stays under the length limit", at: limitAt },
         ].map((p, i) => (
           <React.Fragment key={p.text}>
             <Ink at={p.at - 4} dur={12} style={{ left: COL_X[1] + 84, top: y(GLYPH_Y) + 24 + i * 96, whiteSpace: "nowrap" }}>

@@ -14,7 +14,6 @@ import {
   Headline,
   INPUT,
   INPUT_INK,
-  INPUT_SOFT,
   lerp,
   POINT_INK,
   pulse,
@@ -57,6 +56,10 @@ export const ResendScene: React.FC = () => {
   const sliceAt = n.word("slice", "thin slice");
   const paidAt = n.word("slice", "already paid");
   const billCue = [n.word("turns", "ten turns"), n.word("turns", "Twenty"), n.word("turns", "Forty")];
+  const sumBillAt = n.word("sum", "bill");
+  const everyOneAt = n.word("sum", "every one");
+  const replyAt = n.word("sum", "reply");
+  const worseAt = n.word("triple", "worse");
   const doubleAt = n.word("triple", "Double");
   const triplesAt = n.word("triple", "triples");
 
@@ -126,9 +129,17 @@ export const ResendScene: React.FC = () => {
           const yResent = tokY(t.resent * g);
           const lit = t.turn <= litUpTo;
           const glow = pulse(frame, newAt + t.turn, 16);
+          // "Every one of these bars": a sweep lights each bar in turn, the whole of it.
+          const swept = pulse(frame, everyOneAt - 2 + t.turn * 0.8, 14);
           return (
             <g key={t.turn}>
-              <rect x={x} y={yResent} width={BAR_W} height={y(BASE) - yResent} fill={lit ? `color-mix(in srgb, ${INPUT} 58%, ${PAPER})` : INPUT_SOFT} />
+              <rect
+                x={x}
+                y={yResent}
+                width={BAR_W}
+                height={y(BASE) - yResent}
+                fill={lit ? `color-mix(in srgb, ${INPUT} 62%, ${PAPER})` : `color-mix(in srgb, ${INPUT} ${Math.round(32 + swept * 40)}%, ${PAPER})`}
+              />
               <rect x={x - glow * 2} y={Math.min(yTop, yResent - 4)} width={BAR_W + glow * 4} height={Math.max(4, yResent - yTop)} fill={INPUT} />
             </g>
           );
@@ -155,8 +166,11 @@ export const ResendScene: React.FC = () => {
       </Note>
 
       {/* The bill so far. */}
-      <Note at={billCue[0] - 8} x={BILL_R} y={y(BILL_Y[0] - 56)} align="right">
-        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>The bill so far</span>
+      <Note at={sumBillAt - 4} x={BILL_R} y={y(BILL_Y[0] - 56)} align="right">
+        <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          The bill: every bar
+          <span style={{ opacity: ease(frame, replyAt - 6, 12) }}>, plus each reply</span>
+        </span>
       </Note>
       {BILL_TURNS.map((t, k) => (
         <React.Fragment key={t}>
@@ -177,8 +191,20 @@ export const ResendScene: React.FC = () => {
         return (
           <React.Fragment key={k}>
             <Arrow from={[ARROW_X, yA]} to={[ARROW_X, yB]} at={doubleAt + k * 8} dur={12} color={POINT_INK} width={2.4} />
-            <Note at={triplesAt - 6 + k * 6} x={ARROW_X - 16} y={(yA + yB) / 2 - 18} align="right">
-              <span style={{ ...note(28, POINT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>x{times.toFixed(1)}</span>
+            <Note at={triplesAt - 6 + k * 6} x={ARROW_X + 16} y={(yA + yB) / 2 - 18}>
+              <span
+                style={{
+                  ...note(28, POINT_INK),
+                  fontWeight: 700,
+                  ...TABULAR,
+                  whiteSpace: "nowrap",
+                  display: "inline-block",
+                  transformOrigin: "0 60%",
+                  transform: `scale(${1 + (k === 1 ? pulse(frame, worseAt - 2, 22) * 0.18 : 0)})`,
+                }}
+              >
+                x{times.toFixed(1)}
+              </span>
             </Note>
           </React.Fragment>
         );

@@ -39,22 +39,32 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     different, 2,739 of them once ("nearly four in ten"); the top hundred
  *     are 60.0% of the book ("sixty percent"); the top two are "to" 5,239 and
  *     "the" 5,201 ("almost tie"). Log count against log rank over ranks 1 to
- *     1,000 has slope -1.14 ("roughly as one over the rank"). The page's own
- *     output (block-outputs.json 420e59ef) prints the same eight rows. The
- *     lesson reads that table as rank times count staying "in the same
- *     ballpark" with the top word "roughly twice the second"; its own numbers
- *     run 5,239 to 19,752 and the top two nearly tie, so the video says the
- *     top is rough and gives the law on the whole vocabulary (see the report).
+ *     1,000 has slope -1.14: on log scales, close to the straight line of
+ *     one over the rank. "The second word turns up about half as often as
+ *     the first, the tenth a tenth as often" is the law's prediction, and the
+ *     ghost cell beside "the" is half of 5,239, 2,620 (measure.py's
+ *     secondByLaw). The page's own output (block-outputs.json 420e59ef)
+ *     prints the same eight rows. Where the lesson's prose and its numbers
+ *     disagree, the video follows the numbers: the lesson reads that table as
+ *     rank times count staying "in the same ballpark" with the top word
+ *     "roughly twice the second", but its own numbers run 5,239 to 19,752 and
+ *     the top two nearly tie, so the video says the top is rough and gives
+ *     the law on the whole vocabulary. The two shares (60% of the book, 39%
+ *     of the different words) are drawn on linear bars as well, because the
+ *     log rank axis gives the top hundred half its width.
  *   - Next-word counts, the lesson's block verbatim: after "the", cat 3 and
  *     dog 2, guess cat (block-outputs.json 3ed0a4c2).
  *   - ELIZA, the lesson's block verbatim: "I need a break" gives "Why do you
  *     need a break?", and the other three replies (207d9aa4).
  *   - Spärck Jones's weight, her paper's own rule and example (below),
  *     computed and asserted: in 200 documents, a term in 90 weighs 2 and one
- *     in 3 weighs 7.
+ *     in 3 weighs 7. Her rule counts halvings, so it tracks log2(N / n) + 1:
+ *     2.15 and 7.06, printed under each weight as the bridge to the course's
+ *     log(N / df).
  *   - word2vec: NLTK's sample of the GoogleNews vectors (43,981 words, 300
  *     numbers each). Leaving out the three question words, the nearest word
- *     to king - man + woman is queen (cosine 0.712), then monarch and
+ *     to king - man + woman is queen (cosine 0.712; "the nearest other
+ *     word", since king itself is nearer, 0.799), then monarch and
  *     princess; "great" is among the six nearest to "excellent" (0.612).
  *
  * Facts from sources (the lesson's, each checked):
@@ -62,7 +72,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     in The Psycho-Biology of Language (1935), ranked again in Human
  *     Behavior and the Principle of Least Effort (1949). Others noticed the
  *     regularity earlier (Estoup, Condon), so the video says Zipf "counted
- *     words" and names the law, and dates him to the thirties.
+ *     words" and names the law, and dates him to the thirties. The opening
+ *     card for 1935 reads "Ranking word counts", not counting words, which is
+ *     far older; 2026 - 1935 = 91, "over ninety".
  *   - Shannon: "A Mathematical Theory of Communication", Bell System
  *     Technical Journal 27, July and October 1948. Part I, section 3: the
  *     "second-order word approximation" begins "THE HEAD AND IN FRONTAL
@@ -90,7 +102,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     government agencies convened in 1964 ("a government committee"):
  *     Language and Machines: Computers in Translation and Linguistics
  *     (National Academy of Sciences, 1966) found "no immediate or
- *     predictable prospect of useful machine translation" (p. 32), and US
+ *     predictable prospect of useful machine translation" (p. 32; said "no
+ *     near-term prospect"), and US
  *     funding for machine translation largely ended (Hutchins, as above:
  *     "ended funding in US in favour of basic NLP").
  *   - ELIZA: Weizenbaum, "ELIZA: A Computer Program for the Study of Natural
@@ -114,7 +127,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     does not repeat.
  *   - word2vec: Mikolov, Chen, Corrado and Dean (Google), "Efficient
  *     Estimation of Word Representations in Vector Space", arXiv 1301.3781,
- *     16 January 2013; "King - Man + Woman" gives "a vector very close to
+ *     16 January 2013, all four authors at "Google Inc., Mountain View, CA"
+ *     (the paper's own first page, shown as a card); "King - Man + Woman"
+ *     gives "a vector very close to
  *     Queen" (Mikolov, Yih and Zweig, NAACL 2013). Said "word to vec",
  *     "Tomash" for Tomáš; the screen sets both as written.
  *   - The close is the lesson's own "Why the history matters" callout, with

@@ -99,4 +99,4 @@ export const WINDOW = {
   trigrams: m.window.trigrams,
 };
 export const ORDER = m.order;
-export const PHRASES = { top3: pairs(m.phrases.top3) };
+export const PHRASES = { sentences: m.phrases.sentences as readonly string[], top3: pairs(m.phrases.top3) };

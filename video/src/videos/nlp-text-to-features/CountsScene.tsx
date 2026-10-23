@@ -35,10 +35,14 @@ export const CountsScene: React.FC = () => {
   // ── Cues ──
   const start = n.beat("counts").from;
   const newAt = n.word("counts", "three new documents");
-  const docAt = [n.word("counts", "a cat on a mat"), n.word("counts", "a dog in a park"), n.word("counts", "a comet in the sky")];
-  const rawAt = n.word("counts", "By raw count");
-  const leadsAt = n.word("counts", "leads every row");
-  const twoAt = n.word("counts", "with two");
+  const docAt = [
+    n.word("counts", "the cat sat on the mat"),
+    n.word("counts", "the dog ran in the park"),
+    n.word("counts", "the comet streaked across the sky"),
+  ];
+  const rawAt = n.word("counts-lead", "By raw count");
+  const leadsAt = n.word("counts-lead", "leads every row");
+  const twoAt = n.word("counts-lead", "with two");
   const sameAt = n.word("same", "same in every row");
   const cantAt = n.word("same", "can't tell");
   const apartAt = n.word("same", "apart");
@@ -53,7 +57,10 @@ export const CountsScene: React.FC = () => {
       <Sfx name="el-pencil" at={leadsAt - 2} level={-34} />
 
       <Kicker at={start - 10}>Weighting words</Kicker>
-      <Headline at={rawAt - 6} second={leadsAt - 4} italic="“the” leads every row.">
+      <Headline at={start - 4} out={rawAt - 8}>
+        Three new documents
+      </Headline>
+      <Headline at={rawAt - 4} second={leadsAt - 4} italic="“the” leads every row.">
         By raw count,
       </Headline>
       <FigLabel n="10" title="The TF-IDF lesson’s three documents, counted" at={newAt - 4} x={X0} y={y(FIG_Y)} />

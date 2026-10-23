@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { CUSTOM, type Filtered, NEGATION, REVIEW } from "./data";
-import { Chip, chipHeight, chipWidth, Headline, Kicker, LabelEnd, lerp, type MarkSpan, rowLayout, Tag, X0 } from "./parts";
+import { Chip, chipHeight, chipWidth, Headline, Kicker, lerp, type MarkSpan, rowLayout, Tag, X0 } from "./parts";
 
 const SIZE = 32;
 const SMALL = 28;
@@ -25,10 +25,12 @@ const KEPT_Y = 704;
 /** The words of Fig. 11, in the order the narration reads them. */
 const READ = ["not", "no", "nor", "but", "don't", "won't", "never"];
 
-/** A chip that sits in a line of text instead of at a page position. */
-const Inline: React.FC<{ text: string; at: number; marks?: readonly MarkSpan[] }> = ({ text, at, marks }) => (
+/** A chip that sits in a line of text instead of at a page position. A
+ *  `ghost` one is drawn faded and struck: the lesson's keep-list subtracts
+ *  "never", which Fig. 11 has just shown is not on NLTK's list at all. */
+const Inline: React.FC<{ text: string; at: number; marks?: readonly MarkSpan[]; ghost?: boolean }> = ({ text, at, marks, ghost }) => (
   <span style={{ position: "relative", display: "inline-block", width: chipWidth(text, SMALL), height: chipHeight(SMALL) }}>
-    <Chip text={text} x={0} y={0} at={at} size={SMALL} marks={marks} />
+    <Chip text={text} x={0} y={0} at={at} size={SMALL} marks={marks} gone={ghost ? at + 6 : undefined} strike={ghost ? at + 10 : undefined} />
   </span>
 );
 
@@ -228,7 +230,6 @@ export const TrapScene: React.FC = () => {
 
         {/* Fig. 13: the lesson's custom list, and the review through it. */}
         <FigLabel n="13" title="A stoplist for movie reviews" at={sentimentAt - 2} x={RIGHT_X} y={y(FIG13_Y)} />
-        <LabelEnd at={curateAt} x={1800} y={y(FIG13_Y)} call="(base - keep) | add" />
         <div
           style={{
             position: "absolute",
@@ -247,7 +248,13 @@ export const TrapScene: React.FC = () => {
             −
           </Op>
           {CUSTOM.keep.map((w, i) => (
-            <Inline key={w} text={w} at={takeAt + 2 + i * 3} marks={w === "not" ? [{ at: notAt, out: runAt }] : []} />
+            <Inline
+              key={w}
+              text={w}
+              at={takeAt + 2 + i * 3}
+              marks={w === "not" ? [{ at: notAt, out: runAt }] : []}
+              ghost={!CUSTOM.keepRemoved.includes(w)}
+            />
           ))}
           <Op at={addAt} style={{ ...body(40), color: INK, margin: "0 6px" }}>
             +

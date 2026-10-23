@@ -81,7 +81,7 @@ export const RunsScene: React.FC = () => {
       <Headline lead="Every pick is a draw." at={start - 4} out={alwaysAt - 8} />
       <Headline lead="It always picks something," turn="true or not." at={alwaysAt - 4} turnAt={nothingAt - 2} />
 
-      <FigLabel n="5" title="Five runs of eight picks, one fixed random seed (the lesson's block)" at={drawAt - 6} x={X0} y={y(236)} />
+      <FigLabel n="5" title="Five runs of eight picks, one fixed seed (the lesson's block)" at={drawAt - 6} x={X0} y={y(236)} />
       {/* The three close scores every pick draws from. */}
       <Note at={closeAt - 4} x={X0} y={y(296)}>
         <span style={{ display: "inline-flex", gap: 26, alignItems: "baseline", whiteSpace: "nowrap" }}>

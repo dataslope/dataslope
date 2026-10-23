@@ -334,12 +334,16 @@ export const TokenRun: React.FC<{
   inkAt: (i: number) => number;
   faint?: number;
   rowGap?: number;
-}> = ({ pieces, size = 30, width, inkAt, faint = 0.35, rowGap = 14 }) => {
+  lineHeight?: number;
+  /** 0..1 per token: a red ground for the tokens the narration points at. */
+  focus?: (i: number) => number;
+}> = ({ pieces, size = 30, width, inkAt, faint = 0.35, rowGap = 14, lineHeight = 1.45, focus }) => {
   const frame = useCurrentFrame();
   return (
     <div style={{ display: "flex", flexWrap: "wrap", rowGap, width }}>
       {pieces.map((p, i) => {
         const t = ease(frame, inkAt(i), 6);
+        const f = focus ? Math.min(1, focus(i)) : 0;
         const breaks = p.text.endsWith("\n");
         const text = breaks ? p.text.slice(0, -1) : p.text;
         return (
@@ -349,14 +353,17 @@ export const TokenRun: React.FC<{
                 fontFamily: MONO,
                 fontSize: size,
                 fontWeight: 500,
-                lineHeight: 1.45,
+                lineHeight,
                 whiteSpace: "pre",
                 color: INK,
                 padding: "0 1px",
                 margin: "0 1px",
                 borderRadius: 5,
-                background: t > 0 ? (i % 2 ? TOKEN_TINT_2 : TOKEN_TINT) : "transparent",
-                boxShadow: t > 0 ? `inset 0 -3px 0 color-mix(in srgb, ${TOKEN} ${Math.round(t * 70)}%, transparent)` : undefined,
+                background: t > 0 ? chipGround(f, i % 2 === 1) : "transparent",
+                boxShadow:
+                  t > 0
+                    ? `inset 0 -3px 0 color-mix(in srgb, ${f > 0 ? chipEdge(f) : TOKEN} ${Math.round(t * 70 + f * 30)}%, transparent)`
+                    : undefined,
                 opacity: faint + (1 - faint) * t,
                 fontVariantLigatures: "none",
               }}

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { halo, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -51,6 +51,7 @@ export const SaturationScene: React.FC = () => {
   const grow = (at: number, dur = 18) => ease(frame, at, dur);
   const hle = lerp(QUOTED.hleLaunch, QUOTED.hleNow, ease(frame, sixtyAt - 10, 26));
   const skip = ease(frame, skipAt + 4, 14);
+  const skipGpqa = ease(frame, skipAt + 12, 14);
 
   const bar = (v: number, rowY: number, at: number) => (
     <rect x={BX0} y={ry(rowY) - BAR_H / 2} width={Math.max(0, X(v) - BX0) * grow(at)} height={BAR_H} rx={3} fill={A} />
@@ -65,20 +66,21 @@ export const SaturationScene: React.FC = () => {
       <Sfx name="el-tap" at={underAt - 2} level={-28} />
       <Sfx name="el-whoosh" at={sixtyAt - 10} level={-33} />
       <Sfx name="el-scratch" at={skipAt - 2} level={-34} />
+      <Sfx name="el-scratch" at={skipAt + 8} level={-36} />
 
       <Kicker at={from - 10}>Four pitfalls</Kicker>
       <Headline at={from - 6} second={topAt - 4} italic="Everyone near the top.">
         One, saturation.
       </Headline>
       <Spot id="llm-benchmarks-gauge" at={topAt - 6} left={1530} top={y(110)} width={240} height={322} />
-      <FigLabel n="5" title="Best published scores, 0 to 100" at={from + 4} x={X0} y={y(330)} />
+      <FigLabel n="5" title="Where the top scores sit, 0 to 100" at={from + 4} x={X0} y={y(330)} />
 
       <Drift from={from} to={end} amount={0.012} origin="40% 60%">
         {/* The scale every row shares, and its grid. */}
         <Svg opacity={ease(frame, from + 6, 14)}>
           {[0, 25, 50, 75, 100].map((v) => (
             <g key={v}>
-              <line x1={X(v)} x2={X(v)} y1={ry(ROWS.mmlu) - 44} y2={ry(ROWS.hle) + 60} stroke={FAINT} strokeWidth={1.2} />
+              <line x1={X(v)} x2={X(v)} y1={ry(ROWS.mmlu) - 44} y2={ry(ROWS.hle) + 18} stroke={FAINT} strokeWidth={1.2} />
               <text x={X(v)} y={ry(ROWS.hle) + 86} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR }}>
                 {v}
               </text>
@@ -109,7 +111,15 @@ export const SaturationScene: React.FC = () => {
           </span>
         </Ink>
         <Svg opacity={1 - skip * 0.45}>
-          {bar(QUOTED.mmluFrontierAbove, ROWS.mmlu, ninetyTwoAt - 6)}
+          {/* Where every frontier model sits: from 92 up to the ceiling. */}
+          <rect
+            x={X(QUOTED.mmluFrontierAbove)}
+            y={ry(ROWS.mmlu) - BAR_H / 2}
+            width={(X(QUOTED.mmluCeiling) - X(QUOTED.mmluFrontierAbove)) * grow(ninetyTwoAt - 6, 14)}
+            height={BAR_H}
+            rx={3}
+            fill={A}
+          />
           {/* The ceiling near 95, from "near the top". */}
           <line
             x1={X(QUOTED.mmluCeiling)}
@@ -123,27 +133,31 @@ export const SaturationScene: React.FC = () => {
           />
         </Svg>
         <Ink at={ninetyTwoAt} dur={12} style={{ left: X(100) + 22, top: ry(ROWS.mmlu) - 17, whiteSpace: "nowrap", opacity: 1 - skip * 0.45 }}>
-          <span style={{ ...note(24, A_INK), fontWeight: 700 }}>every frontier model above {QUOTED.mmluFrontierAbove}</span>
+          <span style={{ ...note(24, A_INK), fontWeight: 700 }}>
+            every frontier model, {QUOTED.mmluFrontierAbove} to {QUOTED.mmluCeiling}
+          </span>
         </Ink>
         <Ink at={apartAt - 2} dur={12} style={{ left: X(QUOTED.mmluCeiling) - 30, top: ry(ROWS.mmlu) + 34, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, TRAP_INK), fontWeight: 600 }}>ceiling</span>
         </Ink>
-        {/* The tell: the three points between the frontier and the ceiling. */}
+        {/* The tell: every frontier model inside the same three points. */}
         <Bracket x0={X(QUOTED.mmluFrontierAbove)} x1={X(QUOTED.mmluCeiling)} y={ry(ROWS.mmlu) - 30} at={threeAt - 4} up={false} color={TRAP} />
         <Ink at={threeAt - 2} dur={12} style={{ left: X(QUOTED.mmluCeiling) + 4, top: ry(ROWS.mmlu) - 72, whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, TRAP_INK), fontWeight: 700, display: "inline-block", transform: "translateX(-100%)" }}>
-            within {QUOTED.withinPoints} points
+            all within {QUOTED.withinPoints} points
           </span>
         </Ink>
 
         {/* ── GPQA Diamond ── */}
-        <Ink at={gpqaAt - 4} dur={12} style={{ left: X0, top: ry(ROWS.gpqa) - 17, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, INK), fontWeight: 700 }}>GPQA Diamond</span>
+        <Ink at={gpqaAt - 4} dur={12} style={{ left: X0, top: ry(ROWS.gpqa) - 17, whiteSpace: "nowrap", opacity: 1 - skipGpqa * 0.45 }}>
+          <span style={{ ...label(26, INK), fontWeight: 700 }}>
+            <Strike at={skipAt + 8}>GPQA Diamond</Strike>
+          </span>
         </Ink>
-        <Svg>
+        <Svg opacity={1 - skipGpqa * 0.45}>
           {bar(QUOTED.gpqaLeaders, ROWS.gpqa, ninetyFiveAt - 8)}
         </Svg>
-        <Ink at={ninetyFiveAt} dur={12} style={{ left: X(100) + 22, top: ry(ROWS.gpqa) - 17, whiteSpace: "nowrap" }}>
+        <Ink at={ninetyFiveAt} dur={12} style={{ left: X(100) + 22, top: ry(ROWS.gpqa) - 17, whiteSpace: "nowrap", opacity: 1 - skipGpqa * 0.45 }}>
           <span style={{ ...note(24, A_INK), fontWeight: 700 }}>leaders around {QUOTED.gpqaLeaders}</span>
         </Ink>
         <Ink at={replaceAt - 2} dur={12} style={{ left: X0, top: ry(ROWS.gpqa) + 18, whiteSpace: "nowrap" }}>
@@ -168,15 +182,15 @@ export const SaturationScene: React.FC = () => {
             x1={X(QUOTED.hleLaunch)}
             x2={X(QUOTED.hleLaunch)}
             y1={ry(ROWS.hle) - 26}
-            y2={ry(ROWS.hle) + 26}
+            y2={ry(ROWS.hle) + 16}
             stroke={INK}
             strokeWidth={2}
             strokeDasharray="4 4"
             opacity={ease(frame, underAt, 10)}
           />
         </Svg>
-        <Ink at={underAt} dur={12} style={{ left: X(QUOTED.hleLaunch) - 10, top: ry(ROWS.hle) + 22, whiteSpace: "nowrap" }}>
-          <span style={note(21, INK_SOFT)}>
+        <Ink at={underAt} dur={12} style={{ left: X(QUOTED.hleLaunch) + 8, top: ry(ROWS.hle) + 22, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, INK_SOFT), ...halo }}>
             launch, January 2025: every model under <span style={TABULAR}>{QUOTED.hleLaunch}</span>
           </span>
         </Ink>

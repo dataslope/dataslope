@@ -8102,6 +8102,11 @@
   "inB": false
  },
  "phrases": {
+  "sentences": [
+   "machine learning is fun.",
+   "machine learning is powerful.",
+   "i love machine learning and natural language processing."
+  ],
   "tokens": [
    "machine",
    "learning",

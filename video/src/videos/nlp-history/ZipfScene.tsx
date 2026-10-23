@@ -78,7 +78,7 @@ export const ZipfScene: React.FC = () => {
   const drawn = ease(frame, rankAt, 46);
   const lineFrom = ZIPF.lineC / 10 ** HI;
   const guide = ease(frame, lineAt - 2, 30);
-  const guideTo = ZIPF.distinct;
+  const guideTo = ZIPF.firstHapaxRank;
   const band = ease(frame, hundredAt - 2, 18);
   const tail = ease(frame, fourAt - 2, 20);
   const hapax0 = lx(ZIPF.firstHapaxRank);

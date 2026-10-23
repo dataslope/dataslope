@@ -304,6 +304,7 @@
     "count": 5
    }
   ],
+  "pairTotal": 14,
   "steps": [
    {
     "merge": null,
@@ -835,7 +836,454 @@
     "o200k_base": 89,
     "cl100k_base": 89,
     "p50k_base": 102,
-    "r50k_base": 120
+    "r50k_base": 120,
+    "pieces": [
+     {
+      "text": "[\n",
+      "id": 20070,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": " {\n",
+      "id": 405,
+      "key": false
+     },
+     {
+      "text": "   ",
+      "id": 271,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "customer",
+      "id": 21605,
+      "key": true
+     },
+     {
+      "text": "_id",
+      "id": 1537,
+      "key": true
+     },
+     {
+      "text": "\":",
+      "id": 1243,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": "100",
+      "id": 1353,
+      "key": false
+     },
+     {
+      "text": "1",
+      "id": 16,
+      "key": false
+     },
+     {
+      "text": ",\n",
+      "id": 412,
+      "key": false
+     },
+     {
+      "text": "   ",
+      "id": 271,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "region",
+      "id": 8073,
+      "key": true
+     },
+     {
+      "text": "\":",
+      "id": 1243,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "north",
+      "id": 132211,
+      "key": false
+     },
+     {
+      "text": "\",\n",
+      "id": 1150,
+      "key": false
+     },
+     {
+      "text": "   ",
+      "id": 271,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "amount",
+      "id": 10703,
+      "key": true
+     },
+     {
+      "text": "\":",
+      "id": 1243,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": "249",
+      "id": 26392,
+      "key": false
+     },
+     {
+      "text": ".",
+      "id": 13,
+      "key": false
+     },
+     {
+      "text": "99",
+      "id": 2058,
+      "key": false
+     },
+     {
+      "text": "\n",
+      "id": 198,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": " },\n",
+      "id": 1862,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": " {\n",
+      "id": 405,
+      "key": false
+     },
+     {
+      "text": "   ",
+      "id": 271,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "customer",
+      "id": 21605,
+      "key": true
+     },
+     {
+      "text": "_id",
+      "id": 1537,
+      "key": true
+     },
+     {
+      "text": "\":",
+      "id": 1243,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": "100",
+      "id": 1353,
+      "key": false
+     },
+     {
+      "text": "2",
+      "id": 17,
+      "key": false
+     },
+     {
+      "text": ",\n",
+      "id": 412,
+      "key": false
+     },
+     {
+      "text": "   ",
+      "id": 271,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "region",
+      "id": 8073,
+      "key": true
+     },
+     {
+      "text": "\":",
+      "id": 1243,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "south",
+      "id": 145118,
+      "key": false
+     },
+     {
+      "text": "\",\n",
+      "id": 1150,
+      "key": false
+     },
+     {
+      "text": "   ",
+      "id": 271,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "amount",
+      "id": 10703,
+      "key": true
+     },
+     {
+      "text": "\":",
+      "id": 1243,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": "89",
+      "id": 7479,
+      "key": false
+     },
+     {
+      "text": ".",
+      "id": 13,
+      "key": false
+     },
+     {
+      "text": "5",
+      "id": 20,
+      "key": false
+     },
+     {
+      "text": "\n",
+      "id": 198,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": " },\n",
+      "id": 1862,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": " {\n",
+      "id": 405,
+      "key": false
+     },
+     {
+      "text": "   ",
+      "id": 271,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "customer",
+      "id": 21605,
+      "key": true
+     },
+     {
+      "text": "_id",
+      "id": 1537,
+      "key": true
+     },
+     {
+      "text": "\":",
+      "id": 1243,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": "100",
+      "id": 1353,
+      "key": false
+     },
+     {
+      "text": "3",
+      "id": 18,
+      "key": false
+     },
+     {
+      "text": ",\n",
+      "id": 412,
+      "key": false
+     },
+     {
+      "text": "   ",
+      "id": 271,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "region",
+      "id": 8073,
+      "key": true
+     },
+     {
+      "text": "\":",
+      "id": 1243,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "north",
+      "id": 132211,
+      "key": false
+     },
+     {
+      "text": "\",\n",
+      "id": 1150,
+      "key": false
+     },
+     {
+      "text": "   ",
+      "id": 271,
+      "key": false
+     },
+     {
+      "text": " \"",
+      "id": 392,
+      "key": false
+     },
+     {
+      "text": "amount",
+      "id": 10703,
+      "key": true
+     },
+     {
+      "text": "\":",
+      "id": 1243,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": "512",
+      "id": 16057,
+      "key": false
+     },
+     {
+      "text": ".",
+      "id": 13,
+      "key": false
+     },
+     {
+      "text": "0",
+      "id": 15,
+      "key": false
+     },
+     {
+      "text": "\n",
+      "id": 198,
+      "key": false
+     },
+     {
+      "text": " ",
+      "id": 220,
+      "key": false
+     },
+     {
+      "text": " }\n",
+      "id": 606,
+      "key": false
+     },
+     {
+      "text": "]",
+      "id": 60,
+      "key": false
+     }
+    ]
    },
    "csv": {
     "chars": 76,
@@ -843,14 +1291,187 @@
     "o200k_base": 33,
     "cl100k_base": 33,
     "p50k_base": 34,
-    "r50k_base": 34
+    "r50k_base": 34,
+    "pieces": [
+     {
+      "text": "customer",
+      "id": 21605,
+      "key": true
+     },
+     {
+      "text": "_id",
+      "id": 1537,
+      "key": true
+     },
+     {
+      "text": ",",
+      "id": 11,
+      "key": false
+     },
+     {
+      "text": "region",
+      "id": 8073,
+      "key": true
+     },
+     {
+      "text": ",",
+      "id": 11,
+      "key": false
+     },
+     {
+      "text": "amount",
+      "id": 10703,
+      "key": true
+     },
+     {
+      "text": "\n",
+      "id": 198,
+      "key": false
+     },
+     {
+      "text": "100",
+      "id": 1353,
+      "key": false
+     },
+     {
+      "text": "1",
+      "id": 16,
+      "key": false
+     },
+     {
+      "text": ",n",
+      "id": 18103,
+      "key": false
+     },
+     {
+      "text": "orth",
+      "id": 2909,
+      "key": false
+     },
+     {
+      "text": ",",
+      "id": 11,
+      "key": false
+     },
+     {
+      "text": "249",
+      "id": 26392,
+      "key": false
+     },
+     {
+      "text": ".",
+      "id": 13,
+      "key": false
+     },
+     {
+      "text": "99",
+      "id": 2058,
+      "key": false
+     },
+     {
+      "text": "\n",
+      "id": 198,
+      "key": false
+     },
+     {
+      "text": "100",
+      "id": 1353,
+      "key": false
+     },
+     {
+      "text": "2",
+      "id": 17,
+      "key": false
+     },
+     {
+      "text": ",s",
+      "id": 20379,
+      "key": false
+     },
+     {
+      "text": "outh",
+      "id": 4656,
+      "key": false
+     },
+     {
+      "text": ",",
+      "id": 11,
+      "key": false
+     },
+     {
+      "text": "89",
+      "id": 7479,
+      "key": false
+     },
+     {
+      "text": ".",
+      "id": 13,
+      "key": false
+     },
+     {
+      "text": "5",
+      "id": 20,
+      "key": false
+     },
+     {
+      "text": "\n",
+      "id": 198,
+      "key": false
+     },
+     {
+      "text": "100",
+      "id": 1353,
+      "key": false
+     },
+     {
+      "text": "3",
+      "id": 18,
+      "key": false
+     },
+     {
+      "text": ",n",
+      "id": 18103,
+      "key": false
+     },
+     {
+      "text": "orth",
+      "id": 2909,
+      "key": false
+     },
+     {
+      "text": ",",
+      "id": 11,
+      "key": false
+     },
+     {
+      "text": "512",
+      "id": 16057,
+      "key": false
+     },
+     {
+      "text": ".",
+      "id": 13,
+      "key": false
+     },
+     {
+      "text": "0",
+      "id": 15,
+      "key": false
+     }
+    ]
    },
    "pageEstimate": {
     "json": 93,
     "csv": 22,
     "ratio": 4.3
    },
-   "ratio": 2.7
+   "ratio": 2.7,
+   "keys": [
+    "customer_id",
+    "region",
+    "amount"
+   ],
+   "jsonKeyNames": 9
   },
   "families": [
    {

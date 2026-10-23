@@ -27,11 +27,14 @@ prepopulated output the site's own Pyodide recorded for that lesson
 calls are made directly, and their results, not parsed print-out, are what
 measurements.json holds.
 
-Two values are the video's own, computed from the lessons' pieces rather than
-printed by a block: the review filtered against the lesson's custom stoplist
-(its "subtract what you must keep, add your domain's noise" recipe applied to
-its own review), and the fox sentence's and review's per-token stopword flags,
-which the blocks compute inside a list comprehension.
+Three values are the video's own, computed from the lessons' pieces rather
+than printed by a block: the order tip (text-normalization's "strip
+punctuation after tokenizing") run on the recipes' own line, sent_tokenize()
+before and after its punctuation is deleted; the review filtered against the
+lesson's custom stoplist (its "subtract what you must keep, add your domain's
+noise" recipe applied to its own review); and the fox sentence's and review's
+per-token stopword flags, which the blocks compute inside a list
+comprehension.
 """
 
 import contextlib
@@ -328,6 +331,16 @@ def measure():
         "isalpha": [w for w in text.split() if w.isalpha()],
         "translate": [w for w in approach2 if w],
         "regex": re.findall(r"[a-z]+", text.lower()),
+    }
+    # The lesson's order tip ("Strip punctuation after tokenizing, not before"),
+    # run on the same line: Punkt on the text as written, and on the text with
+    # its punctuation characters deleted first.
+    stripped = text.translate(table)
+    out["order"] = {
+        "text": text,
+        "stripped": stripped,
+        "sentences": sent_tokenize(text),
+        "strippedSentences": sent_tokenize(stripped),
     }
 
     # stopwords.mdx

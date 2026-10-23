@@ -52,10 +52,9 @@ export const SplitScene: React.FC = () => {
   const mrAt = n.word("sixteen", "Mr.");
   const periodAt = n.word("sixteen", "period");
   const eachAt = n.beat("token").from;
-  const tokenAt = n.word("token", "token");
   const meaningfulAt = n.word("token", "meaningful");
-  const aWordAt = n.word("token", "word");
-  const markAt = n.word("token", "punctuation");
+  const aWordAt = n.word("token-kinds", "word");
+  const markAt = n.word("token-kinds", "punctuation");
   const levelAt = n.word("sent-in", "period");
   const end = n.beat("sent-in").to;
 
@@ -127,7 +126,7 @@ export const SplitScene: React.FC = () => {
 
       <Kicker at={hookFrom - 6}>Tokenization</Kicker>
       <Headline lead="Where does one word end?" at={whereAt - 4} out={eachAt} />
-      <Headline lead="A token:" turn="one meaningful unit of text." at={tokenAt - 4} turnAt={meaningfulAt - 2} />
+      <Headline lead="A token:" turn="one meaningful unit of text." at={eachAt + 8} turnAt={meaningfulAt - 2} />
       <Spot id="nlp-cleaning-text-scissors" at={hookFrom + 4} left={1446} top={50} width={340} height={233} />
 
       {/* Fig. 1: the sentence, split at the spaces. */}
@@ -144,7 +143,7 @@ export const SplitScene: React.FC = () => {
         text={WORDS.text}
         x={X0}
         y={y(RAW_Y)}
-        at={decisionAt}
+        at={hookFrom + 8}
         size={30}
         words={wordSpans(WORDS.text).map((w) => ({ ...w, at: n.word("sentence", w.word) }))}
       />

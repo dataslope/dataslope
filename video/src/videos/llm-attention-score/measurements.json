@@ -1,0 +1,215 @@
+{
+ "versions": {
+  "numpy": "2.4.6"
+ },
+ "cosine": {
+  "queryLength": 1.005,
+  "keys": [
+   {
+    "token": "trophy",
+    "cosine": 0.995,
+    "keyLength": 1.02
+   },
+   {
+    "token": "suitcase",
+    "cosine": 0.381,
+    "keyLength": 1.044
+   },
+   {
+    "token": "it",
+    "cosine": 0.774,
+    "keyLength": 0.141
+   }
+  ]
+ },
+ "spread": [
+  {
+   "d": 2,
+   "std": 1.4,
+   "stdScaled": 1.02
+  },
+  {
+   "d": 64,
+   "std": 8.2,
+   "stdScaled": 1.03
+  },
+  {
+   "d": 128,
+   "std": 11.1,
+   "stdScaled": 0.98
+  }
+ ],
+ "lesson": {
+  "tokens": [
+   "trophy",
+   "suitcase",
+   "it"
+  ],
+  "keys": [
+   [
+    1.0,
+    0.2
+   ],
+   [
+    0.3,
+    1.0
+   ],
+   [
+    0.1,
+    0.1
+   ]
+  ],
+  "values": [
+   [
+    10.0,
+    0.0
+   ],
+   [
+    0.0,
+    10.0
+   ],
+   [
+    1.0,
+    1.0
+   ]
+  ],
+  "d": 2,
+  "root": 1.414
+ },
+ "trophy": {
+  "query": [
+   1.0,
+   0.1
+  ],
+  "rows": [
+   {
+    "token": "trophy",
+    "key": [
+     1.0,
+     0.2
+    ],
+    "products": [
+     1.0,
+     0.02
+    ],
+    "dot": 1.02,
+    "score": 0.721,
+    "power": 2.056,
+    "weight": 0.461
+   },
+   {
+    "token": "suitcase",
+    "key": [
+     0.3,
+     1.0
+    ],
+    "products": [
+     0.3,
+     0.1
+    ],
+    "dot": 0.4,
+    "score": 0.283,
+    "power": 1.327,
+    "weight": 0.297
+   },
+   {
+    "token": "it",
+    "key": [
+     0.1,
+     0.1
+    ],
+    "products": [
+     0.1,
+     0.01
+    ],
+    "dot": 0.11,
+    "score": 0.078,
+    "power": 1.081,
+    "weight": 0.242
+   }
+  ],
+  "total": 4.464,
+  "totalExact": 4.465,
+  "output": [
+   4.849,
+   3.214
+  ],
+  "output2": [
+   4.85,
+   3.21
+  ],
+  "argmax": "trophy",
+  "outputFromShown": [
+   4.852,
+   3.212
+  ]
+ },
+ "suitcase": {
+  "query": [
+   0.2,
+   1.0
+  ],
+  "rows": [
+   {
+    "token": "trophy",
+    "key": [
+     1.0,
+     0.2
+    ],
+    "products": [
+     0.2,
+     0.2
+    ],
+    "dot": 0.4,
+    "score": 0.283,
+    "power": 1.327,
+    "weight": 0.293
+   },
+   {
+    "token": "suitcase",
+    "key": [
+     0.3,
+     1.0
+    ],
+    "products": [
+     0.06,
+     1.0
+    ],
+    "dot": 1.06,
+    "score": 0.75,
+    "power": 2.117,
+    "weight": 0.467
+   },
+   {
+    "token": "it",
+    "key": [
+     0.1,
+     0.1
+    ],
+    "products": [
+     0.02,
+     0.1
+    ],
+    "dot": 0.12,
+    "score": 0.085,
+    "power": 1.089,
+    "weight": 0.24
+   }
+  ],
+  "total": 4.533,
+  "totalExact": 4.531,
+  "output": [
+   3.168,
+   4.91
+  ],
+  "output2": [
+   3.17,
+   4.91
+  ],
+  "argmax": "suitcase",
+  "outputFromShown": [
+   3.17,
+   4.91
+  ]
+ }
+}

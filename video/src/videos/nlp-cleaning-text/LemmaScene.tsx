@@ -7,7 +7,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { LEMMAS } from "./data";
-import { Chip, chipHeight, chipWidth, Fade, Headline, Mark, Kicker, type MarkSpan, Spot, type ToneStep, X0 } from "./parts";
+import { Chip, chipHeight, chipWidth, Fade, Headline, Kicker, Mark, type MarkSpan, Spot, Tag, type ToneStep, X0 } from "./parts";
 
 const SIZE = 32;
 const FIG_Y = 300;
@@ -18,6 +18,9 @@ const COL = [X0, 330, 560];
 const RIGHT_X = 1010;
 const CARD_Y = [370, 572];
 const CARD_W = 790;
+/** The open dictionary, centred in the right half where Fig. 16 will go; its
+ *  box follows the art's own proportions (1536x1024 before trimming). */
+const BOOK = { left: 1080, dy: 0, w: 560, h: 373 };
 
 const head: React.CSSProperties = { fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, whiteSpace: "nowrap" };
 
@@ -61,7 +64,6 @@ export const LemmaScene: React.FC = () => {
     was: n.word("pos", "be"),
     better: n.word("pos", "good"),
   };
-  const adjectiveAt = n.word("pos", "adjective");
   const wasAt = n.word("know", "was");
   const beAt = n.word("know", "be");
   const soAt = n.word("choose", "So");
@@ -79,6 +81,8 @@ export const LemmaScene: React.FC = () => {
   const wordAt = LEMMAS.map((_, i) => from + 8 + i * 4);
   const defAt = LEMMAS.map((_, i) => nounAt + 2 + i * 3);
   const wasRow: MarkSpan[] = [{ at: wasAt, out: soAt }];
+  /** The pos labels share one column, past the widest lemma. */
+  const posX = COL[2] + Math.max(...LEMMAS.map((l) => chipWidth(l.withPos, SIZE))) + 14;
 
   return (
     <AbsoluteFill>
@@ -94,7 +98,7 @@ export const LemmaScene: React.FC = () => {
 
       <Kicker at={from - 6}>Stems and lemmas</Kicker>
       <Headline lead="A lemma is" turn="the dictionary form." at={from - 4} turnAt={dictionaryAt - 2} />
-      <Spot id="nlp-cleaning-text-dictionary" at={wordnetAt} out={soAt} left={1080} top={y(340)} width={560} height={386} />
+      <Spot id="nlp-cleaning-text-book" at={wordnetAt} out={soAt} left={BOOK.left} top={y(340) + BOOK.dy} width={BOOK.w} height={BOOK.h} />
 
       {/* Fig. 15: the lemmatizer with no part of speech, then with one. */}
       <FigLabel n="15" title="WordNet lemmas, with and without a part of speech" at={from} x={X0} y={y(FIG_Y)} />
@@ -112,7 +116,7 @@ export const LemmaScene: React.FC = () => {
         const wrong = wrongAt[l.word];
         const defTones: ToneStep[] = wrong !== undefined ? [{ at: wrong, tone: "bad" }] : [];
         const marks = l.word === "was" ? wasRow : [];
-        const posAt = l.pos === "a" ? adjectiveAt : rightAt[l.word];
+        const posAt = rightAt[l.word] + 2;
         return (
           <React.Fragment key={l.word}>
             <Chip text={l.word} x={COL[0]} y={top} at={wordAt[i]} size={SIZE} marks={marks} />
@@ -126,7 +130,12 @@ export const LemmaScene: React.FC = () => {
               tones={[{ at: rightAt[l.word] + 4, tone: "good" }]}
               marks={l.word === "was" ? [{ at: beAt, out: soAt }] : []}
             />
-            <Ink at={posAt} dur={10} style={{ left: COL[2] + chipWidth(l.withPos, SIZE) + 14, top: top + chipH / 2 - 14 }}>
+            {l.word === "was" ? (
+              <Tag at={wrong} x={COL[1] + chipWidth(l.default, SIZE) + 12} y={top + chipH / 2 - 13} size={20}>
+                plural noun
+              </Tag>
+            ) : null}
+            <Ink at={posAt} dur={10} style={{ left: posX, top: top + chipH / 2 - 14 }}>
               <span style={{ ...head, fontSize: 22 }}>pos=&quot;{l.pos}&quot;</span>
             </Ink>
           </React.Fragment>
@@ -148,6 +157,11 @@ export const LemmaScene: React.FC = () => {
         <Mark at={realAt - 2}>
           <span style={{ fontStyle: "italic" }}>real word</span>
         </Mark>
+        <div style={{ marginTop: 10 }}>
+          <Fade at={realAt + 14}>
+            <span style={label(22, INK_SOFT)}>given the part of speech</span>
+          </Fade>
+        </div>
       </Card>
       <Sfx name="el-pencil" at={realAt - 4} level={-36} />
     </AbsoluteFill>

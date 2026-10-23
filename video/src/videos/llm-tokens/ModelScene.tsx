@@ -151,7 +151,7 @@ export const ModelScene: React.FC = () => {
             tokens, sharing the other {rest.toFixed(2)}
           </div>
           <div style={{ ...note(21, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>
-            o200k_base has {num(VOCAB)} tokens in all
+            o200k_base, GPT-4o&apos;s tokenizer, has {num(VOCAB)} tokens in all
           </div>
         </Note>
       </Drift>

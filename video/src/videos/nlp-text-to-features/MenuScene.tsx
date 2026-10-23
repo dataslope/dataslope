@@ -66,7 +66,6 @@ export const MenuScene: React.FC = () => {
   const featuresAt = n.word("unit", "features");
   const rowsAt = n.word("unit", "rows of numbers");
   const learnAt = n.word("unit", "learn from");
-  const choiceAt = n.word("menu", "a choice");
   const menuAt = n.word("menu", "a menu");
   const recipeAt = n.word("menu", "recipe");
   const tokenizeAt = n.word("steps", "tokenize");
@@ -102,7 +101,7 @@ export const MenuScene: React.FC = () => {
       <Sfx name="el-pencil" at={doesAt - 4} level={-35} />
 
       <Kicker at={hookFrom - 10}>Choosing the pipeline</Kicker>
-      <Headline at={hookFrom - 4} second={listsAt - 4} out={choiceAt - 6} italic="not lists of words.">
+      <Headline at={hookFrom - 4} second={listsAt - 4} out={menuAt - 10} italic="not lists of words.">
         A model wants numbers,
       </Headline>
       <Headline at={menuAt - 2} second={recipeAt - 4} italic="not a recipe.">
@@ -110,7 +109,7 @@ export const MenuScene: React.FC = () => {
       </Headline>
 
       {/* ── Fig. 1: one document as words, and as the row of counts it becomes ── */}
-      <FigLabel n="1" title="One document, as a list of words and as a row of numbers" at={hookFrom - 2} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="1" title="One document, as words and as counts over a shared vocabulary" at={hookFrom - 2} x={X0} y={y(FIG_Y)} />
       <ChipRow x={X0} y={y(ROW_Y)}>
         {DOC.map((w, k) => (
           <Chip key={k} text={w} size={28} at={listsAt - 2 + k * 2} />
@@ -152,15 +151,18 @@ export const MenuScene: React.FC = () => {
       </Card>
       {QUESTIONS.map((q, k) => (
         <React.Fragment key={q}>
-          <Arrow
-            from={[(k === 0 ? TOKENIZE.x + TOKENIZE.w : optionalX(k - 1) + OPTIONAL_W) + 6, stationMid]}
-            to={[optionalX(k) - 8, stationMid]}
-            at={k === 0 ? questionAt - 4 : askAt[k] - 6}
-            dur={8}
-            color={INK_SOFT}
-            width={2}
-            head={10}
-          />
+          {/* One arrow out of tokenize; the optional steps are a menu, not a chain. */}
+          {k === 0 ? (
+            <Arrow
+              from={[TOKENIZE.x + TOKENIZE.w + 6, stationMid]}
+              to={[optionalX(0) - 8, stationMid]}
+              at={questionAt - 4}
+              dur={8}
+              color={INK_SOFT}
+              width={2}
+              head={10}
+            />
+          ) : null}
           <Card at={askAt[k] - 4} x={optionalX(k)} y={y(STATION_Y)} w={OPTIONAL_W} h={h(STATION_H)} dashed line={CHIP_LINE}>
             <span style={{ ...label(24, INK), width: OPTIONAL_W - 30, lineHeight: 1.2 }}>{q}</span>
           </Card>

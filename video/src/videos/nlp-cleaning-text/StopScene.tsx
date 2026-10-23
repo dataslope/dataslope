@@ -91,7 +91,7 @@ export const StopScene: React.FC = () => {
         at={againstAt}
         x={figRight}
         y={y(FIG10_Y)}
-        call="t not in stop"
+        call="[t for t in tokens if t not in stop]"
         count={`${removed} of ${FOX.tokens.length} removed`}
         countAt={dropAt}
       />

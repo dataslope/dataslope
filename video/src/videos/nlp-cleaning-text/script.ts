@@ -37,11 +37,15 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *   - tokenization, "Word tokenization": split() gives 11 pieces ("work,",
  *     "see!", "don't" whole); word_tokenize() gives 16 tokens, with "do" and
  *     "n't", "Lee" and "'s", "we" and "'ll", "," and "!" apart, and "Mr."
- *     whole. The token definition is the lesson's first paragraph.
+ *     whole. The token definition is the lesson's first paragraph; its
+ *     "a number, a symbol" is left out, because this sentence has neither.
  *   - tokenization, "Sentence tokenization": split(".") gives 5 pieces
  *     ("Dr", " Lee earned 2", "5 million", " He smiled", " Wasn't that
  *     great?"), sent_tokenize() 3 sentences. The period's three jobs (end, the
- *     abbreviation "Dr.", the decimal in "2.5") are the lesson's.
+ *     abbreviation "Dr.", the decimal in "2.5") are the lesson's. What the
+ *     split throws away is its periods ("He smiled" against Punkt's "He
+ *     smiled."); the lesson's "missed that ? also ends a sentence" costs
+ *     nothing here, where the "?" ends the text, so the video does not say it.
  *   - tokenization, "When the right tokens depend on your domain": the default
  *     tokenizer gives "#" "NLP", "@" "dataslope" and ":" ")"; TweetTokenizer
  *     keeps "#NLP", "@dataslope" and ":)". "The correct tokenization is the
@@ -50,9 +54,13 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     and "dog" (the page prints the set in hash order; the video uses first
  *     appearance); "US".lower() is "us", "WHO" "who", "Apple" "apple", with
  *     the lesson's glosses. The three recipes on "Hello, World! It's a GREAT
- *     day... isn't it?": isalpha() keeps only "a" and "GREAT"; translate()
- *     gives "its" and "isnt"; the regex gives "isn" "t" and "it" "s". "Strip
- *     punctuation after tokenizing, not before" is the lesson's order tip.
+ *     day... isn't it?": isalpha() keeps only "a" and "GREAT" (2 of 8);
+ *     translate() gives "its" and "isnt"; the regex gives "isn" "t" and "it"
+ *     "s". The second and third run on text.lower(), as the lesson's code
+ *     does, and the narration and labels say so. "Strip punctuation after
+ *     tokenizing, not before" is the lesson's order tip; measure.py runs it on
+ *     the same line: sent_tokenize() finds 2 sentences in it as written and 1
+ *     once string.punctuation is deleted first.
  *   - stopwords: 198 English stopwords ("under 200"); the fox sentence's 12
  *     tokens lose 5 ("the" three times, "over", "in") and keep 7; "not",
  *     "no", "nor", "but", "don't" and "won't" are on the list and "never" is
@@ -61,7 +69,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     but; plus movie, film, watch): "not" is off it, "movie" and "the" on.
  *     The same review filtered against it keeps "not" and "good"; the lesson
  *     prints the list's membership, not that sentence, so measure.py makes
- *     the one extra call.
+ *     the one extra call. "never" is subtracted by the lesson but was never
+ *     on the list, so Fig. 13 draws it faded and struck.
  *   - stemming-and-lemmatization: Porter (the lesson's "from 1980") turns
  *     runs and running into run, leaves ran, and gives studi for studies and
  *     studying, happi for happiness, and organ for organization, organize and
@@ -69,9 +78,14 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     WordNetLemmatizer with no part of speech returns running, ran, study,
  *     better and wa; with pos="v" run, run, study, be; with pos="a" better is
  *     good. "A stem is a key, not a word", and stemming for a search index
- *     against lemmatizing for real words, are the lesson's.
+ *     against lemmatizing for real words, are the lesson's. "wa" is "was"
+ *     read as a plural noun, the -s stripped (the tag says so). The lesson's
+ *     claim that a lemmatizer handles "mice" and "feet" holds only as nouns:
+ *     its own pos="v" table prints them unchanged, so the video follows the
+ *     numbers and leaves that table out.
  *   - There are no dates, quotes or real-world figures beyond the lesson's
- *     own, and nothing on screen is typed by hand.
+ *     own (Porter's 1980, quoted in data.ts), and no token on screen is typed
+ *     by hand.
  *
  * Written for Hope's voice, upbeat and clear: short spoken sentences, no
  * symbols or parentheses, numbers as words, contractions. Initialisms are

@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FOX } from "./data";
-import { CodePanel, DATA, flow, Headline, HBar, Kicker, MARK_BAD, Marked, Mono, numStyle, Spot, Tile } from "./parts";
+import { CodePanel, DATA, flow, Headline, HBar, Kicker, lerp, Marked, Mono, numStyle, REPEAT_WASH, Spot, Tile } from "./parts";
 
 const TILE_SIZE = 26;
 const LEFT_X = 120;
@@ -58,8 +58,8 @@ export const CountScene: React.FC = () => {
   const tiles = flow(FOX.tokens, LEFT_X, y(TOKENS_Y), LEFT_MAX, TILE_SIZE, 10, h(ROW_STEP));
   const tilesBottom = Math.max(...tiles.map((t) => t.y)) + h(46);
   const tileAt = (i: number) => wordsAt - 2 + Math.round(i * 0.9);
-  // FreqDist reads them left to right: one token every 1.6 frames from "tallies".
-  const step = 1.6;
+  // FreqDist reads them left to right: one token every 2.5 frames from "tallies".
+  const step = 2.5;
   const countedAt = (i: number) => talliesAt + 2 + i * step;
   const sweepEnd = countedAt(FOX.tokens.length - 1);
   const firstSeen = new Map<string, number>();
@@ -68,8 +68,12 @@ export const CountScene: React.FC = () => {
   });
   const repeats = FOX.tokens.map((t, i) => firstSeen.get(t) !== i);
 
-  // ── The table: one row per distinct word, in most_common() order ──
+  // ── The table: a row per distinct word as it is first seen, re-sorted into
+  // most_common() order when the narration asks for the most common ──
   const rowY = (k: number) => y(TABLE_Y) + k * h(ROW_H);
+  const seenOrder = [...firstSeen.keys()];
+  const sortP = ease(frame, askAt - 2, 22);
+  const rowAt = (word: string, k: number) => y(TABLE_Y) + lerp(seenOrder.indexOf(word), k, sortP) * h(ROW_H);
   const rowH = h(ROW_H);
   const tallyOf = (word: string) =>
     FOX.tokens.reduce((s, t, i) => (t === word ? s + ease(frame, countedAt(i), 5) : s), 0);
@@ -98,7 +102,7 @@ export const CountScene: React.FC = () => {
           ...(t.text === "fox" ? [{ at: foxAt - 2 + (i % 3), out: dogAt + 10 }] : []),
           ...(t.text === "dog" ? [{ at: dogAt - 2 + (i % 3), out: talliesAt - 4 }] : []),
           { at: countedAt(i) - 2, out: countedAt(i) + 8, color: HIGHLIGHT },
-          ...(repeats[i] ? [{ at: repeatsAt - 2 + (i % 5), color: MARK_BAD }] : []),
+          ...(repeats[i] ? [{ at: repeatsAt - 2 + (i % 5), color: REPEAT_WASH }] : []),
         ];
         return <Tile key={i} text={t.text} x={t.x} y={t.y} at={tileAt(i)} size={TILE_SIZE} marks={marks} />;
       })}
@@ -148,7 +152,7 @@ export const CountScene: React.FC = () => {
                 position: "absolute",
                 left: WORD_RIGHT - 160,
                 width: 160,
-                top: rowY(k),
+                top: rowAt(word, k),
                 height: rowH,
                 display: "flex",
                 alignItems: "center",
@@ -157,14 +161,14 @@ export const CountScene: React.FC = () => {
               }}
             >
               <Mono size={22} color={INK}>
-                {isThe ? <Marked at={theAt - 2} color={MARK_BAD}>{word}</Marked> : word}
+                {isThe ? <Marked at={theAt - 2}>{word}</Marked> : word}
               </Mono>
             </div>
             <div
               style={{
                 position: "absolute",
                 left: BAR_X,
-                top: rowY(k) + rowH * 0.2,
+                top: rowAt(word, k) + rowH * 0.2,
                 width: t * UNIT,
                 height: rowH * 0.6,
                 background: DATA,
@@ -175,7 +179,7 @@ export const CountScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: BAR_X + t * UNIT + 10,
-                top: rowY(k),
+                top: rowAt(word, k),
                 height: rowH,
                 display: "flex",
                 alignItems: "center",
@@ -189,7 +193,7 @@ export const CountScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      <Note at={thirteenAt - 2} x={NOTE_X} y={rowY(7) + 6}>
+      <Note at={Math.max(thirteenAt - 2, sweepEnd + 2)} x={NOTE_X} y={rowY(7) + 6}>
         <div style={{ ...body(30), color: INK, whiteSpace: "nowrap" }}>
           <span style={numStyle(30, INK)}>{FOX.distinct}</span> different words
         </div>
@@ -202,7 +206,7 @@ export const CountScene: React.FC = () => {
         </span>
       </Ink>
       <Note at={repeatsAt} x={NOTE_X} y={rowY(7) + 122}>
-        <span style={{ ...body(28, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>so the text repeats itself</span>
+        <span style={{ ...body(28, true), color: INK, whiteSpace: "nowrap" }}>so the text repeats itself</span>
       </Note>
     </AbsoluteFill>
   );

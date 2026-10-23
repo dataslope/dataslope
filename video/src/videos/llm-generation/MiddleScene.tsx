@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RECALL } from "./data";
-import { Drift, Headline, Illustrative, Kicker, Svg, X0 } from "./kit";
+import { Drift, GOOD, GOOD_INK, Headline, Illustrative, Kicker, Svg, Tag, X0 } from "./kit";
 
 /** Fig. 15: recall against position, 0 to 100% of the context. */
 const CX0 = 300;
@@ -49,6 +49,8 @@ export const MiddleScene: React.FC = () => {
   const lostAt = n.word("middle", "lost in the middle");
   const biggerAt = n.word("permission", "bigger window");
   const notAt = n.word("permission", "not a recommendation");
+  const chaptersAt = n.word("permission", "three chapters");
+  const firstLastAt = n.word("permission", "first or last");
 
   const xAt = (at: number) => CX0 + ((CX1 - CX0) * at) / 100;
   const yAt = (r: number) => y(C_BASE) - ((y(C_BASE) - y(C_TOP)) * (r - R_LO)) / (R_HI - R_LO);
@@ -131,6 +133,20 @@ export const MiddleScene: React.FC = () => {
         <Ink at={lostAt - 2} dur={18} style={{ left: xAt(worst.at) - 220, width: 440, top: yAt(0.87), textAlign: "center" }}>
           <span style={{ ...headline(46, true), color: ACCENT_INK }}>Lost in the middle</span>
         </Ink>
+        {/* The lesson's rule: what matters goes where recall is strong. */}
+        <Note at={firstLastAt - 2} x={CX0 - 40} y={y(C_BASE) + 40}>
+          <Tag color={GOOD} ink={GOOD_INK} size={22}>
+            key facts here
+          </Tag>
+        </Note>
+        <Note at={firstLastAt + 6} x={CX1 + 40} y={y(C_BASE) + 40} align="right">
+          <Tag color={GOOD} ink={GOOD_INK} size={22}>
+            or here
+          </Tag>
+        </Note>
+        <Note at={chaptersAt - 2} x={1490} y={y(640)} width={340}>
+          <div style={{ ...note(23, INK), fontWeight: 600 }}>The three chapters that matter, not the whole manual.</div>
+        </Note>
         <Note at={start + 30} x={1490} y={y(470)} width={340}>
           <Illustrative>Stylized heights, from the lesson. The U shape is the finding that replicates.</Illustrative>
         </Note>

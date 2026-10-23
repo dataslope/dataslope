@@ -63,7 +63,7 @@ export const CloseScene: React.FC = () => {
 
   // Each list line, the story it points back to, and when it is said.
   const still = [
-    { story: "w2v", at: vectorsAt, mark: tokensAt, text: "word2vec still starts from tokens", markText: "tokens" },
+    { story: "zipf", at: vectorsAt, mark: tokensAt, text: "word2vec still starts from tokens", markText: "tokens" },
     { story: "sparck", at: searchAt, mark: idfAt, text: "search still leans on IDF", markText: "IDF" },
     { story: "shannon", at: modelsAt, mark: nextAt, text: "language models still guess the next word", markText: "the next word" },
   ];
@@ -107,7 +107,7 @@ export const CloseScene: React.FC = () => {
       <Headline at={groundAt - 4} lead="The ground" turn="everything since is built on." turnAt={groundAt + 8} size={68} />
 
       <div style={{ transform: `translateY(${-hold * 6}px)` }}>
-        <FigLabel n="1" title="How the field got here" at={from - 2} x={96} y={y(290)} />
+        <FigLabel n="1" title="How the field got here: all seven stories" at={from - 2} x={96} y={y(290)} />
         <TimelineAxis y={AXIS} at={from} todayAt={from + 8} />
         {/* The counting thread, from Zipf to today. */}
         <Svg>
@@ -155,8 +155,11 @@ export const CloseScene: React.FC = () => {
         })}
 
         {/* ── What still sits underneath ── */}
+        <Ink at={vectorsAt - 4} dur={14} style={{ left: 96, top: LIST - 4, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK_SOFT) }}>still underneath, and the year it came from</span>
+        </Ink>
         {still.map((l, i) => (
-          <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: 96, top: LIST + i * ROW, whiteSpace: "nowrap" }}>
+          <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: 96, top: LIST + 40 + i * ROW, whiteSpace: "nowrap" }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
               <span style={{ ...label(24, DATA_INK), fontWeight: 700, ...TABULAR }}>{storyYear(l.story)}</span>
               <span style={{ ...headline(34), color: INK }}>

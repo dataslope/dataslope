@@ -47,13 +47,15 @@ export const TasksScene: React.FC = () => {
   // ── Cues ──
   const start = n.beat("tasks").from;
   const choosesAt = n.word("tasks", "chooses differently");
-  const rowAt = [n.word("tasks", "Search wants"), n.word("tasks", "Topics want"), n.word("tasks", "Sentiment keeps"), n.word("author", "who wrote")];
+  const rowAt = [n.word("tasks", "Search wants"), n.word("tasks", "Topics want"), n.word("tasks-sent", "Sentiment keeps"), n.word("author", "who wrote")];
   const cellAt = [
     { col: 2, at: n.word("tasks", "stems") },
     { col: 2, at: n.word("tasks", "lemmas") },
-    { col: 1, at: n.word("tasks", "keeps its stopwords") },
+    { col: 1, at: n.word("tasks-sent", "keeps its negations") },
     { col: 1, at: n.word("author", "signal itself") },
   ];
+  const wordsAt = n.word("author-why", "words like");
+  const fingerprintAt = n.word("author-why", "fingerprint");
   const changeAt = n.word("ablate", "Change one step");
   const measureAt = n.word("ablate", "measure");
   const ablationAt = n.word("ablate", "ablation");
@@ -113,6 +115,13 @@ export const TasksScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+
+        {/* The authorship row's reason, from the lesson: the rate of function words. */}
+        <Note at={wordsAt - 2} x={COLS[1].x} y={rowTop(3) + 40}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            how often <i>the</i>, <i>of</i>, <i>that</i> appear: <Reveal at={fingerprintAt - 2}>a fingerprint</Reveal>
+          </span>
+        </Note>
 
         {/* ── Fig. 5: an ablation ── */}
         <FigLabel n="5" title="One step at a time" at={changeAt - 6} x={X0} y={y(FIG5_Y)} />

@@ -283,6 +283,9 @@ tf_idf = {
     # "Used twice in this document, cat would score twice as much": the
     # lesson's own formula on a Doc 1 where cat appeared twice in six words.
     "catTwice": twice,
+    # The lesson's callout on why the log: a word in 1 of 10,000 documents
+    # would weigh 10,000 without it, and ln 10,000 = 9.21 with it.
+    "logExample": {"N": 10000, "df": 1, "ratio": 10000 / 1, "ln": math.log(10000 / 1)},
     "theCountEveryRow": [row[the] for row in counts],
     "maxOtherCount": max(c for row in counts for j, c in enumerate(row) if j != the),
     "sklearnDefault": {

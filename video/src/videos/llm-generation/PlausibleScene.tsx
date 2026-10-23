@@ -130,7 +130,7 @@ export const PlausibleScene: React.FC = () => {
       </Note>
 
       {/* Fig. 8: the shape it has seen millions of times. */}
-      <FigLabel n="8" title="The shape of a citation, which it has read millions of times" at={citationsAt - 4} x={X0} y={y(660)} />
+      <FigLabel n="8" title="The pattern of a citation, learned from millions of examples" at={citationsAt - 4} x={X0} y={y(660)} />
       {SLOTS.map((s, k) => {
         const filled = ease(frame, slotAt[k] - 2, 12);
         return (

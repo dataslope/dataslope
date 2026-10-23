@@ -91,6 +91,10 @@ export const LOSSY = m.lossy.map((r, i) => ({
 /** The three recipes on one line. `split` is what the first one filters. */
 export const PUNCT = m.punct;
 
+/** The lesson's order tip on the same line: sent_tokenize() on the text as
+ *  written, and on the text with its punctuation deleted first. */
+export const ORDER = m.order;
+
 // ── Part 3. Stopwords ────────────────────────────────────────────────────────
 
 export const STOPLIST = m.stopwords;
@@ -104,6 +108,8 @@ export const CUSTOM = {
   keep: m.custom.keep,
   add: m.custom.add,
   has: m.custom.has,
+  /** The keep-words that were on NLTK's list to begin with ("never" is not). */
+  keepRemoved: m.custom.keepRemoved,
   review: m.custom.review as Filtered,
 };
 

@@ -4,10 +4,11 @@ import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
+import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ANSWER_TOKENS, THINKING_TOKENS } from "./data";
-import { Drift, Headline, Kicker, lerp, pulse, Svg, Tag, THINK, THINK_INK, tint, X0 } from "./kit";
+import { Drift, Headline, Kicker, lerp, Marked, pulse, Svg, Tag, THINK, THINK_INK, tint, X0 } from "./kit";
 
 /** Fig. 20: tokens to pixels, so the bill's bar is the whole width. */
 const B0 = 460;
@@ -20,7 +21,9 @@ const BAR_H = 64;
 /** Fig. 21: the effort setting, low to high. */
 const LEVELS = ["low", "medium", "high"] as const;
 const DIAL = [560, 1360] as const;
-const DIAL_Y = 690;
+const DIAL_Y = 660;
+/** The closing row: every token the model touches, on the bill. */
+const CHIPS_Y = 772;
 
 /**
  * Bill, effort, next: thinking tokens are output tokens. In the lesson's
@@ -34,10 +37,12 @@ export const BillScene: React.FC = () => {
   const n = useNarration();
   const { y, h } = useLayout();
   const start = n.beat("bill").from;
+  const outputAt = n.word("bill", "output tokens");
   const seeAt = n.word("bill", "see them");
   const readAt = n.word("bill", "read thirteen");
   const payAt = n.word("bill", "pay output prices");
   const total119At = n.word("bill", "hundred and nineteen");
+  const settingAt = n.word("effort", "reasoning effort");
   const lowestAt = n.word("effort", "lowest effort");
   const passesAt = n.word("effort", "passes your own tests");
   const purposeAt = n.word("effort", "on purpose");
@@ -50,7 +55,8 @@ export const BillScene: React.FC = () => {
   const readY = y(READ_Y);
   const payY = y(PAY_Y);
   const bh = h(BAR_H);
-  const thinkW = bw(THINKING_TOKENS) * ease(frame, payAt - 2, 22);
+  // The bill's bar draws on "output tokens", so the claim never plays over an empty figure.
+  const thinkW = bw(THINKING_TOKENS) * ease(frame, outputAt - 2, 22);
   const answerW = bw(ANSWER_TOKENS);
   // The dial: from the middle to the bottom of the range, on "lowest effort".
   const knob = lerp(0.5, 0, ease(frame, lowestAt - 2, 24));
@@ -61,7 +67,7 @@ export const BillScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-tap" at={readAt - 2} level={-29} />
-      <Sfx name="el-whoosh" at={payAt - 2} level={-34} />
+      <Sfx name="el-whoosh" at={outputAt - 2} level={-34} />
       <Sfx name="el-pop" at={total119At - 2} level={-34} />
       <Sfx name="el-whoosh" at={lowestAt - 2} level={-36} />
       <Sfx name="el-chime" at={n.beat("effort").to + 6} level={-33} />
@@ -69,7 +75,7 @@ export const BillScene: React.FC = () => {
       <Drift from={start} to={durationInFrames} amount={0.012} origin="45% 60%">
       <Kicker at={start - 6}>Reasoning models</Kicker>
       <Headline lead="Thinking tokens are output tokens," turn="seen or not." at={start - 4} turnAt={seeAt - 2} size={56} />
-      <FigLabel n="20" title="That answer, counted in o200k_base tokens" at={start} x={X0} y={y(240)} />
+      <FigLabel n="20" title="That answer, counted in the course tokenizer's tokens (o200k_base)" at={start} x={X0} y={y(240)} />
 
       {/* What you read: the answer. */}
       <Ink at={readAt - 4} dur={12} style={{ left: X0, top: readY + bh / 2 - 16, whiteSpace: "nowrap" }}>
@@ -83,17 +89,19 @@ export const BillScene: React.FC = () => {
       </Note>
 
       {/* What you pay output prices for: the working too. */}
-      <Ink at={payAt - 4} dur={12} style={{ left: X0, top: payY + bh / 2 - 30, width: 320 }}>
-        <div style={{ ...label(22, INK), fontWeight: 600, lineHeight: 1.25 }}>You pay output prices for</div>
+      <Ink at={outputAt - 4} dur={12} style={{ left: X0, top: payY + bh / 2 - 30, width: 320 }}>
+        <div style={{ ...label(22, INK), fontWeight: 600, lineHeight: 1.25 }}>
+          You <Marked at={payAt - 2}>pay output prices</Marked> for
+        </div>
       </Ink>
-      <Svg opacity={ease(frame, payAt - 4, 8)}>
+      <Svg opacity={ease(frame, outputAt - 4, 8)}>
         <rect x={B0} y={payY} width={thinkW} height={bh} fill={tint(THINK, 28 + glowThink * 22)} />
         <rect x={B0} y={payY + bh - 5} width={thinkW} height={5} fill={THINK} />
         <rect x={B0 + thinkW} y={payY} width={answerW} height={bh} fill={tint(BAR, 30 + glowAnswer * 22)} />
         <rect x={B0 + thinkW} y={payY + bh - 5} width={answerW} height={5} fill={BAR} />
         <line x1={B0 + thinkW} x2={B0 + thinkW} y1={payY} y2={payY + bh} stroke={PAPER} strokeWidth={2} />
       </Svg>
-      <Note at={payAt + 10} x={B0 + 18} y={payY + bh / 2 - 15}>
+      <Note at={seeAt - 2} x={B0 + 18} y={payY + bh / 2 - 15}>
         <span style={{ ...note(23, THINK_INK), fontWeight: 650, ...TABULAR }}>{THINKING_TOKENS} thinking tokens, hidden</span>
       </Note>
       <Ink at={total119At - 2} dur={14} style={{ left: B0, top: payY + bh + 18, width: B1 - B0 + 2, textAlign: "right" }}>
@@ -102,8 +110,8 @@ export const BillScene: React.FC = () => {
       </Ink>
 
       {/* Fig. 21: the control that is left, set low on purpose. */}
-      <FigLabel n="21" title="Reasoning effort" at={lowestAt - 8} x={X0} y={y(DIAL_Y - 70)} />
-      <Svg opacity={ease(frame, lowestAt - 6, 12)}>
+      <FigLabel n="21" title="Reasoning effort, the setting reasoning models expose" at={settingAt - 4} x={X0} y={y(DIAL_Y - 70)} />
+      <Svg opacity={ease(frame, settingAt, 12)}>
         <line x1={DIAL[0]} x2={DIAL[1]} y1={y(DIAL_Y)} y2={y(DIAL_Y)} stroke={INK} strokeWidth={1.6} />
         {LEVELS.map((_, k) => {
           const x = DIAL[0] + ((DIAL[1] - DIAL[0]) * k) / (LEVELS.length - 1);
@@ -120,7 +128,7 @@ export const BillScene: React.FC = () => {
             width: 120,
             top: y(DIAL_Y) + 22,
             textAlign: "center",
-            opacity: ease(frame, lowestAt - 4, 12),
+            opacity: ease(frame, settingAt + 2, 12),
             ...note(22, INK_SOFT),
           }}
         >
@@ -130,24 +138,27 @@ export const BillScene: React.FC = () => {
       <Note at={passesAt - 2} x={DIAL[0] - 30} y={y(DIAL_Y) - 22} align="right">
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the lowest that passes your tests</span>
       </Note>
-      <Note at={purposeAt - 2} x={DIAL[1] + 40} y={y(DIAL_Y) - 18}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>on purpose</span>
+      <Note at={purposeAt - 2} x={DIAL[0]} y={y(DIAL_Y) + 54} from="up" style={{ transform: "translateX(-50%)" }}>
+        <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>set on purpose</span>
       </Note>
 
       {/* Every token read, written or thought ends up here. */}
       {[
-        { at: readsAt, text: "reads", color: BAR, ink: BLUE_INK },
+        { at: readsAt, text: "reads", color: ds("gray", 500), ink: INK_SOFT },
         { at: writesAt, text: "writes", color: BAR, ink: BLUE_INK },
         { at: thinksAt, text: "thinks", color: THINK, ink: THINK_INK },
       ].map((c, k) => (
-        <Note key={c.text} at={c.at - 2} x={B0 + k * 150} y={payY + bh + 34} from="up">
+        <Note key={c.text} at={c.at - 2} x={X0 + 260 + k * 150} y={y(CHIPS_Y)} from="up">
           <Tag color={c.color} ink={c.ink} size={22}>
             {c.text}
           </Tag>
         </Note>
       ))}
-      <Note at={billAt - 2} x={B0 + 450} y={payY + bh + 38}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>all billed</span>
+      <Ink at={readsAt - 6} dur={12} style={{ left: X0, top: y(CHIPS_Y) + 6, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(22, INK), fontWeight: 600 }}>Every token it</span>
+      </Ink>
+      <Note at={billAt - 2} x={X0 + 260 + 450} y={y(CHIPS_Y) + 4}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>all on the bill</span>
       </Note>
       <NextLine at={costAt - 4} x={X0} y={y(848)} width={1680}>
         what a token costs

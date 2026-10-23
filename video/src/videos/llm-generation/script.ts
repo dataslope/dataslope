@@ -63,17 +63,26 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     attached to a fact"; its risk score block, run as written: Capital of
  *     France 0 of 5, Population of a small town 2, Page number of a quotation
  *     3, Name of the study that proved X 4 ("Four"); hedges that are
- *     "stylistic, not diagnostic"; and the four fixes of "What actually
- *     reduces it" in its order, NOT_FOUND being its own example.
+ *     "stylistic, not diagnostic" and "do not land preferentially on the
+ *     wrong answers" ("they land on right and wrong answers alike", the
+ *     October fix pass's wording: the first cut said "don't land on the
+ *     wrong answers", stronger than the lesson); and the four fixes of
+ *     "What actually reduces it" in its order, each with the lesson's own
+ *     reason under it on screen, NOT_FOUND being its own example.
  *   - context-windows: the budget block, run as written: 1,500 + 180,000 +
  *     12,000 + 200 = 193,700 of a 200,000 window, leaving 6,300 ("six
  *     thousand three hundred"); the hard edge and the silent trimming are the
  *     lesson's; "a 500,000-token document in a ten-turn conversation is five
  *     million billed input tokens unless caching intervenes" ("unless a cache
- *     steps in"); the "lost in the middle" block's recall
+ *     steps in"), placed in a million-token window ("frontier models advertise
+ *     windows around one million tokens", as of October 2026), the cache's
+ *     "10% of input or less" from pricing-structure.mdx; the "lost in the
+ *     middle" block's recall
  *     by position (0.97 at the start, 0.68 halfway, 0.96 at the end),
  *     stylized as the lesson says and labelled so; "a bigger window is
- *     permission, not a recommendation"; 8,000 to 1,000,000 tokens is 125
+ *     permission, not a recommendation", with its "three relevant chapters"
+ *     and "put the important material at the beginning or the end"
+ *     ("the three chapters that matter", "first or last"); 8,000 to 1,000,000 tokens is 125
  *     times the length and 15,625 times the naive attention work ("over
  *     fifteen thousand", where the lesson rounds to "roughly 15,000").
  *   - reasoning-models: the thinking transcript is its first block's, and its
@@ -87,8 +96,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     so: the first 500 tokens buy 0.24 of the 0.37 gain, 65% ("nearly two
  *     thirds"), and the last doubling buys nothing ("past eight thousand").
  *     Where it helps, the "overthinking" failure ("talk it out of a right
- *     first answer"), that thinking tokens are billed at the output rate
- *     whether shown or not, and "the lowest setting that passes your
+ *     answer"), that thinking tokens are billed at the output rate whether
+ *     shown or not, the effort level as the control providers expose ("a
+ *     reasoning effort setting"), and "the lowest setting that passes your
  *     evaluation" are the lesson's.
  *
  * Written for Drew's voice, casual and curious: short spoken sentences, no
@@ -132,7 +142,7 @@ export const script: NarrationScript = {
       id: "picker",
       text: "And the picking isn't done by the model. It's a few lines of code with a couple of settings... and it's why one prompt can give different answers.",
       // Holds the three draws, the first of them the 21.6% token, before the cut.
-      pauseAfter: 1.4,
+      pauseAfter: 2.0,
     },
     {
       id: "divide",

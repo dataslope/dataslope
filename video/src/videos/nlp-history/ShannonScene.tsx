@@ -170,7 +170,7 @@ export const ShannonScene: React.FC = () => {
   // typed out once the sample is introduced.
   const steps = [openAt + 6, findAt, copyAt, lerp(copyAt, repeatAt, 0.5), repeatAt, repeatAt + 8, repeatAt + 16, repeatAt + 24];
   const wordAt = (i: number) => {
-    if (i === 0) return beforeAt - 4;
+    if (i === 0) return guessAt - 2;
     if (i === 1) return howOftenAt;
     if (i < 10) return steps[i - 2];
     return cameAt + 2 + (i - 10) * 2;
@@ -179,6 +179,14 @@ export const ShannonScene: React.FC = () => {
   /** JetBrains Mono's advance at the sample's 34px. */
   const CHAR = 34 * 0.6;
   const read = SHANNON_SAMPLE.slice(0, 10).join(" ");
+  // Word centres in the monospace line (the first ten words fit on one).
+  const starts = SHANNON_SAMPLE.slice(0, 10).map((_, i) => SHANNON_SAMPLE.slice(0, i).join(" ").length + (i ? 1 : 0));
+  const centre = (i: number) => (starts[i] + SHANNON_SAMPLE[i].length / 2) * CHAR;
+  const hookAt = (k: number) => (k === 1 ? followsAt - 2 : steps[k - 2]);
+  const hooks = Array.from({ length: 9 }, (_, j) => {
+    const k = j + 1;
+    return { x0: centre(k - 1), x1: centre(k), at: hookAt(k), out: k < 9 ? hookAt(k + 1) - 2 : cameAt };
+  });
   const rest = SHANNON_SAMPLE.slice(10, SHOWN);
 
   // ── Part B: the course's next-word counts ──
@@ -227,7 +235,7 @@ export const ShannonScene: React.FC = () => {
       <Spot id="book" at={handAt - 4} out={sampleOut} left={110} top={y(430)} width={440} height={347} />
 
       {/* ── Fig. 4, Shannon's sample, word by word ── */}
-      <FigLabel n="4" title="Shannon's sample, one word at a time, 1948" at={beforeAt - 6} x={SX} y={y(290)} out={sampleOut} />
+      <FigLabel n="4" title="Shannon's sample, one word at a time, 1948" at={tuckedAt} x={SX} y={y(290)} out={sampleOut} />
       <div
         style={{
           position: "absolute",
@@ -257,20 +265,24 @@ export const ShannonScene: React.FC = () => {
           <span style={{ opacity: ease(frame, wordAt(SHOWN), 6), color: INK_SOFT }}>…</span>
         </span>
       </div>
-      {/* HEAD follows THE: a hook from the one word to the next, gone once the rest arrives. */}
-      <Wire
-        points={[
-          [SX + 1.5 * CHAR, STOP + 50],
-          [SX + 1.5 * CHAR, STOP + 70],
-          [SX + 6 * CHAR, STOP + 70],
-          [SX + 6 * CHAR, STOP + 48],
-        ]}
-        at={followsAt - 2}
-        dur={16}
-        out={cameAt}
-        color={ACCENT}
-        width={2.4}
-      />
+      {/* Each step of the method: a hook from the last word copied to the one
+          that followed it, replaced at the next step, gone once the rest arrives. */}
+      {hooks.map((h, k) => (
+        <Wire
+          key={k}
+          points={[
+            [SX + h.x0, STOP + 50],
+            [SX + h.x0, STOP + 70],
+            [SX + h.x1, STOP + 70],
+            [SX + h.x1, STOP + 48],
+          ]}
+          at={h.at}
+          dur={12}
+          out={h.out}
+          color={ACCENT}
+          width={2.4}
+        />
+      ))}
       <Ink at={englishAt - 2} out={sampleOut} style={{ left: SX, top: y(720), whiteSpace: "nowrap" }}>
         <div style={{ ...headline(42, true), color: INK }}>
           Reads like English, <span style={{ color: ACCENT_INK }}>says nothing.</span>

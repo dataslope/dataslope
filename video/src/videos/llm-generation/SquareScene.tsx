@@ -67,6 +67,8 @@ export const SquareScene: React.FC = () => {
       <Headline lead="Every token attends to every other," turn="so the work is squared." at={everyAt - 4} turnAt={squareAt - 2} out={reasonAt - 8} size={52} />
       <Headline lead="Reasoning models spend tokens" turn="on purpose." at={reasonAt - 4} turnAt={purposeAt - 2} />
 
+      {/* The figures step back for the turn into reasoning models. */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, reasonAt - 4, 14) * 0.55 }}>
       {/* Fig. 16: the pairs attention compares, at a length and at twice it. */}
       <FigLabel n="16" title="Every token compared with every other" at={buildAt - 6} x={X0} y={y(250)} />
       {GRIDS.map((g, k) => {
@@ -96,14 +98,14 @@ export const SquareScene: React.FC = () => {
                     y={top + r * CELL + 2}
                     width={CELL - 4}
                     height={CELL - 4}
-                    fill={tint(k === 0 ? BAR : ACCENT, 44)}
+                    fill={tint(ACCENT, k === 0 ? 34 : 44)}
                     opacity={p}
                   />
                 );
               })}
             </Svg>
             <Note at={fillAt + (k === 0 ? 30 : 24)} x={g.x} y={top + side + 18}>
-              <span style={{ ...note(22, k === 0 ? BLUE_INK : ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+              <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
                 {g.n} tokens, {g.n * g.n} pairs
               </span>
             </Note>
@@ -112,13 +114,13 @@ export const SquareScene: React.FC = () => {
       })}
 
       {/* Fig. 17: the work, against a reference that grows only with the text. */}
-      <FigLabel n="17" title="Work, relative to an 8,000-token context" at={eightAt - 6} x={LX0 - 60} y={y(250)} />
+      <FigLabel n="17" title="Work, relative to an 8,000-token context (log scales)" at={eightAt - 6} x={LX0 - 60} y={y(250)} />
       <Svg opacity={ease(frame, eightAt - 2, 12)}>
         {Y_TICKS.map((w) => (
           <line key={w} x1={LX0} x2={LX1} y1={ly(w)} y2={ly(w)} stroke={HAIRLINE} strokeWidth={0.8} strokeDasharray="2 5" />
         ))}
         <line x1={LX0} x2={LX1} y1={ly(1)} y2={ly(1)} stroke={INK} strokeWidth={1.6} />
-        <path d={curve("linear")} fill="none" stroke={BAR} strokeWidth={3} strokeDasharray="7 5" pathLength={1} style={{ clipPath: `inset(0 ${(1 - linP) * 100}% 0 0)` }} />
+        <path d={curve("linear")} fill="none" stroke={BAR} strokeWidth={3} strokeDasharray="0.012 0.009" pathLength={1} style={{ clipPath: `inset(0 ${(1 - linP) * 100}% 0 0)` }} />
         <path d={curve("quadratic")} fill="none" stroke={ACCENT} strokeWidth={3.4} pathLength={1} strokeDasharray={`${quadP} 1`} />
       </Svg>
       {Y_TICKS.map((w) => (
@@ -135,7 +137,7 @@ export const SquareScene: React.FC = () => {
         </div>
       ))}
       <Ink at={eightAt + 4} dur={12} style={{ left: LX0, top: ly(1) + 44, width: LX1 - LX0, textAlign: "center" }}>
-        <span style={label(20)}>Context length, in tokens</span>
+        <span style={label(20)}>Context length, in tokens (log scale)</span>
       </Ink>
       <Note at={textAt - 2} x={LX1 + 14} y={ly(ATTENTION.lengthRatio) - 16}>
         <span style={{ ...note(24, BLUE_INK), fontWeight: 700, ...TABULAR, ...halo }}>{count(ATTENTION.lengthRatio)}×</span>
@@ -145,6 +147,11 @@ export const SquareScene: React.FC = () => {
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, ...TABULAR, ...halo }}>{count(ATTENTION.workRatio)}×</span>
         <div style={note(20, INK_SOFT)}>the work</div>
       </Note>
+      {/* Why the square is a straight line here. */}
+      <Note at={fifteenAt + 10} x={LX0 + 14} y={ly(9000)}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>On log axes, a square is a line twice as steep.</span>
+      </Note>
+      </div>
       </Drift>
     </AbsoluteFill>
   );

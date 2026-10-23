@@ -41,7 +41,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     summing to 0.58), which the lesson gives as an illustration ("Something
  *     like:"); the figure says so. Their o200k ids (cat 9059, dog 6446, man
  *     873, first 1577) are measured. o200k_base has 199,998 merged tokens and
- *     2 special ones: "two hundred thousand". "No plan", "no database", and
+ *     2 special ones: "two hundred thousand". The hook glosses tokens as
+ *     "chunks of text, often whole words", ahead of their definition. "No plan", "no database", and
  *     "the same mechanism" for a fact and an invented citation are the
  *     lesson's.
  *   - tokens: "strawberry" alone is st, raw, berry, ids 302, 1618 and 19772
@@ -52,12 +53,18 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     quarters of a word a token, and 1,000 tokens as 750 words, are the
  *     lesson's rule of thumb. The lesson's own first paragraph (190
  *     characters, 31 words) is 36 o200k tokens: 5.3 characters a token,
- *     which is why the narration says newer tokenizers "often do better".
+ *     which is why the narration says newer tokenizers "often pack more text
+ *     into each token". Fig. 4's six vocabulary rows are ids the video
+ *     measures elsewhere: Fig. 1's four candidates with their leading
+ *     spaces, and " Token" (17951) and "ization" (2860), the two pieces of
+ *     "Tokenization" in that opening paragraph.
  *   - building-a-tokenizer: the training text ("low" five times, "lower"
  *     twice, "newest" three times, "widest" twice), the end-of-word marker
  *     </w>, the first count (l o and o w both 7), and all ten merges in the
  *     lesson's order (lo, low, low</w>, es, est, est</w>, ne, new,
- *     newest</w>, lowe), ending low -> low</w>, newest -> newest</w>, widest
+ *     newest</w>, lowe), every one named as it happens (the last four in
+ *     "rest"; l o and o w tie at 7 and Python's Counter keeps the first
+ *     counted, as the figure notes; the first count finds 14 distinct pairs), ending low -> low</w>, newest -> newest</w>, widest
  *     -> w i d est</w> ("still four pieces"; "wid was not frequent enough to
  *     earn a merge"). measure.py re-runs the lesson's pair_counts and
  *     merge_pair a step at a time and checks each merge and the final splits
@@ -75,7 +82,12 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     (4.48, "four and a half"), 1,240 in 520 (2.38, "under two and a
  *     half"); the page's block only estimates them at 4 and 3. The three
  *     records are token-counts-in-practice's JSON-against-CSV block, counted:
- *     89 tokens as JSON, 33 as CSV (the page estimates 93 and 22). The same
+ *     89 tokens as JSON, 33 as CSV (the page estimates 93 and 22), both drawn
+ *     token by token with the 12 key-name tokens (customer, _id, region,
+ *     amount on each of 3 records) lit against the CSV header's 4. The
+ *     lesson's prose says JSON "roughly doubles" the cost; its own block and
+ *     the measured counts disagree (4.3 and 2.7 times), so the video follows
+ *     the numbers and states no ratio. The same
  *     JSON on cl100k_base (gpt-4), p50k_base (text-davinci-003) and r50k_base
  *     (davinci, "GPT-3's tokenizer"): 89, 102 and 120, from tiktoken's own
  *     model table. "About thirty percent more tokens" is Anthropic's, as the
@@ -83,8 +95,10 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     lesson's concept check: 1.3 times 0.8 is 1.04, "about four percent
  *     more". The conversation is the lesson's block (a 2,000-token system
  *     prompt, 100 a message, 400 a reply): ten turns leave it 7,000 tokens
- *     long and bill 43,500 input tokens, 6.2 times its length ("over six
- *     times"; the lesson's prose says "roughly five", see the report).
+ *     long and bill 43,500 input tokens, 6.2 times its length. The lesson's
+ *     prose says "roughly five"; its own block prints 6.2, and the video
+ *     follows the block ("over six times"). Each bar is drawn in its three
+ *     parts: the system prompt, the earlier turns sent again, the new message.
  *   - The bridge: berry's id is 19772; " cherry" is one id, 60225.
  *
  * Written for Drew's voice, casual and curious: short spoken sentences, no
@@ -103,7 +117,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Here's the whole job of a language model. It takes a sequence of tokens, and gives back a probability for every token that could come next.",
+      text: "Here's the whole job of a language model. It takes a sequence of tokens, chunks of text, often whole words, and gives back a probability for every token that could come next.",
       pauseAfter: 0.7,
     },
     {
@@ -116,7 +130,7 @@ export const script: NarrationScript = {
       id: "loop",
       scene: true,
       text: "To write, it picks a token, adds it to the end, and runs again on the longer input.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.8,
     },
     { id: "again", text: "The, cat, sat, on, the, mat, and then a token that means done.", pauseAfter: 0.8 },
     {
@@ -164,7 +178,7 @@ export const script: NarrationScript = {
       text: "For English, the rule of thumb is about four characters a token, or three quarters of a word. So a thousand tokens is roughly seven hundred and fifty words.",
       pauseAfter: 0.7,
     },
-    { id: "newer", text: "Newer tokenizers often do better.", pauseAfter: 0.6 },
+    { id: "newer", text: "Newer tokenizers often pack more text into each token.", pauseAfter: 0.6 },
     {
       id: "opening",
       text: "This one turns the lesson's opening, a hundred and ninety characters, into thirty-six tokens.",
@@ -199,6 +213,12 @@ export const script: NarrationScript = {
     {
       id: "suffix",
       text: "Then E and S, then T, then the word end. Nobody told it about suffixes. Est ends both newest and widest, so it earned its merges early.",
+      pauseAfter: 0.9,
+    },
+    // The last four merges, one word each, so none lands unspoken.
+    {
+      id: "rest",
+      text: "Next come N and E, then W, then newest as one piece, and last, low picks up an E.",
       pauseAfter: 0.9,
     },
     {

@@ -34,9 +34,9 @@ export const BinaryScene: React.FC = () => {
   // ── Cues ──
   const start = n.beat("binary").from;
   const whetherAt = n.word("binary", "whether");
-  const spamAt = n.word("binary", "This spam");
-  const freeAt = n.word("binary", "free");
-  const threeAt = n.word("binary", "three times");
+  const spamAt = n.word("binary-spam", "This spam");
+  const freeAt = n.word("binary-spam", "free");
+  const threeAt = n.word("binary-spam", "three times");
   const countAt = n.word("vectors", "count vector");
   const keepsAt = n.word("vectors", "keeps the three");
   const binAt = n.word("vectors", "binary vector");
@@ -76,6 +76,9 @@ export const BinaryScene: React.FC = () => {
         })}
       </ChipRow>
 
+      <Note at={whetherAt + 4} x={X0} y={y(HEAD_ROW_Y) + 4}>
+        <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the lesson’s vocabulary</span>
+      </Note>
       {SPAM.vocab.map((w, j) => (
         <Ink
           key={w}

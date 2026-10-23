@@ -162,6 +162,17 @@
       "it"
     ]
   },
+  "order": {
+    "text": "Hello, World! It's a GREAT day... isn't it?",
+    "stripped": "Hello World Its a GREAT day isnt it",
+    "sentences": [
+      "Hello, World!",
+      "It's a GREAT day... isn't it?"
+    ],
+    "strippedSentences": [
+      "Hello World Its a GREAT day isnt it"
+    ]
+  },
   "stopwords": {
     "count": 198,
     "first25": [

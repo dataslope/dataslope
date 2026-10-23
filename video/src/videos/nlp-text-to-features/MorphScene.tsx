@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HAIRLINE, headline, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, headline, note } from "../../editorial/style";
 import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CAT, COUNTS, DOC0_TOP, IDF, LENGTHS, N, num, spell, TFIDF, THE, VOCAB } from "./data";
+import { CAT, COUNTS, DOC0_TOP, IDF, LENGTHS, N, num, spell, TFIDF, THE, TWICE, VOCAB } from "./data";
 import { FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, pulse, X0 } from "./parts";
 import { DocTable, Frac, idfRow, IdfRow, tableGeo } from "./tfidf";
 
@@ -22,18 +22,22 @@ const TOP_SCORE = TFIDF[0][VOCAB.indexOf(DOC0_TOP[0])];
 /** A worked product for one cell of Doc 1: tf times idf. Captions share one
  *  row and values another, so a stacked fraction does not lift its caption
  *  above the rest. */
-const Worked: React.FC<{ j: number; x: number; top: number; at: number; resultAt: number; color: string }> = ({
-  j,
-  x,
-  top,
-  at,
-  resultAt,
-  color,
-}) => {
+const Worked: React.FC<{
+  j: number;
+  x: number;
+  top: number;
+  at: number;
+  resultAt: number;
+  color: string;
+  out?: number;
+  /** A what-if: the count it would have, its score, and the caption. */
+  ghost?: { count: number; score: number; caption: string };
+}> = ({ j, x, top, at, resultAt, color, out, ghost }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const r = ease(frame, resultAt, 12);
-  if (p <= 0) return null;
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
   const cap = (text: string, col: number, opacity = 1) => (
     <span style={{ gridRow: 1, gridColumn: col, justifySelf: "center", ...note(20, INK_SOFT), opacity, whiteSpace: "nowrap" }}>{text}</span>
   );
@@ -53,21 +57,22 @@ const Worked: React.FC<{ j: number; x: number; top: number; at: number; resultAt
         alignItems: "center",
         columnGap: 18,
         rowGap: 4,
-        opacity: p,
+        opacity: p * (1 - o),
         transform: `translateY(${(1 - p) * 10}px)`,
+        ...(ghost ? { border: `2px dashed ${BLUE_INK}`, padding: "6px 16px 8px", margin: "-8px -18px" } : {}),
       }}
     >
-      {cap("Doc 1", 1)}
+      {cap(ghost ? ghost.caption : "Doc 1", 1)}
       {val(1, <i>{VOCAB[j]}</i>)}
       <span style={{ gridRow: "1 / span 2", gridColumn: 2, width: 1.5, alignSelf: "stretch", background: HAIRLINE, margin: "0 6px" }} />
       {cap("tf", 3)}
-      {val(3, <Frac top={COUNTS[0][j]} bottom={LENGTHS[0]} />)}
+      {val(3, <Frac top={ghost ? ghost.count : COUNTS[0][j]} bottom={LENGTHS[0]} />)}
       {val(4, "×", INK_SOFT)}
       {cap("idf", 5)}
       {val(5, num(IDF[j]))}
       {val(6, "=", INK_SOFT, r)}
       {cap("tf-idf", 7, r)}
-      {val(7, num(TFIDF[0][j]), color, r)}
+      {val(7, num(ghost ? ghost.score : TFIDF[0][j]), color, r)}
     </div>
   );
 };
@@ -110,6 +115,8 @@ export const MorphScene: React.FC = () => {
   const ruleAt = n.beat("rule").from;
   const elsewhereAt = n.word("rule", "rare elsewhere");
   const noListAt = n.word("rule", "no stopword list");
+  const twiceFrom = n.beat("rule-twice").from;
+  const twiceAt = n.word("rule-twice", "twice as much");
 
   /** When each cell turns: Doc 1's cat and the as they are worked, then the
    *  rest in a wave from left to right. */
@@ -144,7 +151,7 @@ export const MorphScene: React.FC = () => {
       <Headline at={ruleAt - 2} second={elsewhereAt - 4} italic="rare elsewhere.">
         Frequent here,
       </Headline>
-      <FigLabel n="12" title="Fig. 10’s table, as TF-IDF" at={start - 2} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="12" title="The same table, as TF-IDF" at={start - 2} x={X0} y={y(FIG_Y)} />
 
       <DocTable
         g={G}
@@ -155,21 +162,32 @@ export const MorphScene: React.FC = () => {
         frameBottom={idfRow(G).top + idfRow(G).h}
         block={block}
         glow={glow}
+        wait={(i, j) => (i === 0 && j === CAT ? 0 : ease(frame, catScoreAt - 4, 10) * (1 - morph(i, j)))}
         sub={{ at: shareAt, text: (i) => `${spell(LENGTHS[i])} words` }}
       />
       <IdfRow g={G} at={multiplyAt - 4} lit={[rarityAt - 2, elsewhereAt - 2]} />
 
       <Worked j={CAT} x={X0} top={y(EQ_Y)} at={catAt - 4} resultAt={catScoreAt - 2} color={INK} />
-      <Worked j={THE} x={940} top={y(EQ_Y)} at={theAt - 4} resultAt={timesZeroAt} color={ACCENT_INK} />
+      <Worked j={THE} x={940} top={y(EQ_Y)} at={theAt - 4} resultAt={timesZeroAt} color={ACCENT_INK} out={twiceFrom - 10} />
+      {/* "Frequent here": what cat would score if Doc 1 used it twice. */}
+      <Worked
+        j={CAT}
+        x={960}
+        top={y(EQ_Y)}
+        at={twiceFrom - 2}
+        resultAt={twiceAt - 4}
+        color={BLUE_INK}
+        ghost={{ count: TWICE.count, score: TWICE.tfidf, caption: "if twice" }}
+      />
 
-      <Note at={tieAt - 2} x={X0} y={y(FOOT_Y)}>
+      <Note at={tieAt - 2} out={ruleAt - 6} x={X0} y={y(FOOT_Y)}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
           Doc 1’s top four tie at {num(TOP_SCORE)}, <Mark at={onSaysAt - 2}><i>on</i> included</Mark>: each is in one document of{" "}
           {spell(N)}.
         </span>
       </Note>
-      <Note at={noListAt - 2} x={1400} y={y(EQ_Y) + 30}>
-        <span style={{ ...note(24, INK), display: "block", width: 400, lineHeight: 1.35 }}>
+      <Note at={noListAt - 2} x={X0} y={y(FOOT_Y)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           No stopword list: rarity alone silenced <i>the</i>.
         </span>
       </Note>

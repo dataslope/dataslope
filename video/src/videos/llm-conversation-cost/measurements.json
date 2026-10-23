@@ -1,0 +1,557 @@
+{
+ "model": "sonnet",
+ "name": "Claude Sonnet 5.5",
+ "price": {
+  "in": 2.0,
+  "out": 10.0,
+  "cached": 0.1
+ },
+ "system": 2000,
+ "user": 150,
+ "reply": 400,
+ "turns": [
+  {
+   "turn": 1,
+   "sent": 2150,
+   "system": 2000,
+   "chatBefore": 0,
+   "message": 150,
+   "resent": 0,
+   "newSlice": 2150,
+   "inputCost": 0.0043,
+   "inputCostCached": 0.0043
+  },
+  {
+   "turn": 2,
+   "sent": 2700,
+   "system": 2000,
+   "chatBefore": 550,
+   "message": 150,
+   "resent": 2150,
+   "newSlice": 550,
+   "inputCost": 0.0054,
+   "inputCostCached": 0.001315
+  },
+  {
+   "turn": 3,
+   "sent": 3250,
+   "system": 2000,
+   "chatBefore": 1100,
+   "message": 150,
+   "resent": 2700,
+   "newSlice": 550,
+   "inputCost": 0.0065,
+   "inputCostCached": 0.00137
+  },
+  {
+   "turn": 4,
+   "sent": 3800,
+   "system": 2000,
+   "chatBefore": 1650,
+   "message": 150,
+   "resent": 3250,
+   "newSlice": 550,
+   "inputCost": 0.0076,
+   "inputCostCached": 0.001425
+  },
+  {
+   "turn": 5,
+   "sent": 4350,
+   "system": 2000,
+   "chatBefore": 2200,
+   "message": 150,
+   "resent": 3800,
+   "newSlice": 550,
+   "inputCost": 0.0087,
+   "inputCostCached": 0.00148
+  },
+  {
+   "turn": 6,
+   "sent": 4900,
+   "system": 2000,
+   "chatBefore": 2750,
+   "message": 150,
+   "resent": 4350,
+   "newSlice": 550,
+   "inputCost": 0.0098,
+   "inputCostCached": 0.001535
+  },
+  {
+   "turn": 7,
+   "sent": 5450,
+   "system": 2000,
+   "chatBefore": 3300,
+   "message": 150,
+   "resent": 4900,
+   "newSlice": 550,
+   "inputCost": 0.0109,
+   "inputCostCached": 0.00159
+  },
+  {
+   "turn": 8,
+   "sent": 6000,
+   "system": 2000,
+   "chatBefore": 3850,
+   "message": 150,
+   "resent": 5450,
+   "newSlice": 550,
+   "inputCost": 0.012,
+   "inputCostCached": 0.001645
+  },
+  {
+   "turn": 9,
+   "sent": 6550,
+   "system": 2000,
+   "chatBefore": 4400,
+   "message": 150,
+   "resent": 6000,
+   "newSlice": 550,
+   "inputCost": 0.0131,
+   "inputCostCached": 0.0017
+  },
+  {
+   "turn": 10,
+   "sent": 7100,
+   "system": 2000,
+   "chatBefore": 4950,
+   "message": 150,
+   "resent": 6550,
+   "newSlice": 550,
+   "inputCost": 0.0142,
+   "inputCostCached": 0.001755
+  },
+  {
+   "turn": 11,
+   "sent": 7650,
+   "system": 2000,
+   "chatBefore": 5500,
+   "message": 150,
+   "resent": 7100,
+   "newSlice": 550,
+   "inputCost": 0.0153,
+   "inputCostCached": 0.00181
+  },
+  {
+   "turn": 12,
+   "sent": 8200,
+   "system": 2000,
+   "chatBefore": 6050,
+   "message": 150,
+   "resent": 7650,
+   "newSlice": 550,
+   "inputCost": 0.0164,
+   "inputCostCached": 0.001865
+  },
+  {
+   "turn": 13,
+   "sent": 8750,
+   "system": 2000,
+   "chatBefore": 6600,
+   "message": 150,
+   "resent": 8200,
+   "newSlice": 550,
+   "inputCost": 0.0175,
+   "inputCostCached": 0.00192
+  },
+  {
+   "turn": 14,
+   "sent": 9300,
+   "system": 2000,
+   "chatBefore": 7150,
+   "message": 150,
+   "resent": 8750,
+   "newSlice": 550,
+   "inputCost": 0.0186,
+   "inputCostCached": 0.001975
+  },
+  {
+   "turn": 15,
+   "sent": 9850,
+   "system": 2000,
+   "chatBefore": 7700,
+   "message": 150,
+   "resent": 9300,
+   "newSlice": 550,
+   "inputCost": 0.0197,
+   "inputCostCached": 0.00203
+  },
+  {
+   "turn": 16,
+   "sent": 10400,
+   "system": 2000,
+   "chatBefore": 8250,
+   "message": 150,
+   "resent": 9850,
+   "newSlice": 550,
+   "inputCost": 0.0208,
+   "inputCostCached": 0.002085
+  },
+  {
+   "turn": 17,
+   "sent": 10950,
+   "system": 2000,
+   "chatBefore": 8800,
+   "message": 150,
+   "resent": 10400,
+   "newSlice": 550,
+   "inputCost": 0.0219,
+   "inputCostCached": 0.00214
+  },
+  {
+   "turn": 18,
+   "sent": 11500,
+   "system": 2000,
+   "chatBefore": 9350,
+   "message": 150,
+   "resent": 10950,
+   "newSlice": 550,
+   "inputCost": 0.023,
+   "inputCostCached": 0.002195
+  },
+  {
+   "turn": 19,
+   "sent": 12050,
+   "system": 2000,
+   "chatBefore": 9900,
+   "message": 150,
+   "resent": 11500,
+   "newSlice": 550,
+   "inputCost": 0.0241,
+   "inputCostCached": 0.00225
+  },
+  {
+   "turn": 20,
+   "sent": 12600,
+   "system": 2000,
+   "chatBefore": 10450,
+   "message": 150,
+   "resent": 12050,
+   "newSlice": 550,
+   "inputCost": 0.0252,
+   "inputCostCached": 0.002305
+  },
+  {
+   "turn": 21,
+   "sent": 13150,
+   "system": 2000,
+   "chatBefore": 11000,
+   "message": 150,
+   "resent": 12600,
+   "newSlice": 550,
+   "inputCost": 0.0263,
+   "inputCostCached": 0.00236
+  },
+  {
+   "turn": 22,
+   "sent": 13700,
+   "system": 2000,
+   "chatBefore": 11550,
+   "message": 150,
+   "resent": 13150,
+   "newSlice": 550,
+   "inputCost": 0.0274,
+   "inputCostCached": 0.002415
+  },
+  {
+   "turn": 23,
+   "sent": 14250,
+   "system": 2000,
+   "chatBefore": 12100,
+   "message": 150,
+   "resent": 13700,
+   "newSlice": 550,
+   "inputCost": 0.0285,
+   "inputCostCached": 0.00247
+  },
+  {
+   "turn": 24,
+   "sent": 14800,
+   "system": 2000,
+   "chatBefore": 12650,
+   "message": 150,
+   "resent": 14250,
+   "newSlice": 550,
+   "inputCost": 0.0296,
+   "inputCostCached": 0.002525
+  },
+  {
+   "turn": 25,
+   "sent": 15350,
+   "system": 2000,
+   "chatBefore": 13200,
+   "message": 150,
+   "resent": 14800,
+   "newSlice": 550,
+   "inputCost": 0.0307,
+   "inputCostCached": 0.00258
+  },
+  {
+   "turn": 26,
+   "sent": 15900,
+   "system": 2000,
+   "chatBefore": 13750,
+   "message": 150,
+   "resent": 15350,
+   "newSlice": 550,
+   "inputCost": 0.0318,
+   "inputCostCached": 0.002635
+  },
+  {
+   "turn": 27,
+   "sent": 16450,
+   "system": 2000,
+   "chatBefore": 14300,
+   "message": 150,
+   "resent": 15900,
+   "newSlice": 550,
+   "inputCost": 0.0329,
+   "inputCostCached": 0.00269
+  },
+  {
+   "turn": 28,
+   "sent": 17000,
+   "system": 2000,
+   "chatBefore": 14850,
+   "message": 150,
+   "resent": 16450,
+   "newSlice": 550,
+   "inputCost": 0.034,
+   "inputCostCached": 0.002745
+  },
+  {
+   "turn": 29,
+   "sent": 17550,
+   "system": 2000,
+   "chatBefore": 15400,
+   "message": 150,
+   "resent": 17000,
+   "newSlice": 550,
+   "inputCost": 0.0351,
+   "inputCostCached": 0.0028
+  },
+  {
+   "turn": 30,
+   "sent": 18100,
+   "system": 2000,
+   "chatBefore": 15950,
+   "message": 150,
+   "resent": 17550,
+   "newSlice": 550,
+   "inputCost": 0.0362,
+   "inputCostCached": 0.002855
+  },
+  {
+   "turn": 31,
+   "sent": 18650,
+   "system": 2000,
+   "chatBefore": 16500,
+   "message": 150,
+   "resent": 18100,
+   "newSlice": 550,
+   "inputCost": 0.0373,
+   "inputCostCached": 0.00291
+  },
+  {
+   "turn": 32,
+   "sent": 19200,
+   "system": 2000,
+   "chatBefore": 17050,
+   "message": 150,
+   "resent": 18650,
+   "newSlice": 550,
+   "inputCost": 0.0384,
+   "inputCostCached": 0.002965
+  },
+  {
+   "turn": 33,
+   "sent": 19750,
+   "system": 2000,
+   "chatBefore": 17600,
+   "message": 150,
+   "resent": 19200,
+   "newSlice": 550,
+   "inputCost": 0.0395,
+   "inputCostCached": 0.00302
+  },
+  {
+   "turn": 34,
+   "sent": 20300,
+   "system": 2000,
+   "chatBefore": 18150,
+   "message": 150,
+   "resent": 19750,
+   "newSlice": 550,
+   "inputCost": 0.0406,
+   "inputCostCached": 0.003075
+  },
+  {
+   "turn": 35,
+   "sent": 20850,
+   "system": 2000,
+   "chatBefore": 18700,
+   "message": 150,
+   "resent": 20300,
+   "newSlice": 550,
+   "inputCost": 0.0417,
+   "inputCostCached": 0.00313
+  },
+  {
+   "turn": 36,
+   "sent": 21400,
+   "system": 2000,
+   "chatBefore": 19250,
+   "message": 150,
+   "resent": 20850,
+   "newSlice": 550,
+   "inputCost": 0.0428,
+   "inputCostCached": 0.003185
+  },
+  {
+   "turn": 37,
+   "sent": 21950,
+   "system": 2000,
+   "chatBefore": 19800,
+   "message": 150,
+   "resent": 21400,
+   "newSlice": 550,
+   "inputCost": 0.0439,
+   "inputCostCached": 0.00324
+  },
+  {
+   "turn": 38,
+   "sent": 22500,
+   "system": 2000,
+   "chatBefore": 20350,
+   "message": 150,
+   "resent": 21950,
+   "newSlice": 550,
+   "inputCost": 0.045,
+   "inputCostCached": 0.003295
+  },
+  {
+   "turn": 39,
+   "sent": 23050,
+   "system": 2000,
+   "chatBefore": 20900,
+   "message": 150,
+   "resent": 22500,
+   "newSlice": 550,
+   "inputCost": 0.0461,
+   "inputCostCached": 0.00335
+  },
+  {
+   "turn": 40,
+   "sent": 23600,
+   "system": 2000,
+   "chatBefore": 21450,
+   "message": 150,
+   "resent": 23050,
+   "newSlice": 550,
+   "inputCost": 0.0472,
+   "inputCostCached": 0.003405
+  }
+ ],
+ "bills": [
+  {
+   "turns": 5,
+   "plain": 0.0525,
+   "cached": 0.02989,
+   "saved": 0.4307,
+   "line": 0.04,
+   "systemPart": 0.02,
+   "replies": 0.02,
+   "triangle": 0.0125,
+   "triangleShare": 0.2381,
+   "sentTokens": 16250
+  },
+  {
+   "turns": 10,
+   "plain": 0.1325,
+   "cached": 0.058115,
+   "saved": 0.5614,
+   "line": 0.08,
+   "systemPart": 0.04,
+   "replies": 0.04,
+   "triangle": 0.0525,
+   "triangleShare": 0.3962,
+   "sentTokens": 46250
+  },
+  {
+   "turns": 20,
+   "plain": 0.375,
+   "cached": 0.11869,
+   "saved": 0.6835,
+   "line": 0.16,
+   "systemPart": 0.08,
+   "replies": 0.08,
+   "triangle": 0.215,
+   "triangleShare": 0.5733,
+   "sentTokens": 147500
+  },
+  {
+   "turns": 40,
+   "plain": 1.19,
+   "cached": 0.25634,
+   "saved": 0.7846,
+   "line": 0.32,
+   "systemPart": 0.16,
+   "replies": 0.16,
+   "triangle": 0.87,
+   "triangleShare": 0.7311,
+   "sentTokens": 515000
+  },
+  {
+   "turns": 80,
+   "plain": 4.14,
+   "cached": 0.59764,
+   "saved": 0.8556,
+   "line": 0.64,
+   "systemPart": 0.32,
+   "replies": 0.32,
+   "triangle": 3.5,
+   "triangleShare": 0.8454,
+   "sentTokens": null
+  }
+ ],
+ "doublings": [
+  {
+   "from": 10,
+   "to": 20,
+   "times": 2.8302,
+   "line": 2.0,
+   "triangle": 4.0952
+  },
+  {
+   "from": 20,
+   "to": 40,
+   "times": 3.1733,
+   "line": 2.0,
+   "triangle": 4.0465
+  },
+  {
+   "from": 40,
+   "to": 80,
+   "times": 3.479,
+   "line": 2.0,
+   "triangle": 4.023
+  }
+ ],
+ "cache": {
+  "fraction": 0.05,
+  "turns": 40,
+  "plain": 1.19,
+  "cached": 0.25634,
+  "saved": 0.7846,
+  "inputPlain": 1.03,
+  "inputCached": 0.09634,
+  "replies": 0.16
+ },
+ "fresh": {
+  "chats": 8,
+  "turnsEach": 5,
+  "each": 0.0525,
+  "eight": 0.42,
+  "one": 1.19,
+  "times": 2.8333
+ }
+}

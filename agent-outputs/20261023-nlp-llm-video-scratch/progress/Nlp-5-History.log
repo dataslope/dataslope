@@ -13,3 +13,6 @@
 09:19 check:motion pass after final edits (longest still 2.5 s); frames3 + mix2 queued
 09:29 check:frames pass, check:mix 21.0 LU under; all checks done, report written
 10:02 fix pass started (review: 1 P1, 5 P2, 9 P3)
+10:10 resumed after container restart; booths redraw batch had completed and imported (separate booths, no tube)
+10:14 re-voiced age, law, alpac, analogy (481 chars)
+10:18 fixes applied, stills reviewed; running checks

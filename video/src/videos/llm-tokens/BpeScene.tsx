@@ -7,7 +7,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { END, FIRST_PAIRS, FREQS, MERGES, STEPS, unitsOf, WORDS } from "./data";
+import { END, FIRST_PAIRS, FREQS, MERGES, PAIR_TOTAL, STEPS, unitsOf, WORDS } from "./data";
 import {
   chipGround,
   ChipFace,
@@ -58,7 +58,7 @@ const Sym: React.FC<{ text: string; size?: number }> = ({ text, size = 28 }) => 
   return (
     <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: size, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
       {body}
-      {end ? <span style={{ fontSize: size * 0.72, color: INK_SOFT }}>{END}</span> : null}
+      {end ? <span style={{ fontSize: Math.max(20, size * 0.72), color: INK_SOFT }}>{END}</span> : null}
     </span>
   );
 };
@@ -137,7 +137,10 @@ export const BpeScene: React.FC = () => {
   const suffixEndAt = n.word("suffix", "word end");
   const newestAt = n.word("suffix", "newest");
   const widestAt = n.word("suffix", "widest");
-  const afterAt = n.word("after", "After");
+  const restNe = n.word("rest", "N and E");
+  const restW = n.word("rest", "then W");
+  const restNewest = n.word("rest", "newest");
+  const restLow = n.word("rest", "low picks");
   const singleAt = n.word("after", "low and newest");
   const fourAt = n.word("after", "still four");
   const widAt = n.word("after", "wid");
@@ -149,9 +152,8 @@ export const BpeScene: React.FC = () => {
   const piecesAt = n.word("counts-in", "pieces");
   const end = n.beat("bytes").from;
 
-  // When each merge happens: the narration walks the first six, then the
-  // last four land together on "After ten merges".
-  const mergeCue = [mergeAt, makingAt, wordEndAt, esAt + 4, tAt + 2, suffixEndAt, afterAt, afterAt + 7, afterAt + 14, afterAt + 21];
+  // When each merge happens: every one on the words that name it.
+  const mergeCue = [mergeAt, makingAt, wordEndAt, esAt + 4, tAt + 2, suffixEndAt, restNe + 4, restW + 2, restNewest, restLow + 2];
   const stepAt = (f: number) => mergeCue.filter((c) => f >= c).length;
   const k = stepAt(frame);
   // Each merge: the two old tiles go first, then the fused one comes in on
@@ -302,7 +304,7 @@ export const BpeScene: React.FC = () => {
         </Note>
 
         {/* Fig. 9: the first count of neighbouring pairs, the lesson's top five. */}
-        <FigLabel n="9" title="Neighbouring pairs, counted" at={countAt - 4} x={RX} y={y(FIG_Y)} out={writeAt - 2} />
+        <FigLabel n="9" title={`Neighbouring pairs: the top five of ${PAIR_TOTAL}`} at={countAt - 4} x={RX} y={y(FIG_Y)} out={writeAt - 2} />
         {FIRST_PAIRS.map((p, i) => {
           const on = ease(frame, countAt + 4 + i * 4, 10) * (1 - ease(frame, writeAt - 2, 10));
           if (on <= 0) return null;
@@ -367,6 +369,11 @@ export const BpeScene: React.FC = () => {
               <InlineArrow width={34} size={24} />
               <ChipFace text={m.a + m.b} size={22} focus={Math.max(clamp01(hot), lit)} />
               <span style={{ ...note(21, INK_SOFT), marginLeft: 6, ...TABULAR }}>×{m.count}</span>
+              {i === 0 ? (
+                <span style={{ ...note(21, INK_SOFT), marginLeft: 14, whiteSpace: "nowrap", opacity: ease(frame, firstAt + 4, 12) }}>
+                  o w tied: first counted wins
+                </span>
+              ) : null}
             </div>
           );
         })}

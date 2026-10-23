@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, body, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { PUNCT } from "./data";
+import { ORDER, PUNCT } from "./data";
 import { Chip, chipHeight, Headline, Kicker, RawText, rowLayout, Tag, type ToneStep, X0 } from "./parts";
 
 const SIZE = 32;
@@ -16,6 +16,8 @@ const RAW_Y = 350;
 const ROWS_Y = [436, 552, 668];
 const CHIPS_X = 540;
 const NOTE_Y = 790;
+/** Where the order tip's two sent_tokenize() lines sit, right of the note. */
+const INSET_X = 1060;
 /** The marks a sentence tokenizer reads as ends: a pale wash of the blue the
  *  video gives a unit worth keeping. */
 const CLUE = `color-mix(in srgb, ${BAR} 26%, transparent)`;
@@ -26,14 +28,30 @@ const find = (list: readonly string[], t: string) => {
   return i;
 };
 
-/** A recipe's name in the code face from `at`, and what it does under it
- *  from `doesAt`, when the narration describes it. */
-const Recipe: React.FC<{ at: number; doesAt: number; y: number; call: string; does: string }> = ({ at, doesAt, y, call, does }) => (
+/**
+ * A recipe as the lesson runs it: the call in the code face from `at`, what it
+ * runs on (the lesson lowercases the line first for the second and third)
+ * from `onAt`, and what it does from `doesAt`, each when the narration says so.
+ */
+const Recipe: React.FC<{ at: number; onAt: number; doesAt: number; y: number; call: string; on: string; does: string }> = ({
+  at,
+  onAt,
+  doesAt,
+  y,
+  call,
+  on,
+  does,
+}) => (
   <>
-    <Ink at={at} dur={14} style={{ left: X0, top: y, whiteSpace: "nowrap" }}>
+    <Ink at={at} dur={14} style={{ left: X0, top: y - 8, whiteSpace: "nowrap" }}>
       <div style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{call}</div>
     </Ink>
-    <Ink at={doesAt} dur={14} style={{ left: X0, top: y + 36, whiteSpace: "nowrap" }}>
+    <Ink at={onAt} dur={14} style={{ left: X0, top: y + 24, whiteSpace: "nowrap" }}>
+      <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 500, color: INK_SOFT, fontVariantLigatures: "none" }}>
+        on {on}
+      </div>
+    </Ink>
+    <Ink at={doesAt} dur={14} style={{ left: X0, top: y + 56, whiteSpace: "nowrap" }}>
       <div style={note(20, INK_SOFT)}>{does}</div>
     </Ink>
   </>
@@ -57,10 +75,13 @@ export const PunctScene: React.FC = () => {
   const exclAt = n.word("alpha", "exclamation");
   const punctuationAt = n.word("alpha", "punctuation");
   const charactersAt = n.word("translate", "characters");
-  const surviveAt = n.word("translate", "survive");
+  const surviveAt = n.word("shut", "survive");
+  const lower2At = n.word("translate", "lowercases");
+  const lower3At = n.word("regex", "lowercases");
   const cleaningAt = n.word("look", "cleaning");
   const didAt = n.word("look", "did");
   const cluesAt = n.word("order", "clues");
+  const tokenizerAt = n.word("order", "tokenizer", { nth: 1 });
   const nextAt = n.word("stop-in", "Next");
   const everywhereAt = n.word("stop-in", "everywhere");
   const firstAt = n.word("alpha", "first");
@@ -70,9 +91,9 @@ export const PunctScene: React.FC = () => {
   const loseAt = n.word("alpha", "lose");
   const secondAt = n.word("translate", "second");
   const deletesAt = n.word("translate", "deletes");
-  const gluedAt = n.word("translate", "glued");
-  const itsAt = n.word("translate", "it's");
-  const isntAt = n.word("translate", "isn't");
+  const gluedAt = n.word("shut", "glued");
+  const itsAt = n.word("shut", "it's");
+  const isntAt = n.word("shut", "isn't");
   const thirdAt = n.word("regex", "third");
   const pullsAt = n.word("regex", "pulls");
   const splitsAt = n.word("regex", "splits");
@@ -152,9 +173,33 @@ export const PunctScene: React.FC = () => {
         ]}
       />
 
-      <Recipe at={recipesAt} doesAt={firstAt} y={y(ROWS_Y[0]) + 2} call="w.isalpha()" does="keeps all-letter tokens" />
-      <Recipe at={recipesAt + 5} doesAt={secondAt} y={y(ROWS_Y[1]) + 2} call="w.translate(table)" does="deletes punctuation characters" />
-      <Recipe at={recipesAt + 10} doesAt={thirdAt} y={y(ROWS_Y[2]) + 2} call={'re.findall(r"[a-z]+")'} does="pulls out runs of letters" />
+      <Recipe
+        at={recipesAt}
+        onAt={firstAt}
+        doesAt={keepsAt}
+        y={y(ROWS_Y[0]) + 2}
+        call="w.isalpha()"
+        on="text.split()"
+        does="keeps all-letter tokens"
+      />
+      <Recipe
+        at={recipesAt + 5}
+        onAt={lower2At}
+        doesAt={deletesAt}
+        y={y(ROWS_Y[1]) + 2}
+        call="w.translate(table)"
+        on="text.lower().split()"
+        does="deletes punctuation characters"
+      />
+      <Recipe
+        at={recipesAt + 10}
+        onAt={lower3At}
+        doesAt={pullsAt}
+        y={y(ROWS_Y[2]) + 2}
+        call={'re.findall(r"[a-z]+", …)'}
+        on="text.lower()"
+        does="pulls out runs of letters"
+      />
 
       <div style={{ position: "absolute", inset: 0, opacity: rowsDim }}>
         {rows.map((r, k) =>
@@ -177,17 +222,38 @@ export const PunctScene: React.FC = () => {
         <Tag at={punctuationAt - 4} x={layouts[0][world].mid} y={y(ROWS_Y[0]) + chipHeight(SIZE) + 10} align="center">
           the whole word lost
         </Tag>
+        <Tag at={loseAt} x={layouts[0][PUNCT.split.length - 1].right + 22} y={y(ROWS_Y[0]) + 14} color={INK} size={22}>
+          {PUNCT.isalpha.length} of {PUNCT.split.length} kept
+        </Tag>
       </div>
 
-      {/* The lesson's order tip, as it is said. */}
+      {/* The lesson's order tip, as it is said, and what it means on this line:
+          Punkt finds two sentences in the text as written, one once its
+          punctuation is gone. */}
       <div style={{ position: "absolute", left: X0, top: y(NOTE_Y), display: "flex", gap: "0.26em", whiteSpace: "nowrap", ...body(36), color: INK }}>
         <Ink at={afterAt - 6} dur={16} style={{ position: "relative" }}>
-          Strip it after you tokenize,
+          Strip punctuation after you tokenize,
         </Ink>
         <Ink at={neverAt - 4} dur={16} style={{ position: "relative", fontStyle: "italic" }}>
           never before.
         </Ink>
       </div>
+      {[
+        { call: "sent_tokenize(text)", n: ORDER.sentences.length, at: tokenizerAt, color: BLUE_INK },
+        { call: "sent_tokenize(stripped)", n: ORDER.strippedSentences.length, at: cluesAt, color: ACCENT_INK },
+      ].map((r, i) => (
+        <Ink
+          key={r.call}
+          at={r.at}
+          dur={14}
+          style={{ left: INSET_X, top: y(NOTE_Y) - 6 + i * 38, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}
+        >
+          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none", width: 300 }}>{r.call}</span>
+          <span style={{ ...note(24, r.color), fontWeight: 650 }}>
+            {r.n} {r.n === 1 ? "sentence" : "sentences"}
+          </span>
+        </Ink>
+      ))}
       <Sfx name="el-pencil" at={neverAt - 4} level={-36} />
     </AbsoluteFill>
   );

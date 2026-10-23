@@ -6,7 +6,7 @@ import { label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { SARCASM, signed, UNKNOWN, type Trace } from "./data";
+import { CONTEXT, SARCASM, signed, UNKNOWN, type Trace } from "./data";
 import { Chip, FIG_Y, Headline, INK, INK_SOFT, Kicker, LOST_INK, Mark, NEG, NEG_INK, POS, POS_INK, Reveal, Spot, Strike, TokenCol, TokenRow, X0 } from "./parts";
 
 const ROW_Y = { sarcasm: 342, context: 462, missing: 582 } as const;
@@ -20,13 +20,12 @@ const LEARN_Y = 748;
 const DATES_Y = 806;
 const NEXT_Y = 858;
 
-const chipW = (w: string) => (w.length * 0.56 + 1.4) * CHIP + 4;
 const inkFor = (l: string) => (l === "positive" ? POS_INK : l === "negative" ? NEG_INK : INK_SOFT);
 
 /**
  * Where the rules run out, from the lesson's limits list: sarcasm scored on
- * its words, a word whose sense depends on context, and a word in neither
- * list. Then why a rule-based baseline is still worth building, what learned
+ * its words, a word whose sense depends on context (put in the negative list
+ * for brakes, it sinks a thriller), and a word in neither list. Then why a rule-based baseline is still worth building, what learned
  * models keep from this unit, and the bridge to Unit 5: these ideas are old.
  */
 export const LimitsScene: React.FC = () => {
@@ -64,7 +63,6 @@ export const LimitsScene: React.FC = () => {
       {text}
     </Ink>
   );
-  const unpredictableX = CHIPS_X;
 
   return (
     <AbsoluteFill>
@@ -73,6 +71,7 @@ export const LimitsScene: React.FC = () => {
       <Sfx name="el-scratch" at={winkAt} level={-32} />
       <Sfx name="el-tap" at={brakesAt - 2} level={-30} />
       <Sfx name="el-tap" at={thrillerAt - 2} level={-30} />
+      <Sfx name="el-scratch" at={thrillerAt + 10} level={-33} />
       <Sfx name="el-tap" at={nothingAt - 2} level={-29} />
       <Sfx name="el-pop" at={ceilingsAt} level={-31} />
       {[fastAt, dataAt, beatAt].map((t, i) => (
@@ -95,20 +94,24 @@ export const LimitsScene: React.FC = () => {
         <span style={{ ...note(21, LOST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>it can’t see the wink</span>
       </Note>
 
-      {/* Context: one word, two senses. */}
+      {/* Context: one word, two senses. Put "unpredictable" in the negative
+          list, as the brakes would want, and the thriller pays for it. */}
       {rowLabel("Context", contextAt - 2, ROW_Y.context)}
-      <div style={{ position: "absolute", left: unpredictableX, top: y(ROW_Y.context) }}>
-        <Chip text="unpredictable" size={CHIP} at={unpredAt - 2} />
-      </div>
-      <Note at={brakesAt - 2} x={unpredictableX + chipW("unpredictable") + 30} y={y(ROW_Y.context) + 4}>
-        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-          in brakes: <span style={{ color: NEG_INK, fontWeight: 650 }}>bad</span>
+      <TraceRow
+        trace={CONTEXT}
+        top={y(ROW_Y.context)}
+        at={unpredAt - 4}
+        scoreAt={brakesAt}
+        verdictAt={thrillerAt}
+        struck={thrillerAt + 10}
+      />
+      <Note at={brakesAt + 2} x={CHIPS_X} y={y(ROW_Y.context) + 50}>
+        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          with <i>{CONTEXT.added}</i> added to the negative list, as brakes would want
         </span>
       </Note>
-      <Note at={thrillerAt - 2} x={unpredictableX + chipW("unpredictable") + 260} y={y(ROW_Y.context) + 4}>
-        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-          in a thriller: <span style={{ color: POS_INK, fontWeight: 650 }}>good</span>
-        </span>
+      <Note at={thrillerAt + 14} x={VERDICT_X} y={y(ROW_Y.context) + 48}>
+        <span style={{ ...note(21, LOST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a good thriller</span>
       </Note>
 
       {/* Missing words: in neither list, so worth nothing. */}
@@ -116,7 +119,7 @@ export const LimitsScene: React.FC = () => {
       <TraceRow trace={UNKNOWN} top={y(ROW_Y.missing)} at={missingAt - 2} verdictAt={nothingAt} />
       <Note at={nothingAt + 4} x={CHIPS_X} y={y(ROW_Y.missing) + 50}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          <i>unpredictable</i> is in neither list
+          in the lesson’s lists, <i>unpredictable</i> is in neither
         </span>
       </Note>
 
@@ -156,13 +159,14 @@ export const LimitsScene: React.FC = () => {
   );
 };
 
-/** One review, token by token, then its sum and verdict; `struck` crosses
- *  the verdict out. */
-const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: number; struck?: number }> = ({
+/** One review, token by token, then its sum and verdict; `scoreAt` holds
+ *  the scored words' tones back to a cue, and `struck` crosses the verdict out. */
+const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: number; scoreAt?: number; struck?: number }> = ({
   trace,
   top,
   at,
   verdictAt,
+  scoreAt,
   struck,
 }) => {
   const frame = useCurrentFrame();
@@ -171,6 +175,7 @@ const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: num
       <TokenRow x={CHIPS_X} top={top}>
         {trace.steps.map((s, k) => {
           const polar = s.polarity !== 0;
+          const toneAt = scoreAt ?? at + k * 2 + 6;
           return (
             <TokenCol
               key={k}
@@ -180,14 +185,14 @@ const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: num
                   size={CHIP}
                   at={at + k * 2}
                   tone={polar ? (s.polarity > 0 ? POS : NEG) : undefined}
-                  toneAt={at + k * 2 + 6}
+                  toneAt={toneAt}
                   mono={s.token.length === 1}
                   style={{ marginRight: 0 }}
                 />
               }
               below={
                 polar ? (
-                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, at + k * 2 + 8, 10) }}>
+                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, toneAt + 2, 10) }}>
                     {signed(s.polarity)}
                   </span>
                 ) : null

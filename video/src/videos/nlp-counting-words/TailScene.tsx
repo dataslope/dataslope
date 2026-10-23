@@ -3,26 +3,24 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, body, fmt, HAIRLINE, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA } from "./data";
-import { Bracket, DATA, Headline, Kicker, Marked, numStyle, pulse, Svg } from "./parts";
+import { DATA, Headline, Kicker, Marked, Mono, numStyle, pulse, Svg } from "./parts";
 
 /** Fig. 4: the vocabulary as a hundred squares, on the left. */
 const WX = 130;
 const WY = 350;
 const CELL = 26;
 const CELL_GAP = 4;
-/** Fig. 5: Emma's top words as bars, then the rest of the ranks squeezed. */
+/** Fig. 5: every one of Emma's words, ranked by count, on a linear rank axis,
+ *  so the tail is drawn as long as it is: the top ten take the first 1.5 px. */
 const X0 = 640;
-const BARS = 20;
-const PITCH = 44;
-const BAR_W = 32;
+const X1 = 1790;
 const BASE = 612;
 const TALL = 236;
-const TAIL_X0 = X0 + BARS * PITCH + 14;
-const TAIL_X1 = 1790;
+const RANK_TICKS = [1, 1000, 2000, 3000, 4000, 5000, 6000, 7000];
 /** Fig. 6: vocabulary growth, under Fig. 5. */
 const GX0 = 640;
 const GX1 = 1560;
@@ -69,21 +67,27 @@ export const TailScene: React.FC = () => {
   const fig6Back = 1 - 0.6 * ease(frame, tellAt - 2, 14);
   const fig4Back = 1 - 0.6 * ease(frame, bookAt - 2, 14);
 
-  // ── Fig. 4 geometry ──
+  // ── Fig. 5 geometry: rank 1 at X0, rank 7,079 at X1 ──
   const base = y(BASE);
   const unit = h(TALL) / EMMA.ranked[0];
-  const barAt = (i: number) => rankAt - 2 + Math.round(i * 1.4);
-  const tail = EMMA.ranked.slice(BARS);
-  const tailPts = tail
-    .map((c, i) => [TAIL_X0 + ((TAIL_X1 - TAIL_X0) * i) / (tail.length - 1), base - c * unit] as const)
-    .filter((_, i) => i % 8 === 0 || i === tail.length - 1);
-  const tailP = ease(frame, otherEndAt - 4, 24);
-  const topTenRight = X0 + 9 * PITCH + BAR_W;
-  const bracketY = base - h(TALL) - 18;
+  const V = EMMA.ranked.length;
+  const rx = (rank: number) => X0 + ((rank - 1) / (V - 1)) * (X1 - X0);
+  const curve = EMMA.ranked
+    .map((c, i) => [rx(i + 1), base - c * unit] as const)
+    .filter((_, i) => i < 400 || i % 10 === 0 || i === V - 1);
+  const curvePts = curve.map(([x, yy]) => `${x.toFixed(1)},${yy.toFixed(1)}`).join(" ");
+  // The curve draws left to right as the words are ranked.
+  const drawn = ease(frame, rankAt - 2, 40);
+  const top = base - h(TALL);
+  // The hapaxes are the last 2,739 ranks: all of them at a count of one.
+  const onceFrom = rx(V - EMMA.hapaxes + 1);
+  const onceP = ease(frame, otherEndAt - 2, 20);
 
   // ── Fig. 5: a hundred squares, the last 39 for the words used once ──
   const onceCells = Math.round(EMMA.hapaxShare * 100);
-  const cellAt = (k: number) => differentAt - 6 + Math.round(((k * 37) % 100) * 0.22);
+  // The squares sprinkle in from "a hundred and sixty-one thousand" to "different".
+  const cellSpread = Math.max(20, differentAt - wordsAt);
+  const cellAt = (k: number) => wordsAt - 2 + Math.round((((k * 37) % 100) / 100) * cellSpread);
   const cellTop = y(WY);
   const waffleSide = 10 * CELL + 9 * CELL_GAP;
 
@@ -104,7 +108,7 @@ export const TailScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the squares, the bars, the bracket, the hapaxes, the curve ── */}
-      <Sfx name="el-sprinkle" at={differentAt - 6} level={-32} />
+      <Sfx name="el-sprinkle" at={wordsAt - 2} level={-32} />
       <Sfx name="el-whoosh" at={rankAt - 2} level={-34} />
       <Sfx name="el-pencil" at={topTenAt - 2} level={-34} />
       <Sfx name="el-sprinkle" at={twoThousandAt} level={-31} />
@@ -160,57 +164,60 @@ export const TailScene: React.FC = () => {
       </Note>
       </div>
 
-      {/* Fig. 5: ranked by count. */}
-      <FigLabel n="5" title={`Emma's ${BARS} most common words, by count`} at={rankAt - 4} x={X0 - 10} y={y(286)} />
+      {/* Fig. 5: all 7,079 words, ranked by count, on a linear rank axis. */}
+      <FigLabel n="5" title={`All ${fmt(V, 0)} of Emma's words, ranked by count`} at={rankAt - 4} x={X0 - 10} y={y(286)} />
       <Svg>
-        <line x1={X0 - 6} x2={X0 - 6 + (TAIL_X1 - X0 + 12) * ease(frame, rankAt - 4, 16)} y1={base + 0.5} y2={base + 0.5} stroke={INK} strokeWidth={1.6} />
-        {EMMA.ranked.slice(0, BARS).map((c, i) => {
-          const p = ease(frame, barAt(i), 12);
-          if (p <= 0) return null;
-          const hgt = c * unit * p;
-          return <rect key={i} x={X0 + i * PITCH} y={base - hgt} width={BAR_W} height={hgt} fill={DATA} />;
-        })}
-        {tailP > 0 ? (
-          <polygon
-            points={[...tailPts, [TAIL_X1, base] as const, [TAIL_X0, base] as const]
-              .map(([x, yy]) => `${x.toFixed(1)},${yy.toFixed(1)}`)
-              .join(" ")}
-            fill={DATA}
-            style={{ clipPath: `inset(0 ${(1 - tailP) * 100}% 0 0)` }}
-          />
-        ) : null}
         {/* "a long, thin tail": a wash over it as it is named. */}
-        <rect
-          x={TAIL_X0 - 4}
-          y={base - h(70)}
-          width={TAIL_X1 - TAIL_X0 + 8}
-          height={h(70)}
-          fill={ACCENT}
-          opacity={0.16 * pulse(frame, longAt - 2, 36)}
-        />
-        {tailP > 0 ? (
-          <g opacity={ease(frame, otherEndAt - 4, 10)} stroke={INK_SOFT} strokeWidth={1.6}>
-            <line x1={TAIL_X0 - 10} x2={TAIL_X0 - 2} y1={base + 8} y2={base - 8} />
-            <line x1={TAIL_X0 - 4} x2={TAIL_X0 + 4} y1={base + 8} y2={base - 8} />
-          </g>
-        ) : null}
+        <rect x={rx(60)} y={base - h(60)} width={X1 - rx(60)} height={h(60)} fill={ACCENT} opacity={0.14 * pulse(frame, longAt - 2, 36)} />
+        <g style={{ clipPath: `inset(0 ${(1 - drawn) * 100}% 0 0)` }}>
+          <polygon points={`${curvePts} ${X1},${base} ${X0},${base}`} fill={DATA} />
+          <polyline points={curvePts} fill="none" stroke={DATA} strokeWidth={3} strokeLinejoin="round" strokeLinecap="round" />
+        </g>
+        <line x1={X0} x2={X0 + (X1 - X0) * ease(frame, rankAt - 4, 16)} y1={base + 2.5} y2={base + 2.5} stroke={INK_SOFT} strokeWidth={1.2} />
+        <g opacity={ease(frame, rankAt + 10, 12)}>
+          {RANK_TICKS.map((r) => (
+            <line key={r} x1={rx(r)} x2={rx(r)} y1={base + 3} y2={base + 9} stroke={INK_SOFT} strokeWidth={1.2} />
+          ))}
+        </g>
+        {/* The words used once, the last 39% of the ranks. */}
+        <rect x={onceFrom} y={base + 12} width={(X1 - onceFrom) * onceP} height={7} rx={2} fill={ACCENT} />
       </Svg>
-      {EMMA.top10.map(([w], i) => (
-        <Ink key={w} at={barAt(i) + 4} dur={10} style={{ left: X0 + i * PITCH - 7, width: BAR_W + 14, top: base + 8, textAlign: "center" }}>
-          <span style={{ ...label(20, INK), fontWeight: 600 }}>{i < 6 ? <Marked at={topAt - 2 + i * 3}>{w}</Marked> : w}</span>
+      {RANK_TICKS.map((r) => (
+        <Ink key={r} at={rankAt + 10} dur={12} style={{ left: rx(r) - 40, width: 80, top: base + 22, textAlign: "center" }}>
+          <span style={{ ...label(19, INK_SOFT), fontWeight: 500, ...{ fontVariantNumeric: "lining-nums" } }}>{fmt(r, 0)}</span>
         </Ink>
       ))}
-      <Bracket x0={X0} x1={topTenRight} y={bracketY} at={topTenAt - 2} color={ACCENT} />
-      <Note at={fifthAt - 2} x={topTenRight + 22} y={bracketY - 16}>
-        <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-          the top ten: <span style={numStyle(22, ACCENT_INK)}>{Math.round(EMMA.top10Share * 100)}%</span> of all the words
+      <Note at={rankAt + 16} x={X1} y={base + 50} align="right">
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>rank, most common first</div>
+      </Note>
+      <Note at={rankAt + 4} x={X0 + 12} y={top - 12}>
+        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={numStyle(20, INK)}>{fmt(EMMA.ranked[0], 0)}</span> uses of the top word
         </div>
       </Note>
-      <Note at={otherEndAt + 4} x={TAIL_X0} y={base + 10}>
-        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>the other {fmt(EMMA.distinct - BARS, 0)},</div>
-        <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>squeezed in</div>
+      {/* The top ten, too narrow to see apart: named beside the spike. */}
+      <Note at={topTenAt - 2} x={X0 + 60} y={top + 40}>
+        <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          the top ten
+          <span style={{ opacity: ease(frame, fifthAt - 2, 10) }}>
+            : <span style={numStyle(22, ACCENT_INK)}>{Math.round(EMMA.top10Share * 100)}%</span> of all the words
+          </span>
+        </div>
+        <div style={{ marginTop: 8, display: "flex", gap: 10, whiteSpace: "nowrap" }}>
+          {EMMA.top10.map(([w], i) => (
+            <Mono key={w} size={20} color={INK_SOFT}>
+              {i < 6 ? <Marked at={topAt - 2 + i * 3}>{w}</Marked> : w}
+            </Mono>
+          ))}
+        </div>
       </Note>
-      <Note at={giantsAt - 6} x={X0 + 10 * PITCH + 10} y={bracketY + 44}>
+      <Leader points={[[X0 + 54, top + 56], [X0 + 4, top + 40]]} at={topTenAt} color={INK_SOFT} width={1.4} />
+      <Note at={twoThousandAt - 2} x={onceFrom} y={base - 40}>
+        <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+          <span style={numStyle(22, ACCENT_INK)}>{fmt(EMMA.hapaxes, 0)}</span> used just once
+        </div>
+      </Note>
+      <Note at={giantsAt - 6} x={1260} y={top + 70}>
         <div style={{ ...body(30, true), color: INK, whiteSpace: "nowrap" }}>
           <Marked at={giantsAt}>A few giants</Marked>
           <span style={{ opacity: ease(frame, longAt - 2, 12) }}>, a long tail:</span>

@@ -51,7 +51,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     count vector 1, 3, 0, 0, 1 and the binary vector 1, 1, 0, 0, 1. "dog
  *     bites man" and "man bites dog" are counted the lesson's way and give
  *     the same bag. "Tens of thousands of words" and "great" and
- *     "excellent" as unrelated columns are the lesson's limitations list.
+ *     "excellent" as unrelated columns are the lesson's limitations list;
+ *     the two rows that show it ("great film", "excellent film", sharing
+ *     only the film column) are the video's own, counted the lesson's way.
  *   - tf-idf, "Step 2" and "Step 3", the lesson's textbook formula:
  *     tf = count / words in the document, idf = ln(N / df), the natural log
  *     with no smoothing. "the" is in 3 of 3 documents, idf ln 1 = 0; "cat"
@@ -59,6 +61,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     tf-idf 0.183 ("about zero point one eight"); "the" 2/6 times 0 = 0;
  *     cat, mat, on and sat tie at 0.183 at the top of Doc 1, which the
  *     lesson's prose points out ("on" says nothing about the topic).
+ *     The rule the tie hides is shown on a Doc 1 where cat appears twice in
+ *     six words, the lesson's formula again: 2/6 times 1.0986 = 0.366,
+ *     twice the 0.183. The log's job and its example are the lesson's
+ *     "Why the logarithm" callout: a word in 1 of 10,000 documents would
+ *     weigh 10,000 without it and swamp the rest; ln 10,000 = 9.21.
  *     measure.py checks the table against scikit-learn too. The lesson's
  *     callout on scikit-learn's default TfidfVectorizer(): idf =
  *     ln((1 + N) / (1 + df)) + 1, 1.00 for "the" and 1.69 for "cat"; with raw
@@ -72,7 +79,16 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     for "This is not bad at all", and neutral (+1 - 1) for "The plot was
  *     good but the acting was awful". The lesson's sarcasm line "Oh great,
  *     another delay" run through that classifier scores +1, positive, and
- *     "unpredictable" is in neither list, so it scores 0. The baseline's
+ *     "unpredictable" is in neither list, so it scores 0.
+ *     The reset is run on a sentence of the video's own, "Not really, it was
+ *     good": the comma clears the flag, so good stays +1 (positive); with no
+ *     reset tokens it scores -1 (negative). None of the lesson's examples
+ *     needs the reset, and the one its prose gives, "not great, but
+ *     terrible", scores -2 with or without it under the lesson's own code
+ *     (rule-based-sentiment.mdx:413 and :478; the video does not repeat it).
+ *     The context row scores the video's "The thriller was unpredictable"
+ *     with "unpredictable" added to the negative list: -1, negative.
+ *     The baseline's
  *     virtues ("fast, transparent, needs no labeled data, and gives you a
  *     score to beat") are the lesson's "Why start with rules?" callout.
  *   - The bridge's dates are the history lesson's (interesting-
@@ -287,7 +303,7 @@ export const script: NarrationScript = {
     {
       id: "reset",
       text: "A comma, a full stop, or the word but switches it off again, so a not can't reach into the next clause.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.0,
     },
     {
       id: "reset-ex",

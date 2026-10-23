@@ -31,40 +31,50 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *   - The opening sentence is what-is-nlp's: "I can't believe Dr. Smith's
  *     startup raised $2.5M, it's unreal!", 62 characters ("sixty-two"). The
  *     three questions are the lesson's, shortened for the ear. Its tokens
- *     under "structure a program can compute with" are word_tokenize's 16.
+ *     under "structure a program can compute with" are word_tokenize's 16,
+ *     and "sixteen" reads them back as the answer: can't in two (ca, n't),
+ *     Dr. kept whole, the dollar sign alone. That beat also introduces NLTK
+ *     at its first use.
  *   - "turn unstructured text into structure a program can compute with" and
  *     the definition of NLP are what-is-nlp's.
  *   - The three ambiguities ("bank", "I saw the man with the telescope", the
  *     trophy and the case) and the five kinds of mess (contractions,
  *     punctuation, casing, morphology, multi-word units) are the lesson's
- *     own examples. The lesson leads with "lead" and adds "bank"; the video
+ *     own examples. For casing the video takes the lesson's "a word
+ *     capitalized only because it starts a sentence", which lowercasing
+ *     fixes, not its "Apple the company vs. apple the fruit", which
+ *     lowercasing merges. The lesson leads with "lead" and adds "bank"; the video
  *     takes "bank", because spoken, "lead" the metal and "lead" the verb
- *     sound different and the ear would resolve what the eye cannot. "Each
- *     of these is a reason a later step exists" is its
- *     "Every one of these is a reason a later page exists"; the step tags in
- *     Fig. 5 are the ones the lesson names (tokenization, case folding,
- *     stemming and lemmatization) plus n-grams for multi-word units, the
+ *     sound different and the ear would resolve what the eye cannot.
+ *     "reasons" and "roots" read out the lesson's "Every one of these is a
+ *     reason a later page exists": the step tags in Fig. 5 are the ones the
+ *     lesson names (tokenization, case folding, stemming and lemmatization)
+ *     plus n-grams for multi-word units, the
  *     course's ngrams.mdx and pos-tagging.mdx ("New York" as a unit whose
  *     meaning lives in the combination).
  *   - "I can't believe it's not butter, Mr. Jones!": split() gives eight
  *     pieces, word_tokenize() twelve tokens (ca, n't; the comma and the
  *     exclamation mark on their own; Mr. kept whole), as the page prints.
  *   - The layers are what-is-nlp's diagram (characters, tokens, normalized
- *     tokens, tagged tokens, patterns and counts); "count, match and
+ *     tokens, tagged tokens, patterns and counts), every layer on the same
+ *     three words (the counts box counts those three); "count, match and
  *     transform" and the spam filter are its callout; rules against learning
  *     is its table.
  *   - The pipeline: "The Cats are RUNNING quickly, and the dogs are barking
  *     loudly!" through the lesson's five steps: 13 tokens, 13 lowercased, 11
  *     cleaned, 6 after stopwords (five dropped: the, are, and, the, are),
  *     then cat, running, quickly, dog, barking,
- *     loudly. "running" stays as it is because the lemmatizer reads every
- *     word as a noun unless told otherwise (Unit 2's subject); the video
- *     shows it and does not comment. `tokens = [t.lower() for t in tokens]`
+ *     loudly. "running" and "barking" stay as they are because the
+ *     lemmatizer reads every word as a noun unless told otherwise; told
+ *     "verb", it gives run and bark (measure.py's asVerb). The video says so
+ *     in one clause ("running"); the deep dive on lemmatizing with a part of
+ *     speech, and Unit 2, take it further. `tokens = [t.lower() for t in tokens]`
  *     is the lesson's own case-folding line.
  *   - Order: "The The THE end is near". Lowercase then filter gives end,
  *     near; filter then lowercase gives the, the, the, end, near (all three
  *     survive, which is what the page prints; the lesson's figure caption
- *     says "one survives", reported, not repeated). NLTK's English list has
+ *     says "one survives" and its prose "leaves The and THE behind": the
+ *     video follows the numbers, and the discrepancy is reported). NLTK's English list has
  *     198 words, all lowercase.
  *
  * Written for Hope's voice, upbeat and clear: short spoken sentences, no

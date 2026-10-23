@@ -6,7 +6,7 @@ import { body, fmt, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { SIZES } from "./data";
+import { CLOSE_RATES, SIZES } from "./data";
 import { A, A_INK, Arrow, B, B_INK, Count, Drift, FAINT, Headline, Kicker, Marked, pulse, Svg, Tag, X0 } from "./parts";
 
 /** Fig. 10, the method, one step per chip. */
@@ -56,13 +56,13 @@ export const ExamplesScene: React.FC = () => {
   const sixtyFiveAt = n.word("sim", "sixty-five");
   const twentyAt = n.word("sim", "twenty examples");
   const againEnd = n.word("sim", "again and again", { edge: "end" });
-  const betterAt = n.word("twenty", "better one");
   const aheadAt = n.word("twenty", "ahead");
   const fourAt = n.word("twenty", "four times in five");
   const fiftyAt = n.word("fifty", "fifty examples");
+  /** Fig. 12 waits for the size it is about: "With fifty examples". */
+  const fig12At = fiftyAt - 8;
   const ninetyFourAt = n.word("fifty", "ninety-four");
   const closeAt = n.word("close", "look close");
-  const thirtyAt = n.word("close", "thirty examples");
   const costAt = n.word("close", "Pick on cost");
   const end = n.beat("harness").from;
 
@@ -194,23 +194,44 @@ export const ExamplesScene: React.FC = () => {
           </span>
         </Ink>
 
-        {/* ── Fig. 12: the same run at every size ── */}
-        <FigLabel n="12" title="Better one ahead, by examples" at={betterAt - 2} x={RX0 - 30} y={y(500)} />
+        {/* ── Fig. 12: the same run at every size, from "With fifty examples";
+            then the lesson's 2-point gap beside it, from "look close". ── */}
+        <FigLabel n="12" title="Better one ahead, by examples" at={fig12At} x={RX0 - 30} y={y(486)} />
+        <Ink at={fig12At + 4} dur={12} style={{ left: RX0 - 30, top: y(486) + 36, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 10 }}>
+          <svg width={16} height={16}>
+            <rect width={16} height={16} rx={2} fill={A} />
+          </svg>
+          <span style={note(20, A_INK)}>
+            {SIZES.trueA}% against {SIZES.trueB}%
+          </span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 10, marginLeft: 14, opacity: ease(frame, closeAt - 4, 12) }}>
+            <svg width={16} height={16}>
+              <rect width={16} height={16} rx={2} fill={B} />
+            </svg>
+            <span style={note(20, INK_SOFT)}>
+              {SIZES.trueA}% against {CLOSE_RATES.trueB}%
+            </span>
+          </span>
+        </Ink>
         {SIZES.rates.map((r, i) => {
           const x = RX0 + i * RSTEP;
-          const lit = r.n === SIZES.n ? ease(frame, fourAt - 2, 10) : r.n === 50 ? ease(frame, fiftyAt - 2, 10) : 0;
-          const grow = ease(frame, betterAt + i * 3, 16);
+          const lit = r.n === SIZES.n ? ease(frame, fiftyAt + 2, 10) : r.n === 50 ? ease(frame, ninetyFourAt - 2, 10) : 0;
+          const at = fig12At + 4 + i * 3;
+          const grow = ease(frame, at, 16);
           const bh = h(RMAX) * (r.pct / 100) * grow;
           const swell = r.n === 50 ? pulse(frame, ninetyFourAt, 18) : 0;
+          const close = CLOSE_RATES.rates[i];
+          const ch = h(RMAX) * (close.pct / 100) * ease(frame, closeAt - 4 + i * 3, 16);
           return (
             <React.Fragment key={r.n}>
-              <Svg>
-                <rect x={x} y={y(RBASE) - bh} width={64} height={bh} rx={2} fill={lit > 0 ? A : FAINT} opacity={0.6 + 0.4 * lit} />
-                <text x={x + 32} y={y(RBASE) + 28} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 600, ...TABULAR }}>
+              <Svg opacity={ease(frame, at, 10)}>
+                <rect x={x} y={y(RBASE) - bh} width={44} height={bh} rx={2} fill={lit > 0 ? A : FAINT} opacity={0.6 + 0.4 * lit} />
+                <rect x={x + 48} y={y(RBASE) - ch} width={22} height={ch} rx={2} fill={B} />
+                <text x={x + 35} y={y(RBASE) + 28} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 600, ...TABULAR }}>
                   {r.n}
                 </text>
               </Svg>
-              <Ink at={betterAt + i * 3 + 10} dur={10} style={{ left: x + 32, top: y(RBASE) - h(RMAX) * (r.pct / 100) - 34, whiteSpace: "nowrap" }}>
+              <Ink at={at + 10} dur={10} style={{ left: x + 22, top: y(RBASE) - h(RMAX) * (r.pct / 100) - 34, whiteSpace: "nowrap" }}>
                 <span
                   style={{
                     ...note(lit > 0 ? 22 : 20, lit > 0 ? A_INK : INK_SOFT),
@@ -226,14 +247,24 @@ export const ExamplesScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Ink at={betterAt + 12} dur={12} style={{ left: RX0 + 4 * RSTEP + 76, top: y(RBASE) + 8, whiteSpace: "nowrap" }}>
+        {/* The 2-point gap's best showing: a hundred examples, barely better than a coin. */}
+        <Ink
+          at={closeAt + 12}
+          dur={12}
+          style={{ left: RX0 + 4 * RSTEP + 59, top: y(RBASE) - h(RMAX) * (CLOSE_RATES.rates[4].pct / 100) - 30, whiteSpace: "nowrap" }}
+        >
+          <span style={{ ...note(20, INK_SOFT), fontWeight: 600, ...TABULAR, display: "inline-block", transform: "translateX(-50%)" }}>
+            {fmt(CLOSE_RATES.rates[4].pct, 1)}%
+          </span>
+        </Ink>
+        <Ink at={fig12At + 12} dur={12} style={{ left: RX0 + 4 * RSTEP + 84, top: y(RBASE) + 8, whiteSpace: "nowrap" }}>
           <span style={note(21, INK_SOFT)}>examples</span>
         </Ink>
 
         {/* Close after thirty: they probably are. */}
         <Ink at={closeAt - 4} dur={16} style={{ left: X0, top: y(826), whiteSpace: "nowrap" }}>
           <span style={{ ...body(34, true), color: INK }}>
-            Still close after <Marked at={thirtyAt - 2}>30</Marked>? They probably are.{" "}
+            Still close after 30? They probably are.{" "}
             <span style={{ color: A_INK, fontWeight: 600, opacity: ease(frame, costAt - 2, 12) }}>Pick on cost.</span>
           </span>
         </Ink>

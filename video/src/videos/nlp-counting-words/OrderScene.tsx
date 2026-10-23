@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA, ORDER, PHRASES } from "./data";
-import { flow, HBar, Headline, Kicker, MARK_BAD, Marked, Mono, numStyle, Spot, Tile, tileH } from "./parts";
+import { flow, HBar, Headline, Kicker, MARK_BAD, Marked, Mono, numStyle, Spot, Tile, tileH, tileW } from "./parts";
 
 const X0 = 120;
 const SIZE = 26;
@@ -41,7 +41,8 @@ export const OrderScene: React.FC = () => {
   const notAt = n.word("sets", "not");
   const bigramsAt = n.word("bigram", "bigrams");
   const hasAt = n.word("bigram", "not good");
-  const featureAt = n.word("bigram", "feature");
+  const pairAt = n.word("bigram", "The pair");
+  const notBadAt = n.word("bigram", "not bad");
   const negativeAt = n.word("bigram", "negative");
   const findsAt = n.word("phrases", "finds phrases");
   const linesAt = n.word("phrases", "three short");
@@ -72,7 +73,7 @@ export const OrderScene: React.FC = () => {
   const rowH = h(40);
   const ml = PHRASES.top3;
   const cast = EMMA.pairs.slice(0, 3);
-  const mlUnit = 230 / ml[0][1];
+
   const castUnit = 300 / cast[0][1];
   const mlAts = [ml1At - 4, ml1At + 6, ml1At + 14];
 
@@ -135,9 +136,16 @@ export const OrderScene: React.FC = () => {
           border={i === notGood ? INK : undefined}
         />
       ))}
-      <Note at={featureAt - 2} x={aGrams[notGood].x} y={rowA + tileH(SIZE) + 14}>
+      {/* A lone "not" turns up in praise too: the pair is what carries the sign. */}
+      <Tile text="not bad" x={aGrams[notGood].x} y={rowA + tileH(SIZE) + 12} size={CHIP} at={notBadAt - 4} />
+      <Note at={notBadAt + 2} x={aGrams[notGood].x + tileW("not bad", CHIP) + 14} y={rowA + tileH(SIZE) + 12}>
+        <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          praise has a lone not too
+        </div>
+      </Note>
+      <Note at={pairAt - 2} x={aGrams[notGood].x} y={rowA + tileH(SIZE) + tileH(CHIP) + 20}>
         <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-          a feature a model can learn is <Marked at={negativeAt - 2}>negative</Marked>
+          the pair is what a model can learn is <Marked at={negativeAt - 2}>negative</Marked>
         </div>
       </Note>
       <Note at={hasAt + 4} x={bGrams[bGrams.length - 1].x + bGrams[bGrams.length - 1].w + 16} y={rowB}>
@@ -149,26 +157,32 @@ export const OrderScene: React.FC = () => {
       </div>
 
       {/* Fig. 14: counted pairs. */}
-      <FigLabel n="14" title="The most common bigrams" at={findsAt - 4} x={T1} y={y(560)} />
-      <Ink at={linesAt - 2} dur={12} style={{ left: T1, top: y(560) + 46, whiteSpace: "nowrap" }}>
+      <FigLabel n="14" title="The most common bigrams" at={findsAt - 4} x={T1} y={y(568)} />
+      <Ink at={linesAt - 2} dur={12} style={{ left: T1, top: y(568) + 46, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), fontWeight: 600 }}>three lines about machine learning</span>
       </Ink>
-      {ml.map(([p, c], i) => (
-        <React.Fragment key={p}>
-          <Ink at={mlAts[i] - 2} dur={12} style={{ left: T1, width: WORD_W, top: rowY(i), height: rowH, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-            <Mono size={23} color={INK} weight={i === 0 ? 600 : 500}>
-              {i === 0 ? <Marked at={topPairAt - 2}>{p}</Marked> : p}
-            </Mono>
-          </Ink>
-          <HBar x={T1 + WORD_W + 16} y={rowY(i) + rowH * 0.18} w={c * mlUnit} h={rowH * 0.64} at={mlAts[i]} />
-          <Note at={mlAts[i] + 6} x={T1 + WORD_W + 28 + c * mlUnit} y={rowY(i)}>
-            <div style={{ height: rowH, display: "flex", alignItems: "center", ...numStyle(22, i === 0 ? ACCENT_INK : INK) }}>
-              {i === 0 ? <Marked at={timesAt - 2}>×{c}</Marked> : `×${c}`}
-            </div>
-          </Note>
-        </React.Fragment>
+      {/* The three lines themselves, then what counting their bigrams finds. */}
+      {PHRASES.sentences.map((line, k) => (
+        <Ink key={line} at={linesAt + 4 + k * 6} dur={12} style={{ left: T1, top: rowY(0) + k * 28, whiteSpace: "nowrap" }}>
+          <Mono size={20} color={INK_SOFT}>
+            {line}
+          </Mono>
+        </Ink>
       ))}
-      <Ink at={emmaAt - 2} dur={12} style={{ left: T2, top: y(560) + 46, whiteSpace: "nowrap" }}>
+      {ml.map(([p, c], i) => {
+        const x = T1 + ml.slice(0, i).reduce((sum, [q]) => sum + tileW(q, CHIP) + 70, 0);
+        return (
+          <React.Fragment key={p}>
+            <Tile text={p} x={x} y={rowY(2) - 6} size={CHIP} at={mlAts[i] - 2} marks={i === 0 ? [{ at: topPairAt - 2 }] : []} border={i === 0 ? INK : undefined} />
+            <Note at={mlAts[i] + 4} x={x + tileW(p, CHIP) + 8} y={rowY(2) - 6}>
+              <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...numStyle(22, i === 0 ? ACCENT_INK : INK) }}>
+                {i === 0 ? <Marked at={timesAt - 2}>×{c}</Marked> : `×${c}`}
+              </div>
+            </Note>
+          </React.Fragment>
+        );
+      })}
+      <Ink at={emmaAt - 2} dur={12} style={{ left: T2, top: y(568) + 46, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), fontWeight: 600 }}>
           all of Emma<span style={{ opacity: ease(frame, stopwordAt - 2, 10) }}>, pairs with no stopword</span>
         </span>

@@ -34,15 +34,22 @@ export const WindowScene: React.FC = () => {
   const bigramAt = n.word("ngram", "bigram");
   const trigramAt = n.word("ngram", "trigram");
   const windowAt = n.word("slide", "window");
-  const quickAt = n.word("slide", "quick");
   const stepAt = n.word("slide", "one step");
   const timeAt = n.word("slide", "time");
   const overlapAt = n.word("slide", "overlap");
   const fourAt = n.word("formula", "four bigrams");
   const threeAt = n.word("formula", "three trigrams");
-  const numberAt = n.word("formula", "number of words");
-  const minusAt = n.word("formula", "minus n");
-  const plusAt = n.word("formula", "plus one");
+  const numberAt = n.word("rule", "number of words");
+  const minusAt = n.word("rule", "minus n");
+  const plusAt = n.word("rule", "plus one");
+  // Each tile arrives as its word is read, so the window never frames a gap.
+  const tileAts = [
+    n.word("slide", "the quick"),
+    n.word("slide", "quick"),
+    n.word("slide", "brown"),
+    n.word("slide", "fox"),
+    n.word("slide", "jumps"),
+  ];
 
   // ── The tokens and the window ──
   const tokens = WINDOW.tokens;
@@ -51,8 +58,11 @@ export const WindowScene: React.FC = () => {
   const biY = y(600);
   const triY = y(690);
   // Bigram window: in on "window", then a step at a time.
-  const biSteps = [windowAt + 4, stepAt, lerp(stepAt, timeAt + 8, 0.5), timeAt + 8];
-  const triSteps = [threeAt - 6, threeAt + 4, threeAt + 14];
+  // The window opens once all five words are down, then takes a step at a time.
+  const biSteps = [tileAts[4] + 4, stepAt + 4, lerp(stepAt + 4, timeAt + 14, 0.5), timeAt + 14];
+  const triSteps = [threeAt - 6, threeAt + 14, threeAt + 34];
+  /** The overlap marks lift as the trigram window takes over. */
+  const overlapOut = triSteps[0] - 6;
   const posAt = (steps: readonly number[]) => {
     let pos = 0;
     steps.forEach((s, i) => {
@@ -74,7 +84,12 @@ export const WindowScene: React.FC = () => {
   const [bl, br] = span(posAt(biSteps), 2);
   const [tl, tr] = span(posAt(triSteps), 3);
 
-  const chipList = (grams: readonly (readonly string[])[], ats: readonly number[], top: number, marks?: (i: number) => number | undefined) =>
+  const chipList = (
+    grams: readonly (readonly string[])[],
+    ats: readonly number[],
+    top: number,
+    marks?: (i: number) => number | undefined,
+  ) =>
     flow(
       grams.map((g) => g.join(" ")),
       LIST_X,
@@ -85,7 +100,9 @@ export const WindowScene: React.FC = () => {
       0,
     ).map((t, i) => {
       const m = marks?.(i);
-      return <Tile key={t.text} text={t.text} x={t.x} y={t.y} size={CHIP} at={ats[i] + 4} marks={m === undefined ? [] : [{ at: m }]} />;
+      return (
+        <Tile key={t.text} text={t.text} x={t.x} y={t.y} size={CHIP} at={ats[i] + 4} marks={m === undefined ? [] : [{ at: m, out: overlapOut }]} />
+      );
     });
   const biRight = LIST_X + WINDOW.bigrams.reduce((s, g) => s + tileW(g.join(" "), CHIP) + 14, 0);
   const triRight = LIST_X + WINDOW.trigrams.reduce((s, g) => s + tileW(g.join(" "), CHIP) + 14, 0);
@@ -132,7 +149,7 @@ export const WindowScene: React.FC = () => {
 
       <FigLabel n="12" title="A window, sliding one step at a time" at={windowAt - 6} x={X0} y={y(400)} />
       {tiles.map((t, i) => (
-        <Tile key={i} text={t.text} x={t.x} y={t.y} size={SIZE} at={(i === 0 ? windowAt : quickAt) - 6 + i * 3} marks={i === 1 ? [{ at: overlapAt - 2 }] : []} />
+        <Tile key={i} text={t.text} x={t.x} y={t.y} size={SIZE} at={tileAts[i] - 4} marks={i === 1 ? [{ at: overlapAt - 2, out: overlapOut }] : []} />
       ))}
       <Svg>
         {biOn > 0 ? (
@@ -160,7 +177,7 @@ export const WindowScene: React.FC = () => {
         <span style={{ ...label(24, INK), fontWeight: 600 }}>trigrams</span>
       </Ink>
       {chipList(WINDOW.trigrams, triSteps, triY)}
-      <Note at={threeAt + 18} x={triRight + 16} y={triY}>
+      <Note at={triSteps[2] + 6} x={triRight + 16} y={triY}>
         <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...numStyle(26, ACCENT_INK) }}>
           {WINDOW.trigrams.length}
           <span style={{ ...label(22, INK_SOFT), marginLeft: 10, fontWeight: 500, opacity: ease(frame, minusAt + 4, 10) }}>

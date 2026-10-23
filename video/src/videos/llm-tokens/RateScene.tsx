@@ -50,10 +50,11 @@ export const RateScene: React.FC = () => {
   const thousandAt = n.word("rate", "a thousand tokens");
   const sevenAt = n.word("rate", "seven hundred and fifty");
   const newerAt = n.word("newer", "Newer");
-  const openingAt = n.word("newer", "opening");
-  const charsAt = n.word("newer", "a hundred and ninety");
-  const thirtyAt = n.word("newer", "thirty-six");
-  const tokensAt = n.word("newer", "tokens");
+  const packAt = n.word("newer", "more text");
+  const openingAt = n.word("opening", "opening");
+  const charsAt = n.word("opening", "a hundred and ninety");
+  const thirtyAt = n.word("opening", "thirty-six");
+  const tokensAt = n.word("opening", "tokens");
   const decidedAt = n.word("bpe-in", "decided");
   const cutAt = n.word("bpe-in", "cut");
   const nobodyAt = n.word("bpe-in", "Nobody");
@@ -96,7 +97,7 @@ export const RateScene: React.FC = () => {
 
         {/* Fig. 7: the lesson's own opening, token by token. */}
         <FigLabel n="7" title={`The lesson's opening, in ${ENCODING} tokens`} at={newerAt - 4} x={X0} y={y(PARA_Y) - h(64)} />
-        <div style={{ position: "absolute", left: X0, top: y(PARA_Y), opacity: ease(frame, newerAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(PARA_Y), opacity: ease(frame, packAt - 4, 14) }}>
           <TokenRun pieces={pieces} size={PARA_SIZE} width={1680} inkAt={pieceAt} />
         </div>
         <div
@@ -117,7 +118,8 @@ export const RateScene: React.FC = () => {
             <b style={{ ...TABULAR, fontWeight: 650, color: inked === pieces.length ? FOCUS_INK : INK }}>{inked}</b> tokens
           </span>
           <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, tokensAt + 6, 12), whiteSpace: "nowrap" }}>
-            {OPENING.charsPerToken} characters a token
+            {OPENING.charsPerToken} characters a token:{" "}
+            <span style={{ color: FOCUS_INK }}>more than four, so fewer tokens than the rule predicts</span>
           </span>
         </div>
 

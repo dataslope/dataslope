@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DIVERSITY, EMMA } from "./data";
-import { flow, HBar, Headline, Kicker, MARK_BAD, Marked, numStyle, pulse, Spot, Tile } from "./parts";
+import { flow, HBar, Headline, Kicker, Marked, numStyle, pulse, REPEAT_WASH, Spot, Tile } from "./parts";
 
 const LEFT_X = 120;
 const LEFT_MAX = 985;
@@ -131,7 +131,7 @@ export const DiversityScene: React.FC = () => {
           at={(i < 3 ? veryAt : goodAt) - 4 + (i < 3 ? i : i - 3) * 3}
           marks={[
             ...(repFirst[i] ? [{ at: twoAt - 2 + i }] : []),
-            ...(!repFirst[i] ? [{ at: comingAt - 2 + i, color: MARK_BAD }] : []),
+            ...(!repFirst[i] ? [{ at: comingAt - 2 + i, color: REPEAT_WASH }] : []),
           ]}
         />
       ))}
@@ -161,7 +161,7 @@ export const DiversityScene: React.FC = () => {
       </Note>
 
       {/* Fig. 3: the same ratio on more and more of one novel. */}
-      <FigLabel n="3" title="One novel, scored on more and more of it" at={fallsAt - 4} x={RX} y={y(270)} />
+      <FigLabel n="3" title="Emma, scored on more and more of it" at={fallsAt - 4} x={RX} y={y(270)} />
       <div
         style={{
           position: "absolute",

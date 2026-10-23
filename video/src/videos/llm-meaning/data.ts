@@ -79,11 +79,13 @@ export const WEIGHTS = {
   sum: m.weights.sum,
 };
 
-export type Attend = { query: Vec; scores: readonly number[]; weights: readonly number[]; output: Vec };
+export type Attend = { query: Vec; dots: readonly number[]; scores: readonly number[]; weights: readonly number[]; weightSum: number; output: Vec };
 export const QKV = {
   tokens: m.qkv.tokens as readonly string[],
   keys: m.qkv.keys as readonly Vec[],
   values: m.qkv.values as readonly Vec[],
+  /** The key dimension the scores are divided by the square root of. */
+  dim: m.qkv.dim,
   trophy: m.qkv.trophy as Attend,
   suitcase: m.qkv.suitcase as Attend,
 };

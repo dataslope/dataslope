@@ -98,7 +98,7 @@ export const ReturnsScene: React.FC = () => {
         </div>
       ))}
       <Ink at={start + 10} dur={12} style={{ left: px(0), top: y(C_BASE) + 46, width: px(last) - px(0), textAlign: "center" }}>
-        <span style={label(20)}>Thinking tokens</span>
+        <span style={label(20)}>Thinking tokens (each step past 250 doubles)</span>
       </Ink>
       {/* The accuracy at each end, in the curve's own figures. */}
       <Note at={start + 40} x={px(last)} y={pts[last][1] - 50} align="right">
@@ -135,7 +135,7 @@ export const ReturnsScene: React.FC = () => {
         <span style={label(22, ACCENT_INK)}>Can hurt</span>
       </Ink>
       <Ink at={talkAt - 4} dur={14} style={{ left: RIGHT_X, top: y(730), width: 420 }}>
-        <div style={{ ...body(32), color: INK }}>an easy problem, talked out of a right first answer</div>
+        <div style={{ ...body(32), color: INK }}>an easy problem, talked out of a right answer</div>
       </Ink>
       </Drift>
     </AbsoluteFill>

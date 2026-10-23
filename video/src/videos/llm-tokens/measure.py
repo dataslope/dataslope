@@ -167,6 +167,12 @@ pair_counts, merge_pair = ns["pair_counts"], ns["merge_pair"]
 freqs = Counter(corpus.split())
 splits = {w: list(w) + ["</w>"] for w in freqs}
 first_pairs = [{"pair": list(p), "count": n} for p, n in pair_counts(splits, freqs).most_common(5)]
+# How many distinct neighbouring pairs the first count finds (the page prints
+# its top five), and the tie at the top that Python's Counter breaks in the
+# order the pairs were first counted.
+pair_total = len(pair_counts(splits, freqs))
+top_two = pair_counts(splits, freqs).most_common(2)
+assert top_two[0][1] == top_two[1][1], top_two
 bpe_steps = [{"merge": None, "count": None, "splits": {w: list(s) for w, s in splits.items()}}]
 for step in range(10):
     pairs = pair_counts(splits, freqs)
@@ -243,6 +249,28 @@ for name in [ENC, *OLDER]:
     formats["json"][name] = len(e.encode(as_json))
     formats["csv"][name] = len(e.encode(as_csv))
 formats["ratio"] = round(formats["json"][ENC] / formats["csv"][ENC], 2)
+
+
+def keyed_pieces(text: str, keys: list[str], header_only: bool) -> list[dict]:
+    """The text's o200k pieces, each marked if it falls inside a key name
+    (in JSON every occurrence, in CSV the header line only)."""
+    limit = text.index("\n") if header_only else len(text)
+    spans = [(m.start(), m.end()) for k in keys for m in re.finditer(re.escape(k), text[:limit])]
+    out, at = [], 0
+    for p in pieces(text):
+        a, b = at, at + len(p["text"])
+        at = b
+        out.append({**p, "key": any(a < e and b > s for s, e in spans)})
+    assert "".join(p["text"] for p in out) == text
+    return out
+
+
+KEYS = list(fns["records"][0].keys())
+formats["json"]["pieces"] = keyed_pieces(as_json, KEYS, header_only=False)
+formats["csv"]["pieces"] = keyed_pieces(as_csv, KEYS, header_only=True)
+formats["keys"] = KEYS
+formats["jsonKeyNames"] = sum(as_json.count(f'"{k}"') for k in KEYS)
+assert len(formats["json"]["pieces"]) == formats["json"][ENC] and len(formats["csv"]["pieces"]) == formats["csv"][ENC]
 
 # Which model each encoding belongs to, from tiktoken's own table.
 families = [
@@ -337,6 +365,7 @@ out = {
         "corpus": corpus,
         "freqs": dict(freqs),
         "firstPairs": first_pairs,
+        "pairTotal": pair_total,
         "steps": bpe_steps,
     },
     "counts": {
