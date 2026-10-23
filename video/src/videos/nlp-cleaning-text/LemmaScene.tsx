@@ -19,8 +19,8 @@ const RIGHT_X = 1010;
 const CARD_Y = [370, 572];
 const CARD_W = 790;
 /** The open dictionary, centred in the right half where Fig. 16 will go; its
- *  box follows the art's own proportions (1536x1024 before trimming). */
-const BOOK = { left: 1080, dy: 0, w: 560, h: 373 };
+ *  box follows the art's own proportions (1536x840 after trimming). */
+const BOOK = { left: 1080, dy: 40, w: 560, h: Math.round((560 * 840) / 1536) };
 
 const head: React.CSSProperties = { fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, whiteSpace: "nowrap" };
 

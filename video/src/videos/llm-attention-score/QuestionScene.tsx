@@ -88,7 +88,7 @@ export const QuestionScene: React.FC = () => {
   const trophyAt = n.word("ask", "trophy");
   const winAt = n.word("ask", "win");
   const computeAt = n.word("ask", "compute");
-  const threeAt = n.word("three", "three");
+  const everyTokenAt = n.word("three", "Every token");
   const embeddingAt = n.word("three", "embedding");
   const vectorsAt = n.word("three", "vectors");
   const cardAt = [n.word("query", "query"), n.word("key", "key"), n.word("value", "value")];
@@ -138,11 +138,11 @@ export const QuestionScene: React.FC = () => {
           </>
         }
         at={from}
-        out={threeAt - 8}
+        out={everyTokenAt - 6}
       />
       {/* "Three vectors: query, key, value", each word in its own ink as it is named. */}
       <div style={{ position: "absolute", left: 92, top: y(HEAD_Y), display: "flex", gap: "0.26em", ...headline(72) }}>
-        <Ink at={threeAt - 4} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
+        <Ink at={everyTokenAt + 4} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Three vectors:
         </Ink>
         {["query,", "key,", "value."].map((w, i) => (
@@ -196,8 +196,8 @@ export const QuestionScene: React.FC = () => {
       <Spot id="llm-meaning-trophy" at={trophyAt - 4} left={1440} top={y(390)} width={340} height={334} />
 
       {/* ── Fig. 2: one embedding, three vectors ── */}
-      <FigLabel n="2" title="From one embedding, three vectors" at={threeAt - 4} x={X0} y={y(560)} />
-      <Fade at={threeAt - 2} style={{ left: X0 - 6, top: stripY - 2 }}>
+      <FigLabel n="2" title="From one embedding, three vectors" at={everyTokenAt - 4} x={X0} y={y(560)} />
+      <Fade at={everyTokenAt} style={{ left: X0 - 6, top: stripY - 2 }}>
         <TokenChip text="it" size={24} border={QUERY} color={QUERY_INK} />
       </Fade>
       <Svg opacity={ease(frame, embeddingAt - 4, 12)}>

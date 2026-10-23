@@ -1,6 +1,6 @@
 # Llm-5-Benchmarks: fix pass
 
-All 15 findings are dealt with: 14 fixed and 1 partly fixed (a P3). Both P1s and all six P2s are fixed. I made no commits. The container restart left the files on disk and in 1c08728, with all seven new beats already voiced (`narrate --dry-run`: 0 of 49 beats left to voice). I picked the pass up from there.
+All 15 findings are dealt with: 14 fixed and 1 partly fixed (a P3). Both P1s and all six P2s are fixed. I made no commits; the coordinator's commits (latest 2d4dbd9) carry the work. The container restart left the files on disk and in 1c08728, with all seven new beats already voiced (`narrate --dry-run`: 0 of 49 beats left to voice). I picked the pass up from there.
 
 ## Findings
 
@@ -45,9 +45,9 @@ All 15 findings are dealt with: 14 fixed and 1 partly fixed (a P3). Both P1s and
 | `check:cues` | clean for my folder (the package-wide failures are nlp-counting-words') |
 | `npm test` | nothing names llm-benchmarks. Two failures, both nlp-counting-words, mid-edit by its builder. |
 | `check:sync` | pass, worst **+0.06 s** (`sat-tell`); every re-voiced beat within ±0.02 s |
-| `check:motion` | MOTION |
-| `check:frames` | FRAMES |
-| `check:mix` | MIX |
+| `check:motion` | pass. The longest still is **2.5 s**, and nothing holds for 3 s. The first run after the fixes found one 3.0 s still at the Mismatch opening; I fixed it with a marker on the source tag on "performance" and a swell on "SWE-bench", and the re-run passed. |
+| `check:frames` | pass. 4 illustrations, largest stretch **0.92**; 15 arrows, **0.0°** bend under every head |
+| `check:mix` (informational) | effects **25.6 LU under** the narration (-45.4 against -19.8 LUFS). Their peak is -21.1 dBFS at 0:00.6, which is the logo. Where both sound, speech is a median 26.9 dB above the effects (5th percentile 10.5 dB). |
 
 ## Also changed
 - The script header had Figs. 11, 12 and 13 mislabelled (they are 13, 14 and 15). Corrected, and the header now records each fix's source. It also says where the lesson's prose and its numbers disagree (the cost verdict, and "almost always" at 20 examples), and that the video follows the numbers.

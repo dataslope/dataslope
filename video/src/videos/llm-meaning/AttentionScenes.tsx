@@ -380,6 +380,11 @@ export const BlendScene: React.FC = () => {
   const addAt = n.word("dot", "add");
   const dotProductAt = n.word("dot", "dot product");
   const cosineAt = n.word("dot", "cosine");
+  const dividingAt = n.word("dot", "dividing");
+  const thenAt = n.word("scale", "Then");
+  const scaleVectorAt = n.word("scale", "vector");
+  const thatAt = n.word("scale", "That");
+  const weightsPronounAt = n.word("weights", "pronoun's");
   const dividedAt = n.word("scale", "divided");
   const rootAt = n.word("scale", "square root");
   const smallAt = n.word("scale", "small");
@@ -454,7 +459,7 @@ export const BlendScene: React.FC = () => {
         <span
           style={{
             borderRadius: 8,
-            boxShadow: `0 0 0 ${5 * (pulse(frame, swapQ, 26) + pulse(frame, queryAt, 26) + pulse(frame, flipQuestionAt, 26))}px color-mix(in srgb, ${POINT} 40%, transparent)`,
+            boxShadow: `0 0 0 ${5 * (pulse(frame, swapQ, 26) + pulse(frame, queryAt, 26) + pulse(frame, flipQuestionAt, 26) + pulse(frame, scaleVectorAt - 6, 26))}px color-mix(in srgb, ${POINT} 40%, transparent)`,
           }}
         >
           <VectorCells values={frame < swapQ + 5 ? A.query : B.query} size={26} border={QUERY} fill={PAPER} />
@@ -473,14 +478,39 @@ export const BlendScene: React.FC = () => {
       </Fade>
       <Svg opacity={ease(frame, from + 6, 12)}>
         <line x1={X0} x2={1010} y1={HY + 36} y2={HY + 36} stroke={INK} strokeWidth={1.6} />
+        {/* "Then it's divided": the score column, outlined. */}
+        <rect
+          x={T_X.score - 14}
+          y={rowTop(0) + 2}
+          width={150}
+          height={3 * T_ROW - 10}
+          rx={8}
+          fill="none"
+          stroke={POINT}
+          strokeWidth={2.4}
+          opacity={pulse(frame, thenAt - 2, 40)}
+        />
       </Svg>
       {QKV.tokens.map((t, i) => {
         const p = ease(frame, from + 8 + i * 4, 12);
         if (p <= 0) return null;
-        const keyGlow = pulse(frame, everyKeyAt + i * 4, 22);
+        const keyGlow = pulse(frame, everyKeyAt + i * 4, 22) + pulse(frame, scaleVectorAt + i * 3, 26);
         const weightHot = i === 0 ? ease(frame, pointAt - 2, 10) * (1 - ease(frame, swapW, 10)) : i === 1 ? ease(frame, swapW + 4, 10) : 0;
         return (
           <div key={t} style={{ position: "absolute", left: 0, top: rowTop(i), width: 1100, height: T_ROW, opacity: p }}>
+            {i === 0 ? (
+              <div
+                style={{
+                  position: "absolute",
+                  left: X0 - 12,
+                  top: 0,
+                  width: 1010 - X0 + 24,
+                  height: T_ROW - 10,
+                  borderRadius: 8,
+                  background: `color-mix(in srgb, ${POINT} ${Math.round(10 * ease(frame, weightsPronounAt - 2, 12) * (1 - ease(frame, swapW, 12)))}%, transparent)`,
+                }}
+              />
+            ) : null}
             <div style={{ position: "absolute", left: T_X.tok, top: 8 }}>
               <TokenChip text={t} size={24} />
             </div>
@@ -580,10 +610,11 @@ export const BlendScene: React.FC = () => {
       {/* The tie to cosine, while the right half waits for the blend. */}
       <Note at={cosineAt - 2} out={blendPronounsAt - 8} x={1100} y={y(400)} width={640}>
         <div style={{ ...body(34), color: INK }}>
-          Cosine similarity is this <Mark at={cosineAt + 4}>dot product</Mark>, divided by both vectors&apos; lengths.
+          Cosine similarity is this <Mark at={cosineAt + 4}>dot product</Mark>,{" "}
+          <Mark at={dividingAt}>divided by both vectors&apos; lengths.</Mark>
         </div>
       </Note>
-      <Note at={smallAt - 4} out={blendPronounsAt - 8} x={1100} y={y(560)} width={640}>
+      <Note at={thatAt - 2} out={blendPronounsAt - 8} x={1100} y={y(560)} width={640}>
         <div style={{ ...note(26, INK_SOFT) }}>
           Dividing by √{QKV.dim}, the square root of the vector size, keeps the scores small as vectors grow.
         </div>

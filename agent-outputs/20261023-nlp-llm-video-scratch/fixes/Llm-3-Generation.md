@@ -1,6 +1,6 @@
 # Llm-3-Generation: fix pass
 
-Review: `$S/review/reports/Llm-3-Generation.md` (0 P1, 9 P2, 11 P3). **All 20 findings fixed.** Not committed.
+Review: `$S/review/reports/Llm-3-Generation.md` (0 P1, 9 P2, 11 P3). **All 20 findings fixed.** I made no commits; the work is in the coordinator's 2d4dbd9.
 
 | # | P | Result | What changed |
 | --- | --- | --- | --- |
@@ -11,7 +11,7 @@ Review: `$S/review/reports/Llm-3-Generation.md` (0 P1, 9 P2, 11 P3). **All 20 fi
 | 5 | P2 | fixed | Fig. 17: "(log scales)" in the title, "(log scale)" on the x axis, and a note on "fifteen thousand": "On log axes, a square is a line twice as steep." The reference line is now dashed (`0.012 0.009` in `pathLength` units). Fig. 19's axis: "Thinking tokens (each step past 250 doubles)". |
 | 6 | P2 | fixed | Re-voiced `permission`: adds "Paste the three chapters that matter, and put the key facts first or last." On screen: green tags "key facts here" / "or here" at the curve's two ends on "first or last", and "The three chapters that matter, not the whole manual." on "three chapters". |
 | 7 | P2 | fixed | Each of the first three fixes gets the lesson's reason under it, held to the cut: "the fact is in the context, not the weights", "a query you can run beats a number you must trust", "a schema leaves no field to invent". NOT_FOUND keeps its `exit` line. `works` pauseAfter 0.6 → 1.0. |
-| 8 | P2 | fixed | The three draws land during the sentence (from "lines of code"), with "21.6%, drawn anyway" under the dog chip. `picker` pauseAfter 0.8 → 2.0, so the finished figure holds about 6 s. |
+| 8 | P2 | fixed | The three draws land during the sentence (from "lines of code"), with "21.6%, drawn anyway" under the dog chip. `picker` pauseAfter 0.8 → 2.0, so the finished figure, draws included, holds about 5 s. |
 | 9 | P2 | fixed | Re-voiced `overthink` shorter: "On an easy problem, more thinking can even talk it out of a right answer." 2.9 words/s, down from 3.85. pauseAfter 1.0. The on-screen line matches. |
 | 10 | P3 | fixed | The dial now stops at 1 before going on to 1.5. "Above 1, the gaps shrink." waits until it is past 1. |
 | 11 | P3 | fixed | "Greedy decoding." sits on its own line. |
@@ -32,7 +32,22 @@ Review: `$S/review/reports/Llm-3-Generation.md` (0 P1, 9 P2, 11 P3). **All 20 fi
 
 ## Length and checks
 
-__CHECKS__
+- **Length: 6:32** (392.0 s, 47 beats, 940 words, 144 wpm, from `npm run cues`), up from 6:19. That is the re-voiced beats' added words plus the longer holds after `picker` and `works`.
+- On the final code, through my entry and the queue:
+
+| Check | Result |
+| --- | --- |
+| Typecheck (full `tsc` filtered to my folder, and folder-scoped) | clean |
+| `eslint src/videos/llm-generation` | clean |
+| `check:cues` | nothing for my folder |
+| `npm test` | 57 pass, 2 fail, both in `nlp-counting-words` (another builder's cues), none in mine |
+| `check:frames` | pass: 4 images, largest stretch 0.97, 6 arrows, 0° bend |
+| `check:motion` | pass: 6:32.3, no still stretch of 2 s or more |
+| `check:sync` | pass: worst +0.04 s (`hedge-why`, a re-voiced beat, at 3:02.2) |
+| `check:mix` (informational) | effects 25.8 LU under the narration (-45.9 vs -20.1 LUFS), peak -21.1 dBFS (the intro logo); speech a median 28.3 dB above the effects, 5th percentile 12.4 dB; closest 10.6 dB (6:11.5, 50 ms) |
+
+- Stills re-taken at every changed place and looked at: Figs. 1, 2 (at T = 0 and at 1.4), 3–4, 5–6, 10–11, 12–13, 14 (at its first word and finished), 15, 16–17 (finished and dimmed), 19, and 20–21 (early and finished).
+- The sync and mix logs date from after the last code change (committed as 2d4dbd9). They had finished before the worker restart, so I did not re-run them.
 
 ## New, noticed and fixed
 

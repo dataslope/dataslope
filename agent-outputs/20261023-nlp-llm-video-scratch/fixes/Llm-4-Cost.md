@@ -1,6 +1,6 @@
 # Llm-4-Cost fix pass ("What a token costs", How LLMs Work Unit 4)
 
-All 14 findings are fixed: the P1, all five P2s and all eight P3s. One part of finding 5 is left (the "Lesson 6" retrieval exception, see the table). Nothing committed. The container restarted mid-pass; my edits had survived on disk (1c08728), and the voicing and every check were run after the restart.
+All 14 findings are fixed: the P1, all five P2s and all eight P3s. One part of finding 5 is left (lever 6's retrieval exception, see the table). Nothing committed. Two interruptions (a container restart, then a worker restart) killed nothing that mattered: the edits had survived on disk, voicing and every check ran after the first restart, and the stills and `check:mix` had finished before the second.
 
 | # | P | Result | What changed |
 | --- | --- | --- | --- |
@@ -31,9 +31,9 @@ All 14 findings are fixed: the P1, all five P2s and all eight P3s. One part of f
 - **`check:cues`:** clean for llm-cost.
 - **`npm test`:** passes for llm-cost. The package shows 56/59; the three failures are all llm-meaning's (`cut("real")`, beat "scores"), not mine.
 - **`check:sync`:** pass, worst +0.04 s (effort, 5:01.4).
-- **`check:motion`:** CHECK_MOTION
-- **`check:frames`:** CHECK_FRAMES
-- **`check:mix`:** CHECK_MIX
+- **`check:motion`:** pass, longest still 2.5 s (`threshold`). The first post-fix run failed one 3.0 s stretch, fixed below.
+- **`check:frames`:** pass. Largest illustration stretch 0.86; 7 arrows, 0.0° of bend.
+- **`check:mix`:** effects 25.5 LU under the narration (-45.4 against -19.9 LUFS). Effects' peak -21.1 dBFS at 0:00.6, the logo. Speech a median 26.7 dB above the effects (5th percentile 11.0 dB).
 
 Stills were re-taken at every changed place and looked at: Figs. 2, 3, 4, 6, 7, 8, 9, 10, 11 to 13, the Fig. 9 return, and the close.
 
