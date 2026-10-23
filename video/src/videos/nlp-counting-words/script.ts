@@ -46,27 +46,48 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     stopwords removed first, mr 1,153, emma 865, could, would, mrs, miss
  *     ("without", the lesson's "A catch" on a whole book). "Zipf's law" is
  *     the lesson's name for the shape; its chart zipf-law is drawn on the
- *     Brown corpus's published counts, and Fig. 5 is Emma's own.
+ *     Brown corpus's published counts, and Fig. 5 is Emma's own: all 7,079
+ *     ranks on a linear rank axis, so the top ten take the first pixel and a
+ *     half and the tail runs the width of the chart, its last 38.7% (the
+ *     2,739 hapaxes, count 1) marked. The law itself is left to its own
+ *     deep dive; the unit names it in one sentence.
  *   - pos-tagging: fish is NN in "I caught a big fish." and VBP in "We fish
  *     on weekends."; "The tall man reads books." is DT JJ NN VBZ NNS; the
  *     engineer sentence keeps nouns engineer, system, adjectives talented,
  *     young, brilliant, new, verb designed and adverb quietly; the runners
  *     sentence lemmatizes running and eaten unchanged without tags, and to
  *     be, run, have and eat with them. "About thirty-six" tags and the
- *     first-letter shortcut are the lesson's.
+ *     first-letter shortcut are the lesson's; VBZ is the lesson table's
+ *     "3rd-person" verb ("a present-tense verb for he, she or it"). The Penn
+ *     Treebank is the hand-tagged corpus NLTK's averaged perceptron tagger
+ *     was trained on ("penn"). "Hand each word its tag's first letter" is
+ *     the lesson's to_wordnet_pos, which maps J, V and R to WordNet's
+ *     adjective, verb and adverb and everything else to noun; the full
+ *     mapping is left to the lemmatizing deep dive.
  *   - ngrams: "the quick brown fox jumps" gives 4 bigrams and 3 trigrams
  *     (k - n + 1, said "the number of words, minus n, plus one"); "the food
  *     was not good" against "the food was good" differ only by not as sets,
  *     and only the first holds the bigram (not, good); in the machine
- *     learning lines, ("machine", "learning") is the top bigram, 3 times.
+ *     learning lines (shown as nltk.sent_tokenize splits the block's text),
+ *     ("machine", "learning") is the top bigram, 3 times.
  *     Over Emma, the commonest bigrams whose two words are both not
  *     stopwords are mr knightley 299, mrs weston 256, mr elton 229 ("cast").
- *   - "shares": the share of Emma's distinct n-grams that occur exactly once,
- *     for n = 1 to 5: 38.7%, 72.5%, 89.8%, 97.2%, 99.3%. The lesson's own
- *     sparsity block (four repeated lines about a cat and a dog) prints 7, 9,
- *     8 and 7 n-grams "that repeat" for n = 1 to 4, which does not show the
- *     collapse its prose describes, so the video measures the point on Emma
- *     instead (see the report's lesson discrepancies).
+ *   - "shares" (Fig. 15): of Emma's n-grams as read, every occurrence, the
+ *     share whose n-gram appears again somewhere in the book, 1 - once /
+ *     grams: 98.3%, 70.4%, 27.3%, 6.6%, 1.5% for n = 1 to 5 ("almost always",
+ *     "seven times in ten", "about one in four", "one in fifteen", "almost
+ *     never"). That is what a model counting them can reuse; the share of
+ *     *distinct* n-grams seen once (38.7% to 99.3%) is in measurements.json
+ *     too, but read as a share of the text it overstates the one-offs (by
+ *     occurrence, 1.7% of Emma's words are). The lesson's own sparsity block
+ *     (four repeated lines about a cat and a dog) prints 7, 9, 8 and 7
+ *     n-grams "that repeat" for n = 1 to 4, which does not show the collapse
+ *     its prose describes, so the video measures the point on Emma instead.
+ *     Following the numbers rather than the lesson's "bigrams and trigrams
+ *     are the sweet spot": on a novel, trigrams already recur only about one
+ *     time in four, so the video says bigrams, and trigrams given plenty of
+ *     text. "Not bad" ("bigram") is the lesson's own point that a lone "not"
+ *     says nothing about what it negates; no count is attached to it.
  *
  * Written for Hope's voice, upbeat and clear: short spoken sentences, no
  * symbols or parentheses, numbers as words, contractions, and the Penn tags

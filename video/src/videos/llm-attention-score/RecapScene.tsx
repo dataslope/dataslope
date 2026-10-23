@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, label, PAPER, TABULAR } from "../../editorial/style";
-import { FigLabel } from "../../editorial/ui";
+import { FigLabel, Leader } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -15,7 +15,6 @@ import {
   Fade,
   FIG_Y,
   Headline,
-  KEY_INK,
   Kicker,
   Mono,
   POINT,
@@ -82,6 +81,9 @@ export const RecapScene: React.FC = () => {
   const GY = y(690);
   const CELL = 50;
   const headIn = (h: number) => headsAt - 4 + h * 5;
+  /** Where the notes beside the stack start. */
+  const LX = GX + 3 * CELL + 130;
+  const shift = pulse(frame, makingAt, 30);
 
   return (
     <AbsoluteFill>
@@ -149,8 +151,8 @@ export const RecapScene: React.FC = () => {
         {[3, 2, 1, 0].map((h) => {
           const p = h === 0 ? 1 : ease(frame, headIn(h), 12);
           if (p <= 0) return null;
-          const dx = h * 26;
-          const dy = -h * 22;
+          const dx = h * (26 + 8 * shift);
+          const dy = -h * (22 + 6 * shift);
           return (
             <g key={h} opacity={h === 0 ? 1 : p * 0.85} transform={`translate(${dx}, ${dy})`}>
               <rect x={GX - 8} y={GY - 8} width={3 * CELL + 16} height={3 * CELL + 16} rx={8} fill={PAPER} stroke={INK} strokeWidth={1.6} />
@@ -198,16 +200,22 @@ export const RecapScene: React.FC = () => {
       <Fade at={pairAt + 4} style={{ left: GX - 8, top: GY + 3 * CELL + 18 }}>
         <Tag size={20}>rows: queries · columns: keys</Tag>
       </Fade>
-      <Fade at={pairAt + 8} style={{ left: GX + 3 * CELL + 120, top: GY + 2 * CELL + 2 }}>
+      <Leader
+        points={[
+          [LX - 14, GY + 2.5 * CELL],
+          [GX + 0.5 * CELL, GY + 2.5 * CELL],
+        ]}
+        at={pairAt + 6}
+        color={POINT}
+        dash="5 5"
+      />
+      <Fade at={pairAt + 8} style={{ left: LX, top: GY + 2 * CELL + 10 }}>
         <span style={{ ...label(22, POINT_INK), whiteSpace: "nowrap" }}>
-          ← <Mono>it</Mono> against <Mono>trophy</Mono>: {three(r0.weight)}
+          <Mono>it</Mono> to <Mono>trophy</Mono>, the one we computed: {three(r0.weight)}
         </span>
       </Fade>
-      <Fade at={onceAt} style={{ left: GX + 3 * CELL + 120, top: GY - 30 }}>
+      <Fade at={onceAt - 2} style={{ left: LX, top: GY - 64 }}>
         <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>many heads, at once</span>
-      </Fade>
-      <Fade at={makingAt - 2} style={{ left: GX + 3 * CELL + 120, top: GY + 30 }}>
-        <span style={{ ...label(22, KEY_INK), whiteSpace: "nowrap" }}>each with its own queries, keys and values</span>
       </Fade>
       <Spot id="llm-attention-score-mix" at={realAt - 6} left={1330} top={y(620)} width={420} height={290} />
     </AbsoluteFill>

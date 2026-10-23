@@ -672,9 +672,10 @@ export const TopScene: React.FC = () => {
         </span>
       </Fade>
       <Fade at={allAt + 8} style={{ left: LX, top: rowTop(LOGITS.tokens.length) + 56 }}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          Four example scores from the sampling lesson; {thousands(PARAMS.vocab)} is the mid-sized model&apos;s vocabulary
-        </span>
+        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>Four example scores, from the sampling lesson.</div>
+        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          {thousands(PARAMS.vocab)}: the vocabulary of the lesson&apos;s mid-sized model.
+        </div>
       </Fade>
       <NextLine at={pickAt - 4} x={X0} y={y(880)} width={1680}>
         choosing the next token

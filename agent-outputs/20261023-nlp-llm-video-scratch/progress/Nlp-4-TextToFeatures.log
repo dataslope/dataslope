@@ -17,3 +17,4 @@
 10:05 fix: split 4 beats (free recut), voicing 8 changed/new beats (540 chars)
 10:19 fix: #15 context row (CONTEXT trace), authorship fingerprint note, script header; running lint/typecheck/cues
 10:23 checks: lint ok, tsc ok, check:cues ok for this video, npm test 58/59 (fail is nlp-lemmas-and-tags cues); rendering 47 stills
+10:34 reset pauseAfter 1.0; stills job re-queued (first was killed waiting in the queue)

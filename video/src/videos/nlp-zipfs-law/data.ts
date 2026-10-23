@@ -13,6 +13,8 @@ export const VIDEO = "nlp-zipfs-law";
  *  (copied) and the two spots from illustrations.json. Every frame is laid
  *  out with room for them either way. */
 export const ILLUSTRATIONS = true;
+/** The images in that folder, by file name. */
+export const IMAGES = new Set(["nlp-counting-words-novel"]);
 
 export type Row = { rank: number; word: string; count: number };
 export type Predicted = Row & { law: number; product: number };
@@ -39,6 +41,8 @@ export const EMMA = {
   top100Share: m.top100Share,
   /** How many of the top hundred are on NLTK's English stopword list. */
   top100Stop: m.top100Stop,
+  /** The top hundred in rank order: [word, on the stopword list]. */
+  top100Words: m.top100Words as unknown as readonly (readonly [string, boolean])[],
   hapaxes: m.hapaxes,
   hapaxShare: m.hapaxShare,
   firstHapaxRank: m.firstHapaxRank,

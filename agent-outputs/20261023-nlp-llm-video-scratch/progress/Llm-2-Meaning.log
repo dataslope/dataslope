@@ -11,3 +11,4 @@
 2026-10-23T09:24:33Z final: check:frames and check:motion re-run after last layout edit, both pass; report written
 2026-10-23T10:04:03Z fix pass started (review: 2 P1, 9 P2, 9 P3)
 2026-10-23T10:11:27Z fix: 4 splits recut (free); 9 beats re-voiced, 785 chars
+2026-10-23T10:28:37Z fix: scenes rebuilt; check:sync passed (worst +0.03 s)

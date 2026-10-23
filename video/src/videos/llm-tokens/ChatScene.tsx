@@ -11,7 +11,7 @@ import { BERRY, CHERRY, CONVERSATION, num } from "./data";
 import { ds } from "../../theme/brand";
 import { ChipFace, Drift, FIG_Y, FOCUS, FOCUS_INK, Headline, Out, pulse, Spot, TOKEN, X0 } from "./parts";
 
-/** Fig. 15: one bar per turn, what that turn sends. */
+/** Fig. 16: one bar per turn, what that turn sends. */
 const BAR_X = 170;
 const BAR_W = 58;
 const BAR_GAP = 24;
@@ -20,7 +20,7 @@ const BASE = 820;
 const PER_TOKEN = 400 / 7000;
 /** The right column: the bill. */
 const RX = 1300;
-/** Fig. 16, once the chart has gone: the two tokens, centred on their art. */
+/** Fig. 17, once the chart has gone: the two tokens, centred on their art. */
 const BERRY_X = X0 + 223;
 const CHERRY_X = 820;
 /** The three parts of each bar: sent every turn, sent again, sent new. */
@@ -88,7 +88,7 @@ export const ChatScene: React.FC = () => {
 
       <Drift from={chatFrom} to={n.durationInFrames} amount={0.01} origin="40% 55%">
         <Out at={eachAt - 4} dur={14}>
-          <FigLabel n="15" title="Input tokens sent on each turn, the lesson's example" at={chatFrom} x={X0} y={y(FIG_Y)} />
+          <FigLabel n="16" title="Input tokens sent on each turn, the lesson's example" at={chatFrom} x={X0} y={y(FIG_Y)} />
           {/* The system prompt, sent every time. */}
           <div
             style={{
@@ -222,8 +222,8 @@ export const ChatScene: React.FC = () => {
           </div>
         </div>
 
-        {/* Fig. 16: two tokens, two ids, given the page once the chart has gone. */}
-        <FigLabel n="16" title="Two tokens, two ids" at={idAt - 4} x={X0} y={figY} />
+        {/* Fig. 17: two tokens, two ids, given the page once the chart has gone. */}
+        <FigLabel n="17" title="Two tokens, two ids" at={idAt - 4} x={X0} y={figY} />
         <Spot id="llm-tokens-strawberry" at={idAt - 2} left={BERRY_X - 223} top={figY + 56} width={446} height={250} />
         <div style={{ position: "absolute", left: BERRY_X, top: figY + 330, transform: "translateX(-50%)", opacity: ease(frame, idAt, 12) }}>
           <BridgeChip

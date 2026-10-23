@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, headline, HIGHLIGHT, INK, INK_SOFT, 
 import { H, Ink, W } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { SANS } from "../../theme/fonts";
-import { ILLUSTRATIONS, VIDEO } from "./data";
+import { ILLUSTRATIONS, IMAGES, VIDEO } from "./data";
 
 /**
  * Pieces this video needs beyond the shared editorial kit, after the two
@@ -236,7 +236,7 @@ export const Spot: React.FC<{
   const p = pop(frame, at, fps, 16);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   const d = dim === undefined ? 0 : ease(frame, dim, 20) * 0.6;
-  if (!ILLUSTRATIONS || p <= 0.001 || o >= 1) return null;
+  if (!ILLUSTRATIONS || !IMAGES.has(id) || p <= 0.001 || o >= 1) return null;
   return (
     <Illustration
       video={VIDEO}

@@ -8,7 +8,7 @@ import { ACCENT, ACCENT_INK, headline as headlineStyle, INK, INK_SOFT, label, PA
 import { H, Ink, W } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { SANS } from "../../theme/fonts";
-import { ILLUSTRATIONS, SYSTEM, type Turn, VIDEO } from "./data";
+import { ILLUSTRATIONS, REPLY, SYSTEM, type Turn, VIDEO } from "./data";
 
 /**
  * What this deep dive needs beyond the shared editorial kit: the colors (the
@@ -460,8 +460,9 @@ export const Stairs: React.FC<{
   cacheRate?: number;
   dim?: (turn: number) => number;
   glow?: (turn: number) => number;
+  flash?: (turn: number) => number;
   dividers?: number;
-}> = ({ geo, turns, state, merge = 0, soften = 0, lineTint = 0, triTint = 0, cache = 0, cacheRate = 1, dim, glow, dividers = 0 }) => {
+}> = ({ geo, turns, state, merge = 0, soften = 0, lineTint = 0, triTint = 0, cache = 0, cacheRate = 1, dim, glow, flash, dividers = 0 }) => {
   const width = lerp(geo.bar, geo.slot + 0.6, merge);
   const sentFill = mix(SENT, CACHED, cache);
   const newFill = mix(NEW, SENT, soften);
@@ -474,6 +475,7 @@ export const Stairs: React.FC<{
         const x = geo.x(t.turn);
         const d = dim ? dim(t.turn) : 0;
         const g = glow ? glow(t.turn) : 0;
+        const f = flash ? flash(t.turn) : 0;
         const sentH = t.resent * geo.k * squash;
         const freshH = t.newSlice * geo.k;
         const sentX = s.slide ? x - (1 - s.sent) * geo.slot : x;
@@ -502,11 +504,11 @@ export const Stairs: React.FC<{
               <line
                 x1={x}
                 x2={x + width}
-                y1={t.turn === 1 ? lineTop : geo.base - (t.resent + 400) * geo.k - drop}
-                y2={t.turn === 1 ? lineTop : geo.base - (t.resent + 400) * geo.k - drop}
+                y1={t.turn === 1 ? lineTop : geo.base - (t.resent + REPLY) * geo.k - drop}
+                y2={t.turn === 1 ? lineTop : geo.base - (t.resent + REPLY) * geo.k - drop}
                 stroke={PAPER}
                 strokeWidth={2.5}
-                opacity={dividers * (t.turn === 1 ? s.fresh : s.fresh)}
+                opacity={dividers * Math.min(1, s.fresh * (t.turn === 1 ? 1.4 : 1))}
               />
             ) : null}
             {lineTint > 0 && s.sent + s.fresh > 0 ? (
@@ -515,6 +517,7 @@ export const Stairs: React.FC<{
             {triTint > 0 && s.sent + s.fresh > 0 ? (
               <rect x={x} y={geo.base - shown} width={width} height={Math.max(0, shown - SYSTEM * geo.k)} fill={TRI_FILL} opacity={triTint} />
             ) : null}
+            {f > 0 ? <rect x={x} y={geo.base - shown} width={width} height={shown} fill={NEW} opacity={f * 0.38} /> : null}
           </g>
         );
       })}

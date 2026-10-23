@@ -285,7 +285,7 @@ export const QkvScene: React.FC = () => {
 // ═══ Scene 9: one score worked through, and the blend it makes ═════════════
 
 const T_X = { tok: X0, key: 310, value: 500, score: 700, weight: 890 };
-const T_ROW = 82;
+const T_ROW = 78;
 
 /** A number that changes in place through `steps`, each inked on its frame
  *  with a brief flash; nothing shows before the first. */
@@ -407,9 +407,9 @@ export const BlendScene: React.FC = () => {
   const swapW = followsAt - 6;
   const dotsAt = addAt + 10;
 
-  const QY = y(390);
-  const HY = y(500);
-  const rowTop = (i: number) => y(550) + i * T_ROW;
+  const QY = y(370);
+  const HY = y(460);
+  const rowTop = (i: number) => y(505) + i * T_ROW;
   const workY = rowTop(3) + 12;
 
   // Fig. 14: the plane of values, 0 to 10 on each axis.
@@ -538,7 +538,7 @@ export const BlendScene: React.FC = () => {
       </Fade>
 
       {/* One score written out: trophy's, then suitcase's once the query turns. */}
-      <div style={{ position: "absolute", left: X0, top: workY + 40, opacity: 1 - flipLine }}>
+      <div style={{ position: "absolute", left: X0, top: workY + 52, opacity: 1 - flipLine }}>
         <WorkedScore
           token="trophy"
           q={A.query}
@@ -552,7 +552,7 @@ export const BlendScene: React.FC = () => {
           rootAt={rootAt}
         />
       </div>
-      <div style={{ position: "absolute", left: X0, top: workY + 40, opacity: flipLine }}>
+      <div style={{ position: "absolute", left: X0, top: workY + 52, opacity: flipLine }}>
         <WorkedScore
           token="suitcase"
           q={B.query}
@@ -566,7 +566,7 @@ export const BlendScene: React.FC = () => {
           rootAt={swapS}
         />
       </div>
-      <Note at={newAt - 2} x={X0} y={workY + 128}>
+      <Note at={newAt - 2} x={X0} y={workY + 132}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <span style={{ ...label(24, POINT_INK) }}>
             New vector for <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
