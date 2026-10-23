@@ -15,18 +15,24 @@ in parallel in one checkout. Each builder's milestones are in
 has finished) in `reports/<Id>.md`. A builder's report is final only once its
 progress log ends with "report written" or similar; earlier copies are drafts.
 
-| Video | Folder | Narrator | State at the save |
-| --- | --- | --- | --- |
-| Llm-1-Tokens | llm-tokens | Drew | voiced; frames, sync, mix, motion run |
-| Llm-2-Meaning | llm-meaning | Drew | voiced; sync and mix run |
-| Llm-3-Generation | llm-generation | Drew | voiced; frames passed, motion running |
-| Llm-4-Cost | llm-cost | Drew | **finished**: 5:02, every check passes |
-| Llm-5-Benchmarks | llm-benchmarks | Drew | voiced; frames passed, a motion fix re-checking |
-| Nlp-1-WhyTextIsHard | nlp-why-text-is-hard | Hope | voiced; sync and frames passed |
-| Nlp-2-CleaningText | nlp-cleaning-text | Hope | voiced; sync and frames passed |
-| Nlp-3-CountingWords | nlp-counting-words | Hope | voiced; sync and mix run |
-| Nlp-4-TextToFeatures | nlp-text-to-features | Hope | voiced; motion passed, re-checking after a fix |
-| Nlp-5-History | nlp-history | Hope | voiced; motion passed, frames and mix queued |
+| Video | Folder | Narrator | Length | Characters | State |
+| --- | --- | --- | --- | --- | --- |
+| Llm-1-Tokens | llm-tokens | Drew | 5:23 | 4,094 | built, every check passes |
+| Llm-2-Meaning | llm-meaning | Drew | 6:32 | 5,054 | built, every check passes |
+| Llm-3-Generation | llm-generation | Drew | 6:19 | 5,156 | built, every check passes |
+| Llm-4-Cost | llm-cost | Drew | 5:02 | 3,885 | built, every check passes |
+| Llm-5-Benchmarks | llm-benchmarks | Drew | 5:38 | 4,379 | built, every check passes |
+| Nlp-1-WhyTextIsHard | nlp-why-text-is-hard | Hope | 5:17 | 3,863 | built, every check passes |
+| Nlp-2-CleaningText | nlp-cleaning-text | Hope | 7:31 | 5,582 | built, every check passes |
+| Nlp-3-CountingWords | nlp-counting-words | Hope | 6:34 | 4,778 | built, every check passes |
+| Nlp-4-TextToFeatures | nlp-text-to-features | Hope | 6:50 | 5,016 | built, every check passes |
+| Nlp-5-History | nlp-history | Hope | 5:12 | 4,007 | built, every check passes |
+| **Total** | | | **60:18** | **45,814** | |
+
+All ten were built and voiced by 2026-10-23 10:00 UTC. The package passes
+`typecheck`, `lint`, `npm test` (59/59) and `check:cues`. The review (step 2
+below) started then: frames, timelines and contact sheets for all ten, and one
+reviewer per video.
 
 Everything the builders had written at the save is committed: scripts,
 scenes, `measure.py` and its output, the imported WebP art, the narration
@@ -39,10 +45,7 @@ and 3 to 5 short deep dives chosen from the review.
 
 ## Next steps
 
-1. **Finish the ten.** For any video whose progress log does not end in a
-   finished report: run its checks through its private entry (below), fix
-   what fails, and re-voice only beats whose words changed
-   (`npm run narrate -- <folder>`, never `--force`).
+1. **Finish the ten.** Done.
 2. **Review.** Render frames every 0.5 s and contact sheets with the tools in
    `20261023-nlp-llm-video-scratch/review-tools/` (adapted from the October 21
    review), then one reviewer per video from `REVIEW-BRIEF.md`. Reports list
@@ -81,5 +84,7 @@ suffix so the site's TypeScript and ESLint skip them; drop it when restoring.
 ## Budget
 
 ElevenLabs had 80,140 characters left at the start (resets 2026-11-16). The
-ten first recordings were capped at 52,000 together; each builder's report
-gives its own count.
+ten first recordings were capped at 52,000 together and came to 45,814 by the
+scripts' own count. The account then reported 70,062 characters left (61,050
+of 131,112 used), a smaller drop than the scripts' count; whichever is right,
+the review's re-voicing fits.
