@@ -1,6 +1,6 @@
 # Nlp-2-CleaningText: fix pass
 
-Review: `$S/review/reports/Nlp-2-CleaningText.md` (1 P1, 3 P2, 13 P3). Every finding fixed, one partly. Nothing committed by me (your snapshot 1c08728 holds the work up to the container restart).
+Review: `$S/review/reports/Nlp-2-CleaningText.md` (1 P1, 3 P2, 13 P3). All 17 findings fixed. I committed nothing; your snapshots (1c08728, 2d4dbd9) hold the work through the two interruptions, and the final edits since are in the working tree.
 
 ## Findings
 
@@ -14,7 +14,7 @@ Review: `$S/review/reports/Nlp-2-CleaningText.md` (1 P1, 3 P2, 13 P3). Every fin
 | 6 | P3 | fixed | Row 1 of Fig. 8 inks "2 of 8 kept" on "lose". |
 | 7 | P3 | fixed | `fox` `pauseAfter` 0.5 → 1.5 s: the twelve chips sit whole before any drop. |
 | 8 | P3 | fixed | Fig. 13 draws the keep-word "never" faded and struck (it is not on NLTK's list, as Fig. 11 just showed), driven by measure.py's `keepRemoved`. |
-| 9 | P3 | FIX9 |
+| 9 | P3 | fixed | New spot `nlp-cleaning-text-book` (an open dictionary with a ribbon bookmark, no shears) for LemmaScene; StemScene and Fig. 17's last card keep the book-and-shears. The batch sat at 0 of 1 for an hour, so it was cancelled and the image generated with `sync`, then imported (1536x840, drawn at 560x306, stretch under 1 at 2x). |
 | 10 | P3 | fixed | Fig. 17's Normalize card: "the capitals and punctuation" (the four results now set at 30 px so it fits one line). Re-voiced `close-list`: "The spaces. The capitals and the punctuation. The common words. The endings." |
 | 11 | P3 | fixed | Headline swaps in SplitScene (token) and StemScene (key) now start 8 frames after the old line's exit instead of 1 to 2 s later. |
 | 12 | P3 | fixed | The faint Fig. 1 sentence inks from the hook's first word (`hookFrom + 8`). |
@@ -31,7 +31,20 @@ Review: `$S/review/reports/Nlp-2-CleaningText.md` (1 P1, 3 P2, 13 P3). Every fin
 
 ## Length and checks
 
-LENGTH_AND_CHECKS
+- **Length:** 7:40.5 (460.5 s by `npm run cues`, 67 beats), up from 7:31.5: the new pauses (`fox` 1.5 s, `order` 1.2 s) and the split beats' joins.
+
+| Check | Result |
+| --- | --- |
+| tsc (folder) | clean |
+| eslint (folder) | clean |
+| check:cues | clean for this folder |
+| npm test | 59/59 pass |
+| check:frames | pass: 5 illustrations, largest stretch 0.83 at 2x; 14 arrows, 0.0° of bend |
+| check:sync | pass, worst +0.09 s (`removed`, 4:31.7) |
+| check:motion | pass, longest still 2.5 s (12 stretches of 2 s or more, 26.3 s in all) |
+| check:mix (informational) | effects 21.3 LU under the narration (-46.3 LUFS); peak -21.1 dBFS (the logo); speech a median 23.9 dB above the effects (5th percentile 9.3 dB); closest 10.0 dB at 7:18.1 |
+
+Stills re-taken and checked at every changed place: the hook (faint sentence from the first word), Fig. 2 with the trimmed token kinds, Fig. 3 (plain last piece, "period gone", the ␣ marks on the baseline), Fig. 5 on "Neither", the fold with the dimmed arrow, Fig. 8 with its "on" lines, "2 of 8 kept" and the order inset, Fig. 10's call, Fig. 13's struck "never", Fig. 15 with the book, the "plural noun" tag and the aligned `pos=` column, and Fig. 17's card.
 
 ## Also changed
 

@@ -206,6 +206,7 @@ unit = json.loads((HERE.parent / "llm-meaning" / "measurements.json").read_text(
 assert unit["keys"] == keys.tolist() and unit["values"] == values.tolist()
 for mine, theirs in ((trophy, unit["trophy"]), (suitcase, unit["suitcase"])):
     assert mine["query"] == theirs["query"]
+    assert [row["dot"] for row in mine["rows"]] == theirs["dots"]
     assert [row["score"] for row in mine["rows"]] == theirs["scores"]
     assert [row["weight"] for row in mine["rows"]] == theirs["weights"]
     assert mine["output"] == theirs["output"]

@@ -17,3 +17,4 @@
 2026-10-23T13:59:21Z resumed after usage pause; book art in (sync fallback, batch cancelled)
 2026-10-23T14:23:56Z fix pass: check:sync pass (worst +0.09 s)
 2026-10-23T14:45:41Z fix pass: check:motion pass (longest still 2.5 s)
+2026-10-23T14:55:04Z fix pass: check:frames pass, check:mix 21.3 LU; writing report
