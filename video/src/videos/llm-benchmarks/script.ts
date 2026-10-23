@@ -142,7 +142,7 @@ export const script: NarrationScript = {
     { id: "read", scene: true, text: "Reading a score starts with where it sits on the scale.", pauseAfter: 0.5 },
     {
       id: "mmlu-gap",
-      text: "On MMLU, ninety-two point three beats ninety-one point seven. But label errors cap that test near ninety-five.",
+      text: "On MMLU, ninety-two point three beats ninety-one point seven. But some of its answer keys are wrong, so about ninety-five is the most anyone can score.",
       pauseAfter: 0.6,
     },
     { id: "noise", text: "Six tenths of a point, that close to the ceiling, is noise.", pauseAfter: 0.9 },
@@ -185,7 +185,7 @@ export const script: NarrationScript = {
     },
     {
       id: "swe-drop",
-      text: "That's what sank SWE-bench Verified in February: models could recite some of its fixes.",
+      text: "That's why OpenAI stopped reporting SWE-bench Verified in February: models could recite some of its fixes.",
       pauseAfter: 0.6,
     },
     {
@@ -212,10 +212,15 @@ export const script: NarrationScript = {
     },
     { id: "astra-same", text: "Same model, same test, same week. Only the first number compares with anyone else's.", pauseAfter: 0.8 },
 
-    { id: "mismatch", scene: true, text: "Four, the deepest: construct mismatch. A benchmark measures the benchmark.", pauseAfter: 0.8 },
+    {
+      id: "mismatch",
+      scene: true,
+      text: "Four, the deepest: construct mismatch. A benchmark measures performance on the benchmark, and that only carries over if your task looks like it.",
+      pauseAfter: 0.8,
+    },
     {
       id: "transfer",
-      text: "SWE-bench predicts agentic coding, because the task looks like the job. It says almost nothing about reading your invoices.",
+      text: "Tasks like SWE-bench still predict agentic coding, because they look like the job. They say almost nothing about reading your invoices.",
       pauseAfter: 0.6,
     },
     {
@@ -272,7 +277,7 @@ export const script: NarrationScript = {
     },
     {
       id: "props",
-      text: "Next: score properties. Does it name the three facts, and stay under the limit?",
+      text: "Next: score properties. Say it writes a summary: does it name the three facts, and stay under the limit?",
       pauseAfter: 0.6,
     },
     {
@@ -294,7 +299,14 @@ export const script: NarrationScript = {
     },
     {
       id: "cost-error",
-      text: "So it comes down to what an error costs you. A minute of triage? The cheap model wins. A lost customer? It doesn't.",
+      text: "So price the errors. Sonnet's three points mean thirty thousand fewer a month, at about five cents each.",
+      pauseAfter: 0.8,
+    },
+    // The lesson says the cheap model wins at a minute of triage; its own
+    // table says the opposite (see the header). Voiced in the fix pass.
+    {
+      id: "cost-verdict",
+      text: "If a mistake costs even a minute of someone's time, the cheap model is the expensive one.",
       pauseAfter: 0.9,
     },
 

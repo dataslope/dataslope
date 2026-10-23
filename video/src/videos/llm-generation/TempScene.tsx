@@ -53,7 +53,8 @@ export const TempScene: React.FC = () => {
     { at: belowAt, t: 0.7, dur: 22 },
     { at: pointTwoAt - 4, t: 0.2, dur: 22 },
     { at: zeroAt, t: 0, dur: 18 },
-    { at: aboveAt, t: 1.5, dur: 54 },
+    { at: aboveAt, t: 1, dur: 14 },
+    { at: aboveAt + 14, t: 1.5, dur: 30 },
   ];
   const t = stops.reduce((acc, s) => acc + (s.t - acc) * ease(frame, s.at, s.dur), 1);
   const probs = probsAt(t);
@@ -204,11 +205,12 @@ export const TempScene: React.FC = () => {
       </Ink>
       <Ink at={zeroAt + 2} out={aboveAt - 6} dur={16} style={{ left: PANEL, top: noteY, width: 570 }}>
         <div style={{ ...body(32), color: INK, textWrap: "balance" }}>
-          At 0, always the top token.{" "}
-          <span style={{ color: ACCENT_INK, opacity: ease(frame, greedyAt - 4, 12) }}>Greedy decoding.</span>
+          At 0, always the top token.
+          <span style={{ display: "block", color: ACCENT_INK, opacity: ease(frame, greedyAt - 4, 12) }}>Greedy decoding.</span>
         </div>
       </Ink>
-      <Ink at={aboveAt + 2} dur={16} style={{ left: PANEL, top: noteY, width: 570 }}>
+      {/* Once the dial has passed 1. */}
+      <Ink at={aboveAt + 16} dur={16} style={{ left: PANEL, top: noteY, width: 570 }}>
         <div style={{ ...body(32), color: INK, textWrap: "balance" }}>Above 1, the gaps shrink.</div>
       </Ink>
       </Drift>

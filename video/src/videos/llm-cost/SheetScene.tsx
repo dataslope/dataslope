@@ -54,8 +54,8 @@ export const SheetScene: React.FC = () => {
   // ── Cues ──
   const sheetFrom = n.beat("sheet").from;
   const sameAt = n.word("sheet", "same way");
-  const fiveAt = n.word("sheet", "five numbers");
-  const millionAt = n.word("sheet", "million");
+  const fiveAt = n.word("sheet", "five prices");
+  const proportionsAt = n.word("sheet", "proportions");
   const rowAt = [
     n.word("rows", "Input", { nth: 1 }),
     n.word("rows", "Output"),
@@ -86,14 +86,14 @@ export const SheetScene: React.FC = () => {
       ))}
       <Sfx name="el-whoosh" at={fallingAt - 4} level={-34} />
 
-      <Headline at={sheetFrom - 6} second={millionAt - 4} italic="per million tokens.">
-        Five numbers,
+      <Headline at={sheetFrom - 6} second={proportionsAt - 4} italic="always in proportion.">
+        Five prices,
       </Headline>
       {/* The tags from the opening, still hanging: already settled at the cut. */}
       <Spot id="tags" at={sheetFrom - 60} left={TAGS.left} top={y(TAGS.top)} width={TAGS.width} height={TAGS.height} />
 
       <Drift from={sheetFrom} to={end} amount={0.014} origin="40% 60%">
-        <FigLabel n="2" title="The five numbers on every price sheet" at={sameAt - 6} x={X0} y={y(FIG_Y)} />
+        <FigLabel n="2" title="The five prices on every sheet, per million tokens" at={sameAt - 6} x={X0} y={y(FIG_Y)} />
 
         {/* Header and rules. */}
         {[

@@ -81,7 +81,7 @@ export const RunsScene: React.FC = () => {
       <Headline lead="Every pick is a draw." at={start - 4} out={alwaysAt - 8} />
       <Headline lead="It always picks something," turn="true or not." at={alwaysAt - 4} turnAt={nothingAt - 2} />
 
-      <FigLabel n="5" title="Five runs of eight picks (the lesson's block, seed 0)" at={drawAt - 6} x={X0} y={y(236)} />
+      <FigLabel n="5" title="Five runs of eight picks, one fixed random seed (the lesson's block)" at={drawAt - 6} x={X0} y={y(236)} />
       {/* The three close scores every pick draws from. */}
       <Note at={closeAt - 4} x={X0} y={y(296)}>
         <span style={{ display: "inline-flex", gap: 26, alignItems: "baseline", whiteSpace: "nowrap" }}>
@@ -90,7 +90,7 @@ export const RunsScene: React.FC = () => {
               <span style={{ fontFamily: MONO }}>{t}</span> {pct(RUN_PROBS[i])}
             </span>
           ))}
-          <span style={note(21, INK_SOFT)}>every pick, every run</span>
+          <span style={note(21, INK_SOFT)}>from scores 1.0, 0.9 and 0.8, every pick of every run</span>
         </span>
       </Note>
       {RUNS.map((run, k) => {
@@ -140,7 +140,7 @@ export const RunsScene: React.FC = () => {
       })}
 
       {/* Fig. 6: each pick is context for the next, so one difference carries on. */}
-      <FigLabel n="6" title="Why it compounds (schematic)" at={differentAt + 6} x={FX} y={y(236)} />
+      <FigLabel n="6" title="Why it compounds (schematic)" at={n.beat("compound").from - 4} x={FX} y={y(236)} />
       <Svg opacity={ease(frame, agreeAt - 4, 10)}>
         <rect
           x={fxAt(0) - 10}
@@ -158,7 +158,7 @@ export const RunsScene: React.FC = () => {
       </Note>
       {[0, 1].map((branch) => (
         <Svg key={branch} opacity={ease(frame, splitAt - 4, 10)}>
-          <path d={thread(branch)} fill="none" stroke={branch === 0 ? HUE[0] : HUE[1]} strokeWidth={2} strokeDasharray="3 5" />
+          <path d={thread(branch)} fill="none" stroke={ds("gray", 600)} strokeWidth={2} strokeDasharray="3 5" />
         </Svg>
       ))}
       {[0, 1].map((branch) =>
@@ -167,7 +167,8 @@ export const RunsScene: React.FC = () => {
           const inAt = j < TRUNK ? differentAt + 10 + j * 4 : splitAt - 4 + (j - TRUNK) * 3;
           const p = ease(frame, inAt, 10);
           if (p <= 0) return null;
-          const color = j < TRUNK ? ds("gray", 500) : branch === 0 ? HUE[0] : HUE[1];
+          // Grey throughout: Fig. 5's hues are its tokens, and these picks are no token in particular.
+          const color = j < TRUNK ? ds("gray", 400) : ds("gray", 600);
           return (
             <div
               key={`${branch}-${j}`}
@@ -200,10 +201,10 @@ export const RunsScene: React.FC = () => {
         />
       ))}
       <Note at={splitAt + 10} x={fxAt(TRUNK + BRANCH - 1) + FTILE} y={trunkY - h(SPLIT) - 40} align="right">
-        <span style={{ ...note(21, HUE_INK[0]), fontWeight: 650 }}>one answer</span>
+        <span style={{ ...note(21, INK), fontWeight: 650 }}>one answer</span>
       </Note>
       <Note at={splitAt + 14} x={fxAt(TRUNK + BRANCH - 1) + FTILE} y={trunkY + h(SPLIT) + h(FTILE) + 14} align="right">
-        <span style={{ ...note(21, HUE_INK[1]), fontWeight: 650 }}>another</span>
+        <span style={{ ...note(21, INK), fontWeight: 650 }}>another</span>
       </Note>
       </Drift>
     </AbsoluteFill>

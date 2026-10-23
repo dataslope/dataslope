@@ -106,6 +106,9 @@ out["zipf"] = {
     "top100Share": r(top100),
     "slope": r(slope, 3),
     "lineC": r(zipf_c, 1),
+    # One over the rank, anchored on the top word: the second at half its count.
+    "secondByLaw": round(ranked[0][1] / 2),
+    "hapaxShare": r(hapaxes / len(fd)),
     "curve": curve,
 }
 

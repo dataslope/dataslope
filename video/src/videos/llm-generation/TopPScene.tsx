@@ -61,7 +61,7 @@ const NucleusBar: React.FC<{ nuc: Nucleus; top: number; height: number; at: numb
                 display: "flex",
                 alignItems: "center",
                 justifyContent: nuc.kept.length === 1 ? "flex-start" : "center",
-                paddingLeft: nuc.kept.length === 1 ? 12 : 0,
+                paddingLeft: nuc.kept.length === 1 && i === 0 ? 12 : 0,
                 overflow: "hidden",
                 ...note(21, isKept ? BLUE_INK : INK_SOFT),
                 fontWeight: 650,

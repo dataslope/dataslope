@@ -59,6 +59,10 @@ export const ZIPF = {
   curve: m.zipf.curve as unknown as readonly (readonly [number, number])[],
   /** count = lineC / rank: the 1/rank line placed where it best fits ranks 1 to 1,000. */
   lineC: m.zipf.lineC,
+  /** Half the top word's count: where one over the rank puts the second word. */
+  secondByLaw: m.zipf.secondByLaw,
+  /** The share of different words that appear once. */
+  hapaxShare: m.zipf.hapaxShare,
   /** The first rank whose count is 1: every word from here on appears once. */
   firstHapaxRank: m.zipf.distinct - m.zipf.hapaxes + 1,
 };

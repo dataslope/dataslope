@@ -107,7 +107,7 @@ export const script: NarrationScript = {
     {
       id: "sheet",
       scene: true,
-      text: "Every big provider prices tokens the same way: five numbers, each per million tokens.",
+      text: "Every big provider prices tokens the same way: five prices per million tokens, always in the same proportions.",
       pauseAfter: 0.5,
     },
     {
@@ -126,6 +126,12 @@ export const script: NarrationScript = {
     {
       id: "serial",
       text: "The answer comes out one token at a time, and every token needs its own pass through the whole model.",
+      pauseAfter: 0.8,
+    },
+    // Why a pass is the cost: it moves every weight, for eleven tokens or one. Voiced after the take.
+    {
+      id: "weights",
+      text: "Each pass moves every weight in the model, whether it carries eleven tokens or one. So while it writes, the hardware mostly waits.",
       pauseAfter: 0.9,
     },
     { id: "gap", text: "Five times the price is a real gap in the work.", pauseAfter: 0.8 },
@@ -186,12 +192,14 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     { id: "slice", text: "The new message is a thin slice on top of everything you've already paid for.", pauseAfter: 0.7 },
+    // What the bill is: every bar, plus each reply. Voiced after the take.
+    { id: "sum", text: "The bill pays for every one of these bars, plus each reply.", pauseAfter: 0.7 },
     {
       id: "turns",
       text: "On Sonnet, ten turns cost thirteen cents. Twenty, thirty-seven and a half. Forty, a dollar nineteen.",
       pauseAfter: 0.6,
     },
-    { id: "triple", text: "Double the turns, and the bill roughly triples.", pauseAfter: 1.0 },
+    { id: "triple", text: "Double the turns, and the bill roughly triples, and it keeps getting worse.", pauseAfter: 1.0 },
     {
       id: "think",
       scene: true,
@@ -230,10 +238,12 @@ export const script: NarrationScript = {
     {
       id: "cache",
       text: "Second, cache the stable prefix: whatever never changes goes first. That forty-turn chat drops from a dollar nineteen to twenty-six cents.",
-      pauseAfter: 0.8,
+      pauseAfter: 0.6,
     },
-    { id: "output", text: "Third, cut output, not input. Each output token you save is worth five input ones.", pauseAfter: 0.7 },
-    { id: "effort", text: "Fourth, turn reasoning effort down to the lowest level that passes.", pauseAfter: 0.6 },
+    // How that squares with a model that keeps no memory. Voiced after the take.
+    { id: "cache-resend", text: "You still resend it all. The provider just recognizes that part and reads it back.", pauseAfter: 0.8 },
+    { id: "output", text: "Third, cut output, not input. Each output token you save is worth five input ones.", pauseAfter: 0.9 },
+    { id: "effort", text: "Fourth, turn reasoning effort, the thinking budget, down to the lowest level that passes.", pauseAfter: 0.9 },
     { id: "batch", text: "Fifth, batch anything nobody's waiting on, at about half off.", pauseAfter: 0.6 },
     { id: "prompt", text: "And only then, trim the prompt.", pauseAfter: 1.0 },
     { id: "passes", text: "Notice the word that came up twice: passes.", pauseAfter: 0.7 },
