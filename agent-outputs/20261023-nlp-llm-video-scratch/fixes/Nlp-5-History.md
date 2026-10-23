@@ -38,8 +38,8 @@ Review: `review/reports/Nlp-5-History.md` (1 P1, 5 P2, 9 P3). All 15 findings ar
 | npm test | 59 of 59 pass |
 | check:frames | pass. 4 images, largest stretch 0.95; 11 arrows, at most 0.0° of bend |
 | check:sync | pass. Worst +0.06 s (`turing-out`, 2:19.2) |
-| check:motion | MOTION_RESULT |
-| check:mix | MIX_RESULT |
+| check:motion | pass. Nothing holds still for 3 s; the longest still is 2.5 s (it was a failing 4.3 s over `law` before the rank-10 row) |
+| check:mix | pass. Effects 21.0 LU under the narration, speech a median 25.3 dB above them; the closest moment is 9.5 dB at 4:22.5 (the 6.1 dB at 3:06.1 is gone) |
 
 I re-took stills at every changed moment and looked at each one: Zipf law, emma and tail; IDF query, before and after weights; vector paper card, dots and Fig. 12; booths; close; Georgetown and ELIZA openings. The last set is Zipf at 35-60 s with the rank-10 row and the two bars. Nothing collides: row 10 sits 45px above the first bar label, and the guide line stops short of the "7,079" tag.
 
@@ -47,7 +47,7 @@ I re-took stills at every changed moment and looked at each one: Zipf law, emma 
 
 - **A word2vec paper card** now carries the w2v beat's names and date, so its opening is no longer empty. It shows arXiv, January 2013, the title, the four authors and "Google". I checked these against the arXiv PDF and recorded them in the script header.
 - **The rank-10 ghost row** was added because check:motion failed on a 4.3 s still over `law` (0:35.3-0:39.5) after the re-voice.
-- **The ELIZA opening pop** moved 6 frames ahead of the scene's first word. The re-voice had shifted "Joseph" onto it, and the first post-fix mix put the speech only 6.1 dB above the effects at 3:06.1, the closest moment in the video.
+- **The ELIZA opening pop** moved 6 frames ahead of the scene's first word. The re-voice had shifted "Joseph" onto it, and the first post-fix mix put the speech only 6.1 dB above the effects at 3:06.1, the closest moment in the video. That reading is gone after the move.
 - **Lesson prose vs. numbers:**
   - For Zipf, the video follows the measured counts: in Emma "to" and "the" nearly tie, where the law predicts half. The script header says so.
   - Spärck Jones's weights follow her paper (2 and 7), not the course's log(N/df) (0.80 and 4.20). The on-screen note shows how the two relate.

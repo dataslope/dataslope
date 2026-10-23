@@ -18,3 +18,4 @@
 10:18 fixes applied, stills reviewed; running checks
 10:59 rank-10 ghost row added for motion; tsc/eslint/cues clean; stills queued
 14:03 zipf stills reviewed (row 10 and bars clear); ELIZA opening pop moved 6 frames ahead of the first word (mix closest 6.1 dB); motion running, mix to follow
+14:24 motion pass (max 2.5 s), mix pass (closest 9.5 dB); fix report written
