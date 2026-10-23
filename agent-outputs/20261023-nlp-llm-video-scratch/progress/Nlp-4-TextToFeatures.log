@@ -20,3 +20,4 @@
 10:34 reset pauseAfter 1.0; stills job re-queued (first was killed waiting in the queue)
 10:48 stills reviewed; fixed lamp alignment and Limits context note overlap; re-rendering 5 stills
 13:58 stills OK; running check:sync, frames, motion, mix
+14:47 check:motion failed (3 stills: sklearn-why/top, decide-in, reset-ex); re-cued chart/footnote/gauge and comma mark + lamps; stills + motion/frames/mix rerun

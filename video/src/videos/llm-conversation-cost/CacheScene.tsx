@@ -168,23 +168,21 @@ export const CacheScene: React.FC = () => {
       </Note>
 
       {/* Forty turns, with and without. */}
-      <Note at={fortyAt - 4} x={CHART.x0 + 90} y={y(528)}>
+      <Note at={fortyAt - 4} x={CHART.x0 + 90} y={y(446)}>
         <span style={{ ...label(24, INK_SOFT), ...TABULAR }}>{CACHE.turns} turns</span>
       </Note>
-      <Note at={dollarAt - 4} x={CHART.x0 + 90} y={y(528) + 40}>
+      <Note at={dollarAt - 4} x={CHART.x0 + 90} y={y(446) + 40}>
         <span style={{ ...headline(52), color: INK_SOFT, ...TABULAR, ...halo }}>
           <Strike at={centsAt - 4}>{usd(CACHE.plain)}</Strike>
         </span>
       </Note>
-      <Note at={centsAt - 2} x={CHART.x0 + 360} y={y(528) + 40}>
-        <span style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(52), color: CACHED_INK, ...TABULAR, ...halo }}>{usd(CACHE.cached)}</span>
-          <span style={{ ...note(26, INK), fontWeight: 650, ...TABULAR }}>{pct(CACHE.saved)} less</span>
-        </span>
+      <Note at={centsAt - 2} x={CHART.x0 + 360} y={y(446) + 40}>
+        <span style={{ display: "block", ...headline(52), color: CACHED_INK, ...TABULAR, ...halo }}>{usd(CACHE.cached)}</span>
+        <span style={{ display: "block", marginTop: 14, ...note(26, INK), fontWeight: 650, ...TABULAR, ...halo }}>{pct(CACHE.saved)} less</span>
       </Note>
 
       {/* ── Fig. 7: one request, top to bottom ── */}
-      <FigLabel n="7" title="One request, top to bottom" at={stableFrom - 2} x={RX - 40} y={y(REQ_Y - 50)} />
+      <FigLabel n="7" title="One request, in order" at={stableFrom - 2} x={RX} y={y(REQ_Y - 50)} />
       {REQUEST.map((row, i) => {
         const p = ease(frame, stableFrom + i * 5, 12);
         if (p <= 0) return null;

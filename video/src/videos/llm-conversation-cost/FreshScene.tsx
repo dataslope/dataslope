@@ -71,7 +71,7 @@ export const FreshScene: React.FC = () => {
         When a chat runs long,
       </Headline>
 
-      <FigLabel n="8" title="Forty turns of chat, two ways" at={from - 2} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="8" title="Forty turns of chat, two ways, at one scale" at={from - 2} x={X0} y={y(FIG_Y)} />
 
       {/* One chat of forty turns. */}
       <Note at={longAt - 4} x={CHART.x0} y={y(BASES[0] - 220)}>

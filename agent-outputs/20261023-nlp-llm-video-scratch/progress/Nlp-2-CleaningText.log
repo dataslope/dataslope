@@ -16,3 +16,4 @@
 2026-10-23T10:22:20Z scene fixes applied for findings 1-8,10-17; stills reviewed; waiting on book art
 2026-10-23T13:59:21Z resumed after usage pause; book art in (sync fallback, batch cancelled)
 2026-10-23T14:23:56Z fix pass: check:sync pass (worst +0.09 s)
+2026-10-23T14:45:41Z fix pass: check:motion pass (longest still 2.5 s)

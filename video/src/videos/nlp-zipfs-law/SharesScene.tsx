@@ -7,7 +7,7 @@ import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA, pct } from "./data";
-import { DATA, DATA_INK, EMPTY, Headline, Mark, ONCE, ONCE_INK, POINT, POINT_WASH, Svg, Tag } from "./kit";
+import { Bracket, DATA, DATA_INK, EMPTY, Headline, Mark, ONCE, ONCE_INK, POINT, POINT_WASH, Svg, Tag } from "./kit";
 
 /** Every strip and bar spans the same width. */
 const SX0 = 110;
@@ -38,6 +38,7 @@ export const SharesScene: React.FC = () => {
   const halfAt = n.word("warn", "half the width");
   const plainAt = n.word("plain", "plain one");
   const pointAt = n.word("plain", "one point four percent");
+  const vocabAt = n.word("plain", "vocabulary");
   const countAt = n.word("top100", "Count what they fill");
   const sixtyAt = n.word("top100", "sixty percent");
   const sevenAt = n.word("once", "seven thousand");
@@ -157,9 +158,11 @@ export const SharesScene: React.FC = () => {
         </Svg>
         {[...PLAIN_TICKS, EMMA.distinct].map((v) => (
           <div key={v} style={{ position: "absolute", left: plainX(v - 0.5), top: bTop + STRIP_H + 12, transform: "translateX(-50%)", opacity: ease(frame, from + 20, 12), ...note(20, INK_SOFT), ...TABULAR }}>
-            {fmt(v, 0)}
+            {v === EMMA.distinct ? <Mark at={vocabAt + 4}>{fmt(v, 0)}</Mark> : fmt(v, 0)}
           </div>
         ))}
+        {/* The whole plain axis is the vocabulary: every different word. */}
+        <Bracket x0={SX0} x1={SX1} y={bTop + STRIP_H + 50} at={vocabAt - 2} out={countAt - 8} color={INK_SOFT} tick={8} up />
       </div>
 
       {/* ── Fig. 5: the two shares, on plain bars ── */}

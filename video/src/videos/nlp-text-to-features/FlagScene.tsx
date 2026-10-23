@@ -57,6 +57,7 @@ export const FlagScene: React.FC = () => {
   const exAt = n.word("reset-ex", "Not really");
   const exGoodAt = n.word("reset-ex", "it was good");
   const commaAt = n.word("reset-ex", "comma clears");
+  const clearedAt = n.word("reset-ex", "the flag first");
   const plusOneAt = n.word("reset-ex", "plus one");
   const rowAt = [n.word("fixed", "it is not good"), n.word("fixed", "this is not bad at all"), n.word("mixed", "The plot was good")];
   const verdictAt = [n.word("fixed", "negative"), n.word("fixed", "positive"), n.word("mixed", "neutral")];
@@ -124,6 +125,7 @@ export const FlagScene: React.FC = () => {
         verdictAt={plusOneAt + 4}
         badgeAt={[plusOneAt]}
         lamps
+        lampsAfterReset={clearedAt}
         bumpComma={commaAt}
       />
       <Note at={plusOneAt + 14} x={VERDICT_X} y={y(EX_Y) + 48}>
@@ -154,7 +156,8 @@ export const FlagScene: React.FC = () => {
 
 /** One review, token by token: a negation marked, a flipped word showing its
  *  sign before and after, then the sum and the verdict. With `lamps`, a lamp
- *  under each token shows the flag after it: lit while on, hollow when off. */
+ *  under each token shows the flag after it: lit while on, hollow when off;
+ *  `lampsAfterReset` holds the lamps from the reset token on back to a cue. */
 const TraceRow: React.FC<{
   trace: Trace;
   top: number;
@@ -167,8 +170,10 @@ const TraceRow: React.FC<{
   bump?: number;
   bumpComma?: number;
   lamps?: boolean;
-}> = ({ trace, top, at, verdictAt, x = X0, stagger, badgeAt, markAt, bump, bumpComma, lamps }) => {
+  lampsAfterReset?: number;
+}> = ({ trace, top, at, verdictAt, x = X0, stagger, badgeAt, markAt, bump, bumpComma, lamps, lampsAfterReset }) => {
   const frame = useCurrentFrame();
+  const resetIdx = trace.steps.findIndex((s) => s.role === "reset");
   let scored = 0;
   return (
     <>
@@ -200,7 +205,7 @@ const TraceRow: React.FC<{
                   text={s.token}
                   size={CHIP}
                   at={tokenAt}
-                  mark={s.role === "negation" ? (markAt ?? tokenAt + 4) : undefined}
+                  mark={s.role === "negation" ? (markAt ?? tokenAt + 4) : s.role === "reset" && bumpComma !== undefined ? bumpComma - 2 : undefined}
                   bump={bumpComma !== undefined && s.role === "reset" ? bumpComma : bump === undefined ? undefined : bump + k * 2}
                   tone={polar ? (s.polarity > 0 ? POS : NEG) : undefined}
                   toneAt={badge}
@@ -211,7 +216,10 @@ const TraceRow: React.FC<{
               below={
                 lamps ? (
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 8, height: 26 }}>
-                    <Lamp on={Boolean(s.flag)} at={tokenAt + 4} />
+                    <Lamp
+                      on={Boolean(s.flag)}
+                      at={lampsAfterReset !== undefined && resetIdx >= 0 && k >= resetIdx ? lampsAfterReset + (k - resetIdx) * 3 : tokenAt + 4}
+                    />
                     {sign}
                   </span>
                 ) : (

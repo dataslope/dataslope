@@ -61,6 +61,7 @@ export const LookupScene: React.FC = () => {
   const from = n.beat("list").from;
   const threeAt = n.word("list", "three steps");
   const listAt = n.word("list", "list");
+  const partAt = n.word("list", "part of speech");
   const listed = {
     ran: n.word("listed", "ran"),
     verb: n.word("listed", "verb"),
@@ -77,6 +78,8 @@ export const LookupScene: React.FC = () => {
   const edAt = n.word("rules", "ed");
   const ingAt = n.word("rules", "ing");
   const wordnetAt = n.word("check", "WordNet");
+  const theWordAt = n.word("check", "the word");
+  const guessAt = n.word("check", "every guess");
   const realAt = n.word("check", "real entries");
   const shortestAt = n.word("check", "shortest");
   const wa = n.beat("wa").from;
@@ -131,7 +134,14 @@ export const LookupScene: React.FC = () => {
     const guess = t.guesses[0];
     return (
       <React.Fragment key={`${t.word}-${t.pos}`}>
-        <Chip text={t.word} x={X0} y={top} at={c.word} size={SIZE} />
+        <Chip
+          text={t.word}
+          x={X0}
+          y={top}
+          at={c.word}
+          size={SIZE}
+          marks={i < 3 ? [{ at: theWordAt + i * 3, out: theWordAt + i * 3 + 30 }] : []}
+        />
         <Ink at={c.as} dur={10} style={{ left: AS_X, top: textTop(i), whiteSpace: "nowrap" }}>
           <span style={label(24, INK)}>
             <Mark at={posAt + i * 3} out={posAt + 60}>
@@ -150,6 +160,7 @@ export const LookupScene: React.FC = () => {
               y={top}
               at={f === "well" ? wellAt : c.list + k * 4}
               size={SIZE}
+              marks={[{ at: guessAt + i * 3 + k * 2, out: guessAt + i * 3 + k * 2 + 30 }]}
             />
           ))
         ) : (
@@ -234,8 +245,10 @@ export const LookupScene: React.FC = () => {
       <Head x={X0} y={headY} at={from + 6}>
         word
       </Head>
-      <Head x={AS_X} y={headY} at={from + 9}>
-        part of speech
+      <Head x={AS_X} y={headY} at={partAt - 4}>
+        <Mark at={partAt} out={partAt + 36}>
+          part of speech
+        </Mark>
       </Head>
       <Head x={COL[0]} y={headY} n="1" nAt={threeAt} at={listAt}>
         Irregular forms

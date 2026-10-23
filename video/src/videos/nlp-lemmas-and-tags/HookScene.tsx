@@ -27,7 +27,7 @@ const PHRASE = ["the", "running", "of", "the", "race"];
 /**
  * One call in the code face: lemmatize("word"), its default argument
  * written into it on `ghostAt` (the closing parenthesis moves out to make
- * room), the quoted word highlighted over `wordMark`, and the "n" over
+ * room), the quoted word highlighted over each of `wordMarks`, and the "n" over
  * `nMark`.
  */
 const Call: React.FC<{
@@ -35,13 +35,13 @@ const Call: React.FC<{
   at: number;
   y: number;
   ghostAt: number;
-  wordMark: { at: number; out: number };
+  wordMarks: readonly { at: number; out: number }[];
   nMark: { at: number; out: number };
-}> = ({ word, at, y, ghostAt, wordMark, nMark }) => {
+}> = ({ word, at, y, ghostAt, wordMarks, nMark }) => {
   const frame = useCurrentFrame();
   const g = ease(frame, ghostAt, 16);
   const mark = (m: { at: number; out: number }) => ease(frame, m.at, 10) * (1 - ease(frame, m.out, 12));
-  const wm = mark(wordMark);
+  const wm = Math.max(0, ...wordMarks.map(mark));
   const nm = mark(nMark);
   const hl = (k: number): React.CSSProperties =>
     k > 0 ? { background: `color-mix(in srgb, ${HIGHLIGHT} ${(k * 100).toFixed(0)}%, transparent)`, borderRadius: 4 } : {};
@@ -81,7 +81,9 @@ export const HookScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("hook").from;
-  const callAt = [n.word("hook", "running", { nth: 1 }), n.word("more", "Ran", { nth: 1 }), n.word("more", "was")];
+  // The first call inks as the lemmatizer is named, its word lit as it is said.
+  const callAt = [n.word("hook", "lemmatizer"), n.word("more", "Ran", { nth: 1 }), n.word("more", "was")];
+  const askedAt = n.word("hook", "running", { nth: 1 });
   const resultAt = [n.word("hook", "running", { nth: 2 }), n.word("more", "ran", { nth: 2 }), n.word("more", "wa")];
   const otherwiseAt = n.word("noun", "otherwise");
   const treatsAt = n.word("noun", "treats");
@@ -134,7 +136,10 @@ export const HookScene: React.FC = () => {
               at={callAt[i]}
               y={callTop(i)}
               ghostAt={ghostAt[i]}
-              wordMark={{ at: oneWordAt + i * 6, out: sentenceAt + 10 }}
+              wordMarks={[
+                ...(i === 0 ? [{ at: askedAt, out: askedAt + 30 }] : []),
+                { at: oneWordAt + i * 6, out: sentenceAt + 10 },
+              ]}
               nMark={{ at: nounAt, out: oneWordAt - 4 }}
             />
             <Arrow from={[ARROW_X, mid]} to={[RESULT_X - 18, mid]} at={resultAt[i] - 6} dur={10} />

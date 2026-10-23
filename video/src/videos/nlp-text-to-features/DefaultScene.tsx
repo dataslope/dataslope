@@ -56,10 +56,12 @@ export const DefaultScene: React.FC = () => {
   // lands on bars the viewer has already been told how to read.
   const chartAt = n.word("sklearn-why", "It also");
   const rawAt = n.word("sklearn-why", "raw words");
-  const scalesAt = n.word("sklearn-why", "scales each row");
+  const lengthAt = n.word("sklearn-why", "length one");
+  // The chart arrives with its result, once both defaults have been named.
+  const barsAt = n.word("sklearn-top", "three documents");
   const topAt = n.word("sklearn-top", "stays on top");
   const callAt = n.word("decide-in", "makes a call");
-  const describeAt = n.word("decide-in", "describe");
+  const countsAt = n.word("decide-in", "Counts");
   // The figure steps back as the narration turns to Part 4.
   const back = 1 - 0.55 * ease(frame, callAt - 4, 20);
   const posAt = n.word("decide-in", "positive");
@@ -92,8 +94,8 @@ export const DefaultScene: React.FC = () => {
       {/* ── Sound: the second formula, its plus one, the bars, the turn ── */}
       <Sfx name="el-pencil" at={smoothsAt - 2} level={-35} />
       <Sfx name="el-tap" at={addsAt - 2} level={-28} />
-      <Sfx name="el-sprinkle" at={chartAt} level={-34} />
-      <Sfx name="el-pop" at={describeAt} level={-30} />
+      <Sfx name="el-sprinkle" at={barsAt} level={-34} />
+      <Sfx name="el-pop" at={countsAt} level={-30} />
 
       <Kicker at={start - 10}>Weighting words</Kicker>
       <Headline at={start - 4} second={start + 10} size={62} italic="never reaches zero.">
@@ -165,22 +167,22 @@ export const DefaultScene: React.FC = () => {
       </Note>
 
       {/* Doc 1 under the default. */}
-      <Note at={chartAt - 6} x={CHART_X - 20} y={y(HEAD_Y)}>
+      <Note at={barsAt - 6} x={CHART_X - 20} y={y(HEAD_Y)}>
         <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
           Doc 1’s tf-idf scores through <Code>TfidfVectorizer()</Code>
         </span>
       </Note>
-      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: ease(frame, chartAt - 6, 10) }}>
+      <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: ease(frame, barsAt - 6, 10) }}>
         <line
           x1={CHART_X - 20}
-          x2={CHART_X - 20 + (DOC1.length * STEP - STEP + BAR_W + 40) * ease(frame, chartAt - 6, 16)}
+          x2={CHART_X - 20 + (DOC1.length * STEP - STEP + BAR_W + 40) * ease(frame, barsAt - 6, 16)}
           y1={y(BASE_Y) + 0.5}
           y2={y(BASE_Y) + 0.5}
           stroke={INK}
           strokeWidth={1.6}
         />
         {DOC1.map((d, k) => {
-          const bh = h(MAX_H) * (d.v / TOP_V) * ease(frame, chartAt + k * 3, 20);
+          const bh = h(MAX_H) * (d.v / TOP_V) * ease(frame, barsAt + k * 3, 20);
           return (
             <React.Fragment key={d.w}>
               <rect x={CHART_X + k * STEP} y={y(BASE_Y) - bh} width={BAR_W} height={bh} fill={BAR} />
@@ -195,14 +197,14 @@ export const DefaultScene: React.FC = () => {
       {DOC1.map((d, k) => (
         <React.Fragment key={d.w}>
           <Note
-            at={chartAt + 12 + k * 3}
+            at={barsAt + 12 + k * 3}
             x={CHART_X + k * STEP + BAR_W / 2}
             y={y(BASE_Y) - h(MAX_H) * (d.v / TOP_V) - 40}
             style={{ transform: "translateX(-50%)" }}
           >
             <span style={{ ...note(22, d.j === THE && top > 0.5 ? ACCENT_INK : INK), fontWeight: 600 }}>{d.v.toFixed(2)}</span>
           </Note>
-          <Note at={chartAt + k * 3} x={CHART_X + k * STEP + BAR_W / 2} y={y(BASE_Y) + 12} style={{ transform: "translateX(-50%)" }}>
+          <Note at={barsAt - 4 + k * 3} x={CHART_X + k * STEP + BAR_W / 2} y={y(BASE_Y) + 12} style={{ transform: "translateX(-50%)" }}>
             <span style={{ ...body(30, true), color: INK }}>{d.w}</span>
           </Note>
         </React.Fragment>
@@ -214,16 +216,16 @@ export const DefaultScene: React.FC = () => {
           </span>
         </Note>
       ) : null}
-      <Note at={rawAt - 2} x={CHART_X - 20} y={y(BASE_Y + 118)}>
+      <Note at={chartAt - 2} x={CHART_X - 20} y={y(BASE_Y + 118)}>
         <span style={{ ...note(22, INK), display: "block", width: 680 }}>
-          Its other defaults: <Mark at={rawAt}>raw counts</Mark> for tf, then each row <Mark at={scalesAt}>scaled to length one</Mark>.
+          Its other defaults: <Mark at={rawAt}>raw counts</Mark> for tf, then each row <Mark at={lengthAt - 2}>scaled to length one</Mark>.
         </span>
       </Note>
 
       </div>
 
       {/* ── The turn to Part 4 ── */}
-      <Spot id="gauge" at={describeAt} left={X0} top={y(GAUGE_Y)} width={170} height={h(170)} />
+      <Spot id="gauge" at={countsAt - 2} left={X0} top={y(GAUGE_Y)} width={170} height={h(170)} />
       <Ink at={callAt + 4} dur={16} style={{ left: X0 + 200, top: y(GAUGE_Y) + 50, ...body(40, true), color: INK, whiteSpace: "nowrap" }}>
         <Reveal at={posAt - 2} style={{ color: POS_INK }}>
           positive

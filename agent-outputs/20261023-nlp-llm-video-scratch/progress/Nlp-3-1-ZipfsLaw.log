@@ -7,3 +7,4 @@
 2026-10-23T14:01:47Z voiced: 1 take, 1653 chars
 2026-10-23T14:10:55Z check:frames passed (3 images, largest stretch 0.48)
 2026-10-23T14:21:12Z check:sync passed (worst +0.03 s, straight)
+2026-10-23T14:34:58Z check:mix 22.4 LU under; check:motion failed once (3.0 s at 1:30.5), fixed, re-running
