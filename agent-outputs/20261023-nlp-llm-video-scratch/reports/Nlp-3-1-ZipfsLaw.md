@@ -12,7 +12,7 @@ Folder `video/src/videos/nlp-zipfs-law/`, voiced by Hope. Nothing committed or p
 - Typecheck and lint for the folder: clean. `check:cues`: clean. `npm test`: 59 pass, 0 fail.
 - `check:frames`: pass. 3 images, largest stretch 0.48; no arrows; every cue names its occurrence.
 - `check:sync`: pass. Worst beat is `straight` at +0.03 s (0:35.0). Every beat is within ±0.03 s.
-- `check:motion`: MOTION_RESULT
+- `check:motion`: pass on the re-run. Nothing holds still for 3 s; the longest still is 2.8 s (0:52.3, `slope`). The first run failed on one 3.0 s still at 1:30.5, which is now fixed. The preview is kept as `out/Nlp-3-1-ZipfsLaw-preview.mp4`.
 - `check:mix` (informational): effects -46.9 LUFS against narration -24.5 LUFS, so **22.4 LU under**. Effects peak -27.1 dBFS at 0:09.4. Where both sound, speech is a median 24.4 dB above the effects (5th percentile 12.0 dB).
 
 ## Scenes
@@ -58,5 +58,5 @@ Illustrations:
 
 ## Left undone
 
-- None of the checks remains open. The one long still that `check:motion` found (3.0 s at 1:30.5, over `plain`) was fixed with a bracket and a highlight across the plain rank axis on "vocabulary", and the re-run is reported above.
+- None of the checks remains open. The one long still that `check:motion` found (3.0 s at 1:30.5, over `plain`) was fixed with a bracket and a highlight across the plain rank axis on "vocabulary". `check:frames` ran before that one-line fix; the fix adds no image or arrowhead, and `check:cues` passed after it.
 - Fig. 4 leaves the bottom third of the frame empty for about 12 s, until Fig. 5 arrives. I judged this acceptable rather than crowding the two rank axes.
