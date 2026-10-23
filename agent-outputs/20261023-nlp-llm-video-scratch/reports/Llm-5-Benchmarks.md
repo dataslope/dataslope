@@ -1,6 +1,6 @@
 # Llm-5-Benchmarks: "Is it good enough?" (How LLMs Work, Unit 5 of 5)
 
-Folder `video/src/videos/llm-benchmarks/`. Voiced by Drew. Not committed.
+Folder `video/src/videos/llm-benchmarks/`. Voiced by Drew. I made no commits; the coordinator's work-in-progress snapshots already carry the folder.
 
 ## Length, characters, takes
 
@@ -13,9 +13,9 @@ Folder `video/src/videos/llm-benchmarks/`. Voiced by Drew. Not committed.
 - `check:cues`: clean (whole package).
 - `npm test`: 59 pass, 0 fail.
 - `check:sync`: pass, every beat within ±0.12 s; worst **+0.06 s** (sat-tell, 1:51.0).
-- `check:motion`: MOTION_RESULT
-- `check:frames`: FRAMES_RESULT
-- `check:mix` (informational): MIX_RESULT
+- `check:motion`: pass, nothing still for 3 s; longest still **2.5 s** (2:59.5, astra-same into mismatch; and 5:00.5, cost). The first run found one 3.0 s still at the start of the selective-reporting scene and two of 2.8 s (saturation, astra); fixed with a "launch post" chip and the italic cued to "launch post", the Fig. 7 tracks drawing on "Arc AGI three", and Fig. 5's empty tracks on "everyone". Preview kept at `video/out/Llm-5-Benchmarks-preview.mp4`.
+- `check:frames`: pass. 4 illustrations, largest stretch **0.92** at 2x; 15 arrows, **0.0°** of bend under every head; no ambiguous cues.
+- `check:mix` (informational): narration -20.0 LUFS; effects -45.5 LUFS, **25.5 LU under** the narration; effects' peak -21.1 dBFS at 0:00.6 (the intro's logo, nothing under it); where both sound, speech a median 27.3 dB above the effects (5th percentile 10.2 dB; closest 8.5 dB at 4:40.4, a tap in a gap).
 
 ## Scenes (13, Figs. 1 to 15)
 
@@ -25,7 +25,7 @@ Folder `video/src/videos/llm-benchmarks/`. Voiced by Drew. Not committed.
 4. ScaleScene: Fig. 4 the same two models on a 0 to 100 scale; MMLU's 0.6-point gap magnified under its 95 ceiling ("Noise."), ARC-AGI-3's 32.5 points mid-scale ("a real difference"); four numbered marks preview the four pitfalls.
 5. SaturationScene (gauge spot): Fig. 5 best scores: MMLU above 92 under a 95 ceiling, GPQA Diamond around 95, Humanity's Last Exam growing from under 10 to about 60 in 20 months; the three-point tell strikes the MMLU row.
 6. ContaminationScene (elephant spot): Fig. 6 test questions to published to crawled to training data; the lesson's own table, memorized and capable both reporting "high score"; SWE-bench Verified struck; the defense (private, newer than training).
-7. ReportingScene: what a launch post picks; Fig. 7 GPT-6 Astra on ARC-AGI-3, 62.7% in ARC's standard harness ($26,098) against 99.9% in OpenAI's ($18,817), harness drawn as code around a model; same model, same test, same week; only the first compares.
+7. ReportingScene: a launch post and what it picks (benchmarks, rivals, settings); Fig. 7 GPT-6 Astra on ARC-AGI-3, 62.7% in ARC's standard harness ($26,098) against 99.9% in OpenAI's ($18,817), harness drawn as code around a model; same model, same test, same week; only the first compares.
 8. MismatchScene (shape-sorter spot): Fig. 8 SWE-bench carries to agentic coding, not to reading invoices; third on every leaderboard can still be best for your task. Fig. 9 the four questions for any row of a launch table.
 9. ExamplesScene: Fig. 10 the method in four steps; Fig. 11 the lesson's simulation, 2,000 runs at n = 20 filling two histograms in run order (better one ahead in 1,626, tied 155, behind 219: "about four in five"); Fig. 12 the same run's rate by n (57.5, 70.0, 81.3, 94.2, 99.3%); "Still close after 30? Pick on cost."
 10. HarnessScene: Fig. 13 the lesson's ten tickets and two stand-in models; cheap 30%, good 100%; all 7 misses sent to `other`.
@@ -57,4 +57,4 @@ Things on screen that are drawn, not data: MMLU's four option bars, the ARC grid
 
 ## Left undone
 
-UNDONE
+Nothing. All checks above were run after the last scene edit (check:sync on the same audio and timeline; scene edits do not move cues).
