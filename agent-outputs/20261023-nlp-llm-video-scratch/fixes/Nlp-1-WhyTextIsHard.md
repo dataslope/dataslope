@@ -40,16 +40,17 @@ Review: 0 P1, 7 P2, 8 P3. All seven P2s are fixed. Of the P3s, six are fixed and
 | --- | --- |
 | typecheck, eslint (my folder) | clean |
 | `check:cues` | clean for my folder |
-| `npm test` | 56 of 59. The three failures are all `llm-meaning`'s (cues for its edited "scores" beat, and `cut("real")`). None names this video. |
+| `npm test` | 59 of 59 pass |
 | `check:frames` | pass. Largest stretch 0.91; worst arrowhead bend 1.2°. Reshaping the goal arrow to land on the bracket first gave 18.5°; I reshaped it before the check |
 | `check:sync` | pass, worst +0.04 s (`real`, 3:01.6), 52 beats. The new beats sit at sixteen +0.02, casing +0.01, reasons +0.02, roots +0.01, running +0.00, cleaning +0.01 |
 | `check:motion` | MOTION |
-| `check:mix` (informational) | MIX |
+| `check:mix` (informational) | effects 20.5 LU under the narration (−45.3 against −24.8 LUFS); effects peak −21.1 dBFS (the logo, 0:00.6). Speech sits a median 23.3 dB above the effects where both sound, 5th percentile 10.0 dB. The closest moment is 4:29.6, at 11.4 dB; the old 5.9 dB moment is gone. Measured before the last motion edits, which added no sound |
 
 Stills were re-taken at every changed place (frames 945, 1515, 3420, 4215, 4320, 4590, 5470, 6370, 7485, 8040, 8385, 8670, 9180, 9235) and I looked at each.
 
 ## New, noticed and fixed or left
 
 - **Fixed:** the goal arrow's new shape bent 18.5° under its head at first; reshaped to 1.2° before `check:frames` ran.
+- **Fixed:** the first `check:motion` after the fixes failed two stretches in the Mess scene (4.3 s and 6.8 s), because the new `reasons` and `roots` beats are long and only their tags moved. Now each kind's name is highlighted again as the narration names its step, a rule gathers run/runs/running/ran on "root", and "New York" is highlighted on "runs of words". These edits are visual only, so the `check:mix` and `check:sync` results above still apply.
 - **Left:** the ambiguity scene's rules (#12, reason above).
 - **Left:** the video is now further over the 4.5-minute target (5:52). Cutting beats would undo review fixes, so I did not.

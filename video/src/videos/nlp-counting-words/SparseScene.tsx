@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA } from "./data";
-import { Bracket, DATA, Headline, Kicker, Marked, numStyle, Svg } from "./parts";
+import { Bracket, DATA, Headline, Kicker, Marked, numStyle, pulse, Svg } from "./parts";
 
 const X0 = 170;
 const PITCH = 210;
@@ -45,6 +45,7 @@ export const SparseScene: React.FC = () => {
   const oneAt = n.word("sparsity", "seen only once");
   const sightingAt = n.word("sparsity", "one sighting");
   const sparsityAt = n.word("sparsity", "sparsity");
+  const accidentAt = n.word("sparsity", "accident");
   const sweetAt = n.word("sweet", "sweet spot");
   const plentyAt = n.word("sweet", "plenty");
   const orderAt = n.word("sweet", "enough order");
@@ -106,6 +107,10 @@ export const SparseScene: React.FC = () => {
                 {/* Where each bar will stand, from the moment n-grams are named. */}
                 <rect x={barX(i)} y={base - tall} width={BAR_W} height={tall} fill="none" stroke={HAIRLINE} strokeWidth={1.2} strokeDasharray="4 6" opacity={ghost * (1 - p) * 0.8} />
                 {p > 0 ? <rect x={barX(i)} y={base - hgt} width={BAR_W} height={hgt} fill={DATA} /> : null}
+                {/* "from an accident": the room above each bar, the n-grams seen once. */}
+                {p > 0 ? (
+                  <rect x={barX(i)} y={base - tall} width={BAR_W} height={tall - hgt} fill={ACCENT} opacity={0.16 * pulse(frame, accidentAt - 4 + i * 3, 30)} />
+                ) : null}
                 {lit > 0 ? (
                   <rect
                     x={barX(i) - 6}

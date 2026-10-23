@@ -14,7 +14,7 @@ export const VIDEO = "nlp-zipfs-law";
  *  out with room for them either way. */
 export const ILLUSTRATIONS = true;
 /** The images in that folder, by file name. */
-export const IMAGES = new Set(["nlp-counting-words-novel"]);
+export const IMAGES = new Set(["nlp-counting-words-novel", "nlp-zipfs-law-sieve", "nlp-zipfs-law-balance"]);
 
 export type Row = { rank: number; word: string; count: number };
 export type Predicted = Row & { law: number; product: number };

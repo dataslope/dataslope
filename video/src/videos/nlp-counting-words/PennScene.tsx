@@ -47,6 +47,7 @@ export const PennScene: React.FC = () => {
     n.word("meanings", "present-tense"),
     n.word("meanings", "plural"),
   ];
+  const heAt = n.word("meanings", "he");
   const thirtySixAt = n.word("letters", "thirty-six");
   const firstLetterAt = n.word("letters", "first letter");
   const letterAts: Record<"noun" | "verb" | "adj" | "adv", number> = {
@@ -129,7 +130,16 @@ export const PennScene: React.FC = () => {
 
       <FigLabel n="9" title="A sentence, tagged" at={from - 2} x={X0} y={y(266)} />
       {tallTiles.map((t, i) => (
-        <Tile key={i} text={t.text} x={t.x} y={t.y} size={SIZE} at={tallAt - 6 + i * 4} />
+        <Tile
+          key={i}
+          text={t.text}
+          x={t.x}
+          y={t.y}
+          size={SIZE}
+          at={tallAt - 6 + i * 4}
+          // "for he, she or it": the third-person verb, picked out while it is glossed.
+          marks={TALL[i][1] === "VBZ" ? [{ at: heAt - 2, out: meanAts[4] - 2 }] : []}
+        />
       ))}
       {TALL.map(([, tag], i) => {
         const t = tallTiles[i];

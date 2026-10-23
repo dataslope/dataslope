@@ -12,11 +12,11 @@ import { DATA_INK, EMPTY, Headline, Mark, POINT, POINT_INK, Spot, Strike, Tag } 
 
 /** The top hundred as a 10 by 10 grid of word chips, in rank order. */
 const GX = 96;
-const CHIP_W = 112;
+const CHIP_W = 120;
 const CHIP_H = 38;
-const COL = CHIP_W + 10;
+const COL = CHIP_W + 8;
 /** The two spots, in a column on the right. */
-const SPOT_X = 1430;
+const SPOT_X = 1470;
 const SPOT = 230;
 
 /**
@@ -116,7 +116,7 @@ export const WhyScene: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: SPOT_X - 40,
+          left: SPOT_X - 44,
           top: y(340),
           width: 1,
           height: y(640) + SPOT + 40 - y(340),

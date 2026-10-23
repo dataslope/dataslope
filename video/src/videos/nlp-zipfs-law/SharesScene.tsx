@@ -63,7 +63,8 @@ export const SharesScene: React.FC = () => {
   const dP = ease(frame, thirtyAt - 4, 22);
   const onceX0 = plainX(EMMA.firstHapaxRank - 1);
 
-  const strip = (top: number, at: number, o = 1) => (
+  const strip = (top: number, at: number, o = 1) =>
+    frame < at ? null : (
     <div
       style={{
         position: "absolute",

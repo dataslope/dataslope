@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { WINDOW } from "./data";
-import { flow, Kicker, lerp, Marked, numStyle, Svg, Tile, tileH, tileW } from "./parts";
+import { flow, Kicker, lerp, Marked, numStyle, REPEAT_WASH, Svg, Tile, tileH, tileW } from "./parts";
 
 const X0 = 120;
 const SIZE = 32;
@@ -38,6 +38,7 @@ export const WindowScene: React.FC = () => {
   const timeAt = n.word("slide", "time");
   const overlapAt = n.word("slide", "overlap");
   const fourAt = n.word("formula", "four bigrams");
+  const fiveWordsAt = n.word("formula", "Five words");
   const threeAt = n.word("formula", "three trigrams");
   const numberAt = n.word("rule", "number of words");
   const minusAt = n.word("rule", "minus n");
@@ -149,7 +150,19 @@ export const WindowScene: React.FC = () => {
 
       <FigLabel n="12" title="A window, sliding one step at a time" at={windowAt - 6} x={X0} y={y(400)} />
       {tiles.map((t, i) => (
-        <Tile key={i} text={t.text} x={t.x} y={t.y} size={SIZE} at={tileAts[i] - 4} marks={i === 1 ? [{ at: overlapAt - 2, out: overlapOut }] : []} />
+        <Tile
+          key={i}
+          text={t.text}
+          x={t.x}
+          y={t.y}
+          size={SIZE}
+          at={tileAts[i] - 4}
+          marks={[
+            ...(i === 1 ? [{ at: overlapAt - 2, out: overlapOut }] : []),
+            // "Five words": each tile counted in turn.
+            { at: fiveWordsAt - 2 + i * 4, out: fiveWordsAt + 10 + i * 4, color: REPEAT_WASH },
+          ]}
+        />
       ))}
       <Svg>
         {biOn > 0 ? (
@@ -165,6 +178,21 @@ export const WindowScene: React.FC = () => {
         <span style={{ ...label(24, INK), fontWeight: 600 }}>bigrams</span>
       </Ink>
       {chipList(WINDOW.bigrams, biSteps, biY, (i) => (i < 2 ? overlapAt + i * 4 : undefined))}
+      {/* "four bigrams": each chip counted in turn. */}
+      {flow(WINDOW.bigrams.map((g) => g.join(" ")), LIST_X, biY, 1700, CHIP, 14, 0).map((t, i) => (
+        <div
+          key={`count${i}`}
+          style={{
+            position: "absolute",
+            left: t.x,
+            top: biY + tileH(CHIP) + 6,
+            width: t.w * ease(frame, fourAt - 2 + i * 4, 8),
+            height: 3,
+            background: INK_SOFT,
+            opacity: 1 - ease(frame, triSteps[0] - 6, 10),
+          }}
+        />
+      ))}
       <Note at={fourAt - 2} x={biRight + 16} y={biY}>
         <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...numStyle(26, ACCENT_INK) }}>
           {WINDOW.bigrams.length}

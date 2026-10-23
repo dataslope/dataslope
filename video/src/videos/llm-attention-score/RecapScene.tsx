@@ -217,7 +217,7 @@ export const RecapScene: React.FC = () => {
       <Fade at={onceAt - 2} style={{ left: LX, top: GY - 64 }}>
         <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>many heads, at once</span>
       </Fade>
-      <Spot id="llm-attention-score-mix" at={realAt - 6} left={1330} top={y(620)} width={420} height={290} />
+      <Spot id="llm-attention-score-mix" at={realAt - 6} left={1440} top={y(600)} width={260} height={330} />
     </AbsoluteFill>
   );
 };

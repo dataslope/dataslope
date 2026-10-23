@@ -105,7 +105,7 @@ export const PredictScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, transform: `translateY(${settle}px)` }}>
         {/* The tenth row, washed as it is named (behind its text). */}
         <Svg opacity={ease(frame, tenthRealAt - 2, 12)}>
-          <rect x={86} y={rowY(9) - 6} width={BX0 + BAR_W - 76} height={ROW - 2} rx={6} fill={POINT_WASH} opacity={0.5} />
+          <rect x={86} y={rowY(9) - 6} width={BX0 + BAR_W - 76} height={ROW + 6} rx={6} fill={POINT_WASH} opacity={0.5} />
         </Svg>
         {EMMA.predict.map((r, i) => {
           const top = rowY(i);
@@ -180,7 +180,7 @@ export const PredictScene: React.FC = () => {
         </Tag>
 
         {/* The tenth: the gap from prediction to count. */}
-        <Bracket x0={tenthLawX} x1={tenthEmmaX} y={rowY(9) + 3 + 2 * BAR_H + 14} at={fourAt - 2} color={POINT} tick={9} up />
+        <Bracket x0={tenthLawX} x1={tenthEmmaX} y={rowY(9) + 3 + 2 * BAR_H + 12} at={fourAt - 2} color={POINT} tick={7} up />
         <Tag x={tenthEmmaX + 18} y={rowY(9) + 8} at={fourAt} size={22} color={POINT_INK} weight={700}>
           {(Math.round(EMMA.tenthOverLaw * 10) / 10).toFixed(1)}× the prediction
         </Tag>

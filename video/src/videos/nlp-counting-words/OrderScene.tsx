@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA, ORDER, PHRASES } from "./data";
-import { flow, HBar, Headline, Kicker, MARK_BAD, Marked, Mono, numStyle, Spot, Tile, tileH, tileW } from "./parts";
+import { flow, HBar, Headline, Kicker, MARK_BAD, Marked, Mono, numStyle, pulse, Spot, Tile, tileH, tileW } from "./parts";
 
 const X0 = 120;
 const SIZE = 26;
@@ -43,6 +43,8 @@ export const OrderScene: React.FC = () => {
   const hasAt = n.word("bigram", "not good");
   const pairAt = n.word("bigram", "The pair");
   const notBadAt = n.word("bigram", "not bad");
+  const loneAt = n.word("bigram", "lone");
+  const praiseAt = n.word("bigram", "praise");
   const negativeAt = n.word("bigram", "negative");
   const findsAt = n.word("phrases", "finds phrases");
   const linesAt = n.word("phrases", "three short");
@@ -111,6 +113,7 @@ export const OrderScene: React.FC = () => {
           undim={bigramsAt - 6}
           marks={inB.has(t.text) ? [] : [{ at: notAt - 2, color: MARK_BAD }]}
           border={inB.has(t.text) ? undefined : ACCENT_INK}
+          lift={inB.has(t.text) ? 0 : 10 * pulse(frame, loneAt - 2, 26)}
         />
       ))}
       <Note at={differAt - 2} x={X0} y={rowA + tileH(SIZE) + 14}>
@@ -137,7 +140,7 @@ export const OrderScene: React.FC = () => {
         />
       ))}
       {/* A lone "not" turns up in praise too: the pair is what carries the sign. */}
-      <Tile text="not bad" x={aGrams[notGood].x} y={rowA + tileH(SIZE) + 12} size={CHIP} at={notBadAt - 4} />
+      <Tile text="not bad" x={aGrams[notGood].x} y={rowA + tileH(SIZE) + 12} size={CHIP} at={praiseAt - 2} marks={[{ at: notBadAt - 2 }]} />
       <Note at={notBadAt + 2} x={aGrams[notGood].x + tileW("not bad", CHIP) + 14} y={rowA + tileH(SIZE) + 12}>
         <div style={{ height: tileH(CHIP), display: "flex", alignItems: "center", ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
           praise has a lone not too

@@ -134,7 +134,7 @@ export const CurveScene: React.FC = () => {
   // ── Plain-view rank ticks, cross-fading as the window widens ──
   const tickSets = STEPS.map((s) => {
     const k = win / s;
-    const o = Math.min(ease(k, 2, 1), 1 - ease(k, 7, 1)) * ease(frame, countsAt + 6, 12) * (1 - ease(frame, logAt - 4, 12));
+    const o = Math.min(ease(k, 2, 1), 1 - ease(k, 8, 1)) * ease(frame, countsAt + 6, 12) * (1 - ease(frame, logAt - 4, 12));
     const ticks: number[] = [];
     if (o > 0.01) for (let v = s; v < win; v += s) if (linX(v - 0.5) < CX1 - 90) ticks.push(v);
     return { s, o, ticks };
@@ -167,7 +167,7 @@ export const CurveScene: React.FC = () => {
   }
 
   // ── The bracket over the words used once or twice (plain view, full window) ──
-  const twiceX0 = linX(EMMA.firstOnceOrTwiceRank - 1);
+  const twiceX0 = CX0 + ((EMMA.firstOnceOrTwiceRank - 1) / EMMA.distinct) * CW;
   const bracketY = CY1 - 34;
   const tailOut = switchAt - 4;
 
@@ -194,7 +194,7 @@ export const CurveScene: React.FC = () => {
 
       {/* ── Headlines ── */}
       <Headline at={from - 2} lead="Every word in Emma," turn="ranked." turnAt={rankAt} out={plainAt - 6} />
-      <Headline at={plainAt - 2} lead="A cliff," turn="then a flat floor." turnAt={floorAt - 4} out={switchAt - 6} />
+      <Headline at={plainAt - 2} lead="A cliff," turn="then a flat floor." turnAt={keepAt} out={switchAt - 6} />
       <Headline at={switchAt} lead="On log scales," turn="a straight line." turnAt={straightensAt} />
 
       <Spot id="nlp-counting-words-novel" at={emmaAt - 4} out={switchAt - 4} left={1500} top={y(116)} width={300} height={193} />
