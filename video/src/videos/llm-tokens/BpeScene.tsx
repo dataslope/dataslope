@@ -186,7 +186,7 @@ export const BpeScene: React.FC = () => {
       <Sfx name="el-pencil" at={loAt - 4} level={-35} />
       <Sfx name="el-pencil" at={owAt - 4} level={-35} />
       {mergeCue.map((t, i) => (
-        <Sfx key={i} name="el-pop" at={t} level={i < 6 ? -28 : -32} />
+        <Sfx key={i} name="el-pop" at={t} level={i < 6 ? -31 : -33} />
       ))}
       <Sfx name="el-pencil" at={fourAt - 4} level={-35} />
       <Sfx name="el-sprinkle" at={replayedAt} level={-34} />

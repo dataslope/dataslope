@@ -10,3 +10,4 @@
 07:35 check:motion passed (longest still 2.8 s) after 14 motion fixes
 07:46 check:frames passed on the voiced timeline (largest stretch 0.90)
 08:44 check:mix: effects 20.4 LU under narration, closest 9.1 dB
+09:09 done: all checks pass; report at reports/Nlp-3-CountingWords.md
