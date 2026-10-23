@@ -4,13 +4,25 @@ Folder `video/src/videos/llm-generation/`, Drew, intro title kept as the plan's 
 
 ## Length, voice
 
-- **6:18** (378.0 s, 47 beats, 915 words, 145 wpm overall, from `npm run cues -- llm-generation`).
+- **6:19** (378.8 s, 47 beats, 915 words, 145 wpm overall, from `npm run cues -- llm-generation`).
 - **5,156 characters voiced** (cap 5,700), in **3 takes** (1,538 / 1,761 / 1,857). One run, no 429s, no re-voicing, no `--force`. The script sets `takeChars: 1900` so the closing scene's 335 characters ride with take 3 instead of being a fourth take.
-- Parts: sampling 4.6 to 116 s, hallucination 118 to 211 s, context windows 212 to 292 s, reasoning 294 to 375 s.
+- Parts: sampling 4.6 to 116 s, hallucination 118 to 211 s, context windows 212 to 293 s, reasoning 295 to 376 s.
+- After voicing, `middle` was made a scene beat (CostScene split in two so Fig. 15 has the page to itself). That only re-times a pause; `narrate --dry-run` reports 0 of 47 beats to voice.
 
 ## Checks
 
-__CHECKS__
+All run through my own entry and the render queue, on the final code:
+
+| Check | Result |
+| --- | --- |
+| Typecheck (my folder) | clean (full `tsc` filtered to the folder, and a folder-scoped `tsc -p`) |
+| `eslint src/videos/llm-generation` | clean |
+| `npm run check:cues` | nothing for my folder |
+| `npm test` | 59 pass, 0 fail |
+| `check:frames -- Llm-3-Generation` | pass: 4 images, largest stretch 0.97 (the parrot in FixScene), 6 arrows, 0.0 degrees of bend |
+| `check:sync -- llm-generation` | pass: 47 beats, worst +0.02 s (`topp-cut`, 1:20.3) |
+| `check:motion -- llm-generation` | pass: no still stretch of 2 s or more (the first run found one 3.0 s still in the hook; the jar and token names now arrive on its first words). Preview kept as `video/out/Llm-3-Generation-preview.mp4` |
+| `check:mix -- llm-generation` | effects 25.7 LU under the narration (-45.9 against -20.2 LUFS), effects' peak -21.1 dBFS (the intro's logo); speech a median 28.7 dB above the effects where both sound, 5th percentile 13.5 dB; closest 11.1 dB at 6:01.2 (the pop on "a hundred and nineteen", already lowered from -30 to -34) |
 
 ## Scenes (15 including the intro; Figs. 1 to 21, numbered in order)
 
@@ -54,4 +66,4 @@ Every number, token and string on screen comes from `measure.py` (NumPy 2.4.6, t
 
 ## Left undone
 
-__UNDONE__
+Nothing required is left. Not committed, as instructed. Scratch only outside my folders: `video/out/Llm-3-Generation-*` (stills script, preview, mix WAVs). The first `npm run illustrations` poller was stopped after the batch was cancelled; the four images in `public/images/llm-generation/` come from the `sync` run.

@@ -128,8 +128,8 @@ export const IdfScene: React.FC = () => {
       {/* ── Sound ── */}
       <Sfx name="el-sprinkle" at={from + 6} level={-32} />
       <Sfx name="el-sprinkle" at={from + 46} level={-34} />
-      <Sfx name="el-pop" at={commonAt - 2} level={-31} />
-      <Sfx name="el-pop" at={rareAt - 2} level={-31} />
+      <Sfx name="el-pop" at={commonAt - 2} level={-34} />
+      <Sfx name="el-pop" at={rareAt - 2} level={-34} />
       <Sfx name="el-sprinkle" at={ninetyAt - 2} level={-33} />
       <Sfx name="el-tap" at={weighsTwoAt} level={-28} />
       <Sfx name="el-tap" at={threeAt} level={-29} />

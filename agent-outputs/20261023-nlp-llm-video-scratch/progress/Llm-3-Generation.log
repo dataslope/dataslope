@@ -10,3 +10,5 @@
 08:09 check:frames passed with art (largest stretch 0.97); motion running
 08:49 check:motion: one 3.0 s still in the hook (fixed: jar and token names now arrive on the first words); re-running
 09:02 check:sync re-run passed (worst +0.02 s)
+09:14 check:motion passed (no still stretch of 2 s or more); check:frames passed again
+09:25 check:mix 25.7 LU under; all checks passed; report written

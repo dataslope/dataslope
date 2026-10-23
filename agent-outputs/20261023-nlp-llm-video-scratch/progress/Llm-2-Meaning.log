@@ -8,3 +8,4 @@
 2026-10-23T07:59:07Z check:sync passed (worst +0.04 s); check:frames passed with art (stretch 0.92, arrows 0.0 deg); check:motion run 1 failed (12 stretches >= 3 s), fixed with word-cued motion
 2026-10-23T08:26:11Z check:motion passed (longest still 2.5 s)
 2026-10-23T08:26:24Z check:mix: effects 25.5 LU under narration, peak -21.1 dBFS (logo), speech median 27.1 dB above
+2026-10-23T09:24:33Z final: check:frames and check:motion re-run after last layout edit, both pass; report written

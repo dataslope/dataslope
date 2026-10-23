@@ -10,7 +10,20 @@ Composition `Nlp-4-TextToFeatures`, folder `video/src/videos/nlp-text-to-feature
 
 ## Checks
 
-CHECKS_PLACEHOLDER
+All run on my private entry through the render queue, on the final code.
+
+| Check | Result |
+| --- | --- |
+| Typecheck (my folder) | clean |
+| Lint (my folder) | clean |
+| `check:cues` | clean |
+| `npm test` | 59/59 pass (no failures anywhere at the last run) |
+| `check:frames` | pass: 4 illustrations, largest stretch 0.69 (none drawn past its pixels); 9 arrows, 0.0° bend |
+| `check:sync` | pass: worst +0.03 s (`binary`, 2:29.7) |
+| `check:motion` | pass: longest still 2.8 s (`tie`, `rule`, `blind`); 19 stretches of 2 s or more, 43.0 s in all. The first run failed with 11 stills of 3 s or more; I fixed each with cued motion (a reading underline under the review, chips swelling as they are named, cell and column glows, panels stepping back for a turn, the lexicon filling the page and then stepping aside, the first flag review built during the rule's own beat) |
+| `check:mix` (informational) | narration −24.7 LUFS, effects −45.8 LUFS: **21.2 LU under**; effects peak −21.1 dBFS at 0:00.6 (the intro's logo); speech a median 25.1 dB above the effects where both sound (5th percentile 10.8 dB); closest moment 4:50.0 at 8.6 dB (the gauge's `el-pop` under "describe") |
+
+Preview with sound: `video/out/Nlp-4-TextToFeatures-preview.mp4`.
 
 ## Scenes (13, Fig. 1 to 18)
 
@@ -54,4 +67,7 @@ Built locally in `parts.tsx` / `tfidf.tsx`, likely useful to the other NLP and L
 
 ## Left undone
 
-UNDONE_PLACEHOLDER
+Nothing required. Two small things a reviewer might pick up:
+
+- Fig. 17's flag scene and Fig. 15's naive rows leave the right quarter of the page empty beside the verdicts.
+- `check:mix`'s closest moment (8.6 dB at 4:50.0) is the gauge's pop under "describe". I left it at −30 dBFS; turning it down to about −33 would be a one-number change.

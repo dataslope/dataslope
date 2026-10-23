@@ -67,7 +67,7 @@ export const ElizaScene: React.FC = () => {
       {ELIZA.slice(1).map((_, i) => (
         <Sfx key={i} name="el-tap" at={pairAt(i + 1)} level={-31} />
       ))}
-      <Sfx name="el-pop" at={secretaryAt - 2} level={-30} />
+      <Sfx name="el-pop" at={secretaryAt - 2} level={-35} />
       <Sfx name="el-tap" at={effectAt} level={-28} />
 
       <Kicker at={from - 6}>1966: Joseph Weizenbaum, MIT</Kicker>

@@ -15,11 +15,11 @@ committed or pushed.
 
 - Typecheck (`tsc`, folder filtered): clean. ESLint `src/videos/llm-meaning`: clean.
 - `check:cues`: clean (the whole package passed at the last run).
-- `npm test`: 59 pass, 0 fail (an earlier run failed only on nlp-history's cue, not this folder).
+- `npm test`: 59 pass, 0 fail (an earlier run failed only on another builder's nlp-history cue, never on this folder).
 - `check:sync`: pass, 58 beats, worst +0.04 s (toy, 0:44.4).
-- `check:frames`: pass. 4 illustrations, largest stretch 0.92 at 2x; 12 arrows, worst 0.0 degrees of bend under a head.
-- `check:motion`: MOTION_RESULT
-- `check:mix`: MIX_RESULT
+- `check:frames`: pass (final run after every edit). 4 illustrations, largest stretch 0.92 at 2x; 12 arrows, worst 0.0 degrees of bend under a head. A pre-voice run failed on two curved arrows (22.6 and 15.4 degrees); they became `PathArrow`s.
+- `check:motion`: pass, nothing still for 3 s; longest still 2.5 s (over `set`, `key`/`value` and `top`/`next`). The first run found 12 stretches of 3 to 4.8 s; each now has motion cued to a spoken word (a ring on both dogs at "closeness", the ruler thickening when it is named again, the question outlined at "question", the two figures stepping back at the turn, highlights on "hand over" and "picked", the other weights dimming at "trophy", the query pulsing at "query" and "question", the empty parameter bar drawn at "parameters", and so on). Preview kept as `out/Llm-2-Meaning-preview.mp4`.
+- `check:mix` (informational): effects 25.5 LU under the narration (-45.5 against -20.0 LUFS); effects' peak -21.1 dBFS at 0:00.6, the series intro's logo, with nothing under it; speech a median 27.1 dB above the effects where both sound (5th percentile 11.6 dB). Closest moment 6.5 dB at 1:32.3, a tap landing as the order-blind sums appear, a 50 ms reading between words.
 
 ## Scenes (14) and figures (23, numbered in order of first appearance)
 
@@ -64,4 +64,4 @@ Everything on screen comes from `measure.py` (NumPy 2.4.6, tiktoken 0.12.0 o200k
 
 ## Left undone
 
-Nothing required. The video runs about 30 s past the plan's 6-minute target at 5,054 characters; trimming would mean cutting narration, which I left as it is.
+Nothing required. The video runs about 30 s past the plan's 6-minute target at 5,054 characters (Drew read at 136 wpm against the estimate's 150); shortening it would mean cutting narration and re-voicing, which I did not do. The intro title is the plan's, unchanged. `measure.py` needs `TIKTOKEN_CACHE_DIR` pointed at a cache holding o200k_base (as the brief sets it); no extra NLTK data was fetched.
