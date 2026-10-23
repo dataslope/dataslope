@@ -21,3 +21,5 @@
 10:48 stills reviewed; fixed lamp alignment and Limits context note overlap; re-rendering 5 stills
 13:58 stills OK; running check:sync, frames, motion, mix
 14:47 check:motion failed (3 stills: sklearn-why/top, decide-in, reset-ex); re-cued chart/footnote/gauge and comma mark + lamps; stills + motion/frames/mix rerun
+15:11 motion: 2 more stills (menu, binary) fixed with toolbox at 'a choice' and a short-texts note; rerunning
+15:25 all checks pass (motion 2.8 s longest); fix report written to fixes/Nlp-4-TextToFeatures.md
