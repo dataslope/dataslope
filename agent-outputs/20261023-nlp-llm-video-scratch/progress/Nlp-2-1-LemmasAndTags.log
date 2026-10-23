@@ -5,3 +5,5 @@
 2026-10-23T10:49:02Z stills reviewed, check:frames pass (pre-art), check:cues clean; voicing
 2026-10-23T13:58:53Z voiced (1 take, 1784 chars, 132.7 s); art batch stalled 3h45m, cancelled, running sync
 2026-10-23T14:09:49Z art imported (sync), both spots look right
+2026-10-23T15:02:15Z check:sync, check:frames, check:mix pass; check:motion pass after fixes (longest still 2.5 s); npm test pass
+2026-10-23T15:02:50Z done; report written
