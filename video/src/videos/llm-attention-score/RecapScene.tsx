@@ -78,7 +78,7 @@ export const RecapScene: React.FC = () => {
 
   // Fig. 11: every query against every key, in many heads.
   const GX = X0 + 150;
-  const GY = y(690);
+  const GY = y(718);
   const CELL = 50;
   const headIn = (h: number) => headsAt - 4 + h * 5;
   /** Where the notes beside the stack start. */

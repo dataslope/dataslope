@@ -196,14 +196,14 @@ export const WeightsScene: React.FC = () => {
       </Fade>
 
       {/* The two rules, on the right, as the narration states them. */}
-      <Note at={dividedAt - 2} x={1390} y={headY - 4} width={430}>
+      <Note at={dividedAt - 2} x={1390} y={headY - 4} width={450}>
         <div style={{ ...body(32), color: INK }}>
           score = dot product{" "}
           <Mark at={squareAt}>
             ÷ <span style={{ fontFamily: MONO, fontWeight: 600 }}>√d</span>
           </Mark>
         </div>
-        <div style={{ ...body(28), color: INK_SOFT, marginTop: 12, opacity: ease(frame, howManyAt - 2, 10) }}>
+        <div style={{ ...body(27), color: INK_SOFT, marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, howManyAt - 2, 10) }}>
           <span style={{ fontFamily: MONO, fontWeight: 600, color: INK }}>d</span>: <Mark at={howManyAt}>how many numbers</Mark> a vector holds
         </div>
         <div style={{ ...body(28), color: INK_SOFT, marginTop: 10, opacity: ease(frame, rootTwoAt - 2, 10) }}>
