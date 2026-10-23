@@ -9,3 +9,5 @@
 2026-10-23T07:49:25Z motion fixes applied (two rounds); tsc+lint+check:cues clean; rerunning motion/frames/mix
 2026-10-23T08:21:11Z check:motion pass (longest still 2.5 s)
 2026-10-23T08:40:22Z check:frames pass (voiced)
+2026-10-23T08:57:17Z check:mix done (fx 21.2 LU under, median 23.5 dB)
+2026-10-23T08:58:00Z done; report written

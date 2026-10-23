@@ -1,6 +1,6 @@
 # Nlp-2-CleaningText: report
 
-Composition `Nlp-2-CleaningText`, folder `video/src/videos/nlp-cleaning-text/`, Unit 2 of Natural Language Processing with Python, "Cleaning text" (the plan's title, kept). Voiced by Hope. Not committed.
+Composition `Nlp-2-CleaningText`, folder `video/src/videos/nlp-cleaning-text/`, Unit 2 of Natural Language Processing with Python, "Cleaning text" (the plan's title, kept). Voiced by Hope. I committed nothing; your work-in-progress snapshots already hold the folder, and the working tree matches HEAD for it. Scratch helpers: `out/Nlp-2-CleaningText-stills.mjs` (stills from one bundle) and `out/Nlp-2-CleaningText-words.mjs` (voiced word times).
 
 ## Length, voice, takes
 
@@ -16,10 +16,10 @@ Composition `Nlp-2-CleaningText`, folder `video/src/videos/nlp-cleaning-text/`, 
 | `eslint src/videos/nlp-cleaning-text` | clean |
 | `check:cues` | clean for this folder ("every word cue names a phrase its beat says") |
 | `npm test` | 59/59 pass |
-| `check:frames` | CHECK_FRAMES |
+| `check:frames` | pass: 4 illustrations, largest stretch 0.83 at 2x; 14 arrows, 0.0° bend under any head |
 | `check:sync` | pass, worst beat +0.08 s (`look`, 3:48.3); every beat within ±0.12 s |
-| `check:motion` | CHECK_MOTION |
-| `check:mix` | CHECK_MIX |
+| `check:motion` | pass: longest still 2.5 s (1:20.8, 2:18.8, 3:58.5, 5:13.8); 14 stretches of 2 s or more, 30.3 s in all. The first voiced run had 11 stretches of 3 s or more (worst 10.0 s over `order`/`stop-in`); two rounds of scene-only fixes cleared them, no re-voicing |
+| `check:mix` (informational) | effects -46.2 LUFS against narration -25.0 LUFS: **21.2 LU under**; effects peak -21.1 dBFS (the logo, 0:00.6); where both sound, speech a median 23.5 dB above the effects (5th percentile 9.1 dB); closest moments 7.2 dB (5:34.5, the word taps in Fig. 14) and 7.3 dB (7:12.0, Fig. 16's whoosh), both 50 ms readings |
 
 `out/Nlp-2-CleaningText-preview.mp4` is the half-size preview from the last `check:motion`.
 

@@ -8,3 +8,4 @@
 07:28 art imported via sync (4 webp); check:sync passed, worst +0.06 s (sat-tell)
 07:40 voiced stills reviewed with art
 08:16 check:frames passed (4 images max stretch 0.92, 15 arrows 0 deg); check:motion found one 3.0 s still (select), fixed
+08:56 check:motion passed (longest still 2.5 s)
