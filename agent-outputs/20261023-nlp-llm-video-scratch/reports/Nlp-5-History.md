@@ -1,13 +1,19 @@
 # Nlp-5-History: "How the field got here" (NLP with Python, Unit 5)
 
-Folder `video/src/videos/nlp-history/`, voiced by Hope. Nothing committed.
+Folder `video/src/videos/nlp-history/`, voiced by Hope. I ran no git writes.
 
 ## Length, voice
 - **Length:** 311.8 s (5:12) by `npm run cues` on the voiced timeline (target was about 4.5 min; see "Left undone").
 - **Characters voiced:** 4,007 (cap 4,400), 44 beats, **3 takes** (1,423 / 1,314 / 1,270 chars), `eleven_v4_turbo`, voice `hope`. One run, no 429s, no re-voicing.
 
 ## Checks
-CHECKS_PLACEHOLDER
+All run through my entry (`VIDEO_ENTRY=out/entries/Nlp-5-History.tsx`) and the render queue, on the voiced timeline and the final code:
+- **Typecheck** (`tsc --noEmit`, grep my folder): clean. **Lint** (`eslint src/videos/nlp-history`): clean.
+- **check:cues:** clean. **npm test:** 59 pass, 0 fail.
+- **check:sync:** pass, worst beat **+0.04 s** (`fix`, 3:43.7); every beat within ±0.04 s.
+- **check:motion:** pass, **longest still 2.5 s** (0:32.3, `law`). The first voiced run had five stretches of 3.0–4.8 s (hook, emma, tail, fix, w2v); each now has its next element, mark or label cued to the spoken word. Preview kept at `out/Nlp-5-History-preview.mp4`.
+- **check:frames:** pass: 4 illustrations, largest stretch 0.98 at 2x; 5 arrows, 0.0° of bend under their heads.
+- **check:mix** (informational): effects **21.0 LU under** the narration (−45.7 against −24.7 LUFS), effects' peak −21.1 dBFS (the logo, 0:00.6); speech a median 25.3 dB above the effects where both sound, 5th percentile 12.1 dB; closest moment 10.6 dB (3:15.9, the pop under "secretary", lowered from −30 to −35 after the first measurement).
 
 ## Scenes (one line each)
 0. Series intro, "How the field got here".
@@ -43,4 +49,6 @@ CHECKS_PLACEHOLDER
 - `out/Nlp-5-History-batch-stills.mjs`: renders many stills from one bundle in one browser under one queue slot (`renderStill` with a shared `openBrowser`); with ten builders on two slots, one ticket per frame was the bottleneck.
 
 ## Left undone
-LEFT_PLACEHOLDER
+- **Length runs over the target:** 5:12 against "about 4.5 minutes" (4,007 of 4,400 characters). Seven stories at the plan's own 12.8 characters a second come to about 5 minutes; reaching 4.5 would mean cutting a story the prompt lists. Cut on paper from 4,412 to 4,007 characters before voicing.
+- **Pronunciations not verified by ear:** written as said, "Spark Jones" (Spärck), "Tomash" (Tomáš), "word to vec", "Eliza". check:sync places every beat; nobody has listened for the names.
+- My last edit (two effect levels in `ElizaScene.tsx` and `IdfScene.tsx`) is uncommitted; everything else in the folder appears already committed by the coordinator. Nothing else outstanding.

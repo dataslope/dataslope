@@ -11,3 +11,4 @@
 08:13 check:motion run 1: 5 stretches >=3 s, fixed (headline/marks/labels on spoken words); re-running motion, frames, mix
 08:41 check:motion pass (longest still 2.5 s, 0:32.3 law); frames and mix queued
 09:19 check:motion pass after final edits (longest still 2.5 s); frames3 + mix2 queued
+09:29 check:frames pass, check:mix 21.0 LU under; all checks done, report written
