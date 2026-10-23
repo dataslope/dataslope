@@ -97,6 +97,11 @@ export const script: NarrationScript = {
       text: "Natural language processing, NLP for short, closes that gap. It turns unstructured text into structure a program can compute with.",
       pauseAfter: 1.0,
     },
+    {
+      id: "sixteen",
+      text: "NLTK, the Python toolkit this course uses, says sixteen: can't becomes two, Doctor keeps its period, and the dollar sign stands alone.",
+      pauseAfter: 0.9,
+    },
     { id: "ambig-in", text: "Part of what makes that hard is ambiguity." },
 
     {
@@ -125,10 +130,15 @@ export const script: NarrationScript = {
 
     { id: "contractions", scene: true, text: "Contractions hide words. Don't is do, and not.", pauseAfter: 0.6 },
     { id: "period", text: "One period ends a sentence, shortens Doctor, and marks a decimal point.", pauseAfter: 0.6 },
-    { id: "casing", text: "Apple, the company, isn't apple, the fruit.", pauseAfter: 0.6 },
+    { id: "casing", text: "A capital letter at the start of a sentence doesn't make a new word.", pauseAfter: 0.6 },
     { id: "forms", text: "Run, runs, running and ran are four spellings of one idea.", pauseAfter: 0.6 },
     { id: "units", text: "And New York is one place, written as two words.", pauseAfter: 0.8 },
-    { id: "reasons", text: "Each of these is the reason a later step exists.", pauseAfter: 0.8 },
+    { id: "reasons", text: "Contractions and punctuation are why we tokenize, and casing is why we lowercase.", pauseAfter: 0.6 },
+    {
+      id: "roots",
+      text: "Word forms are why we stem or lemmatize, reducing each to a root. And multi-word units are why we count runs of words, called n-grams.",
+      pauseAfter: 0.9,
+    },
     { id: "split-in", text: "So why not just split on the spaces?" },
 
     { id: "split", scene: true, text: "Here's the lesson's sentence. I can't believe it's not butter, Mister Jones!", pauseAfter: 0.6 },
@@ -148,7 +158,7 @@ export const script: NarrationScript = {
     { id: "do-in", text: "So what does an NLP system actually do?" },
 
     // ── Part 2. What an NLP system does ───────────────────────────────────
-    { id: "layers", scene: true, text: "It adds structure in layers. Characters become tokens.", pauseAfter: 0.6 },
+    { id: "layers", scene: true, text: "It adds structure in layers. Characters become tokens.", pauseAfter: 0.8 },
     {
       id: "layers-up",
       text: "Tokens get normalized, tagged with their part of speech, and turned into counts and patterns.",
@@ -163,7 +173,7 @@ export const script: NarrationScript = {
       id: "rules",
       scene: true,
       text: "A step can follow rules that write down what people already know, like a list of stopwords, the little words to skip.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     { id: "readable", text: "Rules need no training data, and you can read exactly why they did what they did.", pauseAfter: 0.8 },
     { id: "learning", text: "Or it can be learned from labeled examples. That's powerful, but opaque.", pauseAfter: 0.8 },
@@ -181,13 +191,14 @@ export const script: NarrationScript = {
     { id: "lowercased", text: "Lowercasing folds the capitals away.", pauseAfter: 0.6 },
     { id: "cleaned", text: "Cleaning drops the comma and the exclamation mark. Eleven left.", pauseAfter: 0.6 },
     { id: "stopped", text: "Removing stopwords drops five little words. Six left.", pauseAfter: 0.6 },
-    { id: "lemmatized", text: "And lemmatizing turns cats into cat, and dogs into dog.", pauseAfter: 0.9 },
+    { id: "lemmatized", text: "And lemmatizing turns cats into cat, and dogs into dog.", pauseAfter: 0.6 },
+    { id: "running", text: "Running and barking stay as they are: nobody told the lemmatizer they're verbs.", pauseAfter: 0.9 },
     {
       id: "list",
       text: "After tokenizing, each step is one Python list comprehension. The code is easy. Choosing the steps is the hard part.",
       pauseAfter: 0.9,
     },
-    { id: "cleaning", scene: true, text: "Those are the cleaning steps, and they're much the same in every project.", pauseAfter: 0.7 },
+    { id: "cleaning", scene: true, text: "Those are the cleaning steps, and every project picks from the same toolbox.", pauseAfter: 0.7 },
     {
       id: "analysis",
       text: "Analysis comes after: counting, tagging, building features. It depends on your goal, and so should the cleaning, because most of its steps are optional.",

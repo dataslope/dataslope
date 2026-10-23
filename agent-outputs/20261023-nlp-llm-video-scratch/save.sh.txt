@@ -6,9 +6,10 @@ S=/tmp/claude-0/-home-user-dataslope/2a3cc9a3-7547-5d18-88e1-2b54dd0db0d9/scratc
 D=/home/user/dataslope/agent-outputs/20261023-nlp-llm-video-scratch
 cp $S/reports/*.md $D/reports/ 2>/dev/null || true
 cp $S/progress/*.log $D/progress/ 2>/dev/null || true
+mkdir -p $D/fixes; cp $S/fixes/*.md $D/fixes/ 2>/dev/null || true
 cd /home/user/dataslope
 P=""
-for f in llm-tokens llm-meaning llm-generation llm-cost llm-benchmarks nlp-why-text-is-hard nlp-cleaning-text nlp-counting-words nlp-text-to-features nlp-history; do
+for f in llm-tokens llm-meaning llm-generation llm-cost llm-benchmarks nlp-why-text-is-hard nlp-cleaning-text nlp-counting-words nlp-text-to-features nlp-history llm-attention-score llm-conversation-cost nlp-lemmas-and-tags nlp-zipfs-law; do
   for d in video/src/videos/$f video/public/images/$f video/public/narration/$f video/takes/$f; do [ -e $d ] && P="$P $d"; done
 done
 git add -A $P agent-outputs/20261023-nlp-llm-video-state.md agent-outputs/20261023-nlp-llm-video-scratch

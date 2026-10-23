@@ -1,0 +1,25 @@
+// Scratch (gitignored): registers Nlp-3-1-ZipfsLaw alone, exactly as Root.tsx does.
+// Use: VIDEO_ENTRY=out/entries/Nlp-3-1-ZipfsLaw.tsx npm run check:frames -- Nlp-3-1-ZipfsLaw
+//      npx remotion still out/entries/Nlp-3-1-ZipfsLaw.tsx Nlp-3-1-ZipfsLaw out/x.png --frame=300
+import React from "react";
+import { Composition, registerRoot } from "remotion";
+import "../../src/theme/brand";
+import "../../src/theme/fonts";
+import { narratedMetadata } from "../../src/narration/metadata";
+import { EDITORIAL_DEFAULTS, type EditorialProps } from "../../src/editorial/Page";
+import { NlpZipfsLaw } from "../../src/videos/nlp-zipfs-law/Video";
+import { script } from "../../src/videos/nlp-zipfs-law/script";
+
+const Root: React.FC = () => (
+  <Composition
+    id="Nlp-3-1-ZipfsLaw"
+    component={NlpZipfsLaw}
+    width={1920}
+    height={1080}
+    fps={30}
+    durationInFrames={30 * 60}
+    defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+    calculateMetadata={narratedMetadata<EditorialProps>(script)}
+  />
+);
+registerRoot(Root);

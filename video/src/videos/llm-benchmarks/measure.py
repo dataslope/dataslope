@@ -285,6 +285,33 @@ page_says("evaluating-for-your-task", printed)
 printed, cost = run(cost_block)
 page_says("evaluating-for-your-task", printed)
 
+# What each step up the tiers costs per error it avoids: the video's own
+# arithmetic on the lesson's table, not a line the page prints. Errors a month
+# are (1 - accuracy) x volume; a step's break-even is its extra bill divided by
+# the errors it removes. Below that price per error, the cheaper tier is the
+# cheaper choice overall; above it, the dearer one. The lesson's prose ("a
+# minute of triage, the cheap model wins") gets this backwards: Haiku to Sonnet
+# breaks even at about 5 cents an error.
+rows = cost["rows"]
+for r in rows:
+    r["errors"] = round((1 - r["accuracy"]) * cost["volume"])
+cost["steps"] = []
+for lo, hi in zip(rows, rows[1:]):
+    avoided = lo["errors"] - hi["errors"]
+    extra = hi["monthly"] - lo["monthly"]
+    cost["steps"].append({
+        "from": lo["name"],
+        "to": hi["name"],
+        "points": round((hi["accuracy"] - lo["accuracy"]) * 100),
+        "times": round(hi["monthly"] / lo["monthly"], 2),
+        "errorsAvoided": avoided,
+        "extraMonthly": round(extra, 2),
+        "perErrorAvoided": round(extra / avoided, 5) if avoided else None,
+    })
+for st in cost["steps"]:
+    print(f"[break-even] {st['from']} -> {st['to']}: {st['errorsAvoided']:,} fewer errors for ${st['extraMonthly']:,.2f}"
+          f" = {st['perErrorAvoided']} per error", file=sys.stderr)
+
 # The n = 20 draws, counted: how often the worse model ties or wins, and the
 # two histograms of scores (correct answers out of 20) the video draws. The
 # draws themselves stay too, in run order, as two lists of counts.

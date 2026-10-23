@@ -42,6 +42,12 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "a thick closed dictionary lying flat, with a deep blue cloth cover and a red ribbon bookmark trailing from its pages, and a small pair of garden pruning shears with yellow handles resting open on top of it"
+    },
+    {
+      "id": "nlp-cleaning-text-book",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a thick dictionary lying open on its spine, its two blank cream pages fanned gently upward, a deep blue cloth cover showing at the edges and a long red ribbon bookmark draped across the open pages"
     }
   ]
 }

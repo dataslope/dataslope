@@ -102,8 +102,9 @@ export const script: NarrationScript = {
   leadIn: INTRO_LEAD_IN,
   minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
-  // Three takes rather than four: the closing scene's 335 characters ride with the part before.
-  takeChars: 1900,
+  // The three takes as recorded: each part-sized take starts where `take` says,
+  // and the closing scene rides with the take before it.
+  takeChars: 2100,
   beats: [
     // ── Part 1. Sampling ──────────────────────────────────────────────────
     {
@@ -130,7 +131,8 @@ export const script: NarrationScript = {
     {
       id: "picker",
       text: "And the picking isn't done by the model. It's a few lines of code with a couple of settings... and it's why one prompt can give different answers.",
-      pauseAfter: 0.8,
+      // Holds the three draws, the first of them the 21.6% token, before the cut.
+      pauseAfter: 1.4,
     },
     {
       id: "divide",
@@ -174,6 +176,7 @@ export const script: NarrationScript = {
     {
       id: "plausible",
       scene: true,
+      take: true,
       text: "That explains hallucination. The model writes plausible continuations, and a plausible continuation of a question is an answer.",
       pauseAfter: 0.6,
     },
@@ -203,13 +206,14 @@ export const script: NarrationScript = {
     { id: "hedge", scene: true, text: "[curious] So why not just say, tell me if you don't know?", pauseAfter: 0.5 },
     {
       id: "hedge-why",
-      text: "You'll get more hedges... but they don't land on the wrong answers, because nothing inside knows which ones are wrong.",
+      text: "You'll get more hedges... but they land on right and wrong answers alike, because nothing inside knows which ones are wrong.",
       pauseAfter: 0.9,
     },
     {
       id: "works",
       text: "What works is changing the task. Paste in the source. Ask for something you can check. Constrain the shape. And give it an exit, like, reply not found.",
-      pauseAfter: 0.6,
+      // Time to read the lesson's reason under each fix.
+      pauseAfter: 1.0,
     },
     { id: "exit", text: "It's picking a continuation either way, so hand it an easy, honest one.", pauseAfter: 0.7 },
     {
@@ -237,7 +241,8 @@ export const script: NarrationScript = {
     {
       id: "costs",
       scene: true,
-      text: "Filling it isn't free, either. You pay for every input token, every turn. A five hundred thousand token document, over ten turns, is five million tokens billed, unless a cache steps in.",
+      take: true,
+      text: "Filling it isn't free, either. You pay for every input token, every turn. In a million-token window, a five hundred thousand token document resent over ten turns is five million tokens billed, unless a cache steps in.",
       pauseAfter: 0.8,
     },
     {
@@ -246,7 +251,11 @@ export const script: NarrationScript = {
       text: "And the model doesn't read it all equally well. Facts at the start and the end come back reliably. The middle sags. It's called lost in the middle.",
       pauseAfter: 0.8,
     },
-    { id: "permission", text: "So a bigger window is permission, not a recommendation.", pauseAfter: 0.9 },
+    {
+      id: "permission",
+      text: "So a bigger window is permission, not a recommendation. Paste the three chapters that matter, and put the key facts first or last.",
+      pauseAfter: 0.9,
+    },
     {
       id: "square",
       scene: true,
@@ -288,8 +297,8 @@ export const script: NarrationScript = {
     },
     {
       id: "overthink",
-      text: "And on an easy problem, more thinking can even talk it out of a right first answer.",
-      pauseAfter: 0.9,
+      text: "On an easy problem, more thinking can even talk it out of a right answer.",
+      pauseAfter: 1.0,
     },
     {
       id: "bill",
@@ -297,7 +306,11 @@ export const script: NarrationScript = {
       text: "And thinking tokens are output tokens, billed whether you see them or not. In that answer, you'd read thirteen tokens and pay output prices for a hundred and nineteen.",
       pauseAfter: 0.8,
     },
-    { id: "effort", text: "So set the lowest effort that passes your own tests, on purpose.", pauseAfter: 0.7 },
+    {
+      id: "effort",
+      text: "Most providers give you a reasoning effort setting. Pick the lowest effort that passes your own tests, on purpose.",
+      pauseAfter: 0.7,
+    },
     {
       id: "next",
       text: "Every token the model reads, writes or thinks ends up on the bill. So what does a token actually cost?",

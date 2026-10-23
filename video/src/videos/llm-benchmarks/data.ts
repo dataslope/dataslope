@@ -74,6 +74,29 @@ export const TIERS = m.cost.rows.map((r) => ({
 }));
 export const COST = { inTokens: m.cost.inTokens, outTokens: m.cost.outTokens, volume: m.cost.volume };
 
+/**
+ * Each step up the tiers, priced per error it avoids (measure.py's own
+ * arithmetic on the lesson's table): Haiku to Sonnet removes 30,000 errors a
+ * month for $1,567.50, about 5 cents each; Sonnet to Opus 10,000 for $1,650,
+ * 16.5 cents; Opus to Fable none. `perError` is null where nothing is avoided.
+ */
+export const STEPS = m.cost.steps.map((st) => ({
+  from: st.from,
+  to: st.to,
+  points: st.points,
+  times: st.times,
+  avoided: st.errorsAvoided,
+  extra: st.extraMonthly,
+  perError: st.perErrorAvoided as number | null,
+}));
+export const step = (to: string) => {
+  const st = STEPS.find((x) => x.to === to);
+  if (!st) throw new Error(`no step to ${to}`);
+  return st;
+};
+/** "5.2¢", "16.5¢": a price per error, in cents. */
+export const cents = (usdPerError: number) => `${(usdPerError * 100).toFixed(1)}¢`;
+
 /** evaluating-for-your-task, "How many examples" (seed 7, 2,000 runs). */
 export const SIZES = {
   trueA: Math.round(m.sizes.trueA * 100),
@@ -89,6 +112,12 @@ export const SIZES = {
   histA: m.sizes.histA,
   histB: m.sizes.histB,
   ...m.sizes.keptSummary,
+};
+/** The lesson's own follow-up, "change true_b to 0.78": a 2-point gap, run
+ *  the same way. Even 100 examples rank it right about 60% of the time. */
+export const CLOSE_RATES = {
+  trueB: Math.round(m.sizesClose.trueB * 100),
+  rates: Object.entries(m.sizesClose.rates).map(([n, r]) => ({ n: Number(n), pct: Number(pct(r)) })),
 };
 export const rateAt = (n: number) => {
   const r = SIZES.rates.find((x) => x.n === n);

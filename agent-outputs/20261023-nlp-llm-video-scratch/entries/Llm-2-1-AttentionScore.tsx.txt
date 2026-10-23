@@ -1,0 +1,25 @@
+// Scratch (gitignored): registers Llm-2-1-AttentionScore alone, exactly as Root.tsx does.
+// Use: VIDEO_ENTRY=out/entries/Llm-2-1-AttentionScore.tsx npm run check:frames -- Llm-2-1-AttentionScore
+//      npx remotion still out/entries/Llm-2-1-AttentionScore.tsx Llm-2-1-AttentionScore out/x.png --frame=300
+import React from "react";
+import { Composition, registerRoot } from "remotion";
+import "../../src/theme/brand";
+import "../../src/theme/fonts";
+import { narratedMetadata } from "../../src/narration/metadata";
+import { EDITORIAL_DEFAULTS, type EditorialProps } from "../../src/editorial/Page";
+import { LlmAttentionScore } from "../../src/videos/llm-attention-score/Video";
+import { script } from "../../src/videos/llm-attention-score/script";
+
+const Root: React.FC = () => (
+  <Composition
+    id="Llm-2-1-AttentionScore"
+    component={LlmAttentionScore}
+    width={1920}
+    height={1080}
+    fps={30}
+    durationInFrames={30 * 60}
+    defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+    calculateMetadata={narratedMetadata<EditorialProps>(script)}
+  />
+);
+registerRoot(Root);

@@ -233,7 +233,11 @@
           11
         ]
       }
-    ]
+    ],
+    "asVerb": {
+      "running": "run",
+      "barking": "bark"
+    }
   },
   "layers": {
     "chars": "Cats are RUNNING",
@@ -259,15 +263,15 @@
     ],
     "counts": [
       [
-        "the",
-        2
+        "cats",
+        1
       ],
       [
         "are",
-        2
+        1
       ],
       [
-        "cats",
+        "running",
         1
       ]
     ]

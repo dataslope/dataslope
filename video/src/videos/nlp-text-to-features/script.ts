@@ -134,9 +134,9 @@ export const script: NarrationScript = {
     {
       id: "tasks",
       scene: true,
-      text: "Every task chooses differently. Search wants stems. Topics want real words, so lemmas. Sentiment keeps its stopwords.",
-      pauseAfter: 0.6,
+      text: "Every task chooses differently. Search wants stems. Topics want real words, so lemmas.",
     },
+    { id: "tasks-sent", text: "Sentiment keeps its stopwords.", pauseAfter: 0.6 },
     {
       id: "author",
       text: "And to tell who wrote a text, the stopwords are the signal itself.",
@@ -179,9 +179,9 @@ export const script: NarrationScript = {
     {
       id: "binary",
       scene: true,
-      text: "Sometimes all that matters is whether a word is there. This spam says free three times.",
-      pauseAfter: 0.6,
+      text: "Sometimes all that matters is whether a word is there.",
     },
+    { id: "binary-spam", text: "This spam says free three times.", pauseAfter: 0.6 },
     {
       id: "vectors",
       text: "The count vector keeps the three. The binary vector just marks a one, for present.",
@@ -212,9 +212,9 @@ export const script: NarrationScript = {
     {
       id: "counts",
       scene: true,
-      text: "Here are three new documents: a cat on a mat, a dog in a park, a comet in the sky. By raw count, the word the leads every row, with two.",
-      pauseAfter: 0.6,
+      text: "Here are three new documents: a cat on a mat, a dog in a park, a comet in the sky.",
     },
+    { id: "counts-lead", text: "By raw count, the word the leads every row, with two.", pauseAfter: 0.6 },
     {
       id: "same",
       text: "But a column that's the same in every row can't tell the documents apart.",
@@ -252,9 +252,9 @@ export const script: NarrationScript = {
     {
       id: "sklearn",
       scene: true,
-      text: "One caution: that's the textbook formula. Scikit-learn's default smooths it and adds one, so the word the never reaches zero. On these three documents, it even stays on top.",
-      pauseAfter: 0.9,
+      text: "One caution: that's the textbook formula. Scikit-learn's default smooths it and adds one, so the word the never reaches zero.",
     },
+    { id: "sklearn-top", text: "On these three documents, it even stays on top.", pauseAfter: 0.9 },
     { id: "decide-in", text: "Counts and weights describe a text. The last step makes a call on one: is it positive, or negative?" },
 
     // ── Part 4. Rule-based sentiment ──────────────────────────────────────

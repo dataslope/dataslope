@@ -1,0 +1,25 @@
+// Scratch (gitignored): registers Llm-4-1-ConversationCost alone, exactly as Root.tsx does.
+// Use: VIDEO_ENTRY=out/entries/Llm-4-1-ConversationCost.tsx npm run check:frames -- Llm-4-1-ConversationCost
+//      npx remotion still out/entries/Llm-4-1-ConversationCost.tsx Llm-4-1-ConversationCost out/x.png --frame=300
+import React from "react";
+import { Composition, registerRoot } from "remotion";
+import "../../src/theme/brand";
+import "../../src/theme/fonts";
+import { narratedMetadata } from "../../src/narration/metadata";
+import { EDITORIAL_DEFAULTS, type EditorialProps } from "../../src/editorial/Page";
+import { LlmConversationCost } from "../../src/videos/llm-conversation-cost/Video";
+import { script } from "../../src/videos/llm-conversation-cost/script";
+
+const Root: React.FC = () => (
+  <Composition
+    id="Llm-4-1-ConversationCost"
+    component={LlmConversationCost}
+    width={1920}
+    height={1080}
+    fps={30}
+    durationInFrames={30 * 60}
+    defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+    calculateMetadata={narratedMetadata<EditorialProps>(script)}
+  />
+);
+registerRoot(Root);

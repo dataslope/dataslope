@@ -18,7 +18,10 @@ content/courses/natural-language-processing-python/:
   for drawing one under the other, which split piece each token came from.
 - "pipeline" is the-nlp-pipeline.mdx, "Watching a list flow through the
   pipeline": the five steps in the lesson's order, each stage's list, and
-  for each surviving token the position it had in the first list.
+  for each surviving token the position it had in the first list. "asVerb" is what
+  the lemmatizer gives the words it left alone (running, barking) when it is
+  told they are verbs: the reason they stayed, which the video gives in one
+  clause.
 - "order" is the-nlp-pipeline.mdx, "Order matters: a concrete example":
   lowercase-then-filter against filter-then-lowercase, with the list between
   the two steps of each order.
@@ -26,8 +29,8 @@ content/courses/natural-language-processing-python/:
   normalized tokens, tagged tokens, patterns and counts), illustrated on
   three words of the pipeline sentence: their tokens, lowercased, tagged by
   nltk.pos_tag (the averaged perceptron tagger the course loads) after
-  lowercasing, as the pipeline orders it, and the sentence's most common
-  cleaned words. The Penn tags are named in words by their first letters
+  lowercasing, as the pipeline orders it, and the counts of those same
+  three words. The Penn tags are named in words by their first letters
   (NN noun, VB verb, RB adverb, DT determiner).
 - "stopwords" is NLTK's English list as the lessons load it.
 
@@ -153,6 +156,12 @@ out["pipeline"] = {
     "stages": [{"name": name, "tokens": [t for _, t in s], "cols": [i for i, _ in s]} for name, s in steps],
 }
 
+# What the lemmatizer leaves alone, and why: it reads every word as a noun
+# unless it is told the part of speech. Told "verb", it reduces both.
+kept = [t for (_, t), (_, before) in zip(steps[4][1], steps[3][1]) if t == before]
+out["pipeline"]["asVerb"] = {t: lemmatizer.lemmatize(t, pos="v") for t in kept if lemmatizer.lemmatize(t, pos="v") != t}
+assert out["pipeline"]["asVerb"] == {"running": "run", "barking": "bark"}, out["pipeline"]["asVerb"]
+
 # ── Layers (what-is-nlp.mdx's diagram), on three words of that sentence ─────
 first = [t for _, t in steps[0][1]]
 WINDOW = slice(1, 4)  # Cats are RUNNING
@@ -168,7 +177,9 @@ out["layers"] = {
     "normalized": lowered[WINDOW],
     "tags": [t for _, t in tags[WINDOW]],
     "tagNames": [NAMES[t[:2]] for _, t in tags[WINDOW]],
-    "counts": [[w, c] for w, c in Counter(cleaned).most_common(3)],
+    # The counts layer counts the same three words the other layers show,
+    # so the figure follows one input from characters to counts.
+    "counts": [[w, c] for w, c in Counter(lowered[WINDOW]).items()],
 }
 
 # ── Order matters (the-nlp-pipeline.mdx) ─────────────────────────────────────

@@ -234,6 +234,32 @@
       ],
       "same": true
     },
+    "meaning": {
+      "sentences": [
+        "great film",
+        "excellent film"
+      ],
+      "vocab": [
+        "excellent",
+        "film",
+        "great"
+      ],
+      "rows": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "shared": [
+        "film"
+      ]
+    },
     "doc1Counts": {
       "cat": 1,
       "mat": 1,
@@ -489,6 +515,13 @@
       0.0,
       0.0
     ],
+    "catTwice": {
+      "count": 2,
+      "length": 6,
+      "tf": 0.3333333333333333,
+      "idf": 1.0986122886681098,
+      "tfidf": 0.3662040962227032
+    },
     "theCountEveryRow": [
       2,
       2,
@@ -953,6 +986,83 @@
         "withReset": 1,
         "withoutReset": -1
       }
+    },
+    "resetExample": {
+      "text": "Not really, it was good",
+      "steps": [
+        {
+          "token": "not",
+          "role": "negation",
+          "polarity": 0,
+          "flag": true
+        },
+        {
+          "token": "really",
+          "role": "word",
+          "polarity": 0,
+          "flag": true
+        },
+        {
+          "token": ",",
+          "role": "reset",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "it",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "was",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "good",
+          "role": "scored",
+          "polarity": 1,
+          "flag": false
+        }
+      ],
+      "score": 1,
+      "label": "positive",
+      "scoreWithoutReset": -1,
+      "labelWithoutReset": "negative"
+    },
+    "context": {
+      "text": "The thriller was unpredictable",
+      "steps": [
+        {
+          "token": "the",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "thriller",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "was",
+          "role": "word",
+          "polarity": 0,
+          "flag": false
+        },
+        {
+          "token": "unpredictable",
+          "role": "scored",
+          "polarity": -1,
+          "flag": false
+        }
+      ],
+      "score": -1,
+      "label": "negative",
+      "added": "unpredictable"
     }
   }
 }

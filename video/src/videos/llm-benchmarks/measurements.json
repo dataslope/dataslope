@@ -264,7 +264,8 @@
     "perRequest": 8.250000000000001e-05,
     "monthly": 82.50000000000001,
     "perCorrect": 9.065934065934068e-05,
-    "perMillionCorrect": 90.66
+    "perMillionCorrect": 90.66,
+    "errors": 90000
    },
    {
     "name": "sonnet",
@@ -274,7 +275,8 @@
     "perRequest": 0.00165,
     "monthly": 1650.0,
     "perCorrect": 0.0017553191489361702,
-    "perMillionCorrect": 1755.32
+    "perMillionCorrect": 1755.32,
+    "errors": 60000
    },
    {
     "name": "opus",
@@ -284,7 +286,8 @@
     "perRequest": 0.0033,
     "monthly": 3300.0,
     "perCorrect": 0.003473684210526316,
-    "perMillionCorrect": 3473.68
+    "perMillionCorrect": 3473.68,
+    "errors": 50000
    },
    {
     "name": "fable",
@@ -294,7 +297,37 @@
     "perRequest": 0.00825,
     "monthly": 8250.0,
     "perCorrect": 0.008684210526315789,
-    "perMillionCorrect": 8684.21
+    "perMillionCorrect": 8684.21,
+    "errors": 50000
+   }
+  ],
+  "steps": [
+   {
+    "from": "haiku",
+    "to": "sonnet",
+    "points": 3,
+    "times": 20.0,
+    "errorsAvoided": 30000,
+    "extraMonthly": 1567.5,
+    "perErrorAvoided": 0.05225
+   },
+   {
+    "from": "sonnet",
+    "to": "opus",
+    "points": 1,
+    "times": 2.0,
+    "errorsAvoided": 10000,
+    "extraMonthly": 1650.0,
+    "perErrorAvoided": 0.165
+   },
+   {
+    "from": "opus",
+    "to": "fable",
+    "points": 0,
+    "times": 2.5,
+    "errorsAvoided": 0,
+    "extraMonthly": 4950.0,
+    "perErrorAvoided": null
    }
   ]
  },

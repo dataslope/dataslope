@@ -111,9 +111,10 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     { id: "sixteen", text: "That's sixteen tokens. And Mr. keeps its period, right where it belongs.", pauseAfter: 0.7 },
+    { id: "token", text: "Each piece is a token: one meaningful unit of text." },
     {
-      id: "token",
-      text: "Each piece is a token: one meaningful unit of text. Usually a word, but sometimes a number, a symbol, or a punctuation mark.",
+      id: "token-kinds",
+      text: "Usually a word, but sometimes a number, a symbol, or a punctuation mark.",
       pauseAfter: 1.0,
     },
     { id: "sent-in", text: "One level up, the period itself gets tricky." },
@@ -129,9 +130,10 @@ export const script: NarrationScript = {
       text: "Here's a line with all three. Dr. Lee earned two point five million. He smiled. Wasn't that great?",
       pauseAfter: 0.6,
     },
+    { id: "naive", text: "Split that at every period, and it falls into five pieces." },
     {
-      id: "naive",
-      text: "Split that at every period, and it falls into five pieces. It breaks after doctor, breaks inside two point five, and never notices the question mark.",
+      id: "naive-cut",
+      text: "It breaks after doctor, breaks inside two point five, and never notices the question mark.",
       pauseAfter: 0.7,
     },
     {
@@ -183,9 +185,10 @@ export const script: NarrationScript = {
       text: "The first keeps only tokens made entirely of letters. So World is gone, because its exclamation mark came with it. You lose the word, not just the punctuation.",
       pauseAfter: 0.8,
     },
+    { id: "translate", text: "The second deletes the punctuation characters." },
     {
-      id: "translate",
-      text: "The second deletes the punctuation characters. The words survive, but contractions get glued shut: the apostrophe in it's is gone, and so is the one in isn't.",
+      id: "shut",
+      text: "The words survive, but contractions get glued shut: the apostrophe in it's is gone, and so is the one in isn't.",
       pauseAfter: 0.6,
     },
     { id: "regex", text: "The third pulls out runs of letters, and splits isn't in two, at the apostrophe.", pauseAfter: 0.7 },
@@ -294,9 +297,9 @@ export const script: NarrationScript = {
     {
       id: "close",
       scene: true,
-      text: "Look back at the four steps, and each one threw something away on purpose. The spaces. The capitals. The common words. The endings.",
-      pauseAfter: 0.7,
+      text: "Look back at the four steps, and each one threw something away on purpose.",
     },
+    { id: "close-list", text: "The spaces. The capitals. The common words. The endings.", pauseAfter: 0.7 },
     {
       id: "needed",
       text: "Cleaning well means knowing what you threw away, and whether your task needed it.",

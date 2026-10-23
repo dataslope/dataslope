@@ -141,7 +141,7 @@ export const script: NarrationScript = {
     },
     {
       id: "age",
-      text: "The youngest of the three is over fifty. The oldest is nearly a hundred.",
+      text: "The youngest of the three is over fifty. The oldest is over ninety.",
       pauseAfter: 0.9,
     },
     {
@@ -157,7 +157,7 @@ export const script: NarrationScript = {
     },
     {
       id: "law",
-      text: "Rank them by how common they are, and the counts fall off roughly as one over the rank. That's Zipf's law.",
+      text: "Rank them by how common they are, and the second word turns up about half as often as the first, the tenth a tenth as often. On these log scales, that's a straight line: Zipf's law.",
       pauseAfter: 0.9,
     },
     {
@@ -240,7 +240,7 @@ export const script: NarrationScript = {
     },
     {
       id: "alpac",
-      text: "Twelve years later, a government committee saw no prospect of useful machine translation, and the funding dried up.",
+      text: "Twelve years later, a government committee saw no near-term prospect of useful machine translation, and the funding dried up.",
       pauseAfter: 0.8,
     },
     { id: "moral", text: "A polished demo is not a working system.", pauseAfter: 1.0 },
@@ -278,7 +278,7 @@ export const script: NarrationScript = {
     {
       id: "flaw",
       text: "A match on a common word counted just as much as a match on a rare one.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.1,
     },
     {
       id: "fix",
@@ -310,7 +310,7 @@ export const script: NarrationScript = {
     },
     {
       id: "analogy",
-      text: "And directions mean something. Start at king, take away man, add woman, and the nearest word is queen.",
+      text: "And directions mean something. Start at king, take away man, add woman, and the nearest other word is queen.",
       pauseAfter: 1.0,
     },
     {

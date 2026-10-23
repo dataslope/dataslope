@@ -46,6 +46,14 @@ import { NlpTextToFeatures } from "./videos/nlp-text-to-features/Video";
 import { script as nlpTextToFeaturesScript } from "./videos/nlp-text-to-features/script";
 import { NlpHistory } from "./videos/nlp-history/Video";
 import { script as nlpHistoryScript } from "./videos/nlp-history/script";
+import { LlmAttentionScore } from "./videos/llm-attention-score/Video";
+import { script as llmAttentionScoreScript } from "./videos/llm-attention-score/script";
+import { LlmConversationCost } from "./videos/llm-conversation-cost/Video";
+import { script as llmConversationCostScript } from "./videos/llm-conversation-cost/script";
+import { NlpLemmasAndTags } from "./videos/nlp-lemmas-and-tags/Video";
+import { script as nlpLemmasAndTagsScript } from "./videos/nlp-lemmas-and-tags/script";
+import { NlpZipfsLaw } from "./videos/nlp-zipfs-law/Video";
+import { script as nlpZipfsLawScript } from "./videos/nlp-zipfs-law/script";
 import { DaInterview } from "./videos/da-interview/Video";
 import { script as daInterviewScript } from "./videos/da-interview/script";
 import { DaSql } from "./videos/da-sql/Video";
@@ -593,6 +601,16 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(llmMeaningScript)}
       />
       <Composition
+        id="Llm-2-1-AttentionScore"
+        component={LlmAttentionScore}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(llmAttentionScoreScript)}
+      />
+      <Composition
         id="Llm-3-Generation"
         component={LlmGeneration}
         width={1920}
@@ -611,6 +629,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(llmCostScript)}
+      />
+      <Composition
+        id="Llm-4-1-ConversationCost"
+        component={LlmConversationCost}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(llmConversationCostScript)}
       />
       <Composition
         id="Llm-5-Benchmarks"
@@ -646,6 +674,16 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(nlpCleaningTextScript)}
       />
       <Composition
+        id="Nlp-2-1-LemmasAndTags"
+        component={NlpLemmasAndTags}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(nlpLemmasAndTagsScript)}
+      />
+      <Composition
         id="Nlp-3-CountingWords"
         component={NlpCountingWords}
         width={1920}
@@ -654,6 +692,16 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(nlpCountingWordsScript)}
+      />
+      <Composition
+        id="Nlp-3-1-ZipfsLaw"
+        component={NlpZipfsLaw}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(nlpZipfsLawScript)}
       />
       <Composition
         id="Nlp-4-TextToFeatures"

@@ -50,6 +50,8 @@ export const ScoreScene: React.FC = () => {
   const pickingAt = n.word("picker", "picking");
   const codeAt = n.word("picker", "lines of code");
   const diffAt = n.word("picker", "different answers");
+  // The three draws land during the sentence, so they hold through the pause after it.
+  const drawAt = (k: number) => codeAt + 12 + k * 10;
 
   const top = y(ROW_Y(0)) - 14;
   const bottom = y(ROW_Y(TOKENS.length - 1)) + h(BAR_H) + 14;
@@ -80,7 +82,7 @@ export const ScoreScene: React.FC = () => {
       <Sfx name="el-pencil" at={softAt} level={-35} />
       <Sfx name="el-whoosh" at={dividesAt} level={-36} />
       {[0, 1, 2].map((k) => (
-        <Sfx key={k} name="el-tap" at={diffAt + k * 6} level={-29} />
+        <Sfx key={k} name="el-tap" at={drawAt(k)} level={-29} />
       ))}
 
       <Kicker at={start - 6}>Sampling</Kicker>
@@ -234,10 +236,10 @@ export const ScoreScene: React.FC = () => {
         </div>
       </Ink>
       <Ink at={pickingAt - 4} dur={12} style={{ left: X0, top: drawY - 42 }}>
-        <span style={label(20)}>The picker, three runs</span>
+        <span style={label(20)}>The sampler, three runs</span>
       </Ink>
       {DRAWS_T1.slice(0, 3).map((tok, k) => (
-        <Note key={k} at={diffAt + k * 6} x={X0 + 590 + k * 150} y={drawY - 2} from="up">
+        <Note key={k} at={drawAt(k)} x={X0 + 590 + k * 150} y={drawY - 2} from="up">
           <span
             style={{
               display: "inline-block",
@@ -254,9 +256,15 @@ export const ScoreScene: React.FC = () => {
           </span>
         </Note>
       ))}
-      <Arrow from={[X0 + 506, drawY + 26]} to={[X0 + 572, drawY + 26]} at={diffAt - 6} dur={10} />
+      <Arrow from={[X0 + 506, drawY + 26]} to={[X0 + 572, drawY + 26]} at={drawAt(0) - 6} dur={10} />
+      {/* The first draw is the 21.6% token: drawn, not picked. */}
+      <Note at={diffAt - 2} x={X0 + 590} y={drawY + 62}>
+        <span style={{ ...note(21, TEXT[DRAWS_T1[0]]), fontWeight: 650, whiteSpace: "nowrap" }}>
+          {pct(AT_T1.probs[DRAWS_T1[0]])}, drawn anyway
+        </span>
+      </Note>
 
-      <Note at={softAt + 8} x={X0} y={y(888)}>
+      <Note at={softAt + 8} x={1240} y={drawY - 4} width={560}>
         <span style={note(20, INK_SOFT)}>
           Illustrative scores: the lesson&apos;s own four-token example, not a real model&apos;s output.
         </span>

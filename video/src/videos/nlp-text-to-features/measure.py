@@ -159,6 +159,14 @@ def spam_block():
 agreed.append(agrees("bag-of-words", run(spam_block), "bag of words: count and binary vectors"))
 
 # The limitations list: "dog bites man" and "man bites dog" make one bag.
+# The limitations list: "great" and "excellent" are unrelated columns. Two
+# short reviews that mean the same thing, counted the lesson's way, share
+# only the column of the word they have in common.
+meaning_pair = ["great film", "excellent film"]
+meaning_bags = [Counter(s.split()) for s in meaning_pair]
+meaning_vocab = sorted(meaning_bags[0] | meaning_bags[1])
+meaning_shared = sorted(w for w in meaning_vocab if meaning_bags[0][w] and meaning_bags[1][w])
+
 order_pair = ["dog bites man", "man bites dog"]
 order_bags = [Counter(s.split()) for s in order_pair]
 order_vocab = sorted(order_bags[0] | order_bags[1])
@@ -175,6 +183,12 @@ bag = {
         "vocab": order_vocab,
         "rows": [[b[w] for w in order_vocab] for b in order_bags],
         "same": order_bags[0] == order_bags[1],
+    },
+    "meaning": {
+        "sentences": meaning_pair,
+        "vocab": meaning_vocab,
+        "rows": [[b[w] for w in meaning_vocab] for b in meaning_bags],
+        "shared": meaning_shared,
     },
     # Doc 1 as the narration reads it: which words, how many times.
     "doc1Counts": {w: c for w, c in zip(bow_vocab, bow_rows[0]) if c},
@@ -248,6 +262,9 @@ d_idf = dv.idf_[[dv.vocabulary_[w] for w in vocab]]
 assert np.allclose(d_idf, [math.log((1 + N) / (1 + k)) + 1 for k in df], atol=TOL)
 the = vocab.index("the")
 top_score = max(tfidf[0])
+cat = vocab.index("cat")
+twice = {"count": 2, "length": lengths[0], "tf": 2 / lengths[0], "idf": idf[cat], "tfidf": 2 / lengths[0] * idf[cat]}
+assert math.isclose(twice["tfidf"], 2 * tfidf[0][cat])
 tf_idf = {
     "corpus": TF_CORPUS,
     "docs": docs,
@@ -263,6 +280,9 @@ tf_idf = {
     # Doc 1's words that tie at the top, as the lesson's prose names them.
     "doc0Top": sorted(w for w in set(docs[0]) if math.isclose(tf[0][vocab.index(w)] * idf[vocab.index(w)], top_score)),
     "theTfidfEveryRow": [row[the] for row in tfidf],
+    # "Used twice in this document, cat would score twice as much": the
+    # lesson's own formula on a Doc 1 where cat appeared twice in six words.
+    "catTwice": twice,
     "theCountEveryRow": [row[the] for row in counts],
     "maxOtherCount": max(c for row in counts for j, c in enumerate(row) if j != the),
     "sklearnDefault": {
@@ -373,6 +393,30 @@ def score_with(text, reset):
     return score
 
 
+# The video's own reset example, run through the lesson's sentiment() with
+# the flag's state after every token, and scored again with no reset tokens.
+reset_example = negation_trace("Not really, it was good")
+reset_example["scoreWithoutReset"] = score_with("Not really, it was good", set())
+reset_example["labelWithoutReset"] = label(reset_example["scoreWithoutReset"])
+assert reset_example["score"] == 1 and reset_example["scoreWithoutReset"] == -1
+
+
+# The limits list's context case: "unpredictable" is in neither list, so to
+# show the problem the video adds it to NEGATIVE and scores a thriller with it.
+def context_trace(text, extra_negative):
+    global NEGATIVE
+    saved = NEGATIVE
+    NEGATIVE = NEGATIVE | {extra_negative}
+    try:
+        return negation_trace(text)
+    finally:
+        NEGATIVE = saved
+
+
+context = context_trace("The thriller was unpredictable", "unpredictable")
+context["added"] = "unpredictable"
+assert context["score"] == -1
+
 reset_check = {
     text: {"withReset": score_with(text, RESET), "withoutReset": score_with(text, set())}
     for text in ["Not great, but terrible", "Not really, it was good"]
@@ -389,6 +433,8 @@ sentiment = {
     "sarcasm": sarcasm,
     "unknown": unknown,
     "resetCheck": reset_check,
+    "resetExample": reset_example,
+    "context": context,
 }
 
 out = {
