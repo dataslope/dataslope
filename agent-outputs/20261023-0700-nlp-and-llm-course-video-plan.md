@@ -132,6 +132,7 @@ The steps are the README's: script, facts, scenes, art, checks, voice, voiced ch
 - **One video per unit, series intro, bridges, `COURSE_MIN_PAUSE`**, as the two earlier courses.
 - **Illustrations** from `gpt-image-2.5-flare`, quality `low`, transparent, Batch API, with the standing fallback to `sync` when a batch sits an hour.
 - **The existing standalone videos stay as they are.** LlmTemperature (Hope) and TfIdf are not re-voiced or removed; the unit videos draw on their measurements.
+- **Five videos per course, then deep dives** (the user, 2026-10-23). The ten unit videos are the backbone and are not split. Once all ten are voiced they get a full review, as the Statistics and Database Design videos did (`agent-outputs/20261021-0551-course-video-review.md`), and its fixes. Then 3 to 5 short standalone deep dives (about 2 minutes each, in the course's voice, embedded at one lesson section) go where the review finds a unit too compressed. Candidates before the review: attention with query, key and value worked through; why a conversation's bill grows faster than the chat; training a BPE tokenizer by hand; Zipf's law on the Gutenberg texts.
 
 ## Open
 
