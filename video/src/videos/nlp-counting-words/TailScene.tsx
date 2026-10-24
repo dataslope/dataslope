@@ -43,7 +43,7 @@ export const TailScene: React.FC = () => {
   const wordsAt = n.word("book", "hundred and sixty-one thousand");
   const sevenAt = n.word("book", "seven thousand");
   const differentAt = n.word("book", "different");
-  const rankAt = n.word("giants", "Rank");
+  const rankAt = n.word("rank", "Rank");
   const topTenAt = n.word("giants", "top ten");
   const fifthAt = n.word("giants", "fifth");
   const otherEndAt = n.word("hapax", "other end");

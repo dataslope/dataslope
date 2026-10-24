@@ -29,14 +29,16 @@ better model choices than the teams reading benchmark tables.
 
 ## How many examples
 
-Fewer than you think. **Twenty to fifty** is enough to distinguish
-configurations that differ meaningfully, and it is few enough to build
-in an afternoon.
+Fewer than you think. **Twenty to fifty** is enough to rank two
+configurations that differ meaningfully. With a 15-point gap, twenty
+examples put the better one ahead about four times in five, and fifty
+about nineteen times in twenty. Either is few enough to build in an
+afternoon.
 
 <Figure
   slug="llm-evaluating-for-your-task-many-examples-inline-cutout"
   alt="A small tray of task cards beside a very large one, a gauge beside each reading almost the same"
-  caption="Twenty to fifty examples separate configurations about as well as hundreds."
+  caption="Fifty examples already rank a 15-point gap correctly about nineteen times in twenty."
 />
 
 <CodeBlock
@@ -61,7 +63,7 @@ for n in [5, 10, 20, 50, 100]:
     print(f"n={n:>3}: ranks them correctly {correct_ranking / 2000:.1%} of the time")
 
 print()
-print("Twenty examples already identify a 15-point gap almost always.")
+print("Twenty examples get a 15-point gap right about 4 times in 5; fifty, about 19 in 20.")
 print("Try changing true_b to 0.78 and see how the picture changes.")
 `,
     },
@@ -168,7 +170,8 @@ for name, o in options.items():
     per_req = IN_TOK / 1e6 * o["in"] + OUT_TOK / 1e6 * o["out"]
     monthly = per_req * VOLUME
     per_correct = monthly / (VOLUME * o["accuracy"])
-    print(f"{name:<8}{o['accuracy']:>6.0%}\${monthly:>11,.0f}\${per_correct:>13.6f}")
+    cost, each = "$" + format(monthly, ",.0f"), "$" + format(per_correct, ".6f")
+    print(f"{name:<8}{o['accuracy']:>6.0%}{cost:>12}{each:>14}")
 
 print()
 print("Opus buys 1 extra point over sonnet for twice the money,")
@@ -179,9 +182,15 @@ print("Whether a point is worth it depends on what an error costs you.")
   ]}
 />
 
-That last question is the one to answer before choosing. If a
-misclassified ticket costs a minute of human triage, the cheap model
-wins easily. If it costs a lost customer, it does not.
+That last question is the one to answer before choosing, and the table
+already answers it once you price the errors. Sonnet's three extra
+points mean 30,000 fewer misclassified tickets a month for \$1,567.50
+more: about five cents an error. Opus's one more point avoids another
+10,000 for \$1,650, about sixteen cents each, and Fable avoids none. So
+the cheap model wins only if an error costs you almost nothing. If a
+misclassified ticket costs a minute of a support agent's time, that is
+worth more than sixteen cents at any ordinary wage, and Opus becomes the
+cheapest choice overall; a lost customer settles it the same way.
 
 <Callout type="info" title="Build it once, use it forever">
 The harness outlives every model in it. When a new model launches, you
@@ -196,7 +205,7 @@ deciding from leaderboards.
   markdown={`How many examples does a useful first evaluation set need?
 
 - [o] Twenty to fifty, enough to detect a meaningful gap.
-  > A 15-point difference is identified almost every time at twenty examples, and that size is buildable in an afternoon.
+  > With a 15-point difference, twenty examples rank the two correctly about four times in five and fifty about nineteen times in twenty, and that size is buildable in an afternoon.
 - At least 1,000, for statistical significance.
   > Far more than needed to separate configurations that differ meaningfully.
 - Exactly 100, the standard evaluation size.
@@ -297,7 +306,7 @@ comparable.`}
 - Which model scores higher on public benchmarks.
   > Public rank is irrelevant to your cost-benefit calculation.
 - [o] What a single error actually costs you.
-  > A minute of human triage and a lost customer imply completely different answers.
+  > An error that costs nothing favors the cheap model; one that costs a minute of someone's time favors paying for the extra points.
 
 The value of avoided errors is what makes the comparison decidable.`}
 />

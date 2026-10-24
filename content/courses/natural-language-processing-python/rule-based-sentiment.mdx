@@ -232,7 +232,7 @@ ceilings you should respect:
   for a thriller's plot. A fixed lexicon cannot know which.
 - **Coverage.** Any word missing from your lexicon contributes nothing. Slang,
   typos, and new expressions slip through.
-- **Intensity and mixed opinion.** "good" and "phenomenal" both score +1; a
+- **Intensity and mixed opinion.** "good" and "excellent" both score +1; a
   review that is half-praise, half-complaint nets out to a muddle.
 
 <Figure
@@ -410,8 +410,14 @@ for review in ["I love it", "This is not good", "Not bad at all"]:
     {
       id: "reset_after_but",
       name: "Negation resets at a clause boundary",
-      description: "'Not great, but terrible' stays negative (the 'but' resets negation before 'terrible')",
+      description: "'Not great, but terrible' stays negative",
       code: `assert classify("Not great, but terrible") == "negative", "Got: " + classify("Not great, but terrible")`,
+    },
+    {
+      id: "reset_at_comma",
+      name: "A negation does not reach past a comma",
+      description: "'Not really, it was good' -> positive (the comma clears the 'not' before 'good')",
+      code: `assert classify("Not really, it was good") == "positive", "Got: " + classify("Not really, it was good")`,
     },
   ]}
 />
@@ -475,7 +481,7 @@ Sarcasm, context, and coverage gaps are the real ceilings of a hand-built lexico
 - To convert the text to uppercase
   > Case conversion happens in the tokenization step, not through the \`RESET\` set.
 - [o] To clear the negation flag at clause boundaries so a negation does not incorrectly carry over and flip a word in a later clause
-  > Negation should affect only the nearby word, not everything after it. Resetting at punctuation and "but" stops "not great, but terrible" from having the "not" wrongly flip "terrible". It scopes the negation to its clause.
+  > Negation should affect only the nearby word, not everything after it. Resetting at punctuation and "but" stops the "not" in "Not really, it was good" from carrying past the comma and wrongly flipping "good". It scopes the negation to its clause.
 - To add extra weight to positive words
   > The \`RESET\` set has no role in weighting; all sentiment words contribute equally (±1) to the score.
 

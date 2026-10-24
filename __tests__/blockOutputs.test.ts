@@ -62,6 +62,15 @@ describe("toOutputCells", () => {
   it("drops whitespace-only text segments", () => {
     expect(toOutputCells([{ type: "stdout", text: "\n\n" }])).toEqual([]);
   });
+
+  it("keeps the first line's indentation while dropping blank lines around it", () => {
+    // A right-aligned table: the first row's leading spaces are part of the
+    // layout, and .trim() used to shift that row left of the others.
+    const text = "\n\n  fable: $2,700\n   opus: $1,080\n\n";
+    expect(toOutputCells([{ type: "stdout", text }])).toEqual([
+      { type: "stdout", content: "  fable: $2,700\n   opus: $1,080" },
+    ]);
+  });
 });
 
 /**

@@ -84,7 +84,7 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     and "put the important material at the beginning or the end"
  *     ("the three chapters that matter", "first or last"); 8,000 to 1,000,000 tokens is 125
  *     times the length and 15,625 times the naive attention work ("over
- *     fifteen thousand", where the lesson rounds to "roughly 15,000").
+ *     fifteen thousand", the lesson's "about 15,600-fold").
  *   - reasoning-models: the thinking transcript is its first block's, and its
  *     arithmetic is checked in measure.py (240 is simple interest; 1,259.71
  *     is compound). The page estimates its length as words times 1.3 (~72

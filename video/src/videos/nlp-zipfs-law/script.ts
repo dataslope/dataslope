@@ -53,9 +53,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     70 of them are on NLTK's English stopword list;
  *   - 2,739 words appear once, 38.69% of the different words ("thirty-nine").
  *
- * The lesson says the top word is "about twice as common as the second";
- * in Emma the two nearly tie (see the report's lesson discrepancies), which
- * part 3 shows rather than repeats.
+ * The lesson gives the law's ideal form (the second word half as common as
+ * the first) and says real text follows it least closely at the very top;
+ * in Emma the top two nearly tie, which part 3 shows.
  *
  * Written for the ear: short sentences, contractions, numbers as they are
  * said. Every animation is cued to a word below; a cue whose word disappears

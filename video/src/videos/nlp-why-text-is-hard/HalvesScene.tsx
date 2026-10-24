@@ -12,8 +12,8 @@ import { CurvedArrow, FIG_Y, Headline, Kicker, lerp, Spot, X0 } from "./parts";
 const LEFT_X = X0;
 const RIGHT_X = 1120;
 const TITLE_Y = 334;
-// Step 3 is named for what it does: "cleaning" names the whole half here,
-// as the lesson's "Preprocessing (cleaning)" does.
+// Step 3 is named for what it does; the half is "preprocessing", the
+// lesson's own name for it.
 const STEPS = ["tokenize", "lowercase", "drop punctuation", "stopwords", "lemmatize"];
 const STEP_GAP = 12;
 const STEP_SIZE = 22;
@@ -77,9 +77,9 @@ const Pill: React.FC<{ text: string; x: number; y: number; at: number; dashAt?: 
 };
 
 /**
- * Part 3, the two halves: the steps just shown are the cleaning half (the
+ * Part 3, the two halves: the steps just shown are the preprocessing half (the
  * conveyor), one toolbox every project picks from; analysis is what comes after
- * and depends on the goal, which should also choose the cleaning, most of
+ * and depends on the goal, which should also choose the preprocessing, most of
  * whose steps are optional. On "order", two steps trade places.
  */
 export const HalvesScene: React.FC = () => {
@@ -89,7 +89,7 @@ export const HalvesScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("cleaning").from;
-  const cleaningAt = n.word("cleaning", "cleaning");
+  const cleaningAt = n.word("cleaning", "preprocessing");
   const sameAt = n.word("cleaning", "same toolbox");
   const analysisAt = n.word("analysis", "Analysis");
   const uses = [n.word("analysis", "counting"), n.word("analysis", "tagging"), n.word("analysis", "building features")];
@@ -126,13 +126,13 @@ export const HalvesScene: React.FC = () => {
       <Sfx name="el-pencil" at={soAt - 4} level={-35} />
       <Sfx name="el-whoosh" at={orderAt - 2} level={-34} />
 
-      <Kicker at={from - 10}>Cleaning, then analysis</Kicker>
-      <Headline lead="Clean first," turn="then analyze." at={from - 6} turnAt={analysisAt - 6} />
-      <FigLabel n="10" title="The two halves of a pipeline" at={from + 2} x={X0} y={y(FIG_Y)} />
+      <Kicker at={from - 10}>Preprocessing, then analysis</Kicker>
+      <Headline lead="Preprocess first," turn="then analyze." at={from - 6} turnAt={analysisAt - 6} />
+      <FigLabel n="10" title="The two halves of a pipeline: preprocessing, then analysis" at={from + 2} x={X0} y={y(FIG_Y)} />
 
-      {/* ── Cleaning ── */}
+      {/* ── Preprocessing ── */}
       <Ink at={cleaningAt - 4} dur={14} style={{ left: LEFT_X, top: y(TITLE_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Cleaning</span>
+        <span style={{ ...body(44), color: INK, fontWeight: 600 }}>Preprocessing</span>
       </Ink>
       <Spot id={ART.conveyor} at={cleaningAt} left={LEFT_X + 20} top={y(TITLE_Y) + 66} width={700} height={300} />
       {STEPS.map((s, i) => (
@@ -169,7 +169,7 @@ export const HalvesScene: React.FC = () => {
       <Ink at={goalAt - 4} dur={16} style={{ left: RIGHT_X, top: y(TITLE_Y + 96 + 3 * 82) + 6, whiteSpace: "nowrap" }}>
         <span style={{ ...body(32, true), color: INK }}>depends on your goal</span>
       </Ink>
-      {/* The goal chooses the cleaning too. */}
+      {/* The goal chooses the preprocessing too. */}
       <CurvedArrow
         curve={[
           [RIGHT_X - 16, y(TITLE_Y + 96 + 3 * 82) + 26],

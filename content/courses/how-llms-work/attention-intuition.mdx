@@ -122,19 +122,20 @@ values = np.array([[10.0, 0.0], # trophy contributes this
 # The query from "it". Pointing toward 'trophy'-like keys.
 query = np.array([1.0, 0.1])
 
-scores = keys @ query               # relevance of each token to the query
-scores = scores / np.sqrt(keys.shape[1])   # scale, keeps softmax stable
+raw = keys @ query                  # relevance of each token to the query
+scores = raw / np.sqrt(keys.shape[1])      # scale, keeps softmax stable
 weights = softmax(scores)
 output = weights @ values           # weighted blend of the values
 
-print("raw scores:  ", scores.round(3))
-print("weights:     ", weights.round(3))
+print("raw scores:   ", raw.round(3))
+print("scaled scores:", scores.round(3))
+print("weights:      ", weights.round(3))
 print()
 for tok, w in zip(tokens, weights):
     print(f"  {tok:>9}: {w:.3f}")
 print()
 print("new representation for 'it':", output.round(3))
-print("(dominated by trophy's value vector)")
+print("(pulled toward trophy's value vector)")
 `,
     },
   ]}

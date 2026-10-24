@@ -85,9 +85,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     89 tokens as JSON, 33 as CSV (the page estimates 93 and 22), both drawn
  *     token by token with the 12 key-name tokens (customer, _id, region,
  *     amount on each of 3 records) lit against the CSV header's 4. The
- *     lesson's prose says JSON "roughly doubles" the cost; its own block and
- *     the measured counts disagree (4.3 and 2.7 times), so the video follows
- *     the numbers and states no ratio. The same
+ *     lesson's prose says JSON "costs several times" as much (it once said
+ *     "roughly doubles"), which its block's 4.3 and the measured 2.7 bear
+ *     out; the video states no ratio. The same
  *     JSON on cl100k_base (gpt-4), p50k_base (text-davinci-003) and r50k_base
  *     (davinci, "GPT-3's tokenizer"): 89, 102 and 120, from tiktoken's own
  *     model table. "About thirty percent more tokens" is Anthropic's, as the
@@ -95,10 +95,10 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     lesson's concept check: 1.3 times 0.8 is 1.04, "about four percent
  *     more". The conversation is the lesson's block (a 2,000-token system
  *     prompt, 100 a message, 400 a reply): ten turns leave it 7,000 tokens
- *     long and bill 43,500 input tokens, 6.2 times its length. The lesson's
- *     prose says "roughly five"; its own block prints 6.2, and the video
- *     follows the block ("over six times"). Each bar is drawn in its three
- *     parts: the system prompt, the earlier turns sent again, the new message.
+ *     long and bill 43,500 input tokens, 6.2 times its length ("over six
+ *     times"; the lesson's prose now says "more than six times"). Each bar
+ *     is drawn in its three parts: the system prompt, the earlier turns sent
+ *     again, the new message.
  *   - The bridge: berry's id is 19772; " cherry" is one id, 60225.
  *
  * Written for Drew's voice, casual and curious: short spoken sentences, no

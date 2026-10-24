@@ -297,7 +297,9 @@ export type TileMark = { at: number; out?: number; color?: string };
  * One token on a small card, set in mono. It arrives on `at` (a short rise),
  * can take highlighter marks, a tint and a border color, dims on `dim` and
  * leaves on `out`. With `to`, it glides from (x, y) to a new place between
- * `to.at` and `to.at + to.dur`.
+ * `to.at` and `to.at + to.dur`. With `to.via` as well, it travels in two
+ * straight legs instead, each eased on its own: to `via` over `via.dur`,
+ * then on to `to` over `to.dur`, with no arc.
  */
 export const Tile: React.FC<{
   text: string;
@@ -313,7 +315,7 @@ export const Tile: React.FC<{
   dim?: number;
   undim?: number;
   out?: number;
-  to?: { x: number; y: number; at: number; dur?: number };
+  to?: { x: number; y: number; at: number; dur?: number; via?: { x: number; y: number; dur: number } };
   lift?: number;
 }> = ({ text, x, y, at, size = 26, w, marks = [], tint, border, ink = INK, dim, undim, out, to, lift = 0 }) => {
   const frame = useCurrentFrame();
@@ -323,10 +325,12 @@ export const Tile: React.FC<{
   const d1 = undim === undefined ? 0 : ease(frame, undim, 12);
   const d = Math.max(0, d0 - d1) * 0.7;
   if (p <= 0 || o >= 1) return null;
-  const m = to ? ease(frame, to.at, to.dur ?? 18) : 0;
-  const left = to ? lerp(x, to.x, m) : x;
-  const top = to ? lerp(y, to.y, m) : y;
-  const arc = to ? -Math.sin(m * Math.PI) * 26 : 0;
+  const via = to?.via;
+  const m = !to ? 0 : via ? ease(frame, to.at, via.dur) : ease(frame, to.at, to.dur ?? 18);
+  const m2 = to && via ? ease(frame, to.at + via.dur, to.dur ?? 18) : 0;
+  const left = !to ? x : via ? lerp(lerp(x, via.x, m), to.x, m2) : lerp(x, to.x, m);
+  const top = !to ? y : via ? lerp(lerp(y, via.y, m), to.y, m2) : lerp(y, to.y, m);
+  const arc = to && !via ? -Math.sin(m * Math.PI) * 26 : 0;
   const width = w ?? tileW(text, size);
   return (
     <div

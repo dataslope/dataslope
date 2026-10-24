@@ -157,7 +157,7 @@ flowchart TB
     T["Text: Dr. Lee earned 2.5 million. He smiled."]
     T --> N["Naive: <code>text.split('.')</code>"]
     T --> P["<code>sent_tokenize()</code> (Punkt)"]
-    N --> N1["broken fragments:<br/>'Dr', ' Lee earned 2', '5 million', ' He smiled'<br/>split inside 'Dr.' and '2.5'"]
+    N --> N1["5 broken fragments:<br/>'Dr', ' Lee earned 2', '5 million', ' He smiled', ''<br/>split inside 'Dr.' and '2.5', with an empty piece at the end"]
     P --> P1["2 clean sentences:<br/>'Dr. Lee earned 2.5 million.'<br/>'He smiled.'"]
 ```
 

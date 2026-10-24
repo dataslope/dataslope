@@ -20,13 +20,12 @@ can be read against it.
   three-number vectors [animal, size, domestic] and np.linalg.norm from cat.
 - "order" is embeddings.mdx, "Position has to be added": the three 2-number
   vectors, the order-blind sum (the same for both sentences), and the
-  lesson's position signal [0, 0.1 * i] added to each token. The lesson then
-  sums those too, and the sum is still the same for both sentences (both
-  print [1.5 1.8]), because a sum of word-plus-slot vectors is the sum of the
-  words plus the sum of the slots, whatever the order. So the video shows the
-  positioned vectors themselves, token by token, where the two sentences do
-  differ: dog in the first slot is not dog in the last. Both sums are
-  exported, and asserted equal, so the claim is checked rather than typed.
+  lesson's position signal [0, 0.1 * i] added to each token. The lesson
+  prints the positioned vectors one per word, as the video shows them: dog
+  in the first slot is not dog in the last. Summing them would tie the two
+  sentences again (both [1.5 1.8]), because a sum of word-plus-slot vectors
+  is the sum of the words plus the sum of the slots, whatever the order; both
+  sums are exported, and asserted equal, so that claim is checked too.
 - "cosine" is similarity.mdx, "Why not straight-line distance": short [1, 1],
   long [5, 5], other [1, -1], with the lesson's cosine().
 - "search" is similarity.mdx, "A working semantic search": the five documents
@@ -137,7 +136,7 @@ def positioned(words):
 
 p1, p2 = positioned(s1), positioned(s2)
 psum1, psum2 = sum(p1), sum(p2)
-# The lesson's own positioned sums are equal as well: the sum hides the order again.
+# Summed, the positioned vectors are equal as well: the sum hides the order again.
 assert np.allclose(psum1, psum2)
 assert not np.allclose(p1[0], p2[2])  # dog first is not dog last
 echo("", "order-blind sums:", sum1, sum2, "positioned sums (lesson):", psum1.round(3), psum2.round(3))

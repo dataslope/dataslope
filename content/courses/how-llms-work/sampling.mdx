@@ -141,8 +141,8 @@ Sort tokens by probability, accumulate until the total reaches *p*
 (commonly 0.9), discard everything else, renormalize, then sample.
 
 The nucleus is **adaptive**: where the model is confident it might
-contain two tokens, and where the model is genuinely uncertain it might
-contain fifty. That is why it works better than a fixed top-k.
+hold a single token, and where the model is genuinely uncertain it might
+hold fifty. That is why it works better than a fixed top-k.
 
 <CodeBlock
   adapter="python"
@@ -308,7 +308,7 @@ varied.`}
 - It samples more tokens when the output is longer.
   > Output length does not affect the nucleus.
 - [o] The number of tokens kept varies with the model's confidence.
-  > A confident distribution reaches the threshold in two tokens while an uncertain one may need fifty.
+  > A confident distribution can reach the threshold with a single token, while an uncertain one may need fifty.
 - It adjusts the temperature based on the context.
   > Temperature is a separate, independent setting.
 

@@ -6,9 +6,11 @@ import { body, HAIRLINE, INK, INK_SOFT, label, note, TABULAR } from "../../edito
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { arrowHead } from "../../components/arrow";
+import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { HARNESS, MISS_QUEUE, TICKETS } from "./data";
-import { Check, Cross, Drift, Headline, lerp, Marked, OK_INK, pulse, Svg, TRAP, TRAP_INK, X0 } from "./parts";
+import { A, Check, Cross, Drift, Headline, lerp, MARK, Marked, OK_INK, PANEL, pulse, Svg, TRAP, TRAP_INK, X0 } from "./parts";
 
 const COL = { ticket: X0, expected: 720, cheap: 950, good: 1170 };
 const HEAD_Y = 346;
@@ -16,12 +18,21 @@ const ROW0 = 394;
 const STEP = 47;
 const TABLE_X1 = 1360;
 const TOTAL_X = 1470;
+/** The loop, in the room beside the headline: the lesson's evaluate(), cut
+ *  to its four working lines. */
+const LOOP_X = 1280;
+const LOOP_TOP = 110;
+const LOOP_W = 520;
+const LOOP_LINE = 34;
+const LOOP_SIZE = 22;
 
 /**
  * The harness (Fig. 13): the lesson's ten tickets with the queue each belongs
  * in, and its two stand-in models. The cheap one gets three right, 30%, and
  * the good one all ten; then the failure list: every miss of the cheap one
- * went to "other".
+ * went to "other". Beside the headline is the loop that produced it, the
+ * lesson's evaluate() in four lines: a pointer steps down the table as each
+ * mark lands, once per model, and the hit count in the loop counts with it.
  */
 export const HarnessScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -51,6 +62,28 @@ export const HarnessScene: React.FC = () => {
   const goodMark = (i: number) => Math.round(lerp(otherAt, allTenAt + 4, i / 9));
   const missTint = ease(frame, missesAt - 2, 14);
 
+  // The loop runs twice, once per stand-in, a row per mark as it lands.
+  const passes = [
+    { mark: cheapMark, ok: (t: (typeof TICKETS)[number]) => t.cheap === t.expected, name: "cheap" },
+    { mark: goodMark, ok: (t: (typeof TICKETS)[number]) => t.good === t.expected, name: "good" },
+  ];
+  const passOf = frame >= goodMark(0) - 8 ? 1 : 0;
+  const pass = passes[passOf];
+  const landed = TICKETS.filter((_, i) => frame >= pass.mark(i) - 4).length;
+  const row = Math.max(0, landed - 1);
+  const stepT = ease(frame, pass.mark(row) - 4, 5);
+  const pointerY = lerp(ry(Math.max(0, row - 1)), ry(row), row === 0 ? 1 : stepT);
+  const running = (k: number) =>
+    ease(frame, passes[k].mark(0) - 8, 8) * (1 - ease(frame, passes[k].mark(TICKETS.length - 1) + 10, 10));
+  const pointerOn = Math.max(running(0), running(1));
+  const hits = TICKETS.filter((t, i) => frame >= pass.mark(i) && pass.ok(t)).length;
+  const counting = frame >= passes[0].mark(0) - 8;
+  // Which line of the loop is working: the body while rows are scored, the
+  // last line as each score is read out.
+  const bodyLit = pointerOn * (0.55 + 0.45 * pulse(frame, pass.mark(row), 8));
+  const lastLit = Math.max(pulse(frame, thirtyAt - 4, 30), pulse(frame, allTenAt - 4, 30));
+  const KW = inkOf.purple;
+
   return (
     <AbsoluteFill>
       {/* ── Sound: the rows, the scores, the misses ── */}
@@ -64,7 +97,50 @@ export const HarnessScene: React.FC = () => {
       </Headline>
       <FigLabel n="13" title="Ten tickets, two stand-in models (keyword rules, not real LLMs)" at={from} x={X0} y={y(282)} />
 
+      {/* ── The loop, from "a loop" ── */}
+      <Ink at={loopAt - 4} dur={18} style={{ left: LOOP_X, top: y(LOOP_TOP), width: LOOP_W }}>
+        <div
+          style={{
+            position: "relative",
+            background: PANEL,
+            borderTop: `2px solid ${INK}`,
+            padding: "12px 20px",
+            fontFamily: MONO,
+            fontSize: LOOP_SIZE,
+            lineHeight: `${LOOP_LINE}px`,
+            color: INK,
+            whiteSpace: "pre",
+            fontVariantLigatures: "none",
+          }}
+        >
+          {/* The working line's highlight, under the text. */}
+          <div style={{ position: "absolute", left: 8, right: 8, top: 12 + LOOP_LINE, height: LOOP_LINE * 2, background: MARK, opacity: bodyLit * 0.8, borderRadius: 4 }} />
+          <div style={{ position: "absolute", left: 8, right: 8, top: 12 + LOOP_LINE * 3, height: LOOP_LINE, background: MARK, opacity: lastLit * 0.8, borderRadius: 4 }} />
+          <div style={{ position: "relative" }}>
+            <span style={{ color: KW, fontWeight: 600 }}>for</span> text, expected <span style={{ color: KW, fontWeight: 600 }}>in</span> tickets:
+          </div>
+          <div style={{ position: "relative" }}>
+            {"    got = "}
+            <span style={{ color: A, fontWeight: 600 }}>{counting ? pass.name : "model"}</span>
+            (text)
+          </div>
+          <div style={{ position: "relative" }}>
+            {"    hits += got == expected"}
+            <span style={{ color: INK_SOFT, opacity: counting ? 1 : 0 }}>
+              {"   # "}
+              <span style={TABULAR}>{hits}</span>
+            </span>
+          </div>
+          <div style={{ position: "relative" }}>accuracy = hits / len(tickets)</div>
+        </div>
+      </Ink>
+
       <Drift from={from} to={end} amount={0.01} origin="40% 60%">
+        {/* The loop's pointer, on the row it is scoring. */}
+        <Svg opacity={pointerOn}>
+          <path d={arrowHead([[X0 - 30, pointerY], [X0 - 12, pointerY]], 14, 9, { filled: true })} fill={A} />
+        </Svg>
+
         {/* Header. */}
         <Ink at={from + 4} dur={12} style={{ left: COL.ticket, top: y(HEAD_Y) - 16, whiteSpace: "nowrap" }}>
           <span style={label(21, INK_SOFT)}>ticket</span>

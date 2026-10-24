@@ -192,10 +192,12 @@ out["suitcase"] = suitcase
 # ── Against the page's own output ─────────────────────────────────────────────
 blocks = json.loads((ROOT / "lib/generated/block-outputs.json").read_text())
 page = blocks["content/courses/how-llms-work/attention-intuition.mdx"]
-printed = [c["content"] for b in page.values() for c in b["cells"] if "raw scores" in c.get("content", "")]
+# The block prints the dot products as "raw scores", then "scaled scores".
+printed = [c["content"] for b in page.values() for c in b["cells"] if "scaled scores" in c.get("content", "")]
 assert len(printed) == 1, printed
 text = printed[0]
 fmt = lambda xs: "[" + " ".join(f"{x:.3f}" for x in xs) + "]"
+assert "raw scores:    " + str(np.array([row["dot"] for row in trophy["rows"]])) in text, text
 assert fmt([row["score"] for row in trophy["rows"]]) in text, text
 assert fmt([row["weight"] for row in trophy["rows"]]) in text, text
 assert fmt(trophy["output"]) in text, text

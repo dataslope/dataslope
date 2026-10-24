@@ -95,9 +95,13 @@ patterns rather than performed.
 
 Tokenizers are trained on corpora that are mostly English, so English
 compresses well. Other languages, particularly those not using Latin
-script, fragment into many more tokens for the same meaning. The same
-sentence in Japanese or Thai can take two to three times as many
-tokens as in English, and you pay per token.
+script, can fragment into many more tokens for the same meaning, and
+you pay per token. How much depends heavily on the tokenizer: GPT-4's
+spends more than twice as many tokens on a short sentence in Thai, and
+three times as many in Hindi, as on the same sentence in English, while
+GPT-4o's newer, larger vocabulary spends about the same on all three.
+Scripts a tokenizer saw little of still break into many pieces, so
+measure your own languages on the model you will pay for.
 
 <Figure
   slug="llm-tokens-explains-inline-cutout"
@@ -128,7 +132,7 @@ words. So:
 
 Code is denser in tokens than prose, because whitespace, punctuation,
 and identifiers fragment. Estimate code at about three characters per
-token.
+token, and fewer for code dense with symbols.
 
 <Figure
   slug="llm-tokens-inline-cutout"

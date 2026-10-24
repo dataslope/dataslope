@@ -52,12 +52,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     them as a bag of vectors"). Its position signal adds 0, 0.1 and 0.2 to
  *     the second number by slot, so dog first is 0.9, 0.2 and dog last is
  *     0.9, 0.4 ("dog in the first slot gets a different vector from dog in
- *     the last"), and the two bags now differ. The lesson's prose and its
- *     numbers disagree here, and the video follows the numbers: the lesson
- *     demonstrates order-blindness with a sum and then sums the positioned
- *     vectors too, which is again the same for both sentences (1.5, 1.8
- *     twice, as its page prints). The video makes its case with the bag,
- *     which position does change, and shows no sum.
+ *     the last"), and the two bags now differ. The lesson prints the same
+ *     two positioned vectors, one per word (it once summed them, which
+ *     ties the two sentences again, and was corrected to match). The video
+ *     makes its case with the bag, which position does change, and shows
+ *     no sum.
  *   - similarity.mdx: short 1, 1 and long 5, 5 are 5.657 apart ("five point
  *     seven") with cosine 1.0; short against 1, -1 is cosine 0.0, at 90
  *     degrees; "length tracks token frequency" is the lesson's.
@@ -136,8 +135,9 @@ export const script: NarrationScript = {
     },
     {
       id: "embedding",
-      text: "That list is the token's embedding, looked up in a table the model learned in training.",
-      pauseAfter: 0.9,
+      // Re-voiced slowly in the follow-up pass, like "vector": the unit's second core term.
+      text: "[slowly] That list is the token's embedding: its row in a table learned in training.",
+      pauseAfter: 1.0,
     },
     {
       id: "geometry",

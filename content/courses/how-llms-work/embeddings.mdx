@@ -4,7 +4,8 @@ description: Every token becomes a vector, and meaning becomes geometry. This is
 ---
 
 A token id is a number, but it is a meaningless one. Token 11241
-(`" token"`) is not 11 times more of anything than token 1001. Ids are
+(`" token"` in GPT-2's vocabulary, which the Tokens chapter's example
+borrows) is not 11 times more of anything than token 1001. Ids are
 labels, and labels support no arithmetic.
 
 <Figure
@@ -119,24 +120,33 @@ emb = {"dog": np.array([0.9, 0.2]), "bites": np.array([0.1, 0.8]),
 s1 = ["dog", "bites", "man"]
 s2 = ["man", "bites", "dog"]
 
-# Without position: sum the vectors (order-blind).
+# Without position: treat the sentence as a bag of vectors, here summed.
 print("Order-blind representation:")
 print("  'dog bites man':", sum(emb[w] for w in s1))
 print("  'man bites dog':", sum(emb[w] for w in s2))
 print("  Identical, so the model could not tell them apart.")
 
-# With a simple position signal added:
+# With a position signal added to each slot, a word's vector depends on
+# where it sits. The model keeps one vector per position (it never sums
+# them), so the two sentences are now different sequences.
 def positioned(words):
-    return sum(emb[w] + np.array([0.0, 0.1 * i]) for i, w in enumerate(words))
+    return [emb[w] + np.array([0.0, 0.1 * i]) for i, w in enumerate(words)]
 
 print()
-print("With position added:")
-print("  'dog bites man':", positioned(s1).round(3))
-print("  'man bites dog':", positioned(s2).round(3))
+print("With position added, one vector per word:")
+for s in (s1, s2):
+    print(f"  {' '.join(s)!r}:", "  ".join(str(v.round(2)) for v in positioned(s)))
+print("  'dog' first:", positioned(s1)[0].round(2), "  'dog' last:", positioned(s2)[2].round(2))
 `,
     },
   ]}
 />
+
+Notice what would happen if you added the position signal and then
+summed: both sentences use the same three slots, so their position parts
+add up to the same total and the sums tie again. Position only helps
+because the model keeps one vector per token and compares them with each
+other, which is the job of attention, two chapters on.
 
 <Callout type="info" title="Embeddings you can use directly">
 Embedding models are also sold as a product in their own right, for
