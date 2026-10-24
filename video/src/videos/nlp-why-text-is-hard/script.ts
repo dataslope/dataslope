@@ -73,10 +73,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     is the lesson's own case-folding line.
  *   - Order: "The The THE end is near". Lowercase then filter gives end,
  *     near; filter then lowercase gives the, the, the, end, near (all three
- *     survive, which is what the page prints; the lesson's figure caption
- *     says "one survives" and its prose "leaves The and THE behind": the
- *     video follows the numbers, and the discrepancy is reported). NLTK's English list has
- *     198 words, all lowercase.
+ *     survive, which is what the page prints, and what the lesson's caption
+ *     and prose now say; they once said one survived). NLTK's English list
+ *     has 198 words, all lowercase.
  *
  * Written for Hope's voice, upbeat and clear: short spoken sentences, no
  * symbols or parentheses, numbers as words, contractions, questions the next
