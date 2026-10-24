@@ -348,7 +348,10 @@ print("'the' still a stopword?  ", "the" in custom)
 
 This three-line recipe, start from the base list, *subtract* the words you
 must protect, *add* the words specific to your domain, is how stopword
-removal is done responsibly in practice.
+removal is done responsibly in practice. (One of the five, "never", is not on
+NLTK's list in the first place, as the check above showed, so subtracting it
+changes nothing here; keeping it in `keep` protects it against stoplists
+that do include it.)
 
 <MultipleChoice
   markdown={`A sentiment analysis pipeline removes NLTK's default English stopwords before

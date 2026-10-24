@@ -35,8 +35,8 @@ decades.
 ## 1954, the Georgetown–IBM demo and the hype cycle
 
 In 1954 a collaboration between **Georgetown University and IBM** publicly
-demonstrated machine translation, converting a few dozen Russian sentences into
-English. The demo was small and carefully chosen, but it ignited enormous
+demonstrated machine translation, converting just over sixty Russian sentences
+into English. The demo was small and carefully chosen, but it ignited enormous
 optimism, some believed general-purpose translation was just a few years away.
 It was not. Useful translation proved far harder than the demo suggested, and
 after the sobering **ALPAC report in 1966**,[^alpac] much U.S. funding
@@ -45,7 +45,7 @@ for machine translation dried up.
 <Figure
   slug="nlp-discussions-georgetown-ibm-cutout"
   alt="A cabinet computer with tape reels facing a press camera on a tripod, a printed ribbon of blank cards running out of it"
-  caption="Georgetown and IBM, 1954: a few dozen Russian sentences, and a decade of expectations they could not carry."
+  caption="Georgetown and IBM, 1954: about sixty Russian sentences, and a decade of expectations they could not carry."
 />
 
 <Callout type="info" title="The lesson under the story">
@@ -165,7 +165,10 @@ When you ran the TF-IDF page, you used a weighting introduced by **Karen Spärck
 Jones** in 1972.[^sparck-jones] Her paper argued that a term's value
 for retrieval should grow as the term becomes *rarer* across a
 collection, the **inverse document
-frequency** idea. It is hard to overstate how durable this turned out to be: IDF
+frequency** idea. Her own weight counted doublings rather than taking a smooth
+logarithm (in her example collection of 200 documents, a term found in 90 of
+them weighs 2 and a term found in 3 weighs 7), but the idea is the one in your
+TF-IDF code. It is hard to overstate how durable this turned out to be: IDF
 sits at the heart of classic information retrieval and still shapes how search
 engines weigh your query words half a century later. A simple, well-chosen idea
 can outlast every machine it was first written for.
@@ -175,8 +178,9 @@ can outlast every machine it was first written for.
 One pattern haunted nearly every counting exercise in this course: a handful of
 words dominate, and a long tail appears just once. This is **Zipf's law**, in
 natural language, a word's frequency is roughly inversely proportional to its
-rank. The most frequent word tends to be about twice as common as the second,
-three times as common as the third, and so on. It is why stopwords swamp raw
+rank. In its ideal form, the second most frequent word turns up about half as
+often as the first, the third about a third as often, and so on; real text
+follows it roughly, and least closely at the very top. It is why stopwords swamp raw
 frequency, why we weight with IDF, and why the long tail is full of hapaxes.
 
 Let us see the law appear on real text. The block below pulls a public-domain
@@ -229,9 +233,12 @@ for rank, (word, freq) in enumerate(ranked[:8], start=1):
   ]}
 />
 
-Read the rightmost column: $\text{rank} \times \text{freq}$ stays in the same ballpark down the
-list, which is exactly what Zipf's law predicts. The most common word is roughly
-twice the second, and so on. You are watching a statistical regularity of human
+Read the rightmost column. If the law held exactly, $\text{rank} \times \text{freq}$
+would be the same number on every row. It is not: it climbs from 5,239 to
+nearly 20,000 over these eight rows, and the top two words almost tie, so at
+the very top the law is only a rough guide. Its pull shows across the whole
+vocabulary instead, where across thousands of words frequency falls off close
+to one over the rank, a near-straight line on a log-log plot. You are watching a statistical regularity of human
 language, one nobody designed, fall out of a word count.
 
 ## 2013, word2vec and meaning as geometry
@@ -324,5 +331,6 @@ take them next.
 [^sparck-jones]:
     Karen Sparck Jones, "A Statistical Interpretation of Term Specificity
     and Its Application in Retrieval", *Journal of Documentation* 28(1),
-    1972. Eleven pages, and the weighting is still in the default
-    configuration of every search engine you use.
+    1972. Eleven pages, and an IDF term still sits inside BM25, the
+    default ranking function of search libraries such as Lucene,
+    Elasticsearch and Solr.

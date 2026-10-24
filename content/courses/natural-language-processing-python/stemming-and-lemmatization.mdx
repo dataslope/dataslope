@@ -35,7 +35,7 @@ flowchart TB
     W["Word: 'studies'"] --> S["STEMMING (Porter)<br/>apply suffix-chopping rules"]
     W --> L["LEMMATIZATION (WordNet)<br/>look up the dictionary form"]
     S --> S1["chop the ending → 'studi'<br/>fast, no dictionary,<br/>result may not be a real word"]
-    L --> L1["map to lemma → 'study'<br/>needs a dictionary and POS,<br/>result is always a real word"]
+    L --> L1["map to lemma → 'study'<br/>needs a dictionary and POS,<br/>result is a real word when WordNet knows it"]
 ```
 
 **Stemming** is crude and mechanical: it strips suffixes according to fixed
@@ -113,8 +113,9 @@ the document stem?), the fact that they are not real words does not matter.
 ## Lemmatization: looking up the dictionary form
 
 Lemmatization returns the **lemma**, the canonical dictionary form. NLTK's
-`WordNetLemmatizer` uses the WordNet lexical database to do it. The result is
-always a real word, but there is a catch you must understand.
+`WordNetLemmatizer` uses the WordNet lexical database to do it. When WordNet
+knows the word, the result is a real dictionary form (a word it does not know
+comes back unchanged), but there is a catch you must understand.
 
 <CodeBlock
   adapter="python"
@@ -244,8 +245,11 @@ for w in words:
 Notice "happily" stems to the non-word "happili" but you would need an
 adjective/adverb lemma to handle it well; "was" stems to "wa" (nonsense) but
 lemmatizes to "be"; "mice" and "feet" defeat the stemmer entirely (suffix
-rules cannot turn "mice" into "mouse") while a lemmatizer with a dictionary
-can. Stemming is fast and approximate; lemmatization is slower and correct.
+rules cannot turn "mice" into "mouse"). A lemmatizer with a dictionary can
+handle them, but only as the nouns they are: told they are verbs, as this
+table does, it leaves them alone, while the default noun reading gives
+"mouse" and "foot". Stemming is fast and approximate; lemmatization is slower,
+and correct when it is given the right part of speech.
 
 <MultipleChoice
   markdown={`Why does \`WordNetLemmatizer().lemmatize("running")\` return "running"
