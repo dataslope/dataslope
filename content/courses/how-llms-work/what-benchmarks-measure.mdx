@@ -107,31 +107,40 @@ under 10%; by September 2026 the best published scores were around
   files={[
     {
       filename: "main.py",
-      starterCode: `# Whether a gap is meaningful depends on the ceiling and the spread.
-benchmarks = {
-    "MMLU":         {"model_a": 0.923, "model_b": 0.917, "ceiling": 0.95},
-    "GPQA Diamond": {"model_a": 0.960, "model_b": 0.954, "ceiling": 1.00},
-    "ARC-AGI-3":    {"model_a": 0.627, "model_b": 0.302, "ceiling": 1.00},
+      starterCode: `# Is a gap bigger than luck? Two equally good models, scored on the same
+# questions, still differ by chance, and fewer questions means more chance.
+import numpy as np
+
+rng = np.random.default_rng(0)
+results = {
+    # name: (model A, model B, questions in the test)
+    "MMLU":         (0.923, 0.917, 14_042),
+    "GPQA Diamond": (0.960, 0.954, 198),
+    "ARC-AGI-3":    (0.627, 0.302, 100),  # suppose as few as 100 tasks
 }
 
-for name, r in benchmarks.items():
-    gap = r["model_a"] - r["model_b"]
-    headroom = r["ceiling"] - r["model_a"]
-    share = gap / headroom if headroom > 0.001 else float("inf")
-    print(f"{name:<14} gap {gap:+.3f}  headroom {headroom:.3f}  "
-          f"gap is {share:.0%} of remaining headroom")
-
-print()
-print("The same 0.6 point gap means very different things depending")
-print("on how much room is left above it.")
+for name, (a, b, n) in results.items():
+    p = (a + b) / 2
+    # Replay two truly identical models 10,000 times on n questions:
+    # how far apart does luck alone put them, 95% of the time?
+    luck = np.abs(rng.binomial(n, p, 10_000) - rng.binomial(n, p, 10_000)) / n
+    limit = np.quantile(luck, 0.95)
+    verdict = "bigger than luck" if a - b > limit else "within luck"
+    print(f"{name:<13} gap {100 * (a - b):5.2f} points   "
+          f"luck alone reaches {100 * limit:5.2f}   {verdict}")
 `,
     },
   ]}
 />
 
-A one-point gap near a ceiling is noise. The same gap in the middle of
-a wide range is a real difference. Always look at where on the scale
-the comparison sits.
+Two equally good models still differ by luck, and the fewer the
+questions, the bigger the luck. On GPQA Diamond's 198 questions, a
+0.6-point gap is a small fraction of what chance alone produces. Even
+on MMLU's 14,042 it only matches chance, and near MMLU's ceiling the
+label errors add noise of their own. A 32-point gap on ARC-AGI-3 is far
+beyond anything luck could produce. So before reading a gap, ask how
+many questions stand behind it and how close the scores sit to the
+ceiling.
 
 <Callout type="info" title="What the numbers do not include">
 Benchmarks measure capability under ideal conditions: a clean prompt, a
@@ -199,10 +208,10 @@ Keeping answers out of training data is the one thing they all do.`}
 - The first model is meaningfully better at general knowledge.
   > Near a ceiling, a gap this size is within noise.
 - [o] Very little, since both are near the benchmark's effective ceiling.
-  > With documented label errors capping the achievable score near 95%, the remaining headroom is smaller than the measurement error.
+  > Label errors cap the achievable score near 95%, and on a test of MMLU's size luck alone can open a 0.6-point gap between two equally good models.
 
-Read the gap relative to the remaining headroom, not in absolute
-points.`}
+Read a gap against the luck its test allows and the room left below
+the ceiling, not in absolute points.`}
 />
 
 <MultipleChoice

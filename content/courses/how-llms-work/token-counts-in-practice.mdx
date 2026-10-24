@@ -65,10 +65,11 @@ print("Same information, up to 2.7x the cost, depending on encoding.")
   ]}
 />
 
-The JSON row is worth dwelling on. Wrapping data in JSON roughly
-doubles its token cost compared with a compact tabular format, because
-every key is repeated on every record and every brace and quote is a
-token. If you are sending many records to a model, CSV is markedly
+The JSON row is worth dwelling on. Wrapping data in JSON costs several
+times the tokens of a compact tabular format, because every key is
+repeated on every record and every brace and quote is a token. The
+block below estimates about four times; GPT-4o's tokenizer, run on the
+same three records, counts 89 tokens against 33, about 2.7 times. If you are sending many records to a model, CSV is markedly
 cheaper than JSON for identical content.
 
 <Figure
@@ -187,7 +188,7 @@ print(f"You were billed for {total_input} input tokens, "
   ]}
 />
 
-Ten turns, and you paid for roughly five times the conversation's
+Ten turns, and you paid for more than six times the conversation's
 length. Twenty turns and the multiplier keeps climbing. This quadratic
 growth is why prompt caching exists, and why starting a fresh
 conversation is a cost decision as well as an accuracy one.
