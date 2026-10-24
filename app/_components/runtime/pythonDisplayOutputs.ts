@@ -29,6 +29,18 @@ export function isPyDisplayOutputs(v: unknown): v is PyDisplayOutput[] {
 export type BareOutputCell = Omit<OutputCell, "id" | "elapsed">;
 
 /**
+ * A text segment as a cell shows it: blank lines before the first line of
+ * output and whitespace after the last are dropped, but the first line keeps
+ * its own indentation. A plain `.trim()` took that too, so a right-aligned
+ * table printed its first row two spaces left of the rest (`  fable:` over
+ * `   opus:`). The worker's streaming path (`_pg_stream_flush`) applies the
+ * same rule as text arrives, so a streamed cell and this one agree.
+ */
+export function trimOutputText(text: string): string {
+  return text.replace(/^\s*\n/, "").replace(/\s+$/, "");
+}
+
+/**
  * Convert one Python-side output list into cells. Empty text segments are
  * dropped; a figure whose JSON doesn't parse is skipped.
  */
@@ -41,7 +53,7 @@ export function toOutputCells(raw: unknown): BareOutputCell[] {
     } else if (out.type === "image") {
       cells.push({ type: "image", content: out.data });
     } else if (out.type === "stdout" || out.type === "stderr") {
-      const text = out.text.trim();
+      const text = trimOutputText(out.text);
       if (text) cells.push({ type: out.type, content: text });
     } else if (out.type === "plot") {
       try {

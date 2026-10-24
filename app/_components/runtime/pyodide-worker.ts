@@ -296,10 +296,11 @@ _display_outputs = []
 # a postMessage storm.
 #
 # _pg_stream_sink(seq, kind, content, append) is a JS callback installed
-# per run by runCode(). Text segments are streamed *stripped*: leading
-# whitespace is skipped and trailing whitespace is held back until more
-# text arrives, so the streamed concatenation equals the .trim() the
-# non-streaming path applies in toOutputCells().
+# per run by runCode(). Text segments are streamed *stripped*: blank lines
+# before the first line of output are skipped (that line keeps its own
+# indentation) and trailing whitespace is held back until more text
+# arrives, so the streamed concatenation equals what trimOutputText()
+# gives the non-streaming path in toOutputCells().
 _pg_stream_sink = None
 # Per-entry progress: for a text entry, the index in its text up to which
 # content has been sent; for a rich entry, True once posted.
@@ -350,6 +351,8 @@ def _pg_stream_flush(force=False):
                 start = 0
                 while start < end and text[start].isspace():
                     start += 1
+                # Back up to the start of that line, so it keeps its indent.
+                start = text.rfind("\\n", 0, start) + 1
                 if start < end:
                     sink(i, kind, text[start:end], False)
                     _pg_sent[i] = end
