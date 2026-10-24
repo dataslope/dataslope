@@ -25,3 +25,20 @@ The **web-facing** logo assets the app actually uses stay in `public/`:
 
 If you need a logo in a new format on the site, export it into `public/`
 rather than moving these source files back.
+
+## YouTube channel art
+
+`youtube/` holds the channel's banner and profile picture, the blue mark on
+white, generated from `public/dataslope-logo-blue.svg` by
+`npm run build:youtube-art` (`scripts/build-youtube-art.mjs`, which documents
+the sizing).
+
+| File | Size | Upload as |
+| --- | --- | --- |
+| `dataslope-youtube-banner.png` | 2560 × 1440 | Banner image: mark and wordmark |
+| `dataslope-youtube-banner-mark-only.png` | 2560 × 1440 | Banner image: mark alone |
+| `dataslope-youtube-profile.png` | 800 × 800 | Profile picture |
+
+The banner's artwork sits inside YouTube's 1546 × 423 centre safe area, the
+part every device shows. The wordmark is set in Inter SemiBold, which the
+script reads from an installed copy (`INTER_FONT=<path>` to point at one).
