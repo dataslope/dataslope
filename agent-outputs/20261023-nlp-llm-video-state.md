@@ -4,31 +4,33 @@ Saved 2026-10-23 at the user's request, so the work survives if the session
 that started it is lost. The plan is
 [`20261023-0700-nlp-and-llm-course-video-plan.md`](20261023-0700-nlp-and-llm-course-video-plan.md);
 everything below is about where the work stands. Branch
-`claude/blissful-goldberg-149yc1`, pull request dataslope/dataslope#716.
+`claude/blissful-goldberg-149yc1`: pull request dataslope/dataslope#716
+(merged), then dataslope/dataslope#717 for the lesson fixes and follow-ups.
 
 ## Where it stands
 
 **Done.** Fourteen videos, every one voiced and passing `check:frames`,
 `check:motion`, `check:sync` and `check:mix`; the package passes `typecheck`,
-`lint`, `npm test` (59/59) and `check:cues`.
+`lint`, `npm test` (59/59) and `check:cues`. Every lesson error the work
+found is corrected.
 
 | Video | Folder | Narrator | Length |
 | --- | --- | --- | --- |
 | Llm-1-Tokens | llm-tokens | Drew | 5:38 |
-| Llm-2-Meaning | llm-meaning | Drew | 6:47 |
+| Llm-2-Meaning | llm-meaning | Drew | 6:48 |
 | Llm-2-1-AttentionScore (deep dive) | llm-attention-score | Drew | 2:27 |
 | Llm-3-Generation | llm-generation | Drew | 6:32 |
-| Llm-4-Cost | llm-cost | Drew | 5:29 |
+| Llm-4-Cost | llm-cost | Drew | 5:39 |
 | Llm-4-1-ConversationCost (deep dive) | llm-conversation-cost | Drew | 2:20 |
 | Llm-5-Benchmarks | llm-benchmarks | Drew | 5:58 |
-| Nlp-1-WhyTextIsHard | nlp-why-text-is-hard | Hope | 5:52 |
+| Nlp-1-WhyTextIsHard | nlp-why-text-is-hard | Hope | 5:53 |
 | Nlp-2-CleaningText | nlp-cleaning-text | Hope | 7:41 |
 | Nlp-2-1-LemmasAndTags (deep dive) | nlp-lemmas-and-tags | Hope | 2:27 |
-| Nlp-3-CountingWords | nlp-counting-words | Hope | 6:56 |
+| Nlp-3-CountingWords | nlp-counting-words | Hope | 6:57 |
 | Nlp-3-1-ZipfsLaw (deep dive) | nlp-zipfs-law | Hope | 2:07 |
 | Nlp-4-TextToFeatures | nlp-text-to-features | Hope | 7:27 |
 | Nlp-5-History | nlp-history | Hope | 5:20 |
-| **Total** | | | **73:00** |
+| **Total** | | | **73:11** |
 
 How it got here, in order:
 
@@ -42,17 +44,23 @@ How it got here, in order:
    findings fixed and 11 partly; four deep dives built from
    [`DEEPDIVE-BRIEF.md`](20261023-nlp-llm-video-scratch/DEEPDIVE-BRIEF.md);
    one fix report per video in `20261023-nlp-llm-video-scratch/fixes/`. It
-   also lists the lesson errors the work found, which the lessons still
-   carry.
+   also lists the lesson errors the work found.
+4. [The lesson fixes and follow-ups](20261024-1400-nlp-llm-lesson-fixes-and-followups.md):
+   all 31 lesson errors corrected, Python output's first-line indentation
+   restored (35 recorded panels repaired), and the 11 "partly" findings
+   finished from [`FOLLOWUP-BRIEF.md`](20261023-nlp-llm-video-scratch/FOLLOWUP-BRIEF.md),
+   one report per video in `20261023-nlp-llm-video-scratch/followup/`.
 
 **Decided by the user:** Drew for the LLM course, Hope for the NLP course;
 `gpt-image-2.5-flare` at quality low, transparent, Batch API (direct `sync`
 after an hour's stall); five videos per course; then a full review, its
 fixes, and 3 to 5 short deep dives chosen from the review.
 
-**Open:** whether to correct the lessons where their prose contradicts their
-own code (the fixes document's table), and how the videos are embedded on
-the site (undecided for every course).
+**Also decided:** correct the lessons where their prose contradicts their own
+code, after #716 merged.
+
+**Open:** how the videos are embedded on the site (undecided for every
+course).
 
 ## Restoring the scratch setup in a fresh container
 
@@ -83,7 +91,8 @@ suffix so the site's TypeScript and ESLint skip them; drop it when restoring.
 ## Budget
 
 ElevenLabs had 80,140 characters left at the start (resets 2026-11-16). By
-the scripts' own count the work used 58,952: 45,814 for the ten first
-recordings, 6,063 re-voiced in the fix pass and 7,075 for the deep dives.
-The account's own counter fell by less (it reported 67,170 left at the
-end), so whichever is right there is room for later re-voicing.
+the scripts' own count the work used 59,486: 45,814 for the ten first
+recordings, 6,063 re-voiced in the fix pass, 7,075 for the deep dives and
+534 in the follow-ups. The account's own counter fell by less (it reported
+67,170 left after the deep dives), so whichever is right there is room for
+later re-voicing.
