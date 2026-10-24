@@ -185,7 +185,19 @@ export const MarketScene: React.FC = () => {
                   {isFive >= 0 ? (
                     <Marked at={Math.round(fiveAt + ((tenRowsAt - fiveAt) * isFive) / Math.max(1, fivesIdx.length - 1))}>{r.ratioPrinted}</Marked>
                   ) : (
-                    r.ratioPrinted
+                    // More than five: outlined on "never less", the pill sized to its text
+                    // ("8.3x" is wider than "6x"), the digits still on the column's right edge.
+                    <span
+                      style={{
+                        display: "inline-block",
+                        padding: "0 0.4em",
+                        marginRight: "-0.4em",
+                        borderRadius: 18,
+                        boxShadow: `inset 0 0 0 2px color-mix(in srgb, ${OUTPUT_INK} ${Math.round(ease(frame, neverAt, 10) * 100)}%, transparent)`,
+                      }}
+                    >
+                      {r.ratioPrinted}
+                    </span>
                   )}
                 </span>
               </Note>
@@ -202,22 +214,6 @@ export const MarketScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        {/* More than five: the two rows outlined on "never less". */}
-        {moreIdx.map((i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: RATIO_R - 50,
-              top: rowY(i) - 4,
-              width: 60,
-              height: 36,
-              borderRadius: 18,
-              border: `2px solid ${OUTPUT_INK}`,
-              opacity: ease(frame, neverAt, 10),
-            }}
-          />
-        ))}
 
         {/* ── The sidebar: what the table says, as it is said ── */}
         <div style={{ opacity: 1 - ease(frame, sideOut, 12) }}>
