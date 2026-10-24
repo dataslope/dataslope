@@ -44,12 +44,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     the first, the tenth a tenth as often" is the law's prediction, and the
  *     ghost cell beside "the" is half of 5,239, 2,620 (measure.py's
  *     secondByLaw). The page's own output (block-outputs.json 420e59ef)
- *     prints the same eight rows. Where the lesson's prose and its numbers
- *     disagree, the video follows the numbers: the lesson reads that table as
- *     rank times count staying "in the same ballpark" with the top word
- *     "roughly twice the second", but its own numbers run 5,239 to 19,752 and
+ *     prints the same eight rows. Rank times count runs 5,239 to 19,752 and
  *     the top two nearly tie, so the video says the top is rough and gives
- *     the law on the whole vocabulary. The two shares (60% of the book, 39%
+ *     the law on the whole vocabulary, as the lesson's prose now does too
+ *     (it once read the table as "in the same ballpark", the top word
+ *     "roughly twice the second"). The two shares (60% of the book, 39%
  *     of the different words) are drawn on linear bars as well, because the
  *     log rank axis gives the top hundred half its width.
  *   - Next-word counts, the lesson's block verbatim: after "the", cat 3 and
@@ -99,8 +98,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     electronic process in important functional areas of several languages
  *     may well be an accomplished fact" (Christian Science Monitor), all
  *     from J. Hutchins, "The Georgetown-IBM experiment demonstrated in
- *     January 1954" (AMTA 2004 slides). The lesson's "a few dozen Russian
- *     sentences" is consistent; the video says "about sixty".
+ *     January 1954" (AMTA 2004 slides). The video says "about sixty", as
+ *     the lesson now does ("just over sixty").
  *   - ALPAC, the Automatic Language Processing Advisory Committee that US
  *     government agencies convened in 1964 ("a government committee"):
  *     Language and Machines: Computers in Translation and Linguistics
@@ -125,9 +124,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     worked at Cambridge (Cambridge Language Research Unit, then the
  *     Computer Laboratory). "Spark" is how her name is said; the screen sets
  *     Spärck. Search engines "still lean on it": BM25, the default ranking in
- *     Lucene, Elasticsearch and Solr, carries an IDF term. The lesson's
- *     footnote goes further ("every search engine you use"), which the video
- *     does not repeat.
+ *     Lucene, Elasticsearch and Solr, carries an IDF term, which is how the
+ *     lesson's footnote now puts it too.
  *   - word2vec: Mikolov, Chen, Corrado and Dean (Google), "Efficient
  *     Estimation of Word Representations in Vector Space", arXiv 1301.3781,
  *     16 January 2013, all four authors at "Google Inc., Mountain View, CA"
