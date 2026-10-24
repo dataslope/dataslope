@@ -25,6 +25,7 @@
     "capture:block-outputs": "node scripts/capture-browser-outputs.mjs",
     "build:og-image": "node scripts/build-og-image.mjs",
     "build:favicons": "node scripts/build-favicons.mjs",
+    "build:youtube-art": "node scripts/build-youtube-art.mjs",
     "publish:tools-jar": "npm publish ./tools-jar",
     "postinstall": "node scripts/patch-almostnode.mjs && node scripts/patch-opennext.mjs && node scripts/postinstall-generate.mjs",
     "start": "next start",
