@@ -81,8 +81,9 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     too, but read as a share of the text it overstates the one-offs (by
  *     occurrence, 1.7% of Emma's words are). The lesson's own sparsity block
  *     (four repeated lines about a cat and a dog) prints 7, 9, 8 and 7
- *     n-grams "that repeat" for n = 1 to 4, which does not show the collapse
- *     its prose describes, so the video measures the point on Emma instead.
+ *     n-grams "that repeat" for n = 1 to 4, too small to show the collapse,
+ *     so the video measures the point on Emma, as the lesson's prose now
+ *     does too (39%, 90% and 97% for words, trigrams and 4-grams).
  *     Following the numbers rather than the lesson's "bigrams and trigrams
  *     are the sweet spot": on a novel, trigrams already recur only about one
  *     time in four, so the video says bigrams, and trigrams given plenty of
