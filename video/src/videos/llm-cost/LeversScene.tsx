@@ -6,6 +6,7 @@ import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editoria
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { CACHE_LEVER, int, NAME, OUTPUT_WORTH, PRICES, ROUTE, THINKING, usd } from "./data";
 import {
   Arrow,
@@ -84,6 +85,13 @@ export const LeversScene: React.FC = () => {
   const thenAt = n.word("prompt", "only then");
   const twiceAt = n.word("passes", "twice");
   const passesAt = n.word("passes", "passes");
+  const unlessAt = n.word("retrieval", "Unless");
+  const documentAt = n.word("retrieval", "whole document");
+  const everyTurnAt = n.word("retrieval", "every turn");
+  const threeAt = n.word("retrieval", "three paragraphs");
+  const retrievalAt = n.word("retrieval", "retrieval problem");
+  const topAt = n.word("retrieval", "top");
+  const passesFrom = n.beat("passes").from;
   const whatAt = n.word("next", "Passes what");
   const testAt = n.word("next", "test");
   const nextAt = n.word("next", "next");
@@ -127,6 +135,9 @@ export const LeversScene: React.FC = () => {
       <Sfx name="el-pencil" at={haikuAt - 4} level={-35} />
       <Sfx name="el-tap" at={twentySixAt - 2} level={-29} />
       <Sfx name="el-pop" at={thirdAt - 4} level={-32} />
+      <Sfx name="el-pop" at={documentAt - 6} level={-32} />
+      <Sfx name="el-whoosh" at={threeAt + 6} level={-35} />
+      <Sfx name="el-pencil" at={topAt - 4} level={-35} />
       <Sfx name="el-pencil" at={passesAt - 4} level={-35} />
       <Sfx name="el-pencil" at={nextAt - 8} level={-36} />
 
@@ -178,6 +189,24 @@ export const LeversScene: React.FC = () => {
           ))}
         </span>
       </Note>
+      {/* Lever 6's exception: a whole document pasted every turn is a retrieval problem. */}
+      <Arrow from={[TEXT_X + 392, listY(5) + 36]} to={[TEXT_X + 392, listY(5) + 4]} at={topAt - 4} dur={10} color={POINT_INK} width={2.6} />
+      <Note at={topAt - 2} x={TEXT_X + 410} y={listY(5) + 6}>
+        <span style={{ ...note(25, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>retrieval goes to the top</span>
+      </Note>
+      {/* Fig. 14 makes way at "passes", and the levers come back for the close. */}
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, passesFrom + 4, 12) }}>
+        <RetrievalFig
+          at={unlessAt - 4}
+          documentAt={documentAt}
+          everyTurnAt={everyTurnAt}
+          threeAt={threeAt}
+          retrievalAt={retrievalAt}
+          x={RX}
+        />
+      </div>
+      <Spot id="levers" at={passesFrom + 18} left={1130} top={y(318)} width={600} height={433} />
+
       {/* Lever 5: about half off. */}
       <Note at={halfAt - 4} x={TEXT_X + 460} y={listY(4) + 8}>
         <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>about half off</span>
@@ -186,10 +215,9 @@ export const LeversScene: React.FC = () => {
       {/* ── The art, while no figure needs the right half ── */}
       <Spot id="levers" at={sixAt - 6} out={firstAt - 6} left={1130} top={y(318)} width={600} height={433} />
       <Spot id="levers" at={figsOut + 12} out={effortWordAt - 8} left={1130} top={y(318)} width={600} height={433} />
-      <Spot id="levers" at={thenAt - 2} left={1130} top={y(318)} width={600} height={433} />
 
       {/* ── Fig. 9 again, for lever 4: the thinking budget turned down ── */}
-      <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, thenAt - 10, 10) }}>
+      <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, unlessAt - 8, 10) }}>
         <FigLabel n="9" title={`Cost of one request on ${NAME.sonnet}`} at={effortWordAt - 4} x={RX} y={y(FIG_Y)} />
         {[
           { row: THINKING.rows[THINKING.rows.length - 1], at: budgetAt - 4, y: 400, dim: lowestAt + 6 },
@@ -334,3 +362,132 @@ const Square: React.FC<{ color: string; glow?: number }> = ({ color, glow = 0 })
     }}
   />
 );
+
+/** Paragraph widths in Fig. 14's document, as shares of the card: drawn, not
+ *  measured (the lesson gives the document no size). */
+const PARAS = [0.94, 0.82, 0.9, 0.7, 0.88, 0.96, 0.76, 0.86, 0.66, 0.92, 0.8, 0.9, 0.72, 0.84];
+/** The three paragraphs the question needs. */
+const NEEDED = [3, 4, 9];
+
+/**
+ * Fig. 14: a whole document pasted into every prompt, when three of its
+ * paragraphs would do. The paragraphs ink in as the document is named, the
+ * card swells on "every turn", the three needed light up while the rest fall
+ * back, and move to a card of their own, labelled as retrieval.
+ */
+const RetrievalFig: React.FC<{
+  at: number;
+  documentAt: number;
+  everyTurnAt: number;
+  threeAt: number;
+  retrievalAt: number;
+  x: number;
+}> = ({ at, documentAt, everyTurnAt, threeAt, retrievalAt, x }) => {
+  const frame = useCurrentFrame();
+  const { y, h } = useLayout();
+  const cardW = 300;
+  const top = y(352);
+  const paraH = h(15);
+  const gap = h(13);
+  const pad = 18;
+  const cardH = pad * 2 + PARAS.length * paraH + (PARAS.length - 1) * gap;
+  const inner = cardW - pad * 2;
+  const paraY = (i: number) => top + pad + i * (paraH + gap);
+  const lit = ease(frame, threeAt - 2, 12);
+  const swell = pulse(frame, everyTurnAt - 2, 24);
+  const smallX = x + cardW + 110;
+  const smallW = 270;
+  const smallH = pad * 2 + NEEDED.length * paraH + (NEEDED.length - 1) * gap;
+  const smallTop = paraY(NEEDED[0]) - pad - h(10);
+  const moved = ease(frame, threeAt + 8, 16);
+  return (
+    <>
+      <FigLabel n="14" title="A whole document, pasted into every prompt" at={at} x={x} y={y(FIG_Y)} />
+      <div
+        style={{
+          position: "absolute",
+          left: x,
+          top,
+          width: cardW,
+          height: cardH,
+          boxSizing: "border-box",
+          borderRadius: 8,
+          border: `2px solid color-mix(in srgb, ${INK} 45%, transparent)`,
+          background: PAPER,
+          opacity: ease(frame, documentAt - 6, 10),
+          transform: `scale(${1 + swell * 0.03})`,
+          transformOrigin: "50% 50%",
+        }}
+      />
+      {PARAS.map((w, i) => {
+        const needed = NEEDED.includes(i);
+        const p = ease(frame, documentAt - 2 + i, 6);
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: x + pad,
+              top: paraY(i),
+              width: inner * w * p,
+              height: paraH,
+              borderRadius: 3,
+              background: needed
+                ? `color-mix(in srgb, ${ds("yellow", 500)} ${Math.round(lit * 100)}%, color-mix(in srgb, ${INK} 30%, ${PAPER}))`
+                : `color-mix(in srgb, ${INK} ${Math.round(30 - lit * 18)}%, ${PAPER})`,
+            }}
+          />
+        );
+      })}
+      <Note at={documentAt + 6} x={x} y={top + cardH + 14}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          the whole document
+          <span style={{ color: INK, fontWeight: 600, opacity: ease(frame, everyTurnAt - 4, 12) }}>, sent every turn</span>
+        </span>
+      </Note>
+      {/* The three it needs, on a card of their own. */}
+      <Arrow
+        from={[x + cardW + 14, smallTop + smallH / 2]}
+        to={[smallX - 14, smallTop + smallH / 2]}
+        at={threeAt + 6}
+        dur={12}
+        color={INK}
+        width={2.4}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: smallX,
+          top: smallTop,
+          width: smallW,
+          height: smallH,
+          boxSizing: "border-box",
+          borderRadius: 8,
+          border: `2px solid ${POINT}`,
+          background: PAPER,
+          opacity: moved,
+        }}
+      />
+      {NEEDED.map((i, k) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            left: smallX + pad,
+            top: smallTop + pad + k * (paraH + gap),
+            width: (smallW - pad * 2) * PARAS[i] * moved,
+            height: paraH,
+            borderRadius: 3,
+            background: ds("yellow", 500),
+          }}
+        />
+      ))}
+      <Note at={threeAt + 10} x={smallX} y={smallTop + smallH + 14}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>three paragraphs would do</span>
+      </Note>
+      <Note at={retrievalAt - 2} x={smallX} y={smallTop - 42}>
+        <span style={{ ...note(24, POINT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>retrieval: send only these</span>
+      </Note>
+    </>
+  );
+};

@@ -98,7 +98,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     "the thinking budget" ties the setting to Fig. 9, which returns beside
  *     it with its 20,000 and 0 rows (26.0x and 1.0x).
  *     "batch": "Roughly 50% off"; "nobody's waiting" is its concept check's
- *     "it works wherever nobody is waiting".
+ *     "it works wherever nobody is waiting". "retrieval" is lever 6's own
+ *     exception: "if you are pasting a large document on every turn when
+ *     three paragraphs would do, that is a retrieval problem rather than a
+ *     prompt-length problem, and it belongs at the top of this list". Fig.
+ *     14's document is drawn, not measured: the lesson gives it no size.
  *
  * Written for Drew's voice, casual and curious: short spoken sentences, no
  * symbols or parentheses, numbers as words, contractions, questions the next
@@ -261,7 +265,13 @@ export const script: NarrationScript = {
     { id: "output", text: "Third, cut output, not input. Each output token you save is worth five input ones.", pauseAfter: 0.9 },
     { id: "effort", text: "Fourth, turn reasoning effort, the thinking budget, down to the lowest level that passes.", pauseAfter: 0.9 },
     { id: "batch", text: "Fifth, batch anything nobody's waiting on, at about half off.", pauseAfter: 0.6 },
-    { id: "prompt", text: "And only then, trim the prompt.", pauseAfter: 1.0 },
+    { id: "prompt", text: "And only then, trim the prompt.", pauseAfter: 0.7 },
+    // Lever 6's exception, the lesson's own. Voiced after the take.
+    {
+      id: "retrieval",
+      text: "Unless you're pasting a whole document every turn when three paragraphs would do. That's a retrieval problem, and it goes straight to the top.",
+      pauseAfter: 1.0,
+    },
     { id: "passes", text: "Notice the word that came up twice: passes.", pauseAfter: 0.7 },
     { id: "next", text: "Passes what? That takes a test, and that's next: measuring whether a model is good enough." },
   ],

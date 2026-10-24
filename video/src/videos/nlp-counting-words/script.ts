@@ -137,7 +137,8 @@ export const script: NarrationScript = {
       text: "Emma runs to a hundred and sixty-one thousand words, but only about seven thousand different ones.",
       pauseAfter: 0.6,
     },
-    { id: "giants", text: "Rank them by count, and the top ten alone make up over a fifth of the book.", pauseAfter: 1.0 },
+    { id: "rank", text: "Rank them by count.", pauseAfter: 0.6 },
+    { id: "giants", text: "The top ten alone make up over a fifth of the book.", pauseAfter: 1.0 },
     {
       id: "hapax",
       text: "At the other end, more than two thousand seven hundred words appear just once. They're called hapaxes.",

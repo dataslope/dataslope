@@ -17,7 +17,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *      layers, processing that is not understanding, and rules against
  *      learning, briefly.
  *   3. The pipeline ("pipeline" to "next"): the lesson's sentence through
- *      its five steps, cleaning against analysis, and the lesson's proof that
+ *      its five steps, preprocessing against analysis (the lesson's names for
+ *      the two halves; "cleaning" is left to step 3), and the lesson's proof that
  *      order matters. It ends on Unit 2's first question: where one word
  *      ends.
  *
@@ -208,10 +209,10 @@ export const script: NarrationScript = {
       text: "After tokenizing, each step is one Python list comprehension. The code is easy. Choosing the steps is the hard part.",
       pauseAfter: 0.9,
     },
-    { id: "cleaning", scene: true, text: "Those are the cleaning steps, and every project picks from the same toolbox.", pauseAfter: 0.7 },
+    { id: "cleaning", scene: true, text: "Those are the preprocessing steps, and every project picks from the same toolbox.", pauseAfter: 0.7 },
     {
       id: "analysis",
-      text: "Analysis comes after: counting, tagging, building features. It depends on your goal, and so should the cleaning, because most of its steps are optional.",
+      text: "Analysis comes after: counting, tagging, building features. It depends on your goal, and so should the preprocessing, because most of its steps are optional.",
       pauseAfter: 0.9,
     },
     { id: "order-in", text: "The order you run them in matters, too." },

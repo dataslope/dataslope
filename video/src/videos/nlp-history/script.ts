@@ -83,7 +83,10 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     THE PROBLEM FOR AN UNEXPECTED." It was made by hand: "one opens a book
  *     at random and selects a letter at random on the page ... A similar
  *     process was used for (4), (5) and (6)" (the paper, p. 8 of the
- *     reprint). "Founded information theory" is the lesson's.
+ *     reprint). "Founded information theory" is the lesson's. The contents
+ *     card on the shannon beat lists Part I ("Discrete Noiseless Systems"),
+ *     sections 1-7, with the titles as the paper prints them; section 3,
+ *     "The Series of Approximations to English", holds the sample.
  *   - Turing: "Computing Machinery and Intelligence", Mind 59(236), October
  *     1950, pp. 433-460. It opens "I propose to consider the question, 'Can
  *     machines think?'", replaces it with the imitation game, and asks for
