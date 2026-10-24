@@ -12,8 +12,11 @@ run in the site's Pyodide. A mismatch fails the script. The lessons are in
 content/courses/how-llms-work/:
 
 - "score" is what-benchmarks-measure.mdx, "How to read a score": two models
-  on MMLU, GPQA Diamond and ARC-AGI-3, each benchmark's ceiling, the gap and
-  the headroom left above the leader.
+  on MMLU, GPQA Diamond and ARC-AGI-3, the gap, and how far luck alone puts
+  two equally good models apart on that many questions (seed 0). Each
+  benchmark's ceiling, and the headroom left above the leader, are added
+  here: MMLU's is the prose's cap near 95% (label errors), the others' the
+  top of the scale.
 - "contamination" is benchmark-pitfalls.mdx's first block: what the score
   reports for a model that memorized the test, one that is capable, both and
   neither.
@@ -73,33 +76,34 @@ def run(fn):
 
 def score_block():
     # The lesson's block, verbatim.
-    benchmarks = {
-        "MMLU":         {"model_a": 0.923, "model_b": 0.917, "ceiling": 0.95},
-        "GPQA Diamond": {"model_a": 0.960, "model_b": 0.954, "ceiling": 1.00},
-        "ARC-AGI-3":    {"model_a": 0.627, "model_b": 0.302, "ceiling": 1.00},
+    rng = np.random.default_rng(0)
+    results = {
+        # name: (model A, model B, questions in the test)
+        "MMLU":         (0.923, 0.917, 14_042),
+        "GPQA Diamond": (0.960, 0.954, 198),
+        "ARC-AGI-3":    (0.627, 0.302, 100),  # suppose as few as 100 tasks
     }
 
-    for name, r in benchmarks.items():
-        gap = r["model_a"] - r["model_b"]
-        headroom = r["ceiling"] - r["model_a"]
-        share = gap / headroom if headroom > 0.001 else float("inf")
-        print(f"{name:<14} gap {gap:+.3f}  headroom {headroom:.3f}  "
-              f"gap is {share:.0%} of remaining headroom")
-
-    print()
-    print("The same 0.6 point gap means very different things depending")
-    print("on how much room is left above it.")
-    return [
-        {
+    rows = []
+    for name, (a, b, n) in results.items():
+        p = (a + b) / 2
+        # Replay two truly identical models 10,000 times on n questions:
+        # how far apart does luck alone put them, 95% of the time?
+        luck = np.abs(rng.binomial(n, p, 10_000) - rng.binomial(n, p, 10_000)) / n
+        limit = np.quantile(luck, 0.95)
+        verdict = "bigger than luck" if a - b > limit else "within luck"
+        print(f"{name:<13} gap {100 * (a - b):5.2f} points   "
+              f"luck alone reaches {100 * limit:5.2f}   {verdict}")
+        rows.append({
             "name": name,
-            "a": r["model_a"],
-            "b": r["model_b"],
-            "ceiling": r["ceiling"],
-            "gap": round(r["model_a"] - r["model_b"], 4),
-            "headroom": round(r["ceiling"] - r["model_a"], 4),
-        }
-        for name, r in benchmarks.items()
-    ]
+            "a": a,
+            "b": b,
+            "questions": n,
+            "gap": round(a - b, 4),
+            "luck": round(float(limit), 4),
+            "verdict": verdict,
+        })
+    return rows
 
 
 # ── benchmark-pitfalls.mdx ───────────────────────────────────────────────────
@@ -173,7 +177,7 @@ def sizes_block(true_b=0.65, keep_n=20):
         rates[n] = correct_ranking / 2000
 
     print()
-    print("Twenty examples already identify a 15-point gap almost always.")
+    print("Twenty examples get a 15-point gap right about 4 times in 5; fifty, about 19 in 20.")
     print("Try changing true_b to 0.78 and see how the picture changes.")
     return {"trueA": true_a, "trueB": true_b, "trials": 2000, "rates": rates, "keptN": keep_n, "kept": kept}
 
@@ -233,7 +237,7 @@ def harness_block():
 
 
 def cost_block():
-    # The lesson's block, verbatim ("\$" in the MDX template literal is "$").
+    # The lesson's block, verbatim.
     options = {
         "haiku":  {"accuracy": 0.91, "in": 0.10, "out": 0.50},
         "sonnet": {"accuracy": 0.94, "in": 2.00, "out": 10.00},
@@ -248,7 +252,8 @@ def cost_block():
         per_req = IN_TOK / 1e6 * o["in"] + OUT_TOK / 1e6 * o["out"]
         monthly = per_req * VOLUME
         per_correct = monthly / (VOLUME * o["accuracy"])
-        print(f"{name:<8}{o['accuracy']:>6.0%}${monthly:>11,.0f}${per_correct:>13.6f}")
+        cost, each = "$" + format(monthly, ",.0f"), "$" + format(per_correct, ".6f")
+        print(f"{name:<8}{o['accuracy']:>6.0%}{cost:>12}{each:>14}")
         rows.append({
             "name": name,
             "accuracy": o["accuracy"],
@@ -289,9 +294,9 @@ page_says("evaluating-for-your-task", printed)
 # arithmetic on the lesson's table, not a line the page prints. Errors a month
 # are (1 - accuracy) x volume; a step's break-even is its extra bill divided by
 # the errors it removes. Below that price per error, the cheaper tier is the
-# cheaper choice overall; above it, the dearer one. The lesson's prose ("a
-# minute of triage, the cheap model wins") gets this backwards: Haiku to Sonnet
-# breaks even at about 5 cents an error.
+# cheaper choice overall; above it, the dearer one. Haiku to Sonnet breaks
+# even at about 5 cents an error, Sonnet to Opus at about 16.5, as the lesson's
+# prose now says.
 rows = cost["rows"]
 for r in rows:
     r["errors"] = round((1 - r["accuracy"]) * cost["volume"])
@@ -339,7 +344,7 @@ quoted = {
     "gpqaNonExpertPhd": {"value": 34, "where": "what-benchmarks-measure.mdx:34-36"},
     "gpqaLeaders": {"value": 95, "where": "what-benchmarks-measure.mdx:38-40"},
     # Footnote vals-gpqa: 24 of the 136 models one leaderboard tracks at 90% or higher.
-    "gpqaAbove90": {"value": 24, "of": 136, "where": "what-benchmarks-measure.mdx:271-274"},
+    "gpqaAbove90": {"value": 24, "of": 136, "where": "what-benchmarks-measure.mdx:280-283"},
     # Coding: SWE-bench Verified dropped in February 2026; about 30% of Pro's tasks broken.
     "sweProBroken": {"value": 30, "where": "what-benchmarks-measure.mdx:55-57"},
     # Abstract reasoning.
@@ -357,6 +362,15 @@ quoted = {
     "examplesLo": {"value": 20, "where": "evaluating-for-your-task.mdx:32"},
     "examplesHi": {"value": 50, "where": "evaluating-for-your-task.mdx:32"},
 }
+
+# The ceilings the launch table (Fig. 2) and the scale (Fig. 4) draw. The
+# lesson's block no longer carries them; MMLU's is its prose's.
+for row in score:
+    row["ceiling"] = quoted["mmluCeiling"]["value"] / 100 if row["name"] == "MMLU" else 1.00
+    row["headroom"] = round(row["ceiling"] - row["a"], 4)
+mmlu, gpqa, arc = score
+assert mmlu["verdict"] == gpqa["verdict"] == "within luck" and arc["verdict"] == "bigger than luck"
+
 def dumps(value, indent=0):
     """JSON with one key per line, but a list of numbers on one line."""
     pad = " " * indent

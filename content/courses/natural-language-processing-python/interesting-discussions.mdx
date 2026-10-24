@@ -180,8 +180,9 @@ words dominate, and a long tail appears just once. This is **Zipf's law**, in
 natural language, a word's frequency is roughly inversely proportional to its
 rank. In its ideal form, the second most frequent word turns up about half as
 often as the first, the third about a third as often, and so on; real text
-follows it roughly, and least closely at the very top. It is why stopwords swamp raw
-frequency, why we weight with IDF, and why the long tail is full of hapaxes.
+follows it roughly, and least closely at the very top. It is why stopwords
+swamp raw frequency, why we weight with IDF, and why the long tail is full of
+hapaxes.
 
 Let us see the law appear on real text. The block below pulls a public-domain
 book from NLTK's Gutenberg corpus, counts its words, and checks whether
@@ -237,9 +238,10 @@ Read the rightmost column. If the law held exactly, $\text{rank} \times \text{fr
 would be the same number on every row. It is not: it climbs from 5,239 to
 nearly 20,000 over these eight rows, and the top two words almost tie, so at
 the very top the law is only a rough guide. Its pull shows across the whole
-vocabulary instead, where across thousands of words frequency falls off close
-to one over the rank, a near-straight line on a log-log plot. You are watching a statistical regularity of human
-language, one nobody designed, fall out of a word count.
+vocabulary instead: over thousands of words, frequency falls off close to one
+over the rank, a near-straight line on a log-log plot. You are watching a
+statistical regularity of human language, one nobody designed, fall out of a
+word count.
 
 ## 2013, word2vec and meaning as geometry
 

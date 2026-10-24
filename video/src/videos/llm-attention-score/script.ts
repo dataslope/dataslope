@@ -39,7 +39,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - Dot products, written out: 1.0 x 1.0 + 0.1 x 0.2 = 1.02 ("one point
  *     oh two"), 0.3 + 0.1 = 0.40 ("point four"), 0.1 + 0.01 = 0.11 ("point
  *     one one"). Divided by the square root of 2 (1.414): 0.721, 0.283,
- *     0.078, as the page prints them (it labels them "raw scores").
+ *     0.078, the page's "scaled scores" (its "raw scores" line prints the
+ *     dot products, 1.02, 0.4, 0.11).
  *   - Softmax as two steps. The e-powers on screen are e raised to the shown
  *     scores, so a calculator agrees with the screen: 2.056, 1.327, 1.081,
  *     total 4.464. Unrounded, the first is 2.057 and the total 4.465; the

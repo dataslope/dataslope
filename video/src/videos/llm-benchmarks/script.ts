@@ -42,8 +42,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     ARC-AGI-3 62.7 against 30.2. "Six tenths of a point" is its gap of
  *     0.006; the cap near ninety-five from "documented label errors" (said
  *     as "some of its answer keys are wrong") and "noise" are the lesson's
- *     prose. The block's own last line ("the same 0.6 point gap means very
- *     different things") is not used: its own output does not bear it out.
+ *     prose. Its block now replays two equally good models to show how far
+ *     luck alone separates them (seed 0): 0.63 points on MMLU's 14,042
+ *     questions and 4.04 on GPQA Diamond's 198, so both 0.6-point gaps are
+ *     "within luck"; 14.00 on ARC-AGI-3 at 100 tasks, against a 32.5-point
+ *     gap. The video does not draw those; it agrees with them.
  *   - The families (Fig. 3) are the lesson's: MMLU, 57 subjects of multiple
  *     choice "from elementary mathematics to professional law"; GPQA
  *     Diamond, non-expert PhD holders with web access around 34%;
@@ -81,8 +84,8 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     lesson's advice after its true_b = 0.78 variant, which Fig. 12 draws
  *     beside the main run (the same seed, re-run): a 2-point gap is ranked
  *     right 37.5% of the time at 5 examples and only 59.5% at 100. The
- *     lesson's own line "Twenty examples already identify a 15-point gap
- *     almost always" disagrees with its 81.3%; the video follows the number.
+ *     lesson now says "about four times in five" at twenty too (it once
+ *     said "almost always").
  *   - The harness (Fig. 13) is the lesson's block: ten tickets, two stand-in
  *     models; the cheap one 30%, the other 100%; every miss of the cheap one
  *     is "other".
@@ -95,12 +98,11 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     illustrative ("say"); monthly $83, $1,650, $3,300 and $8,250. "One
  *     point for twice the money" and "two and a half times the price" are
  *     its printed lines.
- *     THE VERDICT FOLLOWS THE NUMBERS, NOT THE LESSON. The lesson concludes
- *     "If a misclassified ticket costs a minute of human triage, the cheap
- *     model wins easily" (evaluating-for-your-task.mdx:182-184, echoed at
- *     :300). Its own table says the opposite: measure.py prices each step up
- *     per error it avoids. Haiku to Sonnet removes 30,000 errors a month
- *     (9% to 6% of a million) for $1,567.50 more, about 5.2 cents an error;
+ *     The verdict prices each step up per error it avoids (measure.py), as
+ *     the lesson's prose now does too (it once said a minute of triage made
+ *     the cheap model win, which its own table contradicts). Haiku to
+ *     Sonnet removes 30,000 errors a month (9% to 6% of a million) for
+ *     $1,567.50 more, about 5.2 cents an error;
  *     Sonnet to Opus removes 10,000 for $1,650, 16.5 cents; Opus to Fable
  *     none. A minute of anyone's time costs more than 5 cents, so at a
  *     minute of triage the cheap model is the expensive one ("cost-error",
@@ -323,8 +325,8 @@ export const script: NarrationScript = {
       text: "So price the errors. Sonnet's three points mean thirty thousand fewer a month, at about five cents each.",
       pauseAfter: 0.8,
     },
-    // The lesson says the cheap model wins at a minute of triage; its own
-    // table says the opposite (see the header). Voiced in the fix pass.
+    // The lesson's own table, priced per error (see the header). Voiced in
+    // the fix pass.
     {
       id: "cost-verdict",
       text: "If a mistake costs even a minute of someone's time, the cheap model is the expensive one.",
