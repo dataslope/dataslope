@@ -1,0 +1,19 @@
+06:08 started: read brief, README, plan, review, lessons
+06:13 art submitted (4 prompts, batch)
+06:17 script drafted (39 beats, ~4065 chars, est 283 s); measure.py + measurements.json done
+06:32 scenes built (8 scenes); typecheck/lint/check:cues clean for folder
+06:49 stills reviewed (2 rounds); tsc/eslint/check:cues/npm test clean for folder
+06:50 check:frames passed pre-voice (no art yet); narration sent (3 takes, 4094 chars)
+06:53 voiced (3 takes, 4094 chars)
+06:58 check:sync passed (worst +0.03 s, formats)
+07:14 batch stalled 1 h at 0/4: cancelled, running sync
+07:15 art imported (sync fallback), all 4 look right
+07:51 check:frames passed with art (largest stretch 0.68, arrows 5.4 deg)
+08:03 check:motion failed 3 stretches (bpe 4.8 s, corpus 3.0 s, chat 3.3 s): fixed, re-running
+08:33 check:motion passed (longest still 2.3 s)
+09:33 final check:motion passed (longest 2.3 s); tsc, npm test 59/59 clean
+09:37 check:mix 25.3 LU under; report written; done
+10:09 fix pass resumed: space/newer split (recut, free); voicing hook, newer, rest (309 chars)
+10:10 voiced hook, newer, rest (309 chars)
+10:29 fix code done; running checks
+14:00 fix pass done; report at fixes/Llm-1-Tokens.md

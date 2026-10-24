@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "model": "gpt-image-2.5-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "nlp-text-to-features-toolbox",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an open wooden toolbox with a long wooden carry handle, seen from the front at a slight angle, and two large tools lifted out and lying in front of it: a chunky hammer with a red head and a big blue adjustable wrench"
+    },
+    {
+      "id": "nlp-text-to-features-bag",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a soft cloth drawstring sack lying tipped on its side with its mouth open, and six large plain square wooden tiles tumbling out of it in a loose heap, each tile washed in a different brand color"
+    },
+    {
+      "id": "nlp-text-to-features-balance",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an old brass balance scale with a tall central post and two round hanging pans: the left pan sits low under one large faceted blue gemstone, and the right pan rides high holding a small heap of pale yellow pebbles"
+    },
+    {
+      "id": "nlp-text-to-features-gauge",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a round dial gauge like an old pressure meter in a thick brass rim, its plain face washed deep orange over the left half and green over the right half, with one long dark blue needle pointing up and a little to the right, into the green"
+    }
+  ]
+}

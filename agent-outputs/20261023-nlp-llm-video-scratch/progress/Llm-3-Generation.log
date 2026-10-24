@@ -1,0 +1,19 @@
+06:07 started, reading brief
+06:10 art submitted (4 prompts: jar, parrot, suitcase, hourglass)
+06:31 script drafted, scenes built (14), typechecking
+06:43 stills reviewed (13 scenes, fixes applied); running check:frames
+06:44 check:frames passed (pre-voice, art pending); voicing 5156 chars in 3 takes
+06:52 voiced: 5156 chars, 3 takes
+07:00 check:sync passed (worst +0.02 s, topp-cut)
+07:12 art batch stalled 1 h at 0/4: cancelled, generating with sync
+07:23 art imported (4 WebPs, all kept); check:mix 25.3 LU under
+08:09 check:frames passed with art (largest stretch 0.97); motion running
+08:49 check:motion: one 3.0 s still in the hook (fixed: jar and token names now arrive on the first words); re-running
+09:02 check:sync re-run passed (worst +0.02 s)
+09:14 check:motion passed (no still stretch of 2 s or more); check:frames passed again
+09:25 check:mix 25.7 LU under; all checks passed; report written
+10:02 fix pass: re-voicing 5 beats (658 chars): hedge-why, costs, permission, overthink, effort
+10:10 fix pass resumed after restart; voicing done (0 to voice)
+10:15 fix pass: scene edits done, stills reviewed; running all checks
+10:31 fix pass: frames and motion pass; sync and mix running
+13:59 fix pass done: 20/20 findings, 658 chars re-voiced, all checks pass; report at fixes/Llm-3-Generation.md

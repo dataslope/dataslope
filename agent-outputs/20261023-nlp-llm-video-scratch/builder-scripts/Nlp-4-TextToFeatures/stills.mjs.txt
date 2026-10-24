@@ -1,0 +1,37 @@
+// Renders several stills of Nlp-4-TextToFeatures from one bundle.
+// Usage (from video/): node <this> <outDir> frame1 frame2 ...
+import { rmSync } from "node:fs";
+import { createRequire } from "node:module";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+
+const require = createRequire(path.resolve("package.json"));
+const { bundle } = await import(pathToFileURL(require.resolve("@remotion/bundler")).href);
+const { renderStill, selectComposition } = await import(pathToFileURL(require.resolve("@remotion/renderer")).href);
+
+const [outDir, ...frames] = process.argv.slice(2);
+const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE ?? null;
+const serveUrl = await bundle({ entryPoint: path.resolve("out/entries/Nlp-4-TextToFeatures.tsx") });
+try {
+  const composition = await selectComposition({ serveUrl, id: "Nlp-4-TextToFeatures", inputProps: {}, browserExecutable });
+  console.log(`duration ${composition.durationInFrames} frames`);
+  for (const f of frames) {
+    const frame = Math.min(Number(f), composition.durationInFrames - 1);
+    const output = path.join(outDir, `f${String(frame).padStart(5, "0")}.png`);
+    await renderStill({
+      serveUrl,
+      composition,
+      frame,
+      output,
+      scale: 1,
+      browserExecutable,
+      inputProps: {},
+      onBrowserLog: ({ text }) => {
+        if (/stretched|\[cue\]|Error|error/.test(text)) console.log(`  [${frame}] ${text}`);
+      },
+    });
+    console.log(output);
+  }
+} finally {
+  rmSync(serveUrl, { recursive: true, force: true });
+}

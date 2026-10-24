@@ -1,0 +1,25 @@
+// Scratch (gitignored): registers Nlp-2-1-LemmasAndTags alone, exactly as Root.tsx does.
+// Use: VIDEO_ENTRY=out/entries/Nlp-2-1-LemmasAndTags.tsx npm run check:frames -- Nlp-2-1-LemmasAndTags
+//      npx remotion still out/entries/Nlp-2-1-LemmasAndTags.tsx Nlp-2-1-LemmasAndTags out/x.png --frame=300
+import React from "react";
+import { Composition, registerRoot } from "remotion";
+import "../../src/theme/brand";
+import "../../src/theme/fonts";
+import { narratedMetadata } from "../../src/narration/metadata";
+import { EDITORIAL_DEFAULTS, type EditorialProps } from "../../src/editorial/Page";
+import { NlpLemmasAndTags } from "../../src/videos/nlp-lemmas-and-tags/Video";
+import { script } from "../../src/videos/nlp-lemmas-and-tags/script";
+
+const Root: React.FC = () => (
+  <Composition
+    id="Nlp-2-1-LemmasAndTags"
+    component={NlpLemmasAndTags}
+    width={1920}
+    height={1080}
+    fps={30}
+    durationInFrames={30 * 60}
+    defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+    calculateMetadata={narratedMetadata<EditorialProps>(script)}
+  />
+);
+registerRoot(Root);

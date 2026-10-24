@@ -1,0 +1,21 @@
+06:07 started, reading brief
+06:13 art submitted (4 prompts), facts in progress
+06:15 art imported, all 4 reviewed and kept
+06:22 script drafted (44 beats, 4004 chars), measure.py run
+06:44 scenes built (9 scenes), typecheck/lint/cues clean
+06:53 stills reviewed (round 2), fixes applied; npm test passes for my folder
+07:18 check:frames pass (estimate; 4 images, largest stretch 0.98)
+07:18 voicing started (4,007 chars, 3 takes)
+07:31 voiced: 3 takes, 44 beats, 4,007 chars, 311.8 s
+07:45 check:sync pass (worst +0.04 s, fix)
+08:13 check:motion run 1: 5 stretches >=3 s, fixed (headline/marks/labels on spoken words); re-running motion, frames, mix
+08:41 check:motion pass (longest still 2.5 s, 0:32.3 law); frames and mix queued
+09:19 check:motion pass after final edits (longest still 2.5 s); frames3 + mix2 queued
+09:29 check:frames pass, check:mix 21.0 LU under; all checks done, report written
+10:02 fix pass started (review: 1 P1, 5 P2, 9 P3)
+10:10 resumed after container restart; booths redraw batch had completed and imported (separate booths, no tube)
+10:14 re-voiced age, law, alpac, analogy (481 chars)
+10:18 fixes applied, stills reviewed; running checks
+10:59 rank-10 ghost row added for motion; tsc/eslint/cues clean; stills queued
+14:03 zipf stills reviewed (row 10 and bars clear); ELIZA opening pop moved 6 frames ahead of the first word (mix closest 6.1 dB); motion running, mix to follow
+14:24 motion pass (max 2.5 s), mix pass (closest 9.5 dB); fix report written

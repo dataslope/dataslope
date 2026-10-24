@@ -1,0 +1,20 @@
+2026-10-23T06:07:41Z started, reading brief
+2026-10-23T06:14:04Z art submitted (4 prompts, batch)
+2026-10-23T06:16:23Z art imported (4 webp, all checked by eye, no redraws)
+2026-10-23T06:20:07Z script drafted (63 beats, 5469 chars, 3 takes; estimate 6:27)
+2026-10-23T06:41:38Z scenes built (10 scenes, 17 figures); tsc+lint clean for folder
+2026-10-23T06:47:19Z stills reviewed (30 stills, layout fixes applied)
+2026-10-23T06:52:55Z voiced (3 takes, 5582 chars)
+2026-10-23T06:58:23Z check:sync pass (worst +0.08 s, look)
+2026-10-23T07:49:25Z motion fixes applied (two rounds); tsc+lint+check:cues clean; rerunning motion/frames/mix
+2026-10-23T08:21:11Z check:motion pass (longest still 2.5 s)
+2026-10-23T08:40:22Z check:frames pass (voiced)
+2026-10-23T08:57:17Z check:mix done (fx 21.2 LU under, median 23.5 dB)
+2026-10-23T08:58:00Z done; report written
+2026-10-23T10:02:18Z fix pass started
+2026-10-23T10:11:04Z fix pass resumed after restart; 6 beats re-voiced (478 chars) before it; book batch polling
+2026-10-23T10:22:20Z scene fixes applied for findings 1-8,10-17; stills reviewed; waiting on book art
+2026-10-23T13:59:21Z resumed after usage pause; book art in (sync fallback, batch cancelled)
+2026-10-23T14:23:56Z fix pass: check:sync pass (worst +0.09 s)
+2026-10-23T14:45:41Z fix pass: check:motion pass (longest still 2.5 s)
+2026-10-23T14:55:04Z fix pass: check:frames pass, check:mix 21.3 LU; writing report

@@ -1,0 +1,43 @@
+// Scratch (gitignored): the course videos for the review sampler.
+import React from "react";
+import { Composition, registerRoot } from "remotion";
+import "../../src/theme/brand";
+import "../../src/theme/fonts";
+import { narratedMetadata } from "../../src/narration/metadata";
+import { EDITORIAL_DEFAULTS, type EditorialProps } from "../../src/editorial/Page";
+import { LlmMeaning } from "../../src/videos/llm-meaning/Video";
+import { script as s0 } from "../../src/videos/llm-meaning/script";
+import { LlmGeneration } from "../../src/videos/llm-generation/Video";
+import { script as s1 } from "../../src/videos/llm-generation/script";
+import { LlmCost } from "../../src/videos/llm-cost/Video";
+import { script as s2 } from "../../src/videos/llm-cost/script";
+import { LlmBenchmarks } from "../../src/videos/llm-benchmarks/Video";
+import { script as s3 } from "../../src/videos/llm-benchmarks/script";
+import { NlpWhyTextIsHard } from "../../src/videos/nlp-why-text-is-hard/Video";
+import { script as s4 } from "../../src/videos/nlp-why-text-is-hard/script";
+import { NlpCleaningText } from "../../src/videos/nlp-cleaning-text/Video";
+import { script as s5 } from "../../src/videos/nlp-cleaning-text/script";
+import { NlpCountingWords } from "../../src/videos/nlp-counting-words/Video";
+import { script as s6 } from "../../src/videos/nlp-counting-words/script";
+import { NlpTextToFeatures } from "../../src/videos/nlp-text-to-features/Video";
+import { script as s7 } from "../../src/videos/nlp-text-to-features/script";
+import { NlpHistory } from "../../src/videos/nlp-history/Video";
+import { script as s8 } from "../../src/videos/nlp-history/script";
+import { LlmTokens } from "../../src/videos/llm-tokens/Video";
+import { script as s9 } from "../../src/videos/llm-tokens/script";
+
+const Root: React.FC = () => (
+  <>
+    <Composition id="Llm-2-Meaning" component={LlmMeaning} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s0)} />
+    <Composition id="Llm-3-Generation" component={LlmGeneration} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s1)} />
+    <Composition id="Llm-4-Cost" component={LlmCost} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s2)} />
+    <Composition id="Llm-5-Benchmarks" component={LlmBenchmarks} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s3)} />
+    <Composition id="Nlp-1-WhyTextIsHard" component={NlpWhyTextIsHard} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s4)} />
+    <Composition id="Nlp-2-CleaningText" component={NlpCleaningText} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s5)} />
+    <Composition id="Nlp-3-CountingWords" component={NlpCountingWords} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s6)} />
+    <Composition id="Nlp-4-TextToFeatures" component={NlpTextToFeatures} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s7)} />
+    <Composition id="Nlp-5-History" component={NlpHistory} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s8)} />
+    <Composition id="Llm-1-Tokens" component={LlmTokens} width={1920} height={1080} fps={30} durationInFrames={30 * 60} defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }} calculateMetadata={narratedMetadata<EditorialProps>(s9)} />
+  </>
+);
+registerRoot(Root);

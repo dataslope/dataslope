@@ -1,0 +1,877 @@
+{
+ "rates": [
+  {
+   "model": "Claude Fable 5.1",
+   "in": 10.0,
+   "out": 50.0,
+   "ratioPrinted": "5x",
+   "ratio": 5.0
+  },
+  {
+   "model": "Claude Opus 5.5",
+   "in": 4.0,
+   "out": 20.0,
+   "ratioPrinted": "5x",
+   "ratio": 5.0
+  },
+  {
+   "model": "Claude Sonnet 5.5",
+   "in": 2.0,
+   "out": 10.0,
+   "ratioPrinted": "5x",
+   "ratio": 5.0
+  },
+  {
+   "model": "Claude Haiku 5.5",
+   "in": 0.1,
+   "out": 0.5,
+   "ratioPrinted": "5x",
+   "ratio": 5.0
+  },
+  {
+   "model": "GPT-6 Astra",
+   "in": 10.0,
+   "out": 50.0,
+   "ratioPrinted": "5x",
+   "ratio": 5.0
+  },
+  {
+   "model": "GPT-6.1 Sol",
+   "in": 2.0,
+   "out": 10.0,
+   "ratioPrinted": "5x",
+   "ratio": 5.0
+  },
+  {
+   "model": "GPT-6 Luna",
+   "in": 0.1,
+   "out": 0.5,
+   "ratioPrinted": "5x",
+   "ratio": 5.0
+  },
+  {
+   "model": "Gemini 3.1 Pro (preview)",
+   "in": 2.0,
+   "out": 12.0,
+   "ratioPrinted": "6x",
+   "ratio": 6.0
+  },
+  {
+   "model": "Gemini 3.8 Flash",
+   "in": 0.75,
+   "out": 3.75,
+   "ratioPrinted": "5x",
+   "ratio": 5.0
+  },
+  {
+   "model": "Gemini 3.5 Flash-Lite",
+   "in": 0.3,
+   "out": 2.5,
+   "ratioPrinted": "8x",
+   "ratio": 8.3333
+  }
+ ],
+ "fives": 8,
+ "minRatio": 5.0,
+ "cheapest": "Claude Haiku 5.5",
+ "dearest": "Claude Fable 5.1",
+ "spread": 100.0,
+ "sheet": [
+  {
+   "name": "Input",
+   "what": "Tokens you send",
+   "relation": "The baseline"
+  },
+  {
+   "name": "Output",
+   "what": "Tokens generated",
+   "relation": "5 times input, sometimes more"
+  },
+  {
+   "name": "Cached input",
+   "what": "Repeated prefix, already processed",
+   "relation": "10% of input or less"
+  },
+  {
+   "name": "Cache write",
+   "what": "Storing a prefix for reuse",
+   "relation": "Slightly above input"
+  },
+  {
+   "name": "Batch",
+   "what": "Asynchronous, hours not seconds",
+   "relation": "About 50% off"
+  }
+ ],
+ "prices": {
+  "fable": {
+   "in": 10.0,
+   "out": 50.0,
+   "cached": 0.25
+  },
+  "opus": {
+   "in": 4.0,
+   "out": 20.0,
+   "cached": 0.2
+  },
+  "sonnet": {
+   "in": 2.0,
+   "out": 10.0,
+   "cached": 0.1
+  },
+  "haiku": {
+   "in": 0.1,
+   "out": 0.5,
+   "cached": 0.01
+  }
+ },
+ "cacheFraction": {
+  "fable": 0.025,
+  "opus": 0.05,
+  "sonnet": 0.05,
+  "haiku": 0.1
+ },
+ "prefix": {
+  "tokens": 50000,
+  "sonnetFull": 0.1,
+  "sonnetCached": 0.005
+ },
+ "thresholds": [
+  {
+   "model": "Claude Haiku 5.5",
+   "threshold": 100000,
+   "inMult": 5.0,
+   "outMult": 5.0
+  },
+  {
+   "model": "Gemini 3.1 Pro (preview)",
+   "threshold": 200000,
+   "inMult": 2.0,
+   "outMult": 1.5
+  },
+  {
+   "model": "OpenAI GPT-6 family",
+   "threshold": 272000,
+   "inMult": 2.0,
+   "outMult": 1.5
+  }
+ ],
+ "oversized": {
+  "model": "GPT-6.1 Sol",
+  "tokens": 300000,
+  "threshold": 272000,
+  "past": 28000,
+  "headline": 0.6,
+  "above": 1.2
+ },
+ "request": {
+  "in": 1200,
+  "out": 300,
+  "volume": 100000,
+  "tiers": [
+   {
+    "model": "fable",
+    "per": 0.027,
+    "perVolume": 2700.0
+   },
+   {
+    "model": "opus",
+    "per": 0.0108,
+    "perVolume": 1080.0
+   },
+   {
+    "model": "sonnet",
+    "per": 0.0054,
+    "perVolume": 540.0
+   },
+   {
+    "model": "haiku",
+    "per": 0.00027,
+    "perVolume": 27.0
+   }
+  ]
+ },
+ "conversation": {
+  "model": "sonnet",
+  "system": 2000,
+  "user": 150,
+  "reply": 400,
+  "perTurn": [
+   {
+    "turn": 1,
+    "input": 2150,
+    "resent": 2000,
+    "new": 150
+   },
+   {
+    "turn": 2,
+    "input": 2700,
+    "resent": 2550,
+    "new": 150
+   },
+   {
+    "turn": 3,
+    "input": 3250,
+    "resent": 3100,
+    "new": 150
+   },
+   {
+    "turn": 4,
+    "input": 3800,
+    "resent": 3650,
+    "new": 150
+   },
+   {
+    "turn": 5,
+    "input": 4350,
+    "resent": 4200,
+    "new": 150
+   },
+   {
+    "turn": 6,
+    "input": 4900,
+    "resent": 4750,
+    "new": 150
+   },
+   {
+    "turn": 7,
+    "input": 5450,
+    "resent": 5300,
+    "new": 150
+   },
+   {
+    "turn": 8,
+    "input": 6000,
+    "resent": 5850,
+    "new": 150
+   },
+   {
+    "turn": 9,
+    "input": 6550,
+    "resent": 6400,
+    "new": 150
+   },
+   {
+    "turn": 10,
+    "input": 7100,
+    "resent": 6950,
+    "new": 150
+   },
+   {
+    "turn": 11,
+    "input": 7650,
+    "resent": 7500,
+    "new": 150
+   },
+   {
+    "turn": 12,
+    "input": 8200,
+    "resent": 8050,
+    "new": 150
+   },
+   {
+    "turn": 13,
+    "input": 8750,
+    "resent": 8600,
+    "new": 150
+   },
+   {
+    "turn": 14,
+    "input": 9300,
+    "resent": 9150,
+    "new": 150
+   },
+   {
+    "turn": 15,
+    "input": 9850,
+    "resent": 9700,
+    "new": 150
+   },
+   {
+    "turn": 16,
+    "input": 10400,
+    "resent": 10250,
+    "new": 150
+   },
+   {
+    "turn": 17,
+    "input": 10950,
+    "resent": 10800,
+    "new": 150
+   },
+   {
+    "turn": 18,
+    "input": 11500,
+    "resent": 11350,
+    "new": 150
+   },
+   {
+    "turn": 19,
+    "input": 12050,
+    "resent": 11900,
+    "new": 150
+   },
+   {
+    "turn": 20,
+    "input": 12600,
+    "resent": 12450,
+    "new": 150
+   },
+   {
+    "turn": 21,
+    "input": 13150,
+    "resent": 13000,
+    "new": 150
+   },
+   {
+    "turn": 22,
+    "input": 13700,
+    "resent": 13550,
+    "new": 150
+   },
+   {
+    "turn": 23,
+    "input": 14250,
+    "resent": 14100,
+    "new": 150
+   },
+   {
+    "turn": 24,
+    "input": 14800,
+    "resent": 14650,
+    "new": 150
+   },
+   {
+    "turn": 25,
+    "input": 15350,
+    "resent": 15200,
+    "new": 150
+   },
+   {
+    "turn": 26,
+    "input": 15900,
+    "resent": 15750,
+    "new": 150
+   },
+   {
+    "turn": 27,
+    "input": 16450,
+    "resent": 16300,
+    "new": 150
+   },
+   {
+    "turn": 28,
+    "input": 17000,
+    "resent": 16850,
+    "new": 150
+   },
+   {
+    "turn": 29,
+    "input": 17550,
+    "resent": 17400,
+    "new": 150
+   },
+   {
+    "turn": 30,
+    "input": 18100,
+    "resent": 17950,
+    "new": 150
+   },
+   {
+    "turn": 31,
+    "input": 18650,
+    "resent": 18500,
+    "new": 150
+   },
+   {
+    "turn": 32,
+    "input": 19200,
+    "resent": 19050,
+    "new": 150
+   },
+   {
+    "turn": 33,
+    "input": 19750,
+    "resent": 19600,
+    "new": 150
+   },
+   {
+    "turn": 34,
+    "input": 20300,
+    "resent": 20150,
+    "new": 150
+   },
+   {
+    "turn": 35,
+    "input": 20850,
+    "resent": 20700,
+    "new": 150
+   },
+   {
+    "turn": 36,
+    "input": 21400,
+    "resent": 21250,
+    "new": 150
+   },
+   {
+    "turn": 37,
+    "input": 21950,
+    "resent": 21800,
+    "new": 150
+   },
+   {
+    "turn": 38,
+    "input": 22500,
+    "resent": 22350,
+    "new": 150
+   },
+   {
+    "turn": 39,
+    "input": 23050,
+    "resent": 22900,
+    "new": 150
+   },
+   {
+    "turn": 40,
+    "input": 23600,
+    "resent": 23450,
+    "new": 150
+   }
+  ],
+  "totals": [
+   {
+    "turns": 1,
+    "plain": 0.0083,
+    "cached": 0.0083,
+    "saved": 0.0
+   },
+   {
+    "turns": 2,
+    "plain": 0.0177,
+    "cached": 0.013615,
+    "saved": 0.2308
+   },
+   {
+    "turns": 3,
+    "plain": 0.0282,
+    "cached": 0.018985,
+    "saved": 0.3268
+   },
+   {
+    "turns": 4,
+    "plain": 0.0398,
+    "cached": 0.02441,
+    "saved": 0.3867
+   },
+   {
+    "turns": 5,
+    "plain": 0.0525,
+    "cached": 0.02989,
+    "saved": 0.4307
+   },
+   {
+    "turns": 6,
+    "plain": 0.0663,
+    "cached": 0.035425,
+    "saved": 0.4657
+   },
+   {
+    "turns": 7,
+    "plain": 0.0812,
+    "cached": 0.041015,
+    "saved": 0.4949
+   },
+   {
+    "turns": 8,
+    "plain": 0.0972,
+    "cached": 0.04666,
+    "saved": 0.52
+   },
+   {
+    "turns": 9,
+    "plain": 0.1143,
+    "cached": 0.05236,
+    "saved": 0.5419
+   },
+   {
+    "turns": 10,
+    "plain": 0.1325,
+    "cached": 0.058115,
+    "saved": 0.5614
+   },
+   {
+    "turns": 11,
+    "plain": 0.1518,
+    "cached": 0.063925,
+    "saved": 0.5789
+   },
+   {
+    "turns": 12,
+    "plain": 0.1722,
+    "cached": 0.06979,
+    "saved": 0.5947
+   },
+   {
+    "turns": 13,
+    "plain": 0.1937,
+    "cached": 0.07571,
+    "saved": 0.6091
+   },
+   {
+    "turns": 14,
+    "plain": 0.2163,
+    "cached": 0.081685,
+    "saved": 0.6224
+   },
+   {
+    "turns": 15,
+    "plain": 0.24,
+    "cached": 0.087715,
+    "saved": 0.6345
+   },
+   {
+    "turns": 16,
+    "plain": 0.2648,
+    "cached": 0.0938,
+    "saved": 0.6458
+   },
+   {
+    "turns": 17,
+    "plain": 0.2907,
+    "cached": 0.09994,
+    "saved": 0.6562
+   },
+   {
+    "turns": 18,
+    "plain": 0.3177,
+    "cached": 0.106135,
+    "saved": 0.6659
+   },
+   {
+    "turns": 19,
+    "plain": 0.3458,
+    "cached": 0.112385,
+    "saved": 0.675
+   },
+   {
+    "turns": 20,
+    "plain": 0.375,
+    "cached": 0.11869,
+    "saved": 0.6835
+   },
+   {
+    "turns": 21,
+    "plain": 0.4053,
+    "cached": 0.12505,
+    "saved": 0.6915
+   },
+   {
+    "turns": 22,
+    "plain": 0.4367,
+    "cached": 0.131465,
+    "saved": 0.699
+   },
+   {
+    "turns": 23,
+    "plain": 0.4692,
+    "cached": 0.137935,
+    "saved": 0.706
+   },
+   {
+    "turns": 24,
+    "plain": 0.5028,
+    "cached": 0.14446,
+    "saved": 0.7127
+   },
+   {
+    "turns": 25,
+    "plain": 0.5375,
+    "cached": 0.15104,
+    "saved": 0.719
+   },
+   {
+    "turns": 26,
+    "plain": 0.5733,
+    "cached": 0.157675,
+    "saved": 0.725
+   },
+   {
+    "turns": 27,
+    "plain": 0.6102,
+    "cached": 0.164365,
+    "saved": 0.7306
+   },
+   {
+    "turns": 28,
+    "plain": 0.6482,
+    "cached": 0.17111,
+    "saved": 0.736
+   },
+   {
+    "turns": 29,
+    "plain": 0.6873,
+    "cached": 0.17791,
+    "saved": 0.7411
+   },
+   {
+    "turns": 30,
+    "plain": 0.7275,
+    "cached": 0.184765,
+    "saved": 0.746
+   },
+   {
+    "turns": 31,
+    "plain": 0.7688,
+    "cached": 0.191675,
+    "saved": 0.7507
+   },
+   {
+    "turns": 32,
+    "plain": 0.8112,
+    "cached": 0.19864,
+    "saved": 0.7551
+   },
+   {
+    "turns": 33,
+    "plain": 0.8547,
+    "cached": 0.20566,
+    "saved": 0.7594
+   },
+   {
+    "turns": 34,
+    "plain": 0.8993,
+    "cached": 0.212735,
+    "saved": 0.7634
+   },
+   {
+    "turns": 35,
+    "plain": 0.945,
+    "cached": 0.219865,
+    "saved": 0.7673
+   },
+   {
+    "turns": 36,
+    "plain": 0.9918,
+    "cached": 0.22705,
+    "saved": 0.7711
+   },
+   {
+    "turns": 37,
+    "plain": 1.0397,
+    "cached": 0.23429,
+    "saved": 0.7747
+   },
+   {
+    "turns": 38,
+    "plain": 1.0887,
+    "cached": 0.241585,
+    "saved": 0.7781
+   },
+   {
+    "turns": 39,
+    "plain": 1.1388,
+    "cached": 0.248935,
+    "saved": 0.7814
+   },
+   {
+    "turns": 40,
+    "plain": 1.19,
+    "cached": 0.25634,
+    "saved": 0.7846
+   }
+  ],
+  "eightFives": 0.42,
+  "twentyOverTen": 2.8302,
+  "fortyOverTwenty": 3.1733
+ },
+ "thinking": {
+  "model": "sonnet",
+  "in": 2000,
+  "visible": 400,
+  "rows": [
+   {
+    "thinking": 0,
+    "cost": 0.008,
+    "times": 1.0
+   },
+   {
+    "thinking": 500,
+    "cost": 0.013,
+    "times": 1.625
+   },
+   {
+    "thinking": 2000,
+    "cost": 0.028,
+    "times": 3.5
+   },
+   {
+    "thinking": 8000,
+    "cost": 0.088,
+    "times": 11.0
+   },
+   {
+    "thinking": 20000,
+    "cost": 0.208,
+    "times": 26.0
+   }
+  ]
+ },
+ "month": {
+  "workloads": [
+   {
+    "name": "ticket classification",
+    "model": "haiku",
+    "in": 800,
+    "out": 20,
+    "perDay": 40000,
+    "per": 9e-05,
+    "month": 108.0
+   },
+   {
+    "name": "support replies",
+    "model": "haiku",
+    "in": 2000,
+    "out": 350,
+    "perDay": 6000,
+    "per": 0.000375,
+    "month": 67.5
+   },
+   {
+    "name": "document summaries",
+    "model": "sonnet",
+    "in": 12000,
+    "out": 800,
+    "perDay": 900,
+    "per": 0.032,
+    "month": 864.0
+   },
+   {
+    "name": "code review",
+    "model": "opus",
+    "in": 20000,
+    "out": 2000,
+    "perDay": 200,
+    "per": 0.12,
+    "month": 720.0
+   }
+  ],
+  "total": 1759.5,
+  "dominant": "document summaries",
+  "dearestModel": "code review"
+ },
+ "route": {
+  "in": 600,
+  "out": 15,
+  "perDay": 50000,
+  "tiers": [
+   {
+    "model": "haiku",
+    "month": 101.25
+   },
+   {
+    "model": "sonnet",
+    "month": 2025.0
+   },
+   {
+    "model": "opus",
+    "month": 4050.0
+   },
+   {
+    "model": "fable",
+    "month": 10125.0
+   }
+  ],
+  "saving": 3948.75
+ },
+ "cacheLever": {
+  "turns": 40,
+  "plain": 1.19,
+  "cached": 0.25634,
+  "saved": 0.7846
+ },
+ "outputWorth": 5.0,
+ "names": {
+  "fable": "Claude Fable 5.1",
+  "opus": "Claude Opus 5.5",
+  "sonnet": "Claude Sonnet 5.5",
+  "haiku": "Claude Haiku 5.5"
+ },
+ "tokens": {
+  "prompt": [
+   {
+    "id": 11977,
+    "piece": "Where"
+   },
+   {
+    "id": 382,
+    "piece": " is"
+   },
+   {
+    "id": 922,
+    "piece": " my"
+   },
+   {
+    "id": 2569,
+    "piece": " order"
+   },
+   {
+    "id": 30,
+    "piece": "?"
+   },
+   {
+    "id": 1225,
+    "piece": " It"
+   },
+   {
+    "id": 673,
+    "piece": " was"
+   },
+   {
+    "id": 5192,
+    "piece": " due"
+   },
+   {
+    "id": 402,
+    "piece": " on"
+   },
+   {
+    "id": 10715,
+    "piece": " Monday"
+   },
+   {
+    "id": 13,
+    "piece": "."
+   }
+  ],
+  "answer": [
+   {
+    "id": 3206,
+    "piece": "It"
+   },
+   {
+    "id": 29853,
+    "piece": " shipped"
+   },
+   {
+    "id": 4044,
+    "piece": " today"
+   },
+   {
+    "id": 326,
+    "piece": " and"
+   },
+   {
+    "id": 39650,
+    "piece": " arrives"
+   },
+   {
+    "id": 12453,
+    "piece": " Thursday"
+   },
+   {
+    "id": 13,
+    "piece": "."
+   }
+  ]
+ }
+}

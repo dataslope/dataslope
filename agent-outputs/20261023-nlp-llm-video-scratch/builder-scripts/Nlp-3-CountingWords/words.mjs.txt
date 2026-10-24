@@ -1,0 +1,8 @@
+// Prints each word's start time (s) for the given beats of nlp-counting-words.
+import { videoTimeline } from "/home/user/dataslope/video/scripts/lib/video-timeline.mjs";
+const { timeline } = await videoTimeline("nlp-counting-words");
+const want = process.argv.slice(2);
+for (const b of timeline.beats) {
+  if (want.length && !want.includes(b.id)) continue;
+  console.log(`${b.id} ${b.start.toFixed(2)}-${b.end.toFixed(2)}: ` + b.words.map((w) => `${w.text}@${w.start.toFixed(2)}`).join(" "));
+}

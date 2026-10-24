@@ -26,6 +26,34 @@ import { script as dbDesigningSchemasScript } from "./videos/db-designing-schema
 import { DbRelationalHistory } from "./videos/db-relational-history/Video";
 import { script as dbRelationalHistoryScript } from "./videos/db-relational-history/script";
 // Interview prep, Data Analyst: one video per topic page.
+import { LlmTokens } from "./videos/llm-tokens/Video";
+import { script as llmTokensScript } from "./videos/llm-tokens/script";
+import { LlmMeaning } from "./videos/llm-meaning/Video";
+import { script as llmMeaningScript } from "./videos/llm-meaning/script";
+import { LlmGeneration } from "./videos/llm-generation/Video";
+import { script as llmGenerationScript } from "./videos/llm-generation/script";
+import { LlmCost } from "./videos/llm-cost/Video";
+import { script as llmCostScript } from "./videos/llm-cost/script";
+import { LlmBenchmarks } from "./videos/llm-benchmarks/Video";
+import { script as llmBenchmarksScript } from "./videos/llm-benchmarks/script";
+import { NlpWhyTextIsHard } from "./videos/nlp-why-text-is-hard/Video";
+import { script as nlpWhyTextIsHardScript } from "./videos/nlp-why-text-is-hard/script";
+import { NlpCleaningText } from "./videos/nlp-cleaning-text/Video";
+import { script as nlpCleaningTextScript } from "./videos/nlp-cleaning-text/script";
+import { NlpCountingWords } from "./videos/nlp-counting-words/Video";
+import { script as nlpCountingWordsScript } from "./videos/nlp-counting-words/script";
+import { NlpTextToFeatures } from "./videos/nlp-text-to-features/Video";
+import { script as nlpTextToFeaturesScript } from "./videos/nlp-text-to-features/script";
+import { NlpHistory } from "./videos/nlp-history/Video";
+import { script as nlpHistoryScript } from "./videos/nlp-history/script";
+import { LlmAttentionScore } from "./videos/llm-attention-score/Video";
+import { script as llmAttentionScoreScript } from "./videos/llm-attention-score/script";
+import { LlmConversationCost } from "./videos/llm-conversation-cost/Video";
+import { script as llmConversationCostScript } from "./videos/llm-conversation-cost/script";
+import { NlpLemmasAndTags } from "./videos/nlp-lemmas-and-tags/Video";
+import { script as nlpLemmasAndTagsScript } from "./videos/nlp-lemmas-and-tags/script";
+import { NlpZipfsLaw } from "./videos/nlp-zipfs-law/Video";
+import { script as nlpZipfsLawScript } from "./videos/nlp-zipfs-law/script";
 import { DaInterview } from "./videos/da-interview/Video";
 import { script as daInterviewScript } from "./videos/da-interview/script";
 import { DaSql } from "./videos/da-sql/Video";
@@ -548,6 +576,152 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(dbRelationalHistoryScript)}
+      />
+    </Folder>
+    <Folder name="How-LLMs-Work">
+      {/* How Large Language Models Work: one video per unit, in course order, narrated by Drew. */}
+      <Composition
+        id="Llm-1-Tokens"
+        component={LlmTokens}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(llmTokensScript)}
+      />
+      <Composition
+        id="Llm-2-Meaning"
+        component={LlmMeaning}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(llmMeaningScript)}
+      />
+      <Composition
+        id="Llm-2-1-AttentionScore"
+        component={LlmAttentionScore}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(llmAttentionScoreScript)}
+      />
+      <Composition
+        id="Llm-3-Generation"
+        component={LlmGeneration}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(llmGenerationScript)}
+      />
+      <Composition
+        id="Llm-4-Cost"
+        component={LlmCost}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(llmCostScript)}
+      />
+      <Composition
+        id="Llm-4-1-ConversationCost"
+        component={LlmConversationCost}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(llmConversationCostScript)}
+      />
+      <Composition
+        id="Llm-5-Benchmarks"
+        component={LlmBenchmarks}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(llmBenchmarksScript)}
+      />
+    </Folder>
+    <Folder name="NLP-Python">
+      {/* Natural Language Processing with Python: one video per unit, in course order, narrated by Hope. */}
+      <Composition
+        id="Nlp-1-WhyTextIsHard"
+        component={NlpWhyTextIsHard}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(nlpWhyTextIsHardScript)}
+      />
+      <Composition
+        id="Nlp-2-CleaningText"
+        component={NlpCleaningText}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(nlpCleaningTextScript)}
+      />
+      <Composition
+        id="Nlp-2-1-LemmasAndTags"
+        component={NlpLemmasAndTags}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(nlpLemmasAndTagsScript)}
+      />
+      <Composition
+        id="Nlp-3-CountingWords"
+        component={NlpCountingWords}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(nlpCountingWordsScript)}
+      />
+      <Composition
+        id="Nlp-3-1-ZipfsLaw"
+        component={NlpZipfsLaw}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(nlpZipfsLawScript)}
+      />
+      <Composition
+        id="Nlp-4-TextToFeatures"
+        component={NlpTextToFeatures}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(nlpTextToFeaturesScript)}
+      />
+      <Composition
+        id="Nlp-5-History"
+        component={NlpHistory}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(nlpHistoryScript)}
       />
     </Folder>
     <Folder name="Interview-Data-Analyst">

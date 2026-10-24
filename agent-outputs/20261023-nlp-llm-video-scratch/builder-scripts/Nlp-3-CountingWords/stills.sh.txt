@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Renders stills of Nlp-3-CountingWords at the given frames, one at a time, through the queue.
+cd /home/user/dataslope/video
+export REMOTION_BROWSER_EXECUTABLE=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
+for f in "$@"; do
+  out/render-slot.sh npx remotion still out/entries/Nlp-3-CountingWords.tsx Nlp-3-CountingWords out/Nlp-3-CountingWords-f$f.png --frame=$f --scale=1 2>&1 | grep -E "rror" | head -3
+  echo "f$f done"
+done

@@ -1,0 +1,27 @@
+// Scratch: bundle out/entries/Llm-4-Cost.tsx once and render stills at the
+// given times (seconds), at --scale=1, into out/Llm-4-Cost-t<sec>.png.
+// Run from video/: node <this> 20.5 42.2 ...
+import { createRequire } from "node:module";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+
+const VIDEO = "/home/user/dataslope/video";
+const req = createRequire(path.join(VIDEO, "package.json"));
+const { bundle } = await import(pathToFileURL(req.resolve("@remotion/bundler")).href);
+const { selectComposition, renderStill } = await import(pathToFileURL(req.resolve("@remotion/renderer")).href);
+const { rmSync } = await import("node:fs");
+
+const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE ?? null;
+const serveUrl = await bundle({ entryPoint: path.join(VIDEO, "out/entries/Llm-4-Cost.tsx") });
+try {
+  const composition = await selectComposition({ serveUrl, id: "Llm-4-Cost", inputProps: {}, browserExecutable });
+  console.log(`duration ${(composition.durationInFrames / composition.fps).toFixed(1)} s`);
+  for (const arg of process.argv.slice(2)) {
+    const frame = Math.min(composition.durationInFrames - 1, Math.round(Number(arg) * composition.fps));
+    const output = path.join(VIDEO, "out", `Llm-4-Cost-t${arg}.png`);
+    await renderStill({ serveUrl, composition, frame, output, scale: 1, inputProps: {}, browserExecutable, overwrite: true });
+    console.log(output);
+  }
+} finally {
+  rmSync(serveUrl, { recursive: true, force: true });
+}

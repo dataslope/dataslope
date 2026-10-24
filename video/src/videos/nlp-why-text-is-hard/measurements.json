@@ -1,0 +1,341 @@
+{
+  "env": {
+    "python": "3.13.16",
+    "nltk": "3.9.4"
+  },
+  "hook": {
+    "text": "I can't believe Dr. Smith's startup raised $2.5M, it's unreal!",
+    "chars": 62,
+    "split": [
+      "I",
+      "can't",
+      "believe",
+      "Dr.",
+      "Smith's",
+      "startup",
+      "raised",
+      "$2.5M,",
+      "it's",
+      "unreal!"
+    ],
+    "tokens": [
+      "I",
+      "ca",
+      "n't",
+      "believe",
+      "Dr.",
+      "Smith",
+      "'s",
+      "startup",
+      "raised",
+      "$",
+      "2.5M",
+      ",",
+      "it",
+      "'s",
+      "unreal",
+      "!"
+    ],
+    "tokenPiece": [
+      0,
+      1,
+      1,
+      2,
+      3,
+      4,
+      4,
+      5,
+      6,
+      7,
+      7,
+      7,
+      8,
+      8,
+      9,
+      9
+    ],
+    "sentences": 1
+  },
+  "split": {
+    "text": "I can't believe it's not butter, Mr. Jones!",
+    "pieces": [
+      "I",
+      "can't",
+      "believe",
+      "it's",
+      "not",
+      "butter,",
+      "Mr.",
+      "Jones!"
+    ],
+    "tokens": [
+      "I",
+      "ca",
+      "n't",
+      "believe",
+      "it",
+      "'s",
+      "not",
+      "butter",
+      ",",
+      "Mr.",
+      "Jones",
+      "!"
+    ],
+    "tokenPiece": [
+      0,
+      1,
+      1,
+      2,
+      3,
+      3,
+      4,
+      5,
+      5,
+      6,
+      7,
+      7
+    ]
+  },
+  "pipeline": {
+    "text": "The Cats are RUNNING quickly, and the dogs are barking loudly!",
+    "stages": [
+      {
+        "name": "tokenized",
+        "tokens": [
+          "The",
+          "Cats",
+          "are",
+          "RUNNING",
+          "quickly",
+          ",",
+          "and",
+          "the",
+          "dogs",
+          "are",
+          "barking",
+          "loudly",
+          "!"
+        ],
+        "cols": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "name": "lowercased",
+        "tokens": [
+          "the",
+          "cats",
+          "are",
+          "running",
+          "quickly",
+          ",",
+          "and",
+          "the",
+          "dogs",
+          "are",
+          "barking",
+          "loudly",
+          "!"
+        ],
+        "cols": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      {
+        "name": "cleaned",
+        "tokens": [
+          "the",
+          "cats",
+          "are",
+          "running",
+          "quickly",
+          "and",
+          "the",
+          "dogs",
+          "are",
+          "barking",
+          "loudly"
+        ],
+        "cols": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      },
+      {
+        "name": "no stops",
+        "tokens": [
+          "cats",
+          "running",
+          "quickly",
+          "dogs",
+          "barking",
+          "loudly"
+        ],
+        "cols": [
+          1,
+          3,
+          4,
+          8,
+          10,
+          11
+        ]
+      },
+      {
+        "name": "lemmatized",
+        "tokens": [
+          "cat",
+          "running",
+          "quickly",
+          "dog",
+          "barking",
+          "loudly"
+        ],
+        "cols": [
+          1,
+          3,
+          4,
+          8,
+          10,
+          11
+        ]
+      }
+    ],
+    "asVerb": {
+      "running": "run",
+      "barking": "bark"
+    }
+  },
+  "layers": {
+    "chars": "Cats are RUNNING",
+    "tokens": [
+      "Cats",
+      "are",
+      "RUNNING"
+    ],
+    "normalized": [
+      "cats",
+      "are",
+      "running"
+    ],
+    "tags": [
+      "NNS",
+      "VBP",
+      "VBG"
+    ],
+    "tagNames": [
+      "noun",
+      "verb",
+      "verb"
+    ],
+    "counts": [
+      [
+        "cats",
+        1
+      ],
+      [
+        "are",
+        1
+      ],
+      [
+        "running",
+        1
+      ]
+    ]
+  },
+  "order": {
+    "text": "The The THE end is near",
+    "tokens": [
+      "The",
+      "The",
+      "THE",
+      "end",
+      "is",
+      "near"
+    ],
+    "a": {
+      "lowered": [
+        "the",
+        "the",
+        "the",
+        "end",
+        "is",
+        "near"
+      ],
+      "filtered": [
+        "end",
+        "near"
+      ]
+    },
+    "b": {
+      "filtered": [
+        "The",
+        "The",
+        "THE",
+        "end",
+        "near"
+      ],
+      "lowered": [
+        "the",
+        "the",
+        "the",
+        "end",
+        "near"
+      ]
+    }
+  },
+  "stopwords": {
+    "count": 198,
+    "first": [
+      "a",
+      "about",
+      "above",
+      "after",
+      "again",
+      "against"
+    ],
+    "has": {
+      "the": true,
+      "is": true,
+      "are": true,
+      "and": true,
+      "not": true,
+      "The": false,
+      "THE": false
+    },
+    "allLowercase": true
+  }
+}

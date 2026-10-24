@@ -1,0 +1,577 @@
+{
+ "versions": {
+  "numpy": "2.4.6",
+  "tiktoken": "0.12.0"
+ },
+ "ids": {
+  "encoding": "o200k_base",
+  "vocab": 200019,
+  "berry": 19772,
+  "cherry": 60225,
+  "teeth": 19770,
+  "neighbours": [
+   {
+    "id": 19768,
+    "piece": "\u09c7\u0995\u09c7"
+   },
+   {
+    "id": 19769,
+    "piece": "idor"
+   },
+   {
+    "id": 19770,
+    "piece": " teeth"
+   },
+   {
+    "id": 19771,
+    "piece": "\ufffd\u0e23\u0e14\u0e34\u0e15"
+   },
+   {
+    "id": 19772,
+    "piece": "berry"
+   },
+   {
+    "id": 19773,
+    "piece": "\u0561\u057e\u0578\u0580"
+   },
+   {
+    "id": 19774,
+    "piece": ".Show"
+   },
+   {
+    "id": 19775,
+    "piece": ".ad"
+   },
+   {
+    "id": 19776,
+    "piece": "\u17d2\u179a\ufffd"
+   }
+  ]
+ },
+ "prompt": {
+  "text": "the cat sat on the mat",
+  "tokens": [
+   {
+    "id": 3086,
+    "piece": "the"
+   },
+   {
+    "id": 9059,
+    "piece": " cat"
+   },
+   {
+    "id": 10139,
+    "piece": " sat"
+   },
+   {
+    "id": 402,
+    "piece": " on"
+   },
+   {
+    "id": 290,
+    "piece": " the"
+   },
+   {
+    "id": 2450,
+    "piece": " mat"
+   }
+  ]
+ },
+ "space": {
+  "axes": [
+   "animal",
+   "size",
+   "domestic"
+  ],
+  "words": [
+   {
+    "word": "cat",
+    "vec": [
+     0.9,
+     0.2,
+     0.9
+    ],
+    "dist": 0.0
+   },
+   {
+    "word": "dog",
+    "vec": [
+     0.9,
+     0.4,
+     0.9
+    ],
+    "dist": 0.2
+   },
+   {
+    "word": "wolf",
+    "vec": [
+     0.9,
+     0.5,
+     0.1
+    ],
+    "dist": 0.854
+   },
+   {
+    "word": "kitten",
+    "vec": [
+     0.9,
+     0.1,
+     0.9
+    ],
+    "dist": 0.1
+   },
+   {
+    "word": "truck",
+    "vec": [
+     0.0,
+     0.9,
+     0.2
+    ],
+    "dist": 1.338
+   }
+  ],
+  "nearest": [
+   "kitten",
+   "dog",
+   "wolf",
+   "truck"
+  ]
+ },
+ "order": {
+  "sentences": [
+   [
+    "dog",
+    "bites",
+    "man"
+   ],
+   [
+    "man",
+    "bites",
+    "dog"
+   ]
+  ],
+  "vectors": [
+   [
+    {
+     "word": "dog",
+     "vec": [
+      0.9,
+      0.2
+     ]
+    },
+    {
+     "word": "bites",
+     "vec": [
+      0.1,
+      0.8
+     ]
+    },
+    {
+     "word": "man",
+     "vec": [
+      0.5,
+      0.5
+     ]
+    }
+   ],
+   [
+    {
+     "word": "man",
+     "vec": [
+      0.5,
+      0.5
+     ]
+    },
+    {
+     "word": "bites",
+     "vec": [
+      0.1,
+      0.8
+     ]
+    },
+    {
+     "word": "dog",
+     "vec": [
+      0.9,
+      0.2
+     ]
+    }
+   ]
+  ],
+  "position": [
+   [
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.1
+   ],
+   [
+    0.0,
+    0.2
+   ]
+  ],
+  "positioned": [
+   [
+    {
+     "word": "dog",
+     "vec": [
+      0.9,
+      0.2
+     ]
+    },
+    {
+     "word": "bites",
+     "vec": [
+      0.1,
+      0.9
+     ]
+    },
+    {
+     "word": "man",
+     "vec": [
+      0.5,
+      0.7
+     ]
+    }
+   ],
+   [
+    {
+     "word": "man",
+     "vec": [
+      0.5,
+      0.5
+     ]
+    },
+    {
+     "word": "bites",
+     "vec": [
+      0.1,
+      0.9
+     ]
+    },
+    {
+     "word": "dog",
+     "vec": [
+      0.9,
+      0.4
+     ]
+    }
+   ]
+  ],
+  "sum": [
+   [
+    1.5,
+    1.5
+   ],
+   [
+    1.5,
+    1.5
+   ]
+  ],
+  "positionedSum": [
+   [
+    1.5,
+    1.8
+   ],
+   [
+    1.5,
+    1.8
+   ]
+  ]
+ },
+ "cosine": {
+  "short": [
+   1.0,
+   1.0
+  ],
+  "long": [
+   5.0,
+   5.0
+  ],
+  "other": [
+   1.0,
+   -1.0
+  ],
+  "euclid": 5.657,
+  "lengthRatio": 5.0,
+  "cosLong": 1.0,
+  "cosOther": 0.0,
+  "cosOpposite": -1.0,
+  "angleOther": 90.0
+ },
+ "search": {
+  "axes": [
+   "finance",
+   "weather",
+   "sport",
+   "cooking"
+  ],
+  "docs": [
+   {
+    "text": "Quarterly revenue rose twelve percent",
+    "vec": [
+     0.9,
+     0.0,
+     0.1,
+     0.0
+    ],
+    "score": 0.993
+   },
+   {
+    "text": "Heavy rain expected across the region",
+    "vec": [
+     0.0,
+     0.9,
+     0.1,
+     0.0
+    ],
+    "score": 0.0
+   },
+   {
+    "text": "The match finished two goals to one",
+    "vec": [
+     0.0,
+     0.1,
+     0.9,
+     0.0
+    ],
+    "score": 0.0
+   },
+   {
+    "text": "Simmer the sauce for twenty minutes",
+    "vec": [
+     0.0,
+     0.0,
+     0.0,
+     0.9
+    ],
+    "score": 0.053
+   },
+   {
+    "text": "Earnings beat analyst expectations",
+    "vec": [
+     0.85,
+     0.0,
+     0.0,
+     0.1
+    ],
+    "score": 0.998
+   }
+  ],
+  "question": "How did the company perform financially?",
+  "query": [
+   0.95,
+   0.0,
+   0.0,
+   0.05
+  ],
+  "ranked": [
+   {
+    "text": "Earnings beat analyst expectations",
+    "score": 0.998
+   },
+   {
+    "text": "Quarterly revenue rose twelve percent",
+    "score": 0.993
+   },
+   {
+    "text": "Simmer the sauce for twenty minutes",
+    "score": 0.053
+   },
+   {
+    "text": "The match finished two goals to one",
+    "score": 0.0
+   },
+   {
+    "text": "Heavy rain expected across the region",
+    "score": 0.0
+   }
+  ],
+  "top": "Earnings beat analyst expectations",
+  "sharedWords": []
+ },
+ "weights": {
+  "tokens": [
+   "the",
+   "trophy",
+   "did",
+   "not",
+   "fit",
+   "because",
+   "it"
+  ],
+  "raw": [
+   0.1,
+   3.2,
+   0.1,
+   0.2,
+   1.1,
+   0.3,
+   0.5
+  ],
+  "weights": [
+   0.033,
+   0.722,
+   0.033,
+   0.036,
+   0.088,
+   0.04,
+   0.049
+  ],
+  "sum": 1.0
+ },
+ "qkv": {
+  "tokens": [
+   "trophy",
+   "suitcase",
+   "it"
+  ],
+  "dim": 2,
+  "keys": [
+   [
+    1.0,
+    0.2
+   ],
+   [
+    0.3,
+    1.0
+   ],
+   [
+    0.1,
+    0.1
+   ]
+  ],
+  "values": [
+   [
+    10.0,
+    0.0
+   ],
+   [
+    0.0,
+    10.0
+   ],
+   [
+    1.0,
+    1.0
+   ]
+  ],
+  "trophy": {
+   "query": [
+    1.0,
+    0.1
+   ],
+   "dots": [
+    1.02,
+    0.4,
+    0.11
+   ],
+   "scores": [
+    0.721,
+    0.283,
+    0.078
+   ],
+   "weights": [
+    0.461,
+    0.297,
+    0.242
+   ],
+   "weightSum": 1.0,
+   "output": [
+    4.849,
+    3.214
+   ]
+  },
+  "suitcase": {
+   "query": [
+    0.2,
+    1.0
+   ],
+   "dots": [
+    0.4,
+    1.06,
+    0.12
+   ],
+   "scores": [
+    0.283,
+    0.75,
+    0.085
+   ],
+   "weights": [
+    0.293,
+    0.467,
+    0.24
+   ],
+   "weightSum": 1.0,
+   "output": [
+    3.168,
+    4.91
+   ]
+  }
+ },
+ "cost": [
+  {
+   "n": 10,
+   "scores": 100
+  },
+  {
+   "n": 20,
+   "scores": 400
+  }
+ ],
+ "params": {
+  "vocab": 128000,
+  "dModel": 4096,
+  "layers": 32,
+  "dFf": 14336,
+  "parts": [
+   {
+    "name": "Embedding table",
+    "b": 0.52
+   },
+   {
+    "name": "Attention",
+    "b": 2.15
+   },
+   {
+    "name": "Feed-forward",
+    "b": 3.76
+   },
+   {
+    "name": "Output projection",
+    "b": 0.52
+   }
+  ],
+  "total": 6.95,
+  "ffShare": 54
+ },
+ "moe": {
+  "deepseek": {
+   "total": 671,
+   "active": 37,
+   "share": 5.5
+  },
+  "illustrative": {
+   "stored": 77.3,
+   "used": 2.4,
+   "share": 3.1,
+   "experts": 128,
+   "active": 4
+  }
+ },
+ "logits": {
+  "tokens": [
+   "cat",
+   "dog",
+   "bird",
+   "rock"
+  ],
+  "scores": [
+   3.2,
+   2.1,
+   1.5,
+   -0.4
+  ]
+ }
+}

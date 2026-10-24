@@ -1,0 +1,10 @@
+10:03 started: briefs read
+10:09 resumed after container restart (nothing but reading had been done)
+10:18 measure.py + script drafted (1792 chars); art batch submitted (goldfish, receipt)
+10:43 scenes built (Hook, Stairs, Bills, Cache, Fresh); tsc+eslint clean for folder; check:cues clean; stills queued
+13:58 resumed after usage pause; art batch stalled 3h40m: cancelled, sync fallback running
+13:59 art imported (sync): goldfish 1131x1016, receipt 1280x1016, both look right
+14:30 stills reviewed and fixed (zoom timing, cache layout, labels); voicing
+14:31 voiced: 1 take, 1792 chars
+15:04 check:sync pass (worst +0.03 s), check:frames pass, check:mix 27.9 LU under; check:motion had 4 stills >=3 s, fixed, re-running
+15:08 check:motion pass (longest still 2.8 s); all checks done

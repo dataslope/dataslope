@@ -1,0 +1,595 @@
+{
+  "versions": {
+    "python": "3.13.16",
+    "nltk": "3.9.4"
+  },
+  "defaults": [
+    {
+      "word": "running",
+      "lemma": "running"
+    },
+    {
+      "word": "ran",
+      "lemma": "ran"
+    },
+    {
+      "word": "was",
+      "lemma": "wa"
+    }
+  ],
+  "defaultPos": "n",
+  "runningNoun": {
+    "inWordnet": true,
+    "senses": [
+      "(American football) a play in which a player attempts to carry the ball through or past the opposing team",
+      "the act of running; traveling on foot at a fast pace",
+      "the state of being in operation",
+      "the act of administering or being in charge of something",
+      "the act of participating in an athletic competition involving running on a track"
+    ]
+  },
+  "rules": {
+    "n": [
+      [
+        "s",
+        ""
+      ],
+      [
+        "ses",
+        "s"
+      ],
+      [
+        "ves",
+        "f"
+      ],
+      [
+        "xes",
+        "x"
+      ],
+      [
+        "zes",
+        "z"
+      ],
+      [
+        "ches",
+        "ch"
+      ],
+      [
+        "shes",
+        "sh"
+      ],
+      [
+        "men",
+        "man"
+      ],
+      [
+        "ies",
+        "y"
+      ]
+    ],
+    "v": [
+      [
+        "s",
+        ""
+      ],
+      [
+        "ies",
+        "y"
+      ],
+      [
+        "es",
+        "e"
+      ],
+      [
+        "es",
+        ""
+      ],
+      [
+        "ed",
+        "e"
+      ],
+      [
+        "ed",
+        ""
+      ],
+      [
+        "ing",
+        "e"
+      ],
+      [
+        "ing",
+        ""
+      ]
+    ],
+    "a": [
+      [
+        "er",
+        ""
+      ],
+      [
+        "est",
+        ""
+      ],
+      [
+        "er",
+        "e"
+      ],
+      [
+        "est",
+        "e"
+      ]
+    ],
+    "r": []
+  },
+  "exceptionCounts": {
+    "n": 2050,
+    "v": 2401,
+    "a": 1489,
+    "r": 7
+  },
+  "traces": [
+    {
+      "word": "ran",
+      "pos": "v",
+      "posName": "verb",
+      "listed": [
+        "run"
+      ],
+      "guesses": [],
+      "checked": [
+        {
+          "form": "ran",
+          "inWordnet": false
+        },
+        {
+          "form": "run",
+          "inWordnet": true
+        }
+      ],
+      "kept": [
+        "run"
+      ],
+      "result": "run",
+      "unchanged": false
+    },
+    {
+      "word": "was",
+      "pos": "v",
+      "posName": "verb",
+      "listed": [
+        "be"
+      ],
+      "guesses": [],
+      "checked": [
+        {
+          "form": "was",
+          "inWordnet": false
+        },
+        {
+          "form": "be",
+          "inWordnet": true
+        }
+      ],
+      "kept": [
+        "be"
+      ],
+      "result": "be",
+      "unchanged": false
+    },
+    {
+      "word": "better",
+      "pos": "a",
+      "posName": "adjective",
+      "listed": [
+        "good",
+        "well"
+      ],
+      "guesses": [],
+      "checked": [
+        {
+          "form": "better",
+          "inWordnet": true
+        },
+        {
+          "form": "good",
+          "inWordnet": true
+        },
+        {
+          "form": "well",
+          "inWordnet": true
+        }
+      ],
+      "kept": [
+        "better",
+        "good",
+        "well"
+      ],
+      "result": "good",
+      "unchanged": false
+    },
+    {
+      "word": "was",
+      "pos": "n",
+      "posName": "noun",
+      "listed": null,
+      "guesses": [
+        {
+          "rule": [
+            "s",
+            ""
+          ],
+          "form": "wa"
+        }
+      ],
+      "checked": [
+        {
+          "form": "was",
+          "inWordnet": false
+        },
+        {
+          "form": "wa",
+          "inWordnet": true
+        }
+      ],
+      "kept": [
+        "wa"
+      ],
+      "result": "wa",
+      "unchanged": false
+    },
+    {
+      "word": "running",
+      "pos": "n",
+      "posName": "noun",
+      "listed": null,
+      "guesses": [],
+      "checked": [
+        {
+          "form": "running",
+          "inWordnet": true
+        }
+      ],
+      "kept": [
+        "running"
+      ],
+      "result": "running",
+      "unchanged": false
+    },
+    {
+      "word": "ran",
+      "pos": "n",
+      "posName": "noun",
+      "listed": null,
+      "guesses": [],
+      "checked": [
+        {
+          "form": "ran",
+          "inWordnet": false
+        }
+      ],
+      "kept": [],
+      "result": "ran",
+      "unchanged": true
+    }
+  ],
+  "wa": [
+    {
+      "synset": "washington.n.02",
+      "definition": "a state in northwestern United States on the Pacific",
+      "lemmas": [
+        "Washington",
+        "Evergreen_State",
+        "WA"
+      ]
+    }
+  ],
+  "sentence": {
+    "text": "The runners were running and they had eaten well.",
+    "tokens": [
+      "The",
+      "runners",
+      "were",
+      "running",
+      "and",
+      "they",
+      "had",
+      "eaten",
+      "well",
+      "."
+    ],
+    "tags": [
+      "DT",
+      "NNS",
+      "VBD",
+      "VBG",
+      "CC",
+      "PRP",
+      "VBD",
+      "VBN",
+      "RB",
+      "."
+    ],
+    "letters": [
+      "D",
+      "N",
+      "V",
+      "V",
+      "C",
+      "P",
+      "V",
+      "V",
+      "R",
+      "."
+    ],
+    "wordnetPos": [
+      "n",
+      "n",
+      "v",
+      "v",
+      "n",
+      "n",
+      "v",
+      "v",
+      "r",
+      "n"
+    ],
+    "naive": [
+      "The",
+      "runner",
+      "were",
+      "running",
+      "and",
+      "they",
+      "had",
+      "eaten",
+      "well",
+      "."
+    ],
+    "aware": [
+      "The",
+      "runner",
+      "be",
+      "run",
+      "and",
+      "they",
+      "have",
+      "eat",
+      "well",
+      "."
+    ],
+    "porter": [
+      "the",
+      "runner",
+      "were",
+      "run",
+      "and",
+      "they",
+      "had",
+      "eaten",
+      "well",
+      "."
+    ],
+    "mapping": {
+      "JJ": "a",
+      "JJR": "a",
+      "VB": "v",
+      "VBD": "v",
+      "RB": "r",
+      "NN": "n",
+      "NNS": "n",
+      "DT": "n",
+      "PRP": "n",
+      ".": "n"
+    },
+    "paths": [
+      {
+        "word": "The",
+        "pos": "n",
+        "posName": "noun",
+        "listed": null,
+        "guesses": [],
+        "checked": [
+          {
+            "form": "The",
+            "inWordnet": false
+          }
+        ],
+        "kept": [],
+        "result": "The",
+        "unchanged": true
+      },
+      {
+        "word": "runners",
+        "pos": "n",
+        "posName": "noun",
+        "listed": null,
+        "guesses": [
+          {
+            "rule": [
+              "s",
+              ""
+            ],
+            "form": "runner"
+          }
+        ],
+        "checked": [
+          {
+            "form": "runners",
+            "inWordnet": false
+          },
+          {
+            "form": "runner",
+            "inWordnet": true
+          }
+        ],
+        "kept": [
+          "runner"
+        ],
+        "result": "runner",
+        "unchanged": false
+      },
+      {
+        "word": "were",
+        "pos": "v",
+        "posName": "verb",
+        "listed": [
+          "be"
+        ],
+        "guesses": [],
+        "checked": [
+          {
+            "form": "were",
+            "inWordnet": false
+          },
+          {
+            "form": "be",
+            "inWordnet": true
+          }
+        ],
+        "kept": [
+          "be"
+        ],
+        "result": "be",
+        "unchanged": false
+      },
+      {
+        "word": "running",
+        "pos": "v",
+        "posName": "verb",
+        "listed": [
+          "run"
+        ],
+        "guesses": [],
+        "checked": [
+          {
+            "form": "running",
+            "inWordnet": false
+          },
+          {
+            "form": "run",
+            "inWordnet": true
+          }
+        ],
+        "kept": [
+          "run"
+        ],
+        "result": "run",
+        "unchanged": false
+      },
+      {
+        "word": "and",
+        "pos": "n",
+        "posName": "noun",
+        "listed": null,
+        "guesses": [],
+        "checked": [
+          {
+            "form": "and",
+            "inWordnet": false
+          }
+        ],
+        "kept": [],
+        "result": "and",
+        "unchanged": true
+      },
+      {
+        "word": "they",
+        "pos": "n",
+        "posName": "noun",
+        "listed": null,
+        "guesses": [],
+        "checked": [
+          {
+            "form": "they",
+            "inWordnet": false
+          }
+        ],
+        "kept": [],
+        "result": "they",
+        "unchanged": true
+      },
+      {
+        "word": "had",
+        "pos": "v",
+        "posName": "verb",
+        "listed": [
+          "have"
+        ],
+        "guesses": [],
+        "checked": [
+          {
+            "form": "had",
+            "inWordnet": false
+          },
+          {
+            "form": "have",
+            "inWordnet": true
+          }
+        ],
+        "kept": [
+          "have"
+        ],
+        "result": "have",
+        "unchanged": false
+      },
+      {
+        "word": "eaten",
+        "pos": "v",
+        "posName": "verb",
+        "listed": [
+          "eat"
+        ],
+        "guesses": [],
+        "checked": [
+          {
+            "form": "eaten",
+            "inWordnet": false
+          },
+          {
+            "form": "eat",
+            "inWordnet": true
+          }
+        ],
+        "kept": [
+          "eat"
+        ],
+        "result": "eat",
+        "unchanged": false
+      },
+      {
+        "word": "well",
+        "pos": "r",
+        "posName": "adverb",
+        "listed": null,
+        "guesses": [],
+        "checked": [
+          {
+            "form": "well",
+            "inWordnet": true
+          }
+        ],
+        "kept": [
+          "well"
+        ],
+        "result": "well",
+        "unchanged": false
+      },
+      {
+        "word": ".",
+        "pos": "n",
+        "posName": "noun",
+        "listed": null,
+        "guesses": [],
+        "checked": [
+          {
+            "form": ".",
+            "inWordnet": false
+          }
+        ],
+        "kept": [],
+        "result": ".",
+        "unchanged": true
+      }
+    ]
+  }
+}

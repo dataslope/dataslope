@@ -1,0 +1,11 @@
+2026-10-23T10:03:31Z started, reading briefs
+2026-10-23T10:09:27Z resumed after container restart (nothing built yet; reading done)
+2026-10-23T10:12:02Z art submitted (batch: sieve, balance)
+2026-10-23T10:40:01Z script drafted (1653 chars), scenes built; typecheck+lint clean; check:cues ok; stills queued
+2026-10-23T13:58:44Z resumed after usage pause; art batch stalled 3h46m at 0/2: cancelled, running sync fallback
+2026-10-23T14:00:21Z art imported (sieve, balance via sync fallback; batch cancelled); stills reviewed, fixes applied
+2026-10-23T14:01:47Z voiced: 1 take, 1653 chars
+2026-10-23T14:10:55Z check:frames passed (3 images, largest stretch 0.48)
+2026-10-23T14:21:12Z check:sync passed (worst +0.03 s, straight)
+2026-10-23T14:34:58Z check:mix 22.4 LU under; check:motion failed once (3.0 s at 1:30.5), fixed, re-running
+2026-10-23T14:49:12Z check:motion passed (longest still 2.8 s); report written; done

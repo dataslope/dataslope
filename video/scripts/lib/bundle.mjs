@@ -6,6 +6,7 @@
  * disk on a day of many checks (236 of them, 13 GB).
  */
 import { rmSync } from "node:fs";
+import path from "node:path";
 
 const made = new Set();
 const removeAll = () => {
@@ -26,10 +27,17 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
   });
 }
 
-/** bundle({ entryPoint }), with the bundle removed when this process exits. */
+/**
+ * bundle({ entryPoint }), with the bundle removed when this process exits.
+ *
+ * VIDEO_ENTRY, when set, replaces the entry point: a file that registers one
+ * composition on its own, as Root.tsx does. Several videos built at once share
+ * Root.tsx, so one half-written folder breaks every bundle of it; a private
+ * entry keeps a video's checks running while the others are mid-edit.
+ */
 export async function bundleVideo(entryPoint) {
   const { bundle } = await import("@remotion/bundler");
-  const serveUrl = await bundle({ entryPoint });
+  const serveUrl = await bundle({ entryPoint: process.env.VIDEO_ENTRY ? path.resolve(process.env.VIDEO_ENTRY) : entryPoint });
   made.add(serveUrl);
   return serveUrl;
 }

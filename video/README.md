@@ -29,13 +29,19 @@ Every video is 16:9 and drawn in the **editorial** style described below.
 | `JavaEquality` | `==` or `.equals()`, with the stack, the heap and the `Integer` cache |
 | `SimpsonsParadox` | Berkeley's 1973 admissions: women ahead in most departments, behind overall |
 
-Two courses have one video per unit, each in its own Studio folder, with
+Four courses have one video per unit, each in its own Studio folder, with
 ids that sort in course order:
 
 | Folder | Compositions |
 | --- | --- |
 | `Statistics` | `Stats-1-ThinkingStatistically` to `Stats-9-StatisticsInPractice`. Unit 5 is `Stats-5-Sampling`, one video made of its five parts, `Stats-5-1-SamplingBias` to `Stats-5-5-StandardError`, which also render on their own |
 | `Database-Design` | `DbDesign-1-WhyDesign` to `DbDesign-9-RelationalHistory` |
+| `How-LLMs-Work` | `Llm-1-Tokens` to `Llm-5-Benchmarks`, narrated by Drew, with two deep dives: `Llm-2-1-AttentionScore` (one attention score worked through) and `Llm-4-1-ConversationCost` (why a chat's bill grows faster than the chat) |
+| `NLP-Python` | `Nlp-1-WhyTextIsHard` to `Nlp-5-History`, narrated by Hope, with two deep dives: `Nlp-2-1-LemmasAndTags` (lemmatizing needs the part of speech) and `Nlp-3-1-ZipfsLaw` (Zipf's law read off a log-log plot) |
+
+A deep dive (`Llm-2-1-…`) is a two-minute video on one idea its unit could
+only sketch, embedded at one lesson section beside the unit video. It has no
+series intro and no "Next" line, and sits after its unit in the Studio folder.
 
 A course video's id is not its folder name (`Stats-2-DescribingData` lives in
 `src/videos/describing-data/`). The check scripts take either; `remotion
@@ -714,3 +720,18 @@ with no ffmpeg filters and no Python, so they run the same on Windows. The
 loudness and pause detection are checked against ffmpeg's `ebur128` and
 `silencedetect` (the same pauses to 1 ms) and pinned by
 `scripts/lib/audio.test.mjs` under `npm test`.
+
+**Checking one video while others are mid-edit.** Every render check bundles
+`src/index.ts`, which imports every video through `src/Root.tsx`, so one
+half-written folder breaks the bundle for all of them. `VIDEO_ENTRY` points
+the checks at an entry that registers one composition on its own instead (a
+copy of its `<Composition>` from Root.tsx, kept under `out/`); the Remotion
+CLI takes the same file as its first argument:
+
+```bash
+VIDEO_ENTRY=out/entries/Llm-1-Tokens.tsx npm run check:frames -- Llm-1-Tokens
+npx remotion still out/entries/Llm-1-Tokens.tsx Llm-1-Tokens out/f300.png --frame=300
+```
+
+The composition still has to be registered in Root.tsx, which is where the
+checks look up its folder.

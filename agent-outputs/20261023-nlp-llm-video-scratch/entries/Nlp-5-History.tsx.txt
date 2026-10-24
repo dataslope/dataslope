@@ -1,0 +1,26 @@
+// Scratch (gitignored): registers Nlp-5-History alone, exactly as Root.tsx does, so
+// its builder can render and check it while other videos are mid-edit.
+// Use: VIDEO_ENTRY=out/entries/Nlp-5-History.tsx npm run check:frames -- Nlp-5-History
+//      npx remotion still out/entries/Nlp-5-History.tsx Nlp-5-History out/x.png --frame=300
+import React from "react";
+import { Composition, registerRoot } from "remotion";
+import "../../src/theme/brand";
+import "../../src/theme/fonts";
+import { narratedMetadata } from "../../src/narration/metadata";
+import { EDITORIAL_DEFAULTS, type EditorialProps } from "../../src/editorial/Page";
+import { NlpHistory } from "../../src/videos/nlp-history/Video";
+import { script } from "../../src/videos/nlp-history/script";
+
+const Root: React.FC = () => (
+  <Composition
+    id="Nlp-5-History"
+    component={NlpHistory}
+    width={1920}
+    height={1080}
+    fps={30}
+    durationInFrames={30 * 60}
+    defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+    calculateMetadata={narratedMetadata<EditorialProps>(script)}
+  />
+);
+registerRoot(Root);

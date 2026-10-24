@@ -1,0 +1,8 @@
+10:03 started, reading briefs
+2026-10-23T10:09:28Z resumed after container restart (nothing but reading done before it)
+2026-10-23T10:18:08Z script drafted (25 beats, 1840 chars, one take); measure.py + data.ts done; art submitted (2 prompts, batch) + unit trophy copied
+2026-10-23T13:58:38Z resumed after usage-limit pause; batch stalled 3.7 h at 0/2, cancelled; running sync fallback
+2026-10-23T13:59:57Z art imported via sync (lock, mix; both kept on first draw); scenes built (5 scenes, 11 figures)
+2026-10-23T14:12:50Z voiced (1 take, 1840 chars)
+2026-10-23T14:25:00Z stills reviewed (scene ends, voiced timeline); tsc, lint, check:cues, npm test (59/59) pass; frames/sync/motion/mix queued
+2026-10-23T14:59:55Z check:frames pass (stretch 0.67, arrows 0.0 deg); check:sync pass (worst +0.02 s); check:motion pass (longest still 2.5 s); check:mix 27.6 LU under; measure.py re-asserted against the unit's post-fix numbers (unchanged); report written

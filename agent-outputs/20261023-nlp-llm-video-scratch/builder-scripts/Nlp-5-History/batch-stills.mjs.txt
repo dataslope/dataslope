@@ -1,0 +1,13 @@
+// Renders many stills of Nlp-5-History from the prebuilt bundle in one browser session.
+// usage (from video/): node <this> f1 f2 ...
+import { openBrowser, renderStill, selectComposition } from "@remotion/renderer";
+const S = "/tmp/claude-0/-home-user-dataslope/2a3cc9a3-7547-5d18-88e1-2b54dd0db0d9/scratchpad";
+const serveUrl = `${S}/Nlp-5-History/bundle`;
+const frames = process.argv.slice(2).map(Number);
+const browser = await openBrowser("chrome", { browserExecutable: process.env.REMOTION_BROWSER_EXECUTABLE });
+const composition = await selectComposition({ serveUrl, id: "Nlp-5-History", puppeteerInstance: browser, logLevel: "error" });
+for (const frame of frames) {
+  await renderStill({ serveUrl, composition, frame, output: `out/Nlp-5-History-f${frame}.png`, scale: 1, puppeteerInstance: browser, logLevel: "error" });
+  console.log("still", frame);
+}
+await browser.close({ silent: true });

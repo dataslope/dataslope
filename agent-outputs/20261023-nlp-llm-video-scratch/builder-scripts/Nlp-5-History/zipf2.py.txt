@@ -1,0 +1,13 @@
+import numpy as np
+from nltk.corpus import gutenberg
+from nltk.probability import FreqDist
+words = [w.lower() for w in gutenberg.words("austen-emma.txt") if w.isalpha()]
+fd = FreqDist(words); ranked = fd.most_common()
+f = np.array([c for _,c in ranked], float); r = np.arange(1, len(f)+1)
+N=f.sum()
+for k in [1,10,50,100,200,1000]:
+    print(k, "coverage", round(f[:k].sum()/N*100,1))
+for lo,hi in [(1,len(f)),(10,1000),(1,1000),(10,2000)]:
+    m=(r>=lo)&(r<=hi); s,b=np.polyfit(np.log10(r[m]),np.log10(f[m]),1); print(lo,hi,"slope",round(s,3))
+print("hapax", (f==1).sum(), round((f==1).sum()/len(f)*100,1))
+print("C=", f[9]*10, "pred at 1", f[9]*10, "pred 100", f[9]*10/100, f[99], "pred 1000", f[9]*10/1000, f[999])

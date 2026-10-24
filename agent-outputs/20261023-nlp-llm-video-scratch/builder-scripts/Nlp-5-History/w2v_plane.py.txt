@@ -1,0 +1,14 @@
+import numpy as np, os
+p = os.path.join(os.environ["NLTK_DATA"], "models/word2vec_sample/pruned.word2vec.txt")
+words=[]; vecs=[]
+with open(p, encoding="utf8") as f:
+    f.readline()
+    for line in f:
+        parts=line.rstrip().split(" "); words.append(parts[0]); vecs.append(np.array(parts[1:], dtype=np.float32))
+V=np.vstack(vecs); idx={w:i for i,w in enumerate(words)}
+U=V/np.linalg.norm(V,axis=1,keepdims=True); u=lambda w:U[idx[w]]
+g=u('woman')-u('man'); g/=np.linalg.norm(g)
+k=u('king')-u('man'); k=k-(k@g)*g; k/=np.linalg.norm(k)
+for w in ['prince','princess','monarch','boy','girl','husband','wife','uncle','aunt','father','mother','brother','sister','throne','royal']:
+    if w in idx:
+        d=u(w)-u('man'); print(w, round(float(d@g),3), round(float(d@k),3), 'resid', round(float(np.linalg.norm(d-(d@g)*g-(d@k)*k)),3))

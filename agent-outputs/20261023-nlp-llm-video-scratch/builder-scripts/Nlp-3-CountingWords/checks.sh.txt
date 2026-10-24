@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Runs the voiced checks for Nlp-3-CountingWords one after another, through the queue, on its own entry.
+cd /home/user/dataslope/video
+export REMOTION_BROWSER_EXECUTABLE=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell
+export VIDEO_ENTRY=out/entries/Nlp-3-CountingWords.tsx
+D=/tmp/claude-0/-home-user-dataslope/2a3cc9a3-7547-5d18-88e1-2b54dd0db0d9/scratchpad/Nlp-3-CountingWords
+for c in "$@"; do
+  case $c in
+    sync) out/render-slot.sh npm run check:sync -- nlp-counting-words > $D/sync.log 2>&1; echo "sync exit $?" >> $D/checks.log ;;
+    motion) out/render-slot.sh npm run check:motion -- nlp-counting-words > $D/motion.log 2>&1; echo "motion exit $?" >> $D/checks.log ;;
+    frames) out/render-slot.sh npm run check:frames -- Nlp-3-CountingWords > $D/frames.log 2>&1; echo "frames exit $?" >> $D/checks.log ;;
+    mix) out/render-slot.sh npm run check:mix -- nlp-counting-words > $D/mix.log 2>&1; echo "mix exit $?" >> $D/checks.log ;;
+  esac
+done
+echo "all done" >> $D/checks.log

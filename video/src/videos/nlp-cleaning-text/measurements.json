@@ -1,0 +1,452 @@
+{
+  "versions": {
+    "python": "3.13.16",
+    "nltk": "3.9.4"
+  },
+  "words": {
+    "text": "I don't think Mr. Lee's plan will work, but we'll see!",
+    "split": [
+      "I",
+      "don't",
+      "think",
+      "Mr.",
+      "Lee's",
+      "plan",
+      "will",
+      "work,",
+      "but",
+      "we'll",
+      "see!"
+    ],
+    "tokens": [
+      "I",
+      "do",
+      "n't",
+      "think",
+      "Mr.",
+      "Lee",
+      "'s",
+      "plan",
+      "will",
+      "work",
+      ",",
+      "but",
+      "we",
+      "'ll",
+      "see",
+      "!"
+    ]
+  },
+  "sentences": {
+    "text": "Dr. Lee earned 2.5 million. He smiled. Wasn't that great?",
+    "naive": [
+      "Dr",
+      " Lee earned 2",
+      "5 million",
+      " He smiled",
+      " Wasn't that great?"
+    ],
+    "sentences": [
+      "Dr. Lee earned 2.5 million.",
+      "He smiled.",
+      "Wasn't that great?"
+    ]
+  },
+  "tweet": {
+    "text": "Loving #NLP @dataslope, this is sooo cool!!! :)",
+    "default": [
+      "Loving",
+      "#",
+      "NLP",
+      "@",
+      "dataslope",
+      ",",
+      "this",
+      "is",
+      "sooo",
+      "cool",
+      "!",
+      "!",
+      "!",
+      ":",
+      ")"
+    ],
+    "tweet": [
+      "Loving",
+      "#NLP",
+      "@dataslope",
+      ",",
+      "this",
+      "is",
+      "sooo",
+      "cool",
+      "!",
+      "!",
+      "!",
+      ":)"
+    ]
+  },
+  "case": {
+    "words": [
+      "The",
+      "the",
+      "THE",
+      "Dog",
+      "dog",
+      "DOG"
+    ],
+    "distinct": 6,
+    "folded": [
+      "the",
+      "the",
+      "the",
+      "dog",
+      "dog",
+      "dog"
+    ],
+    "foldedDistinct": [
+      "the",
+      "dog"
+    ]
+  },
+  "lossy": [
+    {
+      "word": "US",
+      "lower": "us"
+    },
+    {
+      "word": "WHO",
+      "lower": "who"
+    },
+    {
+      "word": "Apple",
+      "lower": "apple"
+    }
+  ],
+  "punct": {
+    "text": "Hello, World! It's a GREAT day... isn't it?",
+    "split": [
+      "Hello,",
+      "World!",
+      "It's",
+      "a",
+      "GREAT",
+      "day...",
+      "isn't",
+      "it?"
+    ],
+    "isalpha": [
+      "a",
+      "GREAT"
+    ],
+    "translate": [
+      "hello",
+      "world",
+      "its",
+      "a",
+      "great",
+      "day",
+      "isnt",
+      "it"
+    ],
+    "regex": [
+      "hello",
+      "world",
+      "it",
+      "s",
+      "a",
+      "great",
+      "day",
+      "isn",
+      "t",
+      "it"
+    ]
+  },
+  "order": {
+    "text": "Hello, World! It's a GREAT day... isn't it?",
+    "stripped": "Hello World Its a GREAT day isnt it",
+    "sentences": [
+      "Hello, World!",
+      "It's a GREAT day... isn't it?"
+    ],
+    "strippedSentences": [
+      "Hello World Its a GREAT day isnt it"
+    ]
+  },
+  "stopwords": {
+    "count": 198,
+    "first25": [
+      "a",
+      "about",
+      "above",
+      "after",
+      "again",
+      "against",
+      "ain",
+      "all",
+      "am",
+      "an",
+      "and",
+      "any",
+      "are",
+      "aren",
+      "aren't",
+      "as",
+      "at",
+      "be",
+      "because",
+      "been",
+      "before",
+      "being",
+      "below",
+      "between",
+      "both"
+    ],
+    "has": {
+      "the": true,
+      "is": true,
+      "of": true,
+      "and": true,
+      "python": false,
+      "very": true
+    }
+  },
+  "fox": {
+    "text": "The quick brown fox jumps over the lazy dog in the park",
+    "tokens": [
+      "the",
+      "quick",
+      "brown",
+      "fox",
+      "jumps",
+      "over",
+      "the",
+      "lazy",
+      "dog",
+      "in",
+      "the",
+      "park"
+    ],
+    "isStop": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false
+    ],
+    "content": [
+      "quick",
+      "brown",
+      "fox",
+      "jumps",
+      "lazy",
+      "dog",
+      "park"
+    ]
+  },
+  "negation": [
+    {
+      "word": "not",
+      "isStop": true
+    },
+    {
+      "word": "no",
+      "isStop": true
+    },
+    {
+      "word": "nor",
+      "isStop": true
+    },
+    {
+      "word": "never",
+      "isStop": false
+    },
+    {
+      "word": "but",
+      "isStop": true
+    },
+    {
+      "word": "against",
+      "isStop": true
+    },
+    {
+      "word": "don't",
+      "isStop": true
+    },
+    {
+      "word": "won't",
+      "isStop": true
+    }
+  ],
+  "review": {
+    "text": "The movie was not good at all",
+    "tokens": [
+      "the",
+      "movie",
+      "was",
+      "not",
+      "good",
+      "at",
+      "all"
+    ],
+    "isStop": [
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true
+    ],
+    "content": [
+      "movie",
+      "good"
+    ]
+  },
+  "custom": {
+    "keep": [
+      "not",
+      "no",
+      "nor",
+      "never",
+      "but"
+    ],
+    "add": [
+      "movie",
+      "film",
+      "watch"
+    ],
+    "baseSize": 198,
+    "keepRemoved": [
+      "not",
+      "no",
+      "nor",
+      "but"
+    ],
+    "size": 197,
+    "has": {
+      "not": false,
+      "movie": true,
+      "the": true
+    },
+    "review": {
+      "text": "The movie was not good at all",
+      "tokens": [
+        "the",
+        "movie",
+        "was",
+        "not",
+        "good",
+        "at",
+        "all"
+      ],
+      "isStop": [
+        true,
+        true,
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "content": [
+        "not",
+        "good"
+      ]
+    }
+  },
+  "stems": [
+    {
+      "word": "run",
+      "stem": "run"
+    },
+    {
+      "word": "runs",
+      "stem": "run"
+    },
+    {
+      "word": "running",
+      "stem": "run"
+    },
+    {
+      "word": "ran",
+      "stem": "ran"
+    },
+    {
+      "word": "study",
+      "stem": "studi"
+    },
+    {
+      "word": "studies",
+      "stem": "studi"
+    },
+    {
+      "word": "studying",
+      "stem": "studi"
+    },
+    {
+      "word": "happy",
+      "stem": "happi"
+    },
+    {
+      "word": "happily",
+      "stem": "happili"
+    },
+    {
+      "word": "happiness",
+      "stem": "happi"
+    },
+    {
+      "word": "organization",
+      "stem": "organ"
+    },
+    {
+      "word": "organize",
+      "stem": "organ"
+    },
+    {
+      "word": "organ",
+      "stem": "organ"
+    }
+  ],
+  "lemmas": [
+    {
+      "word": "running",
+      "default": "running",
+      "pos": "v",
+      "withPos": "run"
+    },
+    {
+      "word": "ran",
+      "default": "ran",
+      "pos": "v",
+      "withPos": "run"
+    },
+    {
+      "word": "studies",
+      "default": "study",
+      "pos": "v",
+      "withPos": "study"
+    },
+    {
+      "word": "was",
+      "default": "wa",
+      "pos": "v",
+      "withPos": "be"
+    },
+    {
+      "word": "better",
+      "default": "better",
+      "pos": "a",
+      "withPos": "good"
+    }
+  ],
+  "blocksChecked": 13
+}

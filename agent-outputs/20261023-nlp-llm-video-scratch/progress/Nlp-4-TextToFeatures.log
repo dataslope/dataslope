@@ -1,0 +1,25 @@
+06:07 started, reading brief
+06:13 measure.py written (8 page outputs agree); art batch submitted
+06:37 script drafted (4,996 chars), 13 scenes built, typecheck+lint clean, first stills
+06:47 stills of every scene reviewed and fixed (layout, headline turns, token rows); waiting on art batch
+06:48 check:frames pass (pre-art), narration started (5,016 chars, 4 takes)
+06:50 voiced: 49 beats, 5,016 chars, 4 takes
+07:15 check:sync pass (worst +0.03 s, binary); naive/wrong seam fixed by moving 'positive.' into naive and --recut (free)
+07:15 art batch cancelled after 1 h at 0/4; generating with sync
+07:27 art imported (4 WebPs, all look right, no redraws); voiced stills rendering
+07:55 check:frames pass with art (largest stretch 0.69, arrows 0.0 deg); typecheck clean; check:motion queued
+08:08 check:motion first run: 11 stills >=3 s; added cue motion (reading underline, chip swells, glows, step-backs); rerunning
+08:35 check:motion pass (longest still 2.8 s); then: lexicon fills page then steps aside, first flag row built during flag beat; re-checking
+08:51 check:mix done (effects 21.2 LU under, peak -21.1 dBFS logo, median speech-over-fx 25.1 dB); final motion+frames running
+09:24 final check:motion pass (longest still 2.8 s) and check:frames pass (stretch 0.69); writing report
+09:25 done; report at reports/Nlp-4-TextToFeatures.md
+10:02 fix pass started (0 P1, 6 P2, 10 P3)
+10:05 fix: split 4 beats (free recut), voicing 8 changed/new beats (540 chars)
+10:19 fix: #15 context row (CONTEXT trace), authorship fingerprint note, script header; running lint/typecheck/cues
+10:23 checks: lint ok, tsc ok, check:cues ok for this video, npm test 58/59 (fail is nlp-lemmas-and-tags cues); rendering 47 stills
+10:34 reset pauseAfter 1.0; stills job re-queued (first was killed waiting in the queue)
+10:48 stills reviewed; fixed lamp alignment and Limits context note overlap; re-rendering 5 stills
+13:58 stills OK; running check:sync, frames, motion, mix
+14:47 check:motion failed (3 stills: sklearn-why/top, decide-in, reset-ex); re-cued chart/footnote/gauge and comma mark + lamps; stills + motion/frames/mix rerun
+15:11 motion: 2 more stills (menu, binary) fixed with toolbox at 'a choice' and a short-texts note; rerunning
+15:25 all checks pass (motion 2.8 s longest); fix report written to fixes/Nlp-4-TextToFeatures.md
