@@ -76,6 +76,80 @@ const PaperPage: React.FC<{ x: number; top: number; width: number; height: numbe
   );
 };
 
+/** Part I's first seven section titles, as the 1948 paper prints them. */
+const PART_ONE = [
+  "The Discrete Noiseless Channel",
+  "The Discrete Source of Information",
+  "The Series of Approximations to English",
+  "Graphical Representation of a Markoff Process",
+  "Ergodic and Mixed Sources",
+  "Choice, Uncertainty and Entropy",
+  "The Entropy of an Information Source",
+];
+/** The section the next-word model sits in. */
+const TUCKED = 2;
+
+/** The paper's contents, beside its first page: what "founded information
+ *  theory" covered, with entropy marked on the phrase, and then the one
+ *  section the narration says the next-word idea is tucked inside. */
+const ContentsPage: React.FC<{ x: number; top: number; width: number; height: number; at: number; markAt: number; tuckAt: number; out: number }> = ({
+  x,
+  top,
+  width,
+  height,
+  at,
+  markAt,
+  tuckAt,
+  out,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 16);
+  const o = ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  const pad = 30;
+  const tuck = ease(frame, tuckAt, 14);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top,
+        width,
+        height,
+        opacity: p * (1 - o),
+        transform: `translate(${(1 - p) * 30 + o * 30}px, 0) rotate(${(1 - p) * 1.2 - 0.4}deg)`,
+        background: PAPER,
+        border: `1.5px solid ${HAIRLINE}`,
+        borderRadius: 3,
+        boxSizing: "border-box",
+      }}
+    >
+      <div style={{ position: "absolute", left: pad, right: pad, top: 20, display: "flex", justifyContent: "space-between", ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span>Contents</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, at + 8, 10) }}>Part I: Discrete Noiseless Systems</span>
+      </div>
+      <div style={{ position: "absolute", left: pad, right: pad, top: 52, height: 1.5, background: INK }} />
+      {PART_ONE.map((t, i) => {
+        const isTucked = i === TUCKED;
+        const lineTop = 78 + i * 56;
+        return (
+          <React.Fragment key={t}>
+            {isTucked && tuck > 0 ? (
+              <div style={{ position: "absolute", left: pad - 10, top: lineTop - 6, width: (width - 2 * pad + 20) * tuck, height: 46, borderRadius: 6, background: HIGHLIGHT }} />
+            ) : null}
+            <Ink at={at + 8 + i * 5} dur={12} style={{ left: pad, top: lineTop, right: pad, whiteSpace: "nowrap", opacity: isTucked ? 1 : 1 - tuck * 0.55 }}>
+              <div style={{ display: "flex", gap: 18, alignItems: "baseline", ...note(26, INK), fontWeight: isTucked && tuck > 0.5 ? 600 : 400 }}>
+                <span style={{ ...TABULAR, color: INK_SOFT, width: 22, textAlign: "right" }}>{i + 1}.</span>
+                <span>{i === 5 ? <>Choice, Uncertainty and <Mark at={markAt}>Entropy</Mark></> : t}</span>
+              </div>
+            </Ink>
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
 /** One word of the course's fifteen-word text, as a monospace chip. */
 const WordChip: React.FC<{ x: number; y: number; w: number; text: string; at: number; tone?: string; toneAt?: number; lift?: number }> = ({
   x,
@@ -233,9 +307,11 @@ export const ShannonScene: React.FC = () => {
       {/* ── The paper, then the book ── */}
       <PaperPage x={96} top={y(330)} width={470} height={500} at={from - 4} markAt={theoryAt - 2} lineAt={tuckedAt} out={bookFrom - 2} />
       <Spot id="book" at={handAt - 4} out={sampleOut} left={110} top={y(430)} width={440} height={347} />
+      {/* Its contents, on the right until the sample takes the space. */}
+      <ContentsPage x={SX} top={y(330)} width={820} height={500} at={from} markAt={theoryAt + 10} tuckAt={tuckedAt - 2} out={guessAt - 12} />
 
       {/* ── Fig. 4, Shannon's sample, word by word ── */}
-      <FigLabel n="4" title="Shannon's sample, one word at a time, 1948" at={tuckedAt} x={SX} y={y(290)} out={sampleOut} />
+      <FigLabel n="4" title="Shannon's sample, one word at a time, 1948" at={guessAt - 6} x={SX} y={y(290)} out={sampleOut} />
       <div
         style={{
           position: "absolute",

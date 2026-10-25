@@ -294,12 +294,16 @@ for n in [1, 2, 3, 4]:
   ]}
 />
 
-Watch the "that repeat" column collapse as `n` grows. At `n=1` and `n=2` many
-n-grams recur, so counts are meaningful. By `n=4` almost every window is
-unique, there is no pattern left to count. In practice, **bigrams and
-trigrams are the sweet spot**: enough context to be useful, common enough to
-still carry statistical signal. Going higher usually buys sparsity, a
-ballooning feature space, and little else.
+Watch the "distinct" column grow as `n` grows: every step up adds
+combinations, and a smaller share of them repeat. All 7 distinct words recur,
+but only half of the 14 distinct 4-grams do. This toy text is four near-copies
+of one sentence, so plenty still repeats; on real text the slide is steep. In
+a whole novel, Jane Austen's *Emma*, about 39% of the distinct words appear
+only once, but 90% of the distinct trigrams and 97% of the distinct 4-grams
+do, and a count of one cannot tell a pattern from an accident. In practice,
+**bigrams and trigrams are the sweet spot**: enough context to be useful,
+common enough to still carry statistical signal. Going higher usually buys
+sparsity, a ballooning feature space, and little else.
 
 <Callout type="warn" title="Two costs of large n">
 **Sparsity:** rare n-grams give unreliable counts. **Explosion:** the number

@@ -264,7 +264,7 @@ line often dominates a bill.`}
 - Because early turns use fewer output tokens.
   > Output volume is roughly constant per turn.
 - [o] Because the cached prefix is a larger share of a long context.
-  > At turn 1 the system prompt is most of the request and the write costs slightly more than input; by turn 20 there is far more repeated content to discount.
+  > At turn 1 nothing has been cached yet, so the whole request pays the input price (the function above leaves out the small premium some providers add for writing the cache); by turn 20 there is far more repeated content to discount.
 - Because cache discounts increase with usage volume.
   > The discount rate is fixed.
 - Because caches take several turns to warm up.

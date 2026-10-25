@@ -14,6 +14,10 @@ const SIZE = 28;
 const ESIZE = 24;
 /** The legend of first letters, on the right. */
 const LX = 1240;
+/** The page's right margin, where Fig. 10's sentence ends. */
+const RIGHT = 1800;
+/** Frames a sorted copy takes to drop into its row. */
+const DROP = 12;
 
 /** What the lesson's table calls each tag in this sentence, as narrated. */
 const GLOSS: Record<string, string> = {
@@ -76,7 +80,11 @@ export const PennScene: React.FC = () => {
 
   // ── Fig. 10: the engineer, and the rows it sorts into ──
   const eWords = ENGINEER.tagged.map(([w]) => w);
-  const eTiles = flow(eWords, X0, y(546), 1800, ESIZE, 10, 0);
+  // The sentence ends at the right margin, so every word's column lies to the
+  // right of every row's packed words: a copy dropping into its row never
+  // crosses a word that has already landed (see the glide below).
+  const eWidth = eWords.reduce((s, w) => s + tileW(w, ESIZE) + 10, -10);
+  const eTiles = flow(eWords, RIGHT - eWidth, y(546), RIGHT + 1, ESIZE, 10, 0);
   const eChipY = y(546) + tileH(ESIZE) + 8;
   // The rows stand in the legend's order (N, V, J, R); each fills as it is named.
   const ROW_ORDER: { fam: Family; prefix: string; name: string }[] = [
@@ -101,7 +109,7 @@ export const PennScene: React.FC = () => {
     const x = rowX + before.reduce((s, b) => s + tileW(b, ESIZE) + 10, 0);
     // Each word leaves the sentence as the narration names it.
     const beat = fam === "noun" ? "nouns" : "adjectives";
-    return { k, x, y: sortedY(k), at: n.word(beat, w) - 6 };
+    return { k, x, y: sortedY(k), at: n.word(beat, w) - 6, fall: DROP };
   });
 
   return (
@@ -110,7 +118,7 @@ export const PennScene: React.FC = () => {
       <Sfx name="el-tap" at={tagAts[0] - 2} level={-29} />
       <Sfx name="el-tap" at={tagAts[4] - 2} level={-29} />
       <Sfx name="el-pencil" at={firstLetterAt - 2} level={-35} />
-      {landing.map((l, i) => (l ? <Sfx key={i} name="el-tap" at={l.at + 16} level={-31} /> : null))}
+      {landing.map((l, i) => (l ? <Sfx key={i} name="el-tap" at={l.at + l.fall - 2} level={-31} /> : null))}
 
       <Kicker at={from - 10}>Tagging words</Kicker>
       <Headline at={pennAt - 4} second={handAt - 2} italic="hand-tagged text.">
@@ -209,7 +217,9 @@ export const PennScene: React.FC = () => {
         return <TagChip key={i} tag={tag} family={familyOf(tag)} cx={t.x + t.w / 2} y={eChipY} at={keepAt - 2 + i * 2} size={20} />;
       })}
       {/* The sorted copies, drawn last so a word in flight passes over the
-          chips and rows rather than under them. */}
+          chips and rows rather than under them. Each drops straight down its
+          own column into its row (crossing only its own tag chip), then slides
+          left into place along that row. */}
       {eTiles.map((t, i) => {
         const land = landing[i];
         if (!land) return null;
@@ -224,7 +234,7 @@ export const PennScene: React.FC = () => {
             at={land.at}
             tint={FAMILY[fam].tint}
             border={FAMILY[fam].fill}
-            to={{ x: land.x, y: land.y, at: land.at, dur: 20 }}
+            to={{ x: land.x, y: land.y, at: land.at, dur: 18, via: { x: t.x, y: land.y, dur: land.fall } }}
           />
         );
       })}

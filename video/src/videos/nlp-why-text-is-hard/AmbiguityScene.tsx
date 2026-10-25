@@ -86,13 +86,20 @@ export const AmbiguityScene: React.FC = () => {
   const referentialAt = n.word("answer", "referential");
 
   const row = (i: number) => y(ROW_Y[i]);
-  // The figure's frame draws itself across the opening sentence.
-  const rules = [from + 2, n.word("ambiguity", "resolve") - 4, n.word("ambiguity", "easily") - 4];
+  // Each row's rule draws itself with that row's gist, as its kind begins.
+  const rules = [lexFrom - 4, strFrom - 4, refFrom - 4];
+  // The opening sentence moves on its own words: "it" (the ambiguity) is
+  // highlighted in the headline as it is said, and the figure's label inks
+  // on "resolve".
+  const itAt = n.word("ambiguity", "full of it");
+  const resolveAt = n.word("ambiguity", "resolve");
 
   return (
     <AbsoluteFill>
       {/* ── Sound ── */}
-      <Sfx name="el-pencil" at={from} level={-36} />
+      {rules.map((t) => (
+        <Sfx key={`rule-${t}`} name="el-pencil" at={t} level={-37} />
+      ))}
       <Sfx name="el-tap" at={bankAt - 2} level={-30} />
       <Sfx name="el-tap" at={sawAt - 2} level={-30} />
       <Sfx name="el-pop" at={sawAt + 4} level={-32} />
@@ -103,10 +110,20 @@ export const AmbiguityScene: React.FC = () => {
       ))}
 
       <Kicker at={from - 10}>Text is ambiguous</Kicker>
-      <Headline lead="Full of ambiguity," turn="and we rarely notice." at={from - 6} turnAt={noticeAt - 6} size={64} />
-      <FigLabel n="4" title="Three kinds of ambiguity" at={from + 2} x={X0} y={y(FIG_Y)} />
+      <Headline
+        lead={
+          <>
+            Full of <Mark at={itAt + 4}>ambiguity</Mark>,
+          </>
+        }
+        turn="and we rarely notice."
+        at={from - 6}
+        turnAt={noticeAt - 6}
+        size={64}
+      />
+      <FigLabel n="4" title="Three kinds of ambiguity" at={resolveAt - 4} x={X0} y={y(FIG_Y)} />
 
-      {/* Row rules: the figure's frame arrives with the scene. */}
+      {/* Row rules: each arrives with its own row. */}
       {ROW_Y.map((r, i) => (
         <div
           key={r}

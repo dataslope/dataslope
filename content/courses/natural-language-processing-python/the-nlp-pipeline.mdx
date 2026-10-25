@@ -268,14 +268,14 @@ You cannot transform a list of tokens you have not produced yet.`}
 
 ## Order matters: a concrete example
 
-We just hinted at it; let us prove it. The block below runs the *same three
-operations*, lowercase, remove stopwords, keep alphabetic, but in two
-different orders, and compares the results.
+We just hinted at it; let us prove it. The block below runs the *same two
+operations*, lowercase and remove stopwords, in two different orders, and
+compares the results.
 
 <Figure
   slug="nlp-the-nlp-pipeline-order-matters-concrete-example-inline-cutout"
-  alt="The same three steps run in two different orders, one order leaving stray pieces the other had already removed"
-  caption="Lowercase before removing stopwords and all three thes go; reverse it and one survives."
+  alt="The same steps run in two different orders, one order leaving stray pieces the other had already removed"
+  caption="Lowercase before removing stopwords and all three thes go; reverse it and all three survive."
 />
 
 <CodeBlock
@@ -329,9 +329,10 @@ print("Order B (filter then lowercase):", b)
 />
 
 Order A correctly removes all three "the"s, because by the time we compare
-against the lowercase stopword list, every token is lowercase. Order B leaves
-`"The"` and `"THE"` behind, because they did not match the lowercase `"the"`
-in the stoplist at the moment we filtered. Same operations, different order,
+against the lowercase stopword list, every token is lowercase. Order B keeps
+all three: `"The"`, `"The"` and `"THE"` did not match the lowercase `"the"` in
+the stoplist at the moment we filtered, and were lowercased only afterwards,
+which is why they print as three `'the'`s. Same operations, different order,
 different, and in this case wrong, result.
 
 <Callout type="warn" title="Order bugs are silent">
@@ -478,7 +479,7 @@ produce different results?
 - Reordering steps changes which version of Python runs
   > The Python version is a runtime property of the environment and is completely unaffected by the order of preprocessing operations in your code.
 - It cannot, order never affects the outcome of preprocessing
-  > Order consistently affects outcomes, as the concrete code example in this page demonstrates: filtering stopwords before lowercasing leaves capitalized variants like "The" and "THE" in the output.
+  > Order consistently affects outcomes, as the concrete code example in this page demonstrates: filtering stopwords before lowercasing lets "The" and "THE" slip past the filter, so every "the" reaches the output.
 
 Pipelines are sequential transformations, so the order of those transformations is part of the logic.`}
 />

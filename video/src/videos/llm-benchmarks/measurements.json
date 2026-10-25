@@ -7,24 +7,33 @@
    "name": "MMLU",
    "a": 0.923,
    "b": 0.917,
-   "ceiling": 0.95,
+   "questions": 14042,
    "gap": 0.006,
+   "luck": 0.0063,
+   "verdict": "within luck",
+   "ceiling": 0.95,
    "headroom": 0.027
   },
   {
    "name": "GPQA Diamond",
    "a": 0.96,
    "b": 0.954,
-   "ceiling": 1.0,
+   "questions": 198,
    "gap": 0.006,
+   "luck": 0.0404,
+   "verdict": "within luck",
+   "ceiling": 1.0,
    "headroom": 0.04
   },
   {
    "name": "ARC-AGI-3",
    "a": 0.627,
    "b": 0.302,
-   "ceiling": 1.0,
+   "questions": 100,
    "gap": 0.325,
+   "luck": 0.14,
+   "verdict": "bigger than luck",
+   "ceiling": 1.0,
    "headroom": 0.373
   }
  ],
@@ -355,7 +364,7 @@
   "gpqaAbove90": {
    "value": 24,
    "of": 136,
-   "where": "what-benchmarks-measure.mdx:271-274"
+   "where": "what-benchmarks-measure.mdx:280-283"
   },
   "sweProBroken": {
    "value": 30,
