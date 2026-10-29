@@ -34,7 +34,16 @@ fixed the second half of #13 on the way. Folder `video/src/videos/ds-ml-models/`
 
 ## Length and checks
 
-CHECKS
+- **10:48 (648.0 s)**, from 10:24 (624.2 s): 48 beats, 1,530 words, 142 wpm. The six voiced beats run 2.0 to 2.9 words a second (`r-gen-more`, eight words, is the slow one).
+- Facts: no new numbers. Everything new on screen is read from `results.json` through `data.ts` (`LOGIT.b0`/`b1`, `SHAP.base`, `PCA.cumulative`, `PCA.loadings`, `CURSE.shell`, `ENS.mse.noise`, `FOREST.features`, `RFE`), so `check.mjs` was not re-run and `results.json` is untouched.
+- Typecheck and eslint: no errors in `src/videos/ds-ml-models/`.
+- `npm test`: 59/59. `check:cues`: pass (every cue names a phrase its beat says).
+- `check:sync`: pass, 48 beats, worst +0.05 s (`gb`, unchanged from P2); the new beats are within +0.04 s.
+- `check:mix`: pass. Effects 29.2 LU under the narration; where both sound, speech a median 28.9 dB above them, closest 9.5 dB (3:23.2, the same unchanged spot as P2's 3:16.0, moved by the longer timeline).
+- `check:motion`: pass, 10:48.3 checked, nothing still for 3 s (seven holds of 2.0 to 2.3 s, none in a stretch this pass changed). Its first run was killed by the 2 h background limit at 90% of its preview, after most of that time queued; the re-run passed.
+- `check:frames`: not run (no arrow, illustration or ERD changed).
+- Stills, each looked at: 54.9 and 57.5 (tumors after the axis swap, 1.034), 72, 104.5 (Q2 variance lines), 117 and 133 (cut line short, then down to the Gini chart), 158 (19px ticks), 217 (test MSE label, "about level" marks), 236, 253 (√30 line, frozen grid, "held-out"), 289 (red ring, label under the box), 312 (ellipse), 359.5, 399 (k-means label above the ring), 420, 434 (loadings, 96%), 440.2, 441.5, 442.4, 443.2, 466 (shell, its label, the cross-fade, the finished curse), 484 (table with caption), 527, 548.5 (0.503, 20px note, permutation line), 578.3 (discriminative with plenty of labels), 597, 614, 634.5 (quick-round lines, RFE "asked for 5").
+- Nothing to commit from here: the working tree for this folder matches `HEAD` (the coordinator's work-in-progress commit `5d1993ef` took these files as they now stand).
 
 ## Shared-kit recommendation
 
