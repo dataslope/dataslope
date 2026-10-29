@@ -38,7 +38,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - the video's own 500 paired items (A 79%, B 82%, the page's
  *     concept-check scores): 385 pass both, 80 fail both, 25 pass only B,
  *     10 only A. As two separate samples, p = 0.23; McNemar's exact test on
- *     the 35 that disagree, p = 0.017 ("point oh two").
+ *     the 35 that disagree, p = 0.017 ("point oh two", shown as 0.02),
+ *     against the 17.5 each way that equally good versions would give.
  *   - the judge: 85 pass-pass, 5 fail-fail, 5 each way apart, so 90%
  *     agreement with both at 90% pass; chance agreement 0.82, kappa 0.08 /
  *     0.18 = 0.44. A judge that always says pass agrees 90% too, kappa 0.
@@ -124,7 +125,15 @@ export const script: NarrationScript = {
     },
     {
       id: "size-pair",
-      text: "Two habits help more than raw size. First, pair the comparison. On five hundred items of our own, version B passes eighty-two percent and version A seventy-nine. Read as two separate samples, that's a p-value of point two three. But both ran on the same items, so only the thirty-five where they disagree carry information: twenty-five go to B, ten to A. McNemar's test on those gives point oh two.",
+      text: "Two habits help more than raw size. First, pair the comparison. On five hundred items of our own, version B passes eighty-two percent and version A seventy-nine. Read as two separate samples, that's a p-value of point two three. But both ran on the same items, so only the thirty-five where they disagree carry information: twenty-five go to B, ten to A.",
+    },
+    {
+      id: "size-null",
+      text: "If the two versions were equally good, those would split about evenly, like coin flips.",
+    },
+    {
+      id: "size-mc",
+      text: "McNemar's test on those gives point oh two.",
       pauseAfter: 0.6,
     },
     {
@@ -156,7 +165,11 @@ export const script: NarrationScript = {
     },
     {
       id: "judge-bias",
-      text: "Then test its known biases: a pull toward the first answer shown, toward longer answers, and toward its own model family. And compare it with how well the experts agree with each other. A judge can't beat the humans it imitates.",
+      text: "Then test its known biases: a pull toward the first answer shown, toward longer answers, and toward its own model family. And compare it with how well the experts agree with each other.",
+    },
+    {
+      id: "judge-bar",
+      text: "Don't expect a judge to beat the humans it imitates.",
       pauseAfter: 0.7,
     },
     { id: "ab-in", text: "Offline scores only decide what's worth trying on real users." },
@@ -214,7 +227,15 @@ export const script: NarrationScript = {
     },
     {
       id: "check-list",
-      text: "Then leakage, like a scaler fit on all the data before the split. The wrong test, like a t-test on skewed revenue, or twenty segments compared with no correction, which gives a sixty-four percent chance of at least one false alarm. Columns or functions that don't exist. And causal claims the analysis can't support. Finally, reproduce the headline number another way.",
+      text: "Then leakage, like a scaler fit on all the data before the split.",
+    },
+    {
+      id: "check-test",
+      text: "The wrong test, like a t-test on skewed revenue, or twenty segments tested at five percent each with no correction, which gives a sixty-four percent chance of at least one false alarm.",
+    },
+    {
+      id: "check-rest",
+      text: "Columns or functions that don't exist. And causal claims the analysis can't support. Finally, reproduce the headline number another way.",
       pauseAfter: 0.7,
     },
 
@@ -230,8 +251,16 @@ export const script: NarrationScript = {
       text: "Why is a thumbs-up rate a weak primary metric? Few people click, the ones who do aren't typical, and it rewards a confident tone over a correct answer. Track what people do next: the ticket stays closed, the suggested code is still there a week later, nobody asks again.",
     },
     {
+      id: "r-thumbs-diag",
+      text: "Keep the thumbs-up rate as a diagnostic, not the target.",
+    },
+    {
       id: "r-contam",
-      text: "And benchmark contamination. If a public benchmark's test items were in a model's training data, its score measures memory, not skill. Don't pick a model on leaderboards alone. Keep your own eval set private, refresh it with recent cases, and never train on it.",
+      text: "And benchmark contamination. If a public benchmark's test items were in a model's training data, its score measures memory, not skill. Don't pick a model on leaderboards alone.",
+    },
+    {
+      id: "r-contam-keep",
+      text: "Keep your own eval set private, refresh it with recent cases, and never train on it or put it in few-shot prompts.",
       pauseAfter: 0.9,
     },
     {

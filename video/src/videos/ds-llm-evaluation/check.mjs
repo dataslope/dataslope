@@ -71,6 +71,8 @@ r["pair"] = {
     "n": n, "bothPass": both_pass, "aOnly": a_only, "bOnly": b_only, "bothFail": both_fail,
     "aPass": a_pass, "bPass": b_pass, "aRate": pa, "bRate": pb,
     "discordant": disc,
+    # What "equally good" predicts: the disagreements split like coin flips.
+    "evenSplit": disc / 2,
     "z": round(z, 3), "pUnpaired": round(float(p_unpaired), 4),
     "pMcNemar": round(float(p_mcnemar), 4),
 }
@@ -93,6 +95,9 @@ r["judge"] = {
     "po": round(po, 4), "pe": round(pe, 4), "kappa": round(kappa, 4),
     "above": round(po - pe, 4), "room": round(1 - pe, 4),
     "alwaysPass": {"po": round(po0, 4), "kappa": round(kappa0, 4)},
+    # Each rater's passes, out of the 100: the both-pass items plus its own
+    # side of the disagreements.
+    "judgePasses": pp + pf, "expertPasses": pp + fp,
 }
 
 # ── 6. Rogan–Gladen: the page's sensitivity, specificity and observed share ──
@@ -116,6 +121,7 @@ r["notebook"] = {"rows": 10_000, "afterJoin": 6_700, "lost": round(1 - 6_700 / 1
 # Twenty segment comparisons at 5% with no correction: the chance of at
 # least one false alarm when nothing is going on.
 r["notebook"]["segments"] = 20
+r["notebook"]["alpha"] = 0.05
 r["notebook"]["anyFalse"] = round(1 - 0.95 ** 20, 4)
 
 # ── The close: the track's question bank, counted ───────────────────────────

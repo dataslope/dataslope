@@ -22,7 +22,8 @@ const TABLE = { x: 1010, top: 420, cw: 190, rh: 76, head: 150 };
  * 88%) and a three-point change set against it, then the page's formula for
  * the half-width, which shrinks with the square root of n. Right: the video's own 500
  * paired items as a two-by-two table; read as two samples the gap is p 0.23,
- * paired only the 35 that disagree count, and McNemar gives 0.017. Then the
+ * paired only the 35 that disagree count, which equally good versions would
+ * split about evenly, and McNemar gives 0.017 (shown as said, 0.02). Then the
  * second habit, stratifying, as a small slice that a total would hide.
  */
 export const SizeScene: React.FC = () => {
@@ -50,8 +51,10 @@ export const SizeScene: React.FC = () => {
   const disagreeAt = n.word("size-pair", "the thirty-five where they disagree");
   const toBAt = n.word("size-pair", "twenty-five go to B");
   const toAAt = n.word("size-pair", "ten to A");
-  const mcAt = n.word("size-pair", "McNemar's test");
-  const p02At = n.word("size-pair", "point oh two");
+  const equalAt = n.word("size-null", "equally good");
+  const evenAt = n.word("size-null", "split about evenly");
+  const mcAt = n.word("size-mc", "McNemar's test");
+  const p02At = n.word("size-mc", "point oh two");
   const stratAt = n.word("size-strat", "stratify");
   const sliceAt = n.word("size-strat", "a regression on a small slice");
   const awayAt = n.word("size-strat", "averaged away");
@@ -221,6 +224,15 @@ export const SizeScene: React.FC = () => {
             only these count
           </span>
         </Note>
+        <Note at={equalAt - 2} x={TABLE.x + TABLE.head + 2 * TABLE.cw + 4} y={y(TABLE.top) + h(TABLE.rh) + h(104)}>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+            if equally good,
+            <br />
+            <span style={{ opacity: ease(frame, evenAt - 2, 10) }}>
+              about <b style={{ color: INK, ...TABULAR }}>{PAIR.evenSplit}</b> each way
+            </span>
+          </span>
+        </Note>
         <Note at={separateAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 20)}>
           <span style={{ ...note(26, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
             as two separate samples:{" "}
@@ -236,7 +248,7 @@ export const SizeScene: React.FC = () => {
             paired, McNemar&apos;s test:{" "}
             <span style={{ opacity: ease(frame, p02At - 2, 10), color: OK_INK, fontWeight: 700 }}>
               <Mark at={p02At + 6} color={MARK_OK}>
-                p = {PAIR.pMcNemar.toFixed(3)}
+                p = {PAIR.pMcNemar.toFixed(2)}
               </Mark>
             </span>
           </span>
@@ -246,8 +258,8 @@ export const SizeScene: React.FC = () => {
         <Note at={stratAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 150)}>
           <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={stratAt + 6}>2. stratify</Mark>
-            <span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, sliceAt, 10) }}>
-              {"  "}a small slice that regresses{" "}
+            <span style={{ ...note(24, INK_SOFT), fontWeight: 500, marginLeft: 16, opacity: ease(frame, sliceAt, 10) }}>
+              a small slice that regresses{" "}
               <Mark at={awayAt} color={MARK_BAD}>
                 isn&apos;t averaged away
               </Mark>

@@ -34,6 +34,8 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
     { text: "the suggested code is still there a week later", at: c.w("r-thumbs", "the suggested code is still there") },
     { text: "nobody asks again", at: c.w("r-thumbs", "nobody asks again") },
   ];
+  const diagAt = c.w("r-thumbs-diag", "Keep the thumbs-up rate");
+  const targetAt = c.w("r-thumbs-diag", "a diagnostic, not the target");
   return (
     <>
       <Note at={whyAt - 2} x={R_X} y={c.y(330)}>
@@ -60,6 +62,14 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
           {s.text}
         </Chip>
       ))}
+      <Note at={diagAt - 2} x={R_X} y={c.y(830)}>
+        <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          keep the thumbs-up rate as{" "}
+          <span style={{ opacity: ease(frame, targetAt - 2, 10) }}>
+            <Mark at={targetAt + 6}>a diagnostic, not the target</Mark>
+          </span>
+        </span>
+      </Note>
     </>
   );
 };
@@ -74,10 +84,11 @@ const Contamination: React.FC<{ c: Ctx }> = ({ c }) => {
   const skillAt = c.w("r-contam", "not skill");
   const actions = [
     { text: "don't pick a model on leaderboards alone", at: c.w("r-contam", "Don't pick a model") },
-    { text: "keep your own eval set private", at: c.w("r-contam", "Keep your own eval set private") },
-    { text: "refresh it with recent cases", at: c.w("r-contam", "refresh it with recent cases") },
-    { text: "never train on it", at: c.w("r-contam", "never train on it") },
+    { text: "keep your own eval set private", at: c.w("r-contam-keep", "Keep your own eval set private") },
+    { text: "refresh it with recent cases", at: c.w("r-contam-keep", "refresh it with recent cases") },
+    { text: "never train on it", at: c.w("r-contam-keep", "never train on it") },
   ];
+  const promptsAt = c.w("r-contam-keep", "put it in few-shot prompts");
   const train = ease(frame, contamAt, 14);
   const bench = ease(frame, itemsAt, 14);
   const cx = R_X + 190;
@@ -107,7 +118,10 @@ const Contamination: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       {actions.map((a, i) => (
         <Note key={a.text} at={a.at - 2} x={R_X} y={c.y(650) + i * c.h(52)}>
-          <span style={{ ...note(26, i === 0 ? INK : OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{a.text}</span>
+          <span style={{ ...note(26, i === 0 ? INK : OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            {a.text}
+            {i === actions.length - 1 ? <span style={{ opacity: ease(frame, promptsAt - 2, 10) }}> or put it in few-shot prompts</span> : null}
+          </span>
         </Note>
       ))}
     </>
@@ -179,7 +193,7 @@ export const RapidScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
-          <Chip key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} ink={i === 2 ? ACCENT_INK : BLUE_INK} lit={i === 2 ? workAt : undefined}>
+          <Chip key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 2 ? workAt : undefined}>
             {p.text}
           </Chip>
         ))}

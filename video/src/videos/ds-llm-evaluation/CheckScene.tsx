@@ -80,15 +80,15 @@ export const CheckScene: React.FC = () => {
   const items = [
     { text: "silent data loss: count rows at every step", at: lossAt },
     { text: "leakage: a scaler fit before the split", at: n.word("check-list", "Then leakage") },
-    { text: "the wrong test", at: n.word("check-list", "The wrong test") },
-    { text: "columns or functions that don't exist", at: n.word("check-list", "Columns or functions") },
-    { text: "causal claims it can't support", at: n.word("check-list", "causal claims") },
+    { text: "the wrong test", at: n.word("check-test", "The wrong test") },
+    { text: "columns or functions that don't exist", at: n.word("check-rest", "Columns or functions") },
+    { text: "causal claims it can't support", at: n.word("check-rest", "causal claims") },
   ];
-  const skewAt = n.word("check-list", "a t-test on skewed revenue");
-  const twentyAt = n.word("check-list", "twenty segments compared with no correction");
-  const sixtyAt = n.word("check-list", "sixty-four percent chance");
-  const reproAt = n.word("check-list", "reproduce the headline number another way");
-  const end = n.beat("check-list").to;
+  const skewAt = n.word("check-test", "a t-test on skewed revenue");
+  const twentyAt = n.word("check-test", "twenty segments tested at five percent each");
+  const sixtyAt = n.word("check-test", "sixty-four percent chance");
+  const reproAt = n.word("check-rest", "reproduce the headline number another way");
+  const end = n.beat("check-rest").to;
 
   const cellY = (i: number) => y(NB.top) + i * h(NB.cellH + NB.gap);
 
@@ -143,12 +143,12 @@ export const CheckScene: React.FC = () => {
           </Note>
         ))}
         <Note at={skewAt} x={LIST_X + 40} y={y(LIST_TOP) + 2 * h(LIST_ROW) + h(38)}>
-          <span style={{ ...label(20, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
             a t-test on skewed revenue
             <br />
             <span style={{ opacity: ease(frame, twentyAt - 2, 10) }}>
-              {NOTEBOOK.segments} segments, no correction:{" "}
-              <b style={{ color: ACCENT_INK, opacity: ease(frame, sixtyAt - 2, 10) }}>{pct(NOTEBOOK.anyFalse)} chance of a false alarm</b>
+              {NOTEBOOK.segments} segments at {pct(NOTEBOOK.alpha)} each, no correction:{" "}
+              <b style={{ color: ACCENT_INK, opacity: ease(frame, sixtyAt - 2, 10) }}>{pct(NOTEBOOK.anyFalse)} chance of at least one false alarm</b>
             </span>
           </span>
         </Note>
@@ -157,7 +157,7 @@ export const CheckScene: React.FC = () => {
             <Tick at={reproAt + 6} size={30} />
             <span style={{ ...note(30, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
               <Mark at={reproAt + 8} color={MARK_OK}>
-                reproduce the headline another way
+                reproduce the headline number another way
               </Mark>
             </span>
           </div>
