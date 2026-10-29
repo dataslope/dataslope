@@ -409,6 +409,60 @@
           "stdout": "",
           "warnings": []
         },
+        "apply": {
+          "code": "df[\"revenue\"] = df.apply(\n    lambda r: r[\"price\"] * r[\"qty\"], axis=1\n)\ndf",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "columns": [
+              "price",
+              "qty",
+              "revenue"
+            ],
+            "rows": [
+              [
+                "1",
+                "5",
+                "5"
+              ],
+              [
+                "2",
+                "4",
+                "8"
+              ],
+              [
+                "3",
+                "3",
+                "9"
+              ],
+              [
+                "4",
+                "2",
+                "8"
+              ],
+              [
+                "5",
+                "1",
+                "5"
+              ]
+            ],
+            "dtypes": [
+              "int32",
+              "int32",
+              "int32"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
         "same": {
           "code": "_loop(big) == list(big[\"price\"] * big[\"qty\"])",
           "ok": true,

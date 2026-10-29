@@ -135,8 +135,10 @@ results.figures.plan = figure(
 /** The page's vectorization block, then the same product on a million rows
  *  (the video's own size), timed: best of 3 for the loop, best of 30 for the
  *  vectorized line. Measured in WebAssembly, so these are not a laptop's
- *  times; the script says so and gives no exact ratio, because the
- *  vectorized time alone moves between about 1.0 and 1.8 ms from run to run. */
+ *  times; the script says so and speaks no exact ratio, because the
+ *  vectorized time alone moves between about 0.9 and 1.8 ms from run to run
+ *  (the screen prints the ratio of whatever ran last, rounded, in data.ts).
+ *  Between them, the same revenues from .apply with a lambda, a loop too. */
 results.figures.vector = figure(
   `df = pd.DataFrame({"price": np.arange(1, 6), "qty": np.arange(5, 0, -1)})
 n = 1_000_000
@@ -163,6 +165,12 @@ for p, q in zip(df["price"], df["qty"]):
 df["revenue"] = revenue
 df`,
     vectorized: 'df["revenue"] = df["price"] * df["qty"]\ndf',
+    // The follow-up: .apply with a lambda is the same Python loop, once per
+    // row. Run here so the listing on screen is code that ran and agrees.
+    apply: `df["revenue"] = df.apply(
+    lambda r: r["price"] * r["qty"], axis=1
+)
+df`,
     same: '_loop(big) == list(big["price"] * big["qty"])',
     loopMs: "round(_best(lambda: _loop(big), 3) * 1000, 1)",
     vecMs: 'round(_best(lambda: big["price"] * big["qty"], 30) * 1000, 2)',

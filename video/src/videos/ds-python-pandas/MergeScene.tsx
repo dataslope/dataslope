@@ -7,19 +7,37 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COMBINE } from "./data";
-import { colsOf, DataTable, Drift, geoOf, KeyArrow, Mark, MARK, MARK_KEY, Mono, TableName, X0 } from "./parts";
+import {
+  colsOf,
+  DataTable,
+  Drift,
+  FadeIn,
+  geoOf,
+  KeyArrow,
+  Listing,
+  Mark,
+  MARK,
+  MARK_KEY,
+  Mono,
+  TableName,
+  TitleCode,
+  X0,
+} from "./parts";
 
 const TOP = 400;
 const CUST_X = 640;
 const RESULT_X = 1140;
 const HEAD_Y = 296;
+/** The listings under the tables: the call that made the result. */
+const CODE = 20;
 
 /**
  * Question 5 on the page's orders and customers. Merge: arrows from each
- * order's customer_id to its customer, and the result picks up a name
- * column. Join: the customers' key becomes their index, and the same four
- * rows come back. Concat: nothing is matched; March's two orders (the
- * video's own) are stacked under the four.
+ * order's customer_id to its customer, the result picks up a name column,
+ * and the call is printed under the tables with how's four join types
+ * beside it. Join: the customers' key becomes their index, the call swaps
+ * to join's, and the same four rows come back. Concat: nothing is matched;
+ * March's two orders (the video's own) are stacked under the four.
  */
 export const MergeScene: React.FC = () => {
   const n = useNarration();
@@ -29,15 +47,21 @@ export const MergeScene: React.FC = () => {
   const qAt = n.word("merge", "Question");
   const textAt = n.word("merge", "When do you use merge");
   const asked = n.beat("merge").to;
-  const mergeAt = n.word("merge-three", "Merge matches rows on key columns");
-  const sqlAt = n.word("merge-three", "the way a SQL join does");
-  const nameAt = n.word("merge-three", "each order picks up its customer's name");
-  const joinAt = n.word("merge-three", "Join does the same");
-  const indexAt = n.word("merge-three", "matches on the index");
-  const concatAt = n.word("merge-three", "And concat matches nothing at all");
-  const stackAt = n.word("merge-three", "It stacks frames");
-  const marchAt = n.word("merge-three", "March's orders under the rest");
-  const end = n.beat("merge-three").to;
+  const mergeAt = n.word("merge-key", "Merge matches rows on key columns");
+  const sqlAt = n.word("merge-key", "the way a SQL join does");
+  const nameAt = n.word("merge-key", "each order picks up its customer's name");
+  const howAt = n.word("merge-how", "Its how argument");
+  const typesAt = n.word("merge-how", "inner, left, right or outer");
+  const leftAt = n.word("merge-how", "Here it's left");
+  const keptAt = n.word("merge-how", "every order is kept");
+  const joinAt = n.word("merge-index", "Join does the same");
+  const indexAt = n.word("merge-index", "matches on the index");
+  const setAt = n.word("merge-set", "becomes their index first");
+  const sameAt = n.word("merge-set", "the same four rows");
+  const concatAt = n.word("merge-stack", "And concat matches nothing at all");
+  const stackAt = n.word("merge-stack", "It stacks frames");
+  const marchAt = n.word("merge-stack", "March's orders under the rest");
+  const end = n.beat("merge-stack").to;
   const outMatch = concatAt - 2;
 
   const O = COMBINE.orders;
@@ -59,6 +83,10 @@ export const MergeScene: React.FC = () => {
   const marchG = geoOf(march, X0, og.rowTop(O.rows.length) + h(70), h, { rowH: 52 });
   const sg = geoOf(S, CUST_X + 120, y(TOP), h, { rowH: 52 });
 
+  // The calls, under the tables: merge's, then join's in its place.
+  const codeTop = og.rowTop(O.rows.length) + h(50);
+  const mergeW = 700;
+
   const header = (word: string, rest: string, at: number, out?: number) => (
     <Note at={at} x={X0} y={y(HEAD_Y)} out={out}>
       <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
@@ -74,6 +102,7 @@ export const MergeScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-tap" at={mergeAt + 6} level={-34} />
       <Sfx name="el-pencil" at={nameAt + 4} level={-34} />
+      <Sfx name="el-tap" at={howAt} level={-35} />
       <Sfx name="el-whoosh" at={indexAt} level={-36} />
       <Sfx name="el-whoosh" at={stackAt} level={-34} />
       <Sfx name="el-pop" at={marchAt + 6} level={-32} />
@@ -110,7 +139,7 @@ export const MergeScene: React.FC = () => {
           rows={C.rows.map((cells, i) => ({ cells, at: mergeAt + 4 + i * 2 }))}
         />
         <TableName g={cig} at={indexAt - 2} out={outMatch}>
-          <Mono>customers.set_index(&quot;customer_id&quot;)</Mono>
+          <TitleCode>customers.set_index(&quot;customer_id&quot;)</TitleCode>
         </TableName>
         <DataTable
           g={cig}
@@ -118,7 +147,7 @@ export const MergeScene: React.FC = () => {
           at={indexAt}
           out={outMatch}
           rows={CI.rows.map((cells, i) => ({ cells, at: indexAt + 2 + i * 2 }))}
-          marks={CI.rows.map((_, row) => ({ row, col: 0, at: indexAt + 10 + row * 2, color: MARK_KEY }))}
+          marks={CI.rows.map((_, row) => ({ row, col: 0, at: setAt + row * 2, color: MARK_KEY }))}
         />
         {O.rows.map((_, i) => (
           <KeyArrow
@@ -138,11 +167,39 @@ export const MergeScene: React.FC = () => {
           at={nameAt - 4}
           out={outMatch}
           rows={M.rows.map((cells, i) => ({ cells, at: nameAt + i * 2 }))}
-          bands={M.rows.map((_, row) => ({ row, at: indexAt + 14 + row * 2, color: MARK }))}
+          bands={[
+            ...M.rows.map((_, row) => ({ row, at: keptAt + row * 2, out: joinAt - 4, color: MARK })),
+            ...M.rows.map((_, row) => ({ row, at: sameAt + row * 2, color: MARK })),
+          ]}
         />
-        <Note at={indexAt + 14} x={RESULT_X} y={mg.rowTop(M.rows.length) + h(22)} out={outMatch}>
+        <Note at={sameAt} x={RESULT_X} y={mg.rowTop(M.rows.length) + h(22)} out={outMatch}>
           <span style={{ ...label(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same four rows</span>
         </Note>
+
+        {/* ── the calls: merge's with how's join types, then join's ── */}
+        <Listing lines={COMBINE.merged.lines} x={X0} top={codeTop} width={mergeW} size={CODE} at={sqlAt} out={joinAt - 4} />
+        <Note at={howAt} x={X0 + mergeW + 28} y={codeTop + h(14)} out={joinAt - 4}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <Mono color={INK}>how</Mono>
+            <FadeIn at={typesAt - 2}>
+              : inner,{" "}
+              <Mark at={leftAt}>
+                <span style={{ color: INK, fontWeight: 650 }}>left</span>
+              </Mark>
+              , right or outer
+            </FadeIn>
+          </span>
+        </Note>
+        <Listing
+          lines={COMBINE.joined.lines}
+          x={X0}
+          top={codeTop}
+          width={860}
+          size={CODE}
+          at={indexAt}
+          out={outMatch}
+          marks={[{ line: 0, at: setAt, out: outMatch }]}
+        />
 
         {/* ── concat ── */}
         <TableName g={marchG} at={stackAt - 4}>
@@ -155,7 +212,7 @@ export const MergeScene: React.FC = () => {
           rows={march.rows.map((cells, i) => ({ cells, at: stackAt + i * 2 }))}
         />
         <TableName g={sg} at={marchAt - 4}>
-          <Mono>pd.concat([orders, march], ignore_index=True)</Mono>
+          <TitleCode>pd.concat([orders, march], ignore_index=True)</TitleCode>
         </TableName>
         <DataTable
           g={sg}

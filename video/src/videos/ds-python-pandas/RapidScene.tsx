@@ -20,6 +20,7 @@ import {
   Mark,
   MARK_BAD,
   MARK_KEY,
+  MARK_OK,
   Mono,
   OK,
   OK_INK,
@@ -113,22 +114,47 @@ const ChainBody: React.FC<{ c: Ctx }> = ({ c }) => {
   );
 };
 
-/** 12. np.select with a default, and case_when started without one. */
+/** 12. np.select with a default; then case_when's own code, started from
+ *  the default, in the listing's place, and the same rule started from the
+ *  column instead, where the rows nothing matches keep their old value. */
 const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const S = QUICK.select;
+  const W = QUICK.caseWhen;
   const at = c.w("r-case", "use NumPy select");
-  const listH = listingHeight(S.lines.length, SIZE);
-  const g = geoOf(S, R_X, c.y(370) + listH + c.h(70), c.h, { rowH: 48 });
+  const caseAt = c.w("r-case", "Pandas has case when too");
+  const startAt = c.w("r-case", "Start it from the default");
+  const matchAt = c.w("r-case", "or rows that match nothing");
+  const oldAt = c.w("r-case", "keep their old value");
+  // The tables sit under the taller of the two listings.
+  const listH = Math.max(listingHeight(S.lines.length, SIZE), listingHeight(W.lines.length, SIZE));
+  const tablesTop = c.y(370) + listH + c.h(64);
+  const g = geoOf(S, R_X, tablesTop, c.h, { rowH: 48 });
   const size = S.cols.indexOf("size");
   const B = QUICK.bare;
   const bx = R_X + 480;
-  const bg = geoOf(B, bx, c.y(370) + listH + c.h(70), c.h, { rowH: 48 });
+  const bg = geoOf(B, bx, tablesTop, c.h, { rowH: 48 });
   const kept = B.rows.flatMap((r, i) => (/^\d+$/.test(r[1]) ? [i] : []));
-  const caseAt = c.w("r-case", "Pandas has case when too");
-  const oldAt = c.w("r-case", "keep their old value");
   return (
     <>
-      <Listing lines={S.lines} x={R_X} top={c.y(370)} width={960} size={SIZE} at={at - 4} marks={[{ line: 2, at: c.w("r-case", "and a default") }]} />
+      <Listing
+        lines={S.lines}
+        x={R_X}
+        top={c.y(370)}
+        width={960}
+        size={SIZE}
+        at={at - 4}
+        out={caseAt - 2}
+        marks={[{ line: 2, at: c.w("r-case", "and a default") }]}
+      />
+      <Listing
+        lines={W.lines}
+        x={R_X}
+        top={c.y(370)}
+        width={960}
+        size={SIZE}
+        at={caseAt + 2}
+        marks={[{ line: 0, at: startAt, color: MARK_OK }]}
+      />
       <DataTable
         g={g}
         cols={colsOf(S, { size: { ink: BLUE_INK } })}
@@ -136,16 +162,19 @@ const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
         rows={S.rows.map((cells, i) => ({ cells, at: at + 10 + i * 2 }))}
         marks={S.rows.map((_, row) => ({ row, col: size, at: c.w("r-case", "a list of conditions") + row * 2, color: MARK_KEY }))}
       />
-      <Note at={caseAt} x={bx} y={bg.top - c.h(40)}>
+      <Note at={startAt + 4} x={R_X} y={g.top - c.h(40)}>
+        <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>started from the default</span>
+      </Note>
+      <Note at={matchAt} x={bx} y={bg.top - c.h(40)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          <Mono>case_when</Mono>, with no default
+          started from <Mono>amount</Mono>
         </span>
       </Note>
       <DataTable
         g={bg}
         cols={colsOf(B)}
-        at={caseAt + 4}
-        rows={B.rows.map((cells, i) => ({ cells, at: caseAt + 8 + i * 2 }))}
+        at={matchAt}
+        rows={B.rows.map((cells, i) => ({ cells, at: matchAt + 4 + i * 2 }))}
         marks={kept.map((row) => ({ row, col: 1, at: oldAt + (row - kept[0]) * 4, color: MARK_BAD }))}
       />
       <Line at={oldAt + 4} x={bx + 200} top={bg.rowMid(kept[0]) - c.h(16)} color={ACCENT_INK}>
@@ -227,7 +256,8 @@ const DatesBody: React.FC<{ c: Ctx }> = ({ c }) => {
 /**
  * Questions 10 to 14, a sentence and a line of code each, beside a numbered
  * list: map, apply and DataFrame.map; the page's chain; np.select with a
- * default, and case_when without one keeping 50 and 80; 300 regions as
+ * default, case_when's code started from the default, and the same rule
+ * started from the column keeping 50 and 80; 300 regions as
  * strings and as a category; a week's resample. The bridge maps three
  * pandas words onto their SQL twins.
  */
