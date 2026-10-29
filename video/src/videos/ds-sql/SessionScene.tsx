@@ -3,7 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ds } from "../../theme/brand";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -19,6 +20,11 @@ const AXIS_Y = 370;
 const TABLE_TOP = 500;
 const SQL_X = 760;
 const SQL_SIZE = 19;
+/** What the narration points at (the rule, the long gaps, the hits that open
+ *  a session) is yellow, like the is_new marks in the table: a new session is
+ *  not an error, so the series' red stays off it. The words stay in ink. */
+const POINT = ds("yellow", 600);
+const POINT_FILL = ds("yellow", 500);
 
 const minutes = (hhmm: string) => {
   const [hh, mm] = hhmm.split(":").map(Number);
@@ -28,9 +34,10 @@ const tx = (m: number) => AX_X0 + ((m - T0) / (T1 - T0)) * (AX_X1 - AX_X0);
 
 /**
  * Question 5, on the page's hits. User 1's six hits on a timeline, the
- * thirty-minute rule as a scale bar; LAG brings each the gap before it, the
- * gaps over thirty minutes (and the first hit) are flagged, and the running
- * sum of the flags numbers three sessions, bracketed under the dots. The
+ * thirty-minute threshold (a common one, not the definition) as a scale bar;
+ * LAG brings each the gap before it, the gaps over thirty minutes (and the
+ * first hit) are flagged, and the running sum of the flags numbers three
+ * sessions, bracketed under the dots. The
  * steps as a table, named as user 1's so it is not read as the output of the
  * page's query beside it, whose top rule lines up with that name.
  */
@@ -43,8 +50,8 @@ export const SessionScene: React.FC = () => {
   const qAt = n.word("session", "Question");
   const textAt = n.word("session", "What is sessionization");
   const groupsAt = n.word("session", "It groups one user's events into visits");
-  const thirtyAt = n.word("session", "passes thirty minutes");
-  const hitsAt = n.word("session", "User one has six hits");
+  const thirtyAt = n.word("session-rule", "commonly thirty minutes");
+  const hitsAt = n.word("session-user", "User one has six hits");
   const lagAt = n.word("session-lag", "Lag brings each row");
   const flagAt = n.word("session-lag", "Flag a one");
   const firstAt = n.word("session-lag", "no earlier hit at all");
@@ -89,16 +96,16 @@ export const SessionScene: React.FC = () => {
           {Array.from({ length: 7 }, (_, k) => 9 + k).map((hr) => (
             <g key={hr} opacity={ease(frame, groupsAt + 6 + (hr - 9) * 2, 10)}>
               <line x1={tx(hr * 60)} x2={tx(hr * 60)} y1={ay} y2={ay + 8} stroke={INK_SOFT} strokeWidth={1.4} />
-              <text x={tx(hr * 60)} y={ay + 32} textAnchor="middle" style={{ ...label(19, INK_SOFT), ...TABULAR }}>
+              <text x={tx(hr * 60)} y={ay + 32} textAnchor="middle" fill={INK_SOFT} style={{ ...label(19, INK_SOFT), ...TABULAR }}>
                 {hr}:00
               </text>
             </g>
           ))}
           {/* The rule: thirty minutes, to scale. */}
           <g opacity={ease(frame, thirtyAt - 2, 12)}>
-            <rect x={tx(T1 - 30)} y={ay - 100} width={tx(T0 + 30) - tx(T0)} height={10} rx={3} fill={ACCENT} />
-            <text x={tx(T1 - 30)} y={ay - 110} style={{ ...label(19, ACCENT_INK) }}>
-              30 min
+            <rect x={tx(T1 - 30)} y={ay - 100} width={tx(T0 + 30) - tx(T0)} height={10} rx={3} fill={POINT_FILL} />
+            <text x={tx(T1)} y={ay - 110} textAnchor="end" fill={INK} style={{ ...label(19, INK) }}>
+              a common threshold: 30 min
             </text>
           </g>
           {/* Sessions, bracketed under the dots as they are numbered. */}
@@ -110,7 +117,7 @@ export const SessionScene: React.FC = () => {
             return (
               <g key={s} opacity={p}>
                 <path d={`M${a},${ay + 48} L${a},${ay + 56} L${b},${ay + 56} L${b},${ay + 48}`} fill="none" stroke={OK} strokeWidth={3} />
-                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" style={{ ...label(19, OK_INK), fontWeight: 700 }}>
+                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" fill={OK_INK} style={{ ...label(19, OK_INK), fontWeight: 700 }}>
                   session {s}
                 </text>
               </g>
@@ -128,10 +135,10 @@ export const SessionScene: React.FC = () => {
                 <path
                   d={`M${xs[i - 1]},${ay - 16} Q${mid},${ay - 46} ${xs[i]},${ay - 16}`}
                   fill="none"
-                  stroke={hot > 0.5 ? ACCENT : INK_SOFT}
+                  stroke={hot > 0.5 ? POINT : INK_SOFT}
                   strokeWidth={long ? 2.6 : 1.8}
                 />
-                <text x={mid} y={ay - 54} textAnchor="middle" style={{ ...label(19, hot > 0.5 ? ACCENT_INK : INK_SOFT), fontWeight: long ? 700 : 500, ...TABULAR }}>
+                <text x={mid} y={ay - 54} textAnchor="middle" fill={hot > 0.5 ? INK : INK_SOFT} style={{ ...label(19, hot > 0.5 ? INK : INK_SOFT), fontWeight: long ? 700 : 500, ...TABULAR }}>
                   {long ? `${r[gap]} min` : r[gap]}
                 </text>
               </g>
@@ -144,7 +151,7 @@ export const SessionScene: React.FC = () => {
             return (
               <g key={i} opacity={p}>
                 <circle cx={xs[i]} cy={ay} r={9 * p} fill={BAR} />
-                {ring > 0 && <circle cx={xs[i]} cy={ay} r={16} fill="none" stroke={ACCENT} strokeWidth={2.6} opacity={ring} />}
+                {ring > 0 && <circle cx={xs[i]} cy={ay} r={16} fill="none" stroke={POINT} strokeWidth={3} opacity={ring} />}
               </g>
             );
           })}

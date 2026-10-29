@@ -108,6 +108,9 @@ export const COHORT = {
   sample: table("cohort", "sample"),
   /** The page's query on the video's own activity log. */
   page: query("cohort", "page"),
+  /** The same query one step on: each count over its cohort's month 0, by
+   *  FIRST_VALUE, which is what the grid shows. */
+  shares: query("cohort", "rates"),
   /** Each cohort's shares of its month zero, as a grid: one row per cohort,
    *  a percentage per month offset (null past the data). */
   grid: cohorts.map((c) => ({
@@ -156,6 +159,7 @@ export const RAPID = {
    *  the default RANGE frame gives the tied rows one total. */
   tied: query("ties", "running"),
   latest: query("latest", "latest"),
+  orders: Number(scalar("latest", "rows", "orders")),
   customers: Number(scalar("latest", "rows", "customers")),
   pivot: query("pivot", "pivot"),
   counts: query("count", "counts"),

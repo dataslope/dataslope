@@ -23,10 +23,12 @@ const TOTAL = 15;
  * The opening: the finished cohort chart first, filling in as its rows and
  * columns are described. Shares fall along each row (the tint fades), and
  * the outline traces why each newer row is shorter: it has had fewer months
- * of data, which is a different thing from users leaving. Then the promise
- * that each of its pieces is a question. Then the page's fifteen questions as
- * numbered chips, six filled for the worked ones and nine outlined for the
- * quick round; the first lights on the bridge into question 1.
+ * of data, which is a different thing from users leaving. Then the promise:
+ * its pieces, and the patterns around them, are questions of their own (the
+ * second half of the video is the patterns, not the chart). Then the page's
+ * fifteen questions as numbered chips, six filled for the worked ones and
+ * nine outlined for the quick round; the first lights on the bridge into
+ * question 1.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -42,7 +44,7 @@ export const HookScene: React.FC = () => {
   const threeAt = n.word("hook-cells", "then three");
   const shorterAt = n.word("hook-cells", "each newer row is shorter");
   const fewerAt = n.word("hook-cells", "fewer months to measure");
-  const classicAt = n.word("hook-sql", "a classic data science SQL question");
+  const aroundAt = n.word("hook-sql", "the patterns around them");
   const fifteenAt = n.word("plan", "fifteen questions");
   const sixAt = n.word("plan", "Six get a real query");
   const nineAt = n.word("plan", "The other nine");
@@ -65,7 +67,7 @@ export const HookScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>Data scientist interview prep</Kicker>
-        <Headline lead="One chart," turn="built one question at a time." at={from + 4} turnAt={classicAt} size={70} />
+        <Headline lead="One chart," turn="and the queries around it." at={from + 4} turnAt={aroundAt} size={70} />
 
         <Spot id="ds-sql-seal" at={from + 8} left={1160} top={y(300)} width={640} height={440} />
 

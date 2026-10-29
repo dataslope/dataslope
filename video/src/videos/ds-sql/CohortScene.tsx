@@ -23,8 +23,9 @@ const GRID_TOP = 420;
  * cohort query, its first CTE marked as the cohort is named and the
  * DATE_DIFF as the months since; the counts per cohort and offset, with
  * January's 8, 6, 4, 3 picked out; then those counts as shares of each
- * cohort's month zero, which is the opening's chart again, its outline drawn
- * as the narration says why the newest cohorts are the shortest rows.
+ * cohort's month zero (the query's last SELECT, FIRST_VALUE picking month 0,
+ * under the grid), which is the opening's chart again, its outline drawn as
+ * the narration says why the newest cohorts are the shortest rows.
  */
 export const CohortScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -42,6 +43,7 @@ export const CohortScene: React.FC = () => {
   const eightAt = n.word("cohort-count", "eight users");
   const sixAt = n.word("cohort-count", "then six");
   const divideAt = n.word("cohort-rate", "Divide each count");
+  const zeroAt = n.word("cohort-rate", "the cohort's month zero");
   const sharesAt = n.word("cohort-rate", "the counts become shares");
   const pctAt = [
     n.word("cohort-rate", "a hundred"),
@@ -60,6 +62,10 @@ export const CohortScene: React.FC = () => {
   const cohortCol = P.cols.indexOf("cohort");
   const retained = P.cols.indexOf("retained");
   const january = P.rows.flatMap((r, i) => (r[cohortCol] === P.rows[0][cohortCol] ? [i] : []));
+  // The step that turns counts into shares, the last SELECT of the same
+  // query carried one CTE further (counts): FIRST_VALUE is month 0.
+  const S = COHORT.shares.lines;
+  const shareLines = S.slice(lineOf(S, "SELECT cohort, month_offset, retained,"), lineOf(S, "FROM counts") + 1);
   // The four counts are spoken in a row: eight, then six, four and three.
   const countMarkAt = (k: number) => (k === 0 ? eightAt + 2 : sixAt + 2 + (k - 1) * 9);
 
@@ -148,6 +154,15 @@ export const CohortScene: React.FC = () => {
           rowMark={{ row: 0, at: pctAt[0] - 4 }}
           stairAt={stairAt}
           blankNote={{ at: fewestAt, text: "not reached yet" }}
+        />
+        <Listing
+          lines={shareLines}
+          x={GRID_X}
+          top={y(GRID_TOP) + 4 * h(74) + h(36)}
+          width={720}
+          size={SIZE}
+          at={divideAt + 6}
+          marks={[{ line: lineOf(shareLines, "FIRST_VALUE(retained)"), at: zeroAt + 2 }]}
         />
       </Drift>
     </AbsoluteFill>

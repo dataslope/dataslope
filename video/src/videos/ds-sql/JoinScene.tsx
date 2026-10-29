@@ -45,7 +45,8 @@ const Chip: React.FC<{ at: number; out?: number; x: number; y: number; value: st
  * February has none: 50%. Then those null rows are the churned users: under
  * the page's anti-join, the WHERE closes up the left join's matched rows in
  * place, and what is left becomes the query's own one-column result, so the
- * table under the listing is always the listing's output.
+ * table under the listing is always the listing's output. The NOT EXISTS
+ * version is printed beside it as the narration names it.
  */
 export const JoinScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -227,6 +228,17 @@ export const JoinScene: React.FC = () => {
             <Tick at={existsAt + 8} size={24} color={OK} />
           </span>
         </Note>
+        {/* The NOT EXISTS the note names, so it is shown, not only said. */}
+        <Listing
+          lines={RETAIN.notExists.lines}
+          x={cg.right + 36}
+          top={cg.rowTop(1) + h(8)}
+          width={720}
+          size={SIZE - 2}
+          at={existsAt + 2}
+          marks={[{ line: lineOf(RETAIN.notExists.lines, "NOT EXISTS"), at: existsAt + 14, color: MARK_OK }]}
+          out={end}
+        />
       </Drift>
     </AbsoluteFill>
   );
