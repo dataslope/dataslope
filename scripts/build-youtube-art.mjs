@@ -35,13 +35,13 @@
  * the site serves them. Standalone like `build-favicons.mjs`; regenerate with
  * `npm run build:youtube-art`.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Resvg } from "@resvg/resvg-js";
+import { placeMark, readMark, round } from "./lib/brand-mark.mjs";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-const SOURCE = join(ROOT, "public", "dataslope-logo-blue.svg");
 const OUT = join(ROOT, "brand-assets", "youtube");
 
 const BACKGROUND = "#ffffff";
@@ -78,51 +78,6 @@ const FONT_CANDIDATES = [
   "/Library/Fonts/Inter-SemiBold.otf",
   "/Library/Fonts/Inter-SemiBold.ttf",
 ].filter(Boolean);
-
-// ── Reading the brand mark ──────────────────────────────────────────────────
-
-/** The mark's two gradients and two paths, parsed and asserted the same way
- *  `build-favicons.mjs` does, so a redrawn brand file fails here instead of
- *  emitting half a logo. */
-function readMark() {
-  const svg = readFileSync(SOURCE, "utf8");
-  const gradients = svg.match(/<radialGradient[\s\S]*?<\/radialGradient>/g) ?? [];
-  const paths = [...svg.matchAll(/<path\b[^>]*\bclass="(cls-\d)"[^>]*\bd="([^"]+)"[^>]*\/>/g)];
-  const viewBox = svg.match(/viewBox="0 0 ([\d.]+) ([\d.]+)"/);
-
-  if (gradients.length !== 2 || paths.length !== 2 || !viewBox) {
-    throw new Error(
-      `build-youtube-art: ${SOURCE} is not the two-path, two-gradient mark ` +
-        `this script knows how to place (found ${paths.length} path(s), ` +
-        `${gradients.length} gradient(s)). Re-read it and update readMark().`,
-    );
-  }
-  if (paths[0][1] !== "cls-1" || paths[1][1] !== "cls-2") {
-    throw new Error(
-      "build-youtube-art: the mark's paths are no longer cls-1 then cls-2, " +
-        "so pairing them with the gradients by position would be a guess",
-    );
-  }
-
-  return {
-    width: Number(viewBox[1]),
-    height: Number(viewBox[2]),
-    gradients: gradients.map((g, i) => g.replace(/id="[^"]*"/, `id="ds-mark-${i + 1}"`)),
-    paths: paths.map((p) => p[2]),
-  };
-}
-
-const round = (n) => Number(n.toFixed(4));
-
-/** The mark scaled to `height` with its top-left corner at (x, y). The
- *  gradients are `userSpaceOnUse`, so they travel with the group transform. */
-function placeMark(mark, x, y, height) {
-  const scale = height / mark.height;
-  return `<g transform="translate(${round(x)} ${round(y)}) scale(${round(scale)})">
-    <path fill="url(#ds-mark-1)" d="${mark.paths[0]}"/>
-    <path fill="url(#ds-mark-2)" d="${mark.paths[1]}"/>
-  </g>`;
-}
 
 function canvas(mark, width, height, body) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">

@@ -123,7 +123,7 @@ const LAYOUT = {
     // 104px column and the auto margins do nothing.
     thumb: "w-[65%] mx-auto sm:w-full",
     sizes: "(min-width: 640px) 104px, 65vw",
-    title: "text-[18px] leading-[1.7] tracking-[-0.02em]",
+    title: "text-[17px] leading-[1.7] tracking-[-0.02em]",
     desc: "line-clamp-2 text-[16px] leading-[1.7] sm:line-clamp-none",
   },
   preview: {
