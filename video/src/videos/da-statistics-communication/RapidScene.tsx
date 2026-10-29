@@ -147,7 +147,7 @@ const Variance: React.FC<{ c: Ctx }> = ({ c }) => {
           <Num>
             {count(V.sumSquares)} ÷ {V.n} = {fmt(V.varPop, 0)}
           </Num>
-          , the average: divide by n
+          : the average, dividing by n
         </span>
       </Note>
       <Note at={ddofAt - 2} x={R_X + 40} y={row(4)}>
@@ -156,7 +156,7 @@ const Variance: React.FC<{ c: Ctx }> = ({ c }) => {
             {count(V.sumSquares)} ÷ {V.n - 1} ={" "}
             <b style={{ opacity: ease(frame, fiftyAt - 2, 10) }}>{fmt(V.var, 0)}</b>
           </Num>
-          , pandas&apos; <Mono>.var()</Mono>: a sample divides by n − 1
+          : pandas&apos; <Mono>.var()</Mono> treats it as a sample, n − 1
         </span>
       </Note>
       <Note at={closerAt - 2} x={R_X + 40} y={row(5)}>
@@ -242,7 +242,7 @@ const Normal: React.FC<{ c: Ctx }> = ({ c }) => {
   ];
   const s: Scale = { lo: -3.6, hi: 3.6, a: R_X + 40, b: R_X + 760 };
   const base = c.y(760);
-  const peak = c.h(340);
+  const peak = c.h(300);
   const yOf = (v: number) => base - (normalPdf(v, 0, 1) / normalPdf(0, 0, 1)) * peak;
   const steps = 120;
   const curveP = ease(frame, at0, 22);
@@ -282,18 +282,18 @@ const Normal: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>SD: standard deviation</span>
       </Note>
       {/* Why an analyst cares: the averages are near-normal, whatever the data. */}
-      <Note at={whyAt - 2} x={R_X + 40} y={c.y(318)}>
+      <Note at={whyAt - 2} x={R_X + 40} y={c.y(306)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <b>why it matters</b>: a big sample&apos;s average comes out close to normal,
         </span>
       </Note>
-      <Note at={evenAt - 2} x={R_X + 40} y={c.y(318) + c.h(40)}>
+      <Note at={evenAt - 2} x={R_X + 40} y={c.y(306) + c.h(38)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           even when the data isn&apos;t
           <span style={{ opacity: ease(frame, leanAt - 2, 10) }}>, and intervals and A/B tests lean on that</span>
         </span>
       </Note>
-      <Note at={skewAt - 2} x={R_X + 40} y={c.y(318) + 2 * c.h(40)}>
+      <Note at={skewAt - 2} x={R_X + 40} y={c.y(306) + 2 * c.h(38)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>so skewed raw data doesn&apos;t break them by itself</span>
       </Note>
     </>
