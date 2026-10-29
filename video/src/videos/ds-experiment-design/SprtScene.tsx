@@ -7,7 +7,7 @@ import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, no
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { pct, SPRT } from "./data";
+import { pct, POWER, SPRT } from "./data";
 import { at, Axes, Curve, Drift, Mark, OK, OK_INK, type Scale, Svg } from "./parts";
 
 const BOX = { left: 190, right: 1100, top: 340, bottom: 800 };
@@ -19,8 +19,10 @@ const BAR_W = 500;
  * Question 10. The SPRT on pairs of users, one from each arm: the running
  * log likelihood ratio of "an effect of 0.2 SD" against "no effect" between
  * Wald's boundaries for 2.5% and 20%. One run with the effect crosses the
- * top; one without crosses the bottom. Then 2,000 runs each way: 2.1% false
- * positives, and 262 pairs on average against the fixed test's 393.
+ * top; one without crosses the bottom. Each boundary is labelled with the
+ * log it is, from the design's 2.5% and 20%. Then 2,000 runs each way: 2.1%
+ * false positives, and 262 pairs on average against the fixed test's 393, at
+ * the same power (80.5% and 80.1%), and the limit: two fixed hypotheses only.
  */
 export const SprtScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -36,14 +38,17 @@ export const SprtScene: React.FC = () => {
   const boundsAt = n.word("sprt", "against boundaries fixed before the start");
   const topAt = n.word("sprt", "Cross the top line");
   const concludeAt = n.word("sprt", "you conclude there's an effect");
-  const bottomAt = n.word("sprt", "Cross the bottom");
-  const betweenAt = n.word("sprt", "In between, you keep going");
+  const bottomAt = n.word("sprt-bottom", "Cross the bottom");
+  const betweenAt = n.word("sprt-bottom", "In between, you keep going");
   const runAt = n.word("sprt-cost", "Run it two thousand times");
   const wrongAt = n.word("sprt-cost", "wrongly finds an effect");
   const builtAt = n.word("sprt-cost", "within the two and a half");
-  const realAt = n.word("sprt-cost", "when the effect is real");
-  const pairsAt = n.word("sprt-cost", "two hundred sixty-two pairs");
-  const fixedAt = n.word("sprt-cost", "three hundred ninety-three for the fixed test");
+  const realAt = n.word("sprt-pairs", "when the effect is real");
+  const pairsAt = n.word("sprt-pairs", "two hundred sixty-two pairs");
+  const fixedAt = n.word("sprt-pairs", "three hundred ninety-three for the fixed test");
+  const bothAt = n.word("sprt-limit", "Both catch that effect eighty percent");
+  const classicAt = n.word("sprt-limit", "the classic SPRT holds only");
+  const liveAt = n.word("sprt-limit", "for a live product metric");
   const cheaperAt = n.word("cuped-in", "makes every test cheaper");
   const clearAt = n.beat("cuped-in").to - 6;
 
@@ -56,9 +61,12 @@ export const SprtScene: React.FC = () => {
   const band = ease(frame, betweenAt - 2, 14);
 
   const bars = [
-    { text: "the SPRT, on average", v: SPRT.meanH1, at: pairsAt, color: OK, ink: OK_INK },
-    { text: "the fixed test", v: SPRT.fixed, at: fixedAt, color: BAR, ink: BLUE_INK },
+    { text: "the SPRT, on average", v: SPRT.meanH1, at: pairsAt, color: OK, ink: OK_INK, power: SPRT.power },
+    { text: "the fixed test", v: SPRT.fixed, at: fixedAt, color: BAR, ink: BLUE_INK, power: POWER.base },
   ];
+  // Wald's boundaries, written as the logs they are, from the design's error rates.
+  const upperLog = `log(${(1 - SPRT.beta).toFixed(2)} / ${SPRT.alpha})`;
+  const lowerLog = `log(${SPRT.beta.toFixed(2)} / ${(1 - SPRT.alpha).toFixed(3)})`;
   const xb = (v: number) => COL_X + (v / 400) * BAR_W;
 
   return (
@@ -96,11 +104,15 @@ export const SprtScene: React.FC = () => {
           <line x1={BOX.left} x2={BOX.left + (BOX.right - BOX.left) * bounds} y1={at(ys, SPRT.upper)} y2={at(ys, SPRT.upper)} stroke={OK} strokeWidth={2.6} strokeDasharray="8 6" />
           <line x1={BOX.left} x2={BOX.left + (BOX.right - BOX.left) * bounds} y1={at(ys, SPRT.lower)} y2={at(ys, SPRT.lower)} stroke={INK} strokeWidth={2.6} strokeDasharray="8 6" />
         </Svg>
-        <Note at={boundsAt + 6} x={BOX.right - 6} y={at(ys, SPRT.upper) - h(40)} width={320} align="right">
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>stop: an effect ({SPRT.upper.toFixed(2)})</span>
+        <Note at={boundsAt + 6} x={BOX.right - 6} y={at(ys, SPRT.upper) - h(40)} width={620} align="right">
+          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            stop: an effect · {upperLog} = {SPRT.upper.toFixed(2)}
+          </span>
         </Note>
-        <Note at={boundsAt + 10} x={BOX.right - 6} y={at(ys, SPRT.lower) + h(18)} width={320} align="right">
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>stop: no effect (−{(-SPRT.lower).toFixed(2)})</span>
+        <Note at={boundsAt + 10} x={BOX.right - 6} y={at(ys, SPRT.lower) + h(18)} width={620} align="right">
+          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            stop: favors no effect · {lowerLog} = −{(-SPRT.lower).toFixed(2)}
+          </span>
         </Note>
         <Curve points={effect} x={xs} y={ys} at={topAt - 2} dur={Math.max(20, concludeAt - topAt + 6)} color={BAR} width={2.6} />
         <Curve points={none} x={xs} y={ys} at={bottomAt - 2} dur={22} color={INK_SOFT} width={2.6} />
@@ -141,7 +153,10 @@ export const SprtScene: React.FC = () => {
           const top = y(640) + i * h(92);
           return (
             <React.Fragment key={b.text}>
-              <div style={{ position: "absolute", left: COL_X, top, ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", opacity: p }}>{b.text}</div>
+              <div style={{ position: "absolute", left: COL_X, top, ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", opacity: p }}>
+                {b.text}
+                <span style={{ color: b.ink, opacity: ease(frame, bothAt + i * 6, 10) }}> · power {pct(b.power, 1)}</span>
+              </div>
               <div
                 style={{ position: "absolute", left: COL_X, top: top + h(30), width: (xb(b.v) - COL_X) * p, height: h(34), background: b.color, opacity: 0.85, borderRadius: 3 }}
               />
@@ -153,6 +168,12 @@ export const SprtScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+        <Note at={classicAt} x={COL_X} y={y(826)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>classic SPRT: two fixed hypotheses only</span>
+        </Note>
+        <Note at={liveAt} x={COL_X} y={y(862)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>live metrics: mixture SPRT, group-sequential</span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

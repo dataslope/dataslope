@@ -19,6 +19,9 @@ type Pair = [number, number];
 /** A/A tests on orders nested in users: how often each analysis calls a difference. */
 export const UNIT = results.unit as { sims: number; users: number; ordersPerUser: number; naive: number; user: number };
 
+/** The first of those A/A tests: the standard error of the difference, per order as if independent and per user. */
+export const UNIT_SE = results.unitExample as { orders: number; users: number; seOrders: number; seUsers: number };
+
 /** The page's power block, and power at its 393 per arm with one lever moved at a time. */
 export const POWER = results.power as {
   solve: number;
@@ -30,8 +33,18 @@ export const POWER = results.power as {
 /** The two errors on one threshold: a two-sided 5% test placed for 80% power (DA Part 7's). */
 export const ERRORS = results.errors as { crit: number; shift: number; alpha: number; beta: number; power: number };
 
-/** The page's sample-size function: 10% baseline, at each MDE in points. */
-export const SIZE = results.size as { baseline: number; two: number; one: number; ratio: number; statsmodels: number; curve: Pair[] };
+/** The page's sample-size function: 10% baseline, at each MDE in points, and its terms at a 2-point MDE. */
+export const SIZE = results.size as {
+  baseline: number;
+  two: number;
+  one: number;
+  ratio: number;
+  statsmodels: number;
+  zAlpha: number;
+  zBeta: number;
+  pPool: number;
+  curve: Pair[];
+};
 
 /** One- and two-sided on the same design: critical values, power, and a regression caught. */
 export const SIDES = results.sides as {
@@ -55,8 +68,10 @@ type Rate = { looks: number; rate: number };
 /** 10,000 A/A tests, checked on four schedules. */
 export const PEEK_RATES = results.peekRates as { sims: number; once: Rate; weekly: Rate; daily: Rate; every100: Rate };
 
-/** The SPRT on pairs of users: boundaries, error rates, average pairs, and two example paths. */
+/** The SPRT on pairs of users: the design's error rates, Wald's boundaries, error rates found, average pairs, and two example paths. */
 export const SPRT = results.sprt as {
+  alpha: number;
+  beta: number;
   upper: number;
   lower: number;
   fixed: number;

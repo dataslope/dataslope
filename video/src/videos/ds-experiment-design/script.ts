@@ -34,7 +34,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - the page's own code: NormalIndPower solves 392.44, so 393 per arm, for
  *     an effect of 0.2 at 80% power; the sample-size function gives 3,843 per
  *     arm for 10% and a 2-point MDE, and 14,752 for 1 point (statsmodels'
- *     arcsine version: 3,835); CUPED on 500 users takes the variance from
+ *     arcsine version: 3,835), from z terms of 1.96 and 0.84 and a pooled
+ *     rate of 11%; CUPED on 500 users takes the variance from
  *     8.09 to 3.52 with the mean unchanged; 1,000 A/A tests come out 5.0%
  *     significant.
  *   - Data Analyst Part 7's numbers, so the series agree: the two errors on
@@ -44,12 +45,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     0.3, 94% with the SD cut by a fifth, 88% at alpha 0.10; one-sided, 88%,
  *     and a regression of the same size is caught 0% of the time against 80%.
  *   - the video's own simulations: orders nested in 1,000 users, A/A, 20.6%
- *     significant per order and 4.3% per user; a cheaper checkout as good as
+ *     significant per order and 4.3% per user (in the first, a standard
+ *     error of 0.51 per order against 0.79 per user); a cheaper checkout as good as
  *     the old one, its difference -0.29 to +0.39 points at 60,000 per arm and
  *     -1.19 to +0.99 at 6,000, against a margin of 0.5; 10,000 A/A tests
  *     checked once 4.9%, weekly 12%, daily for four weeks 26.5%, every
- *     hundred visitors 34.8%; the SPRT on pairs, 2.1% false positives, 80.5%
- *     power, 262 pairs on average with the effect; revenue capped at its
+ *     hundred visitors 34.8%; the SPRT on pairs, designed for 2.5% and 20%
+ *     (boundaries log(0.80 / 0.025) and log(0.20 / 0.975)), 2.1% false
+ *     positives, 80.5% power against the fixed test's 80.1%, 262 pairs on
+ *     average with the effect; revenue capped at its
  *     99th percentile loses 48% of its variance; six heavy users among
  *     twenty land five or six in one arm with probability 0.219.
  *
@@ -106,6 +110,11 @@ export const script: NarrationScript = {
     {
       id: "unit-orders",
       text: "The analysis has to respect the unit, too. A thousand users place about five orders each, in an A A test, where both groups get the same version. Treat each order as independent, and the test finds a significant difference twenty-one percent of the time. Analyze one average per user, and it's four percent, inside the five it promises.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "unit-why",
+      text: "Why? One user's orders move together, so treating them as independent makes the standard error about a third too small. An average per user fixes that, and so do clustered standard errors.",
       pauseAfter: 0.7,
     },
     { id: "errors-in", text: "With the plan set, there are still two ways to be wrong." },
@@ -133,7 +142,15 @@ export const script: NarrationScript = {
     },
     {
       id: "size-n",
-      text: "Ten percent convert today, and you want to catch a two-point lift. The page's formula says three thousand eight hundred forty-three users per arm. Halve the lift to one point, and it's fourteen thousand seven hundred fifty-two, nearly four times as many. The sample grows with one over the MDE squared.",
+      text: "Ten percent convert today, and you want to catch a two-point lift. The page's formula says three thousand eight hundred forty-three users per arm.",
+    },
+    {
+      id: "size-terms",
+      text: "In the formula, alpha and power become one point nine six and point eight four. The baseline enters through p times one minus p, with p at eleven percent, the average of the two rates.",
+    },
+    {
+      id: "size-half",
+      text: "Halve the lift to one point, and it's fourteen thousand seven hundred fifty-two, nearly four times as many. The sample grows with one over the MDE squared.",
       pauseAfter: 0.7,
     },
     { id: "sides-in", text: "A test also has to say which direction counts." },
@@ -162,6 +179,11 @@ export const script: NarrationScript = {
     {
       id: "peek-rate",
       text: "Run ten thousand of these A A tests. Checked once, at the end, four point nine percent come out significant. Checked weekly, twelve. Daily for four weeks, twenty-six and a half. Every hundred visitors, thirty-five.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "peek-why",
+      text: "In an A A test, every significant result is a false positive, and each extra look is one more chance for noise to cross the line. So fix the sample size in advance, or use a sequential test, built to be checked as it runs.",
       pauseAfter: 0.7,
     },
 
@@ -169,12 +191,26 @@ export const script: NarrationScript = {
     {
       id: "sprt",
       scene: true,
-      text: "Question ten. What is a sequential probability ratio test? An SPRT tracks the likelihood ratio between two hypotheses, no effect and the effect you designed for, against boundaries fixed before the start. Cross the top line, and you conclude there's an effect. Cross the bottom, and there isn't. In between, you keep going.",
+      text: "Question ten. What is a sequential probability ratio test? An SPRT tracks the likelihood ratio between two hypotheses, no effect and the effect you designed for, against boundaries fixed before the start. Cross the top line, and you conclude there's an effect.",
+    },
+    {
+      id: "sprt-bottom",
+      text: "Cross the bottom, and the data favor no effect over the one you designed for, though a smaller effect may still be there. In between, you keep going.",
       pauseAfter: 0.6,
     },
     {
       id: "sprt-cost",
-      text: "Run it two thousand times each way. It wrongly finds an effect two percent of the time, within the two and a half it was built for. And when the effect is real, it stops after two hundred sixty-two pairs of users on average, against three hundred ninety-three for the fixed test.",
+      text: "Run it two thousand times each way. It wrongly finds an effect two percent of the time, within the two and a half it was built for.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "sprt-pairs",
+      text: "And when the effect is real, it stops after two hundred sixty-two pairs of users on average, against three hundred ninety-three for the fixed test.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "sprt-limit",
+      text: "Both catch that effect eighty percent of the time, so the saving is real. But the classic SPRT holds only for two fixed hypotheses; for a live product metric, teams use a mixture SPRT or group-sequential boundaries.",
       pauseAfter: 0.7,
     },
     { id: "cuped-in", text: "One more choice makes every test cheaper to run." },
