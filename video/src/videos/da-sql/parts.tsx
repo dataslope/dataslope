@@ -134,9 +134,11 @@ export const Headline: React.FC<{
   );
 };
 
-/** Code set inside running text or a label, at the text's own size. */
+/** Code set inside running text or a label, at the text's own size. A mono
+ *  space is 0.6em, so `GROUP BY` beside sans text read as a double space; the
+ *  word spacing brings it back to about a sans space, as QMono does. */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.88em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.88em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
