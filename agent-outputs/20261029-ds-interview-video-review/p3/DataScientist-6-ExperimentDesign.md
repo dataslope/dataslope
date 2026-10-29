@@ -33,7 +33,8 @@ New length: **596.0 s (9:56)**, from 559.2 s. 45 beats, 1,471 words, 148 wpm.
 - `npm test`: 59/59 pass.
 - `check:sync`: passed. 45 beats, all within ±0.12 s; the worst is +0.03 s (`cuped-in`), and the five new beats are within ±0.02 s.
 - `check:mix`: passed. Narration −19.9 LUFS; effects 28.7 LU under it; speech a median 29.9 dB over the effects where both sound (5th percentile 13.1 dB).
-- `check:motion`: MOTION_RESULT
+- `check:motion`: passed on the final code. Nothing holds still for 3 s; the longest still stretches are 2.5 s, over `design`, `peek-in` and `sprt`. The first run failed on Question 3's opening (3.3 s); the highlight above fixed it (now 2.0 s).
+- `check:sync` and `check:mix` ran before the last two screen-only edits (the Question 3 highlight and moving the Errors axis note a row down). Neither edit touches audio or a sound effect.
 - `check:frames`: not run. No arrow, illustration or ERD changed.
 - Stills, each looked at: 25, 30.9, 31.5 (hook and its cut); 50, 64, 75.3, 78.3, 82, 87.5, 91.8 (design); 96.6 (Q3 highlight); 149.9, 165, 200.6, 203.5 (errors); 205.3, 214 (size); 262.9, 313, 333, 336, 341.3 (sides); 463.8 (SPRT into CUPED); 477, 488, 507 (CUPED); 541, 557, 566 (rapid).
 
