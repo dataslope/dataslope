@@ -105,13 +105,15 @@ export const Axes: React.FC<{
             </text>
           </g>
         ))}
+        {/* A title is words: tabular figures would set its hyphens a digit
+            wide ("p - value"), so only the ticks take them. */}
         {xTitle ? (
-          <text x={x.b} y={base + 58} textAnchor="end" style={{ ...tickText(19), fontWeight: 650 }}>
+          <text x={x.b} y={base + 58} textAnchor="end" style={{ ...tickText(19), fontWeight: 650, fontVariantNumeric: "normal" }}>
             {xTitle}
           </text>
         ) : null}
         {yTitle ? (
-          <text x={left - 14} y={y.b - 26} textAnchor="start" style={{ ...tickText(19), fontWeight: 650 }}>
+          <text x={left - 14} y={y.b - 26} textAnchor="start" style={{ ...tickText(19), fontWeight: 650, fontVariantNumeric: "normal" }}>
             {yTitle}
           </text>
         ) : null}

@@ -350,15 +350,18 @@ export const Listing: React.FC<{
         const w = ease(frame, m.at, 12);
         const mo = m.out === undefined ? 0 : ease(frame, m.out, 10);
         if (w <= 0 || mo >= 1) return null;
+        // The band starts at the code, not at the indent before it: a mono
+        // character is 0.6em, so leading spaces shift it right by that much.
+        const indent = lines[m.line].length - lines[m.line].trimStart().length;
         return (
           <div
             key={i}
             style={{
               position: "absolute",
-              left: g.padX - size * 0.2,
+              left: g.padX - size * 0.2 + indent * 0.6 * size,
               top: g.padY + m.line * g.lineH + g.lineH * 0.12,
               height: g.lineH * 0.76,
-              width: `${(lines[m.line].length * 0.6 + 0.4) * w}em`,
+              width: `${((lines[m.line].length - indent) * 0.6 + 0.4) * w}em`,
               fontSize: size,
               background: m.color ?? MARK,
               opacity: 1 - mo,

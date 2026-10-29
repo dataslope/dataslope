@@ -32,9 +32,13 @@ import { Ink } from "./ui";
 export const OK = ds("green", 600);
 export const OK_INK = inkOf.green;
 
-/** Code inside a question or a list label, at the text's own size. */
+/**
+ * Code inside a question or a list label, at the text's own size. A mono space
+ * is 0.6em, so `LEFT JOIN` beside sans text read as a double space; the word
+ * spacing brings it back to about a sans space.
+ */
 export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.84em", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.84em", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
