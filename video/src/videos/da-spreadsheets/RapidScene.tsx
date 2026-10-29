@@ -267,6 +267,11 @@ const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
           <b style={{ color: ACCENT_INK }}>both copies flag</b>; Remove Duplicates keeps the first
         </span>
       </Note>
+      <Note at={firstAt + 24} x={R_X} y={g.bottom + c.h(62)}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          <Mono color={INK}>$A$2:A2</Mono> stops at its own row, so only the later copy flags
+        </span>
+      </Note>
     </>
   );
 };
