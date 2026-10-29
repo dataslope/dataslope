@@ -22,7 +22,8 @@ const SIDE_X = 1060;
  * run Stats-7 TestingHypotheses shows): the observed counts, then beside
  * each the count independence would predict. Mobile churned 103 times
  * against 86.7 expected; the squared gaps over the expected counts sum to
- * 11.9, p = 0.0026. Every expected count clears five.
+ * 11.9, p = 0.0026 on (3 − 1) × (2 − 1) = 2 degrees of freedom. Every
+ * expected count clears five.
  */
 export const ChiScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -44,6 +45,10 @@ export const ChiScene: React.FC = () => {
   const sumAt = n.word("chi", "Square each gap");
   const chiAt = n.word("chi", "eleven point nine");
   const pAt = n.word("chi", "p is point oh oh two six");
+  const curveAt = n.word("chi-dof", "a chi-square curve");
+  const dofAt = n.word("chi-dof", "two degrees of freedom");
+  const rowsAt = n.word("chi-dof", "rows minus one");
+  const colsAt = n.word("chi-dof", "times columns minus one");
   const fiveAt = n.word("chi-five", "One condition");
   const atLeastAt = n.word("chi-five", "at least five");
   const end = n.beat("chi-five").to;
@@ -64,6 +69,7 @@ export const ChiScene: React.FC = () => {
       <Sfx name="el-tap" at={mobileAt + 6} level={-32} />
       <Sfx name="el-sprinkle" at={expectAt} level={-34} />
       <Sfx name="el-pop" at={chiAt} level={-30} />
+      <Sfx name="el-tap" at={dofAt + 4} level={-34} />
       <Sfx name="el-tap" at={atLeastAt} level={-32} />
 
       <Drift from={from} to={end + 40}>
@@ -151,7 +157,17 @@ export const ChiScene: React.FC = () => {
             p = <b>{fmt(CHI.p, 4)}</b>
           </span>
         </Note>
-        <Note at={fiveAt} x={SIDE_X} y={y(740)}>
+        <Note at={curveAt} x={SIDE_X} y={y(696)}>
+          <span style={{ ...noteText(24, INK), ...TABULAR }}>
+            on <Mark at={dofAt + 4}>{CHI.dof} degrees of freedom</Mark>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, rowsAt - 2, 10) }}>
+              {" "}
+              = ({CHI.devices.length} − 1)
+              <span style={{ opacity: ease(frame, colsAt - 2, 10) }}> × ({CHI.observed[0].length} − 1)</span>
+            </span>
+          </span>
+        </Note>
+        <Note at={fiveAt} x={SIDE_X} y={y(770)}>
           <span style={{ ...noteText(26, OK_INK) }}>
             one condition: expected counts of <Mark at={atLeastAt + 2} color={MARK_OK}>at least 5</Mark> in most cells
           </span>

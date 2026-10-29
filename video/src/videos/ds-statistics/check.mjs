@@ -184,8 +184,11 @@ out = {"grid": [round(float(g), 4) for g in grid], "curves": curves}
 
 // ── 7. An unbiased estimator: the n − 1 ─────────────────────────────────────
 
-/** The video's own: 10,000 samples at each size from a population whose
- *  variance is 1, both divisors averaged. Then the page's own five values. */
+/** The video's own: 10,000 samples at each size from a normal population
+ *  whose variance is 1, both divisors averaged, and each one's mean squared
+ *  error against the true 1 (bias squared plus variance: dividing by n, the
+ *  normal's maximum-likelihood estimate, is biased but less variable). Then
+ *  the page's own five values. */
 results.figures.bessel = figure(`
 import numpy as np
 
@@ -193,10 +196,14 @@ rng = np.random.default_rng(1234)
 rows = []
 for n in (2, 3, 5, 10, 30):
     xs = rng.normal(0, 1, size=(10_000, n))
+    by_n = xs.var(axis=1, ddof=0)
+    by_n1 = xs.var(axis=1, ddof=1)
     rows.append({
         "n": n,
-        "byN": round(float(xs.var(axis=1, ddof=0).mean()), 3),
-        "byN1": round(float(xs.var(axis=1, ddof=1).mean()), 3),
+        "byN": round(float(by_n.mean()), 3),
+        "byN1": round(float(by_n1.mean()), 3),
+        "mseN": round(float(((by_n - 1) ** 2).mean()), 3),
+        "mseN1": round(float(((by_n1 - 1) ** 2).mean()), 3),
     })
 data = np.array([4.0, 7.0, 13.0, 2.0, 1.0])
 out = {

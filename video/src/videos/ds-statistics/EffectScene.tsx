@@ -43,7 +43,9 @@ export const EffectScene: React.FC = () => {
   const smallAt = n.word("effect", "too small to matter");
   const reportAt = n.word("effect-report", "report the effect size");
   const intervalAt = n.word("effect-report", "with its interval");
-  const end = n.beat("effect-report").to;
+  const reverseAt = n.word("effect-small", "The reverse happens too");
+  const bigAt = n.word("effect-small", "a big effect can miss significance");
+  const end = n.beat("effect-small").to;
 
   const base = y(BASE);
   const peak = normalPdf(100, 100, 15);
@@ -138,6 +140,15 @@ export const EffectScene: React.FC = () => {
             report the effect size
             <span style={{ opacity: ease(frame, intervalAt - 2, 10) }}>, with its interval,</span> beside every p-value
           </span>
+        </Note>
+        <Note at={reverseAt} x={SIDE_X} y={y(806)}>
+          <div style={{ lineHeight: 1.4 }}>
+            <span style={{ ...noteText(22, INK_SOFT) }}>the reverse happens too:</span>
+            <br />
+            <span style={{ ...noteText(24, INK), opacity: ease(frame, bigAt - 2, 10) }}>
+              a <Mark at={bigAt + 6}>big effect</Mark> can miss significance in a small sample
+            </span>
+          </div>
         </Note>
       </Drift>
     </AbsoluteFill>

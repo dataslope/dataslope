@@ -45,11 +45,12 @@ export const HackScene: React.FC = () => {
   const choicesAt = n.word("hack-paths", "Five reasonable choices");
   const thirtyTwoAt = n.word("hack-paths", "thirty-two possible analyses");
   const remedyAt = [
-    n.word("hack-paths", "Pre-register the plan"),
-    n.word("hack-paths", "correct for the number of tests"),
-    n.word("hack-paths", "confirm on fresh data"),
+    n.word("hack-fix", "Pre-register the plan"),
+    n.word("hack-fix", "correct for the number of tests"),
+    n.word("hack-fix", "confirm on fresh data"),
   ];
-  const end = n.beat("hack-paths").to;
+  const methodsAt = n.word("hack-fix", "with Bonferroni or Benjamini-Hochberg");
+  const end = n.beat("hack-fix").to;
 
   const hit = HACK.p.findIndex((p) => p <= 0.05);
   const tileX = (i: number) => X0 + (i % 10) * (TILE_W + TILE_GAP);
@@ -118,7 +119,7 @@ export const HackScene: React.FC = () => {
                 gap: 2,
               }}
             >
-              <span style={{ ...label(16, INK_SOFT), ...TABULAR }}>test {i + 1}</span>
+              <span style={{ ...label(19, INK_SOFT), ...TABULAR }}>test {i + 1}</span>
               <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: red > 0.5 ? ACCENT_INK : INK, ...TABULAR }}>{fmt(p, 3)}</span>
             </div>
           );
@@ -186,13 +187,16 @@ export const HackScene: React.FC = () => {
         </Note>
 
         {remedyAt.map((t, i) => (
-          <Note key={i} at={t} x={SIDE_X + 140} y={y(680 + i * 64)}>
+          <Note key={i} at={t} x={SIDE_X + 140} y={y([660, 720, 812][i])}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <Tick at={t + 4} size={26} />
               <span style={{ ...noteText(26, OK_INK) }}>{["pre-register the plan", "correct for the number of tests", "confirm on fresh data"][i]}</span>
             </div>
           </Note>
         ))}
+        <Note at={methodsAt} x={SIDE_X + 180} y={y(760)}>
+          <span style={{ ...noteText(22, INK_SOFT) }}>Bonferroni, or Benjamini-Hochberg</span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

@@ -59,7 +59,12 @@ export const MleScene: React.FC = () => {
   const smallAt = n.word("unbiased", "the squares come out small");
   const lowAt = n.word("unbiased", "twenty percent low");
   const fixAt = n.word("unbiased", "Dividing by n minus one");
-  const end = n.beat("unbiased").to;
+  const mseFrom = n.beat("unbiased-mse").from;
+  const mlAt = n.word("unbiased-mse", "the maximum-likelihood answer");
+  const lessAt = n.word("unbiased-mse", "biased, but less variable");
+  const mseAt = n.word("unbiased-mse", "its mean squared error is lower");
+  const notBetterAt = n.word("unbiased-mse", "Unbiased isn't automatically better");
+  const end = n.beat("unbiased-mse").to;
 
   const mleOut = q7At - 4;
 
@@ -78,6 +83,8 @@ export const MleScene: React.FC = () => {
   const byN = rows.map((r, i) => [vx(i), vy(r.byN)] as const);
   const byN1 = rows.map((r, i) => [vx(i), vy(r.byN1)] as const);
   const five = rows.findIndex((r) => r.n === 5);
+  // The mechanism lines make way for the trade-off once they have been said.
+  const whyOut = mseFrom - 6;
 
   return (
     <AbsoluteFill>
@@ -88,6 +95,7 @@ export const MleScene: React.FC = () => {
       <Sfx name="el-pencil" at={byNAt + 4} level={-34} />
       <Sfx name="el-tap" at={lowAt} level={-32} />
       <Sfx name="el-pop" at={fixAt + 6} level={-32} />
+      <Sfx name="el-tap" at={mseAt + 10} level={-34} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={mleOut} size={60}>
@@ -228,7 +236,7 @@ export const MleScene: React.FC = () => {
             variance ÷ n: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>not</span>
           </span>
         </Note>
-        <Note at={ownAt} x={SIDE_X} y={y(550)}>
+        <Note at={ownAt} x={SIDE_X} y={y(550)} out={whyOut}>
           <div style={{ ...noteText(24, INK_SOFT), lineHeight: 1.4 }}>
             each spread is measured from its own
             <br />
@@ -237,13 +245,33 @@ export const MleScene: React.FC = () => {
             than the true mean does
           </div>
         </Note>
-        <Note at={smallAt} x={SIDE_X} y={y(680)}>
+        <Note at={smallAt} x={SIDE_X} y={y(680)} out={whyOut}>
           <span style={{ ...noteText(24, ACCENT_INK) }}>so the squares come out small</span>
         </Note>
         <Note at={fixAt + 6} x={SIDE_X} y={y(760)}>
           <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: OK_INK, whiteSpace: "nowrap" }}>
             s² = Σ(x − <span style={{ textDecoration: "overline" }}>x</span>)² / (n − 1)
           </div>
+        </Note>
+
+        {/* ── The follow-up: is unbiased always better? ── */}
+        <Note at={mlAt} x={SIDE_X} y={y(550)}>
+          <span style={{ ...noteText(24, INK) }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 650 }}>÷ n</span> is the MLE:
+            <span style={{ opacity: ease(frame, lessAt - 2, 10) }}> biased, but less variable</span>
+          </span>
+        </Note>
+        <Note at={mseAt - 4} x={SIDE_X} y={y(600)}>
+          <span style={{ ...noteText(24, INK) }}>mean squared error = bias² + variance</span>
+        </Note>
+        <Note at={mseAt + 4} x={SIDE_X} y={y(648)}>
+          <span style={{ ...noteText(24, INK), ...TABULAR }}>
+            at n = {rows[five].n}: <Mark at={mseAt + 10}>{fmt(rows[five].mseN, 2)}</Mark> for <span style={{ color: ACCENT_INK }}>÷ n</span>, {fmt(rows[five].mseN1, 2)} for{" "}
+            <span style={{ color: OK_INK }}>÷ (n − 1)</span>
+          </span>
+        </Note>
+        <Note at={notBetterAt} x={SIDE_X} y={y(696)}>
+          <span style={{ ...noteText(24, INK_SOFT) }}>unbiased isn&apos;t automatically better</span>
         </Note>
       </Drift>
     </AbsoluteFill>

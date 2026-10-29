@@ -41,9 +41,9 @@ export const PvalueScene: React.FC = () => {
   const pctAt = n.word("pvalue", "two point one percent");
   const thatAt = n.word("pvalue", "That's the p-value");
   const notNullAt = n.word("pvalue-not", "It isn't the chance the null is true");
-  const flukeAt = n.word("pvalue-not", "the chance your result is a fluke");
-  const assumingAt = n.word("pvalue-not", "assuming the null holds");
-  const end = n.beat("pvalue-not").to;
+  const flukeAt = n.word("pvalue-fluke", "the chance your result is a fluke");
+  const assumingAt = n.word("pvalue-fluke", "assuming the null holds");
+  const end = n.beat("pvalue-fluke").to;
 
   const base = y(BASE);
   const unit = h(HEIGHT) / Math.max(...COIN.counts);

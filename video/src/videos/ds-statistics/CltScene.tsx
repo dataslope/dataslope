@@ -9,7 +9,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CLT } from "./data";
-import { at, Axes, Curve, Drift, Mark, noteText, OK, OK_INK, type Scale, Strike, Svg, X0 } from "./parts";
+import { at, Axes, Curve, Drift, Mark, noteText, OK, OK_INK, type Scale, Svg, X0 } from "./parts";
 
 const PANEL_W = 470;
 const PANEL_GAP = 100;
@@ -51,7 +51,6 @@ export const CltScene: React.FC = () => {
   const freeAt = n.word("clt-why", "It isn't free");
   const tailsAt = n.word("clt-why", "heavy tails");
   const thumbAt = n.word("clt-why", "a rule of thumb");
-  const theoremAt = n.word("clt-why", "not a theorem");
   const q5At = n.word("lln", "Question five");
   const q5TextAt = n.word("lln", "What is the Law of Large Numbers");
   const settleAt = n.word("lln", "its mean settles");
@@ -114,7 +113,6 @@ export const CltScene: React.FC = () => {
       ))}
       <Sfx name="el-tap" at={halfAt} level={-32} />
       <Sfx name="el-tap" at={againAt} level={-32} />
-      <Sfx name="el-scratch" at={theoremAt + 4} level={-32} />
       <Sfx name="el-pencil" at={runAt + 4} level={-34} />
       {marks.map((m) => (
         <Sfx key={m.k} name="el-tap" at={m.at} level={-34} />
@@ -174,9 +172,7 @@ export const CltScene: React.FC = () => {
         <Note at={thumbAt - 4} x={X0} y={y(856)} out={panelOut}>
           <span style={{ ...noteText(26, INK), ...TABULAR }}>
             n ≥ 30 is a rule of thumb, not a{" "}
-            <span style={{ color: ACCENT_INK }}>
-              <Strike at={theoremAt + 4}>theorem</Strike>
-            </span>
+            <span style={{ color: ACCENT_INK }}>theorem</span>
           </span>
         </Note>
 
