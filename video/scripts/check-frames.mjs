@@ -13,6 +13,9 @@
  * - Every ERD relationship end (<Relation> in src/editorial/erd.tsx) that is
  *   built across a corner reports it: a crow's foot needs its line straight
  *   for its whole length, or it points nowhere.
+ * - Every text set in tabular figures over a hyphen reports it (PageAudit in
+ *   src/editorial/audit.tsx, on while this runs): Inter sets the hyphen a
+ *   digit wide, so "P-101" reads "P - 101".
  * - Every word cue a beat says more than once with no `nth` reports it
  *   (useNarration in src/narration/NarrationContext.tsx). `npm run
  *   check:cues` finds the literal ones without a render; this catches a cue
@@ -21,8 +24,9 @@
  *   npm run check:frames                    # every composition
  *   npm run check:frames -- BaseRate,TfIdf  # just these
  *
- * Exits non-zero if any image is stretched, any arrowhead sits on a bend, or
- * any relationship end sits on too short a straight stretch.
+ * Exits non-zero if any image is stretched, any arrowhead sits on a bend, any
+ * relationship end sits on too short a straight stretch, or any hyphen is set
+ * in tabular figures.
  */
 import { getCompositions, renderFrames } from "@remotion/renderer";
 import path from "node:path";
@@ -41,11 +45,12 @@ const images = new Map(); // "video/id" -> { stretch, report, comp }
 const arrows = new Map(); // "Comp: from to tip" -> { bend, report, comp }
 const relations = new Map(); // "Comp: relation end" -> report
 const cues = new Map(); // "Comp: beat phrase" -> report
+const tabular = new Map(); // "Comp: text" -> report
 for (const composition of compositions) {
   await renderFrames({
     serveUrl,
     composition,
-    inputProps: {},
+    inputProps: { audit: true },
     outputDir: null,
     imageFormat: "none",
     scale: SCALE,
@@ -61,6 +66,8 @@ for (const composition of compositions) {
         const stretch = Number(img[2]);
         if (!prev || stretch > prev.stretch) images.set(img[1], { stretch, report: text, comp: composition.id });
       }
+      const tab = text.match(/^\[tabular\] (".*?") /);
+      if (tab) tabular.set(`${composition.id}: ${tab[1]}`, `${composition.id}: ${text.replace(/^\[tabular\] /, "")}`);
       const cue = text.match(/^\[cue\] (.*)$/);
       if (cue) cues.set(`${composition.id}: ${cue[1]}`, `${composition.id}: ${cue[1]}`);
       const relation = text.match(/^\[relation\] (.*)$/);
@@ -94,6 +101,8 @@ for (const a of bent) console.log(`  ✗ ${a.report}`);
 if (!bent.length) console.log(`  ✓ every line is within ${MAX_HEAD_BEND}° of straight under its head`);
 for (const r of relations.values()) console.log(`  ✗ ${r}`);
 if (!relations.size) console.log("  ✓ every ERD relationship end sits on a straight stretch of its line");
+for (const t of tabular.values()) console.log(`  ✗ ${t}`);
+if (!tabular.size) console.log("  ✓ no hyphen is set in tabular figures");
 for (const c of cues.values()) console.log(`  ! ${c}`);
 if (!cues.size) console.log("  ✓ every word cue the render took names which occurrence it means");
-if (stretched.length || bent.length || relations.size) process.exit(1);
+if (stretched.length || bent.length || relations.size || tabular.size) process.exit(1);

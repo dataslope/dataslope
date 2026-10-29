@@ -5,6 +5,7 @@ import type { NarratedProps } from "../narration/metadata";
 import { NarrationAudio } from "../narration/NarrationAudio";
 import { NarrationProvider } from "../narration/NarrationContext";
 import { SfxContext } from "../sound/Sfx";
+import { PageAudit } from "./audit";
 import { SERIF } from "./fonts";
 import { LayoutContext, layoutFor } from "./layout";
 import { BLUE_INK, INK, PAPER } from "./style";
@@ -54,6 +55,7 @@ export const EditorialPage: React.FC<EditorialProps & { children: React.ReactNod
           <AbsoluteFill style={{ background: PAPER, ...typefaceVars(face) }}>
             <AbsoluteFill style={{ transform: `translateY(${-LIFT}px)` }}>{children}</AbsoluteFill>
             <NarrationAudio />
+            <PageAudit />
             {captions ? (
               <Captions
                 variant="landscape"

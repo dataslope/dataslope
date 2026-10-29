@@ -234,7 +234,9 @@ export const Sheet: React.FC<{
                 fontWeight: bold?.(r, c) ? 650 : 450,
                 color: swap?.color ?? ink?.(r, c) ?? INK,
                 opacity: vp * (swap ? ease(frame, swap.at, 10) : 1),
-                ...TABULAR,
+                // Tabular figures only on a number: over "P-101" or a date
+                // they set the hyphen a digit wide.
+                ...(NUMERIC.test(text) ? TABULAR : {}),
               }}
             >
               {text}
@@ -401,7 +403,7 @@ export const FormulaBar: React.FC<{
       {result !== undefined && rp > 0 ? (
         <span style={{ marginLeft: "auto", opacity: rp, display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
           <span style={{ fontFamily: SANS, fontSize: size, color: INK_SOFT }}>→</span>
-          <span style={{ fontFamily: SANS, fontSize: size * 1.05, fontWeight: 700, color: resultInk, ...TABULAR }}>{result}</span>
+          <span style={{ fontFamily: SANS, fontSize: size * 1.05, fontWeight: 700, color: resultInk, ...(NUMERIC.test(String(result)) ? TABULAR : {}) }}>{result}</span>
         </span>
       ) : null}
     </div>

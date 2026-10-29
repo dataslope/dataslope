@@ -207,7 +207,10 @@ Every video follows these rules.
 - **Tabular figures on the number only.** Inter's tabular feature also sets
   a hyphen a digit wide, so `TABULAR` over a phrase reads "p - value". Put
   it on the number (`<Num>`, `src/editorial/ui.tsx`); `npm test` fails on
-  `TABULAR` over a hyphenated word.
+  `TABULAR` over a hyphenated word in the source, and `check:frames` fails on
+  one in the drawn page, which also catches text that arrives as a value (a
+  sheet cell "P-101", a list item): `PageAudit` in `src/editorial/audit.tsx`
+  reads the page while it renders.
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative
@@ -720,7 +723,8 @@ npm run lint
 npm test              # timing, scene cuts, word cues, voices, arrowheads
 npm run check:cues    # every word cue says which occurrence it means (no render)
 npm run check:frames  # a frame every half second at --scale=2 (about a minute):
-                      # illustrations sharp at 4K, arrowheads on straight ends
+                      # illustrations sharp at 4K, arrowheads on straight ends,
+                      # no hyphen set in tabular figures
 npm run check:sync -- <video>   # a voiced video: every beat starts where its cue says
 npm run check:mix -- <video>    # a video with sound effects: how far under the voice they sit
 npm run check:motion -- <video> # the picture never holds still for 3 s (renders a half-size preview)

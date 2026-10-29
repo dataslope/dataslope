@@ -176,7 +176,22 @@ export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: st
   );
 };
 
-/** A line struck through the words it wraps, drawn left to right on `at`. */
+/** The text a node renders, for measuring it by its length. */
+const textOf = (node: React.ReactNode): string =>
+  typeof node === "string" || typeof node === "number"
+    ? String(node)
+    : Array.isArray(node)
+      ? node.map(textOf).join("")
+      : React.isValidElement<{ children?: React.ReactNode }>(node)
+        ? textOf(node.props.children)
+        : "";
+
+/**
+ * A line struck through the words it wraps, drawn left to right on `at`. It
+ * tilts 2 degrees over a word or two, and less over a longer phrase, so it
+ * never rises more than about 0.12em: at a fixed angle a 680px phrase climbed
+ * 24px, off the words and into an overline.
+ */
 export const Strike: React.FC<{ at: number; color?: string; top?: string; children: React.ReactNode }> = ({
   at,
   color = ACCENT,
@@ -185,6 +200,9 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
+  // About half an em a character, the width of a sans phrase.
+  const ems = Math.max(1, textOf(children).length * 0.5);
+  const tilt = Math.min(2, (Math.atan(0.12 / ems) * 180) / Math.PI);
   return (
     <span style={{ position: "relative", display: "inline-block" }}>
       {children}
@@ -198,7 +216,7 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
           minHeight: 3,
           background: color,
           borderRadius: 2,
-          transform: "rotate(-2deg)",
+          transform: `rotate(${-tilt}deg)`,
           transformOrigin: "0 50%",
           opacity: p > 0 ? 1 : 0,
         }}
@@ -246,7 +264,8 @@ const KEYWORDS = new Set(
   (
     "SELECT FROM WHERE GROUP BY HAVING ORDER LIMIT JOIN LEFT RIGHT FULL INNER CROSS ON AND OR NOT IN EXISTS IS " +
     "NULL AS WITH DISTINCT UNION ALL EXCEPT CASE WHEN THEN ELSE END DELETE DESC ASC ROLLUP NULLS LAST OVER " +
-    "PARTITION LIKE INTERVAL DATE YEAR VALUES"
+    "PARTITION LIKE INTERVAL DATE YEAR VALUES QUALIFY ROWS RANGE BETWEEN UNBOUNDED PRECEDING FOLLOWING CURRENT " +
+    "ROW RECURSIVE FILTER USING WITHIN TIMESTAMP"
   ).split(" "),
 );
 const TABLES = new Set([
@@ -556,32 +575,45 @@ const wipe = (p: number): React.CSSProperties => {
   return { WebkitMaskImage: mask, maskImage: mask, filter: `blur(${(1 - p) * 1.4}px)` };
 };
 
-const CellText: React.FC<{ value: string; color: string; mark?: CellMark; swap?: CellSwap }> = ({
+const CellText: React.FC<{ value: string; color: string; marks: readonly CellMark[]; swap?: CellSwap }> = ({
   value,
   color,
-  mark,
+  marks,
   swap,
 }) => {
   const frame = useCurrentFrame();
   const swapped = swap !== undefined && frame >= swap.at;
   const text = swapped ? swap.value : value;
   const fade = swap !== undefined && !swapped ? 1 - ease(frame, swap.at - 6, 6) : 1;
-  const w = mark ? ease(frame, mark.at, 12) : 0;
-  const gone = mark?.out === undefined ? 0 : ease(frame, mark.out, 10);
-  const ink = swapped ? (swap?.color ?? color) : text === "null" ? ACCENT_INK : color;
+  const sorted = [...marks].sort((a, b) => a.at - b.at);
+  const shown = (m: CellMark) => ease(frame, m.at, 12) * (m.out === undefined ? 1 : 1 - ease(frame, m.out, 10));
+  // A null is printed the way a SQL client prints one, soft and italic: most
+  // are the right output (a left join's empty side, NULLIF, ROLLUP's subtotal
+  // rows). One that is the trap carries a MARK_BAD mark instead.
+  const isNull = !swapped && text === "null";
+  const ink = swapped ? (swap?.color ?? color) : isNull ? INK_SOFT : color;
   return (
     <span style={{ position: "relative", display: "inline-block" }}>
-      {mark && w > 0 && gone < 1 ? (
-        <span
-          style={{
-            position: "absolute",
-            inset: "0.02em -0.28em",
-            background: mark.color ?? MARK,
-            clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
-            opacity: 1 - gone,
-          }}
-        />
-      ) : null}
+      {/* Every mark on the cell, in cue order: a later one wipes in over an
+          earlier one, which fades as it does so the two tints never mix, and
+          an earlier one shows again once a later one goes. */}
+      {sorted.map((mark, k) => {
+        const w = ease(frame, mark.at, 12);
+        const gone = mark.out === undefined ? 0 : ease(frame, mark.out, 10);
+        const covered = Math.max(0, ...sorted.slice(k + 1).map(shown));
+        return w > 0 && gone < 1 && covered < 1 ? (
+          <span
+            key={k}
+            style={{
+              position: "absolute",
+              inset: "0.02em -0.28em",
+              background: mark.color ?? MARK,
+              clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
+              opacity: (1 - gone) * (1 - covered),
+            }}
+          />
+        ) : null;
+      })}
       <span
         style={{
           position: "relative",
@@ -589,6 +621,7 @@ const CellText: React.FC<{ value: string; color: string; mark?: CellMark; swap?:
           padding: "0.12em 0.1em",
           margin: "-0.12em -0.1em",
           color: ink,
+          fontStyle: isNull ? "italic" : undefined,
           opacity: fade,
           ...(swapped ? wipe(ease(frame, swap.at, 14)) : {}),
         }}
@@ -777,7 +810,7 @@ export const DataTable: React.FC<{
                     <CellText
                       value={v}
                       color={cols[j].ink ?? INK}
-                      mark={marks.find((m) => m.row === i && m.col === j)}
+                      marks={marks.filter((m) => m.row === i && m.col === j)}
                       swap={swaps.find((s) => s.row === i && s.col === j)}
                     />
                   </div>

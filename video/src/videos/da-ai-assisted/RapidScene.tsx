@@ -177,8 +177,8 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       {steps.map((s, i) => (
         <Note key={s.text} at={s.at - 2} x={R_X} y={c.T + c.h(110) + i * c.h(62)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            <span style={{ ...label(24, BLUE_INK), marginRight: 14 }}>{i + 1}</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...label(24, BLUE_INK), ...TABULAR, marginRight: 14 }}>{i + 1}</span>
             {s.text}
           </span>
         </Note>

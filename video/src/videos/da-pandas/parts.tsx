@@ -177,7 +177,22 @@ export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: st
   );
 };
 
-/** A line struck through the words it wraps, drawn left to right on `at`. */
+/** The text a node renders, for measuring it by its length. */
+const textOf = (node: React.ReactNode): string =>
+  typeof node === "string" || typeof node === "number"
+    ? String(node)
+    : Array.isArray(node)
+      ? node.map(textOf).join("")
+      : React.isValidElement<{ children?: React.ReactNode }>(node)
+        ? textOf(node.props.children)
+        : "";
+
+/**
+ * A line struck through the words it wraps, drawn left to right on `at`. It
+ * tilts 2 degrees over a word or two, and less over a longer phrase, so it
+ * never rises more than about 0.12em: at a fixed angle a 680px phrase climbed
+ * 24px, off the words and into an overline.
+ */
 export const Strike: React.FC<{ at: number; color?: string; top?: string; children: React.ReactNode }> = ({
   at,
   color = ACCENT,
@@ -186,6 +201,9 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
+  // About half an em a character, the width of a sans phrase.
+  const ems = Math.max(1, textOf(children).length * 0.5);
+  const tilt = Math.min(2, (Math.atan(0.12 / ems) * 180) / Math.PI);
   return (
     <span style={{ position: "relative", display: "inline-block" }}>
       {children}
@@ -199,7 +217,7 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
           minHeight: 3,
           background: color,
           borderRadius: 2,
-          transform: "rotate(-2deg)",
+          transform: `rotate(${-tilt}deg)`,
           transformOrigin: "0 50%",
           opacity: p > 0 ? 1 : 0,
         }}
@@ -455,7 +473,11 @@ export const Console: React.FC<{
           borderLeft: `4px solid ${HAIRLINE}`,
           background: LISTING_PAPER,
           padding: `${Math.round(size * 0.5)}px ${Math.round(size * 0.8)}px`,
-          height: lines.length * lineH,
+          // The padding is inside the height (border-box), so the height is
+          // consoleHeight's, which counts it: lines * lineH alone left the
+          // last line hanging half out of the box.
+          boxSizing: "border-box",
+          height: consoleHeight(lines.length, size),
           fontFamily: MONO,
           fontSize: size,
           color: INK,
@@ -599,32 +621,41 @@ const wipe = (p: number): React.CSSProperties => {
   return { WebkitMaskImage: mask, maskImage: mask, filter: `blur(${(1 - p) * 1.4}px)` };
 };
 
-const CellText: React.FC<{ value: string; color: string; mark?: CellMark; swap?: CellSwap }> = ({
+const CellText: React.FC<{ value: string; color: string; marks: readonly CellMark[]; swap?: CellSwap }> = ({
   value,
   color,
-  mark,
+  marks,
   swap,
 }) => {
   const frame = useCurrentFrame();
   const swapped = swap !== undefined && frame >= swap.at;
   const text = swapped ? swap.value : value;
   const fade = swap !== undefined && !swapped ? 1 - ease(frame, swap.at - 6, 6) : 1;
-  const w = mark ? ease(frame, mark.at, 12) : 0;
-  const gone = mark?.out === undefined ? 0 : ease(frame, mark.out, 10);
+  const sorted = [...marks].sort((a, b) => a.at - b.at);
+  const shown = (m: CellMark) => ease(frame, m.at, 12) * (m.out === undefined ? 1 : 1 - ease(frame, m.out, 10));
   const ink = swapped ? (swap?.color ?? color) : text === "NaN" ? ACCENT_INK : color;
   return (
     <span style={{ position: "relative", display: "inline-block" }}>
-      {mark && w > 0 && gone < 1 ? (
-        <span
-          style={{
-            position: "absolute",
-            inset: "0.02em -0.28em",
-            background: mark.color ?? MARK,
-            clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
-            opacity: 1 - gone,
-          }}
-        />
-      ) : null}
+      {/* Every mark on the cell, in cue order: a later one wipes in over an
+          earlier one, which fades as it does so the two tints never mix, and
+          an earlier one shows again once a later one goes. */}
+      {sorted.map((mark, k) => {
+        const w = ease(frame, mark.at, 12);
+        const gone = mark.out === undefined ? 0 : ease(frame, mark.out, 10);
+        const covered = Math.max(0, ...sorted.slice(k + 1).map(shown));
+        return w > 0 && gone < 1 && covered < 1 ? (
+          <span
+            key={k}
+            style={{
+              position: "absolute",
+              inset: "0.02em -0.28em",
+              background: mark.color ?? MARK,
+              clipPath: `inset(0 ${(1 - w) * 100}% 0 0)`,
+              opacity: (1 - gone) * (1 - covered),
+            }}
+          />
+        ) : null;
+      })}
       <span
         style={{
           position: "relative",
@@ -820,7 +851,7 @@ export const DataTable: React.FC<{
                     <CellText
                       value={v}
                       color={cols[j].ink ?? INK}
-                      mark={marks.find((m) => m.row === i && m.col === j)}
+                      marks={marks.filter((m) => m.row === i && m.col === j)}
                       swap={swaps.find((s) => s.row === i && s.col === j)}
                     />
                   </div>
