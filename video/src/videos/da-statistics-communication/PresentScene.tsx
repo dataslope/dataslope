@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -78,8 +78,8 @@ export const PresentScene: React.FC = () => {
   const appendixAt = n.word("present-close", "goes in the appendix");
   const q9At = n.word("plain", "Question nine");
   const q9TextAt = n.word("plain", "How do you explain");
-  const anchorAt = n.word("plain", "Anchor it");
-  const twelveAt = n.word("plain", "twelve percent more likely");
+  const anchorAt = n.word("plain-anchor", "Anchor it");
+  const twelveAt = n.word("plain-anchor", "twelve percent more likely");
   const jargonAt = n.word("plain-jargon", "Drop the jargon");
   const insteadAt = n.word("plain-jargon", "Instead of");
   const sayAt = n.word("plain-jargon", "we're highly confident");
@@ -87,10 +87,10 @@ export const PresentScene: React.FC = () => {
   const tieAt = n.word("plain-jargon", "tie it to the decision");
   const q10At = n.word("uncertain", "Question ten");
   const q10TextAt = n.word("uncertain", "How do you communicate");
-  const restsAt = n.word("uncertain", "what the number rests on");
-  const daysAt = n.word("uncertain", "the last ninety days");
-  const pointAt = n.word("uncertain", "Give a range");
-  const assumeAt = n.word("uncertain", "Name the assumptions");
+  const restsAt = n.word("uncertain-rests", "what the number rests on");
+  const daysAt = n.word("uncertain-rests", "the last ninety days");
+  const pointAt = n.word("uncertain-rests", "Give a range");
+  const assumeAt = n.word("uncertain-rests", "Name the assumptions");
   const preciseAt = n.word("uncertain-precise", "falsely precise");
   const twelveThreeAt = n.word("uncertain-precise", "Twelve point three seven");
   const aboutAt = n.word("uncertain-precise", "is about twelve");
@@ -116,7 +116,6 @@ export const PresentScene: React.FC = () => {
       <Sfx name="el-pencil" at={titleAt} level={-34} />
       <Sfx name="el-pencil" at={chartAt} level={-34} />
       <Sfx name="el-tap" at={recommendAt} level={-34} />
-      <Sfx name="el-scratch" at={insteadAt + 4} level={-32} />
       <Sfx name="el-pop" at={sayAt + 4} level={-32} />
       <Sfx name="el-scratch" at={twelveThreeAt + 6} level={-32} />
       <Sfx name="el-pop" at={aboutAt + 2} level={-32} />
@@ -133,12 +132,13 @@ export const PresentScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── The slide ── */}
-        {/* The appendix, behind the slide. */}
+        {/* The appendix, behind the slide, set low enough that its label has a
+            strip of its own under the slide's border. */}
         <div
             style={{
               position: "absolute",
               left: sx + 36,
-              top: sy + 36,
+              top: sy + 52,
               width: sw,
               height: sh,
               border: `1.5px solid ${HAIRLINE}`,
@@ -167,8 +167,8 @@ export const PresentScene: React.FC = () => {
           }}
         />
         <Note at={titleAt - 2} x={sx + pad} y={sy + h(34)} width={sw - 2 * pad}>
-          <span style={{ ...headline(38) }}>
-            The new design lifts purchases by about {LIFT.point}%
+          <span style={{ ...headline(38), display: "block", textWrap: "balance" }}>
+            New design lifts purchases by about {LIFT.point}%
           </span>
         </Note>
         <Svg opacity={chartP}>
@@ -243,7 +243,7 @@ export const PresentScene: React.FC = () => {
 
         {/* ── Question 9: a number people can picture, in plain words ── */}
         <Note at={anchorAt - 2} x={X0} y={y(LIST_Y)} out={out9} width={860}>
-          <span style={{ ...note(30, INK) }}>
+          <span style={{ ...note(30, INK), display: "block", textWrap: "balance" }}>
             &ldquo;Customers who saw the new design were{" "}
             <Mark at={twelveAt}>
               {LIFT.point}% more likely to buy
@@ -251,15 +251,18 @@ export const PresentScene: React.FC = () => {
             .&rdquo;
           </span>
         </Note>
+        {/* The interval is right; it is only jargon. So it is labelled, not struck. */}
         <Note at={jargonAt - 2} x={X0} y={y(LIST_Y) + h(130)} out={out9}>
-          <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
-            <Strike at={insteadAt + 4}>
-              95% confidence interval: [{LIFT.lo}%, {LIFT.hi}%]
-            </Strike>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ color: INK_SOFT }}>jargon: </span>
+            <span style={{ opacity: ease(frame, insteadAt - 2, 10) }}>
+              <Num>95%</Num> confidence interval: [<Num>{LIFT.lo}%</Num>, <Num>{LIFT.hi}%</Num>]
+            </span>
           </span>
         </Note>
         <Note at={sayAt - 2} x={X0} y={y(LIST_Y) + h(200)} out={out9} width={860}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 600 }}>
+          <span style={{ ...note(30, OK_INK), fontWeight: 600, display: "block", textWrap: "balance" }}>
+            <span style={{ color: INK_SOFT, fontWeight: 500 }}>say: </span>
             &ldquo;We&apos;re highly confident the true lift is between {LIFT.lo}% and {LIFT.hi}%.&rdquo;
           </span>
         </Note>

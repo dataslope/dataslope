@@ -24,8 +24,11 @@ import {
 
 const TOP = 340;
 const MID_X = 640;
-const RIGHT_X = 1240;
 const SIZE = 24;
+/** The subset's listing: its first line carries the page's .copy(). */
+const SUBSET_W = 660;
+/** Question 12's notes, clear of that listing. */
+const NOTES_X = MID_X + SUBSET_W + 30;
 /** JetBrains Mono's advance, in em. */
 const ADVANCE = 0.6;
 
@@ -33,8 +36,9 @@ const ADVANCE = 0.6;
  * Questions 11 and 12, under pandas 3's copy-on-write, on the page's
  * view-and-copy frame. The chained assignment, bracketed into its two steps,
  * leaves the frame as it was and warns ChainedAssignmentError; .loc in one
- * step sets both North amounts to 0. Then a subset set to 0 leaves a fresh
- * parent unchanged, with no warning.
+ * step sets both North amounts to 0. Then the page's subset, taken with
+ * .copy() and set to 0, leaves a fresh parent unchanged, with no warning, in
+ * any version of pandas.
  */
 export const CopyScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -49,18 +53,19 @@ export const CopyScene: React.FC = () => {
   const filterAt = n.word("copy-chain", "filter the North rows");
   const setAt = n.word("copy-chain", "set their amount");
   const secondAt = n.word("copy-chain", "The second step");
-  const unchangedAt = n.word("copy-three", "doesn't change");
-  const errorAt = n.word("copy-three", "chained assignment error");
-  const olderAt = n.word("copy-three", "Older pandas");
+  const unchangedAt = n.word("copy-error", "doesn't change");
+  const errorAt = n.word("copy-error", "chained assignment error");
+  const olderAt = n.word("copy-error", "Older pandas");
   const fixAt = n.word("copy-fix", "The fix");
   const zeroAt = n.word("copy-fix", "both North amounts are zero");
   const q12At = n.word("copy-view", "Question twelve");
   const sharesAt = n.word("copy-view", "shares memory");
   const copyNotAt = n.word("copy-view", "A copy doesn't");
-  const actsAt = n.word("copy-view", "acts as a copy");
-  const subsetAt = n.word("copy-view", "Set the subset to zero");
-  const parentAt = n.word("copy-view", "the parent is unchanged");
-  const callAt = n.word("copy-view", "Call copy");
+  const actsAt = n.word("copy-subset", "acts as a copy");
+  const subsetAt = n.word("copy-subset", "Set the subset to zero");
+  const parentAt = n.word("copy-subset", "the parent is unchanged");
+  const sayAt = n.word("copy-when", "say so with copy");
+  const versionAt = n.word("copy-when", "in any version of pandas");
   const end = n.beat("vector-in").to;
 
   const g = geoOf(COPY.frame, X0, y(TOP), h);
@@ -79,6 +84,12 @@ export const CopyScene: React.FC = () => {
     { from: split, to: line.length, at: setAt, text: "2. set their amount" },
   ];
   const warnTop = bracketY + h(84);
+  // The warning's box: its kind and message, wrapped at the box's width.
+  const WARN_SIZE = 21;
+  const WARN_W = 1100;
+  const warnChars = Math.floor((WARN_W - 4 - 40) / (ADVANCE * WARN_SIZE));
+  const warnLines = Math.ceil((COPY.chained.warning.kind.length + 2 + COPY.chained.warning.message.length) / warnChars);
+  const warnBottom = warnTop + 14 + 16 + warnLines * WARN_SIZE * 1.45;
 
   const loc = COPY.loc;
   const pg = geoOf(COPY.parent, X0, y(TOP), h);
@@ -145,17 +156,20 @@ export const CopyScene: React.FC = () => {
         <ErrorBox
           x={MID_X}
           top={warnTop}
-          width={1100}
+          width={WARN_W}
           at={errorAt - 4}
           kind={COPY.chained.warning.kind}
           message={COPY.chained.warning.message}
           out={fixAt - 4}
-          size={21}
+          size={WARN_SIZE}
         />
+        <Note at={errorAt + 12} x={MID_X + 4} y={warnBottom + h(12)} out={fixAt - 4}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a warning: the line runs, and df stays as it was</span>
+        </Note>
         <Note at={unchangedAt - 2} x={X0} y={g.rowTop(COPY.frame.rows.length) + h(24)} out={fixAt - 4}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>df doesn&apos;t change</span>
         </Note>
-        <Note at={olderAt} x={MID_X} y={warnTop + h(140)} out={fixAt - 4}>
+        <Note at={olderAt} x={MID_X} y={warnBottom + h(64)} out={fixAt - 4}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             older pandas: <Mono>SettingWithCopyWarning</Mono>
           </span>
@@ -184,16 +198,25 @@ export const CopyScene: React.FC = () => {
           rows={COPY.parent.rows.map((cells, i) => ({ cells, at: q12At + 8 + i * 2 }))}
           marks={pNorth.map((row, k) => ({ row, col: 2, at: parentAt + 4 + k * 4, color: MARK_OK }))}
         />
-        <Note at={sharesAt - 4} x={RIGHT_X} y={y(TOP)}>
+        <Note at={sharesAt - 4} x={NOTES_X} y={y(TOP)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a view shares memory with its parent</span>
         </Note>
-        <Note at={copyNotAt - 2} x={RIGHT_X} y={y(TOP) + h(48)}>
+        <Note at={copyNotAt - 2} x={NOTES_X} y={y(TOP) + h(48)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>a copy doesn&apos;t</span>
         </Note>
-        <Note at={actsAt - 4} x={RIGHT_X} y={y(TOP) + h(96)}>
+        <Note at={actsAt - 4} x={NOTES_X} y={y(TOP) + h(96)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>in pandas 3, it acts as a copy</span>
         </Note>
-        <Listing lines={COPY.subset.lines} x={MID_X} top={y(TOP)} width={560} size={SIZE} at={subsetAt - 4} />
+        {/* The page's subset: separate on purpose, so it says .copy(). */}
+        <Listing
+          lines={COPY.subset.lines}
+          x={MID_X}
+          top={y(TOP)}
+          width={SUBSET_W}
+          size={SIZE}
+          at={subsetAt - 4}
+          marks={[{ line: 0, at: sayAt + 2 }]}
+        />
         <TableName g={sg} at={subsetAt + 6}>
           north
         </TableName>
@@ -203,10 +226,13 @@ export const CopyScene: React.FC = () => {
           at={subsetAt + 6}
           rows={COPY.subset.rows.map((cells, i) => ({ cells, at: subsetAt + 10 + i * 3 }))}
         />
-        <Note at={callAt - 2} x={MID_X} y={sg.rowTop(COPY.subset.rows.length) + h(30)}>
+        <Note at={sayAt - 2} x={MID_X} y={sg.rowTop(COPY.subset.rows.length) + h(30)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            want a copy? call <Mono>.copy()</Mono>
+            a separate subset? say so: <Mono>.copy()</Mono>
           </span>
+        </Note>
+        <Note at={versionAt - 2} x={MID_X} y={sg.rowTop(COPY.subset.rows.length) + h(76)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>df stays as it was in every version of pandas</span>
         </Note>
       </Drift>
     </AbsoluteFill>

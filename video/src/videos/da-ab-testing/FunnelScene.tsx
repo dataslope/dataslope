@@ -16,7 +16,9 @@ const ROW0 = 360;
 const PITCH = 58;
 const BAR_X = 420;
 const BAR_MAX = 470;
-/** Column centres: the step conversion, then the people lost (later LAG). */
+/** Column centres: the step conversion, then the people lost. For question
+ *  5, LAG(users) takes the first and the step conversion moves to the second,
+ *  so each row reads users, the stage before, and the division of the two. */
 const STEP_X = 1150;
 const SIDE_X = 1390;
 const COL_W = 200;
@@ -26,12 +28,14 @@ const count = (v: number) => v.toLocaleString("en-US");
 
 /**
  * Questions 4 and 5. The page's funnel, 42,000 landings to 3,900 purchases:
- * its stages name themselves as the bridge line says where users drop out,
- * then the bars, overall conversion, then the step conversion beside each stage,
+ * its stages name themselves as the scene cuts in on the bridge line, then
+ * the bars, overall conversion, then the step conversion beside each stage,
  * then the people lost, where the top looks worst only because it is the
- * top. For question 5 the lost column gives way to LAG's: each stage's
- * previous count slides down onto its own row, and the query that does it
- * sits under the bars, with the weakest step picked out.
+ * top. For question 5 the lost column goes, the step conversion slides into
+ * its place, and LAG's column takes the step conversion's: each stage's
+ * previous count slides down onto its own row, left of the division it
+ * feeds, and the query that does it sits under the bars, with the weakest
+ * step picked out.
  */
 export const FunnelScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -39,13 +43,15 @@ export const FunnelScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("funnel-in").from;
-  const namesAt = n.word("funnel-in", "where users drop out");
+  // On the cut, so the bridge line is never said over a blank page.
+  const namesAt = from - 4;
   const qAt = n.word("funnel", "Question four");
   const textAt = n.word("funnel", "What is a funnel");
   const stepsAt = n.word("funnel-steps", "the ordered steps");
   const overallAt = n.word("funnel-steps", "Overall conversion");
   const nineAt = n.word("funnel-steps", "about nine percent");
-  const perStepAt = n.word("funnel-steps", "Per-step conversion");
+  const perStepAt = n.word("funnel-step", "Per-step conversion");
+  const overStepAt = n.word("funnel-step", "over the step before");
   const lostAt = n.word("funnel-lost", "Count the people lost");
   const firstAt = n.word("funnel-lost", "fourteen thousand five hundred gone");
   const topAt = n.word("funnel-lost", "the top always loses the most");
@@ -66,6 +72,9 @@ export const FunnelScene: React.FC = () => {
   const weakest = stages.reduce((w, s, i) => (s.step !== null && s.step < (stages[w].step ?? 1) ? i : w), 1);
   const lostOut = q5At - 2;
   const lowerOut = q5At - 2;
+  // The step conversion slides from its own column into the lost one's.
+  const slide = ease(frame, q5At + 6, 18);
+  const stepX = STEP_X + (SIDE_X - STEP_X) * slide;
 
   const head = (x: number, text: React.ReactNode, at: number, out?: number) => (
     <div
@@ -162,18 +171,20 @@ export const FunnelScene: React.FC = () => {
         })}
 
         {/* ── The step conversion ── */}
-        {head(STEP_X, "step conversion", perStepAt)}
+        <div style={{ position: "absolute", left: 0, top: 0, transform: `translateX(${stepX - STEP_X}px)` }}>
+          {head(STEP_X, "step conversion", perStepAt)}
+        </div>
         {stages.map((s, i) => {
           if (s.step === null) return null;
           const p = ease(frame, perStepAt + 4 + i * 3, 10);
-          const swell = pulse(frame, divAt + i * 2, 16);
+          const swell = pulse(frame, divAt + i * 2, 16) + pulse(frame, overStepAt + i * 2, 16);
           const hot = i === weakest ? ease(frame, weakAt, 10) : 0;
           return (
             <div
               key={s.stage}
               style={{
                 position: "absolute",
-                left: STEP_X - COL_W / 2,
+                left: stepX - COL_W / 2,
                 width: COL_W,
                 top: rowY(i),
                 height: rowH,
@@ -231,7 +242,7 @@ export const FunnelScene: React.FC = () => {
         })}
 
         {/* ── LAG: the stage before, on this row ── */}
-        {head(SIDE_X, <span style={{ fontFamily: MONO, fontSize: 20 }}>LAG(users)</span>, lagAt)}
+        {head(STEP_X, <span style={{ fontFamily: MONO, fontSize: 20 }}>LAG(users)</span>, lagAt)}
         {stages.map((s, i) => {
           const at = rowAt + i * 3;
           const p = ease(frame, at, 14);
@@ -242,7 +253,7 @@ export const FunnelScene: React.FC = () => {
               key={s.stage}
               style={{
                 position: "absolute",
-                left: SIDE_X - COL_W / 2,
+                left: STEP_X - COL_W / 2,
                 width: COL_W,
                 top: rowY(i),
                 height: rowH,

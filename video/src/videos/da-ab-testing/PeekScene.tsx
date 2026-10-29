@@ -36,7 +36,6 @@ export const PeekScene: React.FC = () => {
   const qAt = n.word("peek", "Question thirteen");
   const textAt = n.word("peek", "What is peeking");
   const identicalAt = n.word("peek-run", "both arms are identical");
-  const checkAt = n.word("peek-run", "Check the p-value");
   const eightHundredAt = n.word("peek-run", "at eight hundred");
   const againAt = n.word("peek-run", "and again from two thousand");
   const runEndAt = n.word("peek-run", "four thousand six hundred");

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { INK, note } from "../../editorial/style";
+import { INK, INK_SOFT, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -30,9 +30,11 @@ const SIZE = 22;
 
 /**
  * Questions 6, 7 and 8, on the video's own orders: January and February
- * stacked with concat (labels 0, 1, 0, 1, then 0 to 3 with ignore_index),
- * merged with their customers, and stock and prices merged on one key (four
- * rows from two) and on both (two).
+ * stacked with concat (labels 0, 1, 0, 1, so .loc[0] returns two orders,
+ * then 0 to 3 with ignore_index), merged with the customers shown beside
+ * them, and stock and prices merged on both keys (two rows, the list shown
+ * as it is said) against one key (four rows from two), the two results one
+ * above the other.
  */
 export const MergeScene: React.FC = () => {
   const n = useNarration();
@@ -44,16 +46,21 @@ export const MergeScene: React.FC = () => {
   const asked = n.beat("merge").to;
   const concatAt = n.word("merge-what", "Concat stacks");
   const topAt = n.word("merge-what", "one on top of the other");
-  const mergeAt = n.word("merge-what", "Merge is a SQL join");
-  const customerAt = n.word("merge-what", "each order and its customer");
-  const joinAt = n.word("merge-what", "join is a merge on the index");
+  const sideAt = n.word("merge-what", "side by side");
+  const mergeAt = n.word("merge-join", "Merge is a SQL join");
+  const customerAt = n.word("merge-join", "each order and its customer");
+  const joinAt = n.word("merge-join", "join is a merge on the index");
   const q7At = n.word("merge-index", "Question seven");
   const labelsAt = n.word("merge-index", "zero, one, zero, one");
-  const twoRowsAt = n.word("merge-index", "Two rows answer");
-  const ignoreAt = n.word("merge-index", "ignore index");
-  const runAt = n.word("merge-index", "zero to three");
+  const twoRowsAt = n.word("merge-dup", "Two rows answer");
+  const lockZeroAt = n.word("merge-dup", "lock zero returns");
+  const ordersAt = n.word("merge-dup", "two orders");
+  const linesUpAt = n.word("merge-dup", "anything that lines up");
+  const ignoreAt = n.word("merge-ignore", "ignore index");
+  const runAt = n.word("merge-ignore", "zero to three");
   const q8At = n.word("merge-keys", "Question eight");
-  const stockAt = n.word("merge-keys", "Stock and prices");
+  const listAt = n.word("merge-keys", "Pass a list");
+  const keyedAt = n.word("merge-keys", "product and warehouse");
   const aloneAt = n.word("merge-fan", "product alone");
   const meetsAt = n.word("merge-fan", "every warehouse meets");
   const fourAt = n.word("merge-fan", "four rows from two");
@@ -67,14 +74,23 @@ export const MergeScene: React.FC = () => {
   const stg = geoOf(MERGE.stacked, MID_X, y(TOP) + lineH + h(20), h, { extra: MERGE.clean.rows, headSize: HEAD });
   const mergeH = listingHeight(MERGE.merged.lines.length, SIZE);
   const mg = geoOf(MERGE.merged, RIGHT_X, y(TOP) + mergeH + h(20), h, { headSize: HEAD });
+  // The customers the merge looks up, where its result will land.
+  const cg = geoOf(MERGE.customers, RIGHT_X, mg.top, h, { headSize: HEAD });
+  // Question 7: label 0 of the stacked frame, asked for with loc.
+  const dg = geoOf(MERGE.dupLabel, RIGHT_X, y(TOP) + lineH + h(20), h, { headSize: HEAD });
   const zeros = MERGE.stacked.rows.flatMap((r, i) => (r[0] === "0" ? [i] : []));
   const relabelled = MERGE.stacked.rows.flatMap((r, i) => (r[0] !== MERGE.clean.rows[i][0] ? [i] : []));
 
   const sg = geoOf(MERGE.stock, X0, y(TOP), h);
   const pg = geoOf(MERGE.prices, X0, sg.rowTop(2) + h(70), h);
-  const og = geoOf(MERGE.oneKey, MID_X, y(TOP) + lineH + h(20), h, { headSize: HEAD });
-  const tg = geoOf(MERGE.twoKeys, MID_X, y(TOP) + lineH + h(20), h, { headSize: HEAD });
+  // Question 8, top to bottom: the list of keys and the two rows it gives,
+  // then one key and the four rows it gives, set back once both are said.
+  const compact = { headSize: HEAD, headH: 44, rowH: 46 };
+  const tg = geoOf(MERGE.twoKeys, MID_X, y(TOP) + lineH + h(16), h, compact);
+  const oneTop = tg.rowTop(MERGE.twoKeys.rows.length) + h(24);
+  const og = geoOf(MERGE.oneKey, MID_X, oneTop + lineH + h(16), h, compact);
   const fanned = MERGE.oneKey.rows.flatMap((r, i) => (r[2] !== r[4] ? [i] : []));
+  const keyCols = MERGE.twoKeys.lines[0].match(/on=\[(.*)\]/)![1].split(", ").map((k) => MERGE.stock.cols.indexOf(k.replace(/"/g, "")));
   const out1 = q8At - 4;
 
   return (
@@ -97,7 +113,7 @@ export const MergeScene: React.FC = () => {
           How do you merge on several keys?
         </QuestionCard>
 
-        {/* ── Two months of orders ── */}
+        {/* ── Two months of orders, and the customers they name ── */}
         <TableName g={jg} at={asked - 6} out={out1}>
           jan
         </TableName>
@@ -106,6 +122,16 @@ export const MergeScene: React.FC = () => {
           feb
         </TableName>
         <DataTable g={fg} cols={colsOf(MERGE.feb)} at={asked + 2} out={out1} rows={MERGE.feb.rows.map((cells, i) => ({ cells, at: asked + 6 + i * 2 }))} />
+        <TableName g={cg} at={asked + 10} out={mergeAt - 6}>
+          customers
+        </TableName>
+        <DataTable
+          g={cg}
+          cols={colsOf(MERGE.customers)}
+          at={asked + 10}
+          out={customerAt - 6}
+          rows={MERGE.customers.rows.map((cells, i) => ({ cells, at: asked + 14 + i * 2 }))}
+        />
 
         {/* ── concat: stacked; then the index reset ── */}
         <Listing lines={MERGE.stacked.lines} x={MID_X} top={y(TOP)} width={500} size={SIZE} at={concatAt - 2} out={ignoreAt - 2} />
@@ -123,6 +149,29 @@ export const MergeScene: React.FC = () => {
           bands={zeros.map((row, k) => ({ row, at: twoRowsAt + 4 + k * 4, out: ignoreAt, color: MARK_BAD }))}
           swaps={relabelled.map((row) => ({ row, col: 0, at: runAt, value: MERGE.clean.rows[row][0] }))}
         />
+        <Note at={sideAt - 2} x={MID_X} y={stg.rowTop(MERGE.stacked.rows.length) + h(26)} out={q7At - 4}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <Mono>axis=1</Mono>: side by side
+          </span>
+        </Note>
+
+        {/* ── Question 7: label 0 names two orders ── */}
+        <Listing lines={MERGE.dupLabel.lines} x={RIGHT_X} top={y(TOP)} width={520} size={SIZE} at={lockZeroAt - 4} out={out1} />
+        <DataTable
+          g={dg}
+          cols={colsOf(MERGE.dupLabel)}
+          at={lockZeroAt + 2}
+          out={out1}
+          rows={MERGE.dupLabel.rows.map((cells, i) => ({ cells, at: lockZeroAt + 6 + i * 3 }))}
+          bands={MERGE.dupLabel.rows.map((_, row) => ({ row, at: ordersAt + 2 + row * 4, color: MARK_BAD }))}
+        />
+        <Note at={linesUpAt - 2} x={RIGHT_X} y={dg.rowTop(MERGE.dupLabel.rows.length) + h(26)} out={out1}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            anything aligned on the index
+            <br />
+            pairs the wrong rows
+          </span>
+        </Note>
 
         {/* ── merge: a SQL join on key columns ── */}
         <Listing lines={MERGE.merged.lines} x={RIGHT_X} top={y(TOP)} width={580} size={SIZE} at={mergeAt - 2} out={q7At - 4} />
@@ -139,35 +188,75 @@ export const MergeScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* ── Several keys ── */}
-        <TableName g={sg} at={stockAt - 4}>
+        {/* ── Several keys: the tables, and the list, as it is said ── */}
+        <TableName g={sg} at={q8At + 10}>
           stock
         </TableName>
-        <DataTable g={sg} cols={colsOf(MERGE.stock)} at={stockAt - 4} rows={MERGE.stock.rows.map((cells, i) => ({ cells, at: stockAt + i * 2 }))} />
-        <TableName g={pg} at={stockAt + 4}>
+        <DataTable
+          g={sg}
+          cols={colsOf(MERGE.stock)}
+          at={q8At + 10}
+          rows={MERGE.stock.rows.map((cells, i) => ({ cells, at: q8At + 14 + i * 2 }))}
+          marks={MERGE.stock.rows.flatMap((_, row) => keyCols.map((col, k) => ({ row, col, at: keyedAt + k * 6 + row * 2, out: aloneAt })))}
+        />
+        <TableName g={pg} at={q8At + 18}>
           prices
         </TableName>
-        <DataTable g={pg} cols={colsOf(MERGE.prices)} at={stockAt + 4} rows={MERGE.prices.rows.map((cells, i) => ({ cells, at: stockAt + 8 + i * 2 }))} />
+        <DataTable
+          g={pg}
+          cols={colsOf(MERGE.prices)}
+          at={q8At + 18}
+          rows={MERGE.prices.rows.map((cells, i) => ({ cells, at: q8At + 22 + i * 2 }))}
+          marks={MERGE.prices.rows.flatMap((_, row) => keyCols.map((col, k) => ({ row, col, at: keyedAt + 4 + k * 6 + row * 2, out: aloneAt })))}
+        />
 
-        <Listing lines={MERGE.oneKey.lines} x={MID_X} top={y(TOP)} width={760} size={SIZE} at={aloneAt - 4} out={bothAt - 2} marks={[{ line: 0, at: fourAt, color: MARK_BAD }]} />
+        <Listing
+          lines={MERGE.twoKeys.lines}
+          x={MID_X}
+          top={y(TOP)}
+          width={800}
+          size={SIZE}
+          at={listAt - 4}
+          marks={[
+            { line: 0, at: listAt + 4, out: bothAt },
+            { line: 0, at: bothAt + 6, color: MARK_OK },
+          ]}
+        />
+        <DataTable
+          g={tg}
+          cols={colsOf(MERGE.twoKeys)}
+          at={bothAt + 2}
+          rows={MERGE.twoKeys.rows.map((cells, i) => ({ cells, at: bothAt + 6 + i * 3 }))}
+        />
+        <Note at={differAt - 2} x={tg.right + 40} y={tg.rowTop(0) + h(4)}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            names differ? <Mono>left_on=</Mono> and <Mono>right_on=</Mono>
+          </span>
+        </Note>
+
+        <Listing
+          lines={MERGE.oneKey.lines}
+          x={MID_X}
+          top={oneTop}
+          width={760}
+          size={SIZE}
+          at={aloneAt - 4}
+          dim={bothAt}
+          marks={[{ line: 0, at: fourAt, color: MARK_BAD }]}
+        />
         <DataTable
           g={og}
           cols={colsOf(MERGE.oneKey)}
           at={meetsAt - 4}
-          out={bothAt - 2}
+          dim={bothAt}
           rows={MERGE.oneKey.rows.map((cells, i) => ({ cells, at: meetsAt + i * 3 }))}
           bands={fanned.map((row, k) => ({ row, at: fourAt + 4 + k * 3, color: MARK_BAD }))}
         />
-        <Listing lines={MERGE.twoKeys.lines} x={MID_X} top={y(TOP)} width={800} size={SIZE} at={bothAt + 2} marks={[{ line: 0, at: bothAt + 10, color: MARK_OK }]} />
-        <DataTable
-          g={tg}
-          cols={colsOf(MERGE.twoKeys)}
-          at={bothAt + 6}
-          rows={MERGE.twoKeys.rows.map((cells, i) => ({ cells, at: bothAt + 10 + i * 3 }))}
-        />
-        <Note at={differAt - 2} x={MID_X} y={tg.rowTop(MERGE.twoKeys.rows.length) + h(30)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            names differ? <Mono>left_on=</Mono> and <Mono>right_on=</Mono>
+        <Note at={fourAt + 12} x={og.right + 30} y={og.rowTop(0)} dim={bothAt}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <Mono>warehouse</Mono> is on both sides,
+            <br />
+            so the merge keeps <Mono>_x</Mono> and <Mono>_y</Mono>
           </span>
         </Note>
       </Drift>

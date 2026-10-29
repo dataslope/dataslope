@@ -81,7 +81,7 @@ export const CheckScene: React.FC = () => {
   const top = y(LIST_Y);
   const pitch = h(PITCH);
   // Level with step 2, and clear above step 3, whose example sits beside it.
-  const figTop = top + pitch * 1 - h(22);
+  const figTop = top + pitch * 1 - h(32);
   /** Beside step `i`, level with its text. */
   const besideY = (i: number) => top + i * pitch + 3;
 
@@ -138,7 +138,7 @@ export const CheckScene: React.FC = () => {
         />
         <Count x={FIG_X + 396} y={figTop} at={fourteenAt - 2} name="after the join" rows="14,000 rows" bad />
         {/* Above its box, so the row under it is free for step 3's example. */}
-        <Note at={fanAt - 2} x={FIG_X + 396} y={figTop - h(40)}>
+        <Note at={fanAt - 2} x={FIG_X + 396} y={figTop - h(38)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>something is fanning out</span>
         </Note>
 

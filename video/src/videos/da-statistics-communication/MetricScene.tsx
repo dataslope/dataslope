@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { METRIC } from "./data";
@@ -41,6 +41,11 @@ export const MetricScene: React.FC = () => {
   const sessionsAt = n.word("metric-denom", "Sessions fell");
   const becauseAt = n.word("metric-denom", "because the traffic dropped");
   const finishAt = n.word("metric-end", "Finish with");
+  const lostAt = n.word("metric-driver", "sessions fell by two thousand");
+  const twelveAt = n.word("metric-driver", "orders by only twelve");
+  const driverAt = n.word("metric-driver", "The likeliest driver");
+  const checkAt = n.word("metric-driver", "Check sessions by channel");
+  const ordersFellAt = n.word("metric-driver", "say plainly that orders fell");
   const end = n.beat("quantile-in").to;
 
   const steps = [
@@ -51,6 +56,7 @@ export const MetricScene: React.FC = () => {
   ];
 
   const [last, now] = METRIC.weeks.rows;
+  const lost = METRIC.lost;
   const ci = METRIC.weeks.cols.indexOf("conversion");
   const si = METRIC.weeks.cols.indexOf("sessions");
   const oi = METRIC.weeks.cols.indexOf("orders");
@@ -150,9 +156,34 @@ export const MetricScene: React.FC = () => {
             { row: 2, col: si, at: sessionsAt + 4, color: MARK_BAD },
           ]}
         />
-        <Note at={becauseAt - 2} x={TABLE_X} y={g.rowTop(3) + h(30)}>
+        {/* A rate's change in points, beside its change in percent. */}
+        <Note at={upAt + 10} x={g.xs[ci] + g.widths[ci] - g.pad} align="right" y={g.rowTop(3) + 8} from="up">
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            (<Num>+{fmt(METRIC.points, 1)}</Num> points)
+          </span>
+        </Note>
+        <Note at={becauseAt - 2} x={TABLE_X} y={g.rowTop(3) + h(50)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            the rate rose <span style={{ color: ACCENT_INK, fontWeight: 650 }}>because the traffic dropped</span>
+            the rate rose <b>because the traffic dropped</b>
+          </span>
+        </Note>
+
+        {/* ── This example's driver, and what to check next ── */}
+        <Note at={lostAt - 2} x={TABLE_X} y={g.rowTop(3) + h(100)}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            lost: <Num>{count(String(lost[0]))}</Num> sessions
+            <span style={{ opacity: ease(frame, twelveAt - 2, 10) }}>
+              , only <Num>{lost[1]}</Num> orders (<Num>{fmt(lost[2], 1)}%</Num>)
+            </span>
+          </span>
+        </Note>
+        <Note at={driverAt - 2} x={TABLE_X} y={g.rowTop(3) + h(142)}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>likeliest: low-intent traffic dropped away</span>
+        </Note>
+        <Note at={checkAt - 2} x={TABLE_X} y={g.rowTop(3) + h(184)}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            check next: sessions by channel
+            <span style={{ opacity: ease(frame, ordersFellAt - 2, 10) }}>; say orders fell</span>
           </span>
         </Note>
 

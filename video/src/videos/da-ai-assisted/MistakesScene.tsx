@@ -161,12 +161,17 @@ export const MistakesScene: React.FC = () => {
         </Note>
         {/* The worked mistake, named while it is on screen. */}
         {running(firstAt + 8, outA, 1, "date boundaries")}
-        {running(ratiosAt - 2, undefined, 2, "averaging ratios")}
+        {/* The second waits until the first has gone, so the two never overlap. */}
+        {running(outA + 10, undefined, 2, "averaging ratios")}
 
         {/* ── The date boundary, on the page's nine orders ── */}
-        <TableName g={kg} at={asked - 6} out={outA}>
-          orders
-        </TableName>
+        {/* TableName's own `out` only lifts it (its opacity style overrides
+            Ink's fade), so it fades here with the table. */}
+        <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, outA, 10) }}>
+          <TableName g={kg} at={asked - 6} out={outA}>
+            orders
+          </TableName>
+        </div>
         <DataTable
           g={kg}
           cols={colsOf(K, { assistant: { at: betweenAt, ink: BLUE_INK }, half_open: { at: halfOpenAt, ink: BLUE_INK } })}

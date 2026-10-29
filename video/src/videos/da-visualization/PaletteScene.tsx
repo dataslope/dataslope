@@ -106,7 +106,6 @@ export const PaletteScene: React.FC = () => {
   const cbAt = n.word("access", "as a red-green colorblind reader");
   const safeAt = n.word("access-safe", "Use a colorblind-safe pair");
   const blueOrangeAt = n.word("access-safe", "like blue and orange");
-  const cueAt = n.word("access-fix", "Add a second cue");
   const labelAt = n.word("access-fix", "like a direct label");
   const grayAt = n.word("access-fix", "check the chart in grayscale");
   const robustAt = n.word("access-fix", "it's robust");
@@ -163,6 +162,7 @@ export const PaletteScene: React.FC = () => {
       <Sfx name="el-pop" at={foldAt} level={-32} />
       <Sfx name="el-tap" at={mostAt} level={-34} />
       <Sfx name="el-scratch" at={cbAt + 8} level={-32} />
+      <Sfx name="el-pencil" at={blueOrangeAt} level={-34} />
       <Sfx name="el-pop" at={robustAt} level={-32} />
 
       {/* The page's red-green simulation, as one matrix in linear RGB. */}

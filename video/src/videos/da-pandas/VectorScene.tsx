@@ -44,20 +44,23 @@ export const VectorScene: React.FC = () => {
   const asked = n.beat("vector").to;
   const multAt = n.word("vector-why", "Multiply the column");
   const oneCallAt = n.word("vector-why", "one call");
-  const applyAt = n.word("vector-why", "Apply calls");
-  const everyAt = n.word("vector-why", "once for every value");
-  const millionAt = n.word("vector-why", "A million rows");
+  const applyAt = n.word("vector-apply", "Apply calls");
+  const everyAt = n.word("vector-apply", "once for every value");
+  const millionAt = n.word("vector-apply", "A million rows");
   const sameAt = n.word("vector-same", "Same answer");
   const q14At = n.word("vector-axis", "Question fourteen");
-  const axis0At = n.word("vector-axis", "axis zero");
-  const colAt = n.word("vector-axis", "each column");
-  const axis1At = n.word("vector-axis", "Axis one");
-  const rowAt = n.word("vector-axis", "each row", { nth: 2 });
+  const rangeAt = n.word("vector-range", "Here the function");
+  const maxAt = n.word("vector-range", "max minus min");
+  const axis0At = n.word("vector-axes", "axis zero");
+  const colAt = n.word("vector-axes", "each column");
+  const axis1At = n.word("vector-axes", "Axis one");
+  const rowAt = n.word("vector-axes", "each row");
   const q15At = n.word("vector-map", "Question fifteen");
   const seriesMapAt = n.word("vector-map", "Series map");
   const alongAt = n.word("vector-map", "Apply works along");
-  const frameMapAt = n.word("vector-map", "data frame map works");
-  const cellAt = n.word("vector-map", "every cell");
+  const frameMapAt = n.word("vector-cell", "data frame map");
+  const formerlyAt = n.word("vector-cell", "formerly applymap");
+  const cellAt = n.word("vector-cell", "every cell");
   const end = n.beat("reshape-in").to;
 
   // ── Question 13 ──
@@ -120,7 +123,9 @@ export const VectorScene: React.FC = () => {
           marks={VECTOR.vectorized.rows.map((_, i) => ({ row: i, col: 1, at: sameAt + i * 2, color: MARK_OK }))}
         />
         <Note at={oneCallAt - 2} x={vg.right + 26} y={vg.rowTop(2)} out={out13}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", fontWeight: 650 }}>1 call</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ fontWeight: 650 }}>1 call</span>, in compiled C
+          </span>
         </Note>
         <Listing lines={VECTOR.applied.lines} x={APPLY_X} top={y(TOP)} width={600} size={SIZE} at={applyAt - 4} out={out13} />
         <DataTable
@@ -184,7 +189,16 @@ export const VectorScene: React.FC = () => {
             out={rowAt + 30}
           />
         ))}
-        <Listing lines={VECTOR.byColumn.lines} x={X0} top={listTop} width={980} size={SIZE} at={axis0At - 2} out={out14} />
+        <Listing
+          lines={VECTOR.byColumn.lines}
+          x={X0}
+          top={listTop}
+          width={980}
+          size={SIZE}
+          at={rangeAt - 2}
+          out={out14}
+          marks={[{ line: 0, at: maxAt + 2, out: axis0At }]}
+        />
         <Listing lines={VECTOR.byRow.lines} x={X0} top={listTop + lineH + h(14)} width={980} size={SIZE} at={axis1At - 2} out={out14} />
 
         {/* ── Question 15: Series.map and DataFrame.map ── */}
@@ -206,6 +220,11 @@ export const VectorScene: React.FC = () => {
         <Note at={alongAt} x={RIGHT_X} y={smg.rowTop(VECTOR.seriesMap.rows.length) + h(40)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <QMono>apply</QMono>: along an axis, as on the left
+          </span>
+        </Note>
+        <Note at={formerlyAt - 2} x={RIGHT_X} y={smg.rowTop(VECTOR.seriesMap.rows.length) + h(90)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <QMono>DataFrame.map</QMono>: formerly <QMono>applymap</QMono>
           </span>
         </Note>
       </Drift>

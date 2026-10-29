@@ -165,7 +165,7 @@ export const CteScene: React.FC = () => {
             <span style={{ fontWeight: 650 }}>
               <Mono>CTE</Mono>:
             </span>{" "}
-            a step used twice<Fade at={chainAt}>, or a chain of steps,</Fade>
+            a step used twice<Fade at={chainAt}>, a chain of steps,</Fade>
           </span>
         </Note>
         <Note at={hierarchyAt - 2} x={LIST_X} y={ruleTop + h(90)} out={q10At - 4}>

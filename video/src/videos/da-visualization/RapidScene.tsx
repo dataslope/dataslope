@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
+import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -204,6 +204,10 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
       <Verdict ok x={R_X + 680} y={c.y(720)} at={clutterAt}>
         same week, less ink
       </Verdict>
+      {/* The legend's one job, naming what the bars count, done as a title. */}
+      <Note at={losesAt} x={x0 - 30} y={top - c.h(62)}>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>Visits per day</span>
+      </Note>
     </>
   );
 };
@@ -291,7 +295,11 @@ const Scatter: React.FC<{ c: Ctx }> = ({ c }) => {
   const px = (v: number) => x0 + ((v - lo) / (hi - lo)) * (x1 - x0);
   const py = (v: number) => base - ((v - lo) / (hi - lo)) * (base - top);
   const shown = ease(frame, at0 + 4, 20);
-  const alpha = 0.95 - 0.88 * ease(frame, lowerAt + 4, 30);
+  // Solid, the dots are big enough to fuse into one mass; on "from a blob"
+  // they shrink and fade together, and the two clusters and the bridge show.
+  const thin = ease(frame, blobAt + 4, 26);
+  const alpha = 0.95 - 0.85 * thin;
+  const r = 8 - 4 * thin;
   const count = Math.round(SCATTER.points.length * shown);
 
   return (
@@ -300,19 +308,24 @@ const Scatter: React.FC<{ c: Ctx }> = ({ c }) => {
         <line x1={x0} x2={x0} y1={base} y2={top} stroke={INK} strokeWidth={1.6} opacity={ease(frame, at0 - 4, 10)} />
         <line x1={x0} x2={x1} y1={base} y2={base} stroke={INK} strokeWidth={1.6} opacity={ease(frame, at0 - 4, 10)} />
         {SCATTER.points.slice(0, count).map(([x, y], i) => (
-          <circle key={i} cx={px(x)} cy={py(y)} r={4} fill={BAR} opacity={alpha} />
+          <circle key={i} cx={px(x)} cy={py(y)} r={r} fill={BAR} opacity={alpha} />
         ))}
       </Svg>
       <Note at={pileAt - 2} x={R_X + 580} y={c.y(400)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>two continuous variables, one dot each</span>
       </Note>
-      <Note at={fourAt - 2} x={R_X + 580} y={c.y(460)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>{SCATTER.n.toLocaleString("en-US")} points</span>
+      <Note at={lowerAt - 2} x={R_X + 580} y={c.y(450)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>piled up? lower the opacity</span>
       </Note>
-      <Verdict ok={false} x={R_X + 580} y={c.y(540)} at={blobAt}>
+      <Note at={fourAt - 2} x={R_X + 580} y={c.y(500)}>
+        <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+          <Num>{SCATTER.n.toLocaleString("en-US")}</Num> points
+        </span>
+      </Note>
+      <Verdict ok={false} x={R_X + 580} y={c.y(570)} at={fourAt + 12}>
         solid dots: one blob
       </Verdict>
-      <Verdict ok x={R_X + 580} y={c.y(590)} at={clustersAt}>
+      <Verdict ok x={R_X + 580} y={c.y(620)} at={clustersAt}>
         faint dots: two clusters and a bridge
       </Verdict>
     </>

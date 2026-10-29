@@ -65,8 +65,8 @@ export const DashScene: React.FC = () => {
   // rest of its row moves along one, the last slot of it giving way.
   const big = ease(frame, biggestAt, 16);
   const shade = ease(frame, modelAt, 20);
-  // What the narration points at, while it does.
-  const ring = ease(frame, severalAt - 2, 12) * (1 - ease(frame, consistentAt - 4, 12));
+  // "That's where eyes land": the key metric, ringed while the narration is on it.
+  const ring = ease(frame, eyesAt - 2, 12) * (1 - ease(frame, consistentAt - 4, 12));
   const months = D.added.map((_, i) => (i % 6 === 5 ? String(i + 1) : ""));
   const cBase = y(CREEP.base);
   const cTop = y(CREEP.top);
@@ -76,6 +76,7 @@ export const DashScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-sprinkle" at={onlyAt} level={-34} />
       <Sfx name="el-pop" at={biggestAt} level={-32} />
+      <Sfx name="el-tap" at={severalAt} level={-34} />
       <Sfx name="el-pencil" at={addedAt} level={-34} />
       <Sfx name="el-scratch" at={sixAt} level={-32} />
       <Sfx name="el-tap" at={dashAt} level={-34} />

@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CORR } from "./data";
@@ -17,7 +17,6 @@ import {
   mulberry32,
   OK_INK,
   type Scale,
-  Strike,
   Svg,
   WARM,
   WARM_INK,
@@ -28,10 +27,14 @@ const NODE_W = 250;
 const NODE_H = 64;
 
 /** Drownings are counts, so days with the same count would sit on one row;
- *  each dot is nudged up or down a little, the same way on every frame. */
+ *  each dot is nudged up or down a little, the same way on every frame. A day
+ *  with none is only nudged up, so no dot sits below the axis. */
 const JITTER = (() => {
   const r = mulberry32(2027);
-  return CORR.days.map(() => (r() - 0.5) * 0.5);
+  return CORR.days.map(([, , drown]) => {
+    const j = (r() - 0.5) * 0.5;
+    return drown === 0 ? Math.abs(j) : j;
+  });
 })();
 
 /** A box with a name in it, for the causal sketch. */
@@ -82,8 +85,8 @@ export const CorrScene: React.FC = () => {
   const confounderAt = n.word("corr-heat", "the confounder");
   const fixedAt = n.word("corr-fixed", "Hold temperature fixed");
   const vanishAt = n.word("corr-fixed", "point zero eight");
-  const experimentAt = n.word("corr-fixed", "you need an experiment");
-  const end = n.beat("corr-fixed").to;
+  const experimentAt = n.word("corr-cause", "you need an experiment");
+  const end = n.beat("corr-cause").to;
 
   const xs: Scale = { lo: 150, hi: 850, a: PLOT.left, b: PLOT.right };
   const ys: Scale = { lo: 0, hi: 12, a: y(PLOT.base), b: y(PLOT.top) };
@@ -162,8 +165,15 @@ export const CorrScene: React.FC = () => {
           />
         </Svg>
         <Note at={notCauseAt + 4} x={(linkFrom + linkTo) / 2 - 200} width={400} y={linkY - h(52)} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
-            <Strike at={fixedAt}>r = {fmt(CORR.r)}</Strike>
+          {/* Still true, so never struck: at "Hold temperature fixed" it goes
+              soft and says it is the raw link, beside the 0.08 under the line. */}
+          <span style={{ position: "relative", display: "inline-block", whiteSpace: "nowrap", ...note(24, ACCENT_INK) }}>
+            <span style={{ opacity: 1 - ease(frame, fixedAt, 12) }}>
+              r = <Num>{fmt(CORR.r)}</Num>
+            </span>
+            <span style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)", color: INK_SOFT, opacity: ease(frame, fixedAt, 12) }}>
+              raw r = <Num>{fmt(CORR.r)}</Num>
+            </span>
           </span>
         </Note>
         <Note at={vanishAt - 2} x={(linkFrom + linkTo) / 2 - 200} width={400} y={linkY + h(16)} from="up" style={{ textAlign: "center" }}>

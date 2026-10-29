@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CONDITIONS, type Cell, PIVOT, printed, REFERENCES, TEXT } from "./data";
-import { Drift, FormulaBar, Headline, Kicker, MARK, MARK_OK, Sheet, sheetGeometry, Spot, X0 } from "./parts";
+import { Drift, type FormulaMark, FormulaBar, Headline, Kicker, MARK, MARK_BAD, MARK_OK, Mono, Sheet, sheetGeometry, Spot, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -23,7 +23,15 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 const shown = (c: Cell) => (typeof c.value === "number" && !Number.isInteger(c.value) ? c.value.toFixed(2) : printed(c.value));
 
 /** A formula and its result, in the answer column's k-th slot. */
-const Slot: React.FC<{ c: Ctx; k: number; cell: Cell; at: number; resultAt: number; money?: boolean }> = ({ c, k, cell, at, resultAt, money }) => (
+const Slot: React.FC<{ c: Ctx; k: number; cell: Cell; at: number; resultAt: number; money?: boolean; marks?: readonly FormulaMark[] }> = ({
+  c,
+  k,
+  cell,
+  at,
+  resultAt,
+  money,
+  marks,
+}) => (
   <FormulaBar
     x={R_X}
     top={c.y(TOP) + k * c.h(62)}
@@ -34,16 +42,17 @@ const Slot: React.FC<{ c: Ctx; k: number; cell: Cell; at: number; resultAt: numb
     result={money && typeof cell.value === "number" ? cell.value.toFixed(2) : shown(cell)}
     resultAt={resultAt}
     tone="ok"
+    marks={marks}
     // A long formula sets a little smaller, so it fits the bar.
-    size={(cell.formula ?? "").length > 54 ? 18 : 21}
+    size={(cell.formula ?? "").length > 54 ? 20 : 21}
   />
 );
 
 /** The ten orders, small, under the formulas that read them. */
 const Orders: React.FC<{ c: Ctx; at: number; fills: { r: number; c: number; at: number; color: string }[] }> = ({ c, at, fills }) => {
-  const g = sheetGeometry({ x: R_X, top: c.y(TOP) + c.h(140), widths: [44, 84, 100, 96], rows: 11, rowH: c.h(32) });
+  const g = sheetGeometry({ x: R_X, top: c.y(TOP) + c.h(140), widths: [48, 88, 104, 100], rows: 11, rowH: c.h(34) });
   return (
-    <Sheet g={g} values={PIVOT.orders.map((r) => r.map(String))} at={at} bold={(r) => r === 1} size={18} fills={fills} />
+    <Sheet g={g} values={PIVOT.orders.map((r) => r.map(String))} at={at} bold={(r) => r === 1} size={19} fills={fills} />
   );
 };
 
@@ -98,7 +107,7 @@ const Clean: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-clean", "Trim strips");
   const caseAt = c.w("r-clean", "proper fixes the case");
   const backAt = c.w("r-clean", "comes back as Ava Smith");
-  const lookAt = c.w("r-clean", "Clean before you look up");
+  const lookAt = c.w("r-clean-keys", "Tidy the keys");
   const raw = /"([^"]*)"/.exec(TEXT.clean.formula ?? "")?.[1] ?? "";
   return (
     <>
@@ -112,7 +121,7 @@ const Clean: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>· marks a space: TRIM drops the extras, PROPER fixes the case</span>
       </Note>
       <Note at={lookAt - 2} x={R_X} y={c.y(TOP) + c.h(230)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>clean the keys first, or lookups miss</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>tidy the keys first, or lookups miss</span>
       </Note>
     </>
   );
@@ -128,10 +137,10 @@ const Split: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Slot c={c} k={0} cell={TEXT.username} at={at} resultAt={userAt - 2} />
-      <Slot c={c} k={1} cell={TEXT.join} at={joinAt} resultAt={blanksAt - 4} />
-      <Note at={blanksAt} x={R_X} y={c.y(TOP) + c.h(140)}>
+      <Slot c={c} k={1} cell={TEXT.join} at={joinAt} resultAt={blanksAt - 4} marks={[{ text: "TRUE", color: MARK, at: blanksAt - 4 }]} />
+      <Note at={joinAt + 12} x={R_X} y={c.y(TOP) + c.h(140)}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-          the empty <span style={{ fontFamily: MONO }}>&quot;&quot;</span> leaves no double space
+          <Mono color={INK}>TRUE</Mono> skips the empty <Mono color={INK}>&quot;&quot;</Mono>: no double space
         </span>
       </Note>
     </>
@@ -166,7 +175,7 @@ const Format: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-format", "Conditional formatting colors");
   const overAt = c.w("r-format", "Over a hundred fifty");
   const lit = CONDITIONS.over150.flatMap((cell, i) => (cell.value === true ? [i + 2] : []));
-  const g = sheetGeometry({ x: R_X, top: c.y(TOP) + c.h(70), widths: [44, 84, 100, 96], rows: 11, rowH: c.h(34) });
+  const g = sheetGeometry({ x: R_X, top: c.y(TOP) + c.h(70), widths: [48, 88, 104, 100], rows: 11, rowH: c.h(34) });
   return (
     <>
       <div
@@ -179,14 +188,14 @@ const Format: React.FC<{ c: Ctx }> = ({ c }) => {
           opacity: ease(frame, at, 12),
         }}
       >
-        rule on <b>revenue</b>: cell value <span style={{ fontFamily: MONO }}>&gt; 150</span>
+        rule on <b>revenue</b>: cell value <Mono>&gt; 150</Mono>
       </div>
       <Sheet
         g={g}
         values={PIVOT.orders.map((r) => r.map(String))}
         at={at - 2}
         bold={(r) => r === 1}
-        size={18}
+        size={19}
         fills={lit.map((r, i) => ({ r, c: 3, at: overAt + 4 + i * 4, color: MARK }))}
       />
     </>
@@ -203,7 +212,7 @@ const Named: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Slot c={c} k={0} cell={REFERENCES.named[0]} at={at + 6} resultAt={meansAt} money />
       <Slot c={c} k={1} cell={REFERENCES.absolute[0]} at={pointsAt - 2} resultAt={pointsAt + 6} money />
-      <Note at={pointsAt + 8} x={R_X} y={c.y(TOP) + 2 * c.h(62) + c.h(14)}>
+      <Note at={meansAt + 6} x={R_X} y={c.y(TOP) + 2 * c.h(62) + c.h(14)}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           <b style={{ color: INK }}>TaxRate</b> names <span style={{ fontFamily: MONO }}>$F$1</span>: the same cell, read in words
         </span>
@@ -217,24 +226,46 @@ const Named: React.FC<{ c: Ctx }> = ({ c }) => {
 const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-dupes", "to find duplicates");
   const flagAt = c.w("r-dupes", "flags the repeated email");
-  const removeAt = c.w("r-dupes", "then remove duplicates");
-  const g = sheetGeometry({ x: R_X, top: c.y(TOP) + c.h(80), widths: [250, 120], rows: 5, rowH: c.h(44) });
-  const values = TEXT.emails.map((e, i) => [e, i === 0 ? "repeated" : printed(TEXT.repeated[i - 1].value)]);
+  const bothAt = c.w("r-dupes-both", "It flags both copies");
+  const firstAt = c.w("r-dupes-both", "keeps the first");
+  const g = sheetGeometry({ x: R_X, top: c.y(TOP) + c.h(140), widths: [250, 120, 130], rows: 5, rowH: c.h(44) });
+  const values = TEXT.emails.map((e, i) =>
+    i === 0 ? [e, "repeated", "later copy"] : [e, printed(TEXT.repeated[i - 1].value), printed(TEXT.later[i - 1].value)],
+  );
   const flagged = TEXT.repeated.flatMap((cell, i) => (cell.value === true ? [i + 2] : []));
+  const later = TEXT.later.flatMap((cell, i) => (cell.value === true ? [i + 2] : []));
   return (
     <>
       <FormulaBar x={R_X} top={c.y(TOP)} width={640} cell={TEXT.repeated[0].ref} formula={TEXT.repeated[0].formula ?? ""} at={at} typeDur={12} size={21} />
+      {/* Counting only down to its own row flags the later copy alone. */}
+      <FormulaBar
+        x={R_X}
+        top={c.y(TOP) + c.h(62)}
+        width={640}
+        cell={TEXT.later[0].ref}
+        formula={TEXT.later[0].formula ?? ""}
+        at={firstAt - 4}
+        typeDur={12}
+        size={21}
+        marks={[{ text: "$A$2:A2", color: MARK, at: firstAt + 8 }]}
+      />
       <Sheet
         g={g}
         values={values}
         at={at - 2}
-        cellAt={(r, col) => (col === 1 && r > 1 ? at + 14 + r * 2 : at)}
+        cellAt={(r, col) => (col === 2 ? firstAt + 8 + r * 2 : col === 1 && r > 1 ? at + 14 + r * 2 : at)}
         bold={(r) => r === 1}
         size={20}
-        fills={flagged.flatMap((r, i) => [0, 1].map((col) => ({ r, c: col, at: flagAt + i * 4, color: MARK })))}
+        fills={[
+          ...flagged.flatMap((r, i) => [0, 1].map((col) => ({ r, c: col, at: flagAt + i * 4, out: bothAt, color: MARK }))),
+          ...flagged.map((r, i) => ({ r, c: 1, at: bothAt + i * 4, color: MARK_BAD })),
+          ...later.map((r) => ({ r, c: 2, at: firstAt + 20, color: MARK_OK })),
+        ]}
       />
-      <Note at={removeAt - 2} x={R_X} y={g.bottom + c.h(20)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>check the flags, then Remove Duplicates</span>
+      <Note at={bothAt + 6} x={R_X} y={g.bottom + c.h(20)}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <b style={{ color: ACCENT_INK }}>both copies flag</b>; Remove Duplicates keeps the first
+        </span>
       </Note>
     </>
   );

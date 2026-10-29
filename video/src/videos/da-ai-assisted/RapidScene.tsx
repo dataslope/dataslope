@@ -142,7 +142,8 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
             position: "absolute",
             left: layerX,
             top: T + i * c.h(76),
-            width: 420,
+            // Wide enough that "a semantic model: how tables join" stays on one line.
+            width: 520,
             padding: "14px 18px",
             boxSizing: "border-box",
             borderRadius: 8,

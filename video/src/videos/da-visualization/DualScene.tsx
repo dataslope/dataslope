@@ -51,10 +51,8 @@ export const DualScene: React.FC = () => {
   const climbsAt = n.word("dual-show", "revenue that climbs");
   const nothingAt = n.word("dual-show", "a metric that does nothing");
   const corrAt = n.word("dual-show", "point one two");
-  const fitAt = n.word("dual-axes", "Fit the right axis tightly");
   const noiseAt = n.word("dual-axes", "noise looks as big");
   const zeroAt = n.word("dual-axes", "Start it at zero");
-  const flatAt = n.word("dual-axes", "it lies flat");
   const overtakeAt = n.word("dual-axes", "revenue seems to overtake it");
   const arbitraryAt = n.word("dual-fix", "The scales are arbitrary");
   const indexAt = n.word("dual-index", "Index both series");

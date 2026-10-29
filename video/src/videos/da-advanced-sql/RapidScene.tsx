@@ -18,7 +18,7 @@ import {
   Kicker,
   Listing,
   listingHeight,
-  MARK_OK,
+  MARK,
   rowsAt,
   Spot,
   X0,
@@ -45,6 +45,8 @@ const under = (c: Ctx, lines: number) => c.T + listingHeight(lines, SIZE) + c.h(
 const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-lag", "Lag reads a value");
   const changeAt = c.w("r-lag", "Day over day change");
+  const nullAt = c.w("r-lag-null", "The first row gets null");
+  const defaultAt = c.w("r-lag-null", "pass lag a default");
   const t = { cols: RAPID.lag.cols, rows: RAPID.lag.rows.slice(0, 4) };
   const g = geo(c, t, R_X, under(c, RAPID.lag.lines.length));
   const prev = t.cols.indexOf("prev_day");
@@ -58,12 +60,22 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
         at={at + 2}
         rows={rowsAt(t.rows, at + 6)}
         marks={[
-          ...t.rows.map((_, row) => ({ row, col: prev, at: at + 14 + row * 3 })),
-          ...t.rows.map((_, row) => ({ row, col: ch, at: changeAt + 6 + row * 3, color: MARK_OK })),
+          ...t.rows.map((_, row) => ({ row, col: prev, at: at + 14 + row * 3, out: changeAt })),
+          ...t.rows.map((_, row) => ({ row, col: ch, at: changeAt + 6 + row * 3, out: nullAt })),
+          { row: 0, col: prev, at: nullAt + 2 },
+          { row: 0, col: ch, at: nullAt + 5 },
         ]}
       />
-      <Note at={at + 20} x={g.right + 24} y={g.rowTop(0)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>nothing before day 1</span>
+      <Note at={at + 20} x={R_X} y={g.rowTop(t.rows.length) + c.h(20)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the row before, not the day before</span>
+      </Note>
+      <Note at={nullAt + 4} x={g.right + 24} y={g.rowTop(0)}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>nothing before day 1</span>
+      </Note>
+      <Note at={defaultAt} x={g.right + 24} y={g.rowTop(0) + c.h(36)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          null, unless <QMono>LAG</QMono> gets a default
+        </span>
       </Note>
     </>
   );
@@ -80,20 +92,20 @@ const Ntile: React.FC<{ c: Ctx }> = ({ c }) => {
   const q = RAPID.quartileSizes;
   const f = RAPID.fifthSizes;
   const qg = geo(c, q, R_X, top);
-  const fg = geo(c, f, R_X + 380, top);
+  const fg = geo(c, f, R_X + 420, top);
   const extra = f.rows.flatMap((r, i) => (r[1] === f.rows[0][1] && r[1] !== f.rows[f.rows.length - 1][1] ? [i] : []));
   return (
     <>
       <Listing lines={RAPID.quartiles.lines} x={R_X} top={c.T} width={720} size={SIZE} at={at - 4} marks={[{ line: 1, at: at + 8 }]} />
       <Note at={fourAt - 4} x={R_X} y={top - c.h(36)}>
         <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
-          <QMono>NTILE(4)</QMono>, 24 customers
+          <QMono>NTILE(4)</QMono>: customers per bucket
         </span>
       </Note>
       <DataTable g={qg} cols={colsOf(q)} at={fourAt - 2} rows={rowsAt(q.rows, fourAt + 2)} />
-      <Note at={fiveAt - 4} x={R_X + 380} y={top - c.h(36)}>
+      <Note at={fiveAt - 4} x={R_X + 420} y={top - c.h(36)}>
         <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
-          <QMono>NTILE(5)</QMono>
+          <QMono>NTILE(5)</QMono>: customers per bucket
         </span>
       </Note>
       <DataTable
@@ -101,7 +113,7 @@ const Ntile: React.FC<{ c: Ctx }> = ({ c }) => {
         cols={colsOf(f)}
         at={fiveAt - 2}
         rows={rowsAt(f.rows, fiveAt + 2)}
-        marks={extra.map((row, k) => ({ row, col: 1, at: extraAt + k * 3, color: MARK_OK }))}
+        marks={extra.map((row, k) => ({ row, col: 1, at: extraAt + k * 3, color: MARK }))}
       />
     </>
   );
@@ -121,7 +133,7 @@ const Where: React.FC<{ c: Ctx }> = ({ c }) => {
       <ErrorBox x={R_X} top={errTop} width={700} at={noAt - 4} kind={e.kind} message={e.message} size={21} />
       <Note at={outerAt - 2} x={R_X} y={errTop + c.h(100)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          windows run after <QMono>WHERE</QMono>: filter outside, or with <QMono>QUALIFY</QMono>
+          windows run after <QMono>WHERE</QMono> and <QMono>HAVING</QMono>: filter outside, or with <QMono>QUALIFY</QMono>
         </span>
       </Note>
     </>
@@ -135,16 +147,17 @@ const Recursive: React.FC<{ c: Ctx }> = ({ c }) => {
   const anchorAt = c.w("r-recursive", "anchor rows");
   const backAt = c.w("r-recursive", "joining back on itself");
   const levelsAt = c.w("r-recursive", "walks an org chart");
+  // The CTE counted by level, so the table is this listing's own result.
   const L = RAPID.levels;
   const g = geo(c, L, R_X + 660, c.T);
   return (
     <>
       <Listing
-        lines={RAPID.org.lines}
+        lines={L.lines}
         x={R_X}
         top={c.T}
         width={620}
-        size={17}
+        size={SIZE}
         at={at - 4}
         marks={[
           { line: 3, at: anchorAt },
@@ -164,12 +177,31 @@ const Recursive: React.FC<{ c: Ctx }> = ({ c }) => {
 const Bucket: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-bucket", "Date trunc snaps");
   const weeksAt = c.w("r-bucket", "January's twenty-four days");
+  const mondayAt = c.w("r-bucket-last", "Weeks start on Monday");
+  const shortAt = c.w("r-bucket-last", "only three days");
   const W = RAPID.weeks;
   const g = geo(c, W, R_X + 620, c.T);
+  const last = W.rows.length - 1;
+  const days = W.cols.indexOf("days");
   return (
     <>
       <Listing lines={W.lines} x={R_X} top={c.T} width={580} size={SIZE} at={at - 4} marks={[{ line: 0, at: at + 10 }]} />
-      <DataTable g={g} cols={colsOf(W)} at={weeksAt - 4} rows={rowsAt(W.rows, weeksAt, 3)} />
+      <DataTable
+        g={g}
+        cols={colsOf(W)}
+        at={weeksAt - 4}
+        rows={rowsAt(W.rows, weeksAt, 3)}
+        marks={[
+          ...W.rows.map((_, row) => ({ row, col: 0, at: mondayAt + 4 + row * 3, out: shortAt })),
+          { row: last, col: days, at: shortAt + 2 },
+        ]}
+      />
+      <Note at={mondayAt + 6} x={R_X + 620} y={g.rowTop(W.rows.length) + c.h(16)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>each a Monday</span>
+      </Note>
+      <Note at={shortAt + 4} x={R_X + 620} y={g.rowTop(W.rows.length) + c.h(50)}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>the last week is partial</span>
+      </Note>
     </>
   );
 };
@@ -225,9 +257,11 @@ const Unpivot: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 20. PERCENT_RANK and CUME_DIST ──────────────────────────────────────────
 
 const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
-  const at = c.w("r-percent", "percent rank runs from zero");
-  const cumeAt = c.w("r-percent", "Cume dist is the share");
-  const neverAt = c.w("r-percent", "never reaches zero");
+  const at = c.w("r-percent", "percent rank is rank minus one");
+  const firstAt = c.w("r-percent", "zero for the first row");
+  const lastAt = c.w("r-percent", "one for the last");
+  const cumeAt = c.w("r-cume", "Cume dist is the share");
+  const neverAt = c.w("r-cume", "never reaches zero");
   const S = RAPID.standing;
   const g = geo(c, S, R_X, under(c, S.lines.length));
   const pr = S.cols.indexOf("pct_rank");
@@ -242,13 +276,20 @@ const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
         at={at - 2}
         rows={rowsAt(S.rows, at + 2)}
         marks={[
-          { row: 0, col: pr, at: at + 10 },
-          { row: lastRow, col: pr, at: at + 18 },
-          { row: 0, col: cd, at: neverAt, color: MARK_OK },
+          { row: 0, col: pr, at: firstAt },
+          { row: lastRow, col: pr, at: lastAt },
+          { row: 0, col: cd, at: neverAt },
         ]}
       />
-      <Note at={cumeAt} x={g.right + 24} y={g.rowTop(0)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the share at or below</span>
+      <Note at={at + 6} x={g.right + 24} y={g.rowTop(0)}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <QMono>pct_rank</QMono> = (rank − 1) / (rows − 1)
+        </span>
+      </Note>
+      <Note at={cumeAt} x={g.right + 24} y={g.rowTop(1) + c.h(10)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <QMono>cume_dist</QMono>: the share at or below
+        </span>
       </Note>
     </>
   );
@@ -273,7 +314,7 @@ export const RapidScene: React.FC = () => {
   const items: RapidItem[] = [
     { n: 13, label: <><QMono>LAG</QMono> and <QMono>LEAD</QMono></>, beat: "r-lag", body: <Lag c={c} /> },
     { n: 14, label: <QMono>NTILE</QMono>, beat: "r-ntile", body: <Ntile c={c} /> },
-    { n: 15, label: <>A window in <QMono>WHERE</QMono></>, beat: "r-where", body: <Where c={c} /> },
+    { n: 15, label: <>A window in <QMono>WHERE</QMono> or <QMono>HAVING</QMono></>, beat: "r-where", body: <Where c={c} /> },
     { n: 16, label: "Recursive CTEs", beat: "r-recursive", body: <Recursive c={c} /> },
     { n: 17, label: "Bucketing timestamps", beat: "r-bucket", body: <Bucket c={c} /> },
     { n: 18, label: "Pivoting", beat: "r-pivot", body: <Pivot c={c} /> },

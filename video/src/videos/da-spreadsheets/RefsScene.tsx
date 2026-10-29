@@ -49,7 +49,6 @@ export const RefsScene: React.FC = () => {
   const wholeAt = n.word("refs-mixed", "fills the whole grid");
   const q8At = n.word("iferror", "Question eight");
   const q8TextAt = n.word("iferror", "What does if error do");
-  const asked8 = n.beat("iferror").to;
   const swapsAt = n.word("iferror-what", "swaps an error for a fallback");
   const honestAt = n.word("iferror-what", "unknown is honest");
   const hidesAt = n.word("iferror-trap", "hides every error");
@@ -76,7 +75,7 @@ export const RefsScene: React.FC = () => {
   const crossTab = [["region", ...PIVOT.months], ...PIVOT.regions.map((region, i) => [region, ...PIVOT.grid[i].map((c) => printed(c.value))])];
   // G2 holds the formula first; the rest fill in on "fills the whole grid".
   const gridCellAt = (r: number, c: number) =>
-    r === 1 || c === 0 ? mixedAt + r * 2 : r === 2 && c === 1 ? lockAt + 10 : wholeAt + ((r - 2) * 3 + (c - 1)) * 2;
+    r === 1 || c === 0 ? mixedAt + 8 + r * 2 : r === 2 && c === 1 ? lockAt + 10 : wholeAt + ((r - 2) * 3 + (c - 1)) * 2;
   const ACTIVE = ds("gray", 500);
 
   const absAt = (i: number) => fillAt + 6 + i * 8;
@@ -177,7 +176,7 @@ export const RefsScene: React.FC = () => {
         <Sheet
           g={xg}
           values={crossTab}
-          at={mixedAt + 4}
+          at={mixedAt + 8}
           cellAt={gridCellAt}
           bold={(r, c) => r === 1 || c === 0}
           fills={[

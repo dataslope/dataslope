@@ -34,11 +34,12 @@ const LIST_W = 760;
 
 /**
  * Questions 6, 7 and 8 on the video's own four payments, two of them on
- * January 2. A bracket beside the table is the frame: ROWS grows it one row
- * at a time (100, 350, 425), RANGE takes both January 2 rows together (425
- * twice), the default frame is RANGE's, and no ORDER BY gives every row 605.
- * Then LAST_VALUE on the page's first four days, with the default frame and
- * widened.
+ * January 2. A bracket beside the table is the frame: ROWS, with id breaking
+ * the tie, grows it one row at a time (100, 350, 425), RANGE takes both
+ * January 2 rows together (425 twice), the default frame is RANGE's, and no
+ * ORDER BY gives every row 605. Then LAST_VALUE on the page's first four
+ * days, with the default frame and widened, and FIRST_VALUE and NTH_VALUE
+ * with the default frame.
  */
 export const FrameScene: React.FC = () => {
   const frame = useCurrentFrame();

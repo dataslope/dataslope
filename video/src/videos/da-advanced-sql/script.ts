@@ -42,24 +42,28 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     products, Emma and Ulysses tied at 310: ROW_NUMBER keeps four rows (Emma
  *     of the pair), RANK five; QUALIFY gives ROW_NUMBER's four.
  *   - "frame", the video's own four payments (the page's first four amounts,
- *     the middle two on one day): ROWS gives 100, 350, 425, 605; RANGE and
- *     the default frame give 100, 425, 425, 605; no ORDER BY gives 605 on
- *     every row. LAST_VALUE on the page's first four days returns each row's
- *     own amount, and 180 with the frame widened.
+ *     the middle two on one day): ROWS, ordered by day and then id so the
+ *     tie has one order, gives 100, 350, 425, 605; RANGE and the default
+ *     frame give 100, 425, 425, 605; no ORDER BY gives 605 on every row.
+ *     LAST_VALUE on the page's first four days returns each row's own
+ *     amount, and 180 with the frame widened; FIRST_VALUE gives 100 on every
+ *     row, NTH_VALUE(amount, 3) null, null, then 75.
  *   - "running", the page's 24 days: the running total reaches 4,255; the
- *     trailing three-day average starts 100, 175, 141.67.
+ *     trailing three-day average starts 100.00, 175.00, 141.67. A RANGE frame
+ *     of INTERVAL 2 DAY runs on the spine's sales, which have gaps.
  *   - "latest", the video's own plan changes: user 1 has three rows, and
  *     only team is kept. The page's spine: sales on March 1, 3 and 4, so the
  *     2nd and the 5th come back as zeros.
  *   - at speed: LAG gives 150 for January 2; NTILE(4) makes four groups of
  *     six from the page's 24 customers, NTILE(5) 5, 5, 5, 5, 4; DuckDB's own
  *     error for a window in WHERE; the page's org chart has five levels;
- *     January's 24 days fall in four weeks; the page's pivot and its unpivot;
+ *     January's 24 days fall in four weeks, each from a Monday, the last of
+ *     three days; the page's pivot and its unpivot;
  *     PERCENT_RANK 0 to 1 and CUME_DIST 0.2 to 1 on five customers.
  *
  * Written for Drew's ear, as in Parts 1 to 3: SQL keywords are written as
  * words, "N tile" for NTILE, "cume dist" for CUME_DIST, "date trunc" for
- * DATE_TRUNC.
+ * DATE_TRUNC, "enth value" for NTH_VALUE.
  */
 export const script: NarrationScript = {
   id: "da-advanced-sql",

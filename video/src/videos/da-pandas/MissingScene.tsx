@@ -59,7 +59,8 @@ export const MissingScene: React.FC = () => {
 
   const g = geoOf(MISSING.frame, X0, y(TOP), h);
   const lineH = listingHeight(1, SIZE);
-  const ig = geoOf(MISSING.isnaSum, MID_X, y(TOP) + lineH + h(16), h);
+  // An unnamed Series prints no header, so its table has none either.
+  const ig = geoOf(MISSING.isnaSum, MID_X, y(TOP) + lineH + h(16), h, { headH: MISSING.isnaSum.cols.every((c) => c === "") ? 0 : undefined });
   const eqTop = ig.rowTop(MISSING.isnaSum.rows.length) + h(40);
   const dg = geoOf(MISSING.dropna, MID_X, y(TOP) + lineH + h(16), h);
   const fg = geoOf(MISSING.fillna, RIGHT_X, y(TOP) + lineH + h(16), h);
@@ -155,7 +156,7 @@ export const MissingScene: React.FC = () => {
           at={q10At + 6}
           rows={F.rows.map((cells, i) => ({ cells, at: q10At + 10 + i * 2 }))}
           marks={[
-            ...ffilled.map((row, k) => ({ row, col: 2, at: ffillAt + 8 + k * 4 })),
+            ...ffilled.map((row, k) => ({ row, col: 2, at: ffillAt + 8 + k * 4, out: futureAt })),
             ...bfilled.map((row, k) => ({ row, col: 3, at: bfillAt + 8 + k * 4, out: futureAt })),
             ...bfilled.map((row) => ({ row, col: 3, at: futureAt + 4, color: MARK_BAD })),
           ]}

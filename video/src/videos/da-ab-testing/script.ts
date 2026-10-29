@@ -44,8 +44,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "abtest": charts/randomisation-balances-confounders.mjs, all ten traits
  *     over the 0.1 line when users choose, only age (0.102) when a coin does;
  *     the course's experiment (seed 42), 579 of 6,000 against 702 of 6,000,
- *     z = 3.64, p = 0.0003, "three in ten thousand".
- *   - "signif": charts/effect-size-independent-of-n.mjs, d = 0.2 at every n:
+ *     z = 3.64, p = 0.0003, "three in ten thousand", under the usual 0.05
+ *     (the 5% two-sided tails past 1.96).
+ *   - "signif": charts/effect-size-independent-of-n.mjs, d = 0.2 at every n
+ *     ("a fifth of a standard deviation"):
  *     p = 0.65 at 10 per group, 0.046 at 200, about 2.5 in ten billion at
  *     2,000; the experiment's lift 2.05 points, 95% interval 0.95 to 3.15,
  *     standard error 0.56; charts/ci-coverage.mjs, 4 of 100 intervals miss.
@@ -58,7 +60,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "simpson": the page's kidney-stone counts, A 93.1% and 73.0% in the two
  *     groups against B's 86.7% and 68.8%, pooled 78.0% against 82.6%;
  *     charts/average-of-averages.mjs, 68 against 51.8 per customer, the
- *     Islands' 40 customers.
+ *     Islands' 40 customers; summed first, 610,590 / 11,790 = 51.8.
  *   - short ones: the video's own events, where a repeat purchase makes 0.6
  *     of 0.4; charts/novelty-effect-fades.mjs, week one 14.1% against 3.75%;
  *     charts/cohort-retention.mjs, week eight 26.4% (January) to 51.7% (May);

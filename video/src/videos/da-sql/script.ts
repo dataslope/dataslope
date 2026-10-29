@@ -5,8 +5,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Narration for "SQL" (16:9), Part 1 of the Data Analyst interview prep
  * videos (agent-outputs/20261021-2314-data-analyst-interview-video-plan.md),
  * after content/interview/data-analyst/sql.mdx. It answers all 24 of the
- * page's questions that are this video's to answer: ten questions that hide a
- * trap, taken slowly and numbered aloud, then a rapid-fire round of fourteen
+ * page's questions that are this video's to answer: ten that need a picture
+ * (most of them hide a trap), taken slowly and numbered aloud, then a
+ * rapid-fire round of fourteen
  * (numbered 11 to 24 on screen only). The
  * page's window-function, running-total, pivot and top-N questions are
  * answered in Part 4, Advanced SQL, and its two CTE questions here, once.
@@ -41,7 +42,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     798.75, South 541.50, West 418.00; SUM in WHERE fails with "Binder
  *     Error: WHERE clause cannot contain aggregates!"; HAVING SUM(amount) >
  *     600 keeps East and North ("two regions come back"). The pipeline: 24
- *     rows, 11 with amount >= 100 ("the eleven over a hundred dollars"),
+ *     rows, 11 with amount > 100 ("the eleven over a hundred dollars"; no
+ *     amount is exactly 100.00),
  *     four regions, and HAVING > 400 keeps East 700.50 and North 475.75
  *     ("the two over four hundred"). The thresholds are the video's own.
  *     DuckDB lets WHERE use a plain SELECT alias (plainAlias), which
@@ -58,12 +60,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     their own, 350.00 summed after the join, 150.00 and 4 items with the
  *     item counts aggregated in a CTE first.
  *   - "nulls", six discounts of the video's own (10, null, 5, null, 0,
- *     15): discount = NULL matches 0 rows, IS NULL 2; COUNT(*) 6,
- *     COUNT(discount) 4; AVG 7.5 over the four, 5 with COALESCE(discount, 0).
+ *     15): discount = NULL matches 0 rows, IS NULL 2 (ids 2 and 4); AVG 7.5
+ *     over the other four, 5 with COALESCE(discount, 0); COUNT(*) 6,
+ *     COUNT(discount) 4. COUNT(DISTINCT discount) is 4 here too, so it is
+ *     said and not shown.
  *   - "anti", the "joins" customers and orders plus order 107, a guest
  *     checkout with no customer id (the video's own): NOT IN returns zero
  *     rows and no error; NOT EXISTS and the left join where the order is
- *     null both return Di.
+ *     null both return Di, and so does NOT IN once its subquery filters
+ *     out the null.
  *   - "distinct", the fan-out's orders plus a third that also costs 50.00
  *     (the video's own), each with its items: the join gives 5 rows,
  *     DISTINCT order_id, amount gives 3, SUM(DISTINCT amount) gives 150.00,
@@ -78,7 +83,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     Large, 120.00 Medium, 50.25 Small (the page's thresholds); WHEN score
  *     = NULL sends Ben's null to "Below A", IS NULL to "Unknown"; COALESCE
  *     gives 0 for a null discount and NULLIF a null rate for zero
- *     sessions; ROLLUP over the page's challenge table gives 17 rows (12
+ *     sessions (DuckDB also gives null without NULLIF, where most engines
+ *     raise an error, which the screen says); ROLLUP over the page's challenge table gives 17 rows (12
  *     region and category pairs, 4 subtotals, 1 total); the duplicate
  *     search finds two emails twice, and the ROW_NUMBER delete removes 2
  *     rows; 3 products by 4 regions give 12 rows, and 1,000 by 1,000 give

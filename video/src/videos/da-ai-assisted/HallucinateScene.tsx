@@ -119,7 +119,7 @@ export const HallucinateScene: React.FC = () => {
             Signups <Mark at={confirmsAt + 2} color={MARK_OK}>fell 12%</Mark>{" "}
             {/* Set off from the highlight, so the strike starts on "because", not on its edge. */}
             <span style={{ marginLeft: "0.14em" }}>
-              <Strike at={guessAt + 4} top="0.6em">
+              <Strike at={guessAt + 4} top="0.63em">
                 because of the competitor&apos;s launch
               </Strike>
             </span>

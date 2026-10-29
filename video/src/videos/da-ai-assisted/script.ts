@@ -23,7 +23,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * The opening is written fresh rather than in the earlier parts' words (asked
  * for on 2026-10-22): no numbered tiles or "hide a trap", no bar of segments;
  * the assistant's own query arrives and is questioned line by line. The
- * series ends on a closing line rather than a "Next:" bridge.
+ * series ends on a takeaway and a closing line rather than a "Next:" bridge.
  *
  * Abbreviations are spelled out the first time they are spoken (asked for on
  * 2026-10-22): AI, BI, LLM.
@@ -34,14 +34,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Facts. Every query and result on screen ran in DuckDB v1.4.3 (DuckDB-Wasm
  * 1.32.0, the engine the page's blocks run), by check.mjs into results.json,
  * which data.ts reads:
- *   - "mistakes", the page's nine orders and its query verbatim: the
- *     assistant's BETWEEN total is 405.50, the half-open total 840.50, so the
- *     assistant misses 51.8% of January ("more than half"); '2026-01-31' is
- *     midnight at the start of the 31st, so orders 7 and 8 drop out. The
- *     video's own two days (5 of 10 sessions, then 20 of 1,000): the average
- *     of the two rates is 26%, the pooled rate 2.5%.
+ *   - "mistakes", the page's nine orders and its query (each WHERE broken
+ *     after its column, to fit the panel): the assistant's BETWEEN total is
+ *     405.50, the half-open total 840.50, so the assistant misses 51.8% of
+ *     January's revenue ("more than half"), not of the month: '2026-01-31' is
+ *     midnight at the start of the 31st, so only that day drops out, and its
+ *     orders 7 and 8 hold that share. An order at 23:59:59.5 is dropped by an
+ *     end at 23:59:59 and kept by the half-open range ("any timestamp
+ *     precision", the page's concept check). The video's own two days (5 of
+ *     10 sessions, then 20 of 1,000): the average of the two rates is 26%, the
+ *     pooled rate 2.5%.
  *   - "check": 10,000 orders becoming 14,000 rows is the page's own
- *     illustration, not a query result.
+ *     illustration, not a query result. The NULL trap (the video's own three
+ *     customers and an order with no customer id): NOT IN keeps 0 rows, and
+ *     2 once the NULL is gone.
  *   - "hallucinate": "signups fell 12% because of the competitor's launch" is
  *     the page's own example sentence.
  *   - the question bank holds 110 questions (counted in
