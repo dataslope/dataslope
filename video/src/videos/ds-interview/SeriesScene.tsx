@@ -6,7 +6,7 @@ import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, no
 import { NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { BANK, PARTS, QUESTIONS } from "./data";
+import { BANK, CHALLENGE_PAGES, PARTS, QUESTIONS } from "./data";
 import { Drift, Headline, Hero, Kicker, X0 } from "./parts";
 
 const TILE_W = 260;
@@ -23,8 +23,10 @@ const LINE_Y = 834;
  * The series as a strip of its eleven topic videos, five then six, each tile
  * with its own watercolor hero and its question count, inking in along the
  * track. The two topics that take two videos are marked as pairs; then the
- * total, how every video runs, the practice on every page, and the bridge
- * into Part 1, whose tile lights up.
+ * total, how every video runs, the practice on the pages (concept checks on
+ * every one, challenges on four, and one bank of multiple-choice questions for
+ * the whole track, on a line of its own), and the bridge into Part 1, whose
+ * tile lights up.
  */
 export const SeriesScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -39,10 +41,10 @@ export const SeriesScene: React.FC = () => {
   const expAt = n.word("series", "experimentation each get two videos");
   const figureAt = n.word("series", "the questions worth a figure");
   const oneLineAt = n.word("series", "the one-line answers");
-  const practiceAt = n.word("practice", "Each page carries practice");
+  const everyAt = n.word("practice", "Every one has");
   const checksAt = n.word("practice", "concept checks");
-  const browserAt = n.word("practice", "challenges that run in your browser");
-  const bankAt = n.word("practice", "a hundred and ten");
+  const browserAt = n.word("practice", "four add challenges");
+  const bankAt = n.word("practice", "a bank of a hundred and ten");
   const openAt = n.word("next", "probability and statistics questions");
   const nextAt = n.word("next", "Next");
   const end = n.beat("next").to;
@@ -151,7 +153,7 @@ export const SeriesScene: React.FC = () => {
             top: y(LINE_Y),
             ...note(28, INK),
             whiteSpace: "nowrap",
-            opacity: ease(frame, figureAt - 2, 12) * (1 - ease(frame, practiceAt - 4, 10)),
+            opacity: ease(frame, figureAt - 2, 12) * (1 - ease(frame, everyAt - 12, 10)),
           }}
         >
           In each: the questions worth a figure first,{" "}
@@ -164,14 +166,23 @@ export const SeriesScene: React.FC = () => {
             top: y(LINE_Y),
             ...note(28, INK),
             whiteSpace: "nowrap",
-            ...TABULAR,
-            opacity: 1 - ease(frame, nextAt - 8, 10),
+            opacity: ease(frame, everyAt - 2, 12) * (1 - ease(frame, nextAt - 8, 10)),
           }}
         >
-          <span style={{ opacity: ease(frame, practiceAt, 12) }}>On every page: </span>
-          <span style={{ opacity: ease(frame, checksAt - 2, 10) }}>concept checks · </span>
-          <span style={{ opacity: ease(frame, browserAt - 2, 10) }}>challenges that run in your browser · </span>
-          <span style={{ opacity: ease(frame, bankAt - 2, 10), fontWeight: 650 }}>{BANK} multiple-choice questions</span>
+          Every page: <span style={{ opacity: ease(frame, checksAt - 2, 10) }}>concept checks</span>
+          <span style={{ opacity: ease(frame, browserAt - 2, 10) }}> · {CHALLENGE_PAGES} pages: challenges that run in your browser</span>
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            left: X0,
+            top: y(LINE_Y + 44),
+            ...note(28, INK),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, bankAt - 2, 10) * (1 - ease(frame, nextAt - 8, 10)),
+          }}
+        >
+          A bank of <span style={{ fontWeight: 650 }}>{BANK} multiple-choice questions</span>, for the whole track
         </div>
 
         <NextLine at={nextAt} x={X0} y={y(LINE_Y) - h(8)} width={1000}>

@@ -3,7 +3,10 @@
 // questions it answers. The counts are the plan's table
 // (agent-outputs/20261022-0445-data-scientist-interview-video-plan.md), and
 // each matches the built video's own script header (twelve worked plus three
-// quick in ML evaluation, and so on). Pure.
+// quick in ML evaluation, and so on). The practice counts are the track's own
+// pages, counted by check.mjs into results.json. Pure.
+
+import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "ds-interview";
 
@@ -30,4 +33,8 @@ export const PARTS: readonly Part[] = [
 export const QUESTIONS = PARTS.reduce((a, p) => a + p.questions, 0);
 
 /** multiple-choice-questions.mdx, counted: 110 MultipleChoice blocks. */
-export const BANK = 110;
+export const BANK: number = results.bank;
+
+/** The topic pages with runnable challenges (ChallengeCard or
+ *  SqlChallengeCard): 4 of the 9. Every one of the 9 has concept checks. */
+export const CHALLENGE_PAGES: number = results.challengePages;

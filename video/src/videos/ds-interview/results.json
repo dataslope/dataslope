@@ -1,0 +1,53 @@
+{
+  "bank": 110,
+  "topicPages": 9,
+  "conceptCheckPages": 9,
+  "challengePages": 4,
+  "pages": [
+    {
+      "page": "deep-learning",
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "experimentation",
+      "conceptChecks": 1,
+      "challenges": 0
+    },
+    {
+      "page": "llm-evaluation",
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "machine-learning",
+      "conceptChecks": 2,
+      "challenges": 1
+    },
+    {
+      "page": "probability",
+      "conceptChecks": 3,
+      "challenges": 1
+    },
+    {
+      "page": "product-sense-and-metrics",
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "python-and-pandas",
+      "conceptChecks": 2,
+      "challenges": 2
+    },
+    {
+      "page": "sql",
+      "conceptChecks": 2,
+      "challenges": 2
+    },
+    {
+      "page": "statistics",
+      "conceptChecks": 3,
+      "challenges": 0
+    }
+  ]
+}

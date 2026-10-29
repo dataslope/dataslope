@@ -52,33 +52,36 @@ const line = (frame: number, at: number): React.CSSProperties => ({
 });
 
 /**
- * What AI has brought in, the role page's four points, one panel each:
- * evaluating an LLM feature as a measurement problem, with an interval on a
- * pass rate; experiments where the output itself varies, drawn as three runs
- * of one prompt that never settle; checking what an assistant wrote; and
- * rounds that allow an assistant and rounds that ban it.
+ * What AI has brought in, the role page's four points, one panel each, each
+ * with its own beat: evaluating an LLM feature as a measurement problem, with
+ * an interval on a pass rate (`ai`); experiments where the output itself
+ * varies, drawn as three runs of one prompt that never settle, and where the
+ * provider can change the model mid-test (`ai-exp`); checking what an
+ * assistant wrote (`ai-check`); and coding rounds that allow an assistant and
+ * grade how you check its work, beside rounds that ban it (`ai-rounds`).
  */
 export const AiScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
   const { h } = useLayout();
-  const w = (p: string) => n.word("ai", p);
 
   const from = n.beat("ai").from;
-  const broughtAt = w("has brought in new questions");
-  const evalAt = w("Evaluating a feature");
-  const measureAt = w("a measurement problem");
-  const setAt = w("an eval set");
-  const ciAt = w("a confidence interval");
-  const judgeAt = w("an LLM judge agrees with experts");
-  const expAt = w("Experiments on AI features");
-  const runAt = w("changes from one run to the next");
-  const checkAt = w("Checking code");
-  const analysisAt = w("or an analysis");
-  const allowAt = w("some rounds allow an assistant");
-  const banAt = w("others ban it");
-  const askAt = w("ask the recruiter which is which");
-  const end = n.beat("ai").to;
+  const broughtAt = n.word("ai", "has brought in new questions");
+  const evalAt = n.word("ai", "Evaluating a feature");
+  const measureAt = n.word("ai", "a measurement problem");
+  const setAt = n.word("ai", "an eval set");
+  const ciAt = n.word("ai", "a confidence interval");
+  const judgeAt = n.word("ai", "an LLM judge agrees with experts");
+  const expAt = n.word("ai-exp", "Experiments on AI features");
+  const runAt = n.word("ai-exp", "changes from one run to the next");
+  const swapAt = n.word("ai-exp", "the provider can change the model");
+  const checkAt = n.word("ai-check", "Checking code");
+  const analysisAt = n.word("ai-check", "or an analysis");
+  const allowAt = n.word("ai-rounds", "some coding rounds allow an assistant");
+  const gradeAt = n.word("ai-rounds", "grade how you check its work");
+  const banAt = n.word("ai-rounds", "Others ban it");
+  const askAt = n.word("ai-rounds", "ask the recruiter about each round");
+  const end = n.beat("ai-rounds").to;
 
   // Panel 1's figure: a pass rate with its interval, drawn on a short scale.
   const ciP = ease(frame, ciAt, 16);
@@ -116,7 +119,8 @@ export const AiScene: React.FC = () => {
 
         <Panel i={1} at={expAt} title="Experiments on AI features">
           <div style={line(frame, runAt)}>the output changes</div>
-          <div style={line(frame, runAt + 6)}>from one run to the next</div>
+          <div style={line(frame, runAt + 6)}>from one run to the next,</div>
+          <div style={line(frame, swapAt)}>and the model can change mid-test</div>
           <svg style={{ position: "absolute", left: FIG_X, top: 50, overflow: "visible" }} width={220} height={140}>
             <line x1={0} x2={220} y1={130} y2={130} stroke={INK_SOFT} strokeWidth={1.4} opacity={runP} />
             {runs.map((v, k) => (
@@ -175,9 +179,10 @@ export const AiScene: React.FC = () => {
               );
             })}
           </div>
-          <div style={{ ...note(26, ACCENT_INK), marginTop: h(26), whiteSpace: "nowrap", opacity: ease(frame, askAt - 2, 12) }}>
-            ask the recruiter which is which
+          <div style={{ ...line(frame, gradeAt), color: INK, marginTop: h(14) }}>
+            if allowed, <Mark at={gradeAt + 4}>graded on how you check its work</Mark>
           </div>
+          <div style={{ ...line(frame, askAt), color: INK }}>ask the recruiter about each round</div>
         </Panel>
       </Drift>
     </AbsoluteFill>
