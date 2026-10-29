@@ -9,7 +9,7 @@ import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CURSE, fixed, META } from "./data";
-import { CONTROL, Drift, Headline, Kicker, OK, OK_INK, Spot, TREAT, WARM_INK, X0 } from "./parts";
+import { CONTROL, Drift, Headline, Kicker, OK, OK_INK, pulse, Spot, TREAT, WARM_INK, X0 } from "./parts";
 
 const R_X = 820;
 const LIST_TOP = 340;
@@ -22,35 +22,48 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 const Ate: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const ateAt = c.w("r-ate", "The average treatment effect, ATE");
+  const ateNameAt = c.w("r-ate", "ATE, is averaged");
+  const everyoneAt = c.w("r-ate", "averaged over everyone");
   const attAt = c.w("r-ate", "The average treatment effect on the treated");
+  const attNameAt = c.w("r-ate", "ATT, only over those");
   const gotAt = c.w("r-ate", "only over those who actually got it");
-  const matchAt = c.w("r-ate", "A randomized test makes them match");
-  const apartAt = c.w("r-ate", "Observational data can pull them apart");
+  const matchAt = c.w("r-ate-why", "a randomized test makes them match");
+  const apartAt = c.w("r-ate-why", "Opt-in features and observational data");
+  const reportAt = c.w("r-ate-why", "Report ATT");
   const cx = R_X + 260;
   const cy = c.y(560);
   const all = ease(frame, ateAt, 14);
   const got = ease(frame, attAt + 4, 14);
+  // Each definition lands with its words, and "everyone" lights the whole circle.
+  const lit = pulse(frame, everyoneAt + 8, 22);
   return (
     <>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-        <circle cx={cx} cy={cy} r={c.h(190) * all} fill={`color-mix(in srgb, ${CONTROL} 30%, ${PAPER})`} stroke={INK} strokeWidth={2} />
+        <circle cx={cx} cy={cy} r={c.h(190) * all} fill={`color-mix(in srgb, ${CONTROL} ${30 + 25 * lit}%, ${PAPER})`} stroke={INK} strokeWidth={2 + 2 * lit} />
         <circle cx={cx + 50} cy={cy + c.h(40)} r={c.h(96) * got} fill={TREAT} opacity={0.85} />
       </svg>
-      <Note at={ateAt + 4} x={R_X + 520} y={c.y(400)}>
+      <Note at={ateNameAt - 2} x={R_X + 520} y={c.y(400)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <b>ATE</b>: averaged over everyone
+          <b>ATE</b>
+          <span style={{ opacity: ease(frame, everyoneAt, 10) }}>: averaged over everyone</span>
         </span>
       </Note>
-      <Note at={gotAt - 2} x={R_X + 520} y={c.y(460)}>
+      <Note at={attNameAt - 2} x={R_X + 520} y={c.y(460)}>
         <span style={{ ...note(26, BLUE_INK), whiteSpace: "nowrap" }}>
-          <b>ATT</b>: only over those who got it
+          <b>ATT</b>
+          <span style={{ opacity: ease(frame, gotAt - 2, 10) }}>: only over those who got it</span>
         </span>
       </Note>
       <Note at={matchAt} x={R_X + 520} y={c.y(560)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>randomized: they match</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>randomized, all treated: they match</span>
       </Note>
       <Note at={apartAt} x={R_X + 520} y={c.y(610)}>
-        <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>observational: they can come apart</span>
+        <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>opt-in or observational: they can differ</span>
+      </Note>
+      <Note at={reportAt} x={R_X + 520} y={c.y(690)}>
+        <span style={{ ...note(25, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          report <b>ATT</b> for the people who use it
+        </span>
       </Note>
     </>
   );
@@ -69,33 +82,46 @@ const Long: React.FC<{ c: Ctx }> = ({ c }) => {
   const x0 = R_X;
   const wk = 112;
   const top = c.y(470);
+  // Eight weeks. What drifts is marked above the strip; each defence labels
+  // its own mark: the cycle under its outline, the end date at its flag,
+  // which stands where the run stops.
+  const flagX = x0 + 8 * wk - 3;
   return (
     <>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         {Array.from({ length: 8 }, (_, i) => (
-          <rect key={i} x={x0 + i * wk} y={top} width={wk - 6} height={c.h(60)} rx={5} fill={`color-mix(in srgb, ${CONTROL} 40%, ${PAPER})`} stroke={INK} strokeWidth={1.2} opacity={ease(frame, driftAt + i * 1.5, 8)} />
+          <g key={i} opacity={ease(frame, driftAt + i * 1.5, 8)}>
+            <rect x={x0 + i * wk} y={top} width={wk - 6} height={c.h(60)} rx={5} fill={`color-mix(in srgb, ${CONTROL} 40%, ${PAPER})`} stroke={INK} strokeWidth={1.2} />
+            <text x={x0 + i * wk + (wk - 6) / 2} y={top + c.h(30) + 7} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: INK_SOFT }}>
+              {i === 0 ? "week 1" : i + 1}
+            </text>
+          </g>
         ))}
         {/* A full business cycle: two weeks here. */}
         <rect x={x0 - 4} y={top - 6} width={(2 * wk + 2) * ease(frame, cycleAt, 12)} height={c.h(60) + 12} rx={8} fill="none" stroke={OK} strokeWidth={3.5} />
-        {/* The end date, set before the start. */}
+        {/* The end date, set before the start, where the run ends. */}
         <g opacity={ease(frame, endAt, 10)}>
-          <line x1={x0 + 6 * wk - 3} x2={x0 + 6 * wk - 3} y1={top - c.h(70)} y2={top + c.h(76)} stroke={OK} strokeWidth={3} />
-          <path d={`M${x0 + 6 * wk - 3},${top - c.h(70)} l40,12 l-40,12 z`} fill={OK} />
+          <line x1={flagX} x2={flagX} y1={top - c.h(70)} y2={top + c.h(76)} stroke={OK} strokeWidth={3} />
+          <path d={`M${flagX},${top - c.h(70)} l40,12 l-40,12 z`} fill={OK} />
         </g>
       </svg>
-      <Note at={seasonsAt} x={x0 + 2 * wk} y={top + c.h(84)}>
+      <Note at={seasonsAt} x={x0 + 2 * wk} y={top - c.h(44)}>
         <span style={{ ...label(22, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>seasons turn</span>
       </Note>
-      <Note at={launchesAt} x={x0 + 4 * wk} y={top + c.h(84)}>
+      <Note at={launchesAt} x={x0 + 4 * wk} y={top - c.h(44)}>
         <span style={{ ...label(22, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>other launches land</span>
       </Note>
-      <Note at={freezeAt} x={x0} y={top - c.h(110)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>freeze the scope</span>
+      <Note at={freezeAt} x={x0} y={top - c.h(118)}>
+        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>freeze the scope for the whole run</span>
       </Note>
-      <Note at={cycleAt + 4} x={x0} y={top + c.h(140)}>
-        <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>at least one full business cycle</span>
+      <Note at={cycleAt + 4} x={x0} y={top + c.h(84)}>
+        <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
+          at least one full business cycle
+          <br />
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>(often a week or two)</span>
+        </span>
       </Note>
-      <Note at={endAt + 4} x={x0 + 6 * wk + 50} y={top - c.h(72)}>
+      <Note at={endAt + 4} x={flagX - 12} y={top + c.h(84)} align="right">
         <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>end date, set in advance</span>
       </Note>
     </>
@@ -141,6 +167,7 @@ const Meta: React.FC<{ c: Ctx }> = ({ c }) => {
   const curseAt = c.w("r-curse", "Watch for the winner's curse");
   const twentyAt = c.w("r-curse", "at twenty percent power");
   const overAt = c.w("r-curse", "more than twofold");
+  const allAt = c.w("r-pool", "pool every experiment you ran");
   const low = CURSE.find((r) => r.power === 0.2)!;
   // Three experiments of one change on a lift axis, each sized by its
   // precision (radius 1 / SE): the plain average of their headlines against
@@ -220,6 +247,9 @@ const Meta: React.FC<{ c: Ctx }> = ({ c }) => {
       <div style={{ position: "absolute", left: ex(META.pooled) - 100, width: 200, top: poolY + 24, textAlign: "center", ...label(21, OK_INK), fontWeight: 750, ...TABULAR, opacity: ease(frame, countAt + 24, 10) }}>
         pooled: {fixed(META.pooled, 1)}
       </div>
+      <Note at={allAt} x={R_X} y={c.y(822)}>
+        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>so pool every experiment you ran, not just the winners</span>
+      </Note>
       <Note at={curseAt + 2} x={BAR.x - 20} y={c.y(380)}>
         <span style={{ ...note(26, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>the winner's curse, at 20% power</span>
       </Note>

@@ -39,15 +39,15 @@ export const ManyScene: React.FC = () => {
   const textAt = n.word("many", "What is the multiple comparisons problem");
   const eachAt = n.word("many", "Each test at a five percent level");
   const oneAt = n.word("many", "one in twenty chance");
-  const twentyAt = n.word("many", "Read twenty metrics");
-  const sixtyAt = n.word("many", "sixty-four percent");
+  const twentyAt = n.word("many-20", "Read twenty independent metrics");
+  const sixtyAt = n.word("many-20", "sixty-four percent");
   const tenAt = n.word("many-fix", "Here are ten simulated metrics");
   const realAt = n.word("many-fix", "three of them really moved");
   const fiveAt = n.word("many-fix", "Five come in under point oh five");
   const falseAt = n.word("many-fix", "two of those are false alarms");
-  const bonfAt = n.word("many-fix", "Bonferroni divides");
-  const keepsTwoAt = n.word("many-fix", "keeps two");
-  const dropsAt = n.word("many-fix", "it drops a real one");
+  const bonfAt = n.word("many-bonf", "Bonferroni divides");
+  const keepsTwoAt = n.word("many-bonf", "It keeps two");
+  const dropsAt = n.word("many-bonf", "it drops a real one");
   const bhAt = n.word("many-bh", "Benjamini-Hochberg controls");
   const fdrAt = n.word("many-bh", "the false discovery rate");
   const ruleAt = n.word("many-bh", "It gives the smallest p-value a bar");
@@ -63,7 +63,8 @@ export const ManyScene: React.FC = () => {
 
   // Right: p by rank, log scale.
   const rx: Scale = { lo: 0.4, hi: 10.6, a: RIGHT.x0, b: RIGHT.x1 };
-  const ry: Scale = { lo: lg(0.0003), hi: lg(1.5), a: y(RIGHT.base), b: y(RIGHT.top) };
+  // Headroom above p = 1 holds the key, clear of that row's gridline.
+  const ry: Scale = { lo: lg(0.0003), hi: lg(4), a: y(RIGHT.base), b: y(RIGHT.top) };
   const py = (p: number) => at(ry, lg(p));
   const m = METRICS.m;
   const cut = 0.05;
@@ -122,7 +123,7 @@ export const ManyScene: React.FC = () => {
           <PanelTitle x={LEFT.x0 - 20} y={y(LEFT.top) - 54} at={twentyAt - 6}>
             chance of at least one false alarm
           </PanelTitle>
-          <Axes x={kx} y={ky} xTicks={[1, 5, 10, 15, 20]} yTicks={[0, 0.2, 0.4, 0.6]} yFormat={(v) => `${Math.round(v * 100)}%`} xTitle="metrics read" at={twentyAt - 8} />
+          <Axes x={kx} y={ky} xTicks={[1, 5, 10, 15, 20]} yTicks={[0, 0.2, 0.4, 0.6]} yFormat={(v) => `${Math.round(v * 100)}%`} xTitle="independent metrics read, none really moved" at={twentyAt - 8} />
           <Curve points={fam} x={kx} y={ky} at={twentyAt} dur={Math.max(18, sixtyAt - twentyAt)} color={ACCENT} />
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
             <circle cx={at(kx, 1)} cy={at(ky, FAMILY.p[0])} r={7 * ease(frame, twentyAt, 8)} fill={ACCENT} />

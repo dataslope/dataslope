@@ -16,7 +16,9 @@ const GRID = { x: 560, top: 420, cw: 300, ch: 170 };
  * new, recommendations old or new. The pricing test's lift is read down each
  * column, with and without the new recommendations; if the two lifts differ,
  * the experiments interact. No numbers: the page gives none, and the method is
- * the answer. The grid itself is the factorial design the fixes end on.
+ * the answer. The grid itself is the factorial design the fixes end on: each
+ * test randomized on its own, so all four cells fill (the "neither" cell
+ * lights too) and the interaction is estimated directly.
  */
 export const ConcurrentScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -34,7 +36,10 @@ export const ConcurrentScene: React.FC = () => {
   const separateAt = n.word("concurrent", "separate their users");
   const afterAt = n.word("concurrent", "run them one after the other");
   const factorialAt = n.word("concurrent", "a factorial design");
-  const end = n.beat("concurrent").to;
+  const indepAt = n.word("factorial", "randomizes each test independently");
+  const fillAt = n.word("factorial", "all four cells fill");
+  const estAt = n.word("factorial", "estimates the interaction directly");
+  const end = n.beat("factorial").to;
 
   const gridIn = ease(frame, compareAt - 8, 14);
   const both = ease(frame, compareAt + 4, 12);
@@ -43,11 +48,12 @@ export const ConcurrentScene: React.FC = () => {
   const differ = ease(frame, interactAt, 12);
   const fact = ease(frame, factorialAt, 14);
   const bump = pulse(frame, factorialAt + 4, 20);
+  const fill = ease(frame, fillAt, 12);
 
   const cell = (r: number, c: number) => ({ left: GRID.x + c * GRID.cw, top: y(GRID.top) + r * h(GRID.ch) });
   // Rows: pricing old (0) or new (1); columns: recommendations old (0) or new (1).
   const cells = [
-    { r: 0, c: 0, text: "neither", lit: 0, ink: INK_SOFT },
+    { r: 0, c: 0, text: "neither", lit: fill, ink: INK_SOFT },
     { r: 0, c: 1, text: "recommendations only", lit: only, ink: BLUE_INK },
     { r: 1, c: 0, text: "pricing only", lit: only, ink: BLUE_INK },
     { r: 1, c: 1, text: "in both", lit: both, ink: INK },
@@ -61,6 +67,7 @@ export const ConcurrentScene: React.FC = () => {
       <Sfx name="el-tap" at={separateAt} level={-37} />
       <Sfx name="el-tap" at={afterAt} level={-37} />
       <Sfx name="el-pop" at={factorialAt + 2} level={-35} />
+      <Sfx name="el-tap" at={fillAt} level={-37} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} size={58}>
@@ -137,6 +144,16 @@ export const ConcurrentScene: React.FC = () => {
         </Note>
         <Note at={interactAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) + h(24)}>
           <span style={{ ...note(28, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>if they differ, the two interact</span>
+        </Note>
+
+        {/* What a factorial design does. */}
+        <Note at={indepAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) + h(92)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>factorial: randomize each test independently</span>
+        </Note>
+        <Note at={fillAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) + h(130)}>
+          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
+            all four cells fill<span style={{ opacity: ease(frame, estAt, 10) }}>; estimate the interaction</span>
+          </span>
         </Note>
 
         {/* The fixes. */}

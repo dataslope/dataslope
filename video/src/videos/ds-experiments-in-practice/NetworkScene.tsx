@@ -251,7 +251,7 @@ export const NetworkScene: React.FC = () => {
             />
             <line x1={BARS.x + BARS.w} x2={BARS.x + 2 * BARS.w + BARS.gap + 30} y1={y(BARS.base) - bh(treat)} y2={y(BARS.base) - bh(treat)} stroke={INK} strokeWidth={1} strokeDasharray="3 5" />
           </svg>
-          {["new", "control"].map((t, i) => (
+          {["sharing", "control"].map((t, i) => (
             <div
               key={t}
               style={{ position: "absolute", left: BARS.x + i * (BARS.w + BARS.gap) - 20, width: BARS.w + 40, top: y(BARS.base) + h(10), textAlign: "center", ...label(21, INK_SOFT), fontWeight: 700, opacity: barsIn }}
@@ -268,11 +268,12 @@ export const NetworkScene: React.FC = () => {
           <Note at={shrinkAt + 2} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.5) + h(20)} out={groupsAt + 4}>
             <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>so the difference shrinks</span>
           </Note>
+          {/* Balanced, so neither note leaves a word on a line alone. */}
           <Note at={groupsAt + 4} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.62)} width={380}>
-            <span style={{ ...note(25, OK_INK), fontWeight: 700 }}>randomize groups that rarely touch</span>
+            <span style={{ ...note(25, OK_INK), fontWeight: 700, display: "block", textWrap: "balance" }}>randomize groups that rarely touch</span>
           </Note>
           <Note at={friendsAt} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.62) + h(80)} width={380}>
-            <span style={{ ...note(24, OK_INK) }}>
+            <span style={{ ...note(24, OK_INK), display: "block", textWrap: "balance" }}>
               clusters of friends<span style={{ opacity: ease(frame, citiesAt, 10) }}>, or whole cities</span>
             </span>
           </Note>

@@ -134,15 +134,17 @@ export const NullScene: React.FC = () => {
               >
                 {count(t.n)} per arm
               </div>
+              {/* The narrow interval's ends sit beside its caps, not above
+                  them, where the zero line would run through "−0.1". */}
               {[t.lo, t.hi].map((e, j) => (
                 <div
                   key={j}
                   style={{
                     position: "absolute",
-                    left: at(x, e) - 60,
+                    left: ok ? (j === 0 ? at(x, e) - 132 : at(x, e) + 12) : at(x, e) - 60,
                     width: 120,
-                    top: y(row) - h(52),
-                    textAlign: "center",
+                    top: ok ? y(row) - 14 : y(row) - h(52),
+                    textAlign: ok ? (j === 0 ? "right" : "left") : "center",
                     ...label(21, INK),
                     fontWeight: 700,
                     ...TABULAR,
@@ -152,7 +154,7 @@ export const NullScene: React.FC = () => {
                   {fixed(e, 1, true)}
                 </div>
               ))}
-              <Note at={verdictAt - 2} x={ok ? at(x, t.hi) + 70 : at(x, t.hi) + 40} y={y(row) - 20}>
+              <Note at={verdictAt - 2} x={ok ? at(x, t.hi) + 96 : at(x, t.hi) + 40} y={y(row) - 20}>
                 <span style={{ ...note(28, ok ? OK_INK : ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
                   {ok ? "no meaningful effect" : "can't tell"}
                 </span>

@@ -47,7 +47,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "novelty": charts/novelty-effect-fades.mjs, as DA Part 7 drew it (and
  *     checked against its results.json): week one 14.1% against 3.75%, week
  *     eight 0.68% against 4.19%.
- *   - "many": the page's curve, 1 - 0.95^20 = 64%; ten simulated metrics with
+ *   - "many": the page's curve, 1 - 0.95^20 = 64% (twenty
+ *     independent tests, none with a real effect); ten simulated metrics with
  *     three real effects: five under 0.05 (two false), Benjamini-Hochberg
  *     keeps the three real ones (rank 3's p of 0.0136 is under its bar of
  *     0.015; ranks 4 and 5 miss 0.020 and 0.025), Bonferroni keeps two.
@@ -161,12 +162,20 @@ export const script: NarrationScript = {
     {
       id: "many",
       scene: true,
-      text: "Question six. What is the multiple comparisons problem? Each test at a five percent level has a one in twenty chance of a false alarm. Read twenty metrics, and the chance that at least one of them fires is sixty-four percent.",
+      text: "Question six. What is the multiple comparisons problem? Each test at a five percent level has a one in twenty chance of a false alarm.",
+    },
+    {
+      id: "many-20",
+      text: "Read twenty independent metrics where nothing really moved, and the chance that at least one of them fires is sixty-four percent.",
       pauseAfter: 0.6,
     },
     {
       id: "many-fix",
-      text: "Here are ten simulated metrics, and three of them really moved. Five come in under point oh five, and two of those are false alarms. Bonferroni divides the five percent by ten, and keeps two: safe, but it drops a real one.",
+      text: "Here are ten simulated metrics, and three of them really moved. Five come in under point oh five, and two of those are false alarms.",
+    },
+    {
+      id: "many-bonf",
+      text: "Bonferroni divides the five percent by ten, which holds the chance of any false alarm to at most five percent. It keeps two: safe, but it drops a real one.",
     },
     {
       id: "many-bh",
@@ -183,7 +192,7 @@ export const script: NarrationScript = {
       id: "network",
       scene: true,
       text: "Question seven. What are network effects and interference? A standard test assumes one user's treatment can't change another user's outcome. That's SUTVA, the stable unit treatment value assumption. Give a sharing feature to half the users, and what they share reaches the other half: control gets treated too, and the difference shrinks. So randomize groups that rarely touch: clusters of friends, or whole cities.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.6,
     },
     {
       id: "switchback",
@@ -206,6 +215,10 @@ export const script: NarrationScript = {
       id: "concurrent",
       scene: true,
       text: "Question nine. How do you detect interference between experiments running at once? Compare the users who are in both with those in only one. If a pricing test's lift changes for users who also see new recommendations, the two interact. Then separate their users, run them one after the other, or analyze them together as a factorial design.",
+    },
+    {
+      id: "factorial",
+      text: "A factorial design randomizes each test independently, so all four cells fill, and estimates the interaction directly.",
       pauseAfter: 0.7,
     },
 
@@ -235,7 +248,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-ate",
-      text: "The average treatment effect, ATE, is averaged over everyone. The average treatment effect on the treated, ATT, only over those who actually got it. A randomized test makes them match. Observational data can pull them apart.",
+      text: "The average treatment effect, ATE, is averaged over everyone. The average treatment effect on the treated, ATT, only over those who actually got it.",
+    },
+    {
+      id: "r-ate-why",
+      text: "If everyone assigned is treated, a randomized test makes them match. Opt-in features and observational data can pull them apart. Report ATT when only the people who use the feature matter.",
     },
     {
       id: "r-long",
@@ -252,7 +269,11 @@ export const script: NarrationScript = {
     {
       id: "r-curse",
       text: "Watch for the winner's curse: at twenty percent power, the results that reached significance overstate the true effect more than twofold.",
-      pauseAfter: 1.8,
+    },
+    {
+      id: "r-pool",
+      text: "So pool every experiment you ran, not just the winners.",
+      pauseAfter: 1.2,
     },
     {
       id: "next",

@@ -113,8 +113,13 @@ export const NoveltyScene: React.FC = () => {
         <Note at={plainAt + 8} x={at(x, 3.2)} y={at(yS, NOVELTY.durable[2]) - h(48)}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a plainer change</span>
         </Note>
-        <Note at={readAt + 2} x={at(x, 1.5)} y={y(PLOT.top) - h(6)}>
+        {/* Each band carries its own label: week one while it is the one
+            read, then the first weeks once they are what to run past. */}
+        <Note at={readAt + 2} x={at(x, 1.5)} y={y(PLOT.top) - h(6)} out={pastAt}>
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>read in week one</span>
+        </Note>
+        <Note at={pastAt + 4} x={at(x, 0.6) + 10} y={y(PLOT.top) - h(6)}>
+          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>run past these weeks</span>
         </Note>
         <Note at={wrongAt} x={at(x, 2.2)} y={at(yS, 11)}>
           <span style={{ ...note(27, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>→ you'd ship the wrong one</span>

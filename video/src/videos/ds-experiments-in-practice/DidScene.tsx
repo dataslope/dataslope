@@ -80,7 +80,7 @@ export const DidScene: React.FC = () => {
       <Sfx name="el-pop" at={checkAt + 2} level={-37} />
 
       <Drift from={from} to={end + 30}>
-        <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={58}>
+        <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={54}>
           What is a quasi-experiment, and how does difference-in-differences work?
         </QuestionCard>
         <Note at={cantAt} x={X0} y={y(330)}>
