@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -219,7 +219,7 @@ export const SizeScene: React.FC = () => {
           {[0, 5_000, 10_000, 15_000, 20_000].map((v) => (
             <g key={v}>
               <line x1={at(xs, v)} x2={at(xs, v)} y1={y(AXIS.y)} y2={y(AXIS.y) + 8} stroke={INK} strokeWidth={1.4} />
-              <text x={at(xs, v)} y={y(AXIS.y) + 34} textAnchor="middle" style={{ ...label(20, INK_SOFT), ...TABULAR }}>
+              <text x={at(xs, v)} y={y(AXIS.y) + 34} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), ...TABULAR })}>
                 {num(v)}
               </text>
             </g>

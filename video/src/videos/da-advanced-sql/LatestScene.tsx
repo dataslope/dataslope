@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -147,7 +147,7 @@ export const LatestScene: React.FC = () => {
               x={cx(i)}
               y={y(CHART.base) + 24}
               textAnchor="middle"
-              style={{ ...label(17, zeros.includes(i) ? ACCENT_INK : INK_SOFT), fontVariantNumeric: "tabular-nums" }}
+              style={svgText({ ...label(17, zeros.includes(i) ? ACCENT_INK : INK_SOFT), fontVariantNumeric: "tabular-nums" })}
             >
               Mar {Number(r[0].slice(8))}
             </text>

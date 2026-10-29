@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -50,7 +50,7 @@ const NullPanel: React.FC<{ left: number; two: boolean; at: number; tailAt: numb
       {(two ? [crit, -crit] : [crit]).map((c) => (
         <g key={c} opacity={t}>
           <line x1={xs(c)} x2={xs(c)} y1={y(BASE)} y2={y(BASE) - h(PEAK) * 0.7} stroke={INK} strokeWidth={2} strokeDasharray="5 6" />
-          <text x={xs(c)} y={y(BASE) + 30} textAnchor="middle" style={{ ...label(20, INK), fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>
+          <text x={xs(c)} y={y(BASE) + 30} textAnchor="middle" style={svgText({ ...label(20, INK), fontWeight: 650, fontVariantNumeric: "tabular-nums" })}>
             {c > 0 ? c : `−${-c}`}
           </text>
         </g>

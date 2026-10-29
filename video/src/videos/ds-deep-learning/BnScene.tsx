@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -86,7 +86,7 @@ export const BnScene: React.FC = () => {
                   {line.ticks.map((t) => (
                     <g key={t}>
                       <line x1={pos(i, t)} x2={pos(i, t)} y1={y(line.y)} y2={y(line.y) + 7} stroke={INK} strokeWidth={1.2} />
-                      <text x={pos(i, t)} y={y(line.y) + 30} textAnchor="middle" style={{ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" }}>
+                      <text x={pos(i, t)} y={y(line.y) + 30} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
                         {t < 0 ? `−${-t}` : t}
                       </text>
                     </g>

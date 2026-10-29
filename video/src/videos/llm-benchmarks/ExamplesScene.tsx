@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { body, fmt, INK, INK_SOFT, label, note, TABULAR, svgText } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -160,7 +160,7 @@ export const ExamplesScene: React.FC = () => {
         {/* The axis: correct answers out of 20. */}
         <Svg opacity={ease(frame, sixtyFiveAt, 12)}>
           {[5, 10, 15, 20].map((k) => (
-            <text key={k} x={sx(k) + SLOT / 2} y={y(BASE_B) + 30} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR }}>
+            <text key={k} x={sx(k) + SLOT / 2} y={y(BASE_B) + 30} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
               {k}
             </text>
           ))}
@@ -227,7 +227,7 @@ export const ExamplesScene: React.FC = () => {
               <Svg opacity={ease(frame, at, 10)}>
                 <rect x={x} y={y(RBASE) - bh} width={44} height={bh} rx={2} fill={lit > 0 ? A : FAINT} opacity={0.6 + 0.4 * lit} />
                 <rect x={x + 48} y={y(RBASE) - ch} width={22} height={ch} rx={2} fill={B} />
-                <text x={x + 35} y={y(RBASE) + 28} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 600, ...TABULAR }}>
+                <text x={x + 35} y={y(RBASE) + 28} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 600, ...TABULAR })}>
                   {r.n}
                 </text>
               </Svg>

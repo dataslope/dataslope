@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR, svgText } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -179,10 +179,10 @@ const GpqaBar: React.FC<{ x: number; y: number; w: number; at: number; fill: num
       <Svg opacity={t}>
         <rect x={x} y={y} width={w} height={28} rx={4} fill={PAPER} stroke={HAIRLINE} strokeWidth={1.4} />
         <rect x={x} y={y} width={(w * value * p) / 100} height={28} rx={4} fill={B} />
-        <text x={x} y={y + 58} style={{ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR }}>
+        <text x={x} y={y + 58} style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
           0
         </text>
-        <text x={x + w} y={y + 58} textAnchor="end" style={{ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR }}>
+        <text x={x + w} y={y + 58} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
           100
         </text>
       </Svg>

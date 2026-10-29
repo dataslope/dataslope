@@ -16,6 +16,7 @@ import {
   fmt,
   label,
   note,
+  svgText,
 } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -396,7 +397,7 @@ export const ShapScene: React.FC = () => {
                 x={at(wx, v)}
                 y={y(WF_TOP) + 6 * h(WF_ROW) + 24}
                 textAnchor="middle"
-                style={{ ...label(19, INK_SOFT), ...TABULAR }}
+                style={svgText({ ...label(19, INK_SOFT), ...TABULAR })}
               >
                 {fmt(v, 1)}
               </text>

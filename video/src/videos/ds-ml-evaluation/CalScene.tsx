@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, fmt, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -91,18 +91,18 @@ export const CalScene: React.FC = () => {
           />
           {[0, 0.5, 1].map((v) => (
             <React.Fragment key={v}>
-              <text x={at(xs, v)} y={y(PLOT.bottom) + 30} textAnchor="middle" style={{ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" }}>
+              <text x={at(xs, v)} y={y(PLOT.bottom) + 30} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
                 {v}
               </text>
-              <text x={PLOT.left - 12} y={at(ys, v) + 6} textAnchor="end" style={{ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" }}>
+              <text x={PLOT.left - 12} y={at(ys, v) + 6} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
                 {v * 100}%
               </text>
             </React.Fragment>
           ))}
-          <text x={PLOT.right} y={y(PLOT.bottom) + 60} textAnchor="end" style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>
+          <text x={PLOT.right} y={y(PLOT.bottom) + 60} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
             the model&apos;s score
           </text>
-          <text x={PLOT.left} y={y(PLOT.top) - 18} textAnchor="start" style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>
+          <text x={PLOT.left} y={y(PLOT.top) - 18} textAnchor="start" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
             share actually positive
           </text>
         </Svg>

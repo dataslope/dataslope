@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -148,7 +148,7 @@ export const CvScene: React.FC = () => {
             {ticks.map((t) => (
               <g key={t} opacity={ease(frame, asked + 4, 12)}>
                 <line x1={at(xs, t)} x2={at(xs, t)} y1={base} y2={base + 7} stroke={INK} strokeWidth={1.2} />
-                <text x={at(xs, t)} y={base + 32} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontVariantNumeric: "tabular-nums" }}>
+                <text x={at(xs, t)} y={base + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
                   {Math.round(t * 100)}%
                 </text>
               </g>

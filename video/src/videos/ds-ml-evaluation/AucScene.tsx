@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -38,18 +38,18 @@ const Square: React.FC<{ b: Box; at: number; out?: number; xTitle: string; yTitl
       {diagonal ? <line x1={b.left} y1={bottom} x2={b.right} y2={top} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="5 7" /> : null}
       {[0, 1].map((v) => (
         <React.Fragment key={v}>
-          <text x={b.left + v * (b.right - b.left)} y={bottom + 28} textAnchor="middle" style={{ ...label(19, INK_SOFT) }}>
+          <text x={b.left + v * (b.right - b.left)} y={bottom + 28} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT) })}>
             {v}
           </text>
-          <text x={b.left - 12} y={bottom - v * (bottom - top) + 6} textAnchor="end" style={{ ...label(19, INK_SOFT) }}>
+          <text x={b.left - 12} y={bottom - v * (bottom - top) + 6} textAnchor="end" style={svgText({ ...label(19, INK_SOFT) })}>
             {v}
           </text>
         </React.Fragment>
       ))}
-      <text x={b.right} y={bottom + 56} textAnchor="end" style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>
+      <text x={b.right} y={bottom + 56} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
         {xTitle}
       </text>
-      <text x={b.left} y={top - 16} textAnchor="start" style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>
+      <text x={b.left} y={top - 16} textAnchor="start" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
         {yTitle}
       </text>
     </Svg>

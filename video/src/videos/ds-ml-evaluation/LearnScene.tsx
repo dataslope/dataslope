@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -108,7 +108,7 @@ export const LearnScene: React.FC = () => {
                   strokeWidth={2}
                   strokeDasharray="3 7"
                 />
-                <text x={p.b.right} y={at(ysOf(p.b), LEARN.noise) - 10} textAnchor="end" style={{ ...label(19, INK_SOFT), fontWeight: 650 }}>
+                <text x={p.b.right} y={at(ysOf(p.b), LEARN.noise) - 10} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 650 })}>
                   the noise: {fmt(LEARN.noise)}
                 </text>
               </Svg>

@@ -15,6 +15,7 @@ import {
   fmt,
   label,
   note,
+  svgText,
 } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -333,7 +334,7 @@ export const ForestScene: React.FC = () => {
                   x={at(xb, v)}
                   y={y(GRID_TOP) + h(300) + 26}
                   textAnchor="middle"
-                  style={{ ...label(19, INK_SOFT), ...TABULAR }}
+                  style={svgText({ ...label(19, INK_SOFT), ...TABULAR })}
                 >
                   {v}%
                 </text>

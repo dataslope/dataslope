@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -114,7 +114,7 @@ export const SizeScene: React.FC = () => {
             {[0.7, 0.8, 0.9].map((v) => (
               <g key={v}>
                 <line x1={CHART.x0 - 40} x2={CHART.x1} y1={at(ys, v)} y2={at(ys, v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
-                <text x={CHART.x0 - 52} y={at(ys, v) + 7} textAnchor="end" style={{ ...label(20, INK_SOFT), ...TABULAR }}>
+                <text x={CHART.x0 - 52} y={at(ys, v) + 7} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), ...TABULAR })}>
                   {pct(v)}
                 </text>
               </g>
@@ -135,7 +135,7 @@ export const SizeScene: React.FC = () => {
                   <line key={s} x1={x - 12} x2={x + 12} y1={at(ys, SIZE.p + s * half)} y2={at(ys, SIZE.p + s * half)} stroke={color} strokeWidth={3} />
                 ))}
                 <circle cx={x} cy={at(ys, SIZE.p)} r={7} fill={INK} />
-                <text x={x} y={y(CHART.bottom) + 62} textAnchor="middle" style={{ ...label(20, i === hundred ? BLUE_INK : INK_SOFT), ...TABULAR, fontWeight: i === hundred ? 700 : 500 }}>
+                <text x={x} y={y(CHART.bottom) + 62} textAnchor="middle" style={svgText({ ...label(20, i === hundred ? BLUE_INK : INK_SOFT), ...TABULAR, fontWeight: i === hundred ? 700 : 500 })}>
                   {num(nn)}
                 </text>
               </g>

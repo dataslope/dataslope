@@ -18,6 +18,7 @@ import {
   label,
   PAPER,
   TABULAR,
+  svgText,
 } from "../../editorial/style";
 import { H, Ink, W } from "../../editorial/ui";
 import { colors, ds } from "../../theme/brand";
@@ -400,7 +401,7 @@ export const Track: React.FC<{
         {ticks.map((v) => (
           <g key={v}>
             <line x1={X(v)} x2={X(v)} y1={y + 2} y2={y + 9} stroke={INK_SOFT} strokeWidth={1.4} />
-            <text x={X(v)} y={y + 32} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR }}>
+            <text x={X(v)} y={y + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
               {v}
             </text>
           </g>

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { body, fmt, halo, HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR, svgText } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -116,7 +116,7 @@ export const ScaleScene: React.FC = () => {
           {[90, 92, 94, 96].map((v) => (
             <g key={v}>
               <line x1={zx(v)} x2={zx(v)} y1={zy + 2} y2={zy + 9} stroke={INK_SOFT} strokeWidth={1.4} />
-              <text x={zx(v)} y={zy + 32} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR }}>
+              <text x={zx(v)} y={zy + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
                 {v}
               </text>
             </g>
