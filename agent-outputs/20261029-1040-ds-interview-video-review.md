@@ -210,23 +210,74 @@ Four calls a fixer made that change what the video claims, worth knowing:
 - **ML models now answers past the page**: permutation importance, which the
   page's SHAP answer does not mention, from numbers already in `results.json`.
 
+## The P3s
+
+**All 135 are done**: 132 fixed and 3 partly fixed, where the suggested fix did
+not fit the frame or the voice budget (Probability's Poisson conditions,
+Deep learning's page-check beat, Experiment design's plan card). Three were
+shared with the Data Analyst videos and fixed once, centrally: listing
+highlights start at the code rather than its indent (`da-pandas`, `da-sql`),
+inline code in `QMono` no longer sets a double-width space, and the shared
+`Axes` titles drop tabular figures. The rest were fixed per video, to
+[`tools/P3-BRIEF.md`](20261029-ds-interview-video-review/tools/P3-BRIEF.md);
+each fixer's report is in
+[`20261029-ds-interview-video-review/p3/`](20261029-ds-interview-video-review/p3/).
+
+| Video | P3s | Characters re-voiced | Length before → after |
+| --- | --- | --- | --- |
+| 0 Interview | 10 | 363 | 2:10 → 2:16 |
+| 1 Statistics | 9 | 187 | 11:34 → 11:38 |
+| 2 Probability | 12 | 905 | 8:22 → 8:51 |
+| 3 ML evaluation | 12 | 491 | 9:31 → 10:00 |
+| 4 ML models | 12 | 586 | 10:24 → 10:48 |
+| 5 Deep learning | 14 | 902 | 10:29 → 10:58 |
+| 6 Experiment design | 10 | 564 | 9:19 → 9:56 |
+| 7 Experiments in practice | 13 | 645 | 8:21 → 8:52 |
+| 8 Product sense | 11 | 424 | 8:11 → 8:36 |
+| 9 Python & pandas | 11 | 511 | 7:28 → 7:50 |
+| 10 SQL | 8 | 319 | 6:40 → 6:50 |
+| 11 LLM evaluation | 13 | 493 | 7:57 → 8:16 |
+| **Total** | **135** | **6,390** | **100:26 → 104:51** |
+
+(A P3 already fixed in the P2 pass is counted with its video.) Every video
+stayed under its 1,000-character budget, and every video passed the same
+checks as the P2 pass on its final code; the whole package passed typecheck,
+lint, `npm test` and `check:cues` together once all twelve were in.
+
+This pass cut beats from the kept takes wherever their text was still in one,
+with narrate's own `--recut` run on a scratch copy of a single take; every
+untouched beat it re-cut came back byte-identical, so those pieces are a single
+encode. Pieces whose text is in no take (a beat already re-voiced alone) were
+cut from the beat's own file, one extra MP3 encode of the same speech (27 to
+31 dB SNR against the committed file, same alignment and length). Four beats
+split that way in the P2 pass (ML models' `tree-gini`, `tree-stop`, `ada`,
+`adaboost`) could be re-cut from their takes the same way if that matters.
+
 ## What the fixers kept running into
 
-None of these were changed in this pass (the brief kept the fixers out of the
-shared kit); each is a candidate for its own change.
+None of these were changed in the fix passes (the briefs kept the fixers out of
+the shared kit); each is a candidate for its own change.
 
 - **`narrate --recut` refuses a whole video once any take is stale.** Every
   video whose beats were re-voiced alone after their take (most of this
-  series, after #715's initialism pass) hit it; seven fixers split beats with
-  scratch copies of narrate's own cutter instead. A `--recut` that cuts only
-  the takes still matching the script, or splits a beat's own file, would make
-  "split before you re-voice" work everywhere.
+  series, after #715's initialism pass) hit it. The fixers wrote a
+  `recut-take.mjs` per video that runs narrate's own `--recut` on a scratch
+  root holding one take's text split into the current beats; it reproduces
+  untouched beats byte for byte. A `--recut --take N` (or a `--recut` that cuts
+  every take still matching the script) would make it one command.
 - **SVG `<text>` takes `fill`, not CSS `color`**, so `label()` and `note()` on
   SVG text draw black. It caused Statistics' P1 and Probability's hat numbers.
   A `labelSvg()` helper would close it.
-- **`TABULAR` spread over whole spans** still widens hyphens in places the P2s
-  did not reach, including the shared `Axes` titles in
-  `da-statistics-communication/parts.tsx` ("p - value").
+- **`TABULAR` spread over whole spans** widened hyphens ("p - value", "ROC -
+  AUC", "held - out") in most of the videos; the fixes put it on the
+  number spans only. A `Num` wrapper in the kit would make that the easy way.
+  The shared `Axes` still sets negative ticks with a digit-wide hyphen ("- 4");
+  writing them with U+2212 inside `Axes` would fix it everywhere.
+- **`Axes` takes plain strings** for its titles and ticks, so a superscript
+  tick or a title that changes partway (CUPED's Y to Y_adj) had to be drawn
+  locally.
+- **`QuestionCard` could balance its headline** (`textWrap: "balance"`), which
+  would end one-word orphans across the series.
 - **`check:cues` misses cues behind a one-argument wrapper**
   (`const w = (p) => n.word("ai", p)`): the overview hid 34 of its 57 that way,
   now rewritten as literal calls.
@@ -235,18 +286,24 @@ shared kit); each is a candidate for its own change.
   Fixers ran them with `NODE_PATH` at private copies of the locked versions,
   installing nothing, and every existing number reproduced exactly.
 - **`Drift` eases in over the whole scene**, so lengthening a scene slows its
-  opening and can fail `check:motion` on a card that did not change.
-- **The highlight indent in `da-pandas/parts.tsx`** (a P3) now shows in two
-  more Python & pandas listings.
+  opening and can fail `check:motion` on a card that did not change. Fixers
+  hit it in at least five videos; a fixed short ramp would remove the coupling.
+- **The render queue's waits count against a job's time limit**, so several
+  checks were killed before they started and had to be re-queued.
 
 ## Beyond the videos
 
-- **`content/interview/data-scientist/sql.mdx:244`** says the default window frame
+- **`content/interview/data-scientist/sql.mdx:244`** said the default window frame
   for `SUM(x) OVER (ORDER BY day)` is `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT
   ROW`. With an `ORDER BY` the default is `RANGE`, which sums tied rows together;
   that difference is the usual follow-up. Found by the SQL reviewer, checked here.
+  **Fixed**, along with the same sentence on the Data Engineer SQL page
+  (`content/interview/data-engineer/sql.mdx`). The Data Analyst pages and the SQL
+  course already said `RANGE`.
 
 ## Order of work
+
+**Done:** every step below, in the commits after this review.
 
 1. **The eight P1s.** Each is a few lines of scene code, and Statistics' chi-square
    needs one beat re-voiced.
