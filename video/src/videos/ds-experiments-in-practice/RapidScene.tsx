@@ -5,9 +5,10 @@ import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
+import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CURSE } from "./data";
+import { CURSE, fixed, META } from "./data";
 import { CONTROL, Drift, Headline, Kicker, OK, OK_INK, Spot, TREAT, WARM_INK, X0 } from "./parts";
 
 const R_X = 820;
@@ -134,34 +135,56 @@ const Holdback: React.FC<{ c: Ctx }> = ({ c }) => {
 const Meta: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const poolAt = c.w("r-meta", "a meta-analysis pools many experiments");
-  const weightAt = c.w("r-meta", "weighting each by its precision");
-  const headAt = c.w("r-meta", "rather than averaging headlines");
-  const curseAt = c.w("r-meta", "Watch for the winner's curse");
-  const twentyAt = c.w("r-meta", "at twenty percent power");
-  const overAt = c.w("r-meta", "more than twofold");
+  const headAt = c.w("r-meta", "Rather than averaging their headlines");
+  const weightAt = c.w("r-meta", "it weights each by its precision");
+  const countAt = c.w("r-meta", "big, tight experiments count more");
+  const curseAt = c.w("r-curse", "Watch for the winner's curse");
+  const twentyAt = c.w("r-curse", "at twenty percent power");
+  const overAt = c.w("r-curse", "more than twofold");
   const low = CURSE.find((r) => r.power === 0.2)!;
-  // Three experiments, sized by precision: a sketch of the pooling, no numbers.
-  const studies = [
-    { x: R_X + 60, r: 26 },
-    { x: R_X + 180, r: 46 },
-    { x: R_X + 330, r: 16 },
-  ];
-  const sy = c.y(470);
-  const weigh = ease(frame, weightAt, 14);
-  const merge = ease(frame, headAt + 6, 18);
+  // Three experiments of one change on a lift axis, each sized by its
+  // precision (radius 1 / SE): the plain average of their headlines against
+  // the pooled estimate, which the big, tight one pulls toward itself.
+  const AX = { x0: R_X + 20, unit: 42, hi: 10 };
+  const ex = (v: number) => AX.x0 + v * AX.unit;
+  const studyY = c.y(478);
+  const poolY = c.y(625);
+  const axisY = c.y(692);
+  const axisIn = ease(frame, poolAt - 4, 12);
+  const weigh = ease(frame, weightAt, 16);
+  const avgIn = ease(frame, headAt + 2, 12);
+  const slide = ease(frame, countAt + 6, 22);
+  const pooledX = ex(META.average) + (ex(META.pooled) - ex(META.average)) * slide;
   const BAR = { x: R_X + 520, base: c.y(760), unit: c.h(110) };
   const truth = ease(frame, twentyAt, 12);
   const pub = ease(frame, overAt - 6, 18);
   return (
     <>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-        {studies.map((s, i) => {
-          const tx = R_X + 200;
-          const x = s.x + (tx - s.x) * merge;
-          const r = (14 + (s.r - 14) * weigh) * (1 - 0.3 * merge);
-          return <circle key={i} cx={x} cy={sy} r={r * ease(frame, poolAt + i * 4, 10)} fill={TREAT} opacity={0.55} />;
+        {/* The lift axis. */}
+        <g opacity={axisIn}>
+          <line x1={ex(0)} x2={ex(AX.hi)} y1={axisY} y2={axisY} stroke={INK} strokeWidth={1.6} />
+          {[0, 5, 10].map((v) => (
+            <g key={v}>
+              <line x1={ex(v)} x2={ex(v)} y1={axisY} y2={axisY + 8} stroke={INK} strokeWidth={1.6} />
+              <text x={ex(v)} y={axisY + 32} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}>
+                {v}
+              </text>
+            </g>
+          ))}
+          <text x={ex(AX.hi)} y={axisY + 60} textAnchor="end" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 650, fill: INK_SOFT }}>
+            lift, %
+          </text>
+        </g>
+        {/* The experiments: equal at first, then sized by precision. */}
+        {META.studies.map((st, i) => {
+          const r = 16 + (46 / st.se - 16) * weigh;
+          return <circle key={i} cx={ex(st.est)} cy={studyY} r={r * ease(frame, poolAt + i * 4, 10)} fill={TREAT} opacity={0.6} />;
         })}
-        <circle cx={R_X + 200} cy={sy + c.h(150)} r={44 * merge} fill={TREAT} />
+        {/* The plain average of the headlines. */}
+        <line x1={ex(META.average)} x2={ex(META.average)} y1={poolY - 24} y2={poolY + 24} stroke={ACCENT} strokeWidth={4} opacity={avgIn} />
+        {/* The pooled estimate, pulled from the average toward the tight experiment. */}
+        <circle cx={pooledX} cy={poolY} r={18 * ease(frame, countAt + 2, 10)} fill={OK} />
         {/* Truth against what reached significance, at 20% power. */}
         <g opacity={ease(frame, curseAt, 12)}>
           <line x1={BAR.x - 20} x2={BAR.x + 340} y1={BAR.base} y2={BAR.base} stroke={INK} strokeWidth={1.6} />
@@ -169,26 +192,48 @@ const Meta: React.FC<{ c: Ctx }> = ({ c }) => {
           <rect x={BAR.x + 180} y={BAR.base - BAR.unit * low.ratio * pub} width={120} height={BAR.unit * low.ratio * pub} fill={ACCENT} rx={3} />
         </g>
       </svg>
-      <Note at={weightAt + 2} x={R_X} y={sy - c.h(110)}>
+      <Note at={weightAt + 2} x={R_X} y={c.y(372)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>weighted by precision</span>
       </Note>
-      <Note at={headAt + 10} x={R_X + 260} y={sy + c.h(132)}>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>pooled</span>
-      </Note>
+      {META.studies.map((st, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            left: ex(st.est) - 60,
+            width: 120,
+            top: studyY + 46 / st.se + 6,
+            textAlign: "center",
+            ...label(19, INK_SOFT),
+            fontWeight: 650,
+            ...TABULAR,
+            opacity: ease(frame, weightAt + 10 + i * 3, 10),
+          }}
+        >
+          {i === 0 ? "weight " : ""}
+          {Math.round(st.weight * 100)}%
+        </div>
+      ))}
+      <div style={{ position: "absolute", left: ex(META.average) - 160, width: 320, top: poolY - c.h(62), textAlign: "center", ...label(21, ACCENT_INK), fontWeight: 750, ...TABULAR, opacity: ease(frame, headAt + 6, 10) }}>
+        average of headlines: {fixed(META.average, 1)}
+      </div>
+      <div style={{ position: "absolute", left: ex(META.pooled) - 100, width: 200, top: poolY + 24, textAlign: "center", ...label(21, OK_INK), fontWeight: 750, ...TABULAR, opacity: ease(frame, countAt + 24, 10) }}>
+        pooled: {fixed(META.pooled, 1)}
+      </div>
       <Note at={curseAt + 2} x={BAR.x - 20} y={c.y(380)}>
         <span style={{ ...note(26, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>the winner's curse, at 20% power</span>
       </Note>
       {[
-        { text: "true effect", at: twentyAt + 6, x: BAR.x, ink: OK_INK, v: "1×" },
-        { text: "significant results", at: overAt, x: BAR.x + 180, ink: ACCENT_INK, v: `${low.ratio.toFixed(2)}×` },
+        { text: "true effect", at: twentyAt + 6, x: BAR.x, ink: OK_INK, v: "1×", ratio: 1 },
+        { text: "significant results", at: overAt, x: BAR.x + 180, ink: ACCENT_INK, v: `${low.ratio.toFixed(2)}×`, ratio: low.ratio },
       ].map((b) => (
         <React.Fragment key={b.text}>
           <div style={{ position: "absolute", left: b.x - 40, width: 200, top: BAR.base + c.h(10), textAlign: "center", ...label(20, INK_SOFT), fontWeight: 700, opacity: ease(frame, b.at - 4, 10) }}>
             {b.text}
           </div>
-          <Note at={b.at} x={b.x + 20} y={BAR.base - BAR.unit * (b.v === "1×" ? 1 : low.ratio) - c.h(44)}>
-            <span style={{ ...note(27, b.ink), fontWeight: 800, ...TABULAR }}>{b.v}</span>
-          </Note>
+          <div style={{ position: "absolute", left: b.x, width: 120, top: BAR.base - BAR.unit * b.ratio - c.h(44), textAlign: "center", ...note(27, b.ink), fontWeight: 800, ...TABULAR, opacity: ease(frame, b.at, 14) }}>
+            {b.v}
+          </div>
         </React.Fragment>
       ))}
     </>
@@ -208,7 +253,9 @@ export const RapidScene: React.FC = () => {
   const from = n.beat("rapid-in").from;
   const leftAt = n.word("rapid-in", "Four left");
   const defAt = n.word("rapid-in", "a definition and a reason");
-  const end = n.beat("r-meta").to;
+  // The last answer stays up to the bridge, so the winner's curse holds after
+  // its bar finishes growing; the bridge's spot enters on its first word.
+  const end = n.beat("next").from - 4;
   const assumedAt = n.word("next", "Every answer here assumed");
   const testAt = n.word("next", "what to test");
   const countAt = n.word("next", "what to count");

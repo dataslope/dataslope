@@ -164,6 +164,7 @@
    {
     "rank": 1,
     "p": 0.0008,
+    "bar": 0.005,
     "real": true,
     "raw": true,
     "bh": true,
@@ -172,6 +173,7 @@
    {
     "rank": 2,
     "p": 0.0027,
+    "bar": 0.01,
     "real": true,
     "raw": true,
     "bh": true,
@@ -180,6 +182,7 @@
    {
     "rank": 3,
     "p": 0.0136,
+    "bar": 0.015,
     "real": true,
     "raw": true,
     "bh": true,
@@ -188,6 +191,7 @@
    {
     "rank": 4,
     "p": 0.0228,
+    "bar": 0.02,
     "real": false,
     "raw": true,
     "bh": false,
@@ -196,6 +200,7 @@
    {
     "rank": 5,
     "p": 0.0258,
+    "bar": 0.025,
     "real": false,
     "raw": true,
     "bh": false,
@@ -204,6 +209,7 @@
    {
     "rank": 6,
     "p": 0.0519,
+    "bar": 0.03,
     "real": false,
     "raw": false,
     "bh": false,
@@ -212,6 +218,7 @@
    {
     "rank": 7,
     "p": 0.2968,
+    "bar": 0.035,
     "real": false,
     "raw": false,
     "bh": false,
@@ -220,6 +227,7 @@
    {
     "rank": 8,
     "p": 0.3537,
+    "bar": 0.04,
     "real": false,
     "raw": false,
     "bh": false,
@@ -228,6 +236,7 @@
    {
     "rank": 9,
     "p": 0.5918,
+    "bar": 0.045,
     "real": false,
     "raw": false,
     "bh": false,
@@ -236,6 +245,7 @@
    {
     "rank": 10,
     "p": 0.9851,
+    "bar": 0.05,
     "real": false,
     "raw": false,
     "bh": false,
@@ -323,5 +333,27 @@
    "se": 0.3569,
    "ratio": 1.12
   }
- ]
+ ],
+ "meta": {
+  "studies": [
+   {
+    "est": 2,
+    "se": 1,
+    "weight": 0.7347
+   },
+   {
+    "est": 6,
+    "se": 2,
+    "weight": 0.1837
+   },
+   {
+    "est": 9,
+    "se": 3,
+    "weight": 0.0816
+   }
+  ],
+  "average": 5.67,
+  "pooled": 3.31,
+  "pooledSe": 0.86
+ }
 }

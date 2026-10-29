@@ -18,9 +18,11 @@ const SUM_W = 420;
  * Question 10. Two simulated cities over twelve weeks; a policy starts in the
  * treated one in week 7. Each city's before and after averages are drawn as
  * steps: the treated city rose 8.9, the comparison city 2.4 with no policy,
- * so the difference of differences is 6.5 against a true 6. Then parallel
- * trends: the dashed line is where the treated city would have gone on the
- * comparison city's path, and the weeks before the policy are what show it.
+ * so the difference of differences is 6.5 against a true 6, written as the
+ * subtraction it is. Then parallel trends: the dashed line is where the
+ * treated city would have gone on the comparison city's path. That can't be
+ * seen, but the weeks before the policy can: there the gap between the cities
+ * held steady (its slope, from check.mjs, is the `preGap` printed in the band).
  */
 export const DidScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -43,7 +45,9 @@ export const DidScene: React.FC = () => {
   const trueAt = n.word("did-math", "the true effect of six");
   const parallelAt = n.word("did-math", "It rests on parallel trends");
   const togetherAt = n.word("did-math", "kept moving together");
-  const end = n.beat("did-math").to;
+  const checkAt = n.word("did-check", "you can check the weeks before it");
+  const beforeAt = n.word("did-check", "the two cities rose together");
+  const end = n.beat("did-check").to;
 
   const x: Scale = { lo: 0.5, hi: 12.5, a: PLOT.x0, b: PLOT.x1 };
   const yS: Scale = { lo: 20, hi: 65, a: y(PLOT.base), b: y(PLOT.top) };
@@ -63,7 +67,7 @@ export const DidScene: React.FC = () => {
   // Where the treated city would have gone on the comparison city's path.
   const counterfactual = DID.treatedBefore + DID.controlChange;
   const cf = ease(frame, parallelAt + 4, 16);
-  const pre = ease(frame, parallelAt, 12) * (1 - ease(frame, togetherAt + 20, 12));
+  const pre = ease(frame, checkAt, 14);
   const big = pulse(frame, sixFiveAt, 20);
 
   return (
@@ -73,6 +77,7 @@ export const DidScene: React.FC = () => {
       <Sfx name="el-tap" at={compAt + 4} level={-36} />
       <Sfx name="el-pop" at={sixFiveAt} level={-34} />
       <Sfx name="el-pencil" at={parallelAt + 4} level={-37} />
+      <Sfx name="el-pop" at={checkAt + 2} level={-37} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={58}>
@@ -120,6 +125,15 @@ export const DidScene: React.FC = () => {
         <Note at={policyAt + 8} x={at(x, 12.4) + 12} y={at(yS, DID.treated[11]) - 16}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 750, whiteSpace: "nowrap" }}>treated city</span>
         </Note>
+        {/* The evidence for parallel trends: the weeks before the policy. */}
+        <Note at={beforeAt - 2} x={at(x, 0.6) + 12} y={y(PLOT.top) + h(58)}>
+          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>before the policy, the two rose together</span>
+        </Note>
+        <Note at={beforeAt + 8} x={at(x, 0.6) + 12} y={y(PLOT.top) + h(88)}>
+          <span style={{ ...label(19, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+            the gap between them drifted {fixed(DID.preGap, 2)} a week
+          </span>
+        </Note>
         <Note at={notAt + 8} x={at(x, 12.4) + 12} y={at(yS, DID.control[11]) - 16}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 750, whiteSpace: "nowrap" }}>comparison city</span>
         </Note>
@@ -135,7 +149,7 @@ export const DidScene: React.FC = () => {
           <Note key={r.text} at={r.at} x={SUM_X} y={y(500) + i * h(60)}>
             <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", ...note(27, r.ink), fontWeight: 700, ...TABULAR }}>
               <span>{r.text}</span>
-              <span>{i ? `− ${fixed(r.v, 1)}` : fixed(r.v, 1, true)}</span>
+              <span>{fixed(r.v, 1, true)}</span>
             </span>
           </Note>
         ))}
@@ -147,9 +161,14 @@ export const DidScene: React.FC = () => {
         </svg>
         <Note at={diffAt + 4} x={SUM_X} y={y(500) + h(156)}>
           <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", alignItems: "baseline", ...TABULAR }}>
-            <span style={{ ...note(28, OK_INK), fontWeight: 750 }}>DID</span>
-            <span style={{ ...note(40, OK_INK), fontWeight: 800, display: "inline-block", transform: `scale(${1 + 0.08 * big})` }}>
-              <Mark at={sixFiveAt + 2}>{fixed(DID.did, 1, true)}</Mark>
+            <span style={{ ...note(28, OK_INK), fontWeight: 750 }}>DiD</span>
+            <span style={{ display: "inline-flex", alignItems: "baseline", gap: 12 }}>
+              <span style={{ ...note(26, OK_INK), fontWeight: 650, ...TABULAR }}>
+                {fixed(DID.treatedChange, 1)} − {DID.controlChange < 0 ? `(${fixed(DID.controlChange, 1)})` : fixed(DID.controlChange, 1)} =
+              </span>
+              <span style={{ ...note(40, OK_INK), fontWeight: 800, display: "inline-block", transform: `scale(${1 + 0.08 * big})`, transformOrigin: "right center" }}>
+                <Mark at={sixFiveAt + 2}>{fixed(DID.did, 1, true)}</Mark>
+              </span>
             </span>
           </span>
         </Note>
@@ -161,7 +180,7 @@ export const DidScene: React.FC = () => {
             It rests on parallel trends<span style={{ fontWeight: 500, opacity: ease(frame, togetherAt - 6, 10) }}>: without the policy, the lines move together</span>
           </span>
         </Note>
-        <Note at={parallelAt + 10} x={at(x, split) + 12} y={at(yS, counterfactual) + 10}>
+        <Note at={parallelAt + 10} x={at(x, split) + 30} y={at(yS, counterfactual) + 10}>
           <span style={{ ...label(19, INK), fontWeight: 650, whiteSpace: "nowrap" }}>without the policy</span>
         </Note>
       </Drift>

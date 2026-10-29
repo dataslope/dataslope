@@ -20,7 +20,9 @@
 //   - a checkout test rolled out unevenly across mobile and desktop;
 //   - ten metrics, three of which really moved (seed 25: the first seed in
 //     0 to 59 whose raw, Benjamini-Hochberg and Bonferroni calls all differ);
-//   - two cities over twelve weeks, for difference-in-differences.
+//   - two cities over twelve weeks, for difference-in-differences;
+//   - three experiments of one change (one big and tight, two small and
+//     noisy), pooled by inverse variance for the meta-analysis.
 /* global console */
 import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -101,10 +103,15 @@ p = 2 * stats.norm.sf(np.abs(z))
 bh = multipletests(p, 0.05, "fdr_bh")[0]
 bf = multipletests(p, 0.05, "bonferroni")[0]
 order = np.argsort(p)
+# Benjamini-Hochberg's bar for rank k is k/m x 0.05; it keeps every rank up to
+# the last one whose p is under its bar. Checked against statsmodels' call.
+bars = [(i + 1) / 10 * 0.05 for i in range(10)]
+under = [k for k in range(10) if p[order[k]] <= bars[k]]
+assert int(bh.sum()) == (under[-1] + 1 if under else 0)
 R["metrics"] = {
     "m": 10,
     "real": 3,
-    "rows": [{"rank": i + 1, "p": r4(p[j]), "real": bool(mu[j] > 0), "raw": bool(p[j] < 0.05), "bh": bool(bh[j]), "bonferroni": bool(bf[j])}
+    "rows": [{"rank": i + 1, "p": r4(p[j]), "bar": r4(bars[i]), "real": bool(mu[j] > 0), "raw": bool(p[j] < 0.05), "bh": bool(bh[j]), "bonferroni": bool(bf[j])}
              for i, j in enumerate(order)],
     "counts": {"raw": int((p < 0.05).sum()), "bh": int(bh.sum()), "bonferroni": int(bf.sum()),
                "rawFalse": int(((p < 0.05) & (mu == 0)).sum())},
@@ -147,6 +154,25 @@ def curse(target):
     return {"power": target, "se": r4(se), "ratio": r2((upper + lower) / (stats.norm.sf(a) + stats.norm.cdf(b)))}
 R["curse"] = [curse(v) for v in (0.2, 0.5, 0.8)]
 
+# ── Meta-analysis: three experiments of one change (the video's own) ──
+# One big, tight experiment and two small, noisy ones, each an estimated lift
+# in percent with its standard error. Pooled by inverse variance (the page's
+# fixed-effects model), against the plain average of the three headlines;
+# statsmodels' combine_effects must agree.
+from statsmodels.stats.meta_analysis import combine_effects
+est = np.array([2.0, 6.0, 9.0])
+se = np.array([1.0, 2.0, 3.0])
+w = 1 / se ** 2
+pooled = float((w * est).sum() / w.sum())
+fe = combine_effects(est, se ** 2, method_re="iterated").summary_frame().loc["fixed effect", "eff"]
+assert abs(fe - pooled) < 1e-9, (fe, pooled)
+R["meta"] = {
+    "studies": [{"est": float(e), "se": float(s), "weight": r4(wi / w.sum())} for e, s, wi in zip(est, se, w)],
+    "average": r2(est.mean()),
+    "pooled": r2(pooled),
+    "pooledSe": r2(1 / math.sqrt(w.sum())),
+}
+
 json.dumps(R)
 `);
 
@@ -161,7 +187,7 @@ for (const key of ["novelty", "durable"]) {
 }
 
 writeFileSync(join(here, "results.json"), JSON.stringify(results, null, 1) + "\n");
-const { srm, nosig, simpson, novelty, family, metrics, did, curse } = results;
+const { srm, nosig, simpson, novelty, family, metrics, did, curse, meta } = results;
 console.log(JSON.stringify(results.runtime));
 console.log("srm", JSON.stringify(srm));
 console.log("nosig", JSON.stringify(nosig));
@@ -171,3 +197,4 @@ console.log("family at 20", family.at20);
 console.log("metrics", JSON.stringify(metrics.counts), metrics.rows.map((r) => `${r.p}${r.real ? "*" : ""}`).join(" "));
 console.log("did", JSON.stringify({ ...did, treated: undefined, control: undefined }));
 console.log("curse", JSON.stringify(curse));
+console.log("meta", JSON.stringify(meta));

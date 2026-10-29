@@ -40,7 +40,8 @@ export const FAMILY = results.family as { k: number[]; p: number[]; at20: number
 export const METRICS = results.metrics as {
   m: number;
   real: number;
-  rows: { rank: number; p: number; real: boolean; raw: boolean; bh: boolean; bonferroni: boolean }[];
+  /** `bar` is Benjamini-Hochberg's bar for the rank, rank / m x 0.05. */
+  rows: { rank: number; p: number; bar: number; real: boolean; raw: boolean; bh: boolean; bonferroni: boolean }[];
   counts: { raw: number; bh: number; bonferroni: number; rawFalse: number };
   bonferroniCut: number;
 };
@@ -60,10 +61,22 @@ export const DID = results.did as {
   controlChange: number;
   did: number;
   ols: number;
+  /** The slope of the treated-minus-comparison gap over the weeks before the policy, per week. */
+  preGap: number;
 };
 
 /** The average significant estimate over the truth, by power, computed exactly. */
 export const CURSE = results.curse as { power: number; se: number; ratio: number }[];
+
+/** Three experiments of one change (the video's own): each lift in percent
+ *  with its standard error and its share of the inverse-variance weight; the
+ *  plain average of their headlines, and the pooled estimate. */
+export const META = results.meta as {
+  studies: { est: number; se: number; weight: number }[];
+  average: number;
+  pooled: number;
+  pooledSe: number;
+};
 
 /** A count with thousands separators. */
 export const count = (v: number) => v.toLocaleString("en-US");
