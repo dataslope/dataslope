@@ -62,6 +62,9 @@ export const NorthScene: React.FC = () => {
   const named = ease(frame, cooksAt - 2, 12);
   const glow = pulse(frame, proxiesAt, 30);
   const rail = ease(frame, healthAt, 18);
+  // "unsubscribes" is written like the other guardrails, and turns red only
+  // when the narration says what it catches.
+  const leaveInk = `color-mix(in srgb, ${ACCENT_INK} ${ease(frame, leaveAt, 12) * 100}%, ${INK})`;
 
   return (
     <AbsoluteFill>
@@ -178,7 +181,7 @@ export const NorthScene: React.FC = () => {
               y={y(RAIL.top) + h(52)}
               at={r.at - 2}
               lit={r.text === "unsubscribes" ? leaveAt + 4 : undefined}
-              ink={r.text === "unsubscribes" ? ACCENT_INK : INK}
+              ink={r.text === "unsubscribes" ? leaveInk : INK}
             >
               {r.text}
             </Chip>
@@ -193,9 +196,11 @@ export const NorthScene: React.FC = () => {
               <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, leaveAt, 10) }}>, people quietly leave ▼</span>
             </span>
           </Note>
+          {/* The guardrail catches the harm, so its line runs from the chip to
+              "people quietly leave", not to the sessions it was gamed for. */}
           <Svg opacity={ease(frame, leaveAt + 4, 12)}>
             <path
-              d={`M ${X0 + 950} ${y(RAIL.top) + h(150) + 4} Q ${X0 + 890} ${y(RAIL.top) + h(110)} ${X0 + 800} ${y(RAIL.top) + h(104)}`}
+              d={`M ${X0 + 800} ${y(RAIL.top) + h(104)} Q ${X0 + 1100} ${y(RAIL.top) + h(112)} ${X0 + 1230} ${y(RAIL.top) + h(150) - 4}`}
               fill="none"
               stroke={ACCENT}
               strokeWidth={2.4}

@@ -14,6 +14,8 @@ const ARMS = { top: 470, w: 300, h: 190, gap: 60 };
 const RIGHT_X = 900;
 const SIZE = { top: 590, w: 560, h: 40, gap: 70 };
 const WEEKS = { top: 780, cell: 34, gap: 6 };
+/** Question 9's alternatives, far enough left that each can carry what it does. */
+const ALT_X = 880;
 
 /**
  * Questions 8 and 9. The recommendation test as a design: twenty users
@@ -21,7 +23,8 @@ const WEEKS = { top: 780, cell: 34, gap: 6 };
  * metric, the guardrails, and the unit, the user, not the session; then its
  * size from DA Part 7's own formula (about fifteen thousand a group for 10%
  * to 11%, nearly four times that for half the lift) and two whole weeks with
- * their weekends lit. Then when a test can't run, and what runs instead.
+ * their weekends lit. Then when a test can't run, and what runs instead,
+ * each alternative with a line on what it does.
  */
 export const RecScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -32,6 +35,8 @@ export const RecScene: React.FC = () => {
   const qAt = n.word("rec", "Question");
   const textAt = n.word("rec", "How would you design");
   const abAt = n.word("rec", "Make it an A B test");
+  // The users queue up, one by one, as the question names who the algorithm serves.
+  const queueAt = n.word("rec", "a new recommendation algorithm");
   const splitAt = n.word("rec", "users split at random");
   const algosAt = n.word("rec", "the old algorithm and the new one");
   const primaryAt = n.word("rec", "State one primary metric");
@@ -54,16 +59,32 @@ export const RecScene: React.FC = () => {
     { text: "too few users", eg: "", at: n.word("cant", "too few of them"), egAt: 0 },
     { text: "it would be unethical", eg: "", at: n.word("cant", "when it would be unethical"), egAt: 0 },
   ];
-  const switchAt = n.word("cant-instead", "switch whole regions");
-  const slotsAt = n.word("cant-instead", "or time slots");
+  const switchAt = n.word("cant-instead", "randomize whole regions");
+  const slotsAt = n.word("cant-instead", "switch the change on and off");
   const baselineAt = n.word("cant-instead", "compare against a baseline");
+  // Each alternative with what it does, said as it is named.
   const methods = [
-    { text: "difference-in-differences", at: n.word("cant-instead", "difference-in-differences") },
-    { text: "a synthetic control", at: n.word("cant-instead", "a synthetic control") },
-    { text: "an interrupted time series", at: n.word("cant-instead", "an interrupted time series") },
+    {
+      text: "difference-in-differences",
+      at: n.word("cant-instead", "Difference-in-differences"),
+      gloss: "treated regions' change − untreated regions'",
+      glossAt: n.word("cant-instead", "how much the treated regions moved"),
+    },
+    {
+      text: "a synthetic control",
+      at: n.word("cant-instead", "A synthetic control"),
+      gloss: "untreated regions weighted into a stand-in",
+      glossAt: n.word("cant-instead", "weights untreated regions"),
+    },
+    {
+      text: "an interrupted time series",
+      at: n.word("cant-instead", "An interrupted time series"),
+      gloss: "a break in the trend at the change",
+      glossAt: n.word("cant-instead", "looks for a break in the trend"),
+    },
   ];
-  const tradesAt = n.word("cant-instead", "Each trades some rigor");
-  const runAt = n.word("cant-instead", "something you can actually run");
+  const tradesAt = n.word("cant-trade", "Each trades some rigor");
+  const runAt = n.word("cant-trade", "something you can actually run");
   const numbersAt = n.word("size-in", "the numbers you build");
   const spotAt = n.word("size-in", "on the spot");
   const end = n.beat("size-in").to;
@@ -83,7 +104,7 @@ export const RecScene: React.FC = () => {
       y1: y(ARMS.top) + h(96) + Math.floor(slot / 5) * h(46),
     };
   });
-  const usersIn = ease(frame, abAt, 14);
+  const usersIn = ease(frame, queueAt, 14);
   const longest = Math.max(SAMPLE.perArm, SAMPLE.perArmHalf);
 
   return (
@@ -113,7 +134,9 @@ export const RecScene: React.FC = () => {
         <Svg opacity={usersIn * (1 - ease(frame, out8, 10))}>
           {users.map((u, i) => {
             const t = ease(frame, splitAt + 4 + i * 1.2, 14);
-            return <circle key={i} cx={lerp(u.x0, u.x1, t)} cy={lerp(u.y0, u.y1, t)} r={13} fill={u.arm ? OK : DATA} />;
+            return (
+              <circle key={i} cx={lerp(u.x0, u.x1, t)} cy={lerp(u.y0, u.y1, t)} r={13} fill={u.arm ? OK : DATA} opacity={ease(frame, queueAt + i * 2, 8)} />
+            );
           })}
         </Svg>
         {[0, 1].map((arm) => (
@@ -230,24 +253,29 @@ export const RecScene: React.FC = () => {
               </span>
             </Note>
           ))}
-          <Note at={switchAt - 2} x={1000} y={y(340)}>
+          <Note at={switchAt - 2} x={ALT_X} y={y(340)}>
             <span style={{ ...note(29, INK), fontWeight: 650, whiteSpace: "nowrap" }}>instead:</span>
           </Note>
-          <Chip x={1000} y={y(396)} at={switchAt} size={25} ink={BLUE_INK}>
-            switch whole regions
+          <Chip x={ALT_X} y={y(396)} at={switchAt} size={25} ink={BLUE_INK}>
+            randomize whole regions
           </Chip>
-          <Chip x={1330} y={y(396)} at={slotsAt} size={25} ink={BLUE_INK}>
-            or time slots
+          <Chip x={ALT_X + 370} y={y(396)} at={slotsAt} size={25} ink={BLUE_INK}>
+            or switch by time slot
           </Chip>
-          <Note at={baselineAt} x={1000} y={y(478)}>
+          <Note at={baselineAt} x={ALT_X} y={y(478)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>or compare against a baseline:</span>
           </Note>
           {methods.map((m, i) => (
-            <Chip key={m.text} x={1000} y={y(526) + i * h(62)} at={m.at - 2} size={25} ink={BLUE_INK}>
-              {m.text}
-            </Chip>
+            <React.Fragment key={m.text}>
+              <Chip x={ALT_X} y={y(526) + i * h(62)} at={m.at - 2} size={25} ink={BLUE_INK}>
+                {m.text}
+              </Chip>
+              <Note at={m.glossAt} x={ALT_X + 386} y={y(526) + i * h(62) + h(9)}>
+                <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>{m.gloss}</span>
+              </Note>
+            </React.Fragment>
           ))}
-          <Note at={tradesAt} x={1000} y={y(730)}>
+          <Note at={tradesAt} x={ALT_X} y={y(730)}>
             <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
               less rigor,{" "}
               <span style={{ opacity: ease(frame, runAt, 10) }}>

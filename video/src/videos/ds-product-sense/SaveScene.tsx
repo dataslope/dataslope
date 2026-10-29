@@ -56,7 +56,7 @@ export const SaveScene: React.FC = () => {
   const tree = ease(frame, jobAt, 20);
   const rowLabel = (text: string, at: number, color: string, top: number) => (
     <Note at={at} x={TREE_X} y={top + h(10)}>
-      <span style={{ ...label(20, color), fontWeight: 750, letterSpacing: "0.06em", whiteSpace: "nowrap" }}>{text}</span>
+      <span style={{ ...label(22, color), fontWeight: 700, whiteSpace: "nowrap" }}>{text}</span>
     </Note>
   );
 
@@ -135,12 +135,12 @@ export const SaveScene: React.FC = () => {
             </span>
           </Note>
 
-          {rowLabel("PRIMARY", primaryAt - 2, OK_INK, y(ROWS.primary))}
+          {rowLabel("Primary", primaryAt - 2, OK_INK, y(ROWS.primary))}
           <Chip x={TREE_X + ROW_LABEL_W} y={y(ROWS.primary)} at={primaryAt + 4} ink={OK_INK} size={28} lit={loopAt}>
             share of saved recipes opened again within a week
           </Chip>
 
-          {rowLabel("SECONDARY", secondaryAt - 2, INK_SOFT, y(ROWS.secondary))}
+          {rowLabel("Secondary", secondaryAt - 2, INK_SOFT, y(ROWS.secondary))}
           <Chip x={TREE_X + ROW_LABEL_W} y={y(ROWS.secondary)} at={secondaryAt} size={26}>
             save rate
           </Chip>
@@ -151,7 +151,7 @@ export const SaveScene: React.FC = () => {
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>explain why it moved</span>
           </Note>
 
-          {rowLabel("GUARDRAILS", guardsAt - 2, INK_SOFT, y(ROWS.guard))}
+          {rowLabel("Guardrails", guardsAt - 2, INK_SOFT, y(ROWS.guard))}
           <Chip x={TREE_X + ROW_LABEL_W} y={y(ROWS.guard)} at={cookAt - 2} size={26}>
             cooking sessions
           </Chip>
@@ -162,7 +162,7 @@ export const SaveScene: React.FC = () => {
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>catch it stealing from the main flow</span>
           </Note>
 
-          {rowLabel("NOT", dontAt, ACCENT_INK, y(ROWS.not))}
+          {rowLabel("Not this", dontAt, ACCENT_INK, y(ROWS.not))}
           <Note at={clicksAt - 2} x={TREE_X + ROW_LABEL_W} y={y(ROWS.not)}>
             <div
               style={{

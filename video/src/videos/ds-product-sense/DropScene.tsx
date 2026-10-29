@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DROP, num, pct } from "./data";
-import { Chip, DATA, DATA_LIGHT, Drift, madeUp, Mark, Step, Svg, VLine, X0 } from "./parts";
+import { Chip, DATA, DATA_LIGHT, Drift, madeUp, Mark, OK_INK, Step, Svg, VLine, X0 } from "./parts";
 
 const STEPS_TOP = 350;
 const STEP_GAP = 84;
@@ -16,11 +16,12 @@ const CHART = { x0: 840, x1: 1640, top: 345, bottom: 475, days: 17, dropDay: 15 
 const BARS = { x0: 980, w: 600, top: 545, gap: 66, h: 34 };
 
 /**
- * Question 6, worked outside-in: four steps down the left, each lit as it is
+ * Question 6, worked outside-in: five steps down the left, each lit as it is
  * asked. On the right, the made-up app's daily users stepping down 8%; what
- * can fake that shape; the drop split by platform, where Android holds 7,500
- * of the 8,000; the release that went out that morning; and the last call,
- * internal or external.
+ * can fake that shape, and how to rule it out; the drop split by platform,
+ * where Android holds 7,500 of the 8,000; the release that went out that
+ * morning; the call, internal or external; and the close, sized, fixed and
+ * confirmed.
  */
 export const DropScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -31,6 +32,9 @@ export const DropScene: React.FC = () => {
   const qAt = n.word("drop", "Question");
   const textAt = n.word("drop", "Walk me through diagnosing");
   const dauAt = n.word("drop", "DAU");
+  // The line draws as the drop is named, so the card is not read over a still page.
+  const dropAt = n.word("drop", "eight percent drop");
+  const usersAt = n.word("drop", "daily active users");
   const realAt = n.word("drop", "is it real?");
   const fakes = [
     { text: "a logging change", at: n.word("drop", "A logging change") },
@@ -38,6 +42,9 @@ export const DropScene: React.FC = () => {
     { text: "a holiday", at: n.word("drop", "a holiday") },
   ];
   const shapeAt = n.word("drop", "make that shape on its own");
+  const ruleAt = n.word("drop-check", "Rule them out");
+  const yearAt = n.word("drop-check", "the same week last year");
+  const relatedAt = n.word("drop-check", "related metrics moved with it");
   const broadAt = n.word("drop-split", "is it broad or narrow?");
   const hundredAt = n.word("drop-split", "a hundred thousand daily users");
   const splitAt = n.word("drop-split", "Split by platform");
@@ -50,13 +57,18 @@ export const DropScene: React.FC = () => {
   const internalAt = n.word("drop-when", "internal or external");
   const competitorAt = n.word("drop-when", "a competitor's launch");
   const bugAt = n.word("drop-when", "a bug of your own");
-  const end = n.beat("drop-when").to;
+  const actAt = n.word("drop-act", "Then size it, fix it, and confirm");
+  const fifthAt = n.word("drop-act", "a fifth of its users");
+  const rollAt = n.word("drop-act", "roll back five point two");
+  const climbAt = n.word("drop-act", "watch Android climb back");
+  const end = n.beat("drop-act").to;
 
   const steps = [
     { text: "Is it real?", at: realAt },
     { text: "Broad or narrow?", at: broadAt },
     { text: "What changed, and when?", at: whenAt },
     { text: "Internal or external?", at: internalAt },
+    { text: "Size it, fix it, confirm", at: actAt },
   ];
 
   // The daily total: flat, then the 8% step on the release day.
@@ -66,7 +78,7 @@ export const DropScene: React.FC = () => {
     const d = i + 1;
     return [xOf(d), vOf(d < CHART.dropDay ? DROP.totalBefore : DROP.totalAfter)] as const;
   });
-  const draw = ease(frame, dauAt - 6, 28);
+  const draw = ease(frame, dropAt - 4, 28);
   const fakeOut = broadAt - 2;
 
   const platforms = Object.keys(DROP.before) as (keyof typeof DROP.before)[];
@@ -77,7 +89,7 @@ export const DropScene: React.FC = () => {
       {steps.map((s) => (
         <Sfx key={s.text} name="el-tap" at={s.at} level={-32} />
       ))}
-      <Sfx name="el-pencil" at={dauAt} level={-36} />
+      <Sfx name="el-pencil" at={dropAt} level={-36} />
       <Sfx name="slide" at={splitAt} level={-32} />
       <Sfx name="el-scratch" at={androidAt + 4} level={-32} />
       <Sfx name="el-pop" at={releaseAt + 2} level={-32} />
@@ -106,7 +118,7 @@ export const DropScene: React.FC = () => {
             strokeDasharray={`${draw} 1`}
           />
         </Svg>
-        <Note at={dauAt} x={CHART.x0} y={y(CHART.top) - h(44)}>
+        <Note at={usersAt} x={CHART.x0} y={y(CHART.top) - h(44)}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>daily active users</span>
         </Note>
         <Note at={dauAt + 10} x={CHART.x0 - 16} align="right" y={vOf(DROP.totalBefore) - h(14)}>
@@ -142,6 +154,12 @@ export const DropScene: React.FC = () => {
         ))}
         <Note at={shapeAt} x={CHART.x0} y={y(BARS.top) + h(74)} out={fakeOut}>
           <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>each can make that shape on its own</span>
+        </Note>
+        <Note at={ruleAt} x={CHART.x0} y={y(BARS.top) + h(128)} out={fakeOut}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <b>rule them out:</b> <span style={{ opacity: ease(frame, yearAt, 10) }}>the same week last year</span>
+            <span style={{ opacity: ease(frame, relatedAt, 10) }}>, related metrics</span>
+          </span>
         </Note>
 
         {/* Step 2: split by platform. */}
@@ -181,11 +199,38 @@ export const DropScene: React.FC = () => {
           </span>
         </Note>
 
+        {/* Step 5: size it, fix it, confirm it. */}
+        <Note at={actAt + 4} x={CHART.x0} y={y(BARS.top) + 3 * h(BARS.gap) + h(62)}>
+          <div style={{ display: "flex", gap: 16 }}>
+            {[
+              { text: `size: Android −${pct(-DROP.byPlatform.Android.change)}`, at: fifthAt, ink: INK },
+              { text: `fix: roll back ${DROP.release}`, at: rollAt, ink: OK_INK },
+              { text: "confirm: Android climbs back", at: climbAt, ink: INK },
+            ].map((c) => (
+              <span
+                key={c.text}
+                style={{
+                  padding: "7px 14px",
+                  border: `2.2px solid ${c.ink}`,
+                  borderRadius: 10,
+                  background: c.ink === OK_INK ? `color-mix(in srgb, ${HIGHLIGHT} ${ease(frame, rollAt + 8, 12) * 100}%, ${PAPER})` : PAPER,
+                  ...note(24, c.ink),
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                  opacity: ease(frame, c.at - 2, 12),
+                }}
+              >
+                {c.text}
+              </span>
+            ))}
+          </div>
+        </Note>
+
         {/* Step 4: internal or external. */}
-        <Chip x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(10)} at={competitorAt - 2} size={24} ink={INK_SOFT}>
+        <Chip x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(10)} at={competitorAt - 2} out={actAt - 10} size={24} ink={INK_SOFT}>
           external: a competitor&apos;s launch
         </Chip>
-        <Chip x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(78)} at={bugAt - 2} size={24} ink={ACCENT_INK} lit={bugAt + 8}>
+        <Chip x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(78)} at={bugAt - 2} out={actAt - 10} size={24} ink={ACCENT_INK} lit={bugAt + 8}>
           internal: a bug of your own
         </Chip>
       </Drift>

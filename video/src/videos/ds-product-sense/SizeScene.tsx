@@ -54,10 +54,11 @@ const Factor: React.FC<{ x: number; top: number; w: number; at: number; out: num
 /**
  * Questions 10 and 11. The on-the-spot estimate as a chain of factors, each an
  * assumption said out loud, multiplying the made-up app's two million monthly
- * users down to about 500,000 searches a day. Then a feature bounded before
- * it is built: 120,000 weekly users reach it, lifts of 1% to 3% give 1,200 to
- * 3,600 extra weekly cooks, drawn against a 20,000 goal, and the best case is
- * under a fifth of it.
+ * users down to about 500,000 searches a day, then sanity-checked: one search
+ * a day for each user of the feature. Then a feature bounded before it is
+ * built: 120,000 weekly users reach it, 1 to 3 in every 100 of them becoming
+ * weekly cooks gives 1,200 to 3,600 extra, drawn against a 20,000 goal, and
+ * the best case is under a fifth of it.
  */
 export const SizeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -75,6 +76,9 @@ export const SizeScene: React.FC = () => {
   const halfAt = n.word("market", "half a session a day");
   const twoAt = n.word("market", "two searches a session");
   const resultAt = n.word("market", "About five hundred thousand");
+  const sanityCheckAt = n.word("market-sanity", "sanity-check it");
+  const eachAt = n.word("market-sanity", "one search a day each");
+  const plausibleAt = n.word("market-sanity", "Plausible");
   const structureAt = n.word("market-grade", "the structure");
   const sanityAt = n.word("market-grade", "the sanity check");
   const notAt = n.word("market-grade", "not the number");
@@ -82,9 +86,10 @@ export const SizeScene: React.FC = () => {
   const q11TextAt = n.word("impact", "How do you size");
   const boundAt = n.word("impact", "Bound it");
   const reachAt = n.word("impact", "A hundred and twenty thousand weekly users");
-  const similarAt = n.word("impact", "Similar launches lifted cooking");
-  const rangeAt = n.word("impact", "twelve hundred to thirty-six hundred");
-  const goalAt = n.word("impact", "against a goal of twenty thousand");
+  const similarAt = n.word("impact-lift", "Similar launches turned");
+  const hundredAt = n.word("impact-lift", "one to three in every hundred");
+  const rangeAt = n.word("impact-range", "twelve hundred to thirty-six hundred");
+  const goalAt = n.word("impact-range", "against a goal of twenty thousand");
   const fifthAt = n.word("impact-verdict", "under a fifth of it");
   const cheapestAt = n.word("impact-verdict", "The cheapest experiment");
   const end = n.beat("impact-verdict").to;
@@ -150,6 +155,18 @@ export const SizeScene: React.FC = () => {
           <span style={madeUp()}>assumptions for the made-up app</span>
         </Note>
 
+        {/* The sanity check: what the answer says each feature user does. */}
+        <Note at={sanityCheckAt} x={1824} align="right" y={y(604)} out={out10}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <b>sanity check:</b>{" "}
+            <span style={{ color: BLUE_INK, fontWeight: 600, opacity: ease(frame, sanityCheckAt + 10, 10) }}>
+              {num(MARKET.daily)} searches ÷ {num(MARKET.users)} users
+            </span>
+            <span style={{ color: BLUE_INK, fontWeight: 600, opacity: ease(frame, eachAt, 10) }}> = {MARKET.perUserDaily} search a day each</span>
+            <span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, plausibleAt, 10) }}>, plausible</span>
+          </span>
+        </Note>
+
         {/* What's graded. */}
         <Note at={structureAt - 4} x={X0} y={y(680)} out={out10}>
           <div style={{ display: "flex", alignItems: "center", gap: 36 }}>
@@ -180,7 +197,10 @@ export const SizeScene: React.FC = () => {
             <b>{num(IMPACT.reach)}</b> weekly users reach its screen
             <span style={{ opacity: ease(frame, similarAt, 10) }}>
               {" "}
-              × <b>{pct(IMPACT.liftLo)} to {pct(IMPACT.liftHi)}</b>, what similar launches lifted cooking
+              × <b style={{ opacity: ease(frame, hundredAt, 10) }}>
+                {IMPACT.perHundredLo} to {IMPACT.perHundredHi} in 100
+              </b>{" "}
+              become new weekly cooks <span style={{ color: INK_SOFT }}>(similar launches)</span>
             </span>
           </span>
         </Note>

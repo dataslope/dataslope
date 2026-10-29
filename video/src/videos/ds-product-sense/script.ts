@@ -54,10 +54,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     10% to 11% needs 14,751 users a group, "about fifteen thousand"; 10% to
  *     10.5% needs 57,763, 3.92 times as many, "nearly four times". (10% to 12%
  *     is DA Part 7's 3,841.)
+ *   - the drop's last step: Android lost 19.7% of its 38,000, "a fifth of
+ *     its users".
  *   - the estimate: 2,000,000 monthly users x 25% x half a session a day x 2
- *     searches a session = 500,000 searches a day.
- *   - the impact: 120,000 weekly users reach the screen; lifts of 1% to 3%
- *     give 1,200 to 3,600 extra weekly cooks, 18% of a 20,000 goal at best.
+ *     searches a session = 500,000 searches a day; the sanity check, 500,000
+ *     searches from 500,000 feature users, is one search a day each.
+ *   - the impact: 120,000 weekly users reach the screen; 1 to 3 in every 100
+ *     of them becoming weekly cooks (an absolute lift, in points) gives 1,200
+ *     to 3,600 extra weekly cooks, 18% of a 20,000 goal at best.
  *   - the ratio: 200,000 saves by 100,000 users (2.0 each) to 192,000 by
  *     80,000 (2.4 each): saves down 4%, users down a fifth.
  *   - competing metrics: the page's own +5% sessions and +2% unsubscribes.
@@ -146,6 +150,10 @@ export const script: NarrationScript = {
       id: "drop",
       scene: true,
       text: "Question six. Walk me through diagnosing a sudden eight percent drop in daily active users, DAU. First: is it real? A logging change, a broken pipeline, or a holiday can make that shape on its own.",
+    },
+    {
+      id: "drop-check",
+      text: "Rule them out: compare the same week last year, and check whether related metrics moved with it.",
       pauseAfter: 0.6,
     },
     {
@@ -156,6 +164,11 @@ export const script: NarrationScript = {
     {
       id: "drop-when",
       text: "Then, what changed, and when? Android release five point two went out that morning. Last, internal or external: a competitor's launch looks different from a bug of your own.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "drop-act",
+      text: "That finds the cause. Then size it, fix it, and confirm: Android lost a fifth of its users, so roll back five point two, and watch Android climb back.",
       pauseAfter: 0.7,
     },
 
@@ -197,9 +210,10 @@ export const script: NarrationScript = {
     },
     {
       id: "cant-instead",
-      text: "Then switch whole regions or time slots, or compare against a baseline: difference-in-differences, a synthetic control, an interrupted time series. Each trades some rigor for something you can actually run.",
+      text: "Then randomize whole regions, or switch the change on and off by time slot. Or compare against a baseline. Difference-in-differences takes how much the treated regions moved, minus how much the untreated ones did. A synthetic control weights untreated regions into a stand-in for the treated one. An interrupted time series looks for a break in the trend at the change.",
       pauseAfter: 0.7,
     },
+    { id: "cant-trade", text: "Each trades some rigor for something you can actually run.", pauseAfter: 0.7 },
     { id: "size-in", text: "And last, the numbers you build on the spot." },
 
     // ── 10, 11. Estimating, and sizing a feature ──────────────────────────
@@ -210,13 +224,23 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "market-sanity",
+      text: "Then sanity-check it: five hundred thousand searches from five hundred thousand users is one search a day each. Plausible.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "market-grade",
       text: "The interviewer is grading the structure and the sanity check, not the number.",
       pauseAfter: 0.7,
     },
     {
       id: "impact",
-      text: "Question eleven. How do you size a feature's impact before building it? Bound it. A hundred and twenty thousand weekly users reach the screen it lives on. Similar launches lifted cooking one to three percent. That's twelve hundred to thirty-six hundred extra weekly cooks, against a goal of twenty thousand.",
+      text: "Question eleven. How do you size a feature's impact before building it? Bound it. A hundred and twenty thousand weekly users reach the screen it lives on.",
+    },
+    { id: "impact-lift", text: "Similar launches turned one to three in every hundred of those users into new weekly cooks." },
+    {
+      id: "impact-range",
+      text: "That's twelve hundred to thirty-six hundred extra weekly cooks, against a goal of twenty thousand.",
       pauseAfter: 0.6,
     },
     {

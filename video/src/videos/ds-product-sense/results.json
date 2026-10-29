@@ -199,13 +199,16 @@
     "searchesPerSession": 2,
     "users": 500000,
     "sessionsDaily": 250000,
-    "daily": 500000
+    "daily": 500000,
+    "perUserDaily": 1
   },
   "impact": {
     "reach": 120000,
     "liftLo": 0.01,
     "liftHi": 0.03,
     "goal": 20000,
+    "perHundredLo": 1,
+    "perHundredHi": 3,
     "extraLo": 1200,
     "extraHi": 3600,
     "shareOfGoal": 0.18
