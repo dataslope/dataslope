@@ -72,6 +72,13 @@ export const TREE = results.tree as unknown as {
   sklearn: number;
   left: Side;
   right: Side;
+  /** The same sweep scored by entropy (bits), for "Gini or entropy?". */
+  entropy: {
+    parent: number;
+    best: [number, number];
+    gain: number;
+    sklearnAll: { feature: string; threshold: number };
+  };
 };
 
 /** Bagging and boosting on the video's own noisy sine wave. */

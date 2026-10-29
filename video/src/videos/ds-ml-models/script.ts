@@ -51,6 +51,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     flowers): Gini 0.5 at the root; the best cut, petal width 1.75 (the
  *     one scikit-learn's own tree picks from all four measurements), leaves
  *     49 and 5 on one side, 1 and 45 on the other, a weighted 0.110.
+ *     Scored by entropy instead (information gain), the sweep bottoms out
+ *     at the same 1.75, and so does scikit-learn's entropy tree.
  *   - "bag", the video's own sixty points from a sine with noise (sd 0.35),
  *     tested on 2,000 more: one deep tree's test error is 0.262; two hundred
  *     bagged trees, 0.180; boosting with depth-2 trees, 0.558 after one,
@@ -73,7 +75,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     impurity importance gives the ID 40% and the plan 10%; exact Shapley
  *     values (brute force over all sixteen subsets of four features, against
  *     a hundred background rows; the SHAP library is not in Pyodide) rank
- *     the plan first and the ID last. The customer shown: 0.503 on average,
+ *     the plan first and the ID last, but still give the ID 13% of the
+ *     total. Permutation importance on the 450 held-out rows (accuracy lost
+ *     when a feature is shuffled) gives the plan 53% of the total and the
+ *     ID 7%. The customer shown: 0.503 on average,
  *     +0.183 for the monthly plan, -0.217 for 56 months, 0.475 in all.
  *   - quick: KNN on scikit-learn's wine set scores 69.1% unscaled and
  *     94.9% standardized (five-fold), a tree 88.8% both ways; the page's
@@ -130,7 +135,15 @@ export const script: NarrationScript = {
     },
     {
       id: "tree-gini",
-      text: "Here are a hundred iris flowers, two species, half and half. Gini impurity, the chance that two flowers picked at random differ, starts at point five. Slide a cut along petal width. At one point seven five, one side is forty-nine to five, the other one to forty-five, and the weighted impurity falls to point one one, the lowest of any cut. Then the tree repeats this on each side, until a stopping rule, like a maximum depth.",
+      text: "Here are a hundred iris flowers, two species, half and half. Gini impurity, the chance that two flowers picked at random differ, starts at point five. Slide a cut along petal width. At one point seven five, one side is forty-nine to five, the other one to forty-five, and the weighted impurity falls to point one one, the lowest of any cut.",
+    },
+    {
+      id: "tree-measures",
+      text: "Entropy, the measure behind information gain, picks the same cut here. A regression tree picks the cut that shrinks the variance most.",
+    },
+    {
+      id: "tree-stop",
+      text: "Then the tree repeats this on each side, until a stopping rule, like a maximum depth.",
       pauseAfter: 0.7,
     },
     { id: "bag-in", text: "One tree is quick to read, and quick to overreact. So, many trees." },
@@ -157,7 +170,15 @@ export const script: NarrationScript = {
     },
     {
       id: "ada",
-      text: "Question six. How does gradient boosting differ from AdaBoost? Gradient boosting fits each new tree to the gradient of the loss, the residuals for squared error, so any differentiable loss will do. AdaBoost, short for adaptive boosting, re-weights the data instead: after every round, the points it got wrong count for more. After three rounds, this point carries thirty-five times the weight of the easiest ones. AdaBoost turns out to be gradient boosting with an exponential loss.",
+      text: "Question six. How does gradient boosting differ from AdaBoost?",
+    },
+    {
+      id: "gb",
+      text: "Gradient boosting fits each new tree to the negative gradient of the loss, called the pseudo-residuals. For squared error, they're just the residuals, but any differentiable loss will do.",
+    },
+    {
+      id: "adaboost",
+      text: "AdaBoost, short for adaptive boosting, re-weights the data instead: after every round, the points it got wrong count for more. After three rounds, this point carries thirty-five times the weight of the easiest ones. AdaBoost turns out to be gradient boosting with an exponential loss.",
       pauseAfter: 0.7,
     },
     { id: "knn-in", text: "Back to the border that bent with the data." },
@@ -185,7 +206,15 @@ export const script: NarrationScript = {
     },
     {
       id: "kmeans-k",
-      text: "It minimizes the within-cluster sum of squares, which always falls as k grows, so look for the elbow. Here it drops from twenty thousand at one cluster to five sixty-seven at three, then barely moves. The silhouette score, how much nearer each point sits to its own cluster than to the next, peaks at three as well. And run several starts, or k-means plus plus, because a bad start can settle in the wrong place.",
+      text: "It minimizes the within-cluster sum of squares, which always falls as k grows, so look for the elbow. Here it drops from twenty thousand at one cluster to five sixty-seven at three, then barely moves. The silhouette score, how much nearer each point sits to its own cluster than to the next, peaks at three as well.",
+    },
+    {
+      id: "kmeans-limits",
+      text: "It assumes round clusters of similar size, and outliers drag the means toward them.",
+    },
+    {
+      id: "kmeans-starts",
+      text: "And run several starts, or k-means plus plus, because a bad start can settle in the wrong place.",
       pauseAfter: 0.7,
     },
     { id: "pca-in", text: "More features bring trouble of their own." },
@@ -219,6 +248,10 @@ export const script: NarrationScript = {
     {
       id: "shap-values",
       text: "SHAP splits each prediction fairly among the features, using game theory. This customer starts from the average, point five oh. The monthly plan adds point one eight, fifty-six months of tenure takes away point two two, and the other two bring it to point four seven five. Averaged over customers, SHAP ranks the plan first and the ID last.",
+    },
+    {
+      id: "shap-perm",
+      text: "It still gives the ID thirteen percent, because SHAP explains the model, and this forest does use the ID. To ask whether a feature helps on new customers, shuffle it on held-out rows and measure how much accuracy drops. That's permutation importance, and it gives the ID seven percent, the plan fifty-three.",
       pauseAfter: 0.8,
     },
 
