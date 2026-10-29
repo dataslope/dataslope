@@ -255,41 +255,49 @@ split that way in the P2 pass (ML models' `tree-gini`, `tree-stop`, `ada`,
 
 ## What the fixers kept running into
 
-None of these were changed in the fix passes (the briefs kept the fixers out of
-the shared kit); each is a candidate for its own change.
+The briefs kept the fixers out of the shared kit, so none of these were changed
+in the fix passes. **All but the last are fixed** in the commits after the P3
+pass, each in its own commit:
 
-- **`narrate --recut` refuses a whole video once any take is stale.** Every
+- **`narrate --recut` refused a whole video once any take was stale.** Every
   video whose beats were re-voiced alone after their take (most of this
-  series, after #715's initialism pass) hit it. The fixers wrote a
-  `recut-take.mjs` per video that runs narrate's own `--recut` on a scratch
-  root holding one take's text split into the current beats; it reproduces
-  untouched beats byte for byte. A `--recut --take N` (or a `--recut` that cuts
-  every take still matching the script) would make it one command.
+  series, after #715's initialism pass) hit it, and the fixers wrote a
+  `recut-take.mjs` per video to get round it. **Fixed** (`60cdd9af`): narrate
+  finds each beat in the kept takes by its text (`locateBeats` in
+  `src/narration/takes.ts`). A beat split at a sentence break is then cut from
+  its take for free. `--recut` cuts every take that still matches the script,
+  and never replaces a beat that was voiced alone. Run on all 59 voiced
+  videos, it changes nothing in git.
 - **SVG `<text>` takes `fill`, not CSS `color`**, so `label()` and `note()` on
-  SVG text draw black. It caused Statistics' P1 and Probability's hat numbers.
-  A `labelSvg()` helper would close it.
+  SVG text drew black. It caused Statistics' P1 and Probability's hat numbers.
+  **Fixed** (`28028299`): `svgText()` in `style.ts` carries the color to
+  `fill`, at 28 sites, and `svgText.test.ts` fails on SVG text styled without
+  it.
 - **`TABULAR` spread over whole spans** widened hyphens ("p - value", "ROC -
-  AUC", "held - out") in most of the videos; the fixes put it on the
-  number spans only. A `Num` wrapper in the kit would make that the easy way.
-  The shared `Axes` still sets negative ticks with a digit-wide hyphen ("- 4");
-  writing them with U+2212 inside `Axes` would fix it everywhere.
-- **`Axes` takes plain strings** for its titles and ticks, so a superscript
-  tick or a title that changes partway (CUPED's Y to Y_adj) had to be drawn
-  locally.
-- **`QuestionCard` could balance its headline** (`textWrap: "balance"`), which
-  would end one-word orphans across the series.
-- **`check:cues` misses cues behind a one-argument wrapper**
-  (`const w = (p) => n.word("ai", p)`): the overview hid 34 of its 57 that way,
-  now rewritten as literal calls.
-- **`check.mjs` cannot run as its header says** in a fresh container: the repo
-  root has no `node_modules`, so Pyodide, DuckDB and PGlite do not resolve.
-  Fixers ran them with `NODE_PATH` at private copies of the locked versions,
-  installing nothing, and every existing number reproduced exactly.
-- **`Drift` eases in over the whole scene**, so lengthening a scene slows its
-  opening and can fail `check:motion` on a card that did not change. Fixers
-  hit it in at least five videos; a fixed short ramp would remove the coupling.
-- **The render queue's waits count against a job's time limit**, so several
-  checks were killed before they started and had to be re-queued.
+  AUC", "held - out") in most of the videos. **Fixed** (`447cd12c`): a `Num`
+  wrapper puts tabular figures on the number only, and `tabular.test.ts`
+  flags `TABULAR` over hyphenated literal text (it cannot see runtime values;
+  the Data Analyst review found two). `Axes` sets negative ticks with U+2212.
+- **`Axes` took plain strings** for its titles and ticks, so a superscript tick
+  or a title that changes partway (CUPED's Y to Y_adj) had to be drawn locally.
+  **Fixed** in the same commit: titles and tick formats take React nodes.
+- **`QuestionCard` left one-word orphans.** **Fixed** (`2bb70ed8`): it wraps
+  with `textWrap: "balance"` and keeps hyphenated words on one line.
+- **`check:cues` missed cues behind a one-argument wrapper**
+  (`const w = (p) => n.word("ai", p)`). **Fixed** (`9986f25b`): the scanner
+  resolves both wrapper shapes, with tests.
+- **`check.mjs` could not run as its header says** in a fresh container,
+  because the repo root has no `node_modules`. **Documented** (`1c95dd1b`): the
+  video README says the engines come from the repo root and need its `npm ci`.
+- **`Drift` eased in over the whole scene**, so lengthening a scene slowed its
+  opening and could fail `check:motion` on a card that did not change.
+  **Fixed** (`b223fbec`): `drift()` in `motion.ts` reaches full speed in two
+  seconds and then holds it, whatever the scene's length. `check:motion` is
+  being re-run on all 21 interview videos after the change; every one finished
+  so far passes.
+- **The render queue's waits counted against a job's time limit**, so several
+  checks were killed before they started. That queue was the review's scratch
+  tooling, not part of the repository, so there is nothing to change here.
 
 ## Beyond the videos
 
