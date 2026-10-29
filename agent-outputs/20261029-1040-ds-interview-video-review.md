@@ -318,4 +318,5 @@ the shared kit); each is a candidate for its own change.
 5. **P3s** where a P2 fix already touches the scene.
 6. **The page fix** in `sql.mdx`, outside the videos.
 
-The Data Analyst series (nine videos, #715) has not had this review either.
+The Data Analyst series (nine videos, #715) has now had the same review:
+[`20261029-2148-da-interview-video-review.md`](20261029-2148-da-interview-video-review.md).
