@@ -12,6 +12,7 @@ import {
   colsOf,
   DataTable,
   Drift,
+  FadeIn,
   geoOf,
   Headline,
   Kicker,
@@ -53,11 +54,11 @@ const Line: React.FC<{ at: number; top: number; x?: number; children: React.Reac
   </Note>
 );
 
-/** 10. Series.map, DataFrame.apply, DataFrame.map: what each works on. */
+/** 10. Series.map, DataFrame.apply, DataFrame.map (once applymap): what each works on. */
 const MapBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const S = QUICK.mapCode;
   const listTop = c.y(548);
-  const g = geoOf(S, R_X, listTop + listingHeight(S.lines.length, 18) + c.h(24), c.h, { rowH: 46 });
+  const g = geoOf(S, R_X, listTop + listingHeight(S.lines.length, SIZE) + c.h(24), c.h, { rowH: 46 });
   return (
     <>
       <Line at={c.w("r-map", "Series map")} top={c.y(370)}>
@@ -66,10 +67,16 @@ const MapBody: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={c.w("r-map", "Apply works along an axis")} top={c.y(424)}>
         <Mono color={BLUE_INK}>DataFrame.apply</Mono> along an axis: a row or a column
       </Line>
-      <Line at={c.w("r-map", "Data frame map")} top={c.y(478)}>
+      <Line at={c.w("r-map-cells", "Data frame map")} top={c.y(478)}>
         <Mono color={BLUE_INK}>DataFrame.map</Mono> every cell
+        <FadeIn at={c.w("r-map-cells", "once called apply map")}>
+          <span style={{ color: INK_SOFT }}>
+            {" "}
+            (was <Mono>applymap</Mono>)
+          </span>
+        </FadeIn>
       </Line>
-      <Listing lines={S.lines} x={R_X} top={listTop} width={900} size={18} at={c.w("r-map", "from a function or a lookup")} />
+      <Listing lines={S.lines} x={R_X} top={listTop} width={960} size={SIZE} at={c.w("r-map", "from a function or a lookup")} />
       <DataTable
         g={g}
         cols={colsOf(S, { code: { ink: BLUE_INK } })}
@@ -184,13 +191,13 @@ const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
   );
 };
 
-/** 13. 300 regions as strings, and as a category. */
+/** 13. 300 rows of four regions, as strings and as a category. */
 const CatBody: React.FC<{ c: Ctx }> = ({ c }) => (
   <>
     <Line at={c.w("r-cat", "stores each distinct string once")} top={c.y(370)}>
       <Mono color={BLUE_INK}>astype(&quot;category&quot;)</Mono>: each string once, a small code per row
     </Line>
-    <Line at={c.w("r-cat", "Three hundred regions")} top={c.y(430)} color={INK_SOFT}>
+    <Line at={c.w("r-cat-bytes", "Three hundred rows of four region names")} top={c.y(430)} color={INK_SOFT}>
       300 rows, four distinct regions
     </Line>
     <Bars
@@ -206,7 +213,7 @@ const CatBody: React.FC<{ c: Ctx }> = ({ c }) => (
           text: `${QUICK.catBefore.toLocaleString("en-US")} bytes`,
           color: BAR,
           ink: BLUE_INK,
-          at: c.w("r-cat", "eight thousand nine hundred bytes") - 4,
+          at: c.w("r-cat-bytes", "eight thousand nine hundred bytes") - 4,
         },
         {
           name: "as a category",
@@ -214,7 +221,7 @@ const CatBody: React.FC<{ c: Ctx }> = ({ c }) => (
           text: `${QUICK.catAfter} bytes`,
           color: OK,
           ink: OK_INK,
-          at: c.w("r-cat", "four hundred eighteen") - 4,
+          at: c.w("r-cat-bytes", "four hundred eighteen") - 4,
         },
       ]}
     />
@@ -307,8 +314,7 @@ export const RapidScene: React.FC = () => {
 
         {/* ── The bridge: three pandas words and their SQL twins ── */}
         <Line at={sqlAt} top={y(380)}>
-          <span style={{ color: INK_SOFT }}>pandas</span>
-          <span style={{ display: "inline-block", width: 220 }} />
+          <span style={{ display: "inline-block", width: 290, color: INK_SOFT }}>pandas</span>
           <span style={{ color: INK_SOFT }}>SQL</span>
         </Line>
         {pairs.map((p, i) => (

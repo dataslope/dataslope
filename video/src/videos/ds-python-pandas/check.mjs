@@ -120,6 +120,10 @@ results.figures.fanout = figure(FAN_SETUP, {
   unique: 'customers["customer_id"].is_unique',
   validate: 'orders.merge(customers, on="customer_id", how="left",\n             validate="many_to_one")',
   counts: 'customers["customer_id"].value_counts()',
+  // The fix: one row per customer before the merge. The rows are in the order
+  // the addresses were recorded, so the last is the current one (Bergen).
+  dedup: 'customers = customers.drop_duplicates("customer_id", keep="last")\ncustomers',
+  fixed: 'fixed = orders.merge(customers, on="customer_id", how="left",\n                     validate="many_to_one")\nlen(fixed), int(fixed["amount"].sum())',
 });
 
 /** The video's own: the fourteen questions, counted the pandas way. */

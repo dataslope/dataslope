@@ -18,8 +18,9 @@ import {
   listingHeight,
   Mark,
   MARK_BAD,
-  MARK_KEY,
+  MARK_OK,
   Mono,
+  OK_INK,
   TableName,
   X0,
 } from "./parts";
@@ -40,8 +41,9 @@ const without = (t: { cols: string[]; rows: string[][] }, col: string) => {
  * Customer 2 has two rows, so each of their two orders draws two arrows (in
  * the trap's red) and comes back twice: four rows become six, 265 becomes
  * 375. Then the guards, on the left where the inputs were: is_unique is
- * False, validate="many_to_one" raises pandas' MergeError, and a length
- * check after the merge.
+ * False, validate="many_to_one" (the guard, in the right answer's green)
+ * raises pandas' MergeError, and a length check after the merge. Last, the
+ * fix: one row per customer, and the validated merge is back to 4 rows, 265.
  */
 export const FanoutScene: React.FC = () => {
   const n = useNarration();
@@ -61,6 +63,9 @@ export const FanoutScene: React.FC = () => {
   const validateAt = n.word("fanout-guard", "pass validate equals many to one");
   const raisesAt = n.word("fanout-guard", "pandas raises a merge error");
   const afterAt = n.word("fanout-guard", "compare the row count");
+  const fixAt = n.word("fanout-fix", "fix the customer table first");
+  const keepAt = n.word("fanout-fix", "keep one row per customer");
+  const thenAt = n.word("fanout-fix", "then merge");
   const gapsAt = n.word("missing-in", "the values that aren't there");
   const end = n.beat("missing-in").to;
   const outInputs = uniqueAt - 4;
@@ -90,6 +95,10 @@ export const FanoutScene: React.FC = () => {
   const uTop = y(TOP);
   const vTop = uTop + listingHeight(1, SIZE) + h(84);
   const eTop = vTop + listingHeight(V.lines.length, SIZE) + h(16);
+  const D = FANOUT.dedup;
+  const dTop = eTop + h(170);
+  const dW = 840;
+  const [nFixed, sumFixed] = FANOUT.fixed;
 
   return (
     <AbsoluteFill>
@@ -174,11 +183,19 @@ export const FanoutScene: React.FC = () => {
             → <Mark at={uniqueAt + 16} color={MARK_BAD}><Mono>{U.value}</Mono></Mark>
           </span>
         </Note>
-        <Listing lines={V.lines} x={X0} top={vTop} width={880} size={SIZE} at={validateAt - 4} marks={[{ line: 1, at: validateAt + 6, color: MARK_KEY }]} />
+        <Listing lines={V.lines} x={X0} top={vTop} width={880} size={SIZE} at={validateAt - 4} marks={[{ line: 1, at: validateAt + 6, color: MARK_OK }]} />
         <ErrorBox x={X0} top={eTop} width={960} at={raisesAt} kind={V.kind} message={V.message} size={19} />
         <Note at={afterAt} x={X0} y={eTop + h(96)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            after a merge: <Mark at={afterAt + 8} out={gapsAt + 4}>{nAfter} rows, where you expected {nBefore}</Mark>
+            after a merge: <Mark at={afterAt + 8} out={fixAt}>{nAfter} rows, where you expected {nBefore}</Mark>
+          </span>
+        </Note>
+
+        {/* ── The fix: one row per customer, then merge ── */}
+        <Listing lines={D.lines} x={X0} top={dTop} width={dW} size={SIZE} at={fixAt - 2} marks={[{ line: 0, at: keepAt + 4, out: gapsAt + 4, color: MARK_OK }]} />
+        <Note at={thenAt} x={X0 + dW + 24} y={dTop + h(12)}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+            → then merge: {nFixed} rows, revenue {sumFixed}
           </span>
         </Note>
       </Drift>

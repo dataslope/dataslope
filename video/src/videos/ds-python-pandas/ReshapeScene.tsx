@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
+import { BAR, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -15,7 +15,6 @@ import {
   KeyArrow,
   Listing,
   Mark,
-  MARK,
   MARK_KEY,
   Mono,
   TableName,
@@ -27,13 +26,18 @@ const LONG_X = 700;
 const BACK_X = 1340;
 const CODE_Y = 790;
 const SIZE = 20;
+/** q2's values: a deeper tint of the data blue than q1's (MARK_KEY), so the
+ *  two quarters stay apart while yellow is left to what the narration marks.
+ *  The values on it are in the ink (blue type on blue would not read), as
+ *  the wide tables' already are. */
+const MARK_Q2 = `color-mix(in srgb, ${BAR} 42%, transparent)`;
 
 /**
  * Question 9 on the page's two users by two quarters: wide, then long (each
  * quarter's column turned into rows, a quarter column naming it and a sales
  * column holding it), then wide again with pivot. The q1 values are marked
- * blue and the q2 values yellow, so each can be followed through both
- * moves. The listing at the foot is the call being made.
+ * a light blue and the q2 values a deeper one, so each can be followed
+ * through both moves. The listing at the foot is the call being made.
  */
 export const ReshapeScene: React.FC = () => {
   const n = useNarration();
@@ -64,7 +68,7 @@ export const ReshapeScene: React.FC = () => {
   const q = (t: { cols: string[] }, name: string) => t.cols.indexOf(name);
   const quarter = q(L, "quarter");
   const sales = q(L, "sales");
-  const colorOf = (qq: string) => (qq === "q1" ? MARK_KEY : MARK);
+  const colorOf = (qq: string) => (qq === "q1" ? MARK_KEY : MARK_Q2);
 
   return (
     <AbsoluteFill>
@@ -89,7 +93,7 @@ export const ReshapeScene: React.FC = () => {
           rows={W.rows.map((cells, i) => ({ cells, at: asked - 2 + i * 3 }))}
           marks={W.rows.flatMap((_, row) => [
             { row, col: q(W, "q1"), at: columnAt + row * 3, color: MARK_KEY },
-            { row, col: q(W, "q2"), at: columnAt + 8 + row * 3, color: MARK },
+            { row, col: q(W, "q2"), at: columnAt + 8 + row * 3, color: MARK_Q2 },
           ])}
         />
 
@@ -105,7 +109,7 @@ export const ReshapeScene: React.FC = () => {
         </TableName>
         <DataTable
           g={lg}
-          cols={colsOf(L, { quarter: { at: quarterAt - 2 }, sales: { at: salesAt - 2, ink: BLUE_INK } })}
+          cols={colsOf(L, { quarter: { at: quarterAt - 2 }, sales: { at: salesAt - 2 } })}
           at={meltAt + 8}
           rows={L.rows.map((cells, i) => ({ cells, at: columnAt + 6 + i * 4 }))}
           marks={[
@@ -136,7 +140,7 @@ export const ReshapeScene: React.FC = () => {
           rows={B.rows.map((cells, i) => ({ cells, at: pivotAt + 14 + i * 4 }))}
           marks={B.rows.flatMap((_, row) => [
             { row, col: q(B, "q1"), at: pivotAt + 22 + row * 3, color: MARK_KEY },
-            { row, col: q(B, "q2"), at: pivotAt + 28 + row * 3, color: MARK },
+            { row, col: q(B, "q2"), at: pivotAt + 28 + row * 3, color: MARK_Q2 },
           ])}
         />
         <Note at={uniqueAt} x={BACK_X} y={bg.rowTop(B.rows.length) + h(20)}>

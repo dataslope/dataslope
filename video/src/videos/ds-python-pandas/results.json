@@ -223,6 +223,54 @@
           },
           "stdout": "",
           "warnings": []
+        },
+        "dedup": {
+          "code": "customers = customers.drop_duplicates(\"customer_id\", keep=\"last\")\ncustomers",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "customer_id",
+              "city"
+            ],
+            "rows": [
+              [
+                "1",
+                "Lyon"
+              ],
+              [
+                "2",
+                "Bergen"
+              ],
+              [
+                "3",
+                "Porto"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "fixed": {
+          "code": "fixed = orders.merge(customers, on=\"customer_id\", how=\"left\",\n                     validate=\"many_to_one\")\nlen(fixed), int(fixed[\"amount\"].sum())",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "(4, 265)",
+            "str": "(4, 265)"
+          },
+          "stdout": "",
+          "warnings": []
         }
       }
     },

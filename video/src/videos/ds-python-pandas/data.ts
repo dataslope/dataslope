@@ -122,6 +122,10 @@ export const FANOUT = {
   after: pair("fanout", "after"),
   unique: { lines: code("fanout", "unique"), value: scalar("fanout", "unique") },
   validate: refused("fanout", "validate"),
+  /** The fix: one row per customer (the last, the current address), then
+   *  the same merge, validated, back to the orders' rows and revenue. */
+  dedup: { lines: code("fanout", "dedup"), ...frame("fanout", "dedup") },
+  fixed: pair("fanout", "fixed"),
 };
 
 export const PLAN = { lines: code("plan", "size"), ...series("plan", "size") };

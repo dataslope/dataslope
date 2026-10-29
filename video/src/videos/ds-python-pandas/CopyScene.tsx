@@ -58,8 +58,8 @@ export const CopyScene: React.FC = () => {
   const origAt = n.word("copy-chain", "the original may not change");
   const threeAt = n.word("copy-three", "In pandas three");
   const neverAt = n.word("copy-three", "it never changes");
-  const nowAt = n.word("copy-three", "the warning is now called chained assignment error");
-  const olderAt = n.word("copy-three", "Older versions said setting with copy");
+  const nowAt = n.word("copy-error", "the warning is now called chained assignment error");
+  const olderAt = n.word("copy-error", "Older versions said setting with copy");
   const fixAt = n.word("copy-fix", "Write in one step");
   const locAt = n.word("copy-fix", "with lock, the mask and the column");
   const zeroAt = n.word("copy-fix", "both North amounts become zero");
@@ -169,7 +169,7 @@ export const CopyScene: React.FC = () => {
           <Tag size={22} mono>
             pandas {COPY.version}
           </Tag>
-          <span style={{ ...note(24, INK_SOFT), marginLeft: 14, whiteSpace: "nowrap" }}>copy-on-write: df never changes</span>
+          <span style={{ ...note(24, INK_SOFT), marginLeft: 14, whiteSpace: "nowrap" }}>copy-on-write: every selection acts as a copy</span>
         </Note>
         <ErrorBox
           x={RIGHT_X}

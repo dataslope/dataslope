@@ -36,8 +36,9 @@ const CODE = 20;
  * order's customer_id to its customer, the result picks up a name column,
  * and the call is printed under the tables with how's four join types
  * beside it. Join: the customers' key becomes their index, the call swaps
- * to join's, and the same four rows come back. Concat: nothing is matched;
- * March's two orders (the video's own) are stacked under the four.
+ * to join's, and the same four rows come back. Concat: no key is matched,
+ * only the columns, by name; March's two orders (the video's own) are
+ * stacked under the four.
  */
 export const MergeScene: React.FC = () => {
   const n = useNarration();
@@ -58,8 +59,9 @@ export const MergeScene: React.FC = () => {
   const indexAt = n.word("merge-index", "matches on the index");
   const setAt = n.word("merge-set", "becomes their index first");
   const sameAt = n.word("merge-set", "the same four rows");
-  const concatAt = n.word("merge-stack", "And concat matches nothing at all");
+  const concatAt = n.word("merge-stack", "And concat matches no key");
   const stackAt = n.word("merge-stack", "It stacks frames");
+  const byNameAt = n.word("merge-stack", "lining up columns by name");
   const marchAt = n.word("merge-stack", "March's orders under the rest");
   const end = n.beat("merge-stack").to;
   const outMatch = concatAt - 2;
@@ -87,7 +89,7 @@ export const MergeScene: React.FC = () => {
   const codeTop = og.rowTop(O.rows.length) + h(50);
   const mergeW = 700;
 
-  const header = (word: string, rest: string, at: number, out?: number) => (
+  const header = (word: string, rest: React.ReactNode, at: number, out?: number) => (
     <Note at={at} x={X0} y={y(HEAD_Y)} out={out}>
       <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
         <Mark at={at + 4}>
@@ -114,7 +116,13 @@ export const MergeScene: React.FC = () => {
 
         {header("merge", "matches on key columns, like a SQL join", mergeAt, joinAt - 4)}
         {header("join", "matches on the index", joinAt, concatAt - 4)}
-        {header("concat", "matches nothing: it stacks", concatAt)}
+        {header(
+          "concat",
+          <>
+            matches no key: it stacks,<FadeIn at={byNameAt}> lining up columns by name</FadeIn>
+          </>,
+          concatAt,
+        )}
 
         <TableName g={og} at={asked - 6}>
           orders
