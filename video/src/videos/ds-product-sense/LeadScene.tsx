@@ -75,7 +75,8 @@ const Bar: React.FC<{ x: number; base: number; height: number; at: number; color
 /**
  * Questions 3 and 4. Leading and lagging as two weekly lines from the made-up
  * app: an onboarding change in week 3 shows in week-one cooking the next week
- * and in month-three retention twelve weeks after that. Then Goodhart's law on
+ * and in month-three retention twelve weeks after that, too late to act on.
+ * Then Goodhart's law on
  * support tickets: time to close falls from 9 hours to 3 while reopened
  * tickets climb from 4% to 15%, the counter-metric that catches it.
  */
@@ -93,10 +94,11 @@ export const LeadScene: React.FC = () => {
   const lagExAt = n.word("lead", "retention at month three");
   const changeAt = n.word("lead-gap", "an onboarding change lands");
   const leadDropAt = n.word("lead-gap", "Week-one cooking drops");
-  const lagDropAt = n.word("lead-gap", "doesn't show it for twelve more");
-  const steerAt = n.word("lead-gap", "You steer by the leading line");
-  const causesAt = n.word("lead-gap", "actually causes the outcome");
-  const corrAt = n.word("lead-gap", "just correlated");
+  const lagDropAt = n.word("lead-late", "doesn't show it for twelve more");
+  const lateAt = n.word("lead-late", "too late to act");
+  const steerAt = n.word("lead-steer", "You steer by the leading line");
+  const causesAt = n.word("lead-steer", "actually causes the outcome");
+  const corrAt = n.word("lead-steer", "just correlated");
   const q4At = n.word("goodhart", "Question four");
   const q4TextAt = n.word("goodhart", "What is Goodhart's law");
   const lawAt = n.word("goodhart", "When a measure becomes a target");
@@ -160,7 +162,7 @@ export const LeadScene: React.FC = () => {
         <Note at={leadDefAt + 10} x={at(xs, 8)} y={at(ys, 0.36) - h(50)} out={out3}>
           <span style={{ ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>week-one cooking</span>
         </Note>
-        <Note at={lagDefAt + 10} x={at(xs, 6)} y={at(ys, 0.22) + h(18)} out={out3}>
+        <Note at={lagDefAt + 10} x={at(xs, 6)} y={at(ys, 0.255)} out={out3}>
           <span style={{ ...label(22, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>month-three retention</span>
         </Note>
         <VLine
@@ -175,8 +177,11 @@ export const LeadScene: React.FC = () => {
           label={<span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>onboarding change</span>}
           labelY={y(CHART.top) - h(44)}
         />
-        <Bracket x0={at(xs, dropLead)} x1={at(xs, dropLag)} y={at(ys, 0.3)} at={lagDropAt + 10} out={out3} color={INK}>
-          <span style={{ ...label(22, INK), fontWeight: 700, ...TABULAR }}>{LEAD.lagWeeks} weeks later</span>
+        <Bracket x0={at(xs, dropLead)} x1={at(xs, dropLag)} y={at(ys, 0.334)} at={lagDropAt + 10} out={out3} color={INK}>
+          <span style={{ ...label(22, INK), fontWeight: 700 }}>
+            <span style={TABULAR}>{LEAD.lagWeeks}</span> weeks later
+            <span style={{ color: ACCENT_INK, opacity: ease(frame, lateAt, 10) }}>, too late to act</span>
+          </span>
         </Bracket>
         <Note at={leadDefAt + 4} x={CHART.x0} y={y(CHART.bottom) + h(64)} out={out3}>
           <span style={madeUp()}>the made-up app, with simulated week-to-week noise</span>

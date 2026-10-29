@@ -21,7 +21,7 @@ const Bookmark: React.FC<{ x: number; y: number; size: number; color: string }> 
 
 /**
  * Question 5. A "Save for later" button on the left, with the made-up app's
- * saved recipes under it, ticked as they are opened again. On the right, the
+ * saved recipes under it, ticked as they are cooked. On the right, the
  * metrics as a tree from the button's job: the primary metric in green, the
  * secondary ones that explain it, the guardrails, and the click count struck
  * through, because it measures the interaction, not the value.
@@ -36,13 +36,13 @@ export const SaveScene: React.FC = () => {
   const textAt = n.word("save", "How would you define");
   const jobAt = n.word("save-tree", "Start from the job it does");
   const backAt = n.word("save-tree", "bring people back");
-  const primaryAt = n.word("save-tree", "the primary metric is");
-  const weekAt = n.word("save-tree", "opened again within a week");
-  const secondaryAt = n.word("save-tree", "Save rate and saves per user");
-  const whyAt = n.word("save-tree", "explain why it moved");
-  const guardsAt = n.word("save-tree", "Guardrails catch it stealing");
-  const cookAt = n.word("save-tree", "cooking sessions");
-  const loadAt = n.word("save-tree", "load time");
+  const primaryAt = n.word("save-primary", "the primary metric is");
+  const weekAt = n.word("save-primary", "cooked within a week");
+  const secondaryAt = n.word("save-rest", "Save rate and saves per user");
+  const whyAt = n.word("save-rest", "explain why it moved");
+  const guardsAt = n.word("save-rest", "Guardrails catch it stealing");
+  const cookAt = n.word("save-rest", "cooking sessions");
+  const loadAt = n.word("save-rest", "load time");
   const dontAt = n.word("save-not", "What you don't pick");
   const clicksAt = n.word("save-not", "clicks on the button");
   const interactionAt = n.word("save-not", "That measures the interaction");
@@ -116,7 +116,7 @@ export const SaveScene: React.FC = () => {
             );
           })}
           <Note at={weekAt + 14} x={X0} y={y(ROWS.job) + h(110) + 4 * h(64) + h(6)}>
-            <span style={{ ...label(21, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>opened again within a week</span>
+            <span style={{ ...label(21, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>cooked within a week</span>
           </Note>
           <Note at={backAt + 4} x={X0} y={y(ROWS.not) + h(70)}>
             <span style={madeUp()}>recipes made up for this video</span>
@@ -137,7 +137,7 @@ export const SaveScene: React.FC = () => {
 
           {rowLabel("Primary", primaryAt - 2, OK_INK, y(ROWS.primary))}
           <Chip x={TREE_X + ROW_LABEL_W} y={y(ROWS.primary)} at={primaryAt + 4} ink={OK_INK} size={28} lit={loopAt}>
-            share of saved recipes opened again within a week
+            share of saved recipes cooked within a week
           </Chip>
 
           {rowLabel("Secondary", secondaryAt - 2, INK_SOFT, y(ROWS.secondary))}
@@ -179,7 +179,8 @@ export const SaveScene: React.FC = () => {
           </Note>
           <Note at={interactionAt} x={TREE_X + ROW_LABEL_W + 330} y={y(ROWS.not) + h(10)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-              the interaction, <span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, valueAt, 10) }}>not the value</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 650 }}>the interaction</span>
+              <span style={{ opacity: ease(frame, valueAt, 10) }}>, not the value</span>
             </span>
           </Note>
         </Clear>

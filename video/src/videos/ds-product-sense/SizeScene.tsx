@@ -58,7 +58,7 @@ const Factor: React.FC<{ x: number; top: number; w: number; at: number; out: num
  * a day for each user of the feature. Then a feature bounded before it is
  * built: 120,000 weekly users reach it, 1 to 3 in every 100 of them becoming
  * weekly cooks gives 1,200 to 3,600 extra, drawn against a 20,000 goal, and
- * the best case is under a fifth of it.
+ * the best case is under a fifth of it, so it waits.
  */
 export const SizeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -91,8 +91,9 @@ export const SizeScene: React.FC = () => {
   const rangeAt = n.word("impact-range", "twelve hundred to thirty-six hundred");
   const goalAt = n.word("impact-range", "against a goal of twenty thousand");
   const fifthAt = n.word("impact-verdict", "under a fifth of it");
-  const cheapestAt = n.word("impact-verdict", "The cheapest experiment");
-  const end = n.beat("impact-verdict").to;
+  const deprioritizeAt = n.word("impact-verdict", "deprioritize it");
+  const cheapestAt = n.word("impact-cheap", "The cheapest experiment");
+  const end = n.beat("impact-cheap").to;
 
   const out10 = q11At - 4;
   const xOf = (i: number) => X0 + i * (CHAIN.w + CHAIN.gap);
@@ -109,7 +110,7 @@ export const SizeScene: React.FC = () => {
   ];
 
   const xs: Scale = { lo: 0, hi: IMPACT.goal, a: X0 + 40, b: AXIS.x1 };
-  const axis = ease(frame, goalAt - 6, 20);
+  const axis = ease(frame, rangeAt - 8, 20);
   const band = ease(frame, rangeAt, 16);
 
   return (
@@ -124,7 +125,9 @@ export const SizeScene: React.FC = () => {
       <Sfx name="slide" at={rangeAt} level={-32} />
       <Sfx name="el-pop" at={fifthAt} level={-32} />
 
-      <Drift from={from} to={end + 40}>
+      {/* One slow push per question: a single push over both eases in so
+          slowly that Question 10's card is read over a still page. */}
+      <Drift from={from} to={q11At + 10}>
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} out={out10} size={60}>
           How would you estimate the size of something on the spot?
         </QuestionCard>
@@ -184,7 +187,9 @@ export const SizeScene: React.FC = () => {
             </span>
           </div>
         </Note>
+      </Drift>
 
+      <Drift from={q11At - 8} to={end + 40}>
         {/* ── Question 11: bound it ── */}
         <QuestionCard n={11} at={q11At} textAt={q11TextAt - 2} size={60}>
           How do you size a feature&apos;s impact before building it?
@@ -237,7 +242,10 @@ export const SizeScene: React.FC = () => {
         <Bracket x0={at(xs, 0)} x1={at(xs, IMPACT.extraHi)} y={y(AXIS.y) + h(70)} at={fifthAt} color={ACCENT_INK}>
           <span style={{ ...label(23, ACCENT_INK), fontWeight: 700, ...TABULAR }}>best case: {pct(IMPACT.shareOfGoal)} of the goal</span>
         </Bracket>
-        <Note at={cheapestAt} x={980} y={y(AXIS.y) + h(84)}>
+        <Note at={deprioritizeAt} x={980} y={y(AXIS.y) + h(84)}>
+          <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>→ deprioritize it before anyone builds it</span>
+        </Note>
+        <Note at={cheapestAt} x={980} y={y(AXIS.y) + h(140)}>
           <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={cheapestAt + 8}>the cheapest experiment is the arithmetic</Mark>
           </span>

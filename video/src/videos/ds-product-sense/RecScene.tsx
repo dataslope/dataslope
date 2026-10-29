@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, SAMPLE } from "./data";
-import { Chip, Clear, DATA, Drift, lerp, Mark, OK, OK_INK, Strike, Svg, X0 } from "./parts";
+import { Chip, Clear, DATA, Drift, lerp, Mark, OK, OK_INK, Strike, Svg, WARM, WARM_INK, X0 } from "./parts";
 
 const ARMS = { top: 470, w: 300, h: 190, gap: 60 };
 const RIGHT_X = 900;
@@ -16,10 +16,14 @@ const SIZE = { top: 590, w: 560, h: 40, gap: 70 };
 const WEEKS = { top: 780, cell: 34, gap: 6 };
 /** Question 9's alternatives, far enough left that each can carry what it does. */
 const ALT_X = 880;
+/** Which arm each queued user is dealt to: a fixed shuffle, ten each, so the
+ *  picture is random-looking rather than alternating, and the same every render. */
+const DEAL = [0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1];
 
 /**
  * Questions 8 and 9. The recommendation test as a design: twenty users
- * dealt at random into the old algorithm and the new one; the primary
+ * dealt at random into the old algorithm and the new one (blue and orange,
+ * not green: nothing has won yet), each inked as it lands; the primary
  * metric, the guardrails, and the unit, the user, not the session; then its
  * size from DA Part 7's own formula (about fifteen thousand a group for 10%
  * to 11%, nearly four times that for half the lift) and two whole weeks with
@@ -91,11 +95,10 @@ export const RecScene: React.FC = () => {
 
   const out8 = q9At - 4;
 
-  // Twenty users, dealt alternately here for the picture: each slides from
-  // the queue into its arm.
-  const users = Array.from({ length: 20 }, (_, i) => {
-    const arm = i % 2;
-    const slot = Math.floor(i / 2);
+  // Twenty users, dealt by the fixed shuffle: each slides from the queue
+  // into its arm.
+  const users = DEAL.map((arm, i) => {
+    const slot = DEAL.slice(0, i).filter((a) => a === arm).length;
     return {
       arm,
       x0: X0 + 20 + i * 34,
@@ -135,7 +138,14 @@ export const RecScene: React.FC = () => {
           {users.map((u, i) => {
             const t = ease(frame, splitAt + 4 + i * 1.2, 14);
             return (
-              <circle key={i} cx={lerp(u.x0, u.x1, t)} cy={lerp(u.y0, u.y1, t)} r={13} fill={u.arm ? OK : DATA} opacity={ease(frame, queueAt + i * 2, 8)} />
+              <circle
+                key={i}
+                cx={lerp(u.x0, u.x1, t)}
+                cy={lerp(u.y0, u.y1, t)}
+                r={13}
+                fill={`color-mix(in srgb, ${u.arm ? WARM : DATA} ${t * 100}%, ${INK_SOFT})`}
+                opacity={ease(frame, queueAt + i * 2, 8)}
+              />
             );
           })}
         </Svg>
@@ -146,10 +156,10 @@ export const RecScene: React.FC = () => {
                 width: ARMS.w,
                 height: h(ARMS.h),
                 boxSizing: "border-box",
-                border: `2.2px solid ${arm ? OK_INK : BLUE_INK}`,
+                border: `2.2px solid ${arm ? WARM_INK : BLUE_INK}`,
                 borderRadius: 12,
                 padding: "14px 18px",
-                ...note(26, arm ? OK_INK : BLUE_INK),
+                ...note(26, arm ? WARM_INK : BLUE_INK),
                 fontWeight: 700,
                 whiteSpace: "nowrap",
               }}
@@ -241,10 +251,10 @@ export const RecScene: React.FC = () => {
         </Svg>
 
         {/* ── Question 9: when you can't, and what runs instead ── */}
+        <QuestionCard n={9} at={q9At} textAt={q9TextAt - 2} size={56}>
+          When can&apos;t you run an A/B test, and what do you do instead?
+        </QuestionCard>
         <Clear at={spotAt}>
-          <QuestionCard n={9} at={q9At} textAt={q9TextAt - 2} size={56}>
-            When can&apos;t you run an A/B test, and what do you do instead?
-          </QuestionCard>
           {reasons.map((r, i) => (
             <Note key={r.text} at={r.at - 2} x={X0} y={y(340) + i * h(70)}>
               <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>
