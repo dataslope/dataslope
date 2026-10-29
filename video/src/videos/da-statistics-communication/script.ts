@@ -42,22 +42,25 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "bias", the video's own 100,000 users (seed 21): average satisfaction
  *     5.98; 22.6% churned, the unhappiest likeliest to; those who stayed
  *     average 6.56; thirty surveys of 20 stayers range 5.84 to 7.43, of 2,000
- *     range 6.50 to 6.64.
+ *     range 6.50 to 6.64. Forty scores from each side (seed 22) draw who left.
  *   - "metric", the video's own two weeks: 10,000 sessions and 300 orders,
- *     then 8,000 and 288; conversion 3.0% to 3.6%, up 20%; orders down 4%,
- *     sessions down 20%.
+ *     then 8,000 and 288; conversion 3.0% to 3.6%, up 20% (0.6 points);
+ *     orders down 4%, sessions down 20%: the 2,000 sessions that left carried
+ *     12 orders, 0.6%.
  *   - "quantile", the page's thirteen amounts: Q1 10, median 12, Q3 13, IQR
- *     3; the 90th percentile interpolates between 14 and 190 to 154.8; the
+ *     3; the 90th percentile sits at position 10.8 of 12, 80% of the way
+ *     from 14 to 190: 154.8; the
  *     fences are 5.5 and 17.5 and catch 200 and 190; the mean is 39.5 and
  *     the standard deviation 69.1, so 200 is 2.32 standard deviations out
  *     and 190 is 2.18; a cutoff of 2 flags both, a cutoff of 3 flags none.
  *   - "present": the page's own example, 12% more likely to buy, the lift
  *     between 8% and 16%, and 12.37% as false precision.
- *   - rapid fire: the page's 10 to 50 (variance 250, standard deviation 15.81,
- *     ddof 1); the video's own tickets (billing three times); 100,000 normal
- *     draws (68.1%, 95.5% and 99.7% within one, two and three standard
- *     deviations); a population of 10,000 with mean 50.2 and three samples of
- *     50 averaging 52.1, 51.8 and 51.1.
+ *   - rapid fire: the page's 10, 20, 30, 40 and 50 (squared distances 1,000;
+ *     over n, 200; pandas' n - 1, variance 250 and standard deviation 15.81);
+ *     the video's own tickets (billing three times); the rule's exact areas
+ *     (68.3%, 95.4% and 99.7% within one, two and three standard
+ *     deviations); a population of 10,000 with mean 50.2 and twenty samples
+ *     of 50 averaging 47.8 to 53.1, seven of them below it.
  *
  * Written for Drew's ear, as in Parts 1 and 2. Numbers are written as they
  * are said; "IQR" is spelled for the interquartile range, and "Q one" and

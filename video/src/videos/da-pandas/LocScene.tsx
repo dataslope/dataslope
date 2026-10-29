@@ -60,7 +60,7 @@ export const LocScene: React.FC = () => {
   const eyeThreeAt = n.word("loc-same", "eye lock at row three");
   const fiftyAt = n.word("loc-same", "fifty");
   const sliceAt = n.word("loc-slice", "Slices differ");
-  const locSliceAt = n.word("loc-slice", "Lock zero to two");
+  const locSliceAt = n.word("loc-slice", "Lock zero to two", { nth: 1 });
   const labelTwoAt = n.word("loc-slice", "includes label two");
   const threeRowsAt = n.word("loc-slice", "three rows");
   const ilocSliceAt = n.word("loc-slice", "Eye lock zero to two");

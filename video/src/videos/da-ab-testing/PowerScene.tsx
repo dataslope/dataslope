@@ -286,7 +286,8 @@ export const PowerScene: React.FC = () => {
           <text x={POWER.x1} y={y(POWER.base) + 58} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
             users per arm (log scale)
           </text>
-          <text x={POWER.x0} y={y(POWER.top) - 22} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+          {/* At the right end, so question 10's notes on the left never run into it. */}
+          <text x={POWER.x1} y={y(POWER.top) - 24} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
             power to catch a lift from {Math.round(SAMPLE.from * 100)}%
           </text>
           {SAMPLE.curves.map((c, i) => (
