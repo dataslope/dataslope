@@ -15,8 +15,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *
  * Facts: the page's own wording for the loop, the probes and the AI changes;
  * the eight videos and their 156 questions from the plan's table, which the
- * built videos answer; 110 multiple-choice questions, counted in
- * multiple-choice-questions.mdx.
+ * built videos answer, each once; 110 multiple-choice questions, and the 4 of
+ * 8 topic pages with runnable challenges, counted by check.mjs.
  *
  * Written for Drew's ear: "AI" and "BI" are spelled out the first time.
  */
@@ -35,26 +35,45 @@ export const script: NarrationScript = {
     {
       id: "probe",
       scene: true,
-      text: "Under all three, interviewers check four things. SQL fluency. Framing: the right grain, nulls handled, nothing counted twice after a join. Communication: your assumptions, your caveats, and what you'd check next. And tools: a spreadsheet, and a BI tool, short for business intelligence, like Tableau, Power BI or Looker.",
+      text: "Across the three parts, interviewers probe four things. SQL fluency: joins, GROUP BY, WHERE against HAVING, CASE, and window functions. Framing: picking the right grain, meaning what one row stands for, handling nulls, and not counting anything twice after a join. Communication: your assumptions, your caveats, and what you'd check next. And tools: a spreadsheet, and a BI tool, short for business intelligence, like Tableau, Power BI or Looker.",
       pauseAfter: 0.8,
     },
     {
       id: "ai",
       scene: true,
-      text: "AI, artificial intelligence, has changed some of it. You're now as likely to check a query an assistant wrote as to write one. You'll be asked how you use these tools responsibly. BI tools answer questions in plain language, but only on top of clean metrics. And the live SQL round is usually AI-off, so ask the recruiter about each round.",
+      text: "AI, artificial intelligence, has changed some of it. Checking now matters more than writing, because a plausible query is cheap to produce. Expect to be handed one an assistant wrote, and asked: is it right?",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "ai-use",
+      text: "You'll be asked how you use these tools responsibly: what you'd paste into one, how you disclose using it, and how you keep hallucinated insights out of a report.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "ai-bi",
+      text: "BI tools now answer questions asked in plain language, but they only answer correctly on top of clean, well-defined metrics, and providing those is becoming the analyst's job.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "ai-off",
+      text: "And the live SQL round is usually AI-off, so fluency still matters. Ask the recruiter about each round.",
       pauseAfter: 0.8,
     },
     {
       id: "series",
       scene: true,
-      text: "This series follows the track, one video per topic page, from SQL to AI-assisted analysis: a hundred and fifty-six questions in all. Each video works through the questions that need a figure, then takes the rest quickly.",
+      text: "This series follows the track, one video per topic page, from SQL to AI-assisted analysis: a hundred and fifty-six questions in all, each answered once, in the video of the page it belongs to.",
+    },
+    {
+      id: "series-how",
+      text: "Each video works through the questions that need a figure, then takes the rest quickly.",
       pauseAfter: 0.6,
     },
     {
       id: "practice",
-      text: "And every page has practice of its own: concept checks, runnable challenges, and a bank of a hundred and ten multiple-choice questions.",
+      text: "And every page has concept checks of its own, four of them add runnable challenges, and a bank of a hundred and ten multiple-choice questions covers the whole track.",
       pauseAfter: 0.8,
     },
-    { id: "next", text: "Almost every interview opens with the same screen. Next: SQL." },
+    { id: "next", text: "Almost every interview has a SQL screen, so the series starts there. Next: SQL." },
   ],
 };

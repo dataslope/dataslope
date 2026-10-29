@@ -103,9 +103,10 @@ export const script: NarrationScript = {
       text: "Almost every data analyst interview opens with a SQL screen. And the questions repeat. There are twenty-four you should be ready for.",
       pauseAfter: 0.6,
     },
+    { id: "plan", text: "Ten of them need a picture, so we'll take those slowly." },
     {
-      id: "plan",
-      text: "Ten of them hide a trap, so we'll take those slowly. The other fourteen get one answer each, in a rapid-fire round.",
+      id: "plan-rapid",
+      text: "The other fourteen get one answer each, in a rapid-fire round.",
       pauseAfter: 0.7,
     },
     { id: "where-in", text: "Let's start where most screens start: two ways to filter." },
@@ -129,16 +130,18 @@ export const script: NarrationScript = {
     },
     { id: "where-why", text: "The sum doesn't exist yet when WHERE runs.", pauseAfter: 0.8 },
     { id: "where-fix", text: "Move it to HAVING, and two regions come back: East and North.", pauseAfter: 0.6 },
+    { id: "where-keep", text: "Keep row filters in WHERE, though: they shrink the table before grouping." },
 
-    {
-      id: "order",
-      scene: true,
-      text: "Question two follows from it. In what order does a query actually run?",
-      pauseAfter: 0.6,
-    },
+    { id: "order", scene: true, text: "Question two follows from it." },
+    { id: "order-q", text: "In what order does a query run, logically?", pauseAfter: 0.6 },
     {
       id: "order-list",
       text: "Not the order you write it. From and joins first, then WHERE, GROUP BY and HAVING. Only then SELECT, DISTINCT, ORDER BY and LIMIT.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "order-logical",
+      text: "That's the logical order. The engine can do the work differently, but the answer has to match.",
       pauseAfter: 0.8,
     },
     {
@@ -184,17 +187,19 @@ export const script: NarrationScript = {
       text: "But a left join can quietly turn into an inner one.",
       pauseAfter: 0.6,
     },
-    {
-      id: "trap-where",
-      text: "Ask for orders over fifty dollars, and put that filter in WHERE. Di disappears.",
-      pauseAfter: 0.7,
-    },
+    { id: "trap-where", text: "Ask for every customer and their orders over fifty dollars, and put that filter in WHERE." },
+    { id: "trap-gone", text: "Di disappears.", pauseAfter: 0.7 },
     {
       id: "trap-why",
       text: "Her amount is null, and null over fifty isn't true, so WHERE drops her.",
       pauseAfter: 0.8,
     },
-    { id: "trap-on", text: "Put the filter in the join's on clause instead, and Di stays, with a null.", pauseAfter: 0.6 },
+    { id: "trap-on", text: "Put the filter in the join's on clause instead, and Di stays, with a null.", pauseAfter: 0.7 },
+    {
+      id: "trap-when",
+      text: "If you only want the big orders, WHERE is fine. To keep every customer, filter in ON.",
+      pauseAfter: 0.6,
+    },
     { id: "fanout-in", text: "Joins have one more trap, and this one inflates your totals." },
 
     // ── 3. Fan-out ────────────────────────────────────────────────────────
@@ -216,7 +221,7 @@ export const script: NarrationScript = {
     },
     {
       id: "fanout-fix",
-      text: "The fix is the grain. Count the items per order first, in a CTE, a common table expression, then join. One row per order, and the total's back to one fifty.",
+      text: "The fix is the grain: what one row stands for. We want revenue and an item count, so count the items per order first, in a CTE, a common table expression, then join. One row per order, and the total's back to one fifty.",
       pauseAfter: 0.7,
     },
 
@@ -232,14 +237,20 @@ export const script: NarrationScript = {
       text: "So discount equals null is never true, not even for a null. Zero rows. Write IS NULL, and you find both.",
       pauseAfter: 0.8,
     },
+    { id: "nulls-avg", text: "Aggregates skip nulls. The average is seven and a half, over the other four." },
+    {
+      id: "nulls-coalesce",
+      text: "If a missing discount really means zero, say so with coalesce, and it drops to five.",
+      pauseAfter: 0.8,
+    },
     {
       id: "nulls-count",
       text: "Question six. Count star, count of one, or count of a column? Count star and count of one both count all six rows. Count of discount counts only the four that have one.",
       pauseAfter: 0.8,
     },
     {
-      id: "nulls-avg",
-      text: "Other aggregates skip nulls too. The average is seven and a half, over those four. If a missing discount really means zero, say so with coalesce, and it drops to five.",
+      id: "nulls-faster",
+      text: "Count of one isn't any faster: engines treat the two the same. And count distinct counts the different values, nulls left out.",
       pauseAfter: 0.6,
     },
     { id: "anti-in", text: "Nulls also break the most popular answer to the next question." },
@@ -264,6 +275,11 @@ export const script: NarrationScript = {
     {
       id: "anti-fix",
       text: "Use NOT EXISTS, or a left join where the order comes back null. Both find Di.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "anti-safe",
+      text: "That WHERE is safe: IS NULL is the one test that keeps the unmatched rows. Or keep NOT IN, and filter the nulls out of its subquery.",
       pauseAfter: 0.6,
     },
     { id: "distinct-in", text: "Now, a fix people reach for that hides a bug." },
@@ -280,14 +296,20 @@ export const script: NarrationScript = {
       text: "Three orders, joined to their items, give five rows. Too many. So someone adds DISTINCT, and the three orders look right again.",
       pauseAfter: 0.7,
     },
+    { id: "distinct-sum", text: "Now they want the total, so they write sum of distinct amount, and get one fifty." },
     {
-      id: "distinct-sum",
-      text: "But sum of distinct amount gives one fifty. Orders two and three both cost fifty, and DISTINCT kept that amount once.",
+      id: "distinct-why",
+      text: "Orders two and three both cost fifty, and DISTINCT kept that amount once.",
       pauseAfter: 0.8,
     },
     {
       id: "distinct-truth",
       text: "The real total is two hundred. Before you reach for DISTINCT, find out why the duplicates are there.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "distinct-hid",
+      text: "DISTINCT hid the join's duplicates instead of fixing them. Aggregate the items first, as in question four.",
       pauseAfter: 0.6,
     },
     { id: "cte-in", text: "And the tool that fixes most of these is naming a step." },
@@ -299,9 +321,10 @@ export const script: NarrationScript = {
       text: "Question nine. Should you use a CTE or a subquery?",
       pauseAfter: 0.6,
     },
+    { id: "cte-what", text: "Think of a CTE as a named step, written once at the top, with WITH.", pauseAfter: 0.6 },
     {
-      id: "cte-what",
-      text: "Think of a CTE as a named step, written once at the top, with WITH. Then you can use it as often as you like.",
+      id: "cte-rule",
+      text: "Use a subquery for a one-off filter. Use a CTE when you need a step twice, chain several, or walk a hierarchy, which only a recursive CTE can.",
       pauseAfter: 0.7,
     },
     {
@@ -309,6 +332,7 @@ export const script: NarrationScript = {
       text: "Question ten. What's a correlated subquery? One that reads the outer row. Take orders above their own customer's average. The subquery runs again for every order.",
       pauseAfter: 0.6,
     },
+    { id: "cte-slow", text: "On a big table, that gets slow.", pauseAfter: 0.7 },
     {
       id: "cte-result",
       text: "Ava averages eighty, Ben fifty-five, Cy fifty. Three orders beat their own customer's average.",
@@ -317,8 +341,9 @@ export const script: NarrationScript = {
     {
       id: "cte-plain",
       text: "An uncorrelated subquery runs once. Against everyone's average, about sixty-two, only two orders do.",
-      pauseAfter: 0.7,
+      pauseAfter: 0.8,
     },
+    { id: "cte-back", text: "Back to question nine." },
     {
       id: "cte-same",
       text: "And a CTE gets the same three by working out each average once, then joining. Easier to read, and easier to check.",
@@ -326,17 +351,14 @@ export const script: NarrationScript = {
     },
 
     // ── Rapid fire ────────────────────────────────────────────────────────
-    {
-      id: "rapid-in",
-      scene: true,
-      text: "That's the ten traps. Now, fourteen questions, one answer each.",
-      pauseAfter: 0.6,
-    },
+    { id: "rapid-in", scene: true, text: "That's the ten." },
+    { id: "rapid-fourteen", text: "Now, fourteen questions, one answer each.", pauseAfter: 0.6 },
     {
       id: "r-self",
       text: "A self join? A table joined to itself, like each employee and their manager, both from employees.",
     },
     { id: "r-union", text: "UNION drops duplicate rows. UNION ALL keeps every one, and it's faster." },
+    { id: "r-union-why", text: "It skips the duplicate check." },
     {
       id: "r-except",
       text: "EXCEPT returns what's in the first query but not the second. Four products expected, three received. Product three is missing.",
@@ -350,6 +372,7 @@ export const script: NarrationScript = {
       id: "r-coalesce",
       text: "Coalesce returns the first value that isn't null. Null if turns a value into null, like a zero you're about to divide by.",
     },
+    { id: "r-divide", text: "In most databases, dividing by zero is an error. Dividing by null just gives null." },
     {
       id: "r-dates",
       text: "Dates: extract a part, truncate to the month, or add an interval. The names change between databases. The ideas don't.",
@@ -358,19 +381,20 @@ export const script: NarrationScript = {
       id: "r-strings",
       text: "Strings: trim, upper and lower, substring, length, joining two together, and LIKE, where a percent sign matches anything.",
     },
-    {
-      id: "r-index",
-      text: "A clustered index sets the order rows are stored in, so a table gets one. A non-clustered index is a separate lookup, and you can have many.",
-    },
+    { id: "r-index", text: "A clustered index sets the order rows are stored in, so a table gets one.", pauseAfter: 0.4 },
+    { id: "r-index-many", text: "A non-clustered index is a separate lookup, and you can have many." },
     { id: "r-writes", text: "And every index speeds up reads but slows down writes, because each insert has to update it too." },
     {
       id: "r-rollup",
-      text: "Roll up adds subtotals and a grand total: four regions by three categories gives seventeen rows. GROUP BY ALL groups by every column you didn't aggregate.",
+      text: "Roll up adds subtotals and a grand total: twelve region and category rows, four subtotals and one total make seventeen.",
+      pauseAfter: 0.6,
     },
+    { id: "r-groupall", text: "Where it's supported, GROUP BY ALL groups by every selected column you didn't aggregate." },
     { id: "r-dupes", text: "To find duplicates, group by the column, and keep the counts over one." },
     {
       id: "r-dedupe",
-      text: "To delete them but keep one, number each copy with row number, and delete everything after the first.",
+      text: "To delete them but keep one, number the copies of each email with row number, oldest first, and delete every copy numbered over one.",
+      pauseAfter: 0.8,
     },
     {
       id: "r-cross",

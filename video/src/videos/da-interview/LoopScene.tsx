@@ -13,7 +13,8 @@ const CARD_GAP = 60;
 const CARD_Y = 360;
 const CARD_H = 330;
 
-/** A card for one part of the loop, inking in on its cue. */
+/** A card for one part of the loop, inking in on its cue. Counted "1 of 3",
+ *  never "Part 1": "Part N" is the series' videos, on the last scene. */
 const Card: React.FC<{ i: number; at: number; title: string; children: React.ReactNode }> = ({ i, at, title, children }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
@@ -36,7 +37,7 @@ const Card: React.FC<{ i: number; at: number; title: string; children: React.Rea
         transform: `translateY(${(1 - p) * 18}px)`,
       }}
     >
-      <div style={{ ...label(22, BLUE_INK), marginBottom: 18 }}>{`Part ${i + 1} of the loop`}</div>
+      <div style={{ ...label(22, BLUE_INK), marginBottom: 18 }}>{`${i + 1} of 3`}</div>
       <div style={{ ...headline(40), marginBottom: 18 }}>{title}</div>
       {children}
     </div>
@@ -84,7 +85,10 @@ export const LoopScene: React.FC = () => {
         </Card>
         <Card i={1} at={sheetAt} title="Spreadsheets and statistics">
           <div style={{ ...note(26, INK), lineHeight: 1.5 }}>a few questions each:</div>
-          <div style={{ ...note(24, INK_SOFT), lineHeight: 1.5 }}>a pivot table, a lookup, a median, a p&#8209;value</div>
+          <div style={{ ...note(24, INK_SOFT), lineHeight: 1.5 }}>
+            <div>a pivot table, a lookup,</div>
+            <div>a median, a p&#8209;value</div>
+          </div>
         </Card>
         <Card i={2} at={talkAt} title="A conversation">
           <div style={{ ...headline(34, true), color: INK, opacity: ease(frame, analyzeAt - 2, 14) }}>

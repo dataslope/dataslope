@@ -145,8 +145,11 @@ const ORDERS = [
   const t = book({ orders: ORDERS.map((r, i) => (i === 3 ? [r[0], r[1], r[2], "'150"] : r)) });
   t.set("orders", "F5", "=SUM(D2:D11)");
   t.set("orders", "F6", "=ISTEXT(D4)");
+  // ...and VALUE turns it back into the number.
+  t.set("orders", "F7", "=VALUE(D4)");
   results.figures.conditions.textTotal = t.cell("orders", "F5");
   results.figures.conditions.textCell = t.cell("orders", "F6");
+  results.figures.conditions.textValue = t.cell("orders", "F7");
 }
 
 // ── The products sheet: lookups (questions 3 to 6, and 8) ───────────────────
@@ -187,6 +190,8 @@ const TIERS = [
     ifnaMissing: '=IFNA(VLOOKUP("P-109",products!A2:C5,2,FALSE),"Unknown")',
     ifnaSpace: '=IFNA(VLOOKUP("P-102 ",products!A2:C5,2,FALSE),"Unknown")',
     ifnaBroken: '=IFNA(VLOOKUP("P-102",products!A2:C5,4,FALSE),"Unknown")',
+    // MATCH on its own: the position INDEX is handed (last, so every cell above keeps its ref).
+    matchMug: '=MATCH("Mug",products!B2:B5,0)',
   };
   const ids = Object.keys(formulas);
   ids.forEach((id, i) => b.set("calc", `A${i + 1}`, formulas[id]));
@@ -247,10 +252,14 @@ const TIERS = [
   Object.values(formulas).forEach((f, i) => b.set("calc", `A${i + 1}`, f));
   b.set("emails", "B2", "=COUNTIF($A$2:$A$5,A2)>1");
   b.fill("emails", "B2", ["B3", "B4", "B5"]);
+  // Counting only down to its own row flags the repeat and not the first copy.
+  b.set("emails", "C2", "=COUNTIF($A$2:A2,A2)>1");
+  b.fill("emails", "C2", ["C3", "C4", "C5"]);
   results.figures.text = {
     ...Object.fromEntries(Object.keys(formulas).map((id, i) => [id, b.cell("calc", `A${i + 1}`)])),
     emails,
     repeated: ["B2", "B3", "B4", "B5"].map((r) => b.cell("emails", r)),
+    later: ["C2", "C3", "C4", "C5"].map((r) => b.cell("emails", r)),
   };
 }
 

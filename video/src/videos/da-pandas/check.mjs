@@ -118,6 +118,9 @@ results.figures.loc = figure(
     northIloc: "north.iloc[0]",
     northLoc: "north.loc[0]",
     northLabel: "north.loc[2]",
+    // A slice: loc includes its end label, iloc stops before its end position.
+    locSlice: "df.loc[0:2]",
+    ilocSlice: "df.iloc[0:2]",
   },
 );
 
@@ -129,6 +132,8 @@ results.figures.filter = figure(
 })`,
   {
     frame: "df",
+    // One comparison on its own, before the two are combined.
+    gt: 'df["amount"] > 100',
     noParens: 'df[df["amount"] > 100 & df["region"] == "North"]',
     andWord: 'df[(df["amount"] > 100) and (df["region"] == "North")]',
     mask: 'mask = (df["amount"] > 100) & (df["region"] == "North")\nmask',
@@ -147,10 +152,14 @@ results.figures.groupby = figure(
 })`,
   {
     frame: "df",
+    // groupby on its own computes nothing: it is a GroupBy object.
+    object: 'type(df.groupby("region"))',
     sum: 'df.groupby("region")["amount"].sum()',
     agg: 'df.groupby("region").agg(\n    total=("amount", "sum"),\n    n=("amount", "size"),\n)',
     aggMean: 'df.groupby("region")["amount"].agg("mean")',
     transform: 'df.groupby("region")["amount"].transform("mean")',
+    // The region totals question 5 divides by.
+    transformSum: 'df.groupby("region")["amount"].transform("sum")',
     pct: 'df["pct_of_region"] = (\n    df["amount"] / df.groupby("region")["amount"].transform("sum") * 100\n)\ndf',
   },
 );
@@ -170,6 +179,8 @@ prices = pd.DataFrame({"product_id": [7, 7], "warehouse": ["A", "B"], "price": [
     feb: "feb",
     customers: "customers",
     stacked: "pd.concat([jan, feb])",
+    // Label 0 now names two orders.
+    dupLabel: "pd.concat([jan, feb]).loc[0]",
     stackedClean: "orders = pd.concat([jan, feb], ignore_index=True)\norders",
     merged: 'pd.merge(orders, customers,\n         on="customer_id", how="left")',
     stock: "stock",
@@ -219,7 +230,9 @@ results.figures.chained = figure(COPY_SETUP, {
   loc: 'mask = df["region"] == "North"\ndf.loc[mask, "amount"] = 0\ndf',
 });
 results.figures.subset = figure(COPY_SETUP, {
-  subset: 'north = df[df["region"] == "North"]\nnorth["amount"] = 0\nnorth',
+  // The page's line: a subset meant to be separate says so with .copy(),
+  // which keeps the parent unchanged in every version of pandas.
+  subset: 'north = df[df["region"] == "North"].copy()\nnorth["amount"] = 0\nnorth',
   parent: "df",
   version: "pd.__version__",
 });
@@ -282,6 +295,8 @@ long = pd.DataFrame({
 )`,
     long: "long",
     pivot: 'long.pivot(index="region", columns="category", values="amount")',
+    // pivot_table's default aggfunc is the mean.
+    pivotMean: 'long.pivot_table(index="region", columns="category", values="amount")',
     pivotTable: `long.pivot_table(
     index="region",
     columns="category",
@@ -305,11 +320,14 @@ results.figures.categorical = figure(
     after: 'int(df["region"].memory_usage(deep=True, index=False))',
   },
 );
+/** The page's sort and rank calls, on the video's own amounts: a tie at 120,
+ *  so min and dense ranking differ. */
 results.figures.sort = figure(
-  `df = pd.DataFrame({"region": ["North", "South", "East", "West"], "amount": [120, 80, 200, 50]})`,
+  `df = pd.DataFrame({"region": ["North", "South", "East", "West"], "amount": [120, 80, 200, 120]})`,
   {
     sorted: 'df.sort_values(by="amount", ascending=False)',
-    ranked: 'df["rank"] = df["amount"].rank(method="dense", ascending=False)\ndf',
+    rankMin: 'df["min"] = df["amount"].rank(method="min", ascending=False)\ndf',
+    ranked: 'df["dense"] = df["amount"].rank(method="dense", ascending=False)\ndf',
   },
 );
 results.figures.counts = figure(
@@ -355,6 +373,8 @@ results.figures.duplicates = figure(
 })`,
   {
     frame: "df",
+    // Compared on every column, no row repeats: the subset is what finds them.
+    countAll: "int(df.duplicated().sum())",
     count: 'int(df.duplicated(subset=["email"]).sum())',
     clean: 'df.drop_duplicates(subset=["email"], keep="first")',
   },
@@ -370,18 +390,26 @@ results.figures.dtypes = figure(
   },
 );
 results.figures.case = figure(`df = pd.DataFrame({"amount": [50, 120, 600, 80, 550]})`, {
+  where: 'np.where(df["amount"] >= 500, "Large", "Small")',
   sized: `conditions = [df["amount"] >= 500, df["amount"] >= 100]
 choices = ["Large", "Medium"]
 df["size"] = np.select(conditions, choices, default="Small")
 df`,
 });
-/** The video's own two rows, written to CSV in memory and read back. */
-results.figures.csv = figure(`df = pd.DataFrame({"region": ["North", "South"], "amount": [100, 80]})`, {
-  withIndex: "buf = io.StringIO(); df.to_csv(buf); buf.getvalue()",
-  readBack: "pd.read_csv(io.StringIO(buf.getvalue()))",
-  withoutIndex: "buf = io.StringIO(); df.to_csv(buf, index=False); buf.getvalue()",
-  readClean: "pd.read_csv(io.StringIO(buf.getvalue()))",
-});
+/** The video's own two rows, written to a CSV file and read back, as the
+ *  page's calls do (Pyodide has a filesystem in memory). Each write's second
+ *  line reads the file's text back for the console; the listing shows the
+ *  first. */
+results.figures.csv = figure(
+  `from pathlib import Path
+df = pd.DataFrame({"region": ["North", "South"], "amount": [100, 80]})`,
+  {
+    withIndex: 'df.to_csv("sales.csv")\nPath("sales.csv").read_text()',
+    readBack: 'pd.read_csv("sales.csv")',
+    withoutIndex: 'df.to_csv("sales.csv", index=False)\nPath("sales.csv").read_text()',
+    readClean: 'pd.read_csv("sales.csv")',
+  },
+);
 results.figures.query = figure(
   `df = pd.DataFrame({"region": ["North", "South", "North", "East"], "amount": [120, 80, 60, 200]})`,
   {
@@ -398,6 +426,8 @@ results.figures.shape = figure(
     shape: "df.shape",
     dtypes: "df.dtypes",
     memory: "int(df.memory_usage(deep=True).sum())",
+    // All three at once, with the non-null counts.
+    info: "df.info()",
   },
 );
 

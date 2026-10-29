@@ -194,7 +194,9 @@ INSERT INTO payments VALUES
   (1, '2024-01-01', 100), (2, '2024-01-02', 250), (3, '2024-01-02', 75), (4, '2024-01-03', 180);`;
 results.figures.frame = await figure(PAYMENTS, {
   table: "SELECT id, day, amount FROM payments ORDER BY id;",
-  rows: "SELECT id, day, amount,\n  SUM(amount) OVER (ORDER BY day\n    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total\nFROM payments\nORDER BY day, total;",
+  // ROWS takes peers one at a time in whatever order they come, so id breaks
+  // the tie on January 2 and the running total is the same on every run.
+  rows: "SELECT id, day, amount,\n  SUM(amount) OVER (ORDER BY day, id\n    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total\nFROM payments\nORDER BY day, id;",
   range:
     "SELECT id, day, amount,\n  SUM(amount) OVER (ORDER BY day\n    RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS total\nFROM payments\nORDER BY day, id;",
   defaulted: "SELECT id, day, amount,\n  SUM(amount) OVER (ORDER BY day) AS total\nFROM payments\nORDER BY day, id;",
@@ -206,13 +208,18 @@ results.figures.last = await figure(PAGE_TXNS, {
     "SELECT day, amount,\n  LAST_VALUE(amount) OVER (ORDER BY day) AS last\nFROM txns\nWHERE day <= DATE '2024-01-04'\nORDER BY day;",
   widened:
     "SELECT day, amount,\n  LAST_VALUE(amount) OVER (ORDER BY day\n    ROWS BETWEEN UNBOUNDED PRECEDING\n         AND UNBOUNDED FOLLOWING) AS last\nFROM txns\nWHERE day <= DATE '2024-01-04'\nORDER BY day;",
+  // FIRST_VALUE and NTH_VALUE with the same default frame: the first is right
+  // on every row, the third is null until the frame reaches row 3.
+  firstNth:
+    "SELECT day, amount,\n  FIRST_VALUE(amount) OVER (ORDER BY day) AS first,\n  NTH_VALUE(amount, 3) OVER (ORDER BY day) AS third\nFROM txns\nWHERE day <= DATE '2024-01-04'\nORDER BY day;",
 });
 
 // 9, 10. Running total and moving average: the page's block, with the moving
-//    average rounded to cents for the screen.
+//    average rounded to cents and kept a DECIMAL, so it prints at its scale
+//    ("175.00") like every other amount on screen.
 results.figures.running = await figure(PAGE_TXNS, {
   both:
-    "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg_3\nFROM txns\nORDER BY day;",
+    "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2)::DECIMAL(8,2)\n    AS moving_avg_3\nFROM txns\nORDER BY day;",
   centered:
     "SELECT day, amount,\n  ROUND(AVG(amount) OVER (ORDER BY day\n    ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING), 2) AS centered_3\nFROM txns\nORDER BY day;",
   // Rapid fire: LAG and day-over-day change, on the same days.
@@ -241,6 +248,10 @@ results.figures.spine = await figure(PAGE_SPINE_SALES, {
   without: "SELECT day, amount\nFROM sales\nWHERE day <= DATE '2024-03-05'\nORDER BY day;",
   spine:
     "WITH spine AS (\n  SELECT unnest(generate_series(DATE '2024-03-01',\n    DATE '2024-03-05', INTERVAL 1 DAY))::DATE AS day\n)\nSELECT s.day, COALESCE(x.amount, 0) AS amount\nFROM spine s\nLEFT JOIN sales x ON x.day = s.day\nORDER BY s.day;",
+  // Question 10's follow-up: a three-day average over days with gaps is a
+  // RANGE frame with an interval, not ROWS. Only its frame clause is shown.
+  rangeDays:
+    "SELECT day, amount,\n  AVG(amount) OVER (ORDER BY day\n    RANGE BETWEEN INTERVAL 2 DAY PRECEDING AND CURRENT ROW) AS avg_3_days\nFROM sales\nWHERE day <= DATE '2024-03-07'\nORDER BY day;",
 });
 
 // Rapid fire.
@@ -257,8 +268,10 @@ results.figures.ntile = await figure(PAGE_CUSTOMERS, {
 });
 results.figures.recursive = await figure(PAGE_EMP, {
   org: "WITH RECURSIVE org AS (\n  SELECT id, name, manager_id, 1 AS depth\n  FROM emp\n  WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.id, e.name, e.manager_id, o.depth + 1\n  FROM emp e\n  JOIN org o ON e.manager_id = o.id\n)\nSELECT * FROM org ORDER BY depth, id;",
+  // The figure's listing: the same CTE, counted by level, so the table beside
+  // it is this statement's own result.
   levels:
-    "WITH RECURSIVE org AS (\n  SELECT id, 1 AS depth FROM emp WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.id, o.depth + 1 FROM emp e JOIN org o ON e.manager_id = o.id\n)\nSELECT depth, COUNT(*) AS people FROM org GROUP BY depth ORDER BY depth;",
+    "WITH RECURSIVE org AS (\n  SELECT id, name, manager_id, 1 AS depth\n  FROM emp\n  WHERE manager_id IS NULL\n  UNION ALL\n  SELECT e.id, e.name, e.manager_id, o.depth + 1\n  FROM emp e\n  JOIN org o ON e.manager_id = o.id\n)\nSELECT depth, COUNT(*) AS people\nFROM org GROUP BY depth ORDER BY depth;",
 });
 results.figures.pivot = await figure(PAGE_PIVOT_SALES, {
   pivot:

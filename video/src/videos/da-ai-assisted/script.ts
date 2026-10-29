@@ -107,12 +107,16 @@ export const script: NarrationScript = {
     },
     {
       id: "check-filters",
-      text: "Read each filter against the business definition, and look for null traps.",
+      text: "Read each filter against the business definition: does revenue drop refunds and test accounts? And look for null traps, like NOT IN against a column with nulls.",
       pauseAfter: 0.6,
     },
     {
       id: "check-trust",
-      text: "Then reconcile to a total you trust, follow three raw rows through by hand, and sanity-check the range. A conversion rate over a hundred percent is a bug until proven otherwise.",
+      text: "Then reconcile to a total you trust, like the finance report, follow three raw rows through by hand, and sanity-check the range.",
+    },
+    {
+      id: "check-range",
+      text: "A conversion rate over a hundred percent is a bug until proven otherwise.",
       pauseAfter: 0.7,
     },
 
@@ -128,6 +132,7 @@ export const script: NarrationScript = {
       text: "The same ones people make, delivered with more confidence. The first is the date boundary.",
       pauseAfter: 0.5,
     },
+    { id: "mistakes-recall", text: "Remember the opening query." },
     {
       id: "mistakes-between",
       text: "The assistant filtered January as between the first and the thirty-first. On a timestamp, the thirty-first means midnight at its start, so the rest of that day is gone.",
@@ -135,17 +140,33 @@ export const script: NarrationScript = {
     },
     {
       id: "mistakes-totals",
-      text: "Its total is four oh five fifty. A half-open range, from the first of January up to but not including the first of February, gives eight forty fifty. The assistant missed more than half the month, and nothing in the query looks wrong.",
+      text: "Its total is four oh five fifty. A half-open range, from the first of January up to but not including the first of February, gives eight forty fifty.",
+    },
+    {
+      id: "mistakes-missed",
+      text: "The assistant missed more than half of January's revenue, all of it from the last day, and nothing in the query looks wrong.",
+    },
+    {
+      id: "mistakes-precision",
+      text: "Use the half-open range: it's right at any timestamp precision. Ending at one second to midnight would still lose that last second.",
       pauseAfter: 0.8,
     },
     {
       id: "mistakes-ratios",
-      text: "Next, averaging ratios. One day converts five of ten sessions, the next twenty of a thousand. Average the two rates, and you get twenty-six percent. Divide all conversions by all sessions, and it's two point five.",
+      text: "Next, averaging ratios. One day converts five of ten sessions, the next twenty of a thousand.",
+    },
+    {
+      id: "mistakes-average",
+      text: "Average the two rates, and you get twenty-six percent, because a ten-session day counts as much as a thousand-session one. Divide all conversions by all sessions, and it's two point five percent.",
       pauseAfter: 0.7,
     },
     {
       id: "mistakes-rest",
-      text: "Then fan-out, the business rules it couldn't know, and invented columns. Those fail loudly. The silent ones are the danger.",
+      text: "Then fan-out, and the business rules it couldn't know, like test accounts and internal traffic. Those run without an error too. Invented columns and wrong-dialect functions fail loudly, so they're the harmless kind.",
+    },
+    {
+      id: "mistakes-silent",
+      text: "The silent ones are the danger.",
       pauseAfter: 0.7,
     },
 
@@ -163,12 +184,20 @@ export const script: NarrationScript = {
     },
     {
       id: "hallucinate-example",
-      text: "Signups fell twelve percent because of the competitor's launch. Your query confirms the twelve percent. The because is a guess.",
+      text: "Signups fell twelve percent because of the competitor's launch. Your query confirms the twelve percent.",
+    },
+    {
+      id: "hallucinate-guess",
+      text: "The because is a guess until you check it: did the drop start with the launch, and is it in the segments the competitor reached?",
       pauseAfter: 0.6,
     },
     {
       id: "hallucinate-rule",
-      text: "So make it a rule: every number and every claim traces to a query or a cell you can point to. Let the model draft words around numbers you computed, and cut any cause you haven't tested.",
+      text: "So make it a rule: every number and every claim traces to a query or a cell you can point to.",
+    },
+    {
+      id: "hallucinate-draft",
+      text: "Let the model draft words around numbers you computed, and never let it compute them itself. Cut any cause you haven't tested.",
       pauseAfter: 0.7,
     },
 
@@ -196,7 +225,11 @@ export const script: NarrationScript = {
     },
     {
       id: "takehome-answer",
-      text: "Be specific, and own the result. Say what you used it for, like boilerplate SQL, a regular expression, or chart code. Say what you didn't, like the metric definitions and the conclusions. And say how you checked it.",
+      text: "Be specific, and own the result. Say what you used it for, like boilerplate SQL, a regular expression, or chart code. Say what you didn't, like the metric definitions and the conclusions.",
+    },
+    {
+      id: "takehome-checked",
+      text: "And say how you checked it, like reconciling the total and tracing three rows by hand.",
       pauseAfter: 0.6,
     },
     {
@@ -218,12 +251,18 @@ export const script: NarrationScript = {
     },
     {
       id: "r-bi",
-      text: "AI in BI tools lets anyone ask a question in plain words, but it only answers correctly on top of defined metrics and clean, documented tables. So the analyst's job moves to building and checking those.",
+      text: "AI in BI tools lets anyone ask a question in plain words, but it only answers correctly on top of defined metrics, clean and documented tables, and a semantic model that says how they join. Pointed at messy raw tables, it's confidently wrong at scale.",
     },
+    { id: "r-bi-job", text: "So the analyst's job moves to building and checking those." },
     {
       id: "r-llm",
-      text: "And to sort five thousand survey answers with an LLM, a large language model: fix the categories first, hand-label a hundred or two to measure it, keep the settings the same for every batch, and quote real answers, not its paraphrases.",
+      text: "And to sort five thousand survey answers with an LLM, a large language model: fix the categories first, hand-label a hundred or two to measure it, keep the settings the same for every batch, rerun a sample to confirm the labels repeat, and quote real answers, not its paraphrases.",
       pauseAfter: 0.9,
+    },
+    {
+      id: "close-two",
+      text: "Whoever wrote the query, the interview asks the same two things: what one row means, and how you know the number is right.",
+      pauseAfter: 0.7,
     },
     {
       id: "close",

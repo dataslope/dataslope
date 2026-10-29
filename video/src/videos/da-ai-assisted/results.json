@@ -70,7 +70,7 @@
           ]
         },
         "page": {
-          "sql": "SELECT\n  SUM(amount) FILTER (\n    WHERE order_ts BETWEEN '2026-01-01' AND '2026-01-31'\n  ) AS assistant_total,\n  SUM(amount) FILTER (\n    WHERE order_ts >= '2026-01-01' AND order_ts < '2026-02-01'\n  ) AS half_open_total\nFROM orders\nWHERE status = 'completed';",
+          "sql": "SELECT\n  SUM(amount) FILTER (\n    WHERE order_ts\n      BETWEEN '2026-01-01' AND '2026-01-31'\n  ) AS assistant_total,\n  SUM(amount) FILTER (\n    WHERE order_ts >= '2026-01-01'\n      AND order_ts < '2026-02-01'\n  ) AS half_open_total\nFROM orders\nWHERE status = 'completed';",
           "ok": true,
           "columns": [
             "assistant_total",
@@ -216,6 +216,22 @@
               "2026-01-31 00:00:00"
             ]
           ]
+        },
+        "lastSecond": {
+          "sql": "SELECT\n  CAST(t AS VARCHAR) AS order_ts,\n  t BETWEEN '2026-01-01' AND '2026-01-31 23:59:59' AS to_last_second,\n  t >= '2026-01-01' AND t < '2026-02-01' AS half_open\nFROM (SELECT TIMESTAMP '2026-01-31 23:59:59.5' AS t);",
+          "ok": true,
+          "columns": [
+            "order_ts",
+            "to_last_second",
+            "half_open"
+          ],
+          "rows": [
+            [
+              "2026-01-31 23:59:59.5",
+              false,
+              true
+            ]
+          ]
         }
       },
       "version": "v1.4.3"
@@ -248,10 +264,10 @@
           ]
         },
         "averaged": {
-          "sql": "SELECT ROUND(AVG(100.0 * conversions / sessions), 1) AS avg_of_rates\nFROM daily;",
+          "sql": "SELECT ROUND(AVG(100.0 * conversions / sessions), 1)\n  AS avg_of_rates_pct\nFROM daily;",
           "ok": true,
           "columns": [
-            "avg_of_rates"
+            "avg_of_rates_pct"
           ],
           "rows": [
             [
@@ -260,14 +276,44 @@
           ]
         },
         "pooled": {
-          "sql": "SELECT ROUND(100.0 * SUM(conversions) / SUM(sessions), 1) AS overall_rate\nFROM daily;",
+          "sql": "SELECT ROUND(100.0 * SUM(conversions) / SUM(sessions), 1)\n  AS overall_rate_pct\nFROM daily;",
           "ok": true,
           "columns": [
-            "overall_rate"
+            "overall_rate_pct"
           ],
           "rows": [
             [
               2.5
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "nulls": {
+      "setup": "CREATE TABLE customers (customer_id INTEGER);\nINSERT INTO customers VALUES (1), (2), (3);\nCREATE TABLE orders (customer_id INTEGER);\nINSERT INTO orders VALUES (1), (NULL);",
+      "steps": {
+        "notIn": {
+          "sql": "SELECT COUNT(*) AS never_ordered\nFROM customers\nWHERE customer_id NOT IN (SELECT customer_id FROM orders);",
+          "ok": true,
+          "columns": [
+            "never_ordered"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "withoutNull": {
+          "sql": "SELECT COUNT(*) AS never_ordered\nFROM customers\nWHERE customer_id NOT IN (\n  SELECT customer_id FROM orders WHERE customer_id IS NOT NULL\n);",
+          "ok": true,
+          "columns": [
+            "never_ordered"
+          ],
+          "rows": [
+            [
+              2
             ]
           ]
         }

@@ -51,6 +51,29 @@ const refused = (figure: string, id: string) => {
   return { lines: s.sql.split("\n"), kind, message: rest.join(": ") };
 };
 
+/**
+ * A result whose columns DuckDB named for itself ("count_star()",
+ * "avg(discount)"), headed instead with each expression as the listing above
+ * it writes it ("COUNT(*)"): the SELECT list, split at its top-level commas.
+ */
+const asWritten = <T extends { lines: string[]; cols: string[] }>(q: T): T => {
+  const list = q.lines.join(" ").replace(/^SELECT\s+/, "").split(/\s+FROM\s/)[0];
+  const exprs: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const ch of list) {
+    if (ch === "(") depth++;
+    if (ch === ")") depth--;
+    if (ch === "," && depth === 0) {
+      exprs.push(current.trim());
+      current = "";
+    } else current += ch;
+  }
+  exprs.push(current.trim());
+  if (exprs.length !== q.cols.length) throw new Error(`cannot head ${q.cols.join(", ")} with ${exprs.join(", ")}`);
+  return { ...q, cols: exprs.map((e) => e.replace(/\s+/g, " ")) };
+};
+
 /** The one value of a one-row, one-column result. */
 const scalar = (figure: string, id: string) => table(figure, id).rows[0][0];
 
@@ -63,7 +86,7 @@ export const WHERE = {
   totals: table("where", "totals"),
   aggregate: refused("where", "whereAggregate"),
   having: query("where", "having"),
-  /** Rows of 100 or more: the count WHERE keeps. */
+  /** Rows over 100: the count WHERE keeps. */
   bigRows: Number(scalar("where", "bigRows")),
   bigGroups: table("where", "bigGroups"),
   both: query("where", "both"),
@@ -101,9 +124,12 @@ export const FANOUT = {
 
 export const NULLS = {
   orders: table("nulls", "table"),
-  equals: query("nulls", "equalsNull"),
-  isNull: query("nulls", "isNull"),
-  counts: query("nulls", "counts"),
+  /** The rows each test finds: none for = NULL, both nulls for IS NULL. */
+  equals: query("nulls", "equalsRows"),
+  isNull: query("nulls", "isNullRows"),
+  /** Question 5's aggregates, then Question 6's three COUNTs. */
+  averages: asWritten(query("nulls", "averages")),
+  counts: asWritten(query("nulls", "countRows")),
 };
 
 // ── 7. The anti-join ────────────────────────────────────────────────────────
@@ -160,13 +186,16 @@ export const RAPID = {
   emailIndex: table("rapid", "emailIndex"),
   duplicates: query("rapid", "duplicates"),
   rowNumbers: table("rapid", "rowNumbers"),
-  dedupe: query("rapid", "dedupe"),
+  /** DuckDB heads a DELETE's result "Count"; it is the rows deleted. */
+  dedupe: { ...query("rapid", "dedupe"), cols: ["rows deleted"] },
   afterDedupe: table("rapid", "afterDedupe"),
   products: table("rapid", "products"),
   regions: table("rapid", "regions"),
   cross: Number(scalar("rapid", "crossJoin")),
   crossThousand: Number(scalar("rapid", "crossJoinThousand")),
   rollup: query("rollup", "rollup"),
+  /** DuckDB without NULLIF: a zero divisor gives null, not an error. */
+  divideByZero: table("rapid", "divideByZero"),
   groupByAll: query("rollup", "groupByAll"),
 };
 

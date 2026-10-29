@@ -126,7 +126,11 @@ export const script: NarrationScript = {
     },
     {
       id: "funnel-steps",
-      text: "A funnel is the ordered steps a user takes, from landing page to purchase. Overall conversion is the share who make it to the end: here, about nine percent. Per-step conversion shows where the rest drop off.",
+      text: "A funnel is the ordered steps a user takes, from landing page to purchase. Overall conversion is the share who make it to the end: here, about nine percent.",
+    },
+    {
+      id: "funnel-step",
+      text: "Per-step conversion shows where the rest drop off.",
       pauseAfter: 0.7,
     },
     {
@@ -155,12 +159,24 @@ export const script: NarrationScript = {
     },
     {
       id: "abtest-balance",
-      text: "Let users pick their own group, and all ten of these traits differ between the arms. Flip a coin, and only one edges over the line, barely.",
+      text: "Let users pick their own group, and all ten of these traits differ between the arms.",
+    },
+    {
+      id: "abtest-coin",
+      text: "Flip a coin, and only one edges over the line, barely.",
       pauseAfter: 0.8,
     },
     {
       id: "pvalue",
-      text: "Question seven. What is a p-value, at an analyst's level? It's how likely a result at least this extreme would be, if there were really no difference. In the course's test, five hundred seventy-nine of six thousand convert in A, and seven hundred two in B. If the change did nothing, a gap that big would turn up about three times in ten thousand.",
+      text: "Question seven. What is a p-value, at an analyst's level? It's how likely a result at least this extreme would be, if there were really no difference.",
+    },
+    {
+      id: "pvalue-test",
+      text: "In the course's test, five hundred seventy-nine of six thousand convert in A, and seven hundred two in B.",
+    },
+    {
+      id: "pvalue-gap",
+      text: "If the change did nothing, a gap that big would turn up about three times in ten thousand.",
       pauseAfter: 0.7,
     },
     {
@@ -189,7 +205,15 @@ export const script: NarrationScript = {
     },
     {
       id: "ci-margin",
-      text: "The range is the estimate, plus or minus one point nine six standard errors. Ninety-five percent means that if we ran the test many times, about ninety-five intervals in a hundred would contain the true value. In this run of a hundred, four miss. And a wide interval means we need more data.",
+      text: "The range is the estimate, plus or minus one point nine six standard errors.",
+    },
+    {
+      id: "ci-cover",
+      text: "Ninety-five percent means that if we ran the test many times, about ninety-five intervals in a hundred would contain the true value. In this run of a hundred, four miss.",
+    },
+    {
+      id: "ci-wide",
+      text: "And a wide interval means we need more data.",
       pauseAfter: 0.7,
     },
     { id: "power-in", text: "How much data is the next question." },
@@ -213,7 +237,15 @@ export const script: NarrationScript = {
     },
     {
       id: "errors",
-      text: "Question eleven. What are Type one and Type two errors? A Type one error is a false positive: declaring a winner when there's no effect. Its rate is alpha, usually five percent. A Type two error is a false negative: missing an effect that's really there. Its rate is beta.",
+      text: "Question eleven. What are Type one and Type two errors? A Type one error is a false positive: declaring a winner when there's no effect.",
+    },
+    {
+      id: "errors-alpha",
+      text: "Its rate is alpha, usually five percent.",
+    },
+    {
+      id: "errors-beta",
+      text: "A Type two error is a false negative: missing an effect that's really there. Its rate is beta.",
       pauseAfter: 0.7,
     },
     {
@@ -256,7 +288,11 @@ export const script: NarrationScript = {
     },
     {
       id: "simpson-why",
-      text: "A was given mostly to large stones, the hard cases. So segment before you conclude.",
+      text: "A was given mostly to large stones, the hard cases.",
+    },
+    {
+      id: "simpson-segment",
+      text: "So segment before you conclude.",
       pauseAfter: 0.8,
     },
     {

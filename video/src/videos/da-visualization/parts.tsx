@@ -23,7 +23,7 @@ export { at, Bracket, mulberry32, type Scale, VLine } from "../da-statistics-com
 /** Categories, in the brand's non-semantic hues: blue, then the accents. */
 export const CATS = [...categorical, ds("blue", 300), ds("teal", 300), ds("purple", 300), ds("orange", 300)];
 
-const tickText = (size = 18): React.CSSProperties => ({
+const tickText = (size = 19): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: size,
   fontWeight: 500,
@@ -77,7 +77,7 @@ export const BarSet: React.FC<BarSetProps> = ({
   step = 2,
   color = BAR,
   fill = 0.68,
-  labelSize = 18,
+  labelSize = 19,
   out,
   dim,
   edge = false,
@@ -133,7 +133,7 @@ export const LineSet: React.FC<{
   dim?: number;
   /** Draw the line in bands rather than at band centres (a time axis). */
   edges?: boolean;
-}> = ({ values, x0, x1, base, top, lo, hi, at: from, dur = 20, color = BAR, width = 3.2, dots = true, labels, labelSize = 18, axis = true, out, dim, edges = false }) => {
+}> = ({ values, x0, x1, base, top, lo, hi, at: from, dur = 20, color = BAR, width = 3.2, dots = true, labels, labelSize = 19, axis = true, out, dim, edges = false }) => {
   const frame = useCurrentFrame();
   const o = out === undefined ? 0 : ease(frame, out, 10);
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
@@ -200,7 +200,7 @@ export const YTicks: React.FC<{
         return (
           <g key={t}>
             {grid && x1 !== undefined ? <line x1={x} x2={x1} y1={y} y2={y} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} /> : null}
-            <text x={side === "left" ? x - 10 : x + 10} y={y + 6} textAnchor={side === "left" ? "end" : "start"} style={{ ...tickText(17), fill: color }}>
+            <text x={side === "left" ? x - 10 : x + 10} y={y + 6} textAnchor={side === "left" ? "end" : "start"} style={{ ...tickText(19), fill: color }}>
               {format(t)}
             </text>
           </g>
@@ -224,7 +224,7 @@ export const XTicks: React.FC<{
   size?: number;
   /** A pulse (0 to 1) that lifts the numbers, when the narration points at them. */
   lift?: number;
-}> = ({ ticks, x0, x1, lo, hi, y, at: from, out, format = String, size = 18, lift = 0 }) => {
+}> = ({ ticks, x0, x1, lo, hi, y, at: from, out, format = String, size = 19, lift = 0 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -257,7 +257,7 @@ export const Pie: React.FC<{
   out?: number;
   labels?: readonly string[];
   labelSize?: number;
-}> = ({ values, cx, cy, r, at: from, colors = CATS, out, labels, labelSize = 17 }) => {
+}> = ({ values, cx, cy, r, at: from, colors = CATS, out, labels, labelSize = 19 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 22);
   const o = out === undefined ? 0 : ease(frame, out, 10);

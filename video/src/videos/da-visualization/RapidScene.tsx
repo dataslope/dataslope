@@ -110,7 +110,7 @@ const ThreeD: React.FC<{ c: Ctx }> = ({ c }) => {
                 return (
                   <g key={v} opacity={p}>
                     <circle cx={cx[i]} cy={row.cy} r={row.r(v) * p} fill={lit ? BAR : ds("blue", 200)} />
-                    <text x={cx[i]} y={row.cy + row.r(5) + 28} textAnchor="middle" style={{ ...label(18, INK_SOFT), ...TABULAR }} fill={INK_SOFT}>
+                    <text x={cx[i]} y={row.cy + row.r(5) + 28} textAnchor="middle" style={{ ...label(19, INK_SOFT), ...TABULAR }} fill={INK_SOFT}>
                       {v}
                     </text>
                   </g>
@@ -174,15 +174,15 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
         <g opacity={legend}>
           <rect x={x1 - 118} y={top - 28} width={110} height={36} fill={PAPER} stroke={INK_SOFT} strokeWidth={1.4} />
           <rect x={x1 - 106} y={top - 18} width={16} height={16} fill={BAR} />
-          <text x={x1 - 82} y={top - 4} style={{ ...label(17, INK) }} fill={INK}>
+          <text x={x1 - 82} y={top - 4} style={{ ...label(19, INK) }} fill={INK}>
             Visits
           </text>
         </g>
       </Svg>
-      <BarSet values={values} labels={days} x0={x0} x1={x1} base={base} top={top} lo={0} hi={hi} at={at0} step={1} labelSize={17} />
+      <BarSet values={values} labels={days} x0={x0} x1={x1} base={base} top={top} lo={0} hi={hi} at={at0} step={1} />
       <Svg opacity={ease(frame, losesAt, 12)}>
         {values.map((v, i) => (
-          <text key={i} x={bandMid(i, values.length, x0, x1)} y={yOf(v) - 10} textAnchor="middle" style={{ ...label(17, BLUE_INK), ...TABULAR }} fill={BLUE_INK}>
+          <text key={i} x={bandMid(i, values.length, x0, x1)} y={yOf(v) - 10} textAnchor="middle" style={{ ...label(19, BLUE_INK), ...TABULAR }} fill={BLUE_INK}>
             {v}
           </text>
         ))}
@@ -370,7 +370,7 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
           })}
         </g>
         {["Jan", "Dec"].map((m, i) => (
-          <text key={m} x={i ? x1 : x0} y={base + 26} textAnchor={i ? "end" : "start"} style={{ ...label(17, INK_SOFT) }} fill={INK_SOFT} opacity={reveal}>
+          <text key={m} x={i ? x1 : x0} y={base + 26} textAnchor={i ? "end" : "start"} style={{ ...label(19, INK_SOFT) }} fill={INK_SOFT} opacity={reveal}>
             {m}
           </text>
         ))}
@@ -379,7 +379,7 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
         const mid = ((k ? cum[k - 1][n - 1] : 0) + cum[k][n - 1]) / 2;
         return (
           <Note key={ch.key} at={stackAt + 10 + k * 2} x={x1 + 12} y={yOf(mid, n - 1) - 13}>
-            <span style={{ ...label(18, k === web ? INK : INK_SOFT), whiteSpace: "nowrap", fontWeight: k === web ? 650 : 500 }}>{ch.key}</span>
+            <span style={{ ...label(19, k === web ? INK : INK_SOFT), whiteSpace: "nowrap", fontWeight: k === web ? 650 : 500 }}>{ch.key}</span>
           </Note>
         );
       })}
@@ -402,7 +402,6 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
         dots={false}
         width={3.6}
         labels={channels[web].values.map((_, i) => (i === 0 ? "Jan" : i === n - 1 ? "Dec" : ""))}
-        labelSize={17}
         edges
       />
       <Note at={ownAt + 4} x={L.x0} y={top - c.h(56)}>

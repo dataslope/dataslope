@@ -13,6 +13,7 @@ import {
   ErrorBox,
   Listing,
   listingHeight,
+  Mark,
   MARK_BAD,
   Mono,
   TableName,
@@ -30,7 +31,7 @@ const TABLE_Y = 470;
  * Question 1, WHERE against HAVING, on the page's 24 orders: the two
  * definitions, the region totals as the groups HAVING filters, the sum put
  * in WHERE and DuckDB's refusal, then the same filter in HAVING and the two
- * regions it keeps.
+ * regions it keeps, and why row filters still belong in WHERE.
  */
 export const WhereScene: React.FC = () => {
   const n = useNarration();
@@ -48,7 +49,9 @@ export const WhereScene: React.FC = () => {
   const whyAt = n.word("where-why", "doesn't exist");
   const moveAt = n.word("where-fix", "Move");
   const twoAt = n.word("where-fix", "two regions");
-  const end = n.beat("where-fix").to;
+  const keepAt = n.word("where-keep", "Keep row filters");
+  const shrinkAt = n.word("where-keep", "shrink the table");
+  const end = n.beat("where-keep").to;
 
   const cols = [{ name: "region" }, { name: "revenue", numeric: true }];
   const g = tableGeometry({ x: TABLE_X, top: y(TABLE_Y), cols, rows: WHERE.totals.rows, headH: h(52), rowH: h(60) });
@@ -57,6 +60,7 @@ export const WhereScene: React.FC = () => {
   const listH = listingHeight(WHERE.aggregate.lines.length, SIZE);
   const whereLine = WHERE.aggregate.lines.findIndex((l) => l.startsWith("WHERE"));
   const havingLine = WHERE.having.lines.findIndex((l) => l.startsWith("HAVING"));
+  const havingH = listingHeight(WHERE.having.lines.length, SIZE);
 
   return (
     <AbsoluteFill>
@@ -138,6 +142,11 @@ export const WhereScene: React.FC = () => {
           at={moveAt + 2}
           marks={[{ line: havingLine, at: moveAt + 12 }]}
         />
+        <Note at={keepAt - 2} x={X0} y={y(LIST_Y) + havingH + 30}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+            Row filters still go in <Mono>WHERE</Mono>: <Mark at={shrinkAt}>fewer rows to group</Mark>.
+          </span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

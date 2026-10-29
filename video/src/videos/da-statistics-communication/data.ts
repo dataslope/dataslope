@@ -133,6 +133,8 @@ export const BIAS = {
   stayed: num("bias", "activeMean"),
   churned: num("bias", "churnedShare"),
   surveys: json<Record<string, number[]>>("bias", "surveys"),
+  /** Forty satisfaction scores from each side: who churned, who stayed. */
+  strips: json<{ churned: number[]; stayed: number[] }>("bias", "strips"),
 };
 
 /** Question 5: two weeks of sessions and orders (the video's own). */
@@ -143,6 +145,10 @@ export const METRIC = {
   lift: num("metric", "lift"),
   orders: num("metric", "ordersChange"),
   sessions: num("metric", "sessionsChange"),
+  /** The conversion change in percentage points. */
+  points: num("metric", "points"),
+  /** What left between the weeks: [sessions, orders, their conversion in percent]. */
+  lost: json<[number, number, number]>("metric", "lost"),
 };
 
 /** Questions 6 and 7: the page's thirteen amounts. */
@@ -167,6 +173,9 @@ export const AMOUNTS = (() => {
     zOver2: json<number[]>("outliers", "zOver2"),
     zOver3: json<number[]>("outliers", "zOver3"),
     p90: num("outliers", "p90"),
+    /** Where pandas puts the 90th percentile: a position in the sorted
+     *  amounts, the two values it falls between, and how far along, in %. */
+    p90at: json<{ position: number; between: [number, number]; percent: number }>("outliers", "p90at"),
   };
 })();
 
@@ -177,12 +186,21 @@ export const RAPID = {
     deviations: json<number[]>("variance", "deviations"),
     var: num("variance", "var"),
     std: num("variance", "std"),
+    squares: json<number[]>("variance", "squares"),
+    sumSquares: num("variance", "sumSquares"),
+    /** Divided by n, the average itself; `var` is pandas' n - 1. */
+    varPop: num("variance", "varPop"),
+    n: num("variance", "n"),
   },
   mode: { counts: series("mode", "counts"), mode: json<string[]>("mode", "mode")[0] },
-  normal: { within: json<[number, number, number]>("normal", "within"), draws: 100_000 },
+  /** The exact shares within one, two and three standard deviations, in %. */
+  normal: { within: json<[number, number, number]>("normal", "within") },
   population: {
     mean: num("population", "mean"),
+    /** Twenty samples' means. */
     samples: json<number[]>("population", "samples"),
+    /** The lowest and highest of them. */
+    range: json<[number, number]>("population", "range"),
     size: 50,
     count: 10_000,
   },

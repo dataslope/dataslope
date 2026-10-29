@@ -27,7 +27,7 @@ type Figures = {
     grid: Cell[][];
     countGrid: Cell[][];
   };
-  conditions: Record<"sumif" | "sumifs" | "countifs" | "averageif" | "total" | "textTotal" | "textCell", Cell> & {
+  conditions: Record<"sumif" | "sumifs" | "countifs" | "averageif" | "total" | "textTotal" | "textCell" | "textValue", Cell> & {
     over150: Cell[];
   };
   lookups: Record<string, Cell> & {
@@ -40,6 +40,8 @@ type Figures = {
   text: Record<"clean" | "username" | "join" | "serial" | "days" | "datevalue", Cell> & {
     emails: string[];
     repeated: Cell[];
+    /** COUNTIF($A$2:A2,A2)>1 filled down: only a later copy flags. */
+    later: Cell[];
   };
 };
 const F = results.figures as unknown as Figures;

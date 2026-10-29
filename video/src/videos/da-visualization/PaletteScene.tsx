@@ -223,7 +223,7 @@ export const PaletteScene: React.FC = () => {
                         x={x + (i + 0.5) * cellW}
                         y={stripTop + stripH + 30}
                         textAnchor="middle"
-                        style={{ ...label(18, INK_SOFT) }}
+                        style={{ ...label(19, INK_SOFT) }}
                         fill={INK_SOFT}
                         opacity={ease(frame, at + 6 + i * 2, 10)}
                       >
@@ -239,7 +239,7 @@ export const PaletteScene: React.FC = () => {
                           x={x + [cellW / 2, STRIP_W / 2, STRIP_W - cellW / 2][i]}
                           y={stripTop + stripH + 30}
                           textAnchor="middle"
-                          style={{ ...label(18, INK_SOFT) }}
+                          style={{ ...label(19, INK_SOFT) }}
                           fill={INK_SOFT}
                           opacity={ease(frame, (k === 1 ? darkAt : at) + 6, 10)}
                         >
@@ -370,7 +370,7 @@ export const PaletteScene: React.FC = () => {
           return (
             <React.Fragment key={c.key}>
               <LineSet values={c.values} x0={x0} x1={x0 + SMALL.w} base={base} top={top + h(26)} lo={0} hi={100} at={at} dots={false} width={2.4} out={out16} edges />
-              <div style={{ position: "absolute", left: x0, top, ...label(17, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, at + 2, 10) * (1 - ease(frame, out16, 10)) }}>
+              <div style={{ position: "absolute", left: x0, top, ...label(19, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, at + 2, 10) * (1 - ease(frame, out16, 10)) }}>
                 {c.key}
               </div>
             </React.Fragment>

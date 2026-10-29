@@ -98,7 +98,8 @@ INSERT INTO orders VALUES
 const results = { figures: {} };
 
 // 1. WHERE against HAVING, and the order a query runs in. The thresholds
-//    (amount >= 100, revenue > 400 and > 600) are the video's own.
+//    (amount > 100, revenue > 400 and > 600) are the video's own. No amount
+//    is exactly 100.00, so "over a hundred dollars" is the 11 that > keeps.
 results.figures.where = await figure(PAGE_ORDERS, {
   rows: "SELECT COUNT(*) AS n FROM orders;",
   // The 24 rows in the page's order, for the figure that runs them through.
@@ -106,11 +107,11 @@ results.figures.where = await figure(PAGE_ORDERS, {
   totals: "SELECT region, SUM(amount) AS revenue FROM orders GROUP BY region ORDER BY revenue DESC;",
   whereAggregate: "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE SUM(amount) > 600\nGROUP BY region;",
   having: "SELECT region, SUM(amount) AS revenue\nFROM orders\nGROUP BY region\nHAVING SUM(amount) > 600\nORDER BY revenue DESC;",
-  bigRows: "SELECT COUNT(*) AS n FROM orders WHERE amount >= 100;",
+  bigRows: "SELECT COUNT(*) AS n FROM orders WHERE amount > 100;",
   bigGroups:
-    "SELECT region, COUNT(*) AS orders, SUM(amount) AS revenue FROM orders WHERE amount >= 100 GROUP BY region ORDER BY revenue DESC;",
+    "SELECT region, COUNT(*) AS orders, SUM(amount) AS revenue FROM orders WHERE amount > 100 GROUP BY region ORDER BY revenue DESC;",
   both:
-    "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE amount >= 100\nGROUP BY region\nHAVING SUM(amount) > 400\nORDER BY revenue DESC\nLIMIT 10;",
+    "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE amount > 100\nGROUP BY region\nHAVING SUM(amount) > 400\nORDER BY revenue DESC\nLIMIT 10;",
   // Not shown: DuckDB lets WHERE see a plain SELECT alias, which standard
   // SQL and Postgres refuse. An aggregate's alias still fails (as above).
   plainAlias: "SELECT region, amount * 2 AS doubled FROM orders WHERE doubled > 400 ORDER BY doubled DESC;",
@@ -165,6 +166,15 @@ results.figures.nulls = await figure(NULLS_SETUP, {
   nullEqualsNull: "SELECT NULL = NULL AS same;",
   counts:
     "SELECT COUNT(*), COUNT(1), COUNT(discount),\n       AVG(discount),\n       AVG(COALESCE(discount, 0))\nFROM orders;",
+  // What the video shows: the rows each test finds (Question 5), the two
+  // averages (Question 5's aggregates), then the three COUNTs (Question 6).
+  equalsRows: "SELECT id FROM orders\nWHERE discount = NULL;",
+  isNullRows: "SELECT id FROM orders\nWHERE discount IS NULL;",
+  averages: "SELECT AVG(discount),\n       AVG(COALESCE(discount, 0))\nFROM orders;",
+  countRows: "SELECT COUNT(*), COUNT(1), COUNT(discount)\nFROM orders;",
+  // Not shown, said: COUNT(DISTINCT col) counts the different values, nulls
+  // left out (10, 5, 0, 15: 4).
+  countDistinct: "SELECT COUNT(DISTINCT discount) AS n FROM orders;",
 });
 
 // 5. The anti-join, and NOT IN against a NULL. Order 107, a guest checkout

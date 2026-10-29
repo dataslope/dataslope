@@ -1,0 +1,48 @@
+{
+  "bank": 110,
+  "topicPages": 8,
+  "conceptCheckPages": 8,
+  "challengePages": 4,
+  "pages": [
+    {
+      "page": "ab-testing-and-metrics",
+      "conceptChecks": 3,
+      "challenges": 1
+    },
+    {
+      "page": "advanced-sql",
+      "conceptChecks": 3,
+      "challenges": 2
+    },
+    {
+      "page": "ai-assisted-analysis",
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "data-visualization",
+      "conceptChecks": 5,
+      "challenges": 0
+    },
+    {
+      "page": "excel-and-spreadsheets",
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "pandas",
+      "conceptChecks": 1,
+      "challenges": 1
+    },
+    {
+      "page": "sql",
+      "conceptChecks": 2,
+      "challenges": 2
+    },
+    {
+      "page": "statistics-and-communication",
+      "conceptChecks": 2,
+      "challenges": 0
+    }
+  ]
+}

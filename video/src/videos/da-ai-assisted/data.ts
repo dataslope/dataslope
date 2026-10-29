@@ -49,7 +49,8 @@ const scalar = (figure: string, id: string) => table(figure, id).rows[0][0];
 export const BOUNDARY = {
   /** The page's nine orders, each with whether each filter keeps it. */
   kept: table("boundary", "kept"),
-  /** The page's query, verbatim, and its two totals. */
+  /** The page's query (each WHERE broken after its column, to fit the
+   *  panel), and its two totals. */
   page: query("boundary", "page"),
   /** The assistant's query alone, as the page's concept check describes it. */
   assistant: query("boundary", "assistant"),
@@ -58,6 +59,9 @@ export const BOUNDARY = {
   missed: Number(scalar("boundary", "missed")),
   /** '2026-01-31' as a timestamp: the start of the day. */
   cutoff: scalar("boundary", "cutoff"),
+  /** An order half a second into January's last second: an end one second
+   *  before midnight drops it ("false"), the half-open range keeps it. */
+  lastSecond: table("boundary", "lastSecond"),
 };
 
 export const RATIOS = {
@@ -65,6 +69,13 @@ export const RATIOS = {
   days: query("ratios", "table"),
   averaged: query("ratios", "averaged"),
   pooled: query("ratios", "pooled"),
+};
+
+/** Question 2's NULL trap: NOT IN against a column holding a NULL keeps no
+ *  row (0), where the same list without the NULL keeps two. */
+export const NULLS = {
+  notIn: Number(scalar("nulls", "notIn")),
+  withoutNull: Number(scalar("nulls", "withoutNull")),
 };
 
 /** The track's question bank, counted by check.mjs. */

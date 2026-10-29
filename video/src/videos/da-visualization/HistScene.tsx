@@ -28,7 +28,7 @@ const P_TOP = 440;
  * whose bars stand apart and can be put in any order (they arrive
  * alphabetical and are sorted on "sort them"), and as a histogram of hours
  * to resolve, whose bars touch along a number line. Then one bimodal sample
- * in the page's three bin widths, on a shared density axis.
+ * in the page's three bin widths, drawn as density so their heights compare.
  */
 export const HistScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -52,13 +52,15 @@ export const HistScene: React.FC = () => {
   const tryAt = n.word("bins", "Try several");
   const fiveAt = n.word("bins", "Bins five wide");
   const fuseAt = n.word("bins", "fuse two peaks");
-  const quarterAt = n.word("bins", "a quarter wide");
-  const spikesAt = n.word("bins", "into spikes");
-  const oneAt = n.word("bins", "At one");
-  const clearAt = n.word("bins", "both peaks are clear");
+  const quarterAt = n.word("bins-narrow", "a quarter wide");
+  const spikesAt = n.word("bins-narrow", "add spikes");
+  const noiseAt = n.word("bins-narrow", "only noise");
+  const oneAt = n.word("bins-one", "At one");
+  const clearAt = n.word("bins-one", "both peaks are clear");
   const rulesAt = n.word("bins-rule", "Rules of thumb");
   const startAt = n.word("bins-rule", "a place to start");
-  const reportAt = n.word("bins-rule", "Report the shape");
+  const reportAt = n.word("bins-report", "Report the shape");
+  const widthsAt = n.word("bins-report", "across sensible widths");
   // The bridge: the takeaway marked, the two wrong widths dimmed.
   const bridgeAt = n.beat("axis-in").from;
   const liesAt = n.word("axis-in", "a chart lies");
@@ -125,7 +127,7 @@ export const HistScene: React.FC = () => {
                   <text x={x + bw / 2} y={base + 26} textAnchor="middle" style={{ ...label(19, INK), fill: INK }}>
                     {c.key}
                   </text>
-                  <text x={x + bw / 2} y={yy - 10} textAnchor="middle" style={{ ...label(18, INK_SOFT), fill: INK_SOFT, ...TABULAR }} opacity={g}>
+                  <text x={x + bw / 2} y={yy - 10} textAnchor="middle" style={{ ...label(19, INK_SOFT), fill: INK_SOFT, ...TABULAR }} opacity={g}>
                     {c.count}
                   </text>
                 </g>
@@ -154,11 +156,9 @@ export const HistScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the order is the number line&apos;s, not yours</span>
         </Note>
 
-        {/* ── Question 5: one sample, three bin widths, one density axis ── */}
+        {/* ── Question 5: one sample, three bin widths ── */}
         <Note at={tryAt} x={PANELS[0].x0} y={y(P_TOP) - h(118)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            the same {BINS.n.toLocaleString("en-US")} values, three bin widths, one density axis
-          </span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the same {BINS.n.toLocaleString("en-US")} values, three bin widths</span>
         </Note>
         <PanelTitle x={PANELS[0].x0} y={y(P_TOP) - h(66)} at={fiveAt - 2}>
           Bins {wide.width} wide
@@ -174,8 +174,8 @@ export const HistScene: React.FC = () => {
         </PanelTitle>
         <BarSet values={narrow.density} {...p(2)} at={quarterAt} step={0.25} fill={1} dim={liesAt - 2} />
         <XTicks ticks={[2, 12, 22]} x0={PANELS[2].x0} x1={PANELS[2].x1} lo={BINS.domain[0]} hi={BINS.domain[1]} y={y(P_BASE) + 26} at={quarterAt + 4} />
-        <Verdict ok={false} x={PANELS[2].x0} y={y(P_BASE) + h(52)} at={spikesAt + 2}>
-          spikes, not a shape
+        <Verdict ok={false} x={PANELS[2].x0} y={y(P_BASE) + h(52)} at={noiseAt}>
+          noise: bumps that aren&apos;t real
         </Verdict>
 
         <PanelTitle x={PANELS[1].x0} y={y(P_TOP) - h(66)} at={oneAt - 2}>
@@ -193,9 +193,16 @@ export const HistScene: React.FC = () => {
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>Sturges, Freedman–Diaconis: </span>
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, startAt, 10) }}>a place to start, not a verdict</span>
         </Note>
+        <Note at={startAt + 14} x={PANELS[0].x0} y={y(P_BASE) + h(148)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            Sturges sets the bin count from the sample size; Freedman–Diaconis, the width from the IQR
+          </span>
+        </Note>
         <Note at={reportAt + 4} x={PANELS[2].x0} y={y(P_BASE) + h(110)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <Mark at={bridgeAt + 2}>report the shape that survives</Mark>
+            <Mark at={bridgeAt + 2}>
+              report the shape that holds<span style={{ opacity: ease(frame, widthsAt - 2, 10) }}> across widths</span>
+            </Mark>
           </span>
         </Note>
       </Drift>

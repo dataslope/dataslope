@@ -1,7 +1,11 @@
 // The series this overview introduces: the eight topic videos in the track's
 // order, each with the watercolor hero its own folder holds and the number of
 // questions it answers (the plan's table,
-// agent-outputs/20261021-2314-data-analyst-interview-video-plan.md). Pure.
+// agent-outputs/20261021-2314-data-analyst-interview-video-plan.md). The
+// practice counts are the track's own pages, counted by check.mjs into
+// results.json. Pure.
+
+import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "da-interview";
 
@@ -18,8 +22,16 @@ export const PARTS: readonly Part[] = [
   { n: 8, title: "AI-assisted analysis", questions: 9, video: "da-ai-assisted", hero: "da-ai-assisted-owl" },
 ];
 
-/** The track's questions, each answered once: the sum of the parts. */
+/** The track's questions, each answered once: the sum of the parts. A
+ *  question two pages share is answered in the video of the page it belongs
+ *  to (the plan's "Each question is answered once"), so a card's count is
+ *  not its page's. */
 export const QUESTIONS = PARTS.reduce((a, p) => a + p.questions, 0);
 
 /** multiple-choice-questions.mdx, counted: 110 MultipleChoice blocks. */
-export const BANK = 110;
+export const BANK: number = results.bank;
+
+/** The topic pages, and those with runnable challenges (ChallengeCard or
+ *  SqlChallengeCard): 4 of the 8. Every one of the 8 has concept checks. */
+export const TOPIC_PAGES: number = results.topicPages;
+export const CHALLENGE_PAGES: number = results.challengePages;

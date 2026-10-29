@@ -175,6 +175,11 @@ active = score[~churned]`,
     activeMean: "round(float(active.mean()), 2)",
     churnedShare: "round(float(churned.mean()), 3)",
     surveys: `{n: [round(float(rng.choice(active, n, replace=False).mean()), 2) for _ in range(30)] for n in (20, 200, 2000)}`,
+    // Forty users from each side, for the strips under the bar: who churned.
+    // Their own generator, so the surveys above draw exactly as before.
+    strips: `pick = np.random.default_rng(22)
+{"churned": np.round(pick.choice(score[churned], 40, replace=False), 1).tolist(),
+ "stayed": np.round(pick.choice(active, 40, replace=False), 1).tolist()}`,
   },
 );
 
@@ -190,6 +195,11 @@ weeks["conversion"] = weeks["orders"] / weeks["sessions"]`,
     lift: 'round(float(weeks["conversion"].iloc[1] / weeks["conversion"].iloc[0] - 1), 3)',
     ordersChange: 'round(float(weeks["orders"].iloc[1] / weeks["orders"].iloc[0] - 1), 3)',
     sessionsChange: 'round(float(weeks["sessions"].iloc[1] / weeks["sessions"].iloc[0] - 1), 3)',
+    // The rise in conversion in percentage points, not percent.
+    points: 'round(float((weeks["conversion"].iloc[1] - weeks["conversion"].iloc[0]) * 100), 1)',
+    // What left between the weeks: sessions, orders, and how those converted.
+    lost: `gone = weeks.iloc[0][["sessions", "orders"]] - weeks.iloc[1][["sessions", "orders"]]
+[int(gone["sessions"]), int(gone["orders"]), round(float(gone["orders"] / gone["sessions"] * 100), 1)]`,
   },
 );
 
@@ -211,6 +221,11 @@ results.figures.outliers = figure(
     zOver2: 'df[z.abs() > 2]["amount"].tolist()',
     zOver3: 'df[z.abs() > 3]["amount"].tolist()',
     p90: 'round(float(df["amount"].quantile(0.90)), 1)',
+    // Where pandas' linear rule puts it: position 0.9 * (n - 1) in the sorted
+    // amounts, so this far from the value below it to the value above.
+    p90at: `pos = 0.9 * (len(df) - 1)
+ranked = df["amount"].sort_values().tolist()
+{"position": round(pos, 1), "between": [ranked[int(np.floor(pos))], ranked[int(np.ceil(pos))]], "percent": round((pos - np.floor(pos)) * 100)}`,
   },
 );
 
@@ -222,6 +237,11 @@ results.figures.variance = figure(`s = pd.Series([10, 20, 30, 40, 50])`, {
   var: "float(s.var())",
   std: "round(float(s.std()), 2)",
   deviations: "(s - s.mean()).tolist()",
+  squares: "((s - s.mean()) ** 2).tolist()",
+  sumSquares: "float(((s - s.mean()) ** 2).sum())",
+  // The average itself, dividing by n, against pandas' n - 1 above.
+  varPop: "float(s.var(ddof=0))",
+  n: "len(s)",
 });
 
 /** The video's own support tickets. */
@@ -233,22 +253,22 @@ results.figures.mode = figure(
   },
 );
 
-/** The video's own 100,000 normal draws, for 68, 95 and 99.7. */
-results.figures.normal = figure(
-  `rng = np.random.default_rng(3)
-x = rng.normal(0, 1, 100_000)`,
-  {
-    within: "[round(float((np.abs(x) < k).mean()) * 100, 1) for k in (1, 2, 3)]",
-  },
-);
+/** The rule's exact areas under the curve, for 68, 95 and 99.7: the share of a
+ *  normal distribution within k standard deviations is erf(k / sqrt 2). */
+results.figures.normal = figure(`import math`, {
+  within: "[round(math.erf(k / math.sqrt(2)) * 100, 1) for k in (1, 2, 3)]",
+});
 
-/** The video's own population of 10,000 order values, and three samples. */
+/** The video's own population of 10,000 order values, and twenty samples of
+ *  fifty from it (the first three as the video once drew them). */
 results.figures.population = figure(
   `rng = np.random.default_rng(5)
 population = pd.Series(rng.normal(50, 10, 10_000))`,
   {
     mean: "round(float(population.mean()), 1)",
-    samples: "[round(float(rng.choice(population, 50, replace=False).mean()), 1) for _ in range(3)]",
+    samples: "samples = [round(float(rng.choice(population, 50, replace=False).mean()), 1) for _ in range(20)]\nsamples",
+    range: "[min(samples), max(samples)]",
+    below: "int(sum(m < population.mean() for m in samples))",
   },
 );
 
