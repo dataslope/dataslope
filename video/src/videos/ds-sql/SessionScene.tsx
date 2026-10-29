@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SESSION } from "./data";
-import { colsOf, DataTable, Drift, geoOf, Listing, MARK, MARK_OK, OK, OK_INK, rowsAt, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK, MARK_OK, OK, OK_INK, rowsAt, X0 } from "./parts";
 
 /** The timeline: 08:30 to 15:00, across the page. */
 const T0 = 8 * 60 + 30;
@@ -174,9 +174,9 @@ export const SessionScene: React.FC = () => {
           size={14}
           at={lagAt - 4}
           marks={[
-            { line: 3, at: lagAt + 6 },
-            { line: 4, at: firstAt },
-            { line: 11, at: sumAt + 4, color: MARK_OK },
+            { line: lineOf(SESSION.page.lines, "WHEN ts - LAG(ts)"), at: lagAt + 6 },
+            { line: lineOf(SESSION.page.lines, "OR LAG(ts)"), at: firstAt },
+            { line: lineOf(SESSION.page.lines, "SUM(is_new_session)"), at: sumAt + 4, color: MARK_OK },
           ]}
         />
         <Note at={gapsAt} x={X0} y={g.rowTop(S.rows.length) + h(14)} out={allAt}>

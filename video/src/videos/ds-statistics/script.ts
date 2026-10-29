@@ -208,7 +208,7 @@ export const script: NarrationScript = {
     {
       id: "chi",
       scene: true,
-      text: "Question thirteen. What is the chi-square test used for? Counts in categories. It compares observed counts with expected ones: against a claimed mix, which is goodness of fit, or between two categorical variables, which is independence. Device and churn: a hundred and three mobile users churned, where about eighty-seven would if the two were independent. The squared gaps sum to eleven point nine, and p is point oh oh two six.",
+      text: "Question thirteen. What is the chi-square test used for? Counts in categories. It compares observed counts with expected ones: against a claimed mix, which is goodness of fit, or between two categorical variables, which is independence. Device and churn: a hundred and three mobile users churned, where about eighty-seven would if the two were independent. Square each gap, divide it by its expected count, and add them up: eleven point nine, and p is point oh oh two six.",
       pauseAfter: 0.6,
     },
     {

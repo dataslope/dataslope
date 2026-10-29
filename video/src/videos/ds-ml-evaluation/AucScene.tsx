@@ -165,7 +165,9 @@ export const AucScene: React.FC = () => {
             <span style={{ ...note(30, INK), ...TABULAR, whiteSpace: "nowrap" }}>
               PR-AUC <b style={{ color: BLUE_INK }}>{fmt(CLS.ap)}</b>
               <span style={{ opacity: ease(frame, jumpsAt - 2, 10) }}>
-                {" "}→ <b style={{ color: OK_INK }}>{fmt(CLS.apBalanced)}</b>
+                {/* In ink, as ROC's balanced value is: green would endorse the
+                    rebalanced test set the answer warns against. */}
+                {" "}→ <b>{fmt(CLS.apBalanced)}</b>
               </span>
             </span>
           </Note>

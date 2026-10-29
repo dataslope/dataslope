@@ -41,7 +41,7 @@ export const ChiScene: React.FC = () => {
   const tableAt = n.word("chi", "Device and churn");
   const mobileAt = n.word("chi", "a hundred and three mobile users churned");
   const expectAt = n.word("chi", "about eighty-seven");
-  const sumAt = n.word("chi", "The squared gaps sum to");
+  const sumAt = n.word("chi", "Square each gap");
   const chiAt = n.word("chi", "eleven point nine");
   const pAt = n.word("chi", "p is point oh oh two six");
   const fiveAt = n.word("chi-five", "One condition");

@@ -214,7 +214,8 @@ export const ExpectScene: React.FC = () => {
                       {hat + 1}
                     </text>
                   </g>
-                  <text x={x} y={py + 50} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 700 }}>
+                  {/* Clear of the match's ring, which reaches py + 38. */}
+                  <text x={x} y={py + 62} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 700 }}>
                     {i + 1}
                   </text>
                 </g>
@@ -222,7 +223,7 @@ export const ExpectScene: React.FC = () => {
             })}
           </Svg>
           {SHUFFLE.map((_, i) => (
-            <Note key={i} at={chanceAt + i} x={HATS_ROW.x0 + i * HATS_ROW.pitch - 40} width={80} y={y(HATS_ROW.y) + 70} from="up" style={{ textAlign: "center" }}>
+            <Note key={i} at={chanceAt + i} x={HATS_ROW.x0 + i * HATS_ROW.pitch - 40} width={80} y={y(HATS_ROW.y) + 82} from="up" style={{ textAlign: "center" }}>
               <span style={{ ...math(28, INK) }}>
                 <Frac top="1" bottom="10" gap={2} />
               </span>
@@ -258,7 +259,9 @@ export const ExpectScene: React.FC = () => {
               </Note>
               {s > 0.05 ? (
                 <Note at={shufflesAt + 10 + k * 2} x={HIST.x0 + k * HIST.pitch - 20} width={HIST.w + 40} y={y(HIST.base) - h(s * HIST.unit) - 32} from="up" style={{ textAlign: "center" }}>
-                  <span style={{ ...label(20, INK), ...TABULAR }}>{pct(s)}</span>
+                  {/* The average's line stands at 0.997, through bar 1's label; the
+                      paper behind the label carries the line under it. */}
+                  <span style={{ ...label(20, INK), ...TABULAR, background: PAPER, padding: "0 4px" }}>{pct(s)}</span>
                 </Note>
               ) : null}
             </React.Fragment>

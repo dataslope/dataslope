@@ -46,7 +46,12 @@ export const ZtScene: React.FC = () => {
   const py = (v: number) => base - (v / peak) * h(HEIGHT);
   const pts = (values: readonly number[]) =>
     ZT.x.flatMap((x, i) => (x >= XS.lo - 1e-9 && x <= XS.hi + 1e-9 ? [[at(XS, x), py(values[i])] as const] : []));
-  const cut = (v: number, color: string, from: number, label: string, row: number) => {
+  // 1.96 and 2.04 are a few pixels apart, so a label beside one line sits on
+  // the other: each cutoff gets its own height, the tallest line labelled on
+  // its left, and a shorter one never reaches up into a label beside it.
+  // An SVG <text> takes its color from `fill`; noteText's CSS color alone
+  // left all three black.
+  const cut = (v: number, color: string, from: number, label: string, row: number, side: "left" | "right" = "right") => {
     const p = ease(frame, from, 12);
     if (p <= 0) return null;
     return (
@@ -54,7 +59,13 @@ export const ZtScene: React.FC = () => {
         {[-v, v].map((s) => (
           <line key={s} x1={at(XS, s)} x2={at(XS, s)} y1={base} y2={base - h(150 + row * 40)} stroke={color} strokeWidth={2.6} strokeDasharray="6 5" />
         ))}
-        <text x={at(XS, v) + 10} y={base - h(150 + row * 40) + 6} style={{ ...noteText(24, color), fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>
+        <text
+          x={at(XS, v) + (side === "left" ? -10 : 10)}
+          y={base - h(150 + row * 40) + 6}
+          fill={color}
+          textAnchor={side === "left" ? "end" : "start"}
+          style={{ ...noteText(24, color), fontWeight: 650, fontVariantNumeric: "tabular-nums" }}
+        >
           {label}
         </text>
       </g>
@@ -96,8 +107,8 @@ export const ZtScene: React.FC = () => {
           </span>
         </Note>
         <Svg>
-          {cut(ZT.t5, BLUE_INK, fiveAt + 6, fmt(ZT.t5, 2), 2)}
-          {cut(ZT.z, INK, zCutAt - 2, fmt(ZT.z, 2), 0)}
+          {cut(ZT.t5, BLUE_INK, fiveAt + 6, fmt(ZT.t5, 2), 0)}
+          {cut(ZT.z, INK, zCutAt - 2, fmt(ZT.z, 2), 2, "left")}
           {cut(ZT.t30, WARM_INK, t30At - 2, fmt(ZT.t30, 2), 1)}
         </Svg>
 

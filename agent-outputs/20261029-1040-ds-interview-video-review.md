@@ -137,6 +137,14 @@ page has runnable challenges (four of nine do).
 
 ## The eight P1s
 
+**All eight are fixed** in the commit after this review, each checked against a
+render of the moment it names. Statistics' `chi` beat is the only narration
+re-voiced. Product sense's band is now labelled with its width (±2 standard
+deviations, about ±5%) rather than re-narrated, since the "about three percent"
+the narration says is the one-SD figure and is right. SQL's highlights now find
+their line by its text (`lineOf` in `ds-sql/parts.tsx`), so they cannot drift
+again.
+
 | Video | When | Finding | Cause |
 | --- | --- | --- | --- |
 | 1 Statistics | 441-446 s | The narration says "the squared gaps sum to eleven point nine"; the formula on screen divides each by its expected count. | `ds-statistics/script.ts:211` |

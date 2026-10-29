@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RATE } from "./data";
-import { colsOf, DataTable, Drift, ErrorBox, geoOf, Listing, listingHeight, MARK_BAD, MARK_OK, OK_INK, rowsAt, Strike, X0 } from "./parts";
+import { colsOf, DataTable, Drift, ErrorBox, geoOf, lineOf, Listing, listingHeight, MARK_BAD, MARK_OK, OK_INK, rowsAt, Strike, X0 } from "./parts";
 
 const TOP = 330;
 const PG_SIZE = 20;
@@ -83,7 +83,7 @@ export const RateScene: React.FC = () => {
           width={840}
           size={DUCK_SIZE}
           at={wrapAt - 4}
-          marks={[{ line: 4, at: wrapAt + 6, color: MARK_OK }]}
+          marks={[{ line: lineOf(S.lines, "NULLIF"), at: wrapAt + 6, color: MARK_OK }]}
         />
         <DataTable
           g={sg}
@@ -133,15 +133,18 @@ export const RateScene: React.FC = () => {
           cols={colsOf(T, { rate: { ink: BLUE_INK } })}
           at={intAt + 6}
           rows={rowsAt(T.rows, intAt + 10, 3)}
-          marks={T.rows.map((_, row) => ({ row, col: 1, at: zeroAt + row * 3, out: multAt + 6, color: MARK_BAD }))}
-          swaps={T.rows.map((_, row) => ({ row, col: 1, at: multAt + 10 + row * 3, value: fixedA[row], color: MARK_OK }))}
+          marks={T.rows.map((_, row) => ({ row, col: 1, at: zeroAt + row * 3, out: twelveAt, color: MARK_BAD }))}
+          // A swap's color is the new value's ink, so it takes OK_INK: the
+          // 24%-alpha MARK_OK band color left 0.1200 barely readable. The new
+          // value lands as the narration says it.
+          swaps={T.rows.map((_, row) => ({ row, col: 1, at: twelveAt + row * 3, value: fixedA[row], color: OK_INK }))}
         />
         <Note at={multAt} x={tg.right + 28} y={tg.rowTop(0)}>
           <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
             <QMono>conversions * 1.0 / …</QMono>
           </span>
         </Note>
-        <Note at={zeroAt + 2} x={tg.right + 28} y={tg.rowTop(1) + h(8)} out={multAt}>
+        <Note at={zeroAt + 2} x={tg.right + 28} y={tg.rowTop(1) + h(8)} out={twelveAt}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>120 / 1000 truncates to 0</span>
         </Note>
       </Drift>

@@ -8,7 +8,7 @@ import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
-import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, Listing, listingHeight, MARK_OK, rowsAt, Spot, X0 } from "./parts";
+import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, lineOf, Listing, listingHeight, MARK_OK, rowsAt, Spot, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 740;
@@ -188,7 +188,7 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
   const rt = R.cols.indexOf("running_total");
   return (
     <>
-      <Listing lines={RAPID.running.lines} x={R_X} top={c.T} width={680} size={SIZE} at={at - 4} marks={[{ line: 2, at: at + 8 }]} />
+      <Listing lines={RAPID.running.lines} x={R_X} top={c.T} width={680} size={SIZE} at={at - 4} marks={[{ line: lineOf(RAPID.running.lines, "SUM(amount)"), at: at + 8 }]} />
       <DataTable
         g={g}
         cols={colsOf(R, { running_total: { ink: BLUE_INK } })}
@@ -219,8 +219,8 @@ const Latest: React.FC<{ c: Ctx }> = ({ c }) => {
         size={SIZE}
         at={at - 4}
         marks={[
-          { line: 2, at: newestAt },
-          { line: 6, at: oneAt, color: MARK_OK },
+          { line: lineOf(RAPID.latest.lines, "ORDER BY order_date DESC"), at: newestAt },
+          { line: lineOf(RAPID.latest.lines, "WHERE rn = 1"), at: oneAt, color: MARK_OK },
         ]}
       />
       <DataTable g={g} cols={colsOf(L)} at={oneAt - 2} rows={rowsAt(L.rows, oneAt + 2)} />
