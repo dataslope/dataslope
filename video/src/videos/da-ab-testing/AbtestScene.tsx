@@ -188,7 +188,8 @@ export const AbtestScene: React.FC = () => {
         {/* The page's chart: ten traits, users choosing against a coin. */}
         <Svg opacity={ease(frame, pickAt - 4, 12) * (1 - ease(frame, out6, 10))}>
           <line x1={lineX} x2={lineX} y1={rowY(0) - h(24)} y2={rowY(BALANCE.rows.length - 1) + h(22)} stroke={INK} strokeWidth={1.6} strokeDasharray="5 5" />
-          <text x={lineX - 14} y={rowY(0) - h(30)} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: INK_SOFT }}>
+          {/* Beside the line's top end, so the line never runs through it. */}
+          <text x={lineX + 10} y={rowY(0) - h(26)} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: INK_SOFT }}>
             {BALANCE.threshold}
             <tspan opacity={ease(frame, flagAt - 2, 10)}>: the usual flag</tspan>
           </text>
@@ -289,7 +290,7 @@ export const AbtestScene: React.FC = () => {
         <Note at={nothingAt + 2} x={NULL.x0} y={base - height - h(46)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>gaps a do-nothing change would give, in standard errors</span>
         </Note>
-        <Note at={seAt} x={zx - 16} width={320} y={base - height * 0.55 - h(70)} align="right">
+        <Note at={seAt} x={NULL.x1} width={320} y={base - height * 0.55 - h(80)} align="right">
           <span style={{ ...note(25, B_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             ours: <Num>{fmt(EXPERIMENT.z)}</Num>
           </span>

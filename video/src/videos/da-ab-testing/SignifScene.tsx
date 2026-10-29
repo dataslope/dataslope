@@ -176,9 +176,11 @@ export const SignifScene: React.FC = () => {
         </Note>
         <Note at={callAt - 2} x={P.x0 + 520} y={y(P.top) + h(128)} out={out8}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b>practical</b>: a business call
-            <span style={{ opacity: ease(frame, shipAt - 4, 10) }}>, the effect and its range against the smallest lift worth shipping</span>
+            <b>practical</b> is a business call:
           </span>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, shipAt - 4, 10) }}>
+            the effect and its range against the smallest lift worth shipping
+          </div>
         </Note>
 
         {/* ── Question 9: a range a stakeholder can use ── */}

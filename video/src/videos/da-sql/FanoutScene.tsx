@@ -97,7 +97,7 @@ export const FanoutScene: React.FC = () => {
   });
   const fixG = tableGeometry({
     x: LIST_X,
-    top: y(TOP) + fixedH + h(118),
+    top: y(TOP) + fixedH + h(128),
     cols: [{ name: "revenue" }, { name: "items" }],
     rows: FANOUT.fixed.rows,
     headH: h(HEAD_H),
@@ -203,7 +203,7 @@ export const FanoutScene: React.FC = () => {
             <span style={{ fontWeight: 650 }}>The grain:</span> what one row stands for.
           </span>
         </Note>
-        <Note at={oneRowAt - 2} x={LIST_X} y={y(TOP) + fixedH + 48}>
+        <Note at={oneRowAt - 2} x={LIST_X} y={y(TOP) + fixedH + 54}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mono>items</Mono>: one row per order, the orders&apos; grain. Then the join.
           </span>

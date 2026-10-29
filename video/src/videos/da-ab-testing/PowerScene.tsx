@@ -97,6 +97,8 @@ export const PowerScene: React.FC = () => {
   const lx: Scale = { lo: 2, hi: Math.log10(60000), a: POWER.x0, b: POWER.x1 };
   const pys: Scale = { lo: 0, hi: 1, a: y(POWER.base), b: y(POWER.top) };
   const inks = [ds("blue", 300), A_COLOR, ds("blue", 800)];
+  // Type in each curve's own blue, except the palest, which is too light to read.
+  const labelInks = [INK_SOFT, BLUE_INK, ds("blue", 800)];
   const powerPanelP = ease(frame, detectAt - 4, 14);
   const curvesAt = detectAt + 6;
   const pathOf = (rows: readonly (readonly [number, number])[]) =>
@@ -223,7 +225,11 @@ export const PowerScene: React.FC = () => {
         <Note at={falsePosAt - 2} x={X0} y={y(TOP)} out={q12At - 4}>
           <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>
             <b>Type I</b>: a false positive, a winner with no effect
-            <span style={{ opacity: ease(frame, alphaAt - 2, 10), ...TABULAR }}> (α = {Math.round(ERRORS.alpha * 100)}%)</span>
+            <span style={{ opacity: ease(frame, alphaAt - 2, 10) }}>
+              {" "}
+              (α = <Num>{Math.round(ERRORS.alpha * 100)}%</Num>
+              <span style={{ opacity: ease(frame, splitAt - 2, 10) }}>, half in each tail</span>)
+            </span>
           </span>
         </Note>
         <Note at={falseNegAt - 2} x={X0} y={y(TOP + 48)} out={q12At - 4}>
@@ -232,12 +238,15 @@ export const PowerScene: React.FC = () => {
             <span style={{ opacity: ease(frame, betaAt - 2, 10), ...TABULAR }}> (β = {Math.round(ERRORS.beta * 100)}%)</span>
           </span>
         </Note>
+        {/* Alpha is both of the null's tails: half of it labelled at each. */}
         <Note at={alphaAt + 4} x={at(zs, crit) + 30} y={base - h(70)}>
           <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>
-            α <Num>{fmt(alphaNow * 100, 1)}%</Num>
-            <span style={{ opacity: ease(frame, splitAt - 2, 10) }}>
-              : <Num>{fmt(alphaNow * 50, 1)}%</Num> in each tail
-            </span>
+            <Num>{fmt(alphaNow * 50, 1)}%</Num>
+          </span>
+        </Note>
+        <Note at={alphaAt + 4} x={at(zs, -crit) - 30} y={base - h(70)} align="right">
+          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>
+            <Num>{fmt(alphaNow * 50, 1)}%</Num>
           </span>
         </Note>
         <Note at={betaAt + 4} x={at(zs, crit) - 14} y={base - h(34)} align="right">
@@ -260,12 +269,12 @@ export const PowerScene: React.FC = () => {
         <Svg opacity={powerPanelP}>
           <line x1={POWER.x0} x2={POWER.x1} y1={y(POWER.base)} y2={y(POWER.base)} stroke={INK} strokeWidth={1.4} />
           <line x1={POWER.x0} x2={POWER.x1} y1={at(pys, ERRORS.power)} y2={at(pys, ERRORS.power)} stroke={OK} strokeWidth={1.6} strokeDasharray="6 6" />
-          {/* 80% at the right end, clear of question 10's notes on the left. */}
+          {/* The power ticks at the right end, clear of question 10's notes on the left. */}
           <text x={POWER.x1 + 12} y={at(pys, ERRORS.power) + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: OK_INK }}>
             80%
           </text>
           {[0, 1].map((t) => (
-            <text key={t} x={POWER.x0 - 12} y={at(pys, t) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+            <text key={t} x={POWER.x1 + 12} y={at(pys, t) + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
               {t * 100}%
             </text>
           ))}
@@ -278,7 +287,7 @@ export const PowerScene: React.FC = () => {
             users per arm (log scale)
           </text>
           <text x={POWER.x0} y={y(POWER.top) - 22} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
-            power
+            power to catch a lift from {Math.round(SAMPLE.from * 100)}%
           </text>
           {SAMPLE.curves.map((c, i) => (
             <path key={c.to} d={pathOf(c.rows)} fill="none" stroke={inks[i]} strokeWidth={3 + 2 * pulse(frame, risesAt + i * 6, 20)} pathLength={1} strokeDasharray={`${ease(frame, curvesAt + i * 6, 24)} 1`} />
@@ -287,10 +296,8 @@ export const PowerScene: React.FC = () => {
         {SAMPLE.curves.map((c, i) => {
           const mid = c.rows.find(([, p]) => p >= 0.5) ?? c.rows[0];
           return (
-            <Note key={c.to} at={curvesAt + 10 + i * 6} x={at(lx, Math.log10(mid[0])) - 12} width={160} y={at(pys, 0.5) - h(14)} align="right">
-              <span style={{ ...label(20, inks[i] === A_COLOR ? BLUE_INK : INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-                {Math.round(SAMPLE.from * 100)}% → {Math.round(c.to * 100)}%
-              </span>
+            <Note key={c.to} at={curvesAt + 10 + i * 6} x={at(lx, Math.log10(mid[0])) - 12} width={140} y={at(pys, 0.5) - h(14)} align="right">
+              <span style={{ ...label(20, labelInks[i]), whiteSpace: "nowrap", ...TABULAR }}>→ {Math.round(c.to * 100)}%</span>
             </Note>
           );
         })}

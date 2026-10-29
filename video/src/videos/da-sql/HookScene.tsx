@@ -80,7 +80,7 @@ export const HookScene: React.FC = () => {
                 boxSizing: "border-box",
                 border: `${slow ? 2 + tone : 2}px solid ${border}`,
                 borderRadius: 8,
-                background: lit > 0 ? HIGHLIGHT : PAPER,
+                background: lit > 0 ? HIGHLIGHT : slow ? `color-mix(in srgb, ${INK} ${6 * tone}%, ${PAPER})` : PAPER,
                 opacity: p * (slow ? 1 : 0.45 + 0.55 * tone) * (1 - dim),
                 transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.06 * pulse(frame, startAt, 16)})`,
                 display: "flex",

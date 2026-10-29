@@ -307,7 +307,6 @@ const Dtypes: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 27. A CASE-like column ──────────────────────────────────────────────────
 
 const Case: React.FC<{ c: Ctx }> = ({ c }) => {
-  const at = c.w("r-case", "For a CASE");
   const whereAt = c.w("r-case", "NumPy where");
   const selectAt = c.w("r-case", "NumPy select");
   const winsAt = c.w("r-case", "first true condition wins");

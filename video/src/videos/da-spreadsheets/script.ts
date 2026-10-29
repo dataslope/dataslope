@@ -286,7 +286,7 @@ export const script: NarrationScript = {
     {
       id: "r-dupes-both",
       text: "It flags both copies, so check them before Remove Duplicates, which keeps the first.",
-      pauseAfter: 0.9,
+      pauseAfter: 1.8,
     },
     {
       id: "next",
