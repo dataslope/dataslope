@@ -156,6 +156,13 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      // Added after the take (review P2 #4): where a factor above one comes
+      // from when the sigmoid's slope is a quarter at most.
+      id: "vanish-why",
+      text: "Each layer's factor is its weight times its activation's slope, so the quarter holds for weights near one, and large weights push the factor above one.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "vanish-fix",
       text: "The fixes: ReLU, careful initialization, skip connections that let the gradient bypass layers, normalization, and, for exploding gradients, clipping.",
       pauseAfter: 0.7,
@@ -174,7 +181,7 @@ export const script: NarrationScript = {
     },
     {
       id: "opt-rest",
-      text: "Momentum keeps a running velocity, so it builds speed along the floor and damps the zigzag. RMSProp, root mean square propagation, divides each parameter's step by the recent size of its gradients, so the steep direction and the shallow one move at a similar pace. Adam, adaptive moment estimation, does both, which is why it's the usual default.",
+      text: "Momentum keeps a running velocity, so it builds speed along the floor, and across the valley it swings in slow waves instead of flipping every step. RMSProp, root mean square propagation, divides each parameter's step by the recent size of its gradients, so the steep direction and the shallow one move at a similar pace. Adam, adaptive moment estimation, does both, which is why it's the usual default.",
       pauseAfter: 0.6,
     },
     {
@@ -205,6 +212,13 @@ export const script: NarrationScript = {
     {
       id: "decay",
       text: "Question nine. What is weight decay, and how does it relate to L two regularization? Weight decay shrinks every weight a little toward zero on each step. For plain SGD, that's the same update as adding an L two penalty to the loss: one step of each lands on exactly the same weights.",
+      pauseAfter: 0.6,
+    },
+    {
+      // Added after the take (review P2 #5): what the penalty is, and why
+      // Adam breaks the equivalence.
+      id: "decay-why",
+      text: "The penalty is lambda over two times the sum of squared weights. Its gradient is lambda times the weight, so a step on it is exactly that shrink. But Adam divides every gradient, the penalty's included, by that weight's recent gradient size, so weights with big gradients are barely decayed.",
       pauseAfter: 0.6,
     },
     {

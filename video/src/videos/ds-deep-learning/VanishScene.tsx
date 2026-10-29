@@ -19,9 +19,11 @@ const power = (v: number) => (v >= 1 ? v.toLocaleString("en-US", { maximumFracti
 
 /**
  * Question 5: the gradient's size, layer by layer back from the output, on
- * a log scale. A quarter per layer (the sigmoid's slope at its steepest)
- * falls to 0.25^10, under one in a million; one and a half per layer climbs
- * to 57.7. Then the fixes, each ticked as it is named.
+ * a log scale. Each layer's factor is its weight times its activation's
+ * slope: a quarter per layer (the sigmoid's slope at its steepest, with
+ * weights near one) falls to 0.25^10, under one in a million; one and a half
+ * per layer (large weights) climbs to 57.7. Then the fixes, each ticked as
+ * it is named.
  */
 export const VanishScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -39,6 +41,9 @@ export const VanishScene: React.FC = () => {
   const aboveAt = n.word("vanish", "Factors above one");
   const halfAt = n.word("vanish", "One and a half, ten times over");
   const explodesAt = n.word("vanish", "the gradient explodes");
+  const whyAt = n.word("vanish-why", "Each layer's factor is its weight");
+  const nearAt = n.word("vanish-why", "weights near one");
+  const largeAt = n.word("vanish-why", "large weights push the factor above one");
   const fixes = [
     { text: "ReLU", at: n.word("vanish-fix", "ReLU") },
     { text: "careful initialization", at: n.word("vanish-fix", "careful initialization") },
@@ -90,8 +95,12 @@ export const VanishScene: React.FC = () => {
               yTitle="the gradient's size"
               at={productAt - 4}
             />
+            <Tagline x={120} y={y(236)} at={productAt + 4} size={24} color={INK}>
+              each layer: <Mark at={whyAt + 4}>× its weight × its activation&apos;s slope</Mark>
+            </Tagline>
             <Tagline x={120} y={y(290)} at={quarterAt} size={24} color={ACCENT_INK}>
               the sigmoid&apos;s slope: <Mark at={quarterAt + 4}>at most 0.25</Mark>, so × 0.25 a layer
+              <span style={{ opacity: ease(frame, nearAt - 2, 10) }}>, with weights near 1</span>
             </Tagline>
             <Svg>
               {series.map((s) =>
@@ -143,8 +152,9 @@ export const VanishScene: React.FC = () => {
                 1.5<sup>10</sup> = {VANISH.tenBig}: it explodes
               </span>
             </Note>
-            <Tagline x={px(3)} y={py(1.5 ** 3) + h(14)} at={aboveAt} size={21} color={WARM_INK}>
-              × 1.5 a layer
+            {/* Under the gridline at 1, clear of both lines (it sat on the gridline). */}
+            <Tagline x={px(3)} y={py(1) + h(16)} at={aboveAt} size={21} color={WARM_INK}>
+              × 1.5 a layer<span style={{ opacity: ease(frame, largeAt - 2, 10) }}>, with large weights</span>
             </Tagline>
           </div>
 
