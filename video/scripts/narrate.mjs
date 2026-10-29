@@ -8,7 +8,7 @@
  *   node scripts/narrate.mjs <video>                 voice what is missing
  *   node scripts/narrate.mjs <video> --only n,star   just these beats
  *   node scripts/narrate.mjs <video> --force         new takes of the lot
- *   node scripts/narrate.mjs <video> --recut         re-cut the kept takes
+ *   node scripts/narrate.mjs <video> --recut         re-cut every beat a kept take still says
  *   node scripts/narrate.mjs <video> --onsets --only a,b   re-place beats' first words, no API call
  *   node scripts/narrate.mjs <video> --dry-run       show what would be sent
  *
@@ -33,8 +33,18 @@
  * those are re-voiced one at a time, each with its neighbours as context, so
  * a one-line edit doesn't re-record the rest.
  *
+ * A beat that needs audio but whose words a kept take still says, word for
+ * word (a beat split at a sentence break, or one moved), is cut from that
+ * take instead, for free: locateBeats() (src/narration/takes.ts) finds the
+ * script's beats in each kept take's own text, whatever script it was
+ * recorded from. So "split before you re-voice" is just an edit to the
+ * script. --recut cuts every beat it finds that way, but never replaces a
+ * beat voiced on its own since: it rewrites a beat only when the beat needs
+ * audio, when --only names it, or when the fresh cut is the beat's committed
+ * audio already (it came from that take).
+ *
  * Videos voiced before takes were split keep their single takes/<id>/take.*,
- * which --recut still cuts while it matches the script.
+ * which is one more kept take to cut from.
  *
  * The narrator is the script's `voice`, one of the house voices in
  * src/narration/voices.ts (Drew when it names none). --voice overrides it
@@ -47,7 +57,7 @@
  * directly, so it needs a Node that strips types by default (22.18 or later).
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loudestFrame, speechOnset } from "./lib/onset.mjs";
@@ -90,7 +100,7 @@ const { script } = await import(pathToFileURL(join(VIDEO_ROOT, "src", "videos", 
 const { VOICES, NARRATION_MODEL, voiceId } = await import(
   pathToFileURL(join(VIDEO_ROOT, "src", "narration", "voices.ts")).href
 );
-const { planTakes } = await import(pathToFileURL(join(VIDEO_ROOT, "src", "narration", "takes.ts")).href);
+const { locateBeats, planTakes } = await import(pathToFileURL(join(VIDEO_ROOT, "src", "narration", "takes.ts")).href);
 const outDir = join(VIDEO_ROOT, "public", "narration", script.id);
 const takeDir = join(VIDEO_ROOT, "takes", script.id);
 const alignmentPath = join(outDir, "alignment.json");
@@ -162,22 +172,75 @@ const describe = (k) => {
   return `take ${k + 1} of ${plan.length} (${ids[0]} … ${ids.at(-1)}, ${plan[k].length} beats, ${takeText(plan[k]).text.length} characters)`;
 };
 
+/** Where each kept take says a beat, by beat id: the first kept take (in
+ *  order) whose own text has the beat's words, word for word. */
+const inTakes = new Map();
+for (const { name, take } of keptTakesOnDisk()) {
+  for (const seg of locateBeats(take.text, script.beats)) {
+    if (seg.beat !== null && !inTakes.has(script.beats[seg.beat].id)) inTakes.set(script.beats[seg.beat].id, { name, take });
+  }
+}
+
+/** Beats that need audio but are still said in a kept take, word for word: a
+ *  beat split at a sentence break, or one moved. They are cut from the take
+ *  for free. Not under --only or --force, which ask for a new performance,
+ *  nor after a change of voice. */
+const free = only || flag("--force") || voiceChanged ? [] : todo.filter((beat) => inTakes.has(beat.id));
+const toVoice = todo.filter((beat) => !free.includes(beat));
+
 /** The takes to record whole: every beat in them needs voicing. The rest of
  *  what needs voicing is voiced a beat at a time. */
-const whole = only ? [] : plan.map((_, k) => k).filter((k) => plan[k].every((b) => todo.includes(script.beats[b])));
-const single = todo.filter((beat) => !whole.some((k) => plan[k].includes(script.beats.indexOf(beat))));
+const whole = only ? [] : plan.map((_, k) => k).filter((k) => plan[k].every((b) => toVoice.includes(script.beats[b])));
+const single = toVoice.filter((beat) => !whole.some((k) => plan[k].includes(script.beats.indexOf(beat))));
+
+/** Cuts the named beats from the kept takes that say them, writing only those
+ *  beats; every other beat's audio is left as it is. */
+function cutFromTakes(ids, beats) {
+  const byTake = new Map();
+  for (const id of ids) {
+    const { name, take } = inTakes.get(id);
+    if (!byTake.has(name)) byTake.set(name, { take, ids: [] });
+    byTake.get(name).ids.push(id);
+  }
+  for (const [name, { take, ids: wanted }] of byTake) {
+    const { pieces, write } = cutTake(take, name, locateBeats(take.text, script.beats));
+    for (const piece of pieces) if (wanted.includes(piece.beat.id)) beats[piece.beat.id] = write(piece);
+  }
+  return beats;
+}
 
 if (flag("--recut")) {
-  const missing = plan.map((_, k) => k).filter((k) => !keptTake(k));
-  if (missing.length) {
-    console.error(`No kept take of this text in this voice for ${missing.map(describe).join("; ")}, in ${takeDir}.`);
+  const takes = keptTakesOnDisk();
+  if (!takes.length) {
+    console.error(`No take of ${video} is kept in this voice (${voiceName}, ${model}), in ${takeDir}.`);
     process.exit(1);
   }
   mkdirSync(outDir, { recursive: true });
-  console.log(`${video}: re-cutting ${plan.length} kept take${plan.length > 1 ? "s" : ""} (voice ${voiceName}, model ${model})`);
+  console.log(`${video}: re-cutting ${takes.length} kept take${takes.length > 1 ? "s" : ""} (voice ${voiceName}, model ${model})`);
   const beats = { ...existing.beats };
-  for (let k = 0; k < plan.length; k++) Object.assign(beats, cutTake(keptTake(k), k));
+  const done = new Set();
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  for (const { name, take } of takes) {
+    const segments = locateBeats(take.text, script.beats);
+    if (!segments.some((seg) => seg.beat !== null)) {
+      console.log(`  ${name}: says no beat of the script any more`);
+      continue;
+    }
+    const { pieces, write } = cutTake(take, name, segments);
+    for (const piece of pieces) {
+      const id = piece.beat.id;
+      if (done.has(id) || (only && !only.includes(id))) continue;
+      done.add(id);
+      const old = existing.beats[id];
+      const onDisk = old && existsSync(join(VIDEO_ROOT, "public", old.audio));
+      if (onDisk && old.text === piece.beat.text && same(old, piece.entry) && !only) continue; // this cut already
+      if (!onDisk || old.text !== piece.beat.text || only) beats[id] = write(piece);
+      else console.log(`  · ${id.padEnd(14)} kept as voiced on its own (--only ${id} cuts it from ${name})`);
+    }
+  }
   saveAlignment(beats);
+  const unvoiced = script.beats.filter((b) => beats[b.id]?.text !== b.text).map((b) => b.id);
+  if (unvoiced.length) console.log(`In no kept take, so still to voice: ${unvoiced.join(", ")}`);
   console.log(`Done. Check the new timing with: npm run cues -- ${video}`);
   process.exit(0);
 }
@@ -205,6 +268,7 @@ if (flag("--onsets")) {
 const kept = (k) => (flag("--force") ? null : keptTake(k));
 const sent =
   whole.reduce((n, k) => n + (kept(k) ? 0 : takeText(plan[k]).text.length), 0) + single.reduce((n, b) => n + b.text.length, 0);
+// A beat cut free from a kept take sends nothing.
 console.log(
   `${video}: ${todo.length} of ${script.beats.length} beats to voice, in ${plan.length} take${plan.length > 1 ? "s" : ""} ` +
     `(voice ${voiceName}, model ${model}); about ${sent} characters to send`,
@@ -213,6 +277,7 @@ for (let k = 0; k < plan.length; k++) {
   const state = whole.includes(k) ? (kept(k) ? "kept, will be re-cut" : "to record") : "voiced";
   console.log(`  ${describe(k)}: ${state}`);
 }
+for (const b of free) console.log(`  · ${b.id.padEnd(14)} cut from ${inTakes.get(b.id).name}, free: ${b.text}`);
 for (const b of single) console.log(`  · ${b.id.padEnd(14)} on its own: ${b.text}`);
 if (flag("--dry-run") || todo.length === 0) process.exit(0);
 
@@ -395,22 +460,41 @@ function keptTake(k) {
   return same ? take : null;
 }
 
+/** Every take kept on disk in this voice and model, whatever script it was
+ *  recorded from: takes/<id>/take.json (a video voiced in one take) and
+ *  take-<n>.json. */
+function keptTakesOnDisk() {
+  if (!existsSync(takeDir)) return [];
+  const order = (f) => Number(f.match(/\d+/)?.[0] ?? 0);
+  return readdirSync(takeDir)
+    .filter((f) => /^take(-\d+)?\.json$/.test(f))
+    .sort((a, b) => order(a) - order(b))
+    .map((f) => ({ name: f.replace(/\.json$/, ""), take: JSON.parse(readFileSync(join(takeDir, f), "utf8")) }))
+    .filter(({ take }) => take.voice_id === voice && take.model_id === model);
+}
+
+/** Take k's segments as planned: each of its beats, nothing else. */
+const planned = (k) => takeText(plan[k]).spans.map(([start, end], i) => ({ beat: plan[k][i], start, end }));
+
 function saveAlignment(beats) {
   writeFileSync(alignmentPath, JSON.stringify({ meta: { voice_id: voice, model_id: model }, beats }, null, 2) + "\n");
 }
 
-/** Cuts take k into one MP3 per beat, with each beat's alignment counted
- *  from the start of its own file, and returns those beats' entries. */
-function cutTake(take, k) {
-  const indices = plan[k];
-  const beatAt = (i) => script.beats[indices[i]];
-  const { text, spans } = takeText(indices);
+/** Cuts a take at the pauses between its segments (locateBeats(), or
+ *  planned()) and returns a piece per beat in it: where its file runs in the
+ *  take, and its entry, with the alignment counted from the start of its own
+ *  file. Nothing is written until write(piece); a segment that is text the
+ *  script no longer has is cut around and dropped. */
+function cutTake(take, name, segments) {
+  const text = take.text;
+  const spans = segments.map((seg) => [seg.start, seg.end]);
+  const label = (i) => (segments[i].beat === null ? "(not in the script)" : script.beats[segments[i].beat].id);
   const { characters } = take.alignment;
   const starts = [...take.alignment.character_start_times_seconds];
   const ends = [...take.alignment.character_end_times_seconds];
-  const samples = decode(join(takeDir, `${takeName(k)}.mp3`));
+  const samples = decode(join(takeDir, `${name}.mp3`));
   const length = samples.length / SAMPLE_RATE;
-  console.log(`  ${describe(k)}: ${length.toFixed(2)} s`);
+  console.log(`  ${name}: ${length.toFixed(2)} s, ${segments.filter((seg) => seg.beat !== null).length} beats of the script`);
 
   const frame = Math.round(0.01 * SAMPLE_RATE);
   let loudest = 0;
@@ -446,7 +530,7 @@ function cutTake(take, k) {
     }
     if (quiet < MIN_PAUSE) {
       console.warn(
-        `  ! ${beatAt(i).id} → ${beatAt(i + 1).id}: no clear pause (longest quiet ${quiet.toFixed(2)} s); the cut may clip a word`,
+        `  ! ${label(i)} → ${label(i + 1)}: no clear pause (longest quiet ${quiet.toFixed(2)} s); the cut may clip a word`,
       );
     }
     return at;
@@ -462,7 +546,9 @@ function cutTake(take, k) {
   });
   spans.forEach(([s], i) => {
     const moved = onset[i] - starts[first[i]];
-    if (Math.abs(moved) > 0.08) console.log(`  · ${beatAt(i).id}: first word starts ${moved.toFixed(2)} s from its character time`);
+    if (Math.abs(moved) > 0.08 && segments[i].beat !== null) {
+      console.log(`  · ${label(i)}: first word starts ${moved.toFixed(2)} s from its character time`);
+    }
     starts[first[i]] = Math.min(onset[i], ends[first[i]]);
     for (let j = s; j < first[i]; j++) {
       starts[j] = Math.min(starts[j], onset[i]);
@@ -471,18 +557,18 @@ function cutTake(take, k) {
   });
   // The video's first beat keeps no more lead than the script's lead-in; a
   // later take's first beat follows a scene change, which has room for it.
-  const leadIn = indices[0] === 0 ? (script.leadIn ?? 0.6) : MAX_LEAD;
+  const leadIn = segments[0].beat === 0 ? (script.leadIn ?? 0.6) : MAX_LEAD;
 
-  const beats = {};
-  indices.forEach((b, i) => {
-    const beat = script.beats[b];
+  const pieces = [];
+  segments.forEach((seg, i) => {
+    if (seg.beat === null) return;
+    const beat = script.beats[seg.beat];
     const from = i === 0 ? Math.max(0, onset[0] - Math.min(MAX_LEAD, leadIn)) : Math.max(cuts[i - 1], onset[i] - MAX_LEAD);
     const to = i === spans.length - 1 ? Math.min(length, end[i] + MAX_TAIL) : Math.min(cuts[i], end[i] + MAX_TAIL);
     const audio = `narration/${script.id}/${beat.id}.mp3`;
-    encode(samples, Math.round(from * SAMPLE_RATE), Math.round(to * SAMPLE_RATE), join(VIDEO_ROOT, "public", audio));
     const [s, e] = spans[i];
     const rebase = (t) => Math.round((t - from) * 1000) / 1000;
-    beats[beat.id] = {
+    const entry = {
       text: beat.text,
       audio,
       alignment: {
@@ -491,9 +577,20 @@ function cutTake(take, k) {
         character_end_times_seconds: ends.slice(s, e).map(rebase),
       },
     };
-    console.log(`  ✓ ${beat.id.padEnd(14)} ${from.toFixed(2)} → ${to.toFixed(2)} s of the take`);
+    pieces.push({ beat, from, to, entry });
   });
-  return beats;
+  const write = (piece) => {
+    encode(samples, Math.round(piece.from * SAMPLE_RATE), Math.round(piece.to * SAMPLE_RATE), join(VIDEO_ROOT, "public", piece.entry.audio));
+    console.log(`  ✓ ${piece.beat.id.padEnd(14)} ${piece.from.toFixed(2)} → ${piece.to.toFixed(2)} s of ${name}`);
+    return piece.entry;
+  };
+  return { pieces, write };
+}
+
+/** Cuts a take and writes every beat in it. */
+function cutAll(take, name, segments) {
+  const { pieces, write } = cutTake(take, name, segments);
+  return Object.fromEntries(pieces.map((piece) => [piece.beat.id, write(piece)]));
 }
 
 /**
@@ -553,8 +650,12 @@ const beats = voiceChanged ? {} : { ...existing.beats };
 for (const k of whole) {
   // --force asks for a new performance; otherwise a kept take of this exact
   // text is cut again rather than paid for twice.
-  Object.assign(beats, cutTake(kept(k) ?? (await recordTake(k)), k));
+  Object.assign(beats, cutAll(kept(k) ?? (await recordTake(k)), takeName(k), planned(k)));
   // Saved after every take, so an interrupted run keeps what it paid for.
+  saveAlignment(beats);
+}
+if (free.length) {
+  cutFromTakes(free.map((b) => b.id), beats);
   saveAlignment(beats);
 }
 await voiceBeats(beats);

@@ -339,7 +339,7 @@ npm run narrate -- c-pointers --dry-run   # the text it would send
 npm run narrate -- c-pointers             # a take, or the beats not yet voiced
 npm run narrate -- c-pointers --only star # re-voice one edited beat
 npm run narrate -- c-pointers --force     # new takes of everything (ask first)
-npm run narrate -- c-pointers --recut     # cut the kept take again, no API call
+npm run narrate -- c-pointers --recut     # re-cut every beat a kept take still says, no API call
 npm run cues -- c-pointers                # the timing it produced
 npm run check:sync -- c-pointers          # and that the voice really starts there
 ```
@@ -357,6 +357,14 @@ that beat, or `--recut` if a whole run drifts.
 **Voicing is billed per character, so an edit re-voices only what changed.**
 A plain run sends just the new or edited beats, each on its own. That is
 the default after an edit, and it costs only those beats' characters.
+
+**A split is free.** A beat that needs audio but whose words a kept take
+still says, word for word, is cut from that take instead of voiced: a beat
+split at a sentence break, or one moved. So to change one sentence of a long
+beat, split the sentence off into its own beat, then reword it: the rest of
+the beat is cut from the take and only the new sentence is paid for. `--dry-run`
+marks each such beat "cut from take-N, free". `--only` and `--force` always
+voice, since they ask for a new performance.
 `--force` sends the whole script again, about 1,300 to 2,300 characters for a
 two-minute video, so ask before using it. "The edited beat sounds a little
 apart from the take" is not a reason on its own.
@@ -460,12 +468,18 @@ from:
 - `takes/<script id>/`: the raw takes (`take-1.mp3`, `take-2.mp3`, …) and
   their alignment (`take-1.json`, …), about 1.3 MB for two minutes of speech.
   The beats are cut from them, so `--recut` can cut them again, for instance
-  after a change to the cutting, without paying for another take, and a plain
-  run reuses a take when its text and voice still match. A re-cut is
-  deterministic: cutting an unchanged take reproduces the committed beats
-  byte for byte. Videos voiced before takes were split keep a single
-  `take.mp3`/`take.json`, which `--recut` still cuts while it matches the
-  script. `npm test` fails if a voiced video has lost its takes.
+  after a change to the cutting, without paying for another take. A take is
+  matched to the script by its own text (`locateBeats()` in
+  `src/narration/takes.ts`), not by the take plan, so it stays usable after
+  the script moves on: a beat split at a sentence break is found as its
+  pieces, and a beat reworded and voiced alone since is cut around. `--recut`
+  never replaces a beat voiced on its own: it rewrites a beat only when the
+  beat needs audio, when `--only` names it, or when the fresh cut is the
+  committed audio already. A re-cut is deterministic: cutting an unchanged
+  take reproduces the committed beats byte for byte, and `--recut` on every
+  voiced video changes nothing. Videos voiced before takes were split keep a
+  single `take.mp3`/`take.json`, one more kept take to cut from. `npm test`
+  fails if a voiced video has lost its takes.
 
 A beat whose text has changed since its audio was made is reported as `stale`
 by `npm run cues` and falls back to the estimate, so an edited sentence can't
