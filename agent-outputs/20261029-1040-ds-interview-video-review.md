@@ -161,6 +161,84 @@ Product sense's band, SQL's highlight at 232 s, ML evaluation's green); the othe
 three stand on their reviewers' frames and `file:line`
 references.
 
+## The P2s
+
+**All 76 are fixed**, one fixer per video working to
+[`tools/FIX-BRIEF.md`](20261029-ds-interview-video-review/tools/FIX-BRIEF.md);
+each fixer's report, with every P2 by number and what changed, is in
+[`20261029-ds-interview-video-review/fixes/`](20261029-ds-interview-video-review/fixes/).
+A finding's suggested fix was a suggestion, and several fixers found a better
+one. Every video passed typecheck, lint, `check:cues`, `npm test`,
+`check:motion`, `check:sync` and `check:mix` on its final code, and the whole
+package passed all four static checks together once every video was in.
+
+| Video | P2s | Characters re-voiced | Length before → after |
+| --- | --- | --- | --- |
+| 0 Interview | 3 | 507 | 1:58 → 2:10 |
+| 1 Statistics | 6 | 1,288 | 10:33 → 11:34 |
+| 2 Probability | 6 | 757 | 7:44 → 8:22 |
+| 3 ML evaluation | 11 | 997 | 8:33 → 9:31 |
+| 4 ML models | 6 | 711 | 9:41 → 10:24 |
+| 5 Deep learning | 5 | 845 | 9:55 → 10:29 |
+| 6 Experiment design | 6 | 958 | 8:13 → 9:19 |
+| 7 Experiments in practice | 9 | 1,240 | 7:24 → 8:21 |
+| 8 Product sense | 6 | 828 | 7:23 → 8:11 |
+| 9 Python & pandas | 5 | 466 | 6:51 → 7:28 |
+| 10 SQL | 5 | 487 | 6:21 → 6:40 |
+| 11 LLM evaluation | 8 | 611 | 7:17 → 7:57 |
+| **Total** | **76** | **9,695** | **91:54 → 100:26** |
+
+Every video stayed under its 1,500-character budget. Beats were split at
+sentence breaks before any rewording, so only the changed sentences were
+voiced; every other beat's audio was checked against the committed file and is
+unchanged. The added 8.5 minutes is almost all answers carried one step
+further.
+
+Four calls a fixer made that change what the video claims, worth knowing:
+
+- **ML evaluation's elastic net is fitted at `l1_ratio` 0.9, not 0.5.** At 0.5
+  its "keeps both correlated features" rested on s1 = -0.24 and failed in 8 of
+  30 bootstrap resamples; at 0.9 it keeps both in 37 of 50, and still zeroes
+  age. The page names no mix.
+- **Deep learning's momentum narration was changed, not its figure.** At beta
+  0.9 the computed path swings wider than plain descent, so "damps the zigzag"
+  became "swings in slow waves instead of flipping every step".
+- **Python & pandas' timings are the committed run's** (409.5 ms and 0.9 ms):
+  the machine was too loaded during the pass to time a million-row loop
+  fairly. `data.ts` now refuses a re-run whose timings stop fitting the
+  narration.
+- **ML models now answers past the page**: permutation importance, which the
+  page's SHAP answer does not mention, from numbers already in `results.json`.
+
+## What the fixers kept running into
+
+None of these were changed in this pass (the brief kept the fixers out of the
+shared kit); each is a candidate for its own change.
+
+- **`narrate --recut` refuses a whole video once any take is stale.** Every
+  video whose beats were re-voiced alone after their take (most of this
+  series, after #715's initialism pass) hit it; seven fixers split beats with
+  scratch copies of narrate's own cutter instead. A `--recut` that cuts only
+  the takes still matching the script, or splits a beat's own file, would make
+  "split before you re-voice" work everywhere.
+- **SVG `<text>` takes `fill`, not CSS `color`**, so `label()` and `note()` on
+  SVG text draw black. It caused Statistics' P1 and Probability's hat numbers.
+  A `labelSvg()` helper would close it.
+- **`TABULAR` spread over whole spans** still widens hyphens in places the P2s
+  did not reach, including the shared `Axes` titles in
+  `da-statistics-communication/parts.tsx` ("p - value").
+- **`check:cues` misses cues behind a one-argument wrapper**
+  (`const w = (p) => n.word("ai", p)`): the overview hid 34 of its 57 that way,
+  now rewritten as literal calls.
+- **`check.mjs` cannot run as its header says** in a fresh container: the repo
+  root has no `node_modules`, so Pyodide, DuckDB and PGlite do not resolve.
+  Fixers ran them with `NODE_PATH` at private copies of the locked versions,
+  installing nothing, and every existing number reproduced exactly.
+- **`Drift` eases in over the whole scene**, so lengthening a scene slows its
+  opening and can fail `check:motion` on a card that did not change.
+- **The highlight indent in `da-pandas/parts.tsx`** (a P3) now shows in two
+  more Python & pandas listings.
+
 ## Beyond the videos
 
 - **`content/interview/data-scientist/sql.mdx:244`** says the default window frame
