@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
@@ -20,9 +21,11 @@ const SHOWN = 8;
  * Questions 9 and 10 on the page's 24 days of transactions: the running
  * total climbing 100, 350, 425, 605 to 4,255 on the 24th; then the trailing
  * three-day average, its frame a bracket sliding down the rows, clipped to
- * one row and then two at the start; and the centred frame.
+ * one row and then two at the start; the centered frame as a clause; and a
+ * frame of three rows that is not three days once a day can be missing.
  */
 export const RunningScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
@@ -39,6 +42,7 @@ export const RunningScene: React.FC = () => {
     n.word("running", "six oh five"),
   ];
   const lastAt = n.word("running", "four thousand two hundred fifty-five");
+  const safeAt = n.word("running-safe", "each day appears once");
   const q10At = n.word("moving", "Question ten");
   const q10TextAt = n.word("moving", "How do you compute a moving average");
   const avgAt = n.word("moving", "Average over an explicit rows frame");
@@ -47,6 +51,8 @@ export const RunningScene: React.FC = () => {
   const oneAt = n.word("moving", "one value");
   const twoAt = n.word("moving", "and then two");
   const centeredAt = n.word("moving", "A centered average");
+  const notDaysAt = n.word("moving-days", "Rows counts rows, not days");
+  const intervalAt = n.word("moving-days", "range with an interval");
   const end = n.beat("latest-in").to;
 
   const B = RUNNING.both;
@@ -61,7 +67,10 @@ export const RunningScene: React.FC = () => {
   const listH = listingHeight(B.lines.length, SIZE);
 
   // The trailing frame slides down the shown days as it is described, then
-  // the first two days show it clipped to one row and two, then centred.
+  // the first two days show it clipped to one row and two. The centered frame
+  // is only a clause: the table's column is the trailing average, so a
+  // bracket centred on a row would sit beside the wrong number. Last, three
+  // rows again, for "rows, not days".
   const slideFrom = avgAt + 4;
   const slideTo = lessAt - 8;
   const slides = SHOWN - 3;
@@ -69,8 +78,10 @@ export const RunningScene: React.FC = () => {
     ...Array.from({ length: slides + 1 }, (_, k) => ({ at: slideFrom + (k * (slideTo - slideFrom)) / slides, from: k, to: k + 2 })),
     { at: oneAt - 4, from: 0, to: 0 },
     { at: twoAt - 4, from: 0, to: 1 },
-    { at: centeredAt + 4, from: 3, to: 5, current: 4 },
+    { at: notDaysAt, from: 3, to: 5 },
   ];
+  // The frame by date instead, as it ran over the spine's gappy days.
+  const rangeClause = RUNNING.rangeDays.lines.map((l) => /RANGE BETWEEN .*CURRENT ROW/.exec(l)?.[0]).find(Boolean) ?? "";
 
   return (
     <AbsoluteFill>
@@ -97,7 +108,7 @@ export const RunningScene: React.FC = () => {
           width={820}
           size={SIZE}
           at={asked - 6}
-          lineAt={[asked - 4, asked, avgAt - 4, avgAt, asked + 2, asked + 4]}
+          lineAt={[asked - 4, asked, avgAt - 4, avgAt, avgAt + 4, asked + 2, asked + 4]}
           marks={[
             { line: 1, at: sumAt + 4, out: q10At },
             { line: 3, at: beforeAt - 2 },
@@ -120,13 +131,24 @@ export const RunningScene: React.FC = () => {
           ]}
         />
         <RowBracket g={g} steps={steps} />
+        <Note at={safeAt} x={X0} y={y(TOP) + listH + h(30)} out={q10At - 4}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>each day appears once, so the default frame is safe</span>
+        </Note>
         <Note at={lessAt} x={X0} y={y(TOP) + listH + h(30)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>the first days average fewer rows: the frame is clipped</span>
         </Note>
         <Note at={centeredAt} x={X0} y={y(TOP) + listH + h(90)}>
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>centred, about each day:</span>
+          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>centered, about each day:</span>
           <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
+          </div>
+        </Note>
+        <Note at={notDaysAt + 4} x={X0} y={y(TOP) + listH + h(170)}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            rows, not days. <span style={{ color: INK_SOFT }}>If a day can be missing:</span>
+          </span>
+          <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none", opacity: ease(frame, intervalAt - 2, 12) }}>
+            {rangeClause}
           </div>
         </Note>
       </Drift>

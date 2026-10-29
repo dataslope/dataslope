@@ -63,32 +63,41 @@ const Variance: React.FC<{ c: Ctx }> = ({ c }) => {
   const squaredAt = c.w("r-var", "average squared distance");
   const rootAt = c.w("r-var", "its square root");
   const unitsAt = c.w("r-var", "the data's own units");
-  const varAt = c.w("r-var", "two fifty");
-  const sdAt = c.w("r-var", "fifteen point eight one");
-  const ddofAt = c.w("r-var", "n minus one");
-  const { values, deviations } = RAPID.variance;
+  const takeAt = c.w("r-var-n", "Take ten");
+  const squaresAt = c.w("r-var-n", "Their squared distances");
+  const sumAt = c.w("r-var-n", "add to a thousand");
+  const overFiveAt = c.w("r-var-n", "a thousand over five");
+  const ddofAt = c.w("r-var-n", "n minus one");
+  const fiftyAt = c.w("r-var-n", "two fifty");
+  const closerAt = c.w("r-var-n", "sits closer");
+  const sdAt = c.w("r-var-n", "fifteen point eight one");
+  const V = RAPID.variance;
+  const { values, deviations } = V;
   const s: Scale = { lo: 0, hi: 60, a: R_X + 40, b: R_END };
-  const lineY = c.y(600);
+  const lineY = c.y(560);
   const mean = values.reduce((a, b) => a + b, 0) / values.length;
   const mx = at(s, mean);
+  const count = (v: number) => v.toLocaleString("en-US");
+  // The lines under the figure, each a row of its own.
+  const row = (k: number) => c.y(626) + k * c.h(44);
   return (
     <>
       <Line s={s} y={lineY} ticks={[0, 10, 20, 30, 40, 50, 60]} at={at0 - 4} />
       <VLine
         x={mx}
-        top={c.y(340)}
+        top={c.y(300)}
         bottom={lineY}
         at={at0}
         color={INK}
         dash="6 6"
         width={2}
-        labelY={c.y(330)}
+        labelY={c.y(290)}
         label={<span style={{ ...note(22, INK_SOFT), ...TABULAR }}>mean {fmt(mean, 0)}</span>}
       />
       {/* Each value's distance from the mean, one row each. */}
       <Svg>
         {values.map((v, i) => {
-          const rowY = c.y(400) + i * c.h(36);
+          const rowY = c.y(360) + i * c.h(36);
           const p = ease(frame, squaredAt + i * 3, 12);
           const x = at(s, v);
           return (
@@ -105,34 +114,59 @@ const Variance: React.FC<{ c: Ctx }> = ({ c }) => {
       {values.map((v, i) => {
         const d = deviations[i];
         return (
-          <Note key={v} at={squaredAt + i * 3 + 4} x={at(s, v) + (d < 0 ? -64 : 14)} y={c.y(400) + i * c.h(36) - 14}>
+          <Note key={v} at={squaredAt + i * 3 + 4} x={at(s, v) + (d < 0 ? -64 : 14)} y={c.y(360) + i * c.h(36) - 14}>
             <span style={{ ...label(19, BLUE_INK), ...TABULAR, whiteSpace: "nowrap" }}>
               {d === 0 ? "" : `${d < 0 ? "−" : "+"}${Math.abs(d)}`}
             </span>
           </Note>
         );
       })}
-      <Note at={squaredAt - 2} x={R_X + 40} y={c.y(670)}>
+      <Note at={squaredAt - 2} x={R_X + 40} y={row(0)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <b>variance</b>: the average squared distance from the mean
         </span>
       </Note>
-      <Note at={rootAt - 2} x={R_X + 40} y={c.y(714)}>
+      <Note at={rootAt - 2} x={R_X + 40} y={row(1)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <b>standard deviation</b>: its square root
           <span style={{ opacity: ease(frame, unitsAt - 2, 10) }}>, in the data&apos;s own units</span>
         </span>
       </Note>
-      <Note at={varAt - 4} x={R_X + 40} y={c.y(768)}>
-        <span style={{ ...note(28, BLUE_INK), ...TABULAR, whiteSpace: "nowrap" }}>
-          {values[0]} to {values[values.length - 1]}: variance <b>{fmt(RAPID.variance.var, 0)}</b>
-          <span style={{ opacity: ease(frame, sdAt - 2, 10) }}>
-            , standard deviation <b>{fmt(RAPID.variance.std)}</b>
+      {/* The page's 10 to 50, worked: the squares, then both divisors. */}
+      <Note at={Math.min(takeAt + 8, squaresAt) - 2} x={R_X + 40} y={row(2) + c.h(10)}>
+        <span style={{ ...note(26, BLUE_INK), whiteSpace: "nowrap" }}>
+          squared: <Num>{V.squares.map(count).join(" + ")}</Num>
+          <span style={{ opacity: ease(frame, sumAt - 2, 10) }}>
+            {" "}= <b><Num>{count(V.sumSquares)}</Num></b>
           </span>
         </span>
       </Note>
-      <Note at={ddofAt - 2} x={R_X + 40} y={c.y(818)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>pandas divides by n − 1</span>
+      <Note at={overFiveAt - 2} x={R_X + 40} y={row(3) + c.h(10)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <Num>
+            {count(V.sumSquares)} ÷ {V.n} = {fmt(V.varPop, 0)}
+          </Num>
+          , the average: divide by n
+        </span>
+      </Note>
+      <Note at={ddofAt - 2} x={R_X + 40} y={row(4) + c.h(10)}>
+        <span style={{ ...note(26, BLUE_INK), whiteSpace: "nowrap" }}>
+          <Num>
+            {count(V.sumSquares)} ÷ {V.n - 1} ={" "}
+            <b style={{ opacity: ease(frame, fiftyAt - 2, 10) }}>{fmt(V.var, 0)}</b>
+          </Num>
+          , pandas&apos; <Mono>.var()</Mono>: a sample divides by n − 1
+        </span>
+      </Note>
+      <Note at={closerAt - 2} x={R_X + 40} y={row(5) + c.h(10)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          a sample&apos;s own mean sits closer to its points, so ÷ n comes out small
+        </span>
+      </Note>
+      <Note at={sdAt - 4} x={R_X + 40} y={row(6) + c.h(14)}>
+        <span style={{ ...note(28, BLUE_INK), whiteSpace: "nowrap" }}>
+          standard deviation: <Num>√{fmt(V.var, 0)} =</Num> <b><Num>{fmt(V.std)}</Num></b>
+        </span>
       </Note>
     </>
   );

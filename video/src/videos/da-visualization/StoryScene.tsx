@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK, OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, TABULAR, fmt, headline, label, note } from "../../editorial/style";
+import { BAR, HIGHLIGHT, INK, INK_SOFT, TABULAR, fmt, headline, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ANNOTATION, STORY } from "./data";
-import { bandMid, BarSet, Drift, LineSet, Strike, Verdict, YTicks } from "./parts";
+import { bandMid, BarSet, Drift, LineSet, Mark, Strike, Svg, Verdict, YTicks } from "./parts";
 
 const CHART = { x0: 260, x1: 1260, base: 790, top: 500 };
 const STEPS_X = 1380;
@@ -16,7 +16,8 @@ const STEPS_X = 1380;
 /**
  * Questions 13 and 14. The page's revenue chart titled two ways: "Revenue by
  * month", a dataset, struck for "Revenue fell 12% the month after the price
- * rise", a claim, with the July bar marked. Then the page's signups, which
+ * rise", a claim, with the July bar marked in the highlight (it is what the
+ * title points at, not a wrong answer). Then the page's signups, which
  * look like steady growth until the June pricing change is marked and the
  * slopes either side of it, 1.1 and 4.3 a month, about four times apart.
  */
@@ -53,6 +54,9 @@ export const StoryScene: React.FC = () => {
   // The price rise lands between June and July; July is the bar that fell.
   const riseX = CHART.x0 + (S.rise * (CHART.x1 - CHART.x0)) / S.revenue.length;
   const fellX = bandMid(S.rise, S.revenue.length, CHART.x0, CHART.x1);
+  // The July bar's box, as BarSet draws it (bars fill 68% of their band).
+  const julyW = ((CHART.x1 - CHART.x0) / S.revenue.length) * 0.68;
+  const julyX = fellX - julyW / 2;
   const yRev = (v: number) => base - (v / 500) * (base - top);
   const aLo = 0;
   const aHi = 60;
@@ -93,7 +97,7 @@ export const StoryScene: React.FC = () => {
               key={s.text}
               style={{
                 position: "absolute",
-                left: STEPS_X + i * 14,
+                left: STEPS_X,
                 top: y(470) + i * h(64),
                 ...note(28, s.strong ? INK : INK_SOFT),
                 fontWeight: s.strong ? 650 : 500,
@@ -128,10 +132,13 @@ export const StoryScene: React.FC = () => {
           hi={500}
           at={perPointAt}
           step={1}
-          labelSize={16}
           out={out13}
-          color={S.revenue.map((_, i) => (i === S.rise && frame >= fellAt ? ACCENT : BAR))}
+          color={BAR}
         />
+        {/* The bar the title points at, ringed in the highlight. */}
+        <Svg opacity={ease(frame, fellAt, 12) * (1 - ease(frame, out13, 10))}>
+          <rect x={julyX - 5} y={yRev(S.revenue[S.rise]) - 5} width={julyW + 10} height={base - yRev(S.revenue[S.rise]) + 5} fill="none" stroke={HIGHLIGHT} strokeWidth={6} rx={3} />
+        </Svg>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, fellAt + 4, 12) * (1 - ease(frame, out13, 10)) }}>
           <line x1={riseX} x2={riseX} y1={top - 10} y2={base} stroke={INK} strokeWidth={1.6} strokeDasharray="5 5" />
         </svg>
@@ -139,7 +146,9 @@ export const StoryScene: React.FC = () => {
           <span style={{ ...label(19, INK), whiteSpace: "nowrap" }}>price rise</span>
         </Note>
         <Note at={fellAt + 10} x={fellX - 24} y={yRev(S.revenue[S.rise]) - h(36)} out={out13}>
-          <span style={{ ...label(21, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>−{S.dropPct}%</span>
+          <span style={{ ...label(21, INK), whiteSpace: "nowrap", ...TABULAR }}>
+            <Mark at={fellAt + 12}>−{S.dropPct}%</Mark>
+          </span>
         </Note>
         <Verdict ok={false} x={STEPS_X} y={y(780)} at={datasetAt} out={out13}>
           a topic: hands them a dataset
@@ -150,7 +159,7 @@ export const StoryScene: React.FC = () => {
 
         {/* ── Question 14: one marked change ── */}
         <YTicks ticks={[0, 20, 40, 60]} x={CHART.x0} base={base} top={top} lo={aLo} hi={aHi} at={onChartAt} />
-        <LineSet values={A.values} x0={CHART.x0} x1={CHART.x1} base={base} top={top} lo={aLo} hi={aHi} at={steadyAt - 4} labels={A.months} labelSize={16} edges />
+        <LineSet values={A.values} x0={CHART.x0} x1={CHART.x1} base={base} top={top} lo={aLo} hi={aHi} at={steadyAt - 4} labels={A.months} edges />
         <Note at={steadyAt + 4} x={CHART.x0} y={top - h(70)}>
           <span style={{ ...headline(34), color: INK, whiteSpace: "nowrap" }}>Signups</span>
         </Note>

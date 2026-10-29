@@ -31,9 +31,10 @@ const ROW_H = 56;
 
 /**
  * Question 4, the fan-out: two orders worth 150.00, one with three items.
- * Joined to its items, order 1 is three rows and the sum comes to 350.00;
- * counting the items per order in a CTE first keeps one row per order, and
- * the sum is 150.00 again.
+ * Joined to its items, order 1 is three rows and the sum comes to 350.00.
+ * The fix is the grain, what one row stands for: the query wants revenue and
+ * an item count, so it counts the items per order in a CTE first, keeping one
+ * row per order, and the sum is 150.00 again.
  */
 export const FanoutScene: React.FC = () => {
   const n = useNarration();
@@ -53,7 +54,9 @@ export const FanoutScene: React.FC = () => {
   const sumAt = n.word("fanout-join", "Sum the amount");
   const inflatedAt = n.word("fanout-join", "three hundred fifty");
   const fixAt = n.word("fanout-fix", "The fix");
-  const countAt = n.word("fanout-fix", "Count the items");
+  const grainAt = n.word("fanout-fix", "what one row stands for");
+  const wantAt = n.word("fanout-fix", "revenue and an item count");
+  const countAt = n.word("fanout-fix", "count the items");
   const oneRowAt = n.word("fanout-fix", "One row per order");
   const backAt = n.word("fanout-fix", "one fifty");
   const end = n.beat("fanout-fix").to;
@@ -94,7 +97,7 @@ export const FanoutScene: React.FC = () => {
   });
   const fixG = tableGeometry({
     x: LIST_X,
-    top: y(TOP) + fixedH + h(84),
+    top: y(TOP) + fixedH + h(118),
     cols: [{ name: "revenue" }, { name: "items" }],
     rows: FANOUT.fixed.rows,
     headH: h(HEAD_H),
@@ -104,6 +107,8 @@ export const FanoutScene: React.FC = () => {
   const orderRow = new Map(FANOUT.orders.rows.map((r, i) => [r[0], i]));
   const fanned = FANOUT.joined.rows.map((r) => r[0] === FANOUT.joined.rows[0][0]);
   const cteLines = FANOUT.fixed.lines.findIndex((l) => l.startsWith(")"));
+  // The outer SELECT's two lines: the revenue and the item count it wants.
+  const selectLine = FANOUT.fixed.lines.findIndex((l) => l.startsWith("SELECT"));
 
   return (
     <AbsoluteFill>
@@ -187,11 +192,20 @@ export const FanoutScene: React.FC = () => {
           width={LIST_W}
           size={22}
           at={fixAt + 2}
-          marks={Array.from({ length: cteLines + 1 }, (_, i) => ({ line: i, at: countAt + 2 + i * 3 }))}
+          marks={[
+            { line: selectLine, at: wantAt, out: countAt },
+            { line: selectLine + 1, at: wantAt + 3, out: countAt },
+            ...Array.from({ length: cteLines + 1 }, (_, i) => ({ line: i, at: countAt + 2 + i * 3 })),
+          ]}
         />
-        <Note at={oneRowAt - 2} x={LIST_X} y={y(TOP) + fixedH + 12}>
+        <Note at={grainAt - 2} x={LIST_X} y={y(TOP) + fixedH + 12}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <Mono>items</Mono> has one row per order, then the join
+            <span style={{ fontWeight: 650 }}>The grain:</span> what one row stands for.
+          </span>
+        </Note>
+        <Note at={oneRowAt - 2} x={LIST_X} y={y(TOP) + fixedH + 48}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <Mono>items</Mono>: one row per order, the orders&apos; grain. Then the join.
           </span>
         </Note>
         <DataTable

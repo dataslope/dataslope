@@ -20,14 +20,6 @@ const LIN_HI = 9000;
 const LOG_LO = 1;
 const LOG_HI = 4;
 
-/**
- * Question 8. The page's two series, twelve periods: 4,000 growing 6% a
- * period and 40 growing 35%. On a linear axis the small one lies along the
- * floor; on a log axis both are straight lines and the faster one is the
- * steeper, with the scale labeled. Each line is labeled at its end in both
- * panels, by where it starts and how fast it grows.
- */
-
 /** A series' label at the end of its line: where it starts, and its growth. */
 const EndLabel: React.FC<{ at: number; x: number; y: number; start: number; growth: number }> = ({ at, x, y, start, growth }) => (
   <Note at={at} x={x} y={y - 14}>
@@ -36,6 +28,14 @@ const EndLabel: React.FC<{ at: number; x: number; y: number; start: number; grow
     </span>
   </Note>
 );
+
+/**
+ * Question 8. The page's two series, twelve periods: 4,000 growing 6% a
+ * period and 40 growing 35%. On a linear axis the small one lies along the
+ * floor; on a log axis both are straight lines and the faster one is the
+ * steeper, with the scale labeled. Each line is labeled at its end in both
+ * panels, by where it starts and how fast it grows.
+ */
 export const LogScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();

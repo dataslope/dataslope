@@ -237,7 +237,7 @@ export const script: NarrationScript = {
     {
       id: "risks",
       text: "Question ten. What are the main risks of analysis in a spreadsheet? Manual steps nobody can rerun. Formulas that break quietly when rows move. No schema: one revenue typed as text drops out of the sum, and the total reads ten seventy instead of twelve twenty. And big files that crawl, then crash.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.8,
     },
 
     // ── Rapid round ───────────────────────────────────────────────────────

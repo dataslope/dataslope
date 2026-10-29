@@ -140,6 +140,8 @@ export const ANTI = {
   notIn: query("anti", "notIn"),
   notExists: query("anti", "notExists"),
   leftNull: query("anti", "leftNull"),
+  /** NOT IN with the nulls filtered out of its subquery: it finds Di too. */
+  notInGuarded: query("anti", "notInGuarded"),
 };
 
 // ── 8. DISTINCT ─────────────────────────────────────────────────────────────

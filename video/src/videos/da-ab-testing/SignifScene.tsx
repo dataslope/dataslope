@@ -4,12 +4,12 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COVERAGE, EXPERIMENT, PRACTICAL } from "./data";
-import { A_COLOR, at, B_COLOR, B_INK, Drift, OK, OK_INK, type Scale, Svg, X0 } from "./parts";
+import { A_COLOR, at, B_COLOR, B_INK, Drift, OK_INK, type Scale, Svg, X0 } from "./parts";
 
 const TOP = 330;
 /** Question 8's chart: the p-value against the group size, on a log axis. */
@@ -24,7 +24,8 @@ const pText = (p: number) => (p >= 0.01 ? fmt(p, p >= 0.1 ? 2 : 3) : p >= 1e-4 ?
 /**
  * Questions 8 and 9. One small effect (d = 0.2) at eight group sizes: p
  * falls from 0.65 at 10 to 0.046 at 200, under the line, and to
- * essentially zero at 2,000, the effect never changing. Then the course's
+ * essentially zero at 2,000, the effect never changing; every dot in the
+ * data blue, since significance alone is not the win. Then the course's
  * lift of 2.05 points with its interval, 0.95 to 3.15, as estimate plus or
  * minus 1.96 standard errors, and a hundred intervals around a known truth,
  * four of which miss.
@@ -45,15 +46,19 @@ export const SignifScene: React.FC = () => {
   const twoThousandAt = n.word("signif-n", "At two thousand");
   const neverAt = n.word("signif-n", "The effect never changed");
   const reportAt = n.word("signif-n", "report the effect size");
+  const fifthAt = n.word("signif-size", "a fifth of a standard deviation");
+  const callAt = n.word("signif-size", "a business call");
+  const shipAt = n.word("signif-size", "the smallest lift worth shipping");
   const q9At = n.word("ci", "Question nine");
   const q9TextAt = n.word("ci", "How would you explain");
   const rangeAt = n.word("ci", "Give a range");
   const twoAt = n.word("ci", "about two points");
   const betweenAt = n.word("ci", "between one and three");
   const plusAt = n.word("ci-margin", "plus or minus");
-  const ninetyFiveAt = n.word("ci-margin", "Ninety-five percent means");
-  const fourAt = n.word("ci-margin", "four miss");
-  const wideAt = n.word("ci-margin", "a wide interval");
+  const seAt = n.word("ci-se", "A standard error is");
+  const ninetyFiveAt = n.word("ci-cover", "Ninety-five percent means");
+  const fourAt = n.word("ci-cover", "four miss");
+  const wideAt = n.word("ci-wide", "if the range were wide");
   const end = n.beat("power-in").to;
   const out8 = q9At - 4;
 
@@ -71,8 +76,8 @@ export const SignifScene: React.FC = () => {
     // Each label sits clear of what is near its dot: the axis title by the
     // first, the 0.05 label by the last.
     { size: 10, at: tenAt, color: INK, place: "right" },
-    { size: PRACTICAL.cross, at: twoHundredAt, color: OK_INK, place: "above" },
-    { size: 2000, at: twoThousandAt, color: OK_INK, place: "left" },
+    { size: PRACTICAL.cross, at: twoHundredAt, color: INK, place: "above" },
+    { size: 2000, at: twoThousandAt, color: INK, place: "left" },
   ] as const;
 
   // ── Question 9 ──
@@ -134,7 +139,7 @@ export const SignifScene: React.FC = () => {
             p-value
           </text>
           {PRACTICAL.rows.map(([s, p], i) => (
-            <circle key={s} cx={px(s)} cy={ppy(p)} r={10 * shown(i)} fill={p < 0.05 ? OK : A_COLOR} />
+            <circle key={s} cx={px(s)} cy={ppy(p)} r={10 * shown(i)} fill={A_COLOR} />
           ))}
         </Svg>
         {callouts.map((c) => {
@@ -156,13 +161,24 @@ export const SignifScene: React.FC = () => {
           );
         })}
         <Note at={holdAt + 4} x={P.x0 + 520} y={y(P.top) - h(10)} out={out8}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>the same small effect at every size</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            the same small effect at every size
+            <span style={{ opacity: ease(frame, fifthAt - 2, 10), color: INK }}>
+              : <i>d</i> = <Num>{PRACTICAL.d}</Num>
+            </span>
+          </span>
         </Note>
         <Note at={neverAt - 2} x={P.x0 + 520} y={y(P.top) + h(36)} out={out8}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>only the sample grew</span>
         </Note>
         <Note at={reportAt - 2} x={P.x0 + 520} y={y(P.top) + h(82)} out={out8}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>report the effect and its range, not just p</span>
+        </Note>
+        <Note at={callAt - 2} x={P.x0 + 520} y={y(P.top) + h(128)} out={out8}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <b>practical</b>: a business call
+            <span style={{ opacity: ease(frame, shipAt - 4, 10) }}>, the effect and its range against the smallest lift worth shipping</span>
+          </span>
         </Note>
 
         {/* ── Question 9: a range a stakeholder can use ── */}
@@ -213,8 +229,11 @@ export const SignifScene: React.FC = () => {
             estimate ± 1.96 standard errors: {fmt(EXPERIMENT.lift[0])} ± {fmt(EXPERIMENT.zc)} × {fmt(EXPERIMENT.se)}
           </span>
         </Note>
-        <Note at={wideAt - 2} x={X0} y={liftY + h(180)}>
-          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>a wide interval: we need more data</span>
+        <Note at={seAt - 2} x={X0} y={liftY + h(180)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>standard error: how much the estimate wobbles from run to run</span>
+        </Note>
+        <Note at={wideAt - 2} x={X0} y={liftY + h(232)}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>if it were wide, from a loss to a big win: we&apos;d need more data</span>
         </Note>
 
         {/* A hundred 95% intervals around a known truth. */}

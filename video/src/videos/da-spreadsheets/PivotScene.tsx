@@ -5,7 +5,6 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PIVOT, printed } from "./data";
@@ -189,7 +188,7 @@ export const PivotScene: React.FC = () => {
         />
         <Note at={sqlAt - 2} x={PANEL_X} y={pg.bottom + h(20)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
-            in SQL: <span style={{ fontFamily: MONO, fontSize: 20, color: INK }}>SUM(CASE WHEN …)</span>
+            in SQL: <Mono color={INK}>SUM(CASE WHEN …)</Mono>
           </span>
         </Note>
         <Note at={twoAt - 2} x={pg.colMid(3) + 70} y={pg.rowTop(2) + 4}>

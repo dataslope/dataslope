@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CONDITIONS, PIVOT, printed } from "./data";
-import { Drift, FormulaBar, MARK_BAD, Sheet, sheetGeometry, X0 } from "./parts";
+import { Drift, FormulaBar, Mark, MARK_BAD, Sheet, sheetGeometry, X0 } from "./parts";
 
 const LIST_Y = 360;
 const PITCH = 64;
@@ -92,6 +92,7 @@ export const ToolScene: React.FC = () => {
   const readsAt = n.word("risks", "ten seventy");
   const insteadAt = n.word("risks", "twelve twenty");
   const crawlAt = n.word("risks", "big files that crawl");
+  const sqlAt = n.word("tool-when", "it belongs in SQL");
   const end = n.beat("rapid-in").from;
 
   const out9 = q10At - 4;
@@ -147,7 +148,9 @@ export const ToolScene: React.FC = () => {
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>sheets slow down well before a million rows</span>
         </Note>
         <Note at={weeklyAt - 2} x={X0} y={y(LIST_Y) + h(54) + h(PITCH) * 4 + h(20)} out={out9}>
-          <span style={{ ...note(28, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the same manual steps every week? it belongs in SQL</span>
+          <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            the same manual steps every week? <Mark at={sqlAt}>it belongs in SQL</Mark>
+          </span>
         </Note>
 
         {/* ── Question 10 ── */}
@@ -167,15 +170,17 @@ export const ToolScene: React.FC = () => {
         <Sheet
           g={g}
           values={revenue}
-          at={q10TextAt + 10}
-          cellAt={(r) => q10TextAt + 12 + r}
+          at={q10At + 6}
+          cellAt={(r) => q10At + 8 + r}
           bold={(r) => r === 1}
           align={(r) => (r === textRow ? "left" : undefined)}
           ink={(r) => (r === textRow ? ACCENT_INK : undefined)}
           fills={[{ r: textRow, c: 0, at: textNumAt, color: MARK_BAD }]}
         />
         <Note at={textNumAt + 4} x={g.right + 24} y={g.rowTop(textRow)}>
-          <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>typed as text</span>
+          <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
+            typed as text: it sits <b>left</b>, where numbers sit right
+          </span>
         </Note>
         <FormulaBar
           x={g.right + 24}
@@ -189,10 +194,33 @@ export const ToolScene: React.FC = () => {
           tone="bad"
         />
         <Note at={insteadAt - 2} x={g.right + 24} y={g.rowTop(8) + h(60)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            with it as a number: <b>{printed(C.total.value)}</b>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            with it as a number: <b style={TABULAR}>{printed(C.total.value)}</b>
           </span>
         </Note>
+        {/* How to catch it, and the fix. */}
+        <FormulaBar
+          x={g.right + 24}
+          top={g.rowTop(8) + h(116)}
+          width={420}
+          formula={C.textCell.formula ?? ""}
+          at={insteadAt + 20}
+          typeDur={8}
+          result={printed(C.textCell.value)}
+          resultAt={insteadAt + 30}
+          tone="bad"
+        />
+        <FormulaBar
+          x={g.right + 24}
+          top={g.rowTop(8) + h(176)}
+          width={420}
+          formula={C.textValue.formula ?? ""}
+          at={crawlAt - 6}
+          typeDur={8}
+          result={printed(C.textValue.value)}
+          resultAt={crawlAt + 4}
+          tone="ok"
+        />
       </Drift>
     </AbsoluteFill>
   );

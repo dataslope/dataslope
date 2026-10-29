@@ -7,7 +7,8 @@ import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, not
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, ElbowArrow, X0 } from "./parts";
+import { NULLS } from "./data";
+import { Drift, ElbowArrow, Mono, X0 } from "./parts";
 
 const LIST_Y = 350;
 const PITCH = 70;
@@ -43,8 +44,9 @@ const Count: React.FC<{ x: number; y: number; at: number; name: string; rows: st
 /**
  * Question 2: the page's seven checks, ticked as they are named, with the
  * page's own fan-out illustration (10,000 orders that come out of a join as
- * 14,000 rows) drawn beside the row-count check, and the range check's
- * example beside the last.
+ * 14,000 rows) drawn beside the row-count check, an example beside the
+ * filter, NULL and reconcile checks (the NULL trap's 0 rows from check.mjs),
+ * and the range check's example beside the last.
  */
 export const CheckScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -69,13 +71,19 @@ export const CheckScene: React.FC = () => {
   const tenAt = n.word("check-read", "Ten thousand orders");
   const fourteenAt = n.word("check-read", "fourteen thousand rows");
   const fanAt = n.word("check-read", "fanning out");
-  const hundredAt = n.word("check-trust", "over a hundred percent");
-  const bugAt = n.word("check-trust", "a bug until proven otherwise");
-  const end = n.beat("check-trust").to;
+  const revenueAt = n.word("check-filters", "does revenue drop refunds");
+  const notInAt = n.word("check-filters", "like NOT IN");
+  const financeAt = n.word("check-trust", "like the finance report");
+  const hundredAt = n.word("check-range", "over a hundred percent");
+  const bugAt = n.word("check-range", "a bug until proven otherwise");
+  const end = n.beat("check-range").to;
 
   const top = y(LIST_Y);
   const pitch = h(PITCH);
-  const figTop = top + pitch * 1 - h(10);
+  // Level with step 2, and clear above step 3, whose example sits beside it.
+  const figTop = top + pitch * 1 - h(22);
+  /** Beside step `i`, level with its text. */
+  const besideY = (i: number) => top + i * pitch + 3;
 
   return (
     <AbsoluteFill>
@@ -129,8 +137,23 @@ export const CheckScene: React.FC = () => {
           width={2.4}
         />
         <Count x={FIG_X + 396} y={figTop} at={fourteenAt - 2} name="after the join" rows="14,000 rows" bad />
-        <Note at={fanAt - 2} x={FIG_X + 396} y={figTop + h(108)}>
+        {/* Above its box, so the row under it is free for step 3's example. */}
+        <Note at={fanAt - 2} x={FIG_X + 396} y={figTop - h(40)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>something is fanning out</span>
+        </Note>
+
+        {/* ── Examples for the filter, NULL and reconcile checks ── */}
+        <Note at={revenueAt - 2} x={FIG_X} y={besideY(2)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>does revenue drop refunds and test accounts?</span>
+        </Note>
+        <Note at={notInAt - 2} x={FIG_X} y={besideY(3)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <Mono color={INK}>NOT IN</Mono> against a column with nulls:{" "}
+            <span style={{ color: ACCENT_INK, fontWeight: 650 }}>{NULLS.notIn} rows</span>
+          </span>
+        </Note>
+        <Note at={financeAt - 2} x={FIG_X} y={besideY(4)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>like the finance report</span>
         </Note>
 
         {/* ── The range check's example ── */}

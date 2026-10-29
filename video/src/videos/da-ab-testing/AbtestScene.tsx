@@ -4,11 +4,11 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { BALANCE, EXPERIMENT } from "./data";
+import { BALANCE, ERRORS, EXPERIMENT } from "./data";
 import {
   A_COLOR,
   A_INK,
@@ -18,6 +18,7 @@ import {
   curvePath,
   Drift,
   ElbowArrow,
+  MARK,
   type Scale,
   Strike,
   Svg,
@@ -26,7 +27,7 @@ import {
 
 const TOP = 330;
 /** The balance chart: one row per trait, the gap between arms along x. */
-const BAL = { x0: 1180, x1: 1760, top: 360, pitch: 46 };
+const BAL = { x0: 1180, x1: 1760, top: 360, pitch: 40 };
 /** The null distribution for question 7. */
 const NULL = { x0: 920, x1: 1760, base: 760, height: 300 };
 
@@ -35,8 +36,9 @@ const NULL = { x0: 920, x1: 1760, base: 760, height: 300 };
  * metric; the page's chart of ten traits shows why: under self-selection all
  * ten arms differ by more than the usual 0.1, under a coin only age, at
  * 0.102. Then the course's experiment, 579 of 6,000 against 702 of 6,000,
- * and where its z of 3.64 falls on the curve a do-nothing change would give:
- * p = 0.0003, and what that number is not.
+ * and where its 3.64 standard errors fall on the curve a do-nothing change
+ * would give: the 5% tails past 1.96 in yellow as the cutoff is named, p =
+ * 0.0003 the area past 3.64 (too thin to draw), and what that number is not.
  */
 export const AbtestScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -58,18 +60,22 @@ export const AbtestScene: React.FC = () => {
   const causationAt = n.word("abtest-why", "That's causation");
   const pickAt = n.word("abtest-balance", "Let users pick");
   const tenAt = n.word("abtest-balance", "all ten of these traits");
-  const coinAt = n.word("abtest-balance", "Flip a coin");
-  const barelyAt = n.word("abtest-balance", "barely");
+  const flagAt = n.word("abtest-balance", "the usual flag");
+  const coinAt = n.word("abtest-coin", "Flip a coin");
+  const barelyAt = n.word("abtest-coin", "barely");
   const q7At = n.word("pvalue", "Question seven");
   const q7TextAt = n.word("pvalue", "What is a p-value");
   const extremeAt = n.word("pvalue", "at least this extreme");
   const noDiffAt = n.word("pvalue", "really no difference");
-  const countsAt = n.word("pvalue", "five hundred seventy-nine");
-  const bAt = n.word("pvalue", "seven hundred two in B");
-  const nothingAt = n.word("pvalue", "If the change did nothing");
-  const threeAt = n.word("pvalue", "three times in ten thousand");
+  const countsAt = n.word("pvalue-test", "five hundred seventy-nine");
+  const bAt = n.word("pvalue-test", "seven hundred two in B");
+  const nothingAt = n.word("pvalue-gap", "If the change did nothing");
+  const seAt = n.word("pvalue-gap", "three point six four standard errors");
+  const threeAt = n.word("pvalue-gap", "three times in ten thousand");
+  const cutoffAt = n.word("pvalue-gap", "the usual cutoff");
+  const realAt = n.word("pvalue-gap", "treat the lift as real");
   const notAt = n.word("pvalue-not", "It isn't the chance");
-  const sizeAt = n.word("pvalue-not", "how big the effect is");
+  const sizeAt = n.word("pvalue-size", "how big the effect is");
   const end = n.beat("signif-in").to;
   const out6 = q7At - 4;
 
@@ -93,8 +99,10 @@ export const AbtestScene: React.FC = () => {
   const base = y(NULL.base);
   const height = h(NULL.height);
   const zx = at(zs, EXPERIMENT.z);
+  const crit = EXPERIMENT.zc;
   const curveP = ease(frame, nothingAt - 4, 20);
-  const tailP = ease(frame, threeAt - 6, 14);
+  const oursP = ease(frame, seAt - 2, 14);
+  const tailP = ease(frame, cutoffAt - 2, 14);
   const tableX = X0;
   const tableTop = y(TOP + 30);
   const pctOf = (x: number, total: number) => `${fmt((100 * x) / total, 2)}%`;
@@ -180,8 +188,9 @@ export const AbtestScene: React.FC = () => {
         {/* The page's chart: ten traits, users choosing against a coin. */}
         <Svg opacity={ease(frame, pickAt - 4, 12) * (1 - ease(frame, out6, 10))}>
           <line x1={lineX} x2={lineX} y1={rowY(0) - h(24)} y2={rowY(BALANCE.rows.length - 1) + h(22)} stroke={INK} strokeWidth={1.6} strokeDasharray="5 5" />
-          <text x={lineX} y={rowY(0) - h(32)} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 18, fontWeight: 600, fill: INK_SOFT }}>
-            0.1
+          <text x={lineX - 14} y={rowY(0) - h(30)} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: INK_SOFT }}>
+            {BALANCE.threshold}
+            <tspan opacity={ease(frame, flagAt - 2, 10)}>: the usual flag</tspan>
           </text>
           <line x1={BAL.x0} x2={BAL.x1} y1={rowY(BALANCE.rows.length - 1) + h(26)} y2={rowY(BALANCE.rows.length - 1) + h(26)} stroke={INK} strokeWidth={1.4} />
           {[0, 0.5, 1].map((t) => (
@@ -190,7 +199,7 @@ export const AbtestScene: React.FC = () => {
               x={at(xs, t)}
               y={rowY(BALANCE.rows.length - 1) + h(52)}
               textAnchor="middle"
-              style={{ fontFamily: SANS, fontSize: 18, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
+              style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}
             >
               {t}
             </text>
@@ -225,14 +234,14 @@ export const AbtestScene: React.FC = () => {
           </span>
         </Note>
         <Note at={coinAt + 6} x={BAL.x0} y={rowY(BALANCE.rows.length - 1) + h(104)} out={out6}>
-          <span style={{ ...note(22, A_INK), whiteSpace: "nowrap", ...TABULAR }}>
-            ● a coin: {BALANCE.overRandomised.length}, {overKey} at {fmt(BALANCE.overRandomised[0]?.[1] ?? 0, 3)}
+          <span style={{ ...note(22, A_INK), whiteSpace: "nowrap" }}>
+            ● a coin: only {overKey} over, at <Num>{fmt(BALANCE.overRandomised[0]?.[1] ?? 0, 3)}</Num>
           </span>
         </Note>
 
         {/* ── Question 7: the course's experiment, and a do-nothing world ── */}
         <Note at={countsAt - 4} x={tableX} y={tableTop}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>the course&apos;s test</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>one test</span>
         </Note>
         {[
           { name: "A", x: EXPERIMENT.xA, n: EXPERIMENT.nA, ink: A_INK, at: countsAt },
@@ -251,8 +260,21 @@ export const AbtestScene: React.FC = () => {
             <span style={{ opacity: ease(frame, noDiffAt - 2, 10) }}> if there were really no difference</span>
           </span>
         </Note>
+        <Note at={cutoffAt - 2} x={tableX} y={tableTop + h(278)}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <b>
+              <Num>{EXPERIMENT.p}</Num> &lt; <Num>{ERRORS.alpha}</Num>
+            </b>
+            , the usual cutoff
+            <span style={{ opacity: ease(frame, realAt - 2, 10) }}>: treat the lift as real</span>
+          </span>
+        </Note>
+        {/* The 5% a do-nothing change lands past ±1.96, drawn as the cutoff is named. */}
+        <Svg opacity={tailP}>
+          <path d={curvePath(zs, base, height, 0, crit, 4.4, true)} fill={MARK} />
+          <path d={curvePath(zs, base, height, 0, -4, -crit, true)} fill={MARK} />
+        </Svg>
         <Svg opacity={curveP}>
-          <path d={curvePath(zs, base, height, 0, -4, 4.4, true)} fill={INK_SOFT} opacity={0.12} />
           <path d={curvePath(zs, base, height, 0, -4, 4.4)} fill="none" stroke={INK} strokeWidth={2.4} />
           <line x1={NULL.x0} x2={NULL.x1} y1={base} y2={base} stroke={INK} strokeWidth={1.4} />
           {[-3, 0, 3].map((t) => (
@@ -261,25 +283,39 @@ export const AbtestScene: React.FC = () => {
             </text>
           ))}
         </Svg>
-        <Svg opacity={tailP}>
-          <path d={curvePath(zs, base, height, 0, EXPERIMENT.z, 4.4, true)} fill={ACCENT} opacity={0.9} />
-          <path d={curvePath(zs, base, height, 0, -4, -EXPERIMENT.z, true)} fill={ACCENT} opacity={0.9} />
+        <Svg opacity={oursP}>
           <line x1={zx} x2={zx} y1={base - height * 0.55} y2={base} stroke={B_COLOR} strokeWidth={3.4} />
         </Svg>
         <Note at={nothingAt + 2} x={NULL.x0} y={base - height - h(46)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>gaps a do-nothing change would give, in standard errors</span>
         </Note>
-        <Note at={threeAt - 4} x={zx - 16} width={300} y={base - height * 0.55 - h(70)} align="right">
-          <span style={{ ...note(25, B_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>ours: z = {fmt(EXPERIMENT.z)}</span>
+        <Note at={seAt} x={zx - 16} width={320} y={base - height * 0.55 - h(70)} align="right">
+          <span style={{ ...note(25, B_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            ours: <Num>{fmt(EXPERIMENT.z)}</Num>
+          </span>
           <br />
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>p = {EXPERIMENT.p}</span>
+          <span style={{ ...note(25, B_INK), whiteSpace: "nowrap" }}>standard errors out</span>
         </Note>
-        <Note at={notAt - 2} x={tableX} y={tableTop + h(320)}>
+        {/* Under the axis: what the yellow is, and where p is. */}
+        <Note at={cutoffAt + 4} x={NULL.x0} y={base + h(48)}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            yellow: past ±<Num>{fmt(crit)}</Num>, where <Num>{Math.round(ERRORS.alpha * 100)}%</Num> of do-nothing gaps land
+          </span>
+        </Note>
+        <Note at={threeAt - 2} x={NULL.x0} y={base + h(84)}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <b>
+              p = <Num>{EXPERIMENT.p}</Num>
+            </b>
+            : the area past ±<Num>{fmt(EXPERIMENT.z)}</Num>, too thin to see
+          </span>
+        </Note>
+        <Note at={notAt - 2} x={tableX} y={tableTop + h(336)}>
           <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>
             <Strike at={notAt + 6}>the chance there&apos;s no effect</Strike>
           </span>
         </Note>
-        <Note at={sizeAt - 2} x={tableX} y={tableTop + h(366)}>
+        <Note at={sizeAt - 2} x={tableX} y={tableTop + h(382)}>
           <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>
             <Strike at={sizeAt + 8}>how big the effect is</Strike>
           </span>

@@ -62,6 +62,8 @@ export const RankScene: React.FC = () => {
   const exactlyAt = n.word("topn", "exactly two per category");
   const tieAt = n.word("topn", "Emma and Ulysses tie");
   const onlyAt = n.word("topn", "only one of them makes it");
+  const arbitraryOneAt = n.word("topn-tie", "Which one is arbitrary");
+  const breakerAt = n.word("topn-tie", "to the order by");
   const useRankAt = n.word("topn-rank", "Use rank instead");
   const fiveAt = n.word("topn-rank", "five rows");
   const q5At = n.word("qualify", "Question five");
@@ -69,8 +71,10 @@ export const RankScene: React.FC = () => {
   const filtersAt = n.word("qualify", "filters on a window function");
   const noWrapAt = n.word("qualify", "no wrapping query");
   const supportAt = n.word("qualify", "DuckDB, Snowflake and BigQuery");
+  const wrapAt = n.word("qualify-where", "Postgres and SQL Server");
   const bridgeAt = n.beat("frame-in").from;
-  const clearAt = n.word("frame-in", "the frame") + 2;
+  // The finished page holds through the bridge and fades into the cut.
+  const clearAt = n.beat("frame").from - 8 - 30;
   const end = n.beat("frame-in").to;
 
   // ── Question 3 ──
@@ -105,7 +109,7 @@ export const RankScene: React.FC = () => {
       <Sfx name="el-pop" at={noWrapAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        {/* On the bridge to the next scene the takeaway is marked, then the page clears. */}
+        {/* On the bridge to the next scene the takeaway is marked; the page clears into the cut. */}
         <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} out={out3} size={60}>
           How do <QMono>ROW_NUMBER</QMono>, <QMono>RANK</QMono>, and <QMono>DENSE_RANK</QMono> differ?
@@ -131,18 +135,13 @@ export const RankScene: React.FC = () => {
           out={out3}
           rows={rowsAt(T.rows, asked + 2)}
           bands={[
-            ...eights.map((row) => ({ row, at: eightyEightAt + 2, out: denseAt, color: MARK })),
-            ...fives.map((row) => ({ row, at: eightyFiveAt + 2, out: denseAt, color: MARK })),
+            // The ties are pointed at, then give way to the ranks counted through them.
+            ...eights.map((row) => ({ row, at: eightyEightAt + 2, out: rnAt, color: MARK })),
+            ...fives.map((row) => ({ row, at: eightyFiveAt + 2, out: rnAt, color: MARK })),
           ]}
           marks={[
             ...T.rows.map((_, row) => ({ row, col: col("rn"), at: rnAt + 4 + row * 2, out: rankAt })),
-            ...[...eights, fives[0]].map((row, k) => ({
-              row,
-              col: col("rnk"),
-              at: rankAt + 8 + k * 6,
-              out: denseAt,
-              color: row === fives[0] ? MARK_BAD : undefined,
-            })),
+            ...[...eights, fives[0]].map((row, k) => ({ row, col: col("rnk"), at: rankAt + 8 + k * 6, out: denseAt })),
             ...[...eights, fives[0]].map((row, k) => ({ row, col: col("drnk"), at: denseAt + 8 + k * 6, color: MARK_OK })),
           ]}
         />
@@ -153,7 +152,7 @@ export const RankScene: React.FC = () => {
         </Note>
         <Note at={elevenAt - 4} x={X0} y={y(TOP) + listingHeight(RANK.lines.length, SIZE) + h(76)} out={out3}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <QMono>RANK</QMono>: ties share, then it <span style={{ color: ACCENT_INK, fontWeight: 650 }}>skips</span> (8, 8, 8, 11)
+            <QMono>RANK</QMono>: ties share, then it <span style={{ fontWeight: 650 }}>skips</span> (8, 8, 8, 11)
           </span>
         </Note>
         <Note at={nineAt - 4} x={X0} y={y(TOP) + listingHeight(RANK.lines.length, SIZE) + h(122)} out={out3}>
@@ -184,7 +183,10 @@ export const RankScene: React.FC = () => {
           size={19}
           at={numberAt - 4}
           out={useRankAt - 2}
-          marks={[{ line: 6, at: exactlyAt - 4 }]}
+          marks={[
+            { line: 6, at: exactlyAt - 4, out: breakerAt - 2 },
+            { line: 3, at: breakerAt },
+          ]}
         />
         <DataTable g={rng} cols={colsOf(rn)} at={exactlyAt - 4} out={useRankAt - 2} rows={rowsAt(rn.rows, exactlyAt)} />
         <Listing
@@ -232,11 +234,19 @@ export const RankScene: React.FC = () => {
         <Note at={supportAt - 2} x={TOPN_LIST_X} y={y(TOP) + listingHeight(q.lines.length, 19) + h(68)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>DuckDB, Snowflake, BigQuery</span>
         </Note>
+        <Note at={wrapAt} x={TOPN_LIST_X} y={y(TOP) + listingHeight(q.lines.length, 19) + h(106)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>not Postgres or SQL Server: wrap the query there</span>
+        </Note>
         <Note at={tieAt + 4} x={X0} y={pg.rowTop(P.rows.length) + h(20)} out={useRankAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>Emma and Ulysses: 310 each</span>
         </Note>
         <Note at={onlyAt + 6} x={X0} y={pg.rowTop(P.rows.length) + h(56)} out={useRankAt}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>only one makes it</span>
+        </Note>
+        <Note at={arbitraryOneAt + 2} x={X0} y={pg.rowTop(P.rows.length) + h(92)} out={useRankAt}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            which one is arbitrary, unless <QMono>ORDER BY</QMono> breaks the tie
+          </span>
         </Note>
         </AbsoluteFill>
       </Drift>

@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { INK, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { INK, INK_SOFT, label, note } from "../../editorial/style";
+import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DISTINCT } from "./data";
@@ -30,9 +30,11 @@ const LIST_W = 720;
 
 /**
  * Question 8, DISTINCT hiding a bug: three orders, two of them 50.00. Joined
- * to their items they are five rows; DISTINCT makes them three again, and
- * SUM(DISTINCT amount) counts the two fifties once, 150.00 against a real
- * total of 200.00.
+ * to their items they are five rows; SELECT DISTINCT makes them three again
+ * (right, here). Then someone wants the total and puts DISTINCT inside the
+ * SUM, which counts the two fifties once: 150.00 against a real total of
+ * 200.00. DISTINCT hid the join's duplicates; aggregating the items first
+ * (Question 4) fixes them.
  */
 export const DistinctScene: React.FC = () => {
   const n = useNarration();
@@ -46,11 +48,14 @@ export const DistinctScene: React.FC = () => {
   const tooManyAt = n.word("distinct-rows", "Too many");
   const addsAt = n.word("distinct-rows", "adds DISTINCT");
   const rightAt = n.word("distinct-rows", "look right");
+  const totalAt = n.word("distinct-sum", "want the total");
   const sumAt = n.word("distinct-sum", "sum of distinct amount");
   const fiftyAt = n.word("distinct-sum", "one fifty");
-  const bothAt = n.word("distinct-sum", "Orders two and three");
+  const bothAt = n.word("distinct-why", "Orders two and three");
   const truthAt = n.word("distinct-truth", "real total");
   const findAt = n.word("distinct-truth", "find out why");
+  const hidAt = n.word("distinct-hid", "DISTINCT hid");
+  const firstAt = n.word("distinct-hid", "Aggregate the items first");
   const end = n.beat("cte-in").to;
 
   const og = tableGeometry({
@@ -101,7 +106,8 @@ export const DistinctScene: React.FC = () => {
       <Sfx name="el-pop" at={truthAt + 6} level={-30} />
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4}>
+        {/* The question inks in while "Question eight" is said. */}
+        <QuestionCard n={8} at={qAt - 4} textAt={Math.min(textAt - 4, qAt + 6)}>
           When should you be careful with <Mono>DISTINCT</Mono>?
         </QuestionCard>
 
@@ -129,17 +135,23 @@ export const DistinctScene: React.FC = () => {
         />
 
         {/* ── DISTINCT makes three rows again ── */}
-        <Listing lines={DISTINCT.rows.lines} x={LIST_X} top={y(TOP)} width={LIST_W} size={24} at={addsAt - 4} marks={[{ line: 0, at: addsAt + 6 }]} out={sumAt - 4} />
+        <Caption at={addsAt - 4} x={LIST_X} top={y(TOP) - 40} out={totalAt - 4}>
+          the rows: <Mono>SELECT DISTINCT</Mono>
+        </Caption>
+        <Listing lines={DISTINCT.rows.lines} x={LIST_X} top={y(TOP)} width={LIST_W} size={24} at={addsAt - 4} marks={[{ line: 0, at: addsAt + 6 }]} out={totalAt - 4} />
         <DataTable
           g={rg}
           cols={DISTINCT.rows.cols.map((name) => ({ name, numeric: true }))}
           at={rightAt - 6}
           rows={DISTINCT.rows.rows.map((cells, i) => ({ cells, at: rightAt - 2 + i * 2 }))}
-          out={sumAt - 4}
+          out={totalAt - 4}
         />
 
-        {/* ── SUM(DISTINCT amount) counts 50.00 once ── */}
-        <Listing lines={DISTINCT.sum.lines} x={LIST_X} top={y(TOP)} width={LIST_W} size={24} at={sumAt} marks={[{ line: 0, at: sumAt + 8, color: MARK_BAD }]} />
+        {/* ── Then the total: SUM(DISTINCT amount) counts 50.00 once ── */}
+        <Caption at={totalAt + 2} x={LIST_X} top={y(TOP) - 40}>
+          then the total: <Mono>DISTINCT</Mono> inside <Mono>SUM</Mono>
+        </Caption>
+        <Listing lines={DISTINCT.sum.lines} x={LIST_X} top={y(TOP)} width={LIST_W} size={24} at={totalAt + 4} marks={[{ line: 0, at: sumAt + 8, color: MARK_BAD }]} />
         <DataTable
           g={sg}
           cols={DISTINCT.sum.cols.map((name) => ({ name, numeric: true }))}
@@ -161,7 +173,19 @@ export const DistinctScene: React.FC = () => {
             Before <Mono>DISTINCT</Mono>, find out why the duplicates are there.
           </span>
         </Note>
+        <Note at={hidAt - 2} x={LIST_X} y={sg.rowTop(1) + h(92)}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            Here, the join: <Mark at={firstAt} color={MARK_OK}>aggregate the items first</Mark>, as in question 4.
+          </span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );
 };
+
+/** A listing's small title, over its top rule. */
+const Caption: React.FC<{ at: number; out?: number; x: number; top: number; children: React.ReactNode }> = ({ at, out, x, top, children }) => (
+  <Ink at={at} dur={12} out={out} style={{ left: x, top, whiteSpace: "nowrap" }}>
+    <span style={label(22, INK_SOFT)}>{children}</span>
+  </Ink>
+);

@@ -18,7 +18,8 @@ const KIND_W = 540;
  * Question 4. The three kinds of unsupported claim, each a card as it is
  * named; then the page's own example sentence, set like a line in a weekly
  * report, its measured drop marked as traced to a query and its "because"
- * struck as an untested guess; then the rule that keeps both apart.
+ * struck as a guess until timing and segments are checked; then the rule
+ * that keeps both apart, and never lets the model compute a number.
  */
 export const HallucinateScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -39,12 +40,14 @@ export const HallucinateScene: React.FC = () => {
   const fluentAt = n.word("hallucinate-what", "writes fluent text");
   const exampleAt = n.word("hallucinate-example", "Signups fell");
   const confirmsAt = n.word("hallucinate-example", "Your query confirms");
-  const guessAt = n.word("hallucinate-example", "The because is a guess");
+  const guessAt = n.word("hallucinate-guess", "The because is a guess");
+  const checkAt = n.word("hallucinate-guess", "did the drop start");
   const ruleAt = n.word("hallucinate-rule", "make it a rule");
   const tracesAt = n.word("hallucinate-rule", "traces to a query or a cell");
-  const draftAt = n.word("hallucinate-rule", "Let the model draft words");
-  const cutAt = n.word("hallucinate-rule", "cut any cause");
-  const end = n.beat("hallucinate-rule").to;
+  const draftAt = n.word("hallucinate-draft", "Let the model draft words");
+  const neverAt = n.word("hallucinate-draft", "never let it compute");
+  const cutAt = n.word("hallucinate-draft", "Cut any cause");
+  const end = n.beat("hallucinate-draft").to;
 
   const reportP = ease(frame, exampleAt - 6, 14);
 
@@ -111,17 +114,26 @@ export const HallucinateScene: React.FC = () => {
             transform: `translateY(${(1 - reportP) * 12}px)`,
           }}
         >
-          <div style={{ ...label(19, INK_SOFT), marginBottom: 10 }}>Weekly summary, drafted by a model (the page&apos;s example)</div>
+          <div style={{ ...label(20, INK_SOFT), marginBottom: 10 }}>Weekly summary, drafted by a model</div>
           <div style={{ ...body(44), color: INK, whiteSpace: "nowrap" }}>
             Signups <Mark at={confirmsAt + 2} color={MARK_OK}>fell 12%</Mark>{" "}
-            <Strike at={guessAt + 4}>because of the competitor&apos;s launch</Strike>.
+            {/* Set off from the highlight, so the strike starts on "because", not on its edge. */}
+            <span style={{ marginLeft: "0.14em" }}>
+              <Strike at={guessAt + 4} top="0.6em">
+                because of the competitor&apos;s launch
+              </Strike>
+            </span>
+            .
           </div>
         </div>
         <Note at={confirmsAt + 6} x={X0 + 34} y={y(REPORT_Y) + h(190)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>✓ your query confirms the 12%</span>
         </Note>
         <Note at={guessAt + 6} x={X0 + 560} y={y(REPORT_Y) + h(190)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the &ldquo;because&rdquo; is a guess: test it or cut it</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            the &ldquo;because&rdquo; is a guess
+            <span style={{ opacity: ease(frame, checkAt - 2, 10) }}>: check the timing and the segments, or cut it</span>
+          </span>
         </Note>
 
         {/* ── The rule ── */}
@@ -139,6 +151,7 @@ export const HallucinateScene: React.FC = () => {
           </span>
           <div style={{ ...note(24, INK_SOFT), marginTop: 12, whiteSpace: "nowrap" }}>
             <span style={{ opacity: ease(frame, draftAt - 2, 10) }}>the model drafts the words around numbers you computed</span>
+            <span style={{ opacity: ease(frame, neverAt - 2, 10) }}>, never the numbers</span>
             <span style={{ opacity: ease(frame, cutAt - 2, 10) }}>; untested causes come out</span>
           </div>
         </div>

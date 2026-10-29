@@ -302,6 +302,20 @@
               51.78880407124682
             ]
           ]
+        },
+        "totals": {
+          "sql": "SELECT SUM(avg_order * customers) AS revenue, SUM(customers) AS customers FROM regions;",
+          "ok": true,
+          "columns": [
+            "revenue",
+            "customers"
+          ],
+          "rows": [
+            [
+              "610590",
+              "11790"
+            ]
+          ]
         }
       },
       "version": "v1.4.3"
@@ -514,6 +528,18 @@
             "kind": "value",
             "repr": "200",
             "str": "200"
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
+        "d": {
+          "code": "D",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "0.2",
+            "str": "0.2"
           },
           "stdout": "",
           "displays": [],
@@ -2488,7 +2514,8 @@
             ]
           ]
         }
-      ]
+      ],
+      "from": 0.1
     },
     "novelty": {
       "novelty": [

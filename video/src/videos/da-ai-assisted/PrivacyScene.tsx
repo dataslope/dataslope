@@ -25,6 +25,18 @@ const Cross: React.FC<{ at: number; size?: number }> = ({ at, size = 24 }) => {
   );
 };
 
+/** A short rule, drawn on `at`: an item kept out of the tool on purpose,
+ *  neither ticked nor crossed. */
+const Dash: React.FC<{ at: number; size?: number }> = ({ at, size = 24 }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 10);
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "block", overflow: "visible" }}>
+      <path d="M5 12 L19 12" fill="none" stroke={INK_SOFT} strokeWidth={3.2} strokeLinecap="round" pathLength={1} strokeDasharray={`${p} 1`} />
+    </svg>
+  );
+};
+
 /** One line of a list, with its mark before it. */
 const Item: React.FC<{ x: number; y: number; at: number; mark: React.ReactNode; out?: number; children: React.ReactNode }> = ({ x, y, at, mark, out, children }) => {
   const frame = useCurrentFrame();
@@ -44,7 +56,8 @@ const Item: React.FC<{ x: number; y: number; at: number; mark: React.ReactNode; 
  * as it is named, and what to share instead: the schema and a few made-up
  * rows (the video's own example, after the page's customers table of names,
  * emails and addresses). Then the take-home walkthrough: what it was used
- * for, what it wasn't, how it was checked.
+ * for, what it wasn't (kept by the candidate, so neither ticked nor crossed),
+ * and how it was checked, in two of question 2's checks.
  */
 export const PrivacyScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -80,7 +93,9 @@ export const PrivacyScene: React.FC = () => {
   const didntAt = n.word("takehome-answer", "Say what you didn't");
   const defsAt = n.word("takehome-answer", "the metric definitions");
   const conclusionsAt = n.word("takehome-answer", "the conclusions");
-  const checkedAt = n.word("takehome-answer", "how you checked it");
+  const checkedAt = n.word("takehome-checked", "how you checked it");
+  const reconciledAt = n.word("takehome-checked", "reconciling the total");
+  const tracedAt = n.word("takehome-checked", "tracing three rows");
   const hidingAt = n.word("takehome-hide", "Hiding it");
   const openlyAt = n.word("takehome-hide", "using it openly");
   const end = n.beat("takehome-hide").to;
@@ -95,8 +110,8 @@ export const PrivacyScene: React.FC = () => {
   ];
   const cols = [
     { x: X0, at: used[0] - 6, head: "used it for", items: [{ at: used[0], text: "boilerplate SQL" }, { at: used[1], text: "a regular expression" }, { at: used[2], text: "chart code" }], ok: true },
-    { x: X0 + COL_W + 50, at: didntAt - 2, head: "didn't", items: [{ at: defsAt, text: "the metric definitions" }, { at: conclusionsAt, text: "the conclusions" }], ok: false },
-    { x: X0 + 2 * (COL_W + 50), at: checkedAt - 2, head: "how you checked it", items: [{ at: checkedAt + 6, text: "the checks from question 2" }], ok: true },
+    { x: X0 + COL_W + 50, at: didntAt - 2, head: "didn't use it for", items: [{ at: defsAt, text: "the metric definitions" }, { at: conclusionsAt, text: "the conclusions" }], ok: false },
+    { x: X0 + 2 * (COL_W + 50), at: checkedAt - 2, head: "how you checked it", items: [{ at: reconciledAt, text: "reconciled the total" }, { at: tracedAt, text: "traced three rows by hand" }], ok: true },
   ];
 
   return (
@@ -143,9 +158,11 @@ export const PrivacyScene: React.FC = () => {
         </Note>
         {cols.map((c) => (
           <React.Fragment key={c.head}>
-            <div style={{ position: "absolute", left: c.x, top, ...label(22, c.ok ? BLUE_INK : ACCENT_INK), opacity: ease(frame, c.at, 12), whiteSpace: "nowrap" }}>{c.head}</div>
+            {/* Every header in the same blue: keeping the definitions and the
+                conclusions is the right practice, so nothing here is red. */}
+            <div style={{ position: "absolute", left: c.x, top, ...label(22, BLUE_INK), opacity: ease(frame, c.at, 12), whiteSpace: "nowrap" }}>{c.head}</div>
             {c.items.map((it, k) => (
-              <Item key={it.text} x={c.x} y={top + h(46) + k * pitch} at={it.at} mark={c.ok ? <Tick at={it.at + 4} size={24} /> : <Cross at={it.at + 4} />}>
+              <Item key={it.text} x={c.x} y={top + h(46) + k * pitch} at={it.at} mark={c.ok ? <Tick at={it.at + 4} size={24} /> : <Dash at={it.at + 4} />}>
                 {it.text}
               </Item>
             ))}

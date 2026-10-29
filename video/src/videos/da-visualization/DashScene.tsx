@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, fmt, headline, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -12,15 +12,17 @@ import { Drift, LineSet, PanelTitle, Verdict, YTicks } from "./parts";
 
 const GRID = { x: 200, y: 340, w: 168, hgt: 128, gap: 14 };
 const CREEP = { x0: 1100, x1: 1660, base: 760, top: 440, hi: 45 };
-const CARD = { y: 360, w: 620, hgt: 290 };
+const CARD = { y: 360, w: 620, hgt: 350 };
 const CARDS_X = [220, 1080];
 
 /**
- * Questions 11 and 12. A twelve-slot dashboard shaded by the share of
- * attention each slot gets, from the page's reading-order chart: 20% top left
- * down to 2% bottom right, about 8 times apart. Panels added against panels
- * opened over two years: 41 against 6. Then a dashboard and a report side by
- * side, by what each is for.
+ * Questions 11 and 12. A dashboard grid whose key metric is made the biggest
+ * tile, top left, then shaded by the page's reading-order chart. Those shares
+ * are a model of the shape, not a measurement (the chart spec says so), so the
+ * grid shows the shape only, darker where the model puts more attention, and
+ * says it is a model: no share or ratio from it is printed or spoken. Panels
+ * added against panels opened over two years: 41 against 6. Then a dashboard
+ * and a report side by side, by what each is for and what each drives.
  */
 export const DashScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -33,10 +35,11 @@ export const DashScene: React.FC = () => {
   const onlyAt = n.word("dash", "Only the metrics people act on");
   const biggestAt = n.word("dash", "biggest and top left");
   const eyesAt = n.word("dash-attn", "where eyes land");
-  const fadesAt = n.word("dash-attn", "attention fades");
-  const eightAt = n.word("dash-attn", "about eight times");
-  const consistentAt = n.word("dash-attn", "Keep scales and colors consistent");
-  const freshAt = n.word("dash-attn", "how fresh the data is");
+  const modelAt = n.word("dash-attn", "a simple model of reading order");
+  const fasterAt = n.word("dash-attn", "falls faster down the page");
+  const severalAt = n.word("dash-attn", "worth several");
+  const consistentAt = n.word("dash-keep", "Keep scales and colors consistent");
+  const freshAt = n.word("dash-keep", "how fresh the data is");
   const cutAt = n.word("dash-creep", "cut what doesn't earn its place");
   const addedAt = n.word("dash-creep", "panels only ever get added");
   const fortyAt = n.word("dash-creep", "forty-one panels");
@@ -48,16 +51,22 @@ export const DashScene: React.FC = () => {
   const reportAt = n.word("report", "A report answers one question");
   const narrativeAt = n.word("report", "with narrative and context");
   const topAt = n.word("report", "read from top to bottom");
+  const decisionsAt = n.word("report-use", "Dashboards drive day-to-day decisions");
+  const deeperAt = n.word("report-use", "reports drive deeper analysis");
   const end = n.beat("story-in").to;
 
   const out11 = q12At - 4;
   const D = DASHBOARD;
   const maxShare = Math.max(...D.cells.map((c) => c.share));
-  const first = D.cells[0];
-  const last = D.cells[D.cells.length - 1];
+  const slotShare = (r: number, c: number) => D.cells.find((d) => d.r === r && d.c === c)!.share / maxShare;
   const cellX = (c: number) => GRID.x + c * (GRID.w + GRID.gap);
   const cellY = (r: number) => y(GRID.y) + r * h(GRID.hgt + GRID.gap);
-  const shade = ease(frame, fadesAt, 20);
+  // "Biggest and top left": the key metric widens across two slots, and the
+  // rest of its row moves along one, the last slot of it giving way.
+  const big = ease(frame, biggestAt, 16);
+  const shade = ease(frame, modelAt, 20);
+  // What the narration points at, while it does.
+  const ring = ease(frame, severalAt - 2, 12) * (1 - ease(frame, consistentAt - 4, 12));
   const months = D.added.map((_, i) => (i % 6 === 5 ? String(i + 1) : ""));
   const cBase = y(CREEP.base);
   const cTop = y(CREEP.top);
@@ -66,7 +75,7 @@ export const DashScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-sprinkle" at={onlyAt} level={-34} />
-      <Sfx name="el-pop" at={eightAt} level={-32} />
+      <Sfx name="el-pop" at={biggestAt} level={-32} />
       <Sfx name="el-pencil" at={addedAt} level={-34} />
       <Sfx name="el-scratch" at={sixAt} level={-32} />
       <Sfx name="el-tap" at={dashAt} level={-34} />
@@ -80,26 +89,31 @@ export const DashScene: React.FC = () => {
           What&apos;s the difference between a dashboard and a report?
         </QuestionCard>
 
-        {/* ── Question 11: where attention goes ── */}
+        {/* ── Question 11: the key metric biggest and top left, then the model's shape ── */}
         {D.cells.map((c, i) => {
-          const p = ease(frame, onlyAt + i * 1.5, 10) * (1 - ease(frame, out11, 10));
-          if (p <= 0) return null;
           const lead = c.r === 0 && c.c === 0;
-          const share = c.share / maxShare;
-          const big = lead ? ease(frame, biggestAt, 12) : 0;
+          // Row 0 moves along one slot as the key metric widens; its last slot goes.
+          const moves = c.r === 0 && c.c > 0;
+          const gone = c.r === 0 && c.c === 3 ? big : 0;
+          const p = ease(frame, onlyAt + i * 1.5, 10) * (1 - ease(frame, out11, 10)) * (1 - gone);
+          if (p <= 0) return null;
+          const col = moves ? c.c + big : c.c;
+          // Shaded by the slot it ends up in.
+          const share = lead ? 1 : slotShare(c.r, Math.min(3, moves ? c.c + 1 : c.c));
           return (
             <div
               key={i}
               style={{
                 position: "absolute",
-                left: cellX(c.c),
+                left: cellX(col),
                 top: cellY(c.r),
-                width: GRID.w,
+                width: lead ? GRID.w + big * (GRID.w + GRID.gap) : GRID.w,
                 height: h(GRID.hgt),
                 boxSizing: "border-box",
                 border: `1.5px solid ${HAIRLINE}`,
                 borderRadius: 8,
                 background: `color-mix(in srgb, ${BAR} ${8 + 70 * share * shade}%, ${PAPER})`,
+                boxShadow: lead && ring > 0 ? `0 0 0 ${5 * ring}px ${HIGHLIGHT}` : undefined,
                 opacity: p,
                 display: "flex",
                 flexDirection: "column",
@@ -107,21 +121,16 @@ export const DashScene: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              {lead ? (
-                <span style={{ ...headline(20 + 6 * big), color: INK, whiteSpace: "nowrap" }}>key metric</span>
-              ) : null}
-              <span style={{ ...label(20, share * shade > 0.55 ? PAPER : INK), opacity: shade, ...TABULAR }}>
-                {fmt(c.share * 100, 0)}%
-              </span>
+              {lead ? <span style={{ ...headline(22 + 12 * big), color: INK, whiteSpace: "nowrap" }}>key metric</span> : null}
             </div>
           );
         })}
-        <Note at={eyesAt} x={GRID.x} y={cellY(3) + h(4)} out={out11}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>share of attention by slot</span>
+        <Note at={modelAt} x={GRID.x} y={cellY(3) + h(4)} out={out11}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>darker: more attention, in a simple model, not a measurement</span>
         </Note>
-        <Note at={eightAt - 2} x={GRID.x} y={cellY(3) + h(42)} out={out11}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            top left {fmt(first.share * 100, 0)}%, bottom right {fmt(last.share * 100, 0)}%: about <b>{D.ratio}×</b>
+        <Note at={fasterAt - 2} x={GRID.x} y={cellY(3) + h(42)} out={out11}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            attention falls faster <b>down</b> the page than across it
           </span>
         </Note>
         <Note at={consistentAt} x={GRID.x} y={cellY(3) + h(82)} out={out11}>
@@ -148,7 +157,15 @@ export const DashScene: React.FC = () => {
 
         {/* ── Question 12: what each is for ── */}
         {[
-          { title: "Dashboard", at: dashAt, lines: [{ at: dashAt + 6, text: "a living view, for monitoring" }, { at: nowAt, text: "“What's happening now?”" }] },
+          {
+            title: "Dashboard",
+            at: dashAt,
+            lines: [
+              { at: dashAt + 6, text: "a living view, for monitoring" },
+              { at: nowAt, text: "“What's happening now?”" },
+              { at: decisionsAt + 4, text: "drives day-to-day decisions", strong: true },
+            ],
+          },
           {
             title: "Report",
             at: reportAt,
@@ -156,6 +173,7 @@ export const DashScene: React.FC = () => {
               { at: reportAt + 6, text: "answers one question" },
               { at: narrativeAt, text: "narrative and context" },
               { at: topAt, text: "read from top to bottom" },
+              { at: deeperAt, text: "drives deeper analysis", strong: true },
             ],
           },
         ].map((card, k) => {
@@ -182,7 +200,7 @@ export const DashScene: React.FC = () => {
             >
               <div style={{ ...headline(44), color: INK }}>{card.title}</div>
               {card.lines.map((l) => (
-                <div key={l.text} style={{ ...note(28, INK), marginTop: 22, opacity: ease(frame, l.at - 2, 12), whiteSpace: "nowrap" }}>
+                <div key={l.text} style={{ ...note(28, INK), fontWeight: "strong" in l ? 650 : undefined, marginTop: 22, opacity: ease(frame, l.at - 2, 12), whiteSpace: "nowrap" }}>
                   {l.text}
                 </div>
               ))}

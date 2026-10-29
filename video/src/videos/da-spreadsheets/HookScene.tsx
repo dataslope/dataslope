@@ -86,6 +86,8 @@ export const HookScene: React.FC = () => {
           result={printed(sumifs.value)}
           resultAt={formulaAt + 30}
           size={19}
+          // Pointed at the wrong column, the 290 is no longer the answer.
+          dim={wrongAt}
           out={eighteenAt - 4}
         />
         <RangeBox g={g} r0={2} r1={11} c0={3} c1={3} at={formulaAt + 10} out={wrongAt} color={ds("purple", 500)} />
@@ -116,7 +118,7 @@ export const HookScene: React.FC = () => {
           }}
         />
         <RangeBox g={g} r0={2} r1={11} c0={2} c1={2} at={wrongAt + 2} out={eighteenAt - 4} color={ACCENT} dash />
-        <Note at={wrongAt + 6} x={g.right + 20} y={g.rowTop(6)} out={eighteenAt}>
+        <Note at={wrongAt + 6} x={g.right + 20} y={g.rowTop(6)} out={tenAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the sum, pointed at the months</span>
         </Note>
 

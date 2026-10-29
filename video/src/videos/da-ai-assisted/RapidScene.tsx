@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, body, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, body, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BANK } from "./data";
-import { Drift, ElbowArrow, Headline, Kicker, OK_INK, Spot, TextPanel, X0 } from "./parts";
+import { Drift, Headline, Kicker, Mark, OK_INK, Spot, TextPanel, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -48,16 +48,18 @@ const Prompt: React.FC<{ c: Ctx }> = ({ c }) => {
     c.w("r-prompt", "ask for its assumptions") + 3,
   ];
   const checkAt = c.w("r-prompt", "a second query to check the total");
-  const size = 17;
+  // 21px mono: the longest line, 74 characters, is about 935px of the 980.
+  const size = 21;
   const lineH = Math.round(size * 1.7);
   const pad = Math.round(size * 0.8);
   const markP = ease(frame, cue[7] + 4, 12);
+  const markW = Math.max(PROMPT[7].length, PROMPT[8].length) * 0.6 * size + 12;
   return (
     <>
       <Note at={at - 4} x={R_X} y={c.T - c.h(40)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>the page&apos;s prompt</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a prompt</span>
       </Note>
-      <TextPanel lines={PROMPT} x={R_X} top={c.T} width={820} size={size} mono at={at - 2} lineAt={cue}>
+      <TextPanel lines={PROMPT} x={R_X} top={c.T} width={980} size={size} mono at={at - 2} lineAt={cue}>
         {/* The two lines that matter most. */}
         <div
           style={{
@@ -65,7 +67,7 @@ const Prompt: React.FC<{ c: Ctx }> = ({ c }) => {
             left: pad - 6,
             top: pad + 7 * lineH + 3,
             height: 2 * lineH - 6,
-            width: 790 * markP,
+            width: markW * markP,
             background: HIGHLIGHT,
             opacity: 0.8,
             mixBlendMode: "multiply",
@@ -85,14 +87,18 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const askAt = c.w("r-bi", "ask a question in plain words");
   const metricsAt = c.w("r-bi", "defined metrics");
-  const tablesAt = c.w("r-bi", "clean, documented tables");
-  const jobAt = c.w("r-bi", "the analyst's job moves");
+  const tablesAt = c.w("r-bi", "clean and documented tables");
+  const modelAt = c.w("r-bi", "a semantic model");
+  const messyAt = c.w("r-bi", "Pointed at messy raw tables");
+  const jobAt = c.w("r-bi-job", "the analyst's job moves");
   const T = c.T + c.h(30);
   const layerX = R_X + 380;
   const layers = [
     { at: metricsAt, text: "defined metrics" },
     { at: tablesAt, text: "clean, documented tables" },
+    { at: modelAt, text: "a semantic model: how tables join" },
   ];
+  const below = T + layers.length * c.h(76);
   const jobP = ease(frame, jobAt, 14);
   const box = (x: number, y: number, at: number, text: React.ReactNode, w = 320, strong = false) => {
     const p = ease(frame, at, 12);
@@ -122,9 +128,13 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
       {box(R_X, T, askAt - 2, <>&ldquo;Which region grew fastest?&rdquo;</>, 330)}
       {/* The question wraps to two lines, so its label sits clear below the box. */}
       <Note at={askAt + 2} x={R_X} y={T + c.h(108)}>
-        <span style={{ ...label(18, INK_SOFT), whiteSpace: "nowrap" }}>a question in plain words (an example)</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a question in plain words</span>
       </Note>
-      <ElbowArrow points={[[R_X + 336, T + c.h(32)], [layerX - 8, T + c.h(32)]]} at={askAt + 6} color={INK_SOFT} width={2.4} />
+      {/* Over the stack, so the layers read as what the tool stands on, not as
+          what the question turns into. */}
+      <Note at={metricsAt - 2} x={layerX} y={T - c.h(40)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>what it has to stand on to answer correctly</span>
+      </Note>
       {layers.map((l, i) => (
         <div
           key={l.text}
@@ -146,10 +156,10 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
           {l.text}
         </div>
       ))}
-      <Note at={tablesAt + 6} x={layerX} y={T + 2 * c.h(76) + c.h(4)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>what it has to stand on to answer correctly</span>
+      <Note at={messyAt - 2} x={layerX} y={below + c.h(4)}>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>on messy raw tables: confidently wrong, at scale</span>
       </Note>
-      <Note at={jobAt - 2} x={layerX} y={T + 2 * c.h(76) + c.h(52)}>
+      <Note at={jobAt - 2} x={layerX} y={below + c.h(52)}>
         <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the analyst builds these, and checks the answers</span>
       </Note>
     </>
@@ -159,12 +169,13 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 9. Sorting survey answers with an LLM ───────────────────────────────────
 
 const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const at = c.w("r-llm", "sort five thousand survey answers");
   const llmAt = c.w("r-llm", "a large language model");
   const steps = [
     { at: c.w("r-llm", "fix the categories first"), text: "Fix the categories first" },
     { at: c.w("r-llm", "hand-label a hundred or two"), text: "Hand-label 100 to 200, and measure its accuracy" },
-    { at: c.w("r-llm", "keep the settings the same"), text: "Same instructions and settings, every batch" },
+    { at: c.w("r-llm", "keep the settings the same"), text: "Same settings every batch; a rerun gives the same labels", restAt: c.w("r-llm", "rerun a sample") },
     { at: c.w("r-llm", "quote real answers"), text: "Quote real answers, not its paraphrases" },
   ];
   return (
@@ -175,22 +186,27 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={llmAt - 2} x={R_X} y={c.T + c.h(44)}>
         <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>LLM: large language model, as a first-pass labeler you measure</span>
       </Note>
-      {steps.map((s, i) => (
-        <Note key={s.text} at={s.at - 2} x={R_X} y={c.T + c.h(110) + i * c.h(62)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(24, BLUE_INK), ...TABULAR, marginRight: 14 }}>{i + 1}</span>
-            {s.text}
-          </span>
-        </Note>
-      ))}
+      {steps.map((s, i) => {
+        // A step said in two parts shows its second as it is said.
+        const [lead, rest] = s.restAt === undefined ? [s.text, ""] : s.text.split(/(?=;)/);
+        return (
+          <Note key={s.text} at={s.at - 2} x={R_X} y={c.T + c.h(110) + i * c.h(62)}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+              <span style={{ ...label(24, BLUE_INK), ...TABULAR, marginRight: 14 }}>{i + 1}</span>
+              {lead}
+              {rest ? <span style={{ opacity: ease(frame, (s.restAt ?? 0) - 2, 10) }}>{rest}</span> : null}
+            </span>
+          </Note>
+        );
+      })}
     </>
   );
 };
 
 /**
  * The quick round, questions 7 to 9, in this part's own words ("Three short
- * ones"), then the series' last line: the track's question bank, counted by
- * check.mjs, where a "Next:" would otherwise go.
+ * ones"), then the series' takeaway and last line: the track's question
+ * bank, counted by check.mjs, where a "Next:" would otherwise go.
  */
 export const RapidScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -201,9 +217,13 @@ export const RapidScene: React.FC = () => {
   const from = n.beat("rapid-in").from;
   const threeAt = n.word("rapid-in", "Three short ones");
   const finishAt = n.word("rapid-in", "to finish");
+  const whoeverAt = n.word("close-two", "Whoever wrote the query");
+  const rowAt = n.word("close-two", "what one row means");
+  const rightAt = n.word("close-two", "how you know the number is right");
   const trackAt = n.word("close", "the whole data analyst track");
   const bankAt = n.word("close", "the question bank");
-  const end = n.beat("close").from;
+  // The list stands ticked when the takeaway begins.
+  const end = n.beat("close-two").from;
 
   const items: RapidItem[] = [
     { n: 7, label: "Prompting for SQL", beat: "r-prompt", body: <Prompt c={c} /> },
@@ -212,6 +232,8 @@ export const RapidScene: React.FC = () => {
   ].map(({ beat, ...item }) => ({ ...item, at: n.beat(beat).from }));
   const lastAt = n.beat("r-llm").from;
   const closeY = y(830);
+  // The series' takeaway, two lines above the hairline.
+  const twoY = closeY - h(112);
 
   return (
     <AbsoluteFill>
@@ -240,7 +262,13 @@ export const RapidScene: React.FC = () => {
           <Llm c={c} />
         </Fade>
 
-        {/* ── The close: no next video, the question bank instead ── */}
+        {/* ── The close: the takeaway of the nine parts, then the question bank ── */}
+        <Ink at={whoeverAt - 2} dur={18} style={{ left: R_X, top: twoY, ...body(34), color: INK, whiteSpace: "nowrap" }}>
+          Whoever wrote the query, the interview asks the same two things:
+        </Ink>
+        <Ink at={rowAt - 2} dur={18} style={{ left: R_X, top: twoY + h(48), ...body(34), color: INK, whiteSpace: "nowrap" }}>
+          <Mark at={rowAt + 2}>what one row means</Mark>, and <Mark at={rightAt + 2}>how you know the number is right</Mark>.
+        </Ink>
         <div style={{ position: "absolute", left: R_X, top: closeY, width: 1000, height: 1, background: HAIRLINE, opacity: ease(frame, trackAt - 4, 12) }} />
         <Ink at={trackAt} dur={18} style={{ left: R_X, top: closeY + 20, ...body(30, true), color: INK_SOFT, whiteSpace: "nowrap" }}>
           That&apos;s the whole Data Analyst track.

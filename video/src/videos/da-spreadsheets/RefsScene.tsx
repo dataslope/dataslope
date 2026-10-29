@@ -7,13 +7,14 @@ import { Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { type Cell, LOOKUPS, PIVOT, printed, REFERENCES, screen } from "./data";
-import { Drift, FormulaBar, MARK, MARK_BAD, MARK_OK, RangeBox, Sheet, sheetGeometry, X0 } from "./parts";
+import { type Cell, LOOKUPS, PIVOT, printed, REFERENCES } from "./data";
+import { Drift, FormulaBar, Mark, MARK, MARK_BAD, MARK_OK, RangeBox, Sheet, sheetGeometry, X0 } from "./parts";
 
 const SHEET_Y = 400;
 const ROW = 48;
-const BAR_X = 860;
-const BAR_W = 940;
+// Wide enough for a lookup that names the sheet it reads ("products!A2:C5").
+const BAR_X = 790;
+const BAR_W = 1030;
 
 const money = (c: Cell) => (typeof c.value === "number" ? c.value.toFixed(2) : printed(c.value));
 const LOCK = `color-mix(in srgb, ${ds("yellow", 400)} 70%, transparent)`;
@@ -56,8 +57,10 @@ export const RefsScene: React.FC = () => {
   const fourthAt = n.word("iferror-trap", "a fourth column");
   const bothAt = n.word("iferror-trap", "both come back unknown");
   const causeAt = n.word("iferror-trap", "Fix the cause first");
-  const ifnaAt = n.word("iferror-trap", "If NA catches only");
-  const showAt = n.word("iferror-trap", "lets the broken formula show");
+  const ifnaAt = n.word("iferror-ifna", "If NA catches only");
+  const showAt = n.word("iferror-ifna", "lets the broken formula show");
+  const stillAt = n.word("iferror-space", "the stray space is a missing key too");
+  const trimAt = n.word("iferror-space", "trim it first");
   const end = n.beat("tool-in").to;
 
   // ── Question 7: the tax sheet ──
@@ -68,6 +71,14 @@ export const RefsScene: React.FC = () => {
     ["amount", "with $", "no $", "", "rate", rate],
     ...R.rows.slice(1).map((r, i) => [String(r[0]), money(R.absolute[i]), money(R.relative[i]), "", "", ""]),
   ];
+  // ── Question 7, mixed: the cross-tab the SUMIFS fills, F1:I4 of the orders sheet ──
+  const xg = sheetGeometry({ x: X0, top: y(SHEET_Y), widths: [140, 110, 110, 110], rows: 4, rowH: h(ROW), firstCol: 5 });
+  const crossTab = [["region", ...PIVOT.months], ...PIVOT.regions.map((region, i) => [region, ...PIVOT.grid[i].map((c) => printed(c.value))])];
+  // G2 holds the formula first; the rest fill in on "fills the whole grid".
+  const gridCellAt = (r: number, c: number) =>
+    r === 1 || c === 0 ? mixedAt + r * 2 : r === 2 && c === 1 ? lockAt + 10 : wholeAt + ((r - 2) * 3 + (c - 1)) * 2;
+  const ACTIVE = ds("gray", 500);
+
   const absAt = (i: number) => fillAt + 6 + i * 8;
   const relAt = (i: number) => offAt + 4 + i * 10;
   const out7 = q8At - 4;
@@ -98,7 +109,7 @@ export const RefsScene: React.FC = () => {
     ["P-102, column 4", printed(L.iferrorBroken.value), printed(L.ifnaBroken.value)],
   ];
   // The header as the question ends, then each row as the narration reaches it.
-  const rowAtIn = (r: number) => [asked8 - 4, swapsAt, swapsAt + 4, spaceAt - 2, fourthAt - 2][r - 1];
+  const rowAtIn = (r: number) => [q8TextAt, q8TextAt + 8, swapsAt + 4, spaceAt - 2, fourthAt - 2][r - 1];
   const space = `color-mix(in srgb, ${ds("red", 400)} 45%, transparent)`;
 
   return (
@@ -133,7 +144,7 @@ export const RefsScene: React.FC = () => {
             { r: 3, c: 2, at: zeroAt, color: MARK_BAD },
             { r: 4, c: 2, at: zeroAt + 4, color: MARK_BAD },
           ]}
-          out={out7}
+          out={mixedAt}
         />
         <Note at={shiftsAt - 2} x={g.right + 30} y={g.rowTop(2)} out={staysAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -147,21 +158,36 @@ export const RefsScene: React.FC = () => {
         </Note>
         {R.absolute.map((c, i) => bar(c, absAt(i), i < 2 ? absAt(i + 1) : offAt, "plain", [{ text: "$F$1", color: LOCK }]))}
         {R.absolute.map((c, i) => (
-          <RangeBox key={c.ref} g={g} r0={i + 2} r1={i + 2} c0={1} c1={1} at={absAt(i)} out={i < 2 ? absAt(i + 1) : offAt} color={ds("green", 600)} />
+          <RangeBox key={c.ref} g={g} r0={i + 2} r1={i + 2} c0={1} c1={1} at={absAt(i)} out={i < 2 ? absAt(i + 1) : offAt} color={ACTIVE} />
         ))}
         <RangeBox g={g} r0={1} r1={1} c0={5} c1={5} at={absAt(0) + 4} out={offAt} color={ds("blue", 500)} />
         {R.relative.map((c, i) => bar(c, relAt(i), i < 2 ? relAt(i + 1) : mixedAt, i === 0 ? "plain" : "bad"))}
         {R.relative.map((c, i) => (
-          <RangeBox key={c.ref} g={g} r0={i + 2} r1={i + 2} c0={2} c1={2} at={relAt(i)} out={i < 2 ? relAt(i + 1) : mixedAt} color={ds("green", 600)} />
+          <RangeBox key={c.ref} g={g} r0={i + 2} r1={i + 2} c0={2} c1={2} at={relAt(i)} out={i < 2 ? relAt(i + 1) : mixedAt} color={ACTIVE} />
         ))}
         {/* What each pasted copy reads: F2, then F3, both empty. */}
         <RangeBox g={g} r0={2} r1={2} c0={5} c1={5} at={relAt(1)} out={relAt(2)} color={ACCENT} dash />
         <RangeBox g={g} r0={3} r1={3} c0={5} c1={5} at={relAt(2)} out={mixedAt} color={ACCENT} dash />
-        <Note at={f2At + 4} x={g.right + 30} y={g.rowTop(2)} out={out7}>
+        <Note at={f2At + 4} x={g.right + 30} y={g.rowTop(2)} out={mixedAt}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>F2 and F3 are empty: no tax</span>
         </Note>
 
-        {/* The cross-tab's SUMIFS, filled from G2 to I4: $F and $1 each lock one side. */}
+        {/* The cross-tab's SUMIFS, filled from G2 to I4: $F and $1 each lock one
+            side. The tax sheet makes way for the grid it fills. */}
+        <Sheet
+          g={xg}
+          values={crossTab}
+          at={mixedAt + 4}
+          cellAt={gridCellAt}
+          bold={(r, c) => r === 1 || c === 0}
+          fills={[
+            ...[2, 3, 4].map((r) => ({ r, c: 0, at: lockAt + (r - 2) * 3, color: LOCK })),
+            ...[1, 2, 3].map((c) => ({ r: 1, c, at: rowAt + (c - 1) * 3, color: LOCK })),
+          ]}
+          out={out7}
+        />
+        <RangeBox g={xg} r0={2} r1={2} c0={1} c1={1} at={lockAt + 4} out={rowAt} color={ACTIVE} />
+        <RangeBox g={xg} r0={4} r1={4} c0={3} c1={3} at={rowAt + 4} out={out7} color={ACTIVE} />
         <FormulaBar
           x={X0}
           top={g.bottom + h(40)}
@@ -182,7 +208,7 @@ export const RefsScene: React.FC = () => {
           width={1060}
           cell={PIVOT.grid[2][2].ref}
           formula={PIVOT.grid[2][2].formula ?? ""}
-          at={wholeAt - 6}
+          at={rowAt}
           size={21}
           marks={[
             { text: "$F4", color: LOCK },
@@ -205,7 +231,7 @@ export const RefsScene: React.FC = () => {
         <Sheet
           g={lg}
           values={lookups}
-          at={asked8 - 6}
+          at={q8TextAt - 2}
           cellAt={(r, c) => (c === 2 ? (r === 1 ? ifnaAt - 2 : ifnaAt + 4 + (r - 2) * 3) : rowAtIn(r))}
           bold={(r) => r === 1}
           ink={(r, c) => (c === 2 && r === 5 ? ACCENT_INK : undefined)}
@@ -214,13 +240,16 @@ export const RefsScene: React.FC = () => {
             { r: 4, c: 1, at: bothAt, color: MARK_BAD },
             { r: 5, c: 1, at: bothAt + 4, color: MARK_BAD },
             { r: 5, c: 2, at: showAt, color: MARK },
+            // The stray-space key is #N/A too, so IFNA still turns it into "Unknown".
+            { r: 4, c: 2, at: stillAt, color: MARK_BAD },
           ]}
         />
         <FormulaBar
           x={BAR_X}
           top={lg.top}
           width={BAR_W}
-          formula={screen(L.iferrorMissing)}
+          formula={L.iferrorMissing.formula ?? ""}
+          size={21}
           at={swapsAt}
           result={printed(L.iferrorMissing.value)}
           resultAt={honestAt - 2}
@@ -231,7 +260,8 @@ export const RefsScene: React.FC = () => {
           x={BAR_X}
           top={lg.top}
           width={BAR_W}
-          formula={screen(L.iferrorSpace)}
+          formula={L.iferrorSpace.formula ?? ""}
+          size={21}
           at={spaceAt + 2}
           typeDur={12}
           result={printed(L.iferrorSpace.value)}
@@ -244,7 +274,8 @@ export const RefsScene: React.FC = () => {
           x={BAR_X}
           top={lg.top}
           width={BAR_W}
-          formula={screen(L.iferrorBroken)}
+          formula={L.iferrorBroken.formula ?? ""}
+          size={21}
           at={fourthAt + 2}
           typeDur={12}
           result={printed(L.iferrorBroken.value)}
@@ -255,14 +286,20 @@ export const RefsScene: React.FC = () => {
         <Note at={hidesAt} x={BAR_X} y={lg.top + h(70)} out={ifnaAt}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>every error looks the same</span>
         </Note>
-        <Note at={causeAt - 2} x={BAR_X} y={lg.top + h(110)} out={ifnaAt}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>fix the cause first: trim the key, fix the column</span>
+        <Note at={causeAt - 2} x={BAR_X} y={lg.top + h(150)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            fix the cause first: <Mark at={trimAt}>trim the key</Mark>, fix the column
+          </span>
+        </Note>
+        <Note at={stillAt + 4} x={BAR_X} y={lg.top + h(190)}>
+          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>the stray space is #N/A too: IFNA still hides it</span>
         </Note>
         <FormulaBar
           x={BAR_X}
           top={lg.top}
           width={BAR_W}
-          formula={screen(L.ifnaBroken)}
+          formula={L.ifnaBroken.formula ?? ""}
+          size={21}
           at={ifnaAt + 2}
           typeDur={12}
           result={printed(L.ifnaBroken.value)}

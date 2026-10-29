@@ -110,7 +110,8 @@ export const JoinsScene: React.FC = () => {
       <Sfx name="el-pop" at={eightAt} level={-32} />
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4}>
+        {/* The question inks in while "Question three" is said. */}
+        <QuestionCard n={3} at={qAt - 4} textAt={Math.min(textAt - 4, qAt + 6)}>
           Inner, left, right and full join: what&apos;s the difference?
         </QuestionCard>
 
@@ -153,12 +154,14 @@ export const JoinsScene: React.FC = () => {
         })}
 
         {/* ── The result, as each join is named ── */}
-        {kinds.map((k) => (
+        {/* Each join's name over the result while it is named; the tell's
+            LEFT JOIN comes back at the end, with the stray order gone. */}
+        {[...kinds, { kind: "LEFT" as Kind, at: leftJoinAt, until: undefined, rows: JOINS.left.rows.length }].map((k, i) => (
           <Ink
-            key={k.kind}
+            key={i}
             at={k.at - 2}
             dur={10}
-            out={k.kind === "FULL" ? undefined : k.until - 4}
+            out={k.kind === "FULL" ? leftJoinAt - 4 : k.until === undefined ? undefined : k.until - 4}
             style={{ left: rg.x, top: rg.top - 40, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}
           >
             <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: INK }}>{k.kind} JOIN</span>
@@ -172,7 +175,7 @@ export const JoinsScene: React.FC = () => {
           rows={[
             ...matched.map((cells, i) => ({ cells, at: innerAt + 4 + i * 2 })),
             { cells: di, at: diBackAt, grow: true, collapseAt: rightAt + 2 },
-            { cells: stray, at: strayKeepAt, grow: true },
+            { cells: stray, at: strayKeepAt, grow: true, collapseAt: leftJoinAt },
             { cells: di, at: fullAt + 6, grow: true },
           ]}
         />

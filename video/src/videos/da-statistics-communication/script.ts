@@ -127,7 +127,7 @@ export const script: NarrationScript = {
     },
     {
       id: "corr-fixed",
-      text: "Hold temperature fixed, comparing only days equally hot, and the link all but vanishes: point zero eight. Other links are pure chance, or run backwards.",
+      text: "Hold temperature fixed, comparing only days equally hot, and the link all but vanishes: point zero eight. Other correlations are pure chance, or the cause runs the other way.",
     },
     {
       id: "corr-cause",
@@ -326,7 +326,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-var-n",
-      text: "Take ten, twenty, thirty, forty and fifty. The squared distances add to a thousand, and over five, that's two hundred. But pandas treats the data as a sample and divides by n minus one, four, for two fifty, because a sample's mean sits closer to its own points than the true mean does. Its square root is fifteen point eight one.",
+      text: "Take ten, twenty, thirty, forty and fifty. Their squared distances from the mean add to a thousand, and a thousand over five is two hundred. But pandas treats the data as a sample and divides by n minus one, four, for two fifty: a sample's mean sits closer to its own points than the true mean does, so dividing by n comes out too small. The standard deviation, its square root, is fifteen point eight one.",
     },
     {
       id: "r-mode",
