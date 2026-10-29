@@ -43,6 +43,23 @@ export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   </span>
 );
 
+/** A question's hyphenated words, each kept on one line: balanced wrapping
+ *  would otherwise break "built-in" at its hyphen. */
+const keepHyphenated = (children: React.ReactNode) =>
+  React.Children.map(children, (child) =>
+    typeof child === "string"
+      ? child.split(/(\S+-\S+)/).map((part, i) =>
+          i % 2 ? (
+            <span key={i} style={{ whiteSpace: "nowrap" }}>
+              {part}
+            </span>
+          ) : (
+            part
+          ),
+        )
+      : child,
+  );
+
 /**
  * "Question 3" over the question itself. The number inks in on `at` (the
  * word "Question"), the question on `textAt` (its first word). A question too
@@ -65,8 +82,10 @@ export const QuestionCard: React.FC<{
       <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>{kicker ?? `Question ${n}`}</span>
       </Ink>
-      <Ink at={textAt ?? at + 8} dur={20} out={out} style={{ left: 92, top: y(150), width, ...headline(size) }}>
-        {children}
+      {/* Balanced, so a question that wraps breaks into even lines rather than
+          leaving one word on the last; the line count is the same either way. */}
+      <Ink at={textAt ?? at + 8} dur={20} out={out} style={{ left: 92, top: y(150), width, ...headline(size), textWrap: "balance" }}>
+        {keepHyphenated(children)}
       </Ink>
     </>
   );
