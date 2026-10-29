@@ -1,6 +1,6 @@
 # DataScientist-2-Probability: P3 fixes
 
-Every P3 left after the P2 pass is fixed (#8 to #19), one of them partly (#14: the Poisson's steady rate is on screen but not said, and the empty lower half of the frame under `pois-which` is left). 905 characters were re-voiced, against a budget of 1,000. The video now runs **8:51 (531.4 s)**, up from 8:22 (502.1 s). Every check that has run passes. `check:motion` and the re-shot still of the Q1 fix are queued but have not run yet. Nothing is committed.
+Every P3 left after the P2 pass is fixed (#8 to #19), one of them partly (#14: the Poisson's steady rate is on screen but not said, and the empty lower half of the frame under `pois-which` is left). 905 characters were re-voiced, against a budget of 1,000. The video now runs **8:51 (531.4 s)**, up from 8:22 (502.1 s). Every check that has run passes. `check:motion` failed once on a 3.0 s hold over `test-in`; that is fixed, and the re-run passes. Nothing is committed.
 
 - **Folder:** `video/src/videos/ds-probability/`
 - **Review:** `agent-outputs/20261029-ds-interview-video-review/DataScientist-2-Probability.md`
@@ -68,10 +68,10 @@ The video now runs **531.4 s (8:51)**, up from 502.1 s (8:22). It has 64 beats a
 | `npm test` | 59/59. |
 | `check:sync` | Passes. All 64 beats are within ±0.12 s; the worst is +0.05 s (`linear-var`). |
 | `check:mix` | Passes. The effects sit 28.2 LU under the narration, a median 27.6 dB below it. The closest moment is 9.3 dB at 4:39.7, which is the existing "exactly one does" pop, not a cue I added. |
-| `check:motion` | **Not yet run.** The first attempt was killed by its own 2-hour timeout while it waited in the render queue. It was relaunched detached (`$S/DataScientist-2-Probability/p3-final.sh`, `timeout 14000`) and is still queued; the result will land in `$S/DataScientist-2-Probability/p3-motion.log`. The P2 pass's run passed with a 2.5 s longest still stretch. This pass's scene changes all add motion (new inks and notes), so a failure is unlikely, but it is unverified. |
+| `check:motion` | **Passes** on the re-run (8:51.5 checked): nothing holds still for 3 s, and seven holds of 2 s or more total 16.0 s. The first run had failed one hold, 1:45.8 to 1:48.8 (3.0 s, over `test-in`): the cond scene is longer now, so its slow push (`Drift`) had almost stopped by the bridge. Fixed with two cues on that beat: "P(disease \| positive)" in the "you want" line is washed green on "that test" and swells on "with numbers". Stills at 106.4 s and 107.3 s checked. |
 | `check:frames` | Not run: no arrow, illustration or ERD changed. |
 
-**Stills:** I took 16 stills at every place I changed and looked at each one. They caught one problem: in the new Q1 line, the green wash on "1/3" touched its "=". I added a 0.32em margin. The re-shot still at 68.8 s is in the same queued job, written to `$S/DataScientist-2-Probability/after2/`, and **has not been looked at yet**.
+**Stills:** I took 16 stills at every place I changed and looked at each one. They caught one problem: in the new Q1 line, the green wash on "1/3" touched its "=". I added a 0.32em margin, and the re-shot still at 68.8 s shows it clear.
 
 ## Noticed, and kit suggestions
 

@@ -67,6 +67,8 @@ export const CondScene: React.FC = () => {
   const weightedAt = n.word("bayes-base", "each weighted");
   const baseAt = n.word("bayes-base", "the base rate");
   const breaksAt = n.word("bayes-base", "intuition breaks");
+  const thatTestAt = n.word("test-in", "that test");
+  const numbersAt = n.word("test-in", "with numbers");
   const end = n.beat("test-in").to;
 
   const out1 = q2At - 4;
@@ -262,14 +264,25 @@ export const CondScene: React.FC = () => {
             </Mark>
           </span>
         </Note>
+        {/* The bridge points at what the next question computes: washed green
+            on "that test", and swelling on "with numbers". */}
         <Note at={wantAt + 2} x={X0} y={y(720)}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>you want </span>
-          <span style={math(36, OK_INK)}>
-            <P>
-              disease
-              <Given />
-              positive
-            </P>
+          <span
+            style={{
+              ...math(36, OK_INK),
+              display: "inline-block",
+              transform: `scale(${1 + 0.07 * pulse(frame, numbersAt, 22)})`,
+              transformOrigin: "0 50%",
+            }}
+          >
+            <Mark at={thatTestAt} color={MARK_OK}>
+              <P>
+                disease
+                <Given />
+                positive
+              </P>
+            </Mark>
           </span>
         </Note>
 
