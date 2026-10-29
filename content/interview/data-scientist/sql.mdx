@@ -241,8 +241,9 @@ An ordered `SUM` with no explicit frame already means "everything up to this row
   ]}
 />
 
-`SUM(x) OVER (ORDER BY day)`; the default frame is `ROWS BETWEEN UNBOUNDED
-PRECEDING AND CURRENT ROW`, which accumulates from the start.
+`SUM(x) OVER (ORDER BY day)`; the default frame is `RANGE BETWEEN UNBOUNDED
+PRECEDING AND CURRENT ROW`, which accumulates from the start, and rows tied on
+`day` share one total. Write `ROWS` for a sum that moves strictly row by row.
 
 <SqlCodeBlock
   dialect="duckdb"
