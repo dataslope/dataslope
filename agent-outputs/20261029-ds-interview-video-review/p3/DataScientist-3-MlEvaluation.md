@@ -3,7 +3,9 @@
 Folder `video/src/videos/ds-ml-evaluation/`. Review report:
 `agent-outputs/20261029-ds-interview-video-review/DataScientist-3-MlEvaluation.md`;
 P2 fix report: `.../fixes/DataScientist-3-MlEvaluation.md`, which already fixed
-#13, #15, most of #18 and #19's missing y title. Not committed.
+#13, #15, most of #18 and #19's missing y title. I committed nothing. The
+coordinator's work-in-progress commit `5d1993ef` already holds every change
+below, and the working tree matches it.
 
 ## P3s
 
@@ -37,11 +39,14 @@ All on the final code, through `out/entries/DataScientist-3-MlEvaluation.tsx` an
 - `tsc --noEmit`: no errors. `eslint src/videos/ds-ml-evaluation`: clean.
 - `npm test`: 59/59. `npm run check:cues`: pass.
 - `check:sync`: pass, 52 beats, worst +0.03 s (`learn-bias`); the re-voiced and split beats are all within ±0.02 s.
-- `check:mix`: PENDING
-- `check:motion`: PENDING
+- `check:mix`: exit 0. Narration −19.6 LUFS, effects 28.6 LU under it, speech a median 29.8 dB over the effects where both sound. The closest moment is 7.6 dB for 50 ms at 0:50.0: the existing pop on "Degree three", which I did not touch (the only effect added is a tap on the cross-validation line at 1:24.7).
+- `check:motion`: pass. Nothing is still for 3 s. Three stretches of 2.0 to 2.5 s, all at scene openings (`bias`, `reg`, `cv`); P2 had five. The run had to be queued twice: the first job was stopped at its 2 h limit, most of that spent waiting in the queue, at 30% rendered.
 - `check:frames`: not run (no arrow, illustration or ERD changed).
 - Stills at every change, cropped and looked at: 24 (hook line, tile numbers), 87.5 and 90.6 (fix list, CV line, the degree-3 label; the bridge), 104 and 112 (path caption with the first paths; "ten measurements" marked), 222.5 and 231.5 (test "once"; bridge dim), 264 and 267 (learning-curve note and mark; bridge dim), 310 (F1 formula), 368.5 (readouts, ROC y title), 408.8 (the threshold bars), 449.5 (reliability diagram, Brier), 503, 507.5 and 509 (MAE row first, then RMSE, then MAE marked), 586 and 596 (model choice). The stills led to two layout changes, both re-checked on the motion preview: more space between the recall and precision bar groups, and "or the Brier score" in place of "Brier score".
 
 ## Shared-kit suggestions
 
-None needed for these. The bridge-dim pattern (a finished figure stepping back on a bridge that names nothing on screen) is local to this video. A `dim` prop on the shared `Fade` would make it one prop rather than a wrapping `div`.
+None. Every change is in this video's folder. The P2 report's suggestion still
+stands: `narrate --recut` could cut the takes that still match the script
+instead of refusing the whole video. The take-cut tool used here does that for
+one take at a time.

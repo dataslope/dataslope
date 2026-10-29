@@ -33,8 +33,10 @@ export const VanishScene: React.FC = () => {
   const from = n.beat("vanish").from;
   const qAt = n.word("vanish", "Question five");
   const textAt = n.word("vanish", "What causes vanishing");
+  const explodingAt = n.word("vanish", "exploding gradients");
   const sweepAt = n.word("vanish", "That backward sweep");
   const productAt = n.word("vanish", "a long product");
+  const slopeAt = n.word("vanish", "The sigmoid's slope");
   const quarterAt = n.word("vanish", "a quarter at most");
   const tenAt = n.word("vanish", "ten sigmoid layers");
   const millionAt = n.word("vanish", "less than one in a million");
@@ -95,12 +97,18 @@ export const VanishScene: React.FC = () => {
               yFormat={(v) => power(10 ** v)}
               xTitle="layers back from the output"
               yTitle="the gradient's size"
-              at={sweepAt - 4}
+              at={explodingAt - 2}
             />
-            <Tagline x={120} y={y(236)} at={productAt + 4} size={24} color={INK}>
-              each layer: <Mark at={whyAt + 4}>× its weight × its activation&apos;s slope</Mark>
+            {/* The opening builds a step at a time: the empty axes as the
+                question ends, then each line on its words, so the page never
+                holds still for 3 s while the question is read. */}
+            <Tagline x={120} y={y(236)} at={sweepAt} size={24} color={INK}>
+              each layer:{" "}
+              <span style={{ opacity: ease(frame, productAt + 2, 10) }}>
+                <Mark at={whyAt + 4}>× its weight × its activation&apos;s slope</Mark>
+              </span>
             </Tagline>
-            <Tagline x={120} y={y(290)} at={quarterAt} size={24} color={ACCENT_INK}>
+            <Tagline x={120} y={y(290)} at={slopeAt - 2} size={24} color={ACCENT_INK}>
               the sigmoid&apos;s slope: <Mark at={quarterAt + 4}>at most 0.25</Mark>, so × 0.25 a layer
               <span style={{ opacity: ease(frame, nearAt - 2, 10) }}>, with weights near 1</span>
             </Tagline>
