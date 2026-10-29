@@ -116,7 +116,7 @@ export const SeriesScene: React.FC = () => {
         >
           Each video: the questions that need a figure, then the rest, quickly.
         </div>
-        <div style={{ position: "absolute", left: X0, top: practiceY, ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
+        <div style={{ position: "absolute", left: X0, top: practiceY, ...note(28, INK), whiteSpace: "nowrap" }}>
           <span style={{ opacity: ease(frame, practiceAt, 12) }}>On every page: </span>
           <span style={{ opacity: ease(frame, checksAt - 2, 10) }}>concept checks · </span>
           <span style={{ opacity: ease(frame, runnableAt - 2, 10) }}>runnable challenges · </span>

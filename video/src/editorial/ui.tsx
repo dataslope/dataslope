@@ -1,7 +1,7 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
 import { ease } from "../components/motion";
-import { ACCENT_INK, body, HAIRLINE, INK, label } from "./style";
+import { ACCENT_INK, body, HAIRLINE, INK, label, TABULAR } from "./style";
 
 export const W = 1920;
 export const H = 1080;
@@ -57,6 +57,14 @@ export const Ink: React.FC<{
     </div>
   );
 };
+
+/**
+ * A number in digits of one width, for a counter or a column that must not
+ * shift as its digits change. Use it on the number alone: TABULAR over a
+ * whole phrase also sets every hyphen a digit wide ("p - value").
+ * `src/editorial/tabular.test.ts` fails on TABULAR over a hyphenated word.
+ */
+export const Num: React.FC<{ children: React.ReactNode }> = ({ children }) => <span style={TABULAR}>{children}</span>;
 
 /** An annotation that slides in from the side, optionally dimmed later. */
 export const Note: React.FC<{

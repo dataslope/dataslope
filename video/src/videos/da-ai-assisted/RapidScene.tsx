@@ -170,7 +170,7 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={at - 2} x={R_X} y={c.T}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>5,000 open-ended survey answers</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>5,000 open-ended survey answers</span>
       </Note>
       <Note at={llmAt - 2} x={R_X} y={c.T + c.h(44)}>
         <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>LLM: large language model, as a first-pass labeler you measure</span>
