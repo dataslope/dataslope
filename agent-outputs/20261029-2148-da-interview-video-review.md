@@ -137,10 +137,10 @@ they reach several videos each:
   narration cues never appear: three in Pandas and two in Advanced SQL. The worst
   is Pandas Q10, where yellow stays on ffill while bfill "borrows from the
   future" (`da-pandas/parts.tsx` ~823, `da-sql/parts.tsx` ~778).
-- **The console box is 22px short**, so its last line hangs below it. Every
-  console in Pandas has this, and so does Data Scientist's Python & pandas, which
-  shares the component. Padding comes out of an explicit height under
-  border-box sizing (`da-pandas/parts.tsx:452-456`).
+- **The console box is 22px short**, so its last line hangs below it, in every
+  console in Pandas. Padding comes out of an explicit height under border-box
+  sizing (`da-pandas/parts.tsx:452-456`). Data Scientist's Python & pandas
+  imports the component but never draws one.
 - **The SQL highlighter lacks the frame keywords**: `QUALIFY`, `ROWS`, `RANGE`,
   `BETWEEN`, `UNBOUNDED`, `PRECEDING`, `FOLLOWING`, `CURRENT`, `ROW`,
   `RECURSIVE` (`da-sql/parts.tsx:243-248`).
