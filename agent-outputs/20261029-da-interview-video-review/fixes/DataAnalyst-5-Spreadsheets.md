@@ -1,6 +1,6 @@
 # DataAnalyst-5-Spreadsheets: fixes
 
-Report: `agent-outputs/20261029-da-interview-video-review/DataAnalyst-5-Spreadsheets.md` (0 P1, 9 P2, 9 P3). Folder `video/src/videos/da-spreadsheets`. Nothing committed; the coordinator's WIP snapshot (`2808545b`) already holds part of it.
+Report: `agent-outputs/20261029-da-interview-video-review/DataAnalyst-5-Spreadsheets.md` (0 P1, 9 P2, 9 P3). Folder `video/src/videos/da-spreadsheets`. Nothing committed by me; the coordinator's automatic snapshot (`f098538b`) already holds the final state.
 
 ## Findings
 
@@ -42,8 +42,11 @@ Worked in the brief's order: answers (3, 15, 16, 17), the other P2s (1, 2, 4, 5,
 ## Length and checks
 
 - New length **7:52.4** (472.4 s, 50 beats; was 7:20.6, 38 beats).
-- Typecheck and lint: clean for the folder. `check:cues`: no failure in this folder. `npm test`: 68 of 69; the one failure is `da-pandas/LocScene.tsx:63` (another video's cue).
-- CHECKS_PLACEHOLDER
+- Typecheck and lint: clean for the folder, on the final code. `check:cues`: no failure in this folder. `npm test`: 68 of 69; the one failure is `da-pandas/LocScene.tsx:63` (another video's cue).
+- `check:motion`: **pass**, 7:52.5 checked, no stretch still for 2 s or more.
+- `check:sync`: **pass**, all 50 beats within ±0.12 s; worst +0.03 s (`crosstab`); the six re-voiced beats sit at −0.01 to +0.02.
+- `check:mix`: **pass** (informational). Effects 25.9 LU under the narration; where both sound, speech is a median 26.4 dB above them (5th percentile 9.3 dB). Closest: 6.8 dB for 50 ms at 2:30.5, the existing `el-pop` on "still costs nine" (`LookupScene`, unchanged).
+- `check:frames`: **pass**, including "no hyphen is set in tabular figures".
 - Stills looked at, at every change: 13, 14.5, 15.8, 16.5 (hook); 100, 113.5, 117.5 (Q3 rewrite); 127.5, 131.8, 138.5, 141.8, 145.5, 149.5, 151.8 (Q4); 160, 164, 176, 181.5 (Q5, bridge); 196, 204.5, 214.5, 223.5, 226.5 (Q6); 250, 254.5, 255.6, 259, 263, 264.8, 266 (Q7); 268.5, 291, 300.5, 307.5 (Q8); 340.5, 343.5, 360, 364 (Q9, Q10); 375, 398.5, 408.8, 437, 445.5, 452.5, 459.8, 463, 466 (rapid round), in `video/out/DataAnalyst-5-Spreadsheets-stills/`.
 
 ## Noticed
