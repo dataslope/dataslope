@@ -131,6 +131,9 @@ src/videos/<video>/
   Video.tsx            the composition: scenes, each cued to narration words
   illustrations.json   image prompts (watercolor, GPT Image)
   patterns.json        Tabbied patterns, if the video uses any
+  check.mjs            the facts: runs the lesson's code, writes results.json
+  results.json         what check.mjs measured (committed)
+  data.ts              reads results.json for the scenes
 public/images/<video>/     trimmed WebP cut-outs (generated, committed)
 public/patterns/<video>/   pattern SVGs (generated, committed)
 public/narration/<script id>/   audio and alignment, once there is audio
@@ -159,6 +162,16 @@ Shared building blocks:
   `endSymbols()` says where an end's maximum and minimum sit, to point at one
   as it is read. The `ErdKit` composition under Assets shows the kit.
 
+**A video's facts are measured, never typed.** `check.mjs` runs the lesson's
+own code in the engine the page runs it in (Pyodide, DuckDB-Wasm or PGlite)
+and writes `results.json`; `data.ts` reads it, so a number on screen can't
+drift from what ran. Those engines are the site's dependencies, not this
+package's: `check.mjs` loads them from the repository root's
+`node_modules`, so run `npm ci` at the root once before running one, or it
+stops at `Cannot find module 'pyodide'`. (The Data Scientist fixers, barred
+from installing, pointed `NODE_PATH` at private copies of the locked
+versions; every existing value reproduced.)
+
 Register a new composition in `src/Root.tsx` with
 `defaultProps={EDITORIAL_DEFAULTS}` and
 `calculateMetadata={narratedMetadata(script)}`, so its length follows the
@@ -186,6 +199,15 @@ Every video follows these rules.
   underline or a strike-through is laid out against the words (flex, `em`,
   `100%`), never at a pixel offset measured in one font, so the line still
   works when the face changes.
+- **SVG text is colored with `fill`.** An SVG `<text>` ignores CSS `color`,
+  so `label()` or `note()` on it draws black whatever color it names: the
+  Data Scientist review found 30 such labels, one a P1. Wrap the style in
+  `svgText()` (`src/editorial/style.ts`), or set `fill`; `npm test` fails on
+  SVG text styled without either.
+- **Tabular figures on the number only.** Inter's tabular feature also sets
+  a hyphen a digit wide, so `TABULAR` over a phrase reads "p - value". Put
+  it on the number (`<Num>`, `src/editorial/ui.tsx`); `npm test` fails on
+  `TABULAR` over a hyphenated word.
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative
