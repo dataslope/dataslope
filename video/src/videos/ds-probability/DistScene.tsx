@@ -170,7 +170,7 @@ export const DistScene: React.FC = () => {
           <span style={{ ...note(23, INK) }}>the wait between Poisson events</span>
         </Note>
         <Note at={bernAt + 10} x={panelX(0)} y={y(PANEL.top) + h(PANEL.height) + 4} width={PANEL.w}>
-          <span style={{ ...label(18, INK_SOFT), display: "flex", justifyContent: "space-around" }}>
+          <span style={{ ...label(21, INK_SOFT), display: "flex", justifyContent: "space-around" }}>
             <span>no</span>
             <span>yes</span>
           </span>

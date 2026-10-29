@@ -3,14 +3,16 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COND } from "./data";
-import { DieFace, Drift, Frac, Given, Labeled, Mark, MARK_OK, math, OK, OK_INK, pulse, Strike, V, X0 } from "./parts";
+import { DieFace, Drift, Frac, Given, Labeled, Mark, MARK_OK, math, OK, OK_INK, pulse, V, X0 } from "./parts";
 
 const DIE = { size: 110, pitch: 140, y: 470 };
+/** A probability's own column, so the note after it lines up row to row. */
+const ROW: React.CSSProperties = { display: "inline-block", width: 330 };
 const RULE_X = 1080;
 
 /** "P(" … ")": a probability in the page's notation. */
@@ -37,9 +39,9 @@ export const CondScene: React.FC = () => {
   const answerAt = n.word("cond", "It's the probability");
   const rollAt = n.word("cond-die", "Roll a die");
   const evenAt = n.word("cond-die", "came up even");
-  const threeAt = n.word("cond-die", "Three faces are left");
-  const sixAt = n.word("cond-die", "the chance of a six");
-  const notAt = n.word("cond-die", "not one in six");
+  const threeAt = n.word("cond-six", "Three faces are left");
+  const sixAt = n.word("cond-six", "the chance of a six");
+  const notAt = n.word("cond-six", "not one in six");
   const symbolsAt = n.word("cond-rule", "In symbols");
   const shrinkAt = n.word("cond-rule", "shrink the world");
   const measureAt = n.word("cond-rule", "measure again");
@@ -53,15 +55,20 @@ export const CondScene: React.FC = () => {
   const evidenceAt = n.word("bayes", "evidence");
   const knowAt = n.word("bayes-when", "you know how a test behaves");
   const wantAt = n.word("bayes-when", "you want the chance");
-  const baseAt = n.word("bayes-when", "The base rate");
-  const bottomAt = n.word("bayes-when", "that bottom line");
-  const breaksAt = n.word("bayes-when", "intuition breaks");
+  const bottomAt = n.word("bayes-base", "The bottom line");
+  const sickAt = n.word("bayes-base", "the positives among the sick");
+  const healthyAt = n.word("bayes-base", "the positives among the healthy");
+  const weightedAt = n.word("bayes-base", "each weighted");
+  const baseAt = n.word("bayes-base", "the base rate");
+  const breaksAt = n.word("bayes-base", "intuition breaks");
   const end = n.beat("test-in").to;
 
   const out1 = q2At - 4;
   const odd = ease(frame, evenAt, 14);
   const evenLit = ease(frame, threeAt, 12);
   const sixLit = ease(frame, sixAt, 12);
+  // P(six) stays 1/6: once the conditional arrives it goes quiet, not wrong.
+  const quiet = ease(frame, notAt, 14);
   const formulaY = y(330);
 
   return (
@@ -120,13 +127,15 @@ export const CondScene: React.FC = () => {
             />
           );
         })}
+        {/* Both stay true: each line says which faces it counts over. */}
         <Note at={rollAt + 16} x={X0} y={y(DIE.y + DIE.size + 34)} out={out1}>
-          <span style={math(38)}>
-            <P>six</P> = <Strike at={notAt} color={ACCENT}>1/6</Strike>
+          <span style={{ ...math(38, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), ...ROW }}>
+            <P>six</P> = {COND.pSix}
           </span>
+          <span style={{ ...note(24, INK_SOFT), opacity: quiet, whiteSpace: "nowrap" }}>out of all six faces</span>
         </Note>
         <Note at={sixAt + 2} x={X0} y={y(DIE.y + DIE.size + 96)} out={out1}>
-          <span style={math(38, OK_INK)}>
+          <span style={{ ...math(38, OK_INK), ...ROW }}>
             <P>
               six
               <Given />
@@ -134,6 +143,7 @@ export const CondScene: React.FC = () => {
             </P>{" "}
             = {COND.pSixGivenEven}
           </span>
+          <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, sixAt + 10, 12), whiteSpace: "nowrap" }}>out of the three even faces</span>
         </Note>
 
         {/* The definition, beside the die. */}
@@ -188,7 +198,7 @@ export const CondScene: React.FC = () => {
                       </P>
                     </Mark>
                   </Labeled>{" "}
-                  <Labeled word="prior" at={priorAt}>
+                  <Labeled word="prior: the base rate" at={priorAt}>
                     <P>
                       <V>A</V>
                     </P>
@@ -228,40 +238,47 @@ export const CondScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* The bottom line, written out: where the base rate comes in. */}
-        <Ink at={bottomAt - 4} dur={20} style={{ left: 900, top: y(668) }}>
+        {/* The bottom line, written out and read term by term: the positives
+            among the sick, then among the healthy, each weighted by how
+            common its group is. Those weights are where the base rate comes in. */}
+        <Ink at={bottomAt - 2} dur={20} style={{ left: 900, top: y(668) }}>
           <span style={math(34)}>
             <P>
               <V>B</V>
             </P>{" "}
             ={" "}
-            <P>
-              <V>B</V>
-              <Given />
-              <V>A</V>
-            </P>{" "}
-            <Mark at={baseAt + 4}>
+            <Mark at={sickAt} out={weightedAt}>
               <P>
+                <V>B</V>
+                <Given />
                 <V>A</V>
               </P>
             </Mark>{" "}
+            <Labeled word="the base rate" at={baseAt} below color={INK} size={22}>
+              <Mark at={weightedAt}>
+                <P>
+                  <V>A</V>
+                </P>
+              </Mark>
+            </Labeled>{" "}
             +{" "}
-            <P>
-              <V>B</V>
-              <Given />
-              not <V>A</V>
-            </P>{" "}
-            <Mark at={baseAt + 8}>
+            <Mark at={healthyAt} out={weightedAt}>
               <P>
+                <V>B</V>
+                <Given />
                 not <V>A</V>
               </P>
-            </Mark>
+            </Mark>{" "}
+            <Labeled word="1 − the base rate" at={baseAt + 4} below color={INK} size={22}>
+              <Mark at={weightedAt + 4}>
+                <P>
+                  not <V>A</V>
+                </P>
+              </Mark>
+            </Labeled>
           </span>
         </Ink>
-        <Note at={baseAt + 10} x={900} y={y(740)}>
-          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>the base rate</span>
-        </Note>
-        <Note at={breaksAt} x={1070} y={y(740)}>
+        <Note at={breaksAt} x={900} y={y(762)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>where intuition breaks</span>
         </Note>
       </Drift>

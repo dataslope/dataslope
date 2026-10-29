@@ -34,9 +34,9 @@ export const MontyScene: React.FC = () => {
   const switchAt = n.word("monty-setup", "offers you the switch");
   const takeAt = n.word("monty-switch", "Take it");
   const thirdAt = n.word("monty-switch", "one time in three");
-  const neverAt = n.word("monty-switch", "never opens the car");
-  const twoThirdsAt = n.word("monty-switch", "the other two thirds");
-  const landAt = n.word("monty-switch", "land on the one door");
+  const neverAt = n.word("monty-host", "never opens the car");
+  const twoThirdsAt = n.word("monty-host", "the other two thirds");
+  const landAt = n.word("monty-host", "land on the one door");
   const gamesAt = n.word("monty-sim", "A hundred thousand games");
   const stayAt = n.word("monty-sim", "staying wins");
   const switchingAt = n.word("monty-sim", "switching sixty-seven");

@@ -207,15 +207,20 @@ export const ExpectScene: React.FC = () => {
                 <g key={i}>
                   {ring > 0 ? <circle cx={x} cy={py - 6} r={44} fill="none" stroke={OK} strokeWidth={4} opacity={ring} /> : null}
                   <Person x={x} y={py} size={64} color={DATA} />
-                  <g transform={`translate(${x},${py - 48 - (1 - drop) * 60})`} opacity={drop}>
-                    <rect x={-22} y={-18} width={44} height={22} rx={5} fill={match && ring > 0.5 ? OK : PAPER} stroke={INK} strokeWidth={2} />
-                    <rect x={-30} y={2} width={60} height={6} rx={3} fill={INK} />
-                    <text x={0} y={-1} textAnchor="middle" style={{ ...label(15, match && ring > 0.5 ? PAPER : INK), fontWeight: 700 }}>
+                  {/* The hat's number is the evidence (who got whose hat), so it
+                      is set at 21px, on a crown wide enough to hold it, and the
+                      brim (py - 62 to py - 56) clears the match's ring (py - 52).
+                      SVG text takes `fill`, not the CSS color label() sets, so it
+                      is given here: ink, which reads on the match's green too. */}
+                  <g transform={`translate(${x},${py - 64 - (1 - drop) * 60})`} opacity={drop}>
+                    <rect x={-27} y={-24} width={54} height={28} rx={6} fill={match && ring > 0.5 ? OK : PAPER} stroke={INK} strokeWidth={2} />
+                    <rect x={-33} y={2} width={66} height={6} rx={3} fill={INK} />
+                    <text x={0} y={-3} textAnchor="middle" style={{ ...label(21, INK), fontWeight: 700, fill: INK }}>
                       {hat + 1}
                     </text>
                   </g>
                   {/* Clear of the match's ring, which reaches py + 38. */}
-                  <text x={x} y={py + 62} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 700 }}>
+                  <text x={x} y={py + 62} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 700, fill: INK_SOFT }}>
                     {i + 1}
                   </text>
                 </g>

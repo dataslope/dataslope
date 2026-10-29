@@ -44,7 +44,7 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
 
   return (
     <>
-      <Axes x={xs} y={ys} xTicks={[140, 160, 180, 200]} yTicks={[50, 75, 100]} xTitle="height, cm" yTitle="weight, kg" at={startAt} size={18} />
+      <Axes x={xs} y={ys} xTicks={[140, 160, 180, 200]} yTicks={[50, 75, 100]} xTitle="height, cm" yTitle="weight, kg" at={startAt} size={21} />
       <Dots dots={dots} r={4.5} opacity={0.6} />
       <Note at={startAt + 6} x={SIDE} y={y(390)}>
         <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>covariance</span>
@@ -67,7 +67,7 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
           return (
             <g key={v}>
               <line x1={x} x2={x} y1={scale.y + 14} y2={scale.y + 30} stroke={INK} strokeWidth={2} />
-              <text x={x} y={scale.y + 54} textAnchor="middle" style={{ ...label(18, INK_SOFT), ...TABULAR }}>
+              <text x={x} y={scale.y + 56} textAnchor="middle" style={{ ...label(21, INK_SOFT), ...TABULAR, fill: INK_SOFT }}>
                 {v === -1 ? "−1" : v}
               </text>
             </g>
@@ -75,7 +75,7 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
         })}
         <circle cx={rX} cy={scale.y + 22} r={9} fill={OK} />
       </Svg>
-      <Axes x={px} y={py} xTicks={[]} at={zeroAt - 4} size={16} />
+      <Axes x={px} y={py} xTicks={[]} at={zeroAt - 4} size={21} />
       <Svg opacity={paraP}>
         {COV.parabola.map(([x, v], i) => (
           <circle key={i} cx={at(px, x)} cy={at(py, v)} r={4.5} fill={DATA} opacity={0.75} />

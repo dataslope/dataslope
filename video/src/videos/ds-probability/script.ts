@@ -57,8 +57,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - Binomial(1,000, 0.003) against Poisson(3): at most 0.0003 apart.
  *   - Monty Hall, the page's block (seed 7, 100,000 games): stay 0.334,
  *     switch 0.666.
- *   - 23 people make 253 pairs; a shared birthday is 0.5073 exact, 0.507 in
- *     the page's 50,000 rooms (seed 1); 57 people pass 99%.
+ *   - 23 people make 253 pairs (23 x 22 / 2); no shared birthday is
+ *     364/365 x 363/365 x ... x 343/365 = 0.4927, "forty-nine point three
+ *     percent", so a shared one is 0.5073 exact, 0.507 in the page's 50,000
+ *     rooms (seed 1); 57 people pass 99%.
  *   - the video's own 200 people (seed 23): covariance 42.0 in centimeter
  *     kilograms and 0.42 in meter kilograms, correlation 0.49 both ways; y =
  *     x squared on a symmetric grid has r = 0.
@@ -95,7 +97,12 @@ export const script: NarrationScript = {
     },
     {
       id: "cond-die",
-      text: "Roll a die, and someone tells you it came up even. Three faces are left, so the chance of a six is now one in three, not one in six.",
+      text: "Roll a die, and someone tells you it came up even.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "cond-six",
+      text: "Three faces are left, so the chance of a six is now one in three, not one in six.",
       pauseAfter: 0.6,
     },
     {
@@ -110,7 +117,12 @@ export const script: NarrationScript = {
     },
     {
       id: "bayes-when",
-      text: "Use it when you know how a test behaves given a disease, but you want the chance of the disease given the test. The base rate comes in through that bottom line, and that's where intuition breaks.",
+      text: "Use it when you know how a test behaves given a disease, but you want the chance of the disease given the test.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "bayes-base",
+      text: "The bottom line adds the positives among the sick to the positives among the healthy, each weighted by how common its group is. Those weights are the base rate, and that's where intuition breaks.",
       pauseAfter: 0.7,
     },
     { id: "test-in", text: "So here's that test, with numbers." },
@@ -169,6 +181,11 @@ export const script: NarrationScript = {
     {
       id: "excl-die",
       text: "Roll a one, and you didn't roll a two. Knowing the first drops the second from one in six to zero, which is as far from independent as it gets.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "excl-never",
+      text: "So two exclusive events that can each happen are never independent.",
       pauseAfter: 0.7,
     },
     { id: "expect-in", text: "Then the two numbers that sum up a random variable." },
@@ -234,7 +251,17 @@ export const script: NarrationScript = {
     },
     {
       id: "memory-wait",
-      text: "Say waits average twelve minutes. The chance of waiting ten more is forty-three percent, whether you've waited zero minutes, ten, or thirty. No other continuous distribution does that.",
+      text: "Say waits average twelve minutes.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "memory-more",
+      text: "The bar is everyone still waiting, and the darker part waits ten more. That's forty-three percent of the bar, whether they've waited zero minutes, ten, or thirty.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "memory-other",
+      text: "No other continuous distribution does that.",
       pauseAfter: 0.7,
     },
 
@@ -271,8 +298,13 @@ export const script: NarrationScript = {
     },
     {
       id: "monty-switch",
-      text: "Take it. Your first pick was right one time in three. The host never opens the car, so the other two thirds all land on the one door he left shut.",
-      pauseAfter: 0.6,
+      text: "Take it. Your first pick was right one time in three.",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "monty-host",
+      text: "The host never opens the car, so the other two thirds all land on the one door he left shut.",
+      pauseAfter: 0.8,
     },
     {
       id: "monty-sim",
@@ -293,8 +325,18 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "bday-exact",
+      text: "Work it through the complement. Each new person has to miss everyone before them: three sixty-four out of three sixty-five, then three sixty-three, down to three forty-three. Multiply them, and no match at all is forty-nine point three percent.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "bday-match",
+      text: "So a match is fifty point seven percent, and fifty thousand simulated rooms say the same.",
+      pauseAfter: 0.55,
+    },
+    {
       id: "bday-curve",
-      text: "The exact chance is fifty point seven percent, and fifty thousand simulated rooms say the same. By fifty-seven people, it's over ninety-nine.",
+      text: "By fifty-seven people, it's over ninety-nine.",
       pauseAfter: 0.8,
     },
 

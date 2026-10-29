@@ -646,6 +646,8 @@
     "people": 23,
     "pairs": 253,
     "exact": 0.5073,
+    "noMatch": 0.4927,
+    "lastFactor": 343,
     "exact22": 0.4757,
     "simulated": 0.507,
     "rooms": 50000,

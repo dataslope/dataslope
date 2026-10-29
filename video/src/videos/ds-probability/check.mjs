@@ -153,6 +153,8 @@ days.sort(axis=1)
 has_match = (np.diff(days, axis=1) == 0).any(axis=1)
 r["birthday"] = {
     "people": 23, "pairs": math.comb(23, 2), "exact": round(float(shared(23)), 4),
+    # The complement the answer works through: 364/365 x 363/365 ... x 343/365.
+    "noMatch": round(float(1 - shared(23)), 4), "lastFactor": 365 - 22,
     "exact22": round(float(shared(22)), 4),
     "simulated": round(float(has_match.mean()), 3), "rooms": tr,
     "over99": next(n for n in range(1, 366) if shared(n) > F(99, 100)),
