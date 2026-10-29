@@ -49,9 +49,10 @@ export const HookScene: React.FC = () => {
     { text: "another model often grades it", at: n.word("plan", "another model often grades it") },
   ];
   const nineAt = n.word("plan", "nine questions");
-  const sevenAt = n.word("plan", "Seven get worked through");
-  const twoTakeAt = n.word("plan", "two take a sentence each");
-  const end = n.beat("plan").to;
+  const sevenAt = n.word("plan-seven", "Seven get worked through");
+  const fourAt = n.word("plan-seven", "four of them with real arithmetic");
+  const twoTakeAt = n.word("plan-seven", "two take a sentence each");
+  const end = n.beat("plan-seven").to;
 
   const arrow = ease(frame, twiceAt + 4, 16);
 
@@ -152,8 +153,9 @@ export const HookScene: React.FC = () => {
           <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
             9 questions:{" "}
             <span style={{ opacity: ease(frame, sevenAt - 2, 10) }}>
-              <Mark at={sevenAt + 4}>7 worked through with real arithmetic</Mark>
+              <Mark at={sevenAt + 4}>7 worked through</Mark>
             </span>
+            <span style={{ opacity: ease(frame, fourAt - 2, 10), color: INK_SOFT }}> (4 of them with real arithmetic)</span>
             <span style={{ opacity: ease(frame, twoTakeAt - 2, 10) }}>, 2 in a sentence</span>
           </span>
         </Note>

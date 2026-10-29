@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -45,7 +45,9 @@ const Block: React.FC<{ x: number; y: number; at: number; children: React.ReactN
   );
 };
 
-/** One layer laid across the top of the loop: what is new. */
+/** One layer laid across the top of the loop: what is new. Outlined in the
+ *  soft ink, since nothing here is a trap; yellow lights the ones the
+ *  narration points at. */
 const Layer: React.FC<{ y: number; at: number; lit?: number; dim?: number; children: React.ReactNode }> = ({
   y,
   at: from,
@@ -70,7 +72,7 @@ const Layer: React.FC<{ y: number; at: number; lit?: number; dim?: number; child
         boxSizing: "border-box",
         padding: "0 24px",
         borderRadius: 10,
-        border: `2px solid ${ACCENT_INK}`,
+        border: `2px solid ${INK_SOFT}`,
         background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * l}%, ${PAPER})`,
         display: "flex",
         alignItems: "center",
@@ -90,7 +92,10 @@ const Layer: React.FC<{ y: number; at: number; lit?: number; dim?: number; child
  * experiments, SQL, product sense), and four layers set down on top of it as
  * they are named: evaluating LLM features, experiments where the treatment is
  * random, checking an assistant's work, and rounds with AI allowed or banned.
- * The bridge then lights the first layer, which the rest of the page is about.
+ * The recruiter advice sits beside the last of those, the rounds it is about.
+ * The bridge then lights the first layer, which most of what follows is
+ * about, and the next two, which questions 5 and 7 answer, each named beside
+ * its layer; only the rounds layer dims.
  */
 export const ChangedScene: React.FC = () => {
   const n = useNarration();
@@ -106,8 +111,6 @@ export const ChangedScene: React.FC = () => {
     { text: "SQL", at: n.word("changed", "SQL") },
     { text: "product sense", at: n.word("changed", "product sense") },
   ];
-  const topAt = n.word("changed-layer", "What's layered on top");
-  const seniorAt = n.word("changed-layer", "mostly at mid and senior levels");
   const layers = [
     { text: "evaluating LLM features", at: n.word("changed-layer", "evaluating features built on") },
     { text: "experiments where the treatment is itself random", at: n.word("changed-layer", "Experimenting on AI features") },
@@ -116,9 +119,17 @@ export const ChangedScene: React.FC = () => {
   ];
   const askAt = n.word("changed-layer", "Ask the recruiter");
   const firstAt = n.word("measure-in", "the first of those");
+  const nextAt = n.word("measure-in", "Questions five and seven");
   const end = n.beat("measure-in").to;
 
   const layerTop = (i: number) => y(BASE_Y) - (i + 1) * (LAYER_H + LAYER_GAP) - 6;
+  const SIDE = X0 + 4 * BLOCK_W + 3 * BLOCK_GAP + 30;
+  /** What each layer is in the rest of the video, named beside it as the bridge says so. */
+  const where = [
+    { text: "most of what follows", at: firstAt },
+    { text: "question 5", at: nextAt },
+    { text: "question 7", at: nextAt + 6 },
+  ];
 
   return (
     <AbsoluteFill>
@@ -146,17 +157,25 @@ export const ChangedScene: React.FC = () => {
         ))}
 
         {layers.map((l, i) => (
-          <Layer key={l.text} y={layerTop(i)} at={l.at - 2} lit={i === 0 ? firstAt - 2 : undefined} dim={i === 0 ? undefined : firstAt}>
+          <Layer
+            key={l.text}
+            y={layerTop(i)}
+            at={l.at - 2}
+            lit={i < where.length ? where[i].at - 2 : undefined}
+            dim={i === 3 ? firstAt : undefined}
+          >
             {l.text}
           </Layer>
         ))}
-        <Note at={topAt} x={X0 + 4 * BLOCK_W + 3 * BLOCK_GAP + 30} y={layerTop(3) + 10} from="right">
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>layered on top</span>
+        <Note at={layers[0].at - 2} x={X0} y={layerTop(3) - 48}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>layered on top, mostly at mid and senior levels</span>
         </Note>
-        <Note at={seniorAt} x={X0 + 4 * BLOCK_W + 3 * BLOCK_GAP + 30} y={layerTop(3) + 44} from="right">
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>mostly mid and senior</span>
-        </Note>
-        <Note at={askAt} x={X0 + 4 * BLOCK_W + 3 * BLOCK_GAP + 30} y={layerTop(0) + 14} from="right">
+        {where.map((w, i) => (
+          <Note key={w.text} at={w.at} x={SIDE} y={layerTop(i) + 16} from="right">
+            <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>{w.text}</span>
+          </Note>
+        ))}
+        <Note at={askAt} x={SIDE} y={layerTop(3) - 2} from="right" dim={firstAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mark at={askAt + 6}>ask the recruiter,</Mark>
             <br />

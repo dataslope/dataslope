@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { num, PAIR, pct, SIZE } from "./data";
-import { at, BAD, DATA, Drift, madeUp, Mark, MARK_BAD, MARK_OK, OK_INK, type Scale, Strike, X0 } from "./parts";
+import { at, BAD, DATA, Drift, madeUp, Mark, MARK_BAD, MARK_OK, math, OK_INK, type Scale, Strike, X0 } from "./parts";
 
 const CHART = { x0: X0 + 70, x1: 840, top: 430, bottom: 740 };
 /** The narration's pointer, for the two cells it points at. */
@@ -19,7 +19,8 @@ const TABLE = { x: 1010, top: 420, cw: 190, rh: 76, head: 150 };
 /**
  * Question 3. Left: the page's own block drawn, the 95% interval around an
  * 80% pass rate at six eval-set sizes, with the 100-item one marked (72% to
- * 88%) and a three-point change set against it. Right: the video's own 500
+ * 88%) and a three-point change set against it, then the page's formula for
+ * the half-width, which shrinks with the square root of n. Right: the video's own 500
  * paired items as a two-by-two table; read as two samples the gap is p 0.23,
  * paired only the 35 that disagree count, and McNemar gives 0.017. Then the
  * second habit, stratifying, as a small slice that a total would hide.
@@ -36,6 +37,8 @@ export const SizeScene: React.FC = () => {
   const hundredAt = n.word("size", "With a hundred items");
   const rangeAt = n.word("size", "seventy-two to eighty-eight");
   const threeAt = n.word("size", "A prompt change worth three points");
+  const rootAt = n.word("size-root", "the square root of n");
+  const halvesAt = n.word("size-root", "four times the items only halves it");
   const habitsAt = n.word("size-pair", "Two habits help more");
   const pairAt = n.word("size-pair", "pair the comparison");
   const itemsAt = n.word("size-pair", "On five hundred items of our own");
@@ -163,6 +166,20 @@ export const SizeScene: React.FC = () => {
         <Note at={threeAt + 6} x={CHART.x0 - 40} y={y(CHART.top) - h(66)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <span style={{ display: "inline-block", width: 14, height: 22, background: BAD, verticalAlign: "-3px", marginRight: 10 }} />a 3-point change can&apos;t show
+          </span>
+        </Note>
+
+        <Note at={rootAt - 4} x={CHART.x0 - 40} y={y(CHART.top) - h(22)}>
+          <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
+            <span style={label(21, INK_SOFT)}>half-width</span>
+            <span style={math(28, INK)}>
+              = 1.96 √(p(1 − p) / n)
+            </span>
+            <span style={{ ...note(24, INK), opacity: ease(frame, halvesAt - 2, 10) }}>
+              <Mark at={halvesAt + 6} out={habitsAt}>
+                4× the items, half the width
+              </Mark>
+            </span>
           </span>
         </Note>
 

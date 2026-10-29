@@ -74,7 +74,11 @@ export const script: NarrationScript = {
     },
     {
       id: "plan",
-      text: "The statistics are ones you already know: sampling error, agreement, power, bias. What's new is that the output is text, it changes from run to run, and another model often grades it. This page has nine questions. Seven get worked through with real arithmetic, and two take a sentence each.",
+      text: "The statistics are ones you already know: sampling error, agreement, power, bias. What's new is that the output is text, it changes from run to run, and another model often grades it. This page has nine questions.",
+    },
+    {
+      id: "plan-seven",
+      text: "Seven get worked through, four of them with real arithmetic, and two take a sentence each.",
       pauseAfter: 0.7,
     },
 
@@ -90,7 +94,7 @@ export const script: NarrationScript = {
       text: "What's layered on top, mostly at mid and senior levels, is evaluating features built on a large language model, an LLM. Experimenting on AI features, where the treatment is itself random. Checking code and analysis an assistant wrote. And rounds where AI is allowed, or banned. Ask the recruiter, round by round.",
       pauseAfter: 0.7,
     },
-    { id: "measure-in", text: "The rest of the page is about the first of those." },
+    { id: "measure-in", text: "Most of what follows is about the first of those. Questions five and seven take the next two." },
 
     // ── 2. Measuring quality ──────────────────────────────────────────────
     {
@@ -114,6 +118,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "size-root",
+      text: "The interval narrows with the square root of n, so four times the items only halves it.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "size-pair",
       text: "Two habits help more than raw size. First, pair the comparison. On five hundred items of our own, version B passes eighty-two percent and version A seventy-nine. Read as two separate samples, that's a p-value of point two three. But both ran on the same items, so only the thirty-five where they disagree carry information: twenty-five go to B, ten to A. McNemar's test on those gives point oh two.",
       pauseAfter: 0.6,
@@ -132,8 +141,17 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "judge-chance",
+      text: "That sounds strong, but two raters who mostly say pass agree often by chance.",
+    },
+    {
+      id: "judge-pe",
+      text: "Here, chance alone gives eighty-two percent: both pass, point nine times point nine, plus both fail, point one times point one.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "judge-kappa",
-      text: "That sounds strong, but two raters who mostly say pass agree often by chance. Cohen's kappa takes chance out: point oh eight above chance, out of a possible point one eight, is point four four. Moderate. A judge that never read a reply and always said pass would agree ninety percent of the time too. Its kappa is zero.",
+      text: "Cohen's kappa takes chance out: point oh eight above chance, out of a possible point one eight, is point four four. Moderate. A judge that never read a reply and always said pass would agree ninety percent of the time too. Its kappa is zero.",
       pauseAfter: 0.6,
     },
     {
@@ -162,11 +180,27 @@ export const script: NarrationScript = {
       id: "prev",
       scene: true,
       text: "Question six. You use an LLM to sort a million support tickets. How do you report the share that are complaints? Not as the share it labels complaints, because its errors bias that number. Check it on a hand-labeled sample: it catches ninety percent of real complaints, and wrongly flags five percent of everything else.",
+    },
+    {
+      id: "prev-terms",
+      text: "So its sensitivity is ninety percent, and its specificity, the share of the rest it leaves alone, is ninety-five percent.",
       pauseAfter: 0.6,
     },
     {
       id: "prev-fix",
-      text: "Twenty percent come back labeled complaints. But five percent of the large majority that aren't complaints adds up to a lot of false alarms. Correct for both errors, and the share is about seventeen point six percent. That's the Rogan-Gladen estimator. Report its interval too, since both error rates came from a sample.",
+      text: "Twenty percent come back labeled complaints. But five percent of the large majority that aren't complaints adds up to a lot of false alarms.",
+    },
+    {
+      id: "prev-sum",
+      text: "The twenty percent is ninety percent of the true share, plus five percent of everything else.",
+    },
+    {
+      id: "prev-correct",
+      text: "Correct for both errors, and the share is about seventeen point six percent.",
+    },
+    {
+      id: "prev-rg",
+      text: "That's the Rogan-Gladen estimator. Report its interval too, since both error rates came from a sample.",
       pauseAfter: 0.7,
     },
     { id: "check-in", text: "And the last of the seven: the assistant's own work." },
@@ -202,7 +236,12 @@ export const script: NarrationScript = {
     },
     {
       id: "close",
-      text: "Every round on this track came back to one question: how sure are you, and how would you know? Each page has concept checks to try, most have code you can run, and a bank of a hundred and ten multiple-choice questions closes the track, so you can find the rounds that still need work.",
+      text: "Every round on this track came back to one question: how sure are you, and how would you know?",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "close-practice",
+      text: "Each page has concept checks to try, most have code you can run, and a bank of a hundred and ten multiple-choice questions closes the track, so you can find the rounds that still need work.",
     },
   ],
 };

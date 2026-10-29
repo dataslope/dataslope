@@ -71,7 +71,8 @@ const Mini: React.FC<{ x: number; y: number; w: number; h?: number; color?: stri
 /**
  * Question 4. A hundred items graded by judge and expert, as a grid: they
  * agree on ninety, and the ten they part on turn red. Then the arithmetic in
- * the page's own numbers: chance agreement 0.82, so kappa is 0.08 over 0.18,
+ * the page's own numbers: chance agreement 0.82 (both pass, 0.9 × 0.9, plus
+ * both fail, 0.1 × 0.1, said as well as shown), so kappa is 0.08 over 0.18,
  * 0.44; a judge that always says pass agrees ninety percent too, with kappa 0.
  * Then the three known biases, each drawn as what it does rather than how
  * often (the page gives no rates), and the bar a judge is held to: how well
@@ -89,8 +90,11 @@ export const JudgeScene: React.FC = () => {
   const calibrateAt = n.word("judge", "calibrate it against experts");
   const eachAt = n.word("judge", "each mark ninety percent");
   const agreeAt = n.word("judge", "they agree on ninety percent");
-  const strongAt = n.word("judge-kappa", "That sounds strong");
-  const chanceAt = n.word("judge-kappa", "agree often by chance");
+  const strongAt = n.word("judge-chance", "That sounds strong");
+  const chanceAt = n.word("judge-chance", "agree often by chance");
+  const peAt = n.word("judge-pe", "chance alone gives eighty-two percent");
+  const passAt = n.word("judge-pe", "both pass");
+  const failAt = n.word("judge-pe", "both fail");
   const kappaAt = n.word("judge-kappa", "Cohen's kappa takes chance out");
   const aboveAt = n.word("judge-kappa", "point oh eight above chance");
   const roomAt = n.word("judge-kappa", "out of a possible point one eight");
@@ -166,8 +170,17 @@ export const JudgeScene: React.FC = () => {
             </span>
           </Note>
           <Note at={chanceAt} x={R_X} y={y(GRID.top + 120)}>
-            <span style={{ ...note(26, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
-              agreement by chance alone: 0.9 × 0.9 + 0.1 × 0.1 = <b style={{ color: INK }}>{JUDGE.pe.toFixed(2)}</b>
+            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+              agreement by chance alone:{" "}
+              <span style={{ opacity: ease(frame, peAt - 2, 10) }}>
+                <b style={{ color: INK }}>{JUDGE.pe.toFixed(2)}</b> ={" "}
+              </span>
+              <span style={{ opacity: ease(frame, passAt - 2, 10) }}>
+                0.9 × 0.9 <span style={{ fontSize: 22 }}>(both pass)</span>
+              </span>
+              <span style={{ opacity: ease(frame, failAt - 2, 10) }}>
+                {" "}+ 0.1 × 0.1 <span style={{ fontSize: 22 }}>(both fail)</span>
+              </span>
             </span>
           </Note>
           <Note at={kappaAt} x={R_X} y={y(GRID.top + 190)}>

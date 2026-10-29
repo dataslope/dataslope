@@ -134,12 +134,12 @@ export const RapidScene: React.FC = () => {
   const sureAt = n.word("close", "how sure are you");
   const knowAt = n.word("close", "how would you know");
   const practice = [
-    { text: "concept checks on every page", at: n.word("close", "concept checks to try") },
-    { text: "code you can run on most", at: n.word("close", "most have code you can run") },
-    { text: `${BANK} multiple-choice questions`, at: n.word("close", "a hundred and ten multiple-choice questions") },
+    { text: "concept checks on every page", at: n.word("close-practice", "concept checks to try") },
+    { text: "code you can run on most", at: n.word("close-practice", "most have code you can run") },
+    { text: `${BANK} multiple-choice questions`, at: n.word("close-practice", "a hundred and ten multiple-choice questions") },
   ];
-  const workAt = n.word("close", "the rounds that still need work");
-  const end = n.beat("close").to;
+  const workAt = n.word("close-practice", "the rounds that still need work");
+  const end = n.beat("close-practice").to;
 
   const items: RapidItem[] = [
     { n: 8, label: "A thumbs-up rate", beat: "r-thumbs", body: <Thumbs c={c} /> },
@@ -159,7 +159,11 @@ export const RapidScene: React.FC = () => {
       <Sfx name="el-chime" at={workAt + 4} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.015}>
-        <Kicker at={from}>Questions 8 and 9</Kicker>
+        {/* The close belongs to no question: it ends the series under the kicker it opened on. */}
+        <Kicker at={from} out={roundAt - 6}>
+          Questions 8 and 9
+        </Kicker>
+        <Kicker at={roundAt}>Data scientist interview prep</Kicker>
         <Headline lead="Two more," turn="numbers that look better than they are." at={twoAt - 4} turnAt={lookAt - 4} out={roundAt - 6} size={60} />
         <Headline lead="How sure are you," turn="and how would you know?" at={sureAt - 4} turnAt={knowAt - 4} size={60} />
 
