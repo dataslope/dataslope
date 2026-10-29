@@ -2,7 +2,7 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead, type Cubic, cubicPath, lineLength, roundedPolyline, sampleCubic } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
-import { bob, ease, pop } from "../../components/motion";
+import { bob, drift, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import {
   ACCENT,
@@ -70,8 +70,10 @@ export const Svg: React.FC<{ opacity?: number; children: React.ReactNode }> = ({
 );
 
 /**
- * A slow push on a finished figure: the whole scene eases a few percent
- * larger over its life, from `from` to `to`, around `origin`.
+ * A slow push on a finished figure: the whole scene grows a few percent
+ * larger over its life, from `from` to `to`, around `origin`. It comes up to
+ * speed over two seconds and then holds it (drift() in components/motion.ts),
+ * so a longer scene doesn't open on a near-still page.
  */
 export const Drift: React.FC<{
   from: number;
@@ -81,8 +83,7 @@ export const Drift: React.FC<{
   children: React.ReactNode;
 }> = ({ from, to, scale = 0.025, origin = "50% 45%", children }) => {
   const frame = useCurrentFrame();
-  const t = Math.min(1, Math.max(0, (frame - from) / Math.max(1, to - from)));
-  const s = 1 + scale * (0.5 - 0.5 * Math.cos(Math.PI * t));
+  const s = 1 + scale * drift(frame, from, to);
   return (
     <div style={{ position: "absolute", inset: 0, transform: `scale(${s})`, transformOrigin: origin }}>{children}</div>
   );
