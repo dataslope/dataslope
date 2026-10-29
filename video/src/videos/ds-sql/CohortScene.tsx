@@ -9,11 +9,12 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CohortGrid } from "./CohortGrid";
 import { COHORT } from "./data";
-import { colsOf, DataTable, Drift, geoOf, Listing, MARK_OK, rowsAt, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK_OK, rowsAt, TableName, X0 } from "./parts";
 
 const TOP = 350;
 const SQL_X = 640;
-const SIZE = 16;
+const SIZE = 19;
+const SQL_W = 1000;
 const GRID_X = 640;
 const GRID_TOP = 420;
 
@@ -22,7 +23,8 @@ const GRID_TOP = 420;
  * cohort query, its first CTE marked as the cohort is named and the
  * DATE_DIFF as the months since; the counts per cohort and offset, with
  * January's 8, 6, 4, 3 picked out; then those counts as shares of each
- * cohort's month zero, which is the opening's chart again, staircase and all.
+ * cohort's month zero, which is the opening's chart again, its outline drawn
+ * as the narration says why the newest cohorts are the shortest rows.
  */
 export const CohortScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -47,7 +49,8 @@ export const CohortScene: React.FC = () => {
     n.word("cohort-rate", "fifty"),
     n.word("cohort-rate", "thirty-eight percent"),
   ];
-  const stairAt = n.word("cohort-rate", "That's the staircase");
+  const stairAt = n.word("cohort-stair", "the newest cohorts are the shortest");
+  const fewestAt = n.word("cohort-stair", "the fewest months");
   const end = n.beat("session-in").to;
 
   const sample = COHORT.sample;
@@ -93,17 +96,17 @@ export const CohortScene: React.FC = () => {
           lines={P.lines}
           x={SQL_X}
           top={y(TOP)}
-          width={900}
+          width={SQL_W}
           size={SIZE}
           at={earliestAt - 4}
           out={divideAt}
           marks={[
-            { line: 1, at: earliestAt + 4 },
-            { line: 7, at: labelAt + 4 },
-            { line: 11, at: countAt + 4, color: MARK_OK },
+            { line: lineOf(P.lines, "MIN(event_date)"), at: earliestAt + 4 },
+            { line: lineOf(P.lines, "DATE_DIFF"), at: labelAt + 4 },
+            { line: lineOf(P.lines, "COUNT(DISTINCT user_id)"), at: countAt + 4, color: MARK_OK },
           ]}
         />
-        <Note at={cohortAt + 2} x={SQL_X + 900} y={y(TOP) + h(28)} out={divideAt}>
+        <Note at={cohortAt + 2} x={SQL_X + SQL_W + 24} y={y(TOP) + h(28)} out={divideAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             each user&rsquo;s
             <br />
@@ -144,6 +147,7 @@ export const CohortScene: React.FC = () => {
           fill={(r, c) => (r === 0 ? pctAt[c] : sharesAt + c * 6 + r * 3)}
           rowMark={{ row: 0, at: pctAt[0] - 4 }}
           stairAt={stairAt}
+          blankNote={{ at: fewestAt, text: "not reached yet" }}
         />
       </Drift>
     </AbsoluteFill>

@@ -8,16 +8,17 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SESSION } from "./data";
-import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK, MARK_OK, OK, OK_INK, rowsAt, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK, MARK_OK, OK, OK_INK, rowsAt, TableName, X0 } from "./parts";
 
 /** The timeline: 08:30 to 15:00, across the page. */
 const T0 = 8 * 60 + 30;
 const T1 = 15 * 60;
 const AX_X0 = 170;
 const AX_X1 = 1760;
-const AXIS_Y = 400;
+const AXIS_Y = 370;
 const TABLE_TOP = 500;
 const SQL_X = 760;
+const SQL_SIZE = 19;
 
 const minutes = (hhmm: string) => {
   const [hh, mm] = hhmm.split(":").map(Number);
@@ -30,7 +31,8 @@ const tx = (m: number) => AX_X0 + ((m - T0) / (T1 - T0)) * (AX_X1 - AX_X0);
  * thirty-minute rule as a scale bar; LAG brings each the gap before it, the
  * gaps over thirty minutes (and the first hit) are flagged, and the running
  * sum of the flags numbers three sessions, bracketed under the dots. The
- * steps as a table beside the page's query.
+ * steps as a table, named as user 1's so it is not read as the output of the
+ * page's query beside it, whose top rule lines up with that name.
  */
 export const SessionScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -87,7 +89,7 @@ export const SessionScene: React.FC = () => {
           {Array.from({ length: 7 }, (_, k) => 9 + k).map((hr) => (
             <g key={hr} opacity={ease(frame, groupsAt + 6 + (hr - 9) * 2, 10)}>
               <line x1={tx(hr * 60)} x2={tx(hr * 60)} y1={ay} y2={ay + 8} stroke={INK_SOFT} strokeWidth={1.4} />
-              <text x={tx(hr * 60)} y={ay + 32} textAnchor="middle" style={{ ...label(18, INK_SOFT), ...TABULAR }}>
+              <text x={tx(hr * 60)} y={ay + 32} textAnchor="middle" style={{ ...label(19, INK_SOFT), ...TABULAR }}>
                 {hr}:00
               </text>
             </g>
@@ -95,7 +97,7 @@ export const SessionScene: React.FC = () => {
           {/* The rule: thirty minutes, to scale. */}
           <g opacity={ease(frame, thirtyAt - 2, 12)}>
             <rect x={tx(T1 - 30)} y={ay - 100} width={tx(T0 + 30) - tx(T0)} height={10} rx={3} fill={ACCENT} />
-            <text x={tx(T1 - 30)} y={ay - 110} style={{ ...label(18, ACCENT_INK) }}>
+            <text x={tx(T1 - 30)} y={ay - 110} style={{ ...label(19, ACCENT_INK) }}>
               30 min
             </text>
           </g>
@@ -108,7 +110,7 @@ export const SessionScene: React.FC = () => {
             return (
               <g key={s} opacity={p}>
                 <path d={`M${a},${ay + 48} L${a},${ay + 56} L${b},${ay + 56} L${b},${ay + 48}`} fill="none" stroke={OK} strokeWidth={3} />
-                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" style={{ ...label(18, OK_INK), fontWeight: 700 }}>
+                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" style={{ ...label(19, OK_INK), fontWeight: 700 }}>
                   session {s}
                 </text>
               </g>
@@ -152,6 +154,9 @@ export const SessionScene: React.FC = () => {
         </div>
 
         {/* ── The steps, and the page's query ── */}
+        <TableName g={g} at={hitsAt + 2}>
+          user 1, step by step
+        </TableName>
         <DataTable
           g={g}
           cols={colsOf(S, {
@@ -169,9 +174,9 @@ export const SessionScene: React.FC = () => {
         <Listing
           lines={SESSION.page.lines}
           x={SQL_X}
-          top={y(TABLE_TOP)}
+          top={g.top - 38}
           width={1060}
-          size={14}
+          size={SQL_SIZE}
           at={lagAt - 4}
           marks={[
             { line: lineOf(SESSION.page.lines, "WHEN ts - LAG(ts)"), at: lagAt + 6 },

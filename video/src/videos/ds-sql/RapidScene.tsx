@@ -8,14 +8,14 @@ import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
-import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, lineOf, Listing, listingHeight, MARK_OK, rowsAt, Spot, X0 } from "./parts";
+import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, lineOf, Listing, listingHeight, MARK_OK, rowsAt, Spot, TableName, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 740;
 const TOP = 320;
 const LIST_TOP = 300;
 const ROW = 46;
-const SIZE = 18;
+const SIZE = 19;
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"]; T: number };
 
@@ -43,7 +43,7 @@ const Having: React.FC<{ c: Ctx }> = ({ c }) => {
         lines={RAPID.having.lines}
         x={R_X}
         top={c.T}
-        width={720}
+        width={740}
         size={SIZE}
         at={at - 4}
         out={countAt}
@@ -52,8 +52,8 @@ const Having: React.FC<{ c: Ctx }> = ({ c }) => {
           { line: 4, at: groupsAt + 2 },
         ]}
       />
-      <Listing lines={e.lines} x={R_X} top={c.T} width={720} size={SIZE} at={countAt + 2} marks={[{ line: 2, at: countAt + 8 }]} />
-      <ErrorBox x={R_X} top={under(c, e.lines.length)} width={720} at={noAt - 2} kind={e.kind} message={e.message} size={21} />
+      <Listing lines={e.lines} x={R_X} top={c.T} width={740} size={SIZE} at={countAt + 2} marks={[{ line: 2, at: countAt + 8 }]} />
+      <ErrorBox x={R_X} top={under(c, e.lines.length)} width={740} at={noAt - 2} kind={e.kind} message={e.message} size={21} />
     </>
   );
 };
@@ -158,14 +158,14 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
   const numberAt = c.w("r-topn", "number the rows inside each region");
   const keepAt = c.w("r-topn", "keep row numbers two or lower");
   const T = RAPID.topN;
-  const g = geo(c, T, R_X + 590, c.T, 40);
+  const g = geo(c, T, R_X + 640, c.T, 40);
   return (
     <>
       <Listing
         lines={T.lines}
         x={R_X}
         top={c.T}
-        width={570}
+        width={620}
         size={SIZE}
         at={at - 4}
         marks={[
@@ -180,12 +180,25 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 12. A running total ─────────────────────────────────────────────────────
 
+/**
+ * The ordered SUM has a frame even when none is written: RANGE from the first
+ * row to the current one, so rows tied on the ORDER BY share a total. The
+ * same query on the video's own three rows, two on one day, shows it.
+ */
 const Running: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-running", "A running total is an ordered sum");
   const nums = [c.w("r-running", "one hundred"), c.w("r-running", "three fifty"), c.w("r-running", "four twenty-five"), c.w("r-running", "six oh five")];
+  const frameAt = c.w("r-running", "With no frame written");
+  const tieAt = c.w("r-running", "rows tied on the day");
+  const shareAt = c.w("r-running", "share one total");
   const R = head(RAPID.running, 4);
   const g = geo(c, R, R_X, under(c, RAPID.running.lines.length));
   const rt = R.cols.indexOf("running_total");
+  const Tt = RAPID.tied;
+  const tg = geo(c, Tt, g.right + 40, g.top + c.h(44));
+  const day = Tt.cols.indexOf("day");
+  const tied = Tt.rows.flatMap((r, i) => (Tt.rows.filter((s) => s[day] === r[day]).length > 1 ? [i] : []));
+  const ttotal = Tt.cols.indexOf("running_total");
   return (
     <>
       <Listing lines={RAPID.running.lines} x={R_X} top={c.T} width={680} size={SIZE} at={at - 4} marks={[{ line: lineOf(RAPID.running.lines, "SUM(amount)"), at: at + 8 }]} />
@@ -195,6 +208,24 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
         at={at}
         rows={rowsAt(R.rows, at + 4)}
         marks={nums.map((t, row) => ({ row, col: rt, at: t, color: MARK_OK }))}
+      />
+      <Note at={frameAt} x={R_X} y={g.rowTop(R.rows.length) + c.h(18)}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          the frame by default: <QMono>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</QMono>
+        </span>
+      </Note>
+      <TableName g={tg} at={tieAt - 4}>
+        the video&rsquo;s own tie: two rows on one day
+      </TableName>
+      <DataTable
+        g={tg}
+        cols={colsOf(Tt, { running_total: { ink: BLUE_INK } })}
+        at={tieAt - 2}
+        rows={rowsAt(Tt.rows, tieAt + 2)}
+        marks={[
+          ...tied.map((row, k) => ({ row, col: day, at: tieAt + 8 + k * 3 })),
+          ...tied.map((row, k) => ({ row, col: ttotal, at: shareAt + 2 + k * 4 })),
+        ]}
       />
     </>
   );
@@ -215,7 +246,7 @@ const Latest: React.FC<{ c: Ctx }> = ({ c }) => {
         lines={RAPID.latest.lines}
         x={R_X}
         top={c.T}
-        width={720}
+        width={740}
         size={SIZE}
         at={at - 4}
         marks={[
@@ -250,7 +281,7 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
         lines={P.lines}
         x={R_X}
         top={c.T}
-        width={840}
+        width={870}
         size={SIZE}
         at={at - 4}
         marks={[

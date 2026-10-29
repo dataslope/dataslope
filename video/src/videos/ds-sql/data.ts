@@ -76,8 +76,10 @@ export const RETAIN = {
 // ── 3. A safe rate ──────────────────────────────────────────────────────────
 
 export const RATE = {
-  /** The page's query on the first six of its 24 variants. */
-  safe: query("rate", "firstSix"),
+  /** The page's funnel: its first six of 24 variants, as data. */
+  funnel: table("rate", "funnel"),
+  /** DuckDB's bare division on C and F, with no NULLIF: null already. */
+  duckBare: query("rate", "duckBare"),
   noSessions: scalar("rate", "zeros", "no_sessions"),
   variants: table("rate", "page").rows.length,
   /** The same bare division in Postgres: the zero divisor fails it. */
@@ -150,6 +152,9 @@ export const RAPID = {
   dod: query("txns", "dod"),
   topN: query("window", "topN"),
   running: query("txns", "running"),
+  /** The same running total on the video's own three rows, two on one day:
+   *  the default RANGE frame gives the tied rows one total. */
+  tied: query("ties", "running"),
   latest: query("latest", "latest"),
   customers: Number(scalar("latest", "rows", "customers")),
   pivot: query("pivot", "pivot"),

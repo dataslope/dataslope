@@ -24,9 +24,12 @@ export const CohortGrid: React.FC<{
   stairAt?: number;
   /** A row picked out, with a soft band. */
   rowMark?: { row: number; at: number; out?: number };
+  /** Says, from `at`, what the blank cells are: months the newest cohort
+   *  has not reached yet, not users who left. */
+  blankNote?: { at: number; text: string };
   dim?: number;
   out?: number;
-}> = ({ x, top, cell, cellH, at, fill, rowsAt, stairAt, rowMark, dim, out }) => {
+}> = ({ x, top, cell, cellH, at, fill, rowsAt, stairAt, rowMark, blankNote, dim, out }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 14);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
@@ -131,6 +134,26 @@ export const CohortGrid: React.FC<{
             </div>
           );
         }),
+      )}
+      {blankNote && (
+        <div
+          style={{
+            position: "absolute",
+            left: x0 + filled[rows.length - 1] * cell,
+            top: top + (rows.length - 1) * cellH,
+            width: (cols - filled[rows.length - 1]) * cell,
+            height: cellH,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            ...note(22, INK_SOFT),
+            fontStyle: "italic",
+            whiteSpace: "nowrap",
+            opacity: ease(frame, blankNote.at, 12),
+          }}
+        >
+          {blankNote.text}
+        </div>
       )}
       {stairP > 0 && (
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>

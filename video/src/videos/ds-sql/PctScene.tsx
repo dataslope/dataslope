@@ -118,7 +118,7 @@ export const PctScene: React.FC = () => {
           {[100, 300, 1000, 3000].map((t) => (
             <g key={t}>
               <line x1={px(t)} x2={px(t)} y1={sy + 22} y2={sy + 30} stroke={INK_SOFT} strokeWidth={1.4} />
-              <text x={px(t)} y={sy + 54} textAnchor="middle" style={{ ...label(18, INK_SOFT), ...TABULAR }}>
+              <text x={px(t)} y={sy + 54} textAnchor="middle" style={{ ...label(19, INK_SOFT), ...TABULAR }}>
                 {t >= 1000 ? `${t / 1000} s` : `${t} ms`}
               </text>
             </g>

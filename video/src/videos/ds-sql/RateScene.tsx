@@ -12,15 +12,19 @@ import { colsOf, DataTable, Drift, ErrorBox, geoOf, lineOf, Listing, listingHeig
 
 const TOP = 330;
 const PG_SIZE = 20;
-const DUCK_X = 960;
-const DUCK_SIZE = 18;
+const DATA_X = 960;
+const DUCK_SIZE = 19;
+/** The compact result rows both panels use. */
+const ROWS = { rowH: 36, headH: 38, bodySize: 22, headSize: 19 } as const;
 
 /**
- * Question 3, on the page's funnel. Its first six variants, two with no
- * sessions; the bare division in Postgres, refused with "division by zero";
- * the page's NULLIF query in DuckDB, C and F coming back null (and why a
- * COALESCE to zero would lie); then integer division in Postgres, 0 for A
- * and B until the * 1.0.
+ * Question 3, on the page's funnel. Right: its first six variants as data,
+ * two with no sessions. Left, in Postgres: the bare division, refused with
+ * "division by zero"; then the same query with NULLIF, where the error was,
+ * and its result with C and F null (and why a COALESCE to zero would lie).
+ * Right again, as the narration names DuckDB: its bare division already
+ * returns null, so NULLIF is the portable habit rather than DuckDB's need.
+ * Then integer division in Postgres, 0 for A and B until the * 1.0.
  */
 export const RateScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -39,21 +43,35 @@ export const RateScene: React.FC = () => {
   const duckAt = n.word("rate-nullif", "DuckDB returns null there anyway");
   const coalesceAt = n.word("rate-nullif", "don't patch it with coalesce");
   const intAt = n.word("rate-int", "Then watch integer division");
+  const aAt = n.word("rate-int", "a hundred twenty conversions");
+  const thousandAt = n.word("rate-int", "a thousand sessions");
   const zeroAt = n.word("rate-int", "is zero");
   const multAt = n.word("rate-int", "Multiply by one point oh first");
   const twelveAt = n.word("rate-int", "point one two");
   const end = n.beat("cohort-in").to;
 
-  // ── DuckDB, right: the page's query and its first six variants ──
-  const S = RATE.safe;
-  const rate = S.cols.indexOf("conversion_rate");
-  const sessions = S.cols.indexOf("sessions");
-  const empty = S.rows.flatMap((r, i) => (Number(r[sessions]) === 0 ? [i] : []));
-  const sTop = y(TOP) + h(40) + listingHeight(S.lines.length, DUCK_SIZE) + h(18);
-  const sg = geoOf(S, DUCK_X, sTop, h, { rowH: 36, headH: 38, bodySize: 22, headSize: 19 });
+  // ── Right: the page's funnel, its first six variants ──
+  const F = RATE.funnel;
+  const sessions = F.cols.indexOf("sessions");
+  const conversions = F.cols.indexOf("conversions");
+  const empty = F.rows.flatMap((r, i) => (Number(r[sessions]) === 0 ? [i] : []));
+  const fg = geoOf(F, DATA_X, y(TOP) + h(40), h, ROWS);
 
-  // ── Postgres, left: the bare division, then integer division ──
+  // ── Right, later: DuckDB's bare division on C and F ──
+  const D = RATE.duckBare;
+  const duckLabelY = fg.rowTop(F.rows.length) + h(28);
+  const duckTop = duckLabelY + h(36);
+  const duckW = 570;
+  const dg = geoOf(D, DATA_X + duckW + 24, duckTop, h, ROWS);
+
+  // ── Left: Postgres, the bare division, then NULLIF where the error was ──
   const pgTop = y(TOP) + h(40);
+  const P = RATE.pgFixed;
+  const pRate = P.cols.indexOf("rate");
+  const pNulls = P.rows.flatMap((r, i) => (r[pRate] === "null" ? [i] : []));
+  const pg = geoOf(P, X0, pgTop + listingHeight(P.lines.length, PG_SIZE) + h(18), h, ROWS);
+
+  // ── Left, last: integer division ──
   const T = RATE.pgTruncated;
   const tTop = pgTop + listingHeight(T.lines.length, PG_SIZE) + h(18);
   const tg = geoOf(T, X0, tTop, h, { rowH: 42, extra: RATE.pgFixed.rows.slice(0, 2) });
@@ -72,34 +90,40 @@ export const RateScene: React.FC = () => {
           How do you compute a rate without dividing by zero?
         </QuestionCard>
 
-        {/* ── Right: DuckDB ── */}
-        <div style={{ position: "absolute", left: DUCK_X, top: y(TOP), ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, fourAt - 4, 12) }}>
-          The page&rsquo;s funnel, in DuckDB: {RATE.noSessions} of {RATE.variants} variants have no sessions
+        {/* ── Right: the data ── */}
+        <div style={{ position: "absolute", left: DATA_X, top: y(TOP), ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, fourAt - 4, 12) }}>
+          The page&rsquo;s funnel: {RATE.noSessions} of {RATE.variants} variants have no sessions
         </div>
-        <Listing
-          lines={S.lines}
-          x={DUCK_X}
-          top={y(TOP) + h(40)}
-          width={840}
-          size={DUCK_SIZE}
-          at={wrapAt - 4}
-          marks={[{ line: lineOf(S.lines, "NULLIF"), at: wrapAt + 6, color: MARK_OK }]}
-        />
         <DataTable
-          g={sg}
-          cols={colsOf(S, { conversion_rate: { at: nullAt, ink: BLUE_INK } })}
+          g={fg}
+          cols={colsOf(F, { sessions: { ink: BLUE_INK }, conversions: { ink: BLUE_INK } })}
           at={fourAt - 2}
-          rows={rowsAt(S.rows, fourAt + 2)}
+          rows={rowsAt(F.rows, fourAt + 2)}
           marks={[
-            ...empty.map((row, k) => ({ row, col: sessions, at: fourAt + 14 + k * 4, out: wrapAt, color: MARK_BAD })),
-            ...empty.map((row, k) => ({ row, col: rate, at: cAt + 4 + k * 4, color: MARK_OK })),
+            ...empty.map((row, k) => ({ row, col: sessions, at: fourAt + 14 + k * 4, out: intAt, color: MARK_BAD })),
+            { row: 0, col: conversions, at: aAt + 2 },
+            { row: 0, col: sessions, at: thousandAt + 2 },
           ]}
         />
-        <Note at={duckAt} x={X0} y={pgTop + h(250)} out={intAt}>
+
+        {/* ── Right: DuckDB, once the narration names it ── */}
+        <Note at={duckAt - 2} x={DATA_X} y={duckLabelY} out={intAt}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            DuckDB&rsquo;s bare <QMono>0 / 0</QMono> is already null:
-            <br />
-            <QMono>NULLIF</QMono> is the habit that travels
+            In DuckDB, with no <QMono>NULLIF</QMono>:
+          </span>
+        </Note>
+        <Listing lines={D.lines} x={DATA_X} top={duckTop} width={duckW} size={DUCK_SIZE} at={duckAt} out={intAt} marks={[{ line: 0, at: duckAt + 10 }]} />
+        <DataTable
+          g={dg}
+          cols={colsOf(D, { rate: { ink: BLUE_INK } })}
+          at={duckAt + 8}
+          out={intAt}
+          rows={rowsAt(D.rows, duckAt + 12, 3)}
+          marks={D.rows.map((_, row) => ({ row, col: 1, at: duckAt + 22 + row * 3, color: MARK_OK }))}
+        />
+        <Note at={duckAt + 24} x={DATA_X} y={duckTop + listingHeight(D.lines.length, DUCK_SIZE) + h(16)} out={intAt}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            null already: <QMono>NULLIF</QMono> is the habit that travels
           </span>
         </Note>
 
@@ -107,23 +131,43 @@ export const RateScene: React.FC = () => {
         <div style={{ position: "absolute", left: X0, top: y(TOP), ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, pgAt - 4, 12) }}>
           The same table, in {RATE.pgVersion.startsWith("PostgreSQL") ? RATE.pgVersion : `Postgres ${RATE.pgVersion}`}
         </div>
-        <Listing lines={RATE.pgBare.lines} x={X0} top={pgTop} width={640} size={PG_SIZE} at={pgAt - 2} out={intAt} marks={[{ line: 0, at: pgAt + 8 }]} />
+        <Listing lines={RATE.pgBare.lines} x={X0} top={pgTop} width={640} size={PG_SIZE} at={pgAt - 2} out={wrapAt - 2} marks={[{ line: 0, at: pgAt + 8 }]} />
         <ErrorBox
           x={X0}
           top={pgTop + listingHeight(RATE.pgBare.lines.length, PG_SIZE) + h(18)}
           width={640}
           at={errorAt - 2}
-          out={intAt}
+          out={wrapAt - 2}
           kind={RATE.pgBare.kind}
           message={RATE.pgBare.message}
           size={22}
         />
-        <Note at={coalesceAt} x={X0} y={pgTop + h(340)} out={intAt}>
+        {/* The fix, where the error was: NULLIF, and the query runs. */}
+        <Listing
+          lines={P.lines}
+          x={X0}
+          top={pgTop}
+          width={760}
+          size={PG_SIZE}
+          at={wrapAt}
+          out={intAt}
+          marks={[{ line: lineOf(P.lines, "NULLIF"), at: wrapAt + 8, color: MARK_OK }]}
+        />
+        <DataTable
+          g={pg}
+          cols={colsOf(P, { rate: { ink: BLUE_INK } })}
+          at={nullAt - 2}
+          out={intAt}
+          rows={rowsAt(P.rows, nullAt + 2)}
+          marks={pNulls.map((row, k) => ({ row, col: pRate, at: cAt + 4 + k * 4, color: MARK_OK }))}
+        />
+        <Note at={coalesceAt} x={pg.right + 40} y={pg.rowTop(2)} out={intAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <Strike at={coalesceAt + 10}>
+            <Strike at={coalesceAt + 10} top="0.68em">
               <QMono>COALESCE(rate, 0)</QMono>
             </Strike>
-            <span style={{ color: ACCENT_INK }}> &nbsp;C has no rate, not a rate of 0</span>
+            <br />
+            <span style={{ color: ACCENT_INK }}>C has no rate, not a rate of 0</span>
           </span>
         </Note>
 

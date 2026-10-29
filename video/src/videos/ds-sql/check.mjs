@@ -218,6 +218,12 @@ const SCORES = `CREATE TABLE scores AS SELECT * FROM (VALUES
   ('Ana', 300), ('Ben', 250), ('Cy', 250), ('Dee', 200)
 ) AS t(name, points);`;
 
+/** The video's own three transactions, two of them on one day: the tie a
+ *  running total's default frame sums together. */
+const TIED = `CREATE TABLE txns AS SELECT * FROM (VALUES
+  (DATE '2024-01-01', 100), (DATE '2024-01-02', 250), (DATE '2024-01-02', 75)
+) AS t(day, amount);`;
+
 /** The video's own sessions by region and device, for the pivot. */
 const TRAFFIC = `CREATE TABLE traffic AS SELECT * FROM (VALUES
   ('North', 'mobile', 120), ('North', 'desktop', 80),
@@ -257,6 +263,10 @@ results.figures.rate = await figure(PAGE_FUNNEL, {
   bare: `SELECT variant, conversions / sessions AS rate\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
   zeros: "SELECT COUNT(*) AS no_sessions FROM funnel WHERE sessions = 0;",
   coalesced: `SELECT variant,\n  COALESCE(conversions * 1.0 / NULLIF(sessions, 0), 0) AS rate\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
+  // The funnel's first six rows as data, and DuckDB's bare division on the
+  // two with no sessions: null without any NULLIF.
+  funnel: `SELECT variant, sessions, conversions\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
+  duckBare: "SELECT variant, conversions / sessions AS rate\nFROM funnel WHERE variant IN ('C', 'F')\nORDER BY variant;",
 });
 results.figures.ratePg = await pgFigure(PAGE_FUNNEL, {
   bare: `SELECT variant, conversions / sessions AS rate\nFROM funnel\n${FIRST_SIX}\nORDER BY variant;`,
@@ -317,6 +327,13 @@ results.figures.rank = await figure(SCORES, {
 results.figures.txns = await figure(PAGE_TXNS, {
   dod: "SELECT day, amount,\n  amount - LAG(amount) OVER (ORDER BY day) AS dod_change\nFROM txns\nORDER BY day;",
   running: "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total\nFROM txns\nORDER BY day;",
+});
+// The running total's default frame is RANGE, not ROWS: on the video's own
+// table with two rows on one day, the page's query gives both the same total,
+// and only an explicit ROWS frame (with a tiebreak) counts them one at a time.
+results.figures.ties = await figure(TIED, {
+  running: "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total\nFROM txns\nORDER BY day;",
+  rows: "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day, amount DESC\n    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total\nFROM txns\nORDER BY day, amount DESC;",
 });
 results.figures.latest = await figure(PAGE_ORDERS, {
   latest:

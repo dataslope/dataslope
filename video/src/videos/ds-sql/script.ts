@@ -21,7 +21,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *
  * The opening is written fresh (the series rule since 2026-10-22): it shows
  * the finished cohort chart first and promises each of its pieces, a shape no
- * other video's opening uses.
+ * other video's opening uses. It says why the rows get shorter (newer cohorts
+ * have had fewer months), so the chart's outline is not read as churn.
  *
  * No series intro yet: the first scene opens at frame 0.
  *
@@ -35,9 +36,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     page's churn query returns 1, 4 and 6, and NOT EXISTS the same three.
  *   - "rate", the page's funnel: four of 24 variants have no sessions. In
  *     Postgres the bare division fails ("division by zero") and 120 / 1000
- *     is 0; with * 1.0 and NULLIF, A is 0.1200 and C null. DuckDB already
- *     returns null for 0 / 0 and 0.12 for 120 / 1000, which the narration
- *     says, so NULLIF is the portable habit rather than DuckDB's need.
+ *     is 0; with * 1.0 and NULLIF, A is 0.1200 and C and F null, shown where
+ *     the error was. DuckDB's bare division already returns null for C and F
+ *     (and 0.12 for 120 / 1000), which the narration says, so NULLIF is the
+ *     portable habit rather than DuckDB's need.
  *   - "cohort", the video's own activity log, labelled as such: 46 events
  *     from 23 users. The page's query gives January's cohort 8, 6, 4 and 3
  *     users; as shares of month zero, 100, 75, 50 and 38 percent.
@@ -50,7 +52,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     in four region totals; the video's own four scores for the tie (1, 2,
  *     2, 4 and 1, 2, 2, 3, the page's own example numbers); the page's
  *     transactions (change 150 on January 2; running total 100, 350, 425,
- *     605); the page's sales, top two per region; the page's challenge
+ *     605), and the same running total on the video's own three rows, two on
+ *     January 2, where the default RANGE frame gives both 425 (an explicit
+ *     ROWS frame gives 350, then 425); the page's sales, top two per region; the page's challenge
  *     orders, twelve customers; the video's own traffic for the pivot; the
  *     video's own eight page views (8, 6, 4).
  *
@@ -68,7 +72,15 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Every product team keeps a chart like this one. Each row is the users who first showed up in one month. Each cell is the share of them still active a month later, then two, then three, so every row steps down. Building it is a classic data science SQL question, and each of its pieces gets asked on its own.",
+      text: "Every product team keeps a chart like this one. Each row is the users who first showed up in one month.",
+    },
+    {
+      id: "hook-cells",
+      text: "Each cell is the share of them still active a month later, then two, then three, so every row fades as it goes right. And each newer row is shorter: it has had fewer months to measure.",
+    },
+    {
+      id: "hook-sql",
+      text: "Building it is a classic data science SQL question, and each of its pieces gets asked on its own.",
       pauseAfter: 0.6,
     },
     {
@@ -135,7 +147,11 @@ export const script: NarrationScript = {
     },
     {
       id: "cohort-rate",
-      text: "Divide each count by the cohort's month zero, and the counts become shares: a hundred, seventy-five, fifty, thirty-eight percent. That's the staircase.",
+      text: "Divide each count by the cohort's month zero, and the counts become shares: a hundred, seventy-five, fifty, thirty-eight percent.",
+    },
+    {
+      id: "cohort-stair",
+      text: "Shares fall along each row, and the newest cohorts are the shortest: they've had the fewest months.",
       pauseAfter: 0.8,
     },
     { id: "session-in", text: "Months are coarse. Product teams also measure the smallest unit of use: one visit." },
@@ -206,7 +222,9 @@ export const script: NarrationScript = {
     },
     {
       id: "r-running",
-      text: "A running total is an ordered sum with no frame: one hundred, three fifty, four twenty-five, six oh five.",
+      text: "A running total is an ordered sum: one hundred, three fifty, four twenty-five, six oh five. With no frame written, each sum covers the first row through this one, and rows tied on the day share one total.",
+      // Time to read the tie, which lands on the beat's last words.
+      pauseAfter: 1.2,
     },
     {
       id: "r-latest",
