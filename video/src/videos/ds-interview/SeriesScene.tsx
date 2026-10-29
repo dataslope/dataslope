@@ -25,8 +25,9 @@ const LINE_Y = 834;
  * track. The two topics that take two videos are marked as pairs; then the
  * total, how every video runs, the practice on the pages (concept checks on
  * every one, challenges on four, and one bank of multiple-choice questions for
- * the whole track, on a line of its own), and the bridge into Part 1, whose
- * tile lights up.
+ * the whole track, on a line of its own), and the bridge into Part 1: the
+ * Statistics and Probability tiles light as the track's first two, and Part 1
+ * stays lit for "Next".
  */
 export const SeriesScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -45,7 +46,10 @@ export const SeriesScene: React.FC = () => {
   const checksAt = n.word("practice", "concept checks");
   const browserAt = n.word("practice", "four add challenges");
   const bankAt = n.word("practice", "a bank of a hundred and ten");
-  const openAt = n.word("next", "probability and statistics questions");
+  // The bridge lights the two tiles it names, Statistics then Probability, and
+  // keeps only Part 1 lit once "Next" is said.
+  const openAt = n.word("next", "statistics and probability");
+  const probAt = n.word("next", "and probability");
   const nextAt = n.word("next", "Next");
   const end = n.beat("next").to;
 
@@ -94,8 +98,10 @@ export const SeriesScene: React.FC = () => {
         {PARTS.map((p, i) => {
           const pIn = ease(frame, inAt(i) - 2, 14);
           if (pIn <= 0) return null;
-          const first = i === 0 ? ease(frame, openAt - 2, 12) : 0;
-          const dim = i === 0 ? 0 : ease(frame, openAt, 16) * 0.5;
+          const first =
+            i === 0 ? ease(frame, openAt - 2, 12) : i === 1 ? ease(frame, probAt - 2, 12) * (1 - ease(frame, nextAt, 14)) : 0;
+          const dimFrom = i === 1 ? nextAt : openAt;
+          const dim = i === 0 ? 0 : ease(frame, dimFrom, 16) * 0.5;
           return (
             <React.Fragment key={p.n}>
               <div
@@ -115,7 +121,7 @@ export const SeriesScene: React.FC = () => {
               >
                 <div style={{ position: "absolute", left: 20, right: 16, top: ART + 26 }}>
                   <div style={{ ...label(19, BLUE_INK), ...TABULAR }}>Part {p.n}</div>
-                  <div style={{ ...note(24, INK), fontWeight: 650, marginTop: 4, lineHeight: 1.12 }}>{p.title}</div>
+                  <div style={{ ...note(24, INK), fontWeight: 650, marginTop: 4, lineHeight: 1.12, whiteSpace: "nowrap" }}>{p.title}</div>
                   <div style={{ ...note(20, INK_SOFT), marginTop: 6, ...TABULAR }}>{p.questions} questions</div>
                 </div>
               </div>
@@ -127,7 +133,7 @@ export const SeriesScene: React.FC = () => {
                 top={tileY(i) + 14}
                 width={ART}
                 height={ART}
-                dim={i === 0 ? undefined : openAt}
+                dim={i === 0 ? undefined : dimFrom}
               />
             </React.Fragment>
           );
@@ -166,7 +172,7 @@ export const SeriesScene: React.FC = () => {
             top: y(LINE_Y),
             ...note(28, INK),
             whiteSpace: "nowrap",
-            opacity: ease(frame, everyAt - 2, 12) * (1 - ease(frame, nextAt - 8, 10)),
+            opacity: ease(frame, everyAt - 2, 12) * (1 - ease(frame, nextAt - 16, 10)),
           }}
         >
           Every page: <span style={{ opacity: ease(frame, checksAt - 2, 10) }}>concept checks</span>
@@ -179,13 +185,15 @@ export const SeriesScene: React.FC = () => {
             top: y(LINE_Y + 44),
             ...note(28, INK),
             whiteSpace: "nowrap",
-            opacity: ease(frame, bankAt - 2, 10) * (1 - ease(frame, nextAt - 8, 10)),
+            opacity: ease(frame, bankAt - 2, 10) * (1 - ease(frame, nextAt - 16, 10)),
           }}
         >
           A bank of <span style={{ fontWeight: 650 }}>{BANK} multiple-choice questions</span>, for the whole track
         </div>
 
-        <NextLine at={nextAt} x={X0} y={y(LINE_Y) - h(8)} width={1000}>
+        {/* Its rule clears the tiles by about 40px, and the practice lines have
+            faded before it inks in across where they stood. */}
+        <NextLine at={nextAt} x={X0} y={y(LINE_Y) + h(12)} width={1000}>
           Statistics
         </NextLine>
       </Drift>

@@ -52,13 +52,14 @@ const line = (frame: number, at: number): React.CSSProperties => ({
 });
 
 /**
- * What AI has brought in, the role page's four points, one panel each, each
- * with its own beat: evaluating an LLM feature as a measurement problem, with
- * an interval on a pass rate (`ai`); experiments where the output itself
- * varies, drawn as three runs of one prompt that never settle, and where the
- * provider can change the model mid-test (`ai-exp`); checking what an
- * assistant wrote (`ai-check`); and coding rounds that allow an assistant and
- * grade how you check its work, beside rounds that ban it (`ai-rounds`).
+ * What AI has brought in (`ai`), the role page's four points, one panel each,
+ * each with its own beat: evaluating an LLM feature as a measurement problem,
+ * with an interval on a pass rate between 0% and 100% (`ai-eval`);
+ * experiments where the output itself varies, drawn as three labeled runs of
+ * one prompt that never settle, and where the provider can change the model
+ * mid-test (`ai-exp`); checking what an assistant wrote (`ai-check`); and
+ * coding rounds that allow an assistant and grade how you check its work,
+ * beside rounds that ban it (`ai-rounds`).
  */
 export const AiScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -67,11 +68,13 @@ export const AiScene: React.FC = () => {
 
   const from = n.beat("ai").from;
   const broughtAt = n.word("ai", "has brought in new questions");
-  const evalAt = n.word("ai", "Evaluating a feature");
-  const measureAt = n.word("ai", "a measurement problem");
-  const setAt = n.word("ai", "an eval set");
-  const ciAt = n.word("ai", "a confidence interval");
-  const judgeAt = n.word("ai", "an LLM judge agrees with experts");
+  // Panel 1 inks in as "a large language model" is said, so "LLM" is never
+  // on screen before the narration has said what it stands for.
+  const llmAt = n.word("ai-eval", "a large language model");
+  const measureAt = n.word("ai-eval", "a measurement problem");
+  const setAt = n.word("ai-eval", "an eval set");
+  const ciAt = n.word("ai-eval", "a confidence interval");
+  const judgeAt = n.word("ai-eval", "an LLM judge");
   const expAt = n.word("ai-exp", "Experiments on AI features");
   const runAt = n.word("ai-exp", "changes from one run to the next");
   const swapAt = n.word("ai-exp", "the provider can change the model");
@@ -92,7 +95,7 @@ export const AiScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      {[evalAt, expAt, checkAt, allowAt].map((at, i) => (
+      {[llmAt, expAt, checkAt, allowAt].map((at, i) => (
         <Sfx key={i} name="el-tap" at={at} level={-33} />
       ))}
       <Sfx name="el-pop" at={banAt + 4} level={-32} />
@@ -101,16 +104,30 @@ export const AiScene: React.FC = () => {
         <Kicker at={from}>What AI has changed</Kicker>
         <Headline lead="AI, artificial intelligence," turn="brought in new questions." at={from + 2} turnAt={broughtAt} size={62} />
 
-        <Panel i={0} at={evalAt} title="Evaluating an LLM feature">
+        <Panel i={0} at={llmAt} title="Evaluating an LLM feature">
           <div style={{ ...line(frame, measureAt), color: INK }}>
             <Mark at={measureAt + 4}>a measurement problem</Mark>
           </div>
-          <div style={line(frame, setAt)}>an eval set</div>
+          <div style={line(frame, setAt)}>an eval set of test prompts</div>
           <div style={line(frame, ciAt)}>an interval on its pass rate</div>
-          <div style={line(frame, judgeAt)}>does the judge agree with experts?</div>
+          <div style={line(frame, judgeAt)}>does the LLM judge agree with experts?</div>
           <svg style={{ position: "absolute", left: FIG_X, top: 92, overflow: "visible" }} width={220} height={80}>
             <line x1={0} x2={220} y1={60} y2={60} stroke={INK_SOFT} strokeWidth={1.4} opacity={ciP} />
-            <line x1={110 - 46 * ciP} x2={110 + 46 * ciP} y1={36} y2={36} stroke={BAR} strokeWidth={4} strokeLinecap="round" />
+            {[0, 220].map((x) => (
+              <line key={x} x1={x} x2={x} y1={55} y2={65} stroke={INK_SOFT} strokeWidth={1.4} opacity={ciP} />
+            ))}
+            {(
+              [
+                { x: 0, y: 86, anchor: "start", text: "0%" },
+                { x: 220, y: 86, anchor: "end", text: "100%" },
+                { x: 110, y: 110, anchor: "middle", text: "pass rate" },
+              ] as const
+            ).map((t) => (
+              <text key={t.text} x={t.x} y={t.y} textAnchor={t.anchor} style={label(20, INK_SOFT)} fill={INK_SOFT} opacity={ciP}>
+                {t.text}
+              </text>
+            ))}
+            <line x1={110 - 46 * ciP} x2={110 + 46 * ciP} y1={36} y2={36} stroke={BAR} strokeWidth={4} strokeLinecap="round" opacity={ciP} />
             <line x1={110 - 46 * ciP} x2={110 - 46 * ciP} y1={26} y2={46} stroke={BAR} strokeWidth={3} opacity={ciP} />
             <line x1={110 + 46 * ciP} x2={110 + 46 * ciP} y1={26} y2={46} stroke={BAR} strokeWidth={3} opacity={ciP} />
             <circle cx={110} cy={36} r={8 * ciP} fill={BAR} />
@@ -125,6 +142,11 @@ export const AiScene: React.FC = () => {
             <line x1={0} x2={220} y1={130} y2={130} stroke={INK_SOFT} strokeWidth={1.4} opacity={runP} />
             {runs.map((v, k) => (
               <rect key={k} x={20 + k * 70} y={130 - v * runP} width={44} height={v * runP} rx={4} fill={BAR} opacity={0.35 + 0.25 * k} />
+            ))}
+            {runs.map((_, k) => (
+              <text key={k} x={42 + k * 70} y={156} textAnchor="middle" style={label(20, INK_SOFT)} fill={INK_SOFT} opacity={runP}>
+                run {k + 1}
+              </text>
             ))}
           </svg>
         </Panel>

@@ -7,12 +7,14 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { VIDEO } from "./data";
-import { Drift, Headline, Hero, Kicker, OK, OK_INK } from "./parts";
+import { Drift, Headline, Hero, Kicker } from "./parts";
 
 const ROUTE_Y = 590;
 const FIRST = 210;
 const STEP = 380;
 const TITLE_W = 340;
+/** The modeling case's question sits on one line, wider than a stop's title. */
+const QUOTE_W = 420;
 const R = 26;
 
 /** A small normal curve, drawn along its length from `at`. */
@@ -145,10 +147,11 @@ export const LoopScene: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: cx(1) - TITLE_W / 2,
-              width: TITLE_W,
+              left: cx(1) - QUOTE_W / 2,
+              width: QUOTE_W,
               top: below,
               textAlign: "center",
+              whiteSpace: "nowrap",
               ...headline(32, true),
               color: INK,
               opacity: ease(frame, predictAt - 2, 14),
@@ -158,6 +161,7 @@ export const LoopScene: React.FC = () => {
           </div>
         </Stop>
         <Stop i={2} at={stops[2]} title="An experiment to design">
+          {/* Both arms in data blue, told apart by letter: green would say B is the right answer. */}
           {(["A", "B"] as const).map((arm, k) => (
             <div
               key={arm}
@@ -168,13 +172,13 @@ export const LoopScene: React.FC = () => {
                 width: 108,
                 height: h(78),
                 borderRadius: 12,
-                background: `color-mix(in srgb, ${k ? OK : BAR} 22%, ${PAPER})`,
-                border: `2px solid ${k ? OK : BAR}`,
+                background: `color-mix(in srgb, ${BAR} 22%, ${PAPER})`,
+                border: `2px solid ${BAR}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 ...headline(40),
-                color: k ? OK_INK : BLUE_INK,
+                color: BLUE_INK,
                 opacity: ease(frame, abAt - 2 + k * 6, 12),
                 transform: `translateY(${(1 - ease(frame, abAt - 2 + k * 6, 12)) * 10}px)`,
               }}

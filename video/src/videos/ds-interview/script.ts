@@ -48,7 +48,12 @@ export const script: NarrationScript = {
     {
       id: "ai",
       scene: true,
-      text: "AI, artificial intelligence, has brought in new questions. Evaluating a feature built on a large language model, an LLM, is now treated as a measurement problem: an eval set, a confidence interval on its pass rate, and a check that an LLM judge agrees with experts.",
+      text: "AI, artificial intelligence, has brought in new questions.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "ai-eval",
+      text: "Evaluating a feature built on a large language model, an LLM, is now treated as a measurement problem: an eval set of test prompts, a confidence interval on the share of them it passes, and a check that an LLM judge, a model grading the answers, agrees with human experts.",
       pauseAfter: 0.6,
     },
     {
@@ -77,6 +82,6 @@ export const script: NarrationScript = {
       text: "Each page carries practice too. Every one has concept checks, four add challenges that run in your browser, and a bank of a hundred and ten multiple-choice questions covers the whole track.",
       pauseAfter: 0.8,
     },
-    { id: "next", text: "Most loops open with probability and statistics questions, and so does this series. Next: Statistics." },
+    { id: "next", text: "The track opens with statistics and probability, and so does this series. Next: Statistics." },
   ],
 };

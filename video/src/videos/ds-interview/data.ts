@@ -1,7 +1,8 @@
 // The series this overview introduces: the eleven topic videos in the track's
 // order, each with the watercolor hero its own folder holds and the number of
-// questions it answers. The counts are the plan's table
-// (agent-outputs/20261022-0445-data-scientist-interview-video-plan.md), and
+// questions it answers, under a short title that fits its tile on one line
+// ("Product sense" for "Product sense & metrics"). The counts are the plan's
+// table (agent-outputs/20261022-0445-data-scientist-interview-video-plan.md), and
 // each matches the built video's own script header (twelve worked plus three
 // quick in ML evaluation, and so on). The practice counts are the track's own
 // pages, counted by check.mjs into results.json. Pure.
@@ -23,7 +24,7 @@ export const PARTS: readonly Part[] = [
   { n: 5, title: "Deep learning", questions: 15, video: "ds-deep-learning", hero: "ds-deep-learning-octopus" },
   { n: 6, title: "Experimentation I", questions: 14, video: "ds-experiment-design", hero: "ds-experiment-design-heron" },
   { n: 7, title: "Experimentation II", questions: 14, video: "ds-experiments-in-practice", hero: "ds-experiments-in-practice-turtle" },
-  { n: 8, title: "Product sense & metrics", questions: 14, video: "ds-product-sense", hero: "ds-product-sense-squirrel" },
+  { n: 8, title: "Product sense", questions: 14, video: "ds-product-sense", hero: "ds-product-sense-squirrel" },
   { n: 9, title: "Python & pandas", questions: 14, video: "ds-python-pandas", hero: "ds-python-pandas-badger" },
   { n: 10, title: "SQL", questions: 15, video: "ds-sql", hero: "ds-sql-seal" },
   { n: 11, title: "LLM evaluation", questions: 9, video: "ds-llm-evaluation", hero: "ds-llm-evaluation-parrot" },
