@@ -435,7 +435,6 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
   const fourAt = c.w("r-rollup", "four subtotals");
   const oneAt = c.w("r-rollup", "one total");
   const seventeenAt = c.w("r-rollup", "seventeen");
-  const supportedAt = c.w("r-groupall", "Where it's supported");
   const allAt = c.w("r-groupall", "GROUP BY ALL");
   const everyAt = c.w("r-groupall", "every selected column");
   const { lines, cols, rows } = RAPID.rollup;
@@ -466,7 +465,7 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
   const allLine = RAPID.groupByAll.lines.findIndex((l) => l.startsWith("GROUP BY ALL"));
   return (
     <>
-      <Listing lines={lines} x={R_X} top={c.T} width={760} size={22} at={at - 4} marks={[{ line: 2, at: at + 8 }]} out={supportedAt - 4} />
+      <Listing lines={lines} x={R_X} top={c.T} width={760} size={22} at={at - 4} marks={[{ line: 2, at: at + 8 }]} out={allAt - 4} />
       <DataTable
         g={rg}
         cols={numeric(cols, ["revenue"])}
@@ -477,9 +476,9 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
           { row: sub, at: fourAt },
           { row: shownRows.length - 1, at: oneAt },
         ]}
-        out={supportedAt - 4}
+        out={allAt - 4}
       />
-      <Note at={twelveAt - 2} x={rg.right + 40} y={rg.top + c.h(10)} out={supportedAt - 4}>
+      <Note at={twelveAt - 2} x={rg.right + 40} y={rg.top + c.h(10)} out={allAt - 4}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <Term at={twelveAt - 2}>
             <span style={TABULAR}>{pairs}</span>
@@ -498,7 +497,7 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
           </Term>
         </span>
       </Note>
-      <Listing lines={RAPID.groupByAll.lines} x={R_X} top={c.T} width={760} size={22} at={supportedAt} marks={[{ line: allLine, at: allAt + 4 }]} />
+      <Listing lines={RAPID.groupByAll.lines} x={R_X} top={c.T} width={760} size={22} at={allAt - 2} marks={[{ line: allLine, at: allAt + 8 }]} />
       <DataTable g={ag} cols={numeric(RAPID.groupByAll.cols, ["revenue"])} at={allAt} rows={RAPID.groupByAll.rows.map((cells, i) => ({ cells, at: allAt + 4 + i * 2 }))} />
       <Note at={everyAt - 2} x={ag.right + 40} y={ag.top + c.h(10)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>every selected column you didn&apos;t aggregate</span>

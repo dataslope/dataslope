@@ -393,14 +393,14 @@ export const script: NarrationScript = {
     {
       id: "r-rollup",
       text: "Roll up adds subtotals and a grand total: twelve region and category rows, four subtotals and one total make seventeen.",
-      pauseAfter: 0.6,
+      pauseAfter: 1.0,
     },
     { id: "r-groupall", text: "Where it's supported, GROUP BY ALL groups by every selected column you didn't aggregate." },
     { id: "r-dupes", text: "To find duplicates, group by the column, and keep the counts over one." },
     {
       id: "r-dedupe",
       text: "To delete them but keep one, number the copies of each email with row number, oldest first, and delete every copy numbered over one.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.2,
     },
     {
       id: "r-cross",
