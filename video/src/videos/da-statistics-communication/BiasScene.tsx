@@ -68,6 +68,8 @@ export const BiasScene: React.FC = () => {
   const noiseAt = n.word("bias-bigger", "shrinks the noise");
   const nothingAt = n.word("bias-bigger", "does nothing about the bias");
   const fixAt = n.word("bias-fix", "The fix is the design");
+  const randomAt = n.word("bias-fix", "a random sample of everyone");
+  const strataAt = n.word("bias-fix", "a set share from each group");
   const exitAt = n.word("bias-fix", "run an exit survey");
   const end = n.beat("metric-in").to;
   // The strips clear before the surveys' axis draws.
@@ -226,12 +228,15 @@ export const BiasScene: React.FC = () => {
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same bias</span>
         </Bracket>
         {/* In the plot's empty lower right, clear of the axis row and the notes column. */}
-        <Note at={fixAt - 2} x={1060} y={y(ROWS[1].y) + h(52)} width={440}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 600 }}>the fix: a random or stratified sample of everyone</span>
-        </Note>
-        <Note at={exitAt - 2} x={1060} y={y(ROWS[1].y) + h(52) + 72}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>for those who left: an exit survey</span>
-        </Note>
+        {[
+          { at: Math.min(fixAt + 10, randomAt), text: "the fix: a random sample of everyone" },
+          { at: strataAt, text: "or stratified: a set share per group" },
+          { at: exitAt, text: "for those who left: an exit survey" },
+        ].map((line, i) => (
+          <Note key={line.text} at={line.at - 2} x={1060} y={y(ROWS[1].y) + h(50) + i * 32}>
+            <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{line.text}</span>
+          </Note>
+        ))}
       </Drift>
     </AbsoluteFill>
   );

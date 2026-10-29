@@ -44,6 +44,7 @@ export const MetricScene: React.FC = () => {
   const lostAt = n.word("metric-driver", "sessions fell by two thousand");
   const twelveAt = n.word("metric-driver", "orders by only twelve");
   const driverAt = n.word("metric-driver", "The likeliest driver");
+  const campaignAt = n.word("metric-driver", "a paused campaign");
   const checkAt = n.word("metric-driver", "Check sessions by channel");
   const ordersFellAt = n.word("metric-driver", "say plainly that orders fell");
   const end = n.beat("quantile-in").to;
@@ -69,7 +70,7 @@ export const MetricScene: React.FC = () => {
     { col: oi, at: ordersAt, value: change(METRIC.orders) },
     { col: si, at: sessionsAt, value: change(METRIC.sessions) },
   ];
-  const g = geoOf(table, TABLE_X, y(LIST_Y), h, { extra: [changes.map((c) => c.value)], headH: 56, rowH: 70, bodySize: 32, headSize: 24 });
+  const g = geoOf(table, TABLE_X, y(LIST_Y), h, { extra: [changes.map((c) => c.value)], headH: 56, rowH: 62, bodySize: 32, headSize: 24 });
   const cols = colsOf(table, { conversion: { numeric: true }, sessions: { numeric: true }, orders: { numeric: true } });
 
   return (
@@ -162,14 +163,14 @@ export const MetricScene: React.FC = () => {
             (<Num>+{fmt(METRIC.points, 1)}</Num> points)
           </span>
         </Note>
-        <Note at={becauseAt - 2} x={TABLE_X} y={g.rowTop(3) + h(50)}>
+        <Note at={becauseAt - 2} x={TABLE_X} y={g.rowTop(3) + h(44)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             the rate rose <b>because the traffic dropped</b>
           </span>
         </Note>
 
         {/* ── This example's driver, and what to check next ── */}
-        <Note at={lostAt - 2} x={TABLE_X} y={g.rowTop(3) + h(100)}>
+        <Note at={lostAt - 2} x={TABLE_X} y={g.rowTop(3) + h(92)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             lost: <Num>{count(String(lost[0]))}</Num> sessions
             <span style={{ opacity: ease(frame, twelveAt - 2, 10) }}>
@@ -177,10 +178,13 @@ export const MetricScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={driverAt - 2} x={TABLE_X} y={g.rowTop(3) + h(142)}>
+        <Note at={driverAt - 2} x={TABLE_X} y={g.rowTop(3) + h(132)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>likeliest: low-intent traffic dropped away</span>
         </Note>
-        <Note at={checkAt - 2} x={TABLE_X} y={g.rowTop(3) + h(184)}>
+        <Note at={campaignAt - 2} x={TABLE_X} y={g.rowTop(3) + h(162)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>a paused campaign, or bots now filtered out</span>
+        </Note>
+        <Note at={checkAt - 2} x={TABLE_X} y={g.rowTop(3) + h(200)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             check next: sessions by channel
             <span style={{ opacity: ease(frame, ordersFellAt - 2, 10) }}>; say orders fell</span>

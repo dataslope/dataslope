@@ -85,6 +85,8 @@ export const CorrScene: React.FC = () => {
   const confounderAt = n.word("corr-heat", "the confounder");
   const fixedAt = n.word("corr-fixed", "Hold temperature fixed");
   const vanishAt = n.word("corr-fixed", "point zero eight");
+  const chanceAt = n.word("corr-fixed", "pure chance");
+  const backwardsAt = n.word("corr-fixed", "the cause runs the other way");
   const experimentAt = n.word("corr-cause", "you need an experiment");
   const end = n.beat("corr-cause").to;
 
@@ -204,7 +206,14 @@ export const CorrScene: React.FC = () => {
           <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>the confounder</span>
         </Note>
 
-        <Note at={experimentAt - 2} x={1060} y={y(790)}>
+        {/* The other two ways two things move together. */}
+        <Note at={chanceAt - 2} x={1060} y={y(766)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            other links: pure chance
+            <span style={{ opacity: ease(frame, backwardsAt - 2, 10) }}>, or a cause that runs backwards</span>
+          </span>
+        </Note>
+        <Note at={experimentAt - 2} x={1060} y={y(812)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>To argue a cause: an experiment,</span>
           <br />
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>like an A/B test, or a careful causal design.</span>

@@ -234,6 +234,7 @@ const Normal: React.FC<{ c: Ctx }> = ({ c }) => {
   const whyAt = c.w("r-normal-why", "It matters because");
   const evenAt = c.w("r-normal-why", "even when the data isn't");
   const leanAt = c.w("r-normal-why", "Confidence intervals and A B tests");
+  const skewAt = c.w("r-normal-why", "skewed raw data");
   const bands = [
     { k: 1, at: c.w("r-normal", "Sixty-eight percent"), shade: 0.5 },
     { k: 2, at: c.w("r-normal", "ninety-five within two"), shade: 0.32 },
@@ -291,6 +292,9 @@ const Normal: React.FC<{ c: Ctx }> = ({ c }) => {
           even when the data isn&apos;t
           <span style={{ opacity: ease(frame, leanAt - 2, 10) }}>, and intervals and A/B tests lean on that</span>
         </span>
+      </Note>
+      <Note at={skewAt - 2} x={R_X + 40} y={c.y(318) + 2 * c.h(40)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>so skewed raw data doesn&apos;t break them by itself</span>
       </Note>
     </>
   );
