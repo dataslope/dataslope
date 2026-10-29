@@ -292,9 +292,8 @@ pass, each in its own commit:
 - **`Drift` eased in over the whole scene**, so lengthening a scene slowed its
   opening and could fail `check:motion` on a card that did not change.
   **Fixed** (`b223fbec`): `drift()` in `motion.ts` reaches full speed in two
-  seconds and then holds it, whatever the scene's length. `check:motion` is
-  being re-run on all 21 interview videos after the change; every one finished
-  so far passes.
+  seconds and then holds it, whatever the scene's length. `check:motion` passes
+  on all 21 interview videos after the change.
 - **The render queue's waits counted against a job's time limit**, so several
   checks were killed before they started. That queue was the review's scratch
   tooling, not part of the repository, so there is nothing to change here.
