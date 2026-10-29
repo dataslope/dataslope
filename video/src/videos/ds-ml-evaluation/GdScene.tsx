@@ -79,8 +79,9 @@ const Bowl: React.FC<{ run: Run; drawAt: number; startAt: number; out: number }>
  * Question 12, on the page's own chart (charts/gradient-descent-lr): x² from
  * 8 at three learning rates, drawn as a ball stepping in a bowl. 0.25 halves
  * the distance every step; 0.004 is still at 6.54 after 25 steps; 1.05
- * overshoots further every step and leaves the bowl. Then SGD, mini-batches
- * and Adam in one line each.
+ * overshoots further every step and leaves the bowl. Then the bowls clear
+ * for SGD, mini-batches and Adam, a row each under one heading, so no variant
+ * sits under a learning rate's outcome.
  */
 export const GdScene: React.FC = () => {
   const n = useNarration();
@@ -105,6 +106,10 @@ export const GdScene: React.FC = () => {
   const miniAt = n.word("gd-sgd", "Mini-batches");
   const adamAt = n.word("gd-sgd", "And Adam");
   const end = n.beat("gd-sgd").to;
+  const oneAt = n.word("gd-sgd", "steps on one example");
+  // The bowls clear once the variants are named, after the last outcome has
+  // had its moment, and the list takes their place.
+  const clearAt = sgdAt + 14;
 
   const runs: Run[] = [
     { rate: "0.004", left: LEFTS[0], color: ACCENT, at: smallAt + 6, every: 1.6, shown: GD.steps },
@@ -131,7 +136,7 @@ export const GdScene: React.FC = () => {
       ))}
       <Sfx name="el-pop" at={tenAt} level={-34} />
       <Sfx name="el-whoosh" at={explodesAt} level={-34} />
-      <Sfx name="el-tap" at={sgdAt} level={-36} />
+      <Sfx name="el-tap" at={Math.max(clearAt + 12, oneAt)} level={-36} />
       <Sfx name="el-tap" at={miniAt} level={-36} />
       <Sfx name="el-tap" at={adamAt} level={-36} />
 
@@ -140,7 +145,7 @@ export const GdScene: React.FC = () => {
           What is gradient descent, and how does the learning rate affect it?
         </QuestionCard>
 
-        <Note at={againstAt - 2} x={LEFTS[0]} y={y(310)}>
+        <Note at={againstAt - 2} x={LEFTS[0]} y={y(310)} out={end - 8}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             each step:{" "}
             <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600 }}>
@@ -148,32 +153,37 @@ export const GdScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={startAt - 2} x={LEFTS[0] + 760} y={y(316)}>
+        <Note at={startAt - 2} x={LEFTS[0] + 760} y={y(316)} out={clearAt}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>loss = x², starting at x = {GD.start}</span>
         </Note>
 
         {runs.map((run, i) => (
           <React.Fragment key={run.rate}>
-            <Bowl run={run} drawAt={i === 1 ? asked : startAt - 4 + i * 3} startAt={i === 1 ? againstAt : startAt + i * 3} out={end - 8} />
-            <PanelTitle x={run.left} y={y(TOP) - h(66)} at={titles[i].at} color={INK} out={end - 8}>
+            <Bowl run={run} drawAt={i === 1 ? asked : startAt - 4 + i * 3} startAt={i === 1 ? againstAt : startAt + i * 3} out={clearAt} />
+            <PanelTitle x={run.left} y={y(TOP) - h(66)} at={titles[i].at} color={INK} out={clearAt}>
               <span style={TABULAR}>{titles[i].text}</span>
             </PanelTitle>
-            <Note at={labels[i].at} x={run.left} y={y(BOTTOM) + h(18)} out={end - 8}>
+            <Note at={labels[i].at} x={run.left} y={y(BOTTOM) + h(18)} out={clearAt}>
               <span style={{ ...note(24, labels[i].ink), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>{labels[i].text}</span>
             </Note>
           </React.Fragment>
         ))}
 
-        {/* ── Three ways to take the step ── */}
+        {/* ── Three ways to take the step: a list of its own, once the bowls
+            have cleared, so none sits under a learning rate's outcome ── */}
+        <Note at={clearAt + 6} x={LEFTS[0]} y={y(420)} out={end - 8}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>three ways to take each step</span>
+        </Note>
         {[
-          { at: sgdAt, head: "SGD, stochastic gradient descent", body: "one example a step" },
-          { at: miniAt, head: "mini-batch", body: "a few at a time" },
-          { at: adamAt, head: "Adam", body: "a step size for each parameter" },
+          { at: Math.max(clearAt + 12, oneAt), head: "SGD, stochastic gradient descent", body: "one example a step" },
+          { at: miniAt, head: "mini-batch", body: "a few examples a step" },
+          { at: adamAt, head: "Adam", body: "its own step size for each parameter" },
         ].map((s, i) => (
-          <Note key={s.head} at={s.at - 2} x={LEFTS[i]} y={y(808)} out={end - 8}>
-            <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.head}</span>
-            <br />
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>{s.body}</span>
+          <Note key={s.head} at={s.at - 2} x={LEFTS[0]} y={y(480) + i * h(84)} out={end - 8}>
+            <div style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
+              <span style={{ ...note(32, INK), fontWeight: 650, width: 640 }}>{s.head}</span>
+              <span style={{ ...note(30, INK_SOFT) }}>{s.body}</span>
+            </div>
           </Note>
         ))}
       </Drift>

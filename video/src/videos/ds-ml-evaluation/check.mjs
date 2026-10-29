@@ -39,7 +39,9 @@ from sklearn.metrics import (
     accuracy_score, average_precision_score, mean_absolute_error, mean_squared_error,
     precision_recall_curve, precision_score, r2_score, recall_score, roc_auc_score, roc_curve,
 )
-from sklearn.model_selection import ShuffleSplit, StratifiedKFold, cross_val_score, learning_curve, train_test_split
+from sklearn.model_selection import (
+    RepeatedStratifiedKFold, ShuffleSplit, StratifiedKFold, cross_val_score, learning_curve, train_test_split,
+)
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
@@ -82,10 +84,32 @@ lasso_paths = [Lasso(alpha=a, max_iter=100000).fit(Xd, yd).coef_ for a in alphas
 # axis is "penalty strength" with no units, and ridge is scaled by n to span it.
 ridge_paths = [Ridge(alpha=a * len(yd)).fit(Xd, yd).coef_ for a in alphas]
 pick = 1.0
+# Elastic net mostly L1 with a little L2: enough L2 to share the weight
+# between the two correlated cholesterol measures, enough L1 to still zero
+# a feature out. (At half and half, s1 sits at -0.24, on the edge of zero.)
+mix = 0.9
 la = Lasso(alpha=pick, max_iter=100000).fit(Xd, yd)
-en = ElasticNet(alpha=pick, l1_ratio=0.5, max_iter=100000).fit(Xd, yd)
+en = ElasticNet(alpha=pick, l1_ratio=mix, max_iter=100000).fit(Xd, yd)
 ri = Ridge(alpha=pick * len(yd)).fit(Xd, yd)
 names = list(D.feature_names)
+
+# Steadiness: refit both on fifty resamples of the patients, and count how
+# often each keeps both cholesterol measures, only one, or neither.
+def pair_counts(make, seed=0, B=50):
+    g = np.random.default_rng(seed)
+    c = {"both": 0, "s1": 0, "s2": 0, "neither": 0}
+    for _ in range(B):
+        i = g.integers(0, len(yd), len(yd))
+        w = make().fit(Xd[i], yd[i]).coef_
+        a, b = w[4] != 0, w[5] != 0
+        c["both" if a and b else "s1" if a else "s2" if b else "neither"] += 1
+    return c
+
+boot = {
+    "n": 50,
+    "lasso": pair_counts(lambda: Lasso(alpha=pick, max_iter=100000)),
+    "enet": pair_counts(lambda: ElasticNet(alpha=pick, l1_ratio=mix, max_iter=100000)),
+}
 R["reg"] = {
     "features": names,
     "logAlpha": [r3(np.log10(a)) for a in alphas],
@@ -96,9 +120,12 @@ R["reg"] = {
     "ridgeKept": int((ri.coef_ != 0).sum()),
     "enetKept": int((en.coef_ != 0).sum()),
     "lassoDropped": [names[i] for i in np.where(la.coef_ == 0)[0]],
+    "enetDropped": [names[i] for i in np.where(en.coef_ == 0)[0]],
+    "enetL1Ratio": mix,
     "s1s2": r3(np.corrcoef(Xd[:, 4], Xd[:, 5])[0, 1]),
     "lassoS1S2": [r3(la.coef_[4]), r3(la.coef_[5])],
     "enetS1S2": [r3(en.coef_[4]), r3(en.coef_[5])],
+    "boot": boot,
 }
 
 # ── Cross-validation on the breast cancer set ──
@@ -110,6 +137,10 @@ for s in range(200):
     splits.append(model.fit(a, c).score(b, d))
 splits = np.array(splits)
 folds = cross_val_score(model, Xb, yb, cv=StratifiedKFold(5, shuffle=True, random_state=0))
+# The same five-fold average, over two hundred reshuffles of the folds: how
+# far the estimate itself moves, beside how far one split does.
+reps = cross_val_score(model, Xb, yb, cv=RepeatedStratifiedKFold(n_splits=5, n_repeats=200, random_state=0))
+means = reps.reshape(200, 5).mean(1)
 R["cv"] = {
     "rows": int(len(yb)),
     "test": 114,
@@ -119,6 +150,11 @@ R["cv"] = {
     "folds": [r3(v) for v in folds],
     "mean": r3(folds.mean()),
     "std": r3(folds.std()),
+    "means": [r4(v) for v in means],
+    "meansMin": r3(means.min()),
+    "meansMax": r3(means.max()),
+    "splitsSd": r4(splits.std()),
+    "meansSd": r4(means.std()),
 }
 
 # ── Learning curves: 600 points from the same sine, twenty shuffles each ──
@@ -193,6 +229,14 @@ R["cls"] = {
     "ap": r3(average_precision_score(yte, p)),
     "aucBalanced": r3(roc_auc_score(yte[bal], p[bal])),
     "apBalanced": r3(average_precision_score(yte[bal], p[bal])),
+    # PR's chance level is the share positive: on the real test set, and on
+    # the balanced one.
+    "prevalenceBalanced": r3(yte[bal].mean()),
+    # Why a low false positive rate can flatter: at 0.05, the false alarms
+    # outnumber the catches, yet are a small share of every negative.
+    "alarms": (lambda f: {"t": 0.05, "tp": int((f & (yte == 1)).sum()), "fp": int((f & (yte == 0)).sum()),
+                          "negatives": int((yte == 0).sum()), "fpr": r4((f & (yte == 0)).sum() / (yte == 0).sum()),
+                          "recall": r3((f & (yte == 1)).sum() / yte.sum())})(p >= 0.05),
     "allNegative": r3(accuracy_score(yte, np.zeros_like(yte))),
     "accuracy": r3(accuracy_score(yte, p >= 0.5)),
     "plainAt50": pr_at(p, 0.5),
@@ -229,6 +273,12 @@ R["loss"] = {
     "at": 0.01,
     "xentAt": r3(-np.log(0.01)),
     "sqAt": r3((1 - 0.01) ** 2),
+    # How hard each loss pushes on the logit z behind a sigmoid, p = sigmoid(z),
+    # at that same prediction: cross-entropy's slope is p - 1, squared error's
+    # 2 (p - 1) p (1 - p), which the sigmoid's own flat end squeezes to almost
+    # nothing.
+    "xentGrad": r3(abs(0.01 - 1)),
+    "sqGrad": r3(abs(2 * (0.01 - 1) * 0.01 * (1 - 0.01))),
 }
 
 json.dumps(R)
@@ -240,11 +290,13 @@ console.log(JSON.stringify(results.runtime));
 const { hook, bias, reg, cv, learn, cls, metrics, loss } = results;
 console.log("hook", hook);
 console.log("bias train", bias.train, "val", bias.val);
-console.log("reg kept", reg.lassoKept, reg.ridgeKept, reg.enetKept, reg.lassoDropped, "s1s2", reg.s1s2, reg.lassoS1S2, reg.enetS1S2);
-console.log("cv", cv.min, cv.max, cv.folds, cv.mean, cv.std);
+console.log("reg kept", reg.lassoKept, reg.ridgeKept, reg.enetKept, reg.lassoDropped, reg.enetDropped, "s1s2", reg.s1s2, reg.lassoS1S2, reg.enetS1S2);
+console.log("reg boot", JSON.stringify(reg.boot));
+console.log("cv", cv.min, cv.max, cv.folds, cv.mean, cv.std, "means", cv.meansMin, cv.meansMax, "sd", cv.splitsSd, cv.meansSd);
 console.log("learn", JSON.stringify(learn));
 console.log("cls", cls.prevalence, cls.positives, "auc", cls.auc, cls.ap, "bal", cls.aucBalanced, cls.apBalanced, "acc", cls.allNegative, cls.accuracy);
 console.log("thresholds", JSON.stringify(cls.thresholds));
 console.log("at50", JSON.stringify(cls.plainAt50), JSON.stringify(cls.weightedAt50));
+console.log("chance", cls.prevalence, cls.prevalenceBalanced, "alarms", JSON.stringify(cls.alarms));
 console.log("cal", JSON.stringify(cls.calPlain), JSON.stringify(cls.calWeighted), JSON.stringify(cls.calRecal));
-console.log("metrics", metrics.rmse, metrics.mae, metrics.r2, "loss", loss.xentAt, loss.sqAt);
+console.log("metrics", metrics.rmse, metrics.mae, metrics.r2, "loss", loss.xentAt, loss.sqAt, "grad", loss.xentGrad, loss.sqGrad);

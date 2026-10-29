@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem, Tick } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LOSS, METRICS } from "./data";
-import { at, Axes, Curve, Drift, Fade, Headline, Kicker, Mark, OK_INK, type Scale, Spot, Svg, WARM, WARM_INK, X0 } from "./parts";
+import { at, Axes, Curve, Drift, Fade, Headline, Kicker, Mark, OK, OK_INK, type Scale, Spot, Svg, WARM, WARM_INK, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 780;
@@ -25,9 +25,12 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const rmseAt = c.w("r-metrics", "RMSE");
   const dominateAt = c.w("r-metrics", "big misses dominate");
-  const maeAt = c.w("r-metrics", "MAE, mean absolute error");
-  const r2At = c.w("r-metrics", "R squared is the share");
-  const valuesAt = c.w("r-metrics", "they come to");
+  const maeAt = c.w("r-mae", "MAE, mean absolute error");
+  const unitsAt = c.w("r-mae", "Both are in the target's units");
+  const useAt = c.w("r-mae", "use RMSE when");
+  const r2At = c.w("r-r2", "R squared is the share");
+  const noUnitsAt = c.w("r-r2-units", "no units");
+  const valuesAt = c.w("r-values", "they come to");
   const misses = METRICS.true.map((t, i) => Math.abs(t - METRICS.pred[i]));
   const big = Math.max(...misses);
   const rows = [
@@ -80,15 +83,29 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
           </React.Fragment>
         );
       })}
-      <Note at={dominateAt} x={R_X + 40} y={c.y(620)}>
+      <Note at={dominateAt} x={R_X + 40} y={c.y(600)}>
         <span style={{ ...note(25, WARM_INK), fontWeight: 650, whiteSpace: "nowrap" }}>squared, the two big misses dominate</span>
       </Note>
-      <Note at={r2At - 2} x={R_X + 40} y={c.y(680)}>
+      {/* RMSE's root brings it back to the target's units too: the choice is
+          about what a big miss costs, not about units. */}
+      <Note at={unitsAt - 2} x={R_X + 40} y={c.y(652)}>
+        <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+          both in the target&apos;s units
+          <span style={{ opacity: ease(frame, useAt - 2, 10) }}>
+            : <b>RMSE</b> when big misses cost more
+          </span>
+        </span>
+      </Note>
+      <Note at={r2At - 2} x={R_X + 40} y={c.y(704)}>
         <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
           <b>R²</b>: the share of variance explained; 1 is perfect, 0 is no better than the mean
         </span>
+        <br />
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, noUnitsAt - 2, 10) }}>
+          no units, so it compares across datasets
+        </span>
       </Note>
-      <Note at={valuesAt} x={R_X + 40} y={c.y(740)}>
+      <Note at={valuesAt} x={R_X + 40} y={c.y(800)}>
         <span style={{ ...note(28, BLUE_INK), whiteSpace: "nowrap", ...TABULAR }}>
           RMSE <b>{fmt(METRICS.rmse)}</b> · MAE <b>{fmt(METRICS.mae)}</b> · R² <b>{fmt(METRICS.r2)}</b>
         </span>
@@ -106,7 +123,11 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
   const sqAt = c.w("r-xent", "squared error charges");
   const xentAt = c.w("r-xent", "Cross-entropy charges");
   const climbAt = c.w("r-xent", "keeps climbing");
-  const box = { left: R_X + 80, right: R_X + 720, top: 380, bottom: 760 };
+  const useAt = c.w("r-xent-use", "So use cross-entropy");
+  const gradAt = c.w("r-xent-use", "its gradient stays strong");
+  const flatAt = c.w("r-xent-use", "goes flat");
+  // Narrow enough that the notes beside it end inside the page margin.
+  const box = { left: R_X + 80, right: R_X + 580, top: 380, bottom: 760 };
   const xs: Scale = { lo: 0, hi: 1, a: box.left, b: box.right };
   const ys: Scale = { lo: 0, hi: 5, a: c.y(box.bottom), b: c.y(box.top) };
   const clip = { left: box.left - 10, right: box.right + 10, top: c.y(box.top) - 14, bottom: c.y(box.bottom) + 10 };
@@ -125,25 +146,51 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
         at={at0 - 4}
       />
       <Curve points={sq} x={xs} y={ys} at={sqAt - 4} dur={18} color={BAR} width={3.6} clip={clip} />
-      <Curve points={[...xe].reverse()} x={xs} y={ys} at={xentAt - 4} dur={22} color={ACCENT} width={3.6} clip={clip} />
+      {/* Cross-entropy is the answer, so it is drawn in the answer's green. */}
+      <Curve points={[...xe].reverse()} x={xs} y={ys} at={xentAt - 4} dur={22} color={OK} width={3.6} clip={clip} />
       <Svg opacity={mark}>
         <line x1={at(xs, LOSS.at)} x2={at(xs, LOSS.at)} y1={c.y(box.top)} y2={c.y(box.bottom)} stroke={INK_SOFT} strokeWidth={1.4} strokeDasharray="3 5" />
         <circle cx={at(xs, LOSS.at)} cy={at(ys, LOSS.sqAt)} r={8 * ease(frame, sqAt, 10)} fill={BAR} />
-        <circle cx={at(xs, LOSS.at)} cy={at(ys, LOSS.xentAt)} r={8 * ease(frame, xentAt, 10)} fill={ACCENT} />
+        <circle cx={at(xs, LOSS.at)} cy={at(ys, LOSS.xentAt)} r={8 * ease(frame, xentAt, 10)} fill={OK} />
       </Svg>
       <Note at={predictAt} x={box.right + 30} y={c.y(box.top) + c.h(10)}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>predict {LOSS.at} for a true positive:</span>
       </Note>
       <Note at={sqAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(56)}>
-        <span style={{ ...note(26, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>squared error {fmt(LOSS.sqAt)}</span>
+        <span style={{ ...note(26, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          squared error <span style={TABULAR}>{fmt(LOSS.sqAt)}</span>
+        </span>
       </Note>
       <Note at={xentAt + 2} x={box.right + 30} y={c.y(box.top) + c.h(100)}>
-        <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>cross-entropy {fmt(LOSS.xentAt)}</span>
+        <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          cross-entropy <span style={TABULAR}>{fmt(LOSS.xentAt)}</span>
+        </span>
       </Note>
       <Note at={climbAt} x={box.right + 30} y={c.y(box.top) + c.h(170)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>more confidently wrong:</span>
+        <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>more confidently wrong:</span>
         <br />
-        <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>it keeps climbing</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>it keeps climbing</span>
+      </Note>
+      {/* The answer, and why: how hard each loss still pushes on the logit
+          behind a sigmoid when the model is this wrong. */}
+      <Note at={useAt - 2} x={box.right + 30} y={c.y(box.top) + c.h(250)}>
+        <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <Mark at={useAt + 4}>so use cross-entropy</Mark>
+        </span>
+      </Note>
+      <Note at={gradAt - 2} x={box.right + 30} y={c.y(box.top) + c.h(302)}>
+        <div style={{ whiteSpace: "nowrap" }}>
+          <div style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>
+            gradient at <span style={TABULAR}>{LOSS.at}</span>, behind a sigmoid:
+          </div>
+          <div style={{ ...note(24, OK_INK), fontWeight: 650 }}>
+            cross-entropy <span style={TABULAR}>{fmt(LOSS.xentGrad)}</span>
+          </div>
+          <div style={{ ...note(24, BLUE_INK), fontWeight: 650, opacity: ease(frame, flatAt - 4, 10) }}>
+            squared error <span style={TABULAR}>{fmt(LOSS.sqGrad)}</span>
+            <span style={{ color: ACCENT_INK }}>: flat</span>
+          </div>
+        </div>
       </Note>
     </>
   );

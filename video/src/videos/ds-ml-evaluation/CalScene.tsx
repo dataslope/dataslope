@@ -18,8 +18,9 @@ const NOTE_X = 860;
  * Question 11 on the same 200,000 cases: predicted probability against the
  * share actually positive, in ten bins, over the diagonal where a score means
  * what it says. The plain model near the line; the class-weighted one along
- * the floor (its 0.85 bin is 8.5% positive); then the weighted model
- * recalibrated with Platt scaling, back on the line.
+ * the floor (its 0.85 bin is 8.5% positive); then that same weighted curve
+ * moves, bin by bin, onto its recalibrated self (Platt scaling), back on the
+ * line, turning from red to green as it goes.
  */
 export const CalScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -52,7 +53,12 @@ export const CalScene: React.FC = () => {
   const k = w.pred.findIndex((p) => p > 0.8 && p < 0.9);
   const wx = at(xs, w.pred[k]);
   const wy = at(ys, w.obs[k]);
-  const ringP = ease(frame, nineAt - 2, 12);
+  const ringP = ease(frame, nineAt - 2, 12) * (1 - ease(frame, fitAt, 12));
+  // The weighted model is what gets recalibrated, so its own curve moves.
+  const morph = ease(frame, fitAt + 4, Math.max(20, lineAt - fitAt - 8));
+  const r = CLS.calRecal;
+  const moving = w.pred.map((p, i) => [p + (r.pred[i] - p) * morph, w.obs[i] + (r.obs[i] - w.obs[i]) * morph] as const);
+  const movingColor = morph <= 0 ? ACCENT : morph >= 1 ? OK : `color-mix(in srgb, ${OK} ${(100 * morph).toFixed(1)}%, ${ACCENT})`;
 
   return (
     <AbsoluteFill>
@@ -107,8 +113,7 @@ export const CalScene: React.FC = () => {
 
         {/* ── Three models ── */}
         <Curve points={pts(CLS.calPlain)} x={xs} y={ys} at={plainAt} dur={22} color={BAR} width={3.4} clip={clip} dots={6} dim={fitAt} />
-        <Curve points={pts(CLS.calWeighted)} x={xs} y={ys} at={weightedAt + 2} dur={22} color={ACCENT} width={3.4} clip={clip} dots={6} />
-        <Curve points={pts(CLS.calRecal)} x={xs} y={ys} at={fitAt + 4} dur={24} color={OK} width={3.8} clip={clip} dots={6} />
+        <Curve points={moving} x={xs} y={ys} at={weightedAt + 2} dur={22} color={movingColor} width={3.4 + 0.4 * morph} clip={clip} dots={6} />
         <Svg opacity={ringP}>
           <circle cx={wx} cy={wy} r={16 * ringP} fill="none" stroke={ACCENT} strokeWidth={3} />
           <line x1={wx} x2={wx} y1={wy - 18} y2={at(ys, w.pred[k]) + 4} stroke={ACCENT} strokeWidth={1.6} strokeDasharray="3 5" />
@@ -140,7 +145,7 @@ export const CalScene: React.FC = () => {
         </Note>
         <Note at={fitAt - 2} x={NOTE_X} y={y(676)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>recalibrated</b> on held-out data
+            <b style={{ color: OK_INK }}>class-weighted, recalibrated</b> on held-out data
           </span>
           <br />
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, plattAt - 2, 10) }}>Platt scaling or isotonic regression</span>

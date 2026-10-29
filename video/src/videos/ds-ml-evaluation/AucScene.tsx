@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, fmt, 
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CLS, pct } from "./data";
+import { CLS, count, pct } from "./data";
 import { at, type Box, Curve, Drift, Fade, Mark, OK, OK_INK, PanelTitle, type Scale, Strike, Svg } from "./parts";
 
 const SIDE = 400;
@@ -56,10 +56,38 @@ const Square: React.FC<{ b: Box; at: number; out?: number; xTitle: string; yTitl
   );
 };
 
+/** A horizontal chance level across a square plot, labelled above its left end. */
+const ChanceLine: React.FC<{ b: Box; level: number; at: number; dash: string; children: React.ReactNode }> = ({
+  b,
+  level,
+  at: from,
+  dash,
+  children,
+}) => {
+  const frame = useCurrentFrame();
+  const { y } = useLayout();
+  const p = ease(frame, from, 16);
+  if (p <= 0) return null;
+  const ly = y(b.bottom) - level * (y(b.bottom) - y(b.top));
+  return (
+    <>
+      <Svg>
+        <line x1={b.left} x2={b.left + (b.right - b.left) * p} y1={ly} y2={ly} stroke={INK_SOFT} strokeWidth={2} strokeDasharray={dash} />
+      </Svg>
+      <div style={{ position: "absolute", left: b.left + 14, top: ly - 32, ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, from + 6, 10) }}>
+        {children}
+      </div>
+    </>
+  );
+};
+
 /**
  * Questions 9 and 10 on the same 200,000 cases. The ROC curve over its
- * chance diagonal (area 0.94) beside the PR curve (area 0.45); then the same
- * scores on a balanced test set, dashed: ROC hardly moves, PR jumps to 0.94.
+ * chance diagonal (area 0.94) beside the PR curve (area 0.45) over its own
+ * chance level, the positive rate (0.02); then the same scores on a balanced
+ * test set, dashed: ROC hardly moves, PR jumps to 0.94 as its chance level
+ * jumps to 0.5. Beside them, what a low false positive rate hides: 6.8% of
+ * the negatives is still 13,402 false alarms against 3,017 catches.
  * Then imbalance: accuracy struck out (98% for calling everything negative),
  * and what class weights do to recall and precision at 0.5.
  */
@@ -78,24 +106,27 @@ export const AucScene: React.FC = () => {
   const areaAt = n.word("auc", "The AUC is the area");
   const chanceAt = n.word("auc", "point five is chance");
   const hereAt = n.word("auc", "Here it's point nine four");
-  const prAt = n.word("auc", "The PR curve plots precision");
-  const onlyAt = n.word("auc", "only point four five");
+  const prAt = n.word("auc-pr", "The PR curve plots precision");
+  const onlyAt = n.word("auc-pr", "its area here is point four five");
+  const prChanceAt = n.word("auc-pr", "Chance on it is the positive rate");
   const sameAt = n.word("auc-balance", "Same model, same scores");
   const movesAt = n.word("auc-balance", "barely moves");
   const jumpsAt = n.word("auc-balance", "pee-ar ay-you-see jumps");
   const floodAt = n.word("auc-balance", "The false positive rate divides");
+  const easyAt = n.word("auc-balance", "a flood of easy ones");
+  const flattersAt = n.word("auc-balance", "flatters the ROC curve");
   const honestAt = n.word("auc-balance", "the honest one");
   const q10At = n.word("imbalance", "Question ten");
   const q10TextAt = n.word("imbalance", "How do you handle");
   const ignoreAt = n.word("imbalance", "ignoring accuracy");
   const negAt = n.word("imbalance", "calling every case negative");
-  const weightAt = n.word("imbalance", "Weight the rare class");
-  const recallAt = n.word("imbalance", "recall goes from");
-  const precAt = n.word("imbalance", "while precision falls");
-  const moveAt = n.word("imbalance", "Or move the threshold");
-  const resampleAt = n.word("imbalance", "or resample");
-  const judgeAt = n.word("imbalance", "judge the result");
-  const end = n.beat("imbalance").to;
+  const weightAt = n.word("imbalance-fix", "Weight the rare class");
+  const recallAt = n.word("imbalance-fix", "recall goes from");
+  const precAt = n.word("imbalance-fix", "while precision falls");
+  const moveAt = n.word("imbalance-fix", "Or move the threshold");
+  const resampleAt = n.word("imbalance-fix", "or resample");
+  const judgeAt = n.word("imbalance-fix", "judge the result");
+  const end = n.beat("imbalance-fix").to;
 
   const unit: Scale = { lo: 0, hi: 1, a: 0, b: 1 };
   const xsOf = (b: Box): Scale => ({ ...unit, a: b.left, b: b.right });
@@ -151,6 +182,14 @@ export const AucScene: React.FC = () => {
           <Square b={PR} at={prAt - 2} xTitle="recall" yTitle="precision" />
           <Curve points={CLS.pr} x={xsOf(PR)} y={ysOf(PR)} at={prAt + 4} dur={26} color={BAR} width={3.6} clip={clipOf(PR)} />
           <Curve points={CLS.prBalanced} x={xsOf(PR)} y={ysOf(PR)} at={jumpsAt - 4} dur={22} color={INK} width={2.6} dash="8 7" clip={clipOf(PR)} />
+          {/* PR's chance level is the share positive: 0.02 here, 0.5 on the
+              balanced set, which is most of why its area jumps. */}
+          <ChanceLine b={PR} level={CLS.prevalence} at={prChanceAt} dash="2 6">
+            chance: {fmt(CLS.prevalence)}, the positive rate
+          </ChanceLine>
+          <ChanceLine b={PR} level={CLS.prevalenceBalanced} at={jumpsAt + 6} dash="2 6">
+            chance: {fmt(CLS.prevalenceBalanced, 1)}
+          </ChanceLine>
 
           {/* ── The two areas, and then on a balanced test set ── */}
           <Note at={hereAt - 2} x={READ_X} y={y(ROC.top)}>
@@ -188,7 +227,21 @@ export const AucScene: React.FC = () => {
             <br />
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>false alarms ÷ every negative</span>
           </Note>
-          <Note at={honestAt - 2} x={READ_X} y={y(ROC.top) + h(350)}>
+          {/* The flattering, in counts: a small rate of a huge denominator. */}
+          <Note at={easyAt} x={READ_X} y={y(ROC.top) + h(330)}>
+            <div style={{ ...note(22, INK), whiteSpace: "nowrap", lineHeight: 1.35 }}>
+              <div>
+                at <span style={TABULAR}>{pct(CLS.alarms.recall)}</span> recall it is only <span style={TABULAR}>{pct(CLS.alarms.fpr, 1)}</span>,
+              </div>
+              <div style={{ opacity: ease(frame, flattersAt - 2, 10) }}>
+                but that is <b style={{ color: ACCENT_INK, ...TABULAR }}>{count(CLS.alarms.fp)}</b> false alarms
+              </div>
+              <div style={{ opacity: ease(frame, flattersAt + 6, 10) }}>
+                against <b style={{ color: BLUE_INK, ...TABULAR }}>{count(CLS.alarms.tp)}</b> catches
+              </div>
+            </div>
+          </Note>
+          <Note at={honestAt - 2} x={READ_X} y={y(ROC.top) + h(445)}>
             <span style={{ ...note(27, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
               rare positives: <Mark at={honestAt + 4}>trust PR-AUC</Mark>
             </span>

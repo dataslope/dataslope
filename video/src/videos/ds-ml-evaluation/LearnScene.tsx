@@ -32,13 +32,14 @@ export const LearnScene: React.FC = () => {
   const bothAt = n.word("learn", "track both errors");
   const lineAt = n.word("learn-shapes", "A straight line on the sine wave");
   const meetAt = n.word("learn-shapes", "meet early and stay high");
-  const biasAt = n.word("learn-shapes", "That's bias");
-  const nineAt = n.word("learn-shapes", "The degree-nine polynomial");
-  const wideAt = n.word("learn-shapes", "the gap starts wide");
-  const closesAt = n.word("learn-shapes", "closes as the data grows");
-  const noiseAt = n.word("learn-shapes", "down to the noise");
-  const varianceAt = n.word("learn-shapes", "That's variance");
-  const cureAt = n.word("learn-shapes", "more data is the cure");
+  const biasAt = n.word("learn-bias", "That's bias");
+  const flexAt = n.word("learn-bias", "a more flexible model");
+  const nineAt = n.word("learn-nine", "The degree-nine polynomial");
+  const wideAt = n.word("learn-nine", "the gap starts wide");
+  const closesAt = n.word("learn-nine", "closes as the data grows");
+  const noiseAt = n.word("learn-nine", "down to the noise");
+  const varianceAt = n.word("learn-nine", "That's variance");
+  const cureAt = n.word("learn-nine", "more data is the cure");
   const rareAt = n.word("pr-in", "on a rare event");
   const end = n.beat("pr-in").to;
 
@@ -130,7 +131,11 @@ export const LearnScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>both stay near {fmt(lineLevel, 1)}</span>
         </Note>
         <Note at={biasAt - 2} x={LEFT.left} y={y(LEFT.bottom) + h(76)} out={end - 8}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>bias: more data won&apos;t help</span>
+          <span style={{ ...note(27, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            bias: more data won&apos;t help
+            {/* What will, in the right answer's green. */}
+            <span style={{ color: OK_INK, opacity: ease(frame, flexAt - 2, 10) }}>; a more flexible model will</span>
+          </span>
         </Note>
 
         {/* ── Right: wide, then closed ── */}

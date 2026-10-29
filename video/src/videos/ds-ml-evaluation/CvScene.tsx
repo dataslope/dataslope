@@ -26,12 +26,29 @@ const STACK = (() => {
   });
 })();
 
+/** The axis the pile is drawn on, and the width of one column of dots in score units. */
+const LO = 0.94;
+const HI = 1.005;
+const BIN = (DOT * PER_ROW) / ((STRIP.right - STRIP.left) / (HI - LO));
+
+/** The two hundred five-fold averages, binned into columns as wide as the splits' and stacked the same way. */
+const MEANS = (() => {
+  const seen = new Map<number, number>();
+  return CV.means.map((v) => {
+    const col = Math.round((v - LO) / BIN);
+    const k = seen.get(col) ?? 0;
+    seen.set(col, k + 1);
+    return { v: LO + col * BIN, k };
+  });
+})();
+
 /**
  * Questions 5 and 6 on scikit-learn's breast cancer set (569 tumors). Two
  * hundred random 80/20 splits as a pile of dots, one per split, spread from
  * 94.7% to 100%; then five folds, each scoring the fold the others trained
- * for, with their mean and its spread drawn back onto the pile, and
- * forward-chaining for time series. Then the three sets as one bar, with the
+ * for, with their mean drawn back onto the pile, and that same five-fold
+ * average over two hundred reshuffles piled up in front of the single
+ * splits, far narrower; then forward-chaining for time series. Then the three sets as one bar, with the
  * peek from the test set back into the choice struck out.
  */
 export const CvScene: React.FC = () => {
@@ -51,10 +68,11 @@ export const CvScene: React.FC = () => {
   const fifthAt = n.word("cv-folds", "scores the fifth");
   const overAt = n.word("cv-folds", "five times over");
   const onceAt = n.word("cv-folds", "every row is scored once");
-  const meanAt = n.word("cv-folds", "the mean is");
-  const giveAt = n.word("cv-folds", "give or take");
-  const timeAt = n.word("cv-folds", "For time series");
-  const afterAt = n.word("cv-folds", "comes after the training data");
+  const meanAt = n.word("cv-mean", "the five average");
+  const repeatAt = n.word("cv-mean", "Repeat that on two hundred reshuffles");
+  const pileAt = n.word("cv-mean", "pile up far tighter");
+  const timeAt = n.word("cv-time", "For time series");
+  const afterAt = n.word("cv-time", "comes after the training data");
   const q6At = n.word("split", "Question six");
   const q6TextAt = n.word("split", "What's the discipline");
   const fitAt = n.word("split", "Fit on the training set");
@@ -66,18 +84,18 @@ export const CvScene: React.FC = () => {
   const pictureAt = n.word("learn-in", "a picture tells you");
   const end = n.beat("learn-in").to;
 
-  const xs: Scale = { lo: 0.94, hi: 1.005, a: STRIP.left, b: STRIP.right };
+  const xs: Scale = { lo: LO, hi: HI, a: STRIP.left, b: STRIP.right };
   const base = y(STRIP.base);
   const ticks = [0.95, 0.96, 0.97, 0.98, 0.99, 1];
   const span = Math.max(1, (rangeAt - 6) - waysAt);
   const lo = at(xs, CV.min);
   const hi = at(xs, CV.max);
   const meanX = at(xs, CV.mean);
-  const sdLo = at(xs, CV.mean - CV.std);
-  const sdHi = at(xs, CV.mean + CV.std);
   const top = base - h(DOT) * (Math.ceil(54 / PER_ROW) + 1);
   const meanP = ease(frame, meanAt, 14);
-  const sdP = ease(frame, giveAt, 14);
+  // The single splits step back while the averages pile up in front of them.
+  const back = 1 - 0.75 * ease(frame, repeatAt - 4, 14);
+  const meanSpan = Math.max(1, pileAt - 4 - repeatAt);
   const segW = FOLDS.width / 5;
 
   // Question 6's bar: 60% training, 20% validation, 20% test.
@@ -105,6 +123,7 @@ export const CvScene: React.FC = () => {
         <Sfx key={i} name="el-tap" at={overAt + i * 5} level={-38} />
       ))}
       <Sfx name="el-pop" at={meanAt + 2} level={-32} />
+      <Sfx name="el-sprinkle" at={repeatAt} level={-36} />
       <Sfx name="el-pencil" at={fitAt} level={-36} />
       <Sfx name="el-scratch" at={flatterAt} level={-32} />
 
@@ -118,7 +137,9 @@ export const CvScene: React.FC = () => {
 
         <Fade from={asked - 8} out={q6At - 6}>
           {/* ── Two hundred single splits ── */}
-          <PanelTitle x={STRIP.left} y={top - h(48)} at={asked - 2}>
+          {/* High enough to clear the five-fold averages, whose tallest column
+              (66 of the 200) stands 22 dots high. */}
+          <PanelTitle x={STRIP.left} y={top - h(84)} at={asked - 2}>
             the same model, two hundred random splits of the tumor data
           </PanelTitle>
           <Svg>
@@ -139,11 +160,19 @@ export const CvScene: React.FC = () => {
               const one = i === 0;
               const ring = one ? ease(frame, oneAt, 10) : 0;
               return (
-                <g key={i}>
+                <g key={i} opacity={back}>
                   <circle cx={cx} cy={cy} r={4.4 * p} fill={one && ring > 0 ? ACCENT : BAR} opacity={0.85} />
                   {one ? <circle cx={cx} cy={cy} r={11 * ring} fill="none" stroke={ACCENT} strokeWidth={2.4} opacity={ring} /> : null}
                 </g>
               );
+            })}
+            {/* The five-fold average, repeated on two hundred reshuffles of the folds. */}
+            {MEANS.map((d, i) => {
+              const p = ease(frame, repeatAt + (i / MEANS.length) * meanSpan, 6);
+              if (p <= 0) return null;
+              const cx = at(xs, d.v) + ((d.k % PER_ROW) - 1) * DOT;
+              const cy = base - h(DOT) * (Math.floor(d.k / PER_ROW) + 0.7);
+              return <circle key={`m${i}`} cx={cx} cy={cy} r={4.4 * p} fill={OK} opacity={0.9} />;
             })}
           </Svg>
           <Bracket x0={lo} x1={hi} y={base + h(62)} at={rangeAt} color={ACCENT}>
@@ -155,14 +184,22 @@ export const CvScene: React.FC = () => {
             <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>one split: one draw from that range</span>
           </Note>
 
-          {/* The folds' mean and spread, back on the same axis. */}
+          {/* The folds' mean, back on the same axis; then the same average over
+              two hundred reshuffles, piled up in front of the single splits. */}
           <Svg opacity={meanP}>
-            <rect x={sdLo + (meanX - sdLo) * (1 - sdP)} y={top - h(6)} width={(sdHi - sdLo) * sdP} height={base - top + h(6)} fill={`color-mix(in srgb, ${OK} 14%, transparent)`} />
             <line x1={meanX} x2={meanX} y1={top - h(14)} y2={base} stroke={OK} strokeWidth={3.4} />
           </Svg>
           <Note at={meanAt + 2} x={STRIP.left} y={base + h(128)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
-              five folds: {fmt(CV.mean * 100, 1)}%<span style={{ opacity: sdP }}>, give or take {fmt(CV.std * 100, 1)}</span>
+            <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+              five folds, averaged: <span style={TABULAR}>{fmt(CV.mean * 100, 1)}%</span>
+            </span>
+          </Note>
+          <Note at={pileAt - 2} x={STRIP.left} y={base + h(170)}>
+            <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
+              that average on {CV.means.length} reshuffles:{" "}
+              <b style={TABULAR}>
+                {pct(CV.meansMin, 1)} to {pct(CV.meansMax, 1)}
+              </b>
             </span>
           </Note>
 
@@ -310,7 +347,9 @@ const TimeSeries: React.FC<{ at: number; afterAt: number; left: number; top: num
       {Array.from({ length: rows }, (_, r) =>
         Array.from({ length: 6 }, (_, c) => {
           const kind = c <= r ? "train" : c === r + 1 ? "val" : "none";
-          const p = ease(frame, afterAt - 6 + r * 4 + c, 8);
+          // Drawn as "For time series" is said, so the forward chaining is up
+          // for the whole sentence and the pause after it.
+          const p = ease(frame, from + 8 + r * 4 + c, 8);
           return (
             <div
               key={`${r}-${c}`}
@@ -330,7 +369,7 @@ const TimeSeries: React.FC<{ at: number; afterAt: number; left: number; top: num
           );
         }),
       )}
-      <div style={{ position: "absolute", left: left + 6 * (cell + 4) + 8, top: top + h(58), ...label(19, INK_SOFT), opacity: ease(frame, afterAt, 10), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: left + 6 * (cell + 4) + 8, top: top + h(58), ...label(19, INK_SOFT), opacity: ease(frame, Math.min(afterAt, from + 30), 10), whiteSpace: "nowrap" }}>
         time →
       </div>
     </>
