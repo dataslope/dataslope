@@ -6,7 +6,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * prep videos (agent-outputs/20261022-0445-data-scientist-interview-video-plan.md),
  * after content/interview/data-scientist/probability.mdx. It answers the
  * fourteen questions the plan gives this page: twelve worked through with
- * numbers, numbered aloud, then two that take a sentence each (13 and 14, on
+ * numbers, numbered aloud, then two quick ones (13 and 14, numbered on
  * screen only). The page's Law of Large Numbers and Central Limit Theorem
  * questions are answered in Part 1, Statistics; Part 1's normal, Poisson and
  * binomial questions are answered here, in question 8.
@@ -36,8 +36,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Facts, all from check.mjs (Pyodide 314.0.7, NumPy 2.4.6, SciPy 1.18.0, the
  * runtime the page's blocks run) into results.json, which data.ts reads.
  * Exact answers are worked in fractions:
- *   - one die: a six is 1/6, and 1/3 given an even roll.
- *   - the page's test (1% prevalence, 99% sensitivity, 5% false positives) on
+ *   - one die: a six is 1/6, and 1/3 given an even roll: P(six and even) over
+ *     P(even), 1/6 over 1/2.
+ *   - the page's test (1% prevalence, 99% sensitivity, 5% false positives, so
+ *     95% specificity) on
  *     10,000 people, the population the BaseRate course video walks: 100 sick,
  *     99 caught; 9,900 healthy, 495 flagged; 99 of 594 positives, exactly
  *     1/6, the page's "near 17%" and its block's 0.167. (BaseRate itself runs
@@ -64,7 +66,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - the video's own 200 people (seed 23): covariance 42.0 in centimeter
  *     kilograms and 0.42 in meter kilograms, correlation 0.49 both ways; y =
  *     x squared on a symmetric grid has r = 0.
- *   - the bet: 0.2 x 10 + 0.8 x (-3) = 2 - 2.4 = -0.4.
+ *   - the bet: 1/5 x 10 + 4/5 x (-3) = 2 - 2.4 = -0.4.
  *
  * Written for Drew's ear: numbers as they are said, "lambda" for the rate.
  */
@@ -83,7 +85,12 @@ export const script: NarrationScript = {
     },
     {
       id: "plan",
-      text: "Probability rounds run on puzzles like that, where the first answer is usually wrong, and on definitions you have to state exactly. There are fourteen questions here. Twelve get worked through with numbers, and the last two take a sentence each.",
+      text: "Probability rounds run on puzzles like that, where the first answer is usually wrong, and on definitions you have to state exactly. There are fourteen questions here.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "plan-last",
+      text: "Twelve get worked through with numbers, and the last two are quick.",
       pauseAfter: 0.7,
     },
     { id: "cond-in", text: "Start with the idea every other answer leans on." },
@@ -108,6 +115,11 @@ export const script: NarrationScript = {
     {
       id: "cond-rule",
       text: "In symbols, the probability of A and B, divided by the probability of B. You shrink the world to where B is true, and measure again inside it.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "cond-plug",
+      text: "On the die, that's one sixth over one half: one in three.",
       pauseAfter: 0.8,
     },
     {
@@ -151,7 +163,12 @@ export const script: NarrationScript = {
     },
     {
       id: "test-words",
-      text: "Ninety-nine percent was the sensitivity, measured only on the sick. To read a positive, you also need the false-positive rate on the healthy, and the base rate.",
+      text: "Ninety-nine percent was the sensitivity, measured only on the sick.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "test-need",
+      text: "To read a positive, you also need the specificity, the ninety-five percent of healthy people it clears, and the base rate.",
       pauseAfter: 0.7,
     },
     { id: "indep-in", text: "Next, two ideas that are easy to mix up." },
@@ -214,7 +231,17 @@ export const script: NarrationScript = {
     },
     {
       id: "linear-hats",
-      text: "So split a hard count into easy pieces. Ten people get their hats back at random. Each has a one in ten chance of getting their own, so on average, exactly one does. A hundred thousand shuffles agree.",
+      text: "So split a hard count into easy pieces. Ten people get their hats back at random.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "linear-each",
+      text: "Each person is an indicator: one if they get their own hat, zero if not, with a one in ten chance. The matches depend on each other, and still, on average, exactly one does.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "linear-sim",
+      text: "A hundred thousand shuffles agree.",
       pauseAfter: 0.6,
     },
     {
@@ -274,12 +301,22 @@ export const script: NarrationScript = {
     },
     {
       id: "pois-which",
-      text: "A binomial needs a fixed number of trials, each with the same chance: a thousand impressions, each clicked or not. A Poisson counts events with no natural ceiling, like arrivals per minute.",
+      text: "A binomial needs a fixed number of independent trials, each with the same chance: a thousand impressions, each clicked or not.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "pois-ceiling",
+      text: "A Poisson counts events with no natural ceiling, like arrivals per minute.",
       pauseAfter: 0.6,
     },
     {
       id: "pois-limit",
-      text: "And the two meet. A thousand trials at point three percent is almost exactly a Poisson with a rate of three.",
+      text: "And the two meet.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "pois-np",
+      text: "With many trials and a small chance, the count is almost exactly a Poisson with a rate of n times p: a thousand trials at point three percent give a rate of three.",
       pauseAfter: 0.7,
     },
     { id: "monty-in", text: "Then two puzzles, and the room from the start." },
@@ -344,7 +381,7 @@ export const script: NarrationScript = {
     {
       id: "rapid-in",
       scene: true,
-      text: "That's every puzzle. Two definitions left.",
+      text: "That's every puzzle. Two quick ones left.",
       pauseAfter: 0.6,
     },
     {
@@ -353,7 +390,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-bet",
-      text: "Last, the expected value of a bet that pays ten dollars one time in five, and loses three otherwise. Two dollars, minus two forty: it loses forty cents a play, though its likeliest outcome is losing three.",
+      text: "Last, the expected value of a bet that pays ten dollars one time in five, and loses three otherwise.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "r-bet-ev",
+      text: "A fifth of ten is two dollars, and four fifths of minus three is minus two forty: it loses forty cents a play, though its likeliest outcome is losing three.",
       pauseAfter: 0.9,
     },
     {

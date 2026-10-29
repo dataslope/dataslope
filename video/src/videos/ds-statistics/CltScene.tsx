@@ -4,12 +4,12 @@ import { ease } from "../../components/motion";
 import { Bars, NormalCurve, normalPdf } from "../../editorial/charts";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, INK, TABULAR, fmt } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CLT } from "./data";
-import { at, Axes, Curve, Drift, Mark, noteText, OK, OK_INK, type Scale, Svg, X0 } from "./parts";
+import { at, Axes, Curve, Drift, Mark, noteText, OK_INK, type Scale, Svg, X0 } from "./parts";
 
 const PANEL_W = 470;
 const PANEL_GAP = 100;
@@ -217,6 +217,11 @@ export const CltScene: React.FC = () => {
             return p > 0 ? <circle key={m.k} cx={rx(m.k)} cy={ry(m.v)} r={7 * p} fill={BLUE_INK} /> : null;
           })}
         </svg>
+        {/* The line named where it starts falling, clear of it: an axis
+            title would sit on the question's line above. */}
+        <Note at={runAt + 8} x={rx(2) + 24} y={ry(12.2)} out={clearAt}>
+          <span style={{ ...noteText(22, BLUE_INK) }}>the running mean</span>
+        </Note>
         {marks.map((m, i) => (
           <Note key={m.k} at={m.at} x={rx(m.k) - (i === 2 ? 0 : 20)} y={ry(m.v) - h(i === 2 ? 70 : 62)} align={i === 2 ? "right" : "left"} out={clearAt}>
             <span style={{ ...noteText(24, BLUE_INK), ...TABULAR }}>{fmt(m.v, 2)}</span>
@@ -233,10 +238,16 @@ export const CltScene: React.FC = () => {
             <b>CLT</b>: what <Mark at={shapeAt + 6}>shape</Mark> its uncertainty takes
           </div>
         </Note>
-        <Curve points={bellPts} at={shapeAt + 4} out={clearAt} color={OK} width={3} />
+        {/* The CLT's bell in plain ink (green is the right answer), said in
+            words: it is the mean's spread around μ, the line on the left. */}
+        <Curve points={bellPts} at={shapeAt + 4} out={clearAt} color={INK} width={3} />
         <Svg opacity={ease(frame, shapeAt + 4, 12) * (1 - ease(frame, clearAt, 10))}>
           <line x1={bell.x0} x2={bell.x1} y1={bell.base} y2={bell.base} stroke={INK} strokeWidth={1.4} />
+          <line x1={(bell.x0 + bell.x1) / 2} x2={(bell.x0 + bell.x1) / 2} y1={bell.base} y2={bell.base + 8} stroke={INK} strokeWidth={1.4} />
         </Svg>
+        <Note at={shapeAt + 12} x={bell.x0 + 40} y={bell.base + h(14)} out={clearAt}>
+          <span style={{ ...noteText(22, INK_SOFT) }}>the spread of the mean around μ</span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

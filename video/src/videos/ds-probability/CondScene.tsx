@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -14,6 +14,9 @@ const DIE = { size: 110, pitch: 140, y: 470 };
 /** A probability's own column, so the note after it lines up row to row. */
 const ROW: React.CSSProperties = { display: "inline-block", width: 330 };
 const RULE_X = 1080;
+/** How far in from RULE_X the definition's "=" sits, so the line that puts
+ *  the die's numbers into it starts under it. */
+const PLUG_DX = 176;
 
 /** "P(" … ")": a probability in the page's notation. */
 const P: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -45,6 +48,8 @@ export const CondScene: React.FC = () => {
   const symbolsAt = n.word("cond-rule", "In symbols");
   const shrinkAt = n.word("cond-rule", "shrink the world");
   const measureAt = n.word("cond-rule", "measure again");
+  const plugAt = n.word("cond-plug", "one sixth over one half");
+  const thirdAt = n.word("cond-plug", "one in three");
   const q2At = n.word("bayes", "Question two");
   const q2TextAt = n.word("bayes", "State Bayes' theorem");
   const turnsAt = n.word("bayes", "It turns");
@@ -54,6 +59,7 @@ export const CondScene: React.FC = () => {
   const priorAt = n.word("bayes", "the prior");
   const evidenceAt = n.word("bayes", "evidence");
   const knowAt = n.word("bayes-when", "you know how a test behaves");
+  const diseaseAt = n.word("bayes-when", "given a disease");
   const wantAt = n.word("bayes-when", "you want the chance");
   const bottomAt = n.word("bayes-base", "The bottom line");
   const sickAt = n.word("bayes-base", "the positives among the sick");
@@ -77,6 +83,7 @@ export const CondScene: React.FC = () => {
       <Sfx name="el-tap" at={evenAt + 2} level={-34} />
       <Sfx name="el-pop" at={sixAt + 4} level={-32} />
       <Sfx name="el-pencil" at={symbolsAt + 2} level={-34} />
+      <Sfx name="el-pencil" at={plugAt + 2} level={-36} />
       <Sfx name="el-pencil" at={turnsAt + 2} level={-34} />
       <Sfx name="el-tap" at={knowAt + 2} level={-34} />
       <Sfx name="el-tap" at={wantAt + 2} level={-34} />
@@ -173,6 +180,19 @@ export const CondScene: React.FC = () => {
             />
           </span>
         </Ink>
+        {/* The die's own numbers in it, under the fraction they fill:
+            P(six and even) over P(even). */}
+        <Ink at={plugAt} dur={18} out={out1} style={{ left: RULE_X + PLUG_DX, top: y(612) }}>
+          <span style={math(46)}>
+            = <Frac top={COND.pSixAndEven} bottom={COND.pEven} /> =
+            {/* Clear of the "=": the mark's wash reaches 0.14em past its text. */}
+            <span style={{ display: "inline-block", marginLeft: "0.32em" }}>
+              <Mark at={thirdAt} color={MARK_OK}>
+                <span style={{ color: OK_INK }}>{COND.pSixGivenEven}</span>
+              </Mark>
+            </span>
+          </span>
+        </Ink>
 
         {/* ── Question 2: Bayes' theorem ── */}
         <Ink at={turnsAt} dur={20} style={{ left: X0, top: formulaY }}>
@@ -216,15 +236,30 @@ export const CondScene: React.FC = () => {
           </span>
         </Ink>
 
-        {/* What you know, and what you want. */}
+        {/* Which event is which, then what you know (the likelihood, marked as
+            it is in the theorem) and what you want (the answer, in green). */}
+        <Note at={diseaseAt} x={X0} y={y(590)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={math(30, INK)}>
+              <V>A</V>
+            </span>{" "}
+            = disease,
+            <span style={{ ...math(30, INK), marginLeft: 26 }}>
+              <V>B</V>
+            </span>{" "}
+            = positive
+          </span>
+        </Note>
         <Note at={knowAt + 2} x={X0} y={y(650)}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>you know </span>
-          <span style={math(36, BLUE_INK)}>
-            <P>
-              positive
-              <Given />
-              disease
-            </P>
+          <span style={math(36, INK)}>
+            <Mark at={knowAt + 10}>
+              <P>
+                positive
+                <Given />
+                disease
+              </P>
+            </Mark>
           </span>
         </Note>
         <Note at={wantAt + 2} x={X0} y={y(720)}>

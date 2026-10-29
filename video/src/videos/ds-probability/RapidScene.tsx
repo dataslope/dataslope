@@ -96,22 +96,26 @@ const Cov: React.FC<{ w: Words }> = ({ w }) => {
 };
 
 /** 14. The bet: +$10 one time in five, -$3 otherwise, as two signed bars
- *  that net to -40 cents; the likelier row is the loss. */
+ *  that net to -40 cents; the likelier row is the loss. Each bar is labeled
+ *  with the product it is, the payoff weighted by its probability. */
 const Bet: React.FC<{ w: Words; out?: number }> = ({ w, out: dim }) => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
   const startAt = w("r-bet", "pays ten dollars");
   const loseAt = w("r-bet", "loses three otherwise");
-  const twoAt = w("r-bet", "Two dollars");
-  const minusAt = w("r-bet", "minus two forty");
-  const fortyAt = w("r-bet", "loses forty cents a play");
-  const likelyAt = w("r-bet", "its likeliest outcome");
+  const fifthAt = w("r-bet-ev", "A fifth of ten");
+  const twoAt = w("r-bet-ev", "two dollars");
+  const fourFifthsAt = w("r-bet-ev", "four fifths");
+  const minusAt = w("r-bet-ev", "minus two forty");
+  const fortyAt = w("r-bet-ev", "loses forty cents a play");
+  const likelyAt = w("r-bet-ev", "its likeliest outcome");
   const d = dim === undefined ? 0 : ease(frame, dim, 14);
   const rows = [
-    { text: "win $10, one time in five", part: BET.winPart, at: startAt, partAt: twoAt, color: OK, ink: OK_INK },
-    { text: "lose $3, four times in five", part: BET.losePart, at: loseAt, partAt: minusAt, color: ACCENT, ink: ACCENT_INK },
+    { text: "win $10, one time in five", weight: BET.pWinFrac, pay: BET.win, part: BET.winPart, at: startAt, prodAt: fifthAt, partAt: twoAt, color: OK, ink: OK_INK },
+    { text: "lose $3, four times in five", weight: BET.pLoseFrac, pay: BET.lose, part: BET.losePart, at: loseAt, prodAt: fourFifthsAt, partAt: minusAt, color: ACCENT, ink: ACCENT_INK },
   ];
   const money = (v: number) => `${v < 0 ? "−" : "+"}$${fmt(Math.abs(v))}`;
+  const dollars = (v: number) => `${v < 0 ? "−" : ""}$${Math.abs(v)}`;
   return (
     <div style={{ position: "absolute", inset: 0, opacity: 1 - d }}>
       {rows.map((r, i) => {
@@ -126,13 +130,18 @@ const Bet: React.FC<{ w: Words; out?: number }> = ({ w, out: dim }) => {
             <Svg>
               <rect x={r.part >= 0 ? BET_ROW.zero : BET_ROW.zero - wpx} y={top + 46} width={wpx} height={BET_ROW.bar} rx={4} fill={r.color} opacity={0.85} />
             </Svg>
+            {/* Weight times payoff as it is said, then the product as its bar lands. */}
             <Note
-              at={r.partAt + 8}
-              x={r.part >= 0 ? BET_ROW.zero + wpx + 14 : BET_ROW.zero - Math.abs(r.part) * BET_ROW.unit - 14}
+              at={r.prodAt}
+              x={r.part >= 0 ? BET_ROW.zero + Math.abs(r.part) * BET_ROW.unit + 14 : BET_ROW.zero - Math.abs(r.part) * BET_ROW.unit - 14}
               align={r.part >= 0 ? "left" : "right"}
               y={top + 54}
+              style={{ whiteSpace: "nowrap" }}
             >
-              <span style={{ ...label(28, r.ink), ...TABULAR }}>{money(r.part)}</span>
+              <span style={{ ...label(24, INK_SOFT), ...TABULAR }}>
+                {r.weight} × {dollars(r.pay)} ={" "}
+              </span>
+              <span style={{ ...label(28, r.ink), ...TABULAR, opacity: ease(frame, r.partAt + 8, 12) }}>{money(r.part)}</span>
             </Note>
           </React.Fragment>
         );
@@ -150,8 +159,8 @@ const Bet: React.FC<{ w: Words; out?: number }> = ({ w, out: dim }) => {
 };
 
 /**
- * The last two questions, 13 and 14, in this part's own words ("Two
- * definitions left"), then the bridge into machine learning with the rabbit
+ * The last two questions, 13 and 14, in this part's own words ("Two quick
+ * ones left"), then the bridge into machine learning with the rabbit
  * back on the page.
  */
 export const RapidScene: React.FC = () => {
@@ -161,7 +170,7 @@ export const RapidScene: React.FC = () => {
 
   const from = n.beat("rapid-in").from;
   const puzzleAt = n.word("rapid-in", "That's every puzzle");
-  const leftAt = n.word("rapid-in", "Two definitions left");
+  const leftAt = n.word("rapid-in", "Two quick ones left");
   const modelAt = n.word("next", "A model's output");
   const holdsAt = n.word("next", "holds up on data");
   const scoreAt = n.word("next", "how you'd score it");
@@ -180,12 +189,12 @@ export const RapidScene: React.FC = () => {
       {items.map((item) => (
         <Sfx key={item.n} name="el-tap" at={item.at} level={-34} />
       ))}
-      <Sfx name="el-pop" at={n.word("r-bet", "loses forty cents a play") + 4} level={-32} />
+      <Sfx name="el-pop" at={n.word("r-bet-ev", "loses forty cents a play") + 4} level={-32} />
       <Sfx name="el-chime" at={nextAt} level={-34} />
 
       <Drift from={from} to={n.beat("next").to + 40} scale={0.015}>
         <Kicker at={from}>Questions 13 and 14</Kicker>
-        <Headline lead="That's every puzzle." turn="Two definitions left." at={puzzleAt - 4} turnAt={leftAt - 2} size={64} />
+        <Headline lead="That’s every puzzle." turn="Two quick ones left." at={puzzleAt - 4} turnAt={leftAt - 2} size={64} />
 
         {/* The bet stays up into the bridge, so its body sits outside the list. */}
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={leftAt} end={end} />

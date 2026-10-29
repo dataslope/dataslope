@@ -85,7 +85,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * "r-corr-cause" began as the take's own words; "ci-fixed" and "pvalue-not"
  * were re-voiced [slowly], each in two beats, since they carry the two
  * misreadings the opening promises to fix. Each new or reworded beat was
- * voiced on its own.
+ * voiced on its own. The polish pass after it split "pvalue" before "A fair
+ * coin" (re-cut from the kept take 4) and re-voiced "pvalue-fair" alone, so
+ * the lower tail comes with its reason: the test is two-sided.
  *
  * Written for Drew's ear, as the Data Analyst series is: numbers as they are
  * said, and every abbreviation expanded the first time (SE, CLT, LLN,
@@ -210,7 +212,11 @@ export const script: NarrationScript = {
     {
       id: "pvalue",
       scene: true,
-      text: "Question eleven. What exactly is a p-value? The probability of data at least as extreme as yours, if the null is true. A coin lands heads sixty-two times in a hundred. A fair coin, flipped a hundred times over and over, lands sixty-two or more, or thirty-eight or fewer, two point one percent of the time. That's the p-value.",
+      text: "Question eleven. What exactly is a p-value? The probability of data at least as extreme as yours, if the null is true. A coin lands heads sixty-two times in a hundred.",
+    },
+    {
+      id: "pvalue-fair",
+      text: "A fair coin, flipped a hundred times over and over, lands sixty-two or more, or, since the test is two-sided, thirty-eight or fewer, two point one percent of the time. That's the p-value.",
       pauseAfter: 0.6,
     },
     {

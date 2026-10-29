@@ -238,10 +238,15 @@ export const KmeansScene: React.FC = () => {
               strokeDasharray="5 6"
             />
           </Svg>
+          {/* Above the ring, inside the plot: to its right it ran over the
+              plot's border. */}
           <Note
             at={startAt + 4}
-            x={at(sx, START[0]) + h(76)}
-            y={at(sy, START[1]) - h(16)}
+            x={at(sx, START[0]) - 130}
+            width={260}
+            y={at(sy, START[1]) - h(66) - h(44)}
+            from="up"
+            style={{ textAlign: "center" }}
           >
             <span
               style={{
@@ -338,7 +343,7 @@ export const KmeansScene: React.FC = () => {
             yFormat={(v) => (v ? `${v / 1000}k` : "0")}
             xTitle="k, the number of clusters"
             at={ssAt}
-            size={18}
+            size={19}
           />
           <Svg opacity={ease(frame, fallsAt - 2, 8)}>
             <defs>
@@ -473,7 +478,7 @@ export const KmeansScene: React.FC = () => {
                       textAlign: "center",
                       top: at(silY, 0) + 6,
                       opacity: p,
-                      ...label(18, INK_SOFT),
+                      ...label(19, INK_SOFT),
                       ...TABULAR,
                     }}
                   >

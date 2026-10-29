@@ -24,6 +24,7 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const rmseAt = c.w("r-metrics", "RMSE");
+  const squaresAt = c.w("r-metrics", "squares each miss");
   const dominateAt = c.w("r-metrics", "big misses dominate");
   const maeAt = c.w("r-mae", "MAE, mean absolute error");
   const unitsAt = c.w("r-mae", "Both are in the target's units");
@@ -33,9 +34,11 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
   const valuesAt = c.w("r-values", "they come to");
   const misses = METRICS.true.map((t, i) => Math.abs(t - METRICS.pred[i]));
   const big = Math.max(...misses);
+  // MAE's row comes first, as the plain reference "squared, the big misses
+  // dominate" is read against; it is marked when MAE's own turn comes.
   const rows = [
-    { name: "MAE adds the misses", vals: misses, at: maeAt },
-    { name: "RMSE squares them first", vals: misses.map((m) => m * m), at: rmseAt },
+    { name: "MAE adds the misses", vals: misses, at: rmseAt + 2 },
+    { name: "RMSE squares them first", vals: misses.map((m) => m * m), at: squaresAt },
   ];
   const W = R_END - R_X - 40;
   return (
@@ -50,7 +53,9 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
         let acc = 0;
         return (
           <React.Fragment key={r.name}>
-            <div style={{ position: "absolute", left: R_X + 40, top, ...note(25, INK), fontWeight: 650, opacity: p, whiteSpace: "nowrap" }}>{r.name}</div>
+            <div style={{ position: "absolute", left: R_X + 40, top, ...note(25, INK), fontWeight: 650, opacity: p, whiteSpace: "nowrap" }}>
+              {i === 0 ? <Mark at={maeAt}>{r.name}</Mark> : r.name}
+            </div>
             {r.vals.map((v, k) => {
               const left = R_X + 40 + (acc / total) * W * p;
               acc += v;
@@ -66,12 +71,11 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
                     width: Math.max(0, (v / total) * W * p - 4),
                     height: c.h(40),
                     background: lit > 0 ? `color-mix(in srgb, ${WARM} ${100 * lit}%, ${BAR})` : BAR,
-                    opacity: 0.85,
                     borderRadius: 2,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    ...label(18, PAPER),
+                    ...label(20, PAPER),
                     fontWeight: 700,
                     ...TABULAR,
                   }}
@@ -199,12 +203,15 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 15. Choosing between two models ─────────────────────────────────────────
 
 const Select: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const steps = [
     { text: "compare on validation data", at: c.w("r-select", "compare them on validation data") },
     { text: "with a metric that matches the goal", at: c.w("r-select", "a metric that matches the goal") },
     { text: "weigh speed, interpretability and cost", at: c.w("r-select", "weigh speed") },
   ];
-  const simplerAt = c.w("r-select", "take the simpler one");
+  const noiseAt = c.w("r-close", "If the gap is within its noise");
+  const simplerAt = c.w("r-close", "take the simpler one");
+  const testAt = c.w("r-close", "score the winner once");
   return (
     <>
       {steps.map((s, i) => (
@@ -215,9 +222,16 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
           </div>
         </Note>
       ))}
-      <Note at={simplerAt - 6} x={R_X + 40} y={c.y(380) + 3 * c.h(72) + c.h(20)}>
+      <Note at={noiseAt - 2} x={R_X + 40} y={c.y(380) + 3 * c.h(72) + c.h(20)}>
         <span style={{ ...note(32, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-          close? <Mark at={simplerAt}>take the simpler one</Mark>
+          gap within its noise? <span style={{ opacity: ease(frame, simplerAt - 4, 10) }}><Mark at={simplerAt}>take the simpler one</Mark></span>
+        </span>
+        <br />
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a paired bootstrap on held-out predictions measures that noise</span>
+      </Note>
+      <Note at={testAt - 2} x={R_X + 40} y={c.y(380) + 3 * c.h(72) + c.h(130)}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          then score the winner <b>once</b>, on the untouched test set
         </span>
       </Note>
     </>

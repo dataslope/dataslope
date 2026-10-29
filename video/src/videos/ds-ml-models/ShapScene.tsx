@@ -232,15 +232,16 @@ export const ShapScene: React.FC = () => {
           ))}
         </div>
         <Note at={asked + 6} x={X0 + 580} y={y(TABLE_TOP) + 5 * h(ROW) + h(8)}>
-          <span style={{ ...label(18, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
             distinct values
           </span>
         </Note>
-        <Note at={madeAt} x={X0} y={y(TABLE_TOP) + 6 * h(ROW) + h(6)}>
+        <Note at={asked + 6} x={X0} y={y(TABLE_TOP) + 6 * h(ROW) + h(6)}>
           <span
             style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
           >
-            made up for this video: {SHAP.n.toLocaleString("en-US")} customers
+            <Mark at={madeAt}>made up for this video</Mark>:{" "}
+            {SHAP.n.toLocaleString("en-US")} customers
           </span>
         </Note>
         <Note
@@ -395,7 +396,7 @@ export const ShapScene: React.FC = () => {
                 x={at(wx, v)}
                 y={y(WF_TOP) + 6 * h(WF_ROW) + 24}
                 textAnchor="middle"
-                style={{ ...label(18, INK_SOFT), ...TABULAR }}
+                style={{ ...label(19, INK_SOFT), ...TABULAR }}
               >
                 {fmt(v, 1)}
               </text>
@@ -409,7 +410,7 @@ export const ShapScene: React.FC = () => {
             b: base,
             at: avgAt,
             color: INK_SOFT,
-            text: fmt(base, 2),
+            text: fmt(base, 3),
           },
           ...segs.map((s) => ({
             name: s.name,
@@ -488,7 +489,7 @@ export const ShapScene: React.FC = () => {
         <Note at={finalAt + 8} x={WF_X} y={y(WF_TOP) + 6 * h(WF_ROW) + h(46)}>
           <span
             style={{
-              ...label(18, INK_SOFT),
+              ...label(20, INK_SOFT),
               whiteSpace: "nowrap",
               background: PAPER,
             }}
@@ -504,9 +505,7 @@ export const ShapScene: React.FC = () => {
           x={X0}
           y={y(BARS_TOP) + 4 * h(BAR_ROW) + h(4)}
         >
-          <span
-            style={{ ...label(20, INK), whiteSpace: "nowrap", ...TABULAR }}
-          >
+          <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>
             <span style={{ fontWeight: 650 }}>
               permutation importance, on held-out rows:
             </span>{" "}

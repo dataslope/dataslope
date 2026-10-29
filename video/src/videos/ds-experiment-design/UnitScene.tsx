@@ -79,6 +79,7 @@ export const UnitScene: React.FC = () => {
   const from = n.beat("unit").from;
   const qAt = n.word("unit", "Question");
   const textAt = n.word("unit", "What is the randomization unit");
+  const whyAt = n.word("unit", "why does it matter");
   const assignedAt = n.word("unit", "It's what gets assigned");
   const userAt = n.word("unit", "usually a user");
   const sessionAt = n.word("unit", "sometimes a session or a device");
@@ -99,7 +100,10 @@ export const UnitScene: React.FC = () => {
   const fixAt = n.word("unit-why", "An average per user fixes that");
   const clusterAt = n.word("unit-why", "clustered standard errors");
   const wrongAt = n.word("errors-in", "two ways to be wrong");
-  const clearAt = n.beat("errors-in").to - 6;
+  // The page holds through the pause and clears into the cut, so the next
+  // scene cross-fades in over it rather than over an empty page.
+  const nextAt = n.beat("errors").from;
+  const clearAt = nextAt - 14;
 
   const clear = 1 - ease(frame, clearAt, 10);
   const xOf = (v: number) => RIGHT_X + (v / BAR_MAX) * BAR_W;
@@ -120,9 +124,13 @@ export const UnitScene: React.FC = () => {
       <Sfx name="el-pop" at={naiveAt} level={-32} />
       <Sfx name="el-pop" at={userValAt} level={-32} />
 
-      <Drift from={from} to={n.beat("errors-in").to + 30}>
+      <Drift from={from} to={nextAt}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is the randomization unit, and why does it matter?
+          What is the randomization unit, and{" "}
+          <Mark at={whyAt} out={requestAt}>
+            why does it matter
+          </Mark>
+          ?
         </QuestionCard>
 
         {/* What gets assigned. */}

@@ -38,6 +38,9 @@ r["cond"] = {
     "even": even,
     "pSix": str(F(1, 6)),
     "pSixGivenEven": str(F(sum(1 for f in even if f == 6), len(even))),
+    # The definition with the die's own numbers: P(six and even) / P(even).
+    "pSixAndEven": str(F(sum(1 for f in even if f == 6), len(faces))),
+    "pEven": str(F(len(even), len(faces))),
 }
 
 # ── 3. The rare-disease test, the page's inputs, on 10,000 people ────────────
@@ -56,6 +59,8 @@ r["test"] = {
     "posterior": str(post), "posteriorFloat": round(float(post), 4),
     # The page's own block: sensitivity * prior / P(positive).
     "pageBlock": round(float(sens * prev / p_pos), 3),
+    # The other half of the pair: the share of the healthy the test clears.
+    "specificity": float(1 - fpr), "fpRate": float(fpr),
 }
 
 # ── 4. Independence: the Statistics course's 1,000 users ─────────────────────
@@ -181,7 +186,9 @@ r["cov"] = {
 win, p_win, lose = 10, F(1, 5), -3
 ev = p_win * win + (1 - p_win) * lose
 r["bet"] = {"win": win, "pWin": float(p_win), "lose": lose, "ev": float(ev),
-            "winPart": float(p_win * win), "losePart": float((1 - p_win) * lose)}
+            "winPart": float(p_win * win), "losePart": float((1 - p_win) * lose),
+            # Each payoff's weight, as the narration says it: a fifth, four fifths.
+            "pWinFrac": str(p_win), "pLoseFrac": str(1 - p_win)}
 
 json.dumps(r)
 `);

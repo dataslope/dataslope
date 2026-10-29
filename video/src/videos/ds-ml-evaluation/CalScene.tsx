@@ -20,7 +20,8 @@ const NOTE_X = 860;
  * what it says. The plain model near the line; the class-weighted one along
  * the floor (its 0.85 bin is 8.5% positive); then that same weighted curve
  * moves, bin by bin, onto its recalibrated self (Platt scaling), back on the
- * line, turning from red to green as it goes.
+ * line, turning from red to green as it goes. Last, how calibration is
+ * measured: this plot, a reliability diagram, or the Brier score.
  */
 export const CalScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -41,7 +42,10 @@ export const CalScene: React.FC = () => {
   const fitAt = n.word("cal-curve", "Fit a calibration on held-out data");
   const plattAt = n.word("cal-curve", "Platt scaling");
   const lineAt = n.word("cal-curve", "back on the line");
-  const end = n.beat("cal-curve").to;
+  const diagramAt = n.word("cal-measure", "a reliability diagram");
+  const brierAt = n.word("cal-measure", "the Brier score");
+  const squaredAt = n.word("cal-measure", "the mean squared error");
+  const end = n.beat("cal-measure").to;
 
   const xs: Scale = { lo: 0, hi: 1, a: PLOT.left, b: PLOT.right };
   const ys: Scale = { lo: 0, hi: 1, a: y(PLOT.bottom), b: y(PLOT.top) };
@@ -148,11 +152,26 @@ export const CalScene: React.FC = () => {
             <b style={{ color: OK_INK }}>class-weighted, recalibrated</b> on held-out data
           </span>
           <br />
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, plattAt - 2, 10) }}>Platt scaling or isotonic regression</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, plattAt - 2, 10) }}>
+            Platt scaling (a logistic fit on the scores) or isotonic regression
+          </span>
         </Note>
         <Note at={lineAt - 2} x={NOTE_X} y={y(792)}>
           <span style={{ ...note(30, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={lineAt + 4}>back on the line</Mark>
+          </span>
+        </Note>
+
+        {/* ── How it is measured: this plot, or one number ── */}
+        <Note at={diagramAt - 2} x={PLOT.left} y={y(PLOT.top) - h(80)}>
+          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <Mark at={diagramAt + 4}>a reliability diagram</Mark>
+          </span>
+        </Note>
+        <Note at={brierAt - 2} x={NOTE_X} y={y(850)}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            or the <b>Brier score</b>
+            <span style={{ opacity: ease(frame, squaredAt - 2, 10) }}>: the mean squared error of the probabilities</span>
           </span>
         </Note>
       </Drift>

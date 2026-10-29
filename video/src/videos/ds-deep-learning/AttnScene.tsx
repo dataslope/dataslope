@@ -29,8 +29,9 @@ const QKV = [
 ];
 
 /**
- * Question 12: the formula, its parts marked as they are named; four tokens
- * each making a query, a key and a value; their scores, then the softmaxed
+ * Question 12: the formula, its parts marked as they are named, with where
+ * Q, K and V come from (three learned matrices) and what d is; four tokens
+ * each making a query, a key and a value; their dot-product scores, then the softmaxed
  * weights as a heat map whose rows each add to 1.00; and one row's output
  * spelled out as its blend of the four values, then every row at once.
  * The vectors are random, length four (check.mjs), so the weights mean
@@ -44,11 +45,13 @@ export const AttnScene: React.FC = () => {
   const from = n.beat("attn").from;
   const qAt = n.word("attn", "Question twelve");
   const textAt = n.word("attn", "What is self-attention");
-  const makesAt = n.word("attn", "Each token makes a query");
-  const scoreAt = n.word("attn", "Score every query against every key");
-  const rootAt = n.word("attn", "divide by the square root");
-  const saturateAt = n.word("attn", "doesn't saturate");
-  const softAt = n.word("attn", "softmax each row into weights");
+  const makesAt = n.word("attn-qkv", "Three learned matrices");
+  const scoreAt = n.word("attn-score", "Score every query against every key");
+  const dotAt = n.word("attn-score", "with a dot product");
+  const rootAt = n.word("attn-score", "Divide by the square root of d");
+  const entriesAt = n.word("attn-score", "the number of entries in each");
+  const oneKeyAt = n.word("attn-score", "all its weight on one key");
+  const softAt = n.word("attn-score", "softmax each row into weights");
   const hereAt = n.word("attn-grid", "Here are four tokens");
   const rowAt = n.word("attn-grid", "Every row adds up to one");
   const blendAt = n.word("attn-grid", "its row's blend of all four values");
@@ -82,8 +85,14 @@ export const AttnScene: React.FC = () => {
             <Mark at={softAt}>)</Mark> V
           </span>
         </Note>
-        <Note at={saturateAt - 2} x={X0 + 560} y={y(306)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the √d keeps the softmax from saturating</span>
+        <Note at={makesAt} x={X0 + 560} y={y(290)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Q, K, V: each token&apos;s vector × three learned matrices</span>
+        </Note>
+        <Note at={entriesAt - 2} x={X0 + 560} y={y(326)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
+            d = {A.d}, the entries in each q and k;{" "}
+            <span style={{ opacity: ease(frame, oneKeyAt - 2, 10) }}>√d keeps the softmax from putting all its weight on one key</span>
+          </span>
         </Note>
 
         {/* ── Four tokens, each with a query, a key and a value ── */}
@@ -129,10 +138,10 @@ export const AttnScene: React.FC = () => {
           format={(v) => v.toFixed(2)}
           fill={{ color: OK, at: softAt + 6, max: 0.8 }}
         />
-        <Tagline x={GX} y={rowY(4) + h(10)} width={4 * GW} align="center" at={scoreAt + 6} out={softAt} size={19}>
-          each query against each key
+        <Tagline x={GX + 2 * GW} y={rowY(4) + h(10)} width={4 * GW} align="center" at={scoreAt + 6} out={softAt} size={19}>
+          each query against each key<span style={{ opacity: ease(frame, dotAt - 2, 10) }}>, by dot product</span>
         </Tagline>
-        <Tagline x={GX} y={rowY(4) + h(10)} width={4 * GW} align="center" at={softAt + 6} size={19}>
+        <Tagline x={GX + 2 * GW} y={rowY(4) + h(10)} width={4 * GW} align="center" at={softAt + 6} size={19}>
           weights: how much each token takes from each
         </Tagline>
         {A.roundedSums.map((s, i) => (
@@ -178,7 +187,7 @@ export const AttnScene: React.FC = () => {
             <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>
               <span style={{ display: "inline-block", width: 28 }}>{j > 0 ? "+" : ""}</span>
               <b style={{ color: OK_INK }}>{A.weights[PICK][j].toFixed(2)}</b> × <span style={{ fontFamily: MONO, fontSize: 23, color: BLUE_INK }}>v</span>
-              <span style={{ ...label(18, INK_SOFT) }}>({t})</span>
+              <span style={{ ...label(20, INK_SOFT) }}>({t})</span>
             </span>
           </Note>
         ))}

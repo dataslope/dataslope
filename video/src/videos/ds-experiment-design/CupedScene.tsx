@@ -5,7 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CUPED } from "./data";
@@ -15,6 +15,10 @@ const BOX = { left: 190, right: 1010, top: 380, bottom: 820 };
 const COL_X = 1140;
 const BAR_W = 560;
 const VAR_MAX = 9;
+/** The shared Axes' title face (its `tickText(19)`, set bold), drawn here so
+ *  the titles can name X and Y in the formula's mono and switch to Y_adj. */
+const AXIS_TITLE: React.CSSProperties = { fontFamily: SANS, fontSize: 19, fontWeight: 650, fill: INK_SOFT };
+const AXIS_LETTER: React.CSSProperties = { fontFamily: MONO, fontWeight: 700, fill: INK };
 
 /** The name, with each of its initials marked as it is read. */
 const WORDS = [
@@ -30,7 +34,9 @@ const WORDS = [
  * against their value during the test, the fitted slope theta through the
  * means, then every point lowered by theta times its distance from the
  * pre-period average, so the cloud flattens onto the same mean. The
- * variance falls from 8.09 to 3.52; the mean does not move.
+ * variance falls from 8.09 to 3.52; the mean does not move. The share it
+ * loses is the squared correlation of X and Y (0.75), and the axes are named
+ * X and Y, then Y_adj, so the formula's letters land on the plot.
  */
 export const CupedScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -53,7 +59,9 @@ export const CupedScene: React.FC = () => {
   const averageAt = n.word("cuped-var", "The average stays");
   const noiseAt = n.word("cuped-var", "Only the noise shrinks");
   const halfAt = n.word("cuped-var", "less than half the users");
-  const end = n.beat("cuped-var").to;
+  const shareAt = n.word("cuped-r", "the squared correlation");
+  const seventyFiveAt = n.word("cuped-r", "point seven five squared");
+  const end = n.beat("cuped-r").to;
 
   const xs: Scale = { lo: -2, hi: 20, a: BOX.left, b: BOX.right };
   const ys: Scale = { lo: -2, hi: 16, a: y(BOX.bottom), b: y(BOX.top) };
@@ -64,6 +72,9 @@ export const CupedScene: React.FC = () => {
   const lineAt = (x: number) => CUPED.meanY + slope * (x - CUPED.meanX);
   const meanP = ease(frame, averageAt - 2, 14);
   const letterAts = [nameAt, nameAt + 10, dataAt - 6, dataAt, dataAt + 10];
+  // The y axis is Y until the cloud is flattened, then Y_adj.
+  const adjTitle = ease(frame, thetaAt + 20, 12);
+  const titlesP = ease(frame, beforeAt, 12);
 
   const bars = [
     { text: "variance of Y", v: CUPED.varY, at: fromAt, color: BAR, ink: BLUE_INK },
@@ -100,10 +111,20 @@ export const CupedScene: React.FC = () => {
           y={ys}
           xTicks={[0, 5, 10, 15, 20]}
           yTicks={[0, 5, 10, 15]}
-          xTitle="each user before the test"
-          yTitle="the same user during it"
           at={beforeAt - 6}
         />
+        {/* The axis titles name X and Y, so the formula's letters land on the plot. */}
+        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: titlesP }}>
+          <text x={BOX.right} y={y(BOX.bottom) + 58} textAnchor="end" style={AXIS_TITLE}>
+            <tspan style={AXIS_LETTER}>X</tspan>: each user before the test
+          </text>
+          <text x={BOX.left - 14} y={y(BOX.top) - 26} textAnchor="start" style={AXIS_TITLE} opacity={1 - adjTitle}>
+            <tspan style={AXIS_LETTER}>Y</tspan>: the same user during it
+          </text>
+          <text x={BOX.left - 14} y={y(BOX.top) - 26} textAnchor="start" style={AXIS_TITLE} opacity={adjTitle}>
+            <tspan style={AXIS_LETTER}>Y_adj</tspan>: during it, adjusted
+          </text>
+        </svg>
         <Svg opacity={shown}>
           {CUPED.points.map(([x, yv, adj], i) => (
             <circle key={i} cx={at(xs, x)} cy={at(ys, yv + (adj - yv) * adjust)} r={4.2} fill={BAR} opacity={0.5} />
@@ -122,7 +143,7 @@ export const CupedScene: React.FC = () => {
         <Svg opacity={meanP}>
           <line x1={BOX.left} x2={BOX.right} y1={at(ys, CUPED.meanY)} y2={at(ys, CUPED.meanY)} stroke={OK} strokeWidth={2.4} strokeDasharray="8 6" />
         </Svg>
-        <Note at={predictsAt + 4} x={at(xs, -1)} y={at(ys, 15)} out={thetaAt + 6}>
+        <Note at={predictsAt + 4} x={at(xs, -1)} y={at(ys, 15)} dim={thetaAt + 6}>
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>slope θ = {CUPED.theta}</span>
         </Note>
 
@@ -163,6 +184,14 @@ export const CupedScene: React.FC = () => {
         </Note>
         <Note at={halfAt - 2} x={COL_X} y={y(826)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>same power, under half the users</span>
+        </Note>
+        <Note at={shareAt - 2} x={COL_X} y={y(880)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            share removed = r²
+            <span style={{ opacity: ease(frame, seventyFiveAt - 2, 10) }}>
+              , with r(X, Y) = <span style={TABULAR}>{CUPED.corr.toFixed(2)}</span>
+            </span>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

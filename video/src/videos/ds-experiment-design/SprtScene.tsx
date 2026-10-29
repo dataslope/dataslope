@@ -50,7 +50,10 @@ export const SprtScene: React.FC = () => {
   const classicAt = n.word("sprt-limit", "the classic SPRT holds only");
   const liveAt = n.word("sprt-limit", "for a live product metric");
   const cheaperAt = n.word("cuped-in", "makes every test cheaper");
-  const clearAt = n.beat("cuped-in").to - 6;
+  // The page holds through the pause and clears into the cut, so the next
+  // scene cross-fades in over it rather than over an empty page.
+  const nextAt = n.beat("cuped").from;
+  const clearAt = nextAt - 14;
 
   const clear = 1 - ease(frame, clearAt, 10);
   const xs: Scale = { lo: 0, hi: PAIRS, a: BOX.left, b: BOX.right };
@@ -77,7 +80,7 @@ export const SprtScene: React.FC = () => {
       <Sfx name="el-tap" at={wrongAt} level={-36} />
       <Sfx name="el-pop" at={pairsAt} level={-32} />
 
-      <Drift from={from} to={n.beat("cuped-in").to + 30}>
+      <Drift from={from} to={nextAt}>
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={58}>
           What is a sequential probability ratio test (SPRT)?
         </QuestionCard>

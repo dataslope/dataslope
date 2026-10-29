@@ -169,7 +169,7 @@ export const AnovaScene: React.FC = () => {
           })}
         </Svg>
         <Note at={tenAt} x={SIDE_X} y={y(712)}>
-          <div style={{ ...noteText(24, INK), lineHeight: 1.4, ...TABULAR }}>
+          <div style={{ ...noteText(24, INK), lineHeight: 1.4 }}>
             10 t-tests,
             <br />5 identical groups
           </div>

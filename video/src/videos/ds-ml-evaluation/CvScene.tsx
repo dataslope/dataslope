@@ -81,6 +81,7 @@ export const CvScene: React.FC = () => {
   const reportAt = n.word("split", "to report");
   const peekAt = n.word("split", "Every choice made by looking");
   const flatterAt = n.word("split", "flatter you");
+  const onceTestAt = n.word("split", "once, at the end");
   const pictureAt = n.word("learn-in", "a picture tells you");
   const end = n.beat("learn-in").to;
 
@@ -264,68 +265,71 @@ export const CvScene: React.FC = () => {
 
         {/* ── Question 6: three sets, three jobs ── */}
         <Fade from={q6At + 4} out={end - 8}>
-          {segs.map((s) => {
-            const p = ease(frame, s.at - 4, 14);
-            return (
-              <React.Fragment key={s.name}>
-                <div
-                  style={{
-                    position: "absolute",
-                    left: s.left + 3,
-                    top: barTop,
-                    width: (s.width - 6) * p,
-                    height: barH,
-                    boxSizing: "border-box",
-                    background: s.fill,
-                    border: `2px solid ${s.color}`,
-                    borderRadius: 4,
-                  }}
-                />
-                <Note at={s.at - 2} x={s.left + 14} y={barTop + h(22)}>
-                  <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.name}</span>
-                </Note>
-                <Note at={s.at + 4} x={s.left + 14} y={barTop + barH + h(18)}>
-                  <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-                    {s.name === "test" ? (
-                      <>
-                        <Mark at={pictureAt - 6}>once</Mark>, <span style={{ opacity: ease(frame, reportAt - 2, 10) }}>to report</span>
-                      </>
-                    ) : s.name === "validation" ? (
-                      <>
-                        tune and choose
-                        <br />
-                        <span style={{ ...note(22, INK_SOFT) }}>or cross-validate</span>
-                      </>
-                    ) : (
-                      s.role
-                    )}
-                  </span>
-                </Note>
-              </React.Fragment>
-            );
-          })}
-          {/* The peek: a score read off the test set, fed back into the choice. */}
-          <ElbowArrow
-            points={[
-              [testSeg.left + testSeg.width / 2, barTop - 14],
-              [testSeg.left + testSeg.width / 2, barTop - h(80)],
-              [valSeg.left + valSeg.width / 2, barTop - h(80)],
-              [valSeg.left + valSeg.width / 2, barTop - 14],
-            ]}
-            at={peekAt}
-            color={ACCENT}
-            width={2.8}
-          />
-          <Note at={peekAt + 8} x={valSeg.left + 40} y={barTop - h(130)}>
-            <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>
-              <Strike at={flatterAt - 4} color={ACCENT} top="0.78em">
-                choosing by the test score
-              </Strike>
-            </span>
-          </Note>
-          <Note at={flatterAt} x={SPLIT.left} y={barTop + barH + h(150)}>
-            <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Peek, and the test score flatters you.</span>
-          </Note>
+          {/* Set back on the bridge, which moves on to the next question. */}
+          <div style={{ opacity: 1 - 0.45 * ease(frame, pictureAt, 16) }}>
+            {segs.map((s) => {
+              const p = ease(frame, s.at - 4, 14);
+              return (
+                <React.Fragment key={s.name}>
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: s.left + 3,
+                      top: barTop,
+                      width: (s.width - 6) * p,
+                      height: barH,
+                      boxSizing: "border-box",
+                      background: s.fill,
+                      border: `2px solid ${s.color}`,
+                      borderRadius: 4,
+                    }}
+                  />
+                  <Note at={s.at - 2} x={s.left + 14} y={barTop + h(22)}>
+                    <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.name}</span>
+                  </Note>
+                  <Note at={s.at + 4} x={s.left + 14} y={barTop + barH + h(18)}>
+                    <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+                      {s.name === "test" ? (
+                        <>
+                          <Mark at={onceTestAt}>once</Mark>, <span style={{ opacity: ease(frame, reportAt - 2, 10) }}>to report</span>
+                        </>
+                      ) : s.name === "validation" ? (
+                        <>
+                          tune and choose
+                          <br />
+                          <span style={{ ...note(22, INK_SOFT) }}>or cross-validate</span>
+                        </>
+                      ) : (
+                        s.role
+                      )}
+                    </span>
+                  </Note>
+                </React.Fragment>
+              );
+            })}
+            {/* The peek: a score read off the test set, fed back into the choice. */}
+            <ElbowArrow
+              points={[
+                [testSeg.left + testSeg.width / 2, barTop - 14],
+                [testSeg.left + testSeg.width / 2, barTop - h(80)],
+                [valSeg.left + valSeg.width / 2, barTop - h(80)],
+                [valSeg.left + valSeg.width / 2, barTop - 14],
+              ]}
+              at={peekAt}
+              color={ACCENT}
+              width={2.8}
+            />
+            <Note at={peekAt + 8} x={valSeg.left + 40} y={barTop - h(130)}>
+              <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>
+                <Strike at={flatterAt - 4} color={ACCENT} top="0.78em">
+                  choosing by the test score
+                </Strike>
+              </span>
+            </Note>
+            <Note at={flatterAt} x={SPLIT.left} y={barTop + barH + h(150)}>
+              <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Peek, and the test score flatters you.</span>
+            </Note>
+          </div>
         </Fade>
       </Drift>
     </AbsoluteFill>

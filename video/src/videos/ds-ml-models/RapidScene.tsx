@@ -57,7 +57,6 @@ const Line: React.FC<{
         ...note(size, color),
         fontWeight: weight,
         whiteSpace: "nowrap",
-        ...TABULAR,
       }}
     >
       {children}
@@ -128,6 +127,9 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ opacity: ease(frame, fewAt, 10) }}>
           , copes better with few labels
         </span>
+      </Line>
+      <Line at={c.w("r-gen-more", "With plenty of labels")} top={c.y(700)}>
+        with plenty of labels, discriminative usually wins
       </Line>
     </>
   );
@@ -257,7 +259,7 @@ const Encode: React.FC<{ c: Ctx }> = ({ c }) => {
               style={{
                 width: j ? colW : 110,
                 fontFamily: MONO,
-                fontSize: i === 0 ? 18 : 20,
+                fontSize: i === 0 ? 19 : 20,
                 fontWeight: i === 0 || cell === "1" ? 700 : 500,
                 color: cell === "1" ? BLUE_INK : i === 0 ? INK : INK_SOFT,
                 fontVariantLigatures: "none",
@@ -305,7 +307,7 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
       at: c.w("r-select", "Embedded methods select while training"),
     },
   ];
-  const keepsAt = c.w("r-select", "keeps five of the thirty");
+  const keepsAt = c.w("r-select-rfe", "Asked for five");
   return (
     <>
       {kinds.map((k, i) => (
@@ -317,8 +319,8 @@ const Select: React.FC<{ c: Ctx }> = ({ c }) => {
         </Note>
       ))}
       <Line at={keepsAt} top={c.y(540)} weight={650}>
-        RFE (recursive feature elimination) keeps {RFE.names.length} of {RFE.of}
-        :
+        RFE (recursive feature elimination), asked for {RFE.names.length} of{" "}
+        {RFE.of}, keeps:
       </Line>
       {RFE.names.map((name, i) => (
         <Note

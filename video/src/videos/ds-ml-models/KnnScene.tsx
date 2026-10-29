@@ -104,8 +104,12 @@ export const KnnScene: React.FC = () => {
   const out1 = tradeAt - 2;
   const qx = at(bx, VOTE.q[0]);
   const qy = at(by, VOTE.q[1]);
-  const ringR =
-    (at(bx, VOTE.q[0] + VOTE.radius) - qx) * ease(frame, closestAt, 16);
+  // The neighbors' radius in data units, through each axis's own scale: the
+  // y scale is denser than x, so a circle in pixels left the top ones out.
+  // Padded past the fifteenth neighbor, which sits exactly at that radius.
+  const ring = ease(frame, closestAt, 16);
+  const ringRx = (at(bx, VOTE.q[0] + VOTE.radius) - qx + 12) * ring;
+  const ringRy = (qy - at(by, VOTE.q[1] + VOTE.radius) + 12) * ring;
 
   const panels = [
     {
@@ -164,10 +168,11 @@ export const KnnScene: React.FC = () => {
           out={out1}
         />
         <Svg opacity={ease(frame, closestAt, 12) * (1 - ease(frame, out1, 10))}>
-          <circle
+          <ellipse
             cx={qx}
             cy={qy}
-            r={Math.max(0, ringR)}
+            rx={Math.max(0, ringRx)}
+            ry={Math.max(0, ringRy)}
             fill="none"
             stroke={INK}
             strokeWidth={1.6}

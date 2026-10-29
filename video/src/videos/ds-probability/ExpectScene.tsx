@@ -48,10 +48,12 @@ export const ExpectScene: React.FC = () => {
   const evenWhenAt = n.word("linear", "even when the parts depend");
   const tenAt = n.word("linear-hats", "Ten people");
   const randomAt = n.word("linear-hats", "at random");
-  const chanceAt = n.word("linear-hats", "one in ten chance");
-  const ownAt = n.word("linear-hats", "getting their own");
-  const oneAt = n.word("linear-hats", "exactly one does");
-  const shufflesAt = n.word("linear-hats", "A hundred thousand shuffles");
+  const indicatorAt = n.word("linear-each", "an indicator");
+  const ownAt = n.word("linear-each", "their own hat");
+  const chanceAt = n.word("linear-each", "one in ten chance");
+  const dependAt = n.word("linear-each", "depend on each other");
+  const oneAt = n.word("linear-each", "exactly one does");
+  const shufflesAt = n.word("linear-sim", "A hundred thousand shuffles");
   const varAt = n.word("linear-var", "Variance only adds up");
   const uncorrAt = n.word("linear-var", "uncorrelated");
   const nowAt = n.word("dist-in", "Now");
@@ -150,11 +152,13 @@ export const ExpectScene: React.FC = () => {
             <Note at={squaredAt + 8 + i * 2} x={SQ.x0 + i * SQ.pitch} width={SQ.w} y={y(SQ.base) + 10} out={out6} from="up" style={{ textAlign: "center" }}>
               <span style={{ ...label(22, INK_SOFT), ...TABULAR }}>{i + 1}</span>
             </Note>
+            {/* A bar whose top sits just under the variance line (2.25) takes
+                its value inside, so the dashed line crosses no figure. */}
             <Note
               at={i === 0 || i === 5 ? quarterSixAt + 2 : i === 2 || i === 3 ? quarterAt + 2 : averagedAt - 6}
               x={SQ.x0 + i * SQ.pitch - 20}
               width={SQ.w + 40}
-              y={y(SQ.base) - h(s * SQ.unit) - 34}
+              y={y(SQ.base) - h(s * SQ.unit) + (s > 1 && s < DIE.varFloat ? 8 : -34)}
               out={out6}
               from="up"
               style={{ textAlign: "center" }}
@@ -163,6 +167,28 @@ export const ExpectScene: React.FC = () => {
             </Note>
           </React.Fragment>
         ))}
+        {/* The definition the bars compute, in both forms the page gives. */}
+        <Ink at={squaredAt + 2} dur={22} out={out6} style={{ left: X0, top: y(760) }}>
+          <span style={math(36)}>
+            Var(<V>X</V>) ={" "}
+            <E>
+              (<V>X</V> −{" "}
+              <E>
+                <V>X</V>
+              </E>
+              )²
+            </E>{" "}
+            ={" "}
+            <E>
+              <V>X</V>²
+            </E>{" "}
+            −{" "}
+            <E>
+              <V>X</V>
+            </E>
+            ²
+          </span>
+        </Ink>
         <Note at={squaredAt} x={SQ.x0 - 20} y={y(360)} out={out6}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>squared distance from 3.5</span>
         </Note>
@@ -193,7 +219,15 @@ export const ExpectScene: React.FC = () => {
             </span>
           </Ink>
           <Note at={evenWhenAt} x={X0 + 640} y={y(334)}>
-            <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>even when the parts depend on each other</span>
+            <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+              <Mark at={dependAt}>even when the parts depend on each other</Mark>
+            </span>
+          </Note>
+          {/* Each person is an indicator: the count of matches is their sum. */}
+          <Note at={indicatorAt} x={X0} y={y(418)}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+              each person is an indicator: <span style={TABULAR}>1</span> if they get their own hat, <span style={TABULAR}>0</span> if not
+            </span>
           </Note>
 
           <Svg opacity={ease(frame, tenAt - 4, 12)}>

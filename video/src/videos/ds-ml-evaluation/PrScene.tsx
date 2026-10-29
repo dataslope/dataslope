@@ -90,7 +90,7 @@ export const PrScene: React.FC = () => {
 
         {/* ── Both, against the threshold ── */}
         <PanelTitle x={PLOT.left} y={y(PLOT.top) - h(44)} at={casesAt - 2}>
-          {CLS.test.toLocaleString("en-US")} cases, {Math.round(CLS.prevalence * 100)}% of them positive
+          {CLS.test.toLocaleString("en-US")} simulated cases, {Math.round(CLS.prevalence * 100)}% of them positive
         </PanelTitle>
         <Axes
           x={xs}
@@ -155,6 +155,11 @@ export const PrScene: React.FC = () => {
         <Note at={f1At - 2} x={RIGHT_X} y={y(800)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             <b>F1</b>: the harmonic mean of the two
+          </span>
+          <br />
+          {/* The harmonic mean, written out: it sits near the smaller of the two. */}
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, f1At + 20, 10) }}>
+            2 × precision × recall ÷ (precision + recall)
           </span>
         </Note>
       </Drift>

@@ -23,10 +23,11 @@ const WHY_Y = 380;
 const WHY_ROW = 64;
 
 /**
- * Question 10 on one batch of eight pre-activations (mean 6.58, spread
- * 1.75): the dots drop onto a second line at mean zero and spread one, then
- * onto a third, scaled by gamma and shifted by beta (2 and 1, for the
- * picture). Then why it helps, a tick a reason.
+ * Question 10 on one unit's pre-activations across a batch of eight (mean
+ * 6.58, standard deviation 1.75): the dots drop onto a second line at mean
+ * zero and spread one, then onto a third, scaled by gamma and shifted by beta
+ * (2 and 1, for the picture), leaving a ghost on each line they leave. Then
+ * why it helps, a tick a reason.
  */
 export const BnScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -36,12 +37,13 @@ export const BnScene: React.FC = () => {
   const from = n.beat("bn").from;
   const qAt = n.word("bn", "Question ten");
   const textAt = n.word("bn", "What is batch normalization");
-  const eachAt = n.word("bn", "For each mini-batch");
-  const scalesAt = n.word("bn", "shifts and scales a layer's inputs");
-  const meanAt = n.word("bn", "a mean of six point six");
-  const zeroAt = n.word("bn", "After normalizing, zero");
-  const gammaAt = n.word("bn", "gamma and beta");
-  const wantsAt = n.word("bn", "the network actually wants");
+  const eachAt = n.word("bn-each", "For each unit");
+  const acrossAt = n.word("bn-each", "across the mini-batch");
+  const scalesAt = n.word("bn-each", "shifts and scales the unit's inputs");
+  const meanAt = n.word("bn-mean", "a mean of six point six");
+  const zeroAt = n.word("bn-mean", "After normalizing, zero");
+  const gammaAt = n.word("bn-mean", "gamma and beta");
+  const wantsAt = n.word("bn-mean", "the network actually wants");
   const reasons = [
     { text: "steadier training", at: n.word("bn-why", "It steadies training") },
     { text: "larger learning rates", at: n.word("bn-why", "tolerates larger learning rates") },
@@ -50,14 +52,11 @@ export const BnScene: React.FC = () => {
     { text: "transformers: layer norm, per example", at: n.word("bn-why", "Transformers use layer norm") },
   ];
   const archInAt = n.word("arch-in", "The last two long ones");
-  // The page clears on the bridge's last word, so the gap before question 11 stays short.
-  const shapeAt = n.beat("arch-in").to - 4;
   const end = n.beat("arch-in").to;
 
   const pos = (line: number, v: number) => LEFT + ((v - LINES[line].lo) / (LINES[line].hi - LINES[line].lo)) * (RIGHT - LEFT);
   const toNormed = ease(frame, zeroAt - 6, 24);
   const toOut = ease(frame, gammaAt + 2, 24);
-  const out = shapeAt;
 
   return (
     <AbsoluteFill>
@@ -70,11 +69,13 @@ export const BnScene: React.FC = () => {
       ))}
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} out={out} size={60}>
+        {/* Held to the cut, as every other scene is: clearing on the bridge's
+            last word left a blank page through the gap. */}
+        <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={60}>
           What is batch normalization, and why does it help?
         </QuestionCard>
 
-        <Fade from={from} out={out}>
+        <Fade from={from}>
           {LINES.map((line, i) => {
             const shown = [eachAt - 2, scalesAt, gammaAt - 2][i];
             const p = ease(frame, shown, 16);
@@ -95,7 +96,11 @@ export const BnScene: React.FC = () => {
             );
           })}
           <Tagline x={X0} y={y(LINES[0].y) - h(62)} at={eachAt} size={22} color={INK}>
-            one mini-batch, as it arrives
+            {/* Words, so not tabular: that sets the hyphen a digit wide. */}
+            <span style={{ fontVariantNumeric: "normal" }}>
+              one unit&apos;s input,{" "}
+              <span style={{ opacity: ease(frame, acrossAt - 2, 10) }}>across a mini-batch of {BN.batch.length} examples</span>
+            </span>
           </Tagline>
           <Tagline x={X0} y={y(LINES[1].y) - h(62)} at={scalesAt + 2} size={22} color={INK}>
             normalized: mean 0, variance 1
@@ -138,13 +143,16 @@ export const BnScene: React.FC = () => {
               return (
                 <g key={i}>
                   <circle cx={x0} cy={y0} r={8} fill={BAR} opacity={0.25 * toNormed} />
+                  <circle cx={x1} cy={y1} r={8} fill={BAR} opacity={0.25 * toOut} />
                   <circle cx={xNow} cy={yNow} r={10 * p} fill={lit > 0 ? `color-mix(in srgb, ${OK} ${lit * 100}%, ${BAR})` : BAR} opacity={0.85} />
                 </g>
               );
             })}
           </Svg>
           <Tagline x={RIGHT + 20} y={y(LINES[0].y) - h(26)} at={meanAt + 6} size={20} color={BLUE_INK}>
-            spread {BN.sd}
+            standard deviation
+            <br />
+            {BN.sd}
           </Tagline>
 
           {/* ── Why it helps ── */}

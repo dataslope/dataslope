@@ -3120,6 +3120,8 @@
  "epoch": {
   "n": 10000,
   "batch": 32,
-  "iterations": 313
+  "iterations": 313,
+  "exact": 312.5,
+  "lastBatch": 16
  }
 }

@@ -171,8 +171,12 @@ export const RegScene: React.FC = () => {
             here {Math.round(REG.enetL1Ratio * 100)}% L1 and {Math.round((1 - REG.enetL1Ratio) * 100)}% L2
           </span>
         </Note>
-        <Note at={tenAt - 2} x={RIDGE.left} y={y(326)} out={q4At - 4}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>ten measurements from a diabetes study, one line each</span>
+        {/* Up as the first paths draw, so the lines are never unexplained;
+            the narration names them a few seconds later. */}
+        <Note at={ridgeNameAt - 2} x={RIDGE.left} y={y(326)} out={q4At - 4}>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            <Mark at={tenAt}>ten measurements</Mark> from a diabetes study, one line each
+          </span>
         </Note>
 
         {/* ── Ridge: everything shrinks, nothing leaves ── */}

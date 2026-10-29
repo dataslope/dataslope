@@ -64,6 +64,7 @@ export const SampleScene: React.FC = () => {
   const spreadAt = n.word("sampling", "Its spread is the standard error");
   const simAt = n.word("sampling", "point seven oh");
   const formulaAt = n.word("sampling", "point seven one");
+  const byFormulaAt = n.word("sampling", "by the formula");
   const end = n.beat("sampling").to;
 
   const S = SAMPLE;
@@ -148,10 +149,12 @@ export const SampleScene: React.FC = () => {
         <Note at={popAt + 6} x={x(13)} y={popBase - h(150)}>
           <span style={{ ...partLabel(22, INK_SOFT) }}>the population, simulated</span>
         </Note>
+        {/* The parameter's line runs through everything, in two pieces so
+            it skips the population axis's "5" rather than striking it. */}
         <VLine
           x={x(S.mu)}
           top={popBase - h(POP_H) - h(14)}
-          bottom={pileBase}
+          bottom={popBase}
           at={trueAt}
           color={INK}
           dash="7 6"
@@ -163,6 +166,7 @@ export const SampleScene: React.FC = () => {
           }
           labelY={popBase - h(POP_H) - h(30)}
         />
+        <VLine x={x(S.mu)} top={popBase + h(36)} bottom={pileBase} at={trueAt + 10} color={INK} dash="7 6" width={2.4} />
 
         {/* ── One sample of 50, and its mean: the statistic ── */}
         <Svg>
@@ -281,7 +285,9 @@ export const SampleScene: React.FC = () => {
           color={OK}
           width={2.6}
         />
-        <Note at={drawAt + 2} x={x(9)} y={pileBase - h(150)}>
+        {/* Question 3's notes stand in the column Question 2 used, beside
+            the pile, so the narrow bell keeps the chart to itself. */}
+        <Note at={drawAt + 2} x={RIGHT_X} y={y(706)}>
           <span style={{ ...noteText(26, INK), ...TABULAR }}>
             <b>{shown.toLocaleString("en-US")}</b> sample means, each of 50 values
           </span>
@@ -289,19 +295,21 @@ export const SampleScene: React.FC = () => {
         <Note at={lopsidedAt} x={x(13)} y={popBase - h(108)}>
           <span style={{ ...noteText(24, INK_SOFT) }}>lopsided</span>
         </Note>
-        <Note at={bellAt + 2} x={x(9)} y={pileBase - h(104)}>
+        <Note at={bellAt + 2} x={RIGHT_X} y={y(762)}>
           <span style={{ ...noteText(24, OK_INK) }}>a narrow bell around 5</span>
         </Note>
         <Bracket x0={seX0} x1={seX1} y={pileBase - h(PILE_H) - h(14)} at={spreadAt} up />
-        <Note at={spreadAt + 4} x={x(9)} y={pileBase - h(58)}>
-          <span style={{ ...noteText(26, INK), ...TABULAR }}>
-            its spread is the SE: <Mark at={simAt}>{fmt(S.seSimulated, 2)}</Mark>{" "}
-            <span style={{ ...label(20, INK_SOFT) }}>simulated</span>
+        <Note at={spreadAt + 4} x={RIGHT_X} y={y(818)}>
+          <div style={{ ...noteText(26, INK), ...TABULAR, lineHeight: 1.45 }}>
+            its spread is the SE:
+            <br />
+            <Mark at={simAt}>{fmt(S.seSimulated, 2)}</Mark> <span style={{ ...label(20, INK_SOFT) }}>simulated</span>
             <span style={{ opacity: ease(frame, formulaAt - 2, 10) }}>
               {" "}
-              · <Mark at={formulaAt}>{fmt(S.seFormula, 2)}</Mark> <span style={{ ...label(20, INK_SOFT) }}>by the formula</span>
+              · <Mark at={formulaAt}>{fmt(S.seFormula, 2)}</Mark>{" "}
+              <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, byFormulaAt - 2, 12) }}>by the formula</span>
             </span>
-          </span>
+          </div>
         </Note>
       </Drift>
     </AbsoluteFill>

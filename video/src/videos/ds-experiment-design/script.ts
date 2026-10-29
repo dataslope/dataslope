@@ -36,8 +36,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     arm for 10% and a 2-point MDE, and 14,752 for 1 point (statsmodels'
  *     arcsine version: 3,835), from z terms of 1.96 and 0.84 and a pooled
  *     rate of 11%; CUPED on 500 users takes the variance from
- *     8.09 to 3.52 with the mean unchanged; 1,000 A/A tests come out 5.0%
- *     significant.
+ *     8.09 to 3.52 with the mean unchanged, X and Y correlated at 0.75;
+ *     1,000 A/A tests come out 5.0% significant.
  *   - Data Analyst Part 7's numbers, so the series agree: the two errors on
  *     a two-sided 5% test placed for 80% power, and the peeking chart, under
  *     0.05 at 800 and 2,000 visitors and 0.19 at the planned 8,000.
@@ -47,7 +47,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - the video's own simulations: orders nested in 1,000 users, A/A, 20.6%
  *     significant per order and 4.3% per user (in the first, a standard
  *     error of 0.51 per order against 0.79 per user); a cheaper checkout as good as
- *     the old one, its difference -0.29 to +0.39 points at 60,000 per arm and
+ *     the old one, its 95% interval -0.29 to +0.39 points at 60,000 per arm and
  *     -1.19 to +0.99 at 6,000, against a margin of 0.5; 10,000 A/A tests
  *     checked once 4.9%, weekly 12%, daily for four weeks 26.5%, every
  *     hundred visitors 34.8%; the SPRT on pairs, designed for 2.5% and 20%
@@ -164,7 +164,23 @@ export const script: NarrationScript = {
     },
     {
       id: "noninf",
-      text: "Question eight. What is a non-inferiority test? It asks whether a new version is worse by no more than a margin set in advance. Say a cheaper checkout may cost at most half a point of conversion. At sixty thousand users per arm, the interval for the difference runs from minus point two nine to plus point three nine, clear of the margin. At six thousand, it also contains zero, but reaches past minus one. Not significant isn't the same as not worse.",
+      text: "Question eight. What is a non-inferiority test? It asks whether a new version is worse by no more than a margin set in advance. Say a cheaper checkout may cost at most half a point of conversion.",
+    },
+    {
+      id: "noninf-rule",
+      text: "The null is that it's worse by more than that. You reject it when the lower end of the ninety-five percent interval clears the margin.",
+    },
+    {
+      id: "noninf-big",
+      text: "At sixty thousand users per arm, the interval for the difference runs from minus point two nine to plus point three nine, clear of the margin.",
+    },
+    {
+      id: "noninf-small",
+      text: "At six thousand, it also contains zero, but its lower end crosses the margin, so non-inferiority can't be claimed.",
+    },
+    {
+      id: "noninf-end",
+      text: "Not significant isn't the same as not worse.",
       pauseAfter: 0.7,
     },
     { id: "peek-in", text: "Then the test goes live, and someone opens the dashboard." },
@@ -225,6 +241,10 @@ export const script: NarrationScript = {
     {
       id: "cuped-var",
       text: "On the page's five hundred users, the variance falls from eight point oh nine to three point five two. The average stays exactly where it was. Only the noise shrinks, so the same power needs less than half the users.",
+    },
+    {
+      id: "cuped-r",
+      text: "The share of the variance it removes is the squared correlation between before and during: point seven five squared here, a little over half.",
       pauseAfter: 0.8,
     },
 
@@ -240,8 +260,16 @@ export const script: NarrationScript = {
       text: "Sensitive or robust? A sensitive metric moves reliably when the treatment works, so it can detect small effects. A robust one is hard to game and isn't thrown by outliers. Revenue per user is long-tailed: here, capping it at the ninety-ninth percentile cuts its variance by forty-eight percent.",
     },
     {
+      id: "r-sensitive-gain",
+      text: "So the capped metric can detect a smaller effect, and a few big spenders no longer swing it.",
+    },
+    {
       id: "r-strata",
       text: "Stratified randomization splits users into groups first, like country or device, then randomizes inside each one. With six heavy users among twenty, a coin per user puts five or six of them in one arm about one time in five. Stratifying puts three in each.",
+    },
+    {
+      id: "r-strata-var",
+      text: "It also lowers variance when the groups differ, and it matters most in small tests.",
     },
     {
       id: "r-aa",

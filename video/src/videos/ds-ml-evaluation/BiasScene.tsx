@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, TABULAR, fmt, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -52,11 +52,13 @@ export const BiasScene: React.FC = () => {
     { text: "more data", at: n.word("overfit", "more data") },
     { text: "a simpler model", at: n.word("overfit", "a simpler model") },
     { text: "regularization", at: n.word("overfit", "regularization") },
-    { text: "early stopping", at: n.word("overfit", "early stopping") },
-    { text: "cross-validation, so the estimate is honest", at: n.word("overfit", "and cross-validation") },
+    { text: "early stopping", gloss: ": halt when validation error turns up", at: n.word("overfit", "early stopping") },
   ];
-  const oneAt = n.word("reg-in", "One of those fixes");
-  const ownAt = n.word("reg-in", "a question of its own");
+  // Cross-validation measures the gap rather than closing it, so it gets its
+  // own line under the ticked fixes rather than a tick of its own.
+  const cvAt = n.word("overfit", "and cross-validation");
+  const oneAt = n.word("reg-in", "Regularization");
+  const ownAt = n.word("reg-in", "its own question");
   const end = n.beat("reg-in").to;
 
   // ── The fits ──
@@ -92,6 +94,7 @@ export const BiasScene: React.FC = () => {
       {fixes.map((f) => (
         <Sfx key={f.text} name="el-tap" at={f.at} level={-36} />
       ))}
+      <Sfx name="el-tap" at={cvAt} level={-36} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} out={q2At - 4} size={60}>
@@ -145,7 +148,9 @@ export const BiasScene: React.FC = () => {
         <Svg opacity={bestP}>
           <circle cx={bestX} cy={bestY} r={(13 + 6 * swell) * bestP} fill="none" stroke={OK} strokeWidth={3.4} />
         </Svg>
-        <Note at={bestAt - 2} x={bestX - 24} y={bestY + h(30)} align="right">
+        {/* Right of the ring, in the clear band between the training line and
+            the axis, not in the tick-label column. */}
+        <Note at={bestAt - 2} x={bestX + 24} y={bestY + h(30)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>lowest: degree 3</span>
         </Note>
 
@@ -188,11 +193,17 @@ export const BiasScene: React.FC = () => {
                 <Tick at={f.at + 2} size={26} color={OK} />
                 <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
                   {isReg ? <Mark at={oneAt}>{f.text}</Mark> : f.text}
+                  {f.gloss ? <span style={{ ...note(24, INK_SOFT) }}>{f.gloss}</span> : null}
                 </span>
               </div>
             </Note>
           );
         })}
+        <Note at={cvAt - 2} x={FIT.left} y={y(FIT.top) + h(10) + fixes.length * h(70) + h(24)} dim={ownAt}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            measure with <b>cross-validation</b>, so the estimate is honest
+          </span>
+        </Note>
         <Note at={fixAt} x={FIT.left} y={y(FIT.top) - h(56)} dim={ownAt}>
           <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>to fix it</span>
         </Note>

@@ -176,6 +176,10 @@ export const TreeScene: React.FC = () => {
   const counts = sides(cut);
   const reveal = Math.max(first, first + (last - first) * sweep);
   const okLit = ease(frame, lowestAt, 12);
+  // The cut stops just under the flowers' axis until the Gini chart it
+  // reaches down to is there, then follows it down.
+  const cutTo =
+    base + h(24) + (y(GINI_TOP) + h(GINI_H) - base - h(24)) * ease(frame, slideAt, 14);
 
   return (
     <AbsoluteFill>
@@ -251,7 +255,7 @@ export const TreeScene: React.FC = () => {
             x1={at(sx, cut)}
             x2={at(sx, cut)}
             y1={y(380)}
-            y2={y(GINI_TOP) + h(GINI_H)}
+            y2={cutTo}
             stroke={INK}
             strokeWidth={2.4}
             strokeDasharray="7 6"
@@ -285,7 +289,7 @@ export const TreeScene: React.FC = () => {
           yFormat={(v) => fmt(v, 2)}
           yTitle="weighted Gini of the two sides"
           at={slideAt}
-          size={18}
+          size={19}
         />
         <Svg opacity={ease(frame, slideAt, 10)}>
           <defs>

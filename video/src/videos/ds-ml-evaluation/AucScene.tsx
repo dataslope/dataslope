@@ -89,7 +89,8 @@ const ChanceLine: React.FC<{ b: Box; level: number; at: number; dash: string; ch
  * jumps to 0.5. Beside them, what a low false positive rate hides: 6.8% of
  * the negatives is still 13,402 false alarms against 3,017 catches.
  * Then imbalance: accuracy struck out (98% for calling everything negative),
- * and what class weights do to recall and precision at 0.5.
+ * what class weights do to recall and precision at 0.5, and the plain model
+ * with its threshold moved to 0.02 landing on nearly the same pair.
  */
 export const AucScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -126,7 +127,10 @@ export const AucScene: React.FC = () => {
   const moveAt = n.word("imbalance-fix", "Or move the threshold");
   const resampleAt = n.word("imbalance-fix", "or resample");
   const judgeAt = n.word("imbalance-fix", "judge the result");
-  const end = n.beat("imbalance-fix").to;
+  const movingAt = n.word("imbalance-same", "moving the threshold");
+  const recall2At = n.word("imbalance-same", "eighty-seven percent recall");
+  const prec2At = n.word("imbalance-same", "eleven percent precision");
+  const end = n.beat("imbalance-same").to;
 
   const unit: Scale = { lo: 0, hi: 1, a: 0, b: 1 };
   const xsOf = (b: Box): Scale => ({ ...unit, a: b.left, b: b.right });
@@ -138,9 +142,12 @@ export const AucScene: React.FC = () => {
 
   const plain = CLS.plainAt50;
   const weighted = CLS.weightedAt50;
+  // The plain model with its threshold moved to 0.02 lands where the weights
+  // did at 0.5: the weights mostly moved the threshold.
+  const [lowT, lowPrecision, lowRecall] = CLS.curve.find(([t]) => t === 0.02)!;
   const pairs = [
-    { name: "recall", at: recallAt, before: plain.recall, after: weighted.recall, good: true },
-    { name: "precision", at: precAt, before: plain.precision, after: weighted.precision, good: false },
+    { name: "recall", at: recallAt, lowAt: recall2At, before: plain.recall, after: weighted.recall, low: lowRecall, good: true },
+    { name: "precision", at: precAt, lowAt: prec2At, before: plain.precision, after: weighted.precision, low: lowPrecision, good: false },
   ];
 
   return (
@@ -165,7 +172,7 @@ export const AucScene: React.FC = () => {
           <PanelTitle x={ROC.left} y={y(ROC.top) - h(84)} at={asked} color={INK}>
             ROC: receiver operating characteristic
           </PanelTitle>
-          <Square b={ROC} at={asked} xTitle="false positive rate" yTitle="true positive rate" diagonal />
+          <Square b={ROC} at={asked} xTitle="false positive rate" yTitle="true positive rate (recall)" diagonal />
           <Svg opacity={areaP * 0.9}>
             <path d={rocArea} fill={`color-mix(in srgb, ${BAR} 16%, transparent)`} />
           </Svg>
@@ -193,20 +200,22 @@ export const AucScene: React.FC = () => {
 
           {/* ── The two areas, and then on a balanced test set ── */}
           <Note at={hereAt - 2} x={READ_X} y={y(ROC.top)}>
-            <span style={{ ...note(30, INK), ...TABULAR, whiteSpace: "nowrap" }}>
-              ROC-AUC <b style={{ color: BLUE_INK }}>{fmt(CLS.auc)}</b>
+            {/* Tabular figures on the numbers only: over the whole span they set
+                the hyphen a digit wide ("ROC - AUC"). */}
+            <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+              ROC-AUC <b style={{ color: BLUE_INK, ...TABULAR }}>{fmt(CLS.auc)}</b>
               <span style={{ opacity: ease(frame, movesAt - 2, 10) }}>
-                {" "}→ <b>{fmt(CLS.aucBalanced)}</b>
+                {" "}→ <b style={TABULAR}>{fmt(CLS.aucBalanced)}</b>
               </span>
             </span>
           </Note>
           <Note at={onlyAt - 2} x={READ_X} y={y(ROC.top) + h(56)}>
-            <span style={{ ...note(30, INK), ...TABULAR, whiteSpace: "nowrap" }}>
-              PR-AUC <b style={{ color: BLUE_INK }}>{fmt(CLS.ap)}</b>
+            <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
+              PR-AUC <b style={{ color: BLUE_INK, ...TABULAR }}>{fmt(CLS.ap)}</b>
               <span style={{ opacity: ease(frame, jumpsAt - 2, 10) }}>
                 {/* In ink, as ROC's balanced value is: green would endorse the
                     rebalanced test set the answer warns against. */}
-                {" "}→ <b>{fmt(CLS.apBalanced)}</b>
+                {" "}→ <b style={TABULAR}>{fmt(CLS.apBalanced)}</b>
               </span>
             </span>
           </Note>
@@ -266,9 +275,10 @@ export const AucScene: React.FC = () => {
             </span>
           </Note>
           {pairs.map((p, i) => {
-            const rowTop = y(470) + i * h(150);
+            const rowTop = y(470) + i * h(160);
             const before = ease(frame, p.at, 18);
             const after = ease(frame, p.at + 18, 20);
+            const low = ease(frame, p.lowAt, 20);
             const color = p.good ? OK : ACCENT;
             const ink = p.good ? OK_INK : ACCENT_INK;
             return (
@@ -277,16 +287,19 @@ export const AucScene: React.FC = () => {
                 {[
                   { v: p.before, p: before, fill: `color-mix(in srgb, ${INK_SOFT} 35%, ${PAPER})`, tag: "unweighted", ink: INK },
                   { v: p.after, p: after, fill: color, tag: "weighted", ink },
+                  { v: p.low, p: low, fill: `color-mix(in srgb, ${color} 45%, ${PAPER})`, tag: `unweighted, threshold ${lowT}`, ink },
                 ].map((b, k) => (
                   <React.Fragment key={b.tag}>
                     <div
                       style={{
                         position: "absolute",
                         left: BAR_X,
-                        top: rowTop + k * h(52),
+                        top: rowTop + k * h(46),
                         width: BAR_W * b.v * b.p,
-                        height: h(38),
+                        height: h(34),
                         background: b.fill,
+                        boxSizing: "border-box",
+                        border: k === 2 && b.p > 0 ? `2px solid ${color}` : undefined,
                         borderRadius: 3,
                       }}
                     />
@@ -294,7 +307,7 @@ export const AucScene: React.FC = () => {
                       style={{
                         position: "absolute",
                         left: BAR_X + BAR_W * b.v + 14,
-                        top: rowTop + k * h(52) + h(2),
+                        top: rowTop + k * h(46),
                         ...note(26, b.ink),
                         fontWeight: 700,
                         ...TABULAR,
@@ -311,7 +324,7 @@ export const AucScene: React.FC = () => {
           })}
           <Note at={moveAt - 2} x={ROC.left} y={y(790)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-              or move the threshold
+              or <Mark at={movingAt}>move the threshold</Mark>
               <span style={{ opacity: ease(frame, resampleAt - 2, 10) }}>, or resample</span>
               <span style={{ opacity: ease(frame, judgeAt - 2, 10) }}>
                 ; judge by <b style={{ color: OK_INK }}>PR-AUC</b> or <b style={{ color: OK_INK }}>F1</b>

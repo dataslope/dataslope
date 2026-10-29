@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, fmt, label } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, fmt, label } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CHI } from "./data";
-import { Drift, Mark, MARK_BAD, MARK_OK, noteText, OK_INK, X0 } from "./parts";
+import { Drift, Mark, MARK_OK, noteText, OK_INK, X0 } from "./parts";
 
 const TABLE_TOP = 470;
 const HEAD_H = 52;
@@ -119,8 +119,10 @@ export const ChiScene: React.FC = () => {
             return (
               <React.Fragment key={`${i}-${j}`}>
                 <Note at={tableAt + 4 + (i * 2 + j) * 2} x={x} y={rowY(i) + h(10)}>
-                  <span style={{ fontFamily: MONO, fontSize: 32, fontWeight: 600, color: hot ? ACCENT_INK : BLUE_INK, ...TABULAR }}>
-                    {hot ? <Mark at={mobileAt + 6} color={MARK_BAD}>{obs}</Mark> : obs}
+                  {/* The observed count the narration reads: data blue, under
+                      the yellow mark, not the red kept for a wrong answer. */}
+                  <span style={{ fontFamily: MONO, fontSize: 32, fontWeight: 600, color: BLUE_INK, ...TABULAR }}>
+                    {hot ? <Mark at={mobileAt + 6}>{obs}</Mark> : obs}
                   </span>
                 </Note>
                 <Note at={expectAt + 2 + (i * 2 + j) * 2} x={x} y={rowY(i) + h(54)}>

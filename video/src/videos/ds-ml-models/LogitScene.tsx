@@ -85,11 +85,10 @@ export const LogitScene: React.FC = () => {
   const from = n.beat("logit").from;
   const qAt = n.word("logit", "Question one");
   const textAt = n.word("logit", "What is logistic regression");
-  const addsAt = n.word("logit", "It adds up the features");
-  const oddsAt = n.word("logit", "the log odds");
-  const sigAt = n.word("logit", "through the sigmoid");
-  const squeezeAt = n.word("logit", "squeezes any number");
-  const tumorsAt = n.word("logit-fit", "five hundred sixty-nine tumors");
+  const addsAt = n.word("logit-how", "It weights the features");
+  const oddsAt = n.word("logit-how", "the log odds");
+  const sigAt = n.word("logit-how", "through the sigmoid");
+  const squeezeAt = n.word("logit-how", "squeezes any number");
   const radiusAt = n.word("logit-fit", "the mean radius");
   const fitAt = n.word("logit-fit", "The score is minus");
   const fifteenAt = n.word("logit-fit", "At a radius of fifteen");
@@ -102,8 +101,10 @@ export const LogitScene: React.FC = () => {
   const belowAt = n.word("linear", "below zero");
   const aboveAt = n.word("linear", "above one");
   const r28At = n.word("linear", "At a radius of twenty-eight");
-  const insideAt = n.word("linear", "stays inside");
-  const mlAt = n.word("linear", "maximum likelihood");
+  const varAt = n.word("linear-var", "constant variance");
+  const assumesAt = n.word("linear-var", "least squares assumes");
+  const insideAt = n.word("linear-ml", "stays inside");
+  const mlAt = n.word("linear-ml", "maximum likelihood");
   const nextAt = n.word("tree-in", "Next");
   const clearAt = n.word("tree-in", "steps");
   const end = n.beat("tree-in").to;
@@ -132,7 +133,7 @@ export const LogitScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-pencil" at={sigAt + 2} level={-34} />
-      <Sfx name="el-sprinkle" at={tumorsAt + 2} level={-36} />
+      <Sfx name="el-sprinkle" at={radiusAt + 8} level={-36} />
       <Sfx name="el-tap" at={p56At} level={-34} />
       <Sfx name="el-scratch" at={lineAt + 4} level={-32} />
       <Sfx name="el-pop" at={r28At + 4} level={-33} />
@@ -206,19 +207,20 @@ export const LogitScene: React.FC = () => {
             at={radiusAt}
           />
 
+          {/* The tumors land once the axis is their radius, not the score. */}
           <Points
             xs={LOGIT.radius}
             ys={JITTER}
             labels={LOGIT.label}
             sx={sx}
             sy={sy}
-            at={tumorsAt}
+            at={radiusAt + 6}
             spread={22}
             r={4.5}
             opacity={0.55}
           />
           <Note
-            at={tumorsAt + 8}
+            at={radiusAt + 14}
             x={box.left + box.width - 16}
             y={at(sy, 1) - h(40)}
             align="right"
@@ -229,7 +231,7 @@ export const LogitScene: React.FC = () => {
             </span>
           </Note>
           <Note
-            at={tumorsAt + 14}
+            at={radiusAt + 20}
             x={box.left + box.width - 16}
             y={at(sy, 0) - h(40)}
             align="right"
@@ -348,7 +350,7 @@ export const LogitScene: React.FC = () => {
           </Note>
           <Note at={fitAt} x={COL} y={y(TOP)} out={out1}>
             <Formula>
-              <V>z</V> = −15.25 + 1.03 × radius
+              <V>z</V> = −{fmt(-LOGIT.b0, 2)} + {fmt(LOGIT.b1, 3)} × radius
             </Formula>
           </Note>
           <Note at={fitAt + 6} x={COL} y={y(TOP) + h(54)} out={out1}>
@@ -381,6 +383,22 @@ export const LogitScene: React.FC = () => {
             </Formula>
           </Note>
 
+          <Note at={varAt} x={COL} y={y(TOP)}>
+            <span
+              style={{
+                ...note(24, ACCENT_INK),
+                fontWeight: 650,
+                whiteSpace: "nowrap",
+              }}
+            >
+              a straight line&apos;s errors can&apos;t have constant variance
+            </span>
+          </Note>
+          <Note at={assumesAt} x={COL} y={y(TOP) + h(40)}>
+            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+              which least squares assumes
+            </span>
+          </Note>
           <Note at={insideAt} x={COL} y={y(TOP) + h(130)}>
             <span
               style={{

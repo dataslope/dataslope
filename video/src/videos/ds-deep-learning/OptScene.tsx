@@ -55,7 +55,6 @@ export const OptScene: React.FC = () => {
   const threeAt = n.word("opt-result", "three units from the bottom");
   const otherAt = n.word("opt-result", "The other three");
   const needAt = n.word("opt-result", "a hundred and seventy-five");
-  const tooMuchAt = n.word("overfit-in", "learn too much");
   const end = n.beat("overfit-in").to;
 
   const px = (v: number) => BOX.left + ((v - DOM.x0) / (DOM.x1 - DOM.x0)) * (BOX.right - BOX.left);
@@ -70,7 +69,6 @@ export const OptScene: React.FC = () => {
     { key: "adam", color: OK, ink: OK_INK, name: "Adam", what: "adaptive moment estimation: both", at: adamAt },
   ];
   const nameAt: Record<Optimizer, number> = { sgd: sgdAt, momentum: momAt, rmsprop: rmsAt, adam: adamAt };
-  const out = tooMuchAt - 2;
   // Where each run stopped: ringed on top of every path, SGD's when its
   // distance is read and the others' with theirs, so none hides under another.
   const endAt: Record<Optimizer, number> = { sgd: threeAt, momentum: otherAt, rmsprop: otherAt + 4, adam: otherAt + 8 };
@@ -88,11 +86,13 @@ export const OptScene: React.FC = () => {
       <Sfx name="el-pop" at={otherAt + 4} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={out} size={60}>
+        {/* Held to the cut, as every other scene is: clearing on the bridge's
+            last word left a blank page through the gap. */}
+        <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={60}>
           Compare SGD, momentum, RMSProp, and Adam.
         </QuestionCard>
 
-        <Fade from={from} out={out}>
+        <Fade from={from}>
           {/* ── The valley: contours, start and bottom ── */}
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, valleyAt - 6, 16) }}>
             <defs>

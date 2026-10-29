@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Bars } from "../../editorial/charts";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, TABULAR, body } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, body } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -21,8 +21,8 @@ const OBSERVED = 62;
  * Question 11 on the Statistics course's coin (seed 0, the run Stats-7
  * TestingHypotheses shows): 62 heads in 100, against the heads of 100,000
  * runs of a fair coin. The runs at least as far from 50 as 62, on both
- * sides, turn red: 2.1% of them, the p-value. Then the two misreadings,
- * struck through.
+ * sides (the test is two-sided), stand out in full blue: 2.1% of them, the
+ * p-value. Red is kept for the two misreadings, struck through.
  */
 export const PvalueScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -35,11 +35,12 @@ export const PvalueScene: React.FC = () => {
   const defAt = n.word("pvalue", "The probability of data");
   const nullAt = n.word("pvalue", "if the null is true");
   const coinAt = n.word("pvalue", "A coin lands heads");
-  const fairAt = n.word("pvalue", "A fair coin");
-  const upperAt = n.word("pvalue", "sixty-two or more");
-  const lowerAt = n.word("pvalue", "thirty-eight or fewer");
-  const pctAt = n.word("pvalue", "two point one percent");
-  const thatAt = n.word("pvalue", "That's the p-value");
+  const fairAt = n.word("pvalue-fair", "A fair coin");
+  const upperAt = n.word("pvalue-fair", "sixty-two or more");
+  const sidedAt = n.word("pvalue-fair", "since the test is two-sided");
+  const lowerAt = n.word("pvalue-fair", "thirty-eight or fewer");
+  const pctAt = n.word("pvalue-fair", "two point one percent");
+  const thatAt = n.word("pvalue-fair", "That's the p-value");
   const notNullAt = n.word("pvalue-not", "It isn't the chance the null is true");
   const flukeAt = n.word("pvalue-fluke", "the chance your result is a fluke");
   const assumingAt = n.word("pvalue-fluke", "assuming the null holds");
@@ -95,35 +96,44 @@ export const PvalueScene: React.FC = () => {
           gap={3}
           color={BAR}
           grow={(i) => ease(frame, fairAt + 4 + Math.abs(heads[i] - 50) * 0.8, 14)}
-          opacity={1 - 0.35 * ease(frame, upperAt, 12)}
+          opacity={1 - 0.6 * ease(frame, upperAt, 12)}
         />
-        <Bars counts={upper} lo={XS.lo} bin={1} scale={charts} base={base} unit={unit} gap={3} color={ACCENT} grow={(i) => ease(frame, upperAt + (heads[i] - OBSERVED) * 1.2, 10)} />
-        <Bars counts={lower} lo={XS.lo} bin={1} scale={charts} base={base} unit={unit} gap={3} color={ACCENT} grow={(i) => ease(frame, lowerAt + (100 - OBSERVED - heads[i]) * 1.2, 10)} />
+        {/* The tails are the answer, not a mistake: full data blue over the
+            faded rest, with red kept for the struck misreadings. */}
+        <Bars counts={upper} lo={XS.lo} bin={1} scale={charts} base={base} unit={unit} gap={3} color={BAR} grow={(i) => ease(frame, upperAt + (heads[i] - OBSERVED) * 1.2, 10)} />
+        <Bars counts={lower} lo={XS.lo} bin={1} scale={charts} base={base} unit={unit} gap={3} color={BAR} grow={(i) => ease(frame, lowerAt + (100 - OBSERVED - heads[i]) * 1.2, 10)} />
         <VLine
           x={at(XS, OBSERVED)}
           top={base - h(HEIGHT) + h(40)}
           bottom={base}
           at={coinAt + 4}
-          color={ACCENT_INK}
+          color={INK}
           width={3}
-          label={<span style={{ ...noteText(26, ACCENT_INK), ...TABULAR }}>62 heads</span>}
+          label={<span style={{ ...noteText(26, INK), ...TABULAR }}>62 heads</span>}
         />
         <Note at={fairAt + 6} x={X0 + 10} y={base - h(HEIGHT) + h(10)}>
           <span style={{ ...noteText(24, INK_SOFT), ...TABULAR }}>a fair coin, over and over</span>
         </Note>
         <Note at={upperAt + 6} x={at(XS, 66)} y={base - h(110)}>
-          <span style={{ ...noteText(24, ACCENT_INK), ...TABULAR }}>62 or more</span>
+          <span style={{ ...noteText(24, BLUE_INK), ...TABULAR }}>62 or more</span>
+        </Note>
+        <Note at={sidedAt} x={at(XS, 34)} y={base - h(178)} align="right">
+          <div style={{ ...noteText(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            two-sided:
+            <br />
+            both tails count
+          </div>
         </Note>
         <Note at={lowerAt + 6} x={at(XS, 34)} y={base - h(110)} align="right">
-          <span style={{ ...noteText(24, ACCENT_INK), ...TABULAR }}>38 or fewer</span>
+          <span style={{ ...noteText(24, BLUE_INK), ...TABULAR }}>38 or fewer</span>
         </Note>
         <Note at={pctAt} x={SIDE_X} y={y(430)}>
-          <span style={{ ...noteText(34, ACCENT_INK), ...TABULAR }}>
+          <span style={{ ...noteText(34, BLUE_INK), ...TABULAR }}>
             <b>{pct}%</b> of runs
           </span>
         </Note>
         <Note at={thatAt} x={SIDE_X} y={y(486)}>
-          <span style={{ ...noteText(30, INK), ...TABULAR }}>
+          <span style={{ ...noteText(30, INK) }}>
             = <Mark at={thatAt + 4}>the p-value</Mark>
           </span>
         </Note>

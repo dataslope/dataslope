@@ -55,7 +55,10 @@ export const SizeScene: React.FC = () => {
   const fourAt = n.word("size-half", "nearly four times as many");
   const squaredAt = n.word("size-half", "one over the MDE squared");
   const directionAt = n.word("sides-in", "which direction counts");
-  const clearAt = n.beat("sides-in").to - 6;
+  // The page holds through the pause and clears into the cut, so the next
+  // scene cross-fades in over it rather than over an empty page.
+  const nextAt = n.beat("sides").from;
+  const clearAt = nextAt - 14;
 
   const clear = 1 - ease(frame, clearAt, 10);
   const xs: Scale = { lo: 0.5, hi: 4, a: BOX.left, b: BOX.right };
@@ -86,7 +89,7 @@ export const SizeScene: React.FC = () => {
       <Sfx name="el-pop" at={twoAt} level={-32} />
       <Sfx name="el-pop" at={oneAt} level={-32} />
 
-      <Drift from={from} to={n.beat("sides-in").to + 30}>
+      <Drift from={from} to={nextAt}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={58}>
           How do you calculate the sample size for an A/B test?
         </QuestionCard>
@@ -134,7 +137,7 @@ export const SizeScene: React.FC = () => {
           );
         })}
 
-        {/* The page's function, at every MDE. */}
+        {/* The page's function, at every MDE: its frame is up while the inputs are named. */}
         <Axes
           x={xs}
           y={ys}
@@ -144,7 +147,7 @@ export const SizeScene: React.FC = () => {
           yFormat={(v) => (v === 0 ? "0" : `${v / 1000}k`)}
           xTitle="MDE, points of conversion"
           yTitle="users per arm"
-          at={tenAt - 4}
+          at={inputsAt + 4}
         />
         <Curve points={curve} x={xs} y={ys} at={formulaAt} dur={30} color={BAR} width={3.4} clip={clip} />
         <Svg>

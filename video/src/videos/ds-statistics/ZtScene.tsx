@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, TABULAR, fmt } from "../../editorial/style";
+import { BAR, BLUE_INK, INK, fmt } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -85,7 +85,16 @@ export const ZtScene: React.FC = () => {
           When do you use a z-test versus a t-test?
         </QuestionCard>
 
-        <Axes x={XS} y={{ lo: 0, hi: 1, a: base, b: base - h(HEIGHT) }} xTicks={[-4, -2, 0, 2, 4]} at={zAt - 4} size={19} />
+        {/* A real minus sign: the ticks are tabular, which sets a hyphen a
+            digit wide ("- 2"). */}
+        <Axes
+          x={XS}
+          y={{ lo: 0, hi: 1, a: base, b: base - h(HEIGHT) }}
+          xTicks={[-4, -2, 0, 2, 4]}
+          xFormat={(v) => (v < 0 ? `−${-v}` : String(v))}
+          at={zAt - 4}
+          size={19}
+        />
         <Curve points={pts(ZT.normalPdf)} at={zAt} dur={24} color={INK} width={3} />
         <Curve points={pts(ZT.t5Pdf)} at={tAt + 2} dur={24} color={BAR} width={3.4} />
         <Curve points={pts(ZT.t30Pdf)} at={thirtyAt} dur={24} color={WARM} width={2.6} dash="8 6" />
@@ -127,7 +136,7 @@ export const ZtScene: React.FC = () => {
           </div>
         </Note>
         <Note at={fiveAt + 6} x={SIDE_X} y={y(640)}>
-          <span style={{ ...noteText(24, INK), ...TABULAR }}>the cutoffs, either side</span>
+          <span style={{ ...noteText(24, INK) }}>the 95% cutoffs, two-sided</span>
         </Note>
         <Note at={softwareAt} x={SIDE_X} y={y(770)}>
           <span style={{ ...noteText(26, OK_INK) }}>

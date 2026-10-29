@@ -35,20 +35,22 @@ export const ActScene: React.FC = () => {
   const from = n.beat("act").from;
   const qAt = n.word("act", "Question three");
   const textAt = n.word("act", "Compare the common activation functions");
-  const sigAt = n.word("act", "Sigmoid squashes");
-  const flatAt = n.word("act", "goes flat at both ends");
-  const tanhAt = n.word("act", "Tanh, the hyperbolic tangent");
-  const centeredAt = n.word("act", "centered on zero");
+  const sigAt = n.word("act-sig", "Sigmoid squashes");
+  const flatAt = n.word("act-sig", "goes flat at both ends");
+  const gradAt = n.word("act-sig", "the gradient, is nearly zero");
+  const tanhAt = n.word("act-tanh", "Tanh, the hyperbolic tangent");
+  const centeredAt = n.word("act-tanh", "centered on zero");
   const reluAt = n.word("act-relu", "ReLU, the rectified linear unit");
   const zeroesAt = n.word("act-relu", "zeroes the rest");
   const defaultAt = n.word("act-relu", "the default for hidden layers");
-  const stuckAt = n.word("act-relu", "A unit whose inputs stay negative");
-  const leakyAt = n.word("act-relu", "leaky ReLU keeps a small slope");
+  const stuckAt = n.word("act-dying", "A unit whose inputs stay negative");
+  const dyingAt = n.word("act-dying", "the dying ReLU problem");
+  const leakyAt = n.word("act-dying", "Leaky ReLU fixes it");
+  const geluAt = n.word("act-dying", "GELU with a smooth curve");
   const softAt = n.word("act-soft", "And softmax turns");
   const addAt = n.word("act-soft", "add to one");
   const scoresAt = n.word("act-soft", "Scores of two, one and point one");
   const becomeAt = n.word("act-soft", "become sixty-six");
-  const ideaAt = n.word("backprop-in", "one more idea");
   const end = n.beat("backprop-in").to;
 
   const xs: Scale = { lo: -5, hi: 5, a: BOX.left, b: BOX.right };
@@ -57,10 +59,19 @@ export const ActScene: React.FC = () => {
   const pts = (vals: readonly number[]) => ACT.z.map((z, i) => [z, vals[i]] as const);
   const sig = pts(ACT.sigmoid);
   const tails = [sig.filter(([z]) => z <= -2.8), sig.filter(([z]) => z >= 2.8)];
-  const legendOut = ideaAt - 2;
 
   const legend = [
-    { at: sigAt, color: BAR, dash: undefined, text: <>sigmoid: 0 to 1, <Mark at={flatAt + 2}>flat at both ends</Mark></>, ink: BLUE_INK },
+    {
+      at: sigAt,
+      color: BAR,
+      dash: undefined,
+      text: (
+        <>
+          sigmoid: 0 to 1, <Mark at={flatAt + 2}>flat at both ends</Mark>
+        </>
+      ),
+      ink: BLUE_INK,
+    },
     { at: tanhAt, color: TANH, dash: undefined, text: <>tanh: −1 to 1, centered on 0</>, ink: TANH_INK },
     { at: reluAt, color: OK, dash: undefined, text: <>ReLU: max(0, z), the hidden-layer default</>, ink: OK_INK },
     { at: leakyAt, color: OK, dash: "7 6", text: <>leaky ReLU: a small slope below zero</>, ink: OK_INK },
@@ -92,12 +103,16 @@ export const ActScene: React.FC = () => {
           <rect x={xs.a} y={ys.b} width={(xs.b - xs.a) / 2} height={ys.a - ys.b} fill={`color-mix(in srgb, ${ACCENT} 8%, transparent)`} />
         </Svg>
         <Note at={stuckAt + 2} x={BOX.left + 24} y={y(BOX.top) + h(18)}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>stuck here, a ReLU unit stops learning</span>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            stuck here, a ReLU unit stops learning
+            <br />
+            <span style={{ opacity: ease(frame, dyingAt - 2, 10) }}>the dying ReLU problem</span>
+          </span>
         </Note>
 
         {/* ── The legend, a row per activation as it is described ── */}
         {legend.map((row, i) => (
-          <Note key={i} at={row.at - 2} x={LEG_X} y={y(LEG_Y) + i * h(LEG_ROW)} out={legendOut}>
+          <Note key={i} at={row.at - 2} x={LEG_X} y={y(LEG_Y) + i * h(LEG_ROW)}>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <svg width={44} height={14} style={{ overflow: "visible" }}>
                 <line x1={0} x2={44} y1={7} y2={7} stroke={row.color} strokeWidth={4} strokeDasharray={row.dash} />
@@ -106,22 +121,28 @@ export const ActScene: React.FC = () => {
             </div>
           </Note>
         ))}
-        <Tagline x={LEG_X + 60} y={y(LEG_Y) + 2 * h(LEG_ROW) + h(38)} at={zeroesAt + 2} out={legendOut} size={20}>
+        <Tagline x={LEG_X + 60} y={y(LEG_Y) + h(38)} at={gradAt} size={20}>
+          flat ends: slope, and so gradient, near 0
+        </Tagline>
+        <Tagline x={LEG_X + 60} y={y(LEG_Y) + 2 * h(LEG_ROW) + h(38)} at={zeroesAt + 2} size={20}>
           passes positives, zeroes the rest
         </Tagline>
-        <Tagline x={LEG_X + 60} y={y(LEG_Y) + 1 * h(LEG_ROW) + h(38)} at={centeredAt} out={legendOut} size={20}>
-          the same shape, centered
+        <Tagline x={LEG_X + 60} y={y(LEG_Y) + 1 * h(LEG_ROW) + h(38)} at={centeredAt} size={20}>
+          the same shape, centered: the next layer gets inputs around 0
         </Tagline>
-        <Svg opacity={ease(frame, defaultAt, 10) * (1 - ease(frame, legendOut, 10))}>
+        <Tagline x={LEG_X + 60} y={y(LEG_Y) + 3 * h(LEG_ROW) + h(38)} at={geluAt - 2} size={20}>
+          or GELU: a smooth curve through 0
+        </Tagline>
+        <Svg opacity={ease(frame, defaultAt, 10)}>
           <rect x={LEG_X - 14} y={y(LEG_Y) + 2 * h(LEG_ROW) - 12} width={760} height={h(LEG_ROW) - 4} rx={6} fill="none" stroke={OK} strokeWidth={2} />
         </Svg>
 
         {/* ── Softmax: three scores into probabilities ── */}
-        <Tagline x={LEG_X} y={y(SOFT_Y) - h(46)} at={softAt} out={legendOut} size={22} color={INK}>
+        <Tagline x={LEG_X} y={y(SOFT_Y) - h(46)} at={softAt} size={22} color={INK}>
           softmax: scores into probabilities that <Mark at={addAt}>add to one</Mark>
         </Tagline>
-        <Cells values={[ACT.scores.map((v) => v.toFixed(1))]} x={LEG_X} y={y(SOFT_Y)} w={96} h={h(56)} at={scoresAt - 2} out={legendOut} color={BLUE_INK} />
-        <ElbowArrow points={[[LEG_X + 3 * 96 + 22, y(SOFT_Y) + h(28)], [LEG_X + 3 * 96 + 96, y(SOFT_Y) + h(28)]]} at={becomeAt - 6} out={legendOut} color={INK_SOFT} width={2} head={11} />
+        <Cells values={[ACT.scores.map((v) => v.toFixed(1))]} x={LEG_X} y={y(SOFT_Y)} w={96} h={h(56)} at={scoresAt - 2} color={BLUE_INK} />
+        <ElbowArrow points={[[LEG_X + 3 * 96 + 22, y(SOFT_Y) + h(28)], [LEG_X + 3 * 96 + 96, y(SOFT_Y) + h(28)]]} at={becomeAt - 6} color={INK_SOFT} width={2} head={11} />
         <Cells
           values={[ACT.softmax.map((v) => `${Math.round(v * 100)}%`)]}
           x={LEG_X + 3 * 96 + 112}
@@ -129,14 +150,13 @@ export const ActScene: React.FC = () => {
           w={110}
           h={h(56)}
           at={becomeAt - 2}
-          out={legendOut}
           color={OK_INK}
           look={(_, c) => ({ tint: { color: c === 0 ? CELL_MARK : CELL_OK, at: becomeAt + 4 + c * 3 } })}
         />
-        <Tagline x={LEG_X + 3 * 96 + 112} y={y(SOFT_Y) + h(68)} width={330} align="center" at={becomeAt + 10} out={legendOut} size={20}>
+        <Tagline x={LEG_X + 3 * 96 + 112 + 165} y={y(SOFT_Y) + h(68)} width={330} align="center" at={becomeAt + 10} size={20}>
           sum: 100%
         </Tagline>
-        <Tagline x={LEG_X} y={y(SOFT_Y) + h(68)} width={288} align="center" at={scoresAt} out={legendOut} size={20}>
+        <Tagline x={LEG_X + 144} y={y(SOFT_Y) + h(68)} width={288} align="center" at={scoresAt} size={20}>
           scores
         </Tagline>
       </Drift>

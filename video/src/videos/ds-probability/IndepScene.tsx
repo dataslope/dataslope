@@ -192,10 +192,15 @@ export const IndepScene: React.FC = () => {
           </Note>
         ))}
         <Note at={splitAt + 12} x={BARS.xs[1] + BARS.w + 20} y={barTop + 4} out={out4}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>■ churned</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ color: DATA }}>■</span> churned
+          </span>
         </Note>
-        <Note at={sameAt + 6} x={BARS.xs[0] - 30} y={splitY(CHURN.pAll) - 2} align="right" out={theseAt}>
-          <span style={{ ...label(24, INK), ...TABULAR, whiteSpace: "nowrap", paddingRight: 10 }}>{pct(CHURN.pAll)}</span>
+        {/* The reference the argument rests on keeps its name while the bars move off it. */}
+        <Note at={sameAt + 6} x={BARS.xs[0] - 30} y={splitY(CHURN.pAll) - 2} align="right" out={out4}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap", paddingRight: 10 }}>
+            <span style={TABULAR}>{pct(CHURN.pAll)}</span> if independent
+          </span>
         </Note>
         {[CHURN.pPaid, CHURN.pFree].map((s, i) => (
           <Note

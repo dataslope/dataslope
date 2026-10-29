@@ -13,17 +13,19 @@ import { Cells, CELL_MARK, CELL_OK, Drift, ElbowArrow, Mark, num, OK_INK, Svg, T
 
 const ROW = 432;
 const BOX_H = 80;
-/** The chain, left to right: an operation, the value it hands on. */
+/** The chain, left to right: an operation, the value it hands on, with
+ *  arrows of 60 px between them (they were 20 px stubs that read as glyphs). */
 const OPS = [
   { x: 150, w: 230, text: "w · x + b" },
-  { x: 610, w: 150, text: "sigmoid" },
-  { x: 1000, w: 220, text: "(a − y)²" },
+  { x: 640, w: 150, text: "sigmoid" },
+  { x: 1080, w: 220, text: "(a − y)²" },
 ];
 const VALS = [
-  { x: 420, name: "z" },
-  { x: 800, name: "a" },
-  { x: 1260, name: "loss" },
+  { x: 460, name: "z" },
+  { x: 870, name: "a" },
+  { x: 1380, name: "loss" },
 ];
+const ARROW = 60;
 const SLOPE_Y = 548;
 const PRODUCT_Y = 650;
 const PAGE_Y = 742;
@@ -149,12 +151,12 @@ export const BackpropScene: React.FC = () => {
             <Op x={op.x} w={op.w} top={y(ROW)} height={h(BOX_H)} at={chainAt + i * 4} lit={i === 1 ? midLit : 0}>
               {op.text}
             </Op>
-            <ElbowArrow points={[[op.x + op.w + 8, mid], [VALS[i].x - 12, mid]]} at={chainAt + 2 + i * 4} color={INK_SOFT} width={2} head={11} />
+            <ElbowArrow points={[[op.x + op.w + 8, mid], [op.x + op.w + 8 + ARROW, mid]]} at={chainAt + 2 + i * 4} color={INK_SOFT} width={2} head={11} />
             <Tagline x={VALS[i].x} y={mid - h(18)} at={chainAt + 4 + i * 4} size={26} color={BLUE_INK}>
               {VALS[i].name} = {fwd[i]}
             </Tagline>
             {i < OPS.length - 1 ? (
-              <ElbowArrow points={[[VALS[i].x + 150, mid], [OPS[i + 1].x - 8, mid]]} at={chainAt + 4 + i * 4} color={INK_SOFT} width={2} head={11} />
+              <ElbowArrow points={[[OPS[i + 1].x - 8 - ARROW, mid], [OPS[i + 1].x - 8, mid]]} at={chainAt + 4 + i * 4} color={INK_SOFT} width={2} head={11} />
             ) : null}
           </React.Fragment>
         ))}
@@ -195,7 +197,7 @@ export const BackpropScene: React.FC = () => {
         {/* ── The page's own check of the middle slope ── */}
         <Tagline x={X0} y={y(PAGE_Y)} at={pageAt - 4} size={22} color={INK}>
           the page&apos;s check:{" "}
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600 }}>sigmoid′(z) = s(1 − s)</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600 }}>σ′(z) = σ(z)(1 − σ(z))</span>
         </Tagline>
         {["z", "formula", "nudged"].map((name, r) => (
           <Tagline key={name} x={X0} y={y(PAGE_Y) + h(44) + r * h(42)} at={pageAt + r * 3} size={21}>

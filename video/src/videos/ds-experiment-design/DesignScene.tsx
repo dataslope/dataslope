@@ -20,9 +20,11 @@ const RIGHT_X = 1010;
 /**
  * Questions 1 and 2. The test plan written out before anything runs, one
  * line as each is named: hypothesis, primary metric, guardrail, unit, size,
- * duration, analysis. Then the primary metric chosen against three tests:
- * raw clicks fail the first, ninety-day retention the last, and seven-day
- * activation passes all three and is agreed before launch.
+ * duration, analysis, on a card centered on the page until Question 2 needs
+ * the right half. Then the primary metric chosen against three tests: raw
+ * clicks fail the first, ninety-day retention the last (each verdict names
+ * its test, and that chip pulses), and seven-day activation passes all three
+ * and is agreed before launch.
  */
 export const DesignScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -48,7 +50,10 @@ export const DesignScene: React.FC = () => {
   const agreeAt = n.word("metric", "agree on it before launch");
   const switchAt = n.word("metric", "no one switches metrics");
   const splitAt = n.word("unit-in", "what exactly gets split");
-  const clearAt = n.beat("unit-in").to - 6;
+  // The page holds through the pause and clears into the cut, so the next
+  // scene cross-fades in over it rather than over an empty page.
+  const nextAt = n.beat("unit").from;
+  const clearAt = nextAt - 14;
 
   const rows = [
     { key: "hypothesis", value: "the new onboarding raises 7-day activation", at: n.word("design-plan", "A hypothesis") },
@@ -61,17 +66,21 @@ export const DesignScene: React.FC = () => {
   ];
 
   const card = ease(frame, writeAt - 4, 16);
+  // Centered while it is the only thing on the page; Question 2 moves it left.
+  const centered = (1 - ease(frame, q2At - 4, 18)) * ((1920 - (CARD_W + 40)) / 2 - (X0 - 20));
   const clear = 1 - ease(frame, clearAt, 10);
   const q2 = ease(frame, q2At, 14);
 
+  // Each chip pulses as it is named, again when a candidate fails it, and
+  // all three when seven-day activation passes.
   const criteria = [
-    { text: "tied to the goal", at: tiedAt },
-    { text: "sensitive", at: sensitiveAt },
-    { text: "measurable in the window", at: measurableAt },
+    { text: "tied to the goal", at: tiedAt, again: [inflateAt, passesAt] },
+    { text: "sensitive", at: sensitiveAt, again: [passesAt] },
+    { text: "measurable in the window", at: measurableAt, again: [arriveAt, passesAt] },
   ];
   const candidates = [
-    { text: "raw clicks", at: clicksAt, verdict: "easy to inflate", verdictAt: inflateAt, ok: false },
-    { text: "90-day retention", at: retentionAt, verdict: "arrives after the test ends", verdictAt: arriveAt, ok: false },
+    { text: "raw clicks", at: clicksAt, verdict: "fails 1: easy to inflate", verdictAt: inflateAt, ok: false },
+    { text: "90-day retention", at: retentionAt, verdict: "fails 3: arrives after the test ends", verdictAt: arriveAt, ok: false },
     { text: "7-day activation", at: activationAt, verdict: "passes all three", verdictAt: passesAt, ok: true },
   ];
 
@@ -85,7 +94,7 @@ export const DesignScene: React.FC = () => {
       <Sfx name="el-scratch" at={arriveAt + 2} level={-34} />
       <Sfx name="el-pop" at={passesAt} level={-32} />
 
-      <Drift from={from} to={n.beat("unit-in").to + 30}>
+      <Drift from={from} to={nextAt}>
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} out={q2At - 4} size={60}>
           How would you design an A/B test for a new feature?
         </QuestionCard>
@@ -94,6 +103,7 @@ export const DesignScene: React.FC = () => {
         </QuestionCard>
 
         {/* The plan, written before anything runs. */}
+        <div style={{ position: "absolute", inset: 0, transform: `translateX(${centered}px)` }}>
         <div
           style={{
             position: "absolute",
@@ -161,6 +171,7 @@ export const DesignScene: React.FC = () => {
             </div>
           );
         })}
+        </div>
 
         {/* Question 2: three tests a primary metric has to pass. */}
         <div style={{ position: "absolute", left: RIGHT_X, top: y(310), display: "flex", gap: 14 }}>
@@ -178,7 +189,7 @@ export const DesignScene: React.FC = () => {
                 fontWeight: 650,
                 whiteSpace: "nowrap",
                 opacity: p * q2,
-                transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * pulse(frame, c.at, 14)})`,
+                transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * Math.max(pulse(frame, c.at, 14), ...c.again.map((t) => pulse(frame, t, 14)))})`,
               }}
             >
               {i + 1}. {c.text}

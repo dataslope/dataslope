@@ -67,8 +67,6 @@ export const DropScene: React.FC = () => {
   const holdsAt = n.word("decay-adam", "it holds validation loss at point one one");
   const climbedAt = n.word("decay-adam", "where it had climbed");
   const bnInAt = n.word("bn-in", "Then, a layer");
-  // The page clears on the bridge's last word, so the gap before question 10 stays short.
-  const stackAt = n.beat("bn-in").to - 4;
   const end = n.beat("bn-in").to;
 
   const q8Out = q9At - 6;
@@ -94,7 +92,9 @@ export const DropScene: React.FC = () => {
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} out={q8Out} size={60}>
           What does dropout do, and why does it help?
         </QuestionCard>
-        <QuestionCard n={9} at={q9At} textAt={q9TextAt - 2} out={stackAt} size={54} width={1740}>
+        {/* Held to the cut, as every other scene is: clearing on the bridge's
+            last word left a blank page through the gap. */}
+        <QuestionCard n={9} at={q9At} textAt={q9TextAt - 2} size={54} width={1740}>
           What is weight decay, and how does it relate to L2 regularization?
         </QuestionCard>
 
@@ -159,7 +159,7 @@ export const DropScene: React.FC = () => {
         </Fade>
 
         {/* ── Question 9: two updates that agree ── */}
-        <Fade from={q9At} out={stackAt}>
+        <Fade from={q9At}>
           <Note at={shrinksAt - 2} x={X0} y={y(330)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
               each step, every weight <Mark at={shrinksAt + 4}>shrinks a little toward zero</Mark>
@@ -233,7 +233,6 @@ export const DropScene: React.FC = () => {
             xTitle="epochs"
             yTitle="validation loss, the toy network"
             at={toyAt - 4}
-            size={18}
           />
           <Curve points={plain} x={xs} y={ys} at={toyAt} dur={30} color={ACCENT} width={3} clip={clip} />
           <Curve points={decayed} x={xs} y={ys} at={holdsAt - 4} dur={30} color={OK} width={3.4} clip={clip} />

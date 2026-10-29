@@ -29,6 +29,8 @@ const Sensitive: React.FC<{ c: Ctx }> = ({ c }) => {
   const revenueAt = c.w("r-sensitive", "Revenue per user is long-tailed");
   const capAt = c.w("r-sensitive", "capping it at the ninety-ninth percentile");
   const cutAt = c.w("r-sensitive", "forty-eight percent");
+  const smallerAt = c.w("r-sensitive-gain", "can detect a smaller effect");
+  const swingAt = c.w("r-sensitive-gain", "no longer swing it");
   const W = 560;
   const rows = [
     { text: "revenue per user", v: 1, at: revenueAt, color: BAR, ink: BLUE_INK, label: "its variance" },
@@ -64,6 +66,11 @@ const Sensitive: React.FC<{ c: Ctx }> = ({ c }) => {
           </React.Fragment>
         );
       })}
+      <Note at={smallerAt - 2} x={R_X + 40} y={c.y(690)}>
+        <span style={{ ...note(25, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          capped: more sensitive<span style={{ opacity: ease(frame, swingAt - 4, 10) }}>, and more robust</span>
+        </span>
+      </Note>
     </>
   );
 };
@@ -101,6 +108,8 @@ const Strata: React.FC<{ c: Ctx }> = ({ c }) => {
   const fiveAt = c.w("r-strata", "five or six of them in one arm");
   const oneInFiveAt = c.w("r-strata", "about one time in five");
   const stratAt = c.w("r-strata", "Stratifying puts three in each");
+  const varAt = c.w("r-strata-var", "lowers variance when the groups differ");
+  const smallAt = c.w("r-strata-var", "matters most in small tests");
   // Stratified: three heavy users in each arm, and the other fourteen seven and seven.
   const stratified = Array.from({ length: STRATA.users }, (_, i) => (i % 2 === 0 ? 1 : 0));
   const heavyB = STRATA.coin.slice(0, STRATA.heavy).reduce((a, b) => a + b, 0);
@@ -128,7 +137,7 @@ const Strata: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={oneInFiveAt - 2} x={R_X + 40} y={c.y(580)}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-          a coin does that about 1 time in 5 ({pct(STRATA.lopsided, 1)})
+          a coin puts 5 or 6 in one arm about 1 time in 5 ({pct(STRATA.lopsided, 1)})
         </span>
       </Note>
       <Note at={stratAt - 2} x={R_X + 40} y={c.y(636)}>
@@ -137,6 +146,12 @@ const Strata: React.FC<{ c: Ctx }> = ({ c }) => {
       <Users arms={stratified} top={c.y(700)} at={stratAt} />
       <Note at={stratAt + 10} x={R_X + 40} y={c.y(736)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>three heavy users in each arm</span>
+      </Note>
+      <Note at={varAt - 2} x={R_X + 40} y={c.y(796)}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          also: lower variance when groups differ
+          <span style={{ opacity: ease(frame, smallAt - 4, 10) }}>, most useful in small tests</span>
+        </span>
       </Note>
     </>
   );

@@ -81,10 +81,11 @@ export const BagScene: React.FC = () => {
   const hundredAt = n.word("boost", "after a hundred");
   const mseAt = n.word("boost", "point one seven five");
   const biasAt = n.word("boost", "Boosting cuts bias");
-  const accurateAt = n.word("boost", "the more accurate of the two");
-  const noisyAt = n.word("boost", "overfit noisy data");
-  const holdsAt = n.word("boost", "where bagging holds up");
-  const end = n.beat("boost").to;
+  const levelAt = n.word("boost-noise", "about level");
+  const accurateAt = n.word("boost-noise", "often the more accurate");
+  const noisyAt = n.word("boost-noise", "overfit noisy data");
+  const holdsAt = n.word("boost-noise", "where bagging holds up");
+  const end = n.beat("boost-noise").to;
 
   const boxes: Box[] = LEFTS.map((left) => ({
     left,
@@ -193,7 +194,8 @@ export const BagScene: React.FC = () => {
               ...TABULAR,
             }}
           >
-            200 bagged trees: {fmt(ENS.mse.bag, 3)}
+            200 bagged trees:{" "}
+            <Mark at={levelAt}>{fmt(ENS.mse.bag, 3)}</Mark>
           </span>
         </Note>
         <Note at={varAt} x={LEFTS[0]} y={under + h(96)}>
@@ -301,13 +303,19 @@ export const BagScene: React.FC = () => {
                 ...TABULAR,
               }}
             >
-              {s.name}: {fmt(ENS.mse.stages[s.k], 3)}
+              {s.name}:{" "}
+              {s.k === "100" ? (
+                <Mark at={levelAt + 4}>{fmt(ENS.mse.stages[s.k], 3)}</Mark>
+              ) : (
+                fmt(ENS.mse.stages[s.k], 3)
+              )}
             </span>
           </Note>
         ))}
         <Note at={hundredAt} x={LEFTS[1]} y={under + h(40)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
-            test error, on 2,000 new points
+            test error (mean squared), on 2,000 new points; the noise
+            alone costs {fmt(ENS.mse.noise, 3)}
           </span>
         </Note>
         <Note at={biasAt} x={LEFTS[1]} y={under + h(96)}>

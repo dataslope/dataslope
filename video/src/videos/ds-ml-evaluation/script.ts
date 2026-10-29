@@ -69,7 +69,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     0.05 the false positive rate is only 6.8%, yet that is 13,402 false
  *     alarms against 3,017 catches. Calling everything
  *     negative is 98.0% accurate. With balanced class weights, recall at 0.5
- *     goes from 27% to 86% and precision from 67% to 11%. Calibration bins:
+ *     goes from 27% to 86% and precision from 67% to 11%; the plain model
+ *     with its threshold moved to 0.02 has 87% and 11%. Calibration bins:
  *     the plain model's 0.85 bin is 80% positive; the weighted model's is
  *     8.5% positive; recalibrated with Platt scaling, 81%.
  *   - "gd", the page's own chart: x² from 8. At 0.25 the distance halves each
@@ -96,11 +97,10 @@ export const script: NarrationScript = {
       text: "Here's a model that gets every example it trained on right. A hundred percent. Show it examples it has never seen, and it gets eighty-four. Which of those is the model? Most of the machine learning round comes back to that gap.",
       pauseAfter: 0.6,
     },
-    {
-      id: "plan",
-      text: "Fifteen questions in this round. Every figure you'll see is a real model, fitted in Python. The last three are quick.",
-      pauseAfter: 0.7,
-    },
+    { id: "plan", text: "Fifteen questions in this round." },
+    // Not "every": Question six's figure is a diagram and twelve's is x squared.
+    { id: "plan-figures", text: "Most figures you'll see are real models, fitted in Python." },
+    { id: "plan-quick", text: "The last three are quick.", pauseAfter: 0.7 },
     { id: "bias-in", text: "First, where the gap comes from." },
 
     // ── 1, 2. Bias, variance, overfitting ─────────────────────────────────
@@ -125,7 +125,7 @@ export const script: NarrationScript = {
       text: "Question two. How do you detect and fix overfitting? Look for the gap: good on training data, poor on held-out data. At degree nine, training error is point oh six, and validation error is five point seven. To fix it: more data, a simpler model, regularization, early stopping, and cross-validation, so the estimate is honest.",
       pauseAfter: 0.7,
     },
-    { id: "reg-in", text: "One of those fixes gets a question of its own." },
+    { id: "reg-in", text: "Regularization gets its own question." },
 
     // ── 3, 4. L1, L2, elastic net ─────────────────────────────────────────
     {
@@ -246,6 +246,14 @@ export const script: NarrationScript = {
       text: "Weight the rare class in the loss, and at a threshold of point five, recall goes from twenty-seven percent to eighty-six, while precision falls from sixty-seven to eleven. Or move the threshold, or resample, and judge the result by pee-ar ay-you-see or F one.",
       pauseAfter: 0.7,
     },
+    {
+      // The plain model at 0.02 (results.json cls.curve), against the
+      // weighted one at 0.5: the weights mostly moved the threshold, which
+      // is what Question eleven then shows they cost.
+      id: "imbalance-same",
+      text: "Here, moving the threshold nearly matches the weights: at point oh two, the plain model has eighty-seven percent recall and eleven percent precision.",
+      pauseAfter: 0.7,
+    },
 
     // ── 11. Calibration ───────────────────────────────────────────────────
     {
@@ -257,6 +265,11 @@ export const script: NarrationScript = {
     {
       id: "cal-curve",
       text: "The plain model sits near the diagonal. The weighted one doesn't: of the cases it scores around point eight five, under nine percent are positive. The weights bought recall and broke the probabilities. Fit a calibration on held-out data, with Platt scaling or isotonic regression, and it's back on the line.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "cal-measure",
+      text: "To measure calibration, plot a reliability diagram, like this one, or compute the Brier score: the mean squared error of the probabilities.",
       pauseAfter: 0.7,
     },
 
@@ -315,7 +328,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-select",
-      text: "And to choose between two models, compare them on validation data, with a metric that matches the goal. Then weigh speed, interpretability and cost. If they're close, take the simpler one.",
+      text: "And to choose between two models, compare them on validation data, with a metric that matches the goal. Then weigh speed, interpretability and cost.",
+    },
+    {
+      id: "r-close",
+      text: "If the gap is within its noise, take the simpler one. Then score the winner once, on the untouched test set.",
       pauseAfter: 0.9,
     },
     {

@@ -23,7 +23,7 @@ const OVERLAP = 6;
  * "Probability" (16:9), Part 2 of the Data Scientist interview prep videos,
  * on the editorial page. Fourteen questions of the track's probability page:
  * twelve worked through with numbers, a scene or part of one each, then two
- * that take a sentence. Every number came out of NumPy and SciPy in Pyodide
+ * quick ones. Every number came out of NumPy and SciPy in Pyodide
  * (check.mjs, results.json, data.ts).
  *
  * No series intro yet, as in the Data Analyst videos.

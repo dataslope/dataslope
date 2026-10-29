@@ -25,7 +25,8 @@ const density = (z: number, mu: number) => Math.exp(-0.5 * (z - mu) ** 2) / Math
  * the null curve and an alternative placed for 80% power. The two errors are
  * areas either side of the threshold; power is the rest of the alternative.
  * Then the page's code (393 per arm for an effect of 0.2 SD) and one lever at
- * a time; doubling the users slides the alternative to the right.
+ * a time; doubling the users slides the alternative to the right, its own
+ * power (98%) is written inside it, and the design's 20% and 80% fade back.
  */
 export const ErrorsScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -52,7 +53,10 @@ export const ErrorsScene: React.FC = () => {
   const ninetyEightAt = n.word("power", "it's ninety-eight");
   const leverAts = [ninetyEightAt, n.word("power", "A bigger effect"), n.word("power", "less variance"), n.word("power", "a looser alpha")];
   const howManyAt = n.word("size-in", "how many users");
-  const clearAt = n.beat("size-in").to - 6;
+  // The page holds through the pause and clears into the cut, so the next
+  // scene cross-fades in over it rather than over an empty page.
+  const nextAt = n.beat("size").from;
+  const clearAt = nextAt - 14;
 
   const clear = 1 - ease(frame, clearAt, 10);
   const shift = ERRORS.shift + (ERRORS.shift * Math.SQRT2 - ERRORS.shift) * ease(frame, doubleAt + 2, 24);
@@ -73,6 +77,9 @@ export const ErrorsScene: React.FC = () => {
   const betaP = ease(frame, betaAt - 4, 12);
   const powerP = ease(frame, oneMinusAt, 14);
   const crit = ERRORS.crit;
+  // Once the alternative slides right, the design's 20% and 80% no longer
+  // describe the curve on screen: they fade back, and its own 98% is drawn in.
+  const stale = 1 - 0.72 * ease(frame, doubleAt + 2, 12);
 
   const levers = [
     { text: `double the users, ${POWER.n} → ${POWER.levers[0].to}`, v: POWER.levers[0].power },
@@ -92,7 +99,7 @@ export const ErrorsScene: React.FC = () => {
         <Sfx key={i} name="el-tap" at={t} level={-38} />
       ))}
 
-      <Drift from={from} to={n.beat("size-in").to + 30}>
+      <Drift from={from} to={nextAt}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} out={q5At - 4} size={58}>
           What&apos;s the difference between a Type I and a Type II error?
         </QuestionCard>
@@ -132,7 +139,13 @@ export const ErrorsScene: React.FC = () => {
           <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a real effect</span>
         </Note>
         <Note at={fpAt + 4} x={xs(crit) + 10} y={y(BASE) + h(14)}>
-          <span style={{ ...label(20, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>threshold, z = {crit}</span>
+          <span style={{ ...label(20, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            threshold, z = <span style={TABULAR}>{crit}</span>
+          </span>
+        </Note>
+        {/* The axis, named a row below the threshold so the two never read as one line. */}
+        <Note at={t1At + 12} x={RIGHT} y={y(BASE) + h(48)} align="right">
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>where the test statistic lands</span>
         </Note>
 
         {/* The two errors, named. */}
@@ -149,13 +162,15 @@ export const ErrorsScene: React.FC = () => {
         </Note>
         <Note at={betaAt} x={COL_X} y={y(530)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            β = {pct(ERRORS.beta)}<span style={{ opacity: ease(frame, secondAt, 10) }}>: abandons features that work</span>
+            β<span style={{ opacity: stale }}> = {pct(ERRORS.beta)}</span><span style={{ opacity: ease(frame, secondAt, 10) }}>: abandons features that work</span>
           </span>
         </Note>
 
         {/* Power, and what moves it. */}
         <Note at={oneMinusAt} x={COL_X} y={y(596)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>power = 1 − β = {pct(POWER.base)}</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
+            power = 1 − β<span style={{ opacity: stale }}> = {pct(POWER.base)}</span>
+          </span>
         </Note>
         <Note at={codeAt} x={COL_X} y={y(644)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
@@ -172,6 +187,11 @@ export const ErrorsScene: React.FC = () => {
         ))}
         <Note at={ninetyEightAt} x={xs(ERRORS.shift * Math.SQRT2) - 110} y={y(BASE) - h(PEAK) - h(44)} width={220} style={{ textAlign: "center" }}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>twice the users</span>
+        </Note>
+        {/* The shifted curve's own power, inside its green area, where the old 80% no longer applies. */}
+        <Note at={ninetyEightAt + 4} x={xs(ERRORS.shift * Math.SQRT2) - 110} y={y(BASE) - h(PEAK) * 0.42} width={220} style={{ textAlign: "center" }}>
+          <span style={{ ...note(34, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{pct(POWER.levers[0].power)}</span>
+          <div style={{ ...label(20, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>power</div>
         </Note>
       </Drift>
     </AbsoluteFill>

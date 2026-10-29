@@ -28,6 +28,8 @@ const Bayes: React.FC<{ c: Ctx }> = ({ c }) => {
   const randomAt = c.w("r-bayes", "the data as random");
   const reportsAt = c.w("r-bayes", "and reports p-values");
   const bayesAt = c.w("r-bayes", "A Bayesian updates");
+  const priorAt = c.w("r-bayes", "a prior");
+  const posteriorAt = c.w("r-bayes", "into a posterior");
   const pageAt = c.w("r-bayes-ab", "Take an A B test");
   const bAt = c.w("r-bayes-ab", "against a hundred and fifty");
   const flatAt = c.w("r-bayes-ab", "Start from flat priors");
@@ -36,7 +38,10 @@ const Bayes: React.FC<{ c: Ctx }> = ({ c }) => {
   const s: Scale = { lo: 0.08, hi: 0.2, a: R_X + 30, b: R_END - 40 };
   const base = c.y(740);
   const peak = Math.max(...BAYES.a, ...BAYES.b);
-  const pts = (v: readonly number[]) => BAYES.grid.map((g, i) => [at(s, g), base - (v[i] / peak) * c.h(250)] as const);
+  // Curves a little short of the definition above them, so their labels keep
+  // the house gap under it.
+  const curveH = c.h(225);
+  const pts = (v: readonly number[]) => BAYES.grid.map((g, i) => [at(s, g), base - (v[i] / peak) * curveH] as const);
   return (
     <>
       <Note at={freqAt} x={R_X} y={c.y(330)}>
@@ -49,16 +54,16 @@ const Bayes: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={bayesAt} x={R_X} y={c.y(424)}>
         <span style={{ ...noteText(25, BLUE_INK) }}>
-          <b>Bayesian</b>: a prior, updated into a posterior
+          <b>Bayesian</b>: <Mark at={priorAt + 2}>a prior</Mark>, updated into <Mark at={posteriorAt + 6}>a posterior</Mark>
         </span>
       </Note>
-      <Axes x={s} y={{ lo: 0, hi: 1, a: base, b: base - c.h(250) }} xTicks={[0.1, 0.12, 0.14, 0.16, 0.18]} xFormat={(v) => `${Math.round(v * 100)}%`} xTitle="conversion rate" at={pageAt} size={19} />
+      <Axes x={s} y={{ lo: 0, hi: 1, a: base, b: base - curveH }} xTicks={[0.1, 0.12, 0.14, 0.16, 0.18]} xFormat={(v) => `${Math.round(v * 100)}%`} xTitle="conversion rate" at={pageAt} size={19} />
       <Curve points={pts(BAYES.a)} at={pageAt + 6} dur={20} color={INK_SOFT} width={3} fill={`color-mix(in srgb, ${INK_SOFT} 10%, transparent)`} base={base} />
       <Curve points={pts(BAYES.b)} at={bAt} dur={20} color={BAR} width={3} fill={`color-mix(in srgb, ${BAR} 14%, transparent)`} base={base} />
-      <Note at={pageAt + 8} x={at(s, 0.121) - 10} y={base - c.h(282)} align="right">
+      <Note at={pageAt + 8} x={at(s, 0.121) - 10} y={base - c.h(258)} align="right">
         <span style={{ ...noteText(22, INK_SOFT), ...TABULAR }}>A: 120 in 1,000</span>
       </Note>
-      <Note at={bAt + 4} x={at(s, 0.151) + 10} y={base - c.h(282)}>
+      <Note at={bAt + 4} x={at(s, 0.151) + 10} y={base - c.h(258)}>
         <span style={{ ...noteText(22, BLUE_INK), ...TABULAR }}>B: 150 in 1,000</span>
       </Note>
       <Note at={flatAt} x={R_X + 30} y={c.y(836)}>
@@ -114,7 +119,7 @@ const Ranks: React.FC<{ c: Ctx }> = ({ c }) => {
           <g key={k}>
             <line x1={s.a} x2={s.b} y1={r.y} y2={r.y} stroke={INK} strokeWidth={1.2} opacity={0.5} />
             <line x1={far.a} x2={far.b} y1={r.y} y2={r.y} stroke={INK} strokeWidth={1.2} opacity={0.5} />
-            <text x={(s.b + far.a) / 2} y={r.y + 7} textAnchor="middle" style={{ ...label(22, INK_SOFT) }}>
+            <text x={(s.b + far.a) / 2} y={r.y + 7} textAnchor="middle" fill={INK_SOFT} style={{ ...label(22, INK_SOFT) }}>
               //
             </text>
             {r.values.map((v, i) => {

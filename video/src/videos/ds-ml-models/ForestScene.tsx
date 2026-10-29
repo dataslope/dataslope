@@ -12,6 +12,7 @@ import {
   INK_SOFT,
   PAPER,
   TABULAR,
+  fmt,
   label,
   note,
 } from "../../editorial/style";
@@ -99,12 +100,13 @@ export const ForestScene: React.FC = () => {
   const asked = n.word("forest", "bagged trees with one more twist");
   const splitAt = n.word("forest", "at every split");
   const fiveAt = n.word("forest", "five of thirty");
-  const sameAt = n.word("forest", "stop all making the same cuts");
-  const overlapAt = n.word("forest", "mistakes overlap less");
-  const heldAt = n.word("forest", "held-out tumors");
-  const oneAt = n.word("forest", "one tree scores");
-  const baggedAt = n.word("forest", "bagged trees ninety-three");
-  const forestAt = n.word("forest", "the forest ninety-five");
+  const sqrtAt = n.word("forest-sqrt", "the square root");
+  const sameAt = n.word("forest-why", "stop all making the same cuts");
+  const overlapAt = n.word("forest-why", "mistakes overlap less");
+  const heldAt = n.word("forest-why", "held-out tumors");
+  const oneAt = n.word("forest-why", "one tree scores");
+  const baggedAt = n.word("forest-why", "bagged trees ninety-three");
+  const forestAt = n.word("forest-why", "the forest ninety-five");
   const q6At = n.word("ada", "Question six");
   const q6TextAt = n.word("ada", "How does gradient boosting differ");
   const gbAt = n.word("gb", "Gradient boosting fits each new tree");
@@ -124,8 +126,9 @@ export const ForestScene: React.FC = () => {
   const end = n.beat("knn-in").to;
   const out5 = q6At - 4;
 
-  // ── 5: which handful is lit, changing every 16 frames from the first split ──
-  const k = Math.max(0, Math.floor((frame - splitAt) / 16));
+  // ── 5: which handful is lit, changing every 16 frames from the first split
+  // until the scores are read, so it does not flicker beside them ──
+  const k = Math.max(0, Math.floor((Math.min(frame, heldAt) - splitAt) / 16));
   const lit = SUBSETS[k % SUBSETS.length];
   const gridOn = ease(frame, asked - 2, 12) * (1 - ease(frame, out5, 10));
   const subsetOn = ease(frame, splitAt, 8);
@@ -269,9 +272,22 @@ export const ForestScene: React.FC = () => {
             </span>
           </Note>
           <Note
+            at={sqrtAt}
+            x={X0}
+            y={y(GRID_TOP) + 5 * h(CELL + GAP) + h(52)}
+            out={out5}
+          >
+            <span
+              style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
+            >
+              the usual default: about √{FOREST.features} ≈{" "}
+              {fmt(Math.sqrt(FOREST.features), 1)}
+            </span>
+          </Note>
+          <Note
             at={sameAt}
             x={X0}
-            y={y(GRID_TOP) + 5 * h(CELL + GAP) + h(60)}
+            y={y(GRID_TOP) + 5 * h(CELL + GAP) + h(100)}
             out={out5}
           >
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -281,7 +297,7 @@ export const ForestScene: React.FC = () => {
           <Note
             at={overlapAt}
             x={X0}
-            y={y(GRID_TOP) + 5 * h(CELL + GAP) + h(96)}
+            y={y(GRID_TOP) + 5 * h(CELL + GAP) + h(136)}
             out={out5}
           >
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -295,7 +311,6 @@ export const ForestScene: React.FC = () => {
                 ...label(22, INK),
                 fontWeight: 650,
                 whiteSpace: "nowrap",
-                ...TABULAR,
               }}
             >
               accuracy on {FOREST.nTest} held-out tumors
@@ -503,7 +518,7 @@ export const ForestScene: React.FC = () => {
               cy={at(ay, ADA.y[heaviest])}
               r={radius(MAX_W) + 10 + 4 * pulse(frame, thisAt + 4, 20)}
               fill="none"
-              stroke={OK}
+              stroke={ACCENT}
               strokeWidth={3.4}
               opacity={ease(frame, thisAt, 10)}
             />
@@ -520,22 +535,22 @@ export const ForestScene: React.FC = () => {
               one-split tree
             </span>
           </Note>
+          {/* Under the box, not beside the point: inside it, the label hid a
+              point and crossed a stump on either side. */}
           <Note
             at={thisAt + 4}
-            x={at(ax, ADA.x[heaviest]) + radius(MAX_W) + 18}
-            y={at(ay, ADA.y[heaviest]) - h(16)}
+            x={box.left}
+            y={box.top + box.height + h(14)}
           >
             <span
               style={{
-                ...note(25, OK_INK),
+                ...note(25, ACCENT_INK),
                 fontWeight: 700,
                 whiteSpace: "nowrap",
-                ...TABULAR,
-                background: PAPER,
-                padding: "0 6px",
               }}
             >
-              {Math.round(MAX_W / lightest)}× the lightest
+              ringed: <span style={TABULAR}>{Math.round(MAX_W / lightest)}×</span>{" "}
+              the weight of the lightest point
             </span>
           </Note>
 

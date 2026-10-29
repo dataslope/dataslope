@@ -50,9 +50,9 @@ export const HookScene: React.FC = () => {
   const whichAt = n.word("hook", "Which of those");
   const gapAt = n.word("hook", "that gap");
   const fifteenAt = n.word("plan", "Fifteen questions");
-  const realAt = n.word("plan", "a real model");
-  const pythonAt = n.word("plan", "fitted in Python");
-  const lastAt = n.word("plan", "The last three are quick");
+  const realAt = n.word("plan-figures", "real models");
+  const pythonAt = n.word("plan-figures", "fitted in Python");
+  const lastAt = n.word("plan-quick", "The last three are quick");
   const firstAt = n.word("bias-in", "where the gap comes from");
   const end = n.beat("bias-in").to;
 
@@ -171,12 +171,13 @@ export const HookScene: React.FC = () => {
         })}
         {Array.from({ length: TOTAL }, (_, i) => (
           <Note key={i} at={fifteenAt + i * 1.4} x={X0 + i * (TILE + TILE_GAP)} y={y(TILES_Y) + h(TILE) + h(8)} width={TILE} style={{ textAlign: "center" }} dim={firstAt + 4}>
-            <span style={{ ...label(18, i === 0 && frame >= firstAt ? INK : INK_SOFT), ...TABULAR, fontWeight: 650 }}>{i + 1}</span>
+            <span style={{ ...label(20, i === 0 && frame >= firstAt ? INK : INK_SOFT), ...TABULAR, fontWeight: 650 }}>{i + 1}</span>
           </Note>
         ))}
         <Note at={realAt - 2} x={X0} y={y(TILES_Y) + h(96)} dim={firstAt + 4}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: BLUE_INK }}>12</b> with a figure, each <span style={{ opacity: ease(frame, pythonAt - 2, 10) }}>a real model fitted in Python</span>
+            {/* Not "each": Question 6's figure is a diagram, 12's is x². */}
+            <b style={{ color: BLUE_INK }}>12</b> with a figure, <span style={{ opacity: ease(frame, pythonAt - 2, 10) }}>most of them a real model fitted in Python</span>
           </span>
         </Note>
         <Note at={lastAt} x={X0} y={y(TILES_Y) + h(142)} dim={firstAt + 4}>

@@ -15,7 +15,9 @@
       6
     ],
     "pSix": "1/6",
-    "pSixGivenEven": "1/3"
+    "pSixGivenEven": "1/3",
+    "pSixAndEven": "1/6",
+    "pEven": "1/2"
   },
   "test": {
     "people": 10000,
@@ -26,7 +28,9 @@
     "positives": 594,
     "posterior": "1/6",
     "posteriorFloat": 0.1667,
-    "pageBlock": 0.167
+    "pageBlock": 0.167,
+    "specificity": 0.95,
+    "fpRate": 0.05
   },
   "churn": {
     "paid": [
@@ -1696,6 +1700,8 @@
     "lose": -3,
     "ev": -0.4,
     "winPart": 2,
-    "losePart": -2.4
+    "losePart": -2.4,
+    "pWinFrac": "1/5",
+    "pLoseFrac": "4/5"
   }
 }
