@@ -21,7 +21,9 @@ const GHOST = `, pos="${DEFAULT_POS}"`;
 const CALL_W = Math.max(...DEFAULTS.map((d) => `lemmatize("${d.word}"${GHOST})`.length)) * ADV;
 const ARROW_X = X0 + CALL_W + 26;
 const RESULT_X = ARROW_X + 96;
-const RIGHT_X = 1090;
+/** Fig. 2 starts well clear of Fig. 1's "already a dictionary form", which
+ *  shares its baseline with "a noun". */
+const RIGHT_X = 1140;
 const PHRASE = ["the", "running", "of", "the", "race"];
 
 /**
@@ -90,7 +92,6 @@ export const HookScene: React.FC = () => {
   const nounAt = n.word("noun", "noun");
   const oneWordAt = n.word("alone", "one word");
   const sentenceAt = n.word("alone", "sentence");
-  const nounAgainAt = n.word("race", "noun", { nth: 1 });
   const raceAt = n.word("race", "the running of the race");
   const raceRunningAt = n.word("race", "running", { nth: 2 });
   const dictionaryAt = n.word("race", "dictionary form");
@@ -173,7 +174,8 @@ export const HookScene: React.FC = () => {
           tones={i === runningIdx ? [{ at: dictionaryAt, tone: "good" }] : []}
         />
       ))}
-      <Tag at={nounAgainAt} x={phrase[runningIdx].mid} y={phraseTop + chipH + 12} align="center" color={INK} size={22}>
+      {/* Under the phrase's running, once the phrase is there to read it in. */}
+      <Tag at={raceRunningAt} x={phrase[runningIdx].mid} y={phraseTop + chipH + 12} align="center" color={INK} size={22}>
         a noun
       </Tag>
       <Ink at={oneWordAt} dur={14} out={raceAt - 10} style={{ left: RIGHT_X, top: phraseTop + 6, whiteSpace: "nowrap" }}>

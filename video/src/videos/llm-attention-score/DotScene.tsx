@@ -8,7 +8,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO, SANS } from "../../theme/fonts";
-import { KEYS, one, TOKENS, TROPHY, two } from "./data";
+import { COSINE, KEYS, one, three, TOKENS, TROPHY, two } from "./data";
 import {
   Cells,
   FAINT,
@@ -74,10 +74,12 @@ export const DotScene: React.FC = () => {
   const dotAt = n.word("dot", "dot product");
   const metAt = n.word("cosine", "met");
   const cosineAt = n.word("cosine", "cosine similarity");
-  const shrunkAt = n.word("cosine", "shrunk");
+  const scaledAt = n.word("cosine", "scaled");
   const lengthOneAt = n.word("cosine", "length one");
-  const keepsAt = n.word("cosine", "keeps");
-  const lengthsAt = n.word("cosine", "lengths");
+  const keepsAt = n.word("keeps", "keeps");
+  const shortAt = n.word("short", "short");
+  const elevenAgainAt = n.word("short", "point one one");
+  const cosineSaysAt = n.word("short", "Cosine would");
 
   // ── Fig. 3 geometry ──
   const O: Pt = [210, y(800)];
@@ -88,8 +90,8 @@ export const DotScene: React.FC = () => {
   const glowKey = (i: number) =>
     (i === 0 ? pulse(frame, trophysAt - 2, 30) + pulse(frame, resultAt, 26) : 0) +
     (i === 1 ? pulse(frame, farAt, 30) + pulse(frame, fourAt, 26) : 0) +
-    (i === 2 ? pulse(frame, elevenAt, 26) + pulse(frame, lengthsAt - 2, 36) : 0);
-  const circle = ease(frame, shrunkAt - 2, 20);
+    (i === 2 ? pulse(frame, elevenAt, 26) + pulse(frame, shortAt - 2, 36) : 0);
+  const circle = ease(frame, scaledAt - 2, 20);
   const ghost = circle * (1 - ease(frame, keepsAt - 2, 12));
   const itTip = keyTips[2];
   const itUnit: Pt = [O[0] + U * Math.SQRT1_2, O[1] - U * Math.SQRT1_2];
@@ -122,7 +124,8 @@ export const DotScene: React.FC = () => {
       <Sfx name="el-tap" at={fourAt} level={-25} />
       <Sfx name="el-tap" at={elevenAt} level={-25} />
       <Sfx name="el-pencil" at={dotAt - 2} level={-34} />
-      <Sfx name="el-pencil" at={shrunkAt - 2} level={-36} />
+      <Sfx name="el-pencil" at={scaledAt - 2} level={-36} />
+      <Sfx name="el-tap" at={elevenAgainAt} level={-27} />
 
       <Kicker at={from - 10}>Attention, by hand</Kicker>
       <Headline lead="Score each key" turn="against the query." at={from} turnAt={scoreAt - 4} out={multAddAt - 8} />
@@ -146,8 +149,15 @@ export const DotScene: React.FC = () => {
           </g>
         ))}
         <circle cx={O[0]} cy={O[1]} r={4.5} fill={INK} />
+        {/* Axis names: a vector's first number runs right, its second up. */}
+        <text x={O[0] + 0.58 * U} y={O[1] + 70} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+          first number
+        </text>
+        <text x={O[0] + 12} y={O[1] - 1.12 * U - 14} style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+          second number
+        </text>
       </Svg>
-      {/* "Shrunk to length one": the circle every unit arrow ends on. */}
+      {/* "Scaled to length one": the circle every unit arrow ends on. */}
       <Svg opacity={circle}>
         <path
           d={`M${O[0] + U},${O[1]} A${U},${U} 0 0 0 ${O[0]},${O[1] - U}`}
@@ -160,7 +170,7 @@ export const DotScene: React.FC = () => {
       <Fade at={lengthOneAt - 2} out={keepsAt + 10} style={{ left: O[0] + U * 0.74 + 12, top: O[1] - U * 0.74 - 40, ...halo }}>
         <Tag size={21}>length one</Tag>
       </Fade>
-      {/* The pronoun's short key, stretched to length one for cosine; attention leaves it short. */}
+      {/* The pronoun's short key, scaled up to length one for cosine; attention leaves it short. */}
       <Svg opacity={ghost}>
         <line x1={itTip[0]} y1={itTip[1]} x2={itUnit[0]} y2={itUnit[1]} stroke={KEY} strokeWidth={2.4} strokeDasharray="5 6" />
         <circle cx={itUnit[0]} cy={itUnit[1]} r={8} fill="none" stroke={KEY} strokeWidth={2.4} />
@@ -178,7 +188,7 @@ export const DotScene: React.FC = () => {
       {TOKENS.map((t, i) => {
         const [x, ty] = keyTips[i];
         const pos =
-          i === 0 ? { left: x + 18, top: ty - 30 } : i === 1 ? { left: x + 18, top: ty - 16 } : { left: x + 4, top: ty - 48 };
+          i === 0 ? { left: x + 18, top: ty - 30 } : i === 1 ? { left: x + 18, top: ty - 16 } : { left: x + 4, top: ty - 72 };
         return (
           <Fade key={t} at={keyAt(i) + 8} style={{ ...pos, ...halo }}>
             <span style={{ ...label(22, KEY_INK), whiteSpace: "nowrap" }}>
@@ -187,10 +197,14 @@ export const DotScene: React.FC = () => {
           </Fade>
         );
       })}
-      <Fade at={lengthsAt - 2} style={{ left: itTip[0] + 20, top: itTip[1] - 96, ...halo }}>
+      {/* The payoff: the pronoun's key points roughly the query's way, but it is short. */}
+      <Fade at={shortAt - 2} style={{ left: itTip[0] + 40, top: itTip[1] - 152, ...halo }}>
         <Tag size={21} color={KEY_INK}>
-          short key, small score
+          short key, score {two(TROPHY.rows[2].dot)}
         </Tag>
+      </Fade>
+      <Fade at={cosineSaysAt - 2} style={{ left: itTip[0] + 40, top: itTip[1] - 122, ...halo }}>
+        <Tag size={21}>cosine would give {three(COSINE[2])}</Tag>
       </Fade>
 
       {/* ── Fig. 4: multiply the matching numbers, and add ── */}
@@ -247,9 +261,21 @@ export const DotScene: React.FC = () => {
                 + {one(TROPHY.query[1])} × {one(KEYS[i][1])}
               </span>
             </div>
-            <div style={{ position: "absolute", left: L.result - 44, top: 6, opacity: sum, display: "flex", gap: 18, alignItems: "baseline" }}>
+            <div style={{ position: "absolute", left: L.result - 44, top: 6, opacity: sum, display: "flex", gap: 36, alignItems: "baseline" }}>
               <span style={{ fontFamily: MONO, fontSize: EXPR, fontWeight: 600, color: INK_SOFT }}>=</span>
-              <span style={{ fontFamily: MONO, fontSize: 32, fontWeight: 700, color: INK, ...TABULAR }}>{two(row.dot)}</span>
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: INK,
+                  borderRadius: 6,
+                  boxShadow: i === 2 ? `0 0 0 ${6 * pulse(frame, elevenAgainAt, 30)}px color-mix(in srgb, ${POINT} 35%, transparent)` : undefined,
+                  ...TABULAR,
+                }}
+              >
+                {two(row.dot)}
+              </span>
             </div>
           </Fade>
         );
@@ -261,7 +287,7 @@ export const DotScene: React.FC = () => {
       {/* Cosine, the course's earlier measure, is this same sum. */}
       <Note at={cosineAt - 4} x={L.chip} y={y(800)} width={760}>
         <div style={{ ...body(32), color: INK }}>
-          Cosine similarity: the same sum, on arrows shrunk to <Mark at={lengthOneAt}>length one.</Mark>
+          Cosine similarity: the same sum, on arrows scaled to <Mark at={lengthOneAt}>length one.</Mark>
         </div>
         <div style={{ ...body(32), color: INK, marginTop: 14, opacity: ease(frame, keepsAt - 4, 12) }}>
           Attention <Mark at={keepsAt}>keeps the lengths.</Mark>

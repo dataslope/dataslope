@@ -6,7 +6,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { RULE_EXAMPLES, TRACES, type Trace, WA } from "./data";
+import { RULE_EXAMPLES, TIE, TRACES, type Trace, WA } from "./data";
 import { Chip, chipHeight, chipWidth, Fade, Headline, Kicker, Mark, rowLayout, Tag, X0 } from "./parts";
 
 const SIZE = 28;
@@ -49,9 +49,10 @@ type RowCues = { word: number; as: number; list: number; rules: number; check: n
  * WordNet's lookup, in three steps, traced on six words: the part of
  * speech's list of irregular forms, or else its suffix rules; then the word
  * and every candidate checked against WordNet, the shortest survivor
- * returned, or the word unchanged. ran, was and better are on their lists;
- * was as a noun loses its s and lands on wa, Washington; running is a noun
- * as it stands; ran is no noun at all.
+ * returned, or the word unchanged. ran, was and better are on their lists,
+ * and better's good and well tie, so the first listed wins; was as a noun
+ * loses its s and lands on wa, Washington; running is a noun as it stands;
+ * ran is no noun at all.
  */
 export const LookupScene: React.FC = () => {
   const n = useNarration();
@@ -78,10 +79,16 @@ export const LookupScene: React.FC = () => {
   const edAt = n.word("rules", "ed");
   const ingAt = n.word("rules", "ing");
   const wordnetAt = n.word("check", "WordNet");
+  const dictionaryAt = n.word("check", "dictionary");
+  const lemmatizerAt = n.word("check", "the lemmatizer");
   const theWordAt = n.word("check", "the word");
   const guessAt = n.word("check", "every guess");
-  const realAt = n.word("check", "real entries");
-  const shortestAt = n.word("check", "shortest");
+  const realAt = n.word("survive", "real entries");
+  const shortestAt = n.word("survive", "shortest");
+  /** better's tie: good and well lit as each is named, then the first one
+   *  listed, and the result it gives. */
+  const tieSaid: Record<string, number> = { good: n.word("tie", "Good"), well: n.word("tie", "well") };
+  const firstListedAt = n.word("tie", "first one listed");
   const wa = n.beat("wa").from;
   const waNoun = n.word("wa", "noun");
   const waOff = n.word("wa", "comes off");
@@ -160,7 +167,10 @@ export const LookupScene: React.FC = () => {
               y={top}
               at={f === "well" ? wellAt : c.list + k * 4}
               size={SIZE}
-              marks={[{ at: guessAt + i * 3 + k * 2, out: guessAt + i * 3 + k * 2 + 30 }]}
+              marks={[
+                { at: guessAt + i * 3 + k * 2, out: guessAt + i * 3 + k * 2 + 30 },
+                ...(i === TIE.row && f === TIE.result ? [{ at: firstListedAt, out: firstListedAt + 40 }] : []),
+              ]}
             />
           ))
         ) : (
@@ -200,12 +210,20 @@ export const LookupScene: React.FC = () => {
               size={SIZE}
               tones={k.inWordnet ? [{ at: at + 6, tone: "good" }] : []}
               gone={k.inWordnet ? undefined : at + 8}
+              marks={i === TIE.row && tieSaid[k.form] !== undefined ? [{ at: tieSaid[k.form] - 2, out: firstListedAt + 40 }] : []}
             />
           );
         })}
 
         {/* The shortest survivor, or the word itself. */}
-        <Chip text={t.result} x={RES_X} y={top} at={c.result} size={SIZE} marks={[{ at: c.result, out: c.result + 30 }]} />
+        <Chip
+          text={t.result}
+          x={RES_X}
+          y={top}
+          at={c.result}
+          size={SIZE}
+          marks={[{ at: c.result, out: c.result + 30 }, ...(i === TIE.row ? [{ at: firstListedAt + 8, out: firstListedAt + 48 }] : [])]}
+        />
         {t.unchanged ? (
           <Tag at={c.result + 6} x={RES_X + chipWidth(t.result, SIZE) + 16} y={textTop(i) + 2} color={INK_SOFT} size={22}>
             unchanged
@@ -271,6 +289,16 @@ export const LookupScene: React.FC = () => {
           </Fade>
           <Fade at={ingAt - 2}>
             <span>&nbsp;{RULE_EXAMPLES.verb[1]}</span>
+          </Fade>
+        </span>
+      </Ink>
+
+      {/* What WordNet is, under its column, as the narration says it. */}
+      <Ink at={dictionaryAt - 2} dur={12} style={{ left: COL[2] + 26, top: headY + 34, whiteSpace: "nowrap" }}>
+        <span style={faint}>
+          the dictionary
+          <Fade at={lemmatizerAt - 2}>
+            <span>&nbsp;behind the lemmatizer</span>
           </Fade>
         </span>
       </Ink>

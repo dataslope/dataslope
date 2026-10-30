@@ -51,6 +51,21 @@ export const trace = (word: string, pos: string) => {
   return t;
 };
 
+/**
+ * better's tie (said: "Good and well tie at four letters, so the first one
+ * listed wins"): of the forms WordNet kept, the two shortest are good and
+ * well, both four letters, and lemmatize()'s min(key=len) returns the first.
+ */
+export const TIE = (() => {
+  const t = trace("better", "a");
+  const length = Math.min(...t.kept.map((k) => k.length));
+  const tied = t.kept.filter((k) => k.length === length);
+  if (tied.length !== 2 || tied[0] !== t.result || length !== 4) {
+    throw new Error(`better keeps ${t.kept.join(", ")}: not a four-letter tie won by the first`);
+  }
+  return { row: TRACES.indexOf(t), tied, result: t.result };
+})();
+
 /** A rule as it reads on screen: "-s", or "-ies → y". */
 export const ruleText = ([old, rep]: readonly string[]) => (rep ? `-${old} → ${rep}` : `-${old}`);
 
@@ -90,9 +105,15 @@ export type Sentence = {
  *  WordNet parts of speech, lemmas without and with them, Porter's stems. */
 export const SENTENCE: Sentence = m.sentence;
 
-/** Whether WordNet had each POS-aware lemma (false: the word came back
- *  unchanged because nothing survived the check). */
-export const FOUND: readonly boolean[] = SENTENCE.paths.map((p) => !p.unchanged);
+/** Where the tags change the lemma: the lesson's naive line and its
+ *  POS-aware line differ (were, running, had, eaten), checked against what
+ *  the narration says. */
+export const RESCUED: readonly boolean[] = (() => {
+  const r = SENTENCE.naive.map((l, i) => l !== SENTENCE.aware[i]);
+  const words = SENTENCE.tokens.filter((_, i) => r[i]).join(" ");
+  if (words !== "were running had eaten") throw new Error(`the tags rescue ${words}`);
+  return r;
+})();
 
 /** Index of a token by its text (the nth occurrence). */
 export const tokenAt = (text: string, nth = 1) => {

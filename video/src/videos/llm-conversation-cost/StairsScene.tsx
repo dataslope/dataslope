@@ -21,6 +21,7 @@ import {
   Key,
   LINE,
   LINE_EDGE,
+  mix,
   NEW,
   NEW_INK,
   OUTPUT_INK,
@@ -85,7 +86,9 @@ export const StairsScene: React.FC = () => {
   const oneAt = n.word("first", "Turn one");
   const twoThAt = n.word("first", "two-thousand-token");
   const sysAt = n.word("first", "system prompt");
-  const firstMsgAt = n.word("first", "first message");
+  // "your first message": its slice and its label come in on "your", so the
+  // label has the beat's last words and the pause after them to be read.
+  const yourAt = n.word("first", "your");
   const twoAt = n.word("second", "Turn two");
   const againAt = n.word("second", "again");
   const replyAt = n.word("second", "reply");
@@ -108,8 +111,9 @@ export const StairsScene: React.FC = () => {
   const chatAt = n.word("triangle", "chat itself");
   const againAndAt = n.word("triangle", "again and again");
   const nowAt = n.beat("double").from;
-  const doubleAt = n.word("double", "double the turns");
-  const longAt = n.word("double", "twice as long");
+  const twentyAt = n.word("double", "twenty turns");
+  const doubleAt = n.word("double", "double them");
+  const longAt = n.word("twice", "twice as long");
   const long2At = n.word("four", "twice as long");
   const tallAt = n.word("four", "twice as tall");
   const fourAt = n.word("four", "four");
@@ -137,7 +141,7 @@ export const StairsScene: React.FC = () => {
   const state = (t: number) => {
     if (t === 1) {
       const sys = SYSTEM / (SYSTEM + USER);
-      return { sent: 0, fresh: sys * ease(frame, twoThAt - 2, 16) + (1 - sys) * ease(frame, firstMsgAt - 2, 10) };
+      return { sent: 0, fresh: sys * ease(frame, twoThAt - 2, 16) + (1 - sys) * ease(frame, yourAt - 2, 10) };
     }
     if (t === 2) return { sent: ease(frame, againAt - 6, 18), fresh: ease(frame, replyAt - 2, 14), slide: true };
     return { sent: ease(frame, barAt(t), 8), fresh: ease(frame, barAt(t) + 4, 8), slide: true };
@@ -231,6 +235,9 @@ export const StairsScene: React.FC = () => {
         const p = ease(frame, memFrom + 2 + i * 6, 10);
         const o = ease(frame, oneAt - 8, 10);
         const fill = ease(frame, topAt - 2 + i * 4, 8);
+        // The last message is the one thing this turn adds: new, in Fig. 3's
+        // blue, under a chat sent before, in its light blue.
+        const isNew = i === BUBBLES.length - 1;
         if (p <= 0 || o >= 1) return null;
         return (
           <div
@@ -243,13 +250,14 @@ export const StairsScene: React.FC = () => {
               height: BUBBLE_H,
               borderRadius: b.r,
               boxSizing: "border-box",
-              border: `2px solid ${LINE_EDGE}`,
-              background: `color-mix(in srgb, ${SENT} ${Math.round(fill * 100)}%, ${PAPER})`,
+              border: `2px solid ${isNew ? mix(LINE_EDGE, NEW, fill) : LINE_EDGE}`,
+              background: `color-mix(in srgb, ${isNew ? NEW : SENT} ${Math.round(fill * 100)}%, ${PAPER})`,
               display: "flex",
               alignItems: "center",
               paddingLeft: 18,
               opacity: p * (1 - o),
-              ...note(22, INK),
+              ...note(22, isNew ? mix(INK, PAPER, fill) : INK),
+              fontWeight: isNew ? 600 : undefined,
             }}
           >
             {b.text}
@@ -321,11 +329,11 @@ export const StairsScene: React.FC = () => {
       </Note>
       <Leader
         points={[[ZX - 12, zoomed.ty(SYSTEM + USER / 2) - 40], [zoomed.x(1) + zoomed.bar + 4, zoomed.ty(SYSTEM + USER / 2)]]}
-        at={firstMsgAt - 2}
+        at={yourAt - 2}
         out={twoAt - 6}
         color={INK_SOFT}
       />
-      <Note at={firstMsgAt} out={twoAt - 6} x={ZX} y={zoomed.ty(SYSTEM + USER / 2) - 57}>
+      <Note at={yourAt} out={twoAt - 6} x={ZX} y={zoomed.ty(SYSTEM + USER / 2) - 57}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
           your first message, <b style={{ fontWeight: 650 }}>{int(USER)}</b>
         </span>
@@ -382,8 +390,10 @@ export const StairsScene: React.FC = () => {
       <Note at={areaAt + 2} out={cutAt - 4} x={1010} y={full.base - 150}>
         <span style={{ ...headline(40), whiteSpace: "nowrap", ...halo }}>the bill</span>
       </Note>
+      {/* Two lines broken by hand, so "price" never wraps alone. */}
       <Note at={repliesAt - 2} x={RX} y={y(392)} width={360}>
-        <span style={{ ...note(24, OUTPUT_INK), fontWeight: 600 }}>plus the replies, at the output price</span>
+        <span style={{ display: "block", ...note(24, OUTPUT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>plus the replies,</span>
+        <span style={{ display: "block", ...note(24, OUTPUT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>at the output price</span>
       </Note>
 
       {/* The cut: a rectangle under the system prompt's line, a triangle over it. */}
@@ -466,12 +476,14 @@ export const StairsScene: React.FC = () => {
         <rect x={x20} y={L} width={x40 - x20 + 2} height={full.base - L + 1} fill={PAPER} opacity={veilLow * 0.74} />
         <rect x={x20} y={full.top - 10} width={x40 - x20 + 2} height={L - full.top + 10} fill={PAPER} opacity={veilHigh * 0.74} />
       </Svg>
-      <Bracket x0={CHART.x0} x1={x20 - 2} y={full.base + 50} at={nowAt - 2} out={doubleAt - 4} color={INK} up />
-      <Note at={nowAt} out={doubleAt - 4} x={(CHART.x0 + x20) / 2 - 50} y={full.base + 58}>
+      {/* "Take twenty turns": held through "double them", until the rectangle
+          doubles and the forty-turn bracket takes its place. */}
+      <Bracket x0={CHART.x0} x1={x20 - 2} y={full.base + 50} at={twentyAt - 2} out={longAt - 4} color={INK} up />
+      <Note at={twentyAt} out={longAt - 4} x={(CHART.x0 + x20) / 2 - 50} y={full.base + 58}>
         <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>20 turns</span>
       </Note>
-      <Bracket x0={CHART.x0} x1={x40} y={full.base + 50} at={doubleAt} color={INK} up />
-      <Note at={doubleAt + 4} x={(CHART.x0 + x40) / 2 - 50} y={full.base + 58}>
+      <Bracket x0={CHART.x0} x1={x40} y={full.base + 50} at={longAt} color={INK} up />
+      <Note at={longAt + 4} x={(CHART.x0 + x40) / 2 - 50} y={full.base + 58}>
         <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>40 turns</span>
       </Note>
       <Svg>

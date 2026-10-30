@@ -450,7 +450,13 @@ export type BarState = {
  *  - `lineTint` / `triTint` paint the part under the system prompt grey and
  *    the part over it purple: the rectangle and the triangle;
  *  - `cache` turns what was sent before teal and shrinks it to its cached
- *    price, a twentieth, with the new slice riding down on top of it.
+ *    price, a twentieth, with the new slice riding down on top of it;
+ *    `cacheTint`, when given, turns it teal on its own cue, ahead of the
+ *    shrink.
+ * `flash` washes a bar for whatever the narration names: the whole bar, or
+ * only the triangle's part of it once `triTint` has split the area, so a
+ * wash for "the chat itself" leaves the system prompt alone. `flashSent`
+ * washes only what was sent before.
  */
 export const Stairs: React.FC<{
   geo: Geo;
@@ -461,14 +467,16 @@ export const Stairs: React.FC<{
   lineTint?: number;
   triTint?: number;
   cache?: number;
+  cacheTint?: number;
   cacheRate?: number;
   dim?: (turn: number) => number;
   glow?: (turn: number) => number;
   flash?: (turn: number) => number;
+  flashSent?: (turn: number) => number;
   dividers?: number;
-}> = ({ geo, turns, state, merge = 0, soften = 0, lineTint = 0, triTint = 0, cache = 0, cacheRate = 1, dim, glow, flash, dividers = 0 }) => {
+}> = ({ geo, turns, state, merge = 0, soften = 0, lineTint = 0, triTint = 0, cache = 0, cacheTint, cacheRate = 1, dim, glow, flash, flashSent, dividers = 0 }) => {
   const width = lerp(geo.bar, geo.slot + 0.6, merge);
-  const sentFill = mix(SENT, CACHED, cache);
+  const sentFill = mix(SENT, CACHED, Math.max(cache, cacheTint ?? 0));
   const newFill = mix(NEW, SENT, soften);
   const squash = lerp(1, cacheRate, cache);
   return (
@@ -480,6 +488,7 @@ export const Stairs: React.FC<{
         const d = dim ? dim(t.turn) : 0;
         const g = glow ? glow(t.turn) : 0;
         const f = flash ? flash(t.turn) : 0;
+        const fs = flashSent ? flashSent(t.turn) : 0;
         const sentH = t.resent * geo.k * squash;
         const freshH = t.newSlice * geo.k;
         const sentX = s.slide ? x - (1 - s.sent) * geo.slot : x;
@@ -521,7 +530,12 @@ export const Stairs: React.FC<{
             {triTint > 0 && s.sent + s.fresh > 0 ? (
               <rect x={x} y={geo.base - shown} width={width} height={Math.max(0, shown - SYSTEM * geo.k)} fill={TRI_FILL} opacity={triTint} />
             ) : null}
-            {f > 0 ? <rect x={x} y={geo.base - shown} width={width} height={shown} fill={NEW} opacity={f * 0.38} /> : null}
+            {f > 0 ? (
+              <rect x={x} y={geo.base - shown} width={width} height={Math.max(0, shown - SYSTEM * geo.k * triTint)} fill={NEW} opacity={f * 0.38} />
+            ) : null}
+            {fs > 0 && sentShown > 0 ? (
+              <rect x={sentX} y={geo.base - sentShown} width={width} height={sentShown} fill={NEW} opacity={fs * 0.38} />
+            ) : null}
           </g>
         );
       })}

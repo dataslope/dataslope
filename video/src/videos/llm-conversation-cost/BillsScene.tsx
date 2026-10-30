@@ -32,7 +32,6 @@ const PX = 1060 / billFor(40).plain;
 const ROWS = [10, 20, 40] as const;
 const ROW_Y = [372, 462, 552];
 const ROW_H = 52;
-const ARROW_X = 1660;
 /** The doubling scale: x2 at NX0, x4 at NX1. */
 const NX0 = 380;
 const NX1 = 1560;
@@ -43,8 +42,9 @@ const nx = (r: number) => NX0 + ((r - 2) / 2) * (NX1 - NX0);
  * The bills, split the way the area split: 10, 20 and 40 turns on Sonnet, the
  * straight-line part (the rectangle, and the replies) doubling each time, the
  * triangle's part quadrupling. Then what each doubling does to the whole
- * bill, on a scale from twice (all rectangle) to four times (all triangle):
- * 2.8, 3.2, 3.5, closing in on four.
+ * bill, on a scale from twice (all rectangle and replies) to four times (all
+ * triangle): 2.8, 3.2, 3.5, closing in on four. The ratios are drawn on that
+ * scale only, so each number appears once, where it means something.
  */
 export const BillsScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -56,7 +56,12 @@ export const BillsScene: React.FC = () => {
   const rowAt = [n.word("bills", "ten turns"), n.word("bills", "Twenty"), n.word("bills", "Forty")];
   const valueAt = [n.word("bills", "thirteen cents"), n.word("bills", "thirty-seven"), n.word("bills", "dollar nineteen")];
   const ratiosFrom = n.beat("ratios").from;
-  const ratioAt = [n.word("ratios", "two point eight"), n.word("ratios", "three point two"), n.word("ratios", "three and a half")];
+  const ratioAt = [n.word("ratios", "two point eight"), n.word("ratios", "three point two"), n.word("eighty", "three and a half")];
+  // The scale's two ends, said before the dots are read against them.
+  const allLineAt = n.word("ends", "rectangle and replies");
+  const allTriAt = n.word("ends", "All triangle");
+  const doubleAt = n.word("ends", "just double");
+  const quadAt = n.word("ends", "quadruple");
   const longerAt = n.word("toward", "longer");
   const triangleAt = n.word("toward", "triangle");
   const towardAt = n.word("toward", "toward");
@@ -140,21 +145,6 @@ export const BillsScene: React.FC = () => {
         );
       })}
 
-      {/* Each doubling's ratio, between the rows. */}
-      {[0, 1].map((k) => {
-        const d = DOUBLINGS[k];
-        const yA = rowTop(k) + rowH / 2 + 8;
-        const yB = rowTop(k + 1) + rowH / 2 - 8;
-        return (
-          <React.Fragment key={k}>
-            <Arrow from={[ARROW_X, yA]} to={[ARROW_X, yB]} at={ratioAt[k] - 4} dur={12} color={POINT} width={2.4} />
-            <Note at={ratioAt[k] - 2} x={ARROW_X + 18} y={(yA + yB) / 2 - 20}>
-              <span style={{ ...note(30, POINT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>{times(d.times)}</span>
-            </Note>
-          </React.Fragment>
-        );
-      })}
-
       {/* ── Fig. 5: what each doubling does ── */}
       <FigLabel n="5" title="What doubling the turns does to the bill" at={ratiosFrom - 2} x={X0} y={y(670)} />
       <Svg opacity={ease(frame, ratiosFrom, 14)}>
@@ -163,15 +153,27 @@ export const BillsScene: React.FC = () => {
           <line key={r} x1={nx(r)} x2={nx(r)} y1={y(NY) - 8} y2={y(NY) + 8} stroke={INK} strokeWidth={2} />
         ))}
       </Svg>
+      {/* "would just double", "would quadruple": a swell at each end, in the
+          colors of the part that does it. */}
+      <Svg>
+        {[
+          { r: 2, at: doubleAt, color: LINE_EDGE },
+          { r: 4, at: quadAt, color: TRI },
+        ].map(({ r, at, color }) => {
+          const q = pulse(frame, at - 2, 24);
+          // At most 11 px, so it never reaches the "×2" or "×4" below it.
+          return q > 0 ? <circle key={r} cx={nx(r)} cy={y(NY)} r={11 * q} fill={color} opacity={q} /> : null;
+        })}
+      </Svg>
       {[2, 3, 4].map((r) => (
         <Note key={r} at={ratiosFrom + 2} x={nx(r) - 30} y={y(NY) + 16} width={60} style={{ textAlign: "center" }}>
           <span style={{ ...label(22, INK_SOFT), ...TABULAR }}>{`×${r}`}</span>
         </Note>
       ))}
-      <Note at={longerAt + 6} x={nx(2) - 100} y={y(NY) + 52} width={200} style={{ textAlign: "center" }}>
-        <span style={{ ...note(22, LINE_EDGE), fontWeight: 600, whiteSpace: "nowrap" }}>all rectangle</span>
+      <Note at={allLineAt - 2} x={nx(2) - 150} y={y(NY) + 52} width={300} style={{ textAlign: "center" }}>
+        <span style={{ ...note(22, LINE_EDGE), fontWeight: 600, whiteSpace: "nowrap" }}>all rectangle and replies</span>
       </Note>
-      <Note at={triangleAt} x={nx(4) - 100} y={y(NY) + 52} width={200} style={{ textAlign: "center" }}>
+      <Note at={allTriAt - 2} x={nx(4) - 100} y={y(NY) + 52} width={200} style={{ textAlign: "center" }}>
         <span style={{ ...note(22, TRI_INK), fontWeight: 600, whiteSpace: "nowrap" }}>all triangle</span>
       </Note>
       {DOUBLINGS.map((d, k) => {

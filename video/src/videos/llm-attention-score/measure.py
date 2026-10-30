@@ -174,7 +174,8 @@ out["cosine"] = {"queryLength": r(np.linalg.norm(qv)), "keys": cos}
 # typical size of a dot product of two random d-number vectors, entries of
 # variance one, grows as sqrt(d), and dividing by sqrt(d) brings it back to
 # about one. 128 is a common size for one head's query and key. Seeded,
-# measured on 1,000 pairs. Not shown on screen.
+# measured on 1,000 pairs. Fig. 6 draws the d = 2 and d = 128 rows, each to
+# one decimal (1.4 and 11.1; 1.0 and 1.0 once divided).
 rng = np.random.default_rng(0)
 spread = []
 for dim in (2, 64, 128):
@@ -185,7 +186,27 @@ for dim in (2, 64, 128):
     assert 0.9 < (dots / math.sqrt(dim)).std() < 1.1
 out["spread"] = spread
 
-out["lesson"] = {"tokens": tokens, "keys": keys.tolist(), "values": values.tolist(), "d": d, "root": r(root)}
+# ── Why scale, on the lesson's own vectors ────────────────────────────────────
+# The weights the lesson's query would give if softmax took the dot products
+# undivided. Drawn under the shared-out bar: dividing by sqrt(2) evens the
+# shares out, trophy's from 0.515 ("point five two" aloud) to 0.461, the same
+# direction that keeps long vectors from handing everything to the top key.
+unscaled = softmax(keys @ np.array(trophy["query"]))
+out["unscaled"] = {"weights": [r(x) for x in unscaled], "trophy2": r(unscaled[0], 2)}
+assert out["unscaled"]["trophy2"] == 0.52
+assert unscaled[0] > trophy["rows"][0]["weight"]
+assert all(u < row["weight"] for u, row in zip(unscaled[1:], trophy["rows"][1:]))
+
+# ── Where the blend lands ─────────────────────────────────────────────────────
+# Trophy's value pulls hardest (the biggest weight), but the new vector
+# (4.85, 3.21) is nearer the value of "it" (1, 1) than trophy's (10, 0), so the
+# narration says "pulls hardest", never "lands nearest".
+blend_at = np.array(trophy["output"])
+dist = {t: r(np.linalg.norm(blend_at - v), 2) for t, v in zip(tokens, values)}
+out["blendDistance"] = dist
+assert min(dist, key=dist.get) == "it" and dist["it"] < dist["trophy"] < dist["suitcase"]
+
+out["lesson"] ={"tokens": tokens, "keys": keys.tolist(), "values": values.tolist(), "d": d, "root": r(root)}
 out["trophy"] = trophy
 out["suitcase"] = suitcase
 
@@ -217,6 +238,7 @@ echo("trophy:", [(row["token"], row["dot"], row["score"], row["power"], row["wei
 echo("suitcase:", [(row["token"], row["dot"], row["score"], row["weight"]) for row in suitcase["rows"]], suitcase["output2"])
 echo("cosine:", out["cosine"])
 echo("spread:", spread)
+echo("unscaled:", out["unscaled"], "distance from the blend:", dist)
 
 json.dump(out, sys.stdout, indent=1)
 print()

@@ -39,6 +39,19 @@
    "stdScaled": 0.98
   }
  ],
+ "unscaled": {
+  "weights": [
+   0.515,
+   0.277,
+   0.207
+  ],
+  "trophy2": 0.52
+ },
+ "blendDistance": {
+  "trophy": 6.07,
+  "suitcase": 8.34,
+  "it": 4.44
+ },
  "lesson": {
   "tokens": [
    "trophy",
