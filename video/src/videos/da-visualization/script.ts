@@ -292,6 +292,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.8,
     },
     {
+      id: "dash-audience",
+      text: "Design for the audience: an executive summary differs from an ops monitoring view.",
+      pauseAfter: 0.8,
+    },
+    {
       id: "report",
       text: "Question twelve. What's the difference between a dashboard and a report? A dashboard is a living view for monitoring: what's happening now? A report answers one question, with narrative and context, and is read from top to bottom.",
     },

@@ -21,7 +21,8 @@ const CARDS_X = [220, 1080];
  * are a model of the shape, not a measurement (the chart spec says so), so the
  * grid shows the shape only, darker where the model puts more attention, and
  * says it is a model: no share or ratio from it is printed or spoken. Panels
- * added against panels opened over two years: 41 against 6. Then a dashboard
+ * added against panels opened over two years: 41 against 6, and design for the
+ * audience, in the page's words. Then a dashboard
  * and a report side by side, by what each is for and what each drives.
  */
 export const DashScene: React.FC = () => {
@@ -44,6 +45,8 @@ export const DashScene: React.FC = () => {
   const addedAt = n.word("dash-creep", "panels only ever get added");
   const fortyAt = n.word("dash-creep", "forty-one panels");
   const sixAt = n.word("dash-creep", "six of them get opened");
+  const audienceAt = n.word("dash-audience", "Design for the audience");
+  const execAt = n.word("dash-audience", "an executive summary differs");
   const q12At = n.word("report", "Question twelve");
   const q12TextAt = n.word("report", "What's the difference");
   const dashAt = n.word("report", "A dashboard is a living view");
@@ -155,6 +158,13 @@ export const DashScene: React.FC = () => {
         <Verdict ok x={CREEP.x0} y={cBase + h(50)} at={cutAt} out={out11}>
           cut what doesn&apos;t earn its place
         </Verdict>
+        {/* The page's last point for Question 11, level with the left column's last note. */}
+        <Verdict ok x={CREEP.x0} y={cBase + h(90)} at={audienceAt} out={out11}>
+          design for the audience
+        </Verdict>
+        <Note at={execAt - 2} x={CREEP.x0 + 38} y={cBase + h(130)} out={out11}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>an executive summary differs from an ops monitoring view</span>
+        </Note>
 
         {/* ── Question 12: what each is for ── */}
         {[

@@ -178,6 +178,11 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
     { at: c.w("r-llm", "hand-label a hundred or two"), text: "Hand-label 100 to 200, and measure its accuracy" },
     { at: c.w("r-llm", "keep the settings the same"), text: "Same settings every batch; a rerun gives the same labels", restAt: c.w("r-llm", "rerun a sample") },
     { at: c.w("r-llm", "quote real answers"), text: "Quote real answers, not its paraphrases" },
+    {
+      at: c.w("r-llm-report", "Report which categories it confuses"),
+      text: "Report which categories it confuses; the findings carry that uncertainty",
+      restAt: c.w("r-llm-report", "carry that uncertainty"),
+    },
   ];
   return (
     <>
@@ -190,8 +195,9 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
       {steps.map((s, i) => {
         // A step said in two parts shows its second as it is said.
         const [lead, rest] = s.restAt === undefined ? [s.text, ""] : s.text.split(/(?=;)/);
+        // Five steps, close enough to stand clear above the takeaway that follows.
         return (
-          <Note key={s.text} at={s.at - 2} x={R_X} y={c.T + c.h(110) + i * c.h(62)}>
+          <Note key={s.text} at={s.at - 2} x={R_X} y={c.T + c.h(102) + i * c.h(54)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
               <span style={{ ...label(24, BLUE_INK), ...TABULAR, marginRight: 14 }}>{i + 1}</span>
               {lead}
