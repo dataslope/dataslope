@@ -7,7 +7,7 @@ import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA, pct } from "./data";
-import { Bracket, DATA, DATA_INK, DATA_WASH, Headline, LAW, lerp, Mark, pulse, Spot, Svg, Tag } from "./kit";
+import { Bracket, DATA, DATA_INK, DATA_WASH, GRID, Headline, LAW, lerp, Mark, pulse, Spot, Svg, Tag } from "./kit";
 
 /** The plot box, shared by the plain and the log view. */
 const CX0 = 250;
@@ -26,9 +26,12 @@ const STEPS = [5, 10, 20, 50, 100, 200, 500, 1000, 2000];
 /** Bars shown before the zoom, and where the first zoom stops. */
 const FIRST = 20;
 const SECOND = 100;
-/** The slope triangle on the 1/rank line: one decade of rank. */
+/** The slope triangle on the 1/rank line: one decade of rank, so its run
+ *  spans one column of the decade grid and its drop one row. */
 const TRI_FROM = 10;
 const TRI_TO = 100;
+/** A label set over a gridline keeps a paper halo, so the line stops at it. */
+const HALO: React.CSSProperties = { background: PAPER, padding: "0 6px" };
 
 type Run = readonly [number, number, number];
 
@@ -55,9 +58,11 @@ const niceRank = (v: number) => fmt(v, 0);
  * bars on plain axes, widens to a hundred (the cliff), then zooms the rank
  * axis out to all 7,079 ranks with the window's last rank counting beside
  * it; a bracket marks the 53% used once or twice, flat on the floor. Then
- * both axes morph onto log scales (Fig. 2): the same counts straighten, the
- * dashed 1/rank line is drawn through them, a triangle shows ten times the
- * rank for a tenth the count, and the first thousand ranks are picked out
+ * both axes morph onto log scales (Fig. 2): the same counts straighten over
+ * a faint decade grid, the dashed 1/rank line is drawn through them, a
+ * triangle shows ten times the rank for a tenth the count (one grid step
+ * along, one step down: slope minus one, counted in steps, since a step is
+ * 362px across and 114px down), and the top thousand ranks are picked out
  * with their fitted slope.
  */
 export const CurveScene: React.FC = () => {
@@ -88,8 +93,11 @@ export const CurveScene: React.FC = () => {
   const furtherAt = n.word("law", "ten times further");
   const tenthAt = n.word("law", "a tenth");
   const slopeAt = n.word("slope", "slope of minus one");
-  const thousandAt = n.word("slope", "first thousand");
-  const pointAt = n.word("slope", "minus one point one");
+  const stepDownAt = n.word("slope", "one step down");
+  const stepAlongAt = n.word("slope", "every step along");
+  const thousandAt = n.word("fit", "top thousand");
+  const itsSlopeAt = n.word("fit", "its slope");
+  const pointAt = n.word("fit", "point one four");
 
   const CY0 = y(400);
   const CY1 = y(830);
@@ -152,13 +160,21 @@ export const CurveScene: React.FC = () => {
   const lawFrom = EMMA.lineC / 10 ** HI;
   const lawTo = 10 ** DECADES;
   const lawP = ease(frame, straightensAt, 34);
-  const triH = ease(frame, furtherAt, 16);
-  const triV = ease(frame, tenthAt, 14);
+  // The triangle grows out of the line: from A down to the corner D, then
+  // along to C, back on the line, so no leg ever floats free of it.
+  const triP = ease(frame, furtherAt, 22);
   const A: readonly [number, number] = [logX(TRI_FROM), lawY(TRI_FROM)];
   const C: readonly [number, number] = [logX(TRI_TO), lawY(TRI_TO)];
   const D: readonly [number, number] = [A[0], C[1]];
+  /** The drop's share of the two legs' length, so the pen keeps one speed. */
+  const triSplit = (D[1] - A[1]) / (D[1] - A[1] + (C[0] - D[0]));
+  const dropW = 2 + 1.6 * (pulse(frame, tenthAt, 22) + pulse(frame, stepDownAt, 22));
+  const runW = 2 + 1.6 * pulse(frame, stepAlongAt, 22);
 
-  // The first thousand ranks, picked out under the curve.
+  /** The two "Zipf's law" lines, centred in the row from 1,000 down to 100. */
+  const zipfY = (logY(1000) + logY(100)) / 2 - 31;
+
+  // The top thousand ranks, picked out under the curve.
   const fitP = ease(frame, thousandAt - 2, 24);
   const fitTop: string[] = [];
   for (const [a, b, c] of RUNS) {
@@ -200,7 +216,7 @@ export const CurveScene: React.FC = () => {
       <Spot id="nlp-counting-words-novel" at={emmaAt - 4} out={switchAt - 4} left={1500} top={y(116)} width={300} height={193} />
 
       {/* ── Figure labels: the same counts, plain then log ── */}
-      <FigLabel n="1" title="Emma's words, ranked by count, on plain axes" at={from} x={96} y={y(290)} out={logAt - 6} />
+      <FigLabel n="1" title="The novel's words, ranked by count, on plain axes" at={from} x={96} y={y(290)} out={logAt - 6} />
       <FigLabel n="2" title="The same counts, on log scales" at={logAt + 4} x={96} y={y(290)} />
 
       <Svg opacity={axesIn}>
@@ -209,6 +225,15 @@ export const CurveScene: React.FC = () => {
             <rect x={CX0 - 2} y={CY0 - 60} width={CW + 4} height={CH + 61} />
           </clipPath>
         </defs>
+        {/* The decade grid: one step along, one step down. */}
+        <g opacity={logTicksO}>
+          {LOG_TICKS.map((v) => (
+            <line key={`gy${v}`} x1={CX0} x2={CX1} y1={logY(v)} y2={logY(v)} stroke={GRID} strokeWidth={1.2} />
+          ))}
+          {LOG_TICKS.filter((v) => v > 1).map((v) => (
+            <line key={`gx${v}`} x1={logX(v)} x2={logX(v)} y1={CY0 - 20} y2={CY1} stroke={GRID} strokeWidth={1.2} />
+          ))}
+        </g>
         {/* The counts: an area on plain axes that becomes a line on log ones. */}
         <g clipPath="url(#zipf-plot)" opacity={built}>
           <path d={fillPath} fill={DATA} opacity={1 - t} />
@@ -228,7 +253,7 @@ export const CurveScene: React.FC = () => {
               return <rect key={r.word} x={x0} y={CY1 - hgt} width={pitch - gap} height={hgt} fill={DATA} />;
             })
           : null}
-        {/* The first thousand ranks, washed under the curve on log axes. */}
+        {/* The top thousand ranks, washed under the curve on log axes. */}
         {fitP > 0 ? (
           <path
             d={`M${fitTop.join(" L")}`}
@@ -273,9 +298,31 @@ export const CurveScene: React.FC = () => {
             strokeDasharray="10 8"
           />
         ) : null}
-        {/* Ten times the rank, a tenth the count. */}
-        {triH > 0 ? <line x1={D[0]} y1={D[1]} x2={lerp(D[0], C[0], triH)} y2={D[1]} stroke={INK} strokeWidth={2} /> : null}
-        {triV > 0 ? <line x1={A[0]} y1={A[1]} x2={A[0]} y2={lerp(A[1], D[1], triV)} stroke={INK} strokeWidth={2} /> : null}
+        {/* Ten times the rank, a tenth the count: one path, A to D to C. */}
+        {triP > 0 ? (
+          <>
+            <path
+              d={`M${A[0]},${A[1]} L${D[0]},${D[1]}`}
+              fill="none"
+              stroke={INK}
+              strokeWidth={dropW}
+              strokeLinecap="round"
+              pathLength={1}
+              strokeDasharray={`${Math.min(1, triP / triSplit)} 1`}
+            />
+            {triP > triSplit ? (
+              <path
+                d={`M${D[0]},${D[1]} L${C[0]},${C[1]}`}
+                fill="none"
+                stroke={INK}
+                strokeWidth={runW}
+                strokeLinecap="round"
+                pathLength={1}
+                strokeDasharray={`${(triP - triSplit) / (1 - triSplit)} 1`}
+              />
+            ) : null}
+          </>
+        ) : null}
       </Svg>
 
       {/* ── Count-axis numbers ── */}
@@ -301,8 +348,13 @@ export const CurveScene: React.FC = () => {
         times it appears
         <span style={{ opacity: ease(frame, logAt + 20, 12) }}>, log scale</span>
       </Tag>
-      <Tag x={CX1} y={CY1 + 62} at={from + 6} align="right" size={20} weight={600}>
-        rank<span style={{ opacity: ease(frame, logAt + 20, 12) }}>, log scale</span>
+      {/* Two labels crossfading rather than a hidden suffix, so "rank" ends
+          at the axis end on both views. */}
+      <Tag x={CX1} y={CY1 + 62} at={from + 6} out={logAt + 14} align="right" size={20} weight={600}>
+        rank
+      </Tag>
+      <Tag x={CX1} y={CY1 + 62} at={logAt + 18} align="right" size={20} weight={600}>
+        rank, log scale
       </Tag>
 
       {/* ── Plain-view rank axis: the top words, then numbers as it widens ── */}
@@ -375,7 +427,7 @@ export const CurveScene: React.FC = () => {
       {/* ── More than half the words, flat on the floor ── */}
       <Bracket x0={twiceX0} x1={CX1} y={bracketY} at={halfAt - 2} out={tailOut} color={INK} up={false} />
       <Tag x={(twiceX0 + CX1) / 2} y={bracketY - 66} at={halfAt} out={tailOut} align="center" size={22} color={INK} weight={650}>
-        more than half the words: <span style={TABULAR}>{pct(EMMA.onceOrTwiceShare)}</span>
+        more than half the different words: <span style={TABULAR}>{pct(EMMA.onceOrTwiceShare)}</span>
       </Tag>
       <Tag x={(twiceX0 + CX1) / 2} y={bracketY - 36} at={onceAt - 2} out={tailOut} align="center" size={21} color={INK_SOFT} weight={600}>
         used <Mark at={onceAt}>once or twice</Mark>
@@ -385,24 +437,30 @@ export const CurveScene: React.FC = () => {
       </Svg>
 
       {/* ── The law, on log axes ── */}
-      <Tag x={logX(900)} y={lawY(900) - 104} at={zipfAt - 2} size={24} color={INK} weight={700} style={{ background: PAPER, padding: "0 6px" }}>
+      {/* In the grid row between 1,000 and 100, clear of both gridlines. */}
+      <Tag x={logX(900)} y={zipfY} at={zipfAt - 2} size={24} color={INK} weight={700} style={HALO}>
         Zipf&apos;s law
       </Tag>
-      <Tag x={logX(900)} y={lawY(900) - 70} at={overAt - 2} size={21} color={INK_SOFT} weight={600} style={{ background: PAPER, padding: "0 6px" }}>
+      <Tag x={logX(900)} y={zipfY + 34} at={overAt - 2} size={21} color={INK_SOFT} weight={600} style={HALO}>
         count falls as one over the rank
-        <span style={{ opacity: ease(frame, slopeAt, 12) }}>
-          : slope <span style={TABULAR}>−1</span>
-        </span>
+        {/* Mounted only once it shows, so the halo never runs on past the
+            visible words over the 10,000 gridline. */}
+        {frame >= slopeAt ? (
+          <span style={{ opacity: ease(frame, slopeAt, 12) }}>
+            : slope <span style={TABULAR}>−1</span>
+          </span>
+        ) : null}
       </Tag>
-      <Tag x={(D[0] + C[0]) / 2} y={D[1] + 12} at={furtherAt + 4} align="center" size={21} color={INK} weight={600}>
-        <Mark at={furtherAt + 2}>10×</Mark> the rank
+      {/* The run's label sits on the 100 gridline under it, haloed. */}
+      <Tag x={(D[0] + C[0]) / 2} y={logY(100) - 14} at={furtherAt + 10} align="center" size={21} color={INK} weight={600} style={HALO}>
+        <Mark at={stepAlongAt} out={thousandAt - 6}>one step along</Mark>: <Mark at={furtherAt + 8} out={slopeAt}>10×</Mark> the rank
       </Tag>
-      <Tag x={A[0] - 14} y={(A[1] + D[1]) / 2 - 14} at={tenthAt + 2} align="right" size={21} color={INK} weight={600}>
-        <Mark at={tenthAt + 2}>a tenth</Mark> the count
+      <Tag x={A[0] - 14} y={(A[1] + D[1]) / 2 - 14} at={tenthAt + 2} align="right" size={21} color={INK} weight={600} style={HALO}>
+        <Mark at={stepDownAt} out={thousandAt - 6}>one step down</Mark>: <Mark at={tenthAt + 2} out={slopeAt}>a tenth</Mark> the count
       </Tag>
-      <Tag x={logX(24)} y={logY(5200) - 30} at={thousandAt} size={21} color={DATA_INK} weight={650}>
+      <Tag x={logX(24)} y={logY(10000) + 8} at={thousandAt} size={21} color={DATA_INK} weight={650} style={HALO}>
         Emma, ranks 1 to <span style={TABULAR}>{fmt(EMMA.fitRanks, 0)}</span>
-        <span style={{ opacity: ease(frame, pointAt - 2, 12) }}>
+        <span style={{ opacity: ease(frame, itsSlopeAt, 12) }}>
           : slope <Mark at={pointAt}>{EMMA.slope.toFixed(2).replace("-", "−")}</Mark>
         </span>
       </Tag>

@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EMMA } from "./data";
-import { Bracket, DATA, DATA_INK, drift, Headline, LAW, LAW_FILL, Mark, POINT, POINT_INK, POINT_WASH, Svg, Swatch, Tag } from "./kit";
+import { DATA, DATA_INK, drift, Headline, LAW, LAW_FILL, Mark, POINT, POINT_INK, POINT_WASH, pulse, Svg, Swatch, Tag } from "./kit";
 
 /** Table columns: right edges of rank, the prediction and the count; the
  *  word's left edge. */
@@ -23,9 +23,12 @@ const BAR_H = 15;
 /**
  * Part 3: what one over the rank predicts, row by row, against Emma. Fig. 3
  * lists ranks 1 to 10 with the prediction from the top word (count(1) /
- * rank) as grey dashed bars, then Emma's counts as blue bars on the same
- * scale: "the" nearly ties with "to" where the law wants half, and "she", the
- * tenth, is 4.5 times its prediction.
+ * rank, said and labelled as such: Fig. 2's dashed line is the same law
+ * placed to fit the top thousand, a different line) as grey dashed bars,
+ * then Emma's counts as blue bars on the same scale: "the" nearly ties with
+ * "to" where the law wants half, and "she", the tenth, runs past four
+ * multiples of its prediction, ticked off along its bar. The top words crowd
+ * together, so a prediction from the top one comes out low.
  */
 export const PredictScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -35,14 +38,18 @@ export const PredictScene: React.FC = () => {
   // ── Cues ──
   const from = n.beat("predict").from;
   const predictionAt = n.word("predict", "prediction");
-  const halfAt = n.word("predict", "half as often");
-  const tenthAt = n.word("predict", "a tenth");
+  const topWordAt = n.word("anchor", "top word");
+  const halfAt = n.word("anchor", "half as often");
+  const tenthAt = n.word("anchor", "a tenth");
   const inEmmaAt = n.word("real", "In Emma");
+  const secondAt = n.word("real", "second word");
   const fiveAt = n.word("real", "five thousand");
   const tiesAt = n.word("real", "nearly ties");
   const tenthRealAt = n.word("rough", "tenth");
   const fourAt = n.word("rough", "more than four times");
-  const roughAt = n.word("rough", "rough");
+  const itsPredictionAt = n.word("rough", "its prediction");
+  const crowdAt = n.word("crowd", "crowd together");
+  const roughAt = n.word("crowd", "rough");
 
   const HEAD_Y = y(352);
   const TOP = y(402);
@@ -50,14 +57,18 @@ export const PredictScene: React.FC = () => {
   const rowY = (i: number) => TOP + i * ROW;
   const scale = BAR_W / EMMA.predict[0].count;
   const rowsIn = (i: number) => from + 4 + i * 3;
-  const lawIn = (i: number) => predictionAt - 2 + i * 4;
+  const lawIn = (i: number) => topWordAt - 2 + i * 4;
   const emmaIn = (i: number) => inEmmaAt + i * 4;
   const settle = drift(frame, roughAt, 1, 90);
   const dimOthers = ease(frame, tenthRealAt - 2, 14) * 0.55;
 
   const tenth = EMMA.predict[9];
-  const tenthLawX = BX0 + tenth.law * scale;
   const tenthEmmaX = BX0 + tenth.count * scale;
+  /** Whole multiples of the tenth's prediction that fit inside its bar. */
+  const multiples = Array.from({ length: Math.floor(tenth.count / tenth.law) }, (_, k) => k + 1);
+  // One tick a beat through "four times", the count landing on "its prediction".
+  const tickAt = (k: number) => fourAt + (k - 1) * 8;
+  const emmaBarY = (i: number) => rowY(i) + 3 + BAR_H + 5;
   const tieX0 = BX0 + EMMA.predict[1].count * scale - 30;
   const tieX1 = BX0 + EMMA.predict[0].count * scale + 14;
 
@@ -75,10 +86,10 @@ export const PredictScene: React.FC = () => {
       <Headline at={from - 2} lead="The law's prediction," turn="against Emma." turnAt={inEmmaAt} out={roughAt - 6} />
       <Headline at={roughAt - 2} lead="Rough at" turn="the very top." turnAt={roughAt + 6} />
 
-      <FigLabel n="3" title="Emma's top ten, against one over the rank" at={from} x={96} y={y(286)} />
+      <FigLabel n="3" title="The novel's top ten, against one over the rank from the top word" at={from} x={96} y={y(286)} />
       <Ink at={predictionAt} style={{ left: 1824 - 520, top: y(286) + 2, width: 520, display: "flex", justifyContent: "flex-end", gap: 12, alignItems: "center", whiteSpace: "nowrap" }}>
         <Swatch color={LAW} dashed />
-        <span style={{ ...note(21, INK_SOFT), fontWeight: 600 }}>predicted</span>
+        <span style={{ ...note(21, INK_SOFT), fontWeight: 600 }}>predicted from “to”</span>
         <span style={{ width: 14 }} />
         <span style={{ opacity: ease(frame, inEmmaAt - 2, 10), display: "inline-flex", gap: 12, alignItems: "center" }}>
           <Swatch color={DATA} />
@@ -105,12 +116,13 @@ export const PredictScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, transform: `translateY(${settle}px)` }}>
         {/* The tenth row, washed as it is named (behind its text). */}
         <Svg opacity={ease(frame, tenthRealAt - 2, 12)}>
-          <rect x={86} y={rowY(9) - 6} width={BX0 + BAR_W - 76} height={ROW + 6} rx={6} fill={POINT_WASH} opacity={0.5} />
+          <rect x={86} y={rowY(9) - 6} width={BX0 + BAR_W - 76} height={ROW + 34} rx={6} fill={POINT_WASH} opacity={0.5} />
         </Svg>
         {EMMA.predict.map((r, i) => {
           const top = rowY(i);
           const isTenth = i === 9;
-          const o = isTenth ? 1 : 1 - dimOthers;
+          // The top three come back up as the narration says they crowd.
+          const o = isTenth ? 1 : 1 - dimOthers * (i < 3 ? 1 - ease(frame, crowdAt - 2, 14) : 1);
           const lawP = ease(frame, lawIn(i), 14);
           const emmaP = ease(frame, emmaIn(i), 16);
           const cell = (x: number, align: "left" | "right", at: number, child: React.ReactNode) => (
@@ -123,13 +135,21 @@ export const PredictScene: React.FC = () => {
           return (
             <div key={r.rank} style={{ position: "absolute", inset: 0, opacity: o }}>
               {cell(RANK_R, "right", rowsIn(i), <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{r.rank}</span>)}
-              {cell(WORD_L, "left", rowsIn(i), <span style={{ ...note(24, INK), fontWeight: 600 }}>{r.word}</span>)}
+              {cell(WORD_L, "left", rowsIn(i), <span style={{ ...note(24, INK), fontWeight: 600 }}>{i === 1 ? <Mark at={secondAt}>{r.word}</Mark> : r.word}</span>)}
               {cell(
                 LAW_R,
                 "right",
                 lawIn(i),
                 <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>
-                  {i === 1 ? <Mark at={halfAt}>{lawText}</Mark> : i === 9 ? <Mark at={tenthAt}>{lawText}</Mark> : lawText}
+                  {i === 0 ? (
+                    <Mark at={topWordAt}>{lawText}</Mark>
+                  ) : i === 1 ? (
+                    <Mark at={halfAt}>{lawText}</Mark>
+                  ) : i === 9 ? (
+                    <Mark at={tenthAt}>{lawText}</Mark>
+                  ) : (
+                    lawText
+                  )}
                 </span>,
               )}
               {cell(
@@ -170,7 +190,7 @@ export const PredictScene: React.FC = () => {
             rx={18}
             fill="none"
             stroke={POINT}
-            strokeWidth={2.6}
+            strokeWidth={2.6 + 1.6 * pulse(frame, crowdAt - 2, 26)}
             pathLength={1}
             strokeDasharray={`${ease(frame, tiesAt - 2, 16)} 1`}
           />
@@ -179,9 +199,34 @@ export const PredictScene: React.FC = () => {
           nearly tied
         </Tag>
 
-        {/* The tenth: the gap from prediction to count. */}
-        <Bracket x0={tenthLawX} x1={tenthEmmaX} y={rowY(9) + 3 + 2 * BAR_H + 12} at={fourAt - 2} color={POINT} tick={7} up />
-        <Tag x={tenthEmmaX + 18} y={rowY(9) + 8} at={fourAt} size={22} color={POINT_INK} weight={700}>
+        {/* The tenth: its bar ticked off in lengths of its prediction, so the
+            4.5 can be counted (the dashed bar above it is the first length). */}
+        {multiples.map((k) => {
+          const x = BX0 + k * tenth.law * scale;
+          const p = ease(frame, tickAt(k), 8);
+          if (p <= 0) return null;
+          return (
+            <React.Fragment key={k}>
+              <Svg opacity={p}>
+                <line x1={x} x2={x} y1={emmaBarY(9) - 5} y2={emmaBarY(9) + BAR_H + 5} stroke={POINT} strokeWidth={3} strokeLinecap="round" />
+              </Svg>
+              <div
+                style={{
+                  position: "absolute",
+                  left: x,
+                  top: emmaBarY(9) + BAR_H + 7,
+                  transform: "translateX(-50%)",
+                  opacity: p,
+                  ...note(20, POINT_INK),
+                  fontWeight: 650,
+                }}
+              >
+                {k}×
+              </div>
+            </React.Fragment>
+          );
+        })}
+        <Tag x={tenthEmmaX + 18} y={rowY(9) + 8} at={itsPredictionAt} size={22} color={POINT_INK} weight={700}>
           {(Math.round(EMMA.tenthOverLaw * 10) / 10).toFixed(1)}× the prediction
         </Tag>
       </div>
