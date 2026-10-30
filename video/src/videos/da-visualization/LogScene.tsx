@@ -90,7 +90,7 @@ export const LogScene: React.FC = () => {
         <EndLabel at={oneAt + 20} x={LEFT.x1 + 14} y={linY(big.values.at(-1)!)} start={big.start} growth={big.growthPct} />
         <EndLabel at={otherAt + 10} x={LEFT.x1 + 14} y={linY(small.values.at(-1)!)} start={small.start} growth={small.growthPct} />
         <Verdict ok={false} x={LEFT.x0} y={base + h(50)} at={floorAt}>
-          the small one: flat along the floor
+          the small one: hugs the floor until the end
         </Verdict>
 
         {/* ── Log ── */}
