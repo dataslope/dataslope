@@ -265,7 +265,7 @@ const KEYWORDS = new Set(
     "SELECT FROM WHERE GROUP BY HAVING ORDER LIMIT JOIN LEFT RIGHT FULL INNER CROSS ON AND OR NOT IN EXISTS IS " +
     "NULL AS WITH DISTINCT UNION ALL EXCEPT CASE WHEN THEN ELSE END DELETE DESC ASC ROLLUP NULLS LAST OVER " +
     "PARTITION LIKE INTERVAL DATE YEAR VALUES QUALIFY ROWS RANGE BETWEEN UNBOUNDED PRECEDING FOLLOWING CURRENT " +
-    "ROW RECURSIVE FILTER USING WITHIN TIMESTAMP"
+    "ROW RECURSIVE FILTER USING WITHIN TIMESTAMP DAY DAYS"
   ).split(" "),
 );
 const TABLES = new Set([
@@ -684,7 +684,9 @@ export const DataTable: React.FC<{
   return (
     <div style={{ position: "absolute", inset: 0, opacity: (1 - tableDim) * (1 - gone) }}>
       <div style={{ position: "absolute", left: g.x, top: g.top, width: ruleW, height: 2, background: INK }} />
-      <div style={{ position: "absolute", left: g.x, top: g.top + g.headH - 1, width: ruleW, height: 1, background: HAIRLINE }} />
+      {g.headH > 0 ? (
+        <div style={{ position: "absolute", left: g.x, top: g.top + g.headH - 1, width: ruleW, height: 1, background: HAIRLINE }} />
+      ) : null}
       <div style={{ position: "absolute", left: g.x, top: bottom - 1, width: ruleW, height: 1.5, background: INK }} />
       <Ink at={at + 2} dur={14} style={{ left: g.x, top: g.top, width, height: g.headH }}>
         {/* Ink pads its box to leave room for the wipe's bleed, which would

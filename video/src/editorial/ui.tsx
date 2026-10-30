@@ -48,9 +48,12 @@ export const Ink: React.FC<{
         WebkitMaskImage: p < 1 ? mask : undefined,
         maskImage: p < 1 ? mask : undefined,
         filter: p < 1 ? `blur(${(1 - p) * 1.6}px)` : undefined,
-        opacity: 1 - gone,
         transform: gone > 0 ? `translateY(${-gone * 10}px)` : undefined,
         ...style,
+        // A caller's own opacity (a dim) multiplies the fade-out rather than
+        // replacing it: as a plain style it won, and anything passing both
+        // stayed fully inked through its exit, then vanished.
+        opacity: (1 - gone) * Number(style?.opacity ?? 1),
       }}
     >
       {children}

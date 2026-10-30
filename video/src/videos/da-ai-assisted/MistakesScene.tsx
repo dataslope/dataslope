@@ -165,13 +165,9 @@ export const MistakesScene: React.FC = () => {
         {running(outA + 10, undefined, 2, "averaging ratios")}
 
         {/* ── The date boundary, on the page's nine orders ── */}
-        {/* TableName's own `out` only lifts it (its opacity style overrides
-            Ink's fade), so it fades here with the table. */}
-        <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, outA, 10) }}>
-          <TableName g={kg} at={asked - 6} out={outA}>
-            orders
-          </TableName>
-        </div>
+        <TableName g={kg} at={asked - 6} out={outA}>
+          orders
+        </TableName>
         <DataTable
           g={kg}
           cols={colsOf(K, { assistant: { at: betweenAt, ink: BLUE_INK }, half_open: { at: halfOpenAt, ink: BLUE_INK } })}

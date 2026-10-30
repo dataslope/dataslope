@@ -725,7 +725,9 @@ export const DataTable: React.FC<{
   return (
     <div style={{ position: "absolute", inset: 0, opacity: (1 - tableDim) * (1 - gone) }}>
       <div style={{ position: "absolute", left: g.x, top: g.top, width: ruleW, height: 2, background: INK }} />
-      <div style={{ position: "absolute", left: g.x, top: g.top + g.headH - 1, width: ruleW, height: 1, background: HAIRLINE }} />
+      {g.headH > 0 ? (
+        <div style={{ position: "absolute", left: g.x, top: g.top + g.headH - 1, width: ruleW, height: 1, background: HAIRLINE }} />
+      ) : null}
       <div style={{ position: "absolute", left: g.x, top: bottom - 1, width: ruleW, height: 1.5, background: INK }} />
       <Ink at={at + 2} dur={14} style={{ left: g.x, top: g.top, width, height: g.headH }}>
         {/* Ink pads its box to leave room for the wipe's bleed, which would
