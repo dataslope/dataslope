@@ -81,3 +81,16 @@ test("no sentence opens with the article before an initialism", async () => {
   }
   assert.deepEqual(bad, [], "reword these: the voice reads the opening A as the letter");
 });
+
+// The Data Engineer series says SQL as the word "sequel" (the user's call,
+// 2026-10-30), the way db-relational-history's "Sequel" beat does. Drew reads
+// the plain caps as three letters, so those scripts write the word. On screen
+// it stays SQL; captions are off in the editorial videos.
+test("the Data Engineer videos say SQL as sequel", async () => {
+  const bad: string[] = [];
+  for (const { where, text } of await beats()) {
+    if (!where.startsWith("de-")) continue;
+    for (const [hit] of text.matchAll(/\w*SQL\w*/g)) bad.push(`${where}: "${hit}"`);
+  }
+  assert.deepEqual(bad, [], 'write "sequel" ("Postgres", "Spark sequel"), never SQL');
+});

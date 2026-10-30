@@ -92,6 +92,30 @@ import { DsSql } from "./videos/ds-sql/Video";
 import { script as dsSqlScript } from "./videos/ds-sql/script";
 import { DsLlmEvaluation } from "./videos/ds-llm-evaluation/Video";
 import { script as dsLlmEvaluationScript } from "./videos/ds-llm-evaluation/script";
+import { DeInterview } from "./videos/de-interview/Video";
+import { script as deInterviewScript } from "./videos/de-interview/script";
+import { DeSqlPatterns } from "./videos/de-sql-patterns/Video";
+import { script as deSqlPatternsScript } from "./videos/de-sql-patterns/script";
+import { DeSqlPerformance } from "./videos/de-sql-performance/Video";
+import { script as deSqlPerformanceScript } from "./videos/de-sql-performance/script";
+import { DeDimensionalModeling } from "./videos/de-dimensional-modeling/Video";
+import { script as deDimensionalModelingScript } from "./videos/de-dimensional-modeling/script";
+import { DeModelingHistory } from "./videos/de-modeling-history/Video";
+import { script as deModelingHistoryScript } from "./videos/de-modeling-history/script";
+import { DePython } from "./videos/de-python/Video";
+import { script as dePythonScript } from "./videos/de-python/script";
+import { DePipelines } from "./videos/de-pipelines/Video";
+import { script as dePipelinesScript } from "./videos/de-pipelines/script";
+import { DeDistributed } from "./videos/de-distributed/Video";
+import { script as deDistributedScript } from "./videos/de-distributed/script";
+import { DeStreaming } from "./videos/de-streaming/Video";
+import { script as deStreamingScript } from "./videos/de-streaming/script";
+import { DeWarehousing } from "./videos/de-warehousing/Video";
+import { script as deWarehousingScript } from "./videos/de-warehousing/script";
+import { DeOrchestration } from "./videos/de-orchestration/Video";
+import { script as deOrchestrationScript } from "./videos/de-orchestration/script";
+import { DePipelinesForAi } from "./videos/de-pipelines-for-ai/Video";
+import { script as dePipelinesForAiScript } from "./videos/de-pipelines-for-ai/script";
 import { DaAbTesting } from "./videos/da-ab-testing/Video";
 import { script as daAbTestingScript } from "./videos/da-ab-testing/script";
 import { DaVisualization } from "./videos/da-visualization/Video";
@@ -936,6 +960,128 @@ export const RemotionRoot: React.FC = () => (
         durationInFrames={FPS * 60}
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(dsLlmEvaluationScript)}
+      />
+    </Folder>
+    <Folder name="Interview-Data-Engineer">
+      <Composition
+        id="DataEngineer-0-Interview"
+        component={DeInterview}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(deInterviewScript)}
+      />
+      <Composition
+        id="DataEngineer-1-SqlPatterns"
+        component={DeSqlPatterns}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(deSqlPatternsScript)}
+      />
+      <Composition
+        id="DataEngineer-2-SqlPerformance"
+        component={DeSqlPerformance}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(deSqlPerformanceScript)}
+      />
+      <Composition
+        id="DataEngineer-3-DimensionalModeling"
+        component={DeDimensionalModeling}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(deDimensionalModelingScript)}
+      />
+      <Composition
+        id="DataEngineer-4-ModelingHistory"
+        component={DeModelingHistory}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(deModelingHistoryScript)}
+      />
+      <Composition
+        id="DataEngineer-5-Python"
+        component={DePython}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dePythonScript)}
+      />
+      <Composition
+        id="DataEngineer-6-Pipelines"
+        component={DePipelines}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dePipelinesScript)}
+      />
+      <Composition
+        id="DataEngineer-7-DistributedProcessing"
+        component={DeDistributed}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(deDistributedScript)}
+      />
+      <Composition
+        id="DataEngineer-8-Streaming"
+        component={DeStreaming}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(deStreamingScript)}
+      />
+      <Composition
+        id="DataEngineer-9-Warehousing"
+        component={DeWarehousing}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(deWarehousingScript)}
+      />
+      <Composition
+        id="DataEngineer-10-Orchestration"
+        component={DeOrchestration}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(deOrchestrationScript)}
+      />
+      <Composition
+        id="DataEngineer-11-PipelinesForAi"
+        component={DePipelinesForAi}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(dePipelinesForAiScript)}
       />
     </Folder>
     <Folder name="Assets">
