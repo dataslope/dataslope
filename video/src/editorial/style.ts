@@ -71,6 +71,16 @@ export const note = (size = 21, color: string = INK): React.CSSProperties => ({
   color,
 });
 
+/**
+ * A text style for an SVG <text>. SVG text takes its color from `fill`, not
+ * CSS `color`, so label() or note() on its own draws SVG text black whatever
+ * color it names: it made Statistics' z and t cutoffs all black. svgText()
+ * carries the style's color over to `fill`. Only for SVG text: `fill` is
+ * inherited, so on an HTML element it would recolor any icon inside it.
+ * `src/editorial/svgText.test.ts` fails on SVG text styled without one.
+ */
+export const svgText = (style: React.CSSProperties): React.CSSProperties => ({ ...style, fill: style.color });
+
 /** Digits of one width, for a number that counts or a column of numbers.
  *  Only on the digits: it spaces out a hyphen in Inter (see note()). */
 export const TABULAR: React.CSSProperties = { fontVariantNumeric: "tabular-nums lining-nums" };

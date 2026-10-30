@@ -456,6 +456,65 @@
               0
             ]
           ]
+        },
+        "funnel": {
+          "sql": "SELECT variant, sessions, conversions\nFROM funnel\nWHERE variant IN ('A', 'B', 'C', 'D', 'E', 'F')\nORDER BY variant;",
+          "ok": true,
+          "columns": [
+            "variant",
+            "sessions",
+            "conversions"
+          ],
+          "rows": [
+            [
+              "A",
+              1000,
+              120
+            ],
+            [
+              "B",
+              800,
+              96
+            ],
+            [
+              "C",
+              0,
+              0
+            ],
+            [
+              "D",
+              1240,
+              173
+            ],
+            [
+              "E",
+              640,
+              51
+            ],
+            [
+              "F",
+              0,
+              0
+            ]
+          ]
+        },
+        "duckBare": {
+          "sql": "SELECT variant, conversions / sessions AS rate\nFROM funnel WHERE variant IN ('C', 'F')\nORDER BY variant;",
+          "ok": true,
+          "columns": [
+            "variant",
+            "rate"
+          ],
+          "rows": [
+            [
+              "C",
+              null
+            ],
+            [
+              "F",
+              null
+            ]
+          ]
         }
       },
       "version": "v1.4.3"
@@ -1679,6 +1738,64 @@
               "2024-01-24",
               280,
               "4255"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "ties": {
+      "setup": "CREATE TABLE txns AS SELECT * FROM (VALUES\n  (DATE '2024-01-01', 100), (DATE '2024-01-02', 250), (DATE '2024-01-02', 75)\n) AS t(day, amount);",
+      "steps": {
+        "running": {
+          "sql": "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day) AS running_total\nFROM txns\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount",
+            "running_total"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              100,
+              "100"
+            ],
+            [
+              "2024-01-02",
+              250,
+              "425"
+            ],
+            [
+              "2024-01-02",
+              75,
+              "425"
+            ]
+          ]
+        },
+        "rows": {
+          "sql": "SELECT day, amount,\n  SUM(amount) OVER (ORDER BY day, amount DESC\n    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total\nFROM txns\nORDER BY day, amount DESC;",
+          "ok": true,
+          "columns": [
+            "day",
+            "amount",
+            "running_total"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              100,
+              "100"
+            ],
+            [
+              "2024-01-02",
+              250,
+              "350"
+            ],
+            [
+              "2024-01-02",
+              75,
+              "425"
             ]
           ]
         }

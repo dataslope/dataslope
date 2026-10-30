@@ -118,6 +118,9 @@ export const LOC = {
   frame: frame("loc", "frame"),
   loc: { lines: code("loc", "loc"), value: scalar("loc", "loc") },
   iloc: { lines: code("loc", "iloc"), value: scalar("loc", "iloc") },
+  /** A slice: loc keeps its end label, iloc stops before its end position. */
+  locSlice: { lines: code("loc", "locSlice"), ...frame("loc", "locSlice") },
+  ilocSlice: { lines: code("loc", "ilocSlice"), ...frame("loc", "ilocSlice") },
   north: { lines: code("loc", "north"), ...frame("loc", "north") },
   northIloc: { lines: code("loc", "northIloc"), ...series("loc", "northIloc") },
   northLoc: refused("loc", "northLoc"),
@@ -127,6 +130,8 @@ export const FILTER = {
   frame: frame("filter", "frame"),
   noParens: refused("filter", "noParens"),
   andWord: refused("filter", "andWord"),
+  /** One comparison on its own, before the second joins it. */
+  gt: { lines: code("filter", "gt"), ...series("filter", "gt") },
   mask: { lines: code("filter", "mask"), ...series("filter", "mask") },
   result: { lines: code("filter", "result"), ...frame("filter", "result") },
 };
@@ -135,10 +140,14 @@ export const FILTER = {
 
 export const GROUPBY = {
   frame: frame("groupby", "frame"),
+  /** groupby on its own: a GroupBy object, nothing computed yet. */
+  object: { lines: code("groupby", "object"), value: scalar("groupby", "object") },
   sum: { lines: code("groupby", "sum"), ...series("groupby", "sum") },
   agg: { lines: code("groupby", "agg"), ...frame("groupby", "agg") },
   aggMean: { lines: code("groupby", "aggMean"), ...series("groupby", "aggMean") },
   transform: { lines: code("groupby", "transform"), ...series("groupby", "transform") },
+  /** The region totals question 5 divides by. */
+  transformSum: { lines: code("groupby", "transformSum"), ...series("groupby", "transformSum") },
   pct: { lines: code("groupby", "pct"), ...frame("groupby", "pct") },
 };
 
@@ -149,6 +158,8 @@ export const MERGE = {
   feb: frame("merge", "feb"),
   customers: frame("merge", "customers"),
   stacked: { lines: code("merge", "stacked"), ...frame("merge", "stacked") },
+  /** Label 0 of the stacked frame: two orders. */
+  dupLabel: { lines: code("merge", "dupLabel"), ...frame("merge", "dupLabel") },
   clean: { lines: code("merge", "stackedClean"), ...frame("merge", "stackedClean") },
   merged: { lines: code("merge", "merged"), ...frame("merge", "merged") },
   stock: frame("merge", "stock"),
@@ -202,6 +213,8 @@ export const RESHAPE = {
   long: frame("reshape", "long"),
   pivot: refused("reshape", "pivot"),
   pivotTable: { lines: code("reshape", "pivotTable"), ...frame("reshape", "pivotTable") },
+  /** pivot_table with no aggfunc: the mean. */
+  pivotMean: frame("reshape", "pivotMean"),
 };
 
 // ── Rapid fire ──────────────────────────────────────────────────────────────
@@ -213,6 +226,8 @@ export const RAPID = {
     after: Number(scalar("categorical", "after")),
   },
   sorted: { lines: code("sort", "sorted"), ...frame("sort", "sorted") },
+  /** Ranks with a tie: min, then dense, each a column of the same frame. */
+  rankMin: { lines: code("sort", "rankMin") },
   ranked: { lines: code("sort", "ranked"), ...frame("sort", "ranked") },
   counts: { lines: code("counts", "counts"), ...series("counts", "counts") },
   shares: { lines: code("counts", "shares"), ...series("counts", "shares") },
@@ -223,16 +238,20 @@ export const RAPID = {
   duplicates: {
     frame: frame("duplicates", "frame"),
     count: Number(scalar("duplicates", "count")),
+    /** Compared on every column instead of the email: no repeats. */
+    countAll: Number(scalar("duplicates", "countAll")),
     countLines: code("duplicates", "count"),
     clean: { lines: code("duplicates", "clean"), ...frame("duplicates", "clean") },
   },
   rename: { lines: code("rename", "after"), before: scalar("rename", "before"), after: scalar("rename", "after") },
   dtypes: { lines: code("dtypes", "numeric"), value: scalar("dtypes", "numeric") },
-  case: { lines: code("case", "sized"), ...frame("case", "sized") },
+  case: { where: code("case", "where"), lines: code("case", "sized"), ...frame("case", "sized") },
+  // Each write's listing is its first line: the second only reads the file
+  // back, for the console that shows what the file holds.
   csv: {
-    withIndex: { lines: code("csv", "withIndex"), text: scalar("csv", "withIndex") },
-    readBack: frame("csv", "readBack"),
-    withoutIndex: { lines: code("csv", "withoutIndex"), text: scalar("csv", "withoutIndex") },
+    withIndex: { lines: code("csv", "withIndex").slice(0, 1), text: scalar("csv", "withIndex") },
+    readBack: { lines: code("csv", "readBack"), ...frame("csv", "readBack") },
+    withoutIndex: { lines: code("csv", "withoutIndex").slice(0, 1), text: scalar("csv", "withoutIndex") },
   },
   query: { lines: code("query", "result"), ...frame("query", "result") },
   shape: {
@@ -242,6 +261,7 @@ export const RAPID = {
     dtypes: series("shape", "dtypes"),
     memoryLines: code("shape", "memory"),
     memory: Number(scalar("shape", "memory")),
+    infoLines: code("shape", "info"),
   },
 };
 

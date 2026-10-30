@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -26,12 +26,29 @@ const STACK = (() => {
   });
 })();
 
+/** The axis the pile is drawn on, and the width of one column of dots in score units. */
+const LO = 0.94;
+const HI = 1.005;
+const BIN = (DOT * PER_ROW) / ((STRIP.right - STRIP.left) / (HI - LO));
+
+/** The two hundred five-fold averages, binned into columns as wide as the splits' and stacked the same way. */
+const MEANS = (() => {
+  const seen = new Map<number, number>();
+  return CV.means.map((v) => {
+    const col = Math.round((v - LO) / BIN);
+    const k = seen.get(col) ?? 0;
+    seen.set(col, k + 1);
+    return { v: LO + col * BIN, k };
+  });
+})();
+
 /**
  * Questions 5 and 6 on scikit-learn's breast cancer set (569 tumors). Two
  * hundred random 80/20 splits as a pile of dots, one per split, spread from
  * 94.7% to 100%; then five folds, each scoring the fold the others trained
- * for, with their mean and its spread drawn back onto the pile, and
- * forward-chaining for time series. Then the three sets as one bar, with the
+ * for, with their mean drawn back onto the pile, and that same five-fold
+ * average over two hundred reshuffles piled up in front of the single
+ * splits, far narrower; then forward-chaining for time series. Then the three sets as one bar, with the
  * peek from the test set back into the choice struck out.
  */
 export const CvScene: React.FC = () => {
@@ -51,10 +68,11 @@ export const CvScene: React.FC = () => {
   const fifthAt = n.word("cv-folds", "scores the fifth");
   const overAt = n.word("cv-folds", "five times over");
   const onceAt = n.word("cv-folds", "every row is scored once");
-  const meanAt = n.word("cv-folds", "the mean is");
-  const giveAt = n.word("cv-folds", "give or take");
-  const timeAt = n.word("cv-folds", "For time series");
-  const afterAt = n.word("cv-folds", "comes after the training data");
+  const meanAt = n.word("cv-mean", "the five average");
+  const repeatAt = n.word("cv-mean", "Repeat that on two hundred reshuffles");
+  const pileAt = n.word("cv-mean", "pile up far tighter");
+  const timeAt = n.word("cv-time", "For time series");
+  const afterAt = n.word("cv-time", "comes after the training data");
   const q6At = n.word("split", "Question six");
   const q6TextAt = n.word("split", "What's the discipline");
   const fitAt = n.word("split", "Fit on the training set");
@@ -63,21 +81,22 @@ export const CvScene: React.FC = () => {
   const reportAt = n.word("split", "to report");
   const peekAt = n.word("split", "Every choice made by looking");
   const flatterAt = n.word("split", "flatter you");
+  const onceTestAt = n.word("split", "once, at the end");
   const pictureAt = n.word("learn-in", "a picture tells you");
   const end = n.beat("learn-in").to;
 
-  const xs: Scale = { lo: 0.94, hi: 1.005, a: STRIP.left, b: STRIP.right };
+  const xs: Scale = { lo: LO, hi: HI, a: STRIP.left, b: STRIP.right };
   const base = y(STRIP.base);
   const ticks = [0.95, 0.96, 0.97, 0.98, 0.99, 1];
   const span = Math.max(1, (rangeAt - 6) - waysAt);
   const lo = at(xs, CV.min);
   const hi = at(xs, CV.max);
   const meanX = at(xs, CV.mean);
-  const sdLo = at(xs, CV.mean - CV.std);
-  const sdHi = at(xs, CV.mean + CV.std);
   const top = base - h(DOT) * (Math.ceil(54 / PER_ROW) + 1);
   const meanP = ease(frame, meanAt, 14);
-  const sdP = ease(frame, giveAt, 14);
+  // The single splits step back while the averages pile up in front of them.
+  const back = 1 - 0.75 * ease(frame, repeatAt - 4, 14);
+  const meanSpan = Math.max(1, pileAt - 4 - repeatAt);
   const segW = FOLDS.width / 5;
 
   // Question 6's bar: 60% training, 20% validation, 20% test.
@@ -105,6 +124,7 @@ export const CvScene: React.FC = () => {
         <Sfx key={i} name="el-tap" at={overAt + i * 5} level={-38} />
       ))}
       <Sfx name="el-pop" at={meanAt + 2} level={-32} />
+      <Sfx name="el-sprinkle" at={repeatAt} level={-36} />
       <Sfx name="el-pencil" at={fitAt} level={-36} />
       <Sfx name="el-scratch" at={flatterAt} level={-32} />
 
@@ -118,7 +138,9 @@ export const CvScene: React.FC = () => {
 
         <Fade from={asked - 8} out={q6At - 6}>
           {/* ── Two hundred single splits ── */}
-          <PanelTitle x={STRIP.left} y={top - h(48)} at={asked - 2}>
+          {/* High enough to clear the five-fold averages, whose tallest column
+              (66 of the 200) stands 22 dots high. */}
+          <PanelTitle x={STRIP.left} y={top - h(84)} at={asked - 2}>
             the same model, two hundred random splits of the tumor data
           </PanelTitle>
           <Svg>
@@ -126,7 +148,7 @@ export const CvScene: React.FC = () => {
             {ticks.map((t) => (
               <g key={t} opacity={ease(frame, asked + 4, 12)}>
                 <line x1={at(xs, t)} x2={at(xs, t)} y1={base} y2={base + 7} stroke={INK} strokeWidth={1.2} />
-                <text x={at(xs, t)} y={base + 32} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontVariantNumeric: "tabular-nums" }}>
+                <text x={at(xs, t)} y={base + 32} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontVariantNumeric: "tabular-nums" })}>
                   {Math.round(t * 100)}%
                 </text>
               </g>
@@ -139,11 +161,19 @@ export const CvScene: React.FC = () => {
               const one = i === 0;
               const ring = one ? ease(frame, oneAt, 10) : 0;
               return (
-                <g key={i}>
+                <g key={i} opacity={back}>
                   <circle cx={cx} cy={cy} r={4.4 * p} fill={one && ring > 0 ? ACCENT : BAR} opacity={0.85} />
                   {one ? <circle cx={cx} cy={cy} r={11 * ring} fill="none" stroke={ACCENT} strokeWidth={2.4} opacity={ring} /> : null}
                 </g>
               );
+            })}
+            {/* The five-fold average, repeated on two hundred reshuffles of the folds. */}
+            {MEANS.map((d, i) => {
+              const p = ease(frame, repeatAt + (i / MEANS.length) * meanSpan, 6);
+              if (p <= 0) return null;
+              const cx = at(xs, d.v) + ((d.k % PER_ROW) - 1) * DOT;
+              const cy = base - h(DOT) * (Math.floor(d.k / PER_ROW) + 0.7);
+              return <circle key={`m${i}`} cx={cx} cy={cy} r={4.4 * p} fill={OK} opacity={0.9} />;
             })}
           </Svg>
           <Bracket x0={lo} x1={hi} y={base + h(62)} at={rangeAt} color={ACCENT}>
@@ -155,14 +185,22 @@ export const CvScene: React.FC = () => {
             <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>one split: one draw from that range</span>
           </Note>
 
-          {/* The folds' mean and spread, back on the same axis. */}
+          {/* The folds' mean, back on the same axis; then the same average over
+              two hundred reshuffles, piled up in front of the single splits. */}
           <Svg opacity={meanP}>
-            <rect x={sdLo + (meanX - sdLo) * (1 - sdP)} y={top - h(6)} width={(sdHi - sdLo) * sdP} height={base - top + h(6)} fill={`color-mix(in srgb, ${OK} 14%, transparent)`} />
             <line x1={meanX} x2={meanX} y1={top - h(14)} y2={base} stroke={OK} strokeWidth={3.4} />
           </Svg>
           <Note at={meanAt + 2} x={STRIP.left} y={base + h(128)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
-              five folds: {fmt(CV.mean * 100, 1)}%<span style={{ opacity: sdP }}>, give or take {fmt(CV.std * 100, 1)}</span>
+            <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+              five folds, averaged: <span style={TABULAR}>{fmt(CV.mean * 100, 1)}%</span>
+            </span>
+          </Note>
+          <Note at={pileAt - 2} x={STRIP.left} y={base + h(170)}>
+            <span style={{ ...note(26, OK_INK), whiteSpace: "nowrap" }}>
+              that average on {CV.means.length} reshuffles:{" "}
+              <b style={TABULAR}>
+                {pct(CV.meansMin, 1)} to {pct(CV.meansMax, 1)}
+              </b>
             </span>
           </Note>
 
@@ -227,68 +265,71 @@ export const CvScene: React.FC = () => {
 
         {/* ── Question 6: three sets, three jobs ── */}
         <Fade from={q6At + 4} out={end - 8}>
-          {segs.map((s) => {
-            const p = ease(frame, s.at - 4, 14);
-            return (
-              <React.Fragment key={s.name}>
-                <div
-                  style={{
-                    position: "absolute",
-                    left: s.left + 3,
-                    top: barTop,
-                    width: (s.width - 6) * p,
-                    height: barH,
-                    boxSizing: "border-box",
-                    background: s.fill,
-                    border: `2px solid ${s.color}`,
-                    borderRadius: 4,
-                  }}
-                />
-                <Note at={s.at - 2} x={s.left + 14} y={barTop + h(22)}>
-                  <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.name}</span>
-                </Note>
-                <Note at={s.at + 4} x={s.left + 14} y={barTop + barH + h(18)}>
-                  <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-                    {s.name === "test" ? (
-                      <>
-                        <Mark at={pictureAt - 6}>once</Mark>, <span style={{ opacity: ease(frame, reportAt - 2, 10) }}>to report</span>
-                      </>
-                    ) : s.name === "validation" ? (
-                      <>
-                        tune and choose
-                        <br />
-                        <span style={{ ...note(22, INK_SOFT) }}>or cross-validate</span>
-                      </>
-                    ) : (
-                      s.role
-                    )}
-                  </span>
-                </Note>
-              </React.Fragment>
-            );
-          })}
-          {/* The peek: a score read off the test set, fed back into the choice. */}
-          <ElbowArrow
-            points={[
-              [testSeg.left + testSeg.width / 2, barTop - 14],
-              [testSeg.left + testSeg.width / 2, barTop - h(80)],
-              [valSeg.left + valSeg.width / 2, barTop - h(80)],
-              [valSeg.left + valSeg.width / 2, barTop - 14],
-            ]}
-            at={peekAt}
-            color={ACCENT}
-            width={2.8}
-          />
-          <Note at={peekAt + 8} x={valSeg.left + 40} y={barTop - h(130)}>
-            <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>
-              <Strike at={flatterAt - 4} color={ACCENT} top="0.78em">
-                choosing by the test score
-              </Strike>
-            </span>
-          </Note>
-          <Note at={flatterAt} x={SPLIT.left} y={barTop + barH + h(150)}>
-            <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Peek, and the test score flatters you.</span>
-          </Note>
+          {/* Set back on the bridge, which moves on to the next question. */}
+          <div style={{ opacity: 1 - 0.45 * ease(frame, pictureAt, 16) }}>
+            {segs.map((s) => {
+              const p = ease(frame, s.at - 4, 14);
+              return (
+                <React.Fragment key={s.name}>
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: s.left + 3,
+                      top: barTop,
+                      width: (s.width - 6) * p,
+                      height: barH,
+                      boxSizing: "border-box",
+                      background: s.fill,
+                      border: `2px solid ${s.color}`,
+                      borderRadius: 4,
+                    }}
+                  />
+                  <Note at={s.at - 2} x={s.left + 14} y={barTop + h(22)}>
+                    <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.name}</span>
+                  </Note>
+                  <Note at={s.at + 4} x={s.left + 14} y={barTop + barH + h(18)}>
+                    <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+                      {s.name === "test" ? (
+                        <>
+                          <Mark at={onceTestAt}>once</Mark>, <span style={{ opacity: ease(frame, reportAt - 2, 10) }}>to report</span>
+                        </>
+                      ) : s.name === "validation" ? (
+                        <>
+                          tune and choose
+                          <br />
+                          <span style={{ ...note(22, INK_SOFT) }}>or cross-validate</span>
+                        </>
+                      ) : (
+                        s.role
+                      )}
+                    </span>
+                  </Note>
+                </React.Fragment>
+              );
+            })}
+            {/* The peek: a score read off the test set, fed back into the choice. */}
+            <ElbowArrow
+              points={[
+                [testSeg.left + testSeg.width / 2, barTop - 14],
+                [testSeg.left + testSeg.width / 2, barTop - h(80)],
+                [valSeg.left + valSeg.width / 2, barTop - h(80)],
+                [valSeg.left + valSeg.width / 2, barTop - 14],
+              ]}
+              at={peekAt}
+              color={ACCENT}
+              width={2.8}
+            />
+            <Note at={peekAt + 8} x={valSeg.left + 40} y={barTop - h(130)}>
+              <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>
+                <Strike at={flatterAt - 4} color={ACCENT} top="0.78em">
+                  choosing by the test score
+                </Strike>
+              </span>
+            </Note>
+            <Note at={flatterAt} x={SPLIT.left} y={barTop + barH + h(150)}>
+              <span style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap" }}>Peek, and the test score flatters you.</span>
+            </Note>
+          </div>
         </Fade>
       </Drift>
     </AbsoluteFill>
@@ -310,7 +351,9 @@ const TimeSeries: React.FC<{ at: number; afterAt: number; left: number; top: num
       {Array.from({ length: rows }, (_, r) =>
         Array.from({ length: 6 }, (_, c) => {
           const kind = c <= r ? "train" : c === r + 1 ? "val" : "none";
-          const p = ease(frame, afterAt - 6 + r * 4 + c, 8);
+          // Drawn as "For time series" is said, so the forward chaining is up
+          // for the whole sentence and the pause after it.
+          const p = ease(frame, from + 8 + r * 4 + c, 8);
           return (
             <div
               key={`${r}-${c}`}
@@ -330,7 +373,7 @@ const TimeSeries: React.FC<{ at: number; afterAt: number; left: number; top: num
           );
         }),
       )}
-      <div style={{ position: "absolute", left: left + 6 * (cell + 4) + 8, top: top + h(58), ...label(19, INK_SOFT), opacity: ease(frame, afterAt, 10), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: left + 6 * (cell + 4) + 8, top: top + h(58), ...label(19, INK_SOFT), opacity: ease(frame, Math.min(afterAt, from + 30), 10), whiteSpace: "nowrap" }}>
         time →
       </div>
     </>

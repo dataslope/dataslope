@@ -21,10 +21,14 @@ const TOTAL = 15;
 
 /**
  * The opening: the finished cohort chart first, filling in as its rows and
- * columns are described and outlined as a staircase, then the promise that
- * each of its pieces is a question. Then the page's fifteen questions as
- * numbered chips, six filled for the worked ones and nine outlined for the
- * quick round; the first lights on the bridge into question 1.
+ * columns are described. Shares fall along each row (the tint fades), and
+ * the outline traces why each newer row is shorter: it has had fewer months
+ * of data, which is a different thing from users leaving. Then the promise:
+ * its pieces, and the patterns around them, are questions of their own (the
+ * second half of the video is the patterns, not the chart). Then the page's
+ * fifteen questions as numbered chips, six filled for the worked ones and
+ * nine outlined for the quick round; the first lights on the bridge into
+ * question 1.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -34,12 +38,13 @@ export const HookScene: React.FC = () => {
   const from = n.beat("hook").from;
   const chartAt = n.word("hook", "a chart like this one");
   const rowAt = n.word("hook", "Each row is the users");
-  const cellAt = n.word("hook", "Each cell is the share");
-  const laterAt = n.word("hook", "a month later");
-  const twoAt = n.word("hook", "then two");
-  const threeAt = n.word("hook", "then three");
-  const stepsAt = n.word("hook", "every row steps down");
-  const classicAt = n.word("hook", "a classic data science SQL question");
+  const cellAt = n.word("hook-cells", "Each cell is the share");
+  const laterAt = n.word("hook-cells", "a month later");
+  const twoAt = n.word("hook-cells", "then two");
+  const threeAt = n.word("hook-cells", "then three");
+  const shorterAt = n.word("hook-cells", "each newer row is shorter");
+  const fewerAt = n.word("hook-cells", "fewer months to measure");
+  const aroundAt = n.word("hook-sql", "the patterns around them");
   const fifteenAt = n.word("plan", "fifteen questions");
   const sixAt = n.word("plan", "Six get a real query");
   const nineAt = n.word("plan", "The other nine");
@@ -56,13 +61,13 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-tap" at={laterAt} level={-34} />
       <Sfx name="el-tap" at={twoAt} level={-34} />
       <Sfx name="el-tap" at={threeAt} level={-34} />
-      <Sfx name="el-pencil" at={stepsAt + 2} level={-34} />
+      <Sfx name="el-pencil" at={shorterAt + 2} level={-34} />
       <Sfx name="el-pop" at={sixAt} level={-34} />
       <Sfx name="el-pop" at={firstAt + 2} level={-34} />
 
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>Data scientist interview prep</Kicker>
-        <Headline lead="One chart," turn="built one question at a time." at={from + 4} turnAt={classicAt} size={70} />
+        <Headline lead="One chart," turn="and the queries around it." at={from + 4} turnAt={aroundAt} size={70} />
 
         <Spot id="ds-sql-seal" at={from + 8} left={1160} top={y(300)} width={640} height={440} />
 
@@ -74,7 +79,8 @@ export const HookScene: React.FC = () => {
           at={chartAt - 4}
           rowsAt={rowAt}
           fill={(r, c) => colAt[c] + r * 3}
-          stairAt={stepsAt}
+          stairAt={shorterAt}
+          blankNote={{ at: fewerAt, text: "not reached yet" }}
           dim={fifteenAt}
         />
         {/* What each cell is: a share of the row's own first month. */}

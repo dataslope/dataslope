@@ -76,8 +76,10 @@ export const RETAIN = {
 // ── 3. A safe rate ──────────────────────────────────────────────────────────
 
 export const RATE = {
-  /** The page's query on the first six of its 24 variants. */
-  safe: query("rate", "firstSix"),
+  /** The page's funnel: its first six of 24 variants, as data. */
+  funnel: table("rate", "funnel"),
+  /** DuckDB's bare division on C and F, with no NULLIF: null already. */
+  duckBare: query("rate", "duckBare"),
   noSessions: scalar("rate", "zeros", "no_sessions"),
   variants: table("rate", "page").rows.length,
   /** The same bare division in Postgres: the zero divisor fails it. */
@@ -106,6 +108,9 @@ export const COHORT = {
   sample: table("cohort", "sample"),
   /** The page's query on the video's own activity log. */
   page: query("cohort", "page"),
+  /** The same query one step on: each count over its cohort's month 0, by
+   *  FIRST_VALUE, which is what the grid shows. */
+  shares: query("cohort", "rates"),
   /** Each cohort's shares of its month zero, as a grid: one row per cohort,
    *  a percentage per month offset (null past the data). */
   grid: cohorts.map((c) => ({
@@ -150,7 +155,11 @@ export const RAPID = {
   dod: query("txns", "dod"),
   topN: query("window", "topN"),
   running: query("txns", "running"),
+  /** The same running total on the video's own three rows, two on one day:
+   *  the default RANGE frame gives the tied rows one total. */
+  tied: query("ties", "running"),
   latest: query("latest", "latest"),
+  orders: Number(scalar("latest", "rows", "orders")),
   customers: Number(scalar("latest", "rows", "customers")),
   pivot: query("pivot", "pivot"),
   counts: query("count", "counts"),

@@ -8,7 +8,7 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { type Cell, LOOKUPS, printed, screen } from "./data";
-import { Drift, FormulaBar, MARK, MARK_BAD, MARK_OK, RangeBox, Sheet, sheetGeometry, X0 } from "./parts";
+import { Drift, FormulaBar, MARK, MARK_BAD, MARK_OK, Mono, RangeBox, Sheet, sheetGeometry, X0 } from "./parts";
 
 const TIERS_Y = 330;
 const PRODUCTS_Y = 600;
@@ -35,18 +35,19 @@ export const ApproxScene: React.FC = () => {
   const qAt = n.word("approx", "Question");
   const textAt = n.word("approx", "What's the difference");
   const asked = n.beat("approx").to;
-  const exactAt = n.word("approx-what", "Exact returns only");
+  const approxAt = n.word("approx-what", "Approximate assumes");
   const sortedAt = n.word("approx-what", "assumes the first column is sorted");
   const largestAt = n.word("approx-what", "the largest value");
   const tiersAt = n.word("approx-what", "right for tiers");
   const sixFortyAt = n.word("approx-what", "six hundred forty");
   const tenAt = n.word("approx-what", "ten percent off");
   const codesAt = n.word("approx-trap", "silently wrong for codes");
-  const leaveAt = n.word("approx-trap", "Leave off false");
-  const notExistAt = n.word("approx-trap", "which doesn't exist");
-  const naAt = n.word("approx-trap", "Instead of NA");
-  const lampAt = n.word("approx-trap", "the lamp's price");
-  const unsortedAt = n.word("approx-trap", "On unsorted data");
+  const leaveAt = n.word("approx-leave", "Leave off false");
+  const fallsAt = n.word("approx-leave", "falls back to approximate");
+  const notExistAt = n.word("approx-leave", "which doesn't exist");
+  const naAt = n.word("approx-lamp", "Instead of NA");
+  const lampAt = n.word("approx-lamp", "the lamp's price");
+  const unsortedAt = n.word("approx-lamp", "On unsorted data");
   const end = n.beat("refs-in").to;
 
   const L = LOOKUPS;
@@ -89,9 +90,10 @@ export const ApproxScene: React.FC = () => {
         <Note at={sortedAt + 4} x={X0} y={tg.top - h(36)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>sorted, smallest first</span>
         </Note>
-        <Note at={exactAt - 2} x={BAR_X} y={tg.top - h(4)}>
+        {/* Each mode is named over its own formula: approximate here, exact under FALSE. */}
+        <Note at={approxAt - 2} x={BAR_X} y={tg.top - h(4)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b>exact</b>: a precise hit, or #N/A
+            <b>approximate</b> (<Mono>TRUE</Mono>): the largest value not above the key
           </span>
         </Note>
         <FormulaBar
@@ -107,6 +109,12 @@ export const ApproxScene: React.FC = () => {
         <Note at={sixFortyAt + 4} x={BAR_X} y={tg.top + h(98)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             the largest &ldquo;from&rdquo; not above {key} is <b>{L.tiers[tierRow - 1][0]}</b>
+          </span>
+        </Note>
+        {/* What leaving the argument off means, which differs by function. */}
+        <Note at={fallsAt} x={BAR_X} y={tg.top + h(150)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            left off: <b style={{ color: INK }}>VLOOKUP</b> and <b style={{ color: INK }}>MATCH</b> mean approximate, <b style={{ color: INK }}>XLOOKUP</b> means exact
           </span>
         </Note>
 
@@ -143,7 +151,12 @@ export const ApproxScene: React.FC = () => {
           resultAt={naAt + 6}
           tone="ok"
         />
-        <Note at={unsortedAt - 2} x={BAR_X} y={pg.top + h(160)}>
+        <Note at={naAt + 6} x={BAR_X} y={pg.top + h(150)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <b>exact</b> (<Mono>FALSE</Mono>): a precise hit, or #N/A
+          </span>
+        </Note>
+        <Note at={unsortedAt - 2} x={BAR_X} y={pg.top + h(200)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             unsorted? <span style={{ color: ACCENT_INK }}>approximate match can land anywhere</span>
           </span>

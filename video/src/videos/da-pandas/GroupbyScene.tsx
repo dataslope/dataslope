@@ -4,13 +4,15 @@ import { ease } from "../../components/motion";
 import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Ink, Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GROUPBY } from "./data";
 import {
   colsOf,
+  Console,
+  consoleHeight,
   DataTable,
   Drift,
   geoOf,
@@ -32,13 +34,18 @@ const BODY = 26;
 const PIECE_ROW = 50;
 const PIECE_LABEL = 34;
 const PIECE_GAP = 30;
+/** The stage heads' line, between the question and the pieces. */
+const STAGE_Y = 300;
 
 /**
  * Questions 3, 4 and 5 on one frame, the page's percentage-of-group block:
  * the rows split into one piece per region and slide across, each piece is
- * summed, the sums combine into a Series; then agg against transform (three
- * rows against five, the five as a new column of the same frame); then each
- * order's share of its region, a second new column.
+ * summed, the sums combine into a Series (each stage headed with its name);
+ * groupby on its own is only a GroupBy object; then agg against transform
+ * (three rows against five, the five as a new column of the same frame);
+ * then each order's share of its region, from the region totals
+ * transform("sum") gives, which open as a column of their own beside the
+ * share while the means step back.
  */
 export const GroupbyScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -50,12 +57,16 @@ export const GroupbyScene: React.FC = () => {
   const textAt = n.word("groupby", "What does");
   const asked = n.beat("groupby").to;
   const splitAt = n.word("gb-split", "splits the rows");
+  const applyAt = n.word("gb-split", "Apply runs");
   const sumAt = n.word("gb-split", "here a sum");
   const combineAt = n.word("gb-split", "Combine stacks");
+  const objAt = n.word("gb-object", "On its own");
+  const objectAt = n.word("gb-object", "a GroupBy object");
+  const nothingAt = n.word("gb-object", "Nothing is computed");
   const returnsAt = n.word("gb-returns", "Group one column");
   const seriesAt = n.word("gb-returns", "a Series");
-  const aggAt = n.word("gb-returns", "Name two aggregates");
-  const frameAt = n.word("gb-returns", "a data frame");
+  const aggAt = n.word("gb-agg", "Name two aggregates");
+  const frameAt = n.word("gb-agg", "a data frame");
   const q4At = n.word("gb-transform", "Question four");
   const onePerGroupAt = n.word("gb-transform", "one row per group");
   const transformAt = n.word("gb-transform", "Transform gives");
@@ -66,15 +77,23 @@ export const GroupbyScene: React.FC = () => {
   const end = n.beat("merge-in").to;
 
   // One frame for the whole scene: the page's rows, the transform's column
-  // (question 4) and the share (question 5), each opening on its question.
+  // (question 4), then the region totals the share divides by and the share
+  // itself (question 5), each opening on its question. The means step back
+  // when question 5 asks, so the total sits beside the share it makes.
   const base = GROUPBY.pct;
   const tName = 'transform("mean")';
+  const sName = 'transform("sum")';
   const table = {
-    cols: [...base.cols.slice(0, 3), tName, base.cols[3]],
-    rows: base.rows.map((r, i) => [...r.slice(0, 3), GROUPBY.transform.rows[i][1], r[3]]),
+    cols: [...base.cols.slice(0, 3), tName, sName, base.cols[3]],
+    rows: base.rows.map((r, i) => [...r.slice(0, 3), GROUPBY.transform.rows[i][1], GROUPBY.transformSum.rows[i][1], r[3]]),
   };
   const g = geoOf(table, X0, y(TOP), h, { bodySize: BODY });
-  const cols = colsOf(table, { [tName]: { at: transformAt + 4 }, pct_of_region: { at: divideAt + 4 } });
+  const meansBack = ease(frame, q5At, 14);
+  const cols = colsOf(table, {
+    [tName]: { at: transformAt + 4, ink: `color-mix(in srgb, ${INK} ${100 - 62 * meansBack}%, ${PAPER})` },
+    [sName]: { at: divideAt + 4 },
+    pct_of_region: { at: divideAt + 14 },
+  });
 
   // The pieces, in the order groupby sorts its keys.
   const keys = GROUPBY.sum.rows.map((r) => r[0]);
@@ -98,6 +117,13 @@ export const GroupbyScene: React.FC = () => {
   const mg = geoOf(GROUPBY.aggMean, RIGHT_X, y(TOP) + lineH + h(18), h, { bodySize: BODY });
   const below = g.rowTop(table.rows.length) + h(40);
   const north = 0;
+  // The three stages, each headed on its word, over the pieces, the sums
+  // and the combined Series.
+  const stages = [
+    { text: "split", x: PIECES_X, at: splitAt },
+    { text: "apply", x: PIECES_X + 340, at: applyAt },
+    { text: "combine", x: RESULT_X, at: combineAt },
+  ];
 
   return (
     <AbsoluteFill>
@@ -131,9 +157,32 @@ export const GroupbyScene: React.FC = () => {
           marks={[
             ...table.rows.map((_, i) => ({ row: i, col: 3, at: fiveAt + i * 3, out: q5At })),
             { row: north, col: 2, at: percentAt - 6 },
-            { row: north, col: 4, at: percentAt, color: MARK_OK },
+            { row: north, col: 4, at: percentAt - 6 },
+            { row: north, col: 5, at: percentAt, color: MARK_OK },
           ]}
         />
+
+        {/* ── Split, apply, combine: each stage named on its word ── */}
+        {stages.map((s) => (
+          <Ink key={s.text} at={s.at} dur={12} out={returnsAt - 4} style={{ left: s.x, top: y(STAGE_Y) }}>
+            <span style={{ ...label(22, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>{s.text}</span>
+          </Ink>
+        ))}
+
+        {/* ── groupby on its own: an object, nothing computed yet ── */}
+        <Listing lines={GROUPBY.object.lines} x={X0} top={below} width={440} size={SIZE} at={objAt - 2} out={returnsAt - 4} />
+        <Console
+          lines={[GROUPBY.object.value]}
+          x={X0}
+          top={below + lineH + h(12)}
+          width={640}
+          at={objectAt - 4}
+          out={returnsAt - 4}
+          marks={[{ line: 0, at: objectAt + 6 }]}
+        />
+        <Note at={nothingAt} x={X0} y={below + lineH + h(12) + consoleHeight(1) + h(16)} out={returnsAt - 4}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>nothing computed until you aggregate</span>
+        </Note>
 
         {/* ── Split: one piece per region ── */}
         <div style={{ position: "absolute", inset: 0, opacity: 1 - piecesOut }}>
@@ -272,9 +321,9 @@ export const GroupbyScene: React.FC = () => {
 
         {/* ── A share of the group's total ── */}
         <Listing lines={GROUPBY.pct.lines} x={X0} top={below} width={1000} size={SIZE} at={divideAt - 2} />
-        <Note at={percentAt - 4} x={g.right + 60} y={g.rowTop(north)}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            {base.rows[north][2]} ÷ {GROUPBY.sum.rows.find((r) => r[0] === base.rows[north][1])![1]} = {base.rows[north][3]}%
+        <Note at={percentAt - 4} x={g.right + 40} y={g.rowTop(north)}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <Num>{base.rows[north][2]}</Num> ÷ <Num>{GROUPBY.transformSum.rows[north][1]}</Num> = <Num>{base.rows[north][3]}</Num>%
           </span>
         </Note>
       </Drift>

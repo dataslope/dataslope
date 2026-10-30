@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QMono, RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { BAR, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
+import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
@@ -35,8 +35,8 @@ const SIZE = 22;
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"]; T: number };
 
 /** A table at (x, top) in the round's compact rows. */
-const geo = (c: Ctx, t: { cols: readonly string[]; rows: readonly (readonly string[])[] }, x: number, top: number, rowH = 50) =>
-  geoOf(t, x, top, c.h, { headH: 46, rowH, bodySize: 24 });
+const geo = (c: Ctx, t: { cols: readonly string[]; rows: readonly (readonly string[])[] }, x: number, top: number, rowH = 50, headH = 46) =>
+  geoOf(t, x, top, c.h, { headH, rowH, bodySize: 24 });
 
 /** Rows inking in one after another from `at`. */
 const rowsAt = (rows: readonly (readonly string[])[], at: number, step = 2) => rows.map((cells, i) => ({ cells, at: at + i * step }));
@@ -102,23 +102,37 @@ const Categorical: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Sorting: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-sort", "Sort values");
-  const rankAt = c.w("r-sort", "Rank numbers");
-  const denseAt = c.w("r-sort", "dense leaves no gaps");
+  const rankAt = c.w("r-rank", "Rank numbers");
+  const tiesAt = c.w("r-rank", "ties share a rank");
+  const skipsAt = c.w("r-rank", "min skips a number");
+  const denseAt = c.w("r-rank", "dense doesn't");
   const lineH = listingHeight(1, SIZE);
-  const tablesTop = c.T + 2 * lineH + c.h(56);
+  const step = lineH + c.h(12);
+  const tablesTop = c.T + 3 * step + c.h(30);
   const sg = geo(c, RAPID.sorted, R_X, tablesTop);
   const rg = geo(c, RAPID.ranked, R_X + 420, tablesTop);
+  const R = RAPID.ranked;
+  const minCol = R.cols.indexOf("min");
+  const denseCol = R.cols.indexOf("dense");
+  // The tied rows share a rank; the row after them is where min and dense part.
+  const tied = R.rows.flatMap((r, i) => (R.rows.filter((s) => s[minCol] === r[minCol]).length > 1 ? [i] : []));
+  const parted = R.rows.flatMap((r, i) => (r[minCol] !== r[denseCol] ? [i] : []));
   return (
     <>
       <Listing lines={RAPID.sorted.lines} x={R_X} top={c.T} width={1000} size={SIZE} at={at - 4} />
-      <Listing lines={RAPID.ranked.lines} x={R_X} top={c.T + lineH + c.h(12)} width={1000} size={SIZE} at={rankAt - 4} />
+      <Listing lines={RAPID.rankMin.lines} x={R_X} top={c.T + step} width={1000} size={SIZE} at={rankAt - 4} />
+      <Listing lines={R.lines} x={R_X} top={c.T + 2 * step} width={1000} size={SIZE} at={rankAt + 2} />
       <DataTable g={sg} cols={colsOf(RAPID.sorted)} at={at + 4} rows={rowsAt(RAPID.sorted.rows, at + 8)} />
       <DataTable
         g={rg}
-        cols={colsOf(RAPID.ranked, { rank: { at: rankAt + 4 } })}
+        cols={colsOf(R, { min: { at: rankAt + 4 }, dense: { at: rankAt + 10 } })}
         at={rankAt}
-        rows={rowsAt(RAPID.ranked.rows, rankAt + 2)}
-        marks={RAPID.ranked.rows.map((_, i) => ({ row: i, col: 3, at: denseAt + i * 3 }))}
+        rows={rowsAt(R.rows, rankAt + 2)}
+        marks={[
+          ...tied.flatMap((row, k) => [minCol, denseCol].map((col) => ({ row, col, at: tiesAt + k * 3, out: skipsAt }))),
+          ...parted.map((row) => ({ row, col: minCol, at: skipsAt + 2 })),
+          ...parted.map((row) => ({ row, col: denseCol, at: denseAt })),
+        ]}
       />
     </>
   );
@@ -215,10 +229,11 @@ const Chain: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 24. Duplicates ──────────────────────────────────────────────────────────
 
 const Duplicates: React.FC<{ c: Ctx }> = ({ c }) => {
-  const at = c.w("r-dupes", "Duplicated flags");
-  const twoAt = c.w("r-dupes", "two here");
-  const dropAt = c.w("r-dupes", "Drop duplicates");
-  const firstAt = c.w("r-dupes", "keeps the first");
+  const at = c.w("r-dupes", "Duplicated");
+  const emailAt = c.w("r-dupes", "on the email column");
+  const twoAt = c.w("r-dupes", "two repeats");
+  const dropAt = c.w("r-drop", "Drop duplicates");
+  const firstAt = c.w("r-drop", "keeps the first");
   const D = RAPID.duplicates;
   const fg = geo(c, D.frame, R_X, c.T);
   const listX = R_X + 470;
@@ -232,10 +247,16 @@ const Duplicates: React.FC<{ c: Ctx }> = ({ c }) => {
         cols={colsOf(D.frame)}
         at={at - 6}
         rows={rowsAt(D.frame.rows, at - 2)}
+        marks={D.frame.rows.map((_, row) => ({ row, col: 1, at: emailAt + row * 2, out: twoAt }))}
         bands={repeats.map((row, k) => ({ row, at: twoAt + k * 4, color: MARK_BAD }))}
       />
       <Listing lines={D.countLines} x={listX} top={c.T} width={620} size={SIZE} at={at} />
       <Console lines={[String(D.count)]} x={listX} top={c.T + lineH + c.h(12)} width={100} at={twoAt - 2} />
+      <Note at={twoAt + 8} x={listX + 124} y={c.T + lineH + c.h(12) + c.h(8)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          on every column instead: <Num>{D.countAll}</Num>
+        </span>
+      </Note>
       <Listing
         lines={D.clean.lines}
         x={listX}
@@ -245,6 +266,11 @@ const Duplicates: React.FC<{ c: Ctx }> = ({ c }) => {
         at={dropAt - 4}
       />
       <DataTable g={cg} cols={colsOf(D.clean)} at={firstAt - 4} rows={rowsAt(D.clean.rows, firstAt)} />
+      <Note at={firstAt + 12} x={listX} y={cg.rowTop(D.clean.rows.length) + c.h(20)}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          <QMono>keep=&quot;last&quot;</QMono> keeps the last instead
+        </span>
+      </Note>
     </>
   );
 };
@@ -281,29 +307,36 @@ const Dtypes: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 27. A CASE-like column ──────────────────────────────────────────────────
 
 const Case: React.FC<{ c: Ctx }> = ({ c }) => {
-  const at = c.w("r-case", "For a CASE");
   const whereAt = c.w("r-case", "NumPy where");
   const selectAt = c.w("r-case", "NumPy select");
   const winsAt = c.w("r-case", "first true condition wins");
   const lines = RAPID.case.lines;
+  const lineH = listingHeight(1, SIZE);
+  const selectTop = c.T + lineH + c.h(12);
   const listH = listingHeight(lines.length, SIZE);
-  const tg = geo(c, RAPID.case, R_X, c.T + listH + c.h(30), 44);
+  const tg = geo(c, RAPID.case, R_X, selectTop + listH + c.h(30), 44);
   const selectLine = lines.findIndex((l) => l.includes("np.select"));
+  // The rows both conditions hold for: the first one listed names them.
+  const choices = lines.find((l) => l.startsWith("choices"))!.match(/"([^"]+)"/)![1];
+  const both = RAPID.case.rows.flatMap((r, i) => (r[2] === choices ? [i] : []));
   return (
     <>
-      <Listing lines={lines} x={R_X} top={c.T} width={1000} size={SIZE} at={at - 2} marks={[{ line: selectLine, at: selectAt + 6 }]} />
-      <Note at={whereAt - 2} x={R_X + 700} y={c.T + listH + c.h(40)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
-          one condition: <QMono>np.where</QMono>
-        </span>
-      </Note>
+      <Listing lines={RAPID.case.where} x={R_X} top={c.T} width={1000} size={SIZE} at={whereAt - 4} />
+      <Listing lines={lines} x={R_X} top={selectTop} width={1000} size={SIZE} at={selectAt - 4} marks={[{ line: selectLine, at: selectAt + 6 }]} />
       <DataTable
         g={tg}
         cols={colsOf(RAPID.case, { size: { at: selectAt + 8 } })}
         at={selectAt + 2}
         rows={rowsAt(RAPID.case.rows, selectAt + 4)}
-        marks={RAPID.case.rows.map((_, i) => ({ row: i, col: 2, at: winsAt + i * 3 }))}
+        marks={both.map((row, k) => ({ row, col: 2, at: winsAt + k * 4 }))}
       />
+      <Note at={winsAt + 6} x={tg.right + 30} y={tg.rowTop(both[0]) + c.h(8)}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          both conditions hold:
+          <br />
+          the first wins, {choices}
+        </span>
+      </Note>
     </>
   );
 };
@@ -312,6 +345,7 @@ const Case: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Csv: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-csv", "Read CSV");
+  const toAt = c.w("r-csv", "to CSV");
   const indexAt = c.w("r-csv", "index equals false");
   const unnamedAt = c.w("r-csv", "an unnamed column");
   const excelAt = c.w("r-csv", "Excel works");
@@ -319,13 +353,25 @@ const Csv: React.FC<{ c: Ctx }> = ({ c }) => {
   const textLines = (t: string) => t.replace(/\n$/, "").split("\n");
   const lineH = listingHeight(1, SIZE);
   const firstOut = textLines(withIndex.text);
-  const rg = geo(c, readBack, R_X + 520, c.T + lineH + c.h(12));
-  const secondTop = c.T + lineH + c.h(12) + consoleHeight(firstOut.length) + c.h(40);
+  const secondOut = textLines(withoutIndex.text);
+  // Left: the file written with its index, what it holds, and what reading
+  // it back gives. Right: the same write without the index.
+  const fileTop = c.T + lineH + c.h(12);
+  const readTop = fileTop + consoleHeight(firstOut.length) + c.h(30);
+  const rg = geo(c, readBack, R_X, readTop + lineH + c.h(16));
+  const rightX = R_X + 540;
   const unnamed = readBack.cols.findIndex((col) => col.startsWith("Unnamed"));
+  const file = withIndex.lines[0].match(/"([^"]+)"/)![1];
   return (
     <>
-      <Listing lines={withIndex.lines} x={R_X} top={c.T} width={760} size={SIZE} at={at - 4} />
-      <Console lines={firstOut} x={R_X} top={c.T + lineH + c.h(12)} width={300} at={at + 4} marks={[{ line: 0, at: unnamedAt - 4, color: MARK_BAD }]} />
+      <Listing lines={withIndex.lines} x={R_X} top={c.T} width={420} size={SIZE} at={at - 4} />
+      <Console lines={firstOut} x={R_X} top={fileTop} width={300} at={toAt} marks={[{ line: 0, at: unnamedAt - 4, color: MARK_BAD }]} />
+      <Note at={toAt + 6} x={R_X + 320} y={fileTop + c.h(10)}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          in <QMono>{file}</QMono>
+        </span>
+      </Note>
+      <Listing lines={readBack.lines} x={R_X} top={readTop} width={420} size={SIZE} at={toAt + 8} />
       <DataTable
         g={rg}
         cols={colsOf(readBack, { [readBack.cols[unnamed]]: { at: unnamedAt - 6 } })}
@@ -333,9 +379,9 @@ const Csv: React.FC<{ c: Ctx }> = ({ c }) => {
         rows={rowsAt(readBack.rows, unnamedAt - 8)}
         marks={readBack.rows.map((_, i) => ({ row: i, col: unnamed, at: unnamedAt + 2, color: MARK_BAD }))}
       />
-      <Listing lines={withoutIndex.lines} x={R_X} top={secondTop} width={860} size={SIZE} at={indexAt - 2} marks={[{ line: 0, at: indexAt + 8, color: MARK_OK }]} />
-      <Console lines={textLines(withoutIndex.text)} x={R_X} top={secondTop + lineH + c.h(12)} width={300} at={indexAt + 6} />
-      <Note at={excelAt - 2} x={R_X + 340} y={secondTop + lineH + c.h(40)}>
+      <Listing lines={withoutIndex.lines} x={rightX} top={c.T} width={540} size={SIZE} at={indexAt - 2} marks={[{ line: 0, at: indexAt + 8, color: MARK_OK }]} />
+      <Console lines={secondOut} x={rightX} top={fileTop} width={300} at={indexAt + 6} />
+      <Note at={excelAt - 2} x={rightX} y={fileTop + consoleHeight(secondOut.length) + c.h(30)}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Excel: <QMono>read_excel</QMono>, <QMono>to_excel</QMono>
         </span>
@@ -366,11 +412,16 @@ const Shape: React.FC<{ c: Ctx }> = ({ c }) => {
   const shapeAt = c.w("r-shape", "shape gives");
   const typesAt = c.w("r-shape", "D types gives");
   const bytesAt = c.w("r-shape", "memory usage");
+  const infoAt = c.w("r-info", "Info gives");
+  const allAt = c.w("r-info", "all three");
   const S = RAPID.shape;
   const lineH = listingHeight(1, SIZE);
   const outH = consoleHeight(1);
   const rowTop = (k: number) => c.T + k * (lineH + c.h(8));
-  const dg = geo(c, S.dtypes, R_X + 560, c.T, 44);
+  // An unnamed Series prints no header, so this one has none either; its
+  // first row is level with the line that printed it.
+  const dg = geo(c, S.dtypes, R_X + 600, rowTop(1), 44, S.dtypes.cols.every((col) => col === "") ? 0 : 46);
+  const infoTop = rowTop(3) + lineH + c.h(10) + outH + c.h(34);
   return (
     <>
       <Listing lines={S.shapeLines} x={R_X} top={rowTop(0)} width={300} size={SIZE} at={shapeAt - 4} />
@@ -379,6 +430,10 @@ const Shape: React.FC<{ c: Ctx }> = ({ c }) => {
       <DataTable g={dg} cols={colsOf(S.dtypes)} at={typesAt + 2} rows={rowsAt(S.dtypes.rows, typesAt + 6, 3)} />
       <Listing lines={S.memoryLines} x={R_X} top={rowTop(3)} width={560} size={SIZE} at={bytesAt - 4} />
       <Console lines={[`${S.memory}`]} x={R_X} top={rowTop(3) + lineH + c.h(10)} width={120} at={bytesAt + 8} />
+      <Listing lines={S.infoLines} x={R_X} top={infoTop} width={300} size={SIZE} at={infoAt - 4} />
+      <Note at={allAt} x={R_X + 320} y={infoTop + c.h(14)}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>all three in one printout, with non-null counts</span>
+      </Note>
     </>
   );
 };

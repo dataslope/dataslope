@@ -7,8 +7,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * after content/interview/data-scientist/deep-learning.mdx. The page asks
  * sixteen questions; gradient descent and the learning rate are answered in
  * Part 3 (machine learning I), so this video takes the other fifteen: twelve
- * worked on networks small enough to show every number, numbered aloud, then
- * three quickly (numbered 13 to 15 on screen only).
+ * worked through, every number computed in NumPy, numbered aloud, then three
+ * quickly (numbered 13 to 15 on screen only).
  *
  *   1. what one neuron computes; 2. why activations must be non-linear
  *      ("neuron").
@@ -61,7 +61,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     ends at 0.111. One step of weight decay and one of an L2 penalty under
  *     plain SGD land on identical weights. A real dropout draw zeroes four of
  *     eight activations.
- *   - "bn", a batch of eight with mean 6.58 and spread 1.75.
+ *   - "bn", one unit across a batch of eight: mean 6.58, standard deviation 1.75.
  *   - "arch", four tokens of random vectors, length four: every row of
  *     attention weights adds to 1.00.
  *   - at speed: ten ReLU layers 256 wide take the signal's spread from 1 to
@@ -88,10 +88,12 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      // Re-voiced after the take (review P3 #19): Q3, Q5, Q6 and Q11 are not
+      // networks with numbers, so the plan no longer says they are.
       id: "plan",
-      text: "Of the fifteen questions in this video, twelve get opened up on networks small enough to show every number, worked by hand in NumPy. Three quick ones close it.",
-      pauseAfter: 0.7,
+      text: "Of the fifteen questions in this video, twelve get worked through, with every number computed by hand in NumPy.",
     },
+    { id: "plan-quick", text: "Three quick ones close it.", pauseAfter: 0.7 },
     { id: "neuron-in", text: "The smallest piece first." },
 
     // ── 1, 2. The neuron, and why it needs a non-linearity ────────────────
@@ -108,7 +110,12 @@ export const script: NarrationScript = {
     },
     {
       id: "linear-fix",
-      text: "Ten layers would collapse the same way. Put an activation between them that zeroes the negatives, and the answer becomes three, minus six. Now depth adds something.",
+      text: "Ten layers would collapse the same way. Put an activation between them that zeroes the negatives, and the answer becomes three, minus six.",
+    },
+    {
+      // Re-voiced after the take (review P3 #18): what the non-linearity buys.
+      id: "linear-depth",
+      text: "Now depth adds something: the network can draw curved boundaries, and with enough units, approximate almost any function.",
       pauseAfter: 0.7,
     },
     { id: "act-in", text: "So, which activation?" },
@@ -117,12 +124,27 @@ export const script: NarrationScript = {
     {
       id: "act",
       scene: true,
-      text: "Question three. Compare the common activation functions. Sigmoid squashes any input into zero to one, and goes flat at both ends. Tanh, the hyperbolic tangent, does the same between minus one and one, centered on zero.",
+      text: "Question three. Compare the common activation functions.",
+    },
+    {
+      // Re-voiced after the take (review P3 #13): why the flat ends matter.
+      id: "act-sig",
+      text: "Sigmoid squashes any input into zero to one, and goes flat at both ends, where its slope, and so the gradient, is nearly zero.",
+    },
+    {
+      id: "act-tanh",
+      text: "Tanh, the hyperbolic tangent, does the same between minus one and one, centered on zero.",
       pauseAfter: 0.6,
     },
     {
       id: "act-relu",
-      text: "ReLU, the rectified linear unit, passes positives through and zeroes the rest. It's cheap, it never flattens for positive inputs, and it's the default for hidden layers. A unit whose inputs stay negative stops learning, so leaky ReLU keeps a small slope there.",
+      text: "ReLU, the rectified linear unit, passes positives through and zeroes the rest. It's cheap, it never flattens for positive inputs, and it's the default for hidden layers.",
+    },
+    {
+      // Re-voiced after the take (review P3 #13): the problem by its name, and
+      // GELU, the page's other fix.
+      id: "act-dying",
+      text: "A unit whose inputs stay negative stops learning, the dying ReLU problem. Leaky ReLU fixes it with a small slope there, and GELU with a smooth curve.",
       pauseAfter: 0.6,
     },
     {
@@ -147,12 +169,21 @@ export const script: NarrationScript = {
     {
       id: "backprop-page",
       text: "The middle slope is the sigmoid's own, sigma times one minus sigma, and the page's code checks it the same way: point one oh five, point two five, point one oh five, by formula and by nudging alike.",
-      pauseAfter: 0.7,
+      // A dense beat (a formula and five numbers): its table holds a moment
+      // longer before the cut (review P3 #14).
+      pauseAfter: 2.2,
     },
     {
       id: "vanish",
       scene: true,
       text: "Question five. What causes vanishing and exploding gradients? That backward sweep is a long product. The sigmoid's slope is a quarter at most, so ten sigmoid layers shrink the gradient by a quarter to the tenth: less than one in a million. The early layers barely learn. Factors above one compound the other way. One and a half, ten times over, is almost fifty-eight, and the gradient explodes.",
+      pauseAfter: 0.6,
+    },
+    {
+      // Added after the take (review P2 #4): where a factor above one comes
+      // from when the sigmoid's slope is a quarter at most.
+      id: "vanish-why",
+      text: "Each layer's factor is its weight times its activation's slope, so the quarter holds for weights near one, and large weights push the factor above one.",
       pauseAfter: 0.6,
     },
     {
@@ -174,7 +205,7 @@ export const script: NarrationScript = {
     },
     {
       id: "opt-rest",
-      text: "Momentum keeps a running velocity, so it builds speed along the floor and damps the zigzag. RMSProp, root mean square propagation, divides each parameter's step by the recent size of its gradients, so the steep direction and the shallow one move at a similar pace. Adam, adaptive moment estimation, does both, which is why it's the usual default.",
+      text: "Momentum keeps a running velocity, so it builds speed along the floor, and across the valley it swings in slow waves instead of flipping every step. RMSProp, root mean square propagation, divides each parameter's step by the recent size of its gradients, so the steep direction and the shallow one move at a similar pace. Adam, adaptive moment estimation, does both, which is why it's the usual default.",
       pauseAfter: 0.6,
     },
     {
@@ -208,6 +239,13 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      // Added after the take (review P2 #5): what the penalty is, and why
+      // Adam breaks the equivalence.
+      id: "decay-why",
+      text: "The penalty is lambda over two times the sum of squared weights. Its gradient is lambda times the weight, so a step on it is exactly that shrink. But Adam divides every gradient, the penalty's included, by that weight's recent gradient size, so weights with big gradients are barely decayed.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "decay-adam",
       text: "With Adam the two differ, so AdamW applies the decay separately. On the toy network, it holds validation loss at point one one, where it had climbed to point two four.",
       pauseAfter: 0.7,
@@ -218,7 +256,16 @@ export const script: NarrationScript = {
     {
       id: "bn",
       scene: true,
-      text: "Question ten. What is batch normalization, and why does it help? For each mini-batch, it shifts and scales a layer's inputs to mean zero and variance one. This batch has a mean of six point six. After normalizing, zero. Then two learned numbers, gamma and beta, set the scale and the shift the network actually wants.",
+      text: "Question ten. What is batch normalization, and why does it help?",
+    },
+    {
+      // Re-voiced after the take (review P3 #6): which axis it averages over.
+      id: "bn-each",
+      text: "For each unit, across the mini-batch, it shifts and scales the unit's inputs to mean zero and variance one.",
+    },
+    {
+      id: "bn-mean",
+      text: "This batch has a mean of six point six. After normalizing, zero. Then two learned numbers, gamma and beta, set the scale and the shift the network actually wants.",
       pauseAfter: 0.6,
     },
     {
@@ -248,7 +295,17 @@ export const script: NarrationScript = {
     {
       id: "attn",
       scene: true,
-      text: "Question twelve. What is self-attention? Each token makes a query, a key and a value. Score every query against every key, divide by the square root of their length so the softmax doesn't saturate, and softmax each row into weights.",
+      text: "Question twelve. What is self-attention?",
+    },
+    {
+      // Re-voiced after the take (review P3 #12): where q, k and v come from,
+      // what a score is, what d is, and what "saturate" would have meant.
+      id: "attn-qkv",
+      text: "Three learned matrices turn each token's vector into a query, a key and a value.",
+    },
+    {
+      id: "attn-score",
+      text: "Score every query against every key with a dot product. Divide by the square root of d, the number of entries in each, so the softmax doesn't put all its weight on one key. Then softmax each row into weights.",
       pauseAfter: 0.6,
     },
     {

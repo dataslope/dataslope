@@ -3,11 +3,11 @@ import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TRAP } from "./data";
-import { DataTable, Drift, Listing, MARK_BAD, MARK_OK, Mono, Spot, TableName, tableGeometry, X0 } from "./parts";
+import { DataTable, Drift, Listing, listingHeight, Mark, MARK_BAD, MARK_OK, Mono, Spot, TableName, tableGeometry, X0 } from "./parts";
 
 const LIST_Y = 330;
 const LIST_W = 700;
@@ -16,10 +16,11 @@ const TABLE_X = 1000;
 const TABLE_Y = 350;
 
 /**
- * Question 3, carried on: the left join that turns inner. The page's
- * customers and orders, filtered on amount in WHERE (Di's null amount fails
- * the test and she drops out), then the same filter moved into ON (she stays,
- * with a null).
+ * Question 3, carried on: the left join that turns inner. The ask is every
+ * customer with their orders over 50. The page's customers and orders,
+ * filtered on amount in WHERE (Di's null amount fails the test and she drops
+ * out), then the same filter moved into ON (she stays, with a null), and when
+ * each is the one to use.
  */
 export const TrapScene: React.FC = () => {
   const n = useNarration();
@@ -29,13 +30,18 @@ export const TrapScene: React.FC = () => {
   const textAt = n.word("trap", "a left join");
   // The left join's rows arrive as the headline is read; the filter on its words.
   const rowsAt = n.beat("trap").to - 6;
+  const everyAt = n.word("trap-where", "every customer");
   const askAt = n.word("trap-where", "orders over fifty");
   const filterAt = n.word("trap-where", "put that filter");
-  const goneAt = n.word("trap-where", "Di disappears");
+  const goneAt = n.word("trap-gone", "Di disappears");
   const herAt = n.word("trap-why", "Her amount");
   const overAt = n.word("trap-why", "null over fifty");
   const onAt = n.word("trap-on", "on clause");
   const staysAt = n.word("trap-on", "Di stays");
+  const onlyAt = n.word("trap-when", "only want");
+  const fineAt = n.word("trap-when", "WHERE is fine");
+  const keepAt = n.word("trap-when", "keep every customer");
+  const inOnAt = n.word("trap-when", "filter in ON");
   const end = n.beat("fanout-in").to;
 
   const cols = [{ name: "name" }, { name: "amount", numeric: true }];
@@ -46,6 +52,7 @@ export const TrapScene: React.FC = () => {
   const diResult = TRAP.on.rows.findIndex((r) => r[0] === "Di");
   const whereLine = TRAP.where.lines.findIndex((l) => l.startsWith("WHERE"));
   const onLine = TRAP.on.lines.findIndex((l) => l.trim().startsWith("AND"));
+  const onH = listingHeight(TRAP.on.lines.length, SIZE);
 
   return (
     <AbsoluteFill>
@@ -59,6 +66,13 @@ export const TrapScene: React.FC = () => {
           A left join can quietly turn into an inner one.
         </QuestionCard>
         <Spot id="da-sql-trap" at={from + 6} left={1500} top={y(640)} width={260} height={194} />
+
+        {/* ── What was asked for ── */}
+        <Ink at={everyAt - 2} dur={14} style={{ left: X0, top: y(LIST_Y) - 44, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK_SOFT) }}>
+            The ask: <span style={{ color: INK, fontWeight: 650 }}>every customer</span>, with their orders over 50
+          </span>
+        </Ink>
 
         {/* ── The filter in WHERE ── */}
         <Listing
@@ -116,6 +130,18 @@ export const TrapScene: React.FC = () => {
           rows={TRAP.on.rows.map((cells, i) => ({ cells, at: onAt + 10 + i * 3 }))}
           bands={[{ row: diResult, at: staysAt }]}
         />
+
+        {/* ── Which one to use ── */}
+        <Note at={onlyAt - 2} x={X0} y={y(LIST_Y) + onH + 30}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+            Only the big orders? <Mark at={fineAt}><Mono>WHERE</Mono> is fine</Mark>.
+          </span>
+        </Note>
+        <Note at={keepAt - 2} x={X0} y={y(LIST_Y) + onH + 80}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+            Every customer? <Mark at={inOnAt} color={MARK_OK}>Filter in <Mono>ON</Mono></Mark>.
+          </span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

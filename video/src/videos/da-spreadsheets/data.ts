@@ -27,7 +27,7 @@ type Figures = {
     grid: Cell[][];
     countGrid: Cell[][];
   };
-  conditions: Record<"sumif" | "sumifs" | "countifs" | "averageif" | "total" | "textTotal" | "textCell", Cell> & {
+  conditions: Record<"sumif" | "sumifs" | "countifs" | "averageif" | "total" | "textTotal" | "textCell" | "textValue", Cell> & {
     over150: Cell[];
   };
   lookups: Record<string, Cell> & {
@@ -40,6 +40,8 @@ type Figures = {
   text: Record<"clean" | "username" | "join" | "serial" | "days" | "datevalue", Cell> & {
     emails: string[];
     repeated: Cell[];
+    /** COUNTIF($A$2:A2,A2)>1 filled down: only a later copy flags. */
+    later: Cell[];
   };
 };
 const F = results.figures as unknown as Figures;
@@ -56,7 +58,8 @@ export const printed = (v: Value): string => {
  * A formula as the figure prints it. The lookups ran from a separate "calc"
  * sheet, so their ranges carry a sheet name ("products!A2:C5"); each figure
  * draws the one sheet they read, where Excel would write the same formula
- * without it, so the prefix is dropped on screen.
+ * without it, so the prefix is dropped on screen. Question 8 draws a sheet of
+ * its own results beside its lookups, so it keeps the prefix (c.formula).
  */
 export const screen = (c: Cell): string => (c.formula ?? "").replace(/\b(products|tiers)!/g, "");
 

@@ -8,10 +8,15 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CHURN, EXCL, pct } from "./data";
-import { Clear, DATA, DATA_LIGHT, DieFace, Drift, Given, lerp, Mark, math, Strike, Svg, V, X0 } from "./parts";
+import { Clear, DATA, DATA_LIGHT, DieFace, Drift, Given, lerp, Mark, math, Svg, V, X0 } from "./parts";
 
 const BARS = { top: 360, height: 420, w: 230, xs: [1010, 1370] };
 const DISC = { y: 560, r: 150, xs: [300, 640] };
+/** Question 5's column of formulas: where each starts, how wide a formula's
+ *  column is (so the note after it lines up row to row), and the rows. */
+const COL = { x: 1040, w: 470, prod: 330, zero: 400, two: 500, twoGiven: 565, far: 660, never: 716 };
+/** Question 4's product line, under P(A | B) = P(A), behind "equivalently". */
+const PROD4 = { y: 460, lead: 190 };
 
 const P: React.FC<{ children: React.ReactNode }> = ({ children }) => <span>P({children})</span>;
 
@@ -31,6 +36,7 @@ export const IndepScene: React.FC = () => {
   const textAt = n.word("indep", "What does it mean");
   const knowAt = n.word("indep", "Knowing one");
   const ruleAt = n.word("indep", "the probability of A given B");
+  const justAt = n.word("indep", "is just the probability of A");
   const splitAt = n.word("indep-bars", "Split a thousand users");
   const ifAt = n.word("indep-bars", "If churn didn't depend");
   const sameAt = n.word("indep-bars", "the same height");
@@ -49,7 +55,7 @@ export const IndepScene: React.FC = () => {
   const dropsAt = n.word("excl-die", "drops the second");
   const toZeroAt = n.word("excl-die", "to zero");
   const farAt = n.word("excl-die", "as far from independent");
-  const bridgeAt = n.word("expect-in", "the two numbers");
+  const neverAt = n.word("excl-never", "never independent");
   const clearAt = n.word("expect-in", "random variable");
   const end = n.beat("expect-in").to;
 
@@ -65,6 +71,11 @@ export const IndepScene: React.FC = () => {
   const splitY = (s: number) => barTop + s * barH;
   const barsIn = ease(frame, splitAt, 14);
 
+  // The product form moves from under Question 4's definition to the top of
+  // Question 5's column, so the two conditions end up one above the other.
+  const move = ease(frame, q5At, 20);
+  const quiet = ease(frame, toZeroAt, 14);
+
   const disjoint = ease(frame, cantAt, 16);
   const oneLit = ease(frame, oneAt, 12);
   const twoGone = ease(frame, twoAt + 4, 14);
@@ -78,7 +89,10 @@ export const IndepScene: React.FC = () => {
       <Sfx name="el-tap" at={networkAt} level={-34} />
       <Sfx name="el-pop" at={cantAt + 4} level={-32} />
       <Sfx name="pip-1" at={oneAt + 2} level={-30} />
-      <Sfx name="el-scratch" at={toZeroAt} level={-32} />
+      {/* The scratch goes with the cross through the two, the one mark that is a strike. */}
+      <Sfx name="el-scratch" at={twoAt + 6} level={-32} />
+      <Sfx name="el-pencil" at={justAt + 8} level={-36} />
+      <Sfx name="el-tap" at={neverAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} out={out4} size={60}>
@@ -101,6 +115,34 @@ export const IndepScene: React.FC = () => {
               <V>A</V>
             </P>
           </span>
+        </Ink>
+        {/* Equivalently, the product rule: it stays on into Question 5. */}
+        <Ink
+          at={justAt + 6}
+          dur={20}
+          out={clearAt}
+          style={{
+            left: lerp(X0, COL.x - PROD4.lead, move),
+            top: lerp(y(PROD4.y), y(COL.prod), move),
+            display: "flex",
+            alignItems: "baseline",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <span style={{ ...note(26, INK_SOFT), display: "inline-block", width: PROD4.lead, opacity: 1 - move }}>equivalently</span>
+          <span style={{ ...math(46), display: "inline-block", width: COL.w }}>
+            <P>
+              <V>A</V> and <V>B</V>
+            </P>{" "}
+            ={" "}
+            <P>
+              <V>A</V>
+            </P>{" "}
+            <P>
+              <V>B</V>
+            </P>
+          </span>
+          <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, q5At + 14, 12) }}>independent</span>
         </Ink>
         <Note at={claimAt} x={X0} y={y(540)} out={out4}>
           <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>A claim to justify. These break it:</span>
@@ -150,10 +192,15 @@ export const IndepScene: React.FC = () => {
           </Note>
         ))}
         <Note at={splitAt + 12} x={BARS.xs[1] + BARS.w + 20} y={barTop + 4} out={out4}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>■ churned</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ color: DATA }}>■</span> churned
+          </span>
         </Note>
-        <Note at={sameAt + 6} x={BARS.xs[0] - 30} y={splitY(CHURN.pAll) - 2} align="right" out={theseAt}>
-          <span style={{ ...label(24, INK), ...TABULAR, whiteSpace: "nowrap", paddingRight: 10 }}>{pct(CHURN.pAll)}</span>
+        {/* The reference the argument rests on keeps its name while the bars move off it. */}
+        <Note at={sameAt + 6} x={BARS.xs[0] - 30} y={splitY(CHURN.pAll) - 2} align="right" out={out4}>
+          <span style={{ ...label(24, INK), whiteSpace: "nowrap", paddingRight: 10 }}>
+            <span style={TABULAR}>{pct(CHURN.pAll)}</span> if independent
+          </span>
         </Note>
         {[CHURN.pPaid, CHURN.pFree].map((s, i) => (
           <Note
@@ -204,21 +251,25 @@ export const IndepScene: React.FC = () => {
               ink={i === 1 && twoGone > 0.5 ? INK_SOFT : INK}
             />
           ))}
-          <Note at={zeroAt} x={1040} y={y(380)}>
-            <span style={math(46)}>
+          {/* Mutually exclusive, directly under the product it never equals. */}
+          <Note at={zeroAt} x={COL.x} y={y(COL.zero)} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
+            <span style={{ ...math(46), display: "inline-block", width: COL.w }}>
               <P>
                 <V>A</V> and <V>B</V>
               </P>{" "}
               = 0
             </span>
+            <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, zeroAt + 10, 12) }}>mutually exclusive</span>
           </Note>
-          <Note at={dropsAt} x={1040} y={y(500)}>
-            <span style={math(42)}>
-              <P>two</P> = <Strike at={toZeroAt}>{EXCL.pTwo}</Strike>
+          {/* The die: P(two) stays 1/6; given a one, it is 0. Both are true. */}
+          <Note at={dropsAt} x={COL.x} y={y(COL.two)} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
+            <span style={{ ...math(42, `color-mix(in srgb, ${INK_SOFT} ${quiet * 100}%, ${INK})`), display: "inline-block", width: COL.w }}>
+              <P>two</P> = {EXCL.pTwo}
             </span>
+            <span style={{ ...note(24, INK_SOFT), opacity: quiet }}>out of all six faces</span>
           </Note>
-          <Note at={toZeroAt - 2} x={1040} y={y(570)}>
-            <span style={math(42, ACCENT_INK)}>
+          <Note at={toZeroAt - 2} x={COL.x} y={y(COL.twoGiven)} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
+            <span style={{ ...math(42, INK), display: "inline-block", width: COL.w }}>
               <P>
                 two
                 <Given />
@@ -226,10 +277,14 @@ export const IndepScene: React.FC = () => {
               </P>{" "}
               = {EXCL.pTwoGivenOne}
             </span>
+            <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, toZeroAt + 8, 12) }}>out of the one face left</span>
           </Note>
-          <Note at={farAt} x={1040} y={y(670)}>
-            <span style={{ ...note(30, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-              <Mark at={bridgeAt}>as far from independent as it gets</Mark>
+          <Note at={farAt} x={COL.x} y={y(COL.far)}>
+            <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>as far from independent as it gets</span>
+          </Note>
+          <Note at={neverAt - 8} x={COL.x} y={y(COL.never)}>
+            <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+              <Mark at={neverAt}>exclusive, and each possible: never independent</Mark>
             </span>
           </Note>
           <Svg opacity={ease(frame, twoAt + 6, 10)}>

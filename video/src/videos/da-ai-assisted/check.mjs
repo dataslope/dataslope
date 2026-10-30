@@ -89,16 +89,19 @@ const PAGE_ORDERS = `CREATE TABLE orders AS SELECT * FROM (VALUES
 
 const results = { figures: {} };
 
-// The assistant's January total against the half-open one: the page's query,
-// verbatim, then each order with which filter keeps it.
+// The assistant's January total against the half-open one: the page's query
+// (its comments dropped, and each WHERE broken after the column so the
+// listing fits its panel at 20px), then each order with which filter keeps it.
 results.figures.boundary = await figure(PAGE_ORDERS, {
   table: "SELECT order_id, order_ts, amount, status FROM orders ORDER BY order_id;",
   page: `SELECT
   SUM(amount) FILTER (
-    WHERE order_ts BETWEEN '2026-01-01' AND '2026-01-31'
+    WHERE order_ts
+      BETWEEN '2026-01-01' AND '2026-01-31'
   ) AS assistant_total,
   SUM(amount) FILTER (
-    WHERE order_ts >= '2026-01-01' AND order_ts < '2026-02-01'
+    WHERE order_ts >= '2026-01-01'
+      AND order_ts < '2026-02-01'
   ) AS half_open_total
 FROM orders
 WHERE status = 'completed';`,
@@ -127,6 +130,14 @@ WHERE status = 'completed'
 );`,
   // The string '2026-01-31' as the timestamp BETWEEN compares against.
   cutoff: "SELECT CAST('2026-01-31' AS TIMESTAMP) AS upper_bound;",
+  // Why the half-open range and not an end one second before midnight (the
+  // page's concept check: "correct for any timestamp precision"): an order
+  // half a second into the last second of January.
+  lastSecond: `SELECT
+  CAST(t AS VARCHAR) AS order_ts,
+  t BETWEEN '2026-01-01' AND '2026-01-31 23:59:59' AS to_last_second,
+  t >= '2026-01-01' AND t < '2026-02-01' AS half_open
+FROM (SELECT TIMESTAMP '2026-01-31 23:59:59.5' AS t);`,
 });
 
 // Averaging ratios: the video's own two days, one tiny and one large.
@@ -134,8 +145,22 @@ const DAYS = `CREATE TABLE daily (day DATE, sessions INTEGER, conversions INTEGE
 INSERT INTO daily VALUES ('2026-01-05', 10, 5), ('2026-01-06', 1000, 20);`;
 results.figures.ratios = await figure(DAYS, {
   table: "SELECT day, sessions, conversions,\n  ROUND(100.0 * conversions / sessions, 1) AS rate_pct\nFROM daily ORDER BY day;",
-  averaged: "SELECT ROUND(AVG(100.0 * conversions / sessions), 1) AS avg_of_rates\nFROM daily;",
-  pooled: "SELECT ROUND(100.0 * SUM(conversions) / SUM(sessions), 1) AS overall_rate\nFROM daily;",
+  averaged: "SELECT ROUND(AVG(100.0 * conversions / sessions), 1)\n  AS avg_of_rates_pct\nFROM daily;",
+  pooled: "SELECT ROUND(100.0 * SUM(conversions) / SUM(sessions), 1)\n  AS overall_rate_pct\nFROM daily;",
+});
+
+// Question 2's NULL trap, the page's first example: NOT IN against a column
+// that holds a NULL. The video's own three customers, one of whom ordered,
+// and an order with no customer id.
+const NULLS = `CREATE TABLE customers (customer_id INTEGER);
+INSERT INTO customers VALUES (1), (2), (3);
+CREATE TABLE orders (customer_id INTEGER);
+INSERT INTO orders VALUES (1), (NULL);`;
+results.figures.nulls = await figure(NULLS, {
+  notIn: "SELECT COUNT(*) AS never_ordered\nFROM customers\nWHERE customer_id NOT IN (SELECT customer_id FROM orders);",
+  // The same without the NULL: customers 2 and 3, so the NULL is the cause.
+  withoutNull:
+    "SELECT COUNT(*) AS never_ordered\nFROM customers\nWHERE customer_id NOT IN (\n  SELECT customer_id FROM orders WHERE customer_id IS NOT NULL\n);",
 });
 
 // The closing line's count: the track's question bank, counted rather than

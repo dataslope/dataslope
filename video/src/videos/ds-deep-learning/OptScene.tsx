@@ -24,9 +24,12 @@ type Run = { key: Optimizer; color: string; ink: string; name: string; what: str
  * Question 6 on a made-up narrow valley, 0.5 (0.1 x² + 10 y²), from (-8, 1):
  * fifty steps of each optimizer, each at a learning rate that suits it.
  * Plain steps zigzag across the walls and creep along the floor; momentum
- * builds speed along it; RMSProp evens out the two directions; Adam does
- * both. After fifty steps plain descent is 3.07 from the bottom and the
- * other three within a third of a unit.
+ * builds speed along it, and across it swings in slow waves rather than
+ * flipping every step (at β = 0.9 it is underdamped across the valley, so
+ * that swing is wider than plain descent's, not damped); RMSProp evens
+ * out the two directions; Adam does both. After fifty steps plain descent is
+ * 3.07 from the bottom, ringed and measured off to the bottom, and the other
+ * three, ringed in turn, within a third of a unit.
  */
 export const OptScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -43,6 +46,7 @@ export const OptScene: React.FC = () => {
   const zigAt = n.word("opt", "zigzag across the steep walls");
   const creepAt = n.word("opt", "creep along the floor");
   const momAt = n.word("opt-rest", "Momentum keeps a running velocity");
+  const wavesAt = n.word("opt-rest", "slow waves instead of flipping");
   const rmsAt = n.word("opt-rest", "RMSProp, root mean square propagation");
   const paceAt = n.word("opt-rest", "move at a similar pace");
   const adamAt = n.word("opt-rest", "Adam, adaptive moment estimation");
@@ -51,7 +55,6 @@ export const OptScene: React.FC = () => {
   const threeAt = n.word("opt-result", "three units from the bottom");
   const otherAt = n.word("opt-result", "The other three");
   const needAt = n.word("opt-result", "a hundred and seventy-five");
-  const tooMuchAt = n.word("overfit-in", "learn too much");
   const end = n.beat("overfit-in").to;
 
   const px = (v: number) => BOX.left + ((v - DOM.x0) / (DOM.x1 - DOM.x0)) * (BOX.right - BOX.left);
@@ -66,7 +69,11 @@ export const OptScene: React.FC = () => {
     { key: "adam", color: OK, ink: OK_INK, name: "Adam", what: "adaptive moment estimation: both", at: adamAt },
   ];
   const nameAt: Record<Optimizer, number> = { sgd: sgdAt, momentum: momAt, rmsprop: rmsAt, adam: adamAt };
-  const out = tooMuchAt - 2;
+  // Where each run stopped: ringed on top of every path, SGD's when its
+  // distance is read and the others' with theirs, so none hides under another.
+  const endAt: Record<Optimizer, number> = { sgd: threeAt, momentum: otherAt, rmsprop: otherAt + 4, adam: otherAt + 8 };
+  const sgdEnd = OPT.paths.sgd[OPT.paths.sgd.length - 1];
+  const BRACKET_Y = 1.15; // above the outermost contour (half-height 1), clear of every path
 
   return (
     <AbsoluteFill>
@@ -79,11 +86,13 @@ export const OptScene: React.FC = () => {
       <Sfx name="el-pop" at={otherAt + 4} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={out} size={60}>
+        {/* Held to the cut, as every other scene is: clearing on the bridge's
+            last word left a blank page through the gap. */}
+        <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={60}>
           Compare SGD, momentum, RMSProp, and Adam.
         </QuestionCard>
 
-        <Fade from={from} out={out}>
+        <Fade from={from}>
           {/* ── The valley: contours, start and bottom ── */}
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, valleyAt - 6, 16) }}>
             <defs>
@@ -139,7 +148,37 @@ export const OptScene: React.FC = () => {
             </g>
             <circle cx={px(OPT.start[0])} cy={py(OPT.start[1])} r={9 * ease(frame, valleyAt, 10)} fill={INK} />
             <path d={`M${px(0) - 9},${py(0) - 9} L${px(0) + 9},${py(0) + 9} M${px(0) + 9},${py(0) - 9} L${px(0) - 9},${py(0) + 9}`} stroke={INK} strokeWidth={3} opacity={ease(frame, valleyAt + 4, 10)} />
+
+            {/* SGD's distance to the bottom, measured off above the valley. */}
+            <g opacity={ease(frame, threeAt + 2, 10)}>
+              {[px(sgdEnd[0]), px(0)].map((x, i) => (
+                <line key={i} x1={x} x2={x} y1={py(BRACKET_Y - 0.1)} y2={py(0) - 15} stroke={ACCENT} strokeWidth={1.6} strokeDasharray="4 5" opacity={0.75} />
+              ))}
+              <path
+                d={`M${px(sgdEnd[0])},${py(BRACKET_Y - 0.1)} L${px(sgdEnd[0])},${py(BRACKET_Y)} L${px(sgdEnd[0]) + (px(0) - px(sgdEnd[0])) * ease(frame, threeAt + 4, 14)},${py(BRACKET_Y)}`}
+                fill="none"
+                stroke={ACCENT}
+                strokeWidth={2.6}
+              />
+              <line x1={px(0)} x2={px(0)} y1={py(BRACKET_Y - 0.1)} y2={py(BRACKET_Y)} stroke={ACCENT} strokeWidth={2.6} opacity={ease(frame, threeAt + 16, 6)} />
+            </g>
+
+            {/* Each run's last point, ringed on top of all four paths. */}
+            {runs.map((r) => {
+              const [a, b] = OPT.paths[r.key][OPT.paths[r.key].length - 1];
+              const p = ease(frame, endAt[r.key], 10);
+              if (p <= 0) return null;
+              return (
+                <g key={`end-${r.key}`} opacity={p}>
+                  <circle cx={px(a)} cy={py(b)} r={10 * (0.6 + 0.4 * p)} fill="none" stroke={r.color} strokeWidth={3} />
+                  <circle cx={px(a)} cy={py(b)} r={4.5} fill={r.color} />
+                </g>
+              );
+            })}
           </svg>
+          <Tagline x={(px(sgdEnd[0]) + px(0)) / 2} y={py(BRACKET_Y) - h(36)} width={260} align="center" at={threeAt + 10} size={22} color={ACCENT_INK}>
+            {OPT.dist.sgd.toFixed(2)} to the bottom
+          </Tagline>
           <Tagline x={px(OPT.start[0]) - 30} y={py(OPT.start[1]) - h(44)} at={valleyAt + 2} size={21} color={INK}>
             start
           </Tagline>
@@ -175,7 +214,16 @@ export const OptScene: React.FC = () => {
                 </Note>
                 <Note at={nameAt[r.key] + 4} x={LEG_X + 48} y={top + h(40)}>
                   <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-                    {r.key === "sgd" ? <span style={{ opacity: ease(frame, batchAt - 2, 10) }}>a step per mini-batch</span> : r.what}
+                    {r.key === "sgd" ? (
+                      <span style={{ opacity: ease(frame, batchAt - 2, 10) }}>here, plain steps on the exact gradient</span>
+                    ) : r.key === "momentum" ? (
+                      <>
+                        {r.what}
+                        <span style={{ opacity: ease(frame, wavesAt - 2, 10) }}>: speed along, slow waves across</span>
+                      </>
+                    ) : (
+                      r.what
+                    )}
                   </span>
                 </Note>
                 <Note at={(r.key === "sgd" ? threeAt : otherAt + (i - 1) * 4) - 2} x={1720} y={top} align="right" width={180}>

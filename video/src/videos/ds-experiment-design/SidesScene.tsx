@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -50,7 +50,7 @@ const NullPanel: React.FC<{ left: number; two: boolean; at: number; tailAt: numb
       {(two ? [crit, -crit] : [crit]).map((c) => (
         <g key={c} opacity={t}>
           <line x1={xs(c)} x2={xs(c)} y1={y(BASE)} y2={y(BASE) - h(PEAK) * 0.7} stroke={INK} strokeWidth={2} strokeDasharray="5 6" />
-          <text x={xs(c)} y={y(BASE) + 30} textAnchor="middle" style={{ ...label(20, INK), fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>
+          <text x={xs(c)} y={y(BASE) + 30} textAnchor="middle" style={svgText({ ...label(20, INK), fontWeight: 650, fontVariantNumeric: "tabular-nums" })}>
             {c > 0 ? c : `−${-c}`}
           </text>
         </g>
@@ -88,13 +88,19 @@ export const SidesScene: React.FC = () => {
   const marginAt = n.word("noninf", "a margin set in advance");
   const checkoutAt = n.word("noninf", "Say a cheaper checkout");
   const halfAt = n.word("noninf", "at most half a point");
-  const bigRunsAt = n.word("noninf", "runs from minus point two nine");
-  const clearOfAt = n.word("noninf", "clear of the margin");
-  const smallAt = n.word("noninf", "At six thousand");
-  const pastAt = n.word("noninf", "reaches past minus one");
-  const notWorseAt = n.word("noninf", "Not significant isn't the same");
+  const nullAt = n.word("noninf-rule", "The null is");
+  const rejectAt = n.word("noninf-rule", "You reject it");
+  const lowerEndAt = n.word("noninf-rule", "the lower end");
+  const bigRunsAt = n.word("noninf-big", "runs from minus point two nine");
+  const clearOfAt = n.word("noninf-big", "clear of the margin");
+  const smallAt = n.word("noninf-small", "At six thousand");
+  const crossesAt = n.word("noninf-small", "its lower end crosses the margin");
+  const notWorseAt = n.word("noninf-end", "Not significant isn't the same");
   const liveAt = n.word("peek-in", "the test goes live");
-  const clearAt = n.beat("peek-in").to - 6;
+  // The page holds through the pause and clears into the cut, so the next
+  // scene cross-fades in over it rather than over an empty page.
+  const nextAt = n.beat("peek").from;
+  const clearAt = nextAt - 14;
 
   const clear = 1 - ease(frame, clearAt, 10);
   const q7Out = q8At - 2;
@@ -104,7 +110,7 @@ export const SidesScene: React.FC = () => {
   const ys: Scale = { lo: 0, hi: 1, a: y(760), b: y(380) };
   const intervals = [
     { iv: NONINF.big, drawAt: bigRunsAt, top: 490, color: OK, ink: OK_INK, verdict: "clear of the margin", verdictAt: clearOfAt },
-    { iv: NONINF.small, drawAt: smallAt + 2, top: 620, color: INK_SOFT, ink: ACCENT_INK, verdict: "contains 0, but reaches past −1", verdictAt: pastAt },
+    { iv: NONINF.small, drawAt: smallAt + 2, top: 620, color: INK_SOFT, ink: ACCENT_INK, verdict: "contains 0, but crosses the margin", verdictAt: crossesAt },
   ];
 
   return (
@@ -115,9 +121,9 @@ export const SidesScene: React.FC = () => {
       <Sfx name="el-scratch" at={neverAt + 2} level={-34} />
       <Sfx name="el-whoosh" at={q8At} level={-38} />
       <Sfx name="el-pop" at={clearOfAt} level={-32} />
-      <Sfx name="el-scratch" at={pastAt + 2} level={-34} />
+      <Sfx name="el-scratch" at={crossesAt + 2} level={-34} />
 
-      <Drift from={from} to={n.beat("peek-in").to + 30}>
+      <Drift from={from} to={nextAt}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} out={q7Out} size={56}>
           What&apos;s the difference between a one-sided and a two-sided test?
         </QuestionCard>
@@ -171,6 +177,18 @@ export const SidesScene: React.FC = () => {
               <Mark at={halfAt - 2}>at most half a point</Mark>
             </b>{" "}
             of conversion
+          </span>
+        </Note>
+        <Note at={nullAt - 2} x={330} y={y(348)}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
+            H<sub style={{ fontSize: "0.8em", verticalAlign: "-0.25em", lineHeight: 0 }}>0</sub>: worse by more than the margin
+            <span style={{ opacity: ease(frame, rejectAt - 2, 10) }}>
+              {" · "}rejected when the{" "}
+              <Mark at={lowerEndAt} out={bigRunsAt - 4}>
+                95% interval&apos;s lower end
+              </Mark>{" "}
+              clears it
+            </span>
           </span>
         </Note>
         <Axes

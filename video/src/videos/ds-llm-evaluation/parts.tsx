@@ -121,6 +121,8 @@ export const ReplyCard: React.FC<{
 /**
  * A hundred graded items as a ten-by-ten grid, filled in order: each item
  * one cell, its fill from `color(i)`, inking in from `at` a row at a time.
+ * `slash(i)` draws a white diagonal across a cell at that opacity, to tell
+ * apart two kinds of item that share a color.
  */
 export const Grid100: React.FC<{
   x: number;
@@ -130,8 +132,9 @@ export const Grid100: React.FC<{
   at: number;
   color: (i: number) => string;
   ring?: (i: number) => string | null;
+  slash?: (i: number) => number;
   dim?: number;
-}> = ({ x, y, cell, gap, at: from, color, ring, dim }) => {
+}> = ({ x, y, cell, gap, at: from, color, ring, slash, dim }) => {
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
   return (
@@ -144,18 +147,33 @@ export const Grid100: React.FC<{
         const cx = x + c * (cell + gap);
         const cy = y + r * (cell + gap);
         const edge = ring?.(i) ?? null;
+        const s = slash?.(i) ?? 0;
+        const inset = cell * 0.22;
         return (
-          <rect
-            key={i}
-            x={cx + (cell / 2) * (1 - p)}
-            y={cy + (cell / 2) * (1 - p)}
-            width={cell * p}
-            height={cell * p}
-            rx={5}
-            fill={color(i)}
-            stroke={edge ?? "none"}
-            strokeWidth={edge ? 3 : 0}
-          />
+          <g key={i}>
+            <rect
+              x={cx + (cell / 2) * (1 - p)}
+              y={cy + (cell / 2) * (1 - p)}
+              width={cell * p}
+              height={cell * p}
+              rx={5}
+              fill={color(i)}
+              stroke={edge ?? "none"}
+              strokeWidth={edge ? 3 : 0}
+            />
+            {s > 0 ? (
+              <line
+                x1={cx + inset}
+                y1={cy + cell - inset}
+                x2={cx + cell - inset}
+                y2={cy + inset}
+                stroke={PAPER}
+                strokeWidth={4}
+                strokeLinecap="round"
+                opacity={s * p}
+              />
+            ) : null}
+          </g>
         );
       })}
     </svg>

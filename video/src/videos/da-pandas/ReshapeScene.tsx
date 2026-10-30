@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { INK, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { INK, INK_SOFT, note } from "../../editorial/style";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RESHAPE } from "./data";
@@ -17,6 +17,7 @@ import {
   listingHeight,
   MARK_BAD,
   MARK_OK,
+  Mono,
   TableName,
   X0,
 } from "./parts";
@@ -28,8 +29,9 @@ const SIZE = 22;
 /**
  * Questions 16 and 17. The page's melt call turns two customers' quarterly
  * columns into four rows; then the video's own long table, where North and A
- * appear twice, so pivot refuses with pandas' own error and pivot_table sums
- * the pair to 30 and fills the empty cell with 0.
+ * appear twice, so pivot refuses with pandas' own error and pivot_table,
+ * asked for the sum (its default is the mean, 15 here), sums the pair to 30
+ * and fills the empty cell with 0.
  */
 export const ReshapeScene: React.FC = () => {
   const n = useNarration();
@@ -49,9 +51,11 @@ export const ReshapeScene: React.FC = () => {
   const twiceAt = n.word("reshape-pivot", "appear twice");
   const dupAt = n.word("reshape-pivot", "index contains duplicate entries");
   const tableAt = n.word("reshape-table", "Pivot table aggregates");
-  const thirtyAt = n.word("reshape-table", "sum to thirty");
-  const emptyAt = n.word("reshape-table", "the empty cell");
-  const end = n.beat("reshape-table").to;
+  const meanAt = n.word("reshape-table", "the mean by default");
+  const askAt = n.word("reshape-table", "asks for the sum");
+  const thirtyAt = n.word("reshape-sum", "sum to thirty");
+  const emptyAt = n.word("reshape-sum", "the empty cell");
+  const end = n.beat("reshape-sum").to;
 
   const wg = geoOf(RESHAPE.wide, X0, y(TOP), h);
   const mg = geoOf(RESHAPE.melted, X0, wg.rowTop(RESHAPE.wide.rows.length) + h(90), h);
@@ -71,6 +75,10 @@ export const ReshapeScene: React.FC = () => {
   const dupCat = RESHAPE.long.rows[dup[0]][2];
   const summed = { row: PT.rows.findIndex((r) => r[0] === dupRegion), col: PT.cols.indexOf(dupCat) };
   const empty = PT.rows.flatMap((r, i) => r.flatMap((v, j) => (j > 0 && v === "0" ? [{ row: i, col: j }] : [])));
+  const aggLine = PT.lines.findIndex((l) => l.includes("aggfunc"));
+  // What the same cell holds with no aggfunc: the mean.
+  const PM = RESHAPE.pivotMean;
+  const meanValue = PM.rows[PM.rows.findIndex((r) => r[0] === dupRegion)][PM.cols.indexOf(dupCat)];
 
   return (
     <AbsoluteFill>
@@ -136,7 +144,15 @@ export const ReshapeScene: React.FC = () => {
         />
         <Listing lines={RESHAPE.pivot.lines} x={LIST_X} top={y(TOP)} width={1000} size={SIZE} at={onlyAt - 4} />
         <ErrorBox x={LIST_X} top={errTop} width={1000} at={dupAt - 4} kind={RESHAPE.pivot.kind} message={RESHAPE.pivot.message} />
-        <Listing lines={PT.lines} x={LIST_X} top={ptTop} width={420} size={SIZE} at={tableAt - 4} />
+        <Listing
+          lines={PT.lines}
+          x={LIST_X}
+          top={ptTop}
+          width={420}
+          size={SIZE}
+          at={tableAt - 4}
+          marks={[{ line: aggLine, at: askAt + 2 }]}
+        />
         <DataTable
           g={pg}
           cols={colsOf(PT)}
@@ -147,6 +163,13 @@ export const ReshapeScene: React.FC = () => {
             ...empty.map((c) => ({ ...c, at: emptyAt })),
           ]}
         />
+        <Note at={meanAt - 2} x={pg.x} y={pg.rowTop(PT.rows.length) + h(30)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            with no <Mono>aggfunc</Mono>, the mean:
+            <br />
+            {dupRegion} and {dupCat} would be <Num>{meanValue}</Num>
+          </span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

@@ -44,8 +44,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "abtest": charts/randomisation-balances-confounders.mjs, all ten traits
  *     over the 0.1 line when users choose, only age (0.102) when a coin does;
  *     the course's experiment (seed 42), 579 of 6,000 against 702 of 6,000,
- *     z = 3.64, p = 0.0003, "three in ten thousand".
- *   - "signif": charts/effect-size-independent-of-n.mjs, d = 0.2 at every n:
+ *     z = 3.64, p = 0.0003, "three in ten thousand", under the usual 0.05
+ *     (the 5% two-sided tails past 1.96).
+ *   - "signif": charts/effect-size-independent-of-n.mjs, d = 0.2 at every n
+ *     ("a fifth of a standard deviation"):
  *     p = 0.65 at 10 per group, 0.046 at 200, about 2.5 in ten billion at
  *     2,000; the experiment's lift 2.05 points, 95% interval 0.95 to 3.15,
  *     standard error 0.56; charts/ci-coverage.mjs, 4 of 100 intervals miss.
@@ -58,7 +60,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "simpson": the page's kidney-stone counts, A 93.1% and 73.0% in the two
  *     groups against B's 86.7% and 68.8%, pooled 78.0% against 82.6%;
  *     charts/average-of-averages.mjs, 68 against 51.8 per customer, the
- *     Islands' 40 customers.
+ *     Islands' 40 customers; summed first, 610,590 / 11,790 = 51.8.
  *   - short ones: the video's own events, where a repeat purchase makes 0.6
  *     of 0.4; charts/novelty-effect-fades.mjs, week one 14.1% against 3.75%;
  *     charts/cohort-retention.mjs, week eight 26.4% (January) to 51.7% (May);
@@ -126,7 +128,11 @@ export const script: NarrationScript = {
     },
     {
       id: "funnel-steps",
-      text: "A funnel is the ordered steps a user takes, from landing page to purchase. Overall conversion is the share who make it to the end: here, about nine percent. Per-step conversion shows where the rest drop off.",
+      text: "A funnel is the ordered steps a user takes, from landing page to purchase. Overall conversion is the share who make it to the end: here, about nine percent.",
+    },
+    {
+      id: "funnel-step",
+      text: "Per-step conversion, each step's users over the step before, shows where the rest drop off.",
       pauseAfter: 0.7,
     },
     {
@@ -155,17 +161,34 @@ export const script: NarrationScript = {
     },
     {
       id: "abtest-balance",
-      text: "Let users pick their own group, and all ten of these traits differ between the arms. Flip a coin, and only one edges over the line, barely.",
+      text: "Let users pick their own group, and all ten of these traits differ by more than a tenth of a standard deviation, the usual flag.",
+    },
+    {
+      id: "abtest-coin",
+      text: "Flip a coin, and only one edges over the line, barely.",
       pauseAfter: 0.8,
     },
     {
       id: "pvalue",
-      text: "Question seven. What is a p-value, at an analyst's level? It's how likely a result at least this extreme would be, if there were really no difference. In the course's test, five hundred seventy-nine of six thousand convert in A, and seven hundred two in B. If the change did nothing, a gap that big would turn up about three times in ten thousand.",
+      text: "Question seven. What is a p-value, at an analyst's level? It's how likely a result at least this extreme would be, if there were really no difference.",
+    },
+    {
+      id: "pvalue-test",
+      text: "In one test, five hundred seventy-nine of six thousand convert in A, and seven hundred two in B.",
+    },
+    {
+      id: "pvalue-gap",
+      text: "If the change did nothing, a gap of three point six four standard errors or more would turn up about three times in ten thousand. That's far below the usual cutoff of point oh five, so we treat the lift as real.",
       pauseAfter: 0.7,
     },
     {
       id: "pvalue-not",
-      text: "It isn't the chance that there's no effect, and it says nothing about how big the effect is.",
+      text: "It isn't the chance that there's no effect.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "pvalue-size",
+      text: "And it says nothing about how big the effect is.",
       pauseAfter: 0.7,
     },
     { id: "signif-in", text: "Which is exactly the next question." },
@@ -180,6 +203,10 @@ export const script: NarrationScript = {
     {
       id: "signif-n",
       text: "Hold one small effect fixed, and grow the sample. At ten users per group, the p-value is point six five. At two hundred, it slips under point oh five. At two thousand, it's essentially zero. The effect never changed. So report the effect size and its range, not just the p-value.",
+    },
+    {
+      id: "signif-size",
+      text: "Here it's a fifth of a standard deviation. Whether that matters is a business call: compare the effect and its range with the smallest lift worth shipping.",
       pauseAfter: 0.8,
     },
     {
@@ -189,7 +216,19 @@ export const script: NarrationScript = {
     },
     {
       id: "ci-margin",
-      text: "The range is the estimate, plus or minus one point nine six standard errors. Ninety-five percent means that if we ran the test many times, about ninety-five intervals in a hundred would contain the true value. In this run of a hundred, four miss. And a wide interval means we need more data.",
+      text: "The range is the estimate, plus or minus one point nine six standard errors.",
+    },
+    {
+      id: "ci-se",
+      text: "A standard error is how much the estimate would wobble from one run to the next.",
+    },
+    {
+      id: "ci-cover",
+      text: "Ninety-five percent means that if we ran the test many times, about ninety-five intervals in a hundred would contain the true value. In this run of a hundred, four miss.",
+    },
+    {
+      id: "ci-wide",
+      text: "And if the range were wide, running from a loss to a big win, we'd need more data before deciding.",
       pauseAfter: 0.7,
     },
     { id: "power-in", text: "How much data is the next question." },
@@ -204,6 +243,10 @@ export const script: NarrationScript = {
     {
       id: "power-mde",
       text: "Bigger samples shrink the standard error, so smaller effects become detectable. The MDE, the minimum detectable effect, is the smallest lift you want to be able to catch. Pick it before launch, along with power and significance, and the sample size follows.",
+    },
+    {
+      id: "power-worth",
+      text: "Set the MDE at the smallest lift that would be worth the cost of shipping.",
       pauseAfter: 0.7,
     },
     {
@@ -213,13 +256,21 @@ export const script: NarrationScript = {
     },
     {
       id: "errors",
-      text: "Question eleven. What are Type one and Type two errors? A Type one error is a false positive: declaring a winner when there's no effect. Its rate is alpha, usually five percent. A Type two error is a false negative: missing an effect that's really there. Its rate is beta.",
+      text: "Question eleven. What are Type one and Type two errors? A Type one error is a false positive: declaring a winner when there's no effect.",
+    },
+    {
+      id: "errors-alpha",
+      text: "Its rate is alpha, usually five percent, split evenly between a false winner and a false loser.",
+    },
+    {
+      id: "errors-beta",
+      text: "A Type two error is a false negative: missing an effect that's really there. Its rate is beta.",
       pauseAfter: 0.7,
     },
     {
       id: "power-def",
       text: "Question twelve. What is statistical power? It's one minus beta: the chance of catching a real effect. Eighty percent is the usual target. Power rises with more users, bigger effects, and a looser alpha. Moving the line trades one error for the other. Only more data shrinks both.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
     { id: "peek-in", text: "Then, once the test is running, the urge to look." },
 
@@ -236,9 +287,14 @@ export const script: NarrationScript = {
       pauseAfter: 0.8,
     },
     {
-      id: "peek-fix",
-      text: "Fix the sample size in advance, or use a sequential test, which is built to be watched.",
+      id: "peek-why",
+      text: "Every look is another chance for noise to cross the line, so a team that checks this often ships a false winner far more than five percent of the time.",
       pauseAfter: 0.7,
+    },
+    {
+      id: "peek-fix",
+      text: "Fix the sample size in advance and look once, or use a sequential test, which sets a stricter line for every look.",
+      pauseAfter: 0.8,
     },
     { id: "simpson-in", text: "Last, two ways a total can lie." },
 
@@ -256,12 +312,24 @@ export const script: NarrationScript = {
     },
     {
       id: "simpson-why",
-      text: "A was given mostly to large stones, the hard cases. So segment before you conclude.",
+      text: "A was given mostly to large stones, the hard cases.",
+    },
+    {
+      id: "simpson-better",
+      text: "Treatment A is still the better one.",
+    },
+    {
+      id: "simpson-segment",
+      text: "So segment before you conclude.",
       pauseAfter: 0.8,
     },
     {
       id: "ratio",
       text: "Question fifteen. How do you avoid a misleading ratio metric? Watch the numerator and the denominator together: revenue per session can rise because sessions fell. And an average of averages isn't the overall average. Five regional averages average sixty-eight. Per customer, it's fifty-two, because one region has only forty customers.",
+    },
+    {
+      id: "ratio-fix",
+      text: "So add up the numerator and the denominator first, and divide once.",
       pauseAfter: 0.7,
     },
 
@@ -281,8 +349,16 @@ export const script: NarrationScript = {
       text: "A novelty effect is a lift that comes from newness, and fades. In week one, the change that's about to vanish looks best: fourteen percent against four. A primacy effect is the reverse, when people resist a change at first. Either way, run the test long enough to see it settle.",
     },
     {
+      id: "r-novelty-check",
+      text: "And check that the lift holds for users who never saw the old version.",
+    },
+    {
       id: "r-cohort",
       text: "A cohort analysis groups users by when they started, like their sign-up month, and follows each group. Here every cohort keeps more than the last: twenty-six percent at week eight for January, fifty-two for May.",
+    },
+    {
+      id: "r-cohort-why",
+      text: "A single blended retention number hides this, because it moves whenever acquisition does.",
     },
     {
       id: "r-retention",

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note, svgText } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PCT } from "./data";
@@ -89,7 +89,6 @@ export const PctScene: React.FC = () => {
   const cont = Number(M.rows[0][0]);
   const disc = Number(M.rows[0][1]);
   const p90 = Number(P.rows[0][0]);
-  const p90d = Number(P.rows[0][1]);
   const resTop = y(SQL_TOP);
   const mg = geoOf(M, RES_X, resTop, h, { rowH: 46 });
   const pg = geoOf(P, RES_X, resTop, h, { rowH: 46 });
@@ -97,6 +96,11 @@ export const PctScene: React.FC = () => {
   const faster = sorted.flatMap((v, i) => (v < PCT.mean ? [i] : []));
   // The two values the median falls between (the sixth and seventh).
   const mid = [sorted.length / 2 - 1, sorted.length / 2];
+  // How many of these twelve the p90 line really has under it: 12 values
+  // cannot split nine to one, so it is not 9 in 10 of them.
+  const within = sorted.filter((v) => v <= p90).length;
+  // The median's rings go with its marker, so the p90 strip carries no leftovers.
+  const medianOut = 1 - ease(frame, whyAt, 10);
 
   return (
     <AbsoluteFill>
@@ -118,7 +122,7 @@ export const PctScene: React.FC = () => {
           {[100, 300, 1000, 3000].map((t) => (
             <g key={t}>
               <line x1={px(t)} x2={px(t)} y1={sy + 22} y2={sy + 30} stroke={INK_SOFT} strokeWidth={1.4} />
-              <text x={px(t)} y={sy + 54} textAnchor="middle" style={{ ...label(18, INK_SOFT), ...TABULAR }}>
+              <text x={px(t)} y={sy + 54} textAnchor="middle" fill={INK_SOFT} style={{ ...label(19, INK_SOFT), ...TABULAR }}>
                 {t >= 1000 ? `${t / 1000} s` : `${t} ms`}
               </text>
             </g>
@@ -126,8 +130,11 @@ export const PctScene: React.FC = () => {
           {sorted.map((v, i) => {
             const p = ease(frame, twelveAt + 6 + i * 2, 10);
             const fast = faster.includes(i) ? ease(frame, slowerAt + 4 + i, 10) : 0;
-            const between = mid.includes(i) ? ease(frame, halfwayAt, 10) : 0;
-            const isDisc = (v === disc ? ease(frame, fiftyAt - 2, 10) : 0) + (v === p90d ? ease(frame, p90At + 14, 10) : 0);
+            const between = mid.includes(i) ? ease(frame, halfwayAt, 10) * medianOut : 0;
+            // PERCENTILE_DISC's median, ringed on the value it returns. The
+            // p90's DISC value (the table's 900) is not ringed: beside the 836
+            // line, a ring on its dot read as the line marking it.
+            const isDisc = v === disc ? ease(frame, fiftyAt - 2, 10) * medianOut : 0;
             return (
               <g key={i} opacity={p}>
                 <circle cx={px(v)} cy={sy} r={10 * p} fill={fast > 0.5 ? OK : BAR} />
@@ -171,7 +178,10 @@ export const PctScene: React.FC = () => {
             opacity: ease(frame, nineAt, 12),
           }}
         >
-          9 in 10 finish within it
+          9 in 10 finish within it{" "}
+          <span style={{ color: INK_SOFT, ...TABULAR }}>
+            (here, {within} of the {sorted.length})
+          </span>
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, tailAt, 14) }}>
           <path
@@ -180,7 +190,7 @@ export const PctScene: React.FC = () => {
             stroke={ACCENT}
             strokeWidth={2.6}
           />
-          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={{ ...label(19, ACCENT_INK), fontWeight: 700 }}>
+          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={svgText({ ...label(19, ACCENT_INK), fontWeight: 700 })}>
             the slow tail
           </text>
         </svg>

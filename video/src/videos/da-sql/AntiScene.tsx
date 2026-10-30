@@ -17,6 +17,7 @@ import {
   Mark,
   MARK_BAD,
   MARK_OK,
+  Mono,
   NoRows,
   TableName,
   tableGeometry,
@@ -35,7 +36,10 @@ const RESULT_X = 1490;
  * Question 7, customers who never ordered, on the page's customers and
  * orders plus a guest order with no customer. NOT IN returns nothing, and
  * the comparison it stands for, written out for Di, shows why; NOT EXISTS and
- * the left join that keeps the unmatched rows both find her.
+ * the left join that keeps the unmatched rows both find her. That left join
+ * filters the right table in WHERE, which the trap warned about, and is safe:
+ * IS NULL is the one test that keeps unmatched rows. NOT IN works too once
+ * its subquery drops the nulls.
  */
 export const AntiScene: React.FC = () => {
   const n = useNarration();
@@ -55,6 +59,10 @@ export const AntiScene: React.FC = () => {
   const existsAt = n.word("anti-fix", "NOT EXISTS");
   const leftAt = n.word("anti-fix", "left join");
   const diAt = n.word("anti-fix", "find Di");
+  const safeAt = n.word("anti-safe", "That WHERE is safe");
+  const keepsAt = n.word("anti-safe", "keeps the unmatched rows");
+  const keepNotInAt = n.word("anti-safe", "keep NOT IN");
+  const filterAt = n.word("anti-safe", "filter the nulls out");
   const end = n.beat("distinct-in").to;
 
   const cg = tableGeometry({
@@ -90,6 +98,11 @@ export const AntiScene: React.FC = () => {
     tableGeometry({ x: RESULT_X, top, cols: cols.map((name) => ({ name })), rows, headH: h(HEAD_H), rowH: h(ROW_H) });
   const existsG = resultG(y(TOP), ANTI.notExists.cols, ANTI.notExists.rows);
   const leftG = resultG(leftTop, ANTI.leftNull.cols, ANTI.leftNull.rows);
+  const leftH = listingHeight(ANTI.leftNull.lines.length, 24);
+  const isNullLine = ANTI.leftNull.lines.findIndex((l) => l.startsWith("WHERE"));
+  // NOT IN mended: the filter its subquery needs, as check.mjs ran it.
+  const guard = /WHERE \w+ IS NOT NULL/.exec(ANTI.notInGuarded.lines.join(" "))?.[0];
+  if (!guard || ANTI.notInGuarded.rows.map((r) => r[0]).join() !== di[1]) throw new Error("NOT IN with its nulls filtered does not find Di alone");
 
   return (
     <AbsoluteFill>
@@ -164,7 +177,15 @@ export const AntiScene: React.FC = () => {
           rows={ANTI.notExists.rows.map((cells) => ({ cells, at: diAt - 2 }))}
           bands={[{ row: 0, at: diAt + 4, color: MARK_OK }]}
         />
-        <Listing lines={ANTI.leftNull.lines} x={LIST_X} top={leftTop} width={LIST_W} size={24} at={leftAt - 2} />
+        <Listing
+          lines={ANTI.leftNull.lines}
+          x={LIST_X}
+          top={leftTop}
+          width={LIST_W}
+          size={24}
+          at={leftAt - 2}
+          marks={[{ line: isNullLine, at: safeAt + 4, color: MARK_OK }]}
+        />
         <DataTable
           g={leftG}
           cols={[{ name: ANTI.leftNull.cols[0] }]}
@@ -172,6 +193,18 @@ export const AntiScene: React.FC = () => {
           rows={ANTI.leftNull.rows.map((cells) => ({ cells, at: diAt + 2 }))}
           bands={[{ row: 0, at: diAt + 8, color: MARK_OK }]}
         />
+
+        {/* ── Why that WHERE is safe, and NOT IN mended ── */}
+        <Note at={safeAt - 2} x={LIST_X} y={leftTop + leftH + h(18)}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <Mono>IS NULL</Mono> is the one test that <Mark at={keepsAt}>keeps the unmatched rows</Mark>.
+          </span>
+        </Note>
+        <Note at={keepNotInAt - 2} x={LIST_X} y={leftTop + leftH + h(62)}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            Or keep <Mono>NOT IN</Mono>, with <Mark at={filterAt}><Mono>{guard}</Mono></Mark> inside.
+          </span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

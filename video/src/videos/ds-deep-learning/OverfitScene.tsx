@@ -21,6 +21,11 @@ const FIX_Y = 700;
  * and climbs to more than twice that low; beside it, the curve it ends up
  * drawing through the twenty points. Then the fixes, early stopping marked
  * at the low point.
+ *
+ * The epochs run on a log axis from 20 to 4,000: on a linear one the whole
+ * fall to the low at epoch 160 took the first 4% of the axis, and "stop
+ * here" sat on the y-axis. Full-batch Adam overshoots now and then once its
+ * gradients are tiny, which is what the late spikes are, and a note says so.
  */
 export const OverfitScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -48,11 +53,17 @@ export const OverfitScene: React.FC = () => {
   const end = n.beat("overfit-fix").to;
 
   const O = OVERFIT;
-  const xs: Scale = { lo: 0, hi: 4000, a: LOSS.left, b: LOSS.right };
+  const lg = Math.log10;
+  const FIRST = 20;
+  const xs: Scale = { lo: lg(FIRST), hi: lg(4000), a: LOSS.left, b: LOSS.right };
+  const ex = (epoch: number) => at(xs, lg(epoch));
   const ys: Scale = { lo: 0, hi: 0.3, a: y(LOSS.bottom), b: y(LOSS.top) };
   const clip = { left: LOSS.left - 4, right: LOSS.right + 6, top: y(LOSS.top) - 10, bottom: y(LOSS.bottom) + 4 };
-  const train = O.epochs.map((e, i) => [e, O.train[i]] as const);
-  const val = O.epochs.map((e, i) => [e, O.val[i]] as const);
+  const logged = (values: readonly number[]) =>
+    O.epochs.flatMap((e, i) => (e >= FIRST ? [[lg(e), values[i]] as const] : []));
+  const train = logged(O.train);
+  const val = logged(O.val);
+  const iAt = (epoch: number) => O.epochs.indexOf(epoch);
 
   const fx: Scale = { lo: -1, hi: 1, a: FIT.left, b: FIT.right };
   const fy: Scale = { lo: -2, hi: 2, a: y(FIT.bottom), b: y(FIT.top) };
@@ -79,38 +90,41 @@ export const OverfitScene: React.FC = () => {
         <Axes
           x={xs}
           y={ys}
-          xTicks={[0, 1000, 2000, 3000, 4000]}
+          xTicks={[lg(FIRST), 2, 3, lg(4000)]}
           yTicks={[0, 0.1, 0.2, 0.3]}
-          xFormat={(v) => v.toLocaleString("en-US")}
+          xFormat={(v) => Math.round(10 ** v).toLocaleString("en-US")}
           yFormat={(v) => v.toFixed(1)}
-          xTitle="training epochs"
+          xTitle="training epochs (log scale)"
           yTitle="loss (mean squared error)"
           at={curvesAt - 4}
         />
         <Curve points={train} x={xs} y={ys} at={trainAt - 2} dur={40} color={BAR} width={3.6} clip={clip} />
         <Curve points={val} x={xs} y={ys} at={valAt - 2} dur={44} color={ACCENT} width={3.6} clip={clip} />
-        <Tagline x={at(xs, 3000)} y={at(ys, O.train[150]) + h(14)} at={trainAt + 10} size={22} color={BLUE_INK}>
+        <Tagline x={ex(300)} y={at(ys, O.train[iAt(300)]) + h(14)} at={trainAt + 10} size={22} color={BLUE_INK}>
           training
         </Tagline>
-        <Tagline x={at(xs, 2400)} y={at(ys, O.val[120]) - h(46)} at={valAt + 12} size={22} color={ACCENT_INK}>
+        <Tagline x={ex(42)} y={at(ys, O.val[iAt(40)]) - h(44)} at={valAt + 12} size={22} color={ACCENT_INK}>
           validation
         </Tagline>
-        <Dots dots={[{ x: at(xs, O.bestEpoch), y: at(ys, O.bestVal), at: lowAt }]} r={9} color={OK} opacity={1} />
+        <Dots dots={[{ x: ex(O.bestEpoch), y: at(ys, O.bestVal), at: lowAt }]} r={9} color={OK} opacity={1} />
         <Svg opacity={ease(frame, lowAt + 2, 10)}>
-          <line x1={at(xs, O.bestEpoch) + 6} y1={at(ys, O.bestVal) - 10} x2={at(xs, 300)} y2={at(ys, 0.163)} stroke={OK} strokeWidth={1.6} />
+          <line x1={ex(O.bestEpoch) + 6} y1={at(ys, O.bestVal) - 10} x2={ex(220)} y2={at(ys, 0.163)} stroke={OK} strokeWidth={1.6} />
         </Svg>
-        <Note at={lowAt + 2} x={at(xs, 300) + 6} y={at(ys, 0.163) - h(30)}>
+        <Note at={lowAt + 2} x={ex(220) + 6} y={at(ys, 0.163) - h(30)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
             lowest: {O.bestVal.toFixed(3)}, epoch {O.bestEpoch}
           </span>
         </Note>
-        <Note at={climbAt + 4} x={at(xs, 4000) - 330} y={at(ys, O.endVal) - h(52)}>
+        <Note at={climbAt + 4} x={ex(4000) - 330} y={at(ys, O.endVal) - h(52)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
             {O.endVal.toFixed(3)} by the end: over twice the low
           </span>
         </Note>
+        <Tagline x={ex(4000)} width={330} align="right" y={at(ys, O.endTrain) + h(14)} at={noiseAt + 12} size={20}>
+          spikes: Adam&apos;s steps overshooting
+        </Tagline>
         <VLine
-          x={at(xs, O.bestEpoch)}
+          x={ex(O.bestEpoch)}
           top={y(LOSS.top) - 6}
           bottom={y(LOSS.bottom)}
           at={stopAt - 2}
@@ -123,7 +137,7 @@ export const OverfitScene: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            left: at(xs, O.bestEpoch) - 7,
+            left: ex(O.bestEpoch) - 7,
             top: at(ys, O.bestVal) - 7,
             width: 14,
             height: 14,

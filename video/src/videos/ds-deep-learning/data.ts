@@ -161,5 +161,5 @@ export const INIT = results.init as {
   sd: Record<"one" | "small" | "he", number[]>;
 };
 
-/** Iterations in an epoch. */
-export const EPOCH = results.epoch as { n: number; batch: number; iterations: number };
+/** Iterations in an epoch: n / batch exactly, rounded up, and the partial last batch. */
+export const EPOCH = results.epoch as { n: number; batch: number; iterations: number; exact: number; lastBatch: number };

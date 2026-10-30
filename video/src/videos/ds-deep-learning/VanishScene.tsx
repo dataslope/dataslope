@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { VANISH } from "./data";
-import { Axes, Drift, Fade, Mark, OK_INK, type Scale, Svg, Tagline, WARM, WARM_INK } from "./parts";
+import { Axes, Drift, Fade, Mark, type Scale, Svg, Tagline, WARM, WARM_INK } from "./parts";
 
 const BOX = { left: 230, right: 1000, top: 384, bottom: 806 };
 const FIX_X = 1180;
@@ -19,9 +19,11 @@ const power = (v: number) => (v >= 1 ? v.toLocaleString("en-US", { maximumFracti
 
 /**
  * Question 5: the gradient's size, layer by layer back from the output, on
- * a log scale. A quarter per layer (the sigmoid's slope at its steepest)
- * falls to 0.25^10, under one in a million; one and a half per layer climbs
- * to 57.7. Then the fixes, each ticked as it is named.
+ * a log scale. Each layer's factor is its weight times its activation's
+ * slope: a quarter per layer (the sigmoid's slope at its steepest, with
+ * weights near one) falls to 0.25^10, under one in a million; one and a half
+ * per layer (large weights) climbs to 57.7. Then the fixes, each ticked as
+ * it is named.
  */
 export const VanishScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -31,7 +33,10 @@ export const VanishScene: React.FC = () => {
   const from = n.beat("vanish").from;
   const qAt = n.word("vanish", "Question five");
   const textAt = n.word("vanish", "What causes vanishing");
+  const explodingAt = n.word("vanish", "exploding gradients");
+  const sweepAt = n.word("vanish", "That backward sweep");
   const productAt = n.word("vanish", "a long product");
+  const slopeAt = n.word("vanish", "The sigmoid's slope");
   const quarterAt = n.word("vanish", "a quarter at most");
   const tenAt = n.word("vanish", "ten sigmoid layers");
   const millionAt = n.word("vanish", "less than one in a million");
@@ -39,6 +44,9 @@ export const VanishScene: React.FC = () => {
   const aboveAt = n.word("vanish", "Factors above one");
   const halfAt = n.word("vanish", "One and a half, ten times over");
   const explodesAt = n.word("vanish", "the gradient explodes");
+  const whyAt = n.word("vanish-why", "Each layer's factor is its weight");
+  const nearAt = n.word("vanish-why", "weights near one");
+  const largeAt = n.word("vanish-why", "large weights push the factor above one");
   const fixes = [
     { text: "ReLU", at: n.word("vanish-fix", "ReLU") },
     { text: "careful initialization", at: n.word("vanish-fix", "careful initialization") },
@@ -47,7 +55,6 @@ export const VanishScene: React.FC = () => {
     { text: "exploding: clipping", at: n.word("vanish-fix", "clipping") },
   ];
   const stepAt = n.word("opt-in", "The step size");
-  const pathAt = n.word("opt-in", "about the path");
   const end = n.beat("opt-in").to;
 
   const xs: Scale = { lo: 0, hi: 10, a: BOX.left, b: BOX.right };
@@ -74,11 +81,13 @@ export const VanishScene: React.FC = () => {
       ))}
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} out={pathAt} size={60}>
+        {/* Held to the cut, as every other scene is: clearing on the bridge's
+            last word left a blank page through the gap. */}
+        <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} size={60}>
           What causes vanishing and exploding gradients?
         </QuestionCard>
 
-        <Fade from={from} out={pathAt}>
+        <Fade from={from}>
           <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>
             <Axes
               x={xs}
@@ -88,10 +97,20 @@ export const VanishScene: React.FC = () => {
               yFormat={(v) => power(10 ** v)}
               xTitle="layers back from the output"
               yTitle="the gradient's size"
-              at={productAt - 4}
+              at={explodingAt - 2}
             />
-            <Tagline x={120} y={y(290)} at={quarterAt} size={24} color={ACCENT_INK}>
+            {/* The opening builds a step at a time: the empty axes as the
+                question ends, then each line on its words, so the page never
+                holds still for 3 s while the question is read. */}
+            <Tagline x={120} y={y(236)} at={sweepAt} size={24} color={INK}>
+              each layer:{" "}
+              <span style={{ opacity: ease(frame, productAt + 2, 10) }}>
+                <Mark at={whyAt + 4}>× its weight × its activation&apos;s slope</Mark>
+              </span>
+            </Tagline>
+            <Tagline x={120} y={y(290)} at={slopeAt - 2} size={24} color={ACCENT_INK}>
               the sigmoid&apos;s slope: <Mark at={quarterAt + 4}>at most 0.25</Mark>, so × 0.25 a layer
+              <span style={{ opacity: ease(frame, nearAt - 2, 10) }}>, with weights near 1</span>
             </Tagline>
             <Svg>
               {series.map((s) =>
@@ -143,8 +162,9 @@ export const VanishScene: React.FC = () => {
                 1.5<sup>10</sup> = {VANISH.tenBig}: it explodes
               </span>
             </Note>
-            <Tagline x={px(3)} y={py(1.5 ** 3) + h(14)} at={aboveAt} size={21} color={WARM_INK}>
-              × 1.5 a layer
+            {/* Under the gridline at 1, clear of both lines (it sat on the gridline). */}
+            <Tagline x={px(3)} y={py(1) + h(16)} at={aboveAt} size={21} color={WARM_INK}>
+              × 1.5 a layer<span style={{ opacity: ease(frame, largeAt - 2, 10) }}>, with large weights</span>
             </Tagline>
           </div>
 
@@ -161,9 +181,6 @@ export const VanishScene: React.FC = () => {
             </Note>
           ))}
         </Fade>
-        <Note at={stepAt + 2} x={FIX_X} y={y(FIX_Y) + 5 * h(FIX_ROW) + h(30)} out={pathAt}>
-          <span style={{ ...note(23, OK_INK), whiteSpace: "nowrap" }}>the step size: the machine learning round</span>
-        </Note>
       </Drift>
     </AbsoluteFill>
   );

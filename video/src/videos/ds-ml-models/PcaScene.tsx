@@ -48,8 +48,10 @@ const COL = 1220;
  * Questions 9 and 10. The page's scaled iris: its four components' shares of
  * the variance as bars, the first two adding to 96%, and the flowers
  * projected onto those two, the species separating once their inks come in.
- * Then the curse: the nearest neighbor's distance over the farthest one's,
- * from 0.017 in two dimensions to 0.89 in a thousand.
+ * Under the projection, what component 1 is made of (its loadings). Then the
+ * curse: first how much of a cube lies near its surface as the dimensions
+ * grow, then the nearest neighbor's distance over the farthest one's, from
+ * 0.017 in two dimensions to 0.89 in a thousand.
  */
 export const PcaScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -73,6 +75,7 @@ export const PcaScene: React.FC = () => {
   const straightAt = n.word("pca", "straight-line structure");
   const q10At = n.word("curse", "Question ten");
   const q10TextAt = n.word("curse", "What is the curse of dimensionality");
+  const growAt = n.word("curse", "As dimensions grow");
   const emptyAt = n.word("curse", "space empties out");
   const scatterAt = n.word("curse", "Scatter a thousand random points");
   const twoDAt = n.word("curse", "In two dimensions");
@@ -125,6 +128,15 @@ export const PcaScene: React.FC = () => {
   const ratio = CURSE.ratio.map(([d, r]) => [Math.log10(d), r] as const);
   const r2 = CURSE.ratio.find(([d]) => d === 2)?.[1] ?? 0;
   const r1000 = CURSE.ratio.find(([d]) => d === 1000)?.[1] ?? 0;
+  const shell = CURSE.shell.map(([d, v]) => [Math.log10(d), v] as const);
+  const shell20 = CURSE.shell.find(([d]) => d === 20)?.[1] ?? 0;
+  // The shell has gone before the next experiment's caption arrives.
+  const shellOut = scatterAt + 6;
+
+  // ── 9: component 1's loadings, largest first ──
+  const loadings = Object.entries(PCA.loadings)
+    .map(([name, v]) => ({ name: name.replace(/ \(cm\)$/, ""), v }))
+    .sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
 
   return (
     <AbsoluteFill>
@@ -276,6 +288,25 @@ export const PcaScene: React.FC = () => {
             </span>
           </Note>
 
+          {/* What component 1 is: a weighted mix of the four measurements. */}
+          <Note
+            at={projectAt + 6}
+            x={pb.left}
+            y={pb.top + pb.height + h(14)}
+            out={out9}
+          >
+            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+              <span style={{ color: INK, fontWeight: 650 }}>component 1</span>{" "}
+              ={" "}
+              {loadings.map((l, i) => (
+                <React.Fragment key={l.name}>
+                  {i ? (l.v < 0 ? " − " : " + ") : l.v < 0 ? "−" : ""}
+                  <span style={TABULAR}>{fmt(Math.abs(l.v), 2)}</span> {l.name}
+                </React.Fragment>
+              ))}
+            </span>
+          </Note>
+
           {/* ── 9: the scree ── */}
           <Note at={irisAt} x={sb.left} y={sb.top - h(54)} out={out9}>
             <span
@@ -372,7 +403,7 @@ export const PcaScene: React.FC = () => {
                 ...TABULAR,
               }}
             >
-              {pct(cum2)} in two
+              {pct(cum2, 0)} in two
             </span>
           </Note>
           <Note
@@ -405,6 +436,42 @@ export const PcaScene: React.FC = () => {
             </span>
           </Note>
 
+          {/* ── 10: space empties out: the share of a cube near its surface ── */}
+          <Axes
+            x={lx}
+            y={ly}
+            xTicks={[0, 1, 2, 3]}
+            xFormat={(v) => (10 ** v).toLocaleString("en-US")}
+            yTicks={[0, 0.5, 1]}
+            yFormat={(v) => String(v)}
+            xTitle="dimensions"
+            yTitle="share of a cube within 0.1 of its surface"
+            at={growAt}
+            out={shellOut}
+          />
+          <Curve
+            points={shell}
+            x={lx}
+            y={ly}
+            at={growAt + 4}
+            dur={24}
+            color={C0}
+            width={3.4}
+            out={shellOut}
+          />
+
+          <Note
+            at={emptyAt}
+            x={at(lx, 1.45)}
+            y={at(ly, 1) + h(22)}
+            out={shellOut}
+          >
+            <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>
+              by 20 dimensions, <span style={TABULAR}>{pct(shell20, 0)}</span> of
+              it: the middle is empty
+            </span>
+          </Note>
+
           {/* ── 10: nearest over farthest ── */}
           <Axes
             x={lx}
@@ -415,9 +482,9 @@ export const PcaScene: React.FC = () => {
             yFormat={(v) => String(v)}
             xTitle="dimensions"
             yTitle="nearest neighbor's distance ÷ farthest's"
-            at={emptyAt}
+            at={shellOut - 4}
           />
-          <Note at={scatterAt} x={cb.left + 20} y={cb.top + h(4)}>
+          <Note at={shellOut + 10} x={cb.left + 20} y={cb.top + h(4)}>
             <span
               style={{
                 ...label(20, INK_SOFT),

@@ -47,13 +47,19 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "novelty": charts/novelty-effect-fades.mjs, as DA Part 7 drew it (and
  *     checked against its results.json): week one 14.1% against 3.75%, week
  *     eight 0.68% against 4.19%.
- *   - "many": the page's curve, 1 - 0.95^20 = 64%; ten simulated metrics with
+ *   - "many": the page's curve, 1 - 0.95^20 = 64% (twenty
+ *     independent tests, none with a real effect); ten simulated metrics with
  *     three real effects: five under 0.05 (two false), Benjamini-Hochberg
- *     keeps the three real ones, Bonferroni keeps two.
+ *     keeps the three real ones (rank 3's p of 0.0136 is under its bar of
+ *     0.015; ranks 4 and 5 miss 0.020 and 0.025), Bonferroni keeps two.
  *   - "did": two simulated cities: the treated city +8.91, the comparison
  *     city +2.38, difference 6.53 (statsmodels OLS agrees); the true effect
- *     is 6.
- *   - "r-meta": the winner's-curse chart's question, computed exactly: at 20%
+ *     is 6. Before the policy the gap between the cities drifted -0.07 a
+ *     week: the parallel-trends check.
+ *   - "r-meta": the video's own three experiments of one change, lifts of 2,
+ *     6 and 9 points with standard errors 1, 2 and 3: the headlines average
+ *     5.67, the inverse-variance pool is 3.31 (statsmodels agrees).
+ *   - "r-curse": the winner's-curse chart's question, computed exactly: at 20%
  *     power the significant estimates average 2.24 times the truth.
  *
  * Written for Drew's ear: "A B test" is spelled; every other initialism is
@@ -127,7 +133,11 @@ export const script: NarrationScript = {
     },
     {
       id: "simpson-pool",
-      text: "Pool them, and it loses, four point eight against seven point eight, because desktop converts less and the new checkout got mostly desktop. Check the mix in each arm, and read the segments before the total.",
+      text: "Pool them, and it loses, four point eight against seven point eight, because desktop converts less and the new checkout got mostly desktop.",
+    },
+    {
+      id: "simpson-def",
+      text: "That's Simpson's paradox: a result that holds in every segment flips in the total, because the arms have a different mix. In a randomized test the mix should match, so check it in each arm: a gap is a bug, like an SRM, and the fair comparison is the one within each segment.",
       pauseAfter: 0.7,
     },
 
@@ -140,7 +150,11 @@ export const script: NarrationScript = {
     },
     {
       id: "primacy",
-      text: "Primacy runs the other way: a redesign people resist at first, until they learn it. For both, run past the first weeks, and check the users who arrive after the change has stopped being new.",
+      text: "Primacy runs the other way: a redesign people resist at first, until they learn it.",
+    },
+    {
+      id: "primacy-fix",
+      text: "For both, run past the first weeks, and compare new users, who never saw the old version, with returning ones.",
       pauseAfter: 0.7,
     },
 
@@ -148,12 +162,28 @@ export const script: NarrationScript = {
     {
       id: "many",
       scene: true,
-      text: "Question six. What is the multiple comparisons problem? Each test at a five percent level has a one in twenty chance of a false alarm. Read twenty metrics, and the chance that at least one of them fires is sixty-four percent.",
+      text: "Question six. What is the multiple comparisons problem? Each test at a five percent level has a one in twenty chance of a false alarm.",
+    },
+    {
+      id: "many-20",
+      text: "Read twenty independent metrics where nothing really moved, and the chance that at least one of them fires is sixty-four percent.",
       pauseAfter: 0.6,
     },
     {
       id: "many-fix",
-      text: "Here are ten simulated metrics, and three of them really moved. Five come in under point oh five, and two of those are false alarms. Bonferroni divides the five percent by ten, and keeps two: safe, but it drops a real one. Benjamini-Hochberg controls the false discovery rate, the share of your hits that are false, and keeps the three real ones. Better still, name one primary metric before the test starts.",
+      text: "Here are ten simulated metrics, and three of them really moved. Five come in under point oh five, and two of those are false alarms.",
+    },
+    {
+      id: "many-bonf",
+      text: "Bonferroni divides the five percent by ten, which holds the chance of any false alarm to at most five percent. It keeps two: safe, but it drops a real one.",
+    },
+    {
+      id: "many-bh",
+      text: "Benjamini-Hochberg controls the false discovery rate, the expected share of your hits that are false. It gives the smallest p-value a bar of one tenth of five percent, the next two tenths, and so on, and keeps everything up to the last one under its bar: here, the three real ones.",
+    },
+    {
+      id: "many-end",
+      text: "Better still, name one primary metric before the test starts.",
       pauseAfter: 0.7,
     },
 
@@ -162,17 +192,33 @@ export const script: NarrationScript = {
       id: "network",
       scene: true,
       text: "Question seven. What are network effects and interference? A standard test assumes one user's treatment can't change another user's outcome. That's SUTVA, the stable unit treatment value assumption. Give a sharing feature to half the users, and what they share reaches the other half: control gets treated too, and the difference shrinks. So randomize groups that rarely touch: clusters of friends, or whole cities.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.6,
     },
     {
       id: "switchback",
-      text: "Question eight. What is a switchback experiment? In a marketplace, riders and drivers share one pool, so you can't split users. Split time instead: the whole city gets the new version for an hour, then the old one, switching at random. Leave room for carryover, since one hour spills into the next.",
+      text: "Question eight. What is a switchback experiment?",
+    },
+    {
+      id: "sb-pool",
+      text: "In a marketplace, riders and drivers share one pool, so you can't split users: a treated rider who books faster takes a driver from a control rider, and the split overstates the effect.",
+    },
+    {
+      id: "sb-time",
+      text: "Split time instead: the whole city gets the new version for an hour, then the old one, switching at random.",
+    },
+    {
+      id: "sb-carry",
+      text: "One hour spills into the next, so drop the first minutes of each hour as a washout, and count hours, not users, as the sample.",
       pauseAfter: 0.7,
     },
     {
       id: "concurrent",
       scene: true,
       text: "Question nine. How do you detect interference between experiments running at once? Compare the users who are in both with those in only one. If a pricing test's lift changes for users who also see new recommendations, the two interact. Then separate their users, run them one after the other, or analyze them together as a factorial design.",
+    },
+    {
+      id: "factorial",
+      text: "A factorial design randomizes each test independently, so all four cells fill, and estimates the interaction directly.",
       pauseAfter: 0.7,
     },
 
@@ -186,6 +232,10 @@ export const script: NarrationScript = {
     {
       id: "did-math",
       text: "In this simulation, the treated city's weekly sign-ups rose eight point nine after the policy. The comparison city rose two point four over the same weeks, with no policy at all. The difference of those differences, DiD for short, is six point five, close to the true effect of six. It rests on parallel trends: without the policy, the two lines would have kept moving together.",
+    },
+    {
+      id: "did-check",
+      text: "You can't see that after the policy, but you can check the weeks before it: here the two cities rose together.",
       pauseAfter: 0.8,
     },
 
@@ -198,7 +248,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-ate",
-      text: "The average treatment effect, ATE, is averaged over everyone. The average treatment effect on the treated, ATT, only over those who actually got it. A randomized test makes them match. Observational data can pull them apart.",
+      text: "The average treatment effect, ATE, is averaged over everyone. The average treatment effect on the treated, ATT, only over those who actually got it.",
+    },
+    {
+      id: "r-ate-why",
+      text: "If everyone assigned is treated, a randomized test makes them match. Opt-in features and observational data can pull them apart. Report ATT when only the people who use the feature matter.",
     },
     {
       id: "r-long",
@@ -210,8 +264,16 @@ export const script: NarrationScript = {
     },
     {
       id: "r-meta",
-      text: "And a meta-analysis pools many experiments, weighting each by its precision rather than averaging headlines. Watch for the winner's curse: at twenty percent power, the results that reached significance overstate the true effect more than twofold.",
-      pauseAfter: 0.9,
+      text: "And a meta-analysis pools many experiments. Rather than averaging their headlines, it weights each by its precision, so big, tight experiments count more.",
+    },
+    {
+      id: "r-curse",
+      text: "Watch for the winner's curse: at twenty percent power, the results that reached significance overstate the true effect more than twofold.",
+    },
+    {
+      id: "r-pool",
+      text: "So pool every experiment you ran, not just the winners.",
+      pauseAfter: 1.2,
     },
     {
       id: "next",

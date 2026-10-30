@@ -30,7 +30,9 @@ out.encodings = {
     { key: "Length", error: 1.4 },
     { key: "Angle", error: 1.8 },
     { key: "Area", error: 2.5 },
-    { key: "Color", error: 3.0 },
+    // The page's chart says "Color saturation", after Cleveland & McGill: the
+    // shade of one hue carrying a quantity, not distinct hues for categories.
+    { key: "Color saturation", error: 3.0 },
   ],
 };
 out.encodings.colorVsPosition = round(out.encodings.rows[4].error / out.encodings.rows[0].error, 1);
@@ -181,6 +183,9 @@ out.lineBar = {
     corr: round(num / Math.sqrt(dx * dy), 2),
     fitted: [round(Math.min(...B) - 1.5, 2), round(Math.max(...B) + 1.5, 2)],
     zero: [0, round(Math.max(...B) * 1.25, 2)],
+    // The page's fix: both series indexed to 100 at their first value, so they
+    // share one axis and nothing is left to tune.
+    indexed: { a: A.map((v) => round((v / A[0]) * 100, 1)), b: B.map((v) => round((v / B[0]) * 100, 1)) },
   };
 }
 
@@ -330,6 +335,7 @@ console.log(
       baseline: [out.baseline.risePct, out.baseline.barRatio],
       log: out.log.series.map((s) => [s.key, s.start, s.growthPct, s.values.at(-1)]),
       dualCorr: out.dual.corr,
+      dualIndexed: [Math.min(...out.dual.indexed.a), Math.max(...out.dual.indexed.a), Math.min(...out.dual.indexed.b), Math.max(...out.dual.indexed.b)],
       cherry: [out.cherry.windowPct, out.cherry.decadePct, out.cherry.window],
       inverted: out.inverted.risePct,
       dash: [out.dashboard.ratio, out.dashboard.added.at(-1), out.dashboard.used.at(-1)],

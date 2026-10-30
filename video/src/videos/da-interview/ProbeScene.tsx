@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Headline, Kicker, Mono, X0 } from "./parts";
@@ -11,8 +11,9 @@ const ROW_Y = 330;
 const PITCH = 120;
 
 /**
- * The four things interviewers probe, as the role page lists them, each a
- * numbered row with its detail inking in as it is said.
+ * The four things interviewers probe across the loop, as the role page lists
+ * them, each a numbered row with its detail inking in as it is said. Numbered
+ * in blue, like the loop's cards: red is kept for the trap.
  */
 export const ProbeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -22,8 +23,8 @@ export const ProbeScene: React.FC = () => {
   const from = n.beat("probe").from;
   const fourAt = n.word("probe", "four things");
   const rows = [
-    { at: n.word("probe", "SQL fluency"), name: "SQL fluency", detail: <>joins, <Mono>GROUP BY</Mono>, <Mono>WHERE</Mono> and <Mono>HAVING</Mono>, <Mono>CASE</Mono>, windows</> },
-    { at: n.word("probe", "Framing"), name: "Framing", detail: <>the right grain, nulls handled, nothing counted twice after a join</> },
+    { at: n.word("probe", "SQL fluency"), name: "SQL fluency", detail: <>joins, <Mono>GROUP BY</Mono>, <Mono>WHERE</Mono> vs <Mono>HAVING</Mono>, <Mono>CASE</Mono>, window functions</> },
+    { at: n.word("probe", "Framing"), name: "Framing", detail: <>the right grain (what one row is), nulls handled, nothing counted twice after a join</> },
     { at: n.word("probe", "Communication"), name: "Communication", detail: <>assumptions, caveats, what you&apos;d check next</> },
     { at: n.word("probe", "And tools"), name: "Tools", detail: <>a spreadsheet, and a BI (business intelligence) tool: Tableau, Power BI, Looker</> },
   ];
@@ -37,7 +38,7 @@ export const ProbeScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>What interviewers probe</Kicker>
-        <Headline lead="Four things," turn="under all three." at={from + 2} turnAt={fourAt} size={70} />
+        <Headline lead="Four things," turn="across the three parts." at={from + 2} turnAt={fourAt} size={70} />
 
         {rows.map((r, i) => {
           const p = ease(frame, r.at - 2, 14);
@@ -62,12 +63,12 @@ export const ProbeScene: React.FC = () => {
                   width: 52,
                   height: 52,
                   borderRadius: 26,
-                  border: `2px solid ${ACCENT_INK}`,
+                  border: `2px solid ${BLUE_INK}`,
                   background: PAPER,
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...label(24, ACCENT_INK),
+                  ...label(24, BLUE_INK),
                   ...TABULAR,
                 }}
               >

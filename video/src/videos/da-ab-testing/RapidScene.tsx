@@ -143,6 +143,7 @@ const Novelty: React.FC<{ c: Ctx }> = ({ c }) => {
   const fourteenAt = c.w("r-novelty", "fourteen percent against four");
   const primacyAt = c.w("r-novelty", "A primacy effect");
   const longAt = c.w("r-novelty", "run the test long enough");
+  const checkAt = c.w("r-novelty-check", "check that the lift holds");
 
   const { novelty, durable } = RAPID.novelty;
   const weeks = novelty.length;
@@ -190,6 +191,10 @@ const Novelty: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={longAt - 2} x={at(x, 3)} y={c.y(PLOT.top) + c.h(56)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>run it long enough to settle</span>
       </Note>
+      {/* Below the 10% gridline, clear of both curves. */}
+      <Note at={checkAt - 2} x={at(x, 3)} y={c.y(PLOT.top) + c.h(162)}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>and check it holds for users who never saw the old one</span>
+      </Note>
     </>
   );
 };
@@ -207,6 +212,8 @@ const Cohorts: React.FC<{ c: Ctx }> = ({ c }) => {
   const moreAt = c.w("r-cohort", "keeps more than the last");
   const janAt = c.w("r-cohort", "twenty-six percent at week eight");
   const mayAt = c.w("r-cohort", "fifty-two for May");
+  const blendedAt = c.w("r-cohort-why", "A single blended retention number");
+  const acquisitionAt = c.w("r-cohort-why", "whenever acquisition does");
 
   const K = RAPID.cohorts;
   const weeks = K[0].rows.length - 1;
@@ -252,6 +259,12 @@ const Cohorts: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={mayAt} x={at(x, W) + 16} y={at(y, may.rows[W]) - c.h(46)}>
         <span style={{ ...note(24, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
           {may.key}: {fmt(may.rows[W], 0)}%
+        </span>
+      </Note>
+      <Note at={blendedAt - 2} x={PLOT.x0 - 60} y={c.y(PLOT.base) + c.h(96)}>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          one blended retention number hides this
+          <span style={{ opacity: ease(frame, acquisitionAt - 4, 10) }}>: it moves whenever acquisition does</span>
         </span>
       </Note>
     </>
@@ -306,7 +319,7 @@ const Retention: React.FC<{ c: Ctx }> = ({ c }) => {
         color={INK_SOFT}
         dash="6 6"
         width={2}
-        labelY={c.y(PLOT.top) - c.h(4)}
+        labelY={at(y, 88)}
         label={
           <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
             week {MATCH}: {fmt(core[MATCH], 0)}% and {fmt(leaky[MATCH], 0)}%

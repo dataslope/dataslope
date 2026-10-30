@@ -4,6 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, body } from "../../editorial/style";
+import { MONO } from "../../theme/fonts";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -40,7 +41,7 @@ export const CiScene: React.FC = () => {
   const catchAt = n.word("ci", "catch the true mean");
   const coverAt = n.word("ci", "ninety-four do");
   const missAt = n.word("ci", "six miss");
-  const notAt = n.word("ci-fixed", "So it isn't");
+  const notAt = n.word("ci-not", "So it isn't");
   const fixedAt = n.word("ci-fixed", "The mean is fixed");
   const randomAt = n.word("ci-fixed", "The interval is what's random");
   const eitherAt = n.word("ci-fixed", "either contains the mean");
@@ -91,6 +92,14 @@ export const CiScene: React.FC = () => {
           size={19}
         />
         <Curve points={[[LEFT - 20, vy(TRUTH)], [RIGHT + 20, vy(TRUTH)]]} at={takeAt + 4} dur={16} out={clearAt} color={INK} width={2.4} dash="8 6" />
+        <Note at={buildAt + 4} x={SIDE_X} y={y(300)} out={clearAt}>
+          <span style={{ ...noteText(22, INK_SOFT) }}>
+            each one:{" "}
+            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>
+              <span style={{ textDecoration: "overline" }}>x</span> ± t*·s/√n
+            </span>
+          </span>
+        </Note>
         <Note at={takeAt + 8} x={RIGHT + 30} y={vy(TRUTH) - 16} out={clearAt}>
           <span style={{ ...noteText(22, INK) }}>true mean</span>
         </Note>

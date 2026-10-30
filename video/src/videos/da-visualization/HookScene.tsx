@@ -32,8 +32,8 @@ export const HookScene: React.FC = () => {
   const storyAt = n.word("hook", "the story is there");
   const testAt = n.word("plan", "That's what these interviews test");
   const twentyAt = n.word("plan", "twenty-two questions");
-  const twiceAt = n.word("plan", "seventeen of them twice");
-  const shortAt = n.word("plan", "five short ones");
+  const twiceAt = n.word("plan-drawn", "seventeen of them");
+  const shortAt = n.word("plan-drawn", "five short ones");
   const firstAt = n.word("choose-in", "First");
   const end = n.beat("choose-in").to;
 
@@ -42,7 +42,7 @@ export const HookScene: React.FC = () => {
   const base = y(PLOT.base);
   const counts = [
     { at: twentyAt, big: "22", text: "questions", soft: false },
-    { at: twiceAt, big: "17", text: "drawn twice: wrong, then right", soft: false },
+    { at: twiceAt, big: "17", text: "drawn, most twice: wrong, then right", soft: false },
     { at: shortAt, big: "5", text: "short ones", soft: true },
   ];
 

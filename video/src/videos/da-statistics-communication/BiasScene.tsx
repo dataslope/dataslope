@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BIAS } from "./data";
-import { at, Axes, Bracket, Dots, Drift, OK_INK, type Scale, VLine } from "./parts";
+import { at, Axes, Bracket, Dots, Drift, mulberry32, OK_INK, type Scale, VLine } from "./parts";
 
 const BAR_X = 340;
 const BAR_W = 1160;
@@ -22,6 +22,18 @@ const ROWS = [
 ];
 const BASE = 830;
 const NOTE_X = 1540;
+/** The strips of who churned and who stayed, on a 0 to 10 scale. */
+const STRIP: Scale = { lo: 0, hi: 10, a: 420, b: 1500 };
+const STRIP_ROWS = [
+  { key: "churned", y: 490 },
+  { key: "stayed", y: 550 },
+] as const;
+const STRIP_BASE = 600;
+/** Each strip's dots spread a little up and down, the same on every frame. */
+const SPREAD = (() => {
+  const r = mulberry32(21);
+  return Array.from({ length: 80 }, () => (r() - 0.5) * 20);
+})();
 
 /**
  * Question 4. The video's own 100,000 users: the 22.6% who churned, the
@@ -42,6 +54,7 @@ export const BiasScene: React.FC = () => {
   const distortAt = n.word("bias", "distort results");
   const leftAt = n.word("bias-who", "everyone who already left");
   const quarterAt = n.word("bias-who", "nearly a quarter");
+  const unhappiestAt = n.word("bias-who", "the unhappiest");
   const survivorAt = n.word("bias-who", "survivorship bias");
   const pollAt = n.word("bias-who", "A web poll");
   const selfAt = n.word("bias-who", "self-selection");
@@ -54,8 +67,13 @@ export const BiasScene: React.FC = () => {
   const settleAt = n.word("bias-bigger", "they settle");
   const noiseAt = n.word("bias-bigger", "shrinks the noise");
   const nothingAt = n.word("bias-bigger", "does nothing about the bias");
-  const fixAt = n.word("bias-bigger", "The fix is the design");
+  const fixAt = n.word("bias-fix", "The fix is the design");
+  const randomAt = n.word("bias-fix", "a random sample of everyone");
+  const strataAt = n.word("bias-fix", "a set share from each group");
+  const exitAt = n.word("bias-fix", "run an exit survey");
   const end = n.beat("metric-in").to;
+  // The strips clear before the surveys' axis draws.
+  const stripsOut = truthAt - 14;
 
   const barP = ease(frame, distortAt - 4, 18);
   const churnP = ease(frame, leftAt, 14);
@@ -129,6 +147,34 @@ export const BiasScene: React.FC = () => {
           </span>
         </Note>
 
+        {/* ── Who left: forty scores from each side ── */}
+        <Axes
+          x={STRIP}
+          y={{ lo: 0, hi: 1, a: y(STRIP_BASE), b: y(STRIP_ROWS[0].y) }}
+          xTicks={[0, 2, 4, 6, 8, 10]}
+          xTitle="each dot: one user's satisfaction score, out of 10"
+          at={unhappiestAt - 4}
+          out={stripsOut}
+        />
+        {STRIP_ROWS.map((row, r) => (
+          <React.Fragment key={row.key}>
+            <Note at={unhappiestAt + r * 6 - 4} out={stripsOut} x={120} y={y(row.y) - 16}>
+              <span style={{ ...label(23, r === 0 ? ACCENT_INK : BLUE_INK), whiteSpace: "nowrap" }}>{row.key}</span>
+            </Note>
+            <Dots
+              dots={BIAS.strips[row.key].map((v, i) => ({
+                x: at(STRIP, v),
+                y: y(row.y) + SPREAD[r * 40 + i],
+                at: unhappiestAt + r * 6 + i * 0.4,
+              }))}
+              r={7}
+              color={r === 0 ? ACCENT : BAR}
+              opacity={0.6}
+              out={stripsOut}
+            />
+          </React.Fragment>
+        ))}
+
         {/* ── Thirty surveys at each size ── */}
         <Axes
           x={xs}
@@ -181,9 +227,16 @@ export const BiasScene: React.FC = () => {
         <Bracket x0={tx} x1={sx} y={y(478)} up at={nothingAt} color={ACCENT}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same bias</span>
         </Bracket>
-        <Note at={fixAt - 2} x={NOTE_X} y={y(ROWS[2].y) + h(40)} width={290}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 600 }}>the fix: a random or stratified sample of everyone</span>
-        </Note>
+        {/* In the plot's empty lower right, clear of the axis row and the notes column. */}
+        {[
+          { at: Math.min(fixAt + 10, randomAt), text: "the fix: a random sample of everyone" },
+          { at: strataAt, text: "or stratified: a set share per group" },
+          { at: exitAt, text: "for those who left: an exit survey" },
+        ].map((line, i) => (
+          <Note key={line.text} at={line.at - 2} x={1060} y={y(ROWS[1].y) + h(50) + i * 32}>
+            <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{line.text}</span>
+          </Note>
+        ))}
       </Drift>
     </AbsoluteFill>
   );

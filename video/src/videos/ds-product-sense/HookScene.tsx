@@ -120,7 +120,8 @@ export const HookScene: React.FC = () => {
       <Drift from={0} to={end + 40}>
         <Kicker at={6}>Data scientist interview prep</Kicker>
         <Headline lead="Two numbers" turn="from the same dashboard." at={twoAt - 4} turnAt={sameAt - 4} out={senseAt - 6} size={68} />
-        <Headline lead="Product sense" turn="is that judgment." at={senseAt - 2} turnAt={judgmentAt - 2} out={steersAt} size={68} />
+        {/* Up until the cut, so the bridge never empties to the kicker. */}
+        <Headline lead="Product sense" turn="is that judgment." at={senseAt - 2} turnAt={judgmentAt - 2} size={68} />
 
         <Clear at={steersAt}>
           <Tile
@@ -156,11 +157,11 @@ export const HookScene: React.FC = () => {
               <Mark at={wrongAt + 4}>the one that can say something is wrong</Mark>
             </span>
           </Note>
-          <Note at={codeAt} x={X0} y={y(TILE.top) + h(TILE.h) + h(22)}>
-            <span style={{ ...note(28, INK_SOFT), whiteSpace: "nowrap" }}>no code in this round</span>
-          </Note>
           <Note at={madeUpAt} x={X0} y={y(TILE.top) - h(44)}>
             <span style={{ ...madeUp(21), opacity: 1 }}>one made-up recipe app: all its numbers are invented</span>
+          </Note>
+          <Note at={codeAt} x={X0 + 2 * TILE.w + TILE.gap} align="right" y={y(TILE.top) - h(44) - 5}>
+            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>no code in this round</span>
           </Note>
 
           {/* Fourteen questions: eleven with a figure, three in a sentence. */}
@@ -195,9 +196,21 @@ export const HookScene: React.FC = () => {
           <Note at={threeAt + 6} x={X0 + 11 * (SQUARES.size + SQUARES.gap) + 30} y={y(SQUARES.top) + SQUARES.size + h(14)}>
             <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>3 in a sentence</span>
           </Note>
-          <Note at={beginAt + 4} x={X0} y={y(SQUARES.top) - h(48)}>
-            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>the number a whole team steers by</span>
+          <Note at={beginAt + 4} x={X0} y={y(SQUARES.top) - 62}>
+            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+              <b style={{ color: INK }}>first:</b> the number a whole team steers by
+            </span>
           </Note>
+          <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, beginAt + 8, 8) }}>
+            <line
+              x1={X0 + SQUARES.size / 2}
+              x2={X0 + SQUARES.size / 2}
+              y1={y(SQUARES.top) - 29}
+              y2={y(SQUARES.top) - 6}
+              stroke={INK_SOFT}
+              strokeWidth={2}
+            />
+          </svg>
 
           <Spot id="ds-product-sense-squirrel" at={sameAt} left={1290} top={y(250)} width={500} height={430} />
         </Clear>

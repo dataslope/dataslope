@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
+import { Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -101,8 +101,9 @@ export const QuantileScene: React.FC = () => {
   const iqrAt = n.word("quantile-cuts", "the interquartile range");
   const p90At = n.word("quantile-p90", "a hundred fifty-four point eight");
   const nobodyAt = n.word("quantile-p90", "an amount nobody spent");
-  const betweenAt = n.word("quantile-p90", "between fourteen and one ninety");
-  const rulesAt = n.word("quantile-p90", "Other tools use other rules");
+  const interpAt = n.word("quantile-interp", "eighty percent of the way");
+  const betweenAt = n.word("quantile-interp", "from fourteen to one ninety");
+  const rulesAt = n.word("quantile-rules", "Other tools use other rules");
   const q7At = n.word("outlier", "Question seven");
   const q7TextAt = n.word("outlier", "How do you identify");
   const fenceAt = n.word("outlier-iqr", "puts a fence");
@@ -115,10 +116,13 @@ export const QuantileScene: React.FC = () => {
   const twoAt = n.word("outlier-mask", "a cutoff of two");
   const threeAt = n.word("outlier-mask", "With three");
   const hideAt = n.word("outlier-mask", "hide themselves");
+  const maskingAt = n.word("outlier-which", "That's called masking");
+  const reachAt = n.word("outlier-which", "reach for the IQR rule");
+  const medianZAt = n.word("outlier-which", "a z-score built on the median");
+  const stillAt = n.word("outlier-which", "quartiles don't move");
   const lookAt = n.word("outlier-look", "look before you delete");
   const typoAt = n.word("outlier-look", "a typo");
   const lastThreeAt = n.word("present-in", "The last three");
-  const loudAt = n.word("present-in", "saying it out loud");
   const end = n.beat("present-in").to;
 
   const S = AMOUNTS.sorted;
@@ -159,8 +163,8 @@ export const QuantileScene: React.FC = () => {
       <Sfx name="el-scratch" at={threeAt + 4} level={-32} />
 
       <Drift from={from} to={end + 40}>
-        {/* On the bridge to question 8 the takeaway is marked, then the page clears. */}
-        <AbsoluteFill style={{ opacity: 1 - ease(frame, loudAt + 6, 36) }}>
+        {/* On the bridge to question 8 the takeaway is marked, and the page
+            holds until the next scene cross-fades in. */}
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={out6}>
           What are percentiles and quartiles?
         </QuestionCard>
@@ -243,19 +247,26 @@ export const QuantileScene: React.FC = () => {
           <line x1={cx(lo)} x2={cx(lo + 1)} y1={top - 14} y2={top - 14} stroke={INK_SOFT} strokeWidth={1.6} />
           <line x1={cx(lo)} x2={cx(lo)} y1={top - 20} y2={top - 8} stroke={INK_SOFT} strokeWidth={1.6} />
           <line x1={cx(lo + 1)} x2={cx(lo + 1)} y1={top - 20} y2={top - 8} stroke={INK_SOFT} strokeWidth={1.6} />
-          <line x1={p90X} x2={p90X} y1={top - 36} y2={top - 6} stroke={ACCENT} strokeWidth={3.2} />
+          <line x1={p90X} x2={p90X} y1={top - 36} y2={top - 6} stroke={INK} strokeWidth={3.2} />
         </Svg>
         <Note at={p90At - 2} x={p90X - 300} width={600} y={top - h(76)} out={out6} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
-            90th percentile {fmt(AMOUNTS.p90, 1)}
+          <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            90th percentile <Num>{fmt(AMOUNTS.p90, 1)}</Num>
           </span>
         </Note>
         <Note at={nobodyAt} x={p90X + 30} y={bottom + h(24)} out={out6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>not in the data:</span>
-          <br />
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>interpolated</span>
         </Note>
-        <Note at={rulesAt - 2} x={p90X + 30} y={bottom + h(90)} out={out6}>
+        <Note at={interpAt - 2} x={p90X + 30} y={bottom + h(24) + 30} out={out6}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <Num>{AMOUNTS.p90at.percent}%</Num> of the way
+          </span>
+          <br />
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, betweenAt, 10) }}>
+            from <Num>{AMOUNTS.p90at.between[0]}</Num> to <Num>{AMOUNTS.p90at.between[1]}</Num>
+          </span>
+        </Note>
+        <Note at={rulesAt - 2} x={p90X + 30} y={bottom + h(24) + 108} out={out6}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>other tools,</span>
           <br />
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>other rules</span>
@@ -270,10 +281,12 @@ export const QuantileScene: React.FC = () => {
           return (
             <React.Fragment key={f.k}>
               <Svg opacity={Math.min(1, p * 2)}>
-                <line x1={f.x} x2={f.x} y1={top - 30} y2={top - 30 + (cellH + 46) * p} stroke={ACCENT} strokeWidth={3} strokeDasharray="7 5" />
+                <line x1={f.x} x2={f.x} y1={top - 30} y2={top - 30 + (cellH + 46) * p} stroke={INK} strokeWidth={2.6} strokeDasharray="7 5" />
               </Svg>
               <Note at={fencesAt + f.k * 8} x={f.x - 150} width={300} y={top - h(70)} from="up" style={{ textAlign: "center" }}>
-                <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>fence {fmt(f.v, 1)}</span>
+                <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+                  fence <Num>{fmt(f.v, 1)}</Num>
+                </span>
               </Note>
             </React.Fragment>
           );
@@ -317,9 +330,18 @@ export const QuantileScene: React.FC = () => {
           </span>
         </Note>
         <Note at={hideAt - 2} x={STRIP_X + 840} y={zTop + cellH + h(62)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>the outliers hide themselves</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            the outliers hide themselves<span style={{ opacity: ease(frame, maskingAt - 2, 10) }}>: <b>masking</b></span>
+          </span>
         </Note>
-        </AbsoluteFill>
+        {/* Which rule, then: one built on quartiles, which the outliers can't move. */}
+        <Note at={reachAt - 2} x={STRIP_X} y={zTop + cellH + h(112)}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            so use the IQR rule
+            <span style={{ opacity: ease(frame, medianZAt - 2, 10) }}>, or a z-score built on the median</span>
+            <span style={{ opacity: ease(frame, stillAt - 2, 10), color: INK, fontWeight: 500 }}>: quartiles don&apos;t move</span>
+          </span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

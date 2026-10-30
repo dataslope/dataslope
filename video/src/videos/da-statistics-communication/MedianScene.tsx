@@ -38,8 +38,9 @@ export const MedianScene: React.FC = () => {
   const draggedAt = n.word("median-pull", "dragged to the right");
   const aboveAt = n.word("median-pull", "Only a hundred and eighty-one");
   const incomeAt = n.word("median-both", "Income");
-  const typicalAt = n.word("median-both", "the typical value");
-  const gapAt = n.word("median-both", "the gap");
+  const typicalAt = n.word("median-report", "the typical value");
+  const totalAt = n.word("median-report", "the mean when you need a total");
+  const gapAt = n.word("median-report", "the gap");
   const end = n.beat("corr-in").to;
 
   const xs: Scale = { lo: 0, hi: HI, a: LEFT, b: RIGHT_EDGE };
@@ -151,6 +152,12 @@ export const MedianScene: React.FC = () => {
           </span>
         </Note>
 
+        {/* When the mean is still the number: anything that has to add up. */}
+        <Note at={totalAt - 2} x={ax + 30} y={y(TOP) + h(160)}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+            the mean for a total: revenue = mean order × orders
+          </span>
+        </Note>
         <Note at={incomeAt - 2} x={1180} y={y(TOP) + h(220)}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>also skewed: income, house prices,</span>
           <br />

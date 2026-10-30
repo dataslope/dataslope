@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { INK, INK_SOFT, label, note } from "../../editorial/style";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LOG } from "./data";
@@ -20,11 +20,21 @@ const LIN_HI = 9000;
 const LOG_LO = 1;
 const LOG_HI = 4;
 
+/** A series' label at the end of its line: where it starts, and its growth. */
+const EndLabel: React.FC<{ at: number; x: number; y: number; start: number; growth: number }> = ({ at, x, y, start, growth }) => (
+  <Note at={at} x={x} y={y - 14}>
+    <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>
+      from <Num>{start.toLocaleString("en-US")}</Num>, <Num>+{growth}%</Num>
+    </span>
+  </Note>
+);
+
 /**
  * Question 8. The page's two series, twelve periods: 4,000 growing 6% a
  * period and 40 growing 35%. On a linear axis the small one lies along the
  * floor; on a log axis both are straight lines and the faster one is the
- * steeper, with the scale labeled.
+ * steeper, with the scale labeled. Each line is labeled at its end in both
+ * panels, by where it starts and how fast it grows.
  */
 export const LogScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -50,6 +60,8 @@ export const LogScene: React.FC = () => {
   const [big, small] = LOG.series;
   const lift = pulse(frame, labelAt, 30);
   const periods = big.values.map((_, i) => (i % 3 === 0 ? String(i) : ""));
+  const linY = (v: number) => base - (v / LIN_HI) * (base - top);
+  const logY = (v: number) => base - ((Math.log10(v) - LOG_LO) / (LOG_HI - LOG_LO)) * (base - top);
 
   return (
     <AbsoluteFill>
@@ -75,11 +87,10 @@ export const LogScene: React.FC = () => {
         <YTicks ticks={[0, 3000, 6000, 9000]} x={LEFT.x0} base={base} top={top} lo={0} hi={LIN_HI} at={answerAt + 8} format={(v) => v.toLocaleString("en-US")} />
         <LineSet values={big.values} x0={LEFT.x0} x1={LEFT.x1} base={base} top={top} lo={0} hi={LIN_HI} at={oneAt - 2} color={CATS[0]} dots={false} labels={periods} edges />
         <LineSet values={small.values} x0={LEFT.x0} x1={LEFT.x1} base={base} top={top} lo={0} hi={LIN_HI} at={otherAt - 2} color={CATS[3]} dots={false} axis={false} edges />
-        <div style={{ position: "absolute", left: LEFT.x1 + 14, top: base - (big.values.at(-1)! / LIN_HI) * (base - top) - 14, ...label(20, INK), whiteSpace: "nowrap", opacity: ease(frame, oneAt + 20, 10), ...TABULAR }}>
-          {big.start.toLocaleString("en-US")}, +{big.growthPct}%
-        </div>
+        <EndLabel at={oneAt + 20} x={LEFT.x1 + 14} y={linY(big.values.at(-1)!)} start={big.start} growth={big.growthPct} />
+        <EndLabel at={otherAt + 10} x={LEFT.x1 + 14} y={linY(small.values.at(-1)!)} start={small.start} growth={small.growthPct} />
         <Verdict ok={false} x={LEFT.x0} y={base + h(50)} at={floorAt}>
-          the small one: flat along the floor
+          the small one: hugs the floor until the end
         </Verdict>
 
         {/* ── Log ── */}
@@ -101,11 +112,8 @@ export const LogScene: React.FC = () => {
         />
         <LineSet values={big.values.map(Math.log10)} x0={RIGHT.x0} x1={RIGHT.x1} base={base} top={top} lo={LOG_LO} hi={LOG_HI} at={logAxisAt + 2} color={CATS[0]} dots={false} labels={periods} edges />
         <LineSet values={small.values.map(Math.log10)} x0={RIGHT.x0} x1={RIGHT.x1} base={base} top={top} lo={LOG_LO} hi={LOG_HI} at={straightAt - 2} color={CATS[3]} dots={false} axis={false} edges />
-        <Note at={steeperAt - 2} x={RIGHT.x1 + 14} y={base - ((Math.log10(small.values.at(-1)!) - LOG_LO) / (LOG_HI - LOG_LO)) * (base - top) - 14}>
-          <span style={{ ...label(20, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            {small.start}, +{small.growthPct}%
-          </span>
-        </Note>
+        <EndLabel at={logAxisAt + 10} x={RIGHT.x1 + 14} y={logY(big.values.at(-1)!)} start={big.start} growth={big.growthPct} />
+        <EndLabel at={steeperAt - 2} x={RIGHT.x1 + 14} y={logY(small.values.at(-1)!)} start={small.start} growth={small.growthPct} />
         <Verdict ok x={RIGHT.x0} y={base + h(50)} at={steeperAt}>
           steady growth is straight; steeper is faster
         </Verdict>

@@ -220,7 +220,9 @@ for name, std in (("one", 1.0), ("small", 0.01), ("he", math.sqrt(2 / 256))):
 R["init"] = {"width": 256, "layers": 10, "heStd": r4(math.sqrt(2 / 256)), "sd": init}
 
 # ── 15. Epochs, batches and iterations ──
-R["epoch"] = {"n": 10000, "batch": 32, "iterations": math.ceil(10000 / 32)}
+# 10,000 / 32 is 312.5, so the last of the 313 batches is a partial one.
+R["epoch"] = {"n": 10000, "batch": 32, "iterations": math.ceil(10000 / 32), "exact": 10000 / 32,
+              "lastBatch": 10000 - (math.ceil(10000 / 32) - 1) * 32}
 
 json.dumps(R)
 `);

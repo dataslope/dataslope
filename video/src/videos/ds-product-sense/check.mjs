@@ -99,16 +99,24 @@ r["sample"] = {
 
 # ── 10. The on-the-spot estimate: daily ingredient searches ──────────────────
 mau, share, sessions, searches = 2_000_000, 0.25, 0.5, 2
+# The sanity check the interviewer grades: what the answer says each user of
+# the feature does, a number anyone can judge (one search a day is plausible;
+# fifty would send you back to the factors).
 r["market"] = {
     "mau": mau, "share": share, "sessionsPerDay": sessions, "searchesPerSession": searches,
     "users": int(mau * share), "sessionsDaily": int(mau * share * sessions),
     "daily": int(mau * share * sessions * searches),
+    "perUserDaily": (mau * share * sessions * searches) / (mau * share),
 }
 
 # ── 11. A feature's impact, bounded before it is built ───────────────────────
+# The lift is absolute: of the users the screen reaches, 1 to 3 in every 100
+# become weekly cooks who were not before (percentage points, not a relative
+# lift on the users already cooking, which would need the baseline too).
 reach, lo, hi, goal = 120_000, 0.01, 0.03, 20_000
 r["impact"] = {
     "reach": reach, "liftLo": lo, "liftHi": hi, "goal": goal,
+    "perHundredLo": round(lo * 100), "perHundredHi": round(hi * 100),
     "extraLo": round(reach * lo), "extraHi": round(reach * hi),
     "shareOfGoal": round(reach * hi / goal, 3),
 }

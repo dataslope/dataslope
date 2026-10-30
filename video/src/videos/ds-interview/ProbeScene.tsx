@@ -15,9 +15,10 @@ const COL_H = 460;
 type Item = { at: number; text: React.ReactNode };
 
 /**
- * The five things interviewers score, as the role page lists them, standing
- * as five columns that rise in turn, each filling with its details as they
- * are said.
+ * The five things interviewers probe across the loop, as the role page lists
+ * them ("What interviewers probe"), standing as five columns that rise in
+ * turn, each filling with its details as they are said. No one round scores
+ * all five: a SQL screen does not grade experiment design.
  */
 export const ProbeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -25,55 +26,54 @@ export const ProbeScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("probe").from;
-  const fiveAt = n.word("probe", "the same five things");
-  const w = (p: string) => n.word("probe", p);
+  const fiveAt = n.word("probe", "probe five things");
   const cols: { at: number; name: string; items: Item[] }[] = [
     {
-      at: w("Statistics and probability"),
+      at: n.word("probe-list", "Statistics and probability"),
       name: "Statistics & probability",
       items: [
-        { at: w("distributions"), text: "distributions" },
-        { at: w("tests and intervals"), text: "tests and intervals" },
+        { at: n.word("probe-list", "distributions"), text: "distributions" },
+        { at: n.word("probe-list", "tests and intervals"), text: "tests and intervals" },
       ],
     },
     {
-      at: w("Modeling"),
+      at: n.word("probe-list", "Modeling"),
       name: "Modeling",
       items: [
-        { at: w("the bias and variance trade-off"), text: "the bias–variance trade-off" },
-        { at: w("regularization"), text: "regularization" },
-        { at: w("validation"), text: "validation" },
-        { at: w("the metric you pick"), text: "the metric you pick" },
+        { at: n.word("probe-list", "the bias and variance trade-off"), text: "the bias–variance trade-off" },
+        { at: n.word("probe-list", "regularization"), text: "regularization" },
+        { at: n.word("probe-list", "validation"), text: "validation" },
+        { at: n.word("probe-list", "the metric you pick"), text: "the metric you pick" },
       ],
     },
     {
-      at: w("Experimentation"),
+      at: n.word("probe-list", "Experimentation"),
       name: "Experimentation",
       items: [
-        { at: w("the design"), text: "the design" },
-        { at: w("its power"), text: "its power" },
-        { at: w("the pitfalls"), text: "the pitfalls" },
+        { at: n.word("probe-list", "the design"), text: "the design" },
+        { at: n.word("probe-list", "its power"), text: "its power" },
+        { at: n.word("probe-list", "the pitfalls"), text: "the pitfalls" },
       ],
     },
     {
-      at: w("Coding"),
+      at: n.word("probe-list", "Coding"),
       name: "Coding",
       items: [
-        { at: w("in pandas"), text: <Mono>pandas</Mono> },
-        { at: w("NumPy"), text: <Mono>NumPy</Mono> },
-        { at: w("and SQL"), text: <Mono>SQL</Mono> },
+        { at: n.word("probe-list", "in pandas"), text: <Mono>pandas</Mono> },
+        { at: n.word("probe-list", "NumPy"), text: <Mono>NumPy</Mono> },
+        { at: n.word("probe-list", "and SQL"), text: <Mono>SQL</Mono> },
       ],
     },
     {
-      at: w("And communication"),
+      at: n.word("probe-list", "And communication"),
       name: "Communication",
       items: [
-        { at: w("explaining a model and its caveats"), text: "explaining a model and its caveats" },
-        { at: w("to someone who doesn't build them"), text: "to someone who doesn't build them" },
+        { at: n.word("probe-list", "explaining a model and its caveats"), text: "explaining a model and its caveats" },
+        { at: n.word("probe-list", "to someone who doesn't build them"), text: "to someone who doesn't build them" },
       ],
     },
   ];
-  const end = n.beat("probe").to;
+  const end = n.beat("probe-list").to;
 
   return (
     <AbsoluteFill>
@@ -82,8 +82,8 @@ export const ProbeScene: React.FC = () => {
       ))}
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>What interviewers score</Kicker>
-        <Headline lead="Five things," turn="scored in every round." at={from + 2} turnAt={fiveAt} size={70} />
+        <Kicker at={from}>What interviewers probe</Kicker>
+        <Headline lead="Five things," turn="probed across the loop." at={from + 2} turnAt={fiveAt} size={70} />
 
         {cols.map((c, i) => {
           const p = ease(frame, c.at - 4, 16);

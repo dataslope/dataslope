@@ -46,12 +46,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     error is 0.058, and training error falls with every degree.
  *   - "reg", scikit-learn's diabetes set (442 patients, ten measurements,
  *     standardized): at the marked strength the lasso keeps seven (age, s2
- *     and s4 go to zero) and ridge and elastic net (half and half) keep all
- *     ten. s1 and s2, total and LDL cholesterol, correlate at 0.897: the
- *     lasso keeps s1 and zeroes s2; elastic net keeps both.
+ *     and s4 go to zero) and ridge keeps all ten. s1 and s2, total and LDL
+ *     cholesterol, correlate at 0.897: the lasso keeps s1 and zeroes s2;
+ *     elastic net (90% L1, 10% L2) keeps both, at -2.00 and -2.44, and
+ *     still zeroes age. Refitted on fifty resamples of the patients, elastic
+ *     net keeps the pair in 37, lasso in 5.
  *   - "cv", scikit-learn's breast cancer set (569 tumors): 200 random 80/20
  *     splits score 94.7% to 100%; five stratified folds score 95.6, 97.4,
- *     98.2, 100 and 98.2, a mean of 97.9 with a standard deviation of 1.4.
+ *     98.2, 100 and 98.2, a mean of 97.9. The same five-fold mean over 200
+ *     reshuffles runs from 96.7% to 98.6% (sd 0.36 points, against 1.25
+ *     for a single split).
  *   - "learn", the video's own 600 points from the same sine, twenty
  *     shuffles at each size: a straight line's two errors meet near 0.30;
  *     degree 9's validation error falls from 1.07 at 30 points to 0.089 at
@@ -59,10 +63,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "pr" to "cal", the video's own two Gaussian classes, 2% positive:
  *     trained on 20,000, tested on 200,000 (4,000 positive). Precision and
  *     recall are 87% and 10% at a threshold of 0.8, 18% and 75% at 0.05.
- *     ROC-AUC 0.937 and PR-AUC 0.45; on a balanced test set (the 4,000
- *     positives and 4,000 negatives) 0.938 and 0.94. Calling everything
+ *     ROC-AUC 0.937 and PR-AUC 0.45, against PR's chance level of 0.02 (the
+ *     positive rate); on a balanced test set (the 4,000 positives and 4,000
+ *     negatives) 0.938 and 0.94, where chance is 0.5. At a threshold of
+ *     0.05 the false positive rate is only 6.8%, yet that is 13,402 false
+ *     alarms against 3,017 catches. Calling everything
  *     negative is 98.0% accurate. With balanced class weights, recall at 0.5
- *     goes from 27% to 86% and precision from 67% to 11%. Calibration bins:
+ *     goes from 27% to 86% and precision from 67% to 11%; the plain model
+ *     with its threshold moved to 0.02 has 87% and 11%. Calibration bins:
  *     the plain model's 0.85 bin is 80% positive; the weighted model's is
  *     8.5% positive; recalibrated with Platt scaling, 81%.
  *   - "gd", the page's own chart: x² from 8. At 0.25 the distance halves each
@@ -70,7 +78,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     multiplies it by 1.1 and flips its sign.
  *   - quick: the page's five predictions give RMSE 0.344, MAE 0.300 and
  *     R-squared 0.954; a prediction of 0.01 for a true positive costs 0.98 in
- *     squared error and 4.61 in cross-entropy.
+ *     squared error and 4.61 in cross-entropy, and behind a sigmoid their
+ *     gradients on the logit there are 0.02 and 0.99.
  *
  * Written for Drew's ear: numbers as they are said, "L one" and "L two",
  * "F one", and every abbreviation spelled and expanded the first time.
@@ -88,11 +97,10 @@ export const script: NarrationScript = {
       text: "Here's a model that gets every example it trained on right. A hundred percent. Show it examples it has never seen, and it gets eighty-four. Which of those is the model? Most of the machine learning round comes back to that gap.",
       pauseAfter: 0.6,
     },
-    {
-      id: "plan",
-      text: "Fifteen questions in this round. Every figure you'll see is a real model, fitted in Python. The last three are quick.",
-      pauseAfter: 0.7,
-    },
+    { id: "plan", text: "Fifteen questions in this round." },
+    // Not "every": Question six's figure is a diagram and twelve's is x squared.
+    { id: "plan-figures", text: "Most figures you'll see are real models, fitted in Python." },
+    { id: "plan-quick", text: "The last three are quick.", pauseAfter: 0.7 },
     { id: "bias-in", text: "First, where the gap comes from." },
 
     // ── 1, 2. Bias, variance, overfitting ─────────────────────────────────
@@ -117,7 +125,7 @@ export const script: NarrationScript = {
       text: "Question two. How do you detect and fix overfitting? Look for the gap: good on training data, poor on held-out data. At degree nine, training error is point oh six, and validation error is five point seven. To fix it: more data, a simpler model, regularization, early stopping, and cross-validation, so the estimate is honest.",
       pauseAfter: 0.7,
     },
-    { id: "reg-in", text: "One of those fixes gets a question of its own." },
+    { id: "reg-in", text: "Regularization gets its own question." },
 
     // ── 3, 4. L1, L2, elastic net ─────────────────────────────────────────
     {
@@ -133,7 +141,11 @@ export const script: NarrationScript = {
     },
     {
       id: "enet",
-      text: "Question four. What is elastic net? A mix of the two penalties. Two cholesterol measures here move together, with a correlation of point nine. Lasso keeps one and drops the other. Elastic net keeps both, which makes it steadier when features are correlated.",
+      text: "Question four. What is elastic net? A mix of the two penalties. Two cholesterol measures here move together, with a correlation of point nine. Lasso keeps one and drops the other.",
+    },
+    {
+      id: "enet-both",
+      text: "Elastic net keeps both, at nearly equal weight, and still drops age to zero. Refit both on fifty resamples of the patients: elastic net keeps the pair in thirty-seven, lasso in only five. It selects like lasso, but steadier when features are correlated.",
       pauseAfter: 0.7,
     },
     { id: "cv-in", text: "So how far can you trust a validation score?" },
@@ -147,8 +159,17 @@ export const script: NarrationScript = {
     },
     {
       id: "cv-folds",
-      text: "K-fold cross-validation cuts the rows into five folds, trains on four, and scores the fifth, five times over, so every row is scored once. Here, the mean is ninety-seven point nine, give or take one point four. For time series, keep the order: validate only on data that comes after the training data.",
-      pauseAfter: 0.7,
+      text: "K-fold cross-validation cuts the rows into five folds, trains on four, and scores the fifth, five times over, so every row is scored once.",
+    },
+    {
+      id: "cv-mean",
+      text: "Here, the five average ninety-seven point nine. Repeat that on two hundred reshuffles, and those averages pile up far tighter than single splits do.",
+    },
+    {
+      id: "cv-time",
+      text: "For time series, keep the order: validate only on data that comes after the training data.",
+      // Long enough to read the forward-chaining folds before Question six.
+      pauseAfter: 1.2,
     },
     {
       id: "split",
@@ -166,7 +187,15 @@ export const script: NarrationScript = {
     },
     {
       id: "learn-shapes",
-      text: "A straight line on the sine wave: the two curves meet early and stay high. That's bias, and more data won't help. The degree-nine polynomial: the gap starts wide and closes as the data grows, down to the noise. That's variance, and more data is the cure.",
+      text: "A straight line on the sine wave: the two curves meet early and stay high.",
+    },
+    {
+      id: "learn-bias",
+      text: "That's bias: more data won't help, but a more flexible model or better features will.",
+    },
+    {
+      id: "learn-nine",
+      text: "The degree-nine polynomial: the gap starts wide and closes as the data grows, down to the noise. That's variance, and more data is the cure.",
       pauseAfter: 0.8,
     },
     { id: "pr-in", text: "Now, scoring a classifier, on a rare event." },
@@ -193,7 +222,13 @@ export const script: NarrationScript = {
     {
       id: "auc",
       scene: true,
-      text: "Question nine. What is ar-oh-see ay-you-see, and when is pee-ar ay-you-see preferred? The ROC curve, for receiver operating characteristic, plots the true positive rate against the false positive rate at every threshold. The AUC is the area under the curve: point five is chance, one is perfect. Here it's point nine four. The PR curve plots precision against recall, and its area here is only point four five.",
+      text: "Question nine. What is ar-oh-see ay-you-see, and when is pee-ar ay-you-see preferred? The ROC curve, for receiver operating characteristic, plots the true positive rate against the false positive rate at every threshold. The AUC is the area under the curve: point five is chance, one is perfect. Here it's point nine four.",
+      // Lets the ROC result land before the second curve starts.
+      pauseAfter: 0.7,
+    },
+    {
+      id: "auc-pr",
+      text: "The PR curve plots precision against recall, and its area here is point four five. Chance on it is the positive rate: only point oh two.",
       pauseAfter: 0.6,
     },
     {
@@ -203,7 +238,20 @@ export const script: NarrationScript = {
     },
     {
       id: "imbalance",
-      text: "Question ten. How do you handle class imbalance? Start by ignoring accuracy: calling every case negative is already ninety-eight percent accurate. Weight the rare class in the loss, and at a threshold of point five, recall goes from twenty-seven percent to eighty-six, while precision falls from sixty-seven to eleven. Or move the threshold, or resample, and judge the result by pee-ar ay-you-see or F one.",
+      text: "Question ten. How do you handle class imbalance? Start by ignoring accuracy: calling every case negative is already ninety-eight percent accurate.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "imbalance-fix",
+      text: "Weight the rare class in the loss, and at a threshold of point five, recall goes from twenty-seven percent to eighty-six, while precision falls from sixty-seven to eleven. Or move the threshold, or resample, and judge the result by pee-ar ay-you-see or F one.",
+      pauseAfter: 0.7,
+    },
+    {
+      // The plain model at 0.02 (results.json cls.curve), against the
+      // weighted one at 0.5: the weights mostly moved the threshold, which
+      // is what Question eleven then shows they cost.
+      id: "imbalance-same",
+      text: "Here, moving the threshold nearly matches the weights: at point oh two, the plain model has eighty-seven percent recall and eleven percent precision.",
       pauseAfter: 0.7,
     },
 
@@ -217,6 +265,11 @@ export const script: NarrationScript = {
     {
       id: "cal-curve",
       text: "The plain model sits near the diagonal. The weighted one doesn't: of the cases it scores around point eight five, under nine percent are positive. The weights bought recall and broke the probabilities. Fit a calibration on held-out data, with Platt scaling or isotonic regression, and it's back on the line.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "cal-measure",
+      text: "To measure calibration, plot a reliability diagram, like this one, or compute the Brier score: the mean squared error of the probabilities.",
       pauseAfter: 0.7,
     },
 
@@ -247,15 +300,39 @@ export const script: NarrationScript = {
     },
     {
       id: "r-metrics",
-      text: "RMSE, root mean squared error, squares each miss before averaging, so big misses dominate. MAE, mean absolute error, stays in the target's units and shrugs off outliers. R squared is the share of variance explained: one is perfect, zero is no better than the mean. On the page's five predictions, they come to point three four, point three, and point nine five.",
+      text: "RMSE, root mean squared error, squares each miss before averaging, so big misses dominate.",
+    },
+    {
+      id: "r-mae",
+      text: "MAE, mean absolute error, counts every unit of miss the same, so outliers sway it less. Both are in the target's units; use RMSE when one big miss costs more than several small ones.",
+    },
+    {
+      id: "r-r2",
+      text: "R squared is the share of variance explained: one is perfect, zero is no better than the mean.",
+    },
+    {
+      id: "r-r2-units",
+      text: "It has no units, so it compares across datasets.",
+    },
+    {
+      id: "r-values",
+      text: "On the page's five predictions, they come to point three four, point three, and point nine five.",
     },
     {
       id: "r-xent",
       text: "Cross-entropy or MSE, mean squared error, for a classifier? Predict point oh one for a true positive: squared error charges point nine eight. Cross-entropy charges four point six, and keeps climbing the more confidently wrong you are.",
     },
     {
+      id: "r-xent-use",
+      text: "So use cross-entropy. Behind a sigmoid, its gradient stays strong when the model is confidently wrong, where MSE's goes flat and learning stalls.",
+    },
+    {
       id: "r-select",
-      text: "And to choose between two models, compare them on validation data, with a metric that matches the goal. Then weigh speed, interpretability and cost. If they're close, take the simpler one.",
+      text: "And to choose between two models, compare them on validation data, with a metric that matches the goal. Then weigh speed, interpretability and cost.",
+    },
+    {
+      id: "r-close",
+      text: "If the gap is within its noise, take the simpler one. Then score the winner once, on the untouched test set.",
       pauseAfter: 0.9,
     },
     {

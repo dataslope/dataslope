@@ -54,14 +54,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     likelihoods peak at 0.30.
  *   - "unbiased", the video's own 10,000 samples at each size (seed 1234),
  *     true variance 1: dividing by n averages 0.805 at n = 5 ("about twenty
- *     percent low"), by n − 1 1.006.
+ *     percent low"), by n − 1 1.006; and at n = 5 dividing by n has the lower
+ *     mean squared error, 0.359 against 0.501 ("unbiased-mse").
  *   - "ci", the course's canonical simulation (seed 7, as Stats-6
  *     Estimation): 94 of 100 intervals cover, 6 miss.
  *   - "pvalue", the course's coin (seed 0, as Stats-7 TestingHypotheses): 62
  *     heads in 100; p = 0.0211 over 100,000 fair-coin runs.
  *   - "zt": t cutoffs 2.571 at 5 degrees of freedom and 2.042 at 30; z 1.960.
  *   - "chi", the course's device and churn (seed 5, as Stats-7): 103 mobile
- *     churners against 86.7 expected; chi-square 11.88, p = 0.0026.
+ *     churners against 86.7 expected; chi-square 11.88, p = 0.0026, on
+ *     (3 − 1)(2 − 1) = 2 degrees of freedom.
  *   - "anova", the page's three groups: F = 37.9; the course's pairwise block
  *     (seed 0, as Stats-7): ten t-tests on five identical groups fire in
  *     32.4% of 800 trials, "a third of the time".
@@ -72,9 +74,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     one under 0.05 (test 14 at 0.033); 1 − 0.95²⁰ = 0.642.
  *   - rapid: the page's A/B table (120 and 150 of 1,000) under flat priors,
  *     P(B higher) = 0.975 from 200,000 seeded draws; the course's support
- *     queues (seed 6, as Stats-7): Welch p = 0.72, Mann-Whitney p = 0.033;
+ *     queues (seed 6, as Stats-7, in minutes): Welch p = 0.72, Mann-Whitney
+ *     p = 0.033, medians 32.4 and 36.8;
  *     DA Part 3's own 200 days (its results.json): ice cream and drownings r
  *     = 0.57, 0.08 with temperature held fixed.
+ *
+ * The fix pass after the 2026-10-29 review split six beats at sentence
+ * breaks: "hack-paths", "r-bayes", "r-param" and "r-corr" were cut from the
+ * kept take 6, so "hack-fix", "r-bayes-ab", "r-param-u", "r-corr-hold" and
+ * "r-corr-cause" began as the take's own words; "ci-fixed" and "pvalue-not"
+ * were re-voiced [slowly], each in two beats, since they carry the two
+ * misreadings the opening promises to fix. Each new or reworded beat was
+ * voiced on its own. The polish pass after it split "pvalue" before "A fair
+ * coin" (re-cut from the kept take 4) and re-voiced "pvalue-fair" alone, so
+ * the lower tail comes with its reason: the test is two-sided.
  *
  * Written for Drew's ear, as the Data Analyst series is: numbers as they are
  * said, and every abbreviation expanded the first time (SE, CLT, LLN,
@@ -157,6 +170,11 @@ export const script: NarrationScript = {
     {
       id: "unbiased",
       text: "Question seven. What makes an estimator unbiased? Its average over many samples equals the true value. The sample mean is unbiased. Variance divided by n is not: each sample's spread is measured from its own mean, which sits closer to its data than the true mean does, so the squares come out small. With five values, it runs about twenty percent low. Dividing by n minus one fixes it.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "unbiased-mse",
+      text: "Dividing by n is still the maximum-likelihood answer: biased, but less variable, and at five values its mean squared error is lower. Unbiased isn't automatically better.",
       pauseAfter: 0.8,
     },
 
@@ -168,8 +186,13 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "ci-not",
+      text: "[slowly] So it isn't a ninety-five percent chance that the mean is in this interval.",
+      pauseAfter: 0.5,
+    },
+    {
       id: "ci-fixed",
-      text: "So it isn't a ninety-five percent chance that the mean is in this interval. The mean is fixed. The interval is what's random, and any one of them either contains the mean or it doesn't.",
+      text: "[slowly] The mean is fixed. The interval is what's random, and any one of them either contains the mean or it doesn't.",
       pauseAfter: 0.7,
     },
     { id: "test-in", text: "The biggest block is next: eight questions on testing." },
@@ -189,12 +212,21 @@ export const script: NarrationScript = {
     {
       id: "pvalue",
       scene: true,
-      text: "Question eleven. What exactly is a p-value? The probability of data at least as extreme as yours, if the null is true. A coin lands heads sixty-two times in a hundred. A fair coin, flipped a hundred times over and over, lands sixty-two or more, or thirty-eight or fewer, two point one percent of the time. That's the p-value.",
+      text: "Question eleven. What exactly is a p-value? The probability of data at least as extreme as yours, if the null is true. A coin lands heads sixty-two times in a hundred.",
+    },
+    {
+      id: "pvalue-fair",
+      text: "A fair coin, flipped a hundred times over and over, lands sixty-two or more, or, since the test is two-sided, thirty-eight or fewer, two point one percent of the time. That's the p-value.",
       pauseAfter: 0.6,
     },
     {
       id: "pvalue-not",
-      text: "It isn't the chance the null is true, and it isn't the chance your result is a fluke. It's computed assuming the null holds.",
+      text: "[slowly] It isn't the chance the null is true.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "pvalue-fluke",
+      text: "[slowly] And it isn't the chance your result is a fluke. It's computed assuming the null holds.",
       pauseAfter: 0.7,
     },
 
@@ -208,7 +240,12 @@ export const script: NarrationScript = {
     {
       id: "chi",
       scene: true,
-      text: "Question thirteen. What is the chi-square test used for? Counts in categories. It compares observed counts with expected ones: against a claimed mix, which is goodness of fit, or between two categorical variables, which is independence. Device and churn: a hundred and three mobile users churned, where about eighty-seven would if the two were independent. The squared gaps sum to eleven point nine, and p is point oh oh two six.",
+      text: "Question thirteen. What is the chi-square test used for? Counts in categories. It compares observed counts with expected ones: against a claimed mix, which is goodness of fit, or between two categorical variables, which is independence. Device and churn: a hundred and three mobile users churned, where about eighty-seven would if the two were independent. Square each gap, divide it by its expected count, and add them up: eleven point nine, and p is point oh oh two six.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "chi-dof",
+      text: "The p is read off a chi-square curve with two degrees of freedom: rows minus one, times columns minus one.",
       pauseAfter: 0.6,
     },
     {
@@ -238,6 +275,11 @@ export const script: NarrationScript = {
     {
       id: "effect-report",
       text: "So report the effect size, with its interval, beside every p-value.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "effect-small",
+      text: "The reverse happens too: a big effect can miss significance in a small sample.",
       pauseAfter: 0.7,
     },
     {
@@ -248,7 +290,11 @@ export const script: NarrationScript = {
     },
     {
       id: "hack-paths",
-      text: "It needn't be deliberate. Five reasonable choices, about outliers, logs and cutoffs, already make thirty-two possible analyses. Pre-register the plan, correct for the number of tests, and confirm on fresh data.",
+      text: "It needn't be deliberate. Five reasonable choices, about outliers, logs and cutoffs, already make thirty-two possible analyses.",
+    },
+    {
+      id: "hack-fix",
+      text: "Pre-register the plan, correct for the number of tests, with Bonferroni or Benjamini-Hochberg, and confirm on fresh data.",
       pauseAfter: 0.8,
     },
 
@@ -261,15 +307,35 @@ export const script: NarrationScript = {
     },
     {
       id: "r-bayes",
-      text: "Frequentist or Bayesian? A frequentist treats the parameter as fixed and the data as random, and reports p-values and confidence intervals. A Bayesian updates a prior into a posterior. On the page's A B test, a hundred and twenty conversions in a thousand against a hundred and fifty, that's a distribution for each rate, and a ninety-seven and a half percent chance that B's is higher.",
+      text: "Frequentist or Bayesian? A frequentist treats the parameter as fixed and the data as random, and reports p-values and confidence intervals. A Bayesian updates a prior into a posterior.",
+    },
+    {
+      id: "r-bayes-ab",
+      text: "Take an A B test: a hundred and twenty conversions in a thousand against a hundred and fifty. Start from flat priors, and you get a distribution for each rate, and a ninety-seven and a half percent chance that B's is higher.",
     },
     {
       id: "r-param",
-      text: "Parametric or non-parametric? A parametric test assumes a distribution, usually normal. A non-parametric one works on ranks. Two support queues, each with three monster tickets: the t-test sees nothing, p of point seven two. Mann-Whitney finds the shift, point oh three three.",
+      text: "Parametric or non-parametric? A parametric test assumes a distribution, usually normal. A non-parametric one works on ranks. Two support queues, each with three monster tickets: the t-test sees nothing, p of point seven two.",
+    },
+    {
+      id: "r-param-why",
+      text: "The monsters blow up the spread, and the shift drowns in it. On ranks, a monster is just the largest value, however large.",
+    },
+    {
+      id: "r-param-u",
+      text: "Mann-Whitney finds the shift, point oh three three.",
     },
     {
       id: "r-corr",
-      text: "And correlation or causation? Correlation is two variables moving together. Causation is one changing the other. Ice cream sales and drownings correlate at point five seven. Hold temperature fixed, and it's point oh eight. A cause takes an experiment, or a careful causal design.",
+      text: "And correlation or causation? Correlation is two variables moving together. Causation is one changing the other. Ice cream sales and drownings correlate at point five seven.",
+    },
+    {
+      id: "r-corr-hold",
+      text: "Both climb on hot days: temperature is a confounder, a third variable behind the two. Hold it fixed, and it's point oh eight.",
+    },
+    {
+      id: "r-corr-cause",
+      text: "A cause takes an experiment, or a careful causal design.",
       pauseAfter: 0.9,
     },
     {

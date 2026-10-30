@@ -34,11 +34,12 @@ const LIST_W = 760;
 
 /**
  * Questions 6, 7 and 8 on the video's own four payments, two of them on
- * January 2. A bracket beside the table is the frame: ROWS grows it one row
- * at a time (100, 350, 425), RANGE takes both January 2 rows together (425
- * twice), the default frame is RANGE's, and no ORDER BY gives every row 605.
- * Then LAST_VALUE on the page's first four days, with the default frame and
- * widened.
+ * January 2. A bracket beside the table is the frame: ROWS, with id breaking
+ * the tie, grows it one row at a time (100, 350, 425), RANGE takes both
+ * January 2 rows together (425 twice), the default frame is RANGE's, and no
+ * ORDER BY gives every row 605. Then LAST_VALUE on the page's first four
+ * days, with the default frame and widened, and FIRST_VALUE and NTH_VALUE
+ * with the default frame.
  */
 export const FrameScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -53,6 +54,7 @@ export const FrameScene: React.FC = () => {
   const sliceAt = n.word("frame-def", "the slice of rows");
   const sameDayAt = n.word("frame-def", "fall on the same day");
   const rowsAt0 = n.word("frame-rows", "Rows counts physical rows");
+  const tieAt = n.word("frame-rows", "with id breaking the tie");
   const hundredAt = n.word("frame-rows", "a hundred");
   const threeFiftyAt = n.word("frame-rows", "three fifty");
   const fourTwentyFiveAt = n.word("frame-rows", "four twenty-five");
@@ -61,18 +63,24 @@ export const FrameScene: React.FC = () => {
   const bothAt = n.word("frame-range", "Both get four twenty-five");
   const q7At = n.word("default", "Question seven");
   const q7TextAt = n.word("default", "What is the default frame");
-  const noFrameAt = n.word("default", "with no frame");
-  const runningAt = n.word("default", "a running total, not the total");
-  const leaveOutAt = n.word("default", "Leave out order by");
-  const sixOhFiveAt = n.word("default", "six oh five");
+  const noFrameAt = n.word("default-range", "with no frame");
+  const runningAt = n.word("default-range", "a running total, not the total");
+  const tiedAt = n.word("default-ties", "Tied days share one total");
+  const writeAt = n.word("default-ties", "write rows and a unique order");
+  const leaveOutAt = n.word("default-whole", "Leave out order by");
+  const sixOhFiveAt = n.word("default-whole", "six oh five");
   const q8At = n.word("last", "Question eight");
   const q8TextAt = n.word("last", "What's the last value gotcha");
   const endsAt = n.word("last", "ends at the current row");
   const ownAt = n.word("last", "the row's own amount");
   const widenAt = n.word("last", "Widen the frame");
   const realAt = n.word("last", "the real last day");
+  const firstAt = n.word("last-first", "First value is safe");
+  const nullAt = n.word("last-first", "null until the frame");
+  const reachesAt = n.word("last-first", "reaches row N");
   const bridgeAt = n.beat("running-in").from;
-  const clearAt = n.word("running-in", "asked to write") + 2;
+  // The finished page holds through the bridge and fades into the cut.
+  const clearAt = n.beat("running").from - 8 - 30;
   const end = n.beat("running-in").to;
 
   const P = FRAME.payments;
@@ -96,6 +104,13 @@ export const FrameScene: React.FC = () => {
   const ldg = geoOf(LD, X0, y(TOP) + listingHeight(LD.lines.length, SIZE) + h(22), h, { rowH: 50 });
   const lwg = geoOf(LW, 1000, y(TOP) + listingHeight(LW.lines.length, SIZE) + h(22), h, { rowH: 50 });
   const lc = LD.cols.indexOf("last");
+  // FIRST_VALUE and NTH_VALUE take the default frame's place on the left.
+  const FN = FRAME.firstNth;
+  const fng = geoOf(FN, X0, y(TOP) + listingHeight(FN.lines.length, SIZE) + h(22), h, { rowH: 50 });
+  const fc = FN.cols.indexOf("first");
+  const nc = FN.cols.indexOf("third");
+  const nulls = FN.rows.flatMap((r, i) => (r[nc] === "null" ? [i] : []));
+  const nth = FN.rows.findIndex((r) => r[nc] !== "null");
 
   return (
     <AbsoluteFill>
@@ -109,7 +124,7 @@ export const FrameScene: React.FC = () => {
       <Sfx name="el-pop" at={realAt} level={-32} />
 
       <Drift from={from} to={end + 40}>
-        {/* On the bridge to the next scene the takeaway is marked, then the page clears. */}
+        {/* On the bridge to the next scene the takeaway is marked; the page clears into the cut. */}
         <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={q7At - 4} size={60}>
           What is a window frame, and how do <QMono>ROWS</QMono> and <QMono>RANGE</QMono> differ?
@@ -140,6 +155,8 @@ export const FrameScene: React.FC = () => {
           g={pg}
           out={out78}
           steps={[
+            // The definition: the rows up to the current one, which gets the dot.
+            { at: sliceAt + 4, from: 0, to: 1 },
             { at: hundredAt - 2, from: 0, to: 0 },
             { at: threeFiftyAt - 2, from: 0, to: 1 },
             { at: fourTwentyFiveAt - 2, from: 0, to: 2 },
@@ -158,7 +175,10 @@ export const FrameScene: React.FC = () => {
           size={SIZE}
           at={rowsAt0 - 4}
           out={rangeAt - 2}
-          marks={[{ line: 2, at: rowsAt0 + 6 }]}
+          marks={[
+            { line: 2, at: rowsAt0 + 6, out: tieAt - 2 },
+            { line: 1, at: tieAt },
+          ]}
         />
         <Listing
           lines={FRAME.range.lines}
@@ -201,9 +221,23 @@ export const FrameScene: React.FC = () => {
             { row: 0, col: tc, at: hundredAt, out: rangeAt },
             { row: 1, col: tc, at: threeFiftyAt, out: rangeAt },
             { row: 2, col: tc, at: fourTwentyFiveAt, out: rangeAt },
-            ...peers.map((row, k) => ({ row, col: tc, at: bothAt + k * 4 })),
+            ...peers.map((row, k) => ({ row, col: tc, at: bothAt + k * 4, out: noFrameAt - 2 })),
+            ...peers.map((row, k) => ({ row, col: tc, at: tiedAt + 4 + k * 4 })),
           ]}
         />
+        <Note at={tieAt + 6} x={rg.right + 30} y={rg.rowTop(1) + h(8)} out={rangeAt - 2}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <QMono>id</QMono> breaks the tie: payment {R.rows[peers[0]][0]}, then {R.rows[peers[1]][0]}
+          </span>
+        </Note>
+        <Note at={tiedAt + 4} x={rg.right + 30} y={rg.rowTop(1) + h(8)} out={leaveOutAt - 2}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>tied days share one total</span>
+        </Note>
+        <Note at={writeAt} x={rg.right + 30} y={rg.rowTop(1) + h(50)} out={leaveOutAt - 2}>
+          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
+            row by row: <QMono>ROWS</QMono> and a unique <QMono>ORDER BY</QMono>
+          </span>
+        </Note>
         {/* No ORDER BY: a second result, every total the partition's. */}
         <DataTable
           g={rg}
@@ -226,15 +260,16 @@ export const FrameScene: React.FC = () => {
         </Note>
 
         {/* ── Question 8: LAST_VALUE, with the default frame and widened ── */}
-        <Listing lines={LD.lines} x={X0} top={y(TOP)} width={820} size={SIZE} at={q8At + 6} marks={[{ line: 1, at: endsAt }]} />
+        <Listing lines={LD.lines} x={X0} top={y(TOP)} width={820} size={SIZE} at={q8At + 6} out={firstAt - 2} marks={[{ line: 1, at: endsAt }]} />
         <DataTable
           g={ldg}
           cols={colsOf(LD, { last: { ink: BLUE_INK } })}
           at={q8At + 10}
+          out={firstAt - 2}
           rows={rowsAt(LD.rows, q8At + 14)}
           marks={LD.rows.map((_, row) => ({ row, col: lc, at: ownAt + row * 3, color: MARK_BAD }))}
         />
-        <Note at={ownAt + 8} x={ldg.right + 24} y={ldg.rowTop(1)}>
+        <Note at={ownAt + 8} x={ldg.right + 24} y={ldg.rowTop(1)} out={firstAt - 2}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>each row&apos;s own amount</span>
         </Note>
         <Listing lines={LW.lines} x={1000} top={y(TOP)} width={800} size={SIZE} at={widenAt - 4} marks={[{ line: 2, at: widenAt + 6, color: MARK_OK }, { line: 3, at: widenAt + 10, color: MARK_OK }]} />
@@ -244,6 +279,30 @@ export const FrameScene: React.FC = () => {
           at={widenAt + 6}
           rows={rowsAt(LW.rows, widenAt + 10)}
           marks={LW.rows.map((_, row) => ({ row, col: lc, at: realAt + row * 3, color: MARK_OK }))}
+        />
+        {/* FIRST_VALUE is right on every row; NTH_VALUE waits for its row. */}
+        <Listing
+          lines={FN.lines}
+          x={X0}
+          top={y(TOP)}
+          width={820}
+          size={SIZE}
+          at={firstAt - 2}
+          marks={[
+            { line: 1, at: firstAt + 6, out: nullAt - 2, color: MARK_OK },
+            { line: 2, at: nullAt },
+          ]}
+        />
+        <DataTable
+          g={fng}
+          cols={colsOf(FN, { first: { ink: BLUE_INK }, third: { ink: BLUE_INK } })}
+          at={firstAt + 2}
+          rows={rowsAt(FN.rows, firstAt + 6)}
+          marks={[
+            ...FN.rows.map((_, row) => ({ row, col: fc, at: firstAt + 14 + row * 3, color: MARK_OK })),
+            ...nulls.map((row, k) => ({ row, col: nc, at: nullAt + 4 + k * 3 })),
+            ...(nth < 0 ? [] : [{ row: nth, col: nc, at: reachesAt + 2 }]),
+          ]}
         />
         <Note at={realAt + 8} x={1000} y={lwg.rowTop(LW.rows.length) + h(20)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>

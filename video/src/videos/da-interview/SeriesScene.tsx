@@ -6,7 +6,7 @@ import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, no
 import { NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { BANK, PARTS, QUESTIONS } from "./data";
+import { BANK, CHALLENGE_PAGES, PARTS, QUESTIONS, TOPIC_PAGES } from "./data";
 import { Drift, Headline, Hero, Kicker, X0 } from "./parts";
 
 const COLS = 4;
@@ -16,12 +16,16 @@ const GRID_Y = 300;
 const CARD_H = 196;
 const ROW_GAP = 26;
 const ART = 132;
+/** Where a card's count sits: under a title of two lines (label 24, gap 6,
+ *  two title lines of 31, gap 8, from the text's top at 26). */
+const COUNT_TOP = 126;
 
 /**
  * The series as a grid of its eight topic videos, each with its own
  * watercolor hero and its question count, inking in along the track; then
- * the total, the practice every page carries, and the bridge into Part 1,
- * whose card lights up.
+ * the total (each question answered once, so a card's count is not its
+ * page's), the practice the pages carry, and the bridge into Part 1, whose
+ * card lights up.
  */
 export const SeriesScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -29,16 +33,16 @@ export const SeriesScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("series").from;
-  const followsAt = n.word("series", "follows the track");
   const pageAt = n.word("series", "one video per topic page");
   const totalAt = n.word("series", "a hundred and fifty-six questions");
-  const worksAt = n.word("series", "works through the questions");
-  const practiceAt = n.word("practice", "practice of its own");
+  const onceAt = n.word("series", "each answered once");
+  const worksAt = n.word("series-how", "works through the questions");
+  const practiceAt = n.word("practice", "every page");
   const checksAt = n.word("practice", "concept checks");
   const runnableAt = n.word("practice", "runnable challenges");
-  const bankAt = n.word("practice", "a hundred and ten");
+  const bankAt = n.word("practice", "a bank");
   const nextAt = n.word("next", "Next");
-  const screenAt = n.word("next", "the same screen");
+  const screenAt = n.word("next", "the series starts there");
   const end = n.beat("next").to;
 
   const cardX = (i: number) => X0 + (i % COLS) * (CARD_W + GAP);
@@ -56,7 +60,7 @@ export const SeriesScene: React.FC = () => {
 
       <Drift from={from} to={end + 40} scale={0.015}>
         <Kicker at={from}>The series</Kicker>
-        <Headline lead="Eight videos," turn="one per topic page." at={followsAt - 2} turnAt={pageAt} size={64} />
+        <Headline lead="Eight videos," turn="one per topic page." at={from + 2} turnAt={pageAt} size={64} />
 
         {PARTS.map((p, i) => {
           const pIn = ease(frame, inAt(i) - 2, 14);
@@ -83,7 +87,11 @@ export const SeriesScene: React.FC = () => {
                 <div style={{ position: "absolute", left: ART + 32, top: 26, right: 20 }}>
                   <div style={{ ...label(20, BLUE_INK), ...TABULAR }}>Part {p.n}</div>
                   <div style={{ ...note(27, INK), fontWeight: 650, marginTop: 6, lineHeight: 1.15 }}>{p.title}</div>
-                  <div style={{ ...note(22, INK_SOFT), marginTop: 8, ...TABULAR }}>{p.questions} questions</div>
+                </div>
+                {/* Its own line, where a two-line title leaves it, so every
+                    count in a row shares a baseline. */}
+                <div style={{ position: "absolute", left: ART + 32, top: COUNT_TOP, ...note(22, INK_SOFT), ...TABULAR }}>
+                  {p.questions} questions
                 </div>
               </div>
               <Hero video={p.video} id={p.hero} at={inAt(i)} left={cardX(i) + 14} top={cardY(i) + (h(CARD_H) - ART) / 2} width={ART} height={ART} dim={i === 0 ? undefined : screenAt} />
@@ -95,7 +103,7 @@ export const SeriesScene: React.FC = () => {
           style={{
             position: "absolute",
             right: 1920 - (cardX(COLS - 1) + CARD_W),
-            top: y(GRID_Y) - h(62),
+            top: y(GRID_Y) - h(98),
             ...label(24, INK),
             ...TABULAR,
             opacity: ease(frame, totalAt - 2, 12) * (1 - ease(frame, screenAt, 16) * 0.5),
@@ -106,24 +114,40 @@ export const SeriesScene: React.FC = () => {
         <div
           style={{
             position: "absolute",
+            right: 1920 - (cardX(COLS - 1) + CARD_W),
+            top: y(GRID_Y) - h(62),
+            ...note(22, INK_SOFT),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, onceAt - 2, 12) * (1 - ease(frame, screenAt, 16) * 0.5),
+          }}
+        >
+          each answered once, in the video of the page it belongs to
+        </div>
+        <div
+          style={{
+            position: "absolute",
             left: X0,
             top: practiceY,
             ...note(28, INK),
             whiteSpace: "nowrap",
-            ...TABULAR,
             opacity: ease(frame, worksAt - 2, 12) * (1 - ease(frame, practiceAt - 4, 10)),
           }}
         >
           Each video: the questions that need a figure, then the rest, quickly.
         </div>
-        <div style={{ position: "absolute", left: X0, top: practiceY, ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
-          <span style={{ opacity: ease(frame, practiceAt, 12) }}>On every page: </span>
-          <span style={{ opacity: ease(frame, checksAt - 2, 10) }}>concept checks · </span>
-          <span style={{ opacity: ease(frame, runnableAt - 2, 10) }}>runnable challenges · </span>
-          <span style={{ opacity: ease(frame, bankAt - 2, 10), fontWeight: 650 }}>{BANK} multiple-choice questions</span>
+        <div style={{ position: "absolute", left: X0, top: practiceY, ...note(28, INK), whiteSpace: "nowrap" }}>
+          <span style={{ opacity: ease(frame, practiceAt, 12) }}>Every page: </span>
+          <span style={{ opacity: ease(frame, checksAt - 2, 10) }}>concept checks</span>
+          <span style={{ opacity: ease(frame, runnableAt - 2, 10) }}>
+            {" · "}
+            {CHALLENGE_PAGES} of {TOPIC_PAGES} pages: runnable challenges
+          </span>
+        </div>
+        <div style={{ position: "absolute", left: X0, top: practiceY + h(44), ...note(28, INK), whiteSpace: "nowrap", opacity: ease(frame, bankAt - 2, 10) }}>
+          A bank of <span style={{ fontWeight: 650 }}>{BANK} multiple-choice questions</span>, across the track
         </div>
 
-        <NextLine at={nextAt} x={X0} y={practiceY + h(70)} width={1000}>
+        <NextLine at={nextAt} x={X0} y={practiceY + h(114)} width={1000}>
           SQL
         </NextLine>
       </Drift>

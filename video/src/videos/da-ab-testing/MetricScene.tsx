@@ -193,7 +193,7 @@ export const MetricScene: React.FC = () => {
             </div>
           );
         })}
-        <Axes x={xs} y={ys} xTicks={[0, 3, 6, 9, 11]} xFormat={(v) => DRIFT.months[v]} yTicks={[0, 200, 400, 600]} yTitle="active users" at={threeAt - 6} out={out1} />
+        <Axes x={xs} y={ys} xTicks={[0, 3, 6, 9, 11]} xFormat={(v) => DRIFT.months[v]} yTicks={[0, 200, 400]} yTitle="active users" at={threeAt - 6} out={out1} />
         {DRIFT.definitions.map((d, i) => (
           <React.Fragment key={d.key}>
             <Line points={d.values.map((v, m) => [m, v] as const)} x={xs} y={ys} at={drawAt(i)} dur={30} out={out1} color={SERIES[i]} width={3.4} />

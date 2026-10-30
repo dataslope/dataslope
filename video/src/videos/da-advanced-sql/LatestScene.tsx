@@ -3,9 +3,9 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { QMono } from "../../editorial/interview";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LATEST } from "./data";
@@ -27,13 +27,18 @@ import {
 
 const TOP = 330;
 const RESULT_X = 900;
-const CHART = { x0: 520, x1: 860, base: 700, top: 560 };
-const SPINE_SIZE = 17;
-const SPINE_RESULT_X = 1490;
+/** The spine's listing, its result, and the chart under the listing, clear
+ *  of the note under the days without a spine. */
+const SPINE_X = 720;
+const SPINE_W = 630;
+const SPINE_SIZE = 19;
+const SPINE_RESULT_X = 1380;
+const CHART = { x0: 790, x1: 1290, base: 800, top: 660 };
 
 /**
  * Questions 11 and 12. The video's own plan changes, numbered newest first
- * per user: rows after the first are struck, and user 1 keeps only "team".
+ * per user: rows after the first are struck, and user 1 keeps only "team";
+ * the listing then becomes the query that keeps them, the filter outside.
  * Then the page's March sales, which skip the 2nd and the 5th: on their own
  * those days are missing and a line chart draws straight over them; joined
  * onto a generated spine of days they come back as zeros.
@@ -52,6 +57,8 @@ export const LatestScene: React.FC = () => {
   const keepAt = n.word("latest", "keep row one");
   const threeAt = n.word("latest", "User one has three rows");
   const teamAt = n.word("latest", "team, survives");
+  const tieAt = n.word("latest-tie", "A tie on the timestamp");
+  const maxAt = n.word("latest-tie", "Group by with max");
   const q12At = n.word("spine", "Question twelve");
   const q12TextAt = n.word("spine", "How do you fill gaps");
   const skipAt = n.word("spine", "skip the second and the fifth");
@@ -60,7 +67,8 @@ export const LatestScene: React.FC = () => {
   const generateAt = n.word("spine-fix", "Generate every day");
   const joinAt = n.word("spine-fix", "left join the sales onto it");
   const zerosAt = n.word("spine-fix", "into zeros with coalesce");
-  const end = n.beat("spine-fix").to;
+  const calendarAt = n.word("spine-calendar", "use a calendar table");
+  const end = n.beat("spine-calendar").to;
 
   // ── Question 11 ──
   const R = LATEST.ranked;
@@ -70,6 +78,11 @@ export const LatestScene: React.FC = () => {
   const firsts = R.rows.flatMap((r, i) => (r[rn] === "1" ? [i] : []));
   const userOne = R.rows.flatMap((r, i) => (r[user] === "1" ? [i] : []));
   const out11 = q12At - 4;
+  // On "keep row one" the listing becomes the statement that keeps it: the
+  // numbering in a CTE, the filter outside it.
+  const K = LATEST.kept;
+  const kNote = y(TOP) + listingHeight(K.lines.length, 21);
+  const lineOf = (lines: readonly string[], text: string) => lines.findIndex((l) => l.includes(text));
 
   // ── Question 12 ──
   const W = LATEST.without;
@@ -104,7 +117,20 @@ export const LatestScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── Question 11: number from the newest, keep row one ── */}
-        <Listing lines={R.lines} x={X0} top={y(TOP)} width={720} size={21} at={asked - 6} out={out11} marks={[{ line: 2, at: numberAt + 4 }]} />
+        <Listing lines={R.lines} x={X0} top={y(TOP)} width={720} size={21} at={asked - 6} out={keepAt - 2} marks={[{ line: 2, at: numberAt + 4 }]} />
+        <Listing
+          lines={K.lines}
+          x={X0}
+          top={y(TOP)}
+          width={720}
+          size={21}
+          at={keepAt - 2}
+          out={out11}
+          marks={[
+            { line: lineOf(K.lines, "ORDER BY updated_at"), at: keepAt - 2 },
+            { line: lineOf(K.lines, "WHERE rn = 1"), at: keepAt + 14, color: MARK_OK },
+          ]}
+        />
         <DataTable
           g={rg}
           cols={colsOf(R, { rn: { ink: BLUE_INK } })}
@@ -122,9 +148,19 @@ export const LatestScene: React.FC = () => {
           ]}
           marks={R.rows.map((_, row) => ({ row, col: rn, at: numberAt + 6 + row * 2, out: keepAt + 4 }))}
         />
-        <Note at={keepAt} x={X0} y={y(TOP) + listingHeight(R.lines.length, 21) + h(30)} out={out11}>
+        <Note at={keepAt + 16} x={X0} y={kNote + h(30)} out={out11}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            then keep <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: OK_INK }}>WHERE rn = 1</span>
+            keep <QMono>rn = 1</QMono> in an outer query, or with <QMono>QUALIFY</QMono>
+          </span>
+        </Note>
+        <Note at={tieAt} x={X0} y={kNote + h(76)} out={out11}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            a tie on <QMono>updated_at</QMono> needs a tiebreaker too
+          </span>
+        </Note>
+        <Note at={maxAt} x={X0} y={kNote + h(116)} out={out11}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <QMono>GROUP BY</QMono> with <QMono>MAX</QMono>: the newest date, but not its plan
           </span>
         </Note>
         <Note at={teamAt + 4} x={rg.right + 24} y={rg.rowTop(0) + 8} out={out11}>
@@ -145,9 +181,9 @@ export const LatestScene: React.FC = () => {
             <text
               key={r[0]}
               x={cx(i)}
-              y={y(CHART.base) + 24}
+              y={y(CHART.base) + 28}
               textAnchor="middle"
-              style={{ ...label(17, zeros.includes(i) ? ACCENT_INK : INK_SOFT), fontVariantNumeric: "tabular-nums" }}
+              style={svgText({ ...label(19, zeros.includes(i) ? ACCENT_INK : INK_SOFT), fontVariantNumeric: "tabular-nums" })}
             >
               Mar {Number(r[0].slice(8))}
             </text>
@@ -165,9 +201,9 @@ export const LatestScene: React.FC = () => {
         {/* The spine: every day, generated, with the sales left-joined on. */}
         <Listing
           lines={S.lines}
-          x={RESULT_X}
+          x={SPINE_X}
           top={y(TOP)}
-          width={570}
+          width={SPINE_W}
           size={SPINE_SIZE}
           at={generateAt - 4}
           marks={[
@@ -185,6 +221,9 @@ export const LatestScene: React.FC = () => {
         />
         <Note at={zerosAt + 8} x={SPINE_RESULT_X} y={sg.rowTop(S.rows.length) + h(16)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap", ...TABULAR }}>back, as 0</span>
+        </Note>
+        <Note at={calendarAt - 2} x={SPINE_RESULT_X} y={sg.rowTop(S.rows.length) + h(60)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>other engines: a calendar table</span>
         </Note>
       </Drift>
     </AbsoluteFill>

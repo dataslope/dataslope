@@ -51,13 +51,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     flowers): Gini 0.5 at the root; the best cut, petal width 1.75 (the
  *     one scikit-learn's own tree picks from all four measurements), leaves
  *     49 and 5 on one side, 1 and 45 on the other, a weighted 0.110.
+ *     Scored by entropy instead (information gain), the sweep bottoms out
+ *     at the same 1.75, and so does scikit-learn's entropy tree.
  *   - "bag", the video's own sixty points from a sine with noise (sd 0.35),
  *     tested on 2,000 more: one deep tree's test error is 0.262; two hundred
  *     bagged trees, 0.180; boosting with depth-2 trees, 0.558 after one,
- *     0.212 after ten and 0.175 after a hundred.
+ *     0.212 after ten and 0.175 after a hundred, about level with bagging
+ *     (the noise alone costs 0.122). Test error is mean squared error.
  *   - "forest", the breast cancer set again, 171 tumors held out: one tree
  *     90.6%, three hundred bagged trees 93.0%, a forest of three hundred
- *     trying 5 of the 30 features at each split 95.3%. AdaBoost by hand,
+ *     trying 5 of the 30 features at each split (about the square root of 30,
+ *     the default for classification) 95.3%. AdaBoost by hand,
  *     with stumps, on 24 moons: after three rounds the heaviest point
  *     carries 35 times the weight of the lightest.
  *   - "kmeans", the page's own three blobs (300 points): from three starting
@@ -65,7 +69,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the page's inertia of 566.9 (from 20,402 at one cluster); the
  *     silhouette peaks at three clusters, at 0.848.
  *   - "pca", the page's own scaled iris: 73.0%, 22.9%, 3.7% and 0.5% of the
- *     variance, 95.8% in two. The curse: a thousand uniform points, twenty
+ *     variance, 95.8% in two (96% as said and shown); component 1 is
+ *     0.58 petal length + 0.56 petal width + 0.52 sepal length - 0.27 sepal
+ *     width (scaled), and the share of a cube within 0.1 of its surface,
+ *     1 - 0.8^d, is 36% in two dimensions and 89% in ten. The curse: a thousand uniform points, twenty
  *     queries each; the nearest neighbor's distance over the farthest's is
  *     0.017 in two dimensions and 0.894 in a thousand.
  *   - "shap", the video's own made-up churn table (1,500 customers: plan,
@@ -73,11 +80,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     impurity importance gives the ID 40% and the plan 10%; exact Shapley
  *     values (brute force over all sixteen subsets of four features, against
  *     a hundred background rows; the SHAP library is not in Pyodide) rank
- *     the plan first and the ID last. The customer shown: 0.503 on average,
+ *     the plan first and the ID last, but still give the ID 13% of the
+ *     total. Permutation importance on the 450 held-out rows (accuracy lost
+ *     when a feature is shuffled) gives the plan 53% of the total and the
+ *     ID 7%. The customer shown: 0.503 on average,
  *     +0.183 for the monthly plan, -0.217 for 56 months, 0.475 in all.
  *   - quick: KNN on scikit-learn's wine set scores 69.1% unscaled and
  *     94.9% standardized (five-fold), a tree 88.8% both ways; the page's
- *     one-hot colors; RFE keeps five of the thirty tumor features.
+ *     one-hot colors; RFE, asked for five of the thirty tumor features, keeps mean radius,
+ *     texture error, worst radius, worst compactness and worst concavity.
  *
  * Written for Drew's ear: numbers as they are said, "KNN" spelled, and
  * every abbreviation spelled and expanded the first time.
@@ -106,7 +117,11 @@ export const script: NarrationScript = {
     {
       id: "logit",
       scene: true,
-      text: "Question one. What is logistic regression, and how does it output probabilities? It adds up the features into a score, the log odds, then passes that score through the sigmoid, which squeezes any number into the range zero to one.",
+      text: "Question one. What is logistic regression, and how does it output probabilities?",
+    },
+    {
+      id: "logit-how",
+      text: "It weights the features and adds them up into a score, the log odds, then passes that score through the sigmoid, which squeezes any number into the range zero to one.",
       pauseAfter: 0.6,
     },
     {
@@ -116,7 +131,15 @@ export const script: NarrationScript = {
     },
     {
       id: "linear",
-      text: "Question two. Why not linear regression for a binary target? Fit a straight line to the same zeros and ones, and it leaves the range: below zero for sixty tumors, above one for thirty-five. At a radius of twenty-eight, it predicts one point seven six, which no probability can be. Logistic regression stays inside, and it's fitted by maximum likelihood.",
+      text: "Question two. Why not linear regression for a binary target? Fit a straight line to the same zeros and ones, and it leaves the range: below zero for sixty tumors, above one for thirty-five. At a radius of twenty-eight, it predicts one point seven six, which no probability can be.",
+    },
+    {
+      id: "linear-var",
+      text: "And its errors can't have the constant variance that least squares assumes.",
+    },
+    {
+      id: "linear-ml",
+      text: "Logistic regression stays inside, and it's fitted by maximum likelihood.",
       pauseAfter: 0.7,
     },
     { id: "tree-in", text: "Next, the model that cuts in steps." },
@@ -130,7 +153,15 @@ export const script: NarrationScript = {
     },
     {
       id: "tree-gini",
-      text: "Here are a hundred iris flowers, two species, half and half. Gini impurity, the chance that two flowers picked at random differ, starts at point five. Slide a cut along petal width. At one point seven five, one side is forty-nine to five, the other one to forty-five, and the weighted impurity falls to point one one, the lowest of any cut. Then the tree repeats this on each side, until a stopping rule, like a maximum depth.",
+      text: "Here are a hundred iris flowers, two species, half and half. Gini impurity, the chance that two flowers picked at random differ, starts at point five. Slide a cut along petal width. At one point seven five, one side is forty-nine to five, the other one to forty-five, and the weighted impurity falls to point one one, the lowest of any cut.",
+    },
+    {
+      id: "tree-measures",
+      text: "Entropy, the measure behind information gain, picks the same cut here. A regression tree picks the cut that shrinks the variance most.",
+    },
+    {
+      id: "tree-stop",
+      text: "Then the tree repeats this on each side, until a stopping rule, like a maximum depth.",
       pauseAfter: 0.7,
     },
     { id: "bag-in", text: "One tree is quick to read, and quick to overreact. So, many trees." },
@@ -144,7 +175,11 @@ export const script: NarrationScript = {
     },
     {
       id: "boost",
-      text: "Boosting trains small models one after another, each fitted to what the ones before it still get wrong. After one tree the fit is crude, after ten it's close, and after a hundred, test error is point one seven five. Boosting cuts bias. It's often the more accurate of the two, but it can overfit noisy data, where bagging holds up.",
+      text: "Boosting trains small models one after another, each fitted to what the ones before it still get wrong. After one tree the fit is crude, after ten it's close, and after a hundred, test error is point one seven five. Boosting cuts bias.",
+    },
+    {
+      id: "boost-noise",
+      text: "On this wave, the two end up about level. In general, boosting is often the more accurate, but it can overfit noisy data, where bagging holds up.",
       pauseAfter: 0.7,
     },
 
@@ -152,12 +187,28 @@ export const script: NarrationScript = {
     {
       id: "forest",
       scene: true,
-      text: "Question five. How does a random forest work? It's bagged trees with one more twist: at every split, a tree may only look at a random handful of features, here five of thirty. The trees stop all making the same cuts, so their mistakes overlap less, and the average gains more. On a hundred seventy-one held-out tumors, one tree scores ninety point six percent, bagged trees ninety-three, and the forest ninety-five point three.",
+      text: "Question five. How does a random forest work? It's bagged trees with one more twist: at every split, a tree may only look at a random handful of features, here five of thirty.",
+    },
+    {
+      id: "forest-sqrt",
+      text: "The usual default is about the square root of the feature count.",
+    },
+    {
+      id: "forest-why",
+      text: "The trees stop all making the same cuts, so their mistakes overlap less, and the average gains more. On a hundred seventy-one held-out tumors, one tree scores ninety point six percent, bagged trees ninety-three, and the forest ninety-five point three.",
       pauseAfter: 0.7,
     },
     {
       id: "ada",
-      text: "Question six. How does gradient boosting differ from AdaBoost? Gradient boosting fits each new tree to the gradient of the loss, the residuals for squared error, so any differentiable loss will do. AdaBoost, short for adaptive boosting, re-weights the data instead: after every round, the points it got wrong count for more. After three rounds, this point carries thirty-five times the weight of the easiest ones. AdaBoost turns out to be gradient boosting with an exponential loss.",
+      text: "Question six. How does gradient boosting differ from AdaBoost?",
+    },
+    {
+      id: "gb",
+      text: "Gradient boosting fits each new tree to the negative gradient of the loss, called the pseudo-residuals. For squared error, they're just the residuals, but any differentiable loss will do.",
+    },
+    {
+      id: "adaboost",
+      text: "AdaBoost, short for adaptive boosting, re-weights the data instead: after every round, the points it got wrong count for more. After three rounds, this point carries thirty-five times the weight of the easiest ones. AdaBoost turns out to be gradient boosting with an exponential loss.",
       pauseAfter: 0.7,
     },
     { id: "knn-in", text: "Back to the border that bent with the data." },
@@ -185,7 +236,15 @@ export const script: NarrationScript = {
     },
     {
       id: "kmeans-k",
-      text: "It minimizes the within-cluster sum of squares, which always falls as k grows, so look for the elbow. Here it drops from twenty thousand at one cluster to five sixty-seven at three, then barely moves. The silhouette score, how much nearer each point sits to its own cluster than to the next, peaks at three as well. And run several starts, or k-means plus plus, because a bad start can settle in the wrong place.",
+      text: "It minimizes the within-cluster sum of squares, which always falls as k grows, so look for the elbow. Here it drops from twenty thousand at one cluster to five sixty-seven at three, then barely moves. The silhouette score, how much nearer each point sits to its own cluster than to the next, peaks at three as well.",
+    },
+    {
+      id: "kmeans-limits",
+      text: "It assumes round clusters of similar size, and outliers drag the means toward them.",
+    },
+    {
+      id: "kmeans-starts",
+      text: "And run several starts, or k-means plus plus, because a bad start can settle in the wrong place.",
       pauseAfter: 0.7,
     },
     { id: "pca-in", text: "More features bring trouble of their own." },
@@ -219,6 +278,10 @@ export const script: NarrationScript = {
     {
       id: "shap-values",
       text: "SHAP splits each prediction fairly among the features, using game theory. This customer starts from the average, point five oh. The monthly plan adds point one eight, fifty-six months of tenure takes away point two two, and the other two bring it to point four seven five. Averaged over customers, SHAP ranks the plan first and the ID last.",
+    },
+    {
+      id: "shap-perm",
+      text: "It still gives the ID thirteen percent, because SHAP explains the model, and this forest does use the ID. To ask whether a feature helps on new customers, shuffle it on held-out rows and measure how much accuracy drops. That's permutation importance, and it gives the ID seven percent, the plan fifty-three.",
       pauseAfter: 0.8,
     },
 
@@ -234,6 +297,10 @@ export const script: NarrationScript = {
       text: "A discriminative model learns the probability of the label given the input, like logistic regression. A generative model learns how the inputs are spread within each class, like naive Bayes, then classifies with Bayes' theorem. It can generate data, and it copes better with few labels.",
     },
     {
+      id: "r-gen-more",
+      text: "With plenty of labels, discriminative models usually win.",
+    },
+    {
       id: "r-scale",
       text: "Scale features for anything built on distances or gradient descent: KNN, k-means, support vector machines and linear models. On the wine data, KNN goes from sixty-nine percent to ninety-five once the features are standardized. A tree scores eighty-nine either way.",
     },
@@ -243,7 +310,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-select",
-      text: "And feature selection comes in three kinds. Filters score each feature on its own. Wrappers, like recursive feature elimination, try subsets with a model. Embedded methods select while training, like the lasso. Here, recursive elimination keeps five of the thirty tumor features.",
+      text: "And feature selection comes in three kinds. Filters score each feature on its own. Wrappers, like recursive feature elimination, try subsets with a model. Embedded methods select while training, like the lasso.",
+    },
+    {
+      id: "r-select-rfe",
+      text: "Asked for five of the thirty tumor features, recursive elimination keeps these.",
       pauseAfter: 0.9,
     },
     {

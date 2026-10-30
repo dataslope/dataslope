@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { WHERE } from "./data";
-import { Drift, ElbowArrow, Listing, MARK_OK, Mono, X0 } from "./parts";
+import { Drift, ElbowArrow, Listing, Mark, MARK_OK, Mono, X0 } from "./parts";
 
 const SIZE = 24;
 const LIST_Y = 300;
@@ -37,10 +37,12 @@ const STEPS = [
 const stepOf = (line: string) => STEPS.findIndex((s) => line.startsWith(s.clause.split(",")[0]));
 
 /**
- * Question 2, the order a query runs in. The page's query as it is written,
- * each line badged with where it runs; the run order as a list of steps; and
- * the page's 24 orders going through the first four steps (24 rows, 11, 4
- * groups, 2). Then why WHERE can't see a SELECT alias and ORDER BY can.
+ * Question 2, the order a query runs in, logically. The page's query as it is
+ * written, each line badged with where it runs; the run order as a list of
+ * steps, and the note that the engine may do the work in another order so
+ * long as the answer matches; and the page's 24 orders going through the
+ * first four steps (24 rows, 11, 4 groups, 2). Then why WHERE can't see a
+ * SELECT alias and ORDER BY can.
  */
 export const OrderScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -49,9 +51,11 @@ export const OrderScene: React.FC = () => {
 
   const from = n.beat("order").from;
   const qAt = n.word("order", "Question");
-  const textAt = n.word("order", "In what order");
   const notAt = n.word("order-list", "Not the order");
   const stepAt = STEPS.map((s) => n.word("order-list", s.word));
+  const logicalAt = n.word("order-logical", "logical order");
+  const engineAt = n.word("order-logical", "The engine");
+  const matchAt = n.word("order-logical", "has to match");
   const watchAt = n.word("order-demo", "Watch");
   const elevenAt = n.word("order-demo", "eleven");
   const fourAt = n.word("order-demo", "four regions");
@@ -67,9 +71,10 @@ export const OrderScene: React.FC = () => {
   // The funnel has been read by the time the aliases need its room.
   const funnelOut = ease(frame, aliasAt - 4, 14);
 
-  // The page's orders, in the page's order; WHERE keeps the ones of 100 or more.
+  // The page's orders, in the page's order; WHERE keeps the ones over 100.
   const amounts = WHERE.orders.rows.map((r) => Number(r[1]));
-  const big = amounts.map((a) => a >= 100);
+  const big = amounts.map((a) => a > 100);
+  if (big.filter(Boolean).length !== WHERE.bigRows) throw new Error("the funnel's WHERE disagrees with check.mjs");
   // Region groups after WHERE, and the two HAVING keeps.
   const groups = WHERE.bigGroups.rows.map((r) => ({ region: r[0], orders: Number(r[1]), revenue: r[2] }));
   const keptGroups = new Set(WHERE.both.rows.map((r) => r[0]));
@@ -87,8 +92,10 @@ export const OrderScene: React.FC = () => {
       <Sfx name="el-pencil" at={canAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={2} at={qAt - 4} textAt={Math.min(textAt - 4, qAt + 12)}>
-          In what order does a query actually run?
+        {/* The question inks in while "Question two" is said, so the cut does
+            not land on a kicker alone. */}
+        <QuestionCard n={2} at={qAt - 4} textAt={qAt + 6}>
+          In what order does a query run, logically?
         </QuestionCard>
 
         {/* ── The query as it is written, each line badged with its step ── */}
@@ -117,7 +124,7 @@ export const OrderScene: React.FC = () => {
           As you write it
         </Caption>
         <Caption at={stepAt[0] - 4} x={STEP_X} top={y(LIST_Y) - 40}>
-          As it runs
+          As it runs, logically
         </Caption>
 
         {/* ── The run order ── */}
@@ -129,6 +136,14 @@ export const OrderScene: React.FC = () => {
             </span>
           </Ink>
         ))}
+
+        {/* ── The logical order, not the engine's plan ── */}
+        <Note at={logicalAt - 2} x={STEP_X} y={rowY(STEPS.length) + h(10)}>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap", fontWeight: 650 }}>That&apos;s the logical order.</div>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, engineAt - 2, 10) }}>
+            The engine may plan the work differently, <Mark at={matchAt}>but the answer must match</Mark>.
+          </div>
+        </Note>
 
         {/* ── The page's orders, going through ── */}
         <div style={{ position: "absolute", inset: 0, opacity: 1 - funnelOut }}>

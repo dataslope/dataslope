@@ -61,20 +61,28 @@ const tickText = (size: number): React.CSSProperties => ({
   fontVariantNumeric: "tabular-nums",
 });
 
+/** A tick's text with a true minus sign. The ticks are set in tabular
+ *  figures, which give a hyphen-minus a digit's width: "-4" read "- 4". */
+const minus = (label: React.ReactNode): React.ReactNode => (typeof label === "string" ? label.replace(/-(?=[\d.])/g, "\u2212") : label);
+
 /**
  * A plot's frame: a baseline with ticks under it, a left axis with faint
  * dotted gridlines, and each axis's title. Scales are in page pixels (`y`
  * already through the layout). It draws itself on `at`.
+ *
+ * A tick format or a title may be a node rather than a string: <tspan>s for
+ * a superscript tick (10<tspan>¹⁰</tspan>), or a title that changes partway
+ * through a scene.
  */
 export const Axes: React.FC<{
   x: Scale;
   y: Scale;
   xTicks: readonly number[];
   yTicks?: readonly number[];
-  xFormat?: (v: number) => string;
-  yFormat?: (v: number) => string;
-  xTitle?: string;
-  yTitle?: string;
+  xFormat?: (v: number) => React.ReactNode;
+  yFormat?: (v: number) => React.ReactNode;
+  xTitle?: React.ReactNode;
+  yTitle?: React.ReactNode;
   at: number;
   out?: number;
   size?: number;
@@ -93,7 +101,7 @@ export const Axes: React.FC<{
           <g key={v}>
             <line x1={left} x2={x.b} y1={at(y, v)} y2={at(y, v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
             <text x={left - 14} y={at(y, v) + 7} textAnchor="end" style={tickText(size)}>
-              {yFormat(v)}
+              {minus(yFormat(v))}
             </text>
           </g>
         ))}
@@ -101,17 +109,19 @@ export const Axes: React.FC<{
           <g key={v}>
             <line x1={at(x, v)} x2={at(x, v)} y1={base + 1} y2={base + 7} stroke={INK} strokeWidth={1.2} />
             <text x={at(x, v)} y={base + 30} textAnchor="middle" style={tickText(size)}>
-              {xFormat(v)}
+              {minus(xFormat(v))}
             </text>
           </g>
         ))}
+        {/* A title is words: tabular figures would set its hyphens a digit
+            wide ("p - value"), so only the ticks take them. */}
         {xTitle ? (
-          <text x={x.b} y={base + 58} textAnchor="end" style={{ ...tickText(19), fontWeight: 650 }}>
+          <text x={x.b} y={base + 58} textAnchor="end" style={{ ...tickText(19), fontWeight: 650, fontVariantNumeric: "normal" }}>
             {xTitle}
           </text>
         ) : null}
         {yTitle ? (
-          <text x={left - 14} y={y.b - 26} textAnchor="start" style={{ ...tickText(19), fontWeight: 650 }}>
+          <text x={left - 14} y={y.b - 26} textAnchor="start" style={{ ...tickText(19), fontWeight: 650, fontVariantNumeric: "normal" }}>
             {yTitle}
           </text>
         ) : null}

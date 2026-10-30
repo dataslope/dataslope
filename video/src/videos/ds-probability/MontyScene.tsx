@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -34,9 +34,9 @@ export const MontyScene: React.FC = () => {
   const switchAt = n.word("monty-setup", "offers you the switch");
   const takeAt = n.word("monty-switch", "Take it");
   const thirdAt = n.word("monty-switch", "one time in three");
-  const neverAt = n.word("monty-switch", "never opens the car");
-  const twoThirdsAt = n.word("monty-switch", "the other two thirds");
-  const landAt = n.word("monty-switch", "land on the one door");
+  const neverAt = n.word("monty-host", "never opens the car");
+  const twoThirdsAt = n.word("monty-host", "the other two thirds");
+  const landAt = n.word("monty-host", "land on the one door");
   const gamesAt = n.word("monty-sim", "A hundred thousand games");
   const stayAt = n.word("monty-sim", "staying wins");
   const switchingAt = n.word("monty-sim", "switching sixty-seven");
@@ -93,7 +93,7 @@ export const MontyScene: React.FC = () => {
                   strokeWidth={2 + 2 * won}
                 />
                 <circle cx={x + 8 + (DOOR.w - 16) * (1 - 0.88 * isOpen) - 22} cy={doorTop + doorH / 2} r={7} fill={DATA} opacity={1 - isOpen} />
-                <text x={x + DOOR.w / 2} y={doorTop + doorH - 26} textAnchor="middle" style={{ ...label(26, INK), fontWeight: 700 }} opacity={1 - isOpen}>
+                <text x={x + DOOR.w / 2} y={doorTop + doorH - 26} textAnchor="middle" style={svgText({ ...label(26, INK), fontWeight: 700 })} opacity={1 - isOpen}>
                   {i + 1}
                 </text>
               </g>

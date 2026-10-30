@@ -18,6 +18,8 @@ const SIDE_X = 1180;
 /** The magnifier: the two means, a quarter of a point apart at most. */
 const ZOOM: Scale = { lo: 99.95, hi: 100.25, a: 1220, b: 1740 };
 const ZOOM_Y = 470;
+/** Both groups' standard deviation, as check.mjs draws them (normal, SD 15). */
+const SD = 15;
 
 /**
  * Question 15 on the Statistics course's challenge (seed 2024, the run
@@ -43,14 +45,16 @@ export const EffectScene: React.FC = () => {
   const smallAt = n.word("effect", "too small to matter");
   const reportAt = n.word("effect-report", "report the effect size");
   const intervalAt = n.word("effect-report", "with its interval");
-  const end = n.beat("effect-report").to;
+  const reverseAt = n.word("effect-small", "The reverse happens too");
+  const bigAt = n.word("effect-small", "a big effect can miss significance");
+  const end = n.beat("effect-small").to;
 
   const base = y(BASE);
-  const peak = normalPdf(100, 100, 15);
+  const peak = normalPdf(100, 100, SD);
   const curve = (mu: number) =>
     Array.from({ length: 121 }, (_, i) => {
       const v = XS.lo + i;
-      return [at(XS, v), base - (normalPdf(v, mu, 15) / peak) * h(HEIGHT)] as const;
+      return [at(XS, v), base - (normalPdf(v, mu, SD) / peak) * h(HEIGHT)] as const;
     });
   const muB = 100 + EFFECT.gap;
   const zp = ease(frame, leadsAt, 14);
@@ -71,7 +75,14 @@ export const EffectScene: React.FC = () => {
         <Note at={howBigAt} x={X0} y={y(300)}>
           <span style={{ ...noteText(26, INK) }}>how big a difference is, which a p-value doesn&apos;t say</span>
         </Note>
-        <Axes x={XS} y={{ lo: 0, hi: 1, a: base, b: base - h(HEIGHT) }} xTicks={[55, 70, 85, 100, 115, 130, 145]} at={usersAt - 4} size={19} />
+        <Axes
+          x={XS}
+          y={{ lo: 0, hi: 1, a: base, b: base - h(HEIGHT) }}
+          xTicks={[55, 70, 85, 100, 115, 130, 145]}
+          xTitle={`score (SD ${SD})`}
+          at={usersAt - 4}
+          size={19}
+        />
         <Curve points={curve(100)} at={usersAt} dur={26} color={INK_SOFT} width={3.2} />
         <Curve points={curve(muB)} at={usersAt + 8} dur={26} color={BAR} width={3.2} dash="10 7" />
         <Note at={usersAt + 6} x={at(XS, 112)} y={base - h(HEIGHT) + h(10)}>
@@ -85,7 +96,7 @@ export const EffectScene: React.FC = () => {
           {[100, 100.1, 100.2].map((v) => (
             <g key={v}>
               <line x1={at(ZOOM, v)} x2={at(ZOOM, v)} y1={y(ZOOM_Y)} y2={y(ZOOM_Y) + 7} stroke={INK} strokeWidth={1.2} />
-              <text x={at(ZOOM, v)} y={y(ZOOM_Y) + 30} textAnchor="middle" style={{ ...noteText(19, INK_SOFT), ...TABULAR }}>
+              <text x={at(ZOOM, v)} y={y(ZOOM_Y) + 30} textAnchor="middle" fill={INK_SOFT} style={{ ...noteText(19, INK_SOFT), ...TABULAR }}>
                 {fmt(v, 1)}
               </text>
             </g>
@@ -94,11 +105,11 @@ export const EffectScene: React.FC = () => {
           <line x1={at(ZOOM, muB)} x2={at(ZOOM, muB)} y1={y(ZOOM_Y) - h(80)} y2={y(ZOOM_Y)} stroke={BLUE_INK} strokeWidth={4} strokeDasharray="8 5" />
         </Svg>
         <Note at={leadsAt + 6} x={at(ZOOM, 100) - 10} y={y(ZOOM_Y) - h(122)} align="right">
-          <span style={{ ...noteText(22, INK_SOFT) }}>A</span>
+          <span style={{ ...noteText(22, INK_SOFT) }}>mean of A</span>
         </Note>
         <Note at={leadsAt + 6} x={at(ZOOM, muB) + 10} y={y(ZOOM_Y) - h(122)}>
-          <span style={{ ...noteText(22, BLUE_INK), ...TABULAR }}>
-            B, <Mark at={leadsAt + 10}>+{fmt(EFFECT.gap, 2)}</Mark>
+          <span style={{ ...noteText(22, BLUE_INK) }}>
+            mean of B, <Mark at={leadsAt + 10}><span style={TABULAR}>+{fmt(EFFECT.gap, 2)}</span></Mark>
           </span>
         </Note>
 
@@ -133,11 +144,20 @@ export const EffectScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={reportAt} x={X0} y={y(850)}>
+        <Note at={reportAt} x={X0} y={y(866)}>
           <span style={{ ...noteText(26, OK_INK) }}>
             report the effect size
             <span style={{ opacity: ease(frame, intervalAt - 2, 10) }}>, with its interval,</span> beside every p-value
           </span>
+        </Note>
+        <Note at={reverseAt} x={SIDE_X} y={y(806)}>
+          <div style={{ lineHeight: 1.4 }}>
+            <span style={{ ...noteText(22, INK_SOFT) }}>the reverse happens too:</span>
+            <br />
+            <span style={{ ...noteText(24, INK), opacity: ease(frame, bigAt - 2, 10) }}>
+              a <Mark at={bigAt + 6}>big effect</Mark> can miss significance in a small sample
+            </span>
+          </div>
         </Note>
       </Drift>
     </AbsoluteFill>

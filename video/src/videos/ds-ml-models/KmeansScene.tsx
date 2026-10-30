@@ -36,7 +36,7 @@ import {
   X0,
 } from "./parts";
 
-const PLOT = { left: X0 + 20, top: 340, width: 760, height: 500 };
+const PLOT = { left: X0 + 20, top: 340, width: 760, height: 476 };
 const XLIM: [number, number] = [-10.6, 8.2];
 const YLIM: [number, number] = [-10.6, 13];
 const CH_X = 1080;
@@ -55,10 +55,12 @@ const thousands = (v: number) => Math.round(v).toLocaleString("en-US");
 
 /**
  * Question 8 on the page's three blobs. Three centers dropped into one blob,
- * every point taking its nearest center's ink, the centers moving to their
- * points' means, and again until they stop: two jump across in the first
- * move, and the third pass settles. Then the elbow in the within-cluster sum
- * of squares, and the silhouette score peaking at the same k.
+ * every point taking its nearest center's ink, and each center's target (its
+ * points' mean) marked while the recipe is read. The moves themselves wait
+ * for the account of this run: two centers jump across on "two of them
+ * jump", and the third pass settles on "it settles". Then the elbow in the
+ * within-cluster sum of squares, the silhouette score peaking at the same k,
+ * and the method's limits under the run.
  */
 export const KmeansScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -71,10 +73,11 @@ export const KmeansScene: React.FC = () => {
   const placeAt = n.word("kmeans", "Place k centers");
   const assignAt = n.word("kmeans", "assign each point to the nearest");
   const moveAt = n.word("kmeans", "move each center to the mean");
-  const repeatAt = n.word("kmeans", "repeat until nothing moves");
   const startAt = n.word("kmeans", "all start in one group");
   const jumpAt = n.word("kmeans", "two of them jump");
   const settleAt = n.word("kmeans", "it settles");
+  const roundAt = n.word("kmeans-limits", "assumes round clusters");
+  const outlierAt = n.word("kmeans-limits", "outliers drag the means");
   const ssAt = n.word("kmeans-k", "the within-cluster sum of squares");
   const fallsAt = n.word("kmeans-k", "always falls as k grows");
   const elbowAt = n.word("kmeans-k", "look for the elbow");
@@ -84,8 +87,8 @@ export const KmeansScene: React.FC = () => {
   const silAt = n.word("kmeans-k", "The silhouette score");
   const nearerAt = n.word("kmeans-k", "how much nearer each point sits");
   const peaksAt = n.word("kmeans-k", "peaks at three as well");
-  const startsAt = n.word("kmeans-k", "run several starts");
-  const wrongAt = n.word("kmeans-k", "settle in the wrong place");
+  const startsAt = n.word("kmeans-starts", "run several starts");
+  const wrongAt = n.word("kmeans-starts", "settle in the wrong place");
   const troubleAt = n.word("pca-in", "More features");
   const clearAt = n.word("pca-in", "their own");
   const end = n.beat("pca-in").to;
@@ -98,9 +101,11 @@ export const KmeansScene: React.FC = () => {
   };
   const { x: sx, y: sy } = scales(box, XLIM, YLIM);
 
-  // Lloyd's algorithm, run through as the sentence describes it.
-  const recolor = [assignAt + 2, repeatAt, repeatAt + 22];
-  const moves = [moveAt + 2, repeatAt + 12];
+  // Lloyd's algorithm. The recipe plays over the first assignment, with
+  // each center's target marked; the moves are cued to the sentence that
+  // tells this run, so the jump is seen while it is described.
+  const moves = [jumpAt, settleAt - 20];
+  const recolor = [assignAt + 2, jumpAt + 16, settleAt - 4];
   const C = KMEANS.steps.map((s) => s.centroids);
   const centerAt = (j: number): [number, number] => {
     let [cx, cy] = C[0][j];
@@ -131,8 +136,8 @@ export const KmeansScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-sprinkle" at={placeAt - 4} level={-36} />
       <Sfx name="el-tap" at={placeAt + 2} level={-34} />
-      <Sfx name="el-whoosh" at={moveAt + 2} level={-36} />
-      <Sfx name="el-whoosh" at={repeatAt + 12} level={-37} />
+      <Sfx name="el-whoosh" at={moves[0]} level={-36} />
+      <Sfx name="el-whoosh" at={moves[1]} level={-37} />
       <Sfx name="el-chime" at={settleAt} level={-36} />
       <Sfx name="el-pencil" at={fallsAt} level={-35} />
       <Sfx name="el-pop" at={threeAt} level={-33} />
@@ -171,6 +176,25 @@ export const KmeansScene: React.FC = () => {
               out={recolor[s + 1]}
             />
           ))}
+          {/* Where each center is about to go: the mean of its points. */}
+          <Svg
+            opacity={
+              ease(frame, moveAt + 2, 12) * (1 - ease(frame, moves[0] + 14, 8))
+            }
+          >
+            {C[1].map(([cx, cy], j) => (
+              <circle
+                key={j}
+                cx={at(sx, cx)}
+                cy={at(sy, cy)}
+                r={15}
+                fill="none"
+                stroke={CLASS[j]}
+                strokeWidth={3}
+                strokeDasharray="4 5"
+              />
+            ))}
+          </Svg>
           <Svg opacity={ease(frame, startAt, 12)}>
             {[1, 2].map((j) => {
               const p = ease(frame, jumpAt + (j - 1) * 4, 20);
@@ -214,10 +238,15 @@ export const KmeansScene: React.FC = () => {
               strokeDasharray="5 6"
             />
           </Svg>
+          {/* Above the ring, inside the plot: to its right it ran over the
+              plot's border. */}
           <Note
             at={startAt + 4}
-            x={at(sx, START[0]) + h(76)}
-            y={at(sy, START[1]) - h(16)}
+            x={at(sx, START[0]) - 130}
+            width={260}
+            y={at(sy, START[1]) - h(66) - h(44)}
+            from="up"
+            style={{ textAlign: "center" }}
           >
             <span
               style={{
@@ -254,7 +283,9 @@ export const KmeansScene: React.FC = () => {
               );
             })}
           </Svg>
-          <Note at={placeAt + 2} x={box.left} y={box.top + box.height + h(12)}>
+          {/* The run's counter heads the plot, so the two caveats below it
+              each get a line of their own. */}
+          <Note at={placeAt + 2} x={box.left} y={box.top - h(40)}>
             <span
               style={{
                 ...label(21, INK_SOFT),
@@ -271,12 +302,18 @@ export const KmeansScene: React.FC = () => {
               </span>
             </span>
           </Note>
-          <Note
-            at={startsAt}
-            x={box.left + 300}
-            y={box.top + box.height + h(12)}
-          >
-            <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
+          <Note at={roundAt} x={box.left} y={box.top + box.height + h(14)}>
+            <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+              assumes round clusters of similar size
+              <span
+                style={{ color: INK_SOFT, opacity: ease(frame, outlierAt, 10) }}
+              >
+                ; outliers drag the means
+              </span>
+            </span>
+          </Note>
+          <Note at={startsAt} x={box.left} y={box.top + box.height + h(54)}>
+            <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
               <Mark at={troubleAt}>run several starts, or k-means++</Mark>
               <span
                 style={{ color: INK_SOFT, opacity: ease(frame, wrongAt, 10) }}
@@ -306,7 +343,7 @@ export const KmeansScene: React.FC = () => {
             yFormat={(v) => (v ? `${v / 1000}k` : "0")}
             xTitle="k, the number of clusters"
             at={ssAt}
-            size={18}
+            size={19}
           />
           <Svg opacity={ease(frame, fallsAt - 2, 8)}>
             <defs>
@@ -441,7 +478,7 @@ export const KmeansScene: React.FC = () => {
                       textAlign: "center",
                       top: at(silY, 0) + 6,
                       opacity: p,
-                      ...label(18, INK_SOFT),
+                      ...label(19, INK_SOFT),
                       ...TABULAR,
                     }}
                   >

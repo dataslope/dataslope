@@ -22,8 +22,8 @@ const OVERLAP = 6;
 /**
  * "Data visualization" (16:9), Part 6 of the Data Analyst interview prep
  * videos, on the editorial page. All twenty-two of the track's visualization
- * questions: seventeen drawn the wrong way and the right way, two to a scene
- * where they belong together, then a quick round of five. Every number is
+ * questions: seventeen drawn, most the wrong way and then the right way, two
+ * to a scene where they belong together, then a quick round of five. Every number is
  * the page's own chart data, computed by check.mjs (results.json, data.ts).
  *
  * No series intro yet, as in Parts 1 to 5 (see da-sql/Video.tsx for how it

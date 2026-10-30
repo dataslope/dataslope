@@ -3,6 +3,7 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -168,6 +169,21 @@ export const Bars: React.FC<{
     </div>
   );
 };
+
+/** Words that follow other words on one line, faded in on their own cue,
+ *  so a second phrase flows after the first instead of sitting at a pixel
+ *  offset. */
+export const FadeIn: React.FC<{ at: number; children: React.ReactNode }> = ({ at, children }) => {
+  const frame = useCurrentFrame();
+  return <span style={{ opacity: ease(frame, at, 12) }}>{children}</span>;
+};
+
+/** Code set as a table's title: the title's own 21px, in the mono face.
+ *  (`Mono` sets code at 0.88em, which inside a 21px title is 18.5px, under
+ *  the 19px floor.) */
+export const TitleCode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
+);
 
 /** A small caption in the soft ink, for where a number came from. */
 export const Source: React.FC<{ children: React.ReactNode }> = ({ children }) => (

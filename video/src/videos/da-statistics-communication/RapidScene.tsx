@@ -5,12 +5,12 @@ import { normalPdf } from "../../editorial/charts";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
+import { NextLine, Note, Num } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
-import { at, Drift, Headline, Kicker, Mark, OK, OK_INK, type Scale, Spot, Svg, VLine, X0 } from "./parts";
+import { at, Drift, Headline, Kicker, Mark, Mono, OK, OK_INK, type Scale, Spot, Svg, VLine, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -63,32 +63,42 @@ const Variance: React.FC<{ c: Ctx }> = ({ c }) => {
   const squaredAt = c.w("r-var", "average squared distance");
   const rootAt = c.w("r-var", "its square root");
   const unitsAt = c.w("r-var", "the data's own units");
-  const varAt = c.w("r-var", "two fifty");
-  const sdAt = c.w("r-var", "fifteen point eight one");
-  const ddofAt = c.w("r-var", "n minus one");
-  const { values, deviations } = RAPID.variance;
+  const takeAt = c.w("r-var-n", "Take ten");
+  const squaresAt = c.w("r-var-n", "Their squared distances");
+  const sumAt = c.w("r-var-n", "add to a thousand");
+  const overFiveAt = c.w("r-var-n", "a thousand over five");
+  const ddofAt = c.w("r-var-n", "n minus one");
+  const fiftyAt = c.w("r-var-n", "two fifty");
+  const closerAt = c.w("r-var-n", "sits closer");
+  const sdAt = c.w("r-var-n", "fifteen point eight one");
+  const V = RAPID.variance;
+  const { values, deviations } = V;
   const s: Scale = { lo: 0, hi: 60, a: R_X + 40, b: R_END };
-  const lineY = c.y(600);
+  const lineY = c.y(510);
   const mean = values.reduce((a, b) => a + b, 0) / values.length;
   const mx = at(s, mean);
+  const count = (v: number) => v.toLocaleString("en-US");
+  // The lines under the figure: the two definitions, then the worked example.
+  const ROWS_Y = [574, 616, 664, 706, 748, 788, 828];
+  const row = (k: number) => c.y(ROWS_Y[k]);
   return (
     <>
       <Line s={s} y={lineY} ticks={[0, 10, 20, 30, 40, 50, 60]} at={at0 - 4} />
       <VLine
         x={mx}
-        top={c.y(340)}
+        top={c.y(296)}
         bottom={lineY}
         at={at0}
         color={INK}
         dash="6 6"
         width={2}
-        labelY={c.y(330)}
+        labelY={c.y(286)}
         label={<span style={{ ...note(22, INK_SOFT), ...TABULAR }}>mean {fmt(mean, 0)}</span>}
       />
       {/* Each value's distance from the mean, one row each. */}
       <Svg>
         {values.map((v, i) => {
-          const rowY = c.y(400) + i * c.h(36);
+          const rowY = c.y(340) + i * c.h(30);
           const p = ease(frame, squaredAt + i * 3, 12);
           const x = at(s, v);
           return (
@@ -105,34 +115,59 @@ const Variance: React.FC<{ c: Ctx }> = ({ c }) => {
       {values.map((v, i) => {
         const d = deviations[i];
         return (
-          <Note key={v} at={squaredAt + i * 3 + 4} x={at(s, v) + (d < 0 ? -64 : 14)} y={c.y(400) + i * c.h(36) - 14}>
+          <Note key={v} at={squaredAt + i * 3 + 4} x={at(s, v) + (d < 0 ? -64 : 14)} y={c.y(340) + i * c.h(30) - 14}>
             <span style={{ ...label(19, BLUE_INK), ...TABULAR, whiteSpace: "nowrap" }}>
               {d === 0 ? "" : `${d < 0 ? "−" : "+"}${Math.abs(d)}`}
             </span>
           </Note>
         );
       })}
-      <Note at={squaredAt - 2} x={R_X + 40} y={c.y(670)}>
+      <Note at={squaredAt - 2} x={R_X + 40} y={row(0)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <b>variance</b>: the average squared distance from the mean
         </span>
       </Note>
-      <Note at={rootAt - 2} x={R_X + 40} y={c.y(714)}>
+      <Note at={rootAt - 2} x={R_X + 40} y={row(1)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           <b>standard deviation</b>: its square root
           <span style={{ opacity: ease(frame, unitsAt - 2, 10) }}>, in the data&apos;s own units</span>
         </span>
       </Note>
-      <Note at={varAt - 4} x={R_X + 40} y={c.y(768)}>
-        <span style={{ ...note(28, BLUE_INK), ...TABULAR, whiteSpace: "nowrap" }}>
-          {values[0]} to {values[values.length - 1]}: variance <b>{fmt(RAPID.variance.var, 0)}</b>
-          <span style={{ opacity: ease(frame, sdAt - 2, 10) }}>
-            , standard deviation <b>{fmt(RAPID.variance.std)}</b>
+      {/* The page's 10 to 50, worked: the squares, then both divisors. */}
+      <Note at={Math.min(takeAt + 8, squaresAt) - 2} x={R_X + 40} y={row(2)}>
+        <span style={{ ...note(26, BLUE_INK), whiteSpace: "nowrap" }}>
+          squared: <Num>{V.squares.map(count).join(" + ")}</Num>
+          <span style={{ opacity: ease(frame, sumAt - 2, 10) }}>
+            {" "}= <b><Num>{count(V.sumSquares)}</Num></b>
           </span>
         </span>
       </Note>
-      <Note at={ddofAt - 2} x={R_X + 40} y={c.y(818)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>pandas divides by n − 1</span>
+      <Note at={overFiveAt - 2} x={R_X + 40} y={row(3)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <Num>
+            {count(V.sumSquares)} ÷ {V.n} = {fmt(V.varPop, 0)}
+          </Num>
+          : the average, dividing by n
+        </span>
+      </Note>
+      <Note at={ddofAt - 2} x={R_X + 40} y={row(4)}>
+        <span style={{ ...note(26, BLUE_INK), whiteSpace: "nowrap" }}>
+          <Num>
+            {count(V.sumSquares)} ÷ {V.n - 1} ={" "}
+            <b style={{ opacity: ease(frame, fiftyAt - 2, 10) }}>{fmt(V.var, 0)}</b>
+          </Num>
+          : pandas&apos; <Mono>.var()</Mono> treats it as a sample, n − 1
+        </span>
+      </Note>
+      <Note at={closerAt - 2} x={R_X + 40} y={row(5)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          a sample&apos;s own mean sits closer to its points, so ÷ n comes out small
+        </span>
+      </Note>
+      <Note at={sdAt - 4} x={R_X + 40} y={row(6)}>
+        <span style={{ ...note(28, BLUE_INK), whiteSpace: "nowrap" }}>
+          standard deviation: <Num>√{fmt(V.var, 0)} =</Num> <b><Num>{fmt(V.std)}</Num></b>
+        </span>
       </Note>
     </>
   );
@@ -144,7 +179,7 @@ const Mode: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const at0 = c.w("r-mode", "The mode is");
   const billingAt = c.w("r-mode", "the most common ticket is billing");
-  const twoAt = c.w("r-mode", "Two modes");
+  const twoAt = c.w("r-modes", "Two peaks");
   const rows = RAPID.mode.counts.rows;
   const unit = 170;
   const barX = R_X + 200;
@@ -184,7 +219,7 @@ const Mode: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>mode: {RAPID.mode.mode}</span>
       </Note>
       <Note at={twoAt - 2} x={R_X + 40} y={top + c.h(330)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>two modes? a reason to split the data</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>two peaks in a distribution? check for two groups</span>
       </Note>
     </>
   );
@@ -196,6 +231,10 @@ const Normal: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const at0 = c.w("r-normal", "A normal distribution");
   const setAt = c.w("r-normal", "its mean and standard deviation");
+  const whyAt = c.w("r-normal-why", "It matters because");
+  const evenAt = c.w("r-normal-why", "even when the data isn't");
+  const leanAt = c.w("r-normal-why", "Confidence intervals and A B tests");
+  const skewAt = c.w("r-normal-why", "skewed raw data");
   const bands = [
     { k: 1, at: c.w("r-normal", "Sixty-eight percent"), shade: 0.5 },
     { k: 2, at: c.w("r-normal", "ninety-five within two"), shade: 0.32 },
@@ -203,7 +242,7 @@ const Normal: React.FC<{ c: Ctx }> = ({ c }) => {
   ];
   const s: Scale = { lo: -3.6, hi: 3.6, a: R_X + 40, b: R_X + 760 };
   const base = c.y(760);
-  const peak = c.h(340);
+  const peak = c.h(300);
   const yOf = (v: number) => base - (normalPdf(v, 0, 1) / normalPdf(0, 0, 1)) * peak;
   const steps = 120;
   const curveP = ease(frame, at0, 22);
@@ -239,13 +278,23 @@ const Normal: React.FC<{ c: Ctx }> = ({ c }) => {
           </span>
         </Note>
       ))}
-      <Note at={bands[2].at + 10} x={R_X + 800} y={c.y(470) + 3 * c.h(64)}>
-        <span style={{ ...note(22, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
-          in {RAPID.normal.draws.toLocaleString("en-US")} draws
+      <Note at={setAt + 4} x={R_X + 800} y={c.y(470) + 3 * c.h(64)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>SD: standard deviation</span>
+      </Note>
+      {/* Why an analyst cares: the averages are near-normal, whatever the data. */}
+      <Note at={whyAt - 2} x={R_X + 40} y={c.y(306)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <b>why it matters</b>: a big sample&apos;s average comes out close to normal,
         </span>
       </Note>
-      <Note at={setAt + 4} x={R_X + 800} y={c.y(470) + 3 * c.h(64) + c.h(36)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>SD: standard deviation</span>
+      <Note at={evenAt - 2} x={R_X + 40} y={c.y(306) + c.h(38)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          even when the data isn&apos;t
+          <span style={{ opacity: ease(frame, leanAt - 2, 10) }}>, and intervals and A/B tests lean on that</span>
+        </span>
+      </Note>
+      <Note at={skewAt - 2} x={R_X + 40} y={c.y(306) + 2 * c.h(38)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>so skewed raw data doesn&apos;t break them by itself</span>
       </Note>
     </>
   );
@@ -258,30 +307,50 @@ const Population: React.FC<{ c: Ctx }> = ({ c }) => {
   const at0 = c.w("r-pop", "the population is everyone");
   const sampleAt = c.w("r-pop", "A sample is the part");
   const estimateAt = c.w("r-pop", "only an estimate");
-  const threeAt = c.w("r-pop", "Three samples of fifty");
-  const popMeanAt = c.w("r-pop", "The population's mean");
+  const manyAt = c.w("r-pop-many", "Twenty samples of fifty");
+  const lowAt = c.w("r-pop-many", "forty-seven point eight");
+  const highAt = c.w("r-pop-many", "fifty-three point one");
+  const bothAt = c.w("r-pop-many", "on both sides");
+  const errorAt = c.w("r-pop-many", "sampling error");
   const P = RAPID.population;
   const s: Scale = { lo: 46, hi: 56, a: R_X + 40, b: R_END };
   const lineY = c.y(720);
+  const r = 10;
+  // A dot plot: each mean sits on the lowest row where it overlaps no other.
+  const placed: { x: number; k: number }[] = [];
+  const dots = P.samples.map((m) => {
+    const x = at(s, m);
+    let k = 0;
+    while (placed.some((d) => d.k === k && Math.abs(d.x - x) < 2 * r + 2)) k++;
+    placed.push({ x, k });
+    return { m, x, y: lineY - r - 4 - k * (2 * r + 2) };
+  });
+  const lowest = dots.find((d) => d.m === P.range[0]);
+  const highest = dots.find((d) => d.m === P.range[1]);
   return (
     <>
       <Note at={at0 - 2} x={R_X + 40} y={c.y(340)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
-          <b>population</b>: everyone you care about ({P.count.toLocaleString("en-US")})
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <b>population</b>: everyone you care about (<Num>{P.count.toLocaleString("en-US")}</Num>)
         </span>
       </Note>
       <Note at={sampleAt - 2} x={R_X + 40} y={c.y(390)}>
-        <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
-          <b>sample</b>: the part you measured ({P.size})
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+          <b>sample</b>: the part you measured (<Num>{P.size}</Num>)
           <span style={{ opacity: ease(frame, estimateAt - 2, 10), color: INK_SOFT }}>; its mean is an estimate</span>
         </span>
       </Note>
-      <Line s={s} y={lineY} ticks={[46, 48, 50, 52, 54, 56]} at={threeAt - 6} />
+      <Line s={s} y={lineY} ticks={[46, 48, 50, 52, 54, 56]} at={manyAt - 6} />
+      <Svg opacity={ease(frame, manyAt + 4, 12)}>
+        <text x={s.b} y={lineY + 62} textAnchor="end" style={{ ...tick(19), fontWeight: 650, fontVariantNumeric: "normal" }}>
+          each dot: one sample&apos;s average order value, $
+        </text>
+      </Svg>
       <VLine
         x={at(s, P.mean)}
         top={c.y(500)}
         bottom={lineY}
-        at={popMeanAt - 2}
+        at={bothAt - 2}
         color={INK}
         dash="7 6"
         width={2.4}
@@ -290,18 +359,25 @@ const Population: React.FC<{ c: Ctx }> = ({ c }) => {
         label={<span style={{ ...note(24, INK), fontWeight: 650 }}>population {fmt(P.mean, 1)}</span>}
       />
       <Svg>
-        {P.samples.map((m, i) => {
-          const p = ease(frame, threeAt + 6 + i * 8, 10);
-          return <circle key={i} cx={at(s, m)} cy={c.y(560) + i * c.h(50)} r={11 * p} fill={BAR} />;
-        })}
+        {dots.map((d, i) => (
+          <circle key={i} cx={d.x} cy={d.y} r={r * ease(frame, manyAt + 4 + i * 3, 10)} fill={BAR} opacity={0.8} />
+        ))}
       </Svg>
-      {P.samples.map((m, i) => (
-        <Note key={i} at={threeAt + 8 + i * 8} x={at(s, m) + 22} y={c.y(560) + i * c.h(50) - 15}>
-          <span style={{ ...note(22, BLUE_INK), ...TABULAR, whiteSpace: "nowrap" }}>
-            sample {i + 1}: {fmt(m, 1)}
-          </span>
-        </Note>
-      ))}
+      {[
+        { d: lowest, at: lowAt },
+        { d: highest, at: highAt },
+      ].map(({ d, at: from }) =>
+        d ? (
+          <Note key={d.m} at={from - 2} x={d.x - 60} width={120} y={d.y - r - 34} from="up" style={{ textAlign: "center" }}>
+            <span style={{ ...note(22, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>{fmt(d.m, 1)}</span>
+          </Note>
+        ) : null,
+      )}
+      <Note at={errorAt - 2} x={at(s, 52.4)} y={c.y(560)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          that scatter: <b>sampling error</b>
+        </span>
+      </Note>
     </>
   );
 };
@@ -311,6 +387,7 @@ const Population: React.FC<{ c: Ctx }> = ({ c }) => {
  * list on the left, ticked as the round goes, and each answer on the right.
  */
 export const RapidScene: React.FC = () => {
+  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
   const c: Ctx = { w: (b, p) => n.word(b, p), y, h };
@@ -318,7 +395,12 @@ export const RapidScene: React.FC = () => {
   const from = n.beat("rapid-in").from;
   const fourAt = n.word("rapid-in", "four questions");
   const eachAt = n.word("rapid-in", "one answer each");
-  const nextAt = n.word("next", "Next");
+  const backAt = n.word("next", "Back to SQL");
+  const bridge = [
+    { text: "rankings", at: n.word("next", "rankings") },
+    { text: "running totals", at: n.word("next", "running totals") },
+    { text: "the latest row per customer", at: n.word("next", "the latest row per customer") },
+  ];
   const end = n.beat("next").from;
 
   const items: RapidItem[] = [
@@ -356,9 +438,17 @@ export const RapidScene: React.FC = () => {
           <Population c={c} />
         </Fade>
 
-        <NextLine at={nextAt} x={R_X + 40} y={y(840)} width={960}>
+        <NextLine at={backAt} x={R_X + 40} y={y(840)} width={960}>
           advanced SQL
         </NextLine>
+        <div style={{ position: "absolute", left: R_X + 360, top: y(840) + 30, ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          {bridge.map((b, i) => (
+            <span key={b.text} style={{ opacity: ease(frame, b.at - 2, 10) }}>
+              {i ? ", " : ""}
+              {b.text}
+            </span>
+          ))}
+        </div>
       </Drift>
     </AbsoluteFill>
   );

@@ -32,7 +32,7 @@ const R = results as unknown as {
     };
     coverage: { truth: number; intervals: [number, number][]; missed: number };
     drift: { months: string[]; definitions: { key: string; values: number[] }[]; spread: number };
-    power: { lifts: { to: number; rows: [number, number][] }[] };
+    power: { lifts: { to: number; rows: [number, number][] }[]; from: number };
     novelty: { novelty: number[]; durable: number[] };
     cohorts: { key: string; rows: number[] }[];
     retention: { core: number[]; leaky: number[] };
@@ -116,7 +116,8 @@ export const EXPERIMENT = {
 // ── 8, 9. Significance and size; the interval ───────────────────────────────
 
 export const PRACTICAL = {
-  d: 0.2,
+  /** The effect, in standard deviations: the same at every size. */
+  d: py("practical", "d"),
   rows: py<[number, number][]>("practical", "rows"),
   /** The first group size whose p-value is under 0.05. */
   cross: py("practical", "cross"),
@@ -131,6 +132,8 @@ export const SAMPLE = {
   eleven: py("sampleSize", "eleven"),
   ratio: py("sampleSize", "ratio"),
   curves: R.charts.power.lifts,
+  /** The conversion every curve starts from. */
+  from: R.charts.power.from,
 };
 
 export const ERRORS = {
@@ -149,10 +152,14 @@ export const PEEK = R.charts.peeking;
 
 export const STONES = { bySize: query("stones", "bySize"), pooled: query("stones", "pooled") };
 
+const totals = sqlStep("ratio", "totals").rows![0];
 export const RATIO = {
   regions: query("ratio", "table"),
   averaged: scalar("ratio", "averaged"),
   weighted: scalar("ratio", "weighted"),
+  /** The numerator and the denominator, each summed first. */
+  revenue: Number(totals[0]),
+  customers: Number(totals[1]),
 };
 
 // ── Short ones ──────────────────────────────────────────────────────────────

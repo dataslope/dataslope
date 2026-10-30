@@ -171,7 +171,7 @@
           ]
         },
         "bigRows": {
-          "sql": "SELECT COUNT(*) AS n FROM orders WHERE amount >= 100;",
+          "sql": "SELECT COUNT(*) AS n FROM orders WHERE amount > 100;",
           "ok": true,
           "columns": [
             "n"
@@ -183,7 +183,7 @@
           ]
         },
         "bigGroups": {
-          "sql": "SELECT region, COUNT(*) AS orders, SUM(amount) AS revenue FROM orders WHERE amount >= 100 GROUP BY region ORDER BY revenue DESC;",
+          "sql": "SELECT region, COUNT(*) AS orders, SUM(amount) AS revenue FROM orders WHERE amount > 100 GROUP BY region ORDER BY revenue DESC;",
           "ok": true,
           "columns": [
             "region",
@@ -214,7 +214,7 @@
           ]
         },
         "both": {
-          "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE amount >= 100\nGROUP BY region\nHAVING SUM(amount) > 400\nORDER BY revenue DESC\nLIMIT 10;",
+          "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE amount > 100\nGROUP BY region\nHAVING SUM(amount) > 400\nORDER BY revenue DESC\nLIMIT 10;",
           "ok": true,
           "columns": [
             "region",
@@ -811,6 +811,71 @@
               4,
               7.5,
               5
+            ]
+          ]
+        },
+        "equalsRows": {
+          "sql": "SELECT id FROM orders\nWHERE discount = NULL;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": []
+        },
+        "isNullRows": {
+          "sql": "SELECT id FROM orders\nWHERE discount IS NULL;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              2
+            ],
+            [
+              4
+            ]
+          ]
+        },
+        "averages": {
+          "sql": "SELECT AVG(discount),\n       AVG(COALESCE(discount, 0))\nFROM orders;",
+          "ok": true,
+          "columns": [
+            "avg(discount)",
+            "avg(COALESCE(discount, 0))"
+          ],
+          "rows": [
+            [
+              7.5,
+              5
+            ]
+          ]
+        },
+        "countRows": {
+          "sql": "SELECT COUNT(*), COUNT(1), COUNT(discount)\nFROM orders;",
+          "ok": true,
+          "columns": [
+            "count_star()",
+            "count(1)",
+            "count(discount)"
+          ],
+          "rows": [
+            [
+              6,
+              6,
+              4
+            ]
+          ]
+        },
+        "countDistinct": {
+          "sql": "SELECT COUNT(DISTINCT discount) AS n FROM orders;",
+          "ok": true,
+          "columns": [
+            "n"
+          ],
+          "rows": [
+            [
+              4
             ]
           ]
         }

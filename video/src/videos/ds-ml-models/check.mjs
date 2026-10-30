@@ -141,6 +141,23 @@ R["tree"] = {
     "left": {"n": int(len(L)), "versicolor": int((L == 0).sum()), "virginica": int((L == 1).sum()), "gini": r3(gini(L))},
     "right": {"n": int(len(Rr)), "versicolor": int((Rr == 0).sum()), "virginica": int((Rr == 1).sum()), "gini": r3(gini(Rr))},
 }
+# The usual follow-up, "Gini or entropy?": the same sweep with entropy (in
+# bits), and scikit-learn's own entropy stump over all four measurements.
+def entropy(lbl):
+    if len(lbl) == 0:
+        return 0.0
+    p = lbl.mean()
+    return -sum(q * math.log2(q) for q in (p, 1 - p) if q > 0)
+ecurve = []
+for t in cands:
+    L = cls[pw <= t]; Rr = cls[pw > t]
+    ecurve.append([r3(t), r4((len(L) * entropy(L) + len(Rr) * entropy(Rr)) / len(cls))])
+ebest = min(ecurve, key=lambda c: c[1])
+efull = DecisionTreeClassifier(max_depth=1, criterion="entropy", random_state=0).fit(iris.data[two], cls)
+R["tree"]["entropy"] = {
+    "parent": r3(entropy(cls)), "best": ebest, "gain": r3(entropy(cls) - ebest[1]),
+    "sklearnAll": {"feature": iris.feature_names[efull.tree_.feature[0]], "threshold": r3(efull.tree_.threshold[0])},
+}
 
 # ── Bagging and boosting: the video's own sine wave with noise ──
 rng = np.random.default_rng(11)

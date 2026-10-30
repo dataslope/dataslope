@@ -101,8 +101,13 @@ export const SrmScene: React.FC = () => {
             strokeDasharray="8 6"
           />
         </svg>
-        <Note at={askedAt + 6} x={BARS_X - 40} y={sy(bad.expected) - h(48)}>
-          <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>asked for: {count(bad.expected)} each</span>
+        {/* At the dashed line's end, apart from the bars' own counts. */}
+        <Note at={askedAt + 6} x={BARS_X + 2 * BAR_W + GAP + 52} y={sy(bad.expected) - h(28)}>
+          <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+            asked for:
+            <br />
+            {count(bad.expected)} each
+          </span>
         </Note>
         {bars.map((b, i) => (
           <React.Fragment key={b.name}>
@@ -214,6 +219,13 @@ export const SrmScene: React.FC = () => {
             {count(v)}
           </div>
         ))}
+        {/* The verdict on the split the question is about outlasts the
+            formula, as the contrast split's does. */}
+        <Note at={formulaOut + 4} x={BARS_X - 40} y={sy(bad.observed[1]) - h(96)}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            p ≈ <span style={TABULAR}>{bad.p.toFixed(5)}</span>: an SRM
+          </span>
+        </Note>
         <Note at={fineP - 2} x={MINI_X - 20} y={y(MINI_TOP) - h(62)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>p = {fine.p.toFixed(2)}: chance</span>
         </Note>

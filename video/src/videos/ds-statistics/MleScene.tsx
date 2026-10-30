@@ -59,7 +59,12 @@ export const MleScene: React.FC = () => {
   const smallAt = n.word("unbiased", "the squares come out small");
   const lowAt = n.word("unbiased", "twenty percent low");
   const fixAt = n.word("unbiased", "Dividing by n minus one");
-  const end = n.beat("unbiased").to;
+  const mseFrom = n.beat("unbiased-mse").from;
+  const mlAt = n.word("unbiased-mse", "the maximum-likelihood answer");
+  const lessAt = n.word("unbiased-mse", "biased, but less variable");
+  const mseAt = n.word("unbiased-mse", "its mean squared error is lower");
+  const notBetterAt = n.word("unbiased-mse", "Unbiased isn't automatically better");
+  const end = n.beat("unbiased-mse").to;
 
   const mleOut = q7At - 4;
 
@@ -78,6 +83,8 @@ export const MleScene: React.FC = () => {
   const byN = rows.map((r, i) => [vx(i), vy(r.byN)] as const);
   const byN1 = rows.map((r, i) => [vx(i), vy(r.byN1)] as const);
   const five = rows.findIndex((r) => r.n === 5);
+  // The mechanism lines make way for the trade-off once they have been said.
+  const whyOut = mseFrom - 6;
 
   return (
     <AbsoluteFill>
@@ -88,6 +95,7 @@ export const MleScene: React.FC = () => {
       <Sfx name="el-pencil" at={byNAt + 4} level={-34} />
       <Sfx name="el-tap" at={lowAt} level={-32} />
       <Sfx name="el-pop" at={fixAt + 6} level={-32} />
+      <Sfx name="el-tap" at={mseAt + 10} level={-34} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} out={mleOut} size={60}>
@@ -107,28 +115,47 @@ export const MleScene: React.FC = () => {
           xTicks={[0, 0.2, 0.4, 0.6, 0.8, 1]}
           xFormat={(v) => fmt(v, 1)}
           xTitle="click rate"
+          yTitle="likelihood"
           at={everyAt - 6}
           out={mleOut}
           size={19}
         />
+        {/* Each curve keeps one ink, keyed by a line beside its name: the
+            first data in grey, ten times the data in the data blue, as the
+            series sets a baseline against what is compared with it. */}
         <Note at={clicksAt} x={SIDE_X} y={y(400)} out={mleOut}>
-          <span style={{ ...noteText(28, BAR), fontWeight: 650, ...TABULAR }}>12 clicks in 40 views</span>
+          <span style={{ ...noteText(28, INK_SOFT), fontWeight: 650, ...TABULAR, display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ width: 34, height: 0, borderTop: `3.4px solid ${INK_SOFT}` }} />
+            12 clicks in 40 views
+          </span>
         </Note>
-        <Curve points={curvePts(wide.values)} at={everyAt} dur={30} out={mleOut} color={BAR} width={3.4} fill={`color-mix(in srgb, ${BAR} 12%, transparent)`} base={lb} />
+        <Curve
+          points={curvePts(wide.values)}
+          at={everyAt}
+          dur={30}
+          out={mleOut}
+          color={INK_SOFT}
+          width={3.4}
+          fill={`color-mix(in srgb, ${INK_SOFT} 10%, transparent)`}
+          base={lb}
+        />
         <Svg opacity={1 - ease(frame, mleOut, 10)}>
           <line x1={at(LX, wide.peak)} x2={at(LX, wide.peak)} y1={ly(1) - h(10)} y2={lb} stroke={INK} strokeWidth={2} strokeDasharray="6 6" opacity={ease(frame, peakAt - 2, 12)} />
-          <circle cx={at(LX, wide.peak)} cy={ly(1)} r={8 * ease(frame, peakAt - 2, 10)} fill={BLUE_INK} />
+          <circle cx={at(LX, wide.peak)} cy={ly(1)} r={8 * ease(frame, peakAt - 2, 10)} fill={INK} />
         </Svg>
         <Note at={peakAt} x={at(LX, wide.peak) + 16} y={ly(1) - h(40)} out={mleOut}>
-          <span style={{ ...noteText(26, BLUE_INK), ...TABULAR }}>
+          <span style={{ ...noteText(26, INK), ...TABULAR }}>
             peak at <b>{fmt(wide.peak, 2)}</b>
             <span style={{ opacity: ease(frame, shareAt - 2, 10) }}> = 12 / 40, the share you saw</span>
           </span>
         </Note>
         <Note at={tenAt} x={SIDE_X} y={y(450)} out={mleOut}>
-          <span style={{ ...noteText(28, BLUE_INK), fontWeight: 650, ...TABULAR }}>120 in 400</span>
+          <span style={{ ...noteText(28, BLUE_INK), fontWeight: 650, ...TABULAR, display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ width: 34, height: 0, borderTop: `3.4px solid ${BAR}` }} />
+            120 in 400
+          </span>
         </Note>
-        <Curve points={curvePts(narrow.values)} at={tenAt + 2} dur={26} out={mleOut} color={BLUE_INK} width={3.4} />
+        <Curve points={curvePts(narrow.values)} at={tenAt + 2} dur={26} out={mleOut} color={BAR} width={3.4} />
         <Note at={narrowAt} x={SIDE_X} y={y(500)} out={mleOut}>
           <span style={{ ...noteText(24, INK_SOFT) }}>same peak, narrower curve</span>
         </Note>
@@ -141,7 +168,7 @@ export const MleScene: React.FC = () => {
             const mid = (x0 + x1) / 2;
             const yy = level(k);
             return (
-              <g key={k} stroke={k ? BLUE_INK : BAR} strokeWidth={2.6}>
+              <g key={k} stroke={k ? BAR : INK_SOFT} strokeWidth={2.6}>
                 <line x1={mid - ((x1 - x0) / 2) * p} x2={mid + ((x1 - x0) / 2) * p} y1={yy} y2={yy} />
                 <line x1={mid - ((x1 - x0) / 2) * p} x2={mid - ((x1 - x0) / 2) * p} y1={yy - 8} y2={yy + 8} />
                 <line x1={mid + ((x1 - x0) / 2) * p} x2={mid + ((x1 - x0) / 2) * p} y1={yy - 8} y2={yy + 8} />
@@ -185,7 +212,7 @@ export const MleScene: React.FC = () => {
         />
         <Svg opacity={ease(frame, byNAt - 2, 10)}>
           {rows.map((r, i) => (
-            <text key={r.n} x={vx(i)} y={y(V_BASE) + 32} textAnchor="middle" style={{ ...label(20, INK_SOFT), ...TABULAR }}>
+            <text key={r.n} x={vx(i)} y={y(V_BASE) + 32} textAnchor="middle" fill={INK_SOFT} style={{ ...label(20, INK_SOFT), ...TABULAR }}>
               n = {r.n}
             </text>
           ))}
@@ -228,7 +255,7 @@ export const MleScene: React.FC = () => {
             variance ÷ n: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>not</span>
           </span>
         </Note>
-        <Note at={ownAt} x={SIDE_X} y={y(550)}>
+        <Note at={ownAt} x={SIDE_X} y={y(550)} out={whyOut}>
           <div style={{ ...noteText(24, INK_SOFT), lineHeight: 1.4 }}>
             each spread is measured from its own
             <br />
@@ -237,13 +264,33 @@ export const MleScene: React.FC = () => {
             than the true mean does
           </div>
         </Note>
-        <Note at={smallAt} x={SIDE_X} y={y(680)}>
+        <Note at={smallAt} x={SIDE_X} y={y(680)} out={whyOut}>
           <span style={{ ...noteText(24, ACCENT_INK) }}>so the squares come out small</span>
         </Note>
         <Note at={fixAt + 6} x={SIDE_X} y={y(760)}>
           <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: OK_INK, whiteSpace: "nowrap" }}>
             s² = Σ(x − <span style={{ textDecoration: "overline" }}>x</span>)² / (n − 1)
           </div>
+        </Note>
+
+        {/* ── The follow-up: is unbiased always better? ── */}
+        <Note at={mlAt} x={SIDE_X} y={y(550)}>
+          <span style={{ ...noteText(24, INK) }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 650 }}>÷ n</span> is the MLE:
+            <span style={{ opacity: ease(frame, lessAt - 2, 10) }}> biased, but less variable</span>
+          </span>
+        </Note>
+        <Note at={mseAt - 4} x={SIDE_X} y={y(600)}>
+          <span style={{ ...noteText(24, INK) }}>mean squared error = bias² + variance</span>
+        </Note>
+        <Note at={mseAt + 4} x={SIDE_X} y={y(648)}>
+          <span style={{ ...noteText(24, INK), ...TABULAR }}>
+            at n = {rows[five].n}: <Mark at={mseAt + 10}>{fmt(rows[five].mseN, 2)}</Mark> for <span style={{ color: ACCENT_INK }}>÷ n</span>, {fmt(rows[five].mseN1, 2)} for{" "}
+            <span style={{ color: OK_INK }}>÷ (n − 1)</span>
+          </span>
+        </Note>
+        <Note at={notBetterAt} x={SIDE_X} y={y(696)}>
+          <span style={{ ...noteText(24, INK_SOFT) }}>unbiased isn&apos;t automatically better</span>
         </Note>
       </Drift>
     </AbsoluteFill>

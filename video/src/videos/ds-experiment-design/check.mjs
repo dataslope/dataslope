@@ -115,6 +115,10 @@ R["size"] = {
     "one": one,
     "ratio": r2(one / two),
     "statsmodels": math.ceil(sm),
+    # The formula's terms at the 2-point MDE, for the key under it on screen.
+    "zAlpha": r2(stats.norm.ppf(1 - 0.05 / 2)),
+    "zBeta": r2(stats.norm.ppf(0.8)),
+    "pPool": r3((0.10 + 0.12) / 2),
     "curve": [[round(m * 100, 2), sample_size_per_variant(0.10, m)] for m in mdes],
 }
 
@@ -200,6 +204,8 @@ while ex1 is None or ex0 is None:
     if ex0 is None and hit0 == 0 and 80 <= n0 <= 260:
         ex0 = {"n": n0, "path": p0}
 R["sprt"] = {
+    "alpha": A_,
+    "beta": B_,
     "upper": r3(upper),
     "lower": r3(lower),
     "fixed": N,
@@ -269,10 +275,10 @@ const { unit, unitExample, power, size, sides, noninf, peekRates, sprt, cuped, c
 console.log(JSON.stringify(results.runtime));
 console.log("unit", unit, unitExample);
 console.log("power", JSON.stringify(power));
-console.log("size", size.two, size.one, size.ratio, "statsmodels", size.statsmodels);
+console.log("size", size.two, size.one, size.ratio, "statsmodels", size.statsmodels, "terms", size.zAlpha, size.zBeta, size.pPool);
 console.log("sides", sides);
 console.log("noninf", JSON.stringify(noninf));
 console.log("peek", JSON.stringify(peekRates), "chart", peeking.crossings, peeking.final);
-console.log("sprt", sprt.upper, sprt.lower, sprt.fixed, sprt.falsePositive, sprt.power, sprt.meanH0, sprt.meanH1, sprt.examples.effect.n, sprt.examples.none.n);
+console.log("sprt", sprt.alpha, sprt.beta, sprt.upper, sprt.lower, sprt.fixed, sprt.falsePositive, sprt.power, sprt.meanH0, sprt.meanH1, sprt.examples.effect.n, sprt.examples.none.n);
 console.log("cuped", cuped.theta, cuped.varY, cuped.varAdj, cuped.share, cuped.meanY, cuped.meanAdj, cuped.corr);
 console.log("cap", cap, "strata", strata, "aa", aa, "errors", errors);

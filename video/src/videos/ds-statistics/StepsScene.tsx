@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { normalPdf } from "../../editorial/charts";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label } from "../../editorial/style";
+import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -25,7 +25,9 @@ const Ctr: React.FC<{ of: string }> = ({ of }) => (
   </span>
 );
 
-/** A small normal curve with its rejection region shaded: one tail or two. */
+/** A small normal curve with its rejection region shaded: one tail or two.
+ *  The region is drawn in the data blue, as the p-value's tails are in the
+ *  next scene: red is kept for a wrong answer. */
 const Tails: React.FC<{ x: number; y: number; at: number; out: number; sides: 1 | 2 }> = ({ x, y, at, out, sides }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 14);
@@ -42,8 +44,8 @@ const Tails: React.FC<{ x: number; y: number; at: number; out: number; sides: 1 
   };
   return (
     <Svg opacity={p * (1 - o)}>
-      <path d={tail(cut, 3.4)} fill={ACCENT} opacity={0.75} />
-      {sides === 2 ? <path d={tail(-3.4, -cut)} fill={ACCENT} opacity={0.75} /> : null}
+      <path d={tail(cut, 3.4)} fill={BAR} opacity={0.85} />
+      {sides === 2 ? <path d={tail(-3.4, -cut)} fill={BAR} opacity={0.85} /> : null}
       <path d={curve} fill="none" stroke={INK} strokeWidth={2} />
       <line x1={x} x2={x + SKETCH_W} y1={y} y2={y} stroke={INK} strokeWidth={1.2} />
     </Svg>
@@ -102,10 +104,10 @@ export const StepsScene: React.FC = () => {
       </>, at: nullAt, tag: null },
     { y: y(530), name: "the alternative", formula: <>
         <Ctr of="new" /> ≠ <Ctr of="old" />
-      </>, at: differAt, tag: { text: "two-sided", at: twoAt, sides: 2 as const } },
+      </>, at: differAt, tag: { text: "two-sided", at: twoAt, sides: 2 as const, area: "2.5% each side" } },
     { y: y(640), name: "", formula: <>
         <Ctr of="new" /> &gt; <Ctr of="old" />
-      </>, at: higherAt, tag: { text: "one-sided", at: oneAt, sides: 1 as const } },
+      </>, at: higherAt, tag: { text: "one-sided", at: oneAt, sides: 1 as const, area: "5% on one side" } },
   ];
 
   return (
@@ -141,11 +143,12 @@ export const StepsScene: React.FC = () => {
                   borderRadius: "50%",
                   border: `2.5px solid ${BAR}`,
                   background: i < 2 ? `color-mix(in srgb, ${BAR} ${ease(frame, beforeAt + 4 + i * 3, 12) * 100}%, ${PAPER})` : PAPER,
-                  color: i < 2 && frame > beforeAt + 8 ? PAPER : BLUE_INK,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   ...label(24),
+                  // After label(), which sets its own color.
+                  color: i < 2 && frame > beforeAt + 8 ? PAPER : BLUE_INK,
                   fontWeight: 700,
                   ...TABULAR,
                 }}
@@ -207,6 +210,10 @@ export const StepsScene: React.FC = () => {
                   </span>
                 </Note>
                 <Tails x={SKETCH_X} y={r.y + h(48)} at={r.tag.at + 4} out={end + 60} sides={r.tag.sides} />
+                {/* α = 5%, split between the tails or all in one. */}
+                <Note at={r.tag.at + 10} x={SKETCH_X + SKETCH_W + 22} y={r.y + h(48) - 34}>
+                  <span style={{ ...noteText(22, BLUE_INK) }}>{r.tag.area}</span>
+                </Note>
               </>
             ) : null}
           </React.Fragment>

@@ -102,6 +102,12 @@ export const DistScene: React.FC = () => {
     ["exponential", expAt],
   ];
   const capY = y(PANEL.top) + h(PANEL.height) + 40;
+  const { bernoulli: bern, binomial: bin, poisson: pois } = DISTS;
+  const params: [React.ReactNode, number][] = [
+    [<><V>p</V> = {bern.p}</>, bernAt + 10],
+    [<><V>n</V> = {bin.n}, <V>p</V> = {bin.p}</>, binAt + 10],
+    [<>λ = {pois.lam}</>, poisAt + 10],
+  ];
   const within = DISTS.normal.within;
 
   return (
@@ -138,9 +144,22 @@ export const DistScene: React.FC = () => {
         />
         <Curve i={4} xs={DISTS.exponential.t} ys={DISTS.exponential.pdf} at={expAt + 2} />
 
+        {/* Each count's parameters, in the empty top corner of its panel, so
+            the binomial and the Poisson (alike in shape) read apart. */}
+        {params.map(([text, at], i) => (
+          <Note key={i} at={at} x={panelX(i) + PANEL.w} y={y(PANEL.top) - 4} align="right">
+            <span style={{ ...math(26, INK_SOFT) }}>{text}</span>
+          </Note>
+        ))}
+
         {/* What each one is, as it is said. */}
         <Note at={trialAt} x={panelX(0)} y={capY} width={PANEL.w}>
           <span style={{ ...note(23, INK) }}>one yes or no trial</span>
+        </Note>
+        <Note at={trialAt + 12} x={panelX(0)} y={capY + 40} width={PANEL.w}>
+          <span style={math(28)}>
+            mean <V>p</V>
+          </span>
         </Note>
         <Note at={binAt + 8} x={panelX(1)} y={capY} width={PANEL.w}>
           <span style={{ ...note(23, INK) }}>successes in <span style={math(26)}><V>n</V></span> trials</span>
@@ -149,6 +168,12 @@ export const DistScene: React.FC = () => {
           <span style={math(28)}>
             mean <V>n</V>
             <V>p</V>
+          </span>
+        </Note>
+        <Note at={npAt + 12} x={panelX(1)} y={capY + 76} width={PANEL.w}>
+          <span style={math(28)}>
+            variance <V>n</V>
+            <V>p</V>(1 − <V>p</V>)
           </span>
         </Note>
         <Note at={poisAt + 8} x={panelX(2)} y={capY} width={PANEL.w}>
@@ -160,7 +185,7 @@ export const DistScene: React.FC = () => {
         <Note at={normAt + 8} x={panelX(3)} y={capY} width={PANEL.w}>
           <span style={{ ...note(23, INK) }}>the symmetric bell</span>
         </Note>
-        <Note at={s68At} x={panelX(3)} y={capY + 40} width={PANEL.w + 40}>
+        <Note at={s68At} x={panelX(3)} y={capY + 40} width={PANEL.w}>
           <span style={{ ...label(23, INK), ...TABULAR, whiteSpace: "nowrap" }}>
             {pct(within[0])} <Late at={s95At}>· {pct(within[1])}</Late> <Late at={s997At}>· {pct(within[2], 1)}</Late>
           </span>
@@ -170,7 +195,7 @@ export const DistScene: React.FC = () => {
           <span style={{ ...note(23, INK) }}>the wait between Poisson events</span>
         </Note>
         <Note at={bernAt + 10} x={panelX(0)} y={y(PANEL.top) + h(PANEL.height) + 4} width={PANEL.w}>
-          <span style={{ ...label(18, INK_SOFT), display: "flex", justifyContent: "space-around" }}>
+          <span style={{ ...label(21, INK_SOFT), display: "flex", justifyContent: "space-around" }}>
             <span>no</span>
             <span>yes</span>
           </span>

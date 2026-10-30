@@ -124,12 +124,32 @@ export const script: NarrationScript = {
     },
     {
       id: "index",
-      text: "Question four. How does index match work, and why is it more robust? Match finds the position of a value in one range. Index returns what sits at that position in another. So it can look left: find mug among the names, and return its SKU. And it points at ranges, not a column number, so after the insert the price range moves with the data, and P one oh two still costs nine.",
+      text: "Question four. How does index match work, and why is it more robust?",
+      pauseAfter: 0.6,
+    },
+    { id: "index-match", text: "Match finds the position of a value in one range." },
+    { id: "index-second", text: "Mug is second, and the zero asks for an exact match." },
+    {
+      id: "index-left",
+      text: "Index returns what sits at that position in another. So it can look left: find mug among the names, and return its SKU.",
+    },
+    {
+      id: "index-ranges",
+      text: "And it points at ranges, not a column number, so after the insert the price range moves with the data, and P one oh two still costs nine.",
       pauseAfter: 0.8,
     },
     {
       id: "xlookup",
-      text: "Question five. What does X lookup improve over both? It's the newer lookup, in current versions of Excel. A lookup array and a return array, so any direction, in one function. Exact match by default. And a built-in if not found: P one oh nine says not found, with no if error around it.",
+      text: "Question five. What does X lookup improve over both?",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "xlookup-newer",
+      text: "It's the newer lookup, in Excel three sixty-five and twenty twenty-one or later; older versions don't have it.",
+    },
+    {
+      id: "xlookup-what",
+      text: "A lookup array and a return array, so any direction, in one function. Exact match by default. And a built-in if not found: P one oh nine says not found, with no if error around it.",
       pauseAfter: 0.7,
     },
     { id: "approx-in", text: "Which brings up the argument everyone forgets." },
@@ -146,9 +166,14 @@ export const script: NarrationScript = {
       text: "Exact returns only a precise hit. Approximate assumes the first column is sorted, and returns the largest value that isn't above the key. That's right for tiers: an order of six hundred forty lands in the five hundred tier, ten percent off.",
       pauseAfter: 0.8,
     },
+    { id: "approx-trap", text: "And it's silently wrong for codes like these." },
     {
-      id: "approx-trap",
-      text: "And it's silently wrong for codes like these. Leave off false, and look up P one oh five, which doesn't exist. Instead of NA, you get the lamp's price: twenty-four dollars. On unsorted data, it gets worse.",
+      id: "approx-leave",
+      text: "Leave off false, and V lookup falls back to approximate. Look up P one oh five, which doesn't exist.",
+    },
+    {
+      id: "approx-lamp",
+      text: "Instead of NA, you get the lamp's price: twenty-four dollars. On unsorted data, it gets worse.",
       pauseAfter: 0.8,
     },
     { id: "refs-in", text: "Then, what happens when you copy a formula." },
@@ -168,7 +193,7 @@ export const script: NarrationScript = {
     {
       id: "refs-mixed",
       text: "A mixed reference locks one side. The cross-tab formula locks the region's column and the month's row, so one formula fills the whole grid.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.4,
     },
 
     // ── 8. IFERROR ────────────────────────────────────────────────────────
@@ -184,7 +209,15 @@ export const script: NarrationScript = {
     },
     {
       id: "iferror-trap",
-      text: "But it hides every error the same way. A key with a stray space, and a formula that asks for a fourth column the table doesn't have, both come back unknown. Fix the cause first, and catch only what you expect. If NA catches only the not-available error: it takes the missing key, and lets the broken formula show.",
+      text: "But it hides every error the same way. A key with a stray space, and a formula that asks for a fourth column the table doesn't have, both come back unknown. Fix the cause first, and catch only what you expect.",
+    },
+    {
+      id: "iferror-ifna",
+      text: "If NA catches only the not-available error: it takes the missing key, and lets the broken formula show.",
+    },
+    {
+      id: "iferror-space",
+      text: "But the stray space is a missing key too, so it stays hidden: trim it first.",
       pauseAfter: 0.8,
     },
     { id: "tool-in", text: "Two questions about when not to use a spreadsheet at all." },
@@ -204,7 +237,7 @@ export const script: NarrationScript = {
     {
       id: "risks",
       text: "Question ten. What are the main risks of analysis in a spreadsheet? Manual steps nobody can rerun. Formulas that break quietly when rows move. No schema: one revenue typed as text drops out of the sum, and the total reads ten seventy instead of twelve twenty. And big files that crawl, then crash.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.8,
     },
 
     // ── Rapid round ───────────────────────────────────────────────────────
@@ -224,15 +257,18 @@ export const script: NarrationScript = {
     },
     {
       id: "r-clean",
-      text: "Trim strips the extra spaces, and proper fixes the case: the messy name comes back as Ava Smith. Clean before you look up, or the keys won't match.",
+      text: "Trim strips the extra spaces, and proper fixes the case: the messy name comes back as Ava Smith.",
     },
+    { id: "r-clean-keys", text: "Tidy the keys before you look up, or they won't match." },
     {
       id: "r-split",
       text: "Left with find splits at a character: everything before the at sign is the username. Text join puts the pieces back, and skips the blanks.",
+      pauseAfter: 1.5,
     },
     {
       id: "r-dates",
       text: "A date is stored as a serial number of days. March first, twenty twenty-four, is forty-five thousand three hundred fifty-two, so March thirty-first minus March first is thirty. A date stored as text won't sort or subtract until date value converts it.",
+      pauseAfter: 1.5,
     },
     {
       id: "r-format",
@@ -241,11 +277,16 @@ export const script: NarrationScript = {
     {
       id: "r-named",
       text: "A named range gives a cell a name, so A two times tax rate reads as what it means, and still points at F one.",
+      pauseAfter: 1.5,
     },
     {
       id: "r-dupes",
-      text: "And to find duplicates, count each value against its own column: a count over one flags the repeated email. Check the flags, then remove duplicates.",
-      pauseAfter: 0.9,
+      text: "And to find duplicates, count each value against its own column: a count over one flags the repeated email.",
+    },
+    {
+      id: "r-dupes-both",
+      text: "It flags both copies, so check them before Remove Duplicates, which keeps the first.",
+      pauseAfter: 1.8,
     },
     {
       id: "next",

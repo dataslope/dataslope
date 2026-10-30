@@ -36,3 +36,21 @@ export const map = (
 /** A gentle idle bob for illustrations, in px. Deterministic per frame. */
 export const bob = (frame: number, amplitude = 8, period = 90) =>
   Math.sin((frame / period) * Math.PI * 2) * amplitude;
+
+/**
+ * How far a slow push across a scene has come, 0 to 1: up to speed over
+ * `ramp` frames, then steady to the end. It replaces a cosine ease over the
+ * whole scene, whose start slowed whenever the scene grew: in the Data
+ * Scientist fix passes, lengthening a scene left its opening card still for
+ * 3 s in five videos, though nothing at the opening had changed. With a fixed
+ * ramp the opening moves the same however long the scene runs.
+ */
+export const drift = (frame: number, from: number, to: number, ramp = 60) => {
+  const length = Math.max(1, to - from);
+  const t = Math.min(length, Math.max(0, frame - from));
+  const r = Math.min(ramp, length / 2);
+  // The speed rises evenly to v over r frames and then holds, so the whole
+  // push covers v * (length - r / 2) = 1.
+  const v = 1 / (length - r / 2);
+  return t < r ? (v * t * t) / (2 * r) : v * (t - r / 2);
+};

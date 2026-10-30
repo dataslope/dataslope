@@ -34,6 +34,8 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
     { text: "the suggested code is still there a week later", at: c.w("r-thumbs", "the suggested code is still there") },
     { text: "nobody asks again", at: c.w("r-thumbs", "nobody asks again") },
   ];
+  const diagAt = c.w("r-thumbs-diag", "Keep the thumbs-up rate");
+  const targetAt = c.w("r-thumbs-diag", "a diagnostic, not the target");
   return (
     <>
       <Note at={whyAt - 2} x={R_X} y={c.y(330)}>
@@ -60,6 +62,14 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
           {s.text}
         </Chip>
       ))}
+      <Note at={diagAt - 2} x={R_X} y={c.y(830)}>
+        <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          keep the thumbs-up rate as{" "}
+          <span style={{ opacity: ease(frame, targetAt - 2, 10) }}>
+            <Mark at={targetAt + 6}>a diagnostic, not the target</Mark>
+          </span>
+        </span>
+      </Note>
     </>
   );
 };
@@ -74,10 +84,11 @@ const Contamination: React.FC<{ c: Ctx }> = ({ c }) => {
   const skillAt = c.w("r-contam", "not skill");
   const actions = [
     { text: "don't pick a model on leaderboards alone", at: c.w("r-contam", "Don't pick a model") },
-    { text: "keep your own eval set private", at: c.w("r-contam", "Keep your own eval set private") },
-    { text: "refresh it with recent cases", at: c.w("r-contam", "refresh it with recent cases") },
-    { text: "never train on it", at: c.w("r-contam", "never train on it") },
+    { text: "keep your own eval set private", at: c.w("r-contam-keep", "Keep your own eval set private") },
+    { text: "refresh it with recent cases", at: c.w("r-contam-keep", "refresh it with recent cases") },
+    { text: "never train on it", at: c.w("r-contam-keep", "never train on it") },
   ];
+  const promptsAt = c.w("r-contam-keep", "put it in few-shot prompts");
   const train = ease(frame, contamAt, 14);
   const bench = ease(frame, itemsAt, 14);
   const cx = R_X + 190;
@@ -107,7 +118,10 @@ const Contamination: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       {actions.map((a, i) => (
         <Note key={a.text} at={a.at - 2} x={R_X} y={c.y(650) + i * c.h(52)}>
-          <span style={{ ...note(26, i === 0 ? INK : OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{a.text}</span>
+          <span style={{ ...note(26, i === 0 ? INK : OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            {a.text}
+            {i === actions.length - 1 ? <span style={{ opacity: ease(frame, promptsAt - 2, 10) }}> or put it in few-shot prompts</span> : null}
+          </span>
         </Note>
       ))}
     </>
@@ -134,12 +148,12 @@ export const RapidScene: React.FC = () => {
   const sureAt = n.word("close", "how sure are you");
   const knowAt = n.word("close", "how would you know");
   const practice = [
-    { text: "concept checks on every page", at: n.word("close", "concept checks to try") },
-    { text: "code you can run on most", at: n.word("close", "most have code you can run") },
-    { text: `${BANK} multiple-choice questions`, at: n.word("close", "a hundred and ten multiple-choice questions") },
+    { text: "concept checks on every page", at: n.word("close-practice", "concept checks to try") },
+    { text: "code you can run on most", at: n.word("close-practice", "most have code you can run") },
+    { text: `${BANK} multiple-choice questions`, at: n.word("close-practice", "a hundred and ten multiple-choice questions") },
   ];
-  const workAt = n.word("close", "the rounds that still need work");
-  const end = n.beat("close").to;
+  const workAt = n.word("close-practice", "the rounds that still need work");
+  const end = n.beat("close-practice").to;
 
   const items: RapidItem[] = [
     { n: 8, label: "A thumbs-up rate", beat: "r-thumbs", body: <Thumbs c={c} /> },
@@ -159,7 +173,11 @@ export const RapidScene: React.FC = () => {
       <Sfx name="el-chime" at={workAt + 4} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.015}>
-        <Kicker at={from}>Questions 8 and 9</Kicker>
+        {/* The close belongs to no question: it ends the series under the kicker it opened on. */}
+        <Kicker at={from} out={roundAt - 6}>
+          Questions 8 and 9
+        </Kicker>
+        <Kicker at={roundAt}>Data scientist interview prep</Kicker>
         <Headline lead="Two more," turn="numbers that look better than they are." at={twoAt - 4} turnAt={lookAt - 4} out={roundAt - 6} size={60} />
         <Headline lead="How sure are you," turn="and how would you know?" at={sureAt - 4} turnAt={knowAt - 4} size={60} />
 
@@ -175,7 +193,7 @@ export const RapidScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
-          <Chip key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} ink={i === 2 ? ACCENT_INK : BLUE_INK} lit={i === 2 ? workAt : undefined}>
+          <Chip key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 2 ? workAt : undefined}>
             {p.text}
           </Chip>
         ))}

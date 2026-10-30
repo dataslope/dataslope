@@ -1,7 +1,7 @@
 import React from "react";
 import { useCurrentFrame } from "remotion";
 import { ease } from "../components/motion";
-import { ACCENT_INK, body, HAIRLINE, INK, label } from "./style";
+import { ACCENT_INK, body, HAIRLINE, INK, label, TABULAR } from "./style";
 
 export const W = 1920;
 export const H = 1080;
@@ -48,15 +48,26 @@ export const Ink: React.FC<{
         WebkitMaskImage: p < 1 ? mask : undefined,
         maskImage: p < 1 ? mask : undefined,
         filter: p < 1 ? `blur(${(1 - p) * 1.6}px)` : undefined,
-        opacity: 1 - gone,
         transform: gone > 0 ? `translateY(${-gone * 10}px)` : undefined,
         ...style,
+        // A caller's own opacity (a dim) multiplies the fade-out rather than
+        // replacing it: as a plain style it won, and anything passing both
+        // stayed fully inked through its exit, then vanished.
+        opacity: (1 - gone) * Number(style?.opacity ?? 1),
       }}
     >
       {children}
     </div>
   );
 };
+
+/**
+ * A number in digits of one width, for a counter or a column that must not
+ * shift as its digits change. Use it on the number alone: TABULAR over a
+ * whole phrase also sets every hyphen a digit wide ("p - value").
+ * `src/editorial/tabular.test.ts` fails on TABULAR over a hyphenated word.
+ */
+export const Num: React.FC<{ children: React.ReactNode }> = ({ children }) => <span style={TABULAR}>{children}</span>;
 
 /** An annotation that slides in from the side, optionally dimmed later. */
 export const Note: React.FC<{

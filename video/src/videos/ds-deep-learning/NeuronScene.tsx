@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COLLAPSE, NEURON } from "./data";
-import { CELL_BAD, CELL_MARK, CELL_OK, Cells, Drift, ElbowArrow, Mark, OK, OK_INK, sn, Svg, Tagline, X0 } from "./parts";
+import { CELL_MARK, CELL_OK, Cells, Drift, ElbowArrow, Mark, OK, OK_INK, sn, Svg, Tagline, X0 } from "./parts";
 
 // ── Question 1: the neuron ──
 const IN_X = 200;
@@ -30,8 +30,8 @@ const ROWS = { a: 372, b: 552, c: 732 };
 
 /**
  * Questions 1 and 2. The neuron: three inputs times their weights, summed
- * with the bias to 1.4, and through a sigmoid to 0.802; struck activation,
- * linear regression. Then two made-up 2x2 layers: the input (1, -1) comes
+ * with the bias to 1.4, and through a sigmoid to 0.802; with the activation
+ * struck, the output falls back to the sum, 1.4: linear regression. Then two made-up 2x2 layers: the input (1, -1) comes
  * out as (1, -8) through both, and through their product, a single matrix;
  * with the negatives zeroed between them it comes out as (3, -6).
  */
@@ -65,7 +65,9 @@ export const NeuronScene: React.FC = () => {
   const tenAt = n.word("linear-fix", "Ten layers would collapse");
   const zeroAt = n.word("linear-fix", "zeroes the negatives");
   const becomesAt = n.word("linear-fix", "the answer becomes three, minus six");
-  const depthAt = n.word("linear-fix", "Now depth adds something");
+  const depthAt = n.word("linear-depth", "Now depth adds something");
+  const curvedAt = n.word("linear-depth", "draw curved boundaries");
+  const anyAt = n.word("linear-depth", "approximate almost any function");
   const whichAt = n.word("act-in", "which activation");
   const end = n.beat("act-in").to;
 
@@ -168,7 +170,9 @@ export const NeuronScene: React.FC = () => {
           <line x1={ACT_X - 8} x2={ACT_X - 8 + (ACT_W + 16) * lit} y1={y(NY) + h(4)} y2={y(NY) - h(4)} stroke={ACCENT_INK} strokeWidth={3.4} />
         </Svg>
         <ElbowArrow points={[[ACT_X + ACT_W + 10, y(NY)], [OUT_X - 14, y(NY)]]} at={aAt - 6} out={q1Out} color={INK_SOFT} width={2} head={12} />
-        <Cells values={[[NEURON.a.toFixed(3)]]} x={OUT_X} y={y(NY) - h(CELL_H) / 2} w={120} h={h(CELL_H)} at={aAt - 2} out={q1Out} size={30} color={OK_INK} />
+        {/* Struck activation, so the output is the sum itself: 0.802 gives way to 1.4. */}
+        <Cells values={[[NEURON.a.toFixed(3)]]} x={OUT_X} y={y(NY) - h(CELL_H) / 2} w={120} h={h(CELL_H)} at={aAt - 2} out={leaveAt + 4} size={30} color={OK_INK} />
+        <Cells values={[[String(NEURON.z)]]} x={OUT_X} y={y(NY) - h(CELL_H) / 2} w={120} h={h(CELL_H)} at={leaveAt + 14} out={q1Out} size={30} color={INK} />
         <Note at={regAt - 2} x={ACT_X - 20} y={y(NY) + h(70)} out={q1Out}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>without it: just linear regression</span>
         </Note>
@@ -250,9 +254,10 @@ export const NeuronScene: React.FC = () => {
           h={H}
           at={zeroAt}
           format={sn}
-          look={(r) => (C.hidden[r] < 0 ? { tint: { color: CELL_BAD, at: zeroAt + 4 } } : undefined)}
+          look={(r) => (C.hidden[r] < 0 ? { tint: { color: CELL_MARK, at: zeroAt + 4 } } : undefined)}
         />
-        <Tagline x={724 + W / 2} y={y(ROWS.c) + cellsH + h(10)} width={240} align="center" at={zeroAt + 4} size={20} color={ACCENT_INK}>
+        {/* The zeroing is the fix, not a fault: pointed at in yellow, not red. */}
+        <Tagline x={724 + W / 2} y={y(ROWS.c) + cellsH + h(10)} width={240} align="center" at={zeroAt + 4} size={20} color={INK}>
           zero the negatives
         </Tagline>
         <ElbowArrow points={[[814, midOf(ROWS.c)], [868, midOf(ROWS.c)]]} at={zeroAt + 6} color={INK_SOFT} width={2} head={11} />
@@ -273,6 +278,12 @@ export const NeuronScene: React.FC = () => {
         <Note at={depthAt - 2} x={1400} y={midOf(ROWS.c) - h(18)}>
           <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={whichAt}>now depth adds something</Mark>
+          </span>
+        </Note>
+        <Note at={curvedAt - 2} x={1400} y={midOf(ROWS.c) + h(22)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            curved boundaries,{" "}
+            <span style={{ opacity: ease(frame, anyAt - 2, 10) }}>almost any function</span>
           </span>
         </Note>
       </Drift>

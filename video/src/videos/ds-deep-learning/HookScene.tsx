@@ -18,7 +18,7 @@ const R = 22;
 const GRAD = [0.0156, 0.0625, 0.25, 1];
 const BAR_TOP = 742;
 const BAR_H = 90;
-/** Questions opened up on a small network; the rest go quickly at the end. */
+/** Questions worked through; the rest go quickly at the end. */
 const DRAWN = 12;
 const TOTAL = 15;
 const DOT_Y = 520;
@@ -47,9 +47,9 @@ export const HookScene: React.FC = () => {
   const deepAt = n.word("hook", "in a deep enough stack");
   const fadesAt = n.word("hook", "fades to almost nothing");
   const twelveAt = n.word("plan", "Of the fifteen questions");
-  const smallAt = n.word("plan", "twelve get opened up");
-  const numpyAt = n.word("plan", "worked by hand in NumPy");
-  const quickAt = n.word("plan", "Three quick ones");
+  const smallAt = n.word("plan", "twelve get worked through");
+  const numpyAt = n.word("plan", "computed by hand in NumPy");
+  const quickAt = n.word("plan-quick", "Three quick ones");
   const firstAt = n.word("neuron-in", "The smallest piece first");
   const end = n.beat("neuron-in").to;
 
@@ -160,7 +160,7 @@ export const HookScene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>how much of the error reaches each layer</span>
         </Note>
 
-        {/* ── The round: fifteen neurons, twelve opened up ── */}
+        {/* ── The round: fifteen neurons, twelve worked through ── */}
         {Array.from({ length: TOTAL }, (_, i) => {
           const p = ease(frame, twelveAt + i * 1.4, 12);
           if (p <= 0) return null;
@@ -204,8 +204,8 @@ export const HookScene: React.FC = () => {
         })}
         <Note at={smallAt} x={X0} y={y(DOT_Y) + h(100)} dim={firstAt + 4}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: BLUE_INK }}>12</b> on networks small enough to show every number,{" "}
-            <span style={{ opacity: ease(frame, numpyAt - 2, 10) }}>worked by hand in NumPy</span>
+            <b style={{ color: BLUE_INK }}>12</b> worked through,{" "}
+            <span style={{ opacity: ease(frame, numpyAt - 2, 10) }}>every number computed by hand in NumPy</span>
           </span>
         </Note>
         <Note at={quickAt} x={X0} y={y(DOT_Y) + h(150)} dim={firstAt + 4}>

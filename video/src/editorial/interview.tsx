@@ -32,12 +32,33 @@ import { Ink } from "./ui";
 export const OK = ds("green", 600);
 export const OK_INK = inkOf.green;
 
-/** Code inside a question or a list label, at the text's own size. */
+/**
+ * Code inside a question or a list label, at the text's own size. A mono space
+ * is 0.6em, so `LEFT JOIN` beside sans text read as a double space; the word
+ * spacing brings it back to about a sans space.
+ */
 export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.84em", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.84em", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
+
+/** A question's hyphenated words, each kept on one line: balanced wrapping
+ *  would otherwise break "built-in" at its hyphen. */
+const keepHyphenated = (children: React.ReactNode) =>
+  React.Children.map(children, (child) =>
+    typeof child === "string"
+      ? child.split(/(\S+-\S+)/).map((part, i) =>
+          i % 2 ? (
+            <span key={i} style={{ whiteSpace: "nowrap" }}>
+              {part}
+            </span>
+          ) : (
+            part
+          ),
+        )
+      : child,
+  );
 
 /**
  * "Question 3" over the question itself. The number inks in on `at` (the
@@ -61,8 +82,10 @@ export const QuestionCard: React.FC<{
       <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>{kicker ?? `Question ${n}`}</span>
       </Ink>
-      <Ink at={textAt ?? at + 8} dur={20} out={out} style={{ left: 92, top: y(150), width, ...headline(size) }}>
-        {children}
+      {/* Balanced, so a question that wraps breaks into even lines rather than
+          leaving one word on the last; the line count is the same either way. */}
+      <Ink at={textAt ?? at + 8} dur={20} out={out} style={{ left: 92, top: y(150), width, ...headline(size), textWrap: "balance" }}>
+        {keepHyphenated(children)}
       </Ink>
     </>
   );

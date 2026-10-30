@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
+import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -110,7 +110,7 @@ const ThreeD: React.FC<{ c: Ctx }> = ({ c }) => {
                 return (
                   <g key={v} opacity={p}>
                     <circle cx={cx[i]} cy={row.cy} r={row.r(v) * p} fill={lit ? BAR : ds("blue", 200)} />
-                    <text x={cx[i]} y={row.cy + row.r(5) + 28} textAnchor="middle" style={{ ...label(18, INK_SOFT), ...TABULAR }} fill={INK_SOFT}>
+                    <text x={cx[i]} y={row.cy + row.r(5) + 28} textAnchor="middle" style={{ ...label(19, INK_SOFT), ...TABULAR }} fill={INK_SOFT}>
                       {v}
                     </text>
                   </g>
@@ -174,15 +174,15 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
         <g opacity={legend}>
           <rect x={x1 - 118} y={top - 28} width={110} height={36} fill={PAPER} stroke={INK_SOFT} strokeWidth={1.4} />
           <rect x={x1 - 106} y={top - 18} width={16} height={16} fill={BAR} />
-          <text x={x1 - 82} y={top - 4} style={{ ...label(17, INK) }} fill={INK}>
+          <text x={x1 - 82} y={top - 4} style={{ ...label(19, INK) }} fill={INK}>
             Visits
           </text>
         </g>
       </Svg>
-      <BarSet values={values} labels={days} x0={x0} x1={x1} base={base} top={top} lo={0} hi={hi} at={at0} step={1} labelSize={17} />
+      <BarSet values={values} labels={days} x0={x0} x1={x1} base={base} top={top} lo={0} hi={hi} at={at0} step={1} />
       <Svg opacity={ease(frame, losesAt, 12)}>
         {values.map((v, i) => (
-          <text key={i} x={bandMid(i, values.length, x0, x1)} y={yOf(v) - 10} textAnchor="middle" style={{ ...label(17, BLUE_INK), ...TABULAR }} fill={BLUE_INK}>
+          <text key={i} x={bandMid(i, values.length, x0, x1)} y={yOf(v) - 10} textAnchor="middle" style={{ ...label(19, BLUE_INK), ...TABULAR }} fill={BLUE_INK}>
             {v}
           </text>
         ))}
@@ -204,6 +204,10 @@ const DataInk: React.FC<{ c: Ctx }> = ({ c }) => {
       <Verdict ok x={R_X + 680} y={c.y(720)} at={clutterAt}>
         same week, less ink
       </Verdict>
+      {/* The legend's one job, naming what the bars count, done as a title. */}
+      <Note at={losesAt} x={x0 - 30} y={top - c.h(62)}>
+        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>Visits per day</span>
+      </Note>
     </>
   );
 };
@@ -291,7 +295,11 @@ const Scatter: React.FC<{ c: Ctx }> = ({ c }) => {
   const px = (v: number) => x0 + ((v - lo) / (hi - lo)) * (x1 - x0);
   const py = (v: number) => base - ((v - lo) / (hi - lo)) * (base - top);
   const shown = ease(frame, at0 + 4, 20);
-  const alpha = 0.95 - 0.88 * ease(frame, lowerAt + 4, 30);
+  // Solid, the dots are big enough to fuse into one mass; on "from a blob"
+  // they shrink and fade together, and the two clusters and the bridge show.
+  const thin = ease(frame, blobAt + 4, 26);
+  const alpha = 0.95 - 0.85 * thin;
+  const r = 8 - 4 * thin;
   const count = Math.round(SCATTER.points.length * shown);
 
   return (
@@ -300,19 +308,24 @@ const Scatter: React.FC<{ c: Ctx }> = ({ c }) => {
         <line x1={x0} x2={x0} y1={base} y2={top} stroke={INK} strokeWidth={1.6} opacity={ease(frame, at0 - 4, 10)} />
         <line x1={x0} x2={x1} y1={base} y2={base} stroke={INK} strokeWidth={1.6} opacity={ease(frame, at0 - 4, 10)} />
         {SCATTER.points.slice(0, count).map(([x, y], i) => (
-          <circle key={i} cx={px(x)} cy={py(y)} r={4} fill={BAR} opacity={alpha} />
+          <circle key={i} cx={px(x)} cy={py(y)} r={r} fill={BAR} opacity={alpha} />
         ))}
       </Svg>
       <Note at={pileAt - 2} x={R_X + 580} y={c.y(400)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>two continuous variables, one dot each</span>
       </Note>
-      <Note at={fourAt - 2} x={R_X + 580} y={c.y(460)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>{SCATTER.n.toLocaleString("en-US")} points</span>
+      <Note at={lowerAt - 2} x={R_X + 580} y={c.y(450)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>piled up? lower the opacity</span>
       </Note>
-      <Verdict ok={false} x={R_X + 580} y={c.y(540)} at={blobAt}>
+      <Note at={fourAt - 2} x={R_X + 580} y={c.y(500)}>
+        <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+          <Num>{SCATTER.n.toLocaleString("en-US")}</Num> points
+        </span>
+      </Note>
+      <Verdict ok={false} x={R_X + 580} y={c.y(570)} at={fourAt + 12}>
         solid dots: one blob
       </Verdict>
-      <Verdict ok x={R_X + 580} y={c.y(590)} at={clustersAt}>
+      <Verdict ok x={R_X + 580} y={c.y(620)} at={clustersAt}>
         faint dots: two clusters and a bridge
       </Verdict>
     </>
@@ -370,7 +383,7 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
           })}
         </g>
         {["Jan", "Dec"].map((m, i) => (
-          <text key={m} x={i ? x1 : x0} y={base + 26} textAnchor={i ? "end" : "start"} style={{ ...label(17, INK_SOFT) }} fill={INK_SOFT} opacity={reveal}>
+          <text key={m} x={i ? x1 : x0} y={base + 26} textAnchor={i ? "end" : "start"} style={{ ...label(19, INK_SOFT) }} fill={INK_SOFT} opacity={reveal}>
             {m}
           </text>
         ))}
@@ -379,7 +392,7 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
         const mid = ((k ? cum[k - 1][n - 1] : 0) + cum[k][n - 1]) / 2;
         return (
           <Note key={ch.key} at={stackAt + 10 + k * 2} x={x1 + 12} y={yOf(mid, n - 1) - 13}>
-            <span style={{ ...label(18, k === web ? INK : INK_SOFT), whiteSpace: "nowrap", fontWeight: k === web ? 650 : 500 }}>{ch.key}</span>
+            <span style={{ ...label(19, k === web ? INK : INK_SOFT), whiteSpace: "nowrap", fontWeight: k === web ? 650 : 500 }}>{ch.key}</span>
           </Note>
         );
       })}
@@ -402,7 +415,6 @@ const PartWhole: React.FC<{ c: Ctx }> = ({ c }) => {
         dots={false}
         width={3.6}
         labels={channels[web].values.map((_, i) => (i === 0 ? "Jan" : i === n - 1 ? "Dec" : ""))}
-        labelSize={17}
         edges
       />
       <Note at={ownAt + 4} x={L.x0} y={top - c.h(56)}>

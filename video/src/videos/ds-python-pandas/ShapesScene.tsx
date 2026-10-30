@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -16,8 +16,8 @@ import {
   Mark,
   MARK,
   MARK_OK,
-  Mono,
   TableName,
+  TitleCode,
   X0,
 } from "./parts";
 
@@ -32,9 +32,10 @@ const LISTING_Y = 716;
  * Questions 3 and 4 on the page's five rows (the frame DA Part 2 used, so
  * the share agrees). Three answers side by side, each the shape it returns:
  * agg three rows, transform five (level with the rows it came from), apply a
- * row per group. Then question 4 grows two columns on the frame
- * itself: each region's total from transform, and the share, North's 100
- * being 62.5% of 160.
+ * row per group (its index is the region and the row's label in df, so the
+ * index column is titled for both). Then question 4 grows two columns on the
+ * frame itself: each region's total from transform, and the share, North's
+ * 100 being 62.5% of 160, with no sum-then-merge on the way.
  */
 export const ShapesScene: React.FC = () => {
   const n = useNarration();
@@ -55,9 +56,9 @@ export const ShapesScene: React.FC = () => {
   const q4At = n.word("pct", "Question four");
   const q4TextAt = n.word("pct", "How do you compute");
   const divideAt = n.word("pct", "Divide each amount");
-  const noMergeAt = n.word("pct", "No merge needed");
-  const northAt = n.word("pct", "North's hundred");
-  const pctAt = n.word("pct", "sixty-two and a half percent");
+  const noMergeAt = n.word("pct-merge", "No need to sum by region");
+  const northAt = n.word("pct-north", "North's hundred");
+  const pctAt = n.word("pct-north", "sixty-two and a half percent");
   const end = n.beat("merge-in").to;
   const out3 = q4At - 4;
 
@@ -79,7 +80,9 @@ export const ShapesScene: React.FC = () => {
   const A = SHAPES.agg;
   const ag = geoOf(A, AGG_X, y(TOP), h, { rowH: 52 });
   const tg = geoOf(T, TRANSFORM_X, y(TOP), h, { rowH: 52 });
-  const AP = SHAPES.apply;
+  // apply's index is (region, the row's label in df), printed as one label,
+  // so its column is titled for both.
+  const AP = { ...SHAPES.apply, cols: ["region, row", ...SHAPES.apply.cols.slice(1)] };
   const pg = geoOf(AP, APPLY_X, y(TOP), h, { rowH: 52 });
   const under = (rows: number) => y(TOP) + h(48) + rows * h(52) + h(20);
 
@@ -117,7 +120,7 @@ export const ShapesScene: React.FC = () => {
 
         {/* ── Question 3: three shapes ── */}
         <TableName g={ag} at={aggAt - 2} out={out3}>
-          <Mono>.agg(&quot;sum&quot;)</Mono>
+          <TitleCode>.agg(&quot;sum&quot;)</TitleCode>
         </TableName>
         <DataTable
           g={ag}
@@ -133,7 +136,7 @@ export const ShapesScene: React.FC = () => {
         </Note>
 
         <TableName g={tg} at={trAt - 2} out={out3}>
-          <Mono>.transform(&quot;sum&quot;)</Mono>
+          <TitleCode>.transform(&quot;sum&quot;)</TitleCode>
         </TableName>
         <DataTable
           g={tg}
@@ -148,7 +151,7 @@ export const ShapesScene: React.FC = () => {
         </Note>
 
         <TableName g={pg} at={applyAt - 2} out={out3}>
-          <Mono>.apply(…nlargest(1)…)</Mono>
+          <TitleCode>.apply(…nlargest(1)…)</TitleCode>
         </TableName>
         <DataTable
           g={pg}
@@ -162,13 +165,13 @@ export const ShapesScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>each region&apos;s largest order</span>
         </Note>
         <Note at={slowAt} x={APPLY_X} y={under(AP.rows.length) + h(40)} out={out3}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>most flexible, and slowest</span>
+          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>most flexible, and slowest</span>
         </Note>
 
-        {/* ── Question 4: the share, no merge ── */}
+        {/* ── Question 4: the share, no sum-then-merge ── */}
         <Listing lines={P.lines} x={X0} top={y(LISTING_Y)} width={1110} size={SIZE} at={divideAt - 4} marks={[{ line: 1, at: divideAt + 8 }]} />
         <Note at={noMergeAt} x={X0 + 1140} y={y(LISTING_Y) + h(14)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>no merge needed</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>no need to sum by region and merge back</span>
         </Note>
         <Note at={pctAt + 4} x={g.right + 30} y={g.rowMid(0) - h(18)}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>100 / 160 = 62.5%</span>

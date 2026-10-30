@@ -8,14 +8,14 @@ import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
-import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, Listing, listingHeight, MARK_OK, rowsAt, Spot, X0 } from "./parts";
+import { colsOf, DataTable, Drift, ErrorBox, geoOf, Headline, Kicker, lineOf, Listing, listingHeight, MARK_BAD, MARK_OK, rowsAt, Spot, TableName, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 740;
 const TOP = 320;
 const LIST_TOP = 300;
 const ROW = 46;
-const SIZE = 18;
+const SIZE = 19;
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"]; T: number };
 
@@ -31,29 +31,49 @@ const head = (t: { cols: string[]; rows: string[][] }, k: number) => ({ cols: t.
 
 // ── 7. WHERE and HAVING ─────────────────────────────────────────────────────
 
+/**
+ * The item ends on both: the HAVING query and its four groups stay up, and
+ * the COUNT-in-WHERE version is printed under them, its WHERE marked red as
+ * DuckDB refuses it.
+ */
 const Having: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-having", "Where filters rows");
   const groupsAt = c.w("r-having", "having filters groups after");
   const countAt = c.w("r-having", "Put count in where");
   const noAt = c.w("r-having", "DuckDB refuses");
+  const H = RAPID.having;
   const e = RAPID.inWhere;
+  const g = geo(c, H, R_X + 764, c.T);
+  const whereTop = under(c, H.lines.length);
+  const bad = lineOf(e.lines, "WHERE COUNT(*)");
   return (
     <>
       <Listing
-        lines={RAPID.having.lines}
+        lines={H.lines}
         x={R_X}
         top={c.T}
-        width={720}
+        width={740}
         size={SIZE}
         at={at - 4}
-        out={countAt}
         marks={[
-          { line: 2, at: at + 6 },
-          { line: 4, at: groupsAt + 2 },
+          { line: lineOf(H.lines, "WHERE amount"), at: at + 6 },
+          { line: lineOf(H.lines, "HAVING"), at: groupsAt + 2, color: MARK_OK },
         ]}
       />
-      <Listing lines={e.lines} x={R_X} top={c.T} width={720} size={SIZE} at={countAt + 2} marks={[{ line: 2, at: countAt + 8 }]} />
-      <ErrorBox x={R_X} top={under(c, e.lines.length)} width={720} at={noAt - 2} kind={e.kind} message={e.message} size={21} />
+      <DataTable g={g} cols={colsOf(H, { n: { ink: BLUE_INK } })} at={groupsAt + 2} rows={rowsAt(H.rows, groupsAt + 6, 2)} />
+      <Listing
+        lines={e.lines}
+        x={R_X}
+        top={whereTop}
+        width={740}
+        size={SIZE}
+        at={countAt + 2}
+        marks={[
+          { line: bad, at: countAt + 8, out: noAt },
+          { line: bad, at: noAt, color: MARK_BAD },
+        ]}
+      />
+      <ErrorBox x={R_X} top={whereTop + listingHeight(e.lines.length, SIZE) + c.h(14)} width={740} at={noAt - 2} kind={e.kind} message={e.message} size={21} />
     </>
   );
 };
@@ -102,14 +122,16 @@ const Window: React.FC<{ c: Ctx }> = ({ c }) => {
 const Rank: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-rank", "On a tie");
   const rnAt = c.w("r-rank", "row number still counts");
-  const rankAt = c.w("r-rank", "Rank shares and then skips");
-  const denseAt = c.w("r-rank", "Dense rank shares without the gap");
+  const arbitraryAt = c.w("r-rank", "which tied row comes first is arbitrary");
+  const rankAt = c.w("r-rank-skip", "Rank shares and then skips");
+  const denseAt = c.w("r-rank-skip", "Dense rank shares without the gap");
   const R = RAPID.ranks;
   const g = geo(c, R, R_X, under(c, R.lines.length));
   const points = R.cols.indexOf("points");
   const ties = R.rows.flatMap((r, i) => (R.rows.filter((s) => s[points] === r[points]).length > 1 ? [i] : []));
   const col = (name: string) => R.cols.indexOf(name);
   const last = R.rows.length - 1;
+  const name = col("name");
   return (
     <>
       <Listing lines={R.lines} x={R_X} top={c.T} width={780} size={SIZE} at={at - 6} />
@@ -124,6 +146,11 @@ const Rank: React.FC<{ c: Ctx }> = ({ c }) => {
           { row: last, col: col("dense_rank"), at: denseAt + 10, color: MARK_OK },
         ]}
       />
+      <Note at={arbitraryAt + 6} x={R_X} y={g.rowTop(R.rows.length) + c.h(18)}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          <QMono>ROW_NUMBER</QMono> on a tie: {ties.map((row) => R.rows[row][name]).join(" or ")} could be {R.rows[ties[0]][col("row_number")]}
+        </span>
+      </Note>
     </>
   );
 };
@@ -158,14 +185,14 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
   const numberAt = c.w("r-topn", "number the rows inside each region");
   const keepAt = c.w("r-topn", "keep row numbers two or lower");
   const T = RAPID.topN;
-  const g = geo(c, T, R_X + 590, c.T, 40);
+  const g = geo(c, T, R_X + 640, c.T, 40);
   return (
     <>
       <Listing
         lines={T.lines}
         x={R_X}
         top={c.T}
-        width={570}
+        width={620}
         size={SIZE}
         at={at - 4}
         marks={[
@@ -180,21 +207,52 @@ const TopN: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 12. A running total ─────────────────────────────────────────────────────
 
+/**
+ * The ordered SUM has a frame even when none is written: RANGE from the first
+ * row to the current one, so rows tied on the ORDER BY share a total. The
+ * same query on the video's own three rows, two on one day, shows it.
+ */
 const Running: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-running", "A running total is an ordered sum");
   const nums = [c.w("r-running", "one hundred"), c.w("r-running", "three fifty"), c.w("r-running", "four twenty-five"), c.w("r-running", "six oh five")];
+  const frameAt = c.w("r-running", "With no frame written");
+  const tieAt = c.w("r-running", "rows tied on the day");
+  const shareAt = c.w("r-running", "share one total");
   const R = head(RAPID.running, 4);
   const g = geo(c, R, R_X, under(c, RAPID.running.lines.length));
   const rt = R.cols.indexOf("running_total");
+  const Tt = RAPID.tied;
+  const tg = geo(c, Tt, g.right + 40, g.top + c.h(44));
+  const day = Tt.cols.indexOf("day");
+  const tied = Tt.rows.flatMap((r, i) => (Tt.rows.filter((s) => s[day] === r[day]).length > 1 ? [i] : []));
+  const ttotal = Tt.cols.indexOf("running_total");
   return (
     <>
-      <Listing lines={RAPID.running.lines} x={R_X} top={c.T} width={680} size={SIZE} at={at - 4} marks={[{ line: 2, at: at + 8 }]} />
+      <Listing lines={RAPID.running.lines} x={R_X} top={c.T} width={680} size={SIZE} at={at - 4} marks={[{ line: lineOf(RAPID.running.lines, "SUM(amount)"), at: at + 8 }]} />
       <DataTable
         g={g}
         cols={colsOf(R, { running_total: { ink: BLUE_INK } })}
         at={at}
         rows={rowsAt(R.rows, at + 4)}
         marks={nums.map((t, row) => ({ row, col: rt, at: t, color: MARK_OK }))}
+      />
+      <Note at={frameAt} x={R_X} y={g.rowTop(R.rows.length) + c.h(18)}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          the frame by default: <QMono>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</QMono>
+        </span>
+      </Note>
+      <TableName g={tg} at={tieAt - 4}>
+        the video&rsquo;s own tie: two rows on one day
+      </TableName>
+      <DataTable
+        g={tg}
+        cols={colsOf(Tt, { running_total: { ink: BLUE_INK } })}
+        at={tieAt - 2}
+        rows={rowsAt(Tt.rows, tieAt + 2)}
+        marks={[
+          ...tied.map((row, k) => ({ row, col: day, at: tieAt + 8 + k * 3 })),
+          ...tied.map((row, k) => ({ row, col: ttotal, at: shareAt + 2 + k * 4 })),
+        ]}
       />
     </>
   );
@@ -215,20 +273,22 @@ const Latest: React.FC<{ c: Ctx }> = ({ c }) => {
         lines={RAPID.latest.lines}
         x={R_X}
         top={c.T}
-        width={720}
+        width={740}
         size={SIZE}
         at={at - 4}
         marks={[
-          { line: 2, at: newestAt },
-          { line: 6, at: oneAt, color: MARK_OK },
+          { line: lineOf(RAPID.latest.lines, "ORDER BY order_date DESC"), at: newestAt },
+          { line: lineOf(RAPID.latest.lines, "WHERE rn = 1"), at: oneAt, color: MARK_OK },
         ]}
       />
       <DataTable g={g} cols={colsOf(L)} at={oneAt - 2} rows={rowsAt(L.rows, oneAt + 2)} />
       <Note at={twelveAt} x={g.right + 24} y={g.rowTop(0)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
-          {RAPID.customers} customers,
+          {RAPID.orders} orders in,
           <br />
-          {RAPID.latest.rows.length} rows
+          {RAPID.latest.rows.length} rows out:
+          <br />
+          one per customer
         </span>
       </Note>
     </>
@@ -250,7 +310,7 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
         lines={P.lines}
         x={R_X}
         top={c.T}
-        width={840}
+        width={870}
         size={SIZE}
         at={at - 4}
         marks={[
@@ -298,7 +358,9 @@ const Count: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <DataTable g={g} cols={colsOf(C)} at={eightAt - 4} rows={rowsAt(C.rows, eightAt)} marks={[0, 1, 2].map((col) => ({ row: 0, col, at: eightAt + 4 + col * 6, color: MARK_OK }))} />
       <Note at={reachAt} x={R_X} y={g.rowTop(1) + c.h(16)}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>volume against reach</span>
+        <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          {C.rows[0][C.cols.indexOf("all_rows")]} views: volume; {C.rows[0][C.cols.indexOf("people")]} people: reach
+        </span>
       </Note>
       <Note at={eightAt} x={g.right + 24} y={g.rowTop(0)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>

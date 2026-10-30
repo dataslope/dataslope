@@ -5,9 +5,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Narration for "Data visualization" (16:9), Part 6 of the Data Analyst
  * interview prep videos (agent-outputs/20261021-2314-data-analyst-interview-video-plan.md),
  * after content/interview/data-analyst/data-visualization.mdx. It answers all
- * twenty-two of the page's questions: seventeen drawn the wrong way and the
- * right way, numbered aloud, then five quick ones (numbered 18 to 22 on
- * screen only).
+ * twenty-two of the page's questions: seventeen drawn, most of them the wrong
+ * way and the right way, numbered aloud, then five quick ones (numbered 18 to
+ * 22 on screen only).
  *
  *   1. choosing a chart ("choose").
  *   2. line or bar; 3. pie charts ("line").
@@ -32,7 +32,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *
  * Facts. Every number is the page's own chart data, computed by check.mjs into
  * results.json, which data.ts reads:
- *   - the encoding ranking: color about 3 times the error of position.
+ *   - the encoding ranking: color saturation about 3 times the error of
+ *     position.
  *   - five shares, 31, 24, 22.5, 14 and 8.5 percent: SUV and truck 1.5
  *     points apart.
  *   - 420 tickets: by channel, Email 149 down to Social 41; by hours to
@@ -43,11 +44,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - twelve monthly scores from 94.2 to 97.6 on an axis from 92: a 3.6% rise,
  *     the last bar 2.55 times the first.
  *   - two series: 4,000 growing 6% a period and 40 growing 35%.
- *   - a dual axis over two unrelated series with correlation 0.12.
+ *   - a dual axis over two unrelated series with correlation 0.12, and the
+ *     same two indexed to 100 at the start on one axis.
  *   - a decade with no net change, and a four-month window in it up 25%;
  *     a series rising 61% drawn upside down; a four-day gap filled with zeros.
- *   - a dashboard grid where the top-left slot gets 8 times the attention of
- *     the bottom-right; a dashboard grown to 41 panels with 6 opened.
+ *   - a dashboard grid shaded by the page's reading-order model (a model of
+ *     the shape, not a measurement: charts/dashboard-reading-order.mjs says
+ *     so, so no share or ratio from it is spoken or printed); a dashboard
+ *     grown to 41 panels with 6 opened.
  *   - revenue falling 12% the month after a price rise.
  *   - signups growing about 4 times faster after a June pricing change (the
  *     page's chart title says "doubled"; its own slopes, 1.1 and 4.3 a month,
@@ -69,7 +73,11 @@ export const script: NarrationScript = {
     },
     {
       id: "plan",
-      text: "That's what these interviews test: choosing the chart, not misleading anyone, and telling the story. There are twenty-two questions. We'll draw seventeen of them twice, the wrong way and the right way, and finish with five short ones.",
+      text: "That's what these interviews test: choosing the chart, not misleading anyone, and telling the story. There are twenty-two questions.",
+    },
+    {
+      id: "plan-drawn",
+      text: "We'll draw seventeen of them, most twice, the wrong way and the right way, and finish with five short ones.",
       pauseAfter: 0.7,
     },
     { id: "choose-in", text: "First, how to pick." },
@@ -87,8 +95,12 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     {
+      id: "choose-under",
+      text: "Under all of it is how accurately people read each encoding.",
+    },
+    {
       id: "choose-rank",
-      text: "Under all of it is how accurately people read each encoding. Position comes first, then length, angle and area, and color last, at about three times the error of position.",
+      text: "Position comes first, then length, angle and area, and color saturation last, at about three times the error of position.",
       pauseAfter: 0.7,
     },
     { id: "line-in", text: "Two choices come up in almost every interview." },
@@ -106,9 +118,14 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "line-choose",
+      text: "When both are honest, choose: bars compare each week with its neighbour, and a line carries the shape, which matters more the longer the series.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "line-wrong",
       text: "But put six issue types on the axis, and a line draws a trend through categories that have no order. That's the one wrong chart of the four.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.5,
     },
     {
       id: "pie",
@@ -141,12 +158,24 @@ export const script: NarrationScript = {
     },
     {
       id: "bins",
-      text: "Question five. How do you choose a histogram's bin width? Try several. Bins five wide fuse two peaks into one. Bins a quarter wide break the data into spikes. At one, both peaks are clear.",
+      text: "Question five. How do you choose a histogram's bin width? Try several. Bins five wide fuse two peaks into one.",
+    },
+    {
+      id: "bins-narrow",
+      text: "Bins a quarter wide add spikes that are only noise.",
+    },
+    {
+      id: "bins-one",
+      text: "At one, both peaks are clear.",
       pauseAfter: 0.6,
     },
     {
       id: "bins-rule",
-      text: "Rules of thumb like Sturges or Freedman Diaconis give you a place to start, not a verdict. Report the shape that survives all of them.",
+      text: "Rules of thumb like Sturges or Freedman Diaconis give you a place to start, not a verdict.",
+    },
+    {
+      id: "bins-report",
+      text: "Report the shape that holds across sensible widths.",
       pauseAfter: 0.7,
     },
     { id: "axis-in", text: "Then the most common way a chart lies." },
@@ -208,12 +237,20 @@ export const script: NarrationScript = {
     },
     {
       id: "dual-show",
-      text: "Two series on two y axes: revenue that climbs, and a metric that does nothing. Their correlation is point one two. Fit the right axis tightly, and the metric seems to rise with revenue. Start it at zero, and it lies flat.",
+      text: "Two series on two y axes: revenue that climbs, and a metric that does nothing. Their correlation is point one two.",
+    },
+    {
+      id: "dual-axes",
+      text: "Fit the right axis tightly, and the metric's noise looks as big as revenue's climb. Start it at zero, and it lies flat, while revenue seems to overtake it.",
       pauseAfter: 0.7,
     },
     {
       id: "dual-fix",
-      text: "The scales are arbitrary, so the relationship you see is too. Index both series to a common start, or put them in two aligned panels.",
+      text: "The scales are arbitrary, so the relationship you see is too.",
+    },
+    {
+      id: "dual-index",
+      text: "Index both series to a hundred at the start, so they share one axis, or put them in two aligned panels.",
       pauseAfter: 0.8,
     },
     {
@@ -224,6 +261,11 @@ export const script: NarrationScript = {
     {
       id: "other-more",
       text: "An inverted axis, where a rise of sixty-one percent draws as a fall. And missing days filled with zeros, which draws a collapse that never happened.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "other-fix",
+      text: "The fixes: show the whole range, keep the axis upright, and leave a gap where data is missing.",
       pauseAfter: 0.7,
     },
     { id: "dash-in", text: "Next, the dashboards these charts end up on." },
@@ -237,7 +279,11 @@ export const script: NarrationScript = {
     },
     {
       id: "dash-attn",
-      text: "That's where eyes land, and attention fades down and to the right: the top left slot gets about eight times the attention of the bottom right. Keep scales and colors consistent, and say how fresh the data is.",
+      text: "That's where eyes land. In a simple model of reading order, attention falls faster down the page than across it, so a slot at the top left is worth several at the bottom right.",
+    },
+    {
+      id: "dash-keep",
+      text: "Keep scales and colors consistent, and say how fresh the data is.",
       pauseAfter: 0.6,
     },
     {
@@ -248,6 +294,10 @@ export const script: NarrationScript = {
     {
       id: "report",
       text: "Question twelve. What's the difference between a dashboard and a report? A dashboard is a living view for monitoring: what's happening now? A report answers one question, with narrative and context, and is read from top to bottom.",
+    },
+    {
+      id: "report-use",
+      text: "Dashboards drive day-to-day decisions; reports drive deeper analysis.",
       pauseAfter: 0.7,
     },
     { id: "story-in", text: "Which brings us to the story itself." },
@@ -291,12 +341,16 @@ export const script: NarrationScript = {
     {
       id: "cap",
       text: "Question sixteen. Why cap a categorical palette at six or eight colors? Because past that, the palette runs out and starts again, and two unrelated groups share a color. Fold the tail into other, or split the chart into small panels.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.5,
     },
     {
       id: "access",
       text: "Question seventeen. How do you make a chart accessible? About eight percent of men have red-green color blindness, so don't carry meaning by color alone. Here are red and green as most people see them, and as a red-green colorblind reader sees them.",
       pauseAfter: 0.6,
+    },
+    {
+      id: "access-safe",
+      text: "Use a colorblind-safe pair, like blue and orange instead of red and green, and keep the contrast high.",
     },
     {
       id: "access-fix",

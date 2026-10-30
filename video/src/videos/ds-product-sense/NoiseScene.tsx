@@ -116,7 +116,11 @@ export const NoiseScene: React.FC = () => {
             ) : null}
           </Svg>
           <Note at={threeAt + 8} x={CHART.x0 + 12} y={at(ys, NOISE.band[1]) - h(36)}>
-            <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>its normal band</span>
+            {/* The band is two standard deviations either side (check.mjs);
+                the ±3% beside the chart is one, so the band says its width. */}
+            <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              its normal band: ±2 standard deviations, about ±{Math.round(NOISE.sdShare * 200)}%
+            </span>
           </Note>
           <Note at={dipAt + 6} x={at(xs, days + 1) + 10} align="right" y={at(ys, NOISE.band[0]) + h(14)}>
             <span style={{ ...note(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>

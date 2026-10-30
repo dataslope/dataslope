@@ -42,22 +42,25 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "bias", the video's own 100,000 users (seed 21): average satisfaction
  *     5.98; 22.6% churned, the unhappiest likeliest to; those who stayed
  *     average 6.56; thirty surveys of 20 stayers range 5.84 to 7.43, of 2,000
- *     range 6.50 to 6.64.
+ *     range 6.50 to 6.64. Forty scores from each side (seed 22) draw who left.
  *   - "metric", the video's own two weeks: 10,000 sessions and 300 orders,
- *     then 8,000 and 288; conversion 3.0% to 3.6%, up 20%; orders down 4%,
- *     sessions down 20%.
+ *     then 8,000 and 288; conversion 3.0% to 3.6%, up 20% (0.6 points);
+ *     orders down 4%, sessions down 20%: the 2,000 sessions that left carried
+ *     12 orders, 0.6%.
  *   - "quantile", the page's thirteen amounts: Q1 10, median 12, Q3 13, IQR
- *     3; the 90th percentile interpolates between 14 and 190 to 154.8; the
+ *     3; the 90th percentile sits at position 10.8 of 12, 80% of the way
+ *     from 14 to 190: 154.8; the
  *     fences are 5.5 and 17.5 and catch 200 and 190; the mean is 39.5 and
  *     the standard deviation 69.1, so 200 is 2.32 standard deviations out
  *     and 190 is 2.18; a cutoff of 2 flags both, a cutoff of 3 flags none.
  *   - "present": the page's own example, 12% more likely to buy, the lift
  *     between 8% and 16%, and 12.37% as false precision.
- *   - rapid fire: the page's 10 to 50 (variance 250, standard deviation 15.81,
- *     ddof 1); the video's own tickets (billing three times); 100,000 normal
- *     draws (68.1%, 95.5% and 99.7% within one, two and three standard
- *     deviations); a population of 10,000 with mean 50.2 and three samples of
- *     50 averaging 52.1, 51.8 and 51.1.
+ *   - rapid fire: the page's 10, 20, 30, 40 and 50 (squared distances 1,000;
+ *     over n, 200; pandas' n - 1, variance 250 and standard deviation 15.81);
+ *     the video's own tickets (billing three times); the rule's exact areas
+ *     (68.3%, 95.4% and 99.7% within one, two and three standard
+ *     deviations); a population of 10,000 with mean 50.2 and twenty samples
+ *     of 50 averaging 47.8 to 53.1, seven of them below it.
  *
  * Written for Drew's ear, as in Parts 1 and 2. Numbers are written as they
  * are said; "IQR" is spelled for the interquartile range, and "Q one" and
@@ -100,9 +103,10 @@ export const script: NarrationScript = {
       text: "The median order is twenty-three eleven. The mean is twenty-six fifty-eight, dragged to the right by the tail. Only a hundred and eighty-one of the five hundred orders are above it.",
       pauseAfter: 0.8,
     },
+    { id: "median-both", text: "Income, house prices and session lengths all look like this." },
     {
-      id: "median-both",
-      text: "Income, house prices and session lengths all look like this. Report the median as the typical value, and both when the gap between them is the story.",
+      id: "median-report",
+      text: "Report the median as the typical value, the mean when you need a total, like revenue, and both when the gap between them is the story.",
       pauseAfter: 0.7,
     },
     { id: "corr-in", text: "Next, two numbers that move together." },
@@ -126,7 +130,11 @@ export const script: NarrationScript = {
     },
     {
       id: "corr-fixed",
-      text: "Hold temperature fixed, and the link all but vanishes: point zero eight. To argue a cause, you need an experiment, like an A B test, where random groups see version A or version B, or a careful causal design.",
+      text: "Hold temperature fixed, comparing only days equally hot, and the link all but vanishes: point zero eight. Other correlations are pure chance, or the cause runs the other way.",
+    },
+    {
+      id: "corr-cause",
+      text: "To argue a cause, you need an experiment, like an A B test, where random groups see version A or version B, or a careful causal design.",
       pauseAfter: 0.7,
     },
 
@@ -149,7 +157,12 @@ export const script: NarrationScript = {
     },
     {
       id: "coef-curve",
-      text: "And a curve that only ever rises scores point eight one. Spearman ranks the values first, and gives it a perfect one. Use it when the relationship is monotonic but not straight, or when the data is ordinal.",
+      text: "And a curve that only ever rises scores point eight one. Spearman ranks the values first, and gives it a perfect one.",
+    },
+    { id: "coef-use", text: "Use it when the relationship is monotonic but not straight, or when the data is ordinal." },
+    {
+      id: "coef-plot",
+      text: "Ordinal means ranked categories, like a one-to-five rating. And neither coefficient sees the U, which is why you plot the data first.",
       pauseAfter: 0.7,
     },
     { id: "bias-in", text: "Then, where the data came from." },
@@ -173,7 +186,11 @@ export const script: NarrationScript = {
     },
     {
       id: "bias-bigger",
-      text: "Survey twenty of them, thirty times over, and the answers scatter. Survey two thousand, and they settle, on six point five six. A bigger sample shrinks the noise. It does nothing about the bias. The fix is the design: a random or stratified sample of everyone.",
+      text: "Survey twenty of them, thirty times over, and the answers scatter. Survey two thousand, and they settle, on six point five six. A bigger sample shrinks the noise. It does nothing about the bias.",
+    },
+    {
+      id: "bias-fix",
+      text: "The fix is the design: a random sample of everyone, or a stratified one, a set share from each group, like new and long-time users. For those who left, run an exit survey.",
       pauseAfter: 0.7,
     },
     { id: "metric-in", text: "The next one is the classic open question." },
@@ -200,6 +217,11 @@ export const script: NarrationScript = {
       text: "Finish with the most likely driver, and what you'd check next.",
       pauseAfter: 0.7,
     },
+    {
+      id: "metric-driver",
+      text: "Here, sessions fell by two thousand and orders by only twelve, so the traffic that left was barely buying. The likeliest driver is low-intent traffic dropping away, like a paused campaign or bots newly filtered out. Check sessions by channel next, and say plainly that orders fell.",
+      pauseAfter: 0.7,
+    },
     { id: "quantile-in", text: "Two questions about the edges of the data." },
 
     // ── 6, 7. Percentiles, quartiles and outliers ─────────────────────────
@@ -219,11 +241,9 @@ export const script: NarrationScript = {
       text: "Here are thirteen amounts, in order. The first quartile, Q one, is ten. The median is twelve, and the third quartile, Q three, is thirteen. Between them is the interquartile range, the IQR: three.",
       pauseAfter: 0.7,
     },
-    {
-      id: "quantile-p90",
-      text: "The ninetieth percentile is a hundred fifty-four point eight, an amount nobody spent. Pandas interpolates between fourteen and one ninety. Other tools use other rules, so exact answers can differ.",
-      pauseAfter: 0.8,
-    },
+    { id: "quantile-p90", text: "The ninetieth percentile is a hundred fifty-four point eight, an amount nobody spent." },
+    { id: "quantile-interp", text: "Pandas goes eighty percent of the way from fourteen to one ninety." },
+    { id: "quantile-rules", text: "Other tools use other rules, so exact answers can differ.", pauseAfter: 0.8 },
     {
       id: "outlier",
       text: "Question seven. How do you identify outliers?",
@@ -242,6 +262,11 @@ export const script: NarrationScript = {
     {
       id: "outlier-mask",
       text: "With a cutoff of two, both are caught. With three, nothing is: the outliers hide themselves.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "outlier-which",
+      text: "That's called masking. So reach for the IQR rule, or a z-score built on the median: quartiles don't move when the outliers do.",
       pauseAfter: 0.7,
     },
     {
@@ -268,9 +293,10 @@ export const script: NarrationScript = {
       text: "Say the caveats plainly, like this excludes refunds. End with what you recommend. The method goes in the appendix.",
       pauseAfter: 0.8,
     },
+    { id: "plain", text: "Question nine. How do you explain a complex statistical finding in plain language?", pauseAfter: 0.6 },
     {
-      id: "plain",
-      text: "Question nine. How do you explain a complex statistical finding in plain language? Anchor it to one number people can picture: customers who saw the new design were twelve percent more likely to buy.",
+      id: "plain-anchor",
+      text: "Anchor it to one number people can picture: customers who saw the new design were twelve percent more likely to buy.",
       pauseAfter: 0.6,
     },
     {
@@ -278,9 +304,10 @@ export const script: NarrationScript = {
       text: "Drop the jargon. Instead of a ninety-five percent confidence interval, say we're highly confident the true lift is between eight and sixteen percent. Then tie it to the decision it informs.",
       pauseAfter: 0.8,
     },
+    { id: "uncertain", text: "Question ten. How do you communicate uncertainty in a data finding?", pauseAfter: 0.6 },
     {
-      id: "uncertain",
-      text: "Question ten. How do you communicate uncertainty? Say what the number rests on, like the last ninety days. Give a range, not just a point. Name the assumptions, and how far the answer moves if they're wrong.",
+      id: "uncertain-rests",
+      text: "Say what the number rests on, like the last ninety days. Give a range, not just a point. Name the assumptions, and how far the answer moves if they're wrong.",
       pauseAfter: 0.7,
     },
     {
@@ -298,19 +325,35 @@ export const script: NarrationScript = {
     },
     {
       id: "r-var",
-      text: "Variance is the average squared distance from the mean. Standard deviation is its square root, back in the data's own units. Ten to fifty gives two fifty and fifteen point eight one. Pandas divides by n minus one.",
+      text: "Variance is the average squared distance from the mean. Standard deviation is its square root, back in the data's own units.",
+    },
+    {
+      id: "r-var-n",
+      text: "Take ten, twenty, thirty, forty and fifty. Their squared distances from the mean add to a thousand, and a thousand over five is two hundred. But pandas treats the data as a sample and divides by n minus one, four, for two fifty: a sample's mean sits closer to its own points than the true mean does, so dividing by n comes out too small. The standard deviation, its square root, is fifteen point eight one.",
     },
     {
       id: "r-mode",
-      text: "The mode is the most common value, and the center that works for categories: the most common ticket is billing. Two modes are a reason to split the data.",
+      text: "The mode is the most common value, and the center that works for categories: the most common ticket is billing.",
+    },
+    {
+      id: "r-modes",
+      text: "Two peaks in a distribution, like a cluster of small baskets and one of large ones, are a reason to look for two groups.",
     },
     {
       id: "r-normal",
       text: "A normal distribution is a symmetric bell, set by its mean and standard deviation. Sixty-eight percent falls within one standard deviation, ninety-five within two, ninety-nine point seven within three.",
     },
     {
+      id: "r-normal-why",
+      text: "It matters because the average of a big sample comes out close to normal even when the data isn't, like the orders in question one. Confidence intervals and A B tests lean on that, so skewed raw data doesn't break them by itself.",
+    },
+    {
       id: "r-pop",
-      text: "And the population is everyone you care about. A sample is the part you measured, and its mean is only an estimate. Three samples of fifty give fifty-two point one, fifty-one point eight and fifty-one point one. The population's mean is fifty point two.",
+      text: "And the population is everyone you care about. A sample is the part you measured, and its mean is only an estimate.",
+    },
+    {
+      id: "r-pop-many",
+      text: "Twenty samples of fifty average anywhere from forty-seven point eight to fifty-three point one, on both sides of the population's mean, fifty point two. That scatter is sampling error.",
       pauseAfter: 0.9,
     },
     {

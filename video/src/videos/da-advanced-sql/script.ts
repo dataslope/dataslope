@@ -42,24 +42,28 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     products, Emma and Ulysses tied at 310: ROW_NUMBER keeps four rows (Emma
  *     of the pair), RANK five; QUALIFY gives ROW_NUMBER's four.
  *   - "frame", the video's own four payments (the page's first four amounts,
- *     the middle two on one day): ROWS gives 100, 350, 425, 605; RANGE and
- *     the default frame give 100, 425, 425, 605; no ORDER BY gives 605 on
- *     every row. LAST_VALUE on the page's first four days returns each row's
- *     own amount, and 180 with the frame widened.
+ *     the middle two on one day): ROWS, ordered by day and then id so the
+ *     tie has one order, gives 100, 350, 425, 605; RANGE and the default
+ *     frame give 100, 425, 425, 605; no ORDER BY gives 605 on every row.
+ *     LAST_VALUE on the page's first four days returns each row's own
+ *     amount, and 180 with the frame widened; FIRST_VALUE gives 100 on every
+ *     row, NTH_VALUE(amount, 3) null, null, then 75.
  *   - "running", the page's 24 days: the running total reaches 4,255; the
- *     trailing three-day average starts 100, 175, 141.67.
+ *     trailing three-day average starts 100.00, 175.00, 141.67. A RANGE frame
+ *     of INTERVAL 2 DAY runs on the spine's sales, which have gaps.
  *   - "latest", the video's own plan changes: user 1 has three rows, and
  *     only team is kept. The page's spine: sales on March 1, 3 and 4, so the
  *     2nd and the 5th come back as zeros.
  *   - at speed: LAG gives 150 for January 2; NTILE(4) makes four groups of
  *     six from the page's 24 customers, NTILE(5) 5, 5, 5, 5, 4; DuckDB's own
  *     error for a window in WHERE; the page's org chart has five levels;
- *     January's 24 days fall in four weeks; the page's pivot and its unpivot;
+ *     January's 24 days fall in four weeks, each from a Monday, the last of
+ *     three days; the page's pivot and its unpivot;
  *     PERCENT_RANK 0 to 1 and CUME_DIST 0.2 to 1 on five customers.
  *
  * Written for Drew's ear, as in Parts 1 to 3: SQL keywords are written as
  * words, "N tile" for NTILE, "cume dist" for CUME_DIST, "date trunc" for
- * DATE_TRUNC.
+ * DATE_TRUNC, "enth value" for NTH_VALUE.
  */
 export const script: NarrationScript = {
   id: "da-advanced-sql",
@@ -138,6 +142,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "topn-tie",
+      text: "Which one is arbitrary, unless you add a tiebreaker to the order by, such as product.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "topn-rank",
       text: "Use rank instead, and both tied books come back: five rows.",
       pauseAfter: 0.7,
@@ -145,6 +154,11 @@ export const script: NarrationScript = {
     {
       id: "qualify",
       text: "Question five. What is qualify? It filters on a window function the way having filters on an aggregate, with no wrapping query. DuckDB, Snowflake and BigQuery support it.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "qualify-where",
+      text: "Postgres and SQL Server don't, so there you wrap the query.",
       pauseAfter: 0.7,
     },
     { id: "frame-in", text: "Now the part people most often get wrong: the frame." },
@@ -163,7 +177,7 @@ export const script: NarrationScript = {
     },
     {
       id: "frame-rows",
-      text: "Rows counts physical rows, so the running total climbs one payment at a time: a hundred, three fifty, four twenty-five.",
+      text: "Rows counts physical rows, so with id breaking the tie, the running total climbs one payment at a time: a hundred, three fifty, four twenty-five.",
       pauseAfter: 0.6,
     },
     {
@@ -173,12 +187,32 @@ export const script: NarrationScript = {
     },
     {
       id: "default",
-      text: "Question seven. What is the default frame? Add order by with no frame, and you get range, from the start to the current row. So sum over order by day is a running total, not the total. Leave out order by, and every row gets six oh five.",
+      text: "Question seven. What is the default frame, and why does it matter?",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "default-range",
+      text: "Add order by with no frame, and you get range, from the start to the current row. So sum over order by day is a running total, not the total.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "default-ties",
+      text: "Tied days share one total. For a total that moves one row at a time, write rows and a unique order yourself.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "default-whole",
+      text: "Leave out order by, and every row gets six oh five.",
       pauseAfter: 0.8,
     },
     {
       id: "last",
       text: "Question eight. What's the last value gotcha? With that default frame, the window ends at the current row, so last value just returns the row's own amount. Widen the frame to unbounded following, and every row gets the real last day: one eighty.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "last-first",
+      text: "First value is safe, since the default frame starts at the first row. And enth value is null until the frame reaches row N.",
       pauseAfter: 0.7,
     },
     { id: "running-in", text: "Two calculations every analyst gets asked to write." },
@@ -188,11 +222,21 @@ export const script: NarrationScript = {
       id: "running",
       scene: true,
       text: "Question nine. How do you compute a running total? An ordered sum, with the default frame: a hundred, three fifty, four twenty-five, six oh five, and on to four thousand two hundred fifty-five by the twenty-fourth.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "running-safe",
+      text: "The default frame is safe here because each day appears once.",
       pauseAfter: 0.7,
     },
     {
       id: "moving",
       text: "Question ten. How do you compute a moving average? Average over an explicit rows frame, the two rows before and the current one. The first two days have less behind them, so they average one value and then two. A centered average uses one preceding and one following.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "moving-days",
+      text: "Rows counts rows, not days. If a day can be missing, use range with an interval, or fill in the dates first: question twelve.",
       pauseAfter: 0.7,
     },
     { id: "latest-in", text: "And two patterns that turn up in almost every take-home." },
@@ -202,6 +246,11 @@ export const script: NarrationScript = {
       id: "latest",
       scene: true,
       text: "Question eleven. How do you keep only the latest row for each user? Number each user's rows from the newest, and keep row one. User one has three rows. Only the newest, team, survives.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "latest-tie",
+      text: "A tie on the timestamp needs a tiebreaker too. Group by with max finds the newest date, but loses the plan that goes with it.",
       pauseAfter: 0.7,
     },
     {
@@ -212,6 +261,11 @@ export const script: NarrationScript = {
     {
       id: "spine-fix",
       text: "Generate every day with generate series, left join the sales onto it, and turn the missing amounts into zeros with coalesce.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "spine-calendar",
+      text: "Engines without generate series use a calendar table instead.",
       pauseAfter: 0.7,
     },
 
@@ -226,6 +280,7 @@ export const script: NarrationScript = {
       id: "r-lag",
       text: "Lag reads a value from an earlier row, and lead from a later one. Day over day change is the amount minus its lag.",
     },
+    { id: "r-lag-null", text: "The first row gets null, unless you pass lag a default." },
     {
       id: "r-ntile",
       text: "N tile splits ordered rows into equal buckets. Twenty-four customers make four quartiles of six. Split them five ways, and the first buckets each take an extra row.",
@@ -242,6 +297,7 @@ export const script: NarrationScript = {
       id: "r-bucket",
       text: "Date trunc snaps a timestamp to the start of its day, week or month. January's twenty-four days fall into four weeks.",
     },
+    { id: "r-bucket-last", text: "Weeks start on Monday here, and the last one holds only three days." },
     {
       id: "r-pivot",
       text: "To pivot, wrap a case in a sum for each new column: one row per region, with the quarters side by side.",
@@ -252,7 +308,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-percent",
-      text: "And percent rank runs from zero for the first row to one for the last. Cume dist is the share of rows at or below this one, so it never reaches zero.",
+      text: "And percent rank is rank minus one, over rows minus one: zero for the first row, one for the last.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-cume",
+      text: "Cume dist is the share of rows at or below this one, so it never reaches zero.",
       pauseAfter: 0.9,
     },
     {

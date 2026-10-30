@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { QMono, RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { BAR, INK, PAPER, TABULAR, fmt, headline, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, fmt, headline, note } from "../../editorial/style";
 import { Ink, NextLine, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -80,6 +80,7 @@ const Union: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-union", "UNION drops");
   const allAt = c.w("r-union", "UNION ALL");
   const fasterAt = c.w("r-union", "faster");
+  const checkAt = c.w("r-union-why", "skips the duplicate check");
   const ag = geo(c, R_X, c.T, RAPID.storeA.cols, RAPID.storeA.rows);
   const bg = geo(c, R_X + 260, c.T, RAPID.storeB.cols, RAPID.storeB.rows);
   const resultTop = c.T + c.h(HEAD_H + 2 * ROW_H + 110);
@@ -106,7 +107,10 @@ const Union: React.FC<{ c: Ctx }> = ({ c }) => {
       </CodeName>
       <DataTable g={ag2} cols={numeric(RAPID.unionAll.cols)} at={allAt} rows={RAPID.unionAll.rows.map((cells, i) => ({ cells, at: allAt + 4 + i * 3 }))} bands={dup(RAPID.unionAll.rows).map((row, k) => ({ row, at: allAt + 18 + k * 4 }))} />
       <Note at={fasterAt - 4} x={ag2.right + 40} y={ag2.top + c.h(60)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>keeps every row, and it&apos;s faster</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>keeps every row, and it&apos;s faster:</span>
+      </Note>
+      <Note at={checkAt - 2} x={ag2.right + 40} y={ag2.top + c.h(100)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>it skips the duplicate check</span>
       </Note>
     </>
   );
@@ -217,12 +221,16 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
   const firstAt = c.w("r-coalesce", "first value");
   const nullifAt = c.w("r-coalesce", "Null if");
   const divideAt = c.w("r-coalesce", "divide by");
+  const errorAt = c.w("r-divide", "dividing by zero");
+  const byNullAt = c.w("r-divide", "Dividing by null");
   const lines = RAPID.coalesce.lines;
   const listH = listingHeight(lines.length, 22);
   const rg = geo(c, R_X, c.T + listH + c.h(70), RAPID.coalesce.cols, RAPID.coalesce.rows);
   const coalesceLine = lines.findIndex((l) => l.includes("COALESCE"));
   const nullifLine = lines.findIndex((l) => l.includes("NULLIF"));
   const day1 = 0;
+  // DuckDB without NULLIF: the zero-session day comes back null, not an error.
+  const duckNull = RAPID.divideByZero.rows[day1][0] === "null";
   return (
     <>
       <Listing
@@ -247,6 +255,21 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
           { row: day1, col: 2, at: divideAt },
         ]}
       />
+      <Note at={errorAt - 2} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(30)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          Dividing by 0: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>an error</span> in most databases.
+        </span>
+      </Note>
+      <Note at={byNullAt - 2} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(76)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Dividing by null: just null.</span>
+      </Note>
+      {/* The engine these ran in is one of the lenient ones: said, so a viewer
+          who tries it on the page is not surprised. */}
+      {duckNull ? (
+        <Note at={byNullAt + 12} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(122)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>DuckDB, which ran these, gives null for both.</span>
+        </Note>
+      ) : null}
     </>
   );
 };
@@ -337,7 +360,10 @@ const IndexFigure: React.FC<{ c: Ctx; tableAt: number; storedAt: number; indexAt
         bands={insertAt === undefined ? [] : [{ row: n, at: insertAt + 4 }]}
       />
       <Note at={storedAt} x={R_X} y={ug.rowTop(n + (insertAt === undefined ? 0 : 1)) + 16}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the rows, stored in id order: one per table</span>
+        <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ fontWeight: 650 }}>clustered:</span> the rows themselves,
+        </div>
+        <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>in id order (one per table)</div>
       </Note>
       <TableName g={ig} at={indexAt}>
         an index on email
@@ -355,8 +381,15 @@ const IndexFigure: React.FC<{ c: Ctx; tableAt: number; storedAt: number; indexAt
       {RAPID.emailIndex.rows.map((r, i) => (
         <KeyArrow key={i} from={[ig.x - 6, ig.rowMid(i)]} to={[ug.right + 8, ug.rowMid(rowOf(r[1]))]} at={lookupAt + i * 3} width={2} />
       ))}
+      {/* The insert's second write: the new index entry, pointing at its row. */}
+      {insertAt === undefined ? null : (
+        <KeyArrow from={[ig.x - 6, ig.rowMid(n)]} to={[ug.right + 8, ug.rowMid(n)]} at={insertAt + 16} width={2} />
+      )}
       <Note at={lookupAt + 6} x={ig.x} y={ig.rowTop(n + (insertAt === undefined ? 0 : 1)) + 16}>
-        <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a separate lookup: many per table</span>
+        <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          <span style={{ fontWeight: 650 }}>non-clustered:</span> a separate lookup
+        </div>
+        <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>(many per table)</div>
       </Note>
     </>
   );
@@ -374,8 +407,8 @@ const Indexes: React.FC<{ c: Ctx }> = ({ c }) => {
         c={c}
         tableAt={c.w("r-index", "A clustered index") - 2}
         storedAt={c.w("r-index", "stored in")}
-        indexAt={c.w("r-index", "non-clustered") - 2}
-        lookupAt={c.w("r-index", "separate lookup")}
+        indexAt={c.w("r-index-many", "non-clustered") - 2}
+        lookupAt={c.w("r-index-many", "separate lookup")}
         insertAt={insertAt + 2}
       />
       <Note at={readsAt - 2} x={R_X} y={c.y(TOP + 480)}>
@@ -396,12 +429,22 @@ const WritesWord: React.FC<{ at: number }> = ({ at }) => {
 
 const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-rollup", "Roll up");
-  const subAt = c.w("r-rollup", "subtotals");
+  const subAt = c.w("r-rollup", "adds subtotals");
   const grandAt = c.w("r-rollup", "grand total");
-  const seventeenAt = c.w("r-rollup", "seventeen rows");
-  const allAt = c.w("r-rollup", "GROUP BY ALL");
-  const everyAt = c.w("r-rollup", "every column");
+  const twelveAt = c.w("r-rollup", "twelve");
+  const fourAt = c.w("r-rollup", "four subtotals");
+  const oneAt = c.w("r-rollup", "one total");
+  const seventeenAt = c.w("r-rollup", "seventeen");
+  const allAt = c.w("r-groupall", "GROUP BY ALL");
+  const everyAt = c.w("r-groupall", "every selected column");
   const { lines, cols, rows } = RAPID.rollup;
+  // The seventeen rows, counted as ROLLUP makes them: region and category
+  // pairs, a subtotal per region (category null), the grand total (both null).
+  const isNull = (v: string) => v === "null";
+  const pairs = rows.filter((r) => !isNull(r[0]) && !isNull(r[1])).length;
+  const subs = rows.filter((r) => !isNull(r[0]) && isNull(r[1])).length;
+  const totals = rows.filter((r) => isNull(r[0])).length;
+  if (pairs + subs + totals !== rows.length) throw new Error("ROLLUP's rows are not pairs + subtotals + total");
   // The first region's rows and its subtotal, a gap, and the grand total.
   const firstRegion = rows.filter((r) => r[0] === rows[0][0]);
   const shownRows = [...firstRegion, ["…", "", ""], rows[rows.length - 1]];
@@ -429,18 +472,39 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
         at={subAt - 6}
         rows={shownRows.map((cells, i) => ({ cells, at: (i === shownRows.length - 1 ? grandAt : subAt) - 2 + (i < sub ? i * 2 : 0) }))}
         bands={[
-          { row: sub, at: subAt + 6 },
-          { row: shownRows.length - 1, at: grandAt + 4 },
+          ...Array.from({ length: sub }, (_, i) => ({ row: i, at: twelveAt + i * 2, out: fourAt })),
+          { row: sub, at: fourAt },
+          { row: shownRows.length - 1, at: oneAt },
         ]}
         out={allAt - 4}
       />
-      <Note at={seventeenAt - 2} x={rg.right + 40} y={rg.top + c.h(10)} out={allAt - 4}>
+      <Note at={twelveAt - 2} x={rg.right + 40} y={rg.top + c.h(10)} out={allAt - 4}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <span style={TABULAR}>{rows.length}</span> rows
+          <Term at={twelveAt - 2}>
+            <span style={TABULAR}>{pairs}</span>
+          </Term>
+          <Term at={fourAt - 2}>
+            {" + "}
+            <span style={TABULAR}>{subs}</span>
+          </Term>
+          <Term at={oneAt - 2}>
+            {" + "}
+            <span style={TABULAR}>{totals}</span>
+          </Term>
+          <Term at={seventeenAt - 2}>
+            {" = "}
+            <span style={{ ...TABULAR, fontWeight: 650 }}>{rows.length}</span> rows
+          </Term>
         </span>
       </Note>
-      <Listing lines={RAPID.groupByAll.lines} x={R_X} top={c.T} width={760} size={22} at={allAt} marks={[{ line: allLine, at: everyAt }]} />
-      <DataTable g={ag} cols={numeric(RAPID.groupByAll.cols, ["revenue"])} at={allAt + 6} rows={RAPID.groupByAll.rows.map((cells, i) => ({ cells, at: allAt + 10 + i * 2 }))} />
+      <Listing lines={RAPID.groupByAll.lines} x={R_X} top={c.T} width={760} size={22} at={allAt - 2} marks={[{ line: allLine, at: allAt + 8 }]} />
+      <DataTable g={ag} cols={numeric(RAPID.groupByAll.cols, ["revenue"])} at={allAt} rows={RAPID.groupByAll.rows.map((cells, i) => ({ cells, at: allAt + 4 + i * 2 }))} />
+      <Note at={everyAt - 2} x={ag.right + 40} y={ag.top + c.h(10)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>every selected column you didn&apos;t aggregate</span>
+      </Note>
+      <Note at={everyAt + 16} x={ag.right + 40} y={ag.top + c.h(52)}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Not standard SQL: where it&apos;s supported.</span>
+      </Note>
     </>
   );
 };
@@ -490,14 +554,20 @@ const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Dedupe: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-dedupe", "To delete them");
-  const numberAt = c.w("r-dedupe", "number each copy");
-  const afterAt = c.w("r-dedupe", "everything after the first");
+  const numberAt = c.w("r-dedupe", "number the copies");
+  const emailAt = c.w("r-dedupe", "each email");
+  const rowNumberAt = c.w("r-dedupe", "row number");
+  const oldestAt = c.w("r-dedupe", "oldest first");
+  const afterAt = c.w("r-dedupe", "numbered over one");
   const { cols, rows } = RAPID.rowNumbers;
   const tg = tableGeometry({ x: R_X, top: c.T, cols: cols.map((name) => ({ name })), rows, headH: c.h(HEAD_H), rowH: c.h(ROW_H), bodySize: 24 });
   const listX = 1170;
   const lines = RAPID.dedupe.lines;
   const listH = listingHeight(lines.length, 20);
   const cg = geo(c, listX, c.T + listH + c.h(70), RAPID.dedupe.cols, RAPID.dedupe.rows, 24);
+  const rowNumberLine = lines.findIndex((l) => l.includes("ROW_NUMBER()"));
+  const partitionLine = lines.findIndex((l) => l.includes("PARTITION BY"));
+  const deleteLine = lines.findIndex((l) => l.includes("rn > 1"));
   return (
     <>
       <TableName g={tg} at={at - 4}>
@@ -505,12 +575,34 @@ const Dedupe: React.FC<{ c: Ctx }> = ({ c }) => {
       </TableName>
       <DataTable
         g={tg}
-        cols={cols.map((name) => ({ name, numeric: name !== "email", at: name === "rn" ? numberAt + 4 : undefined }))}
+        cols={cols.map((name) => ({ name, numeric: name !== "email", at: name === "rn" ? rowNumberAt + 4 : undefined }))}
         at={at - 4}
         rows={rows.map((cells, i) => ({ cells, at: at + i * 2, strikeAt: Number(cells[2]) > 1 ? afterAt + 4 + i : undefined }))}
-        marks={rows.flatMap((r, i) => (Number(r[2]) > 1 ? [{ row: i, col: 2, at: afterAt, color: MARK_BAD }] : []))}
+        bands={rows.flatMap((r, i) => (r[1] === rows[0][1] ? [{ row: i, at: emailAt + i, out: oldestAt + 20 }] : []))}
+        marks={[
+          // The copy that survives: the oldest id of each email, numbered 1.
+          ...rows.flatMap((r, i) => (Number(r[2]) === 1 && rows.some((s) => s[1] === r[1] && s !== r) ? [{ row: i, col: 0, at: oldestAt + 2, color: MARK_OK }] : [])),
+          ...rows.flatMap((r, i) => (Number(r[2]) > 1 ? [{ row: i, col: 2, at: afterAt, color: MARK_BAD }] : [])),
+        ]}
       />
-      <Listing lines={lines} x={listX} top={c.T} width={630} size={20} at={numberAt - 6} marks={[{ line: 1, at: numberAt + 6 }]} />
+      <Ink at={rowNumberAt} dur={12} style={{ left: listX, top: c.T - 38, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK_SOFT) }}>
+          <span style={{ fontFamily: MONO, fontWeight: 600, fontVariantLigatures: "none" }}>ROW_NUMBER()</span>: a window function, Part 4
+        </span>
+      </Ink>
+      <Listing
+        lines={lines}
+        x={listX}
+        top={c.T}
+        width={630}
+        size={20}
+        at={numberAt - 6}
+        marks={[
+          { line: rowNumberLine, at: rowNumberAt + 2 },
+          { line: partitionLine, at: emailAt },
+          { line: deleteLine, at: afterAt + 2, color: MARK_BAD },
+        ]}
+      />
       <DataTable g={cg} cols={numeric(RAPID.dedupe.cols, RAPID.dedupe.cols)} at={afterAt + 8} rows={RAPID.dedupe.rows.map((cells) => ({ cells, at: afterAt + 12 }))} />
     </>
   );
@@ -591,8 +683,8 @@ export const RapidScene: React.FC = () => {
   const c: Ctx = { w: (b, p) => n.word(b, p), y, h, T: y(TOP) };
 
   const from = n.beat("rapid-in").from;
-  const fourteenAt = n.word("rapid-in", "fourteen questions");
-  const eachAt = n.word("rapid-in", "one answer each");
+  const fourteenAt = n.word("rapid-fourteen", "fourteen questions");
+  const eachAt = n.word("rapid-fourteen", "one answer each");
   const nextAt = n.word("next", "Next");
   const end = n.beat("next").from;
 
@@ -659,4 +751,10 @@ const Fade: React.FC<{ from: number; children: React.ReactNode }> = ({ from, chi
   const frame = useCurrentFrame();
   const o = ease(frame, from, 8);
   return o > 0 ? <AbsoluteFill style={{ opacity: o }}>{children}</AbsoluteFill> : null;
+};
+
+/** One term of a sum written out as it is said. */
+const Term: React.FC<{ at: number; children: React.ReactNode }> = ({ at, children }) => {
+  const frame = useCurrentFrame();
+  return <span style={{ opacity: ease(frame, at, 10) }}>{children}</span>;
 };

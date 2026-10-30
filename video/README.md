@@ -131,6 +131,9 @@ src/videos/<video>/
   Video.tsx            the composition: scenes, each cued to narration words
   illustrations.json   image prompts (watercolor, GPT Image)
   patterns.json        Tabbied patterns, if the video uses any
+  check.mjs            the facts: runs the lesson's code, writes results.json
+  results.json         what check.mjs measured (committed)
+  data.ts              reads results.json for the scenes
 public/images/<video>/     trimmed WebP cut-outs (generated, committed)
 public/patterns/<video>/   pattern SVGs (generated, committed)
 public/narration/<script id>/   audio and alignment, once there is audio
@@ -159,6 +162,16 @@ Shared building blocks:
   `endSymbols()` says where an end's maximum and minimum sit, to point at one
   as it is read. The `ErdKit` composition under Assets shows the kit.
 
+**A video's facts are measured, never typed.** `check.mjs` runs the lesson's
+own code in the engine the page runs it in (Pyodide, DuckDB-Wasm or PGlite)
+and writes `results.json`; `data.ts` reads it, so a number on screen can't
+drift from what ran. Those engines are the site's dependencies, not this
+package's: `check.mjs` loads them from the repository root's
+`node_modules`, so run `npm ci` at the root once before running one, or it
+stops at `Cannot find module 'pyodide'`. (The Data Scientist fixers, barred
+from installing, pointed `NODE_PATH` at private copies of the locked
+versions; every existing value reproduced.)
+
 Register a new composition in `src/Root.tsx` with
 `defaultProps={EDITORIAL_DEFAULTS}` and
 `calculateMetadata={narratedMetadata(script)}`, so its length follows the
@@ -186,6 +199,18 @@ Every video follows these rules.
   underline or a strike-through is laid out against the words (flex, `em`,
   `100%`), never at a pixel offset measured in one font, so the line still
   works when the face changes.
+- **SVG text is colored with `fill`.** An SVG `<text>` ignores CSS `color`,
+  so `label()` or `note()` on it draws black whatever color it names: the
+  Data Scientist review found 30 such labels, one a P1. Wrap the style in
+  `svgText()` (`src/editorial/style.ts`), or set `fill`; `npm test` fails on
+  SVG text styled without either.
+- **Tabular figures on the number only.** Inter's tabular feature also sets
+  a hyphen a digit wide, so `TABULAR` over a phrase reads "p - value". Put
+  it on the number (`<Num>`, `src/editorial/ui.tsx`); `npm test` fails on
+  `TABULAR` over a hyphenated word in the source, and `check:frames` fails on
+  one in the drawn page, which also catches text that arrives as a value (a
+  sheet cell "P-101", a list item): `PageAudit` in `src/editorial/audit.tsx`
+  reads the page while it renders.
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative
@@ -339,7 +364,7 @@ npm run narrate -- c-pointers --dry-run   # the text it would send
 npm run narrate -- c-pointers             # a take, or the beats not yet voiced
 npm run narrate -- c-pointers --only star # re-voice one edited beat
 npm run narrate -- c-pointers --force     # new takes of everything (ask first)
-npm run narrate -- c-pointers --recut     # cut the kept take again, no API call
+npm run narrate -- c-pointers --recut     # re-cut every beat a kept take still says, no API call
 npm run cues -- c-pointers                # the timing it produced
 npm run check:sync -- c-pointers          # and that the voice really starts there
 ```
@@ -357,6 +382,14 @@ that beat, or `--recut` if a whole run drifts.
 **Voicing is billed per character, so an edit re-voices only what changed.**
 A plain run sends just the new or edited beats, each on its own. That is
 the default after an edit, and it costs only those beats' characters.
+
+**A split is free.** A beat that needs audio but whose words a kept take
+still says, word for word, is cut from that take instead of voiced: a beat
+split at a sentence break, or one moved. So to change one sentence of a long
+beat, split the sentence off into its own beat, then reword it: the rest of
+the beat is cut from the take and only the new sentence is paid for. `--dry-run`
+marks each such beat "cut from take-N, free". `--only` and `--force` always
+voice, since they ask for a new performance.
 `--force` sends the whole script again, about 1,300 to 2,300 characters for a
 two-minute video, so ask before using it. "The edited beat sounds a little
 apart from the take" is not a reason on its own.
@@ -460,12 +493,18 @@ from:
 - `takes/<script id>/`: the raw takes (`take-1.mp3`, `take-2.mp3`, …) and
   their alignment (`take-1.json`, …), about 1.3 MB for two minutes of speech.
   The beats are cut from them, so `--recut` can cut them again, for instance
-  after a change to the cutting, without paying for another take, and a plain
-  run reuses a take when its text and voice still match. A re-cut is
-  deterministic: cutting an unchanged take reproduces the committed beats
-  byte for byte. Videos voiced before takes were split keep a single
-  `take.mp3`/`take.json`, which `--recut` still cuts while it matches the
-  script. `npm test` fails if a voiced video has lost its takes.
+  after a change to the cutting, without paying for another take. A take is
+  matched to the script by its own text (`locateBeats()` in
+  `src/narration/takes.ts`), not by the take plan, so it stays usable after
+  the script moves on: a beat split at a sentence break is found as its
+  pieces, and a beat reworded and voiced alone since is cut around. `--recut`
+  never replaces a beat voiced on its own: it rewrites a beat only when the
+  beat needs audio, when `--only` names it, or when the fresh cut is the
+  committed audio already. A re-cut is deterministic: cutting an unchanged
+  take reproduces the committed beats byte for byte, and `--recut` on every
+  voiced video changes nothing. Videos voiced before takes were split keep a
+  single `take.mp3`/`take.json`, one more kept take to cut from. `npm test`
+  fails if a voiced video has lost its takes.
 
 A beat whose text has changed since its audio was made is reported as `stale`
 by `npm run cues` and falls back to the estimate, so an edited sentence can't
@@ -684,7 +723,8 @@ npm run lint
 npm test              # timing, scene cuts, word cues, voices, arrowheads
 npm run check:cues    # every word cue says which occurrence it means (no render)
 npm run check:frames  # a frame every half second at --scale=2 (about a minute):
-                      # illustrations sharp at 4K, arrowheads on straight ends
+                      # illustrations sharp at 4K, arrowheads on straight ends,
+                      # no hyphen set in tabular figures
 npm run check:sync -- <video>   # a voiced video: every beat starts where its cue says
 npm run check:mix -- <video>    # a video with sound effects: how far under the voice they sit
 npm run check:motion -- <video> # the picture never holds still for 3 s (renders a half-size preview)

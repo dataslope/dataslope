@@ -203,7 +203,7 @@ FROM orders
 ORDER BY user_id, order_date;`}
 />
 
-`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` is the default frame for ordered windows, so `ORDER BY` alone is sufficient in most dialects.
+`ORDER BY` alone is enough for a running total in most dialects, but its default frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`, which gives rows tied on `order_date` one shared total. Writing `ROWS` explicitly, as here, keeps the total row by row.
 
 ### How do you compute a 7-day moving average?
 

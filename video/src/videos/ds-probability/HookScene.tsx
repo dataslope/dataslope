@@ -7,26 +7,28 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BDAY } from "./data";
-import { Card, DATA, DATA_LIGHT, Drift, Headline, Kicker, mulberry32, Person, pulse, Spot, Strike, Svg, X0 } from "./parts";
+import { Card, DATA, DATA_LIGHT, Drift, Headline, Kicker, mulberry32, Person, pulse, Spot, Svg, X0 } from "./parts";
 
 const ROOM = { x: X0, y: 300, w: 560, h: 380 };
 const BAR_Y = 742;
 const BAR_PX = 4;
 const CARD = { w: 100, h: 140, pitch: 118, y: 380 };
-/** The questions worked through; the rest take a sentence each. */
+/** The questions worked through; the last two are quick ones. */
 const WORKED = 12;
 const TOTAL = 14;
 const SET_ASIDE = 70;
 
 /** Where each of the room's twenty-three people stands, the same on every
- *  frame: a loose grid, nudged. */
+ *  frame: a loose grid, nudged, and kept a shoulder's width (32px) inside the
+ *  room's right wall, which the odd rows' last column could otherwise touch. */
 const SPOTS = (() => {
   const r = mulberry32(23);
   const out: [number, number][] = [];
   for (let i = 0; i < BDAY.people; i++) {
     const col = i % 6;
     const row = Math.floor(i / 6);
-    out.push([ROOM.x + 60 + col * 88 + (r() - 0.5) * 34 + (row % 2) * 30, ROOM.y + 70 + row * 82 + (r() - 0.5) * 22]);
+    const x = ROOM.x + 60 + col * 88 + (r() - 0.5) * 34 + (row % 2) * 30;
+    out.push([Math.min(x, ROOM.x + ROOM.w - 32), ROOM.y + 70 + row * 82 + (r() - 0.5) * 22]);
   }
   return out;
 })();
@@ -53,10 +55,10 @@ export const HookScene: React.FC = () => {
   const wrongAt = n.word("plan", "usually wrong");
   const definitionsAt = n.word("plan", "definitions");
   const fourteenAt = n.word("plan", "fourteen questions");
-  const twelveAt = n.word("plan", "Twelve");
-  const numbersAt = n.word("plan", "with numbers");
-  const lastAt = n.word("plan", "the last two");
-  const sentenceAt = n.word("plan", "a sentence each");
+  const twelveAt = n.word("plan-last", "Twelve");
+  const numbersAt = n.word("plan-last", "with numbers");
+  const lastAt = n.word("plan-last", "the last two");
+  const quickAt = n.word("plan-last", "are quick");
   const startAt = n.word("cond-in", "Start");
   const leansAt = n.word("cond-in", "leans on");
   const end = n.beat("cond-in").to;
@@ -107,7 +109,10 @@ export const HookScene: React.FC = () => {
         </Note>
         <Note at={sayNoAt} x={ROOM.x + ROOM.w + 30} y={y(ROOM.y + 150)} out={roomOut}>
           <span style={{ ...note(30, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            <Strike at={wrongAt}>Most people say no.</Strike>
+            {/* Pointed at, not struck: the hook leaves its question open until question 12. */}
+            <span style={{ display: "inline-block", transform: `scale(${1 + 0.08 * pulse(frame, wrongAt, 26)})`, transformOrigin: "0 50%" }}>
+              Most people say no.
+            </span>
           </span>
         </Note>
 
@@ -150,8 +155,10 @@ export const HookScene: React.FC = () => {
             <span style={{ ...TABULAR, fontWeight: 650 }}>{WORKED}</span> worked through with numbers
           </span>
         </Note>
-        <Note at={sentenceAt} x={X0 + WORKED * CARD.pitch + SET_ASIDE} y={y(CARD.y + CARD.h + 30)} dim={leansAt - 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>a sentence each</span>
+        <Note at={quickAt} x={X0 + WORKED * CARD.pitch + SET_ASIDE} y={y(CARD.y + CARD.h + 30)} dim={leansAt - 4}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...TABULAR, fontWeight: 650 }}>{TOTAL - WORKED}</span> quick ones
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

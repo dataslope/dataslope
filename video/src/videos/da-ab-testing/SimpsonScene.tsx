@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT_INK, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RATIO, STONES } from "./data";
@@ -25,7 +25,8 @@ const one = (t: { cols: string[]; rows: string[][] }) => {
  * pooled, 78.0% to 82.6%, because 263 of its 350 patients had large stones.
  * Then the page's five regions: their averages average 68, while per
  * customer the figure is 51.8, the Islands' 131 counting as much as North's
- * 52 for 40 customers against 4,200.
+ * 52 for 40 customers against 4,200; and the fix, revenue and customers
+ * each summed first and divided once.
  */
 export const SimpsonScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -42,7 +43,8 @@ export const SimpsonScene: React.FC = () => {
   const losesAt = n.word("simpson-stones", "yet loses overall");
   const pctAt = n.word("simpson-stones", "seventy-eight percent against eighty-three");
   const givenAt = n.word("simpson-why", "mostly to large stones");
-  const segmentAt = n.word("simpson-why", "segment before you conclude");
+  const betterAt = n.word("simpson-better", "still the better one");
+  const segmentAt = n.word("simpson-segment", "segment before you conclude");
   const q15At = n.word("ratio", "Question fifteen");
   const q15TextAt = n.word("ratio", "How do you avoid");
   const bothAt = n.word("ratio", "the numerator and the denominator together");
@@ -51,7 +53,9 @@ export const SimpsonScene: React.FC = () => {
   const sixtyEightAt = n.word("ratio", "average sixty-eight");
   const perAt = n.word("ratio", "Per customer");
   const fortyAt = n.word("ratio", "only forty customers");
-  const end = n.beat("ratio").to;
+  const sumAt = n.word("ratio-fix", "add up the numerator");
+  const onceAt = n.word("ratio-fix", "divide once");
+  const end = n.beat("ratio-fix").to;
   const out14 = q15At - 4;
 
   // ── Question 14 ──
@@ -110,7 +114,10 @@ export const SimpsonScene: React.FC = () => {
           ]}
         />
         <Note at={reverseAt - 2} x={X0} y={sg.rowTop(S.rows.length) + h(26)} out={out14}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>A wins inside each group</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            A wins inside each group
+            <span style={{ opacity: ease(frame, betterAt - 2, 10), color: OK_INK, fontWeight: 650 }}>: the better treatment</span>
+          </span>
         </Note>
         <TableName g={pg} at={losesAt - 6} out={out14}>
           pooled
@@ -162,11 +169,20 @@ export const SimpsonScene: React.FC = () => {
         </Note>
         <Note at={perAt - 2} x={resultX} y={rg.rowTop(2) + h(10)}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>per customer, weighted by customers</span>
-          <div style={{ ...note(44, BLUE_INK), fontWeight: 650, ...TABULAR }}>{fmt(RATIO.weighted, 1)}</div>
+          <div style={{ ...note(44, OK_INK), fontWeight: 650, ...TABULAR }}>{fmt(RATIO.weighted, 1)}</div>
         </Note>
         <Note at={fortyAt + 4} x={resultX} y={rg.rowTop(4) + h(20)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
             the Islands&apos; {R.rows[islands][1]} counts as much as North&apos;s {R.rows[0][1]}, for {R.rows[islands][2]} customers
+          </span>
+        </Note>
+        <Note at={sumAt - 2} x={resultX} y={rg.rowTop(4) + h(70)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            sum, then divide once:{" "}
+            <span style={{ opacity: ease(frame, onceAt - 4, 10) }}>
+              <Num>{RATIO.revenue.toLocaleString("en-US")}</Num> revenue / <Num>{RATIO.customers.toLocaleString("en-US")}</Num> customers ={" "}
+              <Num>{fmt(RATIO.weighted, 1)}</Num>
+            </span>
           </span>
         </Note>
       </Drift>

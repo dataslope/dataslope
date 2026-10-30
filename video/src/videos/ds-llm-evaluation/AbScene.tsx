@@ -199,10 +199,10 @@ export const AbScene: React.FC = () => {
             return <circle key={i} cx={tx} cy={TL.y + 30} r={8 * p} fill={tx < mid ? DATA : BAD} />;
           })}
         </svg>
-        <Note at={pinAt + 4} x={TL.x0} y={TL.y - 70}>
+        <Note at={pinAt + 4} x={TL.x0} y={TL.y - 82}>
           <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>the test, start to finish, one model name</span>
         </Note>
-        <Note at={updateAt + 6} x={mid + 12} y={TL.y - 44} from="right">
+        <Note at={updateAt + 6} x={mid + 12} y={TL.y - 54} from="right">
           <span style={{ ...label(19, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>updated under the same name</span>
         </Note>
         <Note at={halfAt} x={TL.x0} y={TL.y + 50}>

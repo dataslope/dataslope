@@ -16,6 +16,7 @@ import {
   fmt,
   label,
   note,
+  svgText,
 } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -78,7 +79,9 @@ const share = (v: readonly number[]) => {
  * carries nothing. The forest's impurity importance hands the ID 40%; one
  * customer's prediction split exactly among the four features as a
  * waterfall from the average; and the same Shapley values, averaged over
- * customers, set beside the impurity bars with the ID last.
+ * customers, set beside the impurity bars with the ID last. SHAP still gives
+ * the ID 13%, since it explains the model, so the follow-up closes the scene:
+ * permutation importance on held-out rows, as shares like the bars above it.
  */
 export const ShapScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -105,7 +108,11 @@ export const ShapScene: React.FC = () => {
   const rankAt = n.word("shap-values", "Averaged over customers");
   const firstAt = n.word("shap-values", "the plan first");
   const lastAt = n.word("shap-values", "the ID last");
-  const end = n.beat("shap-values").to;
+  const thirteenAt = n.word("shap-perm", "thirteen percent");
+  const permAt = n.word("shap-perm", "permutation importance");
+  const sevenAt = n.word("shap-perm", "seven percent");
+  const fiftyAt = n.word("shap-perm", "the plan fifty-three");
+  const end = n.beat("shap-perm").to;
 
   // ── The table ──
   const tableOn = ease(frame, asked - 2, 12);
@@ -118,6 +125,7 @@ export const ShapScene: React.FC = () => {
   // ── The bars: each feature's share of the total, both ways ──
   const imp = share(SHAP.impurity);
   const sh = share(SHAP.meanAbs);
+  const perm = share(SHAP.permutation);
   const barScale = (v: number) => (v / 0.5) * BAR_W;
 
   // ── The waterfall ──
@@ -225,15 +233,16 @@ export const ShapScene: React.FC = () => {
           ))}
         </div>
         <Note at={asked + 6} x={X0 + 580} y={y(TABLE_TOP) + 5 * h(ROW) + h(8)}>
-          <span style={{ ...label(18, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
             distinct values
           </span>
         </Note>
-        <Note at={madeAt} x={X0} y={y(TABLE_TOP) + 6 * h(ROW) + h(6)}>
+        <Note at={asked + 6} x={X0} y={y(TABLE_TOP) + 6 * h(ROW) + h(6)}>
           <span
             style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}
           >
-            made up for this video: {SHAP.n.toLocaleString("en-US")} customers
+            <Mark at={madeAt}>made up for this video</Mark>:{" "}
+            {SHAP.n.toLocaleString("en-US")} customers
           </span>
         </Note>
         <Note
@@ -334,7 +343,11 @@ export const ShapScene: React.FC = () => {
                   ...TABULAR,
                 }}
               >
-                {Math.round(sh[i] * 100)}%
+                {isId ? (
+                  <Mark at={thirteenAt}>{Math.round(sh[i] * 100)}%</Mark>
+                ) : (
+                  `${Math.round(sh[i] * 100)}%`
+                )}
               </div>
             </React.Fragment>
           );
@@ -384,7 +397,7 @@ export const ShapScene: React.FC = () => {
                 x={at(wx, v)}
                 y={y(WF_TOP) + 6 * h(WF_ROW) + 24}
                 textAnchor="middle"
-                style={{ ...label(18, INK_SOFT), ...TABULAR }}
+                style={svgText({ ...label(19, INK_SOFT), ...TABULAR })}
               >
                 {fmt(v, 1)}
               </text>
@@ -398,7 +411,7 @@ export const ShapScene: React.FC = () => {
             b: base,
             at: avgAt,
             color: INK_SOFT,
-            text: fmt(base, 2),
+            text: fmt(base, 3),
           },
           ...segs.map((s) => ({
             name: s.name,
@@ -477,13 +490,41 @@ export const ShapScene: React.FC = () => {
         <Note at={finalAt + 8} x={WF_X} y={y(WF_TOP) + 6 * h(WF_ROW) + h(46)}>
           <span
             style={{
-              ...label(18, INK_SOFT),
+              ...label(20, INK_SOFT),
               whiteSpace: "nowrap",
               background: PAPER,
             }}
           >
             exact Shapley values: every subset of the 4 features, computed in
             NumPy
+          </span>
+        </Note>
+        {/* The follow-up: does a feature help on new rows? Shuffle it on
+            held-out rows and see what accuracy loses. */}
+        <Note
+          at={permAt}
+          x={X0}
+          y={y(BARS_TOP) + 4 * h(BAR_ROW) + h(4)}
+        >
+          <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>
+            <span style={{ fontWeight: 650 }}>
+              permutation importance, on held-out rows:
+            </span>{" "}
+            {SHAP.names.map((name, i) => {
+              const v = `${i === 3 ? "ID" : name} ${Math.round(perm[i] * 100)}%`;
+              return (
+                <React.Fragment key={name}>
+                  {i ? " · " : ""}
+                  {i === 3 ? (
+                    <Mark at={sevenAt}>{v}</Mark>
+                  ) : i === 0 ? (
+                    <Mark at={fiftyAt}>{v}</Mark>
+                  ) : (
+                    v
+                  )}
+                </React.Fragment>
+              );
+            })}
           </span>
         </Note>
         <Note

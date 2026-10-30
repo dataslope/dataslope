@@ -48,6 +48,7 @@
     "aRate": 0.79,
     "bRate": 0.82,
     "discordant": 35,
+    "evenSplit": 17.5,
     "z": 1.197,
     "pUnpaired": 0.2312,
     "pMcNemar": 0.0167
@@ -67,7 +68,9 @@
     "alwaysPass": {
       "po": 0.9,
       "kappa": 0
-    }
+    },
+    "judgePasses": 90,
+    "expertPasses": 90
   },
   "prev": {
     "sens": 0.9,
@@ -87,6 +90,7 @@
     "afterJoin": 6700,
     "lost": 0.33,
     "segments": 20,
+    "alpha": 0.05,
     "anyFalse": 0.6415
   },
   "bank": 110

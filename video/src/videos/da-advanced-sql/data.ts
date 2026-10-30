@@ -94,6 +94,8 @@ export const FRAME = {
   whole: query("frame", "whole"),
   lastDefault: query("last", "defaulted"),
   lastWide: query("last", "widened"),
+  /** FIRST_VALUE and NTH_VALUE(amount, 3) with the default frame. */
+  firstNth: query("last", "firstNth"),
 };
 
 // ── 9, 10. Running total and moving average ─────────────────────────────────
@@ -101,6 +103,9 @@ export const FRAME = {
 export const RUNNING = {
   both: query("running", "both"),
   centered: query("running", "centered"),
+  /** A three-day average by date rather than by row, over the spine's gappy
+   *  sales: only its frame clause is shown. */
+  rangeDays: query("spine", "rangeDays"),
 };
 
 // ── 11, 12. The latest row, and a date spine ────────────────────────────────
@@ -122,7 +127,8 @@ export const RAPID = {
   fifthSizes: table("ntile", "fifthSizes"),
   standing: query("ntile", "standing"),
   org: query("recursive", "org"),
-  levels: table("recursive", "levels"),
+  /** The recursive CTE, counted by level: the figure's listing and table. */
+  levels: query("recursive", "levels"),
   pivot: query("pivot", "pivot"),
   unpivot: query("pivot", "unpivot"),
   inWhere: refused("topN", "inWhere"),

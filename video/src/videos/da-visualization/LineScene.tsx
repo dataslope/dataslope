@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, HIGHLIGHT, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -21,10 +21,13 @@ const ROWS = [
 const PIE_C = { x: 470, y: 600, r: 190 };
 const SHARE_X = 1120;
 const SHARE_UNIT = 18;
+/** Question 2's note on choosing, right of the top row, past its ticks. */
+const CHOOSE_X = 1530;
 
 /**
  * Questions 2 and 3. The page's six values drawn four ways, a line and bars
  * over weeks and over issue types; only the line over issue types is wrong.
+ * Over weeks both are honest, so a note beside them says how to choose.
  * Then the page's five shares as a pie, where S U V and truck look alike, and
  * as sorted bars, where their 1.5-point gap is plain.
  */
@@ -40,6 +43,10 @@ export const LineScene: React.FC = () => {
   const passedAt = n.word("line-x", "passed through everything");
   const weeksAt = n.word("line-x", "true of weeks");
   const barsAt = n.word("line-x", "Bars work over weeks too");
+  const honestAt = n.word("line-choose", "When both are honest");
+  const neighbourAt = n.word("line-choose", "bars compare each week");
+  const shapeAt = n.word("line-choose", "a line carries the shape");
+  const longerAt = n.word("line-choose", "the longer the series");
   const typesAt = n.word("line-wrong", "six issue types");
   const trendAt = n.word("line-wrong", "draws a trend");
   const wrongAt = n.word("line-wrong", "the one wrong chart");
@@ -75,7 +82,7 @@ export const LineScene: React.FC = () => {
       <Sfx name="el-pencil" at={passedAt} level={-34} />
       <Sfx name="el-tap" at={barsAt} level={-34} />
       <Sfx name="el-scratch" at={wrongAt} level={-32} />
-      <Sfx name="el-pencil" at={fiveAt} level={-34} />
+      <Sfx name="el-pencil" at={fewAt} level={-34} />
       <Sfx name="el-pop" at={gapAt} level={-32} />
 
       <Drift from={from} to={end + 40}>
@@ -97,21 +104,35 @@ export const LineScene: React.FC = () => {
         </PanelTitle>
         <BarSet values={V} {...P[1]} at={barsAt - 2} labels={LINE_BAR.weeks} out={out2} />
         <Verdict ok x={COLS[1].x1 + 20} y={y(ROWS[0].top)} at={barsAt + 10} out={out2} />
+        <Note at={honestAt - 2} out={out2} x={CHOOSE_X} y={y(ROWS[0].top) - h(4)}>
+          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>both honest, so choose:</span>
+        </Note>
+        <Note at={neighbourAt} out={out2} x={CHOOSE_X} y={y(ROWS[0].top) + h(36)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>bars compare neighbours,</span>
+        </Note>
+        <Note at={shapeAt} out={out2} x={CHOOSE_X} y={y(ROWS[0].top) + h(72)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a line carries the shape;</span>
+        </Note>
+        <Note at={longerAt} out={out2} x={CHOOSE_X} y={y(ROWS[0].top) + h(108)}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>longer series: the line</span>
+        </Note>
         <PanelTitle x={COLS[0].x0} y={y(ROWS[1].top) - h(62)} at={typesAt - 4} out={out2}>
           As a line, over six issue types
         </PanelTitle>
-        <LineSet values={V} {...P[2]} at={trendAt - 4} labels={LINE_BAR.types} labelSize={16} out={out2} />
-        <Verdict ok={false} x={COLS[0].x1 + 20} y={y(ROWS[1].top)} at={wrongAt} out={out2}>
-          a trend through no order
-        </Verdict>
+        <LineSet values={V} {...P[2]} at={trendAt - 4} labels={LINE_BAR.types} out={out2} />
+        {/* The cross sits beside its chart like the ticks; its words go under it, clear of the bars. */}
+        <Verdict ok={false} x={COLS[0].x1 + 20} y={y(ROWS[1].top)} at={wrongAt} out={out2} />
+        <Note at={wrongAt + 4} out={out2} x={COLS[0].x0} y={y(ROWS[1].base) + h(46)}>
+          <span style={{ ...label(22, ACCENT_INK), whiteSpace: "nowrap" }}>a trend through no order</span>
+        </Note>
         <PanelTitle x={COLS[1].x0} y={y(ROWS[1].top) - h(62)} at={typesAt} out={out2}>
           As bars, over six issue types
         </PanelTitle>
-        <BarSet values={V} {...P[3]} at={typesAt + 2} labels={LINE_BAR.types} labelSize={16} out={out2} />
+        <BarSet values={V} {...P[3]} at={typesAt + 2} labels={LINE_BAR.types} out={out2} />
         <Verdict ok x={COLS[1].x1 + 20} y={y(ROWS[1].top)} at={wrongAt + 8} out={out2} />
 
         {/* ── Question 3: five shares, as a pie and as bars ── */}
-        <Pie values={PIE.shares.map((s) => s.value)} cx={PIE_C.x} cy={y(PIE_C.y)} r={h(PIE_C.r)} at={fiveAt - 4} colors={CATS} />
+        <Pie values={PIE.shares.map((s) => s.value)} cx={PIE_C.x} cy={y(PIE_C.y)} r={h(PIE_C.r)} at={fewAt} colors={CATS} />
         {pieLabels.map(({ s, x, y: ly }) => (
           <div
             key={s.key}

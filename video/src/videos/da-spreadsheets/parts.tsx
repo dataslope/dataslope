@@ -96,8 +96,16 @@ export const sheetGeometry = ({
 /** A cell filled from `at` to `out`; `inserted` fills the opened column's cell instead. */
 export type CellFill = { r: number; c: number; at: number; out?: number; color: string; inserted?: boolean };
 export type CellSwap = { r: number; c: number; at: number; value: string; color?: string };
+/** A column insert's timing: it opens on `at`; with `replay` it closes on
+ *  `close` and opens again on `open`, for a figure that shows the sheet as it
+ *  was before the insert and then the insert again. */
+export type InsertTiming = { at: number; replay?: { close: number; open: number } };
 /** A column that opens between two others, pushing the rest right. */
-export type ColumnInsert = { c: number; at: number; width: number; values: readonly string[] };
+export type ColumnInsert = InsertTiming & { c: number; width: number; values: readonly string[] };
+
+/** How far an insert is open at `frame`, 0 to 1. */
+export const insertOpen = (frame: number, t: InsertTiming) =>
+  Math.max(0, Math.min(1, ease(frame, t.at, 18) - (t.replay ? ease(frame, t.replay.close, 16) - ease(frame, t.replay.open, 18) : 0)));
 
 const NUMERIC = /^[−-]?[$]?\d[\d,]*(\.\d+)?%?$/;
 
@@ -131,7 +139,7 @@ export const Sheet: React.FC<{
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
 
-  const ins = insert ? ease(frame, insert.at, 18) : 0;
+  const ins = insert ? insertOpen(frame, insert) : 0;
   const shift = (c: number) => (insert && c >= insert.c ? insert.width * ins : 0);
   const xOf = (c: number) => g.xs[c] + shift(c);
   const totalW = g.width + (insert ? insert.width * ins : 0);
@@ -171,7 +179,7 @@ export const Sheet: React.FC<{
       </svg>
       {/* Letters and numbers. */}
       {g.widths.map((w, c) => (
-        <div key={c} style={{ ...cellStyle(xOf(c), w, g.top), height: g.headH, justifyContent: "center", ...label(18, INK_SOFT) }}>
+        <div key={c} style={{ ...cellStyle(xOf(c), w, g.top), height: g.headH, justifyContent: "center", ...label(19, INK_SOFT) }}>
           {letter(c)}
         </div>
       ))}
@@ -181,7 +189,7 @@ export const Sheet: React.FC<{
             ...cellStyle(g.xs[insert.c], insert.width * ins, g.top),
             height: g.headH,
             justifyContent: "center",
-            ...label(18, INK_SOFT),
+            ...label(19, INK_SOFT),
             opacity: ins,
           }}
         >
@@ -189,7 +197,7 @@ export const Sheet: React.FC<{
         </div>
       ) : null}
       {rowNums.map((r) => (
-        <div key={r} style={{ ...cellStyle(g.x, GUTTER, g.rowTop(r)), justifyContent: "center", ...label(17, INK_SOFT) }}>
+        <div key={r} style={{ ...cellStyle(g.x, GUTTER, g.rowTop(r)), justifyContent: "center", ...label(19, INK_SOFT) }}>
           {r}
         </div>
       ))}
@@ -234,7 +242,9 @@ export const Sheet: React.FC<{
                 fontWeight: bold?.(r, c) ? 650 : 450,
                 color: swap?.color ?? ink?.(r, c) ?? INK,
                 opacity: vp * (swap ? ease(frame, swap.at, 10) : 1),
-                ...TABULAR,
+                // Tabular figures only on a number: over "P-101" or a date
+                // they set the hyphen a digit wide.
+                ...(NUMERIC.test(text) ? TABULAR : {}),
               }}
             >
               {text}
@@ -252,7 +262,8 @@ export const Sheet: React.FC<{
                 fontSize: size,
                 fontWeight: i === 0 ? 650 : 450,
                 color: INK,
-                opacity: ease(frame, insert.at + 10 + i * 2, 10),
+                // A replayed insert takes its values with it as it closes.
+                opacity: ease(frame, insert.at + 10 + i * 2, 10) * ins,
               }}
             >
               {v}
@@ -278,13 +289,13 @@ export const RangeBox: React.FC<{
   out?: number;
   color?: string;
   dash?: boolean;
-  shiftAt?: { c: number; at: number; width: number };
+  shiftAt?: InsertTiming & { c: number; width: number };
 }> = ({ g, r0, r1, c0, c1, at: from, out, color = ds("blue", 500), dash, shiftAt }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 14);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
-  const ins = shiftAt ? ease(frame, shiftAt.at, 18) : 0;
+  const ins = shiftAt ? insertOpen(frame, shiftAt) : 0;
   const sx = (c: number) => g.xs[c] + (shiftAt && c >= shiftAt.c ? shiftAt.width * ins : 0);
   const x0 = sx(c0) + 1;
   const x1 = sx(c1) + g.widths[c1] - 1;
@@ -312,23 +323,29 @@ export const RangeBox: React.FC<{
  *  function name in the ink, and everything else soft. */
 const TOKEN = /("[^"]*")|(\$?[A-Z]{1,2}\$?\d+(?::\$?[A-Z]{1,2}\$?\d+)?)|([A-Z][A-Z.]*(?=\())|([A-Za-z_]\w*)|(\d+(?:\.\d+)?)|(\s+)|(.)/g;
 
-/** One formula, colored the way the formula bar colors it. */
-export const FormulaText: React.FC<{ formula: string; upto?: number; size?: number; marks?: readonly { text: string; color: string }[] }> = ({
+export type FormulaMark = { text: string; color: string; at?: number };
+
+/** One formula, colored the way the formula bar colors it. A mark lays its
+ *  color under every token that reads exactly its text, from `at` if given. */
+export const FormulaText: React.FC<{ formula: string; upto?: number; size?: number; marks?: readonly FormulaMark[] }> = ({
   formula,
   upto,
   size,
   marks = [],
 }) => {
+  const frame = useCurrentFrame();
   const shown = upto === undefined ? formula : formula.slice(0, Math.max(0, Math.floor(upto)));
   const parts: { text: string; color: string; weight: number; bg?: string }[] = [];
   for (const m of shown.matchAll(TOKEN)) {
     const [text, str, ref, fn, name, number] = m;
     const mark = marks.find((k) => k.text === text);
-    if (str) parts.push({ text, color: inkOf.green, weight: 500 });
-    else if (ref) parts.push({ text, color: BLUE_INK, weight: 600, bg: mark?.color });
-    else if (fn) parts.push({ text, color: INK, weight: 700 });
-    else if (name) parts.push({ text, color: inkOf.purple, weight: 600, bg: mark?.color });
-    else if (number) parts.push({ text, color: inkOf.orange, weight: 500 });
+    const mp = mark === undefined ? 0 : mark.at === undefined ? 1 : ease(frame, mark.at, 10);
+    const bg = mark && mp > 0 ? (mp >= 1 ? mark.color : `color-mix(in srgb, ${mark.color} ${Math.round(mp * 100)}%, transparent)`) : undefined;
+    if (str) parts.push({ text, color: inkOf.green, weight: 500, bg });
+    else if (ref) parts.push({ text, color: BLUE_INK, weight: 600, bg });
+    else if (fn) parts.push({ text, color: INK, weight: 700, bg });
+    else if (name) parts.push({ text, color: inkOf.purple, weight: 600, bg });
+    else if (number) parts.push({ text, color: inkOf.orange, weight: 500, bg });
     else parts.push({ text, color: INK_SOFT, weight: 500 });
   }
   return (
@@ -345,7 +362,9 @@ export const FormulaText: React.FC<{ formula: string; upto?: number; size?: numb
 /**
  * A formula bar: the cell's name, "fx", and the formula typed in from `at`,
  * then, on `resultAt`, an arrow and what the cell shows, in the right
- * answer's green, the trap's red, or the ink.
+ * answer's green, the trap's red, or the ink. `rewrite` changes the formula
+ * in place, as Excel does to a range when a column opens inside it, and can
+ * change what the cell shows on its own cue.
  */
 export const FormulaBar: React.FC<{
   x: number;
@@ -359,11 +378,12 @@ export const FormulaBar: React.FC<{
   result?: string;
   resultAt?: number;
   tone?: "ok" | "bad" | "plain";
-  marks?: readonly { text: string; color: string }[];
+  marks?: readonly FormulaMark[];
+  rewrite?: { at: number; formula: string; marks?: readonly FormulaMark[]; result?: string; resultAt?: number; tone?: "ok" | "bad" | "plain" };
   size?: number;
   dim?: number;
   out?: number;
-}> = ({ x, top, width, cell, formula, at: from, typeDur, result, resultAt, tone = "plain", marks, size = 22, dim, out }) => {
+}> = ({ x, top, width, cell, formula, at: from, typeDur, result, resultAt, tone = "plain", marks, rewrite, size = 22, dim, out }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from - 4, 10);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
@@ -372,8 +392,15 @@ export const FormulaBar: React.FC<{
   const dur = typeDur ?? Math.min(30, Math.max(10, formula.length * 0.5));
   const typed = Math.min(formula.length, ((frame - from) / dur) * formula.length);
   const h = Math.round(size * 2);
-  const rp = resultAt === undefined ? 0 : ease(frame, resultAt, 12);
-  const resultInk = tone === "ok" ? inkOf.green : tone === "bad" ? ACCENT_INK : INK;
+  const ink = (t: "ok" | "bad" | "plain") => (t === "ok" ? inkOf.green : t === "bad" ? ACCENT_INK : INK);
+  const rw = rewrite ? ease(frame, rewrite.at, 8) : 0;
+  // What the cell shows: the first result, then the rewrite's, each faded in on its own cue.
+  const late = rewrite?.result !== undefined && rewrite.resultAt !== undefined ? ease(frame, rewrite.resultAt, 12) : 0;
+  const results = [
+    { text: result, on: resultAt === undefined ? 0 : ease(frame, resultAt, 12) * (1 - late), tone },
+    { text: rewrite?.result, on: late, tone: rewrite?.tone ?? tone },
+  ].filter((r) => r.text !== undefined && r.on > 0);
+  const layer: React.CSSProperties = { gridArea: "1 / 1", whiteSpace: "nowrap" };
   return (
     <div
       style={{
@@ -393,15 +420,39 @@ export const FormulaBar: React.FC<{
         opacity: p * (1 - d) * (1 - o),
       }}
     >
-      {cell ? <span style={{ ...label(18, INK_SOFT), minWidth: 34 }}>{cell}</span> : null}
-      <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: size * 0.85, color: INK_SOFT, fontWeight: 600 }}>fx</span>
-      <span style={{ flex: "0 1 auto", overflow: "hidden" }}>
-        <FormulaText formula={formula} upto={typed} size={size} marks={marks} />
+      {cell ? <span style={{ ...label(19, INK_SOFT), minWidth: 34 }}>{cell}</span> : null}
+      <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: Math.max(19, size * 0.85), color: INK_SOFT, fontWeight: 600 }}>fx</span>
+      <span style={{ flex: "0 1 auto", overflow: "hidden", display: "grid" }}>
+        <span style={{ ...layer, opacity: 1 - rw }}>
+          <FormulaText formula={formula} upto={typed} size={size} marks={marks} />
+        </span>
+        {rewrite && rw > 0 ? (
+          <span style={{ ...layer, opacity: rw }}>
+            <FormulaText formula={rewrite.formula} size={size} marks={rewrite.marks ?? marks} />
+          </span>
+        ) : null}
       </span>
-      {result !== undefined && rp > 0 ? (
-        <span style={{ marginLeft: "auto", opacity: rp, display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: SANS, fontSize: size, color: INK_SOFT }}>→</span>
-          <span style={{ fontFamily: SANS, fontSize: size * 1.05, fontWeight: 700, color: resultInk, ...TABULAR }}>{result}</span>
+      {results.length ? (
+        <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: SANS, fontSize: size, color: INK_SOFT, opacity: Math.max(...results.map((r) => r.on)) }}>→</span>
+          <span style={{ display: "grid", justifyItems: "end" }}>
+            {results.map((r, i) => (
+              <span
+                key={i}
+                style={{
+                  ...layer,
+                  opacity: r.on,
+                  fontFamily: SANS,
+                  fontSize: size * 1.05,
+                  fontWeight: 700,
+                  color: ink(r.tone),
+                  ...(NUMERIC.test(String(r.text)) ? TABULAR : {}),
+                }}
+              >
+                {r.text}
+              </span>
+            ))}
+          </span>
         </span>
       ) : null}
     </div>

@@ -75,8 +75,9 @@ export const TestScene: React.FC = () => {
   const sickAt = n.word("test-share", "ninety-nine are sick");
   const sixAt = n.word("test-share", "One in six");
   const sensAt = n.word("test-words", "the sensitivity");
-  const fpAt = n.word("test-words", "the false-positive rate");
-  const baseAt = n.word("test-words", "the base rate");
+  const specAt = n.word("test-need", "the specificity");
+  const clearsAt = n.word("test-need", "ninety-five percent");
+  const baseAt = n.word("test-need", "the base rate");
   const end = n.beat("indep-in").to;
 
   const mid = (b: Box) => y(b.y);
@@ -84,7 +85,7 @@ export const TestScene: React.FC = () => {
     { a: ROOT, b: SICK, at: onePctAt, text: pct(TEST.sick / TEST.people), mark: baseAt, color: INK },
     { a: SICK, b: TP, at: catchesAt - 4, text: pct(TEST.truePos / TEST.sick), mark: sensAt, color: INK },
     { a: ROOT, b: WELL, at: healthyAt - 6, text: "", mark: 0, color: INK },
-    { a: WELL, b: FP, at: flagsAt + 4, text: pct(TEST.falsePos / TEST.healthy), mark: fpAt, color: INK },
+    { a: WELL, b: FP, at: flagsAt + 4, text: pct(TEST.falsePos / TEST.healthy), mark: specAt, color: INK },
   ];
 
   const dots = Array.from({ length: TEST.positives }, (_, i) => {
@@ -106,7 +107,7 @@ export const TestScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={alarmsAt} level={-30} />
       <Sfx name="el-pop" at={sixAt + 2} level={-30} />
       <Sfx name="el-tap" at={sensAt} level={-34} />
-      <Sfx name="el-tap" at={fpAt} level={-34} />
+      <Sfx name="el-tap" at={specAt} level={-34} />
       <Sfx name="el-tap" at={baseAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
@@ -174,8 +175,18 @@ export const TestScene: React.FC = () => {
         <Note at={sensAt + 2} x={TP.x} y={y(TP.y) - BOX_H / 2 - 40}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>sensitivity, on the sick</span>
         </Note>
-        <Note at={fpAt + 2} x={WELL.x} y={y(FP.y) + BOX_H / 2 + 14}>
-          <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>false-positive rate, on the healthy</span>
+        {/* Sensitivity's other half: the healthy it clears. The 5% on the
+            branch is what it does not. Figures only take TABULAR, so the
+            hyphen in "false-positive" keeps its own width. */}
+        <Note at={specAt + 2} x={WELL.x} y={y(FP.y) + BOX_H / 2 + 14}>
+          <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            specificity, on the healthy: <span style={TABULAR}>{pct(TEST.specificity)}</span> cleared
+          </span>
+        </Note>
+        <Note at={clearsAt + 8} x={WELL.x} y={y(FP.y) + BOX_H / 2 + 48}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            false-positive rate = 1 − specificity = <span style={TABULAR}>{pct(TEST.fpRate)}</span>
+          </span>
         </Note>
         <Note at={baseAt + 2} x={ROOT.x} y={y(ROOT.y) - BOX_H / 2 - 40}>
           <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>the base rate</span>

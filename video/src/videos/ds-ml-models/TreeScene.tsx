@@ -36,7 +36,7 @@ const WIDTH = 900;
 const BASE = 612;
 const STEP = 15;
 const DOT = 6.4;
-const GINI_TOP = 734;
+const GINI_TOP = 722;
 const GINI_H = 136;
 const COL = 1180;
 const COL_W = 640;
@@ -138,8 +138,10 @@ export const TreeScene: React.FC = () => {
   const otherAt = n.word("tree-gini", "the other one to forty-five");
   const fallsAt = n.word("tree-gini", "falls to point one one");
   const lowestAt = n.word("tree-gini", "the lowest of any cut");
-  const repeatAt = n.word("tree-gini", "repeats this on each side");
-  const depthAt = n.word("tree-gini", "a maximum depth");
+  const entropyAt = n.word("tree-measures", "Entropy");
+  const regressionAt = n.word("tree-measures", "A regression tree");
+  const repeatAt = n.word("tree-stop", "repeats this on each side");
+  const depthAt = n.word("tree-stop", "a maximum depth");
   const readAt = n.word("bag-in", "quick to read");
   const overAt = n.word("bag-in", "quick to overreact");
   const end = n.beat("bag-in").to;
@@ -174,6 +176,10 @@ export const TreeScene: React.FC = () => {
   const counts = sides(cut);
   const reveal = Math.max(first, first + (last - first) * sweep);
   const okLit = ease(frame, lowestAt, 12);
+  // The cut stops just under the flowers' axis until the Gini chart it
+  // reaches down to is there, then follows it down.
+  const cutTo =
+    base + h(24) + (y(GINI_TOP) + h(GINI_H) - base - h(24)) * ease(frame, slideAt, 14);
 
   return (
     <AbsoluteFill>
@@ -249,7 +255,7 @@ export const TreeScene: React.FC = () => {
             x1={at(sx, cut)}
             x2={at(sx, cut)}
             y1={y(380)}
-            y2={y(GINI_TOP) + h(GINI_H)}
+            y2={cutTo}
             stroke={INK}
             strokeWidth={2.4}
             strokeDasharray="7 6"
@@ -283,7 +289,7 @@ export const TreeScene: React.FC = () => {
           yFormat={(v) => fmt(v, 2)}
           yTitle="weighted Gini of the two sides"
           at={slideAt}
-          size={18}
+          size={19}
         />
         <Svg opacity={ease(frame, slideAt, 10)}>
           <defs>
@@ -316,10 +322,12 @@ export const TreeScene: React.FC = () => {
             fill={OK}
           />
         </Svg>
+        {/* Under the rising side of the curve, which ran through the label
+            when it sat above the dot. */}
         <Note
           at={lowestAt}
           x={at(sx, best) + 16}
-          y={at(gy, TREE.best[1]) - h(40)}
+          y={at(gy, TREE.best[1]) + h(2)}
         >
           <span
             style={{
@@ -330,6 +338,24 @@ export const TreeScene: React.FC = () => {
             }}
           >
             {fmt(TREE.best[1], 2)}, the lowest
+          </span>
+        </Note>
+
+        {/* The follow-up "Gini or entropy?", under the Gini chart: entropy's
+            own sweep bottoms out at the same cut. */}
+        <Note
+          at={entropyAt}
+          x={LEFT}
+          y={y(GINI_TOP) + h(GINI_H) + h(12)}
+        >
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap", ...TABULAR }}>
+            entropy (information gain) also picks{" "}
+            {fmt(TREE.entropy.best[0], 2)}
+            <span
+              style={{ color: INK_SOFT, opacity: ease(frame, regressionAt, 10) }}
+            >
+              ; a regression tree cuts variance
+            </span>
           </span>
         </Note>
 
@@ -428,7 +454,15 @@ export const TreeScene: React.FC = () => {
             <>Gini {fmt(TREE.right.gini, 2)}</>,
           ]}
         />
-        <Note at={fallsAt} x={COL} y={y(560) + h(104)}>
+        {/* The split's number, so it sits between the two children rather
+            than under one, clear of the dashed links below each box. */}
+        <Note
+          at={fallsAt}
+          x={COL + 320 - 140}
+          width={280}
+          y={y(560) + h(104)}
+          style={{ textAlign: "center" }}
+        >
           <span
             style={{
               ...note(25, OK_INK),

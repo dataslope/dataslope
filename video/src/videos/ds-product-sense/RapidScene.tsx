@@ -120,17 +120,25 @@ const Vanity: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 14. Ratio metrics ───────────────────────────────────────────────────────
 
+/** A signed percent with a true minus sign. */
+const minus = (s: string) => s.replace("-", "\u2212");
+
 const Ratio: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const topAt = c.w("r-ratio", "because of its top");
   const bottomAt = c.w("r-ratio", "its bottom");
   const mixAt = c.w("r-ratio", "the mix underneath");
-  const roseAt = c.w("r-ratio", "Saves per user rose");
-  const fellAt = c.w("r-ratio", "while saves fell");
-  const leftAt = c.w("r-ratio", "a fifth of the users left");
-  const readAt = c.w("r-ratio", "Read both halves");
-  const addAt = c.w("r-ratio", "add up counts across groups");
-  const avgAt = c.w("r-ratio", "averaging their ratios");
+  const fallAt = c.w("r-simpson", "a rate can fall in every group");
+  const riseAt = c.w("r-simpson", "yet rise overall");
+  const simpsonAt = c.w("r-simpson", "Simpson's paradox");
+  const roseAt = c.w("r-ratio-ex", "Saves per user rose");
+  const fellAt = c.w("r-ratio-ex", "while saves fell");
+  const leftAt = c.w("r-ratio-ex", "a fifth of the users left");
+  const readAt = c.w("r-ratio-rule", "Read both halves");
+  const addAt = c.w("r-ratio-rule", "add up counts across groups");
+  const avgAt = c.w("r-ratio-rule", "averaging their ratios");
+  const tenAt = c.w("r-ratio-why", "a group of ten as much");
+  const thousandAt = c.w("r-ratio-why", "ten thousand");
   const frac = (top: number, bottom: number, value: string, from: number, x: number, ink: string) => (
     <Note at={from} x={x} y={c.y(430)}>
       <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
@@ -152,16 +160,25 @@ const Ratio: React.FC<{ c: Ctx }> = ({ c }) => {
           <span style={{ opacity: ease(frame, mixAt, 10) }}>, or the mix underneath</span>
         </span>
       </Note>
+      <Note at={fallAt - 2} x={R_X + 64} y={c.y(374)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          a rate can fall in every group
+          <span style={{ opacity: ease(frame, riseAt, 10) }}> yet rise overall</span>
+          <span style={{ opacity: ease(frame, simpsonAt, 10) }}>
+            : <b style={{ color: INK }}>Simpson&apos;s paradox</b>
+          </span>
+        </span>
+      </Note>
       {frac(RATIO.savesBefore, RATIO.usersBefore, RATIO.perUserBefore.toFixed(1), roseAt - 2, R_X + 40, INK)}
       <Note at={roseAt + 6} x={R_X + 410} y={c.y(458)}>
         <span style={{ ...note(36, INK_SOFT), whiteSpace: "nowrap" }}>→</span>
       </Note>
       {frac(RATIO.savesAfter, RATIO.usersAfter, RATIO.perUserAfter.toFixed(1), roseAt + 8, R_X + 480, BLUE_INK)}
       <Note at={fellAt} x={R_X + 480} y={c.y(560)}>
-        <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>saves {pct(RATIO.savesChange)}</span>
-      </Note>
-      <Note at={leftAt} x={R_X + 680} y={c.y(560)}>
-        <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>users {pct(RATIO.usersChange)}</span>
+        <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          saves {minus(pct(RATIO.savesChange))}
+          <span style={{ opacity: ease(frame, leftAt, 10) }}>, users {minus(pct(RATIO.usersChange))}</span>
+        </span>
       </Note>
       <Note at={readAt - 2} x={R_X + 40} y={c.y(630)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
@@ -174,6 +191,12 @@ const Ratio: React.FC<{ c: Ctx }> = ({ c }) => {
           <span style={{ color: ACCENT_INK, opacity: ease(frame, avgAt - 2, 10) }}>
             don&apos;t <Strike at={avgAt + 6}>average the ratios</Strike>
           </span>
+        </span>
+      </Note>
+      <Note at={tenAt - 2} x={R_X + 64} y={c.y(732)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          an average of ratios counts a group of 10
+          <span style={{ opacity: ease(frame, thousandAt, 10) }}> as much as a group of 10,000</span>
         </span>
       </Note>
       <Note at={roseAt} x={R_X + 40} y={c.y(560)}>

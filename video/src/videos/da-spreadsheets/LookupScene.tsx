@@ -5,7 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ds, inkOf } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { type Cell, isError, LOOKUPS, printed, screen } from "./data";
@@ -53,18 +53,24 @@ export const LookupScene: React.FC = () => {
   const kitchenAt = n.word("lookup-limits", "comes back as kitchen");
   const q4At = n.word("index", "Question four");
   const q4TextAt = n.word("index", "How does index match");
-  const matchAt = n.word("index", "Match finds the position");
-  const indexAt = n.word("index", "Index returns what sits");
-  const leftAt = n.word("index", "find mug among the names");
-  const skuBackAt = n.word("index", "return its SKU");
-  const rangesAt = n.word("index", "points at ranges");
-  const stillAt = n.word("index", "still costs nine");
+  const matchAt = n.word("index-match", "Match finds the position");
+  const secondAt = n.word("index-second", "Mug is second");
+  const zeroAt = n.word("index-second", "the zero asks");
+  const indexAt = n.word("index-left", "Index returns what sits");
+  const leftAt = n.word("index-left", "find mug among the names");
+  const skuBackAt = n.word("index-left", "return its SKU");
+  const rangesAt = n.word("index-ranges", "points at ranges");
+  const afterAt = n.word("index-ranges", "after the insert");
+  const movesAt = n.word("index-ranges", "moves with the data");
+  const stillAt = n.word("index-ranges", "still costs nine");
   const q5At = n.word("xlookup", "Question five");
   const q5TextAt = n.word("xlookup", "What does X lookup");
-  const newerAt = n.word("xlookup", "the newer lookup");
-  const arraysAt = n.word("xlookup", "a lookup array and a return array");
-  const exactAt = n.word("xlookup", "Exact match by default");
-  const notFoundAt = n.word("xlookup", "says not found");
+  const newerAt = n.word("xlookup-newer", "the newer lookup");
+  const olderAt = n.word("xlookup-newer", "older versions");
+  const arraysAt = n.word("xlookup-what", "A lookup array and a return array");
+  const exactAt = n.word("xlookup-what", "Exact match by default");
+  const notFoundAt = n.word("xlookup-what", "says not found");
+  const bridgeAt = n.beat("approx-in").from;
   const forgetAt = n.word("approx-in", "the argument everyone forgets");
   const limitsAt = n.word("lookup", "what are its limits");
   const end = n.beat("approx-in").to;
@@ -74,12 +80,20 @@ export const LookupScene: React.FC = () => {
   const g = sheetGeometry({ x: X0, top: y(SHEET_Y), widths: [116, 150, 106], rows: 5, rowH: h(ROW) });
   const products = L.products.map((r, i) => r.map((v, c) => (i > 0 && c === 2 ? money(v) : String(v))));
   const category = L.inserted.map((r) => printed(r[2]));
-  const ins = { c: 2, at: insertAt, width: INSERT_W, values: category };
-  const shift = { c: 2, at: insertAt, width: INSERT_W };
+  // Question 4 shows the sheet as the price formula was written, before the
+  // insert, then the insert again: the range moves with the prices.
+  const replay = { close: rangesAt, open: afterAt + 4 };
+  const ins = { c: 2, at: insertAt, width: INSERT_W, values: category, replay };
+  const shift = { c: 2, at: insertAt, width: INSERT_W, replay };
   const mug = 3; // the mug's sheet row
   const slot = (k: number) => y(SHEET_Y) - h(10) + k * h(66);
   const out3 = q4At - 4;
   const out4 = q5At - 4;
+  const RANGE = `color-mix(in srgb, ${ds("yellow", 400)} 60%, transparent)`;
+  // Where the mug sits in the name column B2:B5: MATCH's answer.
+  const position = Number(A.matchMug.value);
+  if (L.products[position][1] !== "Mug") throw new Error(`MATCH says ${position}, but the mug is elsewhere`);
+  if (printed(A.leftward.value) !== printed(L.leftward.value)) throw new Error("the leftward lookup changed with the insert");
 
   return (
     <AbsoluteFill>
@@ -115,6 +129,8 @@ export const LookupScene: React.FC = () => {
             { r: mug, c: 0, at: firstColAt, out: onlyRightAt, color: MARK },
             { r: mug, c: 2, at: nineAt - 2, out: insertAt, color: MARK_OK },
             { r: mug, c: 2, at: kitchenAt - 2, out: q4At, color: MARK_BAD, inserted: true },
+            // "Mug is second": second in B2:B5, on the sheet's row 3.
+            { r: mug, c: 1, at: secondAt, out: rangesAt, color: MARK },
           ]}
         />
         <Note at={skuAt - 2} x={X0} y={g.bottom + h(18)}>
@@ -142,6 +158,7 @@ export const LookupScene: React.FC = () => {
         ))}
 
         {/* ── Question 3 ── */}
+        {/* At the insert Excel widens both ranges to A2:D5, and leaves the 3 alone. */}
         <FormulaBar
           x={BAR_X}
           top={slot(0)}
@@ -151,7 +168,15 @@ export const LookupScene: React.FC = () => {
           result={result(L.vlookup)}
           resultAt={nineAt - 2}
           tone="ok"
-          out={insertAt + 10}
+          rewrite={{
+            at: insertAt + 12,
+            formula: screen(A.vlookup),
+            marks: [{ text: "A2:D5", color: RANGE }],
+            result: result(A.vlookup),
+            resultAt: kitchenAt - 2,
+            tone: "bad",
+          }}
+          out={out3}
         />
         <RangeBox g={g} r0={2} r1={5} c0={0} c1={2} at={firstColAt + 4} out={onlyRightAt} />
         <ElbowArrow
@@ -173,6 +198,7 @@ export const LookupScene: React.FC = () => {
           result={result(L.leftward)}
           resultAt={naAt}
           tone="bad"
+          rewrite={{ at: insertAt + 12, formula: screen(A.leftward), marks: [{ text: "A2:D5", color: RANGE }] }}
           out={out3}
         />
         <RangeBox g={g} r0={2} r1={5} c0={0} c1={0} at={searchAt} out={insertAt} color={ACCENT} dash />
@@ -184,19 +210,6 @@ export const LookupScene: React.FC = () => {
         <Note at={typedAt - 2} x={BAR_X} y={slot(2) + h(40)} out={out3}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>the 3 is typed in</span>
         </Note>
-        <FormulaBar
-          x={BAR_X}
-          top={slot(0)}
-          width={BAR_W}
-          formula={screen(A.vlookup)}
-          at={insertAt + 12}
-          typeDur={10}
-          result={result(A.vlookup)}
-          resultAt={kitchenAt - 2}
-          tone="bad"
-          marks={[{ text: "A2:D5", color: `color-mix(in srgb, ${ds("yellow", 400)} 60%, transparent)` }]}
-          out={out3}
-        />
 
         {/* ── Question 4: INDEX/MATCH ── */}
         <FormulaBar
@@ -208,9 +221,54 @@ export const LookupScene: React.FC = () => {
           result={result(A.indexMatchSku)}
           resultAt={skuBackAt}
           tone="ok"
+          marks={[{ text: "0", color: MARK, at: zeroAt }]}
           out={out4}
         />
+        {/* MATCH on its own: the mug's position in B2:B5. */}
+        <FormulaBar
+          x={BAR_X}
+          top={slot(1)}
+          width={BAR_W}
+          formula={screen(A.matchMug)}
+          at={secondAt - 6}
+          typeDur={10}
+          result={printed(A.matchMug.value)}
+          resultAt={secondAt + 2}
+          marks={[{ text: "0", color: MARK, at: zeroAt }]}
+          out={rangesAt}
+        />
+        <Note at={zeroAt} x={BAR_X} y={slot(2) - h(6)} out={rangesAt}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            <b style={{ color: INK }}>0</b>: exact match, like VLOOKUP&apos;s <Mono>FALSE</Mono>
+          </span>
+        </Note>
+        <Note at={indexAt + 6} x={BAR_X} y={slot(2) + h(40)} out={rangesAt}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            <b style={{ color: INK }}>INDEX</b> takes position {position} of A2:A5: {result(A.indexMatchSku)}
+          </span>
+        </Note>
+        {/* Positions within B2:B5, MATCH's count, beside the sheet's own row numbers. */}
+        {L.products.slice(1).map((_, i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: g.x + g.width + INSERT_W + 10,
+              top: g.rowTop(i + 2),
+              height: g.rowH,
+              display: "flex",
+              alignItems: "center",
+              ...label(i + 1 === position ? 22 : 20, i + 1 === position ? inkOf.teal : INK_SOFT),
+              fontWeight: i + 1 === position ? 700 : 500,
+              opacity: ease(frame, matchAt + 8 + i * 3, 10) * (1 - ease(frame, rangesAt, 10)),
+              ...TABULAR,
+            }}
+          >
+            {i + 1}
+          </div>
+        ))}
         <RangeBox g={g} r0={2} r1={5} c0={1} c1={1} at={matchAt + 6} out={rangesAt} color={ds("teal", 500)} />
+
         <RangeBox g={g} r0={2} r1={5} c0={0} c1={0} at={indexAt} out={rangesAt} color={ds("purple", 500)} />
         <ElbowArrow
           points={[
@@ -222,22 +280,42 @@ export const LookupScene: React.FC = () => {
           width={2.4}
           out={rangesAt}
         />
+        {/* The price formula as it was written, before the insert; the insert
+            opens again and Excel rewrites C2:C5 as D2:D5. */}
         <FormulaBar
           x={BAR_X}
           top={slot(1)}
           width={BAR_W}
-          formula={screen(A.indexMatchPrice)}
-          at={rangesAt}
+          formula={screen(L.indexMatchPrice)}
+          at={rangesAt + 12}
+          typeDur={12}
+          marks={[{ text: "C2:C5", color: RANGE }]}
+          rewrite={{ at: movesAt, formula: screen(A.indexMatchPrice), marks: [{ text: "D2:D5", color: RANGE }] }}
           result={result(A.indexMatchPrice)}
           resultAt={stillAt - 2}
           tone="ok"
           out={out4}
         />
-        <RangeBox g={g} r0={2} r1={5} c0={2} c1={2} at={rangesAt + 8} out={out4} color={ds("purple", 500)} shiftAt={shift} />
+        <RangeBox g={g} r0={2} r1={5} c0={2} c1={2} at={rangesAt + 18} out={out4} color={ds("purple", 500)} shiftAt={shift} />
+        <Note at={rangesAt + 16} x={BAR_X} y={slot(2) - h(6)} out={movesAt}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            written before the insert: <b style={{ color: INK }}>C2:C5</b>, the prices
+          </span>
+        </Note>
+        <Note at={movesAt + 4} x={BAR_X} y={slot(2) - h(6)} out={out4}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            after it, Excel rewrites the range: <b style={{ color: INK }}>D2:D5</b>, still the prices
+          </span>
+        </Note>
 
         {/* ── Question 5: XLOOKUP ── */}
         <Note at={newerAt - 2} x={BAR_X} y={slot(0) - h(4)} out={arraysAt}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the newer lookup, in current Excel</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            the newer lookup: <b style={{ color: INK }}>Excel 365 and 2021 or later</b>
+          </span>
+        </Note>
+        <Note at={olderAt - 2} x={BAR_X} y={slot(0) + h(40)} out={arraysAt}>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>older versions don&apos;t have it</span>
         </Note>
         <FormulaBar
           x={BAR_X}
@@ -248,7 +326,7 @@ export const LookupScene: React.FC = () => {
           result={result(A.xlookupLeft)}
           resultAt={exactAt - 4}
           tone="ok"
-          dim={forgetAt}
+          out={bridgeAt}
         />
         <FormulaBar
           x={BAR_X}
@@ -259,20 +337,20 @@ export const LookupScene: React.FC = () => {
           result={result(A.xlookupMissing)}
           resultAt={notFoundAt - 2}
           tone={isError(A.xlookupMissing.value) ? "bad" : "ok"}
-          dim={forgetAt}
+          out={bridgeAt}
         />
-        {/* The bridge: the argument question 6 is about. */}
-        <Note at={forgetAt} x={BAR_X} y={slot(3) + h(30)}>
+        {/* The bridge: the argument question 6 is about, VLOOKUP's, with XLOOKUP gone. */}
+        <Note at={forgetAt} x={BAR_X} y={slot(1)}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-            the fourth argument: <Mark at={forgetAt + 10}>
+            VLOOKUP&apos;s fourth argument: <Mark at={forgetAt + 10}>
               <Mono>FALSE</Mono>
             </Mark>
           </span>
         </Note>
-        <Note at={notFoundAt + 6} x={BAR_X} y={slot(2) - h(6)}>
+        <Note at={notFoundAt + 6} x={BAR_X} y={slot(2) - h(6)} out={bridgeAt}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>no IFERROR around it</span>
         </Note>
-        <Note at={exactAt} x={BAR_X} y={slot(2) + h(40)}>
+        <Note at={exactAt} x={BAR_X} y={slot(2) + h(40)} out={bridgeAt}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>exact match unless you ask otherwise</span>
         </Note>
         <RangeBox g={g} r0={2} r1={5} c0={1} c1={1} at={arraysAt + 6} out={exactAt + 4} color={ds("teal", 500)} />

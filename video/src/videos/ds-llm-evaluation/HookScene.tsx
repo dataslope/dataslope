@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -49,9 +49,10 @@ export const HookScene: React.FC = () => {
     { text: "another model often grades it", at: n.word("plan", "another model often grades it") },
   ];
   const nineAt = n.word("plan", "nine questions");
-  const sevenAt = n.word("plan", "Seven get worked through");
-  const twoTakeAt = n.word("plan", "two take a sentence each");
-  const end = n.beat("plan").to;
+  const sevenAt = n.word("plan-seven", "Seven get worked through");
+  const fourAt = n.word("plan-seven", "four of them with real arithmetic");
+  const twoTakeAt = n.word("plan-seven", "two take a sentence each");
+  const end = n.beat("plan-seven").to;
 
   const arrow = ease(frame, twiceAt + 4, 16);
 
@@ -141,10 +142,10 @@ export const HookScene: React.FC = () => {
           </Chip>
         ))}
         <Note at={newAt} x={X0} y={y(ROW_NEW - 44)}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>what&apos;s new</span>
+          <span style={{ ...label(22, INK), fontWeight: 700 }}>what&apos;s new</span>
         </Note>
         {fresh.map((c, i) => (
-          <Chip key={c.text} x={X0 + [0, 290, 708][i]} y={y(ROW_NEW)} at={c.at - 2} size={28} ink={ACCENT_INK}>
+          <Chip key={c.text} x={X0 + [0, 290, 708][i]} y={y(ROW_NEW)} at={c.at - 2} size={28} ink={INK}>
             {c.text}
           </Chip>
         ))}
@@ -152,8 +153,9 @@ export const HookScene: React.FC = () => {
           <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
             9 questions:{" "}
             <span style={{ opacity: ease(frame, sevenAt - 2, 10) }}>
-              <Mark at={sevenAt + 4}>7 worked through with real arithmetic</Mark>
+              <Mark at={sevenAt + 4}>7 worked through</Mark>
             </span>
+            <span style={{ opacity: ease(frame, fourAt - 2, 10), color: INK_SOFT }}> (4 of them with real arithmetic)</span>
             <span style={{ opacity: ease(frame, twoTakeAt - 2, 10) }}>, 2 in a sentence</span>
           </span>
         </Note>

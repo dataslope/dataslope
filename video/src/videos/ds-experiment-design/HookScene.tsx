@@ -11,13 +11,14 @@ import { Drift, Headline, Kicker, Mark, OK, OK_INK, pulse, Spot, X0 } from "./pa
 import { mulberry32 } from "../da-statistics-communication/parts";
 
 const LINE_Y = 600;
-const LAUNCH_X = 1040;
+/** Five chips of 188 with gaps of 8 end at 1092, clear of the launch tick. */
+const LAUNCH_X = 1110;
 const LINE_END = 1800;
 const CHIP_Y = 460;
-const CHIP_W = 176;
-const CHIP_GAP = 10;
+const CHIP_W = 188;
+const CHIP_GAP = 8;
 const CHIP_H = 66;
-const DOTS_X = 1110;
+const DOTS_X = 1170;
 const DOTS_Y = 480;
 
 /** The five things settled before launch, in the order the hook names them. */
@@ -58,7 +59,10 @@ export const HookScene: React.FC = () => {
   const simAt = n.word("plan", "simulated experiments");
   const briefAt = n.word("plan", "three brief ones");
   const planAt = n.word("design-in", "the whole plan");
-  const clearAt = n.beat("design-in").to - 6;
+  // The page holds through the pause and clears into the cut, so the next
+  // scene cross-fades in over it rather than over an empty page.
+  const nextAt = n.beat("design").from;
+  const clearAt = nextAt - 14;
 
   const lineP = ease(frame, startAt + 4, 24);
   const washIn = ease(frame, lostAt, 14);
@@ -76,7 +80,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="tock-low" at={settledAt + 6} level={-36} />
       <Sfx name="el-chime" at={fourteenAt} level={-36} />
 
-      <Drift from={0} to={n.beat("design-in").to + 20}>
+      <Drift from={0} to={nextAt}>
         <Kicker at={startAt}>Data scientist interview prep · Experimentation I</Kicker>
         <Headline lead="An A/B test can be lost" turn="before launch." at={startAt + 2} turnAt={beforeAt - 2} size={72} />
         <Spot id="ds-experiment-design-heron" at={startAt + 10} left={1500} top={y(236)} width={300} height={227} />

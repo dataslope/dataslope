@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PEEK, PEEK_RATES, pct } from "./data";
-import { at, Axes, Drift, type Scale, Svg } from "./parts";
+import { at, Axes, Drift, OK_INK, type Scale, Svg } from "./parts";
 
 const BOX = { left: 170, right: 1060, top: 360, bottom: 790 };
 const P_MAX = 0.6;
@@ -21,7 +21,8 @@ const RATE_MAX = 0.4;
  * identical arms, the p-value every hundred visitors, drawn as the
  * narration walks along it: under 0.05 at 800 and again at 2,000, and 0.19
  * at the planned 8,000. Then the video's own 10,000 A/A tests on four
- * schedules, against the 5% a single look promises.
+ * schedules, against the 5% a single look promises, and why: every look is
+ * another chance at a false positive, so fix n or test sequentially.
  */
 export const PeekScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -53,7 +54,10 @@ export const PeekScene: React.FC = () => {
     n.word("peek-rate", "twenty-six and a half"),
     n.word("peek-rate", "thirty-five"),
   ];
-  const end = n.beat("peek-rate").to;
+  const lookAt = n.word("peek-why", "each extra look is one more chance");
+  const fixAt = n.word("peek-why", "So fix the sample size in advance");
+  const sequentialAt = n.word("peek-why", "or use a sequential test");
+  const end = n.beat("peek-why").to;
 
   const xs: Scale = { lo: 0, hi: PEEK.planned, a: BOX.left, b: BOX.right };
   const ys: Scale = { lo: 0, hi: P_MAX, a: y(BOX.bottom), b: y(BOX.top) };
@@ -120,7 +124,8 @@ export const PeekScene: React.FC = () => {
             strokeDasharray="7 6"
           />
           <path d={path} fill="none" stroke={BAR} strokeWidth={3} strokeLinejoin="round" />
-          {head ? <circle cx={at(xs, head[0])} cy={at(ys, Math.min(head[1], P_MAX))} r={6} fill={BAR} /> : null}
+          {/* The pen's tip, only once the line has started from it. */}
+          {head && frame >= asked + 6 ? <circle cx={at(xs, head[0])} cy={at(ys, Math.min(head[1], P_MAX))} r={6} fill={BAR} /> : null}
           {crossings.map((c) => {
             const s = ease(frame, c.at, 10);
             if (s <= 0) return null;
@@ -133,11 +138,13 @@ export const PeekScene: React.FC = () => {
         <Note at={dipAt} x={BOX.right} y={at(ys, 0.05) - h(36)} width={150} align="right">
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>p = 0.05</span>
         </Note>
-        {crossings.map((c) => (
-          <Note key={c.v} at={c.at + 2} x={at(xs, c.v) - 40} y={at(ys, pOf(c.v)) - h(64)}>
-            <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{c.v.toLocaleString("en-US")}</span>
-          </Note>
-        ))}
+        {/* The two crossings are named in the open space above the dip, where
+            no part of the line runs through them. */}
+        <Note at={eightHundredAt} x={at(xs, 800) + 20} y={y(426)}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            under 0.05 at 800<span style={{ opacity: ease(frame, twoThousandAt, 8) }}>, and again at 2,000</span>
+          </span>
+        </Note>
         <Note at={stopAt} x={at(xs, 800) + 20} y={y(470)}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             stop at either<span style={{ opacity: ease(frame, noiseAt, 8) }}>: you&apos;ve shipped noise</span>
@@ -193,6 +200,16 @@ export const PeekScene: React.FC = () => {
         })}
         <Note at={valueAts[0] + 4} x={xr(0.05) - 80} y={y(812)} width={160} style={{ textAlign: "center" }}>
           <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>5% promised</span>
+        </Note>
+
+        {/* Why the bars grow, and what to do instead. */}
+        <Note at={lookAt} x={COL_X} y={y(858)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>each look: one more chance at a false positive</span>
+        </Note>
+        <Note at={fixAt} x={COL_X} y={y(896)}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            fix n in advance<span style={{ opacity: ease(frame, sequentialAt, 8) }}>, or test sequentially</span>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

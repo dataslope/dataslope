@@ -60,7 +60,9 @@ const HOURS = Array.from({ length: 8 }, () => hour() < 0.5);
  * what the new half shares reaches the old half along the edges, and the gap
  * between the arms closes (a sketch, with no scale). Split by group instead
  * and only the two edges between groups still cross. Then a switchback: one
- * pool of riders and drivers, split by the hour, with carryover at each switch.
+ * pool of riders and drivers, where a user split overstates the effect (a
+ * treated rider takes a control rider's driver), split by the hour instead;
+ * carryover at each switch is dropped as a washout, and the hour is the unit.
  */
 export const NetworkScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -82,14 +84,18 @@ export const NetworkScene: React.FC = () => {
   const citiesAt = n.word("network", "or whole cities");
   const q8At = n.word("switchback", "Question eight");
   const q8TextAt = n.word("switchback", "What is a switchback experiment");
-  const poolAt = n.word("switchback", "riders and drivers share one pool");
-  const cantAt = n.word("switchback", "you can't split users");
-  const timeAt = n.word("switchback", "Split time instead");
-  const hourAt = n.word("switchback", "for an hour");
-  const randomAt = n.word("switchback", "switching at random");
-  const carryAt = n.word("switchback", "Leave room for carryover");
-  const spillAt = n.word("switchback", "one hour spills into the next");
-  const end = n.beat("switchback").to;
+  const poolAt = n.word("sb-pool", "riders and drivers share one pool");
+  const cantAt = n.word("sb-pool", "you can't split users");
+  const takesAt = n.word("sb-pool", "takes a driver from a control rider");
+  const overAt = n.word("sb-pool", "the split overstates the effect");
+  const timeAt = n.word("sb-time", "Split time instead");
+  const hourAt = n.word("sb-time", "for an hour");
+  const randomAt = n.word("sb-time", "switching at random");
+  const spillAt = n.word("sb-carry", "One hour spills into the next");
+  const dropAt = n.word("sb-carry", "drop the first minutes of each hour");
+  const washAt = n.word("sb-carry", "as a washout");
+  const hoursAt = n.word("sb-carry", "count hours, not users");
+  const end = n.beat("sb-carry").to;
 
   const graphOut = q8At - 4;
   const nodesIn = ease(frame, assumesAt, 14);
@@ -113,6 +119,18 @@ export const NetworkScene: React.FC = () => {
   const TL = { x0: 830, y: 560, w: 112, gap: 6, hgt: 92 };
   const blocksFrom = hourAt - 6;
   const blocksTo = Math.max(blocksFrom + 40, randomAt + 10);
+  // Carryover: a red strip where the version switched. Then every hour's
+  // first minutes are dropped as a washout, drawn as paper struck through.
+  const dropped = ease(frame, dropAt + 4, 12);
+
+  // Why not a user split, sketched with no scale: treated riders book faster
+  // and take drivers from control riders, so control's bookings fall and the
+  // gap between the arms comes out bigger than the change's real effect.
+  const SK = { x: 1090, w: 420, row: 66, top: 300, hgt: 40 };
+  const skIn = ease(frame, takesAt - 6, 12) * (1 - ease(frame, timeAt - 8, 10));
+  const pulled = ease(frame, takesAt + 12, 20);
+  const skTreat = 0.8;
+  const skCtrl = 0.62 - 0.16 * pulled;
 
   return (
     <AbsoluteFill>
@@ -121,7 +139,9 @@ export const NetworkScene: React.FC = () => {
       <Sfx name="el-pencil" at={groupsAt + 2} level={-36} />
       <Sfx name="el-pop" at={poolAt} level={-37} />
       <Sfx name="el-tap" at={hourAt} level={-37} />
-      <Sfx name="el-pencil" at={carryAt + 2} level={-36} />
+      <Sfx name="el-scratch" at={takesAt + 4} level={-37} />
+      <Sfx name="el-pencil" at={spillAt + 2} level={-36} />
+      <Sfx name="el-pop" at={dropAt + 4} level={-37} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} out={q8At - 4} size={62}>
@@ -231,7 +251,7 @@ export const NetworkScene: React.FC = () => {
             />
             <line x1={BARS.x + BARS.w} x2={BARS.x + 2 * BARS.w + BARS.gap + 30} y1={y(BARS.base) - bh(treat)} y2={y(BARS.base) - bh(treat)} stroke={INK} strokeWidth={1} strokeDasharray="3 5" />
           </svg>
-          {["new", "control"].map((t, i) => (
+          {["sharing", "control"].map((t, i) => (
             <div
               key={t}
               style={{ position: "absolute", left: BARS.x + i * (BARS.w + BARS.gap) - 20, width: BARS.w + 40, top: y(BARS.base) + h(10), textAlign: "center", ...label(21, INK_SOFT), fontWeight: 700, opacity: barsIn }}
@@ -248,11 +268,12 @@ export const NetworkScene: React.FC = () => {
           <Note at={shrinkAt + 2} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.5) + h(20)} out={groupsAt + 4}>
             <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>so the difference shrinks</span>
           </Note>
+          {/* Balanced, so neither note leaves a word on a line alone. */}
           <Note at={groupsAt + 4} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.62)} width={380}>
-            <span style={{ ...note(25, OK_INK), fontWeight: 700 }}>randomize groups that rarely touch</span>
+            <span style={{ ...note(25, OK_INK), fontWeight: 700, display: "block", textWrap: "balance" }}>randomize groups that rarely touch</span>
           </Note>
           <Note at={friendsAt} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.62) + h(80)} width={380}>
-            <span style={{ ...note(24, OK_INK) }}>
+            <span style={{ ...note(24, OK_INK), display: "block", textWrap: "balance" }}>
               clusters of friends<span style={{ opacity: ease(frame, citiesAt, 10) }}>, or whole cities</span>
             </span>
           </Note>
@@ -283,6 +304,42 @@ export const NetworkScene: React.FC = () => {
           <Note at={cantAt} x={250} y={y(570) - h(214)}>
             <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>can't split users</span>
           </Note>
+          {/* The sketch beside it: the gap a user split would report. */}
+          {skIn > 0 ? (
+            <div style={{ position: "absolute", inset: 0, opacity: skIn }}>
+              <div style={{ position: "absolute", left: SK.x - 250, top: y(SK.top) - h(52), ...label(19, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+                rides booked under a user split, a sketch with no scale
+              </div>
+              {[
+                { name: "treated riders", len: skTreat, color: TREAT, ghost: 0 },
+                { name: "control riders", len: skCtrl, color: CONTROL, ghost: 0.62 },
+              ].map((r, i) => {
+                const top = y(SK.top) + i * h(SK.row);
+                return (
+                  <React.Fragment key={r.name}>
+                    <div style={{ position: "absolute", left: SK.x - 250, width: 234, top: top + h(SK.hgt) / 2 - 14, textAlign: "right", ...label(21, INK), fontWeight: 650 }}>{r.name}</div>
+                    {r.ghost ? (
+                      <div style={{ position: "absolute", left: SK.x, top, width: SK.w * r.ghost, height: h(SK.hgt), borderRadius: 4, border: `2px dashed ${INK_SOFT}`, boxSizing: "border-box", opacity: pulled }} />
+                    ) : null}
+                    <div style={{ position: "absolute", left: SK.x, top, width: SK.w * r.len, height: h(SK.hgt), borderRadius: 4, background: r.color }} />
+                  </React.Fragment>
+                );
+              })}
+              <Note at={takesAt + 20} x={SK.x + SK.w * 0.62 + 14} y={y(SK.top) + h(SK.row) + h(SK.hgt) / 2 - 14}>
+                <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>← drivers taken</span>
+              </Note>
+              <Note at={overAt} x={SK.x} y={y(SK.top) + 2 * h(SK.row) + h(4)}>
+                <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the gap comes out bigger than the real effect</span>
+              </Note>
+            </div>
+          ) : null}
+          <Note at={takesAt} x={150} y={y(570) + h(232)}>
+            <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              a treated rider takes a control rider's driver,
+              <br />
+              <span style={{ opacity: ease(frame, overAt - 2, 10) }}>so a user split overstates the effect</span>
+            </span>
+          </Note>
         </div>
         <Note at={timeAt} x={TL.x0} y={y(TL.y) - h(110)}>
           <span style={{ ...note(28, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>Split time instead: the whole city, hour by hour</span>
@@ -293,7 +350,7 @@ export const NetworkScene: React.FC = () => {
           if (p <= 0) return null;
           const x = TL.x0 + i * (TL.w + TL.gap);
           const switched = i > 0 && HOURS[i - 1] !== isNewHour;
-          const carry = switched ? ease(frame, carryAt + i * 2, 10) : 0;
+          const carry = switched ? ease(frame, spillAt + i * 2, 10) : 0;
           return (
             <React.Fragment key={i}>
               <div
@@ -316,7 +373,7 @@ export const NetworkScene: React.FC = () => {
               >
                 {isNewHour ? "new" : "old"}
               </div>
-              {carry > 0 ? (
+              {carry > 0 && dropped < 1 ? (
                 <div
                   style={{
                     position: "absolute",
@@ -326,7 +383,21 @@ export const NetworkScene: React.FC = () => {
                     height: h(TL.hgt),
                     borderRadius: "6px 0 0 6px",
                     background: `repeating-linear-gradient(135deg, ${ACCENT} 0 4px, transparent 4px 9px)`,
-                    opacity: 0.7,
+                    opacity: 0.7 * (1 - dropped),
+                  }}
+                />
+              ) : null}
+              {i > 0 && dropped > 0 ? (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: x,
+                    top: y(TL.y),
+                    width: 30,
+                    height: h(TL.hgt),
+                    borderRadius: "6px 0 0 6px",
+                    background: `repeating-linear-gradient(135deg, ${INK_SOFT} 0 3px, ${PAPER} 3px 8px)`,
+                    opacity: 0.9 * ease(frame, dropAt + 4 + i * 2, 10),
                   }}
                 />
               ) : null}
@@ -338,9 +409,18 @@ export const NetworkScene: React.FC = () => {
             one hour each<span style={{ opacity: ease(frame, randomAt, 10) }}>, new or old at random</span>
           </span>
         </Note>
-        <Note at={carryAt + 4} x={TL.x0} y={y(TL.y) + h(TL.hgt) + h(60)}>
+        <Note at={spillAt + 4} x={TL.x0} y={y(TL.y) + h(TL.hgt) + h(60)}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            carryover<span style={{ opacity: ease(frame, spillAt, 10), fontWeight: 500 }}>: one hour spills into the next</span>
+            carryover<span style={{ fontWeight: 500 }}>: one hour spills into the next</span>
+          </span>
+        </Note>
+        {/* The first dropped strip, named. */}
+        <Note at={washAt} x={TL.x0 + (TL.w + TL.gap) - 6} y={y(TL.y) - h(40)}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>↓ washout, dropped</span>
+        </Note>
+        <Note at={dropAt + 2} x={TL.x0} y={y(TL.y) + h(TL.hgt) + h(108)}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            drop each hour's first minutes<span style={{ opacity: ease(frame, hoursAt - 2, 10) }}>; count hours, not users</span>
           </span>
         </Note>
       </Drift>

@@ -3,17 +3,20 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { JUDGE } from "./data";
-import { BAD, Clear, DATA, DATA_LIGHT, Drift, Frac, Grid100, madeUp, Mark, MARK_BAD, math, X0 } from "./parts";
+import { BAD, Clear, DATA_LIGHT, Drift, Frac, Grid100, Mark, MARK_BAD, math, X0 } from "./parts";
 
 const GRID = { x: X0, top: 370, cell: 36, gap: 6 };
 const R_X = 660;
 const STAR = ds("yellow", 600);
+/** The judge and the reply from its own model family: one hue with no
+ *  meaning in the series, so neither reads as the trap or the answer. */
+const FAMILY = ds("purple", 500);
 /** A five-pointed star, radius 11, centred on the origin. */
 const STAR_PATH =
   Array.from({ length: 10 }, (_, k) => {
@@ -23,9 +26,20 @@ const STAR_PATH =
   }).join(" ") + " Z";
 
 /** Where the ten disagreements and the five shared fails sit in the grid:
- *  spread out, the way they would fall in real labels. */
-const APART = new Set([7, 18, 26, 33, 41, 52, 64, 71, 86, 96]);
+ *  spread out, the way they would fall in real labels. Of the ten, the judge
+ *  passes five the expert fails, and the expert passes the other five. */
+const JUDGE_ONLY = new Set([7, 26, 41, 64, 86]);
+const EXPERT_ONLY = new Set([18, 33, 52, 71, 96]);
 const BOTH_FAIL = new Set([12, 37, 58, 79, 91]);
+
+/** A legend swatch: a filled square, with a white slash for the items only
+ *  the expert passes, the same mark as their cells. */
+const Swatch: React.FC<{ color: string; slash?: boolean }> = ({ color, slash = false }) => (
+  <svg width={16} height={16} style={{ marginRight: 8, verticalAlign: "-2px", overflow: "visible" }}>
+    <rect width={16} height={16} rx={3} fill={color} />
+    {slash ? <line x1={3} y1={13} x2={13} y2={3} stroke={PAPER} strokeWidth={2.4} strokeLinecap="round" /> : null}
+  </svg>
+);
 
 /** A small reply card in a bias sketch: `w` wide, starred if the judge picks it. */
 const Mini: React.FC<{ x: number; y: number; w: number; h?: number; color?: string; star?: boolean; starAt: number; children?: React.ReactNode }> = ({
@@ -70,12 +84,15 @@ const Mini: React.FC<{ x: number; y: number; w: number; h?: number; color?: stri
 
 /**
  * Question 4. A hundred items graded by judge and expert, as a grid: they
- * agree on ninety, and the ten they part on turn red. Then the arithmetic in
- * the page's own numbers: chance agreement 0.82, so kappa is 0.08 over 0.18,
+ * agree on ninety, and the ten they part on turn red, five each way (the
+ * expert's five slashed), so each rater's 85 + 5 = 90 passes can be counted.
+ * Then the arithmetic in
+ * the page's own numbers: chance agreement 0.82 (both pass, 0.9 × 0.9, plus
+ * both fail, 0.1 × 0.1, said as well as shown), so kappa is 0.08 over 0.18,
  * 0.44; a judge that always says pass agrees ninety percent too, with kappa 0.
  * Then the three known biases, each drawn as what it does rather than how
  * often (the page gives no rates), and the bar a judge is held to: how well
- * the experts agree with each other.
+ * the experts agree with each other, which it can't be expected to beat.
  */
 export const JudgeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -89,8 +106,11 @@ export const JudgeScene: React.FC = () => {
   const calibrateAt = n.word("judge", "calibrate it against experts");
   const eachAt = n.word("judge", "each mark ninety percent");
   const agreeAt = n.word("judge", "they agree on ninety percent");
-  const strongAt = n.word("judge-kappa", "That sounds strong");
-  const chanceAt = n.word("judge-kappa", "agree often by chance");
+  const strongAt = n.word("judge-chance", "That sounds strong");
+  const chanceAt = n.word("judge-chance", "agree often by chance");
+  const peAt = n.word("judge-pe", "chance alone gives eighty-two percent");
+  const passAt = n.word("judge-pe", "both pass");
+  const failAt = n.word("judge-pe", "both fail");
   const kappaAt = n.word("judge-kappa", "Cohen's kappa takes chance out");
   const aboveAt = n.word("judge-kappa", "point oh eight above chance");
   const roomAt = n.word("judge-kappa", "out of a possible point one eight");
@@ -103,14 +123,14 @@ export const JudgeScene: React.FC = () => {
   const longerAt = n.word("judge-bias", "toward longer answers");
   const familyAt = n.word("judge-bias", "its own model family");
   const expertsAt = n.word("judge-bias", "how well the experts agree");
-  const beatAt = n.word("judge-bias", "A judge can't beat the humans");
+  const beatAt = n.word("judge-bar", "Don't expect a judge");
   const offlineAt = n.word("ab-in", "Offline scores only decide");
   const usersAt = n.word("ab-in", "on real users");
   const end = n.beat("ab-in").to;
 
   const red = ease(frame, agreeAt + 4, 12);
   const color = (i: number) => {
-    if (APART.has(i)) return `color-mix(in srgb, ${BAD} ${100 * red}%, ${DATA_LIGHT})`;
+    if (JUDGE_ONLY.has(i) || EXPERT_ONLY.has(i)) return `color-mix(in srgb, ${BAD} ${100 * red}%, ${DATA_LIGHT})`;
     if (BOTH_FAIL.has(i)) return BLUE_INK;
     return DATA_LIGHT;
   };
@@ -137,22 +157,43 @@ export const JudgeScene: React.FC = () => {
         <Note at={instrumentAt} x={GRID.x} y={y(GRID.top - 50)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>100 replies, graded by the judge and by an expert</span>
         </Note>
-        <Grid100 x={GRID.x} y={y(GRID.top)} cell={GRID.cell} gap={GRID.gap} at={calibrateAt} color={color} />
+        <Grid100
+          x={GRID.x}
+          y={y(GRID.top)}
+          cell={GRID.cell}
+          gap={GRID.gap}
+          at={calibrateAt}
+          color={color}
+          slash={(i) => (EXPERT_ONLY.has(i) ? red : 0)}
+        />
         <Note at={agreeAt + 6} x={GRID.x} y={y(GRID.top) + gridW + h(18)}>
-          <div style={{ display: "flex", gap: 22, ...label(19, INK), whiteSpace: "nowrap" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "auto auto", columnGap: 26, rowGap: 8, ...label(19, INK), whiteSpace: "nowrap" }}>
             <span>
-              <span style={{ display: "inline-block", width: 16, height: 16, background: DATA_LIGHT, borderRadius: 3, marginRight: 8 }} />
+              <Swatch color={DATA_LIGHT} />
               both pass
             </span>
             <span>
-              <span style={{ display: "inline-block", width: 16, height: 16, background: BLUE_INK, borderRadius: 3, marginRight: 8 }} />
+              <Swatch color={BLUE_INK} />
               both fail
             </span>
             <span style={{ color: ACCENT_INK, fontWeight: 700 }}>
-              <span style={{ display: "inline-block", width: 16, height: 16, background: BAD, borderRadius: 3, marginRight: 8 }} />
-              they disagree
+              <Swatch color={BAD} />
+              only the judge passes
+            </span>
+            <span style={{ color: ACCENT_INK, fontWeight: 700 }}>
+              <Swatch color={BAD} slash />
+              only the expert passes
             </span>
           </div>
+        </Note>
+        <Note at={agreeAt + 14} x={GRID.x} y={y(GRID.top) + gridW + h(96)}>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>
+            judge and expert each pass{" "}
+            <b style={{ color: INK, ...TABULAR }}>
+              {JUDGE.cells.passPass} + {JUDGE.cells.passFail} = {JUDGE.judgePasses}
+            </b>{" "}
+            of the 100
+          </span>
         </Note>
 
         {/* The arithmetic, in the page's numbers. */}
@@ -166,8 +207,17 @@ export const JudgeScene: React.FC = () => {
             </span>
           </Note>
           <Note at={chanceAt} x={R_X} y={y(GRID.top + 120)}>
-            <span style={{ ...note(26, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
-              agreement by chance alone: 0.9 × 0.9 + 0.1 × 0.1 = <b style={{ color: INK }}>{JUDGE.pe.toFixed(2)}</b>
+            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
+              agreement by chance alone:{" "}
+              <span style={{ opacity: ease(frame, peAt - 2, 10) }}>
+                <b style={{ color: INK }}>{JUDGE.pe.toFixed(2)}</b> ={" "}
+              </span>
+              <span style={{ opacity: ease(frame, passAt - 2, 10) }}>
+                0.9 × 0.9 <span style={{ fontSize: 22 }}>(both pass)</span>
+              </span>
+              <span style={{ opacity: ease(frame, failAt - 2, 10) }}>
+                {" "}+ 0.1 × 0.1 <span style={{ fontSize: 22 }}>(both fail)</span>
+              </span>
             </span>
           </Note>
           <Note at={kappaAt} x={R_X} y={y(GRID.top + 190)}>
@@ -235,13 +285,13 @@ export const JudgeScene: React.FC = () => {
               ) : null}
               {i === 2 ? (
                 <>
-                  <Mini x={0} y={60} w={100} color={ACCENT} starAt={b.at + 6}>
+                  <Mini x={0} y={60} w={100} color={FAMILY} starAt={b.at + 6}>
                     judge
                   </Mini>
-                  <Mini x={130} y={60} w={80} color={ACCENT} star starAt={b.at + 6}>
+                  <Mini x={130} y={60} w={80} color={FAMILY} star starAt={b.at + 6}>
                     A
                   </Mini>
-                  <Mini x={230} y={60} w={80} color={DATA} starAt={b.at + 6}>
+                  <Mini x={230} y={60} w={80} starAt={b.at + 6}>
                     B
                   </Mini>
                 </>
@@ -249,15 +299,12 @@ export const JudgeScene: React.FC = () => {
             </div>
           </Note>
         ))}
-        <Note at={familyAt + 10} x={R_X} y={y(GRID.top + 250)}>
-          <span style={madeUp()}>each drawn as a mechanism: the page gives no rates for them</span>
-        </Note>
         <Note at={expertsAt} x={R_X} y={y(GRID.top + 320)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>the bar: how well the experts agree with each other</span>
         </Note>
         <Note at={beatAt} x={R_X} y={y(GRID.top + 370)}>
           <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            <Mark at={beatAt + 6}>a judge can&apos;t beat the humans it imitates</Mark>
+            <Mark at={beatAt + 6}>don&apos;t expect a judge to beat the humans it imitates</Mark>
           </span>
         </Note>
         <Note at={offlineAt} x={R_X} y={y(GRID.top + 450)}>

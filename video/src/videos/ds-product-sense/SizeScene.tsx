@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -54,10 +54,11 @@ const Factor: React.FC<{ x: number; top: number; w: number; at: number; out: num
 /**
  * Questions 10 and 11. The on-the-spot estimate as a chain of factors, each an
  * assumption said out loud, multiplying the made-up app's two million monthly
- * users down to about 500,000 searches a day. Then a feature bounded before
- * it is built: 120,000 weekly users reach it, lifts of 1% to 3% give 1,200 to
- * 3,600 extra weekly cooks, drawn against a 20,000 goal, and the best case is
- * under a fifth of it.
+ * users down to about 500,000 searches a day, then sanity-checked: one search
+ * a day for each user of the feature. Then a feature bounded before it is
+ * built: 120,000 weekly users reach it, 1 to 3 in every 100 of them becoming
+ * weekly cooks gives 1,200 to 3,600 extra, drawn against a 20,000 goal, and
+ * the best case is under a fifth of it, so it waits.
  */
 export const SizeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -75,6 +76,9 @@ export const SizeScene: React.FC = () => {
   const halfAt = n.word("market", "half a session a day");
   const twoAt = n.word("market", "two searches a session");
   const resultAt = n.word("market", "About five hundred thousand");
+  const sanityCheckAt = n.word("market-sanity", "sanity-check it");
+  const eachAt = n.word("market-sanity", "one search a day each");
+  const plausibleAt = n.word("market-sanity", "Plausible");
   const structureAt = n.word("market-grade", "the structure");
   const sanityAt = n.word("market-grade", "the sanity check");
   const notAt = n.word("market-grade", "not the number");
@@ -82,12 +86,14 @@ export const SizeScene: React.FC = () => {
   const q11TextAt = n.word("impact", "How do you size");
   const boundAt = n.word("impact", "Bound it");
   const reachAt = n.word("impact", "A hundred and twenty thousand weekly users");
-  const similarAt = n.word("impact", "Similar launches lifted cooking");
-  const rangeAt = n.word("impact", "twelve hundred to thirty-six hundred");
-  const goalAt = n.word("impact", "against a goal of twenty thousand");
+  const similarAt = n.word("impact-lift", "Similar launches turned");
+  const hundredAt = n.word("impact-lift", "one to three in every hundred");
+  const rangeAt = n.word("impact-range", "twelve hundred to thirty-six hundred");
+  const goalAt = n.word("impact-range", "against a goal of twenty thousand");
   const fifthAt = n.word("impact-verdict", "under a fifth of it");
-  const cheapestAt = n.word("impact-verdict", "The cheapest experiment");
-  const end = n.beat("impact-verdict").to;
+  const deprioritizeAt = n.word("impact-verdict", "deprioritize it");
+  const cheapestAt = n.word("impact-cheap", "The cheapest experiment");
+  const end = n.beat("impact-cheap").to;
 
   const out10 = q11At - 4;
   const xOf = (i: number) => X0 + i * (CHAIN.w + CHAIN.gap);
@@ -104,7 +110,7 @@ export const SizeScene: React.FC = () => {
   ];
 
   const xs: Scale = { lo: 0, hi: IMPACT.goal, a: X0 + 40, b: AXIS.x1 };
-  const axis = ease(frame, goalAt - 6, 20);
+  const axis = ease(frame, rangeAt - 8, 20);
   const band = ease(frame, rangeAt, 16);
 
   return (
@@ -119,7 +125,9 @@ export const SizeScene: React.FC = () => {
       <Sfx name="slide" at={rangeAt} level={-32} />
       <Sfx name="el-pop" at={fifthAt} level={-32} />
 
-      <Drift from={from} to={end + 40}>
+      {/* One slow push per question: a single push over both eases in so
+          slowly that Question 10's card is read over a still page. */}
+      <Drift from={from} to={q11At + 10}>
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} out={out10} size={60}>
           How would you estimate the size of something on the spot?
         </QuestionCard>
@@ -150,6 +158,18 @@ export const SizeScene: React.FC = () => {
           <span style={madeUp()}>assumptions for the made-up app</span>
         </Note>
 
+        {/* The sanity check: what the answer says each feature user does. */}
+        <Note at={sanityCheckAt} x={1824} align="right" y={y(604)} out={out10}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <b>sanity check:</b>{" "}
+            <span style={{ color: BLUE_INK, fontWeight: 600, opacity: ease(frame, sanityCheckAt + 10, 10) }}>
+              {num(MARKET.daily)} searches ÷ {num(MARKET.users)} users
+            </span>
+            <span style={{ color: BLUE_INK, fontWeight: 600, opacity: ease(frame, eachAt, 10) }}> = {MARKET.perUserDaily} search a day each</span>
+            <span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, plausibleAt, 10) }}>, plausible</span>
+          </span>
+        </Note>
+
         {/* What's graded. */}
         <Note at={structureAt - 4} x={X0} y={y(680)} out={out10}>
           <div style={{ display: "flex", alignItems: "center", gap: 36 }}>
@@ -167,7 +187,9 @@ export const SizeScene: React.FC = () => {
             </span>
           </div>
         </Note>
+      </Drift>
 
+      <Drift from={q11At - 8} to={end + 40}>
         {/* ── Question 11: bound it ── */}
         <QuestionCard n={11} at={q11At} textAt={q11TextAt - 2} size={60}>
           How do you size a feature&apos;s impact before building it?
@@ -180,7 +202,10 @@ export const SizeScene: React.FC = () => {
             <b>{num(IMPACT.reach)}</b> weekly users reach its screen
             <span style={{ opacity: ease(frame, similarAt, 10) }}>
               {" "}
-              × <b>{pct(IMPACT.liftLo)} to {pct(IMPACT.liftHi)}</b>, what similar launches lifted cooking
+              × <b style={{ opacity: ease(frame, hundredAt, 10) }}>
+                {IMPACT.perHundredLo} to {IMPACT.perHundredHi} in 100
+              </b>{" "}
+              become new weekly cooks <span style={{ color: INK_SOFT }}>(similar launches)</span>
             </span>
           </span>
         </Note>
@@ -194,7 +219,7 @@ export const SizeScene: React.FC = () => {
           {[0, 5_000, 10_000, 15_000, 20_000].map((v) => (
             <g key={v}>
               <line x1={at(xs, v)} x2={at(xs, v)} y1={y(AXIS.y)} y2={y(AXIS.y) + 8} stroke={INK} strokeWidth={1.4} />
-              <text x={at(xs, v)} y={y(AXIS.y) + 34} textAnchor="middle" style={{ ...label(20, INK_SOFT), ...TABULAR }}>
+              <text x={at(xs, v)} y={y(AXIS.y) + 34} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), ...TABULAR })}>
                 {num(v)}
               </text>
             </g>
@@ -217,7 +242,10 @@ export const SizeScene: React.FC = () => {
         <Bracket x0={at(xs, 0)} x1={at(xs, IMPACT.extraHi)} y={y(AXIS.y) + h(70)} at={fifthAt} color={ACCENT_INK}>
           <span style={{ ...label(23, ACCENT_INK), fontWeight: 700, ...TABULAR }}>best case: {pct(IMPACT.shareOfGoal)} of the goal</span>
         </Bracket>
-        <Note at={cheapestAt} x={980} y={y(AXIS.y) + h(84)}>
+        <Note at={deprioritizeAt} x={980} y={y(AXIS.y) + h(84)}>
+          <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>→ deprioritize it before anyone builds it</span>
+        </Note>
+        <Note at={cheapestAt} x={980} y={y(AXIS.y) + h(140)}>
           <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={cheapestAt + 8}>the cheapest experiment is the arithmetic</Mark>
           </span>

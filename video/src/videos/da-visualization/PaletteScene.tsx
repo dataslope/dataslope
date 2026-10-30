@@ -56,6 +56,8 @@ const PANELS = [
 ];
 const P_TOP = 500;
 const P_BASE = 760;
+/** A colorblind-safe pair, dark blue against orange, far apart in lightness too. */
+const SAFE = [ds("blue", 700), ds("orange", 500)] as const;
 
 /** A legend's line sample, in a series' ink. */
 const Swatch: React.FC<{ color: string }> = ({ color }) => (
@@ -70,7 +72,8 @@ const Swatch: React.FC<{ color: string }> = ({ color }) => (
  * ninth and tenth come round to the first two colors, then the tail folded
  * into "other" and the same channels as small panels. Last, two lines in red
  * and green, then the same two through the page's deuteranope simulation
- * (an SVG color matrix computed in check.mjs), then labeled and in gray.
+ * (an SVG color matrix computed in check.mjs), then redrawn in a
+ * colorblind-safe pair, blue and orange, labeled, and in gray.
  */
 export const PaletteScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -101,7 +104,8 @@ export const PaletteScene: React.FC = () => {
   const aloneAt = n.word("access", "don't carry meaning by color alone");
   const mostAt = n.word("access", "as most people see them");
   const cbAt = n.word("access", "as a red-green colorblind reader");
-  const cueAt = n.word("access-fix", "Add a second cue");
+  const safeAt = n.word("access-safe", "Use a colorblind-safe pair");
+  const blueOrangeAt = n.word("access-safe", "like blue and orange");
   const labelAt = n.word("access-fix", "like a direct label");
   const grayAt = n.word("access-fix", "check the chart in grayscale");
   const robustAt = n.word("access-fix", "it's robust");
@@ -132,10 +136,10 @@ export const PaletteScene: React.FC = () => {
   const pTop = y(P_TOP);
   const pBase = y(P_BASE);
   const pY = (v: number) => pBase - (v / 100) * (pBase - pTop);
-  const lines = (p: (typeof PANELS)[number], at: number) => (
+  const lines = (p: (typeof PANELS)[number], at: number, colors: readonly [string, string] = [OK, ACCENT]) => (
     <>
-      <LineSet values={mobile.values} x0={p.x0} x1={p.x1} base={pBase} top={pTop} lo={0} hi={100} at={at} color={OK} dots={false} edges />
-      <LineSet values={retail.values} x0={p.x0} x1={p.x1} base={pBase} top={pTop} lo={0} hi={100} at={at + 4} color={ACCENT} dots={false} axis={false} edges />
+      <LineSet values={mobile.values} x0={p.x0} x1={p.x1} base={pBase} top={pTop} lo={0} hi={100} at={at} color={colors[0]} dots={false} edges />
+      <LineSet values={retail.values} x0={p.x0} x1={p.x1} base={pBase} top={pTop} lo={0} hi={100} at={at + 4} color={colors[1]} dots={false} axis={false} edges />
     </>
   );
   const legend = (p: (typeof PANELS)[number], at: number) => (
@@ -158,6 +162,7 @@ export const PaletteScene: React.FC = () => {
       <Sfx name="el-pop" at={foldAt} level={-32} />
       <Sfx name="el-tap" at={mostAt} level={-34} />
       <Sfx name="el-scratch" at={cbAt + 8} level={-32} />
+      <Sfx name="el-pencil" at={blueOrangeAt} level={-34} />
       <Sfx name="el-pop" at={robustAt} level={-32} />
 
       {/* The page's red-green simulation, as one matrix in linear RGB. */}
@@ -223,7 +228,7 @@ export const PaletteScene: React.FC = () => {
                         x={x + (i + 0.5) * cellW}
                         y={stripTop + stripH + 30}
                         textAnchor="middle"
-                        style={{ ...label(18, INK_SOFT) }}
+                        style={{ ...label(19, INK_SOFT) }}
                         fill={INK_SOFT}
                         opacity={ease(frame, at + 6 + i * 2, 10)}
                       >
@@ -239,7 +244,7 @@ export const PaletteScene: React.FC = () => {
                           x={x + [cellW / 2, STRIP_W / 2, STRIP_W - cellW / 2][i]}
                           y={stripTop + stripH + 30}
                           textAnchor="middle"
-                          style={{ ...label(18, INK_SOFT) }}
+                          style={{ ...label(19, INK_SOFT) }}
                           fill={INK_SOFT}
                           opacity={ease(frame, (k === 1 ? darkAt : at) + 6, 10)}
                         >
@@ -370,7 +375,7 @@ export const PaletteScene: React.FC = () => {
           return (
             <React.Fragment key={c.key}>
               <LineSet values={c.values} x0={x0} x1={x0 + SMALL.w} base={base} top={top + h(26)} lo={0} hi={100} at={at} dots={false} width={2.4} out={out16} edges />
-              <div style={{ position: "absolute", left: x0, top, ...label(17, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, at + 2, 10) * (1 - ease(frame, out16, 10)) }}>
+              <div style={{ position: "absolute", left: x0, top, ...label(19, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, at + 2, 10) * (1 - ease(frame, out16, 10)) }}>
                 {c.key}
               </div>
             </React.Fragment>
@@ -402,16 +407,19 @@ export const PaletteScene: React.FC = () => {
           which line is which?
         </Verdict>
 
-        <PanelTitle x={PANELS[2].x0} y={pTop - h(56)} at={cueAt - 4}>
-          With labels, in grayscale
+        {/* The fix, built up as it is said: a safe pair, then labels, then gray. */}
+        <PanelTitle x={PANELS[2].x0} y={pTop - h(56)} at={safeAt - 2}>
+          Blue and orange
+          <span style={{ opacity: ease(frame, labelAt, 10) }}>, labeled</span>
+          <span style={{ opacity: ease(frame, grayAt, 10) }}>, in grayscale</span>
         </PanelTitle>
         <div style={{ position: "absolute", inset: 0, filter: `grayscale(${gray})` }}>
-          {lines(PANELS[2], cueAt - 2)}
+          {lines(PANELS[2], blueOrangeAt - 2, SAFE)}
           {[
-            { key: mobile.key, v: mobile.values.at(-1)!, color: OK },
-            { key: retail.key, v: retail.values.at(-1)!, color: ACCENT },
+            { key: mobile.key, v: mobile.values.at(-1)!, color: SAFE[0] },
+            { key: retail.key, v: retail.values.at(-1)!, color: SAFE[1] },
           ].map((s) => (
-            <Note key={s.key} at={labelAt + (s.key === retail.key ? 4 : 0)} x={PANELS[2].x1 - 70} y={pY(s.v) - h(42)}>
+            <Note key={s.key} at={labelAt + (s.key === retail.key ? 4 : 0)} x={PANELS[2].x1 + 12} y={pY(s.v) - h(16)}>
               <span style={{ ...label(21, INK), whiteSpace: "nowrap", borderBottom: `3px solid ${s.color}` }}>{s.key}</span>
             </Note>
           ))}

@@ -4,17 +4,17 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ERRORS, SAMPLE } from "./data";
-import { A_COLOR, at, B_COLOR, B_INK, curvePath, Drift, Mark, OK, OK_INK, Phi, type Scale, Svg, WARM, WARM_INK, X0 } from "./parts";
+import { A_COLOR, at, B_COLOR, B_INK, curvePath, Drift, Mark, OK, OK_INK, Phi, pulse, type Scale, Svg, WARM, WARM_INK, X0 } from "./parts";
 
 const TOP = 330;
 /** Question 10's bars: users per arm for each lift. */
-const BARS = { x0: X0 + 260, max: 1000, y: 620, pitch: 92 };
+const BARS = { x0: X0 + 260, max: 620, y: 640, pitch: 92 };
 /** Questions 11 and 12: the null and the alternative, and power against n. */
 const CURVES = { x0: 140, x1: 1000, base: 790, height: 330 };
 const POWER = { x0: 1170, x1: 1760, base: 790, top: 430 };
@@ -23,11 +23,13 @@ const count = (v: number) => Math.round(v).toLocaleString("en-US");
 
 /**
  * Questions 10, 11 and 12. The course's sample sizes, 3,841 users per arm to
- * catch 10% rising to 12% and 14,751 to catch 11%, drawn to scale; then the
- * two curves every power calculation is about: what a test sees with no
- * effect and with one placed for 80% power, alpha the null's tail past 1.96,
- * beta the alternative's share short of it, power the rest; the line moved
- * one way and the other; and power against users for three lifts.
+ * catch 10% rising to 12% and 14,751 to catch 11%, drawn to scale beside
+ * power against users for three lifts, which is up from "smaller effects
+ * become detectable" through question 12; then the two curves every power
+ * calculation is about: what a test sees with no effect and with one placed
+ * for 80% power, alpha the null's two tails past ±1.96, beta the
+ * alternative's share short of the line, power the rest; and the line moved
+ * one way and the other.
  */
 export const PowerScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -43,8 +45,10 @@ export const PowerScene: React.FC = () => {
   const answerAt = n.beat("power-mde").from;
   const shrinkAt = n.word("power-mde", "Bigger samples shrink");
   const mdeAt = n.word("power-mde", "the minimum detectable effect");
+  const detectAt = n.word("power-mde", "smaller effects become detectable");
   const pickAt = n.word("power-mde", "Pick it before launch");
   const followsAt = n.word("power-mde", "the sample size follows");
+  const worthAt = n.word("power-worth", "worth the cost of shipping");
   const twelveAt = n.word("power-n", "rising to twelve");
   const nAt = n.word("power-n", "three thousand eight hundred forty-one");
   const halveAt = n.word("power-n", "Halve the lift");
@@ -53,9 +57,10 @@ export const PowerScene: React.FC = () => {
   const q11At = n.word("errors", "Question eleven");
   const q11TextAt = n.word("errors", "What are Type one");
   const falsePosAt = n.word("errors", "a false positive");
-  const alphaAt = n.word("errors", "Its rate is alpha");
-  const falseNegAt = n.word("errors", "a false negative");
-  const betaAt = n.word("errors", "Its rate is beta");
+  const alphaAt = n.word("errors-alpha", "Its rate is alpha");
+  const splitAt = n.word("errors-alpha", "split evenly");
+  const falseNegAt = n.word("errors-beta", "a false negative");
+  const betaAt = n.word("errors-beta", "Its rate is beta");
   const q12At = n.word("power-def", "Question twelve");
   const q12TextAt = n.word("power-def", "What is statistical power");
   const minusAt = n.word("power-def", "one minus beta");
@@ -67,9 +72,10 @@ export const PowerScene: React.FC = () => {
   const out10 = q11At - 4;
 
   // ── Question 10 ──
+  // In the power panel's blues: 10% to 12% its middle curve, 10% to 11% its darkest.
   const sizes = [
-    { label: "10% → 12%", users: SAMPLE.twelve, at: twelveAt, numAt: nAt, color: A_COLOR },
-    { label: "10% → 11%", users: SAMPLE.eleven, at: halveAt, numAt: fourteenAt, color: B_COLOR },
+    { label: "10% → 12%", users: SAMPLE.twelve, at: twelveAt, numAt: nAt, color: A_COLOR, ink: BLUE_INK },
+    { label: "10% → 11%", users: SAMPLE.eleven, at: halveAt, numAt: fourteenAt, color: ds("blue", 800), ink: ds("blue", 800) },
   ];
   const unit = BARS.max / SAMPLE.eleven;
 
@@ -91,7 +97,10 @@ export const PowerScene: React.FC = () => {
   const lx: Scale = { lo: 2, hi: Math.log10(60000), a: POWER.x0, b: POWER.x1 };
   const pys: Scale = { lo: 0, hi: 1, a: y(POWER.base), b: y(POWER.top) };
   const inks = [ds("blue", 300), A_COLOR, ds("blue", 800)];
-  const powerPanelP = ease(frame, risesAt - 4, 14);
+  // Type in each curve's own blue, except the palest, which is too light to read.
+  const labelInks = [INK_SOFT, BLUE_INK, ds("blue", 800)];
+  const powerPanelP = ease(frame, detectAt - 4, 14);
+  const curvesAt = detectAt + 6;
   const pathOf = (rows: readonly (readonly [number, number])[]) =>
     rows.map(([nn, p], i) => `${i ? "L" : "M"}${at(lx, Math.log10(nn)).toFixed(1)},${at(pys, p).toFixed(1)}`).join(" ");
 
@@ -139,6 +148,11 @@ export const PowerScene: React.FC = () => {
             <span style={{ opacity: ease(frame, followsAt - 2, 10), color: INK }}>, and the sample size follows</span>
           </span>
         </Note>
+        <Note at={worthAt - 4} x={X0} y={y(TOP + 168)} out={out10}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+            pick the MDE as the <b>smallest lift worth the cost of shipping</b>
+          </span>
+        </Note>
         <Note at={twelveAt - 6} x={X0} y={y(BARS.y) - h(64)} out={out10}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>users in each arm, 80% power, 5% significance</span>
         </Note>
@@ -167,7 +181,7 @@ export const PowerScene: React.FC = () => {
                   position: "absolute",
                   left: BARS.x0 + s.users * unit * p + 16,
                   top: top + 6,
-                  ...note(28, i ? B_INK : BLUE_INK),
+                  ...note(28, s.ink),
                   fontWeight: 650,
                   whiteSpace: "nowrap",
                   opacity: ease(frame, s.numAt - 2, 10) * (1 - ease(frame, out10, 10)),
@@ -194,20 +208,28 @@ export const PowerScene: React.FC = () => {
           <path d={curvePath(zs, base, height, ERRORS.shift, zs.lo, zs.hi)} fill="none" stroke={B_COLOR} strokeWidth={2.8} />
           <line x1={CURVES.x0} x2={CURVES.x1} y1={base} y2={base} stroke={INK} strokeWidth={1.4} />
           <line x1={at(zs, crit)} x2={at(zs, crit)} y1={base - height - 14} y2={base} stroke={INK} strokeWidth={2} strokeDasharray="6 5" />
+          <line x1={at(zs, -crit)} x2={at(zs, -crit)} y1={base - height - 14} y2={base} stroke={INK} strokeWidth={2} strokeDasharray="6 5" />
           <text x={at(zs, 0)} y={base + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: INK_SOFT }}>
             no effect
           </text>
           <text x={at(zs, ERRORS.shift)} y={base + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 19, fontWeight: 600, fill: B_INK }}>
             a real effect
           </text>
-          <text x={at(zs, crit)} y={base - height - 24} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 18, fontWeight: 600, fill: INK_SOFT }}>
+          <text x={at(zs, crit)} y={base - height - 24} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: INK_SOFT }}>
             declare a winner past here
+          </text>
+          <text x={at(zs, -crit)} y={base - height - 24} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: INK_SOFT }}>
+            or a loser past here
           </text>
         </Svg>
         <Note at={falsePosAt - 2} x={X0} y={y(TOP)} out={q12At - 4}>
           <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>
             <b>Type I</b>: a false positive, a winner with no effect
-            <span style={{ opacity: ease(frame, alphaAt - 2, 10), ...TABULAR }}> (α = {Math.round(ERRORS.alpha * 100)}%)</span>
+            <span style={{ opacity: ease(frame, alphaAt - 2, 10) }}>
+              {" "}
+              (α = <Num>{Math.round(ERRORS.alpha * 100)}%</Num>
+              <span style={{ opacity: ease(frame, splitAt - 2, 10) }}>, half in each tail</span>)
+            </span>
           </span>
         </Note>
         <Note at={falseNegAt - 2} x={X0} y={y(TOP + 48)} out={q12At - 4}>
@@ -216,10 +238,18 @@ export const PowerScene: React.FC = () => {
             <span style={{ opacity: ease(frame, betaAt - 2, 10), ...TABULAR }}> (β = {Math.round(ERRORS.beta * 100)}%)</span>
           </span>
         </Note>
-        <Note at={alphaAt + 4} x={at(zs, ERRORS.crit) + 30} y={base - h(70)}>
-          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>α {fmt(alphaNow * 100, 1)}%</span>
+        {/* Alpha is both of the null's tails: half of it labelled at each. */}
+        <Note at={alphaAt + 4} x={at(zs, crit) + 30} y={base - h(70)}>
+          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>
+            <Num>{fmt(alphaNow * 50, 1)}%</Num>
+          </span>
         </Note>
-        <Note at={betaAt + 4} x={at(zs, ERRORS.crit) - 14} y={base - h(34)} align="right">
+        <Note at={alphaAt + 4} x={at(zs, -crit) - 30} y={base - h(70)} align="right">
+          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>
+            <Num>{fmt(alphaNow * 50, 1)}%</Num>
+          </span>
+        </Note>
+        <Note at={betaAt + 4} x={at(zs, crit) - 14} y={base - h(34)} align="right">
           <span style={{ ...label(20, WARM_INK), whiteSpace: "nowrap", ...TABULAR }}>β {fmt(betaNow * 100, 1)}%</span>
         </Note>
         <Note at={minusAt - 2} x={X0} y={y(TOP)}>
@@ -229,39 +259,46 @@ export const PowerScene: React.FC = () => {
           </span>
         </Note>
         <Note at={moveAt + 4} x={X0} y={y(TOP + 48)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>moving the line trades one error for the other</span>
-        </Note>
-        <Note at={onlyAt - 2} x={X0} y={y(TOP + 92)}>
-          <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>only more data shrinks both</span>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            moving the line trades one error for the other
+            <span style={{ opacity: ease(frame, onlyAt - 2, 10), fontWeight: 650 }}>; only more data shrinks both</span>
+          </span>
         </Note>
 
         {/* Power against users per arm, for three lifts. */}
         <Svg opacity={powerPanelP}>
           <line x1={POWER.x0} x2={POWER.x1} y1={y(POWER.base)} y2={y(POWER.base)} stroke={INK} strokeWidth={1.4} />
           <line x1={POWER.x0} x2={POWER.x1} y1={at(pys, ERRORS.power)} y2={at(pys, ERRORS.power)} stroke={OK} strokeWidth={1.6} strokeDasharray="6 6" />
-          <text x={POWER.x0 - 12} y={at(pys, ERRORS.power) + 6} textAnchor="end" style={{ fontFamily: SANS, fontSize: 18, fontWeight: 600, fill: OK_INK }}>
+          {/* The power ticks at the right end, clear of question 10's notes on the left. */}
+          <text x={POWER.x1 + 12} y={at(pys, ERRORS.power) + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 600, fill: OK_INK }}>
             80%
           </text>
+          {[0, 1].map((t) => (
+            <text key={t} x={POWER.x1 + 12} y={at(pys, t) + 7} textAnchor="start" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
+              {t * 100}%
+            </text>
+          ))}
           {[100, 1000, 10000].map((t) => (
-            <text key={t} x={at(lx, Math.log10(t))} y={y(POWER.base) + 26} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 18, fontWeight: 500, fill: INK_SOFT }}>
+            <text key={t} x={at(lx, Math.log10(t))} y={y(POWER.base) + 28} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 500, fill: INK_SOFT }}>
               {t.toLocaleString("en-US")}
             </text>
           ))}
-          <text x={POWER.x1} y={y(POWER.base) + 54} textAnchor="end" style={{ fontFamily: SANS, fontSize: 18, fontWeight: 650, fill: INK_SOFT }}>
+          <text x={POWER.x1} y={y(POWER.base) + 58} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
             users per arm (log scale)
           </text>
-          <text x={POWER.x0} y={y(POWER.top) - 16} style={{ fontFamily: SANS, fontSize: 18, fontWeight: 650, fill: INK_SOFT }}>
-            power
+          {/* At the right end, so question 10's notes on the left never run into it. */}
+          <text x={POWER.x1} y={y(POWER.top) - 24} textAnchor="end" style={{ fontFamily: SANS, fontSize: 20, fontWeight: 650, fill: INK_SOFT }}>
+            power to catch a lift from {Math.round(SAMPLE.from * 100)}%
           </text>
           {SAMPLE.curves.map((c, i) => (
-            <path key={c.to} d={pathOf(c.rows)} fill="none" stroke={inks[i]} strokeWidth={3} pathLength={1} strokeDasharray={`${ease(frame, risesAt + i * 6, 24)} 1`} />
+            <path key={c.to} d={pathOf(c.rows)} fill="none" stroke={inks[i]} strokeWidth={3 + 2 * pulse(frame, risesAt + i * 6, 20)} pathLength={1} strokeDasharray={`${ease(frame, curvesAt + i * 6, 24)} 1`} />
           ))}
         </Svg>
         {SAMPLE.curves.map((c, i) => {
           const mid = c.rows.find(([, p]) => p >= 0.5) ?? c.rows[0];
           return (
-            <Note key={c.to} at={risesAt + 10 + i * 6} x={at(lx, Math.log10(mid[0])) - 12} width={140} y={at(pys, 0.5) - h(14)} align="right">
-              <span style={{ ...label(18, inks[i] === A_COLOR ? BLUE_INK : INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>→ {Math.round(c.to * 100)}%</span>
+            <Note key={c.to} at={curvesAt + 10 + i * 6} x={at(lx, Math.log10(mid[0])) - 12} width={140} y={at(pys, 0.5) - h(14)} align="right">
+              <span style={{ ...label(20, labelInks[i]), whiteSpace: "nowrap", ...TABULAR }}>→ {Math.round(c.to * 100)}%</span>
             </Note>
           );
         })}

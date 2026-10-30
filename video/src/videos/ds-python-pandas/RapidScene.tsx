@@ -12,6 +12,7 @@ import {
   colsOf,
   DataTable,
   Drift,
+  FadeIn,
   geoOf,
   Headline,
   Kicker,
@@ -20,6 +21,7 @@ import {
   Mark,
   MARK_BAD,
   MARK_KEY,
+  MARK_OK,
   Mono,
   OK,
   OK_INK,
@@ -52,11 +54,11 @@ const Line: React.FC<{ at: number; top: number; x?: number; children: React.Reac
   </Note>
 );
 
-/** 10. Series.map, DataFrame.apply, DataFrame.map: what each works on. */
+/** 10. Series.map, DataFrame.apply, DataFrame.map (once applymap): what each works on. */
 const MapBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const S = QUICK.mapCode;
   const listTop = c.y(548);
-  const g = geoOf(S, R_X, listTop + listingHeight(S.lines.length, 18) + c.h(24), c.h, { rowH: 46 });
+  const g = geoOf(S, R_X, listTop + listingHeight(S.lines.length, SIZE) + c.h(24), c.h, { rowH: 46 });
   return (
     <>
       <Line at={c.w("r-map", "Series map")} top={c.y(370)}>
@@ -65,10 +67,16 @@ const MapBody: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={c.w("r-map", "Apply works along an axis")} top={c.y(424)}>
         <Mono color={BLUE_INK}>DataFrame.apply</Mono> along an axis: a row or a column
       </Line>
-      <Line at={c.w("r-map", "Data frame map")} top={c.y(478)}>
+      <Line at={c.w("r-map-cells", "Data frame map")} top={c.y(478)}>
         <Mono color={BLUE_INK}>DataFrame.map</Mono> every cell
+        <FadeIn at={c.w("r-map-cells", "once called apply map")}>
+          <span style={{ color: INK_SOFT }}>
+            {" "}
+            (was <Mono>applymap</Mono>)
+          </span>
+        </FadeIn>
       </Line>
-      <Listing lines={S.lines} x={R_X} top={listTop} width={900} size={18} at={c.w("r-map", "from a function or a lookup")} />
+      <Listing lines={S.lines} x={R_X} top={listTop} width={960} size={SIZE} at={c.w("r-map", "from a function or a lookup")} />
       <DataTable
         g={g}
         cols={colsOf(S, { code: { ink: BLUE_INK } })}
@@ -113,22 +121,47 @@ const ChainBody: React.FC<{ c: Ctx }> = ({ c }) => {
   );
 };
 
-/** 12. np.select with a default, and case_when started without one. */
+/** 12. np.select with a default; then case_when's own code, started from
+ *  the default, in the listing's place, and the same rule started from the
+ *  column instead, where the rows nothing matches keep their old value. */
 const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const S = QUICK.select;
+  const W = QUICK.caseWhen;
   const at = c.w("r-case", "use NumPy select");
-  const listH = listingHeight(S.lines.length, SIZE);
-  const g = geoOf(S, R_X, c.y(370) + listH + c.h(70), c.h, { rowH: 48 });
+  const caseAt = c.w("r-case", "Pandas has case when too");
+  const startAt = c.w("r-case", "Start it from the default");
+  const matchAt = c.w("r-case", "or rows that match nothing");
+  const oldAt = c.w("r-case", "keep their old value");
+  // The tables sit under the taller of the two listings.
+  const listH = Math.max(listingHeight(S.lines.length, SIZE), listingHeight(W.lines.length, SIZE));
+  const tablesTop = c.y(370) + listH + c.h(64);
+  const g = geoOf(S, R_X, tablesTop, c.h, { rowH: 48 });
   const size = S.cols.indexOf("size");
   const B = QUICK.bare;
   const bx = R_X + 480;
-  const bg = geoOf(B, bx, c.y(370) + listH + c.h(70), c.h, { rowH: 48 });
+  const bg = geoOf(B, bx, tablesTop, c.h, { rowH: 48 });
   const kept = B.rows.flatMap((r, i) => (/^\d+$/.test(r[1]) ? [i] : []));
-  const caseAt = c.w("r-case", "Pandas has case when too");
-  const oldAt = c.w("r-case", "keep their old value");
   return (
     <>
-      <Listing lines={S.lines} x={R_X} top={c.y(370)} width={960} size={SIZE} at={at - 4} marks={[{ line: 2, at: c.w("r-case", "and a default") }]} />
+      <Listing
+        lines={S.lines}
+        x={R_X}
+        top={c.y(370)}
+        width={960}
+        size={SIZE}
+        at={at - 4}
+        out={caseAt - 2}
+        marks={[{ line: 2, at: c.w("r-case", "and a default") }]}
+      />
+      <Listing
+        lines={W.lines}
+        x={R_X}
+        top={c.y(370)}
+        width={960}
+        size={SIZE}
+        at={caseAt + 2}
+        marks={[{ line: 0, at: startAt, color: MARK_OK }]}
+      />
       <DataTable
         g={g}
         cols={colsOf(S, { size: { ink: BLUE_INK } })}
@@ -136,16 +169,19 @@ const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
         rows={S.rows.map((cells, i) => ({ cells, at: at + 10 + i * 2 }))}
         marks={S.rows.map((_, row) => ({ row, col: size, at: c.w("r-case", "a list of conditions") + row * 2, color: MARK_KEY }))}
       />
-      <Note at={caseAt} x={bx} y={bg.top - c.h(40)}>
+      <Note at={startAt + 4} x={R_X} y={g.top - c.h(40)}>
+        <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>started from the default</span>
+      </Note>
+      <Note at={matchAt} x={bx} y={bg.top - c.h(40)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-          <Mono>case_when</Mono>, with no default
+          started from <Mono>amount</Mono>
         </span>
       </Note>
       <DataTable
         g={bg}
         cols={colsOf(B)}
-        at={caseAt + 4}
-        rows={B.rows.map((cells, i) => ({ cells, at: caseAt + 8 + i * 2 }))}
+        at={matchAt}
+        rows={B.rows.map((cells, i) => ({ cells, at: matchAt + 4 + i * 2 }))}
         marks={kept.map((row) => ({ row, col: 1, at: oldAt + (row - kept[0]) * 4, color: MARK_BAD }))}
       />
       <Line at={oldAt + 4} x={bx + 200} top={bg.rowMid(kept[0]) - c.h(16)} color={ACCENT_INK}>
@@ -155,13 +191,13 @@ const CaseBody: React.FC<{ c: Ctx }> = ({ c }) => {
   );
 };
 
-/** 13. 300 regions as strings, and as a category. */
+/** 13. 300 rows of four regions, as strings and as a category. */
 const CatBody: React.FC<{ c: Ctx }> = ({ c }) => (
   <>
     <Line at={c.w("r-cat", "stores each distinct string once")} top={c.y(370)}>
       <Mono color={BLUE_INK}>astype(&quot;category&quot;)</Mono>: each string once, a small code per row
     </Line>
-    <Line at={c.w("r-cat", "Three hundred regions")} top={c.y(430)} color={INK_SOFT}>
+    <Line at={c.w("r-cat-bytes", "Three hundred rows of four region names")} top={c.y(430)} color={INK_SOFT}>
       300 rows, four distinct regions
     </Line>
     <Bars
@@ -177,7 +213,7 @@ const CatBody: React.FC<{ c: Ctx }> = ({ c }) => (
           text: `${QUICK.catBefore.toLocaleString("en-US")} bytes`,
           color: BAR,
           ink: BLUE_INK,
-          at: c.w("r-cat", "eight thousand nine hundred bytes") - 4,
+          at: c.w("r-cat-bytes", "eight thousand nine hundred bytes") - 4,
         },
         {
           name: "as a category",
@@ -185,7 +221,7 @@ const CatBody: React.FC<{ c: Ctx }> = ({ c }) => (
           text: `${QUICK.catAfter} bytes`,
           color: OK,
           ink: OK_INK,
-          at: c.w("r-cat", "four hundred eighteen") - 4,
+          at: c.w("r-cat-bytes", "four hundred eighteen") - 4,
         },
       ]}
     />
@@ -227,7 +263,8 @@ const DatesBody: React.FC<{ c: Ctx }> = ({ c }) => {
 /**
  * Questions 10 to 14, a sentence and a line of code each, beside a numbered
  * list: map, apply and DataFrame.map; the page's chain; np.select with a
- * default, and case_when without one keeping 50 and 80; 300 regions as
+ * default, case_when's code started from the default, and the same rule
+ * started from the column keeping 50 and 80; 300 regions as
  * strings and as a category; a week's resample. The bridge maps three
  * pandas words onto their SQL twins.
  */
@@ -277,8 +314,7 @@ export const RapidScene: React.FC = () => {
 
         {/* ── The bridge: three pandas words and their SQL twins ── */}
         <Line at={sqlAt} top={y(380)}>
-          <span style={{ color: INK_SOFT }}>pandas</span>
-          <span style={{ display: "inline-block", width: 220 }} />
+          <span style={{ display: "inline-block", width: 290, color: INK_SOFT }}>pandas</span>
           <span style={{ color: INK_SOFT }}>SQL</span>
         </Line>
         {pairs.map((p, i) => (

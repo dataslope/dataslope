@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, label, note, PAPER, svgText } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -36,7 +36,7 @@ const Badge: React.FC<{ kind: "yes" | "no" | number; at: number; x: number; y: n
         ) : kind === "no" ? (
           <path d="M-7,-7 L7,7 M7,-7 L-7,7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" />
         ) : (
-          <text y={8} textAnchor="middle" style={{ ...label(23, BLUE_INK), fontWeight: 700 }}>
+          <text y={8} textAnchor="middle" style={svgText({ ...label(23, BLUE_INK), fontWeight: 700 })}>
             {kind}
           </text>
         )}

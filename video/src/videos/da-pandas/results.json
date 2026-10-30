@@ -158,6 +158,77 @@
           "stdout": "",
           "displays": [],
           "warnings": []
+        },
+        "locSlice": {
+          "code": "df.loc[0:2]",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "South",
+                "80"
+              ],
+              [
+                "East",
+                "200"
+              ],
+              [
+                "North",
+                "120"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
+        "ilocSlice": {
+          "code": "df.iloc[0:2]",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "South",
+                "80"
+              ],
+              [
+                "East",
+                "200"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
         }
       }
     },
@@ -207,6 +278,33 @@
               "str",
               "int64"
             ]
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
+        "gt": {
+          "code": "df[\"amount\"] > 100",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "amount",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "values": [
+              "True",
+              "False",
+              "False",
+              "True",
+              "True"
+            ],
+            "dtype": "bool"
           },
           "stdout": "",
           "displays": [],
@@ -341,6 +439,18 @@
           "displays": [],
           "warnings": []
         },
+        "object": {
+          "code": "type(df.groupby(\"region\"))",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "<class 'pandas.api.typing.DataFrameGroupBy'>",
+            "str": "<class 'pandas.api.typing.DataFrameGroupBy'>"
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
         "sum": {
           "code": "df.groupby(\"region\")[\"amount\"].sum()",
           "ok": true,
@@ -447,6 +557,33 @@
               "50.0"
             ],
             "dtype": "float64"
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
+        "transformSum": {
+          "code": "df.groupby(\"region\")[\"amount\"].transform(\"sum\")",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": "amount",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "indexName": null,
+            "values": [
+              "160",
+              "160",
+              "200",
+              "200",
+              "50"
+            ],
+            "dtype": "int64"
           },
           "stdout": "",
           "displays": [],
@@ -661,6 +798,43 @@
                 "4",
                 "3",
                 "70"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
+        "dupLabel": {
+          "code": "pd.concat([jan, feb]).loc[0]",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "0"
+            ],
+            "indexName": null,
+            "columns": [
+              "order_id",
+              "customer_id",
+              "amount"
+            ],
+            "rows": [
+              [
+                "1",
+                "1",
+                "100"
+              ],
+              [
+                "3",
+                "2",
+                "50"
               ]
             ],
             "dtypes": [
@@ -1306,7 +1480,7 @@
       "setup": "df = pd.DataFrame({\n    \"region\": [\"North\", \"South\", \"North\", \"East\"],\n    \"amount\": [100, 80, 120, 50],\n})",
       "steps": {
         "subset": {
-          "code": "north = df[df[\"region\"] == \"North\"]\nnorth[\"amount\"] = 0\nnorth",
+          "code": "north = df[df[\"region\"] == \"North\"].copy()\nnorth[\"amount\"] = 0\nnorth",
           "ok": true,
           "value": {
             "kind": "frame",
@@ -1806,6 +1980,39 @@
           "displays": [],
           "warnings": []
         },
+        "pivotMean": {
+          "code": "long.pivot_table(index=\"region\", columns=\"category\", values=\"amount\")",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "North",
+              "South"
+            ],
+            "indexName": "region",
+            "columns": [
+              "A",
+              "B"
+            ],
+            "rows": [
+              [
+                "15.0",
+                "40.0"
+              ],
+              [
+                "NaN",
+                "30.0"
+              ]
+            ],
+            "dtypes": [
+              "float64",
+              "float64"
+            ]
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
         "pivotTable": {
           "code": "long.pivot_table(\n    index=\"region\",\n    columns=\"category\",\n    values=\"amount\",\n    aggfunc=\"sum\",\n    fill_value=0,\n)",
           "ok": true,
@@ -1883,7 +2090,7 @@
       }
     },
     "sort": {
-      "setup": "df = pd.DataFrame({\"region\": [\"North\", \"South\", \"East\", \"West\"], \"amount\": [120, 80, 200, 50]})",
+      "setup": "df = pd.DataFrame({\"region\": [\"North\", \"South\", \"East\", \"West\"], \"amount\": [120, 80, 200, 120]})",
       "steps": {
         "sorted": {
           "code": "df.sort_values(by=\"amount\", ascending=False)",
@@ -1893,8 +2100,8 @@
             "index": [
               "2",
               "0",
-              "1",
-              "3"
+              "3",
+              "1"
             ],
             "indexName": null,
             "columns": [
@@ -1911,12 +2118,12 @@
                 "120"
               ],
               [
-                "South",
-                "80"
+                "West",
+                "120"
               ],
               [
-                "West",
-                "50"
+                "South",
+                "80"
               ]
             ],
             "dtypes": [
@@ -1928,8 +2135,8 @@
           "displays": [],
           "warnings": []
         },
-        "ranked": {
-          "code": "df[\"rank\"] = df[\"amount\"].rank(method=\"dense\", ascending=False)\ndf",
+        "rankMin": {
+          "code": "df[\"min\"] = df[\"amount\"].rank(method=\"min\", ascending=False)\ndf",
           "ok": true,
           "value": {
             "kind": "frame",
@@ -1943,7 +2150,7 @@
             "columns": [
               "region",
               "amount",
-              "rank"
+              "min"
             ],
             "rows": [
               [
@@ -1954,7 +2161,7 @@
               [
                 "South",
                 "80",
-                "3.0"
+                "4.0"
               ],
               [
                 "East",
@@ -1963,13 +2170,68 @@
               ],
               [
                 "West",
-                "50",
-                "4.0"
+                "120",
+                "2.0"
               ]
             ],
             "dtypes": [
               "str",
               "int64",
+              "float64"
+            ]
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
+        "ranked": {
+          "code": "df[\"dense\"] = df[\"amount\"].rank(method=\"dense\", ascending=False)\ndf",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount",
+              "min",
+              "dense"
+            ],
+            "rows": [
+              [
+                "North",
+                "120",
+                "2.0",
+                "2.0"
+              ],
+              [
+                "South",
+                "80",
+                "4.0",
+                "3.0"
+              ],
+              [
+                "East",
+                "200",
+                "1.0",
+                "1.0"
+              ],
+              [
+                "West",
+                "120",
+                "2.0",
+                "2.0"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64",
+              "float64",
               "float64"
             ]
           },
@@ -2231,6 +2493,18 @@
           "displays": [],
           "warnings": []
         },
+        "countAll": {
+          "code": "int(df.duplicated().sum())",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "0",
+            "str": "0"
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
         "count": {
           "code": "int(df.duplicated(subset=[\"email\"]).sum())",
           "ok": true,
@@ -2332,6 +2606,18 @@
     "case": {
       "setup": "df = pd.DataFrame({\"amount\": [50, 120, 600, 80, 550]})",
       "steps": {
+        "where": {
+          "code": "np.where(df[\"amount\"] >= 500, \"Large\", \"Small\")",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "array(['Small', 'Small', 'Large', 'Small', 'Large'], dtype='<U5')",
+            "str": "['Small' 'Small' 'Large' 'Small' 'Large']"
+          },
+          "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
         "sized": {
           "code": "conditions = [df[\"amount\"] >= 500, df[\"amount\"] >= 100]\nchoices = [\"Large\", \"Medium\"]\ndf[\"size\"] = np.select(conditions, choices, default=\"Small\")\ndf",
           "ok": true,
@@ -2383,10 +2669,10 @@
       }
     },
     "csv": {
-      "setup": "df = pd.DataFrame({\"region\": [\"North\", \"South\"], \"amount\": [100, 80]})",
+      "setup": "from pathlib import Path\ndf = pd.DataFrame({\"region\": [\"North\", \"South\"], \"amount\": [100, 80]})",
       "steps": {
         "withIndex": {
-          "code": "buf = io.StringIO(); df.to_csv(buf); buf.getvalue()",
+          "code": "df.to_csv(\"sales.csv\")\nPath(\"sales.csv\").read_text()",
           "ok": true,
           "value": {
             "kind": "value",
@@ -2398,7 +2684,7 @@
           "warnings": []
         },
         "readBack": {
-          "code": "pd.read_csv(io.StringIO(buf.getvalue()))",
+          "code": "pd.read_csv(\"sales.csv\")",
           "ok": true,
           "value": {
             "kind": "frame",
@@ -2435,7 +2721,7 @@
           "warnings": []
         },
         "withoutIndex": {
-          "code": "buf = io.StringIO(); df.to_csv(buf, index=False); buf.getvalue()",
+          "code": "df.to_csv(\"sales.csv\", index=False)\nPath(\"sales.csv\").read_text()",
           "ok": true,
           "value": {
             "kind": "value",
@@ -2447,7 +2733,7 @@
           "warnings": []
         },
         "readClean": {
-          "code": "pd.read_csv(io.StringIO(buf.getvalue()))",
+          "code": "pd.read_csv(\"sales.csv\")",
           "ok": true,
           "value": {
             "kind": "frame",
@@ -2566,6 +2852,14 @@
             "str": "226"
           },
           "stdout": "",
+          "displays": [],
+          "warnings": []
+        },
+        "info": {
+          "code": "df.info()",
+          "ok": true,
+          "value": null,
+          "stdout": "<class 'pandas.DataFrame'>\nRangeIndex: 4 entries, 0 to 3\nData columns (total 3 columns):\n #   Column  Non-Null Count  Dtype\n---  ------  --------------  -----\n 0   region  4 non-null      str  \n 1   amount  4 non-null      int64\n 2   flag    4 non-null      bool \ndtypes: bool(1), int64(1), str(1)\nmemory usage: 124.0 bytes\n",
           "displays": [],
           "warnings": []
         }

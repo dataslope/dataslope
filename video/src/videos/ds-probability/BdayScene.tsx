@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BDAY, pct } from "./data";
-import { at, Axes, DATA, DATA_LIGHT, Drift, OK, OK_INK, Person, pulse, type Scale, Svg } from "./parts";
+import { at, Axes, DATA, DATA_LIGHT, Drift, math, OK, OK_INK, Person, pulse, type Scale, Svg } from "./parts";
 
 const RING = { cx: 470, cy: 590, r: 230 };
 const PLOT = { left: 1000, right: 1780, top: 400, base: 800 };
@@ -20,11 +20,17 @@ const PAIRS = (() => {
   return out;
 })();
 
+/** The complement's working, over the chart: where it starts, and its two
+ *  rows, spaced evenly between the question and the chart's axis title. */
+const WORK = { x: 940, noMatch: 240, match: 300 };
+
 /**
  * Question 12, the opening's room. Its 23 people around a ring, every one
  * of their 253 pairs drawn as a chord, which is what can collide; then the
- * exact curve against room size, crossing a half at 23 (50.7%), the page's
- * 50,000 simulated rooms on the same spot, and 99% at 57.
+ * answer worked through the complement, each new person missing everyone
+ * before them (364/365 down to 343/365, 49.3% with no match), and the exact
+ * curve against room size, crossing a half at 23 (50.7%), the page's 50,000
+ * simulated rooms on the same spot, and 99% at 57.
  */
 export const BdayScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -37,9 +43,14 @@ export const BdayScene: React.FC = () => {
   const yesAt = n.word("bday-pairs", "Yes, just");
   const pairsAt = n.word("bday-pairs", "pairs do");
   const countAt = n.word("bday-pairs", "two hundred and fifty-three pairs");
-  const exactAt = n.word("bday-curve", "The exact chance");
-  const fiftyAt = n.word("bday-curve", "fifty point seven percent");
-  const roomsAt = n.word("bday-curve", "fifty thousand simulated rooms");
+  const complementAt = n.word("bday-exact", "the complement");
+  const firstAt = n.word("bday-exact", "three sixty-four");
+  const secondAt = n.word("bday-exact", "then three sixty-three");
+  const lastAt = n.word("bday-exact", "down to three forty-three");
+  const exactAt = n.word("bday-exact", "Multiply them");
+  const noneAt = n.word("bday-exact", "forty-nine point three percent");
+  const fiftyAt = n.word("bday-match", "fifty point seven percent");
+  const roomsAt = n.word("bday-match", "fifty thousand simulated rooms");
   const fiftySevenAt = n.word("bday-curve", "By fifty-seven people");
   const end = n.beat("bday-curve").to;
 
@@ -66,6 +77,10 @@ export const BdayScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-pop" at={yesAt + 2} level={-32} />
       <Sfx name="fill-roll" at={pairsAt} level={-34} />
+      <Sfx name="el-pencil" at={complementAt + 2} level={-34} />
+      <Sfx name="el-tap" at={firstAt + 2} level={-36} />
+      <Sfx name="el-tap" at={secondAt + 2} level={-36} />
+      <Sfx name="el-tap" at={lastAt + 2} level={-36} />
       <Sfx name="el-pencil" at={exactAt + 2} level={-34} />
       <Sfx name="el-pop" at={fiftyAt + 4} level={-32} />
       <Sfx name="el-tap" at={roomsAt + 4} level={-34} />
@@ -109,6 +124,35 @@ export const BdayScene: React.FC = () => {
             }}
           >
             {Math.min(BDAY.pairs, chords)} pairs
+          </span>
+        </Note>
+        <Note at={countAt + 12} x={RING.cx - 170} width={340} y={cy + 30} from="up" style={{ textAlign: "center" }}>
+          <span style={{ ...math(28, INK), background: PAPER, padding: "2px 10px", borderRadius: 6 }}>
+            {BDAY.people} × {BDAY.people - 1} ÷ 2
+          </span>
+        </Note>
+
+        {/* ── The complement: each new person misses everyone before them ── */}
+        <Note at={complementAt} x={WORK.x} y={y(WORK.noMatch)}>
+          <span style={math(32, INK)}>
+            P(no match) ={" "}
+            <Late at={firstAt}>
+              {365 - 1}/365
+            </Late>
+            <Late at={secondAt}>
+              {" "}× {365 - 2}/365
+            </Late>
+            <Late at={lastAt}>
+              {" "}× ⋯ × {BDAY.lastFactor}/365
+            </Late>
+            <Late at={noneAt}>
+              {" "}= {pct(BDAY.noMatch, 1)}
+            </Late>
+          </span>
+        </Note>
+        <Note at={fiftyAt} x={WORK.x} y={y(WORK.match)}>
+          <span style={math(32, OK_INK)}>
+            P(match) = 1 − {pct(BDAY.noMatch, 1)} = {pct(BDAY.exact, 1)}
           </span>
         </Note>
 
@@ -156,4 +200,10 @@ export const BdayScene: React.FC = () => {
       </Drift>
     </AbsoluteFill>
   );
+};
+
+/** Words that ink in later than the rest of their line. */
+const Late: React.FC<{ at: number; children: React.ReactNode }> = ({ at: from, children }) => {
+  const frame = useCurrentFrame();
+  return <span style={{ opacity: ease(frame, from, 10) }}>{children}</span>;
 };

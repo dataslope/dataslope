@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { halo, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { halo, INK, INK_SOFT, label, note, TABULAR, svgText } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -81,7 +81,7 @@ export const SaturationScene: React.FC = () => {
           {[0, 25, 50, 75, 100].map((v) => (
             <g key={v}>
               <line x1={X(v)} x2={X(v)} y1={ry(ROWS.mmlu) - 44} y2={ry(ROWS.hle) + 18} stroke={FAINT} strokeWidth={1.2} />
-              <text x={X(v)} y={ry(ROWS.hle) + 86} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR }}>
+              <text x={X(v)} y={ry(ROWS.hle) + 86} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 500, ...TABULAR })}>
                 {v}
               </text>
             </g>

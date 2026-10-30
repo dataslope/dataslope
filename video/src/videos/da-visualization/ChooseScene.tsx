@@ -60,7 +60,8 @@ const Glyph: React.FC<{ kind: string; x: number; y: number; p: number }> = ({ ki
 /**
  * Question 1. Five kinds of question down the left, each meeting its chart
  * as it is named; then the encoding ranking the choice rests on, from
- * position (1.0) to color (3.0), the error each carries relative to position.
+ * position (1.0) to color saturation (3.0), the error each carries relative
+ * to position.
  */
 export const ChooseScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -78,13 +79,13 @@ export const ChooseScene: React.FC = () => {
     { at: n.word("choose-map", "A distribution"), q: "A distribution", chart: "histogram or box plot", glyph: "hist" },
     { at: n.word("choose-map", "a relationship"), q: "A relationship", chart: "scatter", glyph: "scatter" },
   ];
-  const underAt = n.word("choose-rank", "how accurately people read");
+  const underAt = n.word("choose-under", "how accurately people read");
   const rankAts = [
     n.word("choose-rank", "Position comes first"),
     n.word("choose-rank", "then length"),
     n.word("choose-rank", "angle"),
     n.word("choose-rank", "and area"),
-    n.word("choose-rank", "color last"),
+    n.word("choose-rank", "color saturation last"),
   ];
   const threeAt = n.word("choose-rank", "about three times");
   const end = n.beat("line-in").to;
@@ -145,7 +146,7 @@ export const ChooseScene: React.FC = () => {
         })}
         <Note at={threeAt - 2} x={1020} y={y(ROW0) + 5 * h(PITCH) + h(6)}>
           <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap", ...TABULAR }}>
-            color: about {fmt(ENCODINGS.colorVsPosition, 0)}× the error of position
+            color saturation: about {fmt(ENCODINGS.colorVsPosition, 0)}× the error of position
           </span>
         </Note>
       </Drift>

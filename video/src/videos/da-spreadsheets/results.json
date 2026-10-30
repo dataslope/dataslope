@@ -309,6 +309,12 @@
         "ref": "F6",
         "formula": "=ISTEXT(D4)",
         "value": true
+      },
+      "textValue": {
+        "sheet": "orders",
+        "ref": "F7",
+        "formula": "=VALUE(D4)",
+        "value": 150
       }
     },
     "lookups": {
@@ -477,6 +483,12 @@
           "error": "#REF!"
         }
       },
+      "matchMug": {
+        "sheet": "calc",
+        "ref": "A19",
+        "formula": "=MATCH(\"Mug\",products!B2:B5,0)",
+        "value": 2
+      },
       "inserted": [
         [
           "sku",
@@ -621,6 +633,12 @@
           "ref": "A18",
           "formula": "=IFNA(VLOOKUP(\"P-102\",products!A2:D5,4,FALSE),\"Unknown\")",
           "value": 9
+        },
+        "matchMug": {
+          "sheet": "calc",
+          "ref": "A19",
+          "formula": "=MATCH(\"Mug\",products!B2:B5,0)",
+          "value": 2
         }
       }
     },
@@ -772,6 +790,32 @@
           "sheet": "emails",
           "ref": "B5",
           "formula": "=COUNTIF($A$2:$A$5,A5)>1",
+          "value": false
+        }
+      ],
+      "later": [
+        {
+          "sheet": "emails",
+          "ref": "C2",
+          "formula": "=COUNTIF($A$2:A2,A2)>1",
+          "value": false
+        },
+        {
+          "sheet": "emails",
+          "ref": "C3",
+          "formula": "=COUNTIF($A$2:A3,A3)>1",
+          "value": false
+        },
+        {
+          "sheet": "emails",
+          "ref": "C4",
+          "formula": "=COUNTIF($A$2:A4,A4)>1",
+          "value": true
+        },
+        {
+          "sheet": "emails",
+          "ref": "C5",
+          "formula": "=COUNTIF($A$2:A5,A5)>1",
           "value": false
         }
       ]

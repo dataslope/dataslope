@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, INK, INK_SOFT, TABULAR, fmt, note } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT, fmt, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -17,9 +17,10 @@ const TOP = 430;
 /**
  * Questions 6 and 7. The page's five team scores (94.1 to 99.0) as bars from
  * zero, nearly equal and honest, then from 94, where the top bar stands 50
- * times as tall as the bottom one. Then a year of scores on an axis from 92:
- * as bars a 3.6% rise draws the last bar 2.55 times as tall as the first; as
- * a line it is a slope, which is fine, with the axis labeled.
+ * times as tall as the bottom one. Then a year of scores on an axis from 92,
+ * each panel drawn as the narration states its rule: as bars a 3.6% rise
+ * draws the last bar 2.55 times as tall as the first; as a line it is a
+ * slope, which is fine, with the axis labeled.
  */
 export const AxisScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -40,8 +41,6 @@ export const AxisScene: React.FC = () => {
   const q7TextAt = n.word("baseline", "So is a non-zero baseline");
   const barsRuleAt = n.word("baseline", "That rule is for bars");
   const positionAt = n.word("baseline", "by position, not length");
-  const yearAt = n.word("baseline-show", "a year of scores");
-  const asBarsAt = n.word("baseline-show", "As bars");
   const tallAt = n.word("baseline-show", "two and a half times as tall");
   const asLineAt = n.word("baseline-show", "As a line");
   const labelAt = n.word("baseline-show", "label the axis");
@@ -63,7 +62,8 @@ export const AxisScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-pencil" at={fiveAt} level={-34} />
       <Sfx name="el-scratch" at={fiftyAt} level={-32} />
-      <Sfx name="el-pencil" at={yearAt} level={-34} />
+      <Sfx name="el-pencil" at={barsRuleAt + 2} level={-34} />
+      <Sfx name="el-pencil" at={positionAt + 2} level={-34} />
       <Sfx name="el-scratch" at={tallAt} level={-32} />
       <Sfx name="el-pop" at={asLineAt + 4} level={-32} />
 
@@ -72,7 +72,7 @@ export const AxisScene: React.FC = () => {
           How can a truncated y axis mislead?
         </QuestionCard>
         <QuestionCard n={7} at={q7At} textAt={q7TextAt - 2} size={60}>
-          Is a non-zero baseline always wrong?
+          So is a non-zero baseline always wrong?
         </QuestionCard>
 
         {/* ── Question 6: the same five scores, from zero and from 94 ── */}
@@ -100,17 +100,13 @@ export const AxisScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a bar&apos;s length is its value: bars start at zero</span>
         </Note>
 
-        {/* ── Question 7: a year of scores on an axis from 92 ── */}
-        <Note at={barsRuleAt - 2} x={LEFT.x0} y={top - h(70)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            bars: <b>length</b>, so start at zero
-          </span>
-        </Note>
-        <Note at={positionAt - 2} x={RIGHT.x0} y={top - h(70)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            lines: <b>position</b>, so zooming in is fine
-          </span>
-        </Note>
+        {/* ── Question 7: a year of scores on an axis from 92, each drawn as its rule is said ── */}
+        <PanelTitle x={LEFT.x0} y={top - h(70)} at={barsRuleAt - 2}>
+          As bars, from {B.floor}
+        </PanelTitle>
+        <PanelTitle x={RIGHT.x0} y={top - h(70)} at={positionAt - 2}>
+          As a line, from {B.floor}
+        </PanelTitle>
         <YTicks
           ticks={[92, 94, 96, 98]}
           x={LEFT.x0}
@@ -118,12 +114,12 @@ export const AxisScene: React.FC = () => {
           top={top}
           lo={B.floor}
           hi={98}
-          at={yearAt - 4}
+          at={barsRuleAt}
           color={lift > 0.05 ? INK : INK_SOFT}
         />
-        <BarSet values={B.score} labels={B.months.map((m) => m[0])} x0={LEFT.x0} x1={LEFT.x1} base={base} top={top} lo={B.floor} hi={98} at={asBarsAt - 2} step={1} labelSize={16} dim={axisAt - 4} />
+        <BarSet values={B.score} labels={B.months.map((m) => m[0])} x0={LEFT.x0} x1={LEFT.x1} base={base} top={top} lo={B.floor} hi={98} at={barsRuleAt + 2} step={1} dim={axisAt - 4} />
         <Verdict ok={false} x={LEFT.x0} y={base + h(50)} at={tallAt}>
-          a {fmt(B.risePct, 1)}% rise, the last bar {fmt(B.barRatio, 2)} times as tall
+          bars are length: a {fmt(B.risePct, 1)}% rise, the last bar {fmt(B.barRatio, 2)} times as tall
         </Verdict>
         <YTicks
           ticks={[92, 94, 96, 98]}
@@ -132,18 +128,16 @@ export const AxisScene: React.FC = () => {
           top={top}
           lo={B.floor}
           hi={98}
-          at={asLineAt - 4}
+          at={positionAt}
           color={lift > 0.05 ? INK : INK_SOFT}
         />
-        <LineSet values={B.score} x0={RIGHT.x0} x1={RIGHT.x1} base={base} top={top} lo={B.floor} hi={98} at={asLineAt - 2} labels={B.months.map((m) => m[0])} labelSize={16} />
+        <LineSet values={B.score} x0={RIGHT.x0} x1={RIGHT.x1} base={base} top={top} lo={B.floor} hi={98} at={positionAt + 2} labels={B.months.map((m) => m[0])} />
         <Verdict ok x={RIGHT.x0} y={base + h(50)} at={asLineAt + 10}>
-          a slope you can read
+          lines are position: a slope you can read
         </Verdict>
-        <Note at={asLineAt + 16} x={RIGHT.x0} y={base + h(96)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>axis from {B.floor}: zoomed in, and labeled</span>
-        </Note>
-        <Note at={labelAt - 2} x={LEFT.x0} y={base + h(96)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        {/* The rule is for both panels, so it sits under both. */}
+        <Note at={labelAt - 2} x={LEFT.x0} y={base + h(104)} width={RIGHT.x1 - LEFT.x0} from="up" style={{ textAlign: "center" }}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <Mark at={bridgeAt + 2}>either way, label the axis</Mark>
           </span>
         </Note>

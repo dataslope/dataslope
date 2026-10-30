@@ -55,6 +55,9 @@
   "one": 14752,
   "ratio": 3.84,
   "statsmodels": 3835,
+  "zAlpha": 1.96,
+  "zBeta": 0.84,
+  "pPool": 0.11,
   "curve": [
    [
     0.4,
@@ -398,6 +401,8 @@
   }
  },
  "sprt": {
+  "alpha": 0.025,
+  "beta": 0.2,
   "upper": 3.466,
   "lower": -1.584,
   "fixed": 393,

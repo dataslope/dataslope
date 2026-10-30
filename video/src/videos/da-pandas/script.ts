@@ -34,19 +34,23 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * (the runtime the page's blocks run in), by check.mjs into results.json,
  * which data.ts reads; every error and warning is pandas' own text:
  *   - "loc", the page's five-row frame: loc[3, "amount"] and iloc[3, 1] are
- *     both 50; the North rows keep labels 2 and 4; north.iloc[0] is North,
- *     120; north.loc[0] raises KeyError: 0.
- *   - "filter", the page's boolean-filter frame: the mask keeps rows 0 and 4
+ *     both 50; loc[0:2] gives three rows and iloc[0:2] two; the North rows
+ *     keep labels 2 and 4; north.iloc[0] is North, 120; north.loc[0] raises
+ *     KeyError: 0.
+ *   - "filter", the page's boolean-filter frame: amount > 100 alone is True
+ *     for rows 0, 3 and 4, and the combined mask keeps rows 0 and 4
  *     (120, 150); without brackets, & runs on 100 and the region column first
  *     and raises a TypeError; `and` raises "The truth value of a Series is
  *     ambiguous".
  *   - "groupby", the page's percentage-of-group frame (North 100 and 60,
  *     South 80 and 120, East 50), used for all three questions so the scene
- *     keeps one table: sums North 160, South 200, East 50; two named
+ *     keeps one table: groupby alone is a DataFrameGroupBy; sums North 160,
+ *     South 200, East 50; two named
  *     aggregates give a DataFrame; transform gives five rows; 100 is 62.5%
- *     of North's 160.
+ *     of North's 160, the total transform("sum") puts on its row.
  *   - "merge", the video's own: January and February stacked are labelled
- *     0, 1, 0, 1, and 0 to 3 with ignore_index; stock and prices keyed by
+ *     0, 1, 0, 1, so .loc[0] returns two orders, and 0 to 3 with
+ *     ignore_index; stock and prices keyed by
  *     product and warehouse give four rows merged on product alone, two on
  *     both.
  *   - "missing", the page's frame: isna().sum() is region 1, amount 2;
@@ -54,19 +58,23 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     four. The daily price with gaps is the video's own.
  *   - "copy", the page's view-and-copy frame: under pandas 3 the chained
  *     assignment leaves the frame unchanged and warns ChainedAssignmentError;
- *     .loc in one step sets both North amounts to 0; a subset set to 0 leaves
- *     the parent as it was, with no warning.
+ *     .loc in one step sets both North amounts to 0; the page's subset, taken
+ *     with .copy() and set to 0, leaves the parent as it was, with no warning
+ *     (without .copy(), pandas 1 and 2 warn SettingWithCopyWarning there).
  *   - "vector", the page's frame: * 0.9 and apply give the same five values;
  *     apply calls the function 1,000,000 times on a million rows (the
  *     video's own; calls, not seconds, so nothing depends on the machine).
  *   - "reshape": melt turns two customers by two quarters into four rows;
  *     pivot raises "Index contains duplicate entries, cannot reshape" on the
  *     video's own rows, where North and A appear twice; pivot_table sums them
- *     to 30 and fills the empty South and A with 0.
+ *     to 30 and fills the empty South and A with 0; without aggfunc it takes
+ *     the mean, 15.0.
  *   - rapid fire, the page's blocks: 300 regions take 8,900 bytes as strings
- *     and 418 as a category; North is half of value_counts(normalize=True);
- *     January resamples to 300 (the video's own dates); two duplicate emails;
- *     select_dtypes("number") gives amount and score; to_csv without
+ *     and 418 as a category; amounts with a tie (the video's own) rank 2, 4,
+ *     1, 2 by min and 2, 3, 1, 2 dense; North is half of
+ *     value_counts(normalize=True); January resamples to 300 (the video's own
+ *     dates); two duplicate emails, none on every column; select_dtypes
+ *     ("number") gives amount and score; a file written by to_csv without
  *     index=False reads back with an "Unnamed: 0" column.
  *
  * Written for Drew's ear, as in Part 1. Method names are written as they are
@@ -111,8 +119,18 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     {
+      id: "loc-slice",
+      text: "Slices differ too. Lock zero to two includes label two: three rows. Eye lock zero to two stops before position two: two rows.",
+      pauseAfter: 0.7,
+    },
+    {
       id: "loc-trap",
-      text: "Now keep only the North rows. Their labels are two and four. Eye lock zero still works: it's the first row, a hundred and twenty. Lock zero fails with a key error, because no row is labelled zero.",
+      text: "Now keep only the North rows. Their labels are two and four.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "loc-fail",
+      text: "Eye lock zero still works: it's the first row, a hundred and twenty. Lock zero fails with a key error, because no row is labelled zero.",
       pauseAfter: 0.8,
     },
 
@@ -138,6 +156,11 @@ export const script: NarrationScript = {
       text: "And the word and fails too: the truth value of a Series is ambiguous.",
       pauseAfter: 0.6,
     },
+    {
+      id: "filter-ops",
+      text: "So use an ampersand for and, a pipe for or, a tilde for not, and brackets around every condition.",
+      pauseAfter: 0.8,
+    },
     { id: "groupby-in", text: "Then comes the one every pandas screen asks." },
 
     // ── 3, 4, 5. groupby ──────────────────────────────────────────────────
@@ -153,9 +176,19 @@ export const script: NarrationScript = {
       pauseAfter: 0.8,
     },
     {
-      id: "gb-returns",
-      text: "Group one column and sum it, and you get a Series, indexed by region. Name two aggregates in ag, and you get a data frame.",
+      id: "gb-object",
+      text: "On its own, groupby returns a GroupBy object. Nothing is computed until you aggregate.",
       pauseAfter: 0.7,
+    },
+    {
+      id: "gb-returns",
+      text: "Group one column and sum it, and you get a Series, indexed by region.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "gb-agg",
+      text: "Name two aggregates in ag, and you get a data frame.",
+      pauseAfter: 1.6,
     },
     {
       id: "gb-transform",
@@ -178,13 +211,25 @@ export const script: NarrationScript = {
     },
     {
       id: "merge-what",
-      text: "Concat stacks frames, one on top of the other. Merge is a SQL join on key columns, like each order and its customer. And join is a merge on the index.",
+      text: "Concat stacks frames, one on top of the other, or side by side with axis one.",
+    },
+    {
+      id: "merge-join",
+      text: "Merge is a SQL join on key columns, like each order and its customer. And join is a merge on the index.",
       pauseAfter: 0.8,
     },
     {
       id: "merge-index",
-      text: "Question seven. Why reset the index when you stack? Look at the labels: zero, one, zero, one. Two rows answer to label zero. Pass ignore index, and they run zero to three.",
-      pauseAfter: 0.8,
+      text: "Question seven. Why reset the index when you stack? Look at the labels: zero, one, zero, one.",
+    },
+    {
+      id: "merge-dup",
+      text: "Two rows answer to label zero, so lock zero returns two orders, and anything that lines up on the index pairs the wrong rows.",
+    },
+    {
+      id: "merge-ignore",
+      text: "Pass ignore index, and they run zero to three.",
+      pauseAfter: 1.6,
     },
     {
       id: "merge-keys",
@@ -217,7 +262,7 @@ export const script: NarrationScript = {
     },
     {
       id: "missing-choose",
-      text: "Then drop or fill, depending on why it's missing. Drop NA on amount keeps two rows. Fill NA with zero keeps all four, but only if missing really means zero.",
+      text: "Then drop or fill, depending on why it's missing, and how much. Drop NA on amount keeps two rows. Fill NA with zero keeps all four, but only if missing really means zero.",
       pauseAfter: 0.8,
     },
     {
@@ -246,7 +291,11 @@ export const script: NarrationScript = {
     },
     {
       id: "copy-three",
-      text: "Pandas three makes that explicit, with copy on write. The frame doesn't change, and the warning is now chained assignment error. Older pandas said setting with copy, and interviewers still ask about it.",
+      text: "Pandas three makes that explicit, with copy on write: the filtered rows are their own copy.",
+    },
+    {
+      id: "copy-error",
+      text: "The frame doesn't change, and the warning is now chained assignment error. Older pandas said setting with copy, and interviewers still ask about it.",
       pauseAfter: 0.8,
     },
     {
@@ -256,7 +305,17 @@ export const script: NarrationScript = {
     },
     {
       id: "copy-view",
-      text: "Question twelve. What's the difference between a view and a copy? A view shares memory with its parent. A copy doesn't. In pandas three, anything you take from a frame acts as a copy. Set the subset to zero, and the parent is unchanged. Call copy when you mean it.",
+      text: "Question twelve. What's the difference between a view and a copy? A view shares memory with its parent. A copy doesn't.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "copy-subset",
+      text: "In pandas three, anything you take from a frame acts as a copy. Set the subset to zero, and the parent is unchanged.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "copy-when",
+      text: "When you want a separate subset, say so with copy. Then the parent never changes, in any version of pandas.",
       pauseAfter: 0.7,
     },
     { id: "vector-in", text: "Now, speed." },
@@ -270,7 +329,11 @@ export const script: NarrationScript = {
     },
     {
       id: "vector-why",
-      text: "Multiply the column by point nine, and that's one call into compiled code. Apply calls your Python function once for every value. A million rows, a million calls.",
+      text: "Multiply the column by point nine, and that's one call into compiled C.",
+    },
+    {
+      id: "vector-apply",
+      text: "Apply calls your Python function once for every value. A million rows, a million calls.",
       pauseAfter: 0.8,
     },
     {
@@ -280,12 +343,24 @@ export const script: NarrationScript = {
     },
     {
       id: "vector-axis",
-      text: "Question fourteen. How do you apply a function to each row or column? Apply with axis zero runs it on each column. Axis one runs it on each row.",
+      text: "Question fourteen. How do you apply a function to each row or column?",
+    },
+    {
+      id: "vector-range",
+      text: "Here the function is the range: max minus min.",
+    },
+    {
+      id: "vector-axes",
+      text: "Apply with axis zero runs it on each column. Axis one runs it on each row.",
       pauseAfter: 0.7,
     },
     {
       id: "vector-map",
-      text: "Question fifteen. Map, apply, or data frame map? Series map works value by value on one column, from a function or a lookup. Apply works along an axis. And data frame map works on every cell.",
+      text: "Question fifteen. Map, apply, or data frame map? Series map works value by value on one column, from a function or a lookup. Apply works along an axis.",
+    },
+    {
+      id: "vector-cell",
+      text: "And data frame map, formerly applymap, works on every cell.",
       pauseAfter: 0.7,
     },
     { id: "reshape-in", text: "The last of the slow ones changes a frame's shape." },
@@ -309,7 +384,11 @@ export const script: NarrationScript = {
     },
     {
       id: "reshape-table",
-      text: "Pivot table aggregates, like a spreadsheet. North and A sum to thirty, and fill value puts a zero in the empty cell.",
+      text: "Pivot table aggregates, like a spreadsheet, with the mean by default. This call asks for the sum.",
+    },
+    {
+      id: "reshape-sum",
+      text: "North and A sum to thirty, and fill value puts a zero in the empty cell.",
       pauseAfter: 0.7,
     },
 
@@ -324,7 +403,8 @@ export const script: NarrationScript = {
       id: "r-cat",
       text: "A categorical stores each distinct string once, and a small code for every row. Three hundred regions drop from eight thousand nine hundred bytes to four hundred eighteen.",
     },
-    { id: "r-sort", text: "Sort values orders the rows. Rank numbers them, and dense leaves no gaps." },
+    { id: "r-sort", text: "Sort values orders the rows." },
+    { id: "r-rank", text: "Rank numbers them, and ties share a rank. After a tie, min skips a number; dense doesn't." },
     { id: "r-counts", text: "Value counts counts each value. Normalize turns the counts into shares: North is half." },
     {
       id: "r-dates",
@@ -335,7 +415,8 @@ export const script: NarrationScript = {
       id: "r-chain",
       text: "Method chaining writes the steps top to bottom: query, assign, group, sum, rename. No temporary variables.",
     },
-    { id: "r-dupes", text: "Duplicated flags the repeats, two here. Drop duplicates keeps the first of each." },
+    { id: "r-dupes", text: "Duplicated, on the email column, flags two repeats." },
+    { id: "r-drop", text: "Drop duplicates keeps the first of each." },
     { id: "r-rename", text: "Rename takes a mapping from old names to new ones." },
     { id: "r-dtypes", text: "Select D types picks columns by type. Number gives amount and score." },
     {
@@ -350,8 +431,8 @@ export const script: NarrationScript = {
     {
       id: "r-shape",
       text: "And shape gives the rows and columns, D types gives each column's type, and memory usage gives the bytes.",
-      pauseAfter: 0.9,
     },
+    { id: "r-info", text: "Info gives all three at once.", pauseAfter: 0.9 },
     {
       id: "next",
       text: "A number from pandas is only half an answer. The other half is what it means. Next: statistics and communication.",

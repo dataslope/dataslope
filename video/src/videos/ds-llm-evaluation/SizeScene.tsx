@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { num, PAIR, pct, SIZE } from "./data";
-import { at, BAD, DATA, Drift, madeUp, Mark, MARK_BAD, MARK_OK, OK_INK, type Scale, Strike, X0 } from "./parts";
+import { at, BAD, DATA, Drift, madeUp, Mark, MARK_BAD, MARK_OK, math, OK_INK, type Scale, Strike, X0 } from "./parts";
 
 const CHART = { x0: X0 + 70, x1: 840, top: 430, bottom: 740 };
 /** The narration's pointer, for the two cells it points at. */
@@ -19,9 +19,11 @@ const TABLE = { x: 1010, top: 420, cw: 190, rh: 76, head: 150 };
 /**
  * Question 3. Left: the page's own block drawn, the 95% interval around an
  * 80% pass rate at six eval-set sizes, with the 100-item one marked (72% to
- * 88%) and a three-point change set against it. Right: the video's own 500
+ * 88%) and a three-point change set against it, then the page's formula for
+ * the half-width, which shrinks with the square root of n. Right: the video's own 500
  * paired items as a two-by-two table; read as two samples the gap is p 0.23,
- * paired only the 35 that disagree count, and McNemar gives 0.017. Then the
+ * paired only the 35 that disagree count, which equally good versions would
+ * split about evenly, and McNemar gives 0.017 (shown as said, 0.02). Then the
  * second habit, stratifying, as a small slice that a total would hide.
  */
 export const SizeScene: React.FC = () => {
@@ -36,6 +38,8 @@ export const SizeScene: React.FC = () => {
   const hundredAt = n.word("size", "With a hundred items");
   const rangeAt = n.word("size", "seventy-two to eighty-eight");
   const threeAt = n.word("size", "A prompt change worth three points");
+  const rootAt = n.word("size-root", "the square root of n");
+  const halvesAt = n.word("size-root", "four times the items only halves it");
   const habitsAt = n.word("size-pair", "Two habits help more");
   const pairAt = n.word("size-pair", "pair the comparison");
   const itemsAt = n.word("size-pair", "On five hundred items of our own");
@@ -47,8 +51,10 @@ export const SizeScene: React.FC = () => {
   const disagreeAt = n.word("size-pair", "the thirty-five where they disagree");
   const toBAt = n.word("size-pair", "twenty-five go to B");
   const toAAt = n.word("size-pair", "ten to A");
-  const mcAt = n.word("size-pair", "McNemar's test");
-  const p02At = n.word("size-pair", "point oh two");
+  const equalAt = n.word("size-null", "equally good");
+  const evenAt = n.word("size-null", "split about evenly");
+  const mcAt = n.word("size-mc", "McNemar's test");
+  const p02At = n.word("size-mc", "point oh two");
   const stratAt = n.word("size-strat", "stratify");
   const sliceAt = n.word("size-strat", "a regression on a small slice");
   const awayAt = n.word("size-strat", "averaged away");
@@ -108,7 +114,7 @@ export const SizeScene: React.FC = () => {
             {[0.7, 0.8, 0.9].map((v) => (
               <g key={v}>
                 <line x1={CHART.x0 - 40} x2={CHART.x1} y1={at(ys, v)} y2={at(ys, v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
-                <text x={CHART.x0 - 52} y={at(ys, v) + 7} textAnchor="end" style={{ ...label(20, INK_SOFT), ...TABULAR }}>
+                <text x={CHART.x0 - 52} y={at(ys, v) + 7} textAnchor="end" style={svgText({ ...label(20, INK_SOFT), ...TABULAR })}>
                   {pct(v)}
                 </text>
               </g>
@@ -129,7 +135,7 @@ export const SizeScene: React.FC = () => {
                   <line key={s} x1={x - 12} x2={x + 12} y1={at(ys, SIZE.p + s * half)} y2={at(ys, SIZE.p + s * half)} stroke={color} strokeWidth={3} />
                 ))}
                 <circle cx={x} cy={at(ys, SIZE.p)} r={7} fill={INK} />
-                <text x={x} y={y(CHART.bottom) + 62} textAnchor="middle" style={{ ...label(20, i === hundred ? BLUE_INK : INK_SOFT), ...TABULAR, fontWeight: i === hundred ? 700 : 500 }}>
+                <text x={x} y={y(CHART.bottom) + 62} textAnchor="middle" style={svgText({ ...label(20, i === hundred ? BLUE_INK : INK_SOFT), ...TABULAR, fontWeight: i === hundred ? 700 : 500 })}>
                   {num(nn)}
                 </text>
               </g>
@@ -163,6 +169,20 @@ export const SizeScene: React.FC = () => {
         <Note at={threeAt + 6} x={CHART.x0 - 40} y={y(CHART.top) - h(66)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <span style={{ display: "inline-block", width: 14, height: 22, background: BAD, verticalAlign: "-3px", marginRight: 10 }} />a 3-point change can&apos;t show
+          </span>
+        </Note>
+
+        <Note at={rootAt - 4} x={CHART.x0 - 40} y={y(CHART.top) - h(22)}>
+          <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
+            <span style={label(21, INK_SOFT)}>half-width</span>
+            <span style={math(28, INK)}>
+              = 1.96 √(p(1 − p) / n)
+            </span>
+            <span style={{ ...note(24, INK), opacity: ease(frame, halvesAt - 2, 10) }}>
+              <Mark at={halvesAt + 6} out={habitsAt}>
+                4× the items, half the width
+              </Mark>
+            </span>
           </span>
         </Note>
 
@@ -204,6 +224,15 @@ export const SizeScene: React.FC = () => {
             only these count
           </span>
         </Note>
+        <Note at={equalAt - 2} x={TABLE.x + TABLE.head + 2 * TABLE.cw + 4} y={y(TABLE.top) + h(TABLE.rh) + h(104)}>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+            if equally good,
+            <br />
+            <span style={{ opacity: ease(frame, evenAt - 2, 10) }}>
+              about <b style={{ color: INK, ...TABULAR }}>{PAIR.evenSplit}</b> each way
+            </span>
+          </span>
+        </Note>
         <Note at={separateAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 20)}>
           <span style={{ ...note(26, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
             as two separate samples:{" "}
@@ -219,7 +248,7 @@ export const SizeScene: React.FC = () => {
             paired, McNemar&apos;s test:{" "}
             <span style={{ opacity: ease(frame, p02At - 2, 10), color: OK_INK, fontWeight: 700 }}>
               <Mark at={p02At + 6} color={MARK_OK}>
-                p = {PAIR.pMcNemar.toFixed(3)}
+                p = {PAIR.pMcNemar.toFixed(2)}
               </Mark>
             </span>
           </span>
@@ -229,8 +258,8 @@ export const SizeScene: React.FC = () => {
         <Note at={stratAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 150)}>
           <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={stratAt + 6}>2. stratify</Mark>
-            <span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, sliceAt, 10) }}>
-              {"  "}a small slice that regresses{" "}
+            <span style={{ ...note(24, INK_SOFT), fontWeight: 500, marginLeft: 16, opacity: ease(frame, sliceAt, 10) }}>
+              a small slice that regresses{" "}
               <Mark at={awayAt} color={MARK_BAD}>
                 isn&apos;t averaged away
               </Mark>

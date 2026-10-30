@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } f
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { pct, UNIT } from "./data";
+import { pct, UNIT, UNIT_SE } from "./data";
 import { Drift, Mark, MARK_OK, OK, OK_INK, Svg, X0 } from "./parts";
 import { mulberry32 } from "../da-statistics-communication/parts";
 
@@ -66,7 +66,10 @@ const Requests: React.FC<{ top: number; at: number; mixed: boolean; label: strin
  * user's requests split by user and split by request, where the same person
  * sees both versions. Then the analysis: 2,000 simulated A/A tests on 1,000
  * users with about five orders each, read per order as if independent and
- * per user, against the 5% a test promises.
+ * per user, against the 5% a test promises. Then why: each user's orders
+ * move together, so the per-order standard error comes out a third too
+ * small (0.51 against 0.79), and the two fixes, one average per user or
+ * clustered standard errors.
  */
 export const UnitScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -76,6 +79,7 @@ export const UnitScene: React.FC = () => {
   const from = n.beat("unit").from;
   const qAt = n.word("unit", "Question");
   const textAt = n.word("unit", "What is the randomization unit");
+  const whyAt = n.word("unit", "why does it matter");
   const assignedAt = n.word("unit", "It's what gets assigned");
   const userAt = n.word("unit", "usually a user");
   const sessionAt = n.word("unit", "sometimes a session or a device");
@@ -90,15 +94,26 @@ export const UnitScene: React.FC = () => {
   const perUserAt = n.word("unit-orders", "Analyze one average per user");
   const userValAt = n.word("unit-orders", "it's four percent");
   const promiseAt = n.word("unit-orders", "inside the five it promises");
+  const togetherAt = n.word("unit-why", "orders move together");
+  const seAt = n.word("unit-why", "makes the standard error");
+  const smallAt = n.word("unit-why", "about a third too small");
+  const fixAt = n.word("unit-why", "An average per user fixes that");
+  const clusterAt = n.word("unit-why", "clustered standard errors");
   const wrongAt = n.word("errors-in", "two ways to be wrong");
-  const clearAt = n.beat("errors-in").to - 6;
+  // The page holds through the pause and clears into the cut, so the next
+  // scene cross-fades in over it rather than over an empty page.
+  const nextAt = n.beat("errors").from;
+  const clearAt = nextAt - 14;
 
   const clear = 1 - ease(frame, clearAt, 10);
   const xOf = (v: number) => RIGHT_X + (v / BAR_MAX) * BAR_W;
   const bars = [
-    { text: "each order as independent", v: UNIT.naive, at: orderAt, valAt: naiveAt, color: ACCENT, ink: ACCENT_INK, top: 560 },
-    { text: "one average per user", v: UNIT.user, at: perUserAt, valAt: userValAt, color: OK, ink: OK_INK, top: 680 },
+    { text: "each order as independent", v: UNIT.naive, at: orderAt, valAt: naiveAt, color: ACCENT, ink: ACCENT_INK, top: 560, se: UNIT_SE.seOrders, seAt },
+    { text: "one average per user", v: UNIT.user, at: perUserAt, valAt: userValAt, color: OK, ink: OK_INK, top: 680, se: UNIT_SE.seUsers, seAt: smallAt },
   ];
+  // Each user's orders rise and fall together while the narration says they
+  // move together, and settle once it turns to the fixes.
+  const together = ease(frame, togetherAt - 4, 10) * (1 - ease(frame, fixAt, 14));
   const promise = ease(frame, promiseAt - 2, 14);
 
   return (
@@ -109,9 +124,13 @@ export const UnitScene: React.FC = () => {
       <Sfx name="el-pop" at={naiveAt} level={-32} />
       <Sfx name="el-pop" at={userValAt} level={-32} />
 
-      <Drift from={from} to={n.beat("errors-in").to + 30}>
+      <Drift from={from} to={nextAt}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is the randomization unit, and why does it matter?
+          What is the randomization unit, and{" "}
+          <Mark at={whyAt} out={requestAt}>
+            why does it matter
+          </Mark>
+          ?
         </QuestionCard>
 
         {/* What gets assigned. */}
@@ -166,13 +185,14 @@ export const UnitScene: React.FC = () => {
           {ORDERS.map((k, u) => {
             const cx = RIGHT_X + 30 + u * 84;
             const cy = y(400);
+            const shared = together * 9 * Math.sin((frame - togetherAt) / 7 + u * 2.1);
             return (
               <g key={u}>
                 {Array.from({ length: k }, (_, j) => {
                   // The user's orders fan out in a row beneath them.
                   const q = ease(frame, thousandAt + u * 2 + j, 8);
                   const ox = cx + (j - (k - 1) / 2) * 11 * q;
-                  const oy = cy + h(36) * q;
+                  const oy = cy + h(36) * q + shared;
                   return (
                     <g key={j}>
                       <line x1={cx} y1={cy} x2={ox} y2={oy} stroke={INK_SOFT} strokeWidth={1.2} opacity={0.6} />
@@ -205,6 +225,11 @@ export const UnitScene: React.FC = () => {
                 ) : (
                   b.text
                 )}
+                <span style={{ ...label(21, b.ink), fontWeight: 650, opacity: ease(frame, b.seAt, 10) }}>
+                  {" · standard error "}
+                  {b.se.toFixed(2)}
+                  {b.v === UNIT.naive ? <span style={{ opacity: ease(frame, smallAt, 10) }}>, too small</span> : null}
+                </span>
               </div>
               <div
                 style={{
@@ -233,6 +258,9 @@ export const UnitScene: React.FC = () => {
         </Note>
         <Note at={orderAt} x={RIGHT_X} y={y(830)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{UNIT.sims.toLocaleString("en-US")} simulated A/A tests</span>
+        </Note>
+        <Note at={clusterAt} x={RIGHT_X} y={y(872)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>or keep every order, with clustered standard errors</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -5,7 +5,6 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SIZE } from "./data";
@@ -14,12 +13,17 @@ import { at, Axes, Curve, Drift, Mark, pulse, type Scale, Svg, WARM, WARM_INK, X
 const BOX = { left: 170, right: 1060, top: 512, bottom: 820 };
 const COL_X = 1180;
 const N_MAX = 30000;
+/** A subscript in the formula and its key: set low, and at 0.8em, which
+ *  keeps the key's (24px) at the 19px floor. */
+const SUB: React.CSSProperties = { fontSize: "0.8em", verticalAlign: "-0.28em", lineHeight: 0 };
 
 /**
  * Question 6, on the page's own sample-size function: four inputs, only the
  * baseline from data. 10% converting, a 2-point lift, 5% alpha and 80% power
  * need 3,843 per arm; a 1-point lift needs 14,752, 3.84 times as many. The
- * curve is the same function across every MDE from 0.75 to 4 points.
+ * curve is the same function across every MDE from 0.75 to 4 points. The
+ * formula's terms are keyed under it as the narration names them: 1.96 and
+ * 0.84 for alpha and power, and p, the average of the two rates, 11%.
  */
 export const SizeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -42,12 +46,19 @@ export const SizeScene: React.FC = () => {
   const liftAt = n.word("size-n", "a two-point lift");
   const formulaAt = n.word("size-n", "The page's formula says");
   const twoAt = n.word("size-n", "three thousand eight hundred forty-three");
-  const halveAt = n.word("size-n", "Halve the lift");
-  const oneAt = n.word("size-n", "fourteen thousand seven hundred fifty-two");
-  const fourAt = n.word("size-n", "nearly four times as many");
-  const squaredAt = n.word("size-n", "one over the MDE squared");
+  const zAlphaAt = n.word("size-terms", "one point nine six");
+  const zBetaAt = n.word("size-terms", "point eight four");
+  const varianceAt = n.word("size-terms", "p times one minus p");
+  const pAt = n.word("size-terms", "eleven percent");
+  const halveAt = n.word("size-half", "Halve the lift");
+  const oneAt = n.word("size-half", "fourteen thousand seven hundred fifty-two");
+  const fourAt = n.word("size-half", "nearly four times as many");
+  const squaredAt = n.word("size-half", "one over the MDE squared");
   const directionAt = n.word("sides-in", "which direction counts");
-  const clearAt = n.beat("sides-in").to - 6;
+  // The page holds through the pause and clears into the cut, so the next
+  // scene cross-fades in over it rather than over an empty page.
+  const nextAt = n.beat("sides").from;
+  const clearAt = nextAt - 14;
 
   const clear = 1 - ease(frame, clearAt, 10);
   const xs: Scale = { lo: 0.5, hi: 4, a: BOX.left, b: BOX.right };
@@ -78,7 +89,7 @@ export const SizeScene: React.FC = () => {
       <Sfx name="el-pop" at={twoAt} level={-32} />
       <Sfx name="el-pop" at={oneAt} level={-32} />
 
-      <Drift from={from} to={n.beat("sides-in").to + 30}>
+      <Drift from={from} to={nextAt}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={58}>
           How do you calculate the sample size for an A/B test?
         </QuestionCard>
@@ -126,7 +137,7 @@ export const SizeScene: React.FC = () => {
           );
         })}
 
-        {/* The page's function, at every MDE. */}
+        {/* The page's function, at every MDE: its frame is up while the inputs are named. */}
         <Axes
           x={xs}
           y={ys}
@@ -136,7 +147,7 @@ export const SizeScene: React.FC = () => {
           yFormat={(v) => (v === 0 ? "0" : `${v / 1000}k`)}
           xTitle="MDE, points of conversion"
           yTitle="users per arm"
-          at={tenAt - 4}
+          at={inputsAt + 4}
         />
         <Curve points={curve} x={xs} y={ys} at={formulaAt} dur={30} color={BAR} width={3.4} clip={clip} />
         <Svg>
@@ -152,29 +163,40 @@ export const SizeScene: React.FC = () => {
           })}
         </Svg>
 
-        {/* The formula and its two answers. */}
-        <Note at={formulaAt} x={COL_X} y={y(500)}>
+        {/* The formula, its terms as the narration names them, and its two answers. */}
+        <Note at={formulaAt} x={COL_X} y={y(486)}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>the page&apos;s formula</span>
-          <div style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK, marginTop: 8, whiteSpace: "pre", fontVariantLigatures: "none" }}>
-            {"n = (z_α/2 + z_β)² · 2p̄(1 − p̄) / MDE²"}
+          <div style={{ ...note(27, INK), fontWeight: 600, marginTop: 6, whiteSpace: "nowrap" }}>
+            n = (z<sub style={SUB}>α/2</sub> + z<sub style={SUB}>β</sub>)² · <Mark at={varianceAt - 2}>2p(1 − p)</Mark> / MDE²
+          </div>
+          <div style={{ ...label(24, INK_SOFT), fontWeight: 600, marginTop: 14, whiteSpace: "nowrap" }}>
+            <span style={{ opacity: ease(frame, zAlphaAt - 2, 10) }}>
+              z<sub style={SUB}>α/2</sub> = {SIZE.zAlpha.toFixed(2)}
+            </span>
+            <span style={{ opacity: ease(frame, zBetaAt - 2, 10) }}>
+              {" · "}z<sub style={SUB}>β</sub> = {SIZE.zBeta.toFixed(2)}
+            </span>
+            <span style={{ opacity: ease(frame, pAt - 2, 10) }}>
+              {" · "}p = {Math.round(SIZE.pPool * 100)}%, the average rate
+            </span>
           </div>
         </Note>
-        <Note at={twoAt} x={COL_X} y={y(600)}>
+        <Note at={twoAt} x={COL_X} y={y(624)}>
           <span style={{ ...note(27, BLUE_INK), whiteSpace: "nowrap", ...TABULAR }}>
             10% → 12%: <b>{SIZE.two.toLocaleString("en-US")}</b> per arm
           </span>
         </Note>
-        <Note at={oneAt} x={COL_X} y={y(650)}>
+        <Note at={oneAt} x={COL_X} y={y(672)}>
           <span style={{ ...note(27, WARM_INK), whiteSpace: "nowrap", ...TABULAR }}>
             <span style={{ opacity: ease(frame, halveAt, 8) }}>10% → 11%:</span> <b>{SIZE.one.toLocaleString("en-US")}</b> per arm
           </span>
         </Note>
-        <Note at={fourAt} x={COL_X} y={y(700)}>
+        <Note at={fourAt} x={COL_X} y={y(720)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
             half the lift, <b>×{SIZE.ratio}</b> the users
           </span>
         </Note>
-        <Note at={squaredAt - 2} x={COL_X} y={y(770)}>
+        <Note at={squaredAt - 2} x={COL_X} y={y(784)}>
           <span style={{ ...note(36, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Mark at={directionAt - 6}>n ∝ 1 / MDE²</Mark>
           </span>

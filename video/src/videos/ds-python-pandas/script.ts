@@ -37,13 +37,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - the opening and "fanout", the video's own frames: four orders totalling
  *     265, and a customer table where customer 2 has two rows (Oslo and
  *     Bergen). The left merge has six rows totalling 375; is_unique is False;
- *     validate="many_to_one" raises MergeError.
+ *     validate="many_to_one" raises MergeError. Kept to one row per customer
+ *     (drop_duplicates, keep="last"), the validated merge gives 4 rows, 265.
  *   - "vector", the page's frame (prices 1 to 5, quantities 5 to 1, revenues
  *     5, 8, 9, 8, 5), then the same product on a million rows of the video's
  *     own: the loop took 410 to 460 ms and the vectorized line 0.9 to 1.8 ms
  *     over several runs, in WebAssembly. Both move from run to run, so the
  *     script says "several hundred milliseconds", "about one" and "hundreds
- *     of times", and the bars print whatever the last run measured.
+ *     of times", and the bars print whatever the last run measured (data.ts
+ *     refuses a run that no longer fits those words). On a laptop the video
+ *     gives the page's "typically 10-100x". And .apply with a lambda gives
+ *     the same revenues, a Python call per row.
  *   - "split", the page's six rows: East 50, North 240, South 150; groupby
  *     alone is a DataFrameGroupBy; one column gives a Series, named
  *     aggregates a DataFrame.
@@ -60,8 +64,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - quickly: the page's map, chaining and CASE blocks (tax East 4.0, North
  *     14.4, South 5.6; Small, Medium, Large, Small, Large); case_when keeps a
  *     row's old value unless started from the default; DA Part 2's 300
- *     regions take 8,900 bytes as strings and 418 as a category; the video's
- *     own five dates resample by week to 180, 170 and 70.
+ *     rows of four regions take 8,900 bytes as strings and 418 as a
+ *     category; the video's own five dates resample by week to 180, 170
+ *     and 70.
  *
  * Written for Drew's ear, as in the Data Analyst series: "ag" for agg, "lock"
  * for loc, "is NA" for isna, "data type" for dtype, "DT" for the dt
@@ -102,7 +107,20 @@ export const script: NarrationScript = {
     },
     {
       id: "vector-time",
-      text: "On a million rows, timed in WebAssembly, the way this page runs Python, the loop takes several hundred milliseconds. The vectorized line takes about one millisecond. That's hundreds of times faster. Write a loop only when no vectorized version exists.",
+      text: "On a million rows, timed in WebAssembly, the way this page runs Python, the loop takes several hundred milliseconds. The vectorized line takes about one millisecond.",
+    },
+    {
+      id: "vector-ratio",
+      text: "In the browser, that's hundreds of times faster. On a laptop, expect ten to a hundred times.",
+    },
+    {
+      id: "vector-why",
+      text: "A loop pays interpreter overhead on every row: each number becomes a Python object, and its type is checked before every multiply. Apply with a lambda pays the same. It's still a loop.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "vector-only",
+      text: "Write a loop only when no vectorized version exists.",
       pauseAfter: 0.8,
     },
     { id: "split-in", text: "Next, the pattern under every groupby." },
@@ -139,7 +157,12 @@ export const script: NarrationScript = {
     },
     {
       id: "pct",
-      text: "Question four. How do you compute a percentage of total within each group? Divide each amount by its region's total from transform. No merge needed. North's hundred is sixty-two and a half percent of one sixty.",
+      text: "Question four. How do you compute a percentage of total within each group? Divide each amount by its region's total from transform.",
+    },
+    { id: "pct-merge", text: "No need to sum by region and merge the totals back." },
+    {
+      id: "pct-north",
+      text: "North's hundred is sixty-two and a half percent of one sixty.",
       pauseAfter: 0.7,
     },
     { id: "merge-in", text: "Then, putting frames together." },
@@ -152,8 +175,26 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
-      id: "merge-three",
-      text: "Merge matches rows on key columns, the way a SQL join does: each order picks up its customer's name. Join does the same, but matches on the index. And concat matches nothing at all. It stacks frames, here March's orders under the rest.",
+      id: "merge-key",
+      text: "Merge matches rows on key columns, the way a SQL join does: each order picks up its customer's name.",
+    },
+    {
+      id: "merge-how",
+      text: "Its how argument picks the join type: inner, left, right or outer. Here it's left, so every order is kept.",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "merge-index",
+      text: "Join does the same, but matches on the index.",
+    },
+    {
+      id: "merge-set",
+      text: "Here the customers' key becomes their index first, and the same four rows come back.",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "merge-stack",
+      text: "And concat matches no key. It stacks frames, lining up columns by name: here, March's orders under the rest.",
       pauseAfter: 0.8,
     },
 
@@ -173,6 +214,11 @@ export const script: NarrationScript = {
       id: "fanout-guard",
       text: "So check that the key is unique before you merge. Or pass validate equals many to one, and pandas raises a merge error instead of fanning out. Afterwards, compare the row count with what you expected.",
       pauseAfter: 0.7,
+    },
+    {
+      id: "fanout-fix",
+      text: "If the key isn't unique, fix the customer table first: keep one row per customer, then merge.",
+      pauseAfter: 0.8,
     },
     { id: "missing-in", text: "Now, the values that aren't there at all." },
 
@@ -208,7 +254,11 @@ export const script: NarrationScript = {
     },
     {
       id: "copy-three",
-      text: "In pandas three, with copy on write, it never changes. The frame stays as it was, and the warning is now called chained assignment error. Older versions said setting with copy, and interviewers still ask about it.",
+      text: "In pandas three, copy on write makes every selection behave as a copy, so it never changes.",
+    },
+    {
+      id: "copy-error",
+      text: "The frame stays as it was, and the warning is now called chained assignment error. Older versions said setting with copy, and interviewers still ask about it.",
       pauseAfter: 0.8,
     },
     {
@@ -245,8 +295,9 @@ export const script: NarrationScript = {
     },
     {
       id: "r-map",
-      text: "Series map works value by value on one column, from a function or a lookup. Apply works along an axis, a row or a column at a time. Data frame map works on every cell.",
+      text: "Series map works value by value on one column, from a function or a lookup. Apply works along an axis, a row or a column at a time.",
     },
+    { id: "r-map-cells", text: "Data frame map, once called apply map, works on every cell." },
     {
       id: "r-chain",
       text: "Method chaining writes the steps top to bottom, query, assign, group, sum, with no throwaway variables in between.",
@@ -254,10 +305,12 @@ export const script: NarrationScript = {
     {
       id: "r-case",
       text: "For a CASE, use NumPy select, with a list of conditions and a default. Pandas has case when too. Start it from the default, or rows that match nothing keep their old value.",
+      pauseAfter: 1.0,
     },
+    { id: "r-cat", text: "The category data type stores each distinct string once, and a small code per row." },
     {
-      id: "r-cat",
-      text: "The category data type stores each distinct string once, and a small code per row. Three hundred regions drop from eight thousand nine hundred bytes to four hundred eighteen.",
+      id: "r-cat-bytes",
+      text: "Three hundred rows of four region names drop from eight thousand nine hundred bytes to four hundred eighteen.",
     },
     {
       id: "r-dates",

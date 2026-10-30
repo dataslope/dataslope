@@ -27,7 +27,10 @@ const DESKTOP = ds("gray", 500);
  * desktop and control mostly to mobile. Left, each arm's mix; right, the
  * rates as a paired dot plot. The new checkout is ahead on mobile (10% to 9%)
  * and on desktop (3.5% to 3%), and behind pooled (4.8% to 7.8%), because
- * desktop converts less and the new checkout got mostly desktop.
+ * desktop converts less and the new checkout got mostly desktop. Then the
+ * definition, and which number to trust: randomized arms should have the same
+ * mix, so an uneven one is a bug, like an SRM, and the fair comparison is the
+ * one within each segment.
  */
 export const SimpsonScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -49,9 +52,14 @@ export const SimpsonScene: React.FC = () => {
   const losesAt = n.word("simpson-pool", "it loses");
   const becauseAt = n.word("simpson-pool", "because desktop converts less");
   const gotAt = n.word("simpson-pool", "got mostly desktop");
-  const checkAt = n.word("simpson-pool", "Check the mix in each arm");
-  const segAt = n.word("simpson-pool", "read the segments before the total");
-  const end = n.beat("simpson-pool").to;
+  const defAt = n.word("simpson-def", "That's Simpson's paradox");
+  const holdsAt = n.word("simpson-def", "holds in every segment");
+  const flipsAt = n.word("simpson-def", "flips in the total");
+  const mixAt = n.word("simpson-def", "the arms have a different mix");
+  const matchAt = n.word("simpson-def", "In a randomized test the mix should match");
+  const bugAt = n.word("simpson-def", "a gap is a bug, like an SRM");
+  const fairAt = n.word("simpson-def", "the fair comparison is the one within each segment");
+  const end = n.beat("simpson-def").to;
 
   const x: Scale = { lo: 0, hi: 12, a: PLOT_X0, b: PLOT_X1 };
   const seg = (s: "Mobile" | "Desktop" | "Pooled") => SIMPSON.find((r) => r.segment === s)!;
@@ -68,8 +76,13 @@ export const SimpsonScene: React.FC = () => {
     { key: "Desktop" as const, at: desktopAt, ratesAt: desktopRatesAt, verdictAt: bothAt + 4, wins: true },
     { key: "Pooled" as const, at: poolAt, ratesAt: poolAt + 6, verdictAt: losesAt, wins: false },
   ];
-  const deskLight = ease(frame, becauseAt, 12) * (1 - ease(frame, checkAt, 12));
-  const gotLight = ease(frame, gotAt, 12) * (1 - ease(frame, checkAt, 12));
+  const deskLight = ease(frame, becauseAt, 12) * (1 - ease(frame, defAt, 12));
+  const gotLight = ease(frame, gotAt, 12) * (1 - ease(frame, defAt, 12));
+  // "a different mix": both arms' mix bars, lit together.
+  const mixLight = ease(frame, mixAt, 12) * (1 - ease(frame, matchAt + 30, 12));
+  // The definition's two halves point back at the verdicts they describe.
+  const segLight = ease(frame, holdsAt, 10) * (1 - ease(frame, flipsAt + 6, 10));
+  const totLight = ease(frame, flipsAt, 10) * (1 - ease(frame, mixAt + 6, 10));
 
   return (
     <AbsoluteFill>
@@ -77,7 +90,8 @@ export const SimpsonScene: React.FC = () => {
       <Sfx name="el-tap" at={mobileRatesAt} level={-36} />
       <Sfx name="el-tap" at={desktopRatesAt} level={-36} />
       <Sfx name="el-scratch" at={losesAt} level={-34} />
-      <Sfx name="el-pop" at={checkAt} level={-36} />
+      <Sfx name="el-pop" at={defAt} level={-36} />
+      <Sfx name="el-pop" at={fairAt} level={-36} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} size={62}>
@@ -115,6 +129,9 @@ export const SimpsonScene: React.FC = () => {
                   boxShadow: lit > 0 ? `0 0 0 ${5 * lit}px ${HIGHLIGHT}` : undefined,
                 }}
               />
+              {mixLight > 0 ? (
+                <div style={{ position: "absolute", left: X0, top: top + h(30), width: wm + wd, height: h(MIX_H), borderRadius: 4, boxShadow: `0 0 0 ${5 * mixLight}px ${HIGHLIGHT}` }} />
+              ) : null}
               {[
                 { text: `${count(m.mobile)} mobile`, left: X0 + 12, w: wm, ink: INK },
                 { text: `${count(m.desktop)} desktop`, left: X0 + wm + 12, w: wd, ink: PAPER },
@@ -194,19 +211,41 @@ export const SimpsonScene: React.FC = () => {
                 {right}%
               </div>
               <Note at={r.verdictAt} x={PLOT_X0 + 130} y={y(ROW_Y[r.key]) - h(64)}>
-                <span style={{ ...note(25, r.wins ? OK_INK : ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+                <span
+                  style={{
+                    ...note(25, r.wins ? OK_INK : ACCENT_INK),
+                    fontWeight: 750,
+                    whiteSpace: "nowrap",
+                    background: (r.wins ? segLight : totLight) > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(100 * (r.wins ? segLight : totLight))}%, transparent)` : undefined,
+                    borderRadius: 4,
+                    padding: "0 6px",
+                    margin: "0 -6px",
+                  }}
+                >
                   {r.wins ? "new checkout wins" : "new checkout loses"}
                 </span>
               </Note>
             </React.Fragment>
           );
         })}
-        <Note at={becauseAt + 4} x={X0} y={y(700)} width={720}>
-          <span style={{ ...note(25, INK) }}>desktop converts less, and the new checkout got mostly desktop</span>
+        <Note at={becauseAt + 4} x={X0} y={y(700)}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            desktop converts less,
+            <br />
+            and the new checkout got mostly desktop
+          </span>
         </Note>
-        <Note at={checkAt - 2} x={X0} y={y(790)} width={720}>
-          <span style={{ ...note(27, OK_INK), fontWeight: 700 }}>
-            Check the mix in each arm<span style={{ opacity: ease(frame, segAt - 2, 10) }}>; read the segments before the total.</span>
+        {/* The answer to the question, under it: the general rule. */}
+        <Note at={defAt} x={X0} y={y(262)}>
+          <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+            <b>Simpson's paradox:</b> what holds in every segment flips in the total
+            <span style={{ opacity: ease(frame, mixAt - 2, 10) }}>, because the arms have a different mix.</span>
+          </span>
+        </Note>
+        <Note at={matchAt} x={X0} y={y(790)} width={760}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 700 }}>
+            Randomized arms should match<span style={{ opacity: ease(frame, bugAt - 2, 10) }}>: a gap is a bug, like an SRM.</span>
+            <span style={{ opacity: ease(frame, fairAt - 2, 10) }}> Compare within each segment.</span>
           </span>
         </Note>
       </Drift>

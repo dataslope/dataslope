@@ -64,7 +64,9 @@ export const WindowScene: React.FC = () => {
   const againAt = n.word("partition-rank", "starts again at one for South");
   const firstAt = n.word("partition-rank", "both come first");
   const bridgeAt = n.beat("rank-in").from;
-  const clearAt = n.word("rank-in", "and to ties") + 2;
+  // The finished page holds through the bridge and fades into the cut, so
+  // the next scene's kicker arrives on it rather than on a blank page.
+  const clearAt = n.beat("rank").from - 8 - 30;
   const end = n.beat("rank-in").to;
 
   // The six sales, banded by region.
@@ -103,7 +105,7 @@ export const WindowScene: React.FC = () => {
       <Sfx name="el-pop" at={firstAt} level={-32} />
 
       <Drift from={from} to={end + 40}>
-        {/* On the bridge to the next scene the takeaway is marked, then the page clears. */}
+        {/* On the bridge to the next scene the takeaway is marked; the page clears into the cut. */}
         <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} out={out1} size={60}>
           What is a window function, and how does the <QMono>OVER</QMono> clause work?

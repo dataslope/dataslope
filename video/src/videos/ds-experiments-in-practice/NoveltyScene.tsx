@@ -19,7 +19,9 @@ const SKETCH = { x0: 1380, x1: 1780, mid: 580, amp: 90 };
  * (charts/novelty-effect-fades.mjs, the numbers DA Part 7 drew): one starts at
  * 14.1% and is under 1% by week eight, the other holds near 4. Read in week
  * one, the fading one wins. Primacy is its mirror, drawn as a sketch with no
- * numbers because the page has none; then the two defences.
+ * numbers because the page has none; then the two defences: run past the
+ * first weeks, and compare new users (who never saw the old version, so
+ * nothing is new or strange to them) with returning ones.
  */
 export const NoveltyScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -40,9 +42,11 @@ export const NoveltyScene: React.FC = () => {
   const primacyAt = n.word("primacy", "Primacy runs the other way");
   const resistAt = n.word("primacy", "people resist at first");
   const learnAt = n.word("primacy", "until they learn it");
-  const pastAt = n.word("primacy", "run past the first weeks");
-  const arriveAt = n.word("primacy", "check the users who arrive after");
-  const end = n.beat("primacy").to;
+  const pastAt = n.word("primacy-fix", "run past the first weeks");
+  const compareAt = n.word("primacy-fix", "compare new users");
+  const neverAt = n.word("primacy-fix", "who never saw the old version");
+  const returningAt = n.word("primacy-fix", "with returning ones");
+  const end = n.beat("primacy-fix").to;
 
   const x: Scale = { lo: 0.6, hi: 8.4, a: PLOT.x0, b: PLOT.x1 };
   const yS: Scale = { lo: 0, hi: 16, a: y(PLOT.base), b: y(PLOT.top) };
@@ -66,7 +70,7 @@ export const NoveltyScene: React.FC = () => {
       <Sfx name="el-pencil" at={plainAt} level={-37} />
       <Sfx name="el-scratch" at={wrongAt} level={-34} />
       <Sfx name="el-pencil" at={resistAt} level={-37} />
-      <Sfx name="el-pop" at={arriveAt} level={-36} />
+      <Sfx name="el-pop" at={compareAt} level={-36} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} size={58}>
@@ -109,8 +113,13 @@ export const NoveltyScene: React.FC = () => {
         <Note at={plainAt + 8} x={at(x, 3.2)} y={at(yS, NOVELTY.durable[2]) - h(48)}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a plainer change</span>
         </Note>
-        <Note at={readAt + 2} x={at(x, 1.5)} y={y(PLOT.top) - h(6)}>
+        {/* Each band carries its own label: week one while it is the one
+            read, then the first weeks once they are what to run past. */}
+        <Note at={readAt + 2} x={at(x, 1.5)} y={y(PLOT.top) - h(6)} out={pastAt}>
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>read in week one</span>
+        </Note>
+        <Note at={pastAt + 4} x={at(x, 0.6) + 10} y={y(PLOT.top) - h(6)}>
+          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>run past these weeks</span>
         </Note>
         <Note at={wrongAt} x={at(x, 2.2)} y={at(yS, 11)}>
           <span style={{ ...note(27, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>→ you'd ship the wrong one</span>
@@ -143,11 +152,18 @@ export const NoveltyScene: React.FC = () => {
         </Note>
 
         {/* The defences, for both. */}
-        <Note at={pastAt} x={SKETCH.x0} y={y(770)}>
+        <Note at={pastAt} x={SKETCH.x0} y={y(752)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>run past the first weeks</span>
         </Note>
-        <Note at={arriveAt} x={SKETCH.x0} y={y(810)} width={420}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700 }}>check users who arrive after it stopped being new</span>
+        <Note at={compareAt} x={SKETCH.x0} y={y(794)}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            compare new users
+            <br />
+            <span style={{ opacity: ease(frame, returningAt - 2, 10) }}>with returning ones</span>
+          </span>
+        </Note>
+        <Note at={neverAt} x={SKETCH.x0} y={y(864)}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>(new users never saw the old version)</span>
         </Note>
       </Drift>
     </AbsoluteFill>

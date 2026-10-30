@@ -8,14 +8,13 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RETAIN } from "./data";
-import { colsOf, DataTable, Drift, geoOf, Listing, listingHeight, MARK_BAD, MARK_OK, OK, OK_INK, rowsAt, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingHeight, MARK_BAD, MARK_OK, OK, OK_INK, rowsAt, TableName, X0 } from "./parts";
 
 const TOP = 350;
 const FEB_X = X0 + 230;
 const SQL_X = 600;
 const SIZE = 21;
 const CHIP_X = 1380;
-const CHURN_X = 1420;
 
 /** A big percentage with its label, for the retention each join counts. */
 const Chip: React.FC<{ at: number; out?: number; x: number; y: number; value: string; color: string; children: React.ReactNode }> = ({
@@ -43,8 +42,11 @@ const Chip: React.FC<{ at: number; out?: number; x: number; y: number; value: st
  * Questions 1 and 2, on the video's own two months of active users. The
  * inner join draws its three matches between the tables and counts
  * retention over them: 100%. The left join keeps all six, nulls where
- * February has none: 50%. Then those null rows are the churned users, and
- * the page's anti-join returns them.
+ * February has none: 50%. Then those null rows are the churned users: under
+ * the page's anti-join, the WHERE closes up the left join's matched rows in
+ * place, and what is left becomes the query's own one-column result, so the
+ * table under the listing is always the listing's output. The NOT EXISTS
+ * version is printed beside it as the narration names it.
  */
 export const JoinScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -84,7 +86,10 @@ export const JoinScene: React.FC = () => {
   const ig = geoOf(RETAIN.inner, SQL_X, resTop, h, { rowH: 44 });
   const lg = geoOf(RETAIN.left, SQL_X, resTop, h, { rowH: 44 });
   const leftNulls = RETAIN.left.rows.flatMap((r, i) => (r[1] === "null" ? [i] : []));
-  const cg = geoOf(RETAIN.churn, CHURN_X, y(TOP) + h(40), h, { rowH: 44 });
+  const leftMatched = RETAIN.left.rows.flatMap((r, i) => (r[1] === "null" ? [] : [i]));
+  // The churn query's result takes the left join's place: the same user_id
+  // column, so the rows left after the WHERE line up with it.
+  const cg = geoOf(RETAIN.churn, SQL_X, resTop, h, { rowH: 44 });
   const pct = (t: { rows: string[][] }) => `${Math.round(Number(t.rows[0][0]) * 100)}%`;
 
   const lineIn = ease(frame, innerAt + 6, 16);
@@ -168,7 +173,11 @@ export const JoinScene: React.FC = () => {
           g={lg}
           cols={colsOf(RETAIN.left, { feb: { ink: BLUE_INK } })}
           at={leftAt + 2}
-          rows={rowsAt(RETAIN.left.rows, leftAt + 6, 2)}
+          out={usersAt - 6}
+          // The WHERE: February's matches close up, leaving the null rows.
+          rows={rowsAt(RETAIN.left.rows, leftAt + 6, 2).map((r, i) =>
+            leftMatched.includes(i) ? { ...r, collapseAt: filterAt + 10 + leftMatched.indexOf(i) * 3 } : r,
+          )}
           marks={leftNulls.map((row, k) => ({ row, col: 1, at: nullAt + 6 + k * 3, out: q2At }))}
           bands={leftNulls.map((row, k) => ({ row, at: nullsAt + k * 3, color: MARK_OK }))}
         />
@@ -184,28 +193,52 @@ export const JoinScene: React.FC = () => {
           width={760}
           size={SIZE - 1}
           at={q2At + 6}
-          marks={[{ line: 3, at: filterAt + 4, color: MARK_OK }]}
+          // The WHERE inks in as it is named, so until then the table under
+          // the listing is the left join its first three lines describe.
+          lineAt={RETAIN.churn.lines.map((l, i) => (l.startsWith("WHERE") ? filterAt : q2At + 10 + i * 4))}
+          marks={[{ line: lineOf(RETAIN.churn.lines, "WHERE"), at: filterAt + 6, color: MARK_OK }]}
           out={end}
+        />
+        <DataTable
+          g={cg}
+          cols={colsOf(RETAIN.churn)}
+          at={usersAt - 4}
+          rows={rowsAt(RETAIN.churn.rows, usersAt - 2, 0)}
+          // Already drawn as the table appears, so the left join's green rows
+          // carry straight on into the result's.
+          bands={RETAIN.churn.rows.map((_, row) => ({ row, at: usersAt - 18, color: MARK_OK }))}
         />
         <div
           style={{
             position: "absolute",
-            left: CHURN_X,
-            top: y(TOP) - h(4),
+            left: cg.right + 36,
+            top: cg.top + (cg.headH - h(28)) / 2,
             ...label(21, INK_SOFT),
             whiteSpace: "nowrap",
-            opacity: ease(frame, usersAt - 4, 12),
+            opacity: ease(frame, usersAt, 12),
           }}
         >
           churned
         </div>
-        <DataTable g={cg} cols={colsOf(RETAIN.churn, { user_id: { ink: BLUE_INK } })} at={usersAt - 4} rows={rowsAt(RETAIN.churn.rows, usersAt, 4)} />
-        <Note at={existsAt} x={CHURN_X} y={cg.rowTop(RETAIN.churn.rows.length) + h(22)}>
+        <Note at={existsAt} x={cg.right + 36} y={cg.rowTop(0) + h(6)}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 10, ...note(24, INK), whiteSpace: "nowrap" }}>
-            <QMono>NOT EXISTS</QMono>: the same three
+            <span>
+              <QMono>NOT EXISTS</QMono>: the same three
+            </span>
             <Tick at={existsAt + 8} size={24} color={OK} />
           </span>
         </Note>
+        {/* The NOT EXISTS the note names, so it is shown, not only said. */}
+        <Listing
+          lines={RETAIN.notExists.lines}
+          x={cg.right + 36}
+          top={cg.rowTop(1) + h(8)}
+          width={720}
+          size={SIZE - 2}
+          at={existsAt + 2}
+          marks={[{ line: lineOf(RETAIN.notExists.lines, "NOT EXISTS"), at: existsAt + 14, color: MARK_OK }]}
+          out={end}
+        />
       </Drift>
     </AbsoluteFill>
   );

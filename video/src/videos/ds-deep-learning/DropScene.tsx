@@ -31,8 +31,10 @@ const VAL = { left: 1200, right: 1760, top: 400, bottom: 720 };
  * activations, a mask that keeps four and doubles them, the zeroed four
  * struck; the total over 100,000 draws matches the total going in. Then
  * weight decay against an L2 penalty under plain SGD, one step each from the
- * same weights, landing on identical numbers; and on the toy network from
- * question 7, decoupled weight decay holding validation loss near its low.
+ * same weights, landing on identical numbers, because the penalty
+ * λ/2 · ‖w‖² has gradient λw; why Adam breaks that (it divides λw by each
+ * weight's gradient size too); and on the toy network from question 7,
+ * decoupled weight decay holding validation loss near its low.
  */
 export const DropScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -56,14 +58,15 @@ export const DropScene: React.FC = () => {
   const sgdAt = n.word("decay", "For plain SGD");
   const penaltyAt = n.word("decay", "adding an L two penalty");
   const sameAt = n.word("decay", "lands on exactly the same weights");
-  const adamAt = n.word("decay-adam", "With Adam the two differ");
+  const lambdaAt = n.word("decay-why", "lambda over two");
+  const gradAt = n.word("decay-why", "Its gradient is lambda times the weight");
+  const butAt = n.word("decay-why", "But Adam divides every gradient");
+  const barelyAt = n.word("decay-why", "barely decayed");
   const adamwAt = n.word("decay-adam", "AdamW applies the decay separately");
   const toyAt = n.word("decay-adam", "On the toy network");
   const holdsAt = n.word("decay-adam", "it holds validation loss at point one one");
   const climbedAt = n.word("decay-adam", "where it had climbed");
   const bnInAt = n.word("bn-in", "Then, a layer");
-  // The page clears on the bridge's last word, so the gap before question 10 stays short.
-  const stackAt = n.beat("bn-in").to - 4;
   const end = n.beat("bn-in").to;
 
   const q8Out = q9At - 6;
@@ -89,7 +92,9 @@ export const DropScene: React.FC = () => {
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} out={q8Out} size={60}>
           What does dropout do, and why does it help?
         </QuestionCard>
-        <QuestionCard n={9} at={q9At} textAt={q9TextAt - 2} out={stackAt} size={54} width={1740}>
+        {/* Held to the cut, as every other scene is: clearing on the bridge's
+            last word left a blank page through the gap. */}
+        <QuestionCard n={9} at={q9At} textAt={q9TextAt - 2} size={54} width={1740}>
           What is weight decay, and how does it relate to L2 regularization?
         </QuestionCard>
 
@@ -154,7 +159,7 @@ export const DropScene: React.FC = () => {
         </Fade>
 
         {/* ── Question 9: two updates that agree ── */}
-        <Fade from={q9At} out={stackAt}>
+        <Fade from={q9At}>
           <Note at={shrinksAt - 2} x={X0} y={y(330)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap", ...TABULAR }}>
               each step, every weight <Mark at={shrinksAt + 4}>shrinks a little toward zero</Mark>
@@ -165,10 +170,12 @@ export const DropScene: React.FC = () => {
             λ = {DECAY.lam}
           </Tagline>
           <Tagline x={X0} y={y(ROW_A) - h(36)} at={penaltyAt - 2} size={22} color={INK}>
-            an L2 penalty in the loss
+            an L2 penalty in the loss<span style={{ opacity: ease(frame, lambdaAt - 2, 10) }}>, λ/2 · ‖w‖², whose gradient is λw</span>
           </Tagline>
           <Note at={penaltyAt} x={X0} y={y(ROW_A) + h(8)}>
-            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>w − η(g + λw) =</span>
+            <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+              w − η(g + <Mark at={gradAt + 4}>λw</Mark>) =
+            </span>
           </Note>
           <Cells
             values={[DECAY.l2.map((v) => num(v, 3))]}
@@ -202,12 +209,16 @@ export const DropScene: React.FC = () => {
               <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>identical</span>
             </div>
           </Note>
-          <Note at={adamAt - 2} x={X0} y={y(700)}>
-            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>with Adam, the two differ:</span>
+          {/* Why Adam breaks the equivalence, then the fix. */}
+          <Note at={butAt - 2} x={X0} y={y(690)}>
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>with Adam, the two differ: it divides λw by each weight&apos;s gradient size too,</span>
           </Note>
-          <Note at={adamwAt - 2} x={X0 + 340} y={y(700)}>
+          <Note at={barelyAt - 4} x={X0} y={y(732)}>
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>so weights with big gradients are barely decayed</span>
+          </Note>
+          <Note at={adamwAt - 2} x={X0} y={y(782)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-              <Mark at={adamwAt + 4}>AdamW</Mark> applies the decay separately
+              <Mark at={adamwAt + 4}>AdamW</Mark> applies the decay separately, to the weights directly
             </span>
           </Note>
 
@@ -222,7 +233,6 @@ export const DropScene: React.FC = () => {
             xTitle="epochs"
             yTitle="validation loss, the toy network"
             at={toyAt - 4}
-            size={18}
           />
           <Curve points={plain} x={xs} y={ys} at={toyAt} dur={30} color={ACCENT} width={3} clip={clip} />
           <Curve points={decayed} x={xs} y={ys} at={holdsAt - 4} dur={30} color={OK} width={3.4} clip={clip} />

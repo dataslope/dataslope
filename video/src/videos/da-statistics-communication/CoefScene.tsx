@@ -8,8 +8,8 @@ import { Note } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { SHAPE } from "./data";
-import { at, Axes, Dots, Drift, OK_INK, type Scale, Svg } from "./parts";
+import { CORR, SHAPE } from "./data";
+import { at, Axes, Dots, Drift, mulberry32, OK_INK, type Scale, Svg } from "./parts";
 
 const SCALE_Y = 430;
 const R: Scale = { lo: -1, hi: 1, a: 420, b: 1500 };
@@ -17,26 +17,38 @@ const PANEL = { top: 570, base: 820 };
 const U_X = { a: 260, b: 820 };
 const E_X = { a: 1120, b: 1680 };
 
+/** Question 2's days, small, so "a number for it" has a number: the same
+ *  nudge off each count's row as there, zeros only upward. */
+const MINI_JITTER = (() => {
+  const r = mulberry32(2027);
+  return CORR.days.map(([, , drown]) => {
+    const j = (r() - 0.5) * 0.5;
+    return drown === 0 ? Math.abs(j) : j;
+  });
+})();
+
 /** A point on the r scale, with its value written above it. */
 const Marker: React.FC<{
   r: number;
   y: number;
   at: number;
+  out?: number;
   color: string;
   row: number;
   /** Which side of the marker the label sits: centred over it, or ending (or
    *  starting) at it, so two close markers' labels stay apart. */
   align?: "center" | "end" | "start";
   children: React.ReactNode;
-}> = ({ r, y, at: from, color, row, align = "center", children }) => {
+}> = ({ r, y, at: from, out, color, row, align = "center", children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 12);
-  if (p <= 0) return null;
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
   const x = at(R, r);
   const lift = 34 + row * 40;
   return (
     <>
-      <Svg>
+      <Svg opacity={1 - o}>
         <line x1={x} x2={x} y1={y - 8} y2={y - lift + 12} stroke={color} strokeWidth={2} opacity={p} />
         <circle cx={x} cy={y} r={9 * p} fill={color} />
       </Svg>
@@ -47,7 +59,7 @@ const Marker: React.FC<{
           width: 600,
           top: y - lift - 22,
           textAlign: align === "center" ? "center" : align === "end" ? "right" : "left",
-          opacity: ease(frame, from + 4, 10),
+          opacity: ease(frame, from + 4, 10) * (1 - o),
           ...note(23, color),
           fontWeight: 650,
           whiteSpace: "nowrap",
@@ -85,7 +97,10 @@ export const CoefScene: React.FC = () => {
   const eightAt = n.word("coef-curve", "point eight one");
   const spearmanAt = n.word("coef-curve", "Spearman ranks");
   const perfectAt = n.word("coef-curve", "a perfect one");
-  const useAt = n.word("coef-curve", "Use it when");
+  const useAt = n.word("coef-use", "Use it when");
+  const ordinalAt = n.word("coef-plot", "Ordinal means");
+  const neitherAt = n.word("coef-plot", "neither coefficient sees the U");
+  const plotAt = n.word("coef-plot", "plot the data first");
   const end = n.beat("bias-in").to;
 
   const sy = y(SCALE_Y);
@@ -99,6 +114,14 @@ export const CoefScene: React.FC = () => {
   const eys = ys(Math.max(...SHAPE.e.map(([, v]) => v)));
   const uDots = SHAPE.u.map(([x, v], i) => ({ x: at(uxs, x), y: at(uys, v), at: uAt + i * 0.6 }));
   const eDots = SHAPE.e.map(([x, v], i) => ({ x: at(exs, x), y: at(eys, v), at: curveAt + i * 0.6 }));
+  // Question 2's scatter, in the curve's panel until the U arrives.
+  const mxs: Scale = { lo: 150, hi: 850, ...E_X };
+  const mys: Scale = { lo: 0, hi: 12, a: y(PANEL.base), b: y(PANEL.top + 30) };
+  const miniDots = CORR.days.map(([, ice, drown], i) => ({
+    x: at(mxs, ice),
+    y: at(mys, drown + MINI_JITTER[i]),
+    at: numberAt + (i * 14) / CORR.days.length,
+  }));
 
   return (
     <AbsoluteFill>
@@ -141,12 +164,23 @@ export const CoefScene: React.FC = () => {
             </g>
           ))}
         </Svg>
+        {/* The scale holds Pearson's r and Spearman's both, so it is named for neither. */}
         <Note at={pearsonAt} x={96} y={sy - 16}>
-          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>Pearson&apos;s r</span>
+          <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>coefficient</span>
         </Note>
-        <Note at={lineAt + 2} x={R.b + 40} y={sy - 16}>
+        <Note at={pearsonAt + 4} x={R.b + 40} y={sy - 36}>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Pearson&apos;s r:</span>
+        </Note>
+        <Note at={lineAt + 2} x={R.b + 40} y={sy - 4}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>how close to a straight line</span>
         </Note>
+
+        {/* ── Question 2's days, for a number to put on the scale ── */}
+        <Axes x={mxs} y={mys} xTicks={[]} xTitle="ice creams sold" yTitle="drownings" at={numberAt} out={missAt - 6} />
+        <Dots dots={miniDots} r={4} opacity={0.6} out={missAt - 6} />
+        <Marker r={CORR.r} y={sy} at={lineAt + 6} out={missAt - 6} color={BLUE_INK} row={0}>
+          question 2: r = {fmt(CORR.r)}
+        </Marker>
 
         {/* ── A U ── */}
         <Axes x={uxs} y={uys} xTicks={[-3, 0, 3]} xFormat={(v) => (v < 0 ? `−${-v}` : String(v))} xTitle="y = x²" at={missAt} />
@@ -171,7 +205,18 @@ export const CoefScene: React.FC = () => {
         <Note at={useAt - 2} x={96} y={y(492)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             Spearman for <span style={{ color: OK_INK, fontWeight: 650 }}>monotonic, not straight</span>, or ordinal data
+            <span style={{ color: INK_SOFT, opacity: ease(frame, ordinalAt - 2, 10) }}> (ranked categories, like a 1-to-5 rating)</span>
           </span>
+        </Note>
+
+        {/* Spearman misses the U as well: a reason to plot first. */}
+        <Note at={neitherAt - 2} x={(U_X.a + U_X.b) / 2 - 200} width={400} y={y(586)} from="up" style={{ textAlign: "center" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", ...TABULAR }}>
+            Spearman: {SHAPE.uSpearman < 0 ? `−${fmt(-SHAPE.uSpearman)}` : fmt(SHAPE.uSpearman)}
+          </span>
+        </Note>
+        <Note at={plotAt - 2} x={(U_X.a + U_X.b) / 2 - 200} width={400} y={y(586) + 40} from="up" style={{ textAlign: "center" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>plot the data first</span>
         </Note>
       </Drift>
     </AbsoluteFill>

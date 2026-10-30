@@ -7,8 +7,9 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note 
 import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { EPOCH, INIT } from "./data";
-import { Axes, Drift, Fade, Headline, Kicker, Mark, OK, OK_INK, type Scale, Spot, Svg, Tagline, WARM, WARM_INK, X0 } from "./parts";
+import { at, Axes, Drift, Fade, Headline, Kicker, Mark, OK, OK_INK, type Scale, Spot, Svg, Tagline, WARM, WARM_INK, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 800;
@@ -53,6 +54,9 @@ const Loss: React.FC<{ c: Ctx }> = ({ c }) => {
           squared error on a sigmoid output: <Mark at={stallsAt + 6}>stalls once it saturates</Mark>
         </span>
       </Note>
+      <Note at={stallsAt + 10} x={COLS[0]} y={c.y(776)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>saturated: on a flat end of the curve, where the gradient is nearly 0</span>
+      </Note>
     </>
   );
 };
@@ -72,9 +76,11 @@ const Init: React.FC<{ c: Ctx }> = ({ c }) => {
   const ys: Scale = { lo: -11, hi: 11, a: c.y(box.bottom), b: c.y(box.top) };
   const px = (k: number) => xs.a + (k / 10) * (xs.b - xs.a);
   const py = (v: number) => ys.a + ((Math.log10(v) - ys.lo) / (ys.hi - ys.lo)) * (ys.b - ys.a);
+  // Red shrinks and orange blows up, as in question 5's vanishing and
+  // exploding gradients.
   const series = [
-    { key: "one" as const, color: ACCENT, at: oneAt, ink: ACCENT_INK, text: `spread 1: ${(INIT.sd.one[10] / 1e9).toFixed(0)} billion` },
-    { key: "small" as const, color: WARM, at: smallAt, ink: WARM_INK, text: "spread 0.01: almost nothing" },
+    { key: "one" as const, color: WARM, at: oneAt, ink: WARM_INK, text: `spread 1: ${(INIT.sd.one[10] / 1e9).toFixed(0)} billion` },
+    { key: "small" as const, color: ACCENT, at: smallAt, ink: ACCENT_INK, text: "spread 0.01: almost nothing" },
     { key: "he" as const, color: OK, at: heAt, ink: OK_INK, text: `He: ${INIT.sd.he[10].toFixed(2)}` },
   ];
   return (
@@ -84,17 +90,28 @@ const Init: React.FC<{ c: Ctx }> = ({ c }) => {
           every weight equal: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>the units stay copies</span>
         </span>
       </Note>
-      <Axes
-        x={xs}
-        y={ys}
-        xTicks={[0, 2, 4, 6, 8, 10]}
-        yTicks={[-10, -5, 0, 5, 10]}
-        yFormat={(v) => (v === 0 ? "1" : `10${v < 0 ? "⁻" : ""}${String(Math.abs(v)).replace(/\d/g, (d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[Number(d)])}`)}
-        xTitle={`ReLU layers, ${INIT.width} wide`}
-        yTitle="the signal's spread"
-        at={scaleAt - 4}
-        size={18}
-      />
+      <Axes x={xs} y={ys} xTicks={[0, 2, 4, 6, 8, 10]} xTitle={`ReLU layers, ${INIT.width} wide`} yTitle="the signal's spread" at={scaleAt - 4} />
+      {/* The y ticks are powers of ten, drawn here so the exponent can be a
+          real superscript: the Unicode ones (10¹⁰) came out about 10 px. */}
+      <Svg opacity={ease(frame, scaleAt + 2, 12)}>
+        {[-10, -5, 0, 5, 10].map((v) => (
+          <g key={v}>
+            <line x1={xs.a} x2={xs.b} y1={at(ys, v)} y2={at(ys, v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
+            <text x={xs.a - 14} y={at(ys, v) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}>
+              {v === 0 ? (
+                "1"
+              ) : (
+                <>
+                  10
+                  <tspan dy={-9} style={{ fontSize: 15 }}>
+                    {v < 0 ? `−${-v}` : v}
+                  </tspan>
+                </>
+              )}
+            </text>
+          </g>
+        ))}
+      </Svg>
       <Svg>
         {series.map((s) =>
           INIT.sd[s.key].map((v, k) => {
@@ -137,8 +154,10 @@ const Epoch: React.FC<{ c: Ctx }> = ({ c }) => {
   const bar = { x: R_X + 40, y: c.y(560), h: c.h(64) };
   const full = ease(frame, epochAt, 20);
   const cuts = ease(frame, tenAt + 4, 30);
-  const shown = Math.floor(EPOCH.iterations * cuts);
-  const seg = W / (EPOCH.n / EPOCH.batch);
+  // The batch boundaries inside the bar: 312 of them, the last batch the
+  // partial one after the last line.
+  const shown = Math.floor((EPOCH.iterations - 1) * cuts);
+  const seg = W / EPOCH.exact;
   return (
     <>
       <Tagline x={bar.x} y={bar.y - c.h(46)} at={epochAt} size={22} color={INK}>
@@ -149,31 +168,27 @@ const Epoch: React.FC<{ c: Ctx }> = ({ c }) => {
         {Array.from({ length: shown }, (_, i) => (
           <line key={i} x1={bar.x + (i + 1) * seg} x2={bar.x + (i + 1) * seg} y1={bar.y + 3} y2={bar.y + bar.h - 3} stroke={BAR} strokeWidth={1} opacity={0.7} />
         ))}
-        <rect
-          x={bar.x}
-          y={bar.y - 6}
-          width={Math.max(seg, 14)}
-          height={bar.h + 12}
-          fill="none"
-          stroke={OK}
-          strokeWidth={3}
-          opacity={ease(frame, batchAt, 10)}
-        />
+        {/* One batch at its true width, a sliver of the bar (it was a 14 px box,
+            about five batches wide). */}
+        <rect x={bar.x} y={bar.y - 8} width={seg} height={bar.h + 16} fill={OK} opacity={ease(frame, batchAt, 10)} />
       </Svg>
       <Note at={batchAt + 2} x={bar.x} y={bar.y + bar.h + c.h(14)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one batch → one update: an iteration</span>
       </Note>
       <Note at={iterAt + 6} x={bar.x} y={bar.y + bar.h + c.h(54)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>the examples behind one update, and the update itself</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>batch: the examples behind one update; iteration: the update</span>
       </Note>
       <Note at={tenAt - 2} x={bar.x} y={c.y(760)}>
-        <span style={{ ...note(30, INK), whiteSpace: "nowrap", ...TABULAR }}>
-          {EPOCH.n.toLocaleString("en-US")} examples ÷ {EPOCH.batch} a batch ={" "}
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          {EPOCH.n.toLocaleString("en-US")} examples ÷ {EPOCH.batch} a batch = {EPOCH.exact}, so{" "}
           <Mark at={makeAt}>
             <b>{EPOCH.iterations}</b> iterations
           </Mark>{" "}
           an epoch
         </span>
+      </Note>
+      <Note at={makeAt + 6} x={bar.x + W} y={bar.y + bar.h + c.h(14)} align="right" width={300}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>the last batch holds {EPOCH.lastBatch}</span>
       </Note>
     </>
   );

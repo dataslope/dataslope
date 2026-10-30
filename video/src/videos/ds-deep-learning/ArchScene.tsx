@@ -32,10 +32,10 @@ const TOK_Y = 720;
 
 /**
  * Question 11, three panels drawn as each is described. A CNN's 3x3 filter
- * sliding over a small picture, filling a smaller grid as it goes; an RNN
- * reading five tokens one step at a time, its hidden state carried along
- * and fading behind it; a transformer joining every token to every other at
- * once.
+ * sliding over a small picture once, filling a smaller grid as it goes; an
+ * RNN reading five tokens one step at a time, its hidden state carried along
+ * and fading behind it, still once the transformer is named; a transformer
+ * joining every token to every other at once.
  */
 export const ArchScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -61,10 +61,9 @@ export const ArchScene: React.FC = () => {
   const backboneAt = n.word("arch-tf", "the backbone of modern language models");
   const end = n.beat("arch-tf").to;
 
-  // The filter visits the 25 positions in raster order, every 5 frames, and starts over.
-  const visits = Math.max(0, Math.floor((frame - slidesAt) / 5));
-  const pos = visits % (OUT * OUT);
-  const pass = Math.floor(visits / (OUT * OUT));
+  // The filter visits the 25 positions in raster order, every 5 frames, once:
+  // looping, it kept sweeping through the RNN and the transformer.
+  const pos = Math.min(OUT * OUT - 1, Math.max(0, Math.floor((frame - slidesAt) / 5)));
   const fr = Math.floor(pos / OUT);
   const fc = pos % OUT;
   const filterOn = ease(frame, slidesAt - 2, 8);
@@ -73,12 +72,23 @@ export const ArchScene: React.FC = () => {
     for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (INKED.has(`${r + i},${c + j}`)) s++;
     return s;
   };
-  const filled = (r: number, c: number) => pass > 0 || r * OUT + c <= pos;
+  const filled = (r: number, c: number) => r * OUT + c <= pos;
 
   const tokX = (panel: number, i: number) => PANELS[panel] + 30 + i * (TOK_W + TOK_GAP);
-  // The RNN reads one token every 12 frames from "one step at a time", then starts over.
-  const rnnT = frame - stepAt;
-  const rnnStep = rnnT < 0 ? -1 : Math.floor(rnnT / 12) % (TOKENS + 3);
+  // The RNN reads one token every 12 frames from "one step at a time", then
+  // starts over, while it is the panel being described. From "A transformer"
+  // it finishes the pass it is on and holds on its last token.
+  const CYCLE = TOKENS + 3;
+  const stepIndex = (f: number) => Math.floor((f - stepAt) / 12);
+  const s0 = stepIndex(tfAt) % CYCLE;
+  const rnnStep =
+    frame < stepAt
+      ? -1
+      : frame < tfAt
+        ? stepIndex(frame) % CYCLE
+        : s0 >= TOKENS - 1
+          ? s0
+          : Math.min(TOKENS - 1, s0 + stepIndex(frame) - stepIndex(tfAt));
   const arcs = ease(frame, onceAt - 2, 18);
   const glow = 0.5 + 0.5 * Math.sin((frame - onceAt) / 9);
 
@@ -154,7 +164,7 @@ export const ArchScene: React.FC = () => {
                 height={OCELL - 3}
                 rx={2}
                 fill={`color-mix(in srgb, ${OK} ${Math.round(Math.min(1, v) * 85)}%, ${PAPER})`}
-                stroke={r === fr && c === fc && pass === 0 ? OK : "none"}
+                stroke={r === fr && c === fc ? OK : "none"}
                 strokeWidth={2}
               />
             );

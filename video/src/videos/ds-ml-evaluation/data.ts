@@ -28,6 +28,8 @@ export const BIAS = results.bias as {
   val: number[];
 };
 
+/** How often a model kept both cholesterol measures, only one, or neither, over resamples. */
+export type PairCounts = { both: number; s1: number; s2: number; neither: number };
 /** The diabetes set's ten coefficients along the lasso and ridge paths, and the marked strength. */
 export const REG = results.reg as {
   features: string[];
@@ -39,9 +41,14 @@ export const REG = results.reg as {
   ridgeKept: number;
   enetKept: number;
   lassoDropped: string[];
+  enetDropped: string[];
+  /** Elastic net's share of L1 in its penalty (the rest is L2). */
+  enetL1Ratio: number;
   s1s2: number;
   lassoS1S2: Pair;
   enetS1S2: Pair;
+  /** Lasso and elastic net refitted on `n` resamples of the patients. */
+  boot: { n: number; lasso: PairCounts; enet: PairCounts };
 };
 
 /** Two hundred single splits of the breast cancer set, and five folds. */
@@ -54,6 +61,12 @@ export const CV = results.cv as {
   folds: number[];
   mean: number;
   std: number;
+  /** The five-fold mean again, over two hundred reshuffles of the folds. */
+  means: number[];
+  meansMin: number;
+  meansMax: number;
+  splitsSd: number;
+  meansSd: number;
 };
 
 type Errors = { train: number[]; val: number[] };
@@ -68,6 +81,10 @@ export const CLS = results.cls as {
   test: number;
   positives: number;
   prevalence: number;
+  /** The share positive on the balanced test set: PR's chance level there. */
+  prevalenceBalanced: number;
+  /** At one low threshold: catches, false alarms, and the false positive rate. */
+  alarms: { t: number; tp: number; fp: number; negatives: number; fpr: number; recall: number };
   thresholds: Rates[];
   /** [threshold, precision, recall] */
   curve: [number, number, number][];
@@ -96,7 +113,23 @@ export const GD = results.gd as { start: number; steps: number; runs: Record<"0.
 export const METRICS = results.metrics as { true: number[]; pred: number[]; rmse: number; mae: number; r2: number };
 
 /** Squared error and cross-entropy for a true positive, against the predicted probability. */
-export const LOSS = results.loss as { p: number[]; xent: number[]; sq: number[]; at: number; xentAt: number; sqAt: number };
+export const LOSS = results.loss as {
+  p: number[];
+  xent: number[];
+  sq: number[];
+  at: number;
+  xentAt: number;
+  sqAt: number;
+  /** Each loss's slope against the logit behind a sigmoid, at `at`. */
+  xentGrad: number;
+  sqGrad: number;
+};
 
 /** A share as a whole percent, the way the narration says it. */
 export const pct = (v: number, digits = 0) => `${(v * 100).toFixed(digits)}%`;
+
+/** A count with thousands separators. */
+export const count = (v: number) => v.toLocaleString("en-US");
+
+/** A signed number with a true minus sign, which a hyphen only imitates. */
+export const signed = (v: number, digits = 2) => `${v < 0 ? "\u2212" : ""}${Math.abs(v).toFixed(digits)}`;

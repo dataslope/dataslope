@@ -224,6 +224,9 @@ INSERT INTO regions VALUES
     table: "SELECT region, avg_order, customers FROM regions ORDER BY rowid;",
     averaged: "SELECT AVG(avg_order) AS average_of_averages FROM regions;",
     weighted: "SELECT SUM(avg_order * customers) * 1.0 / SUM(customers) AS per_customer FROM regions;",
+    // The fix the video gives: the numerator and the denominator summed
+    // first, the division they feed done once.
+    totals: "SELECT SUM(avg_order * customers) AS revenue, SUM(customers) AS customers FROM regions;",
   },
 );
 results.runtime.sql = `DuckDB ${results.sql.funnel.version}`;
@@ -287,6 +290,7 @@ SIZES = [10, 20, 50, 100, 200, 500, 1000, 2000]`,
   {
     rows: "[[n, float(2 * stats.norm.sf(D * np.sqrt(n / 2)))] for n in SIZES]",
     cross: "min(n for n in SIZES if 2 * stats.norm.sf(D * np.sqrt(n / 2)) < 0.05)",
+    d: "D",
   },
 );
 
@@ -399,8 +403,10 @@ results.charts.drift.spread = Number((664 / 214).toFixed(1));
     return normalCdf((Math.abs(p2 - p1) * Math.sqrt(n) - 1.959964 * Math.sqrt(2 * pBar * (1 - pBar))) / Math.sqrt(p1 * (1 - p1) + p2 * (1 - p2)));
   };
   const NS = Array.from({ length: 81 }, (_, i) => Math.pow(10, 2 + (i * Math.log10(600)) / 80));
+  const FROM = 0.1;
   results.charts.power = {
-    lifts: [0.15, 0.12, 0.11].map((to) => ({ to, rows: NS.map((n) => [n, power(n, 0.1, to)]) })),
+    lifts: [0.15, 0.12, 0.11].map((to) => ({ to, rows: NS.map((n) => [n, power(n, FROM, to)]) })),
+    from: FROM,
   };
 }
 

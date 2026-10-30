@@ -122,21 +122,43 @@ export const FANOUT = {
   after: pair("fanout", "after"),
   unique: { lines: code("fanout", "unique"), value: scalar("fanout", "unique") },
   validate: refused("fanout", "validate"),
+  /** The fix: one row per customer (the last, the current address), then
+   *  the same merge, validated, back to the orders' rows and revenue. */
+  dedup: { lines: code("fanout", "dedup"), ...frame("fanout", "dedup") },
+  fixed: pair("fanout", "fixed"),
 };
 
 export const PLAN = { lines: code("plan", "size"), ...series("plan", "size") };
 
 // ── 1. Vectorization ────────────────────────────────────────────────────────
 
+const loopMs = Number(scalar("vector", "loopMs"));
+const vecMs = Number(scalar("vector", "vecMs"));
+const revenues = (t: Table) => t.rows.map((r) => r[t.cols.indexOf("revenue")]).join(",");
+
 export const VECTOR = {
   frame: frame("vector", "frame"),
   loop: { lines: code("vector", "loop"), ...frame("vector", "loop") },
   vectorized: { lines: code("vector", "vectorized"), ...frame("vector", "vectorized") },
+  /** The same revenues from .apply with a lambda: a Python call per row. */
+  apply: { lines: code("vector", "apply"), ...frame("vector", "apply") },
   /** The loop and the vectorized line agree on all million rows. */
   same: scalar("vector", "same") === "True",
-  loopMs: Number(scalar("vector", "loopMs")),
-  vecMs: Number(scalar("vector", "vecMs")),
+  loopMs,
+  vecMs,
+  /** How many times faster the vectorized line ran, to the nearest 50: the
+   *  two times move from run to run, so a finer figure would be false
+   *  precision. The script says only "hundreds of times". */
+  ratio: Math.round(loopMs / vecMs / 50) * 50,
 };
+if (revenues(VECTOR.apply) !== revenues(VECTOR.vectorized)) throw new Error("apply and the vectorized line disagree");
+// The script says "several hundred milliseconds", "about one millisecond"
+// and "hundreds of times faster". A run on a busy machine can measure the
+// loop at well over a second (four were, during the 2026-10-29 fixes), so a
+// result.json that no longer fits those words stops the build here.
+if (VECTOR.loopMs < 200 || VECTOR.loopMs >= 1000) throw new Error(`the script says "several hundred milliseconds"; results.json has ${VECTOR.loopMs}`);
+if (VECTOR.vecMs >= 2) throw new Error(`the script says "about one millisecond"; results.json has ${VECTOR.vecMs}`);
+if (VECTOR.ratio < 200) throw new Error(`the script says "hundreds of times faster"; results.json gives ${VECTOR.ratio}x`);
 
 // ── 2. Split-apply-combine ──────────────────────────────────────────────────
 
@@ -209,3 +231,9 @@ export const QUICK = {
   catAfter: Number(scalar("category", "after")),
   weekly: { lines: code("dates", "weekly"), ...series("dates", "weekly") },
 };
+
+// The screen calls np.select's table "started from the default", which is
+// case_when's answer only while the two agree.
+if (QUICK.caseWhen.rows.map((r) => r[1]).join() !== QUICK.select.rows.map((r) => r[QUICK.select.cols.indexOf("size")]).join()) {
+  throw new Error("case_when from the default and np.select disagree");
+}
