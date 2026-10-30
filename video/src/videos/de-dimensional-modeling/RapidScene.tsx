@@ -223,7 +223,8 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
           </div>
           <div style={{ position: "absolute", left, top: rowTop(i + 1) - 1, width: gridW * ease(frame, downAt + i * 3, 12), height: 1, background: `color-mix(in srgb, ${INK} 20%, transparent)` }} />
           {DIMENSIONS.map((d, j) =>
-            USES[p].includes(d) ? (
+            // A tick not yet due is not drawn: its zero-length dash still paints a round cap.
+            USES[p].includes(d) && frame >= tickAt + i * 5 + j * 2 ? (
               <div key={d} style={{ position: "absolute", left: colLeft(j) + CELL_W / 2 - 13, top: rowTop(i) + CELL_H / 2 - 13 }}>
                 <Tick at={tickAt + i * 5 + j * 2} size={26} color={INK} />
               </div>

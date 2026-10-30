@@ -443,7 +443,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-groupby",
-      text: "Group by splits the rows by key, sums each group, and combines the answers. As index equals false keeps the region as a column: E U two twenty-five, U S one fifty.",
+      text: "Group by splits the rows by key, sums each group, and combines the answers. As index equals false keeps the region as a column: EU two twenty-five, US one fifty.",
     },
     {
       id: "r-pitfalls",

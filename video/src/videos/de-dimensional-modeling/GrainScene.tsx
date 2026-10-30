@@ -64,14 +64,16 @@ export const GrainScene: React.FC = () => {
   const paid = order.rows[0][order.cols.indexOf("shipping_fee")];
   const below = g.rowTop(LINES.rows.length);
 
-  const testRow = (j: number, at: number, ok: boolean) => (
-    <div
-      key={j}
-      style={{ position: "absolute", left: g.xs[j] + g.widths[j] / 2 - 13, top: g.top - 40, width: 26, height: 26 }}
-    >
-      {ok ? <Tick at={at} size={26} /> : <Cross at={at} size={26} />}
-    </div>
-  );
+  // A dash pattern of "0 1" still paints a round cap, so a mark not yet due is not drawn at all.
+  const testRow = (j: number, at: number, ok: boolean) =>
+    frame < at ? null : (
+      <div
+        key={j}
+        style={{ position: "absolute", left: g.xs[j] + g.widths[j] / 2 - 13, top: g.top - 40, width: 26, height: 26 }}
+      >
+        {ok ? <Tick at={at} size={26} /> : <Cross at={at} size={26} />}
+      </div>
+    );
 
   return (
     <AbsoluteFill>
