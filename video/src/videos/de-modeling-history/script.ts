@@ -326,7 +326,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-uuid",
-      text: "And a surrogate key from a sequence is a small integer, handed out in order: compact and quick to join. A UUID, a universally unique identifier, is sixteen bytes any system can make without a shared counter, which matters when many sources insert at once.",
+      text: "And a surrogate key from a sequence is a small integer, handed out in order: compact and quick to join. The other choice is a UUID, a universally unique identifier: sixteen bytes any system can make without a shared counter, which matters when many sources insert at once.",
     },
     {
       id: "r-uuid-cost",

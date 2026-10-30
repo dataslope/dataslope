@@ -90,7 +90,6 @@ export const GenScene: React.FC = () => {
   const from = n.beat("gen").from;
   const qAt = n.word("gen", "Question one");
   const textAt = n.word("gen", "Why prefer a generator");
-  const asked = n.beat("gen").to;
   const listAt = n.word("gen-yield", "A list holds every element at once");
   const genAt = n.word("gen-yield", "A generator yields one at a time");
   const parserAt = n.word("gen-yield", "The page's parser");
@@ -107,7 +106,6 @@ export const GenScene: React.FC = () => {
   const moveAt = n.word("gen-flat", "The generator doesn't move");
   const q2At = n.word("pipe", "Question two");
   const q2TextAt = n.word("pipe", "How do generator pipelines");
-  const asked2 = n.beat("pipe").to;
   const twiceAt = n.word("pipe-swap", "a three-stage pipeline, twice");
   const squareAt = n.word("pipe-swap", "With square brackets");
   const aliveAt = n.word("pipe-swap", "all three are alive at once");

@@ -97,13 +97,11 @@ export const SnapScene: React.FC = () => {
           ]}
         />
         <Note at={sixAt} x={gl.right + 24} y={gl.rowTop(0) + h(4)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <b><Num>{SNAP.logRows}</Num></b> rows,
-            <br />
-            <Num>{SR.rows.length}</Num> orders
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <b><Num>{SNAP.logRows}</Num> rows</b> for <Num>{SR.rows.length}</Num> orders
             <span style={{ color: INK_SOFT, opacity: ease(frame, wholeAt, 10) }}>
               <br />
-              all of it
+              the whole history
             </span>
           </span>
         </Note>
@@ -146,9 +144,9 @@ export const SnapScene: React.FC = () => {
         {/* The log rebuilds the snapshot: its latest row per order. */}
         <Listing
           lines={S.lines}
-          x={SNAP_X - 40}
+          x={SNAP_X + 20}
           top={sTop}
-          width={680}
+          width={660}
           size={SIZE}
           at={rebuildAt}
           title="the log rebuilds the snapshot"
@@ -157,14 +155,15 @@ export const SnapScene: React.FC = () => {
         {latest.map((r, i) => (
           <KeyArrow key={i} from={[gl.right + 8, gl.rowMid(r)]} to={[gs.x - 10, gs.rowMid(i)]} at={latestAt + 4 + i * 6} color={OK_INK} />
         ))}
-        <Note at={cantAt} x={SNAP_X - 40} y={sTop + listingHeight(S.lines.length, SIZE) + h(24)}>
+        <Note at={cantAt} x={SNAP_X + 20} y={sTop + listingHeight(S.lines.length, SIZE) + h(24)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the snapshot can&rsquo;t rebuild the log</span>
         </Note>
 
         {/* The advice. */}
-        <Note at={auditAt} x={X0} y={qTop + listingHeight(Q.lines.length, SIZE) + h(30)}>
+        <Note at={auditAt} x={SNAP_X + 20} y={sTop + listingHeight(S.lines.length, SIZE) + h(80)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            history must be auditable?{" "}
+            history must be auditable?
+            <br />
             <span style={{ color: OK_INK, fontWeight: 700, opacity: ease(frame, keepAt, 10) }}>keep the log</span>
             <span style={{ opacity: ease(frame, serveAt, 10) }}>, serve the snapshot from it</span>
           </span>

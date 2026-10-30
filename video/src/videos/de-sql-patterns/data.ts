@@ -59,7 +59,7 @@ const refused = (from: From, figure: string, id: string) => {
 };
 
 /** The one value of a one-row result's column. */
-const scalar = (from: From, figure: string, id: string, col = 0) => {
+const scalar = (from: From, figure: string, id: string, col: number | string = 0) => {
   const t = table(from, figure, id);
   return t.rows[0][typeof col === "number" ? col : t.cols.indexOf(col)];
 };

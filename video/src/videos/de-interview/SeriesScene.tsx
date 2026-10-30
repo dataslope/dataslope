@@ -26,8 +26,9 @@ const MOST = Math.max(...PARTS.map((p) => p.questions));
 /**
  * The series as a chart: the eleven topic videos in the track's order, each a
  * column with its hero, its part number and title under the baseline, and a
- * bar for the questions it answers. The heroes ink in along the track as
- * "eleven videos" is said, and ride up on their bars as the total is said.
+ * bar for the questions it answers. The names ink in along the baseline as
+ * "follows the track" is said, the heroes on "eleven videos", and the heroes
+ * ride up on their bars as the total is said.
  * SQL's two videos and data modeling's two are marked as pairs; then how each
  * video runs, the practice on the pages (concept checks on every one,
  * challenges on three, a bank of multiple-choice questions for the whole
@@ -39,6 +40,7 @@ export const SeriesScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("series").from;
+  const trackAt = n.word("series", "follows the track");
   const elevenAt = n.word("series", "eleven videos");
   const totalAt = n.word("series", "a hundred and fifty-seven questions");
   const onceAt = n.word("series", "each answered once");
@@ -55,6 +57,9 @@ export const SeriesScene: React.FC = () => {
 
   const colX = (i: number) => LEFT + i * (COL_W + GAP);
   const base = y(BASE);
+  // The parts' names ink in along the track as it is named, their heroes
+  // as "eleven videos" is said, and their bars as the total is.
+  const nameAt = (i: number) => trackAt + 2 + i * 3;
   const inAt = (i: number) => elevenAt + 3 + i * 3;
   const growAt = (i: number) => totalAt + i * 2;
   const pairs = [
@@ -66,7 +71,7 @@ export const SeriesScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {PARTS.map((p, i) => (
-        <Sfx key={p.n} name="el-tap" at={inAt(i)} level={-37} />
+        <Sfx key={p.n} name="el-tap" at={nameAt(i)} level={-37} />
       ))}
       <Sfx name="el-whoosh" at={totalAt} level={-36} />
       <Sfx name="el-chime" at={nextAt} level={-34} />
@@ -116,12 +121,12 @@ export const SeriesScene: React.FC = () => {
             top: base,
             height: 1.5,
             background: HAIRLINE,
-            opacity: ease(frame, elevenAt - 2, 16),
+            opacity: ease(frame, trackAt - 2, 16),
           }}
         />
 
         {PARTS.map((p, i) => {
-          const pIn = ease(frame, inAt(i) - 2, 14);
+          const pIn = ease(frame, nameAt(i) - 2, 14);
           if (pIn <= 0) return null;
           const grow = ease(frame, growAt(i), 22);
           const bh = barH(i) * grow;

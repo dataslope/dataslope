@@ -108,7 +108,11 @@ export const TYPE2 = {
   customers: Number(cell(table("type2", "currentAll"), 0, "customers")),
   load: query("type2", "load"),
 };
-if (TYPE2.matched !== TYPE2.orders) throw new Error("the point-in-time join no longer matches every order once");
+const pitDistinct = Number(table("type2", "pitDistinct").rows[0][0]);
+const seams = table("type2", "seams");
+if (TYPE2.matched !== TYPE2.orders || pitDistinct !== TYPE2.orders) throw new Error("the point-in-time join no longer matches every order once");
+// The narration: the ranges "never overlap and never leave a gap".
+if (Number(cell(seams, 0, "bad_seams")) !== 0) throw new Error("a customer's versions overlap or leave a gap");
 
 // ── 3. Type 0 ───────────────────────────────────────────────────────────────
 

@@ -41,7 +41,7 @@ export const HookScene: React.FC = () => {
   const wholeAt = n.word("hook-fit", "Read the whole file first");
   const fitAt = n.word("hook-fit", "it can't fit");
   const lineAt = n.word("hook-fit", "Read it one line at a time");
-  const holdsAt = n.word("hook-fit", "memory only ever holds one line");
+  const holdsAt = n.word("hook-fit", "memory only ever holds a line");
   const checksAt = n.word("plan", "That's what the Python round checks");
   const memoryAt = n.word("plan", "without running out of memory");
   const twiceAt = n.word("plan", "safe to run twice");

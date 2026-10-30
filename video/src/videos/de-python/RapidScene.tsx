@@ -120,7 +120,7 @@ const PandasBody: React.FC<{ c: Ctx }> = ({ c }) => {
 const GroupbyBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const G = QUICK.groupby;
   const at = c.w("r-groupby", "Group by splits the rows by key");
-  const keepsAt = c.w("r-groupby", "As index equals false keeps region a column");
+  const keepsAt = c.w("r-groupby", "As index equals false keeps the region");
   const top = c.y(372);
   const g = geoOf(G, R_X, top + listingHeight(G.lines.length, SIZE) + c.h(52), c.h, { rowH: 52 });
   const said = [c.w("r-groupby", "E U two twenty-five"), c.w("r-groupby", "U S one fifty")];

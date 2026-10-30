@@ -147,9 +147,13 @@ export const BackfillScene: React.FC = () => {
             2025: <span style={{ color: BLUE_INK, opacity: ease(frame, runsAt, 10) }}>{BACKFILL.partitions} daily partitions</span>
           </span>
         </Note>
-        <Note at={fourAt} x={GRID_X + 31 * PITCH} y={y(290)} align="right">
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <Num>{BACKFILL.parallel}</Num> at a time: <Num>{BACKFILL.waves}</Num> waves
+        <Note at={thrAt} x={GRID_X - 44} y={y(662)}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            throttled
+            <span style={{ opacity: ease(frame, fourAt, 10) }}>
+              : <Num>{BACKFILL.parallel}</Num> at a time, <Num>{BACKFILL.waves}</Num> waves
+            </span>
+            <span style={{ color: OK_INK, opacity: ease(frame, keepAt, 10) }}>, so the source keeps up</span>
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -190,9 +194,6 @@ export const BackfillScene: React.FC = () => {
         </Note>
         <Note at={dagAt} x={GRID_X - 44} y={y(624)}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>Dagster: partitioned assets</span>
-        </Note>
-        <Note at={keepAt} x={GRID_X + 31 * PITCH} y={y(624)} align="right">
-          <span style={{ ...label(21, OK_INK), whiteSpace: "nowrap" }}>throttled, so the source keeps up</span>
         </Note>
 
         {/* Why the loop: the cost of one run, a model. */}

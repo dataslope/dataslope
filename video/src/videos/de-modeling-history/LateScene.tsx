@@ -16,6 +16,9 @@ const SIZE = 20;
 const SIDE_SIZE = 19;
 const ROWS = { headH: 38, rowH: 42, bodySize: 21, headSize: 19 } as const;
 
+/** "1110.00" as "1,110.00". */
+const dollars = (v: string) => Number(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 /**
  * Question 5, on the video's own three staged orders: order 203 is for
  * customer 77, who is not in dim_customer yet. The inner-join lookup loads
@@ -189,11 +192,11 @@ export const LateScene: React.FC = () => {
         />
         <Note at={sevenAt} x={gf.x} y={gf.rowTop(2) + h(14)} out={againstAt}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            $<Num>{LATE.loaded}</Num> of $<Num>{LATE.stagedSum}</Num>
+            $<Num>{dollars(LATE.loaded)}</Num> of $<Num>{dollars(LATE.stagedSum)}</Num>
             <span style={{ opacity: ease(frame, errorAt, 10) }}>, and no error</span>
           </span>
         </Note>
-        <Note at={againstAt + 10} x={gf.x} y={gf.rowTop(3) + h(14)}>
+        <Note at={againstAt + 10} x={gf.x} y={gf.rowTop(3) + h(14)} out={touchedAt - 2}>
           <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>all three loaded</span>
         </Note>
 
@@ -208,9 +211,9 @@ export const LateScene: React.FC = () => {
           rows={R.rows.map((cells, i) => ({ cells, at: pointsAt + 4 + i * 3 }))}
           marks={[{ row: 2, col: rCity, at: tulsaAt + 2, color: MARK_OK }]}
         />
-        <Note at={touchedAt} x={gf.x} y={gf.rowTop(3) + h(62)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            the fact row still holds <b><Num>{F.rows[2][fKey]}</Num></b>: never touched
+        <Note at={touchedAt + 4} x={gf.x} y={gf.rowTop(3) + h(14)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            the fact still holds <Num>{F.rows[2][fKey]}</Num>: never touched
           </span>
         </Note>
 
@@ -219,9 +222,10 @@ export const LateScene: React.FC = () => {
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             or one shared unknown row
             <span style={{ opacity: ease(frame, minusAt, 10) }}>
-              , key <b style={{ color: INK }}>−1</b>
+              , key <b style={{ color: INK }}>−1</b>:
             </span>
-            <span style={{ opacity: ease(frame, rekeyAt - 4, 10) }}>: every fact re-keyed later</span>
+            <br />
+            <span style={{ opacity: ease(frame, rekeyAt - 4, 10) }}>every fact re-keyed later</span>
           </span>
         </Note>
       </Drift>

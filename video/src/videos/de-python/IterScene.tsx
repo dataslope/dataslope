@@ -48,7 +48,6 @@ const Pass: React.FC<{ x: number; top: number; at: number; passes: number; spent
   const pass = Math.min(passes - 1, Math.floor(Math.max(0, t) / per));
   const inPass = t - pass * per;
   const pos = t < 0 ? -1 : Math.min(ROWS, Math.floor(inPass / STEP));
-  const over = !spent && pass === passes - 1 && pos >= ROWS;
   return (
     <>
       {Array.from({ length: ROWS }, (_, i) => {
@@ -72,7 +71,7 @@ const Pass: React.FC<{ x: number; top: number; at: number; passes: number; spent
                 : read
                   ? `color-mix(in srgb, ${INK} 6%, ${PAPER})`
                   : `color-mix(in srgb, ${BAR} 18%, ${PAPER})`,
-              opacity: p * (over ? 1 : 1),
+              opacity: p,
             }}
           />
         );
@@ -95,7 +94,6 @@ export const IterScene: React.FC = () => {
   const from = n.beat("iter").from;
   const qAt = n.word("iter", "Question five");
   const textAt = n.word("iter", "What's the difference");
-  const asked = n.beat("iter").to;
   const iterableAt = n.word("iter-def", "An iterable");
   const freshAt = n.word("iter-def", "hands out a fresh iterator each time");
   const iteratorAt = n.word("iter-def", "An iterator keeps its place");

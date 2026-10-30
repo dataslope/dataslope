@@ -12,8 +12,8 @@ import { TYPE0 } from "./data";
 import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingHeight, MARK_OK, OK_INK, TableName, X0 } from "./parts";
 
 const TOP = 330;
-const SIZE = 21;
-const TABLE_X = 1060;
+const SIZE = 23;
+const TABLE_X = 1100;
 const ROWS = { headH: 40, rowH: 46, bodySize: 24, headSize: 20 } as const;
 
 /**
@@ -47,13 +47,13 @@ export const Type0Scene: React.FC = () => {
   const F = TYPE0.first;
   const L = TYPE0.later;
   const firstTop = y(TOP) + h(40);
-  const laterTop = firstTop + listingHeight(F.lines.length, SIZE) + h(80);
-  const listW = 560;
+  const laterTop = firstTop + listingHeight(F.lines.length, SIZE) + h(64);
+  const listW = 620;
   const T = TYPE0.rows;
   const g = geoOf(T, TABLE_X, y(TOP) + h(40), h, { ...ROWS, extra: [["42", "2023-06-30"]] });
   // The later load's value, refused, as a ghost row under the kept one.
   const laterDate = L.lines.join(" ").match(/DATE '([\d-]+)'/)?.[1] ?? "";
-  const stripY = y(700);
+  const stripY = y(800);
 
   const columns = [
     { name: "customer_key", type: "surrogate key", at: perAt + 4, lit: undefined },

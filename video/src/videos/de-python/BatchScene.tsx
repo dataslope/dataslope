@@ -33,9 +33,8 @@ export const BatchScene: React.FC = () => {
   const from = n.beat("batch").from;
   const qAt = n.word("batch", "Question ten");
   const textAt = n.word("batch", "How do you split");
-  const perRowAt = n.word("batch-why", "One insert per row");
+  const perRowAt = n.word("batch-why", "An insert per row");
   const tripAt = n.word("batch-why", "a round trip per row");
-  const millionAt = n.word("batch-why", "A million rows in batches of a thousand");
   const callsAt = n.word("batch-why", "is a thousand calls");
   const pullAt = n.word("batch-slice", "Pull n items at a time");
   const sliceAt = n.word("batch-slice", "with i-slice");

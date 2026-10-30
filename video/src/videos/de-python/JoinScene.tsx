@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK_SOFT, note } from "../../editorial/style";
@@ -41,7 +41,6 @@ const LOW = 612;
  * KeyError: 3 under square brackets, and .get() keeps it with None.
  */
 export const JoinScene: React.FC = () => {
-  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
@@ -74,8 +73,6 @@ export const JoinScene: React.FC = () => {
   const P = JOIN.probe.lines.slice(0, lineOf(JOIN.probe.lines, "]") + 1);
   const low = y(LOW);
   const probeTop = low + listingHeight(B.length, SIZE) + h(30);
-  // Each order in turn looks its user up, one every 14 frames.
-  const lookK = frame < lookAt ? -1 : Math.min(JOIN.orders.rows.length - 1, Math.floor((frame - lookAt) / 14));
   const userRow = (i: number) => U.rows.findIndex((r) => r[U.cols.indexOf("user_id")] === O.rows[i][uid]);
   const M = JOIN.missing.lines;
   const mH = listingHeight(M.length, SIZE);

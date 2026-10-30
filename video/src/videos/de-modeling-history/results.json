@@ -364,6 +364,32 @@
             ]
           ]
         },
+        "pitDistinct": {
+          "sql": "SELECT COUNT(DISTINCT f.order_id) AS orders_matched\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to;",
+          "ok": true,
+          "columns": [
+            "orders_matched"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "seams": {
+          "sql": "SELECT COUNT(*) AS seams,\n  COUNT(*) FILTER (WHERE next_from <> valid_to + 1) AS bad_seams\nFROM (\n  SELECT valid_to, LEAD(valid_from) OVER (PARTITION BY customer_id ORDER BY valid_from) AS next_from\n  FROM dim_customer\n) WHERE next_from IS NOT NULL;",
+          "ok": true,
+          "columns": [
+            "seams",
+            "bad_seams"
+          ],
+          "rows": [
+            [
+              9,
+              0
+            ]
+          ]
+        },
         "current": {
           "sql": "SELECT customer_key, city\nFROM dim_customer\nWHERE customer_id = 42 AND is_current;",
           "ok": true,

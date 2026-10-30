@@ -16,7 +16,7 @@ import { colsOf, DataTable, Drift, geoOf, Headline, Kicker, MARK, MARK_KEY, OK_I
 const R_X = 820;
 const LIST_TOP = 340;
 const ROW = 64;
-const ROWS = { headH: 38, rowH: 42, bodySize: 21, headSize: 19 } as const;
+const ROWS = { headH: 42, rowH: 46, bodySize: 23, headSize: 20 } as const;
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
 
@@ -231,7 +231,7 @@ const Mini: React.FC<{ c: Ctx }> = ({ c }) => {
       <Entity layout={dimC} at={bigAt - 4} />
       <Entity layout={fact} at={movesAt + 6} rowAt={{ customer_key: movesAt + 12, demo_key: keyAt, amount: movesAt + 18 }} marks={{ demo_key: { at: keyAt + 6, tone: "key" } }} />
       <Entity layout={dimD} at={smallAt - 2} marks={{ age_band: { at: smallAt + 8 }, income_tier: { at: smallAt + 12 } }} />
-      <Relation name="customer to fact" points={[cA, [1290, cA[1]], [1290, fA[1]], fA]} from="exactly-one" to="zero-or-many" at={movesAt + 14} />
+      <Relation name="customer to fact" points={[cA, [1290, cA[1]], [1290, fA[1]], fA]} from="exactly-one" to="zero-or-many" at={bigAt + 6} />
       <Relation name="demographics to fact" points={[dA, [1240, dA[1]], [1240, fB[1]], fB]} from="exactly-one" to="zero-or-many" at={keyAt + 2} />
       <Note at={ageAt} x={R_X} y={c.y(340)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>age band, income tier: change often</span>
@@ -286,7 +286,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
   const seqAt = c.w("r-uuid", "a surrogate key from a sequence");
   const orderAt = c.w("r-uuid", "handed out in order");
   const compactAt = c.w("r-uuid", "compact and quick to join");
-  const uuidAt = c.w("r-uuid", "A UUID, a universally unique identifier");
+  const uuidAt = c.w("r-uuid", "a UUID, a universally unique identifier");
   const bytesAt = c.w("r-uuid", "sixteen bytes");
   const counterAt = c.w("r-uuid", "without a shared counter");
   const manyAt = c.w("r-uuid", "many sources insert at once");
@@ -296,12 +296,13 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
   const v7At = c.w("r-uuid-cost", "Time-ordered version seven UUIDs");
   const betweenAt = c.w("r-uuid-cost", "land in between");
   const U = RAPID.uuid;
-  const keyBox = (top: number, at: number, value: string, name: string, bytes: number, bytesAt: number) => (
+  const keyBox = (top: number, at: number, value: string, name: string, bytes: number, bytesAt: number, kind: string) => (
     <Note at={at} x={R_X} y={top}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), width: 120 }}>{name}</span>
         <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, border: `1.5px solid ${INK}`, borderRadius: 6, padding: "4px 12px" }}>{value}</span>
         <span style={{ ...note(23, BLUE_INK), fontWeight: 700, opacity: ease(frame, bytesAt, 10) }}>
+          {kind ? `${kind}, ` : ""}
           <Num>{bytes}</Num> bytes
         </span>
       </div>
@@ -309,22 +310,22 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
   );
   // The index sizes as bars, longest the random UUIDs'.
   const BAR_X = R_X + 230;
-  const unit = 620 / U.random;
+  const unit = 540 / U.random;
   const bars = [
     { name: "sequence", v: U.sequence, at: costAt + 6, fill: BAR, ink: BLUE_INK },
     { name: "random UUID", v: U.random, at: randomAt + 4, fill: ACCENT, ink: ACCENT_INK },
     { name: "UUID v7", v: U.v7, at: v7At + 4, fill: ds("blue", 300), ink: BLUE_INK },
   ];
-  const barTop = c.y(600);
+  const barTop = c.y(660);
   const barH = c.h(40);
   const step = c.h(62);
   return (
     <>
-      {keyBox(c.y(370), seqAt, U.seqSample, "sequence", U.bigint, compactAt)}
+      {keyBox(c.y(370), seqAt, U.seqSample, "sequence", U.bigint, compactAt, "a bigint")}
       <Note at={orderAt} x={R_X + 140} y={c.y(370) + c.h(52)}>
         <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>1, 2, 3, … in order</span>
       </Note>
-      {keyBox(c.y(470), uuidAt, U.sample, "UUID", U.uuid, bytesAt)}
+      {keyBox(c.y(470), uuidAt, U.sample, "UUID", U.uuid, bytesAt, "")}
       <Note at={counterAt} x={R_X + 140} y={c.y(470) + c.h(52)}>
         <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
           made anywhere, no shared counter
@@ -360,15 +361,15 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
               }}
             >
               <Num>{mb(b.v)}</Num>&nbsp;MB
+              {b.v === U.random ? (
+                <span style={{ marginLeft: 12, opacity: ease(frame, twiceAt, 10) }}>
+                  (<Num>{(U.random / U.sequence).toFixed(2)}</Num>×)
+                </span>
+              ) : null}
             </div>
           </React.Fragment>
         );
       })}
-      <Note at={twiceAt} x={BAR_X + U.random * unit + 130} y={barTop + step} out={v7At}>
-        <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-          <Num>{(U.random / U.sequence).toFixed(2)}</Num>×
-        </span>
-      </Note>
       <Note at={betweenAt} x={BAR_X + U.v7 * unit + 130} y={barTop + 2 * step}>
         <span style={{ ...note(23, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>in between</span>
       </Note>

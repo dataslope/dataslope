@@ -222,6 +222,11 @@ results.figures.type2 = await figure(BEFORE_MOVE, {
   pit: `${PAGE_JOIN}\nWHERE f.customer_id = 42\nORDER BY f.order_id;`,
   pitAll: `SELECT COUNT(*) AS matched\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to;`,
   orders: "SELECT COUNT(*) AS orders FROM fact_orders;",
+  // Each order matched once, not one dropped and another doubled.
+  pitDistinct: `SELECT COUNT(DISTINCT f.order_id) AS orders_matched\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to;`,
+  // Every version starts the day after the one before it ends: no overlap, no gap.
+  seams:
+    "SELECT COUNT(*) AS seams,\n  COUNT(*) FILTER (WHERE next_from <> valid_to + 1) AS bad_seams\nFROM (\n  SELECT valid_to, LEAD(valid_from) OVER (PARTITION BY customer_id ORDER BY valid_from) AS next_from\n  FROM dim_customer\n) WHERE next_from IS NOT NULL;",
   current: "SELECT customer_key, city\nFROM dim_customer\nWHERE customer_id = 42 AND is_current;",
   currentAll: "SELECT COUNT(*) AS current_rows, COUNT(DISTINCT customer_id) AS customers\nFROM dim_customer\nWHERE is_current;",
   // At load time, the fact keeps the key of the version true on its date.

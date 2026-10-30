@@ -14,9 +14,9 @@ import { COLUMN_TINT, Drift, OK, OK_INK, READ, X0 } from "./parts";
 const TOP = 296;
 const PANEL_W = 520;
 const PANEL_GAP = 60;
-const BOX_Y = 372;
+const BOX_Y = 396;
 const BOX_H = 196;
-const NOTES_Y = 598;
+const NOTES_Y = 614;
 
 /** A file in a bucket. */
 const FileChip: React.FC<{ x: number; y: number; name: string; at: number; lit?: number; ring?: number; gone?: number }> = ({

@@ -189,7 +189,7 @@ export const BridgeScene: React.FC = () => {
           g={gb}
           cols={colsOf(B, { weight: { at: weightAt + 2 } })}
           at={pairAt - 2}
-          rows={B.rows.map((cells, i) => ({ cells, at: order1.includes(i) ? pairAt + 2 + i * 4 : q8At + 4 + i * 3 }))}
+          rows={B.rows.map((cells, i) => (order1.includes(i) ? { cells, at: pairAt + 2 + i * 4 } : { cells, at: q8At + 4 + i * 3, grow: true }))}
           bands={order1.map((row) => ({ row, at: onceAt + 2, out: giveAt, color: MARK }))}
           marks={B.rows.map((_, row) => ({ row, col: bWeight, at: oneAt + row * 2, out: shareAt + 20 }))}
         />

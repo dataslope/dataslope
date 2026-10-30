@@ -11,10 +11,10 @@ import { HISTORY, TYPE2 } from "./data";
 import { colsOf, DataTable, Drift, geoOf, MARK_BAD, MARK_OK, OK, OK_INK, rowsAt, TableName, X0 } from "./parts";
 
 /** Each type's band, top to bottom, in layout units. */
-const BANDS = [330, 515, 700] as const;
+const BANDS = [330, 540, 750] as const;
 const TABLE_X = 420;
 /** The table rows here, before `h()`. */
-const ROWS = { headH: 38, rowH: 42, bodySize: 21, headSize: 19 } as const;
+const ROWS = { headH: 40, rowH: 46, bodySize: 21, headSize: 19 } as const;
 
 /**
  * Question 1, on the page's customer 42 and her two orders. Three bands, one
@@ -37,6 +37,7 @@ export const HistoryScene: React.FC = () => {
   const threeAt = n.word("scd", "Three classic types");
   const t1At = n.word("scd-t1", "Type one overwrites");
   const setAt = n.word("scd-t1", "Set her city to Austin");
+  const toAustinAt = n.word("scd-t1", "to Austin");
   const bothAt = n.word("scd-t1", "both orders now say Austin");
   const bostonAt = n.word("scd-t1", "including the one placed in Boston");
   const movedAt = n.word("scd-t1", "three hundred fifty dollars");
@@ -93,7 +94,7 @@ export const HistoryScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={setAt + 6} level={-35} />
+      <Sfx name="el-tap" at={toAustinAt + 2} level={-35} />
       <Sfx name="el-scratch" at={bostonAt + 2} level={-35} />
       <Sfx name="el-pencil" at={endAt + 2} level={-36} />
       <Sfx name="el-tap" at={newRowAt + 2} level={-35} />
@@ -149,7 +150,7 @@ export const HistoryScene: React.FC = () => {
           cols={colsOf(T1)}
           at={t1At + 2}
           rows={[{ cells: t1Before, at: t1At + 6 }]}
-          swaps={[{ row: 0, col: t1City, at: setAt + 6, value: T1.rows[0][t1City] }]}
+          swaps={[{ row: 0, col: t1City, at: toAustinAt + 2, value: T1.rows[0][t1City] }]}
           marks={[{ row: 0, col: t1City, at: setAt + 2, out: bothAt + 10 }]}
         />
         <TableName g={go1} at={bothAt - 4}>
@@ -183,7 +184,7 @@ export const HistoryScene: React.FC = () => {
           at={t2At + 2}
           rows={[
             { cells: T2.rows[0].map((v, j) => (j === t2To || j === t2Cur ? pre[TYPE2.before.cols.indexOf(T2.cols[j])] : v)), at: t2At + 6 },
-            { cells: T2.rows[1], at: newRowAt + 2 },
+            { cells: T2.rows[1], at: newRowAt + 2, grow: true },
           ]}
           swaps={[
             { row: 0, col: t2To, at: endAt + 4, value: T2.rows[0][t2To] },
@@ -226,7 +227,6 @@ export const HistoryScene: React.FC = () => {
           ]}
           marks={[
             { row: 0, col: t3Prev, at: prevAt, out: againAt },
-            { row: 0, col: t3Prev, at: goneAt, color: MARK_BAD },
           ]}
         />
         <Note at={stepAt} x={g3.right + 40} y={g3.rowTop(0) - h(2)}>

@@ -81,7 +81,7 @@ export const HookScene: React.FC = () => {
 
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dimFig }}>
           {/* Whose line this is. */}
-          <Note at={bostonAt - 6} x={TL_X0} y={bandTop - h(150)}>
+          <Note at={bostonAt - 6} x={TL_X0} y={bandTop - h(40)}>
             <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
               customer <Num>42</Num>, as the page&rsquo;s table has her
             </span>
@@ -201,16 +201,14 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={nineAt - 2} x={X0} y={y(826)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: BLUE_INK }}>
               <Num>9</Num>
             </b>{" "}
             worked through
-          </span>
-        </Note>
-        <Note at={sixAt - 2} x={X0 + 300} y={y(826)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            then <b style={{ color: BLUE_INK }}><Num>6</Num></b> quick ones
+            <span style={{ opacity: ease(frame, sixAt - 2, 12) }}>
+              , then <b style={{ color: BLUE_INK }}><Num>6</Num></b> quick ones
+            </span>
           </span>
         </Note>
       </Drift>

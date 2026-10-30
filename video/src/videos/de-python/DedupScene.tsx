@@ -83,7 +83,6 @@ export const DedupScene: React.FC = () => {
     if (i <= walkK && !seenIds.includes(r[uid])) seenIds.push(r[uid]);
   });
   const dupRow = R.rows.findIndex((r, i) => R.rows.slice(0, i).some((q) => q[uid] === r[uid]));
-  const fH = listingHeight(F.length, SIZE);
 
   // ── The page's frame, for the dict and for pandas ──
   const D = DEDUP.frame;

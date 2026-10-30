@@ -11,9 +11,9 @@ import { MOVE, TYPE2 } from "./data";
 import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingHeight, MARK_KEY, MARK_OK, OK_INK, TableName, X0 } from "./parts";
 
 const TOP = 340;
-const SIZE = 20;
-const DIM_X = 960;
-const ROWS = { headH: 38, rowH: 42, bodySize: 21, headSize: 19 } as const;
+const SIZE = 22;
+const DIM_X = 950;
+const ROWS = { headH: 42, rowH: 48, bodySize: 23, headSize: 20 } as const;
 
 /**
  * Question 2. Left, the page's two statements, run with the dates the page's
@@ -59,7 +59,7 @@ export const Type2Scene: React.FC = () => {
   const I = TYPE2.insert;
   const closeTop = y(TOP) + h(16);
   const insertTop = closeTop + listingHeight(C.lines.length, SIZE) + h(64);
-  const listW = 700;
+  const listW = 780;
   const stmtOut = findsAt - 4;
 
   // ── Right: customer 42's rows ──
@@ -132,7 +132,7 @@ export const Type2Scene: React.FC = () => {
           at={twoAt}
           rows={[
             { cells: B, at: twoAt + 4 },
-            { cells: A.rows[1], at: insertAt + 10 },
+            { cells: A.rows[1], at: insertAt + 10, grow: true },
           ]}
           swaps={[
             { row: 0, col: col("valid_to"), at: beforeAt + 4, value: A.rows[0][col("valid_to")] },
@@ -153,7 +153,7 @@ export const Type2Scene: React.FC = () => {
           ]}
           bands={[{ row: 1, at: isCurrentAt + 4, color: `color-mix(in srgb, ${OK_INK} 10%, transparent)` }]}
         />
-        <Note at={overlapAt + 6} x={g.right - 520} y={g.rowTop(2) + h(10)} out={onceAt}>
+        <Note at={overlapAt + 6} x={X0} y={joinTop + listingHeight(P.lines.length, SIZE) + h(80)} out={onceAt}>
           <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             {MOVE.bostonTo}, then {MOVE.austinFrom}: no overlap, no gap
           </span>

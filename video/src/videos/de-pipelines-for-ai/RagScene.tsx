@@ -61,7 +61,7 @@ export const RagScene: React.FC = () => {
     { text: "keep headings and tables", at: n.word("rag-extract", "keep headings and tables") },
     { text: "drop duplicates", at: n.word("rag-extract", "drop duplicates") },
   ];
-  const chunkAt = n.word("rag-meta", "Chunk");
+  const chunkAt = n.word("rag-meta", "Chunk", { nth: 1 });
   const metaAt = n.word("rag-meta", "attach metadata to each chunk");
   const fields = [
     { text: "doc_id", at: n.word("rag-meta", "document id") },

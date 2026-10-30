@@ -55,7 +55,6 @@ export const FileScene: React.FC = () => {
   const from = n.beat("file").from;
   const qAt = n.word("file", "Question three");
   const textAt = n.word("file", "How do you process a file");
-  const asked = n.beat("file").to;
   const dontAt = n.word("file-read", "Don't call read or read lines");
   const sameAt = n.word("file-read", "the same eight megabyte file");
   const textHoldsAt = n.word("file-read", "read holds the whole text");

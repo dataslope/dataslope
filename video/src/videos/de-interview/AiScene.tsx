@@ -75,8 +75,9 @@ export const AiScene: React.FC = () => {
   const from = n.beat("ai").from;
   const fourAt = n.word("ai", "in four ways");
   // "RAG" reaches the screen only once the narration has said what it
-  // stands for: the title inks "Ingestion" first, "for RAG" on "or RAG".
+  // stands for: "Ingestion for" first, its expansion under it, then "RAG".
   const ingestAt = n.word("ai-rag", "Ingestion");
+  const expandAt = n.word("ai-rag", "retrieval-augmented generation");
   const ragAt = n.word("ai-rag", "or RAG");
   const promptAt = n.word("ai-rag", "a system design prompt");
   const steps = [
@@ -122,9 +123,12 @@ export const AiScene: React.FC = () => {
 
         <div style={{ position: "absolute", left: X0, top: top - 4, width: STEP_X - X0 - 40, opacity: ease(frame, ingestAt - 2, 12) }}>
           <div style={{ ...note(30, INK), fontWeight: 650 }}>
-            Ingestion <span style={{ opacity: ease(frame, ragAt - 2, 12) }}>for RAG</span>
+            Ingestion for <span style={{ opacity: ease(frame, ragAt - 2, 12) }}>RAG</span>
           </div>
-          <div style={{ ...note(24, INK_SOFT), marginTop: 6, opacity: ease(frame, promptAt - 2, 12) }}>a system design prompt</div>
+          <div style={{ ...note(24, INK_SOFT), marginTop: 4, opacity: ease(frame, expandAt - 2, 12) }}>retrieval-augmented generation</div>
+          <div style={{ ...note(24, INK), marginTop: 10, opacity: ease(frame, promptAt - 2, 12) }}>
+            <Mark at={promptAt + 4}>a system design prompt</Mark>
+          </div>
         </div>
 
         {steps.map((s, i) => {

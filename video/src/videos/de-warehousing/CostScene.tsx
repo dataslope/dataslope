@@ -11,10 +11,10 @@ import { COST, KB, MB } from "./data";
 import { Drift, FileBar, OK, OK_INK, X0 } from "./parts";
 
 const BILL_Y = 296;
-const READ_Y = 432;
+const READ_Y = 474;
 const BAR_W = 1180;
-const STEP = 62;
-const COMPUTE_Y = 708;
+const STEP = 80;
+const COMPUTE_Y = 790;
 
 /**
  * Question 8 (and the Pipelines page's cost question). What a warehouse
@@ -107,12 +107,12 @@ export const CostScene: React.FC = () => {
         </div>
         {reads.map((r, i) => (
           <React.Fragment key={r.what}>
-            <FileBar x={X0} y={y(READ_Y) + i * h(STEP)} width={w(r.bytes)} height={h(34)} at={r.at} fill={BAR} />
+            <FileBar x={X0} y={y(READ_Y) + i * h(STEP)} width={w(r.bytes)} height={h(42)} at={r.at} fill={BAR} />
             <div
               style={{
                 position: "absolute",
                 left: X0 + w(r.bytes) + 18,
-                top: y(READ_Y) + i * h(STEP) + (h(34) - 32) / 2,
+                top: y(READ_Y) + i * h(STEP) + (h(42) - 32) / 2,
                 ...note(24, INK),
                 whiteSpace: "nowrap",
                 opacity: ease(frame, r.at + 4, 10),
@@ -136,7 +136,7 @@ export const CostScene: React.FC = () => {
             style={{
               position: "absolute",
               left: X0 + (i % 2) * 820,
-              top: y(COMPUTE_Y) + Math.floor(i / 2) * h(52),
+              top: y(COMPUTE_Y) + Math.floor(i / 2) * h(60),
               display: "flex",
               alignItems: "center",
               gap: 12,

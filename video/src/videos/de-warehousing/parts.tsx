@@ -74,7 +74,7 @@ export const segmentOf = (names: readonly string[]) => {
 };
 
 /** What a query read: the narration's highlighter, laid over bytes. */
-export const READ = `color-mix(in srgb, ${ds("yellow", 400)} 85%, transparent)`;
+export const READ = ds("yellow", 400);
 
 /** The watercolor hero from illustrations.json: pops in on `at`, bobs, fades on `out`. */
 export const Spot: React.FC<{
@@ -158,8 +158,11 @@ export const FileBar: React.FC<{
 };
 
 /**
- * A highlighter laid over part of a bar, from `x` for `width` px, swept in on
- * `at`: the bytes a query read.
+ * The highlighter round part of a bar, from `x` for `width` px, swept in on
+ * `at`: the bytes a query read. It sits behind the bar (z-index -1, inside
+ * the scene's Drift), so the bytes keep their own tints and the yellow shows
+ * as a band round them; laid over them, it mixed blue and yellow into green,
+ * the right answer's color.
  */
 export const ReadMark: React.FC<{
   x: number;
@@ -178,13 +181,13 @@ export const ReadMark: React.FC<{
     <div
       style={{
         position: "absolute",
-        left: x - 3,
-        top: y - 5,
-        width: (width + 6) * p,
-        height: height + 10,
+        left: x - 7,
+        top: y - 7,
+        width: (width + 14) * p,
+        height: height + 14,
         background: color,
-        mixBlendMode: "multiply",
-        borderRadius: 4,
+        borderRadius: 5,
+        zIndex: -1,
         opacity: 1 - o,
       }}
     />

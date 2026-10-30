@@ -11,7 +11,8 @@ import { Sfx } from "../../sound/Sfx";
 import { Drift, OK_INK, X0 } from "./parts";
 
 const TOP = 330;
-const SAT = 600;
+/** Room between a hub and its satellite, for the two crow's-foot ends. */
+const SAT_GAP = 96;
 const NOTES_X = 1480;
 
 /**
@@ -48,12 +49,14 @@ export const VaultScene: React.FC = () => {
   const serveAt = n.word("vault-when", "serve the reports");
   const end = n.beat("vault-when").to;
 
+  // Each hub sits level with the link row that names it, so every line is
+  // straight: hub_customer one row down, hub_order two.
   const hubC = useEntityLayout({
     x: X0,
-    y: y(TOP),
+    y: y(TOP) + h(46),
     width: 340,
     name: "hub_customer",
-    columns: [{ name: "customer_hk", key: "PK" }, { name: "customer_id" }, { name: "load_date" }],
+    columns: [{ name: "customer_hk", key: "PK" }, { name: "customer_id" }],
   });
   const link = useEntityLayout({
     x: 580,
@@ -64,21 +67,21 @@ export const VaultScene: React.FC = () => {
   });
   const hubO = useEntityLayout({
     x: 1100,
-    y: y(TOP),
+    y: y(TOP) + 2 * h(46),
     width: 320,
     name: "hub_order",
-    columns: [{ name: "order_hk", key: "PK" }, { name: "order_id" }, { name: "load_date" }],
+    columns: [{ name: "order_hk", key: "PK" }, { name: "order_id" }],
   });
   const satC = useEntityLayout({
     x: X0,
-    y: y(SAT),
+    y: hubC.bottom + SAT_GAP,
     width: 340,
     name: "sat_customer",
     columns: [{ name: "customer_hk", key: "PK, FK" }, { name: "load_date", key: "PK" }, { name: "city" }, { name: "record_source" }],
   });
   const satO = useEntityLayout({
     x: 1100,
-    y: y(SAT),
+    y: hubO.bottom + SAT_GAP,
     width: 320,
     name: "sat_order",
     columns: [{ name: "order_hk", key: "PK, FK" }, { name: "load_date", key: "PK" }, { name: "status" }, { name: "record_source" }],
@@ -87,7 +90,7 @@ export const VaultScene: React.FC = () => {
   const stamp = { load_date: { at: loadedAt + 2, out: insertsAt }, record_source: { at: sourceAt + 2, out: insertsAt } };
   const trace = (at: number) => ({ record_source: { at, out: vaultWhenAt } });
   const midX = 520;
-  const midTop = y(SAT) + h(10);
+  const midTop = link.bottom + h(40);
 
   const whenNotes = [
     { at: vaultWhenAt, head: "Choose a vault", lines: ["many changing sources", "strict audit"], ink: BLUE_INK },
@@ -134,35 +137,32 @@ export const VaultScene: React.FC = () => {
 
         {/* The three kinds, named under the diagram's middle. */}
         <Note at={threeAt} x={midX} y={midTop}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b style={{ opacity: ease(frame, hubsAt, 10) }}>hubs</b>: business keys
-          </span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>three kinds of table</span>
         </Note>
-        <Note at={linksAt} x={midX} y={midTop + h(40)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b>links</b>: relationships
-          </span>
-        </Note>
-        <Note at={satsAt} x={midX} y={midTop + h(80)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <b>satellites</b>: attributes
-            <span style={{ color: INK_SOFT, opacity: ease(frame, changeAt, 10) }}>, a row per change</span>
-          </span>
-        </Note>
+        {[
+          { at: hubsAt, name: "hubs", what: "business keys" },
+          { at: linksAt, name: "links", what: "relationships" },
+          { at: satsAt, name: "satellites", what: "attributes" },
+        ].map((k, i) => (
+          <Note key={k.name} at={k.at} x={midX} y={midTop + (i + 1) * h(36)}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+              <b>{k.name}</b>: {k.what}
+              {i === 2 ? <span style={{ color: INK_SOFT, opacity: ease(frame, changeAt, 10) }}>, a row per change</span> : null}
+            </span>
+          </Note>
+        ))}
 
         {/* Why it loads well. */}
-        <Note at={insertsAt} x={midX} y={midTop + h(150)}>
-          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>loading only inserts</span>
-        </Note>
-        <Note at={ownAt} x={midX} y={midTop + h(190)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a satellite per source</span>
-        </Note>
-        <Note at={parallelAt} x={midX} y={midTop + h(230)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>teams add sources in parallel</span>
-        </Note>
-        <Note at={tracesAt} x={midX} y={midTop + h(270)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>every value traced to its source</span>
-        </Note>
+        {[
+          { at: insertsAt, text: "loading only inserts", bold: true },
+          { at: ownAt, text: "a satellite per source" },
+          { at: parallelAt, text: "teams add sources in parallel" },
+          { at: tracesAt, text: "every value traced to its source" },
+        ].map((r, i) => (
+          <Note key={r.text} at={r.at} x={midX} y={midTop + h(160) + i * h(36)}>
+            <span style={{ ...note(24, INK), fontWeight: r.bold ? 650 : 500, whiteSpace: "nowrap" }}>{r.text}</span>
+          </Note>
+        ))}
 
         {/* When to choose it. */}
         {whenNotes.map((w, i) => (
