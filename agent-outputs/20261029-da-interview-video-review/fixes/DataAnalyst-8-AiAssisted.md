@@ -37,7 +37,10 @@ Report: `agent-outputs/20261029-da-interview-video-review/DataAnalyst-8-AiAssist
 - **New length: 394.6 s** (was 325.7), 43 beats, 956 words, 145 wpm (`npm run cues -- da-ai-assisted`).
 - Typecheck (folder lines): clean. ESLint `src/videos/da-ai-assisted`: clean.
 - `npm run check:cues`: passes. `npm test`: 69 pass, 0 fail.
-- CHECKS_PLACEHOLDER
+- `check:motion`: passes (6:34.8 checked, 0 stretches still for 2 s or more).
+- `check:sync`: passes, 43 beats, worst +0.03 s (`mistakes-recall`).
+- `check:mix`: speech a median 26.5 dB above the effects (5th percentile 10.8 dB), effects 28.5 LU under the narration.
+- `check:frames`: passes, including no hyphen in tabular figures.
 
 ## Facts
 
@@ -46,7 +49,7 @@ Report: `agent-outputs/20261029-da-interview-video-review/DataAnalyst-8-AiAssist
 
 ## Stills checked
 
-94, 112.5, 113.5, 123, 127.8, 138, 145, 148, 150, 158, 167.5, 169.6, 169.9, 188.5, 198, 206.5, 241.5, 258, 317, 333, 355.5, 374.5, 392.5 s.
+94, 112.5, 113.5, 123, 127.8, 150, 158, 167.5, 169.6, 169.9, 198, 206.5, 241.5, 258 (and a crop of the strike), 317, 333, 355.5, 374.5, 392.5 s, each looked at.
 
 ## Noticed, and a shared change recommended
 
