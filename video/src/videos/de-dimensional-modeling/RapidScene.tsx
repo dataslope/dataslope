@@ -432,12 +432,12 @@ export const RapidScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-chime" at={fiveAt} level={-36} />
+      <Sfx name="el-chime" at={fiveAt} level={-35} />
       {items.map((it) => (
-        <Sfx key={it.n} name="el-tap" at={it.at} level={-36} />
+        <Sfx key={it.n} name="el-tap" at={it.at} level={-31} />
       ))}
       <Sfx name="el-whoosh" at={fixedAt} level={-35} />
-      <Sfx name="el-pop" at={nextAt} level={-34} />
+      <Sfx name="el-pop" at={nextAt} level={-29} />
 
       <Drift from={from} to={n.beat("next").to + 40}>
         <Kicker at={fiveAt}>Quick round</Kicker>

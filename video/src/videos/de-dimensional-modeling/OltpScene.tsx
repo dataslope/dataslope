@@ -179,13 +179,13 @@ export const OltpScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={oltpAt} level={-33} />
+      <Sfx name="el-tap" at={oltpAt} level={-28} />
       <Sfx name="el-pencil" at={normAt} level={-35} />
-      <Sfx name="el-tap" at={olapAt} level={-33} />
+      <Sfx name="el-tap" at={olapAt} level={-28} />
       <Sfx name="el-whoosh" at={scanAt} level={-35} />
-      <Sfx name="el-sprinkle" at={appendAt} level={-36} />
+      <Sfx name="el-sprinkle" at={appendAt} level={-32} />
       <Sfx name="el-pencil" at={moveAt + 4} level={-34} />
-      <Sfx name="el-chime" at={jobAt} level={-37} />
+      <Sfx name="el-chime" at={jobAt} level={-35} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} size={60}>

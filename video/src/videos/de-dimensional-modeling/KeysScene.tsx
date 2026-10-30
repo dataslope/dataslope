@@ -83,14 +83,14 @@ export const KeysScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={naturalAt} level={-33} />
+      <Sfx name="el-tap" at={naturalAt} level={-28} />
       {problems.map((p) => (
-        <Sfx key={p.what} name="el-tap" at={p.at} level={-36} />
+        <Sfx key={p.what} name="el-tap" at={p.at} level={-31} />
       ))}
-      <Sfx name="el-pop" at={surrogateAt} level={-33} />
+      <Sfx name="el-pop" at={surrogateAt} level={-29} />
       <Sfx name="el-whoosh" at={twoRowsAt} level={-35} />
       <Sfx name="el-pencil" at={pointsAt + 4} level={-35} />
-      <Sfx name="el-chime" at={historyAt} level={-37} />
+      <Sfx name="el-chime" at={historyAt} level={-35} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} size={58}>

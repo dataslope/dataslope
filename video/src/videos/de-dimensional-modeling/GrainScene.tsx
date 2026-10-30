@@ -78,12 +78,12 @@ export const GrainScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-pencil" at={lineAt} level={-35} />
-      <Sfx name="el-tap" at={qtyAt + 2} level={-34} />
+      <Sfx name="el-tap" at={qtyAt + 2} level={-28} />
       <Sfx name="el-scratch" at={feeAt + 2} level={-34} />
       {[0, 1, 2].map((i) => (
-        <Sfx key={i} name="el-tap" at={timesAt + i * 5} level={-36} />
+        <Sfx key={i} name="el-tap" at={timesAt + i * 5} level={-31} />
       ))}
-      <Sfx name="el-pop" at={fifteenAt + 4} level={-33} />
+      <Sfx name="el-pop" at={fifteenAt + 4} level={-29} />
       <Sfx name="el-whoosh" at={orderGrainAt} level={-35} />
 
       <Drift from={from} to={end + 30}>

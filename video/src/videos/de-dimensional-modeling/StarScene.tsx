@@ -205,16 +205,16 @@ export const StarScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound ── */}
-      <Sfx name="el-tap" at={factAt} level={-30} />
+      <Sfx name="el-tap" at={factAt} level={-28} />
       {Object.values(dimTimes).map((t, i) => (
         <Sfx key={i} name="el-tap" at={t} level={-31} />
       ))}
       <Sfx name="el-pencil" at={dateAt + 4} level={-36} />
-      <Sfx name="el-sprinkle" at={oneJoinAt} level={-36} />
+      <Sfx name="el-sprinkle" at={oneJoinAt} level={-32} />
       <Sfx name="el-whoosh" at={snowAt} level={-34} />
       <Sfx name="el-pencil" at={moveAt + 6} level={-36} />
-      <Sfx name="el-pop" at={threeAt} level={-33} />
-      <Sfx name="el-chime" at={defaultAt} level={-36} />
+      <Sfx name="el-pop" at={threeAt} level={-29} />
+      <Sfx name="el-chime" at={defaultAt} level={-35} />
 
       <Drift from={from} to={end + 30} scale={0.015}>
         <QuestionCard n={1} at={q1At - 4} textAt={q1TextAt - 4} out={q2At - 6} size={60}>

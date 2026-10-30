@@ -48,11 +48,11 @@ export const HookScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-pencil" at={shapedAt} level={-36} />
-      <Sfx name="el-pop" at={starAt + 2} level={-32} />
+      <Sfx name="el-pop" at={starAt + 2} level={-29} />
       {words.map((w) => (
-        <Sfx key={w.w} name="el-tap" at={w.at} level={-37} />
+        <Sfx key={w.w} name="el-tap" at={w.at} level={-31} />
       ))}
-      <Sfx name="el-chime" at={fifteenAt} level={-36} />
+      <Sfx name="el-chime" at={fifteenAt} level={-35} />
 
       <Drift from={0} to={end + 30}>
         <Kicker at={startAt}>Data engineer interview prep · Data modeling I</Kicker>

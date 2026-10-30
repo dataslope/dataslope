@@ -93,15 +93,15 @@ export const TypesScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={txnAt} level={-33} />
+      <Sfx name="el-tap" at={txnAt} level={-28} />
       {TRANSACTIONS.rows.map((_, i) => (
-        <Sfx key={i} name="el-tap" at={depositAt + i * 4} level={-38} />
+        <Sfx key={i} name="el-tap" at={depositAt + i * 4} level={-31} />
       ))}
-      <Sfx name="el-tap" at={periodicAt} level={-33} />
-      <Sfx name="el-tap" at={accumAt} level={-33} />
-      <Sfx name="el-pop" at={swapApprove} level={-33} />
-      <Sfx name="el-pop" at={swapFund} level={-33} />
-      <Sfx name="el-chime" at={longAt} level={-37} />
+      <Sfx name="el-tap" at={periodicAt} level={-28} />
+      <Sfx name="el-tap" at={accumAt} level={-28} />
+      <Sfx name="el-pop" at={swapApprove} level={-29} />
+      <Sfx name="el-pop" at={swapFund} level={-29} />
+      <Sfx name="el-chime" at={longAt} level={-35} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} size={60}>

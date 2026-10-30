@@ -65,12 +65,12 @@ export const NormScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={onceAt} level={-33} />
+      <Sfx name="el-tap" at={onceAt} level={-28} />
       <Sfx name="el-pencil" at={joinAt + 2} level={-35} />
-      <Sfx name="el-tap" at={copiesAt} level={-33} />
-      <Sfx name="el-pop" at={rushedAt + 8} level={-33} />
+      <Sfx name="el-tap" at={copiesAt} level={-28} />
+      <Sfx name="el-pop" at={rushedAt + 8} level={-29} />
       <Sfx name="el-scratch" at={twoAt + 2} level={-34} />
-      <Sfx name="el-chime" at={readsAt} level={-37} />
+      <Sfx name="el-chime" at={readsAt} level={-35} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} size={60}>

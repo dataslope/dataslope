@@ -133,11 +133,11 @@ export const NfScene: React.FC = () => {
       <Sfx name="el-pencil" at={cellAt + 4} level={-35} />
       <Sfx name="el-scratch" at={twoAt + 4} level={-35} />
       <Sfx name="el-pencil" at={wholeAt + 2} level={-35} />
-      <Sfx name="el-tap" at={halfAt + 2} level={-34} />
+      <Sfx name="el-tap" at={halfAt + 2} level={-28} />
       <Sfx name="el-pencil" at={butAt + 2} level={-35} />
-      <Sfx name="el-tap" at={transAt} level={-34} />
-      <Sfx name="el-pop" at={purposeAt} level={-33} />
-      <Sfx name="el-chime" at={backAt} level={-37} />
+      <Sfx name="el-tap" at={transAt} level={-28} />
+      <Sfx name="el-pop" at={purposeAt} level={-29} />
+      <Sfx name="el-chime" at={backAt} level={-35} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={60}>

@@ -83,15 +83,15 @@ export const MismatchScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={salesAt} level={-33} />
-      <Sfx name="el-tap" at={budgetAt} level={-33} />
+      <Sfx name="el-tap" at={salesAt} level={-28} />
+      <Sfx name="el-tap" at={budgetAt} level={-28} />
       <Sfx name="el-whoosh" at={joinAt} level={-35} />
       {NAIVE.rows.map((_, i) => (
-        <Sfx key={i} name="el-tap" at={repeatsAt + i * 4} level={-37} />
+        <Sfx key={i} name="el-tap" at={repeatsAt + i * 4} level={-31} />
       ))}
-      <Sfx name="el-pop" at={sumAt + 4} level={-32} />
+      <Sfx name="el-pop" at={sumAt + 4} level={-29} />
       <Sfx name="el-pencil" at={rollAt + 4} level={-35} />
-      <Sfx name="el-chime" at={againAt} level={-36} />
+      <Sfx name="el-chime" at={againAt} level={-35} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} size={60}>

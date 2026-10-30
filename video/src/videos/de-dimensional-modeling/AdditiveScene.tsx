@@ -129,14 +129,14 @@ export const AdditiveScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={amountAt} level={-34} />
-      <Sfx name="el-tap" at={semiAt} level={-34} />
-      <Sfx name="el-pop" at={sixteenAt} level={-33} />
+      <Sfx name="el-tap" at={amountAt} level={-28} />
+      <Sfx name="el-tap" at={semiAt} level={-28} />
+      <Sfx name="el-pop" at={sixteenAt} level={-29} />
       <Sfx name="el-scratch" at={neverAt} level={-34} />
-      <Sfx name="el-pop" at={lastAt + 6} level={-34} />
-      <Sfx name="el-sprinkle" at={monAt} level={-36} />
+      <Sfx name="el-pop" at={lastAt + 6} level={-29} />
+      <Sfx name="el-sprinkle" at={monAt} level={-32} />
       <Sfx name="el-scratch" at={sixAt} level={-35} />
-      <Sfx name="el-chime" at={partsAt} level={-37} />
+      <Sfx name="el-chime" at={partsAt} level={-35} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={56}>
