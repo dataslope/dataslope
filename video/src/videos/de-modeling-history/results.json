@@ -1,0 +1,1464 @@
+{
+  "figures": {
+    "history": {
+      "setup": "CREATE TABLE dim_customer (\n  customer_key INTEGER,\n  customer_id  INTEGER,\n  city         VARCHAR,\n  valid_from   DATE,\n  valid_to     DATE,\n  is_current   BOOLEAN\n);\nINSERT INTO dim_customer VALUES\n  (1001, 42, 'Boston', DATE '2022-01-01', DATE '2024-03-14', false),\n  (1087, 42, 'Austin', DATE '2024-03-15', DATE '9999-12-31', true),\n  (2001, 99, 'Denver', DATE '2023-06-01', DATE '9999-12-31', true),\n  (3001, 17, 'Seattle', DATE '2021-04-01', DATE '2023-08-31', false),\n  (3062, 17, 'Portland', DATE '2023-09-01', DATE '9999-12-31', true),\n  (4001, 23, 'Chicago', DATE '2020-06-15', DATE '2022-12-31', false),\n  (4055, 23, 'Detroit', DATE '2023-01-01', DATE '9999-12-31', true),\n  (5001, 31, 'Miami', DATE '2022-02-01', DATE '9999-12-31', true),\n  (6001, 55, 'Phoenix', DATE '2019-03-01', DATE '2021-11-30', false),\n  (6044, 55, 'Tucson', DATE '2021-12-01', DATE '2023-09-30', false),\n  (6099, 55, 'Reno', DATE '2023-10-01', DATE '9999-12-31', true),\n  (7001, 68, 'Boise', DATE '2021-01-01', DATE '9999-12-31', true),\n  (8001, 74, 'Dallas', DATE '2020-09-01', DATE '2022-04-30', false),\n  (8033, 74, 'Houston', DATE '2022-05-01', DATE '9999-12-31', true),\n  (9001, 86, 'Atlanta', DATE '2022-07-01', DATE '9999-12-31', true),\n  (9501, 91, 'Nashville', DATE '2021-10-01', DATE '2023-03-31', false),\n  (9577, 91, 'Memphis', DATE '2023-04-01', DATE '9999-12-31', true),\n  (9801, 12, 'Denver', DATE '2020-01-01', DATE '9999-12-31', true),\n  (9901, 28, 'Omaha', DATE '2021-05-01', DATE '2022-12-31', false),\n  (9955, 28, 'Wichita', DATE '2023-01-01', DATE '9999-12-31', true),\n  (9971, 39, 'Austin', DATE '2020-08-01', DATE '9999-12-31', true),\n  (9982, 47, 'Tampa', DATE '2019-11-01', DATE '2021-06-30', false),\n  (9988, 47, 'Orlando', DATE '2021-07-01', DATE '9999-12-31', true),\n  (9994, 63, 'Raleigh', DATE '2022-03-01', DATE '9999-12-31', true);\n\nCREATE TABLE fact_orders (\n  order_id    INTEGER,\n  customer_id INTEGER,\n  order_date  DATE,\n  amount      DECIMAL(10,2)\n);\nINSERT INTO fact_orders VALUES\n  (101, 42, DATE '2023-05-10', 350.00), (102, 42, DATE '2024-06-01', 200.00),\n  (103, 99, DATE '2024-01-15', 500.00), (104, 17, DATE '2022-07-14', 640.00),\n  (105, 17, DATE '2024-03-08', 415.00), (106, 23, DATE '2021-04-19', 980.00),\n  (107, 23, DATE '2023-08-22', 275.00), (108, 31, DATE '2023-10-05', 1530.00),\n  (109, 55, DATE '2020-06-11', 720.00), (110, 55, DATE '2022-09-27', 460.00),\n  (111, 55, DATE '2024-01-16', 1105.00), (112, 68, DATE '2023-05-30', 385.00),\n  (113, 74, DATE '2021-03-24', 890.00), (114, 74, DATE '2023-12-09', 540.00),\n  (115, 86, DATE '2023-11-18', 1250.00), (116, 91, DATE '2022-12-02', 305.00),\n  (117, 91, DATE '2024-03-15', 770.00), (118, 12, DATE '2022-06-07', 1420.00),\n  (119, 28, DATE '2022-03-21', 195.00), (120, 28, DATE '2023-09-13', 660.00),\n  (121, 39, DATE '2023-02-26', 1080.00), (122, 47, DATE '2020-09-04', 425.00),\n  (123, 47, DATE '2023-06-17', 935.00), (124, 63, DATE '2023-10-28', 580.00);\nCREATE TABLE customer_t1 (customer_id INTEGER, city VARCHAR);\nINSERT INTO customer_t1 VALUES (42, 'Boston');\nCREATE TABLE customer_t3 (customer_id INTEGER, city VARCHAR, previous_city VARCHAR);\nINSERT INTO customer_t3 VALUES (42, 'Boston', NULL);",
+      "steps": {
+        "orders": {
+          "sql": "SELECT order_id, order_date, amount\nFROM fact_orders\nWHERE customer_id = 42\nORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_date",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              "2023-05-10",
+              "350.00"
+            ],
+            [
+              102,
+              "2024-06-01",
+              "200.00"
+            ]
+          ]
+        },
+        "t1Before": {
+          "sql": "SELECT customer_id, city FROM customer_t1;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "city"
+          ],
+          "rows": [
+            [
+              42,
+              "Boston"
+            ]
+          ]
+        },
+        "t1Update": {
+          "sql": "UPDATE customer_t1\nSET city = 'Austin'\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "t1After": {
+          "sql": "SELECT customer_id, city FROM customer_t1;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "city"
+          ],
+          "rows": [
+            [
+              42,
+              "Austin"
+            ]
+          ]
+        },
+        "t1Orders": {
+          "sql": "SELECT f.order_id, f.order_date, c.city, f.amount\nFROM fact_orders f\nJOIN customer_t1 c ON c.customer_id = f.customer_id\nWHERE f.customer_id = 42\nORDER BY f.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_date",
+            "city",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              "2023-05-10",
+              "Austin",
+              "350.00"
+            ],
+            [
+              102,
+              "2024-06-01",
+              "Austin",
+              "200.00"
+            ]
+          ]
+        },
+        "t1ByCity": {
+          "sql": "SELECT c.city, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN customer_t1 c ON c.customer_id = f.customer_id\nWHERE f.customer_id = 42\nGROUP BY c.city\nORDER BY c.city DESC;",
+          "ok": true,
+          "columns": [
+            "city",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "Austin",
+              "550.00"
+            ]
+          ]
+        },
+        "t2Rows": {
+          "sql": "SELECT customer_key, city, valid_from, valid_to, is_current\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "city",
+            "valid_from",
+            "valid_to",
+            "is_current"
+          ],
+          "rows": [
+            [
+              1001,
+              "Boston",
+              "2022-01-01",
+              "2024-03-14",
+              false
+            ],
+            [
+              1087,
+              "Austin",
+              "2024-03-15",
+              "9999-12-31",
+              true
+            ]
+          ]
+        },
+        "t2Orders": {
+          "sql": "SELECT f.order_id, f.order_date, d.city, f.amount\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to\nWHERE f.customer_id = 42\nORDER BY f.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_date",
+            "city",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              "2023-05-10",
+              "Boston",
+              "350.00"
+            ],
+            [
+              102,
+              "2024-06-01",
+              "Austin",
+              "200.00"
+            ]
+          ]
+        },
+        "t2ByCity": {
+          "sql": "SELECT d.city, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to\nWHERE f.customer_id = 42\nGROUP BY d.city\nORDER BY d.city DESC;",
+          "ok": true,
+          "columns": [
+            "city",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "Boston",
+              "350.00"
+            ],
+            [
+              "Austin",
+              "200.00"
+            ]
+          ]
+        },
+        "t3Update": {
+          "sql": "UPDATE customer_t3\nSET previous_city = city, city = 'Austin'\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "t3After": {
+          "sql": "SELECT customer_id, city, previous_city FROM customer_t3;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "city",
+            "previous_city"
+          ],
+          "rows": [
+            [
+              42,
+              "Austin",
+              "Boston"
+            ]
+          ]
+        },
+        "t3Again": {
+          "sql": "UPDATE customer_t3\nSET previous_city = city, city = 'Denver'\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "t3Twice": {
+          "sql": "SELECT customer_id, city, previous_city FROM customer_t3;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "city",
+            "previous_city"
+          ],
+          "rows": [
+            [
+              42,
+              "Denver",
+              "Austin"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "type2": {
+      "setup": "CREATE TABLE dim_customer (\n  customer_key INTEGER,\n  customer_id  INTEGER,\n  city         VARCHAR,\n  valid_from   DATE,\n  valid_to     DATE,\n  is_current   BOOLEAN\n);\nINSERT INTO dim_customer VALUES\n  (1001, 42, 'Boston', DATE '2022-01-01', DATE '2024-03-14', false),\n  (1087, 42, 'Austin', DATE '2024-03-15', DATE '9999-12-31', true),\n  (2001, 99, 'Denver', DATE '2023-06-01', DATE '9999-12-31', true),\n  (3001, 17, 'Seattle', DATE '2021-04-01', DATE '2023-08-31', false),\n  (3062, 17, 'Portland', DATE '2023-09-01', DATE '9999-12-31', true),\n  (4001, 23, 'Chicago', DATE '2020-06-15', DATE '2022-12-31', false),\n  (4055, 23, 'Detroit', DATE '2023-01-01', DATE '9999-12-31', true),\n  (5001, 31, 'Miami', DATE '2022-02-01', DATE '9999-12-31', true),\n  (6001, 55, 'Phoenix', DATE '2019-03-01', DATE '2021-11-30', false),\n  (6044, 55, 'Tucson', DATE '2021-12-01', DATE '2023-09-30', false),\n  (6099, 55, 'Reno', DATE '2023-10-01', DATE '9999-12-31', true),\n  (7001, 68, 'Boise', DATE '2021-01-01', DATE '9999-12-31', true),\n  (8001, 74, 'Dallas', DATE '2020-09-01', DATE '2022-04-30', false),\n  (8033, 74, 'Houston', DATE '2022-05-01', DATE '9999-12-31', true),\n  (9001, 86, 'Atlanta', DATE '2022-07-01', DATE '9999-12-31', true),\n  (9501, 91, 'Nashville', DATE '2021-10-01', DATE '2023-03-31', false),\n  (9577, 91, 'Memphis', DATE '2023-04-01', DATE '9999-12-31', true),\n  (9801, 12, 'Denver', DATE '2020-01-01', DATE '9999-12-31', true),\n  (9901, 28, 'Omaha', DATE '2021-05-01', DATE '2022-12-31', false),\n  (9955, 28, 'Wichita', DATE '2023-01-01', DATE '9999-12-31', true),\n  (9971, 39, 'Austin', DATE '2020-08-01', DATE '9999-12-31', true),\n  (9982, 47, 'Tampa', DATE '2019-11-01', DATE '2021-06-30', false),\n  (9988, 47, 'Orlando', DATE '2021-07-01', DATE '9999-12-31', true),\n  (9994, 63, 'Raleigh', DATE '2022-03-01', DATE '9999-12-31', true);\n\nCREATE TABLE fact_orders (\n  order_id    INTEGER,\n  customer_id INTEGER,\n  order_date  DATE,\n  amount      DECIMAL(10,2)\n);\nINSERT INTO fact_orders VALUES\n  (101, 42, DATE '2023-05-10', 350.00), (102, 42, DATE '2024-06-01', 200.00),\n  (103, 99, DATE '2024-01-15', 500.00), (104, 17, DATE '2022-07-14', 640.00),\n  (105, 17, DATE '2024-03-08', 415.00), (106, 23, DATE '2021-04-19', 980.00),\n  (107, 23, DATE '2023-08-22', 275.00), (108, 31, DATE '2023-10-05', 1530.00),\n  (109, 55, DATE '2020-06-11', 720.00), (110, 55, DATE '2022-09-27', 460.00),\n  (111, 55, DATE '2024-01-16', 1105.00), (112, 68, DATE '2023-05-30', 385.00),\n  (113, 74, DATE '2021-03-24', 890.00), (114, 74, DATE '2023-12-09', 540.00),\n  (115, 86, DATE '2023-11-18', 1250.00), (116, 91, DATE '2022-12-02', 305.00),\n  (117, 91, DATE '2024-03-15', 770.00), (118, 12, DATE '2022-06-07', 1420.00),\n  (119, 28, DATE '2022-03-21', 195.00), (120, 28, DATE '2023-09-13', 660.00),\n  (121, 39, DATE '2023-02-26', 1080.00), (122, 47, DATE '2020-09-04', 425.00),\n  (123, 47, DATE '2023-06-17', 935.00), (124, 63, DATE '2023-10-28', 580.00);\nDELETE FROM dim_customer WHERE customer_key = 1087;\nUPDATE dim_customer SET valid_to = DATE '9999-12-31', is_current = true WHERE customer_key = 1001;",
+      "steps": {
+        "before": {
+          "sql": "SELECT customer_key, city, valid_from, valid_to, is_current\nFROM dim_customer\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "city",
+            "valid_from",
+            "valid_to",
+            "is_current"
+          ],
+          "rows": [
+            [
+              1001,
+              "Boston",
+              "2022-01-01",
+              "9999-12-31",
+              true
+            ]
+          ]
+        },
+        "close": {
+          "sql": "UPDATE dim_customer\nSET valid_to = DATE '2024-03-14',\n    is_current = false\nWHERE customer_id = 42 AND is_current;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "insert": {
+          "sql": "INSERT INTO dim_customer VALUES\n  (1087, 42, 'Austin', DATE '2024-03-15',\n   DATE '9999-12-31', true);",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "after": {
+          "sql": "SELECT customer_key, city, valid_from, valid_to, is_current\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "city",
+            "valid_from",
+            "valid_to",
+            "is_current"
+          ],
+          "rows": [
+            [
+              1001,
+              "Boston",
+              "2022-01-01",
+              "2024-03-14",
+              false
+            ],
+            [
+              1087,
+              "Austin",
+              "2024-03-15",
+              "9999-12-31",
+              true
+            ]
+          ]
+        },
+        "samePage": {
+          "sql": "SELECT COUNT(*) AS rows FROM dim_customer;",
+          "ok": true,
+          "columns": [
+            "rows"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "pit": {
+          "sql": "SELECT f.order_id, f.order_date, d.city, f.amount\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to\nWHERE f.customer_id = 42\nORDER BY f.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_date",
+            "city",
+            "amount"
+          ],
+          "rows": [
+            [
+              101,
+              "2023-05-10",
+              "Boston",
+              "350.00"
+            ],
+            [
+              102,
+              "2024-06-01",
+              "Austin",
+              "200.00"
+            ]
+          ]
+        },
+        "pitAll": {
+          "sql": "SELECT COUNT(*) AS matched\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to;",
+          "ok": true,
+          "columns": [
+            "matched"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "orders": {
+          "sql": "SELECT COUNT(*) AS orders FROM fact_orders;",
+          "ok": true,
+          "columns": [
+            "orders"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "current": {
+          "sql": "SELECT customer_key, city\nFROM dim_customer\nWHERE customer_id = 42 AND is_current;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "city"
+          ],
+          "rows": [
+            [
+              1087,
+              "Austin"
+            ]
+          ]
+        },
+        "currentAll": {
+          "sql": "SELECT COUNT(*) AS current_rows, COUNT(DISTINCT customer_id) AS customers\nFROM dim_customer\nWHERE is_current;",
+          "ok": true,
+          "columns": [
+            "current_rows",
+            "customers"
+          ],
+          "rows": [
+            [
+              15,
+              15
+            ]
+          ]
+        },
+        "load": {
+          "sql": "SELECT f.order_id, f.order_date, d.customer_key\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to\nWHERE f.customer_id = 42\nORDER BY f.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_date",
+            "customer_key"
+          ],
+          "rows": [
+            [
+              101,
+              "2023-05-10",
+              1001
+            ],
+            [
+              102,
+              "2024-06-01",
+              1087
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "pageInsert": {
+      "setup": "CREATE TABLE dim_customer (\n  customer_key INTEGER,\n  customer_id  INTEGER,\n  city         VARCHAR,\n  valid_from   DATE,\n  valid_to     DATE,\n  is_current   BOOLEAN\n);\nINSERT INTO dim_customer VALUES\n  (1001, 42, 'Boston', DATE '2022-01-01', DATE '2024-03-14', false),\n  (1087, 42, 'Austin', DATE '2024-03-15', DATE '9999-12-31', true),\n  (2001, 99, 'Denver', DATE '2023-06-01', DATE '9999-12-31', true),\n  (3001, 17, 'Seattle', DATE '2021-04-01', DATE '2023-08-31', false),\n  (3062, 17, 'Portland', DATE '2023-09-01', DATE '9999-12-31', true),\n  (4001, 23, 'Chicago', DATE '2020-06-15', DATE '2022-12-31', false),\n  (4055, 23, 'Detroit', DATE '2023-01-01', DATE '9999-12-31', true),\n  (5001, 31, 'Miami', DATE '2022-02-01', DATE '9999-12-31', true),\n  (6001, 55, 'Phoenix', DATE '2019-03-01', DATE '2021-11-30', false),\n  (6044, 55, 'Tucson', DATE '2021-12-01', DATE '2023-09-30', false),\n  (6099, 55, 'Reno', DATE '2023-10-01', DATE '9999-12-31', true),\n  (7001, 68, 'Boise', DATE '2021-01-01', DATE '9999-12-31', true),\n  (8001, 74, 'Dallas', DATE '2020-09-01', DATE '2022-04-30', false),\n  (8033, 74, 'Houston', DATE '2022-05-01', DATE '9999-12-31', true),\n  (9001, 86, 'Atlanta', DATE '2022-07-01', DATE '9999-12-31', true),\n  (9501, 91, 'Nashville', DATE '2021-10-01', DATE '2023-03-31', false),\n  (9577, 91, 'Memphis', DATE '2023-04-01', DATE '9999-12-31', true),\n  (9801, 12, 'Denver', DATE '2020-01-01', DATE '9999-12-31', true),\n  (9901, 28, 'Omaha', DATE '2021-05-01', DATE '2022-12-31', false),\n  (9955, 28, 'Wichita', DATE '2023-01-01', DATE '9999-12-31', true),\n  (9971, 39, 'Austin', DATE '2020-08-01', DATE '9999-12-31', true),\n  (9982, 47, 'Tampa', DATE '2019-11-01', DATE '2021-06-30', false),\n  (9988, 47, 'Orlando', DATE '2021-07-01', DATE '9999-12-31', true),\n  (9994, 63, 'Raleigh', DATE '2022-03-01', DATE '9999-12-31', true);\n\nCREATE TABLE fact_orders (\n  order_id    INTEGER,\n  customer_id INTEGER,\n  order_date  DATE,\n  amount      DECIMAL(10,2)\n);\nINSERT INTO fact_orders VALUES\n  (101, 42, DATE '2023-05-10', 350.00), (102, 42, DATE '2024-06-01', 200.00),\n  (103, 99, DATE '2024-01-15', 500.00), (104, 17, DATE '2022-07-14', 640.00),\n  (105, 17, DATE '2024-03-08', 415.00), (106, 23, DATE '2021-04-19', 980.00),\n  (107, 23, DATE '2023-08-22', 275.00), (108, 31, DATE '2023-10-05', 1530.00),\n  (109, 55, DATE '2020-06-11', 720.00), (110, 55, DATE '2022-09-27', 460.00),\n  (111, 55, DATE '2024-01-16', 1105.00), (112, 68, DATE '2023-05-30', 385.00),\n  (113, 74, DATE '2021-03-24', 890.00), (114, 74, DATE '2023-12-09', 540.00),\n  (115, 86, DATE '2023-11-18', 1250.00), (116, 91, DATE '2022-12-02', 305.00),\n  (117, 91, DATE '2024-03-15', 770.00), (118, 12, DATE '2022-06-07', 1420.00),\n  (119, 28, DATE '2022-03-21', 195.00), (120, 28, DATE '2023-09-13', 660.00),\n  (121, 39, DATE '2023-02-26', 1080.00), (122, 47, DATE '2020-09-04', 425.00),\n  (123, 47, DATE '2023-06-17', 935.00), (124, 63, DATE '2023-10-28', 580.00);\nDELETE FROM dim_customer WHERE customer_key = 1087;\nUPDATE dim_customer SET valid_to = DATE '9999-12-31', is_current = true WHERE customer_key = 1001;",
+      "steps": {
+        "close": {
+          "sql": "UPDATE dim_customer\nSET valid_to = CURRENT_DATE - INTERVAL '1 day',\n    is_current = false\nWHERE customer_id = 42 AND is_current = true;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "insert": {
+          "sql": "INSERT INTO dim_customer\n  (customer_id, city, valid_from, valid_to, is_current)\nVALUES\n  (42, 'Austin', CURRENT_DATE, DATE '9999-12-31', true);",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "after": {
+          "sql": "SELECT customer_key, city, is_current FROM dim_customer WHERE customer_id = 42 ORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "city",
+            "is_current"
+          ],
+          "rows": [
+            [
+              1001,
+              "Boston",
+              false
+            ],
+            [
+              null,
+              "Austin",
+              true
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "type0": {
+      "setup": "CREATE TABLE dim_customer (\n  customer_id INTEGER PRIMARY KEY,\n  signup_date DATE\n);",
+      "steps": {
+        "first": {
+          "sql": "INSERT INTO dim_customer\nVALUES (42, DATE '2022-01-01')\nON CONFLICT DO NOTHING;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "later": {
+          "sql": "INSERT INTO dim_customer\nVALUES (42, DATE '2023-06-30')\nON CONFLICT DO NOTHING;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "rows": {
+          "sql": "SELECT customer_id, signup_date FROM dim_customer;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "signup_date"
+          ],
+          "rows": [
+            [
+              42,
+              "2022-01-01"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "types46": {
+      "setup": "CREATE TABLE dim_customer (\n  customer_key INTEGER,\n  customer_id  INTEGER,\n  city         VARCHAR,\n  valid_from   DATE,\n  valid_to     DATE,\n  is_current   BOOLEAN\n);\nINSERT INTO dim_customer VALUES\n  (1001, 42, 'Boston', DATE '2022-01-01', DATE '2024-03-14', false),\n  (1087, 42, 'Austin', DATE '2024-03-15', DATE '9999-12-31', true),\n  (2001, 99, 'Denver', DATE '2023-06-01', DATE '9999-12-31', true),\n  (3001, 17, 'Seattle', DATE '2021-04-01', DATE '2023-08-31', false),\n  (3062, 17, 'Portland', DATE '2023-09-01', DATE '9999-12-31', true),\n  (4001, 23, 'Chicago', DATE '2020-06-15', DATE '2022-12-31', false),\n  (4055, 23, 'Detroit', DATE '2023-01-01', DATE '9999-12-31', true),\n  (5001, 31, 'Miami', DATE '2022-02-01', DATE '9999-12-31', true),\n  (6001, 55, 'Phoenix', DATE '2019-03-01', DATE '2021-11-30', false),\n  (6044, 55, 'Tucson', DATE '2021-12-01', DATE '2023-09-30', false),\n  (6099, 55, 'Reno', DATE '2023-10-01', DATE '9999-12-31', true),\n  (7001, 68, 'Boise', DATE '2021-01-01', DATE '9999-12-31', true),\n  (8001, 74, 'Dallas', DATE '2020-09-01', DATE '2022-04-30', false),\n  (8033, 74, 'Houston', DATE '2022-05-01', DATE '9999-12-31', true),\n  (9001, 86, 'Atlanta', DATE '2022-07-01', DATE '9999-12-31', true),\n  (9501, 91, 'Nashville', DATE '2021-10-01', DATE '2023-03-31', false),\n  (9577, 91, 'Memphis', DATE '2023-04-01', DATE '9999-12-31', true),\n  (9801, 12, 'Denver', DATE '2020-01-01', DATE '9999-12-31', true),\n  (9901, 28, 'Omaha', DATE '2021-05-01', DATE '2022-12-31', false),\n  (9955, 28, 'Wichita', DATE '2023-01-01', DATE '9999-12-31', true),\n  (9971, 39, 'Austin', DATE '2020-08-01', DATE '9999-12-31', true),\n  (9982, 47, 'Tampa', DATE '2019-11-01', DATE '2021-06-30', false),\n  (9988, 47, 'Orlando', DATE '2021-07-01', DATE '9999-12-31', true),\n  (9994, 63, 'Raleigh', DATE '2022-03-01', DATE '9999-12-31', true);\n\nCREATE TABLE fact_orders (\n  order_id    INTEGER,\n  customer_id INTEGER,\n  order_date  DATE,\n  amount      DECIMAL(10,2)\n);\nINSERT INTO fact_orders VALUES\n  (101, 42, DATE '2023-05-10', 350.00), (102, 42, DATE '2024-06-01', 200.00),\n  (103, 99, DATE '2024-01-15', 500.00), (104, 17, DATE '2022-07-14', 640.00),\n  (105, 17, DATE '2024-03-08', 415.00), (106, 23, DATE '2021-04-19', 980.00),\n  (107, 23, DATE '2023-08-22', 275.00), (108, 31, DATE '2023-10-05', 1530.00),\n  (109, 55, DATE '2020-06-11', 720.00), (110, 55, DATE '2022-09-27', 460.00),\n  (111, 55, DATE '2024-01-16', 1105.00), (112, 68, DATE '2023-05-30', 385.00),\n  (113, 74, DATE '2021-03-24', 890.00), (114, 74, DATE '2023-12-09', 540.00),\n  (115, 86, DATE '2023-11-18', 1250.00), (116, 91, DATE '2022-12-02', 305.00),\n  (117, 91, DATE '2024-03-15', 770.00), (118, 12, DATE '2022-06-07', 1420.00),\n  (119, 28, DATE '2022-03-21', 195.00), (120, 28, DATE '2023-09-13', 660.00),\n  (121, 39, DATE '2023-02-26', 1080.00), (122, 47, DATE '2020-09-04', 425.00),\n  (123, 47, DATE '2023-06-17', 935.00), (124, 63, DATE '2023-10-28', 580.00);",
+      "steps": {
+        "t4Main": {
+          "sql": "CREATE TABLE customer AS\nSELECT customer_id, city\nFROM dim_customer WHERE is_current;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              15
+            ]
+          ]
+        },
+        "t4History": {
+          "sql": "CREATE TABLE customer_history AS\nSELECT customer_id, city, valid_from, valid_to\nFROM dim_customer;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "t4MainRows": {
+          "sql": "SELECT customer_id, city FROM customer WHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "city"
+          ],
+          "rows": [
+            [
+              42,
+              "Austin"
+            ]
+          ]
+        },
+        "t4HistoryRows": {
+          "sql": "SELECT customer_id, city, valid_from, valid_to\nFROM customer_history\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "city",
+            "valid_from",
+            "valid_to"
+          ],
+          "rows": [
+            [
+              42,
+              "Boston",
+              "2022-01-01",
+              "2024-03-14"
+            ],
+            [
+              42,
+              "Austin",
+              "2024-03-15",
+              "9999-12-31"
+            ]
+          ]
+        },
+        "t4Counts": {
+          "sql": "SELECT (SELECT COUNT(*) FROM customer) AS main_rows,\n  (SELECT COUNT(*) FROM customer_history) AS history_rows;",
+          "ok": true,
+          "columns": [
+            "main_rows",
+            "history_rows"
+          ],
+          "rows": [
+            [
+              15,
+              24
+            ]
+          ]
+        },
+        "t6Add": {
+          "sql": "ALTER TABLE dim_customer ADD COLUMN current_city VARCHAR;",
+          "ok": true,
+          "columns": [
+            "Success"
+          ],
+          "rows": []
+        },
+        "t6Fill": {
+          "sql": "UPDATE dim_customer d\nSET current_city = c.city\nFROM dim_customer c\nWHERE c.customer_id = d.customer_id\n  AND c.is_current;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              24
+            ]
+          ]
+        },
+        "t6Rows": {
+          "sql": "SELECT customer_key, city, current_city, valid_from, valid_to\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "city",
+            "current_city",
+            "valid_from",
+            "valid_to"
+          ],
+          "rows": [
+            [
+              1001,
+              "Boston",
+              "Austin",
+              "2022-01-01",
+              "2024-03-14"
+            ],
+            [
+              1087,
+              "Austin",
+              "Austin",
+              "2024-03-15",
+              "9999-12-31"
+            ]
+          ]
+        },
+        "t6Orders": {
+          "sql": "SELECT f.order_id, f.order_date, d.city, d.current_city\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to\nWHERE f.customer_id = 42\nORDER BY f.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_date",
+            "city",
+            "current_city"
+          ],
+          "rows": [
+            [
+              101,
+              "2023-05-10",
+              "Boston",
+              "Austin"
+            ],
+            [
+              102,
+              "2024-06-01",
+              "Austin",
+              "Austin"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "late": {
+      "setup": "CREATE TABLE dim_customer (\n  customer_key INTEGER,\n  customer_id  INTEGER,\n  city         VARCHAR,\n  inferred     BOOLEAN\n);\nINSERT INTO dim_customer VALUES\n  (1087, 42, 'Austin', false),\n  (2001, 99, 'Denver', false);\nCREATE TABLE staged_orders (order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2));\nINSERT INTO staged_orders VALUES\n  (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);",
+      "steps": {
+        "staged": {
+          "sql": "SELECT order_id, customer_id, amount FROM staged_orders ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "customer_id",
+            "amount"
+          ],
+          "rows": [
+            [
+              201,
+              42,
+              "200.00"
+            ],
+            [
+              202,
+              99,
+              "500.00"
+            ],
+            [
+              203,
+              77,
+              "410.00"
+            ]
+          ]
+        },
+        "dimBefore": {
+          "sql": "SELECT customer_key, customer_id, city, inferred FROM dim_customer ORDER BY customer_key;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "customer_id",
+            "city",
+            "inferred"
+          ],
+          "rows": [
+            [
+              1087,
+              42,
+              "Austin",
+              false
+            ],
+            [
+              2001,
+              99,
+              "Denver",
+              false
+            ]
+          ]
+        },
+        "load": {
+          "sql": "SELECT o.order_id, d.customer_key, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id\nORDER BY o.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "customer_key",
+            "amount"
+          ],
+          "rows": [
+            [
+              201,
+              1087,
+              "200.00"
+            ],
+            [
+              202,
+              2001,
+              "500.00"
+            ]
+          ]
+        },
+        "loadSum": {
+          "sql": "SELECT SUM(o.amount) AS loaded,\n  (SELECT SUM(amount) FROM staged_orders) AS staged\nFROM staged_orders o\nJOIN dim_customer d ON d.customer_id = o.customer_id;",
+          "ok": true,
+          "columns": [
+            "loaded",
+            "staged"
+          ],
+          "rows": [
+            [
+              "700.00",
+              "1110.00"
+            ]
+          ]
+        },
+        "placeholder": {
+          "sql": "INSERT INTO dim_customer VALUES\n  (2002, 77, 'Unknown', true);",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "dimMid": {
+          "sql": "SELECT customer_key, customer_id, city, inferred FROM dim_customer ORDER BY customer_key;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "customer_id",
+            "city",
+            "inferred"
+          ],
+          "rows": [
+            [
+              1087,
+              42,
+              "Austin",
+              false
+            ],
+            [
+              2001,
+              99,
+              "Denver",
+              false
+            ],
+            [
+              2002,
+              77,
+              "Unknown",
+              true
+            ]
+          ]
+        },
+        "reload": {
+          "sql": "CREATE TABLE fact_orders AS\nSELECT o.order_id, d.customer_key, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              3
+            ]
+          ]
+        },
+        "facts": {
+          "sql": "SELECT order_id, customer_key, amount FROM fact_orders ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "customer_key",
+            "amount"
+          ],
+          "rows": [
+            [
+              201,
+              1087,
+              "200.00"
+            ],
+            [
+              202,
+              2001,
+              "500.00"
+            ],
+            [
+              203,
+              2002,
+              "410.00"
+            ]
+          ]
+        },
+        "report": {
+          "sql": "SELECT f.order_id, d.city, f.amount\nFROM fact_orders f\nJOIN dim_customer d USING (customer_key)\nORDER BY f.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "city",
+            "amount"
+          ],
+          "rows": [
+            [
+              201,
+              "Austin",
+              "200.00"
+            ],
+            [
+              202,
+              "Denver",
+              "500.00"
+            ],
+            [
+              203,
+              "Unknown",
+              "410.00"
+            ]
+          ]
+        },
+        "arrive": {
+          "sql": "UPDATE dim_customer\nSET city = 'Tulsa', inferred = false\nWHERE customer_key = 2002;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "reportAfter": {
+          "sql": "SELECT f.order_id, d.city, f.amount\nFROM fact_orders f\nJOIN dim_customer d USING (customer_key)\nORDER BY f.order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "city",
+            "amount"
+          ],
+          "rows": [
+            [
+              201,
+              "Austin",
+              "200.00"
+            ],
+            [
+              202,
+              "Denver",
+              "500.00"
+            ],
+            [
+              203,
+              "Tulsa",
+              "410.00"
+            ]
+          ]
+        },
+        "dimAfter": {
+          "sql": "SELECT customer_key, customer_id, city, inferred FROM dim_customer ORDER BY customer_key;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "customer_id",
+            "city",
+            "inferred"
+          ],
+          "rows": [
+            [
+              1087,
+              42,
+              "Austin",
+              false
+            ],
+            [
+              2001,
+              99,
+              "Denver",
+              false
+            ],
+            [
+              2002,
+              77,
+              "Tulsa",
+              false
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "snap": {
+      "setup": "CREATE TABLE order_events (order_id INTEGER, status VARCHAR, changed_at TIMESTAMP);\nINSERT INTO order_events VALUES\n  (501, 'placed',    TIMESTAMP '2024-06-01 09:00'),\n  (501, 'paid',      TIMESTAMP '2024-06-01 09:05'),\n  (502, 'placed',    TIMESTAMP '2024-06-01 10:00'),\n  (502, 'paid',      TIMESTAMP '2024-06-01 10:02'),\n  (502, 'cancelled', TIMESTAMP '2024-06-01 16:30'),\n  (501, 'shipped',   TIMESTAMP '2024-06-02 14:00');",
+      "steps": {
+        "log": {
+          "sql": "SELECT order_id, status, changed_at\nFROM order_events\nORDER BY order_id, changed_at;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "status",
+            "changed_at"
+          ],
+          "rows": [
+            [
+              501,
+              "placed",
+              "2024-06-01 09:00"
+            ],
+            [
+              501,
+              "paid",
+              "2024-06-01 09:05"
+            ],
+            [
+              501,
+              "shipped",
+              "2024-06-02 14:00"
+            ],
+            [
+              502,
+              "placed",
+              "2024-06-01 10:00"
+            ],
+            [
+              502,
+              "paid",
+              "2024-06-01 10:02"
+            ],
+            [
+              502,
+              "cancelled",
+              "2024-06-01 16:30"
+            ]
+          ]
+        },
+        "snapshot": {
+          "sql": "CREATE TABLE order_snapshot AS\nSELECT order_id, status\nFROM order_events\nQUALIFY ROW_NUMBER() OVER (\n  PARTITION BY order_id ORDER BY changed_at DESC) = 1;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              2
+            ]
+          ]
+        },
+        "snapshotRows": {
+          "sql": "SELECT order_id, status FROM order_snapshot ORDER BY order_id;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "status"
+          ],
+          "rows": [
+            [
+              501,
+              "shipped"
+            ],
+            [
+              502,
+              "cancelled"
+            ]
+          ]
+        },
+        "paidThenCancelled": {
+          "sql": "SELECT order_id\nFROM order_events\nGROUP BY order_id\nHAVING bool_or(status = 'paid')\n   AND bool_or(status = 'cancelled');",
+          "ok": true,
+          "columns": [
+            "order_id"
+          ],
+          "rows": [
+            [
+              502
+            ]
+          ]
+        },
+        "counts": {
+          "sql": "SELECT (SELECT COUNT(*) FROM order_events) AS log_rows,\n  (SELECT COUNT(*) FROM order_snapshot) AS snapshot_rows;",
+          "ok": true,
+          "columns": [
+            "log_rows",
+            "snapshot_rows"
+          ],
+          "rows": [
+            [
+              6,
+              2
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "bridge": {
+      "setup": "CREATE TABLE fact_orders (order_key INTEGER, amount DECIMAL(10,2));\nINSERT INTO fact_orders VALUES (1, 100.00), (2, 60.00), (3, 40.00);\nCREATE TABLE dim_promotion (promo_key INTEGER, promo_name VARCHAR);\nINSERT INTO dim_promotion VALUES (10, 'SUMMER10'), (20, 'FREESHIP'), (30, 'LOYALTY');\nCREATE TABLE order_promotion_bridge (order_key INTEGER, promo_key INTEGER, weight DECIMAL(3,2));\nINSERT INTO order_promotion_bridge VALUES\n  (1, 10, 0.50), (1, 20, 0.50),\n  (2, 10, 1.00),\n  (3, 20, 0.50), (3, 30, 0.50);",
+      "steps": {
+        "orders": {
+          "sql": "SELECT order_key, amount FROM fact_orders ORDER BY order_key;",
+          "ok": true,
+          "columns": [
+            "order_key",
+            "amount"
+          ],
+          "rows": [
+            [
+              1,
+              "100.00"
+            ],
+            [
+              2,
+              "60.00"
+            ],
+            [
+              3,
+              "40.00"
+            ]
+          ]
+        },
+        "rows": {
+          "sql": "SELECT order_key, promo_key, weight FROM order_promotion_bridge ORDER BY order_key, promo_key;",
+          "ok": true,
+          "columns": [
+            "order_key",
+            "promo_key",
+            "weight"
+          ],
+          "rows": [
+            [
+              1,
+              10,
+              "0.50"
+            ],
+            [
+              1,
+              20,
+              "0.50"
+            ],
+            [
+              2,
+              10,
+              "1.00"
+            ],
+            [
+              3,
+              20,
+              "0.50"
+            ],
+            [
+              3,
+              30,
+              "0.50"
+            ]
+          ]
+        },
+        "total": {
+          "sql": "SELECT SUM(amount) AS revenue FROM fact_orders;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "200.00"
+            ]
+          ]
+        },
+        "fanout": {
+          "sql": "SELECT p.promo_name, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN order_promotion_bridge b ON b.order_key = f.order_key\nJOIN dim_promotion p          ON p.promo_key  = b.promo_key\nGROUP BY p.promo_name\nORDER BY p.promo_name DESC;",
+          "ok": true,
+          "columns": [
+            "promo_name",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "SUMMER10",
+              "160.00"
+            ],
+            [
+              "LOYALTY",
+              "40.00"
+            ],
+            [
+              "FREESHIP",
+              "140.00"
+            ]
+          ]
+        },
+        "fanoutTotal": {
+          "sql": "SELECT SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN order_promotion_bridge b ON b.order_key = f.order_key;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "340.00"
+            ]
+          ]
+        },
+        "weighted": {
+          "sql": "SELECT p.promo_name,\n       SUM(f.amount * b.weight) AS attributed_revenue\nFROM fact_orders f\nJOIN order_promotion_bridge b ON b.order_key = f.order_key\nJOIN dim_promotion p          ON p.promo_key  = b.promo_key\nGROUP BY p.promo_name\nORDER BY p.promo_name DESC;",
+          "ok": true,
+          "columns": [
+            "promo_name",
+            "attributed_revenue"
+          ],
+          "rows": [
+            [
+              "SUMMER10",
+              "110.0000"
+            ],
+            [
+              "LOYALTY",
+              "20.0000"
+            ],
+            [
+              "FREESHIP",
+              "70.0000"
+            ]
+          ]
+        },
+        "weightedTotal": {
+          "sql": "SELECT SUM(f.amount * b.weight) AS revenue\nFROM fact_orders f\nJOIN order_promotion_bridge b ON b.order_key = f.order_key;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "200.0000"
+            ]
+          ]
+        },
+        "weightSums": {
+          "sql": "SELECT order_key, SUM(weight) AS weights\nFROM order_promotion_bridge\nGROUP BY order_key\nORDER BY order_key;",
+          "ok": true,
+          "columns": [
+            "order_key",
+            "weights"
+          ],
+          "rows": [
+            [
+              1,
+              "1.00"
+            ],
+            [
+              2,
+              "1.00"
+            ],
+            [
+              3,
+              "1.00"
+            ]
+          ]
+        },
+        "usedBy": {
+          "sql": "SELECT p.promo_name, COUNT(*) AS orders\nFROM order_promotion_bridge b\nJOIN dim_promotion p ON p.promo_key = b.promo_key\nGROUP BY p.promo_name\nORDER BY p.promo_name DESC;",
+          "ok": true,
+          "columns": [
+            "promo_name",
+            "orders"
+          ],
+          "rows": [
+            [
+              "SUMMER10",
+              2
+            ],
+            [
+              "LOYALTY",
+              1
+            ],
+            [
+              "FREESHIP",
+              2
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "rapid": {
+      "setup": "CREATE TABLE fact_order_lines (order_number VARCHAR, product VARCHAR, amount DECIMAL(10,2));\nINSERT INTO fact_order_lines VALUES\n  ('INV-1001', 'kettle', 40.00), ('INV-1001', 'mugs', 18.00),\n  ('INV-1002', 'teapot', 35.00);\nCREATE TABLE dim_date (date_key INTEGER, full_date DATE, day_name VARCHAR);\nINSERT INTO dim_date VALUES\n  (20240607, DATE '2024-06-07', 'Friday'),\n  (20240610, DATE '2024-06-10', 'Monday');\nCREATE TABLE fact_shipments (order_id INTEGER, order_date_key INTEGER, ship_date_key INTEGER);\nINSERT INTO fact_shipments VALUES (301, 20240607, 20240610);\nCREATE TABLE attendance (student VARCHAR, class VARCHAR, class_date DATE);\nINSERT INTO attendance VALUES\n  ('Ada', 'Databases', DATE '2024-09-02'),\n  ('Ben', 'Databases', DATE '2024-09-02'),\n  ('Ada', 'Statistics', DATE '2024-09-03');",
+      "steps": {
+        "lines": {
+          "sql": "SELECT order_number, product, amount FROM fact_order_lines;",
+          "ok": true,
+          "columns": [
+            "order_number",
+            "product",
+            "amount"
+          ],
+          "rows": [
+            [
+              "INV-1001",
+              "kettle",
+              "40.00"
+            ],
+            [
+              "INV-1001",
+              "mugs",
+              "18.00"
+            ],
+            [
+              "INV-1002",
+              "teapot",
+              "35.00"
+            ]
+          ]
+        },
+        "degenerate": {
+          "sql": "SELECT order_number, COUNT(*) AS lines, SUM(amount) AS total\nFROM fact_order_lines\nGROUP BY order_number\nORDER BY order_number;",
+          "ok": true,
+          "columns": [
+            "order_number",
+            "lines",
+            "total"
+          ],
+          "rows": [
+            [
+              "INV-1001",
+              2,
+              "58.00"
+            ],
+            [
+              "INV-1002",
+              1,
+              "35.00"
+            ]
+          ]
+        },
+        "junk": {
+          "sql": "SELECT COUNT(*) AS junk_rows\nFROM (VALUES ('card'), ('cash'), ('voucher')) p(payment),\n     (VALUES (true), (false)) g(is_gift),\n     (VALUES ('web'), ('store')) c(channel);",
+          "ok": true,
+          "columns": [
+            "junk_rows"
+          ],
+          "rows": [
+            [
+              12
+            ]
+          ]
+        },
+        "shipments": {
+          "sql": "SELECT order_id, order_date_key, ship_date_key FROM fact_shipments;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "order_date_key",
+            "ship_date_key"
+          ],
+          "rows": [
+            [
+              301,
+              20240607,
+              20240610
+            ]
+          ]
+        },
+        "dates": {
+          "sql": "SELECT date_key, full_date, day_name FROM dim_date ORDER BY date_key;",
+          "ok": true,
+          "columns": [
+            "date_key",
+            "full_date",
+            "day_name"
+          ],
+          "rows": [
+            [
+              20240607,
+              "2024-06-07",
+              "Friday"
+            ],
+            [
+              20240610,
+              "2024-06-10",
+              "Monday"
+            ]
+          ]
+        },
+        "role": {
+          "sql": "SELECT f.order_id,\n       od.day_name AS ordered,\n       sd.day_name AS shipped\nFROM fact_shipments f\nJOIN dim_date od ON od.date_key = f.order_date_key\nJOIN dim_date sd ON sd.date_key = f.ship_date_key;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "ordered",
+            "shipped"
+          ],
+          "rows": [
+            [
+              301,
+              "Friday",
+              "Monday"
+            ]
+          ]
+        },
+        "mini": {
+          "sql": "SELECT COUNT(*) AS mini_rows\nFROM (VALUES ('18-24'), ('25-34'), ('35-49'), ('50-64'), ('65+')) a(age_band),\n     (VALUES ('low'), ('middle'), ('high'), ('top')) i(income_tier);",
+          "ok": true,
+          "columns": [
+            "mini_rows"
+          ],
+          "rows": [
+            [
+              20
+            ]
+          ]
+        },
+        "factless": {
+          "sql": "SELECT student, class, class_date FROM attendance ORDER BY class_date, student;",
+          "ok": true,
+          "columns": [
+            "student",
+            "class",
+            "class_date"
+          ],
+          "rows": [
+            [
+              "Ada",
+              "Databases",
+              "2024-09-02"
+            ],
+            [
+              "Ben",
+              "Databases",
+              "2024-09-02"
+            ],
+            [
+              "Ada",
+              "Statistics",
+              "2024-09-03"
+            ]
+          ]
+        },
+        "factlessCount": {
+          "sql": "SELECT class, COUNT(*) AS attended\nFROM attendance\nGROUP BY class\nORDER BY class;",
+          "ok": true,
+          "columns": [
+            "class",
+            "attended"
+          ],
+          "rows": [
+            [
+              "Databases",
+              2
+            ],
+            [
+              "Statistics",
+              1
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "uuid": {
+      "setup": "CREATE TABLE seq_keys (id bigint PRIMARY KEY);\nINSERT INTO seq_keys SELECT g FROM generate_series(1, 100000) g;\nCREATE TABLE uuid_keys (id uuid PRIMARY KEY);\nINSERT INTO uuid_keys SELECT md5(g::text)::uuid FROM generate_series(1, 100000) g;\nCREATE TABLE uuid7_keys (id uuid PRIMARY KEY);\nINSERT INTO uuid7_keys SELECT uuidv7() FROM generate_series(1, 100000) g;",
+      "steps": {
+        "bytes": {
+          "sql": "SELECT pg_column_size(1::integer) AS integer_bytes,\n  pg_column_size(1::bigint) AS bigint_bytes,\n  pg_column_size(gen_random_uuid()) AS uuid_bytes;",
+          "ok": true,
+          "columns": [
+            "integer_bytes",
+            "bigint_bytes",
+            "uuid_bytes"
+          ],
+          "rows": [
+            [
+              "4",
+              "8",
+              "16"
+            ]
+          ]
+        },
+        "index": {
+          "sql": "SELECT pg_relation_size('seq_keys_pkey') AS sequence,\n  pg_relation_size('uuid_keys_pkey') AS random_uuid,\n  pg_relation_size('uuid7_keys_pkey') AS uuid_v7;",
+          "ok": true,
+          "columns": [
+            "sequence",
+            "random_uuid",
+            "uuid_v7"
+          ],
+          "rows": [
+            [
+              "2260992",
+              "4423680",
+              "3178496"
+            ]
+          ]
+        },
+        "sample": {
+          "sql": "SELECT id FROM uuid_keys ORDER BY id LIMIT 1;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              "00003e3b-9e53-3668-5200-ae85d21b4f5e"
+            ]
+          ]
+        },
+        "seqSample": {
+          "sql": "SELECT id FROM seq_keys ORDER BY id DESC LIMIT 1;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              "100000"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    }
+  },
+  "engines": {
+    "duckdb": "v1.4.3",
+    "postgres": "PostgreSQL 18.3"
+  }
+}

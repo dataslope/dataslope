@@ -1,0 +1,483 @@
+{
+  "runtime": "Pyodide / Python 3.14.2 / NumPy 2.4.6",
+  "fresh": {
+    "printed": [
+      "embed:  ['doc1#1', 'doc3#0']",
+      "delete: ['doc2#0']"
+    ],
+    "indexed": {
+      "doc1#0": "aa",
+      "doc1#1": "bb",
+      "doc2#0": "cc"
+    },
+    "current": {
+      "doc1#0": "aa",
+      "doc1#1": "zz",
+      "doc3#0": "dd"
+    },
+    "toEmbed": [
+      "doc1#1",
+      "doc3#0"
+    ],
+    "toDelete": [
+      "doc2#0"
+    ],
+    "unchanged": [
+      "doc1#0"
+    ],
+    "block": [
+      "# chunk id -> content hash",
+      "indexed = {\"doc1#0\": \"aa\", \"doc1#1\": \"bb\", \"doc2#0\": \"cc\"}  # in the vector index",
+      "current = {\"doc1#0\": \"aa\", \"doc1#1\": \"zz\", \"doc3#0\": \"dd\"}  # in the sources now",
+      "",
+      "to_embed = sorted(cid for cid, h in current.items() if indexed.get(cid) != h)",
+      "to_delete = sorted(cid for cid in indexed if cid not in current)",
+      "",
+      "print(\"embed: \", to_embed)   # changed or new",
+      "print(\"delete:\", to_delete)  # gone from the source"
+    ]
+  },
+  "switch": {
+    "axes": [
+      "animal",
+      "size",
+      "domestic"
+    ],
+    "newAxes": [
+      "size",
+      "domestic",
+      "animal"
+    ],
+    "words": [
+      {
+        "word": "cat",
+        "vec": [
+          0.9,
+          0.2,
+          0.9
+        ]
+      },
+      {
+        "word": "kitten",
+        "vec": [
+          0.9,
+          0.1,
+          0.9
+        ]
+      },
+      {
+        "word": "dog",
+        "vec": [
+          0.9,
+          0.4,
+          0.9
+        ]
+      },
+      {
+        "word": "wolf",
+        "vec": [
+          0.9,
+          0.5,
+          0.1
+        ]
+      },
+      {
+        "word": "truck",
+        "vec": [
+          0,
+          0.9,
+          0.2
+        ]
+      }
+    ],
+    "kittenOld": [
+      0.9,
+      0.1,
+      0.9
+    ],
+    "kittenNew": [
+      0.1,
+      0.9,
+      0.9
+    ],
+    "dist": {
+      "cat": 1.063,
+      "kitten": 1.131,
+      "dog": 0.943,
+      "wolf": 1.2,
+      "truck": 0.707
+    },
+    "nearest": "truck",
+    "nearestSame": "cat"
+  },
+  "ann": {
+    "n": 20000,
+    "d": 32,
+    "centers": 100,
+    "queries": 200,
+    "k": 10,
+    "lists": 100,
+    "listSize": {
+      "min": 61,
+      "max": 365
+    },
+    "probes": [
+      {
+        "probe": 1,
+        "recall": 0.694,
+        "work": 0.0102
+      },
+      {
+        "probe": 2,
+        "recall": 0.787,
+        "work": 0.0202
+      },
+      {
+        "probe": 4,
+        "recall": 0.858,
+        "work": 0.0404
+      },
+      {
+        "probe": 8,
+        "recall": 0.915,
+        "work": 0.0807
+      },
+      {
+        "probe": 16,
+        "recall": 0.96,
+        "work": 0.1615
+      },
+      {
+        "probe": 32,
+        "recall": 0.987,
+        "work": 0.3243
+      }
+    ]
+  },
+  "filter": {
+    "tenants": 100,
+    "k": 10,
+    "emptyShare": 0.91,
+    "meanKept": 0.09,
+    "keptHist": {
+      "0": 182,
+      "1": 18
+    },
+    "kept": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "emptyChance": 0.904
+  },
+  "hybrid": {
+    "k": 60,
+    "tickets": {
+      "#1182": "App crashes after the update",
+      "#2071": "Error message when syncing",
+      "#0934": "Update failed with an error",
+      "#3310": "E-4031 when pairing a sensor",
+      "#1457": "Sync error every morning",
+      "#2650": "Pairing a second sensor",
+      "#0412": "List of error codes",
+      "#1890": "Sensor pairing times out"
+    },
+    "vector": [
+      "#1182",
+      "#2071",
+      "#0934",
+      "#3310",
+      "#1457"
+    ],
+    "keyword": [
+      "#3310",
+      "#2650",
+      "#0412",
+      "#2071",
+      "#1890"
+    ],
+    "fused": [
+      {
+        "ticket": "#3310",
+        "score": 0.032,
+        "vectorRank": 4,
+        "keywordRank": 1
+      },
+      {
+        "ticket": "#2071",
+        "score": 0.0318,
+        "vectorRank": 2,
+        "keywordRank": 4
+      },
+      {
+        "ticket": "#1182",
+        "score": 0.0164,
+        "vectorRank": 1,
+        "keywordRank": null
+      },
+      {
+        "ticket": "#2650",
+        "score": 0.0161,
+        "vectorRank": null,
+        "keywordRank": 2
+      },
+      {
+        "ticket": "#0934",
+        "score": 0.0159,
+        "vectorRank": 3,
+        "keywordRank": null
+      },
+      {
+        "ticket": "#0412",
+        "score": 0.0159,
+        "vectorRank": null,
+        "keywordRank": 3
+      },
+      {
+        "ticket": "#1457",
+        "score": 0.0154,
+        "vectorRank": 5,
+        "keywordRank": null
+      },
+      {
+        "ticket": "#1890",
+        "score": 0.0154,
+        "vectorRank": null,
+        "keywordRank": 5
+      }
+    ],
+    "idf": {
+      "N": 8,
+      "error": {
+        "df": 4,
+        "idf": 0.69
+      },
+      "code": {
+        "df": 1,
+        "idf": 2.08
+      }
+    }
+  },
+  "backfill": {
+    "chunks": 10000000,
+    "tokensPerChunk": 400,
+    "tokens": 4000000000,
+    "millions": 4000,
+    "rate": 1000000,
+    "minutes": 4000,
+    "hours": 66.7,
+    "days": 2.78
+  },
+  "chunk": {
+    "proseChars": 900,
+    "proseTokens": 201,
+    "charsPerToken": 4.48,
+    "low": 300,
+    "high": 500,
+    "overlapLow": 0.1,
+    "overlapHigh": 0.2,
+    "chars400": 1791
+  },
+  "practice": {
+    "bank": 110,
+    "topics": 9,
+    "withChecks": 9
+  }
+}

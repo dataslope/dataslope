@@ -1,0 +1,772 @@
+{
+  "duckdb": [
+    "v1.4.3"
+  ],
+  "idempotency": {
+    "setup": "CREATE TABLE events_stage (event_date DATE, user_id INTEGER, event_type VARCHAR);\nINSERT INTO events_stage VALUES\n  (DATE '2024-06-01', 1, 'click'), (DATE '2024-06-01', 1, 'click'),\n  (DATE '2024-06-01', 2, 'view'),  (DATE '2024-06-01', 3, 'view'),\n  (DATE '2024-06-01', 3, 'click'), (DATE '2024-06-01', 4, 'purchase'),\n  (DATE '2024-06-01', 5, 'view'),  (DATE '2024-06-01', 2, 'click'),\n  (DATE '2024-06-02', 1, 'purchase'), (DATE '2024-06-02', 3, 'click'),\n  (DATE '2024-06-02', 4, 'view'),  (DATE '2024-06-02', 5, 'click'),\n  (DATE '2024-06-02', 6, 'view'),  (DATE '2024-06-02', 2, 'purchase'),\n  (DATE '2024-06-03', 2, 'click'), (DATE '2024-06-03', 6, 'click'),\n  (DATE '2024-06-03', 7, 'view'),  (DATE '2024-06-03', 1, 'view'),\n  (DATE '2024-06-04', 3, 'purchase'), (DATE '2024-06-04', 7, 'click'),\n  (DATE '2024-06-04', 8, 'view'),  (DATE '2024-06-05', 4, 'click'),\n  (DATE '2024-06-05', 8, 'purchase'), (DATE '2024-06-05', 5, 'view');\nCREATE TABLE events (event_date DATE, user_id INTEGER, event_type VARCHAR);",
+    "steps": {
+      "perDay": {
+        "sql": "SELECT event_date, COUNT(*) AS events FROM events_stage GROUP BY event_date ORDER BY event_date",
+        "ok": true,
+        "columns": [
+          "event_date",
+          "events"
+        ],
+        "rows": [
+          [
+            "2024-06-01",
+            8
+          ],
+          [
+            "2024-06-02",
+            6
+          ],
+          [
+            "2024-06-03",
+            4
+          ],
+          [
+            "2024-06-04",
+            3
+          ],
+          [
+            "2024-06-05",
+            3
+          ]
+        ]
+      },
+      "blind1": {
+        "sql": "INSERT INTO events\nSELECT * FROM events_stage\nWHERE event_date = '2024-06-01';",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      },
+      "blindCount1": {
+        "sql": "SELECT COUNT(*) AS events FROM events WHERE event_date = '2024-06-01'",
+        "ok": true,
+        "columns": [
+          "events"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      },
+      "blind2": {
+        "sql": "INSERT INTO events\nSELECT * FROM events_stage\nWHERE event_date = '2024-06-01';",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      },
+      "blindCount2": {
+        "sql": "SELECT COUNT(*) AS events FROM events WHERE event_date = '2024-06-01'",
+        "ok": true,
+        "columns": [
+          "events"
+        ],
+        "rows": [
+          [
+            16
+          ]
+        ]
+      },
+      "reset": {
+        "sql": "DELETE FROM events",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            16
+          ]
+        ]
+      },
+      "over1Delete": {
+        "sql": "DELETE FROM events\nWHERE event_date = '2024-06-01';",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            0
+          ]
+        ]
+      },
+      "over1Insert": {
+        "sql": "INSERT INTO events\nSELECT * FROM events_stage\nWHERE event_date = '2024-06-01';",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      },
+      "overCount1": {
+        "sql": "SELECT COUNT(*) AS events FROM events WHERE event_date = '2024-06-01'",
+        "ok": true,
+        "columns": [
+          "events"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      },
+      "over2Delete": {
+        "sql": "DELETE FROM events\nWHERE event_date = '2024-06-01';",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      },
+      "over2Insert": {
+        "sql": "INSERT INTO events\nSELECT * FROM events_stage\nWHERE event_date = '2024-06-01';",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      },
+      "overCount2": {
+        "sql": "SELECT COUNT(*) AS events FROM events WHERE event_date = '2024-06-01'",
+        "ok": true,
+        "columns": [
+          "events"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      },
+      "txBegin": {
+        "sql": "BEGIN TRANSACTION",
+        "ok": true,
+        "columns": [
+          "Success"
+        ],
+        "rows": []
+      },
+      "txDelete": {
+        "sql": "DELETE FROM events\nWHERE event_date = '2024-06-01';",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      },
+      "txInsertFails": {
+        "sql": "INSERT INTO events SELECT * FROM events_stage_missing WHERE event_date = '2024-06-01'",
+        "ok": false,
+        "error": "Catalog Error: Table with name events_stage_missing does not exist!"
+      },
+      "txRollback": {
+        "sql": "ROLLBACK",
+        "ok": true,
+        "columns": [
+          "Success"
+        ],
+        "rows": []
+      },
+      "txCount": {
+        "sql": "SELECT COUNT(*) AS events FROM events WHERE event_date = '2024-06-01'",
+        "ok": true,
+        "columns": [
+          "events"
+        ],
+        "rows": [
+          [
+            8
+          ]
+        ]
+      }
+    },
+    "version": "v1.4.3"
+  },
+  "upsert": {
+    "setup": "CREATE TABLE orders (order_id INTEGER PRIMARY KEY, status VARCHAR, updated_at TIMESTAMP);\nCREATE TABLE orders_stage (order_id INTEGER, status VARCHAR, updated_at TIMESTAMP);\nINSERT INTO orders_stage VALUES\n  (101, 'paid', TIMESTAMP '2024-06-01 09:10:00'),\n  (102, 'shipped', TIMESTAMP '2024-06-01 11:45:00'),\n  (103, 'paid', TIMESTAMP '2024-06-01 16:20:00');",
+    "steps": {
+      "run1": {
+        "sql": "INSERT INTO orders (order_id, status, updated_at)\nSELECT order_id, status, updated_at\nFROM orders_stage\nON CONFLICT (order_id)\nDO UPDATE SET\n  status     = EXCLUDED.status,\n  updated_at = EXCLUDED.updated_at",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            3
+          ]
+        ]
+      },
+      "count1": {
+        "sql": "SELECT COUNT(*) AS orders FROM orders",
+        "ok": true,
+        "columns": [
+          "orders"
+        ],
+        "rows": [
+          [
+            3
+          ]
+        ]
+      },
+      "run2": {
+        "sql": "INSERT INTO orders (order_id, status, updated_at)\nSELECT order_id, status, updated_at\nFROM orders_stage\nON CONFLICT (order_id)\nDO UPDATE SET\n  status     = EXCLUDED.status,\n  updated_at = EXCLUDED.updated_at",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            3
+          ]
+        ]
+      },
+      "count2": {
+        "sql": "SELECT COUNT(*) AS orders FROM orders",
+        "ok": true,
+        "columns": [
+          "orders"
+        ],
+        "rows": [
+          [
+            3
+          ]
+        ]
+      },
+      "merge": {
+        "sql": "MERGE INTO orders USING orders_stage AS s ON orders.order_id = s.order_id\nWHEN MATCHED THEN UPDATE SET status = s.status, updated_at = s.updated_at\nWHEN NOT MATCHED THEN INSERT VALUES (s.order_id, s.status, s.updated_at)",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            3
+          ]
+        ]
+      },
+      "count3": {
+        "sql": "SELECT COUNT(*) AS orders FROM orders",
+        "ok": true,
+        "columns": [
+          "orders"
+        ],
+        "rows": [
+          [
+            3
+          ]
+        ]
+      }
+    },
+    "version": "v1.4.3"
+  },
+  "cdc": {
+    "setup": "CREATE TABLE orders (order_id INTEGER, status VARCHAR, updated_at TIMESTAMP);\nINSERT INTO orders VALUES\n  (1, 'paid', TIMESTAMP '2024-05-31 14:02:00'),\n  (2, 'paid', TIMESTAMP '2024-05-31 16:40:00'),\n  (3, 'paid', TIMESTAMP '2024-05-31 18:15:00');",
+    "steps": {
+      "before": {
+        "sql": "SELECT * FROM orders ORDER BY order_id",
+        "ok": true,
+        "columns": [
+          "order_id",
+          "status",
+          "updated_at"
+        ],
+        "rows": [
+          [
+            1,
+            "paid",
+            "2024-05-31 14:02:00"
+          ],
+          [
+            2,
+            "paid",
+            "2024-05-31 16:40:00"
+          ],
+          [
+            3,
+            "paid",
+            "2024-05-31 18:15:00"
+          ]
+        ]
+      },
+      "update2": {
+        "sql": "UPDATE orders SET status = 'shipped', updated_at = TIMESTAMP '2024-06-01 08:15:00' WHERE order_id = 2",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            1
+          ]
+        ]
+      },
+      "insert4": {
+        "sql": "INSERT INTO orders VALUES (4, 'paid', TIMESTAMP '2024-06-01 09:30:00')",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            1
+          ]
+        ]
+      },
+      "delete3": {
+        "sql": "DELETE FROM orders WHERE order_id = 3",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            1
+          ]
+        ]
+      },
+      "after": {
+        "sql": "SELECT * FROM orders ORDER BY order_id",
+        "ok": true,
+        "columns": [
+          "order_id",
+          "status",
+          "updated_at"
+        ],
+        "rows": [
+          [
+            1,
+            "paid",
+            "2024-05-31 14:02:00"
+          ],
+          [
+            2,
+            "shipped",
+            "2024-06-01 08:15:00"
+          ],
+          [
+            4,
+            "paid",
+            "2024-06-01 09:30:00"
+          ]
+        ]
+      },
+      "poll": {
+        "sql": "SELECT * FROM orders\nWHERE updated_at > '2024-06-01 00:00:00'\nORDER BY order_id",
+        "ok": true,
+        "columns": [
+          "order_id",
+          "status",
+          "updated_at"
+        ],
+        "rows": [
+          [
+            2,
+            "shipped",
+            "2024-06-01 08:15:00"
+          ],
+          [
+            4,
+            "paid",
+            "2024-06-01 09:30:00"
+          ]
+        ]
+      }
+    },
+    "version": "v1.4.3"
+  },
+  "parquet": {
+    "setup": "COPY (SELECT * FROM (VALUES (1, 'paid', 20.00::DECIMAL(8,2)), (2, 'paid', 35.50::DECIMAL(8,2))) t(order_id, status, amount)) TO 'day1.parquet' (FORMAT parquet);\nCOPY (SELECT * FROM (VALUES (3, 'paid', 12.00::DECIMAL(8,2), 'SAVE10')) t(order_id, status, amount, coupon)) TO 'day2.parquet' (FORMAT parquet);\nCOPY (SELECT * FROM (VALUES (4, 'paid', 48.00::DECIMAL(8,2), 'WELCOME')) t(order_id, status, total, coupon)) TO 'day3.parquet' (FORMAT parquet);",
+    "steps": {
+      "day1": {
+        "sql": "DESCRIBE SELECT * FROM 'day1.parquet'",
+        "ok": true,
+        "columns": [
+          "column_name",
+          "column_type",
+          "null",
+          "key",
+          "default",
+          "extra"
+        ],
+        "rows": [
+          [
+            "order_id",
+            "INTEGER",
+            "YES",
+            null,
+            null,
+            null
+          ],
+          [
+            "status",
+            "VARCHAR",
+            "YES",
+            null,
+            null,
+            null
+          ],
+          [
+            "amount",
+            "DECIMAL(8,2)",
+            "YES",
+            null,
+            null,
+            null
+          ]
+        ]
+      },
+      "day2": {
+        "sql": "DESCRIBE SELECT * FROM 'day2.parquet'",
+        "ok": true,
+        "columns": [
+          "column_name",
+          "column_type",
+          "null",
+          "key",
+          "default",
+          "extra"
+        ],
+        "rows": [
+          [
+            "order_id",
+            "INTEGER",
+            "YES",
+            null,
+            null,
+            null
+          ],
+          [
+            "status",
+            "VARCHAR",
+            "YES",
+            null,
+            null,
+            null
+          ],
+          [
+            "amount",
+            "DECIMAL(8,2)",
+            "YES",
+            null,
+            null,
+            null
+          ],
+          [
+            "coupon",
+            "VARCHAR",
+            "YES",
+            null,
+            null,
+            null
+          ]
+        ]
+      },
+      "day3": {
+        "sql": "DESCRIBE SELECT * FROM 'day3.parquet'",
+        "ok": true,
+        "columns": [
+          "column_name",
+          "column_type",
+          "null",
+          "key",
+          "default",
+          "extra"
+        ],
+        "rows": [
+          [
+            "order_id",
+            "INTEGER",
+            "YES",
+            null,
+            null,
+            null
+          ],
+          [
+            "status",
+            "VARCHAR",
+            "YES",
+            null,
+            null,
+            null
+          ],
+          [
+            "total",
+            "DECIMAL(8,2)",
+            "YES",
+            null,
+            null,
+            null
+          ],
+          [
+            "coupon",
+            "VARCHAR",
+            "YES",
+            null,
+            null,
+            null
+          ]
+        ]
+      },
+      "plain": {
+        "sql": "SELECT * FROM read_parquet(\n  ['day1.parquet', 'day2.parquet'])",
+        "ok": true,
+        "columns": [
+          "order_id",
+          "status",
+          "amount"
+        ],
+        "rows": [
+          [
+            1,
+            "paid",
+            "20.00"
+          ],
+          [
+            2,
+            "paid",
+            "35.50"
+          ],
+          [
+            3,
+            "paid",
+            "12.00"
+          ]
+        ]
+      },
+      "plainReversed": {
+        "sql": "SELECT * FROM read_parquet(['day2.parquet', 'day1.parquet'])",
+        "ok": false,
+        "error": "Invalid Input Error: Failed to read file \"day1.parquet\": schema mismatch in glob: column \"coupon\" was read from the original file \"day2.parquet\", but could not be found in file \"day1.parquet\"."
+      },
+      "byName": {
+        "sql": "SELECT * FROM read_parquet(\n  ['day1.parquet', 'day2.parquet'],\n  union_by_name = true)",
+        "ok": true,
+        "columns": [
+          "order_id",
+          "status",
+          "amount",
+          "coupon"
+        ],
+        "rows": [
+          [
+            1,
+            "paid",
+            "20.00",
+            null
+          ],
+          [
+            2,
+            "paid",
+            "35.50",
+            null
+          ],
+          [
+            3,
+            "paid",
+            "12.00",
+            "SAVE10"
+          ]
+        ]
+      },
+      "renamed": {
+        "sql": "SELECT * FROM read_parquet(\n  ['day1.parquet', 'day2.parquet', 'day3.parquet'],\n  union_by_name = true)",
+        "ok": true,
+        "columns": [
+          "order_id",
+          "status",
+          "amount",
+          "coupon",
+          "total"
+        ],
+        "rows": [
+          [
+            1,
+            "paid",
+            "20.00",
+            null,
+            null
+          ],
+          [
+            2,
+            "paid",
+            "35.50",
+            null,
+            null
+          ],
+          [
+            3,
+            "paid",
+            "12.00",
+            "SAVE10",
+            null
+          ],
+          [
+            4,
+            "paid",
+            null,
+            "WELCOME",
+            "48.00"
+          ]
+        ]
+      }
+    },
+    "version": "v1.4.3"
+  },
+  "source": {
+    "setup": "CREATE TABLE orders_raw (order_id INTEGER, status VARCHAR, amount DECIMAL(8,2));\nCREATE TABLE orders_clean (order_id INTEGER, status VARCHAR, amount DECIMAL(8,2));\nINSERT INTO orders_raw VALUES (1, 'paid', 20.00), (2, 'paid', 35.50);",
+    "steps": {
+      "before": {
+        "sql": "INSERT INTO orders_clean SELECT * FROM orders_raw",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            2
+          ]
+        ]
+      },
+      "reset": {
+        "sql": "DELETE FROM orders_clean",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            2
+          ]
+        ]
+      },
+      "alter": {
+        "sql": "ALTER TABLE orders_raw ADD COLUMN coupon VARCHAR",
+        "ok": true,
+        "columns": [
+          "Success"
+        ],
+        "rows": []
+      },
+      "newRow": {
+        "sql": "INSERT INTO orders_raw VALUES (3, 'paid', 12.00, 'SAVE10')",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            1
+          ]
+        ]
+      },
+      "raw": {
+        "sql": "SELECT * FROM orders_raw ORDER BY order_id",
+        "ok": true,
+        "columns": [
+          "order_id",
+          "status",
+          "amount",
+          "coupon"
+        ],
+        "rows": [
+          [
+            1,
+            "paid",
+            "20.00",
+            null
+          ],
+          [
+            2,
+            "paid",
+            "35.50",
+            null
+          ],
+          [
+            3,
+            "paid",
+            "12.00",
+            "SAVE10"
+          ]
+        ]
+      },
+      "star": {
+        "sql": "INSERT INTO orders_clean\nSELECT * FROM orders_raw;",
+        "ok": false,
+        "error": "Binder Error: table orders_clean has 3 columns but 4 values were supplied"
+      },
+      "named": {
+        "sql": "INSERT INTO orders_clean\nSELECT order_id, status, amount\nFROM orders_raw;",
+        "ok": true,
+        "columns": [
+          "Count"
+        ],
+        "rows": [
+          [
+            3
+          ]
+        ]
+      },
+      "clean": {
+        "sql": "SELECT * FROM orders_clean ORDER BY order_id",
+        "ok": true,
+        "columns": [
+          "order_id",
+          "status",
+          "amount"
+        ],
+        "rows": [
+          [
+            1,
+            "paid",
+            "20.00"
+          ],
+          [
+            2,
+            "paid",
+            "35.50"
+          ],
+          [
+            3,
+            "paid",
+            "12.00"
+          ]
+        ]
+      }
+    },
+    "version": "v1.4.3"
+  }
+}

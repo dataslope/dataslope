@@ -1,0 +1,357 @@
+{
+ "runtime": {
+  "python": "3.14.2"
+ },
+ "mapreduce": {
+  "rows": [
+   {
+    "index": 0,
+    "dept": "Eng",
+    "salary": 120
+   },
+   {
+    "index": 1,
+    "dept": "Sales",
+    "salary": 95
+   },
+   {
+    "index": 2,
+    "dept": "Eng",
+    "salary": 140
+   },
+   {
+    "index": 3,
+    "dept": "Ops",
+    "salary": 80
+   },
+   {
+    "index": 4,
+    "dept": "Eng",
+    "salary": 128
+   },
+   {
+    "index": 5,
+    "dept": "Sales",
+    "salary": 110
+   },
+   {
+    "index": 6,
+    "dept": "Ops",
+    "salary": 92
+   }
+  ],
+  "splits": [
+   [
+    0,
+    1,
+    2
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    5,
+    6
+   ]
+  ],
+  "groups": [
+   {
+    "dept": "Eng",
+    "values": [
+     120,
+     140,
+     128
+    ],
+    "from": [
+     0,
+     0,
+     1
+    ]
+   },
+   {
+    "dept": "Ops",
+    "values": [
+     80,
+     92
+    ],
+    "from": [
+     1,
+     2
+    ]
+   },
+   {
+    "dept": "Sales",
+    "values": [
+     95,
+     110
+    ],
+    "from": [
+     0,
+     2
+    ]
+   }
+  ],
+  "reduced": [
+   {
+    "dept": "Eng",
+    "salary": 388
+   },
+   {
+    "dept": "Ops",
+    "salary": 172
+   },
+   {
+    "dept": "Sales",
+    "salary": 205
+   }
+  ],
+  "shuffled": 7,
+  "combined": [
+   [
+    {
+     "dept": "Eng",
+     "salary": 260
+    },
+    {
+     "dept": "Sales",
+     "salary": 95
+    }
+   ],
+   [
+    {
+     "dept": "Ops",
+     "salary": 80
+    },
+    {
+     "dept": "Eng",
+     "salary": 128
+    }
+   ],
+   [
+    {
+     "dept": "Sales",
+     "salary": 110
+    },
+    {
+     "dept": "Ops",
+     "salary": 92
+    }
+   ]
+  ],
+  "combinedShuffled": 6
+ },
+ "reduceModel": {
+  "events": 1000000,
+  "keys": 1000,
+  "partitions": 4,
+  "perPartition": 250000,
+  "groupByKey": 1000000,
+  "reduceByKey": 4000,
+  "ratio": 250,
+  "repeats": 250,
+  "biggestKey": 1095
+ },
+ "skew": {
+  "rows": 1000000,
+  "users": 10000,
+  "partitions": 8,
+  "hotShare": 0.3001,
+  "guestRows": 300079,
+  "guestPartition": 0,
+  "before": [
+   387836,
+   87661,
+   87255,
+   87274,
+   87468,
+   87810,
+   87071,
+   87625
+  ],
+  "after": [
+   125222,
+   125263,
+   124508,
+   124813,
+   125082,
+   125402,
+   124401,
+   125309
+  ],
+  "mean": 125000,
+  "maxBefore": 387836,
+  "maxAfter": 125402,
+  "ratioBefore": 3.1,
+  "ratioAfter": 1,
+  "shareBefore": 0.3878,
+  "shareAfter": 0.1254,
+  "salts": 8,
+  "saltPartitions": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "partials": [
+   37592,
+   37330,
+   37684,
+   37465,
+   37602,
+   37253,
+   37539,
+   37614
+  ],
+  "total": 300079
+ },
+ "tail": {
+  "p": 0.01,
+  "half": 69,
+  "atHalf": 0.5002,
+  "tasks": 200,
+  "at200": 0.866,
+  "curve": [
+   0,
+   0.0394,
+   0.0773,
+   0.1136,
+   0.1485,
+   0.1821,
+   0.2143,
+   0.2453,
+   0.275,
+   0.3036,
+   0.331,
+   0.3574,
+   0.3827,
+   0.407,
+   0.4304,
+   0.4528,
+   0.4744,
+   0.4951,
+   0.515,
+   0.5341,
+   0.5525,
+   0.5701,
+   0.5871,
+   0.6033,
+   0.619,
+   0.634,
+   0.6484,
+   0.6622,
+   0.6756,
+   0.6883,
+   0.7006,
+   0.7124,
+   0.7237,
+   0.7346,
+   0.7451,
+   0.7551,
+   0.7648,
+   0.7741,
+   0.783,
+   0.7915,
+   0.7997,
+   0.8076,
+   0.8152,
+   0.8225,
+   0.8295,
+   0.8362,
+   0.8426,
+   0.8488,
+   0.8548,
+   0.8605,
+   0.866
+  ],
+  "step": 4,
+  "max": 200
+ },
+ "ladder": {
+  "levels": [
+   {
+    "name": "Register",
+    "ns": 0.3,
+    "scaled": "300 ms"
+   },
+   {
+    "name": "L1 cache",
+    "ns": 1,
+    "scaled": "1 s"
+   },
+   {
+    "name": "L2 cache",
+    "ns": 4,
+    "scaled": "4 s"
+   },
+   {
+    "name": "L3 cache",
+    "ns": 30,
+    "scaled": "30 s"
+   },
+   {
+    "name": "Main memory",
+    "ns": 100,
+    "scaled": "2 min"
+   },
+   {
+    "name": "NVMe SSD read",
+    "ns": 100000,
+    "scaled": "27.8 hours"
+   },
+   {
+    "name": "Network round trip",
+    "ns": 10000000,
+    "scaled": "116 days"
+   }
+  ],
+  "ssdOverMemory": 1000,
+  "networkOverMemory": 100000,
+  "ssdOrders": 3,
+  "networkOrders": 5
+ },
+ "partitions": {
+  "gb": 16,
+  "cores": 16,
+  "cases": [
+   {
+    "partitions": 4,
+    "mb": 4000,
+    "busy": 4,
+    "idle": 12,
+    "perCore": 0.25
+   },
+   {
+    "partitions": 64,
+    "mb": 250,
+    "busy": 16,
+    "idle": 0,
+    "perCore": 4
+   },
+   {
+    "partitions": 100000,
+    "mb": 0.16,
+    "busy": 16,
+    "idle": 0,
+    "perCore": 6250
+   }
+  ]
+ },
+ "broadcast": {
+  "factTB": 2,
+  "dimMB": 20,
+  "executors": 50,
+  "broadcastMB": 1000,
+  "shuffleMB": 2000020,
+  "ratio": 2000
+ },
+ "source": {
+  "frame": "src/videos/pandas-groupby/measurements.json (pandas 3.0.5)",
+  "ladder": "charts/memory-latency-ladder.mjs",
+  "fanout": "charts/tail-latency-fanout.mjs"
+ }
+}

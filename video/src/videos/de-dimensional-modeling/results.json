@@ -1,0 +1,1201 @@
+{
+  "figures": {
+    "scd": {
+      "steps": {
+        "page": {
+          "sql": "SELECT f.order_id, f.order_date, d.city, f.amount\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to\nORDER BY f.order_id;",
+          "ok": true,
+          "cols": [
+            "order_id",
+            "order_date",
+            "city",
+            "amount"
+          ],
+          "rows": [
+            [
+              "101",
+              "2023-05-10",
+              "Boston",
+              "350.00"
+            ],
+            [
+              "102",
+              "2024-06-01",
+              "Austin",
+              "200.00"
+            ],
+            [
+              "103",
+              "2024-01-15",
+              "Denver",
+              "500.00"
+            ],
+            [
+              "104",
+              "2022-07-14",
+              "Seattle",
+              "640.00"
+            ],
+            [
+              "105",
+              "2024-03-08",
+              "Portland",
+              "415.00"
+            ],
+            [
+              "106",
+              "2021-04-19",
+              "Chicago",
+              "980.00"
+            ],
+            [
+              "107",
+              "2023-08-22",
+              "Detroit",
+              "275.00"
+            ],
+            [
+              "108",
+              "2023-10-05",
+              "Miami",
+              "1530.00"
+            ],
+            [
+              "109",
+              "2020-06-11",
+              "Phoenix",
+              "720.00"
+            ],
+            [
+              "110",
+              "2022-09-27",
+              "Tucson",
+              "460.00"
+            ],
+            [
+              "111",
+              "2024-01-16",
+              "Reno",
+              "1105.00"
+            ],
+            [
+              "112",
+              "2023-05-30",
+              "Boise",
+              "385.00"
+            ],
+            [
+              "113",
+              "2021-03-24",
+              "Dallas",
+              "890.00"
+            ],
+            [
+              "114",
+              "2023-12-09",
+              "Houston",
+              "540.00"
+            ],
+            [
+              "115",
+              "2023-11-18",
+              "Atlanta",
+              "1250.00"
+            ],
+            [
+              "116",
+              "2022-12-02",
+              "Nashville",
+              "305.00"
+            ],
+            [
+              "117",
+              "2024-03-15",
+              "Memphis",
+              "770.00"
+            ],
+            [
+              "118",
+              "2022-06-07",
+              "Denver",
+              "1420.00"
+            ],
+            [
+              "119",
+              "2022-03-21",
+              "Omaha",
+              "195.00"
+            ],
+            [
+              "120",
+              "2023-09-13",
+              "Wichita",
+              "660.00"
+            ],
+            [
+              "121",
+              "2023-02-26",
+              "Austin",
+              "1080.00"
+            ],
+            [
+              "122",
+              "2020-09-04",
+              "Tampa",
+              "425.00"
+            ],
+            [
+              "123",
+              "2023-06-17",
+              "Orlando",
+              "935.00"
+            ],
+            [
+              "124",
+              "2023-10-28",
+              "Raleigh",
+              "580.00"
+            ]
+          ]
+        },
+        "versions": {
+          "sql": "SELECT customer_key, customer_id, city\nFROM dim_customer\nWHERE customer_id = 42\nORDER BY valid_from;",
+          "ok": true,
+          "cols": [
+            "customer_key",
+            "customer_id",
+            "city"
+          ],
+          "rows": [
+            [
+              "1001",
+              "42",
+              "Boston"
+            ],
+            [
+              "1087",
+              "42",
+              "Austin"
+            ]
+          ]
+        },
+        "orders": {
+          "sql": "SELECT f.order_id, f.order_date, d.customer_key, d.city\nFROM fact_orders f\nJOIN dim_customer d\n  ON  d.customer_id = f.customer_id\n  AND f.order_date BETWEEN d.valid_from AND d.valid_to\nWHERE f.customer_id = 42\nORDER BY f.order_id;",
+          "ok": true,
+          "cols": [
+            "order_id",
+            "order_date",
+            "customer_key",
+            "city"
+          ],
+          "rows": [
+            [
+              "101",
+              "2023-05-10",
+              "1001",
+              "Boston"
+            ],
+            [
+              "102",
+              "2024-06-01",
+              "1087",
+              "Austin"
+            ]
+          ]
+        },
+        "repeats": {
+          "sql": "SELECT COUNT(*) AS ids, COUNT(*) FILTER (WHERE n > 1) AS repeated\nFROM (SELECT customer_id, COUNT(*) AS n FROM dim_customer GROUP BY customer_id);",
+          "ok": true,
+          "cols": [
+            "ids",
+            "repeated"
+          ],
+          "rows": [
+            [
+              "15",
+              "8"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "grainPage": {
+      "steps": {
+        "page": {
+          "sql": "WITH daily_sales AS (\n  SELECT sale_date, region, SUM(amount) AS total_sales\n  FROM fact_sales\n  GROUP BY sale_date, region\n)\nSELECT b.sale_date, b.region, b.budget, ds.total_sales\nFROM fact_budget b\nJOIN daily_sales ds\n  ON ds.sale_date = b.sale_date AND ds.region = b.region\nORDER BY b.sale_date, b.region;",
+          "ok": true,
+          "cols": [
+            "sale_date",
+            "region",
+            "budget",
+            "total_sales"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "North",
+              "150.00",
+              "60.00"
+            ],
+            [
+              "2024-01-01",
+              "South",
+              "173.00",
+              "97.00"
+            ],
+            [
+              "2024-01-02",
+              "North",
+              "196.00",
+              "134.00"
+            ],
+            [
+              "2024-01-02",
+              "South",
+              "219.00",
+              "171.00"
+            ],
+            [
+              "2024-01-03",
+              "North",
+              "242.00",
+              "208.00"
+            ],
+            [
+              "2024-01-03",
+              "South",
+              "265.00",
+              "65.00"
+            ],
+            [
+              "2024-01-04",
+              "North",
+              "288.00",
+              "102.00"
+            ],
+            [
+              "2024-01-04",
+              "South",
+              "311.00",
+              "139.00"
+            ],
+            [
+              "2024-01-05",
+              "North",
+              "334.00",
+              "176.00"
+            ],
+            [
+              "2024-01-05",
+              "South",
+              "157.00",
+              "213.00"
+            ],
+            [
+              "2024-01-06",
+              "North",
+              "180.00",
+              "70.00"
+            ],
+            [
+              "2024-01-06",
+              "South",
+              "203.00",
+              "107.00"
+            ],
+            [
+              "2024-01-07",
+              "North",
+              "226.00",
+              "144.00"
+            ],
+            [
+              "2024-01-07",
+              "South",
+              "249.00",
+              "181.00"
+            ],
+            [
+              "2024-01-08",
+              "North",
+              "272.00",
+              "218.00"
+            ],
+            [
+              "2024-01-08",
+              "South",
+              "295.00",
+              "75.00"
+            ],
+            [
+              "2024-01-09",
+              "North",
+              "318.00",
+              "112.00"
+            ],
+            [
+              "2024-01-09",
+              "South",
+              "341.00",
+              "149.00"
+            ],
+            [
+              "2024-01-10",
+              "North",
+              "164.00",
+              "186.00"
+            ],
+            [
+              "2024-01-10",
+              "South",
+              "187.00",
+              "223.00"
+            ],
+            [
+              "2024-01-11",
+              "North",
+              "210.00",
+              "80.00"
+            ],
+            [
+              "2024-01-11",
+              "South",
+              "233.00",
+              "117.00"
+            ],
+            [
+              "2024-01-12",
+              "North",
+              "256.00",
+              "154.00"
+            ],
+            [
+              "2024-01-12",
+              "South",
+              "279.00",
+              "191.00"
+            ]
+          ]
+        },
+        "salesPerKey": {
+          "sql": "SELECT MAX(n) AS most_rows_per_day_and_region FROM (SELECT COUNT(*) AS n FROM fact_sales GROUP BY sale_date, region);",
+          "ok": true,
+          "cols": [
+            "most_rows_per_day_and_region"
+          ],
+          "rows": [
+            [
+              "1"
+            ]
+          ]
+        },
+        "naive": {
+          "sql": "SELECT COUNT(*) AS joined_rows, SUM(b.budget) AS budget\nFROM fact_budget b\nJOIN fact_sales s ON s.sale_date = b.sale_date AND s.region = b.region;",
+          "ok": true,
+          "cols": [
+            "joined_rows",
+            "budget"
+          ],
+          "rows": [
+            [
+              "24",
+              "5748.00"
+            ]
+          ]
+        },
+        "budget": {
+          "sql": "SELECT COUNT(*) AS rows, SUM(budget) AS budget FROM fact_budget;",
+          "ok": true,
+          "cols": [
+            "rows",
+            "budget"
+          ],
+          "rows": [
+            [
+              "24",
+              "5748.00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "datePage": {
+      "steps": {
+        "page": {
+          "sql": "SELECT d.fiscal_quarter, SUM(f.amount) AS revenue\nFROM fact_orders f\nJOIN dim_date d ON d.date_key = f.order_date_key\nWHERE d.is_holiday = false\nGROUP BY d.fiscal_quarter\nORDER BY d.fiscal_quarter;",
+          "ok": true,
+          "cols": [
+            "fiscal_quarter",
+            "revenue"
+          ],
+          "rows": [
+            [
+              "Q1",
+              "1260.00"
+            ],
+            [
+              "Q2",
+              "840.00"
+            ],
+            [
+              "Q3",
+              "265.00"
+            ],
+            [
+              "Q4",
+              "250.00"
+            ]
+          ]
+        },
+        "holidays": {
+          "sql": "SELECT COUNT(*) AS holidays FROM dim_date WHERE is_holiday;",
+          "ok": true,
+          "cols": [
+            "holidays"
+          ],
+          "rows": [
+            [
+              "8"
+            ]
+          ]
+        },
+        "aovAll": {
+          "sql": "SELECT SUM(amount) AS revenue, COUNT(*) AS orders, ROUND(SUM(amount) / COUNT(*), 2) AS aov FROM fact_orders;",
+          "ok": true,
+          "cols": [
+            "revenue",
+            "orders",
+            "aov"
+          ],
+          "rows": [
+            [
+              "4465.00",
+              "24",
+              "186.04"
+            ]
+          ]
+        },
+        "aovWorking": {
+          "sql": "SELECT SUM(f.amount) AS revenue, COUNT(*) AS orders, ROUND(SUM(f.amount) / COUNT(*), 2) AS aov\nFROM fact_orders f JOIN dim_date d ON d.date_key = f.order_date_key\nWHERE NOT d.is_holiday;",
+          "ok": true,
+          "cols": [
+            "revenue",
+            "orders",
+            "aov"
+          ],
+          "rows": [
+            [
+              "2615.00",
+              "16",
+              "163.44"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "lines": {
+      "steps": {
+        "rows": {
+          "sql": "SELECT * FROM fact_order_lines ORDER BY order_id, line;",
+          "ok": true,
+          "cols": [
+            "order_id",
+            "line",
+            "product",
+            "quantity",
+            "amount",
+            "shipping_fee"
+          ],
+          "rows": [
+            [
+              "1001",
+              "1",
+              "Notebook",
+              "2",
+              "16.00",
+              "5.00"
+            ],
+            [
+              "1001",
+              "2",
+              "Pen",
+              "3",
+              "4.50",
+              "5.00"
+            ],
+            [
+              "1001",
+              "3",
+              "Mug",
+              "1",
+              "12.00",
+              "5.00"
+            ]
+          ]
+        },
+        "totals": {
+          "sql": "SELECT SUM(quantity) AS quantity, SUM(amount) AS amount, SUM(shipping_fee) AS shipping_fee FROM fact_order_lines;",
+          "ok": true,
+          "cols": [
+            "quantity",
+            "amount",
+            "shipping_fee"
+          ],
+          "rows": [
+            [
+              "6",
+              "32.50",
+              "15.00"
+            ]
+          ]
+        },
+        "orders": {
+          "sql": "SELECT order_id, MAX(shipping_fee) AS shipping_fee\nFROM fact_order_lines GROUP BY order_id;",
+          "ok": true,
+          "cols": [
+            "order_id",
+            "shipping_fee"
+          ],
+          "rows": [
+            [
+              "1001",
+              "5.00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "mismatch": {
+      "steps": {
+        "sales": {
+          "sql": "SELECT sale_date, region, amount FROM fact_sales ORDER BY sale_id;",
+          "ok": true,
+          "cols": [
+            "sale_date",
+            "region",
+            "amount"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "North",
+              "40.00"
+            ],
+            [
+              "2024-01-01",
+              "North",
+              "25.00"
+            ],
+            [
+              "2024-01-01",
+              "North",
+              "35.00"
+            ],
+            [
+              "2024-01-02",
+              "North",
+              "60.00"
+            ],
+            [
+              "2024-01-02",
+              "North",
+              "30.00"
+            ]
+          ]
+        },
+        "budget": {
+          "sql": "SELECT sale_date, region, budget FROM fact_budget ORDER BY sale_date;",
+          "ok": true,
+          "cols": [
+            "sale_date",
+            "region",
+            "budget"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "North",
+              "150.00"
+            ],
+            [
+              "2024-01-02",
+              "North",
+              "120.00"
+            ]
+          ]
+        },
+        "naive": {
+          "sql": "SELECT s.sale_date, s.amount, b.budget\nFROM fact_sales s\nJOIN fact_budget b\n  ON b.sale_date = s.sale_date AND b.region = s.region\nORDER BY s.sale_id;",
+          "ok": true,
+          "cols": [
+            "sale_date",
+            "amount",
+            "budget"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "40.00",
+              "150.00"
+            ],
+            [
+              "2024-01-01",
+              "25.00",
+              "150.00"
+            ],
+            [
+              "2024-01-01",
+              "35.00",
+              "150.00"
+            ],
+            [
+              "2024-01-02",
+              "60.00",
+              "120.00"
+            ],
+            [
+              "2024-01-02",
+              "30.00",
+              "120.00"
+            ]
+          ]
+        },
+        "naiveTotals": {
+          "sql": "SELECT SUM(s.amount) AS sales, SUM(b.budget) AS budget\nFROM fact_sales s\nJOIN fact_budget b\n  ON b.sale_date = s.sale_date AND b.region = s.region;",
+          "ok": true,
+          "cols": [
+            "sales",
+            "budget"
+          ],
+          "rows": [
+            [
+              "190.00",
+              "690.00"
+            ]
+          ]
+        },
+        "fixed": {
+          "sql": "WITH daily_sales AS (\n  SELECT sale_date, region, SUM(amount) AS sales\n  FROM fact_sales\n  GROUP BY sale_date, region\n)\nSELECT b.sale_date, b.budget, d.sales\nFROM fact_budget b\nJOIN daily_sales d\n  ON d.sale_date = b.sale_date AND d.region = b.region\nORDER BY b.sale_date;",
+          "ok": true,
+          "cols": [
+            "sale_date",
+            "budget",
+            "sales"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "150.00",
+              "100.00"
+            ],
+            [
+              "2024-01-02",
+              "120.00",
+              "90.00"
+            ]
+          ]
+        },
+        "fixedTotals": {
+          "sql": "WITH daily_sales AS (\n  SELECT sale_date, region, SUM(amount) AS sales\n  FROM fact_sales\n  GROUP BY sale_date, region\n)\nSELECT SUM(d.sales) AS sales, SUM(b.budget) AS budget\nFROM fact_budget b\nJOIN daily_sales d\n  ON d.sale_date = b.sale_date AND d.region = b.region;",
+          "ok": true,
+          "cols": [
+            "sales",
+            "budget"
+          ],
+          "rows": [
+            [
+              "190.00",
+              "270.00"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "norm": {
+      "steps": {
+        "flat": {
+          "sql": "SELECT * FROM orders_flat ORDER BY order_id;",
+          "ok": true,
+          "cols": [
+            "order_id",
+            "product_name",
+            "customer_name",
+            "customer_email"
+          ],
+          "rows": [
+            [
+              "1",
+              "Notebook",
+              "Ada",
+              "ada@old.test"
+            ],
+            [
+              "2",
+              "Pencil",
+              "Ada",
+              "ada@old.test"
+            ],
+            [
+              "3",
+              "Notebook",
+              "Grace",
+              "grace@test.test"
+            ]
+          ]
+        },
+        "customers": {
+          "sql": "SELECT * FROM customers ORDER BY customer_id;",
+          "ok": true,
+          "cols": [
+            "customer_id",
+            "name",
+            "email"
+          ],
+          "rows": [
+            [
+              "1",
+              "Ada",
+              "ada@old.test"
+            ],
+            [
+              "2",
+              "Grace",
+              "grace@test.test"
+            ]
+          ]
+        },
+        "orders": {
+          "sql": "SELECT * FROM orders ORDER BY order_id;",
+          "ok": true,
+          "cols": [
+            "order_id",
+            "product_name",
+            "customer_id"
+          ],
+          "rows": [
+            [
+              "1",
+              "Notebook",
+              "1"
+            ],
+            [
+              "2",
+              "Pencil",
+              "1"
+            ],
+            [
+              "3",
+              "Notebook",
+              "2"
+            ]
+          ]
+        },
+        "join": {
+          "sql": "SELECT o.order_id, o.product_name, c.name, c.email\nFROM orders o\nJOIN customers c ON c.customer_id = o.customer_id\nORDER BY o.order_id;",
+          "ok": true,
+          "cols": [
+            "order_id",
+            "product_name",
+            "name",
+            "email"
+          ],
+          "rows": [
+            [
+              "1",
+              "Notebook",
+              "Ada",
+              "ada@old.test"
+            ],
+            [
+              "2",
+              "Pencil",
+              "Ada",
+              "ada@old.test"
+            ],
+            [
+              "3",
+              "Notebook",
+              "Grace",
+              "grace@test.test"
+            ]
+          ]
+        },
+        "update": {
+          "sql": "UPDATE orders_flat SET customer_email = 'ada@new.test' WHERE order_id = 1;",
+          "ok": true,
+          "cols": [
+            "Count"
+          ],
+          "rows": [
+            [
+              "1"
+            ]
+          ]
+        },
+        "flatAfter": {
+          "sql": "SELECT * FROM orders_flat ORDER BY order_id;",
+          "ok": true,
+          "cols": [
+            "order_id",
+            "product_name",
+            "customer_name",
+            "customer_email"
+          ],
+          "rows": [
+            [
+              "1",
+              "Notebook",
+              "Ada",
+              "ada@new.test"
+            ],
+            [
+              "2",
+              "Pencil",
+              "Ada",
+              "ada@old.test"
+            ],
+            [
+              "3",
+              "Notebook",
+              "Grace",
+              "grace@test.test"
+            ]
+          ]
+        },
+        "emails": {
+          "sql": "SELECT COUNT(DISTINCT customer_email) AS emails FROM orders_flat WHERE customer_name = 'Ada';",
+          "ok": true,
+          "cols": [
+            "emails"
+          ],
+          "rows": [
+            [
+              "2"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "account": {
+      "steps": {
+        "transactions": {
+          "sql": "SELECT txn_date, account, amount FROM fact_transactions WHERE account = 'Ada' ORDER BY txn_date;",
+          "ok": true,
+          "cols": [
+            "txn_date",
+            "account",
+            "amount"
+          ],
+          "rows": [
+            [
+              "2024-01-05",
+              "Ada",
+              "1000.00"
+            ],
+            [
+              "2024-02-03",
+              "Ada",
+              "300.00"
+            ],
+            [
+              "2024-02-20",
+              "Ada",
+              "-100.00"
+            ],
+            [
+              "2024-03-12",
+              "Ada",
+              "-300.00"
+            ]
+          ]
+        },
+        "snapshotAda": {
+          "sql": "SELECT month_end, account, balance FROM fact_balance WHERE account = 'Ada' ORDER BY month_end;",
+          "ok": true,
+          "cols": [
+            "month_end",
+            "account",
+            "balance"
+          ],
+          "rows": [
+            [
+              "2024-01-31",
+              "Ada",
+              "1000.00"
+            ],
+            [
+              "2024-02-29",
+              "Ada",
+              "1200.00"
+            ],
+            [
+              "2024-03-31",
+              "Ada",
+              "900.00"
+            ]
+          ]
+        },
+        "balance": {
+          "sql": "SELECT month_end, account, balance FROM fact_balance ORDER BY month_end, account;",
+          "ok": true,
+          "cols": [
+            "month_end",
+            "account",
+            "balance"
+          ],
+          "rows": [
+            [
+              "2024-01-31",
+              "Ada",
+              "1000.00"
+            ],
+            [
+              "2024-01-31",
+              "Ben",
+              "500.00"
+            ],
+            [
+              "2024-02-29",
+              "Ada",
+              "1200.00"
+            ],
+            [
+              "2024-02-29",
+              "Ben",
+              "500.00"
+            ],
+            [
+              "2024-03-31",
+              "Ada",
+              "900.00"
+            ],
+            [
+              "2024-03-31",
+              "Ben",
+              "700.00"
+            ]
+          ]
+        },
+        "flows": {
+          "sql": "SELECT SUM(amount) AS amount FROM fact_transactions;",
+          "ok": true,
+          "cols": [
+            "amount"
+          ],
+          "rows": [
+            [
+              "1600.00"
+            ]
+          ]
+        },
+        "acrossAccounts": {
+          "sql": "SELECT SUM(balance) AS balance FROM fact_balance WHERE month_end = DATE '2024-03-31';",
+          "ok": true,
+          "cols": [
+            "balance"
+          ],
+          "rows": [
+            [
+              "1600.00"
+            ]
+          ]
+        },
+        "overTime": {
+          "sql": "SELECT SUM(balance) AS balance FROM fact_balance;",
+          "ok": true,
+          "cols": [
+            "balance"
+          ],
+          "rows": [
+            [
+              "4800.00"
+            ]
+          ]
+        },
+        "closing": {
+          "sql": "SELECT account, arg_max(balance, month_end) AS closing\nFROM fact_balance\nGROUP BY account\nORDER BY account;",
+          "ok": true,
+          "cols": [
+            "account",
+            "closing"
+          ],
+          "rows": [
+            [
+              "Ada",
+              "900.00"
+            ],
+            [
+              "Ben",
+              "700.00"
+            ]
+          ]
+        },
+        "closingTotal": {
+          "sql": "SELECT SUM(closing) AS balance FROM (\n  SELECT arg_max(balance, month_end) AS closing\n  FROM fact_balance GROUP BY account);",
+          "ok": true,
+          "cols": [
+            "balance"
+          ],
+          "rows": [
+            [
+              "1600.00"
+            ]
+          ]
+        },
+        "average": {
+          "sql": "SELECT account, ROUND(AVG(balance), 2) AS average FROM fact_balance GROUP BY account ORDER BY account;",
+          "ok": true,
+          "cols": [
+            "account",
+            "average"
+          ],
+          "rows": [
+            [
+              "Ada",
+              "1033.33"
+            ],
+            [
+              "Ben",
+              "566.67"
+            ]
+          ]
+        },
+        "applied": {
+          "sql": "SELECT * FROM fact_loan_application;",
+          "ok": true,
+          "cols": [
+            "application_id",
+            "applied",
+            "approved",
+            "funded"
+          ],
+          "rows": [
+            [
+              "7",
+              "2024-03-04",
+              null,
+              null
+            ]
+          ]
+        },
+        "approve": {
+          "sql": "UPDATE fact_loan_application SET approved = DATE '2024-03-11' WHERE application_id = 7;",
+          "ok": true,
+          "cols": [
+            "Count"
+          ],
+          "rows": [
+            [
+              "1"
+            ]
+          ]
+        },
+        "approved": {
+          "sql": "SELECT * FROM fact_loan_application;",
+          "ok": true,
+          "cols": [
+            "application_id",
+            "applied",
+            "approved",
+            "funded"
+          ],
+          "rows": [
+            [
+              "7",
+              "2024-03-04",
+              "2024-03-11",
+              null
+            ]
+          ]
+        },
+        "fund": {
+          "sql": "UPDATE fact_loan_application SET funded = DATE '2024-03-20' WHERE application_id = 7;",
+          "ok": true,
+          "cols": [
+            "Count"
+          ],
+          "rows": [
+            [
+              "1"
+            ]
+          ]
+        },
+        "funded": {
+          "sql": "SELECT * FROM fact_loan_application;",
+          "ok": true,
+          "cols": [
+            "application_id",
+            "applied",
+            "approved",
+            "funded"
+          ],
+          "rows": [
+            [
+              "7",
+              "2024-03-04",
+              "2024-03-11",
+              "2024-03-20"
+            ]
+          ]
+        },
+        "stages": {
+          "sql": "SELECT date_diff('day', applied, approved) AS days_to_approve,\n       date_diff('day', approved, funded) AS days_to_fund\nFROM fact_loan_application;",
+          "ok": true,
+          "cols": [
+            "days_to_approve",
+            "days_to_fund"
+          ],
+          "rows": [
+            [
+              "7",
+              "9"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "visits": {
+      "steps": {
+        "perDay": {
+          "sql": "SELECT day, COUNT(DISTINCT user_name) AS users FROM visits GROUP BY day ORDER BY day;",
+          "ok": true,
+          "cols": [
+            "day",
+            "users"
+          ],
+          "rows": [
+            [
+              "Mon",
+              "3"
+            ],
+            [
+              "Tue",
+              "3"
+            ]
+          ]
+        },
+        "both": {
+          "sql": "SELECT COUNT(DISTINCT user_name) AS users FROM visits;",
+          "ok": true,
+          "cols": [
+            "users"
+          ],
+          "rows": [
+            [
+              "4"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    }
+  },
+  "version": "v1.4.3"
+}
