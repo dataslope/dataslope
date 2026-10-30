@@ -88,8 +88,14 @@ engine **prunes** partitions that can't match and scans only the relevant
 ones, turning a full scan into a fraction of the work. A good key is one
 queries **filter on often**, with reasonably even, not-too-small
 partitions. Over-partitioning creates the **small files problem** (metadata
-overhead dominates). Applying a function to the partition column in the
-filter (e.g. `YEAR(event_date)`) usually defeats pruning.
+overhead dominates). Whether a function on the partition column in the
+filter (e.g. `YEAR(event_date)`) still prunes depends on the engine:
+Postgres's declarative partitioning matches only predicates on the key
+itself and scans every partition, while DuckDB evaluates the function
+against each partition's value and still skips the rest. A range on the
+raw column (`event_date >= '2024-01-01' AND event_date < '2025-01-01'`)
+prunes on every engine, so it is the habit to keep, and the query plan shows
+which happened.
 
 ### What is clustering (or sorting) within a partition?
 
@@ -236,7 +242,9 @@ A **materialized view** stores the pre-computed result of a query on disk,
 so reads are fast, at the cost of **staleness** and refresh work when base
 data changes. Use it for expensive aggregations queried frequently where
 some latency is acceptable. It trades storage + refresh cost for query
-speed, essentially a managed, auto-refreshing cache of a query result.
+speed, essentially a cache of a query result. Who refreshes it depends on
+the engine: Postgres keeps it stale until you run `REFRESH MATERIALIZED
+VIEW`, while some cloud warehouses maintain it in the background.
 
 ### What is a data lake vs a warehouse vs a lakehouse?
 
@@ -286,7 +294,7 @@ warehouse reliability on lake-cost open storage.
 - \`YEAR()\` is not a valid SQL function.
   > It's valid; the issue is that applying it to the partition key blocks pruning.
 - [o] Wrapping the partition column in a function (\`YEAR(...)\`) prevents the engine from matching the filter to partitions.
-  > The optimizer can't map \`YEAR(event_date)\` back to raw partition values, so it can't prune; filter on the raw column with a range instead.`}
+  > This engine's optimizer can't map \`YEAR(event_date)\` back to partition boundaries, so it can't prune. Postgres behaves this way; DuckDB evaluates the function per partition and still prunes. A range on the raw column prunes on every engine.`}
 />
 
 ## Challenges
@@ -317,7 +325,7 @@ FROM sales
 GROUP BY category
 ORDER BY revenue DESC;`}
   tests={[
-    { id: "rows", name: "One row per category", description: "Three categories yield three rows", expectedRowCount: 5 },
+    { id: "rows", name: "One row per category", description: "Five categories yield five rows", expectedRowCount: 5 },
     { id: "cols", name: "Has the required columns", description: "category and revenue", expectedColumnsInclude: ["category", "revenue"] },
   ]}
 />

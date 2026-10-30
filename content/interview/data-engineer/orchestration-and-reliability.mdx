@@ -81,8 +81,6 @@ The failure it prevents compounds. Without idempotent writes, a retry
 after a partial success does not repair the run, it duplicates part of
 it.
 
-<Chart slug="idempotency-retry-storm" />
-
 ### What is a backfill, and how do you design for it?
 
 A **backfill** reprocesses historical data, to populate a new table, fix a
@@ -108,6 +106,13 @@ errors), they'll just fail again and waste time/money. And only retry
 tasks that are **idempotent**; retrying a non-idempotent task can duplicate
 data. Pair retries with alerting so repeated failures surface instead of
 silently exhausting attempts.
+
+Add **jitter**, a random part of each delay, when many tasks or clients
+retry against the same service. Without it, everyone who failed together
+waits the same interval and comes back in the same instant, so the
+recovering service is hit by the full load again.
+
+<Chart slug="idempotency-retry-storm" />
 
 ```python
 default_args = {

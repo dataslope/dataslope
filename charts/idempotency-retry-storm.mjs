@@ -16,7 +16,7 @@
 import { Plot, plot, rng, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
-  "Retry arrivals per 100ms bucket for a thousand clients, with and without jitter. Without jitter the retries land in three tall spikes far above the service's capacity; with jitter they spread into a flat band below it.";
+  "Retry arrivals per 100ms bucket for a thousand clients, with and without jitter. Without jitter the retries land in three tall spikes far above the service's capacity; with jitter they spread across the window, peaking far lower and falling below it by the third round.";
 
 const CLIENTS = 1000;
 const CAPACITY = 90;

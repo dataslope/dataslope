@@ -9,15 +9,15 @@
  *
  * The saw-tooth is the part the answer usually omits. Incremental models drift:
  * late-arriving facts land outside the filter window, a dimension is corrected
- * retroactively, the transformation logic itself changes. So a monthly
- * `--full-refresh` is scheduled deliberately, and the chart shows what it costs
+ * retroactively, the transformation logic itself changes. So a periodic
+ * `--full-refresh` (every 60 days here) is scheduled deliberately, and the chart shows what it costs
  * when it lands. "Incremental" is not "never rebuild"; it is "rebuild on a
  * schedule you chose rather than on every run".
  */
 import { Plot, plot, ACCENT, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
-  "Rows processed per daily run over two years. The full-rebuild line climbs steadily as history accumulates, while the incremental line stays flat at one day of arrivals apart from a monthly spike where a scheduled full refresh lands.";
+  "Rows processed per daily run over two years. The full-rebuild line climbs steadily as history accumulates, while the incremental line stays flat at one day of arrivals apart from a spike every 60 days where a scheduled full refresh lands.";
 
 const DAYS = 730;
 const DAILY = 8_000;

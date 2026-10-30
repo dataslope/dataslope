@@ -390,7 +390,7 @@ To retrieve the full duplicate rows, join back to the original table or use `ROW
 
 ### What is an index, and when does it help (or hurt)?
 
-An index is a data structure (B-tree by default in most relational database management systems (RDBMS)) that lets the engine find rows matching a predicate without scanning the full table. Indexes help when queries are **selective** (returning a small fraction of rows) on the indexed columns. They hurt for bulk writes (each insert/update must also update the index) and for low-cardinality columns where a full scan beats index + random I/O.
+An index is a data structure (B-tree by default in most relational database management systems (RDBMS)) that lets the engine find rows matching a predicate without scanning the full table. Indexes help when queries are **selective** (returning a small fraction of rows) on the indexed columns. They hurt for bulk writes (each insert/update must also update the index) and for predicates that match a large share of the table, where a full scan beats index lookups plus random I/O. What decides it is how many rows the value matches, not how many distinct values the column has: on a two-value `status` column, a value that 10% of rows carry can still use the index while one that 90% carry is read by a full scan.
 
 ### What is a covering index?
 
@@ -398,7 +398,7 @@ A covering index includes **all columns** a query needs, both the filter columns
 
 ### What is partition pruning?
 
-When a table is partitioned (e.g., by `event_date`) and a query filters on that key, the engine skips partitions that cannot match and reads only relevant files. This turns an $O(N)$ full-table scan into a fraction of the work. Pruning works only when the filter column matches the partition key; applying a function to the column (e.g., `YEAR(event_date) = 2024`) often defeats pruning.
+When a table is partitioned (e.g., by `event_date`) and a query filters on that key, the engine skips partitions that cannot match and reads only relevant files. This turns an $O(N)$ full-table scan into a fraction of the work. Pruning works only when the filter column matches the partition key; whether a function on the column (e.g., `YEAR(event_date) = 2024`) still prunes depends on the engine (Postgres scans every partition, DuckDB still prunes), so write a range on the raw column and confirm it in the plan.
 
 ### What are INNER, LEFT, RIGHT, and FULL OUTER JOINs?
 
@@ -470,7 +470,7 @@ JOIN dept_avgs d ON d.department = e.department;
 
 ### What is the difference between a clustered and a non-clustered index?
 
-A **clustered index** physically orders the table's rows on disk in the index's key order, there can only be one per table. A **non-clustered index** is a separate structure that stores pointers back to the table rows. In BigQuery/Snowflake parlance, `CLUSTER BY` / `ORDER BY` on a table serves a similar purpose to a clustered index.
+A **clustered index** physically orders the table's rows on disk in the index's key order, there can only be one per table. A **non-clustered index** is a separate structure that stores pointers back to the table rows. SQL Server keeps its clustered index ordered as rows change, and MySQL's InnoDB clusters every table by its primary key. Postgres has no clustered index: its `CLUSTER` command sorts the table by an index once, rows written afterwards land wherever there is room, and the order decays until it is run again. In BigQuery/Snowflake parlance, `CLUSTER BY` / `ORDER BY` on a table serves a similar purpose to a clustered index.
 
 ### How do you write a query that returns only rows that exist in one table but not another?
 
@@ -593,7 +593,7 @@ FROM orders
 FROM orders
 ORDER BY region, rnk;`}
   tests={[
-    { id: "row_count", name: "All rows are returned", description: "A window function keeps every input row (8 here)", expectedRowCount: 24 },
+    { id: "row_count", name: "All rows are returned", description: "A window function keeps every input row (24 here)", expectedRowCount: 24 },
     { id: "columns", name: "Has the required columns", description: "id, region, amount, rnk", expectedColumnsInclude: ["id", "region", "amount", "rnk"] },
   ]}
 />
@@ -649,7 +649,7 @@ QUALIFY ROW_NUMBER() OVER (
 ) = 1
 ORDER BY user_id;`}
   tests={[
-    { id: "row_count", name: "One row per user", description: "Three users → three rows", expectedRowCount: 10 },
+    { id: "row_count", name: "One row per user", description: "Ten users → ten rows", expectedRowCount: 10 },
     { id: "columns", name: "Has the required columns", description: "user_id, event_time, status", expectedColumnsInclude: ["user_id", "event_time", "status"] },
   ]}
 />
