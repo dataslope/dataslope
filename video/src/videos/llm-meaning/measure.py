@@ -39,7 +39,14 @@ can be read against it.
   as the lesson's code does; then the lesson's own suggestion, the query
   [0.2, 1.0], run the same way. "it"'s own query, key and value (the third
   row) are what the video's Fig. 12 draws.
-- "cost" is attention-intuition.mdx, "The cost": n tokens make n * n scores.
+- "cost" is attention-intuition.mdx, "The cost": n tokens make n * n pairs,
+  the whole square the video's Fig. 16 frames. "decoder" is what the
+  course's decoder-only models score of it: each token itself and every token
+  before it, the lower triangle of the causal mask (np.tril), n (n + 1) / 2;
+  the later tokens, the rest of the square, are never scored. Ten tokens make
+  55 scores and twenty make 210, 3.82 times as many. The ratio is
+  2 (2n + 1) / (n + 1), which nears four as n grows: the lesson's "roughly
+  n^2/2 comparisons" and "doubling the input still quadruples the work".
 - "params" is the-shape-of-a-transformer.mdx, "What the parameters are": the
   lesson's mid-sized model (vocab 128,000, d_model 4096, 32 layers,
   d_ff 14,336) and its own sums.
@@ -263,6 +270,18 @@ out["qkv"] = {
 # ── cost (attention-intuition.mdx, "The cost") ─────────────────────────────────
 out["cost"] = [{"n": n, "scores": n * n} for n in (10, 20)]
 assert out["cost"][1]["scores"] == 4 * out["cost"][0]["scores"]
+# A decoder writes left to right: row i (the token scoring) has a score for
+# column j (the token scored) only when j <= i, itself included.
+decoder = []
+for n in (10, 20):
+    mask = np.tril(np.ones((n, n), dtype=bool))
+    scores = int(mask.sum())
+    assert scores == n * (n + 1) // 2 and int(mask.trace()) == n
+    decoder.append({"n": n, "scores": scores, "later": int((~mask).sum())})
+assert [d["n"] for d in decoder] == [c["n"] for c in out["cost"]]
+out["decoder"] = {"counts": decoder, "ratio": r(decoder[1]["scores"] / decoder[0]["scores"], 2)}
+assert 3.5 < out["decoder"]["ratio"] < 4
+echo("", "decoder scores:", decoder, "ratio:", out["decoder"]["ratio"])
 
 # ── params (the-shape-of-a-transformer.mdx, "What the parameters are") ─────────
 vocab, d_model, n_layers, d_ff = 128_000, 4096, 32, 14_336

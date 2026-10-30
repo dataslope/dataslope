@@ -169,10 +169,11 @@ export const PathScene: React.FC = () => {
         </React.Fragment>
       ))}
       <Svg>
-        {/* Attention: every row reaches every other. */}
+        {/* Attention: each token's new vector (right) draws on itself and
+            every token before it (left), never a later one, as a decoder's does. */}
         {toks.map((_, i) =>
           toks.map((__, j) => {
-            if (i === j) return null;
+            if (j < i) return null;
             const p = ease(frame, mixesAt - 2 + (i + j) * 1.2, 14);
             if (p <= 0) return null;
             const x1 = X.att + 10;

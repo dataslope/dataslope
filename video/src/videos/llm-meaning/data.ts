@@ -90,7 +90,19 @@ export const QKV = {
   suitcase: m.qkv.suitcase as Attend,
 };
 
-export const COST = m.cost as readonly { n: number; scores: number }[];
+/**
+ * "The cost", for 10 and 20 tokens: `pairs`, the whole n × n square of
+ * token pairs, which the figure frames; `scores`, what a decoder computes of
+ * it, each token against itself and every token before it; and `later`, the
+ * rest, a token against a later one, never scored.
+ */
+export const COST = m.decoder.counts.map((d, i) => {
+  const square = m.cost[i];
+  if (square.n !== d.n || square.scores !== d.scores + d.later) throw new Error(`cost and decoder disagree at n = ${d.n}`);
+  return { n: d.n, pairs: square.scores, scores: d.scores, later: d.later };
+});
+/** How many times the scores grow from 10 tokens to 20 (210 / 55). */
+export const COST_RATIO = m.decoder.ratio;
 
 // ── Part 4. The shape of a transformer (the-shape-of-a-transformer.mdx) ──────
 
