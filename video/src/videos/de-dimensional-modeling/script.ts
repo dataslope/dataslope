@@ -194,7 +194,8 @@ export const script: NarrationScript = {
       id: "nf",
       scene: true,
       text: "Question six. What is first, second, and third normal form? First: one value per cell. Two phone numbers in one cell break it.",
-      pauseAfter: 0.6,
+      // The take ran straight into "Second": a longer hold leaves a pause check:sync can find.
+      pauseAfter: 0.9,
     },
     {
       id: "nf-2",

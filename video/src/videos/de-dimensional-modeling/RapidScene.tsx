@@ -109,7 +109,7 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
   const wg = geoOf({ cols: wideCols.map((x) => x.name), rows: [] }, R_X, c.y(436), c.h, { headH: 50 });
   // The narrow design side by side: customers, then two attribute tables
   // keyed by customer_id, the second reached by a route under the first.
-  const NARROW_Y = c.y(628);
+  const NARROW_Y = c.y(642);
   const customers = useEntityLayout({ x: R_X, y: NARROW_Y, width: 290, name: "customers", columns: [{ name: "customer_id", key: "PK" }, { name: "name" }] });
   const cityT = useEntityLayout({ x: R_X + 400, y: NARROW_Y, width: 260, name: "customer_city", columns: [{ name: "customer_id", key: "FK" }, { name: "city" }] });
   const planT = useEntityLayout({ x: R_X + 720, y: NARROW_Y, width: 260, name: "customer_plan", columns: [{ name: "customer_id", key: "FK" }, { name: "plan" }] });
@@ -132,7 +132,7 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={fastAt} x={R_X} y={wg.top + wg.headH + 10}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>fast, and easy in a dashboard</span>
       </Note>
-      <PanelHead at={narrowAt - 2} x={R_X} y={c.y(534)} width={960} sub="flexible, at the cost of joins" subAt={flexAt}>
+      <PanelHead at={narrowAt - 2} x={R_X} y={c.y(550)} width={960} sub="flexible, at the cost of joins" subAt={flexAt}>
         Narrow
       </PanelHead>
       <Entity layout={customers} at={narrowAt} />
