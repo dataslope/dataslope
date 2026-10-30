@@ -38,7 +38,8 @@ What it computes:
      against pricing-structure.mdx, which says so in words.
   4. Starting fresh: eight 5-turn chats against one 40-turn chat (the lesson's
      own comparison, "a 40-turn conversation can cost more than eight separate
-     5-turn ones covering the same ground").
+     5-turn ones covering the same ground"), without the cache, and with it:
+     the cache the scene before turns on closes most of that gap.
 
 Also: "Claude Sonnet 5.5", the name on screen, is matched to the `sonnet`
 price key by both its prices in pricing-structure.mdx's October 2026 table.
@@ -245,8 +246,17 @@ fresh = {
     "eight": r(8 * conversation_cost(MODEL, 5)),
     "one": forty["plain"],
     "times": r(forty["plain"] / (8 * conversation_cost(MODEL, 5)), 4),
+    # The same pair with the cache the scene before turns on: eight short
+    # chats against one long one, both `cached=True`. The gap nearly closes.
+    "eachCached": r(conversation_cost(MODEL, 5, cached=True)),
+    "eightCached": r(8 * conversation_cost(MODEL, 5, cached=True)),
+    "oneCached": forty["cached"],
+    "savedCached": r(1 - 8 * conversation_cost(MODEL, 5, cached=True) / conversation_cost(MODEL, 40, cached=True), 4),
 }
 assert bills[5]["plain"] == fresh["each"]
+assert bills[5]["cached"] == fresh["eachCached"]
+# Still cheaper in eight pieces, but by a few cents rather than two thirds.
+assert fresh["eightCached"] < fresh["oneCached"] and fresh["savedCached"] < 0.1
 
 out = {
     "model": MODEL,
