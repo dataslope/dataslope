@@ -126,7 +126,12 @@ dropped throughout (blue pebbles kept, red grit falling through).
   explanation, callout, cost section and concept check said "every other
   token"), so about $n^2/2$ comparisons.
 
-**The unit video.** `Llm-2-Meaning` makes the same "every token scores every
-token" claim in its Scene 10 ("Ten tokens make a hundred scores"); it is being
-corrected to the decoder's count in the same pass.
+**The unit video.** `Llm-2-Meaning` made the same claim in its Scene 10
+("Every token scores every token, itself included. Ten tokens make a hundred
+scores."). Corrected: ten tokens make 55 scores and twenty make 210, nearly
+four times, computed in `measure.py` from a causal mask; Fig. 16 draws only the
+scored half, and the head grids, the attention column of the transformer
+block and one headline drop the later links too. 189 characters re-voiced,
+6:48 → 6:53, every check passing
+([`fixes/Llm-2-Meaning.md`](20261030-nlp-llm-video-review/fixes/Llm-2-Meaning.md)).
 
