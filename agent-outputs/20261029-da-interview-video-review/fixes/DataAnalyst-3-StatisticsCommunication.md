@@ -52,7 +52,18 @@ so is `CORR` in `data.ts`, which is only read.
   143 wpm overall (`npm run cues -- da-statistics-communication`).
 - Typecheck and ESLint for the folder: clean. `check:cues`: clean.
   `npm test`: 69 of 69 pass.
-- CHECKS_PLACEHOLDER
+- `check:motion`: passes. Nothing holds still for 2 s or more anywhere in
+  the 10:09.
+- `check:sync`: passes. All 65 beats start within ±0.12 s of their cues; the
+  worst is +0.05 s (`rapid-in`).
+- `check:mix`: passes. The effects sit 27.9 LU under the narration; the
+  closest they come is 10.5 dB under the voice, at 5:38.8.
+- `check:frames`: passes, including no hyphen set in tabular figures.
+- I looked at stills at every place I changed: 64, 108.5, 120, 139, 169.5,
+  193, 232, 297, 347, 398, 411.5, 435.5, 461, 478, 530, 545, 573, 594 and
+  605 s. I also checked frames from the preview at 142.6 and 197.3 s, where
+  the two new figures hand over to the next ones cleanly, and the final
+  variance and normal layouts at 530 and 573 s.
 
 ## `results.json`
 
