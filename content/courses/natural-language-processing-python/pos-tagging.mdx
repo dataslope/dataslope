@@ -305,10 +305,12 @@ print("  ", [lemmatizer.lemmatize(w, to_wordnet_pos(t)) for w, t in tagged])
   ]}
 />
 
-Compare the two lines. Without POS, "running" and "eaten" survive unchanged.
-With POS, "running" → "run" and "eaten" → "eat". The tagger supplied the
-context the lemmatizer needed. This tag-then-lemmatize pattern is worth
-committing to memory, it is how accurate normalization is done in practice.
+Compare the two lines. Without POS, "were", "running", "had" and "eaten"
+survive unchanged. With POS, they become "be", "run", "have" and "eat".
+("runners" → "runner" happens in both: a plural noun needs no tag.) The
+tagger supplied the context the lemmatizer needed. This tag-then-lemmatize
+pattern is worth committing to memory: it is how accurate normalization is
+done in practice.
 
 <Callout type="warn" title="Tagging is contextual, and not perfect">
 Because the tagger predicts from context, it can be *wrong*, especially on
