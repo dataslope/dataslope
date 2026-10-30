@@ -9,16 +9,18 @@ import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { STREAM, USERS, WINDOWS } from "./data";
-import { Drift, OK_INK, pulse, QUIET, USER_COLOR, USER_INK, userFill, X0 } from "./parts";
+import { Dash, Drift, OK_INK, pulse, QUIET, USER_COLOR, USER_INK, userFill, X0 } from "./parts";
 
 const AX0 = 440;
-const AX1 = 1520;
+const AX1 = 1400;
+/** The notes' column, right of everything drawn on the axis. */
+const NOTE_X = 1540;
 const SPAN = 30;
 /** Rows, in the layout's coordinates. */
 const AXIS_Y = 330;
-const TUMBLE_Y = 420;
-const SLIDE_Y = 540;
-const SESSION_Y = 710;
+const TUMBLE_Y = 410;
+const SLIDE_Y = 515;
+const SESSION_Y = 680;
 const BOX_H = 48;
 /** The click both of whose sliding windows are shown: ava's from second 6. */
 const PICK_T = 6;
@@ -157,7 +159,7 @@ export const WindowsScene: React.FC = () => {
             </div>
           );
         })}
-        <Note at={oneAt} x={AX1 + 30} y={y(TUMBLE_Y) + h(10)}>
+        <Note at={oneAt} x={NOTE_X} y={y(TUMBLE_Y) + h(10)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>each click in one</span>
         </Note>
 
@@ -199,7 +201,7 @@ export const WindowsScene: React.FC = () => {
             </div>
           );
         })}
-        <Note at={twoAt} x={AX1 + 30} y={y(SLIDE_Y) + h(20)}>
+        <Note at={twoAt} x={NOTE_X} y={y(SLIDE_Y) + h(20)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
             each click in two:
             <br />
@@ -255,14 +257,15 @@ export const WindowsScene: React.FC = () => {
             <span style={{ ...label(21, USER_INK[u]), fontWeight: 700, whiteSpace: "nowrap" }}>{u}</span>
           </Note>
         ))}
-        <Note at={fiveGapAt + 6} x={AX1 + 30} y={y(SESSION_Y) + h(6)}>
+        <Note at={fiveGapAt + 6} x={NOTE_X} y={y(SESSION_Y) + h(6)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
-            - - - five quiet seconds
+            <Dash color={INK_SOFT} />
+            five quiet seconds
             <br />
             close a session
           </span>
         </Note>
-        <Note at={twoSessAt} x={AX1 + 30} y={y(SESSION_Y) + h(100)}>
+        <Note at={twoSessAt} x={NOTE_X} y={y(SESSION_Y) + h(100)}>
           <span style={{ ...note(25, INK), fontWeight: 750, whiteSpace: "nowrap" }}>
             ava: <span style={TABULAR}>5</span> clicks,{" "}
             <span style={{ background: HIGHLIGHT, borderRadius: 4, padding: "0 4px" }}>
@@ -270,7 +273,7 @@ export const WindowsScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={sessionizeAt} x={AX1 + 30} y={y(SESSION_Y) + h(150)}>
+        <Note at={sessionizeAt} x={NOTE_X} y={y(SESSION_Y) + h(150)}>
           <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>how to sessionize users</span>
         </Note>
       </Drift>

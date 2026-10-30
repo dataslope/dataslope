@@ -157,8 +157,8 @@ export const AnnScene: React.FC = () => {
                   x2={px(SPACE.points[b].x)}
                   y2={py(SPACE.points[b].y)}
                   stroke={ds("purple", 400)}
-                  strokeWidth={1.4}
-                  opacity={0.7 * graph * ease(frame, hnswAt + (k % 30) * 0.6, 8)}
+                  strokeWidth={2}
+                  opacity={0.85 * graph * ease(frame, hnswAt + (k % 30) * 0.6, 8)}
                 />
               ))
             : null}

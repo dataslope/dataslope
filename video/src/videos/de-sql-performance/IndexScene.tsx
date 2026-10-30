@@ -15,8 +15,8 @@ import { Bar, Drift, Listing, listingHeight, MARK_RED, PageStrip, PlanBox, X0 } 
 const TOP = 330;
 const SIZE = 21;
 const PLAN = 20;
-const R_X = 1110;
-const R_W = 700;
+const R_X = 1240;
+const R_W = 570;
 const TREE_TOP = 320;
 const STRIP_Y = 700;
 
@@ -92,7 +92,7 @@ export const IndexScene: React.FC = () => {
   // The tree: a root, two inner nodes, a leaf holding 42.
   const rootX = R_X + R_W / 2;
   const tY = y(TREE_TOP);
-  const leafX = R_X + 200;
+  const leafX = R_X + 140;
   const leafY = tY + 200;
   const hotX = leafX - 62 / 2 + 62 * 0.5; // the second of four slots
   const px = (page: number) => R_X + ((page + 0.5) / INDEX.pages) * R_W;
@@ -150,7 +150,7 @@ export const IndexScene: React.FC = () => {
           <Node x={leafX} y={leafY} keys={["41", "42", "43", "…"]} at={treeAt + 8} hot={1} hotAt={findsAt + 4} />
         </svg>
         <div
-          style={{ position: "absolute", left: leafX + 140, top: leafY + 6, ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, pointsAt, 12) * (1 - treeOut) }}
+          style={{ position: "absolute", left: leafX + 140, top: leafY + 6, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, pointsAt, 12) * (1 - treeOut) }}
         >
           each key points at its rows
         </div>
@@ -208,7 +208,7 @@ export const IndexScene: React.FC = () => {
           marks={[{ line: "Seq Scan", text: "Seq Scan", at: scansAt, color: MARK_RED }]}
         />
         <Note at={scansAt + 6} x={R_X} y={y(TREE_TOP) + h(20)}>
-          <div style={{ ...note(26, INK), width: 640 }}>
+          <div style={{ ...note(26, INK), width: 560 }}>
             With 9 rows in 10 matching, jumping from the index to each row costs more than reading every page once.
           </div>
         </Note>

@@ -70,8 +70,10 @@ export const SkewScene: React.FC = () => {
   const sx = (i: number) => X0 + i * (BAR_W + GAP);
   const sy: Scale = { lo: 0, hi: 400_000, a: y(872), b: y(372) };
   const yOf = (v: number) => atScale(sy, v);
-  const grow = (i: number) => ease(frame, modelAt + 4 + i * 2, 14);
-  const hotIn = ease(frame, thirtyAt, 16);
+  // The bars rise as skew is described; the hot key takes its color when the
+  // narration names a common key, and the axis and numbers come with the model.
+  const grow = (i: number) => ease(frame, fewAt + 4 + i * 2, 14);
+  const hotIn = ease(frame, keyAt, 16);
   const spread = (i: number) => ease(frame, spreadAt + 2 + i * 3, 18);
   const meanY = yOf(SKEW.mean);
 
@@ -113,14 +115,14 @@ export const SkewScene: React.FC = () => {
           {SKEW.before.map((_, i) => {
             const g = grow(i);
             const normalTop = yOf(NORMAL[i] * g);
-            const guest = GUEST_BEFORE[i] * hotIn + (GUEST_AFTER[i] - GUEST_BEFORE[i]) * spread(i);
+            const guest = GUEST_BEFORE[i] * g + (GUEST_AFTER[i] - GUEST_BEFORE[i]) * spread(i);
             const guestTop = yOf(NORMAL[i] * g + guest);
             const isHot = i === SKEW.guestPartition;
             const before = ease(frame, timesAt, 10) * (1 - spread(i));
             return (
               <g key={i}>
                 <rect x={sx(i)} y={normalTop} width={BAR_W} height={Math.max(0, sy.a - normalTop)} fill={`color-mix(in srgb, ${BAR} 50%, ${PAPER})`} />
-                {guest > 0 ? <rect x={sx(i)} y={guestTop} width={BAR_W} height={Math.max(0, normalTop - guestTop)} fill={`color-mix(in srgb, ${HOT} 62%, ${PAPER})`} /> : null}
+                {guest > 0 ? <rect x={sx(i)} y={guestTop} width={BAR_W} height={Math.max(0, normalTop - guestTop)} fill={`color-mix(in srgb, color-mix(in srgb, ${HOT} ${hotIn * 100}%, ${BAR}) ${50 + 12 * hotIn}%, ${PAPER})`} /> : null}
                 {isHot && before > 0 ? (
                   <rect x={sx(i) - 3} y={guestTop - 3} width={BAR_W + 6} height={sy.a - guestTop + 3} fill="none" stroke={ACCENT} strokeWidth={3} opacity={before} />
                 ) : null}
@@ -171,7 +173,7 @@ export const SkewScene: React.FC = () => {
             ))}
           </span>
         </Note>
-        <Note at={fewAt} x={R_X} y={y(398)} out={keyAt - 4}>
+        <Note at={fewAt} x={R_X} y={y(398)} out={thirtyAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a few partitions hold far more than the rest</span>
         </Note>
         <Note at={thirtyAt + 2} x={R_X} y={y(410)}>

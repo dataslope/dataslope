@@ -53,10 +53,11 @@ export const OrderScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("order").from;
-  const qAt = n.word("order", "Question");
   const textAt = n.word("order", "What is the logical order");
   const notAt = n.word("order-list", "Not the order");
-  const stepAt = STEPS.map((s) => n.word("order-list", s.word));
+  // "WHERE" is said twice ("which is where window functions are computed"):
+  // each step is the first time its word is said.
+  const stepAt = STEPS.map((s) => n.word("order-list", s.word, { nth: 1 }));
   const windowsAt = n.word("order-list", "window functions are computed");
   const qualifyAt = n.word("order-list", "qualify right after");
   const cantAt = n.word("order-why", "WHERE can't see");
@@ -75,7 +76,6 @@ export const OrderScene: React.FC = () => {
   const fewerAt = n.word("where-early", "fewer rows to group");
   const keepAt = n.word("where-early", "Keep HAVING");
   const bridgeAt = n.beat("frame-in").from;
-  const clearAt = n.beat("frame").from - 8 - 30;
   const end = n.beat("frame-in").to;
 
   const lines = WHERE.both.lines;
@@ -112,8 +112,8 @@ export const OrderScene: React.FC = () => {
       <Sfx name="el-scratch" at={refusesAt + 2} level={-32} />
 
       <Drift from={from} to={end + 40}>
-        <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
-          <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} out={q5At - 4} size={60}>
+        <>
+          <QuestionCard n={4} at={from - 8} textAt={textAt - 4} out={q5At - 4} size={60}>
             What is the logical order of SQL clause execution?
           </QuestionCard>
           <QuestionCard n={5} at={q5At} textAt={q5TextAt - 2} size={60}>
@@ -303,7 +303,7 @@ export const OrderScene: React.FC = () => {
               </Mark>
             </span>
           </Note>
-        </AbsoluteFill>
+        </>
       </Drift>
     </AbsoluteFill>
   );

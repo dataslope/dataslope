@@ -159,7 +159,7 @@ export const script: NarrationScript = {
       id: "cdc",
       scene: true,
       text: "Question four. What is change data capture, CDC, and when do you use it? The simple alternative is polling: select the rows whose updated at is later than the last run.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.6,
     },
     {
       id: "cdc-poll",
@@ -182,7 +182,7 @@ export const script: NarrationScript = {
       id: "evo",
       scene: true,
       text: "Question five. What is schema evolution, and how do Parquet and Avro handle it? It's changing a schema without breaking readers or rewriting old data: adding, renaming, dropping or retyping columns.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.6,
     },
     {
       id: "evo-parquet",
@@ -210,7 +210,7 @@ export const script: NarrationScript = {
     {
       id: "src-name",
       text: "Name the columns you need instead, and the new one is ignored.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.6,
     },
     {
       id: "src-more",
@@ -241,7 +241,7 @@ export const script: NarrationScript = {
     {
       id: "kappa",
       text: "Kappa keeps one streaming path. To reprocess history, replay the event log, in Kafka say, through the same code.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.6,
     },
     {
       id: "kappa-when",
@@ -259,12 +259,12 @@ export const script: NarrationScript = {
     {
       id: "r-dbt",
       text: "dbt is a sequel transformation tool: it runs select statements in the warehouse, and saves each result as a table or a view. Its ref calls tell it what each model depends on, so it builds them in order, with tests and docs alongside. It's the T in ELT.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.6,
     },
     {
       id: "r-fan",
       text: "The fan-out problem: one upstream change sets off many downstream recomputations. Correct a dimension table, and thousands of aggregates built on it go stale. Recompute only the affected partitions, let the dependency graph find the smallest scope, and use CDC so only the change travels.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.6,
     },
     {
       id: "r-lineage",

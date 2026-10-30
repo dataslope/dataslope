@@ -10,7 +10,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { Chip, Drift, KeyArrow, OK, OK_INK, PanelHead, X0 } from "./parts";
+import { Chip, Drift, KeyArrow, Mark, OK, OK_INK, PanelHead, X0 } from "./parts";
 
 const R_X = 1000;
 const CHIP_W = 250;
@@ -51,17 +51,18 @@ const Stream: React.FC<{ at: number; x: number; top: number; width: number; heig
   if (frame < at || o >= 1) return null;
   return (
     <div style={{ position: "absolute", left: x, top, width, height, overflow: "hidden", opacity: 1 - o }}>
-      {OPS.map((op, i) => {
-        const t = (frame - (at + i * step)) / step;
-        if (t < 0) return null;
-        // Each op slides in at the bottom and rises a line per step, fading at the top.
-        const slot = Math.min(t, 1) + Math.max(0, t - 1);
-        const yy = height - lineH - slot * lineH;
-        if (yy < -lineH) return null;
+      {Array.from({ length: 5 }, (_, j) => {
+        // The ops cycle for as long as the scene runs: op k arrives at the
+        // bottom at `at + k * step` and rises a line per step after that.
+        const now = (frame - at) / step;
+        const k = Math.floor(now) - j;
+        if (k < 0) return null;
+        const t = now - k;
+        const yy = height - lineH - t * lineH;
         const fade = Math.min(1, t * 3) * Math.min(1, Math.max(0, yy + lineH * 0.5) / (lineH * 1.2));
         return (
           <div
-            key={i}
+            key={k}
             style={{
               position: "absolute",
               left: 0,
@@ -79,7 +80,7 @@ const Stream: React.FC<{ at: number; x: number; top: number; width: number; heig
             }}
           >
             <span style={{ width: 8, height: 8, borderRadius: 4, background: BAR }} />
-            {op}
+            {OPS[k % OPS.length]}
           </div>
         );
       })}
@@ -134,6 +135,8 @@ export const OltpScene: React.FC = () => {
   const from = n.beat("oltp").from;
   const qAt = n.word("oltp", "Question seven");
   const textAt = n.word("oltp", "What is OLTP versus OLAP");
+  const oltpWordAt = n.word("oltp", "OLTP versus");
+  const olapWordAt = n.word("oltp", "OLAP");
   const oltpAt = n.word("oltp", "OLTP, online transaction processing");
   const appAt = n.word("oltp", "runs the app");
   const shortAt = n.word("oltp", "many short reads and writes");
@@ -186,7 +189,15 @@ export const OltpScene: React.FC = () => {
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} size={60}>
-          What is OLTP versus OLAP, and how does schema design differ?
+          What is{" "}
+          <Mark at={oltpWordAt} out={oltpAt}>
+            OLTP
+          </Mark>{" "}
+          versus{" "}
+          <Mark at={olapWordAt} out={oltpAt}>
+            OLAP
+          </Mark>
+          , and how does schema design differ?
         </QuestionCard>
 
         {/* ── OLTP ── */}
@@ -223,10 +234,10 @@ export const OltpScene: React.FC = () => {
         <Chip layout={dCust} at={starAt} />
         <Chip layout={dStore} at={starAt + 2} />
         <Chip layout={dProd} at={starAt + 4} />
-        <Relation name="olap-date" points={toFact(dDate, "left", -14)} from="exactly-one" to="many" at={starAt + 2} />
-        <Relation name="olap-cust" points={toFact(dCust, "left", 14)} from="exactly-one" to="many" at={starAt + 4} />
-        <Relation name="olap-store" points={toFact(dStore, "right", -14)} from="exactly-one" to="many" at={starAt + 6} />
-        <Relation name="olap-prod" points={toFact(dProd, "right", 14)} from="exactly-one" to="many" at={starAt + 8} />
+        <Relation name="olap-date" points={toFact(dDate, "left", -20)} from="exactly-one" to="many" at={starAt + 2} />
+        <Relation name="olap-cust" points={toFact(dCust, "left", 20)} from="exactly-one" to="many" at={starAt + 4} />
+        <Relation name="olap-store" points={toFact(dStore, "right", -20)} from="exactly-one" to="many" at={starAt + 6} />
+        <Relation name="olap-prod" points={toFact(dProd, "right", 20)} from="exactly-one" to="many" at={starAt + 8} />
         <Strip at={historyAt} scanAt={scanAt} appendAt={appendAt} x={R_X} top={y(STRIP_Y) - h(4)} width={790} height={h(112)} />
 
         <Note at={scanAt - 4} x={R_X} y={PROP(0)}>
@@ -244,11 +255,11 @@ export const OltpScene: React.FC = () => {
         </Note>
 
         {/* ── Between them: the job ── */}
-        <KeyArrow from={[orders.right + 30, y(CHIP_TOP) + h(100)]} to={[R_X - 30, y(CHIP_TOP) + h(100)]} at={moveAt + 2} color={OK} />
-        <Note at={moveAt + 8} x={orders.right + 30} y={y(CHIP_TOP) + h(100) - 52}>
+        <KeyArrow from={[orders.right + 56, y(CHIP_TOP) + h(100)]} to={[R_X - 30, y(CHIP_TOP) + h(100)]} at={moveAt + 2} color={OK} />
+        <Note at={moveAt + 8} x={orders.right + 56} y={y(CHIP_TOP) + h(100) - 52}>
           <span style={{ ...note(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>reshape</span>
         </Note>
-        <Note at={jobAt} x={orders.right + 4} y={y(CHIP_TOP) + h(100) + 18}>
+        <Note at={jobAt} x={orders.right + 56} y={y(CHIP_TOP) + h(100) + 18}>
           <div style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap", background: PAPER, borderTop: `1px solid ${HAIRLINE}`, paddingTop: 6 }}>
             the data
             <br />

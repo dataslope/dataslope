@@ -142,10 +142,12 @@ const rowsFrame = query("own", "moving", "rows");
 const rangeFrame = query("own", "moving", "range");
 const filledAvg = query("own", "spine", "filledAvg");
 /** One row of a result by its first cell. */
-const rowOf = (t: Table, first: string) => {
+const rowOf = (t: Table, first: string): Record<string, string> => {
   const r = t.rows.find((row) => row[0] === first);
   if (!r) throw new Error(`no row ${first}`);
-  return Object.fromEntries(t.cols.map((c, j) => [c, r[j]]));
+  const row: Record<string, string> = Object.fromEntries(t.cols.map((c, j) => [c, r[j]]));
+  // ROUND(x, 1) on a DOUBLE: a client prints 95.0, where JSON kept 95.
+  return { ...row, avg_7: Number(row.avg_7).toFixed(1) };
 };
 const LAST_DAY = "2024-01-13";
 export const MOVING = {

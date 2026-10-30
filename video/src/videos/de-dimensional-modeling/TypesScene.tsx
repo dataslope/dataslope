@@ -130,7 +130,7 @@ export const TypesScene: React.FC = () => {
           rows={TRANSACTIONS.rows.map((cells, i) => ({ cells, at: depositAt + i * 4 }))}
           marks={TRANSACTIONS.rows.map((_, i) => ({ row: i, col: amount, at: happenedAt + i * 2, color: MARK_OK }))}
         />
-        <Note at={happenedAt} x={X0} y={tg.rowTop(TRANSACTIONS.rows.length) + h(16)}>
+        <Note at={happenedAt} x={tg.right + 34} y={tg.rowTop(TRANSACTIONS.rows.length - 1) + h(8)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>what happened</span>
         </Note>
 

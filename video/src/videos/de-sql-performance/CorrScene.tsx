@@ -126,7 +126,7 @@ export const CorrScene: React.FC = () => {
           width={1020}
           size={PLAN}
           step={2}
-          at={hashAt - 6}
+          at={cteAt + 4}
           marks={[
             { line: "Hash Join", text: "Hash Join", at: hashAt + 2, color: MARK_OK },
             { line: "Hash Join", text: "actual rows=10000.00", at: sameAt, color: MARK_OK },
@@ -158,7 +158,7 @@ export const CorrScene: React.FC = () => {
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: h(12) }}>
             {ops.map((op, i) => (
               <React.Fragment key={op}>
-                {i > 0 ? <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, asHashAt - 4 + i * 4, 10) }}>over</span> : null}
+                {i > 0 ? <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, asHashAt - 4 + i * 4, 10) }}>{i === 1 ? "of" : "and"}</span> : null}
                 <span
                   style={{
                     fontFamily: MONO,

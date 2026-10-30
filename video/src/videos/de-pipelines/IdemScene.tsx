@@ -116,15 +116,15 @@ export const IdemScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-pencil" at={blindAt} level={-36} />
-      <Sfx name="el-tap" at={eightAt} level={-34} />
-      <Sfx name="el-scratch" at={failAt + 2} level={-35} />
-      <Sfx name="el-tap" at={sixteenAt} level={-32} />
-      <Sfx name="el-pencil" at={deleteAt} level={-36} />
-      <Sfx name="el-tap" at={onceAt + 6} level={-34} />
-      <Sfx name="el-tap" at={twiceAt + 8} level={-34} />
-      <Sfx name="el-pencil" at={wrapAt + 6} level={-36} />
-      <Sfx name="el-chime" at={emptyAt + 10} level={-36} />
+      <Sfx name="el-pencil" at={blindAt} level={-34} />
+      <Sfx name="el-tap" at={eightAt} level={-30} />
+      <Sfx name="el-scratch" at={failAt + 2} level={-31} />
+      <Sfx name="el-tap" at={sixteenAt} level={-28} />
+      <Sfx name="el-pencil" at={deleteAt} level={-34} />
+      <Sfx name="el-tap" at={onceAt + 6} level={-30} />
+      <Sfx name="el-tap" at={twiceAt + 8} level={-30} />
+      <Sfx name="el-pencil" at={wrapAt + 6} level={-34} />
+      <Sfx name="el-chime" at={emptyAt + 10} level={-32} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={2} at={qAt - 4} textAt={textAt - 4} size={58}>

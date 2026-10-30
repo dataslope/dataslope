@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { SWITCH } from "./data";
-import { Box, DATA, DATA_TINT, Drift, head, LineArrow, madeUp, Mark, MARK_OK, OK, OK_INK, say, X0 } from "./parts";
+import { Box, DATA, DATA_TINT, Drift, head, LineArrow, Mark, MARK_OK, OK, OK_INK, say, X0 } from "./parts";
 
 const T = { x: X0, top: 360, rowH: 52, cols: [150, 120, 100, 140, 160] };
 const BG = { x1: 1010, x2: 1430, w: 380, top: 470, h: 130 };
@@ -99,7 +99,7 @@ export const SwitchScene: React.FC = () => {
 
         {/* The tiny space, and a second model's kitten searched in it. */}
         <Note at={tinyAt - 2} x={T.x} y={y(T.top) - 34}>
-          <span style={madeUp(20)}>a tiny space from the How LLMs Work course: five words, three numbers each</span>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a tiny space from the How LLMs Work course: five words, three numbers each</span>
         </Note>
         {["word", ...SWITCH.axes, "distance"].map((t, j) => (
           <Note key={t} at={(j === 4 ? searchAt : tinyAt) + j * 2} x={colX(j) + 12} y={y(T.top) + 8}>

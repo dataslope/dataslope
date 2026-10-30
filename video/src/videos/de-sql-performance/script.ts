@@ -214,7 +214,7 @@ export const script: NarrationScript = {
     },
     {
       id: "prune-one",
-      text: "March's revenue: the plan scans one partition, eighty-four thousand rows, and skips the other eleven.",
+      text: "March's revenue: the plan scans one partition, nearly eighty-five thousand rows, and skips the other eleven.",
       pauseAfter: 0.7,
     },
     {
@@ -250,7 +250,7 @@ export const script: NarrationScript = {
     {
       id: "join",
       scene: true,
-      text: "Question eight. How do you join two large tables efficiently at scale? First, make them smaller. Filter to December, and eighty-four thousand orders reach the join instead of a million.",
+      text: "Question eight. How do you join two large tables efficiently at scale? First, make them smaller. Filter to December, and nearly eighty-five thousand orders reach the join instead of a million.",
       pauseAfter: 0.6,
     },
     {

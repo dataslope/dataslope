@@ -3,12 +3,12 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, DELIVERY } from "./data";
-import { Cell, Drift, OK_INK, X0 } from "./parts";
+import { Bar, Cell, Drift, OK_INK, X0 } from "./parts";
 
 /** Offsets 3 to 10 of one partition; the batch is 5 to 9. */
 const FIRST = 3;
@@ -18,10 +18,10 @@ const CELL_W = 74;
 const STEP = 86;
 const CELL_H = 50;
 /** Each row's top, in the layout's coordinates. */
-const ROW = [320, 450, 580];
+const ROW = [340, 470, 600];
 const VERDICT_X = 1220;
 /** The model's strips: a thousand messages across this many pixels. */
-const STRIP = { x: 480, w: 1100, h: 26 };
+const STRIP = { x: 480, w: 1000, h: 26 };
 
 /**
  * Question 5. One partition read three ways, offsets 5 to 9 as the batch and
@@ -97,8 +97,8 @@ export const SemanticsScene: React.FC = () => {
   ];
 
   const strips = [
-    { name: "at-most-once", y: y(790), seg: (b: number, c: number) => [c, b + DELIVERY.batch], at: losesAt, text: `${DELIVERY.lost} lost` },
-    { name: "at-least-once", y: y(850), seg: (b: number, c: number) => [b, c], at: twiceSimAt - 6, text: `${DELIVERY.duplicates} processed twice` },
+    { name: "at-most-once", y: y(800), seg: (b: number, c: number) => [c, b + DELIVERY.batch], at: losesAt, text: `${DELIVERY.lost} lost` },
+    { name: "at-least-once", y: y(856), seg: (b: number, c: number) => [b, c], at: twiceSimAt - 6, text: `${DELIVERY.duplicates} processed twice` },
   ];
   const sx = (m: number) => STRIP.x + (m / DELIVERY.messages) * STRIP.w;
 
@@ -205,7 +205,10 @@ export const SemanticsScene: React.FC = () => {
           <line x1={after(9)} x2={after(9)} y1={cellsTop(1) - 8} y2={cellsTop(1) + CELL_H + 8} stroke={BAR} strokeWidth={3} strokeDasharray="5 5" />
         </svg>
         <Note at={figAt + 14} x={after(4) - 60} y={cellsTop(2) + CELL_H + h(14)} out={twiceAt + 30}>
-          <span style={{ ...label(20, BAR), fontWeight: 700, whiteSpace: "nowrap" }}>┃ commit</span>
+          <span style={{ ...label(20, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <Bar color={BAR} />
+            commit
+          </span>
         </Note>
 
         {/* The crash, after 7 in every row. */}
@@ -219,12 +222,12 @@ export const SemanticsScene: React.FC = () => {
         {/* Verdicts. */}
         <Note at={mostAt} x={VERDICT_X} y={cellsTop(0) - h(4)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            no duplicates, but <b style={{ color: ACCENT_INK, opacity: ease(frame, lostAt, 8) > 0.5 ? 1 : 0.25 }}>8 and 9 lost</b>
+            no duplicates, but <b style={{ color: ACCENT_INK, opacity: ease(frame, lostAt - 2, 8) }}>8 and 9 lost</b>
           </span>
         </Note>
         <Note at={leastAt} x={VERDICT_X} y={cellsTop(1) - h(4)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            nothing lost, but <b style={{ color: ACCENT_INK, opacity: ease(frame, dupAt, 8) > 0.5 ? 1 : 0.25 }}>5 to 7 twice</b>
+            nothing lost, but <b style={{ color: ACCENT_INK, opacity: ease(frame, dupAt - 2, 8) }}>5 to 7 twice</b>
             <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, defaultAt, 10) }}> · the usual default</span>
           </span>
         </Note>
@@ -239,7 +242,7 @@ export const SemanticsScene: React.FC = () => {
         </Note>
 
         {/* The model: a thousand messages, twenty batches, three crashes. */}
-        <Note at={modelAt} x={X0} y={y(740)}>
+        <Note at={modelAt} x={X0} y={y(752)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
             model: <Num>{count(DELIVERY.messages)}</Num> messages
             <span style={{ opacity: ease(frame, commitEveryAt, 10) }}>

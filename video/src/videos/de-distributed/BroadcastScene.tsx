@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { BROADCAST } from "./data";
-import { Chip, Curve, Drift, Machine, OK, OK_INK, Svg } from "./parts";
+import { Curve, Drift, Machine, OK, OK_INK, Svg } from "./parts";
 
 const DIM = ds("purple", 500);
 const wash = (c: string, k = 30) => `color-mix(in srgb, ${c} ${k}%, ${PAPER})`;
@@ -151,9 +151,10 @@ export const BroadcastScene: React.FC = () => {
           return (
             <React.Fragment key={k}>
               <Machine x={EX_X} top={y(EX_TOPS[k])} width={EX_W} height={h(EX_H)} at={shipAt + 2 + k * 2} tone="ok" toneAt={noShuffleAt} />
-              <div style={{ position: "absolute", left: EX_X + 12, top: exMid(k) - 12, ...label(19, INK_SOFT), opacity: ease(frame, shipAt + 4 + k * 2, 10), whiteSpace: "nowrap" }}>
+              <div style={{ position: "absolute", left: EX_X + 12, top: exMid(k) - 12, ...label(19, INK_SOFT), opacity: ease(frame, shipAt + 4 + k * 2, 10) * (1 - joined), whiteSpace: "nowrap" }}>
                 {k + 1}
               </div>
+              <div style={{ position: "absolute", left: EX_X + 8, top: exMid(k) - 17, ...label(26, OK_INK), fontWeight: 800, opacity: joined }}>✓</div>
               <div
                 style={{
                   position: "absolute",
@@ -171,6 +172,7 @@ export const BroadcastScene: React.FC = () => {
                   ...label(19, INK),
                   whiteSpace: "nowrap",
                   overflow: "hidden",
+                  opacity: ease(frame, shipAt + 4 + k * 2, 8),
                 }}
               >
                 big table, part {k + 1}
@@ -189,7 +191,6 @@ export const BroadcastScene: React.FC = () => {
                   opacity: land,
                 }}
               />
-              <div style={{ position: "absolute", left: EX_X + EX_W - 34, top: exMid(k) - 16, ...label(26, OK_INK), fontWeight: 800, opacity: joined }}>✓</div>
             </React.Fragment>
           );
         })}
@@ -300,7 +301,7 @@ export const BroadcastScene: React.FC = () => {
         <Note at={defaultAt} x={R0} y={y(SRC_TOPS[0]) - h(36)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>both sides large</span>
         </Note>
-        <Note at={bothAt + 4} x={R0 + SRC_W + 40} y={y(SRC_TOPS[3]) + h(62)}>
+        <Note at={bothAt + 4} x={R0} y={y(SRC_TOPS[3]) + h(66)}>
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>both shuffled</span>
         </Note>
         {co.map((c, r) => {

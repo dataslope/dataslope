@@ -14,7 +14,7 @@ import { Box, Cell, Drift, ElbowArrow, Lane, MARK_BAD, OK, OK_INK, pulse, Strike
 /** What at-least-once delivered after the crash: 5 to 7, then 5 to 7 again, 8 and 9. */
 const DELIVERED = [5, 6, 7, 5, 6, 7, 8, 9];
 const IN = { x: X0 + 230, top: 330, w: 70, step: 80, h: 48 };
-const TABLE = { top: 470, row: 40, w: 420 };
+const TABLE = { top: 450, row: 36, w: 420 };
 const BLIND_X = X0;
 const IDEM_X = 760;
 
@@ -81,7 +81,7 @@ export const IdemScene: React.FC = () => {
   const outT = { x: 930, y: y(560), w: 300, h: h(56) };
   const offs = { x: 930, y: y(680), w: 300, h: h(56) };
   const txn = { x: 900, y: y(520), w: 360, h: y(770) - y(520) };
-  const OUT_X = 1380;
+  const OUT_X = 1400;
   const seqs = [41, 42, 42];
   const sendAt = (k: number) => seqAt + 4 + k * 10;
 
@@ -251,7 +251,7 @@ export const IdemScene: React.FC = () => {
             <Num>{count(DELIVERY.idempotentRows)}</Num> rows
           </span>
         </Note>
-        <Note at={effAt} x={1300} y={rowY(8) + h(52)} out={q6Out}>
+        <Note at={effAt} x={1300} y={rowY(8) + h(16)} out={q6Out}>
           <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             effectively-once,
             <br />
@@ -277,9 +277,9 @@ export const IdemScene: React.FC = () => {
           if (p <= 0) return null;
           const retry = k === 2;
           const tx = topicL.x + 14 + k * 96;
-          const bounce = retry ? ease(frame, dropsAt + 2, 14) : 0;
-          const x = interpolate(p, [0, 1], [prod.x + prod.w - 40, retry ? topicL.x + 14 + 2 * 96 : tx]);
-          const yy = interpolate(p, [0, 1], [prod.y + prod.h / 2 - 22, topicL.y + (topicL.h - 46) / 2]) + bounce * h(70);
+          const drop = retry ? ease(frame, dropsAt + 4, 14) : 0;
+          const x = interpolate(p, [0, 1], [prod.x + prod.w - 40, tx]);
+          const yy = interpolate(p, [0, 1], [prod.y + prod.h / 2 - 22, topicL.y + (topicL.h - 46) / 2]) - drop * h(30);
           return (
             <Cell
               key={k}
@@ -289,20 +289,20 @@ export const IdemScene: React.FC = () => {
               h={46}
               plain
               size={20}
-              opacity={Math.min(1, p * 3) * (1 - 0.6 * bounce)}
-              ring={retry && bounce > 0 ? ACCENT : undefined}
-              ringP={bounce}
+              opacity={Math.min(1, p * 3) * (1 - drop)}
+              ring={retry ? ACCENT : undefined}
+              ringP={retry ? ease(frame, dropsAt, 8) : 0}
             >
               <span style={TABULAR}>seq {s}</span>
             </Cell>
           );
         })}
-        <Note at={sendAt(2) + 4} x={topicL.x + 2 * 96 + 104} y={topicL.y + topicL.h / 2 - h(16)}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>← a retry</span>
+        <Note at={sendAt(2) + 6} x={topicL.x + topicL.w + 16} y={topicL.y + topicL.h / 2 - h(30)}>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>← a retried copy</span>
         </Note>
-        <Note at={dropsAt + 10} x={topicL.x + 2 * 96 - 6} y={topicL.y + topicL.h + h(80)}>
+        <Note at={dropsAt + 6} x={topicL.x + topicL.w + 16} y={topicL.y + topicL.h / 2 + h(2)}>
           <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            <Strike at={dropsAt + 14}>seq 42 again</Strike>: dropped
+            <Strike at={dropsAt + 10}>seq 42 again</Strike>: dropped
           </span>
         </Note>
 
@@ -368,7 +368,7 @@ export const IdemScene: React.FC = () => {
         <Note at={bothAt} x={txn.x + 10} y={txn.y + txn.h + h(12)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>both land, or neither</span>
         </Note>
-        <Note at={loopAt} x={app.x - 330} y={app.y + h(18)}>
+        <Note at={loopAt} x={app.x - 18} y={app.y + h(26)} align="right">
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>consume → transform → produce</span>
         </Note>
 

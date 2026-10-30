@@ -15,7 +15,11 @@ const CELL = 58;
 const GAP = 10;
 const FAIL = 14;
 const CHECKPOINTS = [6, 12, 18];
-const UNCHANGED = [19, 20, 22];
+/** The run dies before this batch. */
+const CRASH = 21;
+/** Embedded before the crash, after the last checkpoint: on the restart
+ *  their content hashes match what is indexed, so they are skipped. */
+const UNCHANGED = [18, 19, 20];
 
 /**
  * Question 11. The page's arithmetic, worked as it is said (check.mjs): 10
@@ -64,10 +68,12 @@ export const BackfillScene: React.FC = () => {
   const fill = (i: number) => {
     if (i < FAIL) return ease(frame, batchAt + 4 + i * 1.2, 6);
     if (i === FAIL) return ease(frame, retryAt + 20, 8);
-    if (i <= CHECKPOINTS[2]) return ease(frame, checkAt + 6 + (i - FAIL) * 2, 6);
-    return ease(frame, resumeAt + 8 + (i - CHECKPOINTS[2]) * 3, 6);
+    if (i < CRASH) return ease(frame, checkAt + 6 + (i - FAIL) * 2, 6);
+    return ease(frame, resumeAt + 10 + (i - CRASH) * 4, 6);
   };
   const failed = ease(frame, retryAt + 2, 8) * (1 - ease(frame, retryAt + 20, 8));
+  const crashAt = upsertAt - 10;
+  const crash = ease(frame, crashAt, 8) * (1 - 0.6 * ease(frame, resumeAt + 16, 12));
   const restart = ease(frame, upsertAt, 10);
 
   return (
@@ -115,7 +121,7 @@ export const BackfillScene: React.FC = () => {
           <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>
             <b>time</b> = 4 billion ÷ your rate limit
             <span style={{ opacity: ease(frame, rateAt - 2, 10), color: INK_SOFT }}>
-              ; at <Num>{num(BACKFILL.rate)}</Num> a minute,
+              ; at <Num>{num(BACKFILL.rate)}</Num> tokens a minute,
             </span>
             <span style={{ opacity: ease(frame, minutesAt - 2, 10) }}>
               {" "}<Num>{num(BACKFILL.minutes)}</Num> minutes
@@ -159,6 +165,10 @@ export const BackfillScene: React.FC = () => {
             const o = ease(frame, retryAt + 6 + k * 5, 6) * (1 - ease(frame, checkAt, 10));
             return <circle key={k} cx={xs[k]} cy={barTop - 14} r={4} fill={ACCENT} opacity={o} />;
           })}
+          {/* The crash, after the last checkpoint. */}
+          <g opacity={crash}>
+            <line x1={cellX(CRASH) - GAP / 2} x2={cellX(CRASH) - GAP / 2} y1={barTop - 14} y2={barTop + CELL + 14} stroke={ACCENT} strokeWidth={3} />
+          </g>
           {/* Checkpoints. */}
           {CHECKPOINTS.map((c, k) => {
             const o = ease(frame, checkAt + 2 + k * 4, 10);
@@ -173,6 +183,9 @@ export const BackfillScene: React.FC = () => {
         </svg>
         <Note at={retryAt} x={cellX(FAIL) - 60} y={barTop - 52} dim={checkAt}>
           <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>rate-limited: retry, wait longer</span>
+        </Note>
+        <Note at={crashAt} x={cellX(CRASH) + 4} y={barTop - 52}>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: crash }}>the run dies</span>
         </Note>
         <Note at={checkAt + 2} x={cellX(CHECKPOINTS[0]) - 4} y={barTop + CELL + 14}>
           <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>checkpoints</span>
@@ -203,7 +216,7 @@ export const BackfillScene: React.FC = () => {
         <Note at={hashAt - 2} x={X0} y={barTop + CELL + 150}>
           <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <span style={{ display: "inline-block", width: 18, height: 18, borderRadius: 4, background: QUIET, marginRight: 10, verticalAlign: "-2px" }} />
-            content hash unchanged:{" "}
+            already embedded, hash unchanged:{" "}
             <Mark at={neverAt + 4} color={MARK_OK}>
               never embedded twice
             </Mark>

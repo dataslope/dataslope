@@ -290,7 +290,7 @@ export const RapidScene: React.FC = () => {
           </span>
         </Note>
         <Note at={neverAt - 2} x={R_X} y={y(540)}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>In streaming, it never does.</span>
+          <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap" }}>In streaming, it never does.</span>
         </Note>
         <Spot id="de-distributed-honeybee" at={assumedAt + 4} left={1420} top={y(560)} width={360} height={282} />
         <NextLine at={nextAt} x={R_X} y={y(760)} width={560}>

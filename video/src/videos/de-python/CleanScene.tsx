@@ -30,7 +30,7 @@ import {
 
 const TOP = 330;
 const SIZE = 19;
-const RIGHT_X = 1000;
+const RIGHT_X = 1060;
 
 /**
  * Questions 13 and 14. The page's clean(): its four raw rows (whitespace kept
@@ -81,10 +81,10 @@ export const CleanScene: React.FC = () => {
   const fnTop = y(TOP);
   const rawLines = CLEAN.raw.map((r) => JSON.stringify(r));
   const rawTop = y(TOP);
-  const outTop = rawTop + consoleHeight(rawLines.length, 21) + h(46);
+  const outTop = rawTop + consoleHeight(rawLines.length, 21) + h(64);
   const PO = CLEAN.page.out;
   const Q = CLEAN.quoted.lines;
-  const qTop = outTop + consoleHeight(PO.length, 20) + h(56);
+  const qTop = outTop + consoleHeight(PO.length, 20) + h(30);
   const QR = CLEAN.quarantine.lines;
   const qrH = listingHeight(QR.length, SIZE);
 
@@ -97,7 +97,7 @@ export const CleanScene: React.FC = () => {
   const tg = geoOf(table, RIGHT_X + 60, y(TOP), h, { rowH: 50, bodySize: 24 });
   const bad = table.rows.flatMap((r, i) => (r[2] === "NaN" ? [i] : []));
   const DT = CLEAN.dates.lines;
-  const dtTop = y(TOP) + listingHeight(NU.lines.length, 21) + h(170);
+  const dtTop = y(TOP) + listingHeight(NU.lines.length, 21) + h(150);
   const DO = CLEAN.dates.out;
 
   return (
@@ -126,7 +126,7 @@ export const CleanScene: React.FC = () => {
           lines={FN}
           x={X0}
           top={fnTop}
-          width={820}
+          width={900}
           size={SIZE}
           at={stripAt - 4}
           out={silenceAt - 4}
@@ -206,7 +206,7 @@ export const CleanScene: React.FC = () => {
           lines={QR}
           x={X0}
           top={fnTop}
-          width={820}
+          width={900}
           size={SIZE}
           at={silenceAt}
           out={out13}
@@ -286,7 +286,7 @@ export const CleanScene: React.FC = () => {
             { line: lineOf(DO, "day 30"), at: febAt + 4, color: MARK_BAD },
           ]}
         />
-        <Note at={formatAt} x={X0 + 860} y={dtTop + h(4)}>
+        <Note at={formatAt} x={X0 + 860} y={dtTop + h(60)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             one explicit format: <Mono>%Y-%m-%d</Mono>
           </span>

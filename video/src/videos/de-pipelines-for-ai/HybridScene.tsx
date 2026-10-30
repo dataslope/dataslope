@@ -155,8 +155,12 @@ export const HybridScene: React.FC = () => {
           <span style={head(22, BLUE_INK)}>vector search, by meaning</span>
         </Note>
         {HYBRID.vector.map((id, i) => (
-          <Row key={id} x={COLS[0]} y={rowY(i)} rank={i + 1} id={id} at={vectorAt + 2 + i * 3} lit={id === CODE ? fourthAt : i < 3 ? generalAt : undefined} />
+          <Row key={id} x={COLS[0]} y={rowY(i)} rank={i + 1} id={id} at={vectorAt + 2 + i * 3} lit={id === CODE ? fourthAt : undefined} />
         ))}
+
+        <Note at={generalAt - 2} x={COLS[0]} y={rowY(5) + 24}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>1 to 3: tickets about errors in general</span>
+        </Note>
 
         {/* The keyword side. */}
         <Note at={addsAt - 2} x={COLS[1]} y={y(LIST_TOP) - 44}>

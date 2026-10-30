@@ -60,7 +60,7 @@ export const JoinScene: React.FC = () => {
   const textAt = n.word("join", "How do you join");
   const smallerAt = n.word("join", "make them smaller");
   const decAt = n.word("join", "Filter to December");
-  const reachAt = n.word("join", "eighty-four thousand orders reach");
+  const reachAt = n.word("join", "eighty-five thousand orders reach");
   const millionAt = n.word("join", "instead of a million");
   const strategyAt = n.word("join-hash", "pick the strategy");
   const buildAt = n.word("join-hash", "builds a hash table");
@@ -162,20 +162,26 @@ export const JoinScene: React.FC = () => {
                 opacity={ease(frame, buildAt + i * 2, 8)}
               />
             ))}
-            <text x={bucketX(0)} y={diagY + 84} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, buildAt + 8, 10)}>
-              hash table, in memory
+            <text x={p1} y={diagY + 86} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, buildAt + 8, 10)}>
+              builds the hash table
             </text>
-            {/* Orders stream along under the buckets, each dropping into one. */}
-            {Array.from({ length: 8 }, (_, k) => {
-              const t = streamP(k);
-              if (t <= 0) return null;
-              const target = bucketX((k * 5) % buckets) + 19;
-              const x = p1 + 20 + (target - p1 - 20) * t;
-              const yy = diagY + 150 - 70 * Math.max(0, (t - 0.7) / 0.3);
-              return <rect key={k} x={x - 8} y={yy - 8} width={16} height={16} rx={3} fill={inkOf.yellow} opacity={1 - Math.max(0, (t - 0.92) / 0.08)} />;
-            })}
-            <text x={p1} y={diagY + 190} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, streamAt, 10)}>
-              orders stream past and probe it
+            <Box x={p1} y={diagY + 104} w={170} h={50} text={`orders ${thousands(JOIN.probe)}`} p={ease(frame, streamAt - 4, 10)} stroke={inkOf.yellow} ink={INK} />
+            {/* Orders stream from their box up into the buckets, one after
+                another for as long as the scene is up: each probes one. */}
+            {streamP(0) > 0
+              ? Array.from({ length: 6 }, (_, k) => {
+                  const t = (((frame - streamAt - k * 7) / 42) % 1 + 1) % 1;
+                  if (frame - streamAt - k * 7 < 0) return null;
+                  const target = bucketX((k * 5) % buckets) + 19;
+                  const sx = p1 + 178;
+                  const sy = diagY + 129;
+                  const x = sx + (target - sx) * t;
+                  const yy = sy + (diagY + 64 - sy) * t * t;
+                  return <rect key={k} x={x - 7} y={yy - 7} width={14} height={14} rx={3} fill={inkOf.yellow} opacity={Math.min(1, t * 5) * (1 - Math.max(0, (t - 0.85) / 0.15))} />;
+                })
+              : null}
+            <text x={bucketX(0)} y={diagY + 176} style={svgText(note(20, INK_SOFT))} opacity={ease(frame, streamAt, 10)}>
+              the big side streams past, probing
             </text>
           </g>
 
@@ -243,10 +249,10 @@ export const JoinScene: React.FC = () => {
                   {/* Bucketing: both tables split on the key, bucket by bucket. */}
                   <g opacity={ease(frame, bucketAt + m * 4, 10)}>
                     <text x={mx + 12} y={diagY + 74} style={svgText(note(19, INK))}>
-                      orders, bucket {m + 1}
+                      orders {m + 1}
                     </text>
                     <text x={mx + 12} y={diagY + 100} style={svgText(note(19, INK))}>
-                      customers, {m + 1}
+                      customers {m + 1}
                     </text>
                   </g>
                 </g>
@@ -256,7 +262,7 @@ export const JoinScene: React.FC = () => {
               the cost is moving rows between machines
             </text>
             <text x={p3} y={diagY + 176} style={svgText(note(20, INK))} opacity={ease(frame, togetherAt, 10)}>
-              matching rows already on one machine
+              bucketed by customer_id: matches sit together
             </text>
           </g>
         </svg>

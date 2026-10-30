@@ -111,7 +111,7 @@ export const script: NarrationScript = {
     },
     {
       id: "hook-fit",
-      text: "Read the whole file first, and it can't fit. Read it one line at a time, and memory only ever holds a line.",
+      text: "[slowly] Read the whole file first, and it can't fit. Read it one line at a time, and memory only ever holds a line.",
       pauseAfter: 0.7,
     },
     {
@@ -208,7 +208,7 @@ export const script: NarrationScript = {
     },
     {
       id: "iter-def",
-      text: "An iterable, like a list or a dict, hands out a fresh iterator each time you loop over it. An iterator keeps its place, and once it reaches the end, it's used up.",
+      text: "[slowly] An iterable, like a list or a dict, hands out a fresh iterator each time you loop over it. An iterator keeps its place, and once it reaches the end, it's used up.",
       pauseAfter: 0.7,
     },
     {
@@ -279,7 +279,7 @@ export const script: NarrationScript = {
     },
     {
       id: "latest-tie",
-      text: "If two rows can share a timestamp, add a tiebreaker to the sort, so which one you keep doesn't depend on arrival order.",
+      text: "[slowly] If two rows can share a timestamp, add a tiebreaker to the sort, so which one you keep doesn't depend on arrival order.",
       pauseAfter: 0.8,
     },
     { id: "join-in", text: "A dict can do a join, too." },
@@ -407,7 +407,7 @@ export const script: NarrationScript = {
     },
     {
       id: "clean-reject",
-      text: "And don't drop bad rows in silence. Send them to a reject list with the reason, and count them.",
+      text: "[slowly] And don't drop bad rows in silence. Send them to a reject list with the reason, and count them.",
       pauseAfter: 0.7,
     },
     {

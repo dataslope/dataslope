@@ -307,26 +307,32 @@ export const script: NarrationScript = {
     {
       id: "r-degen",
       text: "A degenerate dimension is a dimension with no table behind it, like an invoice number kept on the fact. You still group by it.",
+      pauseAfter: 0.9,
     },
     {
       id: "r-junk",
       text: "A junk dimension gathers small flags, payment type, gift or not, web or store, into one table of every combination: twelve rows, and the fact carries one key instead of three.",
+      pauseAfter: 0.8,
     },
     {
       id: "r-role",
       text: "A role-playing dimension is one table in several roles: the date dimension, joined once as the order date and once as the ship date.",
+      pauseAfter: 0.8,
     },
     {
       id: "r-mini",
       text: "A mini-dimension moves fast-changing attributes, like age band and income tier, out of a big customer dimension into a small one, twenty rows here, with its own key on the fact. The big one stops growing a new version every time a band changes.",
+      pauseAfter: 0.8,
     },
     {
       id: "r-factless",
       text: "A factless fact table has no measures at all: one row per event, like a student attending a class. Counting the rows is the measure.",
+      pauseAfter: 1.0,
     },
     {
       id: "r-uuid",
       text: "And a surrogate key from a sequence is a small integer, handed out in order: compact and quick to join. The other choice is a UUID, a universally unique identifier: sixteen bytes any system can make without a shared counter, which matters when many sources insert at once.",
+      pauseAfter: 0.6,
     },
     {
       id: "r-uuid-cost",

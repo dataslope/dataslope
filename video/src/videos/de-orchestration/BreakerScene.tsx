@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease, map } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, halo, label, note, svgText } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -84,7 +84,7 @@ export const BreakerScene: React.FC = () => {
           ? map(frame, [nothingAt, nothingAt + 24], [tripT, firstOpen.t1])
           : map(frame, [probeAt, probeAt + 50], [firstOpen.t1, N - 1]);
   const retryT = map(frame, [retriesAt, retriesAt + 40], [0, N - 1]);
-  const retryErrT = map(frame, [neverAt - 4, neverAt + 26], [0, N - 1]);
+  const retryErrT = map(frame, [retriesAt + 8, retriesAt + 48], [0, N - 1]);
   const path = (vals: readonly number[], upto: number, f: (v: number) => number) => {
     const last = Math.floor(upto);
     if (upto <= 0) return "";
@@ -189,13 +189,13 @@ export const BreakerScene: React.FC = () => {
           ) : null,
         )}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          <circle cx={badX} cy={midY} r={92 + 10 * ring} fill="none" stroke={ACCENT} strokeWidth={2.4} opacity={ease(frame, oneAt, 10) * (0.5 + 0.5 * ring)} strokeDasharray="6 5" />
+          <circle cx={badX} cy={midY} r={106 + 8 * ring} fill="none" stroke={ACCENT} strokeWidth={2.4} opacity={ease(frame, oneAt, 10) * (0.5 + 0.5 * ring)} strokeDasharray="6 5" />
         </svg>
-        <Note at={oneAt + 6} x={badX - 90} y={midY + h(98)}>
+        <Note at={oneAt + 6} x={badX - 100} y={midY + h(116)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>stays one bad table</span>
         </Note>
         <Note at={spreadAt + 4} x={downX - 92} y={downY(DOWN.length - 1) + h(40)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>nothing downstream touched</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>downstream untouched</span>
         </Note>
         <Note at={pointAt} x={X0} y={y(760)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>not to fail faster:</span>
@@ -266,12 +266,12 @@ export const BreakerScene: React.FC = () => {
           </span>
         </Note>
         <Note at={nothingAt + 8} x={(tx(firstOpen.t0) + tx(firstOpen.t1)) / 2 - 4} y={ry(yMax) - h(4)} from="up">
-          <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK), ...halo, fontWeight: 700, whiteSpace: "nowrap" }}>
             open <Num>{BREAKER.openFor}</Num> s: nothing gets through
           </span>
         </Note>
-        <Note at={probeAt + 30} x={tx(lastProbe.t0) + 8} y={ry(BREAKER.offered * BREAKER.probeShare) - h(70)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>probe gets through</span>
+        <Note at={probeAt + 30} x={tx(lastProbe.t0) + 12} y={ry(170)}>
+          <span style={{ ...label(20, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>probe gets through</span>
         </Note>
         <Note at={probeAt + 46} x={TX1 + 12} y={ry(BREAKER.offered) - 14}>
           <span style={{ ...label(20, OK_INK), whiteSpace: "nowrap" }}>with a breaker</span>

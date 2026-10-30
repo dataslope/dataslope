@@ -111,7 +111,7 @@ export const ClusterScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-sprinkle" at={minmaxAt + 4} level={-34} />
+      <Sfx name="el-sprinkle" at={likeAt + 2} level={-34} />
       <Sfx name="el-pencil" at={marchAt} level={-35} />
       <Sfx name="el-tap" at={twoAt} level={-35} />
       <Sfx name="el-sprinkle" at={shuffleAt + 4} level={-34} />
@@ -141,9 +141,9 @@ export const ClusterScene: React.FC = () => {
 
         {/* ── The year, and March ── */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          <g opacity={ease(frame, minmaxAt, 12)}>
+          <g>
             {MONTH_NAMES.map((m, i) => (
-              <g key={m}>
+              <g key={m} opacity={ease(frame, ordersAt + 4 + i * 2, 10)}>
                 <line x1={xOf(monthStart(i))} x2={xOf(monthStart(i))} y1={y(MONTHS_Y) + 4} y2={y(MONTHS_Y) + 28} stroke={INK} strokeOpacity={0.35} />
                 <text x={xOf(monthStart(i)) + 6} y={y(MONTHS_Y) + 22} style={svgText(label(19, INK_SOFT))}>
                   {m}
@@ -167,13 +167,13 @@ export const ClusterScene: React.FC = () => {
         </Note>
 
         {/* ── In date order ── */}
-        <div style={{ position: "absolute", left: X0, top: y(SORTED_Y) - 4, width: AX0 - X0 - 20, opacity: ease(frame, dateOrderAt - 6, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(SORTED_Y) - 4, width: AX0 - X0 - 20, opacity: ease(frame, likeAt - 2, 12) }}>
           <div style={{ ...label(23, INK) }}>in date order</div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 4, opacity: ease(frame, weeksAt, 10) }}>
             <Num>{CLUSTER.sorted.groups.length}</Num> row groups, about six weeks each
           </div>
         </div>
-        {panel(SORTED_Y, CLUSTER.sorted.groups, dateOrderAt - 4, twoAt, BAR, true)}
+        {panel(SORTED_Y, CLUSTER.sorted.groups, likeAt, twoAt, BAR, true)}
         <div style={{ position: "absolute", left: RIGHT, top: y(SORTED_Y) + h(STEP) * 2, opacity: ease(frame, twoAt + 4, 12) }}>
           <div style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Num>{CLUSTER.sorted.overlapping}</Num> of <Num>{CLUSTER.sorted.groups.length}</Num> groups read

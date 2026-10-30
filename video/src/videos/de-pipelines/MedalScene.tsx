@@ -63,13 +63,13 @@ export const MedalScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {TIERS.map((t) => (
-        <Sfx key={t.name} name="el-pop" at={t.at} level={-34} />
+        <Sfx key={t.name} name="el-pop" at={t.at} level={-30} />
       ))}
-      <Sfx name="el-pencil" at={goldFromAt} level={-36} />
-      <Sfx name="el-pencil" at={silverFromAt} level={-36} />
-      <Sfx name="el-scratch" at={wrongAt + 2} level={-35} />
-      <Sfx name="el-whoosh" at={fixAt + 4} level={-36} />
-      <Sfx name="el-chime" at={holdsAt + 8} level={-36} />
+      <Sfx name="el-pencil" at={goldFromAt} level={-34} />
+      <Sfx name="el-pencil" at={silverFromAt} level={-34} />
+      <Sfx name="el-scratch" at={wrongAt + 2} level={-31} />
+      <Sfx name="el-whoosh" at={fixAt + 4} level={-32} />
+      <Sfx name="el-chime" at={holdsAt + 8} level={-32} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} size={60}>

@@ -159,7 +159,7 @@ export const HookScene: React.FC = () => {
         </Note>
         <Note at={twelveAt - 2} x={X0} y={planTop + h(60)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: BLUE_INK, ...TABULAR }}>12</b> worked through on one small stream
+            <b style={{ color: BLUE_INK, ...TABULAR }}>12</b> worked through, most on one small stream
             <span style={{ ...label(22, INK_SOFT), fontWeight: 600, opacity: ease(frame, ownAt, 10) }}> · the video's own</span>
           </span>
         </Note>

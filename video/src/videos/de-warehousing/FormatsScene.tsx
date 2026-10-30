@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { COLUMNS, FILES, MB } from "./data";
-import { COLUMN_TINT, Drift, FileBar, OK, OK_INK, PARQUET_SEGMENTS, X0 } from "./parts";
+import { COLUMN_TINT, Drift, FileBar, OK, OK_INK, PARQUET_SEGMENTS, pulse, X0 } from "./parts";
 
 const TOP = 300;
 const CARD_W = 520;
@@ -135,6 +135,7 @@ export const FormatsScene: React.FC = () => {
   const from = n.beat("fmt").from;
   const qAt = n.word("fmt", "Question three");
   const qTextAt = n.word("fmt", "Compare Parquet");
+  const qEnd = n.beat("fmt").to;
   const pqAt = n.word("fmt-columnar", "Parquet and ORC");
   const orcAt = n.word("fmt-columnar", "ORC, optimized row columnar");
   const bothAt = n.word("fmt-columnar", "both columnar and compressed");
@@ -218,14 +219,17 @@ export const FormatsScene: React.FC = () => {
         </QuestionCard>
 
         {cards.map((c, i) => {
-          const p = ease(frame, c.at, 14);
+          // The three names head their cards as the question finishes, and
+          // each swells as the answer reaches it.
+          const p = ease(frame, qEnd - 12 + i * 6, 14);
           if (p <= 0) return null;
           const x = cardX(i);
+          const named = pulse(frame, c.at, 18);
           return (
             <React.Fragment key={c.name}>
               <div style={{ position: "absolute", left: x, top: y(TOP), width: CARD_W, height: 2, background: INK, transform: `scaleX(${p})`, transformOrigin: "left" }} />
               <div style={{ position: "absolute", left: x, top: y(TOP) + 12, display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap", opacity: p }}>
-                <span style={{ ...headline(44) }}>{c.name}</span>
+                <span style={{ ...headline(44), display: "inline-block", transform: `scale(${1 + 0.08 * named})`, transformOrigin: "left bottom" }}>{c.name}</span>
                 <span style={{ ...label(21, BLUE_INK), opacity: ease(frame, c.kindAt, 10) }}>{c.kind}</span>
               </div>
               {c.diagram}

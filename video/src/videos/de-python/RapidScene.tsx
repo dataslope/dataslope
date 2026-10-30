@@ -1,8 +1,9 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -59,6 +60,35 @@ const Line: React.FC<{ at: number; top: number; x?: number; children: React.Reac
   </Note>
 );
 
+/** Seven nights, each run of the script filling in after the one before. */
+const Nights: React.FC<{ x: number; top: number; at: number }> = ({ x, top, at }) => {
+  const frame = useCurrentFrame();
+  return (
+    <>
+      {Array.from({ length: 7 }, (_, i) => {
+        const p = ease(frame, at + i * 6, 8);
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: x + i * 44,
+              top,
+              width: 32,
+              height: 32,
+              borderRadius: 4,
+              boxSizing: "border-box",
+              border: `2px solid ${OK}`,
+              background: `color-mix(in srgb, ${OK} ${Math.round(p * 55)}%, ${PAPER})`,
+              opacity: ease(frame, at - 6, 8),
+            }}
+          />
+        );
+      })}
+    </>
+  );
+};
+
 /** 15. The page's running dict: five rows in, two groups held. */
 const StreamBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const S = QUICK.stream;
@@ -98,7 +128,7 @@ const PandasBody: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={gens} top={c.y(432)} color={OK_INK}>
         generators: it streams, or it won&apos;t fit
       </Line>
-      <Line at={gens + 8} top={c.y(520)} color={INK_SOFT} size={22}>
+      <Line at={fits + 6} top={c.y(520)} color={INK_SOFT} size={22}>
         the same 1,000,000 rows, peak memory in Pyodide
       </Line>
       <Bars
@@ -233,6 +263,7 @@ export const RapidScene: React.FC = () => {
         <Line at={nightAt} top={y(460)}>
           <Mark at={nightAt + 6}>every night, on a schedule</Mark>
         </Line>
+        <Nights x={R_X + 400} top={y(460) + h(2)} at={nightAt + 8} />
         <Line at={pipelineAt} top={y(520)} color={OK_INK}>
           <span style={{ fontWeight: 650 }}>a pipeline</span>
         </Line>

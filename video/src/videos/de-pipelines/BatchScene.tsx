@@ -68,15 +68,15 @@ export const BatchScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-sprinkle" at={hourAt} level={-33} />
-      <Sfx name="el-pop" at={resultAt + 2} level={-34} />
-      <Sfx name="el-sprinkle" at={streamAt + 4} level={-34} />
+      <Sfx name="el-sprinkle" at={hourAt} level={-31} />
+      <Sfx name="el-pop" at={resultAt + 2} level={-30} />
+      <Sfx name="el-sprinkle" at={streamAt + 4} level={-31} />
       {costs.map((c) => (
-        <Sfx key={c.text} name="el-tap" at={c.at} level={-37} />
+        <Sfx key={c.text} name="el-tap" at={c.at} level={-33} />
       ))}
-      <Sfx name="el-tap" at={dashAt} level={-35} />
-      <Sfx name="el-tap" at={fraudAt} level={-35} />
-      <Sfx name="el-chime" at={realAt + 6} level={-36} />
+      <Sfx name="el-tap" at={dashAt} level={-31} />
+      <Sfx name="el-tap" at={fraudAt} level={-31} />
+      <Sfx name="el-chime" at={realAt + 6} level={-32} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} size={64}>

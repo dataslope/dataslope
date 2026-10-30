@@ -106,7 +106,7 @@ const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={N.rows.flatMap((r, row) => (Number(r[rn]) > 1 ? [{ row, col: rn, at: keepAt + 2 + row, color: MARK }] : []))}
       />
       <Note at={keepAt + 6} x={R_X} y={ng.rowTop(N.rows.length) + c.h(18)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           <QMono>rn &gt; 1</QMono>: every extra copy, whole rows
         </span>
       </Note>
@@ -118,7 +118,7 @@ const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Cte: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-cte", "A subquery nests a step");
-  const namesAt = c.w("r-cte", "A CTE names it up front");
+  const namesAt = c.w("r-cte", "Written as a CTE");
   const twiceAt = c.w("r-cte", "can be used twice");
   const sameAt = c.w("r-cte", "the same three users");
   const S = RAPID.subquery;
@@ -246,12 +246,12 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={edgesAt} x={g.right + 30} y={g.rowTop(0)}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>nothing before the first day:</span>
         <br />
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, zeroAt - 2, 10) }}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, zeroAt - 2, 10) }}>
           <QMono>LAG(revenue, 1, 0)</QMono> gives 0
         </span>
       </Note>
       <Note at={nullAt} x={g.right + 30} y={g.rowTop(last)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           nothing after: <QMono>LEAD</QMono> gives null
         </span>
       </Note>
@@ -269,10 +269,10 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
   const rangeAt = c.w("r-running", "the default is range");
   const shareAt = c.w("r-running", "share one total");
   const R = RAPID.running;
-  const rg = geo(c, R, R_X + 610, c.T + c.h(8));
+  const rg = geo(c, R, R_X + 590, c.T + c.h(8));
   const rt = R.cols.indexOf("running_total");
   const T = RAPID.tied;
-  const tg = geo(c, T, R_X + 610, rg.rowTop(R.rows.length) + c.h(80));
+  const tg = geo(c, T, R_X + 590, rg.rowTop(R.rows.length) + c.h(100));
   const day = T.cols.indexOf("day");
   const tied = T.rows.flatMap((r, i) => (T.rows.filter((s) => s[day] === r[day]).length > 1 ? [i] : []));
   const ttotal = T.cols.indexOf("running_total");
@@ -282,7 +282,7 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
         lines={R.lines}
         x={R_X}
         top={c.T}
-        width={580}
+        width={560}
         size={SIZE}
         at={at - 4}
         marks={[
@@ -469,13 +469,13 @@ const Ntile: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Listing lines={Q.lines} x={R_X} top={c.T} width={720} size={SIZE} at={at - 4} marks={[{ line: lineOf(Q.lines, "NTILE(4)"), at: at + 8 }]} />
       <Note at={fourAt - 4} x={R_X} y={top - c.h(36)}>
-        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
           <QMono>NTILE(4)</QMono>: customers per bucket
         </span>
       </Note>
       <DataTable g={qg} cols={colsOf(q)} at={fourAt - 2} rows={rowsAt(q.rows, fourAt + 2)} />
       <Note at={evenAt - 4} x={R_X + 420} y={top - c.h(36)}>
-        <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
           <QMono>NTILE(5)</QMono>: customers per bucket
         </span>
       </Note>
@@ -507,8 +507,8 @@ const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
       <DataTable
         g={g}
         cols={colsOf(S, { pct_rank: { ink: BLUE_INK }, cume_dist: { ink: BLUE_INK } })}
-        at={valuesAt - 4}
-        rows={rowsAt(S.rows, valuesAt)}
+        at={at + 2}
+        rows={rowsAt(S.rows, at + 6)}
         bands={ties.map((row) => ({ row, at: valuesAt + 10, out: thirdAt }))}
         marks={[
           ...ties.map((row, k) => ({ row, col: pr, at: thirdAt + 2 + k * 3, color: MARK })),
@@ -516,12 +516,12 @@ const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={at + 6} x={g.right + 40} y={g.rowTop(0)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           <QMono>pct_rank</QMono> = (rank − 1) / (rows − 1)
         </span>
       </Note>
       <Note at={cumeAt + 4} x={g.right + 40} y={g.rowTop(1) + c.h(6)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           <QMono>cume_dist</QMono> = rows at or tied with it / rows
         </span>
       </Note>
@@ -546,7 +546,7 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
   const ug = geo(c, U, R_X, c.T + c.h(8), 46);
   const C = RAPID.coalesce;
   const listTop = ug.rowTop(U.rows.length) + c.h(40);
-  const cg = geo(c, C, R_X + 700, listTop, 46);
+  const cg = geo(c, C, ug.right + 60, c.T + c.h(8), 46);
   const phone = U.cols.indexOf("phone");
   const email = U.cols.indexOf("email");
   const N = RAPID.nullif;
@@ -575,8 +575,8 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
       ]} />
       <Note at={nullifAt} x={R_X} y={under(c, C.lines.length, listTop) + c.h(20)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          <QMono>NULLIF(units, 0)</QMono>: a zero becomes null, so <QMono>500 / NULLIF(0, 0)</QMono> is{" "}
-          <span style={{ fontStyle: "italic", color: INK_SOFT }}>{N.rows[0][0]}</span>, not an error
+          <QMono>NULLIF(units, 0)</QMono>: a zero divisor becomes null, so <QMono>500 / NULLIF(0, 0)</QMono> is{" "}
+          <span style={{ fontStyle: "italic", color: INK_SOFT }}>{N.rows[0][0]}</span>
         </span>
       </Note>
     </>
@@ -688,7 +688,7 @@ export const RapidScene: React.FC = () => {
       <Sfx name="el-chime" at={end} level={-34} />
 
       <Drift from={from} to={n.beat("next").to + 40} scale={0.015}>
-        <Kicker at={from}>Questions 12 to 22</Kicker>
+        <Kicker at={from - 8}>Questions 12 to 22</Kicker>
         <Headline lead="The other eleven," turn="one-liners." at={downAt - 4} turnAt={linersAt - 2} size={64} />
         <Spot id="da-sql-stopwatch" video="da-sql" at={from + 6} left={1640} top={y(112)} width={130} height={140} />
 
@@ -699,7 +699,7 @@ export const RapidScene: React.FC = () => {
           <Cross c={c} />
         </Fade>
 
-        <Spot id="de-sql-patterns-koala" at={nextAt - 20} left={1500} top={y(560)} width={300} height={301} />
+        <Spot id="de-sql-patterns-koala" at={end + 6} left={1500} top={y(560)} width={300} height={301} />
         <NextLine at={nextAt} x={R_X} y={y(850)} width={1000}>
           SQL performance
         </NextLine>

@@ -11,8 +11,8 @@ import { RECURSIVE } from "./data";
 import { Drift, lineOf, Listing, listingHeight, MARK_OK, Svg, X0 } from "./parts";
 
 const TOP = 310;
-const SIZE = 18;
-const LIST_W = 700;
+const SIZE = 19;
+const LIST_W = 724;
 /** The tree: one row per depth, nodes spread across the right of the page. */
 const TREE_X0 = 920;
 const TREE_X1 = 1640;
@@ -37,9 +37,8 @@ export const RecursiveScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("recursive").from;
-  const qAt = n.word("recursive", "Question");
   const textAt = n.word("recursive", "How do you write a recursive CTE");
-  const namedAt = n.word("recursive", "a named query");
+  const firstAt = n.word("recursive", "First, a CTE is");
   const withAt = n.word("recursive", "written with WITH");
   const halvesAt = n.word("recursive-anchor", "two halves");
   const unionAt = n.word("recursive-anchor", "joined with union all");
@@ -88,7 +87,7 @@ export const RecursiveScene: React.FC = () => {
       <Sfx name="el-pencil" at={capAt} level={-36} />
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={11} at={qAt - 4} textAt={textAt - 4} size={60}>
+        <QuestionCard n={11} at={from - 8} textAt={textAt - 4} size={60}>
           How do you write a recursive CTE?
         </QuestionCard>
 
@@ -99,7 +98,7 @@ export const RecursiveScene: React.FC = () => {
           top={y(TOP)}
           width={LIST_W}
           size={SIZE}
-          at={namedAt - 6}
+          at={firstAt - 2}
           marks={[
             { line: lineOf(L.lines, "WITH RECURSIVE"), at: withAt },
             { line: lineOf(L.lines, "UNION ALL"), at: unionAt + 2 },
@@ -110,7 +109,7 @@ export const RecursiveScene: React.FC = () => {
           ]}
         />
         <Note at={halvesAt} x={X0} y={y(TOP) + listingHeight(L.lines.length, SIZE) + h(24)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             anchor <QMono>UNION ALL</QMono> recursive half, run until a pass adds no rows
           </span>
         </Note>
@@ -163,7 +162,7 @@ export const RecursiveScene: React.FC = () => {
           </Ink>
         ))}
         <Note at={noManagerAt + 8} x={place.get(L.rows[0][id])!.x + NODE_W / 2 + 20} y={y(LEVEL_Y[0]) + h(12)}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             <QMono>manager_id</QMono> is null
           </span>
         </Note>

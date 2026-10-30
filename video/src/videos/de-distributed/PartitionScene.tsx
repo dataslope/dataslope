@@ -18,8 +18,8 @@ const CELL_TOP = 440;
 const CELL_PITCH = 98;
 const CELL_H = 84;
 const R_X = 760;
-const ROW0 = 430;
-const ROW_PITCH = 104;
+const ROW0 = 410;
+const ROW_PITCH = 92;
 
 const FEW = caseOf(4);
 const MANY = caseOf(100_000);
@@ -89,21 +89,20 @@ export const PartitionScene: React.FC = () => {
         </QuestionCard>
 
         {/* One partition, one task, one core. */}
-        <Note at={unitAt - 2} x={R_X} y={y(318)}>
-          <span style={{ display: "flex", alignItems: "center", gap: 16, whiteSpace: "nowrap", ...note(25, INK) }}>
-            <span style={{ ...label(24, BLUE_INK), fontWeight: 700 }}>1 partition</span>
+        <Note at={unitAt - 2} x={G_X} y={y(300)}>
+          <span style={{ display: "block", whiteSpace: "nowrap", ...note(25, INK) }}>
+            a <b style={{ color: BLUE_INK }}>partition</b>: the unit of parallelism
+          </span>
+          <span style={{ display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap", ...note(25, INK), marginTop: 6 }}>
             <span style={{ opacity: ease(frame, taskAt, 10) }}>
-              → <b>1 task</b>
+              one task, on one partition,
             </span>
-            <span style={{ opacity: ease(frame, coreAt, 10) }}>
-              → <b>1 core</b>
-            </span>
-            <span style={{ opacity: ease(frame, unitAt + 4, 10), color: INK_SOFT, fontSize: 22 }}>: the unit of parallelism</span>
+            <span style={{ opacity: ease(frame, coreAt, 10) }}>on one core</span>
           </span>
         </Note>
 
         {/* The cluster: sixteen cores, and the data. */}
-        <Note at={modelAt - 2} x={G_X} y={y(384)}>
+        <Note at={modelAt - 2} x={G_X} y={y(394)}>
           <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
             A model: <Num>{PARTS.gb}</Num> GB<span style={{ opacity: ease(frame, coresAt, 10) }}> on <Num>{PARTS.cores}</Num> cores</span>
           </span>
@@ -206,7 +205,7 @@ export const PartitionScene: React.FC = () => {
         ].map((b) => {
           const o = band(b.at, b.out);
           return o > 0 ? (
-            <div key={b.k} style={{ position: "absolute", left: R_X - 14, top: caseRow(b.k) - 8, width: 1000, height: h(84), background: HIGHLIGHT, opacity: o * 0.5, borderRadius: 6 }} />
+            <div key={b.k} style={{ position: "absolute", left: R_X - 14, top: caseRow(b.k) - 8, width: 1000, height: h(80), background: HIGHLIGHT, opacity: o * 0.5, borderRadius: 6 }} />
           ) : null;
         })}
         <Note at={fewAt - 2} x={R_X} y={caseRow(0)}>
@@ -240,15 +239,15 @@ export const PartitionScene: React.FC = () => {
         </Note>
 
         {/* Changing the count. */}
-        <Repartition x={R_X} top={y(760)} at={repAt} labelAt={repAt} h={h} />
-        <Coalesce x={R_X + 520} top={y(760)} at={coalAt} labelAt={noShuffleAt} writeAt={writeAt} h={h} />
+        <Repartition x={R_X} top={y(702)} at={repAt} labelAt={repAt} h={h} />
+        <Coalesce x={R_X + 520} top={y(702)} at={coalAt} labelAt={noShuffleAt} writeAt={writeAt} h={h} />
       </Drift>
     </AbsoluteFill>
   );
 };
 
 const MINI_W = 70;
-const MINI_PITCH = 25;
+const MINI_PITCH = 23;
 
 /** Four partitions into six through a full shuffle: every new one draws from every old one. */
 const Repartition: React.FC<{ x: number; top: number; at: number; labelAt: number; h: (v: number) => number }> = ({ x, top, at, labelAt, h }) => {

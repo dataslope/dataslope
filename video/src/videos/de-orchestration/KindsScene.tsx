@@ -48,7 +48,7 @@ export const KindsScene: React.FC = () => {
   const safeAt = n.word("kinds-safe", "All three are safe");
   const idemAt = n.word("kinds-safe", "only on idempotent tasks");
   const sameAt = n.word("kinds-safe", "which end the same");
-  const partAt = n.word("kinds-safe", "Part 6 shows how");
+  const partAt = n.word("kinds-safe", "Part six shows how");
   const end = n.beat("kinds-safe").to;
 
   const stripY = y(590);
@@ -108,6 +108,13 @@ export const KindsScene: React.FC = () => {
             </div>
           </React.Fragment>
         ))}
+        {DAYS.map((d, i) =>
+          i < LAUNCH && frame >= neverAt + 8 + i * 3 ? (
+            <div key={d} style={{ position: "absolute", left: cx(i) - 13, top: stripY - 13 }}>
+              <Tick at={neverAt + 8 + i * 3} size={26} />
+            </div>
+          ) : null,
+        )}
         {DAYS.map((d, i) =>
           i >= LAUNCH && i < TODAY ? (
             <div key={d} style={{ position: "absolute", left: cx(i) - 13, top: stripY - 13, opacity: ease(frame, stripAt + 6 + i, 8) }}>

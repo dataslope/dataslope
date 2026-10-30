@@ -101,13 +101,13 @@ export const EtlScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-pop" at={ownAt} level={-35} />
-      <Sfx name="el-pop" at={loadingAt + 4} level={-35} />
-      <Sfx name="el-pop" at={rawAt} level={-35} />
-      <Sfx name="el-pop" at={insideAt} level={-35} />
-      <Sfx name="el-tap" at={defaultAt} level={-34} />
-      <Sfx name="el-pencil" at={againAt} level={-36} />
-      <Sfx name="el-tap" at={fitsAt} level={-35} />
+      <Sfx name="el-pop" at={ownAt} level={-31} />
+      <Sfx name="el-pop" at={loadingAt + 4} level={-31} />
+      <Sfx name="el-pop" at={rawAt} level={-31} />
+      <Sfx name="el-pop" at={insideAt} level={-31} />
+      <Sfx name="el-tap" at={defaultAt} level={-30} />
+      <Sfx name="el-pencil" at={againAt} level={-34} />
+      <Sfx name="el-tap" at={fitsAt} level={-31} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={60}>
@@ -162,7 +162,7 @@ export const EtlScene: React.FC = () => {
         <Pill x={WH.x + 200} y={WH.top - 52} at={computeAt} tone="ok" size={21} solid>
           cheap, elastic compute
         </Pill>
-        <Note at={fastAt} x={WH.x + 470} y={WH.top - 46}>
+        <Note at={fastAt} x={WH.x + 516} y={WH.top - 46}>
           <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>so transforming in place is fast</span>
         </Note>
         {/* New logic: back from the raw tables into the transform, with no new extract. */}

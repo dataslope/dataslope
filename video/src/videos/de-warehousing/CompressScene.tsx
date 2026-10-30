@@ -77,13 +77,14 @@ export const CompressScene: React.FC = () => {
           top: top + (h(BAR_H) - 30) / 2,
           ...note(23, opts.ink ?? INK),
           whiteSpace: "nowrap",
-          opacity: ease(frame, opts.sizeAt ?? at + 6, 10),
+          opacity: ease(frame, at + 6, 10),
         }}
       >
-        <b>
-          <Num>{size(bytes)}</Num>
-        </b>{" "}
+        {/* What the bar is, then its size as the narration says it. */}
         <span style={{ color: INK_SOFT }}>{kind}</span>
+        <b style={{ opacity: ease(frame, opts.sizeAt ?? at + 6, 10) }}>
+          : <Num>{size(bytes)}</Num>
+        </b>
       </div>
     </>
   );
@@ -160,7 +161,7 @@ export const CompressScene: React.FC = () => {
         {/* ── sale_date: in date order ── */}
         {name(D, sortAt, "sale_date", <><Num>{count(date.distinct)}</Num> days, in date order</>)}
         {bar(D, date.csv, datesAt + 2, "as CSV text", { csv: true, tint: TINTS[1] })}
-        {bar(D + h(STEP), date.parquet, threeKbAt - 4, "in Parquet: long runs of one date", { tint: COLUMN_TINT.sale_date, sizeAt: threeKbAt, ink: OK_INK })}
+        {bar(D + h(STEP), date.parquet, threeKbAt - 4, "in Parquet, in long runs of one date", { tint: COLUMN_TINT.sale_date, sizeAt: threeKbAt, ink: OK_INK })}
 
         {/* ── The whole file, by codec ── */}
         <div style={{ position: "absolute", left: X0, top: C - 6, width: BAR_X - X0 - 20, opacity: ease(frame, codecAt, 12) }}>

@@ -193,6 +193,7 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
+  const obsAt = c.w("r-observe", "And make it observable");
   const logsAt = c.w("r-observe", "structured logs");
   const idsAt = c.w("r-observe", "run and partition IDs");
   const linAt = c.w("r-observe", "lineage from source to dashboard");
@@ -226,7 +227,7 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
           padding: "12px 18px",
           background: `color-mix(in srgb, ${INK} 5%, ${PAPER})`,
           borderTop: `2px solid ${INK}`,
-          opacity: ease(frame, logsAt, 12),
+          opacity: ease(frame, obsAt + 4, 12),
         }}
       >
         {LOG.map((l, i) => (
@@ -245,6 +246,9 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
           </div>
         ))}
       </div>
+      <Note at={logsAt} x={R_X} y={c.y(306)}>
+        <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>structured logs</span>
+      </Note>
       {lin.map((name, i) => (
         <TaskBox key={name} cx={linX(i)} cy={linY} w={210} h={c.h(48)} at={linAt + i * 4} mono={i === 1 || i === 2} size={21}>
           {name}
@@ -268,14 +272,20 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={metaAt} x={R_X} y={c.y(616)}>
         <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>run metadata</span>
       </Note>
-      {metas.map((m, i) => (
-        <Pill key={m.text} x={R_X + 160 + i * 170} y={c.y(606)} at={m.at - 2} ink={BLUE_INK} size={22}>
-          {m.text}
-        </Pill>
-      ))}
-      <Note at={dataAt} x={R_X + 700} y={c.y(616)}>
-        <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>kept as data</span>
-      </Note>
+      <div style={{ position: "absolute", left: R_X + 160, top: c.y(606), display: "flex", alignItems: "center", gap: 14 }}>
+        {metas.map((m) => {
+          const p = ease(frame, m.at - 2, 10);
+          return (
+            <span
+              key={m.text}
+              style={{ padding: "4px 14px", border: `2px solid ${BLUE_INK}`, borderRadius: 999, ...label(22, BLUE_INK), whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}
+            >
+              {m.text}
+            </span>
+          );
+        })}
+        <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, dataAt, 10) }}>kept as data</span>
+      </div>
       {/* One failed slice, rerun alone. */}
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         {Array.from({ length: 7 }, (_, i) => {

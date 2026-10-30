@@ -55,13 +55,13 @@ export const HookScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-pop" at={scriptAt + 2} level={-34} />
-      <Sfx name="el-sprinkle" at={nightAt + 4} level={-33} />
-      <Sfx name="el-pencil" at={pointAt} level={-36} />
+      <Sfx name="el-pop" at={scriptAt + 2} level={-30} />
+      <Sfx name="el-sprinkle" at={nightAt + 4} level={-31} />
+      <Sfx name="el-pencil" at={pointAt} level={-34} />
       {[rerunAt, columnsAt, arrivingAt].map((at) => (
-        <Sfx key={at} name="el-tap" at={at + 2} level={-35} />
+        <Sfx key={at} name="el-tap" at={at + 2} level={-31} />
       ))}
-      <Sfx name="el-chime" at={elevenAt} level={-36} />
+      <Sfx name="el-chime" at={elevenAt} level={-32} />
 
       <Drift from={0} to={end + 20}>
         <Kicker at={scriptAt}>Data engineer interview prep · Pipelines and systems</Kicker>

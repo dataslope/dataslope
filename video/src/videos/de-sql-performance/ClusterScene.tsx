@@ -11,7 +11,7 @@ import { inkOf } from "../../theme/brand";
 import { CLUSTER, thousands } from "./data";
 import { DataTable, Drift, KeyArrow, Listing, OK_INK, PageStrip, TableName, tableGeometry, X0 } from "./parts";
 
-const TOP = 380;
+const TOP = 330;
 const HEAD_H = 46;
 const ROW_H = 50;
 const INDEX_X = X0 + 470;

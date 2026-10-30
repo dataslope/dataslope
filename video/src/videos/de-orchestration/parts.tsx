@@ -249,6 +249,12 @@ export const Cross: React.FC<{ at: number; size?: number; color?: string }> = ({
   );
 };
 
+/** Code inside a sentence, at a set pixel size (never under the 19px floor):
+ *  QMono's 0.84em took 21px labels down to 17.6px. */
+export const CodeSpan: React.FC<{ size?: number; color?: string; children: React.ReactNode }> = ({ size = 20, color, children }) => (
+  <span style={{ fontFamily: MONO, fontSize: Math.max(19, size), fontWeight: 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>{children}</span>
+);
+
 /** A small rounded tag on the page: a check's name, a setting, a state. */
 export const Pill: React.FC<{
   x: number;

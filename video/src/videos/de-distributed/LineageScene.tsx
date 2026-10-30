@@ -136,7 +136,7 @@ export const LineageScene: React.FC = () => {
             const p = ease(frame, lineageAt + 2 + k * 4 + r * 2, 10);
             const isLost = k === 2 && r === LOST;
             const isReplay = r === LOST && k <= 2 && replay(k) > 0;
-            const fill = isLost ? 1 - lost : 1 - dataGone * 0.85;
+            const fill = (isLost ? 1 - lost : 1) * (1 - dataGone * 0.85);
             const keep = k === 1 ? cached : 0;
             const dimRead = k === 0 ? 1 - 0.6 * ckpt : 1;
             return (
@@ -152,7 +152,8 @@ export const LineageScene: React.FC = () => {
                   borderRadius: 4,
                   background: isReplay ? `color-mix(in srgb, ${ds("yellow", 400)} 55%, ${PAPER})` : `color-mix(in srgb, ${BAR} ${36 * fill}%, ${PAPER})`,
                   border: isLost && lost > 0.5 ? `2.4px dashed ${ACCENT}` : keep > 0.5 ? `2.4px solid ${OK}` : `1.6px solid color-mix(in srgb, ${BAR} 70%, ${PAPER})`,
-                  opacity: dimRead,
+                  opacity: dimRead * p,
+                  overflow: "hidden",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",

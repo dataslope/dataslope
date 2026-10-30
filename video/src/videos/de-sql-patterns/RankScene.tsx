@@ -1,6 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { AbsoluteFill } from "remotion";
 import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
@@ -46,12 +45,10 @@ const Q3_RESULT_X = 900;
  * the same ten rows with no subquery, and the engines that have it.
  */
 export const RankScene: React.FC = () => {
-  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
   const from = n.beat("rank").from;
-  const qAt = n.word("rank", "Question");
   const textAt = n.word("rank", "What's the difference");
   // The table arrives on the question's last words.
   const asked = n.word("rank", "row number") + 4;
@@ -82,10 +79,9 @@ export const RankScene: React.FC = () => {
   const goesAt = n.word("qualify", "The subquery goes");
   const sameTenAt = n.word("qualify", "the same ten rows");
   const enginesAt = n.word("qualify-where", "DuckDB, BigQuery");
-  const notAt = n.word("qualify-where", "Postgres and MySQL don't");
+  const notAt = n.word("qualify-where", "Postgres and my sequel don't");
   const bridgeAt = n.beat("order-in").from;
   // The finished page holds through the bridge and fades into the cut.
-  const clearAt = n.beat("order").from - 8 - 30;
   const end = n.beat("order-in").to;
 
   // ── Question 1 ──
@@ -115,6 +111,9 @@ export const RankScene: React.FC = () => {
   const urnk = U.cols.indexOf("rnk");
   const ones = U.rows.flatMap((r, i) => (r[urnk] === "1" ? [i] : []));
   const tieNotesY = ug.rowTop(U.rows.length) + h(26);
+  // The tie and its notes stay until QUALIFY's listing takes their place, so
+  // the last note has time to be read.
+  const tieOut = filtersAt - 6;
 
   // ── Question 3 ──
   const Q = LATEST.qualify;
@@ -132,8 +131,8 @@ export const RankScene: React.FC = () => {
       <Sfx name="el-pop" at={sameTenAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
-          <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} out={out1} size={60}>
+        <>
+          <QuestionCard n={1} at={from - 8} textAt={textAt - 4} out={out1} size={60}>
             What&apos;s the difference between <QMono>RANK</QMono>, <QMono>DENSE_RANK</QMono>, and <QMono>ROW_NUMBER</QMono>?
           </QuestionCard>
           <QuestionCard n={2} at={q2At} textAt={q2TextAt - 2} out={out2} size={60}>
@@ -146,7 +145,7 @@ export const RankScene: React.FC = () => {
           {/* ── Question 1: the page's ranking, where the 80s tie ── */}
           <Listing lines={RANK.lines} x={X0} top={y(TOP)} width={700} size={SIZE} at={asked - 6} out={out1} />
           <Note at={playersAt} x={RESULT_X} y={y(TOP)} out={out1}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
               <QMono>players</QMono>, rows <Num>11</Num> to <Num>17</Num> of the page&apos;s <Num>{RANK.rows}</Num>
             </span>
           </Note>
@@ -202,8 +201,8 @@ export const RankScene: React.FC = () => {
             top={y(TOP)}
             width={SUB_W}
             size={SUB_SIZE}
-            at={keepAt - 4}
-            out={out2}
+            at={numberAt - 2}
+            out={goesAt - 2}
             marks={[
               { line: lineOf(S.lines, "PARTITION BY user_id"), at: keepAt + 4, out: notRankAt },
               { line: lineOf(S.lines, "WHERE rn = 1"), at: keepAt + 12, color: MARK_OK, out: notRankAt },
@@ -217,29 +216,29 @@ export const RankScene: React.FC = () => {
           </Note>
 
           {/* The tie: two events for user 3 at one moment. */}
-          <TableName g={ug} at={sameAt - 4} out={out2}>
+          <TableName g={ug} at={notRankAt + 6} out={tieOut}>
             user 3, with a second event at the same moment
           </TableName>
           <DataTable
             g={ug}
             cols={colsOf(U, { rnk: { ink: BLUE_INK } })}
-            at={sameAt - 4}
-            out={out2}
-            rows={rowsAt(U.rows, sameAt)}
+            at={notRankAt + 6}
+            out={tieOut}
+            rows={rowsAt(U.rows, notRankAt + 10)}
             bands={ones.map((row) => ({ row, at: sameAt + 10, out: bothAt, color: MARK }))}
             marks={ones.map((row, k) => ({ row, col: urnk, at: bothAt + 4 + k * 4, color: MARK_BAD }))}
           />
-          <Note at={twiceAt} x={X0} y={tieNotesY} out={out2}>
+          <Note at={twiceAt} x={X0} y={tieNotesY} out={tieOut}>
             <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>
               <QMono>RANK</QMono> keeps both: <Num>{LATEST.rankKept}</Num> rows, user 3 twice
             </span>
           </Note>
-          <Note at={exactlyAt} x={X0} y={tieNotesY + h(44)} out={out2}>
+          <Note at={exactlyAt} x={X0} y={tieNotesY + h(44)} out={tieOut}>
             <span style={{ ...note(25, OK_INK), whiteSpace: "nowrap" }}>
               <QMono>ROW_NUMBER</QMono> keeps one: <Num>{LATEST.rowNumberKept}</Num> rows
             </span>
           </Note>
-          <Note at={tiebreakAt - 4} x={X0} y={tieNotesY + h(88)} out={out2}>
+          <Note at={tiebreakAt - 4} x={X0} y={tieNotesY + h(88)} out={tieOut}>
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
               which one is arbitrary, unless <QMono>ORDER BY</QMono> breaks the tie
             </span>
@@ -250,7 +249,7 @@ export const RankScene: React.FC = () => {
             lines={Q.lines}
             x={X0}
             top={y(TOP)}
-            width={700}
+            width={660}
             size={SIZE}
             at={filtersAt - 4}
             marks={[{ line: lineOf(Q.lines, "QUALIFY"), at: havingAt, color: MARK_OK }]}
@@ -274,7 +273,7 @@ export const RankScene: React.FC = () => {
           <Note at={notAt - 2} x={X0} y={qNotesY + h(140)}>
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>not Postgres or MySQL: keep the subquery there</span>
           </Note>
-        </AbsoluteFill>
+        </>
       </Drift>
     </AbsoluteFill>
   );

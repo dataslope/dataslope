@@ -96,13 +96,11 @@ export const SnapScene: React.FC = () => {
             { row: rowOf("502", "cancelled"), col: status, at: thenAt + 8, color: MARK_OK },
           ]}
         />
-        <Note at={sixAt} x={gl.right + 24} y={gl.rowTop(0) + h(4)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        {/* Beside the table's name, clear of the arrows that leave its rows. */}
+        <Note at={sixAt} x={gl.x + 300} y={gl.top - 42}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <b><Num>{SNAP.logRows}</Num> rows</b> for <Num>{SR.rows.length}</Num> orders
-            <span style={{ color: INK_SOFT, opacity: ease(frame, wholeAt, 10) }}>
-              <br />
-              the whole history
-            </span>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, wholeAt, 10) }}>: the whole history</span>
           </span>
         </Note>
 

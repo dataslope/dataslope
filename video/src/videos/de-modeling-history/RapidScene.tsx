@@ -47,10 +47,10 @@ const Degenerate: React.FC<{ c: Ctx }> = ({ c }) => {
           <QMono>order_number</QMono> lives on the fact: no table behind it
         </span>
       </Note>
-      <TableName g={gd} at={groupAt - 2}>
+      <TableName g={gd} at={groupAt - 10}>
         grouped by it, no join
       </TableName>
-      <DataTable g={gd} cols={colsOf(D)} at={groupAt - 2} rows={D.rows.map((cells, i) => ({ cells, at: groupAt + 2 + i * 3 }))} />
+      <DataTable g={gd} cols={colsOf(D)} at={groupAt - 10} rows={D.rows.map((cells, i) => ({ cells, at: groupAt - 6 + i * 3 }))} />
     </>
   );
 };
@@ -390,8 +390,10 @@ export const RapidScene: React.FC = () => {
   const from = n.beat("rapid-in").from;
   const lastAt = n.word("rapid-in", "The last six are special cases");
   const eachAt = n.word("rapid-in", "a sentence or two each");
-  const end = n.beat("next").from - 4;
   const jobAt = n.word("next", "filled by a load job");
+  // The last answer holds into the bridge's first words, so the version 7
+  // bar stays up after "in between"; the bridge's notes take over on "filled".
+  const end = jobAt - 4;
   const closeAt = n.word("next", "close a version");
   const placeAt = n.word("next", "insert a placeholder");
   const splitAt = n.word("next", "split a weight");

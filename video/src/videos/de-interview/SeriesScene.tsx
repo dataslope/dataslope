@@ -121,7 +121,7 @@ export const SeriesScene: React.FC = () => {
             top: base,
             height: 1.5,
             background: HAIRLINE,
-            opacity: ease(frame, trackAt - 2, 16),
+            opacity: ease(frame, from + 6, 16),
           }}
         />
 
@@ -158,15 +158,24 @@ export const SeriesScene: React.FC = () => {
                   height: bh,
                   borderRadius: "8px 8px 0 0",
                   background: BAR,
-                  opacity: 1 - dim,
-                  display: "flex",
-                  justifyContent: "center",
-                  paddingTop: 8,
-                  boxSizing: "border-box",
+                  // No bar at all before it grows: a padded box of height 0
+                  // still drew an 8px sliver.
+                  opacity: bh > 0.5 ? 1 - dim : 0,
                   overflow: "hidden",
                 }}
               >
-                <span style={{ ...label(24, PAPER), fontWeight: 700, opacity: ease(frame, growAt(i) + 14, 10) }}>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    top: 8,
+                    textAlign: "center",
+                    ...label(24, PAPER),
+                    fontWeight: 700,
+                    opacity: ease(frame, growAt(i) + 14, 10),
+                  }}
+                >
                   <Num>{p.questions}</Num>
                 </span>
               </div>

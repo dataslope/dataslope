@@ -123,7 +123,7 @@ export const DedupScene: React.FC = () => {
           cols={colsOf(R, { user_id: { ink: BLUE_INK } })}
           at={asked - 6}
           out={out7}
-          rows={R.rows.map((cells, i) => ({ cells, at: asked - 2 + i * 2, strikeAt: i === dupRow ? skippedAt + 2 : undefined }))}
+          rows={R.rows.map((cells, i) => ({ cells, at: asked - 2 + i * 2, dimAt: i === dupRow ? skippedAt + 2 : undefined }))}
           bands={R.rows.map((_, row) => ({
             row,
             at: walkFrom + row * 10,
@@ -163,7 +163,7 @@ export const DedupScene: React.FC = () => {
         </Note>
 
         {/* ── The latest instead: the page's rows, and a dict ── */}
-        <TableName g={dg} at={latestAt} out={q8At - 4}>
+        <TableName g={dg} at={latestAt}>
           <Mono>df</Mono>
         </TableName>
         <DataTable
@@ -173,7 +173,7 @@ export const DedupScene: React.FC = () => {
           rows={D.rows.map((cells, i) => ({
             cells,
             at: latestAt + 4 + i * 2,
-            strikeAt: i === older ? keepsAt + 4 : undefined,
+            dimAt: i === older ? keepsAt + 4 : undefined,
           }))}
           marks={[
             { row: older, col: ts, at: replaceAt, out: sortAt },
@@ -185,7 +185,7 @@ export const DedupScene: React.FC = () => {
           lines={DL}
           x={MID_X}
           top={y(TOP)}
-          width={820}
+          width={870}
           size={SIZE}
           at={mapAt - 4}
           out={q8At - 4}

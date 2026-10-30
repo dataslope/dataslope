@@ -206,12 +206,12 @@ export const JitterScene: React.FC = () => {
             service takes <Num>{STORM.capacity}</Num>
           </span>
         </Note>
-        <Note at={peakAt + 6} x={bx(PANELS[1].x, peakIdx) + bw + 8} y={vy(STORM.peakJitter) - h(6)}>
+        <Note at={peakAt + 6} x={bx(PANELS[1].x, peakIdx) - 8} y={vy(STORM.peakJitter) - h(34)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             peak <Num>{STORM.peakJitter}</Num>
           </span>
         </Note>
-        <Note at={thirdAt + 4} x={msX(PANELS[1].x, round3.to) + 12} y={vy(round3.jitterPeak) - h(20)}>
+        <Note at={thirdAt + 4} x={msX(PANELS[1].x, round3.to) + 12} y={vy(STORM.capacity) + h(14)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Num>{round3.jitterPeak}</Num>: under <Num>{STORM.capacity}</Num>
           </span>

@@ -6,10 +6,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Engineer interview prep videos
  * (agent-outputs/20261030-1600-data-engineer-interview-video-plan.md, "0. The
  * Data Engineer interview"), after content/interview/data-engineer/index.mdx:
- * the prompt the loop is known for and the four things interviewers probe,
- * what AI has changed, and how the series runs, then the bridge into Part 1.
+ * the page's "design a pipeline for X" prompt and the four things
+ * interviewers probe, what AI has changed, and how the series runs, then the
+ * bridge into Part 1.
  *
  * An overview: no question cards, and no question of its own is answered.
+ * Reuse: none of another video's scenes. The headings, Drift, Mark and Mono
+ * are the series' furniture from da-sql/parts.tsx (as ds-interview takes
+ * them), and the eleven heroes are drawn from their own videos' folders.
  *
  * Its own opening, unlike the Data Analyst overview's three cards and the
  * Data Scientist overview's four-stop route: the page's "design a pipeline
@@ -31,13 +35,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   (check.mjs counts their `###` headings); the plan answers a question two
  *   pages share once, which takes 182 to 157.
  * - SQL and data modeling take two videos each: PARTS.
- * - "most close on a quick round": the plan gives a rapid round to 8 of the
- *   11 topic videos (not SQL II, Warehousing or Pipelines for AI).
+ * - "most end on a quick round": the plan gives a rapid round to 8 of the
+ *   11 topic videos (not SQL II, Warehousing or Pipelines for AI), and the
+ *   built scripts agree.
  * - the practice, counted by check.mjs (results.json): concept checks on all
  *   9 topic pages, runnable challenges on 3 (SQL, Python, Data warehousing,
  *   5 in all), and one bank of 110 multiple-choice questions for the track.
- * - the bridge: the page says to "expect hard SQL", and the track's first
- *   page is SQL (meta.json). The video does not claim loops open with it.
+ * - the bridge: "nearly every loop has hard SQL" stands on the page's
+ *   "expect hard SQL"; the series starts there because the track does
+ *   (meta.json). It does not claim that loops open with SQL, which the page
+ *   never says.
  *
  * Written for Drew's ear, to the Data Engineer series' rules: SQL is written
  * "sequel" (on screen it stays SQL), AI is said as it is, RAG is expanded

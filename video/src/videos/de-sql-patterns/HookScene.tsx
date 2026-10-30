@@ -79,8 +79,9 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pop" at={firstAt + 2} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data engineer interview prep</Kicker>
-        <Headline lead="Thirteen days," turn="three questions." at={from + 4} turnAt={missingAt - 4} size={70} />
+        {/* The page opens on the kicker and headline at frame 0, not on white. */}
+        <Kicker at={-14}>Data engineer interview prep</Kicker>
+        <Headline lead="Thirteen days," turn="three questions." at={-20} turnAt={missingAt - 4} size={70} />
 
         <Spot id="de-sql-patterns-koala" at={from + 10} left={1390} top={y(290)} width={440} height={441} />
 

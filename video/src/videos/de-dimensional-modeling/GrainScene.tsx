@@ -8,10 +8,10 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LINE_TOTALS, LINES, money, ORDER_GRAIN } from "./data";
-import { colsOf, DataTable, Drift, geoOf, Mark, MARK_BAD, MARK_OK, Mono, OK_INK, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, KeyArrow, Mark, MARK_BAD, MARK_OK, Mono, OK, OK_INK, TableName, X0 } from "./parts";
 
-const TABLE_Y = 420;
-const ORDERS_X = 1240;
+const TABLE_Y = 430;
+const ORDERS_X = 1290;
 
 /** A red cross, drawn on `at`, for a column that fails the grain. */
 const Cross: React.FC<{ at: number; size?: number }> = ({ at, size = 24 }) => {
@@ -54,12 +54,12 @@ export const GrainScene: React.FC = () => {
   const end = n.beat("grain-fix").to;
 
   const cols = colsOf(LINES);
-  const g = geoOf(LINES, X0, y(TABLE_Y), h, { headH: 52, rowH: 60, bodySize: 28, headSize: 23 });
+  const g = geoOf(LINES, X0, y(TABLE_Y), h, { headH: 56, rowH: 68, bodySize: 31, headSize: 24 });
   const fee = LINES.cols.indexOf("shipping_fee");
   const qty = LINES.cols.indexOf("quantity");
   const amt = LINES.cols.indexOf("amount");
   const order = ORDER_GRAIN;
-  const og = geoOf(order, ORDERS_X, y(TABLE_Y), h, { headH: 52, rowH: 60, bodySize: 28, headSize: 23 });
+  const og = geoOf(order, ORDERS_X, y(TABLE_Y), h, { headH: 56, rowH: 68, bodySize: 31, headSize: 24 });
   const total = LINE_TOTALS.rows[0][LINE_TOTALS.cols.indexOf("shipping_fee")];
   const paid = order.rows[0][order.cols.indexOf("shipping_fee")];
   const below = g.rowTop(LINES.rows.length);
@@ -156,18 +156,8 @@ export const GrainScene: React.FC = () => {
           rows={order.rows.map((cells, i) => ({ cells, at: perOrderAt + i * 4 }))}
           marks={[{ row: 0, col: order.cols.indexOf("shipping_fee"), at: perOrderAt + 8, color: MARK_OK }]}
         />
-        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          {/* The fee's column leaves the line grain. */}
-          <line
-            x1={g.xs[fee] + 10}
-            x2={g.xs[fee] + 10 + (g.widths[fee] - 20) * ease(frame, orderGrainAt + 6, 14)}
-            y1={g.top + g.headH / 2}
-            y2={g.top + g.headH / 2}
-            stroke={ACCENT}
-            strokeWidth={3}
-            strokeLinecap="round"
-          />
-        </svg>
+        {/* The fee moves to the order's grain, where it is counted once. */}
+        <KeyArrow from={[g.right + 14, g.rowMid(0)]} to={[og.x - 14, og.rowMid(0)]} at={orderGrainAt + 4} color={OK} />
         <Note at={catchesAt} x={ORDERS_X} y={og.rowTop(1) + h(40)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Declared first,

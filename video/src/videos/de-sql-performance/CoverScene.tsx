@@ -13,9 +13,9 @@ import { Bar, DataTable, Drift, Listing, listingHeight, MARK_OK, OK_INK, PageStr
 
 const TOP = 300;
 const SIZE = 21;
-const PLAN = 20;
-const R_X = 1180;
-const R_W = 620;
+const PLAN = 19;
+const R_X = 1300;
+const R_W = 500;
 /** Index entries shown: the first few of customer 42's twenty. */
 const SHOWN = 4;
 
@@ -49,7 +49,7 @@ export const CoverScene: React.FC = () => {
 
   const queryTop = y(TOP);
   const planTop = queryTop + listingHeight(COVER.query.length, SIZE) + h(22);
-  const includeTop = planTop + h(250);
+  const includeTop = planTop;
   const afterTop = includeTop + listingHeight(COVER.include.length, SIZE) + h(22);
 
   // The index's entries for 42: customer_id, then amount once INCLUDE adds it.
@@ -91,11 +91,11 @@ export const CoverScene: React.FC = () => {
           lines={COVER.before}
           x={X0}
           top={planTop}
-          width={960}
+          width={1150}
           size={PLAN}
           step={2}
           at={holdsAt + 6}
-          dim={includeAt}
+          out={includeAt - 8}
           marks={[{ line: "Heap Blocks", at: neverAt }]}
         />
         <Listing
@@ -104,14 +104,14 @@ export const CoverScene: React.FC = () => {
           top={includeTop}
           width={640}
           size={SIZE}
-          at={includeAt - 6}
+          at={includeAt - 4}
           marks={[{ line: "INCLUDE", text: "INCLUDE (amount)", at: includeAt + 4, color: MARK_OK }]}
         />
         <PlanBox
           lines={COVER.after}
           x={X0}
           top={afterTop}
-          width={960}
+          width={1150}
           size={PLAN}
           step={2}
           at={onlyAt - 4}
@@ -145,8 +145,9 @@ export const CoverScene: React.FC = () => {
           pages={INDEX.pages}
           at={holdsAt + 6}
           ticks={[{ pages: INDEX.pages42, at: neverAt - 6, out: onlyAt + 6, color: inkOf.red }]}
+          out={sizeAt}
         />
-        <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, holdsAt + 6, 12) }}>
+        <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, holdsAt + 6, 12) * (1 - ease(frame, sizeAt, 10)) }}>
           the table&rsquo;s pages
         </div>
         <Note at={neverAt + 4} x={R_X} y={stripY + h(100)} out={onlyAt}>
@@ -161,13 +162,13 @@ export const CoverScene: React.FC = () => {
         </Note>
 
         {/* ── The price: size ── */}
-        <Note at={sizeAt} x={R_X} y={stripY + h(100)}>
+        <Note at={sizeAt + 2} x={R_X} y={stripY - h(16)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Index size on disk</span>
         </Note>
         <Bar
           x={R_X}
-          y={stripY + h(140)}
-          width={420}
+          y={stripY + h(28)}
+          width={300}
           value={COVER.plain.bytes}
           max={COVER.covering.bytes}
           at={sizeAt + 4}
@@ -182,8 +183,8 @@ export const CoverScene: React.FC = () => {
         />
         <Bar
           x={R_X}
-          y={stripY + h(226)}
-          width={420}
+          y={stripY + h(118)}
+          width={300}
           value={COVER.covering.bytes}
           max={COVER.covering.bytes}
           at={fourAt - 4}
@@ -196,7 +197,7 @@ export const CoverScene: React.FC = () => {
           color={inkOf.red}
           ink={ACCENT_INK}
         />
-        <Note at={writesAt} x={X0} y={afterTop + h(170)}>
+        <Note at={writesAt} x={X0} y={afterTop + h(200)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Every insert writes the wider index too.{" "}
             <span style={{ color: INK, fontWeight: 650, opacity: ease(frame, fewAt, 10) }}>Cover the few that run constantly.</span>

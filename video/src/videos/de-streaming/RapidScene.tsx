@@ -116,8 +116,8 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
   const compactAt = c.w("r-join", "a compacted topic");
   const X1 = 1700;
   const tx = (t: number) => R_X + 120 + (t / 12) * (X1 - R_X - 120);
-  const cy = c.y(470);
-  const by = c.y(560);
+  const cy = c.y(490);
+  const by = c.y(580);
   const winFrom = 4.6;
   const old = ease(frame, expireAt, 12);
   return (
@@ -159,7 +159,7 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
           border: `2.5px dashed ${BLUE_INK}`,
         }}
       />
-      <Note at={bufAt + 6} x={tx(winFrom) + 8} y={by + c.h(36)}>
+      <Note at={bufAt + 6} x={tx(winFrom) + 8} y={cy - c.h(30) - c.h(34)}>
         <span style={{ ...label(20, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>buffered: the last few seconds of each side</span>
       </Note>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
@@ -227,19 +227,19 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
   const batchAt = c.w("r-dlq", "A batch pipeline");
   const rowsAt = c.w("r-dlq", "bad rows or whole tasks");
   const vanishAt = c.w("r-dlq", "none vanish");
-  const lane = { x: R_X, y: c.y(380), w: 560, h: c.h(64) };
-  const cons = { x: R_X + 640, w: 220 };
-  const sink = { x: R_X + 940, w: 160 };
-  const dlq = { x: R_X + 600, y: c.y(560), w: 300, h: c.h(64) };
+  const lane = { x: R_X, y: c.y(400), w: 480, h: c.h(64) };
+  const cons = { x: R_X + 560, w: 200 };
+  const sink = { x: R_X + 840, w: 150 };
+  const dlq = { x: R_X + 520, y: c.y(560), w: 340, h: c.h(64) };
   const mid = lane.y + lane.h / 2;
   // The poison message sits at the front until it is caught, then drops into
   // the dead-letter queue; the rest stand still behind it, then flow.
   const caught = ease(frame, startAt + 8, 16);
   const flowing = Math.max(0, frame - (startAt + 20));
   const STEP = 70;
-  const cells = Array.from({ length: 9 }, (_, k) => {
+  const cells = Array.from({ length: 8 }, (_, k) => {
     const raw = lane.x + 8 + k * STEP + flowing * 2.6;
-    const span = 9 * STEP;
+    const span = 8 * STEP;
     const x = lane.x + 8 + ((raw - lane.x - 8) % span);
     return { k, x };
   });
@@ -323,7 +323,7 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
         dur={14}
         head={12}
       />
-      <Note at={waitAt} x={dlq.x + dlq.w + 20} y={dlq.y + c.h(16)}>
+      <Note at={waitAt} x={dlq.x} y={dlq.y + dlq.h + c.h(18)}>
         <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           inspect, fix<span style={{ opacity: ease(frame, replayAt, 10) }}>, replay</span>
         </span>

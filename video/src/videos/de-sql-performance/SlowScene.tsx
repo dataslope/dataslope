@@ -171,7 +171,7 @@ export const SlowScene: React.FC = () => {
         </div>
 
         {/* ── 2. Reading a plan ── */}
-        <Note at={pendingAt - 2} x={X0} y={q2ListTop - h(46)}>
+        <Note at={pendingAt - 2} x={X0} y={q2ListTop - h(46)} out={analyzeAt}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
             After <Num>{thousands(EXPLAIN.pending)}</Num> pending orders arrived, before <QMono>ANALYZE</QMono>
           </span>

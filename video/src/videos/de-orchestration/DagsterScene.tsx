@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Edge, OK, OK_INK, Pill, TaskBox, X0 } from "./parts";
+import { CodeSpan, Drift, Edge, OK, OK_INK, Pill, TaskBox, X0 } from "./parts";
 
 const LEFT = X0;
 const RIGHT_X = 1000;
@@ -155,7 +155,7 @@ export const DagsterScene: React.FC = () => {
                 opacity: ease(frame, readsAt, 10),
               }}
             >
-              reads <QMono>{a.reads}</QMono>
+              reads <CodeSpan>{a.reads}</CodeSpan>
             </div>
           ) : null,
         )}

@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BACKFILL, count, fullRows, REFRESH } from "./data";
-import { Drift, lineOf, MARK, MARK_OK, OK_INK, PyListing, X0 } from "./parts";
+import { CodeSpan, Drift, lineOf, MARK, MARK_OK, OK_INK, PyListing, X0 } from "./parts";
 
 /** The Pipelines page's backfill listing, word for word. */
 const TASK = [
@@ -147,7 +147,7 @@ export const BackfillScene: React.FC = () => {
             2025: <span style={{ color: BLUE_INK, opacity: ease(frame, runsAt, 10) }}>{BACKFILL.partitions} daily partitions</span>
           </span>
         </Note>
-        <Note at={thrAt} x={GRID_X - 44} y={y(662)}>
+        <Note at={thrAt} x={GRID_X - 44} y={y(644)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             throttled
             <span style={{ opacity: ease(frame, fourAt, 10) }}>
@@ -181,19 +181,19 @@ export const BackfillScene: React.FC = () => {
               />
             );
           })}
-          {MONTHS.map((m, i) => (
+          {MONTHS.map((m, i) =>
+            i % 3 ? null : (
             <text key={m} x={GRID_X - 12} y={gridTop + i * h(PITCH) + h(CELL) - 2} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 600 })} opacity={ease(frame, runsAt + i * 1.5, 8)}>
               {m}
             </text>
-          ))}
+            ),
+          )}
         </svg>
-        <Note at={airAt} x={GRID_X - 44} y={y(586)}>
+        <Note at={airAt} x={GRID_X - 44} y={y(604)}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
-            Airflow: <QMono>catchup=True</QMono> from a <QMono>start_date</QMono>
+            Airflow: <CodeSpan>catchup=True</CodeSpan>, a <CodeSpan>start_date</CodeSpan>
+            <span style={{ opacity: ease(frame, dagAt, 10) }}> · Dagster: partitioned assets</span>
           </span>
-        </Note>
-        <Note at={dagAt} x={GRID_X - 44} y={y(624)}>
-          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>Dagster: partitioned assets</span>
         </Note>
 
         {/* Why the loop: the cost of one run, a model. */}

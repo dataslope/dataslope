@@ -157,7 +157,7 @@ export const script: NarrationScript = {
     },
     {
       id: "qualify-where",
-      text: "DuckDB, BigQuery, Snowflake and Databricks support it. Postgres and MySQL don't, so there you keep the subquery.",
+      text: "DuckDB, BigQuery, Snowflake and Databricks support it. Postgres and my sequel don't, so there you keep the subquery.",
       pauseAfter: 0.7,
     },
     { id: "order-in", text: "So why can't that filter just go in WHERE? Because of the order a query runs in." },
@@ -205,9 +205,11 @@ export const script: NarrationScript = {
     },
     {
       id: "frame-def",
-      text: "The frame is the set of rows the function sees for the current one. Here, two payments land on the same day.",
-      pauseAfter: 0.6,
+      text: "The frame is the set of rows the function sees for the current one.",
+      // A definition, read quickly in the take: time to take it in.
+      pauseAfter: 0.8,
     },
+    { id: "frame-peers", text: "Here, two payments land on the same day.", pauseAfter: 0.6 },
     {
       id: "frame-rows",
       text: "Rows counts physical rows, so the running total climbs one payment at a time: a hundred, three fifty, four twenty-five.",
@@ -303,7 +305,8 @@ export const script: NarrationScript = {
     {
       id: "anti-fix",
       text: "Use NOT EXISTS, or a left join where the order comes back null. Both find Di.",
-      pauseAfter: 0.7,
+      // Time to see both fixes return Di before EXCEPT takes their place.
+      pauseAfter: 1.2,
     },
     {
       id: "anti-except",
@@ -332,7 +335,8 @@ export const script: NarrationScript = {
     {
       id: "recursive-stop",
       text: "A pass that adds nothing ends it: seven people, three levels. If the data has a loop, it never runs dry, so cap the depth.",
-      pauseAfter: 0.8,
+      // The cap and its run arrive on the last words: time to read them.
+      pauseAfter: 2.2,
     },
 
     // ── At speed ──────────────────────────────────────────────────────────
@@ -348,7 +352,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-cte",
-      text: "A subquery nests a step inside the query. A CTE names it up front, reads top to bottom, and can be used twice. Here, both find the same three users.",
+      text: "A subquery nests a step inside the query. Written as a CTE, the step gets a name up front, reads top to bottom, and can be used twice. Here, both find the same three users.",
     },
     {
       id: "r-union",

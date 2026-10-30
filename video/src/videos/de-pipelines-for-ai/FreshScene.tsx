@@ -58,10 +58,10 @@ export const FreshScene: React.FC = () => {
   const cur = FRESH.current as Record<string, string>;
   const action = (id: string) =>
     FRESH.toEmbed.includes(id)
-      ? { text: "embed", ink: BLUE_INK, at: embedAt, lit: id === "doc1#1" ? changedAt : newAt }
+      ? { text: "embed", ink: BLUE_INK, at: embedAt, lit: id === "doc1#1" ? changedAt : newAt, litOut: goneAt }
       : FRESH.toDelete.includes(id)
-        ? { text: "delete", ink: INK, at: deleteAt, lit: goneAt }
-        : { text: "nothing to pay", ink: OK_INK, at: nothingAt, lit: zeroAt };
+        ? { text: "delete", ink: INK, at: deleteAt, lit: goneAt, litOut: zeroAt }
+        : { text: "nothing to pay", ink: OK_INK, at: nothingAt, lit: zeroAt, litOut: skipAt };
   const tableTop = y(340);
   const colX = (j: number) => TABLE_X + COLS.slice(0, j).reduce((a, c) => a + c.w, 0);
 
@@ -126,7 +126,7 @@ export const FreshScene: React.FC = () => {
         {ids.map((id, i) => {
           const a = action(id);
           const top = tableTop + 40 + i * ROW_H;
-          const lit = ease(frame, a.lit, 10) * (1 - ease(frame, skipAt, 12) * (a.text === "delete" ? 0 : 1));
+          const lit = ease(frame, a.lit, 10) * (1 - ease(frame, a.litOut, 12));
           const gone = id in idx && !(id in cur);
           return (
             <React.Fragment key={id}>

@@ -130,10 +130,10 @@ export const MvScene: React.FC = () => {
           ))}
         </Note>
 
-        <div style={{ position: "absolute", left: R_X, top: viewTop + h(10), ...note(24, INK_SOFT), width: 700, opacity: ease(frame, shapesAt, 12) }}>
+        <div style={{ position: "absolute", left: R_X, top: insertTop + h(20), ...note(24, INK_SOFT), width: 700, opacity: ease(frame, shapesAt, 12) }}>
           An index, a partition, a stored result: each shapes a table around its queries.
         </div>
-        <NextLine at={nextAt} x={X0} y={y(920)} width={1000}>
+        <NextLine at={nextAt} x={X0} y={y(900)} width={1000}>
           dimensional modeling
         </NextLine>
       </Drift>

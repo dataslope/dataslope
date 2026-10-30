@@ -134,7 +134,7 @@ export const Type0Scene: React.FC = () => {
         <Note at={nothingAt + 8} x={g.right + 24} y={g.rowTop(1) + h(8)} out={standsAt + 18}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>ignored</span>
         </Note>
-        <Note at={standsAt + 4} x={TABLE_X} y={g.rowTop(1) + h(20)}>
+        <Note at={standsAt + 26} x={TABLE_X} y={g.rowTop(1) + h(20)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the first value stands</span>
         </Note>
 

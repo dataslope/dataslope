@@ -65,14 +65,14 @@ export const LambdaScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-pop" at={batchAt} level={-35} />
-      <Sfx name="el-pop" at={speedAt} level={-35} />
-      <Sfx name="el-pop" at={servingAt} level={-35} />
-      <Sfx name="el-tap" at={twiceAt} level={-34} />
-      <Sfx name="el-pop" at={kappaAt + 4} level={-35} />
-      <Sfx name="el-whoosh" at={replayAt + 2} level={-36} />
-      <Sfx name="el-tap" at={simplerAt} level={-35} />
-      <Sfx name="el-tap" at={fallbackAt} level={-35} />
+      <Sfx name="el-pop" at={batchAt} level={-31} />
+      <Sfx name="el-pop" at={speedAt} level={-31} />
+      <Sfx name="el-pop" at={servingAt} level={-31} />
+      <Sfx name="el-tap" at={twiceAt} level={-30} />
+      <Sfx name="el-pop" at={kappaAt + 4} level={-31} />
+      <Sfx name="el-whoosh" at={replayAt + 2} level={-32} />
+      <Sfx name="el-tap" at={simplerAt} level={-31} />
+      <Sfx name="el-tap" at={fallbackAt} level={-31} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} size={62}>

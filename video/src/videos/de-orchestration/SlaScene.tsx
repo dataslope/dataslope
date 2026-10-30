@@ -1,13 +1,13 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard, Tick } from "../../editorial/interview";
+import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Cross, Drift, OK, OK_INK, pulse, X0 } from "./parts";
+import { CodeSpan, Cross, Drift, OK, OK_INK, pulse, X0 } from "./parts";
 
 const T0 = 300;
 const PER_HOUR = 175;
@@ -136,7 +136,7 @@ export const SlaScene: React.FC = () => {
         ) : null}
         <Note at={ordersAt} x={tx(DEADLINE) + 14} y={y(334)}>
           <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            <QMono>daily_orders</QMono> fresh by 06:00 UTC
+            <CodeSpan size={22}>daily_orders</CodeSpan> fresh by 06:00 UTC
           </span>
         </Note>
         {frame >= missAt + 2 ? (
@@ -172,7 +172,7 @@ export const SlaScene: React.FC = () => {
               {i === 1 ? (
                 <span style={{ ...label(22, INK_SOFT) }}>
                   {" "}
-                  · <QMono>MAX(updated_at)</QMono>
+                  · <CodeSpan size={20}>MAX(updated_at)</CodeSpan>
                 </span>
               ) : null}
             </span>

@@ -83,6 +83,9 @@ export const script: NarrationScript = {
   voice: "drew",
   minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
+  // The close is two short beats; this keeps them in the last take rather
+  // than a 278-character take of their own.
+  takeChars: 2050,
   beats: [
     // ── Opening ───────────────────────────────────────────────────────────
     {

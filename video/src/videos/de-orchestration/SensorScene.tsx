@@ -204,9 +204,10 @@ export const SensorScene: React.FC = () => {
             sensor, waiting
           </div>
         ))}
+        <div style={{ position: "absolute", left: X0, top: laneY(pokeTop, 0) + 3, ...label(19, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, fillAt + 10, 10) }}>queued</div>
         {frame >= nothingAt + 2 ? (
-          <div style={{ position: "absolute", left: X0 + 34, top: laneY(pokeTop, 3) + laneH + h(8) }}>
-            <Cross at={nothingAt + 2} size={26} />
+          <div style={{ position: "absolute", left: X0 + 100, top: laneY(pokeTop, 1) + laneH * 0.8 - 9 }}>
+            <Cross at={nothingAt + 2} size={24} />
           </div>
         ) : null}
         <Note at={nothingAt} x={LANE_X1 + 20} y={laneY(pokeTop, 3) - 2}>

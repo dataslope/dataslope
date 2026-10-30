@@ -70,7 +70,9 @@ export const JoinScene: React.FC = () => {
   const og = geoOf(O, ORDERS_X, y(TOP), h, { rowH: 54 });
   const uid = O.cols.indexOf("user_id");
   const B = JOIN.build.lines;
-  const P = JOIN.probe.lines.slice(0, lineOf(JOIN.probe.lines, "]") + 1);
+  // The comprehension, down to its closing bracket (the print loop after it
+  // is what the console beside it shows).
+  const P = JOIN.probe.lines.slice(0, JOIN.probe.lines.findIndex((l) => l.trim() === "]") + 1);
   const low = y(LOW);
   const probeTop = low + listingHeight(B.length, SIZE) + h(30);
   const userRow = (i: number) => U.rows.findIndex((r) => r[U.cols.indexOf("user_id")] === O.rows[i][uid]);

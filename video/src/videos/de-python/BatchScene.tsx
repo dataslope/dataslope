@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { BATCH } from "./data";
-import { Bars, Console, Drift, lineOf, Listing, listingHeight, MARK, MARK_OK, OK, OK_INK, Title, X0 } from "./parts";
+import { Bars, Console, consoleHeight, Drift, lineOf, Listing, listingHeight, MARK, MARK_OK, OK, OK_INK, Title, X0 } from "./parts";
 
 const TOP = 330;
 const SIZE = 21;
@@ -213,7 +213,7 @@ export const BatchScene: React.FC = () => {
         {/* ── itertools.batched, since 3.12 ── */}
         <Listing lines={BATCH.builtin.lines} x={X0} top={builtinTop} width={760} size={SIZE} at={sinceAt} marks={[{ line: lineOf(BATCH.builtin.lines, "itertools.batched"), at: exactlyAt, color: MARK }]} />
         <Console lines={BATCH.builtin.out} x={RIGHT_X + 340} top={outTop} width={300} at={exactlyAt - 2} />
-        <Note at={exactlyAt + 4} x={RIGHT_X + 340} y={outTop - h(40)}>
+        <Note at={exactlyAt + 4} x={RIGHT_X + 340} y={outTop + consoleHeight(BATCH.builtin.out.length) + h(14)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>batched gives tuples</span>
         </Note>
       </Drift>

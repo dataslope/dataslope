@@ -47,7 +47,7 @@ export const MapReduceScene: React.FC = () => {
   const textAt = n.word("mr", "What is the MapReduce");
   const phasesAt = n.word("mr", "two phases");
   const shuffleWordAt = n.word("mr", "a shuffle between them");
-  const manyAt = n.word("mr", "across many machines");
+  const manyAt = n.word("mr", "a model for running one job");
   const takeAt = n.word("mr", "Take seven salaries");
   const machinesAt = n.word("mr", "three machines");
   const mapAt = n.word("mr-map", "Map runs on every split");
@@ -135,7 +135,7 @@ export const MapReduceScene: React.FC = () => {
         {ROWS.map((r) => {
           const { split, slot } = rowOf(r.index);
           const mid = y(slotTop(split, slot)) + cardH / 2;
-          return <Arrow key={r.index} from={[ROW_X + ROW_W + 10, mid]} to={[PAIR_X - 12, mid]} at={mapAt + 4 + r.index * 3} dur={10} width={1.6} head={10} />;
+          return <Arrow key={r.index} from={[ROW_X + ROW_W + 10, mid]} to={[PAIR_X - 12, mid]} at={mapAt + 4 + r.index * 3} dur={10} width={1.6} head={10} out={sendAt + 2 + order.indexOf(r.index) * 4} />;
         })}
 
         {ROWS.map((r) => {

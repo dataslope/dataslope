@@ -141,16 +141,16 @@ export const EvoScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {kinds.map((k) => (
-        <Sfx key={k.text} name="el-tap" at={k.at} level={-37} />
+        <Sfx key={k.text} name="el-tap" at={k.at} level={-33} />
       ))}
-      <Sfx name="el-pop" at={day2At + 4} level={-35} />
-      <Sfx name="el-pencil" at={readAt} level={-36} />
-      <Sfx name="el-scratch" at={goneAt + 2} level={-35} />
-      <Sfx name="el-whoosh" at={nameAt + 6} level={-36} />
-      <Sfx name="el-pop" at={day3At + 4} level={-35} />
-      <Sfx name="el-whoosh" at={avroAt} level={-36} />
+      <Sfx name="el-pop" at={day2At + 4} level={-31} />
+      <Sfx name="el-pencil" at={readAt} level={-34} />
+      <Sfx name="el-scratch" at={goneAt + 2} level={-31} />
+      <Sfx name="el-whoosh" at={nameAt + 6} level={-32} />
+      <Sfx name="el-pop" at={day3At + 4} level={-31} />
+      <Sfx name="el-whoosh" at={avroAt} level={-32} />
       {rules.map((r) => (
-        <Sfx key={r.name} name="el-tap" at={r.at} level={-36} />
+        <Sfx key={r.name} name="el-tap" at={r.at} level={-32} />
       ))}
 
       <Drift from={from} to={end + 30}>

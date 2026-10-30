@@ -115,10 +115,14 @@ export const HistoryScene: React.FC = () => {
         </Note>
 
         {/* Each band's name, down the left. */}
+        {/* All three named as "three classic types" is said, set back until
+            each one's own sentence. */}
         {bands.map((b, i) => (
-          <Note key={b.name} at={b.at - 2} x={X0} y={top(i) + h(40)}>
-            <div style={{ ...note(32, i === 1 && lit > 0.5 ? OK_INK : INK), fontWeight: 750, whiteSpace: "nowrap" }}>{b.name}</div>
-            <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{b.what}</div>
+          <Note key={b.name} at={threeAt + i * 5} x={X0} y={top(i) + h(40)}>
+            <div style={{ opacity: 0.4 + 0.6 * ease(frame, b.at - 2, 12) }}>
+              <div style={{ ...note(32, i === 1 && lit > 0.5 ? OK_INK : INK), fontWeight: 750, whiteSpace: "nowrap" }}>{b.name}</div>
+              <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{b.what}</div>
+            </div>
           </Note>
         ))}
         {/* The verdict: Type 2 ringed as the standard, Type 1 kept for typos. */}

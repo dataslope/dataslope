@@ -10,10 +10,10 @@ import { Sfx } from "../../sound/Sfx";
 import { BUDGET, FIXED, FIXED_TOTALS, money, NAIVE, NAIVE_TOTALS, SALES } from "./data";
 import { colsOf, DataTable, Drift, geoOf, MARK, MARK_BAD, MARK_OK, Mono, OK, OK_INK, TableName, Verdict, X0 } from "./parts";
 
-const SALES_Y = 350;
-const BUDGET_Y = 740;
-const RES_X = 1060;
-const OPTS = { headH: 50, rowH: 54, bodySize: 25, headSize: 22 } as const;
+const SALES_Y = 334;
+const BUDGET_Y = 712;
+const RES_X = 860;
+const OPTS = { headH: 50, rowH: 50, bodySize: 25, headSize: 22 } as const;
 
 /** A bracket down the right of some rows, drawn on `at`. */
 const Brace: React.FC<{ x: number; y0: number; y1: number; at: number; color: string; out?: number }> = ({ x, y0, y1, at, color, out }) => {
@@ -97,7 +97,7 @@ export const MismatchScene: React.FC = () => {
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} size={60}>
           What does grain mismatch mean, and how do you fix it?
         </QuestionCard>
-        <Note at={sameAt} x={X0} y={y(268)}>
+        <Note at={sameAt} x={X0} y={y(258)}>
           <span style={{ ...label(23, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>Two fact tables at two grains</span>
         </Note>
 

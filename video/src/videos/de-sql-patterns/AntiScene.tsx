@@ -1,6 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
@@ -30,12 +29,10 @@ const EXCEPT_SIZE = 26;
  * returns Di's id, 4, under the tables it came from.
  */
 export const AntiScene: React.FC = () => {
-  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
   const from = n.beat("anti").from;
-  const qAt = n.word("anti", "Question");
   const textAt = n.word("anti", "How do you write a query");
   // The tables arrive as the question is read to its end.
   const asked = n.word("anti", "Say, customers with no orders");
@@ -55,7 +52,6 @@ export const AntiScene: React.FC = () => {
   const blockAt = n.word("anti-except", "the null can't block it");
   const fourAt = n.word("anti-except", "Di's ID, four");
   const joinBackAt = n.word("anti-except", "Join back for her name");
-  const clearAt = n.beat("recursive").from - 8 - 30;
   const end = n.beat("recursive-in").to;
 
   const cg = tableGeometry({ x: X0, top: y(TOP), cols: [{ name: "id" }, { name: "name" }], rows: ANTI.customers.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
@@ -82,7 +78,8 @@ export const AntiScene: React.FC = () => {
   const E = ANTI.except;
   const exceptH = listingHeight(E.lines.length, EXCEPT_SIZE);
   const eg = tableGeometry({ x: RESULT_X, top: y(TOP), cols: E.cols.map((name) => ({ name, numeric: true })), rows: E.rows, headH: h(HEAD_H), rowH: h(ROW_H) });
-  const fixesOut = exceptAt - 4;
+  // Both fixes keep Di on screen into the EXCEPT sentence, then make room.
+  const fixesOut = exceptAt + 8;
   if (E.rows.map((r) => r[0]).join() !== di[0]) throw new Error("EXCEPT does not return Di's id alone");
 
   return (
@@ -94,8 +91,8 @@ export const AntiScene: React.FC = () => {
       <Sfx name="el-pop" at={fourAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
-          <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={56}>
+        <>
+          <QuestionCard n={10} at={from - 8} textAt={textAt - 4} size={56}>
             How do you write a query that returns only rows that exist in one table but not another?
           </QuestionCard>
 
@@ -185,7 +182,7 @@ export const AntiScene: React.FC = () => {
             top={y(TOP)}
             width={LIST_W}
             size={EXCEPT_SIZE}
-            at={exceptAt - 2}
+            at={fixesOut + 8}
             marks={[{ line: lineOf(E.lines, "EXCEPT"), at: setsAt, color: MARK_OK }]}
           />
           <DataTable
@@ -207,7 +204,7 @@ export const AntiScene: React.FC = () => {
               Only the key comes back: join <Mono>customers</Mono> for the name.
             </span>
           </Note>
-        </AbsoluteFill>
+        </>
       </Drift>
     </AbsoluteFill>
   );

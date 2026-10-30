@@ -8,11 +8,11 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ARRIVALS } from "./data";
-import { Box, Cell, Crash, Drift, ElbowArrow, Lane, Marker, OK_INK, pulse, QUIET, Strike, X0 } from "./parts";
+import { Bar, Box, Cell, Crash, Drift, ElbowArrow, Lane, Marker, OK_INK, pulse, QUIET, Strike, X0 } from "./parts";
 
 const LANE_X = 700;
 const LANE_W = 476;
-const ROWS = [360, 470, 580];
+const ROWS = [340, 440, 540];
 const LANE_H = 70;
 const CELL_W = 82;
 const CELL_H = 54;
@@ -71,7 +71,7 @@ export const GroupScene: React.FC = () => {
   const cellX = (k: number) => LANE_X + 10 + k * STEP;
   const cellY = (p: number) => laneTop(p) + (laneH - CELL_H) / 2;
   const cH = h(56);
-  const cTop = (row: number) => (row < 3 ? mid(row) : mid(2) + h(110)) - cH / 2;
+  const cTop = (row: number) => (row < 3 ? mid(row) : mid(2) + h(100)) - cH / 2;
   const cMid = (row: number) => cTop(row) + cH / 2;
   const fanOut = q4At - 4;
 
@@ -140,7 +140,7 @@ export const GroupScene: React.FC = () => {
               user={c.user}
               opacity={ease(frame, figAt + 4 + c.order, 8)}
               ring={flag > 0 ? HIGHLIGHT : undefined}
-              ringP={flag}
+              ringP={flag * 1.6}
             >
               {c.offset}
             </Cell>
@@ -148,10 +148,10 @@ export const GroupScene: React.FC = () => {
         })}
 
         {/* Group A. */}
-        <Box x={GA.x} y={y(320)} w={GA.w} h={y(780) - y(320)} at={setAt} color={INK_SOFT} fill="transparent" dashed>
+        <Box x={GA.x} y={y(300)} w={GA.w} h={y(720) - y(300)} at={setAt} color={INK_SOFT} fill="transparent" dashed>
           {null}
         </Box>
-        <Note at={setAt + 2} x={GA.x + 4} y={y(320) - h(36)}>
+        <Note at={setAt + 2} x={GA.x + 4} y={y(300) - h(36)}>
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>consumer group A</span>
         </Note>
         {[0, 1, 2, 3].map((c) => {
@@ -193,15 +193,15 @@ export const GroupScene: React.FC = () => {
           style={{
             position: "absolute",
             left: GA.x - 8,
-            top: y(320) - 8,
+            top: y(300) - 8,
             width: GA.w + 16,
-            height: y(780) - y(320) + 16,
+            height: y(720) - y(300) + 16,
             borderRadius: 16,
             boxShadow: lift > 0 ? `0 0 0 ${8 * lift}px ${HIGHLIGHT}` : undefined,
           }}
         />
-        <Note at={rebalanceAt} x={GA.x} y={y(790)} out={fanOut}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>rebalance: one partition each</span>
+        <Note at={rebalanceAt} x={GA.x + 210} y={y(300) - h(36)} out={q4At - 4}>
+          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>rebalance</span>
         </Note>
         <Crash x={GA.cx + GA.cw - 6} y={cTop(1) + 4} at={crashAt + 2} />
 
@@ -231,27 +231,29 @@ export const GroupScene: React.FC = () => {
         ))}
 
         {/* What a group does, along the bottom. */}
-        <Note at={splitAt} x={X0} y={y(820)} out={fanOut}>
+        <Note at={splitAt} x={X0} y={y(770)} out={fanOut}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>each partition goes to exactly one consumer in the group: split, never read twice</span>
         </Note>
-        <Note at={stopsAt} x={X0} y={y(872)} out={fanOut}>
+        <Note at={stopsAt} x={X0} y={y(818)} out={fanOut}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             parallelism stops at the partition count: a fourth consumer has nothing to read
           </span>
         </Note>
-        <Note at={feedsAt} x={X0} y={y(924)} out={fanOut}>
+        <Note at={feedsAt} x={X0} y={y(866)} out={fanOut}>
           <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>each group reads every message: one stream feeds several pipelines</span>
         </Note>
-        <Note at={twoAt} x={GB.x} y={y(320)} out={secondAt - 2}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
-            <Num>2</Num> consumers, <Num>3</Num> partitions
-          </span>
-        </Note>
-        <Note at={eachAt} x={GB.x} y={y(372)} out={secondAt - 2}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
-            then <Num>3</Num> and <Num>3</Num>: one each
-          </span>
-        </Note>
+        {[
+          { at: twoAt, text: "2 consumers: one has two partitions" },
+          { at: eachAt, text: "3 consumers: one partition each" },
+          { at: idleAt, text: "4 consumers: one sits idle" },
+        ].map((r, i) => (
+          <Note key={r.text} at={r.at} x={GB.x} y={y(340) + i * h(44)} out={secondAt - 2}>
+            <span style={{ ...note(24, i === 2 ? ACCENT_INK : INK), whiteSpace: "nowrap" }}>
+              <Num>{r.text.slice(0, 1)}</Num>
+              {r.text.slice(1)}
+            </span>
+          </Note>
+        ))}
 
         {/* Question 4: the commits. */}
         {[0, 1, 2].map((p) => (
@@ -259,21 +261,22 @@ export const GroupScene: React.FC = () => {
         ))}
         <Note at={recordsAt + 10} x={X0} y={mid(0) - h(16)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            ┃ <b>commit</b>: how far group A got
+            <Bar color={INK} />
+            <b>commit</b>: how far group A got
           </span>
         </Note>
         <Note at={storesAt} x={X0} y={mid(0) + h(26)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>one per partition, stored in Kafka</span>
         </Note>
-        <Note at={ownerAt + 4} x={cellX(COMMITTED[1] + 1) - 20} y={laneTop(2) + laneH + h(36)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>↑ consumer 1 resumes after the commit</span>
+        <Note at={ownerAt + 4} x={cellX(COMMITTED[1] + 1) - 4} y={laneTop(1) - h(34)}>
+          <span style={{ ...label(21, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>consumer 1 resumes here ↓</span>
         </Note>
-        <Note at={startAt - 2} x={X0} y={mid(2) - h(16)}>
+        <Note at={startAt - 2} x={LANE_X - 24} y={mid(1) - h(16)} align="right">
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
             <Strike at={startAt + 4}>not from offset 0</Strike>
           </span>
         </Note>
-        <Note at={costAt} x={LANE_X} y={y(820)}>
+        <Note at={costAt} x={LANE_X - 280} y={y(770)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <span style={{ background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>offsets 3 and 4</span>: processed, never committed. Read again?
           </span>

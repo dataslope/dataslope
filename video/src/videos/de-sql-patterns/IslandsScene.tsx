@@ -1,6 +1,5 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { AbsoluteFill } from "remotion";
 import { OK_INK, QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
@@ -14,7 +13,7 @@ import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK, MARK_BAD, MARK_
 const TOP = 320;
 const LIST_X = 600;
 const LIST_W = 560;
-const SIZE = 18;
+const SIZE = 19;
 const RESULT_X = 1180;
 
 /** One blue tint per island, lightest first: data, told apart by tone. */
@@ -31,12 +30,10 @@ const TINTS = [ds("blue", 100), ds("blue", 200), ds("blue", 300)].map((c) => `co
  * puts the three islands back.
  */
 export const IslandsScene: React.FC = () => {
-  const frame = useCurrentFrame();
   const n = useNarration();
   const { y, h } = useLayout();
 
   const from = n.beat("islands").from;
-  const qAt = n.word("islands", "Question");
   const textAt = n.word("islands", "What is the gaps-and-islands problem");
   const runsAt = n.word("islands", "runs of consecutive rows");
   const gapsAt = n.word("islands", "between the breaks");
@@ -50,10 +47,10 @@ export const IslandsScene: React.FC = () => {
   const catchAt = n.word("islands-dupe", "One catch");
   const secondAt = n.word("islands-dupe", "a second login on the same day");
   const bumpsAt = n.word("islands-dupe", "bumps the number");
+  const notDateAt = n.word("islands-dupe", "but not the date");
   const addAt = n.word("islands-dupe", "Add one on the second");
   const mergeAt = n.word("islands-dupe", "two streaks merge");
   const dedupAt = n.word("islands-dupe", "Deduplicate the days first");
-  const clearAt = n.beat("anti").from - 8 - 30;
   const end = n.beat("anti-in").to;
 
   // ── User 1's logins and their keys ──
@@ -65,6 +62,7 @@ export const IslandsScene: React.FC = () => {
   const islandOf = (r: readonly string[]) => keys.indexOf(r[grp]);
   const steps = (beatFrom: number, beatTo: number, count: number) => (k: number) => beatFrom + ((beatTo - beatFrom) * k) / Math.max(1, count - 1);
   const rowStep = steps(stillAt, keyAt - 6, K.rows.length);
+  const breaks = K.rows.flatMap((r, i) => (i > 0 && Date.parse(r[0]) - Date.parse(K.rows[i - 1][0]) > 86_400_000 ? [i] : []));
 
   // The duplicate: the same table, one row longer, in the first's place.
   const D = ISLANDS.dupKeys;
@@ -75,6 +73,8 @@ export const IslandsScene: React.FC = () => {
   const Q = ISLANDS.page;
   const R = ISLANDS.userOne;
   const rg = geoOf(R, RESULT_X, y(TOP), h, { rowH: 50, bodySize: 21, headSize: 19, extra: ISLANDS.dupIslands.rows });
+  // The fix's result goes under the wrong one, which stays up to compare.
+  const dg = geoOf(ISLANDS.dedupedIslands, RESULT_X, rg.rowTop(3) + h(100), h, { rowH: 50, bodySize: 21, headSize: 19 });
   const W = ISLANDS.dupIslands;
   const wrong = W.rows.flatMap((r, i) => (R.rows.some((s) => s.join() === r.join()) ? [] : [i]));
   const startCol = R.cols.indexOf("island_start");
@@ -100,8 +100,8 @@ export const IslandsScene: React.FC = () => {
       <Sfx name="el-pop" at={dedupAt + 6} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
-          <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} size={60}>
+        <>
+          <QuestionCard n={9} at={from - 8} textAt={textAt - 4} size={60}>
             What is the gaps-and-islands problem?
           </QuestionCard>
 
@@ -115,16 +115,21 @@ export const IslandsScene: React.FC = () => {
             at={runsAt - 4}
             out={out}
             rows={rowsAt(K.rows, runsAt)}
-            bands={K.rows.map((r, row) => ({ row, at: rowStep(row), color: TINTS[islandOf(r) % TINTS.length] }))}
+            bands={[
+              // The first login after each break, as "the gaps" is said.
+              ...breaks.map((row, k) => ({ row, at: gapsAt + 2 + k * 4, out: numberAt, color: MARK })),
+              ...K.rows.map((r, row) => ({ row, at: rowStep(row), color: TINTS[islandOf(r) % TINTS.length] })),
+            ]}
             marks={[
               ...K.rows.map((_, row) => ({ row, col: rnCol, at: insideAt + row, out: stillAt })),
               ...K.rows.map((_, row) => ({ row, col: 0, at: insideAt + row, out: stillAt })),
             ]}
           />
-          <Note at={gapsAt} x={kg.right + 14} y={kg.rowTop(3) - h(18)} out={out}>
+          {/* The breaks are labelled once the key's column is open beside them. */}
+          <Note at={stillAt + 12} x={kg.right + 14} y={kg.rowTop(3) - h(18)} out={out}>
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>gap</span>
           </Note>
-          <Note at={gapsAt + 6} x={kg.right + 14} y={kg.rowTop(5) - h(18)} out={out}>
+          <Note at={stillAt + 16} x={kg.right + 14} y={kg.rowTop(5) - h(18)} out={out}>
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>gap</span>
           </Note>
 
@@ -139,7 +144,7 @@ export const IslandsScene: React.FC = () => {
             bands={[{ row: dupRow, at: secondAt + 8, color: MARK }]}
             marks={[
               { row: dupRow, col: rnCol, at: bumpsAt + 2, out: addAt },
-              { row: dupRow, col: 0, at: bumpsAt + 6, out: addAt },
+              { row: dupRow, col: 0, at: notDateAt + 2, out: addAt },
               ...brokenRows.map((row, k) => ({ row, col: grp, at: mergeAt - 2 + k * 2, color: MARK_BAD })),
             ]}
           />
@@ -171,36 +176,36 @@ export const IslandsScene: React.FC = () => {
             rows={rowsAt(R.rows, groupAt + 8, 4)}
             bands={R.rows.map((_, row) => ({ row, at: threeAt + row * 6, color: TINTS[row % TINTS.length] }))}
           />
-          <TableName g={rg} at={mergeAt - 2} out={dedupAt + 2}>
+          <TableName g={rg} at={mergeAt - 2}>
             with the duplicate
           </TableName>
           <DataTable
             g={rg}
             cols={colsOf(W, { streak_days: { ink: BLUE_INK } })}
             at={mergeAt - 2}
-            out={dedupAt + 2}
+
             rows={rowsAt(W.rows, mergeAt + 2, 3)}
             marks={wrong.flatMap((row, k) => [
               { row, col: startCol, at: mergeAt + 10 + k * 4, color: MARK_BAD },
               { row, col: startCol + 1, at: mergeAt + 12 + k * 4, color: MARK_BAD },
             ])}
           />
-          <Note at={mergeAt + 14} x={RESULT_X} y={rg.rowTop(3) + h(20)} out={dedupAt + 2}>
+          <Note at={mergeAt + 14} x={RESULT_X} y={rg.rowTop(3) + h(20)}>
             <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
               Jan <Num>{Number(W.rows[wrong[0]][startCol].slice(8))}</Num> to <Num>{Number(W.rows[wrong[0]][startCol + 1].slice(8))}</Num>: a streak that never happened
             </span>
           </Note>
-          <TableName g={rg} at={dedupAt + 2}>
+          <TableName g={dg} at={dedupAt + 2}>
             deduplicated first
           </TableName>
           <DataTable
-            g={rg}
+            g={dg}
             cols={colsOf(ISLANDS.dedupedIslands, { streak_days: { ink: BLUE_INK } })}
             at={dedupAt + 2}
             rows={rowsAt(ISLANDS.dedupedIslands.rows, dedupAt + 6, 3)}
             bands={ISLANDS.dedupedIslands.rows.map((_, row) => ({ row, at: dedupAt + 16 + row * 3, color: MARK_OK }))}
           />
-          <Note at={dedupAt + 8} x={RESULT_X} y={rg.rowTop(3) + h(20)}>
+          <Note at={dedupAt + 8} x={RESULT_X} y={dg.rowTop(3) + h(20)}>
             <div style={{ ...note(23, OK_INK), whiteSpace: "nowrap" }}>
               <QMono>{dedupSelect}</QMono> first
             </div>
@@ -212,11 +217,11 @@ export const IslandsScene: React.FC = () => {
             </span>
           </Note>
           <Note at={keyAt} x={X0} y={kg.rowTop(K.rows.length) + h(18)} out={out}>
-            <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
               <QMono>grp</QMono>: one per island
             </span>
           </Note>
-        </AbsoluteFill>
+        </>
       </Drift>
     </AbsoluteFill>
   );

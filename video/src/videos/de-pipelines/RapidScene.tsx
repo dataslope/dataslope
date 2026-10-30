@@ -195,7 +195,7 @@ const Lineage: React.FC<{ c: Ctx }> = ({ c }) => {
   const whyAt = c.w("r-lineage", "why a metric changed");
   const breaksAt = c.w("r-lineage", "what breaks if you drop a column");
   const personalAt = c.w("r-lineage", "where personal data went");
-  const W = 210;
+  const W = 196;
   const H = c.h(62);
   const colX = (i: number) => R_X + i * 262;
   const rowY = (j: number) => c.y(420) + j * c.h(120);
@@ -243,8 +243,8 @@ const Lineage: React.FC<{ c: Ctx }> = ({ c }) => {
                   ]
                 : [
                     [s.x + W + 6, s.y + H / 2],
-                    [s.x + W + 26, s.y + H / 2],
-                    [s.x + W + 26, t.y + H / 2 + (s.y < t.y ? -12 : 12)],
+                    [s.x + W + 18, s.y + H / 2],
+                    [s.x + W + 18, t.y + H / 2 + (s.y < t.y ? -12 : 12)],
                     [t.x - 8, t.y + H / 2 + (s.y < t.y ? -12 : 12)],
                   ]
             }
@@ -260,7 +260,7 @@ const Lineage: React.FC<{ c: Ctx }> = ({ c }) => {
         const red = fwd.has(k) && k !== "rawCust" ? fwdP : 0;
         return (
           <React.Fragment key={k}>
-            <Node x={node.x} y={node.y} w={W} h={H} at={at(k)} tone={red > 0.5 ? "bad" : k === "ordersDb" || k === "crm" || k === "dash" ? "plain" : "data"} title={<span style={{ fontFamily: k === "ordersDb" || k === "crm" || k === "dash" ? undefined : MONO, fontSize: 21 }}>{node.t}</span>} lit={back.has(k) ? backP * 0.6 : 0} />
+            <Node x={node.x} y={node.y} w={W} h={H} at={at(k)} tone={red > 0.5 ? "bad" : k === "ordersDb" || k === "crm" || k === "dash" ? "plain" : "data"} title={<span style={{ fontFamily: k === "ordersDb" || k === "crm" || k === "dash" ? undefined : MONO, fontSize: 20 }}>{node.t}</span>} lit={back.has(k) ? backP * 0.6 : 0} />
             {pers.has(k) && persP > 0 ? (
               <div style={{ position: "absolute", left: node.x + W - 34, top: node.y - 14, width: 26, height: 26, borderRadius: 13, background: PERSONAL, border: `3px solid ${PAPER}`, opacity: persP }} />
             ) : null}
@@ -319,12 +319,12 @@ export const RapidScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-chime" at={moreAt} level={-36} />
+      <Sfx name="el-chime" at={moreAt} level={-32} />
       {items.map((it) => (
-        <Sfx key={it.n} name="el-tap" at={it.at} level={-36} />
+        <Sfx key={it.n} name="el-tap" at={it.at} level={-32} />
       ))}
-      <Sfx name="el-pop" at={assumedAt + 4} level={-34} />
-      <Sfx name="el-pencil" at={nextAt} level={-36} />
+      <Sfx name="el-pop" at={assumedAt + 4} level={-30} />
+      <Sfx name="el-pencil" at={nextAt} level={-34} />
 
       <Drift from={from} to={n.beat("next").to + 40}>
         <Kicker at={moreAt}>Quick round</Kicker>

@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { COLUMN_TINT, Drift, OK, OK_INK, READ, X0 } from "./parts";
+import { COLUMN_TINT, Drift, OK, OK_INK, READ, Spot, X0 } from "./parts";
 
 const TOP = 296;
 const PANEL_W = 520;
@@ -149,6 +149,7 @@ export const LakeScene: React.FC = () => {
       <Sfx name="el-pencil" at={commitAt + 4} level={-35} />
       <Sfx name="el-tap" at={versionAt + 2} level={-36} />
       <Sfx name="el-tap" at={travelAt + 2} level={-36} />
+      <Sfx name="el-pop" at={landsAt} level={-35} />
       <Sfx name="el-chime" at={nextAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
@@ -294,7 +295,8 @@ export const LakeScene: React.FC = () => {
         <Note at={landsAt} x={X0} y={y(852)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>All of it assumes the data lands on time, every day.</span>
         </Note>
-        <NextLine at={nextAt} x={1000} y={y(842)} width={720}>
+        <Spot id="de-warehousing-hamster" at={landsAt} left={1520} top={y(670)} width={280} height={214} />
+        <NextLine at={nextAt} x={780} y={y(842)} width={640}>
           orchestration and reliability
         </NextLine>
       </Drift>

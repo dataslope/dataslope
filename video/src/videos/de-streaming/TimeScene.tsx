@@ -9,15 +9,15 @@ import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { STREAM, WATERMARK, WINDOWS } from "./data";
-import { Box, Drift, ElbowArrow, LANE_FILL, OK, OK_INK, pulse, USER_COLOR, X0 } from "./parts";
+import { Box, Drift, LANE_FILL, OK, OK_INK, pulse, USER_COLOR, X0 } from "./parts";
 
 const AX0 = 360;
 const AX1 = 1700;
 const SPAN = 30;
 /** The two axes, in the layout's coordinates. */
-const EV_Y = 400;
-const PR_Y = 600;
-const BAND = 90;
+const EV_Y = 380;
+const PR_Y = 560;
+const BAND = 80;
 
 type Trace = (typeof WATERMARK)["three"]["trace"];
 /** The watermark once the engine has seen everything that arrived by `pt`. */
@@ -272,22 +272,22 @@ export const TimeScene: React.FC = () => {
           <circle cx={ex(dee.t)} cy={evY} r={18} fill="none" stroke={deeOk > 0.5 ? OK : ACCENT} strokeWidth={4} opacity={Math.max(deeLate, deeHot)} />
           <circle cx={ex(dee.arrive)} cy={prY} r={18} fill="none" stroke={ACCENT} strokeWidth={4} opacity={deeHot * (1 - ease(frame, q8Out, 10))} />
         </svg>
-        <Note at={deeAt + 4} x={ex(dee.arrive) + 24} y={(evY + prY) / 2 - h(10)} out={q8Out}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <Note at={deeAt + 4} x={X0} y={y(720)} out={q8Out}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             dee's click: happened at <Num>{dee.t}</Num> s, arrived at <Num>{dee.arrive}</Num> s
           </span>
         </Note>
 
         {/* What pulls the two apart. */}
-        {causes.map((c, i) => (
-          <Note key={c.text} at={c.at - 2} x={X0 + [0, 220, 400, 760][i]} y={y(740)} out={byArrivalAt}>
-            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: X0, top: y(720), display: "flex", gap: 14, whiteSpace: "nowrap", opacity: 1 - ease(frame, byArrivalAt, 10) }}>
+          {causes.map((c, i) => (
+            <span key={c.text} style={{ ...note(25, INK), opacity: ease(frame, c.at - 2, 10) }}>
               {c.text}
               {i < causes.length - 1 ? <span style={{ color: INK_SOFT }}> ·</span> : null}
             </span>
-          </Note>
-        ))}
-        <Note at={apartAt} x={X0} y={y(790)} out={byArrivalAt}>
+          ))}
+        </div>
+        <Note at={apartAt} x={X0} y={y(766)} out={byArrivalAt}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>each pulls the two apart</span>
         </Note>
 
@@ -298,9 +298,7 @@ export const TimeScene: React.FC = () => {
             <line x1={ex(pt)} x2={ex(pt)} y1={prY - 14} y2={prY + h(BAND)} stroke={INK} strokeWidth={3} />
             <path d={`M${ex(pt) - 9},${prY + h(BAND) + 14} L${ex(pt) + 9},${prY + h(BAND) + 14} L${ex(pt)},${prY + h(BAND) + 2} Z`} fill={INK} />
             {wm3 !== null ? (
-              <g>
-                <line x1={ex(Math.max(0, wm3))} x2={ex(Math.max(0, wm3))} y1={evY - h(BAND) - 6} y2={evY + 14} stroke={BLUE_INK} strokeWidth={5} />
-              </g>
+              <line x1={ex(Math.max(0, wm3))} x2={ex(Math.max(0, wm3))} y1={evY - h(BAND) - 6} y2={evY + 14} stroke={BLUE_INK} strokeWidth={5} />
             ) : null}
             {wm10 !== null && ten > 0 ? (
               <line
@@ -316,28 +314,39 @@ export const TimeScene: React.FC = () => {
             ) : null}
           </svg>
         ) : null}
-        <Note at={allowAt + 4} x={ex(pt) - 30} y={prY + h(BAND) + h(22)} out={q9Out}>
-          <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>now: {pt.toFixed(1)} s</span>
+        <Note at={allowAt + 4} x={ex(pt) - 40} y={prY + h(BAND) + h(20)} out={q9Out}>
+          <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            now: <Num>{pt.toFixed(1)}</Num> s
+          </span>
         </Note>
         {wm3 !== null ? (
-          <Note at={allowAt + 6} x={ex(Math.max(0, wm3)) - 70} y={evY - h(BAND) - h(36)} out={q9Out}>
-            <span style={{ ...label(20, BLUE_INK), fontWeight: 750, whiteSpace: "nowrap", ...TABULAR }}>watermark {Math.max(0, wm3)} s</span>
+          <Note at={allowAt + 6} x={ex(Math.max(0, wm3)) + 8} y={evY - h(BAND) - h(34)} out={q9Out}>
+            <span style={{ ...label(20, BLUE_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+              watermark, delay 3: <Num>{Math.max(0, wm3)}</Num> s
+            </span>
+          </Note>
+        ) : null}
+        {wm10 !== null ? (
+          <Note at={tenAt + 6} x={ex(Math.max(0, wm10)) - 8} y={evY - h(BAND) - h(34)} out={q9Out} align="right">
+            <span style={{ ...label(20, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+              delay 10: <Num>{Math.max(0, wm10)}</Num> s
+            </span>
           </Note>
         ) : null}
 
-        <Note at={estAt} x={X0} y={y(760)} out={q9Out}>
+        <Note at={estAt} x={X0} y={y(720)} out={q9Out}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: BLUE_INK }}>watermark</b>: everything before it has (probably) arrived
             <span style={{ opacity: ease(frame, closeAt, 10) }}>, so a window can close</span>
           </span>
         </Note>
-        <Note at={ruleAt} x={X0} y={y(808)} out={q9Out}>
+        <Note at={ruleAt} x={X0} y={y(762)} out={q9Out}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             = latest event time seen <span style={{ opacity: ease(frame, delayAt, 10) }}>− an allowed delay</span>
             <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, proofAt, 10) }}> · progress, not proof</span>
           </span>
         </Note>
-        <Note at={closesAt + 6} x={X0} y={y(866)} out={q9Out}>
+        <Note at={closesAt + 6} x={X0} y={y(812)} out={q9Out}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             delay <Num>{t3.delay}</Num> s: first window closes at <Num>{t3.closeFirst}</Num> s
             <span style={{ opacity: ease(frame, withFourAt, 8) }}>
@@ -348,7 +357,7 @@ export const TimeScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={laterAt + 4} x={X0} y={y(914)} out={q9Out}>
+        <Note at={laterAt + 4} x={X0} y={y(854)} out={q9Out}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             delay <Num>{t10.delay}</Num> s: it counts, <Num>{t10.firstCount}</Num> clicks, but closes at <Num>{t10.closeFirst}</Num> s,{" "}
             <b style={{ color: ACCENT_INK }}>
@@ -356,81 +365,89 @@ export const TimeScene: React.FC = () => {
             </b>
           </span>
         </Note>
-        <Note at={buysAt} x={1240} y={y(760)} out={q9Out}>
+        <Note at={buysAt} x={1260} y={y(812)} out={q9Out}>
           <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             longer delay: more complete, later
-            <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, stateAt, 10) }}>, more state held</span>
+            <br />
+            <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, stateAt, 10) }}>and more state held</span>
           </span>
         </Note>
 
         {/* ── Question 10: late data. ───────────────────────────────────── */}
-        <Note at={keepAt} x={X0} y={y(760)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b>1</b> allowed lateness, <Num>{WATERMARK.threeLate.lateness}</Num> s: window 0 to 10 s stays open until the watermark passes{" "}
-            <Num>{WINDOWS.size + WATERMARK.threeLate.lateness}</Num> s
-          </span>
+        {[
+          {
+            at: keepAt,
+            body: (
+              <>
+                <b>1</b> allowed lateness <Num>{WATERMARK.threeLate.lateness}</Num> s: window 0 to 10 s stays open until the watermark passes{" "}
+                <Num>{WINDOWS.size + WATERMARK.threeLate.lateness}</Num> s
+              </>
+            ),
+          },
+          {
+            at: sideAt - 2,
+            body: (
+              <>
+                <b>2</b> later than that: a side output
+                <span style={{ color: ACCENT_INK, opacity: ease(frame, silenceAt, 10) }}>, never silently dropped</span>
+              </>
+            ),
+          },
+          {
+            at: upsertAt,
+            body: (
+              <>
+                <b>3</b> the sink upserts<span style={{ color: OK_INK, fontWeight: 700, opacity: ease(frame, replacesAt, 10) }}>: one row, replaced</span>
+              </>
+            ),
+          },
+        ].map((r, i) => (
+          <Note key={i} at={r.at} x={X0} y={y(720) + i * h(44)}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>{r.body}</span>
+          </Note>
+        ))}
+        <Note at={mixAt} x={X0} y={y(720) + 3 * h(44) + h(6)}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>early, on-time and late results: how late, and how much it matters, decides the mix</span>
         </Note>
-        <Box x={X0 + 40} y={y(810)} w={330} h={h(60)} at={updateAt} size={23}>
-          <span>
-            window 0 to 10 s:{" "}
-            <span style={{ position: "relative", display: "inline-block", width: "0.8em", ...TABULAR }}>
-              <span style={{ position: "absolute", left: 0, opacity: 1 - ease(frame, fiveAt, 10) }}>{WATERMARK.firstOnTime}</span>
-              <span style={{ position: "absolute", left: 0, color: OK_INK, opacity: ease(frame, fiveAt, 10) }}>{WATERMARK.threeLate.firstCount}</span>
+        {/* The window's row in the sink: four, then five, in place. */}
+        <Box x={1420} y={y(712)} w={380} h={h(64)} at={updateAt} size={24}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+            window 0 to 10 s:
+            <span style={{ display: "inline-grid", ...TABULAR }}>
+              <span style={{ gridArea: "1 / 1", opacity: 1 - ease(frame, fiveAt, 10) }}>{WATERMARK.firstOnTime}</span>
+              <span style={{ gridArea: "1 / 1", color: OK_INK, opacity: ease(frame, fiveAt, 10) }}>{WATERMARK.threeLate.firstCount}</span>
             </span>
           </span>
         </Box>
         <div
           style={{
             position: "absolute",
-            left: X0 + 34,
-            top: y(810) - 6,
-            width: 342,
-            height: h(60) + 12,
+            left: 1414,
+            top: y(712) - 6,
+            width: 392,
+            height: h(64) + 12,
             borderRadius: 12,
             boxShadow: `0 0 0 ${6 * pulse(frame, fiveAt, 26)}px ${HIGHLIGHT}`,
           }}
         />
-        <Note at={sideAt - 2} x={620} y={y(810)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b>2</b> later than that: a side output,
-            <span style={{ color: ACCENT_INK, opacity: ease(frame, silenceAt, 10) }}> not silently dropped</span>
-          </span>
-        </Note>
-        <ElbowArrow
-          points={[
-            [640, y(870)],
-            [760, y(870)],
-          ]}
-          at={sideAt + 2}
-          color={INK_SOFT}
-          dur={10}
-          head={12}
-        />
-        <Box x={772} y={y(850)} w={200} h={h(46)} at={sideAt + 6} size={20} color={INK_SOFT}>
-          side output
-        </Box>
-        <Note at={upsertAt} x={1080} y={y(810)}>
-          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b>3</b> the sink upserts: <span style={{ color: OK_INK, fontWeight: 700, opacity: ease(frame, replacesAt, 10) }}>one row, replaced</span>
-          </span>
+        <Note at={updateAt + 4} x={1420} y={y(712) + h(74)}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>the window's row in the sink</span>
         </Note>
         {firings.map((f) => {
           const p = ease(frame, f.at - 2, 10);
+          const top = prY + h(BAND) + 4;
           return (
             <React.Fragment key={f.text}>
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
-                <line x1={ex(f.pt)} x2={ex(f.pt)} y1={prY} y2={prY + h(BAND) + 10} stroke={OK} strokeWidth={3} />
-                <path d={`M${ex(f.pt)},${prY + h(BAND) + 10} l30,10 l-30,10 z`} fill={OK} />
+                <line x1={ex(f.pt)} x2={ex(f.pt)} y1={top} y2={top + h(34)} stroke={OK} strokeWidth={3} />
+                <path d={`M${ex(f.pt)},${top} l26,9 l-26,9 z`} fill={OK} />
               </svg>
-              <Note at={f.at} x={ex(f.pt) + 6} y={prY + h(BAND) + h(34)}>
+              <Note at={f.at} x={ex(f.pt) + 32} y={top + h(4)}>
                 <span style={{ ...label(20, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{f.text}</span>
               </Note>
             </React.Fragment>
           );
         })}
-        <Note at={mixAt} x={1080} y={y(866)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>how late, and how much it matters, decides the mix</span>
-        </Note>
       </Drift>
     </AbsoluteFill>
   );

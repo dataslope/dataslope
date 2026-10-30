@@ -108,7 +108,7 @@ export const FileScene: React.FC = () => {
   const T = { cols: ["name", "qty"], rows: FILE.totals };
   const tg = geoOf(T, TOTALS_X, chunkTop, h, { rowH: 46, bodySize: 24, headH: 44 });
   const totalsAt = foldAt + FILE.nChunks * 8;
-  const pBarsY = rTop + cH + h(80);
+  const pBarsY = rTop + cH + h(112);
   const wh = bytes(FILE.whole.peak);
   const ch = bytes(FILE.chunks.peak);
   const meanTop = chunkTop + FILE.nChunks * chunkH + h(70);
@@ -165,13 +165,19 @@ export const FileScene: React.FC = () => {
           lines={S}
           x={X0}
           top={sTop}
-          width={760}
+          width={740}
           size={SIZE}
           at={loopAt - 4}
           out={out3}
           marks={[{ line: lineOf(S, "for line in f"), at: loopAt + 4, color: MARK_OK }]}
         />
 
+        {/* The for loop's peak stays beside it once the bars give way. */}
+        <Note at={kbAt + 4} x={X0 + 766} y={sTop + listingHeight(S.length, SIZE) / 2 - h(18)} out={out3}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ fontVariantNumeric: "tabular-nums" }}>{st.num}</span> {st.unit}
+          </span>
+        </Note>
         <Note at={textHoldsAt} x={RIGHT_X + 120} y={rTop - h(40)} out={chainAt - 4}>
           <span style={{ display: "flex", gap: 22, alignItems: "baseline", whiteSpace: "nowrap" }}>
             <Title>peak memory</Title>
@@ -198,14 +204,14 @@ export const FileScene: React.FC = () => {
         </Note>
 
         {/* Chained generators: nothing is read until the last one asks. */}
-        <Note at={chainAt - 2} x={RIGHT_X - 60} y={lzTop - h(40)} out={out3}>
+        <Note at={chainAt - 2} x={RIGHT_X} y={lzTop - h(40)} out={out3}>
           <Title>the page&apos;s read_lines, with a print where it opens the file</Title>
         </Note>
         <Listing
           lines={LZ}
-          x={RIGHT_X - 60}
+          x={RIGHT_X}
           top={lzTop}
-          width={860}
+          width={800}
           size={20}
           at={chainAt}
           out={out3}
@@ -216,7 +222,7 @@ export const FileScene: React.FC = () => {
         />
         <Console
           lines={FILE.lazy.out}
-          x={RIGHT_X - 60}
+          x={RIGHT_X}
           top={lzTop + lzH + h(18)}
           width={600}
           size={21}

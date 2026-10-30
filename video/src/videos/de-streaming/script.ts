@@ -93,7 +93,7 @@ export const script: NarrationScript = {
     },
     {
       id: "plan",
-      text: "Fifteen questions: twelve worked through on one small stream, the video's own, of twelve clicks from four users. Then three quick ones.",
+      text: "Fifteen questions: twelve worked through, most on one small stream of the video's own, twelve clicks from four users, then three quick ones.",
       pauseAfter: 0.7,
     },
 

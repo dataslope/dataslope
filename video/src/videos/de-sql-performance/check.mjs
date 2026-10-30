@@ -128,6 +128,10 @@ results.figures.index = await pgFigure(ORDERS, {
   pages: TABLE_PAGES,
   shipped: "SELECT COUNT(*) AS shipped FROM orders WHERE status = 'shipped';",
   shippedPlan: `${EXPLAIN}\n${SHIPPED}`,
+  // Not on screen: the rare value of the same two-value column (one row in
+  // ten) does use the index, so what decides is how selective the value is,
+  // not how few values the column has (the page says "low-cardinality").
+  returnedPlan: `${EXPLAIN}\nSELECT * FROM orders\nWHERE status = 'returned';`,
   writeTables:
     "CREATE TABLE no_index (id int, customer_id int, order_date date, amount numeric, status text);\nCREATE TABLE three_indexes (id int, customer_id int, order_date date, amount numeric, status text);\nCREATE INDEX ON three_indexes (customer_id);\nCREATE INDEX ON three_indexes (order_date);\nCREATE INDEX ON three_indexes (status);",
   walNone: INSERT_10K("no_index"),

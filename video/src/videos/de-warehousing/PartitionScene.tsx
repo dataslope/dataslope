@@ -107,7 +107,7 @@ export const PartitionScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-sprinkle" at={monthAt + 2} level={-34} />
+      <Sfx name="el-sprinkle" at={splitsAt + 10} level={-34} />
       <Sfx name="el-pencil" at={oneAt + 2} level={-35} />
       <Sfx name="el-tap" at={allAt} level={-35} />
       <Sfx name="el-pop" at={goodAt + 4} level={-34} />
@@ -135,7 +135,7 @@ export const PartitionScene: React.FC = () => {
             y={y(FOLDER_Y)}
             h={h(FOLDER_H)}
             name={m}
-            at={monthAt + i * 1.5}
+            at={splitsAt + 10 + i * 2}
             read={i === MARCH ? Math.max(marchOn, fnOn) : 0}
             trap={regionOn}
             pruned={i === MARCH ? 0 : Math.max(marchOn, fnOn)}

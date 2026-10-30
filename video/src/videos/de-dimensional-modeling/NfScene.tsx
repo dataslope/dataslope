@@ -9,10 +9,10 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { NF1, NF2, NF3, type Result } from "./data";
-import { colsOf, DataTable, Drift, geoOf, KEY_INK, MARK, MARK_BAD, MARK_KEY, Mono, OK_INK, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoWith, KEY_INK, MARK, MARK_BAD, MARK_KEY, Mono, OK_INK, X0 } from "./parts";
 
 const TABLE_X = 600;
-const ROWS_Y = [292, 462, 664] as const;
+const ROWS_Y = [276, 454, 678] as const;
 const OPTS = { headH: 42, rowH: 46, bodySize: 23, headSize: 20 } as const;
 const STAR_X = 1460;
 
@@ -62,7 +62,8 @@ const Form: React.FC<{ top: number; at: number; underlineAt: number; color: stri
   return (
     <div style={{ position: "absolute", left: X0, top, width: 450 }}>
       <div style={{ ...label(23, color), fontWeight: 700, opacity: ease(frame, at - 4, 10), whiteSpace: "nowrap" }}>{name}</div>
-      <div style={{ position: "relative", height: 62, marginTop: 6 }}>
+      {/* flow-root, or the Ink's negative bleed margin collapses through this box and lifts it 34px. */}
+      <div style={{ position: "relative", display: "flow-root", height: 62, marginTop: 6 }}>
         <Phrase at={at} underlineAt={underlineAt} color={color}>
           {phrase}
         </Phrase>
@@ -107,9 +108,15 @@ export const NfScene: React.FC = () => {
   const backAt = n.word("nf-star", "Snowflaking puts it back");
   const end = n.beat("nf-star").to;
 
-  const g1 = geoOf(NF1, TABLE_X, y(ROWS_Y[0]), h, OPTS);
-  const g2 = geoOf(NF2, TABLE_X, y(ROWS_Y[1]), h, OPTS);
-  const g3 = geoOf(NF3, TABLE_X, y(ROWS_Y[2]), h, OPTS);
+  const cols1 = colsOf(NF1);
+  const cols2 = colsOf(NF2, {
+    order_id: { ink: KEY_INK, tag: { text: "PK", at: keyByAt } },
+    product_id: { ink: KEY_INK, tag: { text: "PK", at: keyByAt + 4 } },
+  });
+  const cols3 = colsOf(NF3, { order_id: { ink: KEY_INK, tag: { text: "PK", at: thirdAt + 6 } } });
+  const g1 = geoWith(NF1, cols1, TABLE_X, y(ROWS_Y[0]), h, OPTS);
+  const g2 = geoWith(NF2, cols2, TABLE_X, y(ROWS_Y[1]), h, OPTS);
+  const g3 = geoWith(NF3, cols3, TABLE_X, y(ROWS_Y[2]), h, OPTS);
   const col = (t: Result, c: string) => t.cols.indexOf(c);
   const all = (t: Result, c: string, at: number, color: string, step = 3) => t.rows.map((_, i) => ({ row: i, col: col(t, c), at: at + i * step, color }));
   const star = useEntityLayout({
@@ -142,12 +149,12 @@ export const NfScene: React.FC = () => {
           <Form top={y(ROWS_Y[0])} at={firstAt} underlineAt={twoAt} color={BLUE_INK} name="First normal form, 1NF" phrase="One value per cell." table="students" />
           <DataTable
             g={g1}
-            cols={colsOf(NF1)}
+            cols={cols1}
             at={firstAt + 4}
             rows={NF1.rows.map((cells, i) => ({ cells, at: firstAt + 8 + i * 3 }))}
             marks={[{ row: 0, col: col(NF1, "phones"), at: twoAt + 4, color: MARK_BAD }]}
           />
-          <Note at={twoAt + 10} x={g1.right + 24} y={g1.rowTop(0) + 6}>
+          <Note at={twoAt + 10} x={g1.right + 24} y={g1.rowTop(0) + 6} out={appAt}>
             <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>← two values, one cell</span>
           </Note>
 
@@ -155,15 +162,12 @@ export const NfScene: React.FC = () => {
           <Form top={y(ROWS_Y[1])} at={secondAt} underlineAt={wholeAt} color={BLUE_INK} name="Second normal form, 2NF" phrase="The whole key." table="order_items" />
           <DataTable
             g={g2}
-            cols={colsOf(NF2, {
-              order_id: { ink: KEY_INK, tag: { text: "PK", at: keyByAt } },
-              product_id: { ink: KEY_INK, tag: { text: "PK", at: keyByAt + 4 } },
-            })}
+            cols={cols2}
             at={secondAt + 4}
             rows={NF2.rows.map((cells, i) => ({ cells, at: secondAt + 8 + i * 3 }))}
             marks={[...all(NF2, "product_id", halfAt, MARK_KEY), ...all(NF2, "product_name", halfAt + 4, MARK)]}
           />
-          <Note at={halfAt + 8} x={g2.right + 24} y={g2.rowTop(0) + 4}>
+          <Note at={halfAt + 8} x={g2.right + 24} y={g2.rowTop(0) + 4} out={appAt}>
             <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
               ← half the key
             </span>
@@ -173,7 +177,7 @@ export const NfScene: React.FC = () => {
           <Form top={y(ROWS_Y[2])} at={thirdAt} underlineAt={butAt} color={ACCENT_INK} name="Third normal form, 3NF" phrase="Nothing but the key." table="orders_bad" />
           <DataTable
             g={g3}
-            cols={colsOf(NF3, { order_id: { ink: KEY_INK, tag: { text: "PK", at: thirdAt + 6 } } })}
+            cols={cols3}
             at={thirdAt + 4}
             rows={NF3.rows.map((cells, i) => ({ cells, at: thirdAt + 8 + i * 3 }))}
             marks={[...all(NF3, "customer_id", notOrderAt, MARK_KEY), ...all(NF3, "customer_city", cityAt + 4, MARK)]}

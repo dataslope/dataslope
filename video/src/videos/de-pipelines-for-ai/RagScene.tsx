@@ -188,7 +188,7 @@ export const RagScene: React.FC = () => {
           </span>
         </Note>
         {fields.map((f, i) => (
-          <Chip key={f.text} x={X0 + 400 + [0, 150, 290, 470][i]} y={noteY(2) - 8} at={f.at - 2} size={22} ink={BLUE_INK}>
+          <Chip key={f.text} x={X0 + 400 + [0, 128, 270, 452][i]} y={noteY(2) - 8} at={f.at - 2} size={22} ink={BLUE_INK}>
             <span style={{ fontFamily: MONO, fontVariantLigatures: "none" }}>{f.text}</span>
           </Chip>
         ))}

@@ -8,7 +8,7 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PRUNE, thousands } from "./data";
-import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK, OK_INK, PlanBox, X0 } from "./parts";
+import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK, OK_INK, PlanBox, planHeight, X0 } from "./parts";
 
 const BOX_TOP = 300;
 const BOX_W = 128;
@@ -44,7 +44,7 @@ export const PruneScene: React.FC = () => {
   const onlyAt = n.word("prune", "reads only the months");
   const marchAt = n.word("prune-one", "March's revenue");
   const oneAt = n.word("prune-one", "scans one partition");
-  const rowsAt = n.word("prune-one", "eighty-four thousand rows");
+  const rowsAt = n.word("prune-one", "eighty-five thousand rows");
   const skipsAt = n.word("prune-one", "skips the other eleven");
   const wrapAt = n.word("prune-fn", "Wrap the column in a function");
   const extractAt = n.word("prune-fn", "extract month equals three");
@@ -164,7 +164,7 @@ export const PruneScene: React.FC = () => {
             { line: "orders_2024_02", text: "orders_2024_02", at: allAt + 3 },
           ]}
         />
-        <Note at={allAt} x={X0 + 30} y={fnPlanTop + h(300)}>
+        <Note at={allAt} x={X0 + 30} y={fnPlanTop + planHeight(FN_SHOWN, PLAN) + h(14)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             … then the same Seq Scan on the other ten: <b>{PRUNE.fnScans}</b> in all
           </span>

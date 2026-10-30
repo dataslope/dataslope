@@ -98,6 +98,31 @@ const Ring: React.FC<{ e: EntityLayout; at: number; out?: number }> = ({ e, at, 
   );
 };
 
+/** A yellow ring around some of an entity's rows (by index). */
+const RowsRing: React.FC<{ e: EntityLayout; first: number; last: number; at: number; out?: number }> = ({ e, first, last, at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 12);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  const top = e.rows[first].top;
+  const bottom = e.rows[last].top + e.row;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: e.left - 8,
+        top: top - 6,
+        width: e.width + 16,
+        height: bottom - top + 12,
+        boxSizing: "border-box",
+        border: `6px solid ${HIGHLIGHT}`,
+        borderRadius: 8,
+        opacity: p * (1 - o),
+      }}
+    />
+  );
+};
+
 /**
  * Questions 1 and 2, and Data warehousing's star question. A fact table at
  * one row per order line, its measures and its keys; the four dimensions
@@ -125,6 +150,7 @@ export const StarScene: React.FC = () => {
   const customerAt = n.word("dims", "the customer");
   const q2At = n.word("star", "Question two");
   const q2TextAt = n.word("star", "Star versus snowflake schema");
+  const starAt = n.word("star", "This is a star");
   const oneJoinAt = n.word("star", "one join from the fact");
   const plainAt = n.word("star", "category and department as plain text");
   const snowAt = n.word("snow", "Snowflake it");
@@ -139,6 +165,7 @@ export const StarScene: React.FC = () => {
   const toolsAt = n.word("star-why", "dashboard tools");
   const defaultAt = n.word("star-why", "So the star is the default");
   const largeAt = n.word("star-why", "Snowflake a dimension");
+  const sharedAt = n.word("star-why", "or shared");
   const end = n.beat("star-why").to;
 
   // ── Layout: four dimensions in two columns, the fact between them ──
@@ -220,14 +247,8 @@ export const StarScene: React.FC = () => {
           }}
           dim={undefined}
         />
-        {/* The two measures marked again while the star is "scanned a column at a time". */}
-        <Entity
-          layout={fact}
-          at={scannedAt}
-          rowGap={0}
-          marks={{ quantity: { at: scannedAt + 2, tone: "note", out: defaultAt }, amount: { at: scannedAt + 6, tone: "note", out: defaultAt } }}
-          out={defaultAt + 12}
-        />
+        {/* The two measure columns ringed while the fact is "scanned a column at a time". */}
+        <RowsRing e={fact} first={4} last={5} at={scannedAt + 2} out={defaultAt} />
 
         {/* ── The dimensions, each as it is named ── */}
         <Entity layout={dims.date} at={dateAt - 4} />
@@ -239,6 +260,13 @@ export const StarScene: React.FC = () => {
         <Relation name="customer" points={lines.customer} from="exactly-one" to="zero-or-many" at={customerAt + 2} />
         <Relation name="store" points={lines.store} from="exactly-one" to="zero-or-many" at={storeAt + 2} />
         <Relation name="product" points={lines.product} from="exactly-one" to="zero-or-many" at={productAt + 2} />
+
+        {/* "This is a star", named where the snowflake will grow. */}
+        <Note at={starAt} x={NOTE_X} y={y(310)} width={NOTE_W} out={snowAt - 4}>
+          <span style={{ ...note(26, INK) }}>
+            A star: <span style={{ color: BLUE_INK, opacity: ease(frame, oneJoinAt, 10) }}>every dimension one join from the fact</span>
+          </span>
+        </Note>
 
         {/* "One join from the fact": each relationship counted once. */}
         {(["date", "customer", "store", "product"] as const).map((k, i) => {
@@ -293,7 +321,10 @@ export const StarScene: React.FC = () => {
           <span style={{ ...note(30, OK_INK), fontWeight: 750 }}>The default: a star.</span>
         </Note>
         <Note at={largeAt} x={NOTE_X} y={y(660)} width={NOTE_W}>
-          <span style={{ ...note(24, INK_SOFT) }}>Snowflake a dimension when it&apos;s very large, or shared.</span>
+          <span style={{ ...note(24, INK_SOFT) }}>
+            Snowflake a dimension when it&apos;s very large,
+            <span style={{ opacity: ease(frame, sharedAt, 10) }}> or shared.</span>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

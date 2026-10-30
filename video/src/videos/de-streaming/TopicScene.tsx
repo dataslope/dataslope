@@ -213,7 +213,7 @@ export const TopicScene: React.FC = () => {
         <Legend x={LANE_X} y={laneTop(2) + laneH + h(34)} at={flyAt(0) + 4} out={addAt - 4} note="· the video's own stream" />
 
         {/* Offsets named: each lane's slots count from zero. */}
-        <Note at={offsetAt} x={RIGHT_X} y={y(400)} out={partsOut}>
+        <Note at={logAt + 6} x={RIGHT_X} y={y(400)} out={partsOut}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <b>topic</b>: a named log that only grows at its end
           </span>
@@ -223,9 +223,12 @@ export const TopicScene: React.FC = () => {
             <b>partition</b>: the unit of parallelism
           </span>
         </Note>
-        <Note at={zeroAt - 4} x={RIGHT_X} y={y(504)} out={partsOut}>
+        <Note at={offsetAt} x={RIGHT_X} y={y(504)} out={partsOut}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <b>offset</b>: a message's position in its partition, from <Num>0</Num>
+            <b>offset</b>: a message's position in its partition
+            <span style={{ opacity: ease(frame, zeroAt - 2, 10) }}>
+              , from <Num>0</Num>
+            </span>
           </span>
         </Note>
 

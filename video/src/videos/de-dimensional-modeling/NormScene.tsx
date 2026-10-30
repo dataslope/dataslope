@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FLAT, FLAT_AFTER, NORM_CUSTOMERS, NORM_ORDERS, UPDATE_ROWS, UPDATE_SQL } from "./data";
-import { colsOf, DataTable, Drift, ElbowArrow, geoOf, KEY_INK, MARK, MARK_BAD, MARK_KEY, Mono, OK_INK, PanelHead, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, ElbowArrow, geoOf, KEY_INK, Mark, MARK, MARK_BAD, MARK_KEY, Mono, OK_INK, PanelHead, TableName, X0 } from "./parts";
 
 const RIGHT_X = 1000;
 const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
@@ -27,6 +27,8 @@ export const NormScene: React.FC = () => {
   const from = n.beat("norm").from;
   const qAt = n.word("norm", "Question five");
   const textAt = n.word("norm", "Normalization versus denormalization");
+  const normWordAt = n.word("norm", "Normalization versus");
+  const denormWordAt = n.word("norm", "denormalization");
   const onceAt = n.word("norm", "stores each fact once");
   const livesAt = n.word("norm", "Ada's email lives in one customers row");
   const joinAt = n.word("norm", "through a join");
@@ -38,10 +40,11 @@ export const NormScene: React.FC = () => {
   const twoAt = n.word("denorm", "now Ada has two emails");
   const writesAt = n.word("norm-where", "normalize where writes are frequent");
   const readsAt = n.word("norm-where", "Denormalize where reads dominate");
+  const warehouseAt = n.word("norm-where", "like a warehouse");
   const end = n.beat("norm-where").to;
 
   const cg = geoOf(NORM_CUSTOMERS, X0, y(380), h, OPTS);
-  const og = geoOf(NORM_ORDERS, X0, y(560), h, OPTS);
+  const og = geoOf(NORM_ORDERS, X0, y(584), h, OPTS);
   const fg = geoOf(FLAT, RIGHT_X, y(380), h, { ...OPTS, extra: FLAT_AFTER.rows });
   const cEmail = NORM_CUSTOMERS.cols.indexOf("email");
   const cId = NORM_CUSTOMERS.cols.indexOf("customer_id");
@@ -71,7 +74,14 @@ export const NormScene: React.FC = () => {
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} size={60}>
-          Normalization versus denormalization: what&apos;s the trade-off?
+          <Mark at={normWordAt} out={onceAt}>
+            Normalization
+          </Mark>{" "}
+          versus{" "}
+          <Mark at={denormWordAt} out={onceAt}>
+            denormalization
+          </Mark>
+          : what&apos;s the trade-off?
         </QuestionCard>
 
         {/* ── Normalized: each fact once ── */}
@@ -157,7 +167,7 @@ export const NormScene: React.FC = () => {
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Denormalize: reads dominate,
             <br />
-            <span style={{ color: INK }}>like a warehouse</span>
+            <span style={{ color: INK, opacity: ease(frame, warehouseAt - 2, 10) }}>like a warehouse</span>
           </span>
         </Note>
       </Drift>

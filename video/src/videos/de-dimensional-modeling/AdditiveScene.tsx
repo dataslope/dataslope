@@ -89,6 +89,12 @@ export const AdditiveScene: React.FC = () => {
   const from = n.beat("additive").from;
   const qAt = n.word("additive", "Question ten");
   const textAt = n.word("additive", "What is the difference between additive");
+  // The three kinds arrive as the question names them, then light in turn.
+  const kindAt = [
+    n.word("additive", "additive", { nth: 1 }),
+    n.word("additive", "semi-additive"),
+    n.word("additive", "non-additive measures"),
+  ];
   const amountAt = n.word("additive", "An amount is additive");
   const everyAt = n.word("additive", "sums across every dimension");
   const semiAt = n.word("semi", "A balance is semi-additive");
@@ -108,6 +114,7 @@ export const AdditiveScene: React.FC = () => {
   const fourAt = n.word("nonadd", "are four people");
   const sixAt = n.word("nonadd", "not six");
   const partsAt = n.word("nonadd", "Store the parts");
+  const computeAt = n.word("nonadd", "compute the ratio in the query");
   const end = n.beat("nonadd").to;
 
   const bg = geoOf(BALANCE, X0, y(446), h, OPTS);
@@ -137,9 +144,9 @@ export const AdditiveScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── The three kinds, lit in turn ── */}
-        <Kind at={amountAt - 2} litFrom={amountAt} litTo={semiAt} x={X0} y={y(318)} name="additive" eg="an amount" />
-        <Kind at={semiAt - 2} litFrom={semiAt} litTo={nonAt} x={X0 + 440} y={y(318)} name="semi-additive" eg="a balance" />
-        <Kind at={nonAt - 2} litFrom={nonAt} litTo={end + 60} x={X0 + 960} y={y(318)} name="non-additive" eg="a ratio, a distinct count" />
+        <Kind at={kindAt[0]} litFrom={amountAt} litTo={semiAt} x={X0} y={y(318)} name="additive" eg="an amount" />
+        <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} x={X0 + 440} y={y(318)} name="semi-additive" eg="a balance" />
+        <Kind at={kindAt[2]} litFrom={nonAt} litTo={end + 60} x={X0 + 960} y={y(318)} name="non-additive" eg="a ratio, a distinct count" />
         <Note at={everyAt} x={X0} y={y(318) + h(44)}>
           <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>sums across every dimension</span>
         </Note>
@@ -214,7 +221,7 @@ export const AdditiveScene: React.FC = () => {
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Store the parts;
             <br />
-            compute the ratio in the query.
+            <span style={{ opacity: ease(frame, computeAt - 2, 10) }}>compute the ratio in the query.</span>
           </span>
         </Note>
       </Drift>

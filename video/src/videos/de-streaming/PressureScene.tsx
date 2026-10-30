@@ -3,20 +3,20 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { at as sAt, Axes, type Scale } from "../da-statistics-communication/parts";
 import { BACKPRESSURE, count } from "./data";
-import { Box, Bracket, Cell, Drift, ElbowArrow, Lane, OK, OK_INK, X0 } from "./parts";
+import { Bar, Box, Bracket, Cell, Drift, ElbowArrow, Lane, OK, OK_INK, X0 } from "./parts";
 
-const LANE = { x: 400, w: 760, top: 380, h: 68 };
+const LANE = { x: 400, w: 630, top: 370, h: 68 };
 const CELL = { w: 40, h: 46, step: 47 };
 /** How many cells the lane holds, and how fast each end moves, in cells a frame. */
-const SLOTS = 15;
+const SLOTS = 13;
 const IN_RATE = 0.2;
-const OUT_RATE = 0.16;
+const OUT_RATE = 0.11;
 
 /**
  * Question 12. A producer writing faster than its consumer reads: the log
@@ -68,7 +68,7 @@ export const PressureScene: React.FC = () => {
 
   // The chart: lag, second by second.
   const sx: Scale = { lo: 0, hi: 100, a: 400, b: 1400 };
-  const sy: Scale = { lo: 0, hi: 1200, a: y(900), b: y(640) };
+  const sy: Scale = { lo: 0, hi: 1200, a: y(830), b: y(610) };
   const lag = BACKPRESSURE.lag;
   const drawn = (until: number) =>
     lag
@@ -135,27 +135,27 @@ export const PressureScene: React.FC = () => {
           <line x1={committedX} x2={committedX} y1={laneTop - 8} y2={laneTop + laneH + 8} stroke={BAR} strokeWidth={4} strokeLinecap="round" />
           <line x1={latestX} x2={latestX} y1={laneTop - 8} y2={laneTop + laneH + 8} stroke={INK} strokeWidth={3} strokeLinecap="round" />
         </svg>
-        <Bracket x0={committedX} x1={latestX} y={laneTop + laneH + h(16)} at={lagAt} up>
+        <Bracket x0={committedX} x1={latestX} y={laneTop + laneH + h(18)} at={lagAt}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 750 }}>consumer lag</span>
         </Bracket>
-        <Note at={distAt + 2} x={LANE.x} y={laneTop + laneH + h(66)}>
+        <Note at={distAt + 2} x={LANE.x} y={laneTop + laneH + h(76)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
-            lag = latest offset <span style={{ color: INK }}>┃</span> minus committed offset <span style={{ color: BLUE_INK }}>┃</span>
+            lag = latest offset
+            <Bar color={INK} />
+            minus committed offset
+            <Bar color={BAR} />
           </span>
         </Note>
-        <Note at={absorbsAt} x={cons.x + cons.w + 24} y={mid - h(48)}>
+        <Note at={absorbsAt} x={cons.x + cons.w + 24} y={mid - h(52)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            Kafka absorbs it<span style={{ opacity: ease(frame, durableAt, 10) }}>: the log is durable</span>
+            Kafka absorbs it<span style={{ opacity: ease(frame, durableAt, 10) }}>: the log is durable,</span>
           </span>
         </Note>
-        <Note at={behindAt} x={cons.x + cons.w + 24} y={mid - h(8)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            the consumer falls behind
-            <span style={{ color: OK_INK, fontWeight: 700, opacity: ease(frame, droppedAt, 10) }}>,</span>
-          </span>
+        <Note at={behindAt} x={cons.x + cons.w + 24} y={mid - h(14)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>so the consumer falls behind</span>
         </Note>
-        <Note at={droppedAt} x={cons.x + cons.w + 24} y={mid + h(32)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>nothing is dropped</span>
+        <Note at={droppedAt} x={cons.x + cons.w + 24} y={mid + h(24)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>and nothing is dropped</span>
         </Note>
         {/* A push-based system pushes back instead. */}
         <ElbowArrow
@@ -202,7 +202,7 @@ export const PressureScene: React.FC = () => {
           {shown > 1 ? <path d={drawn(shown)} fill="none" stroke={ACCENT} strokeWidth={3.5} strokeLinejoin="round" /> : null}
           <line x1={joinX} x2={joinX} y1={sy.b - 10} y2={sy.a} stroke={OK} strokeWidth={3} strokeDasharray="7 6" opacity={ease(frame, secondAt + 4, 10)} />
         </svg>
-        <Note at={elevenAt} x={sAt(sx, BACKPRESSURE.join) - 250} y={sAt(sy, BACKPRESSURE.atJoin) - h(30)}>
+        <Note at={elevenAt} x={sAt(sx, BACKPRESSURE.join) - 250} y={sAt(sy, BACKPRESSURE.atJoin) - h(48)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>
             <Num>{count(BACKPRESSURE.atJoin)}</Num> at a minute
           </span>
@@ -217,7 +217,7 @@ export const PressureScene: React.FC = () => {
             cleared in <Num>{BACKPRESSURE.drainSeconds}</Num> s
           </span>
         </Note>
-        <Note at={risingAt} x={1440} y={y(700)}>
+        <Note at={risingAt} x={1460} y={y(660)}>
           <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             rising lag:
             <br />

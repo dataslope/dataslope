@@ -43,11 +43,15 @@ export const RowsScene: React.FC = () => {
   const qTextAt = n.word("rows", "What is OLTP");
   const qEnd = n.beat("rows").to;
   const oltpAt = n.word("rows-oltp", "OLTP, online transaction processing");
+  const oltpXAt = n.word("rows-oltp", "online transaction processing");
+  const appAt = n.word("rows-oltp", "runs the application");
   const smallAt = n.word("rows-oltp", "many small reads and writes");
   const oneAtATime = n.word("rows-oltp", "one order at a time");
   const rowStoreAt = n.word("rows-oltp", "So it stores each row's fields together");
   const onePlaceAt = n.word("rows-oltp", "one order, one place");
   const olapAt = n.word("rows-olap", "OLAP, online analytical processing");
+  const olapXAt = n.word("rows-olap", "online analytical processing");
+  const reportsAt = n.word("rows-olap", "runs the reports");
   const fewAt = n.word("rows-olap", "a few columns across millions of rows");
   const colStoreAt = n.word("rows-olap", "So it stores each column together");
   const idAt = n.word("rows-olap", "every sale ID");
@@ -135,7 +139,11 @@ export const RowsScene: React.FC = () => {
           at={qEnd - 8}
           out={q2At - 2}
           rows={rowsAt(sample.rows, qEnd - 4)}
-          bands={[{ row: ORDER, at: oneAtATime, out: fewAt }]}
+          bands={[
+            // Many small reads and writes: one row at a time, then another.
+            ...[0, 1, 3].map((row, k) => ({ row, at: smallAt + 4 + k * 9, out: smallAt + 13 + k * 9 })),
+            { row: ORDER, at: oneAtATime, out: fewAt },
+          ]}
           marks={sample.rows.map((_, row) => ({ row, col: AMOUNT, at: fewAt + 4 + row * 2 }))}
         />
         {/* Each column's tint, over its title, so the strips below read back to it. */}
@@ -156,16 +164,28 @@ export const RowsScene: React.FC = () => {
         ))}
 
         {/* ── What each kind of system does ── */}
-        <Note at={oltpAt} x={RIGHT_X} y={y(TOP) + h(6)} out={q2At - 2}>
+        <Note at={oltpAt} x={RIGHT_X} y={y(TOP) + h(4)} out={q2At - 2}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b>OLTP</b>, the application:
-            <span style={{ opacity: ease(frame, smallAt, 10) }}> many small reads and writes</span>
+            <b>OLTP</b>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, oltpXAt, 10) }}>, online transaction processing</span>
           </span>
         </Note>
-        <Note at={olapAt} x={RIGHT_X} y={y(TOP) + h(76)} out={q2At - 2}>
+        <Note at={appAt} x={RIGHT_X} y={y(TOP) + h(38)} out={q2At - 2}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b>OLAP</b>, the reports:
-            <span style={{ opacity: ease(frame, fewAt, 10) }}> a few columns, millions of rows</span>
+            runs the application
+            <span style={{ opacity: ease(frame, smallAt, 10) }}>: many small reads and writes</span>
+          </span>
+        </Note>
+        <Note at={olapAt} x={RIGHT_X} y={y(TOP) + h(100)} out={q2At - 2}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <b>OLAP</b>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, olapXAt, 10) }}>, online analytical processing</span>
+          </span>
+        </Note>
+        <Note at={reportsAt} x={RIGHT_X} y={y(TOP) + h(134)} out={q2At - 2}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            runs the reports
+            <span style={{ opacity: ease(frame, fewAt, 10) }}>: a few columns, millions of rows</span>
           </span>
         </Note>
 

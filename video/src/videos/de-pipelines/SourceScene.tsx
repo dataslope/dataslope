@@ -86,13 +86,13 @@ export const SourceScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-pop" at={addsAt + 4} level={-35} />
-      <Sfx name="el-pencil" at={jobAt} level={-36} />
-      <Sfx name="el-scratch" at={stopsAt + 2} level={-34} />
-      <Sfx name="el-pencil" at={nameAt} level={-36} />
-      <Sfx name="el-tap" at={nameAt + 14} level={-35} />
+      <Sfx name="el-pop" at={addsAt + 4} level={-31} />
+      <Sfx name="el-pencil" at={jobAt} level={-34} />
+      <Sfx name="el-scratch" at={stopsAt + 2} level={-30} />
+      <Sfx name="el-pencil" at={nameAt} level={-34} />
+      <Sfx name="el-tap" at={nameAt + 14} level={-31} />
       {[nameAt, landAt, registryAt, validateAt].map((at) => (
-        <Sfx key={at} name="el-tap" at={at + 2} level={-37} />
+        <Sfx key={at} name="el-tap" at={at + 2} level={-33} />
       ))}
 
       <Drift from={from} to={end + 30}>

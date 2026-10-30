@@ -44,8 +44,7 @@ export const HookScene: React.FC = () => {
   const holdsAt = n.word("hook-fit", "memory only ever holds a line");
   const checksAt = n.word("plan", "That's what the Python round checks");
   const memoryAt = n.word("plan", "without running out of memory");
-  const twiceAt = n.word("plan", "safe to run twice");
-  const eighteenAt = n.word("plan", "Eighteen questions");
+    const eighteenAt = n.word("plan", "Eighteen questions");
   const workedAt = n.word("plan", "fourteen worked through");
   const quickAt = n.word("plan", "then four quickly");
   const choiceAt = n.word("gen-in", "It starts with one choice");
@@ -101,7 +100,7 @@ export const HookScene: React.FC = () => {
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>Data engineer interview prep</Kicker>
         <Headline lead="A model is a drawing" turn="until code loads it." at={drawingAt} turnAt={loadsAt - 2} out={checksAt - 6} />
-        <Headline lead="Bigger than memory." turn="Safe to run twice." at={memoryAt - 4} turnAt={twiceAt - 2} />
+        <Headline lead="Bigger than memory, safe to run twice." at={memoryAt - 4} />
 
         {/* ── The log and the memory, one scale ── */}
         <Note at={logAt - 2} x={X0} y={logTop - h(42)}>
@@ -134,7 +133,8 @@ export const HookScene: React.FC = () => {
           }}
         />
 
-        <Note at={memAt - 2} x={X0} y={memTop - h(42)}>
+        {/* Under its box, so the lines the for loop drops in never cross it. */}
+        <Note at={memAt - 2} x={X0} y={memTop + barH + h(10)}>
           <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
             memory <span style={{ color: INK_SOFT }}>8 GB</span>
           </span>
@@ -147,13 +147,14 @@ export const HookScene: React.FC = () => {
                 position: "absolute",
                 left: X0,
                 top: logTop + (memTop - logTop) * drop,
-                width: logW,
+                width: memW + (logW - memW) * (1 - over),
                 height: barH,
                 background: BAR,
                 opacity: 0.85 * (1 - dropGone),
                 borderRadius: 3,
               }}
             />
+            {/* What does not fit: the rest of the log, past memory's edge. */}
             <div
               style={{
                 position: "absolute",
@@ -161,6 +162,8 @@ export const HookScene: React.FC = () => {
                 top: memTop,
                 width: (logW - memW) * over,
                 height: barH,
+                boxSizing: "border-box",
+                border: `2px dashed ${ACCENT}`,
                 background: MARK_BAD,
                 opacity: 1 - dropGone,
               }}
@@ -214,15 +217,17 @@ export const HookScene: React.FC = () => {
           </>
         ) : null}
         <Note at={holdsAt} x={X0 + memW + 24} y={memTop + barH / 2 - h(16)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one line at a time</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>memory holds one line</span>
         </Note>
 
         {/* ── The two reads, in code ── */}
         <Note at={wholeAt} x={X0} y={y(CODE_Y)} out={eighteenAt - 6}>
           <span style={{ display: "flex", alignItems: "baseline", gap: 24, whiteSpace: "nowrap" }}>
-            <Strike at={fitAt + 2}>
-              <Code line={wholeLine} size={30} />
-            </Strike>
+            <span style={{ fontSize: 30 }}>
+              <Strike at={fitAt + 2}>
+                <Code line={wholeLine} size={30} />
+              </Strike>
+            </span>
             <span style={note(24, ACCENT_INK)}>the whole file at once</span>
           </span>
         </Note>

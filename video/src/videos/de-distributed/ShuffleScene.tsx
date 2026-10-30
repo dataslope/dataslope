@@ -12,8 +12,8 @@ import { Arrow, Curve, Disk, Drift, Machine, OK_INK, Svg } from "./parts";
 
 const MAP_X = 120;
 const BOX_W = 170;
-const BOX_H = 46;
-const ROW_TOPS = [330, 392, 454];
+const BOX_H = 44;
+const ROW_TOPS = [322, 378, 434];
 const DISK_X = 330;
 const RED_X = 780;
 const KEYS: Dept[] = ["Eng", "Ops", "Sales"];
@@ -23,8 +23,8 @@ const BAR_X = 470;
 const BAR_W = 760;
 const LO = Math.log10(0.2);
 const HI = Math.log10(3e7);
-const LAD_TOP = 584;
-const LAD_PITCH = 40;
+const LAD_TOP = 606;
+const LAD_PITCH = 37;
 const SCALED_X = 1580;
 
 const xOf = (ns: number) => BAR_X + ((Math.log10(ns) - LO) / (HI - LO)) * BAR_W;
@@ -58,7 +58,6 @@ export const ShuffleScene: React.FC = () => {
   const hundredAt = n.word("shuffle-ladder", "a hundred thousand times");
   const secondAt = n.word("shuffle-ladder", "If the fastest cache took one second");
   const daysAt = n.word("shuffle-ladder", "a hundred sixteen days");
-  const tuneAt = n.word("shuffle-tune", "So tuning Spark");
   const fewerAt = n.word("shuffle-tune", "fewer shuffles");
   const lessAt = n.word("shuffle-tune", "less data in each");
   const end = n.beat("shuffle-tune").to;
@@ -139,17 +138,14 @@ export const ShuffleScene: React.FC = () => {
             fewer shuffles<span style={{ opacity: ease(frame, lessAt, 10) }}>, less data in each</span>
           </span>
         </Note>
-        <Note at={tuneAt} x={1080} y={y(ROW_TOPS[0]) - h(30)} out={fewerAt - 4}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>so…</span>
-        </Note>
 
         {/* ── The page's latency chart ── */}
-        <Note at={chartAt} x={MAP_X} y={y(LAD_TOP) - h(54)}>
+        <Note at={chartAt} x={MAP_X} y={y(LAD_TOP) - h(50)}>
           <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
             Latency, from the page&apos;s chart <span style={{ color: INK_SOFT, fontWeight: 500 }}>(nanoseconds, log scale)</span>
           </span>
         </Note>
-        <Note at={secondAt - 2} x={SCALED_X} y={y(LAD_TOP) - h(66)}>
+        <Note at={secondAt - 2} x={SCALED_X} y={y(LAD_TOP) - h(64)}>
           <span style={{ ...label(21, INK_SOFT), display: "block", lineHeight: 1.25, whiteSpace: "nowrap" }}>
             if the fastest cache
             <br />

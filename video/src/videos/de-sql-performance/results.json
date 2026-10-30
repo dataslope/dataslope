@@ -200481,6 +200481,33 @@
             ]
           ]
         },
+        "returnedPlan": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT * FROM orders\nWHERE status = 'returned';",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Bitmap Heap Scan on orders  (cost=1119.42..9729.42 rows=100000 width=26) (actual rows=100000.00 loops=1)"
+            ],
+            [
+              "  Recheck Cond: (status = 'returned'::text)"
+            ],
+            [
+              "  Heap Blocks: exact=7353"
+            ],
+            [
+              "  ->  Bitmap Index Scan on orders_status_idx  (cost=0.00..1094.42 rows=100000 width=0) (actual rows=100000.00 loops=1)"
+            ],
+            [
+              "        Index Cond: (status = 'returned'::text)"
+            ],
+            [
+              "        Index Searches: 1"
+            ]
+          ]
+        },
         "writeTables": {
           "sql": "CREATE TABLE no_index (id int, customer_id int, order_date date, amount numeric, status text);\nCREATE TABLE three_indexes (id int, customer_id int, order_date date, amount numeric, status text);\nCREATE INDEX ON three_indexes (customer_id);\nCREATE INDEX ON three_indexes (order_date);\nCREATE INDEX ON three_indexes (status);",
           "ok": true,

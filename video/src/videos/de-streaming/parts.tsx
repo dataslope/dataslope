@@ -334,3 +334,14 @@ export const Spot: React.FC<{
 export const Hue: React.FC<{ color: string; children: React.ReactNode; weight?: number }> = ({ color, children, weight = 700 }) => (
   <span style={{ color, fontWeight: weight }}>{children}</span>
 );
+
+/** A short upright bar inside a line of text: the key for a commit or offset
+ *  marker drawn in the figure, in the marker's own color. */
+export const Bar: React.FC<{ color: string }> = ({ color }) => (
+  <span style={{ display: "inline-block", width: 4, height: "0.95em", background: color, borderRadius: 2, verticalAlign: "-0.12em", margin: "0 0.2em" }} />
+);
+
+/** A short dashed rule inside a line of text: the key for a dashed line in the figure. */
+export const Dash: React.FC<{ color: string; width?: number }> = ({ color, width = 34 }) => (
+  <span style={{ display: "inline-block", width, borderTop: `2.5px dashed ${color}`, verticalAlign: "middle", margin: "0 0.3em 0 0" }} />
+);

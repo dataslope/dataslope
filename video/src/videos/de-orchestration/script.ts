@@ -135,7 +135,7 @@ export const script: NarrationScript = {
     {
       id: "anti",
       scene: true,
-      text: "Question three. What is a DAG, and what are common anti-patterns? A DAG is a workflow's tasks and the edges between them, with no cycles. Four anti-patterns come up.",
+      text: "Question three. What is a DAG, and what are common anti-patterns? It's a workflow's tasks and the edges between them, with no cycles. Four anti-patterns come up.",
       pauseAfter: 0.5,
     },
     {
@@ -181,7 +181,7 @@ export const script: NarrationScript = {
     },
     {
       id: "kinds-safe",
-      text: "All three are safe only on idempotent tasks, which end the same however often they run. Part 6 shows how.",
+      text: "All three are safe only on idempotent tasks, which end the same however often they run. Part six shows how.",
       pauseAfter: 0.8,
     },
 

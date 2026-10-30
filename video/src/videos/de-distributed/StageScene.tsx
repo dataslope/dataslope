@@ -16,11 +16,11 @@ import { Drift, Machine, Svg } from "./parts";
 const S1_X = 120;
 const S2_X = 1000;
 const S_W = 700;
-const S_TOP = 372;
-const S_H = 236;
-const LANE0 = 428;
-const LANE_PITCH = 42;
-const LANE_H = 26;
+const S_TOP = 362;
+const S_H = 196;
+const LANE0 = 402;
+const LANE_PITCH = 36;
+const LANE_H = 24;
 const TRACK_X = 140;
 const TRACK_W = 560;
 const TASKS = 4;
@@ -65,7 +65,7 @@ export const StageScene: React.FC = () => {
 
   // The fan-out chart, in the lower half.
   const sx: Scale = { lo: 0, hi: TAIL.max, a: 300, b: 1240 };
-  const sy: Scale = { lo: 0, hi: 1, a: y(872), b: y(690) };
+  const sy: Scale = { lo: 0, hi: 1, a: y(866), b: y(704) };
   const draw = ease(frame, pAt, 30);
   const pts = TAIL.curve.map((v, k) => [atScale(sx, k * TAIL.step), atScale(sy, v)] as const);
   const shown = pts.slice(0, Math.max(2, Math.round(pts.length * draw)));
@@ -174,7 +174,7 @@ export const StageScene: React.FC = () => {
             />
           </Svg>
         ) : null}
-        <Note at={perAt - 2} x={S1_X + TRACK_X} y={laneY(TASKS - 1) + laneH + h(12)}>
+        <Note at={perAt - 2} x={S1_X + TRACK_X} y={y(S_TOP) + h(S_H) + h(8)}>
           <span style={{ ...label(20, BLUE_INK), whiteSpace: "nowrap" }}>
             one task per partition<span style={{ opacity: ease(frame, parallelAt, 10) }}>, side by side</span>
           </span>
@@ -184,7 +184,7 @@ export const StageScene: React.FC = () => {
         </Note>
 
         {/* The page's fan-out chart. */}
-        <Note at={chartAt} x={S1_X} y={y(650)}>
+        <Note at={chartAt} x={S1_X} y={y(620)}>
           <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
             From the page&apos;s fan-out chart
             <span style={{ opacity: ease(frame, pAt, 10), color: INK_SOFT, fontWeight: 500 }}>: each task slow with a 1% chance</span>
@@ -196,11 +196,15 @@ export const StageScene: React.FC = () => {
           xTicks={[0, 50, 100, 150, 200]}
           yTicks={[0, 0.5, 1]}
           yFormat={(v) => `${Math.round(v * 100)}%`}
-          xTitle="tasks in the stage"
-          yTitle="chance the stage is slow"
           at={chartAt + 4}
           size={19}
         />
+        <Note at={chartAt + 6} x={sx.a - 14} y={sy.b - h(40)}>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>chance the stage is slow</span>
+        </Note>
+        <Note at={chartAt + 6} x={sx.b + 18} y={sy.a - 14}>
+          <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>tasks in the stage</span>
+        </Note>
         <Svg>
           {draw > 0 ? (
             <path d={shown.map(([a, b], i) => `${i ? "L" : "M"}${a.toFixed(1)},${b.toFixed(1)}`).join(" ")} fill="none" stroke={BAR} strokeWidth={3.2} strokeLinejoin="round" />

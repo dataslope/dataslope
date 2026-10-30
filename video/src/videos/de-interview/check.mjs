@@ -15,6 +15,11 @@
 // The questions the pages ask (182) are more than the series answers (157):
 // a question asked on two pages is answered once, in one video (the plan's
 // table). That 157 is the sum of data.ts's PARTS, not a count made here.
+//
+// Then it reads script.ts and data.ts and exits non-zero if the narration no
+// longer says, in words, the number of videos, the total of PARTS, or the
+// practice it counted: a builder moving a question changes PARTS, and the
+// "a hundred and fifty-seven" the voice says has to move with it.
 /* global console, process, URL */
 import { readFileSync, writeFileSync } from "node:fs";
 

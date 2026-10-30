@@ -55,7 +55,6 @@ export const MovingScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("moving").from;
-  const qAt = n.word("moving", "Question");
   const textAt = n.word("moving", "How do you compute");
   const usualAt = n.word("moving", "The usual answer");
   const sixAt = n.word("moving", "six preceding");
@@ -81,7 +80,6 @@ export const MovingScene: React.FC = () => {
   const ninetyFiveAt = n.word("spine-avg", "averages ninety-five");
   const calendarTableAt = n.word("spine-avg", "Join a calendar table");
   const bridgeAt = n.beat("islands-in").from;
-  const clearAt = n.beat("islands").from - 8 - 30;
   const end = n.beat("islands-in").to;
 
   // ── The strip: the metric on its thirteen days ──
@@ -131,8 +129,8 @@ export const MovingScene: React.FC = () => {
       <Sfx name="el-pop" at={ninetyFiveAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
-          <QuestionCard n={7} at={qAt - 4} textAt={textAt - 4} out={out7} size={60}>
+        <>
+          <QuestionCard n={7} at={from - 8} textAt={textAt - 4} out={out7} size={60}>
             How do you compute a 7-day moving average?
           </QuestionCard>
           <QuestionCard n={8} at={q8At} textAt={q8TextAt - 2} size={60}>
@@ -229,8 +227,8 @@ export const MovingScene: React.FC = () => {
           />
           <Note at={calendarAt} x={SUM_X} y={sg.rowTop(3) + h(26)}>
             <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>by the calendar:</div>
-            <div style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
-              {MOVING.rangeClause}
+            <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+              {MOVING.rangeClause.replace(/\)$/, "")}
             </div>
           </Note>
           <Note at={skipsAt} x={SUM_X} y={sg.rowTop(3) + h(110)} out={q8At}>
@@ -258,7 +256,7 @@ export const MovingScene: React.FC = () => {
               no <QMono>generate_series</QMono>? join a calendar table
             </span>
           </Note>
-        </AbsoluteFill>
+        </>
       </Drift>
     </AbsoluteFill>
   );

@@ -146,7 +146,7 @@ export const SmallFilesScene: React.FC = () => {
         </svg>
 
         {/* ── What a file a day costs ── */}
-        <Note at={kbAt} x={PANEL_X} y={gridY} out={rewriteAt}>
+        <Note at={kbAt} x={PANEL_X} y={gridY} out={fixAt - 4}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <b>
               <Num>{SMALL.day.files}</Num> files
@@ -154,7 +154,7 @@ export const SmallFilesScene: React.FC = () => {
             of about <Num>{KB(SMALL.day.avg)}</Num>, <Num>{count(fewest)}</Num> or <Num>{count(most)}</Num> rows each
           </span>
         </Note>
-        <Note at={footerAt + 4} x={PANEL_X} y={gridY + h(56)} out={rewriteAt}>
+        <Note at={footerAt + 4} x={PANEL_X} y={gridY + h(56)} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <span style={{ display: "inline-block", width: 10, height: 20, background: ds("blue", 700), borderRadius: 2, marginRight: 10, verticalAlign: "-3px" }} />
             <Num>{SMALL.day.files}</Num> footers, <Num>{KB(SMALL.day.footers)}</Num>
@@ -164,7 +164,7 @@ export const SmallFilesScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={openAt + 4} x={PANEL_X} y={gridY + h(106)} out={rewriteAt}>
+        <Note at={openAt + 4} x={PANEL_X} y={gridY + h(106)} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             a scan of the year opens <b style={{ color: ACCENT_INK }}>{SMALL.day.read} files</b>
             <span style={{ color: INK_SOFT }}>
@@ -173,7 +173,7 @@ export const SmallFilesScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={timeAt} x={PANEL_X} y={gridY + h(156)} out={rewriteAt}>
+        <Note at={timeAt} x={PANEL_X} y={gridY + h(156)} out={fixAt - 4}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>time on files, not data</span>
         </Note>
 

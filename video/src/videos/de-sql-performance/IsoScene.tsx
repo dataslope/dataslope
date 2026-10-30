@@ -236,10 +236,10 @@ export const IsoScene: React.FC = () => {
           />
           {/* The cost, along the levels: an arrow down the table. */}
           <g opacity={ease(frame, upAt, 12)}>
-            <line x1={colX(2) + COL_W + 30} y1={gridTop + 40} x2={colX(2) + COL_W + 30} y2={gridTop + 14 + 4 * ROW_H - 20} stroke={BAR} strokeWidth={3} />
+            <line x1={R_X} y1={gridTop + 40} x2={R_X} y2={gridTop + 14 + 4 * ROW_H - 20} stroke={BAR} strokeWidth={3} />
             <path
               d={arrowHead(
-                Array.from({ length: 20 }, (_, k) => [colX(2) + COL_W + 30, gridTop + 40 + ((gridTop + 14 + 4 * ROW_H - 20 - gridTop - 40) * k) / 19] as const),
+                Array.from({ length: 20 }, (_, k) => [R_X, gridTop + 40 + ((gridTop + 14 + 4 * ROW_H - 20 - gridTop - 40) * k) / 19] as const),
                 14,
                 7.5,
                 { filled: true },
@@ -248,7 +248,7 @@ export const IsoScene: React.FC = () => {
             />
           </g>
         </svg>
-        <Note at={upAt + 4} x={colX(2) + COL_W + 60} y={gridTop + h(60)}>
+        <Note at={upAt + 4} x={R_X + 30} y={gridTop + h(60)}>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>prevents more,</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, concurrencyAt, 10) }}>allows less concurrency</div>
           <div style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap", marginTop: h(14), opacity: ease(frame, retriedAt, 10) }}>serializable: a transaction</div>

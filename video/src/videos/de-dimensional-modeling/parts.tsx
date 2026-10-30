@@ -5,7 +5,7 @@ import { bob, ease, pop } from "../../components/motion";
 import { Entity, type EntityLayout } from "../../editorial/erd";
 import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { MONO } from "../../theme/fonts";
-import { OK_INK as OK_INK_LOCAL } from "../da-sql/parts";
+import { OK_INK as OK_INK_LOCAL, tableGeometry, type Col } from "../da-sql/parts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -52,6 +52,31 @@ export {
   type TableRow,
 } from "../da-sql/parts";
 export { colsOf, geoOf, rowsAt } from "../da-advanced-sql/parts";
+
+/**
+ * A result's geometry with its own columns, tags included: geoOf sizes each
+ * column by its name and values only, so a column given a "PK" tag came out
+ * too narrow and its name was cut off on the left.
+ */
+export const geoWith = (
+  t: { rows: readonly (readonly string[])[] },
+  cols: readonly Col[],
+  x: number,
+  top: number,
+  h: (v: number) => number,
+  opts: { headH?: number; rowH?: number; bodySize?: number; headSize?: number; extra?: readonly (readonly string[])[] } = {},
+) =>
+  tableGeometry({
+    x,
+    top,
+    cols,
+    rows: t.rows,
+    extra: opts.extra,
+    headH: h(opts.headH ?? 46),
+    rowH: h(opts.rowH ?? 50),
+    bodySize: opts.bodySize ?? 24,
+    headSize: opts.headSize ?? 21,
+  });
 
 /** The page's right margin. */
 export const RIGHT = 1824;

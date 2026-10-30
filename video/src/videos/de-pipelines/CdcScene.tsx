@@ -111,16 +111,16 @@ export const CdcScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-pencil" at={pollingAt} level={-36} />
-      <Sfx name="el-tap" at={shippedAt} level={-36} />
-      <Sfx name="el-tap" at={placedAt} level={-36} />
-      <Sfx name="el-scratch" at={deletedAt + 2} level={-35} />
-      <Sfx name="el-tap" at={findsAt + 4} level={-35} />
+      <Sfx name="el-pencil" at={pollingAt} level={-34} />
+      <Sfx name="el-tap" at={shippedAt} level={-32} />
+      <Sfx name="el-tap" at={placedAt} level={-32} />
+      <Sfx name="el-scratch" at={deletedAt + 2} level={-31} />
+      <Sfx name="el-tap" at={findsAt + 4} level={-31} />
       {ENTRIES.map((e) => (
-        <Sfx key={e.op} name="el-tap" at={e.at} level={-37} />
+        <Sfx key={e.op} name="el-tap" at={e.at} level={-33} />
       ))}
-      <Sfx name="el-whoosh" at={passesAt} level={-36} />
-      <Sfx name="el-chime" at={deletesAt + 8} level={-36} />
+      <Sfx name="el-whoosh" at={passesAt} level={-32} />
+      <Sfx name="el-chime" at={deletesAt + 8} level={-32} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} size={60}>

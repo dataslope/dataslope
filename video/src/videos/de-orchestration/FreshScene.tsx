@@ -166,11 +166,11 @@ export const FreshScene: React.FC = () => {
           <circle cx={hx(newest)} cy={bandY} r={9 * ease(frame, newestAt + 4, 8)} fill={PAPER} stroke={INK} strokeWidth={2.6} />
           {/* Six o'clock, each morning. */}
           {[
-            { t: now1, at: sixAt },
-            { t: now2, at: fourthAt },
+            { t: now1, at: sixAt, to: b1Y },
+            { t: now2, at: fourthAt, to: b2Y },
           ].map((m) => (
             <g key={m.t} opacity={ease(frame, m.at, 10)}>
-              <line x1={hx(m.t)} x2={hx(m.t)} y1={bandY - bandH / 2 - h(10)} y2={b2Y + h(14)} stroke={INK} strokeWidth={2.2} />
+              <line x1={hx(m.t)} x2={hx(m.t)} y1={bandY - bandH / 2 - h(10)} y2={m.to + h(12)} stroke={INK} strokeWidth={2.2} />
               <text x={hx(m.t)} y={bandY - bandH / 2 - h(16)} textAnchor="middle" style={svgText({ ...label(19, INK), fontWeight: 700 })}>
                 06:00
               </text>
@@ -200,7 +200,7 @@ export const FreshScene: React.FC = () => {
         <Note at={newestAt + 6} x={hx(newest) - 12} y={bandY - bandH / 2 - h(58)} align="right">
           <span style={{ ...label(20, INK), whiteSpace: "nowrap" }}>newest: 23:58</span>
         </Note>
-        <Note at={nightAt + 6} x={hx(52)} y={bandY - 14}>
+        <Note at={nightAt + 6} x={hx(58)} y={bandY - 14}>
           <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>the source sent nothing</span>
         </Note>
         <Note at={sixHAt + 6} x={hx(now1) + 12} y={b1Y - 16}>

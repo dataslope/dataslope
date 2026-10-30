@@ -30,7 +30,9 @@ import {
 const TOP = 322;
 const SIZE = 22;
 const RIGHT_X = 1000;
-const BARS_Y = 662;
+const BARS_Y = 676;
+/** Where the notes on the 100,000-row bars start: past the longer one's value. */
+const NOTE_X = 820;
 
 /** Eight blocks in a row: a list (all of them at once) or a generator (one
  *  lit at a time, stepping along on demand). */
@@ -101,7 +103,6 @@ export const GenScene: React.FC = () => {
   const sixtyAt = n.word("gen-million", "sixty-three megabytes");
   const sumAt = n.word("gen-million", "Summing straight from the generator");
   const kbAt = n.word("gen-million", "about a hundred fifty kilobytes");
-  const tenthAt = n.word("gen-flat", "Cut the file to a tenth");
   const soAt = n.word("gen-flat", "and so does the list");
   const moveAt = n.word("gen-flat", "The generator doesn't move");
   const q2At = n.word("pipe", "Question two");
@@ -125,7 +126,7 @@ export const GenScene: React.FC = () => {
   const L = GEN.list.lines;
   const G = GEN.gen.lines;
   const lTop = y(TOP);
-  const gTop = lTop + listingHeight(L.length, SIZE) + h(64);
+  const gTop = lTop + listingHeight(L.length, SIZE) + h(56);
 
   const m = bytes(GEN.list.m);
   const k = bytes(GEN.list.k);
@@ -137,7 +138,7 @@ export const GenScene: React.FC = () => {
   const PG = PIPE.gens.lines;
   const stages = ["lines = ", "rows = ", "qtys = "];
   const pipeH = listingHeight(PL.length, SIZE);
-  const pBarsY = lTop + pipeH + h(56);
+  const pBarsY = lTop + pipeH + h(72);
   const lp = bytes(PIPE.lists.peak);
   const gp = bytes(PIPE.gens.peak);
   // One row steps through the generator's three stages, over and over.
@@ -236,7 +237,7 @@ export const GenScene: React.FC = () => {
           x={X0}
           top={y(BARS_Y)}
           width={1000}
-          rowH={h(56)}
+          rowH={h(54)}
           nameW={420}
           out={out1}
           bars={[
@@ -246,12 +247,12 @@ export const GenScene: React.FC = () => {
             { name: "generator, 100,000 rows", value: GEN.gen.k, ...g2, color: OK, ink: OK_INK, at: moveAt - 4 },
           ]}
         />
-        <Note at={moveAt + 10} x={X0 + 640} y={y(BARS_Y) + 3 * h(56) + h(8)} out={out1}>
+        <Note at={moveAt + 10} x={NOTE_X} y={y(BARS_Y) + 3 * h(54) + h(8)} out={out1}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={moveAt + 16}>the same, whatever the input&apos;s size</Mark>
           </span>
         </Note>
-        <Note at={tenthAt} x={X0 + 640} y={y(BARS_Y) + 2 * h(56) + h(8)} out={out1}>
+        <Note at={soAt + 6} x={NOTE_X} y={y(BARS_Y) + 2 * h(54) + h(8)} out={out1}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a tenth of the rows, a tenth of the memory</span>
         </Note>
 
@@ -274,6 +275,12 @@ export const GenScene: React.FC = () => {
         </Note>
         <Listing lines={PG} x={RIGHT_X} top={lTop} width={800} size={SIZE} at={roundAt - 2} dim={placeAt} marks={stepMarks} />
 
+        <Note at={mbAt - 10} x={X0} y={pBarsY - h(42)} out={placeAt - 4}>
+          <span style={{ display: "flex", gap: 28, alignItems: "baseline", whiteSpace: "nowrap" }}>
+            <Title>peak memory</Title>
+            <Source>tracemalloc, in Pyodide</Source>
+          </span>
+        </Note>
         <Bars
           x={X0}
           top={pBarsY}

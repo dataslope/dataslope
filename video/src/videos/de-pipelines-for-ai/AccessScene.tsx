@@ -195,15 +195,15 @@ export const AccessScene: React.FC = () => {
             <Mark at={realAt + 4}>deletion, made real</Mark>
           </span>
         </Note>
-        <Box x={RIGHT_X} y={delTop} w={260} h={100} at={requestAt} tone={INK} size={22}>
+        <Box x={RIGHT_X} y={delTop} w={290} h={100} at={requestAt} tone={INK} size={22}>
           erasure request
           <br />
           or removed document
         </Box>
         {targets.map((t, i) => (
           <React.Fragment key={t.text}>
-            <LineArrow from={[RIGHT_X + 270, delTop + 50]} to={[RIGHT_X + 352, delTop - 6 + i * 56 + 22]} at={t.at - 2} dur={8} />
-            <Note at={t.at - 2} x={RIGHT_X + 366} y={delTop - 6 + i * 56}>
+            <LineArrow from={[RIGHT_X + 300, delTop + 50]} to={[RIGHT_X + 382, delTop - 6 + i * 56 + 22]} at={t.at - 2} dur={8} />
+            <Note at={t.at - 2} x={RIGHT_X + 396} y={delTop - 6 + i * 56}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <Tick at={t.at + 6} size={26} />
                 <span style={{ ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{t.text}</span>

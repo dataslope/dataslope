@@ -58,12 +58,15 @@ const Conformed: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = (dy: number): Pt => [date.left, (date.top + date.bottom) / 2 + dy];
   return (
     <>
-      <Entity layout={sales} at={salesAt - 2} />
-      <Entity layout={inventory} at={salesAt + 6} />
       <Entity layout={date} at={oneAt + 2} />
-      <Relation name="conformed-sales" points={elbow(at(-14), sales.anchor("right"), mx)} from="exactly-one" to="zero-or-many" at={dateAt} />
-      <Relation name="conformed-inventory" points={elbow(at(14), inventory.anchor("right"), mx)} from="exactly-one" to="zero-or-many" at={dateAt + 6} />
-      <Note at={shareAt} x={date.right + 26} y={date.top + 2}>
+      <Entity layout={sales} at={shareAt - 2} dim={sameAt} />
+      <Entity layout={inventory} at={shareAt + 4} dim={sameAt} />
+      <Relation name="conformed-sales" points={elbow(at(-14), sales.anchor("right"), mx)} from="exactly-one" to="zero-or-many" at={shareAt + 4} />
+      <Relation name="conformed-inventory" points={elbow(at(14), inventory.anchor("right"), mx)} from="exactly-one" to="zero-or-many" at={shareAt + 10} />
+      {/* Named again as sales and inventory, each lit as it is said. */}
+      <Entity layout={sales} at={salesAt} />
+      <Entity layout={inventory} at={salesAt + 8} />
+      <Note at={dateAt} x={date.right + 26} y={date.top + 2}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
           shared by
           <br />
@@ -104,11 +107,19 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
     { name: "loyalty_tier", at: newAt + 4 },
   ];
   const wg = geoOf({ cols: wideCols.map((x) => x.name), rows: [] }, R_X, c.y(436), c.h, { headH: 50 });
-  const customers = useEntityLayout({ x: R_X, y: c.y(600), width: 300, name: "customers", columns: [{ name: "customer_id", key: "PK" }, { name: "name" }] });
-  const cityT = useEntityLayout({ x: R_X + 420, y: c.y(560), width: 300, name: "customer_city", columns: [{ name: "customer_id", key: "FK" }, { name: "city" }] });
-  const planT = useEntityLayout({ x: R_X + 420, y: c.y(720), width: 300, name: "customer_plan", columns: [{ name: "customer_id", key: "FK" }, { name: "plan" }] });
-  const start = customers.anchor("right", "customer_id");
-  const mx = (customers.right + cityT.left) / 2;
+  // The narrow design side by side: customers, then two attribute tables
+  // keyed by customer_id, the second reached by a route under the first.
+  const NARROW_Y = c.y(628);
+  const customers = useEntityLayout({ x: R_X, y: NARROW_Y, width: 290, name: "customers", columns: [{ name: "customer_id", key: "PK" }, { name: "name" }] });
+  const cityT = useEntityLayout({ x: R_X + 400, y: NARROW_Y, width: 260, name: "customer_city", columns: [{ name: "customer_id", key: "FK" }, { name: "city" }] });
+  const planT = useEntityLayout({ x: R_X + 720, y: NARROW_Y, width: 260, name: "customer_plan", columns: [{ name: "customer_id", key: "FK" }, { name: "plan" }] });
+  const under = customers.bottom + c.h(50);
+  const toPlan: Pt[] = [
+    customers.anchor("bottom", undefined, 60),
+    [customers.left + customers.width / 2 + 60, under],
+    [planT.left + planT.width / 2, under],
+    planT.anchor("bottom"),
+  ];
   return (
     <>
       <PanelHead at={wideAt} x={R_X} y={c.y(346)} width={960} sub="one row per customer, every attribute a column" subAt={everyAt - 4}>
@@ -121,22 +132,15 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={fastAt} x={R_X} y={wg.top + wg.headH + 10}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>fast, and easy in a dashboard</span>
       </Note>
-      <Note at={narrowAt - 2} x={R_X} y={c.y(530)}>
-        <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Narrow</span>
-      </Note>
+      <PanelHead at={narrowAt - 2} x={R_X} y={c.y(534)} width={960} sub="flexible, at the cost of joins" subAt={flexAt}>
+        Narrow
+      </PanelHead>
       <Entity layout={customers} at={narrowAt} />
       <Entity layout={cityT} at={joinsAt} />
       <Entity layout={planT} at={joinsAt + 6} />
-      <Relation name="narrow-city" points={elbow(start, cityT.anchor("left", "customer_id"), mx)} from="exactly-one" to="zero-or-many" at={joinsAt + 2} />
-      <Relation name="narrow-plan" points={elbow(start, planT.anchor("left", "customer_id"), mx)} from="exactly-one" to="zero-or-many" at={joinsAt + 8} />
-      <Note at={flexAt} x={R_X} y={customers.bottom + c.h(18)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-          flexible,
-          <br />
-          at the cost of joins
-        </span>
-      </Note>
-      <Note at={colAt} x={R_X} y={c.y(880)}>
+      <Relation name="narrow-city" points={[customers.anchor("right", "customer_id"), cityT.anchor("left", "customer_id")]} from="exactly-one" to="zero-or-many" at={joinsAt + 2} />
+      <Relation name="narrow-plan" points={toPlan} from="exactly-one" to="zero-or-many" at={joinsAt + 8} />
+      <Note at={colAt} x={R_X} y={c.y(896)}>
         <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Columnar warehouses handle wide tables well.</span>
       </Note>
     </>
@@ -203,6 +207,26 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
           {d}
         </div>
       ))}
+      {/* The shared columns, highlighted across two processes, under the ticks. */}
+      {shared.map((d) => {
+        const j = DIMENSIONS.indexOf(d);
+        const p = ease(frame, sharedAt + 2 + j * 4, 12);
+        return (
+          <div
+            key={d}
+            style={{
+              position: "absolute",
+              left: colLeft(j) + 10,
+              top: rowTop(0) + 6,
+              width: CELL_W - 20,
+              height: (2 * CELL_H - 12) * p,
+              background: HIGHLIGHT,
+              borderRadius: 6,
+              opacity: 0.7 * p,
+            }}
+          />
+        );
+      })}
       {PROCESSES.map((p, i) => (
         <React.Fragment key={p}>
           <div
@@ -232,26 +256,6 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
           )}
         </React.Fragment>
       ))}
-      {/* The shared columns, highlighted across two processes. */}
-      {shared.map((d) => {
-        const j = DIMENSIONS.indexOf(d);
-        const p = ease(frame, sharedAt + 2 + j * 4, 12);
-        return (
-          <div
-            key={d}
-            style={{
-              position: "absolute",
-              left: colLeft(j) + 10,
-              top: rowTop(0) + 6,
-              width: CELL_W - 20,
-              height: (2 * CELL_H - 12) * p,
-              background: HIGHLIGHT,
-              borderRadius: 6,
-              opacity: 0.7 * p,
-            }}
-          />
-        );
-      })}
       {/* The sales mart: one row, built. */}
       <div
         style={{

@@ -30,12 +30,11 @@ export const FrameScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("frame").from;
-  const qAt = n.word("frame", "Question");
   const textAt = n.word("frame", "What is a window frame");
   // The payments arrive on the question's second half.
   const asked = n.word("frame", "difference between rows and range") + 4;
   const setAt = n.word("frame-def", "the set of rows");
-  const sameDayAt = n.word("frame-def", "land on the same day");
+  const sameDayAt = n.word("frame-peers", "land on the same day");
   const rowsAt0 = n.word("frame-rows", "Rows counts physical rows");
   const hundredAt = n.word("frame-rows", "a hundred");
   const threeFiftyAt = n.word("frame-rows", "three fifty");
@@ -47,7 +46,6 @@ export const FrameScene: React.FC = () => {
   const belongAt = n.word("frame-pick", "tied values belong together");
   const spanAt = n.word("frame-pick", "a span of time");
   const bridgeAt = n.beat("moving-in").from;
-  const clearAt = n.beat("moving").from - 8 - 30;
   const end = n.beat("moving-in").to;
 
   const P = FRAME.payments;
@@ -69,8 +67,8 @@ export const FrameScene: React.FC = () => {
       <Sfx name="el-pop" at={togetherAt + 4} level={-32} />
 
       <Drift from={from} to={end + 40}>
-        <AbsoluteFill style={{ opacity: 1 - ease(frame, clearAt, 36) }}>
-          <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={60}>
+        <>
+          <QuestionCard n={6} at={from - 8} textAt={textAt - 4} size={60}>
             What is a window frame, and what is the difference between <QMono>ROWS</QMono> and <QMono>RANGE</QMono>?
           </QuestionCard>
 
@@ -148,7 +146,7 @@ export const FrameScene: React.FC = () => {
               </span>
             </span>
           </Note>
-        </AbsoluteFill>
+        </>
       </Drift>
     </AbsoluteFill>
   );
