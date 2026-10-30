@@ -263,6 +263,10 @@ export const script: NarrationScript = {
     {
       id: "r-llm",
       text: "And to sort five thousand survey answers with an LLM, a large language model: fix the categories first, hand-label a hundred or two to measure it, keep the settings the same for every batch, rerun a sample to confirm the labels repeat, and quote real answers, not its paraphrases.",
+    },
+    {
+      id: "r-llm-report",
+      text: "Report which categories it confuses, and carry that uncertainty into the findings.",
       pauseAfter: 0.9,
     },
     {

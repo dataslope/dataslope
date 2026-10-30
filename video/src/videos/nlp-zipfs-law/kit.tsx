@@ -16,11 +16,16 @@ import { ILLUSTRATIONS, IMAGES, VIDEO } from "./data";
  * watercolor spot, and a slow drift so a finished figure never holds still.
  *
  * Color roles, one meaning each, for the whole video:
- * - Emma's real counts and shares are the kit's data blue (DATA);
+ * - Emma's real counts and shares are the kit's data blue (DATA), the top
+ *   hundred ranks on the two rank axes included, and so are the words kept
+ *   once the stopwords go (the sieve keeps blue pebbles, the balance's heavy
+ *   gem is blue);
  * - what one over the rank predicts is grey and dashed (LAW);
  * - the words that appear only once are orange (ONCE), the one accent hue;
  * - what the narration points at takes the red accent (the near tie, the
- *   top hundred ranks on the two rank axes, a stopword struck out);
+ *   tenth word's multiples of its prediction), and so does what gets thrown
+ *   away (a stopword struck out, the grit through the sieve, the light heap
+ *   on the balance);
  * - a spoken word is swept with the yellow highlighter.
  */
 
@@ -39,6 +44,8 @@ export const POINT_INK = ACCENT_INK;
 export const POINT_WASH = `color-mix(in srgb, ${ACCENT} 20%, transparent)`;
 export const EMPTY = ds("gray", 50);
 export const RULE = `color-mix(in srgb, ${INK} 22%, transparent)`;
+/** The log plot's faint decade grid. */
+export const GRID = `color-mix(in srgb, ${INK} 10%, transparent)`;
 
 /** 0 → 1 → 0 over `dur` frames from `at`: a swell for a mark named again. */
 export const pulse = (frame: number, at: number, dur = 18) => {

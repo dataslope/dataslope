@@ -19,18 +19,24 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   1. Linear (hook to tail): every word ranked, bars for the top twenty on
  *      plain axes, then the rank axis zooms out to all 7,079 ranks, and more
  *      than half the vocabulary lies on the floor (used once or twice).
- *   2. Log (switch to slope): the same data morphs onto log axes and
- *      straightens; the dashed 1/rank line, ten times the rank for a tenth
- *      the count, and the fitted slope.
- *   3. Prediction (predict to rough): what one over the rank predicts for
- *      ranks 1 to 10 from the top word, as ghost bars, against Emma's real
- *      counts: "to" and "the" nearly tie, and the tenth word, "she", is more
- *      than four times its prediction, so the law is rough at the top.
+ *   2. Log (switch to fit): the same data morphs onto log axes over a decade
+ *      grid and straightens; the dashed 1/rank line, ten times the rank for
+ *      a tenth the count (one grid step along, one step down: the slope is
+ *      counted in steps, since a step is wider than it is tall), and the
+ *      fitted slope.
+ *   3. Prediction (predict to crowd): what one over the rank predicts for
+ *      ranks 1 to 10, said and labelled as starting from the top word (Fig.
+ *      2's dashed line is the same law fitted to the top thousand, a
+ *      different line), as ghost bars, against Emma's real counts: "to" and
+ *      "the" nearly tie, and the tenth word, "she", is more than four times
+ *      its prediction, because the top words crowd together.
  *   4. Shares (warn to once): the top hundred ranks on a log rank axis (half
- *      the width) and on a plain one (1.4%); then the plain shares: the top
- *      hundred words are 60% of the book, and 39% of the different words
- *      appear once.
- *   5. Why (why to idf): stopwords and IDF, with two watercolor spots.
+ *      the width, as if half the vocabulary) and on a plain one (1.4% of the
+ *      vocabulary); then the plain shares: the top hundred words are 60% of
+ *      the text, and 39% of the different words appear once.
+ *   5. Why (why to idf): stopwords and IDF (inverse document frequency,
+ *      weighted by how few documents a word is in), with two watercolor
+ *      spots.
  *
  * Facts, every one from measure.py (NLTK 3.9.4, NumPy 2.4.6, the pinned
  * gutenberg data; measurements.json is its output, data.ts reads it). It runs
@@ -45,7 +51,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     524; the tenth word, "she", appears 2,340 times, 4.47 times that ("more
  *     than four times");
  *   - the least-squares slope of log count on log rank over ranks 1 to 1,000
- *     is -1.136 ("minus one point one"), the dashed line is count =
+ *     is -1.136 ("minus one point one four"), the dashed line is count =
  *     18,719.8 / rank, fitted to those ranks (both as nlp-history has them);
  *   - the top hundred ranks are 1.41% of the different words ("one point
  *     four percent"), and half of a log rank axis from 1 to 10,000;
@@ -102,17 +108,18 @@ export const script: NarrationScript = {
     {
       id: "law",
       text: "It's one over the rank: go ten times further down the list, and a word turns up a tenth as often.",
-      pauseAfter: 0.8,
+      pauseAfter: 1.2,
     },
+    { id: "slope", text: "That's a slope of minus one: one step down for every step along.", pauseAfter: 1.0 },
     {
-      id: "slope",
-      text: "That's a slope of minus one, and Emma's first thousand words come out at minus one point one.",
+      id: "fit",
+      text: "Fit a line to the top thousand words, and its slope comes out at minus one point one four.",
       pauseAfter: 0.9,
     },
+    { id: "predict", scene: true, text: "So the law makes a prediction.", pauseAfter: 0.8 },
     {
-      id: "predict",
-      scene: true,
-      text: "So the law makes a prediction. The second word should turn up half as often as the first, and the tenth word a tenth as often.",
+      id: "anchor",
+      text: "Start from the top word: the second should turn up half as often, and the tenth, a tenth as often.",
       pauseAfter: 0.7,
     },
     {
@@ -120,15 +127,12 @@ export const script: NarrationScript = {
       text: "In Emma, the second word, the, turns up five thousand two hundred and one times. It nearly ties with to.",
       pauseAfter: 0.8,
     },
+    { id: "rough", text: "And the tenth, she, comes in at more than four times its prediction.", pauseAfter: 0.7 },
+    { id: "crowd", text: "The top words crowd together, so the law is rough at the very top.", pauseAfter: 0.9 },
+    { id: "warn", scene: true, text: "Log axes show the shape, but they're bad at shares.", pauseAfter: 0.6 },
     {
-      id: "rough",
-      text: "And the tenth, she, comes in at more than four times its prediction. The law is rough at the very top.",
-      pauseAfter: 0.9,
-    },
-    {
-      id: "warn",
-      scene: true,
-      text: "Log axes show the shape, but they're bad at shares. On a log rank axis, the top hundred words fill half the width.",
+      id: "logaxis",
+      text: "On a log rank axis, the top hundred words fill half the width, as if they were half the vocabulary.",
       pauseAfter: 0.6,
     },
     {
@@ -138,7 +142,7 @@ export const script: NarrationScript = {
     },
     {
       id: "top100",
-      text: "Count what they fill, though, and those hundred words are sixty percent of the book.",
+      text: "Count the text they fill instead, and those hundred words are sixty percent of the book.",
       pauseAfter: 0.9,
     },
     {
@@ -153,6 +157,9 @@ export const script: NarrationScript = {
       pauseAfter: 0.7,
     },
     { id: "stop", text: "Seventy of Emma's top hundred are on NLTK's stopword list.", pauseAfter: 0.7 },
-    { id: "idf", text: "And it's why IDF gives a word more weight the rarer it is." },
+    {
+      id: "idf",
+      text: "And it's why IDF, inverse document frequency, gives a word more weight the fewer documents it turns up in.",
+    },
   ],
 };

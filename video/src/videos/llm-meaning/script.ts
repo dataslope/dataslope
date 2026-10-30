@@ -81,9 +81,15 @@ import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
  *     is similarity.mdx's formula with its denominator taken away. The
  *     lesson's first, hand-set example (trophy 0.722, from seven tokens
  *     without "suitcase") is left out, so trophy has one weight on screen.
- *     Ten tokens make a hundred scores, each token scoring itself too, and
- *     twenty make four hundred, the lesson's "doubling the input quadruples
- *     the attention work".
+ *     The cost is a decoder's, as the course's models are: each token scores
+ *     itself and every token before it, never a later one (the lesson's
+ *     "roughly n squared over two comparisons"). Ten tokens make fifty-five
+ *     scores of the hundred pairs, twenty make 210 ("two hundred and ten"),
+ *     3.82 times as many ("nearly four times the work"; the lesson's
+ *     "doubling the input still quadruples the attention work" is the limit
+ *     as the text grows). The square's later half is drawn empty and said
+ *     to be; Fig. 15's heads and Fig. 17's attention leave it out too, and
+ *     Scene 7's headline has tokens weigh earlier tokens, not each other.
  *   - the-shape-of-a-transformer.mdx's mid-sized model (vocabulary 128,000,
  *     width 4,096, 32 layers, feed-forward 14,336): embedding table 0.52
  *     billion ("half a billion"), attention 2.15 ("about two"),
@@ -284,11 +290,18 @@ export const script: NarrationScript = {
       text: "A real model runs many of these side by side, called heads, each with its own idea of relevant. And it stacks them dozens of layers deep.",
       pauseAfter: 0.7,
     },
+    { id: "price", text: "There's a price.", pauseAfter: 0.6 },
     {
       id: "square",
-      text: "There's a price. Every token scores every token, itself included.",
+      // Re-voiced in the decoder fix: a token never scores a later one.
+      text: "Each token scores itself and every token before it, never a later one.",
+      pauseAfter: 0.7,
     },
-    { id: "ten", text: "Ten tokens make a hundred scores. Double the text, and it's four times the work.", pauseAfter: 0.9 },
+    {
+      id: "ten",
+      text: "Ten tokens make fifty-five scores. Double the text to twenty, and it's two hundred and ten, nearly four times the work.",
+      pauseAfter: 0.9,
+    },
     { id: "attn-in", text: "So let's put all the pieces in order." },
 
     // ── Part 4. The shape of a transformer ────────────────────────────────

@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO, SANS } from "../../theme/fonts";
-import { COST, QKV } from "./data";
+import { COST, COST_RATIO, QKV } from "./data";
 import {
   Arrow,
   clamp01,
@@ -106,7 +106,7 @@ export const TrophyScene: React.FC = () => {
 
       <Kicker at={from - 10}>Attention</Kicker>
       <Headline lead="One word," turn="two meanings." at={from} turnAt={smallAt - 4} out={attentionAt - 8} />
-      <Headline lead="Attention:" turn="tokens weigh each other." at={attentionAt - 4} turnAt={pullsAt} />
+      <Headline lead="Attention:" turn="tokens weigh earlier tokens." at={attentionAt - 4} turnAt={pullsAt} />
 
       <FigLabel n="11" title="The lesson's two sentences" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={from} style={{ left: X0, top: R1 }}>
@@ -695,7 +695,8 @@ export const BlendScene: React.FC = () => {
 // ═══ Scene 10: heads, layers, and the square of the length ═════════════════
 
 /** A seeded mini attention pattern for one head: which cells light. Purely
- *  schematic: it says "each head attends differently", not any real weights. */
+ *  schematic: it says "each head attends differently", not any real weights.
+ *  Every pattern stays on or below the diagonal, as a decoder's must. */
 const HEAD_KINDS = [
   (r: number, c: number) => r === c,
   (r: number, c: number) => c === r - 1 || (r === 0 && c === 0),
@@ -715,6 +716,8 @@ const HeadBox: React.FC<{ x: number; y: number; kind: number; at: number; w: num
       {Array.from({ length: N * N }, (_, k) => {
         const r = Math.floor(k / N);
         const c = k % N;
+        // A decoder never scores a later token: above the diagonal, no cell.
+        if (c > r) return null;
         const on = HEAD_KINDS[kind](r, c);
         return (
           <rect
@@ -743,14 +746,17 @@ export const HeadsScene: React.FC = () => {
   const ownAt = n.word("heads", "own");
   const stacksAt = n.word("heads", "stacks");
   const dozensAt = n.word("heads", "dozens");
-  const priceAt = n.word("square", "price");
-  const everyAt = n.word("square", "every", { nth: 1 });
+  const priceAt = n.word("price", "price");
+  const eachAt = n.word("square", "Each");
   const itselfAt = n.word("square", "itself");
-  const tenAt = n.word("ten", "Ten");
-  const hundredAt = n.word("ten", "hundred");
+  const beforeAt = n.word("square", "before");
+  const laterAt = n.word("square", "later");
+  const tenAt = n.word("ten", "Ten", { nth: 1 });
+  const fiftyAt = n.word("ten", "fifty-five");
   const doubleAt = n.word("ten", "Double");
-  const fourAt = n.word("ten", "four");
-  const workAt = n.word("ten", "work");
+  const twentyAt = n.word("ten", "twenty");
+  const hundredAt = n.word("ten", "two hundred");
+  const nearlyAt = n.word("ten", "nearly");
   const soAt = n.word("attn-in", "So");
   const putAt = n.word("attn-in", "put");
 
@@ -762,12 +768,15 @@ export const HeadsScene: React.FC = () => {
   const baseY = y(850);
   const layerAt = (r: number) => (r === 0 ? sideAt : stacksAt + (r - 1) * 6);
 
-  // Fig. 17: the score grid, cells of a fixed size, so twice the tokens is four times the area.
+  // Fig. 16: the square of token pairs, cells of a fixed size. A decoder
+  // fills only its lower triangle: each token (a row) scores itself (the
+  // diagonal) and every token before it (left of the diagonal), never a later
+  // one, so the cells above the diagonal are never drawn.
   const [small, big] = COST;
   const CELL = 27;
   const GX = 1120;
   const GY = y(400);
-  const fill10 = ease(frame, tenAt - 2, 26);
+  const fillBefore = ease(frame, beforeAt - 2, 22);
   const fill20 = ease(frame, doubleAt - 2, 30);
 
   return (
@@ -776,17 +785,17 @@ export const HeadsScene: React.FC = () => {
         <Sfx key={c} name="el-tap" at={sideAt + c * 4} level={-29} />
       ))}
       <Sfx name="el-whoosh" at={stacksAt} level={-34} />
-      <Sfx name="el-pencil" at={tenAt - 2} level={-34} />
-      <Sfx name="el-tap" at={hundredAt} level={-24} />
+      <Sfx name="el-pencil" at={beforeAt - 2} level={-34} />
+      <Sfx name="el-tap" at={fiftyAt} level={-24} />
       <Sfx name="el-pencil" at={doubleAt - 2} level={-33} />
-      <Sfx name="el-tap" at={fourAt} level={-24} />
+      <Sfx name="el-tap" at={hundredAt} level={-24} />
 
       <Kicker at={from - 10}>Attention</Kicker>
-      <Headline lead="Many heads," turn="many layers." at={from} turnAt={stacksAt - 4} out={priceAt - 8} />
-      <Headline lead="Twice the text," turn="four times the work." at={doubleAt - 4} turnAt={fourAt - 2} />
-      <Headline lead="Every token scores every token." at={priceAt - 2} out={doubleAt - 8} />
+      <Headline lead="Many heads," turn="many layers." at={from} turnAt={stacksAt - 4} out={eachAt - 8} />
+      <Headline lead="Each token scores itself" turn="and every token before it." at={eachAt - 2} turnAt={beforeAt - 4} out={doubleAt - 8} />
+      <Headline lead="Twice the text," turn={`${COST_RATIO.toFixed(1)} times the work.`} at={doubleAt - 4} turnAt={nearlyAt - 2} />
 
-      {/* ── Fig. 16: heads side by side, layers stacked ── */}
+      {/* ── Fig. 15: heads side by side, layers stacked ── */}
       <FigLabel n="15" title="Heads side by side, layers stacked" at={from} x={X0} y={y(FIG_Y)} />
       <Svg>
         {[0, 1, 2, 3].map((r) =>
@@ -823,15 +832,21 @@ export const HeadsScene: React.FC = () => {
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>Each head, its own idea of relevant</span>
       </Note>
 
-      {/* ── Fig. 17: every token against every other ── */}
-      <FigLabel n="16" title="Every token scores every token, itself included" at={everyAt - 4} x={GX} y={y(FIG_Y)} />
-      <Svg opacity={ease(frame, everyAt - 2, 12) * (1 - 0.5 * ease(frame, soAt, 16))}>
+      {/* ── Fig. 16: each token against itself and every token before it ── */}
+      {/* The price: the square of token pairs arrives on the word, empty. */}
+      <FigLabel n="16" title="Each token scores itself and every earlier token" at={priceAt - 4} x={GX} y={y(FIG_Y)} />
+      <Svg opacity={ease(frame, priceAt - 2, 12) * (1 - 0.5 * ease(frame, soAt, 16))}>
         {Array.from({ length: big.n * big.n }, (_, k) => {
           const r = Math.floor(k / big.n);
           const c = k % big.n;
-          const inner = r < small.n && c < small.n;
-          const order = inner ? (r + c) / (2 * small.n) : (r + c - small.n) / (2 * big.n);
-          const p = inner ? clamp01((fill10 - order * 0.7) / 0.3) : clamp01((fill20 - order * 0.7) / 0.3);
+          // A later token: never scored, so no cell.
+          if (c > r) return null;
+          const inner = r < small.n;
+          let p: number;
+          if (!inner) p = clamp01((fill20 - ((r - small.n) / (big.n - small.n - 1)) * 0.7) / 0.3);
+          else if (r === c) p = ease(frame, itselfAt - 2 + r * 1.5, 8);
+          // Every token before it, from the nearest back to the first.
+          else p = clamp01((fillBefore - ((r - c - 1) / (small.n - 2)) * 0.7) / 0.3);
           return (
             <rect
               key={k}
@@ -845,7 +860,7 @@ export const HeadsScene: React.FC = () => {
             />
           );
         })}
-        {/* "Itself included": the diagonal, each token scoring itself. */}
+        {/* "Itself": the diagonal, each token scoring itself. */}
         {Array.from({ length: small.n }, (_, k) => (
           <rect
             key={`d${k}`}
@@ -860,18 +875,30 @@ export const HeadsScene: React.FC = () => {
             opacity={ease(frame, itselfAt - 2 + k * 1.5, 8)}
           />
         ))}
-        <rect x={GX} y={GY} width={small.n * CELL} height={small.n * CELL} fill="none" stroke={INK} strokeWidth={2} opacity={fill10} />
+        {/* The whole square of pairs, so the half left out shows as empty. */}
+        <rect x={GX} y={GY} width={small.n * CELL} height={small.n * CELL} fill="none" stroke={INK} strokeWidth={2} />
         <rect x={GX} y={GY} width={big.n * CELL} height={big.n * CELL} fill="none" stroke={INK} strokeWidth={2} opacity={fill20} />
       </Svg>
-      <div style={{ position: "absolute", left: GX, top: GY - 52, opacity: fill10 }}>
+      {/* Said, in the empty half it names: the later tokens are never scored. */}
+      <Fade
+        at={laterAt - 2}
+        style={{ left: GX + small.n * CELL - 14, top: GY + 12, transform: "translateX(-100%)", textAlign: "right" }}
+      >
+        <div style={{ ...label(21, INK_SOFT), lineHeight: 1.25, whiteSpace: "nowrap" }}>
+          Later tokens:
+          <br />
+          never scored
+        </div>
+      </Fade>
+      <div style={{ position: "absolute", left: GX, top: GY - 52, opacity: ease(frame, tenAt - 2, 10) }}>
         <span style={{ ...note(28, INK), fontWeight: 650, ...TABULAR }}>
-          {small.n} tokens: <Mark at={hundredAt}>{small.scores} scores</Mark>
+          {small.n} tokens: <Mark at={fiftyAt}>{small.scores} scores</Mark>
         </span>
       </div>
-      <div style={{ position: "absolute", left: GX + big.n * CELL + 24, top: GY + big.n * CELL - 70, opacity: ease(frame, fourAt - 2, 10) }}>
+      <div style={{ position: "absolute", left: GX + big.n * CELL + 24, top: GY + big.n * CELL - 70, opacity: ease(frame, twentyAt - 2, 10) }}>
         <div style={{ ...note(28, INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>{big.n} tokens:</div>
-        <div style={{ ...note(28, POINT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap" }}>
-          <Mark at={workAt}>{big.scores} scores</Mark>
+        <div style={{ ...note(28, POINT_INK), fontWeight: 650, ...TABULAR, whiteSpace: "nowrap", opacity: ease(frame, hundredAt - 2, 10) }}>
+          <Mark at={hundredAt + 4}>{big.scores} scores</Mark>
         </div>
       </div>
     </AbsoluteFill>

@@ -23,7 +23,7 @@ Report: `agent-outputs/20261029-da-interview-video-review/DataAnalyst-8-AiAssist
 | 15 | P3 | production notes on screen | fixed | "the video's own example" deleted; "Weekly summary, drafted by a model"; "a prompt". |
 | 16 | P3 | hook's query never picked up | fixed | New beat `mistakes-recall`: "Remember the opening query." (27 characters), with the assistant's BETWEEN query typing in on it. |
 | 17 | P3 | arrow sends the question into "defined metrics" | fixed | Arrow deleted; "what it has to stand on to answer correctly" above the stack, cued to `metricsAt - 2`. |
-| 18 | P3 | Q9 repeatability and uncertainty | partly | `r-llm` re-voiced with "rerun a sample to confirm the labels repeat"; step 3 "Same settings every batch; a rerun gives the same labels" (second half on "rerun a sample"). Not added: reporting which categories it confuses and carrying that uncertainty into the findings; the beat is already 18 s. |
+| 18 | P3 | Q9 repeatability and uncertainty | fixed (finished afterwards: `r-llm-report`, see finish-6-and-8.md) | `r-llm` re-voiced with "rerun a sample to confirm the labels repeat"; step 3 "Same settings every batch; a rerun gives the same labels" (second half on "rerun a sample"). Not added: reporting which categories it confuses and carrying that uncertainty into the findings; the beat is already 18 s. |
 | 19 | P3 | series ends on a footer | fixed | New beat `close-two`: "Whoever wrote the query, the interview asks the same two things: what one row means, and how you know the number is right." Set above the hairline in two lines at `body(34)`, the two things highlighted as said; the list's last tick and the chime move to it. |
 
 ## Voice

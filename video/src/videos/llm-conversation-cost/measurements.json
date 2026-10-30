@@ -552,6 +552,10 @@
   "each": 0.0525,
   "eight": 0.42,
   "one": 1.19,
-  "times": 2.8333
+  "times": 2.8333,
+  "eachCached": 0.02989,
+  "eightCached": 0.23912,
+  "oneCached": 0.25634,
+  "savedCached": 0.0672
  }
 }

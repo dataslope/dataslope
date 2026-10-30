@@ -1,6 +1,6 @@
 {
   "versions": {
-    "python": "3.13.16",
+    "python": "3.13.17",
     "nltk": "3.9.4"
   },
   "defaults": [

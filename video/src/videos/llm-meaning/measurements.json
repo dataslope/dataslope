@@ -520,6 +520,21 @@
    "scores": 400
   }
  ],
+ "decoder": {
+  "counts": [
+   {
+    "n": 10,
+    "scores": 55,
+    "later": 45
+   },
+   {
+    "n": 20,
+    "scores": 210,
+    "later": 190
+   }
+  ],
+  "ratio": 3.82
+ },
  "params": {
   "vocab": 128000,
   "dModel": 4096,

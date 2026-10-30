@@ -20,7 +20,8 @@ const OVERLAP = 6;
  *   1. HookScene: lemmatize() with no part of speech, and why noun.
  *   2. LookupScene: WordNet's three steps, traced on six lookups.
  *   3. SentenceScene: the pos-tagging lesson's sentence tagged, mapped and
- *      lemmatized, beside Porter's stems.
+ *      lemmatized without tags and with them, beside Porter's stems, and
+ *      the fix as one call.
  *
  * Every scene boundary is a narration cue, so new audio re-times the cuts
  * along with every animation inside them.

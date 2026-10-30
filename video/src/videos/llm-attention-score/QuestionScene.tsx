@@ -50,21 +50,38 @@ const midOf = (w: string) => {
   return X0 + (i + w.length / 2) * CW;
 };
 
-/** The sentence in mono, with highlighter marks under chosen words. */
-const Sentence: React.FC<{ marks: { word: string; at: number; color?: string }[] }> = ({ marks }) => {
+/** The three tokens the lesson keeps, in its order. */
+const KEPT = ["trophy", "suitcase", "it"];
+
+/**
+ * The sentence in mono, with highlighter marks under chosen words. `dim`
+ * (0 to 1) fades every word but the three the lesson keeps.
+ */
+const Sentence: React.FC<{ marks: { word: string; at: number; color?: string }[]; dim: number }> = ({ marks, dim }) => {
+  const faded = { opacity: 1 - 0.62 * dim };
   const parts: React.ReactNode[] = [];
   let i = 0;
   const sorted = marks.map((m) => ({ ...m, i: S.indexOf(` ${m.word}`) + 1 })).sort((a, b) => a.i - b.i);
   for (const m of sorted) {
-    parts.push(S.slice(i, m.i));
     parts.push(
-      <Mark key={m.word} at={m.at} color={m.color}>
-        {m.word}
-      </Mark>,
+      <span key={`t${m.i}`} style={faded}>
+        {S.slice(i, m.i)}
+      </span>,
+    );
+    parts.push(
+      <span key={m.word} style={KEPT.includes(m.word) ? undefined : faded}>
+        <Mark at={m.at} color={m.color}>
+          {m.word}
+        </Mark>
+      </span>,
     );
     i = m.i + m.word.length;
   }
-  parts.push(S.slice(i));
+  parts.push(
+    <span key="end" style={faded}>
+      {S.slice(i)}
+    </span>,
+  );
   return <span style={{ fontFamily: MONO, fontSize: SIZE, fontWeight: 600, color: INK, whiteSpace: "pre" }}>{parts}</span>;
 };
 
@@ -95,15 +112,19 @@ export const QuestionScene: React.FC = () => {
   const lookingAt = n.word("query", "looking");
   const offerAt = n.word("key", "offer");
   const handOverAt = n.word("value", "hand over");
-  const tinyAt = n.word("toy", "tiny");
-  const twoAt = n.word("toy", "Two numbers");
+  const threeTokensAt = n.word("toy", "Three tokens");
+  const keptAt = [n.word("toy", "trophy"), n.word("toy", "suitcase"), n.word("toy", "the pronoun itself")];
+  const itselfAt = n.word("toy", "itself");
+  const twoAt = n.word("toy", "two numbers");
 
-  // Fig. 1: the sentence, with arcs from "it" to the two nouns.
+  // Fig. 1: the sentence, with an arc from "it" to each token it weighs:
+  // the two nouns above, and itself, a loop below.
   const R = y(440);
   const itX = midOf("it");
   const trX = midOf("trophy");
   const scX = midOf("suitcase");
   const win = ease(frame, winAt - 2, 14);
+  const dim = ease(frame, threeTokensAt - 4, 16);
 
   // Fig. 2: one embedding, three vectors.
   const rowY = (i: number) => y(640) + i * 92;
@@ -112,8 +133,8 @@ export const QuestionScene: React.FC = () => {
   const CELL = 30;
   const STRIP_N = 9;
   const VX = 650;
-  // "Short vectors" first, as blank cells; "tiny" collapses each to two.
-  const collapse = ease(frame, tinyAt - 2, 22);
+  // Longer vectors first, as blank cells; "two numbers" collapses each to two.
+  const collapse = ease(frame, twoAt - 4, 22);
   const cells = lerp(6, 2, collapse);
   const cellW = lerp(30, 72, collapse);
 
@@ -127,8 +148,11 @@ export const QuestionScene: React.FC = () => {
       {cardAt.map((t, i) => (
         <Sfx key={i} name="el-tap" at={t} level={-26} />
       ))}
-      <Sfx name="el-whoosh" at={tinyAt - 2} level={-34} />
-      <Sfx name="el-tap" at={twoAt} level={-24} />
+      {keptAt.map((t, i) => (
+        <Sfx key={`k${i}`} name="el-tap" at={t} level={-29} />
+      ))}
+      <Sfx name="el-whoosh" at={twoAt - 4} level={-34} />
+      <Sfx name="el-tap" at={twoAt + 14} level={-24} />
 
       <Kicker at={from - 10}>Attention, by hand</Kicker>
       <Headline
@@ -153,16 +177,20 @@ export const QuestionScene: React.FC = () => {
       </div>
 
       {/* ── Fig. 1: the lesson's sentence ── */}
-      <FigLabel n="1" title="The lesson's sentence" at={from} x={X0} y={y(FIG_Y)} />
+      <FigLabel n="1" title="The lesson's example" at={from} x={X0} y={y(FIG_Y)} />
       <Fade at={from} style={{ left: X0, top: R }}>
         <Sentence
+          dim={dim}
           marks={[
+            { word: "trophy", at: keptAt[0] },
+            { word: "suitcase", at: keptAt[1] },
             { word: "it", at: itAt, color: `color-mix(in srgb, ${QUERY} 26%, transparent)` },
             { word: "big", at: bigAt },
           ]}
         />
       </Fade>
-      {/* A weight on every token: one arc to each noun, trophy's the heavy one. */}
+      {/* A weight on every token: one arc to each noun, trophy's the heavy one,
+          and a loop back to "it" itself. */}
       <PathArrow
         points={[
           [itX, R - 8],
@@ -187,11 +215,27 @@ export const QuestionScene: React.FC = () => {
         color={INK_SOFT}
         width={2.4}
       />
+      <PathArrow
+        points={[
+          [itX - 12, R + 44],
+          [itX - 12, R + 84],
+          [itX + 12, R + 84],
+          [itX + 12, R + 46],
+        ]}
+        radius={10}
+        at={everyAt + 6}
+        dur={14}
+        color={INK_SOFT}
+        width={2.4 + 2.4 * pulse(frame, itselfAt - 2, 30)}
+      />
       <Fade at={everyAt + 6} style={{ left: itX + 22, top: R - 74 }}>
         <Tag size={21}>a weight for each</Tag>
       </Fade>
-      <Fade at={winAt} style={{ left: (trX + itX) / 2 - 80, top: R - 134 }}>
-        <span style={{ ...label(22, POINT_INK), whiteSpace: "nowrap" }}>the biggest?</span>
+      <Fade at={itselfAt - 2} style={{ left: itX + 28, top: R + 56 }}>
+        <Tag size={21}>itself</Tag>
+      </Fade>
+      <Fade at={winAt} style={{ left: (trX + itX) / 2 - 110, top: R - 134 }}>
+        <span style={{ ...label(22, POINT_INK), whiteSpace: "nowrap" }}>the biggest weight?</span>
       </Fade>
       <Spot id="llm-meaning-trophy" at={trophyAt - 4} left={1440} top={y(390)} width={340} height={334} />
 
@@ -232,7 +276,7 @@ export const QuestionScene: React.FC = () => {
       {QKV.map((c, i) => (
         <React.Fragment key={c.name}>
           <Fade at={vectorsAt - 2 + i * 4} style={{ left: VX, top: rowY(i) }}>
-            <Cells values={c.values} numAt={twoAt + i * 4} cells={cells} cell={cellW} border={c.color} />
+            <Cells values={c.values} numAt={twoAt + 14 + i * 4} cells={cells} cell={cellW} border={c.color} />
           </Fade>
           <Fade at={cardAt[i] - 4} style={{ left: VX + 230, top: rowY(i) + 6, display: "flex", alignItems: "baseline", gap: 22 }}>
             <span style={{ ...label(28, c.ink), width: 92 }}>{c.name}</span>
@@ -261,7 +305,7 @@ export const QuestionScene: React.FC = () => {
           </Fade>
         </React.Fragment>
       ))}
-      <Fade at={twoAt + 6} style={{ left: VX, top: rowY(3) - 8 }}>
+      <Fade at={twoAt + 24} style={{ left: VX, top: rowY(3) - 8 }}>
         <Tag size={21}>
           The lesson&apos;s numbers for <Mono>it</Mono>, two in each
         </Tag>

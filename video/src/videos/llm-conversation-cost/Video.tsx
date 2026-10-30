@@ -24,8 +24,10 @@ const OVERLAP = 6;
  *                then the bill as its area, a rectangle and a triangle (one
  *                scene, so the chart never cross-fades with itself)
  *   BillsScene   10, 20, 40 turns, and each doubling heading toward four
- *   CacheScene   the repeat at a twentieth: the staircase flattens
- *   FreshScene   eight short chats against one long one, and the takeaway
+ *   CacheScene   the repeat at a twentieth: the staircase flattens; the
+ *                cache matches a prefix, so what never changes goes first
+ *   FreshScene   eight short chats against one long one, without the cache
+ *                and with it, and the takeaway
  *
  * Every scene boundary is a narration cue, so new audio re-times the cuts
  * along with every animation inside them.

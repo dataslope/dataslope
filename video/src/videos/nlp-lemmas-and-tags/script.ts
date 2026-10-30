@@ -19,8 +19,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *      was, as a noun, wa.
  *   3. Tag, then lemmatize ("tagger" to "close"): the pos-tagging lesson's
  *      own sentence through pos_tag, each Penn tag cut to its first letter
- *      and mapped to WordNet's n, v, a or r, then lemmatized, beside Porter's
- *      stems of the same sentence.
+ *      and mapped to WordNet's n, v, a or r, then lemmatized without tags and
+ *      with them (the lesson's two printed lines), beside Porter's stems of
+ *      the same sentence, and the fix written as one call.
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
@@ -58,6 +59,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     WordNet noun and wa is (Washington, the state, "WA"), so wa. running
  *     (noun): no noun rule fits, and running itself is a noun. ran (noun): no
  *     rule fits and ran is no noun, so nothing survives and ran comes back.
+ *   - "tie": good and well are both four letters, and good is listed first
+ *     (data.ts TIE asserts both).
  *   - The rules shown are _morphy's table: nouns drop s, or turn ses, xes,
  *     zes, ches, shes into s, x, z, ch, sh, ves into f, ies into y, men into
  *     man; verbs drop s, es, ed and ing, or turn ies into y and es, ed, ing
@@ -65,11 +68,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     none.
  *   - The sentence is pos-tagging.mdx's, "The runners were running and they
  *     had eaten well.": tags DT NNS VBD VBG CC PRP VBD VBN RB and the period's
- *     own tag; to_wordnet_pos (the lesson's) maps J to a, V to v, R to r and
- *     everything else to n; lemmas The runner be run and they have eat well.
+ *     own tag (NNS is the Penn Treebank's plural noun, VBD its past-tense
+ *     verb, VBG its gerund or present participle, the "ing form"; adjectives
+ *     are JJ, JJR and JJS, hence J); to_wordnet_pos (the lesson's) maps J to
+ *     a, V to v, R to r and everything else to n; lemmas The runner be run
+ *     and they have eat well.
  *     Every verb there (were, running, had, eaten) is on the verb exception
  *     list; runners loses its s by the noun rule. Without tags the lemmas are
- *     The runner were running and they had eaten well.
+ *     The runner were running and they had eaten well: runners needs no tag,
+ *     and the four verbs are what the tags rescue.
  *   - Porter's stems of the same tokens, PorterStemmer as the stemming lesson
  *     builds it: the runner were run and they had eaten well (it lowercases).
  *     The lessons never stem this sentence; it is measure.py's one extra call.
@@ -97,11 +104,8 @@ export const script: NarrationScript = {
       text: "It isn't broken. Unless you say otherwise, it treats every word as a noun.",
       pauseAfter: 0.9,
     },
-    {
-      id: "alone",
-      text: "It sees one word at a time, never the sentence, so it can't tell what job that word is doing.",
-      pauseAfter: 0.6,
-    },
+    { id: "alone", text: "It sees one word at a time, never the sentence.", pauseAfter: 0.7 },
+    { id: "job", text: "So it can't tell what job that word is doing.", pauseAfter: 0.6 },
     {
       id: "race",
       text: "And running really can be a noun, as in the running of the race. As a noun, it's already a dictionary form.",
@@ -128,9 +132,11 @@ export const script: NarrationScript = {
     },
     {
       id: "check",
-      text: "Last, the word and every guess are checked against WordNet. Only real entries survive, and the shortest one wins.",
-      pauseAfter: 0.9,
+      text: "Last, the word and every guess are checked against WordNet, the dictionary behind the lemmatizer.",
+      pauseAfter: 0.6,
     },
+    { id: "survive", text: "Only real entries survive, and the shortest one wins.", pauseAfter: 0.6 },
+    { id: "tie", text: "Good and well tie at four letters, so the first one listed wins.", pauseAfter: 0.9 },
     {
       id: "wa",
       text: "That's where wa comes from. Was isn't on the noun list, so the s comes off, and wa is a real entry: it's short for Washington, the state.",
@@ -152,17 +158,19 @@ export const script: NarrationScript = {
     },
     {
       id: "tags",
-      text: "It gives each word a Penn Treebank tag: NNS for runners, VBD for were, VBG for running.",
+      text: "It gives each word a Penn Treebank tag: NNS, a plural noun, for runners; VBD, a past-tense verb, for were; VBG, a verb's ing form, for running.",
       pauseAfter: 0.6,
     },
     {
       id: "letter",
-      text: "WordNet knows just four parts of speech, so keep each tag's first letter. J is an adjective, V a verb, R an adverb, and anything else, a noun.",
-      pauseAfter: 0.9,
+      text: "WordNet knows just four parts of speech, so keep each tag's first letter.",
+      pauseAfter: 0.55,
     },
+    { id: "map", text: "J, as in JJ, is an adjective, V a verb, R an adverb, and anything else, a noun.", pauseAfter: 0.9 },
+    { id: "lemmas", text: "Now lemmatize with those.", pauseAfter: 0.55 },
     {
-      id: "lemmas",
-      text: "Now lemmatize with those. Runners becomes runner, were becomes be, running run, had have, and eaten eat.",
+      id: "contrast",
+      text: "Without tags, were, running, had and eaten come back unchanged. With them, were becomes be, running run, had have, and eaten eat.",
       pauseAfter: 0.9,
     },
     {

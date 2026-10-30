@@ -53,6 +53,23 @@ export const TROPHY = m.trophy as Attend;
 /** The lesson's suggestion: the query turned to 0.2, 1.0. */
 export const SUITCASE = m.suitcase as Attend;
 
+/** The typical size (spread) of a dot product of two random vectors, as
+ *  summed and once divided by the square root of their size: Fig. 6's rows,
+ *  2 numbers (the lesson's) and 128 (a common size for one head). */
+export const SPREAD = [2, 128].map((d) => {
+  const s = m.spread.find((x) => x.d === d);
+  if (!s) throw new Error(`measurements.json has no spread for d = ${d}`);
+  return { d, std: s.std, scaled: s.stdScaled };
+});
+
+/** The lesson's weights if softmax took the dot products undivided. */
+export const UNSCALED = m.unscaled.weights as readonly number[];
+/** Trophy's unscaled weight to two decimals, as the narration says it. */
+export const UNSCALED_TROPHY2 = m.unscaled.trophy2;
+
+/** Cosine similarity of the query with each key (similarity.mdx's formula). */
+export const COSINE = m.cosine.keys.map((k) => k.cosine) as readonly number[];
+
 /** "1.02", "0.40": a dot product, to two decimals. */
 export const two = (x: number) => x.toFixed(2);
 /** "0.721": a score, an e-power or a weight. */

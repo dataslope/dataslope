@@ -12,9 +12,9 @@ import { DATA_INK, EMPTY, Headline, Mark, POINT, POINT_INK, Spot, Strike, Tag } 
 
 /** The top hundred as a 10 by 10 grid of word chips, in rank order. */
 const GX = 96;
-const CHIP_W = 120;
+const CHIP_W = 126;
 const CHIP_H = 38;
-const COL = CHIP_W + 8;
+const COL = CHIP_W + 6;
 /** The two spots, in a column on the right. */
 const SPOT_X = 1470;
 const SPOT = 230;
@@ -22,8 +22,9 @@ const SPOT = 230;
 /**
  * Part 5: why it matters. Emma's top hundred words, the few that fill 60% of
  * the book (Fig. 6), with the seventy on NLTK's English stopword list struck
- * out as they are counted, leaving the book's own words; a sieve for
- * stopwords and a balance for IDF, each named as it is said.
+ * out in red as they are counted, leaving the book's own words in blue; a
+ * sieve for stopwords (blue pebbles kept, red grit through) and a balance for
+ * IDF (a blue gem outweighs a red heap), each named as it is said.
  */
 export const WhyScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -39,7 +40,7 @@ export const WhyScene: React.FC = () => {
   const listAt = n.word("stop", "stopword list");
   const idfAt = n.word("idf", "IDF");
   const weightAt = n.word("idf", "more weight");
-  const rarerAt = n.word("idf", "rarer");
+  const fewerAt = n.word("idf", "fewer documents");
 
   const GY = y(352);
   const ROW = 50;
@@ -60,7 +61,7 @@ export const WhyScene: React.FC = () => {
 
       <Headline at={from - 2} lead="A few words fill" turn="most of the text." turnAt={fillAt} />
 
-      <FigLabel n="6" title="Emma's top 100 words, in rank order" at={from} x={96} y={y(286)} />
+      <FigLabel n="6" title="The novel's top 100 words, in rank order" at={from} x={96} y={y(286)} />
 
       {/* ── The grid ── */}
       {EMMA.top100Words.map(([w, isStop], i) => {
@@ -110,8 +111,10 @@ export const WhyScene: React.FC = () => {
         drop the <Mark at={leastAt}>stopwords</Mark>
       </Tag>
       <Spot id="nlp-zipfs-law-balance" at={idfAt - 2} left={SPOT_X} top={y(640)} width={SPOT} height={SPOT} />
-      <Tag x={SPOT_X + SPOT / 2} y={y(640) + SPOT + 8} at={weightAt - 2} align="center" size={22} color={INK} weight={650}>
-        IDF: <Mark at={rarerAt}>rarer weighs more</Mark>
+      <Tag x={SPOT_X + SPOT / 2} y={y(640) + SPOT + 8} at={idfAt + 2} align="center" size={22} color={INK} weight={650} style={{ textAlign: "center" }}>
+        IDF: <Mark at={weightAt}>more weight</Mark>
+        <br />
+        the <Mark at={fewerAt}>fewer documents</Mark>
       </Tag>
       <div
         style={{

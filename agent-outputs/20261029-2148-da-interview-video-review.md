@@ -9,8 +9,8 @@ their builders and by `check:frames`, `check:motion`, `check:sync` and
 **Result:** 165 findings: **8 P1**, 66 P2, 91 P3. Each video has its own report in
 [`20261029-da-interview-video-review/`](20261029-da-interview-video-review/), every
 finding with its time, beat, frame, cause (`file:line`) and a fix.
-**Fixed:** 163 of the 165 findings in the commits after this review (six of
-them in shared code), and the other two partly (see [The fixes](#the-fixes)).
+**Fixed:** all 165 findings in the commits after this review (six of them in
+shared code; see [The fixes](#the-fixes)).
 
 Severity is the same as in the October reviews: **P1**, a viewer is likely to
 misunderstand or learn something wrong, or the frame has an obvious defect;
@@ -225,10 +225,10 @@ Each fixer's report, with every finding by number and what changed, is in
 | 3 Statistics & communication | 19 fixed | 2,091 | 8:17 → 10:09 |
 | 4 Advanced SQL | 18: 16 fixed, 2 done centrally | 1,178 | 6:36 → 7:54 |
 | 5 Spreadsheets | 18: 17 fixed, 1 done centrally | 476 | 7:21 → 7:52 |
-| 6 Visualization | 20: 19 fixed, 1 partly | 1,173 | 9:47 → 10:39 |
+| 6 Visualization | 20 fixed | 1,255 | 9:47 → 10:45 |
 | 7 A/B testing | 19 fixed | 1,646 | 9:06 → 10:31 |
-| 8 AI-assisted analysis | 19: 17 fixed, 1 partly, 1 done centrally | 1,973 | 5:26 → 6:35 |
-| **Total** | **165** | **13,291** | **65:23 → 76:01** |
+| 8 AI-assisted analysis | 19: 18 fixed, 1 done centrally | 2,055 | 5:26 → 6:41 |
+| **Total** | **165** | **13,455** | **65:23 → 76:13** |
 
 Every video stayed under its 2,500-character budget, and every video passed
 typecheck, lint, `npm test`, `check:cues`, `check:motion`, `check:sync`,
@@ -247,13 +247,15 @@ min rank differ), Statistics & communication's normal areas (exact, not
 simulated) and its population samples (20 means, the first three unchanged), and
 Visualization's encoding row, renamed "Color saturation" after the page chart.
 
-**Left partly done:**
+**Two findings finished afterwards**, each with one new beat and a matching
+line on screen (82 characters each;
+[`fixes/finish-6-and-8.md`](20261029-da-interview-video-review/fixes/finish-6-and-8.md)):
 
-- **Visualization, P3 14:** the page's "design for the audience" line for
-  Question 11 is not said.
-- **AI-assisted analysis, P3 18:** Question 9 now says to rerun a sample to
-  confirm the labels repeat, but not to report which categories the model
-  confuses; the beat already runs 18 s.
+- **Visualization, P3 14:** Question 11 now says the page's "Design for the
+  audience: an executive summary differs from an ops monitoring view."
+- **AI-assisted analysis, P3 18:** Question 9 now adds "Report which
+  categories it confuses, and carry that uncertainty into the findings." as a
+  fifth step.
 
 **Shared changes made after the pass**, from the fixers' notes (`179f70dc`):
 `Ink` multiplies a caller's opacity into its own fade-out instead of letting it

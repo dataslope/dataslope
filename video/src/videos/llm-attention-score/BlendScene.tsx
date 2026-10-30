@@ -62,8 +62,8 @@ export const BlendScene: React.FC = () => {
   const scaledAt = n.word("blend", "scaled");
   const weightAt = n.word("blend", "weight");
   const addedAt = n.word("blend", "added");
-  const nearestAt = n.word("lands", "nearest");
   const trophysAt = n.word("lands", "trophy's");
+  const hardestAt = n.word("lands", "hardest");
   const turnAt = n.word("flip", "turn");
   const towardAt = n.word("flip", "toward suitcase");
   const runAt = n.word("flip", "run it again");
@@ -75,7 +75,7 @@ export const BlendScene: React.FC = () => {
   const questionAt = n.word("answer", "question");
   const answerAt = n.word("answer", "answer");
 
-  // ── Fig. 7: the query, turning ──
+  // ── Fig. 8: the query, turning ──
   const KO: Pt = [170, y(780)];
   const KU = 300;
   const K = (v: readonly number[]): Pt => [KO[0] + v[0] * KU, KO[1] - v[1] * KU];
@@ -90,7 +90,7 @@ export const BlendScene: React.FC = () => {
   const qTip = K([len * Math.cos(ang), len * Math.sin(ang)]);
   const keyTips = KEYS.map(K);
 
-  // ── Fig. 8: the ledger ──
+  // ── Fig. 9: the ledger ──
   const qY = y(385);
   const headY = y(470);
   const rowY = (i: number) => y(530) + i * 80;
@@ -98,10 +98,13 @@ export const BlendScene: React.FC = () => {
   const scoreSwap = (i: number) => runAt + 16 + i * 4;
   const weightSwap = (i: number) => takesAt - 2 + i * 4;
   const exprY = y(785);
+  // Once the query turns, the old weights and blend wait, dimmed, for the new.
+  const stale = ease(frame, runAt, 10);
+  const dimUntil = (swap: number) => 1 - 0.65 * stale * (1 - ease(frame, swap, 10));
 
-  // ── Fig. 9: the plane of the values, 0 to 10 ──
-  const VO: Pt = [1330, y(780)];
-  const VU = 40;
+  // ── Fig. 10: the plane of the values, 0 to 10 ──
+  const VO: Pt = [1300, y(780)];
+  const VU = 36;
   const V = (v: readonly number[]): Pt => [VO[0] + v[0] * VU, VO[1] - v[1] * VU];
   const move = ease(frame, swingsAt - 4, 30);
   const out = [lerp(A.output2[0], B.output2[0], move), lerp(A.output2[1], B.output2[1], move)];
@@ -109,7 +112,9 @@ export const BlendScene: React.FC = () => {
   const [ox, oy] = V(out);
   const springs = ease(frame, scaledAt - 2, 20);
   const point = ease(frame, addedAt - 2, 12);
-  const ring = pulse(frame, nearestAt, 30) + pulse(frame, answerAt, 34);
+  const ring = pulse(frame, answerAt, 34);
+  // "Pulls hardest": the thickest spring, trophy's, swells.
+  const hardest = pulse(frame, hardestAt, 30);
 
   return (
     <AbsoluteFill>
@@ -128,8 +133,8 @@ export const BlendScene: React.FC = () => {
       <Headline lead="Turn the query" turn="toward suitcase." at={turnAt - 4} turnAt={towardAt} out={questionAt - 8} />
       <Headline lead="A different question," turn="a different answer." at={questionAt - 4} turnAt={answerAt - 2} />
 
-      {/* ── Fig. 7: the query and the keys ── */}
-      <FigLabel n="7" title="The query and the keys" at={from} x={X0} y={y(FIG_Y)} />
+      {/* ── Fig. 8: the query and the keys ── */}
+      <FigLabel n="8" title="The query and the keys" at={from} x={X0} y={y(FIG_Y)} />
       <Svg opacity={ease(frame, from, 14)}>
         <line x1={KO[0]} x2={KO[0] + 1.14 * KU} y1={KO[1]} y2={KO[1]} stroke={LINE} strokeWidth={1.6} />
         <line x1={KO[0]} x2={KO[0]} y1={KO[1]} y2={KO[1] - 1.12 * KU} stroke={LINE} strokeWidth={1.6} />
@@ -165,8 +170,8 @@ export const BlendScene: React.FC = () => {
         query
       </div>
 
-      {/* ── Fig. 8: the scores and weights, for this query ── */}
-      <FigLabel n="8" title="Dot products, scores, weights" at={from} x={M.chip} y={y(FIG_Y)} />
+      {/* ── Fig. 9: the scores and weights, for this query ── */}
+      <FigLabel n="9" title="Dot products, scores, weights" at={from} x={M.chip} y={y(FIG_Y)} />
       <Fade at={from} style={{ left: M.chip, top: qY, display: "flex", alignItems: "center", gap: 18 }}>
         <span style={{ ...label(22, QUERY_INK), whiteSpace: "nowrap" }}>
           Query, from <Mono>it</Mono>
@@ -178,11 +183,11 @@ export const BlendScene: React.FC = () => {
       <Fade at={from + 2} style={{ left: 0, top: headY, width: 1300 }}>
         <span style={{ position: "absolute", left: M.key, ...label(21, KEY_INK) }}>Key</span>
         <span style={{ position: "absolute", left: M.dot, ...label(21, INK_SOFT) }}>Dot</span>
-        <span style={{ position: "absolute", left: M.score, ...label(21, INK_SOFT) }}>Score</span>
+        <span style={{ position: "absolute", left: M.score, ...label(21, INK_SOFT) }}>Scaled</span>
         <span style={{ position: "absolute", left: M.weight, ...label(21, INK_SOFT) }}>Weight</span>
       </Fade>
       {TOKENS.map((t, i) => {
-        const hotA = i === 0 ? 1 - ease(frame, weightSwap(0), 10) : 0;
+        const hotA = i === 0 ? 1 - ease(frame, runAt, 10) : 0;
         const hotB = i === 1 ? ease(frame, fourSevenAt - 2, 10) : 0;
         const numStyle: React.CSSProperties = { fontFamily: MONO, fontWeight: 700, fontSize: NUM, color: INK, ...TABULAR };
         return (
@@ -207,7 +212,7 @@ export const BlendScene: React.FC = () => {
             <span style={{ position: "absolute", left: M.score, top: 6 }}>
               <Swap a={three(A.rows[i].score)} b={three(B.rows[i].score)} swapAt={scoreSwap(i)} style={numStyle} />
             </span>
-            <span style={{ position: "absolute", left: M.weight, top: 6 }}>
+            <span style={{ position: "absolute", left: M.weight, top: 6, opacity: dimUntil(weightSwap(i)) }}>
               <Swap
                 a={three(A.rows[i].weight)}
                 b={three(B.rows[i].weight)}
@@ -231,7 +236,7 @@ export const BlendScene: React.FC = () => {
             fontWeight: 600,
             color: INK,
             whiteSpace: "pre",
-            opacity: ease(frame, line ? weightAt : scaledAt - 2, 12),
+            opacity: ease(frame, line ? weightAt : scaledAt - 2, 12) * dimUntil(line ? swingsAt + 20 : swingsAt - 4),
             ...TABULAR,
           }}
         >
@@ -248,10 +253,10 @@ export const BlendScene: React.FC = () => {
         </div>
       ))}
 
-      {/* ── Fig. 9: the new vector, among the values ── */}
-      <FigLabel n="9" title="The new vector, among the values" at={newAt - 4} x={1250} y={y(FIG_Y)} />
+      {/* ── Fig. 10: the new vector, among the values ── */}
+      <FigLabel n="10" title="The new vector, among the values" at={newAt - 4} x={1250} y={y(FIG_Y)} />
       <Svg opacity={ease(frame, newAt - 2, 14)}>
-        <line x1={VO[0]} x2={VO[0] + 10.6 * VU} y1={VO[1]} y2={VO[1]} stroke={LINE} strokeWidth={1.6} />
+        <line x1={VO[0]} x2={VO[0] + 10.3 * VU} y1={VO[1]} y2={VO[1]} stroke={LINE} strokeWidth={1.6} />
         <line x1={VO[0]} x2={VO[0]} y1={VO[1]} y2={VO[1] - 10.6 * VU} stroke={LINE} strokeWidth={1.6} />
         {[0, 5, 10].map((v) => (
           <g key={v}>
@@ -277,7 +282,7 @@ export const BlendScene: React.FC = () => {
                   x2={lerp(ox, vx, springs)}
                   y2={lerp(oy, vy, springs)}
                   stroke={VALUE}
-                  strokeWidth={2 + 18 * w[i]}
+                  strokeWidth={2 + 18 * w[i] + (i === 0 ? 6 * hardest : 0)}
                   strokeLinecap="round"
                   opacity={0.45}
                 />
@@ -297,15 +302,15 @@ export const BlendScene: React.FC = () => {
       </Svg>
       {TOKENS.map((t, i) => {
         const [vx, vy] = V(VALUES[i]);
-        const pos =
-          i === 0
-            ? { left: vx - 20, top: vy + 40, transform: "translateX(-100%)" }
-            : i === 1
-              ? { left: vx + 20, top: vy - 16 }
-              : { left: vx + 16, top: vy + 8 };
+        // Each value named with its coordinates; trophy's to the right of its
+        // dot, in two lines, so it never reads as the x axis's title.
+        const pos = i === 0 ? { left: vx + 22, top: vy - 54 } : i === 1 ? { left: vx + 20, top: vy - 16 } : { left: vx + 16, top: vy + 8 };
+        const at = pair(VALUES[i]);
         return (
           <div key={t} style={{ position: "absolute", ...pos, opacity: ease(frame, valuesAt + i * 3, 10), ...label(21, VALUE_INK), whiteSpace: "nowrap", ...halo }}>
             value of <Mono>{t}</Mono>
+            {i === 0 ? <br /> : " "}
+            {at}
           </div>
         );
       })}
