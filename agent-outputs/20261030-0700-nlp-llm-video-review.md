@@ -7,7 +7,8 @@ since: `Llm-2-1-AttentionScore`, `Llm-4-1-ConversationCost` (Drew),
 **Result:** 48 findings: **2 P1**, 17 P2, 29 P3. Each video has its own report in
 [`20261030-nlp-llm-video-review/`](20261030-nlp-llm-video-review/), every
 finding with its time, beat, frame, cause (`file:line`) and a fix.
-**Not fixed yet.**
+**Fixed:** all 48, in the commits after this review (see [The fixes](#the-fixes)),
+with three lesson corrections and one in the unit video the deep dive follows.
 
 ## Why only the deep dives
 
@@ -78,3 +79,54 @@ explanation that stops one step before the point the lesson makes.
 Pacing is the other thread: each video has one stretch where a new idea
 arrives at 3.2 to 3.5 words a second (Zipf's law and its slope, the cache
 beat, the divide step, `alone`).
+
+## The fixes
+
+**All 48 fixed**, one fixer per video working through its report in order (P1,
+then P2s, then P3s), to
+[`tools/FIX-BRIEF.md`](20261030-nlp-llm-video-review/tools/FIX-BRIEF.md). Each
+fixer's report is in
+[`20261030-nlp-llm-video-review/fixes/`](20261030-nlp-llm-video-review/fixes/).
+
+| Video | Findings | Characters re-voiced | Length before → after |
+| --- | --- | --- | --- |
+| Llm-2-1 Attention score | 14 fixed | 991 | 2:27 → 3:03 |
+| Llm-4-1 Conversation cost | 13 fixed | 685 | 2:20 → 2:57 |
+| Nlp-2-1 Lemmas and tags | 9 fixed | 604 | 2:27 → 2:51 |
+| Nlp-3-1 Zipf's law | 12 fixed | 611 | 2:07 → 2:26 |
+| **Total** | **48** | **2,891** | **9:21 → 11:17** |
+
+Every video stayed under its 1,200-character budget and passed typecheck, lint,
+`npm test`, `check:cues`, `check:motion`, `check:sync`, `check:mix` and
+`check:frames` on its final code. Beats were split at sentence breaks and cut
+from the kept takes before any rewording; every untouched beat is
+byte-identical to its committed file.
+
+**Numbers.** Each `measure.py` ran in a scratch environment with the versions
+the site runs (NLTK 3.9.4, NumPy 2.4.6, the NLTK data packages), and
+reproduced its committed file before any change. Every existing value came back
+identical; the new ones are additions: Attention score's distance from the new
+vector to each value (with an assertion that the nearest is the pronoun's own,
+so the P1 cannot return) and the weights without the scaling; Conversation
+cost's cached fresh-chat pair (asserted within 10%). The two NLP files now
+record Python 3.13.17.
+
+**Illustrations.** Zipf's law's sieve and balance were redrawn so red means
+dropped throughout (blue pebbles kept, red grit falling through).
+
+**Lessons, corrected to match** (`8bf1cc0f`, `ddc7fe81`):
+
+- `pos-tagging`: without a part of speech, "were" and "had" survive unchanged
+  too, not only "running" and "eaten".
+- `estimating-cost`: the "40 turns cost more than eight 5-turn chats" point
+  holds without a cache; cached, the gap nearly closes, and the reason left
+  to start fresh is accuracy.
+- `attention-intuition`: a decoder scores itself and every earlier token,
+  never a later one (the lesson's own caption said so; its description,
+  explanation, callout, cost section and concept check said "every other
+  token"), so about $n^2/2$ comparisons.
+
+**The unit video.** `Llm-2-Meaning` makes the same "every token scores every
+token" claim in its Scene 10 ("Ten tokens make a hundred scores"); it is being
+corrected to the decoder's count in the same pass.
+
