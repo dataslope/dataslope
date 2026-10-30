@@ -31,11 +31,19 @@ Folder `video/src/videos/da-sql/`, its narration (`video/public/narration/da-sql
   - P3: `where-keep`, `anti-safe` (second sentence), `cte-slow`, `nulls-avg`, `r-union-why`, `r-divide`, `r-rollup`, `r-groupall`, `plan`, `rapid-in`.
 - **Splits first, then voicing.** Eight beats were split at sentence breaks: `plan`, `order`, `trap-where`, `nulls-avg` (also moved before `nulls-count`), `distinct-sum`, `rapid-in`, `r-index` and `r-rollup`. `narrate --recut` cut them from the kept takes before any text changed. After the recut, only those beats' files and alignment entries differed, and every other beat was byte-identical. Of the pieces, `plan-rapid`, `order`, `trap-gone`, `nulls-coalesce`, `distinct-why`, `rapid-fourteen` and `r-index-many` kept their take audio.
 - Two splits could not be cut free: `fanout-fix` and `cte-what` had been voiced alone before, and no take has their text. I re-voiced them as above, inside the budget.
-- **New length: 576.7 s** (9:37, was 8:02), 84 beats, 136 wpm (`npm run cues -- da-sql`). The added 94 s is the new answer sentences plus their pauses. Every re-voiced beat runs at 2.2 to 3.1 w/s.
+- **New length: 576.7 s** (9:37, was 8:02), 84 beats, 136 wpm (`npm run cues -- da-sql`). The added 94 s is the new answer sentences plus their pauses. Every re-voiced beat runs at 2.2 to 3.2 w/s.
 
 ## Checks
 
-CHECKS
+All checks ran on the final code, through the private entry and the queue.
+
+- **Typecheck** (da-sql lines only) and **ESLint** on `src/videos/da-sql`: clean.
+- **`npm test`**: 69 pass, 0 fail. **`npm run check:cues`**: passes. An earlier run failed on a `da-pandas` cue, which its fixer has since fixed; nothing ever named da-sql.
+- **`check:sync`**: passes. All 84 beats are within ±0.12 s; the worst is +0.07 s (`trap-gone`), and every re-voiced beat is within ±0.05 s.
+- **`check:mix`**: passes. Narration is at −19.7 LUFS, with the effects 26.6 LU under it. The closest moment is 10.2 dB at 4:44.3, the existing scratch on "returns nothing".
+- **`check:motion`**: passes. 9:36.8 checked, with no still stretch of 2 s or more.
+- **`check:frames`**: passes. 3 illustrations (largest stretch 0.85), 16 arrows (0° of bend under any head, the new index arrow included), no hyphen in tabular figures, and every cue names its occurrence.
+- **Stills**: 45 stills, each looked at. They cover every place changed, the trap and Q7 nulls for finding 9, and the final ROLLUP hold and dedupe after the last timing change. Times: 16.5, 57.5, 60.5, 82.5, 92, 106.2, 128, 146.3, 155, 159.5, 163, 179, 210, 221.5, 236, 236.3, 248.5, 261, 270.5, 290, 314.5, 321, 333, 339.5, 345, 360, 376.5, 388.5, 404.5, 422.5, 431.5, 434.5, 454.5, 495.5, 523.5, 530, 539.5, 542, 546, 557.5, 560.5, 562.2 s. The notes added to Fanout and Anti were moved after the first stills (the Fanout ones further apart, the Anti ones higher, to clear the bottom of the page), and 221.5 and 314.5 were rendered again on the final code.
 
 ## Facts
 
