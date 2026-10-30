@@ -22,8 +22,12 @@ re-laid scenes. The four deep dives (`Llm-2-1-AttentionScore`,
 `Llm-4-1-ConversationCost`, `Nlp-2-1-LemmasAndTags`, `Nlp-3-1-ZipfsLaw`)
 were built in that fix pass and **have never been reviewed**.
 
-So this is a full review of the video as it is now, with one extra job for a
-unit video: read its October 23 report and fix report first, and check that
+**This round reviews the four deep dives only.** The ten unit videos had a
+full review and a complete fix pass, so they get the automated checks instead
+(`check:frames`, which since then also fails on tabular hyphens in the drawn
+page, and `npm test`, which fails on SVG text drawn black). The rest of this
+brief also covers a unit video, should one be reviewed later: it is a full
+review of the video as it is now, with one extra job for a unit video: read its October 23 report and fix report first, and check that
 every finding marked fixed is fixed in the frames. A finding that came back,
 or a fix that broke something nearby, is a finding here (say which earlier
 finding it is). Do not re-report something that is fixed.
