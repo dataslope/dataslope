@@ -3,6 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { INK, note } from "../../editorial/style";
+import { MONO } from "../../theme/fonts";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -178,9 +179,10 @@ export const FilterScene: React.FC = () => {
           marks={[{ line: 0, at: bracketsAt, color: MARK_OK }]}
         />
         {ops.map(([op, word], k) => (
-          <Note key={op} at={opAt[k]} x={X0 + k * 150} y={g.rowTop(FILTER.frame.rows.length) + h(40)}>
-            <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-              <Mono>{op}</Mono> {word}
+          <Note key={op} at={opAt[k]} x={X0 + k * 170} y={g.rowTop(FILTER.frame.rows.length) + h(36)}>
+            <span style={{ ...note(28, INK), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
+              <span style={{ fontFamily: MONO, fontSize: 38, fontWeight: 700, color: INK }}>{op}</span>
+              {word}
             </span>
           </Note>
         ))}

@@ -156,16 +156,17 @@ export const MergeScene: React.FC = () => {
         </Note>
 
         {/* ── Question 7: label 0 names two orders ── */}
-        <Listing lines={MERGE.dupLabel.lines} x={RIGHT_X} top={y(TOP)} width={520} size={SIZE} at={lockZeroAt - 4} out={out1} />
+        {/* It goes once ignore_index fixes it: the reset listing needs the room. */}
+        <Listing lines={MERGE.dupLabel.lines} x={RIGHT_X} top={y(TOP)} width={520} size={SIZE} at={lockZeroAt - 4} out={ignoreAt - 6} />
         <DataTable
           g={dg}
           cols={colsOf(MERGE.dupLabel)}
           at={lockZeroAt + 2}
-          out={out1}
+          out={ignoreAt - 6}
           rows={MERGE.dupLabel.rows.map((cells, i) => ({ cells, at: lockZeroAt + 6 + i * 3 }))}
           bands={MERGE.dupLabel.rows.map((_, row) => ({ row, at: ordersAt + 2 + row * 4, color: MARK_BAD }))}
         />
-        <Note at={linesUpAt - 2} x={RIGHT_X} y={dg.rowTop(MERGE.dupLabel.rows.length) + h(26)} out={out1}>
+        <Note at={linesUpAt - 2} x={RIGHT_X} y={dg.rowTop(MERGE.dupLabel.rows.length) + h(26)} out={ignoreAt - 6}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             anything aligned on the index
             <br />

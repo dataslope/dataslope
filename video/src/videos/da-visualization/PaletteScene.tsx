@@ -419,7 +419,7 @@ export const PaletteScene: React.FC = () => {
             { key: mobile.key, v: mobile.values.at(-1)!, color: SAFE[0] },
             { key: retail.key, v: retail.values.at(-1)!, color: SAFE[1] },
           ].map((s) => (
-            <Note key={s.key} at={labelAt + (s.key === retail.key ? 4 : 0)} x={PANELS[2].x1 - 70} y={pY(s.v) - h(42)}>
+            <Note key={s.key} at={labelAt + (s.key === retail.key ? 4 : 0)} x={PANELS[2].x1 + 12} y={pY(s.v) - h(16)}>
               <span style={{ ...label(21, INK), whiteSpace: "nowrap", borderBottom: `3px solid ${s.color}` }}>{s.key}</span>
             </Note>
           ))}

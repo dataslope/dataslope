@@ -267,7 +267,7 @@ const Duplicates: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <DataTable g={cg} cols={colsOf(D.clean)} at={firstAt - 4} rows={rowsAt(D.clean.rows, firstAt)} />
       <Note at={firstAt + 12} x={listX} y={cg.rowTop(D.clean.rows.length) + c.h(20)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           <QMono>keep=&quot;last&quot;</QMono> keeps the last instead
         </span>
       </Note>
@@ -367,7 +367,7 @@ const Csv: React.FC<{ c: Ctx }> = ({ c }) => {
       <Listing lines={withIndex.lines} x={R_X} top={c.T} width={420} size={SIZE} at={at - 4} />
       <Console lines={firstOut} x={R_X} top={fileTop} width={300} at={toAt} marks={[{ line: 0, at: unnamedAt - 4, color: MARK_BAD }]} />
       <Note at={toAt + 6} x={R_X + 320} y={fileTop + c.h(10)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           in <QMono>{file}</QMono>
         </span>
       </Note>
@@ -420,7 +420,7 @@ const Shape: React.FC<{ c: Ctx }> = ({ c }) => {
   const rowTop = (k: number) => c.T + k * (lineH + c.h(8));
   // An unnamed Series prints no header, so this one has none either; its
   // first row is level with the line that printed it.
-  const dg = geo(c, S.dtypes, R_X + 560, rowTop(1), 44, S.dtypes.cols.every((col) => col === "") ? 0 : 46);
+  const dg = geo(c, S.dtypes, R_X + 600, rowTop(1), 44, S.dtypes.cols.every((col) => col === "") ? 0 : 46);
   const infoTop = rowTop(3) + lineH + c.h(10) + outH + c.h(34);
   return (
     <>

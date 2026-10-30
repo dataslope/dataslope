@@ -12,7 +12,7 @@ import { Drift, LineSet, PanelTitle, Verdict, YTicks } from "./parts";
 
 const GRID = { x: 200, y: 340, w: 168, hgt: 128, gap: 14 };
 const CREEP = { x0: 1100, x1: 1660, base: 760, top: 440, hi: 45 };
-const CARD = { y: 360, w: 620, hgt: 350 };
+const CARD = { y: 360, w: 620, hgt: 310 };
 const CARDS_X = [220, 1080];
 
 /**

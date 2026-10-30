@@ -17,6 +17,7 @@ import {
   geoOf,
   Listing,
   listingHeight,
+  MARK_KEY,
   MARK_OK,
   TableName,
   X0,
@@ -123,8 +124,10 @@ export const LocScene: React.FC = () => {
             { row: endLabel, col: 1, at: labelTwoAt + 4, out: ilocSliceAt },
           ]}
           bands={[
-            ...locRows.map((row, k) => ({ row, at: locSliceAt + 6 + k * 3, out: ilocSliceAt })),
-            ...ilocRows.map((row, k) => ({ row, at: ilocSliceAt + 6 + k * 3, out: northAt })),
+            // The rows each slice returns, in the data blue, so the yellow on
+            // label 2 stands out against them.
+            ...locRows.map((row, k) => ({ row, at: locSliceAt + 6 + k * 3, out: ilocSliceAt, color: MARK_KEY })),
+            ...ilocRows.map((row, k) => ({ row, at: ilocSliceAt + 6 + k * 3, out: northAt, color: MARK_KEY })),
           ]}
           dim={northAt + 6}
         />
