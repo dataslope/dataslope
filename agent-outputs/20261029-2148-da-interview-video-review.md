@@ -9,6 +9,8 @@ their builders and by `check:frames`, `check:motion`, `check:sync` and
 **Result:** 165 findings: **8 P1**, 66 P2, 91 P3. Each video has its own report in
 [`20261029-da-interview-video-review/`](20261029-da-interview-video-review/), every
 finding with its time, beat, frame, cause (`file:line`) and a fix.
+**Fixed:** 163 of the 165 findings in the commits after this review (six of
+them in shared code), and the other two partly (see [The fixes](#the-fixes)).
 
 Severity is the same as in the October reviews: **P1**, a viewer is likely to
 misunderstand or learn something wrong, or the frame has an obvious defect;
@@ -150,6 +152,14 @@ they reach several videos each:
   (`da-sql/parts.tsx:199`). An angle that shrinks with length would fix it
   everywhere.
 
+**All fixed** in shared code before the per-video pass (`b59eed8f`): every mark
+on a cell draws, in cue order; the console box is `consoleHeight()` tall; the
+highlighter knows the frame keywords; `Strike` tilts less over a long phrase;
+and `check:frames` now fails on a hyphen set in tabular figures in the drawn
+page, values included (`PageAudit`, `src/editorial/audit.tsx`), which caught both
+missed cases before they were fixed. SQL nulls went soft grey italic in the
+same commit (SQL's P3 9).
+
 And as in the Data Scientist set, **text under 19px** in five videos:
 Visualization sets every axis tick and category label at 15 to 18px, and Advanced
 SQL, Spreadsheets, A/B testing and AI-assisted analysis each have a listing or a
@@ -182,9 +192,10 @@ Every video passes through an empty or near-empty page somewhere:
 
 ## The eight P1s
 
-None is fixed yet. I checked four against the code myself: the variance, the
-8x, the ROWS ordering and "half the month". The other four stand on their
-reviewers' frames and `file:line` references.
+**All eight are fixed**, each checked on a still of the moment it names. Before
+the fixes I checked four against the code myself (the variance, the 8x, the ROWS
+ordering and "half the month"); the other four stood on their reviewers' frames
+and `file:line` references.
 
 | Video | When | Finding | Cause |
 | --- | --- | --- | --- |
@@ -197,18 +208,65 @@ reviewers' frames and `file:line` references.
 | 8 AI-assisted analysis | 140-145 s | "The assistant missed more than half the month": the BETWEEN bug drops one day, which here holds 51.8% of the revenue. | `da-ai-assisted/script.ts:138`, `MistakesScene.tsx:42, 148` |
 | 8 AI-assisted analysis | 161-170 s | "Then fan-out, the business rules it couldn't know, and invented columns. Those fail loudly." groups fan-out with the loud failures, the reverse of question 2. | `da-ai-assisted/script.ts:148`, `MistakesScene.tsx:166-179` |
 
-## Order of work, if these are fixed
+## The fixes
 
-The same order as the Data Scientist fixes, with the same briefs
-(`20261029-ds-interview-video-review/tools/FIX-BRIEF.md`, `P3-BRIEF.md`):
+**Done**, in the order the review proposed: the shared-code bugs first, then one
+fixer per video working through its report in order (P1s, then the answer
+findings, then the other P2s, then the P3s), to
+[`tools/FIX-BRIEF.md`](20261029-da-interview-video-review/tools/FIX-BRIEF.md).
+Each fixer's report, with every finding by number and what changed, is in
+[`20261029-da-interview-video-review/fixes/`](20261029-da-interview-video-review/fixes/).
 
-1. **The eight P1s.** Four need a beat re-voiced (the variance, both AI-assisted
-   lines, and the 8x unless it is re-labelled instead). Pandas Q12 needs
-   `check.mjs` re-run with `.copy()`.
-2. **The shared-code fixes**, before any per-video work, so fixers don't work
-   around them: `DataTable` drawing every mark on a cell, the console box
-   height, the highlighter keywords, `Strike`'s angle, and a `TABULAR` guard
-   that also catches values.
-3. **The answer findings**, video by video, re-voicing only the beats whose words
-   change.
-4. **The rest of the P2s, then the P3s.**
+| Video | Findings | Characters re-voiced | Length before → after |
+| --- | --- | --- | --- |
+| 0 Interview | 15: 14 fixed, 1 done centrally | 1,529 | 1:41 → 2:20 |
+| 1 SQL | 17: 16 fixed, 1 done centrally | 1,905 | 8:02 → 9:37 |
+| 2 Pandas | 20 fixed (one half done centrally) | 1,320 | 9:07 → 10:24 |
+| 3 Statistics & communication | 19 fixed | 2,091 | 8:17 → 10:09 |
+| 4 Advanced SQL | 18: 16 fixed, 2 done centrally | 1,178 | 6:36 → 7:54 |
+| 5 Spreadsheets | 18: 17 fixed, 1 done centrally | 476 | 7:21 → 7:52 |
+| 6 Visualization | 20: 19 fixed, 1 partly | 1,173 | 9:47 → 10:39 |
+| 7 A/B testing | 19 fixed | 1,646 | 9:06 → 10:31 |
+| 8 AI-assisted analysis | 19: 17 fixed, 1 partly, 1 done centrally | 1,973 | 5:26 → 6:35 |
+| **Total** | **165** | **13,291** | **65:23 → 76:01** |
+
+Every video stayed under its 2,500-character budget, and every video passed
+typecheck, lint, `npm test`, `check:cues`, `check:motion`, `check:sync`,
+`check:mix` and `check:frames` on its final code; the whole package passed
+typecheck, lint, `npm test` (69/69), `check:cues` and the site's prose check
+together once all nine were in. Beats were split at sentence breaks before any
+rewording and cut from the kept takes with `narrate --recut`, so every beat a
+fixer did not mean to change is byte-identical to its committed file. Most of the
+added 11 minutes is answers carried one step further.
+
+**Values.** Every number still comes from a video's `check.mjs`. Every existing
+value in each `results.json` came back identical, except where a finding was
+about that value: Advanced SQL's `moving_avg_3` is now `DECIMAL` (the same
+numbers, two decimals), Pandas' sort ranks (the data now has a tie, so dense and
+min rank differ), Statistics & communication's normal areas (exact, not
+simulated) and its population samples (20 means, the first three unchanged), and
+Visualization's encoding row, renamed "Color saturation" after the page chart.
+
+**Left partly done:**
+
+- **Visualization, P3 14:** the page's "design for the audience" line for
+  Question 11 is not said.
+- **AI-assisted analysis, P3 18:** Question 9 now says to rerun a sample to
+  confirm the labels repeat, but not to report which categories the model
+  confuses; the beat already runs 18 s.
+
+**Shared changes made after the pass**, from the fixers' notes (`179f70dc`):
+`Ink` multiplies a caller's opacity into its own fade-out instead of letting it
+win, so a dimmed element passed an `out` fades rather than snapping off (13 call
+sites in nine videos, nothing ending later than before); a header-less
+`DataTable` drops its stray hairline; and the highlighter colors `DAY`, so
+`INTERVAL 1 DAY` reads as one phrase. One suggestion is not done: a character
+range on a listing mark, so Pandas' Q8 could mark just its `on=[...]` list.
+
+**What the fixers ran into.** Several kept takes letter-space initialisms ("A I",
+"N A", "S K U", "M D E") from before the acronym rule, so a sentence holding one
+cannot be cut from the take for free and had to be voiced. Three fact runners
+needed engines the repo root has not installed: Spreadsheets' HyperFormula
+(fetched with `npm pack` into scratch, nothing installed), and two `check.mjs`
+files that import `charts/_theme.mjs`, which loads Observable Plot and linkedom
+at import time although neither is called (stubbed with a resolver hook).
