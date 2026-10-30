@@ -1,6 +1,6 @@
 ---
 title: Attention
-description: The mechanism that lets each token look at every other token, explained without the matrix algebra.
+description: The mechanism that lets each token look at itself and every earlier token, explained without the matrix algebra.
 ---
 
 Embeddings give every token a meaning. Attention is what lets those
@@ -45,10 +45,12 @@ Each token produces three vectors from its embedding:
 * A **key**: what do I offer to others looking?
 * A **value**: what I actually contribute when attended to.
 
-For each token, the model compares its query against every key,
-producing a relevance score per token. Those scores are turned into
-weights that sum to 1, and the token's new representation becomes a
-weighted sum of all the values.
+For each token, the model compares its query against its own key and
+the key of every token before it, producing a relevance score per token.
+Those scores are turned into weights that sum to 1, and the token's new
+representation becomes a weighted sum of those tokens' values. It never
+scores a later token: the model writes left to right, so those words do
+not exist yet.
 
 <Figure
   slug="llm-attention-intuition-query-key-value-inline-cutout"
@@ -161,16 +163,16 @@ Two multipliers turn this into something powerful:
 Earlier architectures processed text sequentially, so information from
 token 1 reached token 500 only by passing through 499 intermediate
 steps, degrading along the way. Attention connects every token to
-every other token directly, in one step. That is both why long-range
+every earlier token directly, in one step. That is both why long-range
 dependencies work and why training could be parallelized across a
 whole sequence at once, which is what made models this large trainable.
 </Callout>
 
 ## The cost
 
-Every token attends to every other token, so an input of *n* tokens
-requires roughly *$n^2$* comparisons. Doubling the input quadruples the
-attention work. This is the fundamental reason long context windows
+Every token attends to itself and every token before it, so an input of
+*n* tokens requires roughly *$n^2/2$* comparisons. Doubling the input
+still quadruples the attention work. This is the fundamental reason long context windows
 were hard to build and remain expensive to use, and why a great deal of
 research goes into approximations that avoid the full quadratic cost.
 
@@ -231,11 +233,11 @@ The output is a weighted blend, so the weights must be a distribution.`}
   > Softmax is linear in the number of scores.
 - Because embeddings double in size as sequences grow.
   > Embedding dimensionality is fixed.
-- [o] Because every token computes a score against every other token.
-  > With n tokens there are roughly n² pairs, so doubling the input quadruples the comparisons.
+- [o] Because every token computes a score against every token before it.
+  > With n tokens there are roughly n²/2 such pairs, so doubling the input quadruples the comparisons.
 
-All-pairs comparison is the source of both attention's power and its
-cost.`}
+Comparing every token with every earlier one is the source of both
+attention's power and its cost.`}
 />
 
 <MultipleChoice
