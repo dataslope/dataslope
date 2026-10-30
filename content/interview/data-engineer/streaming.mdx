@@ -125,9 +125,13 @@ accuracy doesn't matter.
 A **watermark** is the engine's estimate that "all events with event time
 before T have (probably) arrived," letting it **close and emit** windows
 without waiting forever. It is typically set as `max_seen_event_time -
-allowed_lateness`. The watermark trades **latency vs completeness**: a
-larger lateness margin catches more stragglers but holds windows (and
-state) open longer before producing results.
+max_out_of_orderness`, a bound on how far behind the newest event a
+straggler can be. That bound is not the same setting as **allowed
+lateness** (below): the bound delays the watermark itself, while allowed
+lateness keeps a window's state open after the watermark has passed it.
+The watermark trades **latency vs completeness**: a larger bound catches
+more stragglers but holds windows (and state) open longer before producing
+results.
 
 ### How do you handle late-arriving data?
 
