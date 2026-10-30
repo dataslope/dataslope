@@ -5,8 +5,8 @@ Folder `video/src/videos/da-ab-testing/`. Report:
 8 P2, 11 P3). The fixer's report, saved by the coordinator (the fixer could not
 write files outside its folder).
 
-All 19 findings dealt with: 18 fixed, one partly (14: the hook's fox is not
-redrawn). The work went in with the work-in-progress snapshots; compare against
+All 19 findings fixed. The hook's fox (14) was redrawn by the coordinator after
+this report, with the prompt below and sharp loaded from a scratch copy. The work went in with the work-in-progress snapshots; compare against
 `8de9f413` (#715), the last commit before this pass that touched the folder.
 
 ## Findings
@@ -26,7 +26,7 @@ redrawn). The work went in with the work-in-progress snapshots; compare against
 | 11 | P3 | fixed, two worded differently | "the usual flag" for the 0.1 balance line; a new `ci-se` beat defining the standard error; the power panel titled "power to catch a lift from 10%" with 0% and 100% ticks (spelling each curve "10% → 15%" made the labels collide); "In one test" (not "one real test": the experiment is simulated, `rng(42)`). |
 | 12 | P3 | fixed | `ci-wide`: "And if the range were wide, running from a loss to a big win, we'd need more data before deciding." No −1 to +5 band drawn: those numbers would be invented. |
 | 13 | P3 | fixed | The drift chart drops its 600 tick; the week-2 label sits clear of both gridlines. |
-| 14 | P3 | partly | 51.8 is `OK_INK`; the 10% → 11% bar and 14,751 are blue 800, matching the 11% curve. **The fox is not redrawn**: `npm run illustrations` imports the repo root's `sharp`, which is not installed. To do it: set the prompt in `illustrations.json` to "a red fox sitting between two plain doors standing side by side, one door painted blue and the other teal, the fox sitting between them looking at the viewer", then `npm run illustrations -- da-ab-testing --only da-ab-testing-fox --force` from `video/`. |
+| 14 | P3 | fixed (fox redrawn afterwards) | 51.8 is `OK_INK`; the 10% → 11% bar and 14,751 are blue 800, matching the 11% curve. **The fox is not redrawn**: `npm run illustrations` imports the repo root's `sharp`, which is not installed. To do it: set the prompt in `illustrations.json` to "a red fox sitting between two plain doors standing side by side, one door painted blue and the other teal, the fox sitting between them looking at the viewer", then `npm run illustrations -- da-ab-testing --only da-ab-testing-fox --force` from `video/`. |
 | 15 | P3 | fixed | The funnel and peek scenes have content at their first frame; `power-def` holds 1.4 s. |
 | 16 | P3 | fixed | The power panel draws in Q10 and stays through Q12; `BARS.max` 620 keeps the 14,751 bar clear of it. |
 | 17 | P3 | fixed | Each row reads users, LAG(users), step conversion. |
