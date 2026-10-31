@@ -1,0 +1,65 @@
+{
+  "bank": 110,
+  "topicPages": 9,
+  "pageQuestions": 182,
+  "conceptChecks": 23,
+  "conceptCheckPages": 9,
+  "challenges": 5,
+  "challengePages": 3,
+  "pages": [
+    {
+      "page": "sql",
+      "questions": 32,
+      "conceptChecks": 2,
+      "challenges": 2
+    },
+    {
+      "page": "data-modeling",
+      "questions": 30,
+      "conceptChecks": 2,
+      "challenges": 0
+    },
+    {
+      "page": "python",
+      "questions": 18,
+      "conceptChecks": 2,
+      "challenges": 2
+    },
+    {
+      "page": "pipelines",
+      "questions": 30,
+      "conceptChecks": 2,
+      "challenges": 0
+    },
+    {
+      "page": "distributed-processing",
+      "questions": 17,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "streaming",
+      "questions": 16,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "data-warehousing",
+      "questions": 13,
+      "conceptChecks": 3,
+      "challenges": 1
+    },
+    {
+      "page": "orchestration-and-reliability",
+      "questions": 15,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "pipelines-for-ai",
+      "questions": 11,
+      "conceptChecks": 3,
+      "challenges": 0
+    }
+  ]
+}

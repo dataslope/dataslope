@@ -416,7 +416,7 @@ QUALIFY ROW_NUMBER() OVER (
 ) = 1
 ORDER BY customer_id;`}
   tests={[
-    { id: "rows", name: "One row per customer", description: "Three customers collapse to three rows", expectedRowCount: 12 },
+    { id: "rows", name: "One row per customer", description: "Twelve customers collapse to twelve rows", expectedRowCount: 12 },
     { id: "cols", name: "Has the required columns", description: "customer_id, updated_at, email", expectedColumnsInclude: ["customer_id", "updated_at", "email"] },
   ]}
 />
@@ -464,7 +464,7 @@ LEFT JOIN logins l ON l.login_date = s.day
 GROUP BY s.day
 ORDER BY s.day;`}
   tests={[
-    { id: "rows", name: "One row per calendar day", description: "May 1 through May 4 is four days, including the empty May 2", expectedRowCount: 15 },
+    { id: "rows", name: "One row per calendar day", description: "May 1 through May 15 is fifteen days, including the five with no logins", expectedRowCount: 15 },
     { id: "cols", name: "Has the required columns", description: "day and active_users", expectedColumnsInclude: ["day", "active_users"] },
   ]}
 />

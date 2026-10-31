@@ -1,0 +1,895 @@
+{
+  "runtime": "Pyodide / Python 3.14.2 / pandas 3.0.2",
+  "figures": {
+    "gen": {
+      "setup": "import os, random\nfrom collections import Counter\n\ndef _write(path, n):\n    rng = random.Random(7)\n    names = [\"apple\", \"banana\", \"cherry\", \"plum\"]\n    with open(path, \"w\") as f:\n        for _ in range(n):\n            f.write(f\"{names[rng.randrange(4)]},{rng.randrange(1, 10)}\\n\")\n\n_write(\"events.csv\", 1_000_000)\n_write(\"events_100k.csv\", 100_000)\n\ndef parse_rows(f):\n    for line in f:\n        name, qty = line.strip().split(\",\")\n        yield name, int(qty)\n",
+      "steps": {
+        "page": {
+          "code": "data = io.StringIO(\"apple,3\\nbanana,5\\napple,2\\ncherry,7\\n\")\ntotals = Counter()\nfor name, qty in parse_rows(data):\n    totals[name] += qty\nprint(dict(totals))",
+          "ok": true,
+          "value": null,
+          "stdout": "{'apple': 5, 'banana': 5, 'cherry': 7}\n",
+          "warnings": []
+        },
+        "bytes1m": {
+          "code": "os.path.getsize(\"events.csv\")",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "8249813",
+            "str": "8249813"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "bytes100k": {
+          "code": "os.path.getsize(\"events_100k.csv\")",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "824831",
+            "str": "824831"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "list100k": {
+          "code": "with open(\"events_100k.csv\") as f:\n    rows = list(parse_rows(f))\ntotal = sum(qty for _, qty in rows)\ntotal",
+          "peak": 6304574,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "499438",
+            "str": "499438"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "gen100k": {
+          "code": "with open(\"events_100k.csv\") as f:\n    total = sum(qty for _, qty in parse_rows(f))\ntotal",
+          "peak": 149493,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "499438",
+            "str": "499438"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "list1m": {
+          "code": "with open(\"events.csv\") as f:\n    rows = list(parse_rows(f))\ntotal = sum(qty for _, qty in rows)\ntotal",
+          "peak": 62614797,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "4997801",
+            "str": "4997801"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "gen1m": {
+          "code": "with open(\"events.csv\") as f:\n    total = sum(qty for _, qty in parse_rows(f))\ntotal",
+          "peak": 149288,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "4997801",
+            "str": "4997801"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "pipe": {
+      "setup": "import os, random\nfrom collections import Counter\n\ndef _write(path, n):\n    rng = random.Random(7)\n    names = [\"apple\", \"banana\", \"cherry\", \"plum\"]\n    with open(path, \"w\") as f:\n        for _ in range(n):\n            f.write(f\"{names[rng.randrange(4)]},{rng.randrange(1, 10)}\\n\")\n\n_write(\"events.csv\", 1_000_000)\n_write(\"events_100k.csv\", 100_000)\n\ndef parse_rows(f):\n    for line in f:\n        name, qty = line.strip().split(\",\")\n        yield name, int(qty)\n",
+      "steps": {
+        "lists": {
+          "code": "with open(\"events.csv\") as f:\n    lines = [line for line in f]\n    rows = [line.split(\",\") for line in lines]\n    qtys = [int(r[1]) for r in rows]\n    total = sum(qtys)\ntotal",
+          "peak": 160303627,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "4997801",
+            "str": "4997801"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "gens": {
+          "code": "with open(\"events.csv\") as f:\n    lines = (line for line in f)\n    rows = (line.split(\",\") for line in lines)\n    qtys = (int(r[1]) for r in rows)\n    total = sum(qtys)\ntotal",
+          "peak": 150203,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "4997801",
+            "str": "4997801"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "again": {
+          "code": "with open(\"events.csv\") as f:\n    qtys = (int(line.split(\",\")[1]) for line in f)\n    first = sum(qtys)\n    second = sum(qtys)\n(first, second)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "(4997801, 0)",
+            "str": "(4997801, 0)"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "file": {
+      "setup": "import os, random\nfrom collections import Counter\n\ndef _write(path, n):\n    rng = random.Random(7)\n    names = [\"apple\", \"banana\", \"cherry\", \"plum\"]\n    with open(path, \"w\") as f:\n        for _ in range(n):\n            f.write(f\"{names[rng.randrange(4)]},{rng.randrange(1, 10)}\\n\")\n\n_write(\"events.csv\", 1_000_000)\n_write(\"events_100k.csv\", 100_000)\n\ndef parse_rows(f):\n    for line in f:\n        name, qty = line.strip().split(\",\")\n        yield name, int(qty)\n",
+      "steps": {
+        "read": {
+          "code": "with open(\"events.csv\") as f:\n    text = f.read()\nlen(text)",
+          "peak": 16632046,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "8249813",
+            "str": "8249813"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "readlines": {
+          "code": "with open(\"events.csv\") as f:\n    lines = f.readlines()\nlen(lines)",
+          "peak": 33614680,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "1000000",
+            "str": "1000000"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "stream": {
+          "code": "n = 0\nwith open(\"events.csv\") as f:\n    for line in f:\n        n += 1\nn",
+          "peak": 148673,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "1000000",
+            "str": "1000000"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "whole": {
+          "code": "df = pd.read_csv(\"events.csv\", names=[\"name\", \"qty\"])\ntotals = df.groupby(\"name\")[\"qty\"].sum().to_dict()\ntotals",
+          "peak": 54153654,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "{'apple': 1250556, 'banana': 1251336, 'cherry': 1245956, 'plum': 1249953}",
+            "str": "{'apple': 1250556, 'banana': 1251336, 'cherry': 1245956, 'plum': 1249953}"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "chunks": {
+          "code": "totals = Counter()\nfor chunk in pd.read_csv(\"events.csv\", names=[\"name\", \"qty\"],\n                         chunksize=100_000):\n    part = chunk.groupby(\"name\")[\"qty\"].sum()\n    totals.update(part.to_dict())\ndict(totals)",
+          "peak": 7535570,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "{'apple': 1250556, 'banana': 1251336, 'cherry': 1245956, 'plum': 1249953}",
+            "str": "{'apple': 1250556, 'banana': 1251336, 'cherry': 1245956, 'plum': 1249953}"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "lazy": {
+          "code": "def read_lines(path):\n    print(\"opening\", path)\n    with open(path) as f:\n        for line in f:\n            yield line.rstrip(\"\\n\")\n\nrows = (line.split(\",\") for line in read_lines(\"events.csv\"))\nprint(\"pipeline built\")\nprint(next(rows))",
+          "ok": true,
+          "value": null,
+          "stdout": "pipeline built\nopening events.csv\n['cherry', '3']\n",
+          "warnings": []
+        },
+        "nChunks": {
+          "code": "sum(1 for _ in pd.read_csv(\"events.csv\", names=[\"name\", \"qty\"], chunksize=100_000))",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "10",
+            "str": "10"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "meanTrue": {
+          "code": "head = pd.read_csv(\"events.csv\", names=[\"name\", \"qty\"], nrows=250_000)\nround(float(head[\"qty\"].mean()), 4)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "5.0039",
+            "str": "5.0039"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "meanOfMeans": {
+          "code": "means = [c[\"qty\"].mean() for c in pd.read_csv(\"events.csv\", names=[\"name\", \"qty\"], nrows=250_000, chunksize=100_000)]\nround(float(sum(means) / len(means)), 4)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "5.0061",
+            "str": "5.0061"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "meanFolded": {
+          "code": "s = n = 0\nfor c in pd.read_csv(\"events.csv\", names=[\"name\", \"qty\"], nrows=250_000, chunksize=100_000):\n    s += c[\"qty\"].sum()\n    n += len(c)\nround(float(s / n), 4)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "5.0039",
+            "str": "5.0039"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "iter": {
+      "setup": "import os, random\nfrom collections import Counter\n\ndef _write(path, n):\n    rng = random.Random(7)\n    names = [\"apple\", \"banana\", \"cherry\", \"plum\"]\n    with open(path, \"w\") as f:\n        for _ in range(n):\n            f.write(f\"{names[rng.randrange(4)]},{rng.randrange(1, 10)}\\n\")\n\n_write(\"events.csv\", 1_000_000)\n_write(\"events_100k.csv\", 100_000)\n\ndef parse_rows(f):\n    for line in f:\n        name, qty = line.strip().split(\",\")\n        yield name, int(qty)\n\nwith open(\"orders.csv\", \"w\") as f:\n    f.write(\"apple,3\\nbanana,5\\napple,2\\ncherry,7\\n\")",
+      "steps": {
+        "list": {
+          "code": "rows = list(parse_rows(open(\"orders.csv\")))\nprint(len(list(rows)), len(list(rows)))\niter(rows) is rows",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "False",
+            "str": "False"
+          },
+          "stdout": "4 4\n",
+          "warnings": [
+            "ResourceWarning: unclosed file <_io.TextIOWrapper name='orders.csv' mode='r' encoding='UTF-8'>"
+          ]
+        },
+        "gen": {
+          "code": "rows = parse_rows(open(\"orders.csv\"))\nprint(len(list(rows)), len(list(rows)))\niter(rows) is rows",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "True",
+            "str": "True"
+          },
+          "stdout": "4 0\n",
+          "warnings": [
+            "ResourceWarning: unclosed file <_io.TextIOWrapper name='orders.csv' mode='r' encoding='UTF-8'>"
+          ]
+        },
+        "trap": {
+          "code": "rows = parse_rows(open(\"orders.csv\"))\nn = sum(1 for _ in rows)      # count them for the log\nloaded = list(rows)           # then load them\nprint(n, len(loaded))",
+          "ok": true,
+          "value": null,
+          "stdout": "4 0\n",
+          "warnings": [
+            "ResourceWarning: unclosed file <_io.TextIOWrapper name='orders.csv' mode='r' encoding='UTF-8'>"
+          ]
+        },
+        "file": {
+          "code": "f = open(\"orders.csv\")\niter(f) is f",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "True",
+            "str": "True"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "next": {
+          "code": "rows = parse_rows(open(\"orders.csv\"))\nfor _ in range(4):\n    next(rows)\nnext(rows)",
+          "ok": false,
+          "error": "StopIteration: ",
+          "stdout": "",
+          "warnings": [
+            "ResourceWarning: unclosed file <_io.TextIOWrapper name='orders.csv' mode='r' encoding='UTF-8'>"
+          ]
+        }
+      }
+    },
+    "hash": {
+      "setup": "class Key:\n    eqs = 0\n    __slots__ = (\"v\",)\n    def __init__(self, v):\n        self.v = v\n    def __eq__(self, other):\n        Key.eqs += 1\n        return self.v == other.v\n    def __hash__(self):\n        return hash(self.v)\n\ndef dedup_list(keys):\n    seen = []\n    for k in keys:\n        if k not in seen:\n            seen.append(k)\n    return seen\n\ndef dedup_set(keys):\n    seen = set()\n    for k in keys:\n        if k not in seen:\n            seen.add(k)\n    return seen\n\ndef compares(fn, n):\n    keys = [Key(i) for i in range(n)]\n    Key.eqs = 0\n    fn(keys)\n    return Key.eqs\n",
+      "steps": {
+        "list5k": {
+          "code": "compares(dedup_list, 5_000)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "12497500",
+            "str": "12497500"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "list10k": {
+          "code": "compares(dedup_list, 10_000)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "49995000",
+            "str": "49995000"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "set10k": {
+          "code": "compares(dedup_set, 10_000)",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "0",
+            "str": "0"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "dedup": {
+      "setup": "records = [\n    {\"user_id\": 1, \"action\": \"login\"},\n    {\"user_id\": 2, \"action\": \"login\"},\n    {\"user_id\": 1, \"action\": \"click\"},\n    {\"user_id\": 3, \"action\": \"login\"},\n]\ndf = pd.DataFrame({\n    \"id\":    [1, 1, 2],\n    \"ts\":    [10, 20, 5],\n    \"value\": [\"a\", \"b\", \"c\"],\n})",
+      "steps": {
+        "records": {
+          "code": "pd.DataFrame(records)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "user_id",
+              "action"
+            ],
+            "rows": [
+              [
+                "1",
+                "login"
+              ],
+              [
+                "2",
+                "login"
+              ],
+              [
+                "1",
+                "click"
+              ],
+              [
+                "3",
+                "login"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "first": {
+          "code": "seen = set()\ndeduped = []\nfor r in records:\n    if r[\"user_id\"] not in seen:\n        seen.add(r[\"user_id\"])\n        deduped.append(r)\nprint([r[\"user_id\"] for r in deduped])",
+          "ok": true,
+          "value": null,
+          "stdout": "[1, 2, 3]\n",
+          "warnings": []
+        },
+        "frame": {
+          "code": "df",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2"
+            ],
+            "indexName": null,
+            "columns": [
+              "id",
+              "ts",
+              "value"
+            ],
+            "rows": [
+              [
+                "1",
+                "10",
+                "a"
+              ],
+              [
+                "1",
+                "20",
+                "b"
+              ],
+              [
+                "2",
+                "5",
+                "c"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "latestDict": {
+          "code": "latest = {}\nfor r in df.to_dict(\"records\"):\n    if r[\"id\"] not in latest or r[\"ts\"] > latest[r[\"id\"]][\"ts\"]:\n        latest[r[\"id\"]] = r\nprint({k: v[\"value\"] for k, v in latest.items()})",
+          "ok": true,
+          "value": null,
+          "stdout": "{1: 'b', 2: 'c'}\n",
+          "warnings": []
+        },
+        "latest": {
+          "code": "latest = (df.sort_values(\"ts\")\n            .drop_duplicates(\"id\", keep=\"last\")\n            .sort_values(\"id\")\n            .reset_index(drop=True))\nlatest",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1"
+            ],
+            "indexName": null,
+            "columns": [
+              "id",
+              "ts",
+              "value"
+            ],
+            "rows": [
+              [
+                "1",
+                "20",
+                "b"
+              ],
+              [
+                "2",
+                "5",
+                "c"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "join": {
+      "setup": "users = [{\"user_id\": 1, \"name\": \"Ada\"}, {\"user_id\": 2, \"name\": \"Lin\"}]\norders = [\n    {\"order_id\": 10, \"user_id\": 1, \"amount\": 40},\n    {\"order_id\": 11, \"user_id\": 1, \"amount\": 60},\n    {\"order_id\": 12, \"user_id\": 2, \"amount\": 25},\n]",
+      "steps": {
+        "users": {
+          "code": "pd.DataFrame(users)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1"
+            ],
+            "indexName": null,
+            "columns": [
+              "user_id",
+              "name"
+            ],
+            "rows": [
+              [
+                "1",
+                "Ada"
+              ],
+              [
+                "2",
+                "Lin"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "orders": {
+          "code": "pd.DataFrame(orders)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2"
+            ],
+            "indexName": null,
+            "columns": [
+              "order_id",
+              "user_id",
+              "amount"
+            ],
+            "rows": [
+              [
+                "10",
+                "1",
+                "40"
+              ],
+              [
+                "11",
+                "1",
+                "60"
+              ],
+              [
+                "12",
+                "2",
+                "25"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "build": {
+          "code": "by_id = {u[\"user_id\"]: u[\"name\"] for u in users}\nby_id",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "{1: 'Ada', 2: 'Lin'}",
+            "str": "{1: 'Ada', 2: 'Lin'}"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "probe": {
+          "code": "joined = [\n    {\"order_id\": o[\"order_id\"], \"name\": by_id[o[\"user_id\"]], \"amount\": o[\"amount\"]}\n    for o in orders\n]\nfor row in joined:\n    print(row)",
+          "ok": true,
+          "value": null,
+          "stdout": "{'order_id': 10, 'name': 'Ada', 'amount': 40}\n{'order_id': 11, 'name': 'Ada', 'amount': 60}\n{'order_id': 12, 'name': 'Lin', 'amount': 25}\n",
+          "warnings": []
+        },
+        "missing": {
+          "code": "orders.append({\"order_id\": 13, \"user_id\": 3, \"amount\": 15})\n[by_id[o[\"user_id\"]] for o in orders]",
+          "ok": false,
+          "error": "KeyError: 3",
+          "stdout": "",
+          "warnings": []
+        },
+        "after": {
+          "code": "pd.DataFrame(orders)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "columns": [
+              "order_id",
+              "user_id",
+              "amount"
+            ],
+            "rows": [
+              [
+                "10",
+                "1",
+                "40"
+              ],
+              [
+                "11",
+                "1",
+                "60"
+              ],
+              [
+                "12",
+                "2",
+                "25"
+              ],
+              [
+                "13",
+                "3",
+                "15"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "left": {
+          "code": "[by_id.get(o[\"user_id\"]) for o in orders]",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "['Ada', 'Ada', 'Lin', None]",
+            "str": "['Ada', 'Ada', 'Lin', None]"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "batch": {
+      "setup": "import itertools\n\ndef batched(iterable, n):\n    it = iter(iterable)\n    while True:\n        chunk = list(itertools.islice(it, n))\n        if not chunk:\n            return\n        yield chunk",
+      "steps": {
+        "page": {
+          "code": "for batch in batched(range(7), 3):\n    print(batch)",
+          "ok": true,
+          "value": null,
+          "stdout": "[0, 1, 2]\n[3, 4, 5]\n[6]\n",
+          "warnings": []
+        },
+        "builtin": {
+          "code": "for batch in itertools.batched(range(7), 3):\n    print(batch)",
+          "ok": true,
+          "value": null,
+          "stdout": "(0, 1, 2)\n(3, 4, 5)\n(6,)\n",
+          "warnings": []
+        },
+        "calls": {
+          "code": "sum(1 for _ in batched(range(1_000_000), 1_000))",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "1000",
+            "str": "1000"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "retry": {
+      "setup": "import random\n\nattempts = {\"n\": 0}\ndef flaky():                       # succeeds on the 3rd try\n    attempts[\"n\"] += 1\n    if attempts[\"n\"] < 3:\n        raise ConnectionError(\"transient\")\n    return \"ok\"\n\ndef with_retries(fn, max_tries=5, base=0.01):\n    for attempt in range(1, max_tries + 1):\n        try:\n            return fn()\n        except ConnectionError as e:\n            if attempt == max_tries:\n                raise                          # give up\n            delay = base * (2 ** (attempt - 1))  # exponential backoff\n            print(f\"attempt {attempt} failed ({e}); retry in {delay:.3f}s\")\n            time.sleep(delay)\n\ncalls = {\"n\": 0}\ndef bad_request():\n    calls[\"n\"] += 1\n    raise ValueError(\"400 Bad Request: no such column\")\n\ndef schedule(rng, tries=5, base=1.0, jitter=False):\n    t, times = 0.0, []\n    for attempt in range(1, tries):\n        delay = base * (2 ** (attempt - 1))\n        if jitter:\n            delay = rng.uniform(0, delay)\n        t += delay\n        times.append(round(t, 2))\n    return times",
+      "steps": {
+        "page": {
+          "code": "print(with_retries(flaky))",
+          "ok": true,
+          "value": null,
+          "stdout": "attempt 1 failed (transient); retry in 0.010s\nattempt 2 failed (transient); retry in 0.020s\nok\n",
+          "warnings": []
+        },
+        "permanent": {
+          "code": "with_retries(bad_request)",
+          "ok": false,
+          "error": "ValueError: 400 Bad Request: no such column",
+          "stdout": "",
+          "warnings": []
+        },
+        "permanentCalls": {
+          "code": "calls[\"n\"]",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "1",
+            "str": "1"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "delays": {
+          "code": "[1.0 * (2 ** (attempt - 1)) for attempt in range(1, 5)]",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "[1.0, 2.0, 4.0, 8.0]",
+            "str": "[1.0, 2.0, 4.0, 8.0]"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "plain": {
+          "code": "[schedule(None) for _ in range(6)]",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "[[1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0]]",
+            "str": "[[1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0], [1.0, 3.0, 7.0, 15.0]]"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "jittered": {
+          "code": "rng = random.Random(42)\n[schedule(rng, jitter=True) for _ in range(6)]",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "[[0.64, 0.69, 1.79, 3.58], [0.74, 2.09, 5.66, 6.35], [0.42, 0.48, 1.36, 5.4], [0.03, 0.42, 3.02, 7.38], [0.22, 1.4, 4.64, 4.69], [0.81, 2.2, 3.56, 4.81]]",
+            "str": "[[0.64, 0.69, 1.79, 3.58], [0.74, 2.09, 5.66, 6.35], [0.42, 0.48, 1.36, 5.4], [0.03, 0.42, 3.02, 7.38], [0.22, 1.4, 4.64, 4.69], [0.81, 2.2, 3.56, 4.81]]"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "idem": {
+      "setup": "batch = [{\"id\": 1, \"status\": \"new\"}, {\"id\": 2, \"status\": \"new\"}]\npayments = [{\"id\": 1, \"amount\": 40}, {\"id\": 2, \"amount\": 25}]",
+      "steps": {
+        "upsert": {
+          "code": "state = {}\ndef upsert(events):\n    for e in events:\n        state[e[\"id\"]] = e[\"status\"]   # keyed write, not append\nupsert(batch)\nupsert(batch)          # re-run after a \"failure\"\nprint(state)",
+          "ok": true,
+          "value": null,
+          "stdout": "{1: 'new', 2: 'new'}\n",
+          "warnings": []
+        },
+        "append": {
+          "code": "log = []\ndef append(events):\n    for e in events:\n        log.append(e[\"status\"])        # blind append\nappend(batch)\nappend(batch)\nprint(log)",
+          "ok": true,
+          "value": null,
+          "stdout": "['new', 'new', 'new', 'new']\n",
+          "warnings": []
+        },
+        "adds": {
+          "code": "totals = {}\ndef add(events):\n    for e in events:\n        totals[e[\"id\"]] = totals.get(e[\"id\"], 0) + e[\"amount\"]\nadd(payments)\nadd(payments)\nprint(totals)",
+          "ok": true,
+          "value": null,
+          "stdout": "{1: 80, 2: 50}\n",
+          "warnings": []
+        }
+      }
+    },
+    "clean": {
+      "setup": "import csv\nfrom datetime import datetime\n\nraw = [\"  1, Alice , 30 \", \"2,Bob,\", \"3, Carol , 25\", \"bad row\"]\n\ndef clean(rows):\n    out = []\n    for row in rows:\n        parts = [p.strip() for p in row.split(\",\")]\n        if len(parts) != 3:            # skip malformed\n            continue\n        rid, name, age = parts\n        out.append({\n            \"id\": int(rid),\n            \"name\": name,\n            \"age\": int(age) if age else None,   # tolerate missing age\n        })\n    return out",
+      "steps": {
+        "page": {
+          "code": "for rec in clean(raw):\n    print(rec)",
+          "ok": true,
+          "value": null,
+          "stdout": "{'id': 1, 'name': 'Alice', 'age': 30}\n{'id': 2, 'name': 'Bob', 'age': None}\n{'id': 3, 'name': 'Carol', 'age': 25}\n",
+          "warnings": []
+        },
+        "quoted": {
+          "code": "line = '4,\"Smith, Jo\",41'\nprint(line.split(\",\"))\nprint(next(csv.reader([line])))",
+          "ok": true,
+          "value": null,
+          "stdout": "['4', '\"Smith', ' Jo\"', '41']\n['4', 'Smith, Jo', '41']\n",
+          "warnings": []
+        },
+        "quarantine": {
+          "code": "good, rejects = [], []\nfor n, row in enumerate(csv.reader(raw + ['4,\"Smith, Jo\",41'])):\n    try:\n        rid, name, age = (p.strip() for p in row)\n        good.append((int(rid), name, int(age) if age else None))\n    except ValueError as e:\n        rejects.append((n, str(e)))\nprint(len(good), \"kept\")\nprint(rejects)",
+          "ok": true,
+          "value": null,
+          "stdout": "4 kept\n[(3, 'not enough values to unpack (expected 3, got 1)')]\n",
+          "warnings": []
+        },
+        "numeric": {
+          "code": "amounts = pd.Series([\"12.5\", \"n/a\", \"1,200\", \"7\"])\npd.to_numeric(amounts, errors=\"coerce\")",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": null,
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "values": [
+              "12.5",
+              "NaN",
+              "NaN",
+              "7.0"
+            ],
+            "dtype": "float64"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "badCount": {
+          "code": "int(pd.to_numeric(amounts, errors=\"coerce\").isna().sum())",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "2",
+            "str": "2"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "dates": {
+          "code": "for s in [\"2026-10-30\", \"30/10/2026\", \"2026-02-30\"]:\n    try:\n        print(datetime.strptime(s, \"%Y-%m-%d\").date())\n    except ValueError as e:\n        print(\"ValueError:\", e)",
+          "ok": true,
+          "value": null,
+          "stdout": "2026-10-30\nValueError: time data '30/10/2026' does not match format '%Y-%m-%d'\nValueError: day 30 must be in range 1..28 for month 2 in year 2026\n",
+          "warnings": []
+        }
+      }
+    },
+    "stream": {
+      "setup": "from collections import defaultdict\nstream = [(\"us\", 3), (\"eu\", 5), (\"us\", 2), (\"eu\", 1), (\"us\", 4)]",
+      "steps": {
+        "running": {
+          "code": "running = defaultdict(int)\nfor region, n in stream:\n    running[region] += n\nprint(dict(running))",
+          "ok": true,
+          "value": null,
+          "stdout": "{'us': 9, 'eu': 6}\n",
+          "warnings": []
+        }
+      }
+    },
+    "groupby": {
+      "setup": "df = pd.DataFrame({\n    \"region\": [\"us\", \"eu\", \"us\", \"eu\"],\n    \"amount\": [100, 200, 50, 25],\n})",
+      "steps": {
+        "agg": {
+          "code": "agg = (df.groupby(\"region\", as_index=False)[\"amount\"]\n         .sum()\n         .sort_values(\"region\"))\nagg",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1"
+            ],
+            "indexName": null,
+            "columns": [
+              "region",
+              "amount"
+            ],
+            "rows": [
+              [
+                "eu",
+                "225"
+              ],
+              [
+                "us",
+                "150"
+              ]
+            ],
+            "dtypes": [
+              "str",
+              "int64"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    },
+    "pitfall": {
+      "setup": "rows = [f\"{i},{i % 7}\" for i in range(5)]",
+      "steps": {
+        "concat": {
+          "code": "out = \"\"\nfor r in rows:\n    out += r + \"\\n\"\nout == \"\\n\".join(rows) + \"\\n\"",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "True",
+            "str": "True"
+          },
+          "stdout": "",
+          "warnings": []
+        }
+      }
+    }
+  }
+}

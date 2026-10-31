@@ -1,0 +1,748 @@
+{
+ "runtime": {
+  "python": "3.14.2",
+  "numpy": "2.4.6"
+ },
+ "stream": [
+  {
+   "i": 0,
+   "user": "ava",
+   "t": 1,
+   "arrive": 1.4,
+   "partition": 1,
+   "offset": 0,
+   "order": 0
+  },
+  {
+   "i": 1,
+   "user": "ava",
+   "t": 3,
+   "arrive": 3.3,
+   "partition": 1,
+   "offset": 1,
+   "order": 1
+  },
+  {
+   "i": 2,
+   "user": "ben",
+   "t": 4,
+   "arrive": 4.6,
+   "partition": 2,
+   "offset": 0,
+   "order": 2
+  },
+  {
+   "i": 3,
+   "user": "ava",
+   "t": 6,
+   "arrive": 6.5,
+   "partition": 1,
+   "offset": 2,
+   "order": 3
+  },
+  {
+   "i": 4,
+   "user": "dee",
+   "t": 8,
+   "arrive": 17.2,
+   "partition": 2,
+   "offset": 2,
+   "order": 7
+  },
+  {
+   "i": 5,
+   "user": "cam",
+   "t": 11,
+   "arrive": 11.4,
+   "partition": 0,
+   "offset": 0,
+   "order": 4
+  },
+  {
+   "i": 6,
+   "user": "ben",
+   "t": 13,
+   "arrive": 13.5,
+   "partition": 2,
+   "offset": 1,
+   "order": 5
+  },
+  {
+   "i": 7,
+   "user": "cam",
+   "t": 15,
+   "arrive": 15.3,
+   "partition": 0,
+   "offset": 1,
+   "order": 6
+  },
+  {
+   "i": 8,
+   "user": "ava",
+   "t": 18,
+   "arrive": 18.6,
+   "partition": 1,
+   "offset": 3,
+   "order": 8
+  },
+  {
+   "i": 9,
+   "user": "ava",
+   "t": 21,
+   "arrive": 21.3,
+   "partition": 1,
+   "offset": 4,
+   "order": 9
+  },
+  {
+   "i": 10,
+   "user": "ben",
+   "t": 25,
+   "arrive": 28,
+   "partition": 2,
+   "offset": 3,
+   "order": 11
+  },
+  {
+   "i": 11,
+   "user": "cam",
+   "t": 27,
+   "arrive": 27.4,
+   "partition": 0,
+   "offset": 2,
+   "order": 10
+  }
+ ],
+ "partitions": {
+  "count": 3,
+  "of": {
+   "ava": 1,
+   "ben": 2,
+   "cam": 0,
+   "dee": 2
+  },
+  "sizes": [
+   3,
+   5,
+   4
+  ],
+  "four": {
+   "ava": 3,
+   "ben": 1,
+   "cam": 0,
+   "dee": 3
+  }
+ },
+ "moved": {
+  "keys": 10000,
+  "moved": 7432,
+  "share": 0.7432,
+  "ours": 3
+ },
+ "windows": {
+  "size": 10,
+  "slide": 5,
+  "gap": 5,
+  "end": 30,
+  "tumblingEvent": [
+   5,
+   4,
+   3
+  ],
+  "tumblingProcessing": [
+   4,
+   5,
+   3
+  ],
+  "sliding": [
+   {
+    "start": -5,
+    "count": 3
+   },
+   {
+    "start": 0,
+    "count": 5
+   },
+   {
+    "start": 5,
+    "count": 4
+   },
+   {
+    "start": 10,
+    "count": 4
+   },
+   {
+    "start": 15,
+    "count": 3
+   },
+   {
+    "start": 20,
+    "count": 3
+   },
+   {
+    "start": 25,
+    "count": 2
+   }
+  ],
+  "sessions": {
+   "ava": [
+    {
+     "first": 1,
+     "last": 6,
+     "end": 11,
+     "clicks": 3
+    },
+    {
+     "first": 18,
+     "last": 21,
+     "end": 26,
+     "clicks": 2
+    }
+   ],
+   "ben": [
+    {
+     "first": 4,
+     "last": 4,
+     "end": 9,
+     "clicks": 1
+    },
+    {
+     "first": 13,
+     "last": 13,
+     "end": 18,
+     "clicks": 1
+    },
+    {
+     "first": 25,
+     "last": 25,
+     "end": 30,
+     "clicks": 1
+    }
+   ],
+   "cam": [
+    {
+     "first": 11,
+     "last": 15,
+     "end": 20,
+     "clicks": 2
+    },
+    {
+     "first": 27,
+     "last": 27,
+     "end": 32,
+     "clicks": 1
+    }
+   ],
+   "dee": [
+    {
+     "first": 8,
+     "last": 8,
+     "end": 13,
+     "clicks": 1
+    }
+   ]
+  },
+  "sessionCount": 8
+ },
+ "watermark": {
+  "three": {
+   "delay": 3,
+   "lateness": 0,
+   "trace": [
+    {
+     "i": 0,
+     "arrive": 1.4,
+     "before": null,
+     "after": -2,
+     "behind": false
+    },
+    {
+     "i": 1,
+     "arrive": 3.3,
+     "before": -2,
+     "after": 0,
+     "behind": false
+    },
+    {
+     "i": 2,
+     "arrive": 4.6,
+     "before": 0,
+     "after": 1,
+     "behind": false
+    },
+    {
+     "i": 3,
+     "arrive": 6.5,
+     "before": 1,
+     "after": 3,
+     "behind": false
+    },
+    {
+     "i": 5,
+     "arrive": 11.4,
+     "before": 3,
+     "after": 8,
+     "behind": false
+    },
+    {
+     "i": 6,
+     "arrive": 13.5,
+     "before": 8,
+     "after": 10,
+     "behind": false
+    },
+    {
+     "i": 7,
+     "arrive": 15.3,
+     "before": 10,
+     "after": 12,
+     "behind": false
+    },
+    {
+     "i": 4,
+     "arrive": 17.2,
+     "before": 12,
+     "after": 12,
+     "behind": true
+    },
+    {
+     "i": 8,
+     "arrive": 18.6,
+     "before": 12,
+     "after": 15,
+     "behind": false
+    },
+    {
+     "i": 9,
+     "arrive": 21.3,
+     "before": 15,
+     "after": 18,
+     "behind": false
+    },
+    {
+     "i": 11,
+     "arrive": 27.4,
+     "before": 18,
+     "after": 24,
+     "behind": false
+    },
+    {
+     "i": 10,
+     "arrive": 28,
+     "before": 24,
+     "after": 24,
+     "behind": false
+    }
+   ],
+   "behind": [
+    4
+   ],
+   "dropped": [
+    4
+   ],
+   "closeFirst": 13.5,
+   "counts": [
+    4,
+    4,
+    3
+   ],
+   "firstCount": 4,
+   "final": 24
+  },
+  "ten": {
+   "delay": 10,
+   "lateness": 0,
+   "trace": [
+    {
+     "i": 0,
+     "arrive": 1.4,
+     "before": null,
+     "after": -9,
+     "behind": false
+    },
+    {
+     "i": 1,
+     "arrive": 3.3,
+     "before": -9,
+     "after": -7,
+     "behind": false
+    },
+    {
+     "i": 2,
+     "arrive": 4.6,
+     "before": -7,
+     "after": -6,
+     "behind": false
+    },
+    {
+     "i": 3,
+     "arrive": 6.5,
+     "before": -6,
+     "after": -4,
+     "behind": false
+    },
+    {
+     "i": 5,
+     "arrive": 11.4,
+     "before": -4,
+     "after": 1,
+     "behind": false
+    },
+    {
+     "i": 6,
+     "arrive": 13.5,
+     "before": 1,
+     "after": 3,
+     "behind": false
+    },
+    {
+     "i": 7,
+     "arrive": 15.3,
+     "before": 3,
+     "after": 5,
+     "behind": false
+    },
+    {
+     "i": 4,
+     "arrive": 17.2,
+     "before": 5,
+     "after": 5,
+     "behind": false
+    },
+    {
+     "i": 8,
+     "arrive": 18.6,
+     "before": 5,
+     "after": 8,
+     "behind": false
+    },
+    {
+     "i": 9,
+     "arrive": 21.3,
+     "before": 8,
+     "after": 11,
+     "behind": false
+    },
+    {
+     "i": 11,
+     "arrive": 27.4,
+     "before": 11,
+     "after": 17,
+     "behind": false
+    },
+    {
+     "i": 10,
+     "arrive": 28,
+     "before": 17,
+     "after": 17,
+     "behind": false
+    }
+   ],
+   "behind": [],
+   "dropped": [],
+   "closeFirst": 21.3,
+   "counts": [
+    5,
+    4,
+    3
+   ],
+   "firstCount": 5,
+   "final": 17
+  },
+  "threeLate": {
+   "delay": 3,
+   "lateness": 10,
+   "trace": [
+    {
+     "i": 0,
+     "arrive": 1.4,
+     "before": null,
+     "after": -2,
+     "behind": false
+    },
+    {
+     "i": 1,
+     "arrive": 3.3,
+     "before": -2,
+     "after": 0,
+     "behind": false
+    },
+    {
+     "i": 2,
+     "arrive": 4.6,
+     "before": 0,
+     "after": 1,
+     "behind": false
+    },
+    {
+     "i": 3,
+     "arrive": 6.5,
+     "before": 1,
+     "after": 3,
+     "behind": false
+    },
+    {
+     "i": 5,
+     "arrive": 11.4,
+     "before": 3,
+     "after": 8,
+     "behind": false
+    },
+    {
+     "i": 6,
+     "arrive": 13.5,
+     "before": 8,
+     "after": 10,
+     "behind": false
+    },
+    {
+     "i": 7,
+     "arrive": 15.3,
+     "before": 10,
+     "after": 12,
+     "behind": false
+    },
+    {
+     "i": 4,
+     "arrive": 17.2,
+     "before": 12,
+     "after": 12,
+     "behind": true
+    },
+    {
+     "i": 8,
+     "arrive": 18.6,
+     "before": 12,
+     "after": 15,
+     "behind": false
+    },
+    {
+     "i": 9,
+     "arrive": 21.3,
+     "before": 15,
+     "after": 18,
+     "behind": false
+    },
+    {
+     "i": 11,
+     "arrive": 27.4,
+     "before": 18,
+     "after": 24,
+     "behind": false
+    },
+    {
+     "i": 10,
+     "arrive": 28,
+     "before": 24,
+     "after": 24,
+     "behind": false
+    }
+   ],
+   "behind": [
+    4
+   ],
+   "dropped": [],
+   "closeFirst": 13.5,
+   "counts": [
+    5,
+    4,
+    3
+   ],
+   "firstCount": 5,
+   "final": 24
+  },
+  "dee": 4,
+  "deeAt": 17.2,
+  "deeBehind": 12,
+  "firstOnTime": 4,
+  "firstFinal": 5,
+  "closeLater": 7.8
+ },
+ "delivery": {
+  "messages": 1000,
+  "batch": 50,
+  "crashes": [
+   {
+    "crash": 232,
+    "batch": 200
+   },
+   {
+    "crash": 379,
+    "batch": 350
+   },
+   {
+    "crash": 985,
+    "batch": 950
+   }
+  ],
+  "lost": 54,
+  "duplicates": 96,
+  "blindRows": 1096,
+  "idempotentRows": 1000
+ },
+ "backpressure": {
+  "rate": 100,
+  "one": 80,
+  "two": 160,
+  "join": 60,
+  "meanIn": 99,
+  "lag": [
+   10,
+   25,
+   50,
+   85,
+   90,
+   108,
+   127,
+   139,
+   163,
+   180,
+   209,
+   238,
+   245,
+   252,
+   270,
+   279,
+   316,
+   339,
+   360,
+   396,
+   437,
+   467,
+   509,
+   544,
+   562,
+   585,
+   599,
+   629,
+   646,
+   658,
+   684,
+   695,
+   697,
+   711,
+   714,
+   740,
+   763,
+   771,
+   777,
+   803,
+   822,
+   854,
+   883,
+   891,
+   890,
+   919,
+   939,
+   965,
+   993,
+   997,
+   996,
+   1022,
+   1041,
+   1061,
+   1063,
+   1074,
+   1091,
+   1104,
+   1109,
+   1143,
+   1091,
+   1028,
+   962,
+   904,
+   829,
+   771,
+   709,
+   646,
+   592,
+   526,
+   468,
+   395,
+   338,
+   278,
+   197,
+   140,
+   66,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "atJoin": 1143,
+  "drainedAt": 78,
+  "drainSeconds": 18
+ },
+ "compaction": {
+  "log": [
+   {
+    "offset": 0,
+    "user": "ava",
+    "version": 1,
+    "kept": false
+   },
+   {
+    "offset": 1,
+    "user": "ben",
+    "version": 1,
+    "kept": false
+   },
+   {
+    "offset": 2,
+    "user": "ava",
+    "version": 2,
+    "kept": false
+   },
+   {
+    "offset": 3,
+    "user": "cam",
+    "version": 1,
+    "kept": false
+   },
+   {
+    "offset": 4,
+    "user": "ben",
+    "version": 2,
+    "kept": true
+   },
+   {
+    "offset": 5,
+    "user": "ava",
+    "version": 3,
+    "kept": true
+   },
+   {
+    "offset": 6,
+    "user": "dee",
+    "version": 1,
+    "kept": true
+   },
+   {
+    "offset": 7,
+    "user": "cam",
+    "version": 2,
+    "kept": true
+   }
+  ],
+  "kept": 4
+ }
+}

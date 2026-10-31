@@ -1,0 +1,577 @@
+{
+  "engine": {
+    "duckdbWasm": "1.32.0",
+    "duckdb": "v1.4.3"
+  },
+  "table": {
+    "seed": 0.42,
+    "setup": "CREATE TABLE sales AS\nSELECT\n  (i + 1)::INTEGER                                  AS sale_id,\n  DATE '2024-01-01' + (i * 366 // 1000000)::INTEGER  AS sale_date,\n  ['North', 'South', 'East', 'West'][1 + floor(random() * 4)::INTEGER]               AS region,\n  ['Electronics', 'Books', 'Home', 'Garden', 'Toys'][1 + floor(random() * 5)::INTEGER] AS category,\n  (1 + floor(random() * 5))::INTEGER                 AS units,\n  round(5 + random() * 495, 2)::DECIMAL(10,2)        AS amount\nFROM range(1000000) t(i)\nORDER BY i;",
+    "rows": 1000000,
+    "days": 366,
+    "first": "2024-01-01",
+    "last": "2024-12-31",
+    "sample": {
+      "sql": "SELECT * FROM sales ORDER BY sale_id LIMIT 4",
+      "columns": [
+        "sale_id",
+        "sale_date",
+        "region",
+        "category",
+        "units",
+        "amount"
+      ],
+      "rows": [
+        [
+          1,
+          "2024-01-01",
+          "East",
+          "Home",
+          1,
+          "397.83"
+        ],
+        [
+          2,
+          "2024-01-01",
+          "East",
+          "Books",
+          2,
+          "7.12"
+        ],
+        [
+          3,
+          "2024-01-01",
+          "East",
+          "Home",
+          3,
+          "222.16"
+        ],
+        [
+          4,
+          "2024-01-01",
+          "West",
+          "Toys",
+          3,
+          "123.73"
+        ]
+      ]
+    },
+    "regions": [
+      "East",
+      "West",
+      "North",
+      "South"
+    ],
+    "distinct": [
+      1000000,
+      366,
+      4,
+      5,
+      5,
+      49501
+    ],
+    "checksum": "252235844.17"
+  },
+  "files": {
+    "csv": 39191885,
+    "parquet": 9355298,
+    "zstd": 6278819,
+    "uncompressed": 13149627,
+    "codec": "SNAPPY",
+    "rowGroups": 9,
+    "rowGroupRows": 122880
+  },
+  "columns": [
+    {
+      "name": "sale_id",
+      "distinct": 1000000,
+      "csv": 6888904,
+      "parquet": 4000488,
+      "uncompressed": 4000279,
+      "encodings": "PLAIN"
+    },
+    {
+      "name": "sale_date",
+      "distinct": 366,
+      "csv": 11000010,
+      "parquet": 3087,
+      "uncompressed": 3019,
+      "encodings": "PLAIN_DICTIONARY"
+    },
+    {
+      "name": "region",
+      "distinct": 4,
+      "csv": 5499835,
+      "parquet": 379876,
+      "uncompressed": 379814,
+      "encodings": "PLAIN_DICTIONARY"
+    },
+    {
+      "name": "category",
+      "distinct": 5,
+      "csv": 7005008,
+      "parquet": 379975,
+      "uncompressed": 379906,
+      "encodings": "PLAIN_DICTIONARY"
+    },
+    {
+      "name": "units",
+      "distinct": 5,
+      "csv": 2000006,
+      "parquet": 379705,
+      "uncompressed": 379634,
+      "encodings": "PLAIN_DICTIONARY"
+    },
+    {
+      "name": "amount",
+      "distinct": 49501,
+      "csv": 6798122,
+      "parquet": 4205471,
+      "uncompressed": 8000279,
+      "encodings": "PLAIN"
+    }
+  ],
+  "sortedRegion": {
+    "copy": "COPY (SELECT * FROM sales ORDER BY region)\nTO 'by_region.parquet' (FORMAT parquet);",
+    "region": 554
+  },
+  "query": {
+    "page": "SELECT category,\n       SUM(amount) AS revenue,\n       SUM(units)  AS units_sold\nFROM sales\nGROUP BY category\nORDER BY revenue DESC;",
+    "csv": {
+      "sql": "SELECT category,\n       SUM(amount) AS revenue,\n       SUM(units)  AS units_sold\nFROM 'sales.csv'\nGROUP BY category\nORDER BY revenue DESC;",
+      "read": 39191885,
+      "total": 39191885,
+      "columns": [
+        "category",
+        "revenue",
+        "units_sold"
+      ],
+      "rows": [
+        [
+          "Electronics",
+          50711848.029999785,
+          "602375"
+        ],
+        [
+          "Toys",
+          50477511.43000008,
+          "600730"
+        ],
+        [
+          "Home",
+          50396236.77999956,
+          "599213"
+        ],
+        [
+          "Books",
+          50325490.869999364,
+          "598545"
+        ],
+        [
+          "Garden",
+          50324757.05999992,
+          "600080"
+        ]
+      ]
+    },
+    "parquet": {
+      "sql": "SELECT category,\n       SUM(amount) AS revenue,\n       SUM(units)  AS units_sold\nFROM 'sales.parquet'\nGROUP BY category\nORDER BY revenue DESC;",
+      "read": 4976846,
+      "total": 9355298,
+      "columns": [
+        "category",
+        "revenue",
+        "units_sold"
+      ],
+      "rows": [
+        [
+          "Electronics",
+          "50711848.03",
+          "602375"
+        ],
+        [
+          "Toys",
+          "50477511.43",
+          "600730"
+        ],
+        [
+          "Home",
+          "50396236.78",
+          "599213"
+        ],
+        [
+          "Books",
+          "50325490.87",
+          "598545"
+        ],
+        [
+          "Garden",
+          "50324757.06",
+          "600080"
+        ]
+      ]
+    },
+    "csvPlan": {
+      "sql": "SELECT category,\n       SUM(amount) AS revenue,\n       SUM(units)  AS units_sold\nFROM 'sales.csv'\nGROUP BY category\nORDER BY revenue DESC;",
+      "function": "READ_CSV_AUTO",
+      "projections": [
+        "category",
+        "amount",
+        "units"
+      ],
+      "filters": null,
+      "fileFilters": null,
+      "scanning": null,
+      "filesRead": 1
+    },
+    "parquetPlan": {
+      "sql": "SELECT category,\n       SUM(amount) AS revenue,\n       SUM(units)  AS units_sold\nFROM 'sales.parquet'\nGROUP BY category\nORDER BY revenue DESC;",
+      "function": "PARQUET_SCAN",
+      "projections": [
+        "category",
+        "amount",
+        "units"
+      ],
+      "filters": null,
+      "fileFilters": null,
+      "scanning": null,
+      "filesRead": 1
+    }
+  },
+  "partition": {
+    "copy": "COPY (SELECT *, strftime(sale_date, '%Y-%m') AS sale_month FROM sales)\nTO 'by_month' (FORMAT parquet, PARTITION_BY (sale_month));",
+    "files": 12,
+    "names": [
+      "by_month/sale_month=2024-01/data_0.parquet",
+      "by_month/sale_month=2024-02/data_0.parquet",
+      "by_month/sale_month=2024-03/data_0.parquet",
+      "by_month/sale_month=2024-04/data_0.parquet",
+      "by_month/sale_month=2024-05/data_0.parquet",
+      "by_month/sale_month=2024-06/data_0.parquet",
+      "by_month/sale_month=2024-07/data_0.parquet",
+      "by_month/sale_month=2024-08/data_0.parquet",
+      "by_month/sale_month=2024-09/data_0.parquet",
+      "by_month/sale_month=2024-10/data_0.parquet",
+      "by_month/sale_month=2024-11/data_0.parquet",
+      "by_month/sale_month=2024-12/data_0.parquet"
+    ],
+    "rowsPerFile": [
+      79235,
+      84700
+    ],
+    "march": {
+      "sql": "SELECT SUM(amount) AS revenue\nFROM read_parquet('by_month/*/*.parquet',\n                  hive_partitioning = true)\nWHERE sale_month = '2024-03';",
+      "function": "READ_PARQUET",
+      "projections": null,
+      "filters": null,
+      "fileFilters": "(sale_month = '2024-03')",
+      "scanning": "1/12",
+      "filesRead": 1
+    },
+    "region": {
+      "sql": "SELECT SUM(amount) AS revenue\nFROM read_parquet('by_month/*/*.parquet',\n                  hive_partitioning = true)\nWHERE region = 'North';",
+      "function": "READ_PARQUET",
+      "projections": null,
+      "filters": "region='North'",
+      "fileFilters": null,
+      "scanning": null,
+      "filesRead": 12
+    },
+    "fn": {
+      "sql": "SELECT SUM(amount) AS revenue\nFROM read_parquet('by_month/*/*.parquet',\n                  hive_partitioning = true)\nWHERE right(sale_month, 2) = '03';",
+      "function": "READ_PARQUET",
+      "projections": null,
+      "filters": null,
+      "fileFilters": "(\"right\"(sale_month, 2) ='03')",
+      "scanning": "1/12",
+      "filesRead": 1
+    },
+    "marchResult": {
+      "sql": "SELECT SUM(amount) AS revenue\nFROM read_parquet('by_month/*/*.parquet',\n                  hive_partitioning = true)\nWHERE sale_month = '2024-03';",
+      "columns": [
+        "revenue"
+      ],
+      "rows": [
+        [
+          "21378243.73"
+        ]
+      ]
+    },
+    "regionResult": {
+      "sql": "SELECT SUM(amount) AS revenue\nFROM read_parquet('by_month/*/*.parquet',\n                  hive_partitioning = true)\nWHERE region = 'North';",
+      "columns": [
+        "revenue"
+      ],
+      "rows": [
+        [
+          "63091600.03"
+        ]
+      ]
+    }
+  },
+  "cluster": {
+    "range": [
+      "2024-03-01",
+      "2024-03-31"
+    ],
+    "query": "SELECT region, COUNT(*) AS n_sales, AVG(amount) AS avg_amt\nFROM sales\nWHERE sale_date BETWEEN DATE '2024-03-01' AND DATE '2024-03-31'\nGROUP BY region;",
+    "sorted": {
+      "groups": [
+        {
+          "id": 0,
+          "n": 122880,
+          "lo": "2024-01-01",
+          "hi": "2024-02-14"
+        },
+        {
+          "id": 1,
+          "n": 122880,
+          "lo": "2024-02-14",
+          "hi": "2024-03-30"
+        },
+        {
+          "id": 2,
+          "n": 122880,
+          "lo": "2024-03-30",
+          "hi": "2024-05-14"
+        },
+        {
+          "id": 3,
+          "n": 122880,
+          "lo": "2024-05-14",
+          "hi": "2024-06-28"
+        },
+        {
+          "id": 4,
+          "n": 122880,
+          "lo": "2024-06-28",
+          "hi": "2024-08-12"
+        },
+        {
+          "id": 5,
+          "n": 122880,
+          "lo": "2024-08-12",
+          "hi": "2024-09-26"
+        },
+        {
+          "id": 6,
+          "n": 122880,
+          "lo": "2024-09-26",
+          "hi": "2024-11-10"
+        },
+        {
+          "id": 7,
+          "n": 122880,
+          "lo": "2024-11-10",
+          "hi": "2024-12-25"
+        },
+        {
+          "id": 8,
+          "n": 16960,
+          "lo": "2024-12-25",
+          "hi": "2024-12-31"
+        }
+      ],
+      "overlapping": 2,
+      "sql": "SELECT region, COUNT(*) AS n_sales, AVG(amount) AS avg_amt\nFROM 'sales.parquet'\nWHERE sale_date BETWEEN DATE '2024-03-01' AND DATE '2024-03-31'\nGROUP BY region;",
+      "read": 1133966,
+      "total": 9355298,
+      "columns": [
+        "region",
+        "n_sales",
+        "avg_amt"
+      ],
+      "rows": [
+        [
+          "West",
+          21258,
+          252.23313623106594
+        ],
+        [
+          "South",
+          20938,
+          252.50763778775433
+        ],
+        [
+          "North",
+          21235,
+          251.16064469036968
+        ],
+        [
+          "East",
+          21268,
+          253.70841216851608
+        ]
+      ]
+    },
+    "shuffled": {
+      "file": 10498860,
+      "groups": [
+        {
+          "id": 0,
+          "n": 122880,
+          "lo": "2024-01-01",
+          "hi": "2024-12-31"
+        },
+        {
+          "id": 1,
+          "n": 122880,
+          "lo": "2024-01-01",
+          "hi": "2024-12-31"
+        },
+        {
+          "id": 2,
+          "n": 122880,
+          "lo": "2024-01-01",
+          "hi": "2024-12-31"
+        },
+        {
+          "id": 3,
+          "n": 122880,
+          "lo": "2024-01-01",
+          "hi": "2024-12-31"
+        },
+        {
+          "id": 4,
+          "n": 122880,
+          "lo": "2024-01-01",
+          "hi": "2024-12-31"
+        },
+        {
+          "id": 5,
+          "n": 122880,
+          "lo": "2024-01-01",
+          "hi": "2024-12-31"
+        },
+        {
+          "id": 6,
+          "n": 122880,
+          "lo": "2024-01-01",
+          "hi": "2024-12-31"
+        },
+        {
+          "id": 7,
+          "n": 122880,
+          "lo": "2024-01-01",
+          "hi": "2024-12-31"
+        },
+        {
+          "id": 8,
+          "n": 16960,
+          "lo": "2024-01-01",
+          "hi": "2024-12-31"
+        }
+      ],
+      "overlapping": 9,
+      "sql": "SELECT region, COUNT(*) AS n_sales, AVG(amount) AS avg_amt\nFROM 'shuffled.parquet'\nWHERE sale_date BETWEEN DATE '2024-03-01' AND DATE '2024-03-31'\nGROUP BY region;",
+      "read": 5741446,
+      "total": 10498860,
+      "columns": [
+        "region",
+        "n_sales",
+        "avg_amt"
+      ],
+      "rows": [
+        [
+          "North",
+          21235,
+          251.16064469036968
+        ],
+        [
+          "West",
+          21258,
+          252.23313623106594
+        ],
+        [
+          "South",
+          20938,
+          252.50763778775433
+        ],
+        [
+          "East",
+          21268,
+          253.70841216851608
+        ]
+      ]
+    }
+  },
+  "small": {
+    "copy": "COPY sales TO 'by_day' (FORMAT parquet, PARTITION_BY (sale_date));",
+    "one": {
+      "files": 1,
+      "bytes": 9355298,
+      "footers": 4736,
+      "read": 1
+    },
+    "month": {
+      "files": 12,
+      "bytes": 9363095,
+      "avg": 780258,
+      "footers": 8111,
+      "read": 12
+    },
+    "day": {
+      "files": 366,
+      "bytes": 9812895,
+      "avg": 26811,
+      "smallest": 26766,
+      "largest": 26856,
+      "footers": 206058,
+      "rowsPerFile": [
+        2732,
+        2733
+      ],
+      "read": 366
+    },
+    "target": {
+      "lo": 134217728,
+      "hi": 1073741824
+    }
+  },
+  "cost": {
+    "csv": {
+      "read": 39191885,
+      "total": 39191885
+    },
+    "parquet": {
+      "read": 4976846,
+      "total": 9355298
+    },
+    "march": {
+      "sql": "SELECT category,\n       SUM(amount) AS revenue,\n       SUM(units)  AS units_sold\nFROM read_parquet('by_month/*/*.parquet', hive_partitioning = true)\nWHERE sale_month = '2024-03'\nGROUP BY category\nORDER BY revenue DESC;",
+      "read": 423033,
+      "total": 9363095,
+      "columns": [
+        "category",
+        "revenue",
+        "units_sold"
+      ],
+      "rows": [
+        [
+          "Electronics",
+          "4300841.27",
+          "50845"
+        ],
+        [
+          "Books",
+          "4297688.03",
+          "51119"
+        ],
+        [
+          "Toys",
+          "4271578.91",
+          "50566"
+        ],
+        [
+          "Home",
+          "4268288.01",
+          "50584"
+        ],
+        [
+          "Garden",
+          "4239847.51",
+          "50629"
+        ]
+      ]
+    }
+  }
+}

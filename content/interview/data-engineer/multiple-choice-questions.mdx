@@ -50,7 +50,7 @@ reasoning and runnable examples.
 - Statistics are out of date.
   > Stale statistics skew join order, but pruning is driven by the predicate.
 - [o] The filter is not on the partition column, or wraps it.
-  > A function applied to the column stops the engine pruning. \`WHERE DATE(event_ts) = '2026-01-01'\` defeats pruning on \`event_ts\`; a bare range predicate preserves it.
+  > A function applied to the column stops many engines pruning: in Postgres, \`WHERE DATE(event_ts) = '2026-01-01'\` scans every partition of a table partitioned on \`event_ts\`. A bare range predicate prunes on every engine.
 - The table is not indexed.
   > Columnar engines generally have no secondary indexes; pruning takes their place.
 - The table has been split into far too many very small partitions.

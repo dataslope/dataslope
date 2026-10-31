@@ -89,7 +89,8 @@ WHERE event_date = '2024-06-01'
 GROUP BY user_id, event_type
 ORDER BY user_id, event_type;
 
--- Pruning DEFEAT: wrapping the column in a function prevents pruning.
+-- Wrapping the column in a function defeats pruning on many engines
+-- (Postgres among them); a range on the raw column prunes on all of them.
 -- WHERE YEAR(event_date) = 2024   -- avoid this pattern`}
 />
 
@@ -263,7 +264,7 @@ lands in the `data-lake` bucket, polling every 5 minutes in
 `reschedule` mode and failing after a 2-hour `timeout`.
 
 ```python
-from airflow.sensors.s3_key_sensor import S3KeySensor
+from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 
 wait_for_file = S3KeySensor(
     task_id="wait_for_daily_export",

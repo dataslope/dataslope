@@ -1,0 +1,2382 @@
+{
+  "figures": {
+    "rank": {
+      "setup": "CREATE TABLE players (name VARCHAR, score INTEGER);\nINSERT INTO players VALUES\n  ('Alice', 95), ('Bob', 80), ('Carol', 80), ('Dave', 70),\n  ('Erin', 97), ('Frank', 78), ('Grace', 91), ('Hugo', 80),\n  ('Iris', 72), ('Jonas', 88), ('Kira', 95), ('Leo', 64),\n  ('Mona', 80), ('Nils', 99), ('Otto', 76), ('Pia', 88),\n  ('Quinn', 69), ('Rui', 93), ('Sara', 85), ('Theo', 71),\n  ('Ulla', 82), ('Vik', 96), ('Wanda', 74), ('Yara', 88);",
+      "steps": {
+        "page": {
+          "sql": "SELECT name, score,\n  ROW_NUMBER() OVER (ORDER BY score DESC) AS rn,\n  RANK()       OVER (ORDER BY score DESC) AS rnk,\n  DENSE_RANK() OVER (ORDER BY score DESC) AS dr\nFROM players;",
+          "ok": true,
+          "columns": [
+            "name",
+            "score",
+            "rn",
+            "rnk",
+            "dr"
+          ],
+          "rows": [
+            [
+              "Nils",
+              99,
+              1,
+              1,
+              1
+            ],
+            [
+              "Erin",
+              97,
+              2,
+              2,
+              2
+            ],
+            [
+              "Vik",
+              96,
+              3,
+              3,
+              3
+            ],
+            [
+              "Kira",
+              95,
+              4,
+              4,
+              4
+            ],
+            [
+              "Alice",
+              95,
+              5,
+              4,
+              4
+            ],
+            [
+              "Rui",
+              93,
+              6,
+              6,
+              5
+            ],
+            [
+              "Grace",
+              91,
+              7,
+              7,
+              6
+            ],
+            [
+              "Yara",
+              88,
+              8,
+              8,
+              7
+            ],
+            [
+              "Jonas",
+              88,
+              9,
+              8,
+              7
+            ],
+            [
+              "Pia",
+              88,
+              10,
+              8,
+              7
+            ],
+            [
+              "Sara",
+              85,
+              11,
+              11,
+              8
+            ],
+            [
+              "Ulla",
+              82,
+              12,
+              12,
+              9
+            ],
+            [
+              "Hugo",
+              80,
+              13,
+              13,
+              10
+            ],
+            [
+              "Carol",
+              80,
+              14,
+              13,
+              10
+            ],
+            [
+              "Bob",
+              80,
+              15,
+              13,
+              10
+            ],
+            [
+              "Mona",
+              80,
+              16,
+              13,
+              10
+            ],
+            [
+              "Frank",
+              78,
+              17,
+              17,
+              11
+            ],
+            [
+              "Otto",
+              76,
+              18,
+              18,
+              12
+            ],
+            [
+              "Wanda",
+              74,
+              19,
+              19,
+              13
+            ],
+            [
+              "Iris",
+              72,
+              20,
+              20,
+              14
+            ],
+            [
+              "Theo",
+              71,
+              21,
+              21,
+              15
+            ],
+            [
+              "Dave",
+              70,
+              22,
+              22,
+              16
+            ],
+            [
+              "Quinn",
+              69,
+              23,
+              23,
+              17
+            ],
+            [
+              "Leo",
+              64,
+              24,
+              24,
+              18
+            ]
+          ]
+        },
+        "ordered": {
+          "sql": "SELECT name, score,\n  ROW_NUMBER() OVER (ORDER BY score DESC) AS rn,\n  RANK()       OVER (ORDER BY score DESC) AS rnk,\n  DENSE_RANK() OVER (ORDER BY score DESC) AS dr\nFROM players\nORDER BY rn;",
+          "ok": true,
+          "columns": [
+            "name",
+            "score",
+            "rn",
+            "rnk",
+            "dr"
+          ],
+          "rows": [
+            [
+              "Nils",
+              99,
+              1,
+              1,
+              1
+            ],
+            [
+              "Erin",
+              97,
+              2,
+              2,
+              2
+            ],
+            [
+              "Vik",
+              96,
+              3,
+              3,
+              3
+            ],
+            [
+              "Kira",
+              95,
+              4,
+              4,
+              4
+            ],
+            [
+              "Alice",
+              95,
+              5,
+              4,
+              4
+            ],
+            [
+              "Rui",
+              93,
+              6,
+              6,
+              5
+            ],
+            [
+              "Grace",
+              91,
+              7,
+              7,
+              6
+            ],
+            [
+              "Yara",
+              88,
+              8,
+              8,
+              7
+            ],
+            [
+              "Jonas",
+              88,
+              9,
+              8,
+              7
+            ],
+            [
+              "Pia",
+              88,
+              10,
+              8,
+              7
+            ],
+            [
+              "Sara",
+              85,
+              11,
+              11,
+              8
+            ],
+            [
+              "Ulla",
+              82,
+              12,
+              12,
+              9
+            ],
+            [
+              "Hugo",
+              80,
+              13,
+              13,
+              10
+            ],
+            [
+              "Carol",
+              80,
+              14,
+              13,
+              10
+            ],
+            [
+              "Bob",
+              80,
+              15,
+              13,
+              10
+            ],
+            [
+              "Mona",
+              80,
+              16,
+              13,
+              10
+            ],
+            [
+              "Frank",
+              78,
+              17,
+              17,
+              11
+            ],
+            [
+              "Otto",
+              76,
+              18,
+              18,
+              12
+            ],
+            [
+              "Wanda",
+              74,
+              19,
+              19,
+              13
+            ],
+            [
+              "Iris",
+              72,
+              20,
+              20,
+              14
+            ],
+            [
+              "Theo",
+              71,
+              21,
+              21,
+              15
+            ],
+            [
+              "Dave",
+              70,
+              22,
+              22,
+              16
+            ],
+            [
+              "Quinn",
+              69,
+              23,
+              23,
+              17
+            ],
+            [
+              "Leo",
+              64,
+              24,
+              24,
+              18
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "latest": {
+      "setup": "CREATE TABLE events (user_id INTEGER, event_time TIMESTAMP, status VARCHAR);\nINSERT INTO events VALUES\n  (1, TIMESTAMP '2024-01-01 10:00', 'signup'),\n  (1, TIMESTAMP '2024-01-03 09:00', 'active'),\n  (1, TIMESTAMP '2024-01-09 14:00', 'active'),\n  (2, TIMESTAMP '2024-01-02 12:00', 'signup'),\n  (2, TIMESTAMP '2024-01-05 08:00', 'churn'),\n  (2, TIMESTAMP '2024-01-04 15:00', 'active'),\n  (3, TIMESTAMP '2024-01-01 11:00', 'signup'),\n  (3, TIMESTAMP '2024-01-06 16:00', 'active'),\n  (3, TIMESTAMP '2024-01-12 10:30', 'churn'),\n  (4, TIMESTAMP '2024-01-03 08:15', 'signup'),\n  (4, TIMESTAMP '2024-01-07 13:45', 'active'),\n  (5, TIMESTAMP '2024-01-04 09:20', 'signup'),\n  (5, TIMESTAMP '2024-01-08 11:10', 'active'),\n  (5, TIMESTAMP '2024-01-15 17:00', 'active'),\n  (6, TIMESTAMP '2024-01-05 10:05', 'signup'),\n  (6, TIMESTAMP '2024-01-11 12:30', 'churn'),\n  (7, TIMESTAMP '2024-01-06 14:40', 'signup'),\n  (7, TIMESTAMP '2024-01-13 09:50', 'active'),\n  (8, TIMESTAMP '2024-01-07 15:25', 'signup'),\n  (8, TIMESTAMP '2024-01-14 08:35', 'active'),\n  (8, TIMESTAMP '2024-01-20 16:15', 'churn'),\n  (9, TIMESTAMP '2024-01-08 11:55', 'signup'),\n  (9, TIMESTAMP '2024-01-16 13:05', 'active'),\n  (10, TIMESTAMP '2024-01-09 10:45', 'signup');",
+      "steps": {
+        "rows": {
+          "sql": "SELECT COUNT(*) AS events, COUNT(DISTINCT user_id) AS users FROM events;",
+          "ok": true,
+          "columns": [
+            "events",
+            "users"
+          ],
+          "rows": [
+            [
+              24,
+              10
+            ]
+          ]
+        },
+        "numbered": {
+          "sql": "SELECT user_id, event_time, status,\n  ROW_NUMBER() OVER (\n    PARTITION BY user_id ORDER BY event_time DESC) AS rn\nFROM events\nWHERE user_id <= 3\nORDER BY user_id, rn;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "event_time",
+            "status",
+            "rn"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-09 14:00:00",
+              "active",
+              1
+            ],
+            [
+              1,
+              "2024-01-03 09:00:00",
+              "active",
+              2
+            ],
+            [
+              1,
+              "2024-01-01 10:00:00",
+              "signup",
+              3
+            ],
+            [
+              2,
+              "2024-01-05 08:00:00",
+              "churn",
+              1
+            ],
+            [
+              2,
+              "2024-01-04 15:00:00",
+              "active",
+              2
+            ],
+            [
+              2,
+              "2024-01-02 12:00:00",
+              "signup",
+              3
+            ],
+            [
+              3,
+              "2024-01-12 10:30:00",
+              "churn",
+              1
+            ],
+            [
+              3,
+              "2024-01-06 16:00:00",
+              "active",
+              2
+            ],
+            [
+              3,
+              "2024-01-01 11:00:00",
+              "signup",
+              3
+            ]
+          ]
+        },
+        "subquery": {
+          "sql": "SELECT user_id, event_time, status\nFROM (\n  SELECT *, ROW_NUMBER() OVER (\n    PARTITION BY user_id ORDER BY event_time DESC) AS rn\n  FROM events\n) t\nWHERE rn = 1\nORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "event_time",
+            "status"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-09 14:00:00",
+              "active"
+            ],
+            [
+              2,
+              "2024-01-05 08:00:00",
+              "churn"
+            ],
+            [
+              3,
+              "2024-01-12 10:30:00",
+              "churn"
+            ],
+            [
+              4,
+              "2024-01-07 13:45:00",
+              "active"
+            ],
+            [
+              5,
+              "2024-01-15 17:00:00",
+              "active"
+            ],
+            [
+              6,
+              "2024-01-11 12:30:00",
+              "churn"
+            ],
+            [
+              7,
+              "2024-01-13 09:50:00",
+              "active"
+            ],
+            [
+              8,
+              "2024-01-20 16:15:00",
+              "churn"
+            ],
+            [
+              9,
+              "2024-01-16 13:05:00",
+              "active"
+            ],
+            [
+              10,
+              "2024-01-09 10:45:00",
+              "signup"
+            ]
+          ]
+        },
+        "qualify": {
+          "sql": "SELECT *\nFROM events\nQUALIFY ROW_NUMBER() OVER (\n  PARTITION BY user_id ORDER BY event_time DESC\n) = 1\nORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "event_time",
+            "status"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-09 14:00:00",
+              "active"
+            ],
+            [
+              2,
+              "2024-01-05 08:00:00",
+              "churn"
+            ],
+            [
+              3,
+              "2024-01-12 10:30:00",
+              "churn"
+            ],
+            [
+              4,
+              "2024-01-07 13:45:00",
+              "active"
+            ],
+            [
+              5,
+              "2024-01-15 17:00:00",
+              "active"
+            ],
+            [
+              6,
+              "2024-01-11 12:30:00",
+              "churn"
+            ],
+            [
+              7,
+              "2024-01-13 09:50:00",
+              "active"
+            ],
+            [
+              8,
+              "2024-01-20 16:15:00",
+              "churn"
+            ],
+            [
+              9,
+              "2024-01-16 13:05:00",
+              "active"
+            ],
+            [
+              10,
+              "2024-01-09 10:45:00",
+              "signup"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "latestTie": {
+      "setup": "CREATE TABLE events (user_id INTEGER, event_time TIMESTAMP, status VARCHAR);\nINSERT INTO events VALUES\n  (1, TIMESTAMP '2024-01-01 10:00', 'signup'),\n  (1, TIMESTAMP '2024-01-03 09:00', 'active'),\n  (1, TIMESTAMP '2024-01-09 14:00', 'active'),\n  (2, TIMESTAMP '2024-01-02 12:00', 'signup'),\n  (2, TIMESTAMP '2024-01-05 08:00', 'churn'),\n  (2, TIMESTAMP '2024-01-04 15:00', 'active'),\n  (3, TIMESTAMP '2024-01-01 11:00', 'signup'),\n  (3, TIMESTAMP '2024-01-06 16:00', 'active'),\n  (3, TIMESTAMP '2024-01-12 10:30', 'churn'),\n  (4, TIMESTAMP '2024-01-03 08:15', 'signup'),\n  (4, TIMESTAMP '2024-01-07 13:45', 'active'),\n  (5, TIMESTAMP '2024-01-04 09:20', 'signup'),\n  (5, TIMESTAMP '2024-01-08 11:10', 'active'),\n  (5, TIMESTAMP '2024-01-15 17:00', 'active'),\n  (6, TIMESTAMP '2024-01-05 10:05', 'signup'),\n  (6, TIMESTAMP '2024-01-11 12:30', 'churn'),\n  (7, TIMESTAMP '2024-01-06 14:40', 'signup'),\n  (7, TIMESTAMP '2024-01-13 09:50', 'active'),\n  (8, TIMESTAMP '2024-01-07 15:25', 'signup'),\n  (8, TIMESTAMP '2024-01-14 08:35', 'active'),\n  (8, TIMESTAMP '2024-01-20 16:15', 'churn'),\n  (9, TIMESTAMP '2024-01-08 11:55', 'signup'),\n  (9, TIMESTAMP '2024-01-16 13:05', 'active'),\n  (10, TIMESTAMP '2024-01-09 10:45', 'signup');\nINSERT INTO events VALUES (3, TIMESTAMP '2024-01-12 10:30', 'active');",
+      "steps": {
+        "userThree": {
+          "sql": "SELECT user_id, event_time, status FROM events WHERE user_id = 3 ORDER BY event_time DESC, status;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "event_time",
+            "status"
+          ],
+          "rows": [
+            [
+              3,
+              "2024-01-12 10:30:00",
+              "active"
+            ],
+            [
+              3,
+              "2024-01-12 10:30:00",
+              "churn"
+            ],
+            [
+              3,
+              "2024-01-06 16:00:00",
+              "active"
+            ],
+            [
+              3,
+              "2024-01-01 11:00:00",
+              "signup"
+            ]
+          ]
+        },
+        "userThreeRanks": {
+          "sql": "SELECT event_time, status,\n  RANK() OVER (ORDER BY event_time DESC) AS rnk\nFROM events\nWHERE user_id = 3\nORDER BY rnk, status;",
+          "ok": true,
+          "columns": [
+            "event_time",
+            "status",
+            "rnk"
+          ],
+          "rows": [
+            [
+              "2024-01-12 10:30:00",
+              "active",
+              1
+            ],
+            [
+              "2024-01-12 10:30:00",
+              "churn",
+              1
+            ],
+            [
+              "2024-01-06 16:00:00",
+              "active",
+              3
+            ],
+            [
+              "2024-01-01 11:00:00",
+              "signup",
+              4
+            ]
+          ]
+        },
+        "rank": {
+          "sql": "SELECT user_id, event_time, status\nFROM (\n  SELECT *, RANK() OVER (\n    PARTITION BY user_id ORDER BY event_time DESC) AS rn\n  FROM events\n) t\nWHERE rn = 1\nORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "event_time",
+            "status"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-09 14:00:00",
+              "active"
+            ],
+            [
+              2,
+              "2024-01-05 08:00:00",
+              "churn"
+            ],
+            [
+              3,
+              "2024-01-12 10:30:00",
+              "churn"
+            ],
+            [
+              3,
+              "2024-01-12 10:30:00",
+              "active"
+            ],
+            [
+              4,
+              "2024-01-07 13:45:00",
+              "active"
+            ],
+            [
+              5,
+              "2024-01-15 17:00:00",
+              "active"
+            ],
+            [
+              6,
+              "2024-01-11 12:30:00",
+              "churn"
+            ],
+            [
+              7,
+              "2024-01-13 09:50:00",
+              "active"
+            ],
+            [
+              8,
+              "2024-01-20 16:15:00",
+              "churn"
+            ],
+            [
+              9,
+              "2024-01-16 13:05:00",
+              "active"
+            ],
+            [
+              10,
+              "2024-01-09 10:45:00",
+              "signup"
+            ]
+          ]
+        },
+        "rowNumber": {
+          "sql": "SELECT user_id, event_time, status\nFROM (\n  SELECT *, ROW_NUMBER() OVER (\n    PARTITION BY user_id ORDER BY event_time DESC) AS rn\n  FROM events\n) t\nWHERE rn = 1\nORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "event_time",
+            "status"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-09 14:00:00",
+              "active"
+            ],
+            [
+              2,
+              "2024-01-05 08:00:00",
+              "churn"
+            ],
+            [
+              3,
+              "2024-01-12 10:30:00",
+              "churn"
+            ],
+            [
+              4,
+              "2024-01-07 13:45:00",
+              "active"
+            ],
+            [
+              5,
+              "2024-01-15 17:00:00",
+              "active"
+            ],
+            [
+              6,
+              "2024-01-11 12:30:00",
+              "churn"
+            ],
+            [
+              7,
+              "2024-01-13 09:50:00",
+              "active"
+            ],
+            [
+              8,
+              "2024-01-20 16:15:00",
+              "churn"
+            ],
+            [
+              9,
+              "2024-01-16 13:05:00",
+              "active"
+            ],
+            [
+              10,
+              "2024-01-09 10:45:00",
+              "signup"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "moving": {
+      "setup": "CREATE TABLE daily_metrics (event_date DATE, daily_value INTEGER);\nINSERT INTO daily_metrics VALUES\n  (DATE '2024-01-01', 120), (DATE '2024-01-02', 135), (DATE '2024-01-03', 110),\n  (DATE '2024-01-05', 150), (DATE '2024-01-06', 140), (DATE '2024-01-10', 160),\n  (DATE '2024-01-11', 155), (DATE '2024-01-12', 170), (DATE '2024-01-13', 180);",
+      "steps": {
+        "table": {
+          "sql": "SELECT event_date, daily_value FROM daily_metrics ORDER BY event_date;",
+          "ok": true,
+          "columns": [
+            "event_date",
+            "daily_value"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              120
+            ],
+            [
+              "2024-01-02",
+              135
+            ],
+            [
+              "2024-01-03",
+              110
+            ],
+            [
+              "2024-01-05",
+              150
+            ],
+            [
+              "2024-01-06",
+              140
+            ],
+            [
+              "2024-01-10",
+              160
+            ],
+            [
+              "2024-01-11",
+              155
+            ],
+            [
+              "2024-01-12",
+              170
+            ],
+            [
+              "2024-01-13",
+              180
+            ]
+          ]
+        },
+        "page": {
+          "sql": "SELECT\n  event_date,\n  daily_value,\n  AVG(daily_value) OVER (\n    ORDER BY event_date\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW\n  ) AS moving_avg_7d\nFROM daily_metrics\nORDER BY event_date;",
+          "ok": true,
+          "columns": [
+            "event_date",
+            "daily_value",
+            "moving_avg_7d"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              120,
+              120
+            ],
+            [
+              "2024-01-02",
+              135,
+              127.5
+            ],
+            [
+              "2024-01-03",
+              110,
+              121.66666666666667
+            ],
+            [
+              "2024-01-05",
+              150,
+              128.75
+            ],
+            [
+              "2024-01-06",
+              140,
+              131
+            ],
+            [
+              "2024-01-10",
+              160,
+              135.83333333333334
+            ],
+            [
+              "2024-01-11",
+              155,
+              138.57142857142858
+            ],
+            [
+              "2024-01-12",
+              170,
+              145.71428571428572
+            ],
+            [
+              "2024-01-13",
+              180,
+              152.14285714285714
+            ]
+          ]
+        },
+        "rows": {
+          "sql": "SELECT event_date, daily_value,\n  ROUND(AVG(daily_value) OVER w, 1) AS avg_7,\n  MIN(event_date) OVER w AS frame_start,\n  COUNT(*) OVER w AS n\nFROM daily_metrics\nWINDOW w AS (ORDER BY event_date\n  ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)\nORDER BY event_date;",
+          "ok": true,
+          "columns": [
+            "event_date",
+            "daily_value",
+            "avg_7",
+            "frame_start",
+            "n"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              120,
+              120,
+              "2024-01-01",
+              1
+            ],
+            [
+              "2024-01-02",
+              135,
+              127.5,
+              "2024-01-01",
+              2
+            ],
+            [
+              "2024-01-03",
+              110,
+              121.7,
+              "2024-01-01",
+              3
+            ],
+            [
+              "2024-01-05",
+              150,
+              128.8,
+              "2024-01-01",
+              4
+            ],
+            [
+              "2024-01-06",
+              140,
+              131,
+              "2024-01-01",
+              5
+            ],
+            [
+              "2024-01-10",
+              160,
+              135.8,
+              "2024-01-01",
+              6
+            ],
+            [
+              "2024-01-11",
+              155,
+              138.6,
+              "2024-01-01",
+              7
+            ],
+            [
+              "2024-01-12",
+              170,
+              145.7,
+              "2024-01-02",
+              7
+            ],
+            [
+              "2024-01-13",
+              180,
+              152.1,
+              "2024-01-03",
+              7
+            ]
+          ]
+        },
+        "range": {
+          "sql": "SELECT event_date, daily_value,\n  ROUND(AVG(daily_value) OVER w, 1) AS avg_7,\n  MIN(event_date) OVER w AS frame_start,\n  COUNT(*) OVER w AS n\nFROM daily_metrics\nWINDOW w AS (ORDER BY event_date\n  RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW)\nORDER BY event_date;",
+          "ok": true,
+          "columns": [
+            "event_date",
+            "daily_value",
+            "avg_7",
+            "frame_start",
+            "n"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              120,
+              120,
+              "2024-01-01",
+              1
+            ],
+            [
+              "2024-01-02",
+              135,
+              127.5,
+              "2024-01-01",
+              2
+            ],
+            [
+              "2024-01-03",
+              110,
+              121.7,
+              "2024-01-01",
+              3
+            ],
+            [
+              "2024-01-05",
+              150,
+              128.8,
+              "2024-01-01",
+              4
+            ],
+            [
+              "2024-01-06",
+              140,
+              131,
+              "2024-01-01",
+              5
+            ],
+            [
+              "2024-01-10",
+              160,
+              150,
+              "2024-01-05",
+              3
+            ],
+            [
+              "2024-01-11",
+              155,
+              151.3,
+              "2024-01-05",
+              4
+            ],
+            [
+              "2024-01-12",
+              170,
+              156.3,
+              "2024-01-06",
+              4
+            ],
+            [
+              "2024-01-13",
+              180,
+              166.3,
+              "2024-01-10",
+              4
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "spine": {
+      "setup": "CREATE TABLE daily_metrics (event_date DATE, daily_value INTEGER);\nINSERT INTO daily_metrics VALUES\n  (DATE '2024-01-01', 120), (DATE '2024-01-02', 135), (DATE '2024-01-03', 110),\n  (DATE '2024-01-05', 150), (DATE '2024-01-06', 140), (DATE '2024-01-10', 160),\n  (DATE '2024-01-11', 155), (DATE '2024-01-12', 170), (DATE '2024-01-13', 180);",
+      "steps": {
+        "pageSpine": {
+          "sql": "WITH spine AS (\n  SELECT generate_series(\n    DATE '2024-01-01', DATE '2024-01-31', INTERVAL '1 day'\n  )::date AS day\n)\nSELECT\n  s.day,\n  COALESCE(m.daily_value, 0) AS daily_value\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nORDER BY s.day;",
+          "ok": false,
+          "error": "Conversion Error: Unimplemented type for cast (TIMESTAMP[] -> DATE)"
+        },
+        "joined": {
+          "sql": "WITH spine AS (\n  SELECT CAST(day AS DATE) AS day\n  FROM generate_series(DATE '2024-01-01',\n    DATE '2024-01-13', INTERVAL 1 DAY) AS t(day)\n)\nSELECT s.day, m.daily_value\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nORDER BY s.day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "daily_value"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              120
+            ],
+            [
+              "2024-01-02",
+              135
+            ],
+            [
+              "2024-01-03",
+              110
+            ],
+            [
+              "2024-01-04",
+              null
+            ],
+            [
+              "2024-01-05",
+              150
+            ],
+            [
+              "2024-01-06",
+              140
+            ],
+            [
+              "2024-01-07",
+              null
+            ],
+            [
+              "2024-01-08",
+              null
+            ],
+            [
+              "2024-01-09",
+              null
+            ],
+            [
+              "2024-01-10",
+              160
+            ],
+            [
+              "2024-01-11",
+              155
+            ],
+            [
+              "2024-01-12",
+              170
+            ],
+            [
+              "2024-01-13",
+              180
+            ]
+          ]
+        },
+        "gaps": {
+          "sql": "WITH spine AS (\n  SELECT CAST(day AS DATE) AS day\n  FROM generate_series(DATE '2024-01-01',\n    DATE '2024-01-13', INTERVAL 1 DAY) AS t(day)\n)\nSELECT s.day\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nWHERE m.event_date IS NULL\nORDER BY s.day;",
+          "ok": true,
+          "columns": [
+            "day"
+          ],
+          "rows": [
+            [
+              "2024-01-04"
+            ],
+            [
+              "2024-01-07"
+            ],
+            [
+              "2024-01-08"
+            ],
+            [
+              "2024-01-09"
+            ]
+          ]
+        },
+        "filled": {
+          "sql": "WITH spine AS (\n  SELECT CAST(day AS DATE) AS day\n  FROM generate_series(DATE '2024-01-01',\n    DATE '2024-01-13', INTERVAL 1 DAY) AS t(day)\n)\nSELECT s.day, COALESCE(m.daily_value, 0) AS daily_value\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nORDER BY s.day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "daily_value"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              120
+            ],
+            [
+              "2024-01-02",
+              135
+            ],
+            [
+              "2024-01-03",
+              110
+            ],
+            [
+              "2024-01-04",
+              0
+            ],
+            [
+              "2024-01-05",
+              150
+            ],
+            [
+              "2024-01-06",
+              140
+            ],
+            [
+              "2024-01-07",
+              0
+            ],
+            [
+              "2024-01-08",
+              0
+            ],
+            [
+              "2024-01-09",
+              0
+            ],
+            [
+              "2024-01-10",
+              160
+            ],
+            [
+              "2024-01-11",
+              155
+            ],
+            [
+              "2024-01-12",
+              170
+            ],
+            [
+              "2024-01-13",
+              180
+            ]
+          ]
+        },
+        "filledAvg": {
+          "sql": "WITH spine AS (\n  SELECT CAST(day AS DATE) AS day\n  FROM generate_series(DATE '2024-01-01',\n    DATE '2024-01-13', INTERVAL 1 DAY) AS t(day)\n),\nfilled AS (\n  SELECT s.day, COALESCE(m.daily_value, 0) AS daily_value\n  FROM spine s\n  LEFT JOIN daily_metrics m ON m.event_date = s.day\n)\nSELECT day, daily_value,\n  ROUND(AVG(daily_value) OVER (ORDER BY day\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 1) AS avg_7,\n  MIN(day) OVER (ORDER BY day\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS frame_start\nFROM filled\nORDER BY day;",
+          "ok": true,
+          "columns": [
+            "day",
+            "daily_value",
+            "avg_7",
+            "frame_start"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              120,
+              120,
+              "2024-01-01"
+            ],
+            [
+              "2024-01-02",
+              135,
+              127.5,
+              "2024-01-01"
+            ],
+            [
+              "2024-01-03",
+              110,
+              121.7,
+              "2024-01-01"
+            ],
+            [
+              "2024-01-04",
+              0,
+              91.3,
+              "2024-01-01"
+            ],
+            [
+              "2024-01-05",
+              150,
+              103,
+              "2024-01-01"
+            ],
+            [
+              "2024-01-06",
+              140,
+              109.2,
+              "2024-01-01"
+            ],
+            [
+              "2024-01-07",
+              0,
+              93.6,
+              "2024-01-01"
+            ],
+            [
+              "2024-01-08",
+              0,
+              76.4,
+              "2024-01-02"
+            ],
+            [
+              "2024-01-09",
+              0,
+              57.1,
+              "2024-01-03"
+            ],
+            [
+              "2024-01-10",
+              160,
+              64.3,
+              "2024-01-04"
+            ],
+            [
+              "2024-01-11",
+              155,
+              86.4,
+              "2024-01-05"
+            ],
+            [
+              "2024-01-12",
+              170,
+              89.3,
+              "2024-01-06"
+            ],
+            [
+              "2024-01-13",
+              180,
+              95,
+              "2024-01-07"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "islands": {
+      "setup": "CREATE TABLE daily_logins (user_id INTEGER, login_date DATE);\nINSERT INTO daily_logins VALUES\n  (1, DATE '2024-01-01'), (1, DATE '2024-01-02'), (1, DATE '2024-01-03'),\n  (1, DATE '2024-01-05'), (1, DATE '2024-01-06'), (1, DATE '2024-01-10'),\n  (1, DATE '2024-01-11'), (1, DATE '2024-01-12'), (1, DATE '2024-01-13'),\n  (2, DATE '2024-01-01'), (2, DATE '2024-01-04'), (2, DATE '2024-01-05'),\n  (2, DATE '2024-01-06'), (2, DATE '2024-01-09'),\n  (3, DATE '2024-01-02'), (3, DATE '2024-01-03'), (3, DATE '2024-01-04'),\n  (3, DATE '2024-01-08'), (3, DATE '2024-01-09'),\n  (4, DATE '2024-01-01'), (4, DATE '2024-01-07'),\n  (5, DATE '2024-01-03'), (5, DATE '2024-01-04'), (5, DATE '2024-01-05');",
+      "steps": {
+        "page": {
+          "sql": "SELECT\n  user_id,\n  MIN(login_date) AS island_start,\n  MAX(login_date) AS island_end,\n  COUNT(*)        AS streak_days\nFROM (\n  SELECT\n    user_id,\n    login_date,\n    login_date - ROW_NUMBER() OVER (\n      PARTITION BY user_id ORDER BY login_date\n    ) * INTERVAL '1 day' AS grp\n  FROM daily_logins\n) t\nGROUP BY user_id, grp\nORDER BY user_id, island_start;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "island_start",
+            "island_end",
+            "streak_days"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01",
+              "2024-01-03",
+              3
+            ],
+            [
+              1,
+              "2024-01-05",
+              "2024-01-06",
+              2
+            ],
+            [
+              1,
+              "2024-01-10",
+              "2024-01-13",
+              4
+            ],
+            [
+              2,
+              "2024-01-01",
+              "2024-01-01",
+              1
+            ],
+            [
+              2,
+              "2024-01-04",
+              "2024-01-06",
+              3
+            ],
+            [
+              2,
+              "2024-01-09",
+              "2024-01-09",
+              1
+            ],
+            [
+              3,
+              "2024-01-02",
+              "2024-01-04",
+              3
+            ],
+            [
+              3,
+              "2024-01-08",
+              "2024-01-09",
+              2
+            ],
+            [
+              4,
+              "2024-01-01",
+              "2024-01-01",
+              1
+            ],
+            [
+              4,
+              "2024-01-07",
+              "2024-01-07",
+              1
+            ],
+            [
+              5,
+              "2024-01-03",
+              "2024-01-05",
+              3
+            ]
+          ]
+        },
+        "userOne": {
+          "sql": "SELECT login_date,\n  ROW_NUMBER() OVER (ORDER BY login_date) AS rn,\n  CAST(login_date - ROW_NUMBER() OVER (ORDER BY login_date)\n    * INTERVAL '1 day' AS DATE) AS grp\nFROM daily_logins\nWHERE user_id = 1\nORDER BY login_date;",
+          "ok": true,
+          "columns": [
+            "login_date",
+            "rn",
+            "grp"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              1,
+              "2023-12-31"
+            ],
+            [
+              "2024-01-02",
+              2,
+              "2023-12-31"
+            ],
+            [
+              "2024-01-03",
+              3,
+              "2023-12-31"
+            ],
+            [
+              "2024-01-05",
+              4,
+              "2024-01-01"
+            ],
+            [
+              "2024-01-06",
+              5,
+              "2024-01-01"
+            ],
+            [
+              "2024-01-10",
+              6,
+              "2024-01-04"
+            ],
+            [
+              "2024-01-11",
+              7,
+              "2024-01-04"
+            ],
+            [
+              "2024-01-12",
+              8,
+              "2024-01-04"
+            ],
+            [
+              "2024-01-13",
+              9,
+              "2024-01-04"
+            ]
+          ]
+        },
+        "counts": {
+          "sql": "SELECT COUNT(*) AS logins, COUNT(DISTINCT user_id) AS users FROM daily_logins;",
+          "ok": true,
+          "columns": [
+            "logins",
+            "users"
+          ],
+          "rows": [
+            [
+              24,
+              5
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "islandsDup": {
+      "setup": "CREATE TABLE daily_logins (user_id INTEGER, login_date DATE);\nINSERT INTO daily_logins VALUES\n  (1, DATE '2024-01-01'), (1, DATE '2024-01-02'), (1, DATE '2024-01-03'),\n  (1, DATE '2024-01-05'), (1, DATE '2024-01-06'), (1, DATE '2024-01-10'),\n  (1, DATE '2024-01-11'), (1, DATE '2024-01-12'), (1, DATE '2024-01-13'),\n  (2, DATE '2024-01-01'), (2, DATE '2024-01-04'), (2, DATE '2024-01-05'),\n  (2, DATE '2024-01-06'), (2, DATE '2024-01-09'),\n  (3, DATE '2024-01-02'), (3, DATE '2024-01-03'), (3, DATE '2024-01-04'),\n  (3, DATE '2024-01-08'), (3, DATE '2024-01-09'),\n  (4, DATE '2024-01-01'), (4, DATE '2024-01-07'),\n  (5, DATE '2024-01-03'), (5, DATE '2024-01-04'), (5, DATE '2024-01-05');\nINSERT INTO daily_logins VALUES (1, DATE '2024-01-02');",
+      "steps": {
+        "userOne": {
+          "sql": "SELECT login_date,\n  ROW_NUMBER() OVER (ORDER BY login_date) AS rn,\n  CAST(login_date - ROW_NUMBER() OVER (ORDER BY login_date)\n    * INTERVAL '1 day' AS DATE) AS grp\nFROM daily_logins\nWHERE user_id = 1\nORDER BY login_date;",
+          "ok": true,
+          "columns": [
+            "login_date",
+            "rn",
+            "grp"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              1,
+              "2023-12-31"
+            ],
+            [
+              "2024-01-02",
+              2,
+              "2023-12-31"
+            ],
+            [
+              "2024-01-02",
+              3,
+              "2023-12-30"
+            ],
+            [
+              "2024-01-03",
+              4,
+              "2023-12-30"
+            ],
+            [
+              "2024-01-05",
+              5,
+              "2023-12-31"
+            ],
+            [
+              "2024-01-06",
+              6,
+              "2023-12-31"
+            ],
+            [
+              "2024-01-10",
+              7,
+              "2024-01-03"
+            ],
+            [
+              "2024-01-11",
+              8,
+              "2024-01-03"
+            ],
+            [
+              "2024-01-12",
+              9,
+              "2024-01-03"
+            ],
+            [
+              "2024-01-13",
+              10,
+              "2024-01-03"
+            ]
+          ]
+        },
+        "page": {
+          "sql": "SELECT\n  user_id,\n  MIN(login_date) AS island_start,\n  MAX(login_date) AS island_end,\n  COUNT(*)        AS streak_days\nFROM (\n  SELECT\n    user_id,\n    login_date,\n    login_date - ROW_NUMBER() OVER (\n      PARTITION BY user_id ORDER BY login_date\n    ) * INTERVAL '1 day' AS grp\n  FROM daily_logins\n) t\nGROUP BY user_id, grp\nORDER BY user_id, island_start;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "island_start",
+            "island_end",
+            "streak_days"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01",
+              "2024-01-06",
+              4
+            ],
+            [
+              1,
+              "2024-01-02",
+              "2024-01-03",
+              2
+            ],
+            [
+              1,
+              "2024-01-10",
+              "2024-01-13",
+              4
+            ],
+            [
+              2,
+              "2024-01-01",
+              "2024-01-01",
+              1
+            ],
+            [
+              2,
+              "2024-01-04",
+              "2024-01-06",
+              3
+            ],
+            [
+              2,
+              "2024-01-09",
+              "2024-01-09",
+              1
+            ],
+            [
+              3,
+              "2024-01-02",
+              "2024-01-04",
+              3
+            ],
+            [
+              3,
+              "2024-01-08",
+              "2024-01-09",
+              2
+            ],
+            [
+              4,
+              "2024-01-01",
+              "2024-01-01",
+              1
+            ],
+            [
+              4,
+              "2024-01-07",
+              "2024-01-07",
+              1
+            ],
+            [
+              5,
+              "2024-01-03",
+              "2024-01-05",
+              3
+            ]
+          ]
+        },
+        "deduped": {
+          "sql": "SELECT\n  user_id,\n  MIN(login_date) AS island_start,\n  MAX(login_date) AS island_end,\n  COUNT(*)        AS streak_days\nFROM (\n  SELECT\n    user_id,\n    login_date,\n    login_date - ROW_NUMBER() OVER (\n      PARTITION BY user_id ORDER BY login_date\n    ) * INTERVAL '1 day' AS grp\n  FROM (SELECT DISTINCT user_id, login_date FROM daily_logins)\n) t\nGROUP BY user_id, grp\nORDER BY user_id, island_start;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "island_start",
+            "island_end",
+            "streak_days"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01",
+              "2024-01-03",
+              3
+            ],
+            [
+              1,
+              "2024-01-05",
+              "2024-01-06",
+              2
+            ],
+            [
+              1,
+              "2024-01-10",
+              "2024-01-13",
+              4
+            ],
+            [
+              2,
+              "2024-01-01",
+              "2024-01-01",
+              1
+            ],
+            [
+              2,
+              "2024-01-04",
+              "2024-01-06",
+              3
+            ],
+            [
+              2,
+              "2024-01-09",
+              "2024-01-09",
+              1
+            ],
+            [
+              3,
+              "2024-01-02",
+              "2024-01-04",
+              3
+            ],
+            [
+              3,
+              "2024-01-08",
+              "2024-01-09",
+              2
+            ],
+            [
+              4,
+              "2024-01-01",
+              "2024-01-01",
+              1
+            ],
+            [
+              4,
+              "2024-01-07",
+              "2024-01-07",
+              1
+            ],
+            [
+              5,
+              "2024-01-03",
+              "2024-01-05",
+              3
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "anti": {
+      "setup": "CREATE TABLE customers (id INTEGER, name TEXT);\nINSERT INTO customers VALUES (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di');\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),\n  (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00), (107, NULL, 25.00);",
+      "steps": {
+        "except": {
+          "sql": "SELECT id FROM customers\nEXCEPT\nSELECT customer_id FROM orders;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        },
+        "notIn": {
+          "sql": "SELECT id FROM customers\nWHERE id NOT IN (SELECT customer_id FROM orders);",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": []
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "recursive": {
+      "setup": "CREATE TABLE employees (id INTEGER, name TEXT, manager_id INTEGER);\nINSERT INTO employees VALUES\n  (1, 'Ana', NULL), (2, 'Ben', 1), (3, 'Cy', 1),\n  (4, 'Dee', 2), (5, 'Eli', 2), (6, 'Fay', 3), (7, 'Gus', 3);\nCREATE TABLE edges (src INTEGER, dst INTEGER);\nINSERT INTO edges VALUES (1, 2), (2, 3), (3, 1);",
+      "steps": {
+        "table": {
+          "sql": "SELECT id, name, manager_id FROM employees ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "name",
+            "manager_id"
+          ],
+          "rows": [
+            [
+              1,
+              "Ana",
+              null
+            ],
+            [
+              2,
+              "Ben",
+              1
+            ],
+            [
+              3,
+              "Cy",
+              1
+            ],
+            [
+              4,
+              "Dee",
+              2
+            ],
+            [
+              5,
+              "Eli",
+              2
+            ],
+            [
+              6,
+              "Fay",
+              3
+            ],
+            [
+              7,
+              "Gus",
+              3
+            ]
+          ]
+        },
+        "page": {
+          "sql": "WITH RECURSIVE org_tree AS (\n  -- anchor: top-level manager\n  SELECT id, name, manager_id, 1 AS depth\n  FROM employees\n  WHERE manager_id IS NULL\n\n  UNION ALL\n\n  -- recursive: direct reports of rows already in the result\n  SELECT e.id, e.name, e.manager_id, t.depth + 1\n  FROM employees e\n  JOIN org_tree t ON e.manager_id = t.id\n)\nSELECT * FROM org_tree;",
+          "ok": true,
+          "columns": [
+            "id",
+            "name",
+            "manager_id",
+            "depth"
+          ],
+          "rows": [
+            [
+              1,
+              "Ana",
+              null,
+              1
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              2
+            ],
+            [
+              3,
+              "Cy",
+              1,
+              2
+            ],
+            [
+              4,
+              "Dee",
+              2,
+              3
+            ],
+            [
+              5,
+              "Eli",
+              2,
+              3
+            ],
+            [
+              6,
+              "Fay",
+              3,
+              3
+            ],
+            [
+              7,
+              "Gus",
+              3,
+              3
+            ]
+          ]
+        },
+        "ordered": {
+          "sql": "WITH RECURSIVE org_tree AS (\n  -- anchor: top-level manager\n  SELECT id, name, manager_id, 1 AS depth\n  FROM employees\n  WHERE manager_id IS NULL\n\n  UNION ALL\n\n  -- recursive: direct reports of rows already in the result\n  SELECT e.id, e.name, e.manager_id, t.depth + 1\n  FROM employees e\n  JOIN org_tree t ON e.manager_id = t.id\n)\nSELECT * FROM org_tree\nORDER BY depth, id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "name",
+            "manager_id",
+            "depth"
+          ],
+          "rows": [
+            [
+              1,
+              "Ana",
+              null,
+              1
+            ],
+            [
+              2,
+              "Ben",
+              1,
+              2
+            ],
+            [
+              3,
+              "Cy",
+              1,
+              2
+            ],
+            [
+              4,
+              "Dee",
+              2,
+              3
+            ],
+            [
+              5,
+              "Eli",
+              2,
+              3
+            ],
+            [
+              6,
+              "Fay",
+              3,
+              3
+            ],
+            [
+              7,
+              "Gus",
+              3,
+              3
+            ]
+          ]
+        },
+        "levels": {
+          "sql": "WITH RECURSIVE org_tree AS (\n  -- anchor: top-level manager\n  SELECT id, name, manager_id, 1 AS depth\n  FROM employees\n  WHERE manager_id IS NULL\n\n  UNION ALL\n\n  -- recursive: direct reports of rows already in the result\n  SELECT e.id, e.name, e.manager_id, t.depth + 1\n  FROM employees e\n  JOIN org_tree t ON e.manager_id = t.id\n)\nSELECT depth, COUNT(*) AS people\nFROM org_tree\nGROUP BY depth\nORDER BY depth;",
+          "ok": true,
+          "columns": [
+            "depth",
+            "people"
+          ],
+          "rows": [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              4
+            ]
+          ]
+        },
+        "loop": {
+          "sql": "WITH RECURSIVE walk AS (\n  SELECT 1 AS node, 1 AS depth\n  UNION ALL\n  SELECT e.dst, t.depth + 1\n  FROM edges e\n  JOIN walk t ON e.src = t.node\n  WHERE t.depth < 10\n)\nSELECT MAX(depth) AS deepest, COUNT(*) AS rows FROM walk;",
+          "ok": true,
+          "columns": [
+            "deepest",
+            "rows"
+          ],
+          "rows": [
+            [
+              10,
+              10
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "cte": {
+      "setup": "CREATE TABLE orders (user_id INTEGER, order_date DATE, amount DECIMAL(10,2));\nINSERT INTO orders VALUES\n  (1, DATE '2024-01-01', 100.00), (1, DATE '2024-01-05', 250.00),\n  (1, DATE '2024-01-12', 75.50),  (1, DATE '2024-01-19', 310.00),\n  (1, DATE '2024-01-26', 45.25),  (2, DATE '2024-01-03', 200.00),\n  (2, DATE '2024-01-08', 150.00), (2, DATE '2024-01-15', 90.75),\n  (2, DATE '2024-01-22', 265.00), (3, DATE '2024-01-02', 120.00),\n  (3, DATE '2024-01-09', 340.50), (3, DATE '2024-01-16', 60.00),\n  (3, DATE '2024-01-23', 175.25), (4, DATE '2024-01-04', 210.00),\n  (4, DATE '2024-01-11', 85.00),  (4, DATE '2024-01-18', 295.75),\n  (5, DATE '2024-01-06', 130.00), (5, DATE '2024-01-13', 240.50),\n  (5, DATE '2024-01-20', 70.00),  (5, DATE '2024-01-27', 190.25),\n  (6, DATE '2024-01-07', 155.00), (6, DATE '2024-01-14', 280.00),\n  (6, DATE '2024-01-21', 110.50), (6, DATE '2024-01-28', 205.00);",
+      "steps": {
+        "totals": {
+          "sql": "SELECT user_id, SUM(amount) AS total FROM orders GROUP BY user_id ORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "780.75"
+            ],
+            [
+              2,
+              "705.75"
+            ],
+            [
+              3,
+              "695.75"
+            ],
+            [
+              4,
+              "590.75"
+            ],
+            [
+              5,
+              "630.75"
+            ],
+            [
+              6,
+              "750.50"
+            ]
+          ]
+        },
+        "pageThreshold": {
+          "sql": "SELECT COUNT(*) AS over_1000 FROM (SELECT user_id, SUM(amount) AS total FROM orders GROUP BY user_id) WHERE total > 1000;",
+          "ok": true,
+          "columns": [
+            "over_1000"
+          ],
+          "rows": [
+            [
+              0
+            ]
+          ]
+        },
+        "subquery": {
+          "sql": "SELECT user_id, total\nFROM (SELECT user_id, SUM(amount) AS total\n      FROM orders GROUP BY user_id) t\nWHERE t.total > 700\nORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "780.75"
+            ],
+            [
+              2,
+              "705.75"
+            ],
+            [
+              6,
+              "750.50"
+            ]
+          ]
+        },
+        "cte": {
+          "sql": "WITH user_totals AS (\n  SELECT user_id, SUM(amount) AS total\n  FROM orders GROUP BY user_id\n)\nSELECT user_id, total FROM user_totals\nWHERE total > 700\nORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "total"
+          ],
+          "rows": [
+            [
+              1,
+              "780.75"
+            ],
+            [
+              2,
+              "705.75"
+            ],
+            [
+              6,
+              "750.50"
+            ]
+          ]
+        },
+        "runningOne": {
+          "sql": "SELECT order_date, amount,\n  SUM(amount) OVER (\n    PARTITION BY user_id ORDER BY order_date\n    ROWS BETWEEN UNBOUNDED PRECEDING\n      AND CURRENT ROW) AS running_total\nFROM orders\nWHERE user_id = 1\nORDER BY order_date;",
+          "ok": true,
+          "columns": [
+            "order_date",
+            "amount",
+            "running_total"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              "100.00",
+              "100.00"
+            ],
+            [
+              "2024-01-05",
+              "250.00",
+              "350.00"
+            ],
+            [
+              "2024-01-12",
+              "75.50",
+              "425.50"
+            ],
+            [
+              "2024-01-19",
+              "310.00",
+              "735.50"
+            ],
+            [
+              "2024-01-26",
+              "45.25",
+              "780.75"
+            ]
+          ]
+        },
+        "running": {
+          "sql": "SELECT\n  user_id,\n  order_date,\n  amount,\n  SUM(amount) OVER (\n    PARTITION BY user_id\n    ORDER BY order_date\n    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n  ) AS running_total\nFROM orders\nORDER BY user_id, order_date;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "order_date",
+            "amount",
+            "running_total"
+          ],
+          "rows": [
+            [
+              1,
+              "2024-01-01",
+              "100.00",
+              "100.00"
+            ],
+            [
+              1,
+              "2024-01-05",
+              "250.00",
+              "350.00"
+            ],
+            [
+              1,
+              "2024-01-12",
+              "75.50",
+              "425.50"
+            ],
+            [
+              1,
+              "2024-01-19",
+              "310.00",
+              "735.50"
+            ],
+            [
+              1,
+              "2024-01-26",
+              "45.25",
+              "780.75"
+            ],
+            [
+              2,
+              "2024-01-03",
+              "200.00",
+              "200.00"
+            ],
+            [
+              2,
+              "2024-01-08",
+              "150.00",
+              "350.00"
+            ],
+            [
+              2,
+              "2024-01-15",
+              "90.75",
+              "440.75"
+            ],
+            [
+              2,
+              "2024-01-22",
+              "265.00",
+              "705.75"
+            ],
+            [
+              3,
+              "2024-01-02",
+              "120.00",
+              "120.00"
+            ],
+            [
+              3,
+              "2024-01-09",
+              "340.50",
+              "460.50"
+            ],
+            [
+              3,
+              "2024-01-16",
+              "60.00",
+              "520.50"
+            ],
+            [
+              3,
+              "2024-01-23",
+              "175.25",
+              "695.75"
+            ],
+            [
+              4,
+              "2024-01-04",
+              "210.00",
+              "210.00"
+            ],
+            [
+              4,
+              "2024-01-11",
+              "85.00",
+              "295.00"
+            ],
+            [
+              4,
+              "2024-01-18",
+              "295.75",
+              "590.75"
+            ],
+            [
+              5,
+              "2024-01-06",
+              "130.00",
+              "130.00"
+            ],
+            [
+              5,
+              "2024-01-13",
+              "240.50",
+              "370.50"
+            ],
+            [
+              5,
+              "2024-01-20",
+              "70.00",
+              "440.50"
+            ],
+            [
+              5,
+              "2024-01-27",
+              "190.25",
+              "630.75"
+            ],
+            [
+              6,
+              "2024-01-07",
+              "155.00",
+              "155.00"
+            ],
+            [
+              6,
+              "2024-01-14",
+              "280.00",
+              "435.00"
+            ],
+            [
+              6,
+              "2024-01-21",
+              "110.50",
+              "545.50"
+            ],
+            [
+              6,
+              "2024-01-28",
+              "205.00",
+              "750.50"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "lag": {
+      "setup": "CREATE TABLE daily_revenue (order_date DATE, revenue INTEGER);\nINSERT INTO daily_revenue VALUES\n  (DATE '2024-01-01', 100), (DATE '2024-01-02', 250),\n  (DATE '2024-01-03', 75),  (DATE '2024-01-04', 180);",
+      "steps": {
+        "page": {
+          "sql": "SELECT\n  order_date,\n  revenue,\n  LAG(revenue, 1, 0) OVER (ORDER BY order_date) AS prev_revenue,\n  revenue - LAG(revenue, 1, 0) OVER (ORDER BY order_date) AS delta\nFROM daily_revenue;",
+          "ok": true,
+          "columns": [
+            "order_date",
+            "revenue",
+            "prev_revenue",
+            "delta"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              100,
+              0,
+              100
+            ],
+            [
+              "2024-01-02",
+              250,
+              100,
+              150
+            ],
+            [
+              "2024-01-03",
+              75,
+              250,
+              -175
+            ],
+            [
+              "2024-01-04",
+              180,
+              75,
+              105
+            ]
+          ]
+        },
+        "both": {
+          "sql": "SELECT order_date, revenue,\n  LAG(revenue, 1, 0) OVER (ORDER BY order_date) AS prev,\n  LEAD(revenue) OVER (ORDER BY order_date) AS next,\n  revenue - LAG(revenue, 1, 0)\n    OVER (ORDER BY order_date) AS delta\nFROM daily_revenue\nORDER BY order_date;",
+          "ok": true,
+          "columns": [
+            "order_date",
+            "revenue",
+            "prev",
+            "next",
+            "delta"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              100,
+              0,
+              250,
+              100
+            ],
+            [
+              "2024-01-02",
+              250,
+              100,
+              75,
+              150
+            ],
+            [
+              "2024-01-03",
+              75,
+              250,
+              180,
+              -175
+            ],
+            [
+              "2024-01-04",
+              180,
+              75,
+              null,
+              105
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "percent": {
+      "setup": "CREATE TABLE scores AS SELECT * FROM (VALUES (10), (20), (20), (30)) AS t(v);",
+      "steps": {
+        "both": {
+          "sql": "SELECT v,\n  ROUND(PERCENT_RANK() OVER (ORDER BY v), 2) AS pct_rank,\n  ROUND(CUME_DIST()    OVER (ORDER BY v), 2) AS cume_dist\nFROM scores\nORDER BY v;",
+          "ok": true,
+          "columns": [
+            "v",
+            "pct_rank",
+            "cume_dist"
+          ],
+          "rows": [
+            [
+              10,
+              0,
+              0.25
+            ],
+            [
+              20,
+              0.33,
+              0.75
+            ],
+            [
+              20,
+              0.33,
+              0.75
+            ],
+            [
+              30,
+              1,
+              1
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "coalesce": {
+      "setup": "CREATE TABLE users (user_id INTEGER, phone TEXT, email TEXT);\nINSERT INTO users VALUES\n  (1, '555-0101', 'ada@example.com'), (2, NULL, 'bo@example.com'), (3, NULL, NULL);",
+      "steps": {
+        "table": {
+          "sql": "SELECT user_id, phone, email FROM users ORDER BY user_id;",
+          "ok": true,
+          "columns": [
+            "user_id",
+            "phone",
+            "email"
+          ],
+          "rows": [
+            [
+              1,
+              "555-0101",
+              "ada@example.com"
+            ],
+            [
+              2,
+              null,
+              "bo@example.com"
+            ],
+            [
+              3,
+              null,
+              null
+            ]
+          ]
+        },
+        "page": {
+          "sql": "SELECT COALESCE(phone, email, 'no contact') AS contact\nFROM users;",
+          "ok": true,
+          "columns": [
+            "contact"
+          ],
+          "rows": [
+            [
+              "555-0101"
+            ],
+            [
+              "bo@example.com"
+            ],
+            [
+              "no contact"
+            ]
+          ]
+        },
+        "nullif": {
+          "sql": "SELECT 500 / NULLIF(0, 0) AS per_unit;",
+          "ok": true,
+          "columns": [
+            "per_unit"
+          ],
+          "rows": [
+            [
+              null
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
+    "pivot": {
+      "setup": "CREATE TABLE traffic AS SELECT * FROM (VALUES\n  ('North', 'mobile', 120), ('North', 'desktop', 80),\n  ('South', 'mobile', 95),  ('South', 'desktop', 140),\n  ('East', 'mobile', 60),   ('East', 'desktop', 70)\n) AS t(region, device, sessions);",
+      "steps": {
+        "pivot": {
+          "sql": "PIVOT traffic ON device USING SUM(sessions) GROUP BY region ORDER BY region;",
+          "ok": true,
+          "columns": [
+            "region",
+            "desktop",
+            "mobile"
+          ],
+          "rows": [
+            [
+              "East",
+              "70",
+              "60"
+            ],
+            [
+              "North",
+              "80",
+              "120"
+            ],
+            [
+              "South",
+              "140",
+              "95"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    }
+  }
+}
