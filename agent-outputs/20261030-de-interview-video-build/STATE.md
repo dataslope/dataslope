@@ -36,7 +36,7 @@ All on the final code, one at a time, through each video's private entry.
 | Part | Check | Result |
 | --- | --- | --- |
 | 1 | sync / mix / motion / frames | worst +0.04 s / 28.9 LU under / 0 still stretches / stretch 0.87, arrows 0.0° |
-| 3 | mix (after its effects were raised), sync and motion (after a `pauseAfter` change) | 28.4 LU under / see the commit / see the commit |
+| 3 | mix (after its effects were raised), sync and motion (after a `pauseAfter` change) | 28.4 LU under / worst +0.03 s / 0 still stretches |
 | 4 | frames, motion | stretch 0.87 / 0 still stretches |
 | 5 | mix / frames | 29.1 LU / stretch 0.85, arrows 7.1° |
 | 6 | mix / motion / frames | 27.0 LU / 0 still stretches / stretch 0.91, arrows 3.1° |
