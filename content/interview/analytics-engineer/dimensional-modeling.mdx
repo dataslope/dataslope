@@ -499,7 +499,7 @@ JOIN dim_product p ON p.product_id = f.product_id
 GROUP BY p.category
 ORDER BY revenue DESC;`}
   tests={[
-    { id: "row_count", name: "One row per category", description: "Three categories → three rows", expectedRowCount: 6 },
+    { id: "row_count", name: "One row per category", description: "Six categories → six rows", expectedRowCount: 6 },
     { id: "columns", name: "Has the required columns", description: "category and revenue", expectedColumnsInclude: ["category", "revenue"] },
   ]}
 />

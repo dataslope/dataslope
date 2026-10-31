@@ -56,12 +56,14 @@ README's course examples (17.5 to 18.9 LU).
 In the commits "Data Engineer pages: fix the errors the video builders
 found" and "Streaming: a watermark subtracts an out-of-orderness bound".
 
+The same stale row count turned up in eleven challenge tests on other
+tracks (Analytics Engineer, Backend Engineer, Data Analyst, Data
+Scientist), each describing a smaller dataset than the one it grades;
+fixed in "Interview challenges: test descriptions that give the wrong
+row count".
+
 ## Left for later
 
-- **Other tracks' challenge tests** say the wrong row count in about ten
-  places (Analytics Engineer, Backend Engineer, Data Analyst, Data
-  Scientist), e.g. Data Analyst SQL's "Four customers → four rows" that
-  expects 24. Not part of this series.
 - **Kit suggestions** from the builders, each built locally instead:
   a `PlanBox` for printed query plans (Part 2, Part 9); DDL and `EXPLAIN`
   keywords in `da-sql`'s `Listing` tokenizer (Part 2); `QMono` at 0.84em

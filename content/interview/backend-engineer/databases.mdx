@@ -331,7 +331,7 @@ LEFT JOIN orders o ON o.customer_id = c.id
 WHERE o.customer_id IS NULL
 ORDER BY c.id;`}
   tests={[
-    { id: "rows", name: "Twelve customers never ordered", description: "Ben and Di → two rows", expectedRowCount: 12 },
+    { id: "rows", name: "Twelve customers never ordered", description: "Twelve of the 24 customers have no orders → twelve rows", expectedRowCount: 12 },
     { id: "cols", name: "Has the required columns", description: "id and name", expectedColumnsInclude: ["id", "name"] },
   ]}
 />
@@ -372,7 +372,7 @@ JOIN orders o ON o.customer_id = c.id
 GROUP BY c.name
 ORDER BY revenue DESC;`}
   tests={[
-    { id: "rows", name: "One row per ordering customer", description: "Three customers ordered → three rows", expectedRowCount: 22 },
+    { id: "rows", name: "One row per ordering customer", description: "22 of the 24 customers ordered → 22 rows", expectedRowCount: 22 },
     { id: "cols", name: "Has the required columns", description: "name and revenue", expectedColumnsInclude: ["name", "revenue"] },
   ]}
 />
