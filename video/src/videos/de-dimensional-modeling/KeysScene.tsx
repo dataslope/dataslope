@@ -200,7 +200,7 @@ export const KeysScene: React.FC = () => {
         </Note>
 
         {/* ── Where it leads ── */}
-        <Note at={scdAt} x={X0} y={dg.rowTop(dim.rows.length) + h(96)}>
+        <Note at={scdAt} x={X0} y={dg.rowTop(dim.rows.length) + h(106)}>
           <span style={{ ...note(27, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Versions like these: a slowly changing dimension
             <span style={{ color: INK, fontWeight: 560, opacity: ease(frame, historyAt, 10) }}> · where modeling history begins</span>

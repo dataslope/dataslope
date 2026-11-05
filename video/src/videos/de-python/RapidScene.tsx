@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -114,12 +114,15 @@ const StreamBody: React.FC<{ c: Ctx }> = ({ c }) => {
   );
 };
 
-/** 16. pandas against generators, with the memory measured at question 4. */
+/** 16. pandas against generators: the same totals by name, computed both
+ *  ways on question 4's file, their peak memory measured. Neither is the
+ *  wrong answer, so pandas is drawn as data (blue), and the stream in the
+ *  generators' green. */
 const PandasBody: React.FC<{ c: Ctx }> = ({ c }) => {
   const fits = c.w("r-pandas", "Reach for pandas when the data fits in memory");
   const gens = c.w("r-pandas", "Stay with generators");
   const wh = bytes(FILE.whole.peak);
-  const st = bytes(FILE.stream.peak);
+  const st = bytes(FILE.streamGroup.peak);
   return (
     <>
       <Line at={fits} top={c.y(372)}>
@@ -129,7 +132,7 @@ const PandasBody: React.FC<{ c: Ctx }> = ({ c }) => {
         generators: it streams, or it won&apos;t fit
       </Line>
       <Line at={fits + 6} top={c.y(520)} color={INK_SOFT} size={22}>
-        the same 1,000,000 rows, peak memory in Pyodide
+        the same totals by name, 1,000,000 rows: peak memory in Pyodide
       </Line>
       <Bars
         x={R_X}
@@ -138,8 +141,8 @@ const PandasBody: React.FC<{ c: Ctx }> = ({ c }) => {
         rowH={c.h(60)}
         nameW={300}
         bars={[
-          { name: <TitleCode>pd.read_csv</TitleCode>, value: FILE.whole.peak, ...wh, color: ACCENT, ink: ACCENT_INK, at: fits + 10 },
-          { name: <TitleCode>for line in f</TitleCode>, value: FILE.stream.peak, ...st, color: OK, ink: OK_INK, at: gens + 10 },
+          { name: <TitleCode>read_csv, groupby</TitleCode>, value: FILE.whole.peak, ...wh, color: BAR, ink: BLUE_INK, at: fits + 10 },
+          { name: <TitleCode>a dict, line by line</TitleCode>, value: FILE.streamGroup.peak, ...st, color: OK, ink: OK_INK, at: gens + 10 },
         ]}
       />
     </>
@@ -196,11 +199,13 @@ const PitfallsBody: React.FC<{ c: Ctx }> = ({ c }) => {
       {items.map((it, i) => (
         <Note key={i} at={it.at} x={R_X} y={c.y(372) + i * c.h(66)}>
           <span style={{ display: "flex", alignItems: "baseline", gap: 26, whiteSpace: "nowrap" }}>
-            <span style={{ display: "inline-block", width: 420, ...note(26, INK) }}>
-              <Strike at={it.at + 10}>{it.bad}</Strike>
+            {/* Red at once, so it reads as the wrong way; struck only once it
+                has been read, with its fix right after. */}
+            <span style={{ display: "inline-block", width: 420, ...note(26, ACCENT_INK) }}>
+              <Strike at={it.at + 36}>{it.bad}</Strike>
             </span>
             <span style={{ ...note(26, OK_INK), fontWeight: 600 }}>
-              <FadeIn at={it.at + 14}>{it.fix}</FadeIn>
+              <FadeIn at={it.at + 40}>{it.fix}</FadeIn>
             </span>
           </span>
         </Note>

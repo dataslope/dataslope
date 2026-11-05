@@ -45,7 +45,8 @@ const ROWS: DocRow[] = [
  * the overlap lit (300 to 500 tokens, about 1,800 characters at 400, from
  * llm-tokens' measured prose rate), structure-aware cuts at the headings,
  * and small-to-big (retrieve a small chunk, send its section). Last, the
- * answer: measure recall on labeled questions, and version the settings.
+ * answer: measure recall (glossed beside it) on labeled questions, and
+ * version the settings.
  */
 export const ChunkScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -225,6 +226,9 @@ export const ChunkScene: React.FC = () => {
               </Mark>
             </span>
           </span>
+        </Note>
+        <Note at={recallAt + 14} x={X0 + 880} y={y(820) + 5}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>recall: the share of the right passages it finds</span>
         </Note>
         <Note at={storeAt - 2} x={X0} y={y(820) + 46}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>

@@ -171,7 +171,7 @@ export const GrainScene: React.FC = () => {
         <KeyArrow from={[g.right + 14, g.rowMid(0)]} to={[og.x - 14, og.rowMid(0)]} at={orderGrainAt + 4} color={OK} />
         {/* Or, to report it by product: split across the lines, adding back to the fee. */}
         <Note at={byProductAt} x={ORDERS_X} y={og.rowTop(1) + h(30)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), lineHeight: 1.45, whiteSpace: "nowrap" }}>
             Or, by product: split it across the lines,
             <br />
             <span style={{ opacity: ease(frame, sharesAt, 10) }}>

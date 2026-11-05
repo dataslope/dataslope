@@ -128,7 +128,9 @@ export const AnnScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={exactAt} level={-35} />
       <Sfx name="el-whoosh" at={everyAt} level={-37} />
       <Sfx name="el-pencil" at={hnswAt + 4} level={-36} />
+      <Sfx name="el-whoosh" at={fastAt} level={-37} />
       <Sfx name="el-pop" at={nearestAt + 2} level={-34} />
+      <Sfx name="el-scratch" at={seventyAt + 4} level={-36} />
       <Sfx name="el-pencil" at={modelAt + 4} level={-36} />
       <Sfx name="el-tap" at={oneAt + 4} level={-34} />
       <Sfx name="el-tap" at={sixteenAt + 2} level={-34} />

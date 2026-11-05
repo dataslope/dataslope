@@ -183,13 +183,13 @@ export const LambdaScene: React.FC = () => {
           <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, semanticsAt, 10) }}>the engine handles batch semantics</div>
           <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, reachesAt, 10) }}>and the log reaches back far enough</div>
         </Note>
-        <Note at={meansAt} x={NOTE_X} y={kY + h(70)}>
+        <Note at={meansAt} x={NOTE_X} y={kY + h(84)}>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
             <b style={{ color: INK }}>batch semantics:</b> a batch job's answers,
           </div>
           <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, windowsAt, 10) }}>event-time windows, exactly-once results</div>
         </Note>
-        <Note at={fallbackAt} x={NOTE_X} y={kY + h(136)}>
+        <Note at={fallbackAt} x={NOTE_X} y={kY + h(152)}>
           <span style={{ ...note(24, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>Lambda: the fallback when it can't</span>
         </Note>
       </Drift>

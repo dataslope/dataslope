@@ -72,7 +72,7 @@ const Form: React.FC<{
         </Phrase>
       </div>
       {builds ? (
-        <div style={{ ...note(21, INK), marginTop: 12, opacity: ease(frame, buildsAt ?? at, 10), whiteSpace: "nowrap" }}>{builds}</div>
+        <div style={{ ...note(20, INK), marginTop: 12, opacity: ease(frame, buildsAt ?? at, 10), whiteSpace: "nowrap" }}>{builds}</div>
       ) : null}
       <div style={{ ...note(21, INK_SOFT), marginTop: builds ? 6 : 12, opacity: ease(frame, at + 8, 10), whiteSpace: "nowrap" }}>
         breaks it: <Mono>{table}</Mono>
@@ -256,7 +256,9 @@ export const NfScene: React.FC = () => {
         </Note>
         <Note at={backAt} x={STAR_X} y={star.bottom + h(118)} width={360}>
           <span style={{ ...note(24, INK_SOFT) }}>
-            <span style={{ color: INK, fontWeight: 650 }}>Snowflaking puts it back,</span> at the cost of joins.
+            <span style={{ color: INK, fontWeight: 650 }}>Snowflaking puts it back,</span>
+            <br />
+            at the cost of joins.
           </span>
         </Note>
       </Drift>

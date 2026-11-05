@@ -194,7 +194,7 @@ export const BatchScene: React.FC = () => {
         {/* Between the two: micro-batch, and systems that run both. */}
         <Note at={microAt} x={RIGHT_X + 160} y={(by + sy) / 2 - h(36)}>
           <div style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>In between: micro-batch</div>
-          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, fewAt, 10) }}>a small batch every few seconds</div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, fewAt, 10) }}>a batch every few seconds</div>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, bothAt, 10) }}>and many systems run both</div>
         </Note>
         <Note at={dontAt} x={X0} y={y(885)}>

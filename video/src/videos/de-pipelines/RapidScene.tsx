@@ -157,9 +157,11 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
           const red = stale * (hit ? 1 - redo : 1 - calm);
           const green = hit ? redo : 0;
           const fill = green > 0 ? `color-mix(in srgb, ${OK} ${green * 100}%, ${ACCENT})` : `color-mix(in srgb, ${ACCENT} ${red * 100}%, ${BAR})`;
-          // Unaffected cells stay nearly opaque, so the green edges passing
-          // under them on the way to the six read as under, not through.
-          return <rect key={k} x={p.x} y={p.y} width={GRID.size} height={GRID.size} rx={5} fill={fill} opacity={appear * (0.75 + 0.2 * Math.max(red, green))} />;
+          // A cell's lightness is mixed into its fill rather than set as
+          // opacity, so every cell is solid and the green edges passing under
+          // them on the way to the six are hidden, not seen through.
+          const ink = Math.round((0.75 + 0.25 * Math.max(red, green)) * 100);
+          return <rect key={k} x={p.x} y={p.y} width={GRID.size} height={GRID.size} rx={5} fill={`color-mix(in srgb, ${fill} ${ink}%, ${PAPER})`} opacity={appear} />;
         })}
         {/* Only the change travels. */}
         {travel > 0 && travel < 1 ? (

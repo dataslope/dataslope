@@ -64,9 +64,9 @@ takes are untouched.
   de-distributed and de-modeling-history, other folders mid-edit.
 - `check:sync`: pass. 71 beats, worst +0.05 s (`order`), every beat within
   ±0.12 s.
-- `check:mix`: MIX_RESULT
-- `check:motion`: MOTION_RESULT
-- `check:frames`: FRAMES_RESULT
+- `check:mix`: pass. The effects sit 29.1 LU under the narration. Where both sound (15.1 s), speech is a median 27.8 dB above the effects (5th percentile 14.7 dB). The closest is 10.3 dB, at 2:44.3.
+- `check:motion`: pass. 10:34.8 checked, 0 stretches still for 2 s or more. Its bundle predates the last edit (`textWrap: balance` on one note), which changes no motion.
+- `check:frames`: pass, on the final code. 2 illustrations, largest stretch 0.87. 2 arrows within 10°. No hyphen in tabular figures. Every word cue names its occurrence.
 - Stills, each looked at, cropped to the change: 18.5, 57, 66.4, 96.8, 99.5,
   178, 201.5, 207.6, 233, 271.6, 318.5, 335, 416, 462.8, 483.3, 497.2,
   529.5, 558.6, 592.9 and 599.3 s. 207.6 and 318.5 were taken again after

@@ -43,7 +43,6 @@ export const BreakerScene: React.FC = () => {
   const oneAt = n.word("breaker", "one bad table stays one bad table");
   const spreadAt = n.word("breaker", "instead of spreading");
   const everyAt = n.word("breaker", "every asset and dashboard downstream");
-  const servicesAt = n.word("cb-model", "The name comes from services");
   const pointAt = n.word("cb-model", "the point isn't failing faster");
   const loadAt = n.word("cb-model", "stop sending load");
   const modelAt = n.word("cb-model", "Model a failing dependency");

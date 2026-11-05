@@ -20,16 +20,21 @@ const CRASH = 21;
 /** Embedded before the crash, after the last checkpoint: on the restart
  *  their content hashes match what is indexed, so they are skipped. */
 const UNCHANGED = [18, 19, 20];
+/** The restart's row starts at the last checkpoint. */
+const RESUME = CHECKPOINTS[CHECKPOINTS.length - 1];
 
 /**
  * Question 11. The page's arithmetic, worked as it is said (check.mjs): 10
  * million chunks at about 400 tokens is 4 billion tokens; cost is 4,000
  * times the price per million tokens; time is that over the rate limit, at a
  * million tokens a minute (labelled a rate for scale, not a provider's)
- * 4,000 minutes, 2.8 days. Then the run drawn as batches: one rate-limited
- * and retried with growing waits, checkpoints, a restart that resumes from
- * the last checkpoint with idempotent upserts, and, on the rerun, unchanged
- * chunks skipped by their content hash.
+ * 4,000 minutes, 2.8 days; and, at a range of list prices for scale (2 to 20
+ * cents per million), $80 to $800, so the days are the constraint. Then the
+ * run drawn as batches, the first run on one row: one rate-limited and
+ * retried with growing waits, checkpoints, and the crash. The restart is a
+ * second row under it, from the last checkpoint, with idempotent upserts:
+ * the batches the first run had already embedded are skipped by their
+ * content hash (grey), and the rest are embedded.
  */
 export const BackfillScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -49,6 +54,9 @@ export const BackfillScene: React.FC = () => {
   const rateAt = n.word("backfill-div", "at a million tokens a minute");
   const minutesAt = n.word("backfill-div", "four thousand minutes");
   const daysAt = n.word("backfill-div", "nearly three days");
+  const pricesAt = n.word("backfill-price", "Embedding prices are cents per million tokens");
+  const billAt = n.word("backfill-price", "the bill is tens to hundreds of dollars");
+  const realAt = n.word("backfill-price", "the days are the real constraint");
   const failAt = n.word("backfill-fail", "design for failure partway");
   const batchAt = n.word("backfill-fail", "batch the requests");
   const retryAt = n.word("backfill-fail", "retry with backoff on rate limits");
@@ -62,7 +70,9 @@ export const BackfillScene: React.FC = () => {
 
   const eqY = y(340);
   const barTop = y(650);
+  const row2Top = barTop + CELL + 28;
   const cellX = (i: number) => X0 + i * (CELL + GAP);
+  const cents = (usd: number) => Math.round(usd * 100);
 
   // The run, batch by batch.
   const fill = (i: number) => {
@@ -115,6 +125,12 @@ export const BackfillScene: React.FC = () => {
             <span style={{ opacity: ease(frame, thousandAt - 2, 10) }}>
               <Num>{num(BACKFILL.millions)}</Num> × the price per million tokens
             </span>
+            <span style={{ opacity: ease(frame, pricesAt - 2, 10), color: INK_SOFT }}>
+              ; at <Num>{cents(BACKFILL.priceLow)}</Num> to <Num>{cents(BACKFILL.priceHigh)}</Num> cents,
+            </span>
+            <span style={{ opacity: ease(frame, billAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>
+              {" "}$<Num>{num(BACKFILL.costLow)}</Num> to $<Num>{num(BACKFILL.costHigh)}</Num>
+            </span>
           </span>
         </Note>
         <Note at={timeAt - 2} x={X0} y={eqY + 122}>
@@ -127,12 +143,15 @@ export const BackfillScene: React.FC = () => {
               {" "}<Num>{num(BACKFILL.minutes)}</Num> minutes
             </span>
             <span style={{ opacity: ease(frame, daysAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>
-              {" "}≈ <Num>{BACKFILL.days.toFixed(1)}</Num> days
+              {" "}
+              <Mark at={realAt + 4}>
+                ≈ <Num>{BACKFILL.days.toFixed(1)}</Num> days
+              </Mark>
             </span>
           </span>
         </Note>
         <Note at={rateAt + 6} x={X0} y={eqY + 170}>
-          <span style={madeUp(19)}>the page&apos;s numbers; the rate is one for scale, not a provider&apos;s limit, and no price is quoted</span>
+          <span style={madeUp(19)}>the page&apos;s numbers; the rate and the price range are for scale, not a provider&apos;s quote</span>
         </Note>
 
         {/* The run, designed to fail partway. */}
@@ -143,19 +162,32 @@ export const BackfillScene: React.FC = () => {
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          {Array.from({ length: BATCHES }, (_, i) => {
+          {/* The first run, up to the crash. */}
+          {Array.from({ length: CRASH }, (_, i) => {
             const s = ease(frame, batchAt + i * 0.6, 8);
             if (s <= 0) return null;
             const f = fill(i);
-            const skipped = UNCHANGED.includes(i) ? ease(frame, hashAt + 4 + UNCHANGED.indexOf(i) * 3, 10) : 0;
-            const color = skipped > 0 ? `color-mix(in srgb, ${QUIET} ${100 * skipped}%, ${DATA})` : DATA;
             return (
               <g key={i} opacity={s}>
                 <rect x={cellX(i)} y={barTop} width={CELL} height={CELL} rx={6} fill={PAPER} stroke={INK_SOFT} strokeWidth={1.6} />
-                <rect x={cellX(i)} y={barTop} width={CELL} height={CELL} rx={6} fill={color} opacity={0.85 * Math.max(f, skipped)} />
+                <rect x={cellX(i)} y={barTop} width={CELL} height={CELL} rx={6} fill={DATA} opacity={0.85 * f} />
                 {i === FAIL && failed > 0 ? (
                   <rect x={cellX(i)} y={barTop} width={CELL} height={CELL} rx={6} fill="none" stroke={ACCENT} strokeWidth={3.4} opacity={failed} />
                 ) : null}
+              </g>
+            );
+          })}
+          {/* The restart, from the last checkpoint: already embedded is skipped. */}
+          {Array.from({ length: BATCHES - RESUME }, (_, k) => {
+            const i = RESUME + k;
+            const s = ease(frame, resumeAt + 2 + k * 1.5, 8);
+            if (s <= 0) return null;
+            const skip = UNCHANGED.includes(i);
+            const f = skip ? ease(frame, hashAt + 4 + UNCHANGED.indexOf(i) * 3, 10) : fill(i);
+            return (
+              <g key={i} opacity={s}>
+                <rect x={cellX(i)} y={row2Top} width={CELL} height={CELL} rx={6} fill={PAPER} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray={skip && f < 0.5 ? "4 4" : undefined} />
+                <rect x={cellX(i)} y={row2Top} width={CELL} height={CELL} rx={6} fill={skip ? QUIET : DATA} opacity={0.85 * f} />
               </g>
             );
           })}
@@ -190,30 +222,30 @@ export const BackfillScene: React.FC = () => {
         <Note at={checkAt + 2} x={cellX(CHECKPOINTS[0]) - 4} y={barTop + CELL + 14}>
           <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>checkpoints</span>
         </Note>
-        {/* The restart: from the last checkpoint, not from zero. */}
-        <div style={{ opacity: restart * (1 - ease(frame, hashAt, 10) * 0.5) }}>
+        {/* The restart: a second row, from the last checkpoint, not from zero. */}
+        <div style={{ opacity: restart }}>
           <LineArrow
-            from={[cellX(CHECKPOINTS[2]) - GAP / 2, barTop + CELL + 96]}
-            to={[cellX(CHECKPOINTS[2]) - GAP / 2, barTop + CELL + 16]}
+            from={[cellX(RESUME) - 64, row2Top + CELL / 2]}
+            to={[cellX(RESUME) - 12, row2Top + CELL / 2]}
             at={resumeAt}
             color={OK}
             width={2.6}
           />
         </div>
-        <Note at={resumeAt + 2} x={cellX(CHECKPOINTS[2]) + 12} y={barTop + CELL + 50}>
+        <Note at={resumeAt + 2} x={cellX(RESUME) - 76} y={row2Top + 2} align="right" width={360}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a restart resumes here</span>
         </Note>
-        <Note at={overAt - 2} x={cellX(CHECKPOINTS[2]) + 12} y={barTop + CELL + 84}>
+        <Note at={overAt - 2} x={cellX(RESUME) - 76} y={row2Top + 36} align="right" width={360}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>not from batch one</span>
         </Note>
-        <Note at={upsertAt - 2} x={X0} y={barTop + CELL + 60}>
+        <Note at={upsertAt - 2} x={X0} y={row2Top + 20}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             upserts are idempotent: a batch written twice
             <br />
             is still one copy of each chunk
           </span>
         </Note>
-        <Note at={hashAt - 2} x={X0} y={barTop + CELL + 150}>
+        <Note at={hashAt - 2} x={X0} y={row2Top + CELL + 64}>
           <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <span style={{ display: "inline-block", width: 18, height: 18, borderRadius: 4, background: QUIET, marginRight: 10, verticalAlign: "-2px" }} />
             already embedded, hash unchanged:{" "}

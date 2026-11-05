@@ -50,7 +50,7 @@ const Defense: React.FC<{ at: number; n: number; y: number; children: React.Reac
  * SELECT * into a fixed three-column table fails in DuckDB ("3 columns but 4
  * values"); naming the columns loads all three rows and ignores the new one.
  * Then the page's other three defenses, numbered on the right, schema-on-read
- * defined as it is said (stored as it arrives, typed on read: bronze).
+ * defined as it is said (stored as is, typed on read: bronze).
  */
 export const SourceScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -147,7 +147,7 @@ export const SourceScene: React.FC = () => {
           <span style={{ color: INK_SOFT, opacity: ease(frame, neverAt, 10) }}>so ingestion never breaks</span>
           <br />
           <span style={{ color: INK_SOFT, opacity: ease(frame, storesAt, 10) }}>
-            stored as it arrives
+            stored as is
             <span style={{ opacity: ease(frame, appliesAt, 10) }}>, typed on read</span>
             <span style={{ opacity: ease(frame, bronzeAt, 10) }}>
               : <b style={{ color: INK }}>bronze</b>
