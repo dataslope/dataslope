@@ -121,7 +121,7 @@ export const HybridScene: React.FC = () => {
       {kinds.map((k) => (
         <Sfx key={k.text} name="el-tap" at={k.at} level={-36} />
       ))}
-      <Sfx name="el-pencil" at={searchAt + 4} level={-36} />
+      <Sfx name="el-pencil" at={setupAt + 4} level={-36} />
       <Sfx name="el-tap" at={fourthAt + 2} level={-34} />
       <Sfx name="el-pop" at={bm25At + 2} level={-34} />
       <Sfx name="el-pencil" at={sixtyAt + 2} level={-36} />
@@ -149,7 +149,17 @@ export const HybridScene: React.FC = () => {
         <Note at={setupAt} x={X0} y={y(312)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             search the tickets for{" "}
-            <span style={{ fontFamily: MONO, fontWeight: 700, padding: "2px 10px", border: `2px solid ${INK}`, borderRadius: 8, fontVariantLigatures: "none" }}>
+            <span
+              style={{
+                fontFamily: MONO,
+                fontWeight: 700,
+                padding: "2px 10px",
+                border: `2px solid ${INK}`,
+                borderRadius: 8,
+                fontVariantLigatures: "none",
+                background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * ease(frame, searchAt, 10) * (1 - ease(frame, fourthAt, 12))}%, ${PAPER})`,
+              }}
+            >
               {HYBRID.query}
             </span>
             <span style={{ ...madeUp(19), marginLeft: 22 }}>tickets and the vector ranking made up; BM25 run on them</span>

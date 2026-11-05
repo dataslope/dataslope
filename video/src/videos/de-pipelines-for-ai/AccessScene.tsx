@@ -26,8 +26,10 @@ const allowed = (r: string) => r === "everyone" || r.split(", ").includes(USER_T
 
 /**
  * Question 10. Left, five made-up chunks, each carrying who may read it,
- * and a user from support: at query time the filter keeps the three she
- * could open and sets the rest back. Right, a chunk redacted before it goes
+ * and a user from support: at query time, inside the search (not after it,
+ * Question 8's trap), the filter keeps the three she could open and sets the
+ * rest back. When a permission changes upstream, the chunk's metadata is
+ * updated and nothing is re-embedded. Right, a chunk redacted before it goes
  * to an outside embedding API. Below it, deletion made real: one erasure
  * request reaching the vectors, the cached chunks and the copies in
  * evaluation sets, each ticked as it is named, and the source row alone
@@ -45,6 +47,9 @@ export const AccessScene: React.FC = () => {
   const queryAt = n.word("access", "filter at query time");
   const identityAt = n.word("access", "by the user's identity");
   const onlyAt = n.word("access", "retrieves only what that user could open");
+  const changeAt = n.word("access-sync", "When a permission changes upstream");
+  const updateAt = n.word("access-sync", "update the chunks' metadata at once");
+  const noEmbedAt = n.word("access-sync", "nothing needs re-embedding");
   const redactAt = n.word("access-redact", "Redact secrets and personal data");
   const beforeAt = n.word("access-redact", "before embedding");
   const apiAt = n.word("access-redact", "an outside API");
@@ -86,7 +91,7 @@ export const AccessScene: React.FC = () => {
         </Note>
         <Note at={queryAt - 2} x={CARD.x} y={y(CARD.top) - 52}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            filtered at query time
+            filtered at query time, inside the search,
             <span style={{ opacity: ease(frame, identityAt - 2, 10) }}>
               {" "}for{" "}
               <span style={{ padding: "1px 10px", borderRadius: 14, border: `2px solid ${INK}`, fontWeight: 650 }}>Dana, {USER_TEAM}</span>
@@ -133,7 +138,16 @@ export const AccessScene: React.FC = () => {
             </Mark>
           </span>
         </Note>
-        <Note at={permAt + 30} x={CARD.x} y={cardY(CHUNKS.length) + 52}>
+        <Note at={changeAt - 2} x={CARD.x} y={cardY(CHUNKS.length) + 56}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            a permission changes upstream
+            <span style={{ opacity: ease(frame, updateAt - 2, 10) }}>
+              : update the <span style={{ fontFamily: MONO, fontSize: 20, color: BLUE_INK, fontVariantLigatures: "none" }}>readers</span>
+            </span>
+            <span style={{ opacity: ease(frame, noEmbedAt - 2, 10), color: INK_SOFT }}>, not the vectors</span>
+          </span>
+        </Note>
+        <Note at={permAt + 30} x={CARD.x} y={cardY(CHUNKS.length) + 100}>
           <span style={madeUp(19)}>chunks and user made up for this video</span>
         </Note>
 

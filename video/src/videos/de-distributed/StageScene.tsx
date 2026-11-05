@@ -11,7 +11,7 @@ import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { at as atScale, Axes, type Scale } from "../da-statistics-communication/parts";
 import { TAIL } from "./data";
-import { Drift, Machine, Svg } from "./parts";
+import { Drift, Machine, OK_INK, Svg } from "./parts";
 
 const S1_X = 120;
 const S2_X = 1000;
