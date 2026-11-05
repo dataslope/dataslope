@@ -10,8 +10,8 @@ import { ADA, ANSWER, COUNTS, CUSTOMERS, LISTING, ON_DISK, ORDERS, SAME_ANSWER }
 import {
   ASIDE,
   cellCenter,
-  columnWidths,
   type Column,
+  columnWidths,
   Headline,
   KEY,
   KEY_INK,
@@ -21,6 +21,7 @@ import {
   Mark,
   MovingTable,
   PaperPage,
+  Spot,
   Strike,
   Svg,
   Tick,
@@ -137,6 +138,8 @@ export const CoddScene: React.FC = () => {
         authorMark={tedAt + 4}
         out={keepAt - 14}
       />
+      {/* Codd himself, painted from photographs of him, beside his name. */}
+      <Spot id="db-relational-history-codd" at={tedAt - 4} out={keepAt - 14} left={1290} top={y(250)} width={470} height={504} />
       <Ink at={britishAt - 2} dur={14} out={keepAt - 14} style={{ left: 730, top: y(360), whiteSpace: "nowrap" }}>
         <div style={{ ...label(24, INK) }}>Ted Codd</div>
         <div style={{ ...body(28, true), marginTop: 8 }}>a British-born mathematician</div>
