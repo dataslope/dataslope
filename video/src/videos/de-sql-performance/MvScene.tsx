@@ -136,10 +136,11 @@ export const MvScene: React.FC = () => {
         </Note>
         <Note at={refreshAt} x={vg.right + 40} y={vg.rowTop(0) - h(10)}>
           <Listing lines={MV.refresh} x={0} top={0} width={560} size={20} at={refreshAt} />
-          <div style={{ position: "absolute", top: listingHeight(MV.refresh.length, 20) + h(12), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, rerunAt, 10) }}>
+          {/* Beside the listing, not under it: the bridge's rule runs below. */}
+          <div style={{ position: "absolute", left: 560 + 30, top: 0, ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, rerunAt, 10) }}>
             Postgres reruns the whole query;
           </div>
-          <div style={{ position: "absolute", top: listingHeight(MV.refresh.length, 20) + h(44), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, backgroundAt, 10) }}>
+          <div style={{ position: "absolute", left: 560 + 30, top: h(32), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, backgroundAt, 10) }}>
             some warehouses refresh it for you, in the background
           </div>
         </Note>

@@ -281,16 +281,23 @@ const Factless: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={noneAt + 6} x={ga.x} y={ga.rowTop(A.rows.length) + c.h(16)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>names stand in for keys; no measure column</span>
       </Note>
+      {/* The code at 23px, so QMono's 0.84em stays above 19px. */}
       <TableName g={gx} at={coverAt}>
-        <QMono>enrollment</QMono>
-        <span style={{ opacity: ease(frame, minusAt, 10) }}>
-          {" "}
-          <QMono>EXCEPT</QMono> <QMono>attendance</QMono>: who didn&rsquo;t come
+        <span style={{ fontSize: 23 }}>
+          <QMono>enrollment</QMono>
+          <span style={{ opacity: ease(frame, minusAt, 10) }}>
+            {" "}
+            <QMono>EXCEPT attendance</QMono>
+          </span>
         </span>
+        <span style={{ opacity: ease(frame, cameAt, 10) }}>: who didn&rsquo;t come</span>
       </TableName>
       <DataTable g={gx} cols={colsOf(X)} at={minusAt} rows={X.rows.map((cells, i) => ({ cells, at: cameAt + i * 3 }))} marks={X.rows.map((_, row) => ({ row, col: 0, at: cameAt + 6 }))} />
       <TableName g={gc} at={countAt - 2}>
-        <QMono>COUNT(*)</QMono> per class
+        <span style={{ fontSize: 23 }}>
+          <QMono>COUNT(*)</QMono>
+        </span>{" "}
+        per class
       </TableName>
       <DataTable g={gc} cols={colsOf(C)} at={countAt - 2} rows={C.rows.map((cells, i) => ({ cells, at: countAt + 2 + i * 3 }))} />
     </>

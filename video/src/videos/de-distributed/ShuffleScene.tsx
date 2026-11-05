@@ -26,6 +26,8 @@ const HI = Math.log10(3e7);
 const LAD_TOP = 606;
 const LAD_PITCH = 37;
 const SCALED_X = 1580;
+/** How far left of the row names the highlight band starts. */
+const BAND_L = 262;
 
 const xOf = (ns: number) => BAR_X + ((Math.log10(ns) - LO) / (HI - LO)) * BAR_W;
 const nsText = (ns: number) => `${ns < 1 ? String(ns) : count(ns)} ns`;
@@ -74,6 +76,30 @@ export const ShuffleScene: React.FC = () => {
   const SSD = idx("NVMe SSD read");
   const NET = idx(NET_LEVEL);
   const L1 = idx("L1 cache");
+  const ratioOf = (i: number) => (i === SSD ? LADDER.ssdOverMemory : i === NET ? LADDER.networkOverMemory : null);
+  // A gridline stops for any row whose figure is printed across it, so no
+  // dotted rule runs through a label. Widths are estimated from the text at
+  // the label's 20px (about 10.5px a character, the ratio's bold included).
+  const gridRuns = (x: number): [number, number][] => {
+    const skips = LADDER.levels
+      .map((l, i) => {
+        const r = ratioOf(i);
+        const text = nsText(l.ns) + (r === null ? "" : ` · ${count(r)} × memory`);
+        const x0 = xOf(l.ns) + 14 - 6;
+        const x1 = xOf(l.ns) + 14 + text.length * 10.5 + 6;
+        return x >= x0 && x <= x1 ? [rowY(i) - 6, rowY(i) + rowH + 6] : null;
+      })
+      .filter((v): v is number[] => v !== null);
+    const runs: [number, number][] = [];
+    let from = rowY(0) - 6;
+    for (const [a, b] of skips) {
+      if (a > from) runs.push([from, a]);
+      from = Math.max(from, b);
+    }
+    const end = rowY(LADDER.levels.length - 1) + rowH + 4;
+    if (end > from) runs.push([from, end]);
+    return runs;
+  };
   const mark = (at: number, out?: number) => ease(frame, at, 10) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
 
   return (
@@ -159,13 +185,15 @@ export const ShuffleScene: React.FC = () => {
           const at = i === MEM ? thousandAt : i === SSD ? ssdAt : rtAt;
           const o = mark(at - 2, i === MEM ? secondAt : undefined);
           return o > 0 ? (
-            <div key={i} style={{ position: "absolute", left: NAME_R - 230, top: rowY(i) - 4, width: 230 + (SCALED_X - NAME_R) + 160, height: rowH + 8, background: HIGHLIGHT, opacity: o * 0.45, borderRadius: 4 }} />
+            <div key={i} style={{ position: "absolute", left: NAME_R - BAND_L, top: rowY(i) - 4, width: BAND_L + (SCALED_X - NAME_R) + 160, height: rowH + 8, background: HIGHLIGHT, opacity: o * 0.45, borderRadius: 4 }} />
           ) : null;
         })}
         <Svg>
           {[1, 100, 1e4, 1e6].map((t) => (
             <g key={t} opacity={ease(frame, chartAt + 6, 12)}>
-              <line x1={xOf(t)} x2={xOf(t)} y1={rowY(0) - 6} y2={rowY(LADDER.levels.length - 1) + rowH + 4} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
+              {gridRuns(xOf(t)).map(([a, b]) => (
+                <line key={a} x1={xOf(t)} x2={xOf(t)} y1={a} y2={b} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
+              ))}
               <text x={xOf(t)} y={rowY(LADDER.levels.length - 1) + rowH + 28} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
                 {t >= 1e6 ? `${t / 1e6}M` : t >= 1000 ? `${t / 1000}k` : String(t)}
               </text>

@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { INDEX, thousands } from "./data";
-import { Bar, Drift, Listing, listingHeight, PageStrip, PlanBox, X0 } from "./parts";
+import { Bar, Drift, Listing, listingHeight, PageStrip, PlanBox, SmallMono, X0 } from "./parts";
 
 const TOP = 330;
 const SIZE = 21;
@@ -198,7 +198,7 @@ export const IndexScene: React.FC = () => {
         {/* ── An unselective filter: the index on status goes unused ── */}
         <Note at={nineAt} x={X0} y={y(TOP) - h(46)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            An index on <QMono>status</QMono> exists; <Num>{thousands(INDEX.shipped)}</Num> rows are shipped
+            An index on <SmallMono>status</SmallMono> exists; <Num>{thousands(INDEX.shipped)}</Num> rows are shipped
           </span>
         </Note>
         <Listing lines={INDEX.shippedQuery} x={X0} top={y(TOP)} width={640} size={SIZE} at={lowAt} marks={[{ line: "WHERE", at: nineAt + 6 }]} />

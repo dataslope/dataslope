@@ -207,7 +207,6 @@ const Lineage: React.FC<{ c: Ctx }> = ({ c }) => {
   const dashAt = c.w("r-lineage", "from source system to dashboard");
   const whyAt = c.w("r-lineage", "why a metric changed");
   const breaksAt = c.w("r-lineage", "what breaks if you drop a column");
-  const dropAt = c.w("r-lineage", "drop a column");
   const personalAt = c.w("r-lineage", "where personal data went");
   const W = 196;
   const H = c.h(62);
@@ -235,11 +234,11 @@ const Lineage: React.FC<{ c: Ctx }> = ({ c }) => {
   // (what breaks); the CRM's personal data and everything it reaches.
   const back = new Set<K>(["dash", "fct", "rawOrders", "rawCust", "ordersDb", "crm"]);
   const fwd = new Set<K>(["rawCust", "fct", "dash"]);
-  // The back-trace holds until "drop a column", so it is read before the
-  // forward trace replaces it.
-  const backP = ease(frame, whyAt, 16) * (1 - ease(frame, dropAt - 2, 10));
-  const fwdP = ease(frame, dropAt + 2, 14) * (1 - ease(frame, personalAt - 4, 10));
-  const persP = ease(frame, personalAt + 4, 14);
+  // Each trace holds into the next question's first words, so it is read
+  // before the next replaces it (the back-trace was up for about 1.3 s).
+  const backP = ease(frame, whyAt, 16) * (1 - ease(frame, breaksAt + 6, 10));
+  const fwdP = ease(frame, breaksAt + 8, 14) * (1 - ease(frame, personalAt + 6, 10));
+  const persP = ease(frame, personalAt + 8, 14);
   const pers = new Set<K>(["crm", "rawCust", "fct", "dash"]);
   return (
     <>

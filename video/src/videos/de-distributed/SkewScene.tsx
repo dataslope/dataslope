@@ -222,7 +222,7 @@ export const SkewScene: React.FC = () => {
             <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}>, if it can&apos;t combine locally</span>
           </span>
         </Note>
-        <Note at={saltedAt} x={R_X} y={y(646)}>
+        <Note at={saltedAt} x={R_X} y={y(644)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>1</b> by salted key
             <span style={{ opacity: ease(frame, thenAt, 10) }}>
@@ -231,7 +231,7 @@ export const SkewScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={joinAt - 2} x={R_X} y={y(700)}>
+        <Note at={joinAt - 2} x={R_X} y={y(692)}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap", ...note(24, INK) }}>
             <b>in a join:</b>
             <span style={{ opacity: ease(frame, copyAt, 10), display: "flex", gap: 10, alignItems: "center" }}>
@@ -252,15 +252,15 @@ export const SkewScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={matchAt - 2} x={R_X} y={y(752)}>
+        <Note at={matchAt - 2} x={R_X} y={y(740)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>every salted row still finds its match</span>
         </Note>
-        <Note at={nullsAt - 2} x={R_X} y={y(814)}>
+        <Note at={nullsAt - 2} x={R_X} y={y(792)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             or: handle nulls and stand-in keys separately
           </span>
         </Note>
-        <Note at={aqeAt - 2} x={R_X} y={y(856)}>
+        <Note at={aqeAt - 2} x={R_X} y={y(832)}>
           <span style={{ ...note(23, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
             or: adaptive query execution<span style={{ opacity: ease(frame, splitAt, 10) }}> splits skewed join partitions</span>
             <br />

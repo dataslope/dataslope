@@ -215,10 +215,10 @@ export const PgScene: React.FC = () => {
         ))}
 
         {/* What an interviewer wants. */}
-        <Note at={leanAt - 2} x={RIGHT_X} y={y(630)}>
+        <Note at={leanAt - 2} x={RIGHT_X} y={y(630) + 18}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>the answer they want</span>
         </Note>
-        <Note at={leanAt} x={RIGHT_X} y={y(630) + 40}>
+        <Note at={leanAt} x={RIGHT_X} y={y(630) + 58}>
           <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap", lineHeight: 1.5 }}>
             <Mark at={leanAt + 4} color={MARK_OK}>
               which way you&apos;d lean
@@ -234,7 +234,7 @@ export const PgScene: React.FC = () => {
           </span>
         </Note>
         {evidence.map((e, i) => (
-          <Chip key={e.text} x={RIGHT_X} y={y(630) + 140 + i * 54} at={e.at - 2} size={22}>
+          <Chip key={e.text} x={RIGHT_X} y={y(630) + 156 + i * 54} at={e.at - 2} size={22}>
             {e.text}
           </Chip>
         ))}

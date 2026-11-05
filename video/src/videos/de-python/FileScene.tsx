@@ -119,7 +119,7 @@ export const FileScene: React.FC = () => {
   const T = { cols: ["name", "qty"], rows: FILE.totals };
   const tg = geoOf(T, TOTALS_X, chunkTop, h, { rowH: 46, bodySize: 24, headH: 44 });
   const totalsAt = foldAt + FILE.nChunks * 8;
-  const pBarsY = rTop + cH + h(150);
+  const pBarsY = rTop + cH + h(164);
   const wh = bytes(FILE.whole.peak);
   const ch = bytes(FILE.chunks.peak);
   const meanTop = chunkTop + FILE.nChunks * chunkH + h(70);
@@ -183,8 +183,8 @@ export const FileScene: React.FC = () => {
           marks={[{ line: lineOf(S, "for line in f"), at: loopAt + 4, color: MARK_OK }]}
         />
 
-        {/* The for loop's peak stays beside it once the bars give way. */}
-        <Note at={kbAt + 4} x={X0 + 766} y={sTop + listingHeight(S.length, SIZE) / 2 - h(18)} out={out3}>
+        {/* The for loop's peak stays under it once the bars give way. */}
+        <Note at={kbAt + 4} x={X0} y={sTop + listingHeight(S.length, SIZE) + h(14)} out={out3}>
           <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             peak <Num>{st.num}</Num> {st.unit}
           </span>
@@ -192,7 +192,7 @@ export const FileScene: React.FC = () => {
         {/* read() is the trap only with no size: a file without line breaks
             still streams, a fixed block at a time (the page's "fixed-size
             chunks"). */}
-        <Note at={kbAt + 24} x={X0} y={sTop + listingHeight(S.length, SIZE) + h(20)} out={out3}>
+        <Note at={kbAt + 24} x={X0} y={sTop + listingHeight(S.length, SIZE) + h(58)} out={out3}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             no line breaks? <Mono>f.read(size)</Mono>, a fixed block at a time
           </span>

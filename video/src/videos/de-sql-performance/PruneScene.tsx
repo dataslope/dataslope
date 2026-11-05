@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PRUNE, thousands } from "./data";
-import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK, OK_INK, PlanBox, planHeight, X0 } from "./parts";
+import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK, OK_INK, PlanBox, planHeight, SmallMono, X0 } from "./parts";
 
 const BOX_TOP = 300;
 const BOX_W = 128;
@@ -81,7 +81,7 @@ export const PruneScene: React.FC = () => {
         {/* ── The twelve partitions ── */}
         <Note at={splitAt} x={X0} y={y(BOX_TOP) - h(40)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            orders, <QMono>PARTITION BY RANGE (order_date)</QMono>: one table per month, rows in each
+            orders, <SmallMono>PARTITION BY RANGE (order_date)</SmallMono>: one table per month, rows in each
           </span>
         </Note>
         {PRUNE.partitions.map((p, i) => {

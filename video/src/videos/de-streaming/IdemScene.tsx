@@ -244,7 +244,7 @@ export const IdemScene: React.FC = () => {
           </Note>
         ))}
 
-        <Note at={sameTxnAt} x={1300} y={y(TABLE.top) + h(100) + 3 * h(40) + h(8)} out={q6Out}>
+        <Note at={sameTxnAt} x={1300} y={rowY(6) + h(16)} out={q6Out}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             written in <b style={{ color: OK_INK }}>one transaction with the row</b>,
             <br />
@@ -374,7 +374,7 @@ export const IdemScene: React.FC = () => {
           output messages
         </Box>
         <Note at={outputAt + 6} x={outT.x} y={outT.y + outT.h + h(6)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>sent by an idempotent producer too</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>via an idempotent producer too</span>
         </Note>
         <Box x={offs.x} y={offs.y} w={offs.w} h={offs.h} at={offsetsAt} size={21}>
           consumer offsets

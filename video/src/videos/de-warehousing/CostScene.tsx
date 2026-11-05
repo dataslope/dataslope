@@ -87,25 +87,23 @@ export const CostScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── What the bill counts ── */}
-        {bills.map((b, i) => (
-          <div
-            key={b.title}
-            style={{
-              position: "absolute",
-              left: X0 + i * 560,
-              top: y(BILL_Y),
-              padding: "12px 20px",
-              borderRadius: 8,
-              border: `2px solid ${BAR}`,
-              background: PAPER,
-              whiteSpace: "nowrap",
-              opacity: ease(frame, b.at, 12),
-            }}
-          >
-            <div style={{ ...note(24, INK), fontWeight: 650 }}>{b.title}</div>
-            <div style={{ ...note(21, BLUE_INK), opacity: ease(frame, b.sub, 10) }}>{b.who}</div>
-          </div>
-        ))}
+        <div style={{ position: "absolute", left: X0, top: y(BILL_Y), display: "flex", gap: 44, whiteSpace: "nowrap" }}>
+          {bills.map((b) => (
+            <div
+              key={b.title}
+              style={{
+                padding: "12px 20px",
+                borderRadius: 8,
+                border: `2px solid ${BAR}`,
+                background: PAPER,
+                opacity: ease(frame, b.at, 12),
+              }}
+            >
+              <div style={{ ...note(24, INK), fontWeight: 650 }}>{b.title}</div>
+              <div style={{ ...note(21, BLUE_INK), opacity: ease(frame, b.sub, 10) }}>{b.who}</div>
+            </div>
+          ))}
+        </div>
 
         {/* ── Read less ── */}
         <div style={{ position: "absolute", left: X0, top: y(READ_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, lessAt, 12) }}>
@@ -147,7 +145,7 @@ export const CostScene: React.FC = () => {
             style={{
               position: "absolute",
               left: X0,
-              top: y(COMPUTE_Y) + i * h(50),
+              top: y(COMPUTE_Y) + i * h(44),
               display: "flex",
               alignItems: "center",
               gap: 12,

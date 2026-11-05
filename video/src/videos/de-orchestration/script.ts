@@ -58,9 +58,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Facts (check.mjs into results.json, which data.ts reads). Airflow and
  * Dagster do not run here; their behavior is quoted only as the page states
  * it, and drawn as mechanism.
+ *   - "anti-parse": Airflow's default parse interval, quoted in check.mjs
+ *     (min_file_process_interval, 30 seconds): 2,880 parses a day.
  *   - "retry": the page's default_args (3 retries, 5 minutes, exponential
  *     backoff, 30 at most) as a doubling schedule, in Pyodide 314.0.7: waits
- *     of 5, 10 and 20 minutes; a fourth would be capped at 30, not 40.
+ *     of 5, 10 and 20 minutes; a fourth would be capped at 30, not 40. These
+ *     are floors: Airflow adds a per-task spread of up to the same again, so
+ *     "jitter" is for code that calls a shared service.
  *   - "jitter": charts/idempotency-retry-storm.mjs, copied with its seed and
  *     checked against its caption: 1,000 clients without jitter land 1,000 in
  *     one 100 ms window against a capacity of 90; with jitter the peaks are
@@ -80,7 +84,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     three minutes on June 1 and 2, nothing on June 3; the page's check
  *     (now against max(updated_at)) with now() pinned to 06:00: 6 h 2 min on
  *     June 3, 30 h 2 min (1 day 06:02) on June 4, against the video's own
- *     12-hour threshold.
+ *     12-hour threshold. June 3's load added 0 rows, which a row-count check
+ *     on that load also catches ("fresh-why").
  *
  * Written for Drew's ear: SQL is "sequel"; DAG and SLA are expanded once;
  * every other initialism is plain caps, never letter-spaced; numbers as they

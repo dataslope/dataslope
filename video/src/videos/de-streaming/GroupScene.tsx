@@ -273,8 +273,8 @@ export const GroupScene: React.FC = () => {
         <Note at={storesAt} x={X0} y={mid(0) + h(26)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>one per partition, stored in Kafka</span>
         </Note>
-        {/* Under partition 1, its arrow on the commit: where the new owner picks up. */}
-        <Note at={ownerAt + 4} x={cellX(COMMITTED[1] + 1) - 13} y={laneTop(1) + laneH + h(4)}>
+        {/* Under partition 1, its arrow on the first offset after the commit, clear of the commit bars: where the new owner picks up. */}
+        <Note at={ownerAt + 4} x={cellX(COMMITTED[1] + 1) + 8} y={laneTop(1) + laneH + h(10)}>
           <span style={{ ...label(21, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>↑ consumer 1 resumes here</span>
         </Note>
         {/* The wrong alternative, struck: the start of the partition. */}

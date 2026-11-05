@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { QMono, QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -33,9 +33,8 @@ const Folder: React.FC<{ x: number; y: number; h: number; name: string; at: numb
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   if (p <= 0) return null;
-  // The trap tint mixes into the folder's own blue, so it fades in and out
-  // of it rather than through white.
-  const fill = trap > 0 ? `color-mix(in srgb, ${ACCENT} ${26 * trap}%, ${COLUMN_TINT.sale_id})` : read > 0 ? `color-mix(in srgb, ${READ} ${100 * read}%, ${COLUMN_TINT.sale_id})` : COLUMN_TINT.sale_id;
+  // The trap's pink fades into the folder's own blue, not through white.
+  const fill = trap > 0 ? `color-mix(in srgb, color-mix(in srgb, ${ACCENT} 26%, ${PAPER}) ${100 * trap}%, ${COLUMN_TINT.sale_id})` : read > 0 ? `color-mix(in srgb, ${READ} ${100 * read}%, ${COLUMN_TINT.sale_id})` : COLUMN_TINT.sale_id;
   return (
     <div style={{ position: "absolute", left: x, top: y + (1 - p) * 12, width: FOLDER_W, height: h, opacity: p * (1 - 0.62 * pruned) }}>
       <div style={{ position: "absolute", left: 0, top: 0, width: 54, height: 14, borderRadius: "5px 5px 0 0", background: fill, boxShadow: `inset 0 0 0 1.5px ${INK}` }} />
@@ -196,14 +195,14 @@ export const PartitionScene: React.FC = () => {
         </Note>
 
         {/* ── A good key ── */}
-        <div style={{ position: "absolute", left: X0, top: y(790), display: "flex", alignItems: "center", gap: 14, ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, goodAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(752), display: "flex", alignItems: "center", gap: 14, ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, goodAt, 12) }}>
           <Tick at={goodAt + 6} size={26} color={OK} />
           <span>
             <b style={{ color: OK_INK }}>A good key</b>: the column queries filter on most
             <span style={{ opacity: ease(frame, evenAt, 10) }}>, with partitions even in size and not too small</span>
           </span>
         </div>
-        <Note at={badAt} x={X0 + 40} y={y(826)}>
+        <Note at={badAt} x={X0 + 40} y={y(788)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             not a customer ID
             <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, tinyAt, 10) }}>: millions of tiny folders</span>
@@ -223,7 +222,7 @@ export const PartitionScene: React.FC = () => {
             { text: `Total Files Read: ${PARTITION.fn.filesRead}`, at: stillAt + 2 },
           ]}
         />
-        <Note at={fnAt + 6} x={X0} y={y(868)}>
+        <Note at={fnAt + 6} x={X0} y={y(830)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             A function on the key defeats pruning on many engines
             <span style={{ opacity: ease(frame, appliedAt, 10) }}>; DuckDB applies it to each folder&apos;s name</span>
@@ -231,7 +230,7 @@ export const PartitionScene: React.FC = () => {
           </span>
         </Note>
         {/* The habit that prunes everywhere: the raw key, or a range on it (measured: 3 of 12). */}
-        <div style={{ position: "absolute", left: X0, top: y(906), display: "flex", alignItems: "center", gap: 12, ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, rawAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(866), display: "flex", alignItems: "center", gap: 12, ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, rawAt, 12) }}>
           <Tick at={everyAt} size={23} color={OK} />
           <span>
             Filter on the key itself

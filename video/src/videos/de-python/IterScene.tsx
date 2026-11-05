@@ -32,8 +32,8 @@ const RIGHT_X = 1000;
 const ROWS = 4;
 /** The four rows of a pass, drawn large: the definitions are the scene's
  *  figure until the listings below take the page. */
-const BLOCK = 100;
-const PITCH = 124;
+const BLOCK = 124;
+const PITCH = 150;
 /** Frames the cursor spends on each row. */
 const STEP = 10;
 const PER = ROWS * STEP + 14;
@@ -180,7 +180,7 @@ export const IterScene: React.FC = () => {
   // The passes are drawn large; they give way to the listings below them.
   const outPasses = listAt - 12;
   const row1 = defTop + h(100);
-  const row2 = row1 + BLOCK + h(28);
+  const row2 = row1 + BLOCK + h(34);
 
   return (
     <AbsoluteFill>
@@ -210,7 +210,7 @@ export const IterScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             a fresh iterator for every loop
             <FadeIn at={dunderIterAt - 4}>
-              : <Mark at={dunderIterAt + 2}>
+              : <Mark at={dunderIterAt + 2} out={listAt}>
                 <Mono>__iter__()</Mono>
               </Mark>
             </FadeIn>
@@ -228,12 +228,14 @@ export const IterScene: React.FC = () => {
         </Note>
         <Note at={iteratorAt} x={RIGHT_X} y={defTop + h(42)} out={outDefs}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <Mark at={iteratorAt + 6}>
+            <Mark at={iteratorAt + 6} out={listAt}>
               <Mono>__next__()</Mono>
             </Mark>
             <FadeIn at={placeAt - 2}>: keeps its place, </FadeIn>
             <FadeIn at={usedAt - 2}>
-              <Mark at={usedAt + 4}>then is used up</Mark>
+              <Mark at={usedAt + 4} out={listAt}>
+                then is used up
+              </Mark>
             </FadeIn>
           </span>
         </Note>

@@ -242,7 +242,7 @@ export const AnnScene: React.FC = () => {
           </span>
         </Note>
         <QueryMark x={qx} y={qy} at={everyAt - 4} />
-        <Note at={everyAt + 2} x={qx + 22} y={qy - 50} dim={hnswAt}>
+        <Note at={everyAt + 2} x={qx + 26} y={qy - 15} dim={hnswAt}>
           <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER, padding: "0 4px" }}>query</span>
         </Note>
 

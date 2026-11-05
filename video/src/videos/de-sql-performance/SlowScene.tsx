@@ -8,7 +8,7 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EXPLAIN, SLOW, thousands } from "./data";
-import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK_INK, PlanBox, RowGrid, X0 } from "./parts";
+import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK_INK, PlanBox, RowGrid, SmallMono, X0 } from "./parts";
 
 const TOP = 300;
 const SIZE = 22;
@@ -182,7 +182,7 @@ export const SlowScene: React.FC = () => {
         {/* ── 2. Reading a plan ── */}
         <Note at={pendingAt - 2} x={X0} y={q2ListTop - h(46)} out={analyzeAt}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            After <Num>{thousands(EXPLAIN.pending)}</Num> pending orders arrived, before <QMono>ANALYZE</QMono>
+            After <Num>{thousands(EXPLAIN.pending)}</Num> pending orders arrived, before <SmallMono>ANALYZE</SmallMono>
             <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, autoAt, 10) }}>
               {" "}
               (autovacuum waits for <Num>{thousands(EXPLAIN.autoAfter)}</Num> changes)

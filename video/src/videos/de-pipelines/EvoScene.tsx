@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EVO, splitError } from "./data";
-import { type Col, DataTable, Drift, Flow, geoOf, Listing, MARK, MARK_BAD, Node, OK_INK, Pill, TableName, X0 } from "./parts";
+import { type Col, DataTable, Drift, Flow, geoOf, Listing, Mark, MARK, MARK_BAD, Node, OK_INK, Pill, TableName, X0 } from "./parts";
 
 const FILE_Y = 380;
 const FILE_ROW = 58;
@@ -89,6 +89,8 @@ export const EvoScene: React.FC = () => {
   ];
   const parqAt = n.word("evo-parquet", "Parquet, the columnar file format");
   const schemaAt = n.word("evo-parquet", "keeps a schema in each file");
+  const noRewriteAt = n.word("evo-parquet", "needs no rewrite");
+  const decidesAt = n.word("evo-parquet", "the reader decides");
   const day2At = n.word("evo-read", "Day two's file gained a coupon");
   const readAt = n.word("evo-read", "Read both files in DuckDB");
   const firstAt = n.word("evo-read", "takes the first file's columns");
@@ -207,6 +209,16 @@ export const EvoScene: React.FC = () => {
         <FileRow at={parqAt + 4} y={tTop} name="day1.parquet" cols={EVO.files[0]} markAt={firstAt} markOut={nameAt} out={gone} />
         <FileRow at={day2At} y={tTop + h(FILE_ROW)} name="day2.parquet" cols={EVO.files[1]} inks={{ coupon: BLUE_INK }} out={gone} />
         <FileRow at={day3At} y={tTop + 2 * h(FILE_ROW)} name="day3.parquet" cols={EVO.files[2]} inks={{ coupon: BLUE_INK, total: ACCENT_INK }} out={gone} />
+
+        {/* Before any read: what a schema per file buys, and what it leaves open. */}
+        <Note at={noRewriteAt} x={TABLE_X} y={tTop + h(10)} out={readAt}>
+          <div style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            add a column: <b>old files need no rewrite</b>
+          </div>
+          <div style={{ ...note(25, INK), whiteSpace: "nowrap", marginTop: 14, opacity: ease(frame, decidesAt, 10) }}>
+            <Mark at={decidesAt + 4}>the reader decides</Mark> whether it survives
+          </div>
+        </Note>
 
         {reads.map((r, i) => (
           <Listing key={i} lines={r.lines} x={X0} top={listTop} width={720} size={21} at={r.at} out={r.out} marks={i === 1 ? [{ line: 2, at: nameAt + 4 }] : []} />

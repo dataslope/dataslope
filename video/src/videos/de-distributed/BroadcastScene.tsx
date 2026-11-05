@@ -243,17 +243,19 @@ export const BroadcastScene: React.FC = () => {
             spark.sql.autoBroadcastJoinThreshold
           </span>
         </Note>
-        <Note at={thresholdAt + 10} x={NOTE_X} y={y(696)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+        <Note at={thresholdAt + 10} x={NOTE_X} y={y(694)}>
+          <span style={{ ...label(20, INK_SOFT), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             default <Num>{BROADCAST.autoThresholdMB}</Num> MB
             {BROADCAST.dimOverThreshold ? (
               <span style={{ opacity: ease(frame, hintAt - 2, 10) }}>
-                : this <Num>{BROADCAST.dimMB}</Num> MB lookup needs the hint
+                :
+                <br />
+                this <Num>{BROADCAST.dimMB}</Num> MB lookup needs the hint
               </span>
             ) : null}
           </span>
         </Note>
-        <Note at={hintAt - 2} x={NOTE_X} y={y(744)}>
+        <Note at={hintAt - 2} x={NOTE_X} y={y(778)}>
           <span style={{ ...label(20, INK_SOFT), display: "block", whiteSpace: "nowrap" }}>or hint it</span>
           <span style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}>
             broadcast(small_dim)

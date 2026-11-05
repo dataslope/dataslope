@@ -212,7 +212,7 @@ export const SmallFilesScene: React.FC = () => {
         {/* The format runs or schedules the rewrite and commits it atomically: readers never see it half done. */}
         <Note at={formatAt} x={PANEL_X} y={gridY + h(98)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            or a table format, like Delta Lake or Iceberg, <span style={{ color: OK_INK, fontWeight: 650 }}>commits the rewrite atomically</span>
+            or a table format, like Delta Lake or Iceberg, <span style={{ color: OK_INK, fontWeight: 650 }}>commits it atomically</span>
           </span>
         </Note>
         <Note at={formatAt + 12} x={PANEL_X + 20} y={gridY + h(132)}>

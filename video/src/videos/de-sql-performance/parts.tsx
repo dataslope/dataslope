@@ -42,6 +42,17 @@ export {
 } from "../da-sql/parts";
 export { colsOf, geoOf, rowsAt } from "../da-advanced-sql/parts";
 
+/**
+ * Code inside a line of small type: the interview kit's QMono (mono at
+ * 0.84em, sans-width spaces), but never under 19px, which 0.84em of a 21 or
+ * 22px label would be.
+ */
+export const SmallMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.84em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
+
 /** A mark's red, a trap or the wrong answer, as a band under text. */
 const BAD = `color-mix(in srgb, ${ds("red", 500)} 26%, transparent)`;
 

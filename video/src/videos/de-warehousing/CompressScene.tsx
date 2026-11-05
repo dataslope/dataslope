@@ -113,7 +113,7 @@ export const CompressScene: React.FC = () => {
   const R = y(340);
   const A = y(486);
   const D = y(596);
-  const C = y(772);
+  const C = y(780);
   const ROW_Y = y(684);
   const sample = TABLE.sample;
   const regionCol = sample.cols.indexOf("region");
@@ -177,7 +177,7 @@ export const CompressScene: React.FC = () => {
 
         {/* ── amount: random to the cent ── */}
         {name(A, amountAt, "amount", <><Num>{count(amount.distinct)}</Num> distinct values</>)}
-        <div style={{ position: "absolute", left: X0, top: A + h(54), ...note(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, centAt + 6, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: A + h(50), ...note(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, centAt + 6, 12) }}>
           too many for a dictionary
         </div>
         {bar(A, amount.csv, amountAt + 4, "as CSV text", { csv: true, tint: TINTS[5], sizeAt: fromAt })}

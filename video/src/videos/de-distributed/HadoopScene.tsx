@@ -109,7 +109,7 @@ export const HadoopScene: React.FC = () => {
               ) : null}
               <Note at={dAt + 2} x={gap(i) - 100} y={hMid + h(34)} width={200} style={{ textAlign: "center" }}>
                 <span style={{ ...label(20, isHdfs(i) ? (hot ? ACCENT_INK : INK_SOFT) : INK_SOFT), fontWeight: isHdfs(i) ? 650 : 500, whiteSpace: "nowrap" }}>
-                  {isHdfs(i) ? "HDFS, replicated" : "local disk"}
+                  {isHdfs(i) ? (last ? "HDFS" : "HDFS, replicated") : "local disk"}
                 </span>
               </Note>
             </React.Fragment>
@@ -119,9 +119,9 @@ export const HadoopScene: React.FC = () => {
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             every reduce:
             <br />
-            written to HDFS,
+            HDFS, read back
             <br />
-            read back by the next map
+            by the next map
           </span>
         </Note>
 

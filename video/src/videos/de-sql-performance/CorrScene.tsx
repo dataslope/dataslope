@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard, Tick } from "../../editorial/interview";
+import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, headline, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { CORR, thousands } from "./data";
-import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK, OK_INK, PlanBox, planHeight, X0 } from "./parts";
+import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK, OK_INK, PlanBox, planHeight, SmallMono, X0 } from "./parts";
 
 const TOP = 330;
 const SIZE = 21;
@@ -169,7 +169,7 @@ export const CorrScene: React.FC = () => {
         </Note>
         <Note at={windowAt} x={R_X} y={rewriteTop + listingHeight(CORR.rewrite.length, 20) + h(62)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            or <QMono>AVG(salary) OVER (PARTITION BY department)</QMono>
+            or <SmallMono>AVG(salary) OVER (PARTITION BY department)</SmallMono>
           </span>
         </Note>
 

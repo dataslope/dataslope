@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { COVER, INDEX } from "./data";
-import { Bar, DataTable, Drift, Listing, listingHeight, MARK_OK, OK_INK, PageStrip, PlanBox, planHeight, TableName, tableGeometry, X0 } from "./parts";
+import { Bar, DataTable, Drift, Listing, listingHeight, MARK_OK, OK_INK, PageStrip, PlanBox, planHeight, SmallMono, tableGeometry, TableName, X0 } from "./parts";
 
 const TOP = 300;
 const SIZE = 21;
@@ -104,7 +104,7 @@ export const CoverScene: React.FC = () => {
         />
         <Note at={aloneAt} x={X0 + 1150 - 12} y={planTop + h(4)} align="right" out={includeAt - 8}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            with an index on <QMono>customer_id</QMono> alone
+            with an index on <SmallMono>customer_id</SmallMono> alone
           </span>
         </Note>
         <Listing
@@ -183,7 +183,7 @@ export const CoverScene: React.FC = () => {
           at={sizeAt + 4}
           label={
             <>
-              <QMono>(customer_id)</QMono>
+              <SmallMono>(customer_id)</SmallMono>
             </>
           }
           shown={COVER.plain.mb}
@@ -199,7 +199,7 @@ export const CoverScene: React.FC = () => {
           at={fourAt - 4}
           label={
             <>
-              <QMono>(customer_id) INCLUDE (amount)</QMono>
+              <SmallMono>(customer_id) INCLUDE (amount)</SmallMono>
             </>
           }
           shown={COVER.covering.mb}
@@ -208,7 +208,7 @@ export const CoverScene: React.FC = () => {
         />
         <Note at={zeroAt + 14} x={X0} y={afterTop + planHeight(COVER.after.length, PLAN) + h(14)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            <QMono>0</QMono> because the table was just vacuumed: pages changed since then are still fetched
+            <Num>0</Num> heap fetches because the table was just vacuumed: pages changed since then are still fetched
           </span>
         </Note>
         <Note at={writesAt} x={X0} y={afterTop + h(250)}>

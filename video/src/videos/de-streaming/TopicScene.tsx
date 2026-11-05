@@ -258,7 +258,7 @@ export const TopicScene: React.FC = () => {
         <Note at={acrossAt + 6} x={LANE_X} y={laneTop(2) + laneH + h(10)} out={partsOut}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
             in order of arrival: <b style={{ color: USER_INK.dee }}>dee</b>'s click from <Num>{deeClick.t}</Num> s sits after{" "}
-            <b style={{ color: USER_INK[aheadOfDee.user] }}>{aheadOfDee.user}</b>'s from <Num>{aheadOfDee.t}</Num>
+            <b style={{ color: USER_INK[aheadOfDee.user] }}>{aheadOfDee.user}</b>'s from <Num>{aheadOfDee.t}</Num> s
           </span>
         </Note>
 

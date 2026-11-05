@@ -7,7 +7,7 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, STORM } from "./data";
-import { Drift, Headline, Kicker, OK, OK_INK, TaskBox, X0 } from "./parts";
+import { Drift, Headline, Kicker, OK, OK_INK, TaskBox } from "./parts";
 
 const PANEL_W = 720;
 const PANELS = [
@@ -80,7 +80,8 @@ export const JitterScene: React.FC = () => {
       <Drift from={from} to={end + 30}>
         <Kicker at={from - 4}>Question 4 · retries</Kicker>
         <Headline lead="Add jitter, too." at={Math.min(addAt - 2, from + 6)} size={66} />
-        <Note at={codeAt + 4} x={X0} y={y(250)}>
+        {/* The kicker's left edge, the headline's column. */}
+        <Note at={codeAt + 4} x={96} y={y(250)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             in code that calls a shared service<span style={{ color: INK_SOFT, opacity: ease(frame, partAt, 10) }}>: a random part of each wait</span>
           </span>

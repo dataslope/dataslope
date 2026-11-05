@@ -238,7 +238,7 @@ export const BackfillScene: React.FC = () => {
         <Note at={overAt - 2} x={cellX(RESUME) - 76} y={row2Top + 36} align="right" width={360}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>not from batch one</span>
         </Note>
-        <Note at={upsertAt - 2} x={X0} y={row2Top + 20}>
+        <Note at={upsertAt - 2} x={X0} y={row2Top + 28}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             upserts are idempotent: a batch written twice
             <br />

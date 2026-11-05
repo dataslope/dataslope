@@ -286,7 +286,7 @@ export const LakeScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
-                ...note(25, INK),
+                ...note(24, INK),
                 whiteSpace: "nowrap",
                 opacity: ease(frame, g.at, 10),
               }}
@@ -311,7 +311,7 @@ export const LakeScene: React.FC = () => {
         <Note at={landsAt} x={X0} y={y(852) + 15}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>All of it assumes the data lands on time, every day.</span>
         </Note>
-        <Spot id="de-warehousing-hamster" at={landsAt} left={1600} top={y(806)} width={200} height={153} />
+        <Spot id="de-warehousing-hamster" at={landsAt} left={1020} top={y(700)} width={183} height={140} />
         <NextLine at={nextAt} x={780} y={y(842)} width={640}>
           orchestration and reliability
         </NextLine>

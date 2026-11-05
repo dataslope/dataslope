@@ -150,8 +150,9 @@ export const Types46Scene: React.FC = () => {
         {bandLabel(sixAt - 2, "Type 6", "1 + 2 + 3", y(BAND6))}
         {part(versionsAt + 4, "Type 2", R.cols.indexOf("valid_from"), R.cols.indexOf("valid_to"))}
         {part(part3At, "Type 3", rCur, rCur)}
+        {/* Named short, so "Type 3" over current_city has the line to itself. */}
         <TableName g={gr} at={versionsAt - 2}>
-          dim_customer, with current_city
+          dim_customer
         </TableName>
         <DataTable
           g={gr}

@@ -82,7 +82,9 @@ export const LineageScene: React.FC = () => {
   const reset = ease(frame, q14At - 6, 12);
   const dataGone = ease(frame, notDataAt, 14) * (1 - ease(frame, keepsAt, 14));
   const lost = ease(frame, lostAt, 10) * (1 - ease(frame, replayAt + 34, 12));
-  const replay = (c: number) => ease(frame, replayAt + 4 + c * 8, 10) * (1 - reset);
+  // Past the shuffle, the narrow replay gives way to the wide case.
+  const wideOn = ease(frame, parentAt, 12);
+  const replay = (c: number) => ease(frame, replayAt + 4 + c * 8, 10) * (1 - reset) * (1 - wideOn);
   const ckpt = ease(frame, ckptAt, 12) * (1 - reset);
   const cached = ease(frame, keepsAt, 12);
   const stepsMark = ease(frame, stepsAt, 12) * (1 - ease(frame, diesAt, 12));
@@ -159,6 +161,9 @@ export const LineageScene: React.FC = () => {
             const p = ease(frame, lineageAt + 2 + k * 4 + r * 2, 10);
             const isLost = k === 2 && r === LOST;
             const isReplay = r === LOST && k <= 2 && replay(k) > 0;
+            // A reduceByKey partition lost past the shuffle, and its three parents.
+            const wideParent = k === 2 ? wide : 0;
+            const wideLost = k === 3 && r === LOST && wide > 0.5;
             const fill = (isLost ? 1 - lost : 1) * (1 - dataGone * 0.85);
             const keep = k === 1 ? cached : 0;
             const dimRead = k === 0 ? 1 - 0.6 * ckpt : 1;
@@ -173,18 +178,22 @@ export const LineageScene: React.FC = () => {
                   height: bh,
                   boxSizing: "border-box",
                   borderRadius: 4,
-                  background: isReplay ? `color-mix(in srgb, ${ds("yellow", 400)} 55%, ${PAPER})` : `color-mix(in srgb, ${BAR} ${36 * fill}%, ${PAPER})`,
-                  border: isLost && lost > 0.5 ? `2.4px dashed ${ACCENT}` : keep > 0.5 ? `2.4px solid ${OK}` : `1.6px solid color-mix(in srgb, ${BAR} 70%, ${PAPER})`,
+                  background: isReplay
+                    ? `color-mix(in srgb, ${ds("yellow", 400)} 55%, ${PAPER})`
+                    : wideParent > 0
+                      ? `color-mix(in srgb, ${ds("yellow", 400)} ${55 * wideParent}%, color-mix(in srgb, ${BAR} ${36 * fill}%, ${PAPER}))`
+                      : `color-mix(in srgb, ${BAR} ${36 * fill}%, ${PAPER})`,
+                  border: (isLost && lost > 0.5) || wideLost ? `2.4px dashed ${ACCENT}` : keep > 0.5 ? `2.4px solid ${OK}` : `1.6px solid color-mix(in srgb, ${BAR} 70%, ${PAPER})`,
                   opacity: dimRead * p,
                   overflow: "hidden",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...label(19, isLost && lost > 0.5 ? ACCENT_INK : INK_SOFT),
+                  ...label(19, (isLost && lost > 0.5) || wideLost ? ACCENT_INK : INK_SOFT),
                   whiteSpace: "nowrap",
                 }}
               >
-                {isLost && lost > 0.5 ? "lost" : keep > 0.5 ? "cached" : `part ${r + 1}`}
+                {(isLost && lost > 0.5) || wideLost ? "lost" : keep > 0.5 ? "cached" : `part ${r + 1}`}
               </div>
             );
           }),
@@ -273,15 +282,15 @@ export const LineageScene: React.FC = () => {
             <span style={{ opacity: ease(frame, iterAt, 10) }}>an iterative algorithm</span>
           </span>
         </Note>
-        <Note at={onceUsedAt - 2} x={RDD_X} y={y(764)}>
+        <Note at={onceUsedAt - 2} x={RDD_X} y={y(756)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>used once: wasted memory</span>
         </Note>
-        <Note at={onceUsedAt + 10} x={RDD_X} y={y(804)}>
+        <Note at={onceUsedAt + 10} x={RDD_X} y={y(792)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>unpersist()</span> when done
           </span>
         </Note>
-        <Note at={lazyAt - 2} x={RDD_X} y={y(852)}>
+        <Note at={lazyAt - 2} x={RDD_X} y={y(834)}>
           <span style={{ ...note(23, INK), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             lazy too:
             <span style={{ opacity: ease(frame, firstAt, 10) }}> fills on the</span>

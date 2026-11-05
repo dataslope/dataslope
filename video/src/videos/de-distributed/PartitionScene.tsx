@@ -23,7 +23,7 @@ const ROW0 = 410;
 const ROW_PITCH = 92;
 /** Each row of four cores is one executor: its bracket and name, right of the grid. */
 const EXEC_X = 622;
-const DRIVER_X = 790;
+const DRIVER_X = 840;
 const DRIVER_W = 200;
 const DRIVER_H = 76;
 
@@ -177,7 +177,7 @@ export const PartitionScene: React.FC = () => {
           <span style={{ display: "block", ...label(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, driverAt + 8, 10) }}>plans the job</span>
         </Note>
         {[0, 1, 2, 3].map((r) => (
-          <Curve key={r} from={[DRIVER_X - 4, driverTop + h(DRIVER_H) / 2]} to={[EXEC_X + 124, rowMid(r)]} at={handsAt + r * 2} dur={12} width={1.6} head={9} out={fewAt - 6} />
+          <Curve key={r} from={[DRIVER_X - 4, driverTop + h(DRIVER_H) / 2]} to={[EXEC_X + 136, rowMid(r)]} at={handsAt + r * 2} dur={12} width={1.6} head={9} out={fewAt - 6} />
         ))}
 
         {/* Four partitions: four busy cores, twelve idle. */}

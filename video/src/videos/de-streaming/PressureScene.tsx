@@ -179,8 +179,24 @@ export const PressureScene: React.FC = () => {
         })}
         {/* One consumer reads both partitions; a second takes partition 1. */}
         <Box x={cons.x} y={mid(0) - cons.h / 2} w={cons.w} h={cons.h} at={keepUpAt - 4}>
-          <span>consumer</span>
-          <span style={{ ...label(20, ACCENT_INK), opacity: ease(frame, keepUpAt, 10) * (1 - ease(frame, takesAt, 10)) }}>can't keep up</span>
+          <span>
+            consumer<span style={{ opacity: ease(frame, secondAt + 2, 10) }}>
+              {" "}
+              <Num>1</Num>
+            </span>
+          </span>
+          {/* Folds away once the second consumer takes a partition, so "consumer 1" re-centres. */}
+          <span
+            style={{
+              ...label(20, ACCENT_INK),
+              display: "block",
+              overflow: "hidden",
+              height: 26 * (1 - ease(frame, takesAt + 6, 12)),
+              opacity: ease(frame, keepUpAt, 10) * (1 - ease(frame, takesAt, 10)),
+            }}
+          >
+            can't keep up
+          </span>
         </Box>
         <ElbowArrow
           points={[
@@ -223,7 +239,7 @@ export const PressureScene: React.FC = () => {
         <Note at={idleAt} x={cons.x} y={mid(last) + cons.h / 2 + h(12)}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>on one partition, it would sit idle</span>
         </Note>
-        <Bracket x0={markX(bottom.read)} x1={markX(bottom.written)} y={laneTop(last) + laneH + h(16)} at={lagAt}>
+        <Bracket x0={markX(bottom.read)} x1={markX(bottom.written)} y={laneTop(last) + laneH + h(16)} at={lagAt} out={clearsAt + 10}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 750 }}>consumer lag</span>
         </Bracket>
         <Note at={distAt + 2} x={X0} y={laneTop(last) + laneH + h(28)}>
@@ -232,7 +248,6 @@ export const PressureScene: React.FC = () => {
             <Bar color={INK} />
             minus committed offset
             <Bar color={BAR} />
-            <span style={{ opacity: ease(frame, distAt + 10, 10) }}>, summed over partitions</span>
           </span>
         </Note>
         <Note at={absorbsAt} x={cons.x + cons.w + 24} y={both - h(66)}>
@@ -274,7 +289,7 @@ export const PressureScene: React.FC = () => {
           yTicks={[0, 400, 800, 1200]}
           yFormat={(v) => count(v)}
           xTitle="seconds"
-          yTitle="consumer lag, messages"
+          yTitle="lag in messages, both partitions"
           at={modelAt}
         />
         <Note at={modelAt + 2} x={X0} y={sy.b - h(4)}>
