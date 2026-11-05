@@ -49,7 +49,15 @@ byte-identical to `4bff3bc`.
 
 - 620.1 s (10:20), 64 beats; was 567.5 s, 53 beats.
 - Typecheck and lint clean for the folder; `check:cues` clean; `npm test` 75/75.
-- CHECKS
+- `check:frames` passes (26 arrows within 10°, no hyphen in tabular figures).
+- `check:motion` passes: one still of 2.0 s (3:44.8, the idempotency scene), nothing
+  for 3 s.
+- `check:sync` passes: 64 beats, worst +0.03 s.
+- `check:mix` passes: effects 30.5 LU under the narration, speech a median 29.9 dB above
+  them where both sound.
+- Stills at every changed moment in all nine scenes, each looked at; three collisions they
+  showed were fixed and re-checked (the lag formula against "consumer lag", the Q6 crash
+  note against the overwrite note, the Q7 producer note across the transaction's border).
 
 ## Facts
 
