@@ -22,12 +22,16 @@
 //   a probe finds; work is the share of vectors it compares. Then a tenant
 //   per vector, one of 100 at random, and the top ten post-filtered to the
 //   query's tenant. No vector database runs here and no latency is claimed.
-// - Question 9: two made-up rankings of five tickets each, fused by the
-//   page's reciprocal rank fusion with its k = 60; and TF-IDF's idf,
-//   ln(N / df), as the tf-idf course video computes it, on the eight made-up
-//   tickets.
+// - Question 9: eight made-up tickets searched for "E-4031 error". The vector
+//   side's ranking is made up (no embedding model runs); the keyword side's
+//   is BM25 (k1 = 1.2, b = 0.75, Lucene's idf) over the eight tickets, ties
+//   broken by ticket number. The two are fused by the page's reciprocal rank
+//   fusion with its k = 60; and TF-IDF's idf, ln(N / df), as the tf-idf
+//   course video computes it, on the same tickets.
 // - Question 11: the page's arithmetic (10 million chunks at about 400
-//   tokens), and a rate of a million tokens a minute, for scale only.
+//   tokens), a rate of a million tokens a minute, and a range of list prices
+//   (2 to 20 cents per million tokens, checked November 2026), all for scale
+//   only: no provider is named.
 // - Question 3: 400 tokens in characters, at the prose rate llm-tokens
 //   measured (900 characters in 201 o200k tokens).
 // - The close: the track's bank and concept checks, counted in content/.
@@ -168,13 +172,8 @@ r["filter"] = {
 
 # ── 9. Hybrid search: two rankings, fused; and idf on the made-up tickets ───
 RRF_K = 60
+QUERY = "E-4031 error"
 vector = ["#1182", "#2071", "#0934", "#3310", "#1457"]
-keyword = ["#3310", "#2650", "#0412", "#2071", "#1890"]
-fused = {}
-for lst in (vector, keyword):
-    for rank, t in enumerate(lst, start=1):
-        fused[t] = fused.get(t, 0.0) + 1 / (RRF_K + rank)
-ranked = sorted(fused.items(), key=lambda kv: -kv[1])
 tickets = {
     "#1182": "App crashes after the update",
     "#2071": "Error message when syncing",
@@ -185,16 +184,37 @@ tickets = {
     "#0412": "List of error codes",
     "#1890": "Sensor pairing times out",
 }
-# TF-IDF's idf, ln(N / df), over the eight tickets' words.
-docs = {t: set(s.lower().split()) for t, s in tickets.items()}
+docs = {t: s.lower().split() for t, s in tickets.items()}
+N = len(docs)
 def df(word):
     return sum(1 for ws in docs.values() if word in ws)
-N = len(docs)
+# BM25 over the eight tickets, as a keyword engine scores them.
+K1, B = 1.2, 0.75
+avgdl = sum(len(ws) for ws in docs.values()) / N
+def bm25(t):
+    ws = docs[t]
+    score = 0.0
+    for q in QUERY.lower().split():
+        tf = ws.count(q)
+        if tf:
+            idf = math.log(1 + (N - df(q) + 0.5) / (df(q) + 0.5))
+            score += idf * tf * (K1 + 1) / (tf + K1 * (1 - B + B * len(ws) / avgdl))
+    return score
+scores = {t: bm25(t) for t in tickets}
+keyword = [t for t in sorted(tickets, key=lambda t: (-round(scores[t], 9), t)) if scores[t] > 0][:5]
+fused = {}
+for lst in (vector, keyword):
+    for rank, t in enumerate(lst, start=1):
+        fused[t] = fused.get(t, 0.0) + 1 / (RRF_K + rank)
+ranked = sorted(fused.items(), key=lambda kv: -kv[1])
+# TF-IDF's idf, ln(N / df), over the eight tickets' words.
 r["hybrid"] = {
     "k": RRF_K,
+    "query": QUERY,
     "tickets": tickets,
     "vector": vector,
     "keyword": keyword,
+    "bm25": {t: round(scores[t], 3) for t in keyword},
     "fused": [{"ticket": t, "score": round(s, 4),
                "vectorRank": (vector.index(t) + 1) if t in vector else None,
                "keywordRank": (keyword.index(t) + 1) if t in keyword else None} for t, s in ranked],
@@ -202,7 +222,9 @@ r["hybrid"] = {
             "error": {"df": df("error"), "idf": round(math.log(N / df("error")), 2)},
             "code": {"df": df("e-4031"), "idf": round(math.log(N / df("e-4031")), 2)}},
 }
-assert ranked[0][0] == "#3310"
+assert ranked[0][0] == "#3310" and keyword[0] == "#3310"
+# Every ticket the keyword side lists holds a word of the query.
+assert all(set(QUERY.lower().split()) & set(docs[t]) for t in keyword)
 
 # ── 11. The backfill, on the page's numbers ─────────────────────────────────
 chunks, per = 10_000_000, 400
@@ -210,10 +232,16 @@ total = chunks * per
 per_million = total // 1_000_000
 rate = 1_000_000  # tokens a minute, for scale only
 minutes = total / rate
+# A range of embedding list prices, US dollars per million tokens, for scale
+# only (checked November 2026; no provider named): the cheapest small model
+# to the dearest large one.
+price_low, price_high = 0.02, 0.20
 r["backfill"] = {
     "chunks": chunks, "tokensPerChunk": per, "tokens": total,
     "millions": per_million,
     "rate": rate, "minutes": round(minutes), "hours": round(minutes / 60, 1), "days": round(minutes / 60 / 24, 2),
+    "priceLow": price_low, "priceHigh": price_high,
+    "costLow": round(per_million * price_low), "costHigh": round(per_million * price_high),
 }
 
 # ── 3. 400 tokens in characters, at llm-tokens' measured prose rate ─────────

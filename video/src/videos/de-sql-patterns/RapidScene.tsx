@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK_INK, QMono, RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink, NextLine, Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -21,6 +21,7 @@ import {
   listingHeight,
   Mark,
   MARK,
+  MARK_BAD,
   MARK_OK,
   rowsAt,
   Spot,
@@ -54,12 +55,13 @@ const CodeName: React.FC<{ x: number; top: number; at: number; children: React.R
 // ── 12. Finding duplicates (da-sql's users) ─────────────────────────────────
 
 const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const at = c.w("r-dupes", "To find duplicate rows");
   const groupAt = c.w("r-dupes", "group by the columns");
   const overAt = c.w("r-dupes", "the counts over one");
-  const copyAt = c.w("r-dupes", "To see every copy");
-  const numberAt = c.w("r-dupes", "number them");
-  const keepAt = c.w("r-dupes", "the numbers over one");
+  const copyAt = c.w("r-dupes-copies", "To get the extra copies");
+  const numberAt = c.w("r-dupes-copies", "number them");
+  const keepAt = c.w("r-dupes-copies", "the numbers over one");
   const U = RAPID.users;
   const ug = geo(c, U, R_X, c.T, 46);
   const dupEmails = new Set(RAPID.duplicates.rows.map((r) => r[0]));
@@ -106,9 +108,12 @@ const Dupes: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={N.rows.flatMap((r, row) => (Number(r[rn]) > 1 ? [{ row, col: rn, at: keepAt + 2 + row, color: MARK }] : []))}
       />
       <Note at={keepAt + 6} x={R_X} y={ng.rowTop(N.rows.length) + c.h(18)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          <QMono>rn &gt; 1</QMono>: every extra copy, whole rows
-        </span>
+        <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          <QMono>rn &gt; 1</QMono>: the extra copies, as whole rows
+        </div>
+        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, keepAt + 12, 10) }}>
+          the ones to delete; each first copy stays
+        </div>
       </Note>
     </>
   );
@@ -140,9 +145,12 @@ const Cte: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <DataTable g={rg} cols={colsOf(C)} at={sameAt - 2} rows={rowsAt(C.rows, sameAt + 2, 3)} bands={C.rows.map((_, row) => ({ row, at: sameAt + 10 + row * 2, color: MARK_OK }))} />
       <Note at={sameAt + 8} x={R_X + 680} y={rg.rowTop(C.rows.length) + c.h(16)}>
-        <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-          the page&apos;s orders, totals over <Num>700</Num>
-        </span>
+        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+          the page&apos;s orders, totals over <Num>{RAPID.threshold}</Num>
+        </div>
+        <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>
+          ({RAPID.pagePasses === 0 ? "none" : <Num>{RAPID.pagePasses}</Num>} passes the page&apos;s <Num>{RAPID.pageThreshold}</Num>)
+        </div>
       </Note>
     </>
   );
@@ -209,6 +217,8 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
   const edgesAt = c.w("r-lag", "At the edges");
   const nullAt = c.w("r-lag", "null, unless you pass a default");
   const zeroAt = c.w("r-lag", "like this zero");
+  const deltaAt = c.w("r-lag-delta", "Leave it null in a delta");
+  const jumpAt = c.w("r-lag-delta", "a jump of a hundred");
   const L = RAPID.lag;
   const g = geo(c, L, R_X, under(c, L.lines.length));
   const prev = L.cols.indexOf("prev");
@@ -240,7 +250,9 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
           ...L.rows.map((_, row) => ({ row, col: next, at: laterAt + 4 + row * 2, out: changeAt })),
           ...L.rows.map((_, row) => ({ row, col: delta, at: changeAt + 4 + row * 2, out: edgesAt })),
           { row: last, col: next, at: nullAt },
-          { row: 0, col: prev, at: zeroAt, color: MARK_OK },
+          { row: 0, col: prev, at: zeroAt },
+          // The default's cost in a delta: day one "changes" by its whole value.
+          { row: 0, col: delta, at: jumpAt, color: MARK_BAD },
         ]}
       />
       <Note at={edgesAt} x={g.right + 30} y={g.rowTop(0)}>
@@ -253,6 +265,11 @@ const Lag: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={nullAt} x={g.right + 30} y={g.rowTop(last)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
           nothing after: <QMono>LEAD</QMono> gives null
+        </span>
+      </Note>
+      <Note at={deltaAt + 4} x={R_X} y={g.rowTop(L.rows.length) + c.h(22)}>
+        <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
+          in a delta, the <Num>{L.rows[0][prev]}</Num> makes day one a jump of <Num>{L.rows[0][delta]}</Num>: leave it null there
         </span>
       </Note>
     </>
@@ -327,11 +344,13 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 17. Pivoting (ds-sql's traffic) ─────────────────────────────────────────
 
 const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const at = c.w("r-pivot", "To pivot");
   const caseAt = c.w("r-pivot", "sum a case expression");
   const groupedAt = c.w("r-pivot", "grouped by the row");
   const clauseAt = c.w("r-pivot", "DuckDB also has a pivot clause");
-  const dynamicAt = c.w("r-pivot", "it takes dynamic sequel");
+  const dynamicAt = c.w("r-pivot-dyn", "the case version takes dynamic sequel");
+  const findsAt = c.w("r-pivot-dyn", "DuckDB's pivot finds them itself");
   const P = RAPID.pivot;
   const g = geo(c, P, R_X, under(c, P.lines.length));
   return (
@@ -357,7 +376,12 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
         </div>
       </Note>
       <Note at={dynamicAt - 2} x={g.right + 50} y={g.rowTop(2) + c.h(10)}>
-        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>values not known ahead: dynamic SQL</span>
+        <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+          unknown values: the <QMono>CASE</QMono> version needs dynamic SQL
+        </div>
+        <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, findsAt - 2, 10) }}>
+          <QMono>PIVOT</QMono> with no <QMono>IN</QMono> list finds them itself
+        </div>
       </Note>
     </>
   );
@@ -488,10 +512,10 @@ const Ntile: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-percent", "Percent rank is rank minus one");
-  const cumeAt = c.w("r-percent", "Cume dist is the share");
-  const valuesAt = c.w("r-percent", "For ten, twenty, twenty, thirty");
-  const thirdAt = c.w("r-percent", "a third");
-  const quartersAt = c.w("r-percent", "three quarters");
+  const cumeAt = c.w("r-percent-cume", "Cume dist is the share");
+  const valuesAt = c.w("r-percent-vals", "For ten, twenty, twenty, thirty");
+  const thirdAt = c.w("r-percent-vals", "a third");
+  const quartersAt = c.w("r-percent-vals", "three quarters");
   const S = RAPID.percent;
   const g = geo(c, S, R_X, under(c, S.lines.length), 46);
   const v = S.cols.indexOf("v");
@@ -522,10 +546,10 @@ const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={cumeAt + 4} x={g.right + 40} y={g.rowTop(1) + c.h(6)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          <QMono>cume_dist</QMono> = rows at or tied with it / rows
+          <QMono>cume_dist</QMono> = rows at or before it (ties included) / rows
         </span>
       </Note>
-      <Note at={quartersAt + 8} x={g.right + 40} y={g.rowTop(2) + c.h(16)}>
+      <Note at={valuesAt + 4} x={g.right + 40} y={g.rowTop(2) + c.h(16)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
           the 20s: rank 2 of 4, and 3 of 4 rows at or below
         </span>

@@ -8,7 +8,7 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SNAP } from "./data";
-import { colsOf, DataTable, Drift, geoOf, KeyArrow, lineOf, Listing, listingHeight, MARK, MARK_OK, OK_INK, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, KeyArrow, lineOf, Listing, listingHeight, listingWidth, MARK, MARK_OK, OK_INK, TableName, X0 } from "./parts";
 
 const TOP = 330;
 const SNAP_X = 1130;
@@ -18,10 +18,13 @@ const ROWS = { headH: 38, rowH: 42, bodySize: 21, headSize: 19 } as const;
 /**
  * Question 6, on the video's own two orders. Left, the insert-only log: six
  * rows, every status change. Right, the snapshot: one row per order, its
- * state now, where 502 says cancelled and nothing says it was paid. Then the
- * log answers that (502, paid then cancelled), and rebuilds the snapshot by
- * keeping the latest row per order (arrows from those rows); the snapshot
- * cannot rebuild the log. Then the advice: keep the log, serve the snapshot.
+ * state now, where 502 says cancelled and nothing says it was paid; under
+ * it, while it is named, the periodic kind (Part 3's): a row per order per
+ * day, where 502 still never says paid. Then the log answers that (502, paid
+ * and later cancelled, by its timestamps, in portable SQL), and rebuilds the
+ * snapshot by keeping the latest row per order (arrows from those rows); the
+ * snapshot cannot rebuild the log. Then the advice: keep the log, serve the
+ * snapshot.
  */
 export const SnapScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -36,9 +39,11 @@ export const SnapScene: React.FC = () => {
   const wholeAt = n.word("snap", "the whole history");
   const oneAt = n.word("snap-one", "A snapshot keeps one row per order");
   const nowAt = n.word("snap-one", "its state now");
-  const easyAt = n.word("snap-one", "easy to query");
-  const cancelledAt = n.word("snap-one", "just says cancelled");
-  const paidAt = n.word("snap-one", "Nothing says it was paid first");
+  const perDayAt = n.word("snap-periodic", "one row per order per day");
+  const periodicAt = n.word("snap-periodic", "a periodic snapshot");
+  const easyAt = n.word("snap-easy", "easy to query");
+  const cancelledAt = n.word("snap-easy", "just says cancelled");
+  const paidAt = n.word("snap-easy", "Nothing says it was paid first");
   const answerAt = n.word("snap-log", "The log can answer that");
   const thenAt = n.word("snap-log", "five oh two was paid, then cancelled");
   const rebuildAt = n.word("snap-log", "it can rebuild the snapshot");
@@ -62,9 +67,17 @@ export const SnapScene: React.FC = () => {
 
   const Q = SNAP.paidThenCancelled;
   const qTop = gl.rowTop(LOG.rows.length) + h(66);
-  const qW = 560;
+  const qW = listingWidth(Q.lines, SIZE);
   const S = SNAP.snapshot;
   const sTop = gs.rowTop(SR.rows.length) + h(74);
+  const changed = LOG.cols.indexOf("changed_at");
+
+  // The periodic snapshot, in the rebuild listing's place until it comes.
+  const DS = SNAP.daily;
+  const gds = geoOf(DS, SNAP_X + 20, sTop, h, ROWS);
+  const dsStatus = DS.cols.indexOf("status");
+  const ds502 = DS.rows.map((r, i) => (r[0] === "502" ? i : -1)).filter((i) => i >= 0);
+  const dsOut = rebuildAt - 6;
 
   return (
     <AbsoluteFill>
@@ -94,6 +107,9 @@ export const SnapScene: React.FC = () => {
             { row: paid502, col: status, at: paidAt + 4, out: answerAt, color: MARK },
             { row: paid502, col: status, at: thenAt + 2, color: MARK_OK },
             { row: rowOf("502", "cancelled"), col: status, at: thenAt + 8, color: MARK_OK },
+            // "then": the timestamps, which the query compares.
+            { row: paid502, col: changed, at: thenAt + 14, color: MARK_OK },
+            { row: rowOf("502", "cancelled"), col: changed, at: thenAt + 18, color: MARK_OK },
           ]}
         />
         {/* Beside the table's name, clear of the arrows that leave its rows. */}
@@ -106,7 +122,7 @@ export const SnapScene: React.FC = () => {
 
         {/* ── Right: the snapshot ── */}
         <TableName g={gs} at={oneAt}>
-          order_snapshot
+          order_snapshot <span style={{ color: INK_SOFT, fontWeight: 500 }}>(current state)</span>
         </TableName>
         <DataTable
           g={gs}
@@ -122,7 +138,25 @@ export const SnapScene: React.FC = () => {
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>paid first? not here</span>
         </Note>
 
-        {/* The log answers, with the page's own kind of query. */}
+        {/* The periodic kind: a row per order per day, still no "paid" for 502. */}
+        <TableName g={gds} at={perDayAt} out={dsOut}>
+          order_daily_snapshot <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, periodicAt, 10) }}>(periodic, as in Part 3)</span>
+        </TableName>
+        <DataTable
+          g={gds}
+          cols={colsOf(DS)}
+          at={perDayAt}
+          out={dsOut}
+          rows={DS.rows.map((cells, i) => ({ cells, at: perDayAt + 4 + i * 3 }))}
+          marks={ds502.map((row, i) => ({ row, col: dsStatus, at: cancelledAt + 6 + i * 4 }))}
+        />
+        <Note at={paidAt + 4} x={gds.x} y={gds.rowTop(DS.rows.length) + h(14)} out={dsOut}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            periodic: still no &ldquo;paid&rdquo; for <Num>502</Num>
+          </span>
+        </Note>
+
+        {/* The log answers: paid, and later cancelled, by the timestamps. */}
         <Listing
           lines={Q.lines}
           x={X0}
@@ -131,7 +165,10 @@ export const SnapScene: React.FC = () => {
           size={SIZE}
           at={answerAt}
           title="only the log can answer"
-          marks={[{ line: lineOf(Q.lines, "HAVING"), at: answerAt + 12 }]}
+          marks={[
+            { line: lineOf(Q.lines, "WHERE"), at: answerAt + 12 },
+            { line: lineOf(Q.lines, "changed_at <"), at: thenAt + 6 },
+          ]}
         />
         <Note at={thenAt} x={X0 + qW + 24} y={qTop + h(8)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
@@ -147,7 +184,7 @@ export const SnapScene: React.FC = () => {
           width={660}
           size={SIZE}
           at={rebuildAt}
-          title="the log rebuilds the snapshot"
+          title="rebuilt from the log (QUALIFY filters on a window)"
           marks={[{ line: lineOf(S.lines, "QUALIFY"), at: latestAt + 2 }]}
         />
         {latest.map((r, i) => (

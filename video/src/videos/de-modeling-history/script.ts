@@ -146,11 +146,21 @@ export const script: NarrationScript = {
     {
       id: "type2-insert",
       text: "Then insert the new version, with a new surrogate key, valid from the day of the move to a far future date, flagged current.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type2-tx",
+      text: "Run both in one transaction, only for customers whose tracked columns changed.",
       pauseAfter: 0.6,
     },
     {
       id: "type2-join",
-      text: "A fact finds its version by date: the order date falls between valid from and valid to. All twenty-four of the page's orders match exactly one version, because the ranges never overlap and never leave a gap.",
+      text: "A fact finds its version by date: the order date falls between valid from and valid to.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type2-all",
+      text: "All twenty-four orders match exactly one version, because the ranges never overlap and never leave a gap.",
       pauseAfter: 0.6,
     },
     {
@@ -174,6 +184,11 @@ export const script: NarrationScript = {
     {
       id: "type0-mix",
       text: "Types are chosen per column, so one customer row can hold a Type zero sign-up date beside a Type two city.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type0-copy",
+      text: "Each new version then copies the sign-up date from the row it closes, not from the source.",
       pauseAfter: 0.8,
     },
 
@@ -182,11 +197,21 @@ export const script: NarrationScript = {
       id: "type46",
       scene: true,
       text: "Question four. What are slowly changing dimension types four and six? Type four splits the table. The main dimension keeps only current values, fifteen rows, one per customer, and the history moves to a table of its own: twenty-four rows. Use it when history is large and rarely read.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type4-kimball",
+      text: "Kimball's own Type four is a mini-dimension instead: question thirteen.",
       pauseAfter: 0.6,
     },
     {
       id: "type6",
       text: "Type six is one, plus two, plus three. It versions rows like Type two, and every row also carries the current value, so order one oh one reports Boston as it was, and Austin as it is now, without a second join.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type6-parts",
+      text: "The current-value column is the Type three part, and overwriting it is the Type one part.",
       pauseAfter: 0.5,
     },
     {
@@ -220,6 +245,11 @@ export const script: NarrationScript = {
     {
       id: "late-shared",
       text: "One shared unknown row, key minus one, works too, but then every one of those facts has to be re-keyed later.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "late-rekey",
+      text: "Re-keying needs each fact to keep the customer's own ID.",
       pauseAfter: 0.8,
     },
 
@@ -232,7 +262,17 @@ export const script: NarrationScript = {
     },
     {
       id: "snap-one",
-      text: "A snapshot keeps one row per order, its state now. That's easy to query, but order five oh two just says cancelled. Nothing says it was paid first.",
+      text: "A snapshot keeps one row per order, its state now.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "snap-periodic",
+      text: "Or one row per order per day: a periodic snapshot.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "snap-easy",
+      text: "That's easy to query, but order five oh two just says cancelled. Nothing says it was paid first.",
       pauseAfter: 0.6,
     },
     {
@@ -293,7 +333,17 @@ export const script: NarrationScript = {
     },
     {
       id: "vault-when",
-      text: "Choose it for many changing sources and strict audit. Choose a star when the domain is stable and analysts query it directly. Often it's both: the vault stores the history, and stars built on top of it serve the reports.",
+      text: "Choose it for many changing sources and strict audit.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "vault-cost",
+      text: "The price: every question needs a stack of joins.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "vault-star",
+      text: "Choose a star when the domain is stable and analysts query it directly. Often it's both: the vault stores the history, and stars built on top of it serve the reports.",
       pauseAfter: 0.8,
     },
 
@@ -307,7 +357,7 @@ export const script: NarrationScript = {
     {
       id: "r-degen",
       text: "A degenerate dimension is a dimension with no table behind it, like an invoice number kept on the fact. You still group by it.",
-      pauseAfter: 0.9,
+      pauseAfter: 1.4,
     },
     {
       id: "r-junk",
@@ -322,11 +372,21 @@ export const script: NarrationScript = {
     {
       id: "r-mini",
       text: "A mini-dimension moves fast-changing attributes, like age band and income tier, out of a big customer dimension into a small one, twenty rows here, with its own key on the fact. The big one stops growing a new version every time a band changes.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-mini-t4",
+      text: "This is Kimball's Type four.",
       pauseAfter: 0.8,
     },
     {
       id: "r-factless",
       text: "A factless fact table has no measures at all: one row per event, like a student attending a class. Counting the rows is the measure.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-factless-gap",
+      text: "A coverage table of every student enrolled, minus this one, tells you who didn't come.",
       pauseAfter: 1.0,
     },
     {
@@ -336,7 +396,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-uuid-cost",
-      text: "The cost shows in the index. In Postgres, a hundred thousand random UUIDs built a primary key index almost twice the size of the sequence's. Time-ordered version seven UUIDs land in between.",
+      text: "The cost shows in the index. In Postgres, a hundred thousand random UUIDs built a primary key index almost twice the size of the sequence's.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-uuid-why",
+      text: "Part of that is width, sixteen bytes against eight. The rest is order: random keys split pages all over the index. Version seven UUIDs start with a timestamp, so they arrive in order and pay only for the width.",
       pauseAfter: 1.2,
     },
     {

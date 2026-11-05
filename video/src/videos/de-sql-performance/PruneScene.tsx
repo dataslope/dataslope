@@ -29,7 +29,10 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
  * itself: the plan Postgres printed scans orders_2024_03 alone, so March
  * lights and the other eleven fade. Then the same sum through EXTRACT: the
  * plan's Append over all twelve (shown to its first two scans, then counted),
- * every box lit in red, and the same total.
+ * every box lit in red to the cut, and the same total: in Postgres, which the
+ * narration and the note say, since some engines still prune through a
+ * function. The fix is printed whole: the range on the raw column, as March's
+ * own query wrote it.
  */
 export const PruneScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -51,14 +54,17 @@ export const PruneScene: React.FC = () => {
   const goneAt = n.word("prune-fn", "pruning is gone");
   const sameAt = n.word("prune-fn", "the same total");
   const allAt = n.word("prune-fn", "read from all twelve");
-  const keyAt = n.word("prune-fn", "Filter on the partition key");
-  const end = n.beat("prune-fn").to;
+  const enginesAt = n.word("prune-engines", "some engines still prune it");
+  const keyAt = n.word("prune-key", "Filter on the partition key");
+  const end = n.beat("prune-key").to;
 
   const boxX = (i: number) => X0 + i * (BOX_W + BOX_GAP);
   const marchPlanTop = y(LIST_TOP) + listingHeight(PRUNE.march.length, SIZE) + h(22);
   const fnPlanTop = y(LIST_TOP) + listingHeight(PRUNE.fn.length, SIZE) + h(22);
   const fnLines = PRUNE.fnPlan.slice(0, FN_SHOWN);
   const marchIndex = PRUNE.partitions.findIndex((p) => p.name.endsWith("_03"));
+  // The fix: March's own WHERE clause, the range on the partition key.
+  const range = PRUNE.march.slice(PRUNE.march.findIndex((l) => l.startsWith("WHERE"))).map((l) => l.replace(/;$/, ""));
 
   return (
     <AbsoluteFill>
@@ -83,10 +89,11 @@ export const PruneScene: React.FC = () => {
           const shown = ease(frame, at, 10);
           const isMarch = i === marchIndex;
           // March lights on the pruned plan; the rest fade as they are
-          // skipped, then all twelve light red when pruning is gone.
-          const skipped = isMarch ? 0 : ease(frame, skipsAt, 12) * (1 - ease(frame, allAt, 10));
-          const green = isMarch ? ease(frame, oneAt, 10) * (1 - ease(frame, allAt, 10)) : 0;
-          const red = ease(frame, allAt + i, 10) * (1 - ease(frame, keyAt + 6, 14));
+          // skipped. All twelve return to plain as the function query is
+          // written, then light red when pruning is gone, and stay red.
+          const skipped = isMarch ? 0 : ease(frame, skipsAt, 12) * (1 - ease(frame, wrapAt, 10));
+          const green = isMarch ? ease(frame, oneAt, 10) * (1 - ease(frame, wrapAt, 10)) : 0;
+          const red = ease(frame, allAt + i, 10);
           const border = red > 0.5 ? ACCENT : green > 0.5 ? OK : `color-mix(in srgb, ${BAR} 55%, ${PAPER})`;
           const fill = red > 0 ? `color-mix(in srgb, ${ACCENT} ${18 * red}%, ${PAPER})` : green > 0 ? `color-mix(in srgb, ${OK} ${22 * green}%, ${PAPER})` : `color-mix(in srgb, ${BAR} 10%, ${PAPER})`;
           return (
@@ -171,16 +178,21 @@ export const PruneScene: React.FC = () => {
         </Note>
         <Note at={sameAt} x={R_X} y={y(LIST_TOP)}>
           <div style={{ ...note(28, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, allAt, 10) }}>
-            <b>{PRUNE.fnScans}</b> of 12 partitions read
+            <b>{PRUNE.fnScans}</b> of 12 partitions read, in Postgres
           </div>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8) }}>
             SUM = <Num>{thousands(Number(PRUNE.fnSum))}</Num>, the same
           </div>
         </Note>
-        <Note at={keyAt} x={R_X} y={y(LIST_TOP) + h(120)}>
-          <div style={{ ...note(24, OK_INK), width: 600 }}>
-            Filter on the partition key itself, as a range: <QMono>order_date &gt;= …</QMono>
+        <Note at={enginesAt} x={R_X} y={y(LIST_TOP) + h(104)}>
+          <div style={{ ...note(22, INK_SOFT), width: 600 }}>Some engines still prune through a function.</div>
+        </Note>
+        <Note at={keyAt} x={R_X} y={y(LIST_TOP) + h(164)}>
+          <div style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>Filter on the partition key itself, as a range:</div>
+          <div style={{ position: "relative", height: listingHeight(range.length, 20), marginTop: h(12) }}>
+            <Listing lines={range} x={0} top={0} width={560} size={20} at={keyAt + 4} />
           </div>
+          <div style={{ ...note(24, OK_INK), whiteSpace: "nowrap", marginTop: h(12), opacity: ease(frame, keyAt + 16, 10) }}>and confirm it in the plan.</div>
         </Note>
       </Drift>
     </AbsoluteFill>

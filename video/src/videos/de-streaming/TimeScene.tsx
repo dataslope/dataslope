@@ -9,7 +9,7 @@ import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { STREAM, WATERMARK, WINDOWS } from "./data";
-import { Box, Drift, LANE_FILL, OK, OK_INK, pulse, USER_COLOR, X0 } from "./parts";
+import { Box, Drift, LANE_FILL, OK, OK_INK, pulse, USER_COLOR, USER_INK, X0 } from "./parts";
 
 const AX0 = 360;
 const AX1 = 1700;
@@ -73,10 +73,12 @@ export const TimeScene: React.FC = () => {
   const delayAt = n.word("wm-def", "minus an allowed delay");
   const proofAt = n.word("wm-def", "progress, not proof");
   const allowAt = n.word("wm-three", "Allow three seconds");
-  const closesAt = n.word("wm-three", "closes at thirteen and a half seconds");
   const withFourAt = n.word("wm-three", "with four clicks");
-  const arrivesAt = n.word("wm-three", "Then dee's click arrives");
-  const lateAt = n.word("wm-three", "it's late");
+  const benAt = n.word("wm-ben", "ben's click from second thirteen");
+  const minusAt = n.word("wm-ben", "thirteen minus three is ten");
+  const benEnd = n.beat("wm-ben").to;
+  const arrivesAt = n.word("wm-dee", "Then dee's click arrives");
+  const lateAt = n.word("wm-dee", "it's late");
   const tenAt = n.word("wm-ten", "Allow ten");
   const countsAt = n.word("wm-ten", "it counts");
   const laterAt = n.word("wm-ten", "almost eight seconds later");
@@ -87,10 +89,11 @@ export const TimeScene: React.FC = () => {
   const keepAt = n.word("late-fix", "Keep a window's state");
   const updateAt = n.word("late-fix", "update its result");
   const fiveAt = n.word("late-fix", "four becomes five");
-  const sideAt = n.word("late-fix", "a side output");
-  const silenceAt = n.word("late-fix", "not into silence");
-  const upsertAt = n.word("late-fix", "have the sink upsert");
-  const replacesAt = n.word("late-fix", "replaces the row");
+  const sideAt = n.word("late-side", "a side output");
+  const streamAt = n.word("late-side", "a separate stream");
+  const silenceAt = n.word("late-side", "not into silence");
+  const upsertAt = n.word("late-upsert", "have the sink upsert");
+  const replacesAt = n.word("late-upsert", "replaces the row");
   const firings = [
     { text: "early", at: n.word("late-trig", "early"), pt: 5 },
     { text: "on time", at: n.word("late-trig", "on-time"), pt: WATERMARK.three.closeFirst },
@@ -110,10 +113,14 @@ export const TimeScene: React.FC = () => {
   const t10 = WATERMARK.ten;
   const pt = interpolate(
     frame,
-    [allowAt + 4, closesAt + 6, arrivesAt + 6, tenAt + 10, laterAt + 4],
-    [0, t3.closeFirst, WATERMARK.deeAt, WATERMARK.deeAt, t10.closeFirst],
+    [allowAt + 4, withFourAt, benEnd, arrivesAt + 10, tenAt + 10, laterAt + 4],
+    [0, t3.closeFirst, t3.closeFirst, WATERMARK.deeAt, WATERMARK.deeAt, t10.closeFirst],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
+  // ben's click from second 13 is the one that brings the watermark to the
+  // first window's end: 13 minus the 3-second delay is 10.
+  const ben = STREAM.find((c) => c.user === "ben" && c.arrive === t3.closeFirst)!;
+  const benHot = ease(frame, benAt, 8) * (1 - ease(frame, arrivesAt, 10));
   const sweepIn = ease(frame, allowAt, 10) * (1 - ease(frame, q9Out, 10));
   const wm3 = wmAt(t3.trace, pt);
   const wm10 = wmAt(t10.trace, pt);
@@ -123,6 +130,11 @@ export const TimeScene: React.FC = () => {
   const deeOk = ease(frame, countsAt, 8);
 
   const windows = [0, 1, 2];
+  const bandFill = (w: number) => (w % 2 ? PAPER : LANE_FILL);
+  const AXES = [
+    { y: evY, at: eventAt, name: "event time", sub: "when it happened", subAt: stampedAt, below: false },
+    { y: prY, at: procAt, name: "processing time", sub: "when it arrived", subAt: procAt + 8, below: true },
+  ];
   const evCounts = WINDOWS.tumblingEvent;
   const prCounts = WINDOWS.tumblingProcessing;
   const evCountIn = ease(frame, byEventAt, 10);
@@ -138,7 +150,8 @@ export const TimeScene: React.FC = () => {
       <Sfx name="el-scratch" at={wrongAt + 2} level={-36} />
       <Sfx name="el-tap" at={byEventAt} level={-36} />
       <Sfx name="el-whoosh" at={allowAt + 4} level={-37} />
-      <Sfx name="el-pop" at={closesAt + 6} level={-35} />
+      <Sfx name="el-pop" at={withFourAt} level={-35} />
+      <Sfx name="el-tap" at={minusAt} level={-37} />
       <Sfx name="el-scratch" at={lateAt} level={-34} />
       <Sfx name="el-pop" at={laterAt + 4} level={-35} />
       <Sfx name="el-tap" at={fiveAt} level={-35} />
@@ -158,11 +171,9 @@ export const TimeScene: React.FC = () => {
           How do you handle late-arriving data?
         </QuestionCard>
 
-        {/* The two axes, each with its windows. */}
-        {[
-          { y: evY, at: eventAt, name: "event time", sub: "when it happened", subAt: stampedAt, below: false },
-          { y: prY, at: procAt, name: "processing time", sub: "when it arrived", subAt: procAt + 8, below: true },
-        ].map((a) => {
+        {/* The two axes, each with its windows. The dividers stop short of
+            the tick labels; the labels are drawn later, over the sweep. */}
+        {AXES.map((a) => {
           const p = ease(frame, a.at, 16);
           const bandTop = a.below ? a.y : a.y - h(BAND);
           return (
@@ -175,22 +186,22 @@ export const TimeScene: React.FC = () => {
                     y={bandTop}
                     width={ex(10) - ex(0)}
                     height={h(BAND)}
-                    fill={w % 2 ? PAPER : LANE_FILL}
+                    fill={bandFill(w)}
                     opacity={ease(frame, (a.below ? byArrivalAt : clicksAt) + w * 3, 10)}
                   />
                 ))}
                 {[0, 10, 20, 30].map((t) => (
-                  <g key={t} opacity={ease(frame, a.at + 8, 10)}>
-                    <line x1={ex(t)} x2={ex(t)} y1={bandTop} y2={bandTop + h(BAND)} stroke={HAIRLINE} strokeWidth={1} strokeDasharray="3 5" />
-                    <text
-                      x={ex(t)}
-                      y={a.below ? a.y + 28 : a.y - 12}
-                      textAnchor="middle"
-                      style={svgText({ fontFamily: SANS, fontSize: 20, fontWeight: 600, color: INK_SOFT, fontVariantNumeric: "tabular-nums" })}
-                    >
-                      {t} s
-                    </text>
-                  </g>
+                  <line
+                    key={t}
+                    x1={ex(t)}
+                    x2={ex(t)}
+                    y1={a.below ? a.y + 36 : bandTop}
+                    y2={a.below ? bandTop + h(BAND) : a.y - 30}
+                    stroke={HAIRLINE}
+                    strokeWidth={1}
+                    strokeDasharray="3 5"
+                    opacity={ease(frame, a.at + 8, 10)}
+                  />
                 ))}
                 <line x1={AX0 - 10} x2={AX0 - 10 + (AX1 - AX0 + 20) * p} y1={a.y} y2={a.y} stroke={INK} strokeWidth={2} />
               </svg>
@@ -201,6 +212,58 @@ export const TimeScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+
+        {/* ── Question 9: now and the watermark sweep along, under every label. ── */}
+        {sweepIn > 0 ? (
+          <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: sweepIn }}>
+            {/* Now, on the processing axis. */}
+            <line x1={ex(pt)} x2={ex(pt)} y1={prY - 14} y2={prY + h(BAND)} stroke={INK} strokeWidth={3} />
+            <path d={`M${ex(pt) - 9},${prY + h(BAND) + 14} L${ex(pt) + 9},${prY + h(BAND) + 14} L${ex(pt)},${prY + h(BAND) + 2} Z`} fill={INK} />
+            {wm3 !== null ? (
+              <line x1={ex(Math.max(0, wm3))} x2={ex(Math.max(0, wm3))} y1={evY - h(BAND) - 6} y2={evY + 14} stroke={BLUE_INK} strokeWidth={5} />
+            ) : null}
+            {wm10 !== null && ten > 0 ? (
+              <line
+                x1={ex(Math.max(0, wm10))}
+                x2={ex(Math.max(0, wm10))}
+                y1={evY - h(BAND) - 6}
+                y2={evY + 14}
+                stroke={BLUE_INK}
+                strokeWidth={4}
+                strokeDasharray="6 5"
+                opacity={ten}
+              />
+            ) : null}
+          </svg>
+        ) : null}
+
+        {/* Tick labels, each on a paper halo so a marker passing behind stops at it. */}
+        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+          {AXES.map((a) =>
+            [0, 10, 20, 30].map((t) => (
+              <text
+                key={`${a.name}-${t}`}
+                x={ex(t)}
+                y={a.below ? a.y + 28 : a.y - 12}
+                textAnchor="middle"
+                opacity={ease(frame, a.at + 8, 10)}
+                style={svgText({
+                  fontFamily: SANS,
+                  fontSize: 20,
+                  fontWeight: 600,
+                  color: INK_SOFT,
+                  fontVariantNumeric: "tabular-nums",
+                  stroke: PAPER,
+                  strokeWidth: 8,
+                  strokeLinejoin: "round",
+                  paintOrder: "stroke",
+                })}
+              >
+                {t} s
+              </text>
+            )),
+          )}
+        </svg>
 
         {/* The window counts: by arrival, then by event time. */}
         {windows.map((w) => {
@@ -219,7 +282,9 @@ export const TimeScene: React.FC = () => {
                   opacity: prCountIn,
                 }}
               >
-                <span style={TABULAR}>{prCounts[w]}</span> clicks
+                <span style={{ background: bandFill(w), borderRadius: 6, padding: "0 10px" }}>
+                  <span style={TABULAR}>{prCounts[w]}</span> clicks
+                </span>
               </div>
               <div
                 style={{
@@ -233,7 +298,9 @@ export const TimeScene: React.FC = () => {
                   opacity: evCountIn,
                 }}
               >
-                <span style={TABULAR}>{evCounts[w]}</span> clicks
+                <span style={{ background: bandFill(w), borderRadius: 6, padding: "0 10px" }}>
+                  <span style={TABULAR}>{evCounts[w]}</span> clicks
+                </span>
               </div>
             </React.Fragment>
           );
@@ -271,10 +338,21 @@ export const TimeScene: React.FC = () => {
           {/* dee's click: late against the three-second watermark, on time against ten. */}
           <circle cx={ex(dee.t)} cy={evY} r={18} fill="none" stroke={deeOk > 0.5 ? OK : ACCENT} strokeWidth={4} opacity={Math.max(deeLate, deeHot)} />
           <circle cx={ex(dee.arrive)} cy={prY} r={18} fill="none" stroke={ACCENT} strokeWidth={4} opacity={deeHot * (1 - ease(frame, q8Out, 10))} />
+          {/* ben's click from second 13: the arrival that closes the first window. */}
+          {benHot > 0 ? (
+            <g opacity={benHot}>
+              <circle cx={ex(ben.t)} cy={evY} r={18} fill="none" stroke={HIGHLIGHT} strokeWidth={6} />
+              <circle cx={ex(ben.arrive)} cy={prY} r={18} fill="none" stroke={HIGHLIGHT} strokeWidth={6} />
+            </g>
+          ) : null}
         </svg>
         <Note at={deeAt + 4} x={X0} y={y(720)} out={q8Out}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             dee's click: happened at <Num>{dee.t}</Num> s, arrived at <Num>{dee.arrive}</Num> s
+          </span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, wrongAt, 10) }}>
+            {" "}
+            · the click that sat after ben's from <Num>{ben.t}</Num> s in partition <Num>{dee.partition}</Num>
           </span>
         </Note>
 
@@ -291,29 +369,7 @@ export const TimeScene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>each pulls the two apart</span>
         </Note>
 
-        {/* ── Question 9: the watermark sweeps along. ───────────────────── */}
-        {sweepIn > 0 ? (
-          <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: sweepIn }}>
-            {/* Now, on the processing axis. */}
-            <line x1={ex(pt)} x2={ex(pt)} y1={prY - 14} y2={prY + h(BAND)} stroke={INK} strokeWidth={3} />
-            <path d={`M${ex(pt) - 9},${prY + h(BAND) + 14} L${ex(pt) + 9},${prY + h(BAND) + 14} L${ex(pt)},${prY + h(BAND) + 2} Z`} fill={INK} />
-            {wm3 !== null ? (
-              <line x1={ex(Math.max(0, wm3))} x2={ex(Math.max(0, wm3))} y1={evY - h(BAND) - 6} y2={evY + 14} stroke={BLUE_INK} strokeWidth={5} />
-            ) : null}
-            {wm10 !== null && ten > 0 ? (
-              <line
-                x1={ex(Math.max(0, wm10))}
-                x2={ex(Math.max(0, wm10))}
-                y1={evY - h(BAND) - 6}
-                y2={evY + 14}
-                stroke={BLUE_INK}
-                strokeWidth={4}
-                strokeDasharray="6 5"
-                opacity={ten}
-              />
-            ) : null}
-          </svg>
-        ) : null}
+        {/* ── Question 9: the labels that ride on the sweep. ─────────────── */}
         <Note at={allowAt + 4} x={ex(pt) - 40} y={prY + h(BAND) + h(20)} out={q9Out}>
           <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             now: <Num>{pt.toFixed(1)}</Num> s
@@ -346,10 +402,20 @@ export const TimeScene: React.FC = () => {
             <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, proofAt, 10) }}> · progress, not proof</span>
           </span>
         </Note>
-        <Note at={closesAt + 6} x={X0} y={y(812)} out={q9Out}>
+        <Note at={benAt} x={940} y={y(762)} out={q9Out}>
+          <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
+            <span style={{ background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>
+              <b style={{ color: USER_INK.ben }}>ben</b>'s click from <Num>{ben.t}</Num> s
+            </span>
+            <span style={{ opacity: ease(frame, minusAt, 10) }}>
+              : <Num>{ben.t}</Num> − <Num>{t3.delay}</Num> = <Num>{ben.t - t3.delay}</Num>, the window's end
+            </span>
+          </span>
+        </Note>
+        <Note at={withFourAt - 4} x={X0} y={y(812)} out={q9Out}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             delay <Num>{t3.delay}</Num> s: first window closes at <Num>{t3.closeFirst}</Num> s
-            <span style={{ opacity: ease(frame, withFourAt, 8) }}>
+            <span style={{ opacity: ease(frame, withFourAt + 4, 8) }}>
               , with <Num>{WATERMARK.firstOnTime}</Num>
             </span>
             <span style={{ color: ACCENT_INK, fontWeight: 700, opacity: deeLate }}>
@@ -389,7 +455,8 @@ export const TimeScene: React.FC = () => {
             body: (
               <>
                 <b>2</b> later than that: a side output
-                <span style={{ color: ACCENT_INK, opacity: ease(frame, silenceAt, 10) }}>, never silently dropped</span>
+                <span style={{ opacity: ease(frame, streamAt, 10) }}>, a separate stream</span>
+                <span style={{ color: OK_INK, fontWeight: 700, opacity: ease(frame, silenceAt, 10) }}>, never silently dropped</span>
               </>
             ),
           },
@@ -439,11 +506,11 @@ export const TimeScene: React.FC = () => {
           return (
             <React.Fragment key={f.text}>
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
-                <line x1={ex(f.pt)} x2={ex(f.pt)} y1={top} y2={top + h(34)} stroke={OK} strokeWidth={3} />
-                <path d={`M${ex(f.pt)},${top} l26,9 l-26,9 z`} fill={OK} />
+                <line x1={ex(f.pt)} x2={ex(f.pt)} y1={top} y2={top + h(34)} stroke={BLUE_INK} strokeWidth={3} />
+                <path d={`M${ex(f.pt)},${top} l26,9 l-26,9 z`} fill={BLUE_INK} />
               </svg>
               <Note at={f.at} x={ex(f.pt) + 32} y={top + h(4)}>
-                <span style={{ ...label(20, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{f.text}</span>
+                <span style={{ ...label(20, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{f.text}</span>
               </Note>
             </React.Fragment>
           );

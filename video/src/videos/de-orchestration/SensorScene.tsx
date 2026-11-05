@@ -7,12 +7,15 @@ import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, label, note } from "../.
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Cross, Drift, lineOf, MARK, MARK_OK, OK_INK, PyListing, TaskBox, X0 } from "./parts";
+import { Cross, Drift, lineOf, listingHeight, MARK, MARK_OK, OK_INK, PyListing, TaskBox, X0 } from "./parts";
 
-/** The page's sensor, word for word. */
+/** The page's sensor, with the bucket the Pipelines page's version names: an
+ *  S3KeySensor needs a bucket_name or a full s3:// URL, and the page's has
+ *  neither. */
 const SENSOR = [
   "wait_for_export = S3KeySensor(",
   '    task_id="wait_for_export",',
+  '    bucket_name="data-lake",',
   '    bucket_key="exports/{{ ds }}/orders.parquet",',
   '    mode="reschedule",',
   "    poke_interval=300,",
@@ -31,7 +34,8 @@ const WAIT = `color-mix(in srgb, ${INK_SOFT} 30%, ${PAPER})`;
  * drawn twice: in poke mode the sensors hold every slot while they wait and
  * the real work queues; in reschedule mode each check takes a slot for a
  * moment and gives it back, and the work runs between. The page's sensor
- * checks every 300 seconds and gives up after 7,200.
+ * checks every 300 seconds and gives up after 7,200. A deferrable sensor goes
+ * one further: Airflow's triggerer does the waiting, so no slot is held.
  */
 export const SensorScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -48,19 +52,20 @@ export const SensorScene: React.FC = () => {
   const timesAt = n.word("sensor", "or it times out");
   const pokeAt = n.word("sensor-poke", "In the default poke mode");
   const holdsAt = n.word("sensor-poke", "holds a worker slot the whole time it waits");
-  const fillAt = n.word("sensor-poke", "Fill the pool with waiting sensors");
-  const nothingAt = n.word("sensor-poke", "nothing else can run");
+  const fillAt = n.word("sensor-pool", "Fill the pool with waiting sensors");
+  const nothingAt = n.word("sensor-pool", "nothing else can run");
   const resAt = n.word("sensor-res", "Reschedule mode releases the slot between checks");
   const fiveAt = n.word("sensor-res", "looks every five minutes");
   const twoAt = n.word("sensor-res", "gives up after two hours");
   const useAt = n.word("sensor-res", "Use it, or a deferrable sensor");
+  const deferAt = n.word("sensor-res", "a deferrable sensor");
   const brieflyAt = n.word("sensor-res", "more than briefly");
   const end = n.beat("sensor-res").to;
 
   const laneH = h(30);
   const laneGap = h(8);
   const pokeTop = y(512);
-  const resTop = y(712);
+  const resTop = y(736);
   const laneY = (top: number, i: number) => top + i * (laneH + laneGap);
   const W = LANE_X1 - LANE_X0;
   // Checking, in frames: a radar ping on the sensor box every 20 frames.
@@ -143,13 +148,14 @@ export const SensorScene: React.FC = () => {
           size={20}
           at={sensAt + 6}
           marks={[
+            { line: lineOf(SENSOR, "bucket_name"), at: fileAt, out: pokeAt },
             { line: lineOf(SENSOR, "bucket_key"), at: fileAt, out: pokeAt },
             { line: lineOf(SENSOR, 'mode="reschedule"'), at: resAt, color: MARK_OK },
             { line: lineOf(SENSOR, "poke_interval"), at: fiveAt },
             { line: lineOf(SENSOR, "timeout"), at: twoAt },
           ].map((m) => ({ color: MARK, ...m }))}
         />
-        <Note at={fiveAt + 4} x={1100} y={y(560)}>
+        <Note at={fiveAt + 4} x={1100} y={y(286) + listingHeight(SENSOR.length, 20) + h(18)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             300 s: a check every 5 minutes<span style={{ opacity: ease(frame, twoAt + 4, 10) }}> · 7,200 s: gives up after 2 hours</span>
           </span>
@@ -250,12 +256,15 @@ export const SensorScene: React.FC = () => {
         <Note at={resAt + 40} x={LANE_X1 + 20} y={laneY(resTop, 1) + 4}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>blue: real work, running between</span>
         </Note>
-        <Note at={useAt} x={LANE_X1 + 20} y={laneY(resTop, 2) + h(16)}>
+        <Note at={useAt} x={LANE_X1 + 20} y={laneY(resTop, 2) + 2}>
           <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             reschedule, or a deferrable sensor
           </span>
         </Note>
-        <Note at={brieflyAt} x={LANE_X1 + 20} y={laneY(resTop, 3) + h(16)}>
+        <Note at={deferAt + 10} x={LANE_X1 + 20} y={laneY(resTop, 3) + 4}>
+          <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>deferrable: Airflow&apos;s triggerer waits, no worker slot at all</span>
+        </Note>
+        <Note at={brieflyAt} x={LANE_X1 + 20} y={laneY(resTop, 3) + h(40)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>for anything that waits more than briefly</span>
         </Note>
       </Drift>

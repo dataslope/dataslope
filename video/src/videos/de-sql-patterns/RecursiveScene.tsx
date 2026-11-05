@@ -51,6 +51,7 @@ export const RecursiveScene: React.FC = () => {
   const nothingAt = n.word("recursive-stop", "A pass that adds nothing");
   const sevenAt = n.word("recursive-stop", "seven people, three levels");
   const loopAt = n.word("recursive-stop", "If the data has a loop");
+  const dryAt = n.word("recursive-stop", "never runs dry");
   const capAt = n.word("recursive-stop", "cap the depth");
   const end = n.beat("recursive-stop").to;
 
@@ -179,12 +180,14 @@ export const RecursiveScene: React.FC = () => {
         <Note at={loopAt} x={TREE_X0} y={bottom + h(128)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             a loop in the data never runs dry:{" "}
-            <span style={{ opacity: ease(frame, capAt - 2, 10) }}>
+            {/* The cap arrives before it is named, so it and its run can
+                both be read before the cut. */}
+            <span style={{ opacity: ease(frame, dryAt + 4, 10) }}>
               <QMono>{RECURSIVE.cap}</QMono>
             </span>
           </span>
         </Note>
-        <Note at={capAt + 6} x={TREE_X0} y={bottom + h(170)}>
+        <Note at={capAt - 2} x={TREE_X0} y={bottom + h(170)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
             on a three-node loop, it stops at depth <Num>{RECURSIVE.capped}</Num>
           </span>

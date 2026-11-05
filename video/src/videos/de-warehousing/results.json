@@ -306,6 +306,15 @@
           "63091600.03"
         ]
       ]
+    },
+    "range": {
+      "sql": "SELECT SUM(amount) AS revenue\nFROM read_parquet('by_month/*/*.parquet',\n                  hive_partitioning = true)\nWHERE sale_month BETWEEN '2024-03' AND '2024-05';",
+      "function": "READ_PARQUET",
+      "projections": null,
+      "filters": null,
+      "fileFilters": "(sale_month BETWEEN '2024-03' AND '2024-05')",
+      "scanning": "3/12",
+      "filesRead": 3
     }
   },
   "cluster": {

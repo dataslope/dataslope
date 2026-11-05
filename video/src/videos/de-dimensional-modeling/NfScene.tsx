@@ -9,7 +9,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { NF1, NF2, NF3, type Result } from "./data";
-import { colsOf, DataTable, Drift, geoWith, KEY_INK, MARK, MARK_BAD, MARK_KEY, Mono, OK_INK, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoWith, KEY_INK, MARK, MARK_BAD, MARK_KEY, Mono, X0 } from "./parts";
 
 const TABLE_X = 600;
 const ROWS_Y = [276, 454, 678] as const;
@@ -48,16 +48,19 @@ const Phrase: React.FC<{ at: number; underlineAt: number; color: string; childre
   );
 };
 
-/** One normal form: its name, the oath's phrase for it, and the table that breaks it. */
-const Form: React.FC<{ top: number; at: number; underlineAt: number; color: string; name: string; phrase: string; table: string }> = ({
-  top,
-  at,
-  underlineAt,
-  color,
-  name,
-  phrase,
-  table,
-}) => {
+/** One normal form: its name, the oath's phrase for it, what it adds to the
+ *  form before it (shown on `buildsAt`), and the table that breaks it. */
+const Form: React.FC<{
+  top: number;
+  at: number;
+  underlineAt: number;
+  color: string;
+  name: string;
+  phrase: string;
+  builds?: React.ReactNode;
+  buildsAt?: number;
+  table: string;
+}> = ({ top, at, underlineAt, color, name, phrase, builds, buildsAt, table }) => {
   const frame = useCurrentFrame();
   return (
     <div style={{ position: "absolute", left: X0, top, width: 450 }}>
@@ -68,7 +71,10 @@ const Form: React.FC<{ top: number; at: number; underlineAt: number; color: stri
           {phrase}
         </Phrase>
       </div>
-      <div style={{ ...note(21, INK_SOFT), marginTop: 12, opacity: ease(frame, at + 8, 10), whiteSpace: "nowrap" }}>
+      {builds ? (
+        <div style={{ ...note(21, INK), marginTop: 12, opacity: ease(frame, buildsAt ?? at, 10), whiteSpace: "nowrap" }}>{builds}</div>
+      ) : null}
+      <div style={{ ...note(21, INK_SOFT), marginTop: builds ? 6 : 12, opacity: ease(frame, at + 8, 10), whiteSpace: "nowrap" }}>
         breaks it: <Mono>{table}</Mono>
       </div>
     </div>
@@ -80,7 +86,9 @@ const Form: React.FC<{ top: number; at: number; underlineAt: number; color: stri
  * form it breaks, under Kent's "one value per cell, the whole key, and
  * nothing but the key" (its OathScene, copied and re-cued). Then the
  * warehouse twist: a star's product dimension breaks third normal form on
- * purpose, and snowflaking puts it back.
+ * purpose, and snowflaking puts it back. Each form is the one before it plus
+ * one rule about the non-key columns. Neither the star's choice nor the
+ * snowflake is drawn as the verdict: the star is Question 2's default.
  */
 export const NfScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -94,14 +102,16 @@ export const NfScene: React.FC = () => {
   const cellAt = n.word("nf", "one value per cell");
   const twoAt = n.word("nf", "Two phone numbers in one cell");
   const secondAt = n.word("nf-2", "Second:");
+  const plus1At = n.word("nf-2", "first, plus every non-key column");
   const wholeAt = n.word("nf-2", "the whole key");
-  const keyByAt = n.word("nf-2", "Key order lines by order and product");
-  const halfAt = n.word("nf-2", "depends on only half of it");
+  const keyByAt = n.word("nf-2-eg", "Key order lines by order and product");
+  const halfAt = n.word("nf-2-eg", "depends on only half of it");
   const thirdAt = n.word("nf-3", "Third:");
+  const plus2At = n.word("nf-3", "second, plus");
   const butAt = n.word("nf-3", "nothing but the key");
-  const cityAt = n.word("nf-3", "A customer's city");
-  const notOrderAt = n.word("nf-3", "not the order");
-  const transAt = n.word("nf-3", "transitive dependency");
+  const cityAt = n.word("nf-3-eg", "A customer's city");
+  const notOrderAt = n.word("nf-3-eg", "not the order");
+  const transAt = n.word("nf-3-eg", "transitive dependency");
   const appAt = n.word("nf-star", "App databases");
   const purposeAt = n.word("nf-star", "breaks it on purpose");
   const deptAt = n.word("nf-star", "department depends on category");
@@ -159,7 +169,21 @@ export const NfScene: React.FC = () => {
           </Note>
 
           {/* ── Second normal form ── */}
-          <Form top={y(ROWS_Y[1])} at={secondAt} underlineAt={wholeAt} color={BLUE_INK} name="Second normal form, 2NF" phrase="The whole key." table="order_items" />
+          <Form
+            top={y(ROWS_Y[1])}
+            at={secondAt}
+            underlineAt={wholeAt}
+            color={BLUE_INK}
+            name="Second normal form, 2NF"
+            phrase="The whole key."
+            builds={
+              <>
+                <b>1NF +</b> non-key columns need the whole key
+              </>
+            }
+            buildsAt={plus1At}
+            table="order_items"
+          />
           <DataTable
             g={g2}
             cols={cols2}
@@ -174,7 +198,21 @@ export const NfScene: React.FC = () => {
           </Note>
 
           {/* ── Third normal form ── */}
-          <Form top={y(ROWS_Y[2])} at={thirdAt} underlineAt={butAt} color={ACCENT_INK} name="Third normal form, 3NF" phrase="Nothing but the key." table="orders_bad" />
+          <Form
+            top={y(ROWS_Y[2])}
+            at={thirdAt}
+            underlineAt={butAt}
+            color={BLUE_INK}
+            name="Third normal form, 3NF"
+            phrase="Nothing but the key."
+            builds={
+              <>
+                <b>2NF +</b> no non-key column depends on another
+              </>
+            }
+            buildsAt={plus2At}
+            table="orders_bad"
+          />
           <DataTable
             g={g3}
             cols={cols3}
@@ -193,7 +231,9 @@ export const NfScene: React.FC = () => {
         {/* ── The warehouse: third normal form broken on purpose ── */}
         <Note at={appAt} x={STAR_X} y={y(292)} width={360}>
           <span style={{ ...note(24, INK) }}>
-            App databases: <b style={{ color: OK_INK }}>third normal form</b>
+            App databases:
+            <br />
+            <b style={{ color: BLUE_INK }}>third normal form</b>
           </span>
         </Note>
         <Entity
@@ -202,7 +242,7 @@ export const NfScene: React.FC = () => {
           marks={{
             product_key: { at: deptAt + 4, tone: "key" },
             category: { at: deptAt + 10, tone: "note" },
-            department: { at: purposeAt + 8, tone: "warn" },
+            department: { at: purposeAt + 8, tone: "note" },
           }}
         />
         <Note at={purposeAt + 4} x={STAR_X} y={star.top - 40}>
@@ -211,11 +251,13 @@ export const NfScene: React.FC = () => {
         <Note at={deptAt} x={STAR_X} y={star.bottom + h(18)} width={360}>
           <span style={{ ...note(23, INK) }}>
             <Mono>department</Mono> depends on <Mono>category</Mono>, not on the key:
-            <span style={{ color: ACCENT_INK, fontWeight: 650 }}> not 3NF, on purpose</span>
+            <span style={{ fontWeight: 650 }}> not 3NF, on purpose</span>
           </span>
         </Note>
         <Note at={backAt} x={STAR_X} y={star.bottom + h(118)} width={360}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700 }}>Snowflaking puts it back.</span>
+          <span style={{ ...note(24, INK_SOFT) }}>
+            <span style={{ color: INK, fontWeight: 650 }}>Snowflaking puts it back,</span> at the cost of joins.
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

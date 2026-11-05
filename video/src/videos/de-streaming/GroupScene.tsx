@@ -12,7 +12,12 @@ import { Bar, Box, Cell, Crash, Drift, ElbowArrow, Lane, Marker, OK_INK, pulse, 
 
 const LANE_X = 700;
 const LANE_W = 476;
-const ROWS = [340, 440, 540];
+/** Lane tops, in the layout's coordinates: far enough apart that the note
+ *  under partition 1 clears both lanes. */
+const ROWS = [325, 440, 555];
+/** Group A's box, top and bottom, in the layout's coordinates. */
+const GA_TOP = 300;
+const GA_BOTTOM = 730;
 const LANE_H = 70;
 const CELL_W = 82;
 const CELL_H = 54;
@@ -43,8 +48,8 @@ export const GroupScene: React.FC = () => {
   const textAt = n.word("group", "What is a consumer group");
   const figAt = n.word("group", "scale consumption");
   const setAt = n.word("group-def", "A consumer group is a set of consumers");
-  const oneAt = n.word("group-def", "exactly one of them");
-  const splitAt = n.word("group-def", "the work is split");
+  const oneAt = n.word("group-split", "exactly one of them");
+  const splitAt = n.word("group-split", "they split the work");
   const twoAt = n.word("group-scale", "Two consumers share three partitions");
   const thirdAt = n.word("group-scale", "Add a third");
   const rebalanceAt = n.word("group-scale", "the group rebalances");
@@ -148,10 +153,10 @@ export const GroupScene: React.FC = () => {
         })}
 
         {/* Group A. */}
-        <Box x={GA.x} y={y(300)} w={GA.w} h={y(720) - y(300)} at={setAt} color={INK_SOFT} fill="transparent" dashed>
+        <Box x={GA.x} y={y(GA_TOP)} w={GA.w} h={y(GA_BOTTOM) - y(GA_TOP)} at={setAt} color={INK_SOFT} fill="transparent" dashed>
           {null}
         </Box>
-        <Note at={setAt + 2} x={GA.x + 4} y={y(300) - h(36)}>
+        <Note at={setAt + 2} x={GA.x + 4} y={y(GA_TOP) - h(36)}>
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>consumer group A</span>
         </Note>
         {[0, 1, 2, 3].map((c) => {
@@ -193,14 +198,14 @@ export const GroupScene: React.FC = () => {
           style={{
             position: "absolute",
             left: GA.x - 8,
-            top: y(300) - 8,
+            top: y(GA_TOP) - 8,
             width: GA.w + 16,
-            height: y(720) - y(300) + 16,
+            height: y(GA_BOTTOM) - y(GA_TOP) + 16,
             borderRadius: 16,
             boxShadow: lift > 0 ? `0 0 0 ${8 * lift}px ${HIGHLIGHT}` : undefined,
           }}
         />
-        <Note at={rebalanceAt} x={GA.x + 210} y={y(300) - h(36)} out={q4At - 4}>
+        <Note at={rebalanceAt} x={GA.x + 210} y={y(GA_TOP) - h(36)} out={q4At - 4}>
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>rebalance</span>
         </Note>
         <Crash x={GA.cx + GA.cw - 6} y={cTop(1) + 4} at={crashAt + 2} />
@@ -232,7 +237,7 @@ export const GroupScene: React.FC = () => {
 
         {/* What a group does, along the bottom. */}
         <Note at={splitAt} x={X0} y={y(770)} out={fanOut}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>each partition goes to exactly one consumer in the group: split, never read twice</span>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>each partition goes to exactly one consumer in the group: the work is split, not copied</span>
         </Note>
         <Note at={stopsAt} x={X0} y={y(818)} out={fanOut}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
@@ -268,12 +273,14 @@ export const GroupScene: React.FC = () => {
         <Note at={storesAt} x={X0} y={mid(0) + h(26)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>one per partition, stored in Kafka</span>
         </Note>
-        <Note at={ownerAt + 4} x={cellX(COMMITTED[1] + 1) - 4} y={laneTop(1) - h(34)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>consumer 1 resumes here ↓</span>
+        {/* Under partition 1, its arrow on the commit: where the new owner picks up. */}
+        <Note at={ownerAt + 4} x={cellX(COMMITTED[1] + 1) - 13} y={laneTop(1) + laneH + h(4)}>
+          <span style={{ ...label(21, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>↑ consumer 1 resumes here</span>
         </Note>
+        {/* The wrong alternative, struck: the start of the partition. */}
         <Note at={startAt - 2} x={LANE_X - 24} y={mid(1) - h(16)} align="right">
           <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>
-            <Strike at={startAt + 4}>not from offset 0</Strike>
+            <Strike at={startAt + 4}>from offset 0</Strike>
           </span>
         </Note>
         <Note at={costAt} x={LANE_X - 280} y={y(770)}>

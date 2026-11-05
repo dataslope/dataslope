@@ -28,15 +28,18 @@ const Counter: React.FC<{ from: number; to: number; value: number }> = ({ from, 
  * Questions 1 and 2. First, one customer's orders with no index: the
  * listing, then the plan Postgres printed, a Seq Scan whose filter removed
  * 999,980 rows. Beside it the table's thousand squares are swept as the
- * narration says it read every row, and the twenty kept rows' squares light
- * (they fall in one column: customer 42's order ids are 50,000 apart). The
- * usual fixes follow, the index first.
+ * narration says it read every row, and a dot marks each kept row in its
+ * square (they fall in one column: customer 42's order ids are 50,000
+ * apart). A dot, not a lit square, because a square is a thousand rows and
+ * the kept rows are one each. The usual fixes follow, the index first.
  *
  * Then reading a plan, on the join after 50,000 pending orders arrived
- * since the last ANALYZE: the indented steps light first, then the line they
- * feed; the estimate (rows=1) against the actual 50,000, in red; the nested
- * loop's 50,000 index lookups. ANALYZE, and the plan Postgres prints then:
- * a hash join on an estimate of 50,820.
+ * since the last ANALYZE (too few for autovacuum to analyze again): the
+ * indented steps light first, then the line they feed; the top node's cost
+ * and estimated rows, the one "cost=" kept on screen; the estimate (rows=1)
+ * against the actual 50,000, in red; the nested loop's 50,000 index
+ * lookups. ANALYZE, and the plan Postgres prints then: a hash join on an
+ * estimate of 50,000, its hash in one batch (nothing spilled to disk).
  */
 export const SlowScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -64,14 +67,19 @@ export const SlowScene: React.FC = () => {
   const stepAt = n.word("explain", "Each line is a step");
   const indentAt = n.word("explain", "the indented steps run first");
   const feedAt = n.word("explain", "feeding the line above them");
+  const costAt = n.word("explain-cost", "the planner's cost");
+  const expectsAt = n.word("explain-cost", "the rows it expects");
   const compareAt = n.word("explain-rows", "compare estimated rows");
-  const pendingAt = n.word("explain-rows", "Fifty thousand pending orders");
-  const expectedAt = n.word("explain-rows", "Postgres expected one row");
-  const loopAt = n.word("explain-rows", "it picked a nested loop");
-  const lookupsAt = n.word("explain-rows", "fifty thousand index lookups");
+  const pendingAt = n.word("explain-stale", "Fifty thousand pending orders");
+  const autoAt = n.word("explain-stale", "too few for autovacuum");
+  const expectedAt = n.word("explain-loop", "Postgres expected one row");
+  const loopAt = n.word("explain-loop", "it picked a nested loop");
+  const lookupsAt = n.word("explain-loop", "fifty thousand index lookups");
   const analyzeAt = n.word("explain-fix", "Analyze refreshes the statistics");
   const closeAt = n.word("explain-fix", "estimate becomes fifty thousand");
   const hashAt = n.word("explain-fix", "becomes a hash join");
+  const spillAt = n.word("explain-spill", "spills to disk");
+  const batchAt = n.word("explain-spill", "in one batch");
   const end = n.beat("index-in").to;
 
   // ── Question 1 ──
@@ -126,8 +134,9 @@ export const SlowScene: React.FC = () => {
         {/* The table, swept as it is read; the twenty kept rows light. */}
         <div style={{ position: "absolute", left: GRID_X, top: gridTop - h(40), ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, seqAt, 12) * (1 - ease(frame, q2At - 4, 10)) }}>
           orders, a thousand rows a square
+          <span style={{ opacity: ease(frame, keptAt, 10) }}>; a dot, one kept row</span>
         </div>
-        <RowGrid x={GRID_X} top={gridTop} cell={CELL} gap={PITCH - CELL} at={seqAt - 4} sweep={{ from: everyAt, to: everyAt + 50 }} hits={hits} hitAt={keptAt} out={q2At - 4} />
+        <RowGrid x={GRID_X} top={gridTop} cell={CELL} gap={PITCH - CELL} at={seqAt - 4} sweep={{ from: everyAt, to: everyAt + 50 }} hits={hits} hitAt={keptAt} hitDot out={q2At - 4} />
         <div style={{ position: "absolute", left: GRID_X, top: gridTop + 20 * PITCH + h(20), display: "flex", gap: 44, opacity: 1 - ease(frame, q2At - 4, 10) }}>
           <div style={{ opacity: ease(frame, everyAt, 10) }}>
             <div style={{ ...label(21, INK_SOFT) }}>read</div>
@@ -174,11 +183,15 @@ export const SlowScene: React.FC = () => {
         <Note at={pendingAt - 2} x={X0} y={q2ListTop - h(46)} out={analyzeAt}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
             After <Num>{thousands(EXPLAIN.pending)}</Num> pending orders arrived, before <QMono>ANALYZE</QMono>
+            <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, autoAt, 10) }}>
+              {" "}
+              (autovacuum waits for <Num>{thousands(EXPLAIN.autoAfter)}</Num> changes)
+            </span>
           </span>
         </Note>
         <Listing lines={EXPLAIN.query} x={X0} top={q2ListTop} width={680} size={21} at={q2At + 4} />
         <PlanBox
-          lines={EXPLAIN.stale}
+          lines={EXPLAIN.staleShown}
           x={X0}
           top={q2PlanTop}
           width={1200}
@@ -190,6 +203,8 @@ export const SlowScene: React.FC = () => {
             { line: "Seq Scan on orders o", text: "Seq Scan", at: indentAt + 2, out: compareAt },
             { line: "Index Scan using", text: "Index Scan", at: indentAt + 8, out: compareAt },
             { line: "Nested Loop", text: "Nested Loop", at: feedAt + 2, out: compareAt },
+            { line: "Nested Loop", text: EXPLAIN.staleCost, at: costAt + 2, out: compareAt },
+            { line: "Nested Loop", text: "rows=1)", at: expectsAt, out: compareAt },
             { line: "Seq Scan on orders o", text: "rows=1)", at: expectedAt, color: MARK_RED },
             { line: "Seq Scan on orders o", text: "actual rows=50000.00", at: expectedAt + 10 },
             { line: "Nested Loop", text: "Nested Loop", at: loopAt, color: MARK_RED },
@@ -207,6 +222,7 @@ export const SlowScene: React.FC = () => {
           marks={[
             { line: "Seq Scan on orders o", text: `rows=${EXPLAIN.freshEstimate})`, at: closeAt, color: MARK_OK },
             { line: "Hash Join", text: "Hash Join", at: hashAt, color: MARK_OK },
+            { line: "Buckets", text: `Batches: ${EXPLAIN.batches}`, at: batchAt },
           ]}
         />
 
@@ -214,6 +230,14 @@ export const SlowScene: React.FC = () => {
         <Note at={indentAt} x={RIGHT_X} y={q2ListTop + h(4)} out={compareAt}>
           <div style={{ ...note(24, INK), width: 460 }}>
             Indented steps run first and feed the line above them.
+          </div>
+        </Note>
+        <Note at={costAt} x={RIGHT_X} y={q2ListTop + h(104)} out={compareAt}>
+          <div style={{ ...note(24, INK), width: 460 }}>
+            <QMono>cost</QMono>: the planner&rsquo;s estimate, in its own units
+          </div>
+          <div style={{ ...note(24, INK), width: 460, marginTop: h(10), opacity: ease(frame, expectsAt, 10) }}>
+            <QMono>rows</QMono>: the rows it expects
           </div>
         </Note>
         <Note at={compareAt} x={RIGHT_X} y={q2ListTop + h(4)} out={analyzeAt}>
@@ -239,6 +263,12 @@ export const SlowScene: React.FC = () => {
           </div>
           <div style={{ position: "absolute", top: listingHeight(1, 22) + h(140), ...note(24, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, hashAt, 10) }}>
             so a hash join
+          </div>
+          <div style={{ position: "absolute", top: listingHeight(1, 22) + h(204), width: 460, ...note(24, INK), opacity: ease(frame, spillAt, 10) }}>
+            A spill shows as <QMono>Batches</QMono> above 1, or a sort on <QMono>Disk</QMono>.
+          </div>
+          <div style={{ position: "absolute", top: listingHeight(1, 22) + h(276), ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, batchAt, 10) }}>
+            This one: <Num>{EXPLAIN.batches}</Num> batch, <Num>{thousands(EXPLAIN.hashKb)}</Num> kB in memory
           </div>
         </Note>
       </Drift>

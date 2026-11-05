@@ -164,7 +164,7 @@
         },
         "whole": {
           "code": "df = pd.read_csv(\"events.csv\", names=[\"name\", \"qty\"])\ntotals = df.groupby(\"name\")[\"qty\"].sum().to_dict()\ntotals",
-          "peak": 54153654,
+          "peak": 54153629,
           "ok": true,
           "value": {
             "kind": "value",
@@ -176,7 +176,7 @@
         },
         "chunks": {
           "code": "totals = Counter()\nfor chunk in pd.read_csv(\"events.csv\", names=[\"name\", \"qty\"],\n                         chunksize=100_000):\n    part = chunk.groupby(\"name\")[\"qty\"].sum()\n    totals.update(part.to_dict())\ndict(totals)",
-          "peak": 7535570,
+          "peak": 7535621,
           "ok": true,
           "value": {
             "kind": "value",
@@ -233,6 +233,41 @@
             "kind": "value",
             "repr": "5.0039",
             "str": "5.0039"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "meanSizes": {
+          "code": "[len(c) for c in pd.read_csv(\"events.csv\", names=[\"name\", \"qty\"], nrows=250_000, chunksize=100_000)]",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "[100000, 100000, 50000]",
+            "str": "[100000, 100000, 50000]"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "readBytes": {
+          "code": "with open(\"events.csv\", \"rb\") as f:\n    data = f.read()\nlen(data)",
+          "peak": 8381671,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "8249813",
+            "str": "8249813"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "streamGroup": {
+          "code": "by_name = Counter()\nwith open(\"events.csv\") as f:\n    for line in f:\n        name, qty = line.split(\",\")\n        by_name[name] += int(qty)\ndict(by_name)",
+          "peak": 149102,
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "{'cherry': 1245956, 'plum': 1249953, 'apple': 1250556, 'banana': 1251336}",
+            "str": "{'cherry': 1245956, 'plum': 1249953, 'apple': 1250556, 'banana': 1251336}"
           },
           "stdout": "",
           "warnings": []
@@ -338,7 +373,7 @@
       }
     },
     "dedup": {
-      "setup": "records = [\n    {\"user_id\": 1, \"action\": \"login\"},\n    {\"user_id\": 2, \"action\": \"login\"},\n    {\"user_id\": 1, \"action\": \"click\"},\n    {\"user_id\": 3, \"action\": \"login\"},\n]\ndf = pd.DataFrame({\n    \"id\":    [1, 1, 2],\n    \"ts\":    [10, 20, 5],\n    \"value\": [\"a\", \"b\", \"c\"],\n})",
+      "setup": "records = [\n    {\"user_id\": 1, \"action\": \"login\"},\n    {\"user_id\": 2, \"action\": \"login\"},\n    {\"user_id\": 1, \"action\": \"click\"},\n    {\"user_id\": 3, \"action\": \"login\"},\n]\ndf = pd.DataFrame({\n    \"id\":    [1, 1, 2],\n    \"ts\":    [10, 20, 5],\n    \"value\": [\"a\", \"b\", \"c\"],\n})\n# The same three rows as plain records, for the plain-Python answer.\nrows = [\n    {\"id\": 1, \"ts\": 10, \"value\": \"a\"},\n    {\"id\": 1, \"ts\": 20, \"value\": \"b\"},\n    {\"id\": 2, \"ts\": 5, \"value\": \"c\"},\n]",
       "steps": {
         "records": {
           "code": "pd.DataFrame(records)",
@@ -431,8 +466,50 @@
           "stdout": "",
           "warnings": []
         },
+        "rowsTable": {
+          "code": "pd.DataFrame(rows)",
+          "ok": true,
+          "value": {
+            "kind": "frame",
+            "index": [
+              "0",
+              "1",
+              "2"
+            ],
+            "indexName": null,
+            "columns": [
+              "id",
+              "ts",
+              "value"
+            ],
+            "rows": [
+              [
+                "1",
+                "10",
+                "a"
+              ],
+              [
+                "1",
+                "20",
+                "b"
+              ],
+              [
+                "2",
+                "5",
+                "c"
+              ]
+            ],
+            "dtypes": [
+              "int64",
+              "int64",
+              "str"
+            ]
+          },
+          "stdout": "",
+          "warnings": []
+        },
         "latestDict": {
-          "code": "latest = {}\nfor r in df.to_dict(\"records\"):\n    if r[\"id\"] not in latest or r[\"ts\"] > latest[r[\"id\"]][\"ts\"]:\n        latest[r[\"id\"]] = r\nprint({k: v[\"value\"] for k, v in latest.items()})",
+          "code": "latest = {}\nfor r in rows:\n    if r[\"id\"] not in latest or r[\"ts\"] > latest[r[\"id\"]][\"ts\"]:\n        latest[r[\"id\"]] = r\nprint({k: v[\"value\"] for k, v in latest.items()})",
           "ok": true,
           "value": null,
           "stdout": "{1: 'b', 2: 'c'}\n",
@@ -666,11 +743,22 @@
           },
           "stdout": "",
           "warnings": []
+        },
+        "noIter": {
+          "code": "def batched_no_iter(iterable, n):\n    while True:\n        chunk = list(itertools.islice(iterable, n))\n        if not chunk:\n            return\n        yield chunk\n\nlist(itertools.islice(batched_no_iter(list(range(7)), 3), 4))",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "[[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2]]",
+            "str": "[[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2]]"
+          },
+          "stdout": "",
+          "warnings": []
         }
       }
     },
     "retry": {
-      "setup": "import random\n\nattempts = {\"n\": 0}\ndef flaky():                       # succeeds on the 3rd try\n    attempts[\"n\"] += 1\n    if attempts[\"n\"] < 3:\n        raise ConnectionError(\"transient\")\n    return \"ok\"\n\ndef with_retries(fn, max_tries=5, base=0.01):\n    for attempt in range(1, max_tries + 1):\n        try:\n            return fn()\n        except ConnectionError as e:\n            if attempt == max_tries:\n                raise                          # give up\n            delay = base * (2 ** (attempt - 1))  # exponential backoff\n            print(f\"attempt {attempt} failed ({e}); retry in {delay:.3f}s\")\n            time.sleep(delay)\n\ncalls = {\"n\": 0}\ndef bad_request():\n    calls[\"n\"] += 1\n    raise ValueError(\"400 Bad Request: no such column\")\n\ndef schedule(rng, tries=5, base=1.0, jitter=False):\n    t, times = 0.0, []\n    for attempt in range(1, tries):\n        delay = base * (2 ** (attempt - 1))\n        if jitter:\n            delay = rng.uniform(0, delay)\n        t += delay\n        times.append(round(t, 2))\n    return times",
+      "setup": "import random\n\nattempts = {\"n\": 0}\ndef flaky():                       # succeeds on the 3rd try\n    attempts[\"n\"] += 1\n    if attempts[\"n\"] < 3:\n        raise ConnectionError(\"transient\")\n    return \"ok\"\n\ndef with_retries(fn, max_tries=5, base=0.01):\n    for attempt in range(1, max_tries + 1):\n        try:\n            return fn()\n        except ConnectionError as e:\n            if attempt == max_tries:\n                raise                          # give up\n            delay = base * (2 ** (attempt - 1))  # exponential backoff\n            print(f\"attempt {attempt} failed ({e}); retry in {delay:.3f}s\")\n            time.sleep(delay)\n\ncalls = {\"n\": 0}\ndef bad_request():\n    calls[\"n\"] += 1\n    raise ValueError(\"400 Bad Request: amount must be positive\")\n\ndef schedule(rng, tries=5, base=1.0, jitter=False):\n    t, times = 0.0, []\n    for attempt in range(1, tries):\n        delay = base * (2 ** (attempt - 1))\n        if jitter:\n            delay = rng.uniform(0, delay)\n        t += delay\n        times.append(round(t, 2))\n    return times",
       "steps": {
         "page": {
           "code": "print(with_retries(flaky))",
@@ -682,7 +770,7 @@
         "permanent": {
           "code": "with_retries(bad_request)",
           "ok": false,
-          "error": "ValueError: 400 Bad Request: no such column",
+          "error": "ValueError: 400 Bad Request: amount must be positive",
           "stdout": "",
           "warnings": []
         },
@@ -813,6 +901,52 @@
             "kind": "value",
             "repr": "2",
             "str": "2"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "normalized": {
+          "code": "nums = pd.to_numeric(amounts.str.replace(\",\", \"\"), errors=\"coerce\")\nnums",
+          "ok": true,
+          "value": {
+            "kind": "series",
+            "name": null,
+            "index": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ],
+            "indexName": null,
+            "values": [
+              "12.5",
+              "NaN",
+              "1200.0",
+              "7.0"
+            ],
+            "dtype": "float64"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "leftCount": {
+          "code": "int(nums.isna().sum())",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "1",
+            "str": "1"
+          },
+          "stdout": "",
+          "warnings": []
+        },
+        "rejected": {
+          "code": "amounts[nums.isna()].tolist()",
+          "ok": true,
+          "value": {
+            "kind": "value",
+            "repr": "['n/a']",
+            "str": "['n/a']"
           },
           "stdout": "",
           "warnings": []

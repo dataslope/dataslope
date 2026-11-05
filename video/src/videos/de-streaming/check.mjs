@@ -30,7 +30,9 @@
 //     leave behind;
 //   - backpressure: about a hundred messages a second (Poisson, seeded) into a
 //     consumer that handles eighty, then two that handle a hundred and sixty
-//     from second sixty; the consumer lag second by second;
+//     from second sixty; the consumer lag second by second; and the same
+//     traffic split over a topic of two partitions, one consumer reading both
+//     until the second takes partition 1, which must clear in the same time;
 //   - log compaction: eight updates to four users' profiles, and what a
 //     compacted log keeps.
 /* global console */
@@ -179,10 +181,46 @@ for t in range(SECONDS):
     L = max(0, L + int(arrivals[t]) - cap[t])
     lag.append(L)
 drained = next(t for t in range(JOIN, SECONDS) if lag[t] == 0)
+# The same traffic on a topic of two partitions, each message to one by its
+# key (a fair coin per message, seeded apart so the arrivals above are
+# untouched). One consumer reads both, eighty a second between them, taking
+# from either while it has messages; from second sixty a second consumer
+# takes partition 1 in a rebalance, and each partition has eighty of its own.
+# A second consumer only helps because there is a partition to give it: on
+# one partition it would sit idle (question 3).
+PARTS = 2
+split = np.random.default_rng(13).binomial(arrivals, 0.5)
+lagP, Lp = [], [0, 0]
+for t in range(SECONDS):
+    inP = [int(arrivals[t]) - int(split[t]), int(split[t])]
+    avail = [Lp[p] + inP[p] for p in range(PARTS)]
+    if t < JOIN:
+        # One consumer, eighty a second, shared fairly, never idle while
+        # either partition has a message waiting.
+        served = [min(avail[p], 40) for p in range(PARTS)]
+        spare = 80 - sum(served)
+        for p in range(PARTS):
+            extra = min(spare, avail[p] - served[p])
+            served[p] += extra
+            spare -= extra
+    else:
+        served = [min(avail[p], 80) for p in range(PARTS)]
+    Lp = [avail[p] - served[p] for p in range(PARTS)]
+    lagP.append(list(Lp))
+drainedP = next(t for t in range(JOIN, SECONDS) if sum(lagP[t]) == 0)
+# Before the rebalance one consumer drains the two partitions together, so
+# their sum is the single queue above, second for second.
+assert [sum(x) for x in lagP[:JOIN]] == lag[:JOIN]
 R["backpressure"] = {
     "rate": 100, "one": 80, "two": 160, "join": JOIN,
     "meanIn": round(float(arrivals[:JOIN].mean()), 1),
     "lag": lag, "atJoin": lag[JOIN - 1], "drainedAt": drained + 1, "drainSeconds": drained + 1 - JOIN,
+    "partitions": PARTS, "atJoinByPartition": lagP[JOIN - 1],
+    # The lag summed over the two partitions, second by second: the line the
+    # video draws. It is the single queue's until second sixty, then each
+    # partition drains on its own, and the busier one sets when it is clear.
+    "lagTwoPartitions": [sum(x) for x in lagP],
+    "drainedAtByPartition": drainedP + 1, "drainSecondsByPartition": drainedP + 1 - JOIN,
 }
 
 # ── Log compaction: eight profile updates, the latest per key kept ──────────
@@ -213,5 +251,5 @@ for (const k of ["three", "ten", "threeLate"]) {
 }
 console.log("dee", watermark.deeAt, "behind", watermark.deeBehind, "onTime", watermark.firstOnTime, "final", watermark.firstFinal, "later", watermark.closeLater);
 console.log("delivery", JSON.stringify(delivery));
-console.log("backpressure", backpressure.meanIn, backpressure.atJoin, backpressure.drainedAt, backpressure.drainSeconds, Math.max(...backpressure.lag));
+console.log("backpressure", backpressure.meanIn, backpressure.atJoin, backpressure.drainedAt, backpressure.drainSeconds, Math.max(...backpressure.lag), "by partition", backpressure.atJoinByPartition, backpressure.drainSecondsByPartition);
 console.log("compaction", JSON.stringify(compaction));

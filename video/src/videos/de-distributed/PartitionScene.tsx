@@ -8,8 +8,9 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
+import { MONO } from "../../theme/fonts";
 import { caseOf, count, PARTS } from "./data";
-import { Drift, Machine, OK, OK_INK, Svg } from "./parts";
+import { Curve, Drift, Machine, OK, OK_INK, Svg } from "./parts";
 
 const G_X = 120;
 const CELL_W = 112;
@@ -20,6 +21,11 @@ const CELL_H = 84;
 const R_X = 760;
 const ROW0 = 410;
 const ROW_PITCH = 92;
+/** Each row of four cores is one executor: its bracket and name, right of the grid. */
+const EXEC_X = 622;
+const DRIVER_X = 790;
+const DRIVER_W = 200;
+const DRIVER_H = 76;
 
 const FEW = caseOf(4);
 const MANY = caseOf(100_000);
@@ -29,11 +35,14 @@ const mb = (v: number) => (v >= 1000 ? `${v / 1000} GB` : v >= 1 ? `${v} MB` : `
 
 /**
  * Question 5. The video's own sixteen gigabytes on sixteen cores, drawn as a
- * grid of cores. Four partitions of 4 GB fill four cores and leave twelve
+ * grid of cores, each row of four one executor, which the driver hands its
+ * tasks; one task, on one partition, lights one core. Four partitions of 4 GB
+ * fill four cores and leave twelve
  * idle; a hundred thousand of 160 KB give every core a stream of tasks that
  * are mostly scheduling; sixty-four of 250 MB give every core four. Then the
  * two ways to change the count: repartition (a full shuffle, its lines
- * crossing) and coalesce (neighbours merge, nothing crosses).
+ * crossing) and coalesce (neighbours merge, nothing crosses), and the catch
+ * in coalescing to one.
  */
 export const PartitionScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -46,8 +55,11 @@ export const PartitionScene: React.FC = () => {
   const unitAt = n.word("partitions", "the unit of parallelism");
   const taskAt = n.word("partitions", "one task works on one partition");
   const coreAt = n.word("partitions", "on one core");
-  const modelAt = n.word("partitions", "Model it with sixteen gigabytes");
-  const coresAt = n.word("partitions", "on sixteen cores");
+  const execAt = n.word("part-exec", "Cores belong to executors");
+  const driverAt = n.word("part-exec", "the driver plans the job");
+  const handsAt = n.word("part-exec", "hands them tasks");
+  const modelAt = n.word("part-model", "Model it with sixteen gigabytes");
+  const coresAt = n.word("part-model", "on sixteen cores");
   const fewAt = n.word("part-few", "In four partitions");
   const idleAt = n.word("part-few", "twelve cores sit idle");
   const oomAt = n.word("part-few", "run out of memory");
@@ -62,7 +74,9 @@ export const PartitionScene: React.FC = () => {
   const coalAt = n.word("part-change", "Coalesce only merges");
   const noShuffleAt = n.word("part-change", "no full shuffle");
   const writeAt = n.word("part-change", "before writing");
-  const end = n.beat("part-change").to;
+  const oneAt = n.word("part-one", "But coalesce to one");
+  const singleAt = n.word("part-one", "run as a single task");
+  const end = n.beat("part-one").to;
 
   const cellX = (c: number) => G_X + (c % 4) * (CELL_W + CELL_GAP);
   const cellTop = (c: number) => y(CELL_TOP + Math.floor(c / 4) * CELL_PITCH);
@@ -73,10 +87,16 @@ export const PartitionScene: React.FC = () => {
   const idle = ease(frame, idleAt, 10) * (1 - ease(frame, manyAt, 10));
   const caseRow = (k: number) => y(ROW0 + k * ROW_PITCH);
   const band = (at: number, out: number) => during(frame, at, out, 10);
+  // One task on one partition, on one core, before the model fills the grid.
+  const oneTask = ease(frame, taskAt + 6, 12) * (1 - ease(frame, fewAt, 10));
+  const rowMid = (r: number) => cellTop(r * 4) + cellH / 2;
+  const driverTop = (cellTop(0) + cellTop(12) + cellH) / 2 - h(DRIVER_H) / 2;
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-sprinkle" at={coresAt} level={-37} />
+      <Sfx name="el-sprinkle" at={taskAt} level={-37} />
+      <Sfx name="el-tap" at={execAt + 4} level={-37} />
+      <Sfx name="el-pop" at={driverAt} level={-37} />
       <Sfx name="el-tap" at={fewAt + 2} level={-35} />
       <Sfx name="el-sprinkle" at={manyAt + 2} level={-35} />
       <Sfx name="el-tap" at={sixtyAt} level={-35} />
@@ -93,7 +113,7 @@ export const PartitionScene: React.FC = () => {
           <span style={{ display: "block", whiteSpace: "nowrap", ...note(25, INK) }}>
             a <b style={{ color: BLUE_INK }}>partition</b>: the unit of parallelism
           </span>
-          <span style={{ display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap", ...note(25, INK), marginTop: 6 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", ...note(25, INK), marginTop: 6 }}>
             <span style={{ opacity: ease(frame, taskAt, 10) }}>
               one task, on one partition,
             </span>
@@ -114,10 +134,50 @@ export const PartitionScene: React.FC = () => {
             top={cellTop(c)}
             width={CELL_W}
             height={cellH}
-            at={coresAt + c}
-            tone={c >= FEW.partitions && idle > 0 ? "idle" : showRight > 0.5 ? "ok" : "plain"}
-            toneAt={c >= FEW.partitions && idle > 0 ? idleAt : showRight > 0.5 ? sixtyAt : undefined}
+            at={taskAt + c}
+            tone={c >= FEW.partitions && idle > 0 ? "idle" : showRight > 0.5 ? "ok" : c === 0 && oneTask > 0 ? "focus" : "plain"}
+            toneAt={c >= FEW.partitions && idle > 0 ? idleAt : showRight > 0.5 ? sixtyAt : c === 0 && oneTask > 0 ? coreAt : undefined}
           />
+        ))}
+        {oneTask > 0 ? (
+          <div
+            style={{
+              position: "absolute",
+              left: cellX(0) + 8,
+              top: cellTop(0) + 8,
+              width: (CELL_W - 16) * ease(frame, taskAt + 6, 12),
+              height: cellH - 16,
+              background: `color-mix(in srgb, ${BAR} 40%, ${PAPER})`,
+              border: `2px solid ${BAR}`,
+              borderRadius: 4,
+              opacity: oneTask,
+            }}
+          />
+        ) : null}
+
+        {/* Each row of cores is an executor; the driver hands them their tasks. */}
+        <Svg>
+          {[0, 1, 2, 3].map((r) => {
+            const p = ease(frame, execAt + 2 + r * 3, 10);
+            const t = cellTop(r * 4) + 4;
+            const b = cellTop(r * 4) + cellH - 4;
+            return p > 0 ? (
+              <path key={r} d={`M${EXEC_X - 8},${t} L${EXEC_X},${t} L${EXEC_X},${b} L${EXEC_X - 8},${b}`} fill="none" stroke={INK_SOFT} strokeWidth={1.6} opacity={p} />
+            ) : null;
+          })}
+        </Svg>
+        {[0, 1, 2, 3].map((r) => (
+          <Note key={r} at={execAt + 4 + r * 3} x={EXEC_X + 12} y={rowMid(r) - 13}>
+            <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>executor {r + 1}</span>
+          </Note>
+        ))}
+        <Machine x={DRIVER_X} top={driverTop} width={DRIVER_W} height={h(DRIVER_H)} at={driverAt - 2} out={fewAt - 6} />
+        <Note at={driverAt} x={DRIVER_X + 16} y={driverTop + h(10)} out={fewAt - 6}>
+          <span style={{ display: "block", ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>driver</span>
+          <span style={{ display: "block", ...label(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, driverAt + 8, 10) }}>plans the job</span>
+        </Note>
+        {[0, 1, 2, 3].map((r) => (
+          <Curve key={r} from={[DRIVER_X - 4, driverTop + h(DRIVER_H) / 2]} to={[EXEC_X + 124, rowMid(r)]} at={handsAt + r * 2} dur={12} width={1.6} head={9} out={fewAt - 6} />
         ))}
 
         {/* Four partitions: four busy cores, twelve idle. */}
@@ -241,6 +301,12 @@ export const PartitionScene: React.FC = () => {
         {/* Changing the count. */}
         <Repartition x={R_X} top={y(702)} at={repAt} labelAt={repAt} h={h} />
         <Coalesce x={R_X + 520} top={y(702)} at={coalAt} labelAt={noShuffleAt} writeAt={writeAt} h={h} />
+        <Note at={oneAt - 2} x={R_X + 520} y={y(880)}>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>coalesce(1)</span>
+            <span style={{ opacity: ease(frame, singleAt - 2, 10) }}>: the steps before it run as one task</span>
+          </span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

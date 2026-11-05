@@ -38,6 +38,8 @@ const USED = new Set(["status", "region"]);
  * Questions 3 and 4. The page's PySpark block inks in a line at a time, and
  * each transformation adds a dashed node to a plan beside it; nothing runs.
  * `show()` is the action: the plan's nodes turn solid and run, top to bottom.
+ * Collect, write and a whole DataFrame's count are actions too; the grouped
+ * count on line three is not, and its line is marked when that is said.
  * Then why it waits: the optimizer sees the whole plan, pushes the filter
  * into the scan (the filter node folds into it), and prunes the columns the
  * query never names.
@@ -60,7 +62,9 @@ export const LazyScene: React.FC = () => {
   const compileAt = n.word("lazy-action", "compile the plan");
   const scheduleAt = n.word("lazy-action", "schedule it");
   const runAt = n.word("lazy-action", "and run it");
-  const countAt = n.word("lazy-action", "Count, collect and write");
+  const tooAt = n.word("lazy-too", "Collect, write and count on a whole DataFrame");
+  const wholeDfAt = n.word("lazy-too", "count on a whole DataFrame");
+  const groupedAt = n.word("lazy-too", "the grouped count is not");
   const q4At = n.word("lazy-why", "Question four");
   const text4At = n.word("lazy-why", "Why does Spark use lazy evaluation");
   const wholeAt = n.word("lazy-why", "sees the whole plan");
@@ -89,11 +93,11 @@ export const LazyScene: React.FC = () => {
   const nodeH = h(N_H);
   const bracket = ease(frame, wholeAt, 14) * (1 - ease(frame, pushAt, 10));
 
-  const rewrites = [
+  const rewrites: { at: number; text: string; more?: { at: number; text: string }; soft?: string }[] = [
     { at: pushAt, text: "push the filter into the scan", more: { at: lessAt, text: ": read less" } },
     { at: pruneAt, text: "prune unused columns" },
     { at: fuseAt, text: "fuse chained steps" },
-    { at: joinAt, text: "pick the join strategy" },
+    { at: joinAt, text: "pick the join strategy", soft: " (when the plan has a join)" },
   ];
 
   return (
@@ -126,7 +130,8 @@ export const LazyScene: React.FC = () => {
           marks={[
             { line: lineOf(LINES, ".filter("), at: filterAt, out: groupAt },
             { line: lineOf(LINES, ".groupBy("), at: groupAt, out: lazyAt + 10 },
-            { line: lineOf(LINES, ".show()"), at: showAt + 4, out: q4At },
+            { line: lineOf(LINES, ".show()"), at: showAt + 4, out: groupedAt },
+            { line: lineOf(LINES, ".groupBy("), at: groupedAt, out: q4At },
           ]}
         />
         <Note at={nothingAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(24)} out={showAt}>
@@ -141,14 +146,25 @@ export const LazyScene: React.FC = () => {
             <span style={{ opacity: ease(frame, runAt, 10), color: BLUE_INK, fontWeight: 650 }}>, run</span>
           </span>
         </Note>
-        <Note at={countAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(80)} out={q4At}>
+        <Note at={tooAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(80)} out={q4At}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap" }}>
             <span style={{ ...note(23, INK_SOFT) }}>actions too:</span>
-            {["count()", "collect()", "write"].map((t) => (
-              <Chip key={t} mono size={23}>
-                {t}
-              </Chip>
+            {[
+              { t: "collect()", at: tooAt },
+              { t: "write", at: tooAt + 6 },
+              { t: "df.count()", at: wholeDfAt },
+            ].map((c) => (
+              <span key={c.t} style={{ opacity: ease(frame, c.at - 2, 10) }}>
+                <Chip mono size={23}>
+                  {c.t}
+                </Chip>
+              </span>
             ))}
+          </span>
+        </Note>
+        <Note at={groupedAt - 2} x={L_X} y={y(L_TOP) + listingHeight(LINES.length, SIZE) + h(136)} out={q4At}>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>groupBy().count()</span> is still a transformation
           </span>
         </Note>
 
@@ -216,7 +232,7 @@ export const LazyScene: React.FC = () => {
                 ) : null}
               </span>
               {isShow ? (
-                <span style={{ marginLeft: "auto", ...label(20, ACCENT_INK), fontWeight: 700 }}>action</span>
+                <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), fontWeight: 700 }}>action</span>
               ) : run > 0 ? (
                 <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), opacity: run }}>ran</span>
               ) : null}
@@ -264,6 +280,7 @@ export const LazyScene: React.FC = () => {
               {"  "}
               {r.text}
               {r.more ? <span style={{ opacity: ease(frame, r.more.at, 10), color: OK_INK }}>{r.more.text}</span> : null}
+              {r.soft ? <span style={{ color: INK_SOFT }}>{r.soft}</span> : null}
             </span>
           </Note>
         ))}

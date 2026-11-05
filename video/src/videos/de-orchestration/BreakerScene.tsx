@@ -21,9 +21,12 @@ const TX1 = 1610;
  * and dashboards downstream. Then where the name comes from, redrawn from
  * charts/circuit-breaker-states.mjs (its simulation and seed, check.mjs): a
  * failing dependency's error rate, and the load reaching it. The breaker trips
- * at 50%, sends nothing for 12 seconds at a time until a probe succeeds, and
- * the dependency recovers; retries alone push up to 300 requests a second at
- * it and it never does.
+ * at 50% and opens: nothing for 12 seconds. Then it half-opens and lets a
+ * probe through; the first fails and it opens again, the second passes and it
+ * closes, and the dependency recovers. Retries alone push up to 300 requests a
+ * second at it and it never does. The two halves are captioned apart: "fail
+ * fast, alert, halt" is the pipeline's breaker, "not failing faster" the
+ * service's.
  */
 export const BreakerScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -44,13 +47,13 @@ export const BreakerScene: React.FC = () => {
   const pointAt = n.word("cb-model", "the point isn't failing faster");
   const loadAt = n.word("cb-model", "stop sending load");
   const modelAt = n.word("cb-model", "Model a failing dependency");
-  const tripsAt = n.word("cb-model", "The breaker trips at fifty percent errors");
-  const nothingAt = n.word("cb-model", "sends nothing for twelve seconds");
-  const probeAt = n.word("cb-model", "until a probe gets through");
-  const retriesAt = n.word("cb-model", "Retries alone push");
-  const threeAt = n.word("cb-model", "three hundred requests a second");
-  const neverAt = n.word("cb-model", "it never recovers");
-  const end = n.beat("cb-model").to;
+  const tripsAt = n.word("cb-trip", "The breaker trips at fifty percent errors");
+  const nothingAt = n.word("cb-trip", "sends nothing for twelve seconds");
+  const probeAt = n.word("cb-trip", "then half-opens");
+  const retriesAt = n.word("cb-retry", "Retries alone push");
+  const threeAt = n.word("cb-retry", "three hundred requests a second");
+  const neverAt = n.word("cb-retry", "it never recovers");
+  const end = n.beat("cb-retry").to;
 
   // ── Containment, on the left ──────────────────────────────────────────────
   const midY = y(470);
@@ -96,8 +99,10 @@ export const BreakerScene: React.FC = () => {
     }
     return pts.join(" ");
   };
-  const chartIn = ease(frame, servicesAt, 14);
-  const lastProbe = BREAKER.bands.filter((b) => b.state === "half-open").at(-1)!;
+  const chartIn = ease(frame, modelAt - 10, 14);
+  const probes = BREAKER.bands.filter((b) => b.state === "half-open");
+  const failedProbe = probes[0];
+  const lastProbe = probes.at(-1)!;
 
   return (
     <AbsoluteFill>
@@ -197,8 +202,14 @@ export const BreakerScene: React.FC = () => {
         <Note at={spreadAt + 4} x={downX - 92} y={downY(DOWN.length - 1) + h(40)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>downstream untouched</span>
         </Note>
+        <Note at={fastAt + 4} x={X0} y={y(262)}>
+          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            in a pipeline: fail fast<span style={{ opacity: ease(frame, alertAt, 8) }}>, alert</span>
+            <span style={{ opacity: ease(frame, haltAt, 8) }}>, halt</span>
+          </span>
+        </Note>
         <Note at={pointAt} x={X0} y={y(760)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>not to fail faster:</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>in services, the point isn&apos;t failing faster:</span>
         </Note>
         <Note at={loadAt} x={X0} y={y(800)}>
           <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>stop the load on what can&apos;t recover under it</span>
@@ -207,7 +218,7 @@ export const BreakerScene: React.FC = () => {
         {/* The name's home: a failing dependency, a model. */}
         <div style={{ position: "absolute", left: TX0, top: errTop - h(44), ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: chartIn }}>
           error rate at the dependency
-          <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, modelAt, 10) }}> · a model</span>
+          <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, modelAt, 10) }}> · a service&apos;s breaker, a model</span>
         </div>
         <div style={{ position: "absolute", left: TX0, top: reqTop - h(44), ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: chartIn }}>
           requests per second reaching it
@@ -265,13 +276,34 @@ export const BreakerScene: React.FC = () => {
             trips at <Num>{BREAKER.trip * 100}</Num>%
           </span>
         </Note>
-        <Note at={nothingAt + 8} x={(tx(firstOpen.t0) + tx(firstOpen.t1)) / 2 - 4} y={ry(yMax) - h(4)} from="up">
+        <Note at={nothingAt + 8} x={tx(firstOpen.t0)} y={ry(yMax) - h(4)} from="up">
           <span style={{ ...label(20, INK), ...halo, fontWeight: 700, whiteSpace: "nowrap" }}>
-            open <Num>{BREAKER.openFor}</Num> s: nothing gets through
+            open <Num>{BREAKER.openFor}</Num> s at a time: nothing gets through
           </span>
         </Note>
-        <Note at={probeAt + 30} x={tx(lastProbe.t0) + 12} y={ry(170)}>
-          <span style={{ ...label(20, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>probe gets through</span>
+        {/* Each half-open probe, named under the axis on a leader. */}
+        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+          {[
+            { b: failedProbe, at: probeAt + 6, to: reqBot + h(70) },
+            { b: lastProbe, at: probeAt + 30, to: reqBot + h(104) },
+          ].map(({ b, at: from, to }) => (
+            <line
+              key={b.t0}
+              x1={tx(b.t0 + 0.5)}
+              x2={tx(b.t0 + 0.5)}
+              y1={reqBot + 6}
+              y2={reqBot + 6 + (to - reqBot - 6) * ease(frame, from, 10)}
+              stroke={INK_SOFT}
+              strokeWidth={1.4}
+              opacity={ease(frame, from, 6)}
+            />
+          ))}
+        </svg>
+        <Note at={probeAt + 12} x={tx(failedProbe.t0 + 0.5) - 8} y={reqBot + h(70) - 12} align="right">
+          <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>half-open: probe fails</span>
+        </Note>
+        <Note at={probeAt + 36} x={tx(lastProbe.t0 + 0.5) + 8} y={reqBot + h(104) - 12}>
+          <span style={{ ...label(20, OK_INK), whiteSpace: "nowrap" }}>half-open: probe passes, closed</span>
         </Note>
         <Note at={probeAt + 46} x={TX1 + 12} y={ry(BREAKER.offered) - 14}>
           <span style={{ ...label(20, OK_INK), whiteSpace: "nowrap" }}>with a breaker</span>

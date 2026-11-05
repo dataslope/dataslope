@@ -7,10 +7,12 @@ import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ACROSS, BALANCE, CLOSING, CLOSING_TOTAL, money, OVER_TIME, VISITS_BOTH, VISITS_PER_DAY } from "./data";
-import { colsOf, DataTable, Drift, geoOf, MARK_BAD, MARK_OK, Mono, OK_INK, Strike, TableName, Verdict, X0 } from "./parts";
+import { ACROSS, BALANCE, CLOSING, CLOSING_TOTAL, money, MONTH_ENDS, OVER_TIME, VISITS_BOTH, VISITS_PER_DAY } from "./data";
+import { colsOf, DataTable, Drift, geoOf, MARK_BAD, MARK_OK, Mono, OK_INK, TableName, Verdict, X0 } from "./parts";
 
 const R_X = 680;
+/** The remedies' column, right of the visitors. */
+const FIX_X = 1360;
 const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
 /** Who visited on each day: the video's own rows, counted in DuckDB. */
 const WHO: Record<string, readonly string[]> = { Mon: ["Ada", "Ben", "Cy"], Tue: ["Ben", "Cy", "Di"] };
@@ -79,7 +81,9 @@ const Who: React.FC<{ name: string; at: number; both?: number }> = ({ name, at, 
  * month-end snapshot) sums across accounts, 1,600.00 on March 31, but not
  * across months, 4,800.00, where the last value per period gives 1,600.00
  * again; and a distinct count does not sum at all: three on Monday and three
- * on Tuesday are four people.
+ * on Tuesday are four people. Each non-additive kind gets its own remedy,
+ * beside the visitors: recount a distinct count from the detail rows, and
+ * store a ratio's two parts.
  */
 export const AdditiveScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -113,9 +117,11 @@ export const AdditiveScene: React.FC = () => {
   const tueAt = n.word("nonadd", "three on Tuesday");
   const fourAt = n.word("nonadd", "are four people");
   const sixAt = n.word("nonadd", "not six");
-  const partsAt = n.word("nonadd", "Store the parts");
-  const computeAt = n.word("nonadd", "compute the ratio in the query");
-  const end = n.beat("nonadd").to;
+  const recountAt = n.word("nonadd-fix", "recount distinct users");
+  const detailAt = n.word("nonadd-fix", "from the detail rows");
+  const ratioAt = n.word("nonadd-fix", "For a ratio");
+  const divideAt = n.word("nonadd-fix", "divide in the query");
+  const end = n.beat("nonadd-fix").to;
 
   const bg = geoOf(BALANCE, X0, y(446), h, OPTS);
   const bal = BALANCE.cols.indexOf("balance");
@@ -125,6 +131,9 @@ export const AdditiveScene: React.FC = () => {
   const both = new Set(WHO.Mon.filter((p) => WHO.Tue.includes(p)));
   const everyone = [...new Set([...WHO.Mon, ...WHO.Tue])];
   const closing = CLOSING.rows.map((r) => money(r[1])).join(" + ");
+  // The quarter's sum, term by term: each month-end's total across both accounts.
+  const monthEnds = MONTH_ENDS.rows.map((r) => money(r[1]));
+  if (MONTH_ENDS.rows.reduce((t, r) => t + Number(r[1]), 0) !== Number(OVER_TIME)) throw new Error("the month-ends must add to the quarter's sum");
   const sumOfDays = Number(perDay.Mon) + Number(perDay.Tue);
 
   return (
@@ -136,7 +145,7 @@ export const AdditiveScene: React.FC = () => {
       <Sfx name="el-pop" at={lastAt + 6} level={-29} />
       <Sfx name="el-sprinkle" at={monAt} level={-32} />
       <Sfx name="el-scratch" at={sixAt} level={-35} />
-      <Sfx name="el-chime" at={partsAt} level={-35} />
+      <Sfx name="el-chime" at={recountAt} level={-35} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={10} at={qAt - 4} textAt={textAt - 4} size={56}>
@@ -167,7 +176,26 @@ export const AdditiveScene: React.FC = () => {
           ]}
         />
         <Verdict at={rightAt} x={R_X} y={y(430)} label={`across accounts, ${lastMonth}`} value={money(ACROSS)} tone="ok" />
-        <Verdict at={nonsenseAt} x={R_X} y={y(492)} label="across the quarter's month-ends" value={money(OVER_TIME)} tone="bad" strikeAt={neverAt} />
+        <Verdict
+          at={nonsenseAt}
+          x={R_X}
+          y={y(492)}
+          label={
+            <>
+              the quarter&apos;s month-ends,{" "}
+              {monthEnds.map((v, i) => (
+                <React.Fragment key={v + i}>
+                  {i ? " + " : ""}
+                  <Num>{v}</Num>
+                </React.Fragment>
+              ))}{" "}
+              =
+            </>
+          }
+          value={money(OVER_TIME)}
+          tone="bad"
+          strikeAt={neverAt}
+        />
         <Note at={fortyAt + 4} x={R_X} y={y(540)}>
           <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>money that never existed</span>
         </Note>
@@ -211,17 +239,26 @@ export const AdditiveScene: React.FC = () => {
             <Num>{VISITS_BOTH}</Num> people,
           </span>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, opacity: ease(frame, sixAt - 2, 10) }}>
-            not <Strike at={sixAt + 4}>{sumOfDays}</Strike>
+            not <Num>{sumOfDays}</Num>
           </span>
         </div>
-        <Note at={ratiosAt} x={X0} y={bg.rowTop(BALANCE.rows.length) + h(30)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>ratios and distinct counts don&apos;t sum</span>
+        {/* Under its kind, as "sums across every dimension" sits under additive. */}
+        <Note at={ratiosAt} x={X0 + 960} y={y(318) + h(44)}>
+          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>don&apos;t sum at all</span>
         </Note>
-        <Note at={partsAt} x={X0} y={bg.rowTop(BALANCE.rows.length) + h(74)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            Store the parts;
+        {/* One remedy for each kind, beside the visitors they are about. */}
+        <Note at={recountAt} x={FIX_X} y={y(732) - h(6)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            distinct counts: recount
             <br />
-            <span style={{ opacity: ease(frame, computeAt - 2, 10) }}>compute the ratio in the query.</span>
+            <span style={{ opacity: ease(frame, detailAt, 10) }}>from the detail rows</span>
+          </span>
+        </Note>
+        <Note at={ratioAt} x={FIX_X} y={y(732) + h(102)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            ratios: store both parts,
+            <br />
+            <span style={{ opacity: ease(frame, divideAt - 2, 10) }}>divide in the query</span>
           </span>
         </Note>
       </Drift>

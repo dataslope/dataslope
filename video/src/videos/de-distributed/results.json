@@ -304,15 +304,16 @@
     "scaled": "27.8 hours"
    },
    {
-    "name": "Network round trip",
-    "ns": 10000000,
-    "scaled": "116 days"
+    "name": "Data-center round trip",
+    "ns": 500000,
+    "scaled": "6 days"
    }
   ],
   "ssdOverMemory": 1000,
-  "networkOverMemory": 100000,
+  "networkOverMemory": 5000,
+  "networkDays": 5.79,
   "ssdOrders": 3,
-  "networkOrders": 5
+  "networkOrders": 4
  },
  "partitions": {
   "gb": 16,
@@ -347,11 +348,13 @@
   "executors": 50,
   "broadcastMB": 1000,
   "shuffleMB": 2000020,
-  "ratio": 2000
+  "ratio": 2000,
+  "autoThresholdMB": 10,
+  "dimOverThreshold": true
  },
  "source": {
   "frame": "src/videos/pandas-groupby/measurements.json (pandas 3.0.5)",
-  "ladder": "charts/memory-latency-ladder.mjs",
+  "ladder": "charts/memory-latency-ladder.mjs, its first six levels; the data-center round trip (500,000 ns) from the table it cites, Jeff Dean's latency numbers, in place of its 10 ms row",
   "fanout": "charts/tail-latency-fanout.mjs"
  }
 }

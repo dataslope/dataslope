@@ -139,8 +139,20 @@ export const script: NarrationScript = {
       pauseAfter: 0.5,
     },
     {
-      id: "anti-list",
-      text: "Expensive work at parse time, like an API call in the DAG file, run again on every parse. Monolithic tasks, where one failure redoes everything. Tasks that aren't idempotent, which corrupt state when they rerun. And large data passed through XComs, Airflow's store for small messages between tasks.",
+      id: "anti-parse",
+      text: "Expensive work at parse time, like an API call in the DAG file: the scheduler re-parses every file about every thirty seconds, so the call runs all day and slows every parse.",
+    },
+    {
+      id: "anti-mono",
+      text: "Monolithic tasks, where one failure redoes everything.",
+    },
+    {
+      id: "anti-idem",
+      text: "Tasks that aren't idempotent, that don't end the same however often they run, corrupt state when they rerun.",
+    },
+    {
+      id: "anti-xcom",
+      text: "And large data passed through XComs, Airflow's store for small messages between tasks.",
     },
     {
       id: "anti-fix",
@@ -163,7 +175,11 @@ export const script: NarrationScript = {
     {
       id: "jitter",
       scene: true,
-      text: "Add jitter, too. When a shared source fails, every task reading it fails at once. Model a thousand on one backoff schedule: all thousand retry in the same tenth of a second, against a service that takes ninety.",
+      text: "In code that calls a shared service, add jitter too: a random part of each wait.",
+    },
+    {
+      id: "jitter-storm",
+      text: "When a shared source fails, every task reading it fails at once. Model a thousand on one backoff schedule: all thousand retry in the same tenth of a second, against a service that takes ninety.",
       pauseAfter: 0.5,
     },
     {
@@ -212,7 +228,15 @@ export const script: NarrationScript = {
     },
     {
       id: "gate",
-      text: "Put them in a gate task between load and publish. In this batch of a thousand orders, four percent have no customer ID, against a limit of one percent. The gate fails, and publish never runs.",
+      text: "Put them in a gate task between load and publish.",
+    },
+    {
+      id: "gate-wap",
+      text: "Load writes to a staging table, and publish swaps it in only if the gate passes. That's write, audit, publish.",
+    },
+    {
+      id: "gate-run",
+      text: "In this batch of a thousand orders, four percent have no customer ID, against a limit of one percent. The gate fails, and publish never runs.",
       pauseAfter: 0.8,
     },
 
@@ -225,7 +249,16 @@ export const script: NarrationScript = {
     },
     {
       id: "cb-model",
-      text: "The name comes from services, where the point isn't failing faster: it's to stop sending load to something that can't recover under load. Model a failing dependency. The breaker trips at fifty percent errors and sends nothing for twelve seconds at a time, until a probe gets through. Retries alone push three hundred requests a second at it, and it never recovers.",
+      text: "The name comes from services, where the point isn't failing faster: it's to stop sending load to something that can't recover under load. Model a failing dependency.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "cb-trip",
+      text: "The breaker trips at fifty percent errors and sends nothing for twelve seconds at a time, then half-opens to let a probe through.",
+    },
+    {
+      id: "cb-retry",
+      text: "Retries alone push three hundred requests a second at it, and it never recovers.",
       pauseAfter: 0.8,
     },
 
@@ -238,7 +271,11 @@ export const script: NarrationScript = {
     },
     {
       id: "sla-enforce",
-      text: "Enforce it three ways: a deadline callback that alerts when a task misses its target, freshness checks in the warehouse, and priority, so critical pipelines get compute first. Then track it over time as an objective, not a one-off alert.",
+      text: "Enforce it three ways: a deadline callback that alerts when a task misses its target, freshness checks in the warehouse, and priority, so critical pipelines get compute first.",
+    },
+    {
+      id: "sla-slo",
+      text: "Then track it over time as an objective, an SLO, not a one-off alert.",
       pauseAfter: 0.8,
     },
 
@@ -251,12 +288,17 @@ export const script: NarrationScript = {
     },
     {
       id: "fresh-run",
-      text: "At six on June third, the newest order is from two minutes to midnight: six hours old. That night the source sent nothing. The load still succeeded, with no new rows, so at six on the fourth, the newest order is thirty hours old. Every task is green. Only the freshness check fails.",
+      text: "At six on June third, the newest order is from two minutes to midnight: six hours old.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "fresh-stale",
+      text: "That night the source sent nothing. The load still succeeded, with no new rows, so at six on the fourth, the newest order is thirty hours old. Every task is green.",
       pauseAfter: 0.6,
     },
     {
       id: "fresh-why",
-      text: "It catches missing data, which quality checks can't: they only inspect the rows that are there.",
+      text: "The freshness check fails. It catches data that never arrived, which row-level checks miss: they only inspect the rows that are there. A row-count check on the day's load would catch it too.",
       pauseAfter: 0.8,
     },
 
@@ -269,7 +311,12 @@ export const script: NarrationScript = {
     },
     {
       id: "sensor-poke",
-      text: "In the default poke mode, a sensor holds a worker slot the whole time it waits. Fill the pool with waiting sensors, and nothing else can run.",
+      text: "In the default poke mode, a sensor holds a worker slot the whole time it waits.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "sensor-pool",
+      text: "Fill the pool with waiting sensors, and nothing else can run.",
       pauseAfter: 0.6,
     },
     {

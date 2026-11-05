@@ -129,6 +129,9 @@ export const listingLineMid = (top: number, i: number, size: number) => {
 /**
  * A printed SQL listing: tinted paper between a rule above and a hairline
  * below. Each line inks in on its own cue; `dim` sets the listing back.
+ * `rowIn` holds a line's row shut until its frame, then opens it: the
+ * listing grows and the lines below move down, so a statement can be wrapped
+ * (BEGIN above, COMMIT below) without blank rows held open for it.
  */
 export const Listing: React.FC<{
   lines: readonly string[];
@@ -138,18 +141,23 @@ export const Listing: React.FC<{
   size?: number;
   at: number;
   lineAt?: readonly number[];
+  rowIn?: readonly (number | undefined)[];
   marks?: readonly { line: number; at: number; out?: number; color?: string }[];
   dim?: number;
   out?: number;
-}> = ({ lines, x, top, width, size = 24, at, lineAt, marks = [], dim, out }) => {
+}> = ({ lines, x, top, width, size = 24, at, lineAt, rowIn, marks = [], dim, out }) => {
   const frame = useCurrentFrame();
   const g = listingGeometry(size);
   const p = ease(frame, at, 16);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
+  // How far open each row is, and where each line's row starts.
+  const open = lines.map((_, i) => (rowIn?.[i] === undefined ? 1 : ease(frame, rowIn[i] as number, 12)));
+  const rowTop = open.map((_, i) => g.padY + open.slice(0, i).reduce((sum, v) => sum + v, 0) * g.lineH);
+  const height = g.padY * 2 + open.reduce((sum, v) => sum + v, 0) * g.lineH;
   return (
-    <div style={{ position: "absolute", left: x, top, width, height: listingHeight(lines.length, size), opacity: (1 - d) * (1 - o) }}>
+    <div style={{ position: "absolute", left: x, top, width, height, opacity: (1 - d) * (1 - o) }}>
       <div
         style={{
           position: "absolute",
@@ -171,7 +179,7 @@ export const Listing: React.FC<{
             style={{
               position: "absolute",
               left: g.padX - size * 0.2 + indent * 0.6 * size,
-              top: g.padY + m.line * g.lineH + g.lineH * 0.12,
+              top: rowTop[m.line] + g.lineH * 0.12,
               height: g.lineH * 0.76,
               width: `${((lines[m.line].length - indent) * 0.6 + 0.4) * w}em`,
               fontSize: size,
@@ -186,7 +194,7 @@ export const Listing: React.FC<{
           key={i}
           at={lineAt?.[i] ?? at + 4 + i * 4}
           dur={14}
-          style={{ left: g.padX, top: g.padY + i * g.lineH, height: g.lineH, display: "flex", alignItems: "center" }}
+          style={{ left: g.padX, top: rowTop[i], height: g.lineH, display: "flex", alignItems: "center", opacity: open[i] < 1 ? open[i] : undefined }}
         >
           <Code line={line} size={size} />
         </Ink>

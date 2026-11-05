@@ -758,6 +758,11 @@
       "minutes": 1802,
       "age": "1 day 06:02:00",
       "alert": true
-    }
+    },
+    "missedDayRows": 0
+  },
+  "parse": {
+    "everySeconds": 30,
+    "perDay": 2880
   }
 }

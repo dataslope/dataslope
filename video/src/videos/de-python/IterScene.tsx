@@ -3,15 +3,17 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { MONO } from "../../theme/fonts";
 import { ITER } from "./data";
 import {
   Console,
   consoleHeight,
   Drift,
+  FadeIn,
   lineOf,
   Listing,
   listingHeight,
@@ -28,42 +30,48 @@ const TOP = 322;
 const SIZE = 22;
 const RIGHT_X = 1000;
 const ROWS = 4;
+/** The four rows of a pass, drawn large: the definitions are the scene's
+ *  figure until the listings below take the page. */
+const BLOCK = 100;
+const PITCH = 124;
+/** Frames the cursor spends on each row. */
+const STEP = 10;
+const PER = ROWS * STEP + 14;
 
 /**
- * Four rows read by a cursor. An iterable's cursor starts again from the
- * first row on every pass (`passes` of them); an iterator's makes one pass,
- * and the rows it has passed stay greyed: it is used up.
+ * One loop over four rows: a cursor steps along them from `at`. An
+ * iterable's loop starts on fresh rows every time; an iterator's (`spent`)
+ * leaves the rows it has passed greyed, used up.
  */
-const Pass: React.FC<{ x: number; top: number; at: number; passes: number; spent?: boolean }> = ({
+const Pass: React.FC<{ x: number; top: number; at: number; label: string; spent?: boolean; out: number }> = ({
   x,
   top,
   at,
-  passes,
+  label: name,
   spent = false,
+  out,
 }) => {
   const frame = useCurrentFrame();
-  const STEP = 10;
-  const per = ROWS * STEP + 14;
   const t = frame - at;
-  const pass = Math.min(passes - 1, Math.floor(Math.max(0, t) / per));
-  const inPass = t - pass * per;
-  const pos = t < 0 ? -1 : Math.min(ROWS, Math.floor(inPass / STEP));
+  const pos = t < 0 ? -1 : Math.min(ROWS, Math.floor(t / STEP));
+  const gone = ease(frame, out, 10);
+  if (gone >= 1) return null;
   return (
-    <>
+    <div style={{ position: "absolute", inset: 0, opacity: 1 - gone }}>
       {Array.from({ length: ROWS }, (_, i) => {
         const p = ease(frame, at - 10 + i * 2, 10);
-        const read = spent && (pass > 0 || pos > i);
-        const here = pos === i && !(spent && pass > 0);
+        const read = spent && pos > i;
+        const here = pos === i;
         return (
           <div
             key={i}
             style={{
               position: "absolute",
-              left: x + i * 66,
+              left: x + i * PITCH,
               top,
-              width: 54,
-              height: 54,
-              borderRadius: 5,
+              width: BLOCK,
+              height: BLOCK,
+              borderRadius: 7,
               boxSizing: "border-box",
               border: `2px solid ${here ? BLUE_INK : read ? `color-mix(in srgb, ${INK} 20%, transparent)` : BAR}`,
               background: here
@@ -76,9 +84,53 @@ const Pass: React.FC<{ x: number; top: number; at: number; passes: number; spent
           />
         );
       })}
-    </>
+      <div
+        style={{
+          position: "absolute",
+          left: x + ROWS * PITCH + 6,
+          top: top + BLOCK / 2 - 15,
+          ...note(22, INK_SOFT),
+          whiteSpace: "nowrap",
+          opacity: ease(frame, at - 10, 10),
+        }}
+      >
+        {name}
+      </div>
+    </div>
   );
 };
+
+/** What Python raises when a spent iterator is asked for more: its kind, in
+ *  the error box's red, after the call that raised it. */
+const Raised: React.FC<{ x: number; top: number; at: number; out: number; call: string; kind: string }> = ({
+  x,
+  top,
+  at,
+  out,
+  call,
+  kind,
+}) => (
+  <Note at={at} x={x} y={top} out={out}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "baseline",
+        gap: 18,
+        borderLeft: `4px solid ${ACCENT}`,
+        background: `color-mix(in srgb, ${ACCENT} 9%, ${PAPER})`,
+        padding: "12px 20px 14px",
+        fontFamily: MONO,
+        fontSize: 24,
+        color: INK,
+        whiteSpace: "nowrap",
+        fontVariantLigatures: "none",
+      }}
+    >
+      <span>{call}</span>
+      <span style={{ color: ACCENT_INK, fontWeight: 700 }}>{kind}</span>
+    </div>
+  </Note>
+);
 
 /**
  * Question 5, on the page's four rows in a file of the video's own. An
@@ -96,14 +148,19 @@ export const IterScene: React.FC = () => {
   const textAt = n.word("iter", "What's the difference");
   const iterableAt = n.word("iter-def", "An iterable");
   const freshAt = n.word("iter-def", "hands out a fresh iterator each time");
-  const iteratorAt = n.word("iter-def", "An iterator keeps its place");
-  const usedAt = n.word("iter-def", "it's used up");
+  const dunderIterAt = n.word("iter-next", "dunder iter method");
+  const iteratorAt = n.word("iter-next", "An iterator has dunder next");
+  const placeAt = n.word("iter-next", "it keeps its place");
+  const usedAt = n.word("iter-next", "at the end");
+  const stopAt = n.word("iter-next", "it raises stop iteration");
   const listAt = n.word("iter-twice", "Read the list twice");
   const fourAgainAt = n.word("iter-twice", "then four again");
   const genAt = n.word("iter-twice", "Read the generator twice");
   const zeroAt = n.word("iter-twice", "four, then zero");
   const isAt = n.word("iter-twice", "A generator is an iterator");
   const fileAt = n.word("iter-twice", "and so is an open file");
+  const itselfAt = n.word("iter-self", "it returns itself");
+  const newOneAt = n.word("iter-self", "a list returns a new one");
   const bitesAt = n.word("iter-trap", "Here's how it bites");
   const countAt = n.word("iter-trap", "count the rows for the log");
   const loadAt = n.word("iter-trap", "then load them");
@@ -120,11 +177,16 @@ export const IterScene: React.FC = () => {
   const liH = listingHeight(LI.length, SIZE);
   const T = ITER.trap.lines;
   const outDefs = bitesAt - 4;
+  // The passes are drawn large; they give way to the listings below them.
+  const outPasses = listAt - 12;
+  const row1 = defTop + h(100);
+  const row2 = row1 + BLOCK + h(28);
 
   return (
     <AbsoluteFill>
       <Sfx name="el-tap" at={freshAt} level={-35} />
       <Sfx name="el-tap" at={usedAt} level={-35} />
+      <Sfx name="el-scratch" at={stopAt + 4} level={-34} />
       <Sfx name="el-pop" at={fourAgainAt} level={-34} />
       <Sfx name="el-scratch" at={zeroAt + 6} level={-33} />
       <Sfx name="el-pencil" at={countAt} level={-36} />
@@ -145,11 +207,17 @@ export const IterScene: React.FC = () => {
           </span>
         </Note>
         <Note at={freshAt} x={X0} y={defTop + h(42)} out={outDefs}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>a fresh iterator for every loop</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            a fresh iterator for every loop
+            <FadeIn at={dunderIterAt - 4}>
+              : <Mark at={dunderIterAt + 2}>
+                <Mono>__iter__()</Mono>
+              </Mark>
+            </FadeIn>
+          </span>
         </Note>
-        <div style={{ opacity: 1 - ease(useCurrentFrame(), outDefs, 10) }}>
-          <Pass x={X0} top={defTop + h(96)} at={freshAt + 4} passes={2} />
-        </div>
+        <Pass x={X0} top={row1} at={freshAt + 4} label="loop 1" out={outPasses} />
+        <Pass x={X0} top={row2} at={freshAt + 4 + PER} label="loop 2" out={outPasses} />
         <Note at={iteratorAt - 2} x={RIGHT_X} y={defTop} out={outDefs}>
           <span style={{ display: "flex", gap: 18, alignItems: "baseline", whiteSpace: "nowrap" }}>
             <Title size={26}>iterator</Title>
@@ -158,14 +226,30 @@ export const IterScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={iteratorAt + 4} x={RIGHT_X} y={defTop + h(42)} out={outDefs}>
+        <Note at={iteratorAt} x={RIGHT_X} y={defTop + h(42)} out={outDefs}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            keeps its place, and <Mark at={usedAt}>is used up at the end</Mark>
+            <Mark at={iteratorAt + 6}>
+              <Mono>__next__()</Mono>
+            </Mark>
+            <FadeIn at={placeAt - 2}>: keeps its place, </FadeIn>
+            <FadeIn at={usedAt - 2}>
+              <Mark at={usedAt + 4}>then is used up</Mark>
+            </FadeIn>
           </span>
         </Note>
-        <div style={{ opacity: 1 - ease(useCurrentFrame(), outDefs, 10) }}>
-          <Pass x={RIGHT_X} top={defTop + h(96)} at={iteratorAt + 8} passes={2} spent />
-        </div>
+        <Pass x={RIGHT_X} top={row1} at={placeAt + 2} label="loop 1" spent out={outPasses} />
+        {/* The second loop gets nothing: next() on a spent iterator raises. */}
+        <Note at={stopAt - 6} x={RIGHT_X + ROWS * PITCH + 6} y={row2 + BLOCK / 2 - h(15)} out={outPasses}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>loop 2</span>
+        </Note>
+        <Raised
+          x={RIGHT_X}
+          top={row2 + BLOCK / 2 - 30}
+          at={stopAt}
+          out={outPasses}
+          call={ITER.stop.lines[ITER.stop.lines.length - 1]}
+          kind={ITER.stop.kind}
+        />
 
         {/* ── Read twice ── */}
         <Note at={listAt - 4} x={X0} y={twiceTop - h(40)}>
@@ -182,7 +266,9 @@ export const IterScene: React.FC = () => {
         />
         <Note at={isAt} x={X0 + 330} y={twiceTop + liH + h(22)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            <Mono>iter(rows) is rows</Mono>: {ITER.list.isIter}
+            <Mark at={newOneAt}>
+              <Mono>iter(rows) is rows</Mono>: {ITER.list.isIter}
+            </Mark>
           </span>
         </Note>
 
@@ -200,7 +286,9 @@ export const IterScene: React.FC = () => {
         />
         <Note at={isAt} x={RIGHT_X + 330} y={twiceTop + liH + h(22)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            <Mono>iter(rows) is rows</Mono>: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>{ITER.gen.isIter}</span>
+            <Mark at={itselfAt}>
+              <Mono>iter(rows) is rows</Mono>: <span style={{ color: ACCENT_INK, fontWeight: 650 }}>{ITER.gen.isIter}</span>
+            </Mark>
           </span>
         </Note>
 

@@ -5,7 +5,7 @@ import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, HAIRLINE, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FRESH, hm } from "./data";
@@ -25,7 +25,10 @@ const hoursOf = (t: string) => (Number(t.slice(8, 10)) - 1) * 24 + Number(t.slic
  * video's own). Run in DuckDB on the video's own daily_orders (check.mjs): at
  * 06:00 on June 3 the newest order is 23:58 the night before, 6 h 2 min old;
  * June 3's source sent nothing, so at 06:00 on June 4 it is 30 h 2 min old,
- * though every task succeeded. Then why quality checks cannot catch it.
+ * though every task succeeded. Then what catches it: the freshness check, and
+ * a row-count check on the day's load; row-level checks miss it, since they
+ * only read the rows that arrived. The age column shows the query's interval
+ * as hours and minutes (hm), so it can't read as a clock time.
  */
 export const FreshScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -43,16 +46,17 @@ export const FreshScene: React.FC = () => {
   const sixAt = n.word("fresh-run", "At six on June third");
   const newestAt = n.word("fresh-run", "the newest order is from two minutes to midnight");
   const sixHAt = n.word("fresh-run", "six hours old");
-  const nightAt = n.word("fresh-run", "That night the source sent nothing");
-  const loadAt = n.word("fresh-run", "The load still succeeded");
-  const noRowsAt = n.word("fresh-run", "with no new rows");
-  const fourthAt = n.word("fresh-run", "so at six on the fourth");
-  const thirtyAt = n.word("fresh-run", "thirty hours old");
-  const greenAt = n.word("fresh-run", "Every task is green");
-  const onlyAt = n.word("fresh-run", "Only the freshness check fails");
-  const catchAt = n.word("fresh-why", "It catches missing data");
-  const cantAt = n.word("fresh-why", "which quality checks can't");
+  const nightAt = n.word("fresh-stale", "That night the source sent nothing");
+  const loadAt = n.word("fresh-stale", "The load still succeeded");
+  const noRowsAt = n.word("fresh-stale", "with no new rows");
+  const fourthAt = n.word("fresh-stale", "so at six on the fourth");
+  const thirtyAt = n.word("fresh-stale", "thirty hours old");
+  const greenAt = n.word("fresh-stale", "Every task is green");
+  const onlyAt = n.word("fresh-why", "The freshness check fails");
+  const catchAt = n.word("fresh-why", "It catches data that never arrived");
+  const cantAt = n.word("fresh-why", "which row-level checks miss");
   const thereAt = n.word("fresh-why", "the rows that are there");
+  const countAt = n.word("fresh-why", "A row-count check on the day's load");
   const end = n.beat("fresh-why").to;
 
   // ── The two mornings on one clock ─────────────────────────────────────────
@@ -119,7 +123,7 @@ export const FreshScene: React.FC = () => {
         {/* Its answers, one each morning at six. */}
         <div style={{ position: "absolute", left: RES_X, top: resTop, display: "flex", opacity: ease(frame, sixHAt - 6, 10) }}>
           {COLS.map((c) => (
-            <div key={c.key} style={{ width: c.w, ...label(20, INK_SOFT), fontWeight: 700, fontFamily: c.key === "now" ? undefined : MONO }}>
+            <div key={c.key} style={{ width: c.w, ...label(20, INK_SOFT), fontWeight: 700, fontFamily: c.key === "newest" ? MONO : SANS }}>
               {c.label}
             </div>
           ))}
@@ -131,7 +135,9 @@ export const FreshScene: React.FC = () => {
             <div key={i} style={{ position: "absolute", left: RES_X, top: resTop + (i + 1) * RH, display: "flex", alignItems: "center", opacity: p }}>
               <div style={{ width: COLS[0].w, ...note(22, INK), fontWeight: 600 }}>06:00 Jun {Number(row.r.now.slice(8, 10))}</div>
               <div style={{ width: COLS[1].w, fontFamily: MONO, fontSize: 21, color: INK, fontVariantLigatures: "none" }}>{row.r.newest}</div>
-              <div style={{ width: COLS[2].w, fontFamily: MONO, fontSize: 21, fontWeight: 700, color: row.ok ? OK_INK : ACCENT_INK, fontVariantLigatures: "none" }}>{row.r.age}</div>
+              <div style={{ width: COLS[2].w, ...note(22, row.ok ? OK_INK : ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <Num>{hm(row.r.minutes)}</Num>
+              </div>
               <div style={{ width: 40 }}>{frame >= row.at + 6 ? row.ok ? <Tick at={row.at + 6} size={24} /> : <Cross at={row.at + 6} size={24} /> : null}</div>
             </div>
           );
@@ -210,7 +216,7 @@ export const FreshScene: React.FC = () => {
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{hm(FRESH.stale.minutes)}: stale, alert</span>
         </Note>
 
-        {/* The run that night, all green, and the one check that is not. */}
+        {/* The run that night, all green, and the two checks that are not. */}
         {[
           { text: "extract", at: greenAt },
           { text: "transform", at: greenAt + 3 },
@@ -221,18 +227,28 @@ export const FreshScene: React.FC = () => {
           </Pill>
         ))}
         <Note at={noRowsAt} x={X0 + 460} y={y(826)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>0 new rows</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            <Num>{FRESH.missedDayRows}</Num> new rows
+          </span>
         </Note>
         <Pill x={X0 + 720} y={y(770)} at={onlyAt + 2} ink={ACCENT_INK} size={24}>
           freshness check ✗
         </Pill>
+        <Pill x={X0 + 720} y={y(832)} at={countAt + 2} ink={ACCENT_INK} size={24}>
+          <span>
+            row count: <Num>{FRESH.missedDayRows}</Num> ✗
+          </span>
+        </Pill>
         <Note at={catchAt} x={X0 + 1010} y={y(762)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>catches missing data</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>catches data that never arrived</span>
         </Note>
         <Note at={cantAt} x={X0 + 1010} y={y(802)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            quality checks only read the rows <span style={{ opacity: ease(frame, thereAt, 10) }}>that are there</span>
+            row-level checks only read the rows <span style={{ opacity: ease(frame, thereAt, 10) }}>that are there</span>
           </span>
+        </Note>
+        <Note at={countAt + 6} x={X0 + 1010} y={y(840)}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>a row count on the day&apos;s load catches it too</span>
         </Note>
       </Drift>
     </AbsoluteFill>

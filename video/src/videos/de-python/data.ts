@@ -178,12 +178,33 @@ export const FILE = {
   meanTrue: scalar("file", "meanTrue"),
   meanOfMeans: scalar("file", "meanOfMeans"),
   meanFolded: scalar("file", "meanFolded"),
+  /** The rows in each chunk of the first 250,000: the last is short, which
+   *  is why the mean of the means is off here. */
+  meanSizes: JSON.parse(scalar("file", "meanSizes")) as number[],
+  /** The file's bytes alone, read in binary mode: half of what read() holds,
+   *  which keeps the bytes and the text decoded from them. */
+  readBytes: peak("file", "readBytes"),
+  /** The same totals by name, streamed into a dict a line at a time: the
+   *  like-for-like against read_csv and groupby (`whole`). */
+  streamGroup: { peak: peak("file", "streamGroup"), totals: scalar("file", "streamGroup") },
 };
 // The script says nothing is read until the last stage asks.
 same("the lazy pipeline's first two lines", FILE.lazy.out.slice(0, 2), ["pipeline built", "opening events.csv"]);
 same("the whole read and the chunks' totals", FILE.whole.totals, FILE.chunks.totals);
 same("sum over count and the true mean", FILE.meanFolded, FILE.meanTrue);
 if (FILE.meanOfMeans === FILE.meanTrue) throw new Error("the mean of means is not off; the script says it is");
+// The script says the last chunk holds fifty thousand rows, after two of a
+// hundred thousand, so its rows count double in the mean of means.
+same("the chunk sizes", FILE.meanSizes, [100_000, 100_000, 50_000]);
+// The screen says read() keeps the bytes and the decoded text: about twice
+// the bytes alone.
+if (Math.abs(FILE.read.peak / FILE.readBytes - 2) > 0.1) throw new Error(`read() held ${FILE.read.peak / FILE.readBytes}x the bytes, not twice`);
+// The quick round compares the same job: the streamed totals are pandas'.
+same(
+  "the streamed totals and the whole read's",
+  Object.fromEntries([...FILE.streamGroup.totals.matchAll(/'(\w+)': (\d+)/g)].map((m) => [m[1], Number(m[2])]).sort()),
+  Object.fromEntries([...FILE.whole.totals.matchAll(/'(\w+)': (\d+)/g)].map((m) => [m[1], Number(m[2])]).sort()),
+);
 
 // ── 5: an iterable against an iterator ──────────────────────────────────────
 
@@ -194,6 +215,8 @@ export const ITER = {
   trap: { lines: code("iter", "trap"), out: printed("iter", "trap") },
   stop: refused("iter", "next"),
 };
+// Drawn under the iterator's pass as the end it reaches.
+if (ITER.stop.kind !== "StopIteration") throw new Error(`next() on a spent generator raised ${ITER.stop.kind}`);
 same("a list read twice", ITER.list.out, ["4 4"]);
 same("a generator read twice", ITER.gen.out, ["4 0"]);
 same("counted, then loaded", ITER.trap.out, ["4 0"]);
@@ -222,10 +245,14 @@ export const DEDUP = {
   records: records("dedup", "records"),
   first: { lines: code("dedup", "first"), out: printed("dedup", "first") },
   frame: frame("dedup", "frame"),
+  /** The same three rows as plain records, which the dict answer loops over. */
+  rows: records("dedup", "rowsTable"),
   dict: { lines: code("dedup", "latestDict"), out: printed("dedup", "latestDict") },
   latest: { lines: code("dedup", "latest"), ...frame("dedup", "latest") },
 };
 same("the first record per user", DEDUP.first.out, ["[1, 2, 3]"]);
+// The plain records are the page's frame, row for row.
+same("the records and the frame", DEDUP.rows.rows, DEDUP.frame.rows.map((r) => r.slice(1)));
 
 // ── 9: a join in memory ─────────────────────────────────────────────────────
 
@@ -247,8 +274,12 @@ export const BATCH = {
   page: { lines: code("batch", "page"), out: printed("batch", "page") },
   builtin: { lines: code("batch", "builtin"), out: printed("batch", "builtin") },
   calls: int("batch", "calls"),
+  /** The first four batches without `it = iter(iterable)`: islice restarts
+   *  from the front of the list on every pull. */
+  noIter: scalar("batch", "noIter"),
 };
 if (BATCH.calls !== 1000) throw new Error(`the script says a thousand calls; ${BATCH.calls}`);
+same("the batches without iter()", JSON.parse(BATCH.noIter), [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2]]);
 
 // ── 11: retries ─────────────────────────────────────────────────────────────
 
@@ -297,9 +328,16 @@ export const CLEAN = {
   quarantine: { lines: code("clean", "quarantine"), out: printed("clean", "quarantine") },
   numeric: { lines: code("clean", "numeric"), ...series("clean", "numeric"), inputs: listOn(code("clean", "numeric"), "pd.Series([") },
   badCount: int("clean", "badCount"),
+  /** The thousands comma stripped first: what to_numeric makes of it. */
+  normalized: { lines: code("clean", "normalized"), ...series("clean", "normalized") },
+  leftCount: int("clean", "leftCount"),
+  rejected: JSON.parse(scalar("clean", "rejected").replace(/'/g, '"')) as string[],
   dates: { lines: code("clean", "dates"), out: printed("clean", "dates") },
 };
 if (CLEAN.badCount !== 2) throw new Error("the script names two values that would not parse");
+// The script says twelve hundred survives once its comma is stripped.
+if (CLEAN.normalized.rows.find((r) => r[0] === "2")?.[1] !== "1200.0") throw new Error("1,200 did not parse with its comma stripped");
+if (CLEAN.leftCount !== 1) throw new Error(`the screen says one value is left; ${CLEAN.leftCount}`);
 
 // ── Quickly, 15 to 18 ───────────────────────────────────────────────────────
 

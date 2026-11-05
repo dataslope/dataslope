@@ -151,7 +151,11 @@ export const script: NarrationScript = {
     {
       id: "pipe-swap",
       text: "Here's a three-stage pipeline, twice. With square brackets, each stage is a list, and all three are alive at once: a hundred sixty megabytes. With round brackets, each is a generator, and one row passes through all three before the next is read.",
-      pauseAfter: 0.7,
+    },
+    {
+      id: "pipe-peak",
+      text: "The generators peak at about a hundred fifty kilobytes.",
+      pauseAfter: 1.2,
     },
     {
       id: "pipe-trade",
@@ -175,7 +179,11 @@ export const script: NarrationScript = {
     {
       id: "file-loop",
       text: "A file object is already a lazy iterator over its lines, so a plain for loop streams it, in about a hundred fifty kilobytes. Chain generators on it, and nothing is read until the last one asks.",
-      pauseAfter: 0.8,
+    },
+    {
+      id: "file-lazy",
+      text: "The console shows it: the pipeline is built before the file even opens.",
+      pauseAfter: 1.4,
     },
     {
       id: "csv",
@@ -185,16 +193,25 @@ export const script: NarrationScript = {
     {
       id: "csv-chunks",
       text: "Pass chunk size to read CSV, and you get an iterator of data frames: ten chunks of a hundred thousand rows. Sum each chunk by group, and fold it into a counter.",
-      pauseAfter: 0.6,
+    },
+    {
+      id: "csv-counter",
+      text: "A counter's update adds; a plain dict's would keep only the last chunk.",
+      pauseAfter: 0.9,
     },
     {
       id: "csv-same",
       text: "The totals match the whole-file read exactly, and memory peaks at one chunk: seven and a half megabytes, not fifty-four.",
       pauseAfter: 0.7,
     },
+    { id: "csv-mean", text: "Sums add up across chunks." },
     {
-      id: "csv-mean",
-      text: "Sums add up across chunks. A mean doesn't: the mean of the chunks' means is off. Carry the sum and the count, and divide at the end.",
+      id: "csv-off",
+      text: "A mean doesn't. The last chunk has only fifty thousand rows, so the mean of the three means counts its rows double, and it's off.",
+    },
+    {
+      id: "csv-carry",
+      text: "Carry the sum and the count, and divide at the end.",
       pauseAfter: 0.8,
     },
     { id: "iter-in", text: "That one pass deserves a closer look." },
@@ -208,12 +225,20 @@ export const script: NarrationScript = {
     },
     {
       id: "iter-def",
-      text: "[slowly] An iterable, like a list or a dict, hands out a fresh iterator each time you loop over it. An iterator keeps its place, and once it reaches the end, it's used up.",
+      text: "An iterable, like a list or a dict, hands out a fresh iterator each time you loop over it.",
+    },
+    {
+      id: "iter-next",
+      text: "That's its dunder iter method. An iterator has dunder next: it keeps its place, and at the end, it raises stop iteration.",
       pauseAfter: 0.7,
     },
     {
       id: "iter-twice",
       text: "Read the list twice: four rows, then four again. Read the generator twice: four, then zero. A generator is an iterator, and so is an open file.",
+    },
+    {
+      id: "iter-self",
+      text: "Ask a generator for its iterator, and it returns itself; a list returns a new one.",
       pauseAfter: 0.7,
     },
     {
@@ -239,9 +264,13 @@ export const script: NarrationScript = {
       text: "Dicts and sets are hash tables. Hashing the value picks one bucket out of two million, and Python goes straight there: one comparison, at any size.",
     },
     {
+      id: "hash-avg",
+      text: "On average, that is: collisions can add a few probes, and the worst case is order n.",
+    },
+    {
       id: "hash-time",
       text: "Timed in CPython, that's five and a half milliseconds, against twenty-three nanoseconds.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.3,
     },
     {
       id: "hash-loop",
@@ -265,7 +294,7 @@ export const script: NarrationScript = {
     {
       id: "dedup-dict",
       text: "To keep the latest instead, map each key to a record in a dict, and replace it when a later timestamp arrives.",
-      pauseAfter: 0.7,
+      pauseAfter: 1.6,
     },
     {
       id: "latest",
@@ -279,7 +308,7 @@ export const script: NarrationScript = {
     },
     {
       id: "latest-tie",
-      text: "[slowly] If two rows can share a timestamp, add a tiebreaker to the sort, so which one you keep doesn't depend on arrival order.",
+      text: "If two rows can share a timestamp, add a tiebreaker to the sort, or the row you keep is arbitrary.",
       pauseAfter: 0.8,
     },
     { id: "join-in", text: "A dict can do a join, too." },
@@ -326,6 +355,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "batch-iter",
+      text: "Why call iter first? I-slice on a list starts at the front every time, and the loop never ends.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "batch-builtin",
       text: "Since Python three twelve, itertools batched does exactly this.",
       pauseAfter: 0.8,
@@ -348,6 +382,7 @@ export const script: NarrationScript = {
       id: "retry-herd",
       text: "Then add jitter. Model six clients failing in one outage: with plain backoff, they all come back together, at one, three, seven and fifteen seconds.",
     },
+    { id: "retry-herd-name", text: "That's a thundering herd." },
     {
       id: "retry-jitter",
       text: "Wait a random time up to each delay instead, and their retries spread out.",
@@ -356,6 +391,10 @@ export const script: NarrationScript = {
     {
       id: "retry-not",
       text: "Know what not to retry, too. A bad request fails the same way every time, so it's raised at once. Cap the attempts, and retry only what's safe to repeat: a retried payment can charge twice.",
+    },
+    {
+      id: "retry-key",
+      text: "Give each request an idempotency key, and the server charges it once, however often it arrives.",
       pauseAfter: 0.8,
     },
     { id: "idem-in", text: "Safe to repeat has a name." },
@@ -395,9 +434,10 @@ export const script: NarrationScript = {
       text: "Question thirteen. How do you clean messy delimited records defensively?",
       pauseAfter: 0.6,
     },
+    { id: "clean-page", text: "Strip whitespace, check the field count, and convert types." },
     {
-      id: "clean-page",
-      text: "Strip whitespace, check the field count, and convert types without letting one row crash the job. Bob's missing age becomes none; bad row is dropped.",
+      id: "clean-bob",
+      text: "Bob's missing age becomes none; bad row is dropped.",
       pauseAfter: 0.6,
     },
     {
@@ -417,7 +457,11 @@ export const script: NarrationScript = {
     },
     {
       id: "parse-num",
-      text: "In pandas, to numeric with errors equals coerce turns what won't parse into not a number: n slash a, and twelve hundred with a comma. Count them, so they don't vanish into an average.",
+      text: "In pandas, to numeric with errors equals coerce turns what won't parse into not a number: n slash a, and twelve hundred with a comma.",
+    },
+    {
+      id: "parse-fix",
+      text: "Strip the thousands comma first, and twelve hundred survives. Then count what's left and send it to a reject list, so it doesn't vanish into an average.",
       pauseAfter: 0.6,
     },
     {

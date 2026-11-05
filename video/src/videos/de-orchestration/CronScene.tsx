@@ -21,10 +21,11 @@ const NODE_W = 240;
 /**
  * Question 1. Cron starts a command at a set time and nothing more: on the
  * night extract runs long, transform starts on schedule over half the data.
- * An orchestrator runs the page's DAG (extract, transform, a quality gate,
- * load, publish, with alert and halt on a failed gate), each task waiting for
- * the ones before it, plus retries, backfills, monitoring, lineage and the
- * history of every run.
+ * An orchestrator runs a DAG (extract, transform, load, a quality gate,
+ * publish, with alert and halt on a failed gate), each task waiting for the
+ * ones before it, plus retries, backfills, monitoring, lineage and the history
+ * of every run. The gate sits between load and publish, where Question 7 puts
+ * it; the page's own diagram has it before load.
  */
 export const CronScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -71,11 +72,12 @@ export const CronScene: React.FC = () => {
   const NODES = [
     { key: "extract", label: "extract", cy: y(300) },
     { key: "transform", label: "transform", cy: y(384) },
-    { key: "gate", label: "quality gate", cy: y(468) },
-    { key: "load", label: "load", cy: y(552) },
+    { key: "load", label: "load", cy: y(468) },
+    { key: "gate", label: "quality gate", cy: y(552) },
     { key: "publish", label: "publish", cy: y(636) },
   ];
   const nodeH = h(54);
+  const GATE = NODES.findIndex((nd) => nd.key === "gate");
   const run = (i: number) => succeedAt - 4 + i * 7;
 
   return (
@@ -214,7 +216,7 @@ export const CronScene: React.FC = () => {
             at={depsAt + i * 3}
             dur={8}
             head={11}
-            color={i === 2 ? OK : INK}
+            color={i === GATE ? OK : INK}
           />
         ))}
         {NODES.map((nd, i) =>
@@ -224,32 +226,32 @@ export const CronScene: React.FC = () => {
             </div>
           ) : null,
         )}
-        {/* A failed gate goes to alert and halt, not to load. */}
+        {/* A failed gate goes to alert and halt, not to publish. */}
         <Edge
           points={[
-            [DAG_X + NODE_W / 2 + 50, NODES[2].cy],
-            [1338, NODES[2].cy],
+            [DAG_X + NODE_W / 2 + 50, NODES[GATE].cy],
+            [1338, NODES[GATE].cy],
           ]}
           at={depsAt + 10}
           dur={10}
           head={11}
           color={ACCENT}
           dash="7 5"
-          dim={run(2)}
+          dim={run(GATE)}
         />
-        <TaskBox cx={1450} cy={NODES[2].cy} w={210} h={nodeH} at={depsAt + 14} tones={[{ at: depsAt + 14, tone: "bad" }]} dim={run(2)} size={23}>
+        <TaskBox cx={1450} cy={NODES[GATE].cy} w={210} h={nodeH} at={depsAt + 14} tones={[{ at: depsAt + 14, tone: "bad" }]} dim={run(GATE)} size={23}>
           alert + halt
         </TaskBox>
-        <Note at={depsAt + 12} dim={run(2)} x={DAG_X + NODE_W / 2 + 56} y={NODES[2].cy - h(40)}>
+        <Note at={depsAt + 12} dim={run(GATE)} x={DAG_X + NODE_W / 2 + 56} y={NODES[GATE].cy - h(40)}>
           <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>fail</span>
         </Note>
-        <Note at={depsAt + 8} x={DAG_X + 14} y={(NODES[2].cy + NODES[3].cy) / 2 - 14}>
+        <Note at={depsAt + 8} x={DAG_X + 14} y={(NODES[GATE].cy + NODES[GATE + 1].cy) / 2 - 14}>
           <span style={{ ...label(20, OK_INK), whiteSpace: "nowrap" }}>pass</span>
         </Note>
 
         {/* What comes with it. */}
         {extras.map((e, i) => (
-          <Pill key={e.text} x={1400} y={y(560) + i * h(56)} at={e.at} ink={BLUE_INK} size={23}>
+          <Pill key={e.text} x={1450} y={y(612) + i * h(56)} at={e.at} ink={BLUE_INK} size={23}>
             {e.text}
           </Pill>
         ))}

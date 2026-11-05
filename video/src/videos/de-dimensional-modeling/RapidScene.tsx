@@ -9,7 +9,7 @@ import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } fr
 import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { AOV_ALL, AOV_WORKING, BY_QUARTER, HERO, HOLIDAYS, linesOf, money } from "./data";
+import { AOV_ALL, AOV_WORKING, BY_QUARTER, FISCAL_DIFFERS, HERO, HOLIDAYS, linesOf, money } from "./data";
 import {
   colsOf,
   DataTable,
@@ -138,8 +138,9 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
       <Entity layout={customers} at={narrowAt} />
       <Entity layout={cityT} at={joinsAt} />
       <Entity layout={planT} at={joinsAt + 6} />
-      <Relation name="narrow-city" points={[customers.anchor("right", "customer_id"), cityT.anchor("left", "customer_id")]} from="exactly-one" to="zero-or-many" at={joinsAt + 2} />
-      <Relation name="narrow-plan" points={toPlan} from="exactly-one" to="zero-or-many" at={joinsAt + 8} />
+      {/* One attribute moved into its own table: at most one row per customer, not many. */}
+      <Relation name="narrow-city" points={[customers.anchor("right", "customer_id"), cityT.anchor("left", "customer_id")]} from="exactly-one" to="zero-or-one" at={joinsAt + 2} />
+      <Relation name="narrow-plan" points={toPlan} from="exactly-one" to="zero-or-one" at={joinsAt + 8} />
       <Note at={colAt} x={R_X} y={c.y(896)}>
         <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Columnar warehouses handle wide tables well.</span>
       </Note>
@@ -177,7 +178,8 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
   const rowTop = (i: number) => top + CELL_H + i * CELL_H;
   const colLeft = (j: number) => left + LABEL_W + j * CELL_W;
   const mart = ease(frame, martAt + 4, 14);
-  const shared = ["Date", "Product"] as const;
+  // Every dimension both Sales and Inventory tick: what lets the two marts combine.
+  const shared = DIMENSIONS.filter((d) => USES.Sales.includes(d) && USES.Inventory.includes(d));
   return (
     <>
       <Note at={planAt} x={R_X} y={c.y(352)}>
@@ -207,7 +209,7 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
           {d}
         </div>
       ))}
-      {/* The shared columns, highlighted across two processes, under the ticks. */}
+      {/* The shared columns, highlighted across the two processes, under the ticks. */}
       {shared.map((d) => {
         const j = DIMENSIONS.indexOf(d);
         const p = ease(frame, sharedAt + 2 + j * 4, 12);
@@ -289,12 +291,14 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
 
 const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
+  if (FISCAL_DIFFERS !== 0) throw new Error("the page's fiscal quarters no longer match its calendar quarters: reword the note");
   const whyAt = c.w("r-date", "Why a date dimension");
   const rulesAt = c.w("r-date", "Fiscal quarters and holidays are business rules");
   const onceAt = c.w("r-date", "Store them once, in a table");
   const filtersAt = c.w("r-date", "just filters and groups");
   const pageAt = c.w("r-date", "On the page's orders");
   const oneJoinAt = c.w("r-date", "one join and no date math");
+  const holidaysAt = c.w("r-date", "without holidays");
   const lines = linesOf(BY_QUARTER);
   const SIZE = 22;
   const top = c.y(372);
@@ -333,6 +337,16 @@ const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
           no date math
         </span>
       </Note>
+      {/* The page's fiscal quarters are its calendar's (check.mjs), so it is the
+          holidays that only the table can supply. */}
+      <Note at={holidaysAt} x={g.right + 40} y={g.top + c.h(124)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+          No date function knows
+          <br />
+          the {HOLIDAYS} holidays.
+        </span>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>(Here, the fiscal quarters match the calendar.)</div>
+      </Note>
     </>
   );
 };
@@ -346,10 +360,10 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
   const metricAt = c.w("r-metric", "A metric is a business definition");
   const aovAt = c.w("r-metric", "like average order value");
   const overAt = c.w("r-metric", "revenue over orders");
-  const onceAt = c.w("r-metric", "Define each metric once");
-  const withAt = c.w("r-metric", "a hundred eighty-six dollars with holidays");
-  const withoutAt = c.w("r-metric", "a hundred sixty-three without");
-  const teamsAt = c.w("r-metric", "two teams could each report one");
+  const onceAt = c.w("r-metric-once", "Define each metric once");
+  const withAt = c.w("r-metric-teams", "a hundred eighty-six dollars with holidays");
+  const withoutAt = c.w("r-metric-teams", "a hundred sixty-three without");
+  const teamsAt = c.w("r-metric-teams", "two teams could each report one");
   const col = (t: typeof AOV_ALL, k: string) => t.rows[0][t.cols.indexOf(k)];
   const teams = [
     { who: "all orders", t: AOV_ALL, at: withAt },
@@ -394,7 +408,7 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>one name, two numbers</span>
       </Note>
       <Note at={onceAt} x={R_X} y={c.y(850)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER }}>Define each metric once, in one shared place.</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER }}>Define each metric once, in the semantic layer.</span>
       </Note>
     </>
   );
@@ -415,11 +429,12 @@ export const RapidScene: React.FC = () => {
   const sharedAt = n.word("rapid-in", "one model shared by many teams");
   const nextFrom = n.beat("next").from;
   const end = nextFrom - 4;
-  const fixedAt = n.word("next", "treated a dimension as fixed");
-  const moveAt = n.word("next", "customers move");
-  const renamedAt = n.word("next", "products get renamed");
-  const historyAt = n.word("next", "keep history");
-  const nextAt = n.word("next", "Next:");
+  const apartAt = n.word("next", "Apart from question eight");
+  const everyAt = n.word("next", "every answer here");
+  const moveAt = n.word("next-history", "customers move");
+  const renamedAt = n.word("next-history", "products get renamed");
+  const historyAt = n.word("next-history", "keep history");
+  const nextAt = n.word("next-history", "Next:");
 
   const items: RapidItem[] = [
     { n: 11, label: "A conformed dimension", at: n.word("r-conformed", "A conformed dimension"), body: <Conformed c={c} /> },
@@ -436,17 +451,21 @@ export const RapidScene: React.FC = () => {
       {items.map((it) => (
         <Sfx key={it.n} name="el-tap" at={it.at} level={-31} />
       ))}
-      <Sfx name="el-whoosh" at={fixedAt} level={-35} />
+      <Sfx name="el-whoosh" at={apartAt} level={-35} />
       <Sfx name="el-pop" at={nextAt} level={-29} />
 
-      <Drift from={from} to={n.beat("next").to + 40}>
+      <Drift from={from} to={n.beat("next-history").to + 40}>
         <Kicker at={fiveAt}>Quick round</Kicker>
         <Headline lead="Five quick ones." turn="One model, many teams." at={fiveAt} turnAt={sharedAt - 2} size={64} />
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={620} at={fiveAt + 6} end={end} />
 
         {/* ── The bridge ── */}
-        <Note at={fixedAt} x={X0} y={listBottom + h(36)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Every answer treated a dimension as fixed.</span>
+        {/* Question 8 already kept two rows for customer 42; every other answer did not. */}
+        <Note at={apartAt} x={X0} y={listBottom + h(36)}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            Apart from Question 8,
+            <span style={{ opacity: ease(frame, everyAt - 2, 10) }}> every answer treated a dimension as fixed.</span>
+          </span>
         </Note>
         <Note at={moveAt} x={X0} y={listBottom + h(82)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
@@ -460,7 +479,7 @@ export const RapidScene: React.FC = () => {
         <NextLine at={nextAt} x={X0} y={listBottom + h(184)} width={900}>
           modeling history
         </NextLine>
-        <Spot id={HERO.id} at={fixedAt + 4} left={1180} top={y(330)} width={560} height={Math.round((560 * HERO.h) / HERO.w)} />
+        <Spot id={HERO.id} at={apartAt + 4} left={1180} top={y(330)} width={560} height={Math.round((560 * HERO.h) / HERO.w)} />
       </Drift>
     </AbsoluteFill>
   );

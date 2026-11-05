@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { INK, INK_SOFT, label, note } from "../../editorial/style";
+import { HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -21,7 +21,10 @@ const ROWS = { headH: 38, rowH: 42, bodySize: 21, headSize: 19 } as const;
  * history table of its own holds every version (24 rows). Type 6: Type 2's
  * rows plus current_city on every row, so the point-in-time join gives
  * order 101 Boston as it was and Austin as it is now, from one row; then the
- * price, the current column rewritten on every old row at each move.
+ * price, the current column rewritten on every old row at each move. Type 4
+ * also names its other reading, Kimball's mini-dimension (question 13), and
+ * Type 6's sum is mapped onto its table: "Type 2" over the version dates,
+ * "Type 3" over current_city, "Type 1" on the overwrite that keeps it current.
  */
 export const Types46Scene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -37,12 +40,16 @@ export const Types46Scene: React.FC = () => {
   const historyAt = n.word("type46", "the history moves to a table of its own");
   const twentyFourAt = n.word("type46", "twenty-four rows");
   const useAt = n.word("type46", "Use it when history is large");
+  const kimballAt = n.word("type4-kimball", "Kimball's own Type four");
+  const miniAt = n.word("type4-kimball", "a mini-dimension instead");
   const sixAt = n.word("type6", "Type six is one, plus two, plus three");
   const versionsAt = n.word("type6", "It versions rows like Type two");
   const carriesAt = n.word("type6", "every row also carries the current value");
   const o101At = n.word("type6", "order one oh one reports Boston");
   const nowAt = n.word("type6", "Austin as it is now");
   const joinAt = n.word("type6", "without a second join");
+  const part3At = n.word("type6-parts", "the Type three part");
+  const part1At = n.word("type6-parts", "the Type one part");
   const priceAt = n.word("type6-cost", "The price");
   const rewritesAt = n.word("type6-cost", "every move rewrites that current column");
   const oldAt = n.word("type6-cost", "all of the customer's old rows");
@@ -64,12 +71,26 @@ export const Types46Scene: React.FC = () => {
   const oCur = O.cols.indexOf("current_city");
   const dim4 = ease(frame, sixAt, 14) * 0.45;
 
-  const bandLabel = (at: number, title: string, sub: string, top: number) => (
+  const bandLabel = (at: number, title: string, sub: string, top: number, more?: React.ReactNode) => (
     <Note at={at} x={X0} y={top + h(44)}>
       <div style={{ ...note(32, INK), fontWeight: 750, whiteSpace: "nowrap" }}>{title}</div>
       <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{sub}</div>
+      {more}
     </Note>
   );
+  /** A part of Type 6's sum, named over the columns it is: a small gray tag
+   *  on a rule under it that spans the columns, clear of the header text. */
+  const part = (at: number, text: string, from: number, to: number) => {
+    const left = gr.xs[from] + 10;
+    const right = gr.xs[to] + gr.widths[to] - 10;
+    const p = ease(frame, at, 12);
+    return (
+      <div style={{ position: "absolute", left, top: gr.top - h(40), width: right - left, opacity: p, textAlign: "center" }}>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{text}</span>
+        <div style={{ height: 0, borderTop: `2px solid ${HAIRLINE}`, marginTop: 2, transform: `scaleX(${p})` }} />
+      </div>
+    );
+  };
 
   return (
     <AbsoluteFill>
@@ -88,7 +109,16 @@ export const Types46Scene: React.FC = () => {
 
         {/* ── Type 4: current values here, history in a table of its own ── */}
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dim4 }}>
-          {bandLabel(splitsAt - 2, "Type 4", "split the table", y(BAND4))}
+          {bandLabel(
+            splitsAt - 2,
+            "Type 4",
+            "split the table",
+            y(BAND4),
+            <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 14 }}>
+              <div style={{ opacity: ease(frame, kimballAt, 10) }}>Kimball&rsquo;s Type 4:</div>
+              <div style={{ color: INK, fontWeight: 600, marginTop: 4, opacity: ease(frame, miniAt, 10) }}>a mini-dimension (13)</div>
+            </div>,
+          )}
           <TableName g={gm} at={mainAt}>
             customer
           </TableName>
@@ -118,6 +148,8 @@ export const Types46Scene: React.FC = () => {
 
         {/* ── Type 6: Type 2's rows, and the current value on each ── */}
         {bandLabel(sixAt - 2, "Type 6", "1 + 2 + 3", y(BAND6))}
+        {part(versionsAt + 4, "Type 2", R.cols.indexOf("valid_from"), R.cols.indexOf("valid_to"))}
+        {part(part3At, "Type 3", rCur, rCur)}
         <TableName g={gr} at={versionsAt - 2}>
           dim_customer, with current_city
         </TableName>
@@ -163,6 +195,9 @@ export const Types46Scene: React.FC = () => {
         </Note>
         <Note at={joinAt} x={go.right + 30} y={go.rowTop(0) + h(40)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>no second join</span>
+        </Note>
+        <Note at={part1At} x={gr.right + 30} y={gr.rowTop(0) - h(34)}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>Type 1: overwriting it</span>
         </Note>
         <Note at={priceAt} x={gr.right + 30} y={gr.rowTop(0) + h(2)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>

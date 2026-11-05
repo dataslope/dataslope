@@ -145,8 +145,10 @@ export const FormatsScene: React.FC = () => {
   const avroAt = n.word("fmt-avro", "Avro, a row-based binary format");
   const recordsAt = n.word("fmt-avro", "writes whole records");
   const schemaAt = n.word("fmt-avro", "its files carry the schema");
-  const streamAt = n.word("fmt-avro", "It suits streaming");
-  const compatAt = n.word("fmt-avro", "its compatibility rules");
+  const streamAt = n.word("fmt-kafka", "It suits streaming");
+  const compatAt = n.word("fmt-kafka", "its compatibility rules");
+  const idAt = n.word("fmt-registry", "a schema ID");
+  const fieldAt = n.word("fmt-registry", "a field added with a default");
   const csvAt = n.word("fmt-csv", "And over CSV");
   const typesAt = n.word("fmt-csv", "types and a schema");
   const quarterAt = n.word("fmt-csv", "under a quarter of the size");
@@ -172,7 +174,8 @@ export const FormatsScene: React.FC = () => {
       lines: [
         { at: bothAt + 4, text: "columnar, compressed" },
         { at: statsAt + 4, text: "min and max per column, to skip data" },
-        { at: defaultAt, text: "the default: Spark, pandas, DuckDB, BigQuery, Snowflake" },
+        // Read by all of these; BigQuery and Snowflake store their own tables in their own formats.
+        { at: defaultAt, text: "read by nearly every engine: Spark, pandas, DuckDB, BigQuery, Snowflake" },
       ],
     },
     {
@@ -193,10 +196,19 @@ export const FormatsScene: React.FC = () => {
       at: avroAt,
       kindAt: avroAt + 6,
       diagram: <Rows x={cardX(2)} y={y(DIAGRAM_Y)} h={h(DIAGRAM_H)} at={recordsAt} schemaAt={schemaAt} />,
+      // A file carries its schema; a single message on Kafka carries only an ID.
       lines: [
-        { at: schemaAt + 4, text: "the writer's schema in the file header" },
+        { at: schemaAt + 4, text: "files: the writer's schema in the header" },
         { at: streamAt, text: "a record at a time: streaming, Kafka" },
-        { at: compatAt, text: "schemas evolve by compatibility rules" },
+        {
+          at: compatAt,
+          text: (
+            <>
+              evolves by rules<span style={{ opacity: ease(frame, fieldAt, 10) }}>: a new field takes a default</span>
+            </>
+          ),
+        },
+        { at: idAt, text: "per message: a schema ID, from a registry" },
       ],
     },
   ];

@@ -537,6 +537,73 @@
       },
       "version": "v1.4.3"
     },
+    "type0mix": {
+      "setup": "CREATE TABLE dim_customer (\n  customer_key INTEGER,\n  customer_id  INTEGER,\n  city         VARCHAR,\n  signup_date  DATE,\n  is_current   BOOLEAN\n);\nINSERT INTO dim_customer VALUES (1001, 42, 'Boston', DATE '2022-01-01', true);\nCREATE TABLE staged_customer (customer_id INTEGER, city VARCHAR, signup_date DATE);\nINSERT INTO staged_customer VALUES (42, 'Austin', DATE '2023-06-30');",
+      "steps": {
+        "staged": {
+          "sql": "SELECT customer_id, city, signup_date FROM staged_customer;",
+          "ok": true,
+          "columns": [
+            "customer_id",
+            "city",
+            "signup_date"
+          ],
+          "rows": [
+            [
+              42,
+              "Austin",
+              "2023-06-30"
+            ]
+          ]
+        },
+        "insert": {
+          "sql": "INSERT INTO dim_customer\nSELECT 1087, s.customer_id, s.city, d.signup_date, true\nFROM staged_customer s\nJOIN dim_customer d\n  ON d.customer_id = s.customer_id AND d.is_current;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "close": {
+          "sql": "UPDATE dim_customer SET is_current = false\nWHERE customer_key = 1001;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              1
+            ]
+          ]
+        },
+        "rows": {
+          "sql": "SELECT customer_key, city, signup_date\nFROM dim_customer\nORDER BY customer_key;",
+          "ok": true,
+          "columns": [
+            "customer_key",
+            "city",
+            "signup_date"
+          ],
+          "rows": [
+            [
+              1001,
+              "Boston",
+              "2022-01-01"
+            ],
+            [
+              1087,
+              "Austin",
+              "2022-01-01"
+            ]
+          ]
+        }
+      },
+      "version": "v1.4.3"
+    },
     "types46": {
       "setup": "CREATE TABLE dim_customer (\n  customer_key INTEGER,\n  customer_id  INTEGER,\n  city         VARCHAR,\n  valid_from   DATE,\n  valid_to     DATE,\n  is_current   BOOLEAN\n);\nINSERT INTO dim_customer VALUES\n  (1001, 42, 'Boston', DATE '2022-01-01', DATE '2024-03-14', false),\n  (1087, 42, 'Austin', DATE '2024-03-15', DATE '9999-12-31', true),\n  (2001, 99, 'Denver', DATE '2023-06-01', DATE '9999-12-31', true),\n  (3001, 17, 'Seattle', DATE '2021-04-01', DATE '2023-08-31', false),\n  (3062, 17, 'Portland', DATE '2023-09-01', DATE '9999-12-31', true),\n  (4001, 23, 'Chicago', DATE '2020-06-15', DATE '2022-12-31', false),\n  (4055, 23, 'Detroit', DATE '2023-01-01', DATE '9999-12-31', true),\n  (5001, 31, 'Miami', DATE '2022-02-01', DATE '9999-12-31', true),\n  (6001, 55, 'Phoenix', DATE '2019-03-01', DATE '2021-11-30', false),\n  (6044, 55, 'Tucson', DATE '2021-12-01', DATE '2023-09-30', false),\n  (6099, 55, 'Reno', DATE '2023-10-01', DATE '9999-12-31', true),\n  (7001, 68, 'Boise', DATE '2021-01-01', DATE '9999-12-31', true),\n  (8001, 74, 'Dallas', DATE '2020-09-01', DATE '2022-04-30', false),\n  (8033, 74, 'Houston', DATE '2022-05-01', DATE '9999-12-31', true),\n  (9001, 86, 'Atlanta', DATE '2022-07-01', DATE '9999-12-31', true),\n  (9501, 91, 'Nashville', DATE '2021-10-01', DATE '2023-03-31', false),\n  (9577, 91, 'Memphis', DATE '2023-04-01', DATE '9999-12-31', true),\n  (9801, 12, 'Denver', DATE '2020-01-01', DATE '9999-12-31', true),\n  (9901, 28, 'Omaha', DATE '2021-05-01', DATE '2022-12-31', false),\n  (9955, 28, 'Wichita', DATE '2023-01-01', DATE '9999-12-31', true),\n  (9971, 39, 'Austin', DATE '2020-08-01', DATE '9999-12-31', true),\n  (9982, 47, 'Tampa', DATE '2019-11-01', DATE '2021-06-30', false),\n  (9988, 47, 'Orlando', DATE '2021-07-01', DATE '9999-12-31', true),\n  (9994, 63, 'Raleigh', DATE '2022-03-01', DATE '9999-12-31', true);\n\nCREATE TABLE fact_orders (\n  order_id    INTEGER,\n  customer_id INTEGER,\n  order_date  DATE,\n  amount      DECIMAL(10,2)\n);\nINSERT INTO fact_orders VALUES\n  (101, 42, DATE '2023-05-10', 350.00), (102, 42, DATE '2024-06-01', 200.00),\n  (103, 99, DATE '2024-01-15', 500.00), (104, 17, DATE '2022-07-14', 640.00),\n  (105, 17, DATE '2024-03-08', 415.00), (106, 23, DATE '2021-04-19', 980.00),\n  (107, 23, DATE '2023-08-22', 275.00), (108, 31, DATE '2023-10-05', 1530.00),\n  (109, 55, DATE '2020-06-11', 720.00), (110, 55, DATE '2022-09-27', 460.00),\n  (111, 55, DATE '2024-01-16', 1105.00), (112, 68, DATE '2023-05-30', 385.00),\n  (113, 74, DATE '2021-03-24', 890.00), (114, 74, DATE '2023-12-09', 540.00),\n  (115, 86, DATE '2023-11-18', 1250.00), (116, 91, DATE '2022-12-02', 305.00),\n  (117, 91, DATE '2024-03-15', 770.00), (118, 12, DATE '2022-06-07', 1420.00),\n  (119, 28, DATE '2022-03-21', 195.00), (120, 28, DATE '2023-09-13', 660.00),\n  (121, 39, DATE '2023-02-26', 1080.00), (122, 47, DATE '2020-09-04', 425.00),\n  (123, 47, DATE '2023-06-17', 935.00), (124, 63, DATE '2023-10-28', 580.00);",
       "steps": {
@@ -691,7 +758,7 @@
       "version": "v1.4.3"
     },
     "late": {
-      "setup": "CREATE TABLE dim_customer (\n  customer_key INTEGER,\n  customer_id  INTEGER,\n  city         VARCHAR,\n  inferred     BOOLEAN\n);\nINSERT INTO dim_customer VALUES\n  (1087, 42, 'Austin', false),\n  (2001, 99, 'Denver', false);\nCREATE TABLE staged_orders (order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2));\nINSERT INTO staged_orders VALUES\n  (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);",
+      "setup": "CREATE TABLE dim_customer (\n  customer_key INTEGER,\n  customer_id  INTEGER,\n  city         VARCHAR,\n  inferred     BOOLEAN\n);\nINSERT INTO dim_customer VALUES\n  (1087, 42, 'Austin', false),\n  (2001, 99, 'Denver', false);\nCREATE TABLE staged_orders (order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2));\nINSERT INTO staged_orders VALUES\n  (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);\nCREATE SEQUENCE key_seq START 2002;",
       "steps": {
         "staged": {
           "sql": "SELECT order_id, customer_id, amount FROM staged_orders ORDER BY order_id;",
@@ -779,7 +846,7 @@
           ]
         },
         "placeholder": {
-          "sql": "INSERT INTO dim_customer VALUES\n  (2002, 77, 'Unknown', true);",
+          "sql": "INSERT INTO dim_customer\nSELECT nextval('key_seq'), customer_id,\n       'Unknown', true\nFROM (SELECT DISTINCT customer_id\n      FROM staged_orders) o\nWHERE NOT EXISTS (\n  SELECT 1 FROM dim_customer d\n  WHERE d.customer_id = o.customer_id);",
           "ok": true,
           "columns": [
             "Count"
@@ -1030,7 +1097,7 @@
           ]
         },
         "paidThenCancelled": {
-          "sql": "SELECT order_id\nFROM order_events\nGROUP BY order_id\nHAVING bool_or(status = 'paid')\n   AND bool_or(status = 'cancelled');",
+          "sql": "SELECT order_id\nFROM order_events p JOIN order_events c USING (order_id)\nWHERE p.status = 'paid' AND c.status = 'cancelled'\n  AND p.changed_at < c.changed_at;",
           "ok": true,
           "columns": [
             "order_id"
@@ -1052,6 +1119,49 @@
             [
               6,
               2
+            ]
+          ]
+        },
+        "daily": {
+          "sql": "CREATE TABLE order_daily_snapshot AS\nSELECT e.order_id, d.snapshot_date,\n       arg_max(e.status, e.changed_at) AS status\nFROM (VALUES (DATE '2024-06-01'), (DATE '2024-06-02')) d(snapshot_date)\nJOIN order_events e ON e.changed_at < d.snapshot_date + INTERVAL 1 DAY\nGROUP BY e.order_id, d.snapshot_date;",
+          "ok": true,
+          "columns": [
+            "Count"
+          ],
+          "rows": [
+            [
+              4
+            ]
+          ]
+        },
+        "dailyRows": {
+          "sql": "SELECT order_id, snapshot_date, status\nFROM order_daily_snapshot\nORDER BY order_id, snapshot_date;",
+          "ok": true,
+          "columns": [
+            "order_id",
+            "snapshot_date",
+            "status"
+          ],
+          "rows": [
+            [
+              501,
+              "2024-06-01",
+              "paid"
+            ],
+            [
+              501,
+              "2024-06-02",
+              "shipped"
+            ],
+            [
+              502,
+              "2024-06-01",
+              "cancelled"
+            ],
+            [
+              502,
+              "2024-06-02",
+              "cancelled"
             ]
           ]
         }
@@ -1247,13 +1357,13 @@
       "version": "v1.4.3"
     },
     "rapid": {
-      "setup": "CREATE TABLE fact_order_lines (order_number VARCHAR, product VARCHAR, amount DECIMAL(10,2));\nINSERT INTO fact_order_lines VALUES\n  ('INV-1001', 'kettle', 40.00), ('INV-1001', 'mugs', 18.00),\n  ('INV-1002', 'teapot', 35.00);\nCREATE TABLE dim_date (date_key INTEGER, full_date DATE, day_name VARCHAR);\nINSERT INTO dim_date VALUES\n  (20240607, DATE '2024-06-07', 'Friday'),\n  (20240610, DATE '2024-06-10', 'Monday');\nCREATE TABLE fact_shipments (order_id INTEGER, order_date_key INTEGER, ship_date_key INTEGER);\nINSERT INTO fact_shipments VALUES (301, 20240607, 20240610);\nCREATE TABLE attendance (student VARCHAR, class VARCHAR, class_date DATE);\nINSERT INTO attendance VALUES\n  ('Ada', 'Databases', DATE '2024-09-02'),\n  ('Ben', 'Databases', DATE '2024-09-02'),\n  ('Ada', 'Statistics', DATE '2024-09-03');",
+      "setup": "CREATE TABLE fact_order_lines (invoice_number VARCHAR, product VARCHAR, amount DECIMAL(10,2));\nINSERT INTO fact_order_lines VALUES\n  ('INV-1001', 'kettle', 40.00), ('INV-1001', 'mugs', 18.00),\n  ('INV-1002', 'teapot', 35.00);\nCREATE TABLE dim_date (date_key INTEGER, full_date DATE, day_name VARCHAR);\nINSERT INTO dim_date VALUES\n  (20240607, DATE '2024-06-07', 'Friday'),\n  (20240610, DATE '2024-06-10', 'Monday');\nCREATE TABLE fact_shipments (order_id INTEGER, order_date_key INTEGER, ship_date_key INTEGER);\nINSERT INTO fact_shipments VALUES (301, 20240607, 20240610);\nCREATE TABLE attendance (student VARCHAR, class VARCHAR, class_date DATE);\nINSERT INTO attendance VALUES\n  ('Ada', 'Databases', DATE '2024-09-02'),\n  ('Ben', 'Databases', DATE '2024-09-02'),\n  ('Ada', 'Statistics', DATE '2024-09-03');\nCREATE TABLE enrollment (student VARCHAR, class VARCHAR, class_date DATE);\nINSERT INTO enrollment VALUES\n  ('Ada', 'Databases', DATE '2024-09-02'),\n  ('Ben', 'Databases', DATE '2024-09-02'),\n  ('Ada', 'Statistics', DATE '2024-09-03'),\n  ('Ben', 'Statistics', DATE '2024-09-03');",
       "steps": {
         "lines": {
-          "sql": "SELECT order_number, product, amount FROM fact_order_lines;",
+          "sql": "SELECT invoice_number, product, amount FROM fact_order_lines;",
           "ok": true,
           "columns": [
-            "order_number",
+            "invoice_number",
             "product",
             "amount"
           ],
@@ -1276,10 +1386,10 @@
           ]
         },
         "degenerate": {
-          "sql": "SELECT order_number, COUNT(*) AS lines, SUM(amount) AS total\nFROM fact_order_lines\nGROUP BY order_number\nORDER BY order_number;",
+          "sql": "SELECT invoice_number, COUNT(*) AS lines, SUM(amount) AS total\nFROM fact_order_lines\nGROUP BY invoice_number\nORDER BY invoice_number;",
           "ok": true,
           "columns": [
-            "order_number",
+            "invoice_number",
             "lines",
             "total"
           ],
@@ -1416,6 +1526,22 @@
               1
             ]
           ]
+        },
+        "absent": {
+          "sql": "SELECT student, class, class_date FROM enrollment\nEXCEPT\nSELECT student, class, class_date FROM attendance;",
+          "ok": true,
+          "columns": [
+            "student",
+            "class",
+            "class_date"
+          ],
+          "rows": [
+            [
+              "Ben",
+              "Statistics",
+              "2024-09-03"
+            ]
+          ]
         }
       },
       "version": "v1.4.3"
@@ -1456,14 +1582,16 @@
           ]
         },
         "sample": {
-          "sql": "SELECT id FROM uuid_keys ORDER BY id LIMIT 1;",
+          "sql": "SELECT 'bb88346f-8c24-47db-9b66-2abf63ac6cc9'::uuid AS id,\n  uuid_extract_version('bb88346f-8c24-47db-9b66-2abf63ac6cc9'::uuid) AS version;",
           "ok": true,
           "columns": [
-            "id"
+            "id",
+            "version"
           ],
           "rows": [
             [
-              "00003e3b-9e53-3668-5200-ae85d21b4f5e"
+              "bb88346f-8c24-47db-9b66-2abf63ac6cc9",
+              "4"
             ]
           ]
         },
@@ -1476,6 +1604,18 @@
           "rows": [
             [
               "100000"
+            ]
+          ]
+        },
+        "rebuilt": {
+          "sql": "CREATE TABLE uuid_rebuilt (id uuid);\nINSERT INTO uuid_rebuilt SELECT id FROM uuid_keys;\nALTER TABLE uuid_rebuilt ADD PRIMARY KEY (id);\nSELECT pg_relation_size('uuid_rebuilt_pkey') AS random_uuid_rebuilt;",
+          "ok": true,
+          "columns": [
+            "random_uuid_rebuilt"
+          ],
+          "rows": [
+            [
+              "3178496"
             ]
           ]
         }

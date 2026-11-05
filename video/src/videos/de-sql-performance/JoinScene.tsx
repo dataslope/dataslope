@@ -47,8 +47,9 @@ const Box: React.FC<{ x: number; y: number; w: number; h: number; text: string; 
  * from the 50,000 customers. Then, drawn under it, the three strategies the
  * answer names: a hash join (build a table from the small side, stream the
  * big one through it), a sort-merge join (two sorted runs walked together),
- * and across machines, a broadcast of the small table or both tables
- * bucketed on the key.
+ * and across machines, a broadcast of the small table (a copy beside each
+ * machine's own slice of orders, which stays put) or both tables bucketed on
+ * the key.
  */
 export const JoinScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -69,8 +70,8 @@ export const JoinScene: React.FC = () => {
   const defaultAt = n.word("join-hash", "the usual default");
   const mergeAt = n.word("join-merge", "A sort-merge join");
   const walksAt = n.word("join-merge", "walks them together");
-  const sortedAt = n.word("join-merge", "already sorted");
-  const memoryAt = n.word("join-merge", "too big to hash in memory");
+  const sortedAt = n.word("join-merge-wins", "already sorted");
+  const memoryAt = n.word("join-merge-wins", "too big to hash in memory");
   const machinesAt = n.word("join-dist", "Across many machines");
   const movingAt = n.word("join-dist", "moving rows");
   const broadcastAt = n.word("join-dist", "Broadcast a small table");
@@ -108,7 +109,7 @@ export const JoinScene: React.FC = () => {
 
         {/* ── Shrink first: the December filter, and the plan ── */}
         <Note at={smallerAt} x={R_X} y={y(TOP) - h(46)}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Shrink both sides before the join</span>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>Shrink the big side before the join</span>
         </Note>
         <Listing lines={JOIN.december} x={R_X} top={y(TOP)} width={600} size={20} at={smallerAt + 2} marks={[{ line: "WHERE", at: decAt + 4 }]} />
         <PlanBox
@@ -239,19 +240,21 @@ export const JoinScene: React.FC = () => {
                   <text x={mx + 12} y={diagY + 38} style={svgText(label(19, INK_SOFT))}>
                     machine {m + 1}
                   </text>
-                  {/* Broadcast: a copy of the small table on every machine. */}
-                  <g opacity={ease(frame, broadcastAt + m * 4, 10) * (1 - ease(frame, bucketAt, 10))}>
-                    <rect x={mx + 12} y={diagY + 52} width={132} height={32} rx={4} fill={`color-mix(in srgb, ${BAR} 18%, ${PAPER})`} stroke={BAR} />
-                    <text x={mx + 78} y={diagY + 74} textAnchor="middle" style={svgText(note(19, BLUE_INK))}>
+                  {/* Each machine's own slice of orders, which stays where it is
+                      under both strategies. */}
+                  <text x={mx + 12} y={diagY + 70} style={svgText(note(19, INK))} opacity={ease(frame, broadcastAt, 10)}>
+                    orders {m + 1}
+                  </text>
+                  {/* Broadcast: a whole copy of the small table beside it. */}
+                  <g opacity={ease(frame, broadcastAt + 6 + m * 4, 10) * (1 - ease(frame, bucketAt, 10))}>
+                    <rect x={mx + 12} y={diagY + 84} width={132} height={30} rx={4} fill={`color-mix(in srgb, ${BAR} 18%, ${PAPER})`} stroke={BAR} />
+                    <text x={mx + 78} y={diagY + 105} textAnchor="middle" style={svgText(note(19, BLUE_INK))}>
                       customers
                     </text>
                   </g>
-                  {/* Bucketing: both tables split on the key, bucket by bucket. */}
+                  {/* Bucketing: customers split on the key too, bucket by bucket. */}
                   <g opacity={ease(frame, bucketAt + m * 4, 10)}>
-                    <text x={mx + 12} y={diagY + 74} style={svgText(note(19, INK))}>
-                      orders {m + 1}
-                    </text>
-                    <text x={mx + 12} y={diagY + 100} style={svgText(note(19, INK))}>
+                    <text x={mx + 12} y={diagY + 105} style={svgText(note(19, INK))}>
                       customers {m + 1}
                     </text>
                   </g>

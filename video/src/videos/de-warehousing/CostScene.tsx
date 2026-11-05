@@ -15,13 +15,15 @@ const READ_Y = 474;
 const BAR_W = 1180;
 const STEP = 80;
 const COMPUTE_Y = 790;
+const STORE_X = 920;
 
 /**
  * Question 8 (and the Pipelines page's cost question). What a warehouse
- * bills for, then the two halves of the answer: read less, shown as the
- * bytes DuckDB read for the page's query from the CSV, from the Parquet file,
- * and for March alone from the monthly folders (all measured on the made-up
- * table); then compute less often, as four levers from the page.
+ * bills for (scans or compute, and storage), then the answer: read less,
+ * shown as the bytes DuckDB read for the page's query from the CSV, from the
+ * Parquet file, and for March alone from the monthly folders (all measured
+ * on the made-up table); compute less often, three levers from the page; and
+ * store cheaper, the page's sixth.
  */
 export const CostScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -35,6 +37,8 @@ export const CostScene: React.FC = () => {
   const bqAt = n.word("cost", "like BigQuery");
   const computeAt = n.word("cost", "the compute time it uses");
   const sfAt = n.word("cost", "like Snowflake and Redshift");
+  const storeAt = n.word("cost-store", "Storage is billed too");
+  const smallerAt = n.word("cost-store", "usually the smaller part");
   const lessAt = n.word("cost-read", "So read less");
   const csvAt = n.word("cost-read", "thirty-nine point two megabytes of CSV");
   const pqAt = n.word("cost-read", "five of Parquet");
@@ -51,6 +55,7 @@ export const CostScene: React.FC = () => {
   const bills = [
     { at: scansAt, sub: bqAt, title: "billed by the data a query scans", who: "BigQuery" },
     { at: computeAt, sub: sfAt, title: "billed by compute time", who: "Snowflake, Redshift" },
+    { at: storeAt, sub: smallerAt, title: "and storage, billed too", who: "usually the smaller part" },
   ];
   const reads = [
     { at: csvAt, sizeAt: csvAt + 6, bytes: COST.csv.read, size: MB(COST.csv.read), what: "the CSV, read whole" },
@@ -61,7 +66,6 @@ export const CostScene: React.FC = () => {
     { at: incAt, text: "incremental models, not full refreshes" },
     { at: storedAt, text: "stored results for heavy, repeated queries" },
     { at: suspendAt, text: "warehouses that suspend when idle" },
-    { at: coldAt, text: "cold data on cheaper storage" },
   ];
 
   return (
@@ -71,9 +75,11 @@ export const CostScene: React.FC = () => {
       <Sfx name="el-whoosh" at={csvAt} level={-36} />
       <Sfx name="el-whoosh" at={pqAt} level={-37} />
       <Sfx name="el-tap" at={kbAt} level={-35} />
+      <Sfx name="el-tap" at={storeAt + 2} level={-36} />
       {levers.map((l) => (
         <Sfx key={l.text} name="el-pop" at={l.at} level={-36} />
       ))}
+      <Sfx name="el-pop" at={coldAt} level={-36} />
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={8} at={qAt - 4} textAt={qTextAt - 2} size={60}>
@@ -86,7 +92,7 @@ export const CostScene: React.FC = () => {
             key={b.title}
             style={{
               position: "absolute",
-              left: X0 + i * 700,
+              left: X0 + i * 560,
               top: y(BILL_Y),
               padding: "12px 20px",
               borderRadius: 8,
@@ -126,6 +132,11 @@ export const CostScene: React.FC = () => {
           </React.Fragment>
         ))}
 
+        {/* What the bytes are, on the scan-billed warehouse: its own tables bill logical bytes. */}
+        <div style={{ position: "absolute", left: X0, top: y(READ_Y) + 2 * h(STEP) + h(58), ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, kbAt + 16, 12) }}>
+          On BigQuery&apos;s own tables, a query is billed by the columns and partitions it reads, before compression.
+        </div>
+
         {/* ── Compute less often ── */}
         <div style={{ position: "absolute", left: X0, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, oftenAt, 12) }}>
           Compute less often
@@ -135,8 +146,8 @@ export const CostScene: React.FC = () => {
             key={l.text}
             style={{
               position: "absolute",
-              left: X0 + (i % 2) * 820,
-              top: y(COMPUTE_Y) + Math.floor(i / 2) * h(60),
+              left: X0,
+              top: y(COMPUTE_Y) + i * h(50),
               display: "flex",
               alignItems: "center",
               gap: 12,
@@ -149,6 +160,27 @@ export const CostScene: React.FC = () => {
             {l.text}
           </div>
         ))}
+
+        {/* ── Store cheaper ── */}
+        <div style={{ position: "absolute", left: STORE_X, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, coldAt, 12) }}>
+          Store cheaper
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            left: STORE_X,
+            top: y(COMPUTE_Y),
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            ...note(25, INK),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, coldAt, 12),
+          }}
+        >
+          <Tick at={coldAt + 4} size={24} color={OK} />
+          cold data on cheaper storage
+        </div>
       </Drift>
     </AbsoluteFill>
   );

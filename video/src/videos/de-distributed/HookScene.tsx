@@ -167,17 +167,17 @@ export const HookScene: React.FC = () => {
         {/* What every answer turns on, where it happens. */}
         <Note at={splitAt - 2} x={BOX_X + BOX_W + 14} y={y(278)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: ACCENT_INK }}>1</b> how the work is split
+            <b style={{ color: INK }}>1</b> how the work is split
           </span>
         </Note>
         <Note at={netAt - 2} x={W_X + W_W + 20} y={y(278)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: ACCENT_INK }}>2</b> what crosses the network
+            <b style={{ color: INK }}>2</b> what crosses the network
           </span>
         </Note>
         <Note at={slowAt - 2} x={W_X} y={y(W_TOP + 6 * W_PITCH) + h(4)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: ACCENT_INK }}>3</b> a machine slow, or dead
+            <b style={{ color: INK }}>3</b> a machine slow, or dead
           </span>
         </Note>
 

@@ -70,6 +70,10 @@ export const KindsScene: React.FC = () => {
   const zoomX = cx(TODAY) - 194;
   const zoomY = y(400);
   const retryOk = transAt + 6;
+  // Each kind sets back while the next is drawn, and all three come back on
+  // "All three", so the pill never sits beside two greyed-out labels.
+  const back = ease(frame, safeAt, 12);
+  const setBack = (at: number) => 1 - 0.6 * ease(frame, at, 12) * (1 - back);
 
   return (
     <AbsoluteFill>
@@ -130,6 +134,7 @@ export const KindsScene: React.FC = () => {
         </Note>
 
         {/* A retry: one failed task, inside today's run. */}
+        <div style={{ position: "absolute", inset: 0, opacity: setBack(rerunAt - 6) }}>
         <TaskBox
           cx={zoomX + 120}
           cy={zoomY}
@@ -140,7 +145,6 @@ export const KindsScene: React.FC = () => {
             { at: failedAt + 4, tone: "bad" },
             { at: retryOk, tone: "ok" },
           ]}
-          dim={rerunAt - 6}
           size={22}
         >
           transform
@@ -156,12 +160,11 @@ export const KindsScene: React.FC = () => {
           dur={12}
           head={10}
           color={OK}
-          dim={rerunAt - 6}
         />
-        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, insideAt - 4, 10) * (1 - 0.6 * ease(frame, rerunAt - 6, 12)) }}>
+        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, insideAt - 4, 10) }}>
           <line x1={zoomX + 120} x2={cx(TODAY)} y1={zoomY + h(26)} y2={stripY - boxH / 2} stroke={INK_SOFT} strokeWidth={1.4} strokeDasharray="3 4" />
         </svg>
-        <Note at={retryAt} x={zoomX + 274} y={zoomY - h(96)} align="right" dim={rerunAt - 6}>
+        <Note at={retryAt} x={zoomX + 274} y={zoomY - h(96)} align="right">
           <span style={{ ...note(25, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             retry: <span style={{ fontWeight: 500 }}>one failed task, the same run</span>
           </span>
@@ -171,9 +174,11 @@ export const KindsScene: React.FC = () => {
             <Cross at={failedAt + 4} size={22} />
           </div>
         ) : null}
+        </div>
 
         {/* A rerun: a finished date, run again after a fix. */}
-        <TaskBox cx={cx(RERUN)} cy={stripY - h(118)} w={BOX_W} h={boxH} at={rerunAt + 4} tones={[{ at: rerunAt + 4, tone: "data" }]} dim={backAt - 6} size={20}>
+        <div style={{ position: "absolute", inset: 0, opacity: setBack(backAt - 6) }}>
+        <TaskBox cx={cx(RERUN)} cy={stripY - h(118)} w={BOX_W} h={boxH} at={rerunAt + 4} tones={[{ at: rerunAt + 4, tone: "data" }]} size={20}>
           again
         </TaskBox>
         <Edge
@@ -184,13 +189,13 @@ export const KindsScene: React.FC = () => {
           at={rerunAt + 2}
           dur={8}
           head={10}
-          dim={backAt - 6}
         />
-        <Note at={rerunAt} x={cx(RERUN) - 180} y={stripY - h(118) - boxH / 2 - h(46)} dim={backAt - 6}>
+        <Note at={rerunAt} x={cx(RERUN) - 180} y={stripY - h(118) - boxH / 2 - h(46)}>
           <span style={{ ...note(25, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             rerun: <span style={{ fontWeight: 500, opacity: ease(frame, fixAt, 10) }}>a finished date, after a fix</span>
           </span>
         </Note>
+        </div>
 
         {/* A backfill: the dates that never ran, or a range again. */}
         <Note at={backAt} x={X_START} y={stripY - boxH / 2 - h(96)}>

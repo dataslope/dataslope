@@ -17,7 +17,8 @@ const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
  * Question 5, on why-normalization's shop (re-run in DuckDB). Normalized,
  * Ada's email is one customers row that her orders reach through a join;
  * denormalized, it is copied onto each order, so reads need no join and a
- * rushed update leaves her two emails. Then where each one belongs.
+ * rushed update leaves her two emails. Then where each one belongs, and why
+ * a warehouse can afford its copies: one load rebuilds them.
  */
 export const NormScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -29,9 +30,9 @@ export const NormScene: React.FC = () => {
   const textAt = n.word("norm", "Normalization versus denormalization");
   const normWordAt = n.word("norm", "Normalization versus");
   const denormWordAt = n.word("norm", "denormalization");
-  const onceAt = n.word("norm", "stores each fact once");
-  const livesAt = n.word("norm", "Ada's email lives in one customers row");
-  const joinAt = n.word("norm", "through a join");
+  const onceAt = n.word("norm-once", "stores each piece of data once");
+  const livesAt = n.word("norm-ada", "Ada's email lives in one customers row");
+  const joinAt = n.word("norm-ada", "through a join");
   const copiesAt = n.word("denorm", "copies it onto each order");
   const fasterAt = n.word("denorm", "no join, so reads are faster");
   const priceAt = n.word("denorm", "The price is storage");
@@ -41,7 +42,10 @@ export const NormScene: React.FC = () => {
   const writesAt = n.word("norm-where", "normalize where writes are frequent");
   const readsAt = n.word("norm-where", "Denormalize where reads dominate");
   const warehouseAt = n.word("norm-where", "like a warehouse");
-  const end = n.beat("norm-where").to;
+  const affordAt = n.word("norm-why", "A warehouse can afford the copies");
+  const rebuildsAt = n.word("norm-why", "one pipeline rebuilds them");
+  const handAt = n.word("norm-why", "nobody edits a row by hand");
+  const end = n.beat("norm-why").to;
 
   const cg = geoOf(NORM_CUSTOMERS, X0, y(380), h, OPTS);
   const og = geoOf(NORM_ORDERS, X0, y(584), h, OPTS);
@@ -60,7 +64,7 @@ export const NormScene: React.FC = () => {
       [loopX, cg.rowMid(0)],
       [cg.right + 8, cg.rowMid(0)],
     ] as const;
-  const update = UPDATE_SQL.replace(/;$/, "").replace("UPDATE orders_flat SET ", "UPDATE … SET ").replace("customer_email", "email");
+  const update = UPDATE_SQL.replace(/;$/, "").replace("UPDATE orders_flat SET ", "UPDATE … SET ");
   const below = fg.rowTop(FLAT.rows.length);
 
   return (
@@ -85,7 +89,7 @@ export const NormScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── Normalized: each fact once ── */}
-        <PanelHead at={onceAt - 4} x={X0} y={y(262)} width={760} sub="each fact stored once" subAt={onceAt + 4}>
+        <PanelHead at={onceAt - 4} x={X0} y={y(262)} width={760} sub="each piece of data stored once" subAt={onceAt + 4}>
           Normalized
         </PanelHead>
         <TableName g={cg} at={onceAt}>
@@ -155,19 +159,21 @@ export const NormScene: React.FC = () => {
           <span style={{ ...note(30, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>Ada now has two emails.</span>
         </Note>
 
-        {/* ── Where each belongs ── */}
-        <Note at={writesAt} x={X0} y={og.rowTop(NORM_ORDERS.rows.length) + h(60)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            Normalize: frequent writes
-            <br />
-            that must stay consistent
-          </span>
+        {/* ── Where each belongs, one line each, so the warehouse's reason fits under them ── */}
+        <Note at={writesAt} x={X0} y={og.rowTop(NORM_ORDERS.rows.length) + h(36)}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Normalize: frequent writes that must stay consistent</span>
         </Note>
-        <Note at={readsAt} x={RIGHT_X} y={og.rowTop(NORM_ORDERS.rows.length) + h(60)}>
+        <Note at={readsAt} x={RIGHT_X} y={og.rowTop(NORM_ORDERS.rows.length) + h(36)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Denormalize: reads dominate,
-            <br />
-            <span style={{ color: INK, opacity: ease(frame, warehouseAt - 2, 10) }}>like a warehouse</span>
+            <span style={{ color: INK, opacity: ease(frame, warehouseAt - 2, 10) }}> like a warehouse</span>
+          </span>
+        </Note>
+        {/* Why the warehouse's copies do not drift apart the way orders_flat's did. */}
+        <Note at={affordAt} x={RIGHT_X} y={og.rowTop(NORM_ORDERS.rows.length) + h(84)}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            its copies: <span style={{ opacity: ease(frame, rebuildsAt, 10) }}>rebuilt by one pipeline,</span>
+            <span style={{ opacity: ease(frame, handAt, 10) }}> never edited by hand</span>
           </span>
         </Note>
       </Drift>

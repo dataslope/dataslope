@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -20,8 +20,10 @@ const NOTES_X = 1480;
  * pattern here, so this one is a mechanism). Hubs carry the business keys,
  * the link carries the relationship between the two hubs, and each hub's
  * satellite carries its descriptive attributes with the load date and the
- * source on every row. Then why it loads well (inserts only, a satellite per
- * source, every value traceable) and when to choose it over a star, or both.
+ * source on every row; each `_hk` key is a hash of its business key, said
+ * once beside the first hub. Then why it loads well (inserts only, a
+ * satellite per source, every value traceable), when to choose it over a
+ * star, its price (a stack of joins per question), or both.
  */
 export const VaultScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -43,11 +45,13 @@ export const VaultScene: React.FC = () => {
   const parallelAt = n.word("vault-why", "teams add sources in parallel");
   const tracesAt = n.word("vault-why", "every value traces back");
   const vaultWhenAt = n.word("vault-when", "Choose it for many changing sources");
-  const starAt = n.word("vault-when", "Choose a star");
-  const bothAt = n.word("vault-when", "Often it's both");
-  const storesAt = n.word("vault-when", "the vault stores the history");
-  const serveAt = n.word("vault-when", "serve the reports");
-  const end = n.beat("vault-when").to;
+  const priceAt = n.word("vault-cost", "The price");
+  const joinsAt = n.word("vault-cost", "a stack of joins");
+  const starAt = n.word("vault-star", "Choose a star");
+  const bothAt = n.word("vault-star", "Often it's both");
+  const storesAt = n.word("vault-star", "the vault stores the history");
+  const serveAt = n.word("vault-star", "serve the reports");
+  const end = n.beat("vault-star").to;
 
   // Each hub sits level with the link row that names it, so every line is
   // straight: hub_customer one row down, hub_order two.
@@ -110,6 +114,7 @@ export const VaultScene: React.FC = () => {
       <Sfx name="el-tap" at={satsAt + 2} level={-35} />
       <Sfx name="el-sprinkle" at={loadedAt} level={-37} />
       <Sfx name="el-tap" at={vaultWhenAt + 2} level={-36} />
+      <Sfx name="el-tap" at={priceAt + 2} level={-36} />
       <Sfx name="el-tap" at={starAt + 2} level={-36} />
       <Sfx name="el-chime" at={bothAt + 4} level={-37} />
 
@@ -134,6 +139,13 @@ export const VaultScene: React.FC = () => {
         <Entity layout={satO} at={satsAt + 4} marks={{ status: { at: satsAt + 14, out: changeAt + 20 }, ...stamp, ...trace(tracesAt + 6) }} />
         <Relation name="hub_customer to satellite" points={[hubC.anchor("bottom"), satC.anchor("top")]} from="exactly-one" to="one-or-many" at={satsAt + 6} dur={12} />
         <Relation name="hub_order to satellite" points={[hubO.anchor("bottom"), satO.anchor("top")]} from="exactly-one" to="one-or-many" at={satsAt + 10} dur={12} />
+
+        {/* What `_hk` is: the business key, hashed. */}
+        <Note at={hubsAt + 18} x={X0} y={hubC.y - h(44)}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            <span style={{ fontWeight: 700, color: INK }}>customer_hk</span>: a hash of customer_id
+          </span>
+        </Note>
 
         {/* The three kinds, named under the diagram's middle. */}
         <Note at={threeAt} x={midX} y={midTop}>
@@ -173,6 +185,11 @@ export const VaultScene: React.FC = () => {
                 {l}
               </div>
             ))}
+            {i === 0 ? (
+              <div style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, priceAt, 10) }}>
+                price: <span style={{ opacity: 0.4 + 0.6 * ease(frame, joinsAt, 10) }}>a stack of joins</span>
+              </div>
+            ) : null}
           </Note>
         ))}
       </Drift>

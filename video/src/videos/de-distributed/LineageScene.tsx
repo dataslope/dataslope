@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { Arrow, Chip, Disk, Drift, OK, OK_INK, Svg } from "./parts";
+import { Arrow, Chip, Disk, Drift, Elbow, OK, OK_INK, Svg } from "./parts";
 
 const COLS = [
   { x: 150, name: "read" },
@@ -23,14 +23,18 @@ const ROWS = [382, 452, 522];
 const LOST = 1;
 const RDD_X = 1420;
 const ACT_Y = [704, 804];
+/** The cached step's width in the "with one" row, so both arrows leave its edge. */
+const CACHED_W = 104;
 
 /**
  * Questions 13 and 14. A lineage of four steps (read, filter, map,
  * reduceByKey) over three partitions: the steps are what Spark keeps, not
  * the data. One executor dies and map's middle partition is lost; Spark
- * replays read, filter and map for that partition alone; a checkpoint cuts
- * the chain. Then caching: the filtered table kept in memory, and two
- * actions that read the source twice without it and once with it.
+ * replays read, filter and map for that partition alone; past the shuffle, a
+ * lost partition would need all three of its parents; a checkpoint cuts the
+ * chain. Then caching: the filtered table cached (persist at its default
+ * level, memory and disk), and two actions that read the source twice
+ * without it and once with it.
  */
 export const LineageScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -50,13 +54,18 @@ export const LineageScene: React.FC = () => {
   const replayAt = n.word("lineage-lost", "replays those steps");
   const aloneAt = n.word("lineage-lost", "for that partition alone");
   const restartAt = n.word("lineage-lost", "instead of restarting the job");
-  const ckptAt = n.word("lineage-lost", "Checkpointing cuts a very long lineage short");
-  const savingAt = n.word("lineage-lost", "saving a copy to reliable storage");
+  const pastAt = n.word("lineage-wide", "Past a shuffle");
+  const parentAt = n.word("lineage-wide", "needs output from every parent");
+  const ckptAt = n.word("lineage-ckpt", "Checkpointing cuts a very long lineage short");
+  const savingAt = n.word("lineage-ckpt", "saving a copy to reliable storage");
   const q14At = n.word("cache", "Question fourteen");
   const text14At = n.word("cache", "What does caching or persisting do");
   const keepsAt = n.word("cache", "keeps a DataFrame's computed partitions in memory");
   const reusesAt = n.word("cache", "the next action reuses them");
   const replayingAt = n.word("cache", "instead of replaying the lineage");
+  const persistAt = n.word("cache-level", "Cache is persist at its default level");
+  const diskAt = n.word("cache-level", "memory and disk");
+  const pickAt = n.word("cache-level", "persist lets you pick the level");
   const twoAt = n.word("cache-when", "Two actions on one filtered table");
   const twiceAt = n.word("cache-when", "read the source twice without a cache");
   const onceAt = n.word("cache-when", "and once with one");
@@ -77,6 +86,8 @@ export const LineageScene: React.FC = () => {
   const ckpt = ease(frame, ckptAt, 12) * (1 - reset);
   const cached = ease(frame, keepsAt, 12);
   const stepsMark = ease(frame, stepsAt, 12) * (1 - ease(frame, diesAt, 12));
+  // Past the shuffle, a lost partition needs every parent: the three lines into one.
+  const wide = ease(frame, parentAt, 12) * (1 - ease(frame, ckptAt, 12));
 
   return (
     <AbsoluteFill>
@@ -125,9 +136,21 @@ export const LineageScene: React.FC = () => {
                   <line key={`${k}-${r}`} x1={x1} y1={mid(r)} x2={x1 + (x2 - x1) * p} y2={mid(r)} stroke={hot ? ds("yellow", 600) : INK_SOFT} strokeWidth={hot ? 4 : 1.8} opacity={cut} />
                 );
               }
-              return ROWS.map((__, r2) => (
-                <line key={`${k}-${r}-${r2}`} x1={x1} y1={mid(r)} x2={x1 + (x2 - x1) * p} y2={mid(r) + (mid(r2) - mid(r)) * p} stroke={INK_SOFT} strokeWidth={1.2} opacity={0.7} />
-              ));
+              return ROWS.map((__, r2) => {
+                const hot = r2 === LOST && wide > 0;
+                return (
+                  <line
+                    key={`${k}-${r}-${r2}`}
+                    x1={x1}
+                    y1={mid(r)}
+                    x2={x1 + (x2 - x1) * p}
+                    y2={mid(r) + (mid(r2) - mid(r)) * p}
+                    stroke={hot ? ds("yellow", 600) : INK_SOFT}
+                    strokeWidth={hot ? 1.2 + 2.8 * wide : 1.2}
+                    opacity={hot ? 0.7 + 0.3 * wide : 0.7}
+                  />
+                );
+              });
             }),
           )}
         </Svg>
@@ -161,7 +184,7 @@ export const LineageScene: React.FC = () => {
                   whiteSpace: "nowrap",
                 }}
               >
-                {isLost && lost > 0.5 ? "lost" : keep > 0.5 ? "in memory" : `part ${r + 1}`}
+                {isLost && lost > 0.5 ? "lost" : keep > 0.5 ? "cached" : `part ${r + 1}`}
               </div>
             );
           }),
@@ -197,6 +220,13 @@ export const LineageScene: React.FC = () => {
         <Note at={restartAt - 2} x={RDD_X} y={y(574)} out={q14At - 6}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>not the whole job</span>
         </Note>
+        <Note at={pastAt - 2} x={RDD_X} y={y(622)} out={q14At - 6}>
+          <span style={{ ...note(22, INK), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+            past a shuffle:
+            <br />
+            <span style={{ opacity: ease(frame, parentAt, 10) }}>needs every parent&apos;s output</span>
+          </span>
+        </Note>
         {/* A checkpoint under filter: the chain before it is no longer needed. */}
         <Disk x={COLS[1].x + BW / 2 - 28} top={y(ROWS[2]) + bh + h(30)} at={ckptAt + 2} out={q14At - 6} />
         <Arrow from={[COLS[1].x + BW / 2, y(ROWS[2]) + bh + 4]} to={[COLS[1].x + BW / 2, y(ROWS[2]) + bh + h(28)]} at={savingAt} dur={8} width={1.8} head={9} out={q14At - 6} />
@@ -213,6 +243,17 @@ export const LineageScene: React.FC = () => {
         </Note>
         <Note at={replayingAt} x={COLS[0].x} y={y(ROWS[2]) + bh + h(16)} out={twoAt}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>no replay</span>
+        </Note>
+        <Note at={persistAt - 2} x={COLS[1].x} y={y(ROWS[2]) + bh + h(62)}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>cache()</span>
+            {" is "}
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, opacity: ease(frame, diskAt - 2, 10) }}>persist(MEMORY_AND_DISK)</span>
+            <span style={{ opacity: ease(frame, pickAt, 10), color: INK_SOFT }}>
+              ; or pick a level: <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK }}>MEMORY_ONLY</span>,{" "}
+              <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK }}>DISK_ONLY</span>
+            </span>
+          </span>
         </Note>
         <CacheRow
           label="without a cache"
@@ -235,7 +276,12 @@ export const LineageScene: React.FC = () => {
         <Note at={onceUsedAt - 2} x={RDD_X} y={y(764)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>used once: wasted memory</span>
         </Note>
-        <Note at={lazyAt - 2} x={RDD_X} y={y(808)}>
+        <Note at={onceUsedAt + 10} x={RDD_X} y={y(804)}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600 }}>unpersist()</span> when done
+          </span>
+        </Note>
+        <Note at={lazyAt - 2} x={RDD_X} y={y(852)}>
           <span style={{ ...note(23, INK), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             lazy too:
             <span style={{ opacity: ease(frame, firstAt, 10) }}> fills on the</span>
@@ -263,16 +309,19 @@ const CacheRow: React.FC<{
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
-  const step = (text: string, x: number, c: string, k = 0) => (
+  const step = (text: string, x: number, c: string, k = 0, width?: number) => (
     <div
       style={{
         position: "absolute",
         left: x,
         top: top + k * h(38),
+        width,
+        boxSizing: "border-box",
         height: h(30),
         padding: "0 10px",
         display: "flex",
         alignItems: "center",
+        justifyContent: width ? "center" : undefined,
         borderRadius: 5,
         background: `color-mix(in srgb, ${c} 14%, ${PAPER})`,
         border: `1.5px solid color-mix(in srgb, ${c} 60%, ${PAPER})`,
@@ -296,10 +345,23 @@ const CacheRow: React.FC<{
           {arrow(446, 480)}
           {step("filter", 486, BAR)}
           {arrow(562, 596)}
-          {step("in memory", 602, OK)}
-          {arrow(722, 790, 0)}
+          {step("cached", 602, OK, 0, CACHED_W)}
+          {arrow(602 + CACHED_W + 6, 790, 0)}
           {step("count()", 796, BAR, 0)}
-          {arrow(722, 790, 1)}
+          {/* The second action leaves the same cached copy. */}
+          <Elbow
+            points={[
+              [602 + CACHED_W + 6, top + h(15)],
+              [602 + CACHED_W + 36, top + h(15)],
+              [602 + CACHED_W + 36, top + h(38) + h(15)],
+              [790, top + h(38) + h(15)],
+            ]}
+            at={at + 4}
+            dur={10}
+            width={1.6}
+            head={9}
+            radius={12}
+          />
           {step("write", 796, BAR, 1)}
         </>
       ) : (

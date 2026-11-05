@@ -149,7 +149,18 @@ export const script: NarrationScript = {
     },
     {
       id: "grain-fix",
-      text: "It belongs in a fact at order grain, one row per order. Declaring the grain first is what catches that.",
+      text: "It belongs in a fact at order grain, one row per order.",
+      pauseAfter: 0.6,
+    },
+    {
+      // Review finding 10: the other home for the fee, voiced alone.
+      id: "grain-split",
+      text: "Or, to report it by product, split it across the lines, so the shares add back to five.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "grain-first",
+      text: "Declaring the grain first is what catches that.",
       pauseAfter: 0.8,
     },
 
@@ -175,7 +186,18 @@ export const script: NarrationScript = {
     {
       id: "norm",
       scene: true,
-      text: "Question five. Normalization versus denormalization: what's the trade-off? Normalizing stores each fact once. Ada's email lives in one customers row, and every order reaches it through a join.",
+      text: "Question five. Normalization versus denormalization: what's the trade-off?",
+      pauseAfter: 0.55,
+    },
+    {
+      // Review finding 16: "each fact" read as a fact row in this video. Voiced alone.
+      id: "norm-once",
+      text: "Normalizing stores each piece of data once.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "norm-ada",
+      text: "Ada's email lives in one customers row, and every order reaches it through a join.",
       pauseAfter: 0.6,
     },
     {
@@ -186,6 +208,12 @@ export const script: NarrationScript = {
     {
       id: "norm-where",
       text: "So normalize where writes are frequent and must stay consistent. Denormalize where reads dominate, like a warehouse.",
+      pauseAfter: 0.6,
+    },
+    {
+      // Review finding 4: the follow-up, voiced alone.
+      id: "norm-why",
+      text: "A warehouse can afford the copies: one pipeline rebuilds them from the normalized source, and nobody edits a row by hand.",
       pauseAfter: 0.8,
     },
 
@@ -198,13 +226,26 @@ export const script: NarrationScript = {
       pauseAfter: 0.9,
     },
     {
+      // Review finding 9: each form builds on the last, and only non-key
+      // columns are tested. The definition is voiced alone; the example is cut
+      // from the take.
       id: "nf-2",
-      text: "Second: every column depends on the whole key. Key order lines by order and product, and the product's name depends on only half of it.",
+      text: "Second: first, plus every non-key column depends on the whole key.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "nf-2-eg",
+      text: "Key order lines by order and product, and the product's name depends on only half of it.",
       pauseAfter: 0.6,
     },
     {
       id: "nf-3",
-      text: "Third: nothing but the key. A customer's city on an order row depends on the customer, not the order. That's a transitive dependency.",
+      text: "Third: second, plus nothing but the key.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "nf-3-eg",
+      text: "A customer's city on an order row depends on the customer, not the order. That's a transitive dependency.",
       pauseAfter: 0.7,
     },
     {
@@ -236,16 +277,22 @@ export const script: NarrationScript = {
       id: "keys",
       scene: true,
       text: "Question eight. What is a surrogate key, and why prefer it over a natural key? A natural key comes from the business: an email, a product code. Those change, get reused, and can be long strings that slow every join.",
-      pauseAfter: 0.6,
+      pauseAfter: 0.8,
     },
     {
       id: "surrogate",
       text: "A surrogate key is a number the warehouse makes up. It means nothing, so nothing upstream can change it, and it's small.",
-      pauseAfter: 0.6,
+      pauseAfter: 0.8,
     },
     {
       id: "versions",
       text: "It also lets one customer have two rows. Customer forty-two moved from Boston to Austin. The page's dimension keeps both, as keys ten oh one and ten eighty-seven, and each order points at the version that was true when it was placed.",
+      pauseAfter: 0.6,
+    },
+    {
+      // Review finding 11: how a new order gets the right key. Voiced alone.
+      id: "lookup",
+      text: "The natural key stays as a column, so each load can look up which surrogate a new order gets.",
       pauseAfter: 0.6,
     },
     {
@@ -259,12 +306,12 @@ export const script: NarrationScript = {
       id: "types",
       scene: true,
       text: "Question nine. What are the three types of fact tables? A transaction fact has one row per event: each deposit and withdrawal on Ada's account.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.8,
     },
     {
       id: "periodic",
       text: "A periodic snapshot has one row per account per period: her balance at the end of every month.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.8,
     },
     {
       id: "accum",
@@ -296,7 +343,14 @@ export const script: NarrationScript = {
     },
     {
       id: "nonadd",
-      text: "Non-additive measures, like ratios and distinct counts, don't sum at all. Three users on Monday and three on Tuesday are four people, not six. Store the parts, and compute the ratio in the query.",
+      text: "Non-additive measures, like ratios and distinct counts, don't sum at all. Three users on Monday and three on Tuesday are four people, not six.",
+      pauseAfter: 0.6,
+    },
+    {
+      // Review finding 3: the old last sentence gave only the ratio's remedy
+      // for a distinct-count example. Voiced alone.
+      id: "nonadd-fix",
+      text: "So recount distinct users from the detail rows for each period. For a ratio, store both parts and divide in the query.",
       pauseAfter: 0.8,
     },
 
@@ -325,16 +379,35 @@ export const script: NarrationScript = {
     {
       id: "r-date",
       text: "Why a date dimension, rather than date functions? Fiscal quarters and holidays are business rules. Store them once, in a table, and every query just filters and groups. On the page's orders, revenue by fiscal quarter without holidays is one join and no date math.",
-      pauseAfter: 0.6,
-    },
-    {
-      id: "r-metric",
-      text: "A measure is a raw column on a fact table, like revenue. A metric is a business definition built from measures, like average order value: revenue over orders. Define each metric once, in one shared place. On the page's orders, it's a hundred eighty-six dollars with holidays and a hundred sixty-three without, and two teams could each report one.",
+      // Review finding 13: time to read the holidays note before item 15.
       pauseAfter: 1.2,
     },
     {
+      id: "r-metric",
+      text: "A measure is a raw column on a fact table, like revenue. A metric is a business definition built from measures, like average order value: revenue over orders.",
+      pauseAfter: 0.55,
+    },
+    {
+      // Review finding 19: where the one definition lives. Voiced alone.
+      id: "r-metric-once",
+      text: "Define each metric once, in a semantic layer every dashboard reads.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "r-metric-teams",
+      text: "On the page's orders, it's a hundred eighty-six dollars with holidays and a hundred sixty-three without, and two teams could each report one.",
+      pauseAfter: 1.2,
+    },
+    {
+      // Review finding 5: Question 8 already kept two rows for customer 42.
+      // Voiced alone; the rest of the bridge is cut from the take.
       id: "next",
-      text: "Every answer here treated a dimension as fixed. But customers move and products get renamed, so the model has to keep history. Next: modeling history.",
+      text: "Apart from question eight, every answer here treated a dimension as fixed.",
+      pauseAfter: 0.55,
+    },
+    {
+      id: "next-history",
+      text: "But customers move and products get renamed, so the model has to keep history. Next: modeling history.",
     },
   ],
 };

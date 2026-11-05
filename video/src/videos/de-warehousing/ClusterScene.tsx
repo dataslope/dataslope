@@ -14,7 +14,9 @@ const AX0 = 420;
 const AX1 = 1500;
 const MONTHS_Y = 322;
 const SORTED_Y = 362;
-const SHUFFLED_Y = 598;
+const SHUFFLED_Y = 604;
+/** Row pitch: the date-order panel's is wider, for the ranges labelled under each other. */
+const SORTED_STEP = 26;
 const STEP = 22;
 const BAR_H = 16;
 const RIGHT = 1530;
@@ -61,7 +63,9 @@ export const ClusterScene: React.FC = () => {
   const nothingAt = n.word("cl-shuffle", "Nothing can be skipped");
   const fiveAt = n.word("cl-shuffle", "five times the bytes");
   const noIndexAt = n.word("cl-shuffle", "no index needed");
-  const end = n.beat("cl-shuffle").to;
+  const pairAt = n.word("cl-pair", "partition by date");
+  const nextColAt = n.word("cl-pair", "cluster by the next column");
+  const end = n.beat("cl-pair").to;
 
   const [lo, hi] = CLUSTER.range;
   const bandX0 = xOf(dayOf(lo));
@@ -76,6 +80,7 @@ export const ClusterScene: React.FC = () => {
     readAt: number,
     readColor: string,
     labels: boolean,
+    step: number,
   ) => (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
       {groups.map((g, i) => {
@@ -85,7 +90,7 @@ export const ClusterScene: React.FC = () => {
         const r = ease(frame, readAt + i * 1.5, 10);
         const x0 = xOf(dayOf(g.lo));
         const x1 = xOf(dayOf(g.hi) + 1);
-        const yy = y(top) + i * h(STEP);
+        const yy = y(top) + i * h(step);
         return (
           <g key={g.id} opacity={hit ? 1 : 1 - 0.6 * r}>
             <rect
@@ -132,8 +137,7 @@ export const ClusterScene: React.FC = () => {
             Every column&apos;s minimum and maximum
             <span style={{ opacity: ease(frame, groupAt, 10) }}>, kept for each row group</span>
             <span style={{ opacity: ease(frame, rowsCueAt, 10) }}>
-              {" "}
-              of <Num>{count(CLUSTER.rowGroupRows)}</Num> rows
+              , a slice of <Num>{count(CLUSTER.rowGroupRows)}</Num> rows
             </span>
             <span style={{ opacity: ease(frame, dateOrderAt, 10) }}>; for the dates, the span drawn</span>
           </span>
@@ -141,6 +145,15 @@ export const ClusterScene: React.FC = () => {
 
         {/* ── The year, and March ── */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+          {/* The March band first, so the month names read over it. */}
+          <rect
+            x={bandX0}
+            y={y(MONTHS_Y) - 4}
+            width={bandX1 - bandX0}
+            height={(y(SHUFFLED_Y) + 9 * h(STEP) + 6 - (y(MONTHS_Y) - 4)) * ease(frame, marchAt, 14)}
+            fill={HIGHLIGHT}
+            opacity={0.55}
+          />
           <g>
             {MONTH_NAMES.map((m, i) => (
               <g key={m} opacity={ease(frame, ordersAt + 4 + i * 2, 10)}>
@@ -151,14 +164,6 @@ export const ClusterScene: React.FC = () => {
               </g>
             ))}
           </g>
-          <rect
-            x={bandX0}
-            y={y(MONTHS_Y) - 4}
-            width={bandX1 - bandX0}
-            height={(y(SHUFFLED_Y) + 9 * h(STEP) + 6 - (y(MONTHS_Y) - 4)) * ease(frame, marchAt, 14)}
-            fill={HIGHLIGHT}
-            opacity={0.55}
-          />
         </svg>
         <Note at={marchAt + 4} x={bandX0} y={y(SHUFFLED_Y) + 9 * h(STEP) + h(12)}>
           <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>
@@ -173,8 +178,8 @@ export const ClusterScene: React.FC = () => {
             <Num>{CLUSTER.sorted.groups.length}</Num> row groups, about six weeks each
           </div>
         </div>
-        {panel(SORTED_Y, CLUSTER.sorted.groups, likeAt, twoAt, BAR, true)}
-        <div style={{ position: "absolute", left: RIGHT, top: y(SORTED_Y) + h(STEP) * 2, opacity: ease(frame, twoAt + 4, 12) }}>
+        {panel(SORTED_Y, CLUSTER.sorted.groups, likeAt, twoAt, BAR, true, SORTED_STEP)}
+        <div style={{ position: "absolute", left: RIGHT, top: y(SORTED_Y) + h(SORTED_STEP) * 2, opacity: ease(frame, twoAt + 4, 12) }}>
           <div style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Num>{CLUSTER.sorted.overlapping}</Num> of <Num>{CLUSTER.sorted.groups.length}</Num> groups read
           </div>
@@ -188,23 +193,34 @@ export const ClusterScene: React.FC = () => {
           <div style={{ ...label(23, INK) }}>shuffled</div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 4, opacity: ease(frame, yearAt, 10) }}>every group spans the year</div>
         </div>
-        {panel(SHUFFLED_Y, CLUSTER.shuffled.groups, shuffleAt + 4, nothingAt, ACCENT, false)}
+        {panel(SHUFFLED_Y, CLUSTER.shuffled.groups, shuffleAt + 4, nothingAt, ACCENT, false, STEP)}
         <div style={{ position: "absolute", left: RIGHT, top: y(SHUFFLED_Y) + h(STEP) * 2, opacity: ease(frame, nothingAt + 4, 12) }}>
           <div style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Num>{CLUSTER.shuffled.overlapping}</Num> of <Num>{CLUSTER.shuffled.groups.length}</Num> groups read
           </div>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             <Num>{MB(CLUSTER.shuffled.read, 2)}</Num> read
-            <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, fiveAt, 10) }}>
-              , <Num>{Math.round(ratio)}</Num> times as much
-            </span>
+          </div>
+          <div style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, fiveAt, 10) }}>
+            <Num>{Math.round(ratio)}</Num> times as much
           </div>
         </div>
 
-        <div style={{ position: "absolute", left: X0, top: y(862), display: "flex", alignItems: "center", gap: 12, ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, noIndexAt - 4, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(858), display: "flex", alignItems: "center", gap: 12, ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, noIndexAt - 4, 12) }}>
           <Tick at={noIndexAt + 2} size={24} color={OK} />
           <span>
             <b style={{ color: OK_INK }}>No index:</b> the minimum and maximum do the skipping
+            <span style={{ color: INK_SOFT }}> (often called zone maps)</span>
+          </span>
+        </div>
+        {/* What to cluster on, with partitioning. */}
+        <div style={{ position: "absolute", left: X0, top: y(894), display: "flex", alignItems: "center", gap: 12, ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, pairAt - 2, 12) }}>
+          <Tick at={pairAt + 4} size={24} color={OK} />
+          <span>
+            <b style={{ color: OK_INK }}>In practice:</b> partition by date
+            <span style={{ opacity: ease(frame, nextColAt, 10) }}>
+              , then cluster by the next column queries filter on, like <QMono>region</QMono>
+            </span>
           </span>
         </div>
       </Drift>

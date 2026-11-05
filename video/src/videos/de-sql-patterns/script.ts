@@ -38,7 +38,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - Question 4 and 5's scene is da-sql's OrderScene, copied and re-cued, on
  *     da-sql's results (the DA page's 24 orders: 11 over 100, 4 regions, 2
  *     kept by HAVING > 400; DuckDB's "WHERE clause cannot contain
- *     aggregates!"), with the SUM-in-WHERE error from da-sql's WhereScene.
+ *     aggregates!"), with the SUM-in-WHERE error from da-sql's WhereScene,
+ *     run here with the written query's own condition, SUM(amount) > 400.
  *   - Question 6's scene is da-advanced-sql's FrameScene, its first part,
  *     on its four payments (ROWS 100, 350, 425; RANGE 425 for both).
  *   - Question 10's scene is da-sql's AntiScene, on its customers and orders
@@ -72,7 +73,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     PRECEDING reaches back to the 3rd (eleven days) and averages 152.1;
  *     RANGE of six days holds four rows and averages 166.3 ("one sixty-six");
  *     over the spine, with the four gaps as zeros, ROWS 6 PRECEDING covers the
- *     7th to the 13th and averages 95.0.
+ *     7th to the 13th and averages 95.0. The ROWS frame's first six rows hold
+ *     fewer than seven; CASE WHEN COUNT(*) OVER w = 7 nulls exactly those.
  *   - The page's spine query fails in DuckDB as the page writes it
  *     (generate_series in SELECT returns one list, and the ::date cast
  *     refuses it); the spine on screen is generate_series as a table.
@@ -140,6 +142,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.8,
     },
     {
+      id: "rank-use",
+      text: "So dense rank finds the second-highest score, rank keeps ties in a top N, and row number keeps exactly one per key.",
+      pauseAfter: 0.8,
+    },
+    {
       id: "latest",
       text: "Question two. How do you keep only the latest row per key? Number each user's events from the newest, and keep number one.",
       pauseAfter: 0.6,
@@ -148,7 +155,8 @@ export const script: NarrationScript = {
     {
       id: "latest-tie",
       text: "Use row number, not rank. Give user three two events at the same moment, and rank numbers both of them one, so user three comes back twice. Row number keeps exactly one, though which one is arbitrary without a tiebreaker.",
-      pauseAfter: 0.8,
+      // The tie's last note is read before question 3 takes its place.
+      pauseAfter: 1.8,
     },
     {
       id: "qualify",
@@ -205,10 +213,11 @@ export const script: NarrationScript = {
     },
     {
       id: "frame-def",
-      text: "The frame is the set of rows the function sees for the current one.",
-      // A definition, read quickly in the take: time to take it in.
+      text: "The frame is the set of rows the function sees.",
+      // A definition: time to take it in.
       pauseAfter: 0.8,
     },
+    { id: "frame-def-run", text: "For a running total, that's every row up to the current one.", pauseAfter: 0.8 },
     { id: "frame-peers", text: "Here, two payments land on the same day.", pauseAfter: 0.6 },
     {
       id: "frame-rows",
@@ -220,9 +229,10 @@ export const script: NarrationScript = {
       text: "Range goes by the order by value, so both payments on the second come in together, and both get four twenty-five.",
       pauseAfter: 0.7,
     },
+    { id: "frame-pick", text: "Rows is predictable once the order by breaks ties, like this ID." },
     {
-      id: "frame-pick",
-      text: "Rows is the predictable one. Reach for range when tied values belong together, or when the frame is a span of time.",
+      id: "frame-pick-range",
+      text: "Reach for range when tied values belong together, or when the frame is a span of time.",
       pauseAfter: 0.6,
     },
     { id: "moving-in", text: "That last case is the next question." },
@@ -237,6 +247,11 @@ export const script: NarrationScript = {
     {
       id: "moving-rows",
       text: "That's seven rows. Here's a metric on the thirteen days from the start, with the same four days missing. On the thirteenth, seven rows reach back to the third: eleven days.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "moving-short",
+      text: "And the first six rows have short windows: return null until the window holds seven.",
       pauseAfter: 0.7,
     },
     {
@@ -336,7 +351,7 @@ export const script: NarrationScript = {
       id: "recursive-stop",
       text: "A pass that adds nothing ends it: seven people, three levels. If the data has a loop, it never runs dry, so cap the depth.",
       // The cap and its run arrive on the last words: time to read them.
-      pauseAfter: 2.2,
+      pauseAfter: 3.0,
     },
 
     // ── At speed ──────────────────────────────────────────────────────────
@@ -348,11 +363,17 @@ export const script: NarrationScript = {
     },
     {
       id: "r-dupes",
-      text: "To find duplicate rows, group by the columns that should be unique, and keep the counts over one. To see every copy, number them, and keep the numbers over one.",
+      text: "To find duplicate rows, group by the columns that should be unique, and keep the counts over one.",
+    },
+    {
+      id: "r-dupes-copies",
+      text: "To get the extra copies as whole rows, the ones you'd delete, number them and keep the numbers over one.",
+      pauseAfter: 1.0,
     },
     {
       id: "r-cte",
       text: "A subquery nests a step inside the query. Written as a CTE, the step gets a name up front, reads top to bottom, and can be used twice. Here, both find the same three users.",
+      pauseAfter: 1.0,
     },
     {
       id: "r-union",
@@ -361,8 +382,8 @@ export const script: NarrationScript = {
     {
       id: "r-lag",
       text: "Lag reads a value from an earlier row, and lead from a later one. Revenue minus lag is the change since yesterday, with no self join. At the edges there's no row to read: null, unless you pass a default, like this zero.",
-      pauseAfter: 0.7,
     },
+    { id: "r-lag-delta", text: "Leave it null in a delta, or day one reads as a jump of a hundred.", pauseAfter: 0.7 },
     {
       id: "r-running",
       text: "A running total is a sum ordered by date, framed from the first row to this one, per user. Leave the frame out, and the default is range, so rows tied on a date share one total.",
@@ -370,7 +391,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-pivot",
-      text: "To pivot, sum a case expression for each new column, grouped by the row. DuckDB also has a pivot clause. If the values aren't known in advance, it takes dynamic sequel.",
+      text: "To pivot, sum a case expression for each new column, grouped by the row. DuckDB also has a pivot clause.",
+    },
+    {
+      id: "r-pivot-dyn",
+      text: "If the values aren't known in advance, the case version takes dynamic sequel. DuckDB's pivot finds them itself.",
     },
     {
       id: "r-joins",
@@ -381,10 +406,13 @@ export const script: NarrationScript = {
       id: "r-ntile",
       text: "N tile deals ordered rows into N buckets: twenty-four customers make four quartiles of six. When it can't split evenly, the first buckets get the extra rows.",
     },
+    { id: "r-percent", text: "Percent rank is rank minus one, over rows minus one." },
+    { id: "r-percent-cume", text: "Cume dist is the share of rows at or before this one, ties included." },
     {
-      id: "r-percent",
-      text: "Percent rank is rank minus one, over rows minus one. Cume dist is the share of rows at or tied with this one. For ten, twenty, twenty, thirty, the twenties get a third, and three quarters.",
-      pauseAfter: 0.8,
+      id: "r-percent-vals",
+      text: "For ten, twenty, twenty, thirty, the twenties get a third, and three quarters.",
+      // The derivation of both values stays up to be read.
+      pauseAfter: 1.6,
     },
     {
       id: "r-coalesce",

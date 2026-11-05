@@ -27,7 +27,8 @@ const pick = (t: Result, cols: readonly string[]): Result => ({
  * the warehouse: what goes wrong with a natural key, what a surrogate
  * promises, and the page's own Type 2 dimension, where customer 42 is two
  * rows, keys 1001 and 1087, and each order points at the version true when
- * it was placed.
+ * it was placed; the natural key stays as a column, which is how a load
+ * finds the key a new order gets.
  */
 export const KeysScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -56,6 +57,9 @@ export const KeysScene: React.FC = () => {
   const k2At = n.word("versions", "ten eighty-seven");
   const pointsAt = n.word("versions", "each order points");
   const trueAt = n.word("versions", "true when it was placed");
+  const stayAt = n.word("lookup", "The natural key stays as a column");
+  const lookAt = n.word("lookup", "each load can look up");
+  const newOrderAt = n.word("lookup", "a new order gets");
   const scdAt = n.word("keys-next", "a slowly changing dimension");
   const historyAt = n.word("keys-next", "where modeling history begins");
   const end = n.beat("keys-next").to;
@@ -157,7 +161,9 @@ export const KeysScene: React.FC = () => {
           at={twoRowsAt}
           rows={dim.rows.map((cells, i) => ({ cells, at: twoRowsAt + 6 + i * 4 }))}
           marks={[
-            ...dim.rows.map((_, i) => ({ row: i, col: dId, at: fortyTwoAt + 2 + i * 3, color: MARK_BAD })),
+            ...dim.rows.map((_, i) => ({ row: i, col: dId, at: fortyTwoAt + 2 + i * 3, color: MARK_BAD, out: stayAt })),
+            // The natural key kept as a column: what a load looks up.
+            ...dim.rows.map((_, i) => ({ row: i, col: dId, at: stayAt + 4 + i * 3, color: MARK })),
             ...dim.rows.map((_, i) => ({ row: i, col: dCity, at: movedAt + i * 8, color: MARK })),
             { row: 0, col: dKey, at: k1At, color: MARK_KEY },
             { row: 1, col: dKey, at: k2At, color: MARK_KEY },
@@ -185,6 +191,12 @@ export const KeysScene: React.FC = () => {
         ))}
         <Note at={trueAt + 8} x={fg.x} y={fg.rowTop(fact.rows.length) + h(22)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>each order: the version true when it was placed</span>
+        </Note>
+        <Note at={lookAt} x={fg.x} y={fg.rowTop(fact.rows.length) + h(62)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            each load: <Mono>customer_id</Mono> + date
+            <span style={{ opacity: ease(frame, newOrderAt, 10) }}> → a new order&apos;s key</span>
+          </span>
         </Note>
 
         {/* ── Where it leads ── */}

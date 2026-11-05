@@ -95,17 +95,19 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
   const manyAt = c.w("r-fan", "many downstream recomputations");
   const correctAt = c.w("r-fan", "Correct a dimension table");
   const staleAt = c.w("r-fan", "go stale");
-  const onlyAt = c.w("r-fan", "Recompute only the affected partitions");
-  const graphAt = c.w("r-fan", "let the dependency graph find the smallest scope");
-  const cdcAt = c.w("r-fan", "use CDC so only the change travels");
+  const onlyAt = c.w("r-fan-fix", "Recompute only the affected partitions");
+  const graphAt = c.w("r-fan-fix", "let the dependency graph find the smallest scope");
+  const cdcAt = c.w("r-fan-fix", "use CDC so only the change travels");
+  const joinAt = c.w("r-fan-join", "a join fan-out");
+  const repeatsAt = c.w("r-fan-join", "repeats rows and inflates a sum");
   const dim = { x: R_X, y: c.y(540), w: 250, h: 84 };
   const gx = 1260;
   const gy = c.y(400);
   const cell = (k: number) => ({ x: gx + (k % GRID.cols) * (GRID.size + GRID.gap), y: gy + Math.floor(k / GRID.cols) * (GRID.size + GRID.gap) });
   const total = GRID.cols * GRID.rows;
   const stale = ease(frame, staleAt, 14);
-  const calm = ease(frame, onlyAt, 14);
-  const redo = ease(frame, onlyAt + 12, 14);
+  const calm = ease(frame, onlyAt + 4, 14);
+  const redo = ease(frame, onlyAt + 16, 14);
   const fan = ease(frame, manyAt, 20);
   const pick = ease(frame, graphAt, 14);
   const travel = ease(frame, cdcAt + 4, 30);
@@ -139,7 +141,7 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
               key={`e${k}`}
               x1={from[0]}
               y1={from[1]}
-              x2={from[0] + (p.x + GRID.size / 2 - from[0]) * pick}
+              x2={from[0] + (p.x - 2 - from[0]) * pick}
               y2={from[1] + (p.y + GRID.size / 2 - from[1]) * pick}
               stroke={OK}
               strokeWidth={2.4}
@@ -155,7 +157,9 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
           const red = stale * (hit ? 1 - redo : 1 - calm);
           const green = hit ? redo : 0;
           const fill = green > 0 ? `color-mix(in srgb, ${OK} ${green * 100}%, ${ACCENT})` : `color-mix(in srgb, ${ACCENT} ${red * 100}%, ${BAR})`;
-          return <rect key={k} x={p.x} y={p.y} width={GRID.size} height={GRID.size} rx={5} fill={fill} opacity={appear * (0.55 + 0.35 * Math.max(red, green))} />;
+          // Unaffected cells stay nearly opaque, so the green edges passing
+          // under them on the way to the six read as under, not through.
+          return <rect key={k} x={p.x} y={p.y} width={GRID.size} height={GRID.size} rx={5} fill={fill} opacity={appear * (0.75 + 0.2 * Math.max(red, green))} />;
         })}
         {/* Only the change travels. */}
         {travel > 0 && travel < 1 ? (
@@ -179,6 +183,13 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
           <b style={{ color: OK_INK }}>CDC</b>: only the changed row travels
         </span>
       </Note>
+      {/* The other meaning, from data modeling. */}
+      <Note at={joinAt} x={R_X} y={c.y(838)}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+          not a <b style={{ color: INK }}>join fan-out</b>
+          <span style={{ opacity: ease(frame, repeatsAt, 10) }}>: a one-to-many join that repeats rows and inflates sums</span>
+        </span>
+      </Note>
     </>
   );
 };
@@ -194,6 +205,7 @@ const Lineage: React.FC<{ c: Ctx }> = ({ c }) => {
   const dashAt = c.w("r-lineage", "from source system to dashboard");
   const whyAt = c.w("r-lineage", "why a metric changed");
   const breaksAt = c.w("r-lineage", "what breaks if you drop a column");
+  const dropAt = c.w("r-lineage", "drop a column");
   const personalAt = c.w("r-lineage", "where personal data went");
   const W = 196;
   const H = c.h(62);
@@ -221,8 +233,10 @@ const Lineage: React.FC<{ c: Ctx }> = ({ c }) => {
   // (what breaks); the CRM's personal data and everything it reaches.
   const back = new Set<K>(["dash", "fct", "rawOrders", "rawCust", "ordersDb", "crm"]);
   const fwd = new Set<K>(["rawCust", "fct", "dash"]);
-  const backP = ease(frame, whyAt, 16) * (1 - ease(frame, breaksAt - 4, 10));
-  const fwdP = ease(frame, breaksAt + 4, 14) * (1 - ease(frame, personalAt - 4, 10));
+  // The back-trace holds until "drop a column", so it is read before the
+  // forward trace replaces it.
+  const backP = ease(frame, whyAt, 16) * (1 - ease(frame, dropAt - 2, 10));
+  const fwdP = ease(frame, dropAt + 2, 14) * (1 - ease(frame, personalAt - 4, 10));
   const persP = ease(frame, personalAt + 4, 14);
   const pers = new Set<K>(["crm", "rawCust", "fct", "dash"]);
   return (
@@ -304,11 +318,11 @@ export const RapidScene: React.FC = () => {
   const moreAt = n.word("rapid-in", "Three more");
   const eachAt = n.word("rapid-in", "a sentence or two each");
   const end = n.beat("next").from - 4;
-  const assumedAt = n.word("next", "Each answer here assumed");
-  const oneAt = n.word("next", "one machine could hold the data");
-  const outgrowsAt = n.word("next", "When a day of events outgrows it");
-  const splitAt = n.word("next", "split across many");
-  const nextAt = n.word("next", "Next:");
+  const assumedAt = n.word("next", "Every example here ran");
+  const oneAt = n.word("next", "one machine");
+  const outgrowsAt = n.word("next-many", "When a day of events outgrows it");
+  const splitAt = n.word("next-many", "split across many");
+  const nextAt = n.word("next-many", "Next:");
 
   const items: RapidItem[] = [
     { n: 9, label: "dbt", at: n.word("r-dbt", "dbt is a sequel transformation tool"), body: <Dbt c={c} /> },
@@ -326,7 +340,7 @@ export const RapidScene: React.FC = () => {
       <Sfx name="el-pop" at={assumedAt + 4} level={-30} />
       <Sfx name="el-pencil" at={nextAt} level={-34} />
 
-      <Drift from={from} to={n.beat("next").to + 40}>
+      <Drift from={from} to={n.beat("next-many").to + 40}>
         <Kicker at={moreAt}>Quick round</Kicker>
         <Headline lead="Three more." turn="A sentence or two each." at={moreAt} turnAt={eachAt - 2} size={64} />
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={moreAt + 6} end={end} />
@@ -335,7 +349,7 @@ export const RapidScene: React.FC = () => {
         <Spot id={HERO.id} at={assumedAt + 4} left={1150} top={y(420)} width={660} height={358} />
         <Note at={oneAt} x={X0} y={listBottom + h(50)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-            Each answer assumed <b style={{ color: BLUE_INK }}>one machine</b> could hold the data.
+            Every example here ran on <b style={{ color: BLUE_INK }}>one machine</b>.
           </span>
         </Note>
         <Note at={outgrowsAt} x={X0} y={listBottom + h(104)}>

@@ -8,7 +8,7 @@ import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MV, SLOW, thousands } from "./data";
-import { colsOf, DataTable, Drift, geoOf, Listing, listingHeight, MARK_OK, MARK_RED, OK_INK, PlanBox, rowsAt, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, Listing, listingHeight, MARK_OK, MARK_RED, OK_INK, PlanBox, planHeight, rowsAt, TableName, X0 } from "./parts";
 
 const TOP = 300;
 const SIZE = 21;
@@ -20,10 +20,13 @@ const BASE_X = 960;
  * Question 10, and the close. The view's definition; then, as the narration
  * says a day is one row of 366, the plan Postgres printed for a day read
  * from the view (365 rows filtered) beside the same day computed from the
- * orders (997,268 filtered). Then staleness: 500 orders inserted on
- * 2024-12-31, the view's row still saying 2,732 (in red) while the orders
- * hold 3,232; REFRESH, and the cell takes the new count. When to use one
- * lands on the right, and the bridge to Part 3 under it all.
+ * orders (997,268 filtered), each with what it read (366 against 1,000,000),
+ * held while a beat of its own reads the two out. Then staleness: 500
+ * orders inserted on 2024-12-31, the view's row still saying 2,732 and the
+ * old revenue (both in red) while the orders hold 3,232; REFRESH, and the
+ * cells take the new values; under it, who refreshes (Postgres reruns the
+ * query; some warehouses do it in the background). When to use one lands
+ * on the right, and the bridge to Part 3 under it all.
  */
 export const MvScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -38,10 +41,14 @@ export const MvScene: React.FC = () => {
   const daysAt = n.word("mv-fast", "three hundred sixty-six rows");
   const dashAt = n.word("mv-fast", "a dashboard reads one");
   const insteadAt = n.word("mv-fast", "instead of the orders");
+  const lookupAt = n.word("mv-scan", "That lookup reads");
+  const millionAt = n.word("mv-scan", "reads a million");
   const staleAt = n.word("mv-stale", "The price is staleness");
   const addAt = n.word("mv-stale", "Add five hundred orders");
   const stillAt = n.word("mv-stale", "the view still says");
   const refreshAt = n.word("mv-stale", "until it's refreshed");
+  const rerunAt = n.word("mv-refresh", "reruns the whole query");
+  const backgroundAt = n.word("mv-refresh", "some warehouses refresh");
   const useAt = n.word("mv-when", "Use one for");
   const expensiveAt = n.word("mv-when", "an expensive aggregation");
   const oftenAt = n.word("mv-when", "read far more often");
@@ -56,6 +63,8 @@ export const MvScene: React.FC = () => {
   const viewTop = insertTop + listingHeight(MV.insert.length, SIZE) + h(70);
   const vg = geoOf(MV.stale, X0, viewTop, h, { rowH: 48, extra: MV.fresh.rows });
   const ordersCol = MV.stale.cols.indexOf("orders");
+  // The two plans hold until the insert is written in their place.
+  const plansOut = addAt - 4;
   const revenueCol = MV.stale.cols.indexOf("revenue");
 
   return (
@@ -82,14 +91,24 @@ export const MvScene: React.FC = () => {
             <Num>{MV.days}</Num> rows
           </div>
         </Note>
-        <Note at={dashAt - 2} x={X0} y={plansTop - h(40)} out={staleAt}>
+        <Note at={dashAt - 2} x={X0} y={plansTop - h(40)} out={plansOut}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>One day, from the view</span>
         </Note>
-        <PlanBox lines={MV.dayPlan} x={X0} top={plansTop} width={780} size={PLAN} at={dashAt} out={staleAt} marks={[{ line: "Rows Removed", at: dashAt + 14, color: MARK_OK }]} />
-        <Note at={insteadAt - 2} x={BASE_X} y={plansTop - h(40)} out={staleAt}>
+        <PlanBox lines={MV.dayPlan} x={X0} top={plansTop} width={780} size={PLAN} at={dashAt} out={plansOut} marks={[{ line: "Rows Removed", at: dashAt + 14, color: MARK_OK }]} />
+        <Note at={lookupAt} x={X0} y={plansTop + planHeight(MV.dayPlan.length, PLAN) + h(16)} out={plansOut}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            reads <Num>{thousands(MV.dayRead)}</Num> rows
+          </span>
+        </Note>
+        <Note at={insteadAt - 2} x={BASE_X} y={plansTop - h(40)} out={plansOut}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>The same day, from the orders</span>
         </Note>
-        <PlanBox lines={MV.basePlan} x={BASE_X} top={plansTop} width={800} size={PLAN} at={insteadAt} out={staleAt} marks={[{ line: "Rows Removed", at: insteadAt + 14, color: MARK_RED }]} />
+        <PlanBox lines={MV.basePlan} x={BASE_X} top={plansTop} width={800} size={PLAN} at={insteadAt} out={plansOut} marks={[{ line: "Rows Removed", at: insteadAt + 14, color: MARK_RED }]} />
+        <Note at={millionAt} x={BASE_X} y={plansTop + planHeight(MV.basePlan.length, PLAN) + h(16)} out={plansOut}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            reads <Num>{thousands(MV.baseRead)}</Num> rows
+          </span>
+        </Note>
 
         {/* ── Stale until refreshed ── */}
         <Listing lines={MV.insert} x={X0} top={insertTop} width={800} size={SIZE} at={addAt - 2} />
@@ -101,7 +120,10 @@ export const MvScene: React.FC = () => {
           cols={colsOf(MV.stale, { orders: { ink: BLUE_INK }, revenue: { ink: BLUE_INK } })}
           at={stillAt - 4}
           rows={rowsAt(MV.stale.rows, stillAt)}
-          marks={[{ row: 0, col: ordersCol, at: stillAt + 8, out: refreshAt + 8, color: MARK_RED }]}
+          marks={[
+            { row: 0, col: ordersCol, at: stillAt + 8, out: refreshAt + 8, color: MARK_RED },
+            { row: 0, col: revenueCol, at: stillAt + 12, out: refreshAt + 8, color: MARK_RED },
+          ]}
           swaps={[
             { row: 0, col: ordersCol, at: refreshAt + 10, value: MV.fresh.rows[0][ordersCol], color: OK_INK },
             { row: 0, col: revenueCol, at: refreshAt + 12, value: MV.fresh.rows[0][revenueCol], color: OK_INK },
@@ -114,6 +136,12 @@ export const MvScene: React.FC = () => {
         </Note>
         <Note at={refreshAt} x={vg.right + 40} y={vg.rowTop(0) - h(10)}>
           <Listing lines={MV.refresh} x={0} top={0} width={560} size={20} at={refreshAt} />
+          <div style={{ position: "absolute", top: listingHeight(MV.refresh.length, 20) + h(12), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, rerunAt, 10) }}>
+            Postgres reruns the whole query;
+          </div>
+          <div style={{ position: "absolute", top: listingHeight(MV.refresh.length, 20) + h(44), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, backgroundAt, 10) }}>
+            some warehouses refresh it for you, in the background
+          </div>
         </Note>
 
         {/* ── When to use one ── */}

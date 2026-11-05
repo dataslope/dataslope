@@ -50,15 +50,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "explain": 50,000 'pending' orders inserted after the last ANALYZE;
  *     the join's plan estimates 1 row, gets 50,000, and runs a Nested Loop
  *     with 50,000 index lookups (loops=50000); after ANALYZE the estimate is
- *     exactly 50,000 and the plan a Hash Join (every setup sets
- *     default_statistics_target to 10,000, so ANALYZE reads every row and
- *     two full runs of check.mjs give identical results).
+ *     exactly 50,000 and the plan a Hash Join, its hash in one batch (no
+ *     spill), 2,014 kB (every setup sets default_statistics_target to
+ *     10,000, so ANALYZE reads every row and two full runs of check.mjs give
+ *     identical results). Autovacuum would not have analyzed again: its
+ *     settings (50 + 0.1 of the rows, 100,050 changes) are read from the
+ *     same database.
  *   - "index": with an index on customer_id the same query is a Bitmap Heap
  *     Scan reading 20 of the table's 7,360 pages (Heap Blocks: exact=20).
  *     WHERE status = 'shipped' (900,000 rows) stays a Seq Scan beside an
  *     index on status. Inserting 10,000 rows writes 10,000 WAL records with
  *     no index and about four times that with three (EXPLAIN (ANALYZE, WAL)).
- *   - "cover": INCLUDE (amount) gives an Index Only Scan, "Heap Fetches: 0";
+ *   - "cover": with only the customer_id index the plan reads 20 table
+ *     (heap) pages for the amounts; INCLUDE (amount) gives an Index Only
+ *     Scan, "Heap Fetches: 0" (the table was just vacuumed, said on screen);
  *     the covering index is about four times the plain one's size (B-tree
  *     deduplication shrinks the plain one; an INCLUDE index cannot use it).
  *   - "cluster": customer 42's 20 rows sit on 20 pages (ctid); after CLUSTER
@@ -81,7 +86,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     preventing phantoms are from the Postgres docs, "Transaction Isolation".
  *   - "mv": daily_revenue is 366 rows; a day's lookup reads 366 rows, not a
  *     million; 500 orders added on 2024-12-31 leave it at 2,732 orders until
- *     REFRESH, then 3,232.
+ *     REFRESH, then 3,232. That staleness is Postgres's; the narration says
+ *     so, as the page does (some warehouses refresh in the background).
+ *
+ * Engines named without a run of our own, from the page: SQL Server and
+ * MySQL's InnoDB keep a clustered index; warehouses cluster by key; some
+ * engines still prune through a function on the partition column.
  *
  * Written for Drew's ear: "sequel" for SQL, Postgres keywords as words
  * ("explain analyze", "sub plan"), numbers as they are said, and initialisms
@@ -133,16 +143,20 @@ export const script: NarrationScript = {
       text: "Question two. How do you read an explain plan? Each line is a step, and the indented steps run first, feeding the line above them.",
       pauseAfter: 0.5,
     },
+    { id: "explain-cost", text: "Each step carries the planner's cost, in its own units, and the rows it expects.", pauseAfter: 0.6 },
+    { id: "explain-rows", text: "Then compare estimated rows with actual rows." },
+    { id: "explain-stale", text: "Fifty thousand pending orders arrived after the last analyze, too few for autovacuum to run another." },
     {
-      id: "explain-rows",
-      text: "Then compare estimated rows with actual rows. Fifty thousand pending orders arrived after statistics were last gathered. Postgres expected one row, so it picked a nested loop, and ran fifty thousand index lookups.",
+      id: "explain-loop",
+      text: "Postgres expected one row, so it picked a nested loop, and ran fifty thousand index lookups.",
       pauseAfter: 0.7,
     },
     {
       id: "explain-fix",
       text: "Analyze refreshes the statistics. The estimate becomes fifty thousand, and the plan becomes a hash join.",
-      pauseAfter: 0.8,
+      pauseAfter: 0.6,
     },
+    { id: "explain-spill", text: "Also watch for a sort or hash that spills to disk; this hash fit in memory, in one batch.", pauseAfter: 0.8 },
     { id: "index-in", text: "The first fix the scan pointed at: an index." },
 
     // ── 3. Indexes ────────────────────────────────────────────────────────
@@ -175,16 +189,22 @@ export const script: NarrationScript = {
       text: "Question four. What is a covering index? One that holds every column a query needs, so the table itself is never read.",
       pauseAfter: 0.5,
     },
+    { id: "cover-include", text: "This query wants customer ID and amount." },
     {
-      id: "cover-include",
-      text: "This query wants customer ID and amount. Add amount to the index with include, and the plan becomes an index only scan, with zero heap fetches.",
+      id: "cover-heap",
+      text: "With an index on customer ID alone, Postgres still reads twenty pages of the table, its heap, to fetch the amounts.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "cover-add",
+      text: "Add amount to the index with include, and the plan becomes an index only scan, with zero heap fetches.",
       pauseAfter: 0.7,
     },
     {
       id: "cover-cost",
-      text: "The price is size: this index is four times the plain one, and every insert writes all of it. Cover the few queries that run constantly.",
-      pauseAfter: 0.8,
+      text: "The price is size: this index is four times the plain one, and every insert writes the amount into it too.",
     },
+    { id: "cover-few", text: "Cover the few queries that run constantly.", pauseAfter: 0.8 },
 
     // ── 5. Clustered and non-clustered ────────────────────────────────────
     {
@@ -193,7 +213,12 @@ export const script: NarrationScript = {
       text: "Question five. What is the difference between a clustered and a non-clustered index? A clustered index sets the order rows are stored in, so a table gets one.",
       pauseAfter: 0.4,
     },
-    { id: "cluster-many", text: "A non-clustered index is a separate lookup, and you can have many.", pauseAfter: 0.6 },
+    { id: "cluster-many", text: "A non-clustered index is a separate lookup, and you can have many.", pauseAfter: 0.9 },
+    {
+      id: "cluster-engines",
+      text: "Sequel Server and my sequel keep a clustered index; my sequel stores every table in primary key order.",
+      pauseAfter: 0.7,
+    },
     {
       id: "cluster-pg",
       text: "Postgres has no clustered index. Its cluster command sorts the table by an index once. Customer forty-two's twenty orders sat on twenty pages; after cluster, they share one.",
@@ -202,8 +227,9 @@ export const script: NarrationScript = {
     {
       id: "cluster-decay",
       text: "But the order isn't kept: the next order for forty-two lands on the table's last page.",
-      pauseAfter: 0.8,
+      pauseAfter: 0.6,
     },
+    { id: "cluster-warehouse", text: "Warehouses get the same effect from clustering keys.", pauseAfter: 0.8 },
 
     // ── 6. Partition pruning ──────────────────────────────────────────────
     {
@@ -219,9 +245,11 @@ export const script: NarrationScript = {
     },
     {
       id: "prune-fn",
-      text: "Wrap the column in a function, extract month equals three, and pruning is gone: the same total, read from all twelve. Filter on the partition key itself.",
-      pauseAfter: 0.8,
+      text: "Wrap the column in a function, extract month equals three, and pruning is gone: the same total, read from all twelve.",
+      pauseAfter: 0.6,
     },
+    { id: "prune-engines", text: "That's Postgres; some engines still prune it.", pauseAfter: 0.6 },
+    { id: "prune-key", text: "Filter on the partition key itself.", pauseAfter: 0.8 },
 
     // ── 7. Correlated subqueries ──────────────────────────────────────────
     {
@@ -237,14 +265,14 @@ export const script: NarrationScript = {
     },
     {
       id: "corr-fix",
-      text: "Compute the averages once, in a CTE, a common table expression, and join: one hash join, the same ten thousand rows. A window function works too.",
+      text: "Compute the averages once, in a CTE, a common table expression, and join: one hash join, the same ten thousand rows.",
       pauseAfter: 0.6,
     },
-    {
-      id: "corr-duck",
-      text: "Some optimizers do that rewrite themselves. DuckDB, the page's engine, plans the same subquery as a hash join. So read the plan before you rewrite.",
-      pauseAfter: 0.8,
-    },
+    { id: "corr-cost", text: "It reads the table twice: twenty thousand rows, not a hundred million.", pauseAfter: 0.6 },
+    { id: "corr-window", text: "A window function works too.", pauseAfter: 0.6 },
+    { id: "corr-duck", text: "Some optimizers do that rewrite themselves." },
+    { id: "corr-duck-plan", text: "DuckDB, another engine, plans the same subquery as a hash join." },
+    { id: "corr-read", text: "So read the plan before you rewrite.", pauseAfter: 0.8 },
 
     // ── 8. Joining two large tables ───────────────────────────────────────
     {
@@ -258,11 +286,8 @@ export const script: NarrationScript = {
       text: "Then pick the strategy. A hash join builds a hash table from the smaller side, here fifty thousand customers, and streams the orders past it. It's the usual default.",
       pauseAfter: 0.6,
     },
-    {
-      id: "join-merge",
-      text: "A sort-merge join sorts both sides on the key and walks them together, which wins when both are already sorted, or too big to hash in memory.",
-      pauseAfter: 0.6,
-    },
+    { id: "join-merge", text: "A sort-merge join sorts both sides on the key and walks them together,", pauseAfter: 0.8 },
+    { id: "join-merge-wins", text: "It wins when both are already sorted, or too big to hash in memory.", pauseAfter: 0.6 },
     {
       id: "join-dist",
       text: "Across many machines, the cost is moving rows. Broadcast a small table to every machine, or bucket both tables on the join key, so matching rows already sit together.",
@@ -310,8 +335,18 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "mv-scan",
+      text: "That lookup reads three hundred sixty-six rows; the same day from the orders reads a million.",
+      pauseAfter: 1.5,
+    },
+    {
       id: "mv-stale",
       text: "The price is staleness. Add five hundred orders on New Year's Eve, and the view still says two thousand seven hundred thirty-two, until it's refreshed.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "mv-refresh",
+      text: "In Postgres, a refresh reruns the whole query; some warehouses refresh in the background.",
       pauseAfter: 0.6,
     },
     {

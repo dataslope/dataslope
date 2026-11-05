@@ -112,7 +112,8 @@ const Strip: React.FC<{ at: number; scanAt: number; appendAt: number; x: number;
         const yy = top + i * gap;
         const fresh = i >= rows;
         const w = fresh ? ease(frame, appendAt + (i - rows) * 10, 8) : 1;
-        return <line key={i} x1={x} x2={x + width * w} y1={yy} y2={yy} stroke={fresh ? OK : BAR} strokeWidth={fresh ? 3 : 2} opacity={fresh ? 1 : 0.55} />;
+        // Appended rows are data, not an answer: the same blue, drawn solid and thicker.
+        return <line key={i} x1={x} x2={x + width * w} y1={yy} y2={yy} stroke={BAR} strokeWidth={fresh ? 3 : 2} opacity={fresh ? 1 : 0.55} />;
       })}
       {sweep >= 0 ? (
         <rect x={x - 6} y={top - 6 + sweep * (rows * gap)} width={width + 12} height={gap * 3} fill={HIGHLIGHT} opacity={0.8} rx={3} />
@@ -138,7 +139,6 @@ export const OltpScene: React.FC = () => {
   const oltpWordAt = n.word("oltp", "OLTP versus");
   const olapWordAt = n.word("oltp", "OLAP");
   const oltpAt = n.word("oltp", "OLTP, online transaction processing");
-  const appAt = n.word("oltp", "runs the app");
   const shortAt = n.word("oltp", "many short reads and writes");
   const normAt = n.word("oltp", "normalized to third normal form");
   const rowAt = n.word("oltp", "each write touches one row");
@@ -201,7 +201,7 @@ export const OltpScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── OLTP ── */}
-        <PanelHead at={oltpAt - 2} x={X0} y={y(262)} width={760} sub="online transaction processing: the app's database" subAt={appAt}>
+        <PanelHead at={oltpAt - 2} x={X0} y={y(262)} width={760} sub="online transaction processing: the app's database" subAt={oltpAt + 10}>
           OLTP
         </PanelHead>
         <Chip layout={customers} at={normAt - 6} />
@@ -226,7 +226,7 @@ export const OltpScene: React.FC = () => {
         </Note>
 
         {/* ── OLAP ── */}
-        <PanelHead at={olapAt - 2} x={R_X} y={y(262)} width={800} sub="online analytical processing: the warehouse" subAt={historyAt}>
+        <PanelHead at={olapAt - 2} x={R_X} y={y(262)} width={800} sub="online analytical processing: the warehouse" subAt={olapAt + 10}>
           OLAP
         </PanelHead>
         <Chip layout={fact} at={starAt - 6} />
@@ -250,7 +250,7 @@ export const OltpScene: React.FC = () => {
         </Note>
         <Note at={wideAt} x={R_X} y={PROP(92)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            wide tables, <span style={{ opacity: ease(frame, appendAt, 10), color: OK_INK, fontWeight: 650 }}>mostly appended to</span>
+            wide tables, <span style={{ opacity: ease(frame, appendAt, 10), fontWeight: 650 }}>mostly appended to</span>
           </span>
         </Note>
 

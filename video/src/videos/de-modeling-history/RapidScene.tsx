@@ -10,7 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { HERO, mb, RAPID } from "./data";
+import { HERO, mb, RAPID, UUID_STEPS } from "./data";
 import { colsOf, DataTable, Drift, geoOf, Headline, Kicker, MARK, MARK_KEY, OK_INK, Spot, TableName, X0 } from "./parts";
 
 const R_X = 820;
@@ -44,7 +44,7 @@ const Degenerate: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Note at={invoiceAt + 8} x={gl.x} y={gl.rowTop(L.rows.length) + c.h(16)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          <QMono>order_number</QMono> lives on the fact: no table behind it
+          <QMono>invoice_number</QMono> lives on the fact: no table behind it
         </span>
       </Note>
       <TableName g={gd} at={groupAt - 10}>
@@ -201,6 +201,7 @@ const Mini: React.FC<{ c: Ctx }> = ({ c }) => {
   const twentyAt = c.w("r-mini", "twenty rows here");
   const keyAt = c.w("r-mini", "with its own key on the fact");
   const stopsAt = c.w("r-mini", "stops growing a new version");
+  const t4At = c.w("r-mini-t4", "Kimball's Type four");
   const dimC = useEntityLayout({
     x: 1360,
     y: c.y(340),
@@ -241,6 +242,9 @@ const Mini: React.FC<{ c: Ctx }> = ({ c }) => {
           <Num>5</Num> bands × <Num>4</Num> tiers = <Num>{RAPID.mini}</Num> rows
         </span>
       </Note>
+      <Note at={t4At} x={dimD.x} y={dimD.bottom + c.h(56)}>
+        <span style={{ ...note(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Kimball&rsquo;s SCD Type 4</span>
+      </Note>
       <Note at={stopsAt} x={R_X} y={fact.bottom + c.h(30)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
           no new customer version
@@ -255,13 +259,19 @@ const Mini: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 14. Factless fact table ─────────────────────────────────────────────────
 
 const Factless: React.FC<{ c: Ctx }> = ({ c }) => {
+  const frame = useCurrentFrame();
   const noneAt = c.w("r-factless", "no measures at all");
   const eventAt = c.w("r-factless", "one row per event");
   const countAt = c.w("r-factless", "Counting the rows is the measure");
+  const coverAt = c.w("r-factless-gap", "A coverage table of every student enrolled");
+  const minusAt = c.w("r-factless-gap", "minus this one");
+  const cameAt = c.w("r-factless-gap", "who didn't come");
   const A = RAPID.factless;
   const ga = geoOf(A, R_X, c.y(400), c.h, ROWS);
   const C = RAPID.factlessCount;
   const gc = geoOf(C, ga.right + 60, c.y(400), c.h, ROWS);
+  const X = RAPID.absent;
+  const gx = geoOf(X, R_X, c.y(730), c.h, ROWS);
   return (
     <>
       <TableName g={ga} at={noneAt - 2}>
@@ -269,8 +279,16 @@ const Factless: React.FC<{ c: Ctx }> = ({ c }) => {
       </TableName>
       <DataTable g={ga} cols={colsOf(A)} at={noneAt - 2} rows={A.rows.map((cells, i) => ({ cells, at: eventAt + i * 4 }))} />
       <Note at={noneAt + 6} x={ga.x} y={ga.rowTop(A.rows.length) + c.h(16)}>
-        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>keys and a date, no measure column</span>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>names stand in for keys; no measure column</span>
       </Note>
+      <TableName g={gx} at={coverAt}>
+        <QMono>enrollment</QMono>
+        <span style={{ opacity: ease(frame, minusAt, 10) }}>
+          {" "}
+          <QMono>EXCEPT</QMono> <QMono>attendance</QMono>: who didn&rsquo;t come
+        </span>
+      </TableName>
+      <DataTable g={gx} cols={colsOf(X)} at={minusAt} rows={X.rows.map((cells, i) => ({ cells, at: cameAt + i * 3 }))} marks={X.rows.map((_, row) => ({ row, col: 0, at: cameAt + 6 }))} />
       <TableName g={gc} at={countAt - 2}>
         <QMono>COUNT(*)</QMono> per class
       </TableName>
@@ -293,8 +311,11 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
   const costAt = c.w("r-uuid-cost", "The cost shows in the index");
   const randomAt = c.w("r-uuid-cost", "a hundred thousand random UUIDs");
   const twiceAt = c.w("r-uuid-cost", "almost twice the size");
-  const v7At = c.w("r-uuid-cost", "Time-ordered version seven UUIDs");
-  const betweenAt = c.w("r-uuid-cost", "land in between");
+  const widthAt = c.w("r-uuid-why", "Part of that is width");
+  const orderAt2 = c.w("r-uuid-why", "The rest is order");
+  const splitAt = c.w("r-uuid-why", "random keys split pages");
+  const v7At = c.w("r-uuid-why", "Version seven UUIDs");
+  const onlyAt = c.w("r-uuid-why", "pay only for the width");
   const U = RAPID.uuid;
   const keyBox = (top: number, at: number, value: string, name: string, bytes: number, bytesAt: number, kind: string) => (
     <Note at={at} x={R_X} y={top}>
@@ -308,17 +329,28 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
       </div>
     </Note>
   );
-  // The index sizes as bars, longest the random UUIDs'.
+  // The index sizes as bars, longest the random UUIDs'. Under the random
+  // bar, its extra split in two: the wider key (as far as version 7, which
+  // is inserted in order), then random order. Version 7 sits below, clear of
+  // those two labels, and ends where the width ends.
   const BAR_X = R_X + 230;
   const unit = 540 / U.random;
-  const bars = [
-    { name: "sequence", v: U.sequence, at: costAt + 6, fill: BAR, ink: BLUE_INK },
-    { name: "random UUID", v: U.random, at: randomAt + 4, fill: ACCENT, ink: ACCENT_INK },
-    { name: "UUID v7", v: U.v7, at: v7At + 4, fill: ds("blue", 300), ink: BLUE_INK },
-  ];
-  const barTop = c.y(660);
+  const barTop = c.y(630);
   const barH = c.h(40);
   const step = c.h(62);
+  const v7Top = barTop + step + barH + c.h(72);
+  const bars = [
+    { name: "sequence", v: U.sequence, at: costAt + 6, fill: BAR, ink: BLUE_INK, top: barTop },
+    { name: "random UUID", v: U.random, at: randomAt + 4, fill: ACCENT, ink: ACCENT_INK, top: barTop + step },
+    { name: "UUID v7", v: U.v7, at: v7At + 4, fill: ds("blue", 300), ink: BLUE_INK, top: v7Top },
+  ];
+  const spanTop = barTop + step + barH + c.h(6);
+  const spans = [
+    { from: U.sequence, to: U.v7, at: widthAt, head: "wider key", ratio: UUID_STEPS.width, ink: BLUE_INK, lit: widthAt + 10 },
+    { from: U.v7, to: U.random, at: orderAt2, head: "random order", ratio: UUID_STEPS.order, ink: ACCENT_INK, lit: splitAt },
+  ];
+  const guideX = BAR_X + U.v7 * unit;
+  const guide = ease(frame, onlyAt, 14);
   return (
     <>
       {keyBox(c.y(370), seqAt, U.seqSample, "sequence", U.bigint, compactAt, "a bigint")}
@@ -337,9 +369,9 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
           primary key index, <Num>100,000</Num> rows, Postgres <Num>18</Num>
         </span>
       </Note>
-      {bars.map((b, i) => {
+      {bars.map((b) => {
         const p = ease(frame, b.at, 16);
-        const top = barTop + i * step;
+        const top = b.top;
         return (
           <React.Fragment key={b.name}>
             <div style={{ position: "absolute", left: R_X, top, height: barH, display: "flex", alignItems: "center", ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, b.at - 4, 10) }}>
@@ -370,9 +402,36 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
           </React.Fragment>
         );
       })}
-      <Note at={betweenAt} x={BAR_X + U.v7 * unit + 130} y={barTop + 2 * step}>
-        <span style={{ ...note(23, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>in between</span>
-      </Note>
+      {spans.map((sp) => {
+        const p = ease(frame, sp.at, 12);
+        const x0 = BAR_X + sp.from * unit + 3;
+        const x1 = BAR_X + sp.to * unit - 3;
+        if (p <= 0) return null;
+        return (
+          <div key={sp.head} style={{ position: "absolute", left: x0, top: spanTop, width: x1 - x0, opacity: p }}>
+            {/* A bracket under the stretch of bar it explains. */}
+            <div style={{ height: 8, borderLeft: `2px solid ${sp.ink}`, borderRight: `2px solid ${sp.ink}`, borderBottom: `2px solid ${sp.ink}` }} />
+            <div style={{ position: "absolute", left: "50%", top: 14, transform: "translateX(-50%)", textAlign: "center", whiteSpace: "nowrap" }}>
+              <div style={{ ...label(20, sp.ink), fontWeight: 700 }}>{sp.head}</div>
+              <div style={{ ...label(20, sp.ink), fontWeight: 600, opacity: ease(frame, sp.lit, 10) }}>
+                <Num>{sp.ratio.toFixed(2)}</Num>×
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      {guide > 0 ? (
+        <div
+          style={{
+            position: "absolute",
+            left: guideX - 1,
+            top: barTop + step - c.h(6),
+            height: (v7Top + barH + c.h(6) - (barTop + step - c.h(6))) * guide,
+            borderLeft: `2px dashed ${BLUE_INK}`,
+            opacity: 0.8,
+          }}
+        />
+      ) : null}
     </>
   );
 };

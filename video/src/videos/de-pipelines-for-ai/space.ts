@@ -14,9 +14,12 @@ export type P = { x: number; y: number; c: number };
 
 /**
  * `k` clusters of `per` points each in a unit square (0 to 1 both ways),
- * around centres kept apart from each other and from the edges.
+ * around centres kept apart from each other (by `sep`) and from the edges.
+ * A square drawn `aspect` times wider than tall squashes a round cluster
+ * flat; passing that aspect spreads each cluster and keeps the centres apart
+ * by that much more in y, so they are round where they are drawn.
  */
-export const clusters = (seed: number, k: number, per: number, spread: number) => {
+export const clusters = (seed: number, k: number, per: number, spread: number, aspect = 1, sep = 0.24) => {
   const rand = mulberry32(seed);
   const gauss = () => {
     const u = Math.max(1e-9, rand());
@@ -26,13 +29,13 @@ export const clusters = (seed: number, k: number, per: number, spread: number) =
   const centres: { x: number; y: number }[] = [];
   while (centres.length < k) {
     const c = { x: 0.12 + 0.76 * rand(), y: 0.12 + 0.76 * rand() };
-    if (centres.every((o) => Math.hypot(o.x - c.x, o.y - c.y) > 0.24)) centres.push(c);
+    if (centres.every((o) => Math.hypot(o.x - c.x, (o.y - c.y) / aspect) > sep)) centres.push(c);
   }
   const points: P[] = [];
   centres.forEach((c, ci) => {
     for (let i = 0; i < per; i++) {
       const x = Math.min(0.98, Math.max(0.02, c.x + spread * gauss()));
-      const y = Math.min(0.98, Math.max(0.02, c.y + spread * gauss()));
+      const y = Math.min(0.98, Math.max(0.02, c.y + spread * aspect * gauss()));
       points.push({ x, y, c: ci });
     }
   });
@@ -68,4 +71,25 @@ export const graphEdges = (points: readonly P[], k: number) => {
 export const tenantOf = (seed: number, count: number, share: number) => {
   const rand = mulberry32(seed);
   return Array.from({ length: count }, () => rand() < share);
+};
+
+/**
+ * A greedy search through a navigable graph, as HNSW's is: from `start`,
+ * hop to whichever point within `reach[i]` of the current one is nearest
+ * (x, y), long hops first and shorter ones after (the upper layers' long
+ * links, then the bottom layer's short ones), until no hop gets nearer.
+ * Returns the path, by index.
+ */
+export const greedyWalk = (points: readonly { x: number; y: number }[], start: number, x: number, y: number, reach: readonly number[]) => {
+  const dq = (i: number) => Math.hypot(points[i].x - x, points[i].y - y);
+  const path = [start];
+  let cur = start;
+  for (const r of reach) {
+    let best = cur;
+    points.forEach((p, i) => {
+      if (Math.hypot(p.x - points[cur].x, p.y - points[cur].y) <= r && dq(i) < dq(best)) best = i;
+    });
+    if (best !== cur) path.push((cur = best));
+  }
+  return path;
 };

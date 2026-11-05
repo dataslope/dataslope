@@ -1,10 +1,10 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { ease, map } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CodeSpan, Cross, Drift, OK, OK_INK, pulse, X0 } from "./parts";
@@ -19,14 +19,16 @@ const NIGHTS = [
   { name: "Wednesday", start: 1, end: 6.75 },
 ];
 const STRIP = 14;
-const LATE_DAY = 8;
+const LATE_DAYS = [8];
+const ON_TIME = STRIP - LATE_DAYS.length;
 
 /**
  * Question 9. An SLA as the page's example states it: daily_orders fresh by
  * 06:00 UTC. A night that finishes before the deadline and one that misses
- * it, which a deadline callback turns into an alert; then the page's three
- * ways to enforce it, and the SLA tracked night after night as an objective
- * rather than met or missed once.
+ * it, which a deadline callback turns into an alert at 06:00, while that run
+ * is still going; then the page's three ways to enforce it, and the SLA
+ * tracked night after night as an objective, an SLO, rather than met or
+ * missed once.
  */
 export const SlaScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -47,10 +49,11 @@ export const SlaScene: React.FC = () => {
     { at: n.word("sla-enforce", "and priority"), lead: "priority:", text: "critical pipelines get compute first" },
   ];
   const missAt = n.word("sla-enforce", "misses its target");
-  const trackAt = n.word("sla-enforce", "track it over time");
-  const objAt = n.word("sla-enforce", "as an objective");
-  const oneOffAt = n.word("sla-enforce", "not a one-off alert");
-  const end = n.beat("sla-enforce").to;
+  const trackAt = n.word("sla-slo", "track it over time");
+  const objAt = n.word("sla-slo", "as an objective");
+  const sloAt = n.word("sla-slo", "an SLO");
+  const oneOffAt = n.word("sla-slo", "not a one-off alert");
+  const end = n.beat("sla-slo").to;
 
   const axisY = y(520);
   const rowY = (i: number) => y(394) + i * h(66);
@@ -94,8 +97,13 @@ export const SlaScene: React.FC = () => {
             </g>
           ))}
           {NIGHTS.map((nt, i) => {
-            const p = ease(frame, drawAt[i] + 2, i ? 40 : 20);
-            const endH = nt.start + (nt.end - nt.start) * p;
+            // Wednesday reaches the deadline as the callback fires, and runs on.
+            const endH =
+              i === 0
+                ? nt.start + (nt.end - nt.start) * ease(frame, drawAt[i] + 2, 20)
+                : frame < missAt
+                  ? map(frame, [drawAt[i] + 2, missAt], [nt.start, DEADLINE])
+                  : map(frame, [missAt, missAt + 30], [DEADLINE, nt.end]);
             const blueEnd = Math.min(endH, DEADLINE);
             return (
               <g key={nt.name}>
@@ -139,18 +147,36 @@ export const SlaScene: React.FC = () => {
             <CodeSpan size={22}>daily_orders</CodeSpan> fresh by 06:00 UTC
           </span>
         </Note>
-        {frame >= missAt + 2 ? (
-          <div style={{ position: "absolute", left: tx(NIGHTS[1].end) + 12, top: rowY(1) - 13 }}>
-            <Cross at={missAt + 2} size={26} />
+        {/* The callback fires at the deadline, while the run is still going. */}
+        {frame >= missAt ? (
+          <div
+            style={{
+              position: "absolute",
+              left: tx(DEADLINE) - 18,
+              top: rowY(1) - 18,
+              width: 36,
+              height: 36,
+              boxSizing: "border-box",
+              borderRadius: 18,
+              border: `2.4px solid ${ACCENT}`,
+              background: PAPER,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: ease(frame, missAt, 6),
+            }}
+          >
+            <Cross at={missAt + 2} size={20} />
           </div>
         ) : null}
-        <Note at={missAt + 6} x={tx(NIGHTS[1].end) + 50} y={rowY(1) - 20}>
+        <Note at={missAt + 6} x={tx(DEADLINE) - 30} y={rowY(1) - 19} align="right">
           <span
             style={{
               display: "inline-block",
-              padding: "3px 12px",
+              padding: "2px 12px",
               border: `2.4px solid ${ACCENT}`,
               borderRadius: 8,
+              background: PAPER,
               ...note(22, ACCENT_INK),
               fontWeight: 700,
               whiteSpace: "nowrap",
@@ -183,7 +209,7 @@ export const SlaScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           {Array.from({ length: STRIP }, (_, i) => {
             const p = ease(frame, trackAt + i * 1.5, 8);
-            const late = i === LATE_DAY;
+            const late = LATE_DAYS.includes(i);
             return (
               <rect
                 key={i}
@@ -200,7 +226,10 @@ export const SlaScene: React.FC = () => {
         </svg>
         <Note at={objAt} x={X0 + STRIP * 42 + 20} y={y(822)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            measured night after night: an objective
+            an objective
+            <span style={{ opacity: ease(frame, sloAt, 10) }}>
+              , an <b>SLO</b>: <Num>{ON_TIME}</Num> of <Num>{STRIP}</Num> nights on time
+            </span>
             <span style={{ color: INK_SOFT, opacity: ease(frame, oneOffAt, 10) }}>, not a one-off alert</span>
           </span>
         </Note>

@@ -25,8 +25,9 @@ const EXCEPT_SIZE = 26;
  * and the comparison it stands for, written out for Di, shows why; NOT
  * EXISTS and the left join that keeps the unmatched rows both find her. Then
  * EXCEPT, run here on the same tables: it compares the two sides as sets,
- * where a null matches a null, so the guest order can't block it, and it
- * returns Di's id, 4, under the tables it came from.
+ * removing a left row only where an equal row is on the right, and the guest
+ * order's null equals no customer's id, so it can't block one; it returns
+ * Di's id, 4, under the tables it came from.
  */
 export const AntiScene: React.FC = () => {
   const n = useNarration();
@@ -194,10 +195,12 @@ export const AntiScene: React.FC = () => {
           />
           <Note at={blockAt} x={LIST_X} y={y(TOP) + exceptH + h(30)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-              A set difference: <Mono>NULL</Mono> matches <Mono>NULL</Mono>,
+              A set difference: a row goes only if an equal row is on the right.
             </span>
             <br />
-            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>so the guest order can&apos;t block it.</span>
+            <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+              The guest order&apos;s <Mono>NULL</Mono> equals no customer&apos;s id.
+            </span>
           </Note>
           <Note at={joinBackAt - 2} x={LIST_X} y={y(TOP) + exceptH + h(124)}>
             <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>

@@ -93,15 +93,30 @@ export const SLOW = {
 
 const stale = plan("explain", "stale");
 const fresh = plan("explain", "fresh");
+const autoThreshold = scalar("explain", "autovacuum", "threshold");
+const autoScale = scalar("explain", "autovacuum", "scale_factor");
 export const EXPLAIN = {
   pending: scalar("explain", "pending"),
   query: explained("explain", "stale"),
   stale,
+  /** The stale plan with its top node's "cost=…" kept, as Postgres printed
+   *  it (only "width=…" trimmed): the one cost the video reads aloud. */
+  staleShown: [table("explain", "stale").rows[0][0].replace(/ width=\d+/, ""), ...stale.slice(1)],
+  staleCost: table("explain", "stale").rows[0][0].match(/cost=\S+/)![0],
   fresh,
   staleEstimate: planNumber(stale, "Seq Scan on orders", "rows"),
   staleActual: planNumber(stale, "Seq Scan on orders", "actual rows"),
   lookups: planNumber(stale, "Index Scan", "loops"),
   freshEstimate: planNumber(fresh, "Seq Scan on orders", "rows"),
+  /** The fresh plan's hash: one batch (nothing spilled to disk), in kB. */
+  batches: planNumber(fresh, "Buckets", "Batches"),
+  hashKb: planNumber(fresh, "Buckets", "Memory Usage"),
+  /** Rows that must change before autovacuum analyzes the million-row
+   *  table again: its threshold plus its scale factor times the rows the
+   *  last ANALYZE counted. */
+  autoThreshold,
+  autoScale,
+  autoAfter: Math.round(autoThreshold + autoScale * scalar("slow", "sizes", "orders")),
 };
 
 // ── 3. Indexes ──────────────────────────────────────────────────────────────
@@ -128,7 +143,8 @@ const coverSizes = table("cover", "sizes");
 const sizeOf = (name: string) => {
   const row = coverSizes.rows.find((r) => r[0] === name);
   if (!row) throw new Error(`no size for ${name}`);
-  return { bytes: Number(row[1]), pretty: row[2] };
+  // In MB (2^20 bytes, as pg_size_pretty counts), so the two sizes share a unit.
+  return { bytes: Number(row[1]), pretty: row[2], mb: `${(Number(row[1]) / 2 ** 20).toFixed(1)} MB` };
 };
 export const COVER = {
   /** Customer 42's rows, the two columns the query asks for. */
@@ -136,6 +152,8 @@ export const COVER = {
   include: lines("cover", "include"),
   query: explained("cover", "after"),
   before: plan("cover", "before"),
+  /** The table pages the plan without INCLUDE read, to fetch the amounts. */
+  heapBlocks: planNumber(plan("cover", "before"), "Heap Blocks", "exact"),
   after: plan("cover", "after"),
   plain: sizeOf("orders_customer_idx"),
   covering: sizeOf("orders_customer_amount_idx"),
@@ -180,6 +198,9 @@ export const PRUNE = {
 // ── 7. Correlated subqueries ────────────────────────────────────────────────
 
 const corrPlan = plan("corr", "correlatedPlan");
+const rewritePlan = plan("corr", "rewritePlan");
+/** The rewrite's scans of employees: one for the join, one for the CTE. */
+const rewriteScans = rewritePlan.filter((l) => /Seq Scan on employees\b/.test(l));
 const duck = (results.figures as unknown as { corrDuck: { operators: string[]; version: string } }).corrDuck;
 export const CORR = {
   employees: scalar("corr", "rows", "employees"),
@@ -189,7 +210,9 @@ export const CORR = {
   loops: planNumber(corrPlan, "Seq Scan on employees e2", "loops"),
   perLoop: planNumber(corrPlan, "Seq Scan on employees e2", "actual rows") + planNumber(corrPlan, "Rows Removed", "Filter"),
   rewrite: lines("corr", "rewrite"),
-  rewritePlan: plan("corr", "rewritePlan"),
+  rewritePlan,
+  rewriteScans: rewriteScans.length,
+  rewriteRows: rewriteScans.map((l) => planNumber([l], "Seq Scan", "actual rows")),
   differ: scalar("corr", "differ"),
   duckOps: duck.operators,
   duckVersion: duck.version,
@@ -209,12 +232,19 @@ export const JOIN = {
 
 // ── 10. Materialized views ──────────────────────────────────────────────────
 
+const dayPlan = plan("mv", "dayPlan");
+const basePlan = plan("mv", "basePlan");
+/** Rows a plan's scan read: the rows it kept plus the rows its filter removed. */
+const scanned = (p: readonly string[], scan: string) => planNumber(p, scan, "actual rows") + planNumber(p, "Rows Removed", "Filter");
 export const MV = {
   create: lines("mv", "create"),
   days: scalar("mv", "rows"),
   day: explained("mv", "dayPlan"),
-  dayPlan: plan("mv", "dayPlan"),
-  basePlan: plan("mv", "basePlan"),
+  dayPlan,
+  basePlan,
+  /** What a day's lookup reads from the view (366) and from the orders. */
+  dayRead: scanned(dayPlan, "Seq Scan on daily_revenue"),
+  baseRead: scanned(basePlan, "Seq Scan on orders"),
   view: table("mv", "day"),
   insert: lines("mv", "insert"),
   stale: table("mv", "stale"),

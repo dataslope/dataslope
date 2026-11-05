@@ -122,7 +122,17 @@ export const TYPE0 = {
   later: query("type0", "later"),
   laterCount: written("type0", "later"),
   rows: table("type0", "rows"),
+  /** Beside a Type 2 city: the new version copies signup_date from the row
+   *  it closes, whatever the source sent. */
+  mixStaged: table("type0mix", "staged"),
+  mixRows: table("type0mix", "rows"),
 };
+{
+  const sent = cell(TYPE0.mixStaged, 0, "signup_date");
+  const kept = TYPE0.mixRows.rows.map((_, i) => cell(TYPE0.mixRows, i, "signup_date"));
+  // The narration: each new version copies the date "from the row it closes, not from the source".
+  if (kept.length !== 2 || kept[1] !== kept[0] || kept[1] === sent) throw new Error("the new version no longer copies signup_date from the row it closes");
+}
 
 // ── 4. Types 4 and 6 ────────────────────────────────────────────────────────
 
@@ -160,6 +170,8 @@ export const SNAP = {
   snapshot: query("snap", "snapshot"),
   snapshotRows: table("snap", "snapshotRows"),
   paidThenCancelled: query("snap", "paidThenCancelled"),
+  /** The periodic snapshot: each order's state at the end of each day. */
+  daily: table("snap", "dailyRows"),
   logRows: Number(cell(table("snap", "counts"), 0, "log_rows")),
   snapshotCount: Number(cell(table("snap", "counts"), 0, "snapshot_rows")),
 };
@@ -192,6 +204,8 @@ export const RAPID = {
   mini: Number(table("rapid", "mini").rows[0][0]),
   factless: table("rapid", "factless"),
   factlessCount: query("rapid", "factlessCount"),
+  /** Everyone enrolled, minus everyone who came. */
+  absent: query("rapid", "absent"),
   uuid: {
     /** Bytes per key, as Postgres stores them. */
     bigint: Number(cell(uuidBytes, 0, "bigint_bytes")),
@@ -200,7 +214,11 @@ export const RAPID = {
     sequence: Number(cell(uuidIndex, 0, "sequence")),
     random: Number(cell(uuidIndex, 0, "random_uuid")),
     v7: Number(cell(uuidIndex, 0, "uuid_v7")),
-    sample: table("uuid", "sample").rows[0][0],
+    /** The random keys again, indexed in one sorted build. */
+    rebuilt: Number(cell(table("uuid", "rebuilt"), 0, "random_uuid_rebuilt")),
+    /** One gen_random_uuid() value, recorded; Postgres reads its version. */
+    sample: cell(table("uuid", "sample"), 0, "id"),
+    sampleVersion: Number(cell(table("uuid", "sample"), 0, "version")),
     seqSample: table("uuid", "seqSample").rows[0][0],
   },
 };
@@ -208,6 +226,20 @@ const ratio = RAPID.uuid.random / RAPID.uuid.sequence;
 // The narration says "almost twice", and "in between" for version 7.
 if (ratio < 1.75 || ratio >= 2) throw new Error(`random UUID index is ${ratio.toFixed(2)}x the sequence's; the narration says almost twice`);
 if (!(RAPID.uuid.v7 > RAPID.uuid.sequence && RAPID.uuid.v7 < RAPID.uuid.random)) throw new Error("uuid v7 no longer lands in between");
+if (RAPID.uuid.sampleVersion !== 4) throw new Error(`the sample UUID is version ${RAPID.uuid.sampleVersion}, not a random (version 4) one`);
+/** The two steps from the sequence's index to the random UUIDs': the wider
+ *  key (sequence to version 7, both inserted in order), then random order
+ *  (version 7 to random, the same width). */
+export const UUID_STEPS = {
+  width: RAPID.uuid.v7 / RAPID.uuid.sequence,
+  order: RAPID.uuid.random / RAPID.uuid.v7,
+};
+// The narration: version 7 "pays only for the width". The random keys built
+// in one sorted pass come out the size of version 7's index, so all of the
+// rest is the order they arrived in.
+if (Math.abs(RAPID.uuid.rebuilt / RAPID.uuid.v7 - 1) > 0.02) throw new Error("random keys indexed in order no longer match uuid v7's index; the extra is not all order");
+// "Sixteen bytes against eight".
+if (RAPID.uuid.uuid !== 2 * RAPID.uuid.bigint) throw new Error("a UUID is no longer twice a bigint's width");
 
 /** Bytes as megabytes, to one decimal. */
 export const mb = (bytes: number) => (bytes / 1e6).toFixed(1);

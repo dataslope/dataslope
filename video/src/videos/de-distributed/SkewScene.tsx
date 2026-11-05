@@ -31,7 +31,10 @@ const MAX_AFTER = SKEW.after.indexOf(SKEW.maxAfter);
  * by hash of the key, a "guest" key on 30% of them. Its partition holds
  * 387,836 rows, 3.1 times the 125,000 average. Salted with a suffix 0 to 7,
  * the guest's rows spread over all eight, and the largest holds about the
- * average, which never moved. Then the two-step count, and the other fixes.
+ * average, which never moved. Then what salting needs next: an aggregation
+ * in two steps (one that cannot combine locally; a count needs no salt, as
+ * question 12 shows), and in a join, the other side's guest rows copied once
+ * per suffix. Then the other fixes, AQE's being for joins.
  */
 export const SkewScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -63,9 +66,13 @@ export const SkewScene: React.FC = () => {
   const twoAt = n.word("skew-steps", "aggregate in two steps");
   const saltedAt = n.word("skew-steps", "by the salted key");
   const thenAt = n.word("skew-steps", "and then by the key");
-  const nullsAt = n.word("skew-steps", "handle nulls and stand-in keys separately");
-  const aqeAt = n.word("skew-steps", "adaptive query execution");
-  const end = n.beat("skew-steps").to;
+  const joinAt = n.word("skew-join", "In a join");
+  const copyAt = n.word("skew-join", "copy the other side's guest rows");
+  const matchAt = n.word("skew-join", "still finds its match");
+  const nullsAt = n.word("skew-aqe", "handle nulls and stand-in keys separately");
+  const aqeAt = n.word("skew-aqe", "adaptive query execution");
+  const splitAt = n.word("skew-aqe", "split skewed join partitions");
+  const end = n.beat("skew-aqe").to;
 
   const sx = (i: number) => X0 + i * (BAR_W + GAP);
   const sy: Scale = { lo: 0, hi: 400_000, a: y(872), b: y(372) };
@@ -90,6 +97,7 @@ export const SkewScene: React.FC = () => {
       <Sfx name="el-chime" at={largestAt + 6} level={-36} />
       <Sfx name="el-tap" at={saltedAt} level={-37} />
       <Sfx name="el-tap" at={thenAt} level={-37} />
+      <Sfx name="el-pop" at={copyAt + 6} level={-37} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={9} at={qAt - 4} textAt={textAt - 4} size={60}>
@@ -99,7 +107,7 @@ export const SkewScene: React.FC = () => {
         {/* ── The model's eight partitions ── */}
         <Note at={modelAt - 2} x={120} y={y(316)}>
           <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
-            A model: rows per partition, <Num>{count(SKEW.rows)}</Num> rows in <Num>{SKEW.partitions}</Num>
+            A model: rows per partition by user key, <Num>{count(SKEW.rows)}</Num> rows in <Num>{SKEW.partitions}</Num>
           </span>
         </Note>
         <Axes
@@ -208,26 +216,56 @@ export const SkewScene: React.FC = () => {
         <Note at={stageAt - 2} x={R_X} y={y(536)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the stage waits for the largest</span>
         </Note>
-        <Note at={twoAt - 2} x={R_X} y={y(616)}>
-          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>then count in two steps</span>
-        </Note>
-        <Note at={saltedAt} x={R_X} y={y(660)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>1</b> by salted key: <Num>{SKEW.salts}</Num> partials of about <Num>{count(Math.round(SKEW.total / SKEW.salts / 100) * 100)}</Num>
+        <Note at={twoAt - 2} x={R_X} y={y(604)}>
+          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            aggregate in two steps
+            <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}>, if it can&apos;t combine locally</span>
           </span>
         </Note>
-        <Note at={thenAt} x={R_X} y={y(700)}>
+        <Note at={saltedAt} x={R_X} y={y(646)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>2</b> by key: guest <Num>{count(SKEW.total)}</Num>
+            <b style={{ color: OK_INK }}>1</b> by salted key
+            <span style={{ opacity: ease(frame, thenAt, 10) }}>
+              {", then "}
+              <b style={{ color: OK_INK }}>2</b> by key
+            </span>
           </span>
         </Note>
-        <Note at={nullsAt - 2} x={R_X} y={y(780)}>
+        <Note at={joinAt - 2} x={R_X} y={y(700)}>
+          <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap", ...note(24, INK) }}>
+            <b>in a join:</b>
+            <span style={{ opacity: ease(frame, copyAt, 10), display: "flex", gap: 10, alignItems: "center" }}>
+              <span style={{ ...note(22, INK_SOFT) }}>the other side&apos;s</span>
+              <Chip size={21} mono>
+                guest
+              </Chip>
+              <span>→</span>
+            </span>
+            <span style={{ opacity: ease(frame, copyAt + 10, 10) }}>
+              <Chip size={21} mono>
+                guest#0
+              </Chip>{" "}
+              …{" "}
+              <Chip size={21} mono>
+                guest#7
+              </Chip>
+            </span>
+          </span>
+        </Note>
+        <Note at={matchAt - 2} x={R_X} y={y(752)}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>every salted row still finds its match</span>
+        </Note>
+        <Note at={nullsAt - 2} x={R_X} y={y(814)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             or: handle nulls and stand-in keys separately
           </span>
         </Note>
-        <Note at={aqeAt - 2} x={R_X} y={y(820)}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>or: adaptive query execution splits skewed partitions</span>
+        <Note at={aqeAt - 2} x={R_X} y={y(856)}>
+          <span style={{ ...note(23, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
+            or: adaptive query execution<span style={{ opacity: ease(frame, splitAt, 10) }}> splits skewed join partitions</span>
+            <br />
+            <span style={{ ...note(21, INK_SOFT), opacity: ease(frame, splitAt + 8, 10) }}>re-planning while the job runs</span>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

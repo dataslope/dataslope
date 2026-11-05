@@ -253,6 +253,30 @@ results.figures.type0 = await figure(
   },
 );
 
+// 3b. Type 0 beside a Type 2 column (the video's own): in a dimension that
+//    versions the city, customer_id is not unique, so ON CONFLICT never fires.
+//    Type 0 there means each new version copies signup_date from the row it
+//    closes, and the date the source sends is ignored.
+results.figures.type0mix = await figure(
+  `CREATE TABLE dim_customer (
+  customer_key INTEGER,
+  customer_id  INTEGER,
+  city         VARCHAR,
+  signup_date  DATE,
+  is_current   BOOLEAN
+);
+INSERT INTO dim_customer VALUES (1001, 42, 'Boston', DATE '2022-01-01', true);
+CREATE TABLE staged_customer (customer_id INTEGER, city VARCHAR, signup_date DATE);
+INSERT INTO staged_customer VALUES (42, 'Austin', DATE '2023-06-30');`,
+  {
+    staged: "SELECT customer_id, city, signup_date FROM staged_customer;",
+    insert:
+      "INSERT INTO dim_customer\nSELECT 1087, s.customer_id, s.city, d.signup_date, true\nFROM staged_customer s\nJOIN dim_customer d\n  ON d.customer_id = s.customer_id AND d.is_current;",
+    close: "UPDATE dim_customer SET is_current = false\nWHERE customer_key = 1001;",
+    rows: "SELECT customer_key, city, signup_date\nFROM dim_customer\nORDER BY customer_key;",
+  },
+);
+
 // 4. Types 4 and 6, built from the page's Type 2 table. Type 4: the main
 //    table keeps only current values, history goes to a table of its own.
 //    Type 6: Type 2's rows, plus a current-value column on every row.
@@ -285,13 +309,17 @@ INSERT INTO dim_customer VALUES
   (2001, 99, 'Denver', false);
 CREATE TABLE staged_orders (order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2));
 INSERT INTO staged_orders VALUES
-  (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);`,
+  (201, 42, 200.00), (202, 99, 500.00), (203, 77, 410.00);
+CREATE SEQUENCE key_seq START 2002;`,
   {
     staged: "SELECT order_id, customer_id, amount FROM staged_orders ORDER BY order_id;",
     dimBefore: "SELECT customer_key, customer_id, city, inferred FROM dim_customer ORDER BY customer_key;",
     load: "SELECT o.order_id, d.customer_key, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id\nORDER BY o.order_id;",
     loadSum: "SELECT SUM(o.amount) AS loaded,\n  (SELECT SUM(amount) FROM staged_orders) AS staged\nFROM staged_orders o\nJOIN dim_customer d ON d.customer_id = o.customer_id;",
-    placeholder: "INSERT INTO dim_customer VALUES\n  (2002, 77, 'Unknown', true);",
+    // Before the key lookup: a placeholder for every staged customer the
+    // dimension lacks (here only 77), under a key from the sequence.
+    placeholder:
+      "INSERT INTO dim_customer\nSELECT nextval('key_seq'), customer_id,\n       'Unknown', true\nFROM (SELECT DISTINCT customer_id\n      FROM staged_orders) o\nWHERE NOT EXISTS (\n  SELECT 1 FROM dim_customer d\n  WHERE d.customer_id = o.customer_id);",
     dimMid: "SELECT customer_key, customer_id, city, inferred FROM dim_customer ORDER BY customer_key;",
     reload:
       "CREATE TABLE fact_orders AS\nSELECT o.order_id, d.customer_key, o.amount\nFROM staged_orders o\nJOIN dim_customer d\n  ON d.customer_id = o.customer_id;",
@@ -320,9 +348,15 @@ INSERT INTO order_events VALUES
     snapshot:
       "CREATE TABLE order_snapshot AS\nSELECT order_id, status\nFROM order_events\nQUALIFY ROW_NUMBER() OVER (\n  PARTITION BY order_id ORDER BY changed_at DESC) = 1;",
     snapshotRows: "SELECT order_id, status FROM order_snapshot ORDER BY order_id;",
+    // Paid, then cancelled: the timestamps, not just both statuses, decide.
     paidThenCancelled:
-      "SELECT order_id\nFROM order_events\nGROUP BY order_id\nHAVING bool_or(status = 'paid')\n   AND bool_or(status = 'cancelled');",
+      "SELECT order_id\nFROM order_events p JOIN order_events c USING (order_id)\nWHERE p.status = 'paid' AND c.status = 'cancelled'\n  AND p.changed_at < c.changed_at;",
     counts: "SELECT (SELECT COUNT(*) FROM order_events) AS log_rows,\n  (SELECT COUNT(*) FROM order_snapshot) AS snapshot_rows;",
+    // The periodic snapshot (Part 3's kind): each order's state at the end of
+    // each day. It keeps a row per day, and still no "paid" for 502.
+    daily:
+      "CREATE TABLE order_daily_snapshot AS\nSELECT e.order_id, d.snapshot_date,\n       arg_max(e.status, e.changed_at) AS status\nFROM (VALUES (DATE '2024-06-01'), (DATE '2024-06-02')) d(snapshot_date)\nJOIN order_events e ON e.changed_at < d.snapshot_date + INTERVAL 1 DAY\nGROUP BY e.order_id, d.snapshot_date;",
+    dailyRows: "SELECT order_id, snapshot_date, status\nFROM order_daily_snapshot\nORDER BY order_id, snapshot_date;",
   },
 );
 
@@ -358,7 +392,7 @@ INSERT INTO order_promotion_bridge VALUES
 
 // The quick round's small tables (all the video's own).
 results.figures.rapid = await figure(
-  `CREATE TABLE fact_order_lines (order_number VARCHAR, product VARCHAR, amount DECIMAL(10,2));
+  `CREATE TABLE fact_order_lines (invoice_number VARCHAR, product VARCHAR, amount DECIMAL(10,2));
 INSERT INTO fact_order_lines VALUES
   ('INV-1001', 'kettle', 40.00), ('INV-1001', 'mugs', 18.00),
   ('INV-1002', 'teapot', 35.00);
@@ -372,10 +406,16 @@ CREATE TABLE attendance (student VARCHAR, class VARCHAR, class_date DATE);
 INSERT INTO attendance VALUES
   ('Ada', 'Databases', DATE '2024-09-02'),
   ('Ben', 'Databases', DATE '2024-09-02'),
-  ('Ada', 'Statistics', DATE '2024-09-03');`,
+  ('Ada', 'Statistics', DATE '2024-09-03');
+CREATE TABLE enrollment (student VARCHAR, class VARCHAR, class_date DATE);
+INSERT INTO enrollment VALUES
+  ('Ada', 'Databases', DATE '2024-09-02'),
+  ('Ben', 'Databases', DATE '2024-09-02'),
+  ('Ada', 'Statistics', DATE '2024-09-03'),
+  ('Ben', 'Statistics', DATE '2024-09-03');`,
   {
-    lines: "SELECT order_number, product, amount FROM fact_order_lines;",
-    degenerate: "SELECT order_number, COUNT(*) AS lines, SUM(amount) AS total\nFROM fact_order_lines\nGROUP BY order_number\nORDER BY order_number;",
+    lines: "SELECT invoice_number, product, amount FROM fact_order_lines;",
+    degenerate: "SELECT invoice_number, COUNT(*) AS lines, SUM(amount) AS total\nFROM fact_order_lines\nGROUP BY invoice_number\nORDER BY invoice_number;",
     junk:
       "SELECT COUNT(*) AS junk_rows\nFROM (VALUES ('card'), ('cash'), ('voucher')) p(payment),\n     (VALUES (true), (false)) g(is_gift),\n     (VALUES ('web'), ('store')) c(channel);",
     shipments: "SELECT order_id, order_date_key, ship_date_key FROM fact_shipments;",
@@ -386,6 +426,8 @@ INSERT INTO attendance VALUES
       "SELECT COUNT(*) AS mini_rows\nFROM (VALUES ('18-24'), ('25-34'), ('35-49'), ('50-64'), ('65+')) a(age_band),\n     (VALUES ('low'), ('middle'), ('high'), ('top')) i(income_tier);",
     factless: "SELECT student, class, class_date FROM attendance ORDER BY class_date, student;",
     factlessCount: "SELECT class, COUNT(*) AS attended\nFROM attendance\nGROUP BY class\nORDER BY class;",
+    // The coverage use: everyone enrolled, minus everyone who came.
+    absent: "SELECT student, class, class_date FROM enrollment\nEXCEPT\nSELECT student, class, class_date FROM attendance;",
   },
 );
 
@@ -405,8 +447,16 @@ INSERT INTO uuid7_keys SELECT uuidv7() FROM generate_series(1, 100000) g;`,
     bytes: "SELECT pg_column_size(1::integer) AS integer_bytes,\n  pg_column_size(1::bigint) AS bigint_bytes,\n  pg_column_size(gen_random_uuid()) AS uuid_bytes;",
     index:
       "SELECT pg_relation_size('seq_keys_pkey') AS sequence,\n  pg_relation_size('uuid_keys_pkey') AS random_uuid,\n  pg_relation_size('uuid7_keys_pkey') AS uuid_v7;",
-    sample: "SELECT id FROM uuid_keys ORDER BY id LIMIT 1;",
+    // One value gen_random_uuid() returned on this engine, recorded here so
+    // the run is repeatable; Postgres confirms it is version 4. (The md5 keys
+    // above scatter like random ones, but are not valid version-4 UUIDs.)
+    sample:
+      "SELECT 'bb88346f-8c24-47db-9b66-2abf63ac6cc9'::uuid AS id,\n  uuid_extract_version('bb88346f-8c24-47db-9b66-2abf63ac6cc9'::uuid) AS version;",
     seqSample: "SELECT id FROM seq_keys ORDER BY id DESC LIMIT 1;",
+    // The same random keys, indexed in one sorted build instead of one at a
+    // time: what is left of their extra size is the key's width alone.
+    rebuilt:
+      "CREATE TABLE uuid_rebuilt (id uuid);\nINSERT INTO uuid_rebuilt SELECT id FROM uuid_keys;\nALTER TABLE uuid_rebuilt ADD PRIMARY KEY (id);\nSELECT pg_relation_size('uuid_rebuilt_pkey') AS random_uuid_rebuilt;",
   },
 );
 

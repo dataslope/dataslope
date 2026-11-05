@@ -43,8 +43,7 @@ export const HookScene: React.FC = () => {
   const lineAt = n.word("hook-fit", "Read it one line at a time");
   const holdsAt = n.word("hook-fit", "memory only ever holds a line");
   const checksAt = n.word("plan", "That's what the Python round checks");
-  const memoryAt = n.word("plan", "without running out of memory");
-    const eighteenAt = n.word("plan", "Eighteen questions");
+  const eighteenAt = n.word("plan", "Eighteen questions");
   const workedAt = n.word("plan", "fourteen worked through");
   const quickAt = n.word("plan", "then four quickly");
   const choiceAt = n.word("gen-in", "It starts with one choice");
@@ -100,7 +99,9 @@ export const HookScene: React.FC = () => {
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>Data engineer interview prep</Kicker>
         <Headline lead="A model is a drawing" turn="until code loads it." at={drawingAt} turnAt={loadsAt - 2} out={checksAt - 6} />
-        <Headline lead="Bigger than memory, safe to run twice." at={memoryAt - 4} />
+        {/* In as the first leaves, so the headline's slot is never empty
+            while the narration states what the round checks. */}
+        <Headline lead="Bigger than memory, safe to run twice." at={checksAt + 4} />
 
         {/* ── The log and the memory, one scale ── */}
         <Note at={logAt - 2} x={X0} y={logTop - h(42)}>

@@ -240,6 +240,20 @@
             ]
           ]
         },
+        "autovacuum": {
+          "sql": "SELECT current_setting('autovacuum_analyze_threshold') AS threshold,\n  current_setting('autovacuum_analyze_scale_factor') AS scale_factor;",
+          "ok": true,
+          "columns": [
+            "threshold",
+            "scale_factor"
+          ],
+          "rows": [
+            [
+              "50",
+              "0.1"
+            ]
+          ]
+        },
         "query": {
           "sql": "SELECT c.region, o.amount\nFROM orders o\nJOIN customers c ON c.id = o.customer_id\nWHERE o.status = 'pending';",
           "ok": true,
@@ -281521,7 +281535,7 @@
           ]
         },
         "insert": {
-          "sql": "INSERT INTO orders\nSELECT 1000000 + g, g, DATE '2024-12-31', 50.00, 'shipped'\nFROM generate_series(1, 500) g;",
+          "sql": "INSERT INTO orders\n  (id, customer_id, order_date, amount, status)\nSELECT 1000000 + g, g, DATE '2024-12-31', 50.00, 'shipped'\nFROM generate_series(1, 500) g;",
           "ok": true,
           "columns": [],
           "rows": []

@@ -3,7 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LATEST, RANK } from "./data";
@@ -60,6 +60,9 @@ export const RankScene: React.FC = () => {
   const seventeenAt = n.word("rank-three", "skips to seventeen");
   const denseAt = n.word("rank-three", "Dense rank shares ten");
   const elevenAt = n.word("rank-three", "on to eleven");
+  const secondAt = n.word("rank-use", "dense rank finds the second-highest score");
+  const topAt = n.word("rank-use", "rank keeps ties in a top N");
+  const oneAt = n.word("rank-use", "row number keeps exactly one per key");
   const q2At = n.word("latest", "Question two");
   const q2TextAt = n.word("latest", "How do you keep only");
   const numberAt = n.word("latest", "Number each user's events");
@@ -111,9 +114,9 @@ export const RankScene: React.FC = () => {
   const urnk = U.cols.indexOf("rnk");
   const ones = U.rows.flatMap((r, i) => (r[urnk] === "1" ? [i] : []));
   const tieNotesY = ug.rowTop(U.rows.length) + h(26);
-  // The tie and its notes stay until QUALIFY's listing takes their place, so
-  // the last note has time to be read.
-  const tieOut = filtersAt - 6;
+  // The tie and its notes stay until question 3 is asked; latest-tie's long
+  // pause gives the last note time to be read first.
+  const tieOut = q3At - 4;
 
   // ── Question 3 ──
   const Q = LATEST.qualify;
@@ -159,7 +162,7 @@ export const RankScene: React.FC = () => {
             marks={[
               ...T.rows.map((_, row) => ({ row, col: col("rn"), at: rnAt + 4 + row * 2, out: rankAt })),
               ...[...eighties, after].map((row, k) => ({ row, col: col("rnk"), at: (row === after ? seventeenAt : rankAt + 8) + k * 3, out: denseAt })),
-              ...[...eighties, after].map((row, k) => ({ row, col: col("dr"), at: (row === after ? elevenAt : denseAt + 8) + k * 3, color: MARK_OK })),
+              ...[...eighties, after].map((row, k) => ({ row, col: col("dr"), at: (row === after ? elevenAt : denseAt + 8) + k * 3 })),
             ]}
           />
           <Note at={arbitraryAt} x={X0} y={notesY} out={out1}>
@@ -177,6 +180,21 @@ export const RankScene: React.FC = () => {
               <QMono>DENSE_RANK</QMono>: ties share, <b>no gap</b> (<Num>{denseTie}</Num>, then <Num>{denseNext}</Num>)
             </span>
           </Note>
+
+          {/* When to reach for each, under the table and the notes. */}
+          <div style={{ position: "absolute", left: X0, top: tg.rowTop(T.rows.length) + h(40), display: "flex", gap: 52, whiteSpace: "nowrap" }}>
+            {[
+              { at: secondAt, fn: "DENSE_RANK", use: "the second-highest score" },
+              { at: topAt, fn: "RANK", use: "a top N with ties" },
+              { at: oneAt, fn: "ROW_NUMBER", use: "exactly one per key" },
+            ].map((u) => (
+              <Ink key={u.fn} at={u.at - 2} dur={12} out={out1} style={{ position: "relative" }}>
+                <span style={{ ...note(24, INK) }}>
+                  <QMono>{u.fn}</QMono> for {u.use}
+                </span>
+              </Ink>
+            ))}
+          </div>
 
           {/* ── Question 2: number from the newest, keep number one ── */}
           <TableName g={ng} at={numberAt - 6} out={notRankAt}>

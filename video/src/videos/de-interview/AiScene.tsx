@@ -5,6 +5,8 @@ import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { Num } from "../../editorial/ui";
+import { PARTS, partOf } from "./data";
 import { Drift, Flow, Headline, Kicker, Mark, X0 } from "./parts";
 
 /** The RAG ingestion pipeline across the top: its four steps, left to right. */
@@ -62,10 +64,12 @@ const Line: React.FC<{ at: number; children: React.ReactNode }> = ({ at, childre
 /**
  * What AI has changed, the page's four points. The first is a design prompt,
  * so it is drawn as one: RAG ingestion's four steps (parse, chunk, embed,
- * index) in a row, each boxed as it is said, and the loop back that keeps the
- * index fresh incrementally. The other three are cards that fill line by
- * line: vector search's trade-offs, governance for AI data, and AI-written
- * pipeline code, which ends on asking the recruiter about each round.
+ * index) in a row, outlined as "Ingestion" is said and filled as each is
+ * named, and fed from above by only the new and changed documents, which is
+ * what keeping it fresh incrementally means. The other three are cards that
+ * fill line by line: vector search's trade-offs, governance for AI data, and
+ * AI-written pipeline code, which ends on asking the recruiter about each
+ * round. Under them, the page's pointer: Part 11 covers all four.
  */
 export const AiScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -87,24 +91,25 @@ export const AiScene: React.FC = () => {
     { text: "index", at: n.word("ai-rag", "index") },
   ];
   const freshAt = n.word("ai-rag", "keep it fresh incrementally");
+  const moreAt = n.word("ai-more", "Part eleven covers");
   const likeAt = n.word("ai-rag", "like any other pipeline");
   const vecAt = n.word("ai-vector", "Vector search trade-offs");
   const govAt = n.word("ai-gov", "Governance for AI data");
   const codeAt = n.word("ai-code", "AI-written pipeline code");
-  const end = n.beat("ai-code").to;
+  const end = n.beat("ai-more").to;
+  const aiPart = PARTS.find((p) => p.video === "de-pipelines-for-ai");
 
   const stepX = (i: number) => STEP_X + i * (STEP_W + STEP_GAP);
   const top = y(FLOW_Y);
   const mid = top + h(STEP_H) / 2;
   const bottom = top + h(STEP_H);
-  // The loop back: down from under "index", left beneath the row, and up into
-  // "parse", so its head sits on a straight, vertical last leg.
-  const loopY = bottom + h(52);
-  const loop: [number, number][] = [
-    [stepX(3) + STEP_W / 2, bottom + 4],
-    [stepX(3) + STEP_W / 2, loopY],
-    [stepX(0) + STEP_W / 2, loopY],
-    [stepX(0) + STEP_W / 2, bottom + 4],
+  // Keeping it fresh: only the new and changed documents come in, from above,
+  // into "parse". Not a loop from "index" back to "parse", which would say
+  // the index is parsed again: a full re-run, the opposite of incremental.
+  const feedX = stepX(0) + STEP_W / 2;
+  const feed: [number, number][] = [
+    [feedX, top - 70],
+    [feedX, top - 6],
   ];
 
   return (
@@ -113,6 +118,7 @@ export const AiScene: React.FC = () => {
         <Sfx key={s.text} name="el-tap" at={s.at} level={-32} />
       ))}
       <Sfx name="el-pencil" at={freshAt} level={-35} />
+      <Sfx name="el-tap" at={moreAt} level={-33} />
       {[vecAt, govAt, codeAt].map((at, i) => (
         <Sfx key={i} name="el-tap" at={at} level={-31} />
       ))}
@@ -126,11 +132,37 @@ export const AiScene: React.FC = () => {
             Ingestion for <span style={{ opacity: ease(frame, ragAt - 2, 12) }}>RAG</span>
           </div>
           <div style={{ ...note(24, INK_SOFT), marginTop: 4, opacity: ease(frame, expandAt - 2, 12) }}>retrieval-augmented generation</div>
+          {/* What RAG does, once, for a viewer who has not built one. */}
+          <div style={{ ...note(22, INK_SOFT), fontStyle: "italic", marginTop: 2, textWrap: "balance", opacity: ease(frame, expandAt + 10, 12) }}>
+            a model answers from documents it looks up
+          </div>
           <div style={{ ...note(24, INK), marginTop: 10, opacity: ease(frame, promptAt - 2, 12) }}>
             <Mark at={promptAt + 4}>a system design prompt</Mark>
           </div>
         </div>
 
+        {/* The row is there, empty, from "Ingestion", so the page is not
+            blank while RAG is named; each box fills as its step is said. */}
+        {steps.map((s, i) => {
+          const q = ease(frame, ingestAt - 2, 14) * (1 - ease(frame, s.at - 3, 12));
+          if (q <= 0) return null;
+          return (
+            <div
+              key={`${s.text}-outline`}
+              style={{
+                position: "absolute",
+                left: stepX(i),
+                top,
+                width: STEP_W,
+                height: h(STEP_H),
+                boxSizing: "border-box",
+                border: `2px dashed ${HAIRLINE}`,
+                borderRadius: 12,
+                opacity: q * 0.5,
+              }}
+            />
+          );
+        })}
         {steps.map((s, i) => {
           const p = ease(frame, s.at - 3, 12);
           if (p <= 0) return null;
@@ -171,16 +203,28 @@ export const AiScene: React.FC = () => {
             color={INK_SOFT}
           />
         ))}
-        <Flow points={loop} at={freshAt} dur={22} color={BLUE_INK} />
+        <Flow points={feed} at={freshAt} dur={14} color={BLUE_INK} />
         <div
           style={{
             position: "absolute",
-            left: stepX(0) + STEP_W / 2 + 24,
-            width: stepX(3) - stepX(0) - 48,
-            top: loopY + 12,
+            left: feedX + 18,
+            top: top - 84,
+            ...note(24, INK),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, freshAt + 4, 12),
+          }}
+        >
+          only new and changed documents
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            left: stepX(0),
+            width: stepX(3) + STEP_W - stepX(0),
+            top: bottom + h(22),
             textAlign: "center",
             ...note(24, INK),
-            opacity: ease(frame, freshAt + 6, 12),
+            opacity: ease(frame, freshAt + 10, 12),
           }}
         >
           keep it fresh, incrementally, <span style={{ opacity: ease(frame, likeAt - 2, 12) }}>like any other pipeline</span>
@@ -188,14 +232,16 @@ export const AiScene: React.FC = () => {
 
         <Card i={0} at={vecAt} title="Vector search trade-offs">
           <Line at={n.word("ai-vector", "exact or approximate")}>exact or approximate</Line>
-          <Line at={n.word("ai-vector", "Postgres or a dedicated store")}>Postgres or a dedicated store</Line>
+          <Line at={n.word("ai-vector", "Postgres with its vector extension")}>Postgres (pgvector) or a dedicated store</Line>
           <Line at={n.word("ai-vector", "metadata filters")}>metadata filters</Line>
           <Line at={n.word("ai-vector", "hybrid keyword search")}>hybrid keyword search</Line>
         </Card>
         <Card i={1} at={govAt} title="Governance for AI data">
           <Line at={n.word("ai-gov", "permissions checked at query time")}>permissions checked at query time</Line>
           <Line at={n.word("ai-gov", "deletions that reach the vectors")}>deletions that reach the vectors</Line>
-          <Line at={n.word("ai-gov", "personal data kept from")}>personal data kept from outside embedding APIs</Line>
+          {/* The page's wording, which cannot be misread at its line break
+              ("kept from outside" read as a whole phrase). */}
+          <Line at={n.word("ai-gov", "personal data kept from")}>personal data kept away from external embedding APIs</Line>
         </Card>
         <Card i={2} at={codeAt} title="AI-written pipeline code">
           <Line at={n.word("ai-code", "needs review for idempotency")}>reviewed for idempotency, time zones and schema drift</Line>
@@ -204,6 +250,24 @@ export const AiScene: React.FC = () => {
             <Mark at={n.word("ai-code", "ask the recruiter") + 4}>ask the recruiter about each one</Mark>
           </div>
         </Card>
+
+        {/* The page's pointer: Part 11 works through all four. */}
+        <div
+          style={{
+            position: "absolute",
+            left: X0,
+            top: y(CARD_Y) + h(CARD_H) + h(30),
+            ...note(26, INK),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, moreAt - 2, 12),
+            transform: `translateY(${(1 - ease(frame, moreAt - 2, 12)) * 8}px)`,
+          }}
+        >
+          <span style={label(26, BLUE_INK)}>
+            Part <Num>{partOf("de-pipelines-for-ai")}</Num>
+          </span>
+          , {aiPart?.title}, covers all four in depth.
+        </div>
       </Drift>
     </AbsoluteFill>
   );

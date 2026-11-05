@@ -49,7 +49,8 @@ const Defense: React.FC<{ at: number; n: number; y: number; children: React.Reac
  * Question 6. The source table gains a coupon column; a job that inserts
  * SELECT * into a fixed three-column table fails in DuckDB ("3 columns but 4
  * values"); naming the columns loads all three rows and ignores the new one.
- * Then the page's other three defenses, numbered on the right.
+ * Then the page's other three defenses, numbered on the right, schema-on-read
+ * defined as it is said (stored as it arrives, typed on read: bronze).
  */
 export const SourceScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -69,10 +70,13 @@ export const SourceScene: React.FC = () => {
   const ignoredAt = n.word("src-name", "the new one is ignored");
   const landAt = n.word("src-more", "land raw data in a schema-on-read layer");
   const neverAt = n.word("src-more", "so ingestion never breaks");
-  const registryAt = n.word("src-more", "Give streaming sources a schema registry");
-  const validateAt = n.word("src-more", "validate the schema at ingestion");
-  const haltAt = n.word("src-more", "alert and halt on a breaking change");
-  const end = n.beat("src-more").to;
+  const storesAt = n.word("src-bronze", "It stores what arrives as is");
+  const appliesAt = n.word("src-bronze", "applies a schema only when it's read");
+  const bronzeAt = n.word("src-bronze", "like bronze");
+  const registryAt = n.word("src-registry", "Give streaming sources a schema registry");
+  const validateAt = n.word("src-registry", "validate the schema at ingestion");
+  const haltAt = n.word("src-registry", "alert and halt on a breaking change");
+  const end = n.beat("src-registry").to;
 
   const top = y(TOP);
   const raw = SRC.raw;
@@ -91,7 +95,7 @@ export const SourceScene: React.FC = () => {
       <Sfx name="el-scratch" at={stopsAt + 2} level={-30} />
       <Sfx name="el-pencil" at={nameAt} level={-34} />
       <Sfx name="el-tap" at={nameAt + 14} level={-31} />
-      {[nameAt, landAt, registryAt, validateAt].map((at) => (
+      {[nameAt, landAt, storesAt, registryAt, validateAt].map((at) => (
         <Sfx key={at} name="el-tap" at={at + 2} level={-33} />
       ))}
 
@@ -141,13 +145,21 @@ export const SourceScene: React.FC = () => {
           Land raw data schema-on-read
           <br />
           <span style={{ color: INK_SOFT, opacity: ease(frame, neverAt, 10) }}>so ingestion never breaks</span>
+          <br />
+          <span style={{ color: INK_SOFT, opacity: ease(frame, storesAt, 10) }}>
+            stored as it arrives
+            <span style={{ opacity: ease(frame, appliesAt, 10) }}>, typed on read</span>
+            <span style={{ opacity: ease(frame, bronzeAt, 10) }}>
+              : <b style={{ color: INK }}>bronze</b>
+            </span>
+          </span>
         </Defense>
-        <Defense at={registryAt} n={3} y={top + h(216)}>
+        <Defense at={registryAt} n={3} y={top + h(246)}>
           Streaming sources: a schema
           <br />
           registry, compatibility enforced
         </Defense>
-        <Defense at={validateAt} n={4} y={top + h(322)}>
+        <Defense at={validateAt} n={4} y={top + h(352)}>
           Validate at ingestion
           <br />
           <span style={{ opacity: ease(frame, haltAt, 10) }}>alert and halt on a breaking change</span>

@@ -55,16 +55,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     random: post-filtering the top ten to the query's tenant leaves none
  *     for 91% of queries. No latency is shown: the share of vectors compared
  *     stands in for work, and no vector database ran.
- *   - Question 9: five made-up tickets a side, the code's ticket fourth by
- *     vector and first by keyword; reciprocal rank fusion with the page's
- *     k = 60 puts it first (1/64 + 1/61 = 0.0320 against 0.0318). TF-IDF's
- *     idf on the eight made-up tickets: "error" in 5, ln(8/5) = 0.47;
- *     "E-4031" in 1, ln 8 = 2.08.
+ *   - Question 9: eight made-up tickets searched for "E-4031 error". The
+ *     vector side's five are made up, the code's ticket fourth; the keyword
+ *     side's five are BM25 over the eight tickets, run in check.mjs, the
+ *     code's ticket first and the four that say "error" after it. Reciprocal
+ *     rank fusion with the page's k = 60 puts it first (1/64 + 1/61 = 0.0320
+ *     against 0.0318). TF-IDF's idf on the same tickets: "error" in 4,
+ *     ln(8/4) = 0.69; "E-4031" in 1, ln 8 = 2.08.
  *   - Question 11, the page's own numbers: 10 million chunks x 400 tokens =
  *     4 billion tokens = 4,000 x a million, so cost is 4,000 times the price
  *     per million. At a million tokens a minute, a rate the screen labels as
  *     one for scale and not a provider's, 4,000 minutes, 2.8 days ("nearly
- *     three"). No price or provider limit is quoted.
+ *     three"). For scale, a range of list prices, 2 to 20 cents per million
+ *     tokens (checked November 2026, no provider named): $80 to $800, "tens
+ *     to hundreds of dollars". No provider limit is quoted.
  *   - Question 3: 400 tokens is about 1,800 characters of English prose, at
  *     llm-tokens' measured 4.48 characters a token.
  *   - The close: 110 questions in multiple-choice-questions.mdx, and a
@@ -75,8 +79,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *
  * Written for Drew's ear: AI, PDF, HTML and API said as they are; RAG
  * expanded once; "sequel" for SQL; HNSW glossed as a graph index; the IVF
- * index called a cluster index; the error code respelled "E four oh three
- * one" (the screen keeps E-4031).
+ * index called a cluster index and then named; the error code respelled "E
+ * four oh three one" (the screen keeps E-4031).
  */
 export const script: NarrationScript = {
   id: "de-pipelines-for-ai",
@@ -91,7 +95,11 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "The newest pipelines don't end in a dashboard. They feed an AI assistant, which can only answer from what's in its index.",
+      text: "The newest pipelines don't end in a dashboard.",
+    },
+    {
+      id: "hook-feed",
+      text: "They feed an AI assistant, which knows your documents only from what's in its index.",
       pauseAfter: 0.6,
     },
     {
@@ -220,18 +228,21 @@ export const script: NarrationScript = {
       text: "Question six. Exact or approximate nearest-neighbor search? Exact search compares the query with every vector: perfectly accurate, and fine into the hundreds of thousands, especially after a filter.",
       pauseAfter: 0.6,
     },
+    { id: "ann-index", text: "Beyond that, approximate indexes trade a little recall for big speedups." },
+    { id: "ann-hnsw", text: "HNSW, a graph index, is fast and accurate, but memory-hungry and slow to build." },
     {
-      id: "ann-index",
-      text: "Beyond that, approximate indexes trade a little recall for big speedups. HNSW, a graph index, is fast and accurate, but memory-hungry and slow to build. A cluster index searches only the clusters nearest the query.",
+      id: "ann-ivf",
+      text: "A cluster index, called IVF, uses less memory and builds faster, and searches only the clusters nearest the query.",
     },
     {
       id: "ann-sim",
       text: "Model it in NumPy: twenty thousand vectors in a hundred clusters. Probe one cluster, and you compare one percent of the vectors and find about seventy percent of the true top ten. Probe sixteen: ninety-six.",
       pauseAfter: 0.6,
     },
+    { id: "ann-knob", text: "That's the knob: clusters probed here, search breadth in HNSW." },
     {
       id: "ann-measure",
-      text: "That's the knob. Measure recall against exact search on a sample; don't trust the defaults.",
+      text: "Measure recall against exact search on a sample; don't trust the defaults.",
       pauseAfter: 0.7,
     },
 
@@ -244,13 +255,21 @@ export const script: NarrationScript = {
     {
       id: "pg-why",
       text: "One system, real transactions, joins against your relational data, and access filters in plain sequel.",
+    },
+    {
+      id: "pg-caveat",
+      text: "With an approximate index, though, that filter runs after the search: the trap in question eight.",
       pauseAfter: 0.6,
     },
     {
       id: "pg-dedicated",
       text: "A dedicated vector database earns its operational cost at very large scale, very high query rates, or when you need hybrid search and multi-tenancy built in.",
     },
-    { id: "pg-lean", text: "Say which way you'd lean, and what evidence would change your mind.", pauseAfter: 0.7 },
+    {
+      id: "pg-lean",
+      text: "Say which way you'd lean, here pgvector, and what evidence would change your mind: the index outgrowing memory, latency missing its target at peak load, or filtered searches losing recall.",
+      pauseAfter: 0.7,
+    },
 
     // ── 8. Metadata filters ───────────────────────────────────────────────
     {
@@ -268,13 +287,14 @@ export const script: NarrationScript = {
       text: "In the same simulation, give each vector one of a hundred tenants. Take the top ten, keep one tenant's, and ninety-one percent of searches come back empty.",
       pauseAfter: 0.6,
     },
+    { id: "filter-pre", text: "Pre-filtering restricts first, then searches." },
     {
-      id: "filter-pre",
-      text: "Pre-filtering restricts first, then searches. That's correct, but it can defeat the approximate index, which was built over everything.",
+      id: "filter-pre-why",
+      text: "That's correct, and a small subset can just be scanned exactly. A big one can't, and the index, built over everything, spends its search on points it has to skip.",
     },
     {
       id: "filter-fix",
-      text: "Good answers partition by tenant, use an engine that filters during the search, and test with realistic, selective filters.",
+      text: "Good answers partition by tenant, use an engine that checks the filter at each step of the search until it has ten, and test with realistic, selective filters.",
       pauseAfter: 0.7,
     },
 
@@ -308,6 +328,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "access-sync",
+      text: "When a permission changes upstream, update the chunks' metadata at once; nothing needs re-embedding.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "access-redact",
       text: "Redact secrets and personal data before embedding, above all if the embedding model is an outside API.",
       pauseAfter: 0.6,
@@ -328,6 +353,11 @@ export const script: NarrationScript = {
     {
       id: "backfill-div",
       text: "For cost, that's four thousand times the price per million tokens. For time, divide by your rate limit: at a million tokens a minute, four thousand minutes, nearly three days.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "backfill-price",
+      text: "Embedding prices are cents per million tokens, so the bill is tens to hundreds of dollars; the days are the real constraint.",
       pauseAfter: 0.6,
     },
     {

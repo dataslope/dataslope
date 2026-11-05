@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -67,7 +67,9 @@ const RunCount: React.FC<{ at: number; x: number; y: number; run: string; value:
  * page's events table loads June 1 twice: a blind INSERT goes 8 then 16; the
  * page's delete-then-insert goes 8 then 8. Then why it matters, and the
  * transaction that keeps a failure between the two statements from leaving
- * the day empty (rolled back in DuckDB: still 8).
+ * the day empty (rolled back in DuckDB: still 8). The listing grows to wrap
+ * the two statements only when the transaction is named. The keyed upsert
+ * shows its count too: the page's ON CONFLICT run twice leaves 3 orders, then 3.
  */
 export const IdemScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -93,6 +95,7 @@ export const IdemScene: React.FC = () => {
   const twiceAt = n.word("idem-over", "Run it twice, still eight");
   const keyAt = n.word("idem-over", "Rows with a key take an upsert");
   const mergeAt = n.word("idem-over", "merge, or insert on conflict");
+  const conflictAt = n.word("idem-over", "insert on conflict");
   const whyAt = n.word("idem-why", "That's why idempotency is the foundation");
   const repairAt = n.word("idem-why", "a retry or a backfill repairs a day");
   const autoAt = n.word("idem-why", "recovery can be automated");
@@ -110,8 +113,10 @@ export const IdemScene: React.FC = () => {
   const beginLine = lineOf(B_LINES, "BEGIN");
   const commitLine = lineOf(B_LINES, "COMMIT");
   // Listing B's statements ink in as they are named; BEGIN and COMMIT wait
-  // for the transaction.
-  const bLineAt = B_LINES.map((_, i) => (i === beginLine || i === commitLine ? wrapAt + 6 : i < deleteLine + del.length ? deleteAt + (i - deleteLine) * 4 : insertAt + (i - deleteLine - del.length) * 4));
+  // for the transaction, their rows shut until then, so the listing is the
+  // five statements' height and grows to wrap them.
+  const bLineAt = B_LINES.map((_, i) => (i === beginLine || i === commitLine ? wrapAt + 8 : i < deleteLine + del.length ? deleteAt + (i - deleteLine) * 4 : insertAt + (i - deleteLine - del.length) * 4));
+  const bRowIn = B_LINES.map((_, i) => (i === beginLine || i === commitLine ? wrapAt : undefined));
   const countY = (top: number) => top + h(10);
 
   return (
@@ -159,7 +164,7 @@ export const IdemScene: React.FC = () => {
 
         {/* B: overwrite the partition, run twice; BEGIN and COMMIT come later. */}
         <Note at={overAt - 2} x={X0} y={bTop - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Overwrite the partition, as the page does</span>
+          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Overwrite the partition: delete, then insert</span>
         </Note>
         <Listing
           lines={B_LINES}
@@ -169,6 +174,7 @@ export const IdemScene: React.FC = () => {
           size={SIZE}
           at={overAt}
           lineAt={bLineAt}
+          rowIn={bRowIn}
           marks={[
             { line: beginLine, at: wrapAt + 10, color: MARK_OK },
             { line: commitLine, at: wrapAt + 14, color: MARK_OK },
@@ -190,6 +196,10 @@ export const IdemScene: React.FC = () => {
           </div>
           <div style={{ marginTop: 8, ...note(26, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, mergeAt + 14, 10) }}>
             <Mono>INSERT … ON CONFLICT DO UPDATE</Mono>
+          </div>
+          {/* The page's ON CONFLICT upsert, run twice on three staged orders. */}
+          <div style={{ marginTop: 12, ...note(22, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, conflictAt + 12, 10) }}>
+            run twice: <Num>{IDEM.upsert[0]}</Num> orders, then <Num>{IDEM.upsert[1]}</Num>
           </div>
         </Note>
 

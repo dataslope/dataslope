@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { QMono, QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -33,7 +33,9 @@ const Folder: React.FC<{ x: number; y: number; h: number; name: string; at: numb
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   if (p <= 0) return null;
-  const fill = trap > 0 ? `color-mix(in srgb, ${ACCENT} ${26 * trap}%, ${PAPER})` : read > 0 ? `color-mix(in srgb, ${READ} ${100 * read}%, ${COLUMN_TINT.sale_id})` : COLUMN_TINT.sale_id;
+  // The trap tint mixes into the folder's own blue, so it fades in and out
+  // of it rather than through white.
+  const fill = trap > 0 ? `color-mix(in srgb, ${ACCENT} ${26 * trap}%, ${COLUMN_TINT.sale_id})` : read > 0 ? `color-mix(in srgb, ${READ} ${100 * read}%, ${COLUMN_TINT.sale_id})` : COLUMN_TINT.sale_id;
   return (
     <div style={{ position: "absolute", left: x, top: y + (1 - p) * 12, width: FOLDER_W, height: h, opacity: p * (1 - 0.62 * pruned) }}>
       <div style={{ position: "absolute", left: 0, top: 0, width: 54, height: 14, borderRadius: "5px 5px 0 0", background: fill, boxShadow: `inset 0 0 0 1.5px ${INK}` }} />
@@ -86,13 +88,18 @@ export const PartitionScene: React.FC = () => {
   const regionAt = n.word("part-region", "Filter on region instead");
   const allAt = n.word("part-region", "reads all twelve");
   const keyAt = n.word("part-region", "pruning only works on the key");
-  const goodAt = n.word("part-region", "So a good key");
-  const evenAt = n.word("part-region", "partitions even and not too small");
+  const goodAt = n.word("part-key", "So a good key");
+  const evenAt = n.word("part-key", "partitions even and not too small");
+  const badAt = n.word("part-bad", "Not a customer ID");
+  const tinyAt = n.word("part-bad", "millions of tiny folders");
   const fnAt = n.word("part-fn", "a function wrapped around the key");
-  const appliedAt = n.word("part-fn", "DuckDB applied it");
-  const stillAt = n.word("part-fn", "still read one file");
-  const checkAt = n.word("part-fn", "check your engine's plan");
-  const end = n.beat("part-fn").to;
+  const appliedAt = n.word("part-duck", "DuckDB applied it");
+  const stillAt = n.word("part-duck", "still read one file");
+  const checkAt = n.word("part-duck", "check your engine's plan");
+  const rawAt = n.word("part-raw", "Filtering on the key itself");
+  const rangeAt = n.word("part-raw", "or on a range of it");
+  const everyAt = n.word("part-raw", "prunes on every engine");
+  const end = n.beat("part-raw").to;
 
   const fx = (i: number) => X0 + i * (FOLDER_W + FOLDER_GAP);
   // Which folders each query touches, while its listing is up.
@@ -100,6 +107,10 @@ export const PartitionScene: React.FC = () => {
   const regionOn = during(frame, allAt - 4, fnAt + 4, 10);
   const fnOn = ease(frame, stillAt, 10);
   const [fewest, most] = PARTITION.rowsPerFile;
+  // The range query, as DuckDB scanned it: "3/12".
+  const rangeWhere = PARTITION.range.lines[lineOf(PARTITION.range.lines, "WHERE")].replace(/^WHERE /, "").replace(/;$/, "");
+  const [rangeRead, rangeOf] = (PARTITION.range.scanning ?? "").split("/");
+  if (!rangeRead || !rangeOf) throw new Error("the range query has no Scanning Files line");
 
   const listing = (q: typeof PARTITION.march, at: number, out: number | undefined, markAt: number, color?: string) => (
     <Listing lines={q.lines} x={X0} top={y(LIST_Y)} width={760} size={21} at={at} out={out} marks={[{ line: lineOf(q.lines, "WHERE"), at: markAt, color }]} />
@@ -180,6 +191,9 @@ export const PartitionScene: React.FC = () => {
             <QMono>region</QMono> is not the key: nothing to prune
           </span>
         </Note>
+        <Note at={keyAt + 8} x={PLAN_X} y={y(LIST_Y) + h(146)} out={fnAt - 2}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>pruning: skipping the folders that can&apos;t match</span>
+        </Note>
 
         {/* ── A good key ── */}
         <div style={{ position: "absolute", left: X0, top: y(790), display: "flex", alignItems: "center", gap: 14, ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, goodAt, 12) }}>
@@ -189,6 +203,12 @@ export const PartitionScene: React.FC = () => {
             <span style={{ opacity: ease(frame, evenAt, 10) }}>, with partitions even in size and not too small</span>
           </span>
         </div>
+        <Note at={badAt} x={X0 + 40} y={y(826)}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            not a customer ID
+            <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, tinyAt, 10) }}>: millions of tiny folders</span>
+          </span>
+        </Note>
 
         {/* ── A function on the key ── */}
         {listing(PARTITION.fn, fnAt, undefined, fnAt + 8)}
@@ -203,13 +223,24 @@ export const PartitionScene: React.FC = () => {
             { text: `Total Files Read: ${PARTITION.fn.filesRead}`, at: stillAt + 2 },
           ]}
         />
-        <Note at={fnAt + 6} x={X0} y={y(858)}>
+        <Note at={fnAt + 6} x={X0} y={y(868)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             A function on the key defeats pruning on many engines
             <span style={{ opacity: ease(frame, appliedAt, 10) }}>; DuckDB applies it to each folder&apos;s name</span>
             <span style={{ color: INK, fontWeight: 650, opacity: ease(frame, checkAt, 10) }}>. Check your engine&apos;s plan.</span>
           </span>
         </Note>
+        {/* The habit that prunes everywhere: the raw key, or a range on it (measured: 3 of 12). */}
+        <div style={{ position: "absolute", left: X0, top: y(906), display: "flex", alignItems: "center", gap: 12, ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, rawAt, 12) }}>
+          <Tick at={everyAt} size={23} color={OK} />
+          <span>
+            Filter on the key itself
+            <span style={{ opacity: ease(frame, rangeAt, 10) }}>
+              , or a range: <QMono>{rangeWhere}</QMono> scans <Num>{rangeRead}</Num> of <Num>{rangeOf}</Num>
+            </span>
+            <b style={{ color: OK_INK, opacity: ease(frame, everyAt, 10) }}> · prunes on every engine</b>
+          </span>
+        </div>
       </Drift>
     </AbsoluteFill>
   );

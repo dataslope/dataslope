@@ -105,7 +105,13 @@ export const FRESH = results.fresh as {
   thresholdHours: number;
   fine: Freshness;
   stale: Freshness;
+  /** Rows June 3's load added: what a row-count check on that load sees. */
+  missedDayRows: number;
 };
+
+/** Airflow's default parse interval, quoted (check.mjs): how often a DAG
+ *  file's top level runs, and so how many times a day. */
+export const PARSE = results.parse as { everySeconds: number; perDay: number };
 
 /** A count with thousands separators. */
 export const count = (v: number) => v.toLocaleString("en-US");

@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Node, OK, OK_INK, Pill, pulse, X0 } from "./parts";
+import { Drift, Node, OK_INK, Pill, pulse, X0 } from "./parts";
 
 /** One hour of events, drawn left to right. */
 const AX0 = 360;
@@ -25,7 +25,8 @@ const RIGHT_X = 1300;
  * the hour, a playhead sweeping it, and one result at the end, minutes to
  * hours after the first event. Streaming: the playhead again, and each event
  * dropping straight into a result as it passes. Then streaming's price, and
- * the rule: choose by the latency the business needs.
+ * the rule: choose by the latency the business needs, with micro-batch in
+ * between. Results are drawn in ink: an output, not a right answer.
  */
 export const BatchScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -53,9 +54,12 @@ export const BatchScene: React.FC = () => {
   const chooseAt = n.word("choose", "choose by the latency");
   const dashAt = n.word("choose", "An hourly dashboard is batch");
   const fraudAt = n.word("choose", "Fraud detection is streaming");
-  const dontAt = n.word("choose", "Don't pay for streaming's complexity");
-  const realAt = n.word("choose", "a real requirement");
-  const end = n.beat("choose").to;
+  const microAt = n.word("choose-micro", "In between sits micro-batch");
+  const fewAt = n.word("choose-micro", "a small batch every few seconds");
+  const bothAt = n.word("choose-micro", "many systems run both");
+  const dontAt = n.word("choose-rule", "Don't pay for streaming's complexity");
+  const realAt = n.word("choose-rule", "a real requirement");
+  const end = n.beat("choose-rule").to;
 
   const by = y(BATCH_Y);
   const sy = y(STREAM_Y);
@@ -76,6 +80,7 @@ export const BatchScene: React.FC = () => {
       ))}
       <Sfx name="el-tap" at={dashAt} level={-31} />
       <Sfx name="el-tap" at={fraudAt} level={-31} />
+      <Sfx name="el-tap" at={microAt} level={-32} />
       <Sfx name="el-chime" at={realAt + 6} level={-32} />
 
       <Drift from={from} to={end + 30}>
@@ -143,7 +148,7 @@ export const BatchScene: React.FC = () => {
               <g key={i}>
                 <circle cx={ax(f)} cy={sy - h(30)} r={9 * p} fill={BAR} opacity={0.85} />
                 <line x1={ax(f)} x2={ax(f)} y1={sy - h(18)} y2={sy - h(18) + (h(66) * drop)} stroke={BAR} strokeWidth={2} opacity={0.6} />
-                <rect x={ax(f) - 7} y={sy + h(58)} width={14} height={14 * drop} rx={3} fill={OK} opacity={drop} />
+                <rect x={ax(f) - 7} y={sy + h(58)} width={14} height={14 * drop} rx={3} fill={INK} opacity={drop} />
               </g>
             );
           })}
@@ -152,8 +157,8 @@ export const BatchScene: React.FC = () => {
           ) : null}
         </svg>
 
-        {/* Batch's one result, at the end of the hour. */}
-        <Node x={ax(1) - 120} y={by + h(56)} w={240} h={h(62)} at={resultAt} tone="ok" title="one result" size={23} />
+        {/* Batch's one result, at the end of the hour: an output, not a verdict. */}
+        <Node x={ax(1) - 120} y={by + h(56)} w={240} h={h(62)} at={resultAt} tone="plain" title="one result" size={23} />
         <Note at={hourAt + 4} x={ax(0)} y={by - h(108)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>a bounded chunk: one hour of events</span>
         </Note>
@@ -166,7 +171,7 @@ export const BatchScene: React.FC = () => {
 
         {/* Streaming's results, each seconds after its event. */}
         <Note at={arrivesAt + 6} x={AX1 + 30} y={sy + h(50)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a result per event</span>
+          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>a result per event</span>
         </Note>
         <Note at={secondsAt - 2} x={AX1 + 30} y={sy - h(44)}>
           <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>results seconds old</span>
@@ -186,6 +191,12 @@ export const BatchScene: React.FC = () => {
         </Note>
         <ChoiceCard at={dashAt} x={RIGHT_X + 160} y={by - h(40)} need="An hourly dashboard" pick="batch" lit={pulse(frame, dashAt + 10, 22)} />
         <ChoiceCard at={fraudAt} x={RIGHT_X + 160} y={sy - h(40)} need="Fraud detection" pick="streaming" lit={pulse(frame, fraudAt + 10, 22)} />
+        {/* Between the two: micro-batch, and systems that run both. */}
+        <Note at={microAt} x={RIGHT_X + 160} y={(by + sy) / 2 - h(36)}>
+          <div style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>In between: micro-batch</div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, fewAt, 10) }}>a small batch every few seconds</div>
+          <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, bothAt, 10) }}>and many systems run both</div>
+        </Note>
         <Note at={dontAt} x={X0} y={y(885)}>
           <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Streaming only when low latency is <span style={{ background: ease(frame, realAt, 10) > 0 ? HIGHLIGHT : undefined }}>a real requirement</span>

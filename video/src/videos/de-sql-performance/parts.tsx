@@ -288,7 +288,8 @@ export const MARK_RED = BAD;
  * A table of a million rows as a grid of squares, each a thousand of them,
  * in row order. The squares ink in from `at`; a scan sweeps through them
  * from `sweep.from` to `sweep.to`, each square tinting as it is read; `hits`
- * (square indices) light on `hitAt`.
+ * (square indices) light on `hitAt`, or with `hitDot` take a dot instead,
+ * for hits that are one row each rather than a thousand.
  */
 export const RowGrid: React.FC<{
   x: number;
@@ -302,9 +303,10 @@ export const RowGrid: React.FC<{
   hits?: readonly number[];
   hitAt?: number;
   hitOut?: number;
+  hitDot?: boolean;
   dim?: number;
   out?: number;
-}> = ({ x, top, cols = 50, rows = 20, cell = 15, gap = 3, at, sweep, hits = [], hitAt, hitOut, dim, out }) => {
+}> = ({ x, top, cols = 50, rows = 20, cell = 15, gap = 3, at, sweep, hits = [], hitAt, hitOut, hitDot = false, dim, out }) => {
   const frame = useCurrentFrame();
   const o = out === undefined ? 0 : ease(frame, out, 12);
   if (frame < at || o >= 1) return null;
@@ -325,7 +327,16 @@ export const RowGrid: React.FC<{
         const cy = Math.floor(i / cols) * pitch;
         const read = i < scanned ? 1 - scanOut : 0;
         const hit = hitSet.has(i) ? hitP : 0;
-        const fill = hit > 0 ? `color-mix(in srgb, ${ds("yellow", 500)} ${hit * 100}%, ${BAR})` : read > 0 ? `color-mix(in srgb, ${BAR} ${30 + 45 * read}%, ${PAPER})` : `color-mix(in srgb, ${BAR} 30%, ${PAPER})`;
+        const tint = read > 0 ? `color-mix(in srgb, ${BAR} ${30 + 45 * read}%, ${PAPER})` : `color-mix(in srgb, ${BAR} 30%, ${PAPER})`;
+        if (hitDot) {
+          return (
+            <g key={i}>
+              <rect x={cx} y={cy} width={cell} height={cell} rx={2} fill={tint} />
+              {hit > 0 ? <circle cx={cx + cell / 2} cy={cy + cell / 2} r={cell * 0.3} fill={inkOf.yellow} opacity={hit} /> : null}
+            </g>
+          );
+        }
+        const fill = hit > 0 ? `color-mix(in srgb, ${ds("yellow", 500)} ${hit * 100}%, ${BAR})` : tint;
         return <rect key={i} x={cx} y={cy} width={cell} height={cell} rx={2} fill={fill} />;
       })}
       {/* The scan's front: a line across the row being read. */}

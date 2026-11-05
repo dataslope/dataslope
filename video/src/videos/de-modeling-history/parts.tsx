@@ -154,7 +154,10 @@ export const listingWidth = (lines: readonly string[], size: number) =>
  * A printed SQL listing: tinted paper between a rule above and a hairline
  * below. Each line inks in on its own cue; `marks` lay a band under a line
  * (find it with `lineOf`), `dim` sets the listing back. Copied from
- * da-sql/parts.tsx; only the tokenizer differs.
+ * da-sql/parts.tsx; the tokenizer differs, and two things are local:
+ * `fades` set one line back (a clause the narration has stopped counting)
+ * and bring it back on `out`; `swaps` re-ink one line as new text, so a
+ * listing can become the query whose result sits beside it.
  */
 export const Listing: React.FC<{
   lines: readonly string[];
@@ -165,11 +168,15 @@ export const Listing: React.FC<{
   at: number;
   lineAt?: readonly number[];
   marks?: readonly { line: number; at: number; out?: number; color?: string }[];
+  /** A line set back to `to` (0.3 by default) on `at`, and back on `out`. */
+  fades?: readonly { line: number; at: number; out?: number; to?: number }[];
+  /** A line re-inked as `text` on `at`. */
+  swaps?: readonly { line: number; at: number; text: string }[];
   dim?: number;
   out?: number;
   /** A small title over the listing's top rule. */
   title?: React.ReactNode;
-}> = ({ lines, x, top, width, size = 22, at, lineAt, marks = [], dim, out, title }) => {
+}> = ({ lines, x, top, width, size = 22, at, lineAt, marks = [], fades = [], swaps = [], dim, out, title }) => {
   const frame = useCurrentFrame();
   const g = listingGeometry(size);
   const p = ease(frame, at, 16);
@@ -195,7 +202,9 @@ export const Listing: React.FC<{
         const w = ease(frame, m.at, 12);
         const mo = m.out === undefined ? 0 : ease(frame, m.out, 10);
         if (w <= 0 || mo >= 1) return null;
-        const indent = lines[m.line].length - lines[m.line].trimStart().length;
+        // A mark laid after a swap measures the line's new text.
+        const text = swaps.find((sw) => sw.line === m.line && m.at >= sw.at)?.text ?? lines[m.line];
+        const indent = text.length - text.trimStart().length;
         return (
           <div
             key={i}
@@ -204,7 +213,7 @@ export const Listing: React.FC<{
               left: g.padX - size * 0.2 + indent * 0.6 * size,
               top: g.padY + m.line * g.lineH + g.lineH * 0.12,
               height: g.lineH * 0.76,
-              width: `${((lines[m.line].length - indent) * 0.6 + 0.4) * w}em`,
+              width: `${((text.length - indent) * 0.6 + 0.4) * w}em`,
               fontSize: size,
               background: m.color ?? MARK,
               opacity: 1 - mo,
@@ -212,16 +221,25 @@ export const Listing: React.FC<{
           />
         );
       })}
-      {lines.map((line, i) => (
-        <Ink
-          key={i}
-          at={lineAt?.[i] ?? at + 4 + i * 3}
-          dur={14}
-          style={{ left: g.padX, top: g.padY + i * g.lineH, height: g.lineH, display: "flex", alignItems: "center" }}
-        >
-          <Code line={line} size={size} />
-        </Ink>
-      ))}
+      {lines.map((line, i) => {
+        const fade = fades
+          .filter((f) => f.line === i)
+          .reduce((o, f) => o * (1 - (1 - (f.to ?? 0.3)) * ease(frame, f.at, 12) * (f.out === undefined ? 1 : 1 - ease(frame, f.out, 12))), 1);
+        const swap = swaps.find((sw) => sw.line === i);
+        const lineStyle: React.CSSProperties = { left: g.padX, top: g.padY + i * g.lineH, height: g.lineH, display: "flex", alignItems: "center", opacity: fade };
+        return (
+          <React.Fragment key={i}>
+            <Ink at={lineAt?.[i] ?? at + 4 + i * 3} dur={14} out={swap?.at} outDur={8} style={lineStyle}>
+              <Code line={line} size={size} />
+            </Ink>
+            {swap ? (
+              <Ink at={swap.at + 4} dur={14} style={lineStyle}>
+                <Code line={swap.text} size={size} />
+              </Ink>
+            ) : null}
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 };

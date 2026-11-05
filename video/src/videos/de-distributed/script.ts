@@ -69,25 +69,33 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     160 KB, 64 of 250 MB (four per core). The page's rule: a few hundred MB
  *     a partition, at least as many as cores, often two to four times.
  *   - "shuffle": charts/memory-latency-ladder.mjs: main memory 100 ns, an
- *     NVMe SSD read 100,000 ns (1,000 times), a network round trip 10 ms
- *     (100,000 times); with an L1 hit stretched to one second, the chart's
- *     own column says main memory 2 min and a round trip 116 days. (The page's
- *     prose says the SSD is four orders of magnitude from memory; its chart
- *     says three. The video follows the chart.)
+ *     NVMe SSD read 100,000 ns (1,000 times). The chart's last row, a 10 ms
+ *     "network round trip", is the disk seek of the table it cites (Jeff
+ *     Dean's latency numbers); a shuffle's fetches cross one data center, and
+ *     that table's round trip within one is 500,000 ns (5,000 times), so the
+ *     video draws that instead and does not call the figure the page's. With
+ *     an L1 hit stretched to one second, the chart's own rule gives main
+ *     memory 2 min and the round trip 6 days (5.79: "almost six"). (The
+ *     page's prose says the network is five orders of magnitude from memory;
+ *     in a data center it is closer to four.)
  *   - "stage": charts/tail-latency-fanout.mjs, 1 - 0.99^n: 69 tasks are
  *     slow half the time (0.5002), 200 tasks 87% (0.866).
  *   - "skew": the model, seed 5: a million rows over 10,000 users in eight
  *     partitions by hash of the key, with "guest" on 30.0%: the guest's
  *     partition holds 387,836 rows, 3.1 times the 125,000 average; salted
- *     with a suffix 0 to 7, the largest holds 125,402 (1.0 times), and the
- *     two-step count adds eight partials of about 37,500 back to 300,079.
+ *     with a suffix 0 to 7, the largest holds 125,402 (1.0 times). (A count
+ *     needs no salt, since a DataFrame group by combines locally, so the
+ *     screen shows the two-step aggregation and the join's copy of the other
+ *     side without counting anything.)
  *   - "broadcast": the page's concept check's 2 TB fact table and 20 MB
  *     lookup, on the video's own fifty executors: 1 GB broadcast against
- *     about 2 TB shuffled.
+ *     about 2 TB shuffled. Spark's default spark.sql.autoBroadcastJoinThreshold
+ *     is 10 MB, so this lookup needs the hint.
  *
  * Written for Drew's ear: SQL is said "sequel", RDD is expanded where it is
- * first said (resilient distributed dataset), and MapReduce, Hadoop, Spark
- * and Parquet each get a short gloss where they first matter. Method names
+ * first said (resilient distributed dataset), and MapReduce, Hadoop, Spark,
+ * executors, the driver and Parquet each get a short gloss where they first
+ * matter. Method names
  * are said as words ("group by key", "collect"); the screen keeps the code.
  * Numbers as they are said.
  */
@@ -152,7 +160,7 @@ export const script: NarrationScript = {
     },
     {
       id: "hadoop-spark",
-      text: "Spark, a newer cluster engine, keeps intermediate results in memory, spilling to disk only under pressure. Multi-step and iterative work, like machine learning, runs much faster.",
+      text: "Spark, a newer cluster engine, passes data between steps in memory; only a shuffle writes to local disk. Cache a dataset, and iterative work, like machine learning, reads it from memory on every pass.",
       pauseAfter: 0.5,
     },
     {
@@ -170,7 +178,12 @@ export const script: NarrationScript = {
     },
     {
       id: "lazy-action",
-      text: "Here only show is an action: it makes Spark compile the plan, schedule it and run it. Count, collect and write are actions too.",
+      text: "Here only show is an action: it makes Spark compile the plan, schedule it and run it.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "lazy-too",
+      text: "Collect, write and count on a whole DataFrame are actions too; the grouped count is not.",
       pauseAfter: 0.7,
     },
     {
@@ -188,7 +201,17 @@ export const script: NarrationScript = {
     {
       id: "partitions",
       scene: true,
-      text: "Question five. What is a partition in Spark, and why does partition count matter? A partition is the unit of parallelism: one task works on one partition, on one core. Model it with sixteen gigabytes on sixteen cores.",
+      text: "Question five. What is a partition in Spark, and why does partition count matter? A partition is the unit of parallelism: one task works on one partition, on one core.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "part-exec",
+      text: "Cores belong to executors, the worker processes; the driver plans the job and hands them tasks.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "part-model",
+      text: "Model it with sixteen gigabytes on sixteen cores.",
       pauseAfter: 0.5,
     },
     {
@@ -209,6 +232,11 @@ export const script: NarrationScript = {
     {
       id: "part-change",
       text: "Repartition shuffles to any count. Coalesce only merges partitions, with no full shuffle: the cheap way to cut the count before writing.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "part-one",
+      text: "But coalesce to one, and the steps before it run as a single task.",
       pauseAfter: 0.7,
     },
 
@@ -234,7 +262,7 @@ export const script: NarrationScript = {
     },
     {
       id: "shuffle-ladder",
-      text: "From the page's latency chart: an SSD read takes a thousand times as long as memory, and a network round trip a hundred thousand times. If the fastest cache took one second, a round trip would take a hundred sixteen days.",
+      text: "An SSD read takes a thousand times as long as memory, and a round trip inside the data center five thousand times. If the fastest cache took one second, that round trip would take almost six days.",
       pauseAfter: 0.6,
     },
     {
@@ -247,7 +275,12 @@ export const script: NarrationScript = {
     {
       id: "stage",
       scene: true,
-      text: "Question eight. What is a stage and a task in Spark's execution model? One action starts a job. Spark cuts it into stages at every wide dependency, so counting shuffles counts stages.",
+      text: "Question eight. What is a stage and a task in Spark's execution model? One action starts a job.",
+      pauseAfter: 0.35,
+    },
+    {
+      id: "stage-cut",
+      text: "Spark cuts it into stages at every wide dependency, so each shuffle adds a stage.",
       pauseAfter: 0.4,
     },
     {
@@ -258,6 +291,11 @@ export const script: NarrationScript = {
     {
       id: "stage-tail",
       text: "From the page's fan-out chart: if each task has a one percent chance of being slow, a stage of sixty-nine tasks is slow half the time, and one of two hundred, eighty-seven percent of the time.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "stage-spec",
+      text: "Speculative execution starts a copy of a slow task on another executor.",
       pauseAfter: 0.7,
     },
 
@@ -280,7 +318,17 @@ export const script: NarrationScript = {
     },
     {
       id: "skew-steps",
-      text: "Then aggregate in two steps, by the salted key and then by the key. Or handle nulls and stand-in keys separately, or let adaptive query execution split skewed partitions.",
+      text: "Then aggregate in two steps, by the salted key and then by the key.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "skew-join",
+      text: "In a join, copy the other side's guest rows once per suffix, so every salted row still finds its match.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "skew-aqe",
+      text: "Or handle nulls and stand-in keys separately, or let adaptive query execution split skewed join partitions.",
       pauseAfter: 0.7,
     },
 
@@ -339,12 +387,27 @@ export const script: NarrationScript = {
     },
     {
       id: "lineage-lost",
-      text: "When an executor dies and a partition is lost, Spark replays those steps for that partition alone, instead of restarting the job. Checkpointing cuts a very long lineage short, by saving a copy to reliable storage.",
+      text: "When an executor dies and a partition is lost, Spark replays those steps for that partition alone, instead of restarting the job.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "lineage-wide",
+      text: "Past a shuffle, that replay needs output from every parent.",
+      pauseAfter: 0.4,
+    },
+    {
+      id: "lineage-ckpt",
+      text: "Checkpointing cuts a very long lineage short, by saving a copy to reliable storage.",
       pauseAfter: 0.7,
     },
     {
       id: "cache",
       text: "Question fourteen. What does caching or persisting do, and when is it worth it? It keeps a DataFrame's computed partitions in memory, so the next action reuses them instead of replaying the lineage.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "cache-level",
+      text: "Cache is persist at its default level, memory and disk; persist lets you pick the level, like memory only.",
       pauseAfter: 0.5,
     },
     {

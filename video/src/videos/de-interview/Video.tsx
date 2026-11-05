@@ -37,7 +37,9 @@ const Scenes: React.FC = () => {
         return (
           <Scene
             key={id}
-            from={i === 0 ? 0 : cut(id)}
+            // The first scene is fully up at frame 0 (its kicker already
+            // inked), so the video's first frame is not a blank page.
+            from={i === 0 ? -6 : cut(id)}
             to={next ? until(cut(next[0])) : durationInFrames + OVERLAP}
             fade={6}
           >

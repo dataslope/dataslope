@@ -44,7 +44,7 @@ export const HookScene: React.FC = () => {
   const askAt = n.word("hook-read", "Ask both");
   const everyAt = n.word("hook-read", "every byte of the CSV");
   const fiveAt = n.word("hook-read", "five megabytes");
-  const layoutAt = n.word("hook-read", "only the layout differs");
+  const storedAt = n.word("hook-same", "only how they're stored differs");
   const nineAt = n.word("plan", "nine questions");
   const sevenAt = n.word("plan", "Seven get measured");
   const end = n.beat("plan").to;
@@ -70,7 +70,7 @@ export const HookScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>Data engineer interview prep · Warehousing &amp; storage</Kicker>
-        <Headline lead="A million sales, written twice." turn="Only the layout differs." at={salesAt - 4} turnAt={layoutAt} size={60} />
+        <Headline lead="A million sales, written twice." turn="Only how they're stored differs." at={salesAt - 4} turnAt={storedAt} size={60} />
         <div style={{ position: "absolute", left: X0, top: y(238), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, salesAt + 10, 12) * (1 - ease(frame, dim, 14) * 0.55) }}>
           <Num>{count(TABLE.rows)}</Num> rows made up for this video, in the page&apos;s six <QMono>sales</QMono> columns
         </div>
@@ -98,7 +98,11 @@ export const HookScene: React.FC = () => {
             <span style={{ ...note(26, INK), fontWeight: 700, opacity: ease(frame, pqSizeAt, 10) }}>
               <Num>{MB(FILES.parquet)}</Num>
             </span>
-            <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, columnarAt, 10) }}>columnar: each column stored together</span>
+            <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, columnarAt, 10) }}>
+              columnar: each column stored together
+              {/* Not only columns: the gap to the CSV is binary types and compression too. */}
+              <span style={{ opacity: ease(frame, storedAt, 10) }}>, binary, typed and compressed</span>
+            </span>
           </>,
           ROW2 - 46,
         )}
@@ -116,6 +120,7 @@ export const HookScene: React.FC = () => {
           }}
         >
           the page&apos;s query: revenue and units by <QMono>category</QMono>
+          <span style={{ ...note(22, INK_SOFT) }}>, run in DuckDB, a columnar engine</span>
         </div>
         <ReadMark x={X0} y={y(ROW1)} width={CSV_W} height={h(BAR_H)} at={everyAt + 4} out={dim} />
         <ReadMark x={X0 + pqW * skipped} y={y(ROW2)} width={pqW * readShare} height={h(BAR_H)} at={fiveAt} out={dim} />
