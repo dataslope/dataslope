@@ -50,7 +50,19 @@ gloss (moved to Q5).
 
 ## Length and checks
 
-CHECKS_PLACEHOLDER
+- 653.8 s (10:54), 60 beats; was 603.6 s (10:04), 49 beats.
+- Typecheck and lint clean for the folder; `check:cues` clean; `npm test`
+  75/75.
+- `check:motion` passes (nothing still for 2 s or more); `check:sync` passes
+  (60 beats, worst +0.04 s, `shuffle`); `check:mix` passes (effects 31.2 LU
+  under the narration, speech a median 30.2 dB above them); `check:frames`
+  passes (73 arrows, none bends under its head; no hyphen in tabular figures).
+- Stills at every changed moment, each looked at: the hook, both Hadoop and
+  Spark lanes as they build and finished, the action chips and the trap note,
+  the rewrites, the grid with its executors and driver, `coalesce(1)`, the
+  ladder, speculative execution, the skew column, both broadcast panels, the
+  Q12 divider, the narrow and wide replays, `persist`, the "with one" row and
+  the row groups.
 
 ## Facts
 
