@@ -32,3 +32,11 @@ test("every sound is a 44.1 kHz 16-bit stereo WAV of the length listed", () => {
     assert.ok(Math.abs(length - seconds) < 0.002, `${name}: ${length} s, listed as ${seconds} s`);
   }
 });
+
+test("accents.json gives every sound an accent inside it", () => {
+  const accents: Record<string, number> = JSON.parse(readFileSync(join(SFX, "accents.json"), "utf8"));
+  assert.deepEqual(Object.keys(accents).sort(), Object.keys(listed).sort());
+  for (const [name, at] of Object.entries(accents)) {
+    assert.ok(at >= 0 && at < listed[name], `${name}: accent at ${at} s of ${listed[name]} s`);
+  }
+});

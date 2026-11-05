@@ -39,6 +39,9 @@ ids that sort in course order:
 | `How-LLMs-Work` | `Llm-1-Tokens` to `Llm-5-Benchmarks`, narrated by Drew, with two deep dives: `Llm-2-1-AttentionScore` (one attention score worked through) and `Llm-4-1-ConversationCost` (why a chat's bill grows faster than the chat) |
 | `NLP-Python` | `Nlp-1-WhyTextIsHard` to `Nlp-5-History`, narrated by Hope, with two deep dives: `Nlp-2-1-LemmasAndTags` (lemmatizing needs the part of speech) and `Nlp-3-1-ZipfsLaw` (Zipf's law read off a log-log plot) |
 
+The `Logo-Reveals` folder holds ten short brand clips, five stings and five
+course openers (see [Logo reveals](#logo-reveals)).
+
 A deep dive (`Llm-2-1-…`) is a two-minute video on one idea its unit could
 only sketch, embedded at one lesson section beside the unit video. It has no
 series intro and no "Next" line, and sits after its unit in the Studio folder.
@@ -183,8 +186,9 @@ Every video follows these rules.
 
 - **Content only.** No running head or masthead, and no branded end card. The
   video stops on its last idea. The one brand moment is the series intro
-  below, at the very start of a course video, and nothing else carries the
-  logo.
+  below, at the very start of a course video, and nothing else in a lesson
+  video carries the logo. (The logo reveals are clips of their own, for the
+  head of an edit, a trailer or a channel; they are not placed in lessons.)
 - **No tracked capitals.** Kickers, figure numbers and axis titles are set in
   sentence case. All caps with wide letter spacing shouts, and it blurs at
   small sizes.
@@ -518,9 +522,75 @@ by itself, and the scene gaps still hold.
 Words like "SQL" and "Postgres" are better pinned with an ElevenLabs
 pronunciation dictionary than respelled in the script: the captions show the
 script text exactly as written.
+`agent-outputs/20261105-1200-narration-acronym-redub-plan.md` (at the
+repository root) plans the general fix: one pronunciation table applied when
+the text is sent, which re-voices exactly the beats it changes (52 of them,
+in 19 videos, when it was written).
 
 Captions are off by default (`EDITORIAL_DEFAULTS`). Switch them on in the
 Studio's props panel, or with `--props='{"captions":true}'`.
+
+## Logo reveals
+
+Short brand clips, in the Studio's `Logo-Reveals` folder. A **sting** is the
+mark and the wordmark (3.5 s). A **course opener** adds a course and a unit
+(5 s). Each opens on a few frames of bare page, builds the mark, sets the
+words, and holds the finished lockup for at least a second.
+
+| Composition | The mark | The words | Layout |
+| --- | --- | --- | --- |
+| `Sting-1-Assemble` | `assemble` | `ink` | `sting` |
+| `Sting-2-Plot` | `plot` | `letters` | `sting` |
+| `Sting-3-Histogram` | `histogram` | `slide` | `sting` |
+| `Sting-4-Scatter` | `scatter` | `blur` | `sting` |
+| `Sting-5-UnfoldDark` | `unfold` | `type` | `sting`, on deep blue |
+| `Opener-1-Stack` | `rise` | `slide` | `stack`, every line one size |
+| `Opener-2-Block` | `plot` | `ink` | `block`, every line one size |
+| `Opener-3-Centered` | `unfold` | `letters` | `centered`, every line one size |
+| `Opener-4-Columns` | `assemble` | `blur` | `columns`, every line one size |
+| `Opener-5-Headline` | `histogram` | `ink` | `headline`, a hierarchy, for comparison |
+
+All ten are one component, `LogoReveal` (`src/reveals/`), with different
+props (`src/reveals/presets.ts`). Any mark motion goes with any text motion,
+layout and theme, and an opener names any unit, from the Studio's props panel
+or the command line:
+
+```bash
+npm run render -- Opener-1-Stack --props='{"course":"Database Design with PostgreSQL","unit":"Unit 4","title":"Keys and integrity"}'
+```
+
+- **The mark is the site's own file.** `src/components/mark.ts` holds its two
+  paths and gradients (the series intro draws from it too), and the slope's
+  centre line, `SPINE`, measured from the file: each slope is a band 272
+  units wide along it. That is what lets `plot` draw a slope as one
+  round-capped pen stroke and `scatter` settle points inside it. Every motion
+  ends on the file exactly.
+- **The motions** (`timing.ts`): `assemble` (the halves slide in and meet,
+  then the site's hover tilt), `plot` (drawn up one slope and down the other,
+  the round cap as the pen), `histogram` (bars rise inside the outline, then
+  close their gaps into the shape), `scatter` (points gather into the
+  slopes, then it fills), `rise` (up from behind a horizon, with an
+  overshoot) and `unfold` (the peak drops in folded and swings open like a
+  compass). Distances are in screen pixels, so a small mark beside a line of
+  text moves as much as a large one.
+- **Equal sizes.** The `stack`, `block`, `centered` and `columns` openers set
+  every line at one size, "Dataslope" included: weight and color tell the
+  lines apart (the wordmark in ink at 600, the course in the soft ink at 500,
+  the unit's title in the brand blue). `headline` keeps the size hierarchy of
+  the series intro, to compare against.
+- **One number per motion.** `MARK_LANDS` is the frame the mark is whole; the
+  words, the glide of a sting's mark and the bell are all cued from it.
+  `src/reveals/reveals.test.ts` checks each against the springs that make it,
+  that every sound cued exists and starts inside the video, and that every
+  reveal holds its finished lockup for a second.
+- **Every reveal lands on the same bell**, `el-reveal-bell`: the sonic half of
+  the logo. What leads into it follows the motion: a whoosh as each half of
+  `assemble` sweeps in and a click as they meet, a pen stroke under `plot`, a
+  rising marimba run under `histogram`, a shimmer that swells into `scatter`'s
+  landing, a thud and a whoosh for `unfold`. Each is cued by its accent
+  (`<Sfx accentAt>`, below), and each opener line by the tap of a soft card
+  slide. A reveal measures about -27 LUFS and peaks at -11 dBFS, a little
+  under the narration's -25 LUFS, since it plays alone.
 
 ## Sound effects (SamplingBias, ThinkingStatistically)
 
@@ -560,21 +630,50 @@ script rewrites the list from what is in the folder.
 - **Synthesized** (SamplingBias): `npm run sfx` (`scripts/sfx.mjs`) builds 21
   sounds from damped sines and filtered noise. They are free, unlicensed and
   byte-identical on every run.
-- **Generated by ElevenLabs** (ThinkingStatistically and the logo intro):
-  `npm run sfx:elevenlabs` (`scripts/sfx-elevenlabs.mjs`) sends each prompt in
-  `sfx/elevenlabs.json` to the sound-generation API and writes
-  `public/sfx/el-<name>.wav`. They sound recorded rather than built, which is
-  the point of having them.
+- **Generated by ElevenLabs** (ThinkingStatistically, the logo intro and the
+  logo reveals): `npm run sfx:elevenlabs` (`scripts/sfx-elevenlabs.mjs`)
+  sends each prompt in `sfx/elevenlabs.json` to the sound-generation API and
+  writes `public/sfx/el-<name>.wav`. They sound recorded rather than built,
+  which is the point of having them.
 
 ```bash
 npm run sfx:elevenlabs -- --dry-run        # what would be generated, no calls
 npm run sfx:elevenlabs                     # only the sounds not yet generated
 npm run sfx:elevenlabs -- --only tap,pop   # these again, even if present
+npm run sfx:elevenlabs -- --only x --reprocess   # re-trim the kept MP3, no API call
 ```
 
+**The model is SFX v3**, `eleven_text_to_sound_v3` (released 2026-10-29),
+for every sound that doesn't name another with `model`. The API still
+defaults to v2 when no model is sent, so the script always sends one, and the
+lock file records which model made each file. The first eight sounds
+(`logo` to `chime`) were made on v2 and say so. ElevenLabs removes v2 on
+2027-03-01; the files stay, but regenerating one then means moving it to v3.
+v3 takes a `duration_seconds` of 0.5 to 30 s, which the script checks before
+it spends anything.
+
+**One event per sound, cued by its accent.** v3 is said to follow a prompt
+that lists events in order, but the reveals' first prompts ("two whooshes,
+then a click, then a bell") came back as a single hit near the start, or as
+an even texture with no bell. So each sound is one event, and the animation
+places them. `scripts/lib/wav.mjs` measures each file's **accent**, the
+attack of its loudest moment, into `public/sfx/accents.json`, and
+`<Sfx name="el-reveal-bell" accentAt={land}>` starts the sound early by that
+much, so the bell strikes on the frame the mark lands. The cue still holds
+when the sound is regenerated. A sound whose accent comes before the video
+starts has its head trimmed instead of being dropped.
+
+**`reverse: true`** plays a sound backwards, which turns one that peaks and
+decays into one that swells into its last instant: `el-reveal-shimmer` is a
+shimmer generated forwards and played backwards, building into `scatter`'s
+landing. `--reprocess` re-applies it, or a change to the trimming, from the
+raw MP3 kept in `.generated/sfx/`, for free.
+
 Generation costs credits from the same ElevenLabs pool as the narration,
-though very few: a 2.5 s sound measured 14, so the eight in the file (8.3 s
-asked for in all) come to roughly 50. So the script generates only what is missing, and a
+though very few: a 2.5 s sound measured 14 on v2. ElevenLabs lists 40
+credits a second when a duration is set; the reveals' 20 s of v3 sounds did
+not move the account's character count on 2026-11-05, so check the usage
+page if it matters. So the script generates only what is missing, and a
 prompt edited since its sound was generated is reported (from
 `sfx/elevenlabs.lock.json`) rather than silently regenerated: pass `--only`
 to pay for it. The raw MP3s stay in `.generated/sfx/` (gitignored), and the
@@ -590,7 +689,8 @@ voice. The ElevenLabs set is smaller and covers the same jobs: `el-tap` for a
 value landing, `el-pop` for an illustration or a bar, `el-sprinkle` for many
 dots at once, `el-pencil` for a line drawn, `el-scratch` for a strike-through,
 `el-whoosh` for something sliding or sweeping in, `el-chime` for a
-conclusion, and `el-logo` for the intro. `el-chime` is the one to watch: it
+conclusion, and `el-logo` for the intro. The `el-reveal-*` sounds belong to
+the logo reveals (see above). `el-chime` is the one to watch: it
 centres near 320 Hz, inside the voice, so it goes in a pause and stays at
 about -32.
 
