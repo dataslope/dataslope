@@ -1,6 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
 import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
-import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
  * Narration for "Describing data" (16:9), Unit 2 of the Statistics course.
@@ -82,7 +81,6 @@ export const script: NarrationScript = {
   id: "describing-data",
   voice: "hope",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
-  leadIn: INTRO_LEAD_IN,
   minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   // One take per part: Part 2 is just over the default 1,800 characters.

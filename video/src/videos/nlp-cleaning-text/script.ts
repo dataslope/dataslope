@@ -1,6 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
 import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
-import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
  * Narration for "Cleaning text" (16:9), Unit 2 of Natural Language Processing
@@ -97,7 +96,6 @@ export const script: NarrationScript = {
   id: "nlp-cleaning-text",
   voice: "hope",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
-  leadIn: INTRO_LEAD_IN,
   minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   // Puts the closing scene in the last part's take rather than a 271-character

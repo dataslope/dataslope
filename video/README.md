@@ -44,7 +44,7 @@ course openers (see [Logo reveals](#logo-reveals)).
 
 A deep dive (`Llm-2-1-…`) is a two-minute video on one idea its unit could
 only sketch, embedded at one lesson section beside the unit video. It has no
-series intro and no "Next" line, and sits after its unit in the Studio folder.
+"Next" line, and sits after its unit in the Studio folder.
 
 A course video's id is not its folder name (`Stats-2-DescribingData` lives in
 `src/videos/describing-data/`). The check scripts take either; `remotion
@@ -184,11 +184,11 @@ narration.
 
 Every video follows these rules.
 
-- **Content only.** No running head or masthead, and no branded end card. The
-  video stops on its last idea. The one brand moment is the series intro
-  below, at the very start of a course video, and nothing else in a lesson
-  video carries the logo. (The logo reveals are clips of their own, for the
-  head of an edit, a trailer or a channel; they are not placed in lessons.)
+- **Content only.** No running head or masthead, no opener and no branded
+  end card. The video opens on its first idea and stops on its last. Each
+  course and interview track is uploaded to YouTube as one merged video, and
+  the opener goes on in that edit: one of the logo reveals, or the series
+  intro below, both kept for it. No lesson video carries the logo.
 - **No tracked capitals.** Kickers, figure numbers and axis titles are set in
   sentence case. All caps with wide letter spacing shouts, and it blurs at
   small sizes.
@@ -306,31 +306,32 @@ longer `pauseAfter` on the beat before it, which the gap never shortens.
 before a marked beat. Mark beats the same way when a scene opens on a beat
 some other way, such as a wipe or an eraser keyed to `beat("…").from`.
 
-### A course video opens on the series intro
+### The series intro (kept, not placed)
 
-A course's unit video opens with `<SeriesIntro>` (`src/editorial/SeriesIntro.tsx`):
-the Dataslope mark assembles from its two slopes, tilts the way the site's
-logo tilts on hover, and the wordmark writes itself beside it, set as the
-site header sets it (Inter 600, tracked tight, at 1.38 times the mark's
-height). The course and unit, then the unit's title, arrive under a hairline.
-ThinkingStatistically is the worked example.
+`<SeriesIntro>` (`src/editorial/SeriesIntro.tsx`) is the course opener the
+unit videos used to start on: the Dataslope mark assembles from its two
+slopes, tilts the way the site's logo tilts on hover, and the wordmark
+writes itself beside it, set as the site header sets it (Inter 600, tracked
+tight, at 1.38 times the mark's height). The course and unit, then the
+unit's title, arrive under a hairline. Its sound is `el-logo`, an airy rise
+into a bell, peaking at -21 dBFS with nothing under it, and a pencil stroke
+for the hairline.
 
-- **The mark is the site's own file.** Its two paths and radial gradients are
-  copied from `public/dataslope-logo-blue.svg` (the copy in
-  `public/brand/` is the same file), drawn inline so each half can move, with
-  the blue as a brand token.
+**No video opens on it any more** (removed 2026-11-05). The tracks are
+uploaded as merged videos, each with one opener added in the edit, so 28
+copies of the intro inside them would repeat. The component and its timing
+stay for a video that wants one:
+
 - **The intro is its own scene from frame 0**, ending where the first
   content scene's cut begins, and the script sets `leadIn: INTRO_LEAD_IN`
-  (4.6 s, just past the intro's 4.4) so the first word waits for it. Both
-  numbers live in `src/editorial/intro.ts`, so a change to the intro's length
-  is one edit that moves every course video, and `src/editorial/intro.test.ts`
-  fails any course script that types its own lead-in. Anything the first
-  scene used to show at fixed frames is re-cued to its first beat
-  (`n.beat(id).from`), or it plays under the logo. The first beat is
-  `scene: true`, since a cut is cued from it.
-- **It has its own sound**: `el-logo`, an airy rise into a bell, peaking at
-  -21 dBFS with nothing under it, and a pencil stroke for the
-  hairline.
+  (4.6 s, just past the intro's 4.4, both in `src/editorial/intro.ts`) so the
+  first word waits for it. Anything the first scene shows at fixed frames
+  is cued to its first beat (`n.beat(id).from`) instead, or it plays under
+  the logo.
+- **`src/editorial/intro.test.ts` holds the two together.** A video that
+  opens on the intro takes its lead-in from `intro.ts`, and a script that
+  waits `INTRO_LEAD_IN` without opening on the intro fails, because its
+  first word would follow 4.6 s of empty page.
 
 ### A video in a series leads into the next
 

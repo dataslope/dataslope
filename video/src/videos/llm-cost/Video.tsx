@@ -1,7 +1,6 @@
 import React from "react";
 import { Scene } from "../../components/Scene";
 import { EditorialPage, type EditorialProps } from "../../editorial/Page";
-import { SeriesIntro } from "../../editorial/SeriesIntro";
 import { useNarration } from "../../narration/NarrationContext";
 import { CacheScene } from "./CacheScene";
 import { HookScene } from "./HookScene";
@@ -38,10 +37,7 @@ const Scenes: React.FC = () => {
   const until = (frame: number) => frame + OVERLAP;
   return (
     <>
-      <Scene from={0} to={until(cut("hook"))} fade={8}>
-        <SeriesIntro course="How Large Language Models Work" unit="Unit 4" title="What a token costs" />
-      </Scene>
-      <Scene from={cut("hook")} to={until(cut("sheet"))} fade={6}>
+      <Scene from={0} to={until(cut("sheet"))} fade={6}>
         <HookScene />
       </Scene>
       <Scene from={cut("sheet")} to={until(cut("why"))} fade={6}>

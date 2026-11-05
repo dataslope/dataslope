@@ -1,7 +1,6 @@
 import React from "react";
 import { Scene } from "../../components/Scene";
 import { EditorialPage, type EditorialProps } from "../../editorial/Page";
-import { SeriesIntro } from "../../editorial/SeriesIntro";
 import { useNarration } from "../../narration/NarrationContext";
 import { BlendScene, HeadsScene, QkvScene, TrophyScene } from "./AttentionScenes";
 import { IdsScene, OrderScene, SpaceScene } from "./EmbeddingScenes";
@@ -33,10 +32,7 @@ const Scenes: React.FC = () => {
   const until = (frame: number) => frame + OVERLAP;
   return (
     <>
-      <Scene from={0} to={until(cut("hook"))} fade={8}>
-        <SeriesIntro course="How Large Language Models Work" unit="Unit 2" title="From ids to meaning" />
-      </Scene>
-      <Scene from={cut("hook")} to={until(cut("geometry"))} fade={6}>
+      <Scene from={0} to={until(cut("geometry"))} fade={6}>
         <IdsScene />
       </Scene>
       <Scene from={cut("geometry")} to={until(cut("order"))} fade={6}>

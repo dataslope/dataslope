@@ -1,7 +1,6 @@
 import React from "react";
 import { Scene } from "../../components/Scene";
 import { EditorialPage, type EditorialProps } from "../../editorial/Page";
-import { SeriesIntro } from "../../editorial/SeriesIntro";
 import { useNarration } from "../../narration/NarrationContext";
 import { ChooseScene } from "./ChooseScene";
 import { DeleteScene } from "./DeleteScene";
@@ -51,13 +50,10 @@ const Scenes: React.FC = () => {
   const until = (frame: number) => frame + OVERLAP;
   return (
     <>
-      <Scene from={0} to={until(cut("hook"))} fade={8}>
-        <SeriesIntro course="Database Design with PostgreSQL" unit="Unit 4" title="Keys and integrity" />
-      </Scene>
       {SCENES.map(([id, Body], i) => {
         const next = SCENES[i + 1];
         return (
-          <Scene key={id} from={cut(id)} to={next ? until(cut(next[0])) : durationInFrames + OVERLAP} fade={6}>
+          <Scene key={id} from={i === 0 ? 0 : cut(id)} to={next ? until(cut(next[0])) : durationInFrames + OVERLAP} fade={6}>
             <Body />
           </Scene>
         );

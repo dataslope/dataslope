@@ -1,4 +1,3 @@
-import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 import type { TimedBeat, Timeline } from "../../narration/types";
 import { PARTS } from "./script.ts";
 
@@ -12,7 +11,8 @@ import { PARTS } from "./script.ts";
  * where each part starts:
  *
  *   - the first part's first word lands where a course video's first word
- *     lands after the series intro (INTRO_LEAD_IN, as every course script);
+ *     lands (FIRST_WORD, the narration's own default lead-in); the merged
+ *     video has no series intro, so the first part starts at frame 0;
  *   - every later part starts HOLD seconds after the last word the part
  *     before it plays (its spoken bridge, less any beats its PARTS entry
  *     skips: see `asPlayed`), and cross-fades in over CROSSFADE
@@ -21,8 +21,8 @@ import { PARTS } from "./script.ts";
  *   - the last part runs to the end of its own timeline, tail included.
  */
 
-/** Where the first part's first word lands, in seconds: after the intro. */
-export const FIRST_WORD = INTRO_LEAD_IN;
+/** Where the first part's first word lands, in seconds. */
+export const FIRST_WORD = 0.6;
 /** Seconds between a part's last word and the next part's first frame. */
 export const HOLD = 1.4;
 /** Frames over which one part (or the intro) cross-fades into the next. */
