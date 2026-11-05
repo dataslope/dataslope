@@ -65,9 +65,14 @@ All checks ran on the final code, through my entry and the queue.
 - **`npm test`**: 75/75 pass. An earlier run had two failures, both naming
   `de-distributed` and `de-orchestration`.
 - **`check:motion`**: passes. 9:29.5 checked, with no still stretch of 2 s or more.
-- **`check:sync`**: SYNC_RESULT
-- **`check:mix`**: MIX_RESULT
-- **`check:frames`**: FRAMES_RESULT
+- **`check:sync`**: passes. All 54 beats start within ±0.12 s of their cues; the worst is +0.04 s (`lookup`), and every re-voiced beat is within ±0.04 s.
+- **`check:mix`**: passes (exit 0). Narration is at −19.7 LUFS and the effects 28.5 LU under it. Where both sound, the median gap is 28.2 dB. The closest moment is 10.7 dB at 3:57.1, the existing tap on "depends on only half of it".
+- **`check:frames`**: passes:
+  - 1 illustration, largest stretch 0.90.
+  - 6 arrows, 0° of bend under any head.
+  - Every ERD end sits on a straight stretch.
+  - No hyphen is set in tabular figures.
+  - Every cue names its occurrence.
 - **Stills**: 22 stills, each looked at: 44, 100, 131.4 (twice), 197.5, 215.3,
   232.5, 262.3 (twice), 272, 303.9, 350.2, 356.5, 395, 423.5, 449.3, 489.5,
   507.5, 526.5, 543, 552 and 566.5 s. After the first round I made three
@@ -102,4 +107,9 @@ Unchanged, `check.mjs` reproduced `results.json` byte for byte. After my edits,
   - Its measure/metric answer names "the semantic/BI layer or documented SQL".
     The video now says "a semantic layer".
   - I did not edit the page.
+- **A brief gap before the metric figure fills in.** In quick question 15,
+  "Define each metric once, in the semantic layer." still appears about 0.6 s
+  before the two teams' numbers fill the gap above it. It did the same before,
+  because the narration has always said "define once" before the numbers. I
+  left it.
 - **No shared change is needed** for any of these fixes.
