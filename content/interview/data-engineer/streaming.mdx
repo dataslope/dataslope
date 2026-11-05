@@ -171,8 +171,9 @@ headroom.
 and garbage-collects older values, instead of expiring by time/size. This
 turns a topic into a durable **changelog / snapshot** of current state per
 key (e.g. latest profile per user), useful for rebuilding state stores or
-CDC-style tables. It complements normal time-based retention rather than
-replacing it.
+CDC-style tables. On its own, compaction never deletes a key's latest value,
+however old; a topic that should also expire old keys sets both policies
+(`cleanup.policy=compact,delete`).
 
 ### How does a streaming join differ from a batch join?
 

@@ -231,7 +231,7 @@ ORC is another columnar format, like Parquet it supports compression and predica
 
 ### What is schema evolution, and how do Parquet and Avro handle it?
 
-Schema evolution is the ability to change a schema (add, rename, remove, or change-type columns) without breaking existing readers or rewriting existing data. Parquet supports adding and dropping columns safely; changing types or renaming columns may break older readers. Avro handles evolution more formally via compatibility rules (backward, forward, full) enforced by a **schema registry**, making it the better choice when many independent services must agree on a schema.
+Schema evolution is the ability to change a schema (add, rename, remove, or change-type columns) without breaking existing readers or rewriting existing data. Each Parquet file carries its own schema, so files can gain or lose columns over time, but the reader has to reconcile them: some engines merge schemas by name only when asked (DuckDB's `union_by_name`, Spark's `mergeSchema`), and a default read may silently drop a new column or fail. Changing types or renaming columns may break older readers. Avro handles evolution more formally via compatibility rules (backward, forward, full) enforced by a **schema registry**, making it the better choice when many independent services must agree on a schema.
 
 ### What is a DAG in Airflow, and what are common anti-patterns?
 

@@ -1,7 +1,7 @@
 # Data Engineer interview videos: review
 
 **Reviewed:** the twelve Data Engineer interview prep videos,
-`DataEngineer-0-Interview` to `DataEngineer-11-PipelinesForAi` (Drew), 1:43 in
+`DataEngineer-0-Interview` to `DataEngineer-11-PipelinesForAi` (Drew), 1:40 in
 all, as built and voiced in #722
 ([build record](20261030-de-interview-video-build/STATE.md)). Their builders
 checked them with `check:frames`, `check:motion`, `check:sync` and `check:mix`,
@@ -34,7 +34,7 @@ Severity is the same as in the earlier reviews:
 | 9 Warehousing | 7:25 | 0 | 6 | 9 |
 | 10 Orchestration | 8:54 | 1 | 5 | 13 |
 | 11 Pipelines for AI | 8:57 | 0 | 6 | 10 |
-| **Total** | **1:43:39** | **7** | **65** | **125** |
+| **Total** | **1:39:39** | **7** | **65** | **125** |
 
 ## How it was reviewed
 
@@ -187,9 +187,92 @@ review, because the fixers may not touch shared files:
 
 ## The fixes
 
-In progress: one fixer per video, to
-[`tools/FIX-BRIEF.md`](20261105-de-interview-video-review/tools/FIX-BRIEF.md)
-(P1s, then answers, then other P2s, then P3s). Each fixer may re-voice at
-most 1,200 characters, half the Data Analyst budget, so the ElevenLabs
-account still covers the re-dub that follows. Their reports will land in
+**Done.** One fixer per video worked to
+[`tools/FIX-BRIEF.md`](20261105-de-interview-video-review/tools/FIX-BRIEF.md),
+in order: P1s, then answers, then the other P2s, then P3s. Each fixer's report,
+with every finding by number and what changed, is in
 [`20261105-de-interview-video-review/fixes/`](20261105-de-interview-video-review/fixes/).
+
+| Video | Findings | Characters re-voiced | Length before → after |
+| --- | --- | --- | --- |
+| 0 Interview | 10 fixed (one on screen only) | 542 | 2:13 → 2:32 |
+| 1 SQL patterns | 16 fixed | 719 | 9:50 → 10:35 |
+| 2 SQL performance | 19 fixed | 1,071 | 7:09 → 8:18 |
+| 3 Dimensional modeling | 18 fixed, 1 in part | 709 | 8:48 → 9:29 |
+| 4 Modeling history | 13 fixed, 1 in part | 912 | 8:35 → 9:37 |
+| 5 Python | 20 fixed, 1 done centrally | 1,137 | 10:31 → 11:35 |
+| 6 Pipelines | 13 fixed (one side point of #6 left) | 1,138 | 7:45 → 9:10 |
+| 7 Distributed processing | 14 fixed | 1,172 | 10:04 → 10:54 |
+| 8 Streaming | 21 fixed | 1,015 | 9:28 → 10:20 |
+| 9 Warehousing | 14 fixed, 1 in part | 849 | 7:25 → 8:24 |
+| 10 Orchestration | 19 fixed | 860 | 8:54 → 9:29 |
+| 11 Pipelines for AI | 16 fixed | 1,090 | 8:57 → 9:51 |
+| **Total** | **197** | **11,214** | **1:39:39 → 1:50:16** |
+
+- **Within budget.** Every video stayed under its 1,200-character budget.
+  The pass cost 2,468 ElevenLabs credits for 11,214 characters:
+  `eleven_v4_turbo` bills about a fifth of a credit a character.
+- **Checks.** Every video passed typecheck, lint, `npm test`, `check:cues`,
+  `check:motion`, `check:sync`, `check:mix` and `check:frames` on its final
+  code. The whole package passes `npm test` (75/75) with all twelve in.
+- **Untouched audio.** Beats were split at sentence breaks before any
+  rewording, and the unchanged pieces were cut from the kept takes for free.
+  Every beat a fixer did not mean to change is byte-identical to the pre-fix
+  commit (`4bff3bc`), and no take was re-recorded.
+- **What the extra 11 minutes is.** Most of it is answers carried one step
+  further, plus longer holds where the review found a figure up too briefly.
+
+**Values.** Every number still comes from a video's `check.mjs`. Every
+existing value came back identical except where a finding was about that
+value:
+
+- **Streaming:** the backpressure answer is now a two-partition run of the
+  same seeded traffic. Its busier partition clears in 20 s, where the old
+  one-queue model said 18.
+- **Distributed processing:** the latency ladder's network row is a
+  data-center round trip, 500,000 ns, about 5,000 times memory, not 100,000.
+- **SQL patterns:** the refused `SUM` in `WHERE` now runs at the query's own
+  400.
+
+Several fixers added new measured steps for new claims. Examples: a sorted
+rebuild that shows UUIDv7 pays only for its width, a date range that prunes
+to 3 of 12 files, and BM25 computed for real on the tickets.
+
+**Partly fixed, and why.** The voice budget ran out in four places, so
+each keeps its old narration and is fixed on screen only:
+
+- **Dimensional modeling #13:** the fiscal-quarter note.
+- **Modeling history #13:** "small integer" is still spoken, though a valid
+  version-4 UUID is now shown.
+- **Warehousing #7:** "compact them for you" is still spoken; the lesson page
+  says the same.
+- **Pipelines #6:** the poll's "row updated twice" weakness.
+
+**Done centrally, after the pass.** Shared code and the site:
+
+- **Strikes over code:** `da-pandas/parts.tsx`'s `textOf` reads a
+  `<Code line>`'s text. A strike over code now tilts by its real length:
+  Python's hook, and the same at `ds-python-pandas/HookScene.tsx:147`.
+- **Code in small labels:** `QMono` (`src/editorial/interview.tsx`) is
+  `max(19px, 0.84em)`, so code inside a 21px label no longer drops to
+  17.6px. Two fixers had worked around it locally.
+- **The latency chart:** `charts/memory-latency-ladder.mjs`'s network round
+  trip is 500,000 ns (inside a data center), not the 10 ms disk seek. Its
+  title and spread follow (six orders of magnitude, not seven), as does the
+  C# lesson that introduces it ("six orders", not "ten").
+- **The pages the videos answer**, where a fixer found the page wrong:
+  - **`distributed-processing.mdx`:** Hadoop's map output goes to local
+    disk, and Spark also writes its shuffle output to disk. The real
+    difference is no HDFS write between steps. Disk and network are three
+    and four orders of magnitude from memory.
+  - **`orchestration-and-reliability.mdx`:**
+    - Question 1's gate now sits after load, into staging.
+    - The XCom listing takes `ds` as an argument rather than templating it
+      inside the function body.
+    - The sensor names its bucket.
+  - **`streaming.mdx`:** compaction has no age limit of its own, and a topic
+    that should also expire old keys sets `cleanup.policy=compact,delete`.
+  - **`pipelines.mdx`:** each Parquet file carries its own schema, and the
+    reader reconciles them.
+- **Not needed:** a fixer asked for `EXISTS` and `EXCEPT` in
+  `da-sql/parts.tsx`'s highlighter, which already has both.

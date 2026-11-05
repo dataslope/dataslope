@@ -177,14 +177,19 @@ export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: st
   );
 };
 
-/** The text a node renders, for measuring it by its length. */
+/** The text a node renders, for measuring it by its length. A `<Code line>`
+ *  carries its text in `line`, not in children: read only the children, a
+ *  strike over code measured nothing and kept its full tilt, climbing into an
+ *  overline over a long line (the Data Engineer review, Python #7). */
 const textOf = (node: React.ReactNode): string =>
   typeof node === "string" || typeof node === "number"
     ? String(node)
     : Array.isArray(node)
       ? node.map(textOf).join("")
-      : React.isValidElement<{ children?: React.ReactNode }>(node)
-        ? textOf(node.props.children)
+      : React.isValidElement<{ children?: React.ReactNode; line?: unknown }>(node)
+        ? typeof node.props.line === "string"
+          ? node.props.line
+          : textOf(node.props.children)
         : "";
 
 /**

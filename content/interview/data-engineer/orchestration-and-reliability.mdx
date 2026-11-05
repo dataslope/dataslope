@@ -27,10 +27,10 @@ the **graph** and the **run history**, cron models neither.
 ```mermaid
 flowchart TD
   E[extract] --> T[transform]
-  T --> Q{quality gate}
-  Q -- pass --> L[load]
-  Q -- fail --> A[alert + halt]
-  L --> P[publish / refresh BI]
+  T --> L["load to staging"]
+  L --> Q{quality gate}
+  Q -- pass --> P["publish / refresh BI"]
+  Q -- fail --> A["alert + halt"]
 ```
 
 ### What is a DAG, and what are common anti-patterns?
@@ -51,8 +51,8 @@ def extract():
 
 # Better: write to storage, pass only the path (tiny XCom)
 @task
-def extract():
-    path = "s3://bucket/staging/{{ ds }}.parquet"
+def extract(ds=None):                # ds injected from the run's context
+    path = f"s3://bucket/staging/{ds}.parquet"
     write_parquet(fetch_million_rows(), path)
     return path
 ```
@@ -179,6 +179,7 @@ whenever A runs late.
 # Sensor in reschedule mode frees the worker slot between checks.
 wait_for_export = S3KeySensor(
     task_id="wait_for_export",
+    bucket_name="data-lake",
     bucket_key="exports/{{ ds }}/orders.parquet",
     mode="reschedule",
     poke_interval=300,
