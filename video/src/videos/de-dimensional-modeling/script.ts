@@ -71,11 +71,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     approved 2024-03-11 (seven days), funded 2024-03-20 (nine days later).
  *   - "semi": the video's own month-end balances, built from Ada's and Ben's
  *     transactions: 1,600.00 across both accounts on March 31; 4,800.00
- *     summed over the quarter's three month-ends; the last value per account,
- *     900.00 and 700.00, is 1,600.00 again.
+ *     summed over the quarter's three month-ends (1,500.00, 1,700.00 and
+ *     1,600.00, shown term by term); the last value per account, 900.00 and
+ *     700.00, is 1,600.00 again.
  *   - "nonadd": three users on Monday, three on Tuesday, four over both.
  *   - "r-date": the page's date-dimension block: revenue without holidays,
- *     Q1 1,260.00, Q2 840.00, Q3 265.00, Q4 250.00.
+ *     Q1 1,260.00, Q2 840.00, Q3 265.00, Q4 250.00. Its fiscal quarters are
+ *     its calendar quarters (no date differs), so the screen says it is the
+ *     8 holidays that no date function knows.
  *   - "r-metric": over the same page's 24 orders, average order value is
  *     186.04 (4,465.00 over 24); without the 8 holiday orders, 163.44.
  *   - Quoted from the page, not measured: the definitions; "denormalization

@@ -59,13 +59,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     39.19 MB of the CSV and 4,976,846 bytes of the Parquet file. Both plans
  *     project category, amount and units.
  *   - per column, CSV text against Parquet: region (4 values) 5.50 MB against
- *     379,876 bytes, 3.04 bits a row; amount (random to the cent) 6.80 MB
- *     against 4,205,471; sale_date in date order 11.0 MB against 3,087.
- *     Sorted by region, the region column is 554 bytes.
+ *     379,876 bytes, 3.04 bits a row (said "a few": four codes fit in two
+ *     bits, and DuckDB's writer spends three); amount (random to the cent,
+ *     49,501 values, written PLAIN, no dictionary) 6.80 MB against 4,205,471;
+ *     sale_date in date order 11.0 MB against 3,087. Sorted by region
+ *     instead, the region column is 554 bytes.
  *   - by month: 12 files of 79,235 to 84,700 rows. March: "Scanning Files:
  *     1/12"; region = 'North': 12 files read; right(sale_month, 2) = '03':
  *     1/12 (the page says a function on the key "usually defeats pruning";
- *     DuckDB prunes through it).
+ *     DuckDB prunes through it); sale_month BETWEEN '2024-03' AND '2024-05':
+ *     3/12, the range on the raw key that prunes on every engine.
  *   - row groups of 122,880 rows, 9 in all, each spanning about 45 days in
  *     date order; March overlaps 2. Shuffled, all 9 span the year. The March
  *     query read 1,133,966 bytes sorted and 5,741,446 shuffled (5.1 times).
