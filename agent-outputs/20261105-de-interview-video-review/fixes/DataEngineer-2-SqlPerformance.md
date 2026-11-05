@@ -43,8 +43,8 @@ All checks ran on the final code, through the private entry and the queue.
 - **`npm test`**: 75 pass, 0 fail. An earlier run had 2 failures, both in `de-orchestration`, another fixer's mid-edit; nothing ever named this folder. **`npm run check:cues`**: passes.
 - **`check:sync`**: passes. All 61 beats are within ±0.12 s; the worst is +0.04 s (`mv-fast`, `mv-scan`, `join-hash`, `prune-engines`).
 - **`check:mix`**: passes (exit 0). Narration is at −19.9 LUFS, with the effects 28.3 LU under it. The closest moment is 11.4 dB at 1:40.1, the existing pop on "a hash join".
-- **`check:motion`**: PENDING_MOTION
-- **`check:frames`**: PENDING_FRAMES
+- **`check:motion`**: passes. 8:18.5 checked, with no still stretch of 2 s or more.
+- **`check:frames`**: passes. 1 illustration (largest stretch 0.93), 6 arrows (0° of bend under any head), no hyphen in tabular figures, and every cue names its occurrence.
 - **Stills**: 33, each looked at, cropped to the region changed. The first batch, at 51.5, 75.5, 87.5, 107.5, 136, 149, 159.5, 181, 189.5, 201.5, 226, 249.5, 276, 285.5, 309.5, 320.5, 335.5, 346, 377.5, 382, 430, 458.5, 468, 476 and 497 s, found two defects. The refresh notes sat under the "Next" rule, and code inside 21 to 22px labels rendered under 19px. After the fixes, a second batch at 87.6, 149.1, 181.1, 201.6, 285.6, 335.6, 476.1 and 497.1 s confirmed both. The B-tree and the dots were also checked at 3x zoom.
 
 ## Facts

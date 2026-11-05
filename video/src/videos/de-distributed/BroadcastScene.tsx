@@ -10,22 +10,23 @@ import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { BROADCAST } from "./data";
-import { Curve, Drift, Machine, OK, OK_INK, Svg } from "./parts";
+import { Curve, Drift, Elbow, Machine, OK, OK_INK, Svg } from "./parts";
 
 const DIM = ds("purple", 500);
 const wash = (c: string, k = 30) => `color-mix(in srgb, ${c} ${k}%, ${PAPER})`;
 
 // ── Broadcast panel ──
 const EX_X = 120;
-const EX_W = 400;
+const EX_W = 330;
 const EX_H = 70;
 const EX_TOPS = [430, 520, 610, 700];
-/** Inside an executor: its name, its part of the big table, the lookup's copy, a tick. */
-const NAME_W = 112;
-const FACT_X = EX_X + 12 + NAME_W;
-const FACT_W = 168;
+/** Inside an executor, under its name: its part of the big table, the lookup's copy, a tick. */
+const FACT_X = EX_X + 12;
+const FACT_W = 190;
 const LOOK_W = 56;
 const LOOK_X = FACT_X + FACT_W + 8;
+/** The lookup's copies run down one line here, then in to each executor's edge. */
+const TRUNK_X = 506;
 const SRC_X = 560;
 const SRC_TOP = 360;
 const NOTE_X = 560;
@@ -98,7 +99,8 @@ export const BroadcastScene: React.FC = () => {
   const end = n.beat("smj-cost").to;
 
   const exMid = (k: number) => y(EX_TOPS[k]) + h(EX_H) / 2;
-  const factTop = (k: number) => exMid(k) - h(20);
+  const factTop = (k: number) => y(EX_TOPS[k]) + h(34);
+  const blockH = h(30);
   const chipH = h(30);
   const sorted = ease(frame, sortAt + 2, 16);
   const merged = ease(frame, mergeAt, 12);
@@ -145,7 +147,7 @@ export const BroadcastScene: React.FC = () => {
             left: SRC_X,
             top: y(SRC_TOP),
             width: LOOK_W,
-            height: h(40),
+            height: blockH,
             background: wash(DIM),
             borderLeft: `4px solid ${DIM}`,
             borderRadius: 3,
@@ -157,18 +159,15 @@ export const BroadcastScene: React.FC = () => {
           const joined = ease(frame, joinAt + 4 + k * 3, 10);
           return (
             <React.Fragment key={k}>
-              <Machine x={EX_X} top={y(EX_TOPS[k])} width={EX_W} height={h(EX_H)} at={shipAt + 2 + k * 2} tone="ok" toneAt={noShuffleAt} />
-              <div style={{ position: "absolute", left: EX_X + 14, top: exMid(k) - 13, ...label(20, INK_SOFT), opacity: ease(frame, shipAt + 4 + k * 2, 10), whiteSpace: "nowrap" }}>
-                executor {k + 1}
-              </div>
-              <div style={{ position: "absolute", left: LOOK_X + LOOK_W + 10, top: exMid(k) - 17, ...label(26, OK_INK), fontWeight: 800, opacity: joined }}>✓</div>
+              <Machine x={EX_X} top={y(EX_TOPS[k])} width={EX_W} height={h(EX_H)} at={shipAt + 2 + k * 2} tone="ok" toneAt={noShuffleAt} name={`executor ${k + 1}`} nameSize={19} />
+              <div style={{ position: "absolute", left: LOOK_X + LOOK_W + 10, top: factTop(k) + blockH / 2 - 17, ...label(26, OK_INK), fontWeight: 800, opacity: joined }}>✓</div>
               <div
                 style={{
                   position: "absolute",
                   left: FACT_X,
                   top: factTop(k),
                   width: FACT_W * ease(frame, shipAt + 4 + k * 2, 12),
-                  height: h(40),
+                  height: blockH,
                   background: wash(BAR, 34),
                   borderLeft: `4px solid ${BAR}`,
                   borderRadius: 3,
@@ -184,15 +183,28 @@ export const BroadcastScene: React.FC = () => {
               >
                 big table, part {k + 1}
               </div>
-              {/* The copy's flight ends at the executor's edge; the copy then slides in. */}
-              <Curve from={[SRC_X - 6, y(SRC_TOP) + h(20)]} to={[EX_X + EX_W + 6, exMid(k)]} at={everyAt + k * 3} dur={14} color={DIM} width={1.8} head={10} opacity={0.8} />
+              {/* The copy's route ends at the executor's edge; the copy then slides in. */}
+              <Elbow
+                points={[
+                  [SRC_X - 6, y(SRC_TOP) + blockH / 2],
+                  [TRUNK_X, y(SRC_TOP) + blockH / 2],
+                  [TRUNK_X, exMid(k)],
+                  [EX_X + EX_W + 6, exMid(k)],
+                ]}
+                at={everyAt + k * 3}
+                dur={14}
+                color={DIM}
+                width={1.8}
+                head={10}
+                radius={14}
+              />
               <div
                 style={{
                   position: "absolute",
                   left: LOOK_X + (1 - land) * (EX_X + EX_W - LOOK_W - 4 - LOOK_X),
                   top: factTop(k),
                   width: LOOK_W,
-                  height: h(40),
+                  height: blockH,
                   background: wash(DIM),
                   borderLeft: `4px solid ${DIM}`,
                   borderRadius: 3,
