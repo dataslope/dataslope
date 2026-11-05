@@ -7,11 +7,11 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { IDEM } from "./data";
-import { Code, Console, Drift, FadeIn, lineOf, Mark, MARK_BAD, MARK_OK, OK_INK, Strike, Tag, Title, X0 } from "./parts";
+import { Code, Console, Drift, FadeIn, lineOf, Mark, MARK_BAD, MARK_OK, Mono, OK_INK, Strike, Tag, Title, X0 } from "./parts";
 
 const TOP = 322;
 const CODE = 22;
-const OUT_X = 1180;
+const OUT_X = 1000;
 const ROW = 138;
 
 /** One way to write the batch: its title, its write line, "run twice", and
@@ -126,7 +126,9 @@ export const IdemScene: React.FC = () => {
           h={h}
         />
         <Note at={upsertAt + 6} x={OUT_X} y={rows + h(ROW) - h(4)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>sets each ID&apos;s status</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            an upsert: update the row if its key exists, insert it if not
+          </span>
         </Note>
 
         <Way
@@ -146,7 +148,16 @@ export const IdemScene: React.FC = () => {
         <Note at={setAt} x={X0} y={rows + 3 * h(ROW) - h(10)}>
           <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={setAt + 6} color={MARK_OK}>set values</Mark>;{" "}
-            <Strike at={setAt + 14}>add to them</Strike>
+            <span style={{ color: ACCENT_INK }}>
+              <Strike at={setAt + 14}>add to them</Strike>
+            </span>
+          </span>
+        </Note>
+        {/* The same rule at warehouse scale (no narration: the line is the
+            data engineer's form of the answer). */}
+        <Note at={setAt + 30} x={OUT_X} y={rows + 3 * h(ROW) - h(4)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            in a warehouse: overwrite the day&apos;s partition, or <Mono>MERGE</Mono> on the key
           </span>
         </Note>
       </Drift>

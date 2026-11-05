@@ -11,20 +11,27 @@ import { FILTER, num, pct } from "./data";
 import { Chip, DATA, Drift, madeUp, Mark, MARK_BAD, OK, OK_INK, QueryMark, QUIET, X0 } from "./parts";
 import { clusters, nearestOf, tenantOf } from "./space";
 
+const SC = { x: 140, w: 660, top: 330, h: 430 };
+
 /** The drawn space: about one point in ten is the viewer's tenant, and none
  *  of them is among the query's ten nearest (a picture; the share that
- *  comes back empty is the simulation's, on the right). */
+ *  comes back empty is the simulation's, on the right). Nearness is measured
+ *  where the points are drawn (px), so the ten struck out are the ten the
+ *  eye sees nearest. */
 const SPACE = clusters(31, 9, 14, 0.07);
-const MINE = tenantOf(1, SPACE.points.length, 0.1);
-const Q = { x: 0.5, y: 0.5 };
-const TOP10 = nearestOf(SPACE.points, Q.x, Q.y, 10);
-const MINE_IDX = SPACE.points.map((_, i) => i).filter((i) => MINE[i]);
-const MY_NEAREST = MINE_IDX.map((i) => ({ i, d: Math.hypot(SPACE.points[i].x - Q.x, SPACE.points[i].y - Q.y) }))
-  .sort((a, b) => a.d - b.d)
-  .slice(0, 3)
-  .map((o) => o.i);
-
-const SC = { x: 140, w: 660, top: 330, h: 430 };
+const PTS = SPACE.points.map((p) => ({ x: p.x * SC.w, y: p.y * SC.h, c: p.c }));
+const MINE = tenantOf(1, PTS.length, 0.1);
+const Q = { x: 0.5 * SC.w, y: 0.5 * SC.h };
+const TOP10 = nearestOf(PTS, Q.x, Q.y, 10);
+if (TOP10.some((i) => MINE[i])) throw new Error("the drawn top ten should hold none of the tenant's points");
+const MINE_IDX = PTS.map((_, i) => i).filter((i) => MINE[i]);
+/** Pre-filtering: the tenant's own ten nearest, a full ten. */
+const MY_NEAREST = nearestOf(
+  MINE_IDX.map((i) => PTS[i]),
+  Q.x,
+  Q.y,
+  10,
+).map((k) => MINE_IDX[k]);
 const GRID = { x: 1070, top: 360, cols: 20, cell: 26, gap: 7 };
 
 /**
@@ -34,8 +41,10 @@ const GRID = { x: 1070, top: 360, cols: 20, cell: 26, gap: 7 };
  * nothing is left. Right, the simulation's 200 searches (check.mjs), one
  * cell each: with one tenant in a hundred, the top ten post-filtered comes
  * back empty for 182 of them (91%). Then pre-filtering, which keeps only the
- * tenant's points and finds the right ones, but searches outside the index
- * built over everything; and the three answers, in green.
+ * tenant's points and finds a full ten, but with an index that was not built
+ * for the subset: a small subset is scanned exactly, a big one leaves the
+ * search skipping most of what it visits. Last, the three answers, in green,
+ * the engine's filter checked at each step until it has ten.
  */
 export const FilterScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -57,19 +66,24 @@ export const FilterScene: React.FC = () => {
   const emptyAt = n.word("filter-sim", "ninety-one percent of searches come back empty");
   const preAt = n.word("filter-pre", "Pre-filtering restricts first");
   const thenAt = n.word("filter-pre", "then searches");
-  const correctAt = n.word("filter-pre", "That's correct");
-  const defeatAt = n.word("filter-pre", "it can defeat the approximate index");
-  const builtAt = n.word("filter-pre", "built over everything");
+  const correctAt = n.word("filter-pre-why", "That's correct");
+  const smallAt = n.word("filter-pre-why", "a small subset can just be scanned exactly");
+  const bigAt = n.word("filter-pre-why", "A big one can't");
+  const builtAt = n.word("filter-pre-why", "built over everything");
+  const skipAt = n.word("filter-pre-why", "points it has to skip");
   const fixes = [
     { text: "partition by tenant", at: n.word("filter-fix", "partition by tenant") },
-    { text: "filter during the search", at: n.word("filter-fix", "an engine that filters during the search") },
+    { text: "filter during the search", at: n.word("filter-fix", "an engine that checks the filter") },
     { text: "test with realistic, selective filters", at: n.word("filter-fix", "test with realistic, selective filters") },
   ];
+  const stepAt = n.word("filter-fix", "at each step of the search");
+  const tenAt = n.word("filter-fix", "until it has ten");
   const end = n.beat("filter-fix").to;
 
   const top = y(SC.top);
-  const px = (v: number) => SC.x + v * SC.w;
-  const py = (v: number) => top + v * SC.h;
+  // Drawn px within the space, to the page.
+  const px = (v: number) => SC.x + v;
+  const py = (v: number) => top + v;
   const tint = ease(frame, yourAt, 12);
   const ring = ease(frame, postAt + 4, 10) * (1 - ease(frame, preAt, 12));
   const dropped = ease(frame, dropsAt + 6, 14) * (1 - ease(frame, preAt, 12));
@@ -107,7 +121,7 @@ export const FilterScene: React.FC = () => {
 
         {/* The drawn space. */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          {SPACE.points.map((p, i) => {
+          {PTS.map((p, i) => {
             const s = ease(frame, from + 6 + (i % 30) * 0.6, 8);
             if (s <= 0) return null;
             const mine = MINE[i];
@@ -118,7 +132,7 @@ export const FilterScene: React.FC = () => {
             return <circle key={i} cx={px(p.x)} cy={py(p.y)} r={(mine ? 7.5 : 6) * s} fill={color} opacity={(1 - 0.75 * gone) * (1 - out)} />;
           })}
           {TOP10.map((i) => {
-            const p = SPACE.points[i];
+            const p = PTS[i];
             const cx = px(p.x);
             const cy = py(p.y);
             const x = ease(frame, dropsAt + 6, 10) * (1 - ease(frame, preAt, 12));
@@ -131,8 +145,17 @@ export const FilterScene: React.FC = () => {
               </g>
             );
           })}
-          {MY_NEAREST.map((i) => (
-            <circle key={i} cx={px(SPACE.points[i].x)} cy={py(SPACE.points[i].y)} r={13} fill="none" stroke={OK} strokeWidth={2.6} opacity={found} />
+          {MY_NEAREST.map((i, k) => (
+            <circle
+              key={i}
+              cx={px(PTS[i].x)}
+              cy={py(PTS[i].y)}
+              r={13}
+              fill="none"
+              stroke={OK}
+              strokeWidth={2.6}
+              opacity={found * ease(frame, thenAt + 4 + k * 2, 8)}
+            />
           ))}
         </svg>
         <QueryMark x={px(Q.x)} y={py(Q.y)} at={postAt} />
@@ -153,13 +176,21 @@ export const FilterScene: React.FC = () => {
         </Note>
         <Note at={preAt} x={SC.x} y={top + SC.h + 100}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            <b>pre-filter</b>: this tenant first
+            <b>pre-filter</b>: this tenant first, a full ten
             <span style={{ opacity: ease(frame, correctAt - 2, 10), color: OK_INK, fontWeight: 650 }}>, correct</span>
-            <span style={{ opacity: ease(frame, defeatAt - 2, 10), color: ACCENT_INK }}>, but outside the index</span>
           </span>
         </Note>
-        <Note at={builtAt - 2} x={SC.x} y={top + SC.h + 140}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the approximate index was built over every point</span>
+        <Note at={smallAt - 2} x={SC.x} y={top + SC.h + 140}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            a small subset: scan it exactly
+            <span style={{ opacity: ease(frame, bigAt - 2, 10) }}> · too big to scan: use the index</span>
+          </span>
+        </Note>
+        <Note at={builtAt - 2} x={SC.x} y={top + SC.h + 176}>
+          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>
+            but it wasn&apos;t built for the subset
+            <span style={{ opacity: ease(frame, skipAt - 2, 10) }}>: most points it visits are skipped</span>
+          </span>
         </Note>
 
         {/* The simulation's 200 searches. */}
@@ -205,6 +236,12 @@ export const FilterScene: React.FC = () => {
         {fixes.map((f, i) => (
           <Chip key={f.text} x={GRID.x} y={gridTop + 10 * (GRID.cell + GRID.gap) + 120 + i * 54} at={f.at - 2} size={24} ink={OK_INK}>
             {f.text}
+            {i === 1 ? (
+              <span style={{ color: INK_SOFT, fontWeight: 500 }}>
+                <span style={{ opacity: ease(frame, stepAt - 2, 10) }}>: at each step</span>
+                <span style={{ opacity: ease(frame, tenAt - 2, 10) }}>, until 10</span>
+              </span>
+            ) : null}
           </Chip>
         ))}
       </Drift>
