@@ -64,6 +64,18 @@ export type LogoRevealProps = {
   landing: Landing;
   /** Play the reveal's sounds. */
   sfx: boolean;
+  /** The course and unit lines in the soft ink (grey, the default) or the
+   *  ink itself (black). The title stays in the accent either way. */
+  textInk?: "soft" | "black";
+  /** `columns`: the divider between the lockup and the words, a hairline
+   *  (the default) or a bar in the brand blue. */
+  divider?: "hairline" | "blue";
+  /** `columns`: the unit on a line of its own, between the course and the
+   *  title, rather than in front of the title. */
+  threeLines?: boolean;
+  /** The one text size an equal-size opener sets every line at, in px,
+   *  overriding the layout's own. */
+  size?: number;
 };
 
 
@@ -186,7 +198,7 @@ const Sting: React.FC<LogoRevealProps> = ({ motion, text, theme }) => {
   );
 };
 
-const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, face, course, unit, title }) => {
+const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, face, course, unit, title, textInk, divider, threeLines, size: sizeOverride }) => {
   const frame = useCurrentFrame();
   const t = THEMES[theme];
   const cue = openerCues(motion, text, unit);
@@ -232,14 +244,19 @@ const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, face, 
     );
   }
 
-  const size = layout === "block" ? 64 : layout === "columns" ? 56 : layout === "stack" ? 76 : 68;
+  const size = sizeOverride ?? (layout === "block" ? 64 : layout === "columns" ? 56 : layout === "stack" ? 76 : 68);
+  // Grey by default; black when asked, with the title still in the accent.
+  const lineInk = textInk === "black" ? t.ink : t.soft;
+  const unitWords = unit ? <Words motion={text} at={cue.unitAt} text={unit} style={setIn(face, size, "regular", lineInk)} caret={t.mark} /> : null;
+  const titleWords = <Words motion={text} at={cue.titleAt} text={title} style={setIn(face, size, "strong", t.accent)} caret={t.mark} />;
   const words = {
     word: <Words motion={text} at={cue.word} text="Dataslope" style={inter(size, 600, t.ink)} caret={t.mark} />,
-    course: <Words motion={text} at={cue.course} text={course} style={setIn(face, size, "regular", t.soft)} caret={t.mark} />,
+    course: <Words motion={text} at={cue.course} text={course} style={setIn(face, size, "regular", lineInk)} caret={t.mark} />,
+    // A merged course or track has no unit: its title stands alone.
     unit: (
       <div style={{ display: "flex", alignItems: "baseline", gap: `${0.32 * size}px` }}>
-        <Words motion={text} at={cue.unitAt} text={unit} style={setIn(face, size, "regular", t.soft)} caret={t.mark} />
-        <Words motion={text} at={cue.titleAt} text={title} style={setIn(face, size, "strong", t.accent)} caret={t.mark} />
+        {unitWords}
+        {titleWords}
       </div>
     ),
   };
@@ -294,6 +311,8 @@ const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, face, 
 
   // columns
   const rule = ease(frame, cue.word + 4, 18);
+  const lines = threeLines && unit ? 3 : 2;
+  const blue = divider === "blue";
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
       {lineSounds}
@@ -302,10 +321,26 @@ const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, face, 
           <AnimatedMark motion={motion} at={MARK_AT} height={size * 1.1} color={t.mark} />
           {words.word}
         </div>
-        <div style={{ width: 2, height: 2.4 * size * rule, background: t.rule, margin: `0 ${size}px`, alignSelf: "center" }} />
+        <div
+          style={{
+            width: blue ? 5 : 2,
+            borderRadius: blue ? 3 : 0,
+            height: lines * 1.2 * size * rule,
+            background: blue ? t.mark : t.rule,
+            margin: `0 ${size}px`,
+            alignSelf: "center",
+          }}
+        />
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
           {line(words.course)}
-          {line(words.unit)}
+          {lines === 3 ? (
+            <>
+              {line(unitWords)}
+              {line(titleWords)}
+            </>
+          ) : (
+            line(words.unit)
+          )}
         </div>
       </div>
     </AbsoluteFill>

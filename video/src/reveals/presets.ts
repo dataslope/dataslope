@@ -67,6 +67,65 @@ function find(id: string): LogoRevealProps {
   return found.props;
 }
 
+/**
+ * The columns opener in black, the user's favourite of the first set: the
+ * course and unit lines in ink rather than grey, the title still blue. Two
+ * open a whole merged course or interview track, which has no unit.
+ */
+const COLUMNS: { id: string; props: LogoRevealProps }[] = [
+  opener("Columns-1-Black", { ...find("Opener-4-Columns"), textInk: "black" }),
+  opener("Columns-2-BlueBar", {
+    layout: "columns",
+    motion: "plot",
+    text: "slide",
+    textInk: "black",
+    divider: "blue",
+    course: "Statistics for Data Science with Python",
+    unit: "Unit 7",
+    title: "Testing hypotheses",
+  }),
+  opener("Columns-3-ThreeLines", {
+    layout: "columns",
+    motion: "unfold",
+    text: "letters",
+    textInk: "black",
+    threeLines: true,
+    course: "Database Design with PostgreSQL",
+    unit: "Unit 4",
+    title: "Keys and integrity",
+  }),
+  opener("Columns-4-Large", {
+    layout: "columns",
+    motion: "assemble",
+    text: "ink",
+    textInk: "black",
+    divider: "blue",
+    size: 64,
+    course: "How Large Language Models Work",
+    unit: "Unit 3",
+    title: "Choosing the next token",
+  }),
+  opener("Columns-5-FullCourse", {
+    layout: "columns",
+    motion: "rise",
+    text: "slide",
+    textInk: "black",
+    course: "The full course, nine units",
+    unit: "",
+    title: "Statistics for Data Science with Python",
+  }),
+  opener("Columns-6-InterviewPrep", {
+    layout: "columns",
+    motion: "assemble",
+    text: "blur",
+    textInk: "black",
+    divider: "blue",
+    course: "Interview prep, twelve parts",
+    unit: "",
+    title: "Data Engineer",
+  }),
+];
+
 export const REVEALS: { id: string; props: LogoRevealProps }[] = [
   ...INTER,
   // The same openers in other faces, to compare against Inter: each is an
@@ -74,6 +133,7 @@ export const REVEALS: { id: string; props: LogoRevealProps }[] = [
   { id: "Opener-6-Stack-SourceSerif", props: { ...find("Opener-1-Stack"), face: "source-serif" } },
   { id: "Opener-7-Centered-Fraunces", props: { ...find("Opener-3-Centered"), face: "fraunces" } },
   { id: "Opener-8-Columns-Mono", props: { ...find("Opener-4-Columns"), face: "jetbrains-mono" } },
+  ...COLUMNS,
 ];
 
 function sting(id: string, p: Pick<LogoRevealProps, "motion" | "text"> & Partial<LogoRevealProps>) {

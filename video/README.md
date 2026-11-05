@@ -39,8 +39,11 @@ ids that sort in course order:
 | `How-LLMs-Work` | `Llm-1-Tokens` to `Llm-5-Benchmarks`, narrated by Drew, with two deep dives: `Llm-2-1-AttentionScore` (one attention score worked through) and `Llm-4-1-ConversationCost` (why a chat's bill grows faster than the chat) |
 | `NLP-Python` | `Nlp-1-WhyTextIsHard` to `Nlp-5-History`, narrated by Hope, with two deep dives: `Nlp-2-1-LemmasAndTags` (lemmatizing needs the part of speech) and `Nlp-3-1-ZipfsLaw` (Zipf's law read off a log-log plot) |
 
-The `Logo-Reveals` folder holds ten short brand clips, five stings and five
-course openers (see [Logo reveals](#logo-reveals)).
+The `Logo-Reveals` folder holds nineteen short brand clips: five stings,
+eight course openers and six variations of the columns opener (see
+[Logo reveals](#logo-reveals)). The `Thumbnails` folder holds a YouTube
+thumbnail for each merged course and interview track, in three designs (see
+[YouTube thumbnails](#youtube-thumbnails)).
 
 A deep dive (`Llm-2-1-…`) is a two-minute video on one idea its unit could
 only sketch, embedded at one lesson section beside the unit video. It has no
@@ -554,8 +557,14 @@ words, and holds the finished lockup for at least a second.
 | `Opener-6-Stack-SourceSerif` | `rise` | `slide` | Opener-1 in Source Serif 4, the videos' headline face |
 | `Opener-7-Centered-Fraunces` | `unfold` | `letters` | Opener-3 in Fraunces |
 | `Opener-8-Columns-Mono` | `assemble` | `blur` | Opener-4 in JetBrains Mono, the site's code face |
+| `Columns-1-Black` | `assemble` | `blur` | Opener-4 with the course and unit in black |
+| `Columns-2-BlueBar` | `plot` | `slide` | black, the divider a brand-blue bar |
+| `Columns-3-ThreeLines` | `unfold` | `letters` | black, the unit on a line of its own |
+| `Columns-4-Large` | `assemble` | `ink` | black, blue bar, every line at 64 px |
+| `Columns-5-FullCourse` | `rise` | `slide` | black, a whole merged course: no unit |
+| `Columns-6-InterviewPrep` | `assemble` | `blur` | black, blue bar, a whole interview track |
 
-All ten are one component, `LogoReveal` (`src/reveals/`), with different
+All of them are one component, `LogoReveal` (`src/reveals/`), with different
 props (`src/reveals/presets.ts`). Any mark motion goes with any text motion,
 layout and theme, and an opener names any unit, from the Studio's props panel
 or the command line:
@@ -584,6 +593,14 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
   the unit's title in the brand blue). `headline` keeps a size hierarchy, to
   compare against: its large title is Inter Display, the optical size Inter
   draws at that scale.
+- **Columns options.** `textInk: "black"` sets the course and unit lines in
+  the ink rather than the soft grey; the title stays in the brand blue, so
+  blue is the only color in the words. `divider: "blue"` turns the hairline
+  into a brand-blue bar, `threeLines` gives the unit a line of its own, and
+  `size` overrides the one size every line is set at. A merged course or
+  interview track has no unit: pass `"unit": ""` and the title stands alone,
+  with the course line saying what the video is ("The full course, nine
+  units").
 - **Inter first.** `face` (`OpenerFace` in `LogoReveal.tsx`) sets the course
   and unit lines: `inter` by default, or `source-serif`, `fraunces` or
   `jetbrains-mono` to compare. The wordmark is Inter 600 whatever it says,
@@ -608,6 +625,38 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
   (`<Sfx accentAt>`, below), and each opener line by the tap of a soft card
   slide. A reveal measures about -27 LUFS and peaks at -11 dBFS, a little
   under the narration's -25 LUFS, since it plays alone.
+
+## YouTube thumbnails
+
+Stills in the Studio's `Thumbnails` folder, one per merged course and
+interview track in each of three designs, 1280x720:
+`Thumb-<Design>-<Track>`, e.g. `Thumb-Split-DatabaseDesign`. Each track has
+its own watercolor animal, so the seven read apart at a glance in a list of
+results: an owl on a die (Statistics), an elephant at a card catalog
+(Database Design), a llama with books (LLMs), a parrot (NLP), a raccoon (Data
+Analyst), and the otter and meerkat of the Data Scientist and Data Engineer
+overviews.
+
+| Design | Look |
+| --- | --- |
+| `split` | white page, the words on the left, the animal large on the right |
+| `spotlight` | the same, the animal on a pale brand-blue disc |
+| `panel` | the words in white on a brand-blue panel, the animal stepping over its edge |
+
+- **Seen small.** A thumbnail is about 168x94 on a phone, so the words are
+  few (a kicker pill, the title, one short line) and huge, in Inter 800.
+- **Nothing in the bottom-right corner**, where YouTube prints the running
+  time. The animal stands on the bottom of a box that stops short of it.
+- **The art goes through the pipeline.** The five new animals are prompts in
+  `src/thumbnails/illustrations.json` (watercolor, 1024x1024, transparent),
+  generated and imported like any video's art:
+  `npm run illustrations -- thumbnails`, which finds prompts under
+  `src/<name>/` as well as `src/videos/<name>/`. A track's words and animal
+  are one entry in `TRACKS` (`src/thumbnails/Thumbnail.tsx`).
+
+```bash
+npx remotion still src/index.ts Thumb-Split-DatabaseDesign out/thumb.png
+```
 
 ## Sound effects (SamplingBias, ThinkingStatistically)
 

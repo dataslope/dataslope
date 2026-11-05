@@ -1,5 +1,5 @@
 import React from "react";
-import { Composition, Folder } from "remotion";
+import { Composition, Folder, Still } from "remotion";
 import "./theme/brand";
 import "./theme/fonts";
 import { narratedMetadata } from "./narration/metadata";
@@ -8,6 +8,7 @@ import { ErdKit } from "./editorial/ErdKit";
 import { InterviewKit } from "./editorial/interview";
 import { LogoReveal, REVEAL_FRAMES } from "./reveals/LogoReveal";
 import { REVEALS } from "./reveals/presets";
+import { THUMBNAIL, Thumbnail, type ThumbnailDesign, TRACKS } from "./thumbnails/Thumbnail";
 // Database Design with PostgreSQL, one video per unit.
 import { DbWhyDesign } from "./videos/db-why-design/Video";
 import { script as dbWhyDesignScript } from "./videos/db-why-design/script";
@@ -1100,6 +1101,22 @@ export const RemotionRoot: React.FC = () => (
           defaultProps={props}
         />
       ))}
+    </Folder>
+    <Folder name="Thumbnails">
+      {/* YouTube thumbnails for the merged course and interview videos
+          (src/thumbnails/): three designs, one still per track. */}
+      {(["split", "spotlight", "panel"] as ThumbnailDesign[]).flatMap((design) =>
+        Object.keys(TRACKS).map((track) => (
+          <Still
+            key={`${design}-${track}`}
+            id={`Thumb-${design[0].toUpperCase()}${design.slice(1)}-${track}`}
+            component={Thumbnail}
+            width={THUMBNAIL.width}
+            height={THUMBNAIL.height}
+            defaultProps={{ design, track }}
+          />
+        )),
+      )}
     </Folder>
     <Folder name="Assets">
       {/* The ERD kit (editorial/erd.tsx) on one page, for review. */}
