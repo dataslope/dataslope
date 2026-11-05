@@ -62,7 +62,7 @@ export const UNFOLD_OPENS = 9;
 
 /**
  * Frames from a motion's start to the moment the mark is whole. The words
- * and the bell are cued from it, so a motion that is re-timed moves
+ * and the landing sound are cued from it, so a motion that is re-timed moves
  * everything after it. reveals.test.ts checks each against its springs.
  */
 export const MARK_LANDS: Record<MarkMotion, number> = {
@@ -86,7 +86,7 @@ export type EventSound = "whoosh" | "click" | "pen" | "marimba" | "shimmer" | "t
 /**
  * What each motion's sounds are cued to: an event in the motion, as frames
  * from its start, where that sound's accent should fall (Sfx `accentAt`), and
- * its peak in dBFS. Every reveal then lands on the same bell (BELL_LEVEL), so
+ * its peak in dBFS. Every reveal then lands on the same sound (Landing), so
  * what comes before it varies with the motion and the ending is always the
  * brand's.
  */
@@ -112,10 +112,17 @@ export const MARK_EVENTS: Record<MarkMotion, { sound: EventSound; at: number; le
   ],
 };
 
-/** The bell every reveal lands on. A reveal has nothing under it, so it sits
- *  well above an effect under narration (the series intro's logo is -21):
- *  a reveal measures about -27 LUFS, a little under the narration's -25. */
-export const BELL_LEVEL = -11;
+/**
+ * The sound every reveal lands on, the same whatever came before it: the
+ * sonic half of the logo. Wood, felt or a soft synth, never a bell: the first
+ * one was a bell, and its ringing upper partials read as metal. Marimba is the
+ * house choice, a wooden sound like the rest of the palette.
+ */
+export type Landing = "marimba" | "felt" | "pluck";
+export const LANDINGS: readonly Landing[] = ["marimba", "felt", "pluck"];
+/** A reveal has nothing under it, so its landing sits well above an effect
+ *  under narration (the series intro's logo is -21). */
+export const LANDING_LEVEL = -11;
 /** The soft card-slide under each opener line, its tap where the line lands. */
 export const LINE_LEVEL = -27;
 

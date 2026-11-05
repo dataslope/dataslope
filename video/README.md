@@ -592,14 +592,17 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
   holds. `reveals.test.ts` fails an opener in another face that isn't an
   Inter opener with only the face changed.
 - **One number per motion.** `MARK_LANDS` is the frame the mark is whole; the
-  words, the glide of a sting's mark and the bell are all cued from it.
+  words, the glide of a sting's mark and the landing sound are all cued from it.
   `src/reveals/reveals.test.ts` checks each against the springs that make it,
   that every sound cued exists and starts inside the video, and that every
   reveal holds its finished lockup for a second.
-- **Every reveal lands on the same bell**, `el-reveal-bell`: the sonic half of
-  the logo. What leads into it follows the motion: a whoosh as each half of
-  `assemble` sweeps in and a click as they meet, a pen stroke under `plot`, a
-  rising marimba run under `histogram`, a shimmer that swells into `scatter`'s
+- **Every reveal lands on the same sound**, the sonic half of the logo:
+  `landing`, a marimba chord by default (`el-reveal-land-marimba`), or a felt
+  piano chord (`felt`) or a soft synth pluck (`pluck`). Never a bell: the
+  first landing was one, and its ringing upper partials read as metal. What
+  leads into it follows the motion: a whoosh as each half of `assemble`
+  sweeps in and a click as they meet, a pen stroke under `plot`, a rising
+  marimba run under `histogram`, a shimmer that swells into `scatter`'s
   landing, a thud and a whoosh for `unfold`. Each is cued by its accent
   (`<Sfx accentAt>`, below), and each opener line by the tap of a soft card
   slide. A reveal measures about -27 LUFS and peaks at -11 dBFS, a little
@@ -671,8 +674,8 @@ then a click, then a bell") came back as a single hit near the start, or as
 an even texture with no bell. So each sound is one event, and the animation
 places them. `scripts/lib/wav.mjs` measures each file's **accent**, the
 attack of its loudest moment, into `public/sfx/accents.json`, and
-`<Sfx name="el-reveal-bell" accentAt={land}>` starts the sound early by that
-much, so the bell strikes on the frame the mark lands. The cue still holds
+`<Sfx name="el-reveal-land-marimba" accentAt={land}>` starts the sound early
+by that much, so the chord strikes on the frame the mark lands. The cue still holds
 when the sound is regenerated. A sound whose accent comes before the video
 starts has its head trimmed instead of being dropped.
 

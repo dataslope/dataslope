@@ -79,10 +79,20 @@ export const REVEALS: { id: string; props: LogoRevealProps }[] = [
 function sting(id: string, p: Pick<LogoRevealProps, "motion" | "text"> & Partial<LogoRevealProps>) {
   return {
     id,
-    props: { layout: "sting", theme: "light", face: "inter", course: "", unit: "", title: "", sfx: true, ...p } satisfies LogoRevealProps,
+    props: {
+      layout: "sting",
+      theme: "light",
+      face: "inter",
+      course: "",
+      unit: "",
+      title: "",
+      landing: "marimba",
+      sfx: true,
+      ...p,
+    } satisfies LogoRevealProps,
   };
 }
 
 function opener(id: string, p: Pick<LogoRevealProps, "layout" | "motion" | "text" | "course" | "unit" | "title"> & Partial<LogoRevealProps>) {
-  return { id, props: { theme: "light", face: "inter", sfx: true, ...p } satisfies LogoRevealProps };
+  return { id, props: { theme: "light", face: "inter", landing: "marimba", sfx: true, ...p } satisfies LogoRevealProps };
 }

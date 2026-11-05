@@ -53,12 +53,6 @@
     "influence": 0.6,
     "model": "eleven_text_to_sound_v3"
   },
-  "reveal-bell": {
-    "prompt": "A single warm, clean bell tone, struck once, ringing out softly with a long, gentle decay. Calm, premium and minimal.",
-    "seconds": 2.2,
-    "influence": 0.6,
-    "model": "eleven_text_to_sound_v3"
-  },
   "reveal-whoosh": {
     "prompt": "A single soft, airy whoosh passing quickly from one side to the other. Smooth, subtle and short.",
     "seconds": 0.7,
@@ -93,6 +87,24 @@
   "reveal-thud": {
     "prompt": "One small, soft thud of a light object landing on a cushioned table, with a tiny bounce.",
     "seconds": 0.5,
+    "influence": 0.6,
+    "model": "eleven_text_to_sound_v3"
+  },
+  "reveal-land-marimba": {
+    "prompt": "A single warm, soft chord on a wooden marimba, struck once with soft yarn mallets, round and mellow, ringing out gently.",
+    "seconds": 2,
+    "influence": 0.6,
+    "model": "eleven_text_to_sound_v3"
+  },
+  "reveal-land-felt": {
+    "prompt": "A single soft, warm felt piano chord, played gently once and left to ring, mellow, intimate and round.",
+    "seconds": 2.2,
+    "influence": 0.6,
+    "model": "eleven_text_to_sound_v3"
+  },
+  "reveal-land-pluck": {
+    "prompt": "A single soft, warm, round synth pluck chord, low and mellow, with a short gentle tail.",
+    "seconds": 1.6,
     "influence": 0.6,
     "model": "eleven_text_to_sound_v3"
   }

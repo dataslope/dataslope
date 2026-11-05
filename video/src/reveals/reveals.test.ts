@@ -1,8 +1,8 @@
 // Run with `npm test` (node --test; Node strips the types).
 //
 // A logo reveal is timed from one number per motion, MARK_LANDS: the frame
-// the mark is whole. The words and the bell are cued from it, so if a spring
-// is retuned and the number isn't, the bell rings over a half-built mark.
+// the mark is whole. The words and the landing are cued from it, so if a spring
+// is retuned and the number isn't, the landing sounds over a half-built mark.
 // These check each landing against the springs that make it, and that every
 // sound the reveals cue exists and fits inside the video.
 import assert from "node:assert/strict";
@@ -14,6 +14,7 @@ import { spring } from "remotion";
 import { REVEALS } from "./presets.ts";
 import {
   ASSEMBLE_LAG,
+  LANDINGS,
   BAR_STAGGER,
   BARS,
   MARK_AT,
@@ -49,7 +50,7 @@ const crest = (config: Config) => {
 };
 
 test("each motion lands when its springs say it does", () => {
-  // The right half is home, and the bell follows within a frame or two.
+  // The right half is home, and the landing follows within a frame or two.
   const assembled = ASSEMBLE_LAG + home(SPRINGS.assemble);
   assert.ok(MARK_LANDS.assemble >= assembled && MARK_LANDS.assemble <= assembled + 2, `assemble: halves meet at ${assembled}`);
   // Every bar is up before the gaps start closing, ten frames before landing.
@@ -69,7 +70,7 @@ test("every sound a reveal cues exists and starts inside the video", () => {
   const cues: { name: string; accentAt: number }[] = [];
   for (const motion of MARK_MOTIONS) {
     for (const e of MARK_EVENTS[motion]) cues.push({ name: `el-reveal-${e.sound}`, accentAt: MARK_AT + e.at });
-    cues.push({ name: "el-reveal-bell", accentAt: stingCues(motion).land });
+    for (const landing of LANDINGS) cues.push({ name: `el-reveal-land-${landing}`, accentAt: stingCues(motion).land });
     const lines = openerCues(motion, "ink", "Unit 1");
     cues.push({ name: "el-reveal-line", accentAt: lines.course + 8 });
   }

@@ -4,12 +4,13 @@ import { ease } from "../components/motion";
 import { INTER_OPTICAL } from "../editorial/fonts";
 import { HAIRLINE, INK, INK_SOFT, PAPER } from "../editorial/style";
 import { TYPEFACES } from "../editorial/typefaces";
-import { Sfx, SfxContext, type SoundName } from "../sound/Sfx";
+import { Sfx, SfxContext } from "../sound/Sfx";
 import { ds, inkOf } from "../theme/brand";
 import { MONO, SANS } from "../theme/fonts";
 import { AnimatedMark } from "./Mark";
 import {
-  BELL_LEVEL,
+  type Landing,
+  LANDING_LEVEL,
   LINE_LEVEL,
   MARK_AT,
   MARK_EVENTS,
@@ -59,13 +60,12 @@ export type LogoRevealProps = {
   course: string;
   unit: string;
   title: string;
+  /** The sound the mark lands on (timing.ts). */
+  landing: Landing;
   /** Play the reveal's sounds. */
   sfx: boolean;
 };
 
-/** The bell every reveal lands on, whatever came before it: the sonic half
- *  of the logo (levels in timing.ts). */
-const BELL: SoundName = "el-reveal-bell";
 
 export { REVEAL_FRAMES };
 
@@ -149,7 +149,7 @@ const setIn = (face: OpenerFace, size: number, weight: "regular" | "strong", col
 };
 
 export const LogoReveal: React.FC<LogoRevealProps> = (props) => {
-  const { layout, motion, theme, sfx } = props;
+  const { layout, motion, theme, landing, sfx } = props;
   const t = THEMES[theme];
   const land = stingCues(motion).land;
   return (
@@ -158,7 +158,7 @@ export const LogoReveal: React.FC<LogoRevealProps> = (props) => {
         {MARK_EVENTS[motion].map((e, i) => (
           <Sfx key={i} name={`el-reveal-${e.sound}`} accentAt={MARK_AT + e.at} level={e.level} />
         ))}
-        <Sfx name={BELL} accentAt={land} level={BELL_LEVEL} />
+        <Sfx name={`el-reveal-land-${landing}`} accentAt={land} level={LANDING_LEVEL} />
         {layout === "sting" ? <Sting {...props} /> : <Opener {...props} />}
       </AbsoluteFill>
     </SfxContext.Provider>
