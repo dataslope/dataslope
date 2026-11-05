@@ -15,7 +15,7 @@ Order worked: answers (1, 5, 7, 11), the other P2s (2, 3, 4), then the other P3s
 | 7 | P3 | Batch versus streaming skips micro-batch and "do both" | fixed | `choose` is split. "So choose … Fraud detection is streaming." is cut free. A new beat follows it, `choose-micro`: "In between sits micro-batch, a small batch every few seconds, and many systems run both." Then `choose-rule` ("Don't pay for …") is cut free. On screen, a note sits between the two choice cards, in the gap where it belongs: "**In between: micro-batch**", then "a batch every few seconds" and "and many systems run both", each on its words. |
 | 8 | P3 | Green for neutral results | fixed | Batch's "one result" box is `tone="plain"`. The streaming result squares are ink, and "a result per event" is ink. The plan's 3 is blue, like the 8. |
 | 9 | P3 | Listing holds blank rows for 25 s; heading untrue; upsert count unshown | fixed | The local `Listing` (`parts.tsx`, this video's own copy) takes a `rowIn` per line: a row stays shut until its frame, then opens over 12 frames, and the lines below slide down. Listing B is five statements tall from `overAt`, and it grows to wrap them in `BEGIN TRANSACTION` / `COMMIT` on "Wrap the delete and the insert". This works better than the suggested swap between two listings, which re-inks everything. The heading is now "Overwrite the partition: delete, then insert". Under the upsert lines, a green 22px line reads "run twice: 3 orders, then 3" from `IDEM.upsert[0]` and `[1]`, cued to "insert on conflict". |
-| 10 | P3 | Quick round's key states flash by | fixed | `r-fan` is split after "go stale." with `pauseAfter: 1.0`. The cells calm 4 frames after "Recompute only", not on the word. The red grid is now fully stale from about 504.7 to 506.2 s and fades after that. Before, it was up for 1.2 s in all. Every cell is now solid, its lightness mixed into the fill (75% at rest), not set as opacity. So the green edges, which now end at the target cell's left edge, pass hidden under the cells they cross. In lineage, the back-trace holds until 6 frames into "what breaks" (before, it ended 4 frames before those words). The forward trace follows 2 frames later and holds 6 frames into "where personal data went". |
+| 10 | P3 | Quick round's key states flash by | fixed | `r-fan` is split after "go stale." with `pauseAfter: 1.0`. The cells calm 4 frames after "Recompute only", not on the word. The red grid is now fully stale from about 504.8 to 506.2 s and fades after that. Before, it was up for 1.2 s in all. Every cell is now solid, its lightness mixed into the fill (75% at rest), not set as opacity. So the green edges, which now end at the target cell's left edge, pass hidden under the cells they cross. In lineage, the back-trace holds until 6 frames into "what breaks" (before, it ended 4 frames before those words). The forward trace follows 2 frames later and holds 6 frames into "where personal data went". |
 | 11 | P3 | "fan-out" has a second meaning | fixed | New beat `r-fan-join`: "Not to be confused with a join fan-out, where a one-to-many join repeats rows and inflates a sum." A 23px note under the CDC line: "not a **join fan-out**: a one-to-many join that repeats rows and inflates sums". |
 | 12 | P3 | No safe way to rename | fixed | New beat `evo-iceberg`: "Table formats like Iceberg track columns by ID, so a rename there is safe." Under the red notes: "**safe rename:** a table format like Iceberg, which tracks columns by ID" ("safe rename:" in green, the rest in ink), cued to "Table formats like Iceberg". |
 | 13 | P3 | Bridge says every answer assumed one machine | fixed | `next` is split. Its first sentence is re-voiced: "Every example here ran on one machine." The rest is cut free into `next-many`. On screen: "Every example here ran on **one machine**.", cued to "one machine". |
@@ -30,7 +30,21 @@ Order worked: answers (1, 5, 7, 11), the other P2s (2, 3, 4), then the other P3s
 
 ## Length and checks
 
-PENDING
+- **New length: 550.3 s (9:10.3), was 464.7 s (7:44.7)**, 53 beats (was 30), 140 wpm (`npm run cues -- de-pipelines`). The added 86 s is 13 new sentences and the pauses after the new splits.
+- Typecheck (lines for `src/videos/de-pipelines/`): clean. `npx eslint src/videos/de-pipelines`: clean.
+- `npm run check:cues`: passes (exit 0). Nothing reported for `de-pipelines`.
+- `npm test`: 75 pass, 0 fail (on the final code).
+- `check:motion`: passes. 9:10.5 checked, 0 stretches still for 2 s or more.
+- `check:sync`: passes. All 53 beats start within ±0.12 s of their cue. The worst is `r-lineage` at +0.09 s, a beat that was not re-voiced. The re-voiced beats are within ±0.01 s.
+- `check:mix`: passes. Narration −19.8 LUFS, effects −46.8 LUFS. Where both sound, the speech is a median 27.5 dB above the effects (5th percentile 11.2 dB). New effects sit on the new cues: a tap each on micro-batch, personal data and Debezium, and on each Avro reader rule; a scratch each on the reversed read and on "fails backward"; a chime on "passes all three"; two pops and a whoosh for the Kappa copy. sync and mix ran before the last visual tweaks, none of which touched the audio.
+- `check:frames`: passes. 34 arrows within 10° under their heads (worst 0.2°). No hyphen is set in tabular figures, and every word cue names its occurrence.
+- Stills in `video/out/DataEngineer-6-Pipelines-stills/` and `…-stills2/`, at every changed moment, each looked at. Round 1 led to six tweaks:
+  - The micro-batch sub-line and the bronze line each ran to within 10px of the right margin, so both were shortened.
+  - The Kappa definition sat tight under the conditions, so it got more space.
+  - The fan-out edges still showed through the cells, so the cells are now solid.
+  - In lineage, the forward trace had lost the time the back-trace gained, so the two were rebalanced.
+  - The Parquet half was empty for 6 s during the new `evo-parquet`, so the two notes were added.
+  - Avro's v1 now pops on "contract", as before, so that half is not empty while `evo-avro-read` begins.
 
 ## Facts
 
