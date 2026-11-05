@@ -41,7 +41,36 @@ Left for budget: `ai-gov` ("kept from outside", 150 characters) and the RAG glos
 
 ## Length and checks
 
-CHECKS_PLACEHOLDER
+- `npm run cues -- de-interview`: 19 beats, 318 words, **152.3 s (2:32)**,
+  up from 2:13 (`check:motion` checks 2:32.5 with the tail). The scenes:
+  prompt 0 to 60.5 s, AI 60.5 to 112.6 s, series 112.6 s to the end.
+- Typecheck (`tsc --noEmit`, filtered to `src/videos/de-interview/`) and
+  `eslint src/videos/de-interview`: clean.
+- `npm run check:cues`: nothing in de-interview. The failures it lists are
+  in de-warehousing, de-streaming and other folders mid-edit.
+- `npm test`: 73 of 75 pass. Both failures are the two cue tests, and they
+  fail on other folders mid-edit (de-dimensional-modeling, de-orchestration,
+  de-pipelines-for-ai). Neither names de-interview.
+- `check:motion`: pass. 2:32.5 checked, 0 stretches still for 2 s or more.
+- `check:sync`: pass. Every beat is within ±0.04 s. The worst is +0.04 s
+  (`probe-design`, at 0:48.8), and the five other re-voiced beats are within
+  ±0.02 s.
+- `check:mix`: effects 30.9 LU under the narration. Where both sound, the
+  speech is a median 30.0 dB above the effects (5th percentile 9.8 dB). The
+  closest moment is 14.1 dB at 0:24.0.
+- `check:frames`: pass. 12 images, largest stretch 0.79. 5 arrows, at most
+  0.0° of bend under a head. No hyphen in tabular figures, and every cue
+  names its occurrence.
+- Stills, each looked at (cropped to the change): 0 s (frame 0 shows the
+  kicker), 10.5 (`expect-sql`: SQL band and "a level deeper"), 25 (names
+  centred before their parts arrive), 52.5 (all four lit, bracket, design
+  prompt), 57.5 and 60.2 (parts labels, "Part 11 walks one through",
+  finished hold), 66 (dashed step outlines, RAG gloss), 75.5 (feed arrow,
+  "only new and changed documents", caption), 81 and 111.2 (pgvector card,
+  governance wording, Part 11 pointer), 113.8 (names on "This series"),
+  121.8 (separate pairs, "182" gloss), 128 and 139 (series-how and practice
+  lines), 143.9 (Parts 1 and 2 lit on "hard sequel"), 146.5 (Part 1 alone)
+  and 150 (end).
 
 ## Facts
 
