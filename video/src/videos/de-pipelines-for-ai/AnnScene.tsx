@@ -268,7 +268,7 @@ export const AnnScene: React.FC = () => {
         </Note>
 
         {/* The simulation. */}
-        <Note at={modelAt - 2} x={CH.x0 - 70} y={y(CH.top) - 116}>
+        <Note at={modelAt - 2} x={CH.x0 - 70} y={y(CH.top) - 136}>
           <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             modelled in NumPy
             <span style={{ opacity: ease(frame, sizeAt - 2, 10), fontWeight: 500 }}>
@@ -276,11 +276,11 @@ export const AnnScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={sizeAt + 4} x={CH.x0 - 70} y={y(CH.top) - 78}>
+        <Note at={sizeAt + 4} x={CH.x0 - 70} y={y(CH.top) - 100}>
           <span style={madeUp(19)}>a seeded simulation, not a vector database</span>
         </Note>
         {/* The chart's frame, up from "Beyond that", so the right half is never bare. */}
-        <Note at={tradeAt + 4} x={CH.x0 - 70} y={y(CH.top) - 40}>
+        <Note at={tradeAt + 4} x={CH.x0 - 70} y={y(CH.top) - 62}>
           <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             recall<span style={{ fontWeight: 500, color: INK_SOFT }}>: the share of the true top ten found</span>
           </span>
@@ -327,10 +327,10 @@ export const AnnScene: React.FC = () => {
             ) : null;
           })}
         </svg>
-        <Note at={nearestAt + 4} x={CH.x1 - 360} y={y(CH.bottom) + 84}>
+        <Note at={nearestAt + 4} x={CH.x1 - 520} y={y(CH.bottom) + 84}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Mark at={knobAt + 2}>clusters probed: the knob</Mark>
-            <span style={{ opacity: ease(frame, breadthAt - 2, 10), fontWeight: 500 }}> (HNSW&apos;s: search breadth)</span>
+            <span style={{ opacity: ease(frame, breadthAt - 2, 10), fontWeight: 500 }}> (in HNSW, search breadth)</span>
           </span>
         </Note>
         <Note at={onePctAt - 2} x={xOf(1) + 18} y={at(ys, one.recall) + 14}>

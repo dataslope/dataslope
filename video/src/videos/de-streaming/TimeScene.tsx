@@ -121,6 +121,8 @@ export const TimeScene: React.FC = () => {
   // first window's end: 13 minus the 3-second delay is 10.
   const ben = STREAM.find((c) => c.user === "ben" && c.arrive === t3.closeFirst)!;
   const benHot = ease(frame, benAt, 8) * (1 - ease(frame, arrivesAt, 10));
+  // The click that arrived just before dee's in her partition, in question 1.
+  const aheadOfDee = STREAM.find((c) => c.partition === STREAM[WATERMARK.dee].partition && c.offset === STREAM[WATERMARK.dee].offset - 1)!;
   const sweepIn = ease(frame, allowAt, 10) * (1 - ease(frame, q9Out, 10));
   const wm3 = wmAt(t3.trace, pt);
   const wm10 = wmAt(t10.trace, pt);
@@ -352,7 +354,7 @@ export const TimeScene: React.FC = () => {
           </span>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, wrongAt, 10) }}>
             {" "}
-            · the click that sat after ben's from <Num>{ben.t}</Num> s in partition <Num>{dee.partition}</Num>
+            · the click that sat after {aheadOfDee.user}'s from <Num>{aheadOfDee.t}</Num> s in partition <Num>{dee.partition}</Num>
           </span>
         </Note>
 

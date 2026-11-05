@@ -112,6 +112,10 @@ export const TopicScene: React.FC = () => {
   const newClick = ease(frame, readAt, 16);
   const NEW_P = PARTITIONS.four.ava;
   const oldAva = ease(frame, readAt + 12, 10);
+  // dee's click, and the one that arrived just before it in her partition:
+  // in arrival order, though it happened later.
+  const deeClick = ARRIVALS.find((c) => c.user === "dee")!;
+  const aheadOfDee = ARRIVALS.find((c) => c.partition === deeClick.partition && c.offset === deeClick.offset - 1)!;
 
   return (
     <AbsoluteFill>
@@ -253,8 +257,8 @@ export const TopicScene: React.FC = () => {
         <Legend x={LANE_X} y={laneTop(2) + laneH + h(58)} at={flyAt(0) + 4} out={addAt - 4} note="· the video's own stream" />
         <Note at={acrossAt + 6} x={LANE_X} y={laneTop(2) + laneH + h(10)} out={partsOut}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
-            in order of arrival: <b style={{ color: USER_INK.dee }}>dee</b>'s click from <Num>8</Num> s sits after{" "}
-            <b style={{ color: USER_INK.ben }}>ben</b>'s from <Num>13</Num>
+            in order of arrival: <b style={{ color: USER_INK.dee }}>dee</b>'s click from <Num>{deeClick.t}</Num> s sits after{" "}
+            <b style={{ color: USER_INK[aheadOfDee.user] }}>{aheadOfDee.user}</b>'s from <Num>{aheadOfDee.t}</Num>
           </span>
         </Note>
 

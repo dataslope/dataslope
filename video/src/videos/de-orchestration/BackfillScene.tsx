@@ -10,10 +10,11 @@ import { Sfx } from "../../sound/Sfx";
 import { BACKFILL, count, fullRows, REFRESH } from "./data";
 import { CodeSpan, Drift, lineOf, MARK, MARK_OK, OK_INK, PyListing, X0 } from "./parts";
 
-/** The Pipelines page's backfill listing, word for word. */
+/** The Pipelines page's backfill listing, word for word but for the comment's
+ *  example date, moved from 2024 to the 2025 the grid beside it backfills. */
 const TASK = [
   "@task",
-  'def process_partition(ds: str):  # ds = "2024-06-01" injected by Airflow',
+  'def process_partition(ds: str):  # ds = "2025-06-01" injected by Airflow',
   '    run_sql(f"""',
   "        DELETE FROM events_clean WHERE event_date = '{ds}';",
   "        INSERT INTO events_clean",
@@ -24,6 +25,10 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 const GRID_X = 1104;
 const CELL = 18;
 const PITCH = 21;
+/** Rows of the grid, a month each: a little shorter than the cells are wide
+ *  apart, to leave room under the grid for what catchup does not do. */
+const ROW_CELL = 15;
+const ROW_PITCH = 18;
 /** The cost chart: days along, rows on a log scale. */
 const CH_X0 = 210;
 const CH_X1 = 1240;
@@ -34,7 +39,9 @@ const LOG_HI = Math.log10(12_000_000);
  * Question 6. What a backfill is for, and the design that makes it a loop:
  * the Pipelines page's task, parameterized by its date and overwriting its
  * own partition; a year of 2025 as 365 daily partitions, run four at a time
- * (Pyodide, check.mjs: 92 waves); and why the loop keeps each run small,
+ * (Pyodide, check.mjs: 92 waves) by max_active_runs; catchup only runs dates
+ * that never ran, the backfill command reruns past ones; and why the loop
+ * keeps each run small, on a log scale,
  * from charts/incremental-vs-full-refresh.mjs: at 8,000 rows a day, a full
  * rebuild on day 730 reprocesses 6,040,000 rows, 755 times one partition.
  */
@@ -147,11 +154,11 @@ export const BackfillScene: React.FC = () => {
             2025: <span style={{ color: BLUE_INK, opacity: ease(frame, runsAt, 10) }}>{BACKFILL.partitions} daily partitions</span>
           </span>
         </Note>
-        <Note at={thrAt} x={GRID_X - 44} y={y(644)}>
+        <Note at={thrAt} x={GRID_X - 44} y={y(652)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             throttled
             <span style={{ opacity: ease(frame, fourAt, 10) }}>
-              : <Num>{BACKFILL.parallel}</Num> at a time, <Num>{BACKFILL.waves}</Num> waves
+              : <CodeSpan size={21}>max_active_runs={BACKFILL.parallel}</CodeSpan>, <Num>{BACKFILL.waves}</Num> waves
             </span>
             <span style={{ color: OK_INK, opacity: ease(frame, keepAt, 10) }}>, so the source keeps up</span>
           </span>
@@ -168,9 +175,9 @@ export const BackfillScene: React.FC = () => {
               <rect
                 key={c.i}
                 x={GRID_X + c.d * PITCH}
-                y={gridTop + c.m * h(PITCH)}
+                y={gridTop + c.m * h(ROW_PITCH)}
                 width={CELL}
-                height={h(CELL)}
+                height={h(ROW_CELL)}
                 rx={3}
                 fill={fill}
                 opacity={done ? 0.85 : 1}
@@ -183,17 +190,20 @@ export const BackfillScene: React.FC = () => {
           })}
           {MONTHS.map((m, i) =>
             i % 3 ? null : (
-            <text key={m} x={GRID_X - 12} y={gridTop + i * h(PITCH) + h(CELL) - 2} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 600 })} opacity={ease(frame, runsAt + i * 1.5, 8)}>
+            <text key={m} x={GRID_X - 12} y={gridTop + i * h(ROW_PITCH) + h(ROW_CELL) - 1} textAnchor="end" style={svgText({ ...label(19, INK_SOFT), fontWeight: 600 })} opacity={ease(frame, runsAt + i * 1.5, 8)}>
               {m}
             </text>
             ),
           )}
         </svg>
-        <Note at={airAt} x={GRID_X - 44} y={y(604)}>
+        <Note at={airAt} x={GRID_X - 44} y={y(572)}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
             Airflow: <CodeSpan>catchup=True</CodeSpan>, a <CodeSpan>start_date</CodeSpan>
             <span style={{ opacity: ease(frame, dagAt, 10) }}> · Dagster: partitioned assets</span>
           </span>
+        </Note>
+        <Note at={airAt + 24} x={GRID_X - 44} y={y(612)}>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>catchup runs missed dates; the backfill command reruns past ones</span>
         </Note>
 
         {/* Why the loop: the cost of one run, a model. */}
@@ -202,7 +212,7 @@ export const BackfillScene: React.FC = () => {
             rows one run processes
             <span style={{ ...label(21, INK_SOFT), fontWeight: 500, opacity: ease(frame, modelAt, 10) }}>
               {" "}
-              · a model, <Num>{count(REFRESH.daily)}</Num> new rows a day
+              · a model, <Num>{count(REFRESH.daily)}</Num> new rows a day, log scale
             </span>
           </span>
         </Note>

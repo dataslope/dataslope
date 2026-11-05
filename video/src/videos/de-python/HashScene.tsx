@@ -73,6 +73,9 @@ const B_TITLE = 490;
 const PIPE = 548;
 const B_CELLS = 676;
 const TIME_Y = 790;
+/** Where the average-case note starts: past "bucket 999,999 of 2,097,152"
+ *  and the arc's head. */
+const AVG_X = 1110;
 
 const literal = (v: number) => v.toLocaleString("en-US").replace(/,/g, "_");
 const commas = (v: number) => Math.round(v).toLocaleString("en-US");
@@ -95,6 +98,8 @@ export const HashScene: React.FC = () => {
   const twoMillionAt = n.word("hash-jump", "out of two million");
   const straightAt = n.word("hash-jump", "Python goes straight there");
   const oneAt = n.word("hash-jump", "one comparison");
+  const avgAt = n.word("hash-avg", "On average");
+  const worstAt = n.word("hash-avg", "the worst case is order n");
   const timedAt = n.word("hash-time", "Timed in CPython");
   const msAt = n.word("hash-time", "five and a half milliseconds");
   const nsAt = n.word("hash-time", "twenty-three nanoseconds");
@@ -269,6 +274,18 @@ export const HashScene: React.FC = () => {
             </svg>
           ) : null}
 
+          {/* The average case, and the condition (the page's "hashable"). */}
+          <Note at={avgAt} x={AVG_X} y={pipeY + 4}>
+            <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+              <Mark at={avgAt + 4}>on average</Mark>: a collision adds a probe or two
+            </span>
+          </Note>
+          <Note at={worstAt - 4} x={AVG_X} y={pipeY + 46}>
+            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+              worst case <i>O</i>(<i>n</i>); keys must be hashable
+            </span>
+          </Note>
+
           {/* ── The times, ListVsSet's ── */}
           <Note at={timedAt} x={LEFT} y={y(TIME_Y)}>
             <span style={{ display: "flex", gap: 34, alignItems: "baseline", whiteSpace: "nowrap" }}>
@@ -278,7 +295,7 @@ export const HashScene: React.FC = () => {
               <span style={{ ...note(30, SET_INK), fontWeight: 650, opacity: ease(frame, nsAt - 2, 10) }}>
                 set <span style={{ fontVariantNumeric: "tabular-nums" }}>{HASH.setNs.toFixed(1)}</span> ns
               </span>
-              <Source>a million numbers, timed in CPython 3.13 (the course video List or set?)</Source>
+              <Source>a million numbers, timed in CPython 3.13 for the course video “List or set?”</Source>
             </span>
           </Note>
         </div>
@@ -309,7 +326,7 @@ export const HashScene: React.FC = () => {
           marks={[{ line: lineOf(DS, "not in seen"), at: setAt + 6, color: MARK_OK }]}
         />
         <Note at={fiftyAt - 8} x={X0} y={barsY - h(44)}>
-          <Title>comparisons, deduplicating distinct keys</Title>
+          <Title>equality comparisons, deduplicating distinct keys</Title>
         </Note>
         <Bars
           x={X0}
@@ -332,7 +349,9 @@ export const HashScene: React.FC = () => {
           </span>
         </Note>
         <Note at={setAt + 10} x={X0 + 330 + 160} y={barsY + 2 * h(58) + h(10)}>
-          <span style={{ ...note(26, SET_INK), fontWeight: 650, whiteSpace: "nowrap" }}>one hash lookup per record</span>
+          <span style={{ ...note(26, SET_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            one hash lookup each; every key is new, so nothing to compare
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>
