@@ -626,13 +626,18 @@ Illustrations come from the site's own pipeline
 (`scripts/generate-illustrations.mjs` at the repo root), so they get the same
 house style and checks:
 
-- OpenAI `gpt-image-2.5-flare` (set in each `illustrations.json`)
+- OpenAI `gpt-image-2.6-flare` (set in each `illustrations.json`)
 - `quality: low`
 - transparent background
-- the Batch API
+- the Batch API when the model is offered there; 2.6 is not, so today the
+  generator runs every request synchronously (about $0.02 per 1536x1024 image)
 - an alpha check that rejects an image painted on an opaque background
 
-**When a batch stalls, generate directly.** OpenAI batches usually finish
+The art already in `public/images/` was drawn on `gpt-image-2.5-flare` and
+stays as it is; moving the model does not mean regenerating it.
+
+**When a batch stalls, generate directly.** (This applies only to a model
+the Batch API takes.) OpenAI batches usually finish
 within the hour but have sat at "0 of 2 done" for three to six hours. The
 user has approved this fallback for the video art: if a video's batch is
 still `in_progress` an hour after it was submitted, cancel it and run the

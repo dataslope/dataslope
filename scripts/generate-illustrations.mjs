@@ -5,9 +5,11 @@
  * (the same source the admin gallery renders), builds each prompt in the house
  * style, and writes one PNG per prompt.
  *
- * Defaults to the Batch API (~50% cheaper, async) at **low** quality: image
- * output tokens dominate the bill and `low` (196 tokens per 1024x1024 vs 5488
- * at `high`) holds up for flat isometric/risograph art. Work is split across
+ * Always **low** quality with a **transparent** background: image output
+ * tokens dominate the bill and `low` holds up for flat isometric/risograph
+ * art. Uses the Batch API (~50% cheaper, async) when the model is offered
+ * there. `gpt-image-2.6-*` is not (see `supportsBatch`), so with it `run`
+ * generates synchronously and `submit` refuses. Batch work is split across
  * batches because images come back as inline base64 in the output JSONL — one
  * big batch's file could not be read into a JS string (V8 caps ~512 MB) — and
  * every output file is parsed as a stream, never buffered whole.
@@ -17,7 +19,10 @@
  *
  * Commands:
  *   run        submit the batches, poll them, and download images as they finish
+ *              (a model the Batch API does not take, such as gpt-image-2.6-*,
+ *              runs as `sync` instead)
  *   submit     build + upload the JSONL batches and create them; prints the ids
+ *              (refused for a model the Batch API does not take)
  *   status     show batch status (--batch <id>, or every batch last submitted)
  *   download   download completed batches' images into --out
  *   sync       generate immediately, one request per prompt (bounded concurrency)
@@ -234,11 +239,36 @@ export function buildPrompt(spec, colors, styles = {}) {
   );
 }
 
+// ── Batch support ────────────────────────────────────────────────────────────
+// The Batch API does not take every image model. On 2026-11-05 a batch naming
+// gpt-image-2.6-flare or gpt-image-2.6-sunburst failed validation with
+// `model_not_found` ("not supported by the Batch API") while the same request
+// on gpt-image-2.5-flare ran, and the pricing page lists no Batch rate for
+// 2.6. A batch is only refused after its file is uploaded and the job created,
+// so this is checked up front instead. Narrow it if a later 2.6 joins Batch.
+const NO_BATCH_MODELS = /^gpt-image-2\.6(?:-|$)/;
+
+/** Whether the Batch API accepts `model` for image generation. */
+export function supportsBatch(model) {
+  return !NO_BATCH_MODELS.test(model);
+}
+
 // ── Cost estimation ──────────────────────────────────────────────────────────
-// Image output tokens per request, measured against gpt-image-2 on 2026-07-28.
-// gpt-image-2.5-flare matched it at low 1536x1024 (158) on 2026-10-21.
-// Keyed "<size>/<quality>". `auto` is not listed because the model picks a tier
-// per prompt, so its cost is not predictable up front.
+// Image output tokens per request, keyed "<size>/<quality>". `auto` is not
+// listed because the model picks a tier per prompt, so its cost is not
+// predictable up front.
+//
+// gpt-image-2.6-* bills about four times the tokens of the models before it at
+// `low`, measured on gpt-image-2.6-flare on 2026-11-05 (2.6-sunburst matched at
+// 1536x1024). Only `low` is measured, the tier everything ships at.
+const COST_TOKENS_2_6 = {
+  "1024x1024/low": 824,
+  "1536x1024/low": 664,
+  "1024x1536/low": 664,
+  "1536x768/low": 429,
+};
+// Measured against gpt-image-2 on 2026-07-28; gpt-image-2.5-flare matched it
+// at low 1536x1024 (158) on 2026-10-21.
 const COST_TOKENS = {
   "1024x1024/low": 196,
   "1024x1024/medium": 1372,
@@ -255,21 +285,22 @@ const COST_TOKENS = {
 const USD_PER_MTOK = { batch: 15, sync: 30 };
 
 /** Projected USD for a set of entries, or null when the tier is unpredictable. */
-function estimateCost(entries, opts, mode) {
+function estimateCost(entries, opts, mode, model) {
+  const table = NO_BATCH_MODELS.test(model) ? COST_TOKENS_2_6 : COST_TOKENS;
   let tokens = 0;
   for (const e of entries) {
     const key = `${opts.size || e.size}/${opts.quality}`;
-    const t = COST_TOKENS[key];
+    const t = table[key];
     if (t === undefined) return null;
     tokens += t;
   }
   return (tokens * USD_PER_MTOK[mode]) / 1e6;
 }
 
-function describeCost(entries, opts, mode) {
-  const usd = estimateCost(entries, opts, mode);
+function describeCost(entries, opts, mode, model) {
+  const usd = estimateCost(entries, opts, mode, model);
   if (usd === null) {
-    return `cost not estimable at quality "${opts.quality}" (use low/medium/high)`;
+    return `cost not estimable at quality "${opts.quality}" for ${model} (use low)`;
   }
   return `~$${usd.toFixed(2)} projected (${mode} pricing, image output tokens)`;
 }
@@ -573,14 +604,16 @@ async function writeImage(sink, id, buf, opts) {
 }
 
 // ── Commands ─────────────────────────────────────────────────────────────────
-async function cmdDryRun(entries, opts) {
+async function cmdDryRun(entries, opts, model) {
   const ext = outputExt(opts);
-  const batches = chunk(entries, opts.batchSize).length;
+  const batched = supportsBatch(model);
+  const jobs = batched
+    ? `${chunk(entries, opts.batchSize).length} batch job(s)`
+    : "sync (no Batch API for this model)";
   console.log(
-    `[dry-run] ${entries.length} prompt(s) · background ${opts.background} · ` +
-      `quality ${opts.quality} · ${ext} · writes the ${artifactKind(opts)} · ` +
-      `${batches} batch job(s)\n` +
-      `          ${describeCost(entries, opts, "batch")}\n`,
+    `[dry-run] ${entries.length} prompt(s) · model ${model} · background ${opts.background} · ` +
+      `quality ${opts.quality} · ${ext} · writes the ${artifactKind(opts)} · ${jobs}\n` +
+      `          ${describeCost(entries, opts, batched ? "batch" : "sync", model)}\n`,
   );
   const suffix = artifactKind(opts) === "cutout" ? "-cutout" : "";
   for (const e of entries) {
@@ -928,14 +961,26 @@ async function main() {
 
   const entries = selectEntries(data, opts);
 
-  if (opts.command === "dry-run") return cmdDryRun(entries, opts);
+  if (opts.command === "dry-run") return cmdDryRun(entries, opts, model);
+
+  if (opts.command === "submit" && !supportsBatch(model)) {
+    console.error(
+      `${model} is not offered through the Batch API, so there is nothing to submit.\n` +
+        `Use \`run\` or \`sync\` (both generate synchronously for this model).`,
+    );
+    process.exit(1);
+  }
+  if (opts.command === "run" && !supportsBatch(model)) {
+    console.log(`${model} is not offered through the Batch API; running as \`sync\`.`);
+    opts.command = "sync";
+  }
 
   const mode = opts.command === "sync" ? "sync" : "batch";
   console.log(
     `${entries.length} prompt(s) · model ${model} · background ${opts.background} · ` +
       `quality ${opts.quality} · ${outputExt(opts)} · writes the ` +
       `${artifactKind(opts)} · out ${opts.out}\n` +
-      `${describeCost(entries, opts, mode)}\n`,
+      `${describeCost(entries, opts, mode, model)}\n`,
   );
   const key = requireKey();
   await warnIfNewerModel(model, key);

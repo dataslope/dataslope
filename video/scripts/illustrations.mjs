@@ -3,13 +3,15 @@
  * Generates a video's illustrations and imports them into public/images/.
  *
  * A thin layer over the site's own pipeline (scripts/generate-illustrations.mjs
- * at the repo root), so a video gets the same house style, the same Batch API
- * pricing, the same `quality: low` default, the same transparent background
- * and the same alpha check. The prompts live beside the video
+ * at the repo root), so a video gets the same house style, the same model
+ * (`meta.model`, gpt-image-2.6-flare), the same `quality: low` default, the same
+ * transparent background and the same alpha check. The generator's `run` uses
+ * the Batch API when the model is offered there and `sync` when it is not, as
+ * with 2.6. The prompts live beside the video
  * (src/videos/<video>/illustrations.json) rather than in
  * data/illustration-prompts.json, so they never reach the site's gallery.
  *
- *   1. generate: Batch API → .generated/<video>/<id>-cutout.png (gitignored)
+ *   1. generate: Batch API or sync → .generated/<video>/<id>-cutout.png (gitignored)
  *   2. import:   trim blank margins on both axes, encode WebP q92 →
  *                public/images/<video>/<id>.webp (committed)
  *

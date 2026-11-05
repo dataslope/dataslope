@@ -99,9 +99,10 @@ keepers; only the keepers reach git.
    truth: the `/dashboard/admin/illustration-prompts` gallery, the in-lesson
    `<Figure>`, and every script read it). `lesson` must equal the MDX file stem.
 2. **Generate** — `scripts/generate-illustrations.mjs`, the **latest OpenAI
-   image model** (currently `gpt-image-2.5-flare`, see "Non-negotiables"),
+   image model** (currently `gpt-image-2.6-flare`, see "Non-negotiables"),
    **quality `low`**, **size `1536x1024`**, **`background: transparent`**,
-   always via the **Batch API**. The model returns a real alpha channel, so
+   via the **Batch API** when the model is offered there (2.6 is not, so
+   today every run is synchronous). The model returns a real alpha channel, so
    what comes back *is* the cut-out: it is written to the run's `cutout`
    artifact (`<id>-cutout.png` on disk, `…/v<n>/cutout.png` in R2) and there is
    no separate removal step to forget. An image that comes back with no
@@ -374,42 +375,61 @@ to do with repository secrets.
 
 ### Non-negotiables
 
-**The latest OpenAI image model, for every image request.** Site art and
-video art alike use the newest image model OpenAI ships, currently
-`gpt-image-2.5-flare`. It is pinned in `meta.model` (in
+**GPT Image 2.6 at `quality: "low"` with `background: "transparent"`, for
+every image request.** Site art and video art alike use the newest image model
+OpenAI ships, currently `gpt-image-2.6-flare` (`gpt-image-2.6-sunburst` is the
+same release and price, and is acceptable where a set already uses it). It is
+pinned in `meta.model` (in
 `data/illustration-prompts.json` and in each video's `illustrations.json`) so a
 run is reproducible, and `generate-illustrations.mjs` checks `/v1/models`
 before anything is billed and warns when a newer `gpt-image-*` release exists.
 When it does, move every `meta.model` to it in one commit rather than mixing
 models within a set. Of a release's variants, take the general-purpose
 generation one: 2.5 shipped as `-flare` (fast generation) and `-sunburst`
-(editing and fine detail) at the same per-token price. The model before it,
-`gpt-image-2`, no longer accepts `background: "transparent"` at all; it
-answers HTTP 400.
+(editing and fine detail) at the same per-token price, and 2.6 kept both
+names. Older models are not a fallback: `gpt-image-2` no longer accepts
+`background: "transparent"` at all (it answers HTTP 400), and the art already
+committed was drawn on 2.5 and earlier and is kept as it is, so moving the
+model does not mean regenerating anything. A subject on a transparent
+background comes back from 2.6 at alpha 254, never 255; `alphaStats` counts
+250 and above as solid, so it needs nothing, but a new check written against
+255 would call every 2.6 subject translucent.
 
 **Quality `low`.** Image output tokens dominate the bill and the tiers are far
 apart. Measured on `gpt-image-2`: a 1536x1024 image is **158 output tokens at
 `low`** vs 1372 at `medium` and 5488 at `high`; `gpt-image-2.5-flare` bills the
-same 158 at `low`. At Batch pricing ($15 / 1M
-output tokens) 1000 images is ~$2.37 at `low` and ~$82 at `high`. `low` is
-visibly fine for this material. Never leave quality at `auto` — it picks its
-own tier per prompt, costing ~2x `low` with no control.
+same 158 at `low`. **`gpt-image-2.6-flare` bills about four times as much at
+`low`:** 664 tokens at 1536x1024, 824 at 1024x1024 and 429 at 1536x768
+(measured 2026-11-05). At the synchronous rate it is held to ($30 / 1M output
+tokens), 1000 images at 1536x1024 is ~$20 at `low`, where 2.5 through Batch
+was ~$2.37. `low` is visibly fine for this material. Never leave quality at
+`auto`: it picks its own tier per prompt, costing ~2x `low` with no control.
 
 **Size `1536x1024`** unless there is a specific reason otherwise. It is also
-the cheaper option: 158 tokens vs 196 for `1024x1024` at the same quality.
+the cheaper option: 664 tokens vs 824 for `1024x1024` at the same quality on
+2.6 (158 vs 196 on 2.5).
 Art painted into a *square* slot is that specific reason, and uses
 `1024x1024`: the home bento icons (`home-icon`) and the auth globe pins
 (`auth-globe-pin`). Size is per category in `meta.sizes`, so this is a JSON
 value rather than a flag. Chrome art that only ever renders small should also
 be promoted with `--max-width` — see the runbook's "Site chrome" section.
 
-**Batch API, always.** Half price, and a 20-image job returns in well under a
-minute in practice despite the 24h window. The generator chunks into
-`--batch-size` jobs and streams each output file — do not "simplify" that away:
-images come back as inline base64 (~3.6 MB per 1024px PNG), so a 1000-image
-batch would build a ~3.6 GB string and blow V8's ~512 MB string cap.
+**Batch API whenever the model is offered there, and 2.6 is not.** A batch
+naming `gpt-image-2.6-flare` or `-sunburst` fails validation with
+`model_not_found` ("not supported by the Batch API"), and the pricing page
+lists no Batch rate for either. `supportsBatch` in the generator knows this:
+`run` (which `npm run illustrations` calls) generates synchronously for a 2.6
+model and says so, `dry-run` prices it at the synchronous rate, and `submit`
+refuses before uploading anything, since a batch is only rejected after its
+file and job exist. When a 2.6 model joins the Batch API, narrow
+`NO_BATCH_MODELS` and batches come back by themselves: half price, and a
+20-image job returned in well under a minute in practice despite the 24h
+window. The generator chunks into `--batch-size` jobs and streams each output
+file. Do not "simplify" that away: images come back as inline base64 (~3.6 MB
+per 1024px PNG), so a 1000-image batch would build a ~3.6 GB string and blow
+V8's ~512 MB string cap.
 
-A batch can also stall: `gpt-image-2.5-flare` jobs have sat at 0 done for an
+A batch can also stall: `gpt-image-2.5-flare` jobs sat at 0 done for an
 hour or more before starting. If one is still `in_progress` an hour after it
 was submitted, cancel it (`POST /v1/batches/<id>/cancel`, so it cannot deliver
 and bill later) and run the generator's `sync` command on the same ids. That
@@ -549,7 +569,8 @@ only aesthetic: see the transparency constraint below.
 ### Transparency comes from the model, not a second service
 
 The image model accepts `background: "transparent"` and returns a real alpha
-channel, so generation and cut-out are one step. (`gpt-image-2` did too until
+channel, so generation and cut-out are one step, on `gpt-image-2.6-*` as on
+2.5. (`gpt-image-2` did too until
 it began rejecting the option, which is one reason the model is not frozen.) `--background` defaults to
 `transparent` for exactly that reason, and the generated file is written as
 the run's **cut-out** artifact: `<id>-cutout.png` on disk,

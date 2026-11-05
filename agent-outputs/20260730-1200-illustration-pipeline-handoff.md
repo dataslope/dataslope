@@ -62,11 +62,18 @@ without bound.
 
 Violating any of these has already been tried and rejected. Don't re-litigate.
 
-- **The latest OpenAI image model** (`gpt-image-2.5-flare` since 2026-10-21, pinned in
-  `meta.model`; the generator warns when `/v1/models` lists a newer one), **quality
-  `low`**, **size `1536x1024`**, **always the Batch API**.
+- **The latest OpenAI image model** (`gpt-image-2.6-flare` since 2026-11-05, and
+  `gpt-image-2.5-flare` from 2026-10-21 before it, pinned in `meta.model`; the generator
+  warns when `/v1/models` lists a newer one), **quality `low`**, **`background:
+  "transparent"`**, **size `1536x1024`**, and **the Batch API whenever the model is
+  offered there**. 2.6 is not (a batch naming it fails validation with
+  `model_not_found`), so the generator runs it with `sync` and `submit` refuses it; see
+  "Non-negotiables" in AGENTS.md. At `low` and 1536x1024, 2.6 bills 664 output tokens
+  (824 at 1024x1024) where 2.5 billed 158, at the $30 / 1M synchronous rate, and draws
+  solid pixels at alpha 254, which `alphaStats` counts as solid. Nothing drawn on 2.5 is
+  regenerated for the move.
   Low is the default in the script for a reason: image output tokens dominate the bill
-  and the tiers are 158 vs 1372 vs 5488 tokens.
+  and the tiers are 158 vs 1372 vs 5488 tokens (measured on 2.5 and `gpt-image-2`).
   The first set drawn with 2.5 was `working-with-coding-agents` (2026-10-13), via
   `--model` before it became the default. At `low` and
   1536x1024 it bills the same 158 output tokens, accepts `background: "transparent"`,
