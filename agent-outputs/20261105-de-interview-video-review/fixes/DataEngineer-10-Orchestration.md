@@ -72,7 +72,7 @@ characters.
 - `check:sync`: passes, all 46 beats within ±0.12 s (worst +0.03 s, `cb-retry`).
 - `check:mix`: effects 30.1 LU under the narration, speech a median 29.5 dB
   above them where both sound (5th percentile 15.0 dB).
-- `check:frames`: FRAMES_RESULT
+- `check:frames`: passes. 26 arrows within 10°, no hyphen in tabular figures, the illustration not drawn larger than its pixels, and every cue the render took names its occurrence.
 - Stills, each looked at: 67.5 (Q1 DAG), 98 (Dagster), 137.8 and 148.5
   (anti-patterns, listing), 150.5 (no stray dots), 183.8 (retry floors),
   188.5 and 213 (jitter), 243 (kinds, all three full), 297 (backfill), 329.5
