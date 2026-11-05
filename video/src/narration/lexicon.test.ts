@@ -75,6 +75,11 @@ test("initialisms voiced through the lexicon are said as words, by their timing"
     for (const entry of Object.values(beats)) {
       if (!entry.spoken) continue;
       for (const { written: [a, b] } of say(entry.text).swaps) {
+        // Before punctuation the voice pauses, and the alignment stretches a
+        // word's last letter across the pause ("its SKU," measured 0.64 s
+        // where "the SKU column" measured 0.24 s), so only a word followed
+        // by another word is timed.
+        if (!/^\s+[A-Za-z0-9]/.test(entry.text.slice(b))) continue;
         const key = entry.text.slice(a, b);
         const d = entry.alignment.character_end_times_seconds[b - 1] - entry.alignment.character_start_times_seconds[a];
         durations.set(key, [...(durations.get(key) ?? []), d]);
