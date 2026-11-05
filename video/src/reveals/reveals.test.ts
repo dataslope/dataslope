@@ -97,3 +97,14 @@ test("every reveal holds its finished lockup for at least a second", () => {
     assert.ok(end - done >= FPS, `${id}: finishes at frame ${done} of ${end}`);
   }
 });
+
+test("openers are set in Inter, and another face only ever as a twin of one", () => {
+  const openers = REVEALS.filter((r) => r.props.layout !== "sting");
+  const inter = openers.filter((r) => r.props.face === "inter");
+  assert.ok(inter.length > openers.length / 2, "most openers are Inter");
+  for (const { id, props } of openers.filter((r) => r.props.face !== "inter")) {
+    // Everything but the face matches an Inter opener, so the two compare.
+    const twin = inter.find((r) => JSON.stringify({ ...r.props, face: props.face }) === JSON.stringify(props));
+    assert.ok(twin, `${id} (${props.face}) is not an Inter opener with only its face changed`);
+  }
+});

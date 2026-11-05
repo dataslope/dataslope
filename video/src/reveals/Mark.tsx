@@ -169,21 +169,25 @@ export const AnimatedMark: React.FC<{
   } else if (motion === "histogram") {
     const slot = VIEW.w / BARS;
     // The gaps close once the last bar is up, and the bars become the shape.
-    const gap = slot * 0.3 * (1 - ease(f, MARK_LANDS.histogram - 10, 10));
+    const fuse = ease(f, MARK_LANDS.histogram - 10, 10);
+    const gap = slot * 0.3 * (1 - fuse);
+    // Neighbours overlap by a screen pixel, so the closing gaps leave no seam;
+    // once they have closed the mask comes off, and the last frame is the
+    // logo itself rather than thirteen bars that add up to it.
+    const overlap = px(1);
     const bars = Array.from({ length: BARS }, (_, i) => {
       const rise = spring({ frame: f - i * BAR_STAGGER, fps, config: SPRINGS.bar });
       const h = (VIEW.h + 4) * rise;
-      // Overlap neighbours by a unit once the gaps are closed, so no seam
-      // shows between two bars.
-      return <rect key={i} x={i * slot + gap / 2 - 0.5} y={VIEW.h + 2 - h} width={slot - gap + 1} height={h} fill="white" />;
+      return <rect key={i} x={i * slot + gap / 2 - overlap / 2} y={VIEW.h + 2 - h} width={slot - gap + overlap} height={h} fill="white" />;
     });
-    defs = (
+    const fused = fuse >= 1;
+    defs = fused ? null : (
       <mask id={`${id}-m`} maskUnits="userSpaceOnUse" x={-10} y={-10} width={VIEW.w + 20} height={VIEW.h + 20}>
         {bars}
       </mask>
     );
     body = (
-      <g mask={`url(#${id}-m)`}>
+      <g mask={fused ? undefined : `url(#${id}-m)`}>
         <path d={LEFT} fill={fillL} />
         <path d={RIGHT} fill={fillR} />
       </g>

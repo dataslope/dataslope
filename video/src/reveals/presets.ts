@@ -8,9 +8,11 @@ import type { LogoRevealProps } from "./LogoReveal";
  *
  * Stings are the mark and wordmark alone. Openers add a course and unit; four
  * of them set every line at one size, "Dataslope" included, and the fifth
- * (`headline`) keeps a hierarchy for comparison.
+ * (`headline`) keeps a hierarchy for comparison. Inter is the face, and the
+ * one to prefer; the last three repeat an Inter opener with only the face
+ * changed, to compare against it.
  */
-export const REVEALS: { id: string; props: LogoRevealProps }[] = [
+const INTER: { id: string; props: LogoRevealProps }[] = [
   sting("Sting-1-Assemble", { motion: "assemble", text: "ink" }),
   sting("Sting-2-Plot", { motion: "plot", text: "letters" }),
   sting("Sting-3-Histogram", { motion: "histogram", text: "slide" }),
@@ -58,13 +60,29 @@ export const REVEALS: { id: string; props: LogoRevealProps }[] = [
   }),
 ];
 
+/** An Inter opener's props, by id. */
+function find(id: string): LogoRevealProps {
+  const found = INTER.find((r) => r.id === id);
+  if (!found) throw new Error(`no reveal ${id}`);
+  return found.props;
+}
+
+export const REVEALS: { id: string; props: LogoRevealProps }[] = [
+  ...INTER,
+  // The same openers in other faces, to compare against Inter: each is an
+  // Inter opener above with only `face` changed.
+  { id: "Opener-6-Stack-SourceSerif", props: { ...find("Opener-1-Stack"), face: "source-serif" } },
+  { id: "Opener-7-Centered-Fraunces", props: { ...find("Opener-3-Centered"), face: "fraunces" } },
+  { id: "Opener-8-Columns-Mono", props: { ...find("Opener-4-Columns"), face: "jetbrains-mono" } },
+];
+
 function sting(id: string, p: Pick<LogoRevealProps, "motion" | "text"> & Partial<LogoRevealProps>) {
   return {
     id,
-    props: { layout: "sting", theme: "light", course: "", unit: "", title: "", sfx: true, ...p } satisfies LogoRevealProps,
+    props: { layout: "sting", theme: "light", face: "inter", course: "", unit: "", title: "", sfx: true, ...p } satisfies LogoRevealProps,
   };
 }
 
 function opener(id: string, p: Pick<LogoRevealProps, "layout" | "motion" | "text" | "course" | "unit" | "title"> & Partial<LogoRevealProps>) {
-  return { id, props: { theme: "light", sfx: true, ...p } satisfies LogoRevealProps };
+  return { id, props: { theme: "light", face: "inter", sfx: true, ...p } satisfies LogoRevealProps };
 }

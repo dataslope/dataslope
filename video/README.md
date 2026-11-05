@@ -534,7 +534,8 @@ Studio's props panel, or with `--props='{"captions":true}'`.
 
 Short brand clips, in the Studio's `Logo-Reveals` folder. A **sting** is the
 mark and the wordmark (3.5 s). A **course opener** adds a course and a unit
-(5 s). Each opens on a few frames of bare page, builds the mark, sets the
+(5 s). **Openers are set in Inter**, the site's face; three more repeat an
+Inter opener in another face, to compare against it. Each opens on a few frames of bare page, builds the mark, sets the
 words, and holds the finished lockup for at least a second.
 
 | Composition | The mark | The words | Layout |
@@ -549,6 +550,9 @@ words, and holds the finished lockup for at least a second.
 | `Opener-3-Centered` | `unfold` | `letters` | `centered`, every line one size |
 | `Opener-4-Columns` | `assemble` | `blur` | `columns`, every line one size |
 | `Opener-5-Headline` | `histogram` | `ink` | `headline`, a hierarchy, for comparison |
+| `Opener-6-Stack-SourceSerif` | `rise` | `slide` | Opener-1 in Source Serif 4, the videos' headline face |
+| `Opener-7-Centered-Fraunces` | `unfold` | `letters` | Opener-3 in Fraunces |
+| `Opener-8-Columns-Mono` | `assemble` | `blur` | Opener-4 in JetBrains Mono, the site's code face |
 
 All ten are one component, `LogoReveal` (`src/reveals/`), with different
 props (`src/reveals/presets.ts`). Any mark motion goes with any text motion,
@@ -576,8 +580,17 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
 - **Equal sizes.** The `stack`, `block`, `centered` and `columns` openers set
   every line at one size, "Dataslope" included: weight and color tell the
   lines apart (the wordmark in ink at 600, the course in the soft ink at 500,
-  the unit's title in the brand blue). `headline` keeps the size hierarchy of
-  the series intro, to compare against.
+  the unit's title in the brand blue). `headline` keeps a size hierarchy, to
+  compare against: its large title is Inter Display, the optical size Inter
+  draws at that scale.
+- **Inter first.** `face` (`OpenerFace` in `LogoReveal.tsx`) sets the course
+  and unit lines: `inter` by default, or `source-serif`, `fraunces` or
+  `jetbrains-mono` to compare. The wordmark is Inter 600 whatever it says,
+  because it is the logo. Another face is scaled to Inter's x-height (by the
+  scales `editorial/typefaces.ts` measured), since a serif set at Inter's
+  font size reads smaller, and keeps Inter's line pitch, so "one size" still
+  holds. `reveals.test.ts` fails an opener in another face that isn't an
+  Inter opener with only the face changed.
 - **One number per motion.** `MARK_LANDS` is the frame the mark is whole; the
   words, the glide of a sting's mark and the bell are all cued from it.
   `src/reveals/reveals.test.ts` checks each against the springs that make it,

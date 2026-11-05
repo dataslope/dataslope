@@ -1,11 +1,12 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../components/motion";
-import { headline, HAIRLINE, INK, INK_SOFT, PAPER } from "../editorial/style";
-import { TYPEFACES, typefaceVars } from "../editorial/typefaces";
+import { INTER_OPTICAL } from "../editorial/fonts";
+import { HAIRLINE, INK, INK_SOFT, PAPER } from "../editorial/style";
+import { TYPEFACES } from "../editorial/typefaces";
 import { Sfx, SfxContext, type SoundName } from "../sound/Sfx";
 import { ds, inkOf } from "../theme/brand";
-import { SANS } from "../theme/fonts";
+import { MONO, SANS } from "../theme/fonts";
 import { AnimatedMark } from "./Mark";
 import {
   BELL_LEVEL,
@@ -19,7 +20,6 @@ import {
   type TextMotion,
 } from "./timing";
 import { Words } from "./Words";
-import "../editorial/fonts";
 
 /**
  * Where everything sits:
@@ -38,7 +38,9 @@ import "../editorial/fonts";
  *   - `columns`: mark and wordmark on the left, the course and unit on the
  *     right, a hairline between.
  * - `headline`: the opener with a hierarchy, for comparison: a small wordmark
- *   over a large serif title, the course under it.
+ *   over a large title, the course under it.
+ *
+ * Every opener is set in Inter unless its `face` says otherwise (OpenerFace).
  */
 export type RevealLayout = "sting" | "stack" | "block" | "centered" | "columns" | "headline";
 
@@ -50,6 +52,9 @@ export type LogoRevealProps = {
   text: TextMotion;
   /** `light`: the white page the videos use. `dark`: a deep brand blue. */
   theme: "light" | "dark";
+  /** The face an opener sets its course and unit in (OpenerFace). Inter
+   *  unless there is a reason to compare; a sting ignores it. */
+  face: OpenerFace;
   /** The course and unit an opener names; a sting ignores them. */
   course: string;
   unit: string;
@@ -79,7 +84,7 @@ const THEMES = {
 /** "Dataslope" in Inter 600 at -0.025em is 4.61 em wide (measured in a render). */
 const WORD_EM = 4.61;
 
-/** Inter at one size: the wordmark's face, which every opener line shares. */
+/** Inter at one size: the wordmark's face, as the site header sets it. */
 const inter = (size: number, weight: number, color: string): React.CSSProperties => ({
   fontFamily: SANS,
   fontSize: size,
@@ -89,13 +94,67 @@ const inter = (size: number, weight: number, color: string): React.CSSProperties
   color,
 });
 
+/**
+ * The face an opener sets its course and unit in. **Inter, the site's own
+ * face, is the default and the one to prefer**; the others are there to
+ * compare against it. The wordmark stays Inter 600 whatever this says,
+ * because it is the logo.
+ *
+ * "One size" means one x-height: a serif set at Inter's font size reads
+ * smaller, so each face is scaled until its lowercase stands as tall as
+ * Inter's, by the scales typefaces.ts measured for the editorial videos.
+ * JetBrains Mono, the site's code face, already matches Inter's (0.55 em
+ * against 0.546).
+ */
+export type OpenerFace = "inter" | "source-serif" | "fraunces" | "jetbrains-mono";
+
+const toInter = (id: keyof typeof TYPEFACES) => TYPEFACES[id].headScale / TYPEFACES.inter.headScale;
+const FACES: Record<OpenerFace, { family: string; scale: number; regular: number; strong: number; tracking: string; display: string }> = {
+  // `display` is the family for the headline layout's large title: Inter's
+  // optical-size axis draws it from Inter Display, cut for that size.
+  inter: { family: SANS, scale: 1, regular: 500, strong: 600, tracking: "-0.025em", display: `"${INTER_OPTICAL}", ${SANS}` },
+  "source-serif": {
+    family: TYPEFACES["source-serif"].family,
+    scale: toInter("source-serif"),
+    regular: 400,
+    strong: 640,
+    tracking: "-0.012em",
+    display: TYPEFACES["source-serif"].family,
+  },
+  fraunces: {
+    family: TYPEFACES.fraunces.family,
+    scale: toInter("fraunces"),
+    regular: 400,
+    strong: 560,
+    tracking: "-0.015em",
+    display: TYPEFACES.fraunces.family,
+  },
+  "jetbrains-mono": { family: MONO, scale: 1, regular: 400, strong: 600, tracking: "-0.02em", display: MONO },
+};
+
+/** One line of an opener in `face`, at the x-height of Inter at `size`. Its
+ *  line box is set in pixels, so every face keeps Inter's rhythm. */
+const setIn = (face: OpenerFace, size: number, weight: "regular" | "strong", color: string): React.CSSProperties => {
+  const f = FACES[face];
+  return {
+    fontFamily: f.family,
+    fontSize: size * f.scale,
+    fontWeight: f[weight],
+    letterSpacing: f.tracking,
+    lineHeight: `${size * 1.2}px`,
+    // Fraunces defaults to old-style figures, which drop "Unit 3" below the line.
+    fontVariantNumeric: "lining-nums",
+    color,
+  };
+};
+
 export const LogoReveal: React.FC<LogoRevealProps> = (props) => {
   const { layout, motion, theme, sfx } = props;
   const t = THEMES[theme];
   const land = stingCues(motion).land;
   return (
     <SfxContext.Provider value={sfx}>
-      <AbsoluteFill style={{ background: t.page, ...typefaceVars(TYPEFACES["source-serif"]) }}>
+      <AbsoluteFill style={{ background: t.page }}>
         {MARK_EVENTS[motion].map((e, i) => (
           <Sfx key={i} name={`el-reveal-${e.sound}`} accentAt={MARK_AT + e.at} level={e.level} />
         ))}
@@ -127,7 +186,7 @@ const Sting: React.FC<LogoRevealProps> = ({ motion, text, theme }) => {
   );
 };
 
-const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, course, unit, title }) => {
+const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, face, course, unit, title }) => {
   const frame = useCurrentFrame();
   const t = THEMES[theme];
   const cue = openerCues(motion, text, unit);
@@ -141,8 +200,18 @@ const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, course
 
   if (layout === "headline") {
     // The hierarchy the equal-size openers do without: a small wordmark, a
-    // large serif title, and the course as a label under it.
+    // large title (Inter Display, by default), and the course under it.
     const markH = 236;
+    const f = FACES[face];
+    const big: React.CSSProperties = {
+      fontFamily: f.display,
+      fontSize: 112 * f.scale,
+      fontWeight: face === "inter" ? 640 : f.strong,
+      letterSpacing: face === "inter" ? "-0.03em" : f.tracking,
+      lineHeight: 1.1,
+      fontVariantNumeric: "lining-nums",
+      color: t.ink,
+    };
     return (
       <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
         {lineSounds}
@@ -150,11 +219,11 @@ const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, course
           <AnimatedMark motion={motion} at={MARK_AT} height={markH} color={t.mark} />
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
             {line(<Words motion={text} at={cue.word} text="Dataslope" style={inter(44, 600, t.ink)} caret={t.mark} />)}
-            {line(<Words motion={text} at={cue.course} text={title} style={{ ...headline(118), color: t.ink, lineHeight: 1.1 }} caret={t.mark} />, {
+            {line(<Words motion={text} at={cue.course} text={title} style={big} caret={t.mark} />, {
               marginTop: 6,
             })}
             {line(
-              <Words motion={text} at={cue.unitAt} text={`${course}, ${unit}`} style={inter(34, 550, t.soft)} caret={t.mark} />,
+              <Words motion={text} at={cue.unitAt} text={`${course}, ${unit}`} style={setIn(face, 34, "regular", t.soft)} caret={t.mark} />,
               { marginTop: 14 },
             )}
           </div>
@@ -166,11 +235,11 @@ const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, course
   const size = layout === "block" ? 64 : layout === "columns" ? 56 : layout === "stack" ? 76 : 68;
   const words = {
     word: <Words motion={text} at={cue.word} text="Dataslope" style={inter(size, 600, t.ink)} caret={t.mark} />,
-    course: <Words motion={text} at={cue.course} text={course} style={inter(size, 500, t.soft)} caret={t.mark} />,
+    course: <Words motion={text} at={cue.course} text={course} style={setIn(face, size, "regular", t.soft)} caret={t.mark} />,
     unit: (
-      <div style={{ display: "flex", gap: `${0.32 * size}px` }}>
-        <Words motion={text} at={cue.unitAt} text={unit} style={inter(size, 500, t.soft)} caret={t.mark} />
-        <Words motion={text} at={cue.titleAt} text={title} style={inter(size, 600, t.accent)} caret={t.mark} />
+      <div style={{ display: "flex", alignItems: "baseline", gap: `${0.32 * size}px` }}>
+        <Words motion={text} at={cue.unitAt} text={unit} style={setIn(face, size, "regular", t.soft)} caret={t.mark} />
+        <Words motion={text} at={cue.titleAt} text={title} style={setIn(face, size, "strong", t.accent)} caret={t.mark} />
       </div>
     ),
   };
