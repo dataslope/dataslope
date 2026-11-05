@@ -248,7 +248,7 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "Every query here measured what users did. The newest round asks you to measure what a large language model, an LLM, writes. Next: LLM evaluation.",
+      text: "Every query here measured what users did. The newest round asks you to measure what an LLM writes. Next: LLM evaluation.",
     },
   ],
 };

@@ -48,12 +48,12 @@ export const script: NarrationScript = {
     {
       id: "ai",
       scene: true,
-      text: "AI, artificial intelligence, has brought in new questions.",
+      text: "AI has brought in new questions.",
       pauseAfter: 0.6,
     },
     {
       id: "ai-eval",
-      text: "Evaluating a feature built on a large language model, an LLM, is now treated as a measurement problem: an eval set of test prompts, a confidence interval on the share of them it passes, and a check that an LLM judge, a model grading the answers, agrees with human experts.",
+      text: "Evaluating a feature built on an LLM is now treated as a measurement problem: an eval set of test prompts, a confidence interval on the share of them it passes, and a check that an LLM judge, a model grading the answers, agrees with human experts.",
       pauseAfter: 0.6,
     },
     {

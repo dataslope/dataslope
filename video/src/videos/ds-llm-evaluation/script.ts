@@ -87,12 +87,12 @@ export const script: NarrationScript = {
     {
       id: "changed",
       scene: true,
-      text: "Question one. How have data scientist interviews changed with AI, artificial intelligence? The core loop hasn't: statistics, experiments, SQL and product sense.",
+      text: "Question one. How have data scientist interviews changed with AI? The core loop hasn't: statistics, experiments, SQL and product sense.",
       pauseAfter: 0.6,
     },
     {
       id: "changed-layer",
-      text: "What's layered on top, mostly at mid and senior levels, is evaluating features built on a large language model, an LLM. Experimenting on AI features, where the treatment is itself random. Checking code and analysis an assistant wrote. And rounds where AI is allowed, or banned. Ask the recruiter, round by round.",
+      text: "What's layered on top, mostly at mid and senior levels, is evaluating features built on an LLM. Experimenting on AI features, where the treatment is itself random. Checking code and analysis an assistant wrote. And rounds where AI is allowed, or banned. Ask the recruiter, round by round.",
       pauseAfter: 0.7,
     },
     { id: "measure-in", text: "Most of what follows is about the first of those. Questions five and seven take the next two." },

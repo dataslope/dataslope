@@ -66,7 +66,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Most analysts now draft queries with an AI assistant, artificial intelligence that writes code from a plain request. Interviewers know it, and it has changed what they test: less can you write this query, more can you tell whether it's right.",
+      text: "Most analysts now draft queries with an AI assistant that writes code from a plain request. Interviewers know it, and it has changed what they test: less can you write this query, more can you tell whether it's right.",
       pauseAfter: 0.6,
     },
     {
@@ -262,7 +262,7 @@ export const script: NarrationScript = {
     { id: "r-bi-job", text: "So the analyst's job moves to building and checking those." },
     {
       id: "r-llm",
-      text: "And to sort five thousand survey answers with an LLM, a large language model: fix the categories first, hand-label a hundred or two to measure it, keep the settings the same for every batch, rerun a sample to confirm the labels repeat, and quote real answers, not its paraphrases.",
+      text: "And to sort five thousand survey answers with an LLM: fix the categories first, hand-label a hundred or two to measure it, keep the settings the same for every batch, rerun a sample to confirm the labels repeat, and quote real answers, not its paraphrases.",
     },
     {
       id: "r-llm-report",
