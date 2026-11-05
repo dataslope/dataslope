@@ -31,9 +31,11 @@ its own, no new take, no `--force`:
   `ai-more` 37 (new), `series-how` 108.
 
 Nothing was free to recut: the only split (`expect`) fell at a comma, which
-`locateBeats` will not start a beat after. Every other beat's entry in
-`alignment.json` and every other MP3 is byte-identical to the committed
-files. The takes are untouched.
+`locateBeats` will not start a beat after. Against the pre-fix commit
+`4bff3bc`, every other beat's entry in `alignment.json`, its `meta` and
+every other MP3 are byte-identical, and the takes are untouched (checked
+with `git diff --stat 4bff3bc -- video/public/narration/de-interview/
+video/takes/de-interview/` and a per-beat comparison of the alignment).
 
 Left for budget: `ai-gov` ("kept from outside", 150 characters) and the RAG gloss in `ai-rag` (about 220). Both are carried on screen instead.
 

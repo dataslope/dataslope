@@ -63,27 +63,42 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     exactly one version ("all twenty-four"); 15 current rows, one per
  *     customer. Type 4 split: 15 current rows, 24 history rows. Type 6: 101
  *     reports Boston with current_city Austin.
- *   - "type0", the video's own two loads: the second insert, ON CONFLICT DO
- *     NOTHING, inserts 0 rows and 2022-01-01 stands (the page: "a simple
- *     insert-once strategy suffices").
+ *   - "type0", the video's own two loads into a table keyed by customer_id:
+ *     the second insert, ON CONFLICT DO NOTHING, inserts 0 rows and
+ *     2022-01-01 stands (the page: "a simple insert-once strategy
+ *     suffices"). "type0-copy", the video's own Type 2 table ("type0mix"):
+ *     Austin's new version copies 2022-01-01 from Boston's row, and the
+ *     source's 2023-06-30 is ignored.
  *   - "late", the video's own three staged orders: order 203 for customer 77,
  *     who is not yet in the dimension; the inner-join load keeps 2 rows,
- *     700.00 of 1,110.00; with placeholder key 2002 it keeps all three; the
- *     UPDATE to Tulsa leaves the fact row as it was.
+ *     700.00 of 1,110.00; a placeholder for every staged customer the
+ *     dimension lacks (key 2002, from a sequence) lets it keep all three;
+ *     the UPDATE to Tulsa leaves the fact row as it was.
  *   - "snap", the video's own two orders: six events in the log; the latest
- *     row per order is 501 shipped and 502 cancelled; only the log answers
- *     "paid, then cancelled" (502).
+ *     row per order is 501 shipped and 502 cancelled; the periodic (daily)
+ *     snapshot has four rows and 502 is cancelled on both days; only the
+ *     log answers "paid, then cancelled" (502, by comparing timestamps).
  *   - "bridge"/"mtm", the video's own three orders (100, 60 and 40, 200 in
  *     all) and three promotions, with the page's bridge and weight: summed
  *     through the bridge they report 340; weighted, 110, 70 and 20, which is
  *     200.
  *   - quick round, the video's own small tables: invoice lines grouped by
- *     order number; 3 x 2 x 2 = 12 junk rows; order 301 ordered on a Friday
- *     and shipped on a Monday from one date table; 5 x 4 = 20 mini-dimension
- *     rows; three attendance rows. The UUID item, in Postgres: an integer
- *     is 4 bytes, a bigint 8, a UUID 16; primary-key indexes over 100,000
- *     rows are 2.26 MB for a sequence, 4.42 MB for random UUIDs ("almost
- *     twice": 1.96) and 3.18 MB for Postgres 18's time-ordered uuidv7.
+ *     invoice number; 3 x 2 x 2 = 12 junk rows; order 301 ordered on a
+ *     Friday and shipped on a Monday from one date table; 5 x 4 = 20
+ *     mini-dimension rows; three attendance rows, and enrollment minus
+ *     attendance is Ben's Statistics class. The UUID item, in Postgres: an
+ *     integer is 4 bytes, a bigint 8, a UUID 16; primary-key indexes over
+ *     100,000 rows are 2.26 MB for a sequence, 4.42 MB for random UUIDs
+ *     ("almost twice": 1.96) and 3.18 MB for Postgres 18's time-ordered
+ *     uuidv7. The two steps: 1.41x for the wider key (sequence to v7, both
+ *     in order), 1.39x for random order (v7 to random, same width); the
+ *     random keys indexed in one sorted build come out at v7's 3.18 MB, so
+ *     v7 "pays only for the width". The example UUID is one value
+ *     gen_random_uuid() returned, version 4.
+ *
+ * Kimball's own Type 4 is the mini-dimension ("add mini-dimension" in The
+ * Data Warehouse Toolkit); the history-table reading is the common one and
+ * the page gives both. "type4-kimball" points from one to the other.
  *
  * Written for Drew's ear: SCD and UUID are expanded once, where first said;
  * every other initialism is in plain caps; numbers as they are said ("one oh
