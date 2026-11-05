@@ -24,4 +24,32 @@ Worked in the brief's order: answers (3, 4, 5, then 7, 8), the other P2s (1, 2, 
 | 14 | P3 | fixed | The four checks are a 2 by 2 list in the Lakehouse column, with "ACID: atomic, consistent, isolated, durable" and the upsert gloss under them; the hamster moved to the empty space under the data lake. The transaction log is 20px wider (`left` +14, `PANEL_W - 68`), so "v3 … · an upsert" sits inside its paper and the bucket. The bridge note is 15px lower, so its baseline meets "Next: …". |
 | 15 | P3 | fixed | The trap fill mixes the pink (26% `ACCENT` on paper) into the folder's own blue by `trap`, so it never passes through white (stills at the start and end of the red span). |
 
-PENDING
+## Voice
+
+- **849 characters re-voiced**, ten beats each voiced on its own, no new take, no `--force`: P2 633 (`hook-same` 56, `fmt-registry` 139, `cmp-dict` 84, `cmp-sort` 90, `cmp-row` 136, `part-bad` 55, `part-raw` 73), P3 216 (`sm-prevent` 73, `cl-pair` 95, `cost-store` 48). Within the 1,200 and the 400 for P3s.
+- Split before re-voicing: `hook-read`, `fmt-avro`, `cmp-region` (three pieces, one cut after a colon), `cmp-sort`, `part-region` and `part-fn` were split at sentence breaks and cut from the kept takes with `narrate --recut` (11 beats, free, no "no clear pause" warning; every cut starts and ends in silence, checked on the envelopes).
+- Against the pre-fix commit `4bff3bc`: the 31 beats not split or re-voiced are byte-identical (alignment entries and MP3s); only the six split beats' MP3s changed, and 16 new MP3s were added.
+
+## Facts
+
+- `check.mjs` (run from the repo root, as its header says) gained one statement: the month-partitioned table queried with `sale_month BETWEEN '2024-03' AND '2024-05'`, kept as `partition.range` ("Scanning Files: 3/12", 3 files read). `data.ts` exposes it as `PARTITION.range`; `PartitionScene` takes its WHERE text and its 3/12 from there and throws if the plan line is missing.
+- **Every existing value in `results.json` came back identical**; the only diff is the new `partition.range` block.
+- The narration and screen claims that are not measurements (Avro's schema ID and registry, run-length encoding, the BigQuery billing note, prevention levers) follow the page, except where noted in 7 (the page's "compaction for you" kept in the narration, made precise on screen) and the BigQuery note, which the page does not have: on-demand queries on BigQuery's own tables are billed by the logical bytes of the columns and partitions read.
+
+## Length and checks
+
+- New length **8:24.4** (504.4 s, 52 beats; was 7:24.7, 37 beats).
+- Typecheck and lint: clean for the folder, on the final code. `check:cues`: no failure in this folder (the failures it prints are in `de-pipelines-for-ai` and `de-python`). `npm test`: 73 of 75; both failures are cue tests naming `de-python` only.
+- `check:motion`: **pass**, 8:24.5 checked, no stretch still for 2 s or more.
+- `check:sync`: **pass**, all 52 beats within ±0.12 s; worst +0.03 s (`part-raw`); the ten re-voiced beats sit at −0.00 to +0.03.
+- `check:mix`: **pass** (informational). Effects 30.3 LU under the narration; where both sound, speech is a median 30.7 dB above them (5th percentile 16.7 dB); closest 13.6 dB for 50 ms at 1:49.9.
+- `check:frames`: **pass**, including "no hyphen is set in tabular figures".
+- Stills looked at, at every change: 29.5, 40.8 (hook), 72, 73.9 (Q1 to Q2), 102.5 (Q2), 152, 163.3 (Q3), 222, 238.8 (Q4), 263, 264, 279.5, 281.5, 297.5 (Q5, including the trap colour sampled before, during and after: blue 209,231,255, pink 252,211,209, blue), 343.6 (Q6), 385.5, 392.5 (Q7), 412, 439 (Q8), 490.8, 491, 503 (Q9 and the bridge), in `video/out/DataEngineer-9-Warehousing-stills/`.
+
+## Noticed
+
+- The Q5 good-key and function lines sat at about 1,020px once the new lines were added; the whole closing block moved up about 40px into the empty band under the listing.
+- The three bill boxes in Q8 were placed at fixed 700px steps, which left uneven gaps once a third was added; they are now a flex row with even 44px gaps.
+- DuckDB's writer uses 3 bits for a four-entry dictionary (it sizes the bit width from the dictionary's length, not its largest code), which is where the measured 3.04 bits a row comes from; the narration now says "a few bits" so the drawn codes 0 to 3 do not contradict it.
+- The page says a table format will "manage … compaction for you"; that is true of Delta Lake's auto compaction and Hudi's table services, but Iceberg's is a maintenance job someone runs. The narration keeps the page's words; the screen says what every one of them does (commits the rewrite atomically).
+- No shared change needed or made.
