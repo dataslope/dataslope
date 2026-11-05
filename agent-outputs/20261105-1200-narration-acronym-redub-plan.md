@@ -1,6 +1,40 @@
 # Re-dubbing initialisms in the narration: plan
 
-**Status:** proposal, nothing re-voiced yet. Asked for 2026-11-05: initialisms
+**Status (later on 2026-11-05):** built, and ready to voice once the
+ElevenLabs spend is approved. The Data Engineer review and its fixes landed
+first, as asked, so no beat is voiced twice.
+
+- **Built.** The lexicon is `video/src/narration/lexicon.ts` (SQL, DAG,
+  OLAP, SKU, CUPED and SUTVA, as below). `scripts/narrate.mjs` sends each
+  beat's spoken form, lays the timing back onto the written text, and
+  records `spoken` in `alignment.json`. `lexicon.test.ts` checks the
+  substitution and the mapping back. It also checks, from the committed
+  timing, that every initialism voiced through the lexicon runs faster than
+  letter speed.
+- **Checked without the API.** `--recut` on two untouched videos rewrote
+  nothing.
+- **Decisions taken.** "AI" and "LLM" both lose their expansions (eight
+  beats), and SWE-bench stays as letters. The edits to the eight beats are
+  saved as `agent-outputs/20261105-redub-expansions.patch` rather than
+  committed: a beat whose text has changed plays without audio until it is
+  voiced.
+- **The run.** With the patch applied, `narrate --dry-run` over every
+  voiced video plans 52 beats in 19 videos, 9,303 characters, each voiced on
+  its own with no whole take recorded. At the fix pass's measured rate
+  (about 0.22 credits a character), that is about 2,100 credits.
+- **Waiting on approval.** The first voicing call was stopped by this
+  session's permission check, which treats spending ElevenLabs credits as a
+  purchase. To run it:
+
+  ```bash
+  git apply agent-outputs/20261105-redub-expansions.patch
+  cd video
+  for v in da-ab-testing da-advanced-sql da-ai-assisted da-interview da-pandas da-spreadsheets da-sql da-statistics-communication db-relational-history db-why-design de-dimensional-modeling de-orchestration de-warehousing ds-experiment-design ds-experiments-in-practice ds-interview ds-llm-evaluation ds-python-pandas ds-sql; do npm run narrate -- $v; done
+  ```
+
+  Then run `npm run check:sync -- <video>` on each, and `npm test`.
+
+**Original status:** proposal, nothing re-voiced yet. Asked for 2026-11-05: initialisms
 said the way people say them (DAG as "dag", SQL as "sequel"), acronyms
 everyone knows never expanded ("AI, artificial intelligence"), and only the
 sentences that need it re-recorded, never a whole video.

@@ -46,6 +46,14 @@
  * Videos voiced before takes were split keep their single takes/<id>/take.*,
  * which is one more kept take to cut from.
  *
+ * Initialisms said as a word (SQL as "sequel") are said through the lexicon
+ * in src/narration/lexicon.ts: each beat is sent in its spoken form, and the
+ * voice's character timing is laid back onto the written text, so cues and
+ * captions keep "SQL". alignment.json records the spoken text of a beat that
+ * differs from its written one (`spoken`), and a beat whose spoken form has
+ * changed since its audio was made needs voicing like an edited one: a new
+ * lexicon entry re-voices exactly the beats that say it.
+ *
  * The narrator is the script's `voice`, one of the house voices in
  * src/narration/voices.ts (Drew when it names none). --voice overrides it
  * for a trial, with a house name or any ElevenLabs voice id. A video is never
@@ -101,6 +109,23 @@ const { VOICES, NARRATION_MODEL, voiceId } = await import(
   pathToFileURL(join(VIDEO_ROOT, "src", "narration", "voices.ts")).href
 );
 const { locateBeats, planTakes } = await import(pathToFileURL(join(VIDEO_ROOT, "src", "narration", "takes.ts")).href);
+const { spokenText, toWritten } = await import(pathToFileURL(join(VIDEO_ROOT, "src", "narration", "lexicon.ts")).href);
+/** Each beat as the voice is sent it (lexicon.ts), for matching kept takes,
+ *  whose text is what was sent. */
+const spokenBeats = script.beats.map((b) => ({ ...b, text: spokenText(b.text) }));
+/** What a beat's committed audio says: its `spoken` text, or, for audio made
+ *  before the lexicon, its written text, which is what was sent then. */
+const saidBy = (entry) => entry.spoken ?? entry.text;
+/** An alignment.json entry for a beat, its timing laid onto the written text. */
+const entryFor = (beat, audio, spokenAlignment) => {
+  const spoken = spokenText(beat.text);
+  return {
+    text: beat.text,
+    ...(spoken !== beat.text ? { spoken } : {}),
+    audio,
+    alignment: toWritten(beat.text, spokenAlignment),
+  };
+};
 const outDir = join(VIDEO_ROOT, "public", "narration", script.id);
 const takeDir = join(VIDEO_ROOT, "takes", script.id);
 const alignmentPath = join(outDir, "alignment.json");
@@ -139,6 +164,7 @@ const todo = script.beats.filter((beat) => {
     voiceChanged ||
     !entry ||
     entry.text !== beat.text ||
+    saidBy(entry) !== spokenText(beat.text) ||
     !existsSync(join(VIDEO_ROOT, "public", entry.audio))
   );
 });
@@ -150,7 +176,7 @@ function takeText(indices) {
   let text = "";
   const spans = [];
   indices.forEach((b, k) => {
-    const beat = script.beats[b];
+    const beat = spokenBeats[b];
     if (k) text += beat.scene ? "\n\n" : " ";
     spans.push([text.length, text.length + beat.text.length]);
     text += beat.text;
@@ -176,7 +202,7 @@ const describe = (k) => {
  *  order) whose own text has the beat's words, word for word. */
 const inTakes = new Map();
 for (const { name, take } of keptTakesOnDisk()) {
-  for (const seg of locateBeats(take.text, script.beats)) {
+  for (const seg of locateBeats(take.text, spokenBeats)) {
     if (seg.beat !== null && !inTakes.has(script.beats[seg.beat].id)) inTakes.set(script.beats[seg.beat].id, { name, take });
   }
 }
@@ -203,7 +229,7 @@ function cutFromTakes(ids, beats) {
     byTake.get(name).ids.push(id);
   }
   for (const [name, { take, ids: wanted }] of byTake) {
-    const { pieces, write } = cutTake(take, name, locateBeats(take.text, script.beats));
+    const { pieces, write } = cutTake(take, name, locateBeats(take.text, spokenBeats));
     for (const piece of pieces) if (wanted.includes(piece.beat.id)) beats[piece.beat.id] = write(piece);
   }
   return beats;
@@ -221,7 +247,7 @@ if (flag("--recut")) {
   const done = new Set();
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   for (const { name, take } of takes) {
-    const segments = locateBeats(take.text, script.beats);
+    const segments = locateBeats(take.text, spokenBeats);
     if (!segments.some((seg) => seg.beat !== null)) {
       console.log(`  ${name}: says no beat of the script any more`);
       continue;
@@ -234,12 +260,14 @@ if (flag("--recut")) {
       const old = existing.beats[id];
       const onDisk = old && existsSync(join(VIDEO_ROOT, "public", old.audio));
       if (onDisk && old.text === piece.beat.text && same(old, piece.entry) && !only) continue; // this cut already
-      if (!onDisk || old.text !== piece.beat.text || only) beats[id] = write(piece);
+      if (!onDisk || old.text !== piece.beat.text || saidBy(old) !== spokenText(piece.beat.text) || only) beats[id] = write(piece);
       else console.log(`  · ${id.padEnd(14)} kept as voiced on its own (--only ${id} cuts it from ${name})`);
     }
   }
   saveAlignment(beats);
-  const unvoiced = script.beats.filter((b) => beats[b.id]?.text !== b.text).map((b) => b.id);
+  const unvoiced = script.beats
+    .filter((b) => beats[b.id]?.text !== b.text || saidBy(beats[b.id]) !== spokenText(b.text))
+    .map((b) => b.id);
   if (unvoiced.length) console.log(`In no kept take, so still to voice: ${unvoiced.join(", ")}`);
   console.log(`Done. Check the new timing with: npm run cues -- ${video}`);
   process.exit(0);
@@ -278,7 +306,10 @@ for (let k = 0; k < plan.length; k++) {
   console.log(`  ${describe(k)}: ${state}`);
 }
 for (const b of free) console.log(`  · ${b.id.padEnd(14)} cut from ${inTakes.get(b.id).name}, free: ${b.text}`);
-for (const b of single) console.log(`  · ${b.id.padEnd(14)} on its own: ${b.text}`);
+for (const b of single) {
+  const said = spokenText(b.text);
+  console.log(`  · ${b.id.padEnd(14)} on its own: ${b.text}${said !== b.text ? `\n    ${"".padEnd(14)} said as: ${said}` : ""}`);
+}
 if (flag("--dry-run") || todo.length === 0) process.exit(0);
 
 const key = process.env.ELEVENLABS_API_KEY;
@@ -432,7 +463,7 @@ function context(k) {
   const around = (from, to) =>
     script.beats
       .slice(Math.max(0, from), Math.max(0, to))
-      .map((b) => b.text)
+      .map((b) => spokenText(b.text))
       .join(" ") || undefined;
   return { previous_text: around(first - 2, first), next_text: around(last + 1, last + 3) };
 }
@@ -568,15 +599,11 @@ function cutTake(take, name, segments) {
     const audio = `narration/${script.id}/${beat.id}.mp3`;
     const [s, e] = spans[i];
     const rebase = (t) => Math.round((t - from) * 1000) / 1000;
-    const entry = {
-      text: beat.text,
-      audio,
-      alignment: {
-        characters: characters.slice(s, e),
-        character_start_times_seconds: starts.slice(s, e).map(rebase),
-        character_end_times_seconds: ends.slice(s, e).map(rebase),
-      },
-    };
+    const entry = entryFor(beat, audio, {
+      characters: characters.slice(s, e),
+      character_start_times_seconds: starts.slice(s, e).map(rebase),
+      character_end_times_seconds: ends.slice(s, e).map(rebase),
+    });
     pieces.push({ beat, from, to, entry });
   });
   const write = (piece) => {
@@ -627,16 +654,16 @@ async function voiceBeats(beats) {
     const i = script.beats.indexOf(beat);
     const r = await tts(
       {
-        text: beat.text,
+        text: spokenText(beat.text),
         // The neighbouring beats, so the intonation runs on across the cut.
-        previous_text: script.beats[i - 1]?.text,
-        next_text: script.beats[i + 1]?.text,
+        previous_text: spokenBeats[i - 1]?.text,
+        next_text: spokenBeats[i + 1]?.text,
       },
       beat.id,
     );
     const audio = `narration/${script.id}/${beat.id}.mp3`;
     writeFileSync(join(VIDEO_ROOT, "public", audio), Buffer.from(r.audio_base64, "base64"));
-    beats[beat.id] = placeOnset(beat.id, { text: beat.text, audio, alignment: r.alignment });
+    beats[beat.id] = placeOnset(beat.id, entryFor(beat, audio, r.alignment));
     console.log(`  ✓ ${beat.id.padEnd(14)} ${r.alignment.character_end_times_seconds.at(-1).toFixed(2)} s`);
     // Saved after every beat, so an interrupted run keeps what it paid for.
     saveAlignment(beats);
@@ -660,6 +687,8 @@ if (free.length) {
 }
 await voiceBeats(beats);
 
-const stale = script.beats.filter((b) => beats[b.id]?.text !== b.text).map((b) => b.id);
+const stale = script.beats
+  .filter((b) => beats[b.id]?.text !== b.text || saidBy(beats[b.id]) !== spokenText(b.text))
+  .map((b) => b.id);
 if (stale.length) console.log(`Still on estimated timing: ${stale.join(", ")}`);
 console.log(`Done. Check the new timing with: npm run cues -- ${video}`);
