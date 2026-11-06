@@ -7,7 +7,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Num } from "../../editorial/ui";
 import { PARTS, partOf } from "./data";
-import { Drift, Flow, Headline, Kicker, Mark, X0 } from "./parts";
+import { Drift, Flow, Headline, Kicker, Mark, Spot, X0 } from "./parts";
 
 /** The RAG ingestion pipeline across the top: its four steps, left to right. */
 const FLOW_Y = 330;
@@ -20,6 +20,10 @@ const CARD_Y = 580;
 const CARD_W = 540;
 const CARD_GAP = 30;
 const CARD_H = 250;
+/** The small spots: a card index right of the row's last step, and one spot
+ *  at a time in the empty slot right of the newest card, gone before the next
+ *  card inks in there. */
+const INDEX_X = 1706;
 
 /** A card that inks in on `at`, its title, then its lines. */
 const Card: React.FC<{ i: number; at: number; title: string; children: React.ReactNode }> = ({ i, at, title, children }) => {
@@ -97,6 +101,8 @@ export const AiScene: React.FC = () => {
   const govAt = n.word("ai-gov", "Governance for AI data");
   const codeAt = n.word("ai-code", "AI-written pipeline code");
   const end = n.beat("ai-more").to;
+  const searchAt = n.word("ai-vector", "Vector search trade-offs");
+  const lockAt = n.word("ai-gov", "permissions checked at query time");
   const aiPart = PARTS.find((p) => p.video === "de-pipelines-for-ai");
 
   const stepX = (i: number) => STEP_X + i * (STEP_W + STEP_GAP);
@@ -250,6 +256,36 @@ export const AiScene: React.FC = () => {
             <Mark at={n.word("ai-code", "ask the recruiter") + 4}>ask the recruiter about each one</Mark>
           </div>
         </Card>
+
+        {/* A card index, right of the row's "index" step, as it is said;
+            1018 by 898. */}
+        <Spot id="de-interview-card-index" at={steps[3].at} left={INDEX_X} top={mid - 66} width={150} height={132} phase={30} amp={3} />
+        {/* One spot at a time in the empty slot right of the newest card,
+            each gone before the next card inks in over its slot: a
+            magnifying glass for vector search, then a padlock for the
+            permissions governance checks. */}
+        <Spot
+          id="de-interview-magnifier"
+          at={searchAt}
+          out={govAt - 14}
+          left={X0 + (CARD_W + CARD_GAP) + CARD_W / 2 - 85}
+          top={y(CARD_Y) + h(CARD_H) / 2 - 85}
+          width={170}
+          height={170}
+          phase={60}
+          amp={3}
+        />
+        <Spot
+          id="de-interview-padlock"
+          at={lockAt}
+          out={codeAt - 14}
+          left={X0 + 2 * (CARD_W + CARD_GAP) + CARD_W / 2 - 65}
+          top={y(CARD_Y) + h(CARD_H) / 2 - 85}
+          width={130}
+          height={170}
+          phase={90}
+          amp={3}
+        />
 
         {/* The page's pointer: Part 11 works through all four. */}
         <div

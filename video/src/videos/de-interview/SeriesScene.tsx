@@ -20,6 +20,9 @@ const BAR_W = 92;
 const ART_W = 140;
 const ART_H = 112;
 const LINE_Y = 834;
+/** The small spots' column, bottom right: under Part 11's title and right of
+ *  the longest line beside it (the practice line, to about x 1554). */
+const SPOT_CX = 1740;
 
 const MOST = Math.max(...PARTS.map((p) => p.questions));
 
@@ -58,6 +61,7 @@ export const SeriesScene: React.FC = () => {
   const startsAt = n.word("next", "the series starts there");
   const nextAt = n.word("next", "Next");
   const end = n.beat("next").to;
+  const browserWordAt = n.word("practice", "the browser");
 
   const colX = (i: number) => LEFT + i * (COL_W + GAP);
   const base = y(BASE);
@@ -268,6 +272,13 @@ export const SeriesScene: React.FC = () => {
         >
           A bank of <span style={{ fontWeight: 650 }}>{BANK} multiple-choice questions</span>, for the whole track
         </div>
+
+        {/* One small spot at a time, under the last column and beside the
+            line it illustrates, each gone as its line fades: a stopwatch for
+            the quick round, then a laptop for the challenges that run in the
+            browser. 853 by 1018 and 1005 by 832. */}
+        <Spot id="de-interview-stopwatch" at={quickAt} out={everyAt - 12} left={SPOT_CX - 65} top={base + 133} width={130} height={155} phase={20} amp={3} />
+        <Spot id="de-interview-laptop" at={browserWordAt} out={nextAt - 16} left={SPOT_CX - 92} top={base + 133} width={185} height={153} phase={50} amp={3} />
 
         <NextLine at={nextAt} x={LEFT} y={y(LINE_Y) + h(6)} width={1000}>
           SQL, window functions and query patterns

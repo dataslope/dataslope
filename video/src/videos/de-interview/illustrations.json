@@ -24,6 +24,48 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "a meerkat standing upright on a low rounded mound of sand, front paws held close to its chest, looking out into the distance with its head raised"
+    },
+    {
+      "id": "de-interview-snowflake",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single large chunky snowflake with six thick branching arms, each arm forking into two short side spurs, carved from solid translucent blue ice and lying at a slight tilt"
+    },
+    {
+      "id": "de-interview-warehouse",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small squat warehouse building with a low pitched roof and solid brick walls, one wide roll-up loading door across its front and two large wooden crates stacked beside the door"
+    },
+    {
+      "id": "de-interview-card-index",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single long wooden card-catalog drawer pulled out and seen from a three-quarter angle, packed with upright blank index cards, three colored divider cards standing taller than the rest"
+    },
+    {
+      "id": "de-interview-magnifier",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a large round magnifying glass with a thick wooden handle, tilted as if searching, its deep metal rim holding a clear glass lens that catches a soft blue reflection"
+    },
+    {
+      "id": "de-interview-padlock",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky closed padlock with a thick rounded body and a heavy curved steel shackle, a single round keyhole on its front, standing upright"
+    },
+    {
+      "id": "de-interview-stopwatch",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a round brass stopwatch on a short loop of chain, its plain blank face with a single hand and no numbers, the crown button on top"
+    },
+    {
+      "id": "de-interview-laptop",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an open laptop computer seen from a three-quarter angle, its screen a plain wash of pale blue with three soft colored rectangles on it and no text, its keyboard deck a solid block of keys"
     }
   ]
 }

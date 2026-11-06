@@ -13,7 +13,8 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "de-interview";
 
-/** The meerkat is generated and imported (public/images/de-interview/). */
+/** The meerkat and the seven small spots are generated and imported
+ *  (public/images/de-interview/). */
 export const ILLUSTRATIONS = true;
 
 export type Part = { n: number; title: string; questions: number; video: string; hero: string };

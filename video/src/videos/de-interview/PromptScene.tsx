@@ -23,6 +23,16 @@ const NAME_W = 300;
  *  design prompt set beside it, under the meerkat. */
 const BRACKET_X = 1470;
 const DESIGN_X = 1494;
+/** The meerkat's box, and the column under it where the two small spots
+ *  stand: centred on the meerkat, clear of the bracket's right edge (1482). */
+const MEERKAT_H = 403;
+const SPOT_CX = 1655;
+/** Each spot's box, at its image's aspect: the snowflake 948 by 1009, the
+ *  warehouse 1024 by 684. */
+const SNOW_W = 160;
+const SNOW_H = 170;
+const HOUSE_W = 225;
+const HOUSE_H = 150;
 
 type Layer = {
   name: string;
@@ -84,6 +94,8 @@ export const PromptScene: React.FC = () => {
   const buildsAt = n.word("probe-design", "builds each layer");
   const elevenAt = n.word("probe-design", "Part eleven walks");
   const end = n.beat("probe-design").to;
+  const snowAt = n.word("probe-model", "snowflake");
+  const houseAt = n.word("probe-store", "warehouse or lakehouse");
 
   const layers: Layer[] = [
     {
@@ -162,14 +174,22 @@ export const PromptScene: React.FC = () => {
       <Drift from={from} to={end + 40} scale={0.02}>
         {/* Inked before frame 0, so the video's first frame (its poster) is
             not a blank page. */}
-        <Kicker at={-14}>Data engineer interview prep</Kicker>
+        <Kicker at={-14}>Data engineer interview questions</Kicker>
         <Headline lead="Design a pipeline" turn="for X." at={from + 2} turnAt={forAt - 2} out={fourAt - 10} size={80} />
         <Headline lead="Four things," turn="from the query down to the files." at={fourAt} turnAt={downAt} size={60} />
 
         {/* The meerkat, standing lookout over the page as "Expect it" is said:
             330 by 403, under half its 833 by 1017 pixels, so it stays sharp
             at 4K. */}
-        <Spot id="de-interview-meerkat" at={expectAt} left={1490} top={y(150)} width={330} height={403} amp={4} />
+        <Spot id="de-interview-meerkat" at={expectAt} left={1490} top={y(150)} width={330} height={MEERKAT_H} amp={4} />
+
+        {/* Two small spots in the column under the meerkat, one at a time,
+            each beside the layer it names: a snowflake as "snowflake
+            schemas" is said, gone before the design prompt takes its place
+            on the right; then a warehouse as "warehouse or lakehouse" is,
+            standing under that prompt to the cut. */}
+        <Spot id="de-interview-snowflake" at={snowAt} out={houseAt - 4} left={SPOT_CX - SNOW_W / 2} top={y(150) + MEERKAT_H + 52} width={SNOW_W} height={SNOW_H} phase={40} amp={3} />
+        <Spot id="de-interview-warehouse" at={houseAt} left={SPOT_CX - HOUSE_W / 2} top={designTop + 150} width={HOUSE_W} height={HOUSE_H} phase={70} amp={3} />
 
         {/* From the query down to the files: an arrow down the stack's left. */}
         <div
@@ -258,8 +278,10 @@ export const PromptScene: React.FC = () => {
               </div>
               <div style={{ position: "relative", flex: 1, display: "flex", flexWrap: "wrap", gap: "10px 12px", alignContent: "center" }}>
                 {l.chips.map((c, k) => (frame >= c.at - 2 ? <Chip key={k} at={c.at} size={26}>{c.text}</Chip> : null))}
+                {/* Inter at the layer name's size, not the serif: the two
+                    share the band's one line, so they share one face. */}
                 {deeper > 0 ? (
-                  <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", ...body(30, true), color: INK, opacity: deeper, whiteSpace: "nowrap" }}>
+                  <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", ...note(30, INK_SOFT), opacity: deeper, whiteSpace: "nowrap" }}>
                     a level deeper than an analyst screen
                   </div>
                 ) : null}
