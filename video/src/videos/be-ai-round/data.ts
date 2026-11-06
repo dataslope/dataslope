@@ -88,6 +88,10 @@ export const RETRY = results.retry as {
   jitter: Wave[];
 };
 
+/** Question 7: METR's trial as the page reports it (19% longer measured,
+ *  about 20% faster felt; 16 developers, 246 tasks). */
+export const METR = results.metr;
+
 /** The close: concept checks on every topic page, code that runs on most,
  *  and the bank. */
 export const PRACTICE = results.practice;

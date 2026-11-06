@@ -25,9 +25,9 @@ const COL_W = 760;
 const COL_GAP = 160;
 const colX = (c: number) => COL_L + c * (COL_W + COL_GAP);
 const colCx = (c: number) => colX(c) + COL_W / 2;
-/** The companies under each head, one centred block each. */
-const CARD_Y = 500;
-const CARD_STEP = 106;
+/** The formats under each head, one centred line each. */
+const ROWS_Y = 500;
+const ROW_STEP = 64;
 /** The take-home and the survey, under the fork once the cards go. The
  *  envelope (1024 by 868) is the scene's one spot, 180 by 153, with the
  *  take-home's two lines a clear 90px to its right. */
@@ -46,34 +46,32 @@ const movedX = (c: number) => COL_L + c * (MOVED_W + MOVED_GAP);
 const MOVED_DROP = 76;
 const LLM_DROP = 196;
 
-type Company = { name: string; when: string; what: React.ReactNode; at: number };
+type Format = { text: string; at: number };
 
-/** One company's policy, as a centred block of text under its column's
- *  head: its name and when on the first line, what changed under it.
- *  Neutral ink in both columns: neither kind of round is the right answer,
- *  so neither is green or red. */
-const CompanyBlock: React.FC<{ c: number; i: number; company: Company; out: number }> = ({ c, i, company, out }) => {
+/** One kind of round, as a centred line of text under its column's head.
+ *  Formats, not companies, so the video does not date. Neutral ink in both
+ *  columns: neither kind of round is the right answer, so neither is green
+ *  or red. */
+const FormatRow: React.FC<{ c: number; i: number; format: Format; out: number }> = ({ c, i, format, out }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
-  const p = ease(frame, company.at - 2, 14) * (1 - ease(frame, out, 12));
+  const p = ease(frame, format.at - 2, 14) * (1 - ease(frame, out, 12));
   if (p <= 0) return null;
   return (
     <div
       style={{
         position: "absolute",
         left: colX(c),
-        top: y(CARD_Y) + i * h(CARD_STEP),
+        top: y(ROWS_Y) + i * h(ROW_STEP),
         width: COL_W,
         textAlign: "center",
+        ...note(28, INK),
+        whiteSpace: "nowrap",
         opacity: p,
         transform: `translateY(${(1 - p) * 12}px)`,
       }}
     >
-      <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-        <span style={{ fontWeight: 650 }}>{company.name}</span>
-        <span style={{ color: INK_SOFT }}> · {company.when}</span>
-      </div>
-      <div style={{ ...note(23, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{company.what}</div>
+      {format.text}
     </div>
   );
 };
@@ -130,8 +128,9 @@ const Moved: React.FC<{ c: number; at: number; title: string; part: React.ReactN
  * What AI has changed, answering the AI page's "How have coding interviews
  * changed since AI assistants became standard?". The coding round as one
  * heading that forks into two columns, AI allowed and AI banned, each filling
- * with the companies the page names as they are said, and Part 9 under the
- * allowed column. Then, under the fork, why: a take-home an assistant
+ * with the two formats the page's table describes as they are said (formats,
+ * not companies, so the video does not date), and Part 9 under the allowed
+ * column. Then, under the fork, why: a take-home an assistant
  * finishes unseen, its envelope (the scene's one spot) fading, beside
  * Karat's two figures with its caveat; then where the time went, three live
  * rounds with the parts that answer them, and the four LLM topics system
@@ -179,27 +178,16 @@ export const AiScene: React.FC = () => {
   const practiceAt = n.word("ai-ask", "Algorithm practice still matters");
   const end = n.beat("ai-ask").to;
 
-  const allowed: Company[] = [
-    { name: "Canva", when: "June 2025", what: "an AI-assisted coding round", at: n.word("ai-allowed-who", "Canva's does") },
-    {
-      name: "Meta",
-      when: "piloted from October 2025",
-      what: (
-        <>
-          one of two onsite coding rounds, now <Mark at={n.word("ai-allowed-who", "sixty-minute") + 2}>60 minutes</Mark> with AI
-        </>
-      ),
-      at: n.word("ai-allowed-who", "Meta made"),
-    },
-    { name: "Google, a pilot", when: "second half of 2026", what: "a round for reading and debugging code", at: n.word("ai-allowed-who", "Google is piloting") },
+  const allowed: Format[] = [
+    { text: "Extend a multi-file project, assistant built in", at: n.word("ai-allowed-who", "an hour extending a multi-file project") },
+    { text: "Read, debug and speed up unfamiliar code", at: n.word("ai-allowed-who", "unfamiliar code to read, debug and speed up") },
   ];
-  const banned: Company[] = [
-    { name: "Amazon", when: "2025", what: "unapproved AI can disqualify a candidate", at: n.word("ai-banned", "Amazon can disqualify") },
-    { name: "Anthropic", when: "2025", what: "none in interviews unless the interviewer says so", at: n.word("ai-banned", "Anthropic allows none") },
-    { name: "Google", when: "2025", what: "a round brought back in person", at: n.word("ai-banned", "Google has brought back") },
+  const banned: Format[] = [
+    { text: "Unapproved AI can disqualify you", at: n.word("ai-banned", "Using one without permission") },
+    { text: "Some rounds back in person", at: n.word("ai-banned", "some rounds are back in person") },
   ];
 
-  // The companies give way to the take-home and the survey, and those to where
+  // The formats give way to the take-home and the survey, and those to where
   // the time went, each in the pause before its beat.
   const cardsOut = whyFrom - 10;
   const panel = during(frame, finishAt - 4, movedFrom - 6, 10);
@@ -222,8 +210,8 @@ export const AiScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-tap" at={roundAt} level={-31} />
       <Sfx name="el-pencil" at={splitAt} level={-35} />
-      {[...allowed, ...banned].map((c) => (
-        <Sfx key={`${c.name}-${c.at}`} name="el-tap" at={c.at} level={-33} />
+      {[...allowed, ...banned].map((f) => (
+        <Sfx key={f.text} name="el-tap" at={f.at} level={-33} />
       ))}
       <Sfx name="el-pop" at={takeAt} level={-30} />
       <Sfx name="el-tap" at={karatAt} level={-33} />
@@ -322,11 +310,11 @@ export const AiScene: React.FC = () => {
         >
           algorithm practice still matters: <span style={label(22, BLUE_INK)}>Part {partOf("be-algorithms")}</span>
         </div>
-        {allowed.map((c, i) => (
-          <CompanyBlock key={c.name} c={0} i={i} company={c} out={cardsOut} />
+        {allowed.map((f, i) => (
+          <FormatRow key={f.text} c={0} i={i} format={f} out={cardsOut} />
         ))}
-        {banned.map((c, i) => (
-          <CompanyBlock key={c.name} c={1} i={i} company={c} out={cardsOut} />
+        {banned.map((f, i) => (
+          <FormatRow key={f.text} c={1} i={i} format={f} out={cardsOut} />
         ))}
         <div
           style={{
@@ -334,7 +322,7 @@ export const AiScene: React.FC = () => {
             left: colX(0),
             width: COL_W,
             textAlign: "center",
-            top: y(CARD_Y) + 3 * h(CARD_STEP) + 4,
+            top: y(ROWS_Y) + 2 * h(ROW_STEP) + 18,
             ...label(22, BLUE_INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, allowedEnd - 10, 12) * (1 - ease(frame, cardsOut, 12)),

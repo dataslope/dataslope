@@ -1,5 +1,11 @@
 {
   "runtime": "Pyodide / Python 3.14.2",
+  "metr": {
+    "measured": 19,
+    "felt": 20,
+    "developers": 16,
+    "tasks": 246
+  },
   "hour": {
     "phases": [
       {
@@ -385,6 +391,7 @@
     "canva": "the strong candidates \"didn't just prompt AI and accept whatever it generated\"",
     "struggled": "the candidates who struggled lacked the judgment to steer the tool, not the ability to code",
     "rubric": "Google's pilot rubric names the same three skills: prompt writing, validating the output, and debugging",
+    "rubricYear": "pilot in the second half of 2026",
     "byHand": "it is better to solve part of the problem by hand than to present a solution you cannot explain",
     "narrate": "The interviewer cannot grade reasoning they cannot hear",
     "ticket": "The same things that make a good ticket for a teammate: context, an interface, constraints, and a way to check the result",

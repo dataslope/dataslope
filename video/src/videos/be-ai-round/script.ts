@@ -97,7 +97,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * which data.ts reads; it fails if the page stops saying any fact below in
  * its own words, and if a beat stops saying a number it computes:
  *   - "grade" to "grade-past": the page's answer as it words it (Canva's
- *     write-up, footnote [^canva]; Google's pilot rubric, [^google-pilot];
+ *     write-up, footnote [^canva]; Google's pilot rubric, [^google-pilot],
+ *     dated 2026 as the page's table dates the pilot and said in the past
+ *     tense, so no sentence claims what a named company does now;
  *     the signals and red flags; the advice to solve part by hand, which the
  *     page attributes to "one prep guide", interviewing.io, [^meta]).
  *   - "hour": the page's table. Its minutes add to 50 to 55 of the 60, and
@@ -174,7 +176,7 @@ export const script: NarrationScript = {
     },
     {
       id: "grade-canva",
-      text: "Canva's write-up of its first AI-assisted interviews said the strong candidates didn't just prompt AI and accept whatever it generated. The ones who struggled lacked the judgment to steer the tool, not the ability to code. Google's pilot rubric names the same three skills: writing prompts, validating the output, and debugging.",
+      text: "Canva's write-up of its first AI-assisted interviews said the strong candidates didn't just prompt AI and accept whatever it generated. The ones who struggled lacked the judgment to steer the tool, not the ability to code. Google's twenty twenty-six pilot rubric named the same three skills: writing prompts, validating the output, and debugging.",
       pauseAfter: 0.6,
     },
     {

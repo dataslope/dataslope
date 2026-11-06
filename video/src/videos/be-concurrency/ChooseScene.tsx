@@ -3,16 +3,15 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Band, Drift, Flow, Node, OK, OK_INK, pulse, tint, X0 } from "./parts";
+import { Band, Drift, Flow, OK_INK, X0 } from "./parts";
 
 const ROOT = { cx: 960, y: 330, w: 600, h: 78 };
 const SPLIT = 470;
 const LEAF_Y = 586;
-const LEAF_H = 138;
 const LEAF_W = 420;
 const LEAVES = [
   { x: X0, title: "async", when: "waiting, on many connections", why: "one thread, the lowest overhead", branch: 0 },
@@ -57,7 +56,6 @@ export const ChooseScene: React.FC = () => {
   const rootH = h(ROOT.h);
   const splitY = y(SPLIT);
   const leafY = y(LEAF_Y);
-  const leafH = h(LEAF_H);
   const branchAt = [waitingAt, burningAt];
   // Which branch the narration is on: lit while its leaves are read.
   const onBranch = (b: number) => (b === 0 ? Math.max(ease(frame, whenAt[0], 10) * (1 - ease(frame, whenAt[2], 10)), 0) : ease(frame, whenAt[2], 10) * (1 - ease(frame, mixAt, 10)));

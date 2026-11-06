@@ -7,6 +7,7 @@ import { ACCENT_INK, BAR, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "..
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { METR } from "./data";
 import { Clear, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
 
 const BIN_Y = 372;
@@ -20,8 +21,8 @@ const FELT_V = 552;
 const BAR_H = 64;
 
 /** The page's two numbers, as it gives them: 19% longer, about 20% faster. */
-const MEASURED = 19;
-const FELT = 20;
+const MEASURED = METR.measured;
+const FELT = METR.felt;
 
 /**
  * Question 7, the behavioral one. A vague answer struck; then the concrete
@@ -171,7 +172,7 @@ export const DailyScene: React.FC = () => {
         </Note>
         <Note at={metrAt} x={X0} y={y(318)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            METR&apos;s 2025 randomized trial: <Num>16</Num> experienced open-source developers, <Num>246</Num> tasks
+            METR&apos;s 2025 randomized trial: <Num>{METR.developers}</Num> experienced open-source developers, <Num>{METR.tasks}</Num> tasks
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: axis }}>

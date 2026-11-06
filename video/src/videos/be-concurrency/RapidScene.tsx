@@ -10,7 +10,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { POOL, SEMAPHORE } from "./data";
-import { Band, Drift, Flow, Headline, Kicker, lerp, LockGlyph, Node, OK, OK_INK, SERIES, Spot, THREAD, tint, X0 } from "./parts";
+import { Band, Drift, Flow, Headline, Kicker, lerp, LockGlyph, Node, OK, OK_INK, SERIES, Spot, THREAD, ThreadName, tint, X0 } from "./parts";
 
 const R_X = 780;
 const LIST_TOP = 330;
@@ -25,11 +25,6 @@ const Lead: React.FC<{ at: number; c: Ctx; term: string; children: React.ReactNo
       <b style={{ color: BLUE_INK }}>{term}</b>: {children}
     </span>
   </Note>
-);
-
-/** A thread, as a small colored tag. */
-const Tag: React.FC<{ t: number; x: number; y: number; w?: number; h: number; at: number; text?: string; dashed?: boolean; out?: number }> = ({ t, x, y, w = 150, h, at, text, dashed, out }) => (
-  <Node x={x} y={y} w={w} h={h} at={at} out={out} fill={tint(THREAD[t].fill, dashed ? 6 : 20)} line={THREAD[t].fill} titleInk={THREAD[t].ink} title={text ?? `thread ${t + 1}`} size={21} dashed={dashed} />
 );
 
 // ── 10. Locks, mutexes, semaphores ──────────────────────────────────────────
@@ -61,8 +56,9 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={mutexAt + 4} x={R_X} y={c.y(392)}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 14, fontSize: 21 }}>
           <LockGlyph size={30} color={INK} />
-          <span style={{ ...label(21, THREAD[0].ink), fontWeight: 700, border: `2px solid ${THREAD[0].fill}`, background: tint(THREAD[0].fill, 20), borderRadius: 7, padding: "4px 12px" }}>thread 1 holds it</span>
-          <span style={{ ...label(21, THREAD[1].ink), fontWeight: 600, border: `2px dashed ${THREAD[1].fill}`, borderRadius: 7, padding: "4px 12px" }}>thread 2 waits</span>
+          <span style={{ ...label(22, THREAD[0].ink), fontWeight: 700 }}>thread 1 holds it</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, marginLeft: 18 }}>·</span>
+          <span style={{ ...label(22, THREAD[1].ink), fontWeight: 600, marginLeft: 18 }}>thread 2 waits</span>
         </span>
       </Note>
 
@@ -75,7 +71,7 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
         const k = wave * limit + s;
         const live = frame >= fiveAt + 6 && wave < waves && k < downloads;
         return (
-          <Node key={s} x={R_X + s * 84} y={slotY} w={74} h={slotH} at={fiveAt + s * 2} tone={live ? "data" : "soft"} title={live ? <Num>{k + 1}</Num> : ""} size={22} />
+          <Node key={s} x={R_X + s * 84} y={slotY} w={74} h={slotH} at={fiveAt + s * 2} tone="data" fill="transparent" line={live ? BAR : HAIRLINE} stroke={1.5} title={live ? <Num>{k + 1}</Num> : ""} size={22} />
         );
       })}
       <Note at={fiveAt + 10} x={R_X + limit * 84 + 20} y={slotY + slotH / 2 - 15}>
@@ -94,7 +90,7 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
           <b style={{ color: BLUE_INK }}>Reentrant lock</b>: its holder can take it again
         </span>
       </Note>
-      <Tag t={0} x={R_X} y={c.y(726)} h={c.h(48)} at={reAt + 4} />
+      <ThreadName t={0} x={R_X} y={c.y(750) - 15} at={reAt + 4} />
       <Flow points={[[R_X + 160, c.y(750)], [R_X + 232, c.y(750)]]} at={reAt + 8} color={THREAD[0].fill} width={2.6} head={13} />
       <Note at={reAt + 10} x={R_X + 244} y={c.y(736)}>
         <LockGlyph size={34} color={INK} />
@@ -195,7 +191,6 @@ const Safe: React.FC<{ c: Ctx }> = ({ c }) => {
   const ownerX = qX + 300;
   const stateX = ownerX + 270;
   const dY = c.y(626);
-  const tagH = c.h(40);
   return (
     <>
       <Lead at={behavesAt} c={c} term="Thread-safe">
@@ -212,11 +207,11 @@ const Safe: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* One owner thread, fed by a queue. */}
       {[0, 1, 2].map((t) => (
         <React.Fragment key={t}>
-          <Tag t={t} x={R_X} y={dY + (t - 1) * c.h(56) - tagH / 2} w={140} h={tagH} at={oneAt + 6 + t * 3} />
+          <ThreadName t={t} x={R_X} y={dY + (t - 1) * c.h(56) - 15} at={oneAt + 6 + t * 3} />
           <Flow points={[[R_X + 148, dY + (t - 1) * c.h(56)], [qX - 10, dY + (t - 1) * c.h(16)]]} at={queueAt + t * 3} color={THREAD[t].fill} width={2.4} head={12} />
         </React.Fragment>
       ))}
-      <Node x={qX} y={dY - c.h(34)} w={220} h={c.h(68)} at={queueAt} tone="data" align="center">
+      <Node x={qX} y={dY - c.h(34)} w={220} h={c.h(68)} at={queueAt} tone="data" fill="transparent" line={HAIRLINE} stroke={1.5} align="center">
         <span style={{ display: "flex", gap: 6 }}>
           {[0, 1, 2, 3].map((k) => (
             <span key={k} style={{ width: 30, height: 30, borderRadius: 5, background: k < 3 ? tint(THREAD[k % 3].fill, 50) : PAPER, border: `2px solid ${k < 3 ? THREAD[k % 3].fill : HAIRLINE}`, opacity: ease(frame, queueAt + 8 + k * 4, 8) }} />
@@ -227,9 +222,13 @@ const Safe: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>a thread-safe queue</span>
       </Note>
       <Flow points={[[qX + 228, dY], [ownerX - 10, dY]]} at={queueAt + 10} color={BAR} width={2.6} head={13} />
-      <Node x={ownerX} y={dY - c.h(30)} w={190} h={c.h(60)} at={oneAt + 4} tone="ok" title="owner thread" size={22} />
+      <Note at={oneAt + 4} x={ownerX} y={dY - 15} width={190} from="up" style={{ textAlign: "center" }}>
+        <span style={{ ...label(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>one owner thread</span>
+      </Note>
       <Flow points={[[ownerX + 198, dY], [stateX - 10, dY]]} at={oneAt + 10} color={OK} width={2.6} head={13} />
-      <Node x={stateX} y={dY - c.h(30)} w={150} h={c.h(60)} at={oneAt + 10} tone="data" title="the state" size={22} />
+      <Note at={oneAt + 10} x={stateX} y={dY - 15} width={150} from="up" style={{ textAlign: "center" }}>
+        <span style={{ ...label(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the state</span>
+      </Note>
       <Note at={shareAt} x={R_X} y={c.y(780)}>
         <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           Share by communicating, <span style={{ color: INK_SOFT }}>not by sharing memory.</span>
@@ -461,7 +460,7 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       {Array.from({ length: workers }, (_, i) => (
-        <Node key={i} x={wX + i * 112} y={qY - c.h(8)} w={104} h={chip + c.h(16)} at={fixedAt + 4 + i * 3} tone="plain" fill={PAPER} dashed />
+        <Node key={i} x={wX + i * 112} y={qY - c.h(8)} w={104} h={chip + c.h(16)} at={fixedAt + 4 + i * 3} tone="plain" fill="transparent" line={HAIRLINE} stroke={1.5} dashed />
       ))}
       <Note at={fixedAt + 8} x={wX} y={qY + chip + c.h(18)}>
         <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>

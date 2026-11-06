@@ -97,7 +97,7 @@ export const GradeScene: React.FC = () => {
   const struggledAt = n.word("grade-canva", "The ones who struggled");
   const steerAt = n.word("grade-canva", "the judgment to steer the tool");
   const abilityAt = n.word("grade-canva", "not the ability to code");
-  const googleAt = n.word("grade-canva", "Google's pilot rubric");
+  const googleAt = n.word("grade-canva", "Google's twenty twenty-six pilot rubric");
   const skills = [
     { text: "writing prompts", at: n.word("grade-canva", "writing prompts") },
     { text: "validating the output", at: n.word("grade-canva", "validating the output") },
@@ -178,7 +178,9 @@ export const GradeScene: React.FC = () => {
             </span>
           </Note>
           <Note at={googleAt} x={X0} y={y(660)}>
-            <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Google&apos;s pilot rubric: the same three skills</span>
+            <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              Google pilot rubric, 2026: <span style={{ fontWeight: 600 }}>the same three skills</span>
+            </span>
           </Note>
           <div style={{ position: "absolute", left: X0, top: y(712), display: "flex", alignItems: "baseline", gap: 18, fontSize: 28 }}>
             {skills.map((s, i) => {

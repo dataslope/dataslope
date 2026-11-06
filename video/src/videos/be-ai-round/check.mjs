@@ -100,6 +100,7 @@ const PAGE_SAYS = {
   canva: 'the strong candidates "didn\'t just prompt AI and accept whatever it generated"',
   struggled: "the candidates who struggled lacked the judgment to steer the tool, not the ability to code",
   rubric: "Google's pilot rubric names the same three skills: prompt writing, validating the output, and debugging",
+  rubricYear: "pilot in the second half of 2026",
   byHand: "it is better to solve part of the problem by hand than to present a solution you cannot explain",
   narrate: "The interviewer cannot grade reasoning they cannot hear",
   ticket: "The same things that make a good ticket for a teammate: context, an interface, constraints, and a way to check the result",
@@ -204,8 +205,23 @@ const practice = {
   topics,
 };
 
+// METR's trial, as the page reports it: the two results and the footnote's size.
+const metrMatch = {
+  measured: prose.match(/took (\d+)% longer on tasks where AI was allowed/),
+  felt: prose.match(/had made them about (\d+)% faster/),
+  size: prose.match(/July 2025: (\d+) developers, (\d+) tasks/),
+};
+if (!metrMatch.measured || !metrMatch.felt || !metrMatch.size) throw new Error("the page no longer reports METR's trial as the video draws it");
+const metr = {
+  measured: Number(metrMatch.measured[1]),
+  felt: Number(metrMatch.felt[1]),
+  developers: Number(metrMatch.size[1]),
+  tasks: Number(metrMatch.size[2]),
+};
+
 const results = {
   runtime: out.runtime,
+  metr,
   hour,
   prompt: { weak, better, fence: promptLines },
   design: { nodes, edges },

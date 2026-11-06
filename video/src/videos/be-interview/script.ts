@@ -18,17 +18,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * headline in the serif, with the capybara sitting beside them, because they
  * are the questions every later part trains for.
  *
- * On screen, scene by scene:
- *   - "hook" to "probe": the two questions inked in one after the other;
- *     then the page's five probes as a stack of five labelled bands, the
- *     four everyone gets in blue (data structures, algorithms, complexity,
- *     language fundamentals) and the backend one below them, set apart in
- *     yellow (API and system design, SQL, caching, concurrency). Each band
- *     carries, small, the part that answers it, so the map starts here:
- *     "Part 8" on the first three, "Parts 1 to 5" on the backend band, and
- *     "Python page, not in this series" in grey on language fundamentals
- *     (the series comes back to it on "series-python").
- *   - "ai" to "ai-ask": one band labelled "Coding round" forking into two
+ * On screen, scene by scene, as built: plain text grouped by spacing and
+ * hairlines, no cards (the owner's rule, 2026-11-06), and the capybara plus
+ * one spot only (the envelope):
+ *   - "hook" to "probe": the two questions inked in one after the other
+ *     beside the capybara; then the page's five probes as a ruled list,
+ *     the four everyone gets (data structures, algorithms, complexity,
+ *     language fundamentals) and the backend one set apart below them, its
+ *     name under the yellow highlighter and its topics as a line of words
+ *     (system and API design, SQL, caching, concurrency). Each row carries,
+ *     small and right-aligned, the part that answers it, so the map starts
+ *     here: "Part 8" on the first three, "Parts 1 to 5" on the backend row,
+ *     and "Python page: not in this series" in grey on language
+ *     fundamentals (the series comes back to it on "series-python").
+ *   - "ai" to "ai-ask": the heading "Coding round" forking into two
  *     columns, "AI allowed" and "AI banned", in neutral ink (neither is the
  *     right answer, so neither is green or red). The two formats are named,
  *     not the companies, so the video does not date: under allowed, on
@@ -39,17 +42,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     spot for a take-home, faded ("ai-why"), beside two bars,
  *     71% and 62%, inked on "ai-survey-data" and sourced "Karat, Engineering
  *     Interview Trends 2026, 400 engineering leaders; one vendor's survey".
- *     Then where the time went: three cards (extend a multi-file project,
- *     read and debug unfamiliar code, design discussion) with the glasses
- *     and whiteboard spots, "Part 7" under the reading card and "Parts 1 and
- *     2" under design, and the four LLM topics as chips under the design
- *     card, labelled "Part 9". "ai-ask" writes "Ask the recruiter, for every
- *     round" across the fork.
+ *     Then where the time went: three blocks of text (extend a multi-file
+ *     project, read and debug unfamiliar code, design discussion), with
+ *     "Part 9", "Part 7" and "Parts 1 and 2" under them, and the four LLM
+ *     topics as a line of words, labelled "Part 9". "ai-ask" writes "Ask the
+ *     recruiter, for every round" across the fork.
  *   - "series" to "next": "Decisions, not syntax" as the headline; then the
  *     nine topic videos as a bar chart of the questions each answers (PARTS
- *     in data.ts), each bar topped by its own hero, in series order, the
- *     bars rising as "series-parts" names them; the Python fundamentals page
- *     shown as a grey outline with an arrow into Part 5's bar on
+ *     in data.ts), each bar topped by its own small hero, in series order,
+ *     the bars rising as "series-parts" names them; the Python fundamentals
+ *     page as two grey lines with an arrow into Part 5's bar on
  *     "series-python"; the practice line beneath, naming the three pages
  *     with challenges (CHALLENGE_LABELS: algorithms, object design,
  *     databases); <NextLine> on "Next", with Parts 1 and 2 lit on "design".
