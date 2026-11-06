@@ -69,7 +69,7 @@ export const LoopScene: React.FC = () => {
       <Sfx name="el-tap" at={talkAt} level={-32} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data analyst interview prep</Kicker>
+        <Kicker at={from}>Data analyst interview questions</Kicker>
         <Headline lead="The interview," turn="in three parts." at={from + 4} turnAt={threeAt - 2} size={72} />
 
         <Card i={0} at={sqlAt} title="A SQL screen">

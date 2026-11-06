@@ -85,6 +85,8 @@ export const LibraryScene: React.FC = () => {
       <Headline lead="Not syntax," turn="meaning." at={manualAt + 2} turnAt={meansAt - 2} size={72} />
 
       <Spot id="db-why-design-books" at={libraryAt - 4} dim={payAt} left={X0 + 10} top={y(625)} width={316} height={300} />
+      {/* "the title in the catalog": a card catalog, bottom right, under the "makes" line. */}
+      <Spot id="db-why-design-catalog" at={catalogAt - 4} dim={payAt} left={1560} top={y(688)} width={236} height={190} />
 
       <Drift from={libFrom} to={end} amount={0.02} origin="60% 50%">
         <div style={{ position: "absolute", inset: 0, opacity: fade }}>

@@ -52,7 +52,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={startAt + 2} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data analyst interview prep</Kicker>
+        <Kicker at={from}>Data analyst interview questions</Kicker>
         <Headline lead="Here's a number." turn="What does it mean?" at={numberAt - 6} turnAt={meansAt - 4} size={72} />
 
         <Spot id="da-statistics-communication-elephant" at={from + 4} left={1150} top={y(290)} width={640} height={460} />

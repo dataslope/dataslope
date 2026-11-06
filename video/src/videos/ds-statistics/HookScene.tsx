@@ -78,7 +78,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={bridgeAt + 2} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data scientist interview prep</Kicker>
+        <Kicker at={from}>Data scientist interview questions</Kicker>
         <Headline lead="Statistics:" turn="the round you're rustiest on" at={from + 4} turnAt={rustyAt - 4} size={72} />
 
         <Spot id="ds-statistics-hedgehog" at={from + 8} left={1210} top={y(300)} width={600} height={430} />

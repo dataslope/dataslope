@@ -160,6 +160,10 @@ export const WarrantyScene: React.FC = () => {
 
         </div>
 
+        {/* The store, under its own side of the sums, until the bridge
+            takes that space. */}
+        <Spot id="probability-store" at={storeAt - 2} out={evAt - 16} left={220} top={y(724)} width={280} height={h(205)} />
+
         {/* ── A million in code ── */}
         <Ink at={millionAt - 4} dur={14} style={{ left: RIGHT, top: y(330), whiteSpace: "nowrap" }}>
           <span style={note(26, INK)}>

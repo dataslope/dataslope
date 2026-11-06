@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { FIXED_ORDER, FLAT, MISSED_ORDER, NEW_EMAIL, OLD_EMAIL, rowsChanged } from "./data";
-import { Chip, Drift, Headline, lerp, Listing, Mark, pulse, X0 } from "./parts";
+import { Chip, Drift, Headline, lerp, Listing, Mark, pulse, Spot, X0 } from "./parts";
 
 /** The programs that touch the table: the lesson's own list ("the web app,
  *  the admin dashboard, the import job, the reporting script"). */
@@ -85,6 +85,9 @@ export const CostScene: React.FC = () => {
 
       <Headline lead="Legal SQL," turn="bad design." at={legalFrom - 6} turnAt={designAt - 4} />
 
+      {/* "became copies": a copier, top right above the update, dimmed with the page. */}
+      <Spot id="db-why-design-copier" at={copiesAt - 4} dim={dimAll} left={1540} top={y(92)} width={237} height={200} />
+
       <Drift from={legalFrom} to={end} amount={0.018} origin="45% 55%">
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, dimAll, 20) * 0.6 }}>
           {/* The update itself, carried over from Fig. 1's scene, until the programs need the room. */}
@@ -100,17 +103,18 @@ export const CostScene: React.FC = () => {
             out={programAt - 16}
           />
           {/* What Postgres said to the rushed update. */}
-          <Ink at={legalFrom - 4} dur={16} style={{ left: X0, top: y(300), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-            <span style={label(22, INK_SOFT)}>Postgres replied</span>
-            <span style={{ fontFamily: MONO, fontSize: 34, fontWeight: 600, color: INK }}>
+          {/* One line at one size, the notes' own: the reply stands out by its ink, weight and highlight. */}
+          <Ink at={legalFrom - 4} dur={16} style={{ left: X0, top: y(300), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14, fontSize: 24 }}>
+            <span style={label(24, INK_SOFT)}>Postgres replied</span>
+            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 700, color: INK }}>
               <Mark at={toldAt - 2}>UPDATE {FLAT.updated}</Mark>
             </span>
-            <span style={note(22, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
+            <span style={note(24, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
           </Ink>
-          <Note at={illegalAt} x={NOTE_X} y={y(300) + 4}>
+          <Note at={illegalAt} x={NOTE_X} y={y(300)}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>No error, no warning.</span>
           </Note>
-          <Note at={exactlyAt + 2} x={NOTE_X} y={y(300) + 40} dim={designAt}>
+          <Note at={exactlyAt + 2} x={NOTE_X} y={y(300) + 38} dim={designAt}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Exactly what it was told.</span>
           </Note>
           {/* The fact, and the copies it became. The second copy is drawn first, so it

@@ -177,7 +177,7 @@ export const RapidScene: React.FC = () => {
         <Kicker at={from} out={roundAt - 6}>
           Questions 8 and 9
         </Kicker>
-        <Kicker at={roundAt}>Data scientist interview prep</Kicker>
+        <Kicker at={roundAt}>Data scientist interview questions</Kicker>
         <Headline lead="Two more," turn="numbers that look better than they are." at={twoAt - 4} turnAt={lookAt - 4} out={roundAt - 6} size={60} />
         <Headline lead="How sure are you," turn="and how would you know?" at={sureAt - 4} turnAt={knowAt - 4} size={60} />
 

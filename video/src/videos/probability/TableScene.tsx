@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, TABLE } from "./data";
-import { Headline, Kicker, lerp, STAT, STAT_INK, Svg, Sweep } from "./parts";
+import { Headline, Kicker, lerp, Spot, STAT, STAT_INK, Svg, Sweep } from "./parts";
 
 /** Column centres: row label, churned, stayed, total. */
 const COL = { label: 160, churned: 530, stayed: 750, total: 970 } as const;
@@ -64,7 +64,7 @@ const Cell: React.FC<{ x: number; y: number; at: number; lit?: number; dim?: num
 export const TableScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
 
   // ── Cues ──
   const tableFrom = n.beat("table").from;
@@ -134,6 +134,8 @@ export const TableScene: React.FC = () => {
       <Headline top={y(150)} first="Conditioning" second="zooms into the rows." firstAt={allAt - 4} secondAt={keepAt - 2} out={splitInFrom - 6} />
       <Headline top={y(150)} first={`${pct(TABLE.pPaid)} against ${pct(TABLE.pFree)}:`} second="linked?" firstAt={splitInFrom - 2} secondAt={linkedAt - 4} />
       <FigLabel n="2" title="Users by plan, and whether they churned this quarter" at={tableFrom} x={COL.label} y={y(268)} />
+      {/* The users themselves, top right, above where the rates arrive. */}
+      <Spot id="probability-users" at={usersAt - 2} left={1520} top={y(140)} width={240} height={h(215)} />
 
       {/* ── The table ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - tableBack }}>
@@ -236,7 +238,9 @@ export const TableScene: React.FC = () => {
 
       {/* ── Each rate, on its own row ── */}
       {chips.map((c) => (
-        <Ink key={c.key} at={c.at - 8} dur={16} style={{ left: CHIP_X, top: y(c.rowY) - 36, opacity: c.key === "all" ? 1 - ease(frame, comparingAt - 4, 12) * 0.6 : 1, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
+        <Ink key={c.key} at={c.at - 8} dur={16} style={{ left: CHIP_X, top: y(c.rowY) - 24, opacity: c.key === "all" ? 1 - ease(frame, comparingAt - 4, 12) * 0.6 : 1, whiteSpace: "nowrap" }}>
+          {/* One line, one size: the rate is the line's own Inter, in the
+              accent and bold. */}
           <span style={{ ...note(30, INK) }}>
             P(churn{c.given ? <span style={{ color: INK_SOFT }}> | {c.given}</span> : null}) = {num(c.top)} /{" "}
             {c.key === "free" ? (
@@ -245,10 +249,9 @@ export const TableScene: React.FC = () => {
               </Sweep>
             ) : (
               num(c.bottom)
-            )}
-          </span>
-          <span style={{ ...headline(60, true), color: STAT_INK }}>
-            {c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}
+            )}{" "}
+            ={" "}
+            <span style={{ color: STAT_INK, fontWeight: 700 }}>{c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}</span>
           </span>
         </Ink>
       ))}

@@ -138,6 +138,8 @@ export const GateScene: React.FC = () => {
 
       {/* The building every program enters, from "what gets in", and the programs, under it. */}
       <Spot id="db-why-design-building" at={getsAt - 4} left={RIGHT_X} top={y(BUILDING_Y)} width={340} height={BUILDING_H} />
+      {/* "An order for a customer who isn't there": a parcel on an empty doormat, under the programs. */}
+      <Spot id="db-why-design-parcel" at={kinds[2].at - 4} left={1540} top={y(754)} width={225} height={170} />
       {PROGRAMS.map((p, i) => {
         const lit = i === 0 ? ease(frame, doorAt - 4, 10) : wholeIn;
         return (

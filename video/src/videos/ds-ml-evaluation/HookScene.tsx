@@ -75,7 +75,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-tap" at={firstAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data scientist interview prep</Kicker>
+        <Kicker at={from}>Data scientist interview questions</Kicker>
         <Headline lead="A hundred percent," turn="or eighty-four?" at={hundredAt - 4} turnAt={whichAt - 4} size={72} />
 
         <Spot id="ds-ml-evaluation-beaver" at={from + 4} left={1140} top={y(250)} width={660} height={470} />

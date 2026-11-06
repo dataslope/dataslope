@@ -78,7 +78,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={clicksFourAt} level={-33} />
 
       <Drift from={0} to={end + 20}>
-        <Kicker at={startAt}>Data engineer interview prep · Streaming and messaging</Kicker>
+        <Kicker at={startAt}>Data engineer interview questions · Streaming and messaging</Kicker>
         <Headline lead="The data never stops arriving." at={startAt} size={72} />
         <Spot id="de-streaming-salmon" at={startAt + 14} left={1452} top={y(286)} width={360} height={449} />
 

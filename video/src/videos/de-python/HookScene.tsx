@@ -97,7 +97,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={listAt} level={-36} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data engineer interview prep</Kicker>
+        <Kicker at={from}>Data engineer interview questions</Kicker>
         <Headline lead="A model is a drawing" turn="until code loads it." at={drawingAt} turnAt={loadsAt - 2} out={checksAt - 6} />
         {/* In as the first leaves, so the headline's slot is never empty
             while the narration states what the round checks. */}

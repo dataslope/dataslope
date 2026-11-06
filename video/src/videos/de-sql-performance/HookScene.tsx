@@ -56,7 +56,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pop" at={startAt + 2} level={-33} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data engineer interview prep</Kicker>
+        <Kicker at={from}>Data engineer interview questions</Kicker>
         <Headline lead="A correct query," turn="on a million rows." at={from + 4} turnAt={millionAt - 4} size={70} />
 
         <Spot id="de-sql-performance-cheetah" at={from + 10} left={1190} top={y(300)} width={620} height={457} />

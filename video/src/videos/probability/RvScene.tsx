@@ -6,7 +6,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HEADS } from "./data";
-import { Arrow, Coin, Headline, Kicker, STAT_INK } from "./parts";
+import { Arrow, Coin, Headline, Kicker, Spot, STAT_INK } from "./parts";
 
 const ROW_Y = [384, 506, 628, 750];
 const COIN_X = [470, 552];
@@ -17,7 +17,7 @@ const COIN_X = [470, 552];
  */
 export const RvScene: React.FC = () => {
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
 
   // ── Cues ──
   const rvFrom = n.beat("rv").from;
@@ -60,6 +60,8 @@ export const RvScene: React.FC = () => {
           </Ink>
         </React.Fragment>
       ))}
+      {/* The two coins, top right, over the notes. */}
+      <Spot id="probability-two-coins" at={flipAt - 2} left={1280} top={y(262)} width={350} height={h(200)} />
       <Note at={one2At + 4} x={1080} y={y((ROW_Y[1] + ROW_Y[2]) / 2) - 22} width={620}>
         <span style={{ ...body(32, true), color: INK }}>Two outcomes, one number: that&apos;s allowed.</span>
       </Note>

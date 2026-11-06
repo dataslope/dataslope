@@ -51,7 +51,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={startAt + 2} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data analyst interview prep</Kicker>
+        <Kicker at={from}>Data analyst interview questions</Kicker>
         <Headline lead="When it isn't SQL," turn="it's pandas." at={screenAt - 10} turnAt={pandasAt - 4} size={72} />
 
         <Spot id="da-pandas-panda" at={from + 4} left={1150} top={y(290)} width={640} height={460} />

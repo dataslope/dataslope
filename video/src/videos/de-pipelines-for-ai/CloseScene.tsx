@@ -48,7 +48,7 @@ export const CloseScene: React.FC = () => {
       <Sfx name="el-chime" at={workAt + 4} level={-34} />
 
       <Drift from={from} to={end + 40} scale={0.015}>
-        <Kicker at={from}>Data engineer interview prep</Kicker>
+        <Kicker at={from}>Data engineer interview questions</Kicker>
         <Headline lead="Eleven questions," turn="the same habits." at={elevenAt - 2} turnAt={habitsAt - 2} size={68} />
 
         {habits.map((c, i) => (

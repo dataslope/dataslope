@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, STREAK, TABLE } from "./data";
-import { Coin, DATA_INK, Headline, Held, lerp, Pulse, SOFT, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
+import { Coin, DATA_INK, Headline, Held, lerp, Pulse, SOFT, Spot, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 /** Two bars, one per plan, equally wide because both plans have 500 users. */
 const BARS = { x: [200, 600], w: 280, top: 384, base: 812 } as const;
@@ -27,11 +27,12 @@ const STEP_X = 980;
 export const SplitScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
 
   // ── Cues ──
   const splitFrom = n.beat("split").from;
   const barAt = n.word("split", "a bar");
+  const planAt = n.word("split", "each plan");
   const splitAt = n.word("split", "split");
   const sameAt = n.word("flat", "same height");
   const knowingAt = n.word("flat", "knowing the plan");
@@ -176,8 +177,9 @@ export const SplitScene: React.FC = () => {
       {BARS.x.map((x, i) => (
         <React.Fragment key={i}>
           <Ink at={barAt - 2 + i * 6} dur={12} style={{ left: x, top: base + 16, whiteSpace: "nowrap" }}>
-            <span style={{ ...headline(40), color: INK }}>{i === 0 ? "Paid" : "Free"}</span>
-            <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>{num(TABLE.rowTotals[i])} users</span>
+            {/* The plan's name, and its users on a line of their own. */}
+            <div style={{ ...headline(40), color: INK }}>{i === 0 ? "Paid" : "Free"}</div>
+            <div style={{ ...note(21, INK_SOFT), marginTop: 2 }}>{num(TABLE.rowTotals[i])} users</div>
           </Ink>
           {/* The split's label rides above the split, outside its bar. */}
           <div
@@ -232,6 +234,10 @@ export const SplitScene: React.FC = () => {
       </Note>
       </div>
 
+      {/* The two plans, paid and free, in the right column until the ten
+          coins need it. */}
+      <Spot id="probability-cards" at={planAt - 2} out={tenAt - 16} left={1340} top={y(523)} width={300} height={h(195)} />
+
       {/* ── Independence, in symbols ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - multiDim * 0.7 }}>
       <Ink at={indepAt - 4} dur={14} style={{ left: RIGHT, top: y(344), whiteSpace: "nowrap" }}>
@@ -273,10 +279,13 @@ export const SplitScene: React.FC = () => {
         })}
       </div>
       <Ink at={oneInAt - 4} dur={16} style={{ left: RIGHT, top: y(668), whiteSpace: "nowrap" }}>
-        {/* 0.5 to the tenth is 0.000977, so "about". */}
-        <span style={{ ...note(30, INK) }}>≈ {STREAK.ten.toFixed(4).replace(/0+$/, "")}, about </span>
-        <span style={{ ...headline(52, true), color: STAT_INK }}>
-          <Sweep at={oneInAt}>1 in 1,000</Sweep>
+        {/* 0.5 to the tenth is 0.000977, so "about". One line, one size:
+            the answer is the line's own Inter, in the accent and bold. */}
+        <span style={{ ...note(30, INK) }}>
+          ≈ {STREAK.ten.toFixed(4).replace(/0+$/, "")}, about{" "}
+          <span style={{ color: STAT_INK, fontWeight: 700 }}>
+            <Sweep at={oneInAt}>1 in 1,000</Sweep>
+          </span>
         </span>
       </Ink>
       </div>

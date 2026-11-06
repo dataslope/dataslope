@@ -131,7 +131,7 @@ export const LoopScene: React.FC = () => {
       ))}
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data scientist interview prep</Kicker>
+        <Kicker at={from}>Data scientist interview questions</Kicker>
         <Headline lead="The loop," turn="four kinds of round." at={from + 4} turnAt={fourAt - 2} size={72} />
 
         <svg style={{ position: "absolute", inset: 0, overflow: "visible" }} width={1920} height={1080}>

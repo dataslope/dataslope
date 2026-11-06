@@ -82,7 +82,7 @@ export const OrbiterScene: React.FC = () => {
           <span style={{ ...note(30, INK), fontWeight: 650 }}>
             <Mark at={wordAt}>{unit}</Mark>
           </span>
-          <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT }}>{sym}</span>
+          <span style={{ fontFamily: MONO, fontSize: 28, color: INK_SOFT }}>{sym}</span>
         </div>
       </div>
     </Ink>
@@ -125,8 +125,8 @@ export const OrbiterScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT }}>Small Forces file</span>
-              <span style={{ ...body(30, true), color: INK, opacity: ease(frame, justAt - 2, 12) }}>just numbers</span>
+              <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT }}>Small Forces file</span>
+              <span style={{ ...body(26, true), color: INK, opacity: ease(frame, justAt - 2, 12) }}>just numbers</span>
             </div>
           </Ink>
           <Arrow from={[mid, fileTop + fileH + 6]} to={[mid, bTop - 6]} at={readAt + 2} dur={10} />
@@ -183,6 +183,9 @@ export const OrbiterScene: React.FC = () => {
           </Note>
         </div>
       </Drift>
+
+      {/* "naming the things your data is about": things with blank tags, under the dimmed orbiter. */}
+      <Spot id="db-why-design-tags" at={namingAt - 4} left={1500} top={y(758)} width={262} height={170} />
 
       <NextLine at={namingAt - 2} x={X0} y={y(820)} width={760}>
         <Mark at={thingsAt + 4} dur={16}>

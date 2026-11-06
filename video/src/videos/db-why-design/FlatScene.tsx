@@ -19,6 +19,7 @@ import {
   Mark,
   MARK_BAD,
   RowBracket,
+  Spot,
   tableGeometry,
   X0,
 } from "./parts";
@@ -93,6 +94,11 @@ export const FlatScene: React.FC = () => {
       <Headline lead={<Mark at={dayAt - 2} dur={14}>Day one:</Mark>} turn="it works." at={rarelyAt - 4} turnAt={worksAt - 4} out={twoAt - 8} />
       <Headline lead="One person," turn="two emails." at={twoAt - 2} turnAt={twoAt + 8} />
 
+      {/* Spots, outside the push: the first screen that works, top right, for as long as
+          "Day one: it works." holds; then her email twice, in the empty corner under the update. */}
+      <Spot id="db-why-design-laptop" at={worksAt - 4} out={twoAt - 8} left={1530} top={y(92)} width={250} height={190} />
+      <Spot id="db-why-design-envelopes" at={emailAt - 4} left={1540} top={y(609)} width={230} height={210} />
+
       <Drift from={hookFrom} to={end} amount={0.016} origin="40% 60%">
         {/* The table and its columns from the first mention of a database; its rows with "a few orders". */}
         <FigLabel n="1" title="One table for everything" at={databaseAt - 4} x={X0} y={y(FIG_Y)} />
@@ -135,12 +141,13 @@ export const FlatScene: React.FC = () => {
           lineAt={[changesAt - 2, rushedAt, fixesAt]}
           marks={[{ line: 2, at: oneOhOneAt - 2 }]}
         />
-        <Ink at={swapAt + 4} dur={14} style={{ left: RIGHT_X, top: replyTop, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-          <span style={label(21, INK_SOFT)}>Postgres replied</span>
-          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 600, color: INK }}>UPDATE {FLAT.updated}</span>
-          <span style={note(21, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
+        {/* One line at one size: the reply stands out by its ink and weight. */}
+        <Ink at={swapAt + 4} dur={14} style={{ left: RIGHT_X, top: replyTop, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14, fontSize: 22 }}>
+          <span style={label(22, INK_SOFT)}>Postgres replied</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: INK }}>UPDATE {FLAT.updated}</span>
+          <span style={note(22, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
         </Ink>
-        <Note at={missesAt + 2} x={RIGHT_X} y={replyTop + 58}>
+        <Note at={missesAt + 2} x={RIGHT_X} y={replyTop + 52}>
           <div style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>Order {FLAT.rows[MISSED_ROW][F.id]} still has the old one.</div>
         </Note>
 

@@ -68,7 +68,7 @@ export const HookScene: React.FC = () => {
       ))}
 
       <Drift from={0} to={end + 40}>
-        <Kicker at={6}>Data scientist interview prep</Kicker>
+        <Kicker at={6}>Data scientist interview questions</Kicker>
         <Headline lead="One question," turn="two answers." at={askAt} turnAt={twoAt - 4} out={knowAt - 8} size={68} />
         <Headline lead="The statistics" turn="are ones you already know." at={knowAt - 2} turnAt={knowAt + 14} size={68} />
 

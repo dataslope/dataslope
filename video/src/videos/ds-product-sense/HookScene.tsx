@@ -118,7 +118,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-whoosh" at={steersAt} level={-36} />
 
       <Drift from={0} to={end + 40}>
-        <Kicker at={6}>Data scientist interview prep</Kicker>
+        <Kicker at={6}>Data scientist interview questions</Kicker>
         <Headline lead="Two numbers" turn="from the same dashboard." at={twoAt - 4} turnAt={sameAt - 4} out={senseAt - 6} size={68} />
         {/* Up until the cut, so the bridge never empties to the kicker. */}
         <Headline lead="Product sense" turn="is that judgment." at={senseAt - 2} turnAt={judgmentAt - 2} size={68} />

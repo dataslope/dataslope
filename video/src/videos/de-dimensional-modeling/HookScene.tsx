@@ -55,7 +55,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-chime" at={fifteenAt} level={-35} />
 
       <Drift from={0} to={end + 30}>
-        <Kicker at={startAt}>Data engineer interview prep · Data modeling I</Kicker>
+        <Kicker at={startAt}>Data engineer interview questions · Data modeling I</Kicker>
         <Headline lead="Tables shaped" turn="for the question." at={startAt + 2} turnAt={shapedAt - 2} size={72} />
         <Spot id={HERO.id} at={starAt - 4} left={1180} top={y(300)} width={HERO_W} height={HERO_H} />
 

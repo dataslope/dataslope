@@ -79,7 +79,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-chime" at={planAt} level={-35} />
 
       <Drift from={0} to={end + 30}>
-        <Kicker at={startAt}>Data engineer interview prep · Distributed processing</Kicker>
+        <Kicker at={startAt}>Data engineer interview questions · Distributed processing</Kicker>
         <Headline lead="Too big for one machine." turn="Cut it into pieces." at={startAt + 2} turnAt={cutAt - 2} size={70} />
         <Spot id="de-distributed-honeybee" at={startAt + 14} left={1430} top={y(268)} width={400} height={313} />
 

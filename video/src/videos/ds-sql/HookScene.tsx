@@ -66,7 +66,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pop" at={firstAt + 2} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data scientist interview prep</Kicker>
+        <Kicker at={from}>Data scientist interview questions</Kicker>
         <Headline lead="One chart," turn="and the queries around it." at={from + 4} turnAt={aroundAt} size={70} />
 
         <Spot id="ds-sql-seal" at={from + 8} left={1160} top={y(300)} width={640} height={440} />

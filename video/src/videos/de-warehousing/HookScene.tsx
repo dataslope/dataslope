@@ -69,7 +69,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-tap" at={sevenAt + 4} level={-36} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data engineer interview prep · Warehousing &amp; storage</Kicker>
+        <Kicker at={from}>Data engineer interview questions · Warehousing &amp; storage</Kicker>
         <Headline lead="A million sales, written twice." turn="Only how they're stored differs." at={salesAt - 4} turnAt={storedAt} size={60} />
         <div style={{ position: "absolute", left: X0, top: y(238), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, salesAt + 10, 12) * (1 - ease(frame, dim, 14) * 0.55) }}>
           <Num>{count(TABLE.rows)}</Num> rows made up for this video, in the page&apos;s six <QMono>sales</QMono> columns

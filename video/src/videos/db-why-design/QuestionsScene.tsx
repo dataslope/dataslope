@@ -6,7 +6,7 @@ import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label } from "../../editoria
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Badge, Code, Drift, Headline, Kicker, Mark, X0 } from "./parts";
+import { Badge, Code, Drift, Headline, Kicker, Mark, Spot, X0 } from "./parts";
 
 const ROW_Y0 = 372;
 const ROW_STEP = 90;
@@ -92,6 +92,9 @@ export const QuestionsScene: React.FC = () => {
         </span>
       </Ink>
 
+      {/* "how you write the answers down": a clipboard and pencil, top right, over the column that writes them. */}
+      <Spot id="db-why-design-clipboard" at={writeAt - 4} left={1610} top={y(78)} width={163} height={190} />
+
       <Drift from={whatFrom} to={end} amount={0.018} origin="40% 60%">
         {/* Column heads, and a rule under them. */}
         <div style={{ position: "absolute", left: Q_X, top: rowY(0) - 64, opacity: heads, ...label(21, INK_SOFT) }}>The question</div>
@@ -107,8 +110,9 @@ export const QuestionsScene: React.FC = () => {
           const sw = ease(frame, toSql(i), 12);
           return (
             <React.Fragment key={r.q}>
-              <Ink at={r.at - 6} dur={14} style={{ left: X0, top: rowY(i) + 4, whiteSpace: "nowrap" }}>
-                <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>{i + 1}</span>
+              {/* The number is set as its question is: same face, same size, told apart by ink and weight. */}
+              <Ink at={r.at - 6} dur={14} style={{ left: X0, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
+                <span style={{ ...body(38), color: ACCENT_INK, fontWeight: 600 }}>{i + 1}</span>
               </Ink>
               <Ink at={r.at - 4} dur={16} style={{ left: Q_X, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
                 <span style={{ ...body(38), color: INK }}>
@@ -117,7 +121,7 @@ export const QuestionsScene: React.FC = () => {
               </Ink>
               <Ink at={r.key - 2} dur={14} style={{ left: R_X, top: rowY(i) + 2, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
                 <span style={{ ...label(28, INK), fontWeight: 600 }}>{r.decides}</span>
-                {"badge" in r ? <Badge size={24}>{r.badge}</Badge> : null}
+                {"badge" in r ? <Badge size={28}>{r.badge}</Badge> : null}
               </Ink>
               {sw > 0 ? (
                 <div

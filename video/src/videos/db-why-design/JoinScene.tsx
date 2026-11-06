@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { NOTE_TEXT, NOTEBOOK, NOTEBOOK_NAME, OTHERS, SHOP } from "./data";
-import { DbTable, Drift, FIG_Y, FigKey, Headline, KEY, Kicker, LISTING_PAPER, Mark, MARK_BAD, tableGeometry, X0 } from "./parts";
+import { DbTable, Drift, FIG_Y, FigKey, Headline, KEY, Kicker, LISTING_PAPER, Mark, MARK_BAD, Spot, tableGeometry, X0 } from "./parts";
 
 const TOP = 340;
 const LOW_FIG = 640;
@@ -95,6 +95,11 @@ export const JoinScene: React.FC = () => {
 
       <Kicker at={askFrom - 10}>What design buys</Kicker>
       <Headline lead="Which customers" turn="bought a notebook?" at={askFrom - 6} turnAt={notebookAt - 6} size={72} />
+
+      {/* The headline's notebook, top right; then "links", three of them for the three joins,
+          in the empty lower right until Fig. 6 needs it. */}
+      <Spot id="db-why-design-notebook" at={notebookAt - 4} left={1590} top={y(81)} width={197} height={180} />
+      <Spot id="db-why-design-chain" at={linksAt - 4} out={sentenceAt - 20} left={1150} top={y(679)} width={340} height={120} />
 
       <Drift from={askFrom} to={end} amount={0.016} origin="50% 40%">
         <div style={{ position: "absolute", inset: 0, opacity: 1 - lowered * 0.5 }}>
@@ -207,7 +212,8 @@ export const JoinScene: React.FC = () => {
               whiteSpace: "nowrap",
             }}
           >
-            <span style={{ fontFamily: MONO, fontSize: 21, color: INK_SOFT }}>orders.note</span>
+            {/* The column and its value, one line at one size: the column in the soft ink. */}
+            <span style={{ fontFamily: MONO, fontSize: 28, color: INK_SOFT }}>orders.note</span>
             <span style={{ fontFamily: MONO, fontSize: 28, color: INK }}>
               &apos;
               {parts.map((t, i) =>

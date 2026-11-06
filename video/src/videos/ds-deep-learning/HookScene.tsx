@@ -78,7 +78,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-tap" at={firstAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data scientist interview prep</Kicker>
+        <Kicker at={from}>Data scientist interview questions</Kicker>
         <Headline lead="Not train one," turn="explain one." at={trainAt - 4} turnAt={explainAt - 4} size={72} />
 
         <Spot id="ds-deep-learning-octopus" at={from + 6} left={1260} top={y(270)} width={510} height={500} />

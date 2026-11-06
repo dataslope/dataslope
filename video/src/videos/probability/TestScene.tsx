@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { mulberry32, num, pct, TEST } from "./data";
-import { Big, Count, DATA, DATA_INK, Headline, Kicker, lerp, Pulse, SOFT, STAT, STAT_INK, Strike, Svg, Sweep, VBracket } from "./parts";
+import { Big, Count, DATA, DATA_INK, Headline, Kicker, lerp, Pulse, SOFT, Spot, STAT, STAT_INK, Strike, Svg, Sweep, VBracket } from "./parts";
 
 /** The tree: where each node's label is centred. */
 const NODE = {
@@ -135,9 +135,13 @@ export const TestScene: React.FC = () => {
             [accurateAt - 2, pct(TEST.specificity), "of healthy people test negative", INK_SOFT],
           ] as const
         ).map(([cue, big, text, color], i) => (
-          <Ink key={i} at={cue} dur={16} style={{ left: 160, top: y(330 + i * 120), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 22 }}>
-            <span style={{ ...headline(76), color }}>{i === 0 ? big : <Sweep at={bothAt - 2 + (i - 1) * 6}>{big}</Sweep>}</span>
-            <span style={note(30, INK)}>{text}</span>
+          // Each fact's number on a line of its own, and its words on the
+          // next: one size and one face to a line.
+          <Ink key={i} at={cue} dur={16} style={{ left: 160, top: y(310 + i * 130), whiteSpace: "nowrap" }}>
+            <div>
+              <span style={{ ...headline(72), color }}>{i === 0 ? big : <Sweep at={bothAt - 2 + (i - 1) * 6}>{big}</Sweep>}</span>
+            </div>
+            <div style={{ ...note(30, INK), marginTop: 2 }}>{text}</div>
           </Ink>
         ))}
         <Ink at={positiveAt - 2} dur={14} style={{ left: 160, top: y(712), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 18 }}>
@@ -151,7 +155,7 @@ export const TestScene: React.FC = () => {
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              ...note(40, "var(--ds-white)"),
+              ...note(30, "var(--ds-white)"),
               fontWeight: 700,
             }}
           >
@@ -159,6 +163,8 @@ export const TestScene: React.FC = () => {
           </span>
           <span style={{ ...note(30, INK), fontWeight: 600 }}>You test positive.</span>
         </Ink>
+        {/* The test, between the facts and the thousand people. */}
+        <Spot id="probability-test-tubes" at={aTestAt - 2} out={walkFrom - 12} left={760} top={y(380)} width={250} height={h(230)} />
         {/* A thousand people, one of whom has it. */}
         <Ink at={thousandAt - 4} dur={12} style={{ left: FIELD.x0, top: y(FIELD.top) - 40, whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>
@@ -184,18 +190,20 @@ export const TestScene: React.FC = () => {
         <Ink at={chancesAt - 4} dur={14} style={{ left: 1100, top: y(616), whiteSpace: "nowrap" }}>
           <span style={label(24, INK)}>The chance you have it</span>
         </Ink>
-        <Ink at={gutAt - 2} dur={14} style={{ left: 1100, top: y(654), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
-          <span style={note(26, INK_SOFT)}>Your gut</span>
-          <Big size={96} color={INK_SOFT}>
+        {/* The two answers side by side, each named on its own line above
+            it, and set at one size, so the eye compares the numbers. */}
+        <Ink at={gutAt - 2} dur={14} style={{ left: 1100, top: y(654), whiteSpace: "nowrap" }}>
+          <div style={note(26, INK_SOFT)}>Your gut</div>
+          <Big size={100} color={INK_SOFT}>
             <Strike at={answerAt - 2} top="0.5em">
               {pct(TEST.sensitivity)}
             </Strike>
           </Big>
         </Ink>
-        <Ink at={answerAt + 2} dur={14} style={{ left: 1100, top: y(768), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
-          <span style={note(26, INK)}>The answer</span>
+        <Ink at={answerAt + 2} dur={14} style={{ left: 1390, top: y(654), whiteSpace: "nowrap" }}>
+          <div style={note(26, INK)}>The answer</div>
           <span style={{ opacity: ease(frame, nineAt - 4, 12) }}>
-            <Big size={110} color={STAT_INK} italic>
+            <Big size={100} color={STAT_INK} italic>
               about {pct(TEST.treePpv)}
             </Big>
           </span>
@@ -305,27 +313,25 @@ export const TestScene: React.FC = () => {
           <Count at={peopleAt} dur={20} to={TEST.positives} format={num} /> positives in all
         </span>
       </Note>
-      <Ink at={percentAt - 4} dur={16} style={{ left: GRID.x0, top: gridBottom + 72, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 24 }}>
+      {/* The answer on a line of its own, and the division it comes from
+          on the line under it. */}
+      <Ink at={percentAt - 4} dur={16} style={{ left: GRID.x0, top: gridBottom + 56, whiteSpace: "nowrap" }}>
         <Big size={130} color={STAT_INK} italic>
           {pct(TEST.treePpv)}
         </Big>
-        <span style={note(26, INK)}>
-          = {TEST.tp} / {num(TEST.positives)}
-        </span>
-      </Ink>
-      <Note at={simAt - 2} x={GRID.x0} y={gridBottom + 236}>
-        <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          Simulated, <Count at={simAt} dur={30} to={TEST.simN} format={num} style={{ fontWeight: 700 }} /> people
+        <div style={{ ...note(26, INK), marginTop: 2 }}>
+          {TEST.tp} / {num(TEST.positives)}
         </div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 18, marginTop: 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, simAt + 14, 10) }}>
-            {num(TEST.simSickPositive)} sick of {num(TEST.simPositives)} positives
-          </span>
-          <span style={{ opacity: ease(frame, pointOneAt - 4, 10) }}>
-            <Big size={64} color={STAT_INK} italic>
-              {fmt(TEST.simPpv * 100, 1)}%
-            </Big>
-          </span>
+      </Ink>
+      <Note at={simAt - 2} x={GRID.x0} y={gridBottom + 250}>
+        <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          Simulated, <Count at={simAt} dur={30} to={TEST.simN} format={num} style={{ fontWeight: 700 }} /> people:
+        </div>
+        <div style={{ ...note(26, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>
+          <span style={{ opacity: ease(frame, simAt + 14, 10) }}>
+            {num(TEST.simSickPositive)} sick of {num(TEST.simPositives)} positives,
+          </span>{" "}
+          <span style={{ color: STAT_INK, fontWeight: 700, opacity: ease(frame, pointOneAt - 4, 10) }}>{fmt(TEST.simPpv * 100, 1)}%</span>
         </div>
       </Note>
     </AbsoluteFill>

@@ -78,7 +78,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-chime" at={billAt + 10} level={-35} />
 
       <Drift from={0} to={end + 40}>
-        <Kicker at={6}>Data engineer interview prep</Kicker>
+        <Kicker at={6}>Data engineer interview questions</Kicker>
         <Headline lead="The newest pipelines" turn="feed an AI assistant." at={newestAt - 2} turnAt={feedAt - 2} size={68} />
 
         {/* Documents, a pipeline, the index, and what reads it. */}

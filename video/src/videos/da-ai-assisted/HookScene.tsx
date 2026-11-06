@@ -59,7 +59,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pop" at={threeAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data analyst interview prep</Kicker>
+        <Kicker at={from}>Data analyst interview questions</Kicker>
         <Headline lead="The assistant writes it." turn="Can you check it?" at={from + 4} turnAt={rightAt - 4} size={68} />
 
         <Spot id="da-ai-assisted-owl" at={from + 6} left={1150} top={y(290)} width={640} height={460} />

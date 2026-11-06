@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, TEST } from "./data";
-import { Arrow, Big, DATA, DATA_INK, Headline, Held, lerp, SOFT, STAT, STAT_INK, Strike, Svg, Sweep } from "./parts";
+import { Arrow, Big, DATA, DATA_INK, Headline, Held, lerp, SOFT, Spot, STAT, STAT_INK, Strike, Svg, Sweep } from "./parts";
 
 /** The two-bar comparison: the share of positives who are sick, once and
  *  twice tested. Both bars are the whole of their positives. */
@@ -209,6 +209,8 @@ export const BayesScene: React.FC = () => {
             <b>{num(TEST.healthy / TEST.sick)}</b> to 1
           </span>
         </Note>
+        {/* The false alarms, above the line that counts them. */}
+        <Spot id="probability-alarm-bell" at={falseAt - 2} out={retestFrom - 12} left={1400} top={y(270)} width={240} height={h(210)} />
         {/* Right of the rule, clear of its widest line. */}
         <Ink at={falseAt - 4} dur={14} style={{ left: 1240, top: y(540), whiteSpace: "nowrap" }}>
           <span style={{ ...note(24, INK) }}>
@@ -298,11 +300,12 @@ export const BayesScene: React.FC = () => {
           Before you trust a positive, ask <Sweep at={rareAt}>how rare</Sweep> the thing is.
         </span>
       </Ink>
-      <Ink at={rareAt + 2} dur={16} style={{ left: 900, top: y(842), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
-        <span style={note(24, INK_SOFT)}>Here,</span>
-        <Big size={56} color={DATA_INK} italic>
-          1 in {num(TEST.oneIn)}
-        </Big>
+      {/* In the face and size of the line above it: the rate stands out by
+          its color and weight. */}
+      <Ink at={rareAt + 2} dur={16} style={{ left: 900, top: y(842), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(36, true), color: INK_SOFT }}>
+          Here, <span style={{ color: DATA_INK, fontWeight: 600 }}>1 in {num(TEST.oneIn)}</span>.
+        </span>
       </Ink>
       </div>
     </AbsoluteFill>

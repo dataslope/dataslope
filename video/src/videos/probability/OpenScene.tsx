@@ -233,22 +233,24 @@ export const OpenScene: React.FC = () => {
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>…</span>
       </Note>
 
-      {/* ── The count: a hundred thousand flips in code ── */}
-      <div style={{ position: "absolute", left: 160, top: y(808), display: "flex", alignItems: "baseline", gap: 56 }}>
+      {/* ── The count: a hundred thousand flips in code. Each label sits on
+           its own line above its value, so the values share one line at one
+           size and the share stands out by its color alone. ── */}
+      <div style={{ position: "absolute", left: 160, top: y(790), display: "flex", alignItems: "flex-start", gap: 64 }}>
         <Ink at={hundredAt - 4} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT), marginRight: 14 }}>Flips</span>
-          <Count at={hundredAt - 2} dur={28} to={COIN.flips} format={num} style={{ ...note(40, INK), fontWeight: 650 }} />
+          <div style={note(24, INK_SOFT)}>Flips</div>
+          <Count at={hundredAt - 2} dur={28} to={COIN.flips} format={num} style={{ ...note(40, INK), fontWeight: 650, display: "block" }} />
         </Ink>
         <Ink at={fiftyAt - 6} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, DATA), fontWeight: 650, marginRight: 14 }}>Heads</span>
-          <Count at={fiftyAt - 4} dur={30} to={COIN.heads} format={num} style={{ ...note(40, INK), fontWeight: 650 }} />
+          <div style={{ ...note(24, DATA), fontWeight: 650 }}>Heads</div>
+          <Count at={fiftyAt - 4} dur={30} to={COIN.heads} format={num} style={{ ...note(40, INK), fontWeight: 650, display: "block" }} />
         </Ink>
         <Ink at={pointAt - 4} dur={16} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT), marginRight: 14 }}>Share</span>
-          <span style={{ ...headline(64, true), color: STAT_INK }}>{fmt(COIN.pHeads, 4)}</span>
-        </Ink>
-        <Ink at={closeAt - 2} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={note(22, INK_SOFT)}>close to the true 0.5, not on it</span>
+          <div style={note(24, INK_SOFT)}>
+            Share
+            <span style={{ opacity: ease(frame, closeAt - 2, 12) }}>, close to the true 0.5 but not on it</span>
+          </div>
+          <div style={{ ...note(40, STAT_INK), fontWeight: 700 }}>{fmt(COIN.pHeads, 4)}</div>
         </Ink>
       </div>
       {/* A hairline under the count, drawn as the share lands. */}
@@ -256,7 +258,7 @@ export const OpenScene: React.FC = () => {
         style={{
           position: "absolute",
           left: 160,
-          top: y(808) + 70,
+          top: y(790) + 104,
           width: 1560 * ease(frame, pointAt, 18),
           height: 1,
           background: HAIRLINE,

@@ -64,7 +64,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-chime" at={elevenAt} level={-32} />
 
       <Drift from={0} to={end + 20}>
-        <Kicker at={scriptAt}>Data engineer interview prep · Pipelines and systems</Kicker>
+        <Kicker at={scriptAt}>Data engineer interview questions · Pipelines and systems</Kicker>
         <Headline lead="A script, run every night," turn="is a pipeline." at={nightAt} turnAt={pipeAt} size={66} />
 
         {/* The script, then its source and its output. */}
