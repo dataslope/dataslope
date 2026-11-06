@@ -16,6 +16,9 @@ const PANEL_X = [X0, 700, 1300];
 const RULE_X = [(498 + 700) / 2, (1226 + 1300) / 2];
 const HEAD_Y = 338;
 const SENT_Y = 392;
+/** From a sentence's letter (A to D) to the sentence: more than 1.2em of the
+ *  sentence's size, so the letters read as a column of names beside it. */
+const SENT_GAP = 36;
 const MINI = { x0: 210, w: 96, headY: 506, rowY: 550, step: 60, h: 50 };
 const STRIP_Y = 470;
 const COMMON_Y = 824;
@@ -95,7 +98,7 @@ export const BlindScene: React.FC = () => {
           key={s}
           at={(i === 0 ? dogAt : manAt) - 4}
           dur={14}
-          style={{ left: px[0], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}
+          style={{ left: px[0], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: SENT_GAP, whiteSpace: "nowrap" }}
         >
           <span style={{ ...label(21, INK_SOFT), width: 22 }}>{"AB"[i]}</span>
           <span style={{ ...body(34), color: INK }}>{s}</span>
@@ -194,7 +197,7 @@ export const BlindScene: React.FC = () => {
           key={t}
           at={(i === 0 ? greatAt : excellentAt) - 4}
           dur={14}
-          style={{ left: px[2], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}
+          style={{ left: px[2], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: SENT_GAP, whiteSpace: "nowrap" }}
         >
           <span style={{ ...label(21, INK_SOFT), width: 22 }}>{"CD"[i]}</span>
           <span style={{ ...body(34), color: INK }}>{t}</span>
