@@ -12,9 +12,14 @@ import { Drift, Mark, X0 } from "./parts";
 const BASE_Y = 670;
 const BLOCK_W = 384;
 const BLOCK_GAP = 24;
-/** A layer's row, and the space between the lowest layer and the loop. */
-const LAYER_H = 64;
+/** A layer's row, and the space between the lowest layer and the loop. Its
+ *  words sit LAYER_PAD over the hairline under them and 30px under the one
+ *  above (the house's room under a rule: at least 28px). */
+const LAYER_H = 80;
+const LAYER_PAD = 14;
 const LAYER_GAP = 24;
+/** Where a layer's words start, down from the top of its row. */
+const LAYER_TEXT = LAYER_H - LAYER_PAD - 36;
 const WIDTH = 3 * BLOCK_W + 2 * BLOCK_GAP;
 const SIDE = X0 + WIDTH + 44;
 
@@ -62,8 +67,10 @@ const Layer: React.FC<{ y: number; at: number; rule: boolean; lit?: number; dim?
           left: X0,
           top: y,
           height: LAYER_H,
+          boxSizing: "border-box",
+          paddingBottom: LAYER_PAD,
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-end",
           ...note(28, INK),
           fontWeight: 600,
           whiteSpace: "nowrap",
@@ -183,7 +190,7 @@ export const ChangedScene: React.FC = () => {
             <span style={{ ...note(24, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{c.text}</span>
           </Note>
         ))}
-        <Note at={pipeAt} x={SIDE} y={layerTop(0) + 14} from="right">
+        <Note at={pipeAt} x={SIDE} y={layerTop(0) + LAYER_TEXT} from="right">
           <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>now: the pipeline itself</span>
         </Note>
       </Drift>

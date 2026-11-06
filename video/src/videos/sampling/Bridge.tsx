@@ -45,7 +45,7 @@ export const Bridge: React.FC<{
     <>
       <div style={{ position: "absolute", left: x, top: y, width, height: 1, background: HAIRLINE, opacity: ease(frame, first - 4, 12) }} />
       {merged.map((line, i) => (
-        <Ink key={i} at={line.at} dur={18} style={{ left: x, top: y + 20 + i * PITCH, ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
+        <Ink key={i} at={line.at} dur={18} style={{ left: x, top: y + 28 + i * PITCH, ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
           {line.text}
         </Ink>
       ))}
