@@ -88,7 +88,11 @@
     ],
     "ssdOverMemory": 1000,
     "rttOverSsd": 5,
-    "rttOverMemory": 5000
+    "rttOverMemory": 5000,
+    "path": {
+      "hitMs": 1,
+      "missMs": 1.6
+    }
   },
   "percentiles": {
     "n": 40000,
@@ -793,6 +797,16 @@
       "beat": "q2-fanout",
       "words": "a hundred calls",
       "means": 100
+    },
+    {
+      "beat": "q3-path",
+      "words": "about a millisecond",
+      "means": 1
+    },
+    {
+      "beat": "q3-path",
+      "words": "about one point six",
+      "means": 1.6
     },
     {
       "beat": "q3-key",

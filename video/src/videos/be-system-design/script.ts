@@ -88,6 +88,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q3-diagram: the page's diagram, drawn box by box as named: client, load
  *     balancer, two app servers, cache, key-value store (system-design.mdx's
  *     mermaid); "100 : 1" on the cache's arrow.
+ *   q3-path: one redirect travels the diagram as a dot: load balancer to an
+ *     app server, app server to the cache and back (two round trips, each
+ *     "0.5 ms" from the ladder), "≈ 1 ms" in green; then a miss, the dot
+ *     going on to the store, "+0.5 ms +0.1 ms (SSD) ≈ 1.6 ms".
  *   q3-counter: a single "counter" box that both app servers call, ringed in
  *     red; it splits into two ID blocks, one per server ("1 to 1,000,000",
  *     "1,000,001 to 2,000,000"), drawn green.
@@ -160,7 +164,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     links a year ("about fifteen"); five years is 18.25 billion. Base 62 of
  *     an auto-increment ID, or a hash: the page's two options. The cache, the
  *     key-value store and the stateless tier behind a load balancer: the
- *     page's answer and its diagram. ID blocks ("a million at a time") and
+ *     page's answer and its diagram. One redirect, on the ladder: a cache
+ *     hit is two in-data-center round trips (load balancer to app server,
+ *     app server to cache), 2 × 0.5 = 1 ms; a miss adds a third and an SSD
+ *     read, 1.5 + 0.1 = 1.6 ms. Network time only, as the ladder gives it;
+ *     no server's processing time is claimed. ID blocks ("a million at a time") and
  *     consecutive keys are the follow-up, shown on the video's own IDs.
  *   - single points of failure (q4): the page's answer (one database, one
  *     load balancer, one cache; active-passive pairs, replicated databases
@@ -314,6 +322,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.8,
     },
     {
+      id: "q3-path",
+      text: "Follow one redirect through it. On a cache hit, that's two round trips inside the data center, about a millisecond by the ladder. A miss adds a third, to the store, and an SSD read: about one point six.",
+      pauseAfter: 0.8,
+    },
+    {
       id: "q3-counter",
       text: "The follow-up is the counter. One counter that every server asks is a bottleneck, and one more thing that can fail. Hand each server a block of IDs instead, say a million at a time, and it counts on its own.",
       pauseAfter: 0.6,
@@ -366,7 +379,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q5-light",
-      text: "Distance sets a floor. Light in fiber covers about two hundred kilometers a millisecond, so a user in Sydney is at least a hundred and fifty-seven milliseconds, round trip, from a server in Virginia, before any work is done. An edge server across town is under a millisecond away.",
+      text: "Distance sets a floor. Light in fiber covers about two hundred kilometers a millisecond, so a user in Sydney is at least a hundred and fifty-seven milliseconds, round trip, from a server in Virginia, before the redirect's millisecond inside it even starts. An edge server across town is under a millisecond away.",
       pauseAfter: 0.7,
     },
     {

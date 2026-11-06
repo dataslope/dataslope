@@ -114,7 +114,11 @@ R.key = { alphabet: ALPHABET, keyLengths, counted, idBlock: 1_000_000 };
   const ssd = ns("NVMe SSD read");
   const rtt = ns("Network round trip");
   check(memory === 100 && ssd === 100_000 && rtt === 500_000, "the ladder's memory, SSD and round trip");
-  R.ladder = { levels, ssdOverMemory: ssd / memory, rttOverSsd: rtt / ssd, rttOverMemory: rtt / memory };
+  // One redirect through the diagram, network and storage time only: a cache
+  // hit is two round trips inside the data center (load balancer to app
+  // server, app server to cache); a miss adds one to the store and an SSD read.
+  const path = { hitMs: (2 * rtt) / 1e6, missMs: (3 * rtt + ssd) / 1e6 };
+  R.ladder = { levels, ssdOverMemory: ssd / memory, rttOverSsd: rtt / ssd, rttOverMemory: rtt / memory, path };
 }
 
 // ── 2. Percentiles (charts/latency-percentiles.mjs, copied with its seed) ────
@@ -300,6 +304,8 @@ const said = [
   ["q2-tail", "two hundred and eighty-six", 286, Math.round(R.percentiles.marks.p99)],
   ["q2-fanout", "sixty-three percent", 63, Math.round(R.percentiles.hitsTail * 100)],
   ["q2-fanout", "a hundred calls", 100, R.percentiles.calls],
+  ["q3-path", "about a millisecond", 1, R.ladder.path.hitMs],
+  ["q3-path", "about one point six", 1.6, R.ladder.path.missMs],
   ["q3-key", "fifty-seven billion", 57e9, sig2(six.keys)],
   ["q3-key", "about fifteen years", 15, Math.floor(six.years)],
   ["q3-counter", "a million at a time", 1e6, R.key.idBlock],

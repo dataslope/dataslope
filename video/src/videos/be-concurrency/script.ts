@@ -181,7 +181,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "A thousand requests arrive in the same second. Each one spends most of its time waiting: on a database, on another service. Serve them one after another, and the server sits idle through nearly all of that second.",
+      text: "A thousand requests arrive in the same second. Each one spends most of its time waiting: on a database, on another service. Serve them one after another, and the server spends most of its time idle while the queue grows.",
       pauseAfter: 0.6,
     },
     {
@@ -199,7 +199,7 @@ export const script: NarrationScript = {
     {
       id: "conc",
       scene: true,
-      text: "Question one. Concurrency versus parallelism, what's the difference? Concurrency is dealing with many tasks at once. One core switches between them, and each makes progress in turns.",
+      text: "Question one. Concurrency versus parallelism, what is the difference? Concurrency is dealing with many tasks at once. One core switches between them, and each makes progress in turns.",
       pauseAfter: 0.6,
     },
     {
@@ -273,7 +273,7 @@ export const script: NarrationScript = {
     {
       id: "gil",
       scene: true,
-      text: "Question four. What is the GIL, and why does it exist? CPython's global interpreter lock, the GIL, is a mutex that lets only one thread run Python bytecode at a time.",
+      text: "Question four. What is the GIL, and why does it exist? In CPython, the standard Python interpreter, the global interpreter lock, or GIL, is one lock that lets only one thread run Python bytecode at a time.",
       pauseAfter: 0.6,
     },
     {
@@ -337,7 +337,7 @@ export const script: NarrationScript = {
     },
     {
       id: "prevent-share",
-      text: "Mutual exclusion: share nothing. Hand the work to one owner through a queue, and there's no lock to wait on.",
+      text: "Mutual exclusion: share nothing. Give the state one owner thread and send it work through a queue, so no other thread needs a lock on it.",
       pauseAfter: 0.5,
     },
     { id: "prevent-short", text: "And keep critical sections short, so contention stays low.", pauseAfter: 0.6 },
@@ -379,7 +379,7 @@ export const script: NarrationScript = {
     },
     {
       id: "block-run",
-      text: "Swap a's await for a plain sleep. Now a holds the thread for its whole twenty milliseconds, and b can't even start its wait. This time a finishes first, and the pair takes thirty: the waits add up instead of overlapping.",
+      text: "Swap a's await for a blocking sleep. Now a holds the thread for its whole twenty milliseconds, and b can't even start its wait. This time a finishes first, and the pair takes thirty: the waits add up instead of overlapping.",
       pauseAfter: 0.7,
     },
     {
@@ -397,7 +397,7 @@ export const script: NarrationScript = {
     {
       id: "choose",
       scene: true,
-      text: "Question nine. When do you choose threads, multiprocessing, or async? Match the tool to the bottleneck. The deciding question is always: is the program waiting on IO, or burning CPU?",
+      text: "Question nine. When do you choose threads versus multiprocessing versus async? Match the tool to the bottleneck. The deciding question is always: is the program waiting on IO, or burning CPU?",
       pauseAfter: 0.7,
     },
     { id: "choose-async", text: "Waiting, on many connections: async. One thread, the lowest overhead.", pauseAfter: 0.5 },
@@ -441,7 +441,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-starve",
-      text: "Starvation is a thread that never gets the resource, because others keep getting priority, like a low-priority thread that never wins a lock. Fair locks fix it.",
+      text: "Starvation is a thread that never gets the resource, because others keep getting priority, like a low-priority thread that never wins a lock. Fair locks help, and so does not handing out shared resources by priority.",
       pauseAfter: 0.6,
     },
     {
