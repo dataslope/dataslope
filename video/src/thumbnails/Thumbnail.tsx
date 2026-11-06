@@ -101,6 +101,8 @@ export type ThumbnailProps = {
   /** Which of a course's lines is in the brand blue, the other in black:
    *  "Full Course" (the kicker) or the course's name (the title). */
   courseBlue?: "kicker" | "title";
+  /** Where a course's "Full Course" sits: above its name, or under it. */
+  kickerAt?: "top" | "bottom";
   /** Where the animal stands: on the line the words end on, or hung from
    *  the top-right corner, level with the mark. */
   artAt?: "bottom" | "top";
@@ -156,12 +158,16 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
   greenShade = 550,
   labelFirst = false,
   courseBlue = "kicker",
+  kickerAt = "top",
 }) => {
   const t = TRACKS[track];
   const course = t.kind === "course";
   const labelInk = tone === "green" ? GREEN[greenShade] : TONE[tone];
   const kick = kicker === "same" ? SIZE : KICKER;
   const top = artAt === "top";
+  // On the title's line pitch whatever its size, with nothing added: every
+  // line of the block is one step apart.
+  const fullCourse = <div style={{ ...type(kick, courseBlue === "kicker" ? ds("blue", 500) : INK), lineHeight: `${1.1 * SIZE}px` }}>Full Course</div>;
   return (
     <AbsoluteFill style={{ background: "var(--ds-white)" }}>
       {/* The mark alone, no wordmark. A motion that has long since landed
@@ -198,11 +204,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
       </div>
 
       <div style={{ position: "absolute", left: PAD, bottom: 56 }}>
-        {course ? (
-          // On the title's line pitch whatever its size, with nothing added:
-          // every line of the block is one step apart.
-          <div style={{ ...type(kick, courseBlue === "kicker" ? ds("blue", 500) : INK), lineHeight: `${1.1 * SIZE}px` }}>Full Course</div>
-        ) : null}
+        {course && kickerAt === "top" ? fullCourse : null}
         {!course && labelFirst ? <Lines lines={INTERVIEW[label]} style={type(SIZE, labelInk)} /> : null}
         <Lines
           lines={t.title}
@@ -212,6 +214,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
           )}
         />
         {!course && !labelFirst ? <Lines lines={INTERVIEW[label]} style={type(SIZE, labelInk)} /> : null}
+        {course && kickerAt === "bottom" ? fullCourse : null}
       </div>
     </AbsoluteFill>
   );
@@ -221,8 +224,9 @@ export const THUMBNAIL = { width: W, height: H } as const;
 
 /** Every thumbnail the Studio shows, the owner's 2026-11-06 round: the
  *  animal hung top-right throughout and "Full Course" at the title's size.
- *  A course comes two ways, "Full Course" in blue over its name in black
- *  (V1) or the reverse (V2). An interview track says "Interview" and
+ *  A course comes four ways: "Full Course" in blue over its name in black
+ *  (V1) or the reverse (V2), and the same two with "Full Course" under the
+ *  name (V3, V4). An interview track says "Interview" and
  *  "Questions" on two lines, four ways: the role first in black over the
  *  label in green (V1), the role in green over the label in black (V2), the
  *  label first in black over the role in green (V3), and the label first in
@@ -234,6 +238,8 @@ export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entrie
     ? [
         { id: `Thumb-${track}-V1-BlueKicker`, props: { ...base, kicker: "same", courseBlue: "kicker" } },
         { id: `Thumb-${track}-V2-BlueTitle`, props: { ...base, kicker: "same", courseBlue: "title" } },
+        { id: `Thumb-${track}-V3-BlueKickerBelow`, props: { ...base, kicker: "same", courseBlue: "kicker", kickerAt: "bottom" } },
+        { id: `Thumb-${track}-V4-BlueTitleKickerBelow`, props: { ...base, kicker: "same", courseBlue: "title", kickerAt: "bottom" } },
       ]
     : [
         { id: `Thumb-${track}-V1-RoleBlack-QuestionsGreen`, props: { ...base, label: "questions-two", role: "black", tone: "green" } },

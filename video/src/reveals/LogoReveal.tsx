@@ -76,6 +76,9 @@ export type LogoRevealProps = {
   /** The one text size an equal-size opener sets every line at, in px,
    *  overriding the layout's own. */
   size?: number;
+  /** On the light page, the hue of the mark and the title: the brand blue
+   *  (the courses) or green (the interview series, as their thumbnails). */
+  hue?: "blue" | "green";
 };
 
 
@@ -198,9 +201,28 @@ const Sting: React.FC<LogoRevealProps> = ({ motion, text, theme }) => {
   );
 };
 
-const Opener: React.FC<LogoRevealProps> = ({ layout, motion, text, theme, face, course, unit, title, textInk, divider, threeLines, size: sizeOverride }) => {
+/** The light page in green: the mark in the brand green, the title in
+ *  green's ink (its 500 is too pale for type on white). */
+const themeOf = (theme: LogoRevealProps["theme"], hue: LogoRevealProps["hue"]) =>
+  theme === "light" && hue === "green" ? { ...THEMES.light, mark: ds("green", 500), accent: inkOf.green } : THEMES[theme];
+
+const Opener: React.FC<LogoRevealProps> = ({
+  layout,
+  motion,
+  text,
+  theme,
+  face,
+  course,
+  unit,
+  title,
+  textInk,
+  divider,
+  threeLines,
+  size: sizeOverride,
+  hue,
+}) => {
   const frame = useCurrentFrame();
-  const t = THEMES[theme];
+  const t = themeOf(theme, hue);
   const cue = openerCues(motion, text, unit);
   const line = (child: React.ReactNode, style?: React.CSSProperties) => <div style={{ display: "flex", ...style }}>{child}</div>;
   const lineSounds = (

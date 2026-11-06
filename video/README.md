@@ -101,7 +101,7 @@ npm run render -- CPointers                  # 4K → out/CPointers.mp4
 npm run render:fhd -- CPointers out/CPointers-fhd.mp4   # 1920x1080
 npm run render:preview -- CPointers out/c-pointers-preview.mp4   # half size, fast
 npm run render:all -- --fhd                  # every video changed since its last render, 1080p
-npm run render:all -- --dry-run              # list what would render (scripts/render-all.mjs)
+npm run render:series -- Statistics --fhd    # a whole course in one video, openers between units
 npm run still -- CPointers out/frame.png --frame=600
 npm run cues -- c-pointers                   # when each beat is spoken
 ```
@@ -110,6 +110,72 @@ Remotion downloads its own Chrome Headless Shell on the first render. Where
 that download is blocked, point it at one you have:
 `REMOTION_BROWSER_EXECUTABLE=/path/to/headless_shell` (the cloud container has
 one under `/opt/pw-browsers/chromium_headless_shell-*/chrome-linux/`).
+
+### Rendering what changed, and whole series
+
+Two scripts sit on top of `remotion render`. Both take `--fhd` for 1080p
+(`out/<id>-fhd.mp4`); without it they render at 4K (`out/<id>.mp4`), the
+size to upload, since YouTube streams a 4K upload at a higher bitrate even
+to a 1080p viewer, which keeps small type sharp.
+
+**`npm run render:all`** (`scripts/render-all.mjs`) renders every video,
+plus the series openers and the unit opener sample, and skips each one whose
+output is in `out/` and whose inputs have not changed since it was rendered.
+A video's fingerprint is a hash of everything its render reads: the source
+files reachable from its folder, the shared kit, its `<Composition>` in
+`Root.tsx`, its narration, images and patterns, the sound effects and brand
+files, the dependency versions and the render settings. Fingerprints are
+kept in `out/.render-manifest.json`, written after each render, so a run
+that stops resumes where it stopped.
+
+```bash
+npm run render:all                           # 4K, every video that changed
+npm run render:all -- --fhd                  # the same at 1080p
+npm run render:all -- --dry-run              # list what would render, and why
+npm run render:all -- BaseRate,TfIdf         # only these (ids or folders)
+npm run render:all -- --force                # render even if unchanged
+```
+
+An edit to one scene re-renders that video alone; an edit to the shared kit
+(`src/editorial/`, `src/theme/`) or the sound effects re-renders every video,
+as it should. The first run after a change like that takes hours at 4K.
+
+**`npm run render:series`** (`scripts/render-series.mjs`) puts a whole
+course or interview track in one video: before each unit or part, its
+opener, then its videos, in the order `src/series.ts` lists them.
+
+```bash
+npm run render:series -- Statistics          # 4K → out/series/Statistics.mp4
+npm run render:series -- Statistics --fhd    # 1080p → out/series/Statistics-fhd.mp4
+npm run render:series -- --all --fhd         # every series
+npm run render:series -- DataEngineer --units 0-2 --fhd   # a stretch, to preview
+npm run render:series -- Statistics --dry-run   # list the pieces
+npm run render:series -- Statistics --no-render # stitch what is in out/ as it is
+```
+
+It runs `render:all` on exactly the pieces it needs first, so only a missing
+or changed piece is rendered, then joins them with ffmpeg. **The picture is
+not re-encoded**: every frame is copied packet for packet from the piece
+that rendered it, so the series looks exactly like its parts and the join
+takes minutes. The sound is decoded and encoded once (AAC, 320 kb/s, the
+rate the pieces have), because AAC does not join cleanly when copied: each
+piece's encoder delay would leave a click at every join. Every piece must
+share size, frame rate and pixel format, which pieces from one `render:all`
+run do; anything else stops the stitch. Beside the video it writes
+`<name>.chapters.txt`, one line per unit ("0:00 Unit 1 · Thinking
+statistically") for the YouTube description, and the same chapters go into
+the file's metadata. ffmpeg is Remotion's own (`npx remotion ffmpeg`), so
+nothing else needs installing.
+
+**The series** are in `src/series.ts`: each course's units and each
+interview track's parts, the videos each one plays, and the title its
+opener shows. The openers are Columns-7's three lines (the series' name,
+"Unit n" or "Part n", the title), generated from that list into the Studio's
+`Series-Openers` folder: a course's in blue, an interview track's in green,
+mark and title both, like their thumbnails. Renaming a unit there
+re-renders that unit's opener alone. A unit with a deep dive plays it after
+the unit video, under the one opener, and Statistics Unit 5 is the merged
+`Stats-5-Sampling`.
 
 ### Why the compositions are 1080p
 
@@ -695,16 +761,19 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
 
 ## YouTube thumbnails
 
-Stills in the Studio's `Thumbnails` folder, 1280x720. A course has
-"Full Course" above its title, smaller (`Small`) or at its size (`Same`),
-with the animal low (`Bottom`) or high (`Top`). An interview track says
-"Interview Questions" with the animal hung top-right and a green mark,
-green being the interview series' color against the courses' blue: the
-role in green (`GreenRole`), or the role in black and the label in green
-after it (`GreenLabel`) or above it (`GreenLabelFirst`); `BlueRole` and
-`BlackRole` remain for comparison. Other labels ("Interview Prep"), greys
-and green shades are props. For example `Thumb-DatabaseDesign-Same-Top` or
-`Thumb-DataEngineer-Questions-GreenLabel-Top`.
+Stills in the Studio's `Thumbnails` folder, 1280x720, the animal hung
+top-right throughout. A course's "Full Course" is at its title's size, in
+four variations: "Full Course" in blue over the name in black (`V1`), the
+reverse (`V2`), and the same two with "Full Course" under the name (`V3`,
+`V4`). An interview track says "Interview" and "Questions" on two lines,
+with a green mark, green being the interview series' color against the
+courses' blue, in four variations: the role first in black and the label
+in green (`V1`), the role in green and the label in black (`V2`), the label
+first in black and the role in green (`V3`), the label first in green and
+the role in black (`V4`). Earlier rounds' options (a smaller "Full Course",
+the animal low, "Interview Prep", other greys and greens) are props. For
+example `Thumb-DatabaseDesign-V1-BlueKicker` or
+`Thumb-DataEngineer-V4-QuestionsGreenFirst-RoleBlack`.
 
 Each track has its own watercolor animal, so the seven read apart at a
 glance in a list of results: an owl on a die (Statistics), an elephant at a
@@ -719,8 +788,11 @@ the mark and as far in from the edge.
 
 - **One weight, one pitch.** Every word is Inter 500 and every line sits on
   the title's line pitch, blue or green lines included, with nothing added
-  between them. The title is 80px (`SIZE`); a course's "Full Course" is
-  52px or the title's size. No pills or badges; the words sit on the page.
+  between them. The title is 80px (`SIZE`), and so is "Full Course" in this
+  round's variations. No pills or badges; the words sit on the page.
+- **One size of animal.** The raccoon is drawn at 86% of its box
+  (`artScale` in `TRACKS`): its body fills more of its picture than the
+  otter's or the meerkat's, and at full size it read larger than them.
 - **Seen small.** A thumbnail is about 168x94 on a phone, where 80px is about
   10px, so the words are few. "Interview Questions", the widest line at
   about 730px, fits beside the animal hung top-right; "Interview
@@ -735,7 +807,7 @@ the mark and as far in from the edge.
   are one entry in `TRACKS` (`src/thumbnails/Thumbnail.tsx`).
 
 ```bash
-npx remotion still src/index.ts Thumb-DatabaseDesign-Small-Bottom out/thumb.png
+npx remotion still src/index.ts Thumb-DatabaseDesign-V1-BlueKicker out/thumb.png
 ```
 
 ## Sound effects (SamplingBias, ThinkingStatistically)
