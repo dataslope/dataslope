@@ -230,6 +230,14 @@ Every video follows these rules.
   word, and fails a gap under 0.15em that holds for two samples: the "of"
   and highlighted "2,097,152" of ListVsSet were 3.7px apart. Words meant to
   touch (punctuation, one line of code, letters set one by one) pass.
+- **One line, one size, one family.** Words that share a line are set in one
+  size and one face: "Expected profit = $80 − $45 =" in Inter beside "$35"
+  in the serif at twice the size reads as two things. Emphasis is color,
+  weight or a highlight. A label beside a big value either matches it or
+  takes a line of its own above it; a hero number may stay large only on a
+  line of its own. Headlines, code in the mono face and super- and
+  subscripts are exempt. `check:frames` fails neighbours on a line that
+  differ in size by more than 12% or in family (`[mixed]`).
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative
@@ -949,7 +957,8 @@ npm test              # timing, scene cuts, word cues, voices, arrowheads
 npm run check:cues    # every word cue says which occurrence it means (no render)
 npm run check:frames  # a frame every half second at --scale=2 (about a minute):
                       # illustrations sharp at 4K, arrowheads on straight ends,
-                      # no hyphen set in tabular figures, a space between words
+                      # no hyphen set in tabular figures, a space between words,
+                      # one size and one family per line
                       # (CHECK_SCALE=1 for a quicker layout-only sweep)
 npm run check:sync -- <video>   # a voiced video: every beat starts where its cue says
 npm run check:mix -- <video>    # a video with sound effects: how far under the voice they sit

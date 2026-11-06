@@ -22,6 +22,13 @@ import { getInputProps, useCurrentFrame } from "remotion";
  *   word, and a gap under CROWDED (in the smaller word's size) is reported
  *   as `[crowded]`. Words that touch exactly, like the tokens of one line of
  *   code, are meant to.
+ * - One line in two sizes or two faces. A line of words and numbers reads as
+ *   one line only when it is set in one size and one family: "Expected
+ *   profit = $80 − $45 =" in Inter with "$35" in a serif twice the size
+ *   reads as two things. Emphasis is color, weight or a highlight. Every
+ *   pair of neighbours on a line is compared, and one that differs in size
+ *   by more than MIXED or in family (code in the mono face excepted, and
+ *   super- and subscripts) is reported as `[mixed]`.
  */
 export const PageAudit: React.FC = () => {
   const frame = useCurrentFrame();
@@ -40,6 +47,7 @@ export const PageAudit: React.FC = () => {
       console.warn(`[tabular] "${text.trim()}" sets its hyphen a digit wide; put TABULAR on the number alone`);
     }
     for (const c of crowded()) console.warn(`[crowded] ${c} at frame ${frame}`);
+    for (const c of mixed()) console.warn(`[mixed] ${c} at frame ${frame}`);
   }, [frame, on]);
   return null;
 };
@@ -138,6 +146,74 @@ function crowded(): string[] {
       return `"${t}"${p.highlight ? " (its highlight)" : ""}`;
     };
     out.push(`${name(a, true)} and ${name(b, false)} are ${gap.toFixed(1)}px apart (${(gap / em).toFixed(2)}em)`);
+  }
+  return out;
+}
+
+/** The most two neighbours on one line may differ in font size: 12%. */
+export const MIXED = 1.12;
+
+/** A face's family, by the first name in its stack: "sans", "serif" or "mono". */
+const family = (stack: string) => {
+  const first = stack.split(",")[0].replace(/["']/g, "").trim().toLowerCase();
+  if (/mono/.test(first)) return "mono";
+  if (/serif|fraunces|georgia|times/.test(first) && !/sans/.test(first)) return "serif";
+  return "sans";
+};
+
+function mixed(): string[] {
+  type Word = { r: DOMRect; owner: Element; text: string; size: number; face: string; script: boolean };
+  const words: Word[] = [];
+  const settled = (el: Element) => {
+    let a = 1;
+    for (let e: Element | null = el; e; e = e.parentElement) {
+      const st = getComputedStyle(e);
+      if (st.display === "none" || st.visibility === "hidden") return false;
+      a *= Number(st.opacity);
+    }
+    return a > 0.9;
+  };
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const text = node.textContent ?? "";
+    const first = text.search(/\S/);
+    const el = node.parentElement;
+    if (first < 0 || !el || !settled(el)) continue;
+    const st = getComputedStyle(el);
+    let script = false;
+    for (let e: Element | null = el; e && !script; e = e.parentElement) {
+      script = /^(SUP|SUB)$/i.test(e.tagName) || /super|sub/.test(getComputedStyle(e).verticalAlign);
+    }
+    const range = document.createRange();
+    range.setStart(node, first);
+    range.setEnd(node, text.trimEnd().length);
+    for (const r of range.getClientRects()) {
+      if (r.width < 1 || r.height < 1) continue;
+      words.push({ r, owner: el, text: text.trim(), size: parseFloat(st.fontSize), face: family(st.fontFamily), script });
+    }
+  }
+  const out: string[] = [];
+  for (const a of words) {
+    let best: { b: Word; gap: number } | null = null;
+    for (const b of words) {
+      if (a.owner === b.owner) continue;
+      const overlap = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
+      if (overlap < 0.5 * Math.min(a.r.height, b.r.height)) continue;
+      if (b.r.left <= a.r.left || b.r.right <= a.r.right) continue;
+      const gap = b.r.left - a.r.right;
+      if (gap < -0.25 * Math.min(a.size, b.size)) continue;
+      if (!best || gap < best.gap) best = { b, gap };
+    }
+    if (!best) continue;
+    const { b, gap } = best;
+    // Neighbours on one line: no further apart than a word or two.
+    if (gap > 1.2 * Math.max(a.size, b.size) || a.script || b.script) continue;
+    const ratio = Math.max(a.size, b.size) / Math.min(a.size, b.size);
+    const faces = a.face !== b.face && a.face !== "mono" && b.face !== "mono";
+    if (ratio <= MIXED && !faces) continue;
+    out.push(
+      `"${a.text.slice(-24)}" (${Math.round(a.size)}px ${a.face}) and "${b.text.slice(0, 24)}" (${Math.round(b.size)}px ${b.face}) share a line`,
+    );
   }
   return out;
 }
