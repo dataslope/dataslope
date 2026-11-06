@@ -340,6 +340,14 @@ export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: 
   return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height, background: HAIRLINE, opacity: p }} />;
 };
 
+/** The same hairline as an item of the columns' flex row, as tall as the
+ *  row's text: spread the row with `space-between` to centre it in its gap. */
+export const FlexRule: React.FC<{ at: number; out?: number }> = ({ at: from, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, from, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  return <div style={{ width: 1, alignSelf: "stretch", flexShrink: 0, background: HAIRLINE, opacity: Math.max(0, p) }} />;
+};
+
 /** A small panel title over a chart. */
 export const PanelTitle: React.FC<{ x: number; y: number; at: number; out?: number; children: React.ReactNode }> = ({ x, y, at: from, out, children }) => {
   const frame = useCurrentFrame();

@@ -168,7 +168,7 @@ export const MismatchScene: React.FC = () => {
           </span>
         </Note>
         <Verdict at={sumAt} x={RES_X} y={resBottom + h(26)} label={<Mono>SUM(budget)</Mono>} value={money(naiveBudget)} tone="bad" out={naiveOut} />
-        <Verdict at={sumAt + 10} x={RES_X} y={resBottom + h(80)} label={<Mono>SUM(amount)</Mono>} value={money(naiveSales)} out={naiveOut} size={26} />
+        <Verdict at={sumAt + 10} x={RES_X} y={resBottom + h(80)} label={<Mono>SUM(amount)</Mono>} value={money(naiveSales)} out={naiveOut} />
 
         {/* ── The fix: sales rolled up to days, then joined ── */}
         {days.map((d, k) => {
@@ -209,7 +209,7 @@ export const MismatchScene: React.FC = () => {
           </span>
         </Note>
         <Verdict at={againAt} x={RES_X} y={fg.rowTop(FIXED.rows.length) + h(80)} label={<Mono>SUM(budget)</Mono>} value={money(fixedBudget)} tone="ok" />
-        <Verdict at={againAt + 10} x={RES_X} y={fg.rowTop(FIXED.rows.length) + h(134)} label={<Mono>SUM(sales)</Mono>} value={money(fixedSales)} size={26} />
+        <Verdict at={againAt + 10} x={RES_X} y={fg.rowTop(FIXED.rows.length) + h(134)} label={<Mono>SUM(sales)</Mono>} value={money(fixedSales)} />
       </Drift>
     </AbsoluteFill>
   );

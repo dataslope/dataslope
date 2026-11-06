@@ -252,7 +252,6 @@ export const AdditiveScene: React.FC = () => {
               {closing} = <span style={{ color: OK_INK }}>{money(CLOSING_TOTAL)}</span>
             </>
           }
-          size={27}
         />
         <Note at={averageAt} x={R_X} y={y(652)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>or the average over the period</span>

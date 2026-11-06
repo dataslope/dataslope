@@ -3,10 +3,10 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import type { Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
-import { QMono, RapidFire, type RapidItem, Tick } from "../../editorial/interview";
+import { RapidFire, type RapidItem, Tick } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { NextLine, Note, Num } from "../../editorial/ui";
+import { ColumnRule, NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AOV_ALL, AOV_WORKING, BY_QUARTER, FISCAL_DIFFERS, HERO, HOLIDAYS, linesOf, money } from "./data";
@@ -25,11 +25,16 @@ import {
   OK,
   OK_INK,
   PanelHead,
+  QMono,
   Spot,
   X0,
 } from "./parts";
 
 const R_X = 840;
+/** The two teams' columns (420 apart): the hairline between them, from R_X,
+ *  and its height, a label and a line of sum. */
+const TEAM_RULE = 340;
+const TEAM_H = 66;
 const LIST_TOP = 340;
 const ROW = 64;
 
@@ -184,7 +189,7 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={planAt} x={R_X} y={c.y(352)}>
         <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-          Bus matrix <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}>· the plan</span>
+          Bus matrix <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>· the plan</span>
         </span>
       </Note>
       {/* The grid's rules. */}
@@ -274,7 +279,7 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
       />
       <Note at={martAt} x={R_X} y={rowTop(PROCESSES.length) + c.h(28)}>
         <span style={{ ...label(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-          Data mart <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}>· what gets built</span>
+          Data mart <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>· what gets built</span>
         </span>
       </Note>
       <Note at={salesAt} x={R_X} y={rowTop(PROCESSES.length) + c.h(78)}>
@@ -396,14 +401,18 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
           <div style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
             team {i === 0 ? "A" : "B"}: {tm.who}
           </div>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>
+          {/* One size across the sum: the answer stands out by weight and
+              color. */}
+          <div style={{ ...note(24, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>
             <Num>{money(col(tm.t, "revenue"))}</Num> / <Num>{col(tm.t, "orders")}</Num> ={" "}
-            <b style={{ fontSize: 32, color: ACCENT_INK }}>
+            <b style={{ fontWeight: 800, color: ACCENT_INK }}>
               <Num>{money(col(tm.t, "aov"))}</Num>
             </b>
           </div>
         </Note>
       ))}
+      {/* The two teams side by side, a hairline between them. */}
+      <ColumnRule x={R_X + TEAM_RULE} top={c.y(680)} height={TEAM_H} at={teams[1].at} />
       <Note at={teamsAt} x={R_X} y={c.y(800)}>
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>one name, two numbers</span>
       </Note>

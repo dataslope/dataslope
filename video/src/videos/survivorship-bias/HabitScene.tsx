@@ -19,9 +19,9 @@ const ROWS = [
 const ROW_Y = (i: number) => 330 + i * 126;
 const HERE_X = 120;
 const GONE_X = 780;
-/** The hairline between the columns: centred between the longest row on the
- *  left ("The planes that made it home") and the column on the right. */
-const RULE_X = 720;
+/** The hairline between the columns: centred between the end of the longest
+ *  row on the left ("The planes that made it home", ~626) and GONE_X. */
+const RULE_X = 703;
 
 /**
  * The habit: every dataset of survivors, and the column it is missing. Ends

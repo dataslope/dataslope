@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { BUBBLES, INK_WEEK, PARTS, SCATTER } from "./data";
-import { bandMid, BarSet, CATS, ColumnRule, Drift, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
+import { bandMid, BarSet, CATS, Drift, FlexRule, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -227,36 +227,36 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
     { name: "Power BI", at: c.w("r-tools", "Power BI fits the Microsoft stack"), text: "fits the Microsoft stack" },
     { name: "Looker", at: c.w("r-tools", "Looker defines metrics as code"), text: "metrics defined as code" },
   ];
-  // Three columns of plain text, a hairline centred in each gap: each name,
-  // and under it what it is for, wrapped to the column's width.
-  const colW = 250;
-  const pitch = colW + 80;
-  const colX = (k: number) => R_X + 40 + k * pitch;
-  const top = c.y(392);
+  // Three columns of plain text spread across the answer area, a hairline
+  // centred in each gap: each name, and under it what it is for.
+  const p0 = ease(frame, at0, 14);
   return (
     <>
-      {cards.map((card, k) => {
-        const p = ease(frame, at0 + k * 6, 14);
-        if (p <= 0) return null;
-        return (
-          <React.Fragment key={card.name}>
-            {k > 0 ? <ColumnRule x={colX(k) - 40} top={top} height={44 + 12 + 2 * 31} at={at0 + k * 6} /> : null}
-            <div
-              style={{
-                position: "absolute",
-                left: colX(k),
-                top,
-                width: colW,
-                opacity: p,
-                transform: `translateY(${(1 - p) * 12}px)`,
-              }}
-            >
-              <div style={{ ...headline(38), color: INK, lineHeight: "44px", whiteSpace: "nowrap" }}>{card.name}</div>
-              <div style={{ ...note(24, INK_SOFT), lineHeight: "31px", marginTop: 12, textWrap: "balance", opacity: ease(frame, card.at - 2, 12) }}>{card.text}</div>
-            </div>
-          </React.Fragment>
-        );
-      })}
+      <div
+        style={{
+          position: "absolute",
+          left: R_X + 40,
+          top: c.y(416),
+          width: R_END - (R_X + 40),
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          opacity: p0 > 0 ? 1 : 0,
+        }}
+      >
+        {cards.map((card, k) => {
+          const p = ease(frame, at0 + k * 6, 14);
+          return (
+            <React.Fragment key={card.name}>
+              {k > 0 ? <FlexRule at={at0 + k * 6} /> : null}
+              <div style={{ opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
+                <div style={{ ...headline(38), color: INK, lineHeight: "44px", whiteSpace: "nowrap" }}>{card.name}</div>
+                <div style={{ ...note(24, INK_SOFT), lineHeight: "31px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, card.at - 2, 12) }}>{card.text}</div>
+              </div>
+            </React.Fragment>
+          );
+        })}
+      </div>
       <Note at={biAt - 2} x={R_X + 40} y={c.y(600)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           all three are <b>BI</b> tools<span style={{ opacity: ease(frame, busAt - 2, 10) }}>: business intelligence</span>
