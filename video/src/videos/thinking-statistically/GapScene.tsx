@@ -29,8 +29,9 @@ const JIT_B = jitter(41, GAPS.n);
 const signed = (v: number) => `${v < 0 ? "−" : "+"}${fmt(Math.abs(v))}`;
 
 /**
- * Part 1 opens: two groups of forty, B ahead, then the reveal that both come
- * from one process, and four more draws whose gaps are never zero.
+ * Part 1 opens: two groups of forty, B ahead, then the reveal that both are
+ * made the same way (fifty, plus or minus luck), and four more draws whose
+ * gaps are never zero.
  */
 export const GapScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -46,8 +47,8 @@ export const GapScene: React.FC = () => {
   const halfAt = n.word("hook", "three");
   const betterAt = n.word("better", "better");
   const sameAt = n.word("same", "same");
-  const bothAt = n.word("same", "Both groups");
-  const processAt = n.word("same", "process");
+  const bothAt = n.word("same", "both groups");
+  const fiftyAt = n.word("same", "fifty");
   const noRealAt = n.word("same", "no real");
   const againAt = n.word("again", "again");
   const aheadAt = n.word("again", "A comes");
@@ -126,7 +127,7 @@ export const GapScene: React.FC = () => {
       {draws.map((d, k) => (
         <Sfx key={k} name="el-pop" at={d.bar} level={-29} />
       ))}
-      <Sfx name="el-pencil" at={processAt - 4} level={-33} />
+      <Sfx name="el-pencil" at={fiftyAt - 4} level={-33} />
       <Sfx name="el-pencil" at={noRealAt} level={-35} />
 
       <Kicker at={hookFrom - 10}>Signal and noise</Kicker>
@@ -147,7 +148,7 @@ export const GapScene: React.FC = () => {
       </div>
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         <Ink at={sameAt - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          Same process.
+          Made the same way.
         </Ink>
         <Ink at={neverAt - 6} dur={18} style={{ position: "relative", ...headline(80, true), color: STAT_INK, whiteSpace: "nowrap" }}>
           The gap is never zero.
@@ -198,11 +199,11 @@ export const GapScene: React.FC = () => {
         <span style={label(22, INK)}>Score</span>
       </Ink>
 
-      {/* The process both groups come from. */}
-      <TruthLine x={sx(X, GAPS.mu)} bottom={y(AXIS)} top={y(STRIP_A - 56)} at={processAt - 4} />
-      <Note at={processAt} x={sx(X, GAPS.mu)} y={y(AXIS + 44)} from="up">
+      {/* The one way both groups are made: fifty, plus or minus luck. */}
+      <TruthLine x={sx(X, GAPS.mu)} bottom={y(AXIS)} top={y(STRIP_A - 56)} at={fiftyAt - 4} />
+      <Note at={fiftyAt} x={sx(X, GAPS.mu)} y={y(AXIS + 44)} from="up">
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
-          Both from one process, which averages {GAPS.mu}
+          Every score: {GAPS.mu}, plus or minus luck
         </span>
       </Note>
 
