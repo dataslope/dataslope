@@ -4,12 +4,12 @@ import type { Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { STORE } from "./data";
-import { Chip, GhostRow, KEY, PathArrow, Ping, rowBox, RowStrike, RowWash } from "./parts";
+import { GhostRow, KEY, PathArrow, Ping, rowBox, RowStrike, RowWash } from "./parts";
 
 /** The store's diagram on the page: two rows of three boxes, in layout units. */
 export const STORE_TOP = 320;
@@ -268,10 +268,10 @@ export const StoreErd: React.FC = () => {
         >
           <span style={{ ...label(22, INK_SOFT) }}>facts of the link</span>
           <span style={{ opacity: ease(frame, howManyAt - 2, 10), transform: `translateY(${(1 - ease(frame, howManyAt - 2, 10)) * 8}px)` }}>
-            <Chip>how many</Chip>
+            <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>how many</span>
           </span>
           <span style={{ opacity: ease(frame, whatPriceAt - 2, 10), transform: `translateY(${(1 - ease(frame, whatPriceAt - 2, 10)) * 8}px)` }}>
-            <Chip>at what price</Chip>
+            <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>at what price</span>
           </span>
         </div>
       ) : null}

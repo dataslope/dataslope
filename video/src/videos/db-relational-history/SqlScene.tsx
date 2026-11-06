@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -226,10 +226,9 @@ export const SqlScene: React.FC = () => {
           );
         })}
       </div>
-      <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 880, top: y(520), whiteSpace: "nowrap" }}>
-        <div style={{ transform: "rotate(-5deg)", border: `3px solid ${ACCENT}`, borderRadius: 6, padding: "6px 16px" }}>
-          <span style={{ ...label(26, ACCENT_INK) }}>That name is taken</span>
-        </div>
+      <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 898, top: y(520) + 9, whiteSpace: "nowrap" }}>
+        {/* Plain words in the red of a trap, where a stamp's frame used to be. */}
+        <span style={{ ...label(26, ACCENT_INK), fontWeight: 700 }}>That name is taken</span>
       </Ink>
       <Spot
         id="db-relational-history-plane"
