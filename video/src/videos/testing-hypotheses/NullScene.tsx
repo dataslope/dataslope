@@ -6,7 +6,7 @@ import { body, HAIRLINE, INK, INK_SOFT } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Arrow, H0, Head, Label, Mark, pulse, Spot, STAT, STAT_INK } from "./parts";
+import { Arrow, H0, Head, Label, Mark, pulse, Spot, STAT, STAT_INK, STAT_WASH } from "./parts";
 
 /** Where the gavel sits, here and in the courtroom scene, so it carries over the cut. */
 export const GAVEL = { left: 120, top: 660, width: 270, height: 270 };
@@ -156,9 +156,11 @@ export const NullScene: React.FC = () => {
         </Label>
       </Ink>
       <Ink at={rejectAt - 4} dur={14} style={{ left: leftX - 30, top: outTop + 40 }}>
-        <span style={{ ...body(38, true), color: STAT_INK, whiteSpace: "nowrap" }}>
-          Reject <H0 />
-        </span>
+        <div style={{ background: STAT_WASH, borderRadius: 8, padding: "8px 18px", whiteSpace: "nowrap" }}>
+          <span style={{ ...body(38, true), color: STAT_INK }}>
+            Reject <H0 />
+          </span>
+        </div>
       </Ink>
       <Ink at={ordinaryAt} dur={14} style={{ left: rightX + 60, top: outTop, whiteSpace: "nowrap" }}>
         <Label size={22} color={INK_SOFT}>
@@ -166,9 +168,11 @@ export const NullScene: React.FC = () => {
         </Label>
       </Ink>
       <Ink at={failAt - 4} dur={14} style={{ left: rightX + 60, top: outTop + 40 }}>
-        <span style={{ ...body(38, true), color: INK, whiteSpace: "nowrap" }}>
-          Fail to reject <H0 />
-        </span>
+        <div style={{ border: `2px solid ${HAIRLINE}`, borderRadius: 8, padding: "6px 16px", whiteSpace: "nowrap" }}>
+          <span style={{ ...body(38, true), color: INK }}>
+            Fail to reject <H0 />
+          </span>
+        </div>
       </Ink>
 
       {/* The turn to the courtroom: the gavel arrives where the next scene keeps it. */}

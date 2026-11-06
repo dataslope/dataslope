@@ -9,18 +9,9 @@ import { Sfx } from "../../sound/Sfx";
 import { Arrow, Bracket, Drift, Headline, lerp, Marker, STAT, STAT_INK, Svg } from "./parts";
 
 const TRAPS = ["Simpson's paradox", "Cherry-picking", "The sharpshooter's target"];
-/** The three traps as one line of plain names with a middle dot between
- *  them, no boxes, and the bracket under exactly that line: the names run
- *  about 255, 204 and 343px, each dot about 49px with its space, so the
- *  line is about 900px. Its top keeps the line where the words sat inside
- *  their boxes; the bracket sits 12px under the descenders, its label 22px
- *  under it, all in px from y(TAG_Y). */
-const TRAPS_X = 160;
-const TRAPS_W = 900;
+/** The three traps as outlined tags, the bracket under the row of them. */
+const TAG_X = [160, 640, 1100];
 const TAG_Y = 360;
-const TRAPS_DY = 14;
-const BRACKET_DY = 84;
-const FLAW_DY = 106;
 const STEPS = ["Decide", "Look", "Confirm"];
 const STEP_X = [160, 560, 960];
 const STEP_Y = 620;
@@ -74,35 +65,25 @@ export const CloseScene: React.FC = () => {
 
       {/* The finished close eases in over the last words and the hold after them. */}
       <Drift from={freshAt} to={n.durationInFrames} amount={0.025} origin={[960, 560]}>
-      <div
-        style={{
-          position: "absolute",
-          left: TRAPS_X,
-          top: y(TAG_Y) + TRAPS_DY,
-          display: "flex",
-          alignItems: "baseline",
-          whiteSpace: "nowrap",
-          ...body(34, true),
-          color: INK,
-          opacity: 1 - ease(frame, cureAt - 4, 14) * 0.45,
-        }}
-      >
-        {TRAPS.map((t, i) => (
-          <React.Fragment key={t}>
-            {/* Each dot arrives with the name after it. */}
-            {i ? (
-              <Ink at={tagAt(i)} dur={12} style={{ position: "relative", padding: "40px 0.6em", margin: "-40px 0", color: INK_SOFT }}>
-                ·
-              </Ink>
-            ) : null}
-            <Ink at={tagAt(i)} dur={12} style={{ position: "relative" }}>
-              {t}
-            </Ink>
-          </React.Fragment>
-        ))}
-      </div>
-      <Bracket x0={TRAPS_X} x1={TRAPS_X + TRAPS_W} y={y(TAG_Y) + BRACKET_DY} at={flawAt - 4} up tick={14} color={STAT} width={2.6} />
-      <Ink at={dataAt - 6} dur={14} style={{ left: TRAPS_X, top: y(TAG_Y) + FLAW_DY, whiteSpace: "nowrap" }}>
+      {TRAPS.map((t, i) => (
+        <Ink key={t} at={tagAt(i)} dur={12} style={{ left: TAG_X[i], top: y(TAG_Y), whiteSpace: "nowrap" }}>
+          <div
+            style={{
+              padding: "12px 22px",
+              border: `2px solid ${INK}`,
+              borderRadius: 8,
+              background: PAPER,
+              ...body(34, true),
+              color: INK,
+              opacity: 1 - ease(frame, cureAt - 4, 14) * 0.45,
+            }}
+          >
+            {t}
+          </div>
+        </Ink>
+      ))}
+      <Bracket x0={TAG_X[0]} x1={TAG_X[2] + 420} y={y(TAG_Y) + 96} at={flawAt - 4} up tick={14} color={STAT} width={2.6} />
+      <Ink at={dataAt - 6} dur={14} style={{ left: TAG_X[0], top: y(TAG_Y) + 118, whiteSpace: "nowrap" }}>
         <span style={label(26, STAT_INK)}>
           one flaw: the data chose the analysis, <Marker at={advanceAt - 4}>not the plan</Marker>
         </span>
