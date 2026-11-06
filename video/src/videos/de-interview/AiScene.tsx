@@ -22,7 +22,7 @@ const COLS_Y = 580;
 const COL_W = 516;
 const COLS_W = 1800 - X0;
 /** The page's pointer, under the columns. */
-const POINTER_Y = 860;
+const POINTER_Y = 820;
 
 /** One point: its title, then its lines, the title inking in on `at`. It
  *  holds its place before it inks, so the row never reflows. */

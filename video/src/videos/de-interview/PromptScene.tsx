@@ -6,8 +6,9 @@ import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, body, label, note } from 
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { MONO } from "../../theme/fonts";
 import { partOf } from "./data";
-import { Drift, Flow, Headline, Kicker, Mono, Spot } from "./parts";
+import { Drift, Flow, Headline, Kicker, Spot } from "./parts";
 
 /** The stack's left edge, its right edge, and the arrow beside it. The
  *  layers are rows of plain text ruled off by a hairline, not boxes. */
@@ -32,6 +33,12 @@ const DESIGN_X = 1494;
 const MEERKAT_CX = 1655;
 const MEERKAT_W = 180;
 const MEERKAT_H = 220;
+
+/** QUALIFY in the mono face, at a size within the house's 12% of the words
+ *  it shares its line with (Mono's 0.88em sets it 23px beside 26px). */
+const QualifyMono: React.FC = () => (
+  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: 600, fontVariantLigatures: "none" }}>QUALIFY</span>
+);
 
 type Layer = {
   name: string;
@@ -104,7 +111,7 @@ export const PromptScene: React.FC = () => {
       parts: ["de-sql-patterns", "de-sql-performance"],
       chips: [
         { at: n.word("probe-sql", "window functions"), text: "window functions", line: 0 },
-        { at: n.word("probe-sql", "qualify"), text: <Mono>QUALIFY</Mono>, line: 0 },
+        { at: n.word("probe-sql", "qualify"), text: <QualifyMono />, line: 0 },
         { at: n.word("probe-sql", "deduplication"), text: "deduplication", line: 0 },
         { at: n.word("probe-sql", "gaps and islands"), text: "gaps and islands", line: 1 },
         { at: n.word("probe-sql", "incremental logic"), text: "incremental logic", line: 1 },
