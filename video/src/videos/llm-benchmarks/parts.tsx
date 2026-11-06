@@ -128,7 +128,9 @@ export const Marked: React.FC<{ at: number; color?: string; out?: number; childr
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.08em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.08em" }}>
       <span
         style={{
           position: "absolute",

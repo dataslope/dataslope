@@ -218,6 +218,18 @@ Every video follows these rules.
   one in the drawn page, which also catches text that arrives as a value (a
   sheet cell "P-101", a list item): `PageAudit` in `src/editorial/audit.tsx`
   reads the page while it renders.
+- **A space stays a space.** Words set as separate elements are spaced by
+  margins, so two things can eat the space between them. An `em` gap on a
+  flex row means the row's own font size, which is the page default (16px)
+  when only the children set one: "0.36em" between 40px words came out at
+  5.8px, so set `fontSize` on the row. And a highlight drawn behind a word
+  reaches past it on both sides; every highlight component (`Mark`,
+  `Marked`, `Marker`, `Sweep`) takes the same width back as margin, so a
+  neighbour keeps a full space from the band. `check:frames` measures every
+  pair of neighbouring words on a line, a highlight counting as part of its
+  word, and fails a gap under 0.15em that holds for two samples: the "of"
+  and highlighted "2,097,152" of ListVsSet were 3.7px apart. Words meant to
+  touch (punctuation, one line of code, letters set one by one) pass.
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative
@@ -935,7 +947,8 @@ npm test              # timing, scene cuts, word cues, voices, arrowheads
 npm run check:cues    # every word cue says which occurrence it means (no render)
 npm run check:frames  # a frame every half second at --scale=2 (about a minute):
                       # illustrations sharp at 4K, arrowheads on straight ends,
-                      # no hyphen set in tabular figures
+                      # no hyphen set in tabular figures, a space between words
+                      # (CHECK_SCALE=1 for a quicker layout-only sweep)
 npm run check:sync -- <video>   # a voiced video: every beat starts where its cue says
 npm run check:mix -- <video>    # a video with sound effects: how far under the voice they sit
 npm run check:motion -- <video> # the picture never holds still for 3 s (renders a half-size preview)

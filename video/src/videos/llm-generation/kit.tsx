@@ -129,7 +129,9 @@ export const Marked: React.FC<{ at: number; out?: number; color?: string; childr
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   return (
-    <span style={{ position: "relative", whiteSpace: "nowrap" }}>
+    // The highlight reaches 0.18em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", whiteSpace: "nowrap", margin: "0 0.18em" }}>
       <span
         style={{
           position: "absolute",

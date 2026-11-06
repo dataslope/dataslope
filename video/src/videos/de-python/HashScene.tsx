@@ -229,7 +229,9 @@ export const HashScene: React.FC = () => {
           >
             <span style={{ ...body(30, true), color: INK }}>bucket 999,999</span>
             <span style={{ ...body(30, true), color: INK_SOFT }}>of</span>
-            <span style={{ position: "relative", ...headline(34), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums" }}>
+            <span style={{ position: "relative", ...headline(34), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums", marginLeft: "0.15em" }}>
+              {/* The highlight reaches 0.1em past the number, so the number
+                  keeps 0.15em of margin: a full space between it and "of". */}
               <span
                 style={{
                   position: "absolute",

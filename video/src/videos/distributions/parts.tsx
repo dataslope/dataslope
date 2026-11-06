@@ -251,7 +251,9 @@ export const Sweep: React.FC<{ at: number; out?: number; color?: string; childre
   const p = ease(frame, at, 14);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.12em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.12em" }}>
       <span
         style={{
           position: "absolute",
