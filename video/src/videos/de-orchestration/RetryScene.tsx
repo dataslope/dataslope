@@ -113,7 +113,7 @@ export const RetryScene: React.FC = () => {
         <Note at={sameAt} x={X0 + 20} y={y(646)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the same failure, every time</span>
         </Note>
-        <Pill x={X0} y={y(740)} at={idemAt} ink={OK_INK} size={24}>
+        <Pill x={X0} y={y(740)} at={idemAt} tone="green" size={24}>
           retry only idempotent tasks
         </Pill>
 

@@ -228,7 +228,7 @@ export const FreshScene: React.FC = () => {
           { text: "transform", at: greenAt + 3 },
           { text: "load", at: loadAt },
         ].map((t, i) => (
-          <Pill key={t.text} x={X0 + i * 230} y={y(770)} at={t.at} ink={OK_INK} size={24}>
+          <Pill key={t.text} x={X0 + i * 230} y={y(770)} at={t.at} tone="green" size={24}>
             {t.text} ✓
           </Pill>
         ))}
@@ -238,10 +238,10 @@ export const FreshScene: React.FC = () => {
           </span>
         </Note>
         <VRule x={X0 + 640} top={y(770)} height={y(832) + PILL_H - y(770)} at={onlyAt + 2} />
-        <Pill x={X0 + 720} y={y(770)} at={onlyAt + 2} ink={ACCENT_INK} size={24}>
+        <Pill x={X0 + 720} y={y(770)} at={onlyAt + 2} tone="red" size={24}>
           freshness check ✗
         </Pill>
-        <Pill x={X0 + 720} y={y(832)} at={countAt + 2} ink={ACCENT_INK} size={24}>
+        <Pill x={X0 + 720} y={y(832)} at={countAt + 2} tone="red" size={24}>
           <span>
             row count: <Num>{FRESH.missedDayRows}</Num> ✗
           </span>

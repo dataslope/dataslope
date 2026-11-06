@@ -5,7 +5,8 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
+import { badgeStyle, type BadgeTone } from "../../editorial/ui";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -255,18 +256,19 @@ export const CodeSpan: React.FC<{ size?: number; color?: string; children: React
   <span style={{ fontFamily: MONO, fontSize: Math.max(19, size), fontWeight: 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>{children}</span>
 );
 
-/** A small rounded tag on the page: a check's name, a setting, a state. */
+/** A small tag on the page (a check's name, a setting, a state) as the
+ *  house badge (`badgeStyle`): a light tint of its hue in that hue's ink, no
+ *  border. It rises in on `at`. */
 export const Pill: React.FC<{
   x: number;
   y: number;
   at: number;
-  ink?: string;
-  fill?: string;
+  tone?: BadgeTone;
   size?: number;
   out?: number;
   dim?: number;
   children: React.ReactNode;
-}> = ({ x, y, at: from, ink = INK, fill = PAPER, size = 22, out, dim, children }) => {
+}> = ({ x, y, at: from, tone = "gray", size = 22, out, dim, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -275,18 +277,14 @@ export const Pill: React.FC<{
   return (
     <div
       style={{
+        ...badgeStyle(tone, size),
         position: "absolute",
         left: x,
         top: y,
         display: "flex",
         alignItems: "center",
         gap: 8,
-        padding: `${Math.round(size * 0.28)}px ${Math.round(size * 0.62)}px`,
-        border: `2px solid ${ink}`,
-        borderRadius: 999,
-        background: fill,
-        ...label(size, ink),
-        whiteSpace: "nowrap",
+        fontFamily: SANS,
         opacity: p * (1 - o) * (1 - d),
         transform: `translateY(${(1 - p) * 10}px)`,
       }}

@@ -215,10 +215,10 @@ export const DagsterScene: React.FC = () => {
             />
           );
         })}
-        <Pill x={RIGHT_X} y={y(660)} at={linAt} ink={OK_INK} size={23}>
+        <Pill x={RIGHT_X} y={y(660)} at={linAt} tone="green" size={23}>
           lineage, built in
         </Pill>
-        <Pill x={RIGHT_X + 260} y={y(660)} at={freshAt + 6} ink={OK_INK} size={23}>
+        <Pill x={RIGHT_X + 260} y={y(660)} at={freshAt + 6} tone="green" size={23}>
           freshness, built in
         </Pill>
         <Note at={knowsAt} x={RIGHT_X} y={y(728)}>
@@ -226,10 +226,10 @@ export const DagsterScene: React.FC = () => {
             every asset knows what produced it<span style={{ opacity: ease(frame, whenAt, 10) }}>, and when</span>
           </span>
         </Note>
-        <Pill x={RIGHT_X} y={y(790)} at={typingAt} ink={BLUE_INK} size={22}>
+        <Pill x={RIGHT_X} y={y(790)} at={typingAt} tone="blue" size={22}>
           stronger typing
         </Pill>
-        <Pill x={RIGHT_X + 236} y={y(790)} at={testingAt - 4} ink={BLUE_INK} size={22}>
+        <Pill x={RIGHT_X + 236} y={y(790)} at={testingAt - 4} tone="blue" size={22}>
           testing primitives
         </Pill>
         <Note at={typingAt + 8} x={RIGHT_X} y={y(846)}>

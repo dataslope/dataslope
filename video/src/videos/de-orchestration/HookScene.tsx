@@ -209,7 +209,7 @@ export const HookScene: React.FC = () => {
           { text: "recovery from failure", at: recoverAt },
           { text: "bad data caught early", at: badAt },
         ].map((c, i) => (
-          <Pill key={c.text} x={X0 + [0, 270, 620][i]} y={y(650)} at={c.at - 2} ink={BLUE_INK} size={25}>
+          <Pill key={c.text} x={X0 + [0, 270, 620][i]} y={y(650)} at={c.at - 2} tone="blue" size={25}>
             {c.text}
           </Pill>
         ))}

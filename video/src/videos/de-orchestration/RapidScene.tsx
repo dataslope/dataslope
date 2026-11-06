@@ -80,7 +80,7 @@ const Deps: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>instead, wait on the data:</span>
       </Note>
       {opts.map((o, i) => (
-        <Pill key={o.text} x={R_X} y={c.y(684) + i * c.h(54)} at={o.at - 2} ink={OK_INK} size={23}>
+        <Pill key={o.text} x={R_X} y={c.y(684) + i * c.h(54)} at={o.at - 2} tone="green" size={23}>
           {o.text}
         </Pill>
       ))}

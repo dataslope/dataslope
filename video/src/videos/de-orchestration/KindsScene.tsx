@@ -216,7 +216,7 @@ export const KindsScene: React.FC = () => {
         </Note>
 
         {/* What all three need. */}
-        <Pill x={X_START} y={y(800)} at={safeAt} ink={OK_INK} size={26}>
+        <Pill x={X_START} y={y(800)} at={safeAt} tone="green" size={26}>
           all three: safe only on idempotent tasks
         </Pill>
         <Note at={sameAt} x={X_START + 640} y={y(806)}>
