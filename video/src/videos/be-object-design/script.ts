@@ -63,9 +63,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *               beside the cart with a "has a" link; before and after both
  *               3. "comp-mix": a 3 by 3 grid of subclass names (nine), then a
  *               fourth row (twelve); beside it, two short columns of parts,
- *               three channels and three timings (six, then seven).
- *               "comp-swap": one customer's timing part slides from "now" to
- *               "daily digest".
+ *               three channels and three timings (six, then seven); then
+ *               one customer's timing part slides from "now" to "daily
+ *               digest".
  *   lsp         A rectangle 2 by 3 and a square 3 by 3. "lsp-break": a
  *               caller sets width 5, height 4: the rectangle reads 20 (green),
  *               the square 16 (red). "lsp-rule": two arrows, "demand no
@@ -225,12 +225,12 @@ export const script: NarrationScript = {
     },
     {
       id: "comp-cart",
-      text: "The shop's loyalty program extends the shopping cart, and counts each item as it's added. The cart's add-all adds items one at a time, so three items count three.",
+      text: "The shop's loyalty program extends the shopping cart, and counts each item as it's added. The cart's add-all adds them one at a time, so three items count three.",
       pauseAfter: 0.5,
     },
     {
       id: "comp-break",
-      text: "Then the cart team speeds add-all up, so it no longer adds them one at a time. The loyalty count for those three items drops to zero, and nobody touched the loyalty code.",
+      text: "Then the cart team speeds add-all up, and it stops adding them one at a time. The count for those three drops to zero, and nobody touched the loyalty code.",
       pauseAfter: 0.8,
     },
     {
@@ -240,12 +240,7 @@ export const script: NarrationScript = {
     },
     {
       id: "comp-mix",
-      text: "It also combines freely. Notifications go by email, text or push, and now, in a daily digest, or after quiet hours. A subclass per pair is nine, and a fourth channel makes twelve. Composition gives each notifier one channel and one timing: six parts, then seven.",
-      pauseAfter: 0.6,
-    },
-    {
-      id: "comp-swap",
-      text: "And a customer who switches to the digest swaps one part, at runtime.",
+      text: "It also combines freely. Notifications go by email, text or push, and now, in a daily digest, or after quiet hours. A subclass per pair is nine, and a fourth channel makes twelve. Composition gives each notifier one channel and one timing: six parts, then seven. A customer who switches to the digest swaps one part, at runtime.",
       pauseAfter: 0.6,
     },
     {

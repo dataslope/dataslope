@@ -138,7 +138,7 @@ export const TableScene: React.FC = () => {
         {/* "Products": the lesson's two, a notebook and a pen, top right above their table. */}
         <Spot id="db-entities-notebook" at={productsAt} left={1620} top={y(202)} width={180} height={175} />
         {/* "A product has a price": a price tag under the price column. */}
-        <Spot id="db-entities-price-tag" at={priceAt} left={1400} top={y(708)} width={220} height={176} />
+        <Spot id="db-entities-price-tag" at={priceAt} left={1400} top={y(728)} width={220} height={176} />
 
         <Ink at={rememberFrom - 2} dur={18} style={{ left: CUSTOMERS_X, top: y(800), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>What do you need to remember about each one?</span>

@@ -129,7 +129,7 @@ export const DomainScene: React.FC = () => {
         {/* "Shipped": a delivery van in the empty right half, gone before the CHECKs arrive there. */}
         <Spot id="db-entities-van" at={spellAt[1]} out={narrowAt - 6} left={1330} top={y(408)} width={260} height={182} />
         {/* "The status banana": a banana under the table it never got into. */}
-        <Spot id="db-entities-banana" at={bananaAt} left={150} top={y(778)} width={220} height={164} />
+        <Spot id="db-entities-banana" at={bananaAt} left={160} top={y(804)} width={190} height={141} />
 
         {/* ── The narrow domain: the lesson's two CHECKs ── */}
         <Fig n="7" at={listAt - 2} x={RIGHT_X} y={listTop - FIG_GAP}>

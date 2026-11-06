@@ -50,7 +50,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     lines. On "bugs-past", the invented-API card's error lights (the one
  *     loud kind), the six quiet cards dim to gray, and three of them
  *     (boundaries, assumptions, tests that agree) lift out and move beside
- *     the eight lines.
+ *     the diff.
  *   - "debug" to "debug-past": the five steps as a numbered column on the
  *     left, each lit as it is named, the listing on the right. "debug-report":
  *     a report card, [[8, 10], [1, 3], [2, 6]] in, [[8, 6]] out, the 8 and

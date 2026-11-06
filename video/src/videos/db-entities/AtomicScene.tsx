@@ -158,14 +158,14 @@ export const AtomicScene: React.FC = () => {
           {/* "Boxes and facts": the two boxes the next part draws. */}
           <BoxPulse x={customers.x} y={customers.y} width={BOX_W} height={customers.height} at={boxesAt} />
           <BoxPulse x={addresses.x} y={addresses.y} width={BOX_W} height={addresses.head} at={boxesAt + 4} />
-          {/* "Saved addresses": a house and its mailbox, beside the new entity. */}
-          <Spot id="db-entities-house" at={savedAt} left={BOX_X + 10} top={y(644)} width={240} height={191} />
           <Note at={tooAt + 2} x={BOX_X} y={addresses.bottom + 46} from="up">
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
               An entity of its own, <span style={{ color: INK_SOFT }}>many per customer</span>
             </span>
           </Note>
         </div>
+        {/* "Saved addresses": a house and its mailbox, right of the new entity once it has settled. */}
+        <Spot id="db-entities-house" at={savedAt} left={1270} top={y(644)} width={240} height={191} />
       </Drift>
     </AbsoluteFill>
   );

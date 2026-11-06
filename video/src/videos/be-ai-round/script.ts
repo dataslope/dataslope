@@ -117,7 +117,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     an output token costs 5 input tokens; halving the 2,000-token prompt
  *     saves 1,000 dollars a day, halving the 300-token answer 750. Input is
  *     57% of the cost and 87% of the tokens (results.json; not said).
- *   - "inj": OWASP's ranking ([^owasp]), direct and indirect, the defenses,
+ *   - "inj": OWASP's ranking ([^owasp]; "the security project OWASP" is the
+ *     video's gloss), direct and indirect, the defenses,
  *     and the dangerous combination, as the page words them; the refund
  *     email is the page's own concept check, and "inj-weak" is that check's
  *     three wrong answers and their explanations.
@@ -131,11 +132,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   can tell good code from plausible code") as the series' last word.
  *
  * Written for Drew's ear: initialisms as people write them (AI, API, LLM,
- * HTTP-free: status codes are said as numbers, "four twenty-nines"; SQL,
- * HTML, ID; OWASP and METR are said as words, for the lexicon), LLM expanded
- * once in "plan"; numbers as they are said; no sentence opens on "A" before
- * an initialism. Products: Canva, Google, Copilot and METR are the page's
- * sources and examples, named as such; none runs here.
+ * SQL, HTML, ID), LLM expanded once, in "plan"; OWASP and METR are said as
+ * words (for the lexicon), and OWASP is glossed as a security project; HTTP
+ * status codes are said as numbers ("four twenty-nines"), server errors in
+ * words; numbers as they are said; no sentence opens on "A" before an
+ * initialism. Canva, Google, Copilot and METR are the page's sources and
+ * examples, named as such; nothing of theirs runs here.
  */
 export const script: NarrationScript = {
   id: "be-ai-round",
