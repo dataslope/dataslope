@@ -1,7 +1,8 @@
 import type { CharacterAlignment } from "./types";
 
 /**
- * How the narrator says an initialism that people say as a word. A script
+ * How the narrator says an initialism (or a technical word, like RESTful or
+ * deque) that people say as a word. A script
  * writes the initialism as everyone writes it (SQL, DAG), and
  * scripts/narrate.mjs sends this spoken form instead, then maps the voice's
  * character timing back onto the written text. So cues, captions and the
@@ -27,6 +28,26 @@ export const SAY: Readonly<Record<string, string>> = {
   SKUs: "skews",
   CUPED: "cue-ped",
   SUTVA: "sut-vuh",
+  // The Backend / Software Engineer series (2026-11-06). JSON and ACID were
+  // already said in llm-tokens and de-warehousing; those beats re-voice only
+  // if those videos are narrated again.
+  REST: "rest",
+  RESTful: "restful",
+  JSON: "jay-son",
+  OAuth: "oh-auth",
+  HATEOAS: "hate-ee-oss",
+  NoSQL: "no-sequel",
+  ACID: "acid",
+  CAP: "cap",
+  PACELC: "pass-elk",
+  GIL: "gill",
+  SOLID: "solid",
+  YAGNI: "yag-nee",
+  OWASP: "oh-wasp",
+  METR: "meter",
+  ASCII: "ask-ee",
+  XOR: "ex-or",
+  deque: "deck",
 };
 
 /** Longest first, so DAGs is matched before DAG. A key matches as a whole

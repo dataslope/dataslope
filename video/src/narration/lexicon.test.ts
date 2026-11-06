@@ -24,9 +24,11 @@ test("an initialism is said as a word only as a whole token", () => {
   assert.equal(spokenText("SQL fluency. Then SQL again. DAG first"), "Sequel fluency. Then sequel again. Dag first");
 });
 
-test("every lexicon key is a plain-caps initialism, said in lower case as a word", () => {
+test("every lexicon key is an initialism or a technical word, said in lower case as a word", () => {
   for (const [written, spoken] of Object.entries(SAY)) {
-    assert.match(written, /^[A-Z]{2,}s?$/, written);
+    // Plain caps (SQL, DAGs) or a word as people write it (RESTful, NoSQL,
+    // OAuth, deque): letters only, so a key matches as a whole token.
+    assert.match(written, /^[A-Za-z]{3,}$/, written);
     // Lower case is what makes the voice read it as a word, even when the
     // letters are the same ("dag" for DAG).
     assert.match(spoken, /^[a-z][a-z' -]*$/, `${written}: "${spoken}"`);
