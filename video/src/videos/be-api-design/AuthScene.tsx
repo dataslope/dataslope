@@ -141,7 +141,7 @@ export const AuthScene: React.FC = () => {
   const J = PANELS[1];
   const lines = tokenLines();
   const tokenTop = bodyTop + h(34);
-  const claimsTop = tokenTop + lines.length * 28 + h(70);
+  const claimsTop = tokenTop + lines.length * 28 + h(80);
   const claimLine = (k: string, v: string | number) => `"${k}": ${typeof v === "string" ? `"${v}"` : v}`;
 
   // ── OAuth ──
@@ -277,12 +277,12 @@ export const AuthScene: React.FC = () => {
             ))}
           </div>
         </Note>
-        <Note at={sigAt} x={J.x} y={claimsTop + h(140)} out={leave}>
+        <Note at={sigAt} x={J.x} y={claimsTop + h(150)} out={leave}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             the <span style={{ color: PART_INK.signature, fontWeight: 650 }}>signature</span> proves who issued it
           </span>
         </Note>
-        <Note at={verifiesAt} x={J.x} y={claimsTop + h(184)} out={leave}>
+        <Note at={verifiesAt} x={J.x} y={claimsTop + h(194)} out={leave}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 23 }}>
             <Cross at={verifiesAt + 2} size={22} />
             <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>role changed: it no longer verifies</span>
@@ -443,7 +443,7 @@ export const AuthScene: React.FC = () => {
 
         {/* Hairlines between the panels, and between Question 8's two sides. */}
         {[610, 1247].map((x, i) => (
-          <VRule key={x} x={x} top={headTop} bottom={claimsTop + h(184) + 30} at={diffAt + (i + 1) * 6} out={leave} />
+          <VRule key={x} x={x} top={headTop} bottom={claimsTop + h(194) + 30} at={diffAt + (i + 1) * 6} out={leave} />
         ))}
         <VRule x={890} top={bTop} bottom={Math.max(storeB.y + storeB.h + h(28) + twoH, svcRow + h(80) + 30)} at={locallyAt} />
       </Drift>

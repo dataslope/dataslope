@@ -190,7 +190,7 @@ export const DiagramScene: React.FC = () => {
         <Line x={RX} y={y(296)} at={hitAt} out={pathOut} size={26} weight={700}>
           Cache hit
         </Line>
-        <Line x={RX} y={y(296) + 56} at={tripsAt} out={pathOut} size={26} weight={700} color={OK_INK}>
+        <Line x={RX} y={y(296) + 48} at={tripsAt} out={pathOut} size={26} weight={700} color={OK_INK}>
           <Num>2</Num> round trips
           <span style={{ opacity: ease(frame, msAt, 10) }}>
             {" "}
@@ -200,10 +200,10 @@ export const DiagramScene: React.FC = () => {
         <Line x={RX} y={y(296) + 128} at={missAt} out={pathOut} size={26} weight={700}>
           Cache miss
         </Line>
-        <Line x={RX} y={y(296) + 184} at={sixAt} out={pathOut} size={26} weight={700} color={INK}>
+        <Line x={RX} y={y(296) + 176} at={sixAt} out={pathOut} size={26} weight={700} color={INK}>
           <Num>3</Num> trips + SSD ≈ <Num>{LADDER.path.missMs}</Num> ms
         </Line>
-        <Line x={RX} y={y(296) + 240} at={sixAt + 8} out={pathOut} size={21} color={INK_SOFT}>
+        <Line x={RX} y={y(296) + 228} at={sixAt + 8} out={pathOut} size={21} color={INK_SOFT}>
           network time only, from the ladder
         </Line>
 
@@ -220,16 +220,16 @@ export const DiagramScene: React.FC = () => {
         <Line x={RX} y={y(296)} at={askAt} size={26} weight={700}>
           One shared counter
         </Line>
-        <Line x={RX} y={y(296) + 56} at={bottleAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
+        <Line x={RX} y={y(296) + 48} at={bottleAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
           a bottleneck
         </Line>
-        <Line x={RX} y={y(296) + 112} at={failAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
+        <Line x={RX} y={y(296) + 96} at={failAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
           and one more thing to fail
         </Line>
-        <Line x={RX} y={y(296) + 184} at={blockAt} size={26} weight={700} color={OK_INK}>
+        <Line x={RX} y={y(296) + 176} at={blockAt} size={26} weight={700} color={OK_INK}>
           A block of IDs per server
         </Line>
-        <Line x={RX} y={y(296) + 240} at={millionAt} size={26} weight={650} color={OK_INK}>
+        <Line x={RX} y={y(296) + 224} at={millionAt} size={26} weight={650} color={OK_INK}>
           <Num>{int(KEY.idBlock)}</Num> at a time
         </Line>
 

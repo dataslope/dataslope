@@ -55,8 +55,6 @@ export const KeyScene: React.FC = () => {
   const cell = 46;
   const cellsX = X0 + 330;
 
-  // The hash path, left to right.
-  const flowY = y(560);
 
   return (
     <AbsoluteFill>
@@ -167,7 +165,7 @@ export const KeyScene: React.FC = () => {
         <Line x={RX} y={secY} at={hashAt} size={28} weight={700}>
           Or a hash of the long URL
         </Line>
-        <div style={{ position: "absolute", left: RX, top: flowY - 20, display: "flex", alignItems: "center", gap: 16, fontSize: 27 }}>
+        <div style={{ position: "absolute", left: RX, top: secY + 60, display: "flex", alignItems: "center", gap: 16, fontSize: 27 }}>
           <span style={{ ...note(27, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, hashAt + 4, 10) }}>long URL</span>
           <InlineArrow at={hashAt + 10} w={40} />
           <span style={{ ...note(27, INK), fontWeight: 650, opacity: ease(frame, hashAt + 14, 10) }}>hash</span>

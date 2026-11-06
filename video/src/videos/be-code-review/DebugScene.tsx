@@ -315,7 +315,7 @@ export const DebugScene: React.FC = () => {
         <Note at={lastAt} x={LIST_X} y={B} out={step2 - 6}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>each interval is compared only with the last one merged</span>
         </Note>
-        <Note at={orderAt} x={LIST_X} y={B + 44} out={step2 - 6}>
+        <Note at={orderAt} x={LIST_X} y={B + 58} out={step2 - 6}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             safe only if <Mark at={orderAt + 6}>the order</Mark> holds
           </span>
@@ -357,7 +357,7 @@ export const DebugScene: React.FC = () => {
             hypothesis: the loop assumes its input is <Mark at={sortedAt + 10}>sorted</Mark>
           </span>
         </Note>
-        <Note at={beforeAt} x={LIST_X} y={B + 56} out={step4 - 6}>
+        <Note at={beforeAt} x={LIST_X} y={B + 60} out={step4 - 6}>
           <span style={{ display: "flex", gap: 16, alignItems: "center", whiteSpace: "nowrap", fontSize: 22 }}>
             <Code line={`merge_intervals(sorted(${DEBUG.repro.arg}))`} size={22} />
             <span style={note(22, INK_SOFT)}>returns</span>
@@ -395,7 +395,7 @@ export const DebugScene: React.FC = () => {
           { at: whyAt, q: "Why is the fix right?", a: "the sort guarantees it", aAt: guaranteesAt },
           { at: elseAt, q: "What else might share the flaw?", a: "", aAt: elseAt },
         ].map((r, i) => (
-          <Note key={i} at={r.at} x={LIST_X} y={B + i * 44} out={aiAt - 6}>
+          <Note key={i} at={r.at} x={LIST_X} y={B + i * 56} out={aiAt - 6}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               <span style={{ fontWeight: 650 }}>{r.q}</span>
               {r.a ? (
@@ -416,11 +416,11 @@ export const DebugScene: React.FC = () => {
           { at: doesAt, text: "What does this function do?" },
           { at: couldAt, text: "What could make it return an interval that ends before it starts?" },
         ].map((b, i) => (
-          <Note key={i} at={b.at} x={LIST_X} y={B + 38 + i * 46} out={pastAt - 6}>
+          <Note key={i} at={b.at} x={LIST_X} y={B + 36 + i * 58} out={pastAt - 6}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>&ldquo;{b.text}&rdquo;</span>
           </Note>
         ))}
-        <Note at={noSubAt + 4} x={LIST_X} y={B + 142} out={pastAt - 6}>
+        <Note at={noSubAt + 4} x={LIST_X} y={B + 162} out={pastAt - 6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             no substitute for <Mark at={noSubAt + 10}>step 2, reproducing it</Mark>
           </span>

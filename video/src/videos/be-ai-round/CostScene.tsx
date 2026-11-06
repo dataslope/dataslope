@@ -243,7 +243,7 @@ export const CostScene: React.FC = () => {
         {[levers.slice(0, 2), levers.slice(2)].map((row, r) => (
           <div
             key={r}
-            style={{ position: "absolute", left: X0, top: y(BAR_B.v) + barH + h(20 + r * 40), display: "flex", alignItems: "baseline", gap: 14, fontSize: 23 }}
+            style={{ position: "absolute", left: X0, top: y(BAR_B.v) + barH + h(12 + r * 36), display: "flex", alignItems: "baseline", gap: 14, fontSize: 23 }}
           >
             {row.map((l, i) => {
               const p = ease(frame, l.at - 2, 12);
@@ -256,22 +256,22 @@ export const CostScene: React.FC = () => {
             })}
           </div>
         ))}
-        <Note at={afterAt} x={NEXT_X} y={y(BAR_B.v) - 44}>
+        <Note at={afterAt} x={NEXT_X} y={y(BAR_B.v) - 40}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>after that</span>
         </Note>
         {nexts.map((l, i) => (
-          <Ink key={l.text} at={l.at} dur={12} style={{ left: NEXT_X, top: y(BAR_B.v) + h(4 + i * 40) }}>
+          <Ink key={l.text} at={l.at} dur={12} style={{ left: NEXT_X, top: y(BAR_B.v) + h(-2 + i * 40) }}>
             <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{l.text}</span>
           </Ink>
         ))}
 
         {/* Per token, and per request. */}
-        <Note at={fiveAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(22)}>
+        <Note at={fiveAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(12)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             per token, output costs <b>{COST.outputPerTokenRatio}×</b> input
           </span>
         </Note>
-        <Note at={fewerAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(62)}>
+        <Note at={fewerAt - 2} x={X0 + COST.input * BAR_B.px + 3} y={y(BAR_B.v) + barH + h(48)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             but a request has <Num>{thousands(COST.inputTokens)}</Num> in, <Mark at={fewerAt + 6}><Num>{COST.outputTokens}</Num> out</Mark>
           </span>

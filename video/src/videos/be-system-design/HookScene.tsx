@@ -121,7 +121,7 @@ export const HookScene: React.FC = () => {
               >
                 <span style={{ ...note(31, c.ink), fontWeight: 650, whiteSpace: "nowrap" }}>{c.text}</span>
               </div>
-              <Ink at={c.at + 2} dur={12} style={{ left: c.x + 64, top: cardsTop + CARD_H / 2 + 22 }}>
+              <Ink at={c.at + 2} dur={12} style={{ left: c.x + 64, top: cardsTop + CARD_H / 2 + 12 }}>
                 <span style={{ ...label(22, c.trendInk), whiteSpace: "nowrap", opacity: 1 - dimCards }}>{c.trend}</span>
               </Ink>
               <div style={{ position: "absolute", inset: 0, opacity: 1 - dimCards }}>
@@ -131,7 +131,7 @@ export const HookScene: React.FC = () => {
           );
         })}
 
-        <VRule x={582} top={cardsTop + 16} bottom={cardsTop + CARD_H / 2 + 52} at={grownAt + 4} dim={fiveAt} />
+        <VRule x={582} top={cardsTop + 16} bottom={cardsTop + CARD_H / 2 + 42} at={grownAt + 4} dim={fiveAt} />
 
         {/* The plan: five questions on one design. */}
         <Ink at={fiveAt} dur={14} style={{ left: X0, top: chipY - 76 }}>

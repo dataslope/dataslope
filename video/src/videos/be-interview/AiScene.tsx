@@ -35,11 +35,15 @@ const PANEL_Y = 500;
 const ENVELOPE_W = 180;
 const ENVELOPE_H = 153;
 const TAKE_X = COL_L + ENVELOPE_W + 90;
-/** The take-home's lines run about 450px at 26px; the survey's block is
- *  about 300px tall, its header to its second bar. */
+/** The take-home's lines run about 450px at 26px. The survey's block, its
+ *  source to its second bar, in px: the caveat sits 10px under the title,
+ *  each stat 40px under what comes before it, each label 12px over its own
+ *  bar, so the space between groups is clearly larger than inside one. */
 const TAKE_W = 450;
 const SURVEY_X = 1080;
-const SURVEY_H = 300;
+const STAT_1 = 146;
+const STAT_2 = 266;
+const SURVEY_H = 344;
 const TRACK_W = 560;
 /** Where the time went: three columns of text under the fork, spread
  *  across the page's width with a hairline centred in each gap. */
@@ -350,13 +354,14 @@ export const AiScene: React.FC = () => {
           dim={unseenAt}
           dimBy={0.5}
           left={COL_L}
-          top={surveyTop + 76}
+          top={surveyTop + 96}
           width={ENVELOPE_W}
           height={ENVELOPE_H}
           phase={20}
           amp={3}
         />
-        <div style={{ position: "absolute", left: TAKE_X, top: surveyTop + 102, opacity: panel }}>
+        {/* Level with the middle of the survey beside it. */}
+        <div style={{ position: "absolute", left: TAKE_X, top: surveyTop + 136, opacity: panel }}>
           <div style={{ ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, finishAt - 2, 12) }}>An assistant can finish a take-home,</div>
           <div style={{ ...note(26, INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, unseenAt - 2, 12) }}>
             and <Mark at={unseenAt + 2}>nobody sees how.</Mark>
@@ -394,10 +399,10 @@ export const AiScene: React.FC = () => {
           </div>
         </div>
         <div style={{ opacity: panel }}>
-          <SurveyBar top={surveyTop + 128} pct={KARAT.harderToAssess} at={harderAt}>
+          <SurveyBar top={surveyTop + STAT_1} pct={KARAT.harderToAssess} at={harderAt}>
             say AI makes technical skills harder to assess
           </SurveyBar>
-          <SurveyBar top={surveyTop + 228} pct={KARAT.stillProhibit} at={bannedAt}>
+          <SurveyBar top={surveyTop + STAT_2} pct={KARAT.stillProhibit} at={bannedAt}>
             of organizations still banned AI in technical interviews
           </SurveyBar>
         </div>

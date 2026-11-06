@@ -133,16 +133,16 @@ export const DipScene: React.FC = () => {
         <Box x={lerp(HOME_X, dockX, fakeIn)} y={fakeY} w={PLUG.w} h={PLUG.h} at={testAt + 2} title="Recording fake" tone="data" />
 
         {/* What the fake recorded. */}
-        <Line x={CONF.x} y={top + CONF.h + 36} at={recordsAt + 4} size={21} color={INK_SOFT} weight={650}>
+        <Line x={CONF.x} y={top + CONF.h + 44} at={recordsAt + 4} size={21} color={INK_SOFT} weight={650}>
           the fake recorded one message
         </Line>
-        <Line x={CONF.x} y={top + CONF.h + 70} at={recordsAt + 10} size={26} color={BLUE_INK} weight={700}>
+        <Line x={CONF.x} y={top + CONF.h + 78} at={recordsAt + 10} size={26} color={BLUE_INK} weight={700}>
           “{sent}”
         </Line>
-        <div style={{ position: "absolute", left: CONF.x + 590, top: top + CONF.h + 66, width: 32, height: 32 }}>
+        <div style={{ position: "absolute", left: CONF.x + 590, top: top + CONF.h + 80, width: 32, height: 32 }}>
           <Mark2 at={checksAt} kind="tick" size={32} />
         </div>
-        <Line x={CONF.x + 636} y={top + CONF.h + 68} at={checksAt + 2} size={23} color={OK_INK} weight={650}>
+        <Line x={CONF.x + 636} y={top + CONF.h + 82} at={checksAt + 2} size={23} color={OK_INK} weight={650}>
           checked, no mail server
         </Line>
 

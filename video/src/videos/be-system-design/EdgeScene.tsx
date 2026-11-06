@@ -118,7 +118,7 @@ export const EdgeScene: React.FC = () => {
         <WordRow x={X0} y={benY} size={28} items={benefits.map((b) => ({ ...b, ink: OK_INK }))} />
 
         {/* What goes where. */}
-        <VRule x={901} top={headY} bottom={noteY + 192} at={dynAt} />
+        <VRule x={901} top={headY} bottom={noteY + 212} at={dynAt} />
         <Line x={X0} y={headY} at={useAt} size={29} weight={700} color={OK_INK}>
           At the edge: <span style={{ color: INK_SOFT, fontWeight: 500 }}>static or cacheable</span>
         </Line>
@@ -148,7 +148,7 @@ export const EdgeScene: React.FC = () => {
         <Line x={COL_B} y={noteY + 48} at={countAt - 6} size={24} weight={600} color={ACCENT_INK} width={740}>
           a click the edge answers never reaches your servers, so they can&apos;t count it
         </Line>
-        <Line x={COL_B} y={noteY + 130} at={downAt} size={24} weight={600} color={ACCENT_INK} width={740}>
+        <Line x={COL_B} y={noteY + 150} at={downAt} size={24} weight={600} color={ACCENT_INK} width={740}>
           a link you take down keeps working there until its time to live runs out
         </Line>
 

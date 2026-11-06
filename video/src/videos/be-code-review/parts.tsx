@@ -349,10 +349,10 @@ export const Card: React.FC<{
         transform: `translateY(${(1 - p) * 12}px)`,
         display: "flex",
         flexDirection: "column",
-        gap: 14,
+        gap: 16,
       }}
     >
-      <div style={{ ...label(24, red > 0.5 ? ACCENT_INK : INK), whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...label(24, red > 0.5 ? ACCENT_INK : INK), whiteSpace: "nowrap", marginBottom: -4 }}>{title}</div>
       {children}
     </div>
   );

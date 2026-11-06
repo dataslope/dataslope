@@ -80,12 +80,12 @@ export const CacheScene: React.FC = () => {
         <MiniMap at={qAt} stage={1} lit="cache" grow={{ replica: replicaAt }} />
 
         {/* ── The read path, then the write path: steps, lit as said. ── */}
-        <Line at={onReadAt} x={X0} y={y(338)} size={22} weight={700} color={INK_SOFT} dim={dimA}>
+        <Line at={onReadAt} x={X0} y={y(342)} size={22} weight={700} color={INK_SOFT} dim={dimA}>
           On a read
         </Line>
         <StepRow
           x={X0}
-          y={y(384)}
+          y={y(378)}
           size={26}
           dim={dimA}
           steps={[
@@ -95,15 +95,15 @@ export const CacheScene: React.FC = () => {
             { text: "return it", at: returnsAt - 2, lit: [returnsAt, writeAt] },
           ]}
         />
-        <Line at={firstAt} x={X0} y={y(432)} size={22} color={INK_SOFT} dim={dimA}>
+        <Line at={firstAt} x={X0} y={y(422)} size={22} color={INK_SOFT} dim={dimA}>
           every key&apos;s first request pays <Mark at={firstAt + 2}>the miss</Mark>
         </Line>
-        <Line at={writeAt - 4} x={X0} y={y(500)} size={22} weight={700} color={INK_SOFT} dim={dimA}>
+        <Line at={writeAt - 4} x={X0} y={y(482)} size={22} weight={700} color={INK_SOFT} dim={dimA}>
           On a write
         </Line>
         <StepRow
           x={X0}
-          y={y(546)}
+          y={y(518)}
           size={26}
           dim={dimA}
           steps={[

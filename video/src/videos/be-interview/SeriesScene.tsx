@@ -239,7 +239,7 @@ export const SeriesScene: React.FC = () => {
             <div style={{ ...note(24, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
               Python fundamentals page<span style={{ opacity: ease(frame, leftOutAt - 2, 12) }}>, left out: it&apos;s syntax</span>
             </div>
-            <div style={{ ...note(22, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", opacity: ease(frame, designQAt - 2, 12) }}>
+            <div style={{ ...note(22, INK_SOFT), marginTop: 14, whiteSpace: "nowrap", opacity: ease(frame, designQAt - 2, 12) }}>
               its design questions:{" "}
               {topics.map((t, k) => (
                 <span key={t.text} style={{ opacity: ease(frame, t.at - 2, 10) }}>
@@ -281,7 +281,7 @@ export const SeriesScene: React.FC = () => {
           style={{
             position: "absolute",
             left: LEFT,
-            top: y(LINE_Y) + 42,
+            top: y(LINE_Y) + 58,
             ...note(26, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, bankAt - 2, 10) * (1 - ease(frame, nextAt - 16, 10)),

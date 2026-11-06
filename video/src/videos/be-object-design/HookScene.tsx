@@ -95,7 +95,7 @@ export const HookScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Pill x={X0 + 5 * (STEP_W + STEP_GAP) - STEP_GAP + 34} y={mid - 21} at={worksAt} tone="ok" dim={dim}>
+        <Pill x={X0 + 5 * (STEP_W + STEP_GAP) - STEP_GAP + 44} y={mid - 21} at={worksAt} tone="ok" dim={dim}>
           ✓ works
         </Pill>
 

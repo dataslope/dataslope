@@ -71,7 +71,7 @@ export const IdemScene: React.FC = () => {
   // The two runs, side by side.
   const labelTop = y(330);
   const msgTop = y(378);
-  const tableTop = y(510);
+  const tableTop = y(518);
   const headH = h(40);
   const rowH = h(42);
   const plainCols: Col[] = [{ name: "id", numeric: true }, { name: "amount", numeric: true }, { name: "currency" }];

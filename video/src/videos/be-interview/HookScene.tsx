@@ -156,7 +156,7 @@ export const HookScene: React.FC = () => {
         <Ink at={backendAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 252, whiteSpace: "nowrap", ...note(30, INK) }}>
           Backend interviews ask them <Mark at={moreAt + 2}>more than they used to.</Mark>
         </Ink>
-        <Ink at={seriesAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 302, whiteSpace: "nowrap", ...note(30, INK) }}>
+        <Ink at={seriesAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 316, whiteSpace: "nowrap", ...note(30, INK) }}>
           This series is about answering them.
         </Ink>
 

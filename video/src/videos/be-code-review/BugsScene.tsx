@@ -213,7 +213,7 @@ export const BugsScene: React.FC = () => {
                 style={{
                   position: "absolute",
                   left: X0,
-                  top: top + 52,
+                  top: top + 46,
                   width: w,
                   height: 48,
                   background: BAR,
@@ -221,7 +221,7 @@ export const BugsScene: React.FC = () => {
                   opacity: 1 - ease(frame, surveyOut, 10),
                 }}
               />
-              <Note at={at + 14} x={X0 + w + 22} y={top + 50} out={surveyOut}>
+              <Note at={at + 14} x={X0 + w + 22} y={top + 44} out={surveyOut}>
                 <span style={{ ...note(38, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
                   <span style={TABULAR}>{s.pct}</span>%
                 </span>
@@ -340,7 +340,7 @@ export const BugsScene: React.FC = () => {
         </Card>
 
         <Card x={cx(3)} y={R2} w={CARD_W} h={CARD_H} at={creepAt - 4} title="Scope creep" dim={quietAt} out={gone}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <DiffRow at={creepAt + 4} add>
               the change asked for
             </DiffRow>

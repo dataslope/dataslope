@@ -217,13 +217,13 @@ export const ApproachScene: React.FC = () => {
             <Line x={f.x} y={figY} at={f.at} size={27} weight={700} color={BLUE_INK}>
               <Num>{int(f.n)}</Num> {f.unit}
             </Line>
-            <Line x={f.x} y={figY + 60} at={Math.max(f.at, sameAt)} size={22} weight={600} color={INK}>
+            <Line x={f.x} y={figY + 48} at={Math.max(f.at, sameAt)} size={22} weight={600} color={INK}>
               shorten · redirect
             </Line>
             <Arrow
               points={[
-                [f.x + 214, figY + 75],
-                [f.x + 262, figY + 75],
+                [f.x + 214, figY + 63],
+                [f.x + 262, figY + 63],
               ]}
               at={differentAt}
               dur={8}
@@ -239,7 +239,7 @@ export const ApproachScene: React.FC = () => {
                   <rect
                     key={k}
                     x={f.x + 280 + col * 34}
-                    y={figY + (f.servers > 1 ? 56 + rowK * 26 : 62) }
+                    y={figY + (f.servers > 1 ? 40 + rowK * 26 : 46)}
                     width={26}
                     height={f.servers > 1 ? 20 : 34}
                     rx={4}
@@ -253,8 +253,8 @@ export const ApproachScene: React.FC = () => {
             </svg>
           </React.Fragment>
         ))}
-        <VRule x={583} top={figY} bottom={figY + 104} at={billionAt} />
-        <VRule x={1308} top={figY} bottom={figY + 104} at={sayAt} />
+        <VRule x={583} top={figY} bottom={figY + 92} at={billionAt} />
+        <VRule x={1308} top={figY} bottom={figY + 92} at={sayAt} />
         <Line x={1400} y={figY} at={sayAt} size={27} weight={700} width={420}>
           Say each assumption out loud
         </Line>

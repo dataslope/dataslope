@@ -171,21 +171,21 @@ export const GradeScene: React.FC = () => {
               <span style={{ opacity: ease(frame, quoteAt - 2, 12) }}>&ldquo;didn&rsquo;t just prompt AI and accept whatever it generated.&rdquo;</span>
             </div>
           </Ink>
-          <Note at={canvaAt + 10} x={X0} y={y(500)}>
+          <Note at={canvaAt + 10} x={X0} y={y(452)}>
             <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Canva&apos;s write-up of its first AI-assisted interviews, June 2025</span>
           </Note>
-          <Note at={struggledAt} x={X0} y={y(572)}>
+          <Note at={struggledAt} x={X0} y={y(548)}>
             <span style={line(28, INK)}>
               The ones who struggled lacked <Mark at={steerAt + 4}>the judgment to steer the tool</Mark>
               <span style={{ opacity: ease(frame, abilityAt - 2, 10) }}>, not the ability to code.</span>
             </span>
           </Note>
-          <Note at={googleAt} x={X0} y={y(660)}>
+          <Note at={googleAt} x={X0} y={y(636)}>
             <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
               Google pilot rubric, 2026: <span style={{ fontWeight: 600 }}>the same three skills</span>
             </span>
           </Note>
-          <div style={{ position: "absolute", left: X0, top: y(712), display: "flex", alignItems: "baseline", gap: 18, fontSize: 28 }}>
+          <div style={{ position: "absolute", left: X0, top: y(676), display: "flex", alignItems: "baseline", gap: 18, fontSize: 28 }}>
             {skills.map((s, i) => {
               const p = ease(frame, s.at - 2, 12);
               return (

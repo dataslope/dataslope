@@ -102,7 +102,7 @@ export const ObsScene: React.FC = () => {
         <Line x={ORDER.x} y={orderTop + ORDER.h + 22} at={typesAt} size={21} color={INK_SOFT} weight={600} dim={costDim}>
           knows only: notify each one
         </Line>
-        <Pill x={ORDER.x} y={orderTop + ORDER.h + 64} at={withoutAt} tone="ok" size={21} dim={costDim}>
+        <Pill x={ORDER.x} y={orderTop + ORDER.h + 70} at={withoutAt} tone="ok" size={21} dim={costDim}>
           ✓ not edited
         </Pill>
         {[0, 1, 2, 3].map((i) => {

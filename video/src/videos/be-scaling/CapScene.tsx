@@ -173,23 +173,23 @@ export const CapScene: React.FC = () => {
         <Line at={takenAt} x={apX} y={opsTop + h(62)} size={20} color={INK_SOFT}>
           a taken-down link still working
         </Line>
-        <Line at={mintAt} x={apX} y={opsTop + h(104)} size={22} weight={700} color={BLUE_INK}>
+        <Line at={mintAt} x={apX} y={opsTop + h(124)} size={22} weight={700} color={BLUE_INK}>
           new key
         </Line>
-        <Line at={blockAt} x={apX} y={opsTop + h(138)} size={20} color={INK_SOFT}>
+        <Line at={blockAt} x={apX} y={opsTop + h(158)} size={20} color={INK_SOFT}>
           each server mints from
         </Line>
-        <Line at={blockAt + 4} x={apX} y={opsTop + h(166)} size={20} color={INK_SOFT}>
+        <Line at={blockAt + 4} x={apX} y={opsTop + h(186)} size={20} color={INK_SOFT}>
           its own block of IDs
         </Line>
         {/* Consistent: the custom alias. */}
-        <Line at={aliasAt} x={cpX} y={opsTop + h(104)} size={22} weight={700} color={BLUE_INK}>
+        <Line at={aliasAt} x={cpX} y={opsTop + h(124)} size={22} weight={700} color={BLUE_INK}>
           custom alias
         </Line>
-        <Line at={aliasAt + 6} x={cpX} y={opsTop + h(138)} size={20} color={INK_SOFT}>
+        <Line at={aliasAt + 6} x={cpX} y={opsTop + h(158)} size={20} color={INK_SOFT}>
           must be unique, so
         </Line>
-        <Line at={majorityAt} x={cpX} y={opsTop + h(166)} size={20} color={ACCENT_INK} weight={650}>
+        <Line at={majorityAt} x={cpX} y={opsTop + h(186)} size={20} color={ACCENT_INK} weight={650}>
           the minority side refuses it
         </Line>
         <VRule x={1225} top={y(316)} bottom={y(900)} at={choiceAt + 2} />

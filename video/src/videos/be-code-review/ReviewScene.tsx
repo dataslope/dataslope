@@ -150,7 +150,7 @@ export const ReviewScene: React.FC = () => {
   const containIn = parse(REVIEW.contained.arg);
   const containOut = parse(REVIEW.contained.repr ?? "[]");
   const rTop = top + 10;
-  const cTop = top + 300;
+  const cTop = top + 320;
 
   // The assistant's tests: on this code, and on a correct one (the fix).
   const assertRow = (name: string) => lineOf(tests, `def ${name}`) + 1;
@@ -273,7 +273,7 @@ export const ReviewScene: React.FC = () => {
         <Note at={mergeAt} x={R_X} y={rTop + 178} out={rOut}>
           <Pair name="should be" value={REVIEW.fixed.touching.repr ?? ""} ink={OK_INK} />
         </Note>
-        <Note at={apartAt} x={R_X} y={rTop + 218} out={rOut}>
+        <Note at={apartAt} x={R_X} y={rTop + 232} out={rOut}>
           <Pair name="returns" value={REVIEW.touching.repr ?? ""} ink={ACCENT_INK} />
         </Note>
 
@@ -299,7 +299,7 @@ export const ReviewScene: React.FC = () => {
         <Note at={becomesAt} x={R_X} y={cTop + 190} out={rOut}>
           <Pair name="returns" value={REVIEW.contained.repr ?? ""} ink={ACCENT_INK} />
         </Note>
-        <Note at={shrankAt} x={R_X} y={cTop + 230} out={rOut}>
+        <Note at={shrankAt} x={R_X} y={cTop + 244} out={rOut}>
           <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>
             <Mark at={shrankAt + 4} color={MARK_BAD}>
               the merge shrank it
@@ -343,7 +343,7 @@ export const ReviewScene: React.FC = () => {
         <Note at={tellAt} x={LIST_X} y={top + diffHeight(tests.length, TEST_SIZE) + 30} out={fixIn}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>the first passes on both: it can&apos;t tell them apart</span>
         </Note>
-        <Note at={bugAt} x={LIST_X} y={top + diffHeight(tests.length, TEST_SIZE) + 74} out={fixIn}>
+        <Note at={bugAt} x={LIST_X} y={top + diffHeight(tests.length, TEST_SIZE) + 86} out={fixIn}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             the second is <Mark at={bugAt + 6} color={MARK_BAD}>the bug, written down as a requirement</Mark>
           </span>

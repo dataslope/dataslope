@@ -86,7 +86,7 @@ export const HookScene: React.FC = () => {
 
   // The twelve chips: nine worked through, two quick, the news feed apart.
   const chipX = (i: number) => X0 - 12 + i * (CHIP + CHIP_GAP) + (i === 11 ? 50 : 0);
-  const chipsTop = y(812);
+  const chipsTop = y(816);
   const chipAt = (i: number) => (i < 9 ? nineAt + i * 2 : i < 11 ? quickAt + (i - 9) * 3 : feedAt);
 
   return (
@@ -163,7 +163,7 @@ export const HookScene: React.FC = () => {
         </Ink>
 
         {/* The round: twelve questions. */}
-        <Ink at={twelveAt} dur={14} style={{ left: X0, top: y(770), whiteSpace: "nowrap" }}>
+        <Ink at={twelveAt} dur={14} style={{ left: X0, top: y(776), whiteSpace: "nowrap" }}>
           <span style={{ ...label(24, INK), fontWeight: 700 }}>Twelve questions</span>
         </Ink>
         {/* The twelve as plain numerals: nine in the data blue, two quick ones

@@ -100,10 +100,10 @@ export const StratScene: React.FC = () => {
             asks its card for the cost
           </span>
         </Box>
-        <Pill x={SHIP.x} y={shipTop + SHIP.h + 24} at={notEditedAt} tone="ok" size={21}>
+        <Pill x={SHIP.x} y={shipTop + SHIP.h + 36} at={notEditedAt} tone="ok" size={21}>
           ✓ not edited
         </Pill>
-        <Line x={SHIP.x + 190} y={shipTop + SHIP.h + 30} at={ocAt} size={23} color={OK_INK} weight={650}>
+        <Line x={SHIP.x + 190} y={shipTop + SHIP.h + 42} at={ocAt} size={23} color={OK_INK} weight={650}>
           open-closed
         </Line>
 

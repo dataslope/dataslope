@@ -13,9 +13,9 @@ import { Bar, Cylinder, Drift, Flow, Headline, Kicker, Node, pulse, Spot, X0 } f
 const FIG_TOP = 290;
 const API = { x: X0, w: 170 };
 const DB = { x: 660, w: 250 };
-const BARS_TOP = 572;
-const CHIPS_Y = 722;
-const SQUARES_Y = 802;
+const BARS_TOP = 562;
+const CHIPS_Y = 733;
+const SQUARES_Y = 794;
 const SQ = 48;
 const SQ_GAP = 10;
 const SMALL = 36;
@@ -151,7 +151,7 @@ export const HookScene: React.FC = () => {
         />
         <Bar
           x={X0}
-          y={y(BARS_TOP) + h(80)}
+          y={y(BARS_TOP) + h(84)}
           width={560}
           max={OPENING.orders}
           at={ordersAt - 2}

@@ -202,7 +202,7 @@ export const InvalidateScene: React.FC = () => {
         </Line>
         <StepRow
           x={X0}
-          y={y(462)}
+          y={y(454)}
           steps={[
             { text: "mark it taken down", at: takenAt + 4 },
             { text: "commit", at: commitsAt, color: OK_INK },
@@ -214,7 +214,7 @@ export const InvalidateScene: React.FC = () => {
         </Line>
         <StepRow
           x={X0}
-          y={y(602)}
+          y={y(594)}
           steps={[
             { text: "delete the cached entry", at: firstAt },
             { text: "a read reloads the old value", at: betweenAt, lit: [betweenAt, backAt] },
@@ -223,7 +223,7 @@ export const InvalidateScene: React.FC = () => {
           ]}
         />
         <Spot id="timer" at={backstopAt} x={1560} y={y(366)} w={150} />
-        <Line at={backstopAt + 4} x={X0} y={y(680)} size={22} weight={650}>
+        <Line at={backstopAt + 4} x={X0} y={y(690)} size={22} weight={650}>
           The TTL stays as a backstop: a stale entry still expires
         </Line>
 
