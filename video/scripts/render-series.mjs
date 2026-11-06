@@ -16,20 +16,21 @@
  * - The picture is copied packet for packet (`-c:v copy`): every frame in the
  *   series is the frame its piece rendered, bit for bit, at no quality cost
  *   and in minutes rather than the hours a fresh render would take.
- * - The sound is decoded and encoded once (AAC at 320 kb/s, the rate the
- *   pieces have), because AAC frames do not join cleanly when copied: each
- *   piece's encoder delay would leave a few milliseconds of silence or a
- *   click at every join.
+ * - The sound is decoded and encoded once (AAC at 320 kb/s with libfdk_aac,
+ *   the encoder and rate the pieces have), because AAC frames do not join
+ *   cleanly when copied: each piece's encoder delay would leave a few
+ *   milliseconds of silence or a click at every join.
  * - Every piece must share size, frame rate and pixel format, which pieces
  *   from one render-all run do; anything else stops the stitch, since
  *   copying cannot convert.
  *
  * Next to each video it writes `<name>.chapters.txt`, one line per unit
  * ("0:00 Unit 1 · Thinking statistically"), ready for a YouTube
- * description, and the same chapters go into the file's own metadata.
+ * description, which is where YouTube reads chapters from.
  *
  * ffmpeg and ffprobe are Remotion's own (`npx remotion ffmpeg`), so nothing
- * else needs installing.
+ * else needs installing. Its build is minimal (no ffmetadata reader), so the
+ * chapters are not written into the file itself.
  */
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
@@ -168,23 +169,6 @@ for (const name of names) {
   mkdirSync(SERIES_OUT, { recursive: true });
   const list = path.join(SERIES_OUT, `${stem}.concat.txt`);
   writeFileSync(list, probed.map((p) => `file '${outputOf(p.id).replaceAll("'", "'\\''")}'`).join("\n") + "\n");
-  const meta = path.join(SERIES_OUT, `${stem}.ffmetadata.txt`);
-  const esc = (s) => s.replace(/[=;#\\\n]/g, (c) => `\\${c}`);
-  writeFileSync(
-    meta,
-    [
-      ";FFMETADATA1",
-      `title=${esc(series.name)}`,
-      ...chapters.flatMap((c, i) => [
-        "[CHAPTER]",
-        "TIMEBASE=1/1000",
-        `START=${Math.round(c.start * 1000)}`,
-        `END=${Math.round((chapters[i + 1]?.start ?? total) * 1000)}`,
-        `title=${esc(chapterTitle(c.unit))}`,
-      ]),
-    ].join("\n") + "\n",
-  );
-
   console.log(`\nStitching ${probed.length} pieces (${clock(total)})…`);
   const started = Date.now();
   tool("ffmpeg", [
@@ -197,20 +181,14 @@ for (const name of names) {
     "0",
     "-i",
     list,
-    "-i",
-    meta,
     "-map",
     "0:v",
     "-map",
     "0:a",
-    "-map_metadata",
-    "1",
-    "-map_chapters",
-    "1",
     "-c:v",
     "copy",
     "-c:a",
-    "aac",
+    "libfdk_aac",
     "-b:a",
     "320k",
     "-movflags",

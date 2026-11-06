@@ -157,15 +157,16 @@ It runs `render:all` on exactly the pieces it needs first, so only a missing
 or changed piece is rendered, then joins them with ffmpeg. **The picture is
 not re-encoded**: every frame is copied packet for packet from the piece
 that rendered it, so the series looks exactly like its parts and the join
-takes minutes. The sound is decoded and encoded once (AAC, 320 kb/s, the
-rate the pieces have), because AAC does not join cleanly when copied: each
-piece's encoder delay would leave a click at every join. Every piece must
+takes minutes. The sound is decoded and encoded once (AAC at 320 kb/s with
+libfdk_aac, the encoder and rate the pieces have), because AAC does not join
+cleanly when copied: each piece's encoder delay would leave a click at every
+join. Every piece must
 share size, frame rate and pixel format, which pieces from one `render:all`
 run do; anything else stops the stitch. Beside the video it writes
 `<name>.chapters.txt`, one line per unit ("0:00 Unit 1 · Thinking
-statistically") for the YouTube description, and the same chapters go into
-the file's metadata. ffmpeg is Remotion's own (`npx remotion ffmpeg`), so
-nothing else needs installing.
+statistically") for the YouTube description, which is where YouTube reads
+chapters from. ffmpeg is Remotion's own (`npx remotion ffmpeg`), so nothing
+else needs installing.
 
 **The series** are in `src/series.ts`: each course's units and each
 interview track's parts, the videos each one plays, and the title its
