@@ -152,11 +152,13 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", ton
 
       <div style={{ position: "absolute", left: PAD, bottom: 56 }}>
         {course ? (
-          <div style={{ ...type(kick, ds("blue", 500)), marginBottom: kicker === "same" ? 0.12 * SIZE : 0.2 * KICKER }}>Full Course</div>
+          // On the title's line pitch whatever its size, with nothing added:
+          // every line of the block is one step apart.
+          <div style={{ ...type(kick, ds("blue", 500)), lineHeight: `${1.1 * SIZE}px` }}>Full Course</div>
         ) : null}
         <Lines lines={t.title} style={type(SIZE, !course && role === "blue" ? ds("blue", 500) : INK)} />
         {course ? null : (
-          <div style={{ marginTop: 0.12 * SIZE }}>
+          <div>
             <Lines lines={INTERVIEW[label]} style={type(SIZE, TONE[tone])} />
           </div>
         )}
