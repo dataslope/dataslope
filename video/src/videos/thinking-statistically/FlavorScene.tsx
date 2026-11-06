@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, fmt, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -175,15 +175,13 @@ export const FlavorScene: React.FC = () => {
       {/* The computer's view of the column: integers, as pandas stores them. */}
       <Ink at={computerAt - 4} dur={14} style={{ left: DTYPE_X, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
         <div style={label(20, INK_SOFT)}>stored as whole numbers</div>
-        {/* The dtype as plain code under its label, no pill: the highlight
-            behind it is what "stored" points at. */}
         <div
           style={{
-            marginTop: 10,
-            marginLeft: -8,
+            marginTop: 8,
             display: "inline-block",
-            padding: "0 8px",
-            borderRadius: 4,
+            padding: "2px 12px",
+            border: `1.5px solid ${HAIRLINE}`,
+            borderRadius: 14,
             fontFamily: MONO,
             fontSize: 22,
             color: INK_SOFT,

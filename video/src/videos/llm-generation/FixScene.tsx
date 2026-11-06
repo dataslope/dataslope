@@ -133,7 +133,7 @@ export const FixScene: React.FC = () => {
         const swell = k === 0 ? pulse(frame, pastingAt - 2, 22) : 0;
         return (
           <React.Fragment key={k}>
-            <Badge kind={k + 1} at={itemAt[k] - 4} x={RIGHT_X + 22} y={y(ITEM_Y(k)) + 22} />
+            <Badge kind={k + 1} at={itemAt[k] - 4} x={RIGHT_X + 17} y={y(ITEM_Y(k)) + 22} />
             <Ink at={itemAt[k] - 2} dur={14} style={{ left: RIGHT_X + 64, top: y(ITEM_Y(k)), width: 800 }}>
               {/* A highlighted item gives back the 0.18em its Marked band adds on the left, so all four start on one edge. */}
               <div

@@ -30,17 +30,15 @@ const mono = (size: number, color: string = INK, weight = 500): React.CSSPropert
   whiteSpace: "nowrap",
 });
 
-/** A dtype as pandas prints it: plain code, no pill, with a highlight behind
- *  it while the narration points at it (set out by its padding, so the code
- *  itself stays on the column's left edge). */
+/** A dtype as pandas prints it, in a pill. */
 const Dtype: React.FC<{ children: React.ReactNode; lit?: number }> = ({ children, lit = 0 }) => (
   <span
     style={{
       ...mono(21, INK_SOFT),
       display: "inline-block",
-      marginLeft: -8,
-      padding: "0 8px",
-      borderRadius: 4,
+      padding: "2px 12px",
+      border: `1.5px solid ${HAIRLINE}`,
+      borderRadius: 14,
       background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, transparent)`,
     }}
   >

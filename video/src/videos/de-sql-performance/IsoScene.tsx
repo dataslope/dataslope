@@ -4,10 +4,11 @@ import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { Drift, OK_INK, X0 } from "./parts";
 
@@ -48,14 +49,15 @@ const Event: React.FC<{ x: number; y: number; at: number; text: string; color?: 
   );
 };
 
-/** What a read returned: the value, in its color, under its dot. */
+/** What a read returned: a value in a rounded tag under its dot. */
 const Value: React.FC<{ x: number; y: number; at: number; value: string; color: string; out?: number }> = ({ x, y, at, value, color, out }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
   if (p <= 0) return null;
   return (
     <g opacity={p}>
-      <text x={x} y={y + 40} textAnchor="middle" style={{ ...mono(24, color), fontWeight: 700 }}>
+      <rect x={x - 34} y={y + 16} width={68} height={34} rx={17} fill={PAPER} stroke={color} strokeWidth={2} />
+      <text x={x} y={y + 40} textAnchor="middle" style={mono(20, color)}>
         {value}
       </text>
     </g>
@@ -211,7 +213,7 @@ export const IsoScene: React.FC = () => {
                 ))}
                 {isDefault ? (
                   <g opacity={ease(frame, defaultAt, 10)}>
-                    <rect x={colX(2) + COL_W + 14} y={yy - 26} width={156} height={34} rx={5} fill={HIGHLIGHT} />
+                    <rect x={colX(2) + COL_W - 6} y={yy - 26} width={196} height={36} rx={18} fill={`color-mix(in srgb, ${ds("yellow", 400)} 70%, ${PAPER})`} />
                     <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText(label(20, INK))}>
                       Postgres default
                     </text>
