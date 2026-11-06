@@ -249,7 +249,7 @@ export const CacheScene: React.FC = () => {
         <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>a tenth</span>
       </div>
       <Note at={twentiethAt + 2} x={PRICE_X + FULL_W * CACHE_FRACTION.sonnet + 130} y={y(PRICE_ROW_Y[1]) + h(16) - 16}>
-        <span style={{ ...note(23, CACHED_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a twentieth</span>
+        <span style={{ ...note(25, CACHED_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a twentieth</span>
       </Note>
     </AbsoluteFill>
   );

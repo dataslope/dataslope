@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { body, INK, INK_SOFT, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -169,11 +169,13 @@ export const LeversScene: React.FC = () => {
                 opacity: Math.max(ease(frame, at - 4, 8) * lit, i === 0 || i === 3 ? pulse(frame, twiceAt - 2, 40) : 0),
               }}
             />
+            {/* The numerals are set in the list's own face, so each line is one
+                size and one family. */}
             <div style={{ position: "absolute", left: X0, top: ry, opacity: slot * 0.25 * (1 - ease(frame, at - 6, 8)) }}>
-              <span style={{ ...label(32, INK_SOFT), fontWeight: 700 }}>{i + 1}</span>
+              <span style={{ ...body(32), color: INK_SOFT, fontWeight: 700 }}>{i + 1}</span>
             </div>
             <Ink at={at - 6} dur={14} style={{ left: X0, top: ry, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 24 }}>
-              <span style={{ ...label(32, POINT_INK), fontWeight: 700, width: 34 }}>{i + 1}</span>
+              <span style={{ ...body(32), color: POINT_INK, fontWeight: 700, width: 34 }}>{i + 1}</span>
               <span style={{ ...body(32), color: INK }}>{text}</span>
             </Ink>
           </React.Fragment>
@@ -243,8 +245,8 @@ export const LeversScene: React.FC = () => {
               ) : null}
               <Note at={at + 12} x={RX + px(inC + ansC + thinkC) + 14} y={ry + h(20) - 19}>
                 <span style={{ display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
-                  <span style={{ ...note(23, INK_SOFT), ...TABULAR }}>{usd(row.cost, 5)}</span>
-                  <span style={{ ...note(28, INK), fontWeight: 700, ...TABULAR }}>{row.times.toFixed(1)}x</span>
+                  <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{usd(row.cost, 5)}</span>
+                  <span style={{ ...note(26, INK), fontWeight: 700, ...TABULAR }}>{row.times.toFixed(1)}x</span>
                 </span>
               </Note>
             </div>

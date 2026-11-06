@@ -6,7 +6,7 @@ import { ACCENT_INK, BAR, body, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note,
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Bracket, Headline, Kicker, lerp, Marker, Ring, STAT, STAT_INK, Strike, Svg } from "./parts";
+import { Bracket, Headline, Kicker, lerp, Marker, Ring, STAT_INK, Strike, Svg } from "./parts";
 
 /** The arc of an A/B test, in the lesson's order. */
 export const STEPS = ["Hypothesis and metric", "Randomize", "Sample size", "Run to plan", "Analyze", "Decide"];

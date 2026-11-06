@@ -212,34 +212,34 @@ export const MarketScene: React.FC = () => {
 
         {/* ── The sidebar: what the table says, as it is said ── */}
         <div style={{ opacity: 1 - ease(frame, sideOut, 12) }}>
+          {/* Each stat is a label, its number, and under the number what
+              it counts: three lines, each one size and one face. */}
           <Ink at={fiveAt - 4} dur={14} style={{ left: SIDE_X, top: y(352), whiteSpace: "nowrap" }}>
             <span style={label(23, INK_SOFT)}>Output against input</span>
           </Ink>
-          <Ink at={fiveAt} dur={16} style={{ left: SIDE_X, top: y(386), whiteSpace: "nowrap" }}>
+          <Ink at={fiveAt} dur={16} style={{ left: SIDE_X, top: y(380), whiteSpace: "nowrap" }}>
             <span style={{ ...headline(92), color: OUTPUT_INK }}>5x</span>
           </Ink>
-          <Note at={tenRowsAt - 2} x={SIDE_X + 150} y={y(406)}>
+          <Note at={tenRowsAt - 2} x={SIDE_X} y={y(484)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               in {FIVES} of {RATES.length} rows
+              <span style={{ fontWeight: 650, opacity: ease(frame, neverAt - 2, 14) }}> and never less</span>
             </span>
           </Note>
-          <Note at={neverAt - 2} x={SIDE_X + 150} y={y(444)}>
-            <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>and never less</span>
-          </Note>
 
-          <Ink at={cheapestAt - 4} dur={14} style={{ left: SIDE_X, top: y(540), whiteSpace: "nowrap" }}>
+          <Ink at={cheapestAt - 4} dur={14} style={{ left: SIDE_X, top: y(568), whiteSpace: "nowrap" }}>
             <span style={label(23, INK_SOFT)}>Cheapest input to dearest</span>
           </Ink>
-          <Ink at={hundredthAt - 2} dur={16} style={{ left: SIDE_X, top: y(574), whiteSpace: "nowrap" }}>
+          <Ink at={hundredthAt - 2} dur={16} style={{ left: SIDE_X, top: y(596), whiteSpace: "nowrap" }}>
             <span style={{ ...headline(92), color: POINT_INK }}>{SPREAD}x</span>
           </Ink>
-          <Note at={tenDollarsAt - 2} x={SIDE_X + 230} y={y(604)}>
+          <Note at={tenDollarsAt - 2} x={SIDE_X} y={y(700)}>
             <span style={{ ...note(25, INK), ...TABULAR, whiteSpace: "nowrap" }}>
               {usd(minIn)} to {usd(maxIn)}
             </span>
           </Note>
 
-          <Ink at={pickAt - 4} dur={18} style={{ left: SIDE_X, top: y(742), width: 480 }}>
+          <Ink at={pickAt - 4} dur={18} style={{ left: SIDE_X, top: y(790), width: 480 }}>
             <span style={{ ...body(33, true), color: INK }}>
               The model you pick moves the bill more than any <Marked at={trickAt}>prompt trick.</Marked>
             </span>

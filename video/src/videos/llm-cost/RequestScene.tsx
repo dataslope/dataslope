@@ -188,11 +188,11 @@ export const RequestScene: React.FC = () => {
         up
       />
       <Ink at={apartAt - 6} dur={16} style={{ left: BAR_X + 220, top: rowY(tiers.length) + 12, whiteSpace: "nowrap" }}>
-        <span style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-          <span style={{ ...headline(54), color: POINT_INK }}>{Math.round(maxV / minV)}x</span>
-          <span style={{ ...note(25, INK) }}>
-            {NAME[tiers[haikuRow].model]} to {NAME[tiers[fableRow].model]}
-          </span>
+        {/* The multiple, and under it what it spans: two lines, so each is
+            one size and one face. */}
+        <span style={{ display: "block", ...headline(54), color: POINT_INK }}>{Math.round(maxV / minV)}x</span>
+        <span style={{ display: "block", marginTop: 8, ...note(25, INK) }}>
+          {NAME[tiers[haikuRow].model]} to {NAME[tiers[fableRow].model]}
         </span>
       </Ink>
     </AbsoluteFill>

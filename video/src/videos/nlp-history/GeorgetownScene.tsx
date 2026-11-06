@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ALPAC, ALPAC_YEAR, DEMO, storyYear } from "./data";
@@ -12,6 +12,12 @@ import { Headline, Kicker, Mark, pulse, Spot, Svg, Tag, WARN_WASH } from "./part
 
 const X: XScale = { lo: 1952, hi: 1968, x0: 150, x1: 1770 };
 const TICKS = [1952, 1954, 1956, 1958, 1960, 1962, 1964, 1966, 1968];
+
+/** Fig. 7's three stats, spaced so both gaps are the same: "250" ends near
+ *  x 232, "grammar rules" 176px after its left edge; each hairline sits in
+ *  the middle of its gap, 64px from the text either side. */
+const STAT_X = [96, 360, 664];
+const RULE_X = [296, 600];
 
 /**
  * Part 4, 1954: Georgetown and IBM show Russian turned into English. The
@@ -94,10 +100,14 @@ export const GeorgetownScene: React.FC = () => {
       {/* ── Fig. 7, the demo in numbers ── */}
       <FigLabel n="7" title={`The demo, ${DEMO.date}`} at={wordsAt - 8} x={96} y={y(290)} />
       <div style={{ opacity: 1 - ease(frame, twelveAt, 16) * 0.35 }}>
-        {stat(96, wordsAt - 2, DEMO.words, "words")}
-        {stat(400, rulesAt - 2, DEMO.rules, "grammar rules")}
+        {stat(STAT_X[0], wordsAt - 2, DEMO.words, "words")}
+        {/* Three stats side by side, a hairline in each gap, inking with the
+            stat to its right: from the numbers' tops to the captions' feet. */}
+        <ColumnRule x={RULE_X[0]} top={y(370) + 22} height={124} at={rulesAt - 2} />
+        {stat(STAT_X[1], rulesAt - 2, DEMO.rules, "grammar rules")}
+        <ColumnRule x={RULE_X[1]} top={y(370) + 22} height={124} at={sixtyAt - 2} />
         {stat(
-          640,
+          STAT_X[2],
           sixtyAt - 2,
           <>
             <span style={{ ...headline(46), color: INK_SOFT }}>about </span>

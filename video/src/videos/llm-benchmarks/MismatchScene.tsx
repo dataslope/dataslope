@@ -14,6 +14,8 @@ const DST = { coding: 372, invoices: 486 };
 const BOARD_Y = 622;
 const BOARD_STEP = 52;
 const Q_Y = [404, 514, 624, 734];
+/** "No?" on the last question's line, more than a word's width past its tag. */
+const NO_X = 1060;
 
 /**
  * Pitfall four, construct mismatch (Fig. 8): SWE-bench's task carries over
@@ -142,7 +144,9 @@ export const MismatchScene: React.FC = () => {
         return (
           <React.Fragment key={q.q}>
             <Ink at={at} dur={12} style={{ left: X0, top: ry - 20, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(32, A_INK), fontWeight: 700, display: "inline-block", width: 48 }}>{i + 1}</span>
+              {/* The numeral in the question's own face, so the line is one
+                  size and one family. */}
+              <span style={{ ...body(40), color: A_INK, fontWeight: 700, display: "inline-block", width: 48 }}>{i + 1}</span>
               <span style={{ ...body(40), color: INK }}>{last ? <Marked at={lastAt - 2}>{q.q}</Marked> : q.q}</span>
             </Ink>
             <Ink at={at + 8} dur={12} style={{ left: 780, top: ry - 10, whiteSpace: "nowrap" }}>
@@ -151,12 +155,13 @@ export const MismatchScene: React.FC = () => {
           </React.Fragment>
         );
       })}
-      {/* "If the last answer is no": only your own test can answer it. */}
-      <Ink at={noAt - 2} dur={12} style={{ left: 1010, top: y(Q_Y[3]) - 22, whiteSpace: "nowrap" }}>
+      {/* "If the last answer is no": only your own test can answer it. Set
+          well clear of the last question's tag, so the two read as two lines. */}
+      <Ink at={noAt - 2} dur={12} style={{ left: NO_X, top: y(Q_Y[3]) - 22, whiteSpace: "nowrap" }}>
         <span style={{ ...body(40, true), color: TRAP_INK }}>No?</span>
       </Ink>
-      <Arrow from={[1100, y(Q_Y[3]) + 2]} to={[1210, y(Q_Y[3]) + 2]} at={findAt - 6} dur={12} color={INK} />
-      <Ink at={findAt - 2} dur={14} style={{ left: 1230, top: y(Q_Y[3]) - 13, whiteSpace: "nowrap" }}>
+      <Arrow from={[NO_X + 90, y(Q_Y[3]) + 2]} to={[NO_X + 200, y(Q_Y[3]) + 2]} at={findAt - 6} dur={12} color={INK} />
+      <Ink at={findAt - 2} dur={14} style={{ left: NO_X + 220, top: y(Q_Y[3]) - 13, whiteSpace: "nowrap" }}>
         <span style={{ ...label(26, INK), fontWeight: 700, padding: "4px 12px", background: PAPER }}>find out yourself</span>
       </Ink>
     </AbsoluteFill>

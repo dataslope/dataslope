@@ -10,9 +10,10 @@ import { IDEAS, NOW, storyYear } from "./data";
 import { DATA, DATA_INK, drift, Headline, Mark, pulse, Svg } from "./parts";
 import { TimelineAxis, tx, YearDot } from "./timeline";
 
-/** An idea from the course as a card on the timeline: its year over its
- *  name, dropping onto its dot with a stem down to it. */
-const IdeaCard: React.FC<{
+/** An idea from the course as a label on the timeline: its year over its
+ *  name, in plain text set on its stem, dropping in over its dot with the
+ *  stem drawing down to it. */
+const IdeaLabel: React.FC<{
   year: number;
   text: React.ReactNode;
   top: number;
@@ -28,26 +29,23 @@ const IdeaCard: React.FC<{
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   if (p <= 0.001) return null;
   const x = tx(year);
-  const H = 78;
+  // The text sits where the card held it (10px down, its left edge on the
+  // stem); the stem starts 12px under the name.
+  const textTop = top + 10;
+  const stemTop = top + 80;
   return (
     <>
       <Svg opacity={1 - d}>
-        <line x1={x} x2={x} y1={top + H} y2={top + H + (axis - top - H) * stem} stroke={HAIRLINE} strokeWidth={1.6} />
+        <line x1={x} x2={x} y1={stemTop} y2={stemTop + (axis - stemTop) * stem} stroke={HAIRLINE} strokeWidth={1.6} />
       </Svg>
       <div
         style={{
           position: "absolute",
-          left: x - 20,
-          top,
-          height: H,
-          boxSizing: "border-box",
-          padding: "8px 18px",
-          border: `2px solid ${DATA}`,
-          borderRadius: 10,
-          background: PAPER,
+          left: x,
+          top: textTop,
           opacity: p * (1 - d),
           transform: `translateY(${(1 - p) * -28}px) scale(${1 + swell * 0.05})`,
-          transformOrigin: "20px 100%",
+          transformOrigin: "0 100%",
           whiteSpace: "nowrap",
         }}
       >
@@ -123,7 +121,7 @@ export const OpenScene: React.FC = () => {
   const AXIS = y(640);
   const TIER_A = y(410);
   const TIER_B = y(500);
-  const cards = [
+  const ideas = [
     { ...IDEAS[0], at: countingAt - 2, top: TIER_A },
     { ...IDEAS[1], at: guessingAt - 2, top: TIER_B },
     { ...IDEAS[2], at: rareAt - 2, top: TIER_A },
@@ -131,13 +129,13 @@ export const OpenScene: React.FC = () => {
   const zipfYear = storyYear("zipf");
   const youngest = storyYear("sparck");
 
-  // The figure leans in on the oldest card as the story turns to it.
+  // The figure leans in on the oldest idea as the story turns to it.
   const zoom = ease(frame, firstAt - 4, 70);
   const lean = drift(frame, lookAt + 10, 1, 240);
 
   return (
     <AbsoluteFill>
-      {/* ── Sound: the axis, the three cards landing, the spans, the turn ── */}
+      {/* ── Sound: the axis, the three labels landing, the spans, the turn ── */}
       <Sfx name="el-pencil" at={hookFrom} level={-35} />
       <Sfx name="el-pop" at={countingAt - 2} level={-30} />
       <Sfx name="el-pop" at={guessingAt - 2} level={-30} />
@@ -164,7 +162,7 @@ export const OpenScene: React.FC = () => {
         }}
       >
         <TimelineAxis y={AXIS} at={hookFrom} todayAt={youngestAt - 4} />
-        {cards.map((c) => {
+        {ideas.map((c) => {
           const year = storyYear(c.story);
           const isOldest = c.story === "zipf";
           return (
@@ -176,7 +174,7 @@ export const OpenScene: React.FC = () => {
                 color={DATA}
                 swell={isOldest ? pulse(frame, firstAt - 2, 24) : 0}
               />
-              <IdeaCard
+              <IdeaLabel
                 year={year}
                 text={isOldest ? <Mark at={firstAt}>{c.text}</Mark> : c.text}
                 top={c.top}

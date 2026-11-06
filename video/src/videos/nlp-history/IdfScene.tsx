@@ -218,11 +218,11 @@ export const IdfScene: React.FC = () => {
         </Ink>
 
         <Ink at={searchAt - 2} dur={16} style={{ left: RX, top: QUERY_Y, whiteSpace: "nowrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, ...label(23, INK_SOFT) }}>
-            a search for
-            <span style={{ padding: "4px 14px", borderRadius: 18, border: `2px solid ${COMMON_INK}`, color: COMMON_INK, fontWeight: 650 }}>a common word</span>
-            and
-            <span style={{ padding: "4px 14px", borderRadius: 18, border: `2px solid ${DATA}`, color: DATA_INK, fontWeight: 650 }}>a rare word</span>
+          {/* The two words named in their own colors, plain text: the grey and
+              the blue the rows and the grid below give them. */}
+          <div style={{ ...label(23, INK_SOFT) }}>
+            a search for <span style={{ color: COMMON_INK }}>a common word</span> and{" "}
+            <span style={{ color: DATA_INK }}>a rare word</span>
           </div>
         </Ink>
         {row(

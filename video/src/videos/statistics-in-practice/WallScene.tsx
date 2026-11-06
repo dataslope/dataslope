@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, body, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";

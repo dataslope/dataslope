@@ -138,7 +138,7 @@ export const WindowScene: React.FC = () => {
           {count(USED)} of {count(WINDOW)} used
         </span>
       </Ink>
-      <Ink at={sixAt - 2} dur={16} style={{ left: 900, top: y(506), whiteSpace: "nowrap" }}>
+      <Ink at={sixAt - 2} dur={16} style={{ left: 900, top: y(512), whiteSpace: "nowrap" }}>
         <div style={{ ...note(26, INK) }}>Tokens left to answer in</div>
         <div style={{ ...headline(84), color: ACCENT_INK, marginTop: 4, marginLeft: -4, ...TABULAR }}>{count(ROOM)}</div>
       </Ink>

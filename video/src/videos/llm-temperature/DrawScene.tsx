@@ -148,10 +148,12 @@ export const DrawScene: React.FC = () => {
                 </div>
               );
             })}
-            <Note at={tileAt(k, DRAWS - 1) + 4} x={COUNT_X} y={top + h(TILE_H) / 2 - 27}>
-              <span style={{ display: "inline-flex", alignItems: "baseline", gap: 8, whiteSpace: "nowrap" }}>
+            {/* The count, and under it what it is out of: two lines, so each
+                is one size and one face. */}
+            <Note at={tileAt(k, DRAWS - 1) + 4} x={COUNT_X} y={top + h(TILE_H) / 2 - 37}>
+              <span style={{ display: "block", whiteSpace: "nowrap" }}>
                 <span
-                  style={{ ...headline(44), color: TEXT[0], fontVariantNumeric: "tabular-nums lining-nums" }}
+                  style={{ display: "block", ...headline(44), color: TEXT[0], fontVariantNumeric: "tabular-nums lining-nums" }}
                 >
                   {/* The count the narration reads, all twenty then only
                       eleven, under the highlighter; the negative margin gives
@@ -167,7 +169,7 @@ export const DrawScene: React.FC = () => {
                     r.counts[0]
                   )}
                 </span>
-                <span style={note(20, INK_SOFT)}>of {DRAWS}</span>
+                <span style={{ display: "block", marginTop: 2, ...note(20, INK_SOFT) }}>of {DRAWS}</span>
               </span>
             </Note>
           </React.Fragment>
