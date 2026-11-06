@@ -308,10 +308,11 @@ export const Verdict: React.FC<{ ok: boolean; at: number; size?: number; gray?: 
 // ── The kinds of bug ────────────────────────────────────────────────────────
 
 /**
- * One kind of bug as a card: its name, then a few tokens of code or a note.
- * It inks in on `at`; `dim` grays it and `undim` brings it back; `alarm`
- * turns its rule red (the one kind that makes a noise); `to` slides it to a
- * new place from a frame on, lifted a little on the way.
+ * One kind of bug: its name over a hairline, then a few tokens of code or a
+ * note, grouped by space and alignment rather than boxed. It inks in on
+ * `at`; `dim` grays it and `undim` brings it back; `alarm` turns its name red
+ * (the one kind that makes a noise); `to` slides it to a new place from a
+ * frame on, rising a little on the way.
  */
 export const Card: React.FC<{
   x: number;
@@ -344,11 +345,8 @@ export const Card: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        padding: "16px 20px",
-        background: PAPER,
-        border: `${1.5 + red * 1.5}px solid ${red > 0.5 ? ACCENT : `color-mix(in srgb, ${INK} 26%, transparent)`}`,
-        borderRadius: 10,
-        boxShadow: lift > 0.01 ? `0 ${10 * lift}px ${24 * lift}px color-mix(in srgb, ${INK} ${14 * lift}%, transparent)` : undefined,
+        paddingTop: 14,
+        borderTop: `1px solid ${HAIRLINE}`,
         opacity: p * (1 - o) * (1 - 0.6 * d),
         filter: d > 0.01 ? `grayscale(${d})` : undefined,
         transform: `translateY(${(1 - p) * 12}px)`,
@@ -357,7 +355,7 @@ export const Card: React.FC<{
         gap: 14,
       }}
     >
-      <div style={{ ...label(24, INK), whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...label(24, red > 0.5 ? ACCENT_INK : INK), whiteSpace: "nowrap" }}>{title}</div>
       {children}
     </div>
   );
@@ -370,7 +368,6 @@ const lerpN = (a: number, b: number, t: number) => a + (b - a) * t;
 /**
  * The method as a numbered column: every row inks in from `at`, each is
  * current (a highlight band) from its own cue to the next one's, then ticked.
- * `ring` circles one row from a frame on (the step an assistant cannot do).
  */
 export const Steps: React.FC<{
   items: readonly { label: string; at: number }[];
@@ -380,15 +377,17 @@ export const Steps: React.FC<{
   width: number;
   at: number;
   end: number;
-  ring?: { row: number; at: number; out?: number };
+  /** Light a row again from a frame on (the step an assistant cannot do). */
+  relight?: { row: number; at: number };
   out?: number;
-}> = ({ items, x, top, rowH, width, at, end, ring, out }) => {
+}> = ({ items, x, top, rowH, width, at, end, relight, out }) => {
   const frame = useCurrentFrame();
   return (
     <>
       {items.map((item, i) => {
         const next = items[i + 1]?.at ?? end;
-        const current = during(frame, item.at - 2, next, 8);
+        const again = relight && relight.row === i ? ease(frame, relight.at, 10) : 0;
+        const current = Math.max(during(frame, item.at - 2, next, 8), again);
         const done = ease(frame, next - 2, 10);
         return (
           <Ink key={i} at={at + i * 3} dur={12} out={out} style={{ left: x, top: top + i * rowH, width, height: rowH }}>
@@ -425,7 +424,6 @@ export const Steps: React.FC<{
           </Ink>
         );
       })}
-      {ring ? <Ring x={x - 22} y={top + ring.row * rowH + 2} w={width + 30} h={rowH - 4} at={ring.at} out={ring.out} /> : null}
     </>
   );
 };
