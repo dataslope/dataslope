@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TWIN_POSTQUEL, TWIN_SQL } from "./data";
-import { Card, Headline, KEY, KEY_INK, KEY_WASH, Listing, Mark, pulse, Spot, Tag, Wire } from "./parts";
+import { Card, Headline, KEY_INK, Listing, Mark, pulse, Spot, Tag, Wire } from "./parts";
 
 const SYLLABLES = ["post", "gres", "cue", "ell"];
 
@@ -16,8 +16,15 @@ const SYLLABLES = ["post", "gres", "cue", "ell"];
 const BUILT_IN = ["integer", "floating point", "character string"];
 const YOUR_OWN = ["polygon", "latitude and longitude"];
 
-/** A type, as a chip: ink for the built-ins, the data blue for one added. */
-const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }> = ({ at, added = false, children }) => {
+/** A type, as a word in a line of them: ink for the built-ins, the data
+ *  blue for one added. No chip around it: after the first, a middle dot
+ *  parts it from the one before, and inks in with it. */
+const Chip: React.FC<{ at: number; added?: boolean; first?: boolean; children: React.ReactNode }> = ({
+  at,
+  added = false,
+  first = false,
+  children,
+}) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = Math.min(1, pop(frame, at, fps, 14));
@@ -25,10 +32,6 @@ const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }>
   return (
     <div
       style={{
-        border: `2px solid ${added ? KEY : INK}`,
-        borderRadius: 8,
-        background: added ? KEY_WASH : "transparent",
-        padding: "5px 16px",
         opacity: p,
         transform: `translateY(${(1 - p) * 12}px)`,
         whiteSpace: "nowrap",
@@ -36,6 +39,7 @@ const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }>
         fontWeight: added ? 650 : 500,
       }}
     >
+      {first ? null : <span style={{ color: INK_SOFT, fontWeight: 500, margin: "0 0.55em" }}>·</span>}
       {children}
     </div>
   );
@@ -186,9 +190,9 @@ export const PostgresScene: React.FC = () => {
       <Ink at={extendAt - 4} dur={14} out={catchAt - 6} style={{ left: AX, top: TOP + 2, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT) }}>Commercial systems: a fixed menu of types</span>
       </Ink>
-      <div style={{ position: "absolute", left: AX, top: TOP + 44, display: "flex", gap: 14, opacity: 1 - ease(frame, catchAt - 6, 10) }}>
+      <div style={{ position: "absolute", left: AX, top: TOP + 44, display: "flex", opacity: 1 - ease(frame, catchAt - 6, 10) }}>
         {BUILT_IN.map((t, i) => (
-          <Chip key={t} at={extendAt + i * 4}>
+          <Chip key={t} at={extendAt + i * 4} first={i === 0}>
             {t}
           </Chip>
         ))}
@@ -196,9 +200,9 @@ export const PostgresScene: React.FC = () => {
       <Ink at={typesAt - 4} dur={14} out={catchAt - 6} style={{ left: AX, top: TOP + 128, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, KEY_INK) }}>POSTGRES: add your own, such as</span>
       </Ink>
-      <div style={{ position: "absolute", left: AX, top: TOP + 170, display: "flex", gap: 14, opacity: 1 - ease(frame, catchAt - 6, 10) }}>
+      <div style={{ position: "absolute", left: AX, top: TOP + 170, display: "flex", opacity: 1 - ease(frame, catchAt - 6, 10) }}>
         {YOUR_OWN.map((t, i) => (
-          <Chip key={t} at={typesAt + 2 + i * 6} added>
+          <Chip key={t} at={typesAt + 2 + i * 6} added first={i === 0}>
             {t}
           </Chip>
         ))}
