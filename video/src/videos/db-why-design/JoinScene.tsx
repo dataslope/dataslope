@@ -35,7 +35,7 @@ const PROJECT = ["parse the text", "handle misspellings", "notebook or notebooks
 const CHORE_STEP = 18;
 /** The chores' second column, and the gap before it that holds their hairline. */
 const CHORE_COL = 470;
-const CHORE_GAP = 110;
+const CHORE_GAP = 184;
 
 /**
  * Part 3 opens: which customers bought a notebook? In the lesson's clean

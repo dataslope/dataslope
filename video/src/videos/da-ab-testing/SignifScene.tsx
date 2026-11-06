@@ -9,7 +9,7 @@ import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COVERAGE, EXPERIMENT, PRACTICAL } from "./data";
-import { A_COLOR, at, B_COLOR, B_INK, Drift, OK_INK, type Scale, Svg, X0 } from "./parts";
+import { A_COLOR, at, B_COLOR, B_INK, ColumnRule, Drift, OK_INK, type Scale, Svg, X0 } from "./parts";
 
 const TOP = 330;
 /** Question 8's chart: the p-value against the group size, on a log axis. */
@@ -111,6 +111,9 @@ export const SignifScene: React.FC = () => {
             <b>statistical</b>: unlikely to be noise
           </span>
         </Note>
+        {/* Between the two definitions, centred in their gap: the first runs
+            about 430px at 26px. */}
+        <ColumnRule x={X0 + 495} top={y(TOP - 20)} height={34} at={pracAt - 2} out={out8} />
         <Note at={pracAt - 2} x={X0 + 560} y={y(TOP - 20)} out={out8}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <b>practical</b>: big enough to matter

@@ -70,6 +70,16 @@ export const curvePath = (x: Scale, base: number, height: number, mu: number, lo
   return area ? `${line} L${at(x, hi).toFixed(1)},${base} L${at(x, lo).toFixed(1)},${base} Z` : line;
 };
 
+/** A vertical hairline between columns of text set side by side, placed by
+ *  hand: centred in their gap, as tall as their text, inking in with the
+ *  column to its right (`at`). */
+export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: number; out?: number }> = ({ x, top, height, at: from, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, from, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  if (p <= 0) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height, background: HAIRLINE, opacity: p }} />;
+};
+
 /** A vertical hairline between columns of text set side by side, as an item
  *  of their flex row: as tall as the row's text, inking in with the column
  *  to its right (`at`). Spread the row with `space-between` to centre it in

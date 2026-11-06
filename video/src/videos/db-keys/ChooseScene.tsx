@@ -104,8 +104,10 @@ export const ChooseScene: React.FC = () => {
             return (
               <React.Fragment key={a.action}>
                 <ElbowArrow points={i === 1 ? [pts[0], [ANSWER_X - 14, by]] : pts} at={a.at - 2} color={INK} width={2.2} dur={14} />
-                <Ink at={a.at} dur={14} style={{ left: ANSWER_X, top: by - 28, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
+                <Ink at={a.at} dur={14} style={{ left: ANSWER_X, top: by - 28, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 24 }}>
                   <span style={{ ...body(38, true), color: INK }}>{a.q}</span>
+                  {/* The answer as a word in the mono face, bold and in the
+                      accent, with no outline: the color and face carry it. */}
                   <span style={{ opacity: ease(frame, a.actAt - 4, 10), transform: `translateY(${(1 - ease(frame, a.actAt - 4, 10)) * 8}px)`, display: "inline-block" }}>
                     <span
                       style={{
@@ -114,9 +116,6 @@ export const ChooseScene: React.FC = () => {
                         fontSize: 35,
                         fontWeight: 700,
                         color: ACCENT_INK,
-                        padding: "2px 14px",
-                        border: `2px solid ${ACCENT_INK}`,
-                        borderRadius: 8,
                       }}
                     >
                       {a.action}

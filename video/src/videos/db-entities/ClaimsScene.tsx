@@ -29,6 +29,9 @@ const SIDES = [
   { x: 120, head: "What you control", items: "statuses, roles, internal codes", verdict: "Be strict" },
   { x: 760, head: "What the world sends", items: "names, addresses", verdict: "Go easy" },
 ] as const;
+/** The gap between the two sides, where their hairline sits: centred between the
+ *  first side's longest line and the second side's left edge. */
+const SIDES_GAP = 220;
 
 /**
  * A domain is a claim about the world. VARCHAR(20) claims no name is
@@ -207,6 +210,21 @@ export const ClaimsScene: React.FC = () => {
               <Ink at={verdictAt + 8} dur={14} style={{ left: s.x, top: y(830), whiteSpace: "nowrap" }}>
                 <span style={{ ...label(24, i === 0 ? STAT_INK : INK_SOFT) }}>{s.verdict}</span>
               </Ink>
+              {/* Two columns side by side: a hairline in the gap, the height of the
+                  columns' text, inking in with the column to its right. */}
+              {i > 0 ? (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: s.x - SIDES_GAP / 2,
+                    top: y(724) + 4,
+                    width: 1,
+                    height: y(830) + 30 - y(724),
+                    background: HAIRLINE,
+                    opacity: ease(frame, Math.min(headAt, verdictAt) - 2, 14),
+                  }}
+                />
+              ) : null}
             </React.Fragment>
           );
         })}
