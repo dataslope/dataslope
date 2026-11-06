@@ -52,7 +52,7 @@ const Acid: React.FC<{ c: Ctx }> = ({ c }) => {
         const a = ease(frame, p.at - 4, 12);
         return (
           <React.Fragment key={p.letter}>
-          {i > 0 ? <ColumnRule x={x - 27} top={top + c.h(14)} bottom={top + c.h(300)} at={p.at - 4} /> : null}
+          {i > 0 ? <ColumnRule x={x - 27} top={top + c.h(14)} bottom={top + c.h(256)} at={p.at - 4} /> : null}
           <div style={{ position: "absolute", left: x, top, width: 196, opacity: Math.max(0.25, a) }}>
             <div style={{ ...headline(110), color: a > 0.5 ? BLUE_INK : INK_SOFT, lineHeight: 1 }}>{p.letter}</div>
             <div style={{ ...label(26, INK), fontWeight: 700, marginTop: c.h(20), opacity: a }}>{p.word}</div>

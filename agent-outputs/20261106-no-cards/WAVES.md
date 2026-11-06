@@ -10,8 +10,10 @@ Brief: BRIEF.md in this folder. Layout only, no re-voicing, no new images.
 - Added to the trim agents' jobs: thinking-statistically, describing-data (Stats-1, 2);
   probability, distributions (Stats-3, 4); db-why-design, db-entities (DbD 1, 2)
 
+## Wave 2 (started)
+- DS 4-7: ds-ml-models, ds-deep-learning, ds-experiment-design, ds-experiments-in-practice (started when backend Part 3 finished)
+
 ## Later waves (start one as each agent finishes)
-- DS 4-7: ds-ml-models, ds-deep-learning, ds-experiment-design, ds-experiments-in-practice
 - DS 8-11: ds-product-sense, ds-python-pandas, ds-sql, ds-llm-evaluation
 - DA 0-4: da-interview, da-sql, da-pandas, da-statistics-communication, da-advanced-sql
 - DA 5-8: da-spreadsheets, da-visualization, da-ab-testing, da-ai-assisted
