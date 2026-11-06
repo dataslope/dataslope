@@ -223,7 +223,7 @@ export const CompositeScene: React.FC = () => {
             </span>
           </Note>
         </div>
-        <Spot art="phoneBook" at={bookAt} out={bookOut} left={1540} top={y(480)} width={200} />
+        <Spot art="phoneBook" at={bookAt} out={runAt - 24} left={1540} top={y(480)} width={200} />
 
         {/* ── Phase B: the statements, top left and top right ── */}
         <Listing lines={COMPOSITE.create} x={X0} top={listTop} width={720} size={20} at={runAt} out={swapAt - 4} marks={[{ line: "ON orders", text: "(customer_id, created_at)", at: runAt + 10 }]} />
