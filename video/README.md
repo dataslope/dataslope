@@ -646,8 +646,10 @@ merged course and interview track: the animal low (`Bottom`) or high
 (`Top`); a course's "Full Course" smaller than its title (`Small`) or at its
 size (`Same`); an interview track saying "Interview Prep" (`Prep`) or
 "Interview Preparation" (`Preparation`), in the title's black or one of two
-greys, or in black after the role set in blue (`BlueRole`). For example
-`Thumb-DatabaseDesign-Same-Top` or `Thumb-DataEngineer-Preparation-BlueRole-Top`.
+greys, or in black after the role set in blue (`BlueRole`) or in green with
+a green mark (`GreenRole`): green tells the interview series apart from the
+courses' blue. For example `Thumb-DatabaseDesign-Same-Top` or
+`Thumb-DataEngineer-Preparation-GreenRole-Top`.
 
 Each track has its own watercolor animal, so the seven read apart at a
 glance in a list of results: an owl on a die (Statistics), an elephant at a

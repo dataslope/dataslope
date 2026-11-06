@@ -3,7 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { Illustration } from "../components/Illustration";
 import { INK } from "../editorial/style";
 import { AnimatedMark } from "../reveals/Mark";
-import { ds } from "../theme/brand";
+import { ds, inkOf } from "../theme/brand";
 import { SANS } from "../theme/fonts";
 
 /**
@@ -73,8 +73,9 @@ export type ThumbnailProps = {
   label?: InterviewLabel;
   tone?: LabelTone;
   /** An interview track's role ("Data Analyst"): black like a course
-   *  title, or in the brand blue, with the label after it in black. */
-  role?: "black" | "blue";
+   *  title, or in a hue with the label after it in black. Green marks the
+   *  interview series apart from the courses' blue, the mark included. */
+  role?: "black" | "blue" | "green";
   /** A course's "Full Course": smaller than the title, or the title's size. */
   kicker?: "small" | "same";
   /** Where the animal stands: on the line the words end on, or hung from
@@ -126,7 +127,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", ton
       {/* The mark alone, no wordmark. A motion that has long since landed
           draws the finished mark. */}
       <div style={{ position: "absolute", left: PAD, top: 52 }}>
-        <AnimatedMark motion="assemble" at={-120} height={56} color={ds("blue", 500)} />
+        <AnimatedMark motion="assemble" at={-120} height={56} color={!course && role === "green" ? ds("green", 500) : ds("blue", 500)} />
       </div>
 
       {/* The animal, either standing on the same line as the last line of
@@ -156,7 +157,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", ton
           // every line of the block is one step apart.
           <div style={{ ...type(kick, ds("blue", 500)), lineHeight: `${1.1 * SIZE}px` }}>Full Course</div>
         ) : null}
-        <Lines lines={t.title} style={type(SIZE, !course && role === "blue" ? ds("blue", 500) : INK)} />
+        <Lines lines={t.title} style={type(SIZE, course || role === "black" ? INK : role === "green" ? inkOf.green : ds("blue", 500))} />
         {course ? null : (
           <div>
             <Lines lines={INTERVIEW[label]} style={type(SIZE, TONE[tone])} />
@@ -191,6 +192,8 @@ export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entrie
             // The role in blue, the label in black: the courses' scheme turned
             // round, the line that names the video in blue.
             { id: `Thumb-${track}-${cap(label)}-BlueRole-${cap(artAt)}`, props: { track, label, tone: "black", role: "blue", artAt } },
+            // The same in green, mark and role: the interview series' color.
+            { id: `Thumb-${track}-${cap(label)}-GreenRole-${cap(artAt)}`, props: { track, label, tone: "black", role: "green", artAt } },
           ],
         ),
   ),
