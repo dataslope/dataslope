@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { fmt, halo, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
@@ -25,6 +25,7 @@ import {
   Head,
   lerp,
   pulse,
+  Spot,
   Strike,
   Svg,
 } from "./parts";
@@ -95,14 +96,19 @@ export const ZScene: React.FC = () => {
           { text: "a position.", at: positionAt - 6, italic: true },
         ]}
       />
-      <Ink at={zScoreAt - 2} dur={16} style={{ left: 96, top: y(252), whiteSpace: "nowrap" }}>
-        <span style={{ ...body(40, true), color: INK }}>
-          z = (score − mean) / SD
-          <span style={{ color: ASK_INK, opacity: ease(frame, isTwoAt - 6, 14), marginLeft: "0.4em" }}>
-            = ({x} − {mu}) / {sigma} = {fmt(Z.z, 0)}
+      {/* The formula on one line in Inter at one size: the worked numbers
+          in the accent, and the z they come to in weight as well. */}
+      <Ink at={zScoreAt - 2} dur={16} style={{ left: 96, top: y(254), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(34, INK) }}>
+          z = (score − mean) / SD{" "}
+          <span style={{ color: ASK_INK, opacity: ease(frame, isTwoAt - 6, 14) }}>
+            = ({x} − {mu}) / {sigma} = <b style={{ fontWeight: 700 }}>{fmt(Z.z, 0)}</b>
           </span>
         </span>
       </Ink>
+
+      {/* A position: a pin in a map, top right, clear of the notes under it. */}
+      <Spot id="distributions-pin" at={positionAt - 4} left={1580} top={y(104)} width={200} height={190} />
 
       <Drift from={zFrom} to={n.beat("skew-in").to + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>

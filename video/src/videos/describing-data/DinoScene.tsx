@@ -220,8 +220,9 @@ export const DinoScene: React.FC = () => {
           const top = y(410) + i * 64;
           return (
             <div key={r.key} style={{ position: "absolute", left: 1000, top, width: 470, opacity: p, transform: `translateX(${(1 - p) * 18}px)`, display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 10 }}>
-              <span style={{ ...label(25, INK), fontWeight: 560 }}>{r.name}</span>
-              <span style={{ ...note(30, INK), ...TABULAR, fontWeight: 700 }}>
+              {/* A row reads as one line: name and value at one size, the value in weight. */}
+              <span style={{ ...label(27, INK), fontWeight: 560 }}>{r.name}</span>
+              <span style={{ ...note(27, INK), ...TABULAR, fontWeight: 700 }}>
                 <Mark at={hundredthAt - 2 + i * 2} out={plotAt + 10}>
                   {stat(stats[r.key])}
                 </Mark>

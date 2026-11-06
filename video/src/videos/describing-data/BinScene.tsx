@@ -8,7 +8,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BINS } from "./data";
-import { DATA, Drift, lerp, Mark, Pulse, STAT, Svg, Tag } from "./parts";
+import { DATA, Drift, lerp, Mark, Pulse, Spot, STAT, Svg, Tag } from "./parts";
 
 type Level = "5" | "20" | "80";
 const LEVELS: Level[] = ["5", "20", "80"];
@@ -129,6 +129,9 @@ export const BinScene: React.FC = () => {
       </Ink>
 
       <FigLabel n="12" title="One thousand values, the same in every panel" at={histAt - 4} x={160} y={y(330)} />
+
+      {/* "a knob": a rotary knob, top right above the slider that turns it. */}
+      <Spot id="describing-data-knob" at={knobAt - 4} left={1610} top={y(96)} width={210} height={190} />
 
       {/* ── The knob ── */}
       {knobIn > 0 ? (

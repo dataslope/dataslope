@@ -8,7 +8,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HEIGHTS, SKEW, type Shape } from "./data";
-import { Arrow, DATA, Drift, Kicker, lerp, Mark, Pulse, SECOND, SECOND_INK, STAT, STAT_INK, Svg, Tag } from "./parts";
+import { Arrow, DATA, Drift, Kicker, lerp, Mark, Pulse, SECOND, SECOND_INK, Spot, STAT, STAT_INK, Svg, Tag } from "./parts";
 
 const PANEL_W = 480;
 const PANEL_X = { left: 170, symmetric: 720, right: 1270 } as const;
@@ -144,6 +144,11 @@ export const ShapeScene: React.FC = () => {
       <Ink at={peaksFrom - 2} dur={20} style={{ left: 92, top: y(150), ...headline(80), whiteSpace: "nowrap" }}>
         Two peaks, two groups.
       </Ink>
+
+      {/* "the long tail": a kite trailing its tail to the right, top right while the three
+          samples are up; then "two groups" of people, short and tall, for the heights. */}
+      <Spot id="describing-data-kite" at={tailAt - 4} out={peaksFrom - 10} left={1560} top={y(96)} width={230} height={179} />
+      <Spot id="describing-data-two-groups" at={groupsAt - 4} left={1560} top={y(100)} width={240} height={174} />
 
       {/* ── Phase A: three samples of five thousand ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - phaseB, transform: `translateY(${-phaseB * 40}px)` }}>

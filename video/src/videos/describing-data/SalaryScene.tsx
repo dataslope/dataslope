@@ -38,6 +38,7 @@ export const SalaryScene: React.FC = () => {
   const typicalAt = n.word("hook", "typical");
   const takeAt = n.word("hook", "So take");
   const tenAt = n.word("hook", "ten salaries");
+  const smallAt = n.word("hook", "small company");
   const fortyAt = n.word("hook", "forty-two");
   const sixtyAt = n.word("hook", "sixty-five");
   const jumpSevenAt = n.word("jump", "seven");
@@ -145,6 +146,10 @@ export const SalaryScene: React.FC = () => {
         The median finds the middle.
       </Ink>
 
+      {/* "a small company": its building, top right, until the CEO walks in. Then the CEO
+          over his own dot, gone again as the seesaw takes the corner for the balance. */}
+      <Spot id="describing-data-office" at={smallAt - 4} out={ceoAt - 10} left={1580} top={y(96)} width={220} height={189} />
+      <Spot id="describing-data-ceo" at={ceoAt + 2} out={balanceAt - 18} left={1582} top={y(306)} width={99} height={230} />
       <Spot id="describing-data-seesaw" at={balanceAt - 6} left={1500} top={y(150)} width={330} height={169} />
 
       <FigLabel n="1" title="Salaries at a small company, in thousands" at={takeAt - 4} x={160} y={y(330)} />

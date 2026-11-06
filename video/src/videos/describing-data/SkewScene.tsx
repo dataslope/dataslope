@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
+import { fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ORDERS } from "./data";
-import { Arrow, Bracket, DATA, Drift, lerp, Mark, Pulse, STAT, STAT_INK, Svg, Tag } from "./parts";
+import { Arrow, Bracket, DATA, Drift, lerp, Mark, Pulse, Spot, STAT, STAT_INK, Svg, Tag } from "./parts";
 
 const BASE = 830;
 const X0 = 160;
@@ -70,6 +70,7 @@ export const SkewScene: React.FC = () => {
   // ── Cues ──
   const ordersFrom = n.beat("orders").from;
   const fiveAt = n.word("orders", "five hundred");
+  const customerAt = n.word("orders", "customer orders");
   const modestAt = n.word("orders", "modest");
   const tailAt = n.word("orders", "long tail");
   const rightAt = n.word("orders", "right");
@@ -144,6 +145,12 @@ export const SkewScene: React.FC = () => {
       </Ink>
 
       <FigLabel n="2" title={`${ORDERS.n} customer orders, in dollars`} at={ordersFrom} x={160} y={y(330)} />
+
+      {/* "customer orders": a shopping bag, in the empty right half over the tail, gone
+          before the histogram narrows for the table; then "wait times", an hourglass,
+          top right beside the table's headline. */}
+      <Spot id="describing-data-bag" at={customerAt - 4} out={rightFrom - 10} left={1520} top={y(402)} width={175} height={220} />
+      <Spot id="describing-data-hourglass" at={examplesAt[2] - 4} left={1650} top={y(96)} width={122} height={210} />
 
       <Drift from={ordersFrom} to={moveAt + 30} scale={0.018} origin={[X0, base]}>
         <Bars
@@ -249,8 +256,9 @@ export const SkewScene: React.FC = () => {
                 opacity: p,
                 transform: `translateX(${(1 - p) * 24}px)`,
                 whiteSpace: "nowrap",
-                ...body(32),
-                color: INK,
+                // The row's case and its answer read as one line: one face, one size.
+                ...note(28, INK),
+                lineHeight: 1.2,
               }}
             >
               {r.what}
@@ -259,11 +267,12 @@ export const SkewScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: 1530,
-                top: top + 6,
+                top: top + 2,
                 opacity: ease(frame, answerAt[i] - 6, 12),
                 whiteSpace: "nowrap",
                 ...label(28, r.red ? STAT_INK : INK),
                 fontWeight: 700,
+                lineHeight: 1.2,
                 ...halo,
               }}
             >

@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { expCdf, expPdf, QUANTILE } from "./data";
-import { areaD, Arrow, ASK, ASK_FILL, askNote, Centered, clamp01, code, curveD, DIST, Drift, Head, lerp, pulse, Svg, YTicks } from "./parts";
+import { areaD, Arrow, ASK, ASK_FILL, askNote, Centered, clamp01, code, curveD, DIST, Drift, Head, lerp, pulse, Spot, Svg, YTicks } from "./parts";
 
 const X: XScale = { lo: 0, hi: 1000, x0: 200, x1: 1280 };
 const BASE = 820;
@@ -36,6 +36,7 @@ export const QuantileScene: React.FC = () => {
   const timeAt = n.word("quantile", "the time");
   const avgAt = n.word("quantile", "two hundred milliseconds");
   const ninetyAt = n.word("quantile", "ninety-five percent");
+  const requestsAt = n.word("quantile", "requests");
   const plotAt = n.word("across", "Plot");
   const areaAt = n.word("across", "area to its left");
   const densityEnd = n.word("across", "density", { edge: "end" });
@@ -84,6 +85,9 @@ export const QuantileScene: React.FC = () => {
           { text: "the area, read backwards.", at: backwardsAt - 8, italic: true },
         ]}
       />
+
+      {/* The server the requests go to, over the density inset. */}
+      <Spot id="distributions-server" at={requestsAt - 4} left={1600} top={y(104)} width={145} height={230} />
 
       <Drift from={quantileFrom} to={n.beat("normal-in").to + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>

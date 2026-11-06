@@ -291,7 +291,8 @@ const sig2 = (v) => {
 const said = [
   ["q2-trick", "about twelve a second", 12, Math.round(R.estimate.millionPerDayQps)],
   ["q2-writes", "about a hundred and twenty writes a second", 120, sig2(R.estimate.writeQps)],
-  ["q2-reads", "a billion redirects a day", 1e9, R.estimate.readsPerDay],
+  ["q2-reads", "a hundred redirects per link", 100, R.estimate.assumptions.readsPerWrite],
+  ["q2-reads", "a billion a day", 1e9, R.estimate.readsPerDay],
   ["q2-reads", "about twelve thousand a second", 12_000, sig2(R.estimate.readQps)],
   ["q2-peak", "about thirty-five thousand redirects a second", 35_000, sig2(R.estimate.peakReadQps)],
   ["q2-storage", "five gigabytes a day", 5e9, R.estimate.storagePerDayBytes],
@@ -317,6 +318,7 @@ const said = [
   ["q5-light", "about two hundred kilometers a millisecond", 200, R.distance.kmPerMs],
   ["q5-light", "a hundred and fifty-seven milliseconds", 157, Math.round(R.distance.roundTripMs)],
   ["q5-light", "under a millisecond", 1, Math.ceil(R.distance.edgeRoundTripMs)],
+  ["q5-light", "over a hundred times the millisecond", 100, Math.floor(R.distance.roundTripMs / R.ladder.path.hitMs / 100) * 100],
 ];
 const bad = [];
 for (const [id, words, means, value] of said) {

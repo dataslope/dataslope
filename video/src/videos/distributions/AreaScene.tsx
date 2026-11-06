@@ -62,6 +62,7 @@ export const AreaScene: React.FC = () => {
   const areaAt = n.word("area", "area under the curve");
   const betweenAt = n.word("area", "between two and eight");
   const percentAt = n.word("area", "forty-seven percent");
+  const codeAt = n.word("cdf", "code");
   const leftEightAt = n.word("cdf", "left of eight");
   const minusAt = n.word("cdf", "minus");
   const leftTwoEnd = n.word("cdf", "two", { edge: "end" });
@@ -110,6 +111,8 @@ export const AreaScene: React.FC = () => {
       />
 
       <Spot id="distributions-hourglass" at={waitingAt - 4} left={1530} top={y(88)} width={250} height={290} />
+      {/* The code, right of the lines that spell it out. */}
+      <Spot id="distributions-laptop" at={codeAt - 4} left={1530} top={y(595)} width={220} height={170} />
 
       <Drift from={exactFrom} to={n.beat("height-in").to + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dimFig }}>
@@ -179,17 +182,18 @@ export const AreaScene: React.FC = () => {
             <Count at={percentAt - 10} dur={16} to={EXPONENTIAL.between * 100} suffix="%" />
           </Centered>
 
-          {/* The area as code. */}
+          {/* The area as code. One line, one size: the code and the words
+              beside it share the line's 24px, the code in the site's mono. */}
           <Ink at={leftEightAt - 4} dur={14} style={{ left: EQ_X, top: y(470), whiteSpace: "nowrap" }}>
-            <span style={code(28, INK)}>cdf({b})</span>
-            <span style={{ ...note(22, INK_SOFT), marginLeft: 14 }}>area left of {b}: {fmt(EXPONENTIAL.cdfB, 3)}</span>
+            <span style={code(24, INK)}>cdf({b})</span>
+            <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>area left of {b}: {fmt(EXPONENTIAL.cdfB, 3)}</span>
           </Ink>
-          <Ink at={minusAt - 2} dur={14} style={{ left: EQ_X - 30, top: y(516), whiteSpace: "nowrap" }}>
-            <span style={code(28, INK)}>− cdf({a})</span>
-            <span style={{ ...note(22, INK_SOFT), marginLeft: 14 }}>left of {a}: {fmt(EXPONENTIAL.cdfA, 3)}</span>
+          <Ink at={minusAt - 2} dur={14} style={{ left: EQ_X - 29, top: y(514), whiteSpace: "nowrap" }}>
+            <span style={code(24, INK)}>− cdf({a})</span>
+            <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>left of {a}: {fmt(EXPONENTIAL.cdfA, 3)}</span>
           </Ink>
-          <Ink at={leftTwoEnd} dur={14} style={{ left: EQ_X - 30, top: y(562), whiteSpace: "nowrap" }}>
-            <span style={code(28, ASK)}>= {fmt(EXPONENTIAL.between, 3)}</span>
+          <Ink at={leftTwoEnd} dur={14} style={{ left: EQ_X - 29, top: y(558), whiteSpace: "nowrap" }}>
+            <span style={code(24, ASK)}>= {fmt(EXPONENTIAL.between, 3)}</span>
           </Ink>
         </div>
 

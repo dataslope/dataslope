@@ -17,7 +17,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   3. "When does an index help, and when does it hurt?" ("hurt").
  *   4. "What is a composite index and why does column order matter?"
  *      ("composite").
- *   5. "How do you read a query plan?" ("plan").
+ *   5. "How do you read a query plan?" ("plan-q").
  *   6. "Why can a join inflate a SUM, and how do you fix it?" ("fanout").
  *   7. "What is a transaction, and how do you use one?" ("txn").
  *   8. "What are the SQL isolation levels?" ("levels") and 9. "What
@@ -77,7 +77,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     composite-rule: "equality first, then range or sort".
  *     composite-skip: an index on (status, created_at), four status runs,
  *     five short searches into them, "Heap Fetches: 0".
- *   plan: QuestionCard 5; a plan printed as a tree, the indented node
+ *   plan-q: QuestionCard 5; a plan printed as a tree, the indented node
  *     marked as running first. plan-look: three labels pinned to it: scan,
  *     estimate vs actual, rows removed. plan-bad: the function filter's plan,
  *     "rows=5000" against "actual rows=2732" in yellow, "Rows Removed by
@@ -94,10 +94,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     bracket. txn-run: accounts 1 and 2 at 100; the debit takes 1 to 70;
  *     the transfer row fails its foreign key (the error, as Postgres printed
  *     it, in red). txn-abort: the next statement refused ("current
- *     transaction is aborted"); ROLLBACK; account 1 back at 100 (green).
- *     txn-app: one line, "catch, roll back, retry the whole transaction".
- *   levels: QuestionCard 8; the four levels as rows of a grid.
- *     levels-pg: "Postgres: read committed" from SHOW.
+ *     transaction is aborted"); ROLLBACK; account 1 back at 100 (green);
+ *     then one line, "catch, roll back, retry or report".
+ *   levels: QuestionCard 8; the four levels as rows of a grid; on
+ *     "defaults differ", "Postgres: read committed" from SHOW.
  *     anomalies: QuestionCard 9 replaces 8 over the same grid, whose three
  *     columns appear. anomalies-dirty: two timelines; the other transaction
  *     writes 50 and stays open; this one reads at each of the four levels,
@@ -122,8 +122,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     the database), the cycle found, one transfer struck in red "deadlock
  *     detected", the other finishing (green), then the victim re-run.
  *     deadlock-order: both transfers taking account 1 first; the second
- *     simply waits, no cycle. deadlock-pool: a pool of ten connections, a
- *     queue of requests behind it, none of them waiting on a lock.
+ *     simply waits, no cycle.
  *   rapid-in: the RapidFire list, 12 to 16. r-acid: four letters, each word
  *     under it. r-norm: one customer's email in one table against copied into
  *     every order, one copy changed and the others stale (red).
@@ -193,9 +192,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "deadlock": drawn, for the same reason. deadlock_timeout is "1s"
  *     (SHOW, from the same database); Postgres's detector, its victim and
  *     "deadlock detected" are from its docs ("Deadlocks", and
- *     deadlock_timeout: the wait before checking for a deadlock). The pool
- *     line is the page's own ("a saturated connection pool"), with no
- *     number.
+ *     deadlock_timeout: the wait before checking for a deadlock). A full
+ *     connection pool, which the page adds as a look-alike failure, is left
+ *     out for length: an aside to the question, not part of its answer.
  *   - "r-joins": the page's tables: inner join 24 rows, left join 30; Di,
  *     Hana, Leo, Pia, Theo and Yara have no orders. "r-keys": pg_indexes on
  *     accounts and transfers lists only the two primary keys
@@ -249,7 +248,7 @@ export const script: NarrationScript = {
     },
     {
       id: "nosql-no",
-      text: "Pick NoSQL when writes must scale out across machines, when the schema keeps changing, as documents do, or when one access pattern, known in advance, runs at huge volume: key-value or wide-column. The price is weaker consistency and few joins.",
+      text: "Pick NoSQL when writes must scale out across machines, when the schema keeps changing, as documents do, or when one access pattern, known in advance, runs at huge volume: key-value or wide-column. The price: weaker consistency and few joins.",
       pauseAfter: 0.6,
     },
     {
@@ -287,7 +286,7 @@ export const script: NarrationScript = {
     },
     {
       id: "index-hash",
-      text: "The kind matters. A hash index finds one email as fast, but ask it for a range, and Postgres reads the whole table again.",
+      text: "The kind matters. A hash index goes straight to one email, but ask it for a range, and Postgres reads the whole table again.",
       pauseAfter: 0.8,
     },
 
@@ -353,7 +352,7 @@ export const script: NarrationScript = {
     },
     {
       id: "composite-skip",
-      text: "Postgres eighteen added a skip scan, which uses an index without its first column when that column has few values. On status, then order time, one day took five searches of the index, and never touched the table.",
+      text: "Postgres eighteen added a skip scan, which uses an index without its first column when that column has few values. On status, then order time, one day took five index searches and never touched the table.",
       pauseAfter: 0.8,
     },
 
@@ -435,7 +434,7 @@ export const script: NarrationScript = {
     {
       id: "levels",
       scene: true,
-      text: "Question eight. What are the SQL isolation levels? The standard names four: read uncommitted, read committed, repeatable read, and serializable. Each is defined by the anomalies it allows, not by how it's built, and defaults differ: Postgres uses read committed.",
+      text: "Question eight. What are the SQL isolation levels? The standard names four: read uncommitted, read committed, repeatable read, and serializable. Each is defined by the anomalies it rules out, not by how it's built, and defaults differ: Postgres uses read committed.",
       pauseAfter: 0.5,
     },
     {
@@ -468,7 +467,7 @@ export const script: NarrationScript = {
     {
       id: "lock",
       scene: true,
-      text: "Question ten. What is an optimistic versus pessimistic locking strategy? Pessimistic locks first: select for update locks the row until commit, and anyone else who wants it waits.",
+      text: "Question ten. What is an optimistic versus pessimistic locking strategy? Pessimistic locks first: select for update locks the row until commit, and any other transaction that wants to change or lock it waits.",
       pauseAfter: 0.5,
     },
     {
@@ -529,7 +528,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-norm",
-      text: "Normalization stores each fact once, so an update can't leave copies disagreeing, which suits write-heavy systems. Denormalization repeats data to skip joins, trading storage and harder updates for read speed. Normalize first, and denormalize where profiling blames a join.",
+      text: "Normalization stores each fact once, so no update leaves copies disagreeing, which suits write-heavy systems. Denormalization repeats data to skip joins, buying read speed with storage and harder updates. Normalize first; denormalize where profiling blames a join.",
       pauseAfter: 0.6,
     },
     {

@@ -402,7 +402,7 @@ const said = [
   ["q9-token", "one every six seconds", 6, R.rate.refillSeconds],
   ["q9-token", "the second is refused", 0, R.rate.token.second],
   ["q9-leaky", "one every six seconds", 6, R.rate.refillSeconds],
-  ["q9-shared", "Four app servers", 4, R.rate.servers],
+  ["q9-shared", "four app servers", 4, R.rate.servers],
   ["q9-shared", "four times the limit", 4, R.rate.localOk / R.rate.sharedOk],
   ["q12-storm", "two hundred followers, two hundred writes", 200, R.feed.pushWritesOrdinary],
   ["q12-storm", "fifty million followers makes fifty million writes", 50e6, R.feed.pushWritesCelebrity],

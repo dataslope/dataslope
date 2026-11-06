@@ -22,7 +22,7 @@
 // Rate limiting is answered from the client's side with no number: Part 2
 // runs the limiter's algorithms, and Part 9 the seeded model of a thousand
 // clients retrying in step, so neither is repeated here.
-/* global console, process, URL */
+/* global Buffer, console, process, URL */
 import { createHash, createHmac } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";

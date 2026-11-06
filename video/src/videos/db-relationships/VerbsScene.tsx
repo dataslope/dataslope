@@ -15,8 +15,8 @@ const BOX_W = 360;
 const XS = [150, 780, 1410];
 const SENT_Y = 660;
 /** Page px from a sentence to the next, and from a sentence to its verdict. */
-const SENT_STEP = 128;
-const VERDICT_DY = 64;
+const SENT_STEP = 136;
+const VERDICT_DY = 70;
 
 /**
  * Part 1 opens on Unit 2's bridge: entities never live alone. Three boxes

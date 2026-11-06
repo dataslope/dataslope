@@ -7,7 +7,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Mini, type MiniKind } from "./Mini";
-import { Arrow, ASK, askNote, Centered, Drift, Head, lerp, Svg } from "./parts";
+import { Arrow, ASK, askNote, Centered, Drift, Head, lerp, Spot, Svg } from "./parts";
 
 const ROW_Y0 = 318;
 const ROW_STEP = 104;
@@ -85,6 +85,11 @@ export const ChooseScene: React.FC = () => {
       <Sfx name="el-pencil" at={measuringAt - 4} level={-34} />
 
       <Head parts={[{ text: "What are you counting?", at: chooseFrom - 4 }]} />
+
+      {/* A tally counter over the column of models, and a tape measure
+          beside the line where measuring begins. */}
+      <Spot id="distributions-tally" at={countingAt - 4} left={1460} top={y(100)} width={175} height={182} />
+      <Spot id="distributions-tape-measure" at={measuringAt - 4} left={1652} top={y(749)} width={178} height={150} />
 
       <Drift from={chooseFrom} to={n.beat("whole").to + 50} origin="50% 40%">
         <Ink at={countingAt - 4} dur={14} style={{ left: Q_X, top: y(ROW_Y0 - 50), whiteSpace: "nowrap" }}>

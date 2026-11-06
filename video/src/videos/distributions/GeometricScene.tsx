@@ -8,7 +8,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GEOMETRIC } from "./data";
-import { ASK, askNote, Bracket, code, Count, DIST, Drift, Head, KBars, lerp, pulse, Svg, VRule } from "./parts";
+import { ASK, askNote, Bracket, code, Count, DIST, Drift, Head, KBars, lerp, pulse, Spot, Svg, VRule } from "./parts";
 
 const X: XScale = { lo: 0.5, hi: 20.5, x0: 160, x1: 1500 };
 const BASE = 840;
@@ -72,6 +72,9 @@ export const GeometricScene: React.FC = () => {
           { text: "geometric.", at: geometricAt - 6, italic: true },
         ]}
       />
+
+      {/* The sales call, under the pie that gives its chance. */}
+      <Spot id="distributions-phone" at={callAt - 4} left={1560} top={y(560)} width={210} height={180} />
 
       <Drift from={geoFrom} to={n.beat("five").to + 50}>
         <FigLabel n="5" title="Calls until the first sale" at={triesAt - 4} x={160} y={y(300)} />

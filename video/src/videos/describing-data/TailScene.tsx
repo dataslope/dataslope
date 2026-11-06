@@ -8,7 +8,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TAILS, type Tail } from "./data";
-import { Drift, Mark, Pulse, STAT, STAT_INK, Svg, Tag, count } from "./parts";
+import { Drift, Mark, Pulse, Spot, STAT, STAT_INK, Svg, Tag, count } from "./parts";
 
 /** Standardized values: the body from -4 to 4 SD in bars, the far values as dots. */
 const X: XScale = { lo: -12, hi: 12, x0: 300, x1: 1500 };
@@ -126,6 +126,11 @@ export const TailScene: React.FC = () => {
       </Ink>
 
       <FigLabel n="9" title="Twenty thousand draws each, in standard deviations from the mean" at={twentyAt - 6} x={160} y={y(330)} />
+
+      {/* Where heavy tails live: "financial returns", stacks of coins, and "insurance
+          losses", an umbrella over a house, top right beside the headline. */}
+      <Spot id="describing-data-coins" at={examples[0] - 4} left={1290} top={y(130)} width={200} height={150} />
+      <Spot id="describing-data-umbrella" at={examples[1] - 4} left={1590} top={y(102)} width={175} height={174} />
 
       <Drift from={tailsFrom} to={mistakeAt + 40} scale={0.02} origin={[900, y(ROWS.heavy)]}>
         {/* Beyond four SD, either side. */}

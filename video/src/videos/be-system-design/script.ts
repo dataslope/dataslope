@@ -51,8 +51,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     latency, availability, consistency), each item inked on its word; the
  *     two question marks stay gray, as questions to ask.
  *   q1-steps: a five-step strip under the lists: requirements, estimate, API,
- *     high-level design, bottlenecks; each lights as it is said, the last
- *     ("bottlenecks") marked as where the second half of the hour goes.
+ *     high-level design, bottlenecks; each lights as it is said, the first
+ *     four filled in, the last ("bottlenecks") left open.
  *   q1-why: the "Non-functional" column takes the yellow highlight on "shapes
  *     the design"; two small figures side by side, "1,000 users" and "1
  *     billion redirects a day", over the same two feature chips.
@@ -99,7 +99,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (counted), stacked so the keys visibly differ in one last character;
  *     red on "walk through".
  *   q4: question card; the q3 diagram returns, and the load balancer, the
- *     cache and the store are ringed in red on their words. On "lose it",
+ *     cache and the store are ringed in red on their words. On "Lose that",
  *     the cache fades and every arrow it carried reroutes to the store.
  *   q4-fix: each ring is answered: a second load balancer drawn dashed
  *     (standby), a replica beside the store with a failover arrow, a replica
@@ -116,7 +116,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q5: question card; a world outline with an origin dot in Virginia and a
  *     user in Sydney. The globe spot.
  *   q5-light: the arc between them with "15,700 km ÷ 200 km/ms × 2 ≈ 157 ms",
- *     a floor; then an edge dot beside the user, "under 1 ms".
+ *     a floor, and beside it q3-path's "≈ 1 ms" inside the data center, drawn
+ *     to the same scale (a sliver); then an edge dot beside the user, "under
+ *     1 ms".
  *   q5-use: three benefits as chips (latency, origin offload, spikes), then
  *     two columns: "at the edge" (images, JavaScript, CSS, video) and "to the
  *     origin" (user-specific responses, or a short time to live).
@@ -142,10 +144,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     redirect on lookup"); "custom aliases? links that expire?" are
  *     questions to ask, not facts.
  *   - the estimate (q2), arithmetic on the video's own assumptions, each
- *     said as one: 10,000,000 new links a day; 100 reads a write (the page's
- *     "100:1 or more"); peak 3 times average (the page's "often 2–3x"); 500
- *     bytes a link (the page's "a few hundred bytes per URL"); five years;
- *     500 bytes a redirect response. A million a day is 11.6 a second (the
+ *     said as one ("assume", "say", "take"): 10,000,000 new links a day; 100
+ *     redirects a link (the page's "100:1 or more"); peak 3 times average
+ *     (the page's "often 2–3x"); 500 bytes a link (the page's "a few hundred
+ *     bytes per URL"); five years; 500 bytes a redirect response. A million a day is 11.6 a second (the
  *     page: "roughly 12"); writes 115.7 a second ("about a hundred and
  *     twenty"); a billion redirects a day, 11,574 a second ("about twelve
  *     thousand"); peak 34,722 ("about thirty-five thousand"); 5 GB a day,
@@ -168,8 +170,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     hit is two in-data-center round trips (load balancer to app server,
  *     app server to cache), 2 × 0.5 = 1 ms; a miss adds a third and an SSD
  *     read, 1.5 + 0.1 = 1.6 ms. Network time only, as the ladder gives it;
- *     no server's processing time is claimed. ID blocks ("a million at a time") and
- *     consecutive keys are the follow-up, shown on the video's own IDs.
+ *     no server's processing time is claimed. ID blocks ("a million at a
+ *     time") and consecutive keys are the follow-up, shown on the video's own
+ *     IDs (9,876,543,210 and the next two: aMoY42, aMoY43, aMoY44).
  *   - single points of failure (q4): the page's answer (one database, one
  *     load balancer, one cache; active-passive pairs, replicated databases
  *     with failover, multiple app servers, several availability zones). The
@@ -181,8 +184,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     breaker's at 0.025.
  *   - distance (q5): light in fiber about 200 km a millisecond (c over a
  *     refractive index near 1.5); Sydney to Ashburn, Virginia, 15,674 km
- *     great-circle, so at least 157 ms round trip; an edge server 50 km away,
- *     0.5 ms ("under a millisecond"). A lower bound from physics, not a
+ *     great-circle, so at least 157 ms round trip ("over a hundred times" the
+ *     1 ms of q3-path); an edge server 50 km away, 0.5 ms ("under a
+ *     millisecond"). A lower bound from physics, not a
  *     measurement of any network. What a CDN caches, what bypasses it, and
  *     "the cheapest large win": the page. That an edge-answered redirect is
  *     not counted and outlives a takedown until its time to live runs out
@@ -260,7 +264,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-reads",
-      text: "Reads matter more. Most consumer systems are read-heavy, a hundred to one or more, so that's a billion redirects a day, about twelve thousand a second.",
+      text: "Reads matter more. Most consumer systems are read-heavy, a hundred to one or more, so assume a hundred redirects per link: a billion a day, about twelve thousand a second.",
       pauseAfter: 0.6,
     },
     {
@@ -275,7 +279,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-band",
-      text: "Bandwidth: half a kilobyte per redirect, at that peak, is about seventeen megabytes a second.",
+      text: "Bandwidth: say half a kilobyte per redirect, and that peak is about seventeen megabytes a second.",
       pauseAfter: 0.6,
     },
     {
@@ -323,7 +327,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q3-path",
-      text: "Follow one redirect through it. On a cache hit, that's two round trips inside the data center, about a millisecond by the ladder. A miss adds a third, to the store, and an SSD read: about one point six.",
+      text: "Follow one redirect through it. On a cache hit, that's two round trips inside the data center, about a millisecond by the ladder. A miss adds a third, to the store, and an SSD read: about one point six milliseconds.",
       pauseAfter: 0.8,
     },
     {
@@ -379,7 +383,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q5-light",
-      text: "Distance sets a floor. Light in fiber covers about two hundred kilometers a millisecond, so a user in Sydney is at least a hundred and fifty-seven milliseconds, round trip, from a server in Virginia, before the redirect's millisecond inside it even starts. An edge server across town is under a millisecond away.",
+      text: "Distance sets a floor. Light in fiber covers about two hundred kilometers a millisecond, so a user in Sydney is at least a hundred and fifty-seven milliseconds, round trip, from a server in Virginia: over a hundred times the millisecond the redirect spends inside the data center. An edge server across town is under a millisecond away.",
       pauseAfter: 0.7,
     },
     {

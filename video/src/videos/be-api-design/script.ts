@@ -97,8 +97,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     X-RateLimit-Reset, Retry-After: 30), each header lit as it is named.
  *     limit-client: a client gauge reading Remaining and slowing; then the
  *     wait drawn as Retry-After plus a spread of jitter, with the doubling
- *     backoff after it. limit-safe: GET, PUT and a keyed POST ticked as safe
- *     to retry; a bare POST not.
+ *     backoff after it. limit-safe: the same backoff under a timeout and a
+ *     5xx, where the outcome is unknown; GET, PUT and a keyed POST ticked as
+ *     safe to repeat there, a bare POST not.
  *   styles: QuestionCard 10; three columns. styles-rest: REST's screen
  *     making three round trips (article, author, comments), extra fields
  *     faded. styles-graphql: one query naming its fields, one response;
@@ -151,10 +152,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - No API product is named: the page names none.
  *
  * Written for Drew's ear: status codes as they are said ("four oh one",
- * "two oh one", "four twenty-nine"), initialisms in plain caps (API, HTTP,
- * URL, ID, JWT, JSON; REST, CRUD-free, and HATEOAS listed for the lexicon),
- * no sentence opening on "A" before an initialism, JWT and HATEOAS expanded
- * once, header names said as words.
+ * "two oh one", "four twenty-nine"); initialisms in plain caps (API, HTTP,
+ * URL, ID, JWT, JSON), with the ones said as words (REST, RESTful, JSON,
+ * HATEOAS, gRPC) reported for the lexicon; the HTTP methods in caps, as
+ * they are written (GET, PUT, POST, PATCH, DELETE), to be confirmed as said
+ * as words; no sentence opening on "A" before an initialism; JWT and
+ * HATEOAS expanded once; header names said as words, except Retry-After.
  */
 export const script: NarrationScript = {
   id: "be-api-design",
@@ -166,7 +169,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Draw any backend, and every arrow between two boxes is an API: one side asks, the other answers, and both have to agree on how. The interview tests whether you can design that agreement so it's predictable, consistent, and hard to misuse.",
+      text: "Draw any backend, and every arrow between two boxes is an API: one side asks, the other answers, and both must agree on how. The interview tests whether you can design that agreement to be predictable, consistent, and hard to misuse.",
       pauseAfter: 0.6,
     },
     {
@@ -189,7 +192,7 @@ export const script: NarrationScript = {
     },
     {
       id: "rest-nouns",
-      text: "So paths are nouns: articles, forty-two, not get article. Each request carries everything the server needs, and the server keeps no session for the client between requests. And status codes and methods mean what HTTP says they mean.",
+      text: "So paths are nouns, like articles slash forty-two, never a verb like get article. Each request carries everything the server needs, with no session kept between requests. And methods and status codes mean what HTTP says they mean.",
       pauseAfter: 0.6,
     },
     {
@@ -202,7 +205,7 @@ export const script: NarrationScript = {
     {
       id: "methods",
       scene: true,
-      text: "Question two. Walk through the main HTTP methods and their semantics. Two properties sort them. Safe means the server's state doesn't change. Idempotent means repeating the request has the same effect as sending it once.",
+      text: "Question two. Walk through the main HTTP methods and their semantics. Two properties sort them. Safe: the server's state doesn't change. Idempotent: repeating the request has the same effect as sending it once.",
       pauseAfter: 0.6,
     },
     {
@@ -225,7 +228,7 @@ export const script: NarrationScript = {
     {
       id: "codes",
       scene: true,
-      text: "Question three. What do the HTTP status code classes mean? The first digit tells the story. Two hundreds are success: two hundred OK, two oh one created, two oh four no content. Three hundreds redirect. Four hundreds say the client got something wrong, and five hundreds say the server did.",
+      text: "Question three. What do the HTTP status code classes mean? The first digit tells the story. Two hundreds succeed: two hundred OK, two oh one created, two oh four no content. Three hundreds redirect. Four hundreds blame the client, and five hundreds the server.",
       pauseAfter: 0.6,
     },
     {
@@ -273,7 +276,7 @@ export const script: NarrationScript = {
     },
     {
       id: "idem-key",
-      text: "The fix is an idempotency key: a unique ID the client generates once and sends with every attempt. The server stores it with the payment. The first attempt inserts; each retry finds the key, inserts nothing, and gets the original payment back. Three requests, one charge.",
+      text: "The fix is an idempotency key: a unique ID the client generates once and sends with every attempt. The server stores it with the payment. Each retry finds the key, inserts nothing, and gets the original payment back. Three requests, one charge.",
       pauseAfter: 0.7,
     },
     {
@@ -286,7 +289,7 @@ export const script: NarrationScript = {
     {
       id: "page",
       scene: true,
-      text: "Question six. How do you paginate a large collection? The simple way is offset and limit: skip forty, take twenty. It can jump to any page, but the database still walks every row it skips.",
+      text: "Question six. How do you paginate a large collection? The simple way is offset and limit: skip forty, take twenty. It can jump to any page, but the database walks every row it skips.",
       pauseAfter: 0.5,
     },
     {
@@ -324,7 +327,7 @@ export const script: NarrationScript = {
     },
     {
       id: "auth-jwt",
-      text: "JWT, a JSON Web Token, is a signed format for claims. This one is a hundred sixty-four characters, and anyone can read it: decode the middle part, and there's the user, the role, and when it expires. The signature only proves who issued it. Change the role to admin, and it no longer verifies.",
+      text: "JWT, a JSON Web Token, is a signed format for claims. This one is a hundred sixty-four characters, and anyone can read it: decode the middle part, and there's the user, the role, and the expiry. The signature proves who issued it: change the role to admin, and it no longer verifies.",
       pauseAfter: 0.6,
     },
     {
@@ -339,7 +342,7 @@ export const script: NarrationScript = {
     },
     {
       id: "revoke-session",
-      text: "When you need instant revocation, to log a user out or ban them now. Delete the session, and the next request fails. A JWT checked locally stays valid until it expires, unless every check does a lookup again.",
+      text: "When you need instant revocation, to log a user out or ban them now. Delete the session, and the next request fails. Checked locally, a JWT stays valid until it expires, unless every check does a lookup again.",
       pauseAfter: 0.6,
     },
     {
@@ -367,12 +370,12 @@ export const script: NarrationScript = {
     },
     {
       id: "limit-client",
-      text: "A well-behaved client watches what's remaining and slows down before it's refused. On a four twenty-nine, it waits at least Retry-After, then backs off exponentially, with random jitter, so a crowd of clients doesn't return in the same instant.",
+      text: "A well-behaved client watches what's remaining, and slows down before it's refused. On a four twenty-nine, it waits at least Retry-After, then backs off exponentially, with random jitter, so a crowd of clients doesn't return at once.",
       pauseAfter: 0.6,
     },
     {
       id: "limit-safe",
-      text: "And it retries only what's safe to repeat: a GET, a PUT, or a POST with an idempotency key.",
+      text: "The same backoff serves timeouts and server errors, but there the client can't know what happened, so it repeats only what's safe: a GET, a PUT, or a POST with an idempotency key.",
       pauseAfter: 0.8,
     },
 
@@ -385,7 +388,7 @@ export const script: NarrationScript = {
     },
     {
       id: "styles-rest",
-      text: "REST is resources over HTTP and JSON: universally understood, easy to cache, and the safe default for a public API. Its weakness: a screen that needs an article, its author and its comments may make three round trips, and get fields it never shows.",
+      text: "REST is resources over HTTP and JSON: universally understood, easy to cache, the safe default for a public API. But a screen that needs an article, its author and its comments may make three round trips, and get fields it never shows.",
       pauseAfter: 0.6,
     },
     {
@@ -395,7 +398,7 @@ export const script: NarrationScript = {
     },
     {
       id: "styles-grpc",
-      text: "gRPC sends binary Protocol Buffers over HTTP two: fast, strongly typed, and able to stream. It's ideal between internal services, with weaker browser support, and messages a person can't read.",
+      text: "gRPC sends binary Protocol Buffers over HTTP two: fast, strongly typed, and able to stream. It's ideal between internal services, with weaker browser support, and messages that aren't human-readable.",
       pauseAfter: 0.6,
     },
     {
@@ -413,12 +416,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-naming",
-      text: "Name resources with plural nouns for collections and IDs for members: articles, article forty-two, and its comments beneath it. No verbs in paths, because the method is the verb. An action like publish becomes a state change: patch the article's status to published.",
+      text: "Name resources with plural nouns for collections and IDs for members: articles, article forty-two, its comments beneath it. No verbs in paths: the method is the verb. An action like publish becomes a state change: patch the status to published.",
       pauseAfter: 0.6,
     },
     {
       id: "r-blog",
-      text: "So the blog is two collections. GET and POST on articles; GET, PATCH and DELETE on one article; GET and POST on its comments. Filters and sorting go in the query string, and a create answers two oh one, with a Location header pointing at the new article.",
+      text: "So the blog is two collections: GET and POST on articles, GET, PATCH and DELETE on one article, GET and POST on its comments. Filters go in the query string, and a create answers two oh one, with a Location header pointing at the new article.",
       pauseAfter: 0.6,
     },
     {
@@ -438,7 +441,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-content",
-      text: "Content negotiation lets one URL serve several representations. The Accept header says what the client can take, and Content-Type says what it got. Encoding works the same way: ask for gzip, and this page of twenty articles arrives at about a sixth of its size.",
+      text: "Content negotiation lets one URL serve several representations: Accept says what the client can take, and Content-Type what it got. Encoding works the same way: ask for gzip, and this page of twenty articles arrives at about a sixth of its size.",
       pauseAfter: 0.9,
     },
     {

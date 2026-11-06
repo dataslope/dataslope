@@ -735,7 +735,12 @@
     },
     {
       "beat": "q2-reads",
-      "words": "a billion redirects a day",
+      "words": "a hundred redirects per link",
+      "means": 100
+    },
+    {
+      "beat": "q2-reads",
+      "words": "a billion a day",
       "means": 1000000000
     },
     {
@@ -862,6 +867,11 @@
       "beat": "q5-light",
       "words": "under a millisecond",
       "means": 1
+    },
+    {
+      "beat": "q5-light",
+      "words": "over a hundred times the millisecond",
+      "means": 100
     }
   ]
 }

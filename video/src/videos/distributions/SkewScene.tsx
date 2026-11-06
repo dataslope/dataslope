@@ -8,7 +8,7 @@ import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { INCOME, normalPdf } from "./data";
-import { ASK, ASK_FILL, areaD, askNote, Count, Curve, curveD, DIST, Drift, Head, KBars, lerp, pulse, VRule } from "./parts";
+import { ASK, ASK_FILL, areaD, askNote, Count, Curve, curveD, DIST, Drift, Head, KBars, lerp, pulse, Spot, VRule } from "./parts";
 
 /** Dollars, in thousands on the axis. */
 const X: XScale = { lo: -60_000, hi: 160_000, x0: 160, x1: 1700 };
@@ -74,6 +74,9 @@ export const SkewScene: React.FC = () => {
           { text: "Plot it.", at: plotAt - 6, italic: true },
         ]}
       />
+
+      {/* Incomes: a wallet, top right, above the long tail. */}
+      <Spot id="distributions-wallet" at={thousandAt - 4} left={1580} top={y(100)} width={184} height={200} />
 
       <Drift from={incomesFrom} to={n.beat("fit-in").to + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>

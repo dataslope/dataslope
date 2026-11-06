@@ -160,15 +160,13 @@ export const BadgeScene: React.FC = () => {
             on "keys and constraints". */}
         {/* One line, one size and face: the end in italic, what it becomes in roman. */}
         <Ink at={shareAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(RULE_SIZE, true), color: INK }}>Zero or many:</span>
-          <span style={{ ...body(RULE_SIZE), color: INK_SOFT, marginLeft: "0.25em" }}>
-            <Mark at={keysAt}>a foreign key</Mark>
+          <span style={{ ...body(RULE_SIZE), color: INK_SOFT }}>
+            <span style={{ fontStyle: "italic", color: INK }}>Zero or many:</span> <Mark at={keysAt}>a foreign key</Mark>
           </span>
         </Ink>
         <Ink at={twiceAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y + 50), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(RULE_SIZE, true), color: INK }}>Zero or one:</span>
-          <span style={{ ...body(RULE_SIZE), color: INK_SOFT, marginLeft: "0.25em" }}>
-            a foreign key, and <Mark at={constraintsAt + 8}>unique</Mark>
+          <span style={{ ...body(RULE_SIZE), color: INK_SOFT }}>
+            <span style={{ fontStyle: "italic", color: INK }}>Zero or one:</span> a foreign key, and <Mark at={constraintsAt + 8}>unique</Mark>
           </span>
         </Ink>
 

@@ -42,6 +42,96 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a friendly green toy tyrannosaurus standing on its two back legs, seen from the side, with tiny front arms and a long tail"
+    },
+    {
+      "id": "describing-data-office",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small two-storey office building with a flat roof, a glass front door and two rows of square windows, a chunky solid block seen from the front at a slight angle"
+    },
+    {
+      "id": "describing-data-ceo",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one anonymous business person standing upright in a blue suit with a red tie, holding a solid brown briefcase at their side, the whole figure seen from the front"
+    },
+    {
+      "id": "describing-data-bag",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a sturdy paper shopping bag with two rope handles, standing upright, with two wrapped parcel boxes poking out of its open top"
+    },
+    {
+      "id": "describing-data-hourglass",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a wooden hourglass standing upright, its sand running from the upper glass bulb into a small heap in the lower bulb"
+    },
+    {
+      "id": "describing-data-stopwatch",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a round stopwatch with a chunky button on top and one hand on a plain dial with no numbers or marks, tilted slightly"
+    },
+    {
+      "id": "describing-data-crowd",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small crowd of seven anonymous people standing close together in a loose group, of different heights and in different clothes, the whole figures seen from the front"
+    },
+    {
+      "id": "describing-data-moneybag",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a plump cloth money sack tied at the neck with a cord, plain with nothing printed on it, with three gold coins lying beside it"
+    },
+    {
+      "id": "describing-data-kite",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a diamond-shaped kite in the air, its long ribbon tail of small bows streaming far out to the right of it"
+    },
+    {
+      "id": "describing-data-two-groups",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "two separate groups of anonymous people standing side by side with a clear gap between them: three short people on the left, three tall people on the right, the whole figures seen from the front"
+    },
+    {
+      "id": "describing-data-coins",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "three stacks of thick gold coins standing side by side, a short stack, a middle stack and a tall stack"
+    },
+    {
+      "id": "describing-data-umbrella",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a large open umbrella with red and yellow panels sheltering a small house with a pitched roof beneath it"
+    },
+    {
+      "id": "describing-data-fence",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a short stretch of wooden picket fence, five thick pointed pickets on two rails, seen at a slight angle"
+    },
+    {
+      "id": "describing-data-knob",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a large chunky round rotary knob with a ridged rim and a pointer notch on its top, mounted on a small square base, seen at a slight angle"
+    },
+    {
+      "id": "describing-data-violin",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a violin lying at a slight angle, with its bow resting beside it"
+    },
+    {
+      "id": "describing-data-box",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a plain closed cardboard box, a chunky solid cube with its top flaps folded shut, seen at a slight angle"
     }
   ]
 }

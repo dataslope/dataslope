@@ -23,6 +23,7 @@ import {
   Kicker,
   lerp,
   pulse,
+  Spot,
   stepD,
   Strike,
   Svg,
@@ -102,6 +103,7 @@ export const CastScene: React.FC = () => {
   const aloneAt = n.word("alone", "decides alone");
   const sameAt = n.word("alone", "same chance");
   const crowdAt = n.word("alone", "crowd");
+  const tvAt = n.word("alone", "TV ad");
   const alikeAt = n.word("alone", "behaving alike");
   const widerAt = n.word("alone", "wider");
   const fixedAt = n.word("poisson-in", "fixed number");
@@ -193,6 +195,13 @@ export const CastScene: React.FC = () => {
           { text: "binomial.", at: binomialAt - 6, italic: true },
         ]}
       />
+
+      {/* ── Spots ── */}
+      {/* The visitor, left of the centred Bernoulli and facing it, gone
+          before the figure slides into that column on "rarer". */}
+      <Spot id="distributions-visitor" at={visitorAt - 4} out={rarerAt - 16} left={510} top={y(455)} width={120} height={250} />
+      {/* The TV ad, top right, above the binomial's figure label. */}
+      <Spot id="distributions-tv" at={tvAt - 4} left={1560} top={y(104)} width={205} height={175} />
 
       {/* ── The cast: one variable's summary, then the seven shapes ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - castOut, transform: `translateY(${-castOut * 30}px)` }}>

@@ -94,8 +94,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   Each row's answer is drawn beside the list, with the number from
  *   results.json where the line says one (the two trees' heights, the two
  *   call counts, the coins, the Hoppers, the twenty probes, the
- *   hundred-million-against-a-trillion bars, Kahn's three of four nodes left
- *   on a cycle).
+ *   hundred-million-against-a-trillion bars, Kahn's one node out of four
+ *   when a cycle blocks the rest).
  *
  * Opening: fresh, on code that is fast at a hundred items and the question of
  * what it costs at a million, without naming the video before it (whose
@@ -214,7 +214,7 @@ export const script: NarrationScript = {
     { id: "big-million", text: "At a million items, it's half a trillion.", pauseAfter: 0.7 },
     {
       id: "big-model",
-      text: "Model it at a hundred million checks a second, an assumption: about eighty-three minutes. One pass over the million takes a hundredth of a second.",
+      text: "Model it at a hundred million checks a second, an assumption: about eighty-three minutes. One pass over the million: a hundredth of a second.",
       pauseAfter: 0.8,
     },
     {
@@ -237,7 +237,7 @@ export const script: NarrationScript = {
     },
     {
       id: "hash-twosum",
-      text: "It turns Two Sum's double loop into one pass: at each number, ask the map for target minus it, then store the number. Linear time, bought with linear memory.",
+      text: "It turns Two Sum's double loop into one pass: at each number, ask the map for target minus it, then store the number. Linear time, at a cost of linear memory.",
       pauseAfter: 0.7,
     },
     {
@@ -275,7 +275,7 @@ export const script: NarrationScript = {
     },
     {
       id: "amort-factor",
-      text: "A textbook array doubles, for under two copies an append. Python grows by about an eighth, so it copies more often. Any fixed factor keeps it constant, and a hash table's rehash too.",
+      text: "A textbook array doubles, for under two copies an append. Python grows by about an eighth, so it copies more often. Any fixed factor keeps it constant, a hash table's rehash too.",
       pauseAfter: 0.6,
     },
     {
@@ -317,12 +317,12 @@ export const script: NarrationScript = {
     },
     {
       id: "bfs-graph",
-      text: "A leads to B and C, and both lead to D. Breadth-first visits A, B, C, D; depth-first, A, B, D, then C.",
+      text: "Node A leads to B and C, and both lead to D. Breadth-first visits A, B, C, D; depth-first, A, B, D, then C.",
       pauseAfter: 0.6,
     },
     {
       id: "bfs-short",
-      text: "Choose BFS for shortest paths in an unweighted graph, since it reaches each node first by the fewest edges. Choose DFS for cycle detection, topological sort and backtracking.",
+      text: "Choose BFS for shortest paths in an unweighted graph: it reaches each node first by the fewest edges. DFS for cycle detection, topological sort and backtracking.",
       pauseAfter: 0.6,
     },
     {
@@ -345,7 +345,7 @@ export const script: NarrationScript = {
     },
     {
       id: "heap-choose",
-      text: "A sorted list pops instantly, but at a million items an insert shifts half a million on average. An unsorted list inserts instantly and scans to pop.",
+      text: "Keep a list sorted, most urgent at the end, and a pop is instant, but at a million items an insert shifts half a million on average. An unsorted list inserts instantly and scans to pop.",
       pauseAfter: 0.6,
     },
     {
@@ -355,7 +355,7 @@ export const script: NarrationScript = {
     },
     {
       id: "heap-build",
-      text: "The follow-up: building a heap is linear, not n log n, since most nodes sit near the bottom. For a million items arriving least urgent first, heapify takes one and a half million comparisons; pushes, eighteen million.",
+      text: "The follow-up: building a heap is linear, not n log n, since most nodes sit near the bottom. For a million items arriving least urgent first, heapify takes one and a half million comparisons; one at a time, eighteen million.",
       pauseAfter: 0.8,
     },
 
@@ -484,11 +484,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-trie",
-      text: "A trie stores strings a character per level, so a lookup costs the key's length, however many keys: autocomplete, IP routing, at a cost in memory.",
+      text: "A trie stores strings a character per level, so a lookup costs the key's length, however many keys: autocomplete, IP routing. It takes more memory.",
     },
     {
       id: "r-binary",
-      text: "Binary search needs sorted, indexable data: twenty probes at most for a million. Its bugs: off-by-one bounds, and a midpoint sum that overflows fixed-width integers.",
+      text: "Binary search needs sorted, indexable data: twenty probes at most for a million. Its bugs: off-by-one bounds, and a midpoint sum overflowing fixed-width integers.",
     },
     {
       id: "r-pointers",
@@ -513,7 +513,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-kahn",
-      text: "Kahn's algorithm keeps removing nodes with nothing pointing in. If fewer than V come out, the rest sit on a cycle.",
+      text: "Kahn's algorithm keeps removing nodes with nothing pointing in. If fewer than V come out, the graph has a cycle.",
     },
     {
       id: "r-bits",

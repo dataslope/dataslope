@@ -23,6 +23,7 @@ import {
   Drift,
   Head,
   pulse,
+  Spot,
   Svg,
   VRule,
 } from "./parts";
@@ -61,6 +62,7 @@ export const ExtentScene: React.FC = () => {
   const zerosAt = n.word("outside", "twenty-three zeros");
   const threeAt = n.word("outside", "a three");
   const nothingAt = n.word("shape", "Nothing out there");
+  const observedAt = n.word("shape", "observed");
   const shapeAt = n.word("shape", "assumed shape");
   const goodAt = n.word("next", "as good as");
   const drawnAt = n.word("next", "how the sample");
@@ -99,6 +101,9 @@ export const ExtentScene: React.FC = () => {
           { text: "where its data was.", at: knowsAt + 4, italic: true },
         ]}
       />
+
+      {/* Never observed: a telescope, top right, above the empty tail. */}
+      <Spot id="distributions-telescope" at={observedAt - 4} left={1570} top={y(104)} width={197} height={220} />
 
       <Drift from={extentFrom} to={n.beat("next").to + 60} amount={0.02}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - settle }}>

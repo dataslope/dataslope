@@ -8,7 +8,7 @@ import { FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BINS } from "./data";
-import { Bracket, DATA, Drift, lerp, Mark, Pulse, SOFT_FILL, STAT, STAT_INK, Svg, Tag } from "./parts";
+import { Bracket, DATA, Drift, lerp, Mark, Pulse, SOFT_FILL, Spot, STAT, STAT_INK, Svg, Tag } from "./parts";
 
 const W = 680;
 const COL = [160, 1060] as const;
@@ -111,10 +111,11 @@ export const WhichScene: React.FC = () => {
   const lowerFwd = BINS.kde.grid.map((g, i) => `${i ? "L" : "M"}${sx(vs, g).toFixed(1)},${(mid2 + (BINS.kde.density[i] / peak) * h(VIOLIN_H)).toFixed(1)}`).join(" ");
   const secondPeakX = BINS.kde.grid.reduce((best, g, i) => (g > 12 && BINS.kde.density[i] > BINS.kde.density[best] ? i : best), BINS.kde.grid.findIndex((g) => g > 12));
 
+  // A panel's name and what it is for: one line at one size, the name in weight.
   const panel = (x: number, top: number, title: string, use: string, at: number) => (
     <Ink at={at - 6} dur={14} style={{ left: x, top, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
-      <span style={{ ...label(25, INK), fontWeight: 700 }}>{title}</span>
-      <span style={{ ...note(21, INK_SOFT) }}>{use}</span>
+      <span style={{ ...label(23, INK), fontWeight: 700 }}>{title}</span>
+      <span style={{ ...note(23, INK_SOFT) }}>{use}</span>
     </Ink>
   );
 
@@ -138,6 +139,13 @@ export const WhichScene: React.FC = () => {
         <Ink at={summarizeAt - 4} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Summarize second.
         </Ink>
+      </div>
+
+      {/* "box plots": a cardboard box, then "A violin can": a violin beside it, top
+          right; they dim with the figure and each leaves with its own panel. */}
+      <div style={{ position: "absolute", inset: 0, opacity: fade }}>
+        <Spot id="describing-data-box" at={boxAt - 4} out={evenAt + 6 + 2 * 14} left={1360} top={y(110)} width={170} height={169} />
+        <Spot id="describing-data-violin" at={violinAt - 4} out={evenAt + 6 + 3 * 14} left={1620} top={y(96)} width={200} height={204} />
       </div>
 
       <div style={{ position: "absolute", inset: 0, opacity: fade }}>

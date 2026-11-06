@@ -83,11 +83,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     on "seventy-four"; then the same grid on the ring: only the squares
  *     that turn the new server's color change, "23% moved, all to the new
  *     server" in green. A small hash ring beside it, 100 points a server.
- *     A "simulation" note.
+ *     A "simulation" note. The ring spot.
  *   q3: question card; the read path as four steps along an arrow: check
  *     the cache; miss; read the database and write the cache; return. The
  *     write path below: update the database, then invalidate the entry.
- *     The drawer spot.
  *   q3-props: "first request pays the miss" under the miss step, yellow.
  *   q3-sim: three bars, cache size against share of redirects answered
  *     (0.1% → 40%, 1% → 58%, 10% → 77%, results.json), each lit on its size;
@@ -117,8 +116,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     a window after the write, green; then, separately, a follower promoted
  *     with its last two writes missing, red.
  *   q6: question card; one table split into pieces (partitioning), then the
- *     pieces moved onto separate server boxes (sharding). The cheese-wheel
- *     spot.
+ *     pieces moved onto separate server boxes (sharding). The shards spot.
  *   q6-key: eight shard columns. By creation date, all of today's new links
  *     stack on the last column, red; by hash, the million keys spread to
  *     eight near-equal bars (results.json counts), green, "within 1%".
@@ -161,7 +159,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     monotonic reads placed between; a feed icon at the eventual end and a
  *     bank balance at the strong end.
  *   q12: question card; a poster and four followers' feed boxes; on "push",
- *     the post's ID drops into each feed. The megaphone spot.
+ *     the post's ID drops into each feed. The newspaper spot.
  *   q12-storm: two posters side by side: "200 followers: 200 writes" and
  *     "50,000,000 followers: 50,000,000 writes", the second in red.
  *   q12-pull: a reader's feed assembled on request from 300 timelines,
@@ -312,7 +310,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-algos",
-      text: "Round-robin deals them in turn. Least-connections picks the server with the fewest open, which copes with slow requests. Consistent hashing sends a key to the same server every time, for servers that cache their own hot links.",
+      text: "Round-robin deals them in turn. Least-connections picks the server with the fewest open connections, which copes with slow requests. Consistent hashing sends a key to the same server every time, for servers that cache their own hot links.",
       pauseAfter: 0.6,
     },
     {
@@ -435,7 +433,7 @@ export const script: NarrationScript = {
     {
       id: "q8",
       scene: true,
-      text: "Question eight. When do you introduce a message queue? When work can leave the request. Counting clicks in the database makes every redirect wait on a write, and sends a viral link's whole spike there.",
+      text: "Question eight. When do you introduce a message queue? When work doesn't need to finish inside the request. Counting clicks in the database makes every redirect wait on a write, and sends a viral link's whole spike there.",
       pauseAfter: 0.6,
     },
     {
@@ -478,7 +476,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q9-shared",
-      text: "The follow-up is where the count lives. Four app servers each keeping its own bucket hand one client four buckets: four times the limit. The count belongs in a store they share.",
+      text: "The follow-up is where the count lives. With four app servers, each keeping its own bucket, round-robin hands one client four buckets: four times the limit. The count belongs in a store they all share.",
       pauseAfter: 0.8,
     },
 
@@ -491,12 +489,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-evict",
-      text: "Which eviction policy, when the cache fills? LRU, least recently used, drops the entry untouched longest: a good default. LFU, least frequently used, keeps popular keys through a quiet spell. First in, first out ignores use altogether. Expiry by TTL bounds staleness whatever the memory pressure. Most systems pair LRU with a TTL.",
+      text: "Which eviction policy, when the cache fills? LRU, least recently used, drops the entry untouched longest: a good default. LFU, least frequently used, keeps popular keys through a quiet spell. First in, first out evicts in insertion order, used or not. Expiry by TTL bounds staleness whatever the memory pressure. Most systems pair LRU with a TTL.",
       pauseAfter: 0.7,
     },
     {
       id: "r-consist",
-      text: "And the consistency models to know. Strong: every read reflects the latest write. Eventual: replicas converge, and a read can be stale meanwhile. Between them, read-your-writes, the fix from question five, and monotonic reads, where time never runs backwards. A feed can be eventual; a bank balance usually needs strong.",
+      text: "And the consistency models to know. Strong: every read reflects the latest write. Eventual: replicas converge once writes stop, and a read can be stale meanwhile. Between them, read-your-writes, the fix from question five, and monotonic reads, where time never runs backwards. A feed can be eventual; a bank balance usually needs strong.",
       pauseAfter: 0.9,
     },
 

@@ -133,7 +133,7 @@ export const script: NarrationScript = {
     },
     {
       id: "ai-llm",
-      text: "And system design now takes in features that call an LLM: streaming, retries, cost measured in tokens, and prompt injection.",
+      text: "And system design now takes in features that call a large language model, or LLM: streaming, retries, cost measured in tokens, and prompt injection.",
       pauseAfter: 0.6,
     },
     {

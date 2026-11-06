@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SANS } from "../../theme/fonts";
 import { QQ_PLOTS } from "./data";
-import { ASK, askNote, DIST, Drift, Head, lerp, Svg } from "./parts";
+import { ASK, askNote, DIST, Drift, Head, lerp, Spot, Svg } from "./parts";
 
 type Panel = {
   key: "normal" | "skewed";
@@ -45,6 +45,7 @@ export const QQScene: React.FC = () => {
 
   // ── Cues ──
   const qqFrom = n.beat("qq").from;
+  const lookAt = n.word("qq", "look");
   const plotAt = n.word("qq", "Q-Q plot");
   const quantilesAt = n.word("qq", "data's quantiles");
   const modelsAt = n.word("qq", "model's");
@@ -79,6 +80,9 @@ export const QQScene: React.FC = () => {
           { text: "a Q-Q plot.", at: plotAt - 4, italic: true },
         ]}
       />
+
+      {/* "So look": a magnifying glass, top right, above the second panel. */}
+      <Spot id="distributions-magnifier" at={lookAt - 4} left={1600} top={y(100)} width={180} height={180} />
 
       <Drift from={qqFrom} to={n.beat("bend").to + 40}>
         {PANELS.map((p, pi) => {
@@ -200,8 +204,9 @@ export const QQScene: React.FC = () => {
         <Note at={tailsAt - 4} x={sx(scaleFor(PANELS[1]), 62)} y={yFor(PANELS[1])(112)} align="right">
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the upper tail runs away</span>
         </Note>
-        {/* Just above the lower tail's points, left of the line. */}
-        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), -17)} y={yFor(PANELS[1])(46)}>
+        {/* Above the lower tail's points, left of the line, and clear of the
+            y axis's 40 so the two don't read as one line. */}
+        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), -14)} y={yFor(PANELS[1])(60)}>
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the lower tail, too</span>
         </Note>
         <Note at={costlyAt - 2} x={sx(scaleFor(PANELS[1]), 62)} y={yFor(PANELS[1])(112) + 36} align="right">

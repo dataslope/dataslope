@@ -119,6 +119,9 @@ export const BellScene: React.FC = () => {
       />
 
       <Spot id="distributions-penguin" at={flippersAt - 4} left={1540} top={y(250)} width={230} height={300} />
+      {/* "Close to a bell": a bell under the penguin, as the bell curve
+          draws. It goes before the cut, where the next figure's axis runs. */}
+      <Spot id="distributions-hand-bell" at={bellAt - 4} out={n.beat("rule").from - 24} left={1600} top={y(578)} width={120} height={190} />
 
       <Drift from={bellFrom} to={n.beat("rule-in").to + 40}>
         {/* Small effects adding up: pegs, and dots nudged down through them. */}
@@ -177,7 +180,8 @@ export const BellScene: React.FC = () => {
           <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>mean {fmt(PENGUINS.mean, 1)} mm</span>
         </Note>
         <Note at={twoAt} x={mx - 14} y={labelY - 10} align="right">
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap", ...halo }}>two numbers set it:</span>
+          {/* The mean's line, at the mean label's size: one line, one size. */}
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...halo }}>two numbers set it:</span>
         </Note>
         <Bracket x0={sx(X, PENGUINS.mean)} x1={sx(X, PENGUINS.mean + PENGUINS.sd)} y={sdY} at={sdAt - 2} color={INK} up />
         <Note at={halfAt - 4} x={sx(X, PENGUINS.mean + PENGUINS.sd) + 16} y={sdY - 14}>
