@@ -5,7 +5,7 @@ import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Badge, badgeStyle, Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EVO, splitError } from "./data";
@@ -180,7 +180,7 @@ export const EvoScene: React.FC = () => {
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 12 }}>
             Changing a schema without breaking readers or rewriting old data:
             {kinds.map((k) => (
-              <Badge key={k.text} tone="blue" size={26} style={{ opacity: ease(frame, k.at, 8) }}>
+              <Badge key={k.text} tone="blue" size={26} style={{ fontFamily: SANS, opacity: ease(frame, k.at, 8) }}>
                 {k.text}
               </Badge>
             ))}
@@ -268,7 +268,7 @@ export const EvoScene: React.FC = () => {
           <span style={{ display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap" }}>
             <span style={{ ...label(22, INK_SOFT), fontWeight: 650 }}>A reader resolves the writer's schema:</span>
             {resolve.map((r) => (
-              <Badge key={r.text} tone="gray" size={22} style={{ opacity: ease(frame, r.at, 10) }}>
+              <Badge key={r.text} tone="gray" size={22} style={{ fontFamily: SANS, opacity: ease(frame, r.at, 10) }}>
                 {r.text}
               </Badge>
             ))}
