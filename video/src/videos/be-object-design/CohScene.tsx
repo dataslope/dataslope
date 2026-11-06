@@ -196,8 +196,10 @@ export const CohScene: React.FC = () => {
           const mid = rowMid(i);
           return (
             <React.Fragment key={j.why}>
-              <Box x={WHY.x} y={mid - WHY.h / 2} w={WHY.w} h={WHY.h} at={at} title={j.why} size={21} tone="plain" tones={i === EMAIL ? [[templateAt, "bad"], [splitAt + 20, "plain"]] : []} />
-              <Flow points={[[WHY.x + WHY.w + 6, mid], [GOD.x + 16, mid]]} at={at + 4} dur={8} color={red > 0.5 ? ACCENT : INK} width={2.2} head={12} />
+              <Line x={WHY.x + WHY.w} y={mid - 15} at={at} size={22} weight={650} color={red > 0.5 ? ACCENT : INK_SOFT} align="right" width={WHY.w}>
+                {j.why}
+              </Line>
+              <Flow points={[[WHY.x + WHY.w + 16, mid], [GOD.x + 16, mid]]} at={at + 4} dur={8} color={red > 0.5 ? ACCENT : INK} width={2.2} head={12} />
             </React.Fragment>
           );
         })}

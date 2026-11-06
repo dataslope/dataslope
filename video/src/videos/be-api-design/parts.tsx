@@ -4,12 +4,15 @@ import { arrowHead, lineLength, roundedPolyline, type Pt } from "../../component
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 import { Mark, Strike } from "../da-pandas/parts";
+
+/** The paper a code listing is printed on (da-pandas/parts.tsx). */
+export const LISTING_PAPER = ds("gray", 50);
 
 /**
  * Pieces this video needs beyond the shared editorial kit and the interview
@@ -151,11 +154,13 @@ export const msgLineMid = (top: number, i: number, size = 22) => {
 };
 
 /**
- * An HTTP request or response as a short card: its first line (the method
- * and path, or the status), then the headers that matter and a line or two
- * of body. The card pops in on `at`; each line inks in on its own cue.
- * `tone` washes the card (data, the right answer, the trap); `lit` swells
- * its border for a card the narration names again.
+ * An HTTP request or response, printed the way the house prints a code
+ * listing (tinted paper between a rule above and a hairline below, no box
+ * around it): its first line (the method and path, or the status), then the
+ * headers that matter and a line or two of body. It wipes in on `at`; each
+ * line inks in on its own cue. `tone` colors the rule above and the status
+ * line (data, the right answer, the trap); `lit` thickens the rule for a
+ * message the narration names again.
  */
 export const Msg: React.FC<{
   x: number;
@@ -169,12 +174,10 @@ export const Msg: React.FC<{
   out?: number;
   dim?: number;
   lit?: number;
-  dashed?: boolean;
-}> = ({ x, y, w, at, lines, tone = "plain", size = 22, statusInk, out, dim, lit = 0, dashed }) => {
+}> = ({ x, y, w, at, lines, tone = "plain", size = 22, statusInk, out, dim, lit = 0 }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
   const g = msgGeometry(size);
-  const p = pop(frame, at, fps, 16);
+  const p = ease(frame, at, 14);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
   if (p <= 0.001 || o >= 1) return null;
@@ -190,15 +193,19 @@ export const Msg: React.FC<{
         top: y,
         width: w,
         height,
-        boxSizing: "border-box",
-        border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${t.line}`,
-        borderRadius: 10,
-        background: t.fill,
-        opacity: Math.min(1, p) * (1 - o) * (1 - d),
-        transform: `scale(${0.94 + 0.06 * Math.min(1, p)})`,
-        transformOrigin: "0 50%",
+        opacity: (1 - o) * (1 - d),
       }}
     >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: LISTING_PAPER,
+          clipPath: `inset(0 ${(1 - p) * 100}% 0 0)`,
+          borderTop: `${2 + 2 * lit}px solid ${tone === "plain" ? INK : t.line}`,
+          borderBottom: `1px solid ${HAIRLINE}`,
+        }}
+      />
       {lines.map((l, i) => {
         const la = ease(frame, l.at ?? at + 6 + i * 4, 12);
         const ld = l.dim === undefined ? 0 : ease(frame, l.dim, 12) * 0.6;
@@ -360,7 +367,11 @@ export const Flow: React.FC<{
   );
 };
 
-/** A small rounded label on the page, in its tone's ink, that inks in. */
+/**
+ * A short label on the page, in its tone's ink, that inks in: plain bold
+ * text, never an outlined pill (the house's no-cards rule). The "lit" tone
+ * sits on the highlighter's yellow, which is a highlight, not a card.
+ */
 export const Pill: React.FC<{
   x: number;
   y: number;
@@ -369,31 +380,17 @@ export const Pill: React.FC<{
   size?: number;
   out?: number;
   dim?: number;
-  solid?: boolean;
   mono?: boolean;
-  lit?: number;
   children: React.ReactNode;
-}> = ({ x, y, at, tone = "data", size = 22, out, dim, solid, mono, lit = 0, children }) => {
+}> = ({ x, y, at, tone = "data", size = 22, out, dim, mono, children }) => {
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
-  const t = TONE[tone];
+  const text = (
+    <span style={{ ...label(size, TONE[tone].ink), fontWeight: 700, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO, fontWeight: 700 } : {}) }}>{children}</span>
+  );
   return (
-    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d }}>
-      <span
-        style={{
-          display: "inline-block",
-          padding: "5px 14px 6px",
-          borderRadius: 8,
-          border: `${2 + 2 * lit}px solid ${t.line}`,
-          background: solid ? t.line : t.fill,
-          ...label(size, solid ? PAPER : t.ink),
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-          ...(mono ? { fontFamily: MONO, fontWeight: 700 } : {}),
-        }}
-      >
-        {children}
-      </span>
+    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d, fontSize: size }}>
+      {tone === "lit" ? <Mark at={at + 4}>{text}</Mark> : text}
     </Ink>
   );
 };

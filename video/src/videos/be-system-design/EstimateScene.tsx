@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE } from "./data";
-import { artH, Drift, int, Line, Mark, OK, OK_INK, Pill, pulse, sig, Spot, X0 } from "./parts";
+import { artH, Drift, int, Line, Mark, OK_INK, pulse, sig, Spot, X0 } from "./parts";
 
 const ST_X = 1060;
 const BW_X = 1520;
@@ -105,16 +105,10 @@ export const EstimateScene: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            left: X0 - 16,
-            top: ruleY - 10,
-            height: 56,
-            boxSizing: "border-box",
-            border: `2px solid ${INK}`,
-            borderRadius: 10,
-            background: PAPER,
+            left: X0,
+            top: ruleY - 2,
             display: "flex",
             alignItems: "center",
-            padding: "0 18px",
             opacity: ease(frame, trickAt, 12),
           }}
         >
@@ -167,27 +161,14 @@ export const EstimateScene: React.FC = () => {
             )}
           </span>
         </Line>
-        <Line x={X0} y={pair(2) + 40} at={peakQpsAt} size={28} weight={700} color={BLUE_INK}>
+        <Line x={X0} y={pair(2) + 40} at={peakQpsAt} size={28} weight={700} color={BLUE_INK} style={{ transform: `scale(${1 + 0.06 * lit})`, transformOrigin: "0 50%" }}>
           <Mark at={peakQpsAt + 6} color={HIGHLIGHT}>
             ≈ <Num>{int(sig(E.peakReadQps))}</Num> redirects a second
           </Mark>
         </Line>
-        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          <rect
-            x={X0 - 14}
-            y={pair(2) + 30}
-            width={460}
-            height={58}
-            rx={10}
-            fill="none"
-            stroke={INK}
-            strokeWidth={2.4}
-            opacity={lit}
-          />
-        </svg>
-        <Pill x={X0 + 470} y={pair(2) + 36} at={cacheAt} ink={OK_INK} fill={`color-mix(in srgb, ${OK} 12%, ${PAPER})`} size={25}>
+        <Line x={X0 + 450} y={pair(2) + 40} at={cacheAt} size={28} weight={700} color={OK_INK}>
           and a cache
-        </Pill>
+        </Line>
 
         {/* Storage. */}
         <Line x={ST_X} y={ruleY} at={bytesAt} size={25} dim={neitherAt}>

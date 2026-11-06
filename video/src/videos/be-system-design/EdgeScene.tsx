@@ -2,14 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease, map } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, Line, Mark, OK, OK_INK, Pill, X0 } from "./parts";
+import { Drift, Headline, Kicker, Line, Mark, OK, OK_INK, X0 } from "./parts";
 
 const COL_B = 980;
-const OK_FILL = `color-mix(in srgb, ${OK} 12%, ${PAPER})`;
-const DATA_FILL = `color-mix(in srgb, ${BAR} 10%, ${PAPER})`;
 
 /** A timer with a short time left: a dial whose sweep is nearly gone. */
 const Timer: React.FC<{ x: number; y: number; at: number }> = ({ x, y, at }) => {
@@ -29,29 +27,18 @@ const Timer: React.FC<{ x: number; y: number; at: number }> = ({ x, y, at }) => 
   );
 };
 
-/** Chips in a row, each inking in on its own cue, spaced by a real gap. */
-const ChipRow: React.FC<{ x: number; y: number; gap: number; items: readonly { text: string; at: number; ink: string; fill: string }[] }> = ({ x, y, gap, items }) => {
+/** Words in a row, each inking in on its own cue, set apart by middle dots. */
+const WordRow: React.FC<{ x: number; y: number; size?: number; weight?: number; items: readonly { text: string; at: number; ink: string }[] }> = ({ x, y, size = 27, weight = 650, items }) => {
   const frame = useCurrentFrame();
   return (
-    <div style={{ position: "absolute", left: x, top: y, display: "flex", gap, fontSize: 25 }}>
-      {items.map((it) => {
+    <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "baseline", gap: "0.55em", fontSize: size }}>
+      {items.map((it, i) => {
         const p = ease(frame, it.at, 12);
         return (
-          <span
-            key={it.text}
-            style={{
-              padding: "7px 16px",
-              border: `2px solid ${it.ink}`,
-              borderRadius: 999,
-              background: it.fill,
-              ...label(25, it.ink),
-              whiteSpace: "nowrap",
-              opacity: p,
-              transform: `translateY(${(1 - p) * 10}px)`,
-            }}
-          >
-            {it.text}
-          </span>
+          <React.Fragment key={it.text}>
+            {i ? <span style={{ ...note(size, INK_SOFT), opacity: p }}>·</span> : null}
+            <span style={{ ...note(size, it.ink), fontWeight: weight, whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 8}px)` }}>{it.text}</span>
+          </React.Fragment>
         );
       })}
     </div>
@@ -128,14 +115,14 @@ export const EdgeScene: React.FC = () => {
         <Headline lead="When to use one" at={from + 4} size={64} />
 
         {/* What it buys. */}
-        <ChipRow x={X0} y={benY} gap={22} items={benefits.map((b) => ({ ...b, ink: OK_INK, fill: OK_FILL }))} />
+        <WordRow x={X0} y={benY} size={28} items={benefits.map((b) => ({ ...b, ink: OK_INK }))} />
 
         {/* What goes where. */}
         <div style={{ position: "absolute", left: COL_B - 50, top: headY - 6, width: 1.5, height: y(786) - headY, background: HAIRLINE, opacity: ease(frame, useAt, 12) }} />
         <Line x={X0} y={headY} at={useAt} size={29} weight={700} color={OK_INK}>
           At the edge: <span style={{ color: INK_SOFT, fontWeight: 500 }}>static or cacheable</span>
         </Line>
-        <ChipRow x={X0} y={itemY} gap={16} items={kinds.map((k) => ({ ...k, ink: INK, fill: PAPER }))} />
+        <WordRow x={X0} y={itemY} size={27} items={kinds.map((k) => ({ ...k, ink: INK }))} />
         <Line x={COL_B} y={headY} at={dynAt} size={29} weight={700} color={BLUE_INK}>
           To the origin
         </Line>
@@ -148,9 +135,9 @@ export const EdgeScene: React.FC = () => {
         </Line>
 
         {/* The short link's redirect: from the origin's side to the edge. */}
-        <Pill x={redirX} y={redirY} at={popularAt + 4} ink={BLUE_INK} fill={DATA_FILL} size={25}>
+        <Line x={redirX} y={redirY} at={popularAt + 4} size={26} weight={650} color={BLUE_INK}>
           a popular short link&apos;s redirect, the same for everyone
-        </Pill>
+        </Line>
         <Timer x={X0 + 26} y={y(616) + 18} at={shortAt} />
         <Line x={X0 + 72} y={y(616)} at={shortAt + 4} size={26} weight={700} color={OK_INK}>
           so keep that time to live short

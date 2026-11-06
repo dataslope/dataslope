@@ -16,13 +16,12 @@ const WIN = { x: X0, w: 1020, top: 306, h: 384 };
 const BAR_H = 46;
 const SPLIT = 790;
 const LABEL_X = 1184;
-/** The plan's seven cards, in three groups. */
-const CARD_W = 208;
-const CARD_GAP = 14;
-const GROUP_GAP = 56;
-const GROUP_Y = 752;
-const CARD_Y = 790;
-const CARD_H = 94;
+/** The plan's seven questions, in three columns. */
+const COL_W = 480;
+const COL_GAP = 100;
+const GROUP_Y = 744;
+const ROW_Y = 792;
+const ROW_H = 36;
 
 const GROUPS = [
   { title: "The round", cards: ["What's graded", "The 60 minutes", "A good prompt"] },
@@ -56,7 +55,7 @@ const CODE_ROWS = Array.from({ length: 11 }, (_, i) => {
  * three things that are graded around it, each pinned to the part of the
  * window where the candidate does it: the request typed to the assistant, the
  * Accept on its diff, and the test run. The lemur watches. Then the plan:
- * seven question cards in the page's three groups.
+ * seven questions in the page's three groups.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -294,9 +293,10 @@ export const HookScene: React.FC = () => {
 
         <Spot id={HERO.id} at={someAt + 10} left={1490} top={y(292)} width={312} height={341} />
 
-        {/* The plan: seven questions in the page's three groups. */}
+        {/* The plan: seven questions in the page's three groups, a column
+            each, set as text under a hairline. */}
         {GROUPS.map((g, gi) => {
-          const x0 = X0 + GROUPS.slice(0, gi).reduce((s, q) => s + q.cards.length * (CARD_W + CARD_GAP) - CARD_GAP + GROUP_GAP, 0);
+          const x0 = X0 + gi * (COL_W + COL_GAP);
           const first = GROUPS.slice(0, gi).reduce((s, q) => s + q.cards.length, 0);
           const at = gi === 1 ? Math.min(groupAt[1], llmAt) : groupAt[gi];
           return (
@@ -304,6 +304,7 @@ export const HookScene: React.FC = () => {
               <Ink at={at - 2} dur={12} style={{ left: x0, top: y(GROUP_Y) }}>
                 <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{g.title}</span>
               </Ink>
+              <div style={{ position: "absolute", left: x0, top: y(GROUP_Y) + 38, width: COL_W * ease(frame, at, 14), height: 1, background: HAIRLINE }} />
               {g.cards.map((title, i) => {
                 const p = ease(frame, at + 2 + i * 4, 12);
                 if (p <= 0) return null;
@@ -312,21 +313,18 @@ export const HookScene: React.FC = () => {
                     key={title}
                     style={{
                       position: "absolute",
-                      left: x0 + i * (CARD_W + CARD_GAP),
-                      top: y(CARD_Y),
-                      width: CARD_W,
-                      height: h(CARD_H),
-                      boxSizing: "border-box",
-                      border: `1.5px solid ${HAIRLINE}`,
-                      borderRadius: 12,
-                      background: PAPER,
-                      padding: "14px 16px",
+                      left: x0,
+                      top: y(ROW_Y + i * ROW_H),
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: 14,
+                      fontSize: 24,
                       opacity: p,
-                      transform: `translateY(${(1 - p) * 12}px)`,
+                      transform: `translateX(${(1 - p) * -10}px)`,
                     }}
                   >
-                    <div style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>{first + i + 1}</div>
-                    <div style={{ ...note(22, INK), fontWeight: 600, marginTop: 8, whiteSpace: "nowrap" }}>{title}</div>
+                    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700, width: 18 }}>{first + i + 1}</span>
+                    <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{title}</span>
                   </div>
                 );
               })}

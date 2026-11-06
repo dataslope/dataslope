@@ -191,7 +191,7 @@ export const GilScene: React.FC = () => {
 
         {/* Why one lock: every object's reference count. */}
         <Spot id="key" at={singleAt} out={memAt - 8} left={1360} top={y(400)} width={210} height={h(190)} />
-        <Node x={BOX.x} y={y(BOX.top)} w={BOX.w} h={h(BOX.h)} at={memAt} tone="plain" fill={PAPER} out={page1Out} lit={ease(frame, oneLockAt + 4, 10)} line={frame >= oneLockAt + 4 ? OK : INK} />
+        <Node x={BOX.x} y={y(BOX.top)} w={BOX.w} h={h(BOX.h)} at={memAt} tone="plain" fill="transparent" out={page1Out} stroke={frame >= oneLockAt + 4 ? 2.5 : 1.5} line={frame >= oneLockAt + 4 ? OK : HAIRLINE} />
         <Note at={memAt + 4} x={BOX.x + 24} y={y(BOX.top) + h(14)} out={page1Out}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>the interpreter: memory management</span>
         </Note>
@@ -199,12 +199,12 @@ export const GilScene: React.FC = () => {
           const x = BOX.x + 30 + k * 160;
           return (
             <React.Fragment key={o.name}>
-              <Node x={x} y={y(BOX.top + 70)} w={140} h={h(100)} at={countsAt + k * 4} tone="data" out={page1Out}>
-                <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{o.name}</span>
-                <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
+              <Note at={countsAt + k * 4} x={x} y={y(BOX.top + 84)} width={140} from="up" out={page1Out} style={{ textAlign: "center" }}>
+                <div style={{ ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{o.name}</div>
+                <div style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", marginTop: 6 }}>
                   refs: <Num>{o.refs}</Num>
-                </span>
-              </Node>
+                </div>
+              </Note>
               <Ink at={withoutAt - 4 + k * 3} dur={10} out={page1Out} style={{ left: x + 54, top: y(BOX.top + 196) }}>
                 <span style={{ position: "relative", display: "inline-block" }}>
                   <LockGlyph size={30} color={ds("gray", 400)} />
@@ -278,7 +278,8 @@ export const GilScene: React.FC = () => {
         </Note>
         {[0, 1, 2].map((j) => (
           <React.Fragment key={j}>
-            <Node x={P_X} y={pRow(j) + h(46)} w={660} h={h(66)} at={procAt + 4 + j * 4} tone="plain" fill={PAPER} align="left" justify="center">
+            {j > 0 ? <div style={{ position: "absolute", left: P_X, top: pRow(j) + h(46) - h(14), width: 660, height: 1, background: HAIRLINE, opacity: ease(frame, procAt + 4 + j * 4, 10) }} /> : null}
+            <Note at={procAt + 4 + j * 4} x={P_X} y={pRow(j) + h(46) + h(66) / 2 - 15}>
               <span style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 21 }}>
                 <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>process {j + 1}</span>
                 <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, ownAt + j * 3, 10) }}>own interpreter, own GIL</span>
@@ -286,7 +287,7 @@ export const GilScene: React.FC = () => {
                   <KeyGlyph size={30} color={THREAD[j].ink} />
                 </span>
               </span>
-            </Node>
+            </Note>
             <div
               style={{
                 position: "absolute",

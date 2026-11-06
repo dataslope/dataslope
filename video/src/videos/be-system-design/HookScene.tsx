@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import type { Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -60,7 +60,7 @@ export const HookScene: React.FC = () => {
   const chipH = 58;
   const chipX = (i: number) => X0 + i * (CHIP_W + CHIP_GAP);
   const thread = ease(frame, carriedAt, 30);
-  const lastChip = chipX(CHIPS.length - 1) + CHIP_W;
+  const lastChip = chipX(CHIPS.length - 1) + 120;
   const crowW = 470;
   const crowH = Math.round((crowW * ART.crow[1]) / ART.crow[0]);
 
@@ -88,7 +88,7 @@ export const HookScene: React.FC = () => {
 
         {/* Fewer take-homes, more live design. */}
         {[
-          { x: X0, at: fewerAt, up: false, text: <>Take-home projects</>, color: INK_SOFT, ink: INK_SOFT },
+          { x: X0, at: fewerAt, up: false, text: <>Take-home projects</>, color: INK_SOFT, ink: INK_SOFT, trend: "fewer", trendInk: INK_SOFT },
           {
             x: X0 + CARD_W + 50,
             at: moreAt,
@@ -103,6 +103,8 @@ export const HookScene: React.FC = () => {
             ),
             color: BAR,
             ink: INK,
+            trend: "more",
+            trendInk: BLUE_INK,
           },
         ].map((c, i) => {
           const p = ease(frame, (i === 0 ? promptsAt : grownAt) + 4, 14);
@@ -111,35 +113,23 @@ export const HookScene: React.FC = () => {
               <div
                 style={{
                   position: "absolute",
-                  left: c.x,
-                  top: cardsTop,
-                  width: CARD_W,
-                  height: CARD_H,
-                  boxSizing: "border-box",
-                  border: `2px solid ${i ? INK : HAIRLINE}`,
-                  borderRadius: 14,
-                  background: PAPER,
-                  display: "flex",
-                  alignItems: "center",
-                  paddingLeft: 96,
+                  left: c.x + 64,
+                  top: cardsTop + CARD_H / 2 - 40,
                   opacity: p * (1 - dimCards),
                   transform: `translateY(${(1 - p) * 14}px)`,
                 }}
               >
-                <span style={{ ...note(30, c.ink), fontWeight: 650, whiteSpace: "nowrap" }}>{c.text}</span>
+                <span style={{ ...note(31, c.ink), fontWeight: 650, whiteSpace: "nowrap" }}>{c.text}</span>
               </div>
+              <Ink at={c.at + 2} dur={12} style={{ left: c.x + 64, top: cardsTop + CARD_H / 2 + 12 }}>
+                <span style={{ ...label(22, c.trendInk), whiteSpace: "nowrap", opacity: 1 - dimCards }}>{c.trend}</span>
+              </Ink>
               <div style={{ position: "absolute", inset: 0, opacity: 1 - dimCards }}>
-                <Trend x={c.x + 50} y={cardsTop + CARD_H / 2} up={c.up} at={c.at} color={c.color} />
+                <Trend x={c.x + 22} y={cardsTop + CARD_H / 2} up={c.up} at={c.at} color={c.color} />
               </div>
             </React.Fragment>
           );
         })}
-        <Ink at={fewerAt + 2} dur={12} style={{ left: X0, top: cardsTop + CARD_H + 22 }}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", opacity: 1 - dimCards }}>fewer</span>
-        </Ink>
-        <Ink at={moreAt + 2} dur={12} style={{ left: X0 + CARD_W + 50, top: cardsTop + CARD_H + 22 }}>
-          <span style={{ ...label(22, BLUE_INK), whiteSpace: "nowrap", opacity: 1 - dimCards }}>more</span>
-        </Ink>
 
         {/* The plan: five questions on one design. */}
         <Ink at={fiveAt} dur={14} style={{ left: X0, top: chipY - 76 }}>
@@ -149,7 +139,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Ink>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          <line x1={X0} x2={X0 + (lastChip - X0) * thread} y1={chipY + chipH / 2} y2={chipY + chipH / 2} stroke={BAR} strokeWidth={3} opacity={thread > 0 ? 1 : 0} />
+          <line x1={X0} x2={X0 + (lastChip - X0) * thread} y1={chipY + chipH + 6} y2={chipY + chipH + 6} stroke={BAR} strokeWidth={3} opacity={thread > 0 ? 1 : 0} />
         </svg>
         {CHIPS.map((c, i) => {
           const at = chipAt[i];
@@ -164,23 +154,30 @@ export const HookScene: React.FC = () => {
                 position: "absolute",
                 left: chipX(i),
                 top: chipY,
-                width: CHIP_W,
                 height: chipH,
-                boxSizing: "border-box",
-                border: `2px solid ${INK}`,
-                borderRadius: 999,
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 70)}%, ${PAPER})`,
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                gap: "0.45em",
-                fontSize: 27,
+                fontSize: 30,
                 opacity: p,
                 transform: `translateY(${(1 - p) * 10}px)`,
               }}
             >
-              <span style={{ ...note(27, ACCENT_INK), fontWeight: 700 }}>{c.n}</span>
-              <span style={{ ...note(27, INK), fontWeight: 650 }}>{c.word}</span>
+              <span style={{ position: "relative", display: "inline-block", margin: "0 0.14em", whiteSpace: "nowrap" }}>
+                <span
+                  style={{
+                    position: "absolute",
+                    left: "-0.14em",
+                    right: "-0.14em",
+                    top: "0.04em",
+                    bottom: "-0.06em",
+                    background: HIGHLIGHT,
+                    borderRadius: "0.14em",
+                    opacity: lit,
+                  }}
+                />
+                <span style={{ position: "relative", ...note(30, ACCENT_INK), fontWeight: 700 }}>{c.n}</span>
+                <span style={{ position: "relative", ...note(30, INK), fontWeight: 650 }}> {c.word}</span>
+              </span>
             </div>
           );
         })}

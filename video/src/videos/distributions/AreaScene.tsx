@@ -110,7 +110,7 @@ export const AreaScene: React.FC = () => {
       />
 
       {/* The hourglass, small, top right, clear of the page's edge. */}
-      <Spot id="distributions-hourglass" at={waitingAt - 4} left={1600} top={y(110)} width={96} height={200} />
+      <Spot id="distributions-hourglass" at={waitingAt - 4} left={1600} top={y(130)} width={96} height={200} />
 
       <Drift from={exactFrom} to={n.beat("height-in").to + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dimFig }}>

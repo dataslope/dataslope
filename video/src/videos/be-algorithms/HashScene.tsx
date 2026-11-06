@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK, QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { TABULAR, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HASH, sharedChance } from "./data";
-import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, Cell, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, PAPER, Pill, Svg, int } from "./parts";
+import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, Cell, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, Mark, Mono, OK_INK, Svg, int } from "./parts";
 
 const AX = 140;
 const PITCH_X = 84;
@@ -116,11 +116,14 @@ export const HashScene: React.FC = () => {
         <Line at={lookupsAt} x={96} y={y(262)} size={24} color={INK_SOFT}>
           Lookups and inserts by key, in O(1) on average:
         </Line>
-        {uses.map((u, i) => (
-          <Pill key={u.text} x={[664, 820, 984][i]} y={y(256)} at={u.at - 2} tone="data" size={24}>
-            {u.text}
-          </Pill>
-        ))}
+        <div style={{ position: "absolute", left: 670, top: y(262), display: "flex", gap: 14, fontSize: 24, whiteSpace: "nowrap" }}>
+          {uses.map((u, i) => (
+            <span key={u.text} style={{ ...note(24, BLUE_INK), fontWeight: 700, opacity: ease(frame, u.at - 2, 10) }}>
+              {i ? <span style={{ color: INK_SOFT, fontWeight: 500, marginRight: 14 }}>·</span> : null}
+              {u.text}
+            </span>
+          ))}
+        </div>
 
         {/* Two Sum: one pass with a map. */}
         <Line at={twoSumAt} x={AX} y={aTop - 50} size={22} weight={650}>
@@ -149,7 +152,7 @@ export const HashScene: React.FC = () => {
         </div>
         <div style={{ position: "absolute", left: MAP_X, top: aTop + 92, opacity: ease(frame, linearAt - 6, 10), display: "flex", alignItems: "center", gap: 12, fontSize: 26 }}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>returns</span>
-          <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 700, color: OK_INK, padding: "4px 12px", border: `2.5px solid ${OK}`, borderRadius: 8, background: PAPER }}>{HASH.twoSum.answer}</span>
+          <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 700, color: OK_INK }}>{HASH.twoSum.answer}</span>
         </div>
         <Line at={linearAt} x={AX} y={aTop + 214} size={24} weight={650}>
           O(n) time, at the cost of O(n) memory
@@ -192,7 +195,7 @@ export const HashScene: React.FC = () => {
 
         {/* The worst case, counted. */}
         <Line at={worstAt} x={AX} y={y(684)} size={22} weight={650}>
-          Worst case: <QMono>__eq__</QMono> calls filling a Python set with <Num>{int(HASH.keys)}</Num> keys
+          Worst case: <Mono>__eq__</Mono> calls filling a Python set with <Num>{int(HASH.keys)}</Num> keys
         </Line>
         <HBar x={AX} y={y(724)} w={640} max={HASH.eqSame} value={HASH.eqSpread} at={noneAt - 2} color={BAR} label="Distinct hashes" valueText={<Num>{int(HASH.eqSpread)}</Num>} size={22} barH={22} />
         <HBar

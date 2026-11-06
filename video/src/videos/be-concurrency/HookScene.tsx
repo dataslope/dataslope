@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Band, Block, Drift, Headline, Kicker, LockGlyph, Node, OK_INK, SERIES, tint, X0 } from "./parts";
+import { Band, Block, Drift, Headline, Kicker, LockGlyph, OK_INK, SERIES, tint, X0 } from "./parts";
 
 /** One second of the server's time, in px. */
 const SEC = 760;
@@ -52,14 +52,10 @@ const Chip: React.FC<{ at: number; x: number; y: number; w: number; h: number; n
         top: y,
         width: w,
         height: h,
-        boxSizing: "border-box",
-        border: `2px solid ${big ? BAR : HAIRLINE}`,
-        borderRadius: 10,
-        background: big ? tint(BAR, 8) : PAPER,
         display: "flex",
         flexDirection: big ? "column" : "row",
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: big ? "center" : "baseline",
+        justifyContent: big ? "center" : "flex-start",
         gap: big ? 2 : "0.4em",
         fontSize: 20,
         opacity: Math.min(1, p),
@@ -80,7 +76,7 @@ const Glyph: React.FC<{ kind: string }> = ({ kind }) =>
   kind === "lock" ? (
     <LockGlyph size={46} color={BAR} />
   ) : kind === "counter" ? (
-    <span style={{ ...label(30, BLUE_INK), fontWeight: 750, border: `2.5px solid ${BAR}`, borderRadius: 8, padding: "0 14px", background: PAPER, lineHeight: 1.3 }}>
+    <span style={{ ...label(36, BLUE_INK), fontWeight: 750, lineHeight: 1.1 }}>
       <Num>5</Num>
     </span>
   ) : (
@@ -243,10 +239,12 @@ export const HookScene: React.FC = () => {
 
           {/* What they share. */}
           {shared.map((s) => (
-            <Node key={s.id} x={s.x} y={y(380)} w={230} h={h(130)} at={s.at} tone="data" justify="center">
-              <Glyph kind={s.id} />
-              <span style={{ ...label(24, INK), fontWeight: 650, whiteSpace: "nowrap", marginTop: 6 }}>{s.name}</span>
-            </Node>
+            <Note key={s.id} at={s.at} x={s.x} y={y(392)} width={230} from="up" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+              <span style={{ height: 46, display: "flex", alignItems: "center" }}>
+                <Glyph kind={s.id} />
+              </span>
+              <span style={{ ...label(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.name}</span>
+            </Note>
           ))}
           <Note at={bugsAt} x={1000} y={y(560)}>
             <span style={{ ...note(28, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>That&apos;s where the bugs live.</span>

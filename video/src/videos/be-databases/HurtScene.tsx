@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { HURT, OPENING, thousands } from "./data";
-import { Bar, Drift, Listing, listingHeight, Node, Pill, PlanBox, SmallMono, X0 } from "./parts";
+import { Bar, Drift, Listing, listingHeight, Node, PlanBox, SmallMono, X0 } from "./parts";
 
 const HELPS_Y = 300;
 const L_TOP = 392;
@@ -89,16 +89,19 @@ export const HurtScene: React.FC = () => {
         <Note at={helpsAt} x={X0} y={y(HELPS_Y) + 6}>
           <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>Helps selective reads:</span>
         </Note>
-        {[
-          { at: eqAt, text: "equality", x: 410 },
-          { at: rangesAt, text: "ranges", x: 572 },
-          { at: joinsAt, text: "joins", x: 712 },
-          { at: sortsAt, text: "sorts on the column", x: 836 },
-        ].map((p) => (
-          <Pill key={p.text} x={p.x} y={y(HELPS_Y)} at={p.at} tone="ok" size={22}>
-            {p.text}
-          </Pill>
-        ))}
+        <div style={{ position: "absolute", left: 410, top: y(HELPS_Y) + 6, display: "flex", alignItems: "baseline", gap: "0.5em", fontSize: 23, whiteSpace: "nowrap" }}>
+          {[
+            { at: eqAt, text: "equality" },
+            { at: rangesAt, text: "ranges" },
+            { at: joinsAt, text: "joins" },
+            { at: sortsAt, text: "sorts on the column" },
+          ].map((p, i) => (
+            <span key={p.text} style={{ ...note(23, OK_INK), fontWeight: 650, opacity: ease(frame, p.at, 10) }}>
+              {i > 0 ? <span style={{ color: INK_SOFT, fontWeight: 500, marginRight: "0.5em" }}>·</span> : null}
+              {p.text}
+            </span>
+          ))}
+        </div>
 
         {/* ── Left: most rows match, and the index sits unused ── */}
         <Note at={nothingAt} x={X0} y={lTop}>
@@ -135,7 +138,7 @@ export const HurtScene: React.FC = () => {
           h={h(76)}
           at={indexAt}
           tone="off"
-          dashed
+          bare
           title={<SmallMono>users_active_idx</SmallMono>}
           sub={<span style={{ opacity: ease(frame, scansAt + 6, 10) }}>exists, unused</span>}
           size={22}

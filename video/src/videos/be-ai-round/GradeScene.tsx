@@ -163,12 +163,12 @@ export const GradeScene: React.FC = () => {
 
           {/* Canva's write-up, as a pull quote with its source. */}
           <Ink at={canvaAt} dur={18} style={{ left: X0, top: y(398), width: 1330 }}>
-            <div style={{ ...body(38, true), color: INK, lineHeight: 1.22, borderLeft: `4px solid ${INK}`, paddingLeft: 28 }}>
+            <div style={{ ...body(38, true), color: INK, lineHeight: 1.22 }}>
               The strong candidates{" "}
               <span style={{ opacity: ease(frame, quoteAt - 2, 12) }}>&ldquo;didn&rsquo;t just prompt AI and accept whatever it generated.&rdquo;</span>
             </div>
           </Ink>
-          <Note at={canvaAt + 10} x={X0 + 32} y={y(510)}>
+          <Note at={canvaAt + 10} x={X0} y={y(500)}>
             <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Canva&apos;s write-up of its first AI-assisted interviews, June 2025</span>
           </Note>
           <Note at={struggledAt} x={X0} y={y(572)}>
@@ -180,25 +180,14 @@ export const GradeScene: React.FC = () => {
           <Note at={googleAt} x={X0} y={y(660)}>
             <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Google&apos;s pilot rubric: the same three skills</span>
           </Note>
-          <div style={{ position: "absolute", left: X0, top: y(712), display: "flex", gap: 18, fontSize: 26 }}>
-            {skills.map((s) => {
+          <div style={{ position: "absolute", left: X0, top: y(712), display: "flex", alignItems: "baseline", gap: 18, fontSize: 28 }}>
+            {skills.map((s, i) => {
               const p = ease(frame, s.at - 2, 12);
               return (
-                <span
-                  key={s.text}
-                  style={{
-                    padding: "8px 18px 9px",
-                    border: `2.2px solid ${INK}`,
-                    borderRadius: 10,
-                    ...note(26, INK),
-                    fontWeight: 600,
-                    whiteSpace: "nowrap",
-                    opacity: p,
-                    transform: `translateY(${(1 - p) * 12}px)`,
-                  }}
-                >
-                  {s.text}
-                </span>
+                <React.Fragment key={s.text}>
+                  {i > 0 ? <span style={{ ...note(28, INK_SOFT), opacity: p }}>·</span> : null}
+                  <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>{s.text}</span>
+                </React.Fragment>
               );
             })}
           </div>

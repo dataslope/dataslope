@@ -178,24 +178,9 @@ const Traverse: React.FC<{ c: Ctx }> = ({ c }) => {
           <Line at={r.at} x={rx} y={c.T + c.h(30) + i * c.h(120)} size={23} weight={650}>
             {r.name}
           </Line>
-          <div style={{ position: "absolute", left: rx, top: c.T + c.h(72) + i * c.h(120), display: "flex", gap: 10, fontSize: 24 }}>
+          <div style={{ position: "absolute", left: rx, top: c.T + c.h(72) + i * c.h(120), display: "flex", gap: 18, fontSize: 26 }}>
             {r.order.map((v, k) => (
-              <span
-                key={k}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 8,
-                  border: `2px solid ${BAR}`,
-                  background: BLUE_FILL,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  ...label(22, BLUE_INK),
-                  ...TABULAR,
-                  opacity: ease(frame, r.at + 4 + k * 3, 8),
-                }}
-              >
+              <span key={k} style={{ ...label(26, BLUE_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, r.at + 4 + k * 3, 8) }}>
                 {v}
               </span>
             ))}

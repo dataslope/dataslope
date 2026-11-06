@@ -3,10 +3,10 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, headline, label } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, PAPER, headline, label } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ACCENT_INK, Box, Drift, Flow, Line, Mark, Mark2, OK_INK, Pill, Strike, X0 } from "./parts";
+import { ACCENT_INK, Box, Drift, Flow, Line, Mark, Mark2, OK_INK, Strike, X0 } from "./parts";
 
 const ROW_TOP = 290;
 const PITCH = 100;
@@ -85,21 +85,16 @@ export const SolidScene: React.FC = () => {
               <div
                 style={{
                   position: "absolute",
-                  left: X0,
-                  top: top(i),
+                  left: X0 + 6,
+                  top: top(i) - 6,
                   width: TILE,
                   height: TILE,
-                  boxSizing: "border-box",
-                  borderRadius: 12,
-                  border: `2.5px solid ${BAR}`,
-                  background: `color-mix(in srgb, ${BAR} ${Math.round(8 + fill * 92)}%, ${PAPER})`,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
                   opacity: ease(frame, textAt + i * 3, 10) * (1 - d),
                 }}
               >
-                <span style={{ ...headline(46), color: fill > 0.5 ? PAPER : BLUE_INK, fontWeight: 700 }}>{r.letter}</span>
+                <span style={{ ...headline(60), color: `color-mix(in srgb, ${BLUE_INK} ${Math.round(35 + fill * 65)}%, ${PAPER})`, fontWeight: 700 }}>{r.letter}</span>
               </div>
               <Line x={NAME_X} y={top(i) - 2} at={r.at} size={26} weight={700} dim={dim}>
                 {r.name}
@@ -146,9 +141,9 @@ export const SolidScene: React.FC = () => {
         </Box>
 
         {/* D: on to question 5. */}
-        <Pill x={EX_X} y={mid(4) - 22} at={nextAt} tone="data" dim={dim}>
+        <Line x={EX_X} y={mid(4) - 16} at={nextAt} size={24} weight={700} color={BLUE_INK} dim={dim}>
           → the next question
-        </Pill>
+        </Line>
 
         {/* Guidelines, not laws. */}
         <Line x={X0} y={y(800)} at={lawsAt} size={30} weight={600}>

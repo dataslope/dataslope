@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, BLUE_INK, INK, INK_SOFT, label } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FAKE_SENT } from "./data";
@@ -133,10 +133,12 @@ export const DipScene: React.FC = () => {
         <Box x={lerp(HOME_X, dockX, fakeIn)} y={fakeY} w={PLUG.w} h={PLUG.h} at={testAt + 2} title="Recording fake" tone="data" />
 
         {/* What the fake recorded. */}
-        <Box x={CONF.x} y={top + CONF.h + 40} w={560} h={96} at={recordsAt + 4} tone="data" align="left">
-          <span style={{ ...note(20, INK_SOFT), fontWeight: 600 }}>the fake recorded one message</span>
-          <span style={{ ...note(25, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>“{sent}”</span>
-        </Box>
+        <Line x={CONF.x} y={top + CONF.h + 36} at={recordsAt + 4} size={21} color={INK_SOFT} weight={650}>
+          the fake recorded one message
+        </Line>
+        <Line x={CONF.x} y={top + CONF.h + 70} at={recordsAt + 10} size={26} color={BLUE_INK} weight={700}>
+          “{sent}”
+        </Line>
         <div style={{ position: "absolute", left: CONF.x + 590, top: top + CONF.h + 66, width: 32, height: 32 }}>
           <Mark2 at={checksAt} kind="tick" size={32} />
         </div>

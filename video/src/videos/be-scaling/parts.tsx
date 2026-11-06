@@ -547,3 +547,63 @@ export const MiniMap: React.FC<{
     </div>
   );
 };
+
+// ── Steps in a row: plain text joined by arrows, never boxed ─────────────────
+
+export type Step = {
+  text: React.ReactNode;
+  /** When the step inks in. */
+  at: number;
+  /** A highlight behind it while the narration is on it. */
+  lit?: readonly [number, number];
+  color?: string;
+  weight?: number;
+};
+
+/**
+ * A process as words in a row joined by arrows ("check the cache → miss →
+ * …"): each step inks in on its cue and is highlighted while it is read. The
+ * house has no cards (README, "No cards unless the layout needs one"), so the
+ * steps are plain text, grouped by the row itself.
+ */
+export const StepRow: React.FC<{ x: number; y: number; steps: readonly Step[]; size?: number; dim?: number; out?: number }> = ({
+  x,
+  y,
+  steps,
+  size = 24,
+  dim,
+  out,
+}) => {
+  const frame = useCurrentFrame();
+  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.65;
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (o >= 1) return null;
+  return (
+    <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "baseline", gap: "0.5em", fontSize: size, whiteSpace: "nowrap", opacity: (1 - d) * (1 - o) }}>
+      {steps.map((s, i) => {
+        const p = ease(frame, s.at, 12);
+        const lit = s.lit ? Math.min(ease(frame, s.lit[0], 8), 1 - ease(frame, s.lit[1], 10)) : 0;
+        return (
+          <React.Fragment key={i}>
+            {i > 0 ? <span style={{ ...note(size, INK_SOFT), opacity: p }}>→</span> : null}
+            <span style={{ ...note(size, s.color ?? INK), fontWeight: s.weight ?? 650, opacity: p, position: "relative", display: "inline-block", margin: "0 0.14em" }}>
+              <span
+                style={{
+                  position: "absolute",
+                  left: "-0.14em",
+                  right: "-0.14em",
+                  top: "0.04em",
+                  bottom: "-0.06em",
+                  background: HIGHLIGHT,
+                  borderRadius: "0.14em",
+                  opacity: lit,
+                }}
+              />
+              <span style={{ position: "relative" }}>{s.text}</span>
+            </span>
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};

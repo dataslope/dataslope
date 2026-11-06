@@ -150,20 +150,8 @@ export const BlockScene: React.FC = () => {
         <Note at={serverAt} x={X0} y={laneY + laneH / 2 - 15}>
           <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>the loop</span>
         </Note>
-        <div
-          style={{
-            position: "absolute",
-            left: AXIS.x - 10,
-            top: laneY - 8,
-            width: 920,
-            height: laneH + 16,
-            borderRadius: 10,
-            background: ds("gray", 50),
-            border: `1.5px solid ${HAIRLINE}`,
-            boxSizing: "border-box",
-            opacity: ease(frame, serverAt, 12),
-          }}
-        />
+        {/* The loop's lane: a hairline under it. */}
+        <div style={{ position: "absolute", left: AXIS.x - 10, top: laneY + laneH + 8, width: 920, height: 1, background: HAIRLINE, opacity: ease(frame, serverAt, 12) }} />
         {Array.from({ length: REQS }, (_, k) => {
           const at = serverAt + 4 + k * 3;
           const p = ease(frame, at, 10);
@@ -201,7 +189,7 @@ export const BlockScene: React.FC = () => {
         </Note>
 
         {/* The fix. */}
-        <Node x={POOL.x} y={y(POOL.y)} w={POOL.w} h={h(POOL.h)} at={poolAt} tone="plain" fill={PAPER} align="left" justify="flex-start">
+        <Node x={POOL.x} y={y(POOL.y)} w={POOL.w} h={h(POOL.h)} at={poolAt} tone="plain" fill="transparent" line={HAIRLINE} stroke={1.5} align="left" justify="flex-start">
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", marginTop: 8 }}>a thread or process pool</span>
         </Node>
         <div

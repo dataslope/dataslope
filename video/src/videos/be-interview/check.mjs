@@ -17,8 +17,8 @@
 // - a kept page's question count stops matching the parts that answer it
 //   (data.ts PARTS, plus the one question this overview answers and the one
 //   Part 4 answers together with its twin);
-// - a page stops saying what the narration quotes from it (the companies,
-//   the survey's numbers, the round's sixty minutes);
+// - a page stops saying what the narration quotes from it (the round
+//   formats behind the companies' policies, the survey's numbers);
 // - the narration stops saying, in words, the numbers counted here.
 /* global console, process, URL */
 import { readFileSync, writeFileSync } from "node:fs";
@@ -81,7 +81,7 @@ if (PARTS.some((x) => x.page === LEFT_OUT)) problems.push("a part answers from t
 const quotes = [
   ["ai-assisted-coding.mdx", "Since 2025 the coding interview has split in two"],
   ["ai-assisted-coding.mdx", "expected to use their usual AI tools"],
-  ["ai-assisted-coding.mdx", "One of the two onsite coding rounds became a 60-minute AI-enabled round"],
+  ["ai-assisted-coding.mdx", "One of the two onsite coding rounds became a 60-minute AI-enabled round: a multi-file project in CoderPad with a built-in assistant"],
   ["ai-assisted-coding.mdx", '"code comprehension" round where candidates read, debug, and optimize existing code'],
   ["ai-assisted-coding.mdx", "Using unapproved generative AI during an interview can disqualify a candidate"],
   ["ai-assisted-coding.mdx", "No AI in take-homes or live interviews unless the interviewer says otherwise"],
@@ -128,7 +128,11 @@ const claims = [
   ["ai-survey", "which sells interviewing services"],
   ["ai-survey-data", "seventy-one percent"],
   ["ai-survey-data", "sixty-two percent"],
-  ["ai-allowed-who", "sixty-minute"],
+  // The formats the page's table describes, said without the companies.
+  ["ai-allowed-who", "an hour extending a multi-file project with the assistant built in"],
+  ["ai-allowed-who", "unfamiliar code to read, debug and speed up"],
+  ["ai-banned", "without permission can disqualify you"],
+  ["ai-banned", "back in person"],
   ["ai", "since 2025"],
 ];
 for (const [id, phrase] of claims) if (!text(id).includes(phrase)) problems.push(`script.ts "${id}" no longer says "${phrase}"`);

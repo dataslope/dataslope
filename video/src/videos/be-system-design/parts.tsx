@@ -323,6 +323,21 @@ export const Arrow: React.FC<{
   );
 };
 
+/** A short arrow that sits in a line of words, pointing right, drawn on
+ *  `at`: the "then" between two steps. Its head is arrow.ts's. */
+export const InlineArrow: React.FC<{ at: number; w?: number; color?: string; size?: number }> = ({ at, w = 40, color = INK_SOFT, size = 26 }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 8);
+  const h = Math.round(size * 0.8);
+  const line: Pt[] = Array.from({ length: 21 }, (_, i) => [2 + ((w - 4) * i) / 20, h / 2] as Pt);
+  return (
+    <svg width={w} height={h} style={{ display: "block", flex: "none", overflow: "visible", opacity: p }}>
+      <path d={`M2,${h / 2} L${w - 12},${h / 2}`} stroke={color} strokeWidth={2.2} fill="none" />
+      <path d={arrowHead(line, 11, 6, { filled: true })} fill={color} />
+    </svg>
+  );
+};
+
 /** A request on its way: a dot that rides `points` from `from` to `to`. */
 export const Traveller: React.FC<{ points: readonly Pt[]; from: number; to: number; color?: string; r?: number; out?: number }> = ({
   points,
@@ -344,48 +359,6 @@ export const Traveller: React.FC<{ points: readonly Pt[]; from: number; to: numb
       <circle cx={x} cy={y} r={r + 4} fill={PAPER} />
       <circle cx={x} cy={y} r={r} fill={color} />
     </svg>
-  );
-};
-
-/** A small rounded tag on the page: a role, a benefit, a step. */
-export const Pill: React.FC<{
-  x: number;
-  y: number;
-  at: number;
-  ink?: string;
-  fill?: string;
-  size?: number;
-  out?: number;
-  dim?: number;
-  dashed?: boolean;
-  children: React.ReactNode;
-}> = ({ x, y, at, ink = INK, fill = PAPER, size = 22, out, dim, dashed, children }) => {
-  const frame = useCurrentFrame();
-  const p = ease(frame, at, 12);
-  const o = out === undefined ? 0 : ease(frame, out, 10);
-  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
-  if (p <= 0 || o >= 1) return null;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: x,
-        top: y,
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: `${Math.round(size * 0.3)}px ${Math.round(size * 0.66)}px`,
-        border: `2px ${dashed ? "dashed" : "solid"} ${ink}`,
-        borderRadius: 999,
-        background: fill,
-        ...label(size, ink),
-        whiteSpace: "nowrap",
-        opacity: p * (1 - o) * (1 - d),
-        transform: `translateY(${(1 - p) * 10}px)`,
-      }}
-    >
-      {children}
-    </div>
   );
 };
 

@@ -34,9 +34,6 @@ export const RIGHT = 1800;
 /** A light green and a light red under an added and a removed line. */
 export const TINT_ADD = `color-mix(in srgb, ${OK} 15%, transparent)`;
 export const TINT_DEL = `color-mix(in srgb, ${ACCENT} 12%, transparent)`;
-/** A ring drawn around what the narration points at: the yellow, deep enough
- *  to read as a line on white. */
-export const RING = ds("yellow", 600);
 
 // ── Python, colored as every listing in the series colors it ────────────────
 
@@ -425,27 +422,6 @@ export const Steps: React.FC<{
         );
       })}
     </>
-  );
-};
-
-/** A rounded ring drawn around a box, in the pointing yellow. */
-export const Ring: React.FC<{ x: number; y: number; w: number; h: number; at: number; out?: number; color?: string }> = ({
-  x,
-  y,
-  w,
-  h,
-  at,
-  out,
-  color = RING,
-}) => {
-  const frame = useCurrentFrame();
-  const p = ease(frame, at, 16);
-  const o = out === undefined ? 0 : ease(frame, out, 10);
-  if (p <= 0 || o >= 1) return null;
-  return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: 1 - o }}>
-      <rect x={x} y={y} width={w} height={h} rx={h / 2} fill="none" stroke={color} strokeWidth={3} pathLength={1} strokeDasharray={`${p} 1`} />
-    </svg>
   );
 };
 

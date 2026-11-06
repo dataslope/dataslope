@@ -118,7 +118,7 @@ export const Headline: React.FC<{ lead: string; turn?: string; at: number; turnA
 
 /** Code inside running text, at the text's own size (QMono's spacing). */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.88em)", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );
@@ -321,42 +321,6 @@ export const Flow: React.FC<{
   );
 };
 
-/** A small rounded label that inks in, in its tone's ink. */
-export const Pill: React.FC<{
-  x: number;
-  y: number;
-  at: number;
-  tone?: Tone;
-  size?: number;
-  out?: number;
-  dim?: number;
-  mono?: boolean;
-  children: React.ReactNode;
-}> = ({ x, y, at, tone = "data", size = 22, out, dim, mono, children }) => {
-  const frame = useCurrentFrame();
-  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
-  const t = TONE[tone];
-  return (
-    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d }}>
-      <span
-        style={{
-          display: "inline-block",
-          padding: "5px 14px 6px",
-          borderRadius: 8,
-          border: `2px solid ${t.line}`,
-          background: t.fill,
-          ...label(size, t.ink),
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-          ...(mono ? { fontFamily: MONO } : {}),
-        }}
-      >
-        {children}
-      </span>
-    </Ink>
-  );
-};
-
 // ── Counts on a shared scale ─────────────────────────────────────────────────
 
 /**
@@ -527,18 +491,20 @@ export const GraphNode: React.FC<{
           style={{
             position: "absolute",
             ...off,
-            padding: "2px 10px 3px",
-            borderRadius: 999,
-            border: `2px solid ${bt.line}`,
-            background: bt.fill,
-            ...label(22, bt.ink),
+            // A plain number beside its node; the one the narration points
+            // at gets a highlighter band, never a box.
+            ...label(24, badgeTone === "look" || badgeTone === "plain" ? INK : bt.ink),
             ...TABULAR,
-            fontWeight: 700,
+            fontWeight: 750,
             whiteSpace: "nowrap",
             opacity: b,
           }}
         >
-          {badge}
+          {badgeTone === "look" ? (
+            <span style={{ background: HIGHLIGHT, borderRadius: 4, padding: "1px 8px 2px" }}>{badge}</span>
+          ) : (
+            badge
+          )}
         </div>
       ) : null}
     </>

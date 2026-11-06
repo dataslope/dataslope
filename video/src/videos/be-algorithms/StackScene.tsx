@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK, QuestionCard, Tick } from "../../editorial/interview";
+import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { HIGHLIGHT, note } from "../../editorial/style";
 import { MONO } from "../../theme/fonts";
@@ -253,7 +253,6 @@ export const StackScene: React.FC = () => {
         <Verdict at={nestedAt + 4} accepts={nested.count} right={nested.count} x={COL2} top={row(1) + 12} />
         <Verdict at={nestedAt + 4} accepts={nested.queue} right={nested.queue} x={COL2} top={row(2) + 12} />
         <Verdict at={nestedAt + 10} accepts={nested.stack} right={nested.stack} x={COL2} top={row(3) + 12} />
-        <div style={{ position: "absolute", left: TX - 14, top: row(3) + 4, width: COL2 + 104 - TX, height: 48, borderRadius: 6, border: `2px solid ${OK}`, opacity: ease(frame, nestedAt + 16, 10) }} />
 
         {/* Depth-first search, the same idea. */}
         <Line at={dfsAt} x={SX} y={y(866)} size={26} weight={600}>

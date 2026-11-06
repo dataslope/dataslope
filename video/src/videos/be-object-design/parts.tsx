@@ -316,7 +316,8 @@ export const Flow: React.FC<{
   );
 };
 
-/** A small rounded label on the page, in its tone's ink, that inks in. */
+/** A short tag set as plain text in its tone's ink (no outline, no fill:
+ *  the house sets tags as words, not pills), inking in. */
 export const Pill: React.FC<{
   x: number;
   y: number;
@@ -325,28 +326,13 @@ export const Pill: React.FC<{
   size?: number;
   out?: number;
   dim?: number;
-  solid?: boolean;
   children: React.ReactNode;
-}> = ({ x, y, at, tone = "data", size = 22, out, dim, solid, children }) => {
+}> = ({ x, y, at, tone = "data", size = 22, out, dim, children }) => {
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.62;
-  const t = TONE[tone];
   return (
-    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d }}>
-      <span
-        style={{
-          display: "inline-block",
-          padding: "5px 14px 6px",
-          borderRadius: 8,
-          border: `2px solid ${t.line}`,
-          background: solid ? t.line : t.fill,
-          ...label(size, solid ? PAPER : t.ink),
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {children}
-      </span>
+    <Ink at={at} dur={12} out={out} style={{ left: x, top: y + 6, opacity: 1 - d }}>
+      <span style={{ ...label(size, tone === "plain" ? INK_SOFT : TONE[tone].ink), fontWeight: 700, whiteSpace: "nowrap" }}>{children}</span>
     </Ink>
   );
 };
@@ -388,7 +374,8 @@ export const Line: React.FC<{
   );
 };
 
-/** A value in a box that pops in: a count, a total, a test's result. */
+/** A value set large in its tone's ink, centered in a w x h slot: a count,
+ *  a total. No box around it; `lit` swells it a little. */
 export const Value: React.FC<{
   x: number;
   y: number;
@@ -401,11 +388,33 @@ export const Value: React.FC<{
   out?: number;
   dim?: number;
   children: React.ReactNode;
-}> = ({ x, y, at, w = 110, h = 62, tone = "data", size = 36, lit = 0, out, dim, children }) => (
-  <Box x={x} y={y} w={w} h={h} at={at} tone={tone} lit={lit} out={out} dim={dim} radius={10}>
-    <span style={{ ...label(size, toneInk(tone)), fontWeight: 750, fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>{children}</span>
-  </Box>
-);
+}> = ({ x, y, at, w = 110, h = 62, tone = "data", size = 40, lit = 0, out, dim, children }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const p = pop(frame, at, fps, 16);
+  const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.62;
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0.001 || o >= 1) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        width: w,
+        height: h,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        opacity: Math.min(1, p) * (1 - d) * (1 - o),
+        transform: `scale(${(0.9 + 0.1 * Math.min(1, p)) * (1 + 0.12 * lit)})`,
+        transformOrigin: "0% 50%",
+      }}
+    >
+      <span style={{ ...label(size, toneInk(tone)), fontWeight: 750, fontVariantNumeric: "tabular-nums lining-nums", whiteSpace: "nowrap" }}>{children}</span>
+    </div>
+  );
+};
 
 /**
  * A semicircular gauge: a track from "low" to "high", and a needle at

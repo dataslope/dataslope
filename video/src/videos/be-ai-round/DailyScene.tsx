@@ -7,13 +7,11 @@ import { ACCENT_INK, BAR, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "..
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
 import { Clear, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
 
 const BIN_Y = 372;
 const BIN_W = 392;
 const BIN_GAP = 20;
-const BIN_H = 300;
 /** METR's two results, on one axis of time taken: zero, and a percent in px. */
 const ZERO = 800;
 const PCT = 18;
@@ -147,13 +145,9 @@ export const DailyScene: React.FC = () => {
                   left: X0 + i * (BIN_W + BIN_GAP),
                   top: binTop,
                   width: BIN_W,
-                  height: h(BIN_H),
                   boxSizing: "border-box",
-                  border: `1.5px solid ${HAIRLINE}`,
-                  borderTop: `4px solid ${i === 3 ? ds("red", 400) : BAR}`,
-                  borderRadius: 12,
-                  background: PAPER,
-                  padding: "22px 24px",
+                  borderTop: `1px solid ${HAIRLINE}`,
+                  padding: "18px 0 0",
                   opacity: p,
                   transform: `translateY(${(1 - p) * 12}px)`,
                 }}

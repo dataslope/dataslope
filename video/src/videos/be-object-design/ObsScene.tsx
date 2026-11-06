@@ -165,15 +165,11 @@ export const ObsScene: React.FC = () => {
         />
 
         {/* Where it is used. */}
-        {[
-          { at: useAt, x: X0 + 0, t: "event systems" },
-          { at: uiAt, x: X0 + 230, t: "UI data binding" },
-          { at: pubAt, x: X0 + 490, t: "publish-subscribe" },
-        ].map((p) => (
-          <Pill key={p.t} x={p.x} y={pathTop + 10} at={p.at} tone="plain" size={22} out={costAt}>
-            {p.t}
-          </Pill>
-        ))}
+        <Line x={X0} y={pathTop + 14} at={useAt} size={24} weight={600} out={costAt}>
+          event systems
+          <span style={{ opacity: ease(frame, uiAt, 10) }}> · UI data binding</span>
+          <span style={{ opacity: ease(frame, pubAt, 10) }}> · publish-subscribe</span>
+        </Line>
 
         {/* The cost: a reader's path through the checkout stops at notify. */}
         {["cart", "pay", "notify"].map((s, i) => (

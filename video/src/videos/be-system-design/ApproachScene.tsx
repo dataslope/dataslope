@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE } from "./data";
-import { Arrow, Drift, int, Line, Mark, X0 } from "./parts";
+import { Arrow, Drift, InlineArrow, int, Line, Mark, X0 } from "./parts";
 
 const NF_X = 900;
 const ROW_SIZE = 27;
@@ -19,8 +19,6 @@ const STEPS = [
   { text: "High-level design", cue: "sketch a high-level design" },
   { text: "Bottlenecks", cue: "drill into the bottlenecks" },
 ] as const;
-const STEP_W = [228, 292, 262, 292, 228];
-const STEP_GAP = 52;
 
 /**
  * Question 1, the method, in the page's order: not boxes first, but the
@@ -71,7 +69,6 @@ export const ApproachScene: React.FC = () => {
   const headY = y(300);
   const row = (i: number) => y(372) + i * 60;
   const stepsY = y(648);
-  const stepX = (i: number) => X0 + STEP_W.slice(0, i).reduce((s, w) => s + w + STEP_GAP, 0);
   const figY = y(748);
   const items = [
     { at: shortenAt, text: "Shorten a long URL", ink: INK },
@@ -178,51 +175,37 @@ export const ApproachScene: React.FC = () => {
         ))}
 
         {/* The order: requirements first, bottlenecks last. */}
-        {STEPS.map((s, i) => {
-          const at = stepAt[i];
-          const p = ease(frame, at, 12);
-          if (p <= 0) return null;
-          const next = stepAt[i + 1] ?? stepsEnd + 10;
-          const lit = Math.min(ease(frame, at, 8), 1 - ease(frame, next, 10));
-          const open = i === STEPS.length - 1;
-          return (
-            <div
-              key={s.text}
-              style={{
-                position: "absolute",
-                left: stepX(i),
-                top: stepsY,
-                width: STEP_W[i],
-                height: 54,
-                boxSizing: "border-box",
-                border: `2.4px ${open ? "dashed" : "solid"} ${open ? INK_SOFT : INK}`,
-                borderRadius: 10,
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 70)}%, ${PAPER})`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: p,
-                transform: `translateY(${(1 - p) * 10}px)`,
-              }}
-            >
-              <span style={{ ...note(25, open ? INK_SOFT : INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.text}</span>
-            </div>
-          );
-        })}
-        {STEPS.slice(1).map((s, i) => (
-          <Arrow
-            key={s.text}
-            points={[
-              [stepX(i) + STEP_W[i] + 10, stepsY + 27],
-              [stepX(i + 1) - 10, stepsY + 27],
-            ]}
-            at={stepAt[i + 1] - 4}
-            dur={6}
-            head={11}
-            width={2.2}
-            color={INK_SOFT}
-          />
-        ))}
+        <div style={{ position: "absolute", left: X0, top: stepsY, height: 54, display: "flex", alignItems: "center", gap: 18, fontSize: 26 }}>
+          {STEPS.map((s, i) => {
+            const at = stepAt[i];
+            const p = ease(frame, at, 12);
+            const next = stepAt[i + 1] ?? stepsEnd + 10;
+            const lit = Math.min(ease(frame, at, 8), 1 - ease(frame, next, 10));
+            const open = i === STEPS.length - 1;
+            return (
+              <React.Fragment key={s.text}>
+                {i ? <InlineArrow at={at - 4} w={44} /> : null}
+                <span style={{ position: "relative", display: "inline-block", margin: "0 0.14em", whiteSpace: "nowrap", opacity: p }}>
+                  <span
+                    style={{
+                      position: "absolute",
+                      left: "-0.14em",
+                      right: "-0.14em",
+                      top: "0.04em",
+                      bottom: "-0.06em",
+                      background: HIGHLIGHT,
+                      borderRadius: "0.14em",
+                      opacity: lit,
+                    }}
+                  />
+                  <span style={{ position: "relative", ...note(26, open ? INK_SOFT : INK), fontWeight: 650, fontStyle: open ? "italic" : "normal" }}>
+                    {s.text}
+                  </span>
+                </span>
+              </React.Fragment>
+            );
+          })}
+        </div>
 
         {/* Same features, different systems. */}
         {[
@@ -233,31 +216,13 @@ export const ApproachScene: React.FC = () => {
             <Line x={f.x} y={figY} at={f.at} size={27} weight={700} color={BLUE_INK}>
               <Num>{int(f.n)}</Num> {f.unit}
             </Line>
-            {["shorten", "redirect"].map((w, j) => (
-              <div
-                key={w}
-                style={{
-                  position: "absolute",
-                  left: f.x + j * 132,
-                  top: figY + 58,
-                  width: 116,
-                  height: 42,
-                  boxSizing: "border-box",
-                  border: `2px solid ${INK}`,
-                  borderRadius: 999,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  opacity: ease(frame, sameAt + j * 3, 10) * ease(frame, f.at, 10),
-                }}
-              >
-                <span style={{ ...note(20, INK), fontWeight: 600 }}>{w}</span>
-              </div>
-            ))}
+            <Line x={f.x} y={figY + 60} at={Math.max(f.at, sameAt)} size={22} weight={600} color={INK}>
+              shorten · redirect
+            </Line>
             <Arrow
               points={[
-                [f.x + 272, figY + 79],
-                [f.x + 318, figY + 79],
+                [f.x + 214, figY + 75],
+                [f.x + 262, figY + 75],
               ]}
               at={differentAt}
               dur={8}
@@ -272,7 +237,7 @@ export const ApproachScene: React.FC = () => {
                 return (
                   <rect
                     key={k}
-                    x={f.x + 334 + col * 34}
+                    x={f.x + 280 + col * 34}
                     y={figY + (f.servers > 1 ? 56 + rowK * 26 : 62) }
                     width={26}
                     height={f.servers > 1 ? 20 : 34}

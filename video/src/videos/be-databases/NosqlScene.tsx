@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK, OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -77,9 +77,7 @@ const Shape: React.FC<{ x: number; y: number; at: number; name: string; pattern:
           width: SHAPE_W,
           height: SHAPE_H,
           boxSizing: "border-box",
-          border: `2px solid ${BAR}`,
-          borderRadius: 10,
-          background: `color-mix(in srgb, ${BAR} 6%, ${PAPER})`,
+          borderTop: `1px solid ${HAIRLINE}`,
           overflow: "hidden",
         }}
       >
@@ -147,13 +145,13 @@ export const NosqlScene: React.FC = () => {
   const bracketX = ord.x + ord.w + 52;
 
   // ── Phase 2: one system, both stores ──
-  const app = { x: 760, w: 400, y: y(300), h: h(72) };
+  const app = { x: 860, w: 200, y: y(300), h: h(72) };
   const store = { w: 260, y: y(426), h: h(170) };
   const sqlX = 300;
   const noX = 1150;
   const copyX = 1540;
   const underY = store.y + store.h + h(16);
-  const newQ = { x: 760, w: 400, y: y(704), h: h(76) };
+  const newQ = { x: 860, w: 200, y: y(704), h: h(76) };
   const newMid = newQ.y + newQ.h / 2;
 
   return (
@@ -254,7 +252,7 @@ export const NosqlScene: React.FC = () => {
             </span>
           </Note>
           <Shape x={R_X} y={y(SHAPES_TOP)} at={schemaAt} name="document" pattern="any shape, and it changes">
-            <div style={{ position: "absolute", left: 16, top: 26 }}>
+            <div style={{ position: "absolute", left: 0, top: 26 }}>
               {['{', '  "name": "Ava",', '  "tags": ["vip"],', '  "address": {…}', '}'].map((l, i) => (
                 <div key={i} style={mono(i === 0 || i === 4 ? INK_SOFT : INK)}>
                   {l}
@@ -263,10 +261,10 @@ export const NosqlScene: React.FC = () => {
             </div>
           </Shape>
           <Shape x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP)} at={kvAt} name="key-value" pattern="get one value by its key">
-            <div style={{ position: "absolute", left: 14, top: 22, display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ position: "absolute", left: 0, top: 22, display: "flex", flexDirection: "column", gap: 14 }}>
               {["user:41", "user:42", "user:43", "user:44"].map((k, i) => (
                 <div key={k} style={{ display: "flex", gap: 10, alignItems: "center", opacity: ease(frame, kvAt + 2 + i * 2, 8) }}>
-                  <span style={{ ...mono(BLUE_INK), fontWeight: 600, padding: "0 6px", borderRadius: 4, background: `color-mix(in srgb, ${BAR} 14%, ${PAPER})`, lineHeight: "24px" }}>{k}</span>
+                  <span style={{ ...mono(BLUE_INK), fontWeight: 600, lineHeight: "24px" }}>{k}</span>
                   <span style={{ ...mono(INK_SOFT), lineHeight: "24px" }}>→</span>
                   <span style={{ display: "inline-block", width: 64, height: 12, borderRadius: 6, background: `color-mix(in srgb, ${INK} 22%, ${PAPER})` }} />
                 </div>
@@ -274,7 +272,7 @@ export const NosqlScene: React.FC = () => {
             </div>
           </Shape>
           <Shape x={R_X + 2 * (SHAPE_W + SHAPE_GAP)} y={y(SHAPES_TOP)} at={wideAt} name="wide-column" pattern="rows by key, at volume">
-            <div style={{ position: "absolute", left: 14, top: 26, display: "flex", flexDirection: "column", gap: 18 }}>
+            <div style={{ position: "absolute", left: 0, top: 26, display: "flex", flexDirection: "column", gap: 18 }}>
               {[5, 2, 4, 3].map((cells, i) => (
                 <div key={i} style={{ display: "flex", gap: 6, alignItems: "center", opacity: ease(frame, wideAt + 2 + i * 2, 8) }}>
                   <span style={{ display: "inline-block", width: 40, height: 20, borderRadius: 4, background: `color-mix(in srgb, ${BAR} 55%, ${PAPER})` }} />
@@ -294,9 +292,9 @@ export const NosqlScene: React.FC = () => {
         </div>
 
         {/* ── Phase 2: one system, both stores ── */}
-        <Node x={app.x} y={app.y} w={app.w} h={app.h} at={bothAt} tone="plain" title="application" size={24} />
-        <Flow points={[[app.x + 70, app.y + app.h + 6], [app.x + 70, app.y + app.h + h(20)], [sqlX + store.w / 2, app.y + app.h + h(20)], [sqlX + store.w / 2, store.y - 10]]} at={coreAt} color={BAR} width={2.6} />
-        <Flow points={[[app.x + app.w - 70, app.y + app.h + 6], [app.x + app.w - 70, app.y + app.h + h(20)], [noX + store.w / 2, app.y + app.h + h(20)], [noX + store.w / 2, store.y - 10]]} at={logsAt} color={BAR} width={2.6} />
+        <Node x={app.x} y={app.y} w={app.w} h={app.h} at={bothAt} tone="plain" title="application" size={26} bare />
+        <Flow points={[[app.x + 30, app.y + app.h + 2], [app.x + 30, app.y + app.h + h(20)], [sqlX + store.w / 2, app.y + app.h + h(20)], [sqlX + store.w / 2, store.y - 10]]} at={coreAt} color={BAR} width={2.6} />
+        <Flow points={[[app.x + app.w - 30, app.y + app.h + 2], [app.x + app.w - 30, app.y + app.h + h(20)], [noX + store.w / 2, app.y + app.h + h(20)], [noX + store.w / 2, store.y - 10]]} at={logsAt} color={BAR} width={2.6} />
         <Cylinder x={sqlX} y={store.y} w={store.w} h={store.h} at={coreAt - 2} title="SQL" size={26} />
         <Cylinder x={noX} y={store.y} w={store.w} h={store.h} at={logsAt - 2} title="NoSQL" size={26} />
         <Note at={coreAt + 6} x={sqlX + store.w / 2} y={underY} style={{ transform: "translateX(-50%)" }}>
@@ -311,11 +309,9 @@ export const NosqlScene: React.FC = () => {
         </Note>
 
         {/* A query nobody planned for. */}
-        <Node x={newQ.x} y={newQ.y} w={newQ.w} h={newQ.h} at={askAt} tone="look" dashed title="a new query" sub="next year's" size={23} />
+        <Node x={newQ.x} y={newQ.y} w={newQ.w} h={newQ.h} at={askAt} tone="look" title="a new query" sub="next year's" size={24} bare />
         <Flow points={[[newQ.x - 8, newMid], [sqlX + store.w + 70, newMid]]} at={relNewAt} color={inkOf.yellow} width={2.6} dash="9 7" />
         <Svg opacity={ease(frame, joinAt - 4, 12)}>
-          <rect x={sqlX - 10} y={newMid - 26} width={110} height={52} rx={7} fill={PAPER} stroke={BAR} strokeWidth={2} />
-          <rect x={sqlX + 170} y={newMid - 26} width={110} height={52} rx={7} fill={PAPER} stroke={BAR} strokeWidth={2} />
           <line x1={sqlX + 100} y1={newMid} x2={sqlX + 170} y2={newMid} stroke={OK} strokeWidth={3} pathLength={1} strokeDasharray={`${ease(frame, joinAt, 12)} 1`} />
           <text x={sqlX + 45} y={newMid + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 19, fontWeight: 600, color: INK })}>
             orders

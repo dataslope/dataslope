@@ -9,25 +9,18 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { TTL } from "./data";
-import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, Spot, Svg, X0 } from "./parts";
+import { Drift, Line, Mark, MiniMap, pct, Q_SIZE, Q_W, Spot, StepRow, Svg, X0 } from "./parts";
 
 /** The TTL chart: shares of reads against the TTL on a log axis. */
 const C = { x0: 960, x1: 1760, top: 410, base: 790, max: 0.5, lo: 1, hi: 600 };
-const STEP_H = 62;
 
-/** One of the two copies of a link: its name and what it points at. */
-const Copy: React.FC<{ x: number; y: number; at: number; name: string; value: React.ReactNode; tone: "data" | "bad" | "lit"; out?: number }> = ({
-  x,
-  y,
-  at,
-  name,
-  value,
-  tone,
-  out,
-}) => (
-  <Node x={x} y={y} w={300} h={104} at={at} tone={tone === "lit" ? "data" : tone} out={out} title={name} size={23}>
-    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>{value}</span>
-  </Node>
+/** One of the two copies of a link: its name over what it points at, as
+ *  plain text. */
+const Copy: React.FC<{ x: number; y: number; at: number; name: string; value: React.ReactNode; out?: number }> = ({ x, y, at, name, value, out }) => (
+  <Ink at={at} dur={14} out={out} style={{ left: x, top: y, whiteSpace: "nowrap" }}>
+    <div style={{ ...label(23, BLUE_INK), fontWeight: 700 }}>{name}</div>
+    <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK, marginTop: 10 }}>{value}</div>
+  </Ink>
 );
 
 /**
@@ -83,19 +76,6 @@ export const InvalidateScene: React.FC = () => {
   const crossP = ease(frame, crossAt, 14);
 
   // ── Phase B: the shortener's link taken down. ──
-  const rightY = y(452) - STEP_H / 2;
-  const wrongY = y(606) - STEP_H / 2;
-  const RIGHT_STEPS = [
-    { x: X0, w: 290, t: "mark it taken down", at: takenAt + 4 },
-    { x: 470, w: 170, t: "commit ✓", at: commitsAt },
-    { x: 700, w: 330, t: "delete the cached entry", at: commitsAt + 10 },
-  ];
-  const WRONG_STEPS = [
-    { x: X0, w: 330, t: "delete the cached entry", at: firstAt },
-    { x: 510, w: 380, t: "a read reloads the old value", at: betweenAt },
-    { x: 950, w: 150, t: "commit", at: betweenAt + 18 },
-    { x: 1160, w: 330, t: "cache: the old value ✕", at: backAt },
-  ];
   const wtY = y(764);
   const wbY = y(846);
 
@@ -129,7 +109,6 @@ export const InvalidateScene: React.FC = () => {
           at={copiesAt}
           name="cache"
           value={<span style={{ color: drifted > 0.5 ? ACCENT_INK : INK }}>aMoY42 → page A</span>}
-          tone={drifted > 0.5 ? "bad" : "data"}
           out={phaseOut}
         />
         <Copy
@@ -142,10 +121,9 @@ export const InvalidateScene: React.FC = () => {
               aMoY42 → page {drifted > 0.5 ? "B" : "A"}
             </span>
           }
-          tone="data"
           out={phaseOut}
         />
-        <Line at={driftAt + 6} x={X0} y={y(352) + 104 + h(24)} size={22} color={INK_SOFT} out={phaseOut}>
+        <Line at={driftAt + 6} x={X0} y={y(352) + 72 + h(24)} size={22} color={INK_SOFT} out={phaseOut}>
           the database changed; the cache still says the old value
         </Line>
         <Line at={ttlAt} x={X0} y={y(600)} size={23} weight={700} out={phaseOut}>
@@ -214,26 +192,33 @@ export const InvalidateScene: React.FC = () => {
           A short link barely changes: a long TTL,
           <span style={{ color: ACCENT_INK, opacity: ease(frame, takenAt, 10) }}> until one is taken down for abuse</span>
         </Line>
-        <Line at={deleteAt} x={X0} y={rightY - h(40)} size={21} weight={700} color={OK_INK}>
+        <Line at={deleteAt} x={X0} y={y(420)} size={21} weight={700} color={OK_INK}>
           delete the cached entry after the database commits
         </Line>
-        {RIGHT_STEPS.map((s, i) => (
-          <React.Fragment key={i}>
-            <Node x={s.x} y={rightY} w={s.w} h={STEP_H} at={s.at} tone={i ? "ok" : "data"} title={s.t} size={21} />
-            {i > 0 ? <Flow points={[[RIGHT_STEPS[i - 1].x + RIGHT_STEPS[i - 1].w + 6, rightY + STEP_H / 2], [s.x - 8, rightY + STEP_H / 2]]} at={s.at - 4} color={OK} /> : null}
-          </React.Fragment>
-        ))}
-        <Line at={firstAt} x={X0} y={wrongY - h(40)} size={21} weight={700} color={ACCENT_INK}>
+        <StepRow
+          x={X0}
+          y={y(462)}
+          steps={[
+            { text: "mark it taken down", at: takenAt + 4 },
+            { text: "commit", at: commitsAt, color: OK_INK },
+            { text: "delete the cached entry", at: commitsAt + 10, color: OK_INK, lit: [commitsAt + 10, firstAt] },
+          ]}
+        />
+        <Line at={firstAt} x={X0} y={y(560)} size={21} weight={700} color={ACCENT_INK}>
           delete it first, and a read in between puts the old value back
         </Line>
-        {WRONG_STEPS.map((s, i) => (
-          <React.Fragment key={i}>
-            <Node x={s.x} y={wrongY} w={s.w} h={STEP_H} at={s.at} tone={i === 3 ? "bad" : "data"} title={s.t} size={21} />
-            {i > 0 ? <Flow points={[[WRONG_STEPS[i - 1].x + WRONG_STEPS[i - 1].w + 6, wrongY + STEP_H / 2], [s.x - 8, wrongY + STEP_H / 2]]} at={s.at - 4} color={i === 3 ? ACCENT : BAR} /> : null}
-          </React.Fragment>
-        ))}
+        <StepRow
+          x={X0}
+          y={y(602)}
+          steps={[
+            { text: "delete the cached entry", at: firstAt },
+            { text: "a read reloads the old value", at: betweenAt, lit: [betweenAt, backAt] },
+            { text: "commit", at: betweenAt + 18 },
+            { text: "the cache holds the old value", at: backAt, color: ACCENT_INK },
+          ]}
+        />
         <Spot id="timer" at={backstopAt} x={1560} y={y(366)} w={150} />
-        <Line at={backstopAt + 4} x={X0} y={wrongY + STEP_H + h(28)} size={22} weight={650}>
+        <Line at={backstopAt + 4} x={X0} y={y(680)} size={22} weight={650}>
           The TTL stays as a backstop: a stale entry still expires
         </Line>
 
@@ -241,12 +226,9 @@ export const InvalidateScene: React.FC = () => {
         <Ink at={throughAt} dur={14} style={{ left: X0, top: wtY, whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, INK), display: "inline-flex", alignItems: "center", gap: 16 }}>
             <b style={{ width: 190 }}>Write-through</b>
-            {["cache", "database"].map((t) => (
-              <span key={t} style={{ padding: "4px 12px", borderRadius: 8, border: `2px solid ${BAR}`, background: `color-mix(in srgb, ${BAR} 10%, ${PAPER})`, ...label(20, BLUE_INK), fontWeight: 700 }}>
-                {t}
-              </span>
-            ))}
-            <span>written together</span>
+            <span>
+              <b style={{ color: BLUE_INK }}>cache</b> and <b style={{ color: BLUE_INK }}>database</b> written together
+            </span>
             <span style={{ color: INK_SOFT, opacity: ease(frame, costAt, 10) }}>: consistent, at a cost on every write</span>
           </span>
         </Ink>

@@ -3,11 +3,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { note } from "../../editorial/style";
+import { halo, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Art, BAR, BLUE_FILL, BLUE_INK, Drift, HIGHLIGHT, Headline, INK, INK_SOFT, Kicker, Line, OK_INK, Pill, Svg } from "./parts";
+import { Art, BAR, BLUE_FILL, BLUE_INK, Drift, HIGHLIGHT, Headline, INK, INK_SOFT, Kicker, Line, OK_INK, Svg } from "./parts";
 
 /** The million drawn as a square, a thousand items a side. */
 const SQ = 440;
@@ -17,7 +17,7 @@ const SQ_X = 140;
 const DOTS = 10;
 const PITCH = 22;
 const STRUCTS = ["hash map", "heap", "stack", "deque"];
-const CHIP_X = [700, 870, 980, 1100];
+const CHIP_X = 700;
 
 /**
  * The opening. A hundred items as a ten-by-ten grid, fast; then the grid
@@ -101,28 +101,31 @@ export const HookScene: React.FC = () => {
           <Tick at={fastAt} size={28} />
           <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>fast</span>
         </div>
-        <Pill at={millionAt + 28} x={SQ_X + 26} y={top + 14} tone="plain" size={21}>
-          ← the hundred
-        </Pill>
+        <Line at={millionAt + 28} x={SQ_X + 26} y={top + 10} size={22} weight={700}>
+          <span style={halo}>← the hundred</span>
+        </Line>
 
         {/* Which structure keeps it cheap. */}
-        <Line at={structureAt - 2} x={CHIP_X[0]} y={top + 20} size={26} weight={650}>
+        <Line at={structureAt - 2} x={CHIP_X} y={top + 20} size={26} weight={650}>
           Which structure keeps it cheap?
         </Line>
-        {STRUCTS.map((s, i) => (
-          <Pill key={s} x={CHIP_X[i]} y={top + 76} at={structureAt + 6 + i * 5} tone="data" size={22}>
-            {s}
-          </Pill>
-        ))}
+        <div style={{ position: "absolute", left: CHIP_X, top: top + 76, display: "flex", gap: 14, fontSize: 26, whiteSpace: "nowrap" }}>
+          {STRUCTS.map((st, i) => (
+            <span key={st} style={{ ...note(26, BLUE_INK), fontWeight: 700, opacity: ease(frame, structureAt + 6 + i * 5, 10) }}>
+              {i ? <span style={{ color: INK_SOFT, fontWeight: 500, marginRight: 14 }}>·</span> : null}
+              {st}
+            </span>
+          ))}
+        </div>
 
         {/* The round. */}
-        <Line at={thirtyAt - 2} x={CHIP_X[0]} y={top + 236} size={30} weight={700}>
+        <Line at={thirtyAt - 2} x={CHIP_X} y={top + 236} size={30} weight={700}>
           <span style={{ color: BLUE_INK }}>
             <Num>35</Num> questions
           </span>
           <span style={{ opacity: ease(frame, countsAt, 10) }}>, argued with counts, not code</span>
         </Line>
-        <div style={{ position: "absolute", left: CHIP_X[0], top: top + 300, display: "flex", gap: 34, fontSize: 26, whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: CHIP_X, top: top + 300, display: "flex", gap: 34, fontSize: 26, whiteSpace: "nowrap" }}>
           {[
             { at: eightAt, n: 8, text: "with a figure each" },
             { at: threeAt, n: 3, text: "inside those" },
@@ -136,7 +139,7 @@ export const HookScene: React.FC = () => {
             </span>
           ))}
         </div>
-        <Line at={quickAt + 10} x={CHIP_X[0]} y={top + 362} size={22} color={INK_SOFT} weight={600}>
+        <Line at={quickAt + 10} x={CHIP_X} y={top + 362} size={22} color={INK_SOFT} weight={600}>
           Each answer: the structure, and what an operation costs, counted
         </Line>
 

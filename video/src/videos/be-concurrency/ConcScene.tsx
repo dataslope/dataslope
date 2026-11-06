@@ -123,20 +123,8 @@ export const ConcScene: React.FC = () => {
             if (o <= 0) return null;
             return (
               <React.Fragment key={i}>
-                <div
-                  style={{
-                    position: "absolute",
-                    left: LANE_X - 8,
-                    top: ly - 6,
-                    width: ROUNDS * 3 * STEP + 8,
-                    height: laneH + 12,
-                    borderRadius: 10,
-                    background: ds("gray", 50),
-                    border: `1.5px solid ${HAIRLINE}`,
-                    boxSizing: "border-box",
-                    opacity: o,
-                  }}
-                />
+                {/* The core's lane: a hairline under it. */}
+                <div style={{ position: "absolute", left: LANE_X, top: ly + laneH + 6, width: ROUNDS * 3 * STEP, height: 1, background: HAIRLINE, opacity: o }} />
                 <div style={{ position: "absolute", left: X0, top: ly + laneH / 2 - 14, opacity: o, ...label(21, i === 0 || frame < moreAt ? INK : BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
                   core {i + 1}
                 </div>

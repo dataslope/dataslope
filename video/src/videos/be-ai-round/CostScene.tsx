@@ -3,12 +3,12 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COST, thousands } from "./data";
-import { Clear, Console, DATA_LIGHT, Drift, line, lineOf, Listing, Mark, Pill, X0 } from "./parts";
+import { Clear, Console, DATA_LIGHT, Drift, line, lineOf, Listing, Mark, X0 } from "./parts";
 
 const LIST_SIZE = 20;
 const LIST_Y = 340;
@@ -229,19 +229,30 @@ export const CostScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* The levers on the input. */}
-        {levers.map((l, i) => (
-          <Pill key={l.text} x={X0 + [0, 228, 0][i]} y={y(BAR_B.v) + barH + h([22, 22, 70][i])} at={l.at} tone="data" size={20}>
-            {l.text}
-          </Pill>
+        {/* The levers on the input, under its segment; the next two beside the bar. */}
+        {[levers.slice(0, 2), levers.slice(2)].map((row, r) => (
+          <div
+            key={r}
+            style={{ position: "absolute", left: X0, top: y(BAR_B.v) + barH + h(20 + r * 40), display: "flex", alignItems: "baseline", gap: 14, fontSize: 23 }}
+          >
+            {row.map((l, i) => {
+              const p = ease(frame, l.at - 2, 12);
+              return (
+                <React.Fragment key={l.text}>
+                  {i > 0 ? <span style={{ ...note(23, INK_SOFT), opacity: p }}>·</span> : null}
+                  <span style={{ ...note(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: p }}>{l.text}</span>
+                </React.Fragment>
+              );
+            })}
+          </div>
         ))}
         <Note at={afterAt} x={NEXT_X} y={y(BAR_B.v) - 44}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>after that</span>
         </Note>
         {nexts.map((l, i) => (
-          <Pill key={l.text} x={NEXT_X} y={y(BAR_B.v) + h(i * 50)} at={l.at} tone="plain" size={20}>
-            {l.text}
-          </Pill>
+          <Ink key={l.text} at={l.at} dur={12} style={{ left: NEXT_X, top: y(BAR_B.v) + h(4 + i * 40) }}>
+            <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{l.text}</span>
+          </Ink>
         ))}
 
         {/* Per token, and per request. */}

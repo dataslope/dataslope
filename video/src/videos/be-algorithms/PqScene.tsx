@@ -163,7 +163,6 @@ export const PqScene: React.FC = () => {
         <Svg opacity={ease(frame, sortedAt - 4, 12)}>
           <line x1={T.name} x2={1010} y1={tTop + 34} y2={tTop + 34} stroke={INK} strokeWidth={1.4} />
         </Svg>
-        <div style={{ position: "absolute", left: T.name - 12, top: rowY(2) + 2, width: 1010 - T.name + 24, height: 48, borderRadius: 6, border: `2px solid ${OK}`, opacity: ease(frame, heapAt + 12, 10) }} />
         {rows.map((r, i) => (
           <React.Fragment key={r.name}>
             <div style={{ position: "absolute", left: T.name, top: rowY(i) + 10, ...note(24, INK), fontWeight: 650, opacity: ease(frame, r.at - 2, 10), whiteSpace: "nowrap" }}>{r.name}</div>

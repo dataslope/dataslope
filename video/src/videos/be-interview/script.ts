@@ -30,13 +30,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (the series comes back to it on "series-python").
  *   - "ai" to "ai-ask": one band labelled "Coding round" forking into two
  *     columns, "AI allowed" and "AI banned", in neutral ink (neither is the
- *     right answer, so neither is green or red). Under allowed, on
- *     "ai-allowed-who": Canva (June 2025), Meta (60-minute round, piloted
- *     from October 2025), Google's comprehension pilot (second half of
- *     2026), each card inking in on its name, and "Part 9" under the column.
- *     Under banned: Amazon (2025), Anthropic (2025), Google's in-person round
- *     (2025). The laptop and padlock spots sit on the two column heads. Then
- *     the envelope spot for a take-home, faded ("ai-why"), beside two bars,
+ *     right answer, so neither is green or red). The two formats are named,
+ *     not the companies, so the video does not date: under allowed, on
+ *     "ai-allowed-who", "Extend a multi-file project, assistant built in" and
+ *     "Read, debug and speed up unfamiliar code", each inking in on its
+ *     words, and "Part 9" under the column; under banned, "Unapproved AI can
+ *     disqualify you" and "Some rounds back in person". Then the envelope
+ *     spot for a take-home, faded ("ai-why"), beside two bars,
  *     71% and 62%, inked on "ai-survey-data" and sourced "Karat, Engineering
  *     Interview Trends 2026, 400 engineering leaders; one vendor's survey".
  *     Then where the time went: three cards (extend a multi-file project,
@@ -62,16 +62,17 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     has split in two".
  *   - "ai-allowed": the index's "give you an assistant and grade how you
  *     drive and verify it". "ai-allowed-who", "ai-banned": the AI page's
- *     table (Canva, June 2025; Meta, "One of the two onsite coding rounds
- *     became a 60-minute AI-enabled round", piloted from October 2025;
- *     Google's pilot, a code comprehension round, second half of 2026;
- *     Amazon, "Using unapproved generative AI during an interview can
- *     disqualify a candidate"; Anthropic, "No AI in take-homes or live
- *     interviews unless the interviewer says otherwise"; Google, "At least
- *     one round is back in person"). The index says "Amazon and Anthropic
- *     can disqualify candidates"; the AI page says that of Amazon only, so
- *     the narration takes its narrower wording for Anthropic (see the
- *     report).
+ *     table, generalized to formats at the owner's request (2026-11-06) so
+ *     the video does not date by naming companies. "An hour extending a
+ *     multi-file project with the assistant built in" is Meta's round ("a
+ *     60-minute AI-enabled round: a multi-file project in CoderPad with a
+ *     built-in assistant"); "unfamiliar code to read, debug and speed up" is
+ *     Google's pilot ("read, debug, and optimize existing code"). "Using
+ *     one without permission can disqualify you" is Amazon's rule ("Using
+ *     unapproved generative AI during an interview can disqualify a
+ *     candidate") with Anthropic's ("No AI ... unless the interviewer says
+ *     otherwise"); "some rounds are back in person" is Google's ("At least
+ *     one round is back in person").
  *   - "ai-why": the AI page, "take-home projects and automated code tests
  *     have lost most of their signal, because an assistant can complete them
  *     and the reviewer cannot see how". "ai-survey", "ai-survey-data":
@@ -132,12 +133,12 @@ export const script: NarrationScript = {
     },
     {
       id: "ai-allowed-who",
-      text: "Canva's does. Meta made one of its two onsite coding rounds a sixty-minute AI-enabled round, and Google is piloting one for reading and debugging code.",
+      text: "That can be an hour extending a multi-file project with the assistant built in, or a round that hands you unfamiliar code to read, debug and speed up.",
       pauseAfter: 0.6,
     },
     {
       id: "ai-banned",
-      text: "Others ban assistants. Amazon can disqualify a candidate who uses unapproved AI, Anthropic allows none in interviews unless the interviewer says so, and Google has brought back an in-person round.",
+      text: "Others ban assistants. Using one without permission can disqualify you, and some rounds are back in person.",
       pauseAfter: 0.7,
     },
     {

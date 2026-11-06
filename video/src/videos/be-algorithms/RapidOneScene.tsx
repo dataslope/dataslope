@@ -28,7 +28,6 @@ import {
   Mark,
   OK_INK,
   PAPER,
-  Pill,
   Svg,
   X0,
   int,
@@ -432,9 +431,9 @@ const Classic: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {problems.map((p, i) => (
         <React.Fragment key={p.name}>
-          <Pill x={R_X} y={c.T + i * c.h(76)} at={p.at - 2} tone="data" size={23}>
+          <Line at={p.at - 2} x={R_X} y={c.T + i * c.h(76) + 8} size={24} weight={700} color={BLUE_INK}>
             {p.name}
-          </Pill>
+          </Line>
           <Line at={stateAt + i * 4} x={R_X + 470} y={c.T + i * c.h(76) + 8} size={23} color={INK_SOFT}>
             state: {p.state}
           </Line>

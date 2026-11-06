@@ -6,7 +6,7 @@ import { BAR, BLUE_INK, HIGHLIGHT, INK, PAPER, label } from "../../editorial/sty
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
-import { ArtSpot, Box, Drift, Flow, Headline, Kicker, Line, Pill, pulse, X0 } from "./parts";
+import { ACCENT_INK, ArtSpot, Box, Drift, Flow, Headline, Kicker, Line, OK_INK, Pill, pulse, X0 } from "./parts";
 
 /** The checkout, as the shop's five steps. */
 const STEPS = ["cart", "pay", "invoice", "email", "stock"];
@@ -110,12 +110,18 @@ export const HookScene: React.FC = () => {
           const bandW = NEW.w + (EDIT.w - NEW.w) * k + 12;
           return (
             <React.Fragment key={r.id}>
-              <Box x={X0} y={top} w={CARD.w} h={CARD.h} at={at} title={r.text} align="left" dashed dim={dim} />
+              <Line x={X0} y={rowMid - 18} at={at} size={27} weight={600} dim={dim}>
+                {r.text}
+              </Line>
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: hover * (1 - ease(frame, dim, 12)) }}>
                 <rect x={bandX} y={rowMid - OPT_H / 2 - 6} width={bandW} height={OPT_H + 12} rx={10} fill={HIGHLIGHT} />
               </svg>
-              <Box x={NEW.x} y={rowMid - OPT_H / 2} w={NEW.w} h={OPT_H} at={landsAt + i * 3} tone="ok" title="a new piece" size={21} dim={dim} />
-              <Box x={EDIT.x} y={rowMid - OPT_H / 2} w={EDIT.w} h={OPT_H} at={editAt + i * 3} tone="bad" title="an edit to working code" size={21} dim={dim} />
+              <Line x={NEW.x + NEW.w / 2} y={rowMid - 15} at={landsAt + i * 3} size={23} weight={700} color={OK_INK} align="center" width={NEW.w} dim={dim}>
+                a new piece
+              </Line>
+              <Line x={EDIT.x + EDIT.w / 2} y={rowMid - 15} at={editAt + i * 3} size={23} weight={700} color={ACCENT_INK} align="center" width={EDIT.w} dim={dim}>
+                an edit to working code
+              </Line>
             </React.Fragment>
           );
         })}

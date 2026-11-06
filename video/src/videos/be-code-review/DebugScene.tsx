@@ -19,7 +19,6 @@ import {
   FadeIn,
   FileTab,
   lineOf,
-  LISTING_PAPER,
   Mark,
   MARK_BAD,
   MARK_OK,
@@ -272,7 +271,7 @@ export const DebugScene: React.FC = () => {
             { label: "Fix the cause, not the symptom", at: step4 },
             { label: "Explain", at: step5 },
           ]}
-          ring={{ row: 1, at: noSubAt }}
+          relight={{ row: 1, at: noSubAt }}
         />
 
         {/* ── What it returns: the report and the reproduction ── */}
@@ -418,22 +417,15 @@ export const DebugScene: React.FC = () => {
           { at: doesAt, text: "What does this function do?" },
           { at: couldAt, text: "What could make it return an interval that ends before it starts?" },
         ].map((b, i) => (
-          <Note key={i} at={b.at} x={LIST_X} y={B + 34 + i * 60} out={pastAt - 6}>
-            <span
-              style={{
-                ...note(23, INK),
-                display: "inline-block",
-                padding: "6px 16px 8px",
-                background: LISTING_PAPER,
-                borderLeft: `4px solid ${ds("blue", 300)}`,
-                borderRadius: 4,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {b.text}
-            </span>
+          <Note key={i} at={b.at} x={LIST_X} y={B + 38 + i * 46} out={pastAt - 6}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>&ldquo;{b.text}&rdquo;</span>
           </Note>
         ))}
+        <Note at={noSubAt + 4} x={LIST_X} y={B + 142} out={pastAt - 6}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            no substitute for <Mark at={noSubAt + 10}>step 2, reproducing it</Mark>
+          </span>
+        </Note>
 
         {/* ── What else shares the flaw: the tests ── */}
         <TestGrid

@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RACE } from "./data";
-import { Band, Drift, Flow, lerp, LockGlyph, OK, OK_INK, Pill, pulse, Spot, THREAD, tint, X0 } from "./parts";
+import { Band, Drift, Flow, lerp, LockGlyph, OK, OK_INK, pulse, Spot, THREAD, tint, X0 } from "./parts";
 
 const STEP_X = 270;
 const CHIP_W = 100;
@@ -132,7 +132,6 @@ export const RaceScene: React.FC = () => {
   // The counter: five, then the writes land; seven once the lock is in.
   const counter = frame >= bothSevenAt ? RACE.locked.right : frame >= bothWriteAt + 6 ? LOST.result : RACE.one.start;
   const counterTone = frame >= bothSevenAt ? "ok" : frame >= lostAt ? "bad" : "data";
-  const counterLine = counterTone === "ok" ? OK : counterTone === "bad" ? ACCENT : BAR;
   const counterInk = counterTone === "ok" ? OK_INK : counterTone === "bad" ? ACCENT_INK : BLUE_INK;
   const gridOut = ease(frame, fixAt + 2, 12);
   const judge7 = ease(frame, sevenAt, 10);
@@ -167,20 +166,13 @@ export const RaceScene: React.FC = () => {
           style={{
             position: "absolute",
             left: X0,
-            top: y(392),
-            width: 170,
-            height: h(96),
-            boxSizing: "border-box",
-            border: `${3 + 2 * Math.max(pulse(frame, fiveAt, 18), pulse(frame, bothWriteAt + 6, 18))}px solid ${counterLine}`,
-            borderRadius: 12,
-            background: tint(counterLine, 12),
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            top: y(390),
             opacity: ease(frame, classicAt, 10),
+            transform: `scale(${1 + 0.12 * Math.max(pulse(frame, fiveAt, 18), pulse(frame, bothWriteAt + 6, 18))})`,
+            transformOrigin: "0 50%",
           }}
         >
-          <span style={{ ...label(52, counterInk), fontWeight: 750 }}>
+          <span style={{ ...label(64, counterInk), fontWeight: 750, lineHeight: 1 }}>
             <Num>{counter}</Num>
           </span>
         </div>
@@ -350,12 +342,12 @@ export const RaceScene: React.FC = () => {
         <Note at={pauseAt} x={X0} y={y(846)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Which order runs is timing:</span>
         </Note>
-        <Pill x={480} y={y(840)} at={passAt} tone="ok" size={22}>
-          ✓ today: pass
-        </Pill>
-        <Pill x={700} y={y(840)} at={failAt} tone="bad" size={22}>
-          ✕ tomorrow: fail
-        </Pill>
+        <Note at={passAt} x={470} y={y(846)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>✓ today: pass</span>
+        </Note>
+        <Note at={failAt} x={680} y={y(846)}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>✕ tomorrow: fail</span>
+        </Note>
         <Note at={sameAt} x={960} y={y(846)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>same code, no change</span>
         </Note>

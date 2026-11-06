@@ -11,7 +11,7 @@ import { OPENING, thousands } from "./data";
 import { Bar, Cylinder, Drift, Flow, Headline, Kicker, Node, pulse, Spot, X0 } from "./parts";
 
 const FIG_TOP = 290;
-const API = { x: X0, w: 210 };
+const API = { x: X0, w: 170 };
 const DB = { x: 660, w: 250 };
 const BARS_TOP = 572;
 const CHIPS_Y = 722;
@@ -99,7 +99,7 @@ export const HookScene: React.FC = () => {
         <Spot art="chipmunk" at={from + 12} left={1230} top={y(292)} width={540} />
 
         {/* ── An API, a database, and the requests between them ── */}
-        <Node x={API.x} y={top} w={API.w} h={apiH} at={apiAt - 2} tone="plain" title="API" sub="requests" size={30} />
+        <Node x={API.x} y={top} w={API.w} h={apiH} at={apiAt - 2} tone="plain" title="API" sub="requests" size={30} bare />
         <Cylinder x={DB.x} y={dbTop} w={DB.w} h={dbH + h(30)} at={dbAt - 2} title="database" swapTo={OPENING.version} swapAt={postgresAt + 2} size={24} />
         <Flow points={[[API.x + API.w + 8, readY], [DB.x - 12, readY]]} at={readsAt} color={BAR} width={3} />
         <Note at={fastAt - 4} x={API.x + API.w + 40} y={readY - h(44)}>
@@ -114,7 +114,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         {/* A second request, writing at the same moment as the first. */}
-        <Node x={API.x} y={otherTop} w={API.w} h={otherH} at={anotherAt - 4} tone="look" title="another request" size={21} />
+        <Node x={API.x} y={otherTop} w={API.w} h={otherH} at={anotherAt - 4} tone="look" title="another request" size={21} bare />
         <Flow
           points={[
             [API.x + API.w + 8, otherY],
@@ -170,22 +170,11 @@ export const HookScene: React.FC = () => {
           }
           segments={[{ value: OPENING.orders, color: BAR }]}
         />
-        <div style={{ position: "absolute", left: X0, top: y(CHIPS_Y), display: "flex", alignItems: "center", gap: 14, fontSize: 21 }}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, smallAt - 2, 10) }}>and small ones:</span>
-          {chips.map((c) => (
-            <span
-              key={c.name}
-              style={{
-                ...note(21, INK),
-                whiteSpace: "nowrap",
-                padding: "4px 12px 5px",
-                borderRadius: 8,
-                border: `2px solid ${BAR}`,
-                background: `color-mix(in srgb, ${BAR} 10%, ${PAPER})`,
-                opacity: ease(frame, c.at, 10),
-                transform: `scale(${0.85 + 0.15 * ease(frame, c.at, 10)})`,
-              }}
-            >
+        <div style={{ position: "absolute", left: X0, top: y(CHIPS_Y), display: "flex", alignItems: "baseline", gap: "0.5em", fontSize: 22, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, smallAt - 2, 10) }}>and small ones:</span>
+          {chips.map((c, i) => (
+            <span key={c.name} style={{ ...note(22, INK), opacity: ease(frame, c.at, 10) }}>
+              {i > 0 ? <span style={{ color: INK_SOFT, marginRight: "0.5em" }}>·</span> : null}
               <b>{c.name}</b> <span style={{ ...TABULAR, color: BLUE_INK, fontWeight: 650 }}>{c.rows}</span>
             </span>
           ))}
@@ -236,7 +225,6 @@ export const HookScene: React.FC = () => {
             ...label(19, INK),
             fontWeight: 700,
             background: HIGHLIGHT,
-            border: `2px solid ${PAPER}`,
             borderRadius: 999,
             padding: "0 7px",
             lineHeight: 1.3,

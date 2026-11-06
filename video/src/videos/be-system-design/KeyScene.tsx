@@ -3,16 +3,15 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE, KEY } from "./data";
-import { Arrow, artH, Box, Drift, int, Line, Spot, X0 } from "./parts";
+import { Arrow, artH, Drift, InlineArrow, int, Line, Mark, Spot, X0 } from "./parts";
 
 const CARD_W = 600;
-const CARD_H = 112;
 const RX = 1060;
 
 /**
@@ -58,11 +57,6 @@ export const KeyScene: React.FC = () => {
 
   // The hash path, left to right.
   const flowY = y(560);
-  const fbox = (cx: number, w: number) => ({ cx, cy: flowY, w, h: 66 });
-  const urlB = fbox(RX + 75, 150);
-  const hashB = fbox(RX + 246, 104);
-  const takenB = fbox(RX + 442, 200);
-  const storeB = fbox(RX + 640, 108);
 
   return (
     <AbsoluteFill>
@@ -96,23 +90,15 @@ export const KeyScene: React.FC = () => {
                 position: "absolute",
                 left: c.x,
                 top: cardY,
-                width: CARD_W,
-                height: CARD_H,
-                boxSizing: "border-box",
-                border: `2px solid ${INK}`,
-                borderRadius: 12,
-                background: PAPER,
-                padding: "16px 24px",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "center",
-                gap: 8,
+                gap: 12,
                 opacity: p,
                 transform: `translateY(${(1 - p) * 12}px)`,
               }}
             >
               <span style={{ ...label(23, INK_SOFT), fontWeight: 700 }}>{c.name}</span>
-              <span style={{ ...note(29, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, c.sub - 4, 10) }}>{c.body}</span>
+              <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, c.sub - 4, 10) }}>{c.body}</span>
             </div>
           );
         })}
@@ -129,21 +115,10 @@ export const KeyScene: React.FC = () => {
             <Num>{KEY.alphabet.length}</Num> characters:
           </span>
           {groups.map((g, i) => (
-            <span
-              key={g}
-              style={{
-                fontFamily: MONO,
-                fontSize: 26,
-                fontWeight: 600,
-                color: BLUE_INK,
-                padding: "2px 12px",
-                border: `2px solid ${BLUE_INK}`,
-                borderRadius: 8,
-                opacity: ease(frame, groupAt[i], 10),
-              }}
-            >
-              {g}
-            </span>
+            <React.Fragment key={g}>
+              {i ? <span style={{ ...note(26, INK_SOFT), opacity: ease(frame, groupAt[i], 10) }}>·</span> : null}
+              <span style={{ fontFamily: MONO, fontSize: 27, fontWeight: 600, color: BLUE_INK, opacity: ease(frame, groupAt[i], 10) }}>{g}</span>
+            </React.Fragment>
           ))}
         </div>
         <Line x={X0} y={cellsY + 6} at={idAt} size={26} weight={600}>
@@ -159,31 +134,13 @@ export const KeyScene: React.FC = () => {
           head={12}
           color={INK_SOFT}
         />
-        {[...id.key].map((ch, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: cellsX + i * (cell + 4),
-              top: cellsY,
-              width: cell,
-              height: cell,
-              boxSizing: "border-box",
-              border: `2px solid ${INK}`,
-              borderRadius: 6,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: MONO,
-              fontSize: 27,
-              fontWeight: 600,
-              color: INK,
-              opacity: ease(frame, idAt + 10 + i * 3, 8),
-            }}
-          >
-            {ch}
-          </div>
-        ))}
+        <div style={{ position: "absolute", left: cellsX, top: cellsY - 2, display: "flex", fontFamily: MONO, fontSize: 34, fontWeight: 600, color: INK }}>
+          {[...id.key].map((ch, i) => (
+            <span key={i} style={{ width: cell + 4, textAlign: "center", opacity: ease(frame, idAt + 10 + i * 3, 8) }}>
+              {ch}
+            </span>
+          ))}
+        </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           <path
             d={`M${cellsX},${cellsY + cell + 12} v8 H${cellsX + 6 * (cell + 4) - 4} v-8`}
@@ -209,13 +166,19 @@ export const KeyScene: React.FC = () => {
         <Line x={RX} y={secY} at={hashAt} size={28} weight={700}>
           Or a hash of the long URL
         </Line>
-        <Box r={urlB} at={hashAt + 4} title="long URL" tone="data" size={24} />
-        <Arrow points={[[urlB.cx + urlB.w / 2 + 8, flowY], [hashB.cx - hashB.w / 2 - 8, flowY]]} at={hashAt + 10} dur={8} head={12} />
-        <Box r={hashB} at={hashAt + 14} title="hash" size={24} />
-        <Arrow points={[[hashB.cx + hashB.w / 2 + 8, flowY], [takenB.cx - takenB.w / 2 - 8, flowY]]} at={checkAt - 4} dur={8} head={12} />
-        <Box r={takenB} at={checkAt} title="already taken?" tone="lit" size={24} />
-        <Arrow points={[[takenB.cx + takenB.w / 2 + 8, flowY], [storeB.cx - storeB.w / 2 - 8, flowY]]} at={storeAt - 4} dur={8} head={12} />
-        <Box r={storeB} at={storeAt} title="store" tone="data" size={24} />
+        <div style={{ position: "absolute", left: RX, top: flowY - 20, display: "flex", alignItems: "center", gap: 16, fontSize: 27 }}>
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, hashAt + 4, 10) }}>long URL</span>
+          <InlineArrow at={hashAt + 10} w={40} />
+          <span style={{ ...note(27, INK), fontWeight: 650, opacity: ease(frame, hashAt + 14, 10) }}>hash</span>
+          <InlineArrow at={checkAt - 4} w={40} />
+          <span style={{ ...note(27, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, checkAt, 10) }}>
+            <Mark at={checkAt + 2} color={HIGHLIGHT}>
+              already taken?
+            </Mark>
+          </span>
+          <InlineArrow at={storeAt - 4} w={40} />
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 650, opacity: ease(frame, storeAt, 10) }}>store</span>
+        </div>
       </Drift>
     </AbsoluteFill>
   );

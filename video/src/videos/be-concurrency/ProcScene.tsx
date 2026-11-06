@@ -3,11 +3,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Band, Drift, Flow, Node, OK, OK_INK, pulse, THREAD, tint, X0 } from "./parts";
+import { Band, Drift, Flow, Node, OK, OK_INK, pulse, THREAD, ThreadName, tint, X0 } from "./parts";
 
 /** The left panel: one process, its threads sharing its memory. */
 const L = { x: X0, w: 720, top: 352, h: 384 };
@@ -25,14 +25,6 @@ const P_W = 248;
 const P_GAP = 38;
 const P_TOP = 352;
 const P_H = 280;
-
-/** A thread, as its colored tag. */
-const ThreadTag: React.FC<{ i: number; x: number; y: number; w: number; h: number; at: number; lit?: number; children?: React.ReactNode }> = ({ i, x, y, w, h, at, lit = 0, children }) => {
-  const th = THREAD[i];
-  return (
-    <Node x={x} y={y} w={w} h={h} at={at} fill={tint(th.fill, 22)} line={th.fill} titleInk={th.ink} title={children ?? `thread ${i + 1}`} size={22} lit={lit} />
-  );
-};
 
 /**
  * Question 2. Threads share one process's memory: one writes a cell, another
@@ -109,7 +101,7 @@ export const ProcScene: React.FC = () => {
             Threads: <span style={{ fontWeight: 500 }}>inside one process, sharing its memory</span>
           </span>
         </Note>
-        <Node x={L.x} y={y(L.top)} w={L.w} h={h(L.h)} at={threadsAt + 2} tone="plain" fill={PAPER} />
+        <Node x={L.x} y={y(L.top)} w={L.w} h={h(L.h)} at={threadsAt + 2} tone="plain" fill="transparent" line={HAIRLINE} stroke={1.5} />
         <Ink at={threadsAt + 6} dur={12} style={{ left: L.x + 40, top: y(L.top) + h(18) }}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
             one process<span style={{ opacity: ease(frame, shareAt, 10) }}>: its memory, shared</span>
@@ -135,7 +127,7 @@ export const ProcScene: React.FC = () => {
           );
         })}
         {[0, 1, 2].map((i) => (
-          <ThreadTag key={i} i={i} x={threadX(i)} y={threadTop} w={THREAD_W} h={threadH} at={threadsAt + 8 + i * 4} />
+          <ThreadName key={i} t={i} x={threadX(i) + THREAD_W / 2} y={threadTop + threadH / 2 - 14} at={threadsAt + 8 + i * 4} center />
         ))}
         {/* One writes, another reads. */}
         <Flow points={[[threadX(0) + 60, threadTop - 8], [cellX(WRITE) + CELL_W / 2 - 14, cellTop + cellH + 8]]} at={writesAt} color={THREAD[0].fill} width={3} />
@@ -167,7 +159,7 @@ export const ProcScene: React.FC = () => {
           const dead = j === 1 ? crashed : 0;
           return (
             <React.Fragment key={j}>
-              <Node x={pX(j)} y={pTop} w={P_W} h={pH} at={at} tone={dead > 0.5 ? "bad" : "plain"} fill={dead > 0 ? tint(ACCENT, 8 * dead) : PAPER} lit={j === 1 ? pulse(frame, crashAt + 4, 20) : 0} />
+              <Node x={pX(j)} y={pTop} w={P_W} h={pH} at={at} tone="plain" fill="transparent" line={dead > 0.5 ? ACCENT : HAIRLINE} stroke={dead > 0.5 ? 2.5 : 1.5} lit={j === 1 ? pulse(frame, crashAt + 4, 20) : 0} />
               <Ink at={at + 4} dur={12} style={{ left: pX(j) + 20, top: pTop + h(16) }}>
                 <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>process {j + 1}</span>
               </Ink>
@@ -184,9 +176,9 @@ export const ProcScene: React.FC = () => {
                   dim={j === 1 ? crashAt + 4 : undefined}
                 />
               ))}
-              <ThreadTag i={j} x={pX(j) + 20} y={pTop + h(140)} w={P_W - 40} h={h(50)} at={at + 10}>
-                {j === 1 && crashed > 0.5 ? "crashed" : `thread ${j + 1}`}
-              </ThreadTag>
+              <ThreadName t={j} x={pX(j) + 20} y={pTop + h(152)} at={at + 10} ink={j === 1 && crashed > 0.5 ? ACCENT_INK : undefined}>
+                {j === 1 && crashed > 0.5 ? "thread 2: crashed" : `thread ${j + 1}`}
+              </ThreadName>
               {/* Running: a bar under each thread that fills, all at once. */}
               {j !== 1 ? (
                 <div style={{ position: "absolute", left: pX(j) + 20, top: pTop + h(208), width: (P_W - 40) * run, height: 8, borderRadius: 4, background: OK, opacity: run > 0 ? 1 : 0 }} />

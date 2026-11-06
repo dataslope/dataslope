@@ -59,6 +59,50 @@ export const THREAD = [
   { name: "T3", fill: ds("orange", 500), ink: inkOf.orange },
 ] as const;
 
+/**
+ * A thread named on the page: plain text in its color after a small dot of
+ * it, never a tag in a box. `center` puts the middle of the name at `x`.
+ */
+export const ThreadName: React.FC<{
+  t: number;
+  x: number;
+  y: number;
+  at: number;
+  out?: number;
+  dim?: number;
+  size?: number;
+  center?: boolean;
+  ink?: string;
+  children?: React.ReactNode;
+}> = ({ t, x, y, at, out, dim, size = 22, center, ink, children }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 12);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.62;
+  if (p <= 0 || o >= 1) return null;
+  const th = THREAD[t];
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: center ? x - 200 : x,
+        top: y,
+        width: center ? 400 : undefined,
+        display: "flex",
+        justifyContent: center ? "center" : "flex-start",
+        alignItems: "center",
+        gap: "0.4em",
+        fontSize: size,
+        opacity: p * (1 - o) * (1 - d),
+        transform: `translateY(${(1 - p) * 8}px)`,
+      }}
+    >
+      <span style={{ width: size * 0.55, height: size * 0.55, borderRadius: size, background: th.fill, flexShrink: 0 }} />
+      <span style={{ ...label(size, ink ?? th.ink), fontWeight: 700, whiteSpace: "nowrap" }}>{children ?? `thread ${t + 1}`}</span>
+    </div>
+  );
+};
+
 // ── Shapes ───────────────────────────────────────────────────────────────────
 
 /** What a box is: data (blue), the right answer (green), the trap (red), or
@@ -98,10 +142,11 @@ export const Node: React.FC<{
   lit?: number;
   dashed?: boolean;
   radius?: number;
+  stroke?: number;
   align?: "center" | "left";
   justify?: "center" | "flex-start";
   children?: React.ReactNode;
-}> = ({ x, y, w, h, at, title, sub, tone = "data", fill, line, titleInk, size = 25, subSize = 21, dim, out, lit = 0, dashed, radius = 12, align = "center", justify = "center", children }) => {
+}> = ({ x, y, w, h, at, title, sub, tone = "data", fill, line, titleInk, size = 25, subSize = 21, dim, out, lit = 0, dashed, radius = 12, stroke = 2.5, align = "center", justify = "center", children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
@@ -118,7 +163,7 @@ export const Node: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${line ?? t.line}`,
+        border: `${stroke + 2 * lit}px ${dashed ? "dashed" : "solid"} ${line ?? t.line}`,
         borderRadius: radius,
         background: fill ?? t.fill,
         display: "flex",

@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QuestionCard } from "../../editorial/interview";
+import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DESIGN } from "./data";
-import { Drift, Flow, Node, Pill, X0 } from "./parts";
+import { Drift, Flow, Node, X0 } from "./parts";
 
 /** The page's flowchart, laid out in two rows: the request path along the
  *  top, the provider and the validation that checks it under the cache. */
@@ -259,9 +259,9 @@ export const DesignScene: React.FC = () => {
         {/* Latency: a queue for long jobs, with a status endpoint the client polls. */}
         <Node x={QUEUE.x} y={queueTop} w={QUEUE.w} h={bh} at={queueAt} title="Queue" sub="long jobs" tone="plain" lit={queueAt} litOut={failAt - 4} />
         <Flow points={[[475, bottom("API") + 6], [475, queueTop - 8]]} at={queueAt + 4} head={13} />
-        <Pill x={QUEUE.x} y={y(732)} at={statusAt} tone="plain" size={20}>
-          status endpoint
-        </Pill>
+        <Ink at={statusAt} dur={12} style={{ left: QUEUE.x, top: y(732) + 6 }}>
+          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>status endpoint</span>
+        </Ink>
         <Flow
           points={[
             [BOX.C.x + 60, bottom("C") + 6],
@@ -302,14 +302,14 @@ export const DesignScene: React.FC = () => {
         </Note>
 
         {/* Structured output: validate, retry or repair. */}
-        <Pill x={BOX.V.x} y={y(800)} at={trustAt} tone="ok" size={21}>
-          never trust the shape
-        </Pill>
+        <Ink at={trustAt} dur={12} style={{ left: BOX.V.x, top: y(800) }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>never trust the shape</span>
+        </Ink>
 
         {/* Cost: a spend alert on the quota. */}
-        <Pill x={BOX.Q.x} y={y(470)} at={alertAt} tone="plain" size={20}>
-          alert on spend
-        </Pill>
+        <Ink at={alertAt} dur={12} style={{ left: BOX.Q.x, top: y(470) }}>
+          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>+ an alert on spend</span>
+        </Ink>
 
         {/* Quality: an eval set, and logs, under the provider. */}
         <Node x={BOX.LLM.x} y={y(812)} w={BOX.LLM.w} h={h(70)} at={evalAt} title="Evaluation set" sub="runs on every change" size={21} subSize={19} tone="ok" />

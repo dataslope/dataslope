@@ -385,8 +385,12 @@ export const Node: React.FC<{
   out?: number;
   lit?: number;
   dashed?: boolean;
+  /** Text only, no box: the house rule is no cards unless the layout needs
+   *  one, so a diagram's labels stand on the page and only the arrows and
+   *  drawn shapes are lines. */
+  bare?: boolean;
   children?: React.ReactNode;
-}> = ({ x, y, w, h, at, title, sub, tone = "data", size = 24, subSize = 21, dim, out, lit = 0, dashed, children }) => {
+}> = ({ x, y, w, h, at, title, sub, tone = "data", size = 24, subSize = 21, dim, out, lit = 0, dashed, bare, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
@@ -403,9 +407,9 @@ export const Node: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${t.line}`,
+        border: bare ? undefined : `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${t.line}`,
         borderRadius: 12,
-        background: t.fill,
+        background: bare ? undefined : t.fill,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

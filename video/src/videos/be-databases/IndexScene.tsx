@@ -315,8 +315,7 @@ export const IndexScene: React.FC = () => {
         {/* ── A hash index ── */}
         <Listing lines={INDEX.hashCreate} x={R_X} top={y(TOP) - h(4)} width={R_W} size={20} at={hashAt} />
         <Svg opacity={ease(frame, hashAt, 12)}>
-          <rect x={hashBox.x} y={hashBox.y} width={hashBox.w} height={hashBox.h} rx={8} fill={PAPER} stroke={INK} strokeWidth={2} />
-          <text x={hashBox.x + hashBox.w / 2} y={hashBox.y + hashBox.h / 2 + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK })}>
+          <text x={hashBox.x + hashBox.w / 2} y={hashBox.y + hashBox.h / 2 + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: INK })}>
             hash(email)
           </text>
           {Array.from({ length: BUCKETS }, (_, i) => {

@@ -36,7 +36,7 @@ const Chip: React.FC<{ x: number; y: number; amount: number; tone: "data" | "bad
         width: CHIP_W,
         height: CHIP_H,
         boxSizing: "border-box",
-        borderRadius: 7,
+        borderRadius: 3,
         border: `2px solid ${line}`,
         background: tone === "sara" ? `color-mix(in srgb, ${inkOf.yellow} 22%, ${PAPER})` : `color-mix(in srgb, ${line} 9%, ${PAPER})`,
         display: "flex",
@@ -165,23 +165,6 @@ export const FanoutScene: React.FC = () => {
                 const off = copy * STACK * (1 - fold);
                 return <Chip key={k} x={R_X + p.x + off} y={top + p.y - off} amount={o.amount} tone={copy > 0 ? "bad" : tone} opacity={copy > 0 ? show * (1 - fold) : show} behind={copy > 0} />;
               })}
-              {/* The item count, once the items are counted first. */}
-              <div
-                style={{
-                  position: "absolute",
-                  left: R_X + p.x + CHIP_W - 12,
-                  top: top + p.y - 13,
-                  ...label(19, PAPER),
-                  fontWeight: 700,
-                  background: OK,
-                  borderRadius: 999,
-                  padding: "0 7px",
-                  lineHeight: 1.3,
-                  opacity: ease(frame, oneRowAt + 4 + i * 0.6, 8),
-                }}
-              >
-                ×{o.items}
-              </div>
             </React.Fragment>
           );
         })}

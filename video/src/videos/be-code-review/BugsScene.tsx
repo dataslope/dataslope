@@ -24,8 +24,6 @@ import {
   Source,
   Spot,
   Tick,
-  TINT_ADD,
-  TINT_DEL,
   X0,
 } from "./parts";
 
@@ -65,45 +63,25 @@ const Op: React.FC<{ color: string; children: React.ReactNode }> = ({ color, chi
   <span style={{ fontFamily: MONO, fontWeight: 700, color, fontVariantLigatures: "none" }}>{children}</span>
 );
 
-/** A small pill for one assumption ("sorted?"). */
-const Pill: React.FC<{ at: number; children: React.ReactNode }> = ({ at, children }) => {
+/** One assumption ("sorted?"), plain, after a middle dot unless it leads. */
+const Assumed: React.FC<{ at: number; first?: boolean; children: React.ReactNode }> = ({ at, first, children }) => {
   const frame = useCurrentFrame();
   return (
-    <span
-      style={{
-        ...note(22, INK),
-        display: "inline-block",
-        padding: "2px 14px 4px",
-        borderRadius: 999,
-        border: `1.5px solid ${INK_SOFT}`,
-        opacity: ease(frame, at, 10),
-        whiteSpace: "nowrap",
-      }}
-    >
+    <span style={{ opacity: ease(frame, at, 10) }}>
+      {first ? null : <span style={{ color: INK_SOFT }}> · </span>}
       {children}
     </span>
   );
 };
 
-/** One line of a tiny diff: its sign, and what the line does, tinted. */
+/** One line the diff adds: its sign, then what the line does, the asked-for
+ *  change in green and what slipped in beside it in red. */
 const DiffRow: React.FC<{ at: number; add: boolean; children: React.ReactNode }> = ({ at, add, children }) => {
   const frame = useCurrentFrame();
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: "1px 10px",
-        background: add ? TINT_ADD : TINT_DEL,
-        borderRadius: 3,
-        opacity: ease(frame, at, 10),
-        whiteSpace: "nowrap",
-        fontSize: 21,
-      }}
-    >
-      <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 700, color: add ? OK_INK : ACCENT_INK }}>+</span>
-      <span style={note(21, add ? INK : ACCENT_INK)}>{children}</span>
+    <div style={{ display: "flex", alignItems: "center", gap: 12, opacity: ease(frame, at, 10), whiteSpace: "nowrap", fontSize: 22 }}>
+      <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: add ? OK_INK : ACCENT_INK }}>+</span>
+      <span style={note(22, add ? INK : ACCENT_INK)}>{children}</span>
     </div>
   );
 };
@@ -254,13 +232,17 @@ export const BugsScene: React.FC = () => {
         </Card>
 
         <Card x={cx(1)} y={R1} w={CARD_W} h={CARD_H} at={assumeAt - 4} title="Unstated assumptions" dim={quietAt} undim={lift - 4}>
-          <div style={{ display: "flex", gap: 12, fontSize: 22 }}>
-            <Pill at={sortedAt}>sorted?</Pill>
-            <Pill at={uniqueAt}>unique?</Pill>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <Assumed at={sortedAt} first>
+              sorted?
+            </Assumed>
+            <Assumed at={uniqueAt}>unique?</Assumed>
           </div>
-          <div style={{ display: "flex", gap: 12, fontSize: 22 }}>
-            <Pill at={nullAt}>not null?</Pill>
-            <Pill at={asciiAt}>ASCII?</Pill>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <Assumed at={nullAt} first>
+              not null?
+            </Assumed>
+            <Assumed at={asciiAt}>ASCII?</Assumed>
           </div>
         </Card>
 
@@ -345,7 +327,7 @@ export const BugsScene: React.FC = () => {
         </Card>
 
         <Card x={cx(3)} y={R2} w={CARD_W} h={CARD_H} at={creepAt - 4} title="Scope creep" dim={quietAt} out={gone}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <DiffRow at={creepAt + 4} add>
               the change asked for
             </DiffRow>

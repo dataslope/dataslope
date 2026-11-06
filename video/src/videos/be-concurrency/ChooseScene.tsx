@@ -80,13 +80,19 @@ export const ChooseScene: React.FC = () => {
         </Note>
 
         {/* The deciding question. */}
-        <Node x={ROOT.cx - ROOT.w / 2} y={rootTop} w={ROOT.w} h={rootH} at={decidingAt} tone="plain" fill={tint(HIGHLIGHT, 30)} size={27} title="Waiting on I/O, or burning CPU?" />
+        <Note at={decidingAt} x={ROOT.cx - ROOT.w / 2} y={rootTop + rootH / 2 - 20} width={ROOT.w} from="up" style={{ textAlign: "center" }}>
+          <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <Band at={decidingAt + 6}>Waiting on I/O, or burning CPU?</Band>
+          </span>
+        </Note>
         {BRANCHES.map((b, i) => {
           const lit = onBranch(i);
           return (
             <React.Fragment key={b.text}>
               <Flow points={[[ROOT.cx + (i ? 120 : -120), rootTop + rootH + 4], [ROOT.cx + (i ? 120 : -120), splitY - h(34)], [b.cx, splitY - h(34)], [b.cx, splitY - 8]]} at={branchAt[i]} color={lit > 0.5 ? INK : INK_SOFT} width={2.4} head={13} />
-              <Node x={b.cx - 120} y={splitY} w={240} h={h(50)} at={branchAt[i] + 8} tone="data" title={b.text} size={23} lit={lit} />
+              <Note at={branchAt[i] + 8} x={b.cx - 150} y={splitY + h(25) - 16} width={300} from="up" style={{ textAlign: "center" }}>
+                <span style={{ ...label(24, BLUE_INK), fontWeight: lit > 0.5 ? 800 : 700, whiteSpace: "nowrap" }}>{b.text}</span>
+              </Note>
             </React.Fragment>
           );
         })}
@@ -97,7 +103,7 @@ export const ChooseScene: React.FC = () => {
           return (
             <React.Fragment key={l.title}>
               <Flow points={[[b.cx + (l.branch === 0 ? (i === 0 ? -40 : 40) : 0), splitY + h(50) + 4], [b.cx + (l.branch === 0 ? (i === 0 ? -40 : 40) : 0), leafY - h(26)], [cx, leafY - h(26)], [cx, leafY - 8]]} at={whenAt[i]} color={INK_SOFT} width={2.4} head={13} />
-              <Node x={l.x} y={leafY} w={LEAF_W} h={leafH} at={whenAt[i] + 6} tone={named > 0.5 ? "ok" : "plain"} fill={named > 0.5 ? tint(OK, 10) : PAPER} lit={pulse(frame, leafAt[i] + 2, 20)}>
+              <Note at={whenAt[i] + 6} x={l.x} y={leafY + h(6)} width={LEAF_W} from="up" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
                 <span style={{ ...label(30, OK_INK), fontWeight: 750, whiteSpace: "nowrap", opacity: named }}>
                   {i === 1 ? (
                     <>
@@ -109,7 +115,7 @@ export const ChooseScene: React.FC = () => {
                 </span>
                 <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>{l.when}</span>
                 <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, whyAt[i], 10) }}>{l.why}</span>
-              </Node>
+              </Note>
             </React.Fragment>
           );
         })}
@@ -118,12 +124,16 @@ export const ChooseScene: React.FC = () => {
         <Note at={mixAt} x={X0} y={mixY + h(14)}>
           <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>Real services mix them:</span>
         </Note>
-        <Node x={480} y={mixY} w={300} h={h(64)} at={serverAt} tone="data" title="async server" size={24} />
+        <Note at={serverAt} x={480} y={mixY + h(32) - 16} width={300} from="up" style={{ textAlign: "center" }}>
+          <span style={{ ...label(25, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>async server</span>
+        </Note>
         <Flow points={[[792, mixY + h(32)], [1092, mixY + h(32)]]} at={heavyAt} color={BAR} width={2.8} />
         <Note at={heavyAt + 4} x={820} y={mixY - h(30)}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>heavy computation</span>
         </Note>
-        <Node x={1104} y={mixY} w={300} h={h(64)} at={poolAt} tone="ok" title="process pool" size={24} />
+        <Note at={poolAt} x={1104} y={mixY + h(32) - 16} width={300} from="up" style={{ textAlign: "center" }}>
+          <span style={{ ...label(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>process pool</span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, headline, label, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -67,12 +67,8 @@ export const CloseScene: React.FC = () => {
         {SERIES.map((s, i) => {
           const at = everyAt + 2 + i * 4;
           const x = LEFT + i * COL_W;
-          const lit = i === ours ? ease(frame, jobAt, 14) : 0;
           return (
             <React.Fragment key={s.n}>
-              {lit > 0 ? (
-                <div style={{ position: "absolute", left: x + 6, top: y(ROW_V) - 10, width: COL_W - 12, height: h(ART_H) + h(96), borderRadius: 14, background: HIGHLIGHT, opacity: lit * 0.7 }} />
-              ) : null}
               {hasArt(s.video, s.hero) ? (
                 <Spot id={s.hero} video={s.video} at={at} left={x + (COL_W - ART_W) / 2} top={y(ROW_V)} width={ART_W} height={h(ART_H)} phase={i * 23} amp={3} />
               ) : (
@@ -94,7 +90,9 @@ export const CloseScene: React.FC = () => {
                 <div style={{ ...label(20, i === ours ? ACCENT_INK : INK_SOFT), fontWeight: 700 }}>
                   <Num>{s.n}</Num>
                 </div>
-                <div style={{ ...note(20, INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 2 }}>{s.title}</div>
+                <div style={{ ...note(20, INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 2 }}>
+                  {i === ours ? <Mark at={jobAt}>{s.title}</Mark> : s.title}
+                </div>
               </Ink>
             </React.Fragment>
           );
@@ -140,9 +138,8 @@ export const CloseScene: React.FC = () => {
                 top: y(CARD_V),
                 width: CARD_W,
                 boxSizing: "border-box",
-                borderTop: `3px solid ${BLUE_INK}`,
-                background: PAPER,
-                padding: "16px 4px 0",
+                borderTop: `1px solid ${HAIRLINE}`,
+                padding: "16px 0 0",
                 opacity: q,
                 transform: `translateY(${(1 - q) * 12}px)`,
               }}

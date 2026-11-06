@@ -8,20 +8,8 @@ import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CACHE } from "./data";
-import { commas, Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, X0 } from "./parts";
+import { commas, Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, StepRow, X0 } from "./parts";
 
-const STEP_H = 66;
-/** The read path's four steps and the write path's two, left to right. */
-const READ = [
-  { x: X0, w: 250, t: "check the cache" },
-  { x: 430, w: 130, t: "miss" },
-  { x: 620, w: 450, t: "read the database, write the cache" },
-  { x: 1130, w: 190, t: "return it" },
-];
-const WRITE = [
-  { x: X0, w: 300, t: "update the database" },
-  { x: 480, w: 360, t: "invalidate the cached copy" },
-];
 const BAR_X = 450;
 const BAR_W = 620;
 const SIZE_NAME = ["a thousandth of the links", "a hundredth", "a tenth"];
@@ -61,11 +49,6 @@ export const CacheScene: React.FC = () => {
   const replicaAt = n.word("q3-loss", "the cache needs replicas too");
   const end = n.beat("q3-loss").to;
 
-  const readY = y(410) - STEP_H / 2;
-  const writeY = y(574) - STEP_H / 2;
-  const readStepAt = [checksAt, missAt, readsAt, returnsAt];
-  const lit = (at: number, until: number) => (frame >= at - 2 && frame < until ? 1 : 0);
-  const readUntil = [missAt, readsAt, returnsAt, writeAt];
   const dimA = simAt - 4;
   const rowY = (i: number) => y(700) + i * h(62);
   const dead = ease(frame, deadAt, 10);
@@ -76,7 +59,7 @@ export const CacheScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      {readStepAt.map((at, i) => (
+      {[checksAt, missAt, readsAt, returnsAt].map((at, i) => (
         <Sfx key={i} name="el-tap" at={at} level={-32} />
       ))}
       <Sfx name="el-tap" at={writeAt} level={-32} />
@@ -96,52 +79,38 @@ export const CacheScene: React.FC = () => {
         </QuestionCard>
         <MiniMap at={qAt} stage={1} lit="cache" grow={{ replica: replicaAt }} />
 
-        {/* ── The read path ── */}
+        {/* ── The read path, then the write path: steps, lit as said. ── */}
         <Line at={onReadAt} x={X0} y={y(338)} size={22} weight={700} color={INK_SOFT} dim={dimA}>
           On a read
         </Line>
-        {READ.map((s, i) => (
-          <React.Fragment key={i}>
-            <Node
-              x={s.x}
-              y={readY}
-              w={s.w}
-              h={STEP_H}
-              at={readStepAt[i] - 2}
-              tone={lit(readStepAt[i], readUntil[i]) ? "lit" : i === 1 ? "plain" : "data"}
-              title={s.t}
-              size={22}
-              dim={dimA}
-            />
-            {i > 0 ? (
-              <Flow points={[[READ[i - 1].x + READ[i - 1].w + 6, readY + STEP_H / 2], [s.x - 8, readY + STEP_H / 2]]} at={readStepAt[i] - 6} color={BAR} dim={dimA} />
-            ) : null}
-          </React.Fragment>
-        ))}
-        <Line at={firstAt} x={READ[1].x - 40} y={readY + STEP_H + h(18)} size={21} weight={650} dim={dimA}>
-          <Mark at={firstAt + 2}>every key&apos;s first request pays it</Mark>
+        <StepRow
+          x={X0}
+          y={y(384)}
+          size={26}
+          dim={dimA}
+          steps={[
+            { text: "check the cache", at: checksAt - 2, lit: [checksAt, missAt] },
+            { text: "miss", at: missAt - 2, lit: [missAt, readsAt] },
+            { text: "read the database, write the cache", at: readsAt - 2, lit: [readsAt, returnsAt] },
+            { text: "return it", at: returnsAt - 2, lit: [returnsAt, writeAt] },
+          ]}
+        />
+        <Line at={firstAt} x={X0} y={y(432)} size={22} color={INK_SOFT} dim={dimA}>
+          every key&apos;s first request pays <Mark at={firstAt + 2}>the miss</Mark>
         </Line>
-
-        {/* ── The write path ── */}
-        <Line at={writeAt - 4} x={X0} y={writeY - h(44)} size={22} weight={700} color={INK_SOFT} dim={dimA}>
+        <Line at={writeAt - 4} x={X0} y={y(500)} size={22} weight={700} color={INK_SOFT} dim={dimA}>
           On a write
         </Line>
-        {WRITE.map((s, i) => (
-          <React.Fragment key={i}>
-            <Node
-              x={s.x}
-              y={writeY}
-              w={s.w}
-              h={STEP_H}
-              at={i ? invalAt - 2 : writeAt}
-              tone={i === 1 && frame >= invalAt + 2 && frame < onlyAt ? "lit" : "data"}
-              title={s.t}
-              size={22}
-              dim={dimA}
-            />
-            {i > 0 ? <Flow points={[[WRITE[0].x + WRITE[0].w + 6, writeY + STEP_H / 2], [s.x - 8, writeY + STEP_H / 2]]} at={invalAt - 6} color={BAR} dim={dimA} /> : null}
-          </React.Fragment>
-        ))}
+        <StepRow
+          x={X0}
+          y={y(546)}
+          size={26}
+          dim={dimA}
+          steps={[
+            { text: "update the database", at: writeAt, lit: [writeAt, invalAt] },
+            { text: "invalidate the cached copy", at: invalAt - 2, lit: [invalAt, onlyAt] },
+          ]}
+        />
 
         {/* ── What follows ── */}
         <Line at={onlyAt} x={1400} y={y(338)} size={22} dim={dimA}>

@@ -9,7 +9,7 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DEADLOCK } from "./data";
-import { Drift, Flow, Node, OK, OK_INK, pulse, THREAD, tint, X0 } from "./parts";
+import { Drift, Flow, LockGlyph, OK, OK_INK, pulse, THREAD, ThreadName, X0 } from "./parts";
 
 /** The wait-for picture, in layout units: two locks between two threads. */
 const A = { x: 410, y: 350, w: 140, h: 64 };
@@ -175,20 +175,20 @@ export const DeadScene: React.FC = () => {
         </svg>
         <Flow points={[[t1c, t1.y + t1.h + 4], [t1c, bMid], [b.x - 8, bMid]]} at={wantsBAt} color={waitColor} dash="9 7" width={3} out={getsAt} />
         <Flow points={[[t2c, t2.y - 4], [t2c, aMid], [a.x + a.w + 8, aMid]]} at={wantsAAt} color={waitColor} dash="9 7" width={3} />
-        <Node x={a.x} y={a.y} w={a.w} h={a.h} at={holdsAt} tone="data" fill={tint(THREAD[0].fill, 22 * draw(firstAt + 4))} title="lock A" size={23} />
-        <Node
-          x={b.x}
-          y={b.y}
-          w={b.w}
-          h={b.h}
-          at={holdsAt + 4}
-          tone="data"
-          fill={tint(ordered > 0.5 ? THREAD[0].fill : THREAD[1].fill, 22 * Math.max(draw(secondAt + 4) * (1 - ordered), ordered))}
-          title="lock B"
-          size={23}
-        />
+        {/* The locks: a padlock in its holder's color, and its name. */}
+        {[
+          { b: a, name: "lock A", at: holdsAt, holder: draw(firstAt + 4) > 0.5 ? 0 : -1 },
+          { b, name: "lock B", at: holdsAt + 4, holder: ordered > 0.5 ? 0 : draw(secondAt + 4) > 0.5 ? 1 : -1 },
+        ].map((l) => (
+          <Note key={l.name} at={l.at} x={l.b.x} y={l.b.y + l.b.h / 2 - 17} width={l.b.w} from="up" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 10 }}>
+            <span style={{ transform: `scale(${1 + 0.2 * pulse(frame, twoAt + 10, 18)})` }}>
+              <LockGlyph size={30} color={l.holder < 0 ? INK : THREAD[l.holder].fill} />
+            </span>
+            <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>{l.name}</span>
+          </Note>
+        ))}
         {[t1, t2].map((t, i) => (
-          <Node key={i} x={t.x} y={t.y} w={t.w} h={t.h} at={setAt + 6 + i * 4} fill={tint(THREAD[i].fill, 18)} line={THREAD[i].fill} titleInk={THREAD[i].ink} title={`thread ${i + 1}`} size={23} lit={pulse(frame, twoAt + i * 6, 18)} />
+          <ThreadName key={i} t={i} x={t.x + t.w / 2} y={t.y + t.h / 2 - 15} at={setAt + 6 + i * 4} size={23} center />
         ))}
         <Note at={wantsBAt} x={X0} y={y(686)}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.5em", fontSize: 20 }}>

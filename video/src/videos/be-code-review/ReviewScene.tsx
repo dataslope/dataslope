@@ -48,21 +48,9 @@ const Pair: React.FC<{ name: string; value: string; ink?: string; size?: number 
   </span>
 );
 
-/** A word set as a small tag beside a line it classifies. */
+/** A word set beside a line it classifies, as plain text. */
 const Kind: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span
-    style={{
-      ...note(21, INK),
-      fontWeight: 600,
-      display: "inline-block",
-      padding: "1px 12px 3px",
-      borderRadius: 999,
-      border: `1.5px solid ${INK_SOFT}`,
-      whiteSpace: "nowrap",
-    }}
-  >
-    {children}
-  </span>
+  <span style={{ ...note(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{children}</span>
 );
 
 /**
