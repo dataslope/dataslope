@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT } from "../../editorial/style";
+import { body, HAIRLINE, INK, INK_SOFT } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -12,10 +12,16 @@ import { Arrow, H0, Head, Label, Mark, pulse, Spot, STAT, STAT_INK } from "./par
 export const GAVEL = { left: 120, top: 660, width: 270, height: 270 };
 
 /** The two hypotheses, plain text on the left: no cards, no boxes. Each is
- *  a title and its line 10px under it; the two sit 200 layout units apart,
- *  so the space between them is far larger than the space inside either. */
+ *  a title and its line 10px under it; they keep the rows their cards had,
+ *  200 layout units apart, which leaves the column level with the question
+ *  and its verdicts on the right, so a hairline is centred in the gap
+ *  between them. A hypothesis runs about 90px, title to line, and its
+ *  longest line about 500px, which the hairline matches. */
 const HYP_X = 160;
 const HYP_W = 700;
+const HYP_ROWS = [330, 530];
+const HYP_H = 90;
+const HYP_RULE_W = 500;
 /** The question and its two verdicts, on the right. The question's first
  *  line, the "Very surprising" label and its verdict share one left edge. */
 const FLOW_X = 1020;
@@ -94,7 +100,7 @@ export const NullScene: React.FC = () => {
 
       {/* The boring answer arrives as it is named; its line on "nothing". */}
       {hypothesis(
-        330,
+        HYP_ROWS[0],
         boringAt,
         nullAt,
         <>
@@ -103,8 +109,20 @@ export const NullScene: React.FC = () => {
         "Nothing is going on: no difference at all.",
         nothingAt,
       )}
+      {/* The hairline between the two arrives with the second. */}
+      <div
+        style={{
+          position: "absolute",
+          left: HYP_X,
+          top: Math.round((y(HYP_ROWS[0]) + TEXT_DY + HYP_H + y(HYP_ROWS[1]) + TEXT_DY) / 2),
+          width: HYP_RULE_W,
+          height: 1,
+          background: HAIRLINE,
+          opacity: ease(frame, altAt - 4, 14) * (1 - 0.45 * ease(frame, soundsAt - 4, 14)),
+        }}
+      />
       {hypothesis(
-        530,
+        HYP_ROWS[1],
         altAt,
         realAt,
         <>

@@ -14,15 +14,20 @@ const CX = 1340;
 const UNIT = 120;
 const M_BASE = 600;
 const M_TALL = 220;
-/** The three designs: three plain columns, each a title and under it a
- *  sketch of the data it takes, with a hairline in each gap instead of a
- *  box round each. A column's left edge, then each gap's centre, in px. The
- *  columns run 334, 412 and 406px wide as drawn (the first and last their
- *  titles, the middle its two strips), so equal 224px gaps spread them
- *  across the page's 160 to 1760. */
+/** The three designs: three plain columns of one width, each a title and
+ *  under it a sketch of the data it takes, both set flush to the column's
+ *  left edge, with a hairline centred in each of the two equal gaps instead
+ *  of a box round each. The widest column as drawn (the middle one's two
+ *  strips) runs about 412px, so 420px columns with 170px gaps span the
+ *  page's 160 to 1760. */
 const DESIGN_Y = 690;
-const DESIGN_X = [160, 718, 1354];
-const RULE_X = [606, 1242];
+const DESIGN_W = 420;
+const DESIGN_GAP = 170;
+const DESIGN_X = [0, 1, 2].map((i) => 160 + i * (DESIGN_W + DESIGN_GAP));
+const RULE_X = [0, 1].map((i) => DESIGN_X[i] + DESIGN_W + DESIGN_GAP / 2);
+/** How far in each sketch's first mark sits, so the sketch can be set flush
+ *  left: its leftmost dot's centre, less the dot's radius. */
+const DOT_R = 6;
 /** A title's line, then its sketch 11px under it, in px. */
 const SKETCH_DY = 42;
 
@@ -70,7 +75,7 @@ export const RatioScene: React.FC = () => {
   const sig = ease(frame, gapAt - 2, 14);
   const noi = ease(frame, seAt - 4, 14);
 
-  const design = (i: number, at: number, title: string, draw: React.ReactNode) => {
+  const design = (i: number, at: number, title: string, inset: number, draw: React.ReactNode) => {
     const p = ease(frame, at - 4, 14);
     if (p <= 0) return null;
     return (
@@ -84,15 +89,16 @@ export const RatioScene: React.FC = () => {
         }}
       >
         <Label size={26}>{title}</Label>
-        <svg width={460} height={sketchH} style={{ position: "absolute", left: 0, top: SKETCH_DY, overflow: "visible" }}>
-          {draw}
+        <svg width={DESIGN_W} height={sketchH} style={{ position: "absolute", left: 0, top: SKETCH_DY, overflow: "visible" }}>
+          <g transform={`translate(${-inset} 0)`}>{draw}</g>
         </svg>
       </div>
     );
   };
   const sketchH = h(200) - 70;
   const strip = (j: readonly number[], cx: number, cy: number, spread: number, fill: string) =>
-    j.map((v, k) => <circle key={k} cx={cx + (v - 0.5) * spread} cy={cy + ((k % 3) - 1) * 9} r={6} fill={fill} stroke={PAPER} strokeWidth={1.2} />);
+    j.map((v, k) => <circle key={k} cx={cx + (v - 0.5) * spread} cy={cy + ((k % 3) - 1) * 9} r={DOT_R} fill={fill} stroke={PAPER} strokeWidth={1.2} />);
+  const stripInset = (j: readonly number[], cx: number, spread: number) => cx + (Math.min(...j) - 0.5) * spread - DOT_R;
 
   return (
     <AbsoluteFill>
@@ -176,6 +182,7 @@ export const RatioScene: React.FC = () => {
         0,
         targetAt,
         "One group against a target",
+        stripInset(J1, 200, 220),
         <>
           {strip(J1, 200, sketchH / 2, 220, DOT)}
           <line x1={250} x2={250} y1={4} y2={sketchH - 4} stroke={INK} strokeWidth={2.2} strokeDasharray="6 5" />
@@ -186,6 +193,7 @@ export const RatioScene: React.FC = () => {
         1,
         separateAt,
         "Two separate groups",
+        stripInset(J1, 130, 170),
         <>
           {strip(J1, 130, sketchH / 2, 170, RAW)}
           {strip(J2, 320, sketchH / 2, 170, DATA)}
@@ -196,6 +204,7 @@ export const RatioScene: React.FC = () => {
         2,
         sameUnitsAt,
         "The same units, measured twice",
+        90 + Math.min(...J1.slice(0, 6)) * 60 - DOT_R,
         <>
           {J1.slice(0, 6).map((v, k) => {
             const yy = 12 + k * ((sketchH - 24) / 5);
@@ -204,8 +213,8 @@ export const RatioScene: React.FC = () => {
             return (
               <g key={k}>
                 <line x1={x0} x2={lerp(x0, x1, ease(frame, twiceAt - 4 + k * 2, 10))} y1={yy} y2={yy} stroke={STAT} strokeWidth={2} opacity={0.7} />
-                <circle cx={x0} cy={yy} r={6} fill={RAW} stroke={PAPER} strokeWidth={1.2} />
-                <circle cx={x1} cy={yy} r={6 * ease(frame, twiceAt + 4 + k * 2, 8)} fill={DATA} stroke={PAPER} strokeWidth={1.2} />
+                <circle cx={x0} cy={yy} r={DOT_R} fill={RAW} stroke={PAPER} strokeWidth={1.2} />
+                <circle cx={x1} cy={yy} r={DOT_R * ease(frame, twiceAt + 4 + k * 2, 8)} fill={DATA} stroke={PAPER} strokeWidth={1.2} />
               </g>
             );
           })}

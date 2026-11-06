@@ -3,7 +3,7 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, label, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PIPE } from "./data";
@@ -181,6 +181,9 @@ export const TwoPipelinesScene: React.FC = () => {
           <span style={{ color: INK_SOFT }}>What it’s about: </span>plot, acting
         </span>
       </Note>
+      {/* The two readings side by side: a hairline in the gap ("plot, acting"
+          ends near x 752), inking with the second. */}
+      <ColumnRule x={(752 + ROW_X + 480) / 2} top={y(READ_Y)} height={31} at={saysGoodAt - 2} />
       <Note at={saysGoodAt - 2} x={ROW_X + 480} y={y(READ_Y)}>
         <span style={{ ...note(24, LOST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           <span style={{ color: INK_SOFT, fontWeight: 500 }}>How it feels: </span>
