@@ -213,10 +213,10 @@ export const JudgeScene: React.FC = () => {
                 <b style={{ color: INK }}>{JUDGE.pe.toFixed(2)}</b> ={" "}
               </span>
               <span style={{ opacity: ease(frame, passAt - 2, 10) }}>
-                0.9 × 0.9 <span style={{ fontSize: 22 }}>(both pass)</span>
+                0.9 × 0.9 <span style={{ fontSize: 24 }}>(both pass)</span>
               </span>
               <span style={{ opacity: ease(frame, failAt - 2, 10) }}>
-                {" "}+ 0.1 × 0.1 <span style={{ fontSize: 22 }}>(both fail)</span>
+                {" "}+ 0.1 × 0.1 <span style={{ fontSize: 24 }}>(both fail)</span>
               </span>
             </span>
           </Note>

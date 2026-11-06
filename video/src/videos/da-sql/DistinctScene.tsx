@@ -15,11 +15,11 @@ import {
   Mark,
   MARK_BAD,
   MARK_OK,
-  Mono,
   TableName,
   tableGeometry,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 340;
 const HEAD_H = 48;

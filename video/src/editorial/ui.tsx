@@ -198,9 +198,69 @@ export const NextLine: React.FC<{
       <div
         style={{ position: "absolute", left: x, top: y, width, height: 1, background: HAIRLINE, opacity: ease(frame, at - 4, 12) }}
       />
-      <Ink at={at} dur={18} style={{ left: x, top: y + 20, ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
+      <Ink at={at} dur={18} style={{ left: x, top: y + 28, ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
         Next: {children}
       </Ink>
     </>
   );
 };
+
+/**
+ * The 1px vertical hairline between columns set side by side, which the
+ * house uses where a row of boxes used to separate them (README, "No cards
+ * unless the layout needs one"). `x` is the centre of the gap, `top` and
+ * `height` match the columns' text. It draws down over 14 frames from `at`,
+ * the frame the column to its right arrives; `dim` fades it with the
+ * columns when the page moves on.
+ */
+export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: number; dim?: number }> = ({
+  x,
+  top,
+  height,
+  at,
+  dim,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at - 2, 14);
+  if (p <= 0) return null;
+  const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height: height * p, background: HAIRLINE, opacity: 1 - d }} />;
+};
+
+/** A badge's hue: the brand hues, plus gray for a neutral tag. */
+export type BadgeTone = "blue" | "green" | "red" | "yellow" | "teal" | "purple" | "orange" | "gray";
+
+/**
+ * The house badge (the owner, 2026-11-06, on backend Part 9's prompt
+ * ingredients: "use this style … the background slightly lighter, but the
+ * no-use of border is amazing"): a word, a value or a short tag on a light
+ * tint of its hue, in that hue's ink, rounded, with no border. Its text is
+ * the size of the line it sits on (one line, one size), so pass that size.
+ * Inline: it sits in a line of text or a flex row of badges.
+ */
+export const badgeStyle = (tone: BadgeTone, size = 24): React.CSSProperties => {
+  const ink = tone === "gray" ? "var(--ds-gray-700)" : tone === "yellow" ? "var(--ds-yellow-800)" : tone === "green" ? "var(--ds-green-700)" : tone === "teal" ? "var(--ds-teal-700)" : `var(--ds-${tone}-500)`;
+  const tint = tone === "gray" ? "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)" : `color-mix(in srgb, var(--ds-${tone}-400) 24%, transparent)`;
+  return {
+    display: "inline-block",
+    // Even top and bottom: at line-height 1.15 the caps sit centred in the
+    // line box (Inter and JetBrains Mono alike), so equal padding centres them.
+    padding: `${Math.round(size * 0.21)}px ${Math.round(size * 0.55)}px`,
+    borderRadius: Math.round(size / 3),
+    background: tint,
+    color: ink,
+    fontSize: size,
+    // Semibold: the owner found bold too heavy for a tinted chip.
+    fontWeight: 600,
+    lineHeight: 1.15,
+    whiteSpace: "nowrap",
+  };
+};
+
+/** A badge as an element; `style` adds position or motion. */
+export const Badge: React.FC<{ tone: BadgeTone; size?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
+  tone,
+  size = 24,
+  style,
+  children,
+}) => <span style={{ ...badgeStyle(tone, size), ...style }}>{children}</span>;

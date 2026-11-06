@@ -164,7 +164,7 @@ export const SensorScene: React.FC = () => {
         {/* Poke mode: four slots, four sensors waiting in them. */}
         <Note at={pokeAt} x={X0} y={pokeTop - h(46)}>
           <span style={{ ...note(25, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            poke mode <span style={{ ...label(21, INK_SOFT) }}>(the default) · a pool of 4 worker slots</span>
+            poke mode <span style={{ ...label(23, INK_SOFT) }}>(the default) · a pool of 4 worker slots</span>
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, pokeAt, 10) }}>
@@ -223,7 +223,7 @@ export const SensorScene: React.FC = () => {
         {/* Reschedule mode: a check takes a slot for a moment and gives it back. */}
         <Note at={resAt} x={X0} y={resTop - h(46)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            reschedule mode <span style={{ ...label(21, INK_SOFT) }}>· the slot is free between checks</span>
+            reschedule mode <span style={{ ...label(23, INK_SOFT) }}>· the slot is free between checks</span>
           </span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, resAt, 10) }}>

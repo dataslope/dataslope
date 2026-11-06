@@ -81,7 +81,7 @@ export const script: NarrationScript = {
     { id: "better", text: "So is B better?", pauseAfter: 0.9 },
     {
       id: "same",
-      text: "Here's the catch. Both groups came from the SAME process. There's no real difference at all.",
+      text: "Here's the catch. Every score in both groups was made the same way: fifty, plus or minus pure luck. There's no real difference at all.",
       pauseAfter: 0.45,
     },
     {

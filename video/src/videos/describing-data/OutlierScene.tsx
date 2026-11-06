@@ -16,6 +16,8 @@ const AXIS = 610;
 const JIT = 46;
 const R = 5.5;
 const CARDS = 720;
+/** Room between each kind's top rule and its title, in px. */
+const RULE_GAP = 28;
 const JIT_Y = jitter(73, OUTLIERS.values.length);
 
 /** The lesson's three kinds of outlier, and what each one calls for. */
@@ -114,7 +116,7 @@ export const OutlierScene: React.FC = () => {
         </Ink>
       </div>
 
-      <Spot id="describing-data-magnifier" at={lookAt - 6} left={1620} top={y(100)} width={200} height={203} />
+      <Spot id="describing-data-magnifier" at={lookAt - 6} left={1600} top={y(112)} width={200} height={203} />
 
       <FigLabel n="10" title="Two hundred skewed incomes, and two genuine high earners" at={outlierFrom} x={160} y={y(330)} />
 
@@ -213,7 +215,8 @@ export const OutlierScene: React.FC = () => {
         </Tag>
       </Drift>
 
-      {/* ── The three kinds, then what each one calls for ── */}
+      {/* ── The three kinds, then what each one calls for: three columns,
+           each under its own rule, so no hairline runs between them ── */}
       {KINDS.map((k, i) => {
         const p = ease(frame, kindAt[i] - 6, 14);
         const shown = Math.max(p * (1 - cardsOut), acts);
@@ -230,7 +233,7 @@ export const OutlierScene: React.FC = () => {
               opacity: shown,
               transform: `translateY(${(1 - shown) * 16}px)`,
               borderTop: `2px solid ${HAIRLINE}`,
-              paddingTop: 16,
+              paddingTop: RULE_GAP,
             }}
           >
             <div style={{ ...label(26, INK), fontWeight: 700 }}>{k.title}</div>
@@ -249,8 +252,8 @@ export const OutlierScene: React.FC = () => {
           </div>
         );
       })}
-      <Pulse x={160 + 560 + 8} y={y(CARDS) + 34} at={missingAt - 2} color={INK} r={6} />
-      <Pulse x={160 + 1120 + 8} y={y(CARDS) + 34} at={fraudAt - 2} color={STAT} r={6} />
+      <Pulse x={160 + 560 + 8} y={y(CARDS) + RULE_GAP + 18} at={missingAt - 2} color={INK} r={6} />
+      <Pulse x={160 + 1120 + 8} y={y(CARDS) + RULE_GAP + 18} at={fraudAt - 2} color={STAT} r={6} />
       <Pulse x={sx(X, 200)} y={ySpread(at(200))} at={egAt[2] - 2} color={DATA} r={7} />
       <Ink at={whyAt - 4} dur={16} style={{ left: 160, top: y(CARDS) - 56, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT) }}>First find out which it is</span>

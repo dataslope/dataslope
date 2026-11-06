@@ -59,7 +59,8 @@ of parsing error strings.
 ### 401 vs 403, what is the difference?
 
 **401 Unauthorized** means the request lacks valid authentication credentials
-for the target and normally includes a `WWW-Authenticate` challenge. Despite
+for the target, and the server must send a `WWW-Authenticate` challenge with
+it (RFC 9110). Despite
 its name, it is an authentication response. **403 Forbidden** means the server
 understood the request but refuses to fulfill it; valid credentials may be
 insufficient, and authenticating again will not necessarily help. The common
@@ -207,9 +208,10 @@ traffic looks like.
 
 HATEOAS (Hypermedia As The Engine Of Application State) means responses
 include **links** to related actions, so a client discovers what it can do
-next without hardcoding URLs. It is the strictest level of REST maturity. In
-practice most "RESTful" APIs skip full HATEOAS, it is aspirational rather than
-required, though returning a few useful links (next page, related resources)
+next without hardcoding URLs. It is the strictest level of REST maturity.
+Strictly, REST as Fielding defined it requires it: hypermedia is one of its
+four interface constraints. In practice most "RESTful" APIs skip full
+HATEOAS, though returning a few useful links (next page, related resources)
 is common and pragmatic.
 
 ### How do you design a clean resource API for, say, a blog?

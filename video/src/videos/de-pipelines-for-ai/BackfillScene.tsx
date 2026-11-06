@@ -155,12 +155,15 @@ export const BackfillScene: React.FC = () => {
         </Note>
 
         {/* The run, designed to fail partway. */}
-        <Note at={failAt} x={X0} y={barTop - 92}>
+        <Note at={failAt} x={X0} y={barTop - 104}>
           <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={failAt + 4}>design for failure partway</Mark>
-            <span style={{ ...label(21, INK_SOFT), marginLeft: 18, opacity: ease(frame, batchAt - 2, 10) }}>each square, one batch of requests</span>
           </span>
         </Note>
+        {/* The key, on a line of its own just over the squares it names. */}
+        <div style={{ position: "absolute", left: X0, top: barTop - 44, ...label(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, failAt, 14) * ease(frame, batchAt - 2, 10) }}>
+          each square, one batch of requests
+        </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           {/* The first run, up to the crash. */}
           {Array.from({ length: CRASH }, (_, i) => {

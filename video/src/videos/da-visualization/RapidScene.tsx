@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
+import { ACCENT, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
 import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { BUBBLES, INK_WEEK, PARTS, SCATTER } from "./data";
-import { bandMid, BarSet, CATS, Drift, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
+import { bandMid, BarSet, CATS, Drift, FlexRule, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -227,36 +227,36 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
     { name: "Power BI", at: c.w("r-tools", "Power BI fits the Microsoft stack"), text: "fits the Microsoft stack" },
     { name: "Looker", at: c.w("r-tools", "Looker defines metrics as code"), text: "metrics defined as code" },
   ];
-  const cardW = 290;
-  const gap = 30;
+  // Three columns of plain text spread across the answer area, a hairline
+  // centred in each gap: each name, and under it what it is for.
+  const p0 = ease(frame, at0, 14);
   return (
     <>
-      {cards.map((card, k) => {
-        const p = ease(frame, at0 + k * 6, 14);
-        if (p <= 0) return null;
-        return (
-          <div
-            key={card.name}
-            style={{
-              position: "absolute",
-              left: R_X + 40 + k * (cardW + gap),
-              top: c.y(360),
-              width: cardW,
-              height: c.h(200),
-              boxSizing: "border-box",
-              border: `1.5px solid ${HAIRLINE}`,
-              borderRadius: 12,
-              padding: "24px 26px",
-              background: PAPER,
-              opacity: p,
-              transform: `translateY(${(1 - p) * 12}px)`,
-            }}
-          >
-            <div style={{ ...headline(38), color: INK, whiteSpace: "nowrap" }}>{card.name}</div>
-            <div style={{ ...note(24, INK_SOFT), marginTop: 18, opacity: ease(frame, card.at - 2, 12) }}>{card.text}</div>
-          </div>
-        );
-      })}
+      <div
+        style={{
+          position: "absolute",
+          left: R_X + 40,
+          top: c.y(416),
+          width: R_END - (R_X + 40),
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          opacity: p0 > 0 ? 1 : 0,
+        }}
+      >
+        {cards.map((card, k) => {
+          const p = ease(frame, at0 + k * 6, 14);
+          return (
+            <React.Fragment key={card.name}>
+              {k > 0 ? <FlexRule at={at0 + k * 6} /> : null}
+              <div style={{ opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
+                <div style={{ ...headline(38), color: INK, lineHeight: "44px", whiteSpace: "nowrap" }}>{card.name}</div>
+                <div style={{ ...note(24, INK_SOFT), lineHeight: "31px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, card.at - 2, 12) }}>{card.text}</div>
+              </div>
+            </React.Fragment>
+          );
+        })}
+      </div>
       <Note at={biAt - 2} x={R_X + 40} y={c.y(600)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
           all three are <b>BI</b> tools<span style={{ opacity: ease(frame, busAt - 2, 10) }}>: business intelligence</span>

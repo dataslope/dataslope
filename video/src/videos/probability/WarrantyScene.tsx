@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { normalPdf } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, fmt, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { BINOM, num, pct, WARRANTY } from "./data";
-import { Big, Count, DATA, Headline, Held, lerp, STAT_INK, Svg, Sweep, VBracket } from "./parts";
+import { Count, DATA, Headline, Held, lerp, Spot, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 const RIGHT = 1150;
 /** The closing band: three named shapes, small. */
@@ -106,6 +106,10 @@ export const WarrantyScene: React.FC = () => {
 
       <div style={{ opacity: 1 - dim }}>
         <Headline top={y(150)} first="An $80 warranty." second="Who comes out ahead?" firstAt={warrantyFrom - 6} secondAt={paysAt - 4} />
+        {/* The warranty itself, small, in the middle of the empty right half
+            while the outcomes are worked out on the left; it leaves before the
+            million sales take that half. */}
+        <Spot id="probability-warranty" at={eightyAt - 2} out={millionAt - 14} left={1395} top={y(434)} width={200} height={187} />
         {/* A list of outcomes rather than a chart, so a plain label, not a
             numbered figure. */}
         <Ink at={eightyAt - 6} dur={14} style={{ left: 160, top: y(268), whiteSpace: "nowrap" }}>
@@ -122,12 +126,13 @@ export const WarrantyScene: React.FC = () => {
         <VBracket x={190} y0={y(420)} y1={y(510)} at={failsAt - 6} color={INK_SOFT} right />
         {rows.map((r, i) => (
           <React.Fragment key={r.name}>
-            <Ink at={r.at} dur={14} style={{ left: 220, top: y(400 + i * 90), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-              <span style={{ ...note(28, INK), width: 210, display: "inline-block" }}>{r.name}</span>
-              <span style={{ ...headline(44), color: i === 0 ? STAT_INK : INK_SOFT, opacity: ease(frame, r.pAt, 10), width: 120, display: "inline-block" }}>
+            {/* One line, one size: the chance stands out by color and weight. */}
+            <Ink at={r.at} dur={14} style={{ left: 220, top: y(400 + i * 90), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18, ...note(28, INK) }}>
+              <span style={{ width: 210, display: "inline-block" }}>{r.name}</span>
+              <span style={{ color: i === 0 ? STAT_INK : INK_SOFT, fontWeight: 700, opacity: ease(frame, r.pAt, 10), width: 90, display: "inline-block" }}>
                 {pct(r.p)}
               </span>
-              <span style={{ ...note(26, INK_SOFT) }}>
+              <span style={{ color: INK_SOFT }}>
                 store pays <b style={{ color: INK }}>${num(r.pays)}</b>
               </span>
             </Ink>
@@ -144,17 +149,22 @@ export const WarrantyScene: React.FC = () => {
             </span>
           </span>
         </Ink>
-        <Ink at={keepAt - 4} dur={16} style={{ left: 160, top: y(652), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 20 }}>
+        <Ink at={keepAt - 4} dur={16} style={{ left: 160, top: y(652), whiteSpace: "nowrap" }}>
+          {/* One line, one size: the store's gain is the line's own Inter, in
+              the green it has on the right too, and bold. */}
           <span style={note(28, INK)}>
-            Expected profit = ${WARRANTY.price} − ${fmt(WARRANTY.ePayout, 0)} =
+            Expected profit = ${WARRANTY.price} − ${fmt(WARRANTY.ePayout, 0)} ={" "}
+            <span style={{ color: OK_INK, fontWeight: 700 }}>
+              <Sweep at={keepAt + 4}>${fmt(WARRANTY.eProfit, 0)}</Sweep>
+            </span>
           </span>
-          {/* The store's gain, in the green it has on the right too. */}
-          <Big size={84} color={OK_INK} italic>
-            ${fmt(WARRANTY.eProfit, 0)}
-          </Big>
         </Ink>
 
         </div>
+
+        {/* A hairline between the two columns, from their first line to the
+            last of the sums, inking in with the column on the right. */}
+        <div style={{ position: "absolute", left: 964, top: y(330), width: 1, height: y(652) - y(330) + 36, background: HAIRLINE, opacity: ease(frame, millionAt - 4, 14) }} />
 
         {/* ── A million in code ── */}
         <Ink at={millionAt - 4} dur={14} style={{ left: RIGHT, top: y(330), whiteSpace: "nowrap" }}>
@@ -166,26 +176,26 @@ export const WarrantyScene: React.FC = () => {
             average profit <b style={{ color: STAT_INK }}>${fmt(WARRANTY.simProfit)}</b>
           </span>
         </Ink>
-        <Ink at={storeAt - 4} dur={14} style={{ left: RIGHT, top: y(384), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
-          <span style={{ ...note(26, INK), width: 130, display: "inline-block" }}>The store</span>
-          <Big size={60} color={OK_INK}>
-            +${fmt(WARRANTY.eProfit, 0)}
-          </Big>
-          <span style={note(22, INK_SOFT)}>a warranty, on average</span>
+        {/* Each side's average on one line at one size, the amount in its
+            color and bold. */}
+        <Ink at={storeAt - 4} dur={14} style={{ left: RIGHT, top: y(392), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16, ...note(28, INK) }}>
+          <span style={{ width: 140, display: "inline-block" }}>The store</span>
+          <span style={{ color: OK_INK, fontWeight: 700, width: 76, display: "inline-block" }}>+${fmt(WARRANTY.eProfit, 0)}</span>
+          <span style={{ color: INK_SOFT }}>a warranty, on average</span>
         </Ink>
-        <Ink at={onAverageAt - 4} dur={14} style={{ left: RIGHT, top: y(452), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
-          <span style={{ ...note(26, INK), width: 130, display: "inline-block" }}>The buyer</span>
-          <Big size={60} color={STAT_INK}>
+        <Ink at={onAverageAt - 4} dur={14} style={{ left: RIGHT, top: y(448), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16, ...note(28, INK) }}>
+          <span style={{ width: 140, display: "inline-block" }}>The buyer</span>
+          <span style={{ color: STAT_INK, fontWeight: 700, width: 76, display: "inline-block" }}>
             <Sweep at={buyerAt - 2}>−${fmt(WARRANTY.eProfit, 0)}</Sweep>
-          </Big>
-          <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, buyerAt - 2, 10) }}>a losing bet</span>
+          </span>
+          <span style={{ color: INK_SOFT, opacity: ease(frame, buyerAt - 2, 10) }}>a losing bet</span>
         </Ink>
 
         {/* ── When the average isn't the whole story ── */}
-        <div style={{ position: "absolute", left: RIGHT, top: y(548), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
+        <div style={{ position: "absolute", left: RIGHT, top: y(528), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
           <Held at={anAverageAt - 4}>Faced many times,</Held> <Held at={manyAt - 2}>the average decides.</Held>
         </div>
-        <div style={{ position: "absolute", left: RIGHT, top: y(604), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
+        <div style={{ position: "absolute", left: RIGHT, top: y(584), whiteSpace: "nowrap", ...body(34, true), color: INK }}>
           <Held at={oneLossAt - 4}>Faced once, and ruinous,</Held>{" "}
           <Held at={spreadAt - 4}>
             <Sweep at={moreAt - 2}>the spread</Sweep> does.
@@ -197,7 +207,7 @@ export const WarrantyScene: React.FC = () => {
           style={{
             position: "absolute",
             left: RIGHT,
-            top: y(672),
+            top: y(652),
             display: "grid",
             gridTemplateColumns: "auto auto auto auto auto",
             columnGap: 16,
@@ -227,7 +237,7 @@ export const WarrantyScene: React.FC = () => {
           </Held>
           <Held at={oneLossAt + 20}>pay ${WARRANTY.price}</Held>
         </div>
-        <Note at={insuranceAt - 2} x={RIGHT} y={y(772)}>
+        <Note at={insuranceAt - 2} x={RIGHT} y={y(752)}>
           <span style={{ ...body(28), color: INK_SOFT, whiteSpace: "nowrap" }}>Insurance is paying to avoid the spread.</span>
         </Note>
       </div>

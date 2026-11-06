@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { body, fmt, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -20,6 +20,10 @@ const STACK_W = 170;
 const BLOCK = 34;
 const STACK_BASE = 860;
 
+/** The computer's view of the column, past the last chip by more than a
+ *  word's width, so the chip's code and the label never read as one line. */
+const DTYPE_X = 1504;
+
 const NAMES = ["1", "2", "3"].map((c) => FLAVORS.codes[c]);
 const chipX = (i: number) => CHIP_X + i * CHIP_PITCH;
 
@@ -31,6 +35,10 @@ const SLOTS = (() => {
     return { col, k: filled[col]++ };
   });
 })();
+
+/** The dtype's badge, gray, and the yellow it turns on "stored". */
+const DTYPE_BADGE = badgeStyle("gray", 22);
+const DTYPE_LIT = badgeStyle("yellow", 22);
 
 /**
  * Part 3 opens: favorite flavors stored as the codes 1, 2 and 3, a mean of
@@ -106,7 +114,7 @@ export const FlavorScene: React.FC = () => {
         ))}
       </div>
 
-      <Spot id="thinking-statistically-cones" at={creamAt - 6} left={1380} top={y(104)} width={400} height={260} />
+      <Spot id="thinking-statistically-cones" at={creamAt - 6} left={1580} top={y(150)} width={200} height={130} />
 
       <FigLabel n="6" title="Ten answers, as the survey stores them" at={tenAt - 6} x={160} y={y(380)} />
 
@@ -169,19 +177,16 @@ export const FlavorScene: React.FC = () => {
       })}
 
       {/* The computer's view of the column: integers, as pandas stores them. */}
-      <Ink at={computerAt - 4} dur={14} style={{ left: 1478, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
+      <Ink at={computerAt - 4} dur={14} style={{ left: DTYPE_X, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
         <div style={label(20, INK_SOFT)}>stored as whole numbers</div>
+        {/* A gray house badge that turns the highlighter's yellow on "stored". */}
         <div
           style={{
             marginTop: 8,
-            display: "inline-block",
-            padding: "2px 12px",
-            border: `1.5px solid ${HAIRLINE}`,
-            borderRadius: 14,
+            ...DTYPE_BADGE,
             fontFamily: MONO,
-            fontSize: 22,
-            color: INK_SOFT,
-            background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(stored * 100)}%, transparent)`,
+            background: `color-mix(in srgb, ${DTYPE_LIT.background} ${Math.round(stored * 100)}%, ${DTYPE_BADGE.background})`,
+            color: `color-mix(in srgb, ${DTYPE_LIT.color} ${Math.round(stored * 100)}%, ${DTYPE_BADGE.color})`,
           }}
         >
           {FLAVORS.dtype}
@@ -190,21 +195,24 @@ export const FlavorScene: React.FC = () => {
 
       {/* ── The mean of the codes ── */}
       <div style={{ position: "absolute", inset: 0, opacity: meanOp }}>
-      <Ink at={avgAt - 4} dur={14} style={{ left: 160, top: y(624), whiteSpace: "nowrap" }}>
-        <span style={label(22, INK_SOFT)}>Mean of the column</span>
-      </Ink>
+      {/* The label, and on "The math ran fine" the sum it did, in full: one
+          line at one size, above the mean it gives. */}
+      <div style={{ position: "absolute", left: 160, top: y(624), display: "flex", alignItems: "baseline", gap: 28, whiteSpace: "nowrap" }}>
+        <Ink at={avgAt - 4} dur={14} style={{ position: "relative" }}>
+          <span style={label(22, INK_SOFT)}>Mean of the column</span>
+        </Ink>
+        <Ink at={mathAt - 2} dur={26} out={honestAt - 2} style={{ position: "relative" }}>
+          <span style={{ fontFamily: MONO, fontSize: 22, color: INK }}>
+            ({FLAVORS.answers.join(" + ")}) ÷ {FLAVORS.answers.length}
+          </span>
+        </Ink>
+      </div>
       <Ink at={eightAt - 6} dur={16} style={{ left: 156, top: y(660), ...headline(140), color: STAT_INK, whiteSpace: "nowrap" }}>
         <Strike at={noAt}>{mean}</Strike>
       </Ink>
       <Note at={noAt + 6} x={160} y={y(826)}>
         <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>names no flavor at all</span>
       </Note>
-      {/* "The math ran fine": the sum it did, in full. */}
-      <Ink at={mathAt - 2} dur={26} out={honestAt - 2} style={{ left: 384, top: y(706), whiteSpace: "nowrap" }}>
-        <span style={{ fontFamily: MONO, fontSize: 25, color: INK }}>
-          ({FLAVORS.answers.join(" + ")}) ÷ {FLAVORS.answers.length}
-        </span>
-      </Ink>
       </div>
 
       {/* ── The tally ── */}

@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { HYBRID } from "./data";
-import { Drift, head, madeUp, Mark, MARK_OK, math, OK, OK_INK, QUIET, X0 } from "./parts";
+import { Drift, head, madeUp, Mark, MARK_OK, math, OK_INK, QUIET, X0 } from "./parts";
 
 const COLS = [X0, 700, 1290];
 const COL_W = 540;
@@ -50,8 +50,9 @@ const Row: React.FC<{ x: number; y: number; rank: number; id: string; at: number
         display: "flex",
         alignItems: "center",
         gap: 12,
-        background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * l * (1 - g)}%, color-mix(in srgb, ${OK} ${16 * g}%, ${PAPER}))`,
-        border: `2px solid color-mix(in srgb, ${OK} ${100 * g}%, transparent)`,
+        // A highlight behind the row, never an outline: yellow while the
+        // narration is on it, green once it is the right answer.
+        background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * l * (1 - g)}%, color-mix(in srgb, ${MARK_OK} ${100 * g}%, transparent))`,
         opacity: p,
         transform: `translateX(${(1 - p) * -10}px)`,
       }}
@@ -149,21 +150,26 @@ export const HybridScene: React.FC = () => {
         <Note at={setupAt} x={X0} y={y(312)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             search the tickets for{" "}
+            {/* The query as a house badge in the mono face; the highlighter's
+                yellow lays over its tint while the search is said. */}
             <span
               style={{
+                ...badgeStyle("gray", 25),
                 fontFamily: MONO,
-                fontWeight: 700,
-                padding: "2px 10px",
-                border: `2px solid ${INK}`,
-                borderRadius: 8,
+                fontSize: 23,
                 fontVariantLigatures: "none",
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * ease(frame, searchAt, 10) * (1 - ease(frame, fourthAt, 12))}%, ${PAPER})`,
+                background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * ease(frame, searchAt, 10) * (1 - ease(frame, fourthAt, 12))}%, ${badgeStyle("gray").background})`,
               }}
             >
               {HYBRID.query}
             </span>
-            <span style={{ ...madeUp(19), marginLeft: 22 }}>tickets and the vector ranking made up; BM25 run on them</span>
           </span>
+        </Note>
+
+        {/* Where the figure's data comes from, set apart at the right
+            margin rather than run on from the search in a smaller size. */}
+        <Note at={setupAt} x={COLS[2] - 8 + COL_W} y={y(312) + 4} align="right">
+          <span style={madeUp(19)}>tickets and the vector ranking made up; BM25 run on them</span>
         </Note>
 
         {/* The vector side. */}
@@ -180,6 +186,24 @@ export const HybridScene: React.FC = () => {
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>1 to 3: tickets about errors in general</span>
         </Note>
 
+        {/* The three rankings side by side: a hairline centred in each gap,
+            from the heads to the notes under them, inking in with the
+            column to its right. */}
+        {[1, 2].map((c) => (
+          <div
+            key={c}
+            style={{
+              position: "absolute",
+              left: (COLS[c - 1] - 8 + COL_W + COLS[c] - 8) / 2,
+              top: y(LIST_TOP) - 44,
+              width: 1,
+              height: rowY(5) + 130 - (y(LIST_TOP) - 44),
+              background: HAIRLINE,
+              opacity: ease(frame, setupAt + 4 + 4 * c, 14),
+            }}
+          />
+        ))}
+
         {/* The keyword side. */}
         <Note at={setupAt + 8} x={COLS[1]} y={y(LIST_TOP) - 44}>
           <span style={head(22, headInk(INK, addsAt))}>
@@ -192,7 +216,8 @@ export const HybridScene: React.FC = () => {
         <Note at={tfidfAt - 2} x={COLS[1]} y={rowY(5) + 24}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
             like TF-IDF&apos;s{" "}
-            <span style={{ ...math(24, INK), fontWeight: 500 }}>
+            {/* The formula in the line's own face and size: one line, one face. */}
+            <span style={{ ...note(22, INK), fontWeight: 500 }}>
               idf = ln(<i>N</i> / <i>df</i>)
             </span>
           </span>
@@ -236,8 +261,8 @@ export const HybridScene: React.FC = () => {
         <Note at={sixtyAt - 2} x={COLS[2]} y={rowY(3) + 6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             each list gives{" "}
-            <span style={{ ...math(25, INK) }}>
-              1 / ({HYBRID.k} + rank)
+            <span style={{ ...note(23, INK), ...TABULAR }}>
+              1 / ({HYBRID.k} + <i>rank</i>)
             </span>
             <span style={{ opacity: ease(frame, summedAt - 2, 10) }}>, summed</span>
           </span>
@@ -253,7 +278,7 @@ export const HybridScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, cheapAt - 4, 10) }}>
           <line x1={X0} x2={1800} y1={y(850)} y2={y(850)} stroke={HAIRLINE} />
         </svg>
-        <Note at={cheapAt} x={X0} y={y(850) + 18}>
+        <Note at={cheapAt} x={X0} y={y(850) + 29}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             cheap to add
             <span style={{ opacity: ease(frame, helpsAt - 2, 10) }}>, and it usually helps on technical content</span>

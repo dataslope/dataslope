@@ -2,7 +2,8 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { ACCENT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { OK_INK, Tick } from "../../editorial/interview";
+import { ACCENT_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { ds } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -10,10 +11,10 @@ import { ILLUSTRATIONS, VIDEO } from "./data";
  * Pieces this video needs beyond the editorial kit and the interview kit
  * (editorial/interview.tsx). The page furniture and the plotting pieces come
  * from the Data Analyst statistics part, the bridge's clear and the fraction
- * from the probability part, and the chip, step and made-up label from the
- * product-sense part, so the series stays one family. What is new is this
- * round's own material: a model's reply on a card, and a hundred graded
- * items as a grid.
+ * from the probability part, and the tag and step (house badges) and the
+ * made-up label from the product-sense part, so the series stays one family. What is new is this
+ * round's own material: a model's reply, and a hundred graded items as a
+ * grid.
  */
 export {
   at,
@@ -35,7 +36,8 @@ export {
   X0,
 } from "../da-statistics-communication/parts";
 export { Clear, Frac, math } from "../ds-probability/parts";
-export { BAD, Chip, DATA, DATA_LIGHT, madeUp, Step } from "../ds-product-sense/parts";
+export { BAD, DATA, DATA_LIGHT, madeUp } from "../ds-product-sense/parts";
+export { Step, Tag } from "../ds-product-sense/badges";
 
 /** The paper-grey of what the narration has moved past. */
 export const QUIET = ds("blue", 100);
@@ -74,28 +76,28 @@ export const Spot: React.FC<{
 };
 
 /**
- * A model's reply on a card: a small heading ("Run 1"), the reply in the
- * text face, and a border in `ink`. `verdict` inks the card in on its own
- * frame: green for the reply that matches, red for the one that doesn't.
+ * A model's reply as plain text: a small heading ("Run 1") and the reply in
+ * the text face, no box around them. `verdict` colors the heading on its own
+ * frame, with a tick beside it for the reply that matches and a cross for
+ * the one that doesn't: green right, red wrong.
  */
-export const ReplyCard: React.FC<{
+export const Reply: React.FC<{
   x: number;
   y: number;
   width: number;
   at: number;
   title: string;
-  ink?: string;
   verdict?: { at: number; ok: boolean };
   dim?: number;
   size?: number;
   children: React.ReactNode;
-}> = ({ x, y, width, at: from, title, ink = INK_SOFT, verdict, dim, size = 27, children }) => {
+}> = ({ x, y, width, at: from, title, verdict, dim, size = 27, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 14);
   const v = verdict ? ease(frame, verdict.at, 12) : 0;
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
   if (p <= 0) return null;
-  const tone = verdict ? (verdict.ok ? ds("green", 600) : ACCENT) : ink;
+  const tone = verdict ? (verdict.ok ? OK_INK : ACCENT_INK) : INK_SOFT;
   return (
     <div
       style={{
@@ -103,16 +105,20 @@ export const ReplyCard: React.FC<{
         left: x,
         top: y,
         width,
-        boxSizing: "border-box",
-        padding: "18px 24px 20px",
-        borderRadius: 14,
-        border: `2.2px solid color-mix(in srgb, ${tone} ${30 + 70 * v}%, ${ink})`,
-        background: `color-mix(in srgb, ${tone} ${8 * v}%, ${PAPER})`,
         opacity: p * (1 - d),
         transform: `translateY(${(1 - p) * 14}px)`,
       }}
     >
-      <div style={{ ...label(19, INK_SOFT), fontWeight: 700, marginBottom: 8 }}>{title}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, height: 26, marginBottom: 10 }}>
+        <span style={{ ...label(21, `color-mix(in srgb, ${tone} ${100 * v}%, ${INK_SOFT})`), fontWeight: 700 }}>{title}</span>
+        {verdict && v > 0 ? (
+          verdict.ok ? (
+            <Tick at={verdict.at} size={24} />
+          ) : (
+            <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, opacity: v }}>✕</span>
+          )
+        ) : null}
+      </div>
       <div style={{ ...note(size, INK), lineHeight: 1.35 }}>{children}</div>
     </div>
   );

@@ -2,10 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { BAR, BLUE_INK, body, INK, INK_SOFT, note, PAPER } from "../../editorial/style";
+import { Badge, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { HERO } from "./data";
 import { Drift, Headline, Kicker, OK_INK, Spot, X0 } from "./parts";
 
@@ -55,7 +56,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-chime" at={fifteenAt} level={-35} />
 
       <Drift from={0} to={end + 30}>
-        <Kicker at={startAt}>Data engineer interview prep · Data modeling I</Kicker>
+        <Kicker at={startAt}>Data engineer interview questions · Data modeling I</Kicker>
         <Headline lead="Tables shaped" turn="for the question." at={startAt + 2} turnAt={shapedAt - 2} size={72} />
         <Spot id={HERO.id} at={starAt - 4} left={1180} top={y(300)} width={HERO_W} height={HERO_H} />
 
@@ -80,25 +81,15 @@ export const HookScene: React.FC = () => {
             <span style={{ ...note(30, INK) }}>small tables around it, that say</span>
           </span>
         </Note>
+        {/* The four words as the house's badges, each popping in as it is
+            said. */}
         <div style={{ position: "absolute", left: X0 + 48, top: y(LIST_Y + 206), display: "flex", gap: 16 }}>
           {words.map((w) => {
-            const p = pop(frame, w.at - 2, fps, 14);
+            const p = Math.min(1, pop(frame, w.at - 2, fps, 14));
             return (
-              <span
-                key={w.w}
-                style={{
-                  ...label(26, BLUE_INK),
-                  fontWeight: 700,
-                  padding: "4px 16px 6px",
-                  border: `2px solid ${BAR}`,
-                  borderRadius: 999,
-                  background: PAPER,
-                  opacity: Math.min(1, p),
-                  transform: `scale(${0.7 + 0.3 * Math.min(1, p)})`,
-                }}
-              >
+              <Badge key={w.w} tone="blue" size={26} style={{ fontFamily: SANS, opacity: p, transform: `scale(${0.7 + 0.3 * p})` }}>
                 {w.w}
-              </span>
+              </Badge>
             );
           })}
         </div>

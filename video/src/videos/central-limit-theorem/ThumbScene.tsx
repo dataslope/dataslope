@@ -167,7 +167,8 @@ export const ThumbScene: React.FC = () => {
         return (
           <React.Fragment key={r.letter}>
             <Ink at={c.at - 6} dur={14} style={{ left: X0, top: y(r.top), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(19, ACCENT_INK), marginRight: 12 }}>{r.letter}</span>
+              {/* The row's letter in the title's face and size, in the accent. */}
+              <span style={{ ...body(28, true), color: ACCENT_INK, marginRight: "0.4em" }}>{r.letter}</span>
               <span style={{ ...body(28, true), color: INK }}>{r.title}</span>
             </Ink>
             {r.off > 0 ? (

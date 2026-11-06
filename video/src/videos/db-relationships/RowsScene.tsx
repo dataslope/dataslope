@@ -175,8 +175,10 @@ export const RowsScene: React.FC = () => {
         >
           places
         </div>
-        <Query x={b[0] - 34} y={lineY - 36} at={questionAt} out={oneCustAt - 6} />
-        <Query x={a[0] + 34} y={lineY - 36} at={questionAt + 5} out={oneOrderAt - 6} />
+        {/* Each mark of the question stands off its box far enough to read as
+            the line's end, not as a word in the box's key row. */}
+        <Query x={b[0] - 52} y={lineY - 36} at={questionAt} out={oneCustAt - 6} />
+        <Query x={a[0] + 52} y={lineY - 36} at={questionAt + 5} out={oneOrderAt - 6} />
 
         {/* One customer: how many orders? Asked at the orders end. */}
         <Ink at={oneCustAt - 4} dur={14} style={{ left: b[0] - 324, top: noteY, width: 300, textAlign: "right", whiteSpace: "nowrap" }}>

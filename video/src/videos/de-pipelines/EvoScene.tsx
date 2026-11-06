@@ -4,8 +4,8 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { Badge, badgeStyle, Note } from "../../editorial/ui";
+import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { EVO, splitError } from "./data";
@@ -35,20 +35,7 @@ const FileRow: React.FC<{
   if (p <= 0 || o >= 1) return null;
   return (
     <div style={{ position: "absolute", left: X0, top: y, display: "flex", alignItems: "center", gap: 18, opacity: p * (1 - o), transform: `translateX(${(1 - p) * -14}px)` }}>
-      <span
-        style={{
-          fontFamily: MONO,
-          fontSize: 22,
-          fontWeight: 700,
-          color: INK,
-          padding: "6px 12px",
-          border: `2px solid ${INK}`,
-          borderRadius: 6,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {name}
-      </span>
+      <span style={{ ...badgeStyle("gray", 22), fontFamily: MONO, fontVariantLigatures: "none" }}>{name}</span>
       <span style={{ position: "relative", display: "flex", gap: 14, fontFamily: MONO, fontSize: 21, whiteSpace: "nowrap" }}>
         <span style={{ position: "absolute", inset: "-4px -8px", background: HIGHLIGHT, borderRadius: 4, opacity: m, clipPath: `inset(0 ${(1 - m) * 100}% 0 0)` }} />
         {cols.map((c) => (
@@ -189,13 +176,13 @@ export const EvoScene: React.FC = () => {
         <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} size={60}>
           What is schema evolution, and how do Parquet and Avro handle it?
         </QuestionCard>
-        <Note at={defAt} x={X0} y={y(296)}>
+        <Note at={defAt} x={X0} y={y(282)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 12 }}>
             Changing a schema without breaking readers or rewriting old data:
             {kinds.map((k) => (
-              <span key={k.text} style={{ ...label(22, BLUE_INK), fontWeight: 700, padding: "2px 10px", border: `2px solid ${BAR}`, borderRadius: 8, opacity: ease(frame, k.at, 8) }}>
+              <Badge key={k.text} tone="blue" size={26} style={{ fontFamily: SANS, opacity: ease(frame, k.at, 8) }}>
                 {k.text}
-              </span>
+              </Badge>
             ))}
           </span>
         </Note>
@@ -281,9 +268,9 @@ export const EvoScene: React.FC = () => {
           <span style={{ display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap" }}>
             <span style={{ ...label(22, INK_SOFT), fontWeight: 650 }}>A reader resolves the writer's schema:</span>
             {resolve.map((r) => (
-              <span key={r.text} style={{ ...label(21, INK), fontWeight: 650, padding: "4px 12px 5px", border: `2px solid ${INK}`, borderRadius: 8, opacity: ease(frame, r.at, 10) }}>
+              <Badge key={r.text} tone="gray" size={22} style={{ fontFamily: SANS, opacity: ease(frame, r.at, 10) }}>
                 {r.text}
-              </span>
+              </Badge>
             ))}
           </span>
         </Note>
@@ -329,7 +316,7 @@ export const EvoScene: React.FC = () => {
             <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 2 }}>
               {r.text}
               {r.reader ? (
-                <span style={{ ...label(20, INK_SOFT), marginLeft: 14 }}>
+                <span style={{ ...label(21, INK_SOFT), marginLeft: 14 }}>
                   ({r.reader} reader, {r.data} data)
                 </span>
               ) : null}
@@ -338,13 +325,13 @@ export const EvoScene: React.FC = () => {
         ))}
 
         {/* The verdict on v2's coupon. */}
-        <Pill x={X0} y={AY + h(318)} at={passesAt} tone="ok" size={22}>
+        <Pill x={X0} y={AY + h(330)} at={passesAt} tone="ok" size={22}>
           coupon with a default: passes all three
         </Pill>
-        <Note at={failsBackAt} x={X0} y={AY + h(370)}>
+        <Note at={failsBackAt} x={X0} y={AY + h(382)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>no default: fails backward, so fails full</span>
         </Note>
-        <Pill x={X0} y={AY + h(428)} at={suitsAt} tone="ok" size={23} solid>
+        <Pill x={X0} y={AY + h(438)} at={suitsAt} tone="ok" size={23} solid>
           many services that must agree on one schema
         </Pill>
       </Drift>

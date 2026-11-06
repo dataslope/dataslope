@@ -111,12 +111,15 @@ export const AdmitScene: React.FC = () => {
         ]}
       />
       <Note at={from - 4} x={92} y={y(176)}>
-        <span style={{ ...body(52, true), color: INK, whiteSpace: "nowrap", opacity: 1 - ease(frame, bothAt - 10, 8) }}>
+        {/* The question and its source as one line in one face, the source a
+            size down and in the soft ink: a 24px Inter note on the line of a
+            52px serif question read as two things. */}
+        <span style={{ ...body(46, true), color: INK, whiteSpace: "nowrap", opacity: 1 - ease(frame, bothAt - 10, 8) }}>
           Who gets in?
-          <span style={{ ...label(24, INK_SOFT), marginLeft: 24, opacity: ease(frame, yearAt - 2, 10) }}>
+          <span style={{ ...body(42, true), color: INK_SOFT, marginLeft: 24, opacity: ease(frame, yearAt - 2, 10) }}>
             The famous case: Berkeley, 1973.
           </span>
-          <span style={{ ...label(24, INK), marginLeft: 10, opacity: ease(frame, madeUpAt - 2, 10) }}>These numbers are made up.</span>
+          <span style={{ ...body(42, true), color: INK, marginLeft: 10, opacity: ease(frame, madeUpAt - 2, 10) }}>These numbers are made up.</span>
         </span>
       </Note>
 
@@ -269,7 +272,7 @@ export const AdmitScene: React.FC = () => {
               <Note at={r.gapAt} x={GAP_X} y={cy - 19}>
                 <span
                   style={{
-                    ...note(28, GROUP_INK[lead]),
+                    ...note(26, GROUP_INK[lead]),
                     fontWeight: 650,
                     padding: "0 8px",
                     marginLeft: -8,
@@ -278,7 +281,8 @@ export const AdmitScene: React.FC = () => {
                 >
                   {signed(gap)}
                 </span>
-                <span style={{ ...note(20, INK_SOFT), marginLeft: 8 }}>points</span>
+                {/* Within a size of the number it follows, so the two read as one line. */}
+                <span style={{ ...note(24, INK_SOFT), marginLeft: 8 }}>points</span>
               </Note>
               {i > 0 ? <Ring x={px(r.cells.women.rate)} y={cy} at={r.gapAt - 2} color={GROUP_COLOR.women} r0={radius(r.cells.women.applied)} r1={radius(r.cells.women.applied) + 40} /> : null}
               {i === 0 ? <Ring x={px(POOLED.women.rate)} y={cy} at={behindAt} color={GROUP_COLOR.women} r0={radius(POOLED.women.applied)} r1={radius(POOLED.women.applied) + 40} /> : null}
@@ -286,24 +290,6 @@ export const AdmitScene: React.FC = () => {
           );
         })}
 
-        {/* The lurking variable, boxed as it is named. */}
-        {ease(frame, deptAt - 4, 14) > 0 ? (
-          <Svg>
-            <rect
-              x={140}
-              y={rowY(1) - 56}
-              width={260}
-              height={rowY(2) - rowY(1) + 110}
-              rx={10}
-              fill="none"
-              stroke={INK}
-              strokeWidth={2.6}
-              pathLength={1}
-              strokeDasharray={`${ease(frame, deptAt - 4, 14)} 1`}
-              opacity={1 - ease(frame, totalAt - 6, 12)}
-            />
-          </Svg>
-        ) : null}
 
         {/* What the narration is reading, ringed as it is read. */}
         <Ring x={px(POOLED.women.rate)} y={rowY(0)} at={womenWordAt - 2} color={GROUP_COLOR.women} r0={radius(700)} r1={radius(700) + 44} />

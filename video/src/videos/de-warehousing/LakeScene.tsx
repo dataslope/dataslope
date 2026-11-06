@@ -14,6 +14,8 @@ import { COLUMN_TINT, Drift, OK, OK_INK, READ, Spot, X0 } from "./parts";
 const TOP = 296;
 const PANEL_W = 520;
 const PANEL_GAP = 60;
+/** Room between a column's top rule and its title (set 12px under TOP). */
+const RULE_GAP = 32;
 const BOX_Y = 396;
 const BOX_H = 196;
 const NOTES_Y = 614;
@@ -54,7 +56,7 @@ const FileChip: React.FC<{ x: number; y: number; name: string; at: number; lit?:
 };
 
 /**
- * Question 9 (and the Pipelines page's lakehouse question). Three panels: a
+ * Question 9 (and the Pipelines page's lakehouse question). Three columns: a
  * warehouse (its own managed storage, tuned for SQL), a lake (open files in
  * a bucket, with no transactions or schema enforcement), and a lakehouse:
  * the same kind of bucket under a transaction log, whose commits say which
@@ -114,7 +116,9 @@ export const LakeScene: React.FC = () => {
 
   const title = (i: number, at: number, text: string, sub: React.ReactNode, subAt: number) => (
     <div style={{ position: "absolute", left: px(i), top: y(TOP), opacity: ease(frame, at, 12) }}>
-      <div style={{ position: "absolute", left: 0, top: 0, width: PANEL_W, height: 2, background: INK }} />
+      {/* The column's own rule, with 32px of room under it: it groups the
+          column, so no hairline runs between them. */}
+      <div style={{ position: "absolute", left: 0, top: 12 - RULE_GAP - 2, width: PANEL_W, height: 2, background: INK }} />
       <div style={{ position: "absolute", left: 0, top: 12, ...headline(42), whiteSpace: "nowrap" }}>{text}</div>
       <div style={{ position: "absolute", left: 0, top: 64, ...label(20, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, subAt, 10) }}>{sub}</div>
     </div>

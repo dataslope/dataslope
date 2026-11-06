@@ -120,7 +120,7 @@ const COLUMNS: { id: string; props: LogoRevealProps }[] = [
     text: "blur",
     textInk: "black",
     divider: "blue",
-    course: "Interview prep, twelve parts",
+    course: "Interview questions, twelve parts",
     unit: "",
     title: "Data Engineer",
   }),

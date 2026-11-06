@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CUSTOMERS, F, FLAT, JOINED, MUG, ORDERS, PRODUCTS, SPLIT_TAGS } from "./data";
@@ -287,23 +287,25 @@ export const HomeScene: React.FC = () => {
  * a wash and an outline, with what it asks for set under it, so lighting it
  * moves nothing beside it.
  */
+const STEP_BADGE = badgeStyle("blue", 26);
+
 const Step: React.FC<{ name: string; litAt?: number }> = ({ name, litAt }) => {
   const frame = useCurrentFrame();
   const lit = litAt === undefined ? 0 : ease(frame, litAt - 2, 12);
   return (
+    // Plain until it is lit, then a blue house badge: the tint fades in.
     <span
       style={{
+        ...label(26),
+        ...STEP_BADGE,
         position: "relative",
-        display: "inline-block",
-        padding: "2px 12px",
-        borderRadius: 6,
-        border: `1.5px solid color-mix(in srgb, ${INK} ${Math.round(lit * 100)}%, transparent)`,
-        background: `color-mix(in srgb, ${BAR} ${Math.round(lit * 14)}%, transparent)`,
+        background: `color-mix(in srgb, ${STEP_BADGE.background} ${Math.round(lit * 100)}%, transparent)`,
+        color: lit > 0 ? STEP_BADGE.color : INK,
       }}
     >
-      <span style={{ ...label(26, lit > 0 ? BLUE_INK : INK), fontWeight: 700 }}>{name}</span>
+      {name}
       {litAt !== undefined ? (
-        <span style={{ position: "absolute", left: 12, top: "100%", marginTop: 10, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: lit }}>
+        <span style={{ position: "absolute", left: 14, top: "100%", marginTop: 10, fontWeight: 400, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: lit }}>
           one value per cell
         </span>
       ) : null}

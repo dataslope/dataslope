@@ -4,7 +4,7 @@ import { arrowHead, type Cubic, cubicPath, lineLength, roundedPolyline, sampleCu
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { ACCENT, BAR, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import type { Pt } from "../../editorial/ui";
+import { badgeStyle, type BadgeTone, type Pt } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import { DEPT_COLOR, DEPT_INK, type Dept, ILLUSTRATIONS, type Row, VIDEO } from "./data";
@@ -38,6 +38,17 @@ export {
   Svg,
   X0,
 } from "../da-pandas/parts";
+
+/**
+ * Code inside a line of type: the interview kit's QMono, but at 0.92em, so
+ * it stays within the 12% a line's sizes may differ by (README, "One line,
+ * one size, one family"); never under 19px.
+ */
+export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
 
 /** The index of the listing line that holds `text` (ds-sql's rule: find a
  *  highlight's line by what it says, never by a number). */
@@ -122,7 +133,7 @@ const numText: React.CSSProperties = { ...note(25, INK), fontWeight: 540, lineHe
 /** One row of the frame: its index, its department and its salary. */
 export const RowCard: React.FC<{ row: Row; pose: Pose; width: number; height: number }> = ({ row, pose, width, height }) => (
   <div style={cardBox(row.dept, pose, width, height)}>
-    <span style={{ fontFamily: MONO, fontSize: 20, color: INK_SOFT, width: 40, textAlign: "right", paddingRight: 4, boxSizing: "border-box" }}>
+    <span style={{ fontFamily: MONO, fontSize: 21, color: INK_SOFT, width: 40, textAlign: "right", paddingRight: 4, boxSizing: "border-box" }}>
       {row.index}
     </span>
     <span style={{ ...deptText(row.dept), width: 100, paddingLeft: 14, boxSizing: "border-box" }}>{row.dept}</span>
@@ -408,23 +419,22 @@ export const Elbow: React.FC<{
   );
 };
 
-/** A small rounded tag: a word set in its own ink on a wash of it. */
-export const Chip: React.FC<{ children: React.ReactNode; color?: string; ink?: string; size?: number; mono?: boolean }> = ({
+/**
+ * A small tag: a word or a value as the house badge (`badgeStyle`), a light
+ * tint of its hue in that hue's ink, no border. `size` is the line's text
+ * size; code is set in the mono face at 0.92 of it, which reads the same
+ * size, and never under 19px.
+ */
+export const Chip: React.FC<{ children: React.ReactNode; tone?: BadgeTone; size?: number; mono?: boolean }> = ({
   children,
-  color = BAR,
-  ink = INK,
+  tone = "blue",
   size = 22,
   mono = false,
 }) => (
   <span
     style={{
-      display: "inline-block",
-      padding: "4px 12px",
-      borderRadius: 6,
-      background: `color-mix(in srgb, ${color} 14%, ${PAPER})`,
-      border: `1.5px solid color-mix(in srgb, ${color} 60%, ${PAPER})`,
-      ...(mono ? { fontFamily: MONO, fontSize: size * 0.92, fontWeight: 600, color: ink, fontVariantLigatures: "none" } : { ...label(size, ink), fontWeight: 600 }),
-      whiteSpace: "nowrap",
+      ...badgeStyle(tone, size),
+      ...(mono ? { fontFamily: MONO, fontSize: Math.max(19, size * 0.92), fontWeight: 600, fontVariantLigatures: "none" } : { fontFamily: SANS }),
     }}
   >
     {children}

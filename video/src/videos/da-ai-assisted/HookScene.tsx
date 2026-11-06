@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -21,7 +21,8 @@ const BUG_LINE = 3;
  * an assistant's January query, with the BETWEEN filter the page describes,
  * arrives line by line as if typed into a chat, then the narration's turn ("whether it's right") puts a question
  * mark against the BETWEEN line that question 3 takes apart. The split of
- * the round is two plain pills under it.
+ * the round is two badges under it, in the data's blue: the six in full on
+ * the house tint, the three short on a lighter one.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -46,9 +47,11 @@ export const HookScene: React.FC = () => {
   const pillsY = y(TOP) + h(34) + listH + h(36);
   const dim = ease(frame, firstAt, 14) * 0.5;
 
-  const pills = [
-    { at: sixAt, text: "6 in full", fill: BAR, ink: PAPER },
-    { at: threeAt, text: "3 short", fill: ds("blue", 100), ink: INK },
+  // The round's split, two badges after "9 questions:": the short ones on a
+  // lighter tint, where the original pills set them on a paler fill.
+  const split = [
+    { at: sixAt, text: "6 in full", tint: undefined },
+    { at: threeAt, text: "3 short", tint: `color-mix(in srgb, ${ds("blue", 400)} 11%, transparent)` },
   ];
 
   return (
@@ -59,7 +62,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pop" at={threeAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data analyst interview prep</Kicker>
+        <Kicker at={from}>Data analyst interview questions</Kicker>
         <Headline lead="The assistant writes it." turn="Can you check it?" at={from + 4} turnAt={rightAt - 4} size={68} />
 
         <Spot id="da-ai-assisted-owl" at={from + 6} left={1150} top={y(290)} width={640} height={460} />
@@ -83,33 +86,28 @@ export const HookScene: React.FC = () => {
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>right?</span>
         </Note>
 
-        {/* ── Nine questions: six in full, three short ── */}
+        {/* ── Nine questions: six in full, three short, as two badges ── */}
         <Note at={nineAt - 2} x={X0} y={pillsY} dim={firstAt + 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>9 questions:</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16, ...TABULAR }}>
+            9 questions:
+            {split.map((p) => {
+              const q = ease(frame, p.at - 2, 12);
+              return (
+                <span
+                  key={p.text}
+                  style={{
+                    ...badgeStyle("blue", 28),
+                    ...(p.tint ? { background: p.tint } : {}),
+                    opacity: q,
+                    transform: `scale(${0.9 + 0.1 * q})`,
+                  }}
+                >
+                  {p.text}
+                </span>
+              );
+            })}
+          </span>
         </Note>
-        {pills.map((p, i) => {
-          const q = ease(frame, p.at - 2, 12);
-          return (
-            <div
-              key={p.text}
-              style={{
-                position: "absolute",
-                left: X0 + 190 + i * 180,
-                top: pillsY - 4,
-                padding: "6px 18px",
-                borderRadius: 999,
-                background: p.fill,
-                color: p.ink,
-                ...label(24, p.ink),
-                whiteSpace: "nowrap",
-                opacity: q * (1 - ease(frame, firstAt + 4, 14) * 0.5),
-                transform: `scale(${0.9 + 0.1 * q})`,
-              }}
-            >
-              {p.text}
-            </div>
-          );
-        })}
       </Drift>
     </AbsoluteFill>
   );

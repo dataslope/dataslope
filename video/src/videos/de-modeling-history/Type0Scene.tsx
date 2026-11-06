@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -15,6 +15,9 @@ const TOP = 330;
 const SIZE = 23;
 const TABLE_X = 1100;
 const ROWS = { headH: 40, rowH: 46, bodySize: 24, headSize: 20 } as const;
+/** The space between two of the row's columns, a hairline centred in it:
+ *  40px of clear page either side of the rule. */
+const COL_GAP = 80;
 
 /**
  * Question 3. Type 0 as the page puts it, insert once: two loads of customer
@@ -177,43 +180,38 @@ export const Type0Scene: React.FC = () => {
         </Note>
 
         {/* Types are per column: one row, each column with its own. */}
-        <Note at={perAt} x={X0} y={stripY - h(54)}>
+        <Note at={perAt} x={X0} y={stripY - h(42)}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>one customer row, a type per column</span>
         </Note>
-        <div style={{ position: "absolute", left: X0, top: stripY, display: "flex", gap: 18 }}>
-          {columns.map((c) => {
+        {/* Three columns of plain text, a column's name over its type,
+            with a hairline in each gap that inks in with the column to its
+            right. */}
+        <div style={{ position: "absolute", left: X0, top: stripY, display: "flex", alignItems: "stretch" }}>
+          {columns.map((c, i) => {
             const p = ease(frame, c.at, 12);
             const lit = c.lit === undefined ? 0 : ease(frame, c.lit, 10);
             return (
-              <div
-                key={c.name}
-                style={{
-                  opacity: p,
-                  transform: `translateY(${(1 - p) * 10}px)`,
-                  border: `2px solid ${INK}`,
-                  borderRadius: 8,
-                  background: PAPER,
-                  padding: "12px 20px 14px",
-                  minWidth: 200,
-                }}
-              >
-                <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>{c.name}</div>
-                <div style={{ marginTop: 6 }}>
-                  <span
-                    style={{
-                      ...label(21, INK),
-                      fontWeight: 700,
-                      whiteSpace: "nowrap",
-                      padding: "1px 6px",
-                      margin: "0 -6px",
-                      borderRadius: 4,
-                      background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${lit * 100}%, transparent)` : undefined,
-                    }}
-                  >
-                    {c.type}
-                  </span>
+              <React.Fragment key={c.name}>
+                {i ? <div style={{ width: 1, margin: `0 ${COL_GAP / 2}px`, background: HAIRLINE, opacity: p }} /> : null}
+                <div style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
+                  <div style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK, lineHeight: 1.25, whiteSpace: "nowrap" }}>{c.name}</div>
+                  <div style={{ marginTop: 12 }}>
+                    <span
+                      style={{
+                        ...label(21, INK),
+                        fontWeight: 700,
+                        whiteSpace: "nowrap",
+                        padding: "1px 6px",
+                        margin: "0 -6px",
+                        borderRadius: 4,
+                        background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${lit * 100}%, transparent)` : undefined,
+                      }}
+                    >
+                      {c.type}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              </React.Fragment>
             );
           })}
         </div>

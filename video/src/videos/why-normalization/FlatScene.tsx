@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { F, FLAT_COLS, FLAT_ROWS, ILLUSTRATIONS, VIDEO } from "./data";
@@ -29,7 +29,10 @@ const ANOMALIES = [
   { name: "Deletion anomaly", gist: "Delete the order, lose the customer." },
 ] as const;
 const ROADMAP_Y = 680;
+/** Each anomaly's column: the original even step, no rules between them. */
 const ROADMAP_STEP = 560;
+/** Space between each column's short top rule and its name. */
+const RULE_GAP = 32;
 
 /**
  * Hook, copies and traps: the shop's one wide table, Ada's email on two of
@@ -99,6 +102,9 @@ export const FlatScene: React.FC = () => {
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Ada&apos;s email, on orders 1 and 2</span>
       </Note>
 
+      {/* The three anomalies, side by side on an even step. Each column's
+          short rule above it groups it, so no rules run between them. The
+          number is set in the name's own face and size. */}
       {ANOMALIES.map((a, k) => (
         <Ink
           key={a.name}
@@ -106,9 +112,9 @@ export const FlatScene: React.FC = () => {
           dur={16}
           style={{ left: X0 + k * ROADMAP_STEP, top: y(ROADMAP_Y), width: ROADMAP_STEP - 60 }}
         >
-          <div style={{ height: 2, width: 56, background: INK, marginBottom: 18 }} />
+          <div style={{ height: 2, width: 56, background: INK, marginBottom: RULE_GAP }} />
           <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-            <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>{k + 1}</span>
+            <span style={{ ...body(38), color: ACCENT_INK }}>{k + 1}</span>
             <span style={{ ...body(38), color: INK }}>{a.name}</span>
           </div>
           <div style={{ ...note(22, INK_SOFT), marginTop: 12 }}>{a.gist}</div>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, TABULAR, halo, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -141,12 +141,12 @@ export const SidesScene: React.FC = () => {
               <Mark at={usuallyAt} color={MARK_OK}>
                 two-sided
               </Mark>
-              <span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, eachAt, 10) }}>: 2.5% in each tail</span>
+              <span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, eachAt, 10) }}>: 2.5% in each tail</span>
             </span>
           </Note>
           <Note at={oneAt} x={PANELS[1].left} y={y(320)}>
             <span style={{ ...note(28, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-              one-sided<span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, allAt, 10) }}>: all 5% on the predicted side</span>
+              one-sided<span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, allAt, 10) }}>: all 5% on the predicted side</span>
             </span>
           </Note>
           {[
@@ -224,7 +224,9 @@ export const SidesScene: React.FC = () => {
                 <circle cx={mid} cy={y(r.top)} r={9} fill={r.color} />
               </Svg>
               <Note at={r.drawAt + 4} x={at(xs, r.iv.lo)} y={y(r.top) + h(24)}>
-                <span style={{ ...note(24, INK), whiteSpace: "nowrap", background: PAPER, padding: "2px 8px", borderRadius: 4, ...TABULAR }}>
+                {/* A paper halo round the glyphs, not a paper box: the box
+                    showed as a white card over the tinted margin region. */}
+                <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...halo, ...TABULAR }}>
                   {r.iv.n.toLocaleString("en-US")} per arm: {signed(r.iv.lo)} to {signed(r.iv.hi)}
                   <b style={{ color: r.ink, opacity: ease(frame, r.verdictAt - 2, 10) }}>, {r.verdict}</b>
                 </span>

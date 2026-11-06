@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, label, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BOW } from "./data";
@@ -183,19 +183,8 @@ export const MenuScene: React.FC = () => {
         { at: signalAt - 2, x: X0 + 400, text: "If it’s signal: keep it." },
       ].map((p) => (
         <Note key={p.text} at={p.at} x={p.x} y={y(PILL_Y)}>
-          <span
-            style={{
-              ...note(24, INK),
-              display: "inline-block",
-              padding: "8px 18px 10px",
-              border: `1.5px solid ${CHIP_LINE}`,
-              borderRadius: 999,
-              whiteSpace: "nowrap",
-              opacity: 0.4 + 0.6 * ease(frame, p.at, 12),
-            }}
-          >
-            {p.text}
-          </span>
+          {/* The house badge: a gray tint, no border. */}
+          <span style={{ ...note(24, INK), ...badgeStyle("gray", 24), opacity: 0.4 + 0.6 * ease(frame, p.at, 12) }}>{p.text}</span>
         </Note>
       ))}
     </AbsoluteFill>

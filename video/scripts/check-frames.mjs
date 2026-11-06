@@ -40,12 +40,16 @@ const compositions = (await getCompositions(serveUrl, { browserExecutable, input
   (c) => c.durationInFrames > 1 && (!only || only.includes(c.id)),
 );
 
-const SCALE = 2;
+// 4K, so a stretched illustration shows. CHECK_SCALE=1 sweeps faster when
+// only the layout checks are wanted.
+const SCALE = Number(process.env.CHECK_SCALE ?? 2);
 const images = new Map(); // "video/id" -> { stretch, report, comp }
 const arrows = new Map(); // "Comp: from to tip" -> { bend, report, comp }
 const relations = new Map(); // "Comp: relation end" -> report
 const cues = new Map(); // "Comp: beat phrase" -> report
 const tabular = new Map(); // "Comp: text" -> report
+const crowd = new Map(); // "Comp: pair" -> { report, frames }
+const mix = new Map(); // "Comp: pair" -> { report, frames }
 for (const composition of compositions) {
   await renderFrames({
     serveUrl,
@@ -68,6 +72,18 @@ for (const composition of compositions) {
       }
       const tab = text.match(/^\[tabular\] (".*?") /);
       if (tab) tabular.set(`${composition.id}: ${tab[1]}`, `${composition.id}: ${text.replace(/^\[tabular\] /, "")}`);
+      const tight = text.match(/^\[crowded\] (.*) are [-0-9.]+px apart/);
+      if (tight) {
+        const key = `${composition.id}: ${tight[1]}`;
+        const prev = crowd.get(key);
+        crowd.set(key, { report: prev?.report ?? `${composition.id}: ${text.replace(/^\[crowded\] /, "")}`, frames: (prev?.frames ?? 0) + 1 });
+      }
+      const two = text.match(/^\[mixed\] (.*) share a line/);
+      if (two) {
+        const key = `${composition.id}: ${two[1]}`;
+        const prev = mix.get(key);
+        mix.set(key, { report: prev?.report ?? `${composition.id}: ${text.replace(/^\[mixed\] /, "")}`, frames: (prev?.frames ?? 0) + 1 });
+      }
       const cue = text.match(/^\[cue\] (.*)$/);
       if (cue) cues.set(`${composition.id}: ${cue[1]}`, `${composition.id}: ${cue[1]}`);
       const relation = text.match(/^\[relation\] (.*)$/);
@@ -103,6 +119,14 @@ for (const r of relations.values()) console.log(`  ✗ ${r}`);
 if (!relations.size) console.log("  ✓ every ERD relationship end sits on a straight stretch of its line");
 for (const t of tabular.values()) console.log(`  ✗ ${t}`);
 if (!tabular.size) console.log("  ✓ no hyphen is set in tabular figures");
+// A pair seen in one sample only is a word passing another mid-animation
+// (a sweep that swells its word as it draws); one that holds is a layout.
+const crowded = [...crowd.values()].filter((c) => c.frames >= 2);
+for (const c of crowded) console.log(`  ✗ ${c.report}`);
+if (!crowded.length) console.log("  ✓ every word keeps at least a space from its neighbour");
+const mixedLines = [...mix.values()].filter((c) => c.frames >= 2);
+for (const c of mixedLines) console.log(`  ✗ ${c.report}`);
+if (!mixedLines.length) console.log("  ✓ every line is set in one size and one family");
 for (const c of cues.values()) console.log(`  ! ${c}`);
 if (!cues.size) console.log("  ✓ every word cue the render took names which occurrence it means");
-if (stretched.length || bent.length || relations.size || tabular.size) process.exit(1);
+if (stretched.length || bent.length || relations.size || tabular.size || crowded.length || mixedLines.length) process.exit(1);

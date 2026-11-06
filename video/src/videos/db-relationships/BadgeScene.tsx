@@ -21,6 +21,7 @@ const CAPTION_Y = 474;
 const TABLE_Y = 508;
 const ERROR_Y = 706;
 const RULE_Y = 744;
+const RULE_SIZE = 30;
 
 /**
  * The marks change the schema (cardinality.mdx): many devices per employee is
@@ -111,7 +112,9 @@ export const BadgeScene: React.FC = () => {
       <Kicker at={schemaFrom - 40}>Cardinality</Kicker>
       <Headline lead="The marks" at={schemaFrom - 4} turn="change the schema." turnAt={changeAt - 4} out={translateAt - 8} />
       <Headline lead="You translate" at={translateAt - 2} turn="the picture." turnAt={translateAt + 10} />
-      <Spot id="db-relationships-badge" at={oneBadgeAt - 2} left={1676} top={y(70)} width={132} height={280} />
+      {/* The badge, small, in the top right corner: above the listing and
+          over 80px clear of its right end, which the push carries toward it. */}
+      <Spot id="db-relationships-badge" at={oneBadgeAt - 2} left={1741} top={y(110)} width={90} height={191} />
 
       <Drift from={schemaFrom} to={translateTo + 60} scale={0.018} origin={[960, y(560)]}>
         <Fig n="5" at={schemaFrom} x={EMP_X} y={y(268)}>
@@ -147,16 +150,15 @@ export const BadgeScene: React.FC = () => {
         {/* ── What each end becomes ── */}
         {/* Each arrives as its end is turned into a rule, and is named again
             on "keys and constraints". */}
+        {/* One line, one size and face: the end in italic, what it becomes in roman. */}
         <Ink at={shareAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: INK }}>Zero or many:</span>
-          <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>
-            <Mark at={keysAt}>a foreign key</Mark>
+          <span style={{ ...body(RULE_SIZE), color: INK_SOFT }}>
+            <span style={{ fontStyle: "italic", color: INK }}>Zero or many:</span> <Mark at={keysAt}>a foreign key</Mark>
           </span>
         </Ink>
         <Ink at={twiceAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y + 50), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: INK }}>Zero or one:</span>
-          <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>
-            a foreign key, and <Mark at={constraintsAt + 8}>unique</Mark>
+          <span style={{ ...body(RULE_SIZE), color: INK_SOFT }}>
+            <span style={{ fontStyle: "italic", color: INK }}>Zero or one:</span> a foreign key, and <Mark at={constraintsAt + 8}>unique</Mark>
           </span>
         </Ink>
 

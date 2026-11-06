@@ -72,7 +72,9 @@ export const ErrorScene: React.FC = () => {
       {/* One line in two inks; the second half follows the first in the flow. */}
       <div style={{ position: "absolute", left: 116, top: y(104), display: "flex", gap: "0.26em", ...headline(56) }}>
         <Ink at={fallsAt - 6} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={{ position: "relative" }}>
+          {/* The highlight reaches 0.1em past the words; the margin gives it
+              back on the side that has a neighbour. */}
+          <span style={{ position: "relative", marginRight: "0.1em" }}>
             <span
               style={{
                 position: "absolute",

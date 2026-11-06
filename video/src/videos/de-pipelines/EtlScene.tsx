@@ -4,10 +4,11 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
+import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Flow, Node, OK, OK_INK, Pill, pulse, X0 } from "./parts";
+import { Drift, Flow, Node, OK, OK_INK, Pill, pulse, strongTint, X0 } from "./parts";
 
 const ETL_Y = 360;
 const ELT_Y = 610;
@@ -31,20 +32,8 @@ const RowName: React.FC<{ at: number; expandAt: number; x: number; y: number; na
       <div style={{ ...label(44, INK), fontWeight: 800, whiteSpace: "nowrap" }}>{name}</div>
       <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, expandAt, 12) }}>{words}</div>
       {tag ? (
-        <div
-          style={{
-            marginTop: 10,
-            display: "inline-block",
-            padding: "3px 12px 4px",
-            borderRadius: 8,
-            background: OK,
-            ...label(20, PAPER),
-            fontWeight: 750,
-            whiteSpace: "nowrap",
-            opacity: ease(frame, tag.at, 10),
-          }}
-        >
-          {tag.text}
+        <div style={{ marginTop: 10, opacity: ease(frame, tag.at, 10) }}>
+          <span style={{ ...badgeStyle("green", 20), fontFamily: SANS, background: strongTint("green") }}>{tag.text}</span>
         </div>
       ) : null}
     </Note>

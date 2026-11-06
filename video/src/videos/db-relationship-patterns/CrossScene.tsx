@@ -116,7 +116,7 @@ export const CrossScene: React.FC = () => {
 
       <Kicker at={from - 10}>Many to many</Kicker>
       <Head lead="Many on both sides," leadAt={from - 6} turn="so no parent." turnAt={neitherAt - 2} />
-      <Spot id="db-relationship-patterns-books" at={coursesAt} left={1570} top={y(66)} width={250} height={250} />
+      <Spot id="db-relationship-patterns-books" at={coursesAt} left={1580} top={y(114)} width={200} height={200} />
 
       {/* ── Students and courses, linked as they are named. The label stays
           out of the drift, level with Fig. 7's, and steps back with its figure. ── */}

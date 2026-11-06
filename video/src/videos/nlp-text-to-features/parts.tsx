@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, PAPER, headline as headlineStyle, label, note, TABULAR } from "../../editorial/style";
-import { H, Ink, W } from "../../editorial/ui";
+import { badgeStyle, type BadgeTone, H, Ink, W } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -121,7 +121,9 @@ export const Mark: React.FC<{ at: number; out?: number; color?: string; children
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.1em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.1em" }}>
       <span
         style={{
           position: "absolute",
@@ -170,11 +172,23 @@ export const Strike: React.FC<{ at: number; color?: string; children: React.Reac
 /** Inter at a chip's size is about this wide per character, in em. */
 const CHAR_EM = 0.56;
 
+/** `a` over `b` by `t` (0..1). */
+const mixTo = (a: string, t: number, b: string) => `color-mix(in srgb, ${a} ${(clamp01(t) * 100).toFixed(1)}%, ${b})`;
+
+const BADGE_HUES: readonly string[] = ["blue", "green", "red", "yellow", "teal", "purple", "orange", "gray"];
+/** The badge hue of a brand color written as `ds(hue)`, if it is one. */
+const hueOf = (color: string): BadgeTone | undefined => {
+  const m = /--ds-([a-z]+)-/.exec(color);
+  return m && BADGE_HUES.includes(m[1]) ? (m[1] as BadgeTone) : undefined;
+};
+
 /**
- * One token as a chip. It inks in on `at`; `strike` draws the accent through
- * it; `drop` fades it and closes its gap in the row (its width runs to
- * nothing), so the tokens after it slide up to meet the ones before; `mark`
- * lays the highlighter behind it; `tone` tints its box (a polarity).
+ * One token as a chip: the house badge (editorial/ui), gray tint and gray
+ * ink, no border. It inks in on `at`; `strike` draws the accent through it;
+ * `drop` fades it and closes its gap in the row (its width runs to nothing),
+ * so the tokens after it slide up to meet the ones before; `mark` lays the
+ * highlighter over its tint; `tone` turns it to that hue's badge, tint and
+ * ink (a polarity). `ink` overrides the gray ink of a plain chip.
  */
 export const Chip: React.FC<{
   text: string;
@@ -192,7 +206,7 @@ export const Chip: React.FC<{
   /** Frames at which the chip swells briefly, as the narration names it. */
   bump?: number | readonly number[];
   style?: React.CSSProperties;
-}> = ({ text, at, size = 26, strike, drop, mark, markOut, tone, toneAt, ink = INK, dim, mono, bump, style }) => {
+}> = ({ text, at, size = 26, strike, drop, mark, markOut, tone, toneAt, ink, dim, mono, bump, style }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const s = strike === undefined ? 0 : ease(frame, strike, 10);
@@ -203,6 +217,13 @@ export const Chip: React.FC<{
   const est = (text.length * CHAR_EM + 1.4) * size + 4;
   const swell = bump === undefined ? 0 : Math.max(...(typeof bump === "number" ? [bump] : bump).map((b) => pulse(frame, b, 16)));
   const gone = d >= 1;
+  const plain = badgeStyle("gray", size);
+  const hue = tone === undefined ? undefined : hueOf(tone);
+  const toned = hue === undefined ? undefined : badgeStyle(hue, size);
+  const plainInk = ink ?? String(plain.color);
+  const under = m > 0 ? mixTo(HIGHLIGHT, m, String(plain.background)) : String(plain.background);
+  const background = tone && tn > 0 ? mixTo(toned ? String(toned.background) : tint(1, tone, 26), tn, under) : under;
+  const color = toned && tn > 0 ? mixTo(String(toned.color), tn, plainInk) : plainInk;
   return (
     <span
       style={{
@@ -222,13 +243,15 @@ export const Chip: React.FC<{
         style={{
           position: "relative",
           display: "inline-block",
-          padding: "0.12em 0.42em 0.18em",
-          border: `1.5px solid ${CHIP_LINE}`,
-          borderRadius: 6,
-          background: tone && tn > 0 ? tint(tn, tone, 26) : m > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${(m * 100).toFixed(0)}%, ${PAPER})` : PAPER,
-          ...note(size, ink),
+          // Even top and bottom, as the house badge; the sides keep the
+          // bordered chip's outer width (its 1.5px rule is now padding), so
+          // rows, arrows and the labels under chips stay where they were.
+          padding: "0.21em calc(0.42em + 1.5px)",
+          borderRadius: plain.borderRadius,
+          background,
+          ...note(size, color),
           ...(mono ? { fontFamily: '"JetBrains Mono", ui-monospace, monospace' } : {}),
-          fontWeight: 500,
+          fontWeight: 600,
           lineHeight: 1.15,
           whiteSpace: "nowrap",
         }}

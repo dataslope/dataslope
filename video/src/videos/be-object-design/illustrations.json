@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "model": "gpt-image-2.6-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "be-object-design-armadillo",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "an armadillo standing on all four short legs in three-quarter view, its arched shell made of broad overlapping bands, its long pointed snout lowered and its small ears raised"
+    },
+    {
+      "id": "be-object-design-multitool",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky folding pocketknife with every tool fanned open at once: a blade, a saw, scissors, a corkscrew, a screwdriver and a bottle opener, splayed out from one thick red handle"
+    },
+    {
+      "id": "be-object-design-shopping-cart",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small wire shopping cart on four wheels seen from a three-quarter angle, holding three large simple items: a loaf of bread, a jar and a carton"
+    },
+    {
+      "id": "be-object-design-parcel",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a sturdy cardboard parcel box tied with a band of string in a cross, a plain blank label on its top, no writing"
+    },
+    {
+      "id": "be-object-design-plug",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small table lamp with a round cloth shade, its cord curling down to a plug with two thick round prongs, the plug held just in front of a round wall socket with two matching holes"
+    }
+  ]
+}

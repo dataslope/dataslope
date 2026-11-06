@@ -1,15 +1,15 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK, QMono, QuestionCard } from "../../editorial/interview";
+import { OK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Ink, Note, Num } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { badgeStyle, Ink, Note, Num } from "../../editorial/ui";
+import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { WHERE } from "./data";
-import { Drift, ElbowArrow, ErrorBox, lineOf, Listing, listingHeight, Mark, MARK_BAD, MARK_OK, Mono, X0 } from "./parts";
+import { Drift, ElbowArrow, ErrorBox, lineOf, Listing, listingHeight, Mark, MARK_BAD, MARK_OK, Mono, QMono, X0 } from "./parts";
 
 const SIZE = 24;
 const LIST_Y = 300;
@@ -145,7 +145,7 @@ export const OrderScene: React.FC = () => {
                 at={stepAt[s] + 2}
                 dur={10}
                 out={tryAt - 2}
-                style={{ left: X0 + LIST_W - 52, top: y(LIST_Y) + g.padY + i * g.lineH + g.lineH / 2 - 15 }}
+                style={{ left: X0 + LIST_W - 52, top: y(LIST_Y) + g.padY + i * g.lineH + g.lineH / 2 - BADGE / 2 }}
               >
                 <StepBadge n={s + 1} />
               </Ink>
@@ -309,21 +309,24 @@ export const OrderScene: React.FC = () => {
   );
 };
 
-/** A step's number in a ring. */
+/** A step's number on a disc: the house badge, round, in gray, no ring.
+ *  36px across; the numeral at 24px, within 12% of the 24px query and the
+ *  26px clauses beside it. */
+const BADGE = 36;
 const StepBadge: React.FC<{ n: number }> = ({ n }) => (
   <span
     style={{
+      ...badgeStyle("gray", 24),
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
-      width: 32,
-      height: 32,
-      borderRadius: 999,
-      border: `2px solid ${INK}`,
-      background: PAPER,
-      ...label(19, INK),
+      flex: "none",
+      width: BADGE,
+      height: BADGE,
+      padding: 0,
+      borderRadius: "50%",
+      fontFamily: SANS,
       ...TABULAR,
-      fontWeight: 700,
     }}
   >
     {n}

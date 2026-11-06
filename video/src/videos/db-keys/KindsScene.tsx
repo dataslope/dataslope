@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, INK, INK_SOFT, label } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COUNTRIES, IDENTITY } from "./data";
@@ -18,6 +18,10 @@ const HEAD_H = 52;
 const ROW_H = 70;
 /** Two short tables on a half page each: set large. */
 const SIZES = { headSize: 24, bodySize: 32, pad: 22 };
+/** Where the natural panel's longest line ends ("a real-world value the
+ *  thing already has"): the hairline between the panels is centred in the
+ *  gap from here to the surrogate panel. */
+const NATURAL_R = 604;
 
 /**
  * Part 2 opens: the two kinds of key. A natural key is a value the thing
@@ -53,7 +57,11 @@ export const KindsScene: React.FC = () => {
   const customers = tableGeometry({ x: RIGHT_X, top: y(TABLE_Y), cols: customerCols, rows: IDENTITY.slim.rows, headH: h(HEAD_H), rowH: h(ROW_H), ...SIZES });
   const jp = COUNTRIES.rows.findIndex((r) => r[0] === "JP");
   const below = (g: typeof countries) => g.rowTop(g === countries ? COUNTRIES.rows.length : IDENTITY.slim.rows.length) + 34;
-  const divider = ease(frame, surrogateAt - 10, 16);
+  // The two panels' hairline: 1px, centred in the gap, from the panels'
+  // headings to the foot of the lines under their tables.
+  const ruleX = (Math.max(NATURAL_R, countries.right) + RIGHT_X) / 2;
+  const ruleTop = y(PANEL_Y) + 4;
+  const ruleH = Math.max(below(countries), below(customers)) + 40 - ruleTop;
 
   return (
     <AbsoluteFill>
@@ -101,17 +109,8 @@ export const KindsScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* The two panels' divider. */}
-        <div
-          style={{
-            position: "absolute",
-            left: 900,
-            top: y(PANEL_Y),
-            width: 1.5,
-            height: (y(852) - y(PANEL_Y)) * divider,
-            background: `color-mix(in srgb, ${INK} 30%, transparent)`,
-          }}
-        />
+        {/* The two panels' hairline, inking in with the surrogate panel. */}
+        <ColumnRule x={ruleX} top={ruleTop} height={ruleH} at={surrogateAt - 2} />
 
         {/* ── Surrogate ── */}
         <Ink at={surrogateAt - 4} dur={14} style={{ left: RIGHT_X, top: y(PANEL_Y), whiteSpace: "nowrap" }}>

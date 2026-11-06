@@ -141,7 +141,9 @@ export const TrendScene: React.FC = () => {
         </Ink>
       </div>
 
-      <Spot id="thinking-statistically-machine" at={processAt - 6} dim={neverSeeAt} left={1480} top={y(104)} width={320} height={305} />
+      {/* The process, as a machine: small, top-aligned with the headline,
+          and level with the examples beside it. */}
+      <Spot id="thinking-statistically-machine" at={processAt - 6} dim={neverSeeAt} left={1580} top={y(150)} width={200} height={191} />
 
       {/* The examples of a process, beside the machine, until "never see". */}
       {["customers deciding,", "machines running,", "demand rising and falling"].map((t, i) => (

@@ -2,45 +2,65 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, Mark, OK, OK_INK, X0 } from "./parts";
+import { badgeStyle } from "../../editorial/ui";
+import { Drift, Headline, Kicker, Mark, OK_INK, X0 } from "./parts";
 
-const PANEL_W = 820;
-const GAP = 40;
+/** Two columns of text, each at its left edge, the second 880px in, so a
+ *  column's figure (FIG_X in, 220 wide) ends 50px short of the hairline in
+ *  the gap and the second column's figure ends at 1780. */
+const COL_X = [X0, X0 + 880];
 const ROW_Y = [290, 560];
-const PANEL_H = 240;
-/** Where each panel's small figure sits, from the panel's left edge. */
+/** Where each block's small figure sits, from its text's left edge. */
 const FIG_X = 560;
+/** The figure's right edge, from the text's left edge. */
+const FIG_R = FIG_X + 220;
+/** How tall each row's hairline stands, in px (text does not stretch with
+ *  the layout): the row's text, title to last line. */
+const RULE_H = [192, 172];
 
-/** A panel that inks in on `at`, with its title, its lines and its figure. */
+/** One of the four points: a title over its lines and its small figure, as a
+ *  block of plain text that inks in on `at`. The second block on a row gets a
+ *  hairline in the gap before it, inking in with it. */
 const Panel: React.FC<{ i: number; at: number; title: string; children: React.ReactNode }> = ({ i, at, title, children }) => {
   const frame = useCurrentFrame();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
   const p = ease(frame, at - 2, 14);
   if (p <= 0) return null;
+  const row = Math.floor(i / 2);
+  const left = COL_X[i % 2];
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: X0 + (i % 2) * (PANEL_W + GAP),
-        top: y(ROW_Y[Math.floor(i / 2)]),
-        width: PANEL_W,
-        height: h(PANEL_H),
-        boxSizing: "border-box",
-        border: `1.5px solid ${HAIRLINE}`,
-        borderRadius: 12,
-        background: PAPER,
-        padding: "26px 30px",
-        opacity: p,
-        transform: `translateY(${(1 - p) * 14}px)`,
-      }}
-    >
-      <div style={{ ...note(32, INK), fontWeight: 650, marginBottom: 16, whiteSpace: "nowrap" }}>{title}</div>
-      {children}
-    </div>
+    <>
+      {i % 2 === 1 ? (
+        <div
+          style={{
+            position: "absolute",
+            left: (COL_X[0] + FIG_R + COL_X[1]) / 2,
+            top: y(ROW_Y[row]),
+            width: 1,
+            height: RULE_H[row],
+            background: HAIRLINE,
+            opacity: p,
+          }}
+        />
+      ) : null}
+      <div
+        style={{
+          position: "absolute",
+          left,
+          top: y(ROW_Y[row]),
+          width: FIG_R,
+          opacity: p,
+          transform: `translateY(${(1 - p) * 14}px)`,
+        }}
+      >
+        <div style={{ ...note(32, INK), fontWeight: 650, marginBottom: 16, whiteSpace: "nowrap" }}>{title}</div>
+        {children}
+      </div>
+    </>
   );
 };
 
@@ -52,7 +72,8 @@ const line = (frame: number, at: number): React.CSSProperties => ({
 });
 
 /**
- * What AI has brought in (`ai`), the role page's four points, one panel each,
+ * What AI has brought in (`ai`), the role page's four points, a block of
+ * plain text each in two rows of two, a hairline between the blocks on a row,
  * each with its own beat: evaluating an LLM feature as a measurement problem,
  * with an interval on a pass rate between 0% and 100% (`ai-eval`);
  * experiments where the output itself varies, drawn as three labeled runs of
@@ -110,7 +131,7 @@ export const AiScene: React.FC = () => {
           <div style={line(frame, setAt)}>an eval set of test prompts</div>
           <div style={line(frame, ciAt)}>an interval on its pass rate</div>
           <div style={line(frame, judgeAt)}>does the LLM judge agree with experts?</div>
-          <svg style={{ position: "absolute", left: FIG_X, top: 92, overflow: "visible" }} width={220} height={80}>
+          <svg style={{ position: "absolute", left: FIG_X, top: 66, overflow: "visible" }} width={220} height={80}>
             <line x1={0} x2={220} y1={60} y2={60} stroke={INK_SOFT} strokeWidth={1.4} opacity={ciP} />
             {[0, 220].map((x) => (
               <line key={x} x1={x} x2={x} y1={55} y2={65} stroke={INK_SOFT} strokeWidth={1.4} opacity={ciP} />
@@ -137,7 +158,7 @@ export const AiScene: React.FC = () => {
           <div style={line(frame, runAt)}>the output changes</div>
           <div style={line(frame, runAt + 6)}>from one run to the next,</div>
           <div style={line(frame, swapAt)}>and the model can change mid-test</div>
-          <svg style={{ position: "absolute", left: FIG_X, top: 50, overflow: "visible" }} width={220} height={140}>
+          <svg style={{ position: "absolute", left: FIG_X, top: 24, overflow: "visible" }} width={220} height={140}>
             <line x1={0} x2={220} y1={130} y2={130} stroke={INK_SOFT} strokeWidth={1.4} opacity={runP} />
             {runs.map((v, k) => (
               <rect key={k} x={20 + k * 70} y={130 - v * runP} width={44} height={v * runP} rx={4} fill={BAR} opacity={0.35 + 0.25 * k} />
@@ -157,7 +178,7 @@ export const AiScene: React.FC = () => {
             style={{
               position: "absolute",
               left: FIG_X - 40,
-              top: 96,
+              top: 70,
               padding: "10px 16px",
               border: `1.5px solid ${HAIRLINE}`,
               borderRadius: 8,
@@ -178,19 +199,16 @@ export const AiScene: React.FC = () => {
         <Panel i={3} at={allowAt} title="Assistant allowed, or banned">
           <div style={{ display: "flex", gap: 18, marginTop: 6 }}>
             {[
-              { at: allowAt + 6, text: "allowed", color: OK, ink: OK_INK },
-              { at: banAt, text: "banned", color: ACCENT, ink: ACCENT_INK },
+              { at: allowAt + 6, text: "allowed", tone: "green" as const },
+              { at: banAt, text: "banned", tone: "red" as const },
             ].map((pill) => {
               const q = ease(frame, pill.at - 2, 12);
               return (
                 <div
                   key={pill.text}
                   style={{
-                    padding: "8px 22px",
-                    borderRadius: 28,
-                    border: `2px solid ${pill.color}`,
-                    background: `color-mix(in srgb, ${pill.color} 16%, ${PAPER})`,
-                    ...label(24, pill.ink),
+                    ...label(24),
+                    ...badgeStyle(pill.tone, 24),
                     opacity: q,
                     transform: `scale(${0.8 + 0.2 * q})`,
                   }}

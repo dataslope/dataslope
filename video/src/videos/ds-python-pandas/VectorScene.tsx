@@ -199,7 +199,7 @@ export const VectorScene: React.FC = () => {
               about {VECTOR.ratio}× faster here
             </Mark>
             <FadeIn at={laptopAt}>
-              <span style={{ ...note(24, INK_SOFT), fontWeight: 400, marginLeft: "0.8em" }}>
+              <span style={{ ...note(28, INK_SOFT), fontWeight: 400, marginLeft: "0.8em" }}>
                 on a laptop, 10–100× is typical
               </span>
             </FadeIn>

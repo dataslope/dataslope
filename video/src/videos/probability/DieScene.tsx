@@ -223,9 +223,12 @@ export const DieScene: React.FC = () => {
           <span style={{ opacity: ease(frame, faceAt - 2, 10), fontWeight: 500, color: INK }}>, not a face</span>
         </span>
       </Note>
-      <Spot id="probability-seesaw" at={pictureAt - 2} out={spreadWordAt - 10} left={1280} top={y(650)} width={540} height={220} />
+      {/* The seesaw, small, under the sum in the right column. */}
+      <Spot id="probability-seesaw" at={pictureAt - 2} out={spreadWordAt - 10} left={RIGHT} top={y(650)} width={240} height={94} />
 
       {/* ── The sum ── */}
+      {/* The sum on one line, its "=" arriving with the answer, and the
+          answer on a line of its own under it. */}
       <Ink at={addAt - 4} dur={18} style={{ left: RIGHT, top: y(358), whiteSpace: "nowrap" }}>
         <span style={note(26, INK)}>
           {DIE.terms.map((t, i) => (
@@ -234,17 +237,17 @@ export const DieScene: React.FC = () => {
               {fmt(t, 1)}
             </span>
           ))}
+          <span style={{ color: INK_SOFT, opacity: ease(frame, fourFiveAt - 4, 10) }}> =</span>
         </span>
       </Ink>
-      <Ink at={fourFiveAt - 4} dur={16} style={{ left: RIGHT, top: y(398), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-        <span style={{ ...note(32, INK_SOFT) }}>E[X] =</span>
+      <Ink at={fourFiveAt - 4} dur={16} style={{ left: RIGHT, top: y(392), whiteSpace: "nowrap" }}>
         <Big size={100} color={STAT_INK} italic>
           {fmt(DIE.expected, 1)}
         </Big>
       </Ink>
       <Ink at={rollAt - 4} dur={14} style={{ left: RIGHT, top: y(524), whiteSpace: "nowrap" }}>
         <span style={note(26, INK)}>
-          <Count at={rollAt - 2} dur={30} to={DIE.draws} format={num} style={{ ...note(34, INK), fontWeight: 700 }} /> rolls:{" "}
+          <Count at={rollAt - 2} dur={30} to={DIE.draws} format={num} style={{ fontWeight: 700 }} /> rolls:{" "}
           <span style={{ opacity: ease(frame, comesAt - 2, 10) }}>
             mean{" "}
             <b>
@@ -256,11 +259,11 @@ export const DieScene: React.FC = () => {
 
       {/* ── The spread ── */}
       <Ink at={varianceAt - 4} dur={14} style={{ left: RIGHT, top: y(592), whiteSpace: "nowrap" }}>
-        <span style={note(30, INK)}>
+        <span style={note(28, INK)}>
           Variance, Var(X){" "}
           <span style={{ opacity: ease(frame, threeAt - 4, 10) }}>
             = <b style={{ color: STAT_INK }}>{fmt(DIE.variance, 2)}</b>
-            <span style={{ ...note(22, INK_SOFT) }}> in squared units</span>
+            <span style={{ color: INK_SOFT }}>, in squared units</span>
           </span>
         </span>
       </Ink>

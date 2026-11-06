@@ -120,7 +120,8 @@ export const CodeScene: React.FC = () => {
         </Ink>
         <Ink at={fortyAt - 2} dur={14} style={{ position: "relative" }}>
           <div style={label(24, INK_SOFT)}>after making</div>
-          <div style={{ display: "flex", alignItems: "baseline", gap: "0.3em", marginTop: 8, whiteSpace: "nowrap" }}>
+          {/* fontSize: the gap is 0.3em of "calls", not of the page default. */}
+          <div style={{ display: "flex", alignItems: "baseline", fontSize: 42, gap: "0.3em", marginTop: 8, whiteSpace: "nowrap" }}>
             <span
               style={{
                 ...headline(104),

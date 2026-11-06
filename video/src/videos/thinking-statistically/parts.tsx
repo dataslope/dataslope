@@ -3,7 +3,8 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { SERIF } from "../../editorial/fonts";
+import { INTER_OPTICAL, SERIF } from "../../editorial/fonts";
+import { SANS } from "../../theme/fonts";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
@@ -251,16 +252,19 @@ export const Bell: React.FC<{
 };
 
 /**
- * Symbols, set in the serif whatever face surrounds them: x-bar as an italic
- * x with a combining macron (the latin subset carries U+0304, so the face
- * places the bar itself), and mu upright, from the Greek subset fonts.ts
- * waits for.
+ * Symbols: x-bar as an italic x with a combining macron (the latin subsets
+ * carry U+0304, so the face places the bar itself), and mu upright, from the
+ * Greek subsets editorial/fonts.ts waits for. On their own, or in a line of
+ * the serif, they are set in the serif. `inline` sets them in Inter instead,
+ * for a line of Inter ("μ = 100"), which is one face throughout: a serif μ
+ * beside Inter's "= 100" reads as two things.
  */
-export const XBar: React.FC<{ color?: string }> = ({ color }) => (
-  <span style={{ fontFamily: SERIF, fontStyle: "italic", color }}>{"x\u0304"}</span>
+const symbolFace = (inline?: boolean) => (inline ? `"${INTER_OPTICAL}", ${SANS}` : SERIF);
+export const XBar: React.FC<{ color?: string; inline?: boolean }> = ({ color, inline }) => (
+  <span style={{ fontFamily: symbolFace(inline), fontStyle: "italic", color }}>{"x\u0304"}</span>
 );
-export const Mu: React.FC<{ color?: string }> = ({ color }) => (
-  <span style={{ fontFamily: SERIF, fontStyle: "normal", color }}>μ</span>
+export const Mu: React.FC<{ color?: string; inline?: boolean }> = ({ color, inline }) => (
+  <span style={{ fontFamily: symbolFace(inline), fontStyle: "normal", color }}>μ</span>
 );
 
 /**

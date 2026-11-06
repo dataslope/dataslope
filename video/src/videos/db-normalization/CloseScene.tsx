@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, NextLine } from "../../editorial/ui";
+import { ColumnRule, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { KICKER_Y, X0 } from "./kit";
@@ -86,11 +86,17 @@ export const CloseScene: React.FC = () => {
           {FORMS.map((f, k) => (
             <Ink key={f.name} at={rulesAt + k * 6} dur={14} style={{ left: X0 + k * 420, top: y(560), whiteSpace: "nowrap" }}>
               <span style={{ display: "inline-flex", alignItems: "baseline", gap: 12 }}>
-                <span style={{ ...label(26, BLUE_INK), fontWeight: 700 }}>{f.name}</span>
+                {/* 24px, within 12% of the 22px gist on its line. */}
+                <span style={{ ...label(24, BLUE_INK), fontWeight: 700 }}>{f.name}</span>
                 <span style={{ ...note(22, INK) }}>{f.gist}</span>
               </span>
             </Ink>
           ))}
+          {/* The three side by side take a hairline in each gap, inking in
+              with the form to its right: centred between the end of one
+              (about 250 and 200px long) and the start of the next. */}
+          <ColumnRule x={X0 + 335} top={y(560) + 2} height={30} at={rulesAt + 6} />
+          <ColumnRule x={X0 + 730} top={y(560) + 2} height={30} at={rulesAt + 12} />
         </Fade>
 
         <NextLine at={processAt} x={X0} y={y(700)} width={980}>

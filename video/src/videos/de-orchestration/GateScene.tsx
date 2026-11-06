@@ -3,8 +3,9 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { Badge, Note, Num } from "../../editorial/ui";
+import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, GATE } from "./data";
@@ -62,7 +63,7 @@ export const GateScene: React.FC = () => {
   const nodeH = h(60);
   const passAt = (i: number) => gateAt + 6 + i * 6;
 
-  // The batch card under the gate.
+  // The batch's checks under the gate: a ruled table, no frame.
   const cardX = cx(GATE_I) - 260;
   const cardW = 520;
   const cardTop = y(600);
@@ -98,20 +99,9 @@ export const GateScene: React.FC = () => {
           {CHECKS.map((c) => {
             const p = ease(frame, c.at - 2, 10);
             return (
-              <span
-                key={c.text}
-                style={{
-                  padding: "5px 14px",
-                  border: `2px solid ${BLUE_INK}`,
-                  borderRadius: 999,
-                  ...label(22, BLUE_INK),
-                  whiteSpace: "nowrap",
-                  opacity: p,
-                  transform: `translateY(${(1 - p) * 10}px)`,
-                }}
-              >
+              <Badge key={c.text} tone="blue" size={22} style={{ fontFamily: SANS, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
                 {c.text}
-              </span>
+              </Badge>
             );
           })}
         </div>
@@ -197,15 +187,11 @@ export const GateScene: React.FC = () => {
             top: cardTop,
             width: cardW,
             height: HEAD + rows.length * ROW,
-            boxSizing: "border-box",
-            border: `2px solid ${INK}`,
-            borderRadius: 10,
-            background: PAPER,
             opacity: ease(frame, batchAt, 12),
             transform: `translateY(${(1 - ease(frame, batchAt, 12)) * 12}px)`,
           }}
         >
-          <div style={{ height: HEAD, display: "flex", alignItems: "center", padding: "0 20px", borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ height: HEAD, display: "flex", alignItems: "center", borderBottom: `1px solid ${HAIRLINE}` }}>
             <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
               this batch: <Num>{count(GATE.rows)}</Num> orders
             </span>
@@ -226,22 +212,25 @@ export const GateScene: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: 14,
-                  padding: "0 20px",
-                  background: bad > 0 ? `color-mix(in srgb, ${MARK_BAD} ${bad * 100}%, transparent)` : undefined,
+                  borderTop: i ? `1px solid ${HAIRLINE}` : undefined,
                   opacity: p,
                 }}
               >
-                <span style={{ ...note(23, INK), flex: 1, whiteSpace: "nowrap" }}>{r.name}</span>
-                <span style={{ ...note(23, r.pass ? INK : ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                {/* The failing row's red, a little past the text either side. */}
+                {bad > 0 ? (
+                  <div style={{ position: "absolute", left: -10, right: -10, top: 0, bottom: 0, background: `color-mix(in srgb, ${MARK_BAD} ${bad * 100}%, transparent)` }} />
+                ) : null}
+                <span style={{ position: "relative", ...note(23, INK), flex: 1, whiteSpace: "nowrap" }}>{r.name}</span>
+                <span style={{ position: "relative", ...note(23, r.pass ? INK : ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
                   <Num>{r.value}</Num>
                   {!r.pass ? (
-                    <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, opacity: ease(frame, limitAt, 10) }}>
+                    <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, opacity: ease(frame, limitAt, 10) }}>
                       {" "}
                       · limit <Num>{(GATE.limits.maxNullRate * 100).toFixed(0)}%</Num>
                     </span>
                   ) : null}
                 </span>
-                <span style={{ width: 24, display: "flex", justifyContent: "center" }}>
+                <span style={{ position: "relative", width: 24, display: "flex", justifyContent: "center" }}>
                   {r.pass ? frame >= at + 4 ? <Tick at={at + 4} size={22} /> : null : frame >= limitAt + 6 ? <Cross at={limitAt + 6} size={22} /> : null}
                 </span>
               </div>
@@ -249,19 +238,9 @@ export const GateScene: React.FC = () => {
           })}
         </div>
         <Note at={failsAt + 4} x={cardX + cardW + 30} y={cardTop + h(10)}>
-          <span
-            style={{
-              display: "inline-block",
-              padding: "6px 16px",
-              border: `3px solid ${ACCENT}`,
-              borderRadius: 8,
-              ...note(26, ACCENT_INK),
-              fontWeight: 800,
-              whiteSpace: "nowrap",
-            }}
-          >
+          <Badge tone="red" size={26} style={{ fontFamily: SANS }}>
             gate fails: halt
-          </span>
+          </Badge>
         </Note>
         <Note at={failsAt + 10} x={cardX + cardW + 30} y={cardTop + h(74)}>
           <span style={{ ...label(21, OK_INK), whiteSpace: "nowrap" }}>bad data stops before anyone sees it</span>

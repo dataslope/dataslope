@@ -30,7 +30,6 @@ export {
   MARK_BAD,
   MARK_KEY,
   MARK_OK,
-  Mono,
   OK,
   OK_INK,
   pulse,
@@ -43,6 +42,15 @@ export {
 } from "../da-sql/parts";
 
 const NUMBER = /^-?\d[\d,_]*(\.\d+)?$/;
+
+/** Code inside a line of prose, in the mono face at 0.92em: within the 12%
+ *  a line's sizes may differ by (`check:frames`), where the 0.88em of the
+ *  Mono this video used to take from Parts 1 and 2 is not. */
+export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
 
 /**
  * Columns for a result: every column whose cells are all numbers (or null)
@@ -78,7 +86,6 @@ export const geoOf = (
 
 /** Rows inking in one after another from `at`. */
 export const rowsAt = (rows: readonly (readonly string[])[], at: number, step = 2) => rows.map((cells, i) => ({ cells, at: at + i * step }));
-
 
 // ── Plain text, set like a listing ───────────────────────────────────────────
 
@@ -142,6 +149,27 @@ export const TextPanel: React.FC<{
       {children}
     </div>
   );
+};
+
+// ── Hairlines between columns ───────────────────────────────────────────────
+
+/** A vertical hairline between columns of text set side by side: centred in
+ *  their gap, as tall as their text, inking in with the column to its right
+ *  (`at`). */
+export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: number; out?: number }> = ({ x, top, height, at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  if (p <= 0) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height, background: HAIRLINE, opacity: p }} />;
+};
+
+/** The same hairline as an item of the columns' flex row, as tall as the
+ *  row's text: spread the row with `space-between`, or give it an even
+ *  `gap`, to centre it in its gap. */
+export const FlexRule: React.FC<{ at: number; out?: number }> = ({ at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  return <div style={{ width: 1, alignSelf: "stretch", flexShrink: 0, background: HAIRLINE, opacity: Math.max(0, p) }} />;
 };
 
 // ── Spot illustrations ───────────────────────────────────────────────────────

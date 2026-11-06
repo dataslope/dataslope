@@ -3,12 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DROP, num, pct } from "./data";
-import { Chip, DATA, DATA_LIGHT, Drift, madeUp, Mark, OK_INK, Step, Svg, VLine, X0 } from "./parts";
+import { DATA, DATA_LIGHT, Drift, madeUp, Mark, Svg, VLine, X0 } from "./parts";
+import { Step, Tag } from "./badges";
 
 const STEPS_TOP = 350;
 const STEP_GAP = 84;
@@ -148,9 +149,9 @@ export const DropScene: React.FC = () => {
 
         {/* Step 1: what can fake the shape. */}
         {fakes.map((f, i) => (
-          <Chip key={f.text} x={CHART.x0 + i * 300} y={y(BARS.top)} at={f.at - 2} out={fakeOut} size={25}>
+          <Tag key={f.text} x={CHART.x0 + i * 300} y={y(BARS.top)} at={f.at - 2} out={fakeOut} size={25}>
             {f.text}
-          </Chip>
+          </Tag>
         ))}
         <Note at={shapeAt} x={CHART.x0} y={y(BARS.top) + h(74)} out={fakeOut}>
           <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>each can make that shape on its own</span>
@@ -199,40 +200,40 @@ export const DropScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* Step 5: size it, fix it, confirm it. */}
+        {/* Step 5: size it, fix it, confirm it, as house badges held apart by
+            their gap; the fix green, under the highlighter once it is said. */}
         <Note at={actAt + 4} x={CHART.x0} y={y(BARS.top) + 3 * h(BARS.gap) + h(62)}>
           <div style={{ display: "flex", gap: 16 }}>
             {[
-              { text: `size: Android −${pct(-DROP.byPlatform.Android.change)}`, at: fifthAt, ink: INK },
-              { text: `fix: roll back ${DROP.release}`, at: rollAt, ink: OK_INK },
-              { text: "confirm: Android climbs back", at: climbAt, ink: INK },
-            ].map((c) => (
-              <span
-                key={c.text}
-                style={{
-                  padding: "7px 14px",
-                  border: `2.2px solid ${c.ink}`,
-                  borderRadius: 10,
-                  background: c.ink === OK_INK ? `color-mix(in srgb, ${HIGHLIGHT} ${ease(frame, rollAt + 8, 12) * 100}%, ${PAPER})` : PAPER,
-                  ...note(24, c.ink),
-                  fontWeight: 600,
-                  whiteSpace: "nowrap",
-                  opacity: ease(frame, c.at - 2, 12),
-                }}
-              >
-                {c.text}
-              </span>
-            ))}
+              { text: `size: Android −${pct(-DROP.byPlatform.Android.change)}`, at: fifthAt, fix: false },
+              { text: `fix: roll back ${DROP.release}`, at: rollAt, fix: true },
+              { text: "confirm: Android climbs back", at: climbAt, fix: false },
+            ].map((c) => {
+              const badge = badgeStyle(c.fix ? "green" : "gray", 24);
+              return (
+                <span
+                  key={c.text}
+                  style={{
+                    ...note(24),
+                    ...badge,
+                    background: c.fix ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(ease(frame, rollAt + 8, 12) * 100)}%, ${badge.background})` : badge.background,
+                    opacity: ease(frame, c.at - 2, 12),
+                  }}
+                >
+                  {c.text}
+                </span>
+              );
+            })}
           </div>
         </Note>
 
         {/* Step 4: internal or external. */}
-        <Chip x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(10)} at={competitorAt - 2} out={actAt - 10} size={24} ink={INK_SOFT}>
+        <Tag x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(10)} at={competitorAt - 2} out={actAt - 10} size={24}>
           external: a competitor&apos;s launch
-        </Chip>
-        <Chip x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(78)} at={bugAt - 2} out={actAt - 10} size={24} ink={ACCENT_INK} lit={bugAt + 8}>
+        </Tag>
+        <Tag x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(78)} at={bugAt - 2} out={actAt - 10} size={24} tone="red" lit={bugAt + 8}>
           internal: a bug of your own
-        </Chip>
+        </Tag>
       </Drift>
     </AbsoluteFill>
   );

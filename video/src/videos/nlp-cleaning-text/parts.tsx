@@ -176,7 +176,9 @@ export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: st
   const p = ease(frame, at, dur);
   const o = out === undefined ? 0 : ease(frame, out, 14);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.1em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.1em" }}>
       <span
         style={{
           position: "absolute",
@@ -281,8 +283,9 @@ export const LabelEnd: React.FC<{
       <span style={{ opacity: p, fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none" }}>
         {call}
       </span>
+      {/* The count at 22px beside the 21px call: one line, one size. */}
       {count ? (
-        <span style={{ ...note(24, countColor), fontWeight: 650, opacity: c, transform: `translateY(${(1 - c) * 6}px)`, display: "inline-block" }}>
+        <span style={{ ...note(22, countColor), fontWeight: 650, opacity: c, transform: `translateY(${(1 - c) * 6}px)`, display: "inline-block" }}>
           {count}
         </span>
       ) : null}

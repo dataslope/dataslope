@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FUNNEL, pct } from "./data";
-import { Drift, Listing, MARK, MARK_BAD, OK_INK, pulse, X0 } from "./parts";
+import { Drift, Listing, MARK, MARK_BAD, Mono, OK_INK, pulse, X0 } from "./parts";
 
 const HEAD_Y = 318;
 const ROW0 = 360;
@@ -108,7 +108,7 @@ export const FunnelScene: React.FC = () => {
           What is a funnel, and how do you measure conversion at each step?
         </QuestionCard>
         <QuestionCard n={5} at={q5At} textAt={q5TextAt - 2} size={58}>
-          What is a step-to-step conversion, and how does <QMono>LAG</QMono> help?
+          What is a step-to-step conversion, and how does <Mono>LAG</Mono> help?
         </QuestionCard>
 
         {/* ── The weakest step, picked out across its row ── */}

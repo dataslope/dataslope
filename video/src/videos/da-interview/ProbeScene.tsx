@@ -2,10 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, Mono, X0 } from "./parts";
+import { Drift, Headline, Kicker, X0 } from "./parts";
+import { Mono } from "./mono";
 
 const ROW_Y = 330;
 const PITCH = 120;
@@ -13,7 +15,8 @@ const PITCH = 120;
 /**
  * The four things interviewers probe across the loop, as the role page lists
  * them, each a numbered row with its detail inking in as it is said. Numbered
- * in blue, like the loop's cards: red is kept for the trap.
+ * on a blue disc, the house badge with no ring, blue like the loop's "1 of
+ * 3": red is kept for the trap.
  */
 export const ProbeScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -58,17 +61,20 @@ export const ProbeScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -16}px)`,
               }}
             >
+              {/* The number on a tinted disc, at 35px: within 12% of the
+                  name's 38, so the line keeps one size. */}
               <span
                 style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: 26,
-                  border: `2px solid ${BLUE_INK}`,
-                  background: PAPER,
+                  ...label(35, BLUE_INK),
+                  ...badgeStyle("blue", 35),
+                  width: 60,
+                  height: 60,
+                  flex: "none",
+                  padding: 0,
+                  borderRadius: 30,
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...label(24, BLUE_INK),
                   ...TABULAR,
                 }}
               >

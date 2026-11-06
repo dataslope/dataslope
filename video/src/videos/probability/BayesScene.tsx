@@ -298,11 +298,12 @@ export const BayesScene: React.FC = () => {
           Before you trust a positive, ask <Sweep at={rareAt}>how rare</Sweep> the thing is.
         </span>
       </Ink>
-      <Ink at={rareAt + 2} dur={16} style={{ left: 900, top: y(842), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
-        <span style={note(24, INK_SOFT)}>Here,</span>
-        <Big size={56} color={DATA_INK} italic>
-          1 in {num(TEST.oneIn)}
-        </Big>
+      {/* In the face and size of the line above it: the rate stands out by
+          its color and weight. */}
+      <Ink at={rareAt + 2} dur={16} style={{ left: 900, top: y(842), whiteSpace: "nowrap" }}>
+        <span style={{ ...body(36, true), color: INK_SOFT }}>
+          Here, <span style={{ color: DATA_INK, fontWeight: 600 }}>1 in {num(TEST.oneIn)}</span>.
+        </span>
       </Ink>
       </div>
     </AbsoluteFill>

@@ -129,7 +129,9 @@ export const Sweep: React.FC<{ at: number; dur?: number; color?: string; out?: n
   const p = ease(frame, at, dur);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The stroke reaches 0.08em past the words on each side; the margin gives
+    // that back, so a neighbour keeps a full space from the stroke.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.08em" }}>
       <span
         style={{
           position: "absolute",

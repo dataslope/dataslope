@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { type BadgeTone, badgeStyle, Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, TOKENS, VIDEO } from "./data";
@@ -129,7 +129,9 @@ export const Marked: React.FC<{ at: number; out?: number; color?: string; childr
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   return (
-    <span style={{ position: "relative", whiteSpace: "nowrap" }}>
+    // The highlight reaches 0.18em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", whiteSpace: "nowrap", margin: "0 0.18em" }}>
       <span
         style={{
           position: "absolute",
@@ -260,30 +262,14 @@ export const Spot: React.FC<{
   );
 };
 
-/** A small rounded tag in a hue, for a label that sits on a figure. */
-export const Tag: React.FC<{ color: string; ink: string; children: React.ReactNode; size?: number; style?: React.CSSProperties }> = ({
-  color,
-  ink,
+/** A small tag for a label that sits on a figure: the house badge, a light
+ *  tint of its hue in that hue's ink, no border. */
+export const Tag: React.FC<{ tone: BadgeTone; children: React.ReactNode; size?: number; style?: React.CSSProperties }> = ({
+  tone,
   children,
   size = 21,
   style,
-}) => (
-  <span
-    style={{
-      display: "inline-block",
-      padding: "4px 12px 5px",
-      borderRadius: 8,
-      background: tint(color, 20),
-      border: `1.5px solid ${color}`,
-      ...note(size, ink),
-      fontWeight: 650,
-      whiteSpace: "nowrap",
-      ...style,
-    }}
-  >
-    {children}
-  </span>
-);
+}) => <span style={{ ...note(size), ...badgeStyle(tone, size), ...style }}>{children}</span>;
 
 /** Soft ink for the notes that say a figure's numbers are the lesson's
  *  illustration rather than a measurement. */

@@ -174,11 +174,13 @@ export const SizeScene: React.FC = () => {
 
         <Note at={rootAt - 4} x={CHART.x0 - 40} y={y(CHART.top) - h(22)}>
           <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
-            <span style={label(21, INK_SOFT)}>half-width</span>
+            {/* One line, one face: the name, the formula and what it means
+                are all set in the math serif at one size. */}
+            <span style={math(28, INK_SOFT)}>half-width</span>
             <span style={math(28, INK)}>
               = 1.96 √(p(1 − p) / n)
             </span>
-            <span style={{ ...note(24, INK), opacity: ease(frame, halvesAt - 2, 10) }}>
+            <span style={{ ...math(28, INK), opacity: ease(frame, halvesAt - 2, 10) }}>
               <Mark at={halvesAt + 6} out={habitsAt}>
                 4× the items, half the width
               </Mark>
@@ -258,12 +260,16 @@ export const SizeScene: React.FC = () => {
         <Note at={stratAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 150)}>
           <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={stratAt + 6}>2. stratify</Mark>
-            <span style={{ ...note(24, INK_SOFT), fontWeight: 500, marginLeft: 16, opacity: ease(frame, sliceAt, 10) }}>
-              a small slice that regresses{" "}
-              <Mark at={awayAt} color={MARK_BAD}>
-                isn&apos;t averaged away
-              </Mark>
-            </span>
+          </span>
+        </Note>
+        {/* What it keeps, on a line of its own under the habit, as the first
+            habit's note sits under it. */}
+        <Note at={sliceAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 150) + h(50)}>
+          <span style={{ ...note(24, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap" }}>
+            a small slice that regresses{" "}
+            <Mark at={awayAt} color={MARK_BAD}>
+              isn&apos;t averaged away
+            </Mark>
           </span>
         </Note>
       </Drift>

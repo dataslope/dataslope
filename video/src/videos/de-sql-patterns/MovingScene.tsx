@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK, OK_INK, QMono, QuestionCard } from "../../editorial/interview";
+import { OK, OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
@@ -22,6 +22,7 @@ import {
   MARK,
   MARK_BAD,
   MARK_OK,
+  QMono,
   stripGeometry,
   TableName,
   X0,

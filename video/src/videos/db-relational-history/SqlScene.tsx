@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Card, Headline, KEY, KEY_INK, Mark, pulse, Spot, Svg, Tick } from "./parts";
@@ -226,10 +226,12 @@ export const SqlScene: React.FC = () => {
           );
         })}
       </div>
-      <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 880, top: y(520), whiteSpace: "nowrap" }}>
-        <div style={{ transform: "rotate(-5deg)", border: `3px solid ${ACCENT}`, borderRadius: 6, padding: "6px 16px" }}>
-          <span style={{ ...label(26, ACCENT_INK) }}>That name is taken</span>
-        </div>
+      {/* The stamp, its words well over 1.2 times SEQUEL's 175px clear of its
+          last letter (near 690), so they read as a note beside the word, not
+          as part of its line. */}
+      <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 910, top: y(520), whiteSpace: "nowrap" }}>
+        {/* A red house badge, set at a stamp's tilt. */}
+        <div style={{ ...label(26), ...badgeStyle("red", 26), transform: "rotate(-5deg)" }}>That name is taken</div>
       </Ink>
       <Spot
         id="db-relational-history-plane"

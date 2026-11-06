@@ -175,9 +175,11 @@ export const ResendScene: React.FC = () => {
       {BILL_TURNS.map((t, k) => (
         <React.Fragment key={t}>
           <Note at={billCue[k] - 4} x={BILL_R} y={y(BILL_Y[k])} align="right">
-            <span style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{t} turns</span>
-              <span style={{ ...headline(48), ...TABULAR }}>{usd(billAt(t), 4)}</span>
+            {/* The bill, and under it how many turns it pays for: two lines,
+                so each is one size and one face. */}
+            <span style={{ display: "block", ...headline(48), ...TABULAR, whiteSpace: "nowrap" }}>{usd(billAt(t), 4)}</span>
+            <span style={{ display: "block", marginTop: 6, ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+              <span style={TABULAR}>{t}</span> turns
             </span>
           </Note>
         </React.Fragment>

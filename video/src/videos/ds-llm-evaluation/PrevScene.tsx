@@ -148,10 +148,11 @@ export const PrevScene: React.FC = () => {
           />
         </svg>
         <Note at={twentyAt + 4} x={BAR.x0} y={y(ROW_LABEL) + h(BAR.h + 10)}>
-          <span style={{ ...note(30, BLUE_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          {/* One size along the line: the share large only by weight. */}
+          <span style={{ ...note(28, BLUE_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
             labeled complaints: {pct(PREV.obs)}
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 500 }}> {num(PREV.flagged)}</span>
-            <span style={{ ...note(22, BLUE_INK), fontWeight: 600, opacity: counted, marginLeft: 22 }}>
+            <span style={{ ...note(26, INK_SOFT), fontWeight: 500 }}> {num(PREV.flagged)}</span>
+            <span style={{ ...note(26, BLUE_INK), fontWeight: 600, opacity: counted, marginLeft: 22 }}>
               caught: {pct(PREV.sens)} of {num(PREV.trueComplaints)} = {num(PREV.caught)}
             </span>
           </span>
@@ -183,11 +184,11 @@ export const PrevScene: React.FC = () => {
           </svg>
         ) : null}
         <Note at={shareAt} x={BAR.x0} y={y(ROW_TRUTH) + h(BAR.h + 10)}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
             <Mark at={shareAt + 6} color={MARK_OK}>
               complaints: about {pct(PREV.prev, 1)}
             </Mark>
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 500 }}> {num(PREV.trueComplaints)}</span>
+            <span style={{ ...note(26, INK_SOFT), fontWeight: 500 }}> {num(PREV.trueComplaints)}</span>
           </span>
         </Note>
         <Note at={correctAt + 10} x={BAR.x0 + px(PREV.trueComplaints) + 20} y={y(ROW_TRUTH) + h(12)}>
@@ -215,7 +216,7 @@ export const PrevScene: React.FC = () => {
               </span>
             </span>
             <span style={{ opacity: solved, display: "flex", alignItems: "center", marginLeft: 56 }}>
-              <span style={{ ...label(21, INK_SOFT), marginRight: 22 }}>so</span>
+              <span style={{ ...math(30, INK_SOFT), marginRight: 22 }}>so</span>
               <span>share</span>
               <Op>=</Op>
               <Frac

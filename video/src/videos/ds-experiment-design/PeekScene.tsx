@@ -172,7 +172,7 @@ export const PeekScene: React.FC = () => {
             <React.Fragment key={r.text}>
               <div style={{ position: "absolute", left: COL_X, top, ...note(23, INK), whiteSpace: "nowrap", opacity: p, ...TABULAR }}>
                 {r.text}
-                <span style={{ ...label(19, INK_SOFT) }}> · {r.r.looks} {r.r.looks === 1 ? "look" : "looks"}</span>
+                <span style={{ ...label(21, INK_SOFT) }}> · {r.r.looks} {r.r.looks === 1 ? "look" : "looks"}</span>
               </div>
               <div
                 style={{

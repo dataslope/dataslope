@@ -2,18 +2,18 @@ import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink, NextLine } from "../../editorial/ui";
+import { body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { badgeStyle, FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, ElbowArrow, FIG_Y, Headline, Mark, Tag } from "./parts";
+import { Drift, ElbowArrow, FIG_Y, Headline, Mark, Spot, Tag } from "./parts";
 
 const ROOT_X = 120;
 const ROOT_W = 300;
 const ROOT_H = 92;
 /** The three answers, the top one clear of Fig. 12's label at FIG_Y. */
-const BRANCH_Y = [376, 510, 644];
+const BRANCH_Y = [376, 502, 628];
 const ANSWER_X = 660;
 
 /**
@@ -29,6 +29,7 @@ export const ChooseScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("choose").from;
+  const childAt = n.word("choose", "child");
   const withoutAt = n.word("choose", "without its parent");
   const nothingAt = n.word("choose", "Nothing");
   const cascadeAt = n.word("choose", "Cascade");
@@ -58,6 +59,7 @@ export const ChooseScene: React.FC = () => {
       <Sfx name="el-pencil" at={aloneAt - 4} level={-34} />
       <Sfx name="el-pencil" at={recordAt - 6} level={-34} />
       <Sfx name="el-tap" at={sameAt} level={-29} />
+      <Sfx name="el-pop" at={childAt - 2} level={-30} />
       {/* The conclusion's bell, in the silence after the last word. */}
       <Sfx name="el-chime" at={end + 6} level={-32} />
 
@@ -107,30 +109,28 @@ export const ChooseScene: React.FC = () => {
                   <span style={{ opacity: ease(frame, a.actAt - 4, 10), transform: `translateY(${(1 - ease(frame, a.actAt - 4, 10)) * 8}px)`, display: "inline-block" }}>
                     <span
                       style={{
+                        // A red house badge, within 12% of the question it
+                        // answers: one line, one size.
+                        ...badgeStyle("red", 35),
                         fontFamily: MONO,
-                        fontSize: 28,
-                        fontWeight: 700,
-                        color: ACCENT_INK,
-                        padding: "2px 14px",
-                        border: `2px solid ${ACCENT_INK}`,
-                        borderRadius: 8,
                       }}
                     >
                       {a.action}
                     </span>
                   </span>
                 </Ink>
-                <Ink at={a.actAt + 4} dur={14} style={{ left: ANSWER_X, top: by + 30, whiteSpace: "nowrap" }}>
-                  <span style={{ ...note(21, INK_SOFT) }}>{a.eg}</span>
+                <Ink at={a.actAt + 4} dur={14} style={{ left: ANSWER_X, top: by + 42, whiteSpace: "nowrap" }}>
+                  <span style={{ ...note(28, INK_SOFT) }}>{a.eg}</span>
                 </Ink>
               </React.Fragment>
             );
           })}
 
-          {/* ── ON UPDATE: the same question ── */}
-          <div style={{ position: "absolute", left: ROOT_X, top: y(766) - 14, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
+          {/* ── ON UPDATE: the same question, set apart by space alone (the
+              owner: no rule above it, more room instead) ── */}
           <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(766), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
-            <Tag color={INK} size={22} mono>
+            {/* At the sentence's own size, less the 12% a line may vary. */}
+            <Tag color={INK} size={29} mono>
               ON UPDATE
             </Tag>
             <span style={{ ...body(32, true), color: INK }}>
@@ -143,7 +143,10 @@ export const ChooseScene: React.FC = () => {
           </Ink>
         </div>
 
-        <NextLine at={shapeAt - 4} x={ROOT_X} y={y(842)} width={760}>
+        {/* A parent and the child holding its hand: the question the headline asks. */}
+        <Spot id="db-keys-family" at={childAt - 4} left={1500} top={400} width={171} height={220} />
+
+        <NextLine at={shapeAt - 4} x={ROOT_X} y={y(850)} width={760}>
           the shapes relationships take.
         </NextLine>
       </Drift>

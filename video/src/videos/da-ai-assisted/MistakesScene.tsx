@@ -268,11 +268,11 @@ export const MistakesScene: React.FC = () => {
         {rest.map((r, i) => (
           <Note key={r.text} at={r.at} x={REST_X} y={restTop + i * pitch}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(22, INK_SOFT), marginRight: 12 }}>
+              <span style={{ ...label(24, INK_SOFT), marginRight: 12 }}>
                 <Num>{i + 1}</Num>
               </span>
               {r.text}
-              {r.silent ? <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, opacity: ease(frame, noErrorAt - 2, 10) }}> (silent)</span> : null}
+              {r.silent ? <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, opacity: ease(frame, noErrorAt - 2, 10) }}> (silent)</span> : null}
             </span>
           </Note>
         ))}
@@ -295,7 +295,7 @@ export const MistakesScene: React.FC = () => {
         </Note>
         <Note at={inventedAt - 2} x={REST_X} y={loudY}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, INK_SOFT), marginRight: 12 }}>
+            <span style={{ ...label(24, INK_SOFT), marginRight: 12 }}>
               <Num>5</Num>
             </span>
             invented columns, wrong-dialect functions

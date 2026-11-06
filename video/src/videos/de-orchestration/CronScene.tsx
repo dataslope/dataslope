@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -251,7 +251,7 @@ export const CronScene: React.FC = () => {
 
         {/* What comes with it. */}
         {extras.map((e, i) => (
-          <Pill key={e.text} x={1450} y={y(612) + i * h(56)} at={e.at} ink={BLUE_INK} size={23}>
+          <Pill key={e.text} x={1450} y={y(612) + i * h(56)} at={e.at} tone="blue" size={23}>
             {e.text}
           </Pill>
         ))}

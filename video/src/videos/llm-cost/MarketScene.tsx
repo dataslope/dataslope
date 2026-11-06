@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FIVES, int, OVERSIZED, RATES, SPREAD, THRESHOLDS, usd } from "./data";
@@ -33,6 +33,9 @@ const ROW_DY = 48;
 const IN_R = 640;
 const OUT_R = 790;
 const RATIO_R = 890;
+/** The house badge (orange, the output hue) on the ratios over five, and its side padding. */
+const RATIO_BADGE = badgeStyle("orange", 24);
+const RATIO_PAD = Math.round(24 * 0.55);
 const BAR_X = 930;
 const PX_PER_DOLLAR = 30;
 const TABLE_R = 1236;
@@ -185,15 +188,14 @@ export const MarketScene: React.FC = () => {
                   {isFive >= 0 ? (
                     <Marked at={Math.round(fiveAt + ((tenRowsAt - fiveAt) * isFive) / Math.max(1, fivesIdx.length - 1))}>{r.ratioPrinted}</Marked>
                   ) : (
-                    // More than five: outlined on "never less", the pill sized to its text
-                    // ("8.3x" is wider than "6x"), the digits still on the column's right edge.
+                    // More than five: a house badge on "never less", its tint fading in, sized
+                    // to its text ("8.3x" is wider than "6x"), the digits still on the column's
+                    // right edge.
                     <span
                       style={{
-                        display: "inline-block",
-                        padding: "0 0.4em",
-                        marginRight: "-0.4em",
-                        borderRadius: 18,
-                        boxShadow: `inset 0 0 0 2px color-mix(in srgb, ${OUTPUT_INK} ${Math.round(ease(frame, neverAt, 10) * 100)}%, transparent)`,
+                        ...RATIO_BADGE,
+                        marginRight: -RATIO_PAD,
+                        background: `color-mix(in srgb, ${RATIO_BADGE.background} ${Math.round(ease(frame, neverAt, 10) * 100)}%, transparent)`,
                       }}
                     >
                       {r.ratioPrinted}
@@ -217,34 +219,34 @@ export const MarketScene: React.FC = () => {
 
         {/* ── The sidebar: what the table says, as it is said ── */}
         <div style={{ opacity: 1 - ease(frame, sideOut, 12) }}>
+          {/* Each stat is a label, its number, and under the number what
+              it counts: three lines, each one size and one face. */}
           <Ink at={fiveAt - 4} dur={14} style={{ left: SIDE_X, top: y(352), whiteSpace: "nowrap" }}>
             <span style={label(23, INK_SOFT)}>Output against input</span>
           </Ink>
-          <Ink at={fiveAt} dur={16} style={{ left: SIDE_X, top: y(386), whiteSpace: "nowrap" }}>
+          <Ink at={fiveAt} dur={16} style={{ left: SIDE_X, top: y(380), whiteSpace: "nowrap" }}>
             <span style={{ ...headline(92), color: OUTPUT_INK }}>5x</span>
           </Ink>
-          <Note at={tenRowsAt - 2} x={SIDE_X + 150} y={y(406)}>
+          <Note at={tenRowsAt - 2} x={SIDE_X} y={y(484)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               in {FIVES} of {RATES.length} rows
+              <span style={{ fontWeight: 650, opacity: ease(frame, neverAt - 2, 14) }}> and never less</span>
             </span>
           </Note>
-          <Note at={neverAt - 2} x={SIDE_X + 150} y={y(444)}>
-            <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>and never less</span>
-          </Note>
 
-          <Ink at={cheapestAt - 4} dur={14} style={{ left: SIDE_X, top: y(540), whiteSpace: "nowrap" }}>
+          <Ink at={cheapestAt - 4} dur={14} style={{ left: SIDE_X, top: y(568), whiteSpace: "nowrap" }}>
             <span style={label(23, INK_SOFT)}>Cheapest input to dearest</span>
           </Ink>
-          <Ink at={hundredthAt - 2} dur={16} style={{ left: SIDE_X, top: y(574), whiteSpace: "nowrap" }}>
+          <Ink at={hundredthAt - 2} dur={16} style={{ left: SIDE_X, top: y(596), whiteSpace: "nowrap" }}>
             <span style={{ ...headline(92), color: POINT_INK }}>{SPREAD}x</span>
           </Ink>
-          <Note at={tenDollarsAt - 2} x={SIDE_X + 230} y={y(604)}>
+          <Note at={tenDollarsAt - 2} x={SIDE_X} y={y(700)}>
             <span style={{ ...note(25, INK), ...TABULAR, whiteSpace: "nowrap" }}>
               {usd(minIn)} to {usd(maxIn)}
             </span>
           </Note>
 
-          <Ink at={pickAt - 4} dur={18} style={{ left: SIDE_X, top: y(742), width: 480 }}>
+          <Ink at={pickAt - 4} dur={18} style={{ left: SIDE_X, top: y(790), width: 480 }}>
             <span style={{ ...body(33, true), color: INK }}>
               The model you pick moves the bill more than any <Marked at={trickAt}>prompt trick.</Marked>
             </span>

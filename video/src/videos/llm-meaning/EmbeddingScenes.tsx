@@ -170,7 +170,7 @@ const TableRow: React.FC<{ top: number; id: number; text: string; at: number; fi
           );
         })}
       </span>
-      <span style={{ ...note(28, INK_SOFT), marginLeft: 10, opacity: ease(frame, fillAt + CELLS, 10) }}>…</span>
+      <span style={{ ...note(24, INK_SOFT), marginLeft: 10, opacity: ease(frame, fillAt + CELLS, 10) }}>…</span>
     </div>
   );
 };
@@ -468,23 +468,19 @@ export const SpaceScene: React.FC = () => {
 
       {/* Under the table: the sentence that generalizes, then dimension 1,847. */}
       <Fade at={catSatAt - 6} out={notesOut} style={{ left: X0, top: y(800) }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 18, ...body(32), color: INK, whiteSpace: "nowrap" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 22, ...body(32), color: INK, whiteSpace: "nowrap" }}>
           <span>
             the <Mark at={catSatAt}>cat</Mark> sat on the mat
           </span>
-          <Tag size={21}>seen in training</Tag>
+          <span style={{ fontStyle: "italic", color: INK_SOFT }}>seen in training</span>
         </div>
       </Fade>
       <Fade at={dogSatAt - 4} out={notesOut} style={{ left: X0, top: y(860) }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 18, ...body(32), color: INK, whiteSpace: "nowrap" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 22, ...body(32), color: INK, whiteSpace: "nowrap" }}>
           <span>
             the <Mark at={dogSatAt}>dog</Mark> sat on the mat
           </span>
-          <span style={{ opacity: ease(frame, halfAt - 2, 10) }}>
-            <Tag size={21} color={POINT_INK}>
-              half handled already
-            </Tag>
-          </span>
+          <span style={{ fontStyle: "italic", color: POINT_INK, opacity: ease(frame, halfAt - 2, 10) }}>half handled already</span>
         </div>
       </Fade>
       <Fade at={dimensionAt - 4} style={{ left: X0, top: y(800) }}>

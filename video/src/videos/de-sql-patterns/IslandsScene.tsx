@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { OK_INK, QMono, QuestionCard } from "../../editorial/interview";
+import { OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -8,7 +8,7 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ISLANDS } from "./data";
-import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK, MARK_BAD, MARK_OK, rowsAt, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, MARK, MARK_BAD, MARK_OK, QMono, rowsAt, TableName, X0 } from "./parts";
 
 const TOP = 320;
 const LIST_X = 600;

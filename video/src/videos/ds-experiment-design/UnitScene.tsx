@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { pct, UNIT, UNIT_SE } from "./data";
@@ -127,42 +127,27 @@ export const UnitScene: React.FC = () => {
       <Drift from={from} to={nextAt}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={60}>
           What is the randomization unit, and{" "}
+          {/* The question mark inside the highlight: after it, the
+              highlighter's 0.14em margin set it apart as "matter ?". */}
           <Mark at={whyAt} out={requestAt}>
-            why does it matter
+            why does it matter?
           </Mark>
-          ?
         </QuestionCard>
 
-        {/* What gets assigned. */}
-        <Note at={assignedAt} x={X0} y={y(300)}>
-          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>assigned to a group:</span>
-        </Note>
-        <div style={{ position: "absolute", left: X0 + 250, top: y(294), display: "flex", gap: 12 }}>
-        {[
-          { text: "user", at: userAt, main: true },
-          { text: "session", at: sessionAt, main: false },
-          { text: "device", at: sessionAt + 6, main: false },
-        ].map((c) => {
-          const p = ease(frame, c.at - 2, 10);
-          return (
-            <div
-              key={c.text}
-              style={{
-                padding: "4px 14px",
-                borderRadius: 6,
-                border: `2px solid ${c.main ? OK : INK_SOFT}`,
-                background: c.main ? `color-mix(in srgb, ${OK} 16%, ${PAPER})` : PAPER,
-                ...note(24, c.main ? OK_INK : INK),
-                fontWeight: c.main ? 700 : 500,
-                whiteSpace: "nowrap",
-                opacity: p,
-              }}
-            >
-              {c.main ? "usually a " : ""}
+        {/* What gets assigned: one line, the units as house badges held
+            apart by their gap, the usual one green. Each badge holds its
+            place before it inks, so the line never reflows. */}
+        <div style={{ position: "absolute", left: X0, top: y(300), display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, INK_SOFT), opacity: ease(frame, assignedAt, 14) }}>assigned to a group:</span>
+          {[
+            { text: "usually a user", at: userAt, main: true },
+            { text: "session", at: sessionAt, main: false },
+            { text: "device", at: sessionAt + 6, main: false },
+          ].map((c) => (
+            <span key={c.text} style={{ ...note(25), ...badgeStyle(c.main ? "green" : "gray", 25), opacity: ease(frame, c.at - 2, 10) }}>
               {c.text}
-            </div>
-          );
-        })}
+            </span>
+          ))}
         </div>
 
         <Requests top={y(410)} at={userAt + 6} mixed={false} label="by user" />
@@ -225,7 +210,7 @@ export const UnitScene: React.FC = () => {
                 ) : (
                   b.text
                 )}
-                <span style={{ ...label(21, b.ink), fontWeight: 650, opacity: ease(frame, b.seAt, 10) }}>
+                <span style={{ ...label(23, b.ink), fontWeight: 650, opacity: ease(frame, b.seAt, 10) }}>
                   {" · standard error "}
                   {b.se.toFixed(2)}
                   {b.v === UNIT.naive ? <span style={{ opacity: ease(frame, smallAt, 10) }}>, too small</span> : null}

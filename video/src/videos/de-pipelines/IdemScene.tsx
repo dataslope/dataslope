@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, ColumnRule, Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BLIND, DELETE_DAY, IDEM } from "./data";
-import { Drift, lineOf, Listing, listingHeight, Mark, MARK_OK, Mono, OK, OK_INK, Pill, pulse, X0 } from "./parts";
+import { Drift, lineOf, Listing, listingHeight, Mark, MARK_OK, Mono, OK_INK, Pill, pulse, X0 } from "./parts";
 
 const SIZE = 23;
 const LIST_W = 560;
@@ -17,6 +17,11 @@ const A_TOP = 390;
 const B_TOP = 620;
 const COUNT_X = 800;
 const COUNT_GAP = 220;
+/** A count's label and its box, top to bottom, in px (20px label, 8px gap,
+ *  the 64px box), and the hairline between a pair's two counts, centred in
+ *  the gap between the first box and the second label. */
+const COUNT_H = 96;
+const COUNT_RULE = 160;
 const NOTE_X = 1310;
 
 /** The day's count after one run: a label over the number COUNT(*) printed. */
@@ -32,28 +37,27 @@ const RunCount: React.FC<{ at: number; x: number; y: number; run: string; value:
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
-  const line = tone === "bad" ? ACCENT : tone === "ok" ? OK : BAR;
-  const ink = tone === "bad" ? ACCENT_INK : tone === "ok" ? OK_INK : BLUE_INK;
+  const badge = tone === "bad" ? "red" : tone === "ok" ? "green" : "blue";
   return (
     <div style={{ position: "absolute", left: x, top: y, width: 170, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
       <div style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>{run}</div>
+      {/* The number as a house badge, at the box's old size; a second look
+          swells it a little (`lit`). */}
       <div
         style={{
+          ...badgeStyle(badge, 40),
           marginTop: 8,
           width: 120,
           height: 64,
+          padding: 0,
           boxSizing: "border-box",
-          border: `${2.5 + 2 * lit}px solid ${line}`,
-          borderRadius: 10,
-          background: `color-mix(in srgb, ${line} 12%, ${PAPER})`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontFamily: MONO,
-          fontSize: 40,
-          fontWeight: 700,
-          color: ink,
           fontVariantNumeric: "tabular-nums",
+          transform: `scale(${1 + 0.1 * lit})`,
+          transformOrigin: "0 50%",
         }}
       >
         {value}
@@ -153,6 +157,7 @@ export const IdemScene: React.FC = () => {
         </Note>
         <RunCount at={eightAt - 2} x={COUNT_X} y={countY(aTop)} run="after run 1" value={IDEM.blind[0]} tone="data" />
         <RunCount at={sixteenAt - 2} x={COUNT_X + COUNT_GAP} y={countY(aTop)} run="after the retry" value={IDEM.blind[1]} tone="bad" lit={pulse(frame, sixteenAt + 8, 20)} />
+        <ColumnRule x={COUNT_X + COUNT_RULE} top={countY(aTop)} height={COUNT_H} at={sixteenAt} />
         <Pill x={COUNT_X + 140} y={aTop + h(120)} at={failAt} tone="bad" size={20}>
           ✕ failed after the write
         </Pill>
@@ -182,6 +187,7 @@ export const IdemScene: React.FC = () => {
         />
         <RunCount at={onceAt + 4} x={COUNT_X} y={countY(bTop) + h(40)} run="after run 1" value={IDEM.over[0]} tone="data" />
         <RunCount at={twiceAt + 6} x={COUNT_X + COUNT_GAP} y={countY(bTop) + h(40)} run="after run 2" value={IDEM.over[1]} tone="ok" lit={pulse(frame, twiceAt + 18, 20)} />
+        <ColumnRule x={COUNT_X + COUNT_RULE} top={countY(bTop) + h(40)} height={COUNT_H} at={twiceAt + 8} />
         <Note at={emptyAt} x={COUNT_X} y={bTop + bH - h(56)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             insert fails inside it: rolled back, June 1 still has {IDEM.rolledBack}

@@ -94,7 +94,7 @@ export const SelfScene: React.FC = () => {
 
       <Kicker at={from - 10}>Self-reference</Kicker>
       <Head lead="One table," leadAt={from - 6} turn="pointing at itself." turnAt={pointsAt - 2} />
-      <Spot id="db-relationship-patterns-dolls" at={chainAt} left={1590} top={y(70)} width={250} height={170} />
+      <Spot id="db-relationship-patterns-dolls" at={chainAt} left={1580} top={y(114)} width={200} height={136} />
 
       <Drift from={from} to={internAt + 60} scale={0.016} origin={[960, y(580)]}>
         <FigLabel n="17" title="Employees and their managers, in one table" at={employeeAt - 6} x={a[0] - LOOP} y={figY} />

@@ -7,7 +7,8 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TRAP } from "./data";
-import { DataTable, Drift, Listing, listingHeight, Mark, MARK_BAD, MARK_OK, Mono, Spot, TableName, tableGeometry, X0 } from "./parts";
+import { DataTable, Drift, Listing, listingHeight, Mark, MARK_BAD, MARK_OK, Spot, TableName, tableGeometry, X0 } from "./parts";
+import { Mono } from "./mono";
 
 const LIST_Y = 330;
 const LIST_W = 700;

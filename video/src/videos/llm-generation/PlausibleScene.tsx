@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, BLUE_INK, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CONTINUATIONS } from "./data";
-import { GOOD, GOOD_INK, Headline, Kicker, pulse, Spot, Svg, Tag, tint, X0 } from "./kit";
+import { GOOD_INK, Headline, Kicker, pulse, Spot, Svg, Tag, tint, X0 } from "./kit";
 
 const ROW_Y = [384, 510] as const;
 const TAG_DY = 58;
@@ -64,7 +64,6 @@ export const PlausibleScene: React.FC = () => {
       <FigLabel n="7" title="Two continuations, one mechanism (the lesson's first block)" at={contAt - 6} x={X0} y={y(318)} />
       {CONTINUATIONS.map((c, i) => {
         const top = y(ROW_Y[i]);
-        const color = c.grounded ? GOOD : ACCENT;
         const swell = pulse(frame, fluentAt - 2 + i * 4, 20);
         return (
           <React.Fragment key={c.prompt}>
@@ -103,7 +102,7 @@ export const PlausibleScene: React.FC = () => {
               </span>
             </Ink>
             <Note at={tagIn[i] - 2} x={X0} y={top + h(TAG_DY)} from="up">
-              <Tag color={color} ink={c.grounded ? GOOD_INK : ACCENT_INK}>
+              <Tag tone={c.grounded ? "green" : "red"}>
                 {c.grounded ? "seen millions of times" : "never in its data"}
               </Tag>
             </Note>

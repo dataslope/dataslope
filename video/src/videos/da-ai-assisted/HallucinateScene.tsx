@@ -3,21 +3,22 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, body, label, note } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT, body, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Mark, MARK_OK, OK_INK, Strike, X0 } from "./parts";
+import { Drift, FlexRule, Mark, MARK_OK, OK_INK, Strike, X0 } from "./parts";
 
 const KINDS_Y = 350;
+/** The three kinds run from X0 to here, a hairline centred in each gap. */
+const KINDS_R = 1720;
 const REPORT_Y = 470;
 const RULE_Y = 760;
-const KIND_W = 540;
 
 /**
- * Question 4. The three kinds of unsupported claim, each a card as it is
- * named; then the page's own example sentence, set like a line in a weekly
- * report, its measured drop marked as traced to a query and its "because"
+ * Question 4. The three kinds of unsupported claim, each a column of red
+ * text as it is named; then the page's own example sentence, under the name
+ * of the weekly report it comes from, its measured drop marked as traced to a query and its "because"
  * struck as a guess until timing and segments are checked; then the rule
  * that keeps both apart, and never lets the model compute a number.
  */
@@ -50,6 +51,9 @@ export const HallucinateScene: React.FC = () => {
   const end = n.beat("hallucinate-draft").to;
 
   const reportP = ease(frame, exampleAt - 6, 14);
+  // The report's line: its source 12px over it, its two verdicts 26px under.
+  const reportTop = y(REPORT_Y) + h(36);
+  const verdictY = reportTop + 26 + 12 + 56 + 26;
 
   return (
     <AbsoluteFill>
@@ -69,53 +73,36 @@ export const HallucinateScene: React.FC = () => {
         <Note at={Math.min(claimAt, asked) - 6} x={X0} y={y(KINDS_Y) - h(48)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a claim the data doesn&apos;t support:</span>
         </Note>
-        {kinds.map((k, i) => {
-          const p = ease(frame, k.at - 2, 12);
-          if (p <= 0) return null;
-          return (
-            <div
-              key={k.text}
-              style={{
-                position: "absolute",
-                left: X0 + i * (KIND_W + 30),
-                top: y(KINDS_Y),
-                width: KIND_W,
-                padding: "14px 20px",
-                boxSizing: "border-box",
-                borderLeft: `4px solid ${ACCENT}`,
-                background: `color-mix(in srgb, ${ACCENT} 7%, ${PAPER})`,
-                ...note(28, INK),
-                opacity: p,
-                transform: `translateY(${(1 - p) * 10}px)`,
-              }}
-            >
-              {k.text}
-            </div>
-          );
-        })}
-        <Note at={fluentAt - 2} x={X0} y={y(KINDS_Y) + h(80)}>
+        <div style={{ position: "absolute", left: X0, top: y(KINDS_Y), width: KINDS_R - X0, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          {kinds.map((k, i) => {
+            const p = ease(frame, k.at - 2, 12);
+            return (
+              <React.Fragment key={k.text}>
+                {i > 0 ? <FlexRule at={k.at - 2} /> : null}
+                <div style={{ ...note(28, ACCENT_INK), fontWeight: 600, lineHeight: "36px", whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
+                  {k.text}
+                </div>
+              </React.Fragment>
+            );
+          })}
+        </div>
+        <Note at={fluentAt - 2} x={X0} y={y(KINDS_Y) + h(66)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>a language model writes fluent text either way</span>
         </Note>
 
-        {/* ── The page's example, as a line in a weekly report ── */}
+        {/* ── The page's example, as a line in a weekly report: its source
+            over it, and the two verdicts on it under it ── */}
         <div
           style={{
             position: "absolute",
             left: X0,
-            top: y(REPORT_Y),
-            width: 1680,
-            padding: "26px 34px",
-            boxSizing: "border-box",
-            border: `1.5px solid ${HAIRLINE}`,
-            borderRadius: 10,
-            background: PAPER,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+            top: reportTop,
             opacity: reportP,
             transform: `translateY(${(1 - reportP) * 12}px)`,
           }}
         >
-          <div style={{ ...label(20, INK_SOFT), marginBottom: 10 }}>Weekly summary, drafted by a model</div>
-          <div style={{ ...body(44), color: INK, whiteSpace: "nowrap" }}>
+          <div style={{ ...label(20, INK_SOFT), lineHeight: "26px", whiteSpace: "nowrap" }}>Weekly summary, drafted by a model</div>
+          <div style={{ ...body(44), color: INK, lineHeight: "56px", marginTop: 12, whiteSpace: "nowrap" }}>
             Signups <Mark at={confirmsAt + 2} color={MARK_OK}>fell 12%</Mark>{" "}
             {/* Set off from the highlight, so the strike starts on "because", not on its edge. */}
             <span style={{ marginLeft: "0.14em" }}>
@@ -126,10 +113,10 @@ export const HallucinateScene: React.FC = () => {
             .
           </div>
         </div>
-        <Note at={confirmsAt + 6} x={X0 + 34} y={y(REPORT_Y) + h(190)}>
+        <Note at={confirmsAt + 6} x={X0} y={verdictY}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>✓ your query confirms the 12%</span>
         </Note>
-        <Note at={guessAt + 6} x={X0 + 560} y={y(REPORT_Y) + h(190)}>
+        <Note at={guessAt + 6} x={X0 + 526} y={verdictY}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             the &ldquo;because&rdquo; is a guess
             <span style={{ opacity: ease(frame, checkAt - 2, 10) }}>: check the timing and the segments, or cut it</span>

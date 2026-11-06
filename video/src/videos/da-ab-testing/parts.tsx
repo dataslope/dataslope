@@ -2,8 +2,9 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { BAR } from "../../editorial/style";
+import { BAR, HAIRLINE } from "../../editorial/style";
 import { ds, inkOf } from "../../theme/brand";
+import { MONO } from "../../theme/fonts";
 import { type Col, tableGeometry } from "../da-sql/parts";
 import { at, type Scale } from "../da-statistics-communication/parts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -29,7 +30,6 @@ export {
   MARK_BAD,
   MARK_KEY,
   MARK_OK,
-  Mono,
   OK,
   OK_INK,
   pulse,
@@ -40,6 +40,15 @@ export {
   type TableGeometry,
 } from "../da-sql/parts";
 export { at, Axes, Bracket, Dots, VLine, WARM, WARM_INK, type Scale } from "../da-statistics-communication/parts";
+
+/** Code inside a line of prose, in the mono face at 0.92em: within the 12%
+ *  a line's sizes may differ by (`check:frames`), where the 0.88em of the
+ *  Mono this video used to take from Parts 1 and 2 is not. */
+export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
 
 /** The two arms keep one ink each across the video, as in the hook: A the
  *  data blue, B a teal (a non-semantic hue, so neither reads as right). */
@@ -68,6 +77,26 @@ export const curvePath = (x: Scale, base: number, height: number, mu: number, lo
   });
   const line = pts.map(([px, py], i) => `${i ? "L" : "M"}${px.toFixed(1)},${py.toFixed(1)}`).join(" ");
   return area ? `${line} L${at(x, hi).toFixed(1)},${base} L${at(x, lo).toFixed(1)},${base} Z` : line;
+};
+
+/** A vertical hairline between columns of text set side by side, placed by
+ *  hand: centred in their gap, as tall as their text, inking in with the
+ *  column to its right (`at`). */
+export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: number; out?: number }> = ({ x, top, height, at: from, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, from, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  if (p <= 0) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height, background: HAIRLINE, opacity: p }} />;
+};
+
+/** A vertical hairline between columns of text set side by side, as an item
+ *  of their flex row: as tall as the row's text, inking in with the column
+ *  to its right (`at`). Spread the row with `space-between` to centre it in
+ *  its gap. */
+export const FlexRule: React.FC<{ at: number; out?: number }> = ({ at: from, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, from, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  return <div style={{ width: 1, alignSelf: "stretch", flexShrink: 0, background: HAIRLINE, opacity: Math.max(0, p) }} />;
 };
 
 const NUMBER = /^-?\d[\d,_]*(\.\d+)?$/;

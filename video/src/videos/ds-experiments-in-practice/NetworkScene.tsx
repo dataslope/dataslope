@@ -232,8 +232,8 @@ export const NetworkScene: React.FC = () => {
 
           {/* SUTVA, named. */}
           <Note at={sutvaAt} x={1080} y={y(370)}>
-            <span style={{ ...note(30, INK), fontWeight: 800, whiteSpace: "nowrap" }}>SUTVA</span>
-            <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, stableAt, 10) }}>: the stable unit treatment value assumption</span>
+            <span style={{ ...note(27, INK), fontWeight: 800, whiteSpace: "nowrap" }}>SUTVA</span>
+            <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, stableAt, 10) }}>: the stable unit treatment value assumption</span>
           </Note>
 
           {/* The two arms, sketched: the gap closes. */}

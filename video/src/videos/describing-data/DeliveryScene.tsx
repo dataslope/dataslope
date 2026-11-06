@@ -145,7 +145,8 @@ export const DeliveryScene: React.FC = () => {
         Square, sum, divide, root.
       </Ink>
 
-      <Spot id="describing-data-scooter" at={twoAt - 4} left={1600} top={y(96)} width={240} height={238} />
+      {/* The delivery: a small scooter, top right, well above the working's column. */}
+      <Spot id="describing-data-scooter" at={twoAt - 4} left={1610} top={y(112)} width={190} height={189} />
 
       <FigLabel n="3" title="Ten deliveries from each service, in minutes" at={twoAt - 6} x={160} y={y(330)} />
 
@@ -339,24 +340,38 @@ export const DeliveryScene: React.FC = () => {
         </div>
       </div>
 
-      {/* Divide, then root. */}
+      {/* Divide, then root: each a line of one size, the working in weight
+          and color, the words after it in the soft ink. */}
       <Ink at={countAt - 4} dur={14} style={{ left: 160, top: y(WORK_Y) + 44, whiteSpace: "nowrap" }}>
         <span style={{ ...note(21, INK_SOFT) }}>
           {DELIVERY.steady.length} deliveries, minus one
         </span>
       </Ink>
       <Ink at={nineAt - 4} dur={16} style={{ left: 160, top: y(WORK_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(28, INK), fontWeight: 600 }}>
+        <span style={{ ...note(26, INK), fontWeight: 650 }}>
           {fmt(DELIVERY.sumSquares, 0)} ÷ {DELIVERY.divisor} = {fmt(DELIVERY.variance, 2)}{" "}
-          <span style={{ ...note(24, INK_SOFT) }}>
+          <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             square minutes, the <Mark at={varianceAt - 2}>variance</Mark>
           </span>
         </span>
       </Ink>
+      {/* The two steps sit side by side: a hairline in the gap, as tall as the
+          variance and its note, inking in with the root on its right. */}
+      <div
+        style={{
+          position: "absolute",
+          left: 848,
+          top: y(WORK_Y) + 2,
+          width: 1,
+          height: 68,
+          background: HAIRLINE,
+          opacity: ease(frame, rootAt - 4, 14),
+        }}
+      />
       <Ink at={rootAt - 2} dur={16} style={{ left: 1010, top: y(WORK_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(28, STAT_INK), fontWeight: 700 }}>
+        <span style={{ ...note(26, STAT_INK), fontWeight: 650 }}>
           √{fmt(DELIVERY.variance, 2)} ≈ {fmt(DELIVERY.steadySd, 1)}{" "}
-          <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>
+          <span style={{ color: INK_SOFT, fontWeight: 500 }}>
             minutes, the <Mark at={sdAt - 2}>standard deviation</Mark>
           </span>
         </span>

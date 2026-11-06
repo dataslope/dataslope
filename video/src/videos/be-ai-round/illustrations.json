@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "model": "gpt-image-2.6-flare",
+    "brandColors": {
+      "blue": "#148cff",
+      "green": "#20c621",
+      "red": "#ff4f59",
+      "yellow": "#ffdd6c"
+    },
+    "sizes": {
+      "video-hero": "1536x1024",
+      "video-icon": "1024x1024"
+    },
+    "styles": {
+      "watercolor illustration": {
+        "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      }
+    }
+  },
+  "prompts": [
+    {
+      "id": "be-ai-round-lemur",
+      "category": "video-hero",
+      "style": "watercolor illustration",
+      "subject": "a ring-tailed lemur sitting upright on a low rounded rock, its long tail ringed in bands curling up behind it in a tall loose curve, its front paws resting on its knees and its wide eyes looking straight ahead"
+    },
+    {
+      "id": "be-ai-round-steering-wheel",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single round car steering wheel with a thick padded rim and three solid spokes meeting at a plain round hub, seen at a slight tilt"
+    },
+    {
+      "id": "be-ai-round-hourglass",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a standing hourglass with two round wooden end caps and three turned wooden posts, its glass bulbs holding warm yellow sand, most of it still in the upper bulb"
+    },
+    {
+      "id": "be-ai-round-envelope",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single closed paper envelope seen from the back, its triangular flap sealed with a round red wax seal, the paper plain and unmarked"
+    },
+    {
+      "id": "be-ai-round-speedometer",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a round car speedometer gauge in a thick chrome rim, a plain dial face with evenly spaced tick marks and no numbers, a single red needle pointing a little past the middle"
+    }
+  ]
+}

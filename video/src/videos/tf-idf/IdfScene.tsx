@@ -66,6 +66,10 @@ export const IdfScene: React.FC = () => {
   const valueAt = n.word("idf-cat", "one point one");
 
   const zeroLine = ease(frame, theFrom - 4, 16);
+  // The bars' axis label stands 28px clear of the rule above it, and the
+  // zero axis starts under the label, wherever the layout puts the rows.
+  const axisHead = y(RULE_Y) + 28;
+  const axisTop = Math.max(y(ROW_Y.the) - 6, axisHead + 32);
   const catBar = ease(frame, valueAt - 4, 20);
 
   const rows = [
@@ -157,13 +161,13 @@ export const IdfScene: React.FC = () => {
         <line
           x1={BAR_X0}
           x2={BAR_X0}
-          y1={y(ROW_Y.the) - 6}
-          y2={y(ROW_Y.the) - 6 + (y(ROW_Y.cat + ROW_H) - y(ROW_Y.the) + 12) * zeroLine}
+          y1={axisTop}
+          y2={axisTop + (y(ROW_Y.cat + ROW_H) + 6 - axisTop) * zeroLine}
           stroke={INK}
           strokeWidth={1.6}
         />
       </svg>
-      <Note at={theFrom} x={BAR_X0} y={y(RULE_Y) + 8} style={{ transform: "translateX(-50%)" }}>
+      <Note at={theFrom} x={BAR_X0} y={axisHead} style={{ transform: "translateX(-50%)" }}>
         <span style={label(20, INK_SOFT)}>idf</span>
       </Note>
 

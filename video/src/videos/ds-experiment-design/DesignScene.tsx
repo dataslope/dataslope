@@ -3,28 +3,32 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
+import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Mark, MARK_OK, OK_INK, pulse, Strike, X0 } from "./parts";
 
-const CARD_W = 800;
-const CARD_TOP = 290;
+/** The plan's rows: as wide as its longest line (the sample size, about
+ *  720), so their rules stop well short of the divider. */
+const PLAN_W = 740;
+const PLAN_TOP = 290;
 const ROW_TOP = 344;
 const ROW = 74;
 const KEY_W = 210;
 const RIGHT_X = 1010;
+/** The hairline between the plan, once it has moved left, and Question 2:
+ *  centred between the end of the plan's rows (860) and RIGHT_X. */
+const DIVIDER_X = 936;
 
 /**
  * Questions 1 and 2. The test plan written out before anything runs, one
  * line as each is named: hypothesis, primary metric, guardrail, unit, size,
- * duration, analysis, on a card centered on the page until Question 2 needs
- * the right half. Then the primary metric chosen against three tests: raw
- * clicks fail the first, ninety-day retention the last (each verdict names
- * its test, and that chip pulses), and seven-day activation passes all three
- * and is agreed before launch.
+ * duration, analysis, as plain rows with a hairline between them, centered
+ * on the page until Question 2 needs the right half. Then the primary
+ * metric chosen against three tests: raw clicks fail the first, ninety-day
+ * retention the last (each verdict names its test, and that chip pulses),
+ * and seven-day activation passes all three and is agreed before launch.
  */
 export const DesignScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -65,9 +69,8 @@ export const DesignScene: React.FC = () => {
     { key: "analysis", value: "test the difference, check the guardrails", at: n.word("design-plan", "Then test the difference") },
   ];
 
-  const card = ease(frame, writeAt - 4, 16);
   // Centered while it is the only thing on the page; Question 2 moves it left.
-  const centered = (1 - ease(frame, q2At - 4, 18)) * ((1920 - (CARD_W + 40)) / 2 - (X0 - 20));
+  const centered = (1 - ease(frame, q2At - 4, 18)) * ((1920 - (PLAN_W + 40)) / 2 - (X0 - 20));
   const clear = 1 - ease(frame, clearAt, 10);
   const q2 = ease(frame, q2At, 14);
 
@@ -104,22 +107,7 @@ export const DesignScene: React.FC = () => {
 
         {/* The plan, written before anything runs. */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${centered}px)` }}>
-        <div
-          style={{
-            position: "absolute",
-            left: X0 - 20,
-            top: y(CARD_TOP),
-            width: CARD_W + 40,
-            height: h(ROW_TOP - CARD_TOP + rows.length * ROW + 18),
-            boxSizing: "border-box",
-            border: `1.5px solid ${HAIRLINE}`,
-            borderRadius: 10,
-            background: ds("gray", 50),
-            opacity: card,
-            clipPath: `inset(0 ${(1 - card) * 100}% 0 0)`,
-          }}
-        />
-        <Note at={writeAt} x={X0} y={y(CARD_TOP) + h(14)}>
+        <Note at={writeAt} x={X0} y={y(PLAN_TOP) + h(14)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap", letterSpacing: "0.04em" }}>TEST PLAN · written before launch</span>
         </Note>
         {rows.map((r, i) => {
@@ -137,11 +125,11 @@ export const DesignScene: React.FC = () => {
                 position: "absolute",
                 left: X0,
                 top: y(ROW_TOP) + i * h(ROW),
-                width: CARD_W,
+                width: PLAN_W,
                 height: h(ROW),
                 display: "flex",
                 alignItems: "center",
-                borderTop: i === 0 ? "none" : `1px solid color-mix(in srgb, ${INK_SOFT} 30%, transparent)`,
+                borderTop: i === 0 ? "none" : `1px solid ${HAIRLINE}`,
                 opacity: p * (1 - dim),
                 transform: `translateX(${(1 - p) * 12}px)`,
               }}
@@ -173,7 +161,24 @@ export const DesignScene: React.FC = () => {
         })}
         </div>
 
-        {/* Question 2: three tests a primary metric has to pass. */}
+        {/* A hairline between the plan and Question 2's column once the two
+            stand side by side, centred in the gap, inking in with the column
+            on its right. */}
+        <div
+          style={{
+            position: "absolute",
+            left: DIVIDER_X,
+            top: y(296),
+            width: 1,
+            height: y(856) - y(296),
+            background: HAIRLINE,
+            opacity: q2 * ease(frame, tiedAt - 2, 14),
+          }}
+        />
+
+        {/* Question 2: three tests a primary metric has to pass, each in its
+            chip; each chip pulses as it is named, again when a candidate fails
+            it, and all three when seven-day activation passes. */}
         <div style={{ position: "absolute", left: RIGHT_X, top: y(310), display: "flex", gap: 14 }}>
         {criteria.map((c, i) => {
           const p = ease(frame, c.at - 2, 10);
@@ -181,13 +186,8 @@ export const DesignScene: React.FC = () => {
             <div
               key={c.text}
               style={{
-                padding: "6px 14px",
-                borderRadius: 6,
-                border: `2px solid ${INK}`,
-                background: PAPER,
-                ...note(22, INK),
-                fontWeight: 650,
-                whiteSpace: "nowrap",
+                ...note(22),
+                ...badgeStyle("gray", 22),
                 opacity: p * q2,
                 transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * Math.max(pulse(frame, c.at, 14), ...c.again.map((t) => pulse(frame, t, 14)))})`,
               }}

@@ -20,7 +20,7 @@ import {
   TABULAR,
   svgText,
 } from "../../editorial/style";
-import { H, Ink, W } from "../../editorial/ui";
+import { type BadgeTone, badgeStyle, H, Ink, W } from "../../editorial/ui";
 import { colors, ds } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -128,7 +128,9 @@ export const Marked: React.FC<{ at: number; color?: string; out?: number; childr
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.08em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.08em" }}>
       <span
         style={{
           position: "absolute",
@@ -431,44 +433,44 @@ export const Dot: React.FC<{ x: number; y: number; at: number; r?: number; color
   );
 };
 
-/** A small rounded tag, inked in on `at`. */
+/** A small tag, inked in on `at`: the house badge (a light tint of its hue,
+ *  in that hue's ink, no border, its own padding), centred on the 48px box
+ *  the outlined tag had, so the arrows between tags still meet it in the
+ *  middle. `light` halves the tint, for a tag that is only a possibility (the
+ *  outline used to be dashed). */
 export const Tag: React.FC<{
   at: number;
   x: number;
   y: number;
   out?: number;
   dim?: number;
-  color?: string;
-  fill?: string;
-  dashed?: boolean;
+  tone?: BadgeTone;
+  light?: boolean;
   width?: number;
   /** A brief swell when the tag is named again. */
   pulseAt?: number;
   children: React.ReactNode;
-}> = ({ at, x, y, out, dim, color = INK, fill = PAPER, dashed = false, width, pulseAt, children }) => {
+}> = ({ at, x, y, out, dim, tone = "gray", light = false, width, pulseAt, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.65;
   if (p <= 0 || o >= 1) return null;
+  const badge = badgeStyle(tone, 22);
   return (
     <div
       style={{
+        ...label(22),
+        ...badge,
         position: "absolute",
         left: x,
-        top: y,
+        top: y + Math.round((48 - (22 * 1.15 + 2 * Math.round(22 * 0.21))) / 2),
         width,
         boxSizing: "border-box",
-        padding: "9px 18px",
-        borderRadius: 10,
-        border: `2px ${dashed ? "dashed" : "solid"} ${color}`,
-        background: fill,
+        background: light ? `color-mix(in srgb, ${badge.background} 50%, transparent)` : badge.background,
         opacity: p * (1 - o) * (1 - d),
         transform: `translateX(${(1 - p) * -14}px) scale(${1 + (pulseAt === undefined ? 0 : pulse(frame, pulseAt, 18)) * 0.05})`,
         transformOrigin: "0 50%",
-        ...label(22, INK),
-        fontWeight: 600,
-        whiteSpace: "nowrap",
       }}
     >
       {children}

@@ -187,7 +187,7 @@ export const AttnScene: React.FC = () => {
             <span style={{ ...note(25, INK), whiteSpace: "nowrap", ...TABULAR }}>
               <span style={{ display: "inline-block", width: 28 }}>{j > 0 ? "+" : ""}</span>
               <b style={{ color: OK_INK }}>{A.weights[PICK][j].toFixed(2)}</b> × <span style={{ fontFamily: MONO, fontSize: 23, color: BLUE_INK }}>v</span>
-              <span style={{ ...label(20, INK_SOFT) }}>({t})</span>
+              <span style={{ ...label(23, INK_SOFT) }}>({t})</span>
             </span>
           </Note>
         ))}

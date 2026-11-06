@@ -52,7 +52,6 @@ export const RatesScene: React.FC = () => {
   const pointsAt = n.word("relative", "one point two");
   const ppAt = n.word("relative", "percentage points");
   const firstAt = n.word("both", "The first");
-  const readerAt = n.word("both", "reader");
   const everyAt = n.word("interval", "every");
   const sizeAt = n.word("interval", "effect size");
   const liftAt = n.word("interval", "that lift");
@@ -176,9 +175,10 @@ export const RatesScene: React.FC = () => {
                 {w > 0 ? <rect x={RX.x0} y={top} width={w} height={BAR_H} fill={i ? DATA : `color-mix(in srgb, ${DATA} 45%, ${PAPER})`} /> : null}
               </Svg>
               <Note at={(i ? fourAt : threeAt) + 4} x={RX.x0 + w + 14} y={top + 4}>
-                <span style={{ ...note(30, DATA_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(28, DATA_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
                   {fmt(rates[i] * 100, 1)}%
-                  <span style={{ ...note(20, INK_SOFT), marginLeft: 12 }}>
+                  {/* The count, near the rate's size: one line, one size. */}
+                  <span style={{ ...note(26, INK_SOFT), fontWeight: 500, marginLeft: 12 }}>
                     {counts[0]} of {counts[1].toLocaleString("en-US")}
                   </span>
                 </span>
@@ -202,34 +202,20 @@ export const RatesScene: React.FC = () => {
         </Svg>
         <Note at={fortyAt - 2} x={SAY_X} y={y(BAR_Y[0]) - 30}>
           <div style={label(21, INK_SOFT)}>relative</div>
-          <div style={{ ...note(32, INK), fontWeight: 700, marginTop: 6, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(28, INK), fontWeight: 700, marginTop: 6, whiteSpace: "nowrap" }}>
             <Marker at={biggerAt - 2}>+{Math.round(RATES.uplift * 100)}%</Marker>
-            <span style={{ ...note(21, INK_SOFT), fontWeight: 500, marginLeft: 12 }}>{fmt(RATES.ratio, 1)} times the rate</span>
+            <span style={{ ...note(26, INK_SOFT), fontWeight: 500, marginLeft: 12 }}>{fmt(RATES.ratio, 1)} times the rate</span>
           </div>
         </Note>
         <Note at={pointsAt - 2} x={SAY_X} y={y(BAR_Y[1]) - 2}>
           <div style={label(21, INK_SOFT)}>absolute</div>
-          <div style={{ ...note(32, STAT_INK), fontWeight: 700, marginTop: 6, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(28, STAT_INK), fontWeight: 700, marginTop: 6, whiteSpace: "nowrap" }}>
             <Marker at={ppAt + 4}>+{fmt(RATES.difference * 100, 1)} points</Marker>
           </div>
         </Note>
         <Ring x={SAY_X + 50} y={y(BAR_Y[0]) + 22} at={firstAt - 2} r0={30} r1={100} />
-        <Svg>
-          {ease(frame, readerAt - 4, 14) > 0 ? (
-            <rect
-              x={SAY_X - 28}
-              y={y(BAR_Y[0]) - 46}
-              width={380}
-              height={y(BAR_Y[1]) + 96 - (y(BAR_Y[0]) - 46)}
-              rx={10}
-              fill="none"
-              stroke={INK}
-              strokeWidth={2.6}
-              pathLength={1}
-              strokeDasharray={`${ease(frame, readerAt - 4, 14)} 1`}
-            />
-          ) : null}
-        </Svg>
+        {/* The two ways to say it stand as one column, held together by
+            spacing, with "report both" under them; no box round the pair. */}
         <Note at={bothAt - 2} x={SAY_X} y={y(BAR_Y[1]) + 104}>
           <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>
             <Marker at={bothAt + 4}>report both</Marker>

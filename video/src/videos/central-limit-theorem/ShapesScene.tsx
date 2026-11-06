@@ -182,11 +182,13 @@ export const ShapesScene: React.FC = () => {
         return (
           <React.Fragment key={c.letter}>
             <Ink at={at - 2} dur={16} style={{ left: colX(i), top: y(HEAD_Y), whiteSpace: "nowrap" }}>
+              {/* The panel's letter in the title's own face and size, set
+                  apart by the accent: one size to a line. */}
               <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-                <span style={label(20, ACCENT_INK)}>{c.letter}</span>
+                <span style={{ ...headline(46), color: ACCENT_INK }}>{c.letter}</span>
                 <span style={headline(46)}>{c.title}</span>
               </div>
-              <div style={{ ...body(26, true), marginTop: 6, marginLeft: 30 }}>{c.sub}</div>
+              <div style={{ ...body(26, true), marginTop: 6 }}>{c.sub}</div>
             </Ink>
             <Bars
               counts={c.popCounts}
@@ -200,8 +202,10 @@ export const ShapesScene: React.FC = () => {
             <Axis scale={c.popScale} base={y(POP_BASE)} ticks={c.popTicks} format={c.popFmt} at={at} size={20} />
 
             {/* The step between the rows: "average thirty". */}
-            <Ink at={mAt - 6} dur={14} style={{ left: colX(i), top: y(STEP_Y), width: COL_W }}>
-              <div style={{ height: 1, background: HAIRLINE, marginBottom: 12 }} />
+            {/* The rule 8px up into the gap under the axis, its label 28px
+                under it: room under a rule. */}
+            <Ink at={mAt - 6} dur={14} style={{ left: colX(i), top: y(STEP_Y) - 8, width: COL_W }}>
+              <div style={{ height: 1, background: HAIRLINE, marginBottom: 28 }} />
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={label(19, INK_SOFT)}>↓ Averages of 30</span>
                 <span style={note(20, INK_SOFT)}>

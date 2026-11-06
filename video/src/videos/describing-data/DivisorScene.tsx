@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, fmt, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { BLUE_INK, fmt, HAIRLINE, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { DIVISOR, sumSquaresAround } from "./data";
-import { Bracket, DATA, Drift, lerp, Mark, Pulse, STAT, STAT_INK, Svg, Tag, counted } from "./parts";
+import { Bracket, DATA, Drift, lerp, Mark, Pulse, Spot, STAT, STAT_INK, Svg, Tag, counted } from "./parts";
 
 /** The five values, on a line where a unit is 20 px, so a square's side is its distance. */
 const X: XScale = { lo: -26, hi: 16, x0: 360, x1: 1200 };
@@ -56,6 +56,7 @@ export const DivisorScene: React.FC = () => {
   const numberAt = n.word("small", "number of values");
   const measuredFrom = n.beat("measured").from;
   const fourAt = n.word("measured", "four thousand");
+  const samplesAt = n.word("measured", "samples");
   const byNAt = n.word("measured", "dividing by n", { nth: 1 });
   const lowAt = n.word("measured", "low");
   const byN1At = n.word("measured", "Dividing by n minus one");
@@ -118,10 +119,10 @@ export const DivisorScene: React.FC = () => {
         </Ink>
       </div>
 
-      {/* The two divisors the headline asks about. */}
+      {/* The two divisors the headline asks about: one size, the right one in weight and color. */}
       <div style={{ position: "absolute", left: 1330, top: y(330), opacity: (1 - phaseB) * (1 - ease(frame, fiveAt - 4, 12)), whiteSpace: "nowrap", display: "flex", gap: 22, alignItems: "baseline" }}>
-        <span style={{ ...note(30, STAT_INK), fontWeight: 700, opacity: ease(frame, nineAt - 4, 12) }}>12 ÷ 9</span>
-        <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, tenAt - 4, 12) }}>not 12 ÷ 10</span>
+        <span style={{ ...note(28, STAT_INK), fontWeight: 700, opacity: ease(frame, nineAt - 4, 12) }}>12 ÷ 9</span>
+        <span style={{ ...note(28, INK_SOFT), opacity: ease(frame, tenAt - 4, 12) }}>not 12 ÷ 10</span>
       </div>
 
       {/* ── Phase A: five values and their squares ── */}
@@ -272,6 +273,11 @@ export const DivisorScene: React.FC = () => {
       {phaseB > 0 ? (
         <div style={{ position: "absolute", inset: 0, opacity: phaseB }}>
           <FigLabel n="5" title={`Average variance over ${DIVISOR.trials.toLocaleString("en-US")} samples of five`} at={fourAt - 6} x={160} y={y(330)} />
+          {/* "samples of five": a rack of five test tubes, top right beside the headline,
+              dimming with the figure as the next scene's question comes in. */}
+          <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, wildAt - 2, 14) }}>
+            <Spot id="describing-data-samples" at={samplesAt - 4} left={1600} top={y(112)} width={200} height={163} />
+          </div>
           <Drift from={measuredFrom} to={swampAt + 30} scale={0.018} origin={[V.x0, y(BAR_N1)]}>
             <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, wildAt - 2, 14) }}>
             <Svg>
@@ -347,14 +353,28 @@ export const DivisorScene: React.FC = () => {
                   gap: 16,
                 }}
               >
-                <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK }}>{c.code}</span>
-                <span style={{ ...note(30, STAT_INK), fontWeight: 700 }}>{fmt(c.value, 2)}</span>
-                <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, c.noteAt - 4, 12) }}>
+                {/* One size across the line: the code in mono, the value in weight and color. */}
+                <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK }}>{c.code}</span>
+                <span style={{ ...note(26, STAT_INK), fontWeight: 700 }}>{fmt(c.value, 2)}</span>
+                <span style={{ ...note(26, INK_SOFT), opacity: ease(frame, c.noteAt - 4, 12) }}>
                   {i === 1 ? <Mark at={minusOneAt - 2}>{c.note}</Mark> : c.note}
                 </span>
               </div>
             );
           })}
+          {/* The two answers sit side by side: a hairline in the gap, inking in
+              with pandas on its right and dimming with it. */}
+          <div
+            style={{
+              position: "absolute",
+              left: 808,
+              top: y(850),
+              width: 1,
+              height: 36,
+              background: HAIRLINE,
+              opacity: ease(frame, pandasAt - 8, 14) * (1 - 0.6 * ease(frame, wildAt - 4, 12)),
+            }}
+          />
           <Ink at={disagreeAt - 4} dur={16} style={{ left: 260, top: y(800), whiteSpace: "nowrap" }}>
             <span style={{ ...label(22, INK_SOFT) }}>x: the ten salaries of Fig. 1, two answers</span>
           </Ink>

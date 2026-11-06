@@ -3,11 +3,11 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { badgeStyle, ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TWIN_POSTQUEL, TWIN_SQL } from "./data";
-import { Card, Headline, KEY, KEY_INK, KEY_WASH, Listing, Mark, pulse, Spot, Tag, Wire } from "./parts";
+import { Card, Headline, KEY_INK, Listing, Mark, pulse, Spot, Tag, Wire } from "./parts";
 
 const SYLLABLES = ["post", "gres", "cue", "ell"];
 
@@ -16,7 +16,7 @@ const SYLLABLES = ["post", "gres", "cue", "ell"];
 const BUILT_IN = ["integer", "floating point", "character string"];
 const YOUR_OWN = ["polygon", "latitude and longitude"];
 
-/** A type, as a chip: ink for the built-ins, the data blue for one added. */
+/** A type, as a house badge: gray for the built-ins, blue for one added. */
 const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }> = ({ at, added = false, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -25,15 +25,11 @@ const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }>
   return (
     <div
       style={{
-        border: `2px solid ${added ? KEY : INK}`,
-        borderRadius: 8,
-        background: added ? KEY_WASH : "transparent",
-        padding: "5px 16px",
+        ...note(22),
+        ...badgeStyle(added ? "blue" : "gray", 22),
+        display: "block",
         opacity: p,
         transform: `translateY(${(1 - p) * 12}px)`,
-        whiteSpace: "nowrap",
-        ...note(22, added ? KEY_INK : INK),
-        fontWeight: added ? 650 : 500,
       }}
     >
       {children}
@@ -89,6 +85,12 @@ export const PostgresScene: React.FC = () => {
   const W = 520;
   const XS = [96, 700, 1304];
   const mid = TOP + H / 2;
+  /** How far each column's text runs right of its x, measured off the
+   *  render: POSTGRES's "with data types of your own", Postgres95's "1994,
+   *  two Berkeley grad students:". The arrows between the names run from
+   *  24px past one column's text to 24px short of the next; the columns
+   *  have no card round them now. */
+  const COL_RIGHT = [284, 342];
 
   // "After Ingres": the name opens, the missing letters show, and it closes
   // again on the catch.
@@ -175,14 +177,20 @@ export const PostgresScene: React.FC = () => {
           },
         ]}
       />
-      <Tag x={XS[0] + 28} y={TOP + H + 18} at={afterAt} out={catchAt} size={23} color={ACCENT_INK} weight={650}>
+      <Tag x={XS[0] + 2} y={TOP + H + 18} at={afterAt} out={catchAt} size={23} color={ACCENT_INK} weight={650}>
         post Ingres: after Ingres
       </Tag>
-      <Tag x={XS[0] + 28} y={TOP + H + 18} at={wonAt - 4} size={23} color={INK}>
+      <Tag x={XS[0] + 2} y={TOP + H + 18} at={wonAt - 4} size={23} color={INK}>
         and by the 1990s, <Mark at={wonAt}>SQL had won</Mark>
       </Tag>
 
       {/* ── Beside it: the types it was built for, then its language ── */}
+      {/* A hairline between POSTGRES and the column beside it, centred in the
+          gap (its text ends near XS[0] + 284), inking in with that column and
+          leaving with it, before the arrow to Postgres95 takes the gap. */}
+      <div style={{ opacity: 1 - ease(frame, asideOut, 10) }}>
+        <ColumnRule x={(XS[0] + COL_RIGHT[0] + AX) / 2} top={TOP + 8} height={h(176)} at={extendAt - 4} />
+      </div>
       <Ink at={extendAt - 4} dur={14} out={catchAt - 6} style={{ left: AX, top: TOP + 2, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT) }}>Commercial systems: a fixed menu of types</span>
       </Ink>
@@ -223,7 +231,7 @@ export const PostgresScene: React.FC = () => {
       />
 
       {/* ── Postgres95 ── */}
-      <Wire points={[[XS[0] + W + 8, mid], [XS[1] - 8, mid]]} at={ninetyFourAt - 4} dur={12} />
+      <Wire points={[[XS[0] + COL_RIGHT[0] + 24, mid], [XS[1] - 24, mid]]} at={ninetyFourAt - 4} dur={12} />
       <Card
         x={XS[1]}
         top={TOP}
@@ -257,7 +265,7 @@ export const PostgresScene: React.FC = () => {
       />
 
       {/* ── PostgreSQL ── */}
-      <Wire points={[[XS[1] + W + 8, mid], [XS[2] - 8, mid]]} at={volunteersAt - 4} dur={12} />
+      <Wire points={[[XS[1] + COL_RIGHT[1] + 24, mid], [XS[2] - 24, mid]]} at={volunteersAt - 4} dur={12} />
       <Card
         x={XS[2]}
         top={TOP}
@@ -279,7 +287,7 @@ export const PostgresScene: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: XS[2] + 28,
+          left: XS[2],
           top: SYL_TOP,
           display: "flex",
           alignItems: "baseline",
@@ -308,7 +316,7 @@ export const PostgresScene: React.FC = () => {
           );
         })}
       </div>
-      <Tag x={XS[2] + 28} y={SYL_TOP + 92} at={mostAt - 2} size={23} color={INK}>
+      <Tag x={XS[2] + 2} y={SYL_TOP + 92} at={mostAt - 2} size={23} color={INK}>
         or, as most of us say it, <Mark at={nickAt - 2}>Postgres</Mark>
       </Tag>
       <Spot id="db-relational-history-elephant" at={mostAt - 6} left={XS[1] + W - 260} top={TOP + H + 30} width={260} height={230} />

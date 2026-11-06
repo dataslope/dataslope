@@ -210,7 +210,7 @@ export const OddsScene: React.FC = () => {
           <span style={{ ...note(26, STAT_INK), fontWeight: 700, marginLeft: 14, opacity: ease(frame, sharingAt - 4, 12) }}>
             0.05 ÷ 20 = {AT_LEAST.bonferroni}
           </span>
-          <span style={{ ...label(21, INK_SOFT), marginLeft: 12, opacity: ease(frame, sharingAt + 4, 12) }}>(Bonferroni)</span>
+          <span style={{ ...label(24, INK_SOFT), marginLeft: 12, opacity: ease(frame, sharingAt + 4, 12) }}>(Bonferroni)</span>
         </Ink>
         <Note at={raiseAt + 2} x={B.x1} y={y(B_BASE) + 40} align="right">
           <Label size={21} color={INK_SOFT} weight={520}>

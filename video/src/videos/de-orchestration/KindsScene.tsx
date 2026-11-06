@@ -7,7 +7,7 @@ import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Cross, Drift, Edge, OK, OK_INK, Pill, TaskBox, type Tone } from "./parts";
+import { Cross, Drift, Edge, OK, Pill, TaskBox, type Tone } from "./parts";
 
 const X_START = 140;
 const BOX_W = 104;
@@ -216,13 +216,13 @@ export const KindsScene: React.FC = () => {
         </Note>
 
         {/* What all three need. */}
-        <Pill x={X_START} y={y(800)} at={safeAt} ink={OK_INK} size={26}>
+        <Pill x={X_START} y={y(800)} at={safeAt} tone="green" size={26}>
           all three: safe only on idempotent tasks
         </Pill>
         <Note at={sameAt} x={X_START + 640} y={y(806)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             the same end state however often they run
-            <span style={{ ...label(21, INK_SOFT), opacity: ease(frame, partAt, 10) }}> · Part 6</span>
+            <span style={{ ...label(23, INK_SOFT), opacity: ease(frame, partAt, 10) }}> · Part 6</span>
           </span>
         </Note>
       </Drift>

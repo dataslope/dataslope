@@ -251,7 +251,8 @@ export const AbtestScene: React.FC = () => {
           <Note key={r.name} at={r.at - 2} x={tableX} y={tableTop + h(50) + i * h(66)}>
             <span style={{ ...note(34, r.ink), whiteSpace: "nowrap", ...TABULAR }}>
               <b>{r.name}</b> {r.x.toLocaleString("en-US")} of {r.n.toLocaleString("en-US")}
-              <span style={{ ...note(26, INK_SOFT) }}> = {pctOf(r.x, r.n)}</span>
+              {/* The rate in the line's own size: softer ink, not a smaller face. */}
+              <span style={{ color: INK_SOFT }}> = {pctOf(r.x, r.n)}</span>
             </span>
           </Note>
         ))}

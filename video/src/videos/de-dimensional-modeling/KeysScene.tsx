@@ -12,7 +12,9 @@ import { colsOf, DataTable, Drift, geoOf, geoWith, KEY_INK, KeyArrow, Mark, MARK
 
 const R_X = 1000;
 const TABLE_Y = 612;
-const OPTS = { headH: 50, rowH: 58, bodySize: 27, headSize: 22 } as const;
+/** The header at 21px, within 12% of the 19px tag ("PK", "natural") beside
+ *  its column's name. */
+const OPTS = { headH: 50, rowH: 58, bodySize: 27, headSize: 21 } as const;
 
 /** Only these columns of a result, in this order. */
 const pick = (t: Result, cols: readonly string[]): Result => ({

@@ -201,7 +201,7 @@ export const ChiScene: React.FC = () => {
                 >
                   <Count at={at} to={obs} dur={16} />
                   {showGap > 0 ? (
-                    <span style={{ position: "relative", display: "inline-block", marginLeft: 12, ...note(22, STAT_INK), fontWeight: 650 }}>
+                    <span style={{ position: "relative", display: "inline-block", marginLeft: 12, ...note(26, STAT_INK), fontWeight: 650 }}>
                       <span style={{ opacity: showGap * (1 - toShare) }}>
                         {gap > 0 ? "+" : "−"}
                         {fmt(Math.abs(gap), 1)}
@@ -228,7 +228,7 @@ export const ChiScene: React.FC = () => {
           <span style={{ ...note(38, STAT_INK), fontWeight: 700 }}>
             <Greek>χ</Greek>² = <Count at={twelveAt - 8} to={CHI.chi2} dur={20} format={(v) => fmt(v, 1)} />
           </span>
-          <span style={{ ...note(30, STAT_INK), fontWeight: 650, marginLeft: 30, opacity: ease(frame, pAt - 4, 12) }}>p = {fmt(CHI.p, 3)}</span>
+          <span style={{ ...note(36, STAT_INK), fontWeight: 650, marginLeft: 30, opacity: ease(frame, pAt - 4, 12) }}>p = {fmt(CHI.p, 3)}</span>
         </div>
         <Note at={pAt + 6} x={LABEL_X + 520} y={y(830) + 8}>
           <Label size={22} color={INK_SOFT} weight={520}>

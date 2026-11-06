@@ -210,7 +210,7 @@ export const BackfillScene: React.FC = () => {
         <Note at={loopAt} x={X0} y={y(656)}>
           <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             rows one run processes
-            <span style={{ ...label(21, INK_SOFT), fontWeight: 500, opacity: ease(frame, modelAt, 10) }}>
+            <span style={{ ...label(22, INK_SOFT), fontWeight: 500, opacity: ease(frame, modelAt, 10) }}>
               {" "}
               · a model, <Num>{count(REFRESH.daily)}</Num> new rows a day, log scale
             </span>

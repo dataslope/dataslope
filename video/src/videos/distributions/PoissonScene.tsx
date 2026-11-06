@@ -108,7 +108,8 @@ export const PoissonScene: React.FC = () => {
         out={moreAt - 6}
       />
 
-      <Spot id="distributions-desk-bell" at={deskAt - 4} out={nameAt - 2} left={1500} top={y(92)} width={290} height={270} />
+      {/* The help desk's bell, small, in the open top right. */}
+      <Spot id="distributions-desk-bell" at={deskAt - 4} out={nameAt - 2} left={1545} top={y(130)} width={200} height={167} />
 
       <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>
         <Drift from={poissonFrom} to={n.beat("geometric-in").to + 30}>

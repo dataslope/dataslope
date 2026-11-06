@@ -23,6 +23,11 @@ import {
   walkTip,
 } from "./parts";
 
+/** Where the correlation's block starts: far enough right that its 120px
+ *  number keeps a clear 150px from the walks' end labels at the chart's
+ *  edge, so the two never read as one line. */
+const R_X = 1556;
+
 /**
  * Pair, corr: a second walk from its own coin draws itself over the first,
  * and the two turn out to be strongly correlated.
@@ -88,13 +93,13 @@ export const PairScene: React.FC = () => {
         <span style={{ ...note(21, COLOR_INK.b), fontWeight: 650, ...halo }}>Walk b</span>
       </Note>
 
-      <Ink at={corrAt - 4} dur={14} style={{ left: 1470, top: y(380) }}>
+      <Ink at={corrAt - 4} dur={14} style={{ left: R_X, top: y(380) }}>
         <span style={label(21, INK_SOFT)}>Their correlation, r</span>
       </Ink>
-      <Ink at={numberAt - 2} dur={18} style={{ left: 1464, top: y(380) + 44 }}>
+      <Ink at={numberAt - 2} dur={18} style={{ left: R_X - 6, top: y(380) + 44 }}>
         <span style={{ ...headline(120), color: ACCENT_INK }}>{dec(R_WALKS)}</span>
       </Ink>
-      <Note at={numberAt + 14} x={1470} y={y(380) + 186} width={350}>
+      <Note at={numberAt + 14} x={R_X} y={y(380) + 186} width={1800 - R_X}>
         <span style={prose(20)}>0 means no linear relation, 1 means a perfect one.</span>
       </Note>
 

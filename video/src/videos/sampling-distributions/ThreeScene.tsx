@@ -381,7 +381,9 @@ export const ThreeScene: React.FC = () => {
       <Ink at={kindAt} dur={16} out={p3Out} style={{ left: RX, top: y(300), width: RW }}>
         <span style={{ ...body(32, true), color: ACCENT_INK }}>One average per sample.</span>
       </Ink>
-      <div style={{ position: "absolute", left: RX, top: y(560), opacity: counterIn }}>
+      {/* Up beside the sample's bars, clear of Fig. 3's tick row and the
+          label row under it: the big count on a line of its own. */}
+      <div style={{ position: "absolute", left: RX, top: y(400), opacity: counterIn }}>
         <div style={label(21, INK_SOFT)}>Samples drawn</div>
         <div
           style={{
@@ -438,7 +440,8 @@ export const ThreeScene: React.FC = () => {
         <StripSample key={i} index={i + 1} step={st} popBase={y(popBase)} px={PX} />
       ))}
       {fastSample >= 1 ? <FastDots index={fastSample} /> : null}
-      <Note at={thousandAt} x={RX} y={y(752)} from="up" out={piledAt + 10}>
+      {/* Under the counter, which it follows. */}
+      <Note at={thousandAt} x={RX} y={y(592)} from="up" out={piledAt + 10}>
         <span style={note(22, INK_SOFT)}>each a different {N} of the million</span>
       </Note>
       <Rule

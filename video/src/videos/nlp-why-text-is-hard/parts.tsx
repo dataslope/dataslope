@@ -115,7 +115,9 @@ export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: st
   const p = ease(frame, at, dur);
   const o = out === undefined ? 0 : ease(frame, out, 14);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.12em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.12em" }}>
       <span
         style={{
           position: "absolute",
@@ -410,7 +412,8 @@ export const Chip: React.FC<{
   );
 };
 
-/** A number that inks on its word, in tabular figures, with a unit after it. */
+/** A number that inks on its word, in tabular figures, with a unit after it
+ *  at the number's own size (one line, one size), in soft ink. */
 export const Count: React.FC<{
   value: number;
   unit?: string;
@@ -437,7 +440,7 @@ export const Count: React.FC<{
     }}
   >
     <span style={{ ...label(size, color), fontWeight: 700, ...TABULAR }}>{value}</span>
-    {unit ? <span style={{ ...label(Math.round(size * 0.8), INK_SOFT), fontWeight: 600 }}>{unit}</span> : null}
+    {unit ? <span style={{ ...label(size, INK_SOFT), fontWeight: 600 }}>{unit}</span> : null}
   </Ink>
 );
 

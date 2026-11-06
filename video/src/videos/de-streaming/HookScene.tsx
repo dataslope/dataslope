@@ -3,7 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
+import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { STREAM } from "./data";
@@ -78,7 +79,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={clicksFourAt} level={-33} />
 
       <Drift from={0} to={end + 20}>
-        <Kicker at={startAt}>Data engineer interview prep · Streaming and messaging</Kicker>
+        <Kicker at={startAt}>Data engineer interview questions · Streaming and messaging</Kicker>
         <Headline lead="The data never stops arriving." at={startAt} size={72} />
         <Spot id="de-streaming-salmon" at={startAt + 14} left={1452} top={y(286)} width={360} height={449} />
 
@@ -118,18 +119,22 @@ export const HookScene: React.FC = () => {
         </Note>
         {tests.map((t, i) => (
           <Note key={t.cue} at={t.at - 2} x={X0} y={y(466) + i * h(58)}>
+            {/* The number on a tinted disc, no ring, at 26px: within 12% of
+                the line's 29, so the line keeps one size. */}
             <span style={{ display: "inline-flex", alignItems: "center", gap: 16, whiteSpace: "nowrap" }}>
               <span
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  border: `2.5px solid ${INK}`,
+                  ...badgeStyle("gray", 26),
+                  width: 42,
+                  height: 42,
+                  padding: 0,
+                  flex: "none",
+                  borderRadius: 21,
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...label(20, INK),
-                  fontWeight: 800,
+                  fontFamily: SANS,
+                  fontWeight: 700,
                   ...TABULAR,
                 }}
               >
@@ -160,7 +165,7 @@ export const HookScene: React.FC = () => {
         <Note at={twelveAt - 2} x={X0} y={planTop + h(60)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: BLUE_INK, ...TABULAR }}>12</b> worked through, most on one small stream
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 600, opacity: ease(frame, ownAt, 10) }}> · the video's own</span>
+            <span style={{ ...label(25, INK_SOFT), fontWeight: 600, opacity: ease(frame, ownAt, 10) }}> · the video's own</span>
           </span>
         </Note>
         {STREAM.map((c, i) => (

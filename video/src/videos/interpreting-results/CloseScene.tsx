@@ -3,12 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, HIGHLIGHT, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
-import { Ink, NextLine } from "../../editorial/ui";
+import { badgeStyle, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Arrow, Bracket, Drift, Headline, lerp, Marker, STAT, STAT_INK, Svg } from "./parts";
 
 const TRAPS = ["Simpson's paradox", "Cherry-picking", "The sharpshooter's target"];
+/** The three traps as gray house badges, the bracket under the row of them. */
 const TAG_X = [160, 640, 1100];
 const TAG_Y = 360;
 const STEPS = ["Decide", "Look", "Confirm"];
@@ -68,12 +69,8 @@ export const CloseScene: React.FC = () => {
         <Ink key={t} at={tagAt(i)} dur={12} style={{ left: TAG_X[i], top: y(TAG_Y), whiteSpace: "nowrap" }}>
           <div
             style={{
-              padding: "12px 22px",
-              border: `2px solid ${INK}`,
-              borderRadius: 8,
-              background: PAPER,
               ...body(34, true),
-              color: INK,
+              ...badgeStyle("gray", 34),
               opacity: 1 - ease(frame, cureAt - 4, 14) * 0.45,
             }}
           >

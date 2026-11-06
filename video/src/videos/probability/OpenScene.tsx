@@ -173,6 +173,9 @@ export const OpenScene: React.FC = () => {
         <span style={{ ...note(24, INK_SOFT), display: "block", marginBottom: 8 }}>Probability of heads</span>
         <span style={{ ...headline(128), color: INK }}>½</span>
       </Ink>
+      {/* A hairline between the half and the single flip, inking in with
+          the flip: the height of the two columns, centred in their gap. */}
+      <div style={{ position: "absolute", left: 515, top: y(300), width: 1, height: 172, background: HAIRLINE, opacity: ease(frame, singleAt - 4, 14) * (1 - defDim * 0.4) }} />
       <Ink at={singleAt - 4} dur={14} style={{ left: 640, top: y(300), whiteSpace: "nowrap", opacity: 1 - defDim * 0.4 }}>
         <span style={note(24, INK_SOFT)}>One flip</span>
       </Ink>
@@ -193,7 +196,9 @@ export const OpenScene: React.FC = () => {
           </span>
         </Note>
       </div>
-      <Spot id="probability-coin" at={coinAt - 4} left={1480} top={y(232)} width={280} height={420} />
+      {/* The coin, small, in the open space right of the one-flip row and
+          well clear of the sentence under it. */}
+      <Spot id="probability-coin" at={coinAt - 4} left={1555} top={y(270)} width={130} height={200} />
 
       {/* ── The long run ── */}
       <Ink at={longRunAt - 6} dur={20} style={{ left: 160, top: y(560), whiteSpace: "nowrap" }}>
@@ -233,22 +238,28 @@ export const OpenScene: React.FC = () => {
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>…</span>
       </Note>
 
-      {/* ── The count: a hundred thousand flips in code ── */}
-      <div style={{ position: "absolute", left: 160, top: y(808), display: "flex", alignItems: "baseline", gap: 56 }}>
+      {/* ── The count: a hundred thousand flips in code. Each label sits on
+           its own line above its value, so the values share one line at one
+           size and the share stands out by its color alone. ── */}
+      {/* The three counts side by side, a hairline in each gap inking in
+          with the count to its right. */}
+      <div style={{ position: "absolute", left: 160, top: y(790), display: "flex", alignItems: "stretch", gap: 32 }}>
         <Ink at={hundredAt - 4} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT), marginRight: 14 }}>Flips</span>
-          <Count at={hundredAt - 2} dur={28} to={COIN.flips} format={num} style={{ ...note(40, INK), fontWeight: 650 }} />
+          <div style={note(24, INK_SOFT)}>Flips</div>
+          <Count at={hundredAt - 2} dur={28} to={COIN.flips} format={num} style={{ ...note(40, INK), fontWeight: 650, display: "block" }} />
         </Ink>
+        <div style={{ width: 1, background: HAIRLINE, opacity: ease(frame, fiftyAt - 6, 14) }} />
         <Ink at={fiftyAt - 6} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, DATA), fontWeight: 650, marginRight: 14 }}>Heads</span>
-          <Count at={fiftyAt - 4} dur={30} to={COIN.heads} format={num} style={{ ...note(40, INK), fontWeight: 650 }} />
+          <div style={{ ...note(24, DATA), fontWeight: 650 }}>Heads</div>
+          <Count at={fiftyAt - 4} dur={30} to={COIN.heads} format={num} style={{ ...note(40, INK), fontWeight: 650, display: "block" }} />
         </Ink>
+        <div style={{ width: 1, background: HAIRLINE, opacity: ease(frame, pointAt - 4, 16) }} />
         <Ink at={pointAt - 4} dur={16} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, INK_SOFT), marginRight: 14 }}>Share</span>
-          <span style={{ ...headline(64, true), color: STAT_INK }}>{fmt(COIN.pHeads, 4)}</span>
-        </Ink>
-        <Ink at={closeAt - 2} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
-          <span style={note(22, INK_SOFT)}>close to the true 0.5, not on it</span>
+          <div style={note(24, INK_SOFT)}>
+            Share
+            <span style={{ opacity: ease(frame, closeAt - 2, 12) }}>, close to the true 0.5 but not on it</span>
+          </div>
+          <div style={{ ...note(40, STAT_INK), fontWeight: 700 }}>{fmt(COIN.pHeads, 4)}</div>
         </Ink>
       </div>
       {/* A hairline under the count, drawn as the share lands. */}
@@ -256,7 +267,7 @@ export const OpenScene: React.FC = () => {
         style={{
           position: "absolute",
           left: 160,
-          top: y(808) + 70,
+          top: y(790) + 104,
           width: 1560 * ease(frame, pointAt, 18),
           height: 1,
           background: HAIRLINE,

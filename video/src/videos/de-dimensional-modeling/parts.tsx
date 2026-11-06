@@ -34,7 +34,6 @@ export {
   MARK_BAD,
   MARK_KEY,
   MARK_OK,
-  Mono,
   OK,
   OK_INK,
   pulse,
@@ -131,6 +130,29 @@ export const Spot: React.FC<{
 };
 
 /**
+ * Code inside a line of type, at 0.92em of the line (never under 19px), so it
+ * stays within the 12% a line's sizes may differ by (README, "One line, one
+ * size, one family"). `QMono` is the interview kit's name for the same
+ * thing, for questions.
+ */
+export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
+  <span
+    style={{
+      fontFamily: MONO,
+      fontSize: "max(19px, 0.92em)",
+      fontStyle: "normal",
+      fontWeight: weight ?? 600,
+      color,
+      fontVariantLigatures: "none",
+      wordSpacing: "-0.3em",
+    }}
+  >
+    {children}
+  </span>
+);
+export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => <Mono>{children}</Mono>;
+
+/**
  * A table as a name only: an ERD box with no columns, for a schema drawn
  * small (OLTP against OLAP, the conformed dimension). It is the kit's own
  * `<Entity>`, so the boxes read the same as every full one.
@@ -138,6 +160,12 @@ export const Spot: React.FC<{
 export const Chip: React.FC<{ layout: EntityLayout; at: number; dim?: number; out?: number }> = ({ layout, at, dim, out }) => (
   <Entity layout={layout} at={at} dim={dim} out={out} />
 );
+
+/** The white between a panel's rule and its name (README: at least 28px
+ *  under a rule), and how far the rule is lifted above the panel's `y` to
+ *  make it: the name stays where it was, 14px under `y`. */
+const RULE_ROOM = 28;
+const RULE_LIFT = RULE_ROOM - 12;
 
 /** A small rule-and-label heading over a panel. */
 export const PanelHead: React.FC<{
@@ -157,8 +185,10 @@ export const PanelHead: React.FC<{
   if (p <= 0 || o >= 1) return null;
   return (
     <div style={{ position: "absolute", left: x, top: y, width, opacity: 1 - o }}>
-      <div style={{ height: 2, width: width * p, background: color === INK ? INK : color }} />
-      <div style={{ ...label(26, color), fontWeight: 700, marginTop: 12, opacity: p, whiteSpace: "nowrap" }}>{children}</div>
+      {/* The rule sits RULE_LIFT above `y`, so the name keeps its place and
+          has RULE_ROOM of white under the rule. */}
+      <div style={{ height: 2, width: width * p, marginTop: -RULE_LIFT, background: color === INK ? INK : color }} />
+      <div style={{ ...label(26, color), fontWeight: 700, marginTop: RULE_ROOM, opacity: p, whiteSpace: "nowrap" }}>{children}</div>
       {sub ? (
         <div style={{ ...note(22, INK_SOFT), marginTop: 6, opacity: ease(frame, subAt ?? at + 8, 12), whiteSpace: "nowrap" }}>{sub}</div>
       ) : null}
@@ -168,8 +198,10 @@ export const PanelHead: React.FC<{
 
 /**
  * A result a query printed, as one figure: the label it answers to and the
- * value, set in the face listings use. `tone` colors the value: green for
- * the right answer, red for the wrong one, ink for neither.
+ * value, set in the face listings use, both at one size (README, "One line,
+ * one size, one family"): the value stands out by weight and color. `tone`
+ * colors the value: green for the right answer, red for the wrong one, ink
+ * for neither.
  */
 export const Verdict: React.FC<{
   at: number;
@@ -182,7 +214,7 @@ export const Verdict: React.FC<{
   out?: number;
   dim?: number;
   size?: number;
-}> = ({ at, x, y, label: what, value, tone = "ink", strikeAt, out, dim, size = 30 }) => {
+}> = ({ at, x, y, label: what, value, tone = "ink", strikeAt, out, dim, size = 24 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -204,7 +236,7 @@ export const Verdict: React.FC<{
         transform: `translateX(${(1 - p) * -14}px)`,
       }}
     >
-      <span style={{ ...note(23, INK_SOFT) }}>{what}</span>
+      <span style={{ ...note(size, INK_SOFT) }}>{what}</span>
       <span style={{ position: "relative", fontFamily: MONO, fontSize: size, fontWeight: 700, color: ink, fontVariantLigatures: "none" }}>
         {value}
         {s > 0 ? (

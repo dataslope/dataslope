@@ -59,7 +59,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={productAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data analyst interview prep</Kicker>
+        <Kicker at={from}>Data analyst interview questions</Kicker>
         <Headline lead="Not the menus." turn="The formulas." at={menusAt - 6} turnAt={formulaAt - 2} size={72} />
 
         <Spot id="da-spreadsheets-marmot" at={from + 4} left={1150} top={y(280)} width={640} height={470} />

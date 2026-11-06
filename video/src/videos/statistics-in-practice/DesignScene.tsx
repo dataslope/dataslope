@@ -3,10 +3,10 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, body, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { badgeStyle, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Bracket, Headline, Kicker, lerp, Marker, Ring, STAT, STAT_INK, Strike, Svg } from "./parts";
+import { Bracket, Headline, Kicker, lerp, Marker, Ring, STAT_INK, Strike, Svg } from "./parts";
 
 /** The arc of an A/B test, in the lesson's order. */
 export const STEPS = ["Hypothesis and metric", "Randomize", "Sample size", "Run to plan", "Analyze", "Decide"];
@@ -27,6 +27,19 @@ const METRICS = [
   "Page views",
 ];
 const MOVER = METRICS.indexOf("Scroll depth");
+/** The ten as house badges, gray, five to a row, 12px between rows; the one
+ *  that moved turns red as it is cheered, then is struck. "Conversion
+ *  rate" (42px serif) in the column beside them is centred on the two rows
+ *  rather than set on either, and "chosen now" sits 10px under it. Offsets in
+ *  px from y(METRIC_Y). */
+const GRAY_BADGE = badgeStyle("gray", 21);
+const RED_BADGE = badgeStyle("red", 21);
+const METRIC_ROWS = [METRICS.slice(0, 5), METRICS.slice(5)];
+const METRIC_ROW_GAP = 12;
+const METRIC_Y = 726;
+const PRIMARY_DY = 12;
+const CHOSEN_DY = 75;
+const CHEER_Y = 822;
 
 /**
  * Part 2 opens: the A/B test's arc, nearly all of it decided before the first
@@ -163,10 +176,11 @@ export const DesignScene: React.FC = () => {
         <Ink at={metricAt - 4} dur={14} style={{ left: 160, top: y(690), whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>One primary metric</span>
         </Ink>
-        <Ink at={metricAt + 2} dur={18} style={{ left: 160, top: y(726), whiteSpace: "nowrap" }}>
+        <Ink at={metricAt + 2} dur={18} style={{ left: 160, top: y(METRIC_Y) + PRIMARY_DY, whiteSpace: "nowrap" }}>
           <span style={{ ...body(42), color: INK }}>Conversion rate</span>
         </Ink>
-        <Ink at={nowAt - 4} dur={14} style={{ left: 480, top: y(740), whiteSpace: "nowrap" }}>
+        {/* Under the metric it qualifies, 10px down, not on its line. */}
+        <Ink at={nowAt - 4} dur={14} style={{ left: 160, top: y(METRIC_Y) + CHOSEN_DY, whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>chosen now, before any data</span>
         </Ink>
 
@@ -174,37 +188,44 @@ export const DesignScene: React.FC = () => {
         <Ink at={tenAt - 6} dur={14} style={{ left: 1010, top: y(690), whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>Or track ten</span>
         </Ink>
-        <div style={{ position: "absolute", left: 1010, top: y(726), width: 780, display: "flex", flexWrap: "wrap", gap: "12px 14px" }}>
-          {METRICS.map((m, k) => {
-            const p = Math.min(1.06, pop(frame, tenAt - 4 + k * 3, fps, 14));
-            const mover = k === MOVER;
-            return (
-              <div
-                key={m}
-                style={{
-                  opacity: Math.min(1, Math.max(0, p)) * (mover ? 1 : 1 - 0.45 * hot),
-                  transform: `scale(${0.8 + 0.2 * Math.max(0, p)})`,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <span
-                  style={{
-                    ...note(21, mover && hot > 0 ? STAT_INK : INK),
-                    fontWeight: mover ? 650 : 500,
-                    display: "inline-block",
-                    padding: "5px 14px",
-                    borderRadius: 20,
-                    border: `1.6px solid ${mover && hot > 0 ? STAT : HAIRLINE}`,
-                    background: mover ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(hot * 100)}%, ${PAPER})` : PAPER,
-                  }}
-                >
-                  {mover ? <Strike at={hackingAt - 4}>{m}</Strike> : m}
-                </span>
-              </div>
-            );
-          })}
+        <div style={{ position: "absolute", left: 1010, top: y(METRIC_Y), display: "flex", flexDirection: "column", gap: METRIC_ROW_GAP }}>
+          {METRIC_ROWS.map((row, r) => (
+            <div key={r} style={{ display: "flex", gap: 14 }}>
+              {row.map((m, j) => {
+                const k = r * METRIC_ROWS[0].length + j;
+                const p = Math.min(1.06, pop(frame, tenAt - 4 + k * 3, fps, 14));
+                const mover = k === MOVER;
+                return (
+                  <div
+                    key={m}
+                    style={{
+                      opacity: Math.min(1, Math.max(0, p)) * (mover ? 1 : 1 - 0.45 * hot),
+                      transform: `scale(${0.8 + 0.2 * Math.max(0, p)})`,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <span
+                      style={{
+                        ...note(21),
+                        ...GRAY_BADGE,
+                        // The one that moved turns from gray to red as it is cheered.
+                        ...(mover
+                          ? {
+                              background: `color-mix(in srgb, ${RED_BADGE.background} ${Math.round(hot * 100)}%, ${GRAY_BADGE.background})`,
+                              color: `color-mix(in srgb, ${RED_BADGE.color} ${Math.round(hot * 100)}%, ${GRAY_BADGE.color})`,
+                            }
+                          : null),
+                      }}
+                    >
+                      {mover ? <Strike at={hackingAt - 4}>{m}</Strike> : m}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
-        <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(838), whiteSpace: "nowrap" }}>
+        <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(CHEER_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>and cheer the one that moved</span>
         </Ink>
       </div>

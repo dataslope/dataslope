@@ -176,7 +176,7 @@ export const TwentyScene: React.FC = () => {
       {/* Already up at the cut, where ParameterScene's mu ends its ride. */}
       <Note at={twentyFrom - 30} x={muX + 12} y={y(ROW0 - 50)}>
         <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
-          <Mu /> = {KNOWN.mu}
+          <Mu inline /> = {KNOWN.mu}
           <span style={{ ...note(21, INK_SOFT), marginLeft: 12, opacity: ease(frame, parameterAt + 4, 10) }}>never moves</span>
         </span>
       </Note>
@@ -234,7 +234,7 @@ export const TwentyScene: React.FC = () => {
       </Svg>
       <Note at={statisticAt} x={muX - 14} y={y(ROW0 - 50)} align="right" out={summarizeAt - 2}>
         <span style={{ ...note(23, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
-          <XBar />: different every time
+          <XBar inline />: different every time
         </span>
       </Note>
 

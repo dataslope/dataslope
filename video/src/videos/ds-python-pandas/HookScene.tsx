@@ -82,7 +82,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-scratch" at={loopAt + 8} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data scientist interview prep</Kicker>
+        <Kicker at={from}>Data scientist interview questions</Kicker>
         <Headline lead="Four orders in," turn="six out." at={fourAt - 4} turnAt={sixAt - 2} out={runsAt - 6} />
         <Headline lead="It runs," turn="and it's wrong." at={runsAt} turnAt={runsAt + 12} />
 

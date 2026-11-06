@@ -2,16 +2,17 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, HAIRLINE, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CORPUS, COUNTS, THE } from "./data";
 import { FIG_Y, Headline, INK, INK_SOFT, Kicker, Mark, pulse, X0 } from "./parts";
-import { colMid, colX, DocTable, tableBottom, tableGeo } from "./tfidf";
+import { colMid, colX, DocTable, TABLE_RIGHT, tableBottom, tableGeo } from "./tfidf";
 
 const SLIP_Y = 334;
-const SLIP_X = [X0, 680, 1240];
+/** The least space either side of the hairline between two documents. */
+const DOC_GAP = 40;
 const G = tableGeo(436);
 const NOTE_Y = tableBottom(G) + 44;
 const VERDICT_Y = NOTE_Y + 76;
@@ -65,12 +66,31 @@ export const CountsScene: React.FC = () => {
       </Headline>
       <FigLabel n="10" title="The TF-IDF lesson’s three documents, counted" at={newAt - 4} x={X0} y={y(FIG_Y)} />
 
-      {CORPUS.map((d, i) => (
-        <Ink key={i} at={docAt[i] - 4} dur={16} style={{ left: SLIP_X[i], top: y(SLIP_Y), display: "flex", alignItems: "baseline", gap: 16, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, INK_SOFT) }}>Doc {i + 1}</span>
-          <span style={{ ...body(31), color: INK }}>{d}</span>
-        </Ink>
-      ))}
+      {/* The three documents side by side, from the page's left edge to the
+          table's right one, a hairline centred in each gap that inks in with
+          the document to its right. Each name stands more than 1.2em clear of
+          its sentence, so it reads as the document's name, not part of the
+          line. */}
+      <div style={{ position: "absolute", left: X0, width: TABLE_RIGHT - X0, top: y(SLIP_Y), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
+        {CORPUS.map((d, i) => {
+          const rule = ease(frame, docAt[i] - 6, 14);
+          return (
+            <React.Fragment key={i}>
+              {i > 0 ? (
+                <>
+                  <div style={{ flex: 1, minWidth: DOC_GAP }} />
+                  <div style={{ width: 1, height: 40, background: HAIRLINE, transform: `scaleY(${rule})`, transformOrigin: "50% 0" }} />
+                  <div style={{ flex: 1, minWidth: DOC_GAP }} />
+                </>
+              ) : null}
+              <Ink at={docAt[i] - 4} dur={16} style={{ position: "relative", display: "flex", alignItems: "baseline", gap: 40 }}>
+                <span style={{ ...label(21, INK_SOFT) }}>Doc {i + 1}</span>
+                <span style={{ ...body(31), color: INK }}>{d}</span>
+              </Ink>
+            </React.Fragment>
+          );
+        })}
+      </div>
 
       <DocTable
         g={G}

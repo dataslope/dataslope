@@ -192,7 +192,7 @@ export const PivotScene: React.FC = () => {
           </span>
         </Note>
         <Note at={twoAt - 2} x={pg.colMid(3) + 70} y={pg.rowTop(2) + 4}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
             <b>{printed(PIVOT.countGrid[0][2].value)}</b> orders made the {printed(PIVOT.grid[0][2].value)}
           </span>
         </Note>

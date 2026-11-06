@@ -65,7 +65,7 @@ export const OneManyScene: React.FC = () => {
 
       <Kicker at={from - 10}>One to many</Kicker>
       <Head lead="One customer," leadAt={from - 6} turn="many orders." turnAt={ordersAt - 2} />
-      <Spot id="db-relationship-patterns-basket" at={ordersAt + 4} left={1560} top={y(66)} width={270} height={270} />
+      <Spot id="db-relationship-patterns-basket" at={ordersAt + 4} left={1580} top={y(114)} width={200} height={200} />
 
       <Drift from={belongsAt} to={holdsAt + 60} scale={0.02} origin={[midX, y(600)]}>
         <FigLabel n="3" title="Customers and orders, as an ER diagram" at={customerAt - 6} x={customers.x} y={customers.top - FIG_ABOVE} />

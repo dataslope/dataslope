@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { ds, inkOf } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -81,7 +81,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={nineteenAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data analyst interview prep</Kicker>
+        <Kicker at={from}>Data analyst interview questions</Kicker>
         <Headline lead="Two versions," turn="one honest reading." at={teamsAt - 4} turnAt={readingAt - 4} size={70} />
 
         <Spot id="da-ab-testing-fox" at={from + 4} left={1150} top={y(290)} width={600} height={450} />
@@ -178,30 +178,35 @@ export const HookScene: React.FC = () => {
           an <b>A/B test</b>: random groups, one change, one comparison
         </div>
 
-        {/* ── Nineteen questions ── */}
+        {/* ── Nineteen questions: each count on a line of its own over its
+            words, two columns with a hairline centred in their gap ── */}
         {[
           { at: fifteenAt, count: "15", text: "in full, with the numbers on screen", ink: INK },
           { at: fourAt, count: "4", text: "quick", ink: INK_SOFT },
         ].map((r, i) => {
           const p = ease(frame, r.at - 2, 12);
           const dim = ease(frame, startsAt + 2, 14) * 0.45;
+          const top = y(MID_Y) + LANE + 150;
           return (
-            <div
-              key={r.count}
-              style={{
-                position: "absolute",
-                left: X0 + i * 700,
-                top: y(MID_Y) + LANE + 150,
-                display: "flex",
-                alignItems: "baseline",
-                gap: 14,
-                opacity: p * (1 - dim),
-                transform: `translateY(${(1 - p) * 10}px)`,
-              }}
-            >
-              <span style={{ ...note(64, r.ink), fontWeight: 700, ...TABULAR }}>{r.count}</span>
-              <span style={{ ...note(28, r.ink), whiteSpace: "nowrap" }}>{r.text}</span>
-            </div>
+            <React.Fragment key={r.count}>
+              {i > 0 ? (
+                // The first column's words run about 470px at 28px: the rule sits
+                // midway between them and this column.
+                <div style={{ position: "absolute", left: X0 + 585, top: top + 6, width: 1, height: 64 + 8 + 36 - 6, background: HAIRLINE, opacity: ease(frame, r.at - 2, 12) * (1 - dim) }} />
+              ) : null}
+              <div
+                style={{
+                  position: "absolute",
+                  left: X0 + i * 700,
+                  top,
+                  opacity: p * (1 - dim),
+                  transform: `translateY(${(1 - p) * 10}px)`,
+                }}
+              >
+                <div style={{ ...note(64, r.ink), fontWeight: 700, lineHeight: "64px", ...TABULAR }}>{r.count}</div>
+                <div style={{ ...note(28, r.ink), lineHeight: "36px", marginTop: 8, whiteSpace: "nowrap" }}>{r.text}</div>
+              </div>
+            </React.Fragment>
           );
         })}
         <div

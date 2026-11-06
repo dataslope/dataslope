@@ -248,7 +248,7 @@ export const PunctScene: React.FC = () => {
           dur={14}
           style={{ left: INSET_X, top: y(NOTE_Y) - 6 + i * 38, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}
         >
-          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none", width: 300 }}>{r.call}</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none", width: 330 }}>{r.call}</span>
           <span style={{ ...note(24, r.color), fontWeight: 650 }}>
             {r.n} {r.n === 1 ? "sentence" : "sentences"}
           </span>

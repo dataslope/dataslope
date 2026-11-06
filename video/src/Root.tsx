@@ -95,6 +95,27 @@ import { DsSql } from "./videos/ds-sql/Video";
 import { script as dsSqlScript } from "./videos/ds-sql/script";
 import { DsLlmEvaluation } from "./videos/ds-llm-evaluation/Video";
 import { script as dsLlmEvaluationScript } from "./videos/ds-llm-evaluation/script";
+// Backend / Software Engineer interview questions, one video per part.
+import { BeInterview } from "./videos/be-interview/Video";
+import { script as beInterviewScript } from "./videos/be-interview/script";
+import { BeSystemDesign } from "./videos/be-system-design/Video";
+import { script as beSystemDesignScript } from "./videos/be-system-design/script";
+import { BeScaling } from "./videos/be-scaling/Video";
+import { script as beScalingScript } from "./videos/be-scaling/script";
+import { BeApiDesign } from "./videos/be-api-design/Video";
+import { script as beApiDesignScript } from "./videos/be-api-design/script";
+import { BeDatabases } from "./videos/be-databases/Video";
+import { script as beDatabasesScript } from "./videos/be-databases/script";
+import { BeConcurrency } from "./videos/be-concurrency/Video";
+import { script as beConcurrencyScript } from "./videos/be-concurrency/script";
+import { BeObjectDesign } from "./videos/be-object-design/Video";
+import { script as beObjectDesignScript } from "./videos/be-object-design/script";
+import { BeCodeReview } from "./videos/be-code-review/Video";
+import { script as beCodeReviewScript } from "./videos/be-code-review/script";
+import { BeAlgorithms } from "./videos/be-algorithms/Video";
+import { script as beAlgorithmsScript } from "./videos/be-algorithms/script";
+import { BeAiRound } from "./videos/be-ai-round/Video";
+import { script as beAiRoundScript } from "./videos/be-ai-round/script";
 import { DeInterview } from "./videos/de-interview/Video";
 import { script as deInterviewScript } from "./videos/de-interview/script";
 import { DeSqlPatterns } from "./videos/de-sql-patterns/Video";
@@ -965,6 +986,108 @@ export const RemotionRoot: React.FC = () => (
         calculateMetadata={narratedMetadata<EditorialProps>(dsLlmEvaluationScript)}
       />
     </Folder>
+    <Folder name="Interview-Backend-Engineer">
+      <Composition
+        id="BackendEngineer-0-Interview"
+        component={BeInterview}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beInterviewScript)}
+      />
+      <Composition
+        id="BackendEngineer-1-SystemDesign"
+        component={BeSystemDesign}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beSystemDesignScript)}
+      />
+      <Composition
+        id="BackendEngineer-2-Scaling"
+        component={BeScaling}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beScalingScript)}
+      />
+      <Composition
+        id="BackendEngineer-3-ApiDesign"
+        component={BeApiDesign}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beApiDesignScript)}
+      />
+      <Composition
+        id="BackendEngineer-4-Databases"
+        component={BeDatabases}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beDatabasesScript)}
+      />
+      <Composition
+        id="BackendEngineer-5-Concurrency"
+        component={BeConcurrency}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beConcurrencyScript)}
+      />
+      <Composition
+        id="BackendEngineer-6-ObjectDesign"
+        component={BeObjectDesign}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beObjectDesignScript)}
+      />
+      <Composition
+        id="BackendEngineer-7-CodeReview"
+        component={BeCodeReview}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beCodeReviewScript)}
+      />
+      <Composition
+        id="BackendEngineer-8-Algorithms"
+        component={BeAlgorithms}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beAlgorithmsScript)}
+      />
+      <Composition
+        id="BackendEngineer-9-AiRound"
+        component={BeAiRound}
+        width={1920}
+        height={1080}
+        fps={FPS}
+        durationInFrames={FPS * 60}
+        defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
+        calculateMetadata={narratedMetadata<EditorialProps>(beAiRoundScript)}
+      />
+    </Folder>
     <Folder name="Interview-Data-Engineer">
       <Composition
         id="DataEngineer-0-Interview"
@@ -1104,7 +1227,7 @@ export const RemotionRoot: React.FC = () => (
     </Folder>
     <Folder name="Thumbnails">
       {/* YouTube thumbnails for the merged course and interview videos
-          (src/thumbnails/): four designs, one still per track. */}
+          (src/thumbnails/): one still per track. */}
       {THUMBNAILS.map(({ id, props }) => (
         <Still key={id} id={id} component={Thumbnail} width={THUMBNAIL.width} height={THUMBNAIL.height} defaultProps={props} />
       ))}

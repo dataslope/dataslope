@@ -221,15 +221,12 @@ export const LawScene: React.FC = () => {
             top: y(CH.top) - 4,
             opacity: (1 - ease(frame, lawAt - 8, 12)) * ease(frame, afterAt - 2, 8),
             whiteSpace: "nowrap",
-            display: "flex",
-            alignItems: "baseline",
-            gap: 12,
+            ...note(30, INK_SOFT),
           }}
         >
-          <span style={note(22, INK_SOFT)}>after</span>
-          <span style={{ ...note(34, INK), fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
-          <span style={note(22, INK_SOFT)}>flips:</span>
-          <span style={{ ...note(34, DATA_INK), fontWeight: 700, ...TABULAR }}>{head ? pct(head[1]) : ""}</span>
+          {/* One line, one size: the numbers stand out by weight and color. */}
+          after <span style={{ color: INK, fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span> flips:{" "}
+          <span style={{ color: DATA_INK, fontWeight: 700, ...TABULAR }}>{head ? pct(head[1]) : ""}</span>
         </div>
       ) : null}
       <Note at={fiveAt} x={CH.x1 + 12} y={fy(0.5) - 15}>
@@ -268,7 +265,8 @@ export const LawScene: React.FC = () => {
       </Ink>
       {Array.from({ length: 5 }, (_, i) => {
         const x0 = MEM.x0 + i * MEM.pitch;
-        const y0 = y(MEM.y);
+        // A little above MEM.y, so the coins keep a clear row above "The next flip".
+        const y0 = y(MEM.y - 10);
         // On "paid back" a copy of the streak flies to where this run really
         // had five heads in a row, flips 21 to 25, and lands in a row over
         // them; the panel keeps its own, set back.
@@ -294,18 +292,19 @@ export const LawScene: React.FC = () => {
       })}
       <Leader points={[[landX, landY + LANDED.r + 8], [landX, fy(llnAt(STREAK[2])) - 12]]} at={paidAt + 14} dur={10} color={STAT} />
       <Note at={paidAt + 16} x={landX + 2 * LANDED.pitch + LANDED.r + 14} y={landY - 15}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           flips {STREAK[0]} to {STREAK_END}
         </span>
       </Note>
-      <Ink at={fiftyAt - 6} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 52), whiteSpace: "nowrap" }}>
+      {/* High enough that "still ½" clears the chart's "true 50%" row. */}
+      <Ink at={fiftyAt - 6} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 38), whiteSpace: "nowrap" }}>
         <span style={note(22, INK_SOFT)}>The next flip</span>
         <div style={{ ...headline(64, true), color: STAT_INK, marginTop: 6 }}>still ½</div>
       </Ink>
-      <Ink at={memoryAt - 2} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 208), whiteSpace: "nowrap" }}>
+      <Ink at={memoryAt - 2} dur={14} style={{ left: MEM.x0 - MEM.r, top: y(MEM.y + 190), whiteSpace: "nowrap" }}>
         <span style={{ ...body(32, true), color: INK }}>No memory.</span>
       </Ink>
-      <Note at={swampedAt} x={MEM.x0 - MEM.r} y={y(MEM.y + 290)} width={320}>
+      <Note at={swampedAt} x={MEM.x0 - MEM.r} y={y(MEM.y + 262)} width={320}>
         <span style={{ ...note(22, INK), lineHeight: 1.35 }}>A streak is never paid back, only swamped.</span>
       </Note>
       <Note at={afterEnd - 6} x={fx(30)} y={y(CH.base) - h(60)}>

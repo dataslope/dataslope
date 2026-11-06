@@ -21,6 +21,10 @@ const GHOST = ds("blue", 200);
 const TABLE_X = 1370;
 const COL = [TABLE_X, TABLE_X + 180, TABLE_X + 290];
 const TABLE_W = 440;
+/** How far under the last row's top the legend starts, in px: the second
+ *  row holds a count with its "of 10,000" on a line under it, and the
+ *  legend keeps a clear 50px below that. */
+const LEGEND_DROP = 44;
 
 /**
  * Collapse: the same ten thousand pairs, differenced. The wide spread of
@@ -141,14 +145,13 @@ export const CollapseScene: React.FC = () => {
       <Note at={sevenAt + 2} x={COL[1]} y={row(1) - 6}>
         <span style={{ ...headline(44), color: ACCENT_INK }}>{pct(SHARE.walks25)}</span>
       </Note>
+      {/* The count, and what it is out of on a line under it: one size per line. */}
       <Note at={twoAt} x={COL[2]} y={row(1) - 6}>
-        <span style={{ display: "inline-flex", alignItems: "baseline", gap: 8, whiteSpace: "nowrap" }}>
-          <span style={{ ...headline(44), color: COLOR_INK.a }}>{DIFFS_PAST_25}</span>
-          <span style={note(20, INK_SOFT)}>of {PAIRS.toLocaleString("en-US")}</span>
-        </span>
+        <div style={{ ...headline(44), color: COLOR_INK.a }}>{DIFFS_PAST_25}</div>
+        <div style={{ ...note(20, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>of {PAIRS.toLocaleString("en-US")}</div>
       </Note>
 
-      <Note at={sameAt + 20} x={TABLE_X} y={row(2) + 10} width={TABLE_W}>
+      <Note at={sameAt + 20} x={TABLE_X} y={row(2) + LEGEND_DROP} width={TABLE_W}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 12, ...prose(20) }}>
           <Key color={GHOST} kind="box" />
           the walks, from Fig. 3

@@ -91,22 +91,23 @@ const PaperCard: React.FC<{
         <span>arXiv</span>
         <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, dateAt, 10) }}>{W2V_PAPER.date}</span>
       </div>
+      {/* The masthead rule; the title starts 28px below it. */}
       <div style={{ position: "absolute", left: pad, right: pad, top: 52, height: 1.5, background: INK }} />
-      <Ink at={at + 6} dur={20} style={{ left: pad, top: 70, width: width - 2 * pad }}>
+      <Ink at={at + 6} dur={20} style={{ left: pad, top: 82, width: width - 2 * pad }}>
         <div style={{ ...headline(30), lineHeight: 1.12 }}>
           <Mark at={titleMark}>{W2V_PAPER.title}</Mark>
         </div>
       </Ink>
-      <Ink at={authorAt} dur={14} style={{ left: pad, top: 158, width: width - 2 * pad }}>
+      <Ink at={authorAt} dur={14} style={{ left: pad, top: 170, width: width - 2 * pad }}>
         <div style={{ ...label(21, INK), lineHeight: 1.35 }}>{W2V_PAPER.authors}</div>
       </Ink>
-      <Ink at={placeAt} dur={14} style={{ left: pad, top: 226, whiteSpace: "nowrap" }}>
+      <Ink at={placeAt} dur={14} style={{ left: pad, top: 238, whiteSpace: "nowrap" }}>
         <div style={{ ...label(21, INK_SOFT), fontWeight: 560 }}>{W2V_PAPER.place}</div>
       </Ink>
       {Array.from({ length: 5 }, (_, i) => {
         const w = ease(frame, at + 14 + i * 6, 12);
         const full = i === 4 ? 0.5 : 0.88 + ((i * 37) % 10) / 100;
-        return <div key={i} style={{ position: "absolute", left: pad, top: 280 + i * 30, width: (width - 2 * pad) * full * w, height: 6, borderRadius: 3, background: SOFT }} />;
+        return <div key={i} style={{ position: "absolute", left: pad, top: 292 + i * 30, width: (width - 2 * pad) * full * w, height: 6, borderRadius: 3, background: SOFT }} />;
       })}
     </div>
   );

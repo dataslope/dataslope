@@ -140,7 +140,8 @@ export const DecideScene: React.FC = () => {
         <span style={{ ...label(22, INK), fontWeight: 600 }}>A huge test</span>
       </Ink>
       <Ink at={eightAt - 4} dur={18} style={{ left: 470, top: y(HUGE) - 66, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, INK), fontWeight: 600 }}>
+        {/* Within a size of "A huge test" beside it: one line, one size. */}
+        <span style={{ ...note(24, INK), fontWeight: 600 }}>
           {fmt(pp(TINY.pA))}% to {fmt(pp(TINY.pB))}%
         </span>
       </Ink>

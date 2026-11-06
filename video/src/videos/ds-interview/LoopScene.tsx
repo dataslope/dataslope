@@ -3,6 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
+import { badgeStyle } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -16,6 +17,12 @@ const TITLE_W = 340;
 /** The modeling case's question sits on one line, wider than a stop's title. */
 const QUOTE_W = 420;
 const R = 26;
+/** A stop's number: the house badge as a disc (editorial/ui), data blue's
+ *  tint and ink with no ring. It is as wide as the ringed disc was, 2.5px
+ *  past R all round, and laid over the page so the line's ends at R stay
+ *  under its rim, meeting it where they met the ring. */
+const DISC = badgeStyle("blue", 24);
+const DISC_R = R + 2.5;
 
 /** A small normal curve, drawn along its length from `at`. */
 const Bell: React.FC<{ at: number; cx: number; top: number }> = ({ at, cx, top }) => {
@@ -69,18 +76,18 @@ const Stop: React.FC<{ i: number; at: number; title: string; children?: React.Re
       <div
         style={{
           position: "absolute",
-          left: cx - R,
-          top: y(ROUTE_Y) - R,
-          width: 2 * R,
-          height: 2 * R,
-          borderRadius: R,
-          border: `2.5px solid ${BLUE_INK}`,
-          background: PAPER,
+          left: cx - DISC_R,
+          top: y(ROUTE_Y) - DISC_R,
+          width: 2 * DISC_R,
+          height: 2 * DISC_R,
+          borderRadius: DISC_R,
+          background: `linear-gradient(${DISC.background}, ${DISC.background}), ${PAPER}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...label(24, BLUE_INK),
+          ...label(24, String(DISC.color)),
           ...TABULAR,
+          fontWeight: 600,
           transform: `scale(${0.6 + 0.4 * p})`,
           opacity: p,
         }}
@@ -131,7 +138,7 @@ export const LoopScene: React.FC = () => {
       ))}
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data scientist interview prep</Kicker>
+        <Kicker at={from}>Data scientist interview questions</Kicker>
         <Headline lead="The loop," turn="four kinds of round." at={from + 4} turnAt={fourAt - 2} size={72} />
 
         <svg style={{ position: "absolute", inset: 0, overflow: "visible" }} width={1920} height={1080}>

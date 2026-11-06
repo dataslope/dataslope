@@ -212,14 +212,13 @@ export const WaldScene: React.FC = () => {
               <span style={{ ...note(20, BLUE_INK), fontWeight: 650 }}>{pct(p.hitShare)}</span>
             </Note>
             {/* A chance, not a share: "39 in 100", as it is said, so the
-                column does not read as a third set of shares. */}
-            <Note at={estAt} x={EST_X} y={c - 24} align="right" from="right">
-              <span style={{ whiteSpace: "nowrap" }}>
-                <span style={{ ...note(spoken ? 34 : 30, spoken ? ACCENT_INK : INK_SOFT), fontWeight: 700 }}>
-                  {Math.round(p.downedByOneHit * 100)}
-                </span>
-                <span style={note(20, INK_SOFT)}> in 100</span>
-              </span>
+                column does not read as a third set of shares. The number
+                and its "in 100" stack, one size to a line. */}
+            <Note at={estAt} x={EST_X} y={c - 31} align="right" from="right">
+              <div style={{ ...note(spoken ? 34 : 30, spoken ? ACCENT_INK : INK_SOFT), fontWeight: 700, lineHeight: 1, whiteSpace: "nowrap" }}>
+                {Math.round(p.downedByOneHit * 100)}
+              </div>
+              <div style={{ ...note(20, INK_SOFT), lineHeight: 1.2, marginTop: 4, whiteSpace: "nowrap" }}>in 100</div>
             </Note>
           </React.Fragment>
         );

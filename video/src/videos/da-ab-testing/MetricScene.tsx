@@ -4,22 +4,25 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, type BadgeTone, Note } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DRIFT } from "./data";
-import { Axes, Drift, ElbowArrow, Line, OK, OK_INK, type Scale, X0, at } from "./parts";
+import { Axes, Drift, ElbowArrow, FlexRule, Line, OK, OK_INK, type Scale, X0, at } from "./parts";
 
 const LIST_Y = 330;
 const PITCH = 60;
 const CHART = { x0: 900, x1: 1640, top: 360, base: 780 };
 const SERIES = [BAR, ds("teal", 500), ds("purple", 500)];
 const SERIES_INK = [BLUE_INK, inkOf.teal, inkOf.purple];
+/** Question 2's three columns run from X0 to here. */
+const KINDS_R = 1760;
 
 type Box = { text: string; at: number };
 
-/** A labelled card, for the metric kinds and the north star. */
+/** A labelled box, for the north star and the day-to-day metrics its arrows
+ *  run into: nodes of a diagram, so they keep their outline. */
 const Card: React.FC<{ x: number; y: number; w: number; at: number; out?: number; color?: string; strong?: boolean; children: React.ReactNode }> = ({
   x,
   y,
@@ -108,21 +111,20 @@ export const MetricScene: React.FC = () => {
   const drawAt = (i: number) => threeAt + i * 10;
 
   // ── Kinds ──
-  const colW = 520;
-  const cols = [
-    { x: X0, title: "Primary", at: primaryAt, ink: OK_INK, items: [{ text: "checkout conversion", at: primaryAt + 10 }] },
+  const cols: { title: string; at: number; ink: string; tone: BadgeTone; items: Box[] }[] = [
+    { title: "Primary", at: primaryAt, ink: OK_INK, tone: "green", items: [{ text: "checkout conversion", at: primaryAt + 10 }] },
     {
-      x: X0 + colW + 40,
       title: "Guardrail",
       at: guardAt,
       ink: BLUE_INK,
+      tone: "blue",
       items: [
         { text: "page speed", at: guardItems[0] },
         { text: "refunds", at: guardItems[1] },
         { text: "unsubscribes", at: guardItems[2] },
       ],
     },
-    { x: X0 + 2 * (colW + 40), title: "Vanity", at: vanityAt, ink: ACCENT_INK, items: [{ text: "total registered users", at: vanityAt + 12 }] },
+    { title: "Vanity", at: vanityAt, ink: ACCENT_INK, tone: "red", items: [{ text: "total registered users", at: vanityAt + 12 }] },
   ];
 
   // ── North star ──
@@ -216,20 +218,57 @@ export const MetricScene: React.FC = () => {
           <span style={{ ...note(30, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>×{DRIFT.spread}</span>
         </Note>
 
-        {/* ── Question 2: three kinds of metric ── */}
-        {cols.map((c) => (
-          <React.Fragment key={c.title}>
-            <Note at={c.at - 2} x={c.x} y={y(340)} out={out2}>
-              <span style={{ ...label(26, c.ink), whiteSpace: "nowrap" }}>{c.title}</span>
-            </Note>
-            {c.items.map((it, k) => (
-              <Card key={it.text} x={c.x} y={y(400) + k * h(76)} w={colW} at={it.at - 2} out={out2} color={c.ink}>
-                {it.text}
-              </Card>
-            ))}
-          </React.Fragment>
-        ))}
-        <Note at={beforeAt - 2} x={X0} y={y(680)} out={out2}>
+        {/* ── Question 2: three kinds of metric, as three columns spread
+            across the page with a hairline centred in each gap: each kind's
+            name, and under it its metrics as badges in the kind's hue ── */}
+        <div
+          style={{
+            position: "absolute",
+            left: X0,
+            top: y(340),
+            width: KINDS_R - X0,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            opacity: 1 - ease(frame, out2, 10),
+          }}
+        >
+          {cols.map((c, k) => (
+            <React.Fragment key={c.title}>
+              {k > 0 ? <FlexRule at={c.at - 2} /> : null}
+              <div>
+                <div
+                  style={{
+                    ...label(26, c.ink),
+                    lineHeight: "34px",
+                    whiteSpace: "nowrap",
+                    opacity: ease(frame, c.at - 2, 14),
+                    transform: `translateX(${(1 - ease(frame, c.at - 2, 14)) * -18}px)`,
+                  }}
+                >
+                  {c.title}
+                </div>
+                {c.items.map((it, i) => {
+                  const p = ease(frame, it.at - 2, 12);
+                  return (
+                    <div
+                      key={it.text}
+                      style={{
+                        display: "flex",
+                        marginTop: i === 0 ? 14 : 16,
+                        opacity: p,
+                        transform: `translateY(${(1 - p) * 10}px)`,
+                      }}
+                    >
+                      <span style={{ ...note(26, INK), ...badgeStyle(c.tone, 26) }}>{it.text}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+        <Note at={beforeAt - 2} x={X0} y={y(610)} out={out2}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             primary and guardrails: <b>chosen before the test starts</b>
           </span>

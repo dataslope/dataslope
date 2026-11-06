@@ -80,7 +80,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pop" at={startAt + 2} level={-32} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data scientist interview prep</Kicker>
+        <Kicker at={from}>Data scientist interview questions</Kicker>
         <Headline lead="Twenty-three people in a room." turn="Do two share a birthday?" at={peopleAt - 6} turnAt={shareAt - 8} size={64} />
 
         <Spot id="ds-probability-rabbit" at={from + 4} out={fourteenAt - 8} left={1200} top={y(270)} width={600} height={440} />

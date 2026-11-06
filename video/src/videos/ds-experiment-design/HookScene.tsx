@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -11,13 +11,17 @@ import { Drift, Headline, Kicker, Mark, OK, OK_INK, pulse, Spot, X0 } from "./pa
 import { mulberry32 } from "../da-statistics-communication/parts";
 
 const LINE_Y = 600;
-/** Five chips of 188 with gaps of 8 end at 1092, clear of the launch tick. */
+/** The five decisions, gray house badges at their own widths with 10px
+ *  between them, end near 900, clear of the launch tick. (An even 188 put
+ *  "how many users", 200 wide with its padding, into its own edge.) */
 const LAUNCH_X = 1110;
 const LINE_END = 1800;
 const CHIP_Y = 460;
-const CHIP_W = 188;
-const CHIP_GAP = 8;
-const CHIP_H = 66;
+const BADGE_GAP = 10;
+/** How far above the line the settled badges' tops sit: their 35px box
+ *  plus 11px of air over the rule. */
+const BADGE_DROP = 46;
+const DECISION_BADGE = badgeStyle("gray", 22);
 const DOTS_X = 1170;
 const DOTS_Y = 480;
 
@@ -81,7 +85,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-chime" at={fourteenAt} level={-36} />
 
       <Drift from={0} to={nextAt}>
-        <Kicker at={startAt}>Data scientist interview prep · Experimentation I</Kicker>
+        <Kicker at={startAt}>Data scientist interview questions · Experimentation I</Kicker>
         <Headline lead="An A/B test can be lost" turn="before launch." at={startAt + 2} turnAt={beforeAt - 2} size={72} />
         <Spot id="ds-experiment-design-heron" at={startAt + 10} left={1500} top={y(236)} width={300} height={227} />
 
@@ -117,9 +121,10 @@ export const HookScene: React.FC = () => {
         </Note>
 
         {/* Live: two versions, and users split between them at random. */}
+        {/* The two versions as house badges in their own hues over the dots. */}
         {[
-          { text: "A · old", color: BAR, x: DOTS_X },
-          { text: "B · new", color: OK, x: DOTS_X + 150 },
+          { text: "A · old", tone: "blue" as const, x: DOTS_X },
+          { text: "B · new", tone: "green" as const, x: DOTS_X + 150 },
         ].map((c, i) => {
           const p = ease(frame, versionsAt + i * 4, 10);
           return (
@@ -128,13 +133,9 @@ export const HookScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: c.x,
-                top: y(DOTS_Y) - h(64),
-                padding: "4px 14px",
-                borderRadius: 6,
-                background: c.color,
-                ...label(21, PAPER),
-                fontWeight: 700,
-                whiteSpace: "nowrap",
+                top: y(DOTS_Y) - h(60),
+                ...label(21),
+                ...badgeStyle(c.tone, 21),
                 opacity: p,
                 transform: `translateY(${(1 - p) * 10}px)`,
               }}
@@ -161,41 +162,41 @@ export const HookScene: React.FC = () => {
           })}
         </svg>
 
-        {/* Before launch: the five decisions, settling onto the line. */}
-        {DECISIONS.map((d, i) => {
-          const cueAt = n.word("hook", d.cue);
-          const p = ease(frame, cueAt - 2, 10);
-          if (p <= 0) return null;
-          const lift = (y(LINE_Y) - h(CHIP_H) - h(10) - y(CHIP_Y)) * drop;
-          const lit = i < 2 ? ease(frame, planAt, 10) : 0;
-          const bump = pulse(frame, cueAt, 14);
-          return (
-            <div
-              key={d.text}
-              style={{
-                position: "absolute",
-                left: X0 + i * (CHIP_W + CHIP_GAP),
-                top: y(CHIP_Y) + lift,
-                width: CHIP_W,
-                height: h(CHIP_H),
-                boxSizing: "border-box",
-                border: `2px solid ${INK}`,
-                borderRadius: 8,
-                background: lit > 0 ? `color-mix(in srgb, ${ds("yellow", 300)} ${lit * 100}%, ${PAPER})` : PAPER,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                ...note(21, INK),
-                fontWeight: 650,
-                whiteSpace: "nowrap",
-                opacity: p,
-                transform: `translateY(${(1 - p) * -14}px) scale(${1 + 0.06 * bump})`,
-              }}
-            >
-              {d.text}
-            </div>
-          );
-        })}
+        {/* Before launch: the five decisions, gray house badges in a row,
+            settling onto the line. Each holds its place before it inks, so the
+            row never reflows; the two the plan starts from take the
+            highlighter's yellow. */}
+        <div
+          style={{
+            position: "absolute",
+            left: X0,
+            top: y(CHIP_Y) + (y(LINE_Y) - h(BADGE_DROP) - y(CHIP_Y)) * drop,
+            display: "flex",
+            gap: BADGE_GAP,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {DECISIONS.map((d, i) => {
+            const cueAt = n.word("hook", d.cue);
+            const p = ease(frame, cueAt - 2, 10);
+            const lit = i < 2 ? ease(frame, planAt, 10) : 0;
+            const bump = pulse(frame, cueAt, 14);
+            return (
+              <span
+                key={d.text}
+                style={{
+                  ...note(22),
+                  ...DECISION_BADGE,
+                  background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, ${DECISION_BADGE.background})` : DECISION_BADGE.background,
+                  opacity: p,
+                  transform: `translateY(${(1 - p) * -14}px) scale(${1 + 0.06 * bump})`,
+                }}
+              >
+                {d.text}
+              </span>
+            );
+          })}
+        </div>
         <Note at={undoAt - 2} x={DOTS_X} y={y(LINE_Y) + h(70)}>
           <span style={{ ...note(27, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a mistake is hard to undo once it's live</span>
         </Note>

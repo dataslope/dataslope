@@ -243,7 +243,9 @@ export const RulerScene: React.FC = () => {
         <Ink at={sevenAt - 2} dur={14} style={{ position: "relative", ...note(24, ACCENT_INK), fontWeight: 700 }}>
           {fmt(TIMES.lo)} to {fmt(TIMES.hi)} s,
         </Ink>
-        <Ink at={intervalAt - 2} dur={16} style={{ position: "relative", ...body(28, true), color: INK }}>
+        {/* One line, one size, one face: the range is set apart by weight
+            and the accent, not by the serif. */}
+        <Ink at={intervalAt - 2} dur={16} style={{ position: "relative", ...note(24, INK) }}>
           a rough 95% confidence interval
         </Ink>
       </div>
@@ -277,7 +279,7 @@ export const RulerScene: React.FC = () => {
         <span style={{ ...note(22, ACCENT_INK), fontWeight: 700 }}>{fmt(TIMES.gapInSe)} standard errors away</span>
       </Note>
 
-      <div style={{ position: "absolute", left: R.x0, right: 1920 - R.x1, top: y(838), height: 1, background: HAIRLINE, opacity: ease(frame, nextAt - 6, 12) }} />
+      <div style={{ position: "absolute", left: R.x0, right: 1920 - R.x1, top: y(856) - 29, height: 1, background: HAIRLINE, opacity: ease(frame, nextAt - 6, 12) }} />
       <Ink at={nextAt - 2} dur={18} style={{ left: R.x0, top: y(856), ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
         Next: that interval, <span style={{ opacity: ease(frame, properlyAt - 2, 12) }}>built properly.</span>
       </Ink>

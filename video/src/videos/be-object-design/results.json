@@ -1,0 +1,233 @@
+{
+  "runtime": "3.14.2",
+  "figures": {
+    "encapsulation": {
+      "setup": "class BankAccount:\n    def __init__(self, balance=0):\n        self._balance = balance          # \"internal\", not to be poked directly\n\n    def withdraw(self, amount):\n        if amount > self._balance:\n            raise ValueError(\"insufficient funds\")\n        self._balance -= amount\n\n    @property\n    def balance(self):                   # read-only view of internal state\n        return self._balance\n",
+      "steps": {
+        "page": {
+          "code": "acct = BankAccount(100)\nacct.withdraw(30)\nprint(acct.balance)",
+          "ok": true,
+          "printed": [
+            "70"
+          ]
+        },
+        "overdraw": {
+          "code": "acct = BankAccount(100)\nacct.withdraw(200)",
+          "ok": false,
+          "printed": [],
+          "error": "ValueError: insufficient funds"
+        },
+        "opening": {
+          "code": "print(BankAccount(-50).balance)",
+          "ok": true,
+          "printed": [
+            "-50"
+          ]
+        },
+        "negative": {
+          "code": "acct = BankAccount(100)\nacct.withdraw(-30)\nprint(acct.balance)",
+          "ok": true,
+          "printed": [
+            "130"
+          ]
+        },
+        "readonly": {
+          "code": "acct = BankAccount(100)\nacct.balance = 1_000_000",
+          "ok": false,
+          "printed": [],
+          "error": "AttributeError: property 'balance' of 'BankAccount' object has no setter"
+        }
+      }
+    },
+    "polymorphism": {
+      "setup": "import math\n\nclass Circle:\n    def __init__(self, r):\n        self.r = r\n    def area(self):\n        return math.pi * self.r ** 2\n\nclass Square:\n    def __init__(self, s):\n        self.s = s\n    def area(self):\n        return self.s ** 2\n\ndef total_area(shapes):\n    return sum(shape.area() for shape in shapes)   # duck typing\n",
+      "steps": {
+        "page": {
+          "code": "print(round(total_area([Circle(1), Square(2)]), 2))",
+          "ok": true,
+          "printed": [
+            "7.14"
+          ]
+        }
+      }
+    },
+    "strategy": {
+      "setup": "class FlatRate:\n    def cost(self, weight):\n        return 5.0\n\nclass ByWeight:\n    def cost(self, weight):\n        return weight * 2.0\n\nclass Shipment:\n    def __init__(self, weight, strategy):\n        self.weight = weight\n        self.strategy = strategy         # inject the algorithm\n    def price(self):\n        return self.strategy.cost(self.weight)\n",
+      "steps": {
+        "page": {
+          "code": "print(Shipment(3, FlatRate()).price())\nprint(Shipment(3, ByWeight()).price())",
+          "ok": true,
+          "printed": [
+            "5.0",
+            "6.0"
+          ]
+        },
+        "third": {
+          "code": "class FreeOverTen:\n    def cost(self, weight):\n        return 0.0 if weight > 10 else 5.0\n\nprint(Shipment(3, FreeOverTen()).price())\nprint(Shipment(12, FreeOverTen()).price())",
+          "ok": true,
+          "printed": [
+            "5.0",
+            "0.0"
+          ]
+        }
+      }
+    },
+    "liskov": {
+      "setup": "class Rectangle:\n    def __init__(self, width, height):\n        self.width, self.height = width, height\n    def set_width(self, w):\n        self.width = w\n    def set_height(self, h):\n        self.height = h\n    def area(self):\n        return self.width * self.height\n\nclass Square(Rectangle):                 # forces width == height\n    def __init__(self, side):\n        super().__init__(side, side)\n    def set_width(self, w):\n        self.width = self.height = w\n    def set_height(self, h):\n        self.width = self.height = h\n\ndef resize(r):\n    \"\"\"A caller written against Rectangle: widen, then set the height.\"\"\"\n    r.set_width(5)\n    r.set_height(4)\n    return r.area()                       # a rectangle's promise: 5 x 4 = 20\n",
+      "steps": {
+        "rectangle": {
+          "code": "print(resize(Rectangle(2, 3)))",
+          "ok": true,
+          "printed": [
+            "20"
+          ]
+        },
+        "square": {
+          "code": "print(resize(Square(3)))",
+          "ok": true,
+          "printed": [
+            "16"
+          ]
+        }
+      }
+    },
+    "fragileBefore": {
+      "setup": "class Cart:\n    def __init__(self):\n        self.items = []\n    def add(self, item):\n        self.items.append(item)\n    def add_all(self, items):\n        for item in items:\n            self.add(item)\n\nclass LoyaltyCart(Cart):                  # inheritance: counts inside add()\n    def __init__(self):\n        super().__init__()\n        self.counted = 0\n    def add(self, item):\n        self.counted += 1\n        super().add(item)\n\nclass LoyaltyCounter:                     # composition: holds a cart\n    def __init__(self, cart):\n        self.cart = cart\n        self.counted = 0\n    def add(self, item):\n        self.counted += 1\n        self.cart.add(item)\n    def add_all(self, items):\n        items = list(items)\n        self.counted += len(items)\n        self.cart.add_all(items)\n",
+      "steps": {
+        "inherits": {
+          "code": "c = LoyaltyCart()\nc.add_all([\"tea\", \"jam\", \"bread\"])\nprint(len(c.items), c.counted)",
+          "ok": true,
+          "printed": [
+            "3 3"
+          ]
+        },
+        "composes": {
+          "code": "c = LoyaltyCounter(Cart())\nc.add_all([\"tea\", \"jam\", \"bread\"])\nprint(len(c.cart.items), c.counted)",
+          "ok": true,
+          "printed": [
+            "3 3"
+          ]
+        }
+      }
+    },
+    "fragileAfter": {
+      "setup": "class Cart:\n    def __init__(self):\n        self.items = []\n    def add(self, item):\n        self.items.append(item)\n    def add_all(self, items):\n        self.items.extend(items)          # faster: one call, not one per item\n\nclass LoyaltyCart(Cart):                  # inheritance: counts inside add()\n    def __init__(self):\n        super().__init__()\n        self.counted = 0\n    def add(self, item):\n        self.counted += 1\n        super().add(item)\n\nclass LoyaltyCounter:                     # composition: holds a cart\n    def __init__(self, cart):\n        self.cart = cart\n        self.counted = 0\n    def add(self, item):\n        self.counted += 1\n        self.cart.add(item)\n    def add_all(self, items):\n        items = list(items)\n        self.counted += len(items)\n        self.cart.add_all(items)\n",
+      "steps": {
+        "inherits": {
+          "code": "c = LoyaltyCart()\nc.add_all([\"tea\", \"jam\", \"bread\"])\nprint(len(c.items), c.counted)",
+          "ok": true,
+          "printed": [
+            "3 0"
+          ]
+        },
+        "composes": {
+          "code": "c = LoyaltyCounter(Cart())\nc.add_all([\"tea\", \"jam\", \"bread\"])\nprint(len(c.cart.items), c.counted)",
+          "ok": true,
+          "printed": [
+            "3 3"
+          ]
+        }
+      }
+    },
+    "dip": {
+      "setup": "class Report:\n    def __init__(self, sender):        # depends on an abstraction\n        self.sender = sender\n    def deliver(self, text):\n        self.sender.send(text)\n\nclass FakeSender:                      # what a test passes in\n    def __init__(self):\n        self.sent = []\n    def send(self, text):\n        self.sent.append(text)\n",
+      "steps": {
+        "test": {
+          "code": "fake = FakeSender()\nReport(fake).deliver(\"Order 1042 confirmed\")\nprint(fake.sent)",
+          "ok": true,
+          "printed": [
+            "['Order 1042 confirmed']"
+          ]
+        }
+      }
+    },
+    "factory": {
+      "setup": "class JsonParser: pass\nclass CsvParser: pass\n\ndef make_parser(kind):\n    parsers = {\"json\": JsonParser, \"csv\": CsvParser}\n    try:\n        return parsers[kind]()      # caller doesn't know the concrete class\n    except KeyError:\n        raise ValueError(f\"unknown parser: {kind}\")\n",
+      "steps": {
+        "csv": {
+          "code": "print(type(make_parser(\"csv\")).__name__)",
+          "ok": true,
+          "printed": [
+            "CsvParser"
+          ]
+        },
+        "xml": {
+          "code": "make_parser(\"xml\")",
+          "ok": false,
+          "printed": [],
+          "error": "ValueError: unknown parser: xml"
+        }
+      }
+    },
+    "singleton": {
+      "setup": "class Config:\n    _instance = None\n    def __new__(cls):\n        if cls._instance is None:\n            cls._instance = super().__new__(cls)\n            cls._instance.currency = \"USD\"\n        return cls._instance\n\ndef test_prices_in_euros():\n    Config().currency = \"EUR\"\n    assert Config().currency == \"EUR\"\n\ndef test_default_currency():\n    assert Config().currency == \"USD\", f\"currency is {Config().currency}\"\n\ndef run(tests):\n    Config._instance = None             # a fresh process\n    out = []\n    for t in tests:\n        try:\n            t()\n            out.append(f\"{t.__name__}: pass\")\n        except AssertionError as e:\n            out.append(f\"{t.__name__}: FAIL ({e})\")\n    print(out)\n",
+      "steps": {
+        "alone": {
+          "code": "run([test_default_currency])",
+          "ok": true,
+          "printed": [
+            "['test_default_currency: pass']"
+          ]
+        },
+        "inOrder": {
+          "code": "run([test_prices_in_euros, test_default_currency])",
+          "ok": true,
+          "printed": [
+            "['test_prices_in_euros: pass', 'test_default_currency: FAIL (currency is EUR)']"
+          ]
+        }
+      }
+    },
+    "observer": {
+      "setup": "class Order:\n    def __init__(self):\n        self._subscribers = []\n    def subscribe(self, fn):\n        self._subscribers.append(fn)\n    def place(self, number):\n        for notify in self._subscribers:   # it knows none of their types\n            notify(number)\n\nheard = []\norder = Order()\norder.subscribe(lambda n: heard.append(f\"email: confirm {n}\"))\norder.subscribe(lambda n: heard.append(f\"stock: reserve {n}\"))\norder.subscribe(lambda n: heard.append(f\"analytics: count {n}\"))\n",
+      "steps": {
+        "place": {
+          "code": "order.place(1042)\nprint(heard)",
+          "ok": true,
+          "printed": [
+            "['email: confirm 1042', 'stock: reserve 1042', 'analytics: count 1042']"
+          ]
+        },
+        "fourth": {
+          "code": "heard.clear()\norder.subscribe(lambda n: heard.append(f\"loyalty: points for {n}\"))\norder.place(1043)\nprint(heard)",
+          "ok": true,
+          "printed": [
+            "['email: confirm 1043', 'stock: reserve 1043', 'analytics: count 1043', 'loyalty: points for 1043']"
+          ]
+        }
+      }
+    }
+  },
+  "notifiers": {
+    "channels": [
+      "email",
+      "text",
+      "push"
+    ],
+    "timings": [
+      "now",
+      "daily digest",
+      "quiet hours"
+    ],
+    "added": "in-app",
+    "inheritance": [
+      9,
+      12
+    ],
+    "composition": [
+      6,
+      7
+    ],
+    "names": [
+      "EmailNowNotifier",
+      "EmailDailyDigestNotifier",
+      "EmailQuietHoursNotifier",
+      "TextNowNotifier",
+      "TextDailyDigestNotifier",
+      "TextQuietHoursNotifier",
+      "PushNowNotifier",
+      "PushDailyDigestNotifier",
+      "PushQuietHoursNotifier"
+    ]
+  }
+}

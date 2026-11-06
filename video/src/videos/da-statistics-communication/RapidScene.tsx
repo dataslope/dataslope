@@ -10,7 +10,8 @@ import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
-import { at, Drift, Headline, Kicker, Mark, Mono, OK, OK_INK, type Scale, Spot, Svg, VLine, X0 } from "./parts";
+import { at, Drift, Headline, Kicker, Mark, OK, OK_INK, type Scale, Spot, Svg, VLine, X0 } from "./parts";
+import { Mono } from "./mono";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -215,7 +216,9 @@ const Mode: React.FC<{ c: Ctx }> = ({ c }) => {
           </React.Fragment>
         );
       })}
-      <Note at={billingAt + 4} x={barX + 3 * unit + 60} y={top + c.h(50)}>
+      {/* Well clear of the billing bar's count, so the two read as a count
+          and a note about it rather than as one line in two sizes. */}
+      <Note at={billingAt + 4} x={barX + 3 * unit + 110} y={top + c.h(50)}>
         <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>mode: {RAPID.mode.mode}</span>
       </Note>
       <Note at={twoAt - 2} x={R_X + 40} y={top + c.h(330)}>

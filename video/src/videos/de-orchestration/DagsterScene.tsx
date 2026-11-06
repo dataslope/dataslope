@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CodeSpan, Drift, Edge, OK, OK_INK, Pill, TaskBox, X0 } from "./parts";
+import { CodeSpan, Drift, Edge, OK, Pill, TaskBox, VRule, X0 } from "./parts";
 
 const LEFT = X0;
 const RIGHT_X = 1000;
@@ -109,6 +109,10 @@ export const DagsterScene: React.FC = () => {
         <Note at={wireAt + 16} x={LEFT} y={cy + h(112)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the order, written by hand</span>
         </Note>
+
+        {/* The two models side by side: a hairline in the gap, from the heads
+            to the last line, inking in with Dagster on its right. */}
+        <VRule x={934} top={y(286)} height={y(846) + 28 - y(286)} at={dagAt} />
 
         {/* Dagster: assets, the graph worked out from what each reads. */}
         <Note at={dagAt} x={RIGHT_X} y={y(286)}>
@@ -211,10 +215,10 @@ export const DagsterScene: React.FC = () => {
             />
           );
         })}
-        <Pill x={RIGHT_X} y={y(660)} at={linAt} ink={OK_INK} size={23}>
+        <Pill x={RIGHT_X} y={y(660)} at={linAt} tone="green" size={23}>
           lineage, built in
         </Pill>
-        <Pill x={RIGHT_X + 260} y={y(660)} at={freshAt + 6} ink={OK_INK} size={23}>
+        <Pill x={RIGHT_X + 260} y={y(660)} at={freshAt + 6} tone="green" size={23}>
           freshness, built in
         </Pill>
         <Note at={knowsAt} x={RIGHT_X} y={y(728)}>
@@ -222,10 +226,10 @@ export const DagsterScene: React.FC = () => {
             every asset knows what produced it<span style={{ opacity: ease(frame, whenAt, 10) }}>, and when</span>
           </span>
         </Note>
-        <Pill x={RIGHT_X} y={y(790)} at={typingAt} ink={BLUE_INK} size={22}>
+        <Pill x={RIGHT_X} y={y(790)} at={typingAt} tone="blue" size={22}>
           stronger typing
         </Pill>
-        <Pill x={RIGHT_X + 236} y={y(790)} at={testingAt - 4} ink={BLUE_INK} size={22}>
+        <Pill x={RIGHT_X + 236} y={y(790)} at={testingAt - 4} tone="blue" size={22}>
           testing primitives
         </Pill>
         <Note at={typingAt + 8} x={RIGHT_X} y={y(846)}>

@@ -136,11 +136,17 @@ export const FormulaScene: React.FC = () => {
             </span>
           </span>
         </Ink>
+        {/* The unit under the result, built the way the root's value sits
+            under the root, so the big line keeps one size. */}
         <Ink at={zeroAt - 2} dur={14} style={{ position: "relative" }}>
-          = <Marked at={zeroAt + 8} color={HIGHLIGHT}><span style={{ color: ACCENT_INK }}>{fmt(AGES.se)}</span></Marked>
-        </Ink>
-        <Ink at={zeroAt + 4} dur={14} style={{ position: "relative", ...body(36, true), color: INK_SOFT }}>
-          years
+          <span style={{ display: "inline-flex", flexDirection: "column" }}>
+            <span>
+              = <Marked at={zeroAt + 8} color={HIGHLIGHT}><span style={{ color: ACCENT_INK }}>{fmt(AGES.se)}</span></Marked>
+            </span>
+            <span style={{ ...note(21, INK_SOFT), letterSpacing: "normal", marginTop: 4, marginLeft: 60, opacity: ease(frame, zeroAt + 4, 14) }}>
+              years
+            </span>
+          </span>
         </Ink>
       </div>
 
@@ -227,7 +233,9 @@ const Definition: React.FC<{ at: number; top: number; symbol: string; color: str
   children,
 }) => (
   <Ink at={at} dur={16} style={{ left: 640, top, display: "flex", alignItems: "baseline", gap: 22, whiteSpace: "nowrap" }}>
-    <span style={{ ...headline(46, true), color, width: 34 }}>{symbol}</span>
+    {/* The symbol at the definition's own size, set apart by the head
+        face's italic and its color: one size to a line. */}
+    <span style={{ ...headline(32, true), color, width: 34 }}>{symbol}</span>
     <span style={{ ...body(32), color: INK }}>{children}</span>
   </Ink>
 );

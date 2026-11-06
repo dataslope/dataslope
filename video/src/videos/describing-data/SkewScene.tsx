@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Bars, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
+import { fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -249,8 +249,9 @@ export const SkewScene: React.FC = () => {
                 opacity: p,
                 transform: `translateX(${(1 - p) * 24}px)`,
                 whiteSpace: "nowrap",
-                ...body(32),
-                color: INK,
+                // The row's case and its answer read as one line: one face, one size.
+                ...note(28, INK),
+                lineHeight: 1.2,
               }}
             >
               {r.what}
@@ -259,11 +260,12 @@ export const SkewScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: 1530,
-                top: top + 6,
+                top: top + 2,
                 opacity: ease(frame, answerAt[i] - 6, 12),
                 whiteSpace: "nowrap",
                 ...label(28, r.red ? STAT_INK : INK),
                 fontWeight: 700,
+                lineHeight: 1.2,
                 ...halo,
               }}
             >

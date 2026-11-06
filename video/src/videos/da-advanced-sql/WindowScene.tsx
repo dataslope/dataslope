@@ -1,9 +1,9 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -23,11 +23,16 @@ import {
   X0,
   Mark,
 } from "./parts";
+import { QMono } from "./mono";
 
 const TOP = 320;
 const LIST_X = 600;
 const SIZE = 21;
-const CHIP_X = 1420;
+/** The three things OVER can say, at the page's right: where the boxes'
+ *  text stood, each clause 8px over what it says and 110 from the next, so
+ *  the space between them is clearly larger than inside one. */
+const CHIP_X = 1440;
+const CHIP_PITCH = 110;
 
 /**
  * Questions 1 and 2 on the video's own six sales: GROUP BY collapses them to
@@ -171,28 +176,42 @@ export const WindowScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* ── What OVER can say ── */}
+        {/* ── What OVER can say: three clauses, each over what it says, as
+            plain text with the space between them doing the grouping. The
+            clause the narration is on goes under the highlighter. ── */}
         {chips.map((c, i) => {
           const p = ease(frame, c.at - 2, 12);
-          const hot = c.hot.length ? ease(frame, c.hot[0], 10) * (1 - ease(frame, c.hot[1] + 20, 14)) : 0;
           return (
             <div
               key={c.clause}
               style={{
                 position: "absolute",
                 left: CHIP_X,
-                top: y(TOP) + i * h(92),
-                width: 400,
-                padding: "10px 16px",
-                boxSizing: "border-box",
-                borderLeft: `4px solid ${BLUE_INK}`,
-                background: hot > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${hot * 100}%, ${PAPER})` : PAPER,
+                top: y(TOP) + i * h(CHIP_PITCH),
                 opacity: p,
                 transform: `translateX(${(1 - p) * 16}px)`,
               }}
             >
-              <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, fontVariantLigatures: "none" }}>{c.clause}</div>
-              <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 2 }}>{c.text}</div>
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 22,
+                  fontWeight: 600,
+                  color: BLUE_INK,
+                  fontVariantLigatures: "none",
+                  whiteSpace: "nowrap",
+                  marginLeft: c.hot.length ? "-0.14em" : 0,
+                }}
+              >
+                {c.hot.length ? (
+                  <Mark at={c.hot[0]} out={c.hot[1] + 20} dur={10}>
+                    {c.clause}
+                  </Mark>
+                ) : (
+                  c.clause
+                )}
+              </div>
+              <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", marginTop: 8 }}>{c.text}</div>
             </div>
           );
         })}

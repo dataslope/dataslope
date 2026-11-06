@@ -14,12 +14,14 @@ const BLOCK_Y = 312;
 const BLOCK_STEP = 180;
 const BOX_W = 1270;
 const RIGHT_X = 1470;
-/** The building every program comes in through, and the programs under it. */
-const BUILDING_Y = 300;
-const BUILDING_H = 200;
+/** The building every program comes in through, small, centred over the programs under it. */
+const BUILDING_W = 200;
+const BUILDING_H = 113;
+const BUILDING_GAP = 30;
 const CHIP_Y0 = 492;
 const CHIP_STEP = 58;
 const CHIP_H = 50;
+const CHIP_W = 320;
 /** The bracket that shows how far a rule reaches. */
 const REACH_X = RIGHT_X - 30;
 const PROGRAMS = ["web app", "admin dashboard", "import job", "reporting script"] as const;
@@ -62,7 +64,7 @@ export const GateScene: React.FC = () => {
   const nameAt = [namesAt, ruleAt, brokeAt];
   const wholeIn = ease(frame, wholeAt - 2, 14);
   const chipY = (i: number) => y(CHIP_Y0 + i * CHIP_STEP);
-  const buildingTop = y(BUILDING_Y) + 12;
+  const buildingTop = chipY(0) - BUILDING_GAP - BUILDING_H;
   // How far the rule reaches: one door (dashed, what it is not), then the building.
   const reachOne = ease(frame, doorAt - 4, 10) * (1 - ease(frame, wholeAt - 4, 10));
   const reachAll = ease(frame, wholeAt - 2, 16);
@@ -102,7 +104,7 @@ export const GateScene: React.FC = () => {
                   }}
                 >
                   <span style={note(21, INK_SOFT)}>breaks</span>
-                  <Badge>{tag.badge}</Badge>
+                  <Badge size={21}>{tag.badge}</Badge>
                   <span style={{ fontFamily: MONO, fontSize: 21, color: INK }}>{tag.text}</span>
                 </span>
               </Note>
@@ -137,7 +139,7 @@ export const GateScene: React.FC = () => {
       </Drift>
 
       {/* The building every program enters, from "what gets in", and the programs, under it. */}
-      <Spot id="db-why-design-building" at={getsAt - 4} left={RIGHT_X} top={y(BUILDING_Y)} width={340} height={BUILDING_H} />
+      <Spot id="db-why-design-building" at={getsAt - 4} left={RIGHT_X + (CHIP_W - BUILDING_W) / 2} top={buildingTop} width={BUILDING_W} height={BUILDING_H} />
       {PROGRAMS.map((p, i) => {
         const lit = i === 0 ? ease(frame, doorAt - 4, 10) : wholeIn;
         return (
@@ -147,7 +149,7 @@ export const GateScene: React.FC = () => {
             dim={i === 0 ? undefined : appAt + 6}
             x={RIGHT_X}
             y={chipY(i)}
-            width={320}
+            width={CHIP_W}
             glow={Math.min(1, lit * 0.8 + pulse(frame, wholeAt + i * 4, 18) * 0.4)}
           >
             {p}
@@ -156,14 +158,14 @@ export const GateScene: React.FC = () => {
       })}
       {/* The dimmed three come back for the whole building. */}
       {PROGRAMS.slice(1).map((p, i) => (
-        <Chip key={p} at={wholeAt - 2 + i * 4} x={RIGHT_X} y={chipY(i + 1)} width={320} glow={0.8}>
+        <Chip key={p} at={wholeAt - 2 + i * 4} x={RIGHT_X} y={chipY(i + 1)} width={CHIP_W} glow={0.8}>
           {p}
         </Chip>
       ))}
       <SpanBracket x={REACH_X} y0={chipY(0) - 4} y1={chipY(0) + CHIP_H + 4} at={doorAt - 4} color={INK_SOFT} dashed opacity={reachOne > 0 ? 1 : 0} />
       <SpanBracket
         x={REACH_X}
-        y0={lerp(chipY(0) - 4, buildingTop, reachAll)}
+        y0={lerp(chipY(0) - 4, buildingTop + 6, reachAll)}
         y1={lerp(chipY(0) + CHIP_H + 4, chipY(3) + CHIP_H + 4, reachAll)}
         at={wholeAt - 2}
       />

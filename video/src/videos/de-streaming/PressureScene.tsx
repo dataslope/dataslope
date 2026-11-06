@@ -261,7 +261,7 @@ export const PressureScene: React.FC = () => {
         <Note at={droppedAt} x={cons.x + cons.w + 24} y={both + h(14)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             and nothing is dropped
-            <span style={{ ...label(21, INK_SOFT), fontWeight: 650, opacity: ease(frame, retentionAt, 10) }}>, within retention</span>
+            <span style={{ ...label(22, INK_SOFT), fontWeight: 650, opacity: ease(frame, retentionAt, 10) }}>, within retention</span>
           </span>
         </Note>
         {/* A push-based system pushes back instead. */}

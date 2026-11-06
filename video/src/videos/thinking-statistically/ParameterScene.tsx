@@ -13,6 +13,8 @@ import { ROW_ONE } from "./TwentyScene";
 
 const X: XScale = { lo: 50, hi: 150, x0: 160, x1: 1760 };
 const CARD_Y = 300;
+/** Room between each column's top rule and the name under it, in px. */
+const RULE_GAP = 30;
 const FIG_Y = 562;
 const LABEL_Y = 626;
 const STRIP = 722;
@@ -47,8 +49,9 @@ const pickSample = (seed: number) => {
 const SAMPLE_A = pickSample(11);
 const SAMPLE_B = pickSample(12);
 
-/** One card: a name, what it describes, and its symbol, each arriving on
- *  the words that introduce it. */
+/** One column: a rule over it, a name, what it describes, and its symbol,
+ *  each arriving on the words that introduce it. The rule groups the column,
+ *  so no hairline runs between the two. */
 const Card: React.FC<{
   x: number;
   ruleAt: number;
@@ -73,7 +76,7 @@ const Card: React.FC<{
   const rule = ease(frame, ruleAt, 16);
   return (
     <>
-      <div style={{ position: "absolute", left: x, top: y(CARD_Y), width: 720 * rule, height: 2, background: INK }} />
+      <div style={{ position: "absolute", left: x, top: y(CARD_Y + 22) - RULE_GAP - 2, width: 720 * rule, height: 2, background: INK }} />
       <Ink at={at} dur={16} style={{ left: x, top: y(CARD_Y + 22), whiteSpace: "nowrap" }}>
         <span style={{ ...body(48, true), color }}>
           <Mark at={markAt} out={markOut}>
@@ -276,7 +279,7 @@ export const ParameterScene: React.FC = () => {
           ...halo,
         }}
       >
-        <Mu /> = {KNOWN.mu}
+        <Mu inline /> = {KNOWN.mu}
       </div>
 
       <Svg>
@@ -325,7 +328,7 @@ export const ParameterScene: React.FC = () => {
             transformOrigin: "0 100%",
           }}
         >
-          <XBar /> ={" "}
+          <XBar inline /> ={" "}
           <Mark at={pointFourAt - 2} out={closeAt + 6}>
             {fmt(KNOWN.xBar)}
           </Mark>

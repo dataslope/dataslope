@@ -17,6 +17,10 @@ const FILE_Y = 484;
 const B_Y = 604;
 /** A column that says what its numbers mean: the unit in its name. */
 const COLUMN = { name: "impulse_", unit: "n_s", type: "numeric" };
+/** The orbiter and Mars: small, with the right half's white all round it. */
+const ORBITER_W = 190;
+const ORBITER_H = 96;
+const ORBITER_X = 1130;
 
 /**
  * Even a type is a rule: the Mars Climate Orbiter, after
@@ -82,7 +86,7 @@ export const OrbiterScene: React.FC = () => {
           <span style={{ ...note(30, INK), fontWeight: 650 }}>
             <Mark at={wordAt}>{unit}</Mark>
           </span>
-          <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT }}>{sym}</span>
+          <span style={{ fontFamily: MONO, fontSize: 28, color: INK_SOFT }}>{sym}</span>
         </div>
       </div>
     </Ink>
@@ -101,7 +105,18 @@ export const OrbiterScene: React.FC = () => {
 
       <Headline lead="Even a type" turn="is a rule." at={orbFrom - 6} turnAt={ruleAt - 4} size={72} />
 
-      <Spot id="db-why-design-orbiter" at={marsAt - 6} dim={whereAt} left={1030} top={y(380)} width={740} height={374} drift={-40} driftDur={end - marsAt} />
+      {/* The orbiter, small, level with the file that lost it, in the open right half. */}
+      <Spot
+        id="db-why-design-orbiter"
+        at={marsAt - 6}
+        dim={whereAt}
+        left={ORBITER_X}
+        top={fileTop + fileH / 2 - ORBITER_H / 2}
+        width={ORBITER_W}
+        height={ORBITER_H}
+        drift={-12}
+        driftDur={end - marsAt}
+      />
 
       <Drift from={orbFrom} to={end} amount={0.018} origin="20% 55%">
         <div style={{ position: "absolute", inset: 0, opacity: 1 - settle }}>
@@ -125,8 +140,8 @@ export const OrbiterScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT }}>Small Forces file</span>
-              <span style={{ ...body(30, true), color: INK, opacity: ease(frame, justAt - 2, 12) }}>just numbers</span>
+              <span style={{ fontFamily: MONO, fontSize: 24, color: INK_SOFT }}>Small Forces file</span>
+              <span style={{ ...body(26, true), color: INK, opacity: ease(frame, justAt - 2, 12) }}>just numbers</span>
             </div>
           </Ink>
           <Arrow from={[mid, fileTop + fileH + 6]} to={[mid, bTop - 6]} at={readAt + 2} dur={10} />
@@ -148,7 +163,7 @@ export const OrbiterScene: React.FC = () => {
                 transformOrigin: "0 50%",
               }}
             >
-              <span style={{ ...label(22, INK_SOFT) }}>unit</span>
+              <span style={{ ...label(24, INK_SOFT) }}>unit</span>
               <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>none</span>
             </div>
           </Note>
@@ -172,7 +187,7 @@ export const OrbiterScene: React.FC = () => {
                 {COLUMN.name}
                 <Mark at={unitAt}>{COLUMN.unit}</Mark>
               </span>
-              <span style={{ fontFamily: MONO, fontSize: 20, color: INK_SOFT }}>{COLUMN.type}</span>
+              <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT }}>{COLUMN.type}</span>
             </div>
           </Note>
           <Note at={fourAt - 4} x={X0} y={bTop + h(96) + 26}>

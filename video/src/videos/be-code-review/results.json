@@ -1,0 +1,698 @@
+{
+  "runtime": "Pyodide / Python 3.14.2",
+  "listings": {
+    "assistant": [
+      "def merge_intervals(intervals):",
+      "    merged = []",
+      "    for start, end in intervals:",
+      "        if merged and start < merged[-1][1]:",
+      "            merged[-1][1] = end",
+      "        else:",
+      "            merged.append([start, end])",
+      "    return merged"
+    ],
+    "assistantTests": [
+      "from intervals import merge_intervals",
+      "",
+      "",
+      "def test_merges_overlapping():",
+      "    assert merge_intervals([[1, 3], [2, 6], [8, 10]]) == [[1, 6], [8, 10]]",
+      "",
+      "",
+      "def test_adjacent_intervals_stay_separate():",
+      "    assert merge_intervals([[1, 2], [2, 3]]) == [[1, 2], [2, 3]]"
+    ],
+    "reviewTests": [
+      "from intervals import merge_intervals",
+      "",
+      "",
+      "def test_merges_overlapping():",
+      "    assert merge_intervals([[1, 3], [2, 6], [8, 10]]) == [[1, 6], [8, 10]]",
+      "",
+      "",
+      "def test_unsorted_input():",
+      "    assert merge_intervals([[8, 10], [1, 3], [2, 6]]) == [[1, 6], [8, 10]]",
+      "",
+      "",
+      "def test_touching_intervals_merge():",
+      "    assert merge_intervals([[1, 2], [2, 3]]) == [[1, 3]]",
+      "",
+      "",
+      "def test_contained_interval_is_kept():",
+      "    assert merge_intervals([[1, 10], [2, 3]]) == [[1, 10]]"
+    ],
+    "traced": [
+      "def merge_intervals(intervals):",
+      "    merged = []",
+      "    for start, end in intervals:",
+      "        if merged and start < merged[-1][1]:",
+      "            merged[-1][1] = end",
+      "        else:",
+      "            merged.append([start, end])",
+      "        print([start, end], \"->\", merged)",
+      "    return merged"
+    ],
+    "sorted": [
+      "def merge_intervals(intervals):",
+      "    merged = []",
+      "    for start, end in sorted(intervals):",
+      "        if merged and start < merged[-1][1]:",
+      "            merged[-1][1] = end",
+      "        else:",
+      "            merged.append([start, end])",
+      "    return merged"
+    ],
+    "fixed": [
+      "def merge_intervals(intervals):",
+      "    merged = []",
+      "    for start, end in sorted(intervals):",
+      "        if merged and start <= merged[-1][1]:",
+      "            merged[-1][1] = max(merged[-1][1], end)",
+      "        else:",
+      "            merged.append([start, end])",
+      "    return merged"
+    ],
+    "reproTest": [
+      "def test_reproduction():",
+      "    assert merge_intervals([[3, 4], [1, 2]]) == [[1, 2], [3, 4]]"
+    ]
+  },
+  "lines": 8,
+  "diffs": {
+    "arrived": {
+      "intervals.py": [
+        "+def merge_intervals(intervals):",
+        "+    merged = []",
+        "+    for start, end in intervals:",
+        "+        if merged and start < merged[-1][1]:",
+        "+            merged[-1][1] = end",
+        "+        else:",
+        "+            merged.append([start, end])",
+        "+    return merged"
+      ],
+      "test_intervals.py": [
+        "+from intervals import merge_intervals",
+        "+",
+        "+",
+        "+def test_merges_overlapping():",
+        "+    assert merge_intervals([[1, 3], [2, 6], [8, 10]]) == [[1, 6], [8, 10]]",
+        "+",
+        "+",
+        "+def test_adjacent_intervals_stay_separate():",
+        "+    assert merge_intervals([[1, 2], [2, 3]]) == [[1, 2], [2, 3]]"
+      ]
+    },
+    "trace": [
+      "--- a/intervals.py",
+      "+++ b/intervals.py",
+      "@@ -7,2 +7,3 @@",
+      "             merged.append([start, end])",
+      "+        print([start, end], \"->\", merged)",
+      "     return merged"
+    ],
+    "symptom": [
+      "--- a/intervals.py",
+      "+++ b/intervals.py",
+      "@@ -7,2 +7,2 @@",
+      "             merged.append([start, end])",
+      "-    return merged",
+      "+    return [iv for iv in merged if iv[0] <= iv[1]]"
+    ],
+    "cause": [
+      "--- a/intervals.py",
+      "+++ b/intervals.py",
+      "@@ -2,3 +2,3 @@",
+      "     merged = []",
+      "-    for start, end in intervals:",
+      "+    for start, end in sorted(intervals):",
+      "         if merged and start < merged[-1][1]:"
+    ],
+    "fix": [
+      "--- a/intervals.py",
+      "+++ b/intervals.py",
+      "@@ -2,5 +2,5 @@",
+      "     merged = []",
+      "-    for start, end in intervals:",
+      "-        if merged and start < merged[-1][1]:",
+      "-            merged[-1][1] = end",
+      "+    for start, end in sorted(intervals):",
+      "+        if merged and start <= merged[-1][1]:",
+      "+            merged[-1][1] = max(merged[-1][1], end)",
+      "         else:"
+    ],
+    "tests": [
+      "--- a/test_intervals.py",
+      "+++ b/test_intervals.py",
+      "@@ -7,3 +7,11 @@",
+      " ",
+      "-def test_adjacent_intervals_stay_separate():",
+      "-    assert merge_intervals([[1, 2], [2, 3]]) == [[1, 2], [2, 3]]",
+      "+def test_unsorted_input():",
+      "+    assert merge_intervals([[8, 10], [1, 3], [2, 6]]) == [[1, 6], [8, 10]]",
+      "+",
+      "+",
+      "+def test_touching_intervals_merge():",
+      "+    assert merge_intervals([[1, 2], [2, 3]]) == [[1, 3]]",
+      "+",
+      "+",
+      "+def test_contained_interval_is_kept():",
+      "+    assert merge_intervals([[1, 10], [2, 3]]) == [[1, 10]]"
+    ],
+    "whole": {
+      "trace": [
+        " def merge_intervals(intervals):",
+        "     merged = []",
+        "     for start, end in intervals:",
+        "         if merged and start < merged[-1][1]:",
+        "             merged[-1][1] = end",
+        "         else:",
+        "             merged.append([start, end])",
+        "+        print([start, end], \"->\", merged)",
+        "     return merged"
+      ],
+      "symptom": [
+        " def merge_intervals(intervals):",
+        "     merged = []",
+        "     for start, end in intervals:",
+        "         if merged and start < merged[-1][1]:",
+        "             merged[-1][1] = end",
+        "         else:",
+        "             merged.append([start, end])",
+        "-    return merged",
+        "+    return [iv for iv in merged if iv[0] <= iv[1]]"
+      ],
+      "cause": [
+        " def merge_intervals(intervals):",
+        "     merged = []",
+        "-    for start, end in intervals:",
+        "+    for start, end in sorted(intervals):",
+        "         if merged and start < merged[-1][1]:",
+        "             merged[-1][1] = end",
+        "         else:",
+        "             merged.append([start, end])",
+        "     return merged"
+      ],
+      "fix": [
+        " def merge_intervals(intervals):",
+        "     merged = []",
+        "-    for start, end in intervals:",
+        "-        if merged and start < merged[-1][1]:",
+        "-            merged[-1][1] = end",
+        "+    for start, end in sorted(intervals):",
+        "+        if merged and start <= merged[-1][1]:",
+        "+            merged[-1][1] = max(merged[-1][1], end)",
+        "         else:",
+        "             merged.append([start, end])",
+        "     return merged"
+      ]
+    }
+  },
+  "arrived": {
+    "passed": 2,
+    "failed": 0,
+    "tests": [
+      {
+        "name": "test_merges_overlapping",
+        "call": "merge_intervals([[1, 3], [2, 6], [8, 10]])",
+        "expected": "[[1, 6], [8, 10]]",
+        "got": "[[1, 6], [8, 10]]",
+        "ok": true
+      },
+      {
+        "name": "test_adjacent_intervals_stay_separate",
+        "call": "merge_intervals([[1, 2], [2, 3]])",
+        "expected": "[[1, 2], [2, 3]]",
+        "got": "[[1, 2], [2, 3]]",
+        "ok": true
+      }
+    ]
+  },
+  "debug": {
+    "example": {
+      "ok": true,
+      "value": [
+        [
+          1,
+          6
+        ],
+        [
+          8,
+          10
+        ]
+      ],
+      "repr": "[[1, 6], [8, 10]]",
+      "arg": "[[1, 3], [2, 6], [8, 10]]",
+      "stdout": []
+    },
+    "report": {
+      "ok": true,
+      "value": [
+        [
+          8,
+          6
+        ]
+      ],
+      "repr": "[[8, 6]]",
+      "arg": "[[8, 10], [1, 3], [2, 6]]",
+      "stdout": []
+    },
+    "repro": {
+      "ok": true,
+      "value": [
+        [
+          3,
+          2
+        ]
+      ],
+      "repr": "[[3, 2]]",
+      "arg": "[[3, 4], [1, 2]]",
+      "stdout": []
+    },
+    "trace": {
+      "ok": true,
+      "value": [
+        [
+          3,
+          2
+        ]
+      ],
+      "repr": "[[3, 2]]",
+      "arg": "[[3, 4], [1, 2]]",
+      "stdout": [
+        "[3, 4] -> [[3, 4]]",
+        "[1, 2] -> [[3, 2]]"
+      ]
+    },
+    "hypothesis": {
+      "ok": true,
+      "value": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "repr": "[[1, 2], [3, 4]]",
+      "arg": "[[1, 2], [3, 4]]",
+      "stdout": []
+    },
+    "symptomReport": {
+      "ok": true,
+      "value": [],
+      "repr": "[]",
+      "arg": "[[8, 10], [1, 3], [2, 6]]",
+      "stdout": []
+    },
+    "symptomRepro": {
+      "ok": true,
+      "value": [],
+      "repr": "[]",
+      "arg": "[[3, 4], [1, 2]]",
+      "stdout": []
+    },
+    "causeReport": {
+      "ok": true,
+      "value": [
+        [
+          1,
+          6
+        ],
+        [
+          8,
+          10
+        ]
+      ],
+      "repr": "[[1, 6], [8, 10]]",
+      "arg": "[[8, 10], [1, 3], [2, 6]]",
+      "stdout": []
+    },
+    "causeRepro": {
+      "ok": true,
+      "value": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "repr": "[[1, 2], [3, 4]]",
+      "arg": "[[3, 4], [1, 2]]",
+      "stdout": []
+    },
+    "causeTests": {
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "test_merges_overlapping",
+          "call": "merge_intervals([[1, 3], [2, 6], [8, 10]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[1, 6], [8, 10]]",
+          "ok": true
+        },
+        {
+          "name": "test_adjacent_intervals_stay_separate",
+          "call": "merge_intervals([[1, 2], [2, 3]])",
+          "expected": "[[1, 2], [2, 3]]",
+          "got": "[[1, 2], [2, 3]]",
+          "ok": true
+        }
+      ]
+    },
+    "keptBefore": {
+      "passed": 2,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "test_merges_overlapping",
+          "call": "merge_intervals([[1, 3], [2, 6], [8, 10]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[1, 6], [8, 10]]",
+          "ok": true
+        },
+        {
+          "name": "test_adjacent_intervals_stay_separate",
+          "call": "merge_intervals([[1, 2], [2, 3]])",
+          "expected": "[[1, 2], [2, 3]]",
+          "got": "[[1, 2], [2, 3]]",
+          "ok": true
+        },
+        {
+          "name": "test_reproduction",
+          "call": "merge_intervals([[3, 4], [1, 2]])",
+          "expected": "[[1, 2], [3, 4]]",
+          "got": "[[3, 2]]",
+          "ok": false
+        }
+      ]
+    },
+    "keptAfter": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "test_merges_overlapping",
+          "call": "merge_intervals([[1, 3], [2, 6], [8, 10]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[1, 6], [8, 10]]",
+          "ok": true
+        },
+        {
+          "name": "test_adjacent_intervals_stay_separate",
+          "call": "merge_intervals([[1, 2], [2, 3]])",
+          "expected": "[[1, 2], [2, 3]]",
+          "got": "[[1, 2], [2, 3]]",
+          "ok": true
+        },
+        {
+          "name": "test_reproduction",
+          "call": "merge_intervals([[3, 4], [1, 2]])",
+          "expected": "[[1, 2], [3, 4]]",
+          "got": "[[1, 2], [3, 4]]",
+          "ok": true
+        }
+      ]
+    },
+    "search": {
+      "spans": 15,
+      "oneInterval": 0,
+      "twoIntervals": 35,
+      "inputsOfTwo": 225
+    }
+  },
+  "loud": {
+    "code": [
+      "intervals = [[8, 10], [1, 3]]",
+      "intervals.sort(inplace=True)"
+    ],
+    "ok": false,
+    "error": "TypeError: sort() got an unexpected keyword argument 'inplace'"
+  },
+  "review": {
+    "touching": {
+      "ok": true,
+      "value": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "repr": "[[1, 2], [2, 3]]",
+      "arg": "[[1, 2], [2, 3]]",
+      "stdout": []
+    },
+    "contained": {
+      "ok": true,
+      "value": [
+        [
+          1,
+          3
+        ]
+      ],
+      "repr": "[[1, 3]]",
+      "arg": "[[1, 10], [2, 3]]",
+      "stdout": []
+    },
+    "empty": {
+      "ok": true,
+      "value": [],
+      "repr": "[]",
+      "arg": "[]",
+      "stdout": []
+    },
+    "single": {
+      "ok": true,
+      "value": [
+        [
+          5,
+          5
+        ]
+      ],
+      "repr": "[[5, 5]]",
+      "arg": "[[5, 5]]",
+      "stdout": []
+    },
+    "fixed": {
+      "example": {
+        "ok": true,
+        "value": [
+          [
+            1,
+            6
+          ],
+          [
+            8,
+            10
+          ]
+        ],
+        "repr": "[[1, 6], [8, 10]]",
+        "arg": "[[1, 3], [2, 6], [8, 10]]",
+        "stdout": []
+      },
+      "report": {
+        "ok": true,
+        "value": [
+          [
+            1,
+            6
+          ],
+          [
+            8,
+            10
+          ]
+        ],
+        "repr": "[[1, 6], [8, 10]]",
+        "arg": "[[8, 10], [1, 3], [2, 6]]",
+        "stdout": []
+      },
+      "touching": {
+        "ok": true,
+        "value": [
+          [
+            1,
+            3
+          ]
+        ],
+        "repr": "[[1, 3]]",
+        "arg": "[[1, 2], [2, 3]]",
+        "stdout": []
+      },
+      "contained": {
+        "ok": true,
+        "value": [
+          [
+            1,
+            10
+          ]
+        ],
+        "repr": "[[1, 10]]",
+        "arg": "[[1, 10], [2, 3]]",
+        "stdout": []
+      },
+      "empty": {
+        "ok": true,
+        "value": [],
+        "repr": "[]",
+        "arg": "[]",
+        "stdout": []
+      },
+      "single": {
+        "ok": true,
+        "value": [
+          [
+            5,
+            5
+          ]
+        ],
+        "repr": "[[5, 5]]",
+        "arg": "[[5, 5]]",
+        "stdout": []
+      }
+    },
+    "assistantTestsOnFix": {
+      "passed": 1,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "test_merges_overlapping",
+          "call": "merge_intervals([[1, 3], [2, 6], [8, 10]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[1, 6], [8, 10]]",
+          "ok": true
+        },
+        {
+          "name": "test_adjacent_intervals_stay_separate",
+          "call": "merge_intervals([[1, 2], [2, 3]])",
+          "expected": "[[1, 2], [2, 3]]",
+          "got": "[[1, 3]]",
+          "ok": false
+        }
+      ]
+    },
+    "reviewTestsOnAssistant": {
+      "passed": 1,
+      "failed": 3,
+      "tests": [
+        {
+          "name": "test_merges_overlapping",
+          "call": "merge_intervals([[1, 3], [2, 6], [8, 10]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[1, 6], [8, 10]]",
+          "ok": true
+        },
+        {
+          "name": "test_unsorted_input",
+          "call": "merge_intervals([[8, 10], [1, 3], [2, 6]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[8, 6]]",
+          "ok": false
+        },
+        {
+          "name": "test_touching_intervals_merge",
+          "call": "merge_intervals([[1, 2], [2, 3]])",
+          "expected": "[[1, 3]]",
+          "got": "[[1, 2], [2, 3]]",
+          "ok": false
+        },
+        {
+          "name": "test_contained_interval_is_kept",
+          "call": "merge_intervals([[1, 10], [2, 3]])",
+          "expected": "[[1, 10]]",
+          "got": "[[1, 3]]",
+          "ok": false
+        }
+      ]
+    },
+    "reviewTestsOnSorted": {
+      "passed": 2,
+      "failed": 2,
+      "tests": [
+        {
+          "name": "test_merges_overlapping",
+          "call": "merge_intervals([[1, 3], [2, 6], [8, 10]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[1, 6], [8, 10]]",
+          "ok": true
+        },
+        {
+          "name": "test_unsorted_input",
+          "call": "merge_intervals([[8, 10], [1, 3], [2, 6]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[1, 6], [8, 10]]",
+          "ok": true
+        },
+        {
+          "name": "test_touching_intervals_merge",
+          "call": "merge_intervals([[1, 2], [2, 3]])",
+          "expected": "[[1, 3]]",
+          "got": "[[1, 2], [2, 3]]",
+          "ok": false
+        },
+        {
+          "name": "test_contained_interval_is_kept",
+          "call": "merge_intervals([[1, 10], [2, 3]])",
+          "expected": "[[1, 10]]",
+          "got": "[[1, 3]]",
+          "ok": false
+        }
+      ]
+    },
+    "reviewTestsOnFix": {
+      "passed": 4,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "test_merges_overlapping",
+          "call": "merge_intervals([[1, 3], [2, 6], [8, 10]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[1, 6], [8, 10]]",
+          "ok": true
+        },
+        {
+          "name": "test_unsorted_input",
+          "call": "merge_intervals([[8, 10], [1, 3], [2, 6]])",
+          "expected": "[[1, 6], [8, 10]]",
+          "got": "[[1, 6], [8, 10]]",
+          "ok": true
+        },
+        {
+          "name": "test_touching_intervals_merge",
+          "call": "merge_intervals([[1, 2], [2, 3]])",
+          "expected": "[[1, 3]]",
+          "got": "[[1, 3]]",
+          "ok": true
+        },
+        {
+          "name": "test_contained_interval_is_kept",
+          "call": "merge_intervals([[1, 10], [2, 3]])",
+          "expected": "[[1, 10]]",
+          "got": "[[1, 10]]",
+          "ok": true
+        }
+      ]
+    }
+  },
+  "pageSays": {
+    "survey66": "66% of respondents named \"AI solutions that are almost right, but not quite\" as their top frustration",
+    "survey45": "45% said debugging AI-generated code takes longer than expected",
+    "surveyName": "Stack Overflow's 2025 developer survey",
+    "readDebugOptimize": "frames the task as \"read, debug and optimize\" an existing codebase",
+    "assistantAllowed": "allows an approved assistant",
+    "fewHundred": "often a few hundred lines",
+    "stranger": "Like a pull request from a capable stranger",
+    "supplyChain": "A hallucinated package name is also a supply-chain risk, because an attacker can register it",
+    "threeBugs": "A reviewer should find three bugs, none of which the obvious test exercises",
+    "whereToLook": "Each is a boundary or an unstated assumption, which is where to look first",
+    "notStep2": "It is not a substitute for step 2"
+  }
+}

@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MOVE, TYPE2 } from "./data";
-import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingHeight, MARK_KEY, MARK_OK, OK, OK_INK, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, lineOf, Listing, listingHeight, MARK_KEY, MARK_OK, OK, OK_INK, QMono, TableName, X0 } from "./parts";
 
 const TOP = 340;
 const SIZE = 22;

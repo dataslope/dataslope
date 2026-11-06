@@ -4,7 +4,7 @@ import { arrowHead, cubicPath, sampleCubic, type Cubic } from "../../components/
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -232,9 +232,9 @@ export const CasesScene: React.FC = () => {
         </span>
       </Note>
       {/* How many games have been played, counting up as the lines run. */}
-      <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 6, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>games </span>
-        <span style={{ ...note(34, INK), fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
+      {/* One line, one size: the count stands out by weight and color. */}
+      <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 2, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap", ...note(30, INK_SOFT) }}>
+        games <span style={{ color: INK, fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
       </div>
 
       </div>
@@ -251,9 +251,7 @@ export const CasesScene: React.FC = () => {
           <span
             style={{
               ...note(24, INK),
-              padding: "4px 14px",
-              borderRadius: 20,
-              border: `1.5px solid ${INK_SOFT}`,
+              ...badgeStyle("gray", 24),
               opacity: 1 - ease(frame, numbersAt - 2, 12) * 0.5,
             }}
           >

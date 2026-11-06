@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, INK } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { ColumnRule, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Head, Kicker, Mark, MARK_KEY, Underline } from "./parts";
@@ -122,6 +122,11 @@ export const RequirementsScene: React.FC = () => {
           <Underline at={verbsAt + 2}>verbs</Underline> become how they connect
         </span>
       </Ink>
+      {/* A hairline in each gap between the three, inking in with the one to
+          its right: centred between "entities" (ends near 386) and "verbs"
+          (580), and between "connect" (ends near 955) and "facts" (1075). */}
+      <ColumnRule x={483} top={y(720) + 4} height={36} at={verbsAt + 2} />
+      <ColumnRule x={1015} top={y(720) + 4} height={36} at={connectAt - 4} />
       {/* The third mark's meaning, unspoken, so it gets the pause before the cut to read in. */}
       <Ink at={connectAt - 4} dur={16} style={{ left: 1080, top: y(720), whiteSpace: "nowrap" }}>
         <span style={{ ...body(30, true), color: INK }}>

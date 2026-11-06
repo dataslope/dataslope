@@ -1,0 +1,1345 @@
+{
+  "figures": {
+    "index": {
+      "setup": "SET default_statistics_target = 10000;\nCREATE TABLE users AS\nSELECT g AS id, 'user' || g || '@example.com' AS email, (g % 2 = 0) AS is_active\nFROM generate_series(1, 1000000) g;\nALTER TABLE users ADD PRIMARY KEY (id);\nVACUUM ANALYZE users;\nCREATE EXTENSION pageinspect",
+      "steps": {
+        "rows": {
+          "sql": "SELECT COUNT(*) AS users FROM users;",
+          "ok": true,
+          "columns": [
+            "users"
+          ],
+          "rows": [
+            [
+              "1000000"
+            ]
+          ]
+        },
+        "table": {
+          "sql": "SELECT pg_relation_size('users') / current_setting('block_size')::int AS pages,\n  pg_size_pretty(pg_relation_size('users')) AS size;",
+          "ok": true,
+          "columns": [
+            "pages",
+            "size"
+          ],
+          "rows": [
+            [
+              "7360",
+              "58 MB"
+            ]
+          ]
+        },
+        "seq": {
+          "sql": "EXPLAIN (ANALYZE, BUFFERS, TIMING OFF, SUMMARY OFF)\nSELECT * FROM users\nWHERE email = 'user42@example.com';",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Seq Scan on users  (cost=0.00..19860.00 rows=1 width=27) (actual rows=1.00 loops=1)"
+            ],
+            [
+              "  Filter: (email = 'user42@example.com'::text)"
+            ],
+            [
+              "  Rows Removed by Filter: 999999"
+            ],
+            [
+              "  Buffers: shared hit=2598 read=4762"
+            ],
+            [
+              "Planning:"
+            ],
+            [
+              "  Buffers: shared hit=22"
+            ]
+          ]
+        },
+        "create": {
+          "sql": "CREATE INDEX users_email_idx ON users (email);\nANALYZE users;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "levels": {
+          "sql": "SELECT level + 1 AS levels FROM bt_metap('users_email_idx');",
+          "ok": true,
+          "columns": [
+            "levels"
+          ],
+          "rows": [
+            [
+              "3"
+            ]
+          ]
+        },
+        "indexPages": {
+          "sql": "SELECT pg_relation_size('users_email_idx') / current_setting('block_size')::int AS pages,\n  pg_size_pretty(pg_relation_size('users_email_idx')) AS size;",
+          "ok": true,
+          "columns": [
+            "pages",
+            "size"
+          ],
+          "rows": [
+            [
+              "4961",
+              "39 MB"
+            ]
+          ]
+        },
+        "btree": {
+          "sql": "EXPLAIN (ANALYZE, BUFFERS, TIMING OFF, SUMMARY OFF)\nSELECT * FROM users\nWHERE email = 'user42@example.com';",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Index Scan using users_email_idx on users  (cost=0.42..8.44 rows=1 width=27) (actual rows=1.00 loops=1)"
+            ],
+            [
+              "  Index Cond: (email = 'user42@example.com'::text)"
+            ],
+            [
+              "  Index Searches: 1"
+            ],
+            [
+              "  Buffers: shared read=4"
+            ],
+            [
+              "Planning:"
+            ],
+            [
+              "  Buffers: shared hit=31"
+            ]
+          ]
+        },
+        "hash": {
+          "sql": "CREATE INDEX users_email_hash ON users USING hash (email);\nDROP INDEX users_email_idx;\nANALYZE users;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "hashEq": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT * FROM users\nWHERE email = 'user42@example.com';",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Index Scan using users_email_hash on users  (cost=0.00..8.02 rows=1 width=27) (actual rows=1.00 loops=1)"
+            ],
+            [
+              "  Index Cond: (email = 'user42@example.com'::text)"
+            ],
+            [
+              "  Index Searches: 1"
+            ]
+          ]
+        },
+        "hashRange": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT * FROM users\nWHERE email BETWEEN 'user42@' AND 'user43@';",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Seq Scan on users  (cost=0.00..22360.00 rows=11101 width=27) (actual rows=11111.00 loops=1)"
+            ],
+            [
+              "  Filter: ((email >= 'user42@'::text) AND (email <= 'user43@'::text))"
+            ],
+            [
+              "  Rows Removed by Filter: 988889"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "hurt": {
+      "setup": "SET default_statistics_target = 10000;\nCREATE TABLE users AS\nSELECT g AS id, 'user' || g || '@example.com' AS email, (g % 2 = 0) AS is_active\nFROM generate_series(1, 1000000) g;\nALTER TABLE users ADD PRIMARY KEY (id);\nVACUUM ANALYZE users",
+      "steps": {
+        "create": {
+          "sql": "CREATE INDEX users_active_idx ON users (is_active);\nANALYZE users;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "active": {
+          "sql": "SELECT COUNT(*) AS active FROM users WHERE is_active;",
+          "ok": true,
+          "columns": [
+            "active"
+          ],
+          "rows": [
+            [
+              "500000"
+            ]
+          ]
+        },
+        "activePlan": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT * FROM users\nWHERE is_active;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Seq Scan on users  (cost=0.00..17360.00 rows=500000 width=27) (actual rows=500000.00 loops=1)"
+            ],
+            [
+              "  Filter: is_active"
+            ],
+            [
+              "  Rows Removed by Filter: 500000"
+            ]
+          ]
+        },
+        "emailIndex": {
+          "sql": "CREATE INDEX users_email_idx ON users (email);",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "sizes": {
+          "sql": "SELECT relname AS relation, pg_size_pretty(pg_relation_size(oid)) AS size, pg_relation_size(oid) AS bytes\nFROM pg_class\nWHERE relname IN ('users', 'users_pkey', 'users_email_idx', 'users_active_idx')\nORDER BY bytes DESC;",
+          "ok": true,
+          "columns": [
+            "relation",
+            "size",
+            "bytes"
+          ],
+          "rows": [
+            [
+              "users",
+              "58 MB",
+              "60293120"
+            ],
+            [
+              "users_email_idx",
+              "39 MB",
+              "40640512"
+            ],
+            [
+              "users_pkey",
+              "21 MB",
+              "22487040"
+            ],
+            [
+              "users_active_idx",
+              "6792 kB",
+              "6955008"
+            ]
+          ]
+        },
+        "writeTables": {
+          "sql": "CREATE TABLE no_index (id int, email text, is_active boolean, created_at timestamptz);\nCREATE TABLE three_indexes (id int, email text, is_active boolean, created_at timestamptz);\nCREATE INDEX ON three_indexes (id);\nCREATE INDEX ON three_indexes (email);\nCREATE INDEX ON three_indexes (created_at);",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "walNone": {
+          "sql": "EXPLAIN (ANALYZE, WAL, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nINSERT INTO no_index\nSELECT g, 'new' || g || '@example.com', true, now()\nFROM generate_series(1, 10000) g;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Insert on no_index (actual rows=0.00 loops=1)"
+            ],
+            [
+              "  WAL: records=10001 fpi=1 bytes=950249"
+            ],
+            [
+              "  ->  Function Scan on generate_series g (actual rows=10000.00 loops=1)"
+            ]
+          ]
+        },
+        "walThree": {
+          "sql": "EXPLAIN (ANALYZE, WAL, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nINSERT INTO three_indexes\nSELECT g, 'new' || g || '@example.com', true, now()\nFROM generate_series(1, 10000) g;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Insert on three_indexes (actual rows=0.00 loops=1)"
+            ],
+            [
+              "  WAL: records=40187 fpi=1 bytes=3360245"
+            ],
+            [
+              "  ->  Function Scan on generate_series g (actual rows=10000.00 loops=1)"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "composite": {
+      "setup": "SET default_statistics_target = 10000;\nCREATE TABLE orders AS\nSELECT g AS id,\n  (1 + (g::bigint * 7919) % 50000)::int AS customer_id,\n  TIMESTAMP '2024-01-01' + (g - 1) * INTERVAL '31.62 seconds' AS created_at,\n  (ARRAY['pending', 'paid', 'shipped', 'returned'])[1 + g % 4] AS status,\n  round(5 + ((g * 37) % 9500) / 100.0, 2) AS amount\nFROM generate_series(1, 1000000) g;\nALTER TABLE orders ADD PRIMARY KEY (id);\nVACUUM ANALYZE orders",
+      "steps": {
+        "customers": {
+          "sql": "SELECT COUNT(*) AS orders, COUNT(DISTINCT customer_id) AS customers,\n  COUNT(*) / COUNT(DISTINCT customer_id) AS each\nFROM orders;",
+          "ok": true,
+          "columns": [
+            "orders",
+            "customers",
+            "each"
+          ],
+          "rows": [
+            [
+              "1000000",
+              "50000",
+              "20"
+            ]
+          ]
+        },
+        "create": {
+          "sql": "CREATE INDEX orders_customer_created_idx\n  ON orders (customer_id, created_at);\nANALYZE orders;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "latest": {
+          "sql": "SELECT id, created_at, amount FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 10;",
+          "ok": true,
+          "columns": [
+            "id",
+            "created_at",
+            "amount"
+          ],
+          "rows": [
+            [
+              "974839",
+              "2024-12-22 18:19:37",
+              "75.43"
+            ],
+            [
+              "924839",
+              "2024-12-04 11:09:37",
+              "5.43"
+            ],
+            [
+              "874839",
+              "2024-11-16 03:59:37",
+              "30.43"
+            ],
+            [
+              "824839",
+              "2024-10-28 20:49:37",
+              "55.43"
+            ],
+            [
+              "774839",
+              "2024-10-10 13:39:37",
+              "80.43"
+            ],
+            [
+              "724839",
+              "2024-09-22 06:29:37",
+              "10.43"
+            ],
+            [
+              "674839",
+              "2024-09-03 23:19:37",
+              "35.43"
+            ],
+            [
+              "624839",
+              "2024-08-16 16:09:37",
+              "60.43"
+            ],
+            [
+              "574839",
+              "2024-07-29 08:59:37",
+              "85.43"
+            ],
+            [
+              "524839",
+              "2024-07-11 01:49:37",
+              "15.43"
+            ]
+          ]
+        },
+        "latestPlan": {
+          "sql": "EXPLAIN (ANALYZE, BUFFERS, TIMING OFF, SUMMARY OFF)\nSELECT id, created_at, amount FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 10;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Limit  (cost=0.42..42.60 rows=10 width=18) (actual rows=10.00 loops=1)"
+            ],
+            [
+              "  Buffers: shared hit=13"
+            ],
+            [
+              "  ->  Index Scan Backward using orders_customer_created_idx on orders  (cost=0.42..84.77 rows=20 width=18) (actual rows=10.00 loops=1)"
+            ],
+            [
+              "        Index Cond: (customer_id = 42)"
+            ],
+            [
+              "        Index Searches: 1"
+            ],
+            [
+              "        Buffers: shared hit=13"
+            ]
+          ]
+        },
+        "dayCount": {
+          "sql": "SELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31';",
+          "ok": true,
+          "columns": [
+            "count"
+          ],
+          "rows": [
+            [
+              "2656"
+            ]
+          ]
+        },
+        "dayPlan": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31';",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Aggregate  (cost=19866.64..19866.65 rows=1 width=8) (actual rows=1.00 loops=1)"
+            ],
+            [
+              "  ->  Seq Scan on orders  (cost=0.00..19860.00 rows=2657 width=0) (actual rows=2656.00 loops=1)"
+            ],
+            [
+              "        Filter: (created_at >= '2024-12-31 00:00:00'::timestamp without time zone)"
+            ],
+            [
+              "        Rows Removed by Filter: 997344"
+            ]
+          ]
+        },
+        "reverse": {
+          "sql": "DROP INDEX orders_customer_created_idx;\nCREATE INDEX orders_created_customer_idx\n  ON orders (created_at, customer_id);\nANALYZE orders;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "reversePlan": {
+          "sql": "EXPLAIN (ANALYZE, BUFFERS, TIMING OFF, SUMMARY OFF)\nSELECT id, created_at, amount FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 10;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Limit  (cost=0.42..11465.15 rows=10 width=18) (actual rows=10.00 loops=1)"
+            ],
+            [
+              "  Buffers: shared hit=13 read=1824"
+            ],
+            [
+              "  ->  Index Scan Backward using orders_created_customer_idx on orders  (cost=0.42..22929.88 rows=20 width=18) (actual rows=10.00 loops=1)"
+            ],
+            [
+              "        Index Cond: (customer_id = 42)"
+            ],
+            [
+              "        Index Searches: 1"
+            ],
+            [
+              "        Buffers: shared hit=13 read=1824"
+            ],
+            [
+              "Planning:"
+            ],
+            [
+              "  Buffers: shared hit=53 read=1"
+            ]
+          ]
+        },
+        "skip": {
+          "sql": "DROP INDEX orders_created_customer_idx;\nCREATE INDEX orders_status_created_idx\n  ON orders (status, created_at);\nANALYZE orders;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "skipPlan": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31';",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Aggregate  (cost=126.97..126.98 rows=1 width=8) (actual rows=1.00 loops=1)"
+            ],
+            [
+              "  ->  Index Only Scan using orders_status_created_idx on orders  (cost=0.42..120.33 rows=2657 width=0) (actual rows=2656.00 loops=1)"
+            ],
+            [
+              "        Index Cond: (created_at >= '2024-12-31 00:00:00'::timestamp without time zone)"
+            ],
+            [
+              "        Heap Fetches: 0"
+            ],
+            [
+              "        Index Searches: 5"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "plan": {
+      "setup": "SET default_statistics_target = 10000;\nCREATE TABLE orders AS\nSELECT g AS id,\n  (1 + (g::bigint * 7919) % 50000)::int AS customer_id,\n  TIMESTAMP '2024-01-01' + (g - 1) * INTERVAL '31.62 seconds' AS created_at,\n  (ARRAY['pending', 'paid', 'shipped', 'returned'])[1 + g % 4] AS status,\n  round(5 + ((g * 37) % 9500) / 100.0, 2) AS amount\nFROM generate_series(1, 1000000) g;\nALTER TABLE orders ADD PRIMARY KEY (id);\nVACUUM ANALYZE orders",
+      "steps": {
+        "create": {
+          "sql": "CREATE INDEX orders_created_idx ON orders (created_at);\nANALYZE orders;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "fn": {
+          "sql": "SELECT COUNT(*) FROM orders\nWHERE created_at::date = DATE '2024-06-01';",
+          "ok": true,
+          "columns": [
+            "count"
+          ],
+          "rows": [
+            [
+              "2732"
+            ]
+          ]
+        },
+        "fnPlan": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT COUNT(*) FROM orders\nWHERE created_at::date = DATE '2024-06-01';",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Aggregate  (cost=22372.50..22372.51 rows=1 width=8) (actual rows=1.00 loops=1)"
+            ],
+            [
+              "  ->  Seq Scan on orders  (cost=0.00..22360.00 rows=5000 width=0) (actual rows=2732.00 loops=1)"
+            ],
+            [
+              "        Filter: ((created_at)::date = '2024-06-01'::date)"
+            ],
+            [
+              "        Rows Removed by Filter: 997268"
+            ]
+          ]
+        },
+        "range": {
+          "sql": "SELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-06-01'\n  AND created_at <  '2024-06-02';",
+          "ok": true,
+          "columns": [
+            "count"
+          ],
+          "rows": [
+            [
+              "2732"
+            ]
+          ]
+        },
+        "rangePlan": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-06-01'\n  AND created_at <  '2024-06-02';",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Aggregate  (cost=97.89..97.91 rows=1 width=8) (actual rows=1.00 loops=1)"
+            ],
+            [
+              "  ->  Index Only Scan using orders_created_idx on orders  (cost=0.42..91.06 rows=2732 width=0) (actual rows=2732.00 loops=1)"
+            ],
+            [
+              "        Index Cond: ((created_at >= '2024-06-01 00:00:00'::timestamp without time zone) AND (created_at < '2024-06-02 00:00:00'::timestamp without time zone))"
+            ],
+            [
+              "        Heap Fetches: 0"
+            ],
+            [
+              "        Index Searches: 1"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "txn": {
+      "setup": "CREATE TABLE accounts (id int PRIMARY KEY, balance numeric NOT NULL CHECK (balance >= 0));\nINSERT INTO accounts VALUES (1, 100), (2, 100);\nCREATE TABLE transfers (\n  id serial PRIMARY KEY,\n  from_id int NOT NULL REFERENCES accounts,\n  to_id int NOT NULL REFERENCES accounts,\n  amount numeric NOT NULL)",
+      "steps": {
+        "before": {
+          "sql": "SELECT id, balance FROM accounts ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "balance"
+          ],
+          "rows": [
+            [
+              "1",
+              "100"
+            ],
+            [
+              "2",
+              "100"
+            ]
+          ]
+        },
+        "begin": {
+          "sql": "BEGIN;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "debit": {
+          "sql": "UPDATE accounts SET balance = balance - 30 WHERE id = 1\nRETURNING id, balance;",
+          "ok": true,
+          "columns": [
+            "id",
+            "balance"
+          ],
+          "rows": [
+            [
+              "1",
+              "70"
+            ]
+          ]
+        },
+        "record": {
+          "sql": "INSERT INTO transfers (from_id, to_id, amount)\nVALUES (1, 99, 30);",
+          "ok": false,
+          "error": "ERROR: insert or update on table \"transfers\" violates foreign key constraint \"transfers_to_id_fkey\""
+        },
+        "afterError": {
+          "sql": "SELECT balance FROM accounts WHERE id = 1;",
+          "ok": false,
+          "error": "ERROR: current transaction is aborted, commands ignored until end of transaction block"
+        },
+        "rollback": {
+          "sql": "ROLLBACK;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "after": {
+          "sql": "SELECT id, balance FROM accounts ORDER BY id;",
+          "ok": true,
+          "columns": [
+            "id",
+            "balance"
+          ],
+          "rows": [
+            [
+              "1",
+              "100"
+            ],
+            [
+              "2",
+              "100"
+            ]
+          ]
+        },
+        "indexes": {
+          "sql": "SELECT tablename, indexname FROM pg_indexes\nWHERE tablename IN ('accounts', 'transfers')\nORDER BY tablename, indexname;",
+          "ok": true,
+          "columns": [
+            "tablename",
+            "indexname"
+          ],
+          "rows": [
+            [
+              "accounts",
+              "accounts_pkey"
+            ],
+            [
+              "transfers",
+              "transfers_pkey"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "isolation": {
+      "setup": "CREATE TABLE accounts (id int PRIMARY KEY, balance numeric NOT NULL CHECK (balance >= 0));\nINSERT INTO accounts VALUES (1, 100), (2, 100)",
+      "steps": {
+        "default": {
+          "sql": "SHOW default_transaction_isolation;",
+          "ok": true,
+          "columns": [
+            "default_transaction_isolation"
+          ],
+          "rows": [
+            [
+              "read committed"
+            ]
+          ]
+        },
+        "deadlockTimeout": {
+          "sql": "SHOW deadlock_timeout;",
+          "ok": true,
+          "columns": [
+            "deadlock_timeout"
+          ],
+          "rows": [
+            [
+              "1s"
+            ]
+          ]
+        },
+        "other": {
+          "sql": "BEGIN;\nUPDATE accounts SET balance = 50 WHERE id = 1;\nPREPARE TRANSACTION 'other';",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "parked": {
+          "sql": "SELECT gid FROM pg_prepared_xacts;",
+          "ok": true,
+          "columns": [
+            "gid"
+          ],
+          "rows": [
+            [
+              "other"
+            ]
+          ]
+        },
+        "readUncommitted": {
+          "sql": "BEGIN ISOLATION LEVEL READ UNCOMMITTED;\nSELECT current_setting('transaction_isolation') AS level, balance\nFROM accounts WHERE id = 1;\nCOMMIT;",
+          "ok": true,
+          "columns": [
+            "level",
+            "balance"
+          ],
+          "rows": [
+            [
+              "read uncommitted",
+              "100"
+            ]
+          ]
+        },
+        "readCommitted": {
+          "sql": "BEGIN ISOLATION LEVEL READ COMMITTED;\nSELECT current_setting('transaction_isolation') AS level, balance\nFROM accounts WHERE id = 1;\nCOMMIT;",
+          "ok": true,
+          "columns": [
+            "level",
+            "balance"
+          ],
+          "rows": [
+            [
+              "read committed",
+              "100"
+            ]
+          ]
+        },
+        "repeatableRead": {
+          "sql": "BEGIN ISOLATION LEVEL REPEATABLE READ;\nSELECT current_setting('transaction_isolation') AS level, balance\nFROM accounts WHERE id = 1;\nCOMMIT;",
+          "ok": true,
+          "columns": [
+            "level",
+            "balance"
+          ],
+          "rows": [
+            [
+              "repeatable read",
+              "100"
+            ]
+          ]
+        },
+        "serializable": {
+          "sql": "BEGIN ISOLATION LEVEL SERIALIZABLE;\nSELECT current_setting('transaction_isolation') AS level, balance\nFROM accounts WHERE id = 1;\nCOMMIT;",
+          "ok": true,
+          "columns": [
+            "level",
+            "balance"
+          ],
+          "rows": [
+            [
+              "serializable",
+              "100"
+            ]
+          ]
+        },
+        "commit": {
+          "sql": "COMMIT PREPARED 'other';",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "after": {
+          "sql": "SELECT balance FROM accounts WHERE id = 1;",
+          "ok": true,
+          "columns": [
+            "balance"
+          ],
+          "rows": [
+            [
+              "50"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "locking": {
+      "setup": "CREATE TABLE accounts (id int PRIMARY KEY, balance numeric NOT NULL CHECK (balance >= 0));\nINSERT INTO accounts VALUES (1, 100), (2, 100);\nCREATE TABLE items (id int PRIMARY KEY, stock int NOT NULL, version int NOT NULL);\nINSERT INTO items VALUES (1, 5, 3)",
+      "steps": {
+        "holder": {
+          "sql": "BEGIN;\nSELECT * FROM accounts WHERE id = 1 FOR UPDATE;\nPREPARE TRANSACTION 'holder';",
+          "ok": true,
+          "columns": [
+            "id",
+            "balance"
+          ],
+          "rows": [
+            [
+              "1",
+              "100"
+            ]
+          ]
+        },
+        "refused": {
+          "sql": "SELECT * FROM accounts WHERE id = 1\nFOR UPDATE NOWAIT;",
+          "ok": false,
+          "error": "ERROR: could not obtain lock on row in relation \"accounts\""
+        },
+        "otherRow": {
+          "sql": "SELECT * FROM accounts WHERE id = 2\nFOR UPDATE NOWAIT;",
+          "ok": true,
+          "columns": [
+            "id",
+            "balance"
+          ],
+          "rows": [
+            [
+              "2",
+              "100"
+            ]
+          ]
+        },
+        "release": {
+          "sql": "COMMIT PREPARED 'holder';",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "granted": {
+          "sql": "SELECT * FROM accounts WHERE id = 1\nFOR UPDATE NOWAIT;",
+          "ok": true,
+          "columns": [
+            "id",
+            "balance"
+          ],
+          "rows": [
+            [
+              "1",
+              "100"
+            ]
+          ]
+        },
+        "readA": {
+          "sql": "SELECT stock, version FROM items WHERE id = 1;",
+          "ok": true,
+          "columns": [
+            "stock",
+            "version"
+          ],
+          "rows": [
+            [
+              "5",
+              "3"
+            ]
+          ]
+        },
+        "writeB": {
+          "sql": "UPDATE items SET stock = stock - 1, version = version + 1\nWHERE id = 1 AND version = 3\nRETURNING stock, version;",
+          "ok": true,
+          "columns": [
+            "stock",
+            "version"
+          ],
+          "rows": [
+            [
+              "4",
+              "4"
+            ]
+          ]
+        },
+        "writeA": {
+          "sql": "UPDATE items SET stock = stock - 1, version = version + 1\nWHERE id = 1 AND version = 3\nRETURNING stock, version;",
+          "ok": true,
+          "columns": [
+            "stock",
+            "version"
+          ],
+          "rows": []
+        },
+        "rereadA": {
+          "sql": "SELECT stock, version FROM items WHERE id = 1;",
+          "ok": true,
+          "columns": [
+            "stock",
+            "version"
+          ],
+          "rows": [
+            [
+              "4",
+              "4"
+            ]
+          ]
+        },
+        "retryA": {
+          "sql": "UPDATE items SET stock = stock - 1, version = version + 1\nWHERE id = 1 AND version = 4\nRETURNING stock, version;",
+          "ok": true,
+          "columns": [
+            "stock",
+            "version"
+          ],
+          "rows": [
+            [
+              "3",
+              "5"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "joins": {
+      "setup": "CREATE TABLE customers AS SELECT * FROM (VALUES\n  (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di'),\n  (5, 'Eve'), (6, 'Finn'), (7, 'Gus'), (8, 'Hana'),\n  (9, 'Iris'), (10, 'Jonas'), (11, 'Kira'), (12, 'Leo'),\n  (13, 'Mona'), (14, 'Nils'), (15, 'Otto'), (16, 'Pia'),\n  (17, 'Quinn'), (18, 'Rui'), (19, 'Sara'), (20, 'Theo'),\n  (21, 'Ulla'), (22, 'Vik'), (23, 'Wanda'), (24, 'Yara')\n) AS t(id, name);\nCREATE TABLE orders AS SELECT * FROM (VALUES\n  (101, 1, 120.0), (102, 1, 40.0), (103, 2, 80.0), (104, 3, 55.0),\n  (105, 5, 210.0), (106, 6, 75.5), (107, 7, 160.0), (108, 9, 95.25),\n  (109, 10, 130.0), (110, 11, 68.0), (111, 13, 245.0), (112, 14, 52.75),\n  (113, 15, 188.0), (114, 17, 110.5), (115, 18, 84.0), (116, 19, 199.0),\n  (117, 21, 66.25), (118, 22, 142.0), (119, 23, 91.75), (120, 5, 58.0),\n  (121, 13, 77.5), (122, 19, 105.0), (123, 2, 33.0), (124, 3, 175.0)\n) AS t(order_id, customer_id, amount);\nCREATE TABLE order_items AS\nSELECT o.order_id, n AS line\nFROM orders o, generate_series(1, 1 + o.order_id % 3) n",
+      "steps": {
+        "counts": {
+          "sql": "SELECT (SELECT COUNT(*) FROM customers) AS customers, (SELECT COUNT(*) FROM orders) AS orders;",
+          "ok": true,
+          "columns": [
+            "customers",
+            "orders"
+          ],
+          "rows": [
+            [
+              "24",
+              "24"
+            ]
+          ]
+        },
+        "inner": {
+          "sql": "SELECT COUNT(*) AS rows FROM customers c\nJOIN orders o ON o.customer_id = c.id;",
+          "ok": true,
+          "columns": [
+            "rows"
+          ],
+          "rows": [
+            [
+              "24"
+            ]
+          ]
+        },
+        "left": {
+          "sql": "SELECT COUNT(*) AS rows FROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id;",
+          "ok": true,
+          "columns": [
+            "rows"
+          ],
+          "rows": [
+            [
+              "30"
+            ]
+          ]
+        },
+        "none": {
+          "sql": "SELECT c.name FROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nWHERE o.order_id IS NULL\nORDER BY c.id;",
+          "ok": true,
+          "columns": [
+            "name"
+          ],
+          "rows": [
+            [
+              "Di"
+            ],
+            [
+              "Hana"
+            ],
+            [
+              "Leo"
+            ],
+            [
+              "Pia"
+            ],
+            [
+              "Theo"
+            ],
+            [
+              "Yara"
+            ]
+          ]
+        },
+        "cy": {
+          "sql": "SELECT c.name, COUNT(o.order_id) AS orders FROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nWHERE c.name = 'Cy'\nGROUP BY c.name;",
+          "ok": true,
+          "columns": [
+            "name",
+            "orders"
+          ],
+          "rows": [
+            [
+              "Cy",
+              "2"
+            ]
+          ]
+        },
+        "total": {
+          "sql": "SELECT SUM(amount) AS revenue FROM orders;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "2661.50"
+            ]
+          ]
+        },
+        "itemRows": {
+          "sql": "SELECT COUNT(*) AS rows FROM orders o\nJOIN order_items i ON i.order_id = o.order_id;",
+          "ok": true,
+          "columns": [
+            "rows"
+          ],
+          "rows": [
+            [
+              "48"
+            ]
+          ]
+        },
+        "inflated": {
+          "sql": "SELECT c.name, SUM(o.amount) AS revenue, COUNT(*) AS items\nFROM customers c\nJOIN orders o ON o.customer_id = c.id\nJOIN order_items i ON i.order_id = o.order_id\nGROUP BY c.name\nORDER BY c.name;",
+          "ok": true,
+          "columns": [
+            "name",
+            "revenue",
+            "items"
+          ],
+          "rows": [
+            [
+              "Ava",
+              "400.0",
+              "4"
+            ],
+            [
+              "Ben",
+              "193.0",
+              "3"
+            ],
+            [
+              "Cy",
+              "515.0",
+              "5"
+            ],
+            [
+              "Eve",
+              "268.0",
+              "2"
+            ],
+            [
+              "Finn",
+              "151.0",
+              "2"
+            ],
+            [
+              "Gus",
+              "480.0",
+              "3"
+            ],
+            [
+              "Iris",
+              "95.25",
+              "1"
+            ],
+            [
+              "Jonas",
+              "260.0",
+              "2"
+            ],
+            [
+              "Kira",
+              "204.0",
+              "3"
+            ],
+            [
+              "Mona",
+              "400.0",
+              "3"
+            ],
+            [
+              "Nils",
+              "105.50",
+              "2"
+            ],
+            [
+              "Otto",
+              "564.0",
+              "3"
+            ],
+            [
+              "Quinn",
+              "110.5",
+              "1"
+            ],
+            [
+              "Rui",
+              "168.0",
+              "2"
+            ],
+            [
+              "Sara",
+              "912.0",
+              "6"
+            ],
+            [
+              "Ulla",
+              "66.25",
+              "1"
+            ],
+            [
+              "Vik",
+              "284.0",
+              "2"
+            ],
+            [
+              "Wanda",
+              "275.25",
+              "3"
+            ]
+          ]
+        },
+        "inflatedTotal": {
+          "sql": "SELECT SUM(revenue) AS revenue FROM (SELECT c.name, SUM(o.amount) AS revenue, COUNT(*) AS items\nFROM customers c\nJOIN orders o ON o.customer_id = c.id\nJOIN order_items i ON i.order_id = o.order_id\nGROUP BY c.name) t;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "5451.75"
+            ]
+          ]
+        },
+        "fixed": {
+          "sql": "WITH items AS (\n  SELECT order_id, COUNT(*) AS items\n  FROM order_items GROUP BY order_id\n)\nSELECT c.name, SUM(o.amount) AS revenue, SUM(i.items) AS items\nFROM customers c\nJOIN orders o ON o.customer_id = c.id\nJOIN items i ON i.order_id = o.order_id\nGROUP BY c.name\nORDER BY c.name;",
+          "ok": true,
+          "columns": [
+            "name",
+            "revenue",
+            "items"
+          ],
+          "rows": [
+            [
+              "Ava",
+              "160.0",
+              "4"
+            ],
+            [
+              "Ben",
+              "113.0",
+              "3"
+            ],
+            [
+              "Cy",
+              "230.0",
+              "5"
+            ],
+            [
+              "Eve",
+              "268.0",
+              "2"
+            ],
+            [
+              "Finn",
+              "75.5",
+              "2"
+            ],
+            [
+              "Gus",
+              "160.0",
+              "3"
+            ],
+            [
+              "Iris",
+              "95.25",
+              "1"
+            ],
+            [
+              "Jonas",
+              "130.0",
+              "2"
+            ],
+            [
+              "Kira",
+              "68.0",
+              "3"
+            ],
+            [
+              "Mona",
+              "322.5",
+              "3"
+            ],
+            [
+              "Nils",
+              "52.75",
+              "2"
+            ],
+            [
+              "Otto",
+              "188.0",
+              "3"
+            ],
+            [
+              "Quinn",
+              "110.5",
+              "1"
+            ],
+            [
+              "Rui",
+              "84.0",
+              "2"
+            ],
+            [
+              "Sara",
+              "304.0",
+              "6"
+            ],
+            [
+              "Ulla",
+              "66.25",
+              "1"
+            ],
+            [
+              "Vik",
+              "142.0",
+              "2"
+            ],
+            [
+              "Wanda",
+              "91.75",
+              "3"
+            ]
+          ]
+        },
+        "fixedTotal": {
+          "sql": "SELECT SUM(revenue) AS revenue FROM (WITH items AS (\n  SELECT order_id, COUNT(*) AS items\n  FROM order_items GROUP BY order_id\n)\nSELECT c.name, SUM(o.amount) AS revenue, SUM(i.items) AS items\nFROM customers c\nJOIN orders o ON o.customer_id = c.id\nJOIN items i ON i.order_id = o.order_id\nGROUP BY c.name) t;",
+          "ok": true,
+          "columns": [
+            "revenue"
+          ],
+          "rows": [
+            [
+              "2661.50"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "cover": {
+      "setup": "SET default_statistics_target = 10000;\nCREATE TABLE orders AS\nSELECT g AS id,\n  (1 + (g::bigint * 7919) % 50000)::int AS customer_id,\n  TIMESTAMP '2024-01-01' + (g - 1) * INTERVAL '31.62 seconds' AS created_at,\n  (ARRAY['pending', 'paid', 'shipped', 'returned'])[1 + g % 4] AS status,\n  round(5 + ((g * 37) % 9500) / 100.0, 2) AS amount\nFROM generate_series(1, 1000000) g;\nALTER TABLE orders ADD PRIMARY KEY (id);\nVACUUM ANALYZE orders",
+      "steps": {
+        "plain": {
+          "sql": "CREATE INDEX orders_customer_idx ON orders (customer_id);\nANALYZE orders;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "before": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT SUM(amount) FROM orders\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Aggregate  (cost=81.75..81.76 rows=1 width=32) (actual rows=1.00 loops=1)"
+            ],
+            [
+              "  ->  Bitmap Heap Scan on orders  (cost=4.58..81.70 rows=20 width=6) (actual rows=20.00 loops=1)"
+            ],
+            [
+              "        Recheck Cond: (customer_id = 42)"
+            ],
+            [
+              "        Heap Blocks: exact=20"
+            ],
+            [
+              "        ->  Bitmap Index Scan on orders_customer_idx  (cost=0.00..4.58 rows=20 width=0) (actual rows=20.00 loops=1)"
+            ],
+            [
+              "              Index Cond: (customer_id = 42)"
+            ],
+            [
+              "              Index Searches: 1"
+            ]
+          ]
+        },
+        "include": {
+          "sql": "CREATE INDEX orders_customer_amount_idx\n  ON orders (customer_id) INCLUDE (amount);\nVACUUM ANALYZE orders;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "after": {
+          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT SUM(amount) FROM orders\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Aggregate  (cost=4.83..4.84 rows=1 width=32) (actual rows=1.00 loops=1)"
+            ],
+            [
+              "  ->  Index Only Scan using orders_customer_amount_idx on orders  (cost=0.42..4.78 rows=20 width=6) (actual rows=20.00 loops=1)"
+            ],
+            [
+              "        Index Cond: (customer_id = 42)"
+            ],
+            [
+              "        Heap Fetches: 0"
+            ],
+            [
+              "        Index Searches: 1"
+            ]
+          ]
+        },
+        "spend": {
+          "sql": "SELECT SUM(amount) FROM orders\nWHERE customer_id = 42;",
+          "ok": true,
+          "columns": [
+            "sum"
+          ],
+          "rows": [
+            [
+              "1033.60"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    }
+  }
+}

@@ -94,8 +94,9 @@ Better: In limiter.py, implement allow(user_id: str, now: float) -> bool for a
         sliding-window limit of 100 requests per 60 seconds per user. Keep state
         in memory, keyed by user. Do not change the public interface of
         Server.handle(). Add pytest cases for: the 100th and 101st request in
-        one window, a request exactly 60 seconds after the first, and two
-        users who do not affect each other.
+        one window, a request exactly 60 seconds after the first (allowed:
+        the first has left the window), and two users who do not affect
+        each other.
 ```
 
 The better prompt also produces a smaller diff, which is easier to review in
@@ -235,10 +236,12 @@ print(f"total:  {daily:,.0f} USD/day, about {daily * 30:,.0f} USD/month")`,
   ]}
 />
 
-The breakdown tells you which lever to pull. Here input dominates, so trimming
-the prompt, caching the shared prefix, or retrieving fewer documents saves more
-than shortening the answer. Routing easy requests to a smaller model and moving
-offline work to a provider's discounted batch API are the next levers.
+The breakdown tells you which lever to pull. Here input is the larger share,
+2,000 of the 3,500 USD a day, even though each output token costs five times
+as much as an input token. So halving the prompt (trimming it, caching the
+shared prefix, retrieving fewer documents) saves 1,000 USD a day, where
+halving the answer saves 750. Routing easy requests to a smaller model and
+moving offline work to a provider's discounted batch API are the next levers.
 
 ### What is prompt injection, and how do you defend against it?
 

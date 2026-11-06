@@ -1,14 +1,14 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard, Tick } from "../../editorial/interview";
+import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CLUSTER, count, MB } from "./data";
-import { COLUMN_TINT, Drift, OK, OK_INK, X0 } from "./parts";
+import { COLUMN_TINT, Drift, OK, OK_INK, QCode, X0 } from "./parts";
 
 const AX0 = 420;
 const AX1 = 1500;
@@ -167,7 +167,7 @@ export const ClusterScene: React.FC = () => {
         </svg>
         <Note at={marchAt + 4} x={bandX0} y={y(SHUFFLED_Y) + 9 * h(STEP) + h(12)}>
           <span style={{ ...note(21, INK), whiteSpace: "nowrap" }}>
-            <QMono>WHERE sale_date BETWEEN</QMono> March 1 <QMono>AND</QMono> March 31
+            <QCode>WHERE sale_date BETWEEN</QCode> March 1 <QCode>AND</QCode> March 31
           </span>
         </Note>
 
@@ -219,7 +219,7 @@ export const ClusterScene: React.FC = () => {
           <span>
             <b style={{ color: OK_INK }}>In practice:</b> partition by date
             <span style={{ opacity: ease(frame, nextColAt, 10) }}>
-              , then cluster by the next column queries filter on, like <QMono>region</QMono>
+              , then cluster by the next column queries filter on, like <QCode>region</QCode>
             </span>
           </span>
         </div>

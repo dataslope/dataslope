@@ -139,11 +139,12 @@ export const UnknownScene: React.FC = () => {
       {/* The test, as Postgres evaluates it on the row with no price. */}
       <Ink at={testAt - 2} dur={14} out={testOut} style={{ left: TABLE_X, top: below, display: "flex", alignItems: "center", gap: 18 }}>
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>The test on that row:</span>
-        <Code size={28}>{"null >= 0"}</Code>
+        {/* 25px, within 12% of the 23px words it shares a line with. */}
+        <Code size={25}>{"null >= 0"}</Code>
       </Ink>
       <Arrow from={[TABLE_X + 420, below + 22]} to={[TABLE_X + 490, below + 22]} at={unknownAt - 6} dur={10} color={INK_SOFT} out={testOut} />
       <Ink at={unknownAt - 2} dur={14} out={testOut} style={{ left: TABLE_X + 510, top: below, whiteSpace: "nowrap" }}>
-        <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 700, color: ACCENT_INK }}>{String(CHECK_ONLY.test)}</span>
+        <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 700, color: ACCENT_INK }}>{String(CHECK_ONLY.test)}</span>
         <span style={{ ...note(23, INK), marginLeft: 16 }}>unknown, not false</span>
       </Ink>
 

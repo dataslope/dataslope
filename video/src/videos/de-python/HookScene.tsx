@@ -97,7 +97,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={listAt} level={-36} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data engineer interview prep</Kicker>
+        <Kicker at={from}>Data engineer interview questions</Kicker>
         <Headline lead="A model is a drawing" turn="until code loads it." at={drawingAt} turnAt={loadsAt - 2} out={checksAt - 6} />
         {/* In as the first leaves, so the headline's slot is never empty
             while the narration states what the round checks. */}
@@ -223,7 +223,7 @@ export const HookScene: React.FC = () => {
 
         {/* ── The two reads, in code ── */}
         <Note at={wholeAt} x={X0} y={y(CODE_Y)} out={eighteenAt - 6}>
-          <span style={{ display: "flex", alignItems: "baseline", gap: 24, whiteSpace: "nowrap" }}>
+          <span style={{ display: "flex", alignItems: "baseline", gap: 40, whiteSpace: "nowrap" }}>
             <span style={{ fontSize: 30 }}>
               <Strike at={fitAt + 2}>
                 <Code line={wholeLine} size={30} />
@@ -233,7 +233,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={lineAt} x={X0} y={y(CODE_Y) + h(72)} out={eighteenAt - 6}>
-          <span style={{ display: "flex", alignItems: "baseline", gap: 24, whiteSpace: "nowrap" }}>
+          <span style={{ display: "flex", alignItems: "baseline", gap: 40, whiteSpace: "nowrap" }}>
             <Mark at={holdsAt} color={MARK_OK}>
               <Code line={loopLine} size={30} />
             </Mark>
@@ -248,13 +248,13 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
         <Note at={listAt - 4} x={X0} y={y(CODE_Y)}>
-          <span style={{ display: "flex", alignItems: "baseline", gap: 24, whiteSpace: "nowrap" }}>
+          <span style={{ display: "flex", alignItems: "baseline", gap: 40, whiteSpace: "nowrap" }}>
             <Code line={listLine} size={30} />
             <span style={note(24, INK_SOFT)}>a list</span>
           </span>
         </Note>
         <Note at={genAt - 4} x={X0} y={y(CODE_Y) + h(72)}>
-          <span style={{ display: "flex", alignItems: "baseline", gap: 24, whiteSpace: "nowrap" }}>
+          <span style={{ display: "flex", alignItems: "baseline", gap: 40, whiteSpace: "nowrap" }}>
             <Code line={genLine} size={30} />
             <span style={note(24, INK_SOFT)}>a generator</span>
           </span>

@@ -25,7 +25,6 @@ import {
   Mark,
   MARK,
   MARK_OK,
-  Mono,
   OK,
   OK_INK,
   Spot,
@@ -33,6 +32,7 @@ import {
   TitleCode,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 /** Where the answers go: right of the list. */
 const R_X = 800;

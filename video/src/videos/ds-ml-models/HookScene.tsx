@@ -85,7 +85,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-tap" at={lineAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data scientist interview prep</Kicker>
+        <Kicker at={from}>Data scientist interview questions</Kicker>
         <Headline
           lead="Same points,"
           turn="three borders."

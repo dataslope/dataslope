@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { FILES, MB, QUERY, TABLE } from "./data";
-import { colsOf, COLUMN_TINT, DataTable, Drift, FileBar, geoOf, lineOf, Listing, PARQUET_SEGMENTS, ReadMark, rowsAt, segmentOf, X0 } from "./parts";
+import { colsOf, COLUMN_TINT, DataTable, Drift, FileBar, geoOf, lineOf, Listing, PARQUET_SEGMENTS, QCode, ReadMark, rowsAt, segmentOf, X0 } from "./parts";
 
 const TOP = 300;
 /** One stored value, in a strip. */
@@ -206,7 +206,7 @@ export const RowsScene: React.FC = () => {
         ))}
         <Note at={fewAt + 16} x={X0 + sample.rows.length * (cols.length * CW + SEP) + 4} y={rowY + h(4)} out={threeAt}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            <QMono>amount</QMono>: every sixth value
+            <QCode>amount</QCode>: every sixth value
           </span>
         </Note>
         {/* The page's query on rows: every value is read to find its three. */}

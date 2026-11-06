@@ -9,7 +9,8 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { BATCH } from "./data";
-import { Bars, Console, consoleHeight, Drift, lineOf, Listing, listingHeight, MARK, MARK_OK, Mono, OK, OK_INK, Title, X0 } from "./parts";
+import { Bars, Console, consoleHeight, Drift, lineOf, Listing, listingHeight, MARK, MARK_OK, OK, OK_INK, Title, X0 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 330;
 const SIZE = 21;

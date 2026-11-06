@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, fmt, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { BLUE_INK, fmt, HAIRLINE, halo, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -128,6 +128,20 @@ export const RobustScene: React.FC = () => {
             <Mark at={meanGoesAt - 2}>goes with a mean</Mark>
           </div>
         </Ink>
+        {/* The two readouts sit side by side: a hairline in the gap, inking in
+            with the IQR on its right, as tall as a readout and growing to take
+            in the notes under them when they arrive. */}
+        <div
+          style={{
+            position: "absolute",
+            left: 1368,
+            top: statsY + 2,
+            width: 1,
+            height: 40 + 40 * ease(frame, meanGoesAt - 4, 12),
+            background: HAIRLINE,
+            opacity: ease(frame, fourteenAt - 4, 14),
+          }}
+        />
         <Ink at={fourteenAt - 2} dur={14} style={{ left: IQR_X, top: statsY, whiteSpace: "nowrap" }}>
           <div style={{ ...note(32, INK), fontWeight: 700, display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ display: "inline-block", width: 22, height: 22, background: HIGHLIGHT, opacity: 0.8, border: `2px solid ${INK}` }} />

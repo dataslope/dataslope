@@ -194,7 +194,8 @@ export const OptScene: React.FC = () => {
             <span style={{ ...note(24, WARM_INK), whiteSpace: "nowrap" }}>RMSProp: both directions at a similar pace</span>
           </Note>
           <Tagline x={BOX.left} y={y(BOX.bottom) + h(14)} at={valleyAt + 8} size={19}>
-            a made-up valley; 50 steps each, each at a learning rate that suits it
+            {/* Tagline sets tabular figures, which would set this hyphen a digit wide. */}
+            a <span style={{ fontVariantNumeric: "normal" }}>made-up</span> valley; 50 steps each, each at a learning rate that suits it
           </Tagline>
 
           {/* ── The legend, and where each one got to ── */}

@@ -174,14 +174,15 @@ export const RepeatScene: React.FC = () => {
         color={EASY}
         width={3}
       />
+      {/* The name above the arrow and its size under it: one size to a line. */}
       <Ink at={biasAt - 6} dur={16} style={{ left: (truthX + easyX) / 2 - 200, top: y(426), width: 400, textAlign: "center" }}>
         <span style={{ ...headline(56, true), color: EASY_INK, ...halo }}>Bias</span>
-        {/* To the nearest point: the bias is "about ten" at every sample size,
-            and 10.03 here against 9.94 in the closing figure read as if it
-            shrank with more data. */}
-        <span style={{ ...note(24, EASY_INK), fontWeight: 700, marginLeft: 16, ...halo }}>
-          +{fmt(EASY_CENTER - TRUE_MEAN, 0)} points
-        </span>
+      </Ink>
+      {/* To the nearest point: the bias is "about ten" at every sample size,
+          and 10.03 here against 9.94 in the closing figure read as if it
+          shrank with more data. */}
+      <Ink at={biasAt - 6} dur={16} style={{ left: (truthX + easyX) / 2 - 200, top: y(500) + 12, width: 400, textAlign: "center" }}>
+        <span style={{ ...note(24, EASY_INK), fontWeight: 700, ...halo }}>+{fmt(EASY_CENTER - TRUE_MEAN, 0)} points</span>
       </Ink>
     </AbsoluteFill>
   );

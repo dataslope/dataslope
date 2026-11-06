@@ -87,7 +87,7 @@ export const MvScene: React.FC = () => {
           <div style={{ ...label(21, INK_SOFT) }}>
             daily_revenue, from <Num>{thousands(SLOW.orders)}</Num> orders
           </div>
-          <div style={{ ...headline(72), color: BLUE_INK, opacity: ease(frame, daysAt, 10) }}>
+          <div style={{ ...headline(72), color: BLUE_INK, marginTop: 12, opacity: ease(frame, daysAt, 10) }}>
             <Num>{MV.days}</Num> rows
           </div>
         </Note>

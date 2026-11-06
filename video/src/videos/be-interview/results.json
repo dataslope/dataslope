@@ -1,0 +1,68 @@
+{
+  "bank": 110,
+  "topicPages": 8,
+  "conceptCheckPages": 8,
+  "challengePages": 3,
+  "challengePageNames": [
+    "algorithms",
+    "object-oriented-design",
+    "databases"
+  ],
+  "challenges": 6,
+  "keptPages": 7,
+  "keptQuestions": 127,
+  "leftOut": {
+    "page": "python",
+    "questions": 31
+  },
+  "pages": [
+    {
+      "page": "algorithms",
+      "questions": 35,
+      "conceptChecks": 2,
+      "challenges": 3
+    },
+    {
+      "page": "python",
+      "questions": 31,
+      "conceptChecks": 2,
+      "challenges": 0
+    },
+    {
+      "page": "object-oriented-design",
+      "questions": 15,
+      "conceptChecks": 3,
+      "challenges": 1
+    },
+    {
+      "page": "concurrency",
+      "questions": 16,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "databases",
+      "questions": 16,
+      "conceptChecks": 3,
+      "challenges": 2
+    },
+    {
+      "page": "api-design",
+      "questions": 16,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "system-design",
+      "questions": 18,
+      "conceptChecks": 3,
+      "challenges": 0
+    },
+    {
+      "page": "ai-assisted-coding",
+      "questions": 11,
+      "conceptChecks": 4,
+      "challenges": 0
+    }
+  ]
+}

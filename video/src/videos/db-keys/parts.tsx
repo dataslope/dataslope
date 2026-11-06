@@ -18,7 +18,7 @@ import {
   label,
   note,
 } from "../../editorial/style";
-import { Ink, type Pt } from "../../editorial/ui";
+import { badgeStyle, Ink, type Pt } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -131,9 +131,11 @@ export const Headline: React.FC<{
   );
 };
 
-/** Code set inside running text or a label, at the text's own size. */
+/** Code set inside running text or a label, at the text's own size: 0.92em
+ *  matches JetBrains Mono's x-height to the line's and stays inside the one
+ *  size a line may hold (PageAudit's 12%). */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.88em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none" }}>
     {children}
   </span>
 );
@@ -153,7 +155,9 @@ export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: st
   const p = ease(frame, at, dur);
   const o = out === undefined ? 0 : ease(frame, out, 14);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.14em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.14em" }}>
       <span
         style={{
           position: "absolute",
@@ -202,7 +206,11 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
   );
 };
 
-/** A small rounded tag ("PK", "FK", "UNIQUE", "parent"), in its own ink. */
+/**
+ * A tag ("PK", "FK", "UNIQUE", "parent"): the house badge (editorial/ui), a
+ * light tint of its hue in that hue's ink, no border. `color` picks the hue:
+ * the key blue, the accent red, or gray for anything in the plain ink.
+ */
 export const Tag: React.FC<{ children: React.ReactNode; color?: string; size?: number; mono?: boolean }> = ({
   children,
   color = KEY_INK,
@@ -211,16 +219,9 @@ export const Tag: React.FC<{ children: React.ReactNode; color?: string; size?: n
 }) => (
   <span
     style={{
-      display: "inline-block",
-      padding: "1px 9px 2px",
-      borderRadius: 999,
-      border: `1.5px solid ${color}`,
-      color,
-      fontFamily: mono ? MONO : undefined,
-      ...(mono ? { fontSize: size, fontWeight: 600 } : label(size, color)),
-      lineHeight: 1.25,
-      whiteSpace: "nowrap",
-      background: PAPER,
+      ...label(size),
+      ...badgeStyle(color === KEY_INK ? "blue" : color === ACCENT_INK ? "red" : "gray", size),
+      fontFamily: mono ? MONO : label(size).fontFamily,
     }}
   >
     {children}
@@ -485,8 +486,10 @@ export const Reply: React.FC<{
 
 /** JetBrains Mono's advance, in em: every glyph is this wide. */
 const ADVANCE = 0.6;
-/** A header tag ("PK", "UNIQUE"): the 19px floor, the smallest type on screen. */
-const TAG_SIZE = 19;
+/** A header tag ("PK", "UNIQUE") beside its column title: a little smaller
+ *  than the title, but within the 12% a line may vary (PageAudit), and
+ *  never under the 19px floor. */
+const tagSize = (headSize: number) => Math.max(19, Math.round(headSize * 0.9));
 
 export type Col = {
   name: string;
@@ -527,7 +530,7 @@ export const tableGeometry = ({ x, top, cols, rows, extra = [], headH, rowH, hea
   const widths = cols.map((c, i) =>
     Math.ceil(
       Math.max(
-        c.name.length * ADVANCE * headSize + (c.tag ? c.tag.text.length * TAG_SIZE * 0.66 + 36 : 0),
+        c.name.length * ADVANCE * headSize + (c.tag ? c.tag.text.length * tagSize(headSize) * 0.66 + 36 : 0),
         ...all.map((r) => (r[i] ?? "").length * ADVANCE * bodySize),
       ) +
         2 * pad,
@@ -705,7 +708,7 @@ export const DataTable: React.FC<{
             {c.name}
             {c.tag ? (
               <span style={{ opacity: ease(frame, c.tag.at, 10), transform: `scale(${0.8 + 0.2 * ease(frame, c.tag.at, 10)})` }}>
-                <Tag color={c.tag.color ?? KEY_INK} size={TAG_SIZE}>
+                <Tag color={c.tag.color ?? KEY_INK} size={tagSize(g.headSize)}>
                   {c.tag.text}
                 </Tag>
               </span>

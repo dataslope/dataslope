@@ -304,7 +304,9 @@ export const Marked: React.FC<{
   color?: string;
   children: React.ReactNode;
 }> = ({ p, color = HIGHLIGHT, children }) => (
-  <span style={{ position: "relative", display: "inline-block" }}>
+  // The highlight reaches 0.2em past the words on each side; the
+  // margin gives that back, so a neighbour keeps a full space.
+  <span style={{ position: "relative", display: "inline-block", margin: "0 0.2em" }}>
     {p > 0 ? (
       <span
         style={{

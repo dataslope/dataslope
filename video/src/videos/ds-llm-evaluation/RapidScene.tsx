@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BANK } from "./data";
-import { BAD, Chip, Clear, DATA, Drift, Headline, Kicker, Mark, MARK_BAD, OK_INK, Spot, Strike, X0 } from "./parts";
+import { BAD, Clear, DATA, Drift, Headline, Kicker, Mark, MARK_BAD, OK_INK, Spot, Strike, Tag, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 820;
@@ -58,9 +58,9 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>track what people do next:</span>
       </Note>
       {signs.map((s, i) => (
-        <Chip key={s.text} x={R_X + 30} y={c.y(626) + i * c.h(62)} at={s.at - 2} size={24} ink={OK_INK}>
+        <Tag key={s.text} x={R_X + 30} y={c.y(626) + i * c.h(62)} at={s.at - 2} size={24} tone="green">
           {s.text}
-        </Chip>
+        </Tag>
       ))}
       <Note at={diagAt - 2} x={R_X} y={c.y(830)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
@@ -177,7 +177,7 @@ export const RapidScene: React.FC = () => {
         <Kicker at={from} out={roundAt - 6}>
           Questions 8 and 9
         </Kicker>
-        <Kicker at={roundAt}>Data scientist interview prep</Kicker>
+        <Kicker at={roundAt}>Data scientist interview questions</Kicker>
         <Headline lead="Two more," turn="numbers that look better than they are." at={twoAt - 4} turnAt={lookAt - 4} out={roundAt - 6} size={60} />
         <Headline lead="How sure are you," turn="and how would you know?" at={sureAt - 4} turnAt={knowAt - 4} size={60} />
 
@@ -193,9 +193,9 @@ export const RapidScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
-          <Chip key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 2 ? workAt : undefined}>
+          <Tag key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} tone="blue" lit={i === 2 ? workAt : undefined}>
             {p.text}
-          </Chip>
+          </Tag>
         ))}
         <Note at={workAt - 2} x={X0} y={y(740)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap", opacity: 0.4 + 0.6 * ease(frame, workAt, 12) }}>

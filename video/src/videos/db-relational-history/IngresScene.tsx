@@ -34,12 +34,25 @@ export const IngresScene: React.FC = () => {
   const sybaseAt = n.word("industry", "Sybase");
   const microsoftAt = n.word("industry", "Microsoft SQL Server");
 
-  const CODD = { x: 96, top: y(420), w: 290, h: h(118) };
+  // The tree's blocks are plain text now, so its wires run text to text,
+  // 24px clear at each end, rather than box edge to box edge. Codd's and
+  // Sybase's blocks sit a little lower than Ingres's so the three names
+  // share one centre line (Ingres's name, at 50px, sits 53px into its
+  // block; the 34 and 36px names, 37 and 40px into theirs), and the wires
+  // between them run along it.
   const INGRES = { x: 500, top: y(380), w: 560, h: h(222) };
-  const SYB = { x: 1200, top: y(380), w: 600, h: h(118) };
+  const CODD = { x: 96, top: INGRES.top + h(14), w: 290, h: h(118) };
+  const SYB = { x: 1200, top: INGRES.top + h(12), w: 600, h: h(118) };
   const MS = { x: 1200, top: y(580), w: 600, h: h(118) };
-  const coddMid = CODD.top + CODD.h / 2;
-  const sybMid = SYB.top + SYB.h / 2;
+  const nameMid = INGRES.top + h(47);
+  /** Where each block's text ends, measured off the render: Codd's longer
+   *  line, "the relational papers", and Ingres's name. */
+  const coddRight = CODD.x + 206;
+  const ingresNameRight = INGRES.x + 134;
+  /** The foot of Sybase's line, "co-founded by an Ingres alum", and the top
+   *  of Microsoft SQL Server's name. */
+  const sybFoot = SYB.top + h(88);
+  const msHead = MS.top + h(16);
 
   return (
     <AbsoluteFill>
@@ -72,8 +85,8 @@ export const IngresScene: React.FC = () => {
       />
       <Wire
         points={[
-          [CODD.x + CODD.w + 6, coddMid],
-          [INGRES.x - 6, coddMid],
+          [coddRight + 24, nameMid],
+          [INGRES.x - 24, nameMid],
         ]}
         at={relationalAt + 2}
         dur={14}
@@ -117,8 +130,8 @@ export const IngresScene: React.FC = () => {
       {/* ── What grew from it ── */}
       <Wire
         points={[
-          [INGRES.x + INGRES.w + 6, sybMid],
-          [SYB.x - 6, sybMid],
+          [ingresNameRight + 24, nameMid],
+          [SYB.x - 24, nameMid],
         ]}
         at={sybaseAt - 8}
         dur={14}
@@ -135,8 +148,8 @@ export const IngresScene: React.FC = () => {
       />
       <Wire
         points={[
-          [SYB.x + 120, SYB.top + SYB.h + 6],
-          [SYB.x + 120, MS.top - 6],
+          [SYB.x + 120, sybFoot + 24],
+          [SYB.x + 120, msHead - 24],
         ]}
         at={microsoftAt - 10}
         dur={12}

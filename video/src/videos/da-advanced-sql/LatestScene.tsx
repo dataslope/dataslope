@@ -3,7 +3,6 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { QMono } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -24,6 +23,7 @@ import {
   Svg,
   X0,
 } from "./parts";
+import { QMono } from "./mono";
 
 const TOP = 330;
 const RESULT_X = 900;

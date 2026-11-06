@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SIZE } from "./data";
@@ -104,21 +104,18 @@ export const SizeScene: React.FC = () => {
           const tagAt = c.data ? dataAt : choicesAt + i * 3;
           return (
             <React.Fragment key={c.name}>
+              {/* The input's name as a house badge, blue when it comes from
+                  data, gray when it is a choice. */}
               <div
                 style={{
+                  ...note(23),
+                  ...badgeStyle(c.data ? "blue" : "gray", 23),
                   position: "absolute",
                   left: lefts[i],
                   top: y(318),
                   width: widths[i],
                   boxSizing: "border-box",
-                  padding: "6px 0",
                   textAlign: "center",
-                  borderRadius: 6,
-                  border: `2px solid ${c.data ? BAR : INK}`,
-                  background: PAPER,
-                  ...note(23, INK),
-                  fontWeight: 650,
-                  whiteSpace: "nowrap",
                   opacity: p,
                   transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * pulse(frame, inputAts[i], 14)})`,
                 }}

@@ -71,7 +71,11 @@ export const RiskScene: React.FC = () => {
           </Ink>
         ))}
         <Ink at={zeroAt - 6} dur={12} style={{ left: SCORE_X - 70, width: 140, top: y(HEAD_Y), textAlign: "center" }}>
-          <span style={{ ...label(22, INK), fontWeight: 650 }}>Score</span>
+          <span style={{ ...label(22, INK), fontWeight: 650, display: "inline-block", lineHeight: 1.2 }}>
+            Score
+            <br />
+            out of 5
+          </span>
         </Ink>
 
         {RISK.map((r, i) => {
@@ -114,10 +118,7 @@ export const RiskScene: React.FC = () => {
                 );
               })}
               <Ink at={scoreAt[i]} dur={12} style={{ left: SCORE_X - 70, width: 140, top: top + rh / 2 - 30, textAlign: "center" }}>
-                <span style={{ ...headline(48), color: r.score === 0 ? INK : ACCENT_INK, ...TABULAR }}>
-                  {r.score}
-                  <span style={{ ...label(22, INK_SOFT), marginLeft: 6 }}>of 5</span>
-                </span>
+                <span style={{ ...headline(48), color: r.score === 0 ? INK : ACCENT_INK, ...TABULAR }}>{r.score}</span>
               </Ink>
             </React.Fragment>
           );

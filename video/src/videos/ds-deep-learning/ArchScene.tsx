@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -12,6 +12,10 @@ import { Drift, ElbowArrow, Mark, OK, OK_INK, pulse, Svg, Tagline } from "./part
 const PANELS = [130, 710, 1290];
 const PANEL_W = 500;
 const TOP = 352;
+/** The two hairlines between the panels, each centred in its gap: between
+ *  the CNN's widest line (about 568) and the RNN panel (710), and between
+ *  the RNN's widest line (about 1202) and the transformer's title (1298). */
+const SEP_X = [636, 1250];
 
 // ── The CNN: a 7x7 picture and a 3x3 filter sliding over it ──
 const GRID = 7;
@@ -114,8 +118,10 @@ export const ArchScene: React.FC = () => {
 
         {titles.map((t, i) => (
           <Note key={t.head} at={t.at - 2} x={PANELS[i]} y={y(TOP)}>
-            <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap" }}>{t.head}</span>
-            {t.what ? <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{`  ${t.what}`}</span> : null}
+            {/* One line, one size: the name in weight, what it stands for in
+                the softer ink. */}
+            <span style={{ ...note(28, INK), fontWeight: 700, whiteSpace: "nowrap" }}>{t.head}</span>
+            {t.what ? <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>{`  ${t.what}`}</span> : null}
           </Note>
         ))}
 
@@ -260,8 +266,11 @@ export const ArchScene: React.FC = () => {
         <Svg opacity={pulse(frame, longAt, 24)}>
           <rect x={PANELS[2] + 10} y={y(TOK_Y) - h(230)} width={PANEL_W - 20} height={h(300)} rx={10} fill="none" stroke={OK} strokeWidth={2} strokeDasharray="6 6" />
         </Svg>
-        <div style={{ position: "absolute", left: PANELS[1] - 30, top: y(TOP) + 10, width: 1, height: h(520), background: `color-mix(in srgb, ${INK_SOFT} 35%, transparent)`, opacity: ease(frame, rnnAt, 10) }} />
-        <div style={{ position: "absolute", left: PANELS[2] - 30, top: y(TOP) + 10, width: 1, height: h(520), background: `color-mix(in srgb, ${INK_SOFT} 35%, transparent)`, opacity: ease(frame, tfAt, 10) }} />
+        {/* A hairline in each gap between the three panels, centred between
+            one panel's widest line and the next panel's edge, inking in with
+            the panel to its right. */}
+        <div style={{ position: "absolute", left: SEP_X[0], top: y(TOP) + 10, width: 1, height: h(520), background: HAIRLINE, opacity: ease(frame, rnnAt - 2, 14) }} />
+        <div style={{ position: "absolute", left: SEP_X[1], top: y(TOP) + 10, width: 1, height: h(520), background: HAIRLINE, opacity: ease(frame, tfAt - 2, 14) }} />
         <ElbowArrow points={[[GX + GRID * CELL + 8, y(GY) + CELL + (OUT * OCELL) / 2], [OX - 8, y(GY) + CELL + (OUT * OCELL) / 2]]} at={slidesAt + 2} color={INK_SOFT} width={2} head={10} />
       </Drift>
     </AbsoluteFill>

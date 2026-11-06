@@ -336,7 +336,7 @@ const WorkedScore: React.FC<{
   const named = ease(frame, nameAt, 12);
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap", fontFamily: MONO, fontWeight: 600, fontSize: 26, color: INK, ...TABULAR }}>
-      <span style={{ ...label(22, INK_SOFT), fontFamily: undefined }}>{token}:</span>
+      <span style={{ ...label(26, INK_SOFT), fontFamily: undefined }}>{token}:</span>
       <span style={{ position: "relative", display: "inline-flex", gap: 14 }}>
         <span style={step(multiplyAt)}>
           <span style={{ color: QUERY_INK }}>{fix(q[0])}</span> × <span style={{ color: KEY_INK }}>{fix(k[0])}</span>
@@ -560,8 +560,8 @@ export const BlendScene: React.FC = () => {
       <Svg opacity={ease(frame, oneAt - 4, 10)}>
         <line x1={T_X.weight - 10} x2={T_X.weight + 110} y1={rowTop(3) - 6} y2={rowTop(3) - 6} stroke={INK} strokeWidth={1.4} />
       </Svg>
-      <Fade at={oneAt - 2} style={{ left: T_X.weight - 74, top: rowTop(3) + 2, display: "flex", gap: 14, alignItems: "baseline" }}>
-        <span style={{ ...label(21, INK_SOFT) }}>Total</span>
+      <Fade at={oneAt - 2} style={{ left: T_X.weight - 134, top: rowTop(3) + 2, display: "flex", gap: 14, alignItems: "baseline" }}>
+        <span style={{ ...label(26, INK_SOFT), width: 120, textAlign: "right" }}>Total</span>
         <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 26, color: INK, ...TABULAR }}>
           {A.weightSum.toFixed(3)}
         </span>
@@ -601,7 +601,7 @@ export const BlendScene: React.FC = () => {
           <span style={{ ...label(24, POINT_INK) }}>
             New vector for <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
           </span>
-          <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 28, color: POINT_INK, ...TABULAR }}>
+          <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 24, color: POINT_INK, ...TABULAR }}>
             {(move < 0.5 ? A.output : B.output).map((v) => v.toFixed(3)).join(", ")}
           </span>
         </div>

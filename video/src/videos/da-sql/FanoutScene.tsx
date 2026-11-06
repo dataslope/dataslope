@@ -15,11 +15,11 @@ import {
   listingHeight,
   MARK_BAD,
   MARK_OK,
-  Mono,
   TableName,
   tableGeometry,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 340;
 const ITEMS_Y = 620;

@@ -4,8 +4,8 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { Badge, badgeStyle, NextLine, Note } from "../../editorial/ui";
+import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FRESH } from "./data";
@@ -14,6 +14,11 @@ import { Cross, Drift, Edge, Headline, Kicker, OK, OK_INK, Pill, Spot, TaskBox, 
 const R_X = 820;
 const LIST_TOP = 340;
 const ROW = 64;
+/** Question 13: the alert's height (its line, 28px of room under its rule,
+ *  and three fields), and how far right of it the healed retry starts, with
+ *  the hairline 50px before that. */
+const ALERT_H = 188;
+const HEALED_DX = 400;
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
 
@@ -75,7 +80,7 @@ const Deps: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>instead, wait on the data:</span>
       </Note>
       {opts.map((o, i) => (
-        <Pill key={o.text} x={R_X} y={c.y(684) + i * c.h(54)} at={o.at - 2} ink={OK_INK} size={23}>
+        <Pill key={o.text} x={R_X} y={c.y(684) + i * c.h(54)} at={o.at - 2} tone="green" size={23}>
           {o.text}
         </Pill>
       ))}
@@ -122,16 +127,13 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
               top: c.y(350) + row * c.h(78),
               width: 290,
               height: c.h(62),
+              ...badgeStyle(t.base ? "gray" : "blue", 24),
+              padding: 0,
               boxSizing: "border-box",
-              border: `2px solid ${t.base ? INK_SOFT : BAR}`,
-              borderRadius: 10,
-              background: t.base ? PAPER : `color-mix(in srgb, ${BAR} 10%, ${PAPER})`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              ...note(24, t.base ? INK_SOFT : BLUE_INK),
-              fontWeight: 650,
-              whiteSpace: "nowrap",
+              fontFamily: SANS,
               opacity: p,
               transform: `translateY(${(1 - p) * 10}px)`,
             }}
@@ -140,50 +142,39 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
           </div>
         );
       })}
-      {/* One alert, actionable. */}
-      <div
-        style={{
-          position: "absolute",
-          left: cardX,
-          top: cardTop,
-          width: 600,
-          boxSizing: "border-box",
-          border: `2.4px solid ${ACCENT}`,
-          borderRadius: 10,
-          background: PAPER,
-          padding: "10px 20px 12px",
-          opacity: ease(frame, alertAt, 12),
-        }}
-      >
-        <div style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 8 }}>
+      {/* One alert, actionable: its line in the trap's red over a hairline,
+          then its fields. No frame. */}
+      <div style={{ position: "absolute", left: cardX, top: cardTop, opacity: ease(frame, alertAt, 12) }}>
+        <div style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 10 }}>
           one alert<span style={{ color: INK, opacity: ease(frame, teamAt, 10) }}> → orders team</span>
         </div>
-        {fields.map((f) => {
+        {fields.map((f, i) => {
           const p = ease(frame, f.at - 2, 10);
           return (
-            <div key={f.k} style={{ display: "flex", gap: 14, marginTop: 8, opacity: p, alignItems: "baseline" }}>
+            <div key={f.k} style={{ display: "flex", gap: 14, marginTop: i ? 10 : 28, opacity: p, alignItems: "baseline" }}>
               <span style={{ ...label(21, INK_SOFT), width: 110 }}>{f.k}</span>
               <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, fontVariantLigatures: "none", background: p > 0.5 ? HIGHLIGHT : undefined, padding: "0 6px", borderRadius: 3 }}>{f.v}</span>
             </div>
           );
         })}
       </div>
-      {/* A retry that healed: no page. */}
+      {/* The alert and the healed retry side by side: a hairline in the gap,
+          inking in with the retry on its right. */}
       <div
         style={{
           position: "absolute",
-          left: cardX + 640,
+          left: cardX + HEALED_DX - 50,
           top: cardTop,
-          width: 330,
-          boxSizing: "border-box",
-          border: `2px dashed ${INK_SOFT}`,
-          borderRadius: 10,
-          padding: "10px 16px",
-          opacity: ease(frame, pageAt, 12),
+          width: 1,
+          height: c.h(ALERT_H),
+          background: HAIRLINE,
+          opacity: ease(frame, pageAt - 2, 14),
         }}
-      >
+      />
+      {/* A retry that healed: no page. */}
+      <div style={{ position: "absolute", left: cardX + HEALED_DX, top: cardTop, opacity: ease(frame, pageAt, 12) }}>
         <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>try 1 failed, try 2 ran</div>
-        <div style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, healAt, 10) }}>healed itself: no page</div>
+        <div style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", marginTop: 10, opacity: ease(frame, healAt, 10) }}>healed itself: no page</div>
       </div>
     </>
   );
@@ -276,12 +267,9 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
         {metas.map((m) => {
           const p = ease(frame, m.at - 2, 10);
           return (
-            <span
-              key={m.text}
-              style={{ padding: "4px 14px", border: `2px solid ${BLUE_INK}`, borderRadius: 999, ...label(22, BLUE_INK), whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}
-            >
+            <Badge key={m.text} tone="blue" size={22} style={{ fontFamily: SANS, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
               {m.text}
-            </span>
+            </Badge>
           );
         })}
         <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, dataAt, 10) }}>kept as data</span>

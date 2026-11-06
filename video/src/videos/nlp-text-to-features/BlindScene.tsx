@@ -3,23 +3,29 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, label, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BOW, BOW_THE } from "./data";
 import { Chip, CHIP_LINE, FIG_Y, Headline, INK, INK_SOFT, Kicker, LOST_INK, Mark, NumCell, pulse, Reveal, tint, X0 } from "./parts";
 
 /** The three panels of Fig. 9, in layout units. */
-const PANEL_X = [X0, 700, 1280];
+const PANEL_X = [X0, 700, 1300];
+/** The hairlines in the two gaps, each centred between the widest text on
+ *  either side: panel (a)'s little table ends at 498, (b)'s note at 1226. */
+const RULE_X = [(498 + 700) / 2, (1226 + 1300) / 2];
 const HEAD_Y = 338;
 const SENT_Y = 392;
+/** From a sentence's letter (A to D) to the sentence: more than 1.2em of the
+ *  sentence's size, so the letters read as a column of names beside it. */
+const SENT_GAP = 36;
 const MINI = { x0: 210, w: 96, headY: 506, rowY: 550, step: 60, h: 50 };
 const STRIP_Y = 470;
 const COMMON_Y = 824;
 
 const ORDER = BOW.order;
 const MEANING = BOW.meaning;
-const MEANING_X0 = 1320;
+const MEANING_X0 = 1340;
 const MEANING_W = 140;
 const DOC1 = BOW.rows[0];
 /** The long, mostly empty row: doc1's nine counts at the front, its non-zero
@@ -92,7 +98,7 @@ export const BlindScene: React.FC = () => {
           key={s}
           at={(i === 0 ? dogAt : manAt) - 4}
           dur={14}
-          style={{ left: px[0], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}
+          style={{ left: px[0], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: SENT_GAP, whiteSpace: "nowrap" }}
         >
           <span style={{ ...label(21, INK_SOFT), width: 22 }}>{"AB"[i]}</span>
           <span style={{ ...body(34), color: INK }}>{s}</span>
@@ -126,6 +132,11 @@ export const BlindScene: React.FC = () => {
       <Note at={sameAt - 2} x={px[0]} y={y(MINI.rowY + 2 * MINI.step) + 14}>
         <span style={{ ...note(26, LOST_INK), fontWeight: 600, whiteSpace: "nowrap" }}>The same bag</span>
       </Note>
+
+      {/* ── The panels side by side: a hairline in each gap, inking with the
+          panel to its right, as tall as the text either side of it. ── */}
+      <ColumnRule x={RULE_X[0]} top={y(HEAD_Y)} height={y(MINI.rowY + 2 * MINI.step) + 48 - y(HEAD_Y)} at={realAt - 6} />
+      <ColumnRule x={RULE_X[1]} top={y(HEAD_Y)} height={y(MINI.rowY + 2 * MINI.step) + 88 - y(HEAD_Y)} at={greatAt - 8} />
 
       {/* ── (b) Mostly zeros: doc1's row against a real vocabulary ── */}
       <Ink at={realAt - 6} dur={12} style={{ left: px[1], top: y(HEAD_Y), ...label(24, INK), whiteSpace: "nowrap" }}>
@@ -186,7 +197,7 @@ export const BlindScene: React.FC = () => {
           key={t}
           at={(i === 0 ? greatAt : excellentAt) - 4}
           dur={14}
-          style={{ left: px[2], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}
+          style={{ left: px[2], top: y(SENT_Y + i * 50), display: "flex", alignItems: "baseline", gap: SENT_GAP, whiteSpace: "nowrap" }}
         >
           <span style={{ ...label(21, INK_SOFT), width: 22 }}>{"CD"[i]}</span>
           <span style={{ ...body(34), color: INK }}>{t}</span>

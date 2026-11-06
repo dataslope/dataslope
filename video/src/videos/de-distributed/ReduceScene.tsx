@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { count, MR, REDUCE, ROWS } from "./data";
-import { Chip, Drift, Machine, OK, OK_INK, PairCard } from "./parts";
+import { Chip, Drift, Machine, OK, OK_INK, PairCard, QMono } from "./parts";
 
 const RH = 48;
 const CARD_H = 40;
@@ -102,7 +102,7 @@ export const ReduceScene: React.FC = () => {
         {/* What groupByKey sends: every pair. */}
         <Note at={allAt - 2} x={A_X} y={y(312)}>
           <span style={{ display: "flex", gap: 8, alignItems: "center", whiteSpace: "nowrap" }}>
-            <Chip mono size={21} color={ACCENT} ink={ACCENT_INK}>
+            <Chip mono size={21} tone="red">
               groupByKey
             </Chip>
             <span style={{ ...label(20, INK_SOFT) }}>sends</span>
@@ -126,7 +126,7 @@ export const ReduceScene: React.FC = () => {
         {/* What reduceByKey sends: each machine's sums. */}
         <Note at={rbkAt - 2} x={B_X} y={y(312)}>
           <span style={{ display: "flex", gap: 8, alignItems: "center", whiteSpace: "nowrap" }}>
-            <Chip mono size={21} color={OK} ink={OK_INK}>
+            <Chip mono size={21} tone="green">
               reduceByKey
             </Chip>
             <span style={{ ...label(20, INK_SOFT) }}>sends</span>
@@ -141,7 +141,7 @@ export const ReduceScene: React.FC = () => {
               <React.Fragment key={`${s}-${slot}`}>
                 <PairCard dept={pt.dept} value={pt.salary} strong={summed} width={CARD_W} height={cardH} pose={{ x: B_X - (1 - p) * 16, top: y(slotTop(s, slot)), opacity: p }} />
                 {summed ? (
-                  <div style={{ position: "absolute", left: B_X + CARD_W + 10, top: y(slotTop(s, slot)) + cardH / 2 - 13, ...label(20, OK_INK), whiteSpace: "nowrap", opacity: p }}>
+                  <div style={{ position: "absolute", left: B_X + CARD_W + 16, top: y(slotTop(s, slot)) + cardH / 2 - 13, ...label(20, OK_INK), whiteSpace: "nowrap", opacity: p }}>
                     120 + 140
                   </div>
                 ) : null}

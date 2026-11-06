@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
-import { QMono, QuestionCard, Tick } from "../../editorial/interview";
+import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { count, PARTITION } from "./data";
-import { COLUMN_TINT, Drift, lineOf, Listing, MARK_BAD, OK, OK_INK, PlanBox, READ, X0 } from "./parts";
+import { COLUMN_TINT, Drift, lineOf, Listing, MARK_BAD, OK, OK_INK, PlanBox, QCode, READ, X0 } from "./parts";
 
 const FOLDER_Y = 336;
 const FOLDER_W = 130;
@@ -133,7 +133,7 @@ export const PartitionScene: React.FC = () => {
             One folder per value of the key
             <span style={{ opacity: ease(frame, dateAt, 10) }}>, usually a date</span>
             <span style={{ opacity: ease(frame, monthAt, 10) }}>
-              : here <QMono>sale_month=…</QMono>, one Parquet file each
+              : here <QCode>sale_month=…</QCode>, one Parquet file each
             </span>
           </span>
         </Note>
@@ -187,7 +187,7 @@ export const PartitionScene: React.FC = () => {
         />
         <Note at={keyAt} x={PLAN_X} y={y(LIST_Y) + h(110)} out={fnAt - 2}>
           <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            <QMono>region</QMono> is not the key: nothing to prune
+            <QCode>region</QCode> is not the key: nothing to prune
           </span>
         </Note>
         <Note at={keyAt + 8} x={PLAN_X} y={y(LIST_Y) + h(146)} out={fnAt - 2}>
@@ -235,7 +235,7 @@ export const PartitionScene: React.FC = () => {
           <span>
             Filter on the key itself
             <span style={{ opacity: ease(frame, rangeAt, 10) }}>
-              , or a range: <QMono>{rangeWhere}</QMono> scans <Num>{rangeRead}</Num> of <Num>{rangeOf}</Num>
+              , or a range: <QCode>{rangeWhere}</QCode> scans <Num>{rangeRead}</Num> of <Num>{rangeOf}</Num>
             </span>
             <b style={{ color: OK_INK, opacity: ease(frame, everyAt, 10) }}> · prunes on every engine</b>
           </span>

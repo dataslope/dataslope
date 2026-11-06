@@ -156,7 +156,7 @@ export const ExpandScene: React.FC = () => {
       {phases.map((p, i) => {
         const done = ease(frame, p.at + 8, 10);
         return (
-          <Ink key={p.title} at={p.at - 4} dur={14} style={{ left: 1210, top: y(332) + i * 92, display: "flex", alignItems: "center", gap: 16, whiteSpace: "nowrap" }}>
+          <Ink key={p.title} at={p.at - 4} dur={14} style={{ left: 1210, top: y(332) + i * 92, display: "flex", alignItems: "flex-start", gap: 16, whiteSpace: "nowrap" }}>
             <span
               style={{
                 width: 34,
@@ -171,7 +171,11 @@ export const ExpandScene: React.FC = () => {
                 justifyContent: "center",
                 fontFamily: SANS,
                 fontWeight: 700,
-                fontSize: 19,
+                // Level with the phase's name, not centred on the two lines,
+                // and within 12% of its 26px, so the number and the name read
+                // as one line and the serif note under them as another.
+                fontSize: 24,
+                flex: "none",
               }}
             >
               {i + 1}

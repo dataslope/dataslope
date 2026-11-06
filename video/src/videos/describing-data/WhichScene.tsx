@@ -111,10 +111,11 @@ export const WhichScene: React.FC = () => {
   const lowerFwd = BINS.kde.grid.map((g, i) => `${i ? "L" : "M"}${sx(vs, g).toFixed(1)},${(mid2 + (BINS.kde.density[i] / peak) * h(VIOLIN_H)).toFixed(1)}`).join(" ");
   const secondPeakX = BINS.kde.grid.reduce((best, g, i) => (g > 12 && BINS.kde.density[i] > BINS.kde.density[best] ? i : best), BINS.kde.grid.findIndex((g) => g > 12));
 
+  // A panel's name and what it is for: one line at one size, the name in weight.
   const panel = (x: number, top: number, title: string, use: string, at: number) => (
     <Ink at={at - 6} dur={14} style={{ left: x, top, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
-      <span style={{ ...label(25, INK), fontWeight: 700 }}>{title}</span>
-      <span style={{ ...note(21, INK_SOFT) }}>{use}</span>
+      <span style={{ ...label(23, INK), fontWeight: 700 }}>{title}</span>
+      <span style={{ ...note(23, INK_SOFT) }}>{use}</span>
     </Ink>
   );
 

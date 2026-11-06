@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note, PAPER } from "../.
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds, inkOf } from "../../theme/brand";
+import { ds } from "../../theme/brand";
 import { at as atScale, Axes, type Scale } from "../da-statistics-communication/parts";
 import { count, SKEW } from "./data";
 import { Chip, Drift, OK, OK_INK, Svg } from "./parts";
@@ -17,7 +17,6 @@ const BAR_W = 74;
 const GAP = 24;
 const R_X = 1090;
 const HOT = ds("orange", 500);
-const HOT_INK = inkOf.orange;
 
 /** Rows per partition that are not the guest's: the same before and after salting. */
 const NORMAL = SKEW.before.map((v, i) => v - (i === SKEW.guestPartition ? SKEW.guestRows : 0));
@@ -174,7 +173,7 @@ export const SkewScene: React.FC = () => {
             <span style={{ ...note(23, INK_SOFT) }}>one common key:</span>
             {causes.map((c) => (
               <span key={c.text} style={{ opacity: ease(frame, c.at - 2, 10) }}>
-                <Chip color={HOT} ink={HOT_INK} size={21}>
+                <Chip tone="orange" size={23}>
                   {c.text}
                 </Chip>
               </span>
@@ -186,7 +185,7 @@ export const SkewScene: React.FC = () => {
         </Note>
         <Note at={thirtyAt + 2} x={R_X} y={y(410)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <Chip color={HOT} ink={HOT_INK} size={21}>
+            <Chip tone="orange" size={24}>
               guest
             </Chip>{" "}
             on <Num>{Math.round(SKEW.hotShare * 100)}</Num>% of the rows
@@ -198,16 +197,16 @@ export const SkewScene: React.FC = () => {
         <Note at={suffixAt} x={R_X} y={y(470)}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap", ...note(24, INK) }}>
             <b>salt it:</b>
-            <Chip color={HOT} ink={HOT_INK} size={21} mono>
+            <Chip tone="orange" size={26} mono>
               guest
             </Chip>
             <span>→</span>
             <span style={{ opacity: ease(frame, suffixAt + 8, 10) }}>
-              <Chip color={HOT} ink={HOT_INK} size={21} mono>
+              <Chip tone="orange" size={26} mono>
                 guest#0
               </Chip>{" "}
               …{" "}
-              <Chip color={HOT} ink={HOT_INK} size={21} mono>
+              <Chip tone="orange" size={26} mono>
                 guest#7
               </Chip>
             </span>
@@ -236,17 +235,17 @@ export const SkewScene: React.FC = () => {
             <b>in a join:</b>
             <span style={{ opacity: ease(frame, copyAt, 10), display: "flex", gap: 10, alignItems: "center" }}>
               <span style={{ ...note(22, INK_SOFT) }}>the other side&apos;s</span>
-              <Chip size={21} mono>
+              <Chip size={26} mono>
                 guest
               </Chip>
               <span>→</span>
             </span>
             <span style={{ opacity: ease(frame, copyAt + 10, 10) }}>
-              <Chip size={21} mono>
+              <Chip size={26} mono>
                 guest#0
               </Chip>{" "}
               …{" "}
-              <Chip size={21} mono>
+              <Chip size={26} mono>
                 guest#7
               </Chip>
             </span>

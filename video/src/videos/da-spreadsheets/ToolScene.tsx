@@ -8,11 +8,14 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CONDITIONS, PIVOT, printed } from "./data";
-import { Drift, FormulaBar, Mark, MARK_BAD, Sheet, sheetGeometry, X0 } from "./parts";
+import { ColumnRule, Drift, FormulaBar, Mark, MARK_BAD, Sheet, sheetGeometry, X0 } from "./parts";
 
 const LIST_Y = 360;
 const PITCH = 64;
 const RIGHT_X = 980;
+/** The hairline between question 9's two columns: centred in the gap between
+ *  the left column's longest line (about 604px at 28px) and the right column. */
+const RULE_X = 792;
 
 type Item = { text: React.ReactNode; at: number };
 
@@ -144,6 +147,8 @@ export const ToolScene: React.FC = () => {
             { at: joinsAt, text: "joins across several tables" },
           ]}
         />
+        {/* As tall as the two lists, from their headings to their third lines. */}
+        <ColumnRule x={RULE_X} top={y(LIST_Y)} height={54 + 2 * h(PITCH) + 38} at={asked - 2} out={out9} />
         <Note at={outgrowAt + 10} x={RIGHT_X + 24} y={y(LIST_Y) + h(54) + h(PITCH) * 3} out={out9}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>sheets slow down well before a million rows</span>
         </Note>

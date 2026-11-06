@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HOLDOUT, TIPS } from "./data";
 import { Check, Headline, lerp, Marker, Spot, Svg, Wall } from "./parts";
-import { LeadCard, WALL_BOTTOM, WALL_TOP, WALL_X } from "./WallScene";
+import { Lead, WALL_BOTTOM, WALL_TOP, WALL_X } from "./WallScene";
 
 /** The 244 bills as a grid, 22 to a row, left of the wall. */
 const COLS = 22;
@@ -22,8 +22,10 @@ const RIGHT_Y = 400;
 const HELD = [...HOLDOUT.held].sort((a, b) => a - b);
 const HELD_SLOT = new Map(HELD.map((i, k) => [i, k]));
 const HELD_ROWS = Math.ceil(HELD.length / HELD_COLS);
-const CARD_LEFT = { x: 200, y: 790 };
-const CARD_RIGHT = { x: 1080, y: 790 };
+/** Where the lead's words start and land: on the left edge of the labels
+ *  on each side ("The data stays on this side.", "73 locked away"). */
+const CARD_LEFT = { x: LEFT_X - 8, y: 790 };
+const CARD_RIGHT = { x: RIGHT_X - 26, y: 790 };
 
 /**
  * The hold-out slice: split the bills before exploring, 70% to roam in and
@@ -167,7 +169,7 @@ export const HoldoutScene: React.FC = () => {
 
       {/* ── The lead, carried over the wall without its data ── */}
       {cardIn > 0 ? (
-        <LeadCard
+        <Lead
           x={lerp(CARD_LEFT.x, CARD_RIGHT.x, carry)}
           y={y(lerp(CARD_LEFT.y, CARD_RIGHT.y, carry)) - Math.sin(carry * Math.PI) * 70}
           opacity={cardIn * (1 - 0.6 * fade)}

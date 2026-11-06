@@ -8,11 +8,15 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HISTORY, TYPE2 } from "./data";
-import { colsOf, DataTable, Drift, geoOf, MARK_BAD, MARK_OK, OK, OK_INK, rowsAt, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, Mark, MARK_BAD, MARK_OK, OK_INK, rowsAt, TableName, X0 } from "./parts";
 
 /** Each type's band, top to bottom, in layout units. */
 const BANDS = [330, 540, 750] as const;
 const TABLE_X = 420;
+/** A verdict's line under its type's name and "what": 12px under the
+ *  second line, so it reads as the same group (layout units from a band's
+ *  top). */
+const VERDICT = 124;
 /** The table rows here, before `h()`. */
 const ROWS = { headH: 40, rowH: 46, bodySize: 21, headSize: 19 } as const;
 
@@ -120,28 +124,25 @@ export const HistoryScene: React.FC = () => {
         {bands.map((b, i) => (
           <Note key={b.name} at={threeAt + i * 5} x={X0} y={top(i) + h(40)}>
             <div style={{ opacity: 0.4 + 0.6 * ease(frame, b.at - 2, 12) }}>
-              <div style={{ ...note(32, i === 1 && lit > 0.5 ? OK_INK : INK), fontWeight: 750, whiteSpace: "nowrap" }}>{b.name}</div>
+              <div style={{ ...note(32, i === 1 && lit > 0.5 ? OK_INK : INK), fontWeight: 750, whiteSpace: "nowrap", marginLeft: i === 1 ? "-0.14em" : undefined }}>
+                {i === 1 ? (
+                  <Mark at={standardAt} color={MARK_OK}>
+                    {b.name}
+                  </Mark>
+                ) : (
+                  b.name
+                )}
+              </div>
               <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{b.what}</div>
             </div>
           </Note>
         ))}
-        {/* The verdict: Type 2 ringed as the standard, Type 1 kept for typos. */}
-        <div
-          style={{
-            position: "absolute",
-            left: X0 - 16,
-            top: top(1) + h(30),
-            width: 230,
-            height: h(110),
-            border: `3px solid ${OK}`,
-            borderRadius: 10,
-            opacity: lit,
-          }}
-        />
-        <Note at={standardAt + 6} x={X0} y={top(1) + h(150)}>
+        {/* The verdict: Type 2 marked in the right answer's green as the
+            standard, Type 1 kept for typos. */}
+        <Note at={standardAt + 6} x={X0} y={top(1) + h(VERDICT)}>
           <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the standard</span>
         </Note>
-        <Note at={typoAt - 2} x={X0} y={top(0) + h(130)}>
+        <Note at={typoAt - 2} x={X0} y={top(0) + h(VERDICT)}>
           <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>right for a typo</span>
         </Note>
 

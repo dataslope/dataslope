@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, headline, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -30,16 +30,18 @@ const mono = (size: number, color: string = INK, weight = 500): React.CSSPropert
   whiteSpace: "nowrap",
 });
 
-/** A dtype as pandas prints it, in a pill. */
+const GRAY_BADGE = badgeStyle("gray", 21);
+const LIT_BADGE = badgeStyle("yellow", 21);
+
+/** A dtype as pandas prints it, in a gray house badge that turns the
+ *  highlighter's yellow while the narration points at it. */
 const Dtype: React.FC<{ children: React.ReactNode; lit?: number }> = ({ children, lit = 0 }) => (
   <span
     style={{
       ...mono(21, INK_SOFT),
-      display: "inline-block",
-      padding: "2px 12px",
-      border: `1.5px solid ${HAIRLINE}`,
-      borderRadius: 14,
-      background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, transparent)`,
+      ...GRAY_BADGE,
+      background: `color-mix(in srgb, ${LIT_BADGE.background} ${Math.round(lit * 100)}%, ${GRAY_BADGE.background})`,
+      color: `color-mix(in srgb, ${LIT_BADGE.color} ${Math.round(lit * 100)}%, ${GRAY_BADGE.color})`,
     }}
   >
     {children}

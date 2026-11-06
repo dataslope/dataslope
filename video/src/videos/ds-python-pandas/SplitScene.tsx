@@ -1,9 +1,9 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Badge, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SPLIT } from "./data";
@@ -18,11 +18,10 @@ import {
   Mark,
   MARK,
   MARK_KEY,
-  Mono,
   TableName,
-  Tag,
   X0,
 } from "./parts";
+import { CODE_BADGE, Mono, QMono } from "./mono";
 
 const TOP = 340;
 const SPLIT_X = 560;
@@ -171,9 +170,9 @@ export const SplitScene: React.FC = () => {
         {/* ── What groupby returns ── */}
         <Listing lines={['df.groupby("region")']} x={X0} top={objTop} width={420} size={SIZE} at={aloneAt} />
         <Note at={objAt} x={X0} y={objTop + listingHeight(1, SIZE) + h(30)}>
-          <Tag size={24} mono>
+          <Badge tone="blue" size={24} style={CODE_BADGE}>
             {SPLIT.grouped}
-          </Tag>
+          </Badge>
         </Note>
         <Note at={nothingAt} x={X0} y={objTop + listingHeight(1, SIZE) + h(96)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -190,7 +189,11 @@ export const SplitScene: React.FC = () => {
           marks={S.rows.map((_, row) => ({ row, col: 0, at: indexAt + row * 3 }))}
         />
         <Note at={seriesAt + 4} x={oneX} y={og.rowTop(S.rows.length) + h(22)}>
-          <Tag size={22}>Series</Tag>
+          <span style={label(22)}>
+            <Badge tone="blue" size={22}>
+              Series
+            </Badge>
+          </span>
         </Note>
 
         <Listing lines={N.lines} x={namedX} top={y(TOP)} width={520} size={SIZE} at={nameAt - 4} />
@@ -202,7 +205,11 @@ export const SplitScene: React.FC = () => {
           marks={N.rows.map((_, row) => ({ row, col: 0, at: indexAt + 4 + row * 3 }))}
         />
         <Note at={frameAt + 4} x={namedX} y={ng.rowTop(N.rows.length) + h(22)}>
-          <Tag size={22}>DataFrame</Tag>
+          <span style={label(22)}>
+            <Badge tone="blue" size={22}>
+              DataFrame
+            </Badge>
+          </span>
         </Note>
         <Note at={resetAt} x={X0} y={y(744)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>

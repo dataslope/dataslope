@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT_INK, HIGHLIGHT, INK, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Headline, Kicker, pulse, Spot, X0 } from "./parts";
@@ -17,6 +17,13 @@ const ROW_PITCH = 86;
 /** The questions taken slowly; the rest are the rapid-fire round. */
 const TRAPS = 10;
 const TOTAL = 14;
+/** A tile is the house badge as a tile (editorial/ui): gray tint, gray ink,
+ *  no border. A trap turns to the trap's red badge, tint and ink, as the
+ *  narration counts it. */
+const PLAIN = badgeStyle("gray", 28);
+const TRAP = badgeStyle("red", 28);
+/** `a` over `b` by `t` (0..1). */
+const mixTo = (a: string, t: number, b: string) => `color-mix(in srgb, ${a} ${(t * 100).toFixed(1)}%, ${b})`;
 
 /**
  * The opening, as in Parts 1 and 2: the number and what it means, and the
@@ -52,7 +59,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-pencil" at={startAt + 2} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <Kicker at={from}>Data analyst interview prep</Kicker>
+        <Kicker at={from}>Data analyst interview questions</Kicker>
         <Headline lead="Here's a number." turn="What does it mean?" at={numberAt - 6} turnAt={meansAt - 4} size={72} />
 
         <Spot id="da-statistics-communication-elephant" at={from + 4} left={1150} top={y(290)} width={640} height={460} />
@@ -68,7 +75,8 @@ export const HookScene: React.FC = () => {
           const tone = trap ? ease(frame, tenAt + i, 10) : ease(frame, fourteenAt + (i - TRAPS), 10);
           const lit = i === 0 ? ease(frame, startAt, 10) : 0;
           const dim = i === 0 ? 0 : ease(frame, startAt + 4, 14) * 0.55;
-          const border = trap ? `color-mix(in srgb, ${ACCENT} ${30 + 70 * tone}%, ${INK_SOFT})` : INK_SOFT;
+          const tile = trap ? mixTo(String(TRAP.background), tone, String(PLAIN.background)) : String(PLAIN.background);
+          const ink = trap ? mixTo(String(TRAP.color), tone, String(PLAIN.color)) : String(PLAIN.color);
           return (
             <div
               key={i}
@@ -78,18 +86,16 @@ export const HookScene: React.FC = () => {
                 top: y(GRID_Y + row * ROW_PITCH),
                 width: TILE_W,
                 height: h(TILE_H),
-                boxSizing: "border-box",
-                border: `${trap ? 2 + tone : 2}px solid ${border}`,
                 borderRadius: 8,
-                background: lit > 0 ? HIGHLIGHT : trap ? `color-mix(in srgb, ${ACCENT} ${8 * tone}%, ${PAPER})` : PAPER,
+                background: lit > 0 ? HIGHLIGHT : tile,
                 opacity: p * (trap ? 1 : 0.45 + 0.55 * tone) * (1 - dim),
                 transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.06 * pulse(frame, startAt, 16)})`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(28, trap && tone > 0.5 ? ACCENT_INK : INK),
+                ...label(28, ink),
                 ...TABULAR,
-                fontWeight: 700,
+                fontWeight: 600,
               }}
             >
               {i + 1}

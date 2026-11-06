@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, RapidFire, type RapidItem } from "../../editorial/interview";
+import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
@@ -23,6 +23,7 @@ import {
   Spot,
   X0,
 } from "./parts";
+import { QMono } from "./mono";
 
 /** Where the answers go: right of the list. */
 const R_X = 740;

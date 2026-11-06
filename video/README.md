@@ -42,7 +42,7 @@ ids that sort in course order:
 The `Logo-Reveals` folder holds twenty short brand clips: five stings,
 eight course openers and seven variations of the columns opener (see
 [Logo reveals](#logo-reveals)). The `Thumbnails` folder holds a YouTube
-thumbnail for each merged course and interview track, in four designs (see
+thumbnail for each merged course and interview track (see
 [YouTube thumbnails](#youtube-thumbnails)).
 
 A deep dive (`Llm-2-1-…`) is a two-minute video on one idea its unit could
@@ -218,6 +218,70 @@ Every video follows these rules.
   one in the drawn page, which also catches text that arrives as a value (a
   sheet cell "P-101", a list item): `PageAudit` in `src/editorial/audit.tsx`
   reads the page while it renders.
+- **A space stays a space.** Words set as separate elements are spaced by
+  margins, so two things can eat the space between them. An `em` gap on a
+  flex row means the row's own font size, which is the page default (16px)
+  when only the children set one: "0.36em" between 40px words came out at
+  5.8px, so set `fontSize` on the row. And a highlight drawn behind a word
+  reaches past it on both sides; every highlight component (`Mark`,
+  `Marked`, `Marker`, `Sweep`) takes the same width back as margin, so a
+  neighbour keeps a full space from the band. `check:frames` measures every
+  pair of neighbouring words on a line, a highlight counting as part of its
+  word, and fails a gap under 0.15em that holds for two samples: the "of"
+  and highlighted "2,097,152" of ListVsSet were 3.7px apart. Words meant to
+  touch (punctuation, one line of code, letters set one by one) pass.
+- **One line, one size, one family.** Words that share a line are set in one
+  size and one face: "Expected profit = $80 − $45 =" in Inter beside "$35"
+  in the serif at twice the size reads as two things. Emphasis is color,
+  weight or a highlight. A label beside a big value either matches it or
+  takes a line of its own above it; a hero number may stay large only on a
+  line of its own. Headlines, code in the mono face and super- and
+  subscripts are exempt. `check:frames` fails neighbours on a line that
+  differ in size by more than 12% or in family (`[mixed]`).
+- **No cards unless the layout needs one.** Group with spacing and
+  alignment, and separate with at most a very subtle hairline, not with
+  bordered, rounded or tinted boxes around text (the owner, 2026-11-06:
+  "Using spacing or very subtle separators should be preferred"). Code
+  listings and data tables keep the house look, since there the frame is
+  the listing or the table itself. **Small badges stay** (the owner, the
+  same evening: "the little card-like badges look better"): a small tinted
+  and/or outlined chip around one word, one value, a short tag of a few
+  words, or a ringed numeral is a badge, not a card. A card is a box around
+  a sentence, a group of lines, a panel or a column. A badge's text stays
+  within 12% of the size of the text it shares a line with. **Badges have
+  no border**: a light tint of their hue, the hue's ink, rounded corners
+  (the owner, on backend Part 9's prompt ingredients: "use this style …
+  the background slightly lighter, but the no-use of border is amazing").
+  Use `Badge` / `badgeStyle(tone, size)` from `src/editorial/ui.tsx`; a
+  numbered badge is a tinted disc with no ring. Its text is semibold (600,
+  "bold looks too heavy"; a numeral in a disc at most 700) and its padding
+  is even top and bottom, so the word sits centred in its tint; do not
+  override either. A line of text under a row of badges keeps at least
+  20px clear of the tint (the owner: "make sure the description text under
+  each badge has enough top spacing").
+  **Items set side by side take a vertical hairline between them** (the
+  owner: "When there are items laid out horizontally, I think subtle
+  separators will help"): two, three or four columns of text get a 1px
+  `HAIRLINE` rule in each gap, the height of the column's text, centred in
+  the gap and at least 24px from the text on either side. Not before the
+  first column or after the last, and not between words on one line (a
+  middle dot does that). It inks in with the column to its right.
+  **Not where the columns already carry their own rule** (the owner, on
+  WhyNormalization's three anomalies, each under a short rule: "There
+  shouldn't be any vertical separators here"): a column with its own top
+  rule, kicker rule or heading rule is already grouped, so it takes no
+  vertical hairline. **Leave room under a rule** (the same note: "add more
+  spacing after each horizontal line"): at least 28px between a horizontal
+  rule and the text under it.
+  `ColumnRule` in `src/editorial/ui.tsx` draws one.
+  **A card that comes off leaves its padding behind as space** (the owner:
+  "ensure that there are enough spacing between items after removing a
+  card design"). The box was doing the grouping; without it, space has to.
+  Space between groups is clearly larger than space inside one: at least
+  40px between groups (a source block and its first figure, one stat and
+  the next), 10 to 14px inside a group (a label and its bar, a title and
+  its note), and about 25px between rows of text. A label sits closer to
+  the thing it names than to the thing above it.
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative
@@ -629,34 +693,38 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
 
 ## YouTube thumbnails
 
-Stills in the Studio's `Thumbnails` folder, one per merged course and
-interview track in each of four designs, 1280x720:
-`Thumb-<Design>-<Track>`, e.g. `Thumb-Clean-DatabaseDesign`. An interview
-track comes twice, saying "Interview Prep" (`…-DataEngineer-Prep`) or
-"Interview Preparation" (`…-DataEngineer-Preparation`). Each track has its
-own watercolor animal, so the seven read apart at a glance in a list of
-results: an owl on a die (Statistics), an elephant at a card catalog
-(Database Design), a llama with books (LLMs), a parrot (NLP), a raccoon (Data
-Analyst), and the otter and meerkat of the Data Scientist and Data Engineer
-overviews.
+Stills in the Studio's `Thumbnails` folder, 1280x720. A course has
+"Full Course" above its title, smaller (`Small`) or at its size (`Same`),
+with the animal low (`Bottom`) or high (`Top`). An interview track says
+"Interview Questions" with the animal hung top-right and a green mark,
+green being the interview series' color against the courses' blue: the
+role in green (`GreenRole`), or the role in black and the label in green
+after it (`GreenLabel`) or above it (`GreenLabelFirst`); `BlueRole` and
+`BlackRole` remain for comparison. Other labels ("Interview Prep"), greys
+and green shades are props. For example `Thumb-DatabaseDesign-Same-Top` or
+`Thumb-DataEngineer-Questions-GreenLabel-Top`.
 
-| Design | Look |
-| --- | --- |
-| `clean` | white page, the title in black, "Full Course" or "Interview Prep" in blue under it, the animal on the right |
-| `spotlight` | the same, the animal on a pale brand-blue disc |
-| `panel` | the words in white on a brand-blue panel, the kind of video in yellow, the animal stepping over the panel's edge |
-| `columns` | the columns opener's scheme: a hairline down the left, the kind of video in black, the title in blue |
+Each track has its own watercolor animal, so the seven read apart at a
+glance in a list of results: an owl on a die (Statistics), an elephant at a
+card catalog (Database Design), a llama with books (LLMs), a parrot (NLP), a
+raccoon (Data Analyst), and the otter and meerkat of the Data Scientist and
+Data Engineer overviews.
 
-- **One size, like the openers.** Every word is set at `SIZE` (80px), and no
-  weight is above 600: weight (400 or 600) and color tell the lines apart,
-  never size. The wordmark is the one exception, set as the site header sets
-  it. No pills or badges; the words sit on the page.
+A white page, the Dataslope mark alone in the top-left corner (no
+wordmark), the words low on the left and the animal on the right: standing
+on the line the words end on, or hung from the top-right corner, level with
+the mark and as far in from the edge.
+
+- **One weight, one pitch.** Every word is Inter 500 and every line sits on
+  the title's line pitch, blue or green lines included, with nothing added
+  between them. The title is 80px (`SIZE`); a course's "Full Course" is
+  52px or the title's size. No pills or badges; the words sit on the page.
 - **Seen small.** A thumbnail is about 168x94 on a phone, where 80px is about
-  10px, so the words are few. The widest line, "Natural Language", fits the
-  680px the words have; "Interview Preparation" does not, so it takes two
-  lines.
+  10px, so the words are few. "Interview Questions", the widest line at
+  about 730px, fits beside the animal hung top-right; "Interview
+  Preparation" does not fit at all, so it takes two lines.
 - **Nothing in the bottom-right corner**, where YouTube prints the running
-  time. The animal stands on the bottom of a box that stops short of it.
+  time. The animal's box stops well short of it.
 - **The art goes through the pipeline.** The five new animals are prompts in
   `src/thumbnails/illustrations.json` (watercolor, 1024x1024, transparent),
   generated and imported like any video's art:
@@ -665,7 +733,7 @@ overviews.
   are one entry in `TRACKS` (`src/thumbnails/Thumbnail.tsx`).
 
 ```bash
-npx remotion still src/index.ts Thumb-Clean-DatabaseDesign out/thumb.png
+npx remotion still src/index.ts Thumb-DatabaseDesign-Small-Bottom out/thumb.png
 ```
 
 ## Sound effects (SamplingBias, ThinkingStatistically)
@@ -789,7 +857,7 @@ level, for listening.
 | Video | Effects under the narration | Effects' peak | Speech over effects (median, 50 ms) |
 | --- | --- | --- | --- |
 | SamplingBias | 17.5 LU (-42.3 against -24.8 LUFS) | -23 dBFS | 19.9 dB |
-| ThinkingStatistically | 18.9 LU (-43.6 against -24.7 LUFS) | -21 dBFS, the logo, with nothing under it | 22.5 dB |
+| ThinkingStatistically | 21.9 LU (-46.6 against -24.6 LUFS) | -27.1 dBFS at 0:05.6 | 22.0 dB |
 
 About 15 LU under or more reads as subtle. The "closest" moments are 50 ms
 readings, so a knock that lands in the gap between two words can briefly
@@ -932,7 +1000,9 @@ npm test              # timing, scene cuts, word cues, voices, arrowheads
 npm run check:cues    # every word cue says which occurrence it means (no render)
 npm run check:frames  # a frame every half second at --scale=2 (about a minute):
                       # illustrations sharp at 4K, arrowheads on straight ends,
-                      # no hyphen set in tabular figures
+                      # no hyphen set in tabular figures, a space between words,
+                      # one size and one family per line
+                      # (CHECK_SCALE=1 for a quicker layout-only sweep)
 npm run check:sync -- <video>   # a voiced video: every beat starts where its cue says
 npm run check:mix -- <video>    # a video with sound effects: how far under the voice they sit
 npm run check:motion -- <video> # the picture never holds still for 3 s (renders a half-size preview)

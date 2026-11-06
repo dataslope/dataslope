@@ -4,16 +4,19 @@ import { ease } from "../../components/motion";
 import { OK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { badgeStyle, Ink, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { WHERE } from "./data";
-import { Drift, ElbowArrow, Listing, Mark, MARK_OK, Mono, X0 } from "./parts";
+import { Drift, ElbowArrow, Listing, Mark, MARK_OK, X0 } from "./parts";
+import { Mono } from "./mono";
 
 const SIZE = 24;
 const LIST_Y = 300;
 const LIST_W = 640;
+/** A step badge's diameter. */
+const BADGE = 36;
 const STEP_X = 880;
 const STEP_Y = 300;
 const STEP_PITCH = 62;
@@ -115,7 +118,7 @@ export const OrderScene: React.FC = () => {
           const s = stepOf(line);
           if (s < 0) return null;
           return (
-            <Ink key={i} at={stepAt[s] + 2} dur={10} style={{ left: X0 + LIST_W - 52, top: y(LIST_Y) + g.padY + i * g.lineH + g.lineH / 2 - 15 }}>
+            <Ink key={i} at={stepAt[s] + 2} dur={10} style={{ left: X0 + LIST_W - 52, top: y(LIST_Y) + g.padY + i * g.lineH + g.lineH / 2 - BADGE / 2 }}>
               <StepBadge n={s + 1} />
             </Ink>
           );
@@ -247,21 +250,30 @@ export const OrderScene: React.FC = () => {
   );
 };
 
-/** A step's number in a ring. */
+/** The step discs' gray, a little stronger than the house badge's, so the
+ *  discs on the listing's gray ground read as clearly as those on the page. */
+const STEP_TINT = "color-mix(in srgb, var(--ds-gray-400) 40%, transparent)";
+
+/** A step's number on a tinted disc, the house badge with no ring. 24px,
+ *  within 12% of the run order's 26px clauses and level with the listing's
+ *  24px lines, so each line keeps one size; the disc is 36 to hold it,
+ *  inside the listing's 43px line. */
 const StepBadge: React.FC<{ n: number }> = ({ n }) => (
   <span
     style={{
+      ...label(24, INK),
+      ...badgeStyle("gray", 24),
+      background: STEP_TINT,
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
-      width: 32,
-      height: 32,
+      width: BADGE,
+      height: BADGE,
+      flex: "none",
+      boxSizing: "border-box",
+      padding: 0,
       borderRadius: 999,
-      border: `2px solid ${INK}`,
-      background: PAPER,
-      ...label(19, INK),
       ...TABULAR,
-      fontWeight: 700,
     }}
   >
     {n}

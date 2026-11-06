@@ -42,9 +42,11 @@ const Phrase: React.FC<{ at: number; underlineAt: number; color: string; childre
   );
 };
 
-/** What a phrase rules out, set after it on the same line. */
+/** What a phrase rules out, set after it on the same line. 116px clear of
+ *  the phrase, more than a word's space at its 91px, so the small two-line
+ *  gloss reads as a note in the margin rather than as words of the line. */
 const Gloss: React.FC<{ at: number; form: string; gist: string; color: string }> = ({ at, form, gist, color }) => (
-  <Ink at={at} dur={14} style={{ position: "relative", alignSelf: "center", marginLeft: 36, whiteSpace: "nowrap" }}>
+  <Ink at={at} dur={14} style={{ position: "relative", alignSelf: "center", marginLeft: 116, whiteSpace: "nowrap" }}>
     <div style={{ ...label(24, color), fontWeight: 700 }}>{form}</div>
     <div style={{ ...note(21, INK_SOFT), marginTop: 4 }}>{gist}</div>
   </Ink>

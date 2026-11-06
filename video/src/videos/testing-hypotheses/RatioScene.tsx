@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, INK, INK_SOFT, PAPER } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { body, INK, INK_SOFT, PAPER } from "../../editorial/style";
+import { ColumnRule, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter } from "./data";
@@ -14,9 +14,22 @@ const CX = 1340;
 const UNIT = 120;
 const M_BASE = 600;
 const M_TALL = 220;
-const CARD_Y = 690;
-const CARD_W = 500;
-const CARD_X = [160, 710, 1260];
+/** The three designs: three plain columns of one width, each a title and
+ *  under it a sketch of the data it takes, both set flush to the column's
+ *  left edge, with a hairline centred in each of the two equal gaps instead
+ *  of a box round each. The widest column as drawn (the middle one's two
+ *  strips) runs about 412px, so 420px columns with 170px gaps span the
+ *  page's 160 to 1760. */
+const DESIGN_Y = 690;
+const DESIGN_W = 420;
+const DESIGN_GAP = 170;
+const DESIGN_X = [0, 1, 2].map((i) => 160 + i * (DESIGN_W + DESIGN_GAP));
+const RULE_X = [0, 1].map((i) => DESIGN_X[i] + DESIGN_W + DESIGN_GAP / 2);
+/** How far in each sketch's first mark sits, so the sketch can be set flush
+ *  left: its leftmost dot's centre, less the dot's radius. */
+const DOT_R = 6;
+/** A title's line, then its sketch 11px under it, in px. */
+const SKETCH_DY = 42;
 
 const J1 = jitter(51, 14);
 const J2 = jitter(52, 14);
@@ -62,39 +75,34 @@ export const RatioScene: React.FC = () => {
   const sig = ease(frame, gapAt - 2, 14);
   const noi = ease(frame, seAt - 4, 14);
 
-  const card = (i: number, at: number, title: string, draw: React.ReactNode) => {
+  const design = (i: number, at: number, title: string, inset: number, draw: React.ReactNode) => {
     const p = ease(frame, at - 4, 14);
     if (p <= 0) return null;
     return (
       <div
         style={{
           position: "absolute",
-          left: CARD_X[i],
-          top: y(CARD_Y),
-          width: CARD_W,
-          height: h(200),
-          border: `2px solid ${HAIRLINE}`,
-          borderRadius: 10,
+          left: DESIGN_X[i],
+          top: y(DESIGN_Y) + 18,
           opacity: p,
           transform: `translateY(${(1 - p) * 18}px)`,
-          boxSizing: "border-box",
-          padding: "16px 22px",
         }}
       >
         <Label size={26}>{title}</Label>
-        <svg width={CARD_W - 44} height={h(200) - 70} style={{ position: "absolute", left: 22, top: 58, overflow: "visible" }}>
-          {draw}
+        <svg width={DESIGN_W} height={sketchH} style={{ position: "absolute", left: 0, top: SKETCH_DY, overflow: "visible" }}>
+          <g transform={`translate(${-inset} 0)`}>{draw}</g>
         </svg>
       </div>
     );
   };
-  const cardH = h(200) - 70;
+  const sketchH = h(200) - 70;
   const strip = (j: readonly number[], cx: number, cy: number, spread: number, fill: string) =>
-    j.map((v, k) => <circle key={k} cx={cx + (v - 0.5) * spread} cy={cy + ((k % 3) - 1) * 9} r={6} fill={fill} stroke={PAPER} strokeWidth={1.2} />);
+    j.map((v, k) => <circle key={k} cx={cx + (v - 0.5) * spread} cy={cy + ((k % 3) - 1) * 9} r={DOT_R} fill={fill} stroke={PAPER} strokeWidth={1.2} />);
+  const stripInset = (j: readonly number[], cx: number, spread: number) => cx + (Math.min(...j) - 0.5) * spread - DOT_R;
 
   return (
     <AbsoluteFill>
-      {/* ── Sound: the two halves of the ratio, the mounds moving, the cards ── */}
+      {/* ── Sound: the two halves of the ratio, the mounds moving, the designs ── */}
       <Sfx name="el-tap" at={gapAt - 2} level={-29} />
       <Sfx name="el-tap" at={seAt - 4} level={-30} />
       <Sfx name="el-whoosh" at={bigAt - 4} level={-34} />
@@ -108,7 +116,9 @@ export const RatioScene: React.FC = () => {
 
       {/* ── The ratio ── */}
       <div style={{ position: "absolute", left: 160, top: y(330), opacity: ease(frame, ratioAt - 6, 14), display: "flex", alignItems: "center", gap: 28 }}>
-        <span style={{ ...body(84, true), color: INK }}>t =</span>
+        {/* "t =" at the size of the terms it equals, as a display formula
+            sets it: at twice their size it read as a second line size. */}
+        <span style={{ ...body(44, true), color: INK }}>t =</span>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
           <span style={{ ...body(40, true), color: STAT_INK, opacity: sig, whiteSpace: "nowrap" }}>the gap you observed</span>
           <div style={{ width: 430 * ease(frame, ratioAt - 4, 16), height: 3, background: INK }} />
@@ -165,43 +175,48 @@ export const RatioScene: React.FC = () => {
       </Note>
 
       {/* ── The three designs ── */}
-      <Ink at={designsAt - 4} dur={14} style={{ left: 160, top: y(CARD_Y) - 46, whiteSpace: "nowrap" }}>
+      <Ink at={designsAt - 4} dur={14} style={{ left: 160, top: y(DESIGN_Y) - 46, whiteSpace: "nowrap" }}>
         <Label size={22} color={INK_SOFT}>
           Three designs
         </Label>
       </Ink>
-      {card(
+      {design(
         0,
         targetAt,
         "One group against a target",
+        stripInset(J1, 200, 220),
         <>
-          {strip(J1, 200, cardH / 2, 220, DOT)}
-          <line x1={250} x2={250} y1={4} y2={cardH - 4} stroke={INK} strokeWidth={2.2} strokeDasharray="6 5" />
+          {strip(J1, 200, sketchH / 2, 220, DOT)}
+          <line x1={250} x2={250} y1={4} y2={sketchH - 4} stroke={INK} strokeWidth={2.2} strokeDasharray="6 5" />
         </>,
       )}
-      {card(
+      <ColumnRule x={RULE_X[0]} top={y(DESIGN_Y) + 18} height={SKETCH_DY + sketchH} at={separateAt - 2} />
+      {design(
         1,
         separateAt,
         "Two separate groups",
+        stripInset(J1, 130, 170),
         <>
-          {strip(J1, 130, cardH / 2, 170, RAW)}
-          {strip(J2, 320, cardH / 2, 170, DATA)}
+          {strip(J1, 130, sketchH / 2, 170, RAW)}
+          {strip(J2, 320, sketchH / 2, 170, DATA)}
         </>,
       )}
-      {card(
+      <ColumnRule x={RULE_X[1]} top={y(DESIGN_Y) + 18} height={SKETCH_DY + sketchH} at={sameUnitsAt - 2} />
+      {design(
         2,
         sameUnitsAt,
         "The same units, measured twice",
+        90 + Math.min(...J1.slice(0, 6)) * 60 - DOT_R,
         <>
           {J1.slice(0, 6).map((v, k) => {
-            const yy = 12 + k * ((cardH - 24) / 5);
+            const yy = 12 + k * ((sketchH - 24) / 5);
             const x0 = 90 + v * 60;
             const x1 = x0 + 150 + J2[k] * 40;
             return (
               <g key={k}>
                 <line x1={x0} x2={lerp(x0, x1, ease(frame, twiceAt - 4 + k * 2, 10))} y1={yy} y2={yy} stroke={STAT} strokeWidth={2} opacity={0.7} />
-                <circle cx={x0} cy={yy} r={6} fill={RAW} stroke={PAPER} strokeWidth={1.2} />
-                <circle cx={x1} cy={yy} r={6 * ease(frame, twiceAt + 4 + k * 2, 8)} fill={DATA} stroke={PAPER} strokeWidth={1.2} />
+                <circle cx={x0} cy={yy} r={DOT_R} fill={RAW} stroke={PAPER} strokeWidth={1.2} />
+                <circle cx={x1} cy={yy} r={DOT_R * ease(frame, twiceAt + 4 + k * 2, 8)} fill={DATA} stroke={PAPER} strokeWidth={1.2} />
               </g>
             );
           })}

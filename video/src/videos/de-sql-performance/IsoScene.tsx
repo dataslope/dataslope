@@ -4,11 +4,10 @@ import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
+import { badgeStyle, type BadgeTone, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { Drift, OK_INK, X0 } from "./parts";
 
@@ -33,6 +32,8 @@ const LEVELS = [
 const ANOMALIES = ["dirty read", "non-repeatable", "phantom"];
 
 const mono = (size: number, color: string = INK) => svgText({ fontFamily: MONO, fontSize: size, fontWeight: 600, color });
+/** "Postgres default", as a yellow badge beside its row. */
+const DEFAULT_BADGE = badgeStyle("yellow", 20);
 
 /** One event on a lane: a dot, its statement above, a value under it. */
 const Event: React.FC<{ x: number; y: number; at: number; text: string; color?: string; out?: number }> = ({ x, y, at, text, color = INK, out }) => {
@@ -49,15 +50,17 @@ const Event: React.FC<{ x: number; y: number; at: number; text: string; color?: 
   );
 };
 
-/** What a read returned: a value in a rounded tag under its dot. */
-const Value: React.FC<{ x: number; y: number; at: number; value: string; color: string; out?: number }> = ({ x, y, at, value, color, out }) => {
+/** What a read returned: the value as the house's badge (a tint of its
+ *  hue, the hue's ink, no border) under its dot. */
+const Value: React.FC<{ x: number; y: number; at: number; value: string; tone: BadgeTone; out?: number }> = ({ x, y, at, value, tone, out }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
   if (p <= 0) return null;
+  const b = badgeStyle(tone, 20);
   return (
     <g opacity={p}>
-      <rect x={x - 34} y={y + 16} width={68} height={34} rx={17} fill={PAPER} stroke={color} strokeWidth={2} />
-      <text x={x} y={y + 40} textAnchor="middle" style={mono(20, color)}>
+      <rect x={x - 32} y={y + 17} width={64} height={32} rx={b.borderRadius as number} style={{ fill: String(b.background) }} />
+      <text x={x} y={y + 40} textAnchor="middle" style={{ ...mono(20, String(b.color)), fontWeight: 700 }}>
         {value}
       </text>
     </g>
@@ -165,12 +168,12 @@ export const IsoScene: React.FC = () => {
 
           {/* A's two reads, and the read before B commits. */}
           <Event x={readOne} y={laneA} at={readsAt} text="read" color={BLUE_INK} />
-          <Value x={readOne} y={laneA} at={readsAt + 6} value="100" color={BLUE_INK} />
+          <Value x={readOne} y={laneA} at={readsAt + 6} value="100" tone="blue" />
           <Event x={dirtyRead} y={laneA} at={dirtyAt - 2} text="read" color={ACCENT_INK} out={rcAt} />
-          <Value x={dirtyRead} y={laneA} at={dirtyAt + 4} value="50" color={ACCENT_INK} out={rcAt} />
+          <Value x={dirtyRead} y={laneA} at={dirtyAt + 4} value="50" tone="red" out={rcAt} />
           <Event x={readTwo} y={laneA} at={readsAt + 8} text="read again" color={BLUE_INK} />
-          <Value x={readTwo} y={laneA} at={fiftyAt} value="50" color={ACCENT_INK} out={bothAt} />
-          <Value x={readTwo} y={laneA} at={bothAt + 2} value="100" color={OK_INK} />
+          <Value x={readTwo} y={laneA} at={fiftyAt} value="50" tone="red" out={bothAt} />
+          <Value x={readTwo} y={laneA} at={bothAt + 2} value="100" tone="green" />
         </svg>
 
         {/* What the current level does, on the right. */}
@@ -213,8 +216,9 @@ export const IsoScene: React.FC = () => {
                 ))}
                 {isDefault ? (
                   <g opacity={ease(frame, defaultAt, 10)}>
-                    <rect x={colX(2) + COL_W - 6} y={yy - 26} width={196} height={36} rx={18} fill={`color-mix(in srgb, ${ds("yellow", 400)} 70%, ${PAPER})`} />
-                    <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText(label(20, INK))}>
+                    {/* The house's badge, in the highlighter's yellow. */}
+                    <rect x={colX(2) + COL_W} y={yy - 25} width={184} height={32} rx={DEFAULT_BADGE.borderRadius as number} style={{ fill: String(DEFAULT_BADGE.background) }} />
+                    <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText({ ...label(20, String(DEFAULT_BADGE.color)), fontWeight: 700 })}>
                       Postgres default
                     </text>
                   </g>

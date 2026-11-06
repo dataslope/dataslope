@@ -263,7 +263,8 @@ export const SpreadScene: React.FC = () => {
 
       {/* The rule. */}
       <Ink at={ruleFrom - 4} dur={18} style={{ left: TABLE_X, top: Y(548), width: 530 }}>
-        <div style={{ height: 1, background: INK, marginBottom: 18 }} />
+        {/* 28px under the rule: room under a rule. */}
+        <div style={{ height: 1, background: INK, marginBottom: 28 }} />
         <div style={label(20, ACCENT_INK)}>The rule</div>
         <div style={{ ...body(30), color: INK, marginTop: 10 }}>
           <Marker at={thatSpreadAt - 2}>Spread of the average</Marker>

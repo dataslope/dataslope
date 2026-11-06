@@ -124,7 +124,9 @@ export const SurveyScene: React.FC = () => {
         Your question is about {fmtInt(SURVEY.customers)}.
       </Ink>
 
-      <Spot id="thinking-statistically-barrel" at={customersAt - 4} left={1470} top={y(104)} width={310} height={313} />
+      {/* The customers, as a barrel of apples: small, top-aligned with the
+          headline, and right-aligned with the two names below. */}
+      <Spot id="thinking-statistically-barrel" at={customersAt - 4} left={1590} top={y(150)} width={190} height={192} />
 
       <FigLabel
         n="3"

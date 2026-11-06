@@ -8,12 +8,16 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DASHBOARD } from "./data";
-import { Drift, LineSet, PanelTitle, Verdict, YTicks } from "./parts";
+import { ColumnRule, Drift, LineSet, PanelTitle, Verdict, YTicks } from "./parts";
 
 const GRID = { x: 200, y: 340, w: 168, hgt: 128, gap: 14 };
 const CREEP = { x0: 1100, x1: 1660, base: 760, top: 440, hi: 45 };
-const CARD = { y: 360, w: 620, hgt: 310 };
-const CARDS_X = [220, 1080];
+/** Question 12: a dashboard and a report as two columns of plain text, each
+ *  a serif name over its lines, with a hairline centred in the gap between
+ *  the left column's longest line (about 640px) and the right column. */
+const COLS = { y: 388, titleH: 46, lineH: 36, lineGap: 22 };
+const COLS_X = [220, 1080];
+const COLS_RULE_X = 860;
 
 /**
  * Questions 11 and 12. A dashboard grid whose key metric is made the biggest
@@ -166,7 +170,7 @@ export const DashScene: React.FC = () => {
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>an executive summary differs from an ops monitoring view</span>
         </Note>
 
-        {/* ── Question 12: what each is for ── */}
+        {/* ── Question 12: what each is for, side by side ── */}
         {[
           {
             title: "Dashboard",
@@ -187,37 +191,41 @@ export const DashScene: React.FC = () => {
               { at: deeperAt, text: "drives deeper analysis", strong: true },
             ],
           },
-        ].map((card, k) => {
-          const p = ease(frame, card.at - 4, 14);
+        ].map((col, k) => {
+          const p = ease(frame, col.at - 4, 14);
           if (p <= 0) return null;
-          const x = CARDS_X[k];
           return (
             <div
-              key={card.title}
+              key={col.title}
               style={{
                 position: "absolute",
-                left: x,
-                top: y(CARD.y),
-                width: CARD.w,
-                height: h(CARD.hgt),
-                boxSizing: "border-box",
-                border: `1.5px solid ${HAIRLINE}`,
-                borderRadius: 12,
-                padding: "28px 34px",
-                background: PAPER,
+                left: COLS_X[k],
+                top: y(COLS.y),
                 opacity: p,
                 transform: `translateY(${(1 - p) * 14}px)`,
               }}
             >
-              <div style={{ ...headline(44), color: INK }}>{card.title}</div>
-              {card.lines.map((l) => (
-                <div key={l.text} style={{ ...note(28, INK), fontWeight: "strong" in l ? 650 : undefined, marginTop: 22, opacity: ease(frame, l.at - 2, 12), whiteSpace: "nowrap" }}>
+              <div style={{ ...headline(44), color: INK, lineHeight: `${COLS.titleH}px`, whiteSpace: "nowrap" }}>{col.title}</div>
+              {col.lines.map((l) => (
+                <div
+                  key={l.text}
+                  style={{
+                    ...note(28, INK),
+                    lineHeight: `${COLS.lineH}px`,
+                    fontWeight: "strong" in l ? 650 : undefined,
+                    marginTop: COLS.lineGap,
+                    opacity: ease(frame, l.at - 2, 12),
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {l.text}
                 </div>
               ))}
             </div>
           );
         })}
+        {/* As tall as the report's column, the longer of the two. */}
+        <ColumnRule x={COLS_RULE_X} top={y(COLS.y)} height={COLS.titleH + 4 * (COLS.lineGap + COLS.lineH)} at={reportAt - 4} />
       </Drift>
     </AbsoluteFill>
   );

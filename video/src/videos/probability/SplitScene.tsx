@@ -176,8 +176,9 @@ export const SplitScene: React.FC = () => {
       {BARS.x.map((x, i) => (
         <React.Fragment key={i}>
           <Ink at={barAt - 2 + i * 6} dur={12} style={{ left: x, top: base + 16, whiteSpace: "nowrap" }}>
-            <span style={{ ...headline(40), color: INK }}>{i === 0 ? "Paid" : "Free"}</span>
-            <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>{num(TABLE.rowTotals[i])} users</span>
+            {/* The plan's name, and its users on a line of their own. */}
+            <div style={{ ...headline(40), color: INK }}>{i === 0 ? "Paid" : "Free"}</div>
+            <div style={{ ...note(21, INK_SOFT), marginTop: 2 }}>{num(TABLE.rowTotals[i])} users</div>
           </Ink>
           {/* The split's label rides above the split, outside its bar. */}
           <div
@@ -273,17 +274,20 @@ export const SplitScene: React.FC = () => {
         })}
       </div>
       <Ink at={oneInAt - 4} dur={16} style={{ left: RIGHT, top: y(668), whiteSpace: "nowrap" }}>
-        {/* 0.5 to the tenth is 0.000977, so "about". */}
-        <span style={{ ...note(30, INK) }}>≈ {STREAK.ten.toFixed(4).replace(/0+$/, "")}, about </span>
-        <span style={{ ...headline(52, true), color: STAT_INK }}>
-          <Sweep at={oneInAt}>1 in 1,000</Sweep>
+        {/* 0.5 to the tenth is 0.000977, so "about". One line, one size:
+            the answer is the line's own Inter, in the accent and bold. */}
+        <span style={{ ...note(30, INK) }}>
+          ≈ {STREAK.ten.toFixed(4).replace(/0+$/, "")}, about{" "}
+          <span style={{ color: STAT_INK, fontWeight: 700 }}>
+            <Sweep at={oneInAt}>1 in 1,000</Sweep>
+          </span>
         </span>
       </Ink>
       </div>
 
       {/* ── The turn: which way round. The same 120 free churners, over two
            different wholes: the 500 free users, then the 150 who churned. ── */}
-      <div style={{ position: "absolute", left: RIGHT, top: y(766), height: 1, width: 660 * ease(frame, roundAt - 6, 14), background: INK, opacity: 0.5 }} />
+      <div style={{ position: "absolute", left: RIGHT, top: y(784) - 29, height: 1, width: 660 * ease(frame, roundAt - 6, 14), background: INK, opacity: 0.5 }} />
       <div
         style={{
           position: "absolute",

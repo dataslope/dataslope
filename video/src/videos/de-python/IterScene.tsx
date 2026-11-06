@@ -20,11 +20,11 @@ import {
   Mark,
   MARK_BAD,
   MARK_OK,
-  Mono,
   OK_INK,
   Title,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 322;
 const SIZE = 22;
@@ -199,7 +199,7 @@ export const IterScene: React.FC = () => {
 
         {/* ── The two definitions, each with its pass over four rows ── */}
         <Note at={iterableAt - 2} x={X0} y={defTop} out={outDefs}>
-          <span style={{ display: "flex", gap: 18, alignItems: "baseline", whiteSpace: "nowrap" }}>
+          <span style={{ display: "flex", gap: 36, alignItems: "baseline", whiteSpace: "nowrap" }}>
             <Title size={26}>iterable</Title>
             <span style={{ ...note(22, INK_SOFT) }}>
               <Mono>list</Mono>, <Mono>dict</Mono>
@@ -219,7 +219,7 @@ export const IterScene: React.FC = () => {
         <Pass x={X0} top={row1} at={freshAt + 4} label="loop 1" out={outPasses} />
         <Pass x={X0} top={row2} at={freshAt + 4 + PER} label="loop 2" out={outPasses} />
         <Note at={iteratorAt - 2} x={RIGHT_X} y={defTop} out={outDefs}>
-          <span style={{ display: "flex", gap: 18, alignItems: "baseline", whiteSpace: "nowrap" }}>
+          <span style={{ display: "flex", gap: 36, alignItems: "baseline", whiteSpace: "nowrap" }}>
             <Title size={26}>iterator</Title>
             <span style={{ ...note(22, INK_SOFT) }}>
               a generator<span style={{ opacity: ease(useCurrentFrame(), fileAt, 10) }}>, an open file</span>

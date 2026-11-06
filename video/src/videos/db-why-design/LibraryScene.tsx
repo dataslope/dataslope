@@ -12,6 +12,8 @@ import { Drift, FIG_Y, FigKey, Headline, KEY, Mark, Spot, X0 } from "./parts";
 
 const TOP = 340;
 const LOANS_Y = 520;
+/** The books spot's top: 80px and more under the note beneath the books table. */
+const BOOKS_Y = 665;
 /** The figure's right edge: borrowers' right side, where its key ends. */
 const RIGHT = 1820;
 
@@ -84,7 +86,8 @@ export const LibraryScene: React.FC = () => {
       <Headline lead="A book:" turn="the title, or the copy?" at={libFrom - 6} turnAt={copyAt - 4} out={manualAt - 4} size={72} />
       <Headline lead="Not syntax," turn="meaning." at={manualAt + 2} turnAt={meansAt - 2} size={72} />
 
-      <Spot id="db-why-design-books" at={libraryAt - 4} dim={payAt} left={X0 + 10} top={y(625)} width={316} height={300} />
+      {/* The library's books, small, under the books table and well clear of its notes. */}
+      <Spot id="db-why-design-books" at={libraryAt - 4} dim={payAt} left={X0 + 50} top={y(BOOKS_Y)} width={200} height={191} />
 
       <Drift from={libFrom} to={end} amount={0.02} origin="60% 50%">
         <div style={{ position: "absolute", inset: 0, opacity: fade }}>

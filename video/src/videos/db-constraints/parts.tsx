@@ -17,7 +17,7 @@ import {
   headline,
   label,
 } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { badgeStyle, Ink } from "../../editorial/ui";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { type Cell, ILLUSTRATIONS, VIDEO } from "./data";
@@ -134,7 +134,9 @@ export const Mark: React.FC<{ at: number; out?: number; dur?: number; color?: st
   const p = ease(frame, at, dur);
   const o = out === undefined ? 0 : ease(frame, out, 14);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.14em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.14em" }}>
       <span
         style={{
           position: "absolute",
@@ -295,6 +297,20 @@ const tokenize = (line: string): Token[] => {
 };
 
 /** A fragment of SQL, colored, at the size of the text around it. */
+/**
+ * A rule's code as a house badge (editorial/ui): gray, no border, swelling
+ * into the highlighter's yellow when the narration names it.
+ */
+const ruleBadge = (size: number, swell: number): React.CSSProperties => {
+  const gray = badgeStyle("gray", size);
+  const lit = badgeStyle("yellow", size);
+  return {
+    ...gray,
+    background: `color-mix(in srgb, ${lit.background} ${Math.round(swell * 100)}%, ${gray.background})`,
+    lineHeight: 1.2,
+  };
+};
+
 export const Code: React.FC<{ children: string; size?: number }> = ({ children, size }) => (
   <span style={{ fontFamily: MONO, fontSize: size, whiteSpace: "pre", fontVariantLigatures: "none" }}>
     {tokenize(children).map((t, i) => (
@@ -333,16 +349,7 @@ export const Pill: React.FC<{
   if (p <= 0 || o >= 1) return null;
   const swell = Math.max(0, ...pulses.map((t) => pulse(frame, t, 22)));
   const pill = (
-    <div
-      style={{
-        padding: "5px 12px 6px",
-        borderRadius: 8,
-        border: `1.5px solid ${HAIRLINE}`,
-        background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(swell * 100)}%, ${PAPER})`,
-        whiteSpace: "nowrap",
-        lineHeight: 1.2,
-      }}
-    >
+    <div style={{ ...ruleBadge(size, swell), display: "block" }}>
       <Code size={size}>{children}</Code>
     </div>
   );
@@ -457,12 +464,7 @@ export const RuleTags: React.FC<{
                 opacity: p * (1 - o),
                 transform: `translateX(${(1 - p) * -10}px) scale(${1 + swell * 0.08})`,
                 transformOrigin: "0 50%",
-                padding: "5px 12px 6px",
-                borderRadius: 8,
-                border: `1.5px solid ${HAIRLINE}`,
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(swell * 100)}%, ${PAPER})`,
-                whiteSpace: "nowrap",
-                lineHeight: 1.2,
+                ...ruleBadge(TAG_SIZE, swell),
               }}
             >
               <Code size={TAG_SIZE}>{c.code}</Code>

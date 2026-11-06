@@ -29,8 +29,8 @@ they let you model a domain and change internals without breaking callers.
 
 Encapsulation keeps an object's invariants valid by controlling access to its
 state. Instead of exposing a raw attribute, you guard mutation behind methods
-or properties that validate. Below, `BankAccount` hides `_balance` and rejects
-invalid operations, so no caller can push it negative:
+or properties that validate. Below, `BankAccount` hides `_balance` and checks
+every way in, the constructor included, so no caller can push it negative:
 
 <CodeBlock
   adapter="python"
@@ -39,9 +39,13 @@ invalid operations, so no caller can push it negative:
       filename: "main.py",
       starterCode: `class BankAccount:
     def __init__(self, balance=0):
+        if balance < 0:
+            raise ValueError("starting balance can't be negative")
         self._balance = balance          # "internal", not to be poked directly
 
     def withdraw(self, amount):
+        if amount <= 0:
+            raise ValueError("amount must be positive")
         if amount > self._balance:
             raise ValueError("insufficient funds")
         self._balance -= amount
@@ -189,7 +193,7 @@ def make_parser(kind):
     try:
         return parsers[kind]()      # caller doesn't know the concrete class
     except KeyError:
-        raise ValueError(f"unknown parser: {kind}")
+        raise ValueError(f"unknown parser: {kind}") from None
 ```
 
 ### What is the Observer pattern?
@@ -293,7 +297,7 @@ choosing inheritance.
   title="Encapsulated BankAccount"
   instructions={`Implement a \`BankAccount\` class demonstrating encapsulation.
 
-- The constructor takes an optional starting \`balance\` (default \`0\`).
+- The constructor takes an optional starting \`balance\` (default \`0\`); a negative one raises \`ValueError\`.
 - \`deposit(amount)\` increases the balance; a non-positive \`amount\` raises \`ValueError\`.
 - \`withdraw(amount)\` decreases the balance; a non-positive \`amount\` **or** an \`amount\` greater than the current balance raises \`ValueError\`.
 - A read-only \`balance\` property returns the current balance.
@@ -316,6 +320,8 @@ Example: after \`a = BankAccount(100)\`, \`a.withdraw(30)\` leaves \`a.balance\`
     # add a read-only balance property`,
       solutionCode: `class BankAccount:
     def __init__(self, balance=0):
+        if balance < 0:
+            raise ValueError("starting balance can't be negative")
         self._balance = balance
 
     def deposit(self, amount):
@@ -338,6 +344,11 @@ Example: after \`a = BankAccount(100)\`, \`a.withdraw(30)\` leaves \`a.balance\`
   tests={[
     { id: "start", name: "Starting balance", description: "Defaults to 0, accepts an initial value", code: `assert BankAccount().balance == 0
 assert BankAccount(100).balance == 100` },
+    { id: "negative-start", name: "Negative start is rejected", description: "a negative starting balance raises ValueError", code: `try:
+    BankAccount(-50)
+    assert False, "expected ValueError for a negative starting balance"
+except ValueError:
+    pass` },
     { id: "deposit", name: "Deposit increases balance", description: "deposit adds to balance", code: `a = BankAccount(100)
 a.deposit(50)
 assert a.balance == 150` },

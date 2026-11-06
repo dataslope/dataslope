@@ -73,6 +73,8 @@ export const ZipfScene: React.FC = () => {
     { title: "count", w: 140, align: "right" as const },
   ];
   const colX = COLS.map((_, i) => TX0 + COLS.slice(0, i).reduce((s, c) => s + c.w + 24, 0));
+  /** The law aside sits past 1.2em from the table, so it reads as a note, not the same line. */
+  const LAW_GAP = 36;
 
   // ── The curve ──
   const path = ZIPF.curve.map(([r, c], i) => `${i ? "L" : "M"}${lx(r).toFixed(1)},${ly(c).toFixed(1)}`).join(" ");
@@ -154,7 +156,7 @@ export const ZipfScene: React.FC = () => {
             {el as React.ReactNode}
           </Ink>
         ))}
-        <Ink at={tenthAt + 6} dur={14} style={{ left: colX[2] + COLS[2].w + 22, top: TTOP + 52 + 8 * ROW + 3, whiteSpace: "nowrap" }}>
+        <Ink at={tenthAt + 6} dur={14} style={{ left: colX[2] + COLS[2].w + LAW_GAP, top: TTOP + 52 + 8 * ROW + 3, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>
             law: ≈ <span style={TABULAR}>{fmt(ZIPF.tenthByLaw, 0)}</span>
           </span>
@@ -163,7 +165,7 @@ export const ZipfScene: React.FC = () => {
           <line x1={TX0} x2={colX[2] + COLS[2].w} y1={TTOP + 52 + 8 * ROW - 6} y2={TTOP + 52 + 8 * ROW - 6} stroke={HAIRLINE} strokeWidth={1.2} strokeDasharray="4 5" />
         </Svg>
         {/* What one over the rank expects of the second word, beside what it got. */}
-        <Ink at={halfAt - 2} dur={14} style={{ left: colX[2] + COLS[2].w + 22, top: TTOP + 52 + ROW + 3, whiteSpace: "nowrap" }}>
+        <Ink at={halfAt - 2} dur={14} style={{ left: colX[2] + COLS[2].w + LAW_GAP, top: TTOP + 52 + ROW + 3, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>
             law: ≈ <span style={TABULAR}>{fmt(ZIPF.secondByLaw, 0)}</span>
           </span>

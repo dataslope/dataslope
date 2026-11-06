@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, headline, HIGHLIGHT, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { DRAWS, ROWS, SEED, TOKENS, UNIFORMS } from "./data";
-import { FILL, Legend, TEXT, TINT } from "./kit";
+import { FILL, Legend, Marked, TEXT, TINT } from "./kit";
 
 /** Rows of tiles, in layout y, and the tiles' columns. */
 const ROW_Y = (k: number) => 344 + k * 112;
@@ -148,27 +148,34 @@ export const DrawScene: React.FC = () => {
                 </div>
               );
             })}
-            <Note at={tileAt(k, DRAWS - 1) + 4} x={COUNT_X} y={top + h(TILE_H) / 2 - 27}>
-              <span style={{ display: "inline-flex", alignItems: "baseline", gap: 8, whiteSpace: "nowrap" }}>
+            {/* The count, and under it what it is out of: two lines, so each
+                is one size and one face. */}
+            <Note at={tileAt(k, DRAWS - 1) + 4} x={COUNT_X} y={top + h(TILE_H) / 2 - 41}>
+              <span style={{ display: "block", whiteSpace: "nowrap" }}>
                 <span
-                  style={{ ...headline(44), color: TEXT[0], fontVariantNumeric: "tabular-nums lining-nums" }}
+                  style={{ display: "block", ...headline(44), color: TEXT[0], fontVariantNumeric: "tabular-nums lining-nums" }}
                 >
-                  {r.counts[0]}
+                  {/* The count the narration reads, all twenty then only
+                      eleven, under the highlighter; the negative margin gives
+                      back the room the stroke takes, so every row's count
+                      keeps one left edge. */}
+                  {k === 0 || k === HOT ? (
+                    <span style={{ margin: "0 -0.18em" }}>
+                      <Marked at={k === 0 ? allAt - 2 : elevenAt - 2} out={k === 0 ? highAt - 4 : undefined}>
+                        {r.counts[0]}
+                      </Marked>
+                    </span>
+                  ) : (
+                    r.counts[0]
+                  )}
                 </span>
-                <span style={note(20, INK_SOFT)}>of {DRAWS}</span>
+                {/* Clear of the highlighter, which reaches below the number's line. */}
+                <span style={{ display: "block", marginTop: 10, ...note(20, INK_SOFT) }}>of {DRAWS}</span>
               </span>
             </Note>
           </React.Fragment>
         );
       })}
-
-      {/* All twenty, then only eleven: the count the narration reads. */}
-      <Ink at={allAt - 2} dur={10} out={highAt - 4} style={{ left: COUNT_X - 18, top: y(ROW_Y(0)) - 8, width: 150, height: h(TILE_H) + 16 }}>
-        <div style={{ width: "100%", height: "100%", border: `2px solid ${INK}` }} />
-      </Ink>
-      <Ink at={elevenAt - 2} dur={10} style={{ left: COUNT_X - 18, top: y(ROW_Y(HOT)) - 8, width: 150, height: h(TILE_H) + 16 }}>
-        <div style={{ width: "100%", height: "100%", border: `2px solid ${INK}` }} />
-      </Ink>
 
       {/* Rock, once. */}
       {ROCK_AT >= 0 ? (

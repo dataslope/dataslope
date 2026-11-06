@@ -2,9 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ANSWER_TOKENS, THINKING_TOKENS } from "./data";
@@ -105,8 +104,9 @@ export const BillScene: React.FC = () => {
         <span style={{ ...note(23, THINK_INK), fontWeight: 650, ...TABULAR }}>{THINKING_TOKENS} thinking tokens, hidden</span>
       </Note>
       <Ink at={total119At - 2} dur={14} style={{ left: B0, top: payY + bh + 18, width: B1 - B0 + 2, textAlign: "right" }}>
-        <span style={{ ...headline(56), color: ACCENT_INK, ...TABULAR }}>{TOTAL}</span>
-        <span style={{ ...note(24, INK), marginLeft: 12 }}>tokens at the output rate</span>
+        <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
+          <span style={{ color: ACCENT_INK, fontWeight: 700, ...TABULAR }}>{TOTAL}</span> tokens at the output rate
+        </span>
       </Ink>
 
       {/* Fig. 21: the control that is left, set low on purpose. */}
@@ -144,12 +144,12 @@ export const BillScene: React.FC = () => {
 
       {/* Every token read, written or thought ends up here. */}
       {[
-        { at: readsAt, text: "reads", color: ds("gray", 500), ink: INK_SOFT },
-        { at: writesAt, text: "writes", color: BAR, ink: BLUE_INK },
-        { at: thinksAt, text: "thinks", color: THINK, ink: THINK_INK },
+        { at: readsAt, text: "reads", tone: "gray" as const },
+        { at: writesAt, text: "writes", tone: "blue" as const },
+        { at: thinksAt, text: "thinks", tone: "purple" as const },
       ].map((c, k) => (
         <Note key={c.text} at={c.at - 2} x={X0 + 260 + k * 150} y={y(CHIPS_Y)} from="up">
-          <Tag color={c.color} ink={c.ink} size={22}>
+          <Tag tone={c.tone} size={22}>
             {c.text}
           </Tag>
         </Note>

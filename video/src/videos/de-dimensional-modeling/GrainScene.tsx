@@ -106,7 +106,8 @@ export const GrainScene: React.FC = () => {
         <Note at={declareAt} x={X0} y={y(GRAIN_Y)}>
           <span style={{ ...body(40), color: INK, whiteSpace: "nowrap" }}>
             Grain: <Mark at={lineAt}>one row per order line</Mark>
-            <span style={{ ...label(22, INK_SOFT), marginLeft: 22 }}>declared first</span>
+            {/* The same face, near the same size, as the line it finishes. */}
+            <span style={{ ...body(36, true), color: INK_SOFT }}>, declared first</span>
           </span>
         </Note>
 
@@ -144,7 +145,7 @@ export const GrainScene: React.FC = () => {
         <Note at={fifteenAt} x={g.xs[fee]} y={below + h(26)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
             <Mono>SUM(shipping_fee)</Mono> ={" "}
-            <span style={{ fontFamily: "inherit", color: ACCENT_INK, fontWeight: 800, fontSize: 30 }}>{money(total)}</span>
+            <span style={{ fontFamily: "inherit", color: ACCENT_INK, fontWeight: 800, fontSize: 26 }}>{money(total)}</span>
           </span>
         </Note>
         <Note at={fifteenAt + 10} x={g.xs[fee]} y={below + h(72)}>

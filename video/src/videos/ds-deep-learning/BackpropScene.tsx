@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -29,6 +29,8 @@ const ARROW = 60;
 const SLOPE_Y = 548;
 const PRODUCT_Y = 650;
 const PAGE_Y = 742;
+/** The red house badge whose tint picks out the middle slope. */
+const SLOPE_BADGE = badgeStyle("red", 22);
 
 /** A step of the computation: a rounded box with its operation in it. */
 const Op: React.FC<{ x: number; w: number; top: number; height: number; at: number; lit?: number; children: React.ReactNode }> = ({
@@ -169,14 +171,15 @@ export const BackpropScene: React.FC = () => {
         <Tagline x={1440} y={y(SLOPE_Y)} at={localAt} size={21}>
           each step&apos;s local slope
         </Tagline>
+        {/* The middle slope, picked out as a red house badge (its tint, no ring), under its text. */}
+        <Svg opacity={midLit}>
+          <rect x={OPS[1].x - 40} y={y(SLOPE_Y) - 6} width={OPS[1].w + 80} height={h(40)} rx={8} style={{ fill: String(SLOPE_BADGE.background) }} />
+        </Svg>
         {slopes.map((s) => (
           <Tagline key={s.text} x={s.x + s.w / 2} y={y(SLOPE_Y)} width={s.w + 80} align="center" at={s.at - 2} size={23} color={ACCENT_INK}>
             <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600 }}>{s.text}</span>
           </Tagline>
         ))}
-        <Svg opacity={midLit}>
-          <rect x={OPS[1].x - 40} y={y(SLOPE_Y) - 6} width={OPS[1].w + 80} height={h(40)} rx={6} fill="none" stroke={ACCENT} strokeWidth={2} />
-        </Svg>
 
         {/* ── Multiplied: the weight's gradient, and the same by hand ── */}
         <Note at={prodAt - 2} x={X0} y={y(PRODUCT_Y)}>

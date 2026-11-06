@@ -286,15 +286,17 @@ export const BuildScene: React.FC = () => {
         out={p1Out}
       />
       <Note at={avgAt} x={sx(X, WAIT_MU) + 14} y={y(428)} out={p1Out}>
-        <span style={{ ...body(30, true), color: INK }}>Average </span>
+        {/* One face and size on the line; the value carries weight and the accent. */}
+        <span style={{ ...note(28, INK) }}>Average </span>
         <span style={{ ...note(28, ACCENT_INK), fontWeight: 700 }}>{fmt(WAIT_MU)} min</span>
       </Note>
       <SpreadArrow from={sx(X, WAIT_MU)} to={sx(X, WAIT_MU + WAIT_SD)} y={y(546)} at={spreadAt - 2} out={p1Out} />
       <Note at={spreadAt + 2} x={sx(X, WAIT_MU) + 14} y={y(560)} out={p1Out}>
-        <span style={{ ...note(25, INK) }}>
+        <div style={{ ...note(25, INK) }}>
           Spread <span style={{ fontWeight: 700, color: ACCENT_INK }}>{fmt(WAIT_SD)} min</span>
-        </span>
-        <span style={{ ...note(21, INK_SOFT), marginLeft: 10 }}>one standard deviation</span>
+        </div>
+        {/* What the spread is, under it: one size to a line. */}
+        <div style={{ ...note(21, INK_SOFT), marginTop: 2 }}>one standard deviation</div>
       </Note>
 
       {/* ── P2: the sample strip, the averages, the second figure ── */}
@@ -329,8 +331,10 @@ export const BuildScene: React.FC = () => {
         <FallingBlock key={i} step={st} index={i} drop={DROP} />
       ))}
 
-      {/* Counter, right column. */}
-      <div style={{ position: "absolute", left: 1010, top: y(612), opacity: counter }}>
+      {/* Counter, right column, under the heading's left edge: far enough
+          from "Their averages: normal" that the big count never shares its
+          line, and 80px clear of the bell. */}
+      <div style={{ position: "absolute", left: 1180, top: y(612), opacity: counter }}>
         <div style={label(20, INK_SOFT)}>Samples drawn</div>
         <div
           style={{

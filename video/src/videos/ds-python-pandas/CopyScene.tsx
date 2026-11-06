@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Badge, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COPY } from "./data";
@@ -20,12 +20,11 @@ import {
   MARK,
   MARK_BAD,
   MARK_OK,
-  Mono,
   OK_INK,
   TableName,
-  Tag,
   X0,
 } from "./parts";
+import { CODE_BADGE, Mono } from "./mono";
 
 const TOP = 350;
 const SIZE = 24;
@@ -166,9 +165,9 @@ export const CopyScene: React.FC = () => {
 
         {/* ── pandas 3 ── */}
         <Note at={threeAt} x={RIGHT_X} y={y(FRAME_Y) - h(4)} out={outChain}>
-          <Tag size={22} mono>
+          <Badge tone="blue" size={22} style={CODE_BADGE}>
             pandas {COPY.version}
-          </Tag>
+          </Badge>
           <span style={{ ...note(24, INK_SOFT), marginLeft: 14, whiteSpace: "nowrap" }}>copy-on-write: every selection acts as a copy</span>
         </Note>
         <ErrorBox

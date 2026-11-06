@@ -3,16 +3,24 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, OK, OK_INK, TextPanel, X0 } from "./parts";
+import { ColumnRule, Drift, FlexRule, OK_INK, TextPanel, X0 } from "./parts";
 
 const TOP = 340;
 const PITCH = 66;
-const INSTEAD_X = 1000;
+/** Question 5's second column, the schema to share instead: far enough right
+ *  of the list's longest line (to about 932px) for a hairline between them
+ *  with clear space on both sides. */
+const INSTEAD_X = 1040;
+const INSTEAD_W = 760;
+const INSTEAD_RULE_X = 986;
 const COL_W = 540;
+/** The hairlines in question 6's two gaps, each centred between the longest
+ *  line on its left (a mark and about 300px of 27px text) and the next column. */
+const RULES_X = [570, 1166];
 
 /** A cross, drawn on `at`, in the trap's red. */
 const Cross: React.FC<{ at: number; size?: number }> = ({ at, size = 24 }) => {
@@ -141,10 +149,12 @@ export const PrivacyScene: React.FC = () => {
             {i === never.length - 1 ? <span style={{ color: INK_SOFT, opacity: ease(frame, healthAt - 2, 10) }}> (health, payments)</span> : null}
           </Item>
         ))}
+        {/* From the two headings to the list's last line. */}
+        <ColumnRule x={INSTEAD_RULE_X} top={top - h(54)} height={h(54) + 3 * pitch + 36} at={rowsAt0 - 2} out={out5} />
         <Note at={rowsAt0 - 2} x={INSTEAD_X} y={top - h(54)} out={out5}>
           <span style={{ ...label(22, OK_INK), whiteSpace: "nowrap" }}>Instead: the schema, and a few made-up rows</span>
         </Note>
-        <TextPanel lines={schema} x={INSTEAD_X} top={top} width={820} size={20} mono at={schemaAt - 4} lineAt={[schemaAt, madeUpAt, madeUpAt + 6]} out={out5} />
+        <TextPanel lines={schema} x={INSTEAD_X} top={top} width={INSTEAD_W} size={20} mono at={schemaAt - 4} lineAt={[schemaAt, madeUpAt, madeUpAt + 6]} out={out5} />
         <Note at={madeUpAt + 8} x={INSTEAD_X} y={top + h(160)} out={out5}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>made up for this video: no real customer in it</span>
         </Note>
@@ -156,6 +166,11 @@ export const PrivacyScene: React.FC = () => {
         <Note at={Math.min(ownAt, asked6) - 6} x={X0} y={top - h(54)}>
           <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>Be specific, and own the result:</span>
         </Note>
+        {/* A hairline centred in each gap, as tall as the taller of the two
+            columns beside it, inking in with the column to its right. */}
+        {cols.slice(1).map((c, k) => (
+          <ColumnRule key={c.head} x={RULES_X[k]} top={top} height={h(46) + (Math.max(cols[k].items.length, c.items.length) - 1) * pitch + 36} at={c.at} />
+        ))}
         {cols.map((c) => (
           <React.Fragment key={c.head}>
             {/* Every header in the same blue: keeping the definitions and the
@@ -168,6 +183,8 @@ export const PrivacyScene: React.FC = () => {
             ))}
           </React.Fragment>
         ))}
+        {/* The two ways it goes, side by side: red for the trap, green for the
+            right practice, a hairline between them. */}
         <div
           style={{
             position: "absolute",
@@ -178,19 +195,9 @@ export const PrivacyScene: React.FC = () => {
             opacity: ease(frame, hidingAt - 2, 12),
           }}
         >
-          <div style={{ padding: "14px 22px", borderLeft: `4px solid ${ACCENT}`, background: `color-mix(in srgb, ${ACCENT} 8%, ${PAPER})`, ...note(26, INK), whiteSpace: "nowrap" }}>
-            hid it, then couldn&apos;t explain a line
-          </div>
-          <div
-            style={{
-              padding: "14px 22px",
-              borderLeft: `4px solid ${OK}`,
-              background: `color-mix(in srgb, ${OK} 10%, ${PAPER})`,
-              ...note(26, INK),
-              whiteSpace: "nowrap",
-              opacity: ease(frame, openlyAt - 2, 12),
-            }}
-          >
+          <div style={{ ...note(28, ACCENT_INK), fontWeight: 650, lineHeight: "36px", whiteSpace: "nowrap" }}>hid it, then couldn&apos;t explain a line</div>
+          <FlexRule at={openlyAt - 2} />
+          <div style={{ ...note(28, OK_INK), fontWeight: 650, lineHeight: "36px", whiteSpace: "nowrap", opacity: ease(frame, openlyAt - 2, 12) }}>
             used it openly, and checked it
           </div>
         </div>

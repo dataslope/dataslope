@@ -3,8 +3,9 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, INK, TABULAR, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
+import { badgeStyle } from "../../editorial/ui";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, pulse, X0 } from "./parts";
 
@@ -75,18 +76,20 @@ export const PitfallsScene: React.FC = () => {
                   transform: `translateX(${(1 - s) * -18}px)`,
                 }}
               >
+                {/* The row's number, a red house badge as a disc (its tint, no
+                    ring), at 31px, within 12% of the 34px row beside it. */}
                 <span
                   style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 22,
-                    border: `2.5px solid ${ACCENT}`,
+                    ...note(31),
+                    ...badgeStyle("red", 31),
+                    ...TABULAR,
+                    width: 52,
+                    height: 52,
+                    padding: 0,
+                    borderRadius: 26,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    ...label(22, ACCENT_INK),
-                    fontWeight: 800,
-                    ...TABULAR,
                   }}
                 >
                   {i + 1}
@@ -106,20 +109,19 @@ export const PitfallsScene: React.FC = () => {
                   opacity={0.5}
                 />
               </svg>
+              {/* The question that answers it, a blue house badge at the
+                  leader's end, centred on the row. */}
               <div
                 style={{
+                  ...label(24),
+                  ...badgeStyle("blue", 24),
+                  ...TABULAR,
                   position: "absolute",
                   left: TAG_X,
-                  top: top + (h(ROW) - 14) / 2 - 22,
-                  padding: "6px 16px",
-                  borderRadius: 6,
-                  background: BLUE_INK,
-                  ...label(22, PAPER),
-                  fontWeight: 700,
-                  whiteSpace: "nowrap",
-                  ...TABULAR,
+                  top: top + (h(ROW) - 14) / 2 - 19,
                   opacity: tag,
                   transform: `scale(${1 + 0.08 * bump})`,
+                  transformOrigin: "left center",
                 }}
               >
                 Question {p.q}

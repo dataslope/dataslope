@@ -13,8 +13,10 @@ import { Drift, Headline, Kicker, Link, Mark, pulse, Spot } from "./parts";
 const BOX_Y = 384;
 const BOX_W = 360;
 const XS = [150, 780, 1410];
-const SENT_Y = 690;
-const SENT_STEP = 96;
+const SENT_Y = 660;
+/** Page px from a sentence to the next, and from a sentence to its verdict. */
+const SENT_STEP = 136;
+const VERDICT_DY = 70;
 
 /**
  * Part 1 opens on Unit 2's bridge: entities never live alone. Three boxes
@@ -89,7 +91,9 @@ export const VerbsScene: React.FC = () => {
       <Kicker at={hookFrom - 10}>What a relationship is</Kicker>
       <Headline lead="Entities never live alone." at={hookFrom - 6} out={relAt - 8} />
       <Headline lead="Relationships are" at={relAt - 2} turn="the verbs." turnAt={verbsAt - 4} />
-      <Spot id="db-relationships-crates" at={aloneAt - 4} left={1390} top={y(84)} width={430} height={203} />
+      {/* Two crates joined by a rope: "never live alone". Small, level with
+          the headline and centred over the products box, with white all round. */}
+      <Spot id="db-relationships-crates" at={aloneAt - 4} left={1460} top={y(126)} width={260} height={123} />
 
       <Drift from={containAt} to={verbsTo + 50} scale={0.02} origin={[960, y(520)]}>
         <Fig n="1" at={customersAt - 8} x={XS[0]} y={y(300)}>
@@ -165,24 +169,20 @@ export const VerbsScene: React.FC = () => {
           </div>
         ))}
 
-        {/* ── The line as a sentence ── */}
-        <Ink at={readsAt - 4} dur={16} style={{ left: XS[0], top: y(SENT_Y), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 28 }}>
+        {/* ── The line as a sentence, each with its verdict on a line of its own under it ── */}
+        <Ink at={readsAt - 4} dur={16} style={{ left: XS[0], top: y(SENT_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...body(46), color: INK }}>
             Customer <Mark at={placesAt + 4}>places</Mark> order.
           </span>
-          <Ink at={moreAt - 2} dur={12} style={{ position: "relative" }}>
-            <span style={{ ...note(23, INK_SOFT) }}>specific</span>
-          </Ink>
         </Ink>
-        <Ink
-          at={hasAt - 4}
-          dur={16}
-          style={{ left: XS[0], top: y(SENT_Y + SENT_STEP), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 28 }}
-        >
+        <Ink at={moreAt - 2} dur={12} style={{ left: XS[0], top: y(SENT_Y) + VERDICT_DY, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT) }}>specific</span>
+        </Ink>
+        <Ink at={hasAt - 4} dur={16} style={{ left: XS[0], top: y(SENT_Y) + SENT_STEP, whiteSpace: "nowrap" }}>
           <span style={{ ...body(46), color: INK_SOFT, opacity: 0.8 }}>Customer has order.</span>
-          <Ink at={hasAt + 10} dur={12} style={{ position: "relative" }}>
-            <span style={{ ...note(23, INK_SOFT) }}>less precise</span>
-          </Ink>
+        </Ink>
+        <Ink at={hasAt + 10} dur={12} style={{ left: XS[0], top: y(SENT_Y) + SENT_STEP + VERDICT_DY, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK_SOFT) }}>less precise</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

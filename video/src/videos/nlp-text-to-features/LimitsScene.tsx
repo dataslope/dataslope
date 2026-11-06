@@ -19,6 +19,8 @@ const BASELINE_Y = 690;
 const LEARN_Y = 748;
 const DATES_Y = 806;
 const NEXT_Y = 858;
+/** A run-in label before 26px text: within 12% of it, so each is one line. */
+const LEAD_SIZE = 24;
 
 const inkFor = (l: string) => (l === "positive" ? POS_INK : l === "negative" ? NEG_INK : INK_SOFT);
 
@@ -126,7 +128,7 @@ export const LimitsScene: React.FC = () => {
       {/* Why build one anyway, and what learned models keep. */}
       <Note at={baselineAt - 2} x={X0} y={y(BASELINE_Y)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(23, INK_SOFT), marginRight: 16 }}>A baseline first</span>
+          <span style={{ ...label(LEAD_SIZE, INK_SOFT), marginRight: 16 }}>A baseline first</span>
           <Reveal at={fastAt - 2}>fast</Reveal>
           <Reveal at={dataAt - 2}>{", no training data"}</Reveal>
           <Reveal at={beatAt - 2}>{", a score to beat"}</Reveal>
@@ -134,7 +136,7 @@ export const LimitsScene: React.FC = () => {
       </Note>
       <Note at={labeledAt - 4} x={X0} y={y(LEARN_Y)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(23, INK_SOFT), marginRight: 16 }}>Learned models</span>
+          <span style={{ ...label(LEAD_SIZE, INK_SOFT), marginRight: 16 }}>Learned models</span>
           <Reveal at={stillAt - 2}>still </Reveal>
           <Mark at={stillAt + 2}>tokenize</Mark>
           <Reveal at={cleanAt - 2}>{", "}</Reveal>
@@ -147,7 +149,7 @@ export const LimitsScene: React.FC = () => {
       {/* The bridge: two dates, then the next video. */}
       <Note at={olderAt} x={X0} y={y(DATES_Y)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(23, INK_SOFT), marginRight: 16 }}>Older than they look</span>
+          <span style={{ ...label(LEAD_SIZE, INK_SOFT), marginRight: 16 }}>Older than they look</span>
           <Reveal at={idfAt - 2}>IDF, 1972</Reveal>
           <Reveal at={pairsAt - 2}>{"  ·  counting word pairs, 1948"}</Reveal>
         </span>

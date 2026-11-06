@@ -3,7 +3,6 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { SERIF } from "../../editorial/fonts";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, fmt, headline, INK, INK_SOFT, PAPER, label, TABULAR } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
@@ -92,16 +91,24 @@ export const Head: React.FC<{
 };
 
 /** The null hypothesis's symbol, with a real subscript (Inter's latin subset
- *  has no U+2080). Use it at 28px and up, so the zero stays over 19px. */
+ *  has no U+2080). The digit is a <sub>, so the page audit reads it as a
+ *  subscript and not as a second size on the line; it is lowered by an
+ *  offset rather than by vertical-align, so the line box keeps its height,
+ *  and never set under 19px. */
 export const H0: React.FC<{ one?: boolean }> = ({ one }) => (
   <span style={{ whiteSpace: "nowrap" }}>
-    H<span style={{ fontSize: "0.68em", position: "relative", top: "0.28em", marginLeft: "0.04em" }}>{one ? "1" : "0"}</span>
+    H
+    <sub style={{ fontSize: "max(0.68em, 19px)", verticalAlign: "baseline", position: "relative", top: "0.28em", marginLeft: "0.04em" }}>
+      {one ? "1" : "0"}
+    </sub>
   </span>
 );
 
-/** Greek set in the serif, upright, from the subset editorial/fonts.ts waits for. */
+/** Greek, upright, in the face of the line it sits in: Inter on the
+ *  charts' labels (its Greek subset is waited for above), the serif in a
+ *  serif line. A serif letter in an Inter line read as a second face. */
 export const Greek: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
-  <span style={{ fontFamily: SERIF, fontStyle: "normal", color }}>{children}</span>
+  <span style={{ fontStyle: "normal", color }}>{children}</span>
 );
 
 /** A number that counts from `from` to `to` over `dur` frames, eased. */
@@ -134,7 +141,9 @@ export const Mark: React.FC<{ at: number; out?: number; color?: string; children
   const p = ease(frame, at, 8);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.12em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.12em" }}>
       <span
         style={{
           position: "absolute",

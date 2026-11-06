@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -94,7 +94,7 @@ export const AccessScene: React.FC = () => {
             filtered at query time, inside the search,
             <span style={{ opacity: ease(frame, identityAt - 2, 10) }}>
               {" "}for{" "}
-              <span style={{ padding: "1px 10px", borderRadius: 14, border: `2px solid ${INK}`, fontWeight: 650 }}>Dana, {USER_TEAM}</span>
+              <span style={badgeStyle("gray", 23)}>Dana, {USER_TEAM}</span>
             </span>
           </span>
         </Note>

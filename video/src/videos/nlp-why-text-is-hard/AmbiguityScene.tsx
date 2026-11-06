@@ -26,8 +26,10 @@ const Readings: React.FC<{
     <Ink at={aAt} dur={14} style={{ position: "relative" }}>
       <span style={{ ...body(32, true), color: INK }}>{hlA ? <Mark at={hlA.at} out={hlA.out}>{a}</Mark> : a}</span>
     </Ink>
+    {/* "or" in the readings' own face and size, soft and upright, so the
+        line stays one size. */}
     <Ink at={bAt - 6} dur={10} style={{ position: "relative" }}>
-      <span style={{ ...label(22, INK_SOFT) }}>or</span>
+      <span style={{ ...body(32), color: INK_SOFT }}>or</span>
     </Ink>
     <Ink at={bAt} dur={14} style={{ position: "relative" }}>
       <span style={{ ...body(32, true), color: INK }}>{b}</span>

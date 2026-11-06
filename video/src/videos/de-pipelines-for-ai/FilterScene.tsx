@@ -234,7 +234,7 @@ export const FilterScene: React.FC = () => {
 
         {/* What good answers do. */}
         {fixes.map((f, i) => (
-          <Chip key={f.text} x={GRID.x} y={gridTop + 10 * (GRID.cell + GRID.gap) + 120 + i * 54} at={f.at - 2} size={24} ink={OK_INK}>
+          <Chip key={f.text} x={GRID.x} y={gridTop + 10 * (GRID.cell + GRID.gap) + 120 + i * 54} at={f.at - 2} size={24} tone="green">
             {f.text}
             {i === 1 ? (
               <span style={{ color: INK_SOFT, fontWeight: 500 }}>

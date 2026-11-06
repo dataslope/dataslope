@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, body, INK, INK_SOFT, label } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, label } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -241,10 +241,12 @@ export const TrapScene: React.FC = () => {
             whiteSpace: "nowrap",
           }}
         >
+          {/* One line, one size: the list's name and the operators at the
+              28px of the chips between them. */}
           <Op at={startAt}>
-            <span style={{ ...label(24, INK), fontWeight: 600 }}>NLTK&apos;s list</span>
+            <span style={{ ...label(SMALL, INK), fontWeight: 600 }}>NLTK&apos;s list</span>
           </Op>
-          <Op at={takeAt} style={{ ...body(40), color: INK, margin: "0 6px" }}>
+          <Op at={takeAt} style={{ ...label(SMALL, INK), fontWeight: 700, margin: "0 6px" }}>
             −
           </Op>
           {CUSTOM.keep.map((w, i) => (
@@ -256,7 +258,7 @@ export const TrapScene: React.FC = () => {
               ghost={!CUSTOM.keepRemoved.includes(w)}
             />
           ))}
-          <Op at={addAt} style={{ ...body(40), color: INK, margin: "0 6px" }}>
+          <Op at={addAt} style={{ ...label(SMALL, INK), fontWeight: 700, margin: "0 6px" }}>
             +
           </Op>
           {CUSTOM.add.map((w, i) => (

@@ -3,11 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Chip, Clear, DATA, Drift, madeUp, OK_INK, Strike, Svg, X0 } from "./parts";
+import { Clear, DATA, Drift, madeUp, OK_INK, Strike, Svg, X0 } from "./parts";
+import { Tag } from "./badges";
 
 const TREE_X = 640;
 const ROW_LABEL_W = 210;
@@ -136,47 +137,36 @@ export const SaveScene: React.FC = () => {
           </Note>
 
           {rowLabel("Primary", primaryAt - 2, OK_INK, y(ROWS.primary))}
-          <Chip x={TREE_X + ROW_LABEL_W} y={y(ROWS.primary)} at={primaryAt + 4} ink={OK_INK} size={28} lit={loopAt}>
+          <Tag x={TREE_X + ROW_LABEL_W} y={y(ROWS.primary)} at={primaryAt + 4} tone="green" size={28} lit={loopAt}>
             share of saved recipes cooked within a week
-          </Chip>
+          </Tag>
 
           {rowLabel("Secondary", secondaryAt - 2, INK_SOFT, y(ROWS.secondary))}
-          <Chip x={TREE_X + ROW_LABEL_W} y={y(ROWS.secondary)} at={secondaryAt} size={26}>
+          <Tag x={TREE_X + ROW_LABEL_W} y={y(ROWS.secondary)} at={secondaryAt} size={26}>
             save rate
-          </Chip>
-          <Chip x={TREE_X + ROW_LABEL_W + 190} y={y(ROWS.secondary)} at={secondaryAt + 6} size={26}>
+          </Tag>
+          <Tag x={TREE_X + ROW_LABEL_W + 190} y={y(ROWS.secondary)} at={secondaryAt + 6} size={26}>
             saves per user
-          </Chip>
+          </Tag>
           <Note at={whyAt} x={TREE_X + ROW_LABEL_W + 440} y={y(ROWS.secondary) + h(10)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>explain why it moved</span>
           </Note>
 
           {rowLabel("Guardrails", guardsAt - 2, INK_SOFT, y(ROWS.guard))}
-          <Chip x={TREE_X + ROW_LABEL_W} y={y(ROWS.guard)} at={cookAt - 2} size={26}>
+          <Tag x={TREE_X + ROW_LABEL_W} y={y(ROWS.guard)} at={cookAt - 2} size={26}>
             cooking sessions
-          </Chip>
-          <Chip x={TREE_X + ROW_LABEL_W + 270} y={y(ROWS.guard)} at={loadAt - 2} size={26}>
+          </Tag>
+          <Tag x={TREE_X + ROW_LABEL_W + 270} y={y(ROWS.guard)} at={loadAt - 2} size={26}>
             load time
-          </Chip>
+          </Tag>
           <Note at={guardsAt + 4} x={TREE_X + ROW_LABEL_W + 470} y={y(ROWS.guard) + h(10)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>catch it stealing from the main flow</span>
           </Note>
 
           {rowLabel("Not this", dontAt, ACCENT_INK, y(ROWS.not))}
-          <Note at={clicksAt - 2} x={TREE_X + ROW_LABEL_W} y={y(ROWS.not)}>
-            <div
-              style={{
-                padding: "8px 16px",
-                border: `2.2px solid ${ACCENT}`,
-                borderRadius: 10,
-                ...note(26, ACCENT_INK),
-                fontWeight: 600,
-                whiteSpace: "nowrap",
-              }}
-            >
-              <Strike at={clicksAt + 6}>clicks on the button</Strike>
-            </div>
-          </Note>
+          <Tag x={TREE_X + ROW_LABEL_W} y={y(ROWS.not)} at={clicksAt - 2} size={26} tone="red">
+            <Strike at={clicksAt + 6}>clicks on the button</Strike>
+          </Tag>
           <Note at={interactionAt} x={TREE_X + ROW_LABEL_W + 330} y={y(ROWS.not) + h(10)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <span style={{ color: ACCENT_INK, fontWeight: 650 }}>the interaction</span>

@@ -4,8 +4,9 @@ import { arrowHead, type Pt } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { ACCENT, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { badgeStyle, type BadgeTone } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -38,7 +39,7 @@ export {
   X0,
 } from "../da-statistics-communication/parts";
 export { Clear, math } from "../ds-probability/parts";
-export { BAD, Chip, DATA, DATA_LIGHT, madeUp } from "../ds-product-sense/parts";
+export { BAD, DATA, DATA_LIGHT, madeUp } from "../ds-product-sense/parts";
 export { Console, consoleHeight, Listing, listingHeight } from "../da-pandas/parts";
 export { Listing as SqlListing, listingHeight as sqlListingHeight } from "../da-sql/parts";
 export { Arrow, PathArrow } from "../llm-meaning/parts";
@@ -333,3 +334,47 @@ export const QueryMark: React.FC<{ x: number; y: number; at: number; size?: numb
 
 /** The trap's red, for a cell or a mark that shows what goes wrong. */
 export const TRAP = ACCENT;
+
+/**
+ * A short tag (a step, a habit, a fix, a field) as the house badge
+ * (`badgeStyle`): a light tint of its hue in that hue's ink, no border. `lit`
+ * lays the highlighter's yellow over the tint. The props are those of the
+ * outlined product-sense `Chip` it stands in for here, with a hue for an ink.
+ */
+export const Chip: React.FC<{
+  x: number;
+  y: number;
+  at: number;
+  tone?: BadgeTone;
+  size?: number;
+  lit?: number;
+  dim?: number;
+  out?: number;
+  weight?: number;
+  children: React.ReactNode;
+}> = ({ x, y, at: from, tone = "gray", size = 26, lit, dim, out, weight, children }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, from, 12);
+  const l = lit === undefined ? 0 : ease(frame, lit, 12);
+  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.65;
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  const b = badgeStyle(tone, size);
+  return (
+    <div
+      style={{
+        ...b,
+        position: "absolute",
+        left: x,
+        top: y,
+        fontFamily: SANS,
+        ...(weight === undefined ? {} : { fontWeight: weight }),
+        background: l > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${l * 100}%, ${b.background})` : b.background,
+        opacity: p * (1 - d) * (1 - o),
+        transform: `translateY(${(1 - p) * 12}px)`,
+      }}
+    >
+      {children}
+    </div>
+  );
+};

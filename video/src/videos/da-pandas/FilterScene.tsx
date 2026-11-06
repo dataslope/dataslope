@@ -18,10 +18,10 @@ import {
   listingHeight,
   MARK_BAD,
   MARK_OK,
-  Mono,
   TableName,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 340;
 const LIST_X = 900;
@@ -181,7 +181,8 @@ export const FilterScene: React.FC = () => {
         {ops.map(([op, word], k) => (
           <Note key={op} at={opAt[k]} x={X0 + k * 170} y={g.rowTop(FILTER.frame.rows.length) + h(36)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-              <span style={{ fontFamily: MONO, fontSize: 38, fontWeight: 700, color: INK }}>{op}</span>
+              {/* Within 12% of its word's size: one line, one size. */}
+              <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 700, color: INK }}>{op}</span>
               {word}
             </span>
           </Note>

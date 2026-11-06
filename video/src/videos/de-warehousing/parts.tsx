@@ -263,3 +263,27 @@ export const PlanBox: React.FC<{
     </div>
   );
 };
+
+/**
+ * A vertical hairline between two columns of text set side by side, at page
+ * position x (the middle of the gap), as tall as the columns' text. It inks
+ * in with the column to its right, on `at`.
+ */
+export const VRule: React.FC<{ x: number; top: number; height: number; at: number; out?: number }> = ({ x, top, height, at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at - 2, 14) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  if (p <= 0) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height, background: HAIRLINE, opacity: p }} />;
+};
+
+/**
+ * Code inside a line of text. The interview kit's QMono sets it at 0.84em,
+ * which puts it over 12% smaller than the words around it, so check:frames
+ * reads the line as two sizes; 0.92em keeps it one line in one size, with a
+ * mono space brought back to about a sans space.
+ */
+export const QCode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);

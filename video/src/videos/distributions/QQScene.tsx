@@ -200,8 +200,9 @@ export const QQScene: React.FC = () => {
         <Note at={tailsAt - 4} x={sx(scaleFor(PANELS[1]), 62)} y={yFor(PANELS[1])(112)} align="right">
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the upper tail runs away</span>
         </Note>
-        {/* Just above the lower tail's points, left of the line. */}
-        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), -17)} y={yFor(PANELS[1])(46)}>
+        {/* Above the lower tail's points, left of the line, and clear of the
+            y axis's 40 so the two don't read as one line. */}
+        <Note at={tailsAt + 4} x={sx(scaleFor(PANELS[1]), -14)} y={yFor(PANELS[1])(60)}>
           <span style={{ ...askNote(23), whiteSpace: "nowrap" }}>the lower tail, too</span>
         </Note>
         <Note at={costlyAt - 2} x={sx(scaleFor(PANELS[1]), 62)} y={yFor(PANELS[1])(112) + 36} align="right">

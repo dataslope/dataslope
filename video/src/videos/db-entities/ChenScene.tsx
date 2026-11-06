@@ -10,6 +10,11 @@ import { Arrow, Drift, Headline, Kicker, Spot, STAT_INK } from "./parts";
 /** The paper, as ACM Transactions on Database Systems printed it (see script.ts). */
 const PAPER_TITLE = "The Entity-Relationship Model: Toward a Unified View of Data";
 const JOURNAL = "ACM Transactions on Database Systems, 1976";
+/** The plan and the half-built cabinet: small, centred where the larger one sat, in the open right half. */
+const PLAN_W = 200;
+const PLAN_H = 159;
+const PLAN_CX = 1390;
+const PLAN_CY = 492;
 
 /**
  * Part 3 opens: Peter Chen's 1976 model, and its argument in two steps, what
@@ -54,18 +59,19 @@ export const ChenScene: React.FC = () => {
           <div style={{ ...note(21, INK_SOFT), marginTop: 10 }}>{JOURNAL}</div>
         </Ink>
 
-        {/* ── The argument, in order ── */}
+        {/* ── The argument, in order: each step's number in its own words' face and
+            size, set apart by its ink and weight ── */}
         <Ink at={meansAt - 8} dur={16} style={{ left: 122, top: stepY, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, STAT_INK), marginRight: 14 }}>1</span>
+          <span style={{ ...body(40), color: STAT_INK, fontWeight: 600, marginRight: 14 }}>1</span>
           <span style={{ ...body(40), color: INK }}>What the data means</span>
         </Ink>
         <Arrow from={[548, stepY + 30]} to={[618, stepY + 30]} at={beforeAt} dur={12} />
         <Ink at={storeAt - 6} dur={16} style={{ left: 650, top: stepY, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK_SOFT), marginRight: 14 }}>2</span>
+          <span style={{ ...body(40), color: INK_SOFT, fontWeight: 600, marginRight: 14 }}>2</span>
           <span style={{ ...body(40), color: INK_SOFT }}>How to store it</span>
         </Ink>
 
-        <Spot id="db-entities-plan" at={modelAt} left={1060} top={y(300)} width={660} height={440} />
+        <Spot id="db-entities-plan" at={modelAt} left={PLAN_CX - PLAN_W / 2} top={y(PLAN_CY) - PLAN_H / 2} width={PLAN_W} height={PLAN_H} />
       </Drift>
     </AbsoluteFill>
   );

@@ -3,11 +3,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { Badge, type BadgeTone, badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { BAD, Chip, DATA, DATA_LIGHT, Drift, Mark, MARK_BAD, OK, OK_INK, X0 } from "./parts";
+import { BAD, DATA, DATA_LIGHT, Drift, Mark, MARK_BAD, OK_INK, X0 } from "./parts";
 
 const COL = [X0, 1000];
 const ROW = [330, 610];
@@ -17,20 +17,21 @@ const PANEL_W = 800;
 const Title: React.FC<{ n: number; x: number; y: number; at: number; children: React.ReactNode }> = ({ n, x, y, at, children }) => (
   <Note at={at} x={x} y={y}>
     <span style={{ ...note(29, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-      <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, marginRight: 14 }}>{n}</span>
+      <span style={{ ...note(29, ACCENT_INK), fontWeight: 700, marginRight: 14 }}>{n}</span>
       {children}
     </span>
   </Note>
 );
 
-/** A rounded tag on the page: a session, an arm, an output. */
-const Tag: React.FC<{ x: number; y: number; w: number; at: number; color: string; fill?: number; children?: React.ReactNode }> = ({
+/** A rounded tag on the page: a session, an arm, an output. The house
+ *  badge (a light tint of its hue, in that hue's ink, no border, its own
+ *  padding) at a width of its own, which grows in as it inks. */
+const Tag: React.FC<{ x: number; y: number; w: number; at: number; tone: BadgeTone; children?: React.ReactNode }> = ({
   x,
   y,
   w,
   at: from,
-  color,
-  fill = 14,
+  tone,
   children,
 }) => {
   const frame = useCurrentFrame();
@@ -39,20 +40,15 @@ const Tag: React.FC<{ x: number; y: number; w: number; at: number; color: string
   return (
     <div
       style={{
+        ...label(19),
+        ...badgeStyle(tone, 19),
         position: "absolute",
         left: x,
-        top: y,
+        // Its own padding, centred where the 46px box's middle was.
+        top: y + Math.round((46 - (19 * 1.15 + 2 * Math.round(19 * 0.21))) / 2),
         width: w * (0.5 + 0.5 * p),
-        height: 46,
-        borderRadius: 10,
-        border: `2px solid ${color}`,
-        background: `color-mix(in srgb, ${color} ${fill}%, ${PAPER})`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        ...label(19, INK),
-        fontWeight: 700,
-        whiteSpace: "nowrap",
+        boxSizing: "border-box",
+        textAlign: "center",
         overflow: "hidden",
         opacity: p,
       }}
@@ -142,7 +138,7 @@ export const AbScene: React.FC = () => {
           <path d={`M ${COL[0] + 22} ${y(ROW[0]) + 140} Q ${COL[0] + 40} ${y(ROW[0]) + 104} ${COL[0] + 58} ${y(ROW[0]) + 140} Z`} fill={INK} />
         </svg>
         {[0, 1, 2].map((k) => (
-          <Tag key={k} x={COL[0] + 110 + k * 170} y={y(ROW[0]) + 94} w={150} at={stickyAt + k * 4} color={OK}>
+          <Tag key={k} x={COL[0] + 110 + k * 170} y={y(ROW[0]) + 94} w={150} at={stickyAt + k * 4} tone="green">
             session {k + 1}: B
           </Tag>
         ))}
@@ -154,11 +150,11 @@ export const AbScene: React.FC = () => {
         <Title n={2} x={COL[1]} y={y(ROW[0])} at={varianceAt - 2}>
           expect more variance
         </Title>
-        <Tag x={COL[1]} y={y(ROW[0]) + 94} w={160} at={varianceAt + 2} color={BLUE_INK}>
+        <Tag x={COL[1]} y={y(ROW[0]) + 94} w={160} at={varianceAt + 2} tone="blue">
           same input
         </Tag>
         {[260, 150, 330].map((w, k) => (
-          <Tag key={k} x={COL[1] + 210} y={y(ROW[0]) + 64 + k * 54} w={w} at={outputsAt + k * 4} color={DATA} fill={22}>
+          <Tag key={k} x={COL[1] + 210} y={y(ROW[0]) + 64 + k * 54} w={w} at={outputsAt + k * 4} tone="blue">
             output {k + 1}
           </Tag>
         ))}
@@ -218,10 +214,15 @@ export const AbScene: React.FC = () => {
         <Title n={4} x={COL[1]} y={y(ROW[1])} at={guardAt - 2}>
           add guardrails
         </Title>
+        {/* The guardrails as blue house badges, two to a row. */}
         {guards.map((g) => (
-          <Chip key={g.text} x={COL[1] + (g.w % 2) * 330} y={y(ROW[1]) + 70 + Math.floor(g.w / 2) * 64} at={g.at - 2} size={23} ink={BLUE_INK}>
-            {g.text}
-          </Chip>
+          <Note key={g.text} at={g.at - 2} x={COL[1] + (g.w % 2) * 330} y={y(ROW[1]) + 77 + Math.floor(g.w / 2) * 64} from="up">
+            <span style={note(23)}>
+              <Badge tone="blue" size={23}>
+                {g.text}
+              </Badge>
+            </span>
+          </Note>
         ))}
         <Note at={slowAt} x={COL[1]} y={y(ROW[1]) + 210}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>

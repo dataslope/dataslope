@@ -118,7 +118,9 @@ export const Mark: React.FC<{ at: number; out?: number; color?: string; children
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 14);
   return (
-    <span style={{ position: "relative", display: "inline-block" }}>
+    // The highlight reaches 0.14em past the words on each side; the
+    // margin gives that back, so a neighbour keeps a full space.
+    <span style={{ position: "relative", display: "inline-block", margin: "0 0.14em" }}>
       <span
         style={{
           position: "absolute",
@@ -873,9 +875,14 @@ export const ErrorBox: React.FC<{
 export type CardLine = { at: number; children: React.ReactNode };
 
 /**
- * A system in the family tree: a hairline card with its name set large and
- * a few lines under it, each inking in on its own cue. The frame arrives on
- * `at`, the name on `titleAt`.
+ * A system in the family tree: its name set large and a few lines under it,
+ * each inking in on its own cue, as a block of plain text with no card
+ * around it. The name sits flush on `x` (the lines 2px in, which lines the
+ * serif and the sans up by eye); `width` and `height` are the block's room,
+ * which the scenes measure the tree's wires against. The block arrives on
+ * `at` (it lifts into place and swells as a whole, as the card did), the
+ * name on `titleAt`. `accent` sets the name in the accent ink, the emphasis
+ * the card's red frame used to carry.
  */
 export const Card: React.FC<{
   x: number;
@@ -906,19 +913,16 @@ export const Card: React.FC<{
         top,
         width,
         height,
-        boxSizing: "border-box",
-        border: `2px solid ${accent ? ACCENT : INK}`,
-        borderRadius: 10,
-        background: PAPER,
         opacity: p * (1 - o) * (1 - d),
         transform: `translateY(${(1 - p) * 16}px) scale(${1 + swell * 0.04})`,
+        transformOrigin: "0 30%",
       }}
     >
-      <Ink at={titleAt ?? at + 4} dur={18} style={{ left: 26, top: 18, whiteSpace: "nowrap" }}>
-        <div style={{ ...headline(titleSize), color: INK }}>{title}</div>
+      <Ink at={titleAt ?? at + 4} dur={18} style={{ left: 0, top: 18, whiteSpace: "nowrap" }}>
+        <div style={{ ...headline(titleSize), color: accent ? ACCENT_INK : INK }}>{title}</div>
       </Ink>
       {lines.map((l, i) => (
-        <Ink key={i} at={l.at} dur={14} style={{ left: 28, top: 30 + titleSize * 1.15 + i * 36, whiteSpace: "nowrap" }}>
+        <Ink key={i} at={l.at} dur={14} style={{ left: 2, top: 30 + titleSize * 1.15 + i * 36, whiteSpace: "nowrap" }}>
           <div style={{ ...note(21, INK_SOFT) }}>{l.children}</div>
         </Ink>
       ))}

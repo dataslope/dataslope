@@ -2,15 +2,14 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BANK, CHALLENGE_PAGES, PARTS, QUESTIONS } from "./data";
-import { Drift, Headline, Hero, Kicker, X0 } from "./parts";
+import { Drift, Headline, Hero, Kicker, Mark, X0 } from "./parts";
 
 const TILE_W = 260;
-const TILE_H = 250;
 const GAP = 24;
 const ROW_Y = [290, 562];
 /** Five tiles on the first row, six on the second, so each two-video topic
@@ -20,14 +19,15 @@ const ART = 112;
 const LINE_Y = 834;
 
 /**
- * The series as a strip of its eleven topic videos, five then six, each tile
- * with its own watercolor hero and its question count, inking in along the
- * track. The two topics that take two videos are marked as pairs; then the
+ * The series as a strip of its eleven topic videos, five then six, each its
+ * own watercolor hero over a centred caption with its question count, inking
+ * in along the track, no tiles. The two topics that take two videos are
+ * marked as pairs, their titles under the highlighter; then the
  * total, how every video runs, the practice on the pages (concept checks on
  * every one, challenges on four, and one bank of multiple-choice questions for
  * the whole track, on a line of its own), and the bridge into Part 1: the
- * Statistics and Probability tiles light as the track's first two, and Part 1
- * stays lit for "Next".
+ * Statistics and Probability titles light as the track's first two, and Part
+ * 1 stays lit for "Next".
  */
 export const SeriesScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -75,55 +75,48 @@ export const SeriesScene: React.FC = () => {
         <Kicker at={from}>The series</Kicker>
         <Headline lead="In the track's order," turn="eleven videos." at={orderAt - 4} turnAt={elevenAt} size={64} />
 
-        {pairs.map((pr) => {
-          const q = ease(frame, pr.at, 14) * (1 - ease(frame, figureAt - 6, 14));
-          if (q <= 0) return null;
-          return (
-            <div
-              key={pr.a}
-              style={{
-                position: "absolute",
-                left: tileX(pr.a) - 10,
-                top: tileY(pr.a) - 10,
-                width: tileX(pr.b) + TILE_W - tileX(pr.a) + 20,
-                height: h(TILE_H) + 20,
-                borderRadius: 18,
-                background: HIGHLIGHT,
-                opacity: q,
-              }}
-            />
-          );
-        })}
-
         {PARTS.map((p, i) => {
           const pIn = ease(frame, inAt(i) - 2, 14);
           if (pIn <= 0) return null;
-          const first =
-            i === 0 ? ease(frame, openAt - 2, 12) : i === 1 ? ease(frame, probAt - 2, 12) * (1 - ease(frame, nextAt, 14)) : 0;
           const dimFrom = i === 1 ? nextAt : openAt;
           const dim = i === 0 ? 0 : ease(frame, dimFrom, 16) * 0.5;
+          // What the narration points at goes under the highlighter: each
+          // two-video pair while it is named, then Statistics and Probability
+          // as the bridge names them, Part 1 alone once "Next" is said.
+          const pair = pairs.find((pr) => pr.a === i || pr.b === i);
+          const mark = pair
+            ? { at: pair.at, out: figureAt - 6 }
+            : i === 0
+              ? { at: openAt - 2, out: undefined }
+              : i === 1
+                ? { at: probAt - 2, out: nextAt }
+                : null;
           return (
             <React.Fragment key={p.n}>
+              {/* A hero and its caption, centred under it: no tile, the
+                  space between columns does the grouping. */}
               <div
                 style={{
                   position: "absolute",
                   left: tileX(i),
-                  top: tileY(i),
+                  top: tileY(i) + ART + 26,
                   width: TILE_W,
-                  height: h(TILE_H),
-                  boxSizing: "border-box",
-                  border: `1.5px solid ${first > 0 ? BLUE_INK : HAIRLINE}`,
-                  borderRadius: 12,
-                  background: first > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${first * 60}%, ${PAPER})` : PAPER,
+                  textAlign: "center",
                   opacity: pIn * (1 - dim),
                   transform: `translateY(${(1 - pIn) * 14}px)`,
                 }}
               >
-                <div style={{ position: "absolute", left: 20, right: 16, top: ART + 26 }}>
-                  <div style={{ ...label(19, BLUE_INK), ...TABULAR }}>Part {p.n}</div>
-                  <div style={{ ...note(24, INK), fontWeight: 650, marginTop: 4, lineHeight: 1.12, whiteSpace: "nowrap" }}>{p.title}</div>
-                  <div style={{ ...note(20, INK_SOFT), marginTop: 6, ...TABULAR }}>{p.questions} questions</div>
+                <div style={{ ...label(19, BLUE_INK), ...TABULAR }}>Part {p.n}</div>
+                <div style={{ ...note(24, INK), fontWeight: 650, marginTop: 4, lineHeight: 1.12, whiteSpace: "nowrap" }}>
+                  {mark ? (
+                    <Mark at={mark.at} out={mark.out}>
+                      {p.title}
+                    </Mark>
+                  ) : (
+                    p.title
+                  )}
                 </div>
+                <div style={{ ...note(20, INK_SOFT), marginTop: 6, ...TABULAR }}>{p.questions} questions</div>
               </div>
               <Hero
                 video={p.video}

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, HAIRLINE, headline, note } from "../../editorial/style";
-import { FigLabel, Note } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CAT, COUNTS, DOC0_TOP, IDF, LENGTHS, N, num, spell, TFIDF, THE, TWICE, VOCAB } from "./data";
@@ -14,6 +14,11 @@ const G = tableGeo(330);
 /** Rows under the table, in layout units. */
 const EQ_Y = idfRow(G).top + idfRow(G).h + 40;
 const FOOT_Y = EQ_Y + 150;
+/** The second worked product's left edge, the hairline in the gap before it
+ *  (the first product ends near x 548), and the products' height. */
+const WORKED_B = 940;
+const RULE_X = 744;
+const WORKED_H = 132;
 
 const ON = VOCAB.indexOf("on");
 /** Doc 1's tied top score, set to two places like the table's cells. */
@@ -38,8 +43,10 @@ const Worked: React.FC<{
   const r = ease(frame, resultAt, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
-  const cap = (text: string, col: number, opacity = 1) => (
-    <span style={{ gridRow: 1, gridColumn: col, justifySelf: "center", ...note(20, INK_SOFT), opacity, whiteSpace: "nowrap" }}>{text}</span>
+  // A what-if names itself in the blue its result takes, where a box once
+  // held it apart.
+  const cap = (text: string, col: number, opacity = 1, color = INK_SOFT, weight = 500) => (
+    <span style={{ gridRow: 1, gridColumn: col, justifySelf: "center", ...note(20, color), fontWeight: weight, opacity, whiteSpace: "nowrap" }}>{text}</span>
   );
   const val = (col: number, children: React.ReactNode, c: string = INK, opacity = 1) => (
     <span style={{ gridRow: 2, gridColumn: col, justifySelf: "center", ...headline(44), color: c, opacity, whiteSpace: "nowrap" }}>
@@ -59,10 +66,9 @@ const Worked: React.FC<{
         rowGap: 4,
         opacity: p * (1 - o),
         transform: `translateY(${(1 - p) * 10}px)`,
-        ...(ghost ? { border: `2px dashed ${BLUE_INK}`, padding: "6px 16px 8px", margin: "-8px -18px" } : {}),
       }}
     >
-      {cap(ghost ? ghost.caption : "Doc 1", 1)}
+      {ghost ? cap(ghost.caption, 1, 1, BLUE_INK, 650) : cap("Doc 1", 1)}
       {val(1, <i>{VOCAB[j]}</i>)}
       <span style={{ gridRow: "1 / span 2", gridColumn: 2, width: 1.5, alignSelf: "stretch", background: HAIRLINE, margin: "0 6px" }} />
       {cap("tf", 3)}
@@ -168,11 +174,14 @@ export const MorphScene: React.FC = () => {
       <IdfRow g={G} at={multiplyAt - 4} lit={[rarityAt - 2, elsewhereAt - 2]} />
 
       <Worked j={CAT} x={X0} top={y(EQ_Y)} at={catAt - 4} resultAt={catScoreAt - 2} color={INK} />
-      <Worked j={THE} x={940} top={y(EQ_Y)} at={theAt - 4} resultAt={timesZeroAt} color={ACCENT_INK} out={twiceFrom - 10} />
+      {/* The two worked products side by side, a hairline between them that
+          inks with the second. */}
+      <ColumnRule x={RULE_X} top={y(EQ_Y) - 4} height={WORKED_H} at={theAt - 4} />
+      <Worked j={THE} x={WORKED_B} top={y(EQ_Y)} at={theAt - 4} resultAt={timesZeroAt} color={ACCENT_INK} out={twiceFrom - 10} />
       {/* "Frequent here": what cat would score if Doc 1 used it twice. */}
       <Worked
         j={CAT}
-        x={960}
+        x={WORKED_B}
         top={y(EQ_Y)}
         at={twiceFrom - 2}
         resultAt={twiceAt - 4}

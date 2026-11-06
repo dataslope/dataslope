@@ -466,15 +466,13 @@ export const SearchScene: React.FC = () => {
 
 // ═══ Scene 6: where similarity breaks, and the second pass ═════════════════
 
-const Card: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
+/** One of the two sentences, set as plain text: it sat on a paper card, which
+ *  the house no longer draws around words (README, "No cards unless the
+ *  layout needs one"). The two now land as adjacent lines. */
+const Sentence: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
   <div
     style={{
       position: "absolute",
-      padding: "18px 26px 20px",
-      background: PAPER,
-      border: `2px solid ${INK}`,
-      borderRadius: 12,
-      boxShadow: `0 6px 18px -10px color-mix(in srgb, ${INK} 40%, transparent)`,
       ...body(44),
       color: INK,
       whiteSpace: "nowrap",
@@ -484,6 +482,11 @@ const Card: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }>
     {children}
   </div>
 );
+
+/** Fig. 9: where the sentences' text sits, and the pitch the second lands at
+ *  under the first (a 55px line and about 25px between them). */
+const SENTENCE_DY = 18;
+const LANDED = 80;
 
 const Box: React.FC<{ x: number; y: number; w: number; at: number; title: string; children?: React.ReactNode; accent?: boolean }> = ({
   x,
@@ -558,15 +561,16 @@ export const BlindScene: React.FC = () => {
       {/* ── Fig. 9: two sentences, nearly the same vector ── */}
       <FigLabel n="9" title="The lesson's negation problem" at={blindAt - 2} x={X0} y={y(FIG_Y)} />
       <Fade at={drugAt - 4} style={{ left: 0, top: 0 }}>
-        <Card style={{ left: X0, top: cardsTop }}>The drug is effective.</Card>
+        <Sentence style={{ left: X0, top: cardsTop + SENTENCE_DY }}>The drug is effective.</Sentence>
       </Fade>
+      {/* The second lands from below as the line right under the first, flush with it. */}
       <Fade at={notAt - 8} style={{ left: 0, top: 0 }}>
-        <Card style={{ left: lerp(X0 + 40, X0 + 34, land), top: lerp(cardsTop + 190, cardsTop + 70, land) }}>
+        <Sentence style={{ left: lerp(X0 + 40, X0, land), top: lerp(cardsTop + SENTENCE_DY + 190, cardsTop + SENTENCE_DY + LANDED, land) }}>
           The drug is <span style={{ color: POINT_INK, fontWeight: 650, textDecoration: `underline 3px ${POINT}`, textUnderlineOffset: 6 }}>not</span>{" "}
           effective.
-        </Card>
+        </Sentence>
       </Fade>
-      <Note at={topOfAt} x={X0} y={cardsTop + 210}>
+      <Note at={topOfAt} x={X0} y={cardsTop + SENTENCE_DY + LANDED + 100}>
         <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>Almost the same direction, opposite meanings.</span>
       </Note>
 

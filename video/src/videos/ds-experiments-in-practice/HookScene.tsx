@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, NOVELTY, SRM } from "./data";
@@ -14,6 +14,8 @@ const CARD_W = 760;
 const ROW_H = 74;
 const HEAD_H = 64;
 const FLAG_X = X0 + CARD_W + 36;
+/** The readout's cells: its text sits this far in from the ends of its rules. */
+const CELL_PAD = 14;
 
 /**
  * The opening: an experiment readout that says ship it, taken apart. Its
@@ -75,11 +77,13 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-chime" at={fourteenAt} level={-36} />
 
       <Drift from={0} to={end + 20}>
-        <Kicker at={startAt}>Data scientist interview prep · Experimentation II</Kicker>
+        <Kicker at={startAt}>Data scientist interview questions · Experimentation II</Kicker>
         <Headline lead="The readout says it won." turn="Look closer." at={readoutAt - 2} turnAt={closerAt} size={72} />
         <Spot id="ds-experiments-in-practice-turtle" at={startAt + 12} left={1480} top={y(560)} width={340} height={230} />
 
-        {/* The readout card. */}
+        {/* The readout, as a plain table: its title line, a hairline under
+            it and between its rows, and no box. A flagged row takes a red
+            highlight behind its words; "Look closer" swells the whole table. */}
         <div
           style={{
             position: "absolute",
@@ -87,21 +91,46 @@ export const HookScene: React.FC = () => {
             top: y(CARD_TOP),
             width: CARD_W,
             height: HEAD_H + ROWS.length * ROW_H,
-            boxSizing: "border-box",
-            border: `2px solid ${INK}`,
-            borderRadius: 10,
-            background: PAPER,
-            boxShadow: look > 0 ? `0 0 0 ${6 * look}px color-mix(in srgb, ${ACCENT} ${30 * look}%, transparent)` : undefined,
             opacity: cardP * (1 - dimCard),
-            transform: `translateY(${(1 - cardP) * 16}px)`,
+            transform: `translateY(${(1 - cardP) * 16}px) scale(${1 + 0.02 * look})`,
+            transformOrigin: "left center",
           }}
         >
-          <div style={{ height: HEAD_H, display: "flex", alignItems: "center", padding: "0 24px", borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ height: HEAD_H, display: "flex", alignItems: "center", padding: `0 ${CELL_PAD}px`, borderBottom: `1px solid ${HAIRLINE}` }}>
             <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>New checkout · A/B test readout</span>
             <span style={{ marginLeft: 18, display: "inline-flex", alignItems: "center", gap: 8, ...label(20, OK_INK), fontWeight: 700 }}>
               <span style={{ width: 10, height: 10, borderRadius: 5, background: OK, opacity: live }} />
               live
             </span>
+            {/* The verdict somebody wants, at the title line's end: a green
+                house badge where the stamp was, struck when it turns to
+                nothing. */}
+            {stamp > 0.001 ? (
+              <span
+                style={{
+                  ...label(24),
+                  ...badgeStyle("green", 24),
+                  position: "relative",
+                  marginLeft: "auto",
+                  transform: `scale(${0.6 + 0.4 * Math.min(1, stamp)})`,
+                  transformOrigin: "right center",
+                  opacity: Math.min(1, stamp),
+                }}
+              >
+                ship it today
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 8,
+                    top: "50%",
+                    width: `calc((100% - 16px) * ${stampStrike})`,
+                    height: 4,
+                    background: ACCENT,
+                    borderRadius: 2,
+                  }}
+                />
+              </span>
+            ) : null}
           </div>
           {ROWS.map((r, i) => {
             const p = ease(frame, r.at, 10);
@@ -118,13 +147,23 @@ export const HookScene: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  padding: "0 24px",
-                  background: flag > 0 ? `color-mix(in srgb, ${MARK_BAD} ${flag * 100}%, transparent)` : undefined,
-                  borderTop: i ? `1px solid color-mix(in srgb, ${INK} 18%, transparent)` : undefined,
+                  padding: `0 ${CELL_PAD}px`,
+                  borderTop: i ? `1px solid ${HAIRLINE}` : undefined,
                   opacity: p,
                 }}
               >
-                <span style={{ ...note(27, INK_SOFT), whiteSpace: "nowrap" }}>{r.name}</span>
+                {/* A flagged row fills between its rules, as a table row is
+                    highlighted. */}
+                {flag > 0 ? (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: `color-mix(in srgb, ${MARK_BAD} ${flag * 100}%, transparent)`,
+                    }}
+                  />
+                ) : null}
+                <span style={{ position: "relative", ...note(27, INK_SOFT), whiteSpace: "nowrap" }}>{r.name}</span>
                 <span
                   style={{
                     position: "relative",
@@ -153,39 +192,6 @@ export const HookScene: React.FC = () => {
             );
           })}
         </div>
-
-        {/* The stamp somebody wants. */}
-        {stamp > 0.001 ? (
-          <div
-            style={{
-              position: "absolute",
-              left: X0 + CARD_W - 210,
-              top: y(CARD_TOP) - 26,
-              padding: "8px 18px",
-              border: `3px solid ${OK}`,
-              borderRadius: 8,
-              background: PAPER,
-              ...label(24, OK_INK),
-              fontWeight: 800,
-              whiteSpace: "nowrap",
-              transform: `rotate(-6deg) scale(${0.6 + 0.4 * Math.min(1, stamp)})`,
-              opacity: Math.min(1, stamp) * (1 - dimCard),
-            }}
-          >
-            ship it today
-            <span
-              style={{
-                position: "absolute",
-                left: 6,
-                top: "50%",
-                width: `calc((100% - 12px) * ${stampStrike})`,
-                height: 4,
-                background: ACCENT,
-                borderRadius: 2,
-              }}
-            />
-          </div>
-        ) : null}
 
         {/* What a closer look finds, beside each row it is about. */}
         {ROWS.map((r, i) =>

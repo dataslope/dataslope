@@ -218,32 +218,36 @@ export const CheckScene: React.FC = () => {
         <div style={{ ...body(28, true), marginTop: 8 }}>of {CHECK.n} values each</div>
       </div>
 
-      <Ink at={spreadAt - 4} dur={14} style={{ left: COL, top: y(548), width: 384 }}>
-        <div style={{ height: 1, background: INK, marginBottom: 16 }} />
+      {/* Each spread on a line of its own, with what it is ("measured",
+          "estimated") under it: a hero number never shares its line with a
+          smaller word. The pair sits higher than it did, in the space under
+          the count, so the extra line costs the page's foot nothing. */}
+      <Ink at={spreadAt - 4} dur={14} style={{ left: COL, top: y(500), width: 384 }}>
+        <div style={{ height: 1, background: INK, marginBottom: 28 }} />
         <div style={label(20, INK_SOFT)}>Spread of the {CHECK.samples.toLocaleString("en-US")} averages</div>
       </Ink>
-      <Ink at={fiveAt - 2} dur={14} style={{ left: COL, top: y(612), display: "flex", alignItems: "baseline", gap: 16 }}>
-        <span style={{ ...headline(64), color: ACCENT_INK, ...TABULAR }}>
+      <Ink at={fiveAt - 2} dur={14} style={{ left: COL, top: y(564) }}>
+        <div style={{ ...headline(64), color: ACCENT_INK, ...TABULAR }}>
           <Marked at={fiveAt + 6} color={HIGHLIGHT}>
             {fmt(CHECK.measured)}
           </Marked>
-        </span>
-        <span style={{ ...body(28, true) }}>measured</span>
+        </div>
+        <div style={{ ...body(28, true), marginTop: 2 }}>measured</div>
       </Ink>
-      <Ink at={oneAt - 4} dur={14} style={{ left: COL, top: y(708), width: 384 }}>
-        <div style={{ height: 1, background: HAIRLINE, marginBottom: 16 }} />
+      <Ink at={oneAt - 4} dur={14} style={{ left: COL, top: y(690), width: 384 }}>
+        <div style={{ height: 1, background: HAIRLINE, marginBottom: 28 }} />
         {/* The sample's own s, which stands in for σ: where 3.67 comes from. */}
         <div style={label(20, INK_SOFT)}>
           One sample: s = {fmt(CHECK.oneSampleSd)}, ÷ √{CHECK.n}
         </div>
       </Ink>
-      <Ink at={sevenAt - 2} dur={14} style={{ left: COL, top: y(772), display: "flex", alignItems: "baseline", gap: 16 }}>
-        <span style={{ ...headline(64), ...TABULAR }}>
+      <Ink at={sevenAt - 2} dur={14} style={{ left: COL, top: y(754) }}>
+        <div style={{ ...headline(64), ...TABULAR }}>
           <Marker at={closeAt - 2}>{fmt(CHECK.estimated)}</Marker>
-        </span>
-        <span style={{ ...body(28, true) }}>estimated</span>
+        </div>
+        <div style={{ ...body(28, true), marginTop: 2 }}>estimated</div>
       </Ink>
-      <Note at={closeAt + 2} x={COL} y={y(862)}>
+      <Note at={closeAt + 2} x={COL} y={y(884)}>
         <span style={note(20, INK_SOFT)}>
           Theory, {CHECK.sigma} ÷ √{CHECK.n}: {fmt(CHECK.theory)}
         </span>

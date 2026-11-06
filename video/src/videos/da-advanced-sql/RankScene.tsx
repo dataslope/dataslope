@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
@@ -23,6 +23,7 @@ import {
   X0,
   Mark,
 } from "./parts";
+import { QMono } from "./mono";
 
 const TOP = 330;
 const SIZE = 21;

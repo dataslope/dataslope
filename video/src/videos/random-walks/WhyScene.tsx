@@ -146,10 +146,9 @@ export const WhyScene: React.FC = () => {
       {/* Right column: neighbours in the walk, the worked example, neighbours in the flips. */}
       <Note at={eachAt} x={RIGHT} y={y(300) - 8}>
         <div style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Each point against the next</div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginTop: 10 }}>
-          <span style={{ ...headline(72), color: COLOR_INK.a }}>{dec(LAG1_WALK)}</span>
-          <span style={note(21, INK_SOFT)}>correlation</span>
-        </div>
+        {/* The figure, then what it is on a line of its own: one size per line. */}
+        <div style={{ ...headline(72), color: COLOR_INK.a, marginTop: 10 }}>{dec(LAG1_WALK)}</div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>correlation</div>
       </Note>
 
       <Ink at={subtractAt - 4} dur={14} style={{ left: RIGHT, top: tableTop, width: 540 }}>
@@ -198,12 +197,10 @@ export const WhyScene: React.FC = () => {
 
       <Note at={backAt} x={RIGHT} y={mid - 56}>
         <div style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Each flip against the next</div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginTop: 10 }}>
-          <span style={{ ...headline(72), color: COLOR_INK.a }}>{dec(LAG1_FLIPS)}</span>
-          <span style={note(21, INK_SOFT)}>correlation</span>
-        </div>
+        <div style={{ ...headline(72), color: COLOR_INK.a, marginTop: 10 }}>{dec(LAG1_FLIPS)}</div>
+        <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>correlation</div>
       </Note>
-      <Note at={backAt + 10} x={RIGHT} y={mid + 90} width={540}>
+      <Note at={backAt + 10} x={RIGHT} y={mid + 122} width={540}>
         <span style={prose(20)}>{STEPS} differences, each one exactly a flip.</span>
       </Note>
     </AbsoluteFill>

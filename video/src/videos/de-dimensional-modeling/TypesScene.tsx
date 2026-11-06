@@ -12,8 +12,10 @@ import { colsOf, DataTable, Drift, geoOf, MARK, MARK_OK, Mono, OK, OK_INK, Panel
 
 const R_X = 1000;
 const TOP_TABLES = 372;
-const ACC_HEAD = 640;
-const ACC_TABLE = 742;
+/** The third panel, 14 lower than it was so its rule (lifted 16px above
+ *  its `y`) keeps its old distance from the tables above it. */
+const ACC_HEAD = 654;
+const ACC_TABLE = 756;
 const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
 
 /** A span under two cells, drawn on `at`, with how long it was. */

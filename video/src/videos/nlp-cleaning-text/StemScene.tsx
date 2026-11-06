@@ -116,7 +116,9 @@ export const StemScene: React.FC = () => {
             );
           }),
         )}
-        <Tag at={pastAt} x={geo[0].stemX + chipWidth(stemOf("ran"), SIZE) + 18} y={rowTop(3) + 14}>
+        {/* Clear of the chip by more than a word's space at the chip's size,
+            so the 21px note is not read as part of a 36px line. */}
+        <Tag at={pastAt} x={geo[0].stemX + chipWidth(stemOf("ran"), SIZE) + 32} y={rowTop(3) + 14}>
           missed
         </Tag>
         <Tag at={wordsAt} x={GROUP_X[1]} y={rowTop(3) + 6}>

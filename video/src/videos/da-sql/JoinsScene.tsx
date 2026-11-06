@@ -9,7 +9,8 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { JOINS } from "./data";
-import { DataTable, Drift, KEY_INK, KeyArrow, Mark, MARK_BAD, Mono, TableName, tableGeometry, X0 } from "./parts";
+import { DataTable, Drift, KEY_INK, KeyArrow, Mark, MARK_BAD, TableName, tableGeometry, X0 } from "./parts";
+import { Mono } from "./mono";
 
 const TABLE_Y = 340;
 const HEAD_H = 48;

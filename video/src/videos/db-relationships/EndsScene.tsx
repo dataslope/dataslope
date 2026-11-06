@@ -6,11 +6,11 @@ import { ease } from "../../components/motion";
 import { Entity, entityLayout, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink, Leader } from "../../editorial/ui";
+import { ColumnRule, Ink, Leader } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Fig } from "./kit";
-import { Drift, endSymbols, Glow, Headline, Kicker, Link, Svg } from "./parts";
+import { Drift, endSymbols, Glow, Headline, Kicker, Link, Spot, Svg } from "./parts";
 
 /** The first half draws the two ends large: the marker at this size and
  *  stroke, on header-only boxes, so each symbol can be pointed at. */
@@ -36,6 +36,11 @@ const TEXT_X = 950;
 const KEY_X = 1530;
 const KEY_SIZE = 26;
 const KEY_EDGE = 64;
+/** The key and the readings beside it are two columns of text: a hairline
+ *  in the gap, centred between the longest example (which ends near 1446)
+ *  and the key, as tall as the key. */
+const KEY_RULE_X = KEY_X - 42;
+const KEY_RULE_H = 300;
 
 type EndRow = {
   beat: string;
@@ -225,10 +230,11 @@ const EndKey: React.FC<{ top: number; at: number; hits: readonly { glyph: Glyph;
           key={r.lead}
           at={at + 4 + i * 3}
           dur={14}
-          style={{ left: KEY_X, top: top + 46 + i * 48, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 10 }}
+          style={{ left: KEY_X, top: top + 46 + i * 48, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 8 }}
         >
+          {/* One line, one size: the rule's value is set in its lead's Inter, in the accent. */}
           <span style={note(22, INK)}>{r.lead}</span>
-          <span style={{ ...body(28, true), color: ACCENT_INK }}>{r.value}</span>
+          <span style={label(22, ACCENT_INK)}>{r.value}</span>
         </Ink>
       ))}
       <Svg>
@@ -288,6 +294,8 @@ export const EndsScene: React.FC = () => {
   const otherAt = n.word("one", "other box");
   const m2mTo = n.beat("m2m").to;
   const keyHits = KEY_HITS.map((k) => ({ glyph: k.glyph, at: n.word(k.beat, k.word) }));
+  // The crow pops in on the word that names it, silent like the video's other spot art.
+  const crowAt = n.word("ends", "Crow's-foot") + 2;
 
   // ── Part one: the two ends, magnified ──
   const Y0 = y(VIEW_Y);
@@ -351,6 +359,11 @@ export const EndsScene: React.FC = () => {
       <Headline lead="Every end makes" at={endsFrom - 4} turn="two marks." turnAt={twoMarksAt - 4} out={oneFrom - 10} />
       <Headline lead="Start at one box." at={oneFrom - 2} turn="Read the other end." turnAt={otherAt - 4} />
 
+      {/* "Crow's-foot notation": a crow, top right, while the two ends are
+          magnified under it. Gone before the key of ends inks in below where
+          it stood, so that key keeps the column to itself. */}
+      <Spot id="db-relationships-crow" at={crowAt} out={oneFrom - 26} left={1570} top={y(115)} width={173} height={180} />
+
       {/* ── Part one ── */}
       <AbsoluteFill style={{ opacity: partOne }}>
         <Drift from={drawsAt} to={oneFrom} scale={0.02} origin={[960, lineY]}>
@@ -412,7 +425,9 @@ export const EndsScene: React.FC = () => {
         <Fig n="4" at={oneFrom} x={LEFT_X} y={y(268)}>
           The four ends, and feet at both
         </Fig>
-        {/* Fig. 3's key stays on as the legend, from the moment Fig. 3 lifts. */}
+        {/* Fig. 3's key stays on as the legend, from the moment Fig. 3 lifts,
+            set off from the readings beside it by a hairline that inks in with it. */}
+        <ColumnRule x={KEY_RULE_X} top={y(ROW_Y)} height={KEY_RULE_H} at={oneFrom - 10} />
         <EndKey top={y(ROW_Y) - 6} at={oneFrom - 12} hits={keyHits} />
         {rows.map((r) => {
           const a = r.left.anchor("right");

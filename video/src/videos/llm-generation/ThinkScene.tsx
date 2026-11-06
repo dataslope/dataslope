@@ -149,8 +149,8 @@ export const ThinkScene: React.FC = () => {
         <div style={{ width: "100%", height: "100%", background: ds("gray", 50), borderTop: `2px solid ${INK}` }} />
       </Ink>
       <Ink at={writesAt - 2} dur={12} style={{ left: X0 + 24, top: top + 14, display: "flex", gap: 18, alignItems: "baseline", whiteSpace: "nowrap" }}>
-        <span style={label(21, THINK_INK)}>Thinking</span>
-        <span style={{ ...note(21, THINK_INK), fontWeight: 650, opacity: ease(frame, thinkingAt - 2, 10), ...TABULAR }}>
+        <span style={label(22, THINK_INK)}>Thinking</span>
+        <span style={{ ...note(22, THINK_INK), fontWeight: 650, opacity: ease(frame, thinkingAt - 2, 10), ...TABULAR }}>
           {THINKING_TOKENS} tokens
         </span>
       </Ink>
@@ -165,9 +165,9 @@ export const ThinkScene: React.FC = () => {
         <line x1={X0 + 24} x2={X0 + BOX_W - 24} y1={answerTop - 20} y2={answerTop - 20} stroke={THINK} strokeWidth={1.4} strokeDasharray="4 4" />
       </Svg>
       <Ink at={beforeAt - 2} dur={14} style={{ left: X0 + 24, top: answerTop, display: "flex", gap: 18, alignItems: "baseline", whiteSpace: "nowrap" }}>
-        <span style={label(21, INK)}>Answer</span>
-        <span style={{ fontFamily: MONO, fontSize: SIZE + 2, color: INK, fontWeight: 600 }}>{ANSWER}</span>
-        <span style={{ ...note(21, INK), fontWeight: 650, opacity: ease(frame, thinkingAt + 6, 10), ...TABULAR }}>
+        <span style={label(22, INK)}>Answer</span>
+        <span style={{ fontFamily: MONO, fontSize: SIZE, color: INK, fontWeight: 600 }}>{ANSWER}</span>
+        <span style={{ ...note(22, INK), fontWeight: 650, opacity: ease(frame, thinkingAt + 6, 10), ...TABULAR }}>
           {ANSWER_TOKENS} tokens
         </span>
       </Ink>

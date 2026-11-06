@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DAY_NAMES, DAYS, jitter, TIPS } from "./data";
 import { Headline, Kicker, lerp, Marker, Ring, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { CARD_FROM, LEAD_DY } from "./WallScene";
 
 /** The bills: tip as a share of the bill, 0 to 45%. One bill (71%) runs off
  *  the end and is pinned past a break in the axis, labelled from the start. */
@@ -331,21 +332,9 @@ export const LookScene: React.FC = () => {
         <Ring x={sx(X2, TIPS.byDay.Sun.median)} y={y(ROW_Y[SUN])} at={sundayAt - 2} />
       </div>
 
-      {/* ── The lead, carried into the next scene ── */}
-      <Ink at={questionAt - 4} dur={16} style={{ left: 1410, top: y(846), whiteSpace: "nowrap" }}>
-        <span
-          style={{
-            ...body(34, true),
-            color: INK,
-            display: "inline-block",
-            padding: "6px 18px 8px",
-            border: `2px solid ${INK}`,
-            borderRadius: 10,
-            background: PAPER,
-          }}
-        >
-          Does Friday tip more?
-        </span>
+      {/* ── The lead, carried into the next scene: plain words, no card ── */}
+      <Ink at={questionAt - 4} dur={16} style={{ left: CARD_FROM.x, top: y(CARD_FROM.y) + LEAD_DY, whiteSpace: "nowrap" }}>
+        <span style={{ ...body(34, true), color: INK }}>Does Friday tip more?</span>
       </Ink>
     </AbsoluteFill>
   );

@@ -8,7 +8,8 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, SAMPLE } from "./data";
-import { Chip, Clear, DATA, Drift, lerp, Mark, OK, OK_INK, Strike, Svg, WARM, WARM_INK, X0 } from "./parts";
+import { Clear, DATA, Drift, lerp, Mark, OK, OK_INK, Strike, Svg, WARM, WARM_INK, X0 } from "./parts";
+import { Tag } from "./badges";
 
 const ARMS = { top: 470, w: 300, h: 190, gap: 60 };
 const RIGHT_X = 900;
@@ -193,7 +194,7 @@ export const RecScene: React.FC = () => {
         {/* The size, before launch: DA Part 7's formula. */}
         <Note at={sizeAt} x={RIGHT_X} y={y(SIZE.top) - h(56)} out={out8}>
           <span style={{ ...note(27, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            users per group <span style={{ ...label(20, INK_SOFT), fontWeight: 500 }}>(80% power, 5% two-sided)</span>
+            users per group <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}>(80% power, 5% two-sided)</span>
           </span>
         </Note>
         {[
@@ -266,20 +267,20 @@ export const RecScene: React.FC = () => {
           <Note at={switchAt - 2} x={ALT_X} y={y(340)}>
             <span style={{ ...note(29, INK), fontWeight: 650, whiteSpace: "nowrap" }}>instead:</span>
           </Note>
-          <Chip x={ALT_X} y={y(396)} at={switchAt} size={25} ink={BLUE_INK}>
+          <Tag x={ALT_X} y={y(396)} at={switchAt} size={25} tone="blue">
             randomize whole regions
-          </Chip>
-          <Chip x={ALT_X + 370} y={y(396)} at={slotsAt} size={25} ink={BLUE_INK}>
+          </Tag>
+          <Tag x={ALT_X + 370} y={y(396)} at={slotsAt} size={25} tone="blue">
             or switch by time slot
-          </Chip>
+          </Tag>
           <Note at={baselineAt} x={ALT_X} y={y(478)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>or compare against a baseline:</span>
           </Note>
           {methods.map((m, i) => (
             <React.Fragment key={m.text}>
-              <Chip x={ALT_X} y={y(526) + i * h(62)} at={m.at - 2} size={25} ink={BLUE_INK}>
+              <Tag x={ALT_X} y={y(526) + i * h(62)} at={m.at - 2} size={25} tone="blue">
                 {m.text}
-              </Chip>
+              </Tag>
               <Note at={m.glossAt} x={ALT_X + 386} y={y(526) + i * h(62) + h(9)}>
                 <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>{m.gloss}</span>
               </Note>

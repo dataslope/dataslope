@@ -211,7 +211,9 @@ export const DocTable: React.FC<TableProps> = ({ g, at, morph, frame: frameIn = 
                         top: "50%",
                         transform: "translateY(-50%)",
                         opacity: struck,
-                        ...note(22, INK_SOFT),
+                        // Within 12% of the value beside it (30px), so the
+                        // cell reads as one line of figures.
+                        ...note(27, INK_SOFT),
                       }}
                     >
                       <span style={{ position: "relative" }}>

@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
+import { badgeStyle, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { METRIC } from "./data";
@@ -18,9 +18,9 @@ const TABLE_X = 1080;
 const change = (x: number) => `${x > 0 ? "+" : "−"}${fmt(Math.abs(x) * 100, 0)}%`;
 
 /**
- * Question 5. Four checks down the left, the last one the trap: the video's
- * own two weeks, where conversion rose 20% because sessions fell 20% and
- * orders fell 4%.
+ * Question 5. Four checks down the left, each numbered on a tinted disc
+ * (red for the last), the last one the trap: the video's own two weeks, where conversion rose 20%
+ * because sessions fell 20% and orders fell 4%.
  */
 export const MetricScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -106,17 +106,20 @@ export const MetricScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -16}px)`,
               }}
             >
+              {/* The step's number on a tinted disc, at 26px: within 12% of
+                  the step's 28, so the line keeps one size. */}
               <span
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  border: `2px solid ${trap ? ACCENT_INK : INK_SOFT}`,
-                  background: PAPER,
+                  ...label(26, trap ? ACCENT_INK : INK),
+                  ...badgeStyle(trap ? "red" : "gray", 26),
+                  width: 46,
+                  height: 46,
+                  flex: "none",
+                  padding: 0,
+                  borderRadius: 23,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...label(21, trap ? ACCENT_INK : INK),
                   ...TABULAR,
                 }}
               >

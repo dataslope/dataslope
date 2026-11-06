@@ -3,7 +3,6 @@ import { useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { colors } from "../../theme/brand";
 import { COUNTS, DF, IDF, MAX_COUNT, MAX_TFIDF, N, num, OWNER, TFIDF, THE, VOCAB } from "./data";
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -188,7 +187,9 @@ export const DocTable: React.FC<TableProps> = ({ at, morph, frame: frameIn = 0, 
                         top: "50%",
                         transform: "translateY(-50%)",
                         opacity: struck,
-                        ...note(22, INK_SOFT),
+                        // Within 12% of the value beside it (30px), so the
+                        // cell reads as one line of figures.
+                        ...note(27, INK_SOFT),
                       }}
                     >
                       <span style={{ position: "relative" }}>
@@ -370,10 +371,3 @@ export const DocPips: React.FC<{ word: number; p: number; size?: number }> = ({ 
 
 /** "in 3 of 3": how many documents hold the word. */
 export const dfText = (j: number) => `in ${DF[j]} of ${N} documents`;
-
-/** A light card a document is printed on. */
-export const slip: React.CSSProperties = {
-  background: `color-mix(in srgb, ${colors.page} 62%, transparent)`,
-  border: `1px solid color-mix(in srgb, ${INK} 22%, transparent)`,
-  boxShadow: `0 10px 22px -18px color-mix(in srgb, ${INK} 60%, transparent)`,
-};

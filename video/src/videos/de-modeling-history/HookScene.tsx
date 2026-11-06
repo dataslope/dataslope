@@ -2,13 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SANS } from "../../theme/fonts";
 import { HERO, HISTORY, MOVE } from "./data";
-import { AUSTIN, AUSTIN_INK, AUSTIN_WASH, BOSTON, BOSTON_INK, BOSTON_WASH, Drift, Headline, Kicker, OK_INK, pulse, Spot, X0 } from "./parts";
+import { AUSTIN, AUSTIN_INK, AUSTIN_WASH, BOSTON, BOSTON_INK, BOSTON_WASH, Drift, Headline, Kicker, Mark, OK_INK, Spot, X0 } from "./parts";
 
 /** The timeline runs from the start of 2022 to the start of 2025. */
 const T0 = Date.UTC(2022, 0, 1);
@@ -18,6 +18,11 @@ const TL_X1 = 1180;
 const BAND_Y = 520;
 const BAND_H = 64;
 const CARD_Y = 330;
+/** The order's two lines sit this far under CARD_Y, and its pin starts this
+ *  far under it: 14px clear of the date line, so the label reads as the
+ *  pin's own (layout units). */
+const PIN_LABEL = 12;
+const PIN_TOP = 92;
 
 const day = (iso: string) => Date.parse(`${iso}T00:00:00Z`);
 const tx = (iso: string) => TL_X0 + ((day(iso) - T0) / (T1 - T0)) * (TL_X1 - TL_X0);
@@ -62,7 +67,6 @@ export const HookScene: React.FC = () => {
   const orderX = tx(orderDate);
   const todayX = TL_X1 - 6;
   const pinIn = ease(frame, startAt + 6, 14);
-  const ask = pulse(frame, whichAt + 4, 26);
   // The question hangs over the order until the plan moves on.
   const qIn = ease(frame, whichAt, 12);
   const dimFig = ease(frame, changeAt + 10, 18) * 0.35;
@@ -76,7 +80,7 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-chime" at={fifteenAt} level={-36} />
 
       <Drift from={0} to={end + 20}>
-        <Kicker at={startAt}>Data engineer interview prep · Data modeling II</Kicker>
+        <Kicker at={startAt}>Data engineer interview questions · Data modeling II</Kicker>
         <Headline lead="Customers move." turn="Their orders shouldn’t." at={startAt + 4} turnAt={whichAt - 4} size={72} />
         <Spot id={HERO.id} at={startAt + 14} left={1290} top={y(300)} width={540} height={426} />
 
@@ -114,7 +118,7 @@ export const HookScene: React.FC = () => {
 
             {/* The order, pinned to its date inside the Boston years. */}
             <g opacity={pinIn}>
-              <line x1={orderX} x2={orderX} y1={y(CARD_Y) + h(96)} y2={bandTop} stroke={INK} strokeWidth={2} />
+              <line x1={orderX} x2={orderX} y1={y(CARD_Y) + h(PIN_TOP)} y2={bandTop} stroke={INK} strokeWidth={2} />
               <circle cx={orderX} cy={bandTop} r={7} fill={INK} />
             </g>
 
@@ -129,24 +133,17 @@ export const HookScene: React.FC = () => {
             </g>
           </svg>
 
-          {/* The order card. */}
-          <Note at={startAt + 2} x={orderX - 150} y={y(CARD_Y)}>
-            <div
-              style={{
-                width: 300,
-                padding: "10px 18px",
-                border: `2px solid ${INK}`,
-                borderRadius: 8,
-                background: PAPER,
-                boxShadow: ask > 0 ? `0 0 0 ${6 * ask}px color-mix(in srgb, ${ACCENT} ${30 * ask}%, transparent)` : undefined,
-              }}
-            >
-              <div style={{ ...note(27, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          {/* The order: its name over its date and amount, plain text
+              centred on the pin that ties it to the timeline. The question
+              puts the highlighter's yellow behind its name. */}
+          <Note at={startAt + 2} x={orderX - 150} y={y(CARD_Y) + h(PIN_LABEL)} width={300} style={{ textAlign: "center" }}>
+            <div style={{ ...note(27, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              <Mark at={whichAt + 4} out={changeAt + 10}>
                 Order <Num>{orderId}</Num>
-              </div>
-              <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, mayAt, 12) }}>
-                {orderDate} · $<Num>{amount}</Num>
-              </div>
+              </Mark>
+            </div>
+            <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, mayAt, 12) }}>
+              {orderDate} · $<Num>{amount}</Num>
             </div>
           </Note>
 
@@ -176,7 +173,7 @@ export const HookScene: React.FC = () => {
           >
             <span style={{ ...note(28, ACCENT_INK), fontWeight: 700 }}>which city?</span>
             <span style={{ ...note(28, BOSTON_INK), fontWeight: 700 }}>Boston</span>
-            <span style={{ ...note(24, INK_SOFT) }}>or</span>
+            <span style={{ ...note(26, INK_SOFT) }}>or</span>
             <span style={{ ...note(28, AUSTIN_INK), fontWeight: 700 }}>Austin</span>
           </div>
           <Note at={dependsAt} x={orderX + 170} y={y(CARD_Y) + h(58)}>

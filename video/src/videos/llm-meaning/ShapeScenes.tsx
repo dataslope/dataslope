@@ -270,11 +270,11 @@ export const PathScene: React.FC = () => {
           <div style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a score per token</div>
         </div>
       </Fade>
-      <Fade at={thirtyAt - 2} style={{ left: X.stack, top: blockBot + 14, display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 38, color: INK, ...TABULAR }}>×{PARAMS.layers}</div>
+      <Fade at={thirtyAt - 2} style={{ left: X.stack, top: blockBot + 14, display: "flex", alignItems: "baseline", gap: 12 }}>
+        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 24, color: INK, ...TABULAR }}>×{PARAMS.layers}</div>
         <div style={{ opacity: ease(frame, modelAt - 4, 10) }}>
-          <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>in the lesson&apos;s</div>
-          <div style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>mid-sized model</div>
+          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>in the lesson&apos;s</div>
+          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>mid-sized model</div>
         </div>
       </Fade>
     </AbsoluteFill>

@@ -3,10 +3,11 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, ColumnRule, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { ACROSS, BALANCE, CLOSING, CLOSING_TOTAL, money, MONTH_ENDS, OVER_TIME, VISITS_BOTH, VISITS_PER_DAY } from "./data";
 import { colsOf, DataTable, Drift, geoOf, MARK_BAD, MARK_OK, Mono, OK_INK, TableName, Verdict, X0 } from "./parts";
 
@@ -17,56 +18,77 @@ const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
 /** Who visited on each day: the video's own rows, counted in DuckDB. */
 const WHO: Record<string, readonly string[]> = { Mon: ["Ada", "Ben", "Cy"], Tue: ["Ben", "Cy", "Di"] };
 
-/** A kind of measure, lit while the narration is on it. */
-const Kind: React.FC<{ at: number; litFrom: number; litTo: number; x: number; y: number; name: string; eg: string }> = ({
+/** The three kinds side by side, a hairline centred in each gap. */
+const KINDS_Y = 318;
+const KIND_GAP = 64;
+
+/** A kind of measure, lit while the narration is on it, with its note under
+ *  it when it has one. It holds its place before it inks, so the row never
+ *  reflows. */
+const Kind: React.FC<{ at: number; litFrom: number; litTo: number; name: string; eg: string; note?: React.ReactNode; noteAt?: number }> = ({
   at,
   litFrom,
   litTo,
-  x,
-  y,
   name,
   eg,
+  note: under,
+  noteAt = at,
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const lit = Math.min(ease(frame, litFrom, 10), 1 - ease(frame, litTo, 10));
-  if (p <= 0) return null;
+  const q = ease(frame, noteAt, 14);
   return (
-    <div style={{ position: "absolute", left: x, top: y, opacity: p, whiteSpace: "nowrap" }}>
-      <span
-        style={{
-          position: "absolute",
-          left: -12,
-          right: -12,
-          top: -4,
-          bottom: -6,
-          background: HIGHLIGHT,
-          borderRadius: 6,
-          opacity: lit * 0.8,
-        }}
-      />
-      <span style={{ position: "relative", ...label(25, INK), fontWeight: 700 }}>{name}</span>
-      <span style={{ position: "relative", ...note(23, INK_SOFT), marginLeft: 12 }}>{eg}</span>
+    <div style={{ whiteSpace: "nowrap" }}>
+      <div style={{ position: "relative", opacity: p }}>
+        <span
+          style={{
+            position: "absolute",
+            left: -12,
+            right: -12,
+            top: -4,
+            bottom: -6,
+            background: HIGHLIGHT,
+            borderRadius: 6,
+            opacity: lit * 0.8,
+          }}
+        />
+        <span style={{ position: "relative", ...label(25, INK), fontWeight: 700 }}>{name}</span>
+        <span style={{ position: "relative", ...note(23, INK_SOFT), marginLeft: 12 }}>{eg}</span>
+      </div>
+      {under ? <div style={{ marginTop: 12, opacity: q, transform: `translateX(${(1 - q) * -18}px)` }}>{under}</div> : null}
     </div>
   );
 };
 
-/** A visitor, as a small chip. */
+/** The house's hairline between two kinds, set in the row's flow so it sits
+ *  centred in the gap: as tall as a kind and the note under it, inking in
+ *  with the kind to its right. */
+const RULE_H = 72;
+const Gap: React.FC<{ at: number }> = ({ at }) => (
+  <div style={{ position: "relative", width: 1, flex: "none" }}>
+    <ColumnRule x={0} top={0} height={RULE_H} at={at + 2} />
+  </div>
+);
+
+/** A visitor, as the house's badge in the data blue, at 24px: within 12%
+ *  of the day's 24px count and the 26px "people" beside the row. One who
+ *  came on both days turns the highlighter's yellow on `both`. */
+const BLUE_BADGE = badgeStyle("blue", 24);
+const YELLOW_BADGE = badgeStyle("yellow", 24);
 const Who: React.FC<{ name: string; at: number; both?: number }> = ({ name, at, both }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = Math.min(1, pop(frame, at, fps, 14));
   const b = both === undefined ? 0 : ease(frame, both, 10);
+  const mix = (a: unknown, c: unknown) => (b > 0 ? `color-mix(in srgb, ${String(a)} ${Math.round(b * 100)}%, ${String(c)})` : String(c));
   return (
     <span
       style={{
-        display: "inline-block",
-        padding: "2px 14px 4px",
-        borderRadius: 999,
-        border: `2px solid ${BAR}`,
-        background: b > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${b * 100}%, ${PAPER})` : PAPER,
-        ...label(22, BLUE_INK),
-        fontWeight: 700,
+        ...BLUE_BADGE,
+        fontFamily: SANS,
+        background: mix(YELLOW_BADGE.background, BLUE_BADGE.background),
+        color: mix(YELLOW_BADGE.color, BLUE_BADGE.color),
         opacity: p,
         transform: `scale(${0.7 + 0.3 * p})`,
       }}
@@ -153,12 +175,31 @@ export const AdditiveScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── The three kinds, lit in turn ── */}
-        <Kind at={kindAt[0]} litFrom={amountAt} litTo={semiAt} x={X0} y={y(318)} name="additive" eg="an amount" />
-        <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} x={X0 + 440} y={y(318)} name="semi-additive" eg="a balance" />
-        <Kind at={kindAt[2]} litFrom={nonAt} litTo={end + 60} x={X0 + 960} y={y(318)} name="non-additive" eg="a ratio, a distinct count" />
-        <Note at={everyAt} x={X0} y={y(318) + h(44)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>sums across every dimension</span>
-        </Note>
+        <div style={{ position: "absolute", left: X0, top: y(KINDS_Y), display: "flex", alignItems: "flex-start", gap: KIND_GAP }}>
+          <Kind
+            at={kindAt[0]}
+            litFrom={amountAt}
+            litTo={semiAt}
+            name="additive"
+            eg="an amount"
+            noteAt={everyAt}
+            note={<span style={{ ...note(22, OK_INK), fontWeight: 650 }}>sums across every dimension</span>}
+          />
+          <Gap at={kindAt[1]} />
+          <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} name="semi-additive" eg="a balance" />
+          <Gap at={kindAt[2]} />
+          {/* Its note under it, as "sums across every dimension" sits under
+              additive. */}
+          <Kind
+            at={kindAt[2]}
+            litFrom={nonAt}
+            litTo={end + 60}
+            name="non-additive"
+            eg="a ratio, a distinct count"
+            noteAt={ratiosAt}
+            note={<span style={{ ...note(22, INK), fontWeight: 650 }}>don&apos;t sum at all</span>}
+          />
+        </div>
 
         {/* ── A balance: month-end snapshots of two accounts ── */}
         <TableName g={bg} at={semiAt}>
@@ -209,7 +250,6 @@ export const AdditiveScene: React.FC = () => {
               {closing} = <span style={{ color: OK_INK }}>{money(CLOSING_TOTAL)}</span>
             </>
           }
-          size={27}
         />
         <Note at={averageAt} x={R_X} y={y(652)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>or the average over the period</span>
@@ -230,22 +270,28 @@ export const AdditiveScene: React.FC = () => {
             </div>
           );
         })}
-        <div style={{ position: "absolute", left: R_X, top: y(732) + 2 * h(54), display: "flex", alignItems: "center", gap: 10, opacity: ease(frame, fourAt - 2, 10) }}>
+        <div
+          style={{
+            position: "absolute",
+            left: R_X,
+            top: y(732) + 2 * h(54),
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            opacity: ease(frame, fourAt - 2, 10),
+          }}
+        >
           <span style={{ ...label(23, INK_SOFT), fontWeight: 700, width: 64 }}>both</span>
           {everyone.map((p, i) => (
             <Who key={p} name={p} at={fourAt + i * 2} />
           ))}
           <span style={{ ...note(26, OK_INK), fontWeight: 800, marginLeft: 12 }}>
-            <Num>{VISITS_BOTH}</Num> people,
-          </span>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, opacity: ease(frame, sixAt - 2, 10) }}>
-            not <Num>{sumOfDays}</Num>
+            <Num>{VISITS_BOTH}</Num> people,{" "}
+            <span style={{ color: ACCENT_INK, fontWeight: 700, opacity: ease(frame, sixAt - 2, 10) }}>
+              not <Num>{sumOfDays}</Num>
+            </span>
           </span>
         </div>
-        {/* Under its kind, as "sums across every dimension" sits under additive. */}
-        <Note at={ratiosAt} x={X0 + 960} y={y(318) + h(44)}>
-          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>don&apos;t sum at all</span>
-        </Note>
         {/* One remedy for each kind, beside the visitors they are about. */}
         <Note at={recountAt} x={FIX_X} y={y(732) - h(6)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
