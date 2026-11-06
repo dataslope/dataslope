@@ -337,8 +337,8 @@ export const SampleScene: React.FC = () => {
       />
       <Note at={tenAt} x={(truth2X + easySlot.x) / 2} y={y(FIG2_BASE - 166)} from="up">
         <span style={{ display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap", ...halo }}>
-          <span style={{ ...note(26, EASY_INK), fontWeight: 700 }}>{SHOWN.over} points</span>
-          <span style={note(22, INK_SOFT)}> too high</span>
+          <span style={{ ...note(24, EASY_INK), fontWeight: 700 }}>{SHOWN.over} points</span>
+          <span style={note(24, INK_SOFT)}> too high</span>
         </span>
       </Note>
     </AbsoluteFill>

@@ -238,7 +238,7 @@ export const DigestScene: React.FC = () => {
           <span style={{ ...note(24, EASY_INK), fontWeight: 700 }}>
             {fmt(H.resultRooseveltShare - H.digestRooseveltShare, 1)} points
           </span>
-          <span style={note(21, INK_SOFT)}> off</span>
+          <span style={note(24, INK_SOFT)}> off</span>
         </span>
       </Note>
 
@@ -330,7 +330,8 @@ const Row: React.FC<{
           ...halo,
         }}
       >
-        {named ? <span style={note(22, INK_SOFT)}>Roosevelt </span> : null}
+        {/* One size on the line: the value is set apart by weight and ink. */}
+        {named ? <span style={note(26, INK_SOFT)}>Roosevelt </span> : null}
         <span style={{ ...note(26, ink), fontWeight: 700 }}>{fmt(value, 1)}%</span>
       </div>
     </>
