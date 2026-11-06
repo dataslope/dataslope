@@ -130,11 +130,13 @@ export const JoinScene: React.FC = () => {
         />
         <Note at={reachAt + 4} x={R_X} y={y(TOP) + listingHeight(JOIN.december.length, 20) + h(24)}>
           <div style={{ ...label(21, INK_SOFT) }}>orders into the join</div>
+          {/* The count on a line of its own, so it may stay large; what it
+              is not, under it at the label's size. */}
           <div style={{ ...note(40, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Num>{thousands(JOIN.probe)}</Num>
-            <span style={{ ...note(24, INK_SOFT), marginLeft: 14, opacity: ease(frame, millionAt, 10) }}>
-              not <Num>{thousands(JOIN.allProbe)}</Num>
-            </span>
+          </div>
+          <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, millionAt, 10) }}>
+            not <Num>{thousands(JOIN.allProbe)}</Num>
           </div>
         </Note>
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { CLUSTER, thousands } from "./data";
-import { DataTable, Drift, KeyArrow, Listing, OK_INK, PageStrip, TableName, tableGeometry, X0 } from "./parts";
+import { DataTable, Drift, KeyArrow, Listing, OK_INK, PageStrip, QMono, tableGeometry, TableName, X0 } from "./parts";
 
 const TOP = 330;
 const HEAD_H = 46;
