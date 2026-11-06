@@ -24,7 +24,6 @@ import {
   MARK_OK,
   OK_INK,
   Py,
-  Source,
   Steps,
   TestGrid,
   Verdict,
@@ -89,8 +88,8 @@ export const DebugScene: React.FC = () => {
   const hundredAt = n.word("debug", "often a few hundred lines");
   const wrongAt = n.word("debug", "told it's wrong");
   const slowAt = n.word("debug", "or slow");
-  const googleAt = n.word("debug", "Google's pilot");
-  const approvedAt = n.word("debug", "which allows an approved assistant");
+  const allowedAt = n.word("debug", "Where an assistant is allowed");
+  const plainAt = n.word("debug", "the brief can be as plain as");
   const readAt = n.word("debug", "read, debug and optimize");
   const oursAt = n.word("debug-report", "Ours is eight lines");
   const reportAt = n.word("debug-report", "The report");
@@ -207,12 +206,12 @@ export const DebugScene: React.FC = () => {
             </FadeIn>
           </span>
         </Note>
-        <Ink at={googleAt} dur={20} out={introOut} style={{ left: 120, top: y(500), ...body(44, true), color: INK, whiteSpace: "nowrap" }}>
+        <Note at={allowedAt} x={120} y={y(480)} out={introOut}>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>where an assistant is allowed, the brief:</span>
+        </Note>
+        <Ink at={plainAt} dur={20} out={introOut} style={{ left: 120, top: y(525), ...body(44, true), color: INK, whiteSpace: "nowrap" }}>
           &ldquo;<Mark at={readAt}>read, debug and optimize</Mark>&rdquo; an existing codebase
         </Ink>
-        <Note at={approvedAt} x={120} y={y(575)} out={introOut}>
-          <Source>Google&apos;s interview pilot, which allows an approved assistant</Source>
-        </Note>
         <div style={{ position: "absolute", left: 1360, top: sketchTop, opacity: 1 - ease(frame, introOut, 10) }}>
           {SKETCH.map((l, i) => {
             const p = ease(frame, hundredAt - 6 + i * 0.35, 8);

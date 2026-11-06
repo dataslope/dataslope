@@ -126,9 +126,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * From the page, as it words them (check.mjs fails if the page stops saying
  * them): the survey's 66% and 45% (Stack Overflow, 2025 Developer Survey, AI
  * section, the page's footnote); the seven kinds of bug, and the supply-chain
- * risk of an invented package; Google's pilot's "read, debug and optimize",
- * and that it allows an approved assistant (the page's table), and the "few
- * hundred lines"; the five steps of the method, and that an assistant "is not
+ * risk of an invented package; the task as "read, debug and optimize" an
+ * existing codebase (the page's wording, which it attributes to a pilot that
+ * allows an approved assistant; the narration names no company, since what a
+ * company does now goes stale), and the "few hundred lines"; the five steps of the method, and that an assistant "is not
  * a substitute for step 2"; "Like a pull request from a capable stranger" and
  * the five checks; the three bugs, and "Each is a boundary or an unstated
  * assumption, which is where to look first". Past the page, argued rather
@@ -147,7 +148,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * be added); "O of n squared" and "N plus one" spelled as said, with the N
  * plus one query defined where it is named; numbers as they are said; no
  * sentence opens on "A" before an initialism. No product name runs here:
- * Stack Overflow and Google are named as the sources the page cites.
+ * Stack Overflow is named, as the dated source of a dated survey; no claim is
+ * made about what a named company does now.
  */
 export const script: NarrationScript = {
   id: "be-code-review",
@@ -212,7 +214,7 @@ export const script: NarrationScript = {
     {
       id: "debug",
       scene: true,
-      text: "Question two. What happens in a code comprehension or debugging round? You're given unfamiliar code, often a few hundred lines, and told it's wrong, or slow. Google's pilot, which allows an approved assistant, frames the task as read, debug and optimize an existing codebase.",
+      text: "Question two. What happens in a code comprehension or debugging round? You're given unfamiliar code, often a few hundred lines, and told it's wrong, or slow. Where an assistant is allowed, the brief can be as plain as read, debug and optimize an existing codebase.",
       pauseAfter: 0.6,
     },
     {
