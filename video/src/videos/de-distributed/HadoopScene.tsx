@@ -167,7 +167,7 @@ export const HadoopScene: React.FC = () => {
 
         {/* Iterative work: every pass comes back to the cached dataset. */}
         <Note at={cacheAt - 2} x={chipX} y={loopY - h(18)} width={CHIP_W} style={{ textAlign: "center" }}>
-          <Chip mono size={22} color={OK} ink={OK_INK}>
+          <Chip mono size={22} tone="green">
             cache()
           </Chip>
         </Note>
@@ -201,7 +201,7 @@ export const HadoopScene: React.FC = () => {
               <Chip>streaming</Chip>
             </span>
             <span style={{ opacity: ease(frame, optAt - 2, 10) }}>
-              <Chip color={ds("green", 600)} ink={OK_INK}>
+              <Chip tone="green">
                 whole-query optimization
               </Chip>
             </span>

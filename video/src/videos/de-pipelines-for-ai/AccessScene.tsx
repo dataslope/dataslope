@@ -94,7 +94,7 @@ export const AccessScene: React.FC = () => {
             filtered at query time, inside the search,
             <span style={{ opacity: ease(frame, identityAt - 2, 10) }}>
               {" "}for{" "}
-              <span style={{ fontWeight: 700 }}>Dana, {USER_TEAM}</span>
+              <span style={{ padding: "1px 10px", borderRadius: 14, border: `2px solid ${INK}`, fontWeight: 650 }}>Dana, {USER_TEAM}</span>
             </span>
           </span>
         </Note>

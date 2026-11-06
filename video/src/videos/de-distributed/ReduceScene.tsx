@@ -102,7 +102,7 @@ export const ReduceScene: React.FC = () => {
         {/* What groupByKey sends: every pair. */}
         <Note at={allAt - 2} x={A_X} y={y(312)}>
           <span style={{ display: "flex", gap: 8, alignItems: "center", whiteSpace: "nowrap" }}>
-            <Chip mono size={21} color={ACCENT} ink={ACCENT_INK}>
+            <Chip mono size={21} tone="red">
               groupByKey
             </Chip>
             <span style={{ ...label(20, INK_SOFT) }}>sends</span>
@@ -126,7 +126,7 @@ export const ReduceScene: React.FC = () => {
         {/* What reduceByKey sends: each machine's sums. */}
         <Note at={rbkAt - 2} x={B_X} y={y(312)}>
           <span style={{ display: "flex", gap: 8, alignItems: "center", whiteSpace: "nowrap" }}>
-            <Chip mono size={21} color={OK} ink={OK_INK}>
+            <Chip mono size={21} tone="green">
               reduceByKey
             </Chip>
             <span style={{ ...label(20, INK_SOFT) }}>sends</span>

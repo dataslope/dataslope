@@ -4,7 +4,7 @@ import { arrowHead, type Cubic, cubicPath, lineLength, roundedPolyline, sampleCu
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { ACCENT, BAR, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import type { Pt } from "../../editorial/ui";
+import { badgeStyle, type BadgeTone, type Pt } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import { DEPT_COLOR, DEPT_INK, type Dept, ILLUSTRATIONS, type Row, VIDEO } from "./data";
@@ -419,23 +419,22 @@ export const Elbow: React.FC<{
   );
 };
 
-/** A small rounded tag: a word set in its own ink on a wash of it. */
-export const Chip: React.FC<{ children: React.ReactNode; color?: string; ink?: string; size?: number; mono?: boolean }> = ({
+/**
+ * A small tag: a word or a value as the house badge (`badgeStyle`), a light
+ * tint of its hue in that hue's ink, no border. `size` is the line's text
+ * size; code is set in the mono face at 0.92 of it, which reads the same
+ * size, and never under 19px.
+ */
+export const Chip: React.FC<{ children: React.ReactNode; tone?: BadgeTone; size?: number; mono?: boolean }> = ({
   children,
-  color = BAR,
-  ink = INK,
+  tone = "blue",
   size = 22,
   mono = false,
 }) => (
   <span
     style={{
-      display: "inline-block",
-      padding: "4px 12px",
-      borderRadius: 6,
-      background: `color-mix(in srgb, ${color} 14%, ${PAPER})`,
-      border: `1.5px solid color-mix(in srgb, ${color} 60%, ${PAPER})`,
-      ...(mono ? { fontFamily: MONO, fontSize: Math.max(19, size * 0.92), fontWeight: 600, color: ink, fontVariantLigatures: "none" } : { ...label(size, ink), fontWeight: 600 }),
-      whiteSpace: "nowrap",
+      ...badgeStyle(tone, size),
+      ...(mono ? { fontFamily: MONO, fontSize: Math.max(19, size * 0.92), fontWeight: 600, fontVariantLigatures: "none" } : { fontFamily: SANS }),
     }}
   >
     {children}

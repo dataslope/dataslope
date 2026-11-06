@@ -3,11 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, body, label, note } from "../../editorial/style";
-import { Num } from "../../editorial/ui";
+import { Badge, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { partOf } from "./data";
-import { Chip, Drift, Flow, Headline, Kicker, Mono, Spot } from "./parts";
+import { Drift, Flow, Headline, Kicker, Mono, Spot } from "./parts";
 
 /** The stack's left edge, its right edge, and the arrow beside it. The
  *  layers are rows of plain text ruled off by a hairline, not boxes. */
@@ -39,8 +40,8 @@ type Layer = {
   until: number;
   /** The topic videos that answer this layer's questions, by folder. */
   parts: string[];
-  /** Its topics, as chips, each on the line (0 or 1) it is set on, so the
-   *  two rows break where the page breaks them. */
+  /** Its topics, as the house's badges, each on the line (0 or 1) it is
+   *  set on, so the two rows break where the page breaks them. */
   chips: { at: number; text: React.ReactNode; line: 0 | 1 }[];
 };
 
@@ -291,18 +292,21 @@ export const PromptScene: React.FC = () => {
                     <PartsLabel parts={l.parts.map(partOf)} />
                   </div>
                 </div>
-                {/* The topics, as chips on two rows, each inking in as it is
+                {/* The topics, as badges on two rows, each inking in as it is
                     said and holding its place before, so neither row moves. */}
                 <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
                   {([0, 1] as const).map((line) => (
                     <div key={line} style={{ display: "flex", gap: 12 }}>
                       {l.chips
                         .filter((c) => c.line === line)
-                        .map((c, k) => (
-                          <Chip key={k} at={c.at} size={26}>
-                            {c.text}
-                          </Chip>
-                        ))}
+                        .map((c, k) => {
+                          const q = ease(frame, c.at - 2, 12);
+                          return (
+                            <Badge key={k} tone="blue" size={26} style={{ fontFamily: SANS, opacity: q, transform: `translateY(${(1 - q) * 8}px)` }}>
+                              {c.text}
+                            </Badge>
+                          );
+                        })}
                     </div>
                   ))}
                   {/* Inter at the layer name's size, not the serif: the two

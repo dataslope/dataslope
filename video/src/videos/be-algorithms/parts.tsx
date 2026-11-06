@@ -253,7 +253,7 @@ const TONE: Record<Tone, { line: string; fill: string; ink: string }> = {
   data: { line: BAR, fill: BLUE_FILL, ink: BLUE_INK },
   ok: { line: OK, fill: `color-mix(in srgb, ${OK} 12%, ${PAPER})`, ink: OK_INK },
   bad: { line: ACCENT, fill: `color-mix(in srgb, ${ACCENT} 10%, ${PAPER})`, ink: ACCENT_INK },
-  plain: { line: INK, fill: PAPER, ink: INK },
+  plain: { line: INK, fill: "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)", ink: INK },
   look: { line: HIGHLIGHT, fill: `color-mix(in srgb, ${HIGHLIGHT} 45%, ${PAPER})`, ink: INK },
 };
 export const toneInk = (t: Tone) => TONE[t].ink;
@@ -434,7 +434,7 @@ export const Cell: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        border: `2px solid ${t.line}`,
+        // The house badge look (owner, 2026-11-06): a tint, no border.
         borderRadius: 8,
         background: t.fill,
         display: "flex",

@@ -4,7 +4,7 @@ import { arrowHead, cubicPath, sampleCubic, type Cubic } from "../../components/
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -251,9 +251,7 @@ export const CasesScene: React.FC = () => {
           <span
             style={{
               ...note(24, INK),
-              padding: "4px 14px",
-              borderRadius: 20,
-              border: `1.5px solid ${INK_SOFT}`,
+              ...badgeStyle("gray", 24),
               opacity: 1 - ease(frame, numbersAt - 2, 12) * 0.5,
             }}
           >

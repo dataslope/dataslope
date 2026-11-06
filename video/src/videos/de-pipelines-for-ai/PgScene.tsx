@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { DATA, DATA_TINT, Drift, head, lineOf, madeUp, Mark, MARK_BAD, MARK_OK, OK_INK, SqlListing, sqlListingHeight, Tag, X0 } from "./parts";
+import { Chip, DATA, DATA_TINT, Drift, head, lineOf, madeUp, Mark, MARK_BAD, MARK_OK, OK_INK, SqlListing, sqlListingHeight, X0 } from "./parts";
 
 /** pgvector's nearest-neighbour search with an access filter and a join, in
  *  its own syntax (`<=>` is its cosine distance). Shown, not run: no vector
@@ -234,9 +234,9 @@ export const PgScene: React.FC = () => {
           </span>
         </Note>
         {evidence.map((e, i) => (
-          <Tag key={e.text} x={RIGHT_X} y={y(630) + 156 + i * 54} at={e.at - 2} size={22}>
+          <Chip key={e.text} x={RIGHT_X} y={y(630) + 156 + i * 54} at={e.at - 2} size={22}>
             {e.text}
-          </Tag>
+          </Chip>
         ))}
       </Drift>
     </AbsoluteFill>

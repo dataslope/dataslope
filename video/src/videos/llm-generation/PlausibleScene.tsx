@@ -103,7 +103,7 @@ export const PlausibleScene: React.FC = () => {
               </span>
             </Ink>
             <Note at={tagIn[i] - 2} x={X0} y={top + h(TAG_DY)} from="up">
-              <Tag color={color} ink={c.grounded ? GOOD_INK : ACCENT_INK}>
+              <Tag tone={c.grounded ? "green" : "red"}>
                 {c.grounded ? "seen millions of times" : "never in its data"}
               </Tag>
             </Note>

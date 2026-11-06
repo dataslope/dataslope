@@ -118,7 +118,7 @@ export const LineageScene: React.FC = () => {
             <span style={{ position: "relative", display: "inline-block" }}>
               {stepsMark > 0 ? <span style={{ position: "absolute", inset: "-4px -8px", background: HIGHLIGHT, borderRadius: 6, opacity: stepsMark }} /> : null}
               <span style={{ position: "relative" }}>
-                <Chip mono size={22} color={k === 1 && cached > 0 ? OK : BAR} ink={k === 1 && cached > 0 ? OK_INK : INK}>
+                <Chip mono size={22} tone={k === 1 && cached > 0 ? "green" : "blue"}>
                   {c.name}
                 </Chip>
               </span>

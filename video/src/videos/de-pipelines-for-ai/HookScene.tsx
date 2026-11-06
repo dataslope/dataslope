@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HERO } from "./data";
-import { Box, DATA, DATA_TINT, Doc, type DocRow, Drift, Headline, Kicker, LineArrow, Mark, say, Spot, X0 } from "./parts";
+import { Box, Chip, DATA, DATA_TINT, Doc, type DocRow, Drift, Headline, Kicker, LineArrow, Mark, say, Spot, X0 } from "./parts";
 
 const FIG_Y = 360;
 const BOX_H = 120;
@@ -19,19 +19,19 @@ const DOC_ROWS: DocRow[] = [
   { kind: "t", w: 0.6 },
 ];
 const STEPS = [
-  { text: "extract" },
-  { text: "clean" },
-  { text: "split" },
-  { text: "embed" },
-  { text: "index" },
-  { text: "keep fresh" },
-  { text: "delete" },
+  { text: "extract", x: 0, w: 136 },
+  { text: "clean", x: 154, w: 110 },
+  { text: "split", x: 282, w: 104 },
+  { text: "embed", x: 404, w: 122 },
+  { text: "index", x: 544, w: 112 },
+  { text: "keep fresh", x: 674, w: 172 },
+  { text: "delete", x: 864, w: 122 },
 ] as const;
 
 /**
  * The opening, on Part 10's bridge: a pipeline that used to end in a
  * dashboard now ends in an AI assistant, which knows your documents only
- * from what is in its index. Then the pipeline's steps as a line of words, the fundamentals that
+ * from what is in its index. Then the pipeline's steps as chips, the fundamentals that
  * carry over, and the two new parts lit (the vector store, the embedding
  * bill), and how the eleven questions run. The llama stands at the right.
  */
@@ -113,36 +113,23 @@ export const HookScene: React.FC = () => {
         </Note>
 
         {/* The steps, and what is new among them. */}
-        {/* The steps as one line of words joined by middle dots, each rising
-            in as it is said; the two new ones in blue, the highlighter laid
-            behind each as the narration names it. */}
-        <div style={{ position: "absolute", left: X0, top: STEP_Y, ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-          {STEPS.map((s, i) => {
-            const p = ease(frame, steps[i] - 2, 12);
-            const litAt = i === 3 ? billAt - 2 : i === 4 ? storeAt - 2 : undefined;
-            const l = litAt === undefined ? 0 : ease(frame, litAt, 12);
-            return (
-              <span key={s.text} style={{ display: "inline-block", opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
-                {i ? <span style={{ whiteSpace: "pre", color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
-                <span
-                  style={{
-                    color: i === 3 || i === 4 ? BLUE_INK : INK,
-                    padding: "1px 8px 2px",
-                    margin: "0 -8px",
-                    borderRadius: 4,
-                    background: l > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${l * 100}%, transparent)` : undefined,
-                  }}
-                >
-                  {s.text}
-                </span>
-              </span>
-            );
-          })}
-        </div>
-        <Note at={carryAt} x={X0} y={STEP_Y + 52}>
+        {STEPS.map((s, i) => (
+          <Chip
+            key={s.text}
+            x={X0 + s.x}
+            y={STEP_Y}
+            at={steps[i] - 2}
+            size={26}
+            ink={i === 3 || i === 4 ? BLUE_INK : INK}
+            lit={i === 3 ? billAt - 2 : i === 4 ? storeAt - 2 : undefined}
+          >
+            {s.text}
+          </Chip>
+        ))}
+        <Note at={carryAt} x={X0} y={STEP_Y + 84}>
           <span style={say(26, INK_SOFT)}>the fundamentals carry over</span>
         </Note>
-        <Note at={storeAt - 4} x={X0} y={STEP_Y + 100}>
+        <Note at={storeAt - 4} x={X0} y={STEP_Y + 134}>
           <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             what&apos;s new: <Mark at={storeAt + 2}>the vector store</Mark>
             <span style={{ opacity: ease(frame, billAt - 4, 10) }}>

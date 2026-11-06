@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { ACCENT, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { END_A, FIRST_FLIPS, STEPS, TREND, WALK_A } from "./data";
 import {
@@ -75,21 +75,20 @@ export const WalkScene: React.FC = () => {
           <div
             key={i}
             style={{
+              ...note(21),
+              ...badgeStyle(up ? "blue" : "red", 21),
               position: "absolute",
               left: 380 + i * (CHIP_W + CHIP_GAP),
               top: y(258),
               width: CHIP_W,
               height: 42,
               boxSizing: "border-box",
-              border: `1.5px solid ${up ? COLOR.a : ACCENT}`,
-              borderRadius: 6,
+              padding: 0,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               opacity: p,
               transform: `translateY(${(1 - p) * (up ? 10 : -10)}px)`,
-              ...note(21, up ? COLOR_INK.a : ACCENT_INK),
-              fontWeight: 650,
             }}
           >
             {up ? "+1" : "−1"}

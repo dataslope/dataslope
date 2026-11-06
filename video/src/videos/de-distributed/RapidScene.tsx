@@ -216,7 +216,7 @@ const Push: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ display: "flex", gap: 8 }}>
           {COLUMNS.map((col) => (
             <span key={col} style={{ opacity: NAMED.has(col) ? 1 : 1 - 0.72 * prune }}>
-              <Chip mono size={20} color={NAMED.has(col) && prune > 0.5 ? OK : ds("gray", 400)} ink={NAMED.has(col) ? OK_INK : INK_SOFT}>
+              <Chip mono size={20} tone={NAMED.has(col) && prune > 0.5 ? "green" : "gray"}>
                 {col}
               </Chip>
             </span>

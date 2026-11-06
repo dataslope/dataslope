@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { BAR, body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { badgeStyle, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -208,12 +208,8 @@ export const KindsScene: React.FC = () => {
             left: LEAVES[0].x + lerp(COUNTRIES[k][1], COUNTRIES[SHUFFLED[k]][1], shuffle),
             top: y(PICTURE_Y) + lerp(COUNTRIES[k][2], COUNTRIES[SHUFFLED[k]][2], shuffle) + Math.sin(shuffle * Math.PI) * ARC[k],
             opacity: ease(frame, leafAt[0] + 4 + k * 4, 10),
-            border: `2px solid ${INK}`,
-            borderRadius: 8,
-            padding: "6px 16px",
-            background: PAPER,
             ...note(26, INK),
-            fontWeight: 650,
+            ...badgeStyle("gray", 26),
           }}
         >
           {c}
@@ -312,13 +308,8 @@ export const KindsScene: React.FC = () => {
         >
           <span
             style={{
-              border: `2px solid ${INK}`,
-              borderRadius: 8,
-              padding: "6px 14px",
-              background: PAPER,
+              ...badgeStyle("gray", 30),
               fontFamily: MONO,
-              fontSize: 30,
-              color: INK,
             }}
           >
             {ZIPS.zip}

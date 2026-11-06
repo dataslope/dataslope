@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, fmt, HAIRLINE, headline, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -35,6 +35,10 @@ const SLOTS = (() => {
     return { col, k: filled[col]++ };
   });
 })();
+
+/** The dtype's badge, gray, and the yellow it turns on "stored". */
+const DTYPE_BADGE = badgeStyle("gray", 22);
+const DTYPE_LIT = badgeStyle("yellow", 22);
 
 /**
  * Part 3 opens: favorite flavors stored as the codes 1, 2 and 3, a mean of
@@ -175,17 +179,14 @@ export const FlavorScene: React.FC = () => {
       {/* The computer's view of the column: integers, as pandas stores them. */}
       <Ink at={computerAt - 4} dur={14} style={{ left: DTYPE_X, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
         <div style={label(20, INK_SOFT)}>stored as whole numbers</div>
+        {/* A gray house badge that turns the highlighter's yellow on "stored". */}
         <div
           style={{
             marginTop: 8,
-            display: "inline-block",
-            padding: "2px 12px",
-            border: `1.5px solid ${HAIRLINE}`,
-            borderRadius: 14,
+            ...DTYPE_BADGE,
             fontFamily: MONO,
-            fontSize: 22,
-            color: INK_SOFT,
-            background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(stored * 100)}%, transparent)`,
+            background: `color-mix(in srgb, ${DTYPE_LIT.background} ${Math.round(stored * 100)}%, ${DTYPE_BADGE.background})`,
+            color: `color-mix(in srgb, ${DTYPE_LIT.color} ${Math.round(stored * 100)}%, ${DTYPE_BADGE.color})`,
           }}
         >
           {FLAVORS.dtype}

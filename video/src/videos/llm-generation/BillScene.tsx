@@ -145,12 +145,12 @@ export const BillScene: React.FC = () => {
 
       {/* Every token read, written or thought ends up here. */}
       {[
-        { at: readsAt, text: "reads", color: ds("gray", 500), ink: INK_SOFT },
-        { at: writesAt, text: "writes", color: BAR, ink: BLUE_INK },
-        { at: thinksAt, text: "thinks", color: THINK, ink: THINK_INK },
+        { at: readsAt, text: "reads", tone: "gray" as const },
+        { at: writesAt, text: "writes", tone: "blue" as const },
+        { at: thinksAt, text: "thinks", tone: "purple" as const },
       ].map((c, k) => (
         <Note key={c.text} at={c.at - 2} x={X0 + 260 + k * 150} y={y(CHIPS_Y)} from="up">
-          <Tag color={c.color} ink={c.ink} size={22}>
+          <Tag tone={c.tone} size={22}>
             {c.text}
           </Tag>
         </Note>

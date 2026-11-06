@@ -135,12 +135,12 @@ export const MiddleScene: React.FC = () => {
         </Ink>
         {/* The lesson's rule: what matters goes where recall is strong. */}
         <Note at={firstLastAt - 2} x={CX0 - 40} y={y(C_BASE) + 40}>
-          <Tag color={GOOD} ink={GOOD_INK} size={22}>
+          <Tag tone="green" size={22}>
             key facts here
           </Tag>
         </Note>
         <Note at={firstLastAt + 6} x={CX1 + 40} y={y(C_BASE) + 40} align="right">
-          <Tag color={GOOD} ink={GOOD_INK} size={22}>
+          <Tag tone="green" size={22}>
             or here
           </Tag>
         </Note>

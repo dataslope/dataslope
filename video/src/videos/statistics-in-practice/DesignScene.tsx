@@ -3,10 +3,10 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, body, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { badgeStyle, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Bracket, Headline, Kicker, lerp, Marker, Ring, STAT, STAT_INK, Strike, Svg } from "./parts";
+import { Bracket, Headline, Kicker, lerp, Marker, Ring, STAT_INK, Strike, Svg } from "./parts";
 
 /** The arc of an A/B test, in the lesson's order. */
 export const STEPS = ["Hypothesis and metric", "Randomize", "Sample size", "Run to plan", "Analyze", "Decide"];
@@ -27,16 +27,19 @@ const METRICS = [
   "Page views",
 ];
 const MOVER = METRICS.indexOf("Scroll depth");
-/** The ten as outlined pills, five to a row, 12px between rows. "Conversion
+/** The ten as house badges, gray, five to a row, 12px between rows; the one
+ *  that moved turns red as it is cheered, then is struck. "Conversion
  *  rate" (42px serif) in the column beside them is centred on the two rows
  *  rather than set on either, and "chosen now" sits 10px under it. Offsets in
  *  px from y(METRIC_Y). */
+const GRAY_BADGE = badgeStyle("gray", 21);
+const RED_BADGE = badgeStyle("red", 21);
 const METRIC_ROWS = [METRICS.slice(0, 5), METRICS.slice(5)];
 const METRIC_ROW_GAP = 12;
 const METRIC_Y = 726;
-const PRIMARY_DY = 17;
-const CHOSEN_DY = 80;
-const CHEER_Y = 838;
+const PRIMARY_DY = 12;
+const CHOSEN_DY = 75;
+const CHEER_Y = 822;
 
 /**
  * Part 2 opens: the A/B test's arc, nearly all of it decided before the first
@@ -203,13 +206,15 @@ export const DesignScene: React.FC = () => {
                   >
                     <span
                       style={{
-                        ...note(21, mover && hot > 0 ? STAT_INK : INK),
-                        fontWeight: mover ? 650 : 500,
-                        display: "inline-block",
-                        padding: "5px 14px",
-                        borderRadius: 20,
-                        border: `1.6px solid ${mover && hot > 0 ? STAT : HAIRLINE}`,
-                        background: mover ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(hot * 100)}%, ${PAPER})` : PAPER,
+                        ...note(21),
+                        ...GRAY_BADGE,
+                        // The one that moved turns from gray to red as it is cheered.
+                        ...(mover
+                          ? {
+                              background: `color-mix(in srgb, ${RED_BADGE.background} ${Math.round(hot * 100)}%, ${GRAY_BADGE.background})`,
+                              color: `color-mix(in srgb, ${RED_BADGE.color} ${Math.round(hot * 100)}%, ${GRAY_BADGE.color})`,
+                            }
+                          : null),
                       }}
                     >
                       {mover ? <Strike at={hackingAt - 4}>{m}</Strike> : m}

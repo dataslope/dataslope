@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FILTER, num, pct } from "./data";
-import { DATA, Drift, madeUp, Mark, MARK_BAD, OK, OK_INK, QueryMark, QUIET, Tag, X0 } from "./parts";
+import { Chip, DATA, Drift, madeUp, Mark, MARK_BAD, OK, OK_INK, QueryMark, QUIET, X0 } from "./parts";
 import { clusters, nearestOf, tenantOf } from "./space";
 
 const SC = { x: 140, w: 660, top: 330, h: 430 };
@@ -234,7 +234,7 @@ export const FilterScene: React.FC = () => {
 
         {/* What good answers do. */}
         {fixes.map((f, i) => (
-          <Tag key={f.text} x={GRID.x} y={gridTop + 10 * (GRID.cell + GRID.gap) + 120 + i * 54} at={f.at - 2} size={24} ink={OK_INK}>
+          <Chip key={f.text} x={GRID.x} y={gridTop + 10 * (GRID.cell + GRID.gap) + 120 + i * 54} at={f.at - 2} size={24} ink={OK_INK}>
             {f.text}
             {i === 1 ? (
               <span style={{ color: INK_SOFT, fontWeight: 500 }}>
@@ -242,7 +242,7 @@ export const FilterScene: React.FC = () => {
                 <span style={{ opacity: ease(frame, tenAt - 2, 10) }}>, until 10</span>
               </span>
             ) : null}
-          </Tag>
+          </Chip>
         ))}
       </Drift>
     </AbsoluteFill>

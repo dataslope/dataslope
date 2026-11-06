@@ -146,7 +146,7 @@ export const HashScene: React.FC = () => {
         <Line at={twoSumAt + 6} x={MAP_X} y={aTop - 50} size={22} weight={650} color={INK_SOFT}>
           map: number → index
         </Line>
-        <div style={{ position: "absolute", left: MAP_X, top: aTop, width: 190, height: 64, boxSizing: "border-box", border: `2px solid ${BAR}`, borderRadius: 8, background: BLUE_FILL, opacity: ease(frame, twoSumAt + 6, 10) }} />
+        <div style={{ position: "absolute", left: MAP_X, top: aTop, width: 190, height: 64, boxSizing: "border-box", borderRadius: 8, background: BLUE_FILL, opacity: ease(frame, twoSumAt + 6, 10) }} />
         <div style={{ position: "absolute", left: MAP_X, width: 190, top: aTop + 14, textAlign: "center", fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, opacity: ease(frame, storeAt + 2, 10) }}>
           {nums[0]} → 0
         </div>
