@@ -39,10 +39,10 @@ ids that sort in course order:
 | `How-LLMs-Work` | `Llm-1-Tokens` to `Llm-5-Benchmarks`, narrated by Drew, with two deep dives: `Llm-2-1-AttentionScore` (one attention score worked through) and `Llm-4-1-ConversationCost` (why a chat's bill grows faster than the chat) |
 | `NLP-Python` | `Nlp-1-WhyTextIsHard` to `Nlp-5-History`, narrated by Hope, with two deep dives: `Nlp-2-1-LemmasAndTags` (lemmatizing needs the part of speech) and `Nlp-3-1-ZipfsLaw` (Zipf's law read off a log-log plot) |
 
-The `Logo-Reveals` folder holds nineteen short brand clips: five stings,
-eight course openers and six variations of the columns opener (see
+The `Logo-Reveals` folder holds twenty short brand clips: five stings,
+eight course openers and seven variations of the columns opener (see
 [Logo reveals](#logo-reveals)). The `Thumbnails` folder holds a YouTube
-thumbnail for each merged course and interview track, in three designs (see
+thumbnail for each merged course and interview track, in four designs (see
 [YouTube thumbnails](#youtube-thumbnails)).
 
 A deep dive (`Llm-2-1-…`) is a two-minute video on one idea its unit could
@@ -563,6 +563,7 @@ words, and holds the finished lockup for at least a second.
 | `Columns-4-Large` | `assemble` | `ink` | black, blue bar, every line at 64 px |
 | `Columns-5-FullCourse` | `rise` | `slide` | black, a whole merged course: no unit |
 | `Columns-6-InterviewPrep` | `assemble` | `blur` | black, blue bar, a whole interview track |
+| `Columns-7-ThreeLines-Assemble` | `assemble` | `blur` | Columns-3's three lines with Columns-1's motion and sound |
 
 All of them are one component, `LogoReveal` (`src/reveals/`), with different
 props (`src/reveals/presets.ts`). Any mark motion goes with any text motion,
@@ -629,9 +630,11 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
 ## YouTube thumbnails
 
 Stills in the Studio's `Thumbnails` folder, one per merged course and
-interview track in each of three designs, 1280x720:
-`Thumb-<Design>-<Track>`, e.g. `Thumb-Split-DatabaseDesign`. Each track has
-its own watercolor animal, so the seven read apart at a glance in a list of
+interview track in each of four designs, 1280x720:
+`Thumb-<Design>-<Track>`, e.g. `Thumb-Clean-DatabaseDesign`. An interview
+track comes twice, saying "Interview Prep" (`…-DataEngineer-Prep`) or
+"Interview Preparation" (`…-DataEngineer-Preparation`). Each track has its
+own watercolor animal, so the seven read apart at a glance in a list of
 results: an owl on a die (Statistics), an elephant at a card catalog
 (Database Design), a llama with books (LLMs), a parrot (NLP), a raccoon (Data
 Analyst), and the otter and meerkat of the Data Scientist and Data Engineer
@@ -639,12 +642,19 @@ overviews.
 
 | Design | Look |
 | --- | --- |
-| `split` | white page, the words on the left, the animal large on the right |
+| `clean` | white page, the title in black, "Full Course" or "Interview Prep" in blue under it, the animal on the right |
 | `spotlight` | the same, the animal on a pale brand-blue disc |
-| `panel` | the words in white on a brand-blue panel, the animal stepping over its edge |
+| `panel` | the words in white on a brand-blue panel, the kind of video in yellow, the animal stepping over the panel's edge |
+| `columns` | the columns opener's scheme: a hairline down the left, the kind of video in black, the title in blue |
 
-- **Seen small.** A thumbnail is about 168x94 on a phone, so the words are
-  few (a kicker pill, the title, one short line) and huge, in Inter 800.
+- **One size, like the openers.** Every word is set at `SIZE` (80px), and no
+  weight is above 600: weight (400 or 600) and color tell the lines apart,
+  never size. The wordmark is the one exception, set as the site header sets
+  it. No pills or badges; the words sit on the page.
+- **Seen small.** A thumbnail is about 168x94 on a phone, where 80px is about
+  10px, so the words are few. The widest line, "Natural Language", fits the
+  680px the words have; "Interview Preparation" does not, so it takes two
+  lines.
 - **Nothing in the bottom-right corner**, where YouTube prints the running
   time. The animal stands on the bottom of a box that stops short of it.
 - **The art goes through the pipeline.** The five new animals are prompts in
@@ -655,7 +665,7 @@ overviews.
   are one entry in `TRACKS` (`src/thumbnails/Thumbnail.tsx`).
 
 ```bash
-npx remotion still src/index.ts Thumb-Split-DatabaseDesign out/thumb.png
+npx remotion still src/index.ts Thumb-Clean-DatabaseDesign out/thumb.png
 ```
 
 ## Sound effects (SamplingBias, ThinkingStatistically)

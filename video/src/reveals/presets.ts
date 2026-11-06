@@ -124,6 +124,19 @@ const COLUMNS: { id: string; props: LogoRevealProps }[] = [
     unit: "",
     title: "Data Engineer",
   }),
+  // Columns-3's layout with Columns-1's motion and sound: the mark
+  // assembles, the words blur in, and the soundtrack is Columns-1's exactly
+  // (its cues depend only on the two motions).
+  opener("Columns-7-ThreeLines-Assemble", {
+    layout: "columns",
+    motion: "assemble",
+    text: "blur",
+    textInk: "black",
+    threeLines: true,
+    course: "Database Design with PostgreSQL",
+    unit: "Unit 4",
+    title: "Keys and integrity",
+  }),
 ];
 
 export const REVEALS: { id: string; props: LogoRevealProps }[] = [

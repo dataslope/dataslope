@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Illustration } from "../components/Illustration";
-import { INK } from "../editorial/style";
+import { HAIRLINE, INK } from "../editorial/style";
 import { AnimatedMark } from "../reveals/Mark";
 import { ds } from "../theme/brand";
 import { SANS } from "../theme/fonts";
@@ -12,87 +12,83 @@ import { SANS } from "../theme/fonts";
  * and the otter and meerkat of the interview overviews), so the seven read
  * apart at a glance in a list of results.
  *
- * Thumbnails are seen small (about 168x94 on a phone), so the words are few,
- * set huge in Inter 800, and nothing that matters sits in the bottom-right
- * corner, where YouTube prints the running time.
+ * Set like the openers: every word at one size, SIZE, and no weight above
+ * 600, so weight and color tell the lines apart rather than size. The
+ * wordmark is the one exception, set as the site header sets it. No pills,
+ * no badges: the words sit on the page.
  *
- * - `split`: white page, the words on the left, the animal large on the right.
+ * Thumbnails are seen small (about 168x94 on a phone, where SIZE is about
+ * 10px), so the words are few, and nothing that matters sits in the
+ * bottom-right corner, where YouTube prints the running time.
+ *
+ * - `clean`: white page, the words low on the left, the animal on the right.
  * - `spotlight`: the same, with the animal on a pale brand-blue disc.
  * - `panel`: the words in white on a brand-blue panel, the animal on the white
  *   beside it, stepping over the panel's edge.
+ * - `columns`: the columns opener's scheme: a hairline down the left of the
+ *   words, the kind of video in black, the title in blue.
  */
-export type ThumbnailDesign = "split" | "spotlight" | "panel";
+export type ThumbnailDesign = "clean" | "spotlight" | "panel" | "columns";
+
+/** How an interview track names itself. */
+export type InterviewLabel = "prep" | "preparation";
 
 export type Track = {
-  /** The pill above the title: what kind of video this is. */
-  kicker: string;
-  /** The title, one array entry per line. */
-  lines: string[];
-  /** A short line under the title, in the brand blue. */
-  tail?: string;
-  /** The title's size in px, chosen so its longest line fits. */
-  size: number;
+  kind: "course" | "interview";
+  /** The title, one array entry per line, at weight 600. */
+  title: string[];
+  /** What follows the title ("with Python"), at weight 400. */
+  sub?: string[];
   /** The watercolor animal: its folder under public/images/, and its id. */
   art: { video: string; id: string };
 };
 
 export const TRACKS: Record<string, Track> = {
   Statistics: {
-    kicker: "Full course · 9 units",
-    lines: ["Statistics for", "Data Science"],
-    tail: "with Python",
-    size: 86,
+    kind: "course",
+    title: ["Statistics for", "Data Science"],
+    sub: ["with Python"],
     art: { video: "thumbnails", id: "thumb-owl" },
   },
   DatabaseDesign: {
-    kicker: "Full course · 9 units",
-    lines: ["Database", "Design"],
-    tail: "with PostgreSQL",
-    size: 120,
+    kind: "course",
+    title: ["Database Design"],
+    sub: ["with PostgreSQL"],
     art: { video: "thumbnails", id: "thumb-elephant" },
   },
   LargeLanguageModels: {
-    kicker: "Full course · 5 units",
-    lines: ["How large", "language", "models work"],
-    size: 96,
+    kind: "course",
+    title: ["How Large", "Language", "Models Work"],
     art: { video: "thumbnails", id: "thumb-llama" },
   },
   NaturalLanguageProcessing: {
-    kicker: "Full course · 5 units",
-    lines: ["Natural", "language", "processing"],
-    tail: "with Python",
-    size: 92,
+    kind: "course",
+    title: ["Natural Language", "Processing"],
+    sub: ["with Python"],
     art: { video: "thumbnails", id: "thumb-parrot" },
   },
-  DataAnalyst: {
-    kicker: "Interview prep · 9 parts",
-    lines: ["Data", "Analyst"],
-    tail: "interview, every question",
-    size: 132,
-    art: { video: "thumbnails", id: "thumb-raccoon" },
-  },
-  DataScientist: {
-    kicker: "Interview prep · 12 parts",
-    lines: ["Data", "Scientist"],
-    tail: "interview, every question",
-    size: 124,
-    art: { video: "ds-interview", id: "ds-interview-otter" },
-  },
-  DataEngineer: {
-    kicker: "Interview prep · 12 parts",
-    lines: ["Data", "Engineer"],
-    tail: "interview, every question",
-    size: 128,
-    art: { video: "de-interview", id: "de-interview-meerkat" },
-  },
+  DataAnalyst: { kind: "interview", title: ["Data Analyst"], art: { video: "thumbnails", id: "thumb-raccoon" } },
+  DataScientist: { kind: "interview", title: ["Data Scientist"], art: { video: "ds-interview", id: "ds-interview-otter" } },
+  DataEngineer: { kind: "interview", title: ["Data Engineer"], art: { video: "de-interview", id: "de-interview-meerkat" } },
 };
 
-export type ThumbnailProps = { design: ThumbnailDesign; track: keyof typeof TRACKS };
+/** The kind of video, as a line of its own. "Interview Preparation" is too
+ *  wide for one line at SIZE, so it takes two. */
+const KIND: Record<"course" | InterviewLabel, string[]> = {
+  course: ["Full Course"],
+  prep: ["Interview Prep"],
+  preparation: ["Interview", "Preparation"],
+};
+
+export type ThumbnailProps = { design: ThumbnailDesign; track: keyof typeof TRACKS; label?: InterviewLabel };
 
 const W = 1280;
 const H = 720;
-/** Where the words start, and how wide they may run. */
+/** Where the words start. */
 const PAD = 64;
+/** The one size every word is set at. The widest line, "Natural Language"
+ *  in Inter 600, measures 658px at 80px, inside the 680px the words have. */
+export const SIZE = 80;
 
 /** The mark and wordmark, as the site header sets them. */
 const Lockup: React.FC<{ color: string; ink: string }> = ({ color, ink }) => (
@@ -103,23 +99,67 @@ const Lockup: React.FC<{ color: string; ink: string }> = ({ color, ink }) => (
   </div>
 );
 
-export const Thumbnail: React.FC<ThumbnailProps> = ({ design, track }) => {
+type Run = { lines: string[]; weight: 400 | 600; color: string; gapBefore?: boolean };
+
+const Words: React.FC<{ runs: Run[] }> = ({ runs }) => (
+  <div>
+    {runs.map((r, i) => (
+      <div key={i} style={{ marginTop: r.gapBefore ? 0.28 * SIZE : 0 }}>
+        {r.lines.map((l) => (
+          <div
+            key={l}
+            style={{
+              fontFamily: SANS,
+              fontSize: SIZE,
+              fontWeight: r.weight,
+              lineHeight: 1.1,
+              letterSpacing: "-0.02em",
+              whiteSpace: "nowrap",
+              color: r.color,
+            }}
+          >
+            {l}
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+);
+
+export const Thumbnail: React.FC<ThumbnailProps> = ({ design, track, label = "prep" }) => {
   const t = TRACKS[track];
+  const kind = KIND[t.kind === "course" ? "course" : label];
+  const sub = t.sub ?? [];
   const panel = design === "panel";
-  const ink = panel ? "var(--ds-white)" : INK;
-  const accent = panel ? ds("yellow", 300) : ds("blue", 500);
-  const textWidth = panel ? 660 : 700;
+  const columns = design === "columns";
+  const white = "var(--ds-white)";
+  const blue = ds("blue", 500);
+
+  // Title, then what follows it, then the kind of video in an accent; or, in
+  // the opener's scheme, the kind first in black and the title in blue.
+  const runs: Run[] = columns
+    ? [
+        { lines: kind, weight: 400, color: INK },
+        { lines: t.title, weight: 600, color: blue },
+        { lines: sub, weight: 400, color: INK },
+      ]
+    : [
+        { lines: t.title, weight: 600, color: panel ? white : INK },
+        { lines: sub, weight: 400, color: panel ? white : INK },
+        { lines: kind, weight: 600, color: panel ? ds("yellow", 300) : blue, gapBefore: true },
+      ];
+
   return (
-    <AbsoluteFill style={{ background: "var(--ds-white)" }}>
-      {panel ? <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 760, background: ds("blue", 700) }} /> : null}
+    <AbsoluteFill style={{ background: white }}>
+      {panel ? <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 780, background: ds("blue", 700) }} /> : null}
       {design === "spotlight" ? (
         <div
           style={{
             position: "absolute",
-            left: 760,
-            top: 70,
-            width: 580,
-            height: 580,
+            left: 736,
+            top: 92,
+            width: 520,
+            height: 520,
             borderRadius: "50%",
             background: ds("blue", 100),
           }}
@@ -131,7 +171,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ design, track }) => {
       <div
         style={{
           position: "absolute",
-          left: panel ? 680 : 740,
+          left: panel ? 700 : 760,
           right: panel ? 30 : 40,
           top: 40,
           bottom: 56,
@@ -147,59 +187,38 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ design, track }) => {
         />
       </div>
 
-      <div
-        style={{
-          position: "absolute",
-          left: PAD,
-          top: 52,
-          bottom: 56,
-          width: textWidth,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
-        <Lockup color={panel ? "var(--ds-white)" : ds("blue", 500)} ink={ink} />
-        <div>
-          <div
-            style={{
-              display: "inline-block",
-              fontFamily: SANS,
-              fontWeight: 700,
-              fontSize: 30,
-              letterSpacing: "-0.01em",
-              padding: "8px 18px 10px",
-              borderRadius: 999,
-              background: panel ? "var(--ds-white)" : ds("blue", 500),
-              color: panel ? ds("blue", 700) : "var(--ds-white)",
-              marginBottom: 22,
-            }}
-          >
-            {t.kicker}
-          </div>
-          <div
-            style={{
-              fontFamily: SANS,
-              fontWeight: 800,
-              fontSize: t.size,
-              lineHeight: 0.98,
-              letterSpacing: "-0.035em",
-              color: ink,
-            }}
-          >
-            {t.lines.map((l) => (
-              <div key={l} style={{ whiteSpace: "nowrap" }}>
-                {l}
-              </div>
-            ))}
-          </div>
-          {t.tail ? (
-            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 44, letterSpacing: "-0.02em", color: accent, marginTop: 14 }}>{t.tail}</div>
-          ) : null}
-        </div>
+      <div style={{ position: "absolute", left: PAD, top: 52 }}>
+        <Lockup color={panel ? white : blue} ink={panel ? white : INK} />
       </div>
+
+      {columns ? (
+        // Centred in the page below the lockup, a hairline down its left.
+        <div style={{ position: "absolute", left: PAD, top: 120, bottom: 56, display: "flex", alignItems: "center" }}>
+          <div style={{ borderLeft: `2px solid ${HAIRLINE}`, paddingLeft: 28 }}>
+            <Words runs={runs} />
+          </div>
+        </div>
+      ) : (
+        <div style={{ position: "absolute", left: PAD, bottom: 56 }}>
+          <Words runs={runs} />
+        </div>
+      )}
     </AbsoluteFill>
   );
 };
 
 export const THUMBNAIL = { width: W, height: H } as const;
+
+/** Every thumbnail the Studio shows: each design for each track, and the
+ *  interview tracks a second time saying "Interview Preparation". */
+export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = (["clean", "spotlight", "panel", "columns"] as ThumbnailDesign[]).flatMap((design) => {
+  const name = design[0].toUpperCase() + design.slice(1);
+  return Object.entries(TRACKS).flatMap(([track, t]) =>
+    t.kind === "course"
+      ? [{ id: `Thumb-${name}-${track}`, props: { design, track } }]
+      : (["prep", "preparation"] as InterviewLabel[]).map((label) => ({
+          id: `Thumb-${name}-${track}-${label === "prep" ? "Prep" : "Preparation"}`,
+          props: { design, track, label },
+        })),
+  );
+});
