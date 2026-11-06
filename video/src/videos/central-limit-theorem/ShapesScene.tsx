@@ -184,7 +184,7 @@ export const ShapesScene: React.FC = () => {
             <Ink at={at - 2} dur={16} style={{ left: colX(i), top: y(HEAD_Y), whiteSpace: "nowrap" }}>
               {/* The panel's letter in the title's own face and size, set
                   apart by the accent: one size to a line. */}
-              <div style={{ display: "flex", alignItems: "baseline", gap: "0.45em" }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
                 <span style={{ ...headline(46), color: ACCENT_INK }}>{c.letter}</span>
                 <span style={headline(46)}>{c.title}</span>
               </div>

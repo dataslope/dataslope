@@ -136,16 +136,18 @@ export const FormulaScene: React.FC = () => {
             </span>
           </span>
         </Ink>
-        {/* The unit under the result, the way the root's value sits under
-            the root: the big line keeps one size. */}
-        <span style={{ display: "inline-flex", flexDirection: "column" }}>
-          <Ink at={zeroAt - 2} dur={14} style={{ position: "relative" }}>
-            = <Marked at={zeroAt + 8} color={HIGHLIGHT}><span style={{ color: ACCENT_INK }}>{fmt(AGES.se)}</span></Marked>
-          </Ink>
-          <Ink at={zeroAt + 4} dur={14} style={{ position: "relative", ...note(21, INK_SOFT), letterSpacing: "normal", marginTop: 4, marginLeft: 60 }}>
-            years
-          </Ink>
-        </span>
+        {/* The unit under the result, built the way the root's value sits
+            under the root, so the big line keeps one size. */}
+        <Ink at={zeroAt - 2} dur={14} style={{ position: "relative" }}>
+          <span style={{ display: "inline-flex", flexDirection: "column" }}>
+            <span>
+              = <Marked at={zeroAt + 8} color={HIGHLIGHT}><span style={{ color: ACCENT_INK }}>{fmt(AGES.se)}</span></Marked>
+            </span>
+            <span style={{ ...note(21, INK_SOFT), letterSpacing: "normal", marginTop: 4, marginLeft: 60, opacity: ease(frame, zeroAt + 4, 14) }}>
+              years
+            </span>
+          </span>
+        </Ink>
       </div>
 
       {/* ── The same ages, and their average's band, to one scale ── */}
