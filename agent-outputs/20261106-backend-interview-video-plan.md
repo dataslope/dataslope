@@ -1,7 +1,9 @@
 # Backend / Software Engineer interview prep: video series plan
 
-**Status:** proposed, waiting on the owner for the part list and the
-narration spend (below). Nothing is built or voiced yet.
+**Status:** approved by the owner 2026-11-06: the ten parts, leaving out
+the Python fundamentals page, and about 16,000 ElevenLabs credits for
+narration once the scripts are approved. Phase 1 (scripts and facts) is
+under way; see "Build" below.
 
 ## What the series is for
 
@@ -82,3 +84,92 @@ image. Thumbnails use the green interview scheme.
 2. Leave out the Python fundamentals page, as proposed?
 3. Approve about 16,000 ElevenLabs credits for narration once the scripts
    are approved?
+
+## Build
+
+### Ids, folders, heroes, budgets
+
+Every video's hero is a creature no earlier video drew (checked against
+every `illustrations.json`). The overview's capybara is also the track's
+YouTube thumbnail animal.
+
+| # | Composition | Folder | Hero | Characters (cap 9,500) |
+| --- | --- | --- | --- | --- |
+| 0 | BackendEngineer-0-Interview | be-interview | capybara | ~2,000 |
+| 1 | BackendEngineer-1-SystemDesign | be-system-design | crow | ~6,500 |
+| 2 | BackendEngineer-2-Scaling | be-scaling | bison | ~8,000 |
+| 3 | BackendEngineer-3-ApiDesign | be-api-design | puffin | ~8,000 |
+| 4 | BackendEngineer-4-Databases | be-databases | chipmunk | ~8,000 |
+| 5 | BackendEngineer-5-Concurrency | be-concurrency | hummingbird | ~8,000 |
+| 6 | BackendEngineer-6-ObjectDesign | be-object-design | armadillo | ~7,500 |
+| 7 | BackendEngineer-7-CodeReview | be-code-review | lynx | ~6,500 |
+| 8 | BackendEngineer-8-Algorithms | be-algorithms | pangolin | ~9,300 |
+| 9 | BackendEngineer-9-AiRound | be-ai-round | lemur | ~7,500 |
+| | | | **Total** | **~71,000** |
+
+### Which video answers which question
+
+Each of the pages' questions is answered once, by its heading. 127 are asked
+on the seven pages kept; 126 are answered (two near-identical SQL vs NoSQL
+questions are answered together).
+
+- **0, The interview, now:** the index page (what interviewers probe, how AI
+  has changed the interview, the topics) and AI-assisted coding's "How have
+  coding interviews changed since AI assistants became standard?". No
+  question cards; a narrated overview, as `de-interview` is.
+- **1, Approaching system design** (system-design, 5): "How do you approach
+  an open-ended system design question?", "What back-of-the-envelope numbers
+  should you estimate?", "Design a URL shortener at a high level.", "What is
+  a single point of failure, and how do you remove one?", "What is a CDN and
+  when do you use one?".
+- **2, Scaling a design** (system-design, 12): load balancer; horizontal vs
+  vertical; cache-aside; eviction policies; cache invalidation; replication;
+  sharding vs partitioning; CAP; consistency models; message queues; "How
+  does rate limiting work?" (the algorithms: token bucket and its kin); "Design
+  a news feed, fan-out on write or on read?".
+- **3, API design** (api-design, all 16). Its rate-limiting question is
+  answered from the client's side (429, the limit headers, backing off) and
+  points at Part 2 for the algorithms.
+- **4, Databases** (databases, all 16, plus system-design's "SQL or NoSQL at
+  scale, how do you choose?", answered together with "SQL vs NoSQL, when do
+  you pick each?"). Its deadlock question is answered from the database's
+  side (lock order across transactions, the detector that aborts one, retry).
+- **5, Concurrency** (concurrency, all 16, the GIL included; the four
+  deadlock conditions and prevention are answered here in general).
+- **6, Designing objects** (object-oriented-design, all 15).
+- **7, Reading and reviewing code** (ai-assisted-coding, 3): "What kinds of
+  bugs do AI assistants characteristically introduce?", "How do you review
+  code an assistant wrote?", "What happens in a code comprehension or
+  debugging round?". Built around one worked example: a short diff an
+  assistant wrote, read and reviewed on screen.
+- **8, Algorithms as reasoning** (algorithms, all 35): about eight deep dives
+  on choosing a structure and arguing complexity, then the rest in rapid
+  rounds of one-line answers. Never syntax: no line-by-line implementations.
+- **9, The AI-allowed round** (ai-assisted-coding, 7): what interviewers
+  grade; the 60 minutes; a good prompt; designing a feature that calls an LLM
+  API; estimating its cost; prompt injection; "How do you use AI tools in your
+  day-to-day work?".
+
+### How the videos join up
+
+- **0 → 1:** the round that grew while coding rounds shrank is design.
+- **1 → 2:** the first diagram works; now ten times the traffic.
+- **2 → 3:** every box in it talks to the others through an API.
+- **3 → 4:** behind the API, the data has to live somewhere.
+- **4 → 5:** many requests arrive at once.
+- **5 → 6:** code that has to keep changing without breaking.
+- **6 → 7:** most of the code you will be asked about, you did not write.
+- **7 → 8:** reading code includes judging what it costs.
+- **8 → 9:** and when an assistant writes it with you.
+- **9** closes the series.
+
+### Phases
+
+1. **Scripts and facts** (no scenes, no renders, no voice): five writers,
+   one per pair of videos that share a page (0 and 8, 1 and 2, 3 and 4, 5
+   and 6, 7 and 9), to `20261106-backend-interview-build/BRIEF-SCRIPTS.md`.
+   The owner reads the scripts.
+2. **Scenes** on estimated timing, one builder per video, once the
+   typography pass frees render capacity.
+3. **Voice**, then the checks and an independent review, as the Data
+   Engineer series had.
