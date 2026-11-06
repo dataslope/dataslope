@@ -174,8 +174,26 @@ export const AntiScene: React.FC = () => {
         {rows.map((r, i) => (
           <Note key={r.title} at={r.at - 2} x={ROWS_X} y={y(ROW_TOP) + i * h(ROW_H)}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 18 }}>
-              {/* A plain numeral at the title's size, not a ringed badge. */}
-              <span style={{ width: 34, flex: "0 0 34px", ...note(27, ACCENT_INK), fontWeight: 700, ...TABULAR }}>{i + 1}</span>
+              {/* The number in a ring, at 25px: within 12% of the title's
+                  27, so the line keeps one size. */}
+              <span
+                style={{
+                  width: 38,
+                  height: 38,
+                  flex: "0 0 38px",
+                  boxSizing: "border-box",
+                  borderRadius: 19,
+                  border: `2.2px solid ${ACCENT}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  ...label(25, ACCENT_INK),
+                  fontWeight: 700,
+                  ...TABULAR,
+                }}
+              >
+                {i + 1}
+              </span>
               <div>
                 <div style={{ ...note(27, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{r.title}</div>
                 <div style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, r.detailAt, 10) }}>{r.detail}</div>

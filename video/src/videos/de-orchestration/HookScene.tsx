@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FRESH } from "./data";
-import { Drift, Headline, Kicker, OK_INK, Spot, Words, X0 } from "./parts";
+import { Drift, Headline, Kicker, OK_INK, Pill, Spot, X0 } from "./parts";
 
 const CARD_TOP = 320;
 const CARD_W = 720;
@@ -203,16 +203,16 @@ export const HookScene: React.FC = () => {
           <span style={{ ...note(27, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>June 3 never loaded: still yesterday&apos;s numbers</span>
         </Note>
 
-        {/* The round: what it covers, as one line of words, each inking in as
-            it is said. */}
-        <Words
-          style={{ left: X0, top: y(650), ...note(25, BLUE_INK), fontWeight: 650 }}
-          items={[
-            { text: "tasks in order", at: orderAt - 2 },
-            { text: "recovery from failure", at: recoverAt - 2 },
-            { text: "bad data caught early", at: badAt - 2 },
-          ]}
-        />
+        {/* The round. */}
+        {[
+          { text: "tasks in order", at: orderAt },
+          { text: "recovery from failure", at: recoverAt },
+          { text: "bad data caught early", at: badAt },
+        ].map((c, i) => (
+          <Pill key={c.text} x={X0 + [0, 270, 620][i]} y={y(650)} at={c.at - 2} ink={BLUE_INK} size={25}>
+            {c.text}
+          </Pill>
+        ))}
         <Note at={fourteenAt - 4} x={X0} y={y(740)}>
           <span style={{ ...note(32, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Orchestration and reliability:{" "}

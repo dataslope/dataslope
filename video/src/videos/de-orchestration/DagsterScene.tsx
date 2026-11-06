@@ -112,7 +112,7 @@ export const DagsterScene: React.FC = () => {
 
         {/* The two models side by side: a hairline in the gap, from the heads
             to the last line, inking in with Dagster on its right. */}
-        <VRule x={934} top={y(286)} height={y(790) + h(40) + 28 - y(286)} at={dagAt} />
+        <VRule x={934} top={y(286)} height={y(846) + 28 - y(286)} at={dagAt} />
 
         {/* Dagster: assets, the graph worked out from what each reads. */}
         <Note at={dagAt} x={RIGHT_X} y={y(286)}>
@@ -215,25 +215,24 @@ export const DagsterScene: React.FC = () => {
             />
           );
         })}
-        {/* What comes built in, as a line of words each inking in as it is said. */}
         <Pill x={RIGHT_X} y={y(660)} at={linAt} ink={OK_INK} size={23}>
           lineage, built in
-          <span style={{ opacity: ease(frame, freshAt + 6, 12) }}>
-            <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span>freshness, built in
-          </span>
         </Pill>
-        <Note at={knowsAt} x={RIGHT_X} y={y(660) + h(42)}>
+        <Pill x={RIGHT_X + 260} y={y(660)} at={freshAt + 6} ink={OK_INK} size={23}>
+          freshness, built in
+        </Pill>
+        <Note at={knowsAt} x={RIGHT_X} y={y(728)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             every asset knows what produced it<span style={{ opacity: ease(frame, whenAt, 10) }}>, and when</span>
           </span>
         </Note>
         <Pill x={RIGHT_X} y={y(790)} at={typingAt} ink={BLUE_INK} size={22}>
           stronger typing
-          <span style={{ opacity: ease(frame, testingAt - 4, 12) }}>
-            <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span>testing primitives
-          </span>
         </Pill>
-        <Note at={typingAt + 8} x={RIGHT_X} y={y(790) + h(40)}>
+        <Pill x={RIGHT_X + 236} y={y(790)} at={testingAt - 4} ink={BLUE_INK} size={22}>
+          testing primitives
+        </Pill>
+        <Note at={typingAt + 8} x={RIGHT_X} y={y(846)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
             outputs type-checked at run time
             <span style={{ opacity: ease(frame, testingAt + 6, 10) }}> · assets unit-tested with mock resources</span>

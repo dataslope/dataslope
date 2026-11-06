@@ -10,6 +10,18 @@ Revenue · … · Scroll depth"). The no-cards pass went too far: it turned
 `V` = `/home/user/dataslope/video`. Read `V/README.md`, "No cards unless the
 layout needs one", which now says **small badges stay**.
 
+## The style: no border (the owner, after the restore began)
+
+Do not bring back the old outlined look. Every badge, restored or new, uses
+the house badge: a light tint of its hue, the hue's ink, rounded corners,
+**no border**: `Badge` / `badgeStyle(tone, size)` in `src/editorial/ui.tsx`
+(tone: blue, green, red, yellow, teal, purple, orange or gray; size = the
+line's text size). The owner's model is backend Part 9's prompt ingredients
+(`context` `an interface` `constraints` `a way to check the result`), a
+little lighter. A ringed or filled numeral becomes a tinted disc with no
+ring. A badge that meant something by its outline style (dashed for
+optional) keeps that meaning another way: a lighter tint or soft ink.
+
 ## What is a badge (restore) and what is a card (stays removed)
 
 - **Badge, restore it:** a small tinted and/or outlined chip around one word,

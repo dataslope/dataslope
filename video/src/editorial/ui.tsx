@@ -226,3 +226,38 @@ export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: 
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
   return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height: height * p, background: HAIRLINE, opacity: 1 - d }} />;
 };
+
+/** A badge's hue: the brand hues, plus gray for a neutral tag. */
+export type BadgeTone = "blue" | "green" | "red" | "yellow" | "teal" | "purple" | "orange" | "gray";
+
+/**
+ * The house badge (the owner, 2026-11-06, on backend Part 9's prompt
+ * ingredients: "use this style … the background slightly lighter, but the
+ * no-use of border is amazing"): a word, a value or a short tag on a light
+ * tint of its hue, in that hue's ink, rounded, with no border. Its text is
+ * the size of the line it sits on (one line, one size), so pass that size.
+ * Inline: it sits in a line of text or a flex row of badges.
+ */
+export const badgeStyle = (tone: BadgeTone, size = 24): React.CSSProperties => {
+  const ink = tone === "gray" ? "var(--ds-gray-700)" : tone === "yellow" ? "var(--ds-yellow-800)" : tone === "green" ? "var(--ds-green-700)" : tone === "teal" ? "var(--ds-teal-700)" : `var(--ds-${tone}-500)`;
+  const tint = tone === "gray" ? "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)" : `color-mix(in srgb, var(--ds-${tone}-400) 24%, transparent)`;
+  return {
+    display: "inline-block",
+    padding: `${Math.round(size * 0.16)}px ${Math.round(size * 0.55)}px ${Math.round(size * 0.24)}px`,
+    borderRadius: Math.round(size / 3),
+    background: tint,
+    color: ink,
+    fontSize: size,
+    fontWeight: 700,
+    lineHeight: 1.15,
+    whiteSpace: "nowrap",
+  };
+};
+
+/** A badge as an element; `style` adds position or motion. */
+export const Badge: React.FC<{ tone: BadgeTone; size?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
+  tone,
+  size = 24,
+  style,
+  children,
+}) => <span style={{ ...badgeStyle(tone, size), ...style }}>{children}</span>;

@@ -113,7 +113,7 @@ export const RetryScene: React.FC = () => {
         <Note at={sameAt} x={X0 + 20} y={y(646)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the same failure, every time</span>
         </Note>
-        <Pill x={X0} y={y(740)} at={idemAt} ink={OK_INK} size={26} weight={750}>
+        <Pill x={X0} y={y(740)} at={idemAt} ink={OK_INK} size={24}>
           retry only idempotent tasks
         </Pill>
 
@@ -211,15 +211,16 @@ export const RetryScene: React.FC = () => {
           </span>
         </Note>
         <Note at={alertAt + 8} x={xs[3] + R} y={lineY + h(66)} align="right">
-          {/* The alert as words in the trap's red, no box: it swells as it fires. */}
           <span
             style={{
               display: "inline-block",
+              padding: "4px 14px",
+              border: `2.4px solid ${ACCENT}`,
+              borderRadius: 8,
               ...note(24, ACCENT_INK),
-              fontWeight: 800,
+              fontWeight: 700,
               whiteSpace: "nowrap",
               transform: `scale(${1 + 0.06 * ping})`,
-              transformOrigin: "right center",
             }}
           >
             out of retries: alert

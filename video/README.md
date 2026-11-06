@@ -248,7 +248,12 @@ Every video follows these rules.
   and/or outlined chip around one word, one value, a short tag of a few
   words, or a ringed numeral is a badge, not a card. A card is a box around
   a sentence, a group of lines, a panel or a column. A badge's text stays
-  within 12% of the size of the text it shares a line with.
+  within 12% of the size of the text it shares a line with. **Badges have
+  no border**: a light tint of their hue, the hue's ink, rounded corners
+  (the owner, on backend Part 9's prompt ingredients: "use this style …
+  the background slightly lighter, but the no-use of border is amazing").
+  Use `Badge` / `badgeStyle(tone, size)` from `src/editorial/ui.tsx`; a
+  numbered badge is a tinted disc with no ring.
   **Items set side by side take a vertical hairline between them** (the
   owner: "When there are items laid out horizontally, I think subtle
   separators will help"): two, three or four columns of text get a 1px

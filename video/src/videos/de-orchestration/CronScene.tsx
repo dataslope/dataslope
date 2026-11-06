@@ -251,7 +251,7 @@ export const CronScene: React.FC = () => {
 
         {/* What comes with it. */}
         {extras.map((e, i) => (
-          <Pill key={e.text} x={1450} y={y(612) + i * h(50)} at={e.at} ink={BLUE_INK} size={23}>
+          <Pill key={e.text} x={1450} y={y(612) + i * h(56)} at={e.at} ink={BLUE_INK} size={23}>
             {e.text}
           </Pill>
         ))}

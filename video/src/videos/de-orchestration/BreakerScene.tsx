@@ -152,7 +152,7 @@ export const BreakerScene: React.FC = () => {
             <Cross at={fastAt + 2} size={30} />
           </div>
         ) : null}
-        <Pill x={brkX - 29} y={midY - nodeH / 2 - h(50)} at={alertAt} ink={ACCENT_INK} size={23} weight={800}>
+        <Pill x={brkX - 50} y={midY - nodeH / 2 - h(56)} at={alertAt} ink={ACCENT_INK} size={21}>
           alert
         </Pill>
         {DOWN.map((name, i) => (

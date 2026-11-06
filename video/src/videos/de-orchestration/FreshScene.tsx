@@ -12,6 +12,10 @@ import { FRESH, hm } from "./data";
 import { Cross, Drift, lineOf, MARK, OK, OK_INK, Pill, SqlListing, VRule, X0 } from "./parts";
 
 const LINES = FRESH.sql.split("\n");
+/** A size-24 pill's height (its 29px line, 7px padding either side, the
+ *  border), and where the notes column starts, right of the checks. */
+const PILL_H = 47;
+const NOTES_DX = 1050;
 /** The clock from June 1, 00:00 to June 4, 08:00. */
 const H0 = 160;
 const PX_H = 20;
@@ -217,48 +221,41 @@ export const FreshScene: React.FC = () => {
         </Note>
 
         {/* The run that night, all green, and the two checks that are not:
-            three columns of plain text, a hairline in each gap inking in with
-            the column to its right. */}
-        <div style={{ position: "absolute", left: X0, top: y(762), ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-          {[
-            { text: "extract", at: greenAt },
-            { text: "transform", at: greenAt + 3 },
-            { text: "load", at: loadAt },
-          ].map((t, i) => (
-            <span
-              key={t.text}
-              style={{ position: "relative", display: "inline-block", opacity: ease(frame, t.at, 12), transform: `translateY(${(1 - ease(frame, t.at, 12)) * 10}px)` }}
-            >
-              {i ? <span style={{ whiteSpace: "pre", color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
-              {t.text} ✓
-              {/* What the load brought, under its name. */}
-              {i === 2 ? (
-                <span style={{ position: "absolute", right: 0, top: h(56), ...label(21, INK_SOFT), fontWeight: 500, opacity: ease(frame, noRowsAt, 14) }}>
-                  <Num>{FRESH.missedDayRows}</Num> new rows
-                </span>
-              ) : null}
-            </span>
-          ))}
-        </div>
-        <VRule x={X0 + 479} top={y(758)} height={y(872) - y(758)} at={onlyAt + 2} />
-        <Pill x={X0 + 600} y={y(762)} at={onlyAt + 2} ink={ACCENT_INK} size={24}>
+            three groups side by side, a hairline in each gap inking in with
+            the group to its right. */}
+        {[
+          { text: "extract", at: greenAt },
+          { text: "transform", at: greenAt + 3 },
+          { text: "load", at: loadAt },
+        ].map((t, i) => (
+          <Pill key={t.text} x={X0 + i * 230} y={y(770)} at={t.at} ink={OK_INK} size={24}>
+            {t.text} ✓
+          </Pill>
+        ))}
+        <Note at={noRowsAt} x={X0 + 460} y={y(826)}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            <Num>{FRESH.missedDayRows}</Num> new rows
+          </span>
+        </Note>
+        <VRule x={X0 + 640} top={y(770)} height={y(832) + PILL_H - y(770)} at={onlyAt + 2} />
+        <Pill x={X0 + 720} y={y(770)} at={onlyAt + 2} ink={ACCENT_INK} size={24}>
           freshness check ✗
         </Pill>
-        <Pill x={X0 + 600} y={y(838)} at={countAt + 2} ink={ACCENT_INK} size={24}>
+        <Pill x={X0 + 720} y={y(832)} at={countAt + 2} ink={ACCENT_INK} size={24}>
           <span>
             row count: <Num>{FRESH.missedDayRows}</Num> ✗
           </span>
         </Pill>
-        <VRule x={X0 + 870} top={y(758)} height={y(872) - y(758)} at={catchAt} />
-        <Note at={catchAt} x={X0 + 916} y={y(762)}>
+        <VRule x={X0 + 1011} top={y(770)} height={y(832) + PILL_H - y(770)} at={catchAt} />
+        <Note at={catchAt} x={X0 + NOTES_DX} y={y(762)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>catches data that never arrived</span>
         </Note>
-        <Note at={cantAt} x={X0 + 916} y={y(802)}>
+        <Note at={cantAt} x={X0 + NOTES_DX} y={y(802)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             row-level checks only read the rows <span style={{ opacity: ease(frame, thereAt, 10) }}>that are there</span>
           </span>
         </Note>
-        <Note at={countAt + 6} x={X0 + 916} y={y(840)}>
+        <Note at={countAt + 6} x={X0 + NOTES_DX} y={y(840)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>a row count on the day&apos;s load catches it too</span>
         </Note>
       </Drift>
