@@ -5,7 +5,7 @@ import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, HAIRLINE, INK, INK_SOFT, PAPER, label } from "../../editorial/style";
 import { categorical, ds } from "../../theme/brand";
-import { SANS } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -17,8 +17,17 @@ import { ILLUSTRATIONS, VIDEO } from "./data";
  * wrong way and the right way: bars, a line, a pie, a y axis with its ticks,
  * and the verdict each version gets.
  */
-export { Drift, Headline, Kicker, Mark, MARK, MARK_BAD, MARK_OK, Mono, pulse, Strike, Svg, X0 } from "../da-pandas/parts";
+export { Drift, Headline, Kicker, Mark, MARK, MARK_BAD, MARK_OK, pulse, Strike, Svg, X0 } from "../da-pandas/parts";
 export { at, Bracket, mulberry32, type Scale, VLine } from "../da-statistics-communication/parts";
+
+/** Code inside a line of prose, in the mono face at 0.92em: within the 12%
+ *  a line's sizes may differ by (`check:frames`), where the 0.88em of the
+ *  Mono this video used to take from Parts 1 and 2 is not. */
+export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
 
 /** Categories, in the brand's non-semantic hues: blue, then the accents. */
 export const CATS = [...categorical, ds("blue", 300), ds("teal", 300), ds("purple", 300), ds("orange", 300)];

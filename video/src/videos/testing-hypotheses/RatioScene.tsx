@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, INK, INK_SOFT, PAPER } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { body, INK, INK_SOFT, PAPER } from "../../editorial/style";
+import { ColumnRule, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter } from "./data";
@@ -14,9 +14,16 @@ const CX = 1340;
 const UNIT = 120;
 const M_BASE = 600;
 const M_TALL = 220;
-const CARD_Y = 690;
-const CARD_W = 500;
-const CARD_X = [160, 710, 1260];
+/** The three designs: three plain columns, each a title and under it a
+ *  sketch of the data it takes, with a hairline in each gap instead of a
+ *  box round each. A column's left edge, then the gap's centre, in px; the
+ *  columns' widths (the first's title, the other two's sketch or title,
+ *  about 355, 415 and 410px) spread them across the page's 160 to 1760. */
+const DESIGN_Y = 690;
+const DESIGN_X = [160, 730, 1350];
+const RULE_X = [622, 1247];
+/** A title's line, then its sketch 11px under it, in px. */
+const SKETCH_DY = 42;
 
 const J1 = jitter(51, 14);
 const J2 = jitter(52, 14);
@@ -62,39 +69,33 @@ export const RatioScene: React.FC = () => {
   const sig = ease(frame, gapAt - 2, 14);
   const noi = ease(frame, seAt - 4, 14);
 
-  const card = (i: number, at: number, title: string, draw: React.ReactNode) => {
+  const design = (i: number, at: number, title: string, draw: React.ReactNode) => {
     const p = ease(frame, at - 4, 14);
     if (p <= 0) return null;
     return (
       <div
         style={{
           position: "absolute",
-          left: CARD_X[i],
-          top: y(CARD_Y),
-          width: CARD_W,
-          height: h(200),
-          border: `2px solid ${HAIRLINE}`,
-          borderRadius: 10,
+          left: DESIGN_X[i],
+          top: y(DESIGN_Y) + 18,
           opacity: p,
           transform: `translateY(${(1 - p) * 18}px)`,
-          boxSizing: "border-box",
-          padding: "16px 22px",
         }}
       >
         <Label size={26}>{title}</Label>
-        <svg width={CARD_W - 44} height={h(200) - 70} style={{ position: "absolute", left: 22, top: 58, overflow: "visible" }}>
+        <svg width={460} height={sketchH} style={{ position: "absolute", left: 0, top: SKETCH_DY, overflow: "visible" }}>
           {draw}
         </svg>
       </div>
     );
   };
-  const cardH = h(200) - 70;
+  const sketchH = h(200) - 70;
   const strip = (j: readonly number[], cx: number, cy: number, spread: number, fill: string) =>
     j.map((v, k) => <circle key={k} cx={cx + (v - 0.5) * spread} cy={cy + ((k % 3) - 1) * 9} r={6} fill={fill} stroke={PAPER} strokeWidth={1.2} />);
 
   return (
     <AbsoluteFill>
-      {/* ── Sound: the two halves of the ratio, the mounds moving, the cards ── */}
+      {/* ── Sound: the two halves of the ratio, the mounds moving, the designs ── */}
       <Sfx name="el-tap" at={gapAt - 2} level={-29} />
       <Sfx name="el-tap" at={seAt - 4} level={-30} />
       <Sfx name="el-whoosh" at={bigAt - 4} level={-34} />
@@ -165,36 +166,38 @@ export const RatioScene: React.FC = () => {
       </Note>
 
       {/* ── The three designs ── */}
-      <Ink at={designsAt - 4} dur={14} style={{ left: 160, top: y(CARD_Y) - 46, whiteSpace: "nowrap" }}>
+      <Ink at={designsAt - 4} dur={14} style={{ left: 160, top: y(DESIGN_Y) - 46, whiteSpace: "nowrap" }}>
         <Label size={22} color={INK_SOFT}>
           Three designs
         </Label>
       </Ink>
-      {card(
+      {design(
         0,
         targetAt,
         "One group against a target",
         <>
-          {strip(J1, 200, cardH / 2, 220, DOT)}
-          <line x1={250} x2={250} y1={4} y2={cardH - 4} stroke={INK} strokeWidth={2.2} strokeDasharray="6 5" />
+          {strip(J1, 200, sketchH / 2, 220, DOT)}
+          <line x1={250} x2={250} y1={4} y2={sketchH - 4} stroke={INK} strokeWidth={2.2} strokeDasharray="6 5" />
         </>,
       )}
-      {card(
+      <ColumnRule x={RULE_X[0]} top={y(DESIGN_Y) + 18} height={SKETCH_DY + sketchH} at={separateAt - 2} />
+      {design(
         1,
         separateAt,
         "Two separate groups",
         <>
-          {strip(J1, 130, cardH / 2, 170, RAW)}
-          {strip(J2, 320, cardH / 2, 170, DATA)}
+          {strip(J1, 130, sketchH / 2, 170, RAW)}
+          {strip(J2, 320, sketchH / 2, 170, DATA)}
         </>,
       )}
-      {card(
+      <ColumnRule x={RULE_X[1]} top={y(DESIGN_Y) + 18} height={SKETCH_DY + sketchH} at={sameUnitsAt - 2} />
+      {design(
         2,
         sameUnitsAt,
         "The same units, measured twice",
         <>
           {J1.slice(0, 6).map((v, k) => {
-            const yy = 12 + k * ((cardH - 24) / 5);
+            const yy = 12 + k * ((sketchH - 24) / 5);
             const x0 = 90 + v * 60;
             const x1 = x0 + 150 + J2[k] * 40;
             return (

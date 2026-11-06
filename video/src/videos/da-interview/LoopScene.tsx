@@ -12,8 +12,10 @@ import { Drift, Headline, Kicker, X0 } from "./parts";
  *  gap: no cards, the space and the rules do the grouping. */
 const COL_W = 488;
 const COL_GAP = 120;
-const COL_Y = 388;
-/** The columns' text, top to bottom of the tallest: the hairlines' height. */
+/** Set where the cards' middles were, so the page keeps its balance. */
+const COL_Y = 420;
+/** The columns' text, in px, top to foot of the tallest (the first): the
+ *  hairlines' height. */
 const COL_H = 232;
 const colX = (i: number) => X0 + i * (COL_W + COL_GAP);
 
@@ -22,7 +24,7 @@ const colX = (i: number) => X0 + i * (COL_W + COL_GAP);
  *  1": "Part N" is the series' videos, on the last scene. */
 const Column: React.FC<{ i: number; at: number; title: string; children: React.ReactNode }> = ({ i, at, title, children }) => {
   const frame = useCurrentFrame();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
   const p = ease(frame, at - 2, 16);
   if (p <= 0) return null;
   return (
@@ -34,7 +36,7 @@ const Column: React.FC<{ i: number; at: number; title: string; children: React.R
             left: colX(i) - COL_GAP / 2,
             top: y(COL_Y),
             width: 1,
-            height: h(COL_H),
+            height: COL_H,
             background: HAIRLINE,
             opacity: p,
           }}

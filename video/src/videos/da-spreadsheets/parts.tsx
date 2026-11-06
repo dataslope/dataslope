@@ -27,7 +27,6 @@ export {
   MARK_BAD,
   MARK_KEY,
   MARK_OK,
-  Mono,
   OK,
   OK_INK,
   pulse,
@@ -35,6 +34,15 @@ export {
   Svg,
   X0,
 } from "../da-pandas/parts";
+
+/** Code inside a line of prose, in the mono face at 0.92em: within the 12%
+ *  a line's sizes may differ by (`check:frames`), where the 0.88em of the
+ *  Mono this video used to take from Parts 1 and 2 is not. */
+export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
 
 // ── The grid ─────────────────────────────────────────────────────────────────
 
@@ -145,6 +153,9 @@ export const Sheet: React.FC<{
   const totalW = g.width + (insert ? insert.width * ins : 0);
   const letter = (c: number) => colLetter(g.firstCol + (insert && c >= insert.c && ins > 0.5 ? c + 1 : c));
   const rowNums = Array.from({ length: g.rows }, (_, i) => g.firstRow + i);
+  // The chrome's letters and numbers, within the 12% a line allows of the
+  // cells beside them (check:frames), and never under 19px.
+  const chrome = Math.max(19, Math.round(size * 0.9));
   const cellStyle = (left: number, width: number, top: number): React.CSSProperties => ({
     position: "absolute",
     left,
@@ -179,7 +190,7 @@ export const Sheet: React.FC<{
       </svg>
       {/* Letters and numbers. */}
       {g.widths.map((w, c) => (
-        <div key={c} style={{ ...cellStyle(xOf(c), w, g.top), height: g.headH, justifyContent: "center", ...label(19, INK_SOFT) }}>
+        <div key={c} style={{ ...cellStyle(xOf(c), w, g.top), height: g.headH, justifyContent: "center", ...label(chrome, INK_SOFT) }}>
           {letter(c)}
         </div>
       ))}
@@ -189,7 +200,7 @@ export const Sheet: React.FC<{
             ...cellStyle(g.xs[insert.c], insert.width * ins, g.top),
             height: g.headH,
             justifyContent: "center",
-            ...label(19, INK_SOFT),
+            ...label(chrome, INK_SOFT),
             opacity: ins,
           }}
         >
@@ -197,7 +208,7 @@ export const Sheet: React.FC<{
         </div>
       ) : null}
       {rowNums.map((r) => (
-        <div key={r} style={{ ...cellStyle(g.x, GUTTER, g.rowTop(r)), justifyContent: "center", ...label(19, INK_SOFT) }}>
+        <div key={r} style={{ ...cellStyle(g.x, GUTTER, g.rowTop(r)), justifyContent: "center", ...label(chrome, INK_SOFT) }}>
           {r}
         </div>
       ))}
@@ -421,7 +432,7 @@ export const FormulaBar: React.FC<{
       }}
     >
       {cell ? <span style={{ ...label(19, INK_SOFT), minWidth: 34 }}>{cell}</span> : null}
-      <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: Math.max(19, size * 0.85), color: INK_SOFT, fontWeight: 600 }}>fx</span>
+      <span style={{ fontFamily: SANS, fontStyle: "italic", fontSize: Math.max(19, Math.round(size * 0.9)), color: INK_SOFT, fontWeight: 600 }}>fx</span>
       <span style={{ flex: "0 1 auto", overflow: "hidden", display: "grid" }}>
         <span style={{ ...layer, opacity: 1 - rw }}>
           <FormulaText formula={formula} upto={typed} size={size} marks={marks} />

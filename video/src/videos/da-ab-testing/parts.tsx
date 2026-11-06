@@ -4,6 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { BAR, HAIRLINE } from "../../editorial/style";
 import { ds, inkOf } from "../../theme/brand";
+import { MONO } from "../../theme/fonts";
 import { type Col, tableGeometry } from "../da-sql/parts";
 import { at, type Scale } from "../da-statistics-communication/parts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -29,7 +30,6 @@ export {
   MARK_BAD,
   MARK_KEY,
   MARK_OK,
-  Mono,
   OK,
   OK_INK,
   pulse,
@@ -40,6 +40,15 @@ export {
   type TableGeometry,
 } from "../da-sql/parts";
 export { at, Axes, Bracket, Dots, VLine, WARM, WARM_INK, type Scale } from "../da-statistics-communication/parts";
+
+/** Code inside a line of prose, in the mono face at 0.92em: within the 12%
+ *  a line's sizes may differ by (`check:frames`), where the 0.88em of the
+ *  Mono this video used to take from Parts 1 and 2 is not. */
+export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
 
 /** The two arms keep one ink each across the video, as in the hook: A the
  *  data blue, B a teal (a non-semantic hue, so neither reads as right). */

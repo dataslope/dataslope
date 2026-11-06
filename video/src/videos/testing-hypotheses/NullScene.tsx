@@ -2,19 +2,27 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, INK, INK_SOFT, PAPER } from "../../editorial/style";
+import { body, INK, INK_SOFT } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Arrow, H0, Head, Label, Mark, pulse, Spot, STAT, STAT_INK, STAT_WASH } from "./parts";
+import { Arrow, H0, Head, Label, Mark, pulse, Spot, STAT, STAT_INK } from "./parts";
 
 /** Where the gavel sits, here and in the courtroom scene, so it carries over the cut. */
 export const GAVEL = { left: 120, top: 660, width: 270, height: 270 };
 
-const CARD_X = 160;
-const CARD_W = 700;
+/** The two hypotheses, plain text on the left: no cards, no boxes. Each is
+ *  a title and its line 10px under it; the two sit 200 layout units apart,
+ *  so the space between them is far larger than the space inside either. */
+const HYP_X = 160;
+const HYP_W = 700;
+/** The question and its two verdicts, on the right. The question's first
+ *  line, the "Very surprising" label and its verdict share one left edge. */
 const FLOW_X = 1020;
 const FLOW_W = 760;
+/** Where the first line of each block sits, under the top it is given: where
+ *  the words sat inside the boxes, so the page keeps its balance. */
+const TEXT_DY = 24;
 
 /**
  * The null and the alternative, and the one question a test asks of the
@@ -41,7 +49,7 @@ export const NullScene: React.FC = () => {
   const failAt = n.word("verdict", "fail");
   const trialAt = n.word("court-in", "trial");
 
-  const card = (top: number, at: number, glowAt: number, title: React.ReactNode, text: string, textAt: number) => {
+  const hypothesis = (top: number, at: number, glowAt: number, title: React.ReactNode, text: string, textAt: number) => {
     const p = ease(frame, at - 4, 14);
     if (p <= 0) return null;
     const g = pulse(frame, glowAt, 24);
@@ -49,14 +57,9 @@ export const NullScene: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: CARD_X,
-          top: y(top),
-          width: CARD_W,
-          padding: "22px 28px",
-          boxSizing: "border-box",
-          border: `2px solid ${HAIRLINE}`,
-          borderRadius: 10,
-          background: PAPER,
+          left: HYP_X,
+          top: y(top) + TEXT_DY,
+          width: HYP_W,
           opacity: p * (1 - 0.45 * ease(frame, soundsAt - 4, 14)),
           transform: `translateY(${(1 - p) * 16}px) scale(${1 + 0.015 * g})`,
           transformOrigin: "0 50%",
@@ -79,18 +82,18 @@ export const NullScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      {/* ── Sound: two cards, the question, the two verdicts, the gavel ── */}
+      {/* ── Sound: the two hypotheses, the question, the two verdicts, the gavel ── */}
       <Sfx name="el-tap" at={nullAt - 4} level={-29} />
       <Sfx name="el-tap" at={altAt - 4} level={-30} />
       <Sfx name="el-pencil" at={veryAt - 2} level={-34} />
       <Sfx name="el-pencil" at={ordinaryAt - 2} level={-35} />
       <Sfx name="el-pop" at={trialAt - 4} level={-30} />
 
-      {/* The headline stays put: the question itself is the box on the right. */}
+      {/* The headline stays put: the question itself is the text on the right. */}
       <Head a="Start from the boring answer." at={nullFrom - 4} />
 
       {/* The boring answer arrives as it is named; its line on "nothing". */}
-      {card(
+      {hypothesis(
         330,
         boringAt,
         nullAt,
@@ -100,7 +103,7 @@ export const NullScene: React.FC = () => {
         "Nothing is going on: no difference at all.",
         nothingAt,
       )}
-      {card(
+      {hypothesis(
         530,
         altAt,
         realAt,
@@ -116,24 +119,16 @@ export const NullScene: React.FC = () => {
         style={{
           position: "absolute",
           left: FLOW_X,
-          top: boxTop,
+          top: boxTop + TEXT_DY,
           width: FLOW_W,
-          padding: "24px 30px",
-          boxSizing: "border-box",
-          border: `2px solid ${INK}`,
-          borderRadius: 10,
-          background: PAPER,
-          // The box and its question arrive together, so it is never an empty frame.
           opacity: ease(frame, ifAt - 4, 14) * (1 - 0.45 * ease(frame, soundsAt - 4, 14)),
         }}
       >
-        <div>
-          <span style={{ ...body(36, true), color: INK }}>
-            If <H0 /> were true,
-            <br />
-            would data like mine be <Mark at={surprisingAt}>surprising?</Mark>
-          </span>
-        </div>
+        <span style={{ ...body(36, true), color: INK }}>
+          If <H0 /> were true,
+          <br />
+          would data like mine be <Mark at={surprisingAt}>surprising?</Mark>
+        </span>
       </div>
       <Arrow from={[leftX + 140, boxTop + 150]} to={[leftX + 60, outTop - 14]} at={veryAt - 4} color={STAT} width={2.8} />
       <Arrow from={[rightX + 140, boxTop + 150]} to={[rightX + 220, outTop - 14]} at={ordinaryAt - 4} color={INK} width={2.4} />
@@ -143,11 +138,9 @@ export const NullScene: React.FC = () => {
         </Label>
       </Ink>
       <Ink at={rejectAt - 4} dur={14} style={{ left: leftX - 30, top: outTop + 40 }}>
-        <div style={{ background: STAT_WASH, borderRadius: 8, padding: "8px 18px", whiteSpace: "nowrap" }}>
-          <span style={{ ...body(38, true), color: STAT_INK }}>
-            Reject <H0 />
-          </span>
-        </div>
+        <span style={{ ...body(38, true), color: STAT_INK, whiteSpace: "nowrap" }}>
+          Reject <H0 />
+        </span>
       </Ink>
       <Ink at={ordinaryAt} dur={14} style={{ left: rightX + 60, top: outTop, whiteSpace: "nowrap" }}>
         <Label size={22} color={INK_SOFT}>
@@ -155,11 +148,9 @@ export const NullScene: React.FC = () => {
         </Label>
       </Ink>
       <Ink at={failAt - 4} dur={14} style={{ left: rightX + 60, top: outTop + 40 }}>
-        <div style={{ border: `2px solid ${HAIRLINE}`, borderRadius: 8, padding: "6px 16px", whiteSpace: "nowrap" }}>
-          <span style={{ ...body(38, true), color: INK }}>
-            Fail to reject <H0 />
-          </span>
-        </div>
+        <span style={{ ...body(38, true), color: INK, whiteSpace: "nowrap" }}>
+          Fail to reject <H0 />
+        </span>
       </Ink>
 
       {/* The turn to the courtroom: the gavel arrives where the next scene keeps it. */}

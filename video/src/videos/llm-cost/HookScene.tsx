@@ -8,7 +8,6 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { int, THINKING } from "./data";
 import {
-  Chip,
   FIG_Y,
   HBar,
   Headline,
@@ -109,9 +108,20 @@ export const HookScene: React.FC = () => {
             <Note at={grow[i] + 6} x={BAR_X + w(r.tokens) + 18} y={ry + 6 + h(BAR_H) / 2 - 16}>
               <span style={{ ...note(25, INK), ...TABULAR, whiteSpace: "nowrap" }}>{int(r.tokens)} tokens</span>
             </Note>
-            {/* What each one costs: the question the part answers. */}
-            <Note at={costAt - 4 + i * 4} x={ASK_X} y={ry + 6 + h(BAR_H) / 2 - 22}>
-              <Chip piece="$ ?" color={INK_SOFT} size={24} glow={pulse(frame, actuallyAt + i * 5, 20)} />
+            {/* What each one costs: the question the part answers, as plain
+                text level with its bar, swelling as "actually" is said. */}
+            <Note at={costAt - 4 + i * 4} x={ASK_X} y={ry + 6 + h(BAR_H) / 2 - 18}>
+              <span
+                style={{
+                  ...note(28, INK),
+                  fontWeight: 700,
+                  whiteSpace: "nowrap",
+                  display: "inline-block",
+                  transform: `scale(${1 + pulse(frame, actuallyAt + i * 5, 20) * 0.12})`,
+                }}
+              >
+                $ ?
+              </span>
             </Note>
           </React.Fragment>
         );

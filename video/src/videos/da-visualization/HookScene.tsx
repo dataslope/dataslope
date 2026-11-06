@@ -72,14 +72,15 @@ export const HookScene: React.FC = () => {
         </Verdict>
 
         {/* ── How the video splits ── */}
-        <div style={{ position: "absolute", left: X0, top: y(850), display: "flex", gap: 48, alignItems: "baseline", opacity: ease(frame, testAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(850), display: "flex", gap: 48, alignItems: "baseline", fontSize: 28, opacity: ease(frame, testAt, 12) }}>
           {counts.map((c) => {
             const p = ease(frame, c.at - 2, 12);
             const lit = c.big === "17" ? pulse(frame, firstAt, 18) : 0;
             return (
               <span key={c.big} style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.08 * lit})`, display: "inline-block", whiteSpace: "nowrap" }}>
-                <span style={{ ...label(34, c.soft ? INK_SOFT : INK), fontWeight: 750, ...TABULAR }}>{c.big}</span>{" "}
-                <span style={{ ...note(26, c.soft ? INK_SOFT : INK) }}>{c.text}</span>
+                {/* One size for the count and its words: the weight carries the count. */}
+                <span style={{ ...label(28, c.soft ? INK_SOFT : INK), fontWeight: 750, ...TABULAR }}>{c.big}</span>{" "}
+                <span style={{ ...note(28, c.soft ? INK_SOFT : INK) }}>{c.text}</span>
               </span>
             );
           })}

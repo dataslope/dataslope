@@ -16,6 +16,7 @@ import {
   Headline,
   INPUT,
   Marked,
+  OUTPUT,
   OUTPUT_INK,
   POINT,
   POINT_INK,
@@ -43,6 +44,8 @@ const F6_R = 1800;
 const F6_THRESH_R = 1644;
 const F6_IN_R = 1726;
 const AXIS_Y = 672;
+/** The highlight behind a ratio above five, in output's color. */
+const OVER_FIVE = `color-mix(in srgb, ${OUTPUT} 30%, transparent)`;
 
 /**
  * The October 2026 market, the lesson's table verbatim: output at five times
@@ -185,19 +188,11 @@ export const MarketScene: React.FC = () => {
                   {isFive >= 0 ? (
                     <Marked at={Math.round(fiveAt + ((tenRowsAt - fiveAt) * isFive) / Math.max(1, fivesIdx.length - 1))}>{r.ratioPrinted}</Marked>
                   ) : (
-                    // More than five: outlined on "never less", the pill sized to its text
-                    // ("8.3x" is wider than "6x"), the digits still on the column's right edge.
-                    <span
-                      style={{
-                        display: "inline-block",
-                        padding: "0 0.4em",
-                        marginRight: "-0.4em",
-                        borderRadius: 18,
-                        boxShadow: `inset 0 0 0 2px color-mix(in srgb, ${OUTPUT_INK} ${Math.round(ease(frame, neverAt, 10) * 100)}%, transparent)`,
-                      }}
-                    >
+                    // More than five: an output-tinted highlight behind the digits on
+                    // "never less", set like the fives so the column keeps one edge.
+                    <Marked at={neverAt} color={OVER_FIVE}>
                       {r.ratioPrinted}
-                    </span>
+                    </Marked>
                   )}
                 </span>
               </Note>
