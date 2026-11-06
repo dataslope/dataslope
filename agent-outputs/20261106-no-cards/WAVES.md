@@ -26,8 +26,8 @@ Brief: BRIEF.md in this folder. Layout only, no re-voicing, no new images.
 - NLP 3-5: nlp-zipfs-law, nlp-text-to-features, nlp-history, tf-idf (started when DS 0-3 finished)
 - Standalone A: base-rate, box-sizing, c-pointers, java-equality, left-join-trap, list-vs-set (started when the Stats 3-4 trim finished)
 - Standalone B: overfitting, pandas-groupby, random-walks, recursion-fib, simpsons-paradox, sql-null-trap (same)
+- Standalone C: type-erasure, why-normalization, window-functions (started when backend Part 4 finished)
 
 ## Later waves (start one as each agent finishes)
-- Standalone C: type-erasure, why-normalization, window-functions
 
 Folder to composition id: scratchpad folder-ids.txt, or grep src/Root.tsx.
