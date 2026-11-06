@@ -173,3 +173,11 @@ questions are answered together).
    typography pass frees render capacity.
 3. **Voice**, then the checks and an independent review, as the Data
    Engineer series had.
+
+### Said as words (for `src/narration/lexicon.ts`, before voicing)
+
+Collected from the writers' reports; added to the lexicon, and existing
+beats that say them checked for re-voicing cost, before phase 3.
+
+- Part 7: ASCII ("ask-ee").
+- Part 9: OWASP ("oh-wasp"), METR ("meter").
