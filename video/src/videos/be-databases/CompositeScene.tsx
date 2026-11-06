@@ -223,7 +223,7 @@ export const CompositeScene: React.FC = () => {
             </span>
           </Note>
         </div>
-        <Spot art="phoneBook" at={bookAt} out={bookOut} left={1450} top={y(TOP) + h(40)} width={200} />
+        <Spot art="phoneBook" at={bookAt} out={bookOut} left={1540} top={y(480)} width={200} />
 
         {/* ── Phase B: the statements, top left and top right ── */}
         <Listing lines={COMPOSITE.create} x={X0} top={listTop} width={720} size={20} at={runAt} out={swapAt - 4} marks={[{ line: "ON orders", text: "(customer_id, created_at)", at: runAt + 10 }]} />
@@ -235,17 +235,17 @@ export const CompositeScene: React.FC = () => {
         <Listing lines={COMPOSITE.dayQuery} x={960} top={listTop} width={720} size={20} at={statusAt} marks={[{ line: "WHERE", at: fiveAt - 4 }]} />
 
         {/* ── The strip: the index's entries, in index order ── */}
-        <Note at={runAt + 4} x={STRIP_X} y={stripY - h(42)} out={swapAt - 2}>
+        <Note at={runAt + 4} x={STRIP_X} y={stripY - h(80)} out={swapAt - 2}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             index entries in order: <span style={{ color: INK }}>by customer, then time</span>
           </span>
         </Note>
-        <Note at={swapAt + 4} x={STRIP_X} y={stripY - h(42)} out={skipAt - 2}>
+        <Note at={swapAt + 4} x={STRIP_X} y={stripY - h(80)} out={skipAt - 2}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             index entries in order: <span style={{ color: INK }}>by time, then customer</span>
           </span>
         </Note>
-        <Note at={statusAt} x={STRIP_X} y={stripY - h(42)}>
+        <Note at={statusAt} x={STRIP_X} y={stripY - h(80)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             index entries in order: <span style={{ color: INK }}>by status, then time</span>
           </span>

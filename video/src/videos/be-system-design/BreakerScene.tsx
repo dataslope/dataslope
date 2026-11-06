@@ -35,7 +35,7 @@ export const BreakerScene: React.FC = () => {
   const hundredAt = n.word("q4-retry", "failing at a hundred");
   const breakerAt = n.word("q4-states", "A circuit breaker stops that");
   const tripAt = n.word("q4-states", "When errors pass half");
-  const opensAt = n.word("q4-states", "it opens");
+  const opensAt = n.word("q4-states", "it opens", { nth: 1 });
   const nothingAt = n.word("q4-states", "sends nothing for twelve seconds");
   const probeAt = n.word("q4-states", "lets a tenth of the traffic through");
   const firstAt = n.word("q4-states", "the first probe still fails");
@@ -90,8 +90,8 @@ export const BreakerScene: React.FC = () => {
   const green = ease(frame, aloneAt, 14);
   const errInk = green > 0 ? `color-mix(in srgb, ${OK} ${Math.round(green * 100)}%, ${BAR})` : BAR;
   const bandAt = [opensAt, probeAt, againAt, passesAt];
-  const probeY1 = reqBot + h(56);
-  const probeY2 = reqBot + h(92);
+  const probeY1 = reqBot + h(76);
+  const probeY2 = reqBot + h(114);
 
   return (
     <AbsoluteFill>

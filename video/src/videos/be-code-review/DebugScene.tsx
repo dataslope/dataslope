@@ -32,8 +32,8 @@ import {
 } from "./parts";
 
 const SIZE = 21;
-const LIST_X = 590;
-const R_X = 1340;
+const LIST_X = 610;
+const R_X = 1352;
 const STEP_ROW = 64;
 
 /** The assistant's function, every line unchanged, as the diffs print it. */
@@ -262,7 +262,7 @@ export const DebugScene: React.FC = () => {
           x={132}
           top={top}
           rowH={STEP_ROW}
-          width={400}
+          width={438}
           at={step1 - 4}
           end={aiAt}
           items={[
@@ -348,11 +348,8 @@ export const DebugScene: React.FC = () => {
           out={hypoAt - 6}
         />
         <Note at={startsAt} x={LIST_X + 370} y={B + 46} out={hypoAt - 6}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap", display: "flex", gap: 10, alignItems: "baseline", fontSize: 24 }}>
-            <Py text="[1, 2]" size={24} ink={ACCENT_INK} />
-            <span>starts before</span>
-            <Py text="[3, 4]" size={24} />
-            <span>, the interval it was compared with</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <Py text="[1, 2]" size={24} ink={ACCENT_INK} /> starts before <Py text="[3, 4]" size={24} />, the interval it was compared with
           </span>
         </Note>
 
@@ -373,10 +370,8 @@ export const DebugScene: React.FC = () => {
 
         {/* ── Step 4: the symptom patched, then the cause ── */}
         <Note at={emptyAt + 6} x={LIST_X} y={B} out={causeAt - 4}>
-          <span style={{ display: "flex", gap: 14, alignItems: "baseline", whiteSpace: "nowrap", ...note(26, ACCENT_INK), fontSize: 26 }}>
-            <span>three intervals in,</span>
-            <Py text={DEBUG.symptomReport.repr ?? ""} size={26} ink={ACCENT_INK} />
-            <span>out</span>
+          <span style={{ whiteSpace: "nowrap", ...note(26, ACCENT_INK) }}>
+            three intervals in, <Py text={DEBUG.symptomReport.repr ?? ""} size={26} ink={ACCENT_INK} /> out,{" "}
             <FadeIn at={noErrorAt}>
               <Mark at={noErrorAt + 4} color={MARK_BAD}>
                 and no error at all
@@ -465,10 +460,10 @@ export const DebugScene: React.FC = () => {
             };
           })}
         />
-        <Note at={neitherAt + 4} x={LIST_X + 860} y={B + 52}>
+        <Note at={neitherAt + 4} x={LIST_X + 860} y={B + 54}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>neither tested the order</span>
         </Note>
-        <Note at={keepAt + 14} x={LIST_X + 860} y={B + 132}>
+        <Note at={keepAt + 14} x={LIST_X + 860} y={B + 114}>
           <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
             got <Py text={DEBUG.keptBefore.tests[2].got} size={23} ink={ACCENT_INK} />
           </span>

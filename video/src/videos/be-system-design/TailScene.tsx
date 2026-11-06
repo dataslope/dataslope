@@ -41,8 +41,8 @@ export const TailScene: React.FC = () => {
   const sixtyAt = n.word("q2-fanout", "sixty-three percent of loads");
   const end = n.beat("q2-fanout").to;
 
-  const top = y(400);
-  const base = y(626);
+  const top = y(410);
+  const base = y(612);
   const [lo, hi] = P.domain;
   const bw = (hi - lo) / P.counts.length;
   const sx = (ms: number) => HX0 + ((ms - lo) / (hi - lo)) * (HX1 - HX0);
@@ -56,7 +56,7 @@ export const TailScene: React.FC = () => {
     return p > 0 ? <line x1={sx(ms)} x2={sx(ms)} y1={base - (base - from) * p} y2={base} stroke={color} strokeWidth={3} strokeDasharray={dash} /> : null;
   };
 
-  const sqY = y(716);
+  const sqY = y(752);
   const sqX = (i: number) => X0 + i * (SQ + SQ_GAP);
   const slow = 63;
   const red = ease(frame, hitsAt, 8);
@@ -92,9 +92,9 @@ export const TailScene: React.FC = () => {
               <rect
                 key={i}
                 x={sx(lo + i * bw) + 1}
-                y={base - Math.max(h, p > 0 ? 1.5 : 0)}
+                y={base - Math.max(h, p > 0 ? 3 : 0)}
                 width={sx(lo + bw) - sx(lo) - 2}
-                height={Math.max(h, p > 0 ? 1.5 : 0)}
+                height={Math.max(h, p > 0 ? 3 : 0)}
                 fill={sx(lo + i * bw) >= sx(P.marks.p99) - 1 ? ACCENT : BAR}
                 opacity={0.8}
               />
@@ -129,7 +129,7 @@ export const TailScene: React.FC = () => {
         <Line x={sx(P.marks.p99) - 14} y={rowB} at={oneAt + 4} size={24} weight={600} color={ACCENT_INK} align="right">
           one request in a hundred, or slower
         </Line>
-        <Line x={HX1} y={base + 92} at={sampleAt + 10} size={21} color={INK_SOFT} align="right">
+        <Line x={X0} y={y(262)} at={sampleAt} size={22} color={INK_SOFT}>
           a simulated sample of <Num>{int(P.n)}</Num> requests
         </Line>
 

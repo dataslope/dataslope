@@ -54,7 +54,6 @@ export const DeliveryScene: React.FC = () => {
   const deliveryFrom = n.beat("delivery").from;
   const twoAt = n.word("delivery", "Two delivery");
   const thirtyAt = n.word("delivery", "thirty");
-  const minutesAt = n.word("delivery", "minutes");
   const steadyAt = n.word("swing", "twenty-eight");
   const alwaysAt = n.word("swing", "always");
   const differentAt = n.word("same", "different");
@@ -146,9 +145,8 @@ export const DeliveryScene: React.FC = () => {
         Square, sum, divide, root.
       </Ink>
 
-      <Spot id="describing-data-scooter" at={twoAt - 4} left={1600} top={y(96)} width={240} height={238} />
-      {/* "thirty minutes": a stopwatch, under the axis's right half, gone as the zoom starts. */}
-      <Spot id="describing-data-stopwatch" at={minutesAt - 4} out={devFrom - 10} left={1420} top={y(766)} width={168} height={200} />
+      {/* The delivery: a small scooter, top right, well above the working's column. */}
+      <Spot id="describing-data-scooter" at={twoAt - 4} left={1610} top={y(112)} width={190} height={189} />
 
       <FigLabel n="3" title="Ten deliveries from each service, in minutes" at={twoAt - 6} x={160} y={y(330)} />
 

@@ -65,7 +65,7 @@ export const EstimateScene: React.FC = () => {
 
   const headY = y(296);
   const ruleY = y(360);
-  const pair = (i: number) => y(458) + i * 128;
+  const pair = (i: number) => y(456) + i * 140;
   const small = ease(frame, neitherAt, 14) * 0.55;
   const lit = pulse(frame, decidedAt, 30);
 
@@ -176,7 +176,7 @@ export const EstimateScene: React.FC = () => {
           <rect
             x={X0 - 14}
             y={pair(2) + 30}
-            width={520}
+            width={460}
             height={58}
             rx={10}
             fill="none"
@@ -185,7 +185,7 @@ export const EstimateScene: React.FC = () => {
             opacity={lit}
           />
         </svg>
-        <Pill x={X0 + 540} y={pair(2) + 36} at={cacheAt} ink={OK_INK} fill={`color-mix(in srgb, ${OK} 12%, ${PAPER})`} size={25}>
+        <Pill x={X0 + 470} y={pair(2) + 36} at={cacheAt} ink={OK_INK} fill={`color-mix(in srgb, ${OK} 12%, ${PAPER})`} size={25}>
           and a cache
         </Pill>
 
@@ -197,13 +197,13 @@ export const EstimateScene: React.FC = () => {
             </>,
           )}
         </Line>
-        <Line x={ST_X} y={ruleY + 52} at={gbAt - 4} size={27} dim={neitherAt}>
+        <Line x={ST_X} y={ruleY + 60} at={gbAt - 4} size={27} dim={neitherAt}>
           × <Num>{int(A.newLinksPerDay)}</Num> a day
         </Line>
-        <Line x={ST_X} y={ruleY + 102} at={gbAt} size={27} weight={700} color={BLUE_INK} dim={neitherAt}>
+        <Line x={ST_X} y={ruleY + 120} at={gbAt} size={27} weight={700} color={BLUE_INK} dim={neitherAt}>
           = <Num>{Math.round(E.storagePerDayBytes / 1e9)}</Num> GB a day
         </Line>
-        <Line x={ST_X} y={ruleY + 152} at={tbAt} size={27} weight={700} color={BLUE_INK} dim={neitherAt}>
+        <Line x={ST_X} y={ruleY + 180} at={tbAt} size={27} weight={700} color={BLUE_INK} dim={neitherAt}>
           ≈ <Num>{Math.round(E.storageTotalBytes / 1e12)}</Num> TB in <Num>{A.years}</Num> years
         </Line>
 
@@ -215,10 +215,10 @@ export const EstimateScene: React.FC = () => {
             </>,
           )}
         </Line>
-        <Line x={BW_X} y={ruleY + 52} at={mbAt - 6} size={27} dim={neitherAt}>
+        <Line x={BW_X} y={ruleY + 60} at={mbAt - 6} size={27} dim={neitherAt}>
           × <Num>{int(sig(E.peakReadQps))}</Num> a second
         </Line>
-        <Line x={BW_X} y={ruleY + 102} at={mbAt} size={27} weight={700} color={BLUE_INK} dim={neitherAt}>
+        <Line x={BW_X} y={ruleY + 120} at={mbAt} size={27} weight={700} color={BLUE_INK} dim={neitherAt}>
           ≈ <Num>{Math.round(E.peakBandwidthBytesPerSecond / 1e6)}</Num> MB/s at peak
         </Line>
         <div
@@ -227,7 +227,7 @@ export const EstimateScene: React.FC = () => {
             left: ST_X - 30,
             top: headY - 6,
             width: 1.5,
-            height: ruleY + 200 - headY,
+            height: ruleY + 226 - headY,
             background: HAIRLINE,
             opacity: ease(frame, stHead, 12) * (1 - small),
           }}

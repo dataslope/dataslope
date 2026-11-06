@@ -54,9 +54,9 @@ export const HookScene: React.FC = () => {
   const chipAt = CHIPS.map((c) => n.word("plan", c.cue));
   const end = n.beat("plan").to;
 
-  const cardsTop = y(360);
+  const cardsTop = y(392);
   const dimCards = ease(frame, fiveAt, 14) * 0.5;
-  const chipY = y(700);
+  const chipY = y(748);
   const chipH = 58;
   const chipX = (i: number) => X0 + i * (CHIP_W + CHIP_GAP);
   const thread = ease(frame, carriedAt, 30);
@@ -80,7 +80,7 @@ export const HookScene: React.FC = () => {
         <Headline lead="Design a URL shortener." at={designAt} size={84} />
         <Spot id="crow" at={designAt + 6} left={1316} top={y(250)} width={crowW} height={crowH} />
 
-        <Ink at={grownAt} dur={14} style={{ left: X0, top: y(300) }}>
+        <Ink at={grownAt} dur={14} style={{ left: X0, top: y(330) }}>
           <span style={{ ...note(25, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: 1 - dimCards }}>
             Where interviews have grown
           </span>

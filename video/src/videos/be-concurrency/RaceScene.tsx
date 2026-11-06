@@ -13,13 +13,13 @@ import { Band, Drift, Flow, lerp, LockGlyph, OK, OK_INK, Pill, pulse, Spot, THRE
 const STEP_X = 270;
 const CHIP_W = 100;
 const SLOT = 110;
-const CHIP_H = 54;
-const ROWS = [548, 626];
+const CHIP_H = 58;
+const ROWS = [570, 654];
 // The grid of every order, on the right.
 const G_X = 1016;
 const G_TOP = 382;
 const COL_W = 198;
-const ROW_H = 56;
+const ROW_H = 60;
 const SQ = 20;
 
 /** The thread a step letter names: A is thread 1, B thread 2. */
@@ -168,8 +168,8 @@ export const RaceScene: React.FC = () => {
             position: "absolute",
             left: X0,
             top: y(392),
-            width: 150,
-            height: h(84),
+            width: 170,
+            height: h(96),
             boxSizing: "border-box",
             border: `${3 + 2 * Math.max(pulse(frame, fiveAt, 18), pulse(frame, bothWriteAt + 6, 18))}px solid ${counterLine}`,
             borderRadius: 12,
@@ -180,7 +180,7 @@ export const RaceScene: React.FC = () => {
             opacity: ease(frame, classicAt, 10),
           }}
         >
-          <span style={{ ...label(48, counterInk), fontWeight: 750 }}>
+          <span style={{ ...label(52, counterInk), fontWeight: 750 }}>
             <Num>{counter}</Num>
           </span>
         </div>
@@ -262,16 +262,16 @@ export const RaceScene: React.FC = () => {
             <span style={{ ...label(21, THREAD[t].ink), fontWeight: 700, whiteSpace: "nowrap" }}>read, add, write</span>
           </div>
         ))}
-        <Flow points={[[STEP_X, y(704)], [STEP_X + 6 * SLOT - 10, y(704)]]} at={bothReadAt} color={INK_SOFT} width={2} head={13} out={fixAt} />
-        <Note at={bothReadAt + 4} x={STEP_X + 6 * SLOT + 6} y={y(704) - 15} out={fixAt}>
+        <Flow points={[[STEP_X, y(736)], [STEP_X + 6 * SLOT - 10, y(736)]]} at={bothReadAt} color={INK_SOFT} width={2} head={13} out={fixAt} />
+        <Note at={bothReadAt + 4} x={STEP_X + 6 * SLOT + 6} y={y(736) - 15} out={fixAt}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>time</span>
         </Note>
-        <Note at={lostAt} x={STEP_X} y={y(728)} out={fixAt}>
+        <Note at={lostAt} x={STEP_X} y={y(762)} out={fixAt}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Two increments, and the counter reads <Num>{LOST.result}</Num>: one is lost
           </span>
         </Note>
-        <Note at={sectionAt + 4} x={STEP_X} y={y(704)}>
+        <Note at={sectionAt + 4} x={STEP_X} y={y(736)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>One critical section: a lock around all three</span>
         </Note>
 
@@ -347,16 +347,16 @@ export const RaceScene: React.FC = () => {
         })}
 
         {/* The same test, two days. */}
-        <Note at={pauseAt} x={X0} y={y(800)}>
+        <Note at={pauseAt} x={X0} y={y(846)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Which order runs is timing:</span>
         </Note>
-        <Pill x={480} y={y(794)} at={passAt} tone="ok" size={22}>
+        <Pill x={480} y={y(840)} at={passAt} tone="ok" size={22}>
           ✓ today: pass
         </Pill>
-        <Pill x={700} y={y(794)} at={failAt} tone="bad" size={22}>
+        <Pill x={700} y={y(840)} at={failAt} tone="bad" size={22}>
           ✕ tomorrow: fail
         </Pill>
-        <Note at={sameAt} x={960} y={y(800)}>
+        <Note at={sameAt} x={960} y={y(846)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>same code, no change</span>
         </Note>
       </Drift>

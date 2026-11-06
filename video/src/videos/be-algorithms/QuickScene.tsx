@@ -115,9 +115,6 @@ export const QuickScene: React.FC = () => {
           {/* The pivots, one per level, along the staircase's edge. */}
           {depthShown > 0 ? <line x1={ix(LX, N)} y1={stairTop} x2={ix(LX, N - depthShown)} y2={stairBottom} stroke={HIGHLIGHT} strokeWidth={4} /> : null}
         </Svg>
-        <Line at={peelsAt + 4} x={LX + 470} y={stairTop + 8} size={21} color={INK_SOFT} weight={600}>
-          one row per level
-        </Line>
         <Line at={levelsAt} x={600} y={y(590)} size={24} weight={700}>
           <Num>{QUICKSORT.lastPivotSorted.depth}</Num> levels
         </Line>
@@ -194,11 +191,17 @@ export const QuickScene: React.FC = () => {
         </Line>
 
         {/* Why it matters. */}
-        <Line at={commonAt} x={LX} y={y(818)} size={24}>
-          Sorted input is common: rows by ID, events by time.<span style={{ opacity: ease(frame, randomizeAt, 10) }}> <b style={{ color: OK_INK }}>Randomize the pivot.</b></span>
+        <Line at={commonAt} x={RXP} y={insetBottom + 86} size={24}>
+          Sorted input is common: rows by ID, events by time.
         </Line>
-        <Line at={edgeAt} x={LX} y={y(856)} size={24}>
-          Its edge over merge sort: it sorts <Mark at={placeAt}>in place</Mark>, where merge sort needs an <i>n</i>-sized buffer
+        <Line at={randomizeAt} x={RXP} y={insetBottom + 128} size={24} weight={700} color={OK_INK}>
+          Randomize the pivot.
+        </Line>
+        <Line at={edgeAt} x={RXP} y={insetBottom + 190} size={24}>
+          Its edge over merge sort: it sorts <Mark at={placeAt}>in place</Mark>
+        </Line>
+        <Line at={edgeAt + 10} x={RXP} y={insetBottom + 232} size={24} color={INK_SOFT}>
+          where merge sort needs a buffer as big as the input
         </Line>
       </Drift>
     </AbsoluteFill>

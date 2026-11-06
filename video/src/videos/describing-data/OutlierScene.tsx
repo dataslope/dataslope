@@ -114,10 +114,7 @@ export const OutlierScene: React.FC = () => {
         </Ink>
       </div>
 
-      <Spot id="describing-data-magnifier" at={lookAt - 6} left={1620} top={y(100)} width={200} height={203} />
-      {/* "the box-plot fences": a picket fence, under the fence line, in the space the
-          cards leave while the two rules are compared; gone before the cards come back. */}
-      <Spot id="describing-data-fence" at={fencesAt - 4} out={whyAt - 18} left={390} top={y(700)} width={240} height={176} />
+      <Spot id="describing-data-magnifier" at={lookAt - 6} left={1600} top={y(112)} width={200} height={203} />
 
       <FigLabel n="10" title="Two hundred skewed incomes, and two genuine high earners" at={outlierFrom} x={160} y={y(330)} />
 

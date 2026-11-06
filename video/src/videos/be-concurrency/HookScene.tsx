@@ -19,8 +19,8 @@ const N = 6;
 /** When each request starts once they overlap, in seconds. */
 const STAGGER = 0.1;
 const LANE = 362;
-const ROW = 46;
-const BAR_H = 34;
+const ROW = 50;
+const BAR_H = 38;
 
 /** The sixteen questions, as the chips that preview them. */
 const DEEP = ["Concurrency", "Processes", "Races", "The GIL", "Deadlock", "Prevention", "Event loop", "Blocking", "Choosing"];
@@ -136,7 +136,7 @@ export const HookScene: React.FC = () => {
   const dimAt = sixteenAt - 4;
   const dim = 1 - ease(frame, dimAt, 14) * 0.62;
   const lineTop = y(338);
-  const lineBottom = y(640);
+  const lineBottom = y(690);
 
   const shared = [
     { id: "counter", name: "a counter", at: counterAt, x: 1000 },
@@ -237,7 +237,7 @@ export const HookScene: React.FC = () => {
               </span>
             </span>
           </Note>
-          <Note at={moveAt(N - 1) + 18} x={X0} y={rowY(N) + h(12)}>
+          <Note at={moveAt(N - 1) + 18} x={X0} y={rowY(N) + h(10)} out={sixteenAt - 4}>
             <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>At once, all six fit inside the second</span>
           </Note>
 
@@ -254,17 +254,17 @@ export const HookScene: React.FC = () => {
         </div>
 
         {/* The round: nine with a figure, seven quickly. */}
-        <Note at={nineAt - 2} x={X0} y={y(694)}>
+        <Note at={nineAt - 2} x={X0} y={y(716)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>Sixteen questions: nine with a figure each</span>
         </Note>
         {DEEP.map((name, i) => (
-          <Chip key={name} at={sixteenAt + 4 + i * 2} x={X0 + i * 162} y={y(728)} w={150} h={h(80)} n={i + 1} name={name} big />
+          <Chip key={name} at={sixteenAt + 4 + i * 2} x={X0 + i * 162} y={y(750)} w={150} h={h(80)} n={i + 1} name={name} big />
         ))}
-        <Note at={sevenAt - 2} x={X0} y={y(838)}>
+        <Note at={sevenAt - 2} x={X0} y={y(852)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>and seven quickly, at the end</span>
         </Note>
         {QUICK.map((name, i) => (
-          <Chip key={name} at={sevenAt + 2 + i * 2} x={X0 + i * 184} y={y(870)} w={172} h={h(44)} n={10 + i} name={name} big={false} />
+          <Chip key={name} at={sevenAt + 2 + i * 2} x={X0 + i * 184} y={y(884)} w={172} h={h(44)} n={10 + i} name={name} big={false} />
         ))}
       </Drift>
     </AbsoluteFill>

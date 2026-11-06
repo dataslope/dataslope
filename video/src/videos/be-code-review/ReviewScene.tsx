@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, body, label, note } from "../..
 import { Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ARRIVED, DIFFS, LINES, REVIEW, WHOLE } from "./data";
+import { ARRIVED, DIFFS, LINES, LISTINGS, REVIEW, WHOLE } from "./data";
 import {
   Checklist,
   Code,
@@ -26,7 +26,6 @@ import {
   OK_INK,
   Py,
   Spot,
-  Strike,
   TestGrid,
   Verdict,
 } from "./parts";
@@ -34,8 +33,8 @@ import {
 const LIST_X = 660;
 const SIZE = 20;
 const TEST_SIZE = 19;
-const R_X = 1420;
-const R_W = 340;
+const R_X = 1400;
+const R_W = 380;
 const CHECK_ROW = 62;
 
 /** An interval list as it prints, read back into numbers. */
@@ -148,6 +147,7 @@ export const ReviewScene: React.FC = () => {
   const fixBottom = top + diffHeight(fix.length, SIZE);
 
   // The code on screen: the diff as it arrived, its test file, then the fix.
+  const diffIn = c1At + 12;
   const testsIn = lastAt;
   const fixIn = threeAt;
   const rOut = lastAt - 6;
@@ -173,6 +173,11 @@ export const ReviewScene: React.FC = () => {
   const added = fix.map((l, i) => (l.startsWith("+") ? i : -1)).filter((i) => i >= 0);
   const kinds = ["assumption", "boundary", "boundary"];
 
+  // The closing shows the fixed function plain, its sort highlighted.
+  const FIXED = LISTINGS.fixed;
+  const sortedRow = lineOf(FIXED, "sorted(intervals)");
+  const closeIn = addedAt - 8;
+
   // The follow-up's two number lines, where the checklist was.
   const pastIn = followAt - 2;
   const listOut = followAt - 8;
@@ -183,7 +188,7 @@ export const ReviewScene: React.FC = () => {
       {[c1At, c2At, c3At, c4At, c5At].map((at, i) => (
         <Sfx key={i} name="el-pencil" at={at + 2} level={-38} />
       ))}
-      <Sfx name="el-whoosh" at={backAt} level={-36} />
+      <Sfx name="el-whoosh" at={diffIn} level={-36} />
       {[touchesAt, callsAt, passAt].map((at, i) => (
         <Sfx key={i} name="el-tap" at={at + 8} level={-32} />
       ))}
@@ -208,7 +213,7 @@ export const ReviewScene: React.FC = () => {
         <Ink at={strangerAt} dur={18} style={{ left: 96, top: y(232), ...body(36, true), color: INK, whiteSpace: "nowrap" }}>
           Like a pull request from a capable stranger.
         </Ink>
-        <Spot id="be-code-review-clipboard" at={c1At} left={1640} top={86} width={132} height={187} />
+        <Spot id="be-code-review-clipboard" at={c1At} out={lastAt - 10} left={1640} top={86} width={132} height={187} />
 
         {/* ── The five checks ── */}
         <Checklist
@@ -235,19 +240,22 @@ export const ReviewScene: React.FC = () => {
         />
 
         {/* ── The diff as it arrived ── */}
-        <FileTab x={LIST_X} top={top - 44} at={backAt} dim={testsIn} name="intervals.py">
+        <FileTab x={LIST_X} top={top - 44} at={diffIn} out={fixIn} on={[[diffIn, testsIn]]} name="intervals.py">
           +{LINES}
         </FileTab>
-        <FileTab x={LIST_X + 250} top={top - 44} at={backAt + 4} dim={backAt + 10} name="test_intervals.py">
+        <FileTab x={LIST_X + 270} top={top - 44} at={diffIn + 4} on={[[testsIn, fixIn]]} name="test_intervals.py">
           +{tests.length}
         </FileTab>
+        <Note at={backAt} x={LIST_X + 620} y={top - 44} out={testsIn}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>as it arrived, before it shipped</span>
+        </Note>
         <DiffListing
           lines={fn}
           x={LIST_X}
           top={top}
           width={fnW}
           size={SIZE}
-          at={backAt}
+          at={diffIn}
           out={testsIn}
           marks={[
             { line: append, text: "append", at: callsAt + 4, out: passAt },
@@ -271,8 +279,8 @@ export const ReviewScene: React.FC = () => {
           ticks={[0, 1, 2, 3, 4]}
           at={closedAt + 4}
           out={rOut}
-          segs={touchIn.map(([s, e], i) => ({ s, e, dy: 26, color: i ? BAR : `color-mix(in srgb, ${BAR} 60%, white)`, at: closedAt + 8 + i * 8 }))}
-          points={[{ v: 2, dy: 26, at: shareAt + 4, r: 20 }]}
+          segs={touchIn.map(([s, e], i) => ({ s, e, dy: 24 + i * 26, color: BAR, at: closedAt + 8 + i * 8 }))}
+          points={[{ v: touchIn[1][0], dy: 37, at: shareAt + 4, r: 26 }]}
         />
         <Note at={mergeAt} x={R_X} y={rTop + 178} out={rOut}>
           <Pair name="should be" value={REVIEW.fixed.touching.repr ?? ""} ink={OK_INK} />
@@ -291,12 +299,12 @@ export const ReviewScene: React.FC = () => {
           width={R_W - 40}
           from={0}
           to={11}
-          ticks={[0, 1, 3, 5, 10]}
+          ticks={[1, 2, 3, 10]}
           at={tenAt + 4}
           out={rOut}
           segs={[
             { s: containIn[0][0], e: containIn[0][1], dy: 52, color: BAR, at: tenAt + 8 },
-            { s: containIn[1][0], e: containIn[1][1], dy: 24, color: `color-mix(in srgb, ${BAR} 60%, white)`, at: tenAt + 16 },
+            { s: containIn[1][0], e: containIn[1][1], dy: 24, color: BAR, at: tenAt + 16 },
             { s: containOut[0][1], e: containIn[0][1], dy: 52, color: ACCENT, at: becomesAt + 6, dashed: true, open: [true, false] },
           ]}
         />
@@ -312,9 +320,6 @@ export const ReviewScene: React.FC = () => {
         </Note>
 
         {/* ── Its tests: this code, and a correct one ── */}
-        <FileTab x={LIST_X + 250} top={top - 44} at={testsIn} out={fixIn} name="test_intervals.py">
-          +{tests.length}
-        </FileTab>
         <DiffListing
           lines={tests}
           x={LIST_X}
@@ -358,7 +363,7 @@ export const ReviewScene: React.FC = () => {
 
         {/* ── The fix, and the tests the review wanted ── */}
         <FileTab x={LIST_X} top={top - 44} at={fixIn} name="intervals.py">
-          3 lines changed
+          <span style={{ color: OK_INK }}>+{added.length}</span> <span style={{ color: ACCENT_INK }}>−{fix.filter((l) => l.startsWith("-")).length}</span>
         </FileTab>
         <DiffListing
           lines={fix}
@@ -369,12 +374,24 @@ export const ReviewScene: React.FC = () => {
           at={fixIn}
           wipe={false}
           signsAt={fixIn}
+          out={closeIn}
           marks={[
             { line: added[0], text: "sorted(intervals)", at: sortInAt + 4, out: lteAt },
             { line: added[1], text: "<=", at: lteAt + 6, out: largerAt },
             { line: added[2], text: "max(merged[-1][1], end)", at: largerAt + 4, out: writeAt },
-            { line: added[0], text: "sorted(intervals)", at: addedAt + 2 },
           ]}
+        />
+        {/* The closing: the function as it now reads. */}
+        <DiffListing
+          lines={FIXED}
+          diff={false}
+          x={LIST_X}
+          top={top}
+          width={fnW}
+          size={SIZE}
+          at={closeIn}
+          wipe={false}
+          marks={[{ line: sortedRow, text: "sorted(intervals)", at: addedAt + 4 }]}
         />
         {added.map((row, i) => (
           <Note key={row} at={(i === 0 ? assumptionAt : eachAt) + 4 + i * 4} x={LIST_X + fnW + 24} y={top + lineTop(row, SIZE) + 3} out={followAt - 6}>
@@ -423,8 +440,8 @@ export const ReviewScene: React.FC = () => {
           to={4}
           ticks={[0, 1, 2, 3, 4]}
           at={pastIn + 2}
-          segs={touchIn.map(([s, e], i) => ({ s, e, dy: 26, color: i ? BAR : `color-mix(in srgb, ${BAR} 60%, white)`, at: pastIn + 6 + i * 6 }))}
-          points={[{ v: 2, dy: 26, at: pastIn + 16, r: 20 }]}
+          segs={touchIn.map(([s, e], i) => ({ s, e, dy: 24 + i * 26, color: BAR, at: pastIn + 6 + i * 6 }))}
+          points={[{ v: touchIn[1][0], dy: 37, at: pastIn + 16, r: 26 }]}
         />
         <Note at={pastIn + 10} x={120} y={top + 158}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>both hold 2: they touch</span>
@@ -441,12 +458,12 @@ export const ReviewScene: React.FC = () => {
           ticks={[8, 9, 10, 11, 12]}
           at={slotsAt + 2}
           segs={[
-            { s: 9, e: 10, dy: 26, color: `color-mix(in srgb, ${OK} 60%, white)`, at: nineAt, open: [false, true] },
-            { s: 10, e: 11, dy: 26, color: OK, at: nineAt + 10, open: [false, true] },
+            { s: 9, e: 10, dy: 24, color: OK, at: nineAt, open: [false, true] },
+            { s: 10, e: 11, dy: 50, color: OK, at: nineAt + 10, open: [false, true] },
           ]}
         />
         <Note at={overlapAt} x={120} y={top + 388}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>9 to 10 stops short of 10: no overlap</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>10 is in the second slot only: no overlap</span>
         </Note>
         <Note at={askAt} x={LIST_X} y={gridTop + 6} out={addedAt - 6}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
@@ -456,17 +473,18 @@ export const ReviewScene: React.FC = () => {
         </Note>
 
         {/* ── What the sort costs ── */}
-        <Note at={onePassAt} x={LIST_X + fnW + 40} y={top + lineTop(added[0], SIZE) - 2}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap", display: "flex", gap: 16, fontSize: 26 }}>
-            <Strike at={nlognAt}>one pass</Strike>
-            <FadeIn at={nlognAt}>
+        <Note at={onePassAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) - 2}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <span style={{ color: INK_SOFT }}>one pass</span>
+            <FadeIn at={nlognAt - 2}>
+              {" "}→{" "}
               <Mark at={nlognAt + 6}>
                 <i>n</i> log <i>n</i>
               </Mark>
             </FadeIn>
           </span>
         </Note>
-        <Note at={costAt} x={LIST_X + fnW + 40} y={top + lineTop(added[0], SIZE) + 46}>
+        <Note at={costAt} x={LIST_X + fnW + 40} y={top + lineTop(sortedRow, SIZE) + 46}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>what the fix costs</span>
         </Note>
         <NextLine at={nextAt} x={LIST_X} y={gridTop + 40} width={1140}>

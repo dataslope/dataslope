@@ -92,10 +92,10 @@ export const ObsScene: React.FC = () => {
           y={orderTop}
           w={ORDER.w}
           h={ORDER.h}
-          at={placedAt}
+          at={oneAt + 4}
           tone="data"
           title="Order"
-          sub={<span style={{ color: BLUE_INK, fontWeight: 650 }}>{frame >= second ? "1043" : "1042"} placed</span>}
+          sub={<span style={{ color: BLUE_INK, fontWeight: 650 }}>{frame < placedAt ? "the subject" : `${frame >= second ? "1043" : "1042"} placed`}</span>}
           lit={pulse(frame, placedAt + 4, 20) + pulse(frame, second, 20)}
           dim={costDim}
         />
@@ -107,8 +107,8 @@ export const ObsScene: React.FC = () => {
         </Pill>
         {[0, 1, 2, 3].map((i) => {
           const [who] = SECOND[i];
-          const at = i < 3 ? subAt + i * 5 : fourthAt;
-          const lit = pulse(frame, resultAt(i) - 4, 18) + (i < 3 ? pulse(frame, second + 16, 18) : 0);
+          const at = i < 3 ? notifiesAt + 4 + i * 5 : fourthAt;
+          const lit = pulse(frame, resultAt(i) - 4, 18) + (i < 3 ? pulse(frame, second + 16, 18) + pulse(frame, subAt + i * 5, 18) : 0);
           const line = [src, [src[0] + 120, orderMid], [src[0] + 120, lisMid(i)], [LIS.x - 8, lisMid(i)]] as const;
           const t = (frame - dotAt(i)) / 16;
           const t2 = (frame - second - 2) / 16;

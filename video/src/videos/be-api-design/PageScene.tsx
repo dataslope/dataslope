@@ -102,6 +102,7 @@ export const PageScene: React.FC = () => {
     { title: "page 2, by cursor", ids: shown(PAGE.page2Cursor), at: afterAt + 6, tone: "ok" as const },
   ];
   const cursorTop = y(600);
+  const page500 = PAGE.offset.find((o) => o.page === 500)!;
 
   return (
     <AbsoluteFill>
@@ -218,6 +219,23 @@ export const PageScene: React.FC = () => {
         ))}
         <Note at={p1At + 8} x={BAR_X1 + 50} y={axisY + 8}>
           <span style={{ ...note(19, INK_SOFT), whiteSpace: "nowrap" }}>log scale</span>
+        </Note>
+
+        {/* Page 500 as Postgres ran it: the scan reads what OFFSET skips. */}
+        <Note at={p500At} x={LIST_X[0]} y={listTop} out={repeatAt - 6}>
+          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Page 500, as Postgres ran it</span>
+        </Note>
+        {page500.query.map((l, i) => (
+          <Note key={l} at={p500At + 4 + i * 4} x={LIST_X[0]} y={listTop + h(46) + i * h(38)} out={repeatAt - 6}>
+            <span style={{ fontFamily: MONO, fontSize: 23, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
+              {l.includes("OFFSET") ? <Mark at={p500At + 20}>{l}</Mark> : l}
+            </span>
+          </Note>
+        ))}
+        <Note at={p500At + 24} x={LIST_X[0]} y={listTop + h(56) + page500.query.length * h(38)} out={repeatAt - 6}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            the index scan reads <b style={{ color: BLUE_INK }}><Num>{thousands(page500.read)}</Num> rows</b>, and LIMIT keeps <Num>{PAGE_SIZE}</Num>
+          </span>
         </Note>
 
         {/* Drift: a new article, and page two by offset repeats one. */}

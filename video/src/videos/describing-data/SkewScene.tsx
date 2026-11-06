@@ -8,7 +8,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ORDERS } from "./data";
-import { Arrow, Bracket, DATA, Drift, lerp, Mark, Pulse, Spot, STAT, STAT_INK, Svg, Tag } from "./parts";
+import { Arrow, Bracket, DATA, Drift, lerp, Mark, Pulse, STAT, STAT_INK, Svg, Tag } from "./parts";
 
 const BASE = 830;
 const X0 = 160;
@@ -70,7 +70,6 @@ export const SkewScene: React.FC = () => {
   // ── Cues ──
   const ordersFrom = n.beat("orders").from;
   const fiveAt = n.word("orders", "five hundred");
-  const customerAt = n.word("orders", "customer orders");
   const modestAt = n.word("orders", "modest");
   const tailAt = n.word("orders", "long tail");
   const rightAt = n.word("orders", "right");
@@ -145,10 +144,6 @@ export const SkewScene: React.FC = () => {
       </Ink>
 
       <FigLabel n="2" title={`${ORDERS.n} customer orders, in dollars`} at={ordersFrom} x={160} y={y(330)} />
-
-      {/* "customer orders": a shopping bag, in the empty right half over the tail, gone
-          before the histogram narrows for the table. */}
-      <Spot id="describing-data-bag" at={customerAt - 4} out={rightFrom - 10} left={1520} top={y(402)} width={175} height={220} />
 
       <Drift from={ordersFrom} to={moveAt + 30} scale={0.018} origin={[X0, base]}>
         <Bars
@@ -226,9 +221,6 @@ export const SkewScene: React.FC = () => {
 
       {/* ── Which center, when: the lesson's rules, a row at a time ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, hidesAt - 4, 14) }}>
-      {/* "wait times": an hourglass, top right beside the table's headline, dimming with
-          the table when the next part takes over. */}
-      <Spot id="describing-data-hourglass" at={examplesAt[2] - 4} left={1650} top={y(96)} width={122} height={210} />
       {ROWS.map((r, i) => {
         const p = ease(frame, rowAt[i] - 6, 16);
         if (p <= 0) return null;

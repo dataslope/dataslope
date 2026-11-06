@@ -118,7 +118,8 @@ export const BellScene: React.FC = () => {
         ]}
       />
 
-      <Spot id="distributions-penguin" at={flippersAt - 4} left={1540} top={y(250)} width={230} height={300} />
+      {/* The penguin, small, right of the flippers' figure. */}
+      <Spot id="distributions-penguin" at={flippersAt - 4} left={1585} top={y(290)} width={141} height={200} />
 
       <Drift from={bellFrom} to={n.beat("rule-in").to + 40}>
         {/* Small effects adding up: pegs, and dots nudged down through them. */}

@@ -289,9 +289,8 @@ export const EndsScene: React.FC = () => {
   const otherAt = n.word("one", "other box");
   const m2mTo = n.beat("m2m").to;
   const keyHits = KEY_HITS.map((k) => ({ glyph: k.glyph, at: n.word(k.beat, k.word) }));
-  // The spots pop in on the words that name them, silent like the video's other spot art.
+  // The crow pops in on the word that names it, silent like the video's other spot art.
   const crowAt = n.word("ends", "Crow's-foot") + 2;
-  const carAt = n.word("zero-or-one", "parking pass") + 2;
 
   // ── Part one: the two ends, magnified ──
   const Y0 = y(VIEW_Y);
@@ -355,10 +354,10 @@ export const EndsScene: React.FC = () => {
       <Headline lead="Every end makes" at={endsFrom - 4} turn="two marks." turnAt={twoMarksAt - 4} out={oneFrom - 10} />
       <Headline lead="Start at one box." at={oneFrom - 2} turn="Read the other end." turnAt={otherAt - 4} />
 
-      {/* "Crow's-foot notation": a crow, top right, above where the key of ends
-          will stand; then "a parking pass", in the empty corner under that key. */}
-      <Spot id="db-relationships-crow" at={crowAt} left={1560} top={y(92)} width={192} height={200} />
-      <Spot id="db-relationships-car" at={carAt} left={1520} top={y(648)} width={240} height={180} />
+      {/* "Crow's-foot notation": a crow, top right, while the two ends are
+          magnified under it. Gone before the key of ends inks in below where
+          it stood, so that key keeps the column to itself. */}
+      <Spot id="db-relationships-crow" at={crowAt} out={oneFrom - 26} left={1570} top={y(115)} width={173} height={180} />
 
       {/* ── Part one ── */}
       <AbsoluteFill style={{ opacity: partOne }}>

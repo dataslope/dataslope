@@ -220,7 +220,7 @@ export const AsyncScene: React.FC = () => {
               <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>await, {ms(f.wait / 1000)}</span>
             </WaitBar>
             <Note at={f.name === firstDone ? bFirstAt : twentyAt - 6} x={msX(AXIS, f.wait) + 14} y={y(f.row) + h(ROW_H) / 2 - 15}>
-              <span style={{ ...label(21, f.name === firstDone ? OK_INK : INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
                 ✓ {f.name} done{f.name === firstDone ? ", first" : ""}
               </span>
             </Note>

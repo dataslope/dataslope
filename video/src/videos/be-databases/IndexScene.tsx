@@ -14,17 +14,17 @@ import { Drift, Flow, Listing, listingHeight, MARK_GREEN, MARK_RED, PageGrid, Pl
 
 const TOP = 304;
 const SIZE = 21;
-const PLAN = 20;
-const PLAN_W = 780;
-const R_X = 1000;
-const R_W = 800;
+const PLAN = 19;
+const PLAN_W = 960;
+const R_X = 1110;
+const R_W = 690;
 /** The table's 7,360 pages, as 160 x 46 squares. */
 const COLS = 160;
 const ROWS = INDEX.pages / COLS;
 const GRID_HIGH = 330;
 const GRID_LOW = 620;
 const TREE_TOP = 372;
-const NODE_W = 112;
+const NODE_W = 96;
 const NODE_H = 34;
 const LEAVES = 6;
 const BUCKETS = 8;
@@ -100,7 +100,7 @@ export const IndexScene: React.FC = () => {
   // ── Right: the pages, high for the scan, low under the tree ──
   const move = ease(frame, structAt - 4, 24);
   const gridTop = y(GRID_HIGH) + (y(GRID_LOW) - y(GRID_HIGH)) * move;
-  const pitch = 5;
+  const pitch = R_W / COLS;
   const gridBottom = gridTop + ROWS * pitch;
 
   // The tree: a root, three branches, six leaves; the path runs root,
@@ -109,8 +109,8 @@ export const IndexScene: React.FC = () => {
   const tOut = ease(frame, treeOut, 12);
   const lv = [y(TREE_TOP), y(TREE_TOP) + h(64), y(TREE_TOP) + h(128)];
   const rootX = R_X + R_W / 2;
-  const branchX = [R_X + 130, R_X + R_W / 2, R_X + R_W - 130];
-  const leafX = Array.from({ length: LEAVES }, (_, i) => R_X + 62 + (i * (R_W - 124)) / (LEAVES - 1));
+  const branchX = [R_X + 120, R_X + R_W / 2, R_X + R_W - 120];
+  const leafX = Array.from({ length: LEAVES }, (_, i) => R_X + 55 + (i * (R_W - 110)) / (LEAVES - 1));
   const path = ease(frame, threeAt, 8);
   const hotRoot = ease(frame, threeAt, 8);
   const hotBranch = ease(frame, threeAt + 6, 8);
@@ -124,7 +124,7 @@ export const IndexScene: React.FC = () => {
   // The hash index: hash(email) and eight buckets.
   const hashTop = y(TOP) - h(4) + listingHeight(1, 20) + h(24);
   const bucketY = hashTop + h(50) + h(44);
-  const bucketW = 76;
+  const bucketW = 64;
   const bucketX = (i: number) => R_X + 40 + i * ((R_W - 80 - bucketW) / (BUCKETS - 1));
   const hashBox = { x: R_X, w: 240, y: hashTop, h: h(50) };
   const eqBucket = 5;
@@ -211,9 +211,9 @@ export const IndexScene: React.FC = () => {
         {/* log n against n, under the plan */}
         <Note at={logAt} x={X0} y={planTop + h(196)} out={kindAt - 4}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>
-            index: <i style={{ fontFamily: "serif" }}>O</i>(log <i>n</i>)
+            index: <i>O</i>(log <i>n</i>)
             <span style={{ color: INK_SOFT }}> against </span>
-            scan: <i style={{ fontFamily: "serif" }}>O</i>(<i>n</i>)
+            scan: <i>O</i>(<i>n</i>)
           </span>
         </Note>
 
@@ -228,6 +228,7 @@ export const IndexScene: React.FC = () => {
           cols={COLS}
           rows={ROWS}
           pitch={pitch}
+          cell={pitch * 0.8}
           at={findAt}
           sweeps={[
             { from: readsAt, to: readsAt + 54, color: `color-mix(in srgb, ${BAR} 70%, ${PAPER})`, out: structAt },
@@ -269,12 +270,12 @@ export const IndexScene: React.FC = () => {
           {leafX.map((lx, i) => (
             <TreeNode key={i} cx={lx} y={lv[2]} at={btreeAt + 10 + i * 2} hot={i === leafPath ? hotLeaf : 0} />
           ))}
-          {["root", "branch", "leaf"].map((t, i) => (
-            <text key={t} x={R_X - 14} y={lv[i] + NODE_H / 2 + 7} textAnchor="end" style={svgText(label(19, INK_SOFT))} opacity={ease(frame, levelsAt + i * 4, 10)}>
-              {t}
-            </text>
-          ))}
         </Svg>
+        <Note at={levelsAt} x={R_X + 20} y={lv[0] + NODE_H / 2 - h(15)} out={treeOut}>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <b>3 levels</b> deep
+          </span>
+        </Note>
         {/* Sorted leaves: a range is a walk along them. */}
         <Flow
           points={[
@@ -357,8 +358,9 @@ export const IndexScene: React.FC = () => {
         ))}
         <Note at={rangeAt + 10} x={hashBox.x + hashBox.w + 36} y={hashTop + h(10)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: ACCENT_INK }}>a range:</b> scattered buckets, nothing to walk
+            <b style={{ color: ACCENT_INK }}>a range:</b>
           </span>
+          <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: h(6) }}>scattered buckets, nothing to walk</div>
         </Note>
       </Drift>
     </AbsoluteFill>

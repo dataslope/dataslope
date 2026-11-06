@@ -9,7 +9,7 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DEADLOCK } from "./data";
-import { Drift, Flow, Node, OK, OK_INK, Strike, THREAD, tint, X0 } from "./parts";
+import { Drift, Flow, Node, OK, OK_INK, pulse, THREAD, tint, X0 } from "./parts";
 
 /** The wait-for picture, in layout units: two locks between two threads. */
 const A = { x: 410, y: 350, w: 140, h: 64 };
@@ -34,20 +34,22 @@ const named = (s: string) => s.replace(/^T(\d)/, "thread $1");
 const STUCK = DEADLOCK.opposite.examples[0];
 if (!STUCK || STUCK.waitsFor.T1 !== "B" || STUCK.waitsFor.T2 !== "A") throw new Error("deadlock: results.json's schedule is not the one drawn");
 
-/** A chain link, upright; `open` swings its right half away. */
-const Link: React.FC<{ cx: number; cy: number; at: number; open: number; color: string; edge?: boolean }> = ({ cx, cy, at, open, color, edge }) => {
+/** A chain link, an upright oval; `open` cuts a gap in its right side, so the chain comes apart there. */
+const Link: React.FC<{ cx: number; cy: number; at: number; open: number; color: string }> = ({ cx, cy, at, open, color }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
-  const w = edge ? 10 : 34;
-  const hgt = 120;
-  const r = w / 2;
-  const left = `M${cx},${cy - hgt / 2} h${-0} a${r},${r} 0 0 0 ${-r},${r} V${cy + hgt / 2 - r} a${r},${r} 0 0 0 ${r},${r}`;
-  const right = `M${cx},${cy - hgt / 2} a${r},${r} 0 0 1 ${r},${r} V${cy + hgt / 2 - r} a${r},${r} 0 0 1 ${-r},${r}`;
+  const rx = 18;
+  const ry = 60;
+  const gap = (open * 80 * Math.PI) / 180;
+  const pt = (a: number) => `${(cx + rx * Math.cos(a)).toFixed(2)},${(cy + ry * Math.sin(a)).toFixed(2)}`;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
-      <path d={left} fill="none" stroke={color} strokeWidth={7} strokeLinecap="round" />
-      <path d={right} fill="none" stroke={color} strokeWidth={7} strokeLinecap="round" transform={`rotate(${open * 28} ${cx} ${cy + hgt / 2}) translate(${open * 6} 0)`} />
+      {gap > 0.01 ? (
+        <path d={`M${pt(gap / 2)} A${rx},${ry} 0 1 1 ${pt(-gap / 2)}`} fill="none" stroke={color} strokeWidth={7} strokeLinecap="round" />
+      ) : (
+        <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke={color} strokeWidth={7} />
+      )}
     </svg>
   );
 };
@@ -71,6 +73,7 @@ export const DeadScene: React.FC = () => {
   const textAt = n.word("dead", "What is a deadlock");
   const setAt = n.word("dead", "A deadlock is a set of threads");
   const foreverAt = n.word("dead", "waiting forever");
+  const holdsAt = n.word("dead", "something another one holds");
   const twoAt = n.word("dead-ex", "Two threads, two locks");
   const firstAt = n.word("dead-ex", "The first takes A");
   const wantsBAt = n.word("dead-ex", "then wants B");
@@ -172,20 +175,20 @@ export const DeadScene: React.FC = () => {
         </svg>
         <Flow points={[[t1c, t1.y + t1.h + 4], [t1c, bMid], [b.x - 8, bMid]]} at={wantsBAt} color={waitColor} dash="9 7" width={3} out={getsAt} />
         <Flow points={[[t2c, t2.y - 4], [t2c, aMid], [a.x + a.w + 8, aMid]]} at={wantsAAt} color={waitColor} dash="9 7" width={3} />
-        <Node x={a.x} y={a.y} w={a.w} h={a.h} at={twoAt} tone="data" fill={tint(THREAD[0].fill, 22 * draw(firstAt + 4))} title="lock A" size={23} />
+        <Node x={a.x} y={a.y} w={a.w} h={a.h} at={holdsAt} tone="data" fill={tint(THREAD[0].fill, 22 * draw(firstAt + 4))} title="lock A" size={23} />
         <Node
           x={b.x}
           y={b.y}
           w={b.w}
           h={b.h}
-          at={twoAt + 4}
+          at={holdsAt + 4}
           tone="data"
           fill={tint(ordered > 0.5 ? THREAD[0].fill : THREAD[1].fill, 22 * Math.max(draw(secondAt + 4) * (1 - ordered), ordered))}
           title="lock B"
           size={23}
         />
         {[t1, t2].map((t, i) => (
-          <Node key={i} x={t.x} y={t.y} w={t.w} h={t.h} at={twoAt + 2 + i * 4} fill={tint(THREAD[i].fill, 18)} line={THREAD[i].fill} titleInk={THREAD[i].ink} title={`thread ${i + 1}`} size={23} />
+          <Node key={i} x={t.x} y={t.y} w={t.w} h={t.h} at={setAt + 6 + i * 4} fill={tint(THREAD[i].fill, 18)} line={THREAD[i].fill} titleInk={THREAD[i].ink} title={`thread ${i + 1}`} size={23} lit={pulse(frame, twoAt + i * 6, 18)} />
         ))}
         <Note at={wantsBAt} x={X0} y={y(686)}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "0.5em", fontSize: 20 }}>
@@ -260,13 +263,9 @@ export const DeadScene: React.FC = () => {
           const cy = rowY(i) + h(30);
           return (
             <React.Fragment key={c.name}>
-              <Link cx={LINK_X + 17} cy={cy} at={condAt[i] - 2} open={broken[i]} color={broken[i] > 0.5 ? OK : ds("gray", 500)} edge={i % 2 === 1} />
+              <Link cx={LINK_X + 18} cy={cy} at={condAt[i] - 2} open={broken[i]} color={broken[i] > 0.5 ? OK : ds("gray", 500)} />
               <Note at={condAt[i]} x={ROW_X} y={rowY(i)}>
-                <div style={{ ...note(25, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-                  <Strike at={fixAt[i] + 4} color={OK}>
-                    {c.name}
-                  </Strike>
-                </div>
+                <div style={{ ...note(25, broken[i] > 0.5 ? OK_INK : INK), fontWeight: 700, whiteSpace: "nowrap" }}>{c.name}</div>
                 <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{c.gloss}</div>
               </Note>
               <Note at={fixAt[i]} x={FIX_X} y={rowY(i) + h(14)}>

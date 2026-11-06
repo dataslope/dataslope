@@ -43,10 +43,12 @@ const Locks: React.FC<{ c: Ctx }> = ({ c }) => {
   const recAt = c.w("r-lock", "recursive code doesn't deadlock on itself");
   const { limit, downloads, peak } = SEMAPHORE;
   // Twelve downloads through five slots, a wave at a time.
-  const WAVE = 26;
-  const tau = Math.max(0, frame - fiveAt - 6);
-  const wave = Math.floor(tau / WAVE);
+  const WAVE = 30;
   const waves = Math.ceil(downloads / limit);
+  // The twelve go through, five at most at a time, and then again, so the
+  // slots keep moving while the answer is up.
+  const tau = Math.max(0, frame - fiveAt - 6) % (waves * WAVE + 24);
+  const wave = Math.floor(tau / WAVE);
   const slotY = c.y(548);
   const slotH = c.h(46);
   return (
@@ -473,15 +475,15 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={mapAt} x={R_X} y={c.y(582)}>
         <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>pool.map(square, range(6))</span>
       </Note>
-      <div style={{ position: "absolute", left: R_X, top: resY, display: "flex", alignItems: "center", gap: 10, fontSize: 24 }}>
-        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK_SOFT, opacity: ease(frame, mapAt + 6, 10) }}>[</span>
+      <div style={{ position: "absolute", left: R_X, top: resY, fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK_SOFT, whiteSpace: "pre", opacity: ease(frame, mapAt + 6, 10) }}>
+        [
         {results.map((r, k) => (
-          <span key={k} style={{ fontFamily: MONO, fontSize: 24, fontWeight: 700, color: OK_INK, opacity: ease(frame, takeAt(k) + 18, 8) }}>
-            {r}
-            {k < results.length - 1 ? "," : ""}
+          <span key={k}>
+            <span style={{ fontWeight: 700, color: OK_INK, opacity: ease(frame, takeAt(k) + 18, 8) }}>{r}</span>
+            {k < results.length - 1 ? ", " : ""}
           </span>
         ))}
-        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK_SOFT, opacity: ease(frame, mapAt + 6, 10) }}>]</span>
+        ]
       </div>
       <Note at={orderAt} x={R_X} y={resY + c.h(50)}>
         <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>in input order, the page&apos;s example</span>
@@ -532,7 +534,7 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={startAt + 6} x={tEnd + 8} y={axisY - 15}>
         <span style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>time</span>
       </Note>
-      <Note at={startAt} x={t0 - 10} y={c.y(410)}>
+      <Note at={startAt} x={t0} y={c.y(456) + c.h(20) - 15}>
         <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>start the work</span>
       </Note>
       {/* The work runs on, somewhere else. */}

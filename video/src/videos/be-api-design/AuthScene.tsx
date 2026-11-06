@@ -380,7 +380,6 @@ export const AuthScene: React.FC = () => {
         {Array.from({ length: SEG }, (_, i) => {
           const x = tl.x0 + i * segW;
           const after = x > banX;
-          const holding = x <= banX && x + segW > banX;
           const p = ease(frame, accessAt + 4 + i * 3, 10);
           const goneAfter = after ? ease(frame, bannedAt + 8, 10) : 0;
           return (
@@ -393,12 +392,24 @@ export const AuthScene: React.FC = () => {
                 width: segW - 6,
                 height: 26,
                 borderRadius: 5,
-                background: holding ? `color-mix(in srgb, ${ACCENT} ${100 * ease(frame, bannedAt + 6, 10)}%, ${BAR})` : BAR,
+                background: BAR,
                 opacity: p * (1 - goneAfter * 0.85),
               }}
             />
           );
         })}
+        {/* The window a banned user keeps: the rest of the access token. */}
+        <div
+          style={{
+            position: "absolute",
+            left: banX,
+            top: tl.top + 4,
+            width: (tl.x0 + Math.ceil((banX - tl.x0) / segW) * segW - 3 - banX) * ease(frame, bannedAt + 6, 12),
+            height: 26,
+            borderRadius: "0 5px 5px 0",
+            background: ACCENT,
+          }}
+        />
         <div
           style={{
             position: "absolute",
@@ -421,12 +432,12 @@ export const AuthScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, bannedAt, 8) }}>
           <line x1={banX} y1={tl.top - 10} x2={banX} y2={tl.top + h(50) + 40} stroke={ACCENT} strokeWidth={2.6} strokeDasharray="6 5" />
         </svg>
-        <Note at={bannedAt} x={banX - 60} y={tl.top - h(42)}>
+        <Note at={bannedAt} x={banX - 14} y={tl.top - h(42)} align="right">
           <span style={{ ...label(21, ACCENT_INK), whiteSpace: "nowrap" }}>banned</span>
         </Note>
         <Note at={mostAt} x={banX + 14} y={tl.top - h(42)}>
           <span style={{ ...label(21, ACCENT_INK), whiteSpace: "nowrap", boxShadow: `0 0 0 ${2 * pulse(frame, mostAt + 8, 20)}px ${PAPER}` }}>
-            keeps access ≤ <Num>{minutes}</Num> min
+            keeps access at most <Num>{minutes}</Num> min
           </span>
         </Note>
         <div style={{ position: "absolute", left: tl.x0, top: tl.top + h(50) + 40, width: tl.x1 - tl.x0, height: 1, background: HAIRLINE, opacity: ease(frame, refreshAt, 10) }} />

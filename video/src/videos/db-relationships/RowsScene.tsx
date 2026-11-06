@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CUSTOMERS, ORDERS, POINTS_AT } from "./data";
 import { DbTable, Fig, KEY_INK, KeyArrow, MARK, MARK_KEY, Mono, tableGeometry } from "./kit";
-import { Drift, Headline, Kicker, Link, pulse, Query, Spot } from "./parts";
+import { Drift, Headline, Kicker, Link, pulse, Query } from "./parts";
 
 const BOX_Y = 310;
 const CUST_X = 240;
@@ -69,9 +69,6 @@ export const RowsScene: React.FC = () => {
   const storingAt = n.word("one-to-many", "storing");
   const adaIdAt = n.word("one-to-many", "Ada's id");
   const otmTo = n.beat("one-to-many").to;
-  // Each spot pops in late in the word that names it, once what that word draws has begun. Silent, like the crates.
-  const magnifierAt = zoomAt + 6;
-  const keySpotAt = keyAt + 6;
 
   // ── The diagram ──
   // The line runs from customers.id to orders.customer_id, the key that
@@ -141,11 +138,6 @@ export const RowsScene: React.FC = () => {
       <Headline lead="Related, yes." at={bareAt - 2} turn="But how many?" turnAt={howAt - 4} out={cardAt - 8} />
       <Headline lead="Ask it" at={cardAt - 2} turn="both ways." turnAt={bothWaysAt - 4} out={otmAt - 8} />
       <Headline lead="One to many." at={otmAt - 2} turn="The key sits on the many side." turnAt={sideAt - 4} />
-
-      {/* "Zoom in": a magnifying glass, lower left beside the customers rows; then
-          "keeps each link as a key", top right, clear of the longest headline. */}
-      <Spot id="db-relationships-magnifier" at={magnifierAt} left={112} top={y(617)} width={200} height={186} />
-      <Spot id="db-relationships-key" at={keySpotAt} left={1560} top={y(100)} width={192} height={185} />
 
       <Drift from={ideaFrom} to={otmTo + 60} scale={0.018} origin={[960, y(560)]}>
         <Fig n="2" at={rowsFrom - 6} x={CUST_X} y={y(268)}>

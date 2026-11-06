@@ -88,7 +88,7 @@ export const IsoScene: React.FC = () => {
   const fourAt = n.word("levels", "The standard names four");
   const levelAt = [
     n.word("levels", "read uncommitted"),
-    n.word("levels", "read committed"),
+    n.word("levels", "read committed", { nth: 1 }),
     n.word("levels", "repeatable read"),
     n.word("levels", "and serializable"),
   ];
@@ -102,7 +102,7 @@ export const IsoScene: React.FC = () => {
   const dirtyAt = n.word("anomalies-dirty", "A dirty read");
   const beforeAt = n.word("anomalies-dirty", "before it commits");
   const fiftyAt = n.word("anomalies-dirty", "set the balance to fifty");
-  const uncommittedAt = n.word("anomalies-dirty", "uncommitted");
+  const uncommittedAt = n.word("anomalies-dirty", "uncommitted", { nth: 1 });
   const neverAt = n.word("anomalies-dirty", "Postgres never shows it");
   const allFourAt = n.word("anomalies-dirty", "at all four levels");
   const evenAt = n.word("anomalies-dirty", "even read uncommitted");
@@ -151,15 +151,15 @@ export const IsoScene: React.FC = () => {
   const readsX = [0.34, 0.5, 0.66, 0.82].map(tx);
 
   // Postgres's default, from SHOW.
-  const showG = tableGeometry({ x: R_X, top: y(440) + h(10), cols: [{ name: "default_transaction_isolation" }], rows: [[ISOLATION.default]], headH: h(44), rowH: h(50), headSize: 20, bodySize: 24 });
+  const showG = tableGeometry({ x: R_X, top: y(540) + h(10), cols: [{ name: "default_transaction_isolation" }], rows: [[ISOLATION.default]], headH: h(44), rowH: h(50), headSize: 20, bodySize: 24 });
 
   // Serializable's retry: a curve from the failed commit back to the start.
   const failX = tx(0.72);
   const retry: Pt[] = sampleCubic([
     [failX - 10, laneA - 44],
-    [failX - 200, laneA - 110],
-    [tx(0.06) + 160, laneA - 110],
-    [tx(0.06), laneA - 30],
+    [failX - 160, laneA - 84],
+    [tx(0.06) + 120, laneA - 84],
+    [tx(0.06) + 4, laneA - 42],
   ]);
 
   const strikeRu = ease(frame, evenAt + 4, 12);
@@ -200,7 +200,7 @@ export const IsoScene: React.FC = () => {
               </text>
             ))}
           </g>
-          <line x1={X0} y1={gridTop + headH} x2={X0 + (LEVEL_W + 3 * COL_W * move) * ease(frame, fourAt, 14)} y2={gridTop + headH} stroke={INK} strokeWidth={2} opacity={ease(frame, fourAt, 8)} />
+          <line x1={X0} y1={gridTop + headH} x2={X0 + (LEVEL_W + 120 + (3 * COL_W - 120) * move) * ease(frame, fourAt, 14)} y2={gridTop + headH} stroke={INK} strokeWidth={2} opacity={ease(frame, fourAt, 8)} />
           {LEVELS.map((lv, i) => {
             const p = ease(frame, levelAt[i], 12);
             if (p <= 0) return null;
@@ -211,7 +211,7 @@ export const IsoScene: React.FC = () => {
               <g key={lv} opacity={p}>
                 {serial > 0 ? <rect x={X0 - 10} y={yy + 6} width={gridW + 10} height={rowH - 12} rx={5} fill={`color-mix(in srgb, ${OK} ${20 * serial}%, transparent)`} /> : null}
                 {isDefault > 0 ? <rect x={X0 - 10} y={yy + 8} width={196 + 10} height={rowH - 16} rx={5} fill={HIGHLIGHT} opacity={isDefault} /> : null}
-                <line x1={X0} y1={yy + rowH} x2={X0 + gridW * (0.4 + 0.6 * move)} y2={yy + rowH} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
+                <line x1={X0} y1={yy + rowH} x2={X0 + LEVEL_W + 120 + (3 * COL_W - 120) * move} y2={yy + rowH} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
                 <text x={X0} y={yy + rowH / 2 + 8} style={svgText({ ...note(23, INK), fontWeight: 650 })}>
                   {lv}
                 </text>
@@ -263,10 +263,10 @@ export const IsoScene: React.FC = () => {
             Each level is defined by the anomalies it rules out<span style={{ opacity: ease(frame, builtAt, 10) }}>, not by how it&rsquo;s built.</span>
           </div>
         </Note>
-        <Note at={differAt} x={R_X} y={y(400)} out={q9At - 6}>
+        <Note at={differAt} x={R_X} y={y(430)} out={q9At - 6}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Defaults differ. Postgres:</span>
         </Note>
-        <Listing lines={ISOLATION.showDefault} x={R_X} top={y(440) - h(64)} width={520} size={20} at={differAt + 4} out={q9At - 6} />
+        <Listing lines={ISOLATION.showDefault} x={R_X} top={y(470)} width={520} size={20} at={differAt + 4} out={q9At - 6} />
         <DataTable g={showG} cols={[{ name: "default_transaction_isolation" }]} rows={[{ cells: [ISOLATION.default], at: pgDefaultAt }]} at={pgDefaultAt - 4} marks={[{ row: 0, col: 0, at: pgDefaultAt + 4 }]} out={q9At - 6} />
 
         {/* ── The lanes ── */}
@@ -330,7 +330,7 @@ export const IsoScene: React.FC = () => {
           <g opacity={ease(frame, retriedAt, 10)}>
             <path d={`M${retry.map(([a, b]) => `${a},${b}`).join(" L")}`} fill="none" stroke={OK} strokeWidth={2.6} pathLength={1} strokeDasharray={`${ease(frame, retriedAt, 18)} 1`} />
             <path d={arrowHead(retry, 13, 7, { filled: true })} fill={OK} opacity={ease(frame, retriedAt + 14, 5)} />
-            <text x={(failX + tx(0.06)) / 2} y={laneA - 104} textAnchor="middle" style={svgText({ ...label(21, OK_INK), fontWeight: 700 })}>
+            <text x={(failX + tx(0.06)) / 2} y={laneA - 90} textAnchor="middle" style={svgText({ ...label(21, OK_INK), fontWeight: 700 })}>
               retry
             </text>
           </g>

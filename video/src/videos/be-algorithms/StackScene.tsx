@@ -127,7 +127,7 @@ export const StackScene: React.FC = () => {
           The most recent thing still open: nesting, undo, backtracking.
           <span style={{ color: INK, fontWeight: 650, opacity: ease(frame, lifoAt, 10) }}> Last in, first out.</span>
         </Line>
-        <Art name="plates" at={keepsAt} left={1580} top={92} h={150} />
+        <Art name="plates" at={keepsAt} left={1420} top={y(660)} h={170} />
 
         {/* The string, and the counter that accepts it. */}
         {chars.map((ch, i) => (
@@ -155,8 +155,8 @@ export const StackScene: React.FC = () => {
         </Line>
 
         {/* The stack: openers in a column, newest on top. */}
-        <Line at={keepsAt - 2} x={COL_X} y={sTop - 4} size={22} weight={650}>
-          A stack
+        <Line at={keepsAt - 2} x={COL_X - 8} y={sTop - 4} size={22} weight={650}>
+          A stack<span style={{ opacity: ease(frame, topAt, 10) }}>: newest on top</span>
         </Line>
         <Svg opacity={ease(frame, keepsAt, 12)}>
           <path
@@ -168,9 +168,6 @@ export const StackScene: React.FC = () => {
         </Svg>
         <Cell x={COL_X + 4} y={slotY(0)} at={keepsAt + 6} value="(" size={32} w={112} h={SLOT - 8} />
         <Cell x={COL_X + 4} y={slotY(1)} at={topAt} value="[" size={32} w={112} h={SLOT - 8} tone={frame >= matchAt ? "look" : "data"} />
-        <Line at={topAt + 4} x={COL_X - 8} y={slotY(2) - 2} size={21} color={INK_SOFT} weight={600}>
-          newest on top
-        </Line>
         <Cell x={COL_X + 196} y={slotY(1)} at={matchAt} value=")" size={32} w={64} h={SLOT - 8} tone="bad" />
         <div style={{ position: "absolute", left: COL_X + 145, top: slotY(1) + 20, opacity: ease(frame, matchAt + 8, 8) }}>
           <Cross at={matchAt + 8} size={26} />

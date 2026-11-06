@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, BAR, INK, INK_SOFT } from "../../editorial/style";
+import { ACCENT, BAR, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -28,7 +28,7 @@ const along = (pts: readonly P[], t: number): P => {
 /** The three items, in the cart's colors. */
 const ITEM_FILL = [ds("yellow", 500), ds("red", 400), ds("blue", 300)];
 
-const CART = { x: X0, w: 760, top: 432, h: 150 };
+const CART = { x: X0, w: 760, top: 432, h: 182 };
 const CHIP_H = 52;
 const ADD_ALL = { x: 150, w: 170 };
 const ADD = { x: 400, w: 120 };
@@ -42,7 +42,7 @@ const HELD = { top: 610, h: 70 };
 
 const CELL = { w: 200, h: 50 };
 const GRID_X = 250;
-const GRID_TOP = 456;
+const GRID_TOP = 490;
 const GRID_PITCH = 64;
 const PARTS_X = [1010, 1250];
 const PART_W = [190, 220];
@@ -113,12 +113,13 @@ export const CompScene: React.FC = () => {
   const DOT_T = 16;
   const passed1 = run1.filter((at) => frame >= at + DOT_T * 0.5).length;
   const landed1 = run1.filter((at) => frame >= at + DOT_T).length;
-  const bypassTop = cartTop + 26;
+  // Under the chips, clear of the cart's name: add-all straight into the list.
+  const bypassY = chipTop + CHIP_H + 36;
   const path2: P[] = [
-    [ADD_ALL.x + ADD_ALL.w / 2, chipTop - 6],
-    [ADD_ALL.x + ADD_ALL.w / 2, bypassTop],
-    [ITEMS.x + ITEMS.w / 2, bypassTop],
-    [ITEMS.x + ITEMS.w / 2, chipTop - 6],
+    [ADD_ALL.x + ADD_ALL.w / 2, chipTop + CHIP_H + 6],
+    [ADD_ALL.x + ADD_ALL.w / 2, bypassY],
+    [ITEMS.x + ITEMS.w / 2, bypassY],
+    [ITEMS.x + ITEMS.w / 2, chipTop + CHIP_H + 8],
   ];
   const run2 = stopsAt + 6;
   const landed2 = frame >= run2 + 22 ? LOYALTY.inheritsAfter[0] : 0;
@@ -171,10 +172,13 @@ export const CompScene: React.FC = () => {
         <Line x={X0} y={cartTop - 44} at={extendsAt} size={21} color={INK_SOFT} weight={650} out={aOut}>
           Inheritance: the loyalty cart extends the cart
         </Line>
-        <Box x={CART.x} y={cartTop} w={CART.w} h={CART.h} at={extendsAt + 2} out={aOut} align="left">
+        <Box x={CART.x} y={cartTop} w={CART.w} h={CART.h} at={tiesAt} out={aOut} align="left" lit={pulse(frame, breakUpAt, 24)}>
           <span />
         </Box>
-        <Line x={CART.x + 22} y={cartTop + 16} at={extendsAt + 4} size={24} weight={750} out={aOut}>
+        <Line x={CART.x + 22} y={cartTop + 16} at={tiesAt + 4} size={24} weight={750} color={INK_SOFT} out={extendsAt}>
+          Parent class
+        </Line>
+        <Line x={CART.x + 22} y={cartTop + 16} at={extendsAt + 6} size={24} weight={750} out={aOut}>
           Shopping cart
         </Line>
         <Box x={ADD_ALL.x} y={chipTop} w={ADD_ALL.w} h={CHIP_H} at={oneAtATimeAt - 8} title="add-all" size={22} out={aOut} lit={pulse(frame, speedsAt, 20)} />
@@ -182,7 +186,7 @@ export const CompScene: React.FC = () => {
         <Flow points={[[ADD_ALL.x + ADD_ALL.w + 6, chipMid], [ADD.x - 8, chipMid]]} at={oneAtATimeAt - 4} dur={8} width={2.2} head={12} out={speedsAt + 4} />
         <Flow points={[[ADD.x + ADD.w + 6, chipMid], [ITEMS.x - 8, chipMid]]} at={oneAtATimeAt - 2} dur={8} width={2.2} head={12} out={aOut} />
         <Box x={ITEMS.x} y={chipTop} w={ITEMS.w} h={CHIP_H} at={countsAt + 4} tone="data" out={aOut} align="left">
-          <span style={{ fontFamily: "inherit", display: "flex", alignItems: "center", gap: 10, fontSize: 21, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(21, BAR), display: "flex", alignItems: "center", gap: 10, whiteSpace: "nowrap" }}>
             {[0, 1, 2].map((i) => (
               <span key={i} style={{ width: 22, height: 22, borderRadius: 5, background: i < inCart ? ITEM_FILL[i] : "transparent", border: `2px solid ${i < inCart ? ITEM_FILL[i] : ds("blue", 200)}` }} />
             ))}
@@ -190,7 +194,7 @@ export const CompScene: React.FC = () => {
           </span>
         </Box>
         {/* After the speed-up: add-all fills the list itself, skipping add. */}
-        <Flow points={path2} at={speedsAt + 6} dur={14} color={INK} width={2.4} head={12} out={aOut} />
+        <Flow points={path2} at={speedsAt + 6} dur={14} color={INK} width={2.4} head={10} out={aOut} />
         <Svg opacity={1 - ease(frame, aOut, 8)}>
           {run1.map((at, i) => {
             const t = (frame - at) / DOT_T;
@@ -214,13 +218,13 @@ export const CompScene: React.FC = () => {
             top: cartTop + CART.h,
             width: 8,
             height: childTop - cartTop - CART.h,
-            background: INK,
+            background: `color-mix(in srgb, ${ACCENT} ${Math.round(pulse(frame, breakUpAt + 6, 30) * 100)}%, ${INK})`,
             transformOrigin: "50% 0",
-            transform: `scaleY(${ease(frame, extendsAt + 6, 12)})`,
+            transform: `scaleY(${ease(frame, tiesAt + 6, 12)})`,
             opacity: 1 - ease(frame, aOut, 8),
           }}
         />
-        <Line x={CHILD.x + 146} y={(cartTop + CART.h + childTop) / 2 - 16} at={extendsAt + 8} size={21} color={INK_SOFT} weight={650} out={aOut}>
+        <Line x={CHILD.x + 146} y={(cartTop + CART.h + childTop) / 2 - 16} at={tiesAt + 8} size={21} color={INK_SOFT} weight={650} out={aOut}>
           extends
         </Line>
         <Box
@@ -228,9 +232,10 @@ export const CompScene: React.FC = () => {
           y={childTop}
           w={CHILD.w}
           h={y(CHILD.top + CHILD.h) - childTop}
-          at={extendsAt + 10}
-          title="Loyalty cart"
-          sub="counts in add"
+          at={tiesAt + 10}
+          title={frame < extendsAt + 6 ? "Subclass" : "Loyalty cart"}
+          sub={frame < extendsAt + 6 ? "tied to the parent's code" : "counts in add"}
+          lit={pulse(frame, extendsAt + 6, 20)}
           out={aOut}
           tones={[[zeroAt, "bad"]]}
         />
@@ -339,10 +344,8 @@ export const CompScene: React.FC = () => {
                   position: "absolute",
                   inset: 0,
                   textAlign: "center",
-                  fontFamily: "inherit",
-                  fontSize: 21,
+                  ...label(21, OK_INK),
                   fontWeight: 700,
-                  color: OK_INK,
                   whiteSpace: "nowrap",
                   opacity: s.k,
                   transform: `translateY(${(s.text === "now" ? -1 : 1) * (1 - s.k) * 18}px)`,

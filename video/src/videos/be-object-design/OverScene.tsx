@@ -111,7 +111,7 @@ export const OverScene: React.FC = () => {
                 </span>
               </Box>
               <Flow points={[[x + thingW / 2, layerTop + LAYER.h + 6], [x + thingW / 2, thingTop - 8]]} at={c.at + 6} dur={8} width={2.2} head={12} dim={dim} />
-              <Box x={x} y={thingTop} w={thingW} h={THING.h} at={c.at + 8} title={i === 1 && second > 0.5 ? "flat rate" : c.thing} size={22} tone="data" dim={dim} />
+              <Box x={x} y={thingTop} w={thingW} h={THING.h} at={whenAt + 6 + i * 5} title={i === 1 && second > 0.5 ? "flat rate" : c.thing} size={22} tone="data" dim={dim} />
               {i === 1 ? (
                 <>
                   <Box x={x + (COL_W + 20) / 2 + 30 * (1 - second)} y={thingTop} w={(COL_W - 20) / 2} h={THING.h} at={secondAt + 4} title="by weight" size={22} tone="ok" />

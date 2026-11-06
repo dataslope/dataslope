@@ -165,7 +165,7 @@ export const DiagramScene: React.FC = () => {
         <Line x={B.app1.cx + 20} y={B.lb.cy - 2} at={hit[0] + 14} out={pathOut} size={22} weight={650} color={BLUE_INK}>
           <Num>{HOP_MS}</Num> ms
         </Line>
-        <Line x={B.app1.cx - 92} y={B.cache.cy - 18} at={hit[1] + 14} out={pathOut} size={22} weight={650} color={BLUE_INK} align="right">
+        <Line x={B.app1.cx + 56} y={B.cache.cy - 4} at={hit[1] + 14} out={pathOut} size={22} weight={650} color={BLUE_INK} align="right">
           <Num>{HOP_MS}</Num> ms
         </Line>
         <RoundTrip pts={e.lbApp1} from={miss[0]} dur={20} />
@@ -240,14 +240,14 @@ export const DiagramScene: React.FC = () => {
             <span style={{ color: INK_SOFT }}> → </span>
             <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 24 }}>
               {c.key.slice(0, -1)}
-              <span style={{ color: frame >= walkAt ? ACCENT_INK : INK, transition: "none" }}>{c.key.slice(-1)}</span>
+              <span style={{ color: frame >= walkAt ? ACCENT_INK : INK }}>{c.key.slice(-1)}</span>
             </span>
           </Line>
         ))}
         <Line x={X0} y={keysY + 196} at={walkAt + 6} size={23} weight={650} color={ACCENT_INK} width={360}>
           anyone can walk through them
         </Line>
-        <Line x={X0} y={keysY + 254} at={scrambleAt} size={23} weight={650} color={OK_INK} width={360}>
+        <Line x={X0} y={keysY + 254} at={scrambleAt} size={23} weight={650} color={OK_INK}>
           Scramble the ID first
           <span style={{ opacity: ease(frame, useHashAt, 10) }}>, or use the hash</span>
         </Line>

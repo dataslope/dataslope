@@ -139,7 +139,7 @@ export const CdnScene: React.FC = () => {
           origin
           <span style={{ opacity: ease(frame, virginiaAt, 10) }}>, Virginia</span>
         </Line>
-        <Line x={MAP_X + ux - 18} y={top + uy - 4} at={sydneyAt + 2} size={21} weight={700} style={halo} align="right">
+        <Line x={MAP_X + ux - 34} y={top + uy + 22} at={sydneyAt + 2} size={21} weight={700} style={halo} align="right">
           user, Sydney
         </Line>
         <Line x={MAP_X + mid[0]} y={top + mid[1] + 18} at={msAt + 4} size={24} weight={700} color={BLUE_INK} style={halo}>
@@ -162,7 +162,7 @@ export const CdnScene: React.FC = () => {
           light in fiber: about <Num>{DISTANCE.kmPerMs}</Num> km per ms
         </Line>
         <Line x={RX} y={top + 236} at={msAt} size={24} weight={700} color={BLUE_INK}>
-          <Num>{int(kmShown)}</Num> km ÷ <Num>{DISTANCE.kmPerMs}</Num> × <Num>2</Num> ≈ <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms
+          <Num>{int(kmShown)}</Num> km ÷ <Num>{DISTANCE.kmPerMs}</Num> km/ms × <Num>2</Num> ≈ <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms
         </Line>
         <Line x={RX} y={top + 282} at={floorAt} size={21} color={INK_SOFT}>
           <span style={{ opacity: ease(frame, msAt + 10, 10) }}>a floor set by physics, not a measurement</span>

@@ -10,14 +10,14 @@ import { Sfx } from "../../sound/Sfx";
 import { Art, BAR, BLUE_FILL, BLUE_INK, Drift, HIGHLIGHT, Headline, INK, INK_SOFT, Kicker, Line, OK_INK, Pill, Svg } from "./parts";
 
 /** The million drawn as a square, a thousand items a side. */
-const SQ = 360;
+const SQ = 440;
 const SQ_X = 140;
 /** The hundred: ten by ten. Drawn at full size first, then shrunk to the
  *  corner of the million it really is (ten thousandths of a side). */
 const DOTS = 10;
 const PITCH = 22;
 const STRUCTS = ["hash map", "heap", "stack", "deque"];
-const CHIP_X = [620, 790, 900, 1020];
+const CHIP_X = [700, 870, 980, 1100];
 
 /**
  * The opening. A hundred items as a ten-by-ten grid, fast; then the grid
@@ -44,7 +44,7 @@ export const HookScene: React.FC = () => {
   const quickAt = n.word("plan", "twenty-four quickly");
   const end = n.beat("plan").to;
 
-  const top = y(325);
+  const top = y(330);
   // The zoom out: the hundred's grid shrinks to its true size in the million.
   const zoom = ease(frame, millionAt, 28);
   const scale = 1 + (SQ / 1000 / PITCH - 1) * zoom;
@@ -66,10 +66,10 @@ export const HookScene: React.FC = () => {
         <Headline lead="Fast at a hundred." turn="What does a million cost?" at={hundredAt} turnAt={questionAt} />
 
         {/* What the square shows, above it. */}
-        <Line at={hundredAt} x={SQ_X} y={y(280)} size={24} weight={650} out={millionAt}>
+        <Line at={hundredAt} x={SQ_X} y={y(286)} size={24} weight={650} out={millionAt}>
           <Num>100</Num> items
         </Line>
-        <Line at={millionAt + 10} x={SQ_X} y={y(280)} size={24} weight={650}>
+        <Line at={millionAt + 10} x={SQ_X} y={y(286)} size={24} weight={650}>
           <Num>1,000,000</Num> items, a thousand a side
         </Line>
 
@@ -106,23 +106,23 @@ export const HookScene: React.FC = () => {
         </Pill>
 
         {/* Which structure keeps it cheap. */}
-        <Line at={structureAt - 2} x={CHIP_X[0]} y={top} size={26} weight={650}>
+        <Line at={structureAt - 2} x={CHIP_X[0]} y={top + 20} size={26} weight={650}>
           Which structure keeps it cheap?
         </Line>
         {STRUCTS.map((s, i) => (
-          <Pill key={s} x={CHIP_X[i]} y={top + 56} at={structureAt + 6 + i * 5} tone="data" size={22}>
+          <Pill key={s} x={CHIP_X[i]} y={top + 76} at={structureAt + 6 + i * 5} tone="data" size={22}>
             {s}
           </Pill>
         ))}
 
         {/* The round. */}
-        <Line at={thirtyAt - 2} x={CHIP_X[0]} y={top + 160} size={32} weight={700}>
+        <Line at={thirtyAt - 2} x={CHIP_X[0]} y={top + 236} size={30} weight={700}>
           <span style={{ color: BLUE_INK }}>
             <Num>35</Num> questions
           </span>
           <span style={{ opacity: ease(frame, countsAt, 10) }}>, argued with counts, not code</span>
         </Line>
-        <div style={{ position: "absolute", left: CHIP_X[0], top: top + 226, display: "flex", gap: 34, fontSize: 26, whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: CHIP_X[0], top: top + 300, display: "flex", gap: 34, fontSize: 26, whiteSpace: "nowrap" }}>
           {[
             { at: eightAt, n: 8, text: "with a figure each" },
             { at: threeAt, n: 3, text: "inside those" },
@@ -136,11 +136,11 @@ export const HookScene: React.FC = () => {
             </span>
           ))}
         </div>
-        <Line at={quickAt + 10} x={CHIP_X[0]} y={top + 286} size={22} color={INK_SOFT} weight={600}>
+        <Line at={quickAt + 10} x={CHIP_X[0]} y={top + 362} size={22} color={INK_SOFT} weight={600}>
           Each answer: the structure, and what an operation costs, counted
         </Line>
 
-        <Art name="pangolin" at={from} left={1420} top={y(300)} h={380} />
+        <Art name="pangolin" at={from} left={1440} top={y(370)} h={440} />
       </Drift>
     </AbsoluteFill>
   );

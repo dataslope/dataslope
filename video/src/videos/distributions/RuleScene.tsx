@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { normalCdf, normalPdf, RULE } from "./data";
-import { ASK, ASK_FILL, ASK_INK, areaD, askNote, Centered, Curve, curveD, DIST, Drift, Head, lerp, pulse, Spot, Svg } from "./parts";
+import { ASK, ASK_FILL, ASK_INK, areaD, askNote, Centered, Curve, curveD, DIST, Drift, Head, lerp, pulse, Svg } from "./parts";
 
 /** Standard deviations from the mean, -4 to 4. */
 const X: XScale = { lo: -4, hi: 4, x0: 260, x1: 1660 };
@@ -81,9 +81,6 @@ export const RuleScene: React.FC = () => {
           { text: "99.7.", at: ninetyNineAt - 6, italic: true, color: INK },
         ]}
       />
-
-      {/* The test, top right, above the widest band's share. */}
-      <Spot id="distributions-exam" at={scoresAt - 4} left={1650} top={y(100)} width={172} height={190} />
 
       <Drift from={ruleFrom} to={n.beat("z-in").to + 40} origin="50% 45%">
         <FigLabel n="10" title="Any normal, in standard deviations" at={ruleFrom - 4} x={160} y={y(262)} />

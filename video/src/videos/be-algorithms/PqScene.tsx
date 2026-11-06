@@ -19,8 +19,6 @@ const CHIP = 62;
 const T = { name: 140, push: 410, pop: 850 };
 /** The heap, a triangle of its twenty levels, the top four drawn as nodes. */
 const TREE = { apexX: 1440, x0: 1110, x1: 1770 };
-/** The top three levels, drawn as nodes over the triangle. */
-const TOP_NODES = 7;
 
 /**
  * Question 6, with the heap's operation costs answered inside it. Five jobs
@@ -58,7 +56,7 @@ export const PqScene: React.FC = () => {
   const end = n.beat("heap-build").to;
 
   const laneY = [y(318), y(392)];
-  const tTop = y(478);
+  const tTop = y(496);
   const rowY = (i: number) => tTop + 44 + i * 54;
   const rows = [
     { name: "Sorted list", push: <>O(n): shifts <Num>{int(HEAP.sortedInsertMeanShift)}</Num> on average</>, pop: "O(1)", at: sortedAt, pushAt: shiftsAt, popAt: instantAt, pushBad: true, popBad: false },
@@ -146,7 +144,7 @@ export const PqScene: React.FC = () => {
             </div>
           </React.Fragment>
         ))}
-        <Line at={urgentAt + 10} x={LANE_X} y={laneY[1] + 74} size={21} color={INK_SOFT} weight={600}>
+        <Line at={urgentAt + 10} x={LANE_X} y={laneY[1] + 66} size={21} color={INK_SOFT} weight={600}>
           1 is the most urgent
           <span style={{ opacity: ease(frame, schedAt, 10) }}>: a scheduler, Dijkstra&apos;s algorithm</span>
         </Line>
@@ -196,31 +194,21 @@ export const PqScene: React.FC = () => {
           ) : null}
           {dot ? <circle cx={dot[0]} cy={dot[1]} r={8} fill={OK} stroke={PAPER} strokeWidth={2} /> : null}
         </Svg>
-        {/* The top levels as nodes, each parent at least as urgent as its children. */}
-        {Array.from({ length: TOP_NODES }, (_, idx) => {
-          const k = Math.floor(Math.log2(idx + 1));
-          const i = idx + 1 - 2 ** k;
-          const [nx, ny] = nodeXY(k, i);
-          const p = ease(frame, parentAt + idx * 2, 8);
-          const r = k === 0 ? 17 : 13;
-          return (
-            <div
-              key={idx}
-              style={{
-                position: "absolute",
-                left: nx - r,
-                top: ny - r,
-                width: 2 * r,
-                height: 2 * r,
-                borderRadius: "50%",
-                background: k === 0 ? HIGHLIGHT : PAPER,
-                border: `2px solid ${k === 0 ? INK : BAR}`,
-                boxSizing: "border-box",
-                opacity: p,
-              }}
-            />
-          );
-        })}
+        {/* The root: the most urgent, read without moving anything. */}
+        <div
+          style={{
+            position: "absolute",
+            left: TREE.apexX - 14,
+            top: apexY - 14,
+            width: 28,
+            height: 28,
+            borderRadius: 14,
+            background: HIGHLIGHT,
+            border: `2px solid ${INK}`,
+            boxSizing: "border-box",
+            opacity: ease(frame, parentAt, 10),
+          }}
+        />
         <Line at={parentAt} x={TREE.x0} y={baseY + 22} size={23}>
           Each parent at least as urgent as its children
         </Line>
@@ -232,12 +220,12 @@ export const PqScene: React.FC = () => {
         </Line>
 
         {/* Building one. */}
-        <Line at={linearAt} x={140} y={y(694)} size={22} weight={650}>
+        <Line at={linearAt} x={140} y={y(706)} size={22} weight={650}>
           Building a heap: O(n), not O(n log n). Comparisons, a million items:
         </Line>
         <HBar
           x={140}
-          y={y(732)}
+          y={y(742)}
           w={680}
           max={HEAP.pushesCompares}
           value={HEAP.heapifyCompares}
@@ -251,7 +239,7 @@ export const PqScene: React.FC = () => {
         />
         <HBar
           x={140}
-          y={y(800)}
+          y={y(806)}
           w={680}
           max={HEAP.pushesCompares}
           value={HEAP.pushesCompares}

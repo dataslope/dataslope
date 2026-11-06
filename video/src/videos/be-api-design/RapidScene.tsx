@@ -44,19 +44,21 @@ const Naming: React.FC<{ c: Ctx }> = ({ c }) => {
           </Note>
         </React.Fragment>
       ))}
-      <Note at={noVerbsAt} x={R_X} y={top + c.h(176)}>
+      <Note at={noVerbsAt} x={R_X} y={top + c.h(166)}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 28 }}>
           <Cross at={noVerbsAt + 6} size={24} />
           <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: ACCENT_INK, whiteSpace: "nowrap" }}>
             <Strike at={noVerbsAt + 8}>/publishArticle/42</Strike>
           </span>
-          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>the method is the verb</span>
         </div>
       </Note>
-      <Note at={actionAt} x={R_X} y={top + c.h(254)}>
+      <Note at={noVerbsAt + 12} x={R_X + 38} y={top + c.h(210)}>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>no verbs in paths: the method is the verb</span>
+      </Note>
+      <Note at={actionAt} x={R_X} y={top + c.h(266)}>
         <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>An action becomes a state change</span>
       </Note>
-      <Msg x={R_X} y={top + c.h(298)} w={460} at={patchAt} tone="ok" lines={[{ t: "PATCH /articles/42" }, { t: '{"status": "published"}' }]} />
+      <Msg x={R_X} y={top + c.h(310)} w={460} at={patchAt} tone="ok" lines={[{ t: "PATCH /articles/42" }, { t: '{"status": "published"}' }]} />
     </>
   );
 };
@@ -133,7 +135,7 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
     { t: '"id": 7,', at: protectAt },
     { t: '"total": 4200,', at: protectAt + 4, strike: removingAt + 6 },
     { t: '"currency": "usd",', at: protectAt + 8 },
-    { t: '"status": "paid"', at: protectAt + 12, swap: typeAt + 6 },
+    { t: '"status": "paid",', at: protectAt + 12, swap: typeAt + 6 },
   ];
   return (
     <>
@@ -159,7 +161,7 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
                 </span>
               ) : f.swap !== undefined ? (
                 <span>
-                  <Http line={frame >= f.swap ? '"status": 2' : f.t} size={24} />
+                  <Http line={frame >= f.swap ? '"status": 2,' : f.t} size={24} />
                 </span>
               ) : (
                 <Http line={f.t} size={24} />
@@ -255,7 +257,7 @@ const Hateoas: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={skipAt} x={R_X} y={top + msgHeight(HATEOAS_BODY.length, 22) + c.h(72)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-          in practice: <b>often skipped</b>, but for a <span style={{ fontFamily: MONO, fontWeight: 600 }}>next</span> link
+          in practice: <b>often skipped</b>; a <span style={{ fontFamily: MONO, fontWeight: 600 }}>next</span> link is common
         </span>
       </Note>
     </>
@@ -370,7 +372,7 @@ export const RapidScene: React.FC = () => {
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={moreAt + 6} end={end} />
 
         {/* The bridge: every endpoint has data behind it. */}
-        <Spot id="puffin" at={behindAt + 4} left={1400} top={y(370)} {...puffin} />
+        <Spot id="puffin" at={behindAt + 4} left={1430} top={y(360)} {...puffin} />
         <Note at={behindAt} x={R_X} y={y(430)}>
           <span style={{ ...note(30, INK), whiteSpace: "nowrap" }}>Behind every endpoint,</span>
         </Note>
@@ -379,7 +381,7 @@ export const RapidScene: React.FC = () => {
             the data has to <b style={{ color: BLUE_INK }}>live somewhere</b>.
           </span>
         </Note>
-        <NextLine at={nextAt} x={R_X} y={y(640)} width={680}>
+        <NextLine at={nextAt} x={R_X} y={y(640)} width={500}>
           databases
         </NextLine>
       </Drift>

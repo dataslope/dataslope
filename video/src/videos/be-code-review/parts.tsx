@@ -263,19 +263,21 @@ export const DiffListing: React.FC<{
   );
 };
 
-/** A file's name over its listing, and what the diff does to it. */
-export const FileTab: React.FC<{ x: number; top: number; at: number; out?: number; dim?: number; name: string; children?: React.ReactNode; size?: number }> = ({
-  x,
-  top,
-  at,
-  out,
-  dim,
-  name,
-  children,
-  size = 21,
-}) => {
+/** A file's name over its listing, and what the diff does to it. `on`
+ *  lists the stretches it is the file in view; outside them it is set back
+ *  (always in view without it). */
+export const FileTab: React.FC<{
+  x: number;
+  top: number;
+  at: number;
+  out?: number;
+  on?: readonly (readonly [number, number])[];
+  name: string;
+  children?: React.ReactNode;
+  size?: number;
+}> = ({ x, top, at, out, on, name, children, size = 21 }) => {
   const frame = useCurrentFrame();
-  const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
+  const d = on === undefined ? 0 : (1 - Math.max(0, ...on.map(([a, b]) => during(frame, a, b, 10)))) * 0.6;
   return (
     <Ink at={at} dur={14} out={out} style={{ left: x, top, whiteSpace: "nowrap", opacity: 1 - d, display: "flex", alignItems: "baseline", gap: 16, fontSize: size }}>
       <span style={{ fontFamily: MONO, fontSize: size, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{name}</span>

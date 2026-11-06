@@ -157,7 +157,15 @@ export const BfsScene: React.FC = () => {
             <line key={k} x1={TREE.apexX - half(k + 1)} x2={TREE.apexX + half(k + 1)} y1={lv(k + 1)} y2={lv(k + 1)} stroke={BAR} strokeWidth={0.8} opacity={0.35} />
           ))}
           {/* BFS's frontier: the widest level, a band across the base. */}
-          <rect x={TREE.apexX - half(TRAVERSAL.levels - 1)} y={lv(TRAVERSAL.levels - 2) + 1} width={2 * half(TRAVERSAL.levels - 1) * band} height={baseY - lv(TRAVERSAL.levels - 2) + 4} fill={HIGHLIGHT} opacity={band} />
+          <clipPath id="be-alg-band">
+            <rect x={TREE.apexX - half(TRAVERSAL.levels - 1) - 2} y={apexY - 4} width={(2 * half(TRAVERSAL.levels - 1) + 4) * band} height={baseY - apexY + 10} />
+          </clipPath>
+          <path
+            d={`M${TREE.apexX - half(TRAVERSAL.levels - 2)},${lv(TRAVERSAL.levels - 2)} L${TREE.apexX + half(TRAVERSAL.levels - 2)},${lv(TRAVERSAL.levels - 2)} L${TREE.apexX + half(TRAVERSAL.levels - 1)},${baseY} L${TREE.apexX - half(TRAVERSAL.levels - 1)},${baseY} Z`}
+            fill={HIGHLIGHT}
+            clipPath="url(#be-alg-band)"
+            opacity={band > 0 ? 1 : 0}
+          />
           {/* DFS's stack: one path down. */}
           <polyline points={path.slice(0, shown).map(([px, py]) => `${px},${py}`).join(" ")} fill="none" stroke={BAR} strokeWidth={3.4} strokeLinejoin="round" opacity={dfsP > 0 ? 1 : 0} />
           {path.slice(0, shown).map(([px, py], k) => (dfsP > 0 ? <circle key={k} cx={px} cy={py} r={4.5} fill={BAR} /> : null))}

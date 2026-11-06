@@ -47,7 +47,7 @@ export const KeyScene: React.FC = () => {
   const storeAt = n.word("q3-hash", "before you store it");
   const end = n.beat("q3-hash").to;
 
-  const cardY = y(292);
+  const cardY = y(314);
   const secY = y(462);
   const six = KEY.keyLengths.find((k) => k.len === 6)!;
   const id = KEY.counted[0];
@@ -81,7 +81,7 @@ export const KeyScene: React.FC = () => {
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4}>
           Design a URL shortener at a high level.
         </QuestionCard>
-        <Spot id="key" at={keyAt} left={1580} top={y(86)} width={150} height={artH("key", 150)} />
+        <Spot id="key" at={keyAt} left={1440} top={y(668)} width={180} height={artH("key", 180)} />
 
         {/* The API, in words. */}
         {[
@@ -116,8 +116,8 @@ export const KeyScene: React.FC = () => {
             </div>
           );
         })}
-        <Line x={X0 + 2 * CARD_W + 120} y={cardY + 38} at={apiAt} size={24} color={INK_SOFT}>
-          the API
+        <Line x={X0} y={cardY - 52} at={apiAt} size={22} weight={650} color={INK_SOFT}>
+          The API, in two calls
         </Line>
 
         {/* Base 62 of a counted ID. */}

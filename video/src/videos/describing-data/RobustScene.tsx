@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ROBUST, robustSd } from "./data";
-import { AxisBreak, Bracket, DATA, Drift, lerp, Mark, Pulse, Spot, STAT, STAT_INK, Svg, Tag } from "./parts";
+import { AxisBreak, Bracket, DATA, Drift, lerp, Mark, Pulse, STAT, STAT_INK, Svg, Tag } from "./parts";
 
 /** Nine incomes on one stretch of axis, the tenth past a break. */
 const NEAR = { lo: 30, hi: 130, x0: 200, x1: 1340 };
@@ -119,10 +119,6 @@ export const RobustScene: React.FC = () => {
       <FigLabel n="6" title="Ten incomes" at={incomesFrom} x={160} y={y(330)} />
 
       <div style={{ position: "absolute", inset: 0, opacity: 1 - dimAll }}>
-        {/* "nine thousand": a money sack, under the tenth income's place past the break;
-            it dims with the figure when the scene hands over to shape. */}
-        <Spot id="describing-data-moneybag" at={thousandAt - 4} left={1570} top={y(674)} width={200} height={210} />
-
         {/* ── The two readouts, and the center each one goes with ── */}
         <Ink at={nineAt - 2} dur={14} style={{ left: SD_X, top: statsY, whiteSpace: "nowrap" }}>
           <div style={{ ...note(32, STAT_INK), fontWeight: 700 }}>

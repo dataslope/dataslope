@@ -29,6 +29,35 @@ const Timer: React.FC<{ x: number; y: number; at: number }> = ({ x, y, at }) => 
   );
 };
 
+/** Chips in a row, each inking in on its own cue, spaced by a real gap. */
+const ChipRow: React.FC<{ x: number; y: number; gap: number; items: readonly { text: string; at: number; ink: string; fill: string }[] }> = ({ x, y, gap, items }) => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{ position: "absolute", left: x, top: y, display: "flex", gap, fontSize: 25 }}>
+      {items.map((it) => {
+        const p = ease(frame, it.at, 12);
+        return (
+          <span
+            key={it.text}
+            style={{
+              padding: "7px 16px",
+              border: `2px solid ${it.ink}`,
+              borderRadius: 999,
+              background: it.fill,
+              ...label(25, it.ink),
+              whiteSpace: "nowrap",
+              opacity: p,
+              transform: `translateY(${(1 - p) * 10}px)`,
+            }}
+          >
+            {it.text}
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
 /**
  * Question 5, when to use one: it cuts latency, takes traffic off the
  * origin and absorbs spikes. Anything static or cacheable goes at the edge
@@ -75,8 +104,8 @@ export const EdgeScene: React.FC = () => {
   // The redirect: arrives on the origin's side, then moves to the edge.
   const move = ease(frame, answerAt, 20);
   const redirX = map(move, [0, 1], [COL_B, X0]);
-  const redirY = map(move, [0, 1], [y(560), y(512)]);
-  const noteY = y(586);
+  const redirY = map(move, [0, 1], [y(548), y(522)]);
+  const noteY = y(604);
 
   return (
     <AbsoluteFill>
@@ -99,53 +128,45 @@ export const EdgeScene: React.FC = () => {
         <Headline lead="When to use one" at={from + 4} size={64} />
 
         {/* What it buys. */}
-        {benefits.map((b, i) => (
-          <Pill key={b.text} x={X0 + [0, 250, 676][i]} y={benY} at={b.at} ink={OK_INK} fill={OK_FILL} size={25}>
-            {b.text}
-          </Pill>
-        ))}
+        <ChipRow x={X0} y={benY} gap={22} items={benefits.map((b) => ({ ...b, ink: OK_INK, fill: OK_FILL }))} />
 
         {/* What goes where. */}
-        <div style={{ position: "absolute", left: COL_B - 50, top: headY - 6, width: 1.5, height: y(700) - headY, background: HAIRLINE, opacity: ease(frame, useAt, 12) }} />
+        <div style={{ position: "absolute", left: COL_B - 50, top: headY - 6, width: 1.5, height: y(786) - headY, background: HAIRLINE, opacity: ease(frame, useAt, 12) }} />
         <Line x={X0} y={headY} at={useAt} size={29} weight={700} color={OK_INK}>
           At the edge: <span style={{ color: INK_SOFT, fontWeight: 500 }}>static or cacheable</span>
         </Line>
-        {kinds.map((k, i) => (
-          <Pill key={k.text} x={X0 + [0, 140, 312, 410][i]} y={itemY} at={k.at} size={25}>
-            {k.text}
-          </Pill>
-        ))}
+        <ChipRow x={X0} y={itemY} gap={16} items={kinds.map((k) => ({ ...k, ink: INK, fill: PAPER }))} />
         <Line x={COL_B} y={headY} at={dynAt} size={29} weight={700} color={BLUE_INK}>
           To the origin
         </Line>
         <Line x={COL_B} y={itemY + 4} at={dynAt + 4} size={26} weight={600}>
           dynamic, user-specific responses
-          <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, bypassAt, 10) }}>, usually</span>
+          <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, bypassAt, 10) }}> usually bypass it</span>
         </Line>
-        <Line x={COL_B} y={itemY + 50} at={ttlAt} size={24} color={INK_SOFT}>
-          or a short time to live at the edge
+        <Line x={COL_B} y={itemY + 52} at={ttlAt} size={24} color={INK_SOFT}>
+          or get a short time to live at the edge
         </Line>
 
-        {/* The short link's redirect. */}
+        {/* The short link's redirect: from the origin's side to the edge. */}
         <Pill x={redirX} y={redirY} at={popularAt + 4} ink={BLUE_INK} fill={DATA_FILL} size={25}>
           a popular short link&apos;s redirect, the same for everyone
         </Pill>
-        <Line x={X0} y={noteY} at={priceAt} size={24} weight={700}>
+        <Timer x={X0 + 26} y={y(616) + 18} at={shortAt} />
+        <Line x={X0 + 72} y={y(616)} at={shortAt + 4} size={26} weight={700} color={OK_INK}>
+          so keep that time to live short
+        </Line>
+        <Line x={COL_B} y={noteY} at={priceAt} size={25} weight={700}>
           The price
         </Line>
-        <Line x={X0} y={noteY + 44} at={countAt - 6} size={24} weight={600} color={ACCENT_INK}>
-          a click the edge answers is never counted by your servers
+        <Line x={COL_B} y={noteY + 48} at={countAt - 6} size={24} weight={600} color={ACCENT_INK} width={740}>
+          a click the edge answers never reaches your servers, so they can&apos;t count it
         </Line>
-        <Line x={X0} y={noteY + 86} at={downAt} size={24} weight={600} color={ACCENT_INK}>
+        <Line x={COL_B} y={noteY + 130} at={downAt} size={24} weight={600} color={ACCENT_INK} width={740}>
           a link you take down keeps working there until its time to live runs out
-        </Line>
-        <Timer x={X0 + 26} y={noteY + 170} at={shortAt} />
-        <Line x={X0 + 72} y={noteY + 155} at={shortAt + 4} size={26} weight={700} color={OK_INK}>
-          so keep that time to live short
         </Line>
 
         {/* The verdict. */}
-        <div style={{ position: "absolute", left: X0, top: y(800), display: "flex", alignItems: "baseline", fontSize: 32, opacity: ease(frame, winAt, 14) }}>
+        <div style={{ position: "absolute", left: X0, top: y(824), display: "flex", alignItems: "baseline", fontSize: 32, opacity: ease(frame, winAt, 14) }}>
           <span style={{ ...label(32, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             A read-heavy product with users everywhere:{" "}
             <Mark at={cheapAt} color={HIGHLIGHT}>

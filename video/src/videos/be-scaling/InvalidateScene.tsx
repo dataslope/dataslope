@@ -1,3 +1,272 @@
 import React from "react";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { ease } from "../../components/motion";
+import { QuestionCard } from "../../editorial/interview";
+import { useLayout } from "../../editorial/layout";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
+import { Ink } from "../../editorial/ui";
+import { useNarration } from "../../narration/NarrationContext";
+import { Sfx } from "../../sound/Sfx";
+import { MONO } from "../../theme/fonts";
+import { TTL } from "./data";
+import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, Spot, Svg, X0 } from "./parts";
 
-export const InvalidateScene: React.FC = () => null;
+/** The TTL chart: shares of reads against the TTL on a log axis. */
+const C = { x0: 960, x1: 1760, top: 410, base: 790, max: 0.5, lo: 1, hi: 600 };
+const STEP_H = 62;
+
+/** One of the two copies of a link: its name and what it points at. */
+const Copy: React.FC<{ x: number; y: number; at: number; name: string; value: React.ReactNode; tone: "data" | "bad" | "lit"; out?: number }> = ({
+  x,
+  y,
+  at,
+  name,
+  value,
+  tone,
+  out,
+}) => (
+  <Node x={x} y={y} w={300} h={104} at={at} tone={tone === "lit" ? "data" : tone} out={out} title={name} size={23}>
+    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>{value}</span>
+  </Node>
+);
+
+/**
+ * Question 4: two copies of one link that drift apart, and the TTL's two ways
+ * to fail; the page's model of both against the TTL, crossing near fifteen
+ * seconds. Then the shortener's own case (a link taken down: delete after the
+ * commit, never before) and the two write policies.
+ */
+export const InvalidateScene: React.FC = () => {
+  const frame = useCurrentFrame();
+  const n = useNarration();
+  const { y, h } = useLayout();
+
+  const from = n.beat("q4").from;
+  const qAt = n.word("q4", "Question four");
+  const textAt = n.word("q4", "Why is cache invalidation hard");
+  const copiesAt = n.word("q4", "two copies of the truth");
+  const driftAt = n.word("q4", "they drift");
+  const ttlAt = n.word("q4", "Set the TTL");
+  const longAt = n.word("q4", "too long");
+  const shortAt = n.word("q4", "too short");
+  const modelsAt = n.word("q4-model", "The page models a key");
+  const leastAt = n.word("q4-model", "The least bad TTL");
+  const crossAt = n.word("q4-model", "the two failures cross");
+  const fifteenAt = n.word("q4-model", "about fifteen seconds");
+  const missAt = n.word("q4-model", "six percent of reads miss");
+  const staleAt = n.word("q4-model", "six percent are stale");
+  const barelyAt = n.word("q4-ours", "A short link barely changes");
+  const takenAt = n.word("q4-ours", "taken down for abuse");
+  const deleteAt = n.word("q4-ours", "delete its cached entry");
+  const commitsAt = n.word("q4-ours", "after the database commits");
+  const firstAt = n.word("q4-ours", "Delete it first");
+  const betweenAt = n.word("q4-ours", "a read in between");
+  const backAt = n.word("q4-ours", "puts the old value back");
+  const backstopAt = n.word("q4-ours", "The TTL stays as a backstop");
+  const throughAt = n.word("q4-write", "Write-through updates both together");
+  const costAt = n.word("q4-write", "consistent at a cost on every write");
+  const behindAt = n.word("q4-write", "Write-behind batches writes");
+  const crashAt = n.word("q4-write", "a crash loses");
+  const end = n.beat("q4-write").to;
+
+  const phaseOut = barelyAt - 6;
+  const drifted = ease(frame, driftAt, 12);
+
+  // ── The chart. ──
+  const lx = (t: number) => C.x0 + ((Math.log(t) - Math.log(C.lo)) / (Math.log(C.hi) - Math.log(C.lo))) * (C.x1 - C.x0);
+  const ly = (v: number) => y(C.base) - (Math.min(v, C.max) / C.max) * (y(C.base) - y(C.top));
+  const chartIn = ease(frame, modelsAt, 14);
+  const missP = ease(frame, modelsAt + 10, 36);
+  const staleP = ease(frame, modelsAt + 30, 36);
+  const line = (key: "miss" | "stale") => TTL.rows.map((r, i) => `${i ? "L" : "M"}${lx(r.ttl).toFixed(1)},${ly(r[key]).toFixed(1)}`).join(" ");
+  const cross = TTL.cross;
+  const crossP = ease(frame, crossAt, 14);
+
+  // ── Phase B: the shortener's link taken down. ──
+  const rightY = y(452) - STEP_H / 2;
+  const wrongY = y(606) - STEP_H / 2;
+  const RIGHT_STEPS = [
+    { x: X0, w: 290, t: "mark it taken down", at: takenAt + 4 },
+    { x: 470, w: 170, t: "commit ✓", at: commitsAt },
+    { x: 700, w: 330, t: "delete the cached entry", at: commitsAt + 10 },
+  ];
+  const WRONG_STEPS = [
+    { x: X0, w: 330, t: "delete the cached entry", at: firstAt },
+    { x: 510, w: 380, t: "a read reloads the old value", at: betweenAt },
+    { x: 950, w: 150, t: "commit", at: betweenAt + 18 },
+    { x: 1160, w: 330, t: "cache: the old value ✕", at: backAt },
+  ];
+  const wtY = y(764);
+  const wbY = y(846);
+
+  return (
+    <AbsoluteFill>
+      <Sfx name="el-tap" at={copiesAt} level={-31} />
+      <Sfx name="el-tap" at={driftAt + 2} level={-31} />
+      <Sfx name="el-pencil" at={modelsAt + 10} level={-35} />
+      <Sfx name="el-pencil" at={modelsAt + 30} level={-35} />
+      <Sfx name="el-tap" at={fifteenAt} level={-30} />
+      <Sfx name="el-tap" at={takenAt + 4} level={-31} />
+      <Sfx name="el-tap" at={commitsAt} level={-31} />
+      <Sfx name="el-tap" at={commitsAt + 10} level={-31} />
+      <Sfx name="el-tap" at={firstAt} level={-31} />
+      <Sfx name="el-tap" at={betweenAt} level={-31} />
+      <Sfx name="el-scratch" at={backAt} level={-31} />
+      <Sfx name="el-pop" at={backstopAt} level={-30} />
+      <Sfx name="el-tap" at={throughAt} level={-31} />
+      <Sfx name="el-scratch" at={crashAt} level={-31} />
+
+      <Drift from={from} to={end + 30}>
+        <QuestionCard n={4} at={qAt - 4} textAt={textAt - 4} size={Q_SIZE} width={Q_W}>
+          Why is cache invalidation hard?
+        </QuestionCard>
+        <MiniMap at={qAt} stage={3} lit="cache" />
+
+        {/* ── Two copies of the truth, drifting apart. ── */}
+        <Copy
+          x={X0}
+          y={y(352)}
+          at={copiesAt}
+          name="cache"
+          value={<span style={{ color: drifted > 0.5 ? ACCENT_INK : INK }}>aMoY42 → page A</span>}
+          tone={drifted > 0.5 ? "bad" : "data"}
+          out={phaseOut}
+        />
+        <Copy
+          x={X0 + 360}
+          y={y(352)}
+          at={copiesAt + 6}
+          name="database"
+          value={
+            <span style={{ background: drifted > 0.5 ? HIGHLIGHT : "transparent", padding: "0 4px", borderRadius: 4 }}>
+              aMoY42 → page {drifted > 0.5 ? "B" : "A"}
+            </span>
+          }
+          tone="data"
+          out={phaseOut}
+        />
+        <Line at={driftAt + 6} x={X0} y={y(352) + 104 + h(24)} size={22} color={INK_SOFT} out={phaseOut}>
+          the database changed; the cache still says the old value
+        </Line>
+        <Line at={ttlAt} x={X0} y={y(600)} size={23} weight={700} out={phaseOut}>
+          The TTL, the time to live:
+        </Line>
+        <Line at={longAt} x={X0} y={y(650)} size={23} out={phaseOut}>
+          <b style={{ color: ACCENT_INK }}>too long</b>, and users see stale data
+        </Line>
+        <Line at={shortAt} x={X0} y={y(700)} size={23} out={phaseOut}>
+          <b style={{ color: ACCENT_INK }}>too short</b>, and you lose the cache&apos;s benefit
+        </Line>
+
+        {/* ── The page's model: misses and stale reads against the TTL. ── */}
+        <Line at={modelsAt} x={C.x0 - 60} y={y(352)} size={21} weight={650} color={INK_SOFT} out={phaseOut}>
+          The page&apos;s model: a key read once a second, changed every two minutes
+        </Line>
+        <Svg opacity={chartIn * (1 - ease(frame, phaseOut, 10))}>
+          <defs>
+            <clipPath id="be-scaling-ttl">
+              <rect x={C.x0} y={y(C.top) - 2} width={C.x1 - C.x0} height={y(C.base) - y(C.top) + 4} />
+            </clipPath>
+          </defs>
+          {[0, 0.25, 0.5].map((v) => (
+            <g key={v}>
+              <line x1={C.x0} x2={C.x1} y1={ly(v)} y2={ly(v)} stroke={INK_SOFT} strokeWidth={v ? 1 : 1.6} opacity={v ? 0.25 : 1} />
+              <text x={C.x0 - 12} y={ly(v) + 7} textAnchor="end" style={svgText(note(20, INK_SOFT))}>
+                {Math.round(v * 100)}%
+              </text>
+            </g>
+          ))}
+          {[1, 5, 30, 60, 300, 600].map((t) => (
+            <text key={t} x={lx(t)} y={y(C.base) + 30} textAnchor={t === 1 ? "start" : t === 600 ? "end" : "middle"} style={svgText(note(20, INK_SOFT))}>
+              {t >= 60 ? `${t / 60} min` : `${t} s`}
+            </text>
+          ))}
+          <text x={(C.x0 + C.x1) / 2} y={y(C.base) + 64} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
+            TTL (log scale)
+          </text>
+          <g clipPath="url(#be-scaling-ttl)">
+            <path d={line("miss")} fill="none" stroke={BAR} strokeWidth={3} pathLength={1} strokeDasharray={`${missP} 1`} />
+            <path d={line("stale")} fill="none" stroke={ACCENT} strokeWidth={3} pathLength={1} strokeDasharray={`${staleP} 1`} />
+          </g>
+          <text x={lx(1.4)} y={ly(0.44)} style={svgText({ ...label(21, BLUE_INK), fontWeight: 700, opacity: missP })}>
+            reads that miss
+          </text>
+          <text x={lx(560)} y={ly(0.47)} textAnchor="end" style={svgText({ ...label(21, ACCENT_INK), fontWeight: 700, opacity: staleP })}>
+            reads that are stale
+          </text>
+          {crossP > 0 ? (
+            <g opacity={crossP}>
+              <line x1={lx(cross.ttl)} x2={lx(cross.ttl)} y1={y(C.base)} y2={ly(0.2)} stroke={INK} strokeWidth={1.4} strokeDasharray="5 4" />
+              <circle cx={lx(cross.ttl)} cy={ly(cross.miss)} r={7} fill={INK} />
+            </g>
+          ) : null}
+        </Svg>
+        <Ink at={fifteenAt} dur={14} out={phaseOut} style={{ left: lx(cross.ttl) - 140, top: ly(0.2) - 40, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), fontWeight: 700 }}>
+            <Mark at={leastAt}>about {Math.round(cross.ttl)} s</Mark>
+            <span style={{ color: BLUE_INK, opacity: ease(frame, missAt, 10) }}> {pct(cross.miss)} miss</span>
+            <span style={{ color: ACCENT_INK, opacity: ease(frame, staleAt, 10) }}>, {pct(cross.stale)} stale</span>
+          </span>
+        </Ink>
+
+        {/* ── The shortener: a link taken down for abuse. ── */}
+        <Line at={barelyAt} x={X0} y={y(340)} size={23} weight={700}>
+          A short link barely changes: a long TTL,
+          <span style={{ color: ACCENT_INK, opacity: ease(frame, takenAt, 10) }}> until one is taken down for abuse</span>
+        </Line>
+        <Line at={deleteAt} x={X0} y={rightY - h(40)} size={21} weight={700} color={OK_INK}>
+          delete the cached entry after the database commits
+        </Line>
+        {RIGHT_STEPS.map((s, i) => (
+          <React.Fragment key={i}>
+            <Node x={s.x} y={rightY} w={s.w} h={STEP_H} at={s.at} tone={i ? "ok" : "data"} title={s.t} size={21} />
+            {i > 0 ? <Flow points={[[RIGHT_STEPS[i - 1].x + RIGHT_STEPS[i - 1].w + 6, rightY + STEP_H / 2], [s.x - 8, rightY + STEP_H / 2]]} at={s.at - 4} color={OK} /> : null}
+          </React.Fragment>
+        ))}
+        <Line at={firstAt} x={X0} y={wrongY - h(40)} size={21} weight={700} color={ACCENT_INK}>
+          delete it first, and a read in between puts the old value back
+        </Line>
+        {WRONG_STEPS.map((s, i) => (
+          <React.Fragment key={i}>
+            <Node x={s.x} y={wrongY} w={s.w} h={STEP_H} at={s.at} tone={i === 3 ? "bad" : "data"} title={s.t} size={21} />
+            {i > 0 ? <Flow points={[[WRONG_STEPS[i - 1].x + WRONG_STEPS[i - 1].w + 6, wrongY + STEP_H / 2], [s.x - 8, wrongY + STEP_H / 2]]} at={s.at - 4} color={i === 3 ? ACCENT : BAR} /> : null}
+          </React.Fragment>
+        ))}
+        <Spot id="timer" at={backstopAt} x={1560} y={y(366)} w={150} />
+        <Line at={backstopAt + 4} x={X0} y={wrongY + STEP_H + h(28)} size={22} weight={650}>
+          The TTL stays as a backstop: a stale entry still expires
+        </Line>
+
+        {/* ── Write-through and write-behind. ── */}
+        <Ink at={throughAt} dur={14} style={{ left: X0, top: wtY, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), display: "inline-flex", alignItems: "center", gap: 16 }}>
+            <b style={{ width: 190 }}>Write-through</b>
+            {["cache", "database"].map((t) => (
+              <span key={t} style={{ padding: "4px 12px", borderRadius: 8, border: `2px solid ${BAR}`, background: `color-mix(in srgb, ${BAR} 10%, ${PAPER})`, ...label(20, BLUE_INK), fontWeight: 700 }}>
+                {t}
+              </span>
+            ))}
+            <span>written together</span>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, costAt, 10) }}>: consistent, at a cost on every write</span>
+          </span>
+        </Ink>
+        <Ink at={behindAt} dur={14} style={{ left: X0, top: wbY, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, INK), display: "inline-flex", alignItems: "center", gap: 16 }}>
+            <b style={{ width: 190 }}>Write-behind</b>
+            <span style={{ position: "relative", display: "inline-flex", gap: 5 }}>
+              {[0, 1, 2, 3, 4].map((k) => (
+                <span key={k} style={{ width: 22, height: 22, borderRadius: 4, background: `color-mix(in srgb, ${BAR} 60%, ${PAPER})` }} />
+              ))}
+              <svg width={130} height={40} style={{ position: "absolute", left: -6, top: -9, overflow: "visible", opacity: ease(frame, crashAt, 8) }}>
+                <line x1={4} y1={4} x2={126} y2={36} stroke={ACCENT} strokeWidth={4} strokeLinecap="round" />
+                <line x1={4} y1={36} x2={126} y2={4} stroke={ACCENT} strokeWidth={4} strokeLinecap="round" />
+              </svg>
+            </span>
+            <span>batched, for speed</span>
+            <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, crashAt, 10) }}>: a crash loses what it hadn&apos;t written</span>
+          </span>
+        </Ink>
+      </Drift>
+    </AbsoluteFill>
+  );
+};

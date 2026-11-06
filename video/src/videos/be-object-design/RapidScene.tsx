@@ -69,7 +69,7 @@ const Encap: React.FC<{ c: Ctx }> = ({ c }) => {
   const ctorAt = c.w("r-encap", "the constructor too");
   const opensAt = c.w("r-encap", "An account that opens at minus fifty");
   const alreadyAt = c.w("r-encap", "is overdrawn already");
-  const shell = { x: 1110, w: 330, top: c.y(420), h: 210 };
+  const shell = { x: 1090, w: 320, top: c.y(420), h: 210 };
   const mid = shell.top + shell.h / 2;
   const bounce = ease(frame, overdrawAt + 4, 10) - ease(frame, overdrawAt + 16, 10);
   const opened = ease(frame, opensAt + 10, 12);
@@ -88,7 +88,7 @@ const Encap: React.FC<{ c: Ctx }> = ({ c }) => {
           boxSizing: "border-box",
           border: `6px solid ${INK}`,
           borderRadius: "110px 110px 22px 22px",
-          background: `repeating-linear-gradient(90deg, ${PAPER} 0 104px, color-mix(in srgb, ${INK} 8%, ${PAPER}) 104px 108px)`,
+          background: `color-mix(in srgb, ${INK} 4%, ${PAPER})`,
           opacity: ease(frame, hidesAt, 12),
         }}
       />
@@ -104,7 +104,7 @@ const Encap: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line x={shell.x + shell.w + 40} y={mid - 112} at={checkAt + 4} size={22} color={OK_INK} weight={700}>
         withdraw: checks
       </Line>
-      <Flow points={[[1760, mid], [shell.x + shell.w + 26 + 24 * bounce, mid]]} at={overdrawAt} dur={10} color={ACCENT} />
+      <Flow points={[[1740, mid], [shell.x + shell.w + 26 + 24 * bounce, mid]]} at={overdrawAt} dur={10} color={ACCENT} />
       <Line x={shell.x + shell.w + 50} y={mid - 46} at={overdrawAt} size={22} weight={650}>
         withdraw 200
       </Line>
@@ -170,7 +170,7 @@ const Poly: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line x={1360} y={shapes + 150} at={squareAt + 10} size={26} weight={700} color={BLUE_INK} align="center" width={200}>
         4
       </Line>
-      <Line x={1530} y={top + 18} at={squareAt + 16} size={26} weight={700} color={BLUE_INK}>
+      <Line x={1336} y={top + 18} at={squareAt + 16} size={26} weight={700} color={BLUE_INK}>
         = {TOTAL_AREA.toFixed(2)}
       </Line>
       <Line x={R_X} y={c.y(800)} at={noAt} size={24} color={INK_SOFT}>
@@ -288,7 +288,7 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
           <React.Fragment key={name}>
             <Mark2 at={at + 6} kind={ok ? "tick" : "cross"} size={26} style={{ left: R_X, top: testTop + 40 + i * 44 }} />
             <Line x={R_X + 40} y={testTop + 36 + i * 44} at={at} size={23} weight={600} color={ok ? INK : ACCENT_INK}>
-              {name}: {ok ? "pass" : result.toLowerCase()}
+              {name}: {ok ? "pass" : result.replace(/^FAIL/, "fail")}
             </Line>
           </React.Fragment>
         );

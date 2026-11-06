@@ -88,7 +88,7 @@ export const MethodsScene: React.FC = () => {
   const respX = R_X + 360;
   const patchTop = (i: number) => y(640) + i * h(122);
   // The view count climbs once a second while it is on screen.
-  const views = 101 + Math.max(0, Math.min(2, Math.floor((frame - notAt) / 20)));
+  const views = 101 + Math.max(0, Math.min(2, Math.floor((frame - viewAt - 24) / 16)));
 
   return (
     <AbsoluteFill>
@@ -191,7 +191,7 @@ export const MethodsScene: React.FC = () => {
           lit={pulse(frame, notAt, 20)}
           lines={[{ t: "PATCH /articles/42" }, { t: "views = views + 1" }]}
         />
-        <Note at={notAt} x={R_X + 430} y={patchTop(1) + h(10)}>
+        <Note at={viewAt + 12} x={R_X + 430} y={patchTop(1) + h(10)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             views: <Num>{views}</Num>
           </span>

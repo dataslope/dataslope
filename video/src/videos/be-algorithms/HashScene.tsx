@@ -17,7 +17,7 @@ const MAP_X = 560;
 /** The thousand buckets: 50 by 20. */
 const BX = 1010;
 const COLS = 50;
-const BP = 14;
+const BP = 12;
 
 /** Where each key lands, for the drawing: a seeded scatter of distinct
  *  buckets (mulberry32). Only the chance beside it is a claim. */
@@ -117,7 +117,7 @@ export const HashScene: React.FC = () => {
           Lookups and inserts by key, in O(1) on average:
         </Line>
         {uses.map((u, i) => (
-          <Pill key={u.text} x={[640, 790, 950][i]} y={y(256)} at={u.at - 2} tone="data" size={24}>
+          <Pill key={u.text} x={[664, 820, 984][i]} y={y(256)} at={u.at - 2} tone="data" size={24}>
             {u.text}
           </Pill>
         ))}
@@ -147,7 +147,7 @@ export const HashScene: React.FC = () => {
         <div style={{ position: "absolute", left: MAP_X, width: 190, top: aTop + 14, textAlign: "center", fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, opacity: ease(frame, storeAt + 2, 10) }}>
           {nums[0]} → 0
         </div>
-        <div style={{ position: "absolute", left: MAP_X + 214, top: aTop + 6, opacity: ease(frame, linearAt - 6, 10), display: "flex", alignItems: "center", gap: 12, fontSize: 26 }}>
+        <div style={{ position: "absolute", left: MAP_X, top: aTop + 92, opacity: ease(frame, linearAt - 6, 10), display: "flex", alignItems: "center", gap: 12, fontSize: 26 }}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>returns</span>
           <span style={{ fontFamily: MONO, fontSize: 30, fontWeight: 700, color: OK_INK, padding: "4px 12px", border: `2.5px solid ${OK}`, borderRadius: 8, background: PAPER }}>{HASH.twoSum.answer}</span>
         </div>
@@ -182,25 +182,23 @@ export const HashScene: React.FC = () => {
             );
           })}
         </Svg>
-        <div style={{ position: "absolute", left: BX, top: bTop + 20 * BP + 26, ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, bucketsAt, 10) }}>
+        <div style={{ position: "absolute", left: BX, top: bTop + 20 * BP + 24, ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, bucketsAt, 10) }}>
           <span style={TABULAR}>{landed}</span> keys: chance two share a bucket{" "}
           <Mark at={evenAt + 8}>
             <b style={TABULAR}>{(chance * 100).toFixed(1)}%</b>
           </Mark>
+          <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, evenAt + 10, 10) }}>, more likely than not</span>
         </div>
-        <Line at={evenAt + 10} x={BX} y={bTop + 20 * BP + 70} size={24} color={INK_SOFT}>
-          More likely than not from the <Num>{HASH.evenMoneyKeys}</Num>th key
-        </Line>
 
         {/* The worst case, counted. */}
         <Line at={worstAt} x={AX} y={y(684)} size={22} weight={650}>
           Worst case: <QMono>__eq__</QMono> calls filling a Python set with <Num>{int(HASH.keys)}</Num> keys
         </Line>
-        <HBar x={AX} y={y(724)} w={760} max={HASH.eqSame} value={HASH.eqSpread} at={noneAt - 2} color={BAR} label="Distinct hashes" valueText={<Num>{int(HASH.eqSpread)}</Num>} size={22} barH={22} />
+        <HBar x={AX} y={y(724)} w={640} max={HASH.eqSame} value={HASH.eqSpread} at={noneAt - 2} color={BAR} label="Distinct hashes" valueText={<Num>{int(HASH.eqSpread)}</Num>} size={22} barH={22} />
         <HBar
           x={AX}
           y={y(800)}
-          w={760}
+          w={640}
           max={HASH.eqSame}
           value={HASH.eqSame}
           at={sameAt + 4}
@@ -214,7 +212,7 @@ export const HashScene: React.FC = () => {
         />
 
         {/* The hash set, answered. */}
-        <div style={{ position: "absolute", left: BX, top: y(724), opacity: ease(frame, setAt, 12) }}>
+        <div style={{ position: "absolute", left: BX, top: y(708), opacity: ease(frame, setAt, 12) }}>
           <div style={{ ...label(22, INK), fontWeight: 650 }}>A hash set</div>
           {[
             { at: avgAt, k: "time, on average", v: "O(1)", c: OK_INK },

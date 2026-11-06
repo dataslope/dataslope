@@ -203,13 +203,19 @@ export const Msg: React.FC<{
         const la = ease(frame, l.at ?? at + 6 + i * 4, 12);
         const ld = l.dim === undefined ? 0 : ease(frame, l.dim, 12) * 0.6;
         if (la <= 0 || open[i] <= 0.02) return null;
-        const body = <Http line={l.t} size={size} statusInk={statusInk ?? t.ink} color={l.color} />;
-        const marked = l.mark ? (
-          <Mark at={l.mark.at} out={l.mark.out} color={l.mark.color}>
-            {body}
-          </Mark>
-        ) : (
-          body
+        // A highlight starts at the code, not at the indent before it.
+        const text = l.t.trimStart();
+        const indent = l.t.slice(0, l.t.length - text.length);
+        const body = <Http line={text} size={size} statusInk={statusInk ?? t.ink} color={l.color} />;
+        const marked = (
+          <>
+            {indent ? <span style={{ fontFamily: MONO, fontSize: size, whiteSpace: "pre" }}>{indent}</span> : null}
+            {/* Every line sits in a highlighter, lit or not, so a lit one
+                keeps the card's left edge. */}
+            <Mark at={l.mark?.at ?? 1e9} out={l.mark?.out} color={l.mark?.color}>
+              {body}
+            </Mark>
+          </>
         );
         return (
           <div

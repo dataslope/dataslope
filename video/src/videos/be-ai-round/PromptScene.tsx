@@ -144,7 +144,7 @@ export const PromptScene: React.FC = () => {
         <Ink at={betterAt - 2} dur={12} style={{ left: BETTER_X, top: y(LABEL_Y) }}>
           <span style={{ ...label(23, OK_INK), fontWeight: 750 }}>Better</span>
         </Ink>
-        <PromptListing lines={BETTER} x={BETTER_X} top={listTop} width={1100} size={SIZE} at={betterAt} marks={marks} />
+        <PromptListing lines={BETTER} x={BETTER_X} top={listTop} width={1140} size={SIZE} at={betterAt} marks={marks} />
 
         <Note at={smallAt - 2} x={BETTER_X} y={y(722)}>
           <span style={line(26, INK)}>

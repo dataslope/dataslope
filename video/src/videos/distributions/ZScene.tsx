@@ -25,7 +25,6 @@ import {
   Head,
   lerp,
   pulse,
-  Spot,
   Strike,
   Svg,
 } from "./parts";
@@ -106,9 +105,6 @@ export const ZScene: React.FC = () => {
           </span>
         </span>
       </Ink>
-
-      {/* A position: a pin in a map, top right, clear of the notes under it. */}
-      <Spot id="distributions-pin" at={positionAt - 4} left={1580} top={y(104)} width={200} height={190} />
 
       <Drift from={zFrom} to={n.beat("skew-in").to + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>

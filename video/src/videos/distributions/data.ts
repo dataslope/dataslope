@@ -10,7 +10,7 @@ import m from "./measurements.json";
 export const VIDEO = "distributions";
 
 /**
- * Whether public/images/distributions/ holds the watercolors from
+ * Whether public/images/distributions/ holds the four watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
 export const ILLUSTRATIONS = true;

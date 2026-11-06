@@ -13,12 +13,12 @@ import { FANOUT, thousands } from "./data";
 import { Drift, Flow, Listing, Spot, X0 } from "./parts";
 
 const TOP = 336;
-const CHIP_W = 92;
+const CHIP_W = 84;
 const CHIP_H = 44;
-const GAP_X = 10;
+const GAP_X = 22;
 const GAP_Y = 12;
 const COLS = 6;
-const R_X = 880;
+const R_X = 890;
 /** How far each repeated copy of an order sits behind the one in front. */
 const STACK = 7;
 
@@ -169,8 +169,8 @@ export const FanoutScene: React.FC = () => {
               <div
                 style={{
                   position: "absolute",
-                  left: R_X + p.x + CHIP_W - 14,
-                  top: top + p.y - 12,
+                  left: R_X + p.x + CHIP_W - 12,
+                  top: top + p.y - 13,
                   ...label(19, PAPER),
                   fontWeight: 700,
                   background: OK,
@@ -195,7 +195,7 @@ export const FanoutScene: React.FC = () => {
             <SmallCode>SUM(amount)</SmallCode> = <b style={{ color: OK_INK }}>{money(Number(FANOUT.fixedTotal))}</b>
           </span>
         </Note>
-        <Spot art="coins" at={doublesAt} out={fixAt - 4} left={1600} top={top + h(30)} width={170} />
+        <Spot art="coins" at={doublesAt} out={fixAt - 4} left={1612} top={top + h(30)} width={170} />
 
         {/* ── Sara ── */}
         <Note at={saraAt + 2} x={X0} y={listTop} out={fixAt - 4}>

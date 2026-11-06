@@ -8,7 +8,7 @@ import { FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BINS } from "./data";
-import { Bracket, DATA, Drift, lerp, Mark, Pulse, SOFT_FILL, Spot, STAT, STAT_INK, Svg, Tag } from "./parts";
+import { Bracket, DATA, Drift, lerp, Mark, Pulse, SOFT_FILL, STAT, STAT_INK, Svg, Tag } from "./parts";
 
 const W = 680;
 const COL = [160, 1060] as const;
@@ -139,13 +139,6 @@ export const WhichScene: React.FC = () => {
         <Ink at={summarizeAt - 4} dur={18} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Summarize second.
         </Ink>
-      </div>
-
-      {/* "box plots": a cardboard box, then "A violin can": a violin beside it, top
-          right; they dim with the figure and each leaves with its own panel. */}
-      <div style={{ position: "absolute", inset: 0, opacity: fade }}>
-        <Spot id="describing-data-box" at={boxAt - 4} out={evenAt + 6 + 2 * 14} left={1360} top={y(110)} width={170} height={169} />
-        <Spot id="describing-data-violin" at={violinAt - 4} out={evenAt + 6 + 3 * 14} left={1620} top={y(96)} width={200} height={204} />
       </div>
 
       <div style={{ position: "absolute", inset: 0, opacity: fade }}>

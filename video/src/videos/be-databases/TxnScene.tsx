@@ -45,7 +45,7 @@ export const TxnScene: React.FC = () => {
   const ninetyAt = n.word("txn-run", "account ninety-nine doesn't exist");
   const fkAt = n.word("txn-run", "the foreign key refuses it");
   const refusesAt = n.word("txn-abort", "Postgres now refuses every statement");
-  const rollbackAt = n.word("txn-abort", "Roll back");
+  const rollbackAt = n.word("txn-abort", "Roll back", { nth: 1 });
   const hundredAt = n.word("txn-abort", "at a hundred again");
   const jobAt = n.word("txn-abort", "The application's job");
   const catchAt = n.word("txn-abort", "catch the error");

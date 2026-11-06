@@ -218,19 +218,26 @@ const BstHeap: React.FC<{ c: Ctx }> = ({ c }) => {
   const nextAt = c.w("r-bst-heap", "the next key in log n");
   const rangeAt = c.w("r-bst-heap", "a range in log n plus its length");
   const keys = Array.from({ length: 10 }, (_, i) => 10 * (i + 1));
+  /** A min-heap of seven: only the root is known to be the smallest. */
   const heap = [10, 30, 20, 70, 40, 50, 60];
-  const sTop = c.T + c.h(320);
+  const level = (i: number) => Math.floor(Math.log2(i + 1));
+  const hx = (i: number) => {
+    const k = level(i);
+    return R_X + 30 + ((i + 1 - 2 ** k + 0.5) / 2 ** k) * 420;
+  };
+  const hy = (i: number) => c.T + c.h(76) + level(i) * c.h(66);
+  const sTop = c.T + c.h(350);
   return (
     <>
       <Line at={topAt} x={R_X} y={c.T} size={24} weight={650}>
         A heap: only its top is in order
       </Line>
-      {heap.map((v, i) => {
-        const k = Math.floor(Math.log2(i + 1));
-        const j = i + 1 - 2 ** k;
-        const x = k === 0 ? R_X + 200 : R_X + 200 - 85 * 2 ** (k - 1) + ((j + 0.5) / 2 ** k) * 170 * 2 ** k;
-        return <GraphNode key={i} x={x} y={c.T + c.h(76) + k * c.h(78)} at={topAt + 4 + i * 2} name={String(v)} r={24} tone={i === 0 ? "look" : "plain"} />;
-      })}
+      <Svg opacity={ease(frame, topAt + 4, 10)}>
+        {heap.map((_, i) => (i === 0 ? null : <line key={i} x1={hx(Math.floor((i - 1) / 2))} y1={hy(Math.floor((i - 1) / 2)) + 22} x2={hx(i)} y2={hy(i) - 22} stroke={INK_SOFT} strokeWidth={1.6} />))}
+      </Svg>
+      {heap.map((v, i) => (
+        <GraphNode key={i} x={hx(i)} y={hy(i)} at={topAt + 4 + i * 2} name={String(v)} r={24} tone={i === 0 ? "look" : "plain"} />
+      ))}
       <Line at={orderAt} x={R_X} y={sTop - c.h(54)} size={24} weight={650}>
         A balanced BST: the whole order
       </Line>
@@ -375,12 +382,15 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
     if (sum < target) lo++;
     else hi--;
   }
-  const stepAt = [walkAt + 10, bigAt, smallAt + 0, linearAt - 10].sort((a, b) => a - b);
+  const moveLeftAt = c.w("r-pointers", "move the left");
+  // The first state shows as the pointers arrive; the next (too small) as
+  // the rule for it is read, and the found pair once the left has moved.
+  const stepAt = [walkAt + 10, smallAt - 6, moveLeftAt + 12];
   const k = Math.max(0, Math.min(states.length - 1, stepAt.filter((t) => frame >= t).length - 1));
   const s = states[k];
   const cw = 80;
   const rowY = c.T + c.h(110);
-  const found = s.sum === target && frame >= stepAt[states.length - 1];
+  const found = s.sum === target;
   return (
     <>
       <Line at={walkAt} x={R_X} y={c.T} size={24} weight={650}>
@@ -491,6 +501,9 @@ const Adjacency: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
       <div style={{ position: "absolute", left: R_X, top, width: side * m, height: side * m, background: `color-mix(in srgb, ${ACCENT} 12%, ${PAPER})`, border: `2px solid ${ACCENT}`, boxSizing: "border-box", opacity: m > 0 ? 1 : 0 }} />
       <div style={{ position: "absolute", left: R_X + 2, top: top + 2, width: Math.max(4, listSide), height: Math.max(4, listSide), background: BAR, opacity: ease(frame, listAt, 8) }} />
+      <Svg opacity={ease(frame, listAt + 6, 10)}>
+        <circle cx={R_X + 4} cy={top + 4} r={14} fill="none" stroke={HIGHLIGHT} strokeWidth={5} />
+      </Svg>
       <Line at={listAt} x={R_X + side + 40} y={top} size={24} weight={700} color={BLUE_INK}>
         List: <Num>{int(A.listEntries)}</Num> entries
       </Line>
@@ -749,18 +762,18 @@ export const RapidTwoScene: React.FC = () => {
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={nowAt + 6} end={end} />
 
         {/* The close. */}
-        <Art name="pangolin" at={closeAt} left={1440} top={y(320)} h={320} />
-        <Line at={closeAt} x={R_X} y={y(640)} size={30} weight={600}>
+        <Art name="pangolin" at={closeAt} left={1380} top={y(300)} h={340} />
+        <Line at={closeAt} x={R_X} y={y(660)} size={30} weight={600}>
           None of these answers needed a line of code.
         </Line>
-        <Line at={argumentAt} x={R_X} y={y(690)} size={30} weight={700} color={BLUE_INK}>
+        <Line at={argumentAt} x={R_X} y={y(708)} size={30} weight={700} color={BLUE_INK}>
           The structure and the count were the argument.
         </Line>
-        <Line at={assistantAt} x={R_X} y={y(752)} size={26} color={INK_SOFT}>
+        <Line at={assistantAt} x={R_X} y={y(766)} size={26} color={INK_SOFT}>
           With an assistant writing the code
           <span style={{ opacity: ease(frame, gradedAt, 10) }}>, working code isn&apos;t what&apos;s graded</span>
         </Line>
-        <NextLine at={nextAt} x={R_X} y={y(806)} width={900}>
+        <NextLine at={nextAt} x={R_X} y={y(816)} width={900}>
           the AI-allowed round
         </NextLine>
       </Drift>

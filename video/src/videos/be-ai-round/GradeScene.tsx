@@ -173,7 +173,7 @@ export const GradeScene: React.FC = () => {
           </Note>
           <Note at={struggledAt} x={X0} y={y(572)}>
             <span style={line(28, INK)}>
-              Those who struggled lacked <Mark at={steerAt + 4}>the judgment to steer the tool</Mark>
+              The ones who struggled lacked <Mark at={steerAt + 4}>the judgment to steer the tool</Mark>
               <span style={{ opacity: ease(frame, abilityAt - 2, 10) }}>, not the ability to code.</span>
             </span>
           </Note>

@@ -87,7 +87,7 @@ export const DijkScene: React.FC = () => {
   const settleAt: Record<string, number> = { A: findsAt + 6, B: heapAt + 4, C: throughBAt, D: throughCAt - 4 };
 
   // The video's own graph, with a negative edge.
-  const R: Record<string, P> = { A: [1130, mid], B: [1390, y(380)], C: [1390, y(620)], D: [1660, y(380)] };
+  const R: Record<string, P> = { A: [1130, y(500)], B: [1390, y(392)], C: [1390, y(608)], D: [1660, y(392)] };
   const negEdges = Object.entries(DIJKSTRA.negGraph).flatMap(([a, nbs]) => nbs.map(([b, w]) => ({ a, b, w })));
   const negOn = ease(frame, whyAt - 6, 12);
   const negSettleAt: Record<string, number> = { A: finalAt + 6, B: bLeavesAt, C: bLeavesAt + 16, D: bLeavesAt + 26 };
@@ -167,9 +167,6 @@ export const DijkScene: React.FC = () => {
 
         {/* Why no negative weights: the video's own graph. */}
         <div style={{ opacity: negOn }}>
-          <Line at={whyAt} x={1060} y={y(330)} size={22} weight={650}>
-            Finalize a node when it leaves the heap
-          </Line>
           <Glow a={R.C} b={R.B} at={laterAt} color={`color-mix(in srgb, ${ACCENT} 30%, transparent)`} />
           {negEdges.map((e) => (
             <Edge
@@ -202,10 +199,19 @@ export const DijkScene: React.FC = () => {
           </Line>
         </div>
         {/* The two answers. */}
-        <div style={{ position: "absolute", left: 1060, top: y(700), display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, wrongAt, 10) }}>
-          <Cross at={wrongAt} size={22} />
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            Finalizing: B = <Num>{st.B}</Num>, D = <Num>{st.D}</Num>
+        <div style={{ position: "absolute", left: 1060, top: y(700), display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, finalAt, 10) }}>
+          <span style={{ width: 22, display: "flex", opacity: ease(frame, wrongAt, 8) }}>
+            <Cross at={wrongAt} size={22} />
+          </span>
+          <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            Finalize a node when it leaves the heap:
+            <span style={{ color: ACCENT_INK, fontWeight: 700, opacity: ease(frame, wrongAt, 10) }}>
+              {" "}
+              B = <Num>{st.B}</Num>
+              <span style={{ opacity: ease(frame, soDAt, 10) }}>
+                , D = <Num>{st.D}</Num>
+              </span>
+            </span>
           </span>
         </div>
         <div style={{ position: "absolute", left: 1060, top: y(748), display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, bfAt, 10) }}>

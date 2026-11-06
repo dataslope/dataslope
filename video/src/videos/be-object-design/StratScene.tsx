@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, BLUE_INK, INK, INK_SOFT } from "../../editorial/style";
+import { ACCENT, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SHIPPING } from "./data";
@@ -59,9 +59,9 @@ export const StratScene: React.FC = () => {
   const active = frame >= thirdAt ? 2 : frame >= weightAt ? 1 : 0;
   const fold = oneAt + 4;
   const cards = [
-    { title: "Flat rate", at: flatAt - 6 },
-    { title: "By weight, 2 a unit", at: weightAt - 2 },
-    { title: "Free above a weight of 10", at: thirdAt + 2 },
+    { title: "Flat rate", at: behindAt + 10, arrow: asksAt },
+    { title: "By weight, 2 a unit", at: behindAt + 16, arrow: weightAt },
+    { title: "Free above a weight of 10", at: thirdAt + 2, arrow: thirdAt + 6 },
   ];
   const brTop = cardTop(0) - 22;
   const brBottom = cardTop(2) + CARD.h + 22;
@@ -93,10 +93,10 @@ export const StratScene: React.FC = () => {
 
         {/* The shipment, which asks whichever card it holds. */}
         <Box x={SHIP.x} y={shipTop} w={SHIP.w} h={SHIP.h} at={shipAt} tone="plain" title="Shipment" lit={pulse(frame, notEditedAt, 24)}>
-          <span style={{ fontFamily: "inherit", fontSize: 22, color: INK_SOFT, fontWeight: 600, opacity: ease(frame, parcelAt, 10), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), fontWeight: 600, opacity: ease(frame, parcelAt, 10), whiteSpace: "nowrap" }}>
             a parcel weighing <b style={{ color: BLUE_INK }}>{SHIPPING.weight}</b>
           </span>
-          <span style={{ fontFamily: "inherit", fontSize: 22, color: INK_SOFT, fontWeight: 600, opacity: ease(frame, asksAt, 10), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, INK_SOFT), fontWeight: 600, opacity: ease(frame, asksAt, 10), whiteSpace: "nowrap" }}>
             asks its card for the cost
           </span>
         </Box>
@@ -135,7 +135,7 @@ export const StratScene: React.FC = () => {
               title={c.title}
               size={22}
               tone={i === 2 ? "ok" : "data"}
-              lit={i === active ? 1 : 0}
+              lit={i === active && frame >= asksAt ? 1 : 0}
               out={i > 0 ? fold + (i - 1) * 4 : undefined}
             />
             <Flow
@@ -145,7 +145,7 @@ export const StratScene: React.FC = () => {
                 [SHIP.x + SHIP.w + 70, cardMid(i)],
                 [CARD.x - 8, cardMid(i)],
               ]}
-              at={c.at + 4}
+              at={c.arrow}
               dur={12}
               width={2.2}
               head={12}
@@ -164,8 +164,7 @@ export const StratScene: React.FC = () => {
         <Line x={COST_X} y={cardMid(2) - 16} at={freeAt + 8} size={26} weight={600} out={fold + 8}>
           weight {SHIPPING.third.light.weight}: <b style={{ color: BLUE_INK }}>{price(SHIPPING.third.light.cost)}</b>
           <span style={{ opacity: ease(frame, classAt, 10) }}>
-            {" "}
-            · {SHIPPING.third.heavy.weight}: <b style={{ color: OK_INK }}>{price(SHIPPING.third.heavy.cost)}</b>
+            , weight {SHIPPING.third.heavy.weight}: <b style={{ color: OK_INK }}>{price(SHIPPING.third.heavy.cost)}</b>
           </span>
         </Line>
 

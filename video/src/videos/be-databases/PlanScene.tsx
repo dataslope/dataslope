@@ -11,7 +11,6 @@ import { inkOf } from "../../theme/brand";
 import { PLAN, thousands } from "./data";
 import {
   Drift,
-  Flow,
   lineOf,
   Listing,
   listingCharX,
@@ -147,14 +146,15 @@ export const PlanScene: React.FC = () => {
           ]}
         />
         {/* Read as a tree: the indented step first, feeding the one above. */}
-        <Flow points={[[arrowX, seqY], [arrowX + 30, seqY], [arrowX + 30, aggY], [arrowX + 8, aggY]]} at={feedsAt} color={inkOf.yellow} width={3} out={threeAt} />
-        <Note at={firstAt + 4} x={arrowX + 60} y={seqY - h(16)} out={threeAt}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
-            <b>runs first</b>
+        <Note at={firstAt + 4} x={arrowX} y={seqY - h(16)} out={threeAt}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <b style={{ color: inkOf.yellow }}>1</b>&nbsp;&nbsp;the indented step runs first
           </span>
         </Note>
-        <Note at={feedsAt + 6} x={arrowX + 60} y={aggY - h(16)} out={threeAt}>
-          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>takes its rows</span>
+        <Note at={feedsAt + 2} x={arrowX} y={aggY - h(16)} out={threeAt}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            <b style={{ color: inkOf.yellow }}>2</b>&nbsp;&nbsp;and feeds the one above it
+          </span>
         </Note>
 
         {/* ── The three things to read ── */}

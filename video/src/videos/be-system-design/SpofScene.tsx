@@ -117,7 +117,7 @@ export const SpofScene: React.FC = () => {
         {/* The diagram. */}
         <Box r={B.client} at={d0} title="Client" tone="quiet" />
         <Arrow points={between(B.client, lb)} at={d0 + 4} dur={10} />
-        <Box r={lb} at={d0 + 4} title="Load balancer" sub={<span style={{ opacity: ease(frame, pairAt + 10, 10) }}>active</span>} />
+        <Box r={lb} at={d0 + 4} title="Load balancer" sub={frame >= pairAt + 8 ? <span style={{ opacity: ease(frame, pairAt + 8, 10) }}>active</span> : undefined} />
         <Box r={B.app1} at={d0 + 6} title="App server" />
         <Box r={B.app2} at={d0 + 8} title="App server" />
         <Arrow points={between(lb, B.app1)} at={d0 + 8} />
@@ -140,7 +140,7 @@ export const SpofScene: React.FC = () => {
         <Arrow points={sideRoute(B.app1, store, SIDE_A)} at={d0 + 14} dur={16} color={storeLine} width={2.4 + 1.6 * flood} />
         <Arrow points={sideRoute(B.app2, store, SIDE_B)} at={d0 + 16} dur={16} color={storeLine} width={2.4 + 1.6 * flood} out={replAt} />
         {lost > 0 ? (
-          <div style={{ position: "absolute", left: cache.cx - 14, top: cache.cy - 14, opacity: lost }}>
+          <div style={{ position: "absolute", left: cache.cx + cache.w / 2 + 22, top: cache.cy - 14, opacity: lost }}>
             <Cross at={loseAt + 4} size={28} />
           </div>
         ) : null}
@@ -173,8 +173,8 @@ export const SpofScene: React.FC = () => {
         <Line x={X0} y={y(300) + 160} at={threeAt} size={26} weight={700} color={ACCENT_INK}>
           <Num>3</Num> in this diagram
         </Line>
-        <Line x={X0} y={y(720)} at={everyAt} size={24} weight={650} color={ACCENT_INK} width={340} out={redundAt}>
-          without the cache, every read lands on the store at once
+        <Line x={X0} y={y(716)} at={everyAt} size={24} weight={650} color={ACCENT_INK} width={340} out={redundAt}>
+          every read lands on the store at once
         </Line>
 
         {/* The fixes, ticked as they are said. */}

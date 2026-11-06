@@ -5,6 +5,7 @@ import { OK, RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { TABULAR, label } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
+import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -79,9 +80,9 @@ const Merge: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Row values={input} x={R_X} y={c.T} at={halvesAt - 8} />
       <Row values={left} x={R_X} y={c.T + step} at={halvesAt} />
-      <Row values={right} x={R_X + 250} y={c.T + step} at={halvesAt + 4} />
+      <Row values={right} x={R_X + 3 * 68 + 40} y={c.T + step} at={halvesAt + 4} />
       <Row values={sorted(left)} x={R_X} y={c.T + 2 * step} at={sortsAt} />
-      <Row values={sorted(right)} x={R_X + 250} y={c.T + 2 * step} at={sortsAt + 4} />
+      <Row values={sorted(right)} x={R_X + 3 * 68 + 40} y={c.T + 2 * step} at={sortsAt + 4} />
       <Row values={out} x={R_X} y={c.T + 3 * step} at={mergesAt} tone="ok" />
       {[
         { t: "the input", at: halvesAt - 8, k: 0 },
@@ -89,7 +90,7 @@ const Merge: React.FC<{ c: Ctx }> = ({ c }) => {
         { t: "each sorted", at: sortsAt, k: 2 },
         { t: "merged in O(n)", at: mergesAt, k: 3 },
       ].map((r) => (
-        <Line key={r.t} at={r.at} x={R_X + 7 * 68 + 40} y={c.T + r.k * step + 12} size={23} color={INK_SOFT}>
+        <Line key={r.t} at={r.at} x={R_X + 7 * 68 + 100} y={c.T + r.k * step + 12} size={23} color={INK_SOFT}>
           {r.t}
         </Line>
       ))}
@@ -113,7 +114,7 @@ const Heapsort: React.FC<{ c: Ctx }> = ({ c }) => {
   const suitsAt = c.w("r-heapsort", "It suits tight memory");
   const cells = 15;
   const cw = 54;
-  const rowY = c.T + c.h(150);
+  const rowY = c.T + c.h(170);
   const cx = (i: number) => R_X + i * cw + cw / 2;
   // A heap's parent-to-child reads: i to 2i + 1 and 2i + 2, far apart.
   const arcs = Array.from({ length: 7 }, (_, i) => [i, 2 * i + 1] as const);
@@ -135,7 +136,7 @@ const Heapsort: React.FC<{ c: Ctx }> = ({ c }) => {
           return (
             <path
               key={k}
-              d={`M${x1},${rowY - 6} A${r},${r * 0.8} 0 0 1 ${x2},${rowY - 6}`}
+              d={`M${x1},${rowY - 6} A${r},${Math.min(r * 0.8, 64)} 0 0 1 ${x2},${rowY - 6}`}
               fill="none"
               stroke={ACCENT}
               strokeWidth={2.2}
@@ -331,7 +332,7 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
   const fx = R_X + 480;
   const ly = (d: number) => c.T + c.h(90) + d * c.h(66);
   const repeated = (m: number) => fib.filter((f) => f.n === m).length > 1 && m >= 2;
-  const tint: Record<number, string> = { 3: HIGHLIGHT, 2: `color-mix(in srgb, ${OK} 40%, ${PAPER})` };
+  const tint: Record<number, string> = { 3: HIGHLIGHT, 2: `color-mix(in srgb, ${ds("teal", 300)} 70%, ${PAPER})` };
   return (
     <>
       <Line at={dcAt} x={R_X} y={c.T} size={24} weight={650}>
@@ -434,7 +435,7 @@ const Classic: React.FC<{ c: Ctx }> = ({ c }) => {
           <Pill x={R_X} y={c.T + i * c.h(76)} at={p.at - 2} tone="data" size={23}>
             {p.name}
           </Pill>
-          <Line at={stateAt + i * 4} x={R_X + 420} y={c.T + i * c.h(76) + 8} size={23} color={INK_SOFT}>
+          <Line at={stateAt + i * 4} x={R_X + 470} y={c.T + i * c.h(76) + 8} size={23} color={INK_SOFT}>
             state: {p.state}
           </Line>
         </React.Fragment>

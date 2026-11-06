@@ -125,9 +125,6 @@ export const DivisorScene: React.FC = () => {
         <span style={{ ...note(28, INK_SOFT), opacity: ease(frame, tenAt - 4, 12) }}>not 12 ÷ 10</span>
       </div>
 
-      {/* "a population": a crowd, top right beside the question, for as long as Fig. 4 is up. */}
-      <Spot id="describing-data-crowd" at={populationAt - 4} out={measuredFrom - 10} left={1580} top={y(96)} width={220} height={218} />
-
       {/* ── Phase A: five values and their squares ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - phaseB, transform: `translateY(${-phaseB * 30}px)` }}>
         <FigLabel n="4" title="Five values from a population whose true mean is 0" at={distancesAt - 8} x={160} y={y(330)} />
@@ -276,10 +273,10 @@ export const DivisorScene: React.FC = () => {
       {phaseB > 0 ? (
         <div style={{ position: "absolute", inset: 0, opacity: phaseB }}>
           <FigLabel n="5" title={`Average variance over ${DIVISOR.trials.toLocaleString("en-US")} samples of five`} at={fourAt - 6} x={160} y={y(330)} />
-          {/* "samples of five": a rack of five test tubes, top right where the crowd stood,
+          {/* "samples of five": a rack of five test tubes, top right beside the headline,
               dimming with the figure as the next scene's question comes in. */}
           <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, wildAt - 2, 14) }}>
-            <Spot id="describing-data-samples" at={samplesAt - 4} left={1570} top={y(96)} width={230} height={187} />
+            <Spot id="describing-data-samples" at={samplesAt - 4} left={1600} top={y(112)} width={200} height={163} />
           </div>
           <Drift from={measuredFrom} to={swampAt + 30} scale={0.018} origin={[V.x0, y(BAR_N1)]}>
             <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, wildAt - 2, 14) }}>

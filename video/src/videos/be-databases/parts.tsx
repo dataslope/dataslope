@@ -569,7 +569,6 @@ export const ART = {
   chipmunk: { id: "be-databases-chipmunk", w: 1227, h: 1024 },
   phoneBook: { id: "be-databases-phone-book", w: 1024, h: 745 },
   coins: { id: "be-databases-coins", w: 896, h: 895 },
-  padlock: { id: "be-databases-padlock", w: 1024, h: 828 },
 } as const;
 export type ArtName = keyof typeof ART;
 

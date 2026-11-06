@@ -24,6 +24,8 @@ const GOD = { x: 480, w: 430, top: 432, title: 62, row: 54, rowH: 44 };
 const SPLIT_PITCH = 70;
 const CHECKOUT = { x: 1270, w: 230, h: 72 };
 const GAUGE = { r: 78, cy: 318, xs: [1440, 1700] };
+/** While the definitions are read, the gauges sit large in the open page. */
+const BIG = { r: 130, cy: 600, xs: [720, 1200] };
 
 /**
  * Question 1. Cohesion and coupling as two gauges, then the anti-pattern:
@@ -78,6 +80,10 @@ export const CohScene: React.FC = () => {
   const emailRed = ease(frame, templateAt, 12) * (1 - ease(frame, splitAt + 20, 14));
   const redFlow = ease(frame, retestAt - 6, 12) * (1 - split);
   const gaugeY = y(GAUGE.cy);
+  const move = ease(frame, managerAt - 16, 22);
+  const gy = lerp(y(BIG.cy), gaugeY, move);
+  const gr = lerp(BIG.r, GAUGE.r, move);
+  const gx = (i: number) => lerp(BIG.xs[i], GAUGE.xs[i], move);
 
   return (
     <AbsoluteFill>
@@ -106,24 +112,24 @@ export const CohScene: React.FC = () => {
           <span style={{ color: INK_SOFT, opacity: ease(frame, lowAt, 10) }}>; low, and a change rarely spreads</span>
         </Line>
         {(["cohesion", "coupling"] as const).map((name, i) => {
-          const cx = GAUGE.xs[i];
+          const cx = gx(i);
           const good = name === "cohesion" ? 1 : 0;
           return (
             <React.Fragment key={name}>
               <Gauge
                 cx={cx}
-                cy={gaugeY}
-                r={GAUGE.r}
+                cy={gy}
+                r={gr}
                 at={i === 0 ? cohAt + 6 : coupAt + 6}
                 steps={[
                   { at: godAt, value: good ? 0.14 : 0.86, tone: "bad" },
                   { at: highAt, value: good ? 0.86 : 0.14, tone: "ok" },
                 ]}
               />
-              <Line x={cx} y={gaugeY + 18} at={i === 0 ? cohAt + 8 : coupAt + 8} size={22} weight={700} align="center" width={220}>
+              <Line x={cx} y={gy + 18} at={i === 0 ? cohAt + 8 : coupAt + 8} size={22} weight={700} align="center" width={220}>
                 {name}
               </Line>
-              <Line x={cx} y={gaugeY + 50} at={i === 0 ? purposeAt : lowAt} size={20} color={INK_SOFT} weight={600} align="center" width={220}>
+              <Line x={cx} y={gy + 50} at={i === 0 ? purposeAt : lowAt} size={20} color={INK_SOFT} weight={600} align="center" width={220}>
                 {good ? "high is good" : "low is good"}
               </Line>
             </React.Fragment>

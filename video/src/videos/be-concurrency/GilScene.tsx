@@ -9,13 +9,13 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BYTECODE } from "./data";
-import { Band, Drift, KeyGlyph, lineOf, Listing, listingHeight, LockGlyph, MARK_OK, Node, OK, OK_INK, Spot, Strike, THREAD, tint, X0 } from "./parts";
+import { Band, Drift, KeyGlyph, lineOf, Listing, listingHeight, LockGlyph, MARK_OK, Node, OK, OK_INK, Spot, THREAD, tint, X0 } from "./parts";
 
 const LANE_X = 250;
 const SLICE = 75;
-const LANE_H = 46;
-const CPU_LANES = [372, 436, 500];
-const IO_LANES = [664, 728];
+const LANE_H = 50;
+const CPU_LANES = [380, 448, 516];
+const IO_LANES = [672, 742];
 /** Who holds the GIL in each slice of the CPU-bound run. */
 const CPU_TURNS = [0, 1, 2, 0, 1, 2, 0, 1, 2, 0];
 /**
@@ -35,7 +35,7 @@ const OBJECTS = [
   { name: "an int", refs: 7 },
   { name: "a dict", refs: 2 },
 ];
-const BOX = { x: 1110, top: 372, w: 680, h: 250 };
+const BOX = { x: 1110, top: 380, w: 680, h: 262 };
 
 /** A slice of a thread's lane: running with the key, or waiting pale. */
 const Slice: React.FC<{ t: number; x: number; y: number; w: number; h: number; at: number; kind: "run" | "wait" | "block"; dim?: number; text?: string }> = ({ t, x, y, w, h, at, kind, dim = 0, text }) => {
@@ -169,7 +169,7 @@ export const GilScene: React.FC = () => {
             ))}
           </React.Fragment>
         ))}
-        <Note at={noSpeedAt} x={X0} y={y(560)} out={page1Out}>
+        <Note at={noSpeedAt} x={X0} y={y(586)} out={page1Out}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             CPU-bound: they <Band at={turnsAt}>take turns</Band>, so no speedup
           </span>
@@ -185,7 +185,7 @@ export const GilScene: React.FC = () => {
             <Slice t={r.t} x={LANE_X + (r.from + r.len) * SLICE} y={ioY[r.t]} w={SLICE * r.wait} h={laneH} at={ioAt + 10 + k * 10} kind="wait" dim={ease(frame, page1Out, 10)} text={k < 2 ? "waiting on the network" : "waiting"} />
           </React.Fragment>
         ))}
-        <Note at={releasesAt + 6} x={X0} y={y(800)} out={page1Out}>
+        <Note at={releasesAt + 6} x={X0} y={y(816)} out={page1Out}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>IO-bound: the waits overlap, so threads still help</span>
         </Note>
 
@@ -205,7 +205,7 @@ export const GilScene: React.FC = () => {
                   refs: <Num>{o.refs}</Num>
                 </span>
               </Node>
-              <Ink at={withoutAt - 4 + k * 3} dur={10} out={page1Out} style={{ left: x + 54, top: y(BOX.top + 186) }}>
+              <Ink at={withoutAt - 4 + k * 3} dur={10} out={page1Out} style={{ left: x + 54, top: y(BOX.top + 196) }}>
                 <span style={{ position: "relative", display: "inline-block" }}>
                   <LockGlyph size={30} color={ds("gray", 400)} />
                   <svg width={40} height={40} style={{ position: "absolute", left: -5, top: -5, overflow: "visible" }}>
@@ -231,7 +231,7 @@ export const GilScene: React.FC = () => {
         {/* ── Page 2: four instructions, then processes ───────────────── */}
         <Note at={notSafeAt} x={X0} y={y(290)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-            And it doesn&apos;t make <Strike at={nothingAt + 4}>the counter safe</Strike>
+            And it <b style={{ color: ACCENT_INK }}>doesn&apos;t</b> make the counter safe
           </span>
         </Note>
         <Listing lines={SRC} x={X0} top={srcTop} width={LIST_W} size={SIZE + 2} at={notSafeAt + 4} />

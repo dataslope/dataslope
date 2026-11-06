@@ -11,7 +11,7 @@ import { ArtSpot, Box, Drift, Flow, lerp, Line, Mark2, OK, OK_INK, pulse, X0 } f
 
 const CONF = { x: X0, w: 400, top: 420, h: 110 };
 const SOCKET = { w: 116, h: 76 };
-const PLUG = { w: 240, h: 64 };
+const PLUG = { w: 260, h: 68 };
 const HOME_X = 930;
 const SWING = 110;
 
@@ -36,6 +36,7 @@ export const DipScene: React.FC = () => {
   const qAt = n.word("dip", "Question five");
   const textAt = n.word("dip", "What is the dependency inversion principle");
   const highAt = n.word("dip", "High-level code depends on an abstraction");
+  const abstractionAt = n.word("dip", "an abstraction");
   const passedAt = n.word("dip", "the concrete implementation is passed in");
   const confAt = n.word("dip-ex", "The order confirmation needs");
   const sendAt = n.word("dip-ex", "something that can send a message");
@@ -95,16 +96,25 @@ export const DipScene: React.FC = () => {
         </Line>
 
         {/* The confirmation and its socket. */}
-        <Box x={CONF.x} y={top} w={CONF.w} h={CONF.h} at={confAt} title="Order confirmation" sub={<span style={{ opacity: ease(frame, allAt, 10) }}>knows only what it plugs into</span>} />
+        <Box
+          x={CONF.x}
+          y={top}
+          w={CONF.w}
+          h={CONF.h}
+          at={highAt + 4}
+          title="Order confirmation"
+          sub={frame < allAt ? "the high-level code" : "knows only what it plugs into"}
+          lit={pulse(frame, confAt, 20)}
+        />
         <Box
           x={socketX}
           y={mid - SOCKET.h / 2}
           w={SOCKET.w}
           h={SOCKET.h}
-          at={sendAt}
+          at={abstractionAt + 4}
           tone="ok"
           dashed
-          lit={socketLit}
+          lit={socketLit + pulse(frame, sendAt, 20)}
           radius={8}
         >
           <span style={{ ...label(20, OK_INK), fontWeight: 700, textAlign: "center", lineHeight: 1.15 }}>
@@ -113,13 +123,13 @@ export const DipScene: React.FC = () => {
             message
           </span>
         </Box>
-        <Line x={dockX} y={mid - SWING - PLUG.h / 2 - 40} at={prodAt} size={21} color={INK_SOFT} weight={650} out={testAt + 2}>
+        <Line x={dockX} y={mid - PLUG.h / 2 - 40} at={prodAt} size={21} color={INK_SOFT} weight={650} out={testAt + 2}>
           in production
         </Line>
-        <Line x={dockX} y={mid - SWING - PLUG.h / 2 - 40} at={testAt + 8} size={21} color={INK_SOFT} weight={650}>
+        <Line x={dockX} y={mid - PLUG.h / 2 - 40} at={testAt + 8} size={21} color={INK_SOFT} weight={650}>
           in a test
         </Line>
-        <Box x={lerp(HOME_X, dockX, emailIn)} y={emailY} w={PLUG.w} h={PLUG.h} at={emailAt - 4} title="Email sender" tone="data" dim={testAt + 6} />
+        <Box x={lerp(HOME_X, dockX, emailIn)} y={emailY} w={PLUG.w} h={PLUG.h} at={passedAt + 4} title="Email sender" sub={frame < emailAt ? "the concrete piece" : undefined} subSize={20} tone="data" dim={testAt + 6} />
         <Box x={lerp(HOME_X, dockX, fakeIn)} y={fakeY} w={PLUG.w} h={PLUG.h} at={testAt + 2} title="Recording fake" tone="data" />
 
         {/* What the fake recorded. */}

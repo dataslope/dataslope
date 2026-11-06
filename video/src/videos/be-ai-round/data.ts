@@ -12,7 +12,7 @@ import results from "./results.json" with { type: "json" };
 export const VIDEO = "be-ai-round";
 
 /** public/images/be-ai-round/ holds the watercolors from illustrations.json:
- *  the lemur and five small spots, one in each scene that has room for the
+ *  the lemur and four small spots, each in a scene with open space for the
  *  thing it is about. */
 export const ILLUSTRATIONS = true;
 

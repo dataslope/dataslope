@@ -254,7 +254,8 @@ export const DinoScene: React.FC = () => {
         </Tag>
       </div>
 
-      <Spot id="describing-data-dinosaur" at={cairoAt - 4} left={1560} top={y(520)} width={290} height={264} />
+      {/* Cairo's dinosaur, small, right of the table and level with its rows. */}
+      <Spot id="describing-data-dinosaur" at={cairoAt - 4} left={1600} top={y(440)} width={200} height={182} />
 
       {/* The credit. */}
       <Ink at={cairoAt - 2} dur={16} style={{ left: 1000, top: y(860), whiteSpace: "nowrap" }}>

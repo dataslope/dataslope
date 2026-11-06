@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { UNIFORM } from "./data";
-import { ASK, askNote, Bracket, Centered, clamp01, code, DIST, Drift, Head, lerp, pulse, Spot, Strike, Svg } from "./parts";
+import { ASK, askNote, Bracket, Centered, clamp01, code, DIST, Drift, Head, lerp, pulse, Strike, Svg } from "./parts";
 
 const X: XScale = { lo: 0, hi: 10, x0: 220, x1: 1420 };
 const BASE = 820;
@@ -102,10 +102,6 @@ export const HeightScene: React.FC = () => {
           { text: "Area is probability.", at: onlyAt - 6, italic: true },
         ]}
       />
-
-      {/* Flat, beside the flat block; gone before the squeeze, when the
-          block stops being flat and its numbers take the column. */}
-      <Spot id="distributions-level" at={flatAt - 4} out={squeezeAt - 8} left={1490} top={y(604)} width={232} height={170} />
 
       <Drift from={uniformFrom} to={n.beat("quantile-in").to + 40} origin="40% 70%">
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>

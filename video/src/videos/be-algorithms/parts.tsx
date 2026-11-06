@@ -281,7 +281,7 @@ export const Node: React.FC<{
         transform: `scale(${0.9 + 0.1 * Math.min(1, p)})`,
       }}
     >
-      <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", fontFamily: mono ? MONO : undefined }}>{title}</span>
+      <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO } : {}) }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap" }}>{sub}</span> : null}
     </div>
   );
@@ -348,7 +348,7 @@ export const Pill: React.FC<{
           ...label(size, t.ink),
           fontWeight: 700,
           whiteSpace: "nowrap",
-          fontFamily: mono ? MONO : undefined,
+          ...(mono ? { fontFamily: MONO } : {}),
         }}
       >
         {children}

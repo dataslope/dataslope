@@ -160,7 +160,7 @@ export const GapScene: React.FC = () => {
       </div>
       {/* The one spot, top right, clear of the headline and the gap panel:
           the luck every score is made of. */}
-      <Spot id="thinking-statistically-dice" at={diceAt} out={exitAt} left={1570} top={y(104)} width={200} height={170} />
+      <Spot id="thinking-statistically-dice" at={diceAt} out={exitAt} left={1570} top={y(112)} width={200} height={170} />
 
       <Ink at={couldAt - 4} dur={18} style={{ left: 96, top: y(258), whiteSpace: "nowrap" }}>
         <span style={{ ...body(38, true), color: INK }}>Could this just be luck?</span>

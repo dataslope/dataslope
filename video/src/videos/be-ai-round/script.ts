@@ -66,7 +66,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     a single bar of 1,000 at one second, and the jittered wave spread over
  *     that second, its busiest tenth marked 115.
  *   - "cost" to "cost-past": the page's block as a listing, then its three
- *     printed lines; coins (spot art), and a stacked bar of the day's 3,500
+ *     printed lines; a stacked bar of the day's 3,500
  *     dollars, input 2,000 and output 1,500, labelled "illustrative prices".
  *     "cost-lever": the levers as tags on the input segment, then two more
  *     beside the bar. "cost-past": the bar twice more, prompt halved (saves

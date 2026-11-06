@@ -188,7 +188,10 @@ export const LimitScene: React.FC = () => {
 
         {/* After a refusal: Retry-After, then doubling, each with jitter. */}
         <Note at={on429At} x={R_X} y={wTop}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>After a refusal, it waits</span>
+          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            After a 429, it waits <span style={{ fontFamily: MONO, fontWeight: 600 }}>Retry-After</span>
+            <span style={{ opacity: ease(frame, doublesAt, 10) }}>, then doubles the wait</span>
+          </span>
         </Note>
         {WAITS.map((w, i) => {
           const at = waitAt[i];
@@ -219,7 +222,7 @@ export const LimitScene: React.FC = () => {
               />
               <Note at={at + 6} x={x + 4} y={top + h(38)}>
                 <span style={{ ...note(21, i === 0 ? INK : BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-                  <Num>{w}</Num> s{i === 0 ? ": Retry-After" : ""}
+                  <Num>{w}</Num> s
                 </span>
               </Note>
             </React.Fragment>

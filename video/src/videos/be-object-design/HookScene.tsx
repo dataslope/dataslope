@@ -23,8 +23,8 @@ const REQUESTS = [
 const REQ_TOP = 424;
 const REQ_PITCH = 104;
 const CARD = { w: 620, h: 64 };
-const NEW = { x: 950, w: 160 };
-const EDIT = { x: 1134, w: 280 };
+const NEW = { x: 890, w: 180 };
+const EDIT = { x: 1090, w: 320 };
 const OPT_H = 46;
 
 /**
@@ -106,13 +106,13 @@ export const HookScene: React.FC = () => {
           const rowMid = top + CARD.h / 2;
           const phase = (frame - landsAt) / 34 + i * 0.7;
           const k = (1 - Math.cos(Math.PI * Math.max(0, phase))) / 2;
-          const bandX = NEW.x + (EDIT.x - NEW.x) * k - 8;
-          const bandW = NEW.w + (EDIT.w - NEW.w) * k + 16;
+          const bandX = NEW.x + (EDIT.x - NEW.x) * k - 6;
+          const bandW = NEW.w + (EDIT.w - NEW.w) * k + 12;
           return (
             <React.Fragment key={r.id}>
               <Box x={X0} y={top} w={CARD.w} h={CARD.h} at={at} title={r.text} align="left" dashed dim={dim} />
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: hover * (1 - ease(frame, dim, 12)) }}>
-                <rect x={bandX} y={rowMid - OPT_H / 2 - 8} width={bandW} height={OPT_H + 16} rx={10} fill={HIGHLIGHT} />
+                <rect x={bandX} y={rowMid - OPT_H / 2 - 6} width={bandW} height={OPT_H + 12} rx={10} fill={HIGHLIGHT} />
               </svg>
               <Box x={NEW.x} y={rowMid - OPT_H / 2} w={NEW.w} h={OPT_H} at={landsAt + i * 3} tone="ok" title="a new piece" size={21} dim={dim} />
               <Box x={EDIT.x} y={rowMid - OPT_H / 2} w={EDIT.w} h={OPT_H} at={editAt + i * 3} tone="bad" title="an edit to working code" size={21} dim={dim} />

@@ -73,7 +73,8 @@ export const FitScene: React.FC = () => {
         ]}
       />
 
-      <Spot id="distributions-dress-form" at={handAt - 4} left={1560} top={y(88)} width={220} height={300} />
+      {/* The dress form, small, top right, clear of the page's edge. */}
+      <Spot id="distributions-dress-form" at={handAt - 4} left={1625} top={y(130)} width={70} height={200} />
 
       <Drift from={fitFrom} to={n.beat("always").to + 40}>
         <FigLabel n="13" title={`${FIT.n} simulated measurements, and a normal fitted to them`} at={realAt - 6} x={160} y={y(300)} />

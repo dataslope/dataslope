@@ -10,21 +10,21 @@ import { Sfx } from "../../sound/Sfx";
 import { Band, Drift, Flow, Node, OK, OK_INK, pulse, THREAD, tint, X0 } from "./parts";
 
 /** The left panel: one process, its threads sharing its memory. */
-const L = { x: X0, w: 720, top: 352, h: 404 };
+const L = { x: X0, w: 720, top: 352, h: 384 };
 const CELLS = 6;
 const CELL_W = 96;
 const CELL_GAP = 12;
-const CELL_TOP = 410;
-const CELL_H = 62;
-const THREAD_TOP = 616;
+const CELL_TOP = 414;
+const CELL_H = 70;
+const THREAD_TOP = 642;
 const THREAD_W = 170;
-const THREAD_H = 58;
+const THREAD_H = 60;
 /** The right panel: three processes, each with its own. */
 const R_X = 980;
 const P_W = 248;
 const P_GAP = 38;
 const P_TOP = 352;
-const P_H = 262;
+const P_H = 280;
 
 /** A thread, as its colored tag. */
 const ThreadTag: React.FC<{ i: number; x: number; y: number; w: number; h: number; at: number; lit?: number; children?: React.ReactNode }> = ({ i, x, y, w, h, at, lit = 0, children }) => {
@@ -81,10 +81,12 @@ export const ProcScene: React.FC = () => {
   const crashed = ease(frame, crashAt + 4, 10);
   const run = ease(frame, parallelAt, 50);
   // The message through the pipe: packed, then carried from process 1 to 3.
-  const pipeY = y(674);
+  const pipeY = y(716);
   const pipeX0 = pX(0) + P_W / 2;
   const pipeX1 = pX(2) + P_W / 2;
-  const carry = ease(frame, serialAt + 6, 40);
+  // Messages keep going through it, packed small, one after another.
+  const carryT = frame - (serialAt + 6);
+  const carry = carryT < 0 ? -1 : (carryT % 48) / 48;
 
   return (
     <AbsoluteFill>
@@ -192,43 +194,36 @@ export const ProcScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        {/* The crash: struck through, the others run on. */}
-        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: crashed }}>
-          <line x1={pX(1) + 30} y1={pTop + 30} x2={pX(1) + 30 + (P_W - 60) * crashed} y2={pTop + pH - 30} stroke={ACCENT} strokeWidth={5} strokeLinecap="round" />
-        </svg>
+        {/* The crash: one goes down, the others run on. */}
         <Note at={crashAt + 10} x={pX(0)} y={pTop + pH + h(14)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>runs on</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            runs on<span style={{ opacity: ease(frame, parallelAt, 10) }}>, in parallel</span>
+          </span>
         </Note>
         <Note at={crashAt + 10} x={pX(1)} y={pTop + pH + h(14)}>
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>crashed alone</span>
         </Note>
         <Note at={crashAt + 10} x={pX(2)} y={pTop + pH + h(14)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>runs on</span>
-        </Note>
-        <Note at={parallelAt} x={pX(2) + P_W} y={y(292) + 40} align="right">
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>in parallel</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            runs on<span style={{ opacity: ease(frame, parallelAt, 10) }}>, in parallel</span>
+          </span>
         </Note>
 
         {/* The price: a pipe, with the message packed into bytes. */}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, priceAt, 12) }}>
-          <path
-            d={`M${pipeX0},${pTop + pH + h(58)} V${pipeY} H${pipeX1} V${pTop + pH + h(58)}`}
-            fill="none"
-            stroke={INK_SOFT}
-            strokeWidth={14}
-            strokeLinejoin="round"
-            strokeOpacity={0.25}
-          />
+          {/* A tube: a wide stroke with a narrower one in the page's color inside it. */}
+          <path d={`M${pipeX0},${pTop + pH + h(54)} V${pipeY} H${pipeX1} V${pTop + pH + h(54)}`} fill="none" stroke={INK_SOFT} strokeWidth={22} strokeLinejoin="round" strokeOpacity={0.55} />
+          <path d={`M${pipeX0},${pTop + pH + h(54)} V${pipeY} H${pipeX1} V${pTop + pH + h(54)}`} fill="none" stroke={PAPER} strokeWidth={16} strokeLinejoin="round" />
         </svg>
-        {carry > 0 && carry < 1 ? (
+        {carry >= 0 ? (
           <div
             style={{
               position: "absolute",
-              left: pipeX0 + (pipeX1 - pipeX0) * carry - 22,
-              top: pipeY - 16,
-              width: 44,
-              height: 32,
-              borderRadius: 6,
+              left: pipeX0 + (pipeX1 - pipeX0) * carry - 15,
+              top: pipeY - 7,
+              width: 30,
+              height: 14,
+              borderRadius: 3,
               background: BAR,
               border: `2px solid ${PAPER}`,
             }}

@@ -25,7 +25,7 @@ const LANE_Y = 700;
 const LANE_H = 58;
 const CALL_W = 300;
 const REQS = 6;
-const POOL = { x: 1300, y: 676, w: 460, h: 112 };
+const POOL = { x: 1300, y: 676, w: 460, h: 120 };
 
 /**
  * Question 8. The page's two fetches again, with a's await replaced by a
@@ -103,13 +103,13 @@ export const BlockScene: React.FC = () => {
           { name: "b", wait: msB },
         ].map((f, i) => (
           <React.Fragment key={f.name}>
-            <Note at={swapAt - 4} x={AXIS.x - 40} y={y(GHOST[i]) + h(GHOST_H) / 2 - 13}>
+            <Note at={oneThreadAt + 4} x={AXIS.x - 40} y={y(GHOST[i]) + h(GHOST_H) / 2 - 13}>
               <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 700, color: INK_SOFT }}>{f.name}</span>
             </Note>
-            <WaitBar axis={AXIS} y={y(GHOST[i])} h={h(GHOST_H)} start={0} stop={f.wait} at={swapAt - 4} color={ds("gray", 400)} dur={12} />
+            <WaitBar axis={AXIS} y={y(GHOST[i])} h={h(GHOST_H)} start={0} stop={f.wait} at={oneThreadAt + 6 + i * 4} color={ds("gray", 400)} dur={16} />
           </React.Fragment>
         ))}
-        <Note at={swapAt} x={RIGHT_X} y={y(GHOST[0]) + h(6)}>
+        <Note at={oneThreadAt + 12} x={RIGHT_X} y={y(GHOST[0]) + h(6)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             awaiting: about <Num>{overlapped}</Num> ms
           </span>
@@ -194,6 +194,16 @@ export const BlockScene: React.FC = () => {
             </div>
           );
         })}
+        <Note at={stallsAt} x={AXIS.x} y={laneY + laneH + h(26)} out={awaitAt - 2}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            One call, and <Band at={stallsAt + 6}>every request</Band> on the loop stalls until it returns
+          </span>
+        </Note>
+
+        {/* The fix. */}
+        <Node x={POOL.x} y={y(POOL.y)} w={POOL.w} h={h(POOL.h)} at={poolAt} tone="plain" fill={PAPER} align="left" justify="flex-start">
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", marginTop: 8 }}>a thread or process pool</span>
+        </Node>
         <div
           style={{
             position: "absolute",
@@ -213,21 +223,12 @@ export const BlockScene: React.FC = () => {
         >
           <span style={{ ...label(21, moved > 0.5 ? INK : ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{callText}</span>
         </div>
-        <Note at={stallsAt} x={AXIS.x} y={laneY + laneH + h(26)} out={awaitAt - 2}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            One call, and <Band at={stallsAt + 6}>every request</Band> on the loop stalls until it returns
-          </span>
-        </Note>
-
-        {/* The fix. */}
-        <Node x={POOL.x} y={y(POOL.y)} w={POOL.w} h={h(POOL.h)} at={poolAt} tone="plain" fill={PAPER} align="left" justify="flex-start">
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", marginTop: 10 }}>
-            a thread or process pool <span style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600 }}>(run_in_executor)</span>
-          </span>
-        </Node>
-        <Flow points={[[POOL.x + CALL_W / 2 + 24, y(POOL.y) + h(POOL.h) + 6], [POOL.x + CALL_W / 2 + 24, laneY + laneH + h(70)], [AXIS.x + 120, laneY + laneH + h(70)], [AXIS.x + 120, laneY + laneH + 12]]} at={awaitAt} color={OK} width={2.6} dash="8 6" />
-        <Note at={awaitAt + 6} x={AXIS.x + 150} y={laneY + laneH + h(92)}>
+        <Flow points={[[POOL.x - 8, laneY + laneH / 2], [AXIS.x + 916, laneY + laneH / 2]]} at={awaitAt} color={OK} width={2.8} dash="8 6" />
+        <Note at={awaitAt + 6} x={AXIS.x} y={laneY + laneH + h(26)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>await its result: the loop runs on</span>
+        </Note>
+        <Note at={poolAt + 6} x={POOL.x} y={y(POOL.y + POOL.h) + h(14)}>
+          <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, whiteSpace: "nowrap" }}>loop.run_in_executor(…)</span>
         </Note>
         <Note at={libsAt} x={POOL.x} y={y(612)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>The fix: async-native libraries, or</span>

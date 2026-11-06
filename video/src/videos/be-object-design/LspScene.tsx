@@ -7,13 +7,13 @@ import { ACCENT, BAR, INK, INK_SOFT, PAPER } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LISKOV } from "./data";
-import { ACCENT_INK, Box, Drift, Flow, lerp, Line, Mark, Mark2, OK, OK_INK, X0 } from "./parts";
+import { ACCENT_INK, Box, Drift, Flow, lerp, Line, Mark, Mark2, OK, OK_INK, pulse, X0 } from "./parts";
 
 const NODE = { w: 210, h: 64 };
 const CALLER_X = 650;
-const UNIT = 32;
-const RECT_X = 1110;
-const SQ_X = 1470;
+const UNIT = 40;
+const RECT_X = 1080;
+const SQ_X = 1460;
 const BASE = 640;
 
 /** A shape drawn to scale, `w` by `h` units, its bottom-left corner at
@@ -82,7 +82,7 @@ export const LspScene: React.FC = () => {
   const lowRow = y(560);
   const rectBox = { x: lerp(X0, X0, fix), y: lerp(topRow, lowRow, fix) };
   const sqBox = { x: lerp(X0, X0 + 250, fix), y: lowRow };
-  const shapeBox = { x: X0 + 125, y: topRow };
+  const shapeBox = { x: X0 + 65, y: topRow - 12, w: 330, h: NODE.h + 12 };
 
   // The run: width then height, on a rectangle, then on a square.
   const rw = lerp(2, LISKOV.width, ease(frame, widthAt + 4, 12));
@@ -117,30 +117,42 @@ export const LspScene: React.FC = () => {
         </Line>
 
         {/* The hierarchy. */}
-        <Line x={X0} y={topRow - 46} at={trapAt} size={21} color={ACCENT_INK} weight={700} out={fixAt}>
+        <Line x={X0} y={topRow - 60} at={trapAt} size={21} color={ACCENT_INK} weight={700} out={fixAt}>
           The classic trap
         </Line>
-        <Line x={X0} y={topRow - 46} at={fixAt + 10} size={21} color={OK_INK} weight={700}>
+        <Line x={X0} y={topRow - 60} at={fixAt + 10} size={21} color={OK_INK} weight={700}>
           The fix
         </Line>
-        <Box x={rectBox.x} y={rectBox.y} w={NODE.w} h={NODE.h} at={rectAt} title="Rectangle" />
-        <Box x={sqBox.x} y={sqBox.y} w={NODE.w} h={NODE.h} at={squareAt} title="Square" tones={[[sixteenAt, "bad"], [siblingsAt + 10, "ok"]]} />
-        <Flow points={[[X0 + 70, lowRow - 8], [X0 + 70, topRow + NODE.h + 8]]} at={squareAt + 6} out={dontAt} />
-        <Line x={X0 + 92} y={(topRow + NODE.h + lowRow) / 2 - 14} at={squareAt + 8} size={21} color={INK_SOFT} weight={650} out={dontAt}>
+        <Box x={rectBox.x} y={rectBox.y} w={NODE.w} h={NODE.h} at={usableAt + 4} title={frame < rectAt ? "Parent" : "Rectangle"} lit={pulse(frame, rectAt, 20)} />
+        <Box
+          x={sqBox.x}
+          y={sqBox.y}
+          w={NODE.w}
+          h={NODE.h}
+          at={usableAt + 10}
+          title={frame < squareAt ? "Subclass" : "Square"}
+          lit={pulse(frame, squareAt, 20)}
+          tones={[
+            [sixteenAt, "bad"],
+            [siblingsAt + 10, "ok"],
+          ]}
+        />
+        <Flow points={[[X0 + 70, lowRow - 8], [X0 + 70, topRow + NODE.h + 8]]} at={usableAt + 14} out={dontAt} />
+        <Line x={X0 + 92} y={(topRow + NODE.h + lowRow) / 2 - 14} at={usableAt + 16} size={21} color={INK_SOFT} weight={650} out={dontAt}>
           is a
         </Line>
         <Line x={X0} y={lowRow + NODE.h + 18} at={equalAt} size={21} color={INK_SOFT} weight={600} out={dontAt}>
           keeps width and height equal
         </Line>
-        <Box x={shapeBox.x} y={shapeBox.y} w={NODE.w} h={NODE.h} at={siblingsAt} title="Shape" tone="ok" sub="each works out its area" subSize={20} />
-        <Flow points={[[X0 + 105, lowRow - 8], [X0 + 105, lowRow - 34], [shapeBox.x + 60, lowRow - 34], [shapeBox.x + 60, topRow + NODE.h + 8]]} at={siblingsAt + 14} dur={12} width={2.2} head={12} />
-        <Flow points={[[X0 + 355, lowRow - 8], [X0 + 355, lowRow - 34], [shapeBox.x + 150, lowRow - 34], [shapeBox.x + 150, topRow + NODE.h + 8]]} at={siblingsAt + 18} dur={12} width={2.2} head={12} />
+        <Box x={shapeBox.x} y={shapeBox.y} w={shapeBox.w} h={shapeBox.h} at={siblingsAt} title="Shape" tone="ok" sub="each works out its own area" subSize={20} />
+        <Flow points={[[X0 + NODE.w / 2, lowRow - 8], [X0 + NODE.w / 2, topRow + NODE.h + 8]]} at={siblingsAt + 14} dur={10} width={2.2} head={12} />
+        <Flow points={[[X0 + 250 + NODE.w / 2, lowRow - 8], [X0 + 250 + NODE.w / 2, topRow + NODE.h + 8]]} at={siblingsAt + 18} dur={10} width={2.2} head={12} />
         <Line x={X0} y={lowRow + NODE.h + 18} at={resizedAt} size={22} weight={600} color={OK_INK}>
           Or: shapes that can&apos;t be resized
         </Line>
 
         {/* The caller written for rectangles. */}
-        <Line x={CALLER_X} y={topRow - 46} at={codeAt} size={21} color={INK_SOFT} weight={700}>
+        <Line x={CALLER_X} y={topRow - 60} at={codeAt} size={21} color={INK_SOFT} weight={700}>
           Code written for rectangles
         </Line>
         {[
@@ -156,41 +168,41 @@ export const LspScene: React.FC = () => {
         ))}
 
         {/* The rule, in plain words. */}
-        <Line x={CALLER_X} y={y(598)} at={demandAt - 4} size={25} weight={600}>
+        <Line x={CALLER_X} y={y(764)} at={demandAt - 4} size={25} weight={600}>
           A subclass mustn&apos;t <Mark at={demandAt + 4}>demand more</Mark> of its callers,
         </Line>
-        <Line x={CALLER_X} y={y(598) + 48} at={promiseAt - 2} size={25} weight={600}>
+        <Line x={CALLER_X} y={y(764) + 48} at={promiseAt - 2} size={25} weight={600}>
           or <Mark at={promiseAt + 4}>promise them less</Mark>.
         </Line>
 
-        {/* The two shapes, to scale. */}
-        <Line x={RECT_X} y={topRow - 46} at={rectAt} size={21} color={INK_SOFT} weight={700}>
+        {/* The two shapes, to scale, each named under its base. */}
+        <Shape x={RECT_X} base={base} w={rw} h={rh} at={rectAt} tone={rectDone ? "ok" : "data"} />
+        <Line x={RECT_X} y={base + 14} at={rectAt} size={21} color={INK_SOFT} weight={700}>
           rectangle
         </Line>
-        <Shape x={RECT_X} base={base} w={rw} h={rh} at={rectAt} tone={rectDone ? "ok" : "data"} />
-        <Line x={RECT_X} y={base + 18} at={widthAt + 4} size={25} weight={700} color={rectDone ? OK_INK : INK}>
+        <Line x={RECT_X} y={base + 46} at={widthAt + 4} size={25} weight={700} color={rectDone ? OK_INK : INK}>
           <span style={{ fontVariantNumeric: "tabular-nums" }}>
             {Math.round(rw)} × {Math.round(rh)}
             {rectDone ? ` = ${LISKOV.rectangle}` : ""}
           </span>
         </Line>
-        <Mark2 at={expectsAt + 8} kind="tick" size={30} style={{ left: RECT_X + 190, top: base + 18 }} />
+        <Mark2 at={expectsAt + 8} kind="tick" size={30} style={{ left: RECT_X + 160, top: base + 48 }} />
 
-        <Line x={SQ_X} y={topRow - 46} at={squareAt} size={21} color={INK_SOFT} weight={700}>
+        <Shape x={SQ_X} base={base} w={sq} h={sq} at={squareAt + 4} tone={sqDone ? "bad" : "data"} />
+        <Line x={SQ_X} y={base + 14} at={squareAt + 4} size={21} color={INK_SOFT} weight={700}>
           square
         </Line>
-        <Shape x={SQ_X} base={base} w={sq} h={sq} at={squareAt + 4} tone={sqDone ? "bad" : "data"} />
-        <Line x={SQ_X} y={base + 18} at={handAt + 8} size={25} weight={700} color={sqDone ? ACCENT_INK : INK}>
+        <Line x={SQ_X} y={base + 46} at={handAt + 8} size={25} weight={700} color={sqDone ? ACCENT_INK : INK}>
           <span style={{ fontVariantNumeric: "tabular-nums" }}>
             {Math.round(sq)} × {Math.round(sq)}
             {sqDone ? ` = ${LISKOV.square}` : ""}
           </span>
         </Line>
-        <Mark2 at={sixteenAt + 4} kind="cross" size={30} style={{ left: SQ_X + 190, top: base + 18 }} />
-        <Line x={SQ_X} y={base + 62} at={sixteenAt + 8} size={21} color={ACCENT_INK} weight={650}>
+        <Mark2 at={sixteenAt + 4} kind="cross" size={30} style={{ left: SQ_X + 160, top: base + 48 }} />
+        <Line x={SQ_X} y={base + 88} at={sixteenAt + 8} size={21} color={ACCENT_INK} weight={650}>
           expected {LISKOV.width * LISKOV.height}
         </Line>
-        <Line x={SQ_X} y={base + 62} at={tooAt} size={21} color={INK_SOFT} weight={600} out={handAt}>
+        <Line x={SQ_X} y={base + 46} at={tooAt} size={21} color={INK_SOFT} weight={600} out={handAt + 6}>
           width sets height
         </Line>
       </Drift>

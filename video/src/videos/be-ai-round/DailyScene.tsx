@@ -13,7 +13,7 @@ import { Clear, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
 const BIN_Y = 372;
 const BIN_W = 392;
 const BIN_GAP = 20;
-const BIN_H = 250;
+const BIN_H = 300;
 /** METR's two results, on one axis of time taken: zero, and a percent in px. */
 const ZERO = 800;
 const PCT = 18;
@@ -153,14 +153,14 @@ export const DailyScene: React.FC = () => {
                   borderTop: `4px solid ${i === 3 ? ds("red", 400) : BAR}`,
                   borderRadius: 12,
                   background: PAPER,
-                  padding: "18px 22px",
+                  padding: "22px 24px",
                   opacity: p,
                   transform: `translateY(${(1 - p) * 12}px)`,
                 }}
               >
-                <div style={{ ...note(26, INK), fontWeight: 750, marginBottom: 14, whiteSpace: "nowrap" }}>{b.title}</div>
+                <div style={{ ...note(28, INK), fontWeight: 750, marginBottom: 18, whiteSpace: "nowrap" }}>{b.title}</div>
                 {b.items.map((it) => (
-                  <div key={it.text} style={{ ...note(24, INK), marginBottom: 8, whiteSpace: "nowrap", opacity: ease(frame, it.at - 2, 10) }}>
+                  <div key={it.text} style={{ ...note(26, INK), marginBottom: 12, whiteSpace: "nowrap", opacity: ease(frame, it.at - 2, 10) }}>
                     {it.text}
                   </div>
                 ))}
