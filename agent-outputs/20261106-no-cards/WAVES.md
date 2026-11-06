@@ -12,10 +12,10 @@ Brief: BRIEF.md in this folder. Layout only, no re-voicing, no new images.
 
 ## Wave 2 (started)
 - DS 4-7: ds-ml-models, ds-deep-learning, ds-experiment-design, ds-experiments-in-practice (started when backend Part 3 finished)
+- DS 8-11: ds-product-sense, ds-python-pandas, ds-sql, ds-llm-evaluation (started when Parts 0 and 7 finished)
+- DA 0-4: da-interview, da-sql, da-pandas, da-statistics-communication, da-advanced-sql (same)
 
 ## Later waves (start one as each agent finishes)
-- DS 8-11: ds-product-sense, ds-python-pandas, ds-sql, ds-llm-evaluation
-- DA 0-4: da-interview, da-sql, da-pandas, da-statistics-communication, da-advanced-sql
 - DA 5-8: da-spreadsheets, da-visualization, da-ab-testing, da-ai-assisted
 - DbD 3-5: db-relationships, db-keys, db-relationship-patterns
 - DbD 6-9: db-constraints, db-normalization, db-designing-schemas, db-relational-history
