@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -166,14 +166,12 @@ export const SrmScene: React.FC = () => {
           </span>
         </Note>
         <Note at={srmAt} x={RIGHT_X} y={y(650)} out={formulaOut}>
-          {/* The verdict as words, in the trap's red and the heaviest weight
-              on the page, swelling as it is named. */}
+          {/* The verdict, a red house badge, swelling as it is named. */}
           <span
             style={{
-              display: "inline-block",
-              ...note(30, ACCENT_INK),
+              ...note(28),
+              ...badgeStyle("red", 28),
               fontWeight: 800,
-              whiteSpace: "nowrap",
               transform: `scale(${1 + 0.06 * bump})`,
               transformOrigin: "left center",
             }}

@@ -7,7 +7,7 @@ import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Cross, Drift, Edge, OK, OK_INK, Pill, TaskBox, type Tone } from "./parts";
+import { Cross, Drift, Edge, OK, Pill, TaskBox, type Tone } from "./parts";
 
 const X_START = 140;
 const BOX_W = 104;

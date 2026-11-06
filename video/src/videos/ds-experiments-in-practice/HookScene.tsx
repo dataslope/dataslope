@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, NOVELTY, SRM } from "./data";
@@ -102,17 +102,17 @@ export const HookScene: React.FC = () => {
               <span style={{ width: 10, height: 10, borderRadius: 5, background: OK, opacity: live }} />
               live
             </span>
-            {/* The verdict somebody wants, at the title line's end: green
-                words where a stamp was, struck when it turns to nothing. */}
+            {/* The verdict somebody wants, at the title line's end: a green
+                house badge where the stamp was, struck when it turns to
+                nothing. */}
             {stamp > 0.001 ? (
               <span
                 style={{
+                  ...label(24),
+                  ...badgeStyle("green", 24),
                   position: "relative",
                   marginLeft: "auto",
-                  display: "inline-block",
-                  ...label(26, OK_INK),
                   fontWeight: 800,
-                  whiteSpace: "nowrap",
                   transform: `scale(${0.6 + 0.4 * Math.min(1, stamp)})`,
                   transformOrigin: "right center",
                   opacity: Math.min(1, stamp),
@@ -122,9 +122,9 @@ export const HookScene: React.FC = () => {
                 <span
                   style={{
                     position: "absolute",
-                    left: -4,
-                    top: "52%",
-                    width: `calc((100% + 8px) * ${stampStrike})`,
+                    left: 8,
+                    top: "50%",
+                    width: `calc((100% - 16px) * ${stampStrike})`,
                     height: 4,
                     background: ACCENT,
                     borderRadius: 2,

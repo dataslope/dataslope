@@ -255,7 +255,7 @@ export const MetricScene: React.FC = () => {
                       key={it.text}
                       style={{
                         display: "flex",
-                        marginTop: i === 0 ? 14 : 12,
+                        marginTop: i === 0 ? 14 : 16,
                         opacity: p,
                         transform: `translateY(${(1 - p) * 10}px)`,
                       }}

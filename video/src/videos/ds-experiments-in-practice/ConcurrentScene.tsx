@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CONTROL, Drift, OK, OK_INK, pulse, TREAT, X0 } from "./parts";
@@ -156,31 +156,27 @@ export const ConcurrentScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* The fixes: one line of plain text in the right answer's green,
-            a middle dot between them. Each holds its place before it inks,
-            so the line never reflows. */}
-        <div style={{ position: "absolute", left: X0, top: y(830), display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
+        {/* The fixes: green house badges in a row, held apart by their gap.
+            Each holds its place before it inks, so the row never reflows. */}
+        <div style={{ position: "absolute", left: X0, top: y(830), display: "flex", gap: 16, whiteSpace: "nowrap" }}>
           {[
             { text: "separate their users", at: separateAt },
             { text: "run them one after the other", at: afterAt },
             { text: "analyze them together: a factorial design", at: factorialAt },
-          ].map((f, i) => {
+          ].map((f) => {
             const p = ease(frame, f.at - 2, 12);
             return (
-              <React.Fragment key={f.text}>
-                {i > 0 ? <span style={{ ...note(24, INK_SOFT), margin: "0 18px", opacity: p }}>·</span> : null}
-                <span
-                  style={{
-                    display: "inline-block",
-                    ...note(24, OK_INK),
-                    fontWeight: 700,
-                    opacity: p,
-                    transform: `translateY(${(1 - p) * 10}px)`,
-                  }}
-                >
-                  {f.text}
-                </span>
-              </React.Fragment>
+              <span
+                key={f.text}
+                style={{
+                  ...note(24),
+                  ...badgeStyle("green", 24),
+                  opacity: p,
+                  transform: `translateY(${(1 - p) * 10}px)`,
+                }}
+              >
+                {f.text}
+              </span>
             );
           })}
         </div>

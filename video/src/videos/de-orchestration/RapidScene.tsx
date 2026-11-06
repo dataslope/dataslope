@@ -4,8 +4,8 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { Badge, badgeStyle, NextLine, Note } from "../../editorial/ui";
+import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FRESH } from "./data";
@@ -127,16 +127,14 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
               top: c.y(350) + row * c.h(78),
               width: 290,
               height: c.h(62),
+              ...badgeStyle(t.base ? "gray" : "blue", 24),
+              padding: 0,
               boxSizing: "border-box",
-              border: `2px solid ${t.base ? INK_SOFT : BAR}`,
-              borderRadius: 10,
-              background: t.base ? PAPER : `color-mix(in srgb, ${BAR} 10%, ${PAPER})`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              ...note(24, t.base ? INK_SOFT : BLUE_INK),
+              fontFamily: SANS,
               fontWeight: 650,
-              whiteSpace: "nowrap",
               opacity: p,
               transform: `translateY(${(1 - p) * 10}px)`,
             }}
@@ -270,12 +268,9 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
         {metas.map((m) => {
           const p = ease(frame, m.at - 2, 10);
           return (
-            <span
-              key={m.text}
-              style={{ padding: "4px 14px", border: `2px solid ${BLUE_INK}`, borderRadius: 999, ...label(22, BLUE_INK), whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}
-            >
+            <Badge key={m.text} tone="blue" size={22} style={{ fontFamily: SANS, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
               {m.text}
-            </span>
+            </Badge>
           );
         })}
         <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, dataAt, 10) }}>kept as data</span>

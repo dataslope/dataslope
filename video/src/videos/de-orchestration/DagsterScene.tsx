@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CodeSpan, Drift, Edge, OK, OK_INK, Pill, TaskBox, VRule, X0 } from "./parts";
+import { CodeSpan, Drift, Edge, OK, Pill, TaskBox, VRule, X0 } from "./parts";
 
 const LEFT = X0;
 const RIGHT_X = 1000;

@@ -250,6 +250,10 @@ export const OrderScene: React.FC = () => {
   );
 };
 
+/** The step discs' gray, a little stronger than the house badge's, so the
+ *  discs on the listing's gray ground read as clearly as those on the page. */
+const STEP_TINT = "color-mix(in srgb, var(--ds-gray-400) 40%, transparent)";
+
 /** A step's number on a tinted disc, the house badge with no ring. 24px,
  *  within 12% of the run order's 26px clauses and level with the listing's
  *  24px lines, so each line keeps one size; the disc is 36 to hold it,
@@ -259,6 +263,7 @@ const StepBadge: React.FC<{ n: number }> = ({ n }) => (
     style={{
       ...label(24, INK),
       ...badgeStyle("gray", 24),
+      background: STEP_TINT,
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",

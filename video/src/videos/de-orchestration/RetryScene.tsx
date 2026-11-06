@@ -4,7 +4,8 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { badgeStyle, Note, Num } from "../../editorial/ui";
+import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RETRY } from "./data";
@@ -211,18 +212,7 @@ export const RetryScene: React.FC = () => {
           </span>
         </Note>
         <Note at={alertAt + 8} x={xs[3] + R} y={lineY + h(66)} align="right">
-          <span
-            style={{
-              display: "inline-block",
-              padding: "4px 14px",
-              border: `2.4px solid ${ACCENT}`,
-              borderRadius: 8,
-              ...note(24, ACCENT_INK),
-              fontWeight: 700,
-              whiteSpace: "nowrap",
-              transform: `scale(${1 + 0.06 * ping})`,
-            }}
-          >
+          <span style={{ ...badgeStyle("red", 24), fontFamily: SANS, transform: `scale(${1 + 0.06 * ping})` }}>
             out of retries: alert
           </span>
         </Note>

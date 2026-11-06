@@ -4,7 +4,8 @@ import { ease, map } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { badgeStyle, Note, Num } from "../../editorial/ui";
+import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CodeSpan, Cross, Drift, OK, OK_INK, pulse, X0 } from "./parts";
@@ -170,16 +171,13 @@ export const SlaScene: React.FC = () => {
           </div>
         ) : null}
         <Note at={missAt + 6} x={tx(DEADLINE) - 30} y={rowY(1) - 19} align="right">
+          {/* A house badge on a paper ground, so the run under it does not
+              show through its tint. */}
           <span
             style={{
-              display: "inline-block",
-              padding: "2px 12px",
-              border: `2.4px solid ${ACCENT}`,
-              borderRadius: 8,
-              background: PAPER,
-              ...note(22, ACCENT_INK),
-              fontWeight: 700,
-              whiteSpace: "nowrap",
+              ...badgeStyle("red", 22),
+              fontFamily: SANS,
+              background: `linear-gradient(${badgeStyle("red").background}, ${badgeStyle("red").background}), ${PAPER}`,
               transform: `scale(${1 + 0.06 * ring})`,
             }}
           >

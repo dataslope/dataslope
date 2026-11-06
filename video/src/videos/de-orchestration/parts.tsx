@@ -4,9 +4,9 @@ import { arrowHead, lineLength, type Pt, roundedPolyline } from "../../component
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { MONO, SANS } from "../../theme/fonts";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { badgeStyle, type BadgeTone } from "../../editorial/ui";
+import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**

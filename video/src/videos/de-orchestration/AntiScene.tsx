@@ -4,7 +4,8 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { badgeStyle, Note, Num } from "../../editorial/ui";
+import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, PARSE } from "./data";
@@ -174,21 +175,20 @@ export const AntiScene: React.FC = () => {
         {rows.map((r, i) => (
           <Note key={r.title} at={r.at - 2} x={ROWS_X} y={y(ROW_TOP) + i * h(ROW_H)}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 18 }}>
-              {/* The number in a ring, at 25px: within 12% of the title's
-                  27, so the line keeps one size. */}
+              {/* The number on a tinted disc, no ring, at 25px: within 12%
+                  of the title's 27, so the line keeps one size. */}
               <span
                 style={{
+                  ...badgeStyle("red", 25),
                   width: 38,
                   height: 38,
+                  padding: 0,
                   flex: "0 0 38px",
-                  boxSizing: "border-box",
                   borderRadius: 19,
-                  border: `2.2px solid ${ACCENT}`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...label(25, ACCENT_INK),
-                  fontWeight: 700,
+                  fontFamily: SANS,
                   ...TABULAR,
                 }}
               >

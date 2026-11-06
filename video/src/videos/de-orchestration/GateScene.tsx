@@ -4,7 +4,8 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { Badge, Note, Num } from "../../editorial/ui";
+import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, GATE } from "./data";
@@ -98,20 +99,9 @@ export const GateScene: React.FC = () => {
           {CHECKS.map((c) => {
             const p = ease(frame, c.at - 2, 10);
             return (
-              <span
-                key={c.text}
-                style={{
-                  padding: "5px 14px",
-                  border: `2px solid ${BLUE_INK}`,
-                  borderRadius: 999,
-                  ...label(22, BLUE_INK),
-                  whiteSpace: "nowrap",
-                  opacity: p,
-                  transform: `translateY(${(1 - p) * 10}px)`,
-                }}
-              >
+              <Badge key={c.text} tone="blue" size={22} style={{ fontFamily: SANS, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
                 {c.text}
-              </span>
+              </Badge>
             );
           })}
         </div>
@@ -248,19 +238,9 @@ export const GateScene: React.FC = () => {
           })}
         </div>
         <Note at={failsAt + 4} x={cardX + cardW + 30} y={cardTop + h(10)}>
-          <span
-            style={{
-              display: "inline-block",
-              padding: "6px 16px",
-              border: `3px solid ${ACCENT}`,
-              borderRadius: 8,
-              ...note(26, ACCENT_INK),
-              fontWeight: 800,
-              whiteSpace: "nowrap",
-            }}
-          >
+          <Badge tone="red" size={26} style={{ fontFamily: SANS, fontWeight: 800 }}>
             gate fails: halt
-          </span>
+          </Badge>
         </Note>
         <Note at={failsAt + 10} x={cardX + cardW + 30} y={cardTop + h(74)}>
           <span style={{ ...label(21, OK_INK), whiteSpace: "nowrap" }}>bad data stops before anyone sees it</span>
