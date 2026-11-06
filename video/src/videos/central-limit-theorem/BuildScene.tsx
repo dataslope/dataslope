@@ -286,7 +286,8 @@ export const BuildScene: React.FC = () => {
         out={p1Out}
       />
       <Note at={avgAt} x={sx(X, WAIT_MU) + 14} y={y(428)} out={p1Out}>
-        <span style={{ ...body(30, true), color: INK }}>Average </span>
+        {/* One face and size on the line; the value carries weight and the accent. */}
+        <span style={{ ...note(28, INK) }}>Average </span>
         <span style={{ ...note(28, ACCENT_INK), fontWeight: 700 }}>{fmt(WAIT_MU)} min</span>
       </Note>
       <SpreadArrow from={sx(X, WAIT_MU)} to={sx(X, WAIT_MU + WAIT_SD)} y={y(546)} at={spreadAt - 2} out={p1Out} />

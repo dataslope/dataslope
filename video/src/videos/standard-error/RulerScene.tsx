@@ -243,7 +243,9 @@ export const RulerScene: React.FC = () => {
         <Ink at={sevenAt - 2} dur={14} style={{ position: "relative", ...note(24, ACCENT_INK), fontWeight: 700 }}>
           {fmt(TIMES.lo)} to {fmt(TIMES.hi)} s,
         </Ink>
-        <Ink at={intervalAt - 2} dur={16} style={{ position: "relative", ...body(28, true), color: INK }}>
+        {/* One line, one size, one face: the range is set apart by weight
+            and the accent, not by the serif. */}
+        <Ink at={intervalAt - 2} dur={16} style={{ position: "relative", ...note(24, INK) }}>
           a rough 95% confidence interval
         </Ink>
       </div>

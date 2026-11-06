@@ -17,7 +17,7 @@ const PANEL_W = 800;
 const Title: React.FC<{ n: number; x: number; y: number; at: number; children: React.ReactNode }> = ({ n, x, y, at, children }) => (
   <Note at={at} x={x} y={y}>
     <span style={{ ...note(29, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-      <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, marginRight: 14 }}>{n}</span>
+      <span style={{ ...note(29, ACCENT_INK), fontWeight: 700, marginRight: 14 }}>{n}</span>
       {children}
     </span>
   </Note>
