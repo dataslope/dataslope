@@ -189,7 +189,7 @@ export const RtmScene: React.FC = () => {
                 <Note at={g.afterAt + 2} x={COLS[1] + HALF + 30} y={py(g.after) - 17}>
                   <span style={{ ...note(26, g.ink), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
                     {fmt(g.after, 1)}
-                    <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>
+                    <span style={{ ...note(24, INK_SOFT), marginLeft: 12 }}>
                       {g.after > g.before ? "+" : "−"}
                       {fmt(Math.abs(g.after - g.before), 1)}
                     </span>

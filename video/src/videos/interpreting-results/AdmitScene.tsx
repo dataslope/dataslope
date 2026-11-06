@@ -269,7 +269,7 @@ export const AdmitScene: React.FC = () => {
               <Note at={r.gapAt} x={GAP_X} y={cy - 19}>
                 <span
                   style={{
-                    ...note(28, GROUP_INK[lead]),
+                    ...note(26, GROUP_INK[lead]),
                     fontWeight: 650,
                     padding: "0 8px",
                     marginLeft: -8,
@@ -278,7 +278,8 @@ export const AdmitScene: React.FC = () => {
                 >
                   {signed(gap)}
                 </span>
-                <span style={{ ...note(20, INK_SOFT), marginLeft: 8 }}>points</span>
+                {/* Within a size of the number it follows, so the two read as one line. */}
+                <span style={{ ...note(24, INK_SOFT), marginLeft: 8 }}>points</span>
               </Note>
               {i > 0 ? <Ring x={px(r.cells.women.rate)} y={cy} at={r.gapAt - 2} color={GROUP_COLOR.women} r0={radius(r.cells.women.applied)} r1={radius(r.cells.women.applied) + 40} /> : null}
               {i === 0 ? <Ring x={px(POOLED.women.rate)} y={cy} at={behindAt} color={GROUP_COLOR.women} r0={radius(POOLED.women.applied)} r1={radius(POOLED.women.applied) + 40} /> : null}

@@ -140,7 +140,7 @@ export const UnitScene: React.FC = () => {
             <Marker at={peopleAt - 2}>People</Marker>, within a district
             <span style={{ opacity: ease(frame, sevenAt - 6, 8) }}>
               : r = <span style={TABULAR}>{signed(DISTRICTS.rWithin)}</span>
-              <span style={{ ...note(21, INK_SOFT), marginLeft: 10, opacity: ease(frame, averagesAt - 4, 10) }}>averaged over the six</span>
+              <span style={{ ...note(22, INK_SOFT), marginLeft: 10, opacity: ease(frame, averagesAt - 4, 10) }}>averaged over the six</span>
             </span>
           </>,
           STAT_INK,

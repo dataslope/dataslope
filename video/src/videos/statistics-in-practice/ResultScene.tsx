@@ -145,13 +145,15 @@ export const ResultScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={a.at - 4} dur={12} style={{ left: a.x, top: top + gridH + 50, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(28, INK), ...TABULAR, fontWeight: 700 }}>
+            {/* The count, its gloss and the rate share one line, so they are
+                set within a size of each other. */}
+            <span style={{ ...note(26, INK), ...TABULAR, fontWeight: 700 }}>
               <Count to={a.k} at={a.at - 4} dur={26} format={num} />
             </span>
-            <span style={{ ...note(22, INK_SOFT), marginLeft: 10 }}>of {num(EXPERIMENT.n)} bought</span>
+            <span style={{ ...note(24, INK_SOFT), marginLeft: 10 }}>of {num(EXPERIMENT.n)} bought</span>
           </Ink>
           <Ink at={a.rateAt - 4} dur={12} style={{ left: a.x + 300, top: top + gridH + 50, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(28, INK), fontWeight: 700 }}>{fmt(pp(a.rate))}%</span>
+            <span style={{ ...note(26, INK), fontWeight: 700 }}>{fmt(pp(a.rate))}%</span>
           </Ink>
         </React.Fragment>
       ))}
