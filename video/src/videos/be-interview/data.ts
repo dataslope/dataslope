@@ -14,9 +14,9 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "be-interview";
 
-/** Whether public/images/be-interview/ holds the capybara and the spots
- *  from illustrations.json. Not generated yet (phase 2). */
-export const ILLUSTRATIONS = false;
+/** The capybara and the eight small spots from illustrations.json are
+ *  generated and imported (public/images/be-interview/). */
+export const ILLUSTRATIONS = true;
 
 export type Part = {
   n: number;
@@ -42,6 +42,15 @@ export const PARTS: readonly Part[] = [
   { n: 8, title: "Algorithms", questions: 35, video: "be-algorithms", hero: "be-algorithms-pangolin", page: "algorithms" },
   { n: 9, title: "AI round", questions: 7, video: "be-ai-round", hero: "be-ai-round-lemur", page: "ai-assisted-coding" },
 ];
+
+/** The part number of each topic video, by its folder, so a label that
+ *  points at a part ("Part 8", "Parts 1 to 5") follows PARTS if the order
+ *  changes. */
+export const partOf = (video: string): number => {
+  const part = PARTS.find((p) => p.video === video);
+  if (!part) throw new Error(`no part is the video ${video}`);
+  return part.n;
+};
 
 /** The questions the nine topic videos answer, each once: the sum of PARTS
  *  (125). */

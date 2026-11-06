@@ -7,6 +7,7 @@ import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
+import { Sfx } from "../../sound/Sfx";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -332,9 +333,10 @@ export const Band: React.FC<{ at: number; out?: number; color?: string; children
 
 // ── Spot illustrations ───────────────────────────────────────────────────────
 
-/** A watercolor spot from illustrations.json: it pops in on `at`, bobs
- *  gently, and fades on `out`. Its box is the most it may cover; the image
- *  keeps its own shape inside it. */
+/** A watercolor spot from illustrations.json: it pops in on `at` with the
+ *  house pop (el-pop at -30, on the same frame), bobs gently, and fades on
+ *  `out`. Its box is the most it may cover; the image keeps its own shape
+ *  inside it. */
 export const Spot: React.FC<{
   id: string;
   at: number;
@@ -350,8 +352,11 @@ export const Spot: React.FC<{
   const p = pop(frame, at, fps, 16);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   const d = dim === undefined ? 0 : ease(frame, dim, 20) * 0.6;
-  if (!ILLUSTRATIONS || p <= 0.001 || o >= 1) return null;
+  if (!ILLUSTRATIONS) return null;
   return (
+    <>
+      <Sfx name="el-pop" at={at} level={-30} />
+      {p <= 0.001 || o >= 1 ? null : (
     <Illustration
       video={VIDEO}
       id={`${VIDEO}-${id}`}
@@ -365,5 +370,7 @@ export const Spot: React.FC<{
         transform: `translateY(${bob(frame, 5, 110) + (1 - p) * 30}px)`,
       }}
     />
+      )}
+    </>
   );
 };
