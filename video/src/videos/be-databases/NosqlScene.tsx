@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { Cylinder, Drift, Flow, Node, Svg, X0 } from "./parts";
+import { ColumnRule, Cylinder, Drift, Flow, Node, Svg, X0 } from "./parts";
 
 const COL_HEAD = 316;
 const R_X = 980;
@@ -229,6 +229,10 @@ export const NosqlScene: React.FC = () => {
 
         {/* ── Phase 1, right: NoSQL ── */}
         <div style={{ opacity: out1 }}>
+          <ColumnRule x={R_X - 34} top={y(COL_HEAD)} bottom={y(SHAPES_TOP) + SHAPE_H + h(156)} at={noAt - 2} />
+          {[1, 2].map((k) => (
+            <ColumnRule key={k} x={R_X + k * (SHAPE_W + SHAPE_GAP) - SHAPE_GAP / 2} top={y(SHAPES_TOP)} bottom={y(SHAPES_TOP) + SHAPE_H + h(82)} at={k === 1 ? kvAt : wideAt} />
+          ))}
           <Ink at={noAt - 2} dur={14} style={{ left: R_X, top: y(COL_HEAD), whiteSpace: "nowrap" }}>
             <span style={{ ...label(26, INK), fontWeight: 700 }}>NoSQL</span>
           </Ink>
@@ -251,7 +255,7 @@ export const NosqlScene: React.FC = () => {
               ))}
             </span>
           </Note>
-          <Shape x={R_X} y={y(SHAPES_TOP)} at={schemaAt} name="document" pattern="any shape, and it changes">
+          <Shape x={R_X} y={y(SHAPES_TOP)} at={schemaAt} name="document" pattern="any shape, changing">
             <div style={{ position: "absolute", left: 0, top: 26 }}>
               {['{', '  "name": "Ava",', '  "tags": ["vip"],', '  "address": {…}', '}'].map((l, i) => (
                 <div key={i} style={mono(i === 0 || i === 4 ? INK_SOFT : INK)}>
@@ -260,7 +264,7 @@ export const NosqlScene: React.FC = () => {
               ))}
             </div>
           </Shape>
-          <Shape x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP)} at={kvAt} name="key-value" pattern="get one value by its key">
+          <Shape x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP)} at={kvAt} name="key-value" pattern="one value per key">
             <div style={{ position: "absolute", left: 0, top: 22, display: "flex", flexDirection: "column", gap: 14 }}>
               {["user:41", "user:42", "user:43", "user:44"].map((k, i) => (
                 <div key={k} style={{ display: "flex", gap: 10, alignItems: "center", opacity: ease(frame, kvAt + 2 + i * 2, 8) }}>

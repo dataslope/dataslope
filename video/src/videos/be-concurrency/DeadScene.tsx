@@ -9,7 +9,7 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DEADLOCK } from "./data";
-import { Drift, Flow, LockGlyph, OK, OK_INK, pulse, THREAD, ThreadName, tint, X0 } from "./parts";
+import { Drift, Flow, LockGlyph, OK, OK_INK, pulse, THREAD, ThreadName, tint, VRule, X0 } from "./parts";
 
 /** The wait-for picture, in layout units: two locks between two threads. */
 const A = { x: 410, y: 350, w: 140, h: 64 };
@@ -274,6 +274,7 @@ export const DeadScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+        <VRule x={FIX_X - 32} top={rowY(0)} height={rowY(3) + h(70) - rowY(0)} at={globalAt} />
         <Note at={breakAt} x={ROW_X} y={rowY(4) + h(6)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Break any one, and it can&apos;t happen</span>
         </Note>

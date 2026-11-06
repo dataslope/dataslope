@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE, KEY } from "./data";
-import { Arrow, artH, Drift, InlineArrow, int, Line, Mark, Spot, X0 } from "./parts";
+import { Arrow, artH, Drift, InlineArrow, int, Line, Mark, Spot, VRule, X0 } from "./parts";
 
 const CARD_W = 600;
 const RX = 1060;
@@ -102,6 +102,7 @@ export const KeyScene: React.FC = () => {
             </div>
           );
         })}
+        <VRule x={645} top={cardY} bottom={cardY + 80} at={otherAt - 2} />
         <Line x={X0} y={cardY - 52} at={apiAt} size={22} weight={650} color={INK_SOFT}>
           The API, in two calls
         </Line>
@@ -162,7 +163,7 @@ export const KeyScene: React.FC = () => {
         </Line>
 
         {/* Or a hash. */}
-        <div style={{ position: "absolute", left: RX - 50, top: secY - 4, width: 1.5, height: y(820) - secY, background: HAIRLINE, opacity: ease(frame, hashAt, 12) }} />
+        <VRule x={905} top={secY} bottom={y(732) + 84} at={hashAt} />
         <Line x={RX} y={secY} at={hashAt} size={28} weight={700}>
           Or a hash of the long URL
         </Line>

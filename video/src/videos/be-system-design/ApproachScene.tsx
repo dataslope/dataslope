@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE } from "./data";
-import { Arrow, Drift, InlineArrow, int, Line, Mark, X0 } from "./parts";
+import { Arrow, Drift, InlineArrow, int, Line, Mark, VRule, X0 } from "./parts";
 
 const NF_X = 900;
 const ROW_SIZE = 27;
@@ -167,6 +167,7 @@ export const ApproachScene: React.FC = () => {
             Non-functional
           </Mark>
         </Line>
+        <VRule x={785} top={headY} bottom={row(3) + 36} at={listsAt + 6} />
         {qualities.map((q, i) => (
           <Line key={q.name} x={NF_X} y={row(i)} at={nfWords[i]} size={ROW_SIZE} weight={600}>
             {q.name}
@@ -252,6 +253,8 @@ export const ApproachScene: React.FC = () => {
             </svg>
           </React.Fragment>
         ))}
+        <VRule x={583} top={figY} bottom={figY + 104} at={billionAt} />
+        <VRule x={1308} top={figY} bottom={figY + 104} at={sayAt} />
         <Line x={1400} y={figY} at={sayAt} size={27} weight={700} width={420}>
           Say each assumption out loud
         </Line>

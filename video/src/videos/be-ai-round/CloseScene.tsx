@@ -7,7 +7,7 @@ import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PRACTICE, SERIES } from "./data";
-import { Drift, hasArt, Kicker, line, Mark, Spot, X0 } from "./parts";
+import { ColumnRule, Drift, hasArt, Kicker, line, Mark, Spot, X0 } from "./parts";
 
 const COL_W = 168;
 const LEFT = (1920 - SERIES.length * COL_W) / 2;
@@ -15,8 +15,8 @@ const ART_W = 138;
 const ART_H = 124;
 const ROW_V = 176;
 const CARD_V = 700;
-const CARD_W = 530;
-const CARD_GAP = 30;
+const CARD_W = 500;
+const CARD_GAP = 60;
 
 /**
  * The close of the series, which has no "Next" line. The series' ten heroes
@@ -126,6 +126,9 @@ export const CloseScene: React.FC = () => {
         <Note at={practice[0].at - 6} x={X0} y={y(CARD_V) - 44}>
           <span style={{ ...label(23, INK_SOFT), whiteSpace: "nowrap" }}>Practice on the track</span>
         </Note>
+        {practice.slice(1).map((p, i) => (
+          <ColumnRule key={p.text} x={X0 + (i + 1) * (CARD_W + CARD_GAP) - CARD_GAP / 2} top={y(CARD_V)} height={96} at={p.at} />
+        ))}
         {practice.map((p, i) => {
           const q = ease(frame, p.at - 2, 14);
           if (q <= 0) return null;
@@ -138,8 +141,6 @@ export const CloseScene: React.FC = () => {
                 top: y(CARD_V),
                 width: CARD_W,
                 boxSizing: "border-box",
-                borderTop: `1px solid ${HAIRLINE}`,
-                padding: "16px 0 0",
                 opacity: q,
                 transform: `translateY(${(1 - q) * 12}px)`,
               }}

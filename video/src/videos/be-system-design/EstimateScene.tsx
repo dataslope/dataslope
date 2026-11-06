@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE } from "./data";
-import { artH, Drift, int, Line, Mark, OK_INK, pulse, sig, Spot, X0 } from "./parts";
+import { artH, Drift, int, Line, Mark, OK_INK, pulse, sig, Spot, VRule, X0 } from "./parts";
 
 const ST_X = 1060;
 const BW_X = 1520;
@@ -202,17 +202,8 @@ export const EstimateScene: React.FC = () => {
         <Line x={BW_X} y={ruleY + 120} at={mbAt} size={27} weight={700} color={BLUE_INK} dim={neitherAt}>
           ≈ <Num>{Math.round(E.peakBandwidthBytesPerSecond / 1e6)}</Num> MB/s at peak
         </Line>
-        <div
-          style={{
-            position: "absolute",
-            left: ST_X - 30,
-            top: headY - 6,
-            width: 1.5,
-            height: ruleY + 226 - headY,
-            background: HAIRLINE,
-            opacity: ease(frame, stHead, 12) * (1 - small),
-          }}
-        />
+        <VRule x={962} top={headY} bottom={ruleY + 216} at={stHead} dim={neitherAt} />
+        <VRule x={1428} top={headY} bottom={ruleY + 216} at={bwHead} dim={neitherAt} />
       </Drift>
     </AbsoluteFill>
   );

@@ -7,7 +7,7 @@ import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ART, Arrow, Drift, Headline, Kicker, Mark, Spot, X0 } from "./parts";
+import { ART, Arrow, Drift, Headline, Kicker, Mark, Spot, VRule, X0 } from "./parts";
 
 /** The two changes the prompt stands for (index.mdx, "How AI has changed this
  *  interview"): fewer take-homes, more live design with "why?" follow-ups. */
@@ -130,6 +130,8 @@ export const HookScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+
+        <VRule x={582} top={cardsTop + 16} bottom={cardsTop + CARD_H / 2 + 52} at={grownAt + 4} dim={fiveAt} />
 
         {/* The plan: five questions on one design. */}
         <Ink at={fiveAt} dur={14} style={{ left: X0, top: chipY - 76 }}>

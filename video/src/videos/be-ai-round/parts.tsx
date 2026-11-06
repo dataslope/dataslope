@@ -69,6 +69,20 @@ export const lineOf = (lines: readonly string[], text: string): number => {
   return i;
 };
 
+/**
+ * The rule between two columns of text set side by side: 1px of HAIRLINE,
+ * centred in the gap at `x`, the height of the columns' text, drawn down on
+ * `at` (the column to its right's cue). README, "No cards unless the layout
+ * needs one".
+ */
+export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: number; dim?: number }> = ({ x, top, height, at, dim }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at - 2, 14);
+  const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
+  if (p <= 0) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height: height * p, background: HAIRLINE, opacity: 1 - d }} />;
+};
+
 /** A plain sentence on the page. */
 export const line = (size = 26, color: string = INK): React.CSSProperties => ({ ...note(size, color), whiteSpace: "nowrap" });
 

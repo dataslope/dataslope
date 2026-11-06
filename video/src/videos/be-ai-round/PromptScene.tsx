@@ -8,7 +8,7 @@ import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { INGREDIENTS, PROMPT } from "./data";
-import { Drift, INGREDIENT_INK, ingredientBand, line, Mark, PromptListing, X0 } from "./parts";
+import { ColumnRule, Drift, INGREDIENT_INK, ingredientBand, line, Mark, PromptListing, X0 } from "./parts";
 
 const SIZE = 25;
 const LABEL_Y = 350;
@@ -141,6 +141,7 @@ export const PromptScene: React.FC = () => {
             <b>a wish</b>
           </span>
         </Note>
+        <ColumnRule x={(X0 + LEFT_W + BETTER_X) / 2} top={y(LABEL_Y)} height={y(744) + 100 - y(LABEL_Y)} at={betterAt} />
         <Ink at={betterAt - 2} dur={12} style={{ left: BETTER_X, top: y(LABEL_Y) }}>
           <span style={{ ...label(23, OK_INK), fontWeight: 750 }}>Better</span>
         </Ink>

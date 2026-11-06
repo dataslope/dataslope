@@ -8,11 +8,11 @@ import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { METR } from "./data";
-import { Clear, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
+import { Clear, ColumnRule, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
 
 const BIN_Y = 372;
-const BIN_W = 392;
-const BIN_GAP = 20;
+const BIN_W = 362;
+const BIN_GAP = 60;
 /** METR's two results, on one axis of time taken: zero, and a percent in px. */
 const ZERO = 800;
 const PCT = 18;
@@ -135,6 +135,9 @@ export const DailyScene: React.FC = () => {
           <Note at={concreteAt} x={X0} y={binTop - 46}>
             <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>A concrete workflow</span>
           </Note>
+          {bins.slice(1).map((b, i) => (
+            <ColumnRule key={b.title} x={X0 + (i + 1) * (BIN_W + BIN_GAP) - BIN_GAP / 2} top={binTop} height={h(212)} at={b.at} />
+          ))}
           {bins.map((b, i) => {
             const p = ease(frame, b.at - 2, 12);
             if (p <= 0) return null;
@@ -147,8 +150,6 @@ export const DailyScene: React.FC = () => {
                   top: binTop,
                   width: BIN_W,
                   boxSizing: "border-box",
-                  borderTop: `1px solid ${HAIRLINE}`,
-                  padding: "18px 0 0",
                   opacity: p,
                   transform: `translateY(${(1 - p) * 12}px)`,
                 }}

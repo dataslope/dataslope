@@ -395,6 +395,21 @@ export const Pill: React.FC<{
   );
 };
 
+/**
+ * The separator between two columns of text set side by side: a vertical
+ * 1px hairline in the gap, the height of the columns' text, drawn down on
+ * `at` (the cue of the column to its right) and gone on `out`. Never before
+ * the first column or after the last, and never where an arrow already
+ * separates two columns.
+ */
+export const VRule: React.FC<{ x: number; top: number; bottom: number; at: number; out?: number }> = ({ x, top, bottom, at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 14);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height: (bottom - top) * p, background: HAIRLINE, opacity: 1 - o }} />;
+};
+
 /** A cross, drawn on `at`, in the trap's red. */
 export const Cross: React.FC<{ at: number; size?: number; color?: string }> = ({ at, size = 22, color = ACCENT }) => {
   const frame = useCurrentFrame();

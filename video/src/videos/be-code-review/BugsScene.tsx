@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, body, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, body, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -27,9 +27,9 @@ import {
   X0,
 } from "./parts";
 
-const CARD_W = 398;
+const CARD_W = 370;
 const CARD_H = 230;
-const COL = 424;
+const COL = 430;
 const ROW_GAP = 28;
 const SIZE = 20;
 
@@ -62,6 +62,16 @@ const Line: React.FC<{ at: number; children: React.ReactNode; color?: string; si
 const Op: React.FC<{ color: string; children: React.ReactNode }> = ({ color, children }) => (
   <span style={{ fontFamily: MONO, fontWeight: 700, color, fontVariantLigatures: "none" }}>{children}</span>
 );
+
+/** The rule between two columns of text: 1px, centred in the gap, drawn
+ *  down on `at` (with the column to its right), gone on `out`. */
+const ColumnRule: React.FC<{ x: number; top: number; height: number; at: number; out?: number }> = ({ x, top, height, at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 14);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  return <div style={{ position: "absolute", left: x, top, width: 1, height: height * p, background: HAIRLINE, opacity: 1 - o }} />;
+};
 
 /** One assumption ("sorted?"), plain, after a middle dot unless it leads. */
 const Assumed: React.FC<{ at: number; first?: boolean; children: React.ReactNode }> = ({ at, first, children }) => {
@@ -144,6 +154,9 @@ export const BugsScene: React.FC = () => {
   const R1 = y(330);
   const R2 = R1 + CARD_H + ROW_GAP;
   const cx = (i: number) => X0 + i * COL;
+  /** The rule left of column i, centred in the gap before it. */
+  const rule = (i: number) => Math.round(cx(i) - (COL - CARD_W) / 2);
+  const ruleH = CARD_H - 44;
 
   // The survey, gone when the cards arrive.
   const surveyOut = suspectsAt - 8;
@@ -342,6 +355,13 @@ export const BugsScene: React.FC = () => {
             </DiffRow>
           </div>
         </Card>
+
+        {/* ── Rules between the columns, each with the column to its right ── */}
+        <ColumnRule x={rule(1)} top={R1 + 14} height={ruleH} at={assumeAt - 4} />
+        <ColumnRule x={rule(2)} top={R1 + 14} height={ruleH} at={apiAt - 4} />
+        <ColumnRule x={rule(1)} top={R2 + 14} height={ruleH} at={secAt - 4} out={gone} />
+        <ColumnRule x={rule(2)} top={R2 + 14} height={ruleH} at={agreeAt - 4} out={gone} />
+        <ColumnRule x={rule(3)} top={R2 + 14} height={ruleH} at={creepAt - 4} out={gone} />
 
         {/* ── Three of them are in our diff ── */}
         <FileTab x={X0} top={diffTop - 44} at={lift + 10} name="intervals.py">

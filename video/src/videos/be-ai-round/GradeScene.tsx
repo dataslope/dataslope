@@ -7,9 +7,12 @@ import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, body, label, note }
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Clear, Cross, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
+import { Clear, ColumnRule, Cross, Drift, line, Mark, Spot, Strike, X0 } from "./parts";
 
 const RED_X = 1010;
+/** The rule between the two columns, centred between the longest row on
+ *  the left (about x 850) and the right column. */
+const RULE_X = 930;
 const ROW_Y = 374;
 const ROW_H = 58;
 const BLOCK = 66;
@@ -212,6 +215,9 @@ export const GradeScene: React.FC = () => {
             {s.text}
           </Row>
         ))}
+
+        <ColumnRule x={RULE_X} top={y(ROW_Y - 54)} height={y(ROW_Y + 4 * ROW_H) + 34 - y(ROW_Y - 54)} at={redAt} dim={guideAt} />
+        <ColumnRule x={RULE_X} top={pastY} height={BLOCK * 0.78 + h(18) + 32} at={presentAt} />
 
         {/* One prep guide's advice: part of it by hand, explained, beats a
             whole solution you can't explain. */}

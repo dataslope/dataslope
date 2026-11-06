@@ -9,7 +9,7 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BYTECODE } from "./data";
-import { Band, Drift, KeyGlyph, lineOf, Listing, listingHeight, LockGlyph, MARK_OK, Node, OK, OK_INK, Spot, THREAD, tint, X0 } from "./parts";
+import { Band, Drift, KeyGlyph, lineOf, Listing, listingHeight, LockGlyph, MARK_OK, Node, OK, OK_INK, Spot, THREAD, tint, VRule, X0 } from "./parts";
 
 const LANE_X = 250;
 const SLICE = 75;
@@ -205,6 +205,7 @@ export const GilScene: React.FC = () => {
                   refs: <Num>{o.refs}</Num>
                 </div>
               </Note>
+              {k > 0 ? <VRule x={x - 10} top={y(BOX.top + 84)} height={h(56)} at={countsAt + k * 4} out={page1Out} /> : null}
               <Ink at={withoutAt - 4 + k * 3} dur={10} out={page1Out} style={{ left: x + 54, top: y(BOX.top + 196) }}>
                 <span style={{ position: "relative", display: "inline-block" }}>
                   <LockGlyph size={30} color={ds("gray", 400)} />
@@ -271,6 +272,7 @@ export const GilScene: React.FC = () => {
           </span>
         </Note>
 
+        <VRule x={1068} top={y(330)} height={pRow(2) + h(112) - y(330)} at={procAt} />
         <Note at={procAt} x={P_X} y={y(290)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             CPU-bound: <b style={{ color: OK_INK }}>processes</b>

@@ -309,15 +309,21 @@ export const InjectionScene: React.FC = () => {
               </span>
             </span>
           </Note>
-          <Note at={leastAt} x={X0} y={y(572)}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>least privilege</span>
-          </Note>
-          <Note at={humanAt} x={X0 + 230} y={y(572)}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>human confirmation</span>
-          </Note>
-          <Note at={untrustedAt} x={X0 + 500} y={y(572)}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>output as untrusted input</span>
-          </Note>
+          <div style={{ position: "absolute", left: X0, top: y(572), display: "flex", alignItems: "baseline", gap: 14, fontSize: 23 }}>
+            {[
+              { text: "least privilege", at: leastAt },
+              { text: "human confirmation", at: humanAt },
+              { text: "output as untrusted input", at: untrustedAt },
+            ].map((d, i) => {
+              const p = ease(frame, d.at - 2, 12);
+              return (
+                <React.Fragment key={d.text}>
+                  {i > 0 ? <span style={{ ...note(23, INK_SOFT), opacity: p }}>·</span> : null}
+                  <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: p }}>{d.text}</span>
+                </React.Fragment>
+              );
+            })}
+          </div>
           <Node x={X0} y={outTop} w={240} h={h(76)} at={untrustedAt + 4} title="model output" tone="plain" size={22} />
           <Node x={480} y={outTop} w={220} h={h(76)} at={neverAt} title="validate" tone="ok" size={22} />
           <Flow points={[[X0 + 248, outTop + h(38)], [470, outTop + h(38)]]} at={neverAt + 4} />

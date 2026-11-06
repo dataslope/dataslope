@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -35,12 +35,15 @@ const PANEL_Y = 500;
 const ENVELOPE_W = 180;
 const ENVELOPE_H = 153;
 const TAKE_X = COL_L + ENVELOPE_W + 90;
+/** The take-home's lines run about 450px at 26px; the survey's block is
+ *  about 300px tall, its header to its second bar. */
+const TAKE_W = 450;
 const SURVEY_X = 1080;
+const SURVEY_H = 300;
 const TRACK_W = 560;
-/** Where the time went: three columns under the fork. */
-const MOVED_W = 540;
-const MOVED_GAP = 30;
-const movedX = (c: number) => COL_L + c * (MOVED_W + MOVED_GAP);
+/** Where the time went: three columns of text under the fork, spread
+ *  across the page's width with a hairline centred in each gap. */
+const MOVED_R = 1800;
 /** How far the three blocks, and the LLM row under them, sit below the
  *  sentence that introduces them, in px. */
 const MOVED_DROP = 76;
@@ -110,18 +113,24 @@ const SurveyBar: React.FC<{ top: number; pct: number; at: number; children: Reac
 };
 
 /** One of the three places the time went: its name and the part that
- *  answers it, as a block of text in its column. */
-const Moved: React.FC<{ c: number; at: number; title: string; part: React.ReactNode }> = ({ c, at, title, part }) => {
+ *  answers it, as a block of text in the row's flow. It holds its place
+ *  before it inks, so the row never reflows. */
+const Moved: React.FC<{ at: number; title: string; part: React.ReactNode }> = ({ at, title, part }) => {
   const frame = useCurrentFrame();
-  const { y } = useLayout();
   const p = ease(frame, at - 2, 14);
-  if (p <= 0) return null;
   return (
-    <div style={{ position: "absolute", left: movedX(c), top: y(PANEL_Y) + MOVED_DROP, width: MOVED_W, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
+    <div style={{ opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
       <div style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{title}</div>
       <div style={{ ...label(22, BLUE_INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, at + 12, 12) }}>{part}</div>
     </div>
   );
+};
+
+/** A vertical hairline between two side-by-side columns, as tall as their
+ *  text, inking in with the column to its right. */
+const Divider: React.FC<{ at: number }> = ({ at }) => {
+  const frame = useCurrentFrame();
+  return <div style={{ width: 1, alignSelf: "stretch", background: HAIRLINE, opacity: ease(frame, at - 2, 14) }} />;
 };
 
 /**
@@ -354,6 +363,21 @@ export const AiScene: React.FC = () => {
           </div>
         </div>
 
+        {/* A hairline between the take-home and the survey, as tall as the
+            survey, centred in the gap between the two, inking in with the
+            survey on its right. */}
+        <div
+          style={{
+            position: "absolute",
+            left: (TAKE_X + TAKE_W + SURVEY_X) / 2,
+            top: surveyTop + 4,
+            width: 1,
+            height: SURVEY_H,
+            background: HAIRLINE,
+            opacity: panel * ease(frame, karatAt - 2, 14),
+          }}
+        />
+
         {/* Karat's survey, sourced, with the page's caveat. */}
         <div style={{ position: "absolute", left: SURVEY_X, top: surveyTop, opacity: panel }}>
           <div style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, karatAt - 2, 12) }}>
@@ -383,18 +407,33 @@ export const AiScene: React.FC = () => {
         <div style={{ position: "absolute", left: COL_L, top: surveyTop, ...note(28, INK), whiteSpace: "nowrap", opacity: moved }}>
           The time moved to live rounds, where the interviewer <Mark at={watchAt + 2}>watches you reason</Mark>
         </div>
-        <Moved c={0} at={extendAt} title="Extend a multi-file project" part={<>Part {partOf("be-ai-round")}</>} />
-        <Moved c={1} at={readAt} title="Read and debug unfamiliar code" part={<>Part {partOf("be-code-review")}</>} />
-        <Moved
-          c={2}
-          at={designAt}
-          title="Design discussion, with follow-ups"
-          part={
-            <>
-              Parts {partOf("be-system-design")} and {partOf("be-scaling")}
-            </>
-          }
-        />
+        {/* The three spread across the page, so each hairline sits centred
+            between the text either side of it (about 120px from each). */}
+        <div
+          style={{
+            position: "absolute",
+            left: COL_L,
+            width: MOVED_R - COL_L,
+            top: y(PANEL_Y) + MOVED_DROP,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "stretch",
+          }}
+        >
+          <Moved at={extendAt} title="Extend a multi-file project" part={<>Part {partOf("be-ai-round")}</>} />
+          <Divider at={readAt} />
+          <Moved at={readAt} title="Read and debug unfamiliar code" part={<>Part {partOf("be-code-review")}</>} />
+          <Divider at={designAt} />
+          <Moved
+            at={designAt}
+            title="Design discussion, with follow-ups"
+            part={
+              <>
+                Parts {partOf("be-system-design")} and {partOf("be-scaling")}
+              </>
+            }
+          />
+        </div>
         {/* What system design now takes in: one line of words under the
             three blocks, its topics joined by middle dots, all at one size. */}
         <div

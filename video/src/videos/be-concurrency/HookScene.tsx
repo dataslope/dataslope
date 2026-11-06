@@ -6,7 +6,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } 
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Band, Block, Drift, Headline, Kicker, LockGlyph, OK_INK, SERIES, tint, X0 } from "./parts";
+import { Band, Block, Drift, Headline, Kicker, LockGlyph, OK_INK, SERIES, tint, VRule, X0 } from "./parts";
 
 /** One second of the server's time, in px. */
 const SEC = 760;
@@ -246,6 +246,9 @@ export const HookScene: React.FC = () => {
               <span style={{ ...label(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.name}</span>
             </Note>
           ))}
+          {shared.slice(1).map((s) => (
+            <VRule key={s.id} x={s.x - 20} top={y(392)} height={h(86)} at={s.at} />
+          ))}
           <Note at={bugsAt} x={1000} y={y(560)}>
             <span style={{ ...note(28, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>That&apos;s where the bugs live.</span>
           </Note>
@@ -256,14 +259,31 @@ export const HookScene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>Sixteen questions: nine with a figure each</span>
         </Note>
         {DEEP.map((name, i) => (
-          <Chip key={name} at={sixteenAt + 4 + i * 2} x={X0 + i * 162} y={y(750)} w={150} h={h(80)} n={i + 1} name={name} big />
+          <React.Fragment key={name}>
+            <Chip at={sixteenAt + 4 + i * 2} x={X0 + i * 180} y={y(750)} w={180} h={h(80)} n={i + 1} name={name} big />
+            {i > 0 ? <VRule x={X0 + i * 180} top={y(750) + h(10)} height={h(60)} at={sixteenAt + 4 + i * 2} /> : null}
+          </React.Fragment>
         ))}
         <Note at={sevenAt - 2} x={X0} y={y(852)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>and seven quickly, at the end</span>
         </Note>
-        {QUICK.map((name, i) => (
-          <Chip key={name} at={sevenAt + 2 + i * 2} x={X0 + i * 184} y={y(884)} w={172} h={h(44)} n={10 + i} name={name} big={false} />
-        ))}
+        {/* One line: the seven, a middle dot between each. */}
+        <div style={{ position: "absolute", left: X0, top: y(884), height: h(44), display: "flex", alignItems: "center", gap: "0.7em", fontSize: 20 }}>
+          {QUICK.map((name, i) => {
+            const p = ease(frame, sevenAt + 2 + i * 2, 10);
+            return (
+              <React.Fragment key={name}>
+                {i > 0 ? <span style={{ ...label(20, INK_SOFT), opacity: p }}>·</span> : null}
+                <span style={{ ...label(20, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: p }}>
+                  <span style={{ color: INK_SOFT, fontWeight: 700 }}>
+                    <Num>{10 + i}</Num>
+                  </span>{" "}
+                  {name}
+                </span>
+              </React.Fragment>
+            );
+          })}
+        </div>
       </Drift>
     </AbsoluteFill>
   );

@@ -10,7 +10,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { POOL, SEMAPHORE } from "./data";
-import { Band, Drift, Flow, Headline, Kicker, lerp, LockGlyph, Node, OK, OK_INK, SERIES, Spot, THREAD, ThreadName, tint, X0 } from "./parts";
+import { Band, Drift, Flow, Headline, Kicker, lerp, LockGlyph, Node, OK, OK_INK, SERIES, Spot, THREAD, ThreadName, tint, VRule, X0 } from "./parts";
 
 const R_X = 780;
 const LIST_TOP = 330;
@@ -623,6 +623,8 @@ export const RapidScene: React.FC = () => {
         <Headline lead="Seven more." turn="A sentence or two each." at={moreAt} turnAt={eachAt - 2} size={64} />
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={moreAt + 6} end={end} />
 
+        {/* The list and the answer beside it, a hairline between. */}
+        <VRule x={730} top={y(LIST_TOP)} height={items.length * h(ROW)} at={items[0].at} out={end} />
         {/* The bridge. */}
         <Spot id="hummingbird" at={allAt + 4} left={1120} top={y(350)} width={640} height={h(420)} />
         <Note at={allAt} x={X0} y={listBottom + h(40)}>

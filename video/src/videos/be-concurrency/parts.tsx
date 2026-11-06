@@ -4,7 +4,7 @@ import { arrowHead, lineLength, roundedPolyline, type Pt } from "../../component
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { Sfx } from "../../sound/Sfx";
@@ -351,6 +351,19 @@ export const KeyGlyph: React.FC<{ size?: number; color?: string; style?: React.C
     <path d="M14 10 H36 M30 10 V15.5 M35 10 V14" fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" />
   </svg>
 );
+
+/**
+ * The rule between two columns set side by side: a 1px hairline as tall as
+ * the columns' text, centred in the gap, drawn down on `at` (the column to
+ * its right's cue) and gone on `out`.
+ */
+export const VRule: React.FC<{ x: number; top: number; height: number; at: number; out?: number }> = ({ x, top, height, at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 14);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height: height * p, background: HAIRLINE, opacity: 1 - o }} />;
+};
 
 /** A highlighter band behind a block of text, as wide as it, swept in on `at`. */
 export const Band: React.FC<{ at: number; out?: number; color?: string; children: React.ReactNode }> = ({ at, out, color = HIGHLIGHT, children }) => {

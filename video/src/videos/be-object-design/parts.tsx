@@ -5,7 +5,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, drift, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -534,3 +534,29 @@ export const ArtSpot: React.FC<{ id: ArtId; at: number; out?: number; dim?: numb
 };
 /** The width of a spot `h` px tall. */
 export const artW = (id: ArtId, h: number) => Math.round((h * ART[id][0]) / ART[id][1]);
+
+/**
+ * The vertical hairline between two columns set side by side (README, "No
+ * cards"): 1px HAIRLINE from `top` to `bottom`, centred in the gap by the
+ * caller, inking in on `at` with the column to its right.
+ */
+export const VRule: React.FC<{ x: number; top: number; bottom: number; at: number; dim?: number; out?: number }> = ({ x, top, bottom, at, dim, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 14);
+  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.62;
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: Math.round(x),
+        top,
+        width: 1,
+        height: (bottom - top) * p,
+        background: HAIRLINE,
+        opacity: (1 - d) * (1 - o),
+      }}
+    />
+  );
+};

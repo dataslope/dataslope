@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { Drift, HERO, Headline, Kicker, Mark, Spot, X0, line } from "./parts";
+import { ColumnRule, Drift, HERO, Headline, Kicker, Mark, Spot, X0, line } from "./parts";
 
 /** The editor window: a code pane, and the assistant's pane beside it. */
 const WIN = { x: X0, w: 1020, top: 306, h: 384 };
@@ -20,7 +20,7 @@ const LABEL_X = 1184;
 const COL_W = 480;
 const COL_GAP = 100;
 const GROUP_Y = 744;
-const ROW_Y = 792;
+const ROW_Y = 790;
 const ROW_H = 36;
 
 const GROUPS = [
@@ -294,7 +294,7 @@ export const HookScene: React.FC = () => {
         <Spot id={HERO.id} at={someAt + 10} left={1490} top={y(292)} width={312} height={341} />
 
         {/* The plan: seven questions in the page's three groups, a column
-            each, set as text under a hairline. */}
+            each, set as text with a hairline between columns. */}
         {GROUPS.map((g, gi) => {
           const x0 = X0 + gi * (COL_W + COL_GAP);
           const first = GROUPS.slice(0, gi).reduce((s, q) => s + q.cards.length, 0);
@@ -304,7 +304,7 @@ export const HookScene: React.FC = () => {
               <Ink at={at - 2} dur={12} style={{ left: x0, top: y(GROUP_Y) }}>
                 <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{g.title}</span>
               </Ink>
-              <div style={{ position: "absolute", left: x0, top: y(GROUP_Y) + 38, width: COL_W * ease(frame, at, 14), height: 1, background: HAIRLINE }} />
+              {gi > 0 ? <ColumnRule x={x0 - COL_GAP / 2} top={y(GROUP_Y)} height={y(ROW_Y + 2 * ROW_H) + 30 - y(GROUP_Y)} at={at} /> : null}
               {g.cards.map((title, i) => {
                 const p = ease(frame, at + 2 + i * 4, 12);
                 if (p <= 0) return null;

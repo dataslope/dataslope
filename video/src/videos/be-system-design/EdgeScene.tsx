@@ -2,10 +2,10 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease, map } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, Line, Mark, OK, OK_INK, X0 } from "./parts";
+import { Drift, Headline, Kicker, Line, Mark, OK, OK_INK, VRule, X0 } from "./parts";
 
 const COL_B = 980;
 
@@ -118,7 +118,7 @@ export const EdgeScene: React.FC = () => {
         <WordRow x={X0} y={benY} size={28} items={benefits.map((b) => ({ ...b, ink: OK_INK }))} />
 
         {/* What goes where. */}
-        <div style={{ position: "absolute", left: COL_B - 50, top: headY - 6, width: 1.5, height: y(786) - headY, background: HAIRLINE, opacity: ease(frame, useAt, 12) }} />
+        <VRule x={901} top={headY} bottom={noteY + 192} at={dynAt} />
         <Line x={X0} y={headY} at={useAt} size={29} weight={700} color={OK_INK}>
           At the edge: <span style={{ color: INK_SOFT, fontWeight: 500 }}>static or cacheable</span>
         </Line>
