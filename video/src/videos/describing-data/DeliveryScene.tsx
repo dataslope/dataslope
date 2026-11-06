@@ -355,6 +355,19 @@ export const DeliveryScene: React.FC = () => {
           </span>
         </span>
       </Ink>
+      {/* The two steps sit side by side: a hairline in the gap, as tall as the
+          variance and its note, inking in with the root on its right. */}
+      <div
+        style={{
+          position: "absolute",
+          left: 848,
+          top: y(WORK_Y) + 2,
+          width: 1,
+          height: 68,
+          background: HAIRLINE,
+          opacity: ease(frame, rootAt - 4, 14),
+        }}
+      />
       <Ink at={rootAt - 2} dur={16} style={{ left: 1010, top: y(WORK_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, STAT_INK), fontWeight: 650 }}>
           √{fmt(DELIVERY.variance, 2)} ≈ {fmt(DELIVERY.steadySd, 1)}{" "}

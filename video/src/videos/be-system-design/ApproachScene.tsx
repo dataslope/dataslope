@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE } from "./data";
-import { Arrow, Drift, InlineArrow, int, Line, Mark, VRule, X0 } from "./parts";
+import { Arrow, Drift, InlineArrow, int, Line, Mark, reach, VRule, X0 } from "./parts";
 
 const NF_X = 900;
 const ROW_SIZE = 27;
@@ -167,7 +167,7 @@ export const ApproachScene: React.FC = () => {
             Non-functional
           </Mark>
         </Line>
-        <VRule x={785} top={headY} bottom={row(3) + 36} at={listsAt + 6} />
+        <VRule x={785} top={headY} bottom={reach(frame, headY + 40, items.map((it, i) => [it.at, row(i) + 36] as const))} at={listsAt + 6} />
         {qualities.map((q, i) => (
           <Line key={q.name} x={NF_X} y={row(i)} at={nfWords[i]} size={ROW_SIZE} weight={600}>
             {q.name}

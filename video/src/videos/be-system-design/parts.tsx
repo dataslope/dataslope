@@ -388,6 +388,12 @@ export const VRule: React.FC<{ x: number; top: number; bottom: number; at: numbe
   );
 };
 
+/** How far down a separator reaches at `frame`: from `start`, to each
+ *  bottom in turn as its column's rows arrive, so it is never taller than
+ *  the text beside it. */
+export const reach = (frame: number, start: number, steps: readonly (readonly [number, number])[]) =>
+  steps.reduce((b, [at, to]) => b + (to - b) * ease(frame, at, 14), start);
+
 /** A cross, drawn stroke by stroke on `at`, in the error's red: a failure. */
 export const Cross: React.FC<{ at: number; size?: number; color?: string }> = ({ at, size = 22, color = ACCENT }) => {
   const frame = useCurrentFrame();

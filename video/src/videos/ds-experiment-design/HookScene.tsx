@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
@@ -11,13 +11,15 @@ import { Drift, Headline, Kicker, Mark, OK, OK_INK, pulse, Spot, X0 } from "./pa
 import { mulberry32 } from "../da-statistics-communication/parts";
 
 const LINE_Y = 600;
-/** Five chips of 188 with gaps of 8 end at 1092, clear of the launch tick. */
+/** The five decisions, at 26px with 44px between them, end near 1000,
+ *  clear of the launch tick. */
 const LAUNCH_X = 1110;
 const LINE_END = 1800;
 const CHIP_Y = 460;
-const CHIP_W = 188;
-const CHIP_GAP = 8;
-const CHIP_H = 66;
+const WORD_GAP = 44;
+/** How far above the line the settled words' tops sit: their 34px line
+ *  plus 14px of air over the rule. */
+const WORD_DROP = 48;
 const DOTS_X = 1170;
 const DOTS_Y = 480;
 
@@ -117,9 +119,11 @@ export const HookScene: React.FC = () => {
         </Note>
 
         {/* Live: two versions, and users split between them at random. */}
+        {/* The two versions named in their own inks over the dots, a label
+            12px above the group it names. */}
         {[
-          { text: "A · old", color: BAR, x: DOTS_X },
-          { text: "B · new", color: OK, x: DOTS_X + 150 },
+          { text: "A · old", ink: BLUE_INK, x: DOTS_X },
+          { text: "B · new", ink: OK_INK, x: DOTS_X + 150 },
         ].map((c, i) => {
           const p = ease(frame, versionsAt + i * 4, 10);
           return (
@@ -128,11 +132,8 @@ export const HookScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: c.x,
-                top: y(DOTS_Y) - h(64),
-                padding: "4px 14px",
-                borderRadius: 6,
-                background: c.color,
-                ...label(21, PAPER),
+                top: y(DOTS_Y) - h(46),
+                ...label(24, c.ink),
                 fontWeight: 700,
                 whiteSpace: "nowrap",
                 opacity: p,
@@ -161,41 +162,50 @@ export const HookScene: React.FC = () => {
           })}
         </svg>
 
-        {/* Before launch: the five decisions, settling onto the line. */}
-        {DECISIONS.map((d, i) => {
-          const cueAt = n.word("hook", d.cue);
-          const p = ease(frame, cueAt - 2, 10);
-          if (p <= 0) return null;
-          const lift = (y(LINE_Y) - h(CHIP_H) - h(10) - y(CHIP_Y)) * drop;
-          const lit = i < 2 ? ease(frame, planAt, 10) : 0;
-          const bump = pulse(frame, cueAt, 14);
-          return (
-            <div
-              key={d.text}
-              style={{
-                position: "absolute",
-                left: X0 + i * (CHIP_W + CHIP_GAP),
-                top: y(CHIP_Y) + lift,
-                width: CHIP_W,
-                height: h(CHIP_H),
-                boxSizing: "border-box",
-                border: `2px solid ${INK}`,
-                borderRadius: 8,
-                background: lit > 0 ? `color-mix(in srgb, ${ds("yellow", 300)} ${lit * 100}%, ${PAPER})` : PAPER,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                ...note(21, INK),
-                fontWeight: 650,
-                whiteSpace: "nowrap",
-                opacity: p,
-                transform: `translateY(${(1 - p) * -14}px) scale(${1 + 0.06 * bump})`,
-              }}
-            >
-              {d.text}
-            </div>
-          );
-        })}
+        {/* Before launch: the five decisions, plain words in a row held apart
+            by space, settling onto the line. Each holds its place before it
+            inks, so the row never reflows; the two the plan starts from take
+            the highlighter on their words. */}
+        <div
+          style={{
+            position: "absolute",
+            left: X0,
+            top: y(CHIP_Y) + (y(LINE_Y) - h(WORD_DROP) - y(CHIP_Y)) * drop,
+            display: "flex",
+            gap: WORD_GAP,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {DECISIONS.map((d, i) => {
+            const cueAt = n.word("hook", d.cue);
+            const p = ease(frame, cueAt - 2, 10);
+            const lit = i < 2 ? ease(frame, planAt, 10) : 0;
+            const bump = pulse(frame, cueAt, 14);
+            return (
+              <span
+                key={d.text}
+                style={{
+                  display: "inline-block",
+                  ...note(26, INK),
+                  fontWeight: 650,
+                  opacity: p,
+                  transform: `translateY(${(1 - p) * -14}px) scale(${1 + 0.06 * bump})`,
+                }}
+              >
+                <span
+                  style={{
+                    padding: "2px 10px 3px",
+                    margin: "0 -10px",
+                    borderRadius: 6,
+                    background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, transparent)` : undefined,
+                  }}
+                >
+                  {d.text}
+                </span>
+              </span>
+            );
+          })}
+        </div>
         <Note at={undoAt - 2} x={DOTS_X} y={y(LINE_Y) + h(70)}>
           <span style={{ ...note(27, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a mistake is hard to undo once it's live</span>
         </Note>

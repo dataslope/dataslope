@@ -89,7 +89,7 @@ export const ShardScene: React.FC = () => {
         <MiniMap at={qAt} stage={5} lit="store" grow={{ shards: serversAt }} />
 
         {/* ── Partitioning, then sharding ── */}
-        <Line at={partAt} x={X0} y={y(334)} size={22} weight={700}>
+        <Line at={partAt} x={X0} y={y(334)} size={22} weight={700} dim={serversAt + 26}>
           Partitioning: one table, in pieces
         </Line>
         {[0, 1, 2, 3].map((i) => {

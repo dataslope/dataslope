@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE } from "./data";
-import { artH, Drift, int, Line, Mark, OK_INK, pulse, sig, Spot, VRule, X0 } from "./parts";
+import { artH, Drift, int, Line, Mark, OK_INK, pulse, reach, sig, Spot, VRule, X0 } from "./parts";
 
 const ST_X = 1060;
 const BW_X = 1520;
@@ -67,6 +67,13 @@ export const EstimateScene: React.FC = () => {
   const ruleY = y(360);
   const pair = (i: number) => y(456) + i * 140;
   const lit = pulse(frame, decidedAt, 30);
+  // The separators reach as far as the storage column's rows have.
+  const colBottom = reach(frame, headY + 40, [
+    [bytesAt, ruleY + 36],
+    [gbAt - 4, ruleY + 96],
+    [gbAt, ruleY + 156],
+    [tbAt, ruleY + 216],
+  ]);
 
   return (
     <AbsoluteFill>
@@ -201,8 +208,8 @@ export const EstimateScene: React.FC = () => {
         <Line x={BW_X} y={ruleY + 120} at={mbAt} size={27} weight={700} color={BLUE_INK} dim={neitherAt}>
           ≈ <Num>{Math.round(E.peakBandwidthBytesPerSecond / 1e6)}</Num> MB/s at peak
         </Line>
-        <VRule x={962} top={headY} bottom={ruleY + 216} at={stHead} dim={neitherAt} />
-        <VRule x={1428} top={headY} bottom={ruleY + 216} at={bwHead} dim={neitherAt} />
+        <VRule x={962} top={headY} bottom={colBottom} at={stHead} dim={neitherAt} />
+        <VRule x={1428} top={headY} bottom={colBottom} at={bwHead} dim={neitherAt} />
       </Drift>
     </AbsoluteFill>
   );

@@ -5,7 +5,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, Line, Mark, OK, OK_INK, VRule, X0 } from "./parts";
+import { Drift, Headline, Kicker, Line, Mark, OK, OK_INK, reach, VRule, X0 } from "./parts";
 
 const COL_B = 980;
 
@@ -118,7 +118,17 @@ export const EdgeScene: React.FC = () => {
         <WordRow x={X0} y={benY} size={28} items={benefits.map((b) => ({ ...b, ink: OK_INK }))} />
 
         {/* What goes where. */}
-        <VRule x={901} top={headY} bottom={noteY + 212} at={dynAt} />
+        <VRule
+          x={901}
+          top={headY}
+          bottom={reach(frame, itemY + 40, [
+            [ttlAt, itemY + 96],
+            [priceAt, noteY + 34],
+            [countAt - 6, noteY + 110],
+            [downAt, noteY + 212],
+          ])}
+          at={dynAt}
+        />
         <Line x={X0} y={headY} at={useAt} size={29} weight={700} color={OK_INK}>
           At the edge: <span style={{ color: INK_SOFT, fontWeight: 500 }}>static or cacheable</span>
         </Line>

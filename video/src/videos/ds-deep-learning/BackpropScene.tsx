@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BACKPROP, PAGE_CHECK } from "./data";
-import { Cells, CELL_MARK, CELL_OK, Drift, ElbowArrow, Mark, num, OK_INK, Svg, Tagline, X0 } from "./parts";
+import { Cells, CELL_MARK, CELL_OK, Drift, ElbowArrow, Mark, num, OK_INK, Tagline, X0 } from "./parts";
 
 const ROW = 432;
 const BOX_H = 80;
@@ -169,14 +169,19 @@ export const BackpropScene: React.FC = () => {
         <Tagline x={1440} y={y(SLOPE_Y)} at={localAt} size={21}>
           each step&apos;s local slope
         </Tagline>
-        {slopes.map((s) => (
+        {/* The middle slope, when the page's check is about to test it, takes
+            the highlighter on its words, as its step's box takes the tint. */}
+        {slopes.map((s, i) => (
           <Tagline key={s.text} x={s.x + s.w / 2} y={y(SLOPE_Y)} width={s.w + 80} align="center" at={s.at - 2} size={23} color={ACCENT_INK}>
-            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600 }}>{s.text}</span>
+            {i === 1 ? (
+              <Mark at={middleAt}>
+                <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600 }}>{s.text}</span>
+              </Mark>
+            ) : (
+              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600 }}>{s.text}</span>
+            )}
           </Tagline>
         ))}
-        <Svg opacity={midLit}>
-          <rect x={OPS[1].x - 40} y={y(SLOPE_Y) - 6} width={OPS[1].w + 80} height={h(40)} rx={6} fill="none" stroke={ACCENT} strokeWidth={2} />
-        </Svg>
 
         {/* ── Multiplied: the weight's gradient, and the same by hand ── */}
         <Note at={prodAt - 2} x={X0} y={y(PRODUCT_Y)}>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Axis, sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BAR, body, fmt, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { BAR, body, fmt, HAIRLINE, halo, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -13,6 +13,9 @@ import { ROW_ONE } from "./TwentyScene";
 
 const X: XScale = { lo: 50, hi: 150, x0: 160, x1: 1760 };
 const CARD_Y = 300;
+/** The gap between the two columns: the parameter's symbol note ends near
+ *  850, the statistic starts at 1000. */
+const GAP_X = 925;
 const FIG_Y = 562;
 const LABEL_Y = 626;
 const STRIP = 722;
@@ -47,11 +50,11 @@ const pickSample = (seed: number) => {
 const SAMPLE_A = pickSample(11);
 const SAMPLE_B = pickSample(12);
 
-/** One card: a name, what it describes, and its symbol, each arriving on
- *  the words that introduce it. */
+/** One column: a name, what it describes, and its symbol, each arriving on
+ *  the words that introduce it. No box and no rule over it: the two columns
+ *  are held apart by the space between them and a hairline in that gap. */
 const Card: React.FC<{
   x: number;
-  ruleAt: number;
   whatAt: number;
   at: number;
   name: string;
@@ -67,13 +70,11 @@ const Card: React.FC<{
   symbolNote: string;
   symbolNoteAt: number;
   color: string;
-}> = ({ x, ruleAt, whatAt, at, name, markAt, markOut, what, how, howAt, how2, how2At, symbol, symbolAt, symbolNote, symbolNoteAt, color }) => {
+}> = ({ x, whatAt, at, name, markAt, markOut, what, how, howAt, how2, how2At, symbol, symbolAt, symbolNote, symbolNoteAt, color }) => {
   const frame = useCurrentFrame();
   const { y } = useLayout();
-  const rule = ease(frame, ruleAt, 16);
   return (
     <>
-      <div style={{ position: "absolute", left: x, top: y(CARD_Y), width: 720 * rule, height: 2, background: INK }} />
       <Ink at={at} dur={16} style={{ left: x, top: y(CARD_Y + 22), whiteSpace: "nowrap" }}>
         <span style={{ ...body(48, true), color }}>
           <Mark at={markAt} out={markOut}>
@@ -109,7 +110,6 @@ export const ParameterScene: React.FC = () => {
   const { y, h } = useLayout();
 
   // ── Cues ──
-  const pNumberAt = n.word("parameter", "number");
   const describesAt = n.word("parameter", "describes");
   const parameterAt = n.word("parameter", "parameter");
   const fixedAt = n.word("parameter", "fixed");
@@ -188,7 +188,6 @@ export const ParameterScene: React.FC = () => {
       <AbsoluteFill style={{ opacity: cardsOp }}>
         <Card
           x={160}
-          ruleAt={pNumberAt - 4}
           whatAt={describesAt - 2}
           at={parameterAt}
           name="Parameter"
@@ -205,9 +204,23 @@ export const ParameterScene: React.FC = () => {
           symbolNoteAt={meanAt - 2}
           color={INK}
         />
+        {/* A hairline in the gap between the two columns, as tall as their
+            text and centred between the parameter's symbol note and the
+            statistic's left edge; it inks in where the statistic's column
+            begins, on "A number". */}
+        <div
+          style={{
+            position: "absolute",
+            left: GAP_X,
+            top: y(CARD_Y + 22),
+            width: 1,
+            height: y(CARD_Y + 140) + 32 - y(CARD_Y + 22),
+            background: HAIRLINE,
+            opacity: ease(frame, sNumberAt - 4, 14),
+          }}
+        />
         <Card
           x={1000}
-          ruleAt={sNumberAt - 4}
           whatAt={computeAt - 2}
           at={statisticAt}
           name="Statistic"

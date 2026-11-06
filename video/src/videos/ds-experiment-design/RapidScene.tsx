@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem, Tick } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -171,8 +171,7 @@ const AaTest: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={sameAt - 2} x={R_X + 40} y={c.y(330)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          <span style={{ padding: "0 10px", borderRadius: 5, background: BAR, color: PAPER, fontWeight: 700 }}>A</span>{" "}
-          <span style={{ padding: "0 10px", borderRadius: 5, background: BAR, color: PAPER, fontWeight: 700 }}>A</span> the same experience in both groups
+          <b style={{ color: BLUE_INK }}>A/A</b>: the same experience in both groups
         </span>
       </Note>
       <Note at={platformAt} x={R_X + 40} y={c.y(390)}>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, TABULAR, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, pulse, X0 } from "./parts";
@@ -75,16 +75,12 @@ export const PitfallsScene: React.FC = () => {
                   transform: `translateX(${(1 - s) * -18}px)`,
                 }}
               >
+                {/* The row's number, plain, in the trap's red. */}
                 <span
                   style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 22,
-                    border: `2.5px solid ${ACCENT}`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    ...label(22, ACCENT_INK),
+                    width: 32,
+                    textAlign: "right",
+                    ...note(34, ACCENT_INK),
                     fontWeight: 800,
                     ...TABULAR,
                   }}
@@ -106,20 +102,23 @@ export const PitfallsScene: React.FC = () => {
                   opacity={0.5}
                 />
               </svg>
+              {/* The question that answers it, as plain text at the leader's
+                  end, centred on the row. */}
               <div
                 style={{
                   position: "absolute",
                   left: TAG_X,
-                  top: top + (h(ROW) - 14) / 2 - 22,
-                  padding: "6px 16px",
-                  borderRadius: 6,
-                  background: BLUE_INK,
-                  ...label(22, PAPER),
+                  top: top + (h(ROW) - 14) / 2 - 18,
+                  height: 36,
+                  display: "flex",
+                  alignItems: "center",
+                  ...note(28, BLUE_INK),
                   fontWeight: 700,
                   whiteSpace: "nowrap",
                   ...TABULAR,
                   opacity: tag,
                   transform: `scale(${1 + 0.08 * bump})`,
+                  transformOrigin: "left center",
                 }}
               >
                 Question {p.q}

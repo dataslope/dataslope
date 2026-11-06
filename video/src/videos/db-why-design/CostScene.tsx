@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -26,6 +26,8 @@ const LISTING_X = 1150;
 const LISTING_Y = 345;
 /** The notes beside Postgres's reply. */
 const NOTE_X = X0 + 590;
+/** The gap between the reply and the note beside it, where their hairline sits. */
+const REPLY_GAP = 70;
 /** The anomaly's name, below "The data stays." under the copies. */
 const ANOMALY_Y = 840;
 
@@ -114,6 +116,19 @@ export const CostScene: React.FC = () => {
           <Note at={exactlyAt + 2} x={NOTE_X} y={y(300) + 38} dim={designAt}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Exactly what it was told.</span>
           </Note>
+          {/* The reply and what it did not say sit side by side: a hairline in the gap,
+              the height of the two lines, inking in with the column to its right. */}
+          <div
+            style={{
+              position: "absolute",
+              left: NOTE_X - REPLY_GAP / 2,
+              top: y(300) + 4,
+              width: 1,
+              height: 66,
+              background: HAIRLINE,
+              opacity: ease(frame, illegalAt - 2, 14),
+            }}
+          />
           {/* The fact, and the copies it became. The second copy is drawn first, so it
               slides out from under the first rather than over its text. */}
           {cardIn > 0

@@ -16,6 +16,10 @@ const AXIS = 610;
 const JIT = 46;
 const R = 5.5;
 const CARDS = 720;
+/** The two gaps between the kinds' columns: the first column's longest line
+ *  ends near 485 and the second starts at 720; the second's ends near 1034
+ *  and the third starts at 1280. */
+const GAP_X = [602, 1157];
 const JIT_Y = jitter(73, OUTLIERS.values.length);
 
 /** The lesson's three kinds of outlier, and what each one calls for. */
@@ -78,6 +82,7 @@ export const OutlierScene: React.FC = () => {
   const tailBand = ease(frame, longTailAt - 4, 16);
   const cardsOut = ease(frame, flagFrom - 6, 14) * (1 - ease(frame, decideAt - 8, 14));
   const acts = ease(frame, decideAt - 6, 16);
+  const kindShown = (i: number) => Math.max(ease(frame, kindAt[i] - 6, 14) * (1 - cardsOut), acts);
   /** The two planted earners arrive with the rest: the definition needs its far points. */
   const plantedIn = ease(frame, outlierFrom + 28, 10);
 
@@ -213,10 +218,10 @@ export const OutlierScene: React.FC = () => {
         </Tag>
       </Drift>
 
-      {/* ── The three kinds, then what each one calls for ── */}
+      {/* ── The three kinds, then what each one calls for: three columns,
+           no rule over them, a hairline in each gap ── */}
       {KINDS.map((k, i) => {
-        const p = ease(frame, kindAt[i] - 6, 14);
-        const shown = Math.max(p * (1 - cardsOut), acts);
+        const shown = kindShown(i);
         if (shown <= 0) return null;
         const left = 160 + i * 560;
         return (
@@ -225,12 +230,10 @@ export const OutlierScene: React.FC = () => {
             style={{
               position: "absolute",
               left,
-              top: y(CARDS),
+              top: y(CARDS) + 18,
               width: 500,
               opacity: shown,
               transform: `translateY(${(1 - shown) * 16}px)`,
-              borderTop: `2px solid ${HAIRLINE}`,
-              paddingTop: 16,
             }}
           >
             <div style={{ ...label(26, INK), fontWeight: 700 }}>{k.title}</div>
@@ -249,6 +252,23 @@ export const OutlierScene: React.FC = () => {
           </div>
         );
       })}
+      {/* Each hairline is as tall as the columns' three lines, centred between
+          the longest line on its left and the column on its right, and inks
+          in with that column. */}
+      {GAP_X.map((x, i) => (
+        <div
+          key={x}
+          style={{
+            position: "absolute",
+            left: x,
+            top: y(CARDS) + 18,
+            width: 1,
+            height: 118,
+            background: HAIRLINE,
+            opacity: kindShown(i + 1),
+          }}
+        />
+      ))}
       <Pulse x={160 + 560 + 8} y={y(CARDS) + 34} at={missingAt - 2} color={INK} r={6} />
       <Pulse x={160 + 1120 + 8} y={y(CARDS) + 34} at={fraudAt - 2} color={STAT} r={6} />
       <Pulse x={sx(X, 200)} y={ySpread(at(200))} at={egAt[2] - 2} color={DATA} r={7} />

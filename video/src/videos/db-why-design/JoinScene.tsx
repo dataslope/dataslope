@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -33,6 +33,9 @@ const times = (k: number) => (k === 1 ? "once" : k === 2 ? "twice" : `${k} times
  *  CHORE_STEP frames from "notebooks", so each can be read before the next. */
 const PROJECT = ["parse the text", "handle misspellings", "notebook or notebooks?", "clean up old rows"] as const;
 const CHORE_STEP = 18;
+/** The chores' second column, and the gap before it that holds their hairline. */
+const CHORE_COL = 470;
+const CHORE_GAP = 110;
 
 /**
  * Part 3 opens: which customers bought a notebook? In the lesson's clean
@@ -229,7 +232,7 @@ export const JoinScene: React.FC = () => {
             key={t}
             at={notebooksAt + 8 + i * CHORE_STEP}
             dur={14}
-            style={{ left: CARD_X + (i % 2) * 470, top: y(LOW_Y) + 104 + Math.floor(i / 2) * 48, whiteSpace: "nowrap" }}
+            style={{ left: CARD_X + (i % 2) * CHORE_COL, top: y(LOW_Y) + 104 + Math.floor(i / 2) * 48, whiteSpace: "nowrap" }}
           >
             <span style={{ ...label(22, INK), fontWeight: 560 }}>
               <span style={{ color: ACCENT_INK, fontWeight: 700, marginRight: 10 }}>{i + 1}</span>
@@ -237,6 +240,19 @@ export const JoinScene: React.FC = () => {
             </span>
           </Ink>
         ))}
+        {/* The chores' two columns: a hairline in the gap, the height of their two rows,
+            inking in with the column to its right. */}
+        <div
+          style={{
+            position: "absolute",
+            left: CARD_X + CHORE_COL - CHORE_GAP / 2,
+            top: y(LOW_Y) + 106,
+            width: 1,
+            height: 72,
+            background: HAIRLINE,
+            opacity: ease(frame, notebooksAt + 6 + CHORE_STEP, 14),
+          }}
+        />
         <Ink at={projectAt + 2} dur={18} style={{ left: CARD_X, top: y(LOW_Y) + 214, whiteSpace: "nowrap" }}>
           <span style={{ ...body(32, true), color: ACCENT_INK, background: PAPER }}>A query became a project.</span>
         </Ink>

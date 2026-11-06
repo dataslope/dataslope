@@ -9,7 +9,7 @@ import { ds, inkOf } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ACT } from "./data";
-import { Axes, Cells, CELL_MARK, CELL_OK, Curve, Drift, ElbowArrow, Mark, OK, OK_INK, type Scale, Svg, Tagline } from "./parts";
+import { Axes, Cells, CELL_MARK, CELL_OK, Curve, Drift, ElbowArrow, Mark, MARK_OK, OK, OK_INK, type Scale, Svg, Tagline } from "./parts";
 
 const BOX = { left: 170, right: 850, top: 350, bottom: 820 };
 const TANH = ds("purple", 500);
@@ -73,7 +73,19 @@ export const ActScene: React.FC = () => {
       ink: BLUE_INK,
     },
     { at: tanhAt, color: TANH, dash: undefined, text: <>tanh: −1 to 1, centered on 0</>, ink: TANH_INK },
-    { at: reluAt, color: OK, dash: undefined, text: <>ReLU: max(0, z), the hidden-layer default</>, ink: OK_INK },
+    {
+      at: reluAt,
+      color: OK,
+      dash: undefined,
+      // The default is marked on the words as it is named: a green
+      // highlight, not a box around the row.
+      text: (
+        <>
+          ReLU: max(0, z), <Mark at={defaultAt} color={MARK_OK}>the hidden-layer default</Mark>
+        </>
+      ),
+      ink: OK_INK,
+    },
     { at: leakyAt, color: OK, dash: "7 6", text: <>leaky ReLU: a small slope below zero</>, ink: OK_INK },
   ];
 
@@ -133,9 +145,6 @@ export const ActScene: React.FC = () => {
         <Tagline x={LEG_X + 60} y={y(LEG_Y) + 3 * h(LEG_ROW) + h(38)} at={geluAt - 2} size={20}>
           or GELU: a smooth curve through 0
         </Tagline>
-        <Svg opacity={ease(frame, defaultAt, 10)}>
-          <rect x={LEG_X - 14} y={y(LEG_Y) + 2 * h(LEG_ROW) - 12} width={760} height={h(LEG_ROW) - 4} rx={6} fill="none" stroke={OK} strokeWidth={2} />
-        </Svg>
 
         {/* ── Softmax: three scores into probabilities ── */}
         <Tagline x={LEG_X} y={y(SOFT_Y) - h(46)} at={softAt} size={22} color={INK}>

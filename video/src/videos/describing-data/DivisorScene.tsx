@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { sx, type XScale } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, fmt, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { BLUE_INK, fmt, HAIRLINE, halo, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -362,6 +362,19 @@ export const DivisorScene: React.FC = () => {
               </div>
             );
           })}
+          {/* The two answers sit side by side: a hairline in the gap, inking in
+              with pandas on its right and dimming with it. */}
+          <div
+            style={{
+              position: "absolute",
+              left: 808,
+              top: y(850),
+              width: 1,
+              height: 36,
+              background: HAIRLINE,
+              opacity: ease(frame, pandasAt - 8, 14) * (1 - 0.6 * ease(frame, wildAt - 4, 12)),
+            }}
+          />
           <Ink at={disagreeAt - 4} dur={16} style={{ left: 260, top: y(800), whiteSpace: "nowrap" }}>
             <span style={{ ...label(22, INK_SOFT) }}>x: the ten salaries of Fig. 1, two answers</span>
           </Ink>

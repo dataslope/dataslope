@@ -156,7 +156,7 @@ export const InvalidateScene: React.FC = () => {
               </text>
             </g>
           ))}
-          {[1, 5, 30, 60, 300, 600].map((t) => (
+          {[1, 5, 30, 60, 600].map((t) => (
             <text key={t} x={lx(t)} y={y(C.base) + 30} textAnchor={t === 1 ? "start" : t === 600 ? "end" : "middle"} style={svgText(note(20, INK_SOFT))}>
               {t >= 60 ? `${t / 60} min` : `${t} s`}
             </text>

@@ -17,7 +17,7 @@ const SRV = { w: 120, h: 86, gap: 40 };
 const LBX = { x: 790, w: 220, h: 66 };
 const SHARED = { x: 740, w: 340, h: 62 };
 /** The chart: mean wait against load. */
-const C = { x0: 1370, x1: 1790, top: 580, base: 860, max: 20 };
+const C = { x0: 1370, x1: 1790, top: 592, base: 830, max: 20 };
 
 /**
  * Question 1: a server grown taller until it meets its ceiling (vertical),
@@ -250,7 +250,7 @@ export const ScaleScene: React.FC = () => {
         })}
 
         {/* ── The chart: the simplest queue's mean wait against load. ── */}
-        <Line at={chartAt} x={C.x0 - 70} y={y(496)} size={21} weight={650} color={INK_SOFT}>
+        <Line at={chartAt} x={C.x0 - 70} y={y(512)} size={21} weight={650} color={INK_SOFT}>
           The simplest queue: mean wait, in service times
         </Line>
         <Svg opacity={ease(frame, chartAt, 12)}>
@@ -273,12 +273,9 @@ export const ScaleScene: React.FC = () => {
           ))}
           {[0, 0.5, 1].map((r) => (
             <text key={r} x={cx(r)} y={y(C.base) + 30} textAnchor={r === 1 ? "end" : r === 0 ? "start" : "middle"} style={svgText(note(20, INK_SOFT))}>
-              {Math.round(r * 100)}%
+              {Math.round(r * 100)}%{r === 1 ? " load" : ""}
             </text>
           ))}
-          <text x={(C.x0 + C.x1) / 2} y={y(C.base) + 60} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
-            load
-          </text>
           <g clipPath="url(#be-scaling-wait)">
             <path d={path} fill="none" stroke={BAR} strokeWidth={3} pathLength={1} strokeDasharray={`${curveP} 1`} />
           </g>
@@ -309,7 +306,7 @@ export const ScaleScene: React.FC = () => {
             </g>
           ) : null}
         </Svg>
-        <Ink at={roomAt + 6} dur={14} style={{ left: C.x0 - 70, top: y(C.base) + h(76), whiteSpace: "nowrap" }}>
+        <Ink at={roomAt + 6} dur={14} style={{ left: C.x0 - 70, top: y(C.base) + h(56), whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, INK), fontWeight: 650 }}>
             <Mark at={roomAt + 8}>Headroom:</Mark> run where the wait is still flat
           </span>

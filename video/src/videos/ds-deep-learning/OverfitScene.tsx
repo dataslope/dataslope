@@ -12,7 +12,8 @@ import { at, Axes, Curve, Dots, Drift, Mark, OK, OK_INK, type Scale, Svg, Taglin
 
 const LOSS = { left: 180, right: 1000, top: 380, bottom: 800 };
 const FIT = { left: 1130, right: 1760, top: 380, bottom: 640 };
-const FIX_Y = 700;
+/** The fixes sit a clear 40px under the fit's note. */
+const FIX_Y = 716;
 
 /**
  * Question 7 on the video's own toy network (one hidden layer of 100 tanh
@@ -172,8 +173,8 @@ export const OverfitScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* ── The fixes ── */}
-        <div style={{ position: "absolute", left: FIT.left, top: y(FIX_Y), width: 650, display: "flex", flexWrap: "wrap", gap: 12 }}>
+        {/* ── The fixes: plain ticked words, held apart by space ── */}
+        <div style={{ position: "absolute", left: FIT.left, top: y(FIX_Y), width: 650, display: "flex", flexWrap: "wrap", columnGap: 40, rowGap: 14 }}>
           {fixes.map((f) => {
             const p = ease(frame, f.at - 2, 10);
             const isStop = f.at === stopAt;
@@ -184,17 +185,14 @@ export const OverfitScene: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
-                  padding: "6px 14px 6px 10px",
-                  borderRadius: 22,
-                  border: `2px solid ${isStop ? OK : INK_SOFT}`,
                   opacity: p,
                   transform: `translateY(${(1 - p) * 8}px)`,
                   ...label(23, isStop ? OK_INK : INK),
-                  fontWeight: 600,
+                  fontWeight: isStop ? 700 : 600,
                   whiteSpace: "nowrap",
                 }}
               >
-                {p > 0 ? <Tick at={f.at + 2} size={20} /> : null}
+                {p > 0 ? <Tick at={f.at + 2} size={20} /> : <span style={{ width: 20 }} />}
                 {f.text}
               </div>
             );
