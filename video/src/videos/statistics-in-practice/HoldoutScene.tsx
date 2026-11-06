@@ -22,8 +22,10 @@ const RIGHT_Y = 400;
 const HELD = [...HOLDOUT.held].sort((a, b) => a - b);
 const HELD_SLOT = new Map(HELD.map((i, k) => [i, k]));
 const HELD_ROWS = Math.ceil(HELD.length / HELD_COLS);
-const CARD_LEFT = { x: 200, y: 790 };
-const CARD_RIGHT = { x: 1080, y: 790 };
+/** Where the lead's words start and land: on the left edge of the labels
+ *  on each side ("The data stays on this side.", "73 locked away"). */
+const CARD_LEFT = { x: LEFT_X - 8, y: 790 };
+const CARD_RIGHT = { x: RIGHT_X - 26, y: 790 };
 
 /**
  * The hold-out slice: split the bills before exploring, 70% to roam in and
