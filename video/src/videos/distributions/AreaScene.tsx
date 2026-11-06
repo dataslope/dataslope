@@ -62,7 +62,6 @@ export const AreaScene: React.FC = () => {
   const areaAt = n.word("area", "area under the curve");
   const betweenAt = n.word("area", "between two and eight");
   const percentAt = n.word("area", "forty-seven percent");
-  const codeAt = n.word("cdf", "code");
   const leftEightAt = n.word("cdf", "left of eight");
   const minusAt = n.word("cdf", "minus");
   const leftTwoEnd = n.word("cdf", "two", { edge: "end" });
@@ -111,8 +110,6 @@ export const AreaScene: React.FC = () => {
       />
 
       <Spot id="distributions-hourglass" at={waitingAt - 4} left={1530} top={y(88)} width={250} height={290} />
-      {/* The code, right of the lines that spell it out. */}
-      <Spot id="distributions-laptop" at={codeAt - 4} left={1530} top={y(595)} width={220} height={170} />
 
       <Drift from={exactFrom} to={n.beat("height-in").to + 40}>
         <div style={{ position: "absolute", inset: 0, opacity: 1 - dimFig }}>

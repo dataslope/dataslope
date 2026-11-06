@@ -20,7 +20,7 @@ const CHIP = 54;
 const CHIP_GAP = 16;
 
 /** A small red question mark on a box's corner: "every box has to answer". */
-const Query: React.FC<{ x: number; y: number; at: number }> = ({ x, y, at }) => {
+const Query: React.FC<{ x: number; y: number; at: number; dim: number }> = ({ x, y, at, dim }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 12);
@@ -43,7 +43,7 @@ const Query: React.FC<{ x: number; y: number; at: number }> = ({ x, y, at }) => 
         ...label(21, PAPER),
         fontWeight: 800,
         transform: `scale(${Math.min(1.2, p)})`,
-        opacity: Math.min(1, p),
+        opacity: Math.min(1, p) * (1 - ease(frame, dim, 12) * 0.65),
       }}
     >
       ?
@@ -143,7 +143,7 @@ export const HookScene: React.FC = () => {
           [STORE.x + STORE.w, top(up)],
           [STORE.x + STORE.w, top(low)],
         ].map(([qx, qy], i) => (
-          <Query key={i} x={qx - 4} y={qy + 4} at={everyAt + i * 3} />
+          <Query key={i} x={qx - 4} y={qy + 4} at={everyAt + i * 3} dim={dim} />
         ))}
 
         <Spot id="bison" at={shortAt + 6} x={1400} y={y(372)} w={420} />

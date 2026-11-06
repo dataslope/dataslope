@@ -119,9 +119,6 @@ export const BellScene: React.FC = () => {
       />
 
       <Spot id="distributions-penguin" at={flippersAt - 4} left={1540} top={y(250)} width={230} height={300} />
-      {/* "Close to a bell": a bell under the penguin, as the bell curve
-          draws. It goes before the cut, where the next figure's axis runs. */}
-      <Spot id="distributions-hand-bell" at={bellAt - 4} out={n.beat("rule").from - 24} left={1600} top={y(578)} width={120} height={190} />
 
       <Drift from={bellFrom} to={n.beat("rule-in").to + 40}>
         {/* Small effects adding up: pegs, and dots nudged down through them. */}

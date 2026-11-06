@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -276,9 +276,12 @@ export const AiScene: React.FC = () => {
         </div>
         <Flow points={fork(0)} at={splitAt} dur={16} color={INK_SOFT} width={2} />
         <Flow points={fork(1)} at={splitAt} dur={16} color={INK_SOFT} width={2} />
+        {/* Both kinds are named as the round splits, where the two arrows
+            land, so neither arrow points at an empty page while the first
+            column fills. */}
         {[
-          { c: 0, text: "AI allowed", at: someAt },
-          { c: 1, text: "AI banned", at: othersAt },
+          { c: 0, text: "AI allowed", at: splitAt + 14, read: during(frame, someAt - 2, othersAt - 4, 10) },
+          { c: 1, text: "AI banned", at: splitAt + 18, read: during(frame, othersAt - 2, cardsOut, 10) },
         ].map((head) => (
           <div
             key={head.text}
@@ -294,7 +297,18 @@ export const AiScene: React.FC = () => {
               transform: `translateY(${(1 - headIn(head.at)) * 8}px)`,
             }}
           >
-            {head.text}
+            {/* The kind being read carries the highlighter, its words given
+                back as margin so the page does not shift. */}
+            <span
+              style={{
+                padding: "2px 12px 3px",
+                margin: "0 -12px",
+                borderRadius: 8,
+                background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(head.read * 100)}%, transparent)`,
+              }}
+            >
+              {head.text}
+            </span>
           </div>
         ))}
         <div

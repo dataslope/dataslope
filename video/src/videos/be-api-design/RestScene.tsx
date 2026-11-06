@@ -197,7 +197,7 @@ export const RestScene: React.FC = () => {
                 width={2.4}
                 head={12}
               />
-              <Note at={at + 18} x={1560} y={srvTop(i) + h(18)}>
+              <Note at={at + 10} x={1560} y={srvTop(i) + h(18)}>
                 <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: BLUE_INK, whiteSpace: "nowrap" }}>200 OK</span>
               </Note>
             </React.Fragment>

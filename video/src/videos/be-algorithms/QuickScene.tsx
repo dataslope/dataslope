@@ -8,7 +8,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { QUICKSORT } from "./data";
-import { ACCENT, ACCENT_INK, Art, BAR, Drift, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, PAPER, Svg, int } from "./parts";
+import { ACCENT, ACCENT_INK, Art, BAR, Drift, OK, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, PAPER, Svg, int } from "./parts";
 
 /** Two panels on one horizontal scale: a thousand items across 720px. */
 const W = 720;

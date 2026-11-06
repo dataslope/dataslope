@@ -74,9 +74,6 @@ export const FitScene: React.FC = () => {
       />
 
       <Spot id="distributions-dress-form" at={handAt - 4} left={1560} top={y(88)} width={220} height={300} />
-      {/* The wrong shape: a square block by a round hole, under the line
-          that says it. */}
-      <Spot id="distributions-peg" at={wrongAt - 4} left={1420} top={y(851)} width={200} height={105} />
 
       <Drift from={fitFrom} to={n.beat("always").to + 40}>
         <FigLabel n="13" title={`${FIT.n} simulated measurements, and a normal fitted to them`} at={realAt - 6} x={160} y={y(300)} />

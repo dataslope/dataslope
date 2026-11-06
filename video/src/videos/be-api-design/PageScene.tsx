@@ -97,7 +97,7 @@ export const PageScene: React.FC = () => {
   const p1 = PAGE.page1;
   const shown = (ids: readonly number[]) => [ids[0], ids[1], null, ids[ids.length - 1]];
   const lists = [
-    { title: "page 1", ids: shown(p1), at: takesAt, out: undefined as number | undefined },
+    { title: "page 1", ids: shown(p1), at: takesAt },
     { title: "page 2, by offset", ids: shown(PAGE.page2Offset), at: startsAt, tone: "bad" as const },
     { title: "page 2, by cursor", ids: shown(PAGE.page2Cursor), at: afterAt + 6, tone: "ok" as const },
   ];
@@ -223,7 +223,7 @@ export const PageScene: React.FC = () => {
         {/* Drift: a new article, and page two by offset repeats one. */}
         {lists.map((l, li) => (
           <React.Fragment key={l.title}>
-            <Note at={l.at} x={LIST_X[li]} y={listTop}>
+            <Note at={li === 0 ? repeatAt : l.at} x={LIST_X[li]} y={listTop}>
               <span style={{ ...label(21, li === 0 ? INK : l.tone === "bad" ? ACCENT_INK : OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{l.title}</span>
             </Note>
             {l.ids.map((id, i) => {
@@ -259,7 +259,7 @@ export const PageScene: React.FC = () => {
         </Note>
 
         {/* The cursor, and what it decodes to. */}
-        <Note at={stoppedAt} x={LIST_X[0]} y={cursorTop}>
+        <Note at={cursorAt} x={LIST_X[0]} y={cursorTop}>
           <span style={{ fontFamily: MONO, fontSize: 24, color: INK, whiteSpace: "nowrap" }}>
             <span style={{ color: INK_SOFT }}>next_cursor: </span>
             <Mark at={stoppedAt + 8}>{PAGE.cursorToken}</Mark>

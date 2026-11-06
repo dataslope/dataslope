@@ -2,8 +2,16 @@ import React from "react";
 import { Scene } from "../../components/Scene";
 import { EditorialPage, type EditorialProps } from "../../editorial/Page";
 import { useNarration } from "../../narration/NarrationContext";
+import { AsyncScene } from "./AsyncScene";
+import { BlockScene } from "./BlockScene";
+import { ChooseScene } from "./ChooseScene";
 import { ConcScene } from "./ConcScene";
+import { DeadScene } from "./DeadScene";
+import { GilScene } from "./GilScene";
 import { HookScene } from "./HookScene";
+import { ProcScene } from "./ProcScene";
+import { RaceScene } from "./RaceScene";
+import { RapidScene } from "./RapidScene";
 
 /** Frames a scene is up before its beat's first word. */
 const LEAD = 8;
@@ -24,6 +32,14 @@ const OVERLAP = 6;
 const SCENES: [string, React.FC][] = [
   ["hook", HookScene],
   ["conc", ConcScene],
+  ["proc", ProcScene],
+  ["race", RaceScene],
+  ["gil", GilScene],
+  ["dead", DeadScene],
+  ["async", AsyncScene],
+  ["block", BlockScene],
+  ["choose", ChooseScene],
+  ["rapid-in", RapidScene],
 ];
 
 const Scenes: React.FC = () => {

@@ -10,7 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ERD } from "./data";
 import { Fig, KEY_INK } from "./kit";
-import { BoxPulse, Drift, Mark, pulse, Pulse, Spot, STAT_INK, Svg } from "./parts";
+import { BoxPulse, Drift, Mark, pulse, Pulse, STAT_INK, Svg } from "./parts";
 
 const CUSTOMERS_X = 220;
 const ORDERS_X = 1180;
@@ -113,9 +113,6 @@ export const ErdScene: React.FC = () => {
       <Sfx name="el-tap" at={fkAt} level={-30} />
       <Sfx name="el-chime" at={n.beat("line").to + 6} level={-32} />
       <Sfx name="el-pencil" at={betweenAt} level={-35} />
-      {/* The small spots arrive the way the video's other spots do. */}
-      <Sfx name="el-pop" at={primaryAt} level={-31} />
-      <Sfx name="el-pop" at={footAt} level={-31} />
 
       <Drift from={primaryAt} to={end + 80} scale={0.025} origin={[960, 520]}>
         {/* ── Headline: three pieces, named one by one ── */}
@@ -231,11 +228,6 @@ export const ErdScene: React.FC = () => {
         <Pulse x={barsX} y={lineY} at={barsAt} r={8} grow={18} color={STAT_INK} />
         <Pulse x={manyEnd.far![0]} y={lineY} at={circleAt} r={6} grow={14} color={STAT_INK} />
         <Pulse x={manyEnd.near[0]} y={lineY} at={footAt} r={8} grow={18} color={STAT_INK} />
-
-        {/* "Primary key": a key, bottom right under orders. */}
-        <Spot id="db-entities-key" at={primaryAt} left={1560} top={y(739)} width={180} height={181} />
-        {/* "A crow's foot": the bird the symbol is named for, top right above orders. */}
-        <Spot id="db-entities-crow" at={footAt} left={1530} top={y(185)} width={200} height={204} />
 
         <Note at={aloneAt - 4} x={midX} y={lineY - 96} from="up">
           <span style={{ ...note(23, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>

@@ -18,9 +18,9 @@ const B_Y = 604;
 /** A column that says what its numbers mean: the unit in its name. */
 const COLUMN = { name: "impulse_", unit: "n_s", type: "numeric" };
 /** The orbiter and Mars: small, with the right half's white all round it. */
-const ORBITER_W = 180;
-const ORBITER_H = 91;
-const ORBITER_X = 1240;
+const ORBITER_W = 190;
+const ORBITER_H = 96;
+const ORBITER_X = 1130;
 
 /**
  * Even a type is a rule: the Mars Climate Orbiter, after

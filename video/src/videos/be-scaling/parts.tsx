@@ -444,11 +444,11 @@ export const MiniMap: React.FC<{
   const shards = has("shards", 6);
   const queue = has("queue", 8);
   const limit = has("limit", 9);
-  const litList = typeof lit === "string" ? [[lit, -Infinity] as const] : lit;
+  const litList = typeof lit === "string" ? [[lit, -1e6] as const] : lit;
   const glow = (part: MapPart) => {
     let v = 0;
     litList.forEach(([q, from], i) => {
-      const until = litList[i + 1]?.[1] ?? Infinity;
+      const until = litList[i + 1]?.[1] ?? 1e9;
       if (q === part) v = Math.max(v, Math.min(ease(frame, from, 10), 1 - ease(frame, until, 10)));
     });
     return v;

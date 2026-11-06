@@ -18,6 +18,11 @@ const SLOTS_Y = 470;
 const LISTING_Y = 330;
 /** The running count beside the slots, and its unit: the slots' own letter size. */
 const COUNT_SIZE = 30;
+/** The ribbon in its box, in the open lower right. */
+const RIBBON_W = 200;
+const RIBBON_H = 192;
+const RIBBON_CX = 1610;
+const RIBBON_CY = 714;
 
 /** The two sides of the lesson's callout, "When in doubt, constrain what you control". */
 const SIDES = [
@@ -76,8 +81,6 @@ export const ClaimsScene: React.FC = () => {
       <Sfx name="el-pop" at={claimingAt} level={-31} />
       <Sfx name="el-tap" at={statusesAt} level={-30} />
       <Sfx name="el-tap" at={namesAt} level={-30} />
-      {/* The small spot arrives the way the video's other spots do. */}
-      <Sfx name="el-pop" at={worldAt} level={-31} />
 
       <Drift from={namesAt + 6} to={end + 70} scale={0.018} origin={[800, 600]}>
         <Headline
@@ -208,9 +211,8 @@ export const ClaimsScene: React.FC = () => {
           );
         })}
 
-        <Spot id="db-entities-ribbon" at={capAt} left={1440} top={y(560)} width={340} height={340} />
-        {/* "What the world sends": a desk globe, top right, above the ribbon. */}
-        <Spot id="db-entities-globe" at={worldAt} left={1560} top={y(144)} width={165} height={220} />
+        {/* The ribbon too long for its box: small, centred where the larger one sat, clear of the error and the two sides. */}
+        <Spot id="db-entities-ribbon" at={capAt} left={RIBBON_CX - RIBBON_W / 2} top={y(RIBBON_CY) - RIBBON_H / 2} width={RIBBON_W} height={RIBBON_H} />
       </Drift>
     </AbsoluteFill>
   );

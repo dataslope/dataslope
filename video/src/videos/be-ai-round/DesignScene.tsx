@@ -34,7 +34,7 @@ const CONCERNS = [
   { name: "Failure", beat: "design-fail", cue: "Failure" },
   { name: "Structured output", beat: "design-shape", cue: "Structured output" },
   { name: "Cost and abuse", beat: "design-cost", cue: "Cost and abuse" },
-  { name: "Caching", beat: "design-cost", cue: "Caching" },
+  { name: "Caching", beat: "design-cost", cue: "Caching", nth: 1 },
   { name: "Quality", beat: "design-quality", cue: "Quality" },
 ] as const;
 
@@ -70,7 +70,7 @@ export const DesignScene: React.FC = () => {
   const modelAt = n.word("design", "Treat the model");
   const risks = RISKS.map((r) => ({ ...r, at: n.word("design", r.cue) }));
   const buildAt = n.word("design", "and design for that");
-  const concerns = CONCERNS.map((c) => ({ ...c, at: n.word(c.beat, c.cue) }));
+  const concerns = CONCERNS.map((c) => ({ ...c, at: n.word(c.beat, c.cue, "nth" in c ? { nth: c.nth } : undefined) }));
   const [latAt, failAt, shapeAt, costAt, cacheAt, qualityAt] = concerns.map((c) => c.at);
   const streamAt = n.word("design-latency", "stream tokens to the client");
   const queueAt = n.word("design-latency", "Put long jobs on a queue");

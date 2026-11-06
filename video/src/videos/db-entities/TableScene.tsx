@@ -7,7 +7,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ADA_ROW, CUSTOMERS, PRICE_COL, PRICE_NAME, PRODUCTS } from "./data";
 import { DbTable, Fig, FIG_GAP, HEAD_H, MARK, Mono, ROW_H, tableGeometry } from "./kit";
-import { BoxPulse, Bracket, Drift, Headline, Mark, pulse, Spot, STAT_INK } from "./parts";
+import { BoxPulse, Bracket, Drift, Headline, Mark, pulse, STAT_INK } from "./parts";
 
 /** The tables are set larger than a listing's, so two rows read across the room. */
 const S = 1.6;
@@ -67,9 +67,6 @@ export const TableScene: React.FC = () => {
       <Sfx name="el-pencil" at={adaAt} level={-34} />
       <Sfx name="el-tap" at={ownAt} level={-29} />
       <Sfx name="el-pencil" at={priceAt} level={-35} />
-      {/* The small spots arrive the way the video's other spots do. */}
-      <Sfx name="el-pop" at={productsAt} level={-31} />
-      <Sfx name="el-pop" at={priceAt} level={-31} />
 
       <Drift from={doesntAt} to={end + 60} scale={0.018} origin={[700, 560]}>
         <Headline
@@ -134,11 +131,6 @@ export const TableScene: React.FC = () => {
         {/* "What do you need to remember": the columns, in both tables. */}
         <BoxPulse x={CUSTOMERS_X} y={top} width={gC.width * S} height={gC.headH * S} at={rememberAt} />
         <BoxPulse x={PRODUCTS_X} y={top} width={gP.width * S} height={gP.headH * S} at={rememberAt + 3} />
-
-        {/* "Products": the lesson's two, a notebook and a pen, top right above their table. */}
-        <Spot id="db-entities-notebook" at={productsAt} left={1620} top={y(184)} width={180} height={175} />
-        {/* "A product has a price": a price tag under the price column. */}
-        <Spot id="db-entities-price-tag" at={priceAt} left={1400} top={y(728)} width={220} height={176} />
 
         <Ink at={rememberFrom - 2} dur={18} style={{ left: CUSTOMERS_X, top: y(800), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>What do you need to remember about each one?</span>

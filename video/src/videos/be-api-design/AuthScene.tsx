@@ -151,13 +151,13 @@ export const AuthScene: React.FC = () => {
 
   // ── Question 8 ──
   const bTop = y(300);
-  const srvTop = y(350);
-  const storeB = { x: 200, y: y(500), w: 400, h: h(120) };
+  const srvTop = y(340);
+  const storeB = { x: 200, y: y(470), w: 400, h: h(100) };
   const jx = 980;
   const jReqW = 500;
   const twoH = msgHeight(2, 21);
-  const svcRow = y(620);
-  const tl = { x0: X0 + 340, x1: 1780, top: y(780) };
+  const svcRow = y(590);
+  const tl = { x0: X0 + 340, x1: 1780, top: y(790) };
   const SEG = 6;
   const segW = (tl.x1 - tl.x0) / SEG;
   const banX = tl.x0 + segW * 3.4;
@@ -195,7 +195,11 @@ export const AuthScene: React.FC = () => {
         {PANELS.map((p, i) => (
           <React.Fragment key={p.name}>
             <Note at={diffAt + i * 6} x={p.x} y={headTop} out={leave}>
-              <div style={{ ...label(30, INK), fontWeight: 750, whiteSpace: "nowrap" }}>{p.name}</div>
+              <div style={{ ...label(30, INK), fontWeight: 750, whiteSpace: "nowrap" }}>
+                <Mark at={[sessAt, jwtAt, oauthAt][i]} out={[jwtAt, oauthAt, leave][i]}>
+                  {p.name}
+                </Mark>
+              </div>
               <div style={{ ...note(22, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{p.asks}</div>
             </Note>
             <div style={{ position: "absolute", left: p.x, top: headTop - h(14), width: p.w, height: 2, background: INK, opacity: ease(frame, diffAt + i * 6, 12) * (1 - ease(frame, leave, 10)) }} />
@@ -205,7 +209,12 @@ export const AuthScene: React.FC = () => {
         {/* Session: an opaque ID in a cookie, and the server's store. */}
         <Note at={cookieAt} x={S.x} y={bodyTop} out={leave}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            in a cookie: <span style={{ color: INK }}><Num>{AUTH.sessionChars}</Num> random characters</span>
+            in a cookie:{" "}
+            <span style={{ color: INK }}>
+              <Mark at={charsAt}>
+                <Num>{AUTH.sessionChars}</Num> random characters
+              </Mark>
+            </span>
           </span>
         </Note>
         <Note at={idAt} x={S.x} y={cookieTop} out={leave}>
@@ -298,12 +307,12 @@ export const AuthScene: React.FC = () => {
             <Strike at={passAt + 8}>your password</Strike>
           </span>
         </Note>
-        <Note at={delegAt} x={O.x} y={bodyTop - h(4) + h(300) + h(110)} out={leave}>
+        <Note at={delegAt} x={O.x} y={svcTop + h(80) + h(28)} out={leave}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             <b>delegated</b> authorization, not a token format
           </span>
         </Note>
-        <Note at={tokensAt} x={O.x} y={bodyTop + h(300) + h(150)} out={leave}>
+        <Note at={tokensAt} x={O.x} y={svcTop + h(80) + h(68)} out={leave}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>its tokens: JWTs or opaque strings</span>
         </Note>
 
@@ -322,9 +331,9 @@ export const AuthScene: React.FC = () => {
             <Strike at={deleteAt + 4}>{sid.slice(0, 6)}… → user 42</Strike>
           </span>
         </Node>
-        <Msg x={X0} y={storeB.y + storeB.h + h(40)} w={300} at={failsAt} lines={[{ t: "GET /articles/42" }, { t: `Cookie: session=${sid.slice(0, 4)}…`, color: INK_SOFT }]} size={21} />
-        <Flow points={[[X0 + 308, storeB.y + storeB.h + h(40) + twoH / 2], [X0 + 372, storeB.y + storeB.h + h(40) + twoH / 2]]} at={failsAt + 6} color={INK_SOFT} width={2.2} head={11} />
-        <Msg x={X0 + 380} y={storeB.y + storeB.h + h(40)} w={300} at={failsAt + 10} tone="ok" lines={[{ t: "401 Unauthorized" }, { t: "refused at once", color: OK_INK }]} size={21} />
+        <Msg x={X0} y={storeB.y + storeB.h + h(28)} w={300} at={failsAt} lines={[{ t: "GET /articles/42" }, { t: `Cookie: session=${sid.slice(0, 4)}…`, color: INK_SOFT }]} size={21} />
+        <Flow points={[[X0 + 308, storeB.y + storeB.h + h(28) + twoH / 2], [X0 + 372, storeB.y + storeB.h + h(28) + twoH / 2]]} at={failsAt + 6} color={INK_SOFT} width={2.2} head={11} />
+        <Msg x={X0 + 380} y={storeB.y + storeB.h + h(28)} w={300} at={failsAt + 10} tone="ok" lines={[{ t: "401 Unauthorized" }, { t: "refused at once", color: OK_INK }]} size={21} />
 
         {/* JWTs: checked locally, valid until they expire. */}
         <Note at={locallyAt} x={jx} y={bTop}>
@@ -350,7 +359,7 @@ export const AuthScene: React.FC = () => {
             </div>
           </React.Fragment>
         ))}
-        <Note at={withoutAt} x={jx} y={svcRow + h(84)}>
+        <Note at={withoutAt} x={jx} y={svcRow + h(80)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             each verifies the signature itself, <b style={{ color: OK_INK }}>no session store</b>
           </span>

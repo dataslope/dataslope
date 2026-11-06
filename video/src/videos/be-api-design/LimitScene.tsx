@@ -99,7 +99,7 @@ export const LimitScene: React.FC = () => {
   const total = WAITS.reduce((a, b) => a + b, 0) * (1 + JITTER);
   const scale = (R_W - 40) / total;
   const waitX = WAITS.map((_, i) => R_X + WAITS.slice(0, i).reduce((a, b) => a + b * (1 + JITTER), 0) * scale);
-  const waitAt = [leastAt + 4, doublesAt + 2, doublesAt + 12];
+  const waitAt = [leastAt + 4, againAt + 2, doublesAt + 8];
 
   // ── Safe to repeat ──
   const safeTop = y(780);

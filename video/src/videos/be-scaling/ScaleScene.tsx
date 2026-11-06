@@ -17,7 +17,7 @@ const SRV = { w: 120, h: 86, gap: 40 };
 const LBX = { x: 790, w: 220, h: 66 };
 const SHARED = { x: 740, w: 340, h: 62 };
 /** The chart: mean wait against load. */
-const C = { x0: 1370, x1: 1790, top: 520, base: 860, max: 20 };
+const C = { x0: 1370, x1: 1790, top: 580, base: 860, max: 20 };
 
 /**
  * Question 1: a server grown taller until it meets its ceiling (vertical),
@@ -61,9 +61,9 @@ export const ScaleScene: React.FC = () => {
 
   // ── Vertical: one box grows until it meets the ceiling. ──
   const base = y(860);
-  const ceiling = y(452);
+  const ceiling = y(462);
   const grow = ease(frame, bigAt, 30);
-  const boxH = h(110) + (base - ceiling - 14 - h(110)) * grow;
+  const boxH = h(110) + (base - ceiling - 44 - h(110)) * grow;
   const ceilRed = ease(frame, ceilAt, 10);
   const ring = ease(frame, oneAt, 18);
   const vDim = theseAt - 4;
@@ -96,7 +96,7 @@ export const ScaleScene: React.FC = () => {
   const m90 = mark(0.9);
   const m99 = mark(0.99);
   const shade = ease(frame, roomAt, 14);
-  const up99: Pt[] = Array.from({ length: 30 }, (_, i) => [cx(m99.rho), y(C.top) + 70 - i * 2.4] as Pt);
+  const up99: Pt[] = Array.from({ length: 30 }, (_, i) => [cx(m99.rho), y(C.top) + 64 - i * 2.4] as Pt);
 
   return (
     <AbsoluteFill>
@@ -128,19 +128,19 @@ export const ScaleScene: React.FC = () => {
         </Line>
         <Svg opacity={(ease(frame, vertAt, 12)) * (1 - ease(frame, vDim, 12) * 0.65)}>
           <line x1={X0} x2={X0 + 400} y1={ceiling} y2={ceiling} stroke={ceilRed > 0.5 ? ACCENT : INK_SOFT} strokeWidth={2.4} strokeDasharray="10 8" />
-          <text x={X0 + 400} y={ceiling - 12} textAnchor="end" style={svgText({ ...label(21, ceilRed > 0.5 ? ACCENT_INK : INK_SOFT), fontWeight: 700 })}>
+          <text x={X0 + 400} y={ceiling + 32} textAnchor="end" style={svgText({ ...label(21, ceilRed > 0.5 ? ACCENT_INK : INK_SOFT), fontWeight: 700 })}>
             ceiling
           </text>
-          <line x1={X0} x2={X0 + 400} y1={base + 1} y2={base + 1} stroke={INK_SOFT} strokeWidth={1.4} />
         </Svg>
-        <Node x={V.x} y={base - boxH} w={V.w} h={boxH} at={vertAt} tone={ring > 0.5 ? "bad" : "data"} title="server" dim={vDim} />
+        <Node x={V.x} y={base - boxH} w={V.w} h={boxH} at={vertAt} tone="data" title="server" dim={vDim} />
         <Svg opacity={1 - ease(frame, vDim, 12) * 0.65}>
           {ring > 0 ? (
-            <ellipse
-              cx={V.x + V.w / 2}
-              cy={base - boxH / 2}
-              rx={V.w / 2 + 22}
-              ry={boxH / 2 + 22}
+            <rect
+              x={V.x - 14}
+              y={base - boxH - 14}
+              width={V.w + 28}
+              height={boxH + 28}
+              rx={22}
               fill="none"
               stroke={ACCENT}
               strokeWidth={3}
@@ -246,8 +246,8 @@ export const ScaleScene: React.FC = () => {
         })}
 
         {/* ── The chart: the simplest queue's mean wait against load. ── */}
-        <Line at={chartAt} x={C.x0 - 70} y={y(462)} size={21} weight={650} color={INK_SOFT}>
-          Mean wait, in service times · the simplest queue model
+        <Line at={chartAt} x={C.x0 - 70} y={y(486)} size={21} weight={650} color={INK_SOFT}>
+          The simplest queue: mean wait, in service times
         </Line>
         <Svg opacity={ease(frame, chartAt, 12)}>
           <defs>
@@ -267,7 +267,7 @@ export const ScaleScene: React.FC = () => {
               </text>
             </g>
           ))}
-          {[0, 0.5, 0.9, 1].map((r) => (
+          {[0, 0.5, 1].map((r) => (
             <text key={r} x={cx(r)} y={y(C.base) + 30} textAnchor={r === 1 ? "end" : r === 0 ? "start" : "middle"} style={svgText(note(20, INK_SOFT))}>
               {Math.round(r * 100)}%
             </text>
@@ -280,8 +280,8 @@ export const ScaleScene: React.FC = () => {
           </g>
           {/* The three readings, each as it is said. */}
           {[
-            [m50, fiftyAt, "1×"],
-            [m90, ninetyAt, "9×"],
+            [m50, fiftyAt, "1× at 50%"],
+            [m90, ninetyAt, "9× at 90%"],
           ].map(([m, at, t]) => {
             const mm = m as { rho: number; wait: number };
             const p = ease(frame, at as number, 10);
@@ -297,9 +297,9 @@ export const ScaleScene: React.FC = () => {
           })}
           {ease(frame, nn99At, 10) > 0 ? (
             <g opacity={ease(frame, nn99At, 10)}>
-              <line x1={cx(m99.rho)} x2={cx(m99.rho)} y1={y(C.base)} y2={y(C.top) + 70} stroke={ACCENT} strokeWidth={2.4} />
+              <line x1={cx(m99.rho)} x2={cx(m99.rho)} y1={y(C.base)} y2={y(C.top) - 6} stroke={ACCENT} strokeWidth={2.4} />
               <path d={arrowHead(up99, 14, 8, { filled: true })} fill={ACCENT} />
-              <text x={cx(m99.rho) - 14} y={y(C.top) + 14} textAnchor="end" style={svgText({ ...note(24, ACCENT_INK), fontWeight: 700 })}>
+              <text x={cx(m99.rho) - 18} y={y(C.top) - 8} textAnchor="end" style={svgText({ ...note(23, ACCENT_INK), fontWeight: 700 })}>
                 99× at 99%, off the top
               </text>
             </g>
@@ -307,10 +307,10 @@ export const ScaleScene: React.FC = () => {
         </Svg>
         <Ink at={roomAt + 6} dur={14} style={{ left: C.x0 - 70, top: y(C.base) + h(48), whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, INK), fontWeight: 650 }}>
-            <Mark at={roomAt + 8}>Headroom</Mark>: run where the wait is still flat
+            <Mark at={roomAt + 8}>Headroom:</Mark> run where the wait is still flat
           </span>
         </Ink>
-        <Ink at={fullAt} dur={14} style={{ left: 1300, top: oursTop + 62, whiteSpace: "nowrap", opacity: 1 - ease(frame, chartAt, 10) * 0.0 }}>
+        <Ink at={fullAt} dur={14} style={{ left: 1300, top: oursTop + 70, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, BLUE_INK), fontWeight: 600 }}>
             enough that <Num>none</Num> runs near full
           </span>

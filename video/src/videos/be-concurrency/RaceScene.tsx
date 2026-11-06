@@ -171,7 +171,7 @@ export const RaceScene: React.FC = () => {
             width: 150,
             height: h(84),
             boxSizing: "border-box",
-            border: `${3 + 2 * pulse(frame, bothWriteAt + 6, 18)}px solid ${counterLine}`,
+            border: `${3 + 2 * Math.max(pulse(frame, fiveAt, 18), pulse(frame, bothWriteAt + 6, 18))}px solid ${counterLine}`,
             borderRadius: 12,
             background: tint(counterLine, 12),
             display: "flex",
@@ -278,7 +278,9 @@ export const RaceScene: React.FC = () => {
         {/* Every order the six steps can run in. */}
         <Note at={countAt} x={G_X} y={y(326)} out={fixAt + 2}>
           <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            Every order of the six steps: <Num>{RACE.one.orders}</Num>
+            Every order of the six steps<span style={{ opacity: ease(frame, twentyAt, 10) }}>
+              : <Num>{RACE.one.orders}</Num>
+            </span>
           </span>
         </Note>
         {EVERY.map((o, k) => (

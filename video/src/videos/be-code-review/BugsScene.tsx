@@ -42,15 +42,28 @@ const SURVEY = [
   { pct: 45, text: "said debugging AI-generated code takes longer than expected" },
 ];
 
-/** A row of a card: words at the card's own size. */
-const Line: React.FC<{ at: number; children: React.ReactNode; color?: string; size?: number }> = ({ at, children, color = INK, size = 21 }) => {
+/** A row of a card: words at the card's own size, set as running text.
+ *  `icon` puts a tick or a cross before it. */
+const Line: React.FC<{ at: number; children: React.ReactNode; color?: string; size?: number; icon?: React.ReactNode }> = ({
+  at,
+  children,
+  color = INK,
+  size = 21,
+  icon,
+}) => {
   const frame = useCurrentFrame();
   return (
-    <div style={{ ...note(size, color), whiteSpace: "nowrap", opacity: ease(frame, at, 10), display: "flex", alignItems: "center", gap: 12 }}>
-      {children}
+    <div style={{ ...note(size, color), whiteSpace: "nowrap", opacity: ease(frame, at, 10), display: "flex", alignItems: "center", gap: 12, fontSize: size }}>
+      {icon ? <span style={{ width: 24, display: "flex", justifyContent: "center", flex: "none" }}>{icon}</span> : null}
+      <span>{children}</span>
     </div>
   );
 };
+
+/** An operator in the mono face, in its verdict's ink. */
+const Op: React.FC<{ color: string; children: React.ReactNode }> = ({ color, children }) => (
+  <span style={{ fontFamily: MONO, fontWeight: 700, color, fontVariantLigatures: "none" }}>{children}</span>
+);
 
 /** A small pill for one assumption ("sorted?"). */
 const Pill: React.FC<{ at: number; children: React.ReactNode }> = ({ at, children }) => {
@@ -156,7 +169,7 @@ export const BugsScene: React.FC = () => {
 
   // The survey, gone when the cards arrive.
   const surveyOut = suspectsAt - 8;
-  const barScale = 10;
+  const barScale = 12;
 
   // What happens to the cards at the end: the loud one lights, the quiet six
   // go gray, and the three in our diff lift out above it.
@@ -193,53 +206,49 @@ export const BugsScene: React.FC = () => {
         <Spot id="be-code-review-beetle" at={textAt + 6} left={1590} top={92} width={168} height={180} />
 
         {/* ── Code that is almost right: the survey ── */}
-        <Ink at={almostAt - 2} dur={18} out={surveyOut} style={{ left: X0, top: y(320), ...body(38, true), color: INK, whiteSpace: "nowrap" }}>
+        <Ink at={almostAt - 2} dur={18} out={surveyOut} style={{ left: 96, top: y(318), ...body(38, true), color: INK, whiteSpace: "nowrap" }}>
           Code that is almost right.
         </Ink>
         {SURVEY.map((s, i) => {
           const at = i === 0 ? sixtyAt : fortyAt;
-          const top = y(410 + i * 120);
+          const top = y(400 + i * 150);
           const w = s.pct * barScale * ease(frame, at, 22);
           return (
             <React.Fragment key={i}>
               <Note at={at - 4} x={X0} y={top} out={surveyOut}>
-                <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{s.text}</span>
+                <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>{s.text}</span>
               </Note>
               <div
                 style={{
                   position: "absolute",
                   left: X0,
-                  top: top + 46,
+                  top: top + 52,
                   width: w,
-                  height: 34,
+                  height: 48,
                   background: BAR,
                   borderRadius: 3,
                   opacity: 1 - ease(frame, surveyOut, 10),
                 }}
               />
-              <Note at={at + 14} x={X0 + w + 20} y={top + 40} out={surveyOut}>
-                <span style={{ ...note(32, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              <Note at={at + 14} x={X0 + w + 22} y={top + 50} out={surveyOut}>
+                <span style={{ ...note(38, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
                   <span style={TABULAR}>{s.pct}</span>%
                 </span>
               </Note>
             </React.Fragment>
           );
         })}
-        <Note at={fortyAt + 20} x={X0} y={y(660)} out={surveyOut}>
+        <Note at={fortyAt + 20} x={X0} y={y(720)} out={surveyOut}>
           <Source>Stack Overflow, 2025 Developer Survey, AI section</Source>
         </Note>
 
         {/* ── Seven kinds ── */}
         <Card x={cx(0)} y={R1} w={CARD_W} h={CARD_H} at={boundAt - 4} title="Boundaries" dim={quietAt} undim={lift - 4}>
-          <Line at={ltAt} size={26}>
-            <Code line="<" size={26} weight={700} />
-            <span style={note(26, INK_SOFT)}>where</span>
-            <Code line="<=" size={26} weight={700} />
-            <span style={note(26, INK_SOFT)}>belongs</span>
+          <Line at={ltAt} size={26} color={INK_SOFT}>
+            <Op color={ACCENT_INK}>&lt;</Op> where <Op color={OK_INK}>&lt;=</Op> belongs
           </Line>
           <Line at={offAt}>
-            an off-by-one
-            <span style={{ opacity: ease(frame, emptyAt, 10) }}>, the empty input</span>
+            an off-by-one<span style={{ opacity: ease(frame, emptyAt, 10) }}>, the empty input</span>
           </Line>
           <Line at={windowAt}>the exact edge of a window</Line>
         </Card>
@@ -289,10 +298,12 @@ export const BugsScene: React.FC = () => {
             <span style={{ color: ACCENT_INK, fontWeight: 700 }}>{kind}:</span> {message}
           </div>
           <Line at={packageAt} color={ACCENT_INK}>
-            <span>an invented package name:</span>
-            <Mark at={registeredAt} color={MARK_BAD}>
-              <span style={{ opacity: ease(frame, registerAt - 2, 10) }}>an attacker can register it</span>
-            </Mark>
+            an invented package name:{" "}
+            <span style={{ opacity: ease(frame, registerAt - 2, 10) }}>
+              <Mark at={registeredAt} color={MARK_BAD}>
+                an attacker can register it
+              </Mark>
+            </span>
           </Line>
         </Card>
 
@@ -325,17 +336,11 @@ export const BugsScene: React.FC = () => {
           undim={lift - 4}
           to={{ x: cx(2), y: R1, at: lift }}
         >
-          <Line at={assertAt}>
-            <Tick at={assertAt + 4} size={22} />
-            <span style={{ color: OK_INK, fontWeight: 600 }}>the test passes</span>
+          <Line at={assertAt} color={ACCENT_INK} icon={<Cross at={assertAt + 4} size={20} />}>
+            asserts what the code does
           </Line>
-          <Line at={assertAt + 10}>
-            <Cross at={assertAt + 14} size={20} />
-            <span style={{ color: ACCENT_INK }}>on what the code does</span>
-          </Line>
-          <Line at={proveAt - 4}>
-            <span style={{ width: 22 }} />
-            <Mark at={proveAt}>and proves nothing</Mark>
+          <Line at={proveAt - 10} color={OK_INK} icon={<Tick at={proveAt - 6} size={22} />}>
+            passes, <Mark at={proveAt}>and proves nothing</Mark>
           </Line>
         </Card>
 

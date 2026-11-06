@@ -10,7 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ESTIMATE, KEY, LADDER } from "./data";
 import { diagramBoxes, SIDE_A, SIDE_B, sideRoute } from "./diagram";
-import { Arrow, between, Box, Cross, Drift, Headline, int, Kicker, Line, OK, OK_INK, Ring, Traveller, X0 } from "./parts";
+import { Arrow, between, Box, Cross, Drift, Headline, int, Kicker, Line, OK_INK, Ring, Traveller, X0 } from "./parts";
 
 const RX = 1460;
 const HOP_MS = LADDER.levels.find((l) => l.name === "Network round trip")!.ns / 1e6;
@@ -159,7 +159,7 @@ export const DiagramScene: React.FC = () => {
         <Arrow points={between(B.lb, ghost)} at={addAt + 8} dash="6 6" color={INK_SOFT} out={ghostOut} />
 
         {/* One redirect: a hit, then a miss. */}
-        <Traveller points={[B.client.cx, B.client.cy].length ? [[B.client.cx, B.client.cy + B.client.h / 2], e.clientLb[1]] : []} from={followAt} to={followAt + 12} color={BAR} r={8} out={followAt + 14} />
+        <Traveller points={e.clientLb} from={followAt} to={followAt + 12} color={BAR} r={8} out={followAt + 14} />
         <RoundTrip pts={e.lbApp1} from={hit[0]} dur={26} />
         <RoundTrip pts={e.app1Cache} from={hit[1]} dur={26} />
         <Line x={B.app1.cx + 20} y={B.lb.cy - 2} at={hit[0] + 14} out={pathOut} size={22} weight={650} color={BLUE_INK}>
@@ -214,8 +214,8 @@ export const DiagramScene: React.FC = () => {
             <Cross at={failAt + 4} size={28} />
           </div>
         ) : null}
-        <Line x={RX} y={y(296)} at={askAt} size={26} weight={700} out={end}>
-          One counter for every server
+        <Line x={RX} y={y(296)} at={askAt} size={26} weight={700}>
+          One shared counter
         </Line>
         <Line x={RX} y={y(296) + 42} at={bottleAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
           a bottleneck
@@ -251,10 +251,6 @@ export const DiagramScene: React.FC = () => {
           Scramble the ID first
           <span style={{ opacity: ease(frame, useHashAt, 10) }}>, or use the hash</span>
         </Line>
-        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          <circle cx={-10} cy={-10} r={0} fill={OK} stroke={INK} />
-          <circle cx={-10} cy={-10} r={0} fill={ACCENT} />
-        </svg>
       </Drift>
     </AbsoluteFill>
   );

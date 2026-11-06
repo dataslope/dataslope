@@ -281,6 +281,9 @@ export const DeadScene: React.FC = () => {
         <Note at={queueAt} x={FIX_X} y={rowY(0) + h(48)}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>no other thread needs the lock</span>
         </Note>
+        <Note at={orderAt + 4} x={FIX_X} y={rowY(3) + h(48)}>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>the usual target</span>
+        </Note>
         <Note at={releasesAt} x={FIX_X} y={rowY(2) + h(48)}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>gives up, lets go of the first</span>
         </Note>

@@ -118,9 +118,9 @@ export const HookScene: React.FC = () => {
         </Note>
 
         {/* What the interview tests the design for. */}
-        <Note at={predAt - 4} x={X0} y={y(500)}>
+        <Note at={predAt - 4} x={X0} y={y(510)}>
           <span style={{ ...note(36, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            <Mark at={predAt}>Predictable</Mark>, <Mark at={consAt}>consistent</Mark>, <Mark at={misuseAt}>hard to misuse</Mark>.
+            <Mark at={predAt}>Predictable,</Mark> <Mark at={consAt}>consistent,</Mark> <Mark at={misuseAt}>hard to misuse.</Mark>
           </span>
         </Note>
 

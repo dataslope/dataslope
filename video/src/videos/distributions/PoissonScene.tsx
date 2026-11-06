@@ -56,7 +56,6 @@ export const PoissonScene: React.FC = () => {
   const ticketsAt = n.word("poisson", "three tickets");
   const ownEnd = n.word("poisson", "own", { edge: "end" });
   const countAt = n.word("poisson", "count");
-  const anyHourAt = n.word("poisson", "one hour");
   const poissonAt = n.word("poisson", "Poisson");
   const eightAt = n.word("spike", "eight or more");
   const spikeAt = n.word("spike", "spike");
@@ -110,9 +109,6 @@ export const PoissonScene: React.FC = () => {
       />
 
       <Spot id="distributions-desk-bell" at={deskAt - 4} out={nameAt - 2} left={1500} top={y(92)} width={290} height={270} />
-      {/* One hour, in the right column under the bell, gone before the
-          spike's numbers take the column. */}
-      <Spot id="distributions-clock" at={anyHourAt - 4} out={oneHourAt - 18} left={1400} top={y(394)} width={190} height={190} />
 
       <div style={{ position: "absolute", inset: 0, opacity: 1 - dim }}>
         <Drift from={poissonFrom} to={n.beat("geometric-in").to + 30}>

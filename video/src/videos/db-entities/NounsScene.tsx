@@ -21,6 +21,10 @@ const BOXES = [
 const CHIP_Y = 800;
 /** The test's label; the question sits on the line under it. */
 const TEST_Y = 690;
+/** The crates of many things: small, under the products box, level with the test. */
+const CRATES_W = 200;
+const CRATES_H = 102;
+const CRATES_Y = 720;
 
 /**
  * Part 1 opens on Unit 1's bridge: a design starts by naming the things the
@@ -85,9 +89,6 @@ export const NounsScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={lotsAt[0]} level={-34} />
       <Sfx name="el-whoosh" at={describesAt} level={-34} />
       <Sfx name="el-tap" at={landed} level={-29} />
-      {/* The small spots arrive the way the crates do. */}
-      <Sfx name="el-pop" at={words[0]} level={-31} />
-      <Sfx name="el-pop" at={anOrderAt} level={-31} />
 
       <Drift from={trackingAt} to={end + 50} scale={0.02} origin={[960, 560]}>
         <Kicker at={hookFrom - 10}>Entities</Kicker>
@@ -208,11 +209,7 @@ export const NounsScene: React.FC = () => {
             strokeDasharray="5 5"
           />
         </Svg>
-        <Spot id="db-entities-crates" at={candidateAt} left={1240} top={y(660)} width={560} height={290} />
-        {/* "Customers": a shopper, top right, over the products box and clear of the sentence. */}
-        <Spot id="db-entities-shopper" at={words[0]} left={1490} top={y(252)} width={126} height={220} />
-        {/* "Describes an order": a parcel with its tag, bottom left, once the test has gone. */}
-        <Spot id="db-entities-parcel" at={anOrderAt} left={130} top={y(688)} width={250} height={204} />
+        <Spot id="db-entities-crates" at={candidateAt} left={BOXES[2].x + (BOX_W - CRATES_W) / 2} top={y(CRATES_Y)} width={CRATES_W} height={CRATES_H} />
       </Drift>
     </AbsoluteFill>
   );

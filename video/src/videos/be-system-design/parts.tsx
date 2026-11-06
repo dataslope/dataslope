@@ -86,10 +86,8 @@ export const Spot: React.FC<{
 export const ART = {
   crow: [1090, 1021],
   envelope: [960, 754],
-  stopwatch: [752, 996],
   key: [1016, 1019],
   breaker: [873, 882],
-  globe: [772, 1024],
 } as const satisfies Record<string, readonly [number, number]>;
 
 /** The height that keeps `id`'s aspect at `width`. */

@@ -227,8 +227,31 @@ const byName = (t: Table, name: string, col: string) => {
 };
 const inflated = table("joins", "inflated");
 const fixed = table("joins", "fixed");
+/**
+ * The page's 24 orders as the figure's setup created them (the VALUES rows
+ * of its CREATE TABLE orders), each with its customer's name and the item
+ * count order_items gave it (1 + order_id % 3, the setup's rule), checked
+ * below against what the joins returned.
+ */
+const pageSetup = FIGURES.joins.setup;
+const valuesOf = (table: string) => {
+  const block = pageSetup.split(`CREATE TABLE ${table} AS SELECT * FROM (VALUES`)[1]?.split(") AS t(")[0];
+  if (!block) throw new Error(`no VALUES for ${table} in the joins setup`);
+  return [...block.matchAll(/\(([^()]*)\)/g)].map((m) => m[1].split(",").map((v) => v.trim().replace(/^'|'$/g, "")));
+};
+if (!pageSetup.includes("generate_series(1, 1 + o.order_id % 3)")) throw new Error("order_items no longer gives 1 + order_id % 3 items an order");
+const names = new Map(valuesOf("customers").map(([id, name]) => [id, name]));
+const pageOrders = valuesOf("orders").map(([id, customer, amount]) => ({
+  id: Number(id),
+  name: names.get(customer) ?? "?",
+  amount: Number(amount),
+  items: 1 + (Number(id) % 3),
+}));
+
 export const FANOUT = {
   orders: scalar("joins", "counts", "orders"),
+  /** Each order, its customer, amount and item count, in order_id order. */
+  list: pageOrders,
   total: dollars(cell("joins", "total")),
   joinedRows: scalar("joins", "itemRows"),
   inflatedQuery: lines("joins", "inflated"),
@@ -241,6 +264,8 @@ export const FANOUT = {
   sara: { right: dollars(byName(fixed, "Sara", "revenue")), wrong: dollars(byName(inflated, "Sara", "revenue")), items: Number(byName(fixed, "Sara", "items")) },
 };
 if (FANOUT.fixedTotal !== FANOUT.total) throw new Error("the fixed query must give back the orders' own total");
+if (pageOrders.length !== FANOUT.orders || pageOrders.reduce((n, o) => n + o.items, 0) !== FANOUT.joinedRows) throw new Error("the parsed orders must give the joins' row counts");
+if ((pageOrders.reduce((t, o) => t + o.amount * o.items, 0)).toFixed(2) !== FANOUT.inflatedTotal) throw new Error("the parsed orders must give the inflated total");
 
 // ── 7. A transaction ────────────────────────────────────────────────────────
 
@@ -251,6 +276,8 @@ export const TXN = {
   record: lines("txn", "record"),
   recordError: refused("txn", "record"),
   afterError: refused("txn", "afterError"),
+  /** The statement after the error, which Postgres refused. */
+  next: lines("txn", "afterError"),
   after: table("txn", "after"),
 };
 
@@ -260,6 +287,7 @@ const readAt = (id: string) => ({ level: cell("isolation", id, "level"), balance
 export const ISOLATION = {
   /** Postgres's default level, from SHOW. */
   default: cell("isolation", "default"),
+  showDefault: lines("isolation", "default"),
   other: lines("isolation", "other"),
   /** The other transaction's uncommitted balance, read off its UPDATE, and
    *  what each level read while it was parked. */

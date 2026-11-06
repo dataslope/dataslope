@@ -47,7 +47,6 @@ export const BigScene: React.FC = () => {
   const loopAt = n.word("big-count", "A double loop");
   const pairsAt = n.word("big-count", "checks under five thousand pairs");
   const instantAt = n.word("big-count", "Instant");
-  const millionAt = n.word("big-million", "At a million items");
   const trillionAt = n.word("big-million", "half a trillion");
   const modelAt = n.word("big-model", "Model it at a hundred million checks a second");
   const minutesAt = n.word("big-model", "about eighty-three minutes");

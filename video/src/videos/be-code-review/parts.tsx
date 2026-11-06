@@ -235,24 +235,28 @@ export const DiffListing: React.FC<{
           key={i}
           at={wipe ? lineAt?.[i] ?? at + 4 + i * 3 : at}
           dur={wipe ? 14 : 1}
-          style={{ left: 0, top: g.padY + i * g.lineH, height: g.lineH, width, display: "flex", alignItems: "center" }}
+          style={{ left: 0, top: g.padY + i * g.lineH, height: g.lineH, width }}
         >
-          <span
-            style={{
-              position: "absolute",
-              left: g.padX,
-              fontFamily: MONO,
-              fontSize: size,
-              fontWeight: 700,
-              color: r.sign === "+" ? OK_INK : ACCENT_INK,
-              opacity: r.sign === "+" || r.sign === "-" ? signs : 0,
-            }}
-          >
-            {r.sign === "-" ? "−" : r.sign}
-          </span>
-          <span style={{ position: "absolute", left: codeX, opacity: r.sign === "-" ? 1 - 0.4 * signs : 1 }}>
-            <Code line={r.code} size={size} />
-          </span>
+          {/* Ink pads its box by its bleed, so absolute children are placed
+              in a box of the line's own size. */}
+          <div style={{ position: "relative", width, height: g.lineH, display: "flex", alignItems: "center" }}>
+            <span
+              style={{
+                position: "absolute",
+                left: g.padX,
+                fontFamily: MONO,
+                fontSize: size,
+                fontWeight: 700,
+                color: r.sign === "+" ? OK_INK : ACCENT_INK,
+                opacity: r.sign === "+" || r.sign === "-" ? signs : 0,
+              }}
+            >
+              {r.sign === "-" ? "−" : r.sign}
+            </span>
+            <span style={{ position: "absolute", left: codeX, opacity: r.sign === "-" ? 1 - 0.4 * signs : 1 }}>
+              <Code line={r.code} size={size} />
+            </span>
+          </div>
         </Ink>
       ))}
     </div>
@@ -399,16 +403,17 @@ export const Steps: React.FC<{
                   opacity: current * 0.55,
                 }}
               />
-              <span style={{ position: "relative", width: 26, height: 26, display: "flex", alignItems: "center" }}>
+              <span style={{ position: "relative", width: 26, height: 26, flex: "none", display: "flex", alignItems: "center" }}>
                 {done > 0 && frame >= next - 2 ? <Tick at={next - 2} size={24} /> : null}
               </span>
-              <span style={{ position: "relative", ...label(23, current > 0.5 ? ACCENT_INK : INK_SOFT), width: 22, textAlign: "right" }}>{i + 1}</span>
+              <span style={{ position: "relative", ...label(23, current > 0.5 ? ACCENT_INK : INK_SOFT), width: 22, flex: "none", textAlign: "right" }}>{i + 1}</span>
               <span
                 style={{
                   position: "relative",
                   ...note(23, INK),
                   fontWeight: current > 0.5 ? 650 : 500,
                   whiteSpace: "nowrap",
+                  flex: "none",
                   opacity: 0.5 + 0.5 * Math.max(current, done),
                 }}
               >
@@ -550,20 +555,22 @@ export const TestGrid: React.FC<{
         const band = r.markAt === undefined ? 0 : ease(frame, r.markAt, 12);
         return (
           <React.Fragment key={i}>
-            <Ink at={r.at} dur={12} out={r.out ?? out} style={{ left: x, top: rowTop, height: rowH, width, display: "flex", alignItems: "center" }}>
-              <div
-                style={{
-                  position: "absolute",
-                  left: -10,
-                  top: 4,
-                  bottom: 4,
-                  width: (width + 20) * band,
-                  background: r.markColor ?? HIGHLIGHT,
-                  borderRadius: 4,
-                  opacity: 0.6,
-                }}
-              />
-              <span style={{ position: "relative", fontSize: size }}>{r.name}</span>
+            <Ink at={r.at} dur={12} out={r.out ?? out} style={{ left: x, top: rowTop, height: rowH, width }}>
+              <div style={{ position: "relative", width, height: rowH, display: "flex", alignItems: "center" }}>
+                <div
+                  style={{
+                    position: "absolute",
+                    left: -10,
+                    top: 4,
+                    bottom: 4,
+                    width: (width + 20) * band,
+                    background: r.markColor ?? HIGHLIGHT,
+                    borderRadius: 4,
+                    opacity: 0.6,
+                  }}
+                />
+                <span style={{ position: "relative", fontSize: size }}>{r.name}</span>
+              </div>
             </Ink>
             {r.cells.map((c, j) =>
               c ? (

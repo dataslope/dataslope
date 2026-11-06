@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { PACKED, PHONES_COL } from "./data";
 import { DbTable, Fig, FIG_GAP, HEAD_H, Listing, MARK_BAD, ROW_H, tableGeometry } from "./kit";
-import { BoxPulse, Drift, Headline, lerp, Pulse, Spot, Stack, STAT_INK, Svg } from "./parts";
+import { BoxPulse, Drift, Headline, lerp, Pulse, Stack, STAT_INK, Svg } from "./parts";
 
 const S = 1.2;
 const X = 120;
@@ -83,9 +83,6 @@ export const AtomicScene: React.FC = () => {
       <Sfx name="el-tap" at={factAt} level={-30} />
       <Sfx name="el-whoosh" at={savedAt} level={-33} />
       <Sfx name="el-tap" at={savedAt + 20} level={-29} />
-      {/* The small spots arrive the way the video's other spots do. */}
-      <Sfx name="el-pop" at={twoAt} level={-31} />
-      <Sfx name="el-pop" at={savedAt} level={-31} />
 
       <Drift from={tooAt} to={end + 70} scale={0.02} origin={[1440, 600]}>
         <Headline lead="One value per cell." leadAt={from - 6} out={n.beat("erd-in").from - 2} />
@@ -108,8 +105,6 @@ export const AtomicScene: React.FC = () => {
           <Note at={packAt + 2} x={X + g.xs[PHONES_COL] * S} y={tableBottom + 14} from="up">
             <span style={{ ...note(23, STAT_INK), whiteSpace: "nowrap" }}>Two facts in one cell</span>
           </Note>
-          {/* "Two phone numbers": a telephone beside the table, leaving with it. */}
-          <Spot id="db-entities-phone" at={twoAt} left={880} top={y(368)} width={220} height={172} />
           <Listing lines={[PACKED.search]} x={X} top={y(560)} width={960} size={22} at={searchAt - 6} lineAt={[searchAt - 2]} />
           {/* One line at one size: Postgres's answer stands out by its ink and weight. */}
           <Ink at={nothingAt - 2} dur={14} style={{ left: X, top: y(650), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
@@ -164,8 +159,6 @@ export const AtomicScene: React.FC = () => {
             </span>
           </Note>
         </div>
-        {/* "Saved addresses": a house and its mailbox, right of the new entity once it has settled. */}
-        <Spot id="db-entities-house" at={savedAt} left={1270} top={y(644)} width={240} height={191} />
       </Drift>
     </AbsoluteFill>
   );

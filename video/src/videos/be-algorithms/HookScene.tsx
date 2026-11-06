@@ -7,7 +7,7 @@ import { note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Art, BAR, BLUE_FILL, BLUE_INK, Drift, HIGHLIGHT, Headline, INK, INK_SOFT, Kicker, Line, OK_INK, Pill, Svg, X0 } from "./parts";
+import { Art, BAR, BLUE_FILL, BLUE_INK, Drift, HIGHLIGHT, Headline, INK, INK_SOFT, Kicker, Line, OK_INK, Pill, Svg } from "./parts";
 
 /** The million drawn as a square, a thousand items a side. */
 const SQ = 360;

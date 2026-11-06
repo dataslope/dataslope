@@ -28,7 +28,7 @@ const TOP = 25;
 
 /** Where a frame sits between keyframes: each [at, value] eases in from the one before. */
 const keyed = (frame: number, keys: readonly (readonly [number, number])[], dur = 22) =>
-  keys.slice(1).reduce((v, [at, to], i) => lerp(v, to, ease(frame, at, dur)) + 0 * i, keys[0][1]);
+  keys.slice(1).reduce((v, [at, to]) => lerp(v, to, ease(frame, at, dur)), keys[0][1]);
 
 /**
  * Question 1. Three tasks take turns on one core (concurrency), then spread
