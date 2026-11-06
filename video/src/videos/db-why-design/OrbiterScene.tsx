@@ -148,7 +148,7 @@ export const OrbiterScene: React.FC = () => {
                 transformOrigin: "0 50%",
               }}
             >
-              <span style={{ ...label(22, INK_SOFT) }}>unit</span>
+              <span style={{ ...label(24, INK_SOFT) }}>unit</span>
               <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>none</span>
             </div>
           </Note>
@@ -172,7 +172,7 @@ export const OrbiterScene: React.FC = () => {
                 {COLUMN.name}
                 <Mark at={unitAt}>{COLUMN.unit}</Mark>
               </span>
-              <span style={{ fontFamily: MONO, fontSize: 20, color: INK_SOFT }}>{COLUMN.type}</span>
+              <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT }}>{COLUMN.type}</span>
             </div>
           </Note>
           <Note at={fourAt - 4} x={X0} y={bTop + h(96) + 26}>

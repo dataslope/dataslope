@@ -847,7 +847,7 @@ export const FigKey: React.FC<{ entries: readonly KeyEntry[]; right: number; top
             key={e.text}
             style={{ display: "inline-flex", alignItems: "center", gap: 9, opacity: p, transform: `translateY(${(1 - p) * 6}px)` }}
           >
-            {e.badge ? <Badge>{e.badge}</Badge> : null}
+            {e.badge ? <Badge size={21}>{e.badge}</Badge> : null}
             {e.end ? <EndGlyph kind={e.end} /> : null}
             <span style={{ ...note(21, INK_SOFT) }}>{e.text}</span>
           </span>

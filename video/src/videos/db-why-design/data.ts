@@ -16,7 +16,7 @@ import r from "./results.json";
 export const VIDEO = "db-why-design";
 
 /**
- * Whether public/images/db-why-design/ holds the three watercolors from
+ * Whether public/images/db-why-design/ holds the watercolors from
  * illustrations.json. Every frame is laid out with room for them either way.
  */
 export const ILLUSTRATIONS = true;

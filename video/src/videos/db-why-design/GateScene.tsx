@@ -102,7 +102,7 @@ export const GateScene: React.FC = () => {
                   }}
                 >
                   <span style={note(21, INK_SOFT)}>breaks</span>
-                  <Badge>{tag.badge}</Badge>
+                  <Badge size={21}>{tag.badge}</Badge>
                   <span style={{ fontFamily: MONO, fontSize: 21, color: INK }}>{tag.text}</span>
                 </span>
               </Note>
