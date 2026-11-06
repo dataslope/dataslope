@@ -31,3 +31,8 @@ Brief: BRIEF.md in this folder. Layout only, no re-voicing, no new images.
 ## Later waves (start one as each agent finishes)
 
 Folder to composition id: scratchpad folder-ids.txt, or grep src/Root.tsx.
+
+## Status (evening)
+Done: DE 0-11, DS 0-11, DA 5-8, DbD 1-9, Stats 1-9 (Stats 6-9 agent still finishing checks), LLM 1-5 + temperature, NLP 1-2 (agent finishing), NLP 3.1/4/5 + tf-idf (agent finishing checks), all standalones.
+Still running: DA 0-4.
+Disk filled once (ENOSPC) around 18:30; nlp-history/ZipfScene.tsx was truncated and restored (318508e). Whole-project tsc clean afterwards.
