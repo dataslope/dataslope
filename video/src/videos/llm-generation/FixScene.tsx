@@ -19,29 +19,54 @@ const GLOSS = [
   "a schema leaves no field to invent",
 ] as const;
 
-/** A round badge: a tick, a cross, or a number. */
-const Badge: React.FC<{ kind: "yes" | "no" | number; at: number; x: number; y: number }> = ({ kind, at, x, y }) => {
+/** A round badge: a tick or a cross. */
+const Badge: React.FC<{ kind: "yes" | "no"; at: number; x: number; y: number }> = ({ kind, at, x, y }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const s = pop(frame, at, fps, 14);
   if (s <= 0.001) return null;
-  const color = kind === "yes" ? GOOD : kind === "no" ? ACCENT : BAR;
+  const color = kind === "yes" ? GOOD : ACCENT;
   const r = 22;
   return (
     <Svg opacity={Math.min(1, s)}>
       <g transform={`translate(${x}, ${y}) scale(${0.6 + 0.4 * Math.min(1.1, s)})`}>
-        <circle r={r} fill={typeof kind === "number" ? tint(BAR, 22) : color} stroke={typeof kind === "number" ? BAR : "none"} strokeWidth={2} />
+        <circle r={r} fill={color} />
         {kind === "yes" ? (
           <path d="M-9,1 L-3,8 L10,-7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
-        ) : kind === "no" ? (
-          <path d="M-7,-7 L7,7 M7,-7 L-7,7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" />
         ) : (
-          <text y={8} textAnchor="middle" style={svgText({ ...label(23, BLUE_INK), fontWeight: 700 })}>
-            {kind}
-          </text>
+          <path d="M-7,-7 L7,7 M7,-7 L-7,7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" />
         )}
       </g>
     </Svg>
+  );
+};
+
+/** A fix's number, in the item's own face and size so the two read as one
+ *  line, in the blue the circle it replaces was drawn in. It pops in the way
+ *  that circle did, centred where the circle was. */
+const Numeral: React.FC<{ n: number; at: number; x: number; y: number }> = ({ n, at, x, y }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const s = pop(frame, at, fps, 14);
+  if (s <= 0.001) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x - 22,
+        top: y,
+        width: 44,
+        textAlign: "center",
+        ...body(34),
+        color: BLUE_INK,
+        fontWeight: 600,
+        opacity: Math.min(1, s),
+        transform: `scale(${0.6 + 0.4 * Math.min(1.1, s)})`,
+        ...TABULAR,
+      }}
+    >
+      {n}
+    </div>
   );
 };
 
@@ -131,7 +156,7 @@ export const FixScene: React.FC = () => {
         const swell = k === 0 ? pulse(frame, pastingAt - 2, 22) : 0;
         return (
           <React.Fragment key={k}>
-            <Badge kind={k + 1} at={itemAt[k] - 4} x={RIGHT_X + 22} y={y(ITEM_Y(k)) + 22} />
+            <Numeral n={k + 1} at={itemAt[k] - 4} x={RIGHT_X + 22} y={y(ITEM_Y(k))} />
             <Ink at={itemAt[k] - 2} dur={14} style={{ left: RIGHT_X + 64, top: y(ITEM_Y(k)), width: 800 }}>
               <div style={{ ...body(34), color: INK, whiteSpace: "nowrap", transform: `scale(${1 + swell * 0.05})`, transformOrigin: "0 50%" }}>
                 {k === 3 ? (

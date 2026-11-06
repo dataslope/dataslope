@@ -113,8 +113,9 @@ export const BillScene: React.FC = () => {
         <span style={{ ...note(23, THINK_INK), fontWeight: 650, ...TABULAR }}>{THINKING_TOKENS} thinking tokens, hidden</span>
       </Note>
       <Ink at={total119At - 2} dur={14} style={{ left: B0, top: payY + bh + 18, width: B1 - B0 + 2, textAlign: "right" }}>
-        <span style={{ ...headline(56), color: ACCENT_INK, ...TABULAR }}>{TOTAL}</span>
-        <span style={{ ...note(24, INK), marginLeft: 12 }}>tokens at the output rate</span>
+        <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
+          <span style={{ color: ACCENT_INK, fontWeight: 700, ...TABULAR }}>{TOTAL}</span> tokens at the output rate
+        </span>
       </Ink>
 
       {/* Fig. 21: the control that is left, set low on purpose. */}
