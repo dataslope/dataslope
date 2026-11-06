@@ -12,7 +12,7 @@ import { Arrow, Check, Cross, Headline, lerp, Marker, Ring, STAT, STAT_INK, Stri
 export const WALL_X = 960;
 export const WALL_TOP = 300;
 export const WALL_BOTTOM = 790;
-/** Where the lead's card sits at the end of LookScene, and where it settles. */
+/** Where the lead sits at the end of LookScene, and where it settles. */
 export const CARD_FROM = { x: 1410, y: 846 };
 const CARD_TO = { x: 1060, y: 398 };
 
@@ -38,22 +38,17 @@ const SEALED = { x0: 1060, x1: 1390, y0: 540, y1: 668 };
 const NOTE_X = 1458;
 const SEALED_JIT = jitter(77, 48);
 
-/** The card that carries the lead from one side of the wall to the other. */
-export const LeadCard: React.FC<{ x: number; y: number; opacity?: number }> = ({ x, y, opacity = 1 }) => (
-  <div style={{ position: "absolute", left: x, top: y, opacity, whiteSpace: "nowrap" }}>
-    <span
-      style={{
-        ...body(34, true),
-        color: INK,
-        display: "inline-block",
-        padding: "6px 18px 8px",
-        border: `2px solid ${INK}`,
-        borderRadius: 10,
-        background: PAPER,
-      }}
-    >
-      Does Friday tip more?
-    </span>
+/** Where the lead's words sit under its `y`: where they sat inside the card
+ *  it used to have. */
+export const LEAD_DY = 8;
+
+/** The lead, the question that crosses from one side of the wall to the
+ *  other: plain words, no card round them. `x`, `y` is the top left of where
+ *  its box used to be; the words keep that box's top line and take its left
+ *  edge, so they share one edge with the "Confirming" column they settle in. */
+export const Lead: React.FC<{ x: number; y: number; opacity?: number }> = ({ x, y, opacity = 1 }) => (
+  <div style={{ position: "absolute", left: x, top: y + LEAD_DY, opacity, whiteSpace: "nowrap" }}>
+    <span style={{ ...body(34, true), color: INK }}>Does Friday tip more?</span>
   </div>
 );
 
@@ -229,8 +224,9 @@ export const WallScene: React.FC = () => {
       <Ink at={confirmFrom - 4} dur={16} style={{ left: 1060, top: y(318), whiteSpace: "nowrap" }}>
         <span style={{ ...body(44, true), color: INK }}>Confirming</span>
       </Ink>
-      <LeadCard x={card.x} y={card.y} />
-      <Ink at={advanceAt - 4} dur={14} style={{ left: 1428, top: y(CARD_TO.y) + 16, whiteSpace: "nowrap" }}>
+      <Lead x={card.x} y={card.y} />
+      {/* Beside the lead's words (about 300px), as close as a label to what it names. */}
+      <Ink at={advanceAt - 4} dur={14} style={{ left: CARD_TO.x + 332, top: y(CARD_TO.y) + 16, whiteSpace: "nowrap" }}>
         <span style={{ ...note(22, INK_SOFT) }}>stated in advance</span>
       </Ink>
 

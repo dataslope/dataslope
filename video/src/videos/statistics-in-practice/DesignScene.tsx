@@ -27,6 +27,10 @@ const METRICS = [
   "Page views",
 ];
 const MOVER = METRICS.indexOf("Scroll depth");
+/** The ten as two lines of plain names with a middle dot between them, no
+ *  chips; the lines 25px apart, as rows of text are. */
+const METRIC_ROWS = [METRICS.slice(0, 5), METRICS.slice(5)];
+const METRIC_ROW_GAP = 25;
 
 /**
  * Part 2 opens: the A/B test's arc, nearly all of it decided before the first
@@ -62,7 +66,7 @@ export const DesignScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      {/* ── Sound: the six steps, the buttons, the metric pinned, the chips, the strike ── */}
+      {/* ── Sound: the six steps, the buttons, the metric pinned, the ten metrics, the strike ── */}
       <Sfx name="el-pencil" at={experimentAt - 6} level={-34} />
       <Sfx name="el-pop" at={buttonAt - 4} level={-30} />
       <Sfx name="el-tap" at={metricAt - 4} level={-28} />
@@ -174,35 +178,41 @@ export const DesignScene: React.FC = () => {
         <Ink at={tenAt - 6} dur={14} style={{ left: 1010, top: y(690), whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>Or track ten</span>
         </Ink>
-        <div style={{ position: "absolute", left: 1010, top: y(726), width: 780, display: "flex", flexWrap: "wrap", gap: "12px 14px" }}>
-          {METRICS.map((m, k) => {
-            const p = Math.min(1.06, pop(frame, tenAt - 4 + k * 3, fps, 14));
-            const mover = k === MOVER;
-            return (
-              <div
-                key={m}
-                style={{
-                  opacity: Math.min(1, Math.max(0, p)) * (mover ? 1 : 1 - 0.45 * hot),
-                  transform: `scale(${0.8 + 0.2 * Math.max(0, p)})`,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <span
-                  style={{
-                    ...note(21, mover && hot > 0 ? STAT_INK : INK),
-                    fontWeight: mover ? 650 : 500,
-                    display: "inline-block",
-                    padding: "5px 14px",
-                    borderRadius: 20,
-                    border: `1.6px solid ${mover && hot > 0 ? STAT : HAIRLINE}`,
-                    background: mover ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(hot * 100)}%, ${PAPER})` : PAPER,
-                  }}
-                >
-                  {mover ? <Strike at={hackingAt - 4}>{m}</Strike> : m}
-                </span>
-              </div>
-            );
-          })}
+        <div style={{ position: "absolute", left: 1010, top: y(726), display: "flex", flexDirection: "column", gap: METRIC_ROW_GAP }}>
+          {METRIC_ROWS.map((row, r) => (
+            <div key={r} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
+              {row.map((m, j) => {
+                const k = r * METRIC_ROWS[0].length + j;
+                const p = Math.min(1.06, pop(frame, tenAt - 4 + k * 3, fps, 14));
+                const mover = k === MOVER;
+                return (
+                  <div
+                    key={m}
+                    style={{
+                      display: "flex",
+                      alignItems: "baseline",
+                      opacity: Math.min(1, Math.max(0, p)) * (mover ? 1 : 1 - 0.45 * hot),
+                      transform: `scale(${0.8 + 0.2 * Math.max(0, p)})`,
+                      transformOrigin: "50% 60%",
+                    }}
+                  >
+                    {/* The dot arrives with the name after it, so a line never ends on one. */}
+                    {j ? <span style={{ ...note(21, INK_SOFT), padding: "0 0.55em" }}>·</span> : null}
+                    <span
+                      style={{
+                        ...note(21, mover && hot > 0 ? STAT_INK : INK),
+                        fontWeight: mover ? 650 : 500,
+                        // The one that moved takes a highlight behind its words.
+                        background: mover ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(hot * 100)}%, transparent)` : undefined,
+                      }}
+                    >
+                      {mover ? <Strike at={hackingAt - 4}>{m}</Strike> : m}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
         <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(838), whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>and cheer the one that moved</span>

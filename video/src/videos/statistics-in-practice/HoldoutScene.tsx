@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HOLDOUT, TIPS } from "./data";
 import { Check, Headline, lerp, Marker, Spot, Svg, Wall } from "./parts";
-import { LeadCard, WALL_BOTTOM, WALL_TOP, WALL_X } from "./WallScene";
+import { Lead, WALL_BOTTOM, WALL_TOP, WALL_X } from "./WallScene";
 
 /** The 244 bills as a grid, 22 to a row, left of the wall. */
 const COLS = 22;
@@ -167,7 +167,7 @@ export const HoldoutScene: React.FC = () => {
 
       {/* ── The lead, carried over the wall without its data ── */}
       {cardIn > 0 ? (
-        <LeadCard
+        <Lead
           x={lerp(CARD_LEFT.x, CARD_RIGHT.x, carry)}
           y={y(lerp(CARD_LEFT.y, CARD_RIGHT.y, carry)) - Math.sin(carry * Math.PI) * 70}
           opacity={cardIn * (1 - 0.6 * fade)}

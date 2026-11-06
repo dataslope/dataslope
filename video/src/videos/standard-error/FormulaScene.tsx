@@ -136,12 +136,16 @@ export const FormulaScene: React.FC = () => {
             </span>
           </span>
         </Ink>
-        <Ink at={zeroAt - 2} dur={14} style={{ position: "relative" }}>
-          = <Marked at={zeroAt + 8} color={HIGHLIGHT}><span style={{ color: ACCENT_INK }}>{fmt(AGES.se)}</span></Marked>
-        </Ink>
-        <Ink at={zeroAt + 4} dur={14} style={{ position: "relative", ...body(36, true), color: INK_SOFT }}>
-          years
-        </Ink>
+        {/* The unit under the result, the way the root's value sits under
+            the root: the big line keeps one size. */}
+        <span style={{ display: "inline-flex", flexDirection: "column" }}>
+          <Ink at={zeroAt - 2} dur={14} style={{ position: "relative" }}>
+            = <Marked at={zeroAt + 8} color={HIGHLIGHT}><span style={{ color: ACCENT_INK }}>{fmt(AGES.se)}</span></Marked>
+          </Ink>
+          <Ink at={zeroAt + 4} dur={14} style={{ position: "relative", ...note(21, INK_SOFT), letterSpacing: "normal", marginTop: 4, marginLeft: 60 }}>
+            years
+          </Ink>
+        </span>
       </div>
 
       {/* ── The same ages, and their average's band, to one scale ── */}
@@ -227,7 +231,9 @@ const Definition: React.FC<{ at: number; top: number; symbol: string; color: str
   children,
 }) => (
   <Ink at={at} dur={16} style={{ left: 640, top, display: "flex", alignItems: "baseline", gap: 22, whiteSpace: "nowrap" }}>
-    <span style={{ ...headline(46, true), color, width: 34 }}>{symbol}</span>
+    {/* The symbol at the definition's own size, set apart by the head
+        face's italic and its color: one size to a line. */}
+    <span style={{ ...headline(32, true), color, width: 34 }}>{symbol}</span>
     <span style={{ ...body(32), color: INK }}>{children}</span>
   </Ink>
 );

@@ -4,9 +4,10 @@ import { MONO } from "../../theme/fonts";
 /**
  * Code inside a line of prose or a question, in the mono face at 0.92em:
  * within the 12% a line's sizes may differ by (`check:frames`, `[mixed]`),
- * where the 0.88em of da-pandas' `Mono` and the 0.84em of the interview
- * kit's `QMono` are not. Both of those are shared with other videos, so this
- * video takes its own. Never under the house floor of 19px.
+ * where the 0.88em of the series' shared `Mono` (da-sql's and da-pandas'
+ * parts) and the 0.84em of the interview kit's `QMono` are not. Both of
+ * those are shared with other videos, so this video takes its own. Never
+ * under the house floor of 19px.
  */
 const style = (color?: string, weight = 600): React.CSSProperties => ({
   fontFamily: MONO,
