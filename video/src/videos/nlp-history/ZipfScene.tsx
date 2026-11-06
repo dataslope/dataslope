@@ -73,6 +73,9 @@ export const ZipfScene: React.FC = () => {
     { title: "count", w: 140, align: "right" as const },
   ];
   const colX = COLS.map((_, i) => TX0 + COLS.slice(0, i).reduce((s, c) => s + c.w + 24, 0));
+  // What the law expects, set beside a count in a smaller size: more than
+  // 1.2em of the count's 26px clear of it, so it reads as a column of its own.
+  const LAW_GAP = 36;
 
   // ── The curve ──
   const path = ZIPF.curve.map(([r, c], i) => `${i ? "L" : "M"}${lx(r).toFixed(1)},${ly(c).toFixed(1)}`).join(" ");
@@ -154,7 +157,7 @@ export const ZipfScene: React.FC = () => {
             {el as React.ReactNode}
           </Ink>
         ))}
-        <Ink at={tenthAt + 6} dur={14} style={{ left: colX[2] + COLS[2].w + 22, top: TTOP + 52 + 8 * ROW + 3, whiteSpace: "nowrap" }}>
+        <Ink at={tenthAt + 6} dur={14} style={{ left: colX[2] + COLS[2].w + LAW_GAP, top: TTOP + 52 + 8 * ROW + 3, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>
             law: ≈ <span style={TABULAR}>{fmt(ZIPF.tenthByLaw, 0)}</span>
           </span>
@@ -163,7 +166,7 @@ export const ZipfScene: React.FC = () => {
           <line x1={TX0} x2={colX[2] + COLS[2].w} y1={TTOP + 52 + 8 * ROW - 6} y2={TTOP + 52 + 8 * ROW - 6} stroke={HAIRLINE} strokeWidth={1.2} strokeDasharray="4 5" />
         </Svg>
         {/* What one over the rank expects of the second word, beside what it got. */}
-        <Ink at={halfAt - 2} dur={14} style={{ left: colX[2] + COLS[2].w + 22, top: TTOP + 52 + ROW + 3, whiteSpace: "nowrap" }}>
+        <Ink at={halfAt - 2} dur={14} style={{ left: colX[2] + COLS[2].w + LAW_GAP, top: TTOP + 52 + ROW + 3, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>
             law: ≈ <span style={TABULAR}>{fmt(ZIPF.secondByLaw, 0)}</span>
           </span>
@@ -243,64 +246,4 @@ export const ZipfScene: React.FC = () => {
           strokeWidth={2}
           strokeDasharray="8 7"
         />
-        <path d={path} fill="none" stroke={DATA} strokeWidth={3.2} strokeLinejoin="round" pathLength={1} strokeDasharray={`${drawn} 1`} />
-        {/* The top two, almost level. */}
-        <ellipse
-          cx={(lx(1) + lx(2)) / 2}
-          cy={ly(5220)}
-          rx={52}
-          ry={26}
-          fill="none"
-          stroke={ACCENT}
-          strokeWidth={2.6}
-          pathLength={1}
-          strokeDasharray={`${ease(frame, roughAt - 2, 14)} 1`}
-        />
-      </Svg>
-      {TICKS.map((t) => (
-        <React.Fragment key={t}>
-          <div style={{ position: "absolute", left: lx(t), top: CY1 + 14, transform: "translateX(-50%)", opacity: ease(frame, rankAt, 14), ...note(20, INK_SOFT), ...TABULAR }}>
-            {fmt(t, 0)}
-          </div>
-          <div style={{ position: "absolute", left: CX0 - 16, top: ly(t), transform: "translate(-100%, -50%)", opacity: ease(frame, rankAt, 14), ...note(20, INK_SOFT), ...TABULAR }}>
-            {fmt(t, 0)}
-          </div>
-        </React.Fragment>
-      ))}
-      <Svg opacity={ease(frame, sevenAt - 2, 10)}>
-        <line x1={hapax1} x2={hapax1} y1={CY1 - 8} y2={CY1 + 8} stroke={DATA} strokeWidth={3} />
-      </Svg>
-      <Tag x={hapax1} y={ly(1) - 44} at={sevenAt - 2} align="center" size={20} color={DATA_INK} weight={650} style={{ background: PAPER }}>
-        <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span>
-      </Tag>
-      <Tag x={(CX0 + CX1) / 2} y={CY1 + 46} at={rankAt + 4} align="center" size={20} weight={600}>
-        rank, <Mark at={logAt}>log scale</Mark>
-      </Tag>
-      <Tag x={CX0 - 6} y={CY0 - 50} at={rankAt + 4} size={20} weight={600}>
-        times it appears, <Mark at={logAt + 4}>log scale</Mark>
-      </Tag>
-      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 66} at={lineAt + 6} size={21} color={INK_SOFT} weight={600} style={{ background: PAPER }}>
-        one over the rank
-      </Tag>
-      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 98} at={lawAt - 2} size={22} color={INK} weight={700} style={{ background: PAPER }}>
-        Zipf's law
-      </Tag>
-      <Tag x={lx(1) + 18} y={ly(14)} at={sixtyAt - 4} size={22} color={DATA_INK} weight={650}>
-        top 100 of <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span> words:
-      </Tag>
-      <Tag x={lx(1) + 18} y={ly(14) + 30} at={sixtyAt - 2} size={22} color={DATA_INK} weight={650}>
-        {fmt(ZIPF.top100Share * 100, 0)}% of the book
-      </Tag>
-      {/* Left of the run, where the plot is empty, with a short lead to it. */}
-      <Svg opacity={ease(frame, appearAt + 4, 12)}>
-        <line x1={HAPAX_LABEL + 12} x2={hapax0 - 14} y1={ly(1) - 14} y2={ly(1)} stroke={INK} strokeWidth={1.6} />
-      </Svg>
-      <Tag x={HAPAX_LABEL} y={ly(1) - 64} at={differentAt - 2} align="right" size={22} color={INK} weight={650}>
-        <span style={TABULAR}>{fmt(ZIPF.hapaxes, 0)}</span> of <span style={TABULAR}>{fmt(ZIPF.distinct, 0)}</span> words
-      </Tag>
-      <Tag x={HAPAX_LABEL} y={ly(1) - 34} at={appearAt - 2} align="right" size={22} color={INK} weight={650}>
-        appear once
-      </Tag>
-    </AbsoluteFill>
-  );
-};
+        <path d={path} fill="none" stroke={DATA} strokeWidth={3.2} strokeLine

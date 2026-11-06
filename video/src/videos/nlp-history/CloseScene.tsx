@@ -10,8 +10,13 @@ import { NOW, STORIES, storyYear } from "./data";
 import { DATA, DATA_INK, drift, Headline, Mark, pulse, Svg } from "./parts";
 import { Stem, TimelineAxis, tx, YearDot } from "./timeline";
 
-/** The left edge of the warnings, the second of the two lists under the axis. */
+/** The left edge of the warnings, the second of the two lists under the axis,
+ *  and where the longest line of the first list ends. */
 const WARN_X = 1100;
+const LEFT_END = 826;
+/** From a list line's year to its words: more than 1.2em of the words' size,
+ *  so the years read as a column of their own. */
+const YEAR_GAP = 46;
 
 /** The four counting ideas the course taught; the rest are the goal and the hype. */
 const COUNTING = new Set(["zipf", "shannon", "sparck", "w2v"]);
@@ -151,7 +156,7 @@ export const CloseScene: React.FC = () => {
                 }}
               >
                 <span style={{ ...label(24, counting ? DATA_INK : INK), fontWeight: 650 }}>{s.name}</span>
-                <span style={{ ...label(21, INK_SOFT), fontWeight: 500, ...TABULAR }}> {s.year}</span>
+                <span style={{ ...label(22, INK_SOFT), fontWeight: 500, ...TABULAR }}> {s.year}</span>
               </Ink>
             </React.Fragment>
           );
@@ -163,7 +168,7 @@ export const CloseScene: React.FC = () => {
         </Ink>
         {still.map((l, i) => (
           <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: 96, top: LIST + 40 + i * ROW, whiteSpace: "nowrap" }}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: YEAR_GAP }}>
               <span style={{ ...label(24, DATA_INK), fontWeight: 700, ...TABULAR }}>{storyYear(l.story)}</span>
               <span style={{ ...headline(34), color: INK }}>
                 {l.text.slice(0, l.text.lastIndexOf(l.markText))}
@@ -178,17 +183,17 @@ export const CloseScene: React.FC = () => {
         </Ink>
         {warn.map((l, i) => (
           <Ink key={l.story} at={l.at - 2} dur={16} style={{ left: WARN_X, top: LIST + 40 + i * ROW, whiteSpace: "nowrap" }}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: YEAR_GAP }}>
               <span style={{ ...label(24, ACCENT_INK), fontWeight: 700, ...TABULAR }}>{storyYear(l.story)}</span>
               <span style={{ ...headline(34, true), color: ACCENT_INK }}>{l.text}</span>
             </div>
           </Ink>
         ))}
         {/* The two lists side by side: a hairline centred in the gap between
-            the longest line on the left (it ends near x 798) and the warnings,
+            the longest line on the left and the warnings,
             from the lists' labels to the left list's last line. It inks with
             the warnings. */}
-        <ColumnRule x={(798 + WARN_X) / 2} top={LIST + 2} height={40 + 2 * ROW + 44} at={warningsAt - 2} />
+        <ColumnRule x={(LEFT_END + WARN_X) / 2} top={LIST + 2} height={40 + 2 * ROW + 44} at={warningsAt - 2} />
       </div>
     </AbsoluteFill>
   );

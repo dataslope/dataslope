@@ -110,7 +110,9 @@ export const GeorgetownScene: React.FC = () => {
           STAT_X[2],
           sixtyAt - 2,
           <>
-            <span style={{ ...headline(46), color: INK_SOFT }}>about </span>
+            {/* One line, one size: the hedge is set as large as the number
+                and told apart by its soft ink. */}
+            <span style={{ color: INK_SOFT }}>about </span>
             {DEMO.sentences}
           </>,
           <Mark at={pickedAt}>hand-picked sentences</Mark>,
