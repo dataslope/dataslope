@@ -3,17 +3,24 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { TICKETS } from "./data";
-import { A_INK, B, Check, Drift, FAINT, Headline, Marked, OK, PANEL, pulse, Svg, TRAP_INK, X0 } from "./parts";
+import { A_INK, B, Check, Drift, FAINT, Headline, Marked, OK, pulse, Svg, TRAP_INK, X0 } from "./parts";
 
-const COL_X = [X0, 700, 1280];
-const COL_W = 520;
+/** The three approaches as three columns of plain text and pictures, no
+ *  cards: each column's left edge and the width its widest piece (the JSON
+ *  listing) takes, spread across the page with a hairline centred in each
+ *  gap. */
+const COL_X = [X0, 730, 1340];
+const COL_W = 460;
 const TITLE_Y = 360;
 const GLYPH_Y = 440;
+/** Where the deepest column's text ("favors longer answers") ends, in px
+ *  under GLYPH_Y: where the hairlines stop. */
+const TEXT_END = 346;
 
 /**
  * Scoring answers with no exact match (Fig. 14): the lesson's three
@@ -25,7 +32,7 @@ const GLYPH_Y = 440;
 export const ScoringScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
 
   // ── Cues ──
   const from = n.beat("freetext").from;
@@ -73,10 +80,16 @@ export const ScoringScene: React.FC = () => {
       <Drift from={from} to={end} amount={0.012} origin="50% 60%">
         {titles.map((t, i) => (
           <React.Fragment key={t.text}>
-            <Svg opacity={ease(frame, from + 2 + i * 4, 14) * (0.45 + 0.55 * ease(frame, t.at, 10))}>
-              <rect x={COL_X[i]} y={y(TITLE_Y) - 30} width={COL_W} height={h(450)} rx={14} fill={PANEL} stroke={FAINT} strokeWidth={1.6} />
-            </Svg>
-            <Ink at={t.at} dur={14} style={{ left: COL_X[i] + 30, top: y(TITLE_Y) - 4, whiteSpace: "nowrap" }}>
+            {/* A hairline in each gap, inking in with the column to its right. */}
+            {i > 0 ? (
+              <ColumnRule
+                x={(COL_X[i - 1] + COL_W + COL_X[i]) / 2}
+                top={y(TITLE_Y) - 4}
+                height={y(GLYPH_Y) + TEXT_END - (y(TITLE_Y) - 4)}
+                at={t.at}
+              />
+            ) : null}
+            <Ink at={t.at} dur={14} style={{ left: COL_X[i], top: y(TITLE_Y) - 4, whiteSpace: "nowrap" }}>
               <span style={{ ...label(28, A_INK), fontWeight: 700, marginRight: 14 }}>{i + 1}</span>
               <span style={{ ...label(28, INK), fontWeight: 700 }}>{t.text}</span>
             </Ink>
@@ -84,7 +97,7 @@ export const ScoringScene: React.FC = () => {
         ))}
 
         {/* 1. Structured output: fields compared exactly. */}
-        <Ink at={checkableAt} dur={14} style={{ left: COL_X[0] + 30, top: y(GLYPH_Y) + 10, width: COL_W - 60 }}>
+        <Ink at={checkableAt} dur={14} style={{ left: COL_X[0], top: y(GLYPH_Y) + 10, width: COL_W }}>
           <div style={{ background: PAPER, border: `1.6px solid ${FAINT}`, borderRadius: 10, padding: "18px 22px", fontFamily: MONO, fontSize: 26, lineHeight: 1.7, color: INK }}>
             <div>{"{"}</div>
             <div style={{ paddingLeft: 26 }}>
@@ -94,14 +107,14 @@ export const ScoringScene: React.FC = () => {
           </div>
         </Ink>
         <Svg>
-          <Check x={COL_X[0] + 430} y={y(GLYPH_Y) + 10 + 82} at={compareAt} size={34} />
+          <Check x={COL_X[0] + 400} y={y(GLYPH_Y) + 10 + 82} at={compareAt} size={34} />
         </Svg>
-        <Ink at={compareAt - 2} dur={12} style={{ left: COL_X[0] + 30, top: y(GLYPH_Y) + 236, width: COL_W - 60 }}>
+        <Ink at={compareAt - 2} dur={12} style={{ left: COL_X[0], top: y(GLYPH_Y) + 236, width: COL_W }}>
           <span style={{ ...note(24, INK) }}>fields you can compare exactly</span>
         </Ink>
 
         {/* 2. Properties of the text, each a yes or no: here, of a summary. */}
-        <Ink at={summaryAt - 2} dur={12} style={{ left: COL_X[1] + 30, top: y(TITLE_Y) + 46, whiteSpace: "nowrap" }}>
+        <Ink at={summaryAt - 2} dur={12} style={{ left: COL_X[1], top: y(TITLE_Y) + 46, whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, INK_SOFT), fontStyle: "italic" }}>of a summary</span>
         </Ink>
         {[
@@ -109,24 +122,24 @@ export const ScoringScene: React.FC = () => {
           { text: "stays under the length limit", at: limitAt },
         ].map((p, i) => (
           <React.Fragment key={p.text}>
-            <Ink at={p.at - 4} dur={12} style={{ left: COL_X[1] + 84, top: y(GLYPH_Y) + 24 + i * 96, whiteSpace: "nowrap" }}>
+            <Ink at={p.at - 4} dur={12} style={{ left: COL_X[1] + 54, top: y(GLYPH_Y) + 24 + i * 96, whiteSpace: "nowrap" }}>
               <span style={{ ...note(28, INK), fontWeight: 600 }}>{p.text}</span>
             </Ink>
             <Svg opacity={ease(frame, propertiesAt - 2, 12)}>
-              <rect x={COL_X[1] + 30} y={y(GLYPH_Y) + 22 + i * 96} width={36} height={36} rx={7} fill={PAPER} stroke={INK_SOFT} strokeWidth={2} />
-              <Check x={COL_X[1] + 49} y={y(GLYPH_Y) + 40 + i * 96} at={p.at + 6} size={26} />
+              <rect x={COL_X[1]} y={y(GLYPH_Y) + 22 + i * 96} width={36} height={36} rx={7} fill={PAPER} stroke={INK_SOFT} strokeWidth={2} />
+              <Check x={COL_X[1] + 19} y={y(GLYPH_Y) + 40 + i * 96} at={p.at + 6} size={26} />
             </Svg>
           </React.Fragment>
         ))}
 
         {/* 3. A judge with a rubric, and its taste for length. */}
         <Svg opacity={ease(frame, strongAt - 2, 12)}>
-          <rect x={COL_X[2] + 30} y={y(GLYPH_Y) + 6} width={180} height={128} rx={10} fill={PAPER} stroke={INK} strokeWidth={2} />
+          <rect x={COL_X[2]} y={y(GLYPH_Y) + 6} width={180} height={128} rx={10} fill={PAPER} stroke={INK} strokeWidth={2} />
           {[0, 1, 2, 3].map((k) => (
-            <rect key={k} x={COL_X[2] + 52} y={y(GLYPH_Y) + 30 + k * 26} width={[130, 110, 136, 90][k]} height={9} rx={4} fill={B} opacity={ease(frame, rubricAt - 4 + k * 2, 8) * 0.8} />
+            <rect key={k} x={COL_X[2] + 22} y={y(GLYPH_Y) + 30 + k * 26} width={[130, 110, 136, 90][k]} height={9} rx={4} fill={B} opacity={ease(frame, rubricAt - 4 + k * 2, 8) * 0.8} />
           ))}
         </Svg>
-        <Ink at={rubricAt - 2} dur={12} style={{ left: COL_X[2] + 230, top: y(GLYPH_Y) + 54, whiteSpace: "nowrap" }}>
+        <Ink at={rubricAt - 2} dur={12} style={{ left: COL_X[2] + 200, top: y(GLYPH_Y) + 54, whiteSpace: "nowrap" }}>
           <span style={note(22, INK_SOFT)}>a rubric</span>
         </Ink>
         {[
@@ -137,12 +150,12 @@ export const ScoringScene: React.FC = () => {
           const swell = i === 1 ? pulse(frame, longerAt + 6, 20) : 0;
           return (
             <Svg key={i} opacity={ease(frame, favorAt - 6 + i * 3, 12)}>
-              <rect x={COL_X[2] + 30} y={ry} width={a.w} height={22} rx={4} fill={B} />
-              <Check x={COL_X[2] + 30 + a.w + 32} y={ry + 11} at={favorAt + i * 6} size={a.size * (1 + swell * 0.15)} color={i === 1 ? OK : B} />
+              <rect x={COL_X[2]} y={ry} width={a.w} height={22} rx={4} fill={B} />
+              <Check x={COL_X[2] + a.w + 32} y={ry + 11} at={favorAt + i * 6} size={a.size * (1 + swell * 0.15)} color={i === 1 ? OK : B} />
             </Svg>
           );
         })}
-        <Ink at={longerAt - 2} dur={14} style={{ left: COL_X[2] + 30, top: y(GLYPH_Y) + 316, whiteSpace: "nowrap" }}>
+        <Ink at={longerAt - 2} dur={14} style={{ left: COL_X[2], top: y(GLYPH_Y) + 316, whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, TRAP_INK), fontWeight: 600 }}>favors longer answers</span>
         </Ink>
       </Drift>

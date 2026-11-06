@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CONTAMINATION } from "./data";
-import { A_INK, Arrow, Drift, Headline, Marked, OK, OK_INK, pulse, Spot, Strike, Svg, Tag, TRAP, TRAP_INK, X0 } from "./parts";
+import { A_INK, Arrow, Drift, Headline, Marked, OK_INK, pulse, Spot, Strike, Svg, Tag, TRAP, TRAP_INK, X0 } from "./parts";
 
 const PIPE_Y = 356;
 const PIPE = [
@@ -149,12 +149,14 @@ export const ContaminationScene: React.FC = () => {
             The defense: a test it <Marked at={seenAt - 2}>can&apos;t have seen</Marked>
           </span>
         </Ink>
-        <Tag at={privateAt - 2} x={X0 + 640} y={y(808) - 8} color={OK}>
-          <span style={{ color: OK_INK }}>kept private</span>
-        </Tag>
-        <Tag at={newerAt - 2} x={X0 + 840} y={y(808) - 8} color={OK}>
-          <span style={{ color: OK_INK }}>newer than its training</span>
-        </Tag>
+        {/* Its two forms, as plain words under it, each as it is said. */}
+        <div style={{ position: "absolute", left: X0, top: y(808) + 46, whiteSpace: "nowrap", ...note(24, OK_INK), fontWeight: 650 }}>
+          <span style={{ opacity: ease(frame, privateAt - 2, 12) }}>kept private</span>
+          <span style={{ opacity: ease(frame, newerAt - 2, 12) }}>
+            <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span>
+            newer than its training
+          </span>
+        </div>
       </Drift>
 
       <Spot id="llm-benchmarks-elephant" at={memorizedAt - 6} left={1330} top={y(372)} width={420} height={470} />
