@@ -67,14 +67,17 @@ export const GateScene: React.FC = () => {
   const reachOne = ease(frame, doorAt - 4, 10) * (1 - ease(frame, wholeAt - 4, 10));
   const reachAll = ease(frame, wholeAt - 2, 16);
 
+  const parcelAt = kinds[2].at - 4;
+
   return (
     <AbsoluteFill>
-      {/* ── Sound: the building, each refusal, the reach of the rule ── */}
+      {/* ── Sound: the building, the parcel, each refusal, the reach of the rule ── */}
       <Sfx name="el-pop" at={getsAt - 4} level={-30} />
       {[0, 1, 2].map((i) => (
         <Sfx key={i} name="el-scratch" at={errAt(i) + 2} level={-34} />
       ))}
       <Sfx name="el-pencil" at={wholeAt - 2} level={-34} />
+      <Sfx name="el-pop" at={parcelAt} level={-30} />
 
       {/* The beat's first sentence, then the one the blocks illustrate. */}
       <Headline lead="Design decides" turn="what gets in." at={gateFrom - 6} turnAt={getsAt - 4} out={badAt - 8} size={72} />
@@ -139,7 +142,7 @@ export const GateScene: React.FC = () => {
       {/* The building every program enters, from "what gets in", and the programs, under it. */}
       <Spot id="db-why-design-building" at={getsAt - 4} left={RIGHT_X} top={y(BUILDING_Y)} width={340} height={BUILDING_H} />
       {/* "An order for a customer who isn't there": a parcel on an empty doormat, under the programs. */}
-      <Spot id="db-why-design-parcel" at={kinds[2].at - 4} left={1540} top={y(754)} width={225} height={170} />
+      <Spot id="db-why-design-parcel" at={parcelAt} left={1540} top={y(754)} width={225} height={170} />
       {PROGRAMS.map((p, i) => {
         const lit = i === 0 ? ease(frame, doorAt - 4, 10) : wholeIn;
         return (

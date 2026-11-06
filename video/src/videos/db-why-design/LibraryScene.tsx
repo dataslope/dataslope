@@ -69,9 +69,11 @@ export const LibraryScene: React.FC = () => {
   // "makes" line waits for the box to reach its full height.
   const borrowersAt = loanTitleAt + 4;
 
+  const catalogSpotAt = catalogAt - 4;
+
   return (
     <AbsoluteFill>
-      {/* ── Sound: each entity as it lands, the lines between them ── */}
+      {/* ── Sound: each entity as it lands, the lines between them, the two spots ── */}
       <Sfx name="el-tap" at={bookAt - 2} level={-29} />
       <Sfx name="el-tap" at={copyAt - 2} level={-29} />
       <Sfx name="el-pencil" at={shelfAt} level={-34} />
@@ -80,13 +82,14 @@ export const LibraryScene: React.FC = () => {
       <Sfx name="el-tap" at={borrowersAt - 2} level={-31} />
       <Sfx name="el-pencil" at={borrowersAt + 24} level={-36} />
       <Sfx name="el-pop" at={libraryAt - 2} level={-31} />
+      <Sfx name="el-pop" at={catalogSpotAt} level={-30} />
 
       <Headline lead="A book:" turn="the title, or the copy?" at={libFrom - 6} turnAt={copyAt - 4} out={manualAt - 4} size={72} />
       <Headline lead="Not syntax," turn="meaning." at={manualAt + 2} turnAt={meansAt - 2} size={72} />
 
       <Spot id="db-why-design-books" at={libraryAt - 4} dim={payAt} left={X0 + 10} top={y(625)} width={316} height={300} />
       {/* "the title in the catalog": a card catalog, bottom right, under the "makes" line. */}
-      <Spot id="db-why-design-catalog" at={catalogAt - 4} dim={payAt} left={1560} top={y(698)} width={236} height={190} />
+      <Spot id="db-why-design-catalog" at={catalogSpotAt} dim={payAt} left={1560} top={y(698)} width={236} height={190} />
 
       <Drift from={libFrom} to={end} amount={0.02} origin="60% 50%">
         <div style={{ position: "absolute", inset: 0, opacity: fade }}>

@@ -74,11 +74,15 @@ export const CostScene: React.FC = () => {
   const rewritten = (i: number) => rewriteAt - 2 + i * 5;
   const dimAll = whatAt - 4;
 
+  // The copier pops in late in "copies", after the fact's own split, so the two pops are heard apart.
+  const copierAt = copiesAt + 6;
+
   return (
     <AbsoluteFill>
-      {/* ── Sound: the reply, the split, the programs, the name, the rewrite ── */}
+      {/* ── Sound: the reply, the split, the copier, the programs, the name, the rewrite ── */}
       <Sfx name="el-tap" at={legalFrom - 2} level={-30} />
       <Sfx name="el-pop" at={copiesAt - 2} level={-30} />
+      <Sfx name="el-pop" at={copierAt} level={-30} />
       <Sfx name="el-pencil" at={stepAt - 4} level={-35} />
       <Sfx name="el-pencil" at={anomalyAt + 4} level={-34} />
       <Sfx name="el-whoosh" at={rewriteAt - 4} level={-34} />
@@ -86,7 +90,7 @@ export const CostScene: React.FC = () => {
       <Headline lead="Legal SQL," turn="bad design." at={legalFrom - 6} turnAt={designAt - 4} />
 
       {/* "became copies": a copier, top right above the update, dimmed with the page. */}
-      <Spot id="db-why-design-copier" at={copiesAt - 4} dim={dimAll} left={1540} top={y(92)} width={237} height={200} />
+      <Spot id="db-why-design-copier" at={copierAt} dim={dimAll} left={1540} top={y(92)} width={237} height={200} />
 
       <Drift from={legalFrom} to={end} amount={0.018} origin="45% 55%">
         <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, dimAll, 20) * 0.6 }}>

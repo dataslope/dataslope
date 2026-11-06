@@ -83,23 +83,29 @@ export const JoinScene: React.FC = () => {
   const g = tableGeometry({ x: X0, top: y(LOW_Y), cols: NOTEBOOK.cols, rows: NOTEBOOK.rows, headH: h(48), rowH: h(56) });
   const parts = NOTE_TEXT.split(/(notebooks)/);
 
+  // The notebook pops in inside "notebook", after the products box's tap, so the two are heard apart.
+  const notebookSpotAt = notebookAt + 6;
+  const chainAt = linksAt - 4;
+
   return (
     <AbsoluteFill>
-      {/* ── Sound: the entities, each link, the one row, the sentence and its chores ── */}
+      {/* ── Sound: the entities, each link, the one row, the sentence and its chores, the two spots ── */}
       <Sfx name="el-tap" at={customersAt - 2} level={-30} />
       <Sfx name="el-tap" at={notebookAt - 2} level={-30} />
       <Sfx name="el-pencil" at={link(0)} level={-35} />
       <Sfx name="el-pop" at={adaAt - 4} level={-29} />
       <Sfx name="el-whoosh" at={sentenceAt - 6} level={-34} />
       <Sfx name="el-tap" at={notebooksAt + 8} level={-30} />
+      <Sfx name="el-pop" at={notebookSpotAt} level={-30} />
+      <Sfx name="el-pop" at={chainAt} level={-30} />
 
       <Kicker at={askFrom - 10}>What design buys</Kicker>
       <Headline lead="Which customers" turn="bought a notebook?" at={askFrom - 6} turnAt={notebookAt - 6} size={72} />
 
       {/* The headline's notebook, top right; then "links", three of them for the three joins,
           in the empty lower right until Fig. 6 needs it. */}
-      <Spot id="db-why-design-notebook" at={notebookAt - 4} left={1590} top={y(81)} width={197} height={180} />
-      <Spot id="db-why-design-chain" at={linksAt - 4} out={sentenceAt - 20} left={1150} top={y(679)} width={340} height={120} />
+      <Spot id="db-why-design-notebook" at={notebookSpotAt} left={1590} top={y(81)} width={197} height={180} />
+      <Spot id="db-why-design-chain" at={chainAt} out={sentenceAt - 20} left={1150} top={y(679)} width={340} height={120} />
 
       <Drift from={askFrom} to={end} amount={0.016} origin="50% 40%">
         <div style={{ position: "absolute", inset: 0, opacity: 1 - lowered * 0.5 }}>
