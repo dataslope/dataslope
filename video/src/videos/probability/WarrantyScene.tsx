@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { BINOM, num, pct, WARRANTY } from "./data";
-import { Big, Count, DATA, Headline, Held, lerp, STAT_INK, Svg, Sweep, VBracket } from "./parts";
+import { Big, Count, DATA, Headline, Held, lerp, Spot, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 const RIGHT = 1150;
 /** The closing band: three named shapes, small. */
@@ -106,6 +106,10 @@ export const WarrantyScene: React.FC = () => {
 
       <div style={{ opacity: 1 - dim }}>
         <Headline top={y(150)} first="An $80 warranty." second="Who comes out ahead?" firstAt={warrantyFrom - 6} secondAt={paysAt - 4} />
+        {/* The warranty itself, in the right half while the outcomes are
+            worked out on the left; it leaves before the million sales take
+            that half. */}
+        <Spot id="probability-warranty" at={eightyAt - 2} out={millionAt - 14} left={1290} top={y(300)} width={460} height={431} />
         {/* A list of outcomes rather than a chart, so a plain label, not a
             numbered figure. */}
         <Ink at={eightyAt - 6} dur={14} style={{ left: 160, top: y(268), whiteSpace: "nowrap" }}>
