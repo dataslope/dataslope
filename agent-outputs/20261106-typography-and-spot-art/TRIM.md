@@ -14,6 +14,12 @@ where they earn it", is the rule you are trimming to.
 
 ## The rule, in short
 
+**The layout comes first.** The owner: images go in "only when there is
+enough whitespace, and adding the image does not hurt the aesthetics of the
+beautiful layout you previously had". So judge each image against the page
+without it: if the page looked better, or as good, without it, leave it out.
+When in doubt, leave it out.
+
 - **At most one image per scene, counting the art that was there before
   today.** A scene that already had art (a hero, an older spot) keeps that
   and gets none of today's. Many scenes end with none.

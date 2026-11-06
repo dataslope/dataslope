@@ -36,6 +36,12 @@ for neighbours on one line that differ in size by more than 12% or in family
 
 ## 2. A few small spot images, only where they earn it
 
+**The layout comes first.** The owner: images go in "only when there is
+enough whitespace, and adding the image does not hurt the aesthetics of the
+beautiful layout you previously had". So judge each image against the page
+without it: if the page looked better, or as good, without it, leave it out.
+When in doubt, leave it out.
+
 **Revised 2026-11-06 after the owner saw the first videos: it was more than
 they want.** Their words: "I don't want to flood the videos with watercolor
 images", and Stats-3's store, tucked under the warranty sums at the bottom

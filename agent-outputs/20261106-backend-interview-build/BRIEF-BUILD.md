@@ -88,8 +88,11 @@ Timing (`pauseAfter`) and cues are yours.
    bleed as margin (copy a `Mark` from `src/videos/da-pandas/parts.tsx`,
    which already does). A flex row with an `em` gap carries its own
    `fontSize`. Nothing under 19px; about 25px between rows of text.
-3. **Art.** Your hero (the plan's creature) and **a few small spot images,
-   only where they earn it** (revised 2026-11-06: the owner found the first
+3. **Art. The layout comes first:** an image goes in only where there is
+   enough whitespace and it does not hurt the page's design; judge each
+   against the page without it, and when in doubt, leave it out. Your hero
+   (the plan's creature) and **a few small spot images, only where they earn
+   it** (revised 2026-11-06: the owner found the first
    pass too much, "I don't want to flood the videos with watercolor
    images"). At most one per scene, and many scenes get none; only where it
    shows the thing the scene is about, never decoration for a passing word;
