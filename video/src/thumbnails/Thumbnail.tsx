@@ -72,6 +72,9 @@ export type ThumbnailProps = {
   track: keyof typeof TRACKS;
   label?: InterviewLabel;
   tone?: LabelTone;
+  /** An interview track's role ("Data Analyst"): black like a course
+   *  title, or in the brand blue, with the label after it in black. */
+  role?: "black" | "blue";
   /** A course's "Full Course": smaller than the title, or the title's size. */
   kicker?: "small" | "same";
   /** Where the animal stands: on the line the words end on, or hung from
@@ -113,7 +116,7 @@ const Lines: React.FC<{ lines: string[]; style: React.CSSProperties }> = ({ line
 
 const TONE: Record<LabelTone, string> = { black: INK, "gray-600": ds("gray", 600), "gray-500": ds("gray", 500) };
 
-export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", tone = "gray-600", kicker = "small", artAt = "bottom" }) => {
+export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", tone = "gray-600", kicker = "small", artAt = "bottom", role = "black" }) => {
   const t = TRACKS[track];
   const course = t.kind === "course";
   const kick = kicker === "same" ? SIZE : KICKER;
@@ -151,7 +154,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", ton
         {course ? (
           <div style={{ ...type(kick, ds("blue", 500)), marginBottom: kicker === "same" ? 0.12 * SIZE : 0.2 * KICKER }}>Full Course</div>
         ) : null}
-        <Lines lines={t.title} style={type(SIZE, INK)} />
+        <Lines lines={t.title} style={type(SIZE, !course && role === "blue" ? ds("blue", 500) : INK)} />
         {course ? null : (
           <div style={{ marginTop: 0.12 * SIZE }}>
             <Lines lines={INTERVIEW[label]} style={type(SIZE, TONE[tone])} />
@@ -169,7 +172,7 @@ const cap = (x: string) => x.replace(/(^|-)(\w)/g, (_, d: string, c: string) => 
 /** Every thumbnail the Studio shows, with the animal low or high: a course
  *  with "Full Course" smaller than its title or at its size, and an
  *  interview track saying "Interview Prep" or "Interview Preparation" in
- *  black or either grey. */
+ *  black or either grey, or in black after its role in blue. */
 export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entries(TRACKS).flatMap(([track, t]) =>
   (["bottom", "top"] as const).flatMap((artAt): { id: string; props: ThumbnailProps }[] =>
     t.kind === "course"
@@ -178,10 +181,15 @@ export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entrie
           props: { track, kicker, artAt },
         }))
       : (["prep", "preparation"] as InterviewLabel[]).flatMap((label) =>
-          (["black", "gray-600", "gray-500"] as LabelTone[]).map((tone) => ({
-            id: `Thumb-${track}-${cap(label)}-${cap(tone)}-${cap(artAt)}`,
-            props: { track, label, tone, artAt },
-          })),
+          [
+            ...(["black", "gray-600", "gray-500"] as LabelTone[]).map((tone) => ({
+              id: `Thumb-${track}-${cap(label)}-${cap(tone)}-${cap(artAt)}`,
+              props: { track, label, tone, artAt },
+            })),
+            // The role in blue, the label in black: the courses' scheme turned
+            // round, the line that names the video in blue.
+            { id: `Thumb-${track}-${cap(label)}-BlueRole-${cap(artAt)}`, props: { track, label, tone: "black", role: "blue", artAt } },
+          ],
         ),
   ),
 );
