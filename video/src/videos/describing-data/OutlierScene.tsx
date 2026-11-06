@@ -252,9 +252,10 @@ export const OutlierScene: React.FC = () => {
           </div>
         );
       })}
-      {/* Each hairline is as tall as the columns' three lines, centred between
-          the longest line on its left and the column on its right, and inks
-          in with that column. */}
+      {/* Each hairline is as tall as the columns' text (two lines, then three
+          once what each kind calls for arrives), centred between the longest
+          line on its left and the column on its right, and inks in with that
+          column. */}
       {GAP_X.map((x, i) => (
         <div
           key={x}
@@ -263,7 +264,7 @@ export const OutlierScene: React.FC = () => {
             left: x,
             top: y(CARDS) + 18,
             width: 1,
-            height: 118,
+            height: 76 + 42 * Math.max(ease(frame, actAt[i] - 4, 12), ease(frame, actAt[i + 1] - 4, 12)),
             background: HAIRLINE,
             opacity: kindShown(i + 1),
           }}

@@ -18,10 +18,9 @@ const TABLE_X = 1080;
 const change = (x: number) => `${x > 0 ? "+" : "−"}${fmt(Math.abs(x) * 100, 0)}%`;
 
 /**
- * Question 5. Four checks down the left, numbered in plain figures, the last
- * one the trap: the video's
- * own two weeks, where conversion rose 20% because sessions fell 20% and
- * orders fell 4%.
+ * Question 5. Four checks down the left, numbered in plain figures, the
+ * last one the trap: the video's own two weeks, where conversion rose 20%
+ * because sessions fell 20% and orders fell 4%.
  */
 export const MetricScene: React.FC = () => {
   const frame = useCurrentFrame();

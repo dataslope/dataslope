@@ -365,7 +365,7 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       {/* The low-priority thread: waiting below, then in the fair queue, then served. */}
       <Token
-        x={lerp(lerp(1260, slot(1), fairIn), slot(0), serve1)}
+        x={lerp(lerp(1400, slot(1), fairIn), slot(0), serve1)}
         y={rowY + c.h(76) * (1 - fairIn)}
         text={fairIn > 0.5 ? "2 low" : "low"}
         high={false}

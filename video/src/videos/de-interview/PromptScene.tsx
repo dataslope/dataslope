@@ -2,23 +2,26 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, body, label, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, body, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { partOf } from "./data";
-import { Chip, Drift, Flow, Headline, Kicker, Mono, Spot } from "./parts";
+import { Drift, Flow, Headline, Kicker, Mono, Spot } from "./parts";
 
-/** The stack's left edge, its right edge, and the arrow beside it. */
+/** The stack's left edge, its right edge, and the arrow beside it. The
+ *  layers are rows of plain text ruled off by a hairline, not boxes. */
 const STACK_X = 184;
 const STACK_R = 1440;
 const ARROW_X = 128;
-/** Each layer's top, in layout coordinates, and its height. */
+/** Each layer's top, in layout coordinates, and its height; the hairline
+ *  between two layers sits in the middle of the gap. */
 const BAND_TOP = 300;
 const BAND_H = 128;
 const BAND_GAP = 18;
-/** The layer's name column. */
+/** The layer's name column, and the space between it and the topics. */
 const NAME_W = 300;
+const NAME_GAP = 48;
 /** The bracket that takes in all four layers, right of the stack, and the
  *  design prompt set beside it, under the meerkat. */
 const BRACKET_X = 1470;
@@ -36,7 +39,9 @@ type Layer = {
   until: number;
   /** The topic videos that answer this layer's questions, by folder. */
   parts: string[];
-  chips: { at: number; text: React.ReactNode }[];
+  /** Its topics, each on the line (0 or 1) it is set on: two lines of words
+   *  joined by middle dots, broken by hand so no line opens on a dot. */
+  chips: { at: number; text: React.ReactNode; line: 0 | 1 }[];
 };
 
 /** "Parts 1–2" or "Parts 6, 8, 10": a run of two is a range, anything else a
@@ -98,11 +103,11 @@ export const PromptScene: React.FC = () => {
       until: n.beat("probe-model").from,
       parts: ["de-sql-patterns", "de-sql-performance"],
       chips: [
-        { at: n.word("probe-sql", "window functions"), text: "window functions" },
-        { at: n.word("probe-sql", "qualify"), text: <Mono>QUALIFY</Mono> },
-        { at: n.word("probe-sql", "deduplication"), text: "deduplication" },
-        { at: n.word("probe-sql", "gaps and islands"), text: "gaps and islands" },
-        { at: n.word("probe-sql", "incremental logic"), text: "incremental logic" },
+        { at: n.word("probe-sql", "window functions"), text: "window functions", line: 0 },
+        { at: n.word("probe-sql", "qualify"), text: <Mono>QUALIFY</Mono>, line: 0 },
+        { at: n.word("probe-sql", "deduplication"), text: "deduplication", line: 0 },
+        { at: n.word("probe-sql", "gaps and islands"), text: "gaps and islands", line: 1 },
+        { at: n.word("probe-sql", "incremental logic"), text: "incremental logic", line: 1 },
       ],
     },
     {
@@ -111,10 +116,10 @@ export const PromptScene: React.FC = () => {
       until: n.beat("probe-pipe").from,
       parts: ["de-dimensional-modeling", "de-modeling-history"],
       chips: [
-        { at: n.word("probe-model", "star or snowflake schemas"), text: "star or snowflake schemas" },
-        { at: n.word("probe-model", "facts and dimensions"), text: "facts and dimensions" },
-        { at: n.word("probe-model", "normalization trade-offs"), text: "normalization trade-offs" },
-        { at: n.word("probe-model", "slowly changing dimensions"), text: "slowly changing dimensions" },
+        { at: n.word("probe-model", "star or snowflake schemas"), text: "star or snowflake schemas", line: 0 },
+        { at: n.word("probe-model", "facts and dimensions"), text: "facts and dimensions", line: 0 },
+        { at: n.word("probe-model", "normalization trade-offs"), text: "normalization trade-offs", line: 1 },
+        { at: n.word("probe-model", "slowly changing dimensions"), text: "slowly changing dimensions", line: 1 },
       ],
     },
     {
@@ -123,10 +128,10 @@ export const PromptScene: React.FC = () => {
       until: n.beat("probe-store").from,
       parts: ["de-pipelines", "de-streaming", "de-orchestration"],
       chips: [
-        { at: n.word("probe-pipe", "batch or streaming"), text: "batch or streaming" },
-        { at: n.word("probe-pipe", "idempotency"), text: "idempotency" },
-        { at: n.word("probe-pipe", "backfills"), text: "backfills" },
-        { at: n.word("probe-pipe", "scheduling in Airflow or Dagster"), text: "scheduling: Airflow, Dagster" },
+        { at: n.word("probe-pipe", "batch or streaming"), text: "batch or streaming", line: 0 },
+        { at: n.word("probe-pipe", "idempotency"), text: "idempotency", line: 0 },
+        { at: n.word("probe-pipe", "backfills"), text: "backfills", line: 0 },
+        { at: n.word("probe-pipe", "scheduling in Airflow or Dagster"), text: "scheduling: Airflow, Dagster", line: 1 },
       ],
     },
     {
@@ -135,10 +140,10 @@ export const PromptScene: React.FC = () => {
       until: designFrom,
       parts: ["de-distributed", "de-warehousing"],
       chips: [
-        { at: n.word("probe-store", "columnar files like Parquet"), text: "columnar files (Parquet)" },
-        { at: n.word("probe-store", "partitioning and file sizes"), text: "partitioning, file sizes" },
-        { at: n.word("probe-store", "warehouse or lakehouse"), text: "warehouse or lakehouse" },
-        { at: n.word("probe-store", "and cost"), text: "cost" },
+        { at: n.word("probe-store", "columnar files like Parquet"), text: "columnar files (Parquet)", line: 0 },
+        { at: n.word("probe-store", "partitioning and file sizes"), text: "partitioning, file sizes", line: 0 },
+        { at: n.word("probe-store", "warehouse or lakehouse"), text: "warehouse or lakehouse", line: 1 },
+        { at: n.word("probe-store", "and cost"), text: "cost", line: 1 },
       ],
     },
   ];
@@ -223,56 +228,94 @@ export const PromptScene: React.FC = () => {
           // screen" until its own topics start.
           const deeper = i === 0 ? ease(frame, deeperAt - 2, 12) * (1 - ease(frame, firstChip - 12, 10)) : 0;
           return (
-            <div
-              key={l.name}
-              style={{
-                position: "absolute",
-                left: STACK_X,
-                top: bandY(i),
-                width: STACK_R - STACK_X,
-                height: h(BAND_H),
-                boxSizing: "border-box",
-                border: `1.5px solid ${HAIRLINE}`,
-                borderRadius: 12,
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(current * 45)}%, ${PAPER})`,
-                display: "flex",
-                alignItems: "center",
-                padding: "0 28px",
-                gap: 24,
-                opacity: p,
-                transform: `translateY(${(1 - p) * -12}px)`,
-              }}
-            >
-              <div style={{ width: NAME_W, flex: "none" }}>
-                <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.12 }}>{l.name}</div>
-                {/* The parts open a line under the name as they ink in, so
-                    the name rises to make room and the two stay centred in
-                    the band together. */}
+            <React.Fragment key={l.name}>
+              {/* The hairline between this layer and the one above, drawing
+                  in as the layer inks. */}
+              {i > 0 ? (
                 <div
                   style={{
-                    ...label(21, BLUE_INK),
-                    lineHeight: "26px",
-                    height: 26 * partsIn(i),
-                    marginTop: 6 * partsIn(i),
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    opacity: partsIn(i),
+                    position: "absolute",
+                    left: STACK_X,
+                    top: bandY(i) - Math.round(h(BAND_GAP) / 2),
+                    width: (STACK_R - STACK_X) * ease(frame, l.at - 2, 18),
+                    height: 1,
+                    background: HAIRLINE,
                   }}
-                >
-                  <PartsLabel parts={l.parts.map(partOf)} />
+                />
+              ) : null}
+              <div
+                style={{
+                  position: "absolute",
+                  left: STACK_X,
+                  top: bandY(i),
+                  width: STACK_R - STACK_X,
+                  height: h(BAND_H),
+                  display: "flex",
+                  alignItems: "center",
+                  gap: NAME_GAP,
+                  opacity: p,
+                  transform: `translateY(${(1 - p) * -12}px)`,
+                }}
+              >
+                <div style={{ width: NAME_W, flex: "none" }}>
+                  {/* The layer being read carries the highlighter behind its
+                      name, its width given back as margin. */}
+                  <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.12 }}>
+                    <span
+                      style={{
+                        padding: "1px 10px 3px",
+                        margin: "0 -10px",
+                        borderRadius: 8,
+                        background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(current * 100)}%, transparent)`,
+                        boxDecorationBreak: "clone",
+                        WebkitBoxDecorationBreak: "clone",
+                      }}
+                    >
+                      {l.name}
+                    </span>
+                  </div>
+                  {/* The parts open a line under the name as they ink in, so
+                      the name rises to make room and the two stay centred in
+                      the row together. */}
+                  <div
+                    style={{
+                      ...label(21, BLUE_INK),
+                      lineHeight: "26px",
+                      height: 26 * partsIn(i),
+                      marginTop: 6 * partsIn(i),
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      opacity: partsIn(i),
+                    }}
+                  >
+                    <PartsLabel parts={l.parts.map(partOf)} />
+                  </div>
+                </div>
+                {/* The topics, as plain words on two lines, joined by middle
+                    dots, each as it is said. */}
+                <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
+                  {([0, 1] as const).map((line) => (
+                    <div key={line} style={{ ...note(26, INK), lineHeight: 1.3, whiteSpace: "nowrap" }}>
+                      {l.chips
+                        .filter((c) => c.line === line)
+                        .map((c, k) => (
+                          <span key={k} style={{ opacity: ease(frame, c.at - 2, 12) }}>
+                            {k ? <span style={{ color: INK_SOFT }}> · </span> : null}
+                            {c.text}
+                          </span>
+                        ))}
+                    </div>
+                  ))}
+                  {/* Inter at the layer name's size, not the serif: the two
+                      share the row's one line, so they share one face. */}
+                  {deeper > 0 ? (
+                    <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", ...note(30, INK_SOFT), opacity: deeper, whiteSpace: "nowrap" }}>
+                      a level deeper than an analyst screen
+                    </div>
+                  ) : null}
                 </div>
               </div>
-              <div style={{ position: "relative", flex: 1, display: "flex", flexWrap: "wrap", gap: "10px 12px", alignContent: "center" }}>
-                {l.chips.map((c, k) => (frame >= c.at - 2 ? <Chip key={k} at={c.at} size={26}>{c.text}</Chip> : null))}
-                {/* Inter at the layer name's size, not the serif: the two
-                    share the band's one line, so they share one face. */}
-                {deeper > 0 ? (
-                  <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", ...note(30, INK_SOFT), opacity: deeper, whiteSpace: "nowrap" }}>
-                    a level deeper than an analyst screen
-                  </div>
-                ) : null}
-              </div>
-            </div>
+            </React.Fragment>
           );
         })}
 

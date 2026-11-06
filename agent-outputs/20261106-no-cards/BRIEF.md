@@ -36,7 +36,9 @@ and `.../v3/`).
    columns' text, centred in the gap, at least 24px from the text either
    side, none before the first column or after the last, inking in with the
    column to its right. Not between words on one line, and not where a
-   fork's arrows already separate the columns.
+   fork's arrows already separate the columns. `ColumnRule` in
+   `src/editorial/ui.tsx` draws one (`x` the gap's centre, `top`, `height`,
+   `at`, optional `dim`).
 4. **The padding comes back as space.** The box was doing the grouping, so
    space has to: clearly more space between groups than inside one. At
    least 40px between groups (a source block and its first figure, one stat

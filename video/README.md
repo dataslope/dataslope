@@ -251,6 +251,7 @@ Every video follows these rules.
   the gap and at least 24px from the text on either side. Not before the
   first column or after the last, and not between words on one line (a
   middle dot does that). It inks in with the column to its right.
+  `ColumnRule` in `src/editorial/ui.tsx` draws one.
   **A card that comes off leaves its padding behind as space** (the owner:
   "ensure that there are enough spacing between items after removing a
   card design"). The box was doing the grouping; without it, space has to.

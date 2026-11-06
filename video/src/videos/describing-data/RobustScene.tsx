@@ -128,15 +128,16 @@ export const RobustScene: React.FC = () => {
             <Mark at={meanGoesAt - 2}>goes with a mean</Mark>
           </div>
         </Ink>
-        {/* The two readouts sit side by side: a hairline in the gap, as tall as
-            a readout and its note, inking in with the IQR on its right. */}
+        {/* The two readouts sit side by side: a hairline in the gap, inking in
+            with the IQR on its right, as tall as a readout and growing to take
+            in the notes under them when they arrive. */}
         <div
           style={{
             position: "absolute",
             left: 1368,
             top: statsY + 2,
             width: 1,
-            height: 80,
+            height: 40 + 40 * ease(frame, meanGoesAt - 4, 12),
             background: HAIRLINE,
             opacity: ease(frame, fourteenAt - 4, 14),
           }}

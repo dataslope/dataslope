@@ -204,3 +204,25 @@ export const NextLine: React.FC<{
     </>
   );
 };
+
+/**
+ * The 1px vertical hairline between columns set side by side, which the
+ * house uses where a row of boxes used to separate them (README, "No cards
+ * unless the layout needs one"). `x` is the centre of the gap, `top` and
+ * `height` match the columns' text. It draws down over 14 frames from `at`,
+ * the frame the column to its right arrives; `dim` fades it with the
+ * columns when the page moves on.
+ */
+export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: number; dim?: number }> = ({
+  x,
+  top,
+  height,
+  at,
+  dim,
+}) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at - 2, 14);
+  if (p <= 0) return null;
+  const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.55;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height: height * p, background: HAIRLINE, opacity: 1 - d }} />;
+};

@@ -218,10 +218,18 @@ export const AbScene: React.FC = () => {
         <Title n={4} x={COL[1]} y={y(ROW[1])} at={guardAt - 2}>
           add guardrails
         </Title>
-        {guards.map((g) => (
-          <Chip key={g.text} x={COL[1] + (g.w % 2) * 330} y={y(ROW[1]) + 70 + Math.floor(g.w / 2) * 64} at={g.at - 2} size={23} ink={BLUE_INK}>
-            {g.text}
-          </Chip>
+        {/* The guardrails as words, two to a line, a middle dot between. */}
+        {[0, 1].map((line) => (
+          <Note key={line} at={guards[line * 2].at - 2} x={COL[1]} y={y(ROW[1]) + 80 + line * 50} from="up">
+            <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+              {guards.slice(line * 2, line * 2 + 2).map((g, k) => (
+                <span key={g.text} style={{ opacity: ease(frame, g.at - 2, 12) }}>
+                  {k ? <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
+                  {g.text}
+                </span>
+              ))}
+            </span>
+          </Note>
         ))}
         <Note at={slowAt} x={COL[1]} y={y(ROW[1]) + 210}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>

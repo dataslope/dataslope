@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Mark, X0 } from "./parts";
 
-const BASE_Y = 720;
+const BASE_Y = 670;
 const BLOCK_W = 384;
 const BLOCK_GAP = 24;
 /** A layer's row, and the space between the lowest layer and the loop. */

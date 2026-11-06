@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Chip, Clear, Drift, Headline, Kicker, madeUp, Mark, OK_INK, ReplyCard, Spot, X0 } from "./parts";
+import { Clear, Drift, Headline, Kicker, madeUp, Mark, OK_INK, Reply, Spot, X0 } from "./parts";
 
 const CARD_W = 540;
 const CARD_GAP = 40;
@@ -24,7 +24,7 @@ const ROW_NEW = 520;
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y } = useLayout();
+  const { y, h } = useLayout();
 
   const askAt = n.word("hook", "Ask a model");
   const twiceAt = n.word("hook", "the same question twice");
@@ -74,19 +74,8 @@ export const HookScene: React.FC = () => {
 
         {/* The hook: one question, asked twice. */}
         <Clear at={knowAt - 8}>
-          <Note at={askAt + 2} x={X0} y={y(300)}>
-            <div
-              style={{
-                display: "inline-block",
-                padding: "14px 22px",
-                borderRadius: 14,
-                background: `color-mix(in srgb, ${BLUE_INK} 10%, ${PAPER})`,
-                ...note(30, INK),
-                fontWeight: 600,
-              }}
-            >
-              Can I return a jacket after 45 days?
-            </div>
+          <Note at={askAt + 2} x={X0} y={y(300) + 14}>
+            <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Can I return a jacket after 45 days?</span>
           </Note>
           <Note at={twiceAt + 2} x={X0 + 640} y={y(312)}>
             <span style={label(21, INK_SOFT)}>the same model, asked twice</span>
@@ -106,16 +95,18 @@ export const HookScene: React.FC = () => {
               );
             })}
           </svg>
-          <ReplyCard x={X0} y={y(CARD_Y)} width={CARD_W} at={twoAt - 2} title="Run 1" verdict={{ at: policyAt + 8, ok: false }}>
+          {/* The two replies as plain text under the fork's arrows, which
+              part them, so no hairline between. */}
+          <Reply x={X0} y={y(CARD_Y)} width={CARD_W} at={twoAt - 2} title="Run 1" verdict={{ at: policyAt + 8, ok: false }}>
             Yes. Returns are accepted within 60 days of purchase.
-          </ReplyCard>
-          <ReplyCard x={X0 + CARD_W + CARD_GAP} y={y(CARD_Y)} width={CARD_W} at={twoAt + 6} title="Run 2" verdict={{ at: policyAt + 12, ok: true }}>
+          </Reply>
+          <Reply x={X0 + CARD_W + CARD_GAP} y={y(CARD_Y)} width={CARD_W} at={twoAt + 6} title="Run 2" verdict={{ at: policyAt + 12, ok: true }}>
             Sorry, returns close 30 days after purchase.
-          </ReplyCard>
-          <Note at={sureAt} x={X0} y={y(CARD_Y + 170)}>
+          </Reply>
+          <Note at={sureAt} x={X0} y={y(CARD_Y + 150)}>
             <span style={{ ...note(26, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>both sound sure of themselves</span>
           </Note>
-          <Note at={policyAt} x={X0 + CARD_W + CARD_GAP} y={y(CARD_Y + 170)}>
+          <Note at={policyAt} x={X0 + CARD_W + CARD_GAP} y={y(CARD_Y + 150)}>
             <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the refund policy: 30 days</span>
           </Note>
           <Note at={decideAt} x={X0} y={y(700)}>
@@ -132,23 +123,35 @@ export const HookScene: React.FC = () => {
           <Spot id="ds-llm-evaluation-parrot" at={sureAt} left={1340} top={y(300)} width={460} height={420} />
         </Clear>
 
-        {/* The plan: what you know, what's new, and how the page splits. */}
-        <Note at={knowAt + 4} x={X0} y={y(ROW_KNOW - 44)}>
+        {/* The plan: what you know, what's new, and how the page splits.
+            Each group is a label close over a line of words, a middle dot
+            between each two, every word inking as it is said. */}
+        <Note at={knowAt + 4} x={X0} y={y(ROW_KNOW - 38)}>
           <span style={label(22, INK_SOFT)}>you already know</span>
         </Note>
-        {known.map((c, i) => (
-          <Chip key={c.text} x={X0 + [0, 260, 470, 618][i]} y={y(ROW_KNOW)} at={c.at - 2} size={28} ink={BLUE_INK}>
-            {c.text}
-          </Chip>
-        ))}
-        <Note at={newAt} x={X0} y={y(ROW_NEW - 44)}>
+        <Note at={known[0].at - 2} x={X0} y={y(ROW_KNOW) + h(4)} from="up">
+          <span style={{ ...note(28, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            {known.map((c, i) => (
+              <span key={c.text} style={{ opacity: ease(frame, c.at - 2, 12) }}>
+                {i ? <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
+                {c.text}
+              </span>
+            ))}
+          </span>
+        </Note>
+        <Note at={newAt} x={X0} y={y(ROW_NEW - 38)}>
           <span style={{ ...label(22, INK), fontWeight: 700 }}>what&apos;s new</span>
         </Note>
-        {fresh.map((c, i) => (
-          <Chip key={c.text} x={X0 + [0, 290, 708][i]} y={y(ROW_NEW)} at={c.at - 2} size={28} ink={INK}>
-            {c.text}
-          </Chip>
-        ))}
+        <Note at={fresh[0].at - 2} x={X0} y={y(ROW_NEW) + h(4)} from="up">
+          <span style={{ ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            {fresh.map((c, i) => (
+              <span key={c.text} style={{ opacity: ease(frame, c.at - 2, 12) }}>
+                {i ? <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
+                {c.text}
+              </span>
+            ))}
+          </span>
+        </Note>
         <Note at={nineAt} x={X0} y={y(680)}>
           <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
             9 questions:{" "}

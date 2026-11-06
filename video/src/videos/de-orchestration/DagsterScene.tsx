@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { CodeSpan, Drift, Edge, OK, OK_INK, Pill, TaskBox, X0 } from "./parts";
+import { CodeSpan, Drift, Edge, OK, OK_INK, Pill, TaskBox, VRule, X0 } from "./parts";
 
 const LEFT = X0;
 const RIGHT_X = 1000;
@@ -109,6 +109,10 @@ export const DagsterScene: React.FC = () => {
         <Note at={wireAt + 16} x={LEFT} y={cy + h(112)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>the order, written by hand</span>
         </Note>
+
+        {/* The two models side by side: a hairline in the gap, from the heads
+            to the last line, inking in with Dagster on its right. */}
+        <VRule x={934} top={y(286)} height={y(790) + h(40) + 28 - y(286)} at={dagAt} />
 
         {/* Dagster: assets, the graph worked out from what each reads. */}
         <Note at={dagAt} x={RIGHT_X} y={y(286)}>

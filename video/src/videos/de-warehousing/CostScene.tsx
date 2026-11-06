@@ -158,7 +158,7 @@ export const CostScene: React.FC = () => {
 
         {/* Compute and storage side by side: a hairline in the gap, as tall
             as the levers, inking in with storage on its right. */}
-        <VRule x={(X0 + 560 + STORE_X) / 2} top={y(COMPUTE_Y) - h(44)} height={h(44) + 3 * h(44) - h(10)} at={coldAt} />
+        <VRule x={(X0 + 528 + STORE_X) / 2} top={y(COMPUTE_Y) - h(44)} height={h(44) + 3 * h(44) - h(10)} at={coldAt} />
 
         {/* ── Store cheaper ── */}
         <div style={{ position: "absolute", left: STORE_X, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, coldAt, 12) }}>

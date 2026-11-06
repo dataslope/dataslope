@@ -3,30 +3,26 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Mark, OK, OK_INK, Step, X0 } from "./parts";
+import { Drift, Mark, OK_INK, Step, X0 } from "./parts";
 
 const CARD = { x: X0, top: 380, w: 640, row: 66 };
 const STEPS_X = 900;
 const STEPS_TOP = 400;
 const STEP_ROW = 96;
 
-/** A pass or fail pill beside a rubric line. */
-const Pill: React.FC<{ at: number; ok: boolean }> = ({ at: from, ok }) => {
+/** "pass" or "fail" beside a rubric line, as a word in its meaning's ink. */
+const Verdict: React.FC<{ at: number; ok: boolean }> = ({ at: from, ok }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 10);
-  const color = ok ? OK : ACCENT;
   return (
     <span
       style={{
         display: "inline-block",
-        padding: "2px 12px",
-        borderRadius: 999,
-        border: `2px solid ${color}`,
-        ...label(18, ok ? OK_INK : ACCENT_INK),
+        ...note(26, ok ? OK_INK : ACCENT_INK),
         fontWeight: 700,
         opacity: p,
         transform: `scale(${0.8 + 0.2 * p})`,
@@ -74,7 +70,6 @@ export const MeasureScene: React.FC = () => {
   const shortAt = n.word("size-in", "come up short");
   const end = n.beat("size-in").to;
 
-  const card = ease(frame, goodAt - 4, 14);
 
   return (
     <AbsoluteFill>
@@ -99,39 +94,38 @@ export const MeasureScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* The rubric: a good reply, line by line, pass or fail. */}
-        {card > 0 ? (
-          <div
-            style={{
-              position: "absolute",
-              left: CARD.x,
-              top: y(CARD.top),
-              width: CARD.w,
-              height: h(110 + lines.length * CARD.row),
-              boxSizing: "border-box",
-              borderRadius: 14,
-              border: `2px solid ${INK_SOFT}`,
-              background: PAPER,
-              opacity: card,
-            }}
-          />
-        ) : null}
-        <Note at={goodAt - 2} x={CARD.x + 30} y={y(CARD.top + 26)}>
+        {/* The rubric: a good reply, line by line, pass or fail, as a ruled
+            list of plain text under its label. */}
+        <Note at={goodAt - 2} x={CARD.x} y={y(CARD.top + 40)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 700 }}>
             <span style={{ opacity: 1 - ease(frame, rubricAt, 12) }}>a good reply is</span>
           </span>
         </Note>
-        <Note at={rubricAt} x={CARD.x + 30} y={y(CARD.top + 26)}>
+        <Note at={rubricAt} x={CARD.x} y={y(CARD.top + 40)}>
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 700 }}>the rubric</span>
         </Note>
         {lines.map((l, i) => (
-          <Note key={l.text} at={l.at - 2} x={CARD.x + 30} y={y(CARD.top + 80) + i * h(CARD.row)}>
-            <div style={{ display: "flex", alignItems: "center", gap: 18, width: CARD.w - 60 }}>
-              <span style={{ ...note(30, INK), fontWeight: 600, flex: 1 }}>{l.text}</span>
-              <Pill at={passAt + i * 3} ok />
-              <Pill at={passAt + 2 + i * 3} ok={false} />
-            </div>
-          </Note>
+          <React.Fragment key={l.text}>
+            <Note at={l.at - 2} x={CARD.x} y={y(CARD.top + 80) + i * h(CARD.row)}>
+              <div style={{ display: "flex", alignItems: "center", gap: 22, width: CARD.w - 60 }}>
+                <span style={{ ...note(28, INK), fontWeight: 600, flex: 1 }}>{l.text}</span>
+                <Verdict at={passAt + i * 3} ok />
+                <Verdict at={passAt + 2 + i * 3} ok={false} />
+              </div>
+            </Note>
+            {i ? (
+              <div
+                style={{
+                  position: "absolute",
+                  left: CARD.x,
+                  top: y(CARD.top + 80) + i * h(CARD.row) - h(16),
+                  width: (CARD.w - 60) * ease(frame, l.at - 2, 18),
+                  height: 1,
+                  background: HAIRLINE,
+                }}
+              />
+            ) : null}
+          </React.Fragment>
         ))}
 
         {/* The four steps. */}

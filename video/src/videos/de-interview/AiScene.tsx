@@ -15,50 +15,40 @@ const STEP_X = 560;
 const STEP_W = 210;
 const STEP_H = 78;
 const STEP_GAP = 84;
-/** The three cards under it. */
-const CARD_Y = 580;
-const CARD_W = 540;
-const CARD_GAP = 30;
-const CARD_H = 250;
+/** The other three points under it, as three columns of plain text across
+ *  the page's width (X0 to 1800) with a hairline centred in each gap: no
+ *  cards. */
+const COLS_Y = 580;
+const COL_W = 516;
+const COLS_W = 1800 - X0;
+/** The page's pointer, under the columns. */
+const POINTER_Y = 860;
 
-/** A card that inks in on `at`, its title, then its lines. */
-const Card: React.FC<{ i: number; at: number; title: string; children: React.ReactNode }> = ({ i, at, title, children }) => {
+/** One point: its title, then its lines, the title inking in on `at`. It
+ *  holds its place before it inks, so the row never reflows. */
+const Column: React.FC<{ at: number; title: string; children: React.ReactNode }> = ({ at, title, children }) => {
   const frame = useCurrentFrame();
-  const { y, h } = useLayout();
   const p = ease(frame, at - 2, 14);
-  if (p <= 0) return null;
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: X0 + i * (CARD_W + CARD_GAP),
-        top: y(CARD_Y),
-        width: CARD_W,
-        height: h(CARD_H),
-        boxSizing: "border-box",
-        border: `1.5px solid ${HAIRLINE}`,
-        borderRadius: 12,
-        background: PAPER,
-        padding: "24px 28px",
-        opacity: p,
-        transform: `translateY(${(1 - p) * 14}px)`,
-      }}
-    >
+    <div style={{ width: COL_W, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
       <div style={{ ...note(29, INK), fontWeight: 650, marginBottom: 14, whiteSpace: "nowrap" }}>{title}</div>
-      {children}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>{children}</div>
     </div>
   );
 };
 
-/** One of a card's lines, inked in on `at`. */
+/** One of a point's lines, inked in on `at`. */
 const Line: React.FC<{ at: number; children: React.ReactNode }> = ({ at, children }) => {
   const frame = useCurrentFrame();
   const q = ease(frame, at - 2, 12);
-  return (
-    <div style={{ ...note(24, INK_SOFT), lineHeight: 1.3, marginBottom: 12, opacity: q, transform: `translateX(${(1 - q) * -10}px)` }}>
-      {children}
-    </div>
-  );
+  return <div style={{ ...note(24, INK_SOFT), lineHeight: 1.3, opacity: q, transform: `translateX(${(1 - q) * -10}px)` }}>{children}</div>;
+};
+
+/** A vertical hairline between two columns, as tall as their text, inking in
+ *  with the column to its right. */
+const Divider: React.FC<{ at: number }> = ({ at }) => {
+  const frame = useCurrentFrame();
+  return <div style={{ width: 1, alignSelf: "stretch", background: HAIRLINE, opacity: ease(frame, at - 2, 14) }} />;
 };
 
 /**
@@ -66,10 +56,11 @@ const Line: React.FC<{ at: number; children: React.ReactNode }> = ({ at, childre
  * so it is drawn as one: RAG ingestion's four steps (parse, chunk, embed,
  * index) in a row, outlined as "Ingestion" is said and filled as each is
  * named, and fed from above by only the new and changed documents, which is
- * what keeping it fresh incrementally means. The other three are cards that
- * fill line by line: vector search's trade-offs, governance for AI data, and
- * AI-written pipeline code, which ends on asking the recruiter about each
- * round. Under them, the page's pointer: Part 11 covers all four.
+ * what keeping it fresh incrementally means. The other three are columns of
+ * plain text, a hairline between each two, that fill line by line: vector
+ * search's trade-offs, governance for AI data, and AI-written pipeline code,
+ * which ends on asking the recruiter about each round. Under them, the page's
+ * pointer: Part 11 covers all four.
  */
 export const AiScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -230,33 +221,48 @@ export const AiScene: React.FC = () => {
           keep it fresh, incrementally, <span style={{ opacity: ease(frame, likeAt - 2, 12) }}>like any other pipeline</span>
         </div>
 
-        <Card i={0} at={vecAt} title="Vector search trade-offs">
-          <Line at={n.word("ai-vector", "exact or approximate")}>exact or approximate</Line>
-          <Line at={n.word("ai-vector", "Postgres with its vector extension")}>Postgres (pgvector) or a dedicated store</Line>
-          <Line at={n.word("ai-vector", "metadata filters")}>metadata filters</Line>
-          <Line at={n.word("ai-vector", "hybrid keyword search")}>hybrid keyword search</Line>
-        </Card>
-        <Card i={1} at={govAt} title="Governance for AI data">
-          <Line at={n.word("ai-gov", "permissions checked at query time")}>permissions checked at query time</Line>
-          <Line at={n.word("ai-gov", "deletions that reach the vectors")}>deletions that reach the vectors</Line>
-          {/* The page's wording, which cannot be misread at its line break
-              ("kept from outside" read as a whole phrase). */}
-          <Line at={n.word("ai-gov", "personal data kept from")}>personal data kept away from external embedding APIs</Line>
-        </Card>
-        <Card i={2} at={codeAt} title="AI-written pipeline code">
-          <Line at={n.word("ai-code", "needs review for idempotency")}>reviewed for idempotency, time zones and schema drift</Line>
-          <Line at={n.word("ai-code", "Some coding rounds now allow an assistant")}>some coding rounds allow an assistant</Line>
-          <div style={{ ...note(24, INK), lineHeight: 1.3, opacity: ease(frame, n.word("ai-code", "ask the recruiter") - 2, 12) }}>
-            <Mark at={n.word("ai-code", "ask the recruiter") + 4}>ask the recruiter about each one</Mark>
-          </div>
-        </Card>
+        {/* The other three points, side by side, a hairline in each gap. */}
+        <div
+          style={{
+            position: "absolute",
+            left: X0,
+            top: y(COLS_Y),
+            width: COLS_W,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "stretch",
+          }}
+        >
+          <Column at={vecAt} title="Vector search trade-offs">
+            <Line at={n.word("ai-vector", "exact or approximate")}>exact or approximate</Line>
+            <Line at={n.word("ai-vector", "Postgres with its vector extension")}>Postgres (pgvector) or a dedicated store</Line>
+            <Line at={n.word("ai-vector", "metadata filters")}>metadata filters</Line>
+            <Line at={n.word("ai-vector", "hybrid keyword search")}>hybrid keyword search</Line>
+          </Column>
+          <Divider at={govAt} />
+          <Column at={govAt} title="Governance for AI data">
+            <Line at={n.word("ai-gov", "permissions checked at query time")}>permissions checked at query time</Line>
+            <Line at={n.word("ai-gov", "deletions that reach the vectors")}>deletions that reach the vectors</Line>
+            {/* The page's wording, which cannot be misread at its line break
+                ("kept from outside" read as a whole phrase). */}
+            <Line at={n.word("ai-gov", "personal data kept from")}>personal data kept away from external embedding APIs</Line>
+          </Column>
+          <Divider at={codeAt} />
+          <Column at={codeAt} title="AI-written pipeline code">
+            <Line at={n.word("ai-code", "needs review for idempotency")}>reviewed for idempotency, time zones and schema drift</Line>
+            <Line at={n.word("ai-code", "Some coding rounds now allow an assistant")}>some coding rounds allow an assistant</Line>
+            <div style={{ ...note(24, INK), lineHeight: 1.3, opacity: ease(frame, n.word("ai-code", "ask the recruiter") - 2, 12) }}>
+              <Mark at={n.word("ai-code", "ask the recruiter") + 4}>ask the recruiter about each one</Mark>
+            </div>
+          </Column>
+        </div>
 
         {/* The page's pointer: Part 11 works through all four. */}
         <div
           style={{
             position: "absolute",
             left: X0,
-            top: y(CARD_Y) + h(CARD_H) + h(30),
+            top: y(POINTER_Y),
             ...note(26, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, moreAt - 2, 12),

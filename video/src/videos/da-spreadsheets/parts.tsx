@@ -462,6 +462,16 @@ export const FormulaBar: React.FC<{
 /** The height of a formula bar at `size`. */
 export const barHeight = (size = 22) => Math.round(size * 2);
 
+/** A vertical hairline between two columns of text set side by side:
+ *  centred in their gap, as tall as their text, inking in with the column
+ *  to its right (`at`). */
+export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: number; out?: number }> = ({ x, top, height, at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  if (p <= 0) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height, background: HAIRLINE, opacity: p }} />;
+};
+
 // ── Spot illustrations ───────────────────────────────────────────────────────
 
 /** A watercolor spot from illustrations.json: it pops in on `at`, bobs

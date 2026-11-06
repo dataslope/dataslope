@@ -224,7 +224,7 @@ export const RagScene: React.FC = () => {
         {/* The fields as one line of plain words joined by middle dots, each
             rising in as it is said. */}
         <div
-          style={{ position: "absolute", left: X0 + 400, top: noteY(2) + 2, fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}
+          style={{ position: "absolute", left: X0 + 374, top: noteY(2) + 2, fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}
         >
           {fields.map((f, i) => {
             const p = ease(frame, f.at - 2, 12);
@@ -236,7 +236,7 @@ export const RagScene: React.FC = () => {
             );
           })}
         </div>
-        <Note at={makesAt - 2} x={X0 + 1180} y={noteY(2)}>
+        <Note at={makesAt - 2} x={X0 + 1010} y={noteY(2)}>
           <span style={say(24, INK)}>
             → <Mark at={makesAt + 6}>filters, citations, deletes</Mark>
           </span>

@@ -219,7 +219,7 @@ export const FreshScene: React.FC = () => {
         {/* The run that night, all green, and the two checks that are not:
             three columns of plain text, a hairline in each gap inking in with
             the column to its right. */}
-        <div style={{ position: "absolute", left: X0, top: y(770), ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: X0, top: y(762), ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           {[
             { text: "extract", at: greenAt },
             { text: "transform", at: greenAt + 3 },
@@ -240,25 +240,25 @@ export const FreshScene: React.FC = () => {
             </span>
           ))}
         </div>
-        <VRule x={X0 + 567} top={y(762)} height={y(870) - y(762)} at={onlyAt + 2} />
-        <Pill x={X0 + 720} y={y(770)} at={onlyAt + 2} ink={ACCENT_INK} size={24}>
+        <VRule x={X0 + 479} top={y(758)} height={y(872) - y(758)} at={onlyAt + 2} />
+        <Pill x={X0 + 600} y={y(762)} at={onlyAt + 2} ink={ACCENT_INK} size={24}>
           freshness check ✗
         </Pill>
-        <Pill x={X0 + 720} y={y(832)} at={countAt + 2} ink={ACCENT_INK} size={24}>
+        <Pill x={X0 + 600} y={y(838)} at={countAt + 2} ink={ACCENT_INK} size={24}>
           <span>
             row count: <Num>{FRESH.missedDayRows}</Num> ✗
           </span>
         </Pill>
-        <VRule x={X0 + 994} top={y(762)} height={y(870) - y(762)} at={catchAt} />
-        <Note at={catchAt} x={X0 + 1040} y={y(762)}>
+        <VRule x={X0 + 870} top={y(758)} height={y(872) - y(758)} at={catchAt} />
+        <Note at={catchAt} x={X0 + 916} y={y(762)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>catches data that never arrived</span>
         </Note>
-        <Note at={cantAt} x={X0 + 1040} y={y(802)}>
+        <Note at={cantAt} x={X0 + 916} y={y(802)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
             row-level checks only read the rows <span style={{ opacity: ease(frame, thereAt, 10) }}>that are there</span>
           </span>
         </Note>
-        <Note at={countAt + 6} x={X0 + 1040} y={y(840)}>
+        <Note at={countAt + 6} x={X0 + 916} y={y(840)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>a row count on the day&apos;s load catches it too</span>
         </Note>
       </Drift>

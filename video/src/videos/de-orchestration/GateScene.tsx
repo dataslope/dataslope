@@ -198,22 +198,23 @@ export const GateScene: React.FC = () => {
                 key={r.name}
                 style={{
                   position: "absolute",
-                  // The failing row's red runs a little past the text either side.
-                  left: -10,
-                  right: -10,
+                  left: 0,
+                  right: 0,
                   top: HEAD + i * ROW,
                   height: ROW,
                   display: "flex",
                   alignItems: "center",
                   gap: 14,
-                  padding: "0 10px",
                   borderTop: i ? `1px solid ${HAIRLINE}` : undefined,
-                  background: bad > 0 ? `color-mix(in srgb, ${MARK_BAD} ${bad * 100}%, transparent)` : undefined,
                   opacity: p,
                 }}
               >
-                <span style={{ ...note(23, INK), flex: 1, whiteSpace: "nowrap" }}>{r.name}</span>
-                <span style={{ ...note(23, r.pass ? INK : ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                {/* The failing row's red, a little past the text either side. */}
+                {bad > 0 ? (
+                  <div style={{ position: "absolute", left: -10, right: -10, top: 0, bottom: 0, background: `color-mix(in srgb, ${MARK_BAD} ${bad * 100}%, transparent)` }} />
+                ) : null}
+                <span style={{ position: "relative", ...note(23, INK), flex: 1, whiteSpace: "nowrap" }}>{r.name}</span>
+                <span style={{ position: "relative", ...note(23, r.pass ? INK : ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
                   <Num>{r.value}</Num>
                   {!r.pass ? (
                     <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, opacity: ease(frame, limitAt, 10) }}>
@@ -222,7 +223,7 @@ export const GateScene: React.FC = () => {
                     </span>
                   ) : null}
                 </span>
-                <span style={{ width: 24, display: "flex", justifyContent: "center" }}>
+                <span style={{ position: "relative", width: 24, display: "flex", justifyContent: "center" }}>
                   {r.pass ? frame >= at + 4 ? <Tick at={at + 4} size={22} /> : null : frame >= limitAt + 6 ? <Cross at={limitAt + 6} size={22} /> : null}
                 </span>
               </div>

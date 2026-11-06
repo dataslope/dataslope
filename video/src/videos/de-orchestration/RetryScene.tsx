@@ -8,7 +8,7 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RETRY } from "./data";
-import { Cross, Drift, lineOf, MARK, OK_INK, Pill, pulse, PyListing, X0 } from "./parts";
+import { Cross, Drift, lineOf, MARK, OK_INK, Pill, pulse, PyListing, VRule, X0 } from "./parts";
 
 /** The page's default_args, word for word. */
 const ARGS = [
@@ -113,9 +113,13 @@ export const RetryScene: React.FC = () => {
         <Note at={sameAt} x={X0 + 20} y={y(646)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the same failure, every time</span>
         </Note>
-        <Pill x={X0} y={y(740)} at={idemAt} ink={OK_INK} size={24}>
+        <Pill x={X0} y={y(740)} at={idemAt} ink={OK_INK} size={26} weight={750}>
           retry only idempotent tasks
         </Pill>
+
+        {/* What to retry and the page's settings side by side: a hairline in
+            the gap, inking in with the settings on its right. */}
+        <VRule x={(X0 + 470 + RIGHT_X) / 2} top={y(286)} height={lineY + h(122) + 26 - y(286)} at={smallAt - 2} />
 
         {/* The page's settings. */}
         <PyListing
@@ -211,7 +215,7 @@ export const RetryScene: React.FC = () => {
           <span
             style={{
               display: "inline-block",
-              ...note(26, ACCENT_INK),
+              ...note(24, ACCENT_INK),
               fontWeight: 800,
               whiteSpace: "nowrap",
               transform: `scale(${1 + 0.06 * ping})`,
