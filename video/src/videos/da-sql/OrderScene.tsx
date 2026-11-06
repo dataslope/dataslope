@@ -15,6 +15,8 @@ import { Mono } from "./mono";
 const SIZE = 24;
 const LIST_Y = 300;
 const LIST_W = 640;
+/** A step badge's diameter. */
+const BADGE = 36;
 const STEP_X = 880;
 const STEP_Y = 300;
 const STEP_PITCH = 62;
@@ -39,7 +41,7 @@ const stepOf = (line: string) => STEPS.findIndex((s) => line.startsWith(s.clause
 
 /**
  * Question 2, the order a query runs in, logically. The page's query as it is
- * written, each line numbered with where it runs; the run order as a list of
+ * written, each line badged with where it runs; the run order as a list of
  * steps, and the note that the engine may do the work in another order so
  * long as the answer matches; and the page's 24 orders going through the
  * first four steps (24 rows, 11, 4 groups, 2). Then why WHERE can't see a
@@ -99,7 +101,7 @@ export const OrderScene: React.FC = () => {
           In what order does a query run, logically?
         </QuestionCard>
 
-        {/* ── The query as it is written, each line numbered with its step ── */}
+        {/* ── The query as it is written, each line badged with its step ── */}
         <Listing
           lines={lines}
           x={X0}
@@ -116,8 +118,8 @@ export const OrderScene: React.FC = () => {
           const s = stepOf(line);
           if (s < 0) return null;
           return (
-            <Ink key={i} at={stepAt[s] + 2} dur={10} style={{ left: X0 + LIST_W - 52, top: y(LIST_Y) + g.padY + i * g.lineH + g.lineH / 2 - 15 }}>
-              <StepNum n={s + 1} />
+            <Ink key={i} at={stepAt[s] + 2} dur={10} style={{ left: X0 + LIST_W - 52, top: y(LIST_Y) + g.padY + i * g.lineH + g.lineH / 2 - BADGE / 2 }}>
+              <StepBadge n={s + 1} />
             </Ink>
           );
         })}
@@ -131,7 +133,7 @@ export const OrderScene: React.FC = () => {
         {/* ── The run order ── */}
         {STEPS.map((s, i) => (
           <Ink key={s.clause} at={stepAt[i] - 4} dur={12} style={{ left: STEP_X, top: rowY(i), height: h(44), display: "flex", alignItems: "center", gap: 16 }}>
-            <StepNum n={i + 1} />
+            <StepBadge n={i + 1} />
             <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
               {s.clause}
             </span>
@@ -248,18 +250,23 @@ export const OrderScene: React.FC = () => {
   );
 };
 
-/** A step's number, plain, in a slot the size its ring used to be, so it
- *  sits centred on its line: the listing's lines and the run order share
- *  them. Soft ink and the sans face, so a number never reads as code. */
-const StepNum: React.FC<{ n: number }> = ({ n }) => (
+/** A step's number in a ring. 24px, within 12% of the run order's 26px
+ *  clauses and level with the listing's 24px lines, so each line keeps one
+ *  size; the ring is 36 to hold it, inside the listing's 43px line. */
+const StepBadge: React.FC<{ n: number }> = ({ n }) => (
   <span
     style={{
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
-      width: 32,
-      height: 32,
-      ...label(24, INK_SOFT),
+      width: BADGE,
+      height: BADGE,
+      flex: "none",
+      boxSizing: "border-box",
+      borderRadius: 999,
+      border: `2px solid ${INK}`,
+      background: PAPER,
+      ...label(24, INK),
       ...TABULAR,
       fontWeight: 700,
     }}

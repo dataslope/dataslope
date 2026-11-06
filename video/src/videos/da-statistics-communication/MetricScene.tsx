@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, fmt, note } from "../../editorial/style";
+import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, fmt, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -18,8 +18,8 @@ const TABLE_X = 1080;
 const change = (x: number) => `${x > 0 ? "+" : "−"}${fmt(Math.abs(x) * 100, 0)}%`;
 
 /**
- * Question 5. Four checks down the left, numbered in plain figures, the
- * last one the trap: the video's own two weeks, where conversion rose 20%
+ * Question 5. Four checks down the left, each numbered in a ring, the last
+ * one the trap: the video's own two weeks, where conversion rose 20%
  * because sessions fell 20% and orders fell 4%.
  */
 export const MetricScene: React.FC = () => {
@@ -106,8 +106,25 @@ export const MetricScene: React.FC = () => {
                 transform: `translateX(${(1 - p) * -16}px)`,
               }}
             >
-              {/* The step's number, plain, at the step's own size: no ring. */}
-              <span style={{ ...note(28, trap ? ACCENT_INK : INK_SOFT), fontWeight: 650, width: 40, ...TABULAR }}>{i + 1}</span>
+              {/* The step's number in a ring, at 26px: within 12% of the
+                  step's 28, so the line keeps one size. */}
+              <span
+                style={{
+                  width: 46,
+                  height: 46,
+                  flex: "none",
+                  borderRadius: 23,
+                  border: `2px solid ${trap ? ACCENT_INK : INK_SOFT}`,
+                  background: PAPER,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  ...label(26, trap ? ACCENT_INK : INK),
+                  ...TABULAR,
+                }}
+              >
+                {i + 1}
+              </span>
               <span style={{ ...note(28, INK), whiteSpace: "nowrap", fontWeight: trap ? 650 : 500 }}>
                 {trap ? (
                   <Mark at={denomAt + 8} color={HIGHLIGHT}>

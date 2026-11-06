@@ -85,7 +85,7 @@ export const CloseScene: React.FC = () => {
             </Ink>
             <Ink at={lostAt[i] - 2} dur={16} style={{ left: x, top: top + 22 + h + 64, ...line }}>
               <div style={note(21, INK_SOFT)}>threw away</div>
-              <div style={{ ...body(30), color: ACCENT_INK, marginTop: 4 }}>{s.lost}</div>
+              <div style={{ ...body(26), color: ACCENT_INK, marginTop: 4 }}>{s.lost}</div>
             </Ink>
           </React.Fragment>
         );

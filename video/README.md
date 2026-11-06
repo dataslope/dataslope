@@ -240,10 +240,15 @@ Every video follows these rules.
   differ in size by more than 12% or in family (`[mixed]`).
 - **No cards unless the layout needs one.** Group with spacing and
   alignment, and separate with at most a very subtle hairline, not with
-  bordered, rounded or tinted boxes around text, and not with outlined
-  pills for tags (the owner, 2026-11-06: "Using spacing or very subtle
-  separators should be preferred"). Code listings and data tables keep the
-  house look, since there the frame is the listing or the table itself.
+  bordered, rounded or tinted boxes around text (the owner, 2026-11-06:
+  "Using spacing or very subtle separators should be preferred"). Code
+  listings and data tables keep the house look, since there the frame is
+  the listing or the table itself. **Small badges stay** (the owner, the
+  same evening: "the little card-like badges look better"): a small tinted
+  and/or outlined chip around one word, one value, a short tag of a few
+  words, or a ringed numeral is a badge, not a card. A card is a box around
+  a sentence, a group of lines, a panel or a column. A badge's text stays
+  within 12% of the size of the text it shares a line with.
   **Items set side by side take a vertical hairline between them** (the
   owner: "When there are items laid out horizontally, I think subtle
   separators will help"): two, three or four columns of text get a 1px
@@ -251,6 +256,13 @@ Every video follows these rules.
   the gap and at least 24px from the text on either side. Not before the
   first column or after the last, and not between words on one line (a
   middle dot does that). It inks in with the column to its right.
+  **Not where the columns already carry their own rule** (the owner, on
+  WhyNormalization's three anomalies, each under a short rule: "There
+  shouldn't be any vertical separators here"): a column with its own top
+  rule, kicker rule or heading rule is already grouped, so it takes no
+  vertical hairline. **Leave room under a rule** (the same note: "add more
+  spacing after each horizontal line"): at least 28px between a horizontal
+  rule and the text under it.
   `ColumnRule` in `src/editorial/ui.tsx` draws one.
   **A card that comes off leaves its padding behind as space** (the owner:
   "ensure that there are enough spacing between items after removing a

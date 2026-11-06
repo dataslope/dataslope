@@ -6,9 +6,8 @@ import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, body, label, note } from 
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { MONO } from "../../theme/fonts";
 import { partOf } from "./data";
-import { Drift, Flow, Headline, Kicker, Spot } from "./parts";
+import { Chip, Drift, Flow, Headline, Kicker, Mono, Spot } from "./parts";
 
 /** The stack's left edge, its right edge, and the arrow beside it. The
  *  layers are rows of plain text ruled off by a hairline, not boxes. */
@@ -34,20 +33,14 @@ const MEERKAT_CX = 1655;
 const MEERKAT_W = 180;
 const MEERKAT_H = 220;
 
-/** QUALIFY in the mono face, at a size within the house's 12% of the words
- *  it shares its line with (Mono's 0.88em sets it 23px beside 26px). */
-const QualifyMono: React.FC = () => (
-  <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: 600, fontVariantLigatures: "none" }}>QUALIFY</span>
-);
-
 type Layer = {
   name: string;
   at: number;
   until: number;
   /** The topic videos that answer this layer's questions, by folder. */
   parts: string[];
-  /** Its topics, each on the line (0 or 1) it is set on: two lines of words
-   *  joined by middle dots, broken by hand so no line opens on a dot. */
+  /** Its topics, as chips, each on the line (0 or 1) it is set on, so the
+   *  two rows break where the page breaks them. */
   chips: { at: number; text: React.ReactNode; line: 0 | 1 }[];
 };
 
@@ -111,7 +104,7 @@ export const PromptScene: React.FC = () => {
       parts: ["de-sql-patterns", "de-sql-performance"],
       chips: [
         { at: n.word("probe-sql", "window functions"), text: "window functions", line: 0 },
-        { at: n.word("probe-sql", "qualify"), text: <QualifyMono />, line: 0 },
+        { at: n.word("probe-sql", "qualify"), text: <Mono>QUALIFY</Mono>, line: 0 },
         { at: n.word("probe-sql", "deduplication"), text: "deduplication", line: 0 },
         { at: n.word("probe-sql", "gaps and islands"), text: "gaps and islands", line: 1 },
         { at: n.word("probe-sql", "incremental logic"), text: "incremental logic", line: 1 },
@@ -298,18 +291,17 @@ export const PromptScene: React.FC = () => {
                     <PartsLabel parts={l.parts.map(partOf)} />
                   </div>
                 </div>
-                {/* The topics, as plain words on two lines, joined by middle
-                    dots, each as it is said. */}
+                {/* The topics, as chips on two rows, each inking in as it is
+                    said and holding its place before, so neither row moves. */}
                 <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
                   {([0, 1] as const).map((line) => (
-                    <div key={line} style={{ ...note(26, INK), lineHeight: 1.3, whiteSpace: "nowrap" }}>
+                    <div key={line} style={{ display: "flex", gap: 12 }}>
                       {l.chips
                         .filter((c) => c.line === line)
                         .map((c, k) => (
-                          <span key={k} style={{ opacity: ease(frame, c.at - 2, 12) }}>
-                            {k ? <span style={{ color: INK_SOFT }}> · </span> : null}
+                          <Chip key={k} at={c.at} size={26}>
                             {c.text}
-                          </span>
+                          </Chip>
                         ))}
                     </div>
                   ))}
