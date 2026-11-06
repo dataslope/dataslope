@@ -112,7 +112,6 @@ export const HookScene: React.FC = () => {
                   ...badgeStyle("green", 24),
                   position: "relative",
                   marginLeft: "auto",
-                  fontWeight: 800,
                   transform: `scale(${0.6 + 0.4 * Math.min(1, stamp)})`,
                   transformOrigin: "right center",
                   opacity: Math.min(1, stamp),

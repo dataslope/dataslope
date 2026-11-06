@@ -25,3 +25,7 @@ export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?
 
 /** Code inside a question or a list label, in the text's own color. */
 export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => <span style={style()}>{children}</span>;
+
+/** The face for code set in a house badge (`Badge` in editorial/ui): mono,
+ *  at the badge's own size, no ligatures. */
+export const CODE_BADGE: React.CSSProperties = { fontFamily: MONO, fontWeight: 600, fontVariantLigatures: "none" };

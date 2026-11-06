@@ -189,6 +189,7 @@ export const AntiScene: React.FC = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   fontFamily: SANS,
+                  fontWeight: 700,
                   ...TABULAR,
                 }}
               >

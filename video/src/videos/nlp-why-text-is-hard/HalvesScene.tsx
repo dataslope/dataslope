@@ -34,9 +34,10 @@ const PILLS_RIGHT = PILL_XS[STEPS.length - 1] + pillW(STEPS[STEPS.length - 1]);
 const BR_LEFT = PILL_XS[1];
 const BR_MID = (BR_LEFT + PILLS_RIGHT) / 2;
 
-/** A named step or use, as a gray house badge (a light tint, no border) on a
- *  fixed box; from `lightAt` its tint halves and its ink softens, which marks
- *  the step optional. */
+/** A named step or use, as a gray house badge (a light tint, no border, its
+ *  own padding) of a fixed width, centred where the old pill's middle was;
+ *  from `lightAt` its tint pales and its ink softens, which marks the step
+ *  optional. */
 const Pill: React.FC<{ text: string; x: number; y: number; at: number; lightAt?: number; size?: number; width?: number }> = ({
   text,
   x,
@@ -58,16 +59,12 @@ const Pill: React.FC<{ text: string; x: number; y: number; at: number; lightAt?:
         ...badge,
         position: "absolute",
         left: x,
-        top: y,
+        top: y + Math.round((size * 1.9 - (size * 1.15 + 2 * Math.round(size * 0.21))) / 2),
         width: width ?? pillW(text),
-        height: Math.round(size * 1.9),
         boxSizing: "border-box",
-        padding: 0,
-        background: `color-mix(in srgb, ${badge.background} ${Math.round(100 - light * 55)}%, transparent)`,
+        textAlign: "center",
+        background: `color-mix(in srgb, ${badge.background} ${Math.round(100 - light * 70)}%, transparent)`,
         color: `color-mix(in srgb, ${INK_SOFT} ${Math.round(light * 100)}%, ${badge.color})`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         opacity: p,
         transform: `translateY(${(1 - p) * 10}px)`,
       }}

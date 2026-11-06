@@ -37,7 +37,7 @@ const Defense: React.FC<{ at: number; n: number; y: number; children: React.Reac
           alignItems: "center",
           justifyContent: "center",
           fontFamily: SANS,
-          fontWeight: 800,
+          fontWeight: 700,
         }}
       >
         {n}

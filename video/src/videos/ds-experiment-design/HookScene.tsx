@@ -11,12 +11,13 @@ import { Drift, Headline, Kicker, Mark, OK, OK_INK, pulse, Spot, X0 } from "./pa
 import { mulberry32 } from "../da-statistics-communication/parts";
 
 const LINE_Y = 600;
-/** The five decisions, gray house badges at 22px with 10px between them,
- *  end near 980, clear of the launch tick. */
+/** The five decisions, gray house badges of 188 with gaps of 8, end at
+ *  1092, clear of the launch tick. */
 const LAUNCH_X = 1110;
 const LINE_END = 1800;
 const CHIP_Y = 460;
-const BADGE_GAP = 10;
+const BADGE_W = 188;
+const BADGE_GAP = 8;
 /** How far above the line the settled badges' tops sit: their 34px box
  *  plus 12px of air over the rule. */
 const BADGE_DROP = 46;
@@ -186,6 +187,9 @@ export const HookScene: React.FC = () => {
                 style={{
                   ...note(22),
                   ...DECISION_BADGE,
+                  width: BADGE_W,
+                  boxSizing: "border-box",
+                  textAlign: "center",
                   background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, ${DECISION_BADGE.background})` : DECISION_BADGE.background,
                   opacity: p,
                   transform: `translateY(${(1 - p) * -14}px) scale(${1 + 0.06 * bump})`,

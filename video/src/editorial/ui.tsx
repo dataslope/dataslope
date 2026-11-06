@@ -243,12 +243,15 @@ export const badgeStyle = (tone: BadgeTone, size = 24): React.CSSProperties => {
   const tint = tone === "gray" ? "color-mix(in srgb, var(--ds-gray-400) 22%, transparent)" : `color-mix(in srgb, var(--ds-${tone}-400) 24%, transparent)`;
   return {
     display: "inline-block",
-    padding: `${Math.round(size * 0.16)}px ${Math.round(size * 0.55)}px ${Math.round(size * 0.24)}px`,
+    // Even top and bottom: at line-height 1.15 the caps sit centred in the
+    // line box (Inter and JetBrains Mono alike), so equal padding centres them.
+    padding: `${Math.round(size * 0.21)}px ${Math.round(size * 0.55)}px`,
     borderRadius: Math.round(size / 3),
     background: tint,
     color: ink,
     fontSize: size,
-    fontWeight: 700,
+    // Semibold: the owner found bold too heavy for a tinted chip.
+    fontWeight: 600,
     lineHeight: 1.15,
     whiteSpace: "nowrap",
   };

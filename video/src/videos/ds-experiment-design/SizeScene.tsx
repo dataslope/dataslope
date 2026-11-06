@@ -115,7 +115,6 @@ export const SizeScene: React.FC = () => {
                   top: y(318),
                   width: widths[i],
                   boxSizing: "border-box",
-                  padding: "6px 0",
                   textAlign: "center",
                   opacity: p,
                   transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * pulse(frame, inputAts[i], 14)})`,

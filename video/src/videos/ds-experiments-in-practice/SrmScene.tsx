@@ -171,7 +171,6 @@ export const SrmScene: React.FC = () => {
             style={{
               ...note(28),
               ...badgeStyle("red", 28),
-              fontWeight: 800,
               transform: `scale(${1 + 0.06 * bump})`,
               transformOrigin: "left center",
             }}

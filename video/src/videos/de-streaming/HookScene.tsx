@@ -134,7 +134,7 @@ export const HookScene: React.FC = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   fontFamily: SANS,
-                  fontWeight: 800,
+                  fontWeight: 700,
                   ...TABULAR,
                 }}
               >

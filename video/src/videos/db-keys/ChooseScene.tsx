@@ -119,8 +119,8 @@ export const ChooseScene: React.FC = () => {
                     </span>
                   </span>
                 </Ink>
-                <Ink at={a.actAt + 4} dur={14} style={{ left: ANSWER_X, top: by + 30, whiteSpace: "nowrap" }}>
-                  <span style={{ ...note(21, INK_SOFT) }}>{a.eg}</span>
+                <Ink at={a.actAt + 4} dur={14} style={{ left: ANSWER_X, top: by + 42, whiteSpace: "nowrap" }}>
+                  <span style={{ ...note(24, INK_SOFT) }}>{a.eg}</span>
                 </Ink>
               </React.Fragment>
             );

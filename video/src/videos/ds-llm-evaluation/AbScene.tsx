@@ -24,8 +24,8 @@ const Title: React.FC<{ n: number; x: number; y: number; at: number; children: R
 );
 
 /** A rounded tag on the page: a session, an arm, an output. The house
- *  badge (a light tint of its hue, in that hue's ink, no border) on a box of
- *  its own width, which grows in as it inks. */
+ *  badge (a light tint of its hue, in that hue's ink, no border, its own
+ *  padding) at a width of its own, which grows in as it inks. */
 const Tag: React.FC<{ x: number; y: number; w: number; at: number; tone: BadgeTone; children?: React.ReactNode }> = ({
   x,
   y,
@@ -40,17 +40,15 @@ const Tag: React.FC<{ x: number; y: number; w: number; at: number; tone: BadgeTo
   return (
     <div
       style={{
-        position: "absolute",
-        left: x,
-        top: y,
-        width: w * (0.5 + 0.5 * p),
-        height: 46,
         ...label(19),
         ...badgeStyle(tone, 19),
-        padding: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        position: "absolute",
+        left: x,
+        // Its own padding, centred where the 46px box's middle was.
+        top: y + Math.round((46 - (19 * 1.15 + 2 * Math.round(19 * 0.21))) / 2),
+        width: w * (0.5 + 0.5 * p),
+        boxSizing: "border-box",
+        textAlign: "center",
         overflow: "hidden",
         opacity: p,
       }}

@@ -79,14 +79,11 @@ export const WalkScene: React.FC = () => {
               ...badgeStyle(up ? "blue" : "red", 21),
               position: "absolute",
               left: 380 + i * (CHIP_W + CHIP_GAP),
-              top: y(258),
+              // Centred where the 42px chip's middle was, beside its label.
+              top: y(258) + 5,
               width: CHIP_W,
-              height: 42,
               boxSizing: "border-box",
-              padding: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              textAlign: "center",
               opacity: p,
               transform: `translateY(${(1 - p) * (up ? 10 : -10)}px)`,
             }}

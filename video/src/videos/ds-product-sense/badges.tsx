@@ -48,7 +48,7 @@ export const Tag: React.FC<{
       style={{
         position: "absolute",
         left: x,
-        top: y + Math.round(2 + 0.235 * size),
+        top: y + Math.round(2 + 0.185 * size),
         opacity: p * (1 - d) * (1 - o),
         transform: `translateY(${(1 - p) * 12}px)`,
       }}
@@ -56,7 +56,7 @@ export const Tag: React.FC<{
       <Badge
         tone={tone}
         size={size}
-        style={{ ...note(size), fontWeight: 700, lineHeight: base.lineHeight, color: ink, background: l > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(l * 100)}%, ${tint})` : tint }}
+        style={{ ...note(size), fontWeight: base.fontWeight, lineHeight: base.lineHeight, color: ink, background: l > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(l * 100)}%, ${tint})` : tint }}
       >
         {children}
       </Badge>

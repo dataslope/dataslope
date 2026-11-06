@@ -434,9 +434,10 @@ export const Dot: React.FC<{ x: number; y: number; at: number; r?: number; color
 };
 
 /** A small tag, inked in on `at`: the house badge (a light tint of its hue,
- *  in that hue's ink, no border), on a box tall enough that the arrows
- *  between tags meet it in the middle. `light` halves the tint, for a tag
- *  that is only a possibility (the outline used to be dashed). */
+ *  in that hue's ink, no border, its own padding), centred on the 48px box
+ *  the outlined tag had, so the arrows between tags still meet it in the
+ *  middle. `light` halves the tint, for a tag that is only a possibility (the
+ *  outline used to be dashed). */
 export const Tag: React.FC<{
   at: number;
   x: number;
@@ -463,10 +464,9 @@ export const Tag: React.FC<{
         ...badge,
         position: "absolute",
         left: x,
-        top: y,
+        top: y + Math.round((48 - (22 * 1.15 + 2 * Math.round(22 * 0.21))) / 2),
         width,
         boxSizing: "border-box",
-        padding: "11px 20px 12px",
         background: light ? `color-mix(in srgb, ${badge.background} 50%, transparent)` : badge.background,
         opacity: p * (1 - o) * (1 - d),
         transform: `translateX(${(1 - p) * -14}px) scale(${1 + (pulseAt === undefined ? 0 : pulse(frame, pulseAt, 18)) * 0.05})`,

@@ -168,7 +168,6 @@ export const FreshScene: React.FC = () => {
                   style={{
                     ...badgeStyle(a.tone, 23),
                     fontFamily: SANS,
-                    fontWeight: 650,
                     ...(gone ? { background: "color-mix(in srgb, var(--ds-gray-400) 10%, transparent)", color: INK_SOFT } : {}),
                   }}
                 >

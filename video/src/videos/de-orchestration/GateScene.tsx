@@ -238,7 +238,7 @@ export const GateScene: React.FC = () => {
           })}
         </div>
         <Note at={failsAt + 4} x={cardX + cardW + 30} y={cardTop + h(10)}>
-          <Badge tone="red" size={26} style={{ fontFamily: SANS, fontWeight: 800 }}>
+          <Badge tone="red" size={26} style={{ fontFamily: SANS }}>
             gate fails: halt
           </Badge>
         </Note>

@@ -134,7 +134,6 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
               alignItems: "center",
               justifyContent: "center",
               fontFamily: SANS,
-              fontWeight: 650,
               opacity: p,
               transform: `translateY(${(1 - p) * 10}px)`,
             }}

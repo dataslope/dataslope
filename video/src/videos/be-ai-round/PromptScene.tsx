@@ -115,11 +115,11 @@ export const PromptScene: React.FC = () => {
               <span
                 key={c.role}
                 style={{
-                  padding: "4px 14px 6px",
+                  padding: "5px 13px",
                   borderRadius: 8,
                   background: ingredientBand(c.role),
                   ...note(24, INGREDIENT_INK[c.role]),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   whiteSpace: "nowrap",
                   opacity: p,
                   transform: `translateY(${(1 - p) * 10}px)`,

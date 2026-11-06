@@ -278,7 +278,7 @@ export const HybridScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, cheapAt - 4, 10) }}>
           <line x1={X0} x2={1800} y1={y(850)} y2={y(850)} stroke={HAIRLINE} />
         </svg>
-        <Note at={cheapAt} x={X0} y={y(850) + 18}>
+        <Note at={cheapAt} x={X0} y={y(850) + 29}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             cheap to add
             <span style={{ opacity: ease(frame, helpsAt - 2, 10) }}>, and it usually helps on technical content</span>

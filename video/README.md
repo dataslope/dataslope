@@ -253,7 +253,12 @@ Every video follows these rules.
   (the owner, on backend Part 9's prompt ingredients: "use this style …
   the background slightly lighter, but the no-use of border is amazing").
   Use `Badge` / `badgeStyle(tone, size)` from `src/editorial/ui.tsx`; a
-  numbered badge is a tinted disc with no ring.
+  numbered badge is a tinted disc with no ring. Its text is semibold (600,
+  "bold looks too heavy"; a numeral in a disc at most 700) and its padding
+  is even top and bottom, so the word sits centred in its tint; do not
+  override either. A line of text under a row of badges keeps at least
+  20px clear of the tint (the owner: "make sure the description text under
+  each badge has enough top spacing").
   **Items set side by side take a vertical hairline between them** (the
   owner: "When there are items laid out horizontally, I think subtle
   separators will help"): two, three or four columns of text get a 1px

@@ -186,7 +186,6 @@ export const OverfitScene: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
-                  paddingLeft: 9,
                   opacity: p,
                   transform: `translateY(${(1 - p) * 8}px)`,
                 }}
