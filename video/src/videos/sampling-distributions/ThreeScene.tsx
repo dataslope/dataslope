@@ -381,7 +381,9 @@ export const ThreeScene: React.FC = () => {
       <Ink at={kindAt} dur={16} out={p3Out} style={{ left: RX, top: y(300), width: RW }}>
         <span style={{ ...body(32, true), color: ACCENT_INK }}>One average per sample.</span>
       </Ink>
-      <div style={{ position: "absolute", left: RX, top: y(560), opacity: counterIn }}>
+      {/* Up beside the sample's bars, clear of Fig. 3's tick row and the
+          label row under it: the big count on a line of its own. */}
+      <div style={{ position: "absolute", left: RX, top: y(400), opacity: counterIn }}>
         <div style={label(21, INK_SOFT)}>Samples drawn</div>
         <div
           style={{

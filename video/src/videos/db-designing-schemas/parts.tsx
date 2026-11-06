@@ -527,7 +527,8 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
                 justifyContent: "center",
                 fontFamily: SANS,
                 fontWeight: 700,
-                fontSize: 19,
+                // 20px, within 12% of the 22px step beside it.
+                fontSize: 20,
                 color: fill > 0.5 ? PAPER : INK,
                 transform: `scale(${1 + sw * 0.25})`,
                 opacity: lerp(1, lerp(0.55, 1, Math.max(lit, done)), rail),
@@ -746,15 +747,14 @@ export const DbTable: React.FC<{
             <div style={inner}>
             <span style={{ fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: isGhost(j) ? ACCENT_INK : INK_SOFT }}>{c}</span>
             {badge && bIn > 0 ? (
+              // Plain words in the key blue beside the column's name, not a
+              // filled badge; 20px, within 12% of the 22px name.
               <span
                 style={{
                   fontFamily: SANS,
                   fontWeight: 700,
-                  fontSize: 19,
-                  color: PAPER,
-                  background: KEY,
-                  borderRadius: 4,
-                  padding: "1px 7px",
+                  fontSize: 20,
+                  color: KEY_INK,
                   opacity: bIn,
                   transform: `scale(${0.8 + 0.2 * bIn})`,
                   whiteSpace: "nowrap",

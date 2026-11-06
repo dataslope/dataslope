@@ -1,9 +1,9 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
-import { bob, pop } from "../../components/motion";
+import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { F, FLAT_COLS, FLAT_ROWS, ILLUSTRATIONS, VIDEO } from "./data";
@@ -29,7 +29,32 @@ const ANOMALIES = [
   { name: "Deletion anomaly", gist: "Delete the order, lose the customer." },
 ] as const;
 const ROADMAP_Y = 680;
-const ROADMAP_STEP = 560;
+/** Room either side of the hairline between two anomalies. */
+const ROADMAP_GAP = 80;
+
+/**
+ * The hairline between two anomalies: as tall as their text, centred in the
+ * gap the row's flex layout leaves, and drawn down with the column to its
+ * right, as the shared ColumnRule draws.
+ */
+const Divider: React.FC<{ at: number }> = ({ at }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at - 2, 14);
+  return (
+    <div
+      style={{
+        width: 1,
+        flex: "none",
+        alignSelf: "stretch",
+        margin: `0 ${ROADMAP_GAP}px`,
+        background: HAIRLINE,
+        transform: `scaleY(${p})`,
+        transformOrigin: "50% 0",
+        opacity: p > 0 ? 1 : 0,
+      }}
+    />
+  );
+};
 
 /**
  * Hook, copies and traps: the shop's one wide table, Ada's email on two of
@@ -99,21 +124,27 @@ export const FlatScene: React.FC = () => {
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>Ada&apos;s email, on orders 1 and 2</span>
       </Note>
 
-      {ANOMALIES.map((a, k) => (
-        <Ink
-          key={a.name}
-          at={threeAt - 2 + k * 7}
-          dur={16}
-          style={{ left: X0 + k * ROADMAP_STEP, top: y(ROADMAP_Y), width: ROADMAP_STEP - 60 }}
-        >
-          <div style={{ height: 2, width: 56, background: INK, marginBottom: 18 }} />
-          <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-            <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>{k + 1}</span>
-            <span style={{ ...body(38), color: INK }}>{a.name}</span>
-          </div>
-          <div style={{ ...note(22, INK_SOFT), marginTop: 12 }}>{a.gist}</div>
-        </Ink>
-      ))}
+      {/* The three anomalies, side by side: each column as wide as its text,
+          a hairline centred in each gap. The number is set in the name's
+          own face and size, so the line reads as one line. */}
+      <div style={{ position: "absolute", left: X0, top: y(ROADMAP_Y), display: "flex" }}>
+        {ANOMALIES.map((a, k) => {
+          const at = threeAt - 2 + k * 7;
+          return (
+            <React.Fragment key={a.name}>
+              {k > 0 ? <Divider at={at} /> : null}
+              <Ink at={at} dur={16} style={{ position: "relative", flex: "none", whiteSpace: "nowrap" }}>
+                <div style={{ height: 2, width: 56, background: INK, marginBottom: 18 }} />
+                <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+                  <span style={{ ...body(38), color: ACCENT_INK }}>{k + 1}</span>
+                  <span style={{ ...body(38), color: INK }}>{a.name}</span>
+                </div>
+                <div style={{ ...note(22, INK_SOFT), marginTop: 12 }}>{a.gist}</div>
+              </Ink>
+            </React.Fragment>
+          );
+        })}
+      </div>
     </AbsoluteFill>
   );
 };

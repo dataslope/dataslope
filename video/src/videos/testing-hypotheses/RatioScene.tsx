@@ -116,7 +116,9 @@ export const RatioScene: React.FC = () => {
 
       {/* ── The ratio ── */}
       <div style={{ position: "absolute", left: 160, top: y(330), opacity: ease(frame, ratioAt - 6, 14), display: "flex", alignItems: "center", gap: 28 }}>
-        <span style={{ ...body(84, true), color: INK }}>t =</span>
+        {/* "t =" at the size of the terms it equals, as a display formula
+            sets it: at twice their size it read as a second line size. */}
+        <span style={{ ...body(44, true), color: INK }}>t =</span>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
           <span style={{ ...body(40, true), color: STAT_INK, opacity: sig, whiteSpace: "nowrap" }}>the gap you observed</span>
           <div style={{ width: 430 * ease(frame, ratioAt - 4, 16), height: 3, background: INK }} />

@@ -167,12 +167,14 @@ export const RequiredScene: React.FC = () => {
                 justifyContent: "center",
                 fontFamily: SANS,
                 fontWeight: 700,
-                fontSize: 19,
+                // The number, the step and its note share a line, so their
+                // sizes stay within 12% of each other: 22, 24 and 22.
+                fontSize: 22,
               }}
             >
               {i + 1}
             </span>
-            <span style={{ ...label(26, INK), fontWeight: 600, position: "relative" }}>
+            <span style={{ ...label(24, INK), fontWeight: 600, position: "relative" }}>
               <span style={{ position: "absolute", left: "-0.2em", right: "-0.2em", top: "0.05em", bottom: "-0.05em", background: HIGHLIGHT, borderRadius: "0.14em", opacity: lit }} />
               <span style={{ position: "relative" }}>{s.title}</span>
             </span>

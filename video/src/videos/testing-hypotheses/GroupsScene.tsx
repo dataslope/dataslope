@@ -182,7 +182,8 @@ export const GroupsScene: React.FC = () => {
 
       {/* ── F: between over within ── */}
       <Ink at={fAt - 4} dur={16} style={{ left: W.x0, top: y(310), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 22 }}>
-        <span style={{ ...body(64, true), color: INK }}>F =</span>
+        {/* "F =" at the size of the terms it equals, as the t-test scene sets "t =". */}
+        <span style={{ ...body(34, true), color: INK }}>F =</span>
         <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
           <span style={{ ...body(32, true), color: STAT_INK, opacity: ease(frame, betweenAt - 4, 12) }}>
             <Mark at={groupMeansAt}>spread between the group means</Mark>

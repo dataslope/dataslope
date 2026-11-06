@@ -21,6 +21,12 @@ const ROW_DY = 84;
  *  its shaded tails begin (in SDs). */
 const NW = { cx: 1400, sd: 108, base: 650, peak: 210, tail: 2 };
 
+/** The two conditionals, each a 44px formula with its gloss under it, in
+ *  px: the gloss 10px under its formula, the next formula 40px under that
+ *  gloss, the fallacy line as far again under the second. */
+const GLOSS_DY = 10;
+const COND_STEP = 136;
+
 /** A conditional probability set the way the lesson writes it. */
 const Cond: React.FC<{ a: React.ReactNode; b: React.ReactNode; color: string }> = ({ a, b, color }) => (
   <span style={{ ...body(44, true), color, whiteSpace: "nowrap" }}>
@@ -109,19 +115,22 @@ export const IsntScene: React.FC = () => {
         </Ink>
 
         {/* ── The swapped conditional ── */}
+        {/* Each conditional with its gloss 10px under it, not beside it: a
+            22px Inter gloss on the line of a 44px serif formula read as one
+            line in two sizes and two faces. */}
         <Ink at={dataAt - 4} dur={16} style={{ left: LEFT, top: y(530), whiteSpace: "nowrap" }}>
           <Cond a="data" b={<H0 />} color={DATA_INK} />
-          <span style={{ ...label(22, DATA_INK), marginLeft: 22, opacity: ease(frame, givenAt, 12) }}>the p-value</span>
+          <div style={{ ...label(22, DATA_INK), marginTop: GLOSS_DY, opacity: ease(frame, givenAt, 12) }}>the p-value</div>
         </Ink>
         <Ink
           at={nullGivenAt - 4}
           dur={16}
-          style={{ left: LEFT, top: y(530) + 92, whiteSpace: "nowrap", transform: `translateX(${Math.sin(shake * Math.PI * 3) * 6}px)` }}
+          style={{ left: LEFT, top: y(530) + COND_STEP, whiteSpace: "nowrap", transform: `translateX(${Math.sin(shake * Math.PI * 3) * 6}px)` }}
         >
           <Cond a={<H0 />} b="data" color={INK} />
-          <span style={{ ...label(22, INK_SOFT), marginLeft: 22, opacity: ease(frame, givenDataAt, 12) }}>not the p-value</span>
+          <div style={{ ...label(22, INK_SOFT), marginTop: GLOSS_DY, opacity: ease(frame, givenDataAt, 12) }}>not the p-value</div>
         </Ink>
-        <Ink at={fallacyAt - 4} dur={18} style={{ left: LEFT, top: y(530) + 184, whiteSpace: "nowrap" }}>
+        <Ink at={fallacyAt - 4} dur={18} style={{ left: LEFT, top: y(530) + 2 * COND_STEP, whiteSpace: "nowrap" }}>
           <span style={{ ...body(32, true), color: INK_SOFT }}>
             Swapping them: <Mark at={fallacyEndAt}>the prosecutor&apos;s fallacy</Mark>
           </span>

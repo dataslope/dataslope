@@ -227,7 +227,7 @@ export const PairsScene: React.FC = () => {
           </span>
           <span
             style={{
-              ...note(30, STAT_INK),
+              ...note(36, STAT_INK),
               fontWeight: 650,
               marginLeft: 28,
               opacity: ease(frame, billionAt - 6, 12),

@@ -160,7 +160,8 @@ export const PowerScene: React.FC = () => {
         >
           <Count at={fortySevenAt - 4} to={POWER.power} dur={20} format={(v) => pct(v, 1)} />
         </span>
-        <span style={{ ...body(34, true), color: INK, marginLeft: 18, display: "inline-block", transform: `scale(${1 + 0.06 * flipGlow})` }}>
+        {/* In the number's own face and near its size, so the two read as one line. */}
+        <span style={{ ...note(38, INK), fontWeight: 500, marginLeft: 18, display: "inline-block", transform: `scale(${1 + 0.06 * flipGlow})` }}>
           <span style={{ opacity: ease(frame, findingAt - 2, 10) }}>
             caught it<span style={{ opacity: ease(frame, flipAt - 4, 12) }}>: a coin flip</span>
           </span>

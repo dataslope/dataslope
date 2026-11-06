@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TWIN_POSTQUEL, TWIN_SQL } from "./data";
@@ -193,6 +193,12 @@ export const PostgresScene: React.FC = () => {
       </Tag>
 
       {/* ── Beside it: the types it was built for, then its language ── */}
+      {/* A hairline between POSTGRES and the column beside it, centred in the
+          gap (its text ends near XS[0] + 284), inking in with that column and
+          leaving with it, before the arrow to Postgres95 takes the gap. */}
+      <div style={{ opacity: 1 - ease(frame, asideOut, 10) }}>
+        <ColumnRule x={(XS[0] + COL_RIGHT[0] + AX) / 2} top={TOP + 8} height={h(176)} at={extendAt - 4} />
+      </div>
       <Ink at={extendAt - 4} dur={14} out={catchAt - 6} style={{ left: AX, top: TOP + 2, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT) }}>Commercial systems: a fixed menu of types</span>
       </Ink>

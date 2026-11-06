@@ -27,8 +27,8 @@ import {
 /** Where the brackets and notes of the right-hand column start. */
 const RIGHT = 1340;
 /** The first flips, one value per slot: plain bold text in the walk's ink
- *  (up) or the accent (down), with no chip around it. The slot keeps the
- *  old chips' pitch, so the values sit about 34px apart. */
+ *  (up) or the accent (down), held together by spacing alone. At this
+ *  pitch two values sit about 34px apart. */
 const FLIP_W = 50;
 const FLIP_PITCH = 58;
 
