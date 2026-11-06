@@ -13,9 +13,9 @@ import { Bar, Cylinder, Drift, Flow, Headline, Kicker, Node, pulse, Spot, X0 } f
 const FIG_TOP = 290;
 const API = { x: X0, w: 210 };
 const DB = { x: 660, w: 250 };
-const BARS_TOP = 582;
-const CHIPS_Y = 734;
-const SQUARES_Y = 818;
+const BARS_TOP = 572;
+const CHIPS_Y = 722;
+const SQUARES_Y = 802;
 const SQ = 48;
 const SQ_GAP = 10;
 const SMALL = 36;

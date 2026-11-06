@@ -78,9 +78,9 @@ const Norm: React.FC<{ c: Ctx }> = ({ c }) => {
   const NEW = "ava@new.com";
   const top = c.y(372);
   const cg = tableGeometry({ x: R_X, top, cols: [{ name: "id" }, { name: "email" }], rows: [["7", EMAIL]], extra: [["7", NEW]], headH: c.h(42), rowH: c.h(46), headSize: 20, bodySize: 22 });
-  const og = tableGeometry({ x: R_X, top: top + c.h(150), cols: [{ name: "order_id" }, { name: "customer_id" }], rows: [["101", "7"], ["102", "7"], ["103", "7"]], headH: c.h(42), rowH: c.h(46), headSize: 20, bodySize: 22 });
-  const dg = tableGeometry({ x: 1330, top, cols: [{ name: "order_id" }, { name: "email" }], rows: [["101", EMAIL], ["102", EMAIL], ["103", EMAIL]], extra: [["101", NEW]], headH: c.h(42), rowH: c.h(46), headSize: 20, bodySize: 22 });
-  const notesTop = c.y(700);
+  const og = tableGeometry({ x: 1100, top, cols: [{ name: "order_id" }, { name: "customer_id" }], rows: [["101", "7"], ["102", "7"], ["103", "7"]], headH: c.h(42), rowH: c.h(46), headSize: 20, bodySize: 22 });
+  const dg = tableGeometry({ x: 1470, top, cols: [{ name: "order_id" }, { name: "email" }], rows: [["101", EMAIL], ["102", EMAIL], ["103", EMAIL]], extra: [["101", NEW]], headH: c.h(42), rowH: c.h(46), headSize: 20, bodySize: 22 });
+  const notesTop = c.y(640);
   return (
     <>
       <TableName g={cg} at={onceAt}>
@@ -217,7 +217,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
   const doesntAt = c.w("r-keys", "Postgres doesn't index the foreign key's column");
   const top = c.y(372);
   const cg = tableGeometry({
-    x: R_X,
+    x: 1330,
     top,
     cols: [{ name: "id", tag: { text: "PK", at: pkAt } }, { name: "name" }],
     rows: [["1", "Ava"], ["2", "Ben"]],
@@ -227,7 +227,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
     bodySize: 22,
   });
   const og = tableGeometry({
-    x: 1290,
+    x: R_X,
     top,
     cols: [{ name: "order_id", tag: { text: "PK", at: pkAt + 6 } }, { name: "customer_id", tag: { text: "FK", at: fkAt } }],
     rows: [["101", "1"], ["103", "2"]],
@@ -236,7 +236,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
     headSize: 20,
     bodySize: 22,
   });
-  const idxTop = c.y(640);
+  const idxTop = c.y(700);
   const ig = tableGeometry({ x: R_X, top: idxTop, cols: RAPID.keys.cols.map((n) => ({ name: n })), rows: RAPID.keys.rows, headH: c.h(42), rowH: c.h(42), headSize: 20, bodySize: 21 });
   return (
     <>
@@ -244,7 +244,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
         customers
       </TableName>
       <DataTable g={cg} cols={[{ name: "id", ink: BLUE_INK, tag: { text: "PK", at: pkAt + 4 } }, { name: "name" }]} rows={[["1", "Ava"], ["2", "Ben"]].map((cells, i) => ({ cells, at: pkAt + 4 + i * 3 }))} at={pkAt} />
-      <Note at={uniqueAt} x={R_X} y={cg.rowTop(2) + c.h(14)}>
+      <Note at={uniqueAt} x={cg.x} y={cg.rowTop(2) + c.h(14)}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           unique, never null<span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, autoAt, 10) }}>, indexed for you</span>
         </span>
@@ -263,7 +263,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
         at={fkAt - 4}
       />
       {[0, 1].map((i) => (
-        <KeyArrow key={i} from={[og.x - 8, og.rowMid(i)]} to={[cg.right + 8, cg.rowMid(i)]} at={fkAt + 8 + i * 4} />
+        <KeyArrow key={i} from={[og.right + 8, og.rowMid(i)]} to={[cg.x - 8, cg.rowMid(i)]} at={fkAt + 8 + i * 4} />
       ))}
       <Note at={missingAt + 10} x={og.x} y={og.rowTop(3) + c.h(14)}>
         <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>no customer 9: refused</span>
@@ -323,14 +323,6 @@ const Cover: React.FC<{ c: Ctx }> = ({ c }) => {
           the price: <b>a wider index</b>
         </span>
       </Note>
-      <Svg opacity={ease(frame, holdsAt + 4, 10)}>
-        <text x={R_X + 790} y={top + c.h(150)} style={svgText({ ...label(21, INK_SOFT) })}>
-          <tspan>key, plus a</tspan>
-          <tspan x={R_X + 790} dy={28}>
-            stored column
-          </tspan>
-        </text>
-      </Svg>
     </>
   );
 };
