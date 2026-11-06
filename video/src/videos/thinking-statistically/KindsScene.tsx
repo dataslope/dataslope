@@ -75,6 +75,7 @@ export const KindsScene: React.FC = () => {
   const noOrderAt = n.word("labels", "no order");
   const doAt = n.word("labels", "do");
   const sizesAt = n.word("labels", "shirt sizes");
+  const shirtsAt = sizesAt - 2;
   const gapsAt = n.word("labels", "gaps");
   const likeAt = [
     n.word("labels", "like countries"),
@@ -82,6 +83,8 @@ export const KindsScene: React.FC = () => {
     n.word("numbers", "like logins"),
     n.word("numbers", "like price"),
   ];
+  // The spots under Ordinal and Continuous pop, with their sound, on the examples that name them.
+  const tagAt = likeAt[3] - 2;
   // "Labels split again", "Numbers split": the parent named swells first.
   const parentAgainAt = [n.beat("labels").from, n.beat("numbers").from];
   const plainlyAt = n.word("trap-in", "plainly");
@@ -113,6 +116,8 @@ export const KindsScene: React.FC = () => {
       <Sfx name="el-whoosh" at={unevenAt - 4} level={-33} />
       <Sfx name="el-sprinkle" at={leafAt[2] + 4} level={-34} />
       <Sfx name="el-pop" at={fewAt - 4} level={-30} />
+      <Sfx name="el-pop" at={shirtsAt} level={-29} />
+      <Sfx name="el-pop" at={tagAt} level={-29} />
 
       {/* The scene opens on what it is about, then asks it as two halves, each
           on the words that say it, so "Which group," never waits alone. */}
@@ -297,8 +302,8 @@ export const KindsScene: React.FC = () => {
 
       {/* Under two of the leaves, on the examples that name them: shirt sizes
           and a price. The zip code below keeps the middle to itself. */}
-      <Spot id="thinking-statistically-shirts" at={sizesAt - 2} left={LEAVES[1].x + 10} top={y(PICTURE_Y + 112)} width={180} height={160} />
-      <Spot id="thinking-statistically-tag" at={likeAt[3] - 2} left={LEAVES[3].x + 50} top={y(PICTURE_Y + 112)} width={170} height={160} />
+      <Spot id="thinking-statistically-shirts" at={shirtsAt} left={LEAVES[1].x + 10} top={y(PICTURE_Y + 112)} width={180} height={160} />
+      <Spot id="thinking-statistically-tag" at={tagAt} left={LEAVES[3].x + 50} top={y(PICTURE_Y + 112)} width={170} height={160} />
 
       {/* "A few don't": a zip code, between the two kinds. */}
       {zipIn > 0 ? (

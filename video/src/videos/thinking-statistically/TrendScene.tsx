@@ -35,6 +35,8 @@ export const TrendScene: React.FC = () => {
   // ── Cues ──
   const trendFrom = n.beat("trend").from;
   const yearsAt = n.word("trend", "two years");
+  // The calendar pops on "years", clear of the sprinkle the months arrive with.
+  const calendarAt = yearsAt + 8;
   const lastAt = n.word("fell", "last six months");
   const fellAt = n.word("fell", "fell");
   const twelveAt = n.word("fell", "twelve");
@@ -118,6 +120,7 @@ export const TrendScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the months arriving, the story's arrow, the flat line ── */}
       <Sfx name="el-sprinkle" at={yearsAt - 4} level={-34} />
+      <Sfx name="el-pop" at={calendarAt} level={-29} />
       <Sfx name="el-pencil" at={fellAt - 6} level={-32} />
       <Sfx name="el-pop" at={processAt - 6} level={-29} />
       <Sfx name="el-pencil" at={hundredAt - 6} level={-34} />
@@ -142,7 +145,7 @@ export const TrendScene: React.FC = () => {
       </div>
 
       {/* "Two years": a calendar beside the headline, gone before the machine arrives. */}
-      <Spot id="thinking-statistically-calendar" at={yearsAt - 4} out={processAt - 18} left={960} top={y(104)} width={180} height={180} />
+      <Spot id="thinking-statistically-calendar" at={calendarAt} out={processAt - 18} left={960} top={y(104)} width={180} height={180} />
       <Spot id="thinking-statistically-machine" at={processAt - 6} dim={neverSeeAt} left={1480} top={y(104)} width={320} height={305} />
 
       {/* The examples of a process, beside the machine (and 44px clear of it), until "never see". */}

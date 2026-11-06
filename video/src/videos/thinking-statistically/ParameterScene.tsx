@@ -126,6 +126,8 @@ export const ParameterScene: React.FC = () => {
   const xBarAt = n.word("letters", "x-bar");
   const parameterFrom = n.beat("parameter").from;
   const codeAt = n.word("cheat", "In code");
+  // Once the echo of Fig. 3 has cleared the corner the laptop takes.
+  const laptopAt = codeAt + 12;
   const cheatAt = n.word("cheat", "cheat");
   const buildAt = n.word("cheat", "Build");
   const hundredAt = n.word("cheat", "hundred");
@@ -173,6 +175,7 @@ export const ParameterScene: React.FC = () => {
       <Sfx name="el-pencil" at={closeAt - 2} level={-34} />
       <Sfx name="el-pencil" at={priceAt - 4} level={-35} />
       <Sfx name="el-whoosh" at={morphAt} level={-34} />
+      <Sfx name="el-pop" at={laptopAt} level={-29} />
       <Sfx name="el-sprinkle" at={describesAt - 2} level={-35} />
       <Sfx name="el-sprinkle" at={computeAt + 6} level={-35} />
 
@@ -239,7 +242,7 @@ export const ParameterScene: React.FC = () => {
 
       {/* "In code": a laptop at the right end of Fig. 4, once the echo of
           Fig. 3 has cleared that corner; it goes on the turn to Fig. 5. */}
-      <Spot id="thinking-statistically-laptop" at={codeAt + 12} out={turnAt} left={1550} top={y(600)} width={210} height={160} />
+      <Spot id="thinking-statistically-laptop" at={laptopAt} out={turnAt} left={1550} top={y(600)} width={210} height={160} />
 
       {/* ── Fig. 4: a population we know, and one sample from it ── */}
       <FigLabel

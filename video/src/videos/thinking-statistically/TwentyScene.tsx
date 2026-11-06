@@ -74,6 +74,8 @@ export const TwentyScene: React.FC = () => {
   const flavorsFrom = n.beat("flavors").from;
   const moreAt = n.word("twenty", "fifty more", { nth: 1 });
   const samplesAt = n.word("twenty", "Twenty samples");
+  // Inside "Twenty samples", clear of the rows' second sprinkle.
+  const basketsAt = samplesAt + 8;
   const answersAt = n.word("twenty", "answers");
   const parameterAt = n.word("moves", "parameter");
   const statisticAt = n.word("moves", "statistic");
@@ -116,6 +118,7 @@ export const TwentyScene: React.FC = () => {
            the averages flying over, the last one landing on top, Part 2's close ── */}
       <Sfx name="el-sprinkle" at={rowAt(1)} level={-34} />
       <Sfx name="el-sprinkle" at={rowAt(10)} level={-35} />
+      <Sfx name="el-pop" at={basketsAt} level={-29} />
       <Sfx name="el-whoosh" at={variableAt - 6} level={-32} />
       <Sfx name="el-tap" at={variableAt - 6 + SLOTS[0].turn * 1.6 + 12} level={-27} />
       {/* In the pause after "spread", where Part 2 ends. */}
@@ -170,7 +173,7 @@ export const TwentyScene: React.FC = () => {
 
       {/* "Twenty samples": baskets of apples, the sample of the barrel three
           scenes back, top right above the averages' panel. */}
-      <Spot id="thinking-statistically-baskets" at={samplesAt - 4} out={flavorsFrom - 20} left={1450} top={y(104) - 10} width={330} height={140} />
+      <Spot id="thinking-statistically-baskets" at={basketsAt} out={flavorsFrom - 20} left={1450} top={y(104) - 10} width={330} height={140} />
 
       <AbsoluteFill style={{ opacity: figureOp }}>
 

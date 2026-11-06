@@ -39,6 +39,7 @@ export const SurveyScene: React.FC = () => {
   // ── Cues ──
   const surveyFrom = n.beat("survey").from;
   const surveyAt = n.word("survey", "survey");
+  const clipboardAt = surveyAt - 4;
   const fiveAt = n.word("survey", "five hundred");
   const threeAt = n.word("survey", "three hundred thousand");
   const customersAt = n.word("survey", "customers");
@@ -106,6 +107,7 @@ export const SurveyScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the ten picked dots, the barrel, the field sweeping in, the rings ── */}
       <Sfx name="el-sprinkle" at={fiveAt - 4} level={-33} />
+      <Sfx name="el-pop" at={clipboardAt} level={-29} />
       <Sfx name="el-pop" at={customersAt - 4} level={-29} />
       <Sfx name="el-whoosh" at={threeAt - 4} level={-32} />
       <Sfx name="el-pencil" at={sampleAt - 4} level={-34} />
@@ -126,7 +128,7 @@ export const SurveyScene: React.FC = () => {
       </Ink>
 
       {/* "You survey": a clipboard at the end of the second line, short of the barrel. */}
-      <Spot id="thinking-statistically-clipboard" at={surveyAt - 4} left={1140} top={y(222)} width={150} height={150} />
+      <Spot id="thinking-statistically-clipboard" at={clipboardAt} left={1140} top={y(222)} width={150} height={150} />
       <Spot id="thinking-statistically-barrel" at={customersAt - 4} left={1470} top={y(104)} width={310} height={313} />
 
       <FigLabel

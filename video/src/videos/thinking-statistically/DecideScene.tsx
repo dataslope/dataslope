@@ -31,6 +31,8 @@ export const DecideScene: React.FC = () => {
   const allowedAt = n.word("decides", "allowed");
   const labelsAt = n.word("decides", "Labels");
   const ranksAt = n.word("decides", "Ranks");
+  // Inside "Ranks", after the tap its row arrives with.
+  const podiumAt = ranksAt + 4;
   const quantitiesAt = n.word("decides", "Quantities");
   const countsAt = n.word("decides", "counts");
   const commonAt = n.word("decides", "most common value");
@@ -102,6 +104,7 @@ export const DecideScene: React.FC = () => {
         <Sfx key={r.at} name="el-tap" at={r.at - 4} level={-30} />
       ))}
       <Sfx name="el-pencil" at={skewAt - 10} level={-34} />
+      <Sfx name="el-pop" at={podiumAt} level={-29} />
 
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         <Ink at={decidesFrom - 4} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
@@ -113,7 +116,7 @@ export const DecideScene: React.FC = () => {
       </div>
 
       {/* "Ranks": a winners' podium, top right beside the headline. */}
-      <Spot id="thinking-statistically-podium" at={ranksAt - 4} left={1510} top={y(104)} width={260} height={152} />
+      <Spot id="thinking-statistically-podium" at={podiumAt} left={1510} top={y(104)} width={260} height={152} />
 
       {/* ── Summaries ── */}
       {["The column holds", "Its honest summary", "For example"].map((t, i) => (

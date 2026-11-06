@@ -51,6 +51,9 @@ export const GapScene: React.FC = () => {
   const bothAt = n.word("same", "both groups");
   const fiftyAt = n.word("same", "fifty");
   const luckAt = n.word("same", "pure luck");
+  // The spots pop in, with their sound, on the words that name them.
+  const crowdAt = peopleAt - 4;
+  const diceAt = luckAt - 4;
   const noRealAt = n.word("same", "no real");
   const againAt = n.word("again", "again");
   const aheadAt = n.word("again", "A comes");
@@ -131,6 +134,8 @@ export const GapScene: React.FC = () => {
       ))}
       <Sfx name="el-pencil" at={fiftyAt - 4} level={-33} />
       <Sfx name="el-pencil" at={noRealAt} level={-35} />
+      <Sfx name="el-pop" at={crowdAt} level={-29} />
+      <Sfx name="el-pop" at={diceAt} level={-29} />
 
       <Kicker at={hookFrom - 10}>Signal and noise</Kicker>
 
@@ -159,8 +164,8 @@ export const GapScene: React.FC = () => {
       {/* Spot art, top right, clear of the headline and the gap panel: the
           two groups of people, then (as the headline turns) the luck every
           score is made of. */}
-      <Spot id="thinking-statistically-crowd" at={peopleAt - 4} out={sameAt - 14} left={1480} top={y(104) + 10} width={290} height={168} />
-      <Spot id="thinking-statistically-dice" at={luckAt - 4} out={exitAt} left={1570} top={y(104)} width={200} height={170} />
+      <Spot id="thinking-statistically-crowd" at={crowdAt} out={sameAt - 14} left={1480} top={y(104) + 10} width={290} height={168} />
+      <Spot id="thinking-statistically-dice" at={diceAt} out={exitAt} left={1570} top={y(104)} width={200} height={170} />
 
       <Ink at={couldAt - 4} dur={18} style={{ left: 96, top: y(258), whiteSpace: "nowrap" }}>
         <span style={{ ...body(38, true), color: INK }}>Could this just be luck?</span>
