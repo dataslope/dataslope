@@ -64,11 +64,20 @@ const INTERVIEW: Record<InterviewLabel, string[]> = {
   preparation: ["Interview", "Preparation"],
 };
 
-/** The neutral grey an interview label is set in: the brand's soft ink
- *  (gray 600) or a step lighter (gray 500). Both clear AA on white. */
-export type LabelTone = "gray-600" | "gray-500";
+/** The color an interview label is set in: the title's black, the brand's
+ *  soft ink (gray 600), or a step lighter (gray 500). All clear AA on white. */
+export type LabelTone = "black" | "gray-600" | "gray-500";
 
-export type ThumbnailProps = { track: keyof typeof TRACKS; label?: InterviewLabel; tone?: LabelTone };
+export type ThumbnailProps = {
+  track: keyof typeof TRACKS;
+  label?: InterviewLabel;
+  tone?: LabelTone;
+  /** A course's "Full Course": smaller than the title, or the title's size. */
+  kicker?: "small" | "same";
+  /** Where the animal stands: on the line the words end on, or hung from
+   *  the top-right corner, level with the mark. */
+  artAt?: "bottom" | "top";
+};
 
 const W = 1280;
 const H = 720;
@@ -77,7 +86,7 @@ const PAD = 64;
 /** The title's size. The widest line, "Natural Language" in Inter 500,
  *  measures about 650px at 80px, inside the 680px the words have. */
 export const SIZE = 80;
-/** "Full Course", above a course's title: smaller, so the title leads. */
+/** "Full Course", above a course's title, when it is smaller than the title. */
 const KICKER = 52;
 /** Every word is set at this one weight. */
 const WEIGHT = 500;
@@ -102,9 +111,13 @@ const Lines: React.FC<{ lines: string[]; style: React.CSSProperties }> = ({ line
   </>
 );
 
-export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", tone = "gray-600" }) => {
+const TONE: Record<LabelTone, string> = { black: INK, "gray-600": ds("gray", 600), "gray-500": ds("gray", 500) };
+
+export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", tone = "gray-600", kicker = "small", artAt = "bottom" }) => {
   const t = TRACKS[track];
   const course = t.kind === "course";
+  const kick = kicker === "same" ? SIZE : KICKER;
+  const top = artAt === "top";
   return (
     <AbsoluteFill style={{ background: "var(--ds-white)" }}>
       {/* The mark alone, no wordmark. A motion that has long since landed
@@ -113,19 +126,18 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", ton
         <AnimatedMark motion="assemble" at={-120} height={56} color={ds("blue", 500)} />
       </div>
 
-      {/* The animal, standing on the same line as the last line of words and
-          kept clear of the bottom-right corner, where YouTube prints the
+      {/* The animal, either standing on the same line as the last line of
+          words or hung from the top-right corner, level with the mark and as
+          far in from the right as the mark is from the left. Either way it
+          keeps clear of the bottom-right corner, where YouTube prints the
           running time. */}
       <div
         style={{
           position: "absolute",
-          left: 790,
-          right: 90,
-          top: 150,
-          bottom: 60,
+          ...(top ? { right: PAD, width: 400, top: 52, height: 510 } : { left: 790, right: 90, top: 150, bottom: 60 }),
           display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "center",
+          alignItems: top ? "flex-start" : "flex-end",
+          justifyContent: top ? "flex-end" : "center",
         }}
       >
         <Illustration
@@ -137,12 +149,12 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", ton
 
       <div style={{ position: "absolute", left: PAD, bottom: 56 }}>
         {course ? (
-          <div style={{ ...type(KICKER, ds("blue", 500)), marginBottom: 0.2 * KICKER }}>Full Course</div>
+          <div style={{ ...type(kick, ds("blue", 500)), marginBottom: kicker === "same" ? 0.12 * SIZE : 0.2 * KICKER }}>Full Course</div>
         ) : null}
         <Lines lines={t.title} style={type(SIZE, INK)} />
         {course ? null : (
           <div style={{ marginTop: 0.12 * SIZE }}>
-            <Lines lines={INTERVIEW[label]} style={type(SIZE, ds("gray", tone === "gray-600" ? 600 : 500))} />
+            <Lines lines={INTERVIEW[label]} style={type(SIZE, TONE[tone])} />
           </div>
         )}
       </div>
@@ -152,15 +164,24 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", ton
 
 export const THUMBNAIL = { width: W, height: H } as const;
 
-/** Every thumbnail the Studio shows: one per course, and each interview
- *  track saying "Interview Prep" or "Interview Preparation", in either grey. */
+const cap = (x: string) => x.replace(/(^|-)(\w)/g, (_, d: string, c: string) => c.toUpperCase());
+
+/** Every thumbnail the Studio shows, with the animal low or high: a course
+ *  with "Full Course" smaller than its title or at its size, and an
+ *  interview track saying "Interview Prep" or "Interview Preparation" in
+ *  black or either grey. */
 export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entries(TRACKS).flatMap(([track, t]) =>
-  t.kind === "course"
-    ? [{ id: `Thumb-${track}`, props: { track } }]
-    : (["prep", "preparation"] as InterviewLabel[]).flatMap((label) =>
-        (["gray-600", "gray-500"] as LabelTone[]).map((tone) => ({
-          id: `Thumb-${track}-${label === "prep" ? "Prep" : "Preparation"}-${tone === "gray-600" ? "Gray600" : "Gray500"}`,
-          props: { track, label, tone },
-        })),
-      ),
+  (["bottom", "top"] as const).flatMap((artAt): { id: string; props: ThumbnailProps }[] =>
+    t.kind === "course"
+      ? (["small", "same"] as const).map((kicker) => ({
+          id: `Thumb-${track}-${cap(kicker)}-${cap(artAt)}`,
+          props: { track, kicker, artAt },
+        }))
+      : (["prep", "preparation"] as InterviewLabel[]).flatMap((label) =>
+          (["black", "gray-600", "gray-500"] as LabelTone[]).map((tone) => ({
+            id: `Thumb-${track}-${cap(label)}-${cap(tone)}-${cap(artAt)}`,
+            props: { track, label, tone, artAt },
+          })),
+        ),
+  ),
 );

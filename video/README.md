@@ -629,10 +629,14 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
 
 ## YouTube thumbnails
 
-Stills in the Studio's `Thumbnails` folder, one per merged course and
-interview track, 1280x720: `Thumb-<Track>`, e.g. `Thumb-DatabaseDesign`. An
-interview track comes four times: saying "Interview Prep" or "Interview
-Preparation", in either of two greys (`Thumb-DataEngineer-Prep-Gray600`).
+Stills in the Studio's `Thumbnails` folder, 1280x720, in variations for each
+merged course and interview track: the animal low (`Bottom`) or high
+(`Top`); a course's "Full Course" smaller than its title (`Small`) or at its
+size (`Same`); an interview track saying "Interview Prep" (`Prep`) or
+"Interview Preparation" (`Preparation`), in the title's black or one of two
+greys. For example `Thumb-DatabaseDesign-Small-Bottom` or
+`Thumb-DataEngineer-Prep-Black-Top`.
+
 Each track has its own watercolor animal, so the seven read apart at a
 glance in a list of results: an owl on a die (Statistics), an elephant at a
 card catalog (Database Design), a llama with books (LLMs), a parrot (NLP), a
@@ -640,14 +644,16 @@ raccoon (Data Analyst), and the otter and meerkat of the Data Scientist and
 Data Engineer overviews.
 
 A white page, the Dataslope mark alone in the top-left corner (no
-wordmark), the words low on the left and the animal on the right, standing on
-the line the words end on.
+wordmark), the words low on the left and the animal on the right: standing
+on the line the words end on, or hung from the top-right corner, level with
+the mark and as far in from the edge.
 
 - **One weight.** Every word is Inter 500. The title is 80px (`SIZE`) in
-  black; a course's "Full Course" sits above it, smaller (52px) and in the
-  brand blue; an interview track's "Interview Prep" follows the title at the
-  title's size, in a neutral grey (`gray-600`, the soft ink, or `gray-500`).
-  No pills or badges; the words sit on the page.
+  black; a course's "Full Course" sits above it in the brand blue, smaller
+  (52px) or at the title's size; an interview track's "Interview Prep"
+  follows the title at the title's size, in the title's black or a neutral
+  grey (`gray-600`, the soft ink, or `gray-500`). No pills or badges; the
+  words sit on the page.
 - **Seen small.** A thumbnail is about 168x94 on a phone, where 80px is about
   10px, so the words are few. The widest line, "Natural Language", fits the
   680px the words have; "Interview Preparation" does not, so it takes two
@@ -662,7 +668,7 @@ the line the words end on.
   are one entry in `TRACKS` (`src/thumbnails/Thumbnail.tsx`).
 
 ```bash
-npx remotion still src/index.ts Thumb-DatabaseDesign out/thumb.png
+npx remotion still src/index.ts Thumb-DatabaseDesign-Small-Bottom out/thumb.png
 ```
 
 ## Sound effects (SamplingBias, ThinkingStatistically)
