@@ -124,6 +124,10 @@ export const AiScene: React.FC = () => {
         <Sfx key={s.text} name="el-tap" at={s.at} level={-32} />
       ))}
       <Sfx name="el-pencil" at={freshAt} level={-35} />
+      {/* The small spots arrive the way the meerkat does in the opening. */}
+      {[steps[3].at, searchAt, lockAt].map((at, i) => (
+        <Sfx key={`spot-${i}`} name="el-pop" at={at} level={-31} />
+      ))}
       <Sfx name="el-tap" at={moreAt} level={-33} />
       {[vecAt, govAt, codeAt].map((at, i) => (
         <Sfx key={i} name="el-tap" at={at} level={-31} />

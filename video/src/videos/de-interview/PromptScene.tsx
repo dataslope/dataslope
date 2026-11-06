@@ -165,6 +165,9 @@ export const PromptScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-pop" at={expectAt} level={-31} />
+      {/* The small spots arrive the way the meerkat does. */}
+      <Sfx name="el-pop" at={snowAt} level={-31} />
+      <Sfx name="el-pop" at={houseAt} level={-31} />
       {layers.map((l) => (
         <Sfx key={l.name} name="el-tap" at={l.at} level={-31} />
       ))}

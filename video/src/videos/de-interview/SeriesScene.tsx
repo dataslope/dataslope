@@ -86,6 +86,9 @@ export const SeriesScene: React.FC = () => {
       ))}
       <Sfx name="el-whoosh" at={totalAt} level={-36} />
       <Sfx name="el-chime" at={nextAt} level={-34} />
+      {/* The small spots arrive the way the meerkat does in the opening. */}
+      <Sfx name="el-pop" at={quickAt} level={-31} />
+      <Sfx name="el-pop" at={browserWordAt} level={-31} />
 
       <Drift from={from} to={end + 40} scale={0.015}>
         <Kicker at={from}>The series</Kicker>
