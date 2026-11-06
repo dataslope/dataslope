@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { body, HAIRLINE, INK, INK_SOFT, label } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -16,21 +16,24 @@ const ROW_Y = 414;
 const STEP = 74;
 const COL = [X0, 330, 560];
 const RIGHT_X = 1010;
-const CARD_Y = [370, 572];
-const CARD_W = 790;
+/** Fig. 16's two answers, each a heading over its line, where the text sat
+ *  inside the cards they replace; a hairline halfway between them, about
+ *  50px clear of each once the layout stretches. */
+const ANSWER_Y = [390, 592];
+const ANSWER_W = 790;
+const ANSWER_RULE_Y = 545;
 /** The open dictionary, centred in the right half where Fig. 16 will go; its
  *  box follows the art's own proportions (1536x840 after trimming). */
 const BOOK = { left: 1080, dy: 40, w: 560, h: Math.round((560 * 840) / 1536) };
 
 const head: React.CSSProperties = { fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK_SOFT, whiteSpace: "nowrap" };
 
-/** One of Fig. 16's two answers: a heading and a line under it. */
-const Card: React.FC<{ at: number; y: number; title: string; children: React.ReactNode }> = ({ at, y, title, children }) => (
-  <Note at={at} x={RIGHT_X} y={y} width={CARD_W} from="right">
-    <div style={{ borderTop: `2px solid ${INK}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "18px 0 22px", background: PAPER }}>
-      <div style={{ ...label(28, INK), fontWeight: 700 }}>{title}</div>
-      <div style={{ ...body(32), color: INK, marginTop: 12 }}>{children}</div>
-    </div>
+/** One of Fig. 16's two answers: a heading and a line under it, as plain
+ *  text. */
+const Answer: React.FC<{ at: number; y: number; title: string; children: React.ReactNode }> = ({ at, y, title, children }) => (
+  <Note at={at} x={RIGHT_X} y={y} width={ANSWER_W} from="right">
+    <div style={{ ...label(28, INK), fontWeight: 700 }}>{title}</div>
+    <div style={{ ...body(32), color: INK, marginTop: 12 }}>{children}</div>
   </Note>
 );
 
@@ -144,15 +147,19 @@ export const LemmaScene: React.FC = () => {
 
       {/* Fig. 16: which to reach for. */}
       <FigLabel n="16" title="Stem or lemma?" at={stemAt - 4} x={RIGHT_X} y={y(FIG_Y)} />
-      <Card at={stemAt} y={y(CARD_Y[0])} title="Stem">
+      <Answer at={stemAt} y={y(ANSWER_Y[0])} title="Stem">
         <Fade at={speedAt - 4}>for speed,</Fade> <Fade at={machineAt - 4}>when only a machine sees the key</Fade>
         <div style={{ marginTop: 10 }}>
           <Fade at={searchAt - 4}>
             <span style={label(22, INK_SOFT)}>like a search index</span>
           </Fade>
         </div>
-      </Card>
-      <Card at={lemmatizeAt} y={y(CARD_Y[1])} title="Lemmatize">
+      </Answer>
+      {/* The hairline between the two answers arrives with the second. */}
+      <Note at={lemmatizeAt} x={RIGHT_X} y={y(ANSWER_RULE_Y)} width={ANSWER_W} from="right">
+        <div style={{ height: 1, background: HAIRLINE }} />
+      </Note>
+      <Answer at={lemmatizeAt} y={y(ANSWER_Y[1])} title="Lemmatize">
         <Fade at={rootAt - 6}>when the root has to be a</Fade>{" "}
         <Mark at={realAt - 2}>
           <span style={{ fontStyle: "italic" }}>real word</span>
@@ -162,7 +169,7 @@ export const LemmaScene: React.FC = () => {
             <span style={label(22, INK_SOFT)}>given the part of speech</span>
           </Fade>
         </div>
-      </Card>
+      </Answer>
       <Sfx name="el-pencil" at={realAt - 4} level={-36} />
     </AbsoluteFill>
   );

@@ -184,7 +184,7 @@ export const ChangedScene: React.FC = () => {
             {l.text}
           </Layer>
         ))}
-        <Note at={layers[0].at - 2} x={X0} y={layerTop(3) - 26}>
+        <Note at={layers[0].at - 2} x={X0} y={layerTop(3) - 32}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>layered on top, mostly at mid and senior levels</span>
         </Note>
         {where.map((w, i) => (

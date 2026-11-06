@@ -207,30 +207,15 @@ export const HugeScene: React.FC = () => {
       </Drift>
 
       {/* ── The two questions, answered ── */}
-      {(() => {
-        const draw = ease(frame, passesAt - 4, 14);
-        if (draw <= 0) return null;
-        const move = ease(frame, sizeAt - 6, 16);
-        const top = lerp(y(ROW1) - 22, y(ROW2) - 22, move);
-        return (
-          <Svg>
-            <rect
-              x={RIGHT - 26}
-              y={top}
-              width={540}
-              height={lerp(232, 256, move)}
-              rx={10}
-              fill="none"
-              stroke={INK}
-              strokeWidth={2.6}
-              pathLength={1}
-              strokeDasharray={`${draw} 1`}
-            />
-          </Svg>
-        );
-      })()}
+      {/* The question the narration is on takes the highlight: "Is it there?"
+          as passing a test stops meaning much, then "Is it big?" as size
+          is named. (A box drawn round each group in turn used to do this.) */}
       <Ink at={thereAt - 6} dur={14} style={{ left: RIGHT, top: y(ROW1), whiteSpace: "nowrap" }}>
-        <span style={label(24, INK)}>Is it there?</span>
+        <span style={label(24, INK)}>
+          <Marker at={passesAt - 4} off={sizeAt - 6}>
+            Is it there?
+          </Marker>
+        </span>
       </Ink>
       <div
         style={{

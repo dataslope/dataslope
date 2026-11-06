@@ -286,24 +286,6 @@ export const AdmitScene: React.FC = () => {
           );
         })}
 
-        {/* The lurking variable, boxed as it is named. */}
-        {ease(frame, deptAt - 4, 14) > 0 ? (
-          <Svg>
-            <rect
-              x={140}
-              y={rowY(1) - 56}
-              width={260}
-              height={rowY(2) - rowY(1) + 110}
-              rx={10}
-              fill="none"
-              stroke={INK}
-              strokeWidth={2.6}
-              pathLength={1}
-              strokeDasharray={`${ease(frame, deptAt - 4, 14)} 1`}
-              opacity={1 - ease(frame, totalAt - 6, 12)}
-            />
-          </Svg>
-        ) : null}
 
         {/* What the narration is reading, ringed as it is read. */}
         <Ring x={px(POOLED.women.rate)} y={rowY(0)} at={womenWordAt - 2} color={GROUP_COLOR.women} r0={radius(700)} r1={radius(700) + 44} />

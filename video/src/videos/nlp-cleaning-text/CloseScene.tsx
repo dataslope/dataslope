@@ -1,18 +1,25 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink, NextLine } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Headline, Kicker, Spot, X0 } from "./parts";
 
 const FIG_Y = 300;
-const CARD_Y = 346;
-const CARD_W = 402;
-const CARD_GAP = 24;
+/** Four columns across the page, each centred under its spot, with a
+ *  hairline centred in each 40px gap: the widest line ("the capitals and
+ *  punctuation", 372px) keeps 29px from it. The rules that capped each
+ *  column are gone. */
+const COL_Y = 346;
+const COL_W = 390;
+const COL_GAP = 40;
 const ART_H = 150;
+/** A column's text, from its name's top to the bottom of what it lost, in
+ *  px under COL_Y: the hairlines span this. */
+const TEXT_TOP = 22 + ART_H + 18;
+const TEXT_H = 46 + 27 + 4 + 38;
 const NOTE_Y = 664;
 const NEXT_Y = 760;
 
@@ -24,13 +31,6 @@ const STEPS = [
   { name: "Remove stopwords", art: "nlp-cleaning-text-sieve", aspect: 998 / 1005, lost: "the common words", cue: "common" },
   { name: "Stem or lemmatize", art: "nlp-cleaning-text-dictionary", aspect: 1464 / 1009, lost: "the endings", cue: "endings" },
 ];
-
-/** A card's frame: a rule across its top, drawn on `at`. */
-const Rule: React.FC<{ at: number; x: number; y: number }> = ({ at, x, y }) => {
-  const frame = useCurrentFrame();
-  const p = ease(frame, at, 14);
-  return <div style={{ position: "absolute", left: x, top: y, width: CARD_W * p, height: 2, background: INK }} />;
-};
 
 /**
  * The unit in one figure: the four steps, each with its spot, and what each
@@ -51,12 +51,12 @@ export const CloseScene: React.FC = () => {
   const countAt = n.word("next", "count");
   const next = n.beat("next");
 
-  const cardX = (i: number) => X0 + i * (CARD_W + CARD_GAP);
-  const cardAt = STEPS.map((_, i) => fourAt + i * 5);
+  const colX = (i: number) => X0 + i * (COL_W + COL_GAP);
+  const colAt = STEPS.map((_, i) => fourAt + i * 5);
 
   return (
     <AbsoluteFill>
-      {cardAt.map((a, i) => (
+      {colAt.map((a, i) => (
         <Sfx key={`c${i}`} name="el-pop" at={a} level={-31} />
       ))}
       {lostAt.map((a, i) => (
@@ -69,19 +69,21 @@ export const CloseScene: React.FC = () => {
 
       <FigLabel n="17" title="What each step threw away" at={from} x={X0} y={y(FIG_Y)} />
       {STEPS.map((s, i) => {
-        const x = cardX(i);
-        const top = y(CARD_Y);
+        const x = colX(i);
+        const top = y(COL_Y);
         const h = ART_H;
-        const w = Math.min(CARD_W - 40, h * s.aspect);
+        const w = Math.min(COL_W - 40, h * s.aspect);
         const hh = w / s.aspect;
+        // Each line centred in the column, under its centred spot.
+        const line: React.CSSProperties = { width: COL_W, textAlign: "center", whiteSpace: "nowrap" };
         return (
           <React.Fragment key={s.name}>
-            <Rule at={cardAt[i]} x={x} y={top} />
-            <Spot id={s.art} at={cardAt[i] + 2} left={x + (CARD_W - w) / 2} top={top + 22 + (h - hh) / 2} width={w} height={hh} />
-            <Ink at={cardAt[i] + 4} dur={14} style={{ left: x, top: top + 22 + h + 18, whiteSpace: "nowrap" }}>
+            {i > 0 ? <ColumnRule x={x - COL_GAP / 2} top={top + TEXT_TOP} height={TEXT_H} at={colAt[i] + 4} /> : null}
+            <Spot id={s.art} at={colAt[i] + 2} left={x + (COL_W - w) / 2} top={top + 22 + (h - hh) / 2} width={w} height={hh} />
+            <Ink at={colAt[i] + 4} dur={14} style={{ left: x, top: top + TEXT_TOP, ...line }}>
               <span style={{ ...label(28, INK), fontWeight: 700 }}>{s.name}</span>
             </Ink>
-            <Ink at={lostAt[i] - 2} dur={16} style={{ left: x, top: top + 22 + h + 64, whiteSpace: "nowrap" }}>
+            <Ink at={lostAt[i] - 2} dur={16} style={{ left: x, top: top + 22 + h + 64, ...line }}>
               <div style={note(21, INK_SOFT)}>threw away</div>
               <div style={{ ...body(30), color: ACCENT_INK, marginTop: 4 }}>{s.lost}</div>
             </Ink>
@@ -96,7 +98,7 @@ export const CloseScene: React.FC = () => {
       </Ink>
       <Sfx name="el-pencil" at={neededAt - 6} level={-36} />
 
-      <NextLine at={countAt - 6} x={X0} y={y(NEXT_Y)} width={4 * CARD_W + 3 * CARD_GAP}>
+      <NextLine at={countAt - 6} x={X0} y={y(NEXT_Y)} width={4 * COL_W + 3 * COL_GAP}>
         what counting words reveals
       </NextLine>
     </AbsoluteFill>

@@ -52,7 +52,6 @@ export const RatesScene: React.FC = () => {
   const pointsAt = n.word("relative", "one point two");
   const ppAt = n.word("relative", "percentage points");
   const firstAt = n.word("both", "The first");
-  const readerAt = n.word("both", "reader");
   const everyAt = n.word("interval", "every");
   const sizeAt = n.word("interval", "effect size");
   const liftAt = n.word("interval", "that lift");
@@ -214,22 +213,8 @@ export const RatesScene: React.FC = () => {
           </div>
         </Note>
         <Ring x={SAY_X + 50} y={y(BAR_Y[0]) + 22} at={firstAt - 2} r0={30} r1={100} />
-        <Svg>
-          {ease(frame, readerAt - 4, 14) > 0 ? (
-            <rect
-              x={SAY_X - 28}
-              y={y(BAR_Y[0]) - 46}
-              width={380}
-              height={y(BAR_Y[1]) + 96 - (y(BAR_Y[0]) - 46)}
-              rx={10}
-              fill="none"
-              stroke={INK}
-              strokeWidth={2.6}
-              pathLength={1}
-              strokeDasharray={`${ease(frame, readerAt - 4, 14)} 1`}
-            />
-          ) : null}
-        </Svg>
+        {/* The two ways to say it stand as one column, held together by
+            spacing, with "report both" under them; no box round the pair. */}
         <Note at={bothAt - 2} x={SAY_X} y={y(BAR_Y[1]) + 104}>
           <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>
             <Marker at={bothAt + 4}>report both</Marker>

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -16,7 +16,10 @@ const COL_X0 = 520;
 const IN_Y = 326;
 const ROW_Y = { a1: 440, a2: 518, b1: 630, b2: 708 };
 const NEXT_Y = 806;
-const CARD_X = 1290;
+/** NLTK's stopword list, as three lines of text at the top right: its name,
+ *  the words that matter here, and the fact the narration turns on. No box:
+ *  the 250px or so between it and the input's last token keeps it apart. */
+const LIST_X = 1312;
 
 const COL_W = ORDER.tokens.map((t) => chipWidth(t, SIZE));
 const COL_XS = COL_W.map((_, c) => COL_X0 + COL_W.slice(0, c).reduce((a, b) => a + b + GAP, 0));
@@ -116,8 +119,8 @@ export const OrderScene: React.FC = () => {
   const top = (v: number) => y(v);
   const theCols = ORDER.tokens.map((t, c) => (t.toLowerCase() === "the" ? c : -1)).filter((c) => c >= 0);
   const isStop = (c: number) => !ORDER.a.filtered.cols.includes(c);
-  const card = ease(frame, aRemoveAt - 4, 14);
-  const cardY = top(IN_Y) - 8;
+  const list = ease(frame, aRemoveAt - 4, 14);
+  const listY = top(IN_Y) + 8;
 
   return (
     <AbsoluteFill>
@@ -162,20 +165,14 @@ export const OrderScene: React.FC = () => {
       />
 
       {/* ── NLTK's stopword list ── */}
-      {card > 0 ? (
+      {list > 0 ? (
         <div
           style={{
             position: "absolute",
-            left: CARD_X,
-            top: cardY,
-            width: 510,
-            boxSizing: "border-box",
-            padding: "16px 22px 18px",
-            border: `2px solid ${INK}`,
-            borderRadius: 12,
-            background: PAPER,
-            opacity: card,
-            transform: `translateY(${(1 - card) * 10}px)`,
+            left: LIST_X,
+            top: listY,
+            opacity: list,
+            transform: `translateY(${(1 - list) * 10}px)`,
           }}
         >
           <div style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>NLTK's stopwords, {STOPWORDS.count} of them</div>
