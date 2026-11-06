@@ -173,12 +173,12 @@ export const ChangedScene: React.FC = () => {
             {l.text}
           </Layer>
         ))}
-        <Note at={layers[0].at - 2} x={X0} y={layerTop(3) - 48}>
+        <Note at={layers[0].at - 2} x={X0} y={layerTop(3) + LAYER_TEXT - 64}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>what&apos;s been added on top</span>
         </Note>
 
         {/* Beside "AI in your own workflow": what a round with an assistant grades. */}
-        <Note at={roundsAt} x={SIDE} y={layerTop(3) - 52} from="right" dim={pipeAt}>
+        <Note at={roundsAt} x={SIDE} y={layerTop(3) + LAYER_TEXT - 68} from="right" dim={pipeAt}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             rounds that allow an assistant
             <br />
@@ -186,7 +186,7 @@ export const ChangedScene: React.FC = () => {
           </span>
         </Note>
         {checks.map((c, i) => (
-          <Note key={c.text} at={c.at - 2} x={SIDE + 24} y={layerTop(3) + 28 + i * 42} from="right" dim={pipeAt}>
+          <Note key={c.text} at={c.at - 2} x={SIDE + 24} y={layerTop(3) + LAYER_TEXT + 12 + i * 42} from="right" dim={pipeAt}>
             <span style={{ ...note(24, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{c.text}</span>
           </Note>
         ))}

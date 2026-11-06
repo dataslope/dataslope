@@ -120,7 +120,7 @@ export const ChooseScene: React.FC = () => {
                   </span>
                 </Ink>
                 <Ink at={a.actAt + 4} dur={14} style={{ left: ANSWER_X, top: by + 42, whiteSpace: "nowrap" }}>
-                  <span style={{ ...note(24, INK_SOFT) }}>{a.eg}</span>
+                  <span style={{ ...note(28, INK_SOFT) }}>{a.eg}</span>
                 </Ink>
               </React.Fragment>
             );
@@ -144,7 +144,7 @@ export const ChooseScene: React.FC = () => {
         </div>
 
         {/* A parent and the child holding its hand: the question the headline asks. */}
-        <Spot id="db-keys-family" at={childAt - 4} left={1460} top={400} width={171} height={220} />
+        <Spot id="db-keys-family" at={childAt - 4} left={1500} top={400} width={171} height={220} />
 
         <NextLine at={shapeAt - 4} x={ROOT_X} y={y(842)} width={760}>
           the shapes relationships take.
