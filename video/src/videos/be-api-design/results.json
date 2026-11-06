@@ -570,54 +570,5 @@
   "gzip": {
     "bytes": 3663,
     "gzipped": 610
-  },
-  "retry": {
-    "clients": 1000,
-    "capacity": 200,
-    "retryAfter": 2,
-    "spreadSeconds": 5,
-    "seed": 429,
-    "exact": {
-      "sent": 3000,
-      "refused": 2000,
-      "medianServed": 6,
-      "lastServed": 10,
-      "peak": 1000,
-      "perSecond": [
-        0,
-        0,
-        1000,
-        0,
-        800,
-        0,
-        600,
-        0,
-        400,
-        0,
-        200
-      ]
-    },
-    "spread": {
-      "sent": 1024,
-      "refused": 24,
-      "medianServed": 4.6,
-      "lastServed": 13,
-      "peak": 212,
-      "perSecond": [
-        0,
-        0,
-        181,
-        195,
-        209,
-        212,
-        203,
-        2,
-        2,
-        3,
-        10,
-        3,
-        4
-      ]
-    }
   }
 }

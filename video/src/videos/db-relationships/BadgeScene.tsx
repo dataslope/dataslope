@@ -55,6 +55,9 @@ export const BadgeScene: React.FC = () => {
   const keysAt = n.word("translate", "keys");
   const constraintsAt = n.word("translate", "constraints");
   const translateTo = n.beat("translate").to;
+  // The spots pop in late in the words that name them, after those words' own sounds.
+  const devicesSpotAt = devicesAt + 6;
+  const pictureAt = n.word("translate", "picture") + 2;
 
   // ── The diagram ──
   const emp = useEntityLayout({
@@ -108,11 +111,17 @@ export const BadgeScene: React.FC = () => {
       <Sfx name="el-pop" at={oneBadgeAt - 4} level={-30} />
       <Sfx name="el-tap" at={secondAt} level={-28} />
       <Sfx name="el-scratch" at={noAt} level={-30} />
+      <Sfx name="el-pop" at={devicesSpotAt} level={-30} />
+      <Sfx name="el-pop" at={pictureAt} level={-30} />
 
       <Kicker at={schemaFrom - 40}>Cardinality</Kicker>
       <Headline lead="The marks" at={schemaFrom - 4} turn="change the schema." turnAt={changeAt - 4} out={translateAt - 8} />
       <Headline lead="You translate" at={translateAt - 2} turn="the picture." turnAt={translateAt + 10} />
       <Spot id="db-relationships-badge" at={oneBadgeAt - 2} left={1676} top={y(70)} width={132} height={280} />
+      {/* "Many devices": a laptop and a phone, beside Ada's two device rows, gone with them. */}
+      <Spot id="db-relationships-devices" at={devicesSpotAt} out={badgeFrom + 2} left={1420} top={y(490)} width={218} height={210} />
+      {/* "your picture": an empty frame on an easel, beside the headline that names it. */}
+      <Spot id="db-relationships-frame" at={pictureAt} left={1110} top={y(80)} width={124} height={200} />
 
       <Drift from={schemaFrom} to={translateTo + 60} scale={0.018} origin={[960, y(560)]}>
         <Fig n="5" at={schemaFrom} x={EMP_X} y={y(268)}>

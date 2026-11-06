@@ -59,7 +59,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     otherwise"; Google, "At least one round is back in person"). The index
  *     says "Amazon and Anthropic can disqualify candidates"; the narration
  *     takes the AI page's narrower wording for Anthropic (see the report).
- *   - "ai-why": the AI page, "take-home projects and automated code tests
+ *   - "ai-why", "ai-survey": the AI page, "take-home projects and automated code tests
  *     have lost most of their signal, because an assistant can complete them
  *     and the reviewer cannot see how", and Karat's 2026 survey of 400
  *     engineering leaders, 71% and 62% (the page's footnote: "Karat sells

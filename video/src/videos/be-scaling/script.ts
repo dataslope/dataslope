@@ -57,18 +57,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   hook-10x: the figure becomes "350,000/s" in yellow on "ten times"; every
  *     box gets a small red question mark on "every box".
  *   plan: twelve numbered chips in a row, nine blue, two gray (quick), the
- *     last set apart in a different outline ("a different system").
+ *     last set apart in a different outline, lit on "a news feed".
  *   q1: question card; one server box grows into a taller one (vertical)
  *     until it hits a dashed ceiling line, red on "ceiling", and a red ring
  *     on "one machine".
  *   q1-horiz: beside it, the box multiplies into a row behind a load
  *     balancer (horizontal), green; a small "session" token leaves an app
- *     server for a shared store on "push session state".
+ *     server for a shared store on "session state".
  *   q1-ours: the shortener's two app servers become six, green.
  *   q1-headroom, q1-buy: the page's queue chart (queue-utilization-latency),
  *     redrawn from results.json: mean wait against load, with dots at 50%
  *     ("1×"), 90% ("9×") and 99% ("99×", off the top, an arrow) lit as said;
- *     the span from 90% to 99% shaded yellow on "the last few points".
+ *     the span from 90% to 99% shaded yellow on "Headroom".
  *   q2: question card; a load balancer box with a fan of arrows to four
  *     servers.
  *   q2-algos: three small panels, one per algorithm, each lit on its name:
@@ -108,9 +108,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     together, a clock for the cost) and write-behind (writes batched, a
  *     red crash mark over the batch).
  *   q5: question card; a leader box with arrows streaming to two followers,
- *     reads fanning out to the followers.
- *   q5-buys: the leader is crossed out and a follower is promoted (crown or
- *     ring), green.
+ *     reads fanning out to the followers on "scales reads"; then the leader
+ *     is crossed out and a follower promoted (a ring), green, on "promoted".
  *   q5-lag: a timeline: "create" lands on the leader at t0; the follower's
  *     copy arrives later (the lag, shaded); an "open" read in the gap goes to
  *     the follower and comes back "not found", red.
@@ -128,8 +127,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     table "by user" answers it, green.
  *   q7: question card; the page's grid (cap-theorem-grid): rows "network
  *     healthy" and "during a partition", columns "stay consistent" and "stay
- *     available"; the top row lit first.
- *   q7-rows: the bottom row lit, "refuse" and "answer, maybe stale".
+ *     available"; the top row lit first, then the bottom row on "refuses"
+ *     and "answers", "refuse" and "answer, maybe stale".
  *   q7-ours: the shortener split by a red partition line. Three operations,
  *     each placed in a column as said: "redirect" (available), "new random
  *     key" (available, each side drawing on its own ID block), "custom alias"
@@ -142,8 +141,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     redirect returns at once, green; a burst lengthens the queue, workers
  *     drain it at a steady rate.
  *   q8-once: a worker crashes before its "ack"; the click comes round again;
- *     a "seen IDs" box counts it once, green; a small "totals: a few seconds
- *     behind" note.
+ *     a "seen IDs" box counts it once, green; a small "totals run behind"
+ *     note.
  *   q9: question card; a timeline from 0 to 70 s with the minute boundary at
  *     60, ten requests at 59 and ten at 61 (results.json trace). The bucket
  *     spot.
@@ -169,8 +168,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "300 reads per load" in red.
  *   q12-why: "posts: once" against "feed loads: every time", push lit green.
  *   q12-hybrid: one feed built from the precomputed list plus five
- *     celebrity timelines, "6 reads", green; no post above the threshold
- *     pushed.
+ *     celebrity timelines, "1 + 5 = 6 reads", green; the celebrity's post is
+ *     no longer pushed.
  *   next: the whole grown diagram small: load balancer, cache with replicas,
  *     leader and followers, eight shards, a queue, a limiter, each named as
  *     said; every arrow between them lit on "API"; <NextLine> "Next: API
@@ -188,8 +187,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     redundancy and statelessness, session state to a shared store: the
  *     page. Headroom: the page's chart (queue-utilization-latency), mean wait
  *     rho / (1 - rho) service times, the simplest (M/M/1) queue: 1 at 50%, 9
- *     at 90%, 99 at 99%, checked against the chart's caption; "the last few
- *     points cost more than all the rest" is the page's.
+ *     at 90%, 99 at 99%, checked against the chart's caption ("headroom is
+ *     the thing you are buying" is the page's).
  *   - q2: round-robin, least-connections, consistent hashing for sticky
  *     caches, health checks: the page. The simulation: 10,000 keys, MD5,
  *     three servers to four: 74% move under modulo (7,446 of 10,000;
@@ -225,10 +224,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     stale or conflicting versions; "not a label for an entire database";
  *     PACELC), and its chart's two rows. The shortener's three operations
  *     are the video's own example.
- *   - q8: decoupling, bursts, async slow work (email, transcoding), fan-out
- *     to workers, at-least-once and idempotent consumers, "trades immediate
- *     consistency for throughput and resilience": the page. The click ID is
- *     the video's own example.
+ *   - q8: decoupling, bursts, slow work off the request path (email,
+ *     transcoding), at-least-once delivery and idempotent consumers, and
+ *     totals that lag (the page's "trades immediate consistency for
+ *     throughput and resilience"): the page. Counting clicks and the click ID
+ *     are the video's own example.
  *   - q9: the page's four algorithms, 429, "allows short bursts", "trade
  *     accuracy for cheapness". The trace is the video's own: a limit of ten
  *     a minute; fixed window passes all 20 (2 times the limit), the sliding
@@ -241,7 +241,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - q12: push and pull, the write storm, the hybrid: the page. Fifty
  *     million followers: the page's concept check. Two hundred followers,
  *     three hundred accounts followed and five celebrities among them are
- *     assumptions, said as "say"; 1 + 5 = 6 reads. "Feeds are read far more
+ *     the video's own round numbers; 1 + 5 = 6 reads. "Feeds are read far more
  *     often than people post" applies the page's read-heavy rule (100:1 or
  *     more for most consumer systems) to feeds.
  *
@@ -266,12 +266,12 @@ export const script: NarrationScript = {
     },
     {
       id: "hook-10x",
-      text: "Now give it ten times the traffic: three hundred and fifty thousand a second. Every box has to answer for it.",
+      text: "Now give it ten times the traffic, three hundred and fifty thousand a second, and every box has to answer for it.",
       pauseAfter: 0.7,
     },
     {
       id: "plan",
-      text: "Twelve questions on scaling a design. Nine are worked through on this diagram, two go quickly, and the last one is a different system: a news feed.",
+      text: "Twelve questions: nine worked through on this diagram, two quick ones, and a news feed to close.",
       pauseAfter: 0.7,
     },
 
@@ -279,27 +279,27 @@ export const script: NarrationScript = {
     {
       id: "q1",
       scene: true,
-      text: "Question one. Horizontal versus vertical scaling, which do you reach for? Vertical means a bigger machine. It's simple, but it has a ceiling, and it's still one machine that can fail.",
+      text: "Question one. Horizontal versus vertical scaling, which do you reach for? Vertical is a bigger machine: simple, but it has a ceiling, and it's still one machine that can fail.",
       pauseAfter: 0.6,
     },
     {
       id: "q1-horiz",
-      text: "Horizontal means more machines behind the load balancer. It scales nearly without limit and adds redundancy, but only if any server can handle any request. So the app tier has to be stateless: push session state into a shared cache or a database.",
+      text: "Horizontal is more machines behind the load balancer: nearly unlimited, and redundant, but only if any server can handle any request. So keep the app tier stateless, with session state in a shared cache or database.",
       pauseAfter: 0.6,
     },
     {
       id: "q1-ours",
-      text: "These redirect servers already are, so the answer to ten times the traffic is more of them.",
+      text: "These redirect servers already are, so ten times the traffic means more of them.",
       pauseAfter: 0.6,
     },
     {
       id: "q1-headroom",
-      text: "How many more? Enough that none runs near full. In the simplest queue model, a request at fifty percent load waits one service time on average. At ninety percent, it waits nine. At ninety-nine percent, ninety-nine.",
+      text: "How many more? Enough that none runs near full. In the simplest queue model, a request waits one service time on average at fifty percent load, nine at ninety percent, and ninety-nine at ninety-nine.",
       pauseAfter: 0.9,
     },
     {
       id: "q1-buy",
-      text: "The last few points cost more than all the rest. Headroom is what the extra servers buy.",
+      text: "Headroom is what the extra servers buy.",
       pauseAfter: 0.8,
     },
 
@@ -312,22 +312,22 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-algos",
-      text: "Round-robin sends them in turn. Least-connections sends each to the server with the fewest open, which copes better when some requests are slow. Consistent hashing sends the same key to the same server, which matters when each server keeps its own cache of hot links.",
+      text: "Round-robin deals them in turn. Least-connections picks the server with the fewest open, which copes with slow requests. Consistent hashing sends a key to the same server every time, for servers that cache their own hot links.",
       pauseAfter: 0.6,
     },
     {
       id: "q2-health",
-      text: "It also runs health checks, and takes a dead server out of rotation. That's what turns a pool of stateless servers into a highly available tier.",
+      text: "And health checks pull a dead server out of rotation, which is what makes a pool of stateless servers highly available.",
       pauseAfter: 0.7,
     },
     {
       id: "q2-mod",
-      text: "Why consistent hashing? Simulate ten thousand short keys spread over three servers by their hash, modulo three. Add a fourth server, switch to modulo four, and seventy-four percent of the keys move, each one to a cold cache.",
+      text: "Why consistent? Simulate ten thousand short keys on three servers, by hash modulo three. Add a fourth, switch to modulo four, and seventy-four percent of the keys move, each one to a cold cache.",
       pauseAfter: 0.7,
     },
     {
       id: "q2-ring",
-      text: "Put the servers on a hash ring instead, at a hundred points each, and only twenty-three percent move, every one of them to the new server: exactly the share it takes over.",
+      text: "On a hash ring, with a hundred points a server, only twenty-three percent move, all of them to the new server.",
       pauseAfter: 0.8,
     },
 
@@ -335,22 +335,22 @@ export const script: NarrationScript = {
     {
       id: "q3",
       scene: true,
-      text: "Question three. Explain the cache-aside pattern. It's the default. On a read, the app checks the cache. On a miss, it reads the database, writes the value into the cache, and returns it. A write updates the database and invalidates the cached copy.",
+      text: "Question three. Explain the cache-aside pattern. On a read, the app checks the cache. On a miss, it reads the database, writes the value into the cache, and returns it. A write updates the database and invalidates the cached copy.",
       pauseAfter: 0.6,
     },
     {
       id: "q3-props",
-      text: "Only what's asked for gets cached, and if the cache fails, reads fall through to the database. But the first request for every key pays the miss.",
+      text: "Only what's asked for gets cached, and a cache failure falls through to the database, but every key's first request pays the miss.",
       pauseAfter: 0.6,
     },
     {
       id: "q3-sim",
-      text: "How much does it catch? Simulate two million redirects over a million links, where a few links get most of the clicks. A cache holding a thousandth of the links answers forty percent of redirects. A hundredth, fifty-eight. A tenth, seventy-seven.",
+      text: "Simulate two million redirects over a million links, where a few links get most of the clicks. A cache holding a thousandth of the links answers forty percent. A hundredth, fifty-eight. A tenth, seventy-seven.",
       pauseAfter: 0.8,
     },
     {
       id: "q3-loss",
-      text: "And the better it works, the harder losing it lands. At fifty-eight percent, a dead cache multiplies the database's reads by two point four. At seventy-seven, by more than four. So the cache needs replicas, or the database needs that headroom.",
+      text: "And the better it works, the harder losing it lands: a dead cache multiplies the database's reads by two point four at fifty-eight percent, and by more than four at seventy-seven. So the cache needs replicas too.",
       pauseAfter: 0.8,
     },
 
@@ -358,22 +358,22 @@ export const script: NarrationScript = {
     {
       id: "q4",
       scene: true,
-      text: "Question four. Why is cache invalidation hard? Because there are two copies of the truth, and they drift. Set the TTL, the time to live, too long, and users see stale data. Too short, and you lose the cache.",
+      text: "Question four. Why is cache invalidation hard? Because there are two copies of the truth, and they drift. Set the TTL, the time to live, too long and users see stale data; too short and you lose the cache.",
       pauseAfter: 0.6,
     },
     {
       id: "q4-model",
-      text: "The page models one key, read about once a second and changed about every two minutes. The TTL moves both failures, in opposite directions. The least bad setting is where they cross, at about fifteen seconds, and even there six percent of reads miss and six percent are stale.",
+      text: "The page models a key read about once a second and changed every two minutes. The least bad TTL is where the two failures cross, about fifteen seconds, and even there six percent of reads miss and six percent are stale.",
       pauseAfter: 0.9,
     },
     {
       id: "q4-ours",
-      text: "A short link barely changes, so a long TTL costs almost nothing, until a link is taken down for abuse and has to stop now. So that write deletes the cached entry, after the database commits. Delete first, and a read in between puts the old value back. Keep the TTL anyway, as a backstop.",
+      text: "A short link barely changes, so its TTL can be long, until one is taken down for abuse. Then delete its cached entry after the database commits. Delete it first, and a read in between puts the old value back. The TTL stays as a backstop.",
       pauseAfter: 0.7,
     },
     {
       id: "q4-write",
-      text: "The alternatives: write-through updates the cache and the database together, consistent at a cost on every write. Write-behind batches writes for speed, but a crash loses whatever it hadn't written yet.",
+      text: "Write-through updates both together, consistent at a cost on every write. Write-behind batches writes for speed, and a crash loses what it hadn't written.",
       pauseAfter: 0.8,
     },
 
@@ -381,22 +381,17 @@ export const script: NarrationScript = {
     {
       id: "q5",
       scene: true,
-      text: "Question five. What is database replication, and what does it buy you? Copies of the data on several nodes. In leader-follower replication, writes go to the leader and stream to read-only followers.",
-      pauseAfter: 0.6,
-    },
-    {
-      id: "q5-buys",
-      text: "That scales reads, fanned out across the followers, and adds availability: if the leader dies, promote a follower.",
+      text: "Question five. What is database replication, and what does it buy you? Copies of the data on several nodes. In leader-follower replication, writes go to the leader and stream to read-only followers. That scales reads, and if the leader dies, a follower is promoted.",
       pauseAfter: 0.6,
     },
     {
       id: "q5-lag",
-      text: "The catch is replication lag. Someone creates a link, gets the short key back, and opens it at once. The read lands on a follower that hasn't caught up: not found.",
+      text: "The catch is replication lag. Someone creates a link and opens it at once, and the read lands on a follower that hasn't caught up: not found.",
       pauseAfter: 0.8,
     },
     {
       id: "q5-fix",
-      text: "The usual fix: for a short while after a user writes, send that user's reads to the leader, so they always see their own update. And with asynchronous replication, promoting a follower that lags loses the writes it never received.",
+      text: "So for a short while after a user writes, send their reads to the leader. And with asynchronous replication, promoting a lagging follower loses the writes it never received.",
       pauseAfter: 0.8,
     },
 
@@ -404,17 +399,17 @@ export const script: NarrationScript = {
     {
       id: "q6",
       scene: true,
-      text: "Question six. What is sharding, and how does it differ from partitioning? Partitioning splits one large table into smaller pieces. Sharding spreads those pieces across separate database servers, each holding the rows for its share of a shard key. It scales writes and storage past one machine.",
+      text: "Question six. What is sharding, and how does it differ from partitioning? Partitioning splits one large table into pieces. Sharding puts the pieces on separate database servers, by a shard key, to scale writes and storage past one machine.",
       pauseAfter: 0.6,
     },
     {
       id: "q6-key",
-      text: "The shard key decides how well. Shard by creation date, and today's shard takes every new link: a hot spot. Shard by a hash of the short key, and in a simulation, a million keys land on eight shards within one percent of an eighth each.",
+      text: "Shard by creation date, and today's shard takes every new link: a hot spot. Shard by a hash of the short key, and in a simulation, a million keys land on eight shards within one percent of an eighth each.",
       pauseAfter: 0.8,
     },
     {
       id: "q6-cost",
-      text: "A redirect now touches one shard. But one user's links hash everywhere, so listing them asks all eight: cross-shard queries are the price. Keep a second copy keyed by user for that page, and add shards on a hash ring, so few keys move.",
+      text: "A redirect touches one shard, but listing one user's links asks all eight: cross-shard queries are the price. Keep a second copy keyed by user for that page.",
       pauseAfter: 0.8,
     },
 
@@ -422,22 +417,17 @@ export const script: NarrationScript = {
     {
       id: "q7",
       scene: true,
-      text: "Question seven. Explain the CAP theorem. During a network partition, a distributed system can't be both consistent, with every read seeing the latest write as if there were one copy, and available, with every working node still answering.",
+      text: "Question seven. Explain the CAP theorem. During a network partition, a distributed system can't be both consistent, every read seeing the latest write, and available, every working node still answering. So each side either refuses, or answers and risks stale data.",
       pauseAfter: 0.7,
     },
     {
-      id: "q7-rows",
-      text: "Partitions aren't optional, so the choice is what each side does while the network is split: refuse, and stay consistent, or answer, and risk stale or conflicting data.",
-      pauseAfter: 0.6,
-    },
-    {
       id: "q7-ours",
-      text: "It's a choice per operation, not a label for the whole database. A redirect answers from whatever copy it can reach: at worst, a brand-new link isn't found yet. New keys can be minted on both sides too, if each server draws from its own block of IDs. But a custom alias must be unique, so the side that can't reach a majority refuses to grant one.",
+      text: "It's a choice per operation, not a label for the database. A redirect answers from whatever copy it reaches; at worst, a brand-new link isn't found yet. New keys can be minted on both sides, if each server draws from its own block of IDs. But a custom alias must be unique, so the side without a majority refuses it.",
       pauseAfter: 0.8,
     },
     {
       id: "q7-pacelc",
-      text: "And the trade outlives the partition. On a healthy network, waiting for replicas to confirm a write still buys consistency with latency: the second half of PACELC.",
+      text: "And on a healthy network, waiting for replicas to confirm a write still trades latency for consistency: the second half of PACELC.",
       pauseAfter: 0.8,
     },
 
@@ -445,17 +435,17 @@ export const script: NarrationScript = {
     {
       id: "q8",
       scene: true,
-      text: "Question eight. When do you introduce a message queue? When work doesn't have to happen inside the request. Counting clicks is the shortener's case. Written straight to the database, every redirect waits on a write, and a viral link sends its whole spike there.",
+      text: "Question eight. When do you introduce a message queue? When work can leave the request. Counting clicks in the database makes every redirect wait on a write, and sends a viral link's whole spike there.",
       pauseAfter: 0.6,
     },
     {
       id: "q8-queue",
-      text: "Put each click on a queue instead. The redirect returns at once, workers drain the queue at their own pace, and a burst only makes it longer. The same goes for slow work, like sending email or transcoding video, and for fanning work out across many workers.",
+      text: "Queue each click instead. The redirect returns at once, workers drain the queue at their own pace, and a burst just makes it longer. Slow work, like email or video transcoding, goes the same way.",
       pauseAfter: 0.6,
     },
     {
       id: "q8-once",
-      text: "The price is at-least-once delivery: a worker that crashes before acknowledging a click gets it again. So the consumer has to be idempotent. Give each click an ID, and count each ID once. The totals now run a little behind: throughput and resilience, traded for immediate consistency.",
+      text: "The price is at-least-once delivery: a worker that crashes before acknowledging gets the click again. So make the consumer idempotent: give each click an ID, and count each ID once. The totals now run a little behind.",
       pauseAfter: 0.8,
     },
 
@@ -463,32 +453,32 @@ export const script: NarrationScript = {
     {
       id: "q9",
       scene: true,
-      text: "Question nine. How does rate limiting work? It caps how many requests a client can make in a window, to protect the system and keep it fair. Say ten new links a minute, and one client sends ten at fifty-nine seconds, then ten more at one minute and one second.",
+      text: "Question nine. How does rate limiting work? It caps a client's requests per window, to protect the system and keep it fair. Say ten new links a minute, and one client sends ten at fifty-nine seconds, then ten at sixty-one.",
       pauseAfter: 0.6,
     },
     {
       id: "q9-fixed",
-      text: "A fixed-window counter resets on the minute, so all twenty get through, in two seconds: twice the limit. It's one counter per client, which is why it's cheap.",
+      text: "A fixed-window counter resets on the minute, so all twenty get through: twice the limit, for one cheap counter.",
       pauseAfter: 0.6,
     },
     {
       id: "q9-sliding",
-      text: "A sliding-window counter also weighs the minute before, and refuses the second ten. It's still cheap, but it's an estimate: it assumes the last minute's requests were evenly spread.",
+      text: "A sliding-window counter weighs in the minute before and refuses the second ten, though it's an estimate that assumes requests were evenly spread.",
       pauseAfter: 0.6,
     },
     {
       id: "q9-token",
-      text: "A token bucket holds up to ten tokens and refills one every six seconds. Each request spends one, and an empty bucket answers HTTP four twenty-nine, too many requests. The first burst empties it, and the second is refused. Bursts up to the bucket's size get through, then only the refill rate.",
+      text: "A token bucket holds ten tokens and refills one every six seconds. Each request spends one, and an empty bucket answers HTTP four twenty-nine, too many requests. The first burst empties it, and the second is refused.",
       pauseAfter: 0.6,
     },
     {
       id: "q9-leaky",
-      text: "A leaky bucket queues requests and lets them out at a constant rate, one every six seconds, so the load behind it stays smooth.",
+      text: "A leaky bucket queues requests and lets them out at a constant rate, one every six seconds.",
       pauseAfter: 0.6,
     },
     {
       id: "q9-shared",
-      text: "The follow-up is where the count lives. With four app servers each keeping its own bucket, round-robin hands one client four buckets: four times the limit. The count has to sit in a store every server shares.",
+      text: "The follow-up is where the count lives. Four app servers each keeping its own bucket hand one client four buckets: four times the limit. The count belongs in a store they share.",
       pauseAfter: 0.8,
     },
 
@@ -501,12 +491,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-evict",
-      text: "What cache eviction policies exist, and when does each fit? LRU, least recently used, drops the entry untouched for longest: a good default. LFU, least frequently used, keeps popular keys through a quiet spell. First in, first out drops the oldest entry, used or not. A TTL expires entries by age, which bounds staleness whatever the memory pressure. Most systems pair LRU with a TTL.",
+      text: "Which eviction policy, when the cache fills? LRU, least recently used, drops the entry untouched longest: a good default. LFU, least frequently used, keeps popular keys through a quiet spell. First in, first out ignores use altogether. Expiry by TTL bounds staleness whatever the memory pressure. Most systems pair LRU with a TTL.",
       pauseAfter: 0.7,
     },
     {
       id: "r-consist",
-      text: "What consistency models should you know? Strong: every read reflects the latest write. Eventual: replicas converge once writes stop, and a read can be stale until then. Between them, read-your-writes, the fix from question five, and monotonic reads, where time never goes backwards. A feed can be eventual; a bank balance usually needs strong.",
+      text: "And the consistency models to know. Strong: every read reflects the latest write. Eventual: replicas converge, and a read can be stale meanwhile. Between them, read-your-writes, the fix from question five, and monotonic reads, where time never runs backwards. A feed can be eventual; a bank balance usually needs strong.",
       pauseAfter: 0.9,
     },
 
@@ -514,32 +504,32 @@ export const script: NarrationScript = {
     {
       id: "q12",
       scene: true,
-      text: "Question twelve. Design a news feed: fan-out on write, or on read? Fan-out on write, or push: when someone posts, write the post's ID into every follower's precomputed feed. Reading a feed is then one cheap lookup.",
+      text: "Question twelve. Design a news feed: fan-out on write, or on read? Fan-out on write, or push, copies each new post's ID into every follower's precomputed feed, so reading one is a cheap lookup.",
       pauseAfter: 0.6,
     },
     {
       id: "q12-storm",
-      text: "Its cost is per follower. An account with two hundred followers makes two hundred writes a post. A celebrity with fifty million makes fifty million: a write storm, from one post.",
+      text: "Its cost is per follower: two hundred followers, two hundred writes. A celebrity with fifty million followers makes fifty million writes from one post: a write storm.",
       pauseAfter: 0.8,
     },
     {
       id: "q12-pull",
-      text: "Fan-out on read, or pull: build the feed when it's requested, from the accounts you follow. Posting is cheap, but follow three hundred accounts and every feed load reads three hundred timelines.",
+      text: "Fan-out on read, or pull, builds the feed on request from everyone you follow. Posting is cheap, but follow three hundred accounts and every load reads three hundred timelines.",
       pauseAfter: 0.6,
     },
     {
       id: "q12-why",
-      text: "Feeds are read far more often than people post, so push usually wins: it does the work once per post, where pull repeats it on every load.",
+      text: "Feeds are read far more often than people post, so push usually wins: it does the work once per post, not on every load.",
       pauseAfter: 0.6,
     },
     {
       id: "q12-hybrid",
-      text: "Real systems mix them. Push for ordinary accounts, pull for celebrities, and merge at read time: your precomputed feed, plus the handful of celebrities you follow. Say five: six reads instead of three hundred, and no post costs fifty million writes.",
+      text: "So real systems mix them: push for ordinary accounts, pull for celebrities, merged at read time. Follow five celebrities, and a load is six reads, not three hundred, and no post costs fifty million writes.",
       pauseAfter: 0.9,
     },
     {
       id: "next",
-      text: "A load balancer, a cache, replicas, shards, a queue and a limiter. Every box now talks to the others through an API. Next: API design.",
+      text: "A load balancer, a cache, replicas, shards, a queue and a limiter: every box now talks to the others through an API. Next: API design.",
     },
   ],
 };

@@ -8,165 +8,181 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * reasoning"), after content/interview/backend-engineer/algorithms.mdx. It
  * answers all thirty-five of the page's questions, by its headings: eight
  * worked through, numbered aloud and read in the page's words, three more
- * answered inside them, then twenty-four one-line answers in two quick
- * rounds (numbered on screen only, 12 to 35).
+ * answered inside them (named below), then twenty-four one-line answers in
+ * two quick rounds, numbered on screen only (9 to 32; a question answered
+ * inside a deep dive takes no number of its own).
  *
  * The argument is the plan's: Big-O is the case for a design, and the
- * structure is the decision. No implementation is walked through and no
- * code is typed; a figure shows what a structure holds and what an operation
- * costs, counted.
+ * structure is the decision. No implementation is walked through and no code
+ * is typed; each figure shows what a structure holds and what an operation
+ * costs, counted. Colors keep interview.tsx's meanings: red the trap or the
+ * wrong result, green the right one, yellow what the narration points at,
+ * blue data.
  *
  *   1. "What is Big-O notation, and why do interviewers care?" ("big").
- *      On screen: a grid of n by n dots (every pair) beside one row of n
- *      dots (one pass), then a table of n, pairs and passes at 100, 1,000
- *      (counted, results.json) and 1,000,000, and the modeled times under a
- *      label that says "model: 100 million steps a second, an assumption".
- *      "big-next" lights the 100 row: there the brute force is fine.
+ *      A grid of n by n dots (every pair) beside one row of n dots (one
+ *      pass); then a table of n, pairs and one pass at 100, 1,000 (counted,
+ *      marked so) and 1,000,000; then the modeled times, 83 minutes against
+ *      0.01 s, under a label "model: 100 million checks a second, an
+ *      assumption". "big-next" lights the 100 row in yellow: there the brute
+ *      force is fine.
  *   2. "When do you reach for a hash map?" ("hash"), with "What is the time
  *      and space complexity of a hash set?" answered in "hash-worst" and
- *      "hash-set". On screen: Two Sum on the challenge's [2, 7, 11, 15],
- *      target 9: a map filling as the pass moves, 9 - 7 = 2 found, [0, 1].
- *      Then a thousand buckets filling, two keys landing together at the
- *      38th; then two bars of __eq__ calls, 0 and 595,679 (the drawn bucket
- *      for the colliding keys is one long chain of probes).
- *   3. "What is amortized O(1) and when does it apply?" ("amort"). On
- *      screen: a staircase of a Python list's allocated slots against items
- *      appended, its 86 steps (results.json), with a doubling array's 20
- *      steps dashed behind it; a running total of copies per append settling
- *      near 8.4 (doubling's near 1); then the last step lit in yellow, 938,736
- *      items moved by one append.
- *   4. "When is a stack the right structure?" ("stack"). On screen:
- *      "([)]" and "{[]}" checked three ways, counter, queue and stack, each
- *      verdict a tick or a cross from results.json; the stack drawn as a
- *      column of openers, newest on top, the round closer meeting the square
- *      opener in red.
+ *      "hash-set". Two Sum on the challenge's [2, 7, 11, 15], target 9: the
+ *      map filling as the pass moves, 9 - 7 = 2 found, [0, 1] in green. Then
+ *      a thousand buckets filling key by key until two land together, at the
+ *      38th (yellow); then two bars of key comparisons (__eq__ calls),
+ *      0 for distinct hashes and 595,679 for one shared hash (red).
+ *   3. "What is amortized O(1) and when does it apply?" ("amort"). A
+ *      staircase of a Python list's allocated slots against items appended,
+ *      its 86 steps, with a doubling array's 20 dashed behind it; a running
+ *      count of copies per append settling near 8 (doubling's under 2); then
+ *      the last step lit in yellow: the one append that can copy 938,736.
+ *   4. "When is a stack the right structure?" ("stack"). "([)]" and "{[]}"
+ *      checked three ways, counter, queue and stack, each verdict a tick or
+ *      a cross (results.json). The stack drawn as a column of openers,
+ *      newest on top, the round closer meeting the square opener in red; the
+ *      queue's two wrong verdicts in red.
  *   5. "Walk me through BFS vs DFS, when do you choose each?" ("bfs"), with
  *      "What is a deque, and when should you prefer it over a list?" in
- *      "bfs-deque". On screen: the page's graph (A to B and C, both to D),
- *      the two visiting orders numbered on the nodes; then a binary tree of
- *      twenty levels drawn as a triangle, BFS's frontier a band across its
- *      widest level (524,288), DFS's one path down it (20); then a queue as
- *      a row of cells, a pop from the front of a list shifting every cell
- *      (274,876,858,369 shifts in all), the deque's front simply detaching.
+ *      "bfs-deque". The page's graph (A to B and C, both to D), the two
+ *      visiting orders numbered on the nodes; then a twenty-level binary
+ *      tree drawn as a triangle, BFS's frontier a band across its widest
+ *      level (524,288), DFS's a single path down it (20); then a queue as a
+ *      row of cells, a pop from a list's front shifting every cell behind it
+ *      (274,876,858,369 shifts for this tree), a deque's front detaching.
  *   6. "How does a priority queue differ from a regular queue?" ("pq"), with
- *      "What are the time complexities of heap operations?" in "heap-height"
- *      and "heap-build". On screen: a queue and a priority queue side by side
- *      handing out the same five jobs in two orders; three ways to hold them
- *      (sorted list, unsorted list, heap) as a table of push and pop costs;
- *      the heap as a tree twenty levels deep, one push climbing nineteen
- *      levels; then two bars, heapify's 1,499,986 comparisons and one push
- *      at a time's 17,951,445, on the same million items arriving largest
- *      first.
- *   7. "Explain Dijkstra's algorithm and its complexity." ("dijk"). On
- *      screen: the page's graph with its weights, the distances settling in
- *      order to the page's printed {'A': 0, 'B': 1, 'C': 3, 'D': 4}; the
- *      cost (V + E) log V; then the video's own graph with one edge of -2,
- *      the settling version's B = 2, D = 3 struck in red beside
- *      Bellman-Ford's B = 1, D = 2 in green, its three rounds over four
- *      edges counted.
- *   8. "How does quicksort work, and what is its worst-case?" ("quick"). On
- *      screen: a thousand bars already in order, partitioned on the last
- *      one: a recursion "staircase" 999 levels deep, 499,500 comparisons,
- *      with Python's RecursionError for the recursive form; then the same
- *      bars partitioned on random pivots, a bushy tree 21 levels deep,
- *      10,962 comparisons.
- *   Quick round one ("rapid-in", 12 to 22): merge sort; heapsort; stable
- *   sorts; in-place and out-of-place; the Master Theorem; recursion and
- *   iteration; divide and conquer against DP; memoization against
- *   tabulation; the classic DP problems; greedy; backtracking.
- *   Quick round two ("rapid2-in", 23 to 35): array and linked list; the BST;
- *   the three traversals; balanced BST against heap; the trie; binary
- *   search; two pointers; sliding window; adjacency list or matrix; cycle
- *   detection in a directed graph; topological sort; Kahn's algorithm; bit
- *   manipulation. Each row's answer is drawn beside the list: a number from
- *   results.json where the line says one.
+ *      "What are the time complexities of heap operations?" in "heap-choose"
+ *      to "heap-build". A queue and a priority queue handing out the same
+ *      five jobs in two orders; a three-row table of push and pop costs
+ *      (sorted list, unsorted list, heap), the heap's row in green; the heap
+ *      as a tree twenty levels deep, one push climbing nineteen; then two
+ *      bars on the same million items arriving least urgent first (largest
+ *      first, for a min-heap): heapify 1,499,986 comparisons, one push at a
+ *      time 17,951,445.
+ *   7. "Explain Dijkstra's algorithm and its complexity." ("dijk"). The
+ *      page's graph and weights, distances settling in order to the page's
+ *      printed {'A': 0, 'B': 1, 'C': 3, 'D': 4}; the cost, (V + E) log V;
+ *      then the video's own graph with one edge of -2, labelled "finalize a
+ *      node when it leaves the heap": its B = 2, D = 3 in red beside
+ *      Bellman-Ford's B = 1, D = 2 in green, three rounds over four edges.
+ *   8. "How does quicksort work, and what is its worst-case?" ("quick"). A
+ *      thousand bars already in order, partitioned on the last: a staircase
+ *      of splits 999 levels deep, 499,500 comparisons, and Python's
+ *      RecursionError for the recursive form, in red; then the same bars on
+ *      random pivots, a bushy tree 21 levels deep, 10,962 comparisons.
+ *   Quick round one ("rapid-in", 9 to 19): "Explain merge sort and its
+ *   complexity."; "When is heapsort preferable?"; "What makes a sort
+ *   'stable,' and why does it matter?"; "Explain the difference between
+ *   in-place and out-of-place algorithms."; "What is the Master Theorem?";
+ *   "Recursion vs iteration?"; "What is divide and conquer, and how does it
+ *   differ from DP?"; "Explain memoization vs tabulation in dynamic
+ *   programming."; "What are classic DP problems you should know?"; "What is
+ *   a greedy algorithm and when is it safe to use?"; "Explain backtracking
+ *   and give a use case.".
+ *   Quick round two ("rapid2-in", 20 to 32): "Array vs linked list,
+ *   trade-offs?"; "What is a BST and what are its operation complexities?";
+ *   "What are the three DFS tree traversals?"; "How does a balanced BST
+ *   differ from a heap?"; "What is a trie, and what problems is it suited
+ *   for?"; "Binary search, prerequisites and common mistakes?"; "Explain the
+ *   two-pointer technique and give an example."; "What is the
+ *   sliding-window technique?"; "What graph representation should you use,
+ *   adjacency list vs matrix?"; "How do you detect a cycle in a directed
+ *   graph?"; "What is topological sort, and when is it applicable?"; "What
+ *   is Kahn's algorithm and what does it detect?"; "How do bit manipulation
+ *   tricks speed up algorithms?".
+ *   Each row's answer is drawn beside the list, with the number from
+ *   results.json where the line says one (the two trees' heights, the two
+ *   call counts, the coins, the Hoppers, the twenty probes, the
+ *   hundred-million-against-a-trillion bars, Kahn's three of four nodes left
+ *   on a cycle).
  *
- * Opening: fresh, on the gap between code that works and code that keeps
- * working as the input grows, without naming the video before it. The
- * close bridges into Part 9 (an assistant writes the code with you).
+ * Opening: fresh, on code that is fast at a hundred items and the question of
+ * what it costs at a million, without naming the video before it (whose
+ * bridge is "reading code includes judging what it costs"). The close
+ * bridges into Part 9: when an assistant writes the code, working code is
+ * not what's graded.
  *
  * Facts. check.mjs runs the page's own snippets unchanged in Pyodide 314.0.7
- * (Python 3.14.2), the runtime of the page's <CodeBlock>s, counts operations
- * on the video's own inputs (seeded or built from fixed expressions), and
+ * (Python 3.14.2), the runtime of the page's <CodeBlock>s; counts operations
+ * on the video's own inputs (seeded, or built from fixed expressions); and
  * does the arithmetic from stated assumptions, into results.json, which
- * data.ts reads. Then it fails if the narration's words stop matching.
+ * data.ts reads. It then fails if a beat stops saying what ran (58 claims)
+ * or a deep dive stops reading its heading word for word. Nothing is timed.
  *   - "big-count", "big-million": a double loop over n items checks
- *     n(n - 1)/2 pairs: 4,950 at 100, 499,999,500,000 at a million ("half a
- *     trillion"). Counted on a thousand numbers whose only pair is the last
- *     two: 499,500 pairs, against 1,000 hash lookups (on screen).
- *   - "big-model": the rate is an assumption, said as one (a hundred million
- *     comparisons a second): 4,999.995 s, about 83 minutes; one pass of a
- *     million, 0.01 s.
- *   - "hash-twosum": the Two Sum challenge's reference solution on its
- *     example prints [0, 1] (page, "Challenges").
- *   - "hash-collide": with 1,000 buckets and uniform hashing, a shared
- *     bucket is more likely than not from the 38th key (50.9%; 54.6% at
- *     40, the page's "even money by the fortieth key").
- *   - "hash-worst": a thousand keys of one hash put into a Python set call
- *     __eq__ 595,679 times ("nearly six hundred thousand"); with distinct
- *     hashes, 0. More than the n(n - 1)/2 a chain would take, because
- *     open addressing revisits slots. "hash-set": the page's average O(1),
- *     O(n) space, O(n) worst case, and the set's resize past about 2/3 full.
- *   - "amort-run" to "amort-spike": a million appends to a Python list
- *     (allocated slots read from sys.getsizeof after each): 86 resizes; if
- *     each copied every item, 8,445,096 copies, 8.4 per append; growth about
- *     1.126 a step ("about an eighth"); the largest resize happens at
- *     938,736 items. A doubling array: 20 resizes, 1,048,575 copies, "under
- *     two" per append... in fact about one; said as "under two", the
- *     textbook bound. The page says the list doubles: it does not (see the
- *     report); the narration follows the run.
- *   - "stack-*": counter, queue and stack checkers on "([)]" and "{[]}":
- *     the counter accepts both, the queue accepts "([)]" and rejects
- *     "{[]}", the stack rejects "([)]" and accepts "{[]}" (the page's own
- *     concept check names "([)]" and the queue's failure).
+ *     n(n - 1)/2 pairs: 4,950 at 100 ("under five thousand"),
+ *     499,999,500,000 at a million ("half a trillion"). Counted on a
+ *     thousand numbers whose only pair is the last two: 499,500 pairs
+ *     against 1,000 hash lookups (on screen). "big-model": the rate is an
+ *     assumption, said as one: 4,999.995 s, about 83 minutes; one pass of a
+ *     million at the same rate, 0.01 s.
+ *   - "hash-twosum": the Two Sum challenge's reference solution prints
+ *     [0, 1] for its example. "hash-collide": 1,000 buckets, uniform
+ *     hashing: a shared bucket is more likely than not from the 38th key
+ *     (50.9%; 54.6% at 40, the page's "even money by the fortieth key").
+ *     "hash-worst": a thousand keys of one hash, put into a Python set, call
+ *     __eq__ 595,679 times ("nearly six hundred thousand"; more than a
+ *     chain's n(n - 1)/2 because open addressing revisits slots); with
+ *     distinct hashes, 0. "hash-set": the page's answer (average O(1), O(n)
+ *     space, O(n) per operation at worst).
+ *   - "amort-*": a million appends to a Python list, its allocated slots
+ *     read from sys.getsizeof after each: 86 resizes; if each copied every
+ *     item, 8,445,096 copies, 8.4 per append (7.6 at a thousand, 8.6 at two
+ *     million: "at any length"); growth 1.126 a step ("about an eighth");
+ *     the largest resize falls at 938,736 items ("nine hundred thirty-nine
+ *     thousand"). A doubling array: 20 resizes, 1,048,575 copies, under two
+ *     per append. The page says the list doubles; it does not (the report
+ *     says so), and the narration follows the run.
+ *   - "stack-*": a counter, a queue and a stack on "([)]" and "{[]}": the
+ *     counter accepts both; the queue accepts "([)]" and rejects "{[]}";
+ *     the stack rejects "([)]" and accepts "{[]}". The page's own concept
+ *     check names "([)]" and the queue's failure.
  *   - "bfs-graph": the page's bfs prints ['A', 'B', 'C', 'D']; a DFS of the
- *     same graph visits A, B, D, C.
- *   - "bfs-memory": a complete binary tree of 2^20 - 1 = 1,048,575 nodes:
- *     the BFS queue peaks at 524,288 (its widest level), an explicit DFS
- *     stack at 20.
- *   - "bfs-deque": the same BFS with a list popped from the front would
- *     shift 274,876,858,369 elements (each pop moves the len - 1 behind it).
+ *     same graph visits A, B, D, C. "bfs-memory": a complete binary tree of
+ *     2^20 - 1 = 1,048,575 nodes ("a million"): the BFS queue peaks at
+ *     524,288, an explicit DFS stack at 20. "bfs-deque": that BFS with a
+ *     list popped from the front would shift 274,876,858,369 elements, each
+ *     pop moving the len - 1 behind it.
  *   - "heap-choose": a sorted list of a million shifts n / 2 = 500,000 on an
- *     average insert, assuming a uniformly random position (said as "on
- *     average").
- *   - "heap-height": a heap of a million has 20 levels, so a push or pop
- *     moves at most 19 levels; a push of a new minimum into a million made
- *     19 comparisons, a pop 20 (on screen).
- *   - "heap-build": a million items arriving largest first, each a new
- *     minimum: heapify made 1,499,986 comparisons, a push each 17,951,445.
- *     The sum of every node's height, the most moves heapify can make, is
+ *     average insert, at a uniformly random position (said "on average").
+ *     "heap-height": a million items make 20 levels, so a push or pop moves
+ *     at most 19; a push of a new minimum made 19 comparisons, a pop 20 (on
+ *     screen). "heap-build": a million items arriving largest first, each a
+ *     new minimum: heapify 1,499,986 comparisons, a push each 17,951,445;
+ *     the sum of every node's height, the most moves heapify can make, is
  *     999,993, under n (on screen).
  *   - "dijk-run": the page's dijkstra prints {'A': 0, 'B': 1, 'C': 3,
  *     'D': 4}. "dijk-neg": the video's own graph (A-B 2, A-C 3, C-B -2,
- *     B-D 1): a version that settles a node when it leaves the heap returns
- *     B = 2, D = 3; Bellman-Ford returns B = 1, D = 2, in three rounds over
- *     four edges. The page's own function, which re-pushes a node whose
- *     distance improves, gets B = 1 here by processing B twice, so the
- *     narration says "a node is final the moment it leaves the heap", the
- *     textbook algorithm the complexity is for, and the screen labels it so.
+ *     B-D 1): the version that finalizes a node when it leaves the heap
+ *     returns B = 2, D = 3; Bellman-Ford returns B = 1, D = 2, in three
+ *     rounds over four edges. The page's own function re-pushes a node whose
+ *     distance improves, so it gets B = 1 here by processing B twice; the
+ *     narration's "a node is final when it leaves the heap" is the textbook
+ *     algorithm the complexity is for, and the screen says which version.
  *   - "quick-sorted": a thousand sorted numbers, last-element pivot: 499,500
- *     comparisons ("about half a million"), 999 levels; "quick-limit": the
- *     page's recursive shape with a last pivot raises RecursionError at
- *     Python's default limit of 1,000; "quick-random": a seeded random pivot
- *     on the same input, 10,962 ("eleven thousand"), 21 levels.
- *   - Rapid: a BST of 1,000 keys inserted in order is 1,000 levels tall,
- *     21 when shuffled (seeded); naive Fibonacci of 30 makes 2,692,537 calls,
- *     memoized 59; greedy change for 6 from {1, 3, 4} takes 4, 1, 1, the
- *     fewest is 3, 3; a stable sort by first name, then last, keeps the two
- *     Hoppers in first-name order; binary search over a million takes at
- *     most 20 probes; the page's single_number, two_sum_sorted, inorder,
- *     window, merge_sort, permutations, has_cycle, topo_sort and kahns
- *     outputs (results.json, "page"). The adjacency figures are arithmetic
- *     from the assumption said aloud: a million users with a hundred
- *     friends each, 10^8 list entries against 10^12 matrix cells.
- *   Nothing here is timed: every number is a count or an assumption.
+ *     comparisons ("half a million"), 999 levels ("nearly a thousand").
+ *     "quick-limit": the page's recursive shape with a last pivot raises
+ *     RecursionError at Python's default limit, 1,000. "quick-random": a
+ *     seeded random pivot on the same input, 10,962 ("eleven thousand"), 21
+ *     levels.
+ *   - Quick rounds: a BST of 1,000 keys inserted in order is 1,000 levels
+ *     tall, 21 shuffled (seeded); naive Fibonacci of 30 makes 2,692,537
+ *     calls ("two point seven million"), memoized 59; greedy change for 6
+ *     from {1, 3, 4} takes 4, 1, 1, the fewest is 3, 3; sorted by first name
+ *     and then stably by last, the two Hoppers stay Ada, Grace; binary
+ *     search over a million takes at most 20 probes; the page's kahns and
+ *     topo_sort on a graph with a cycle return fewer nodes than it has; the
+ *     page's inorder, single_number, two_sum_sorted, window, merge_sort and
+ *     permutations outputs (results.json, "page"). The adjacency figures are
+ *     arithmetic from the assumption said aloud: a million users with a
+ *     hundred friends each, 10^8 list entries against 10^12 matrix cells.
  *
- * Written for Drew's ear: complexity said as people say it ("order n
- * squared", "log n", "n log n", "O of one", "V plus E"); BFS, DFS, BST, DP
- * and AVL in plain caps, read as letters, each expanded once; XOR said as
- * written (the lexicon gets "ex-or"); "deque" is said "deck" (the lexicon
- * gets it too); no sentence opens with "A" before an initialism; numbers as
- * they are said.
+ * Written for Drew's ear: complexity as people say it ("n squared", "log n",
+ * "n log n", "O of one", "V plus E"); BFS, DFS, BST, AVL, IP and ID in plain
+ * caps, read as letters (BFS and DFS spelled out as breadth-first and
+ * depth-first in question five, BST expanded once); XOR, said as a word, and
+ * "deque", said "deck", go to the lexicon (see the report); no sentence opens
+ * with "A" before an initialism; numbers as they are said.
  */
 export const script: NarrationScript = {
   id: "be-algorithms",
@@ -334,7 +350,7 @@ export const script: NarrationScript = {
     },
     {
       id: "heap-height",
-      text: "A heap does both in log n, each parent at least as urgent as its children. A million items make twenty levels, so a push or pop climbs at most nineteen; a peek is constant.",
+      text: "A heap does both in log n, each parent at least as urgent as its children. A million items make twenty levels, so a push or pop moves at most nineteen; a peek is constant.",
       pauseAfter: 0.7,
     },
     {

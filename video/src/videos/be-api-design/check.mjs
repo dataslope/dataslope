@@ -4,7 +4,7 @@
 //   node video/src/videos/be-api-design/check.mjs
 //
 // No API server, gateway, rate limiter or identity provider runs here, so
-// nothing below is presented as one's output. Three engines, each the one its
+// nothing below is presented as one's output. Two engines, each the one its
 // numbers come from:
 //   - the site's Postgres (PGlite 0.5.8, PostgreSQL 18, through
 //     scripts/lib/sql-engines.mjs), for what an API's database does under two
@@ -19,10 +19,9 @@
 //     and verified after one claim is changed; an opaque session ID of the
 //     same strength for comparison; a cursor as an API would encode it; and
 //     the gzip size of one page of the video's own JSON.
-//   - a seeded simulation (charts/_theme.mjs's rng, as the site's charts use
-//     it) of clients answered 429 with Retry-After, retrying at exactly that
-//     moment or spread at random after it. Its capacity and counts are the
-//     video's stated assumptions, and the narration calls it a model.
+// Rate limiting is answered from the client's side with no number: Part 2
+// runs the limiter's algorithms, and Part 9 the seeded model of a thousand
+// clients retrying in step, so neither is repeated here.
 /* global console, process, URL */
 import { createHash, createHmac } from "node:crypto";
 import { writeFileSync } from "node:fs";
@@ -31,7 +30,6 @@ import { gzipSync } from "node:zlib";
 
 const lib = (p) => new URL(`../../../../${p}`, import.meta.url).href;
 const { createEngine } = await import(lib("scripts/lib/sql-engines.mjs"));
-const { rng } = await import(lib("charts/_theme.mjs"));
 
 const shown = (v) => (v === null || v === undefined ? null : String(v));
 
@@ -198,65 +196,6 @@ const json = (o) => JSON.stringify(o);
     next_cursor: cursor,
   });
   results.gzip = { bytes: Buffer.byteLength(body), gzipped: gzipSync(body).length };
-}
-
-// ── A model: clients answered 429 with Retry-After ──────────────────────────
-{
-  const CLIENTS = 1000;
-  const CAPACITY = 200; // requests the service accepts in each one-second window
-  const RETRY_AFTER = 2; // seconds, the same in every 429
-  const SPREAD = 5; // seconds of random extra wait, for the spread policy
-  const SEED = 429;
-
-  /** Every client was refused at t = 0. Requests are taken in time order:
-   *  each is served while its one-second window has capacity left, and
-   *  otherwise refused, retrying after Retry-After plus its policy's extra
-   *  wait. Ties (the exact policy's thousand at one instant) go in client
-   *  order. */
-  const simulate = (extra) => {
-    // [time, client], kept sorted; a retry is inserted where it belongs.
-    const queue = Array.from({ length: CLIENTS }, (_, c) => [RETRY_AFTER + extra(), c]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-    const used = new Map();
-    const arrivals = new Map();
-    let sent = 0;
-    let refused = 0;
-    const served = [];
-    while (queue.length) {
-      const [t, c] = queue.shift();
-      const w = Math.floor(t);
-      sent++;
-      arrivals.set(w, (arrivals.get(w) ?? 0) + 1);
-      if ((used.get(w) ?? 0) < CAPACITY) {
-        used.set(w, (used.get(w) ?? 0) + 1);
-        served.push(t);
-        continue;
-      }
-      refused++;
-      const retry = [t + RETRY_AFTER + extra(), c];
-      let i = queue.findIndex((q) => q[0] > retry[0] || (q[0] === retry[0] && q[1] > c));
-      if (i < 0) i = queue.length;
-      queue.splice(i, 0, retry);
-    }
-    served.sort((a, b) => a - b);
-    const tenth = (x) => Math.round(x * 10) / 10;
-    return {
-      sent,
-      refused,
-      /** Seconds after the first refusal: when the median client and the
-       *  last client got their answer. */
-      medianServed: tenth((served[CLIENTS / 2 - 1] + served[CLIENTS / 2]) / 2),
-      lastServed: tenth(served.at(-1)),
-      /** The most requests to arrive in any one-second window. */
-      peak: Math.max(...arrivals.values()),
-      /** Requests arriving in each second, from 0 to the last. */
-      perSecond: Array.from({ length: Math.max(...arrivals.keys()) + 1 }, (_, w) => arrivals.get(w) ?? 0),
-    };
-  };
-
-  const exact = simulate(() => 0);
-  const next = rng(SEED);
-  const spread = simulate(() => next() * SPREAD);
-  results.retry = { clients: CLIENTS, capacity: CAPACITY, retryAfter: RETRY_AFTER, spreadSeconds: SPREAD, seed: SEED, exact, spread };
 }
 
 const out = new URL("./results.json", import.meta.url);

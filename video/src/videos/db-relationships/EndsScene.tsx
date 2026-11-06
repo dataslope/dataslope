@@ -10,7 +10,7 @@ import { Ink, Leader } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Fig } from "./kit";
-import { Drift, endSymbols, Glow, Headline, Kicker, Link, Svg } from "./parts";
+import { Drift, endSymbols, Glow, Headline, Kicker, Link, Spot, Svg } from "./parts";
 
 /** The first half draws the two ends large: the marker at this size and
  *  stroke, on header-only boxes, so each symbol can be pointed at. */
@@ -289,6 +289,9 @@ export const EndsScene: React.FC = () => {
   const otherAt = n.word("one", "other box");
   const m2mTo = n.beat("m2m").to;
   const keyHits = KEY_HITS.map((k) => ({ glyph: k.glyph, at: n.word(k.beat, k.word) }));
+  // The spots pop in on the words that name them.
+  const crowAt = n.word("ends", "Crow's-foot") + 2;
+  const carAt = n.word("zero-or-one", "parking pass") + 2;
 
   // ── Part one: the two ends, magnified ──
   const Y0 = y(VIEW_Y);
@@ -347,10 +350,17 @@ export const EndsScene: React.FC = () => {
       {rows.map((r) => (
         <Sfx key={r.beat} name="el-pop" at={r.marksAt} level={-30} />
       ))}
+      <Sfx name="el-pop" at={crowAt} level={-30} />
+      <Sfx name="el-pop" at={carAt} level={-30} />
 
       <Kicker at={endsFrom - 40}>Cardinality</Kicker>
       <Headline lead="Every end makes" at={endsFrom - 4} turn="two marks." turnAt={twoMarksAt - 4} out={oneFrom - 10} />
       <Headline lead="Start at one box." at={oneFrom - 2} turn="Read the other end." turnAt={otherAt - 4} />
+
+      {/* "Crow's-foot notation": a crow, top right, above where the key of ends
+          will stand; then "a parking pass", in the empty corner under that key. */}
+      <Spot id="db-relationships-crow" at={crowAt} left={1560} top={y(92)} width={192} height={200} />
+      <Spot id="db-relationships-car" at={carAt} left={1520} top={y(648)} width={240} height={180} />
 
       {/* ── Part one ── */}
       <AbsoluteFill style={{ opacity: partOne }}>

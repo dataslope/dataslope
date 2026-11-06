@@ -45,6 +45,8 @@ export const VerbsScene: React.FC = () => {
   const moreAt = n.word("verbs", "says more");
   const hasAt = n.word("verbs", "customer has order");
   const verbsTo = n.beat("verbs").to;
+  // The shopper pops in late in "Customers", after the customers box's own pop, so the two are heard apart.
+  const shopperAt = customersAt + 6;
 
   const boxes = [
     useEntityLayout({
@@ -87,11 +89,14 @@ export const VerbsScene: React.FC = () => {
         <Sfx key={i} name="el-pencil" at={l.at} level={-34} />
       ))}
       <Sfx name="el-tap" at={readsAt - 2} level={-29} />
+      <Sfx name="el-pop" at={shopperAt} level={-30} />
 
       <Kicker at={hookFrom - 10}>What a relationship is</Kicker>
       <Headline lead="Entities never live alone." at={hookFrom - 6} out={relAt - 8} />
       <Headline lead="Relationships are" at={relAt - 2} turn="the verbs." turnAt={verbsAt - 4} />
       <Spot id="db-relationships-crates" at={aloneAt - 4} left={1390} top={y(84)} width={430} height={203} />
+      {/* "Customers matter": a shopper, in the empty lower right under the products box. */}
+      <Spot id="db-relationships-shopper" at={shopperAt} left={1517} top={y(639)} width={146} height={230} />
 
       <Drift from={containAt} to={verbsTo + 50} scale={0.02} origin={[960, y(520)]}>
         <Fig n="1" at={customersAt - 8} x={XS[0]} y={y(300)}>
