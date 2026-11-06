@@ -183,7 +183,7 @@ export const script: NarrationScript = {
     },
     {
       id: "plan",
-      text: "Thirty-five questions on data structures and algorithms, all argued in counts, not code. Eight get a figure each, three more are answered inside them, and twenty-four go quickly at the end.",
+      text: "Thirty-five questions, argued with counts, not code. Eight get a figure each, three more are answered inside them, and twenty-four go quickly at the end.",
       pauseAfter: 0.8,
     },
 
@@ -191,84 +191,80 @@ export const script: NarrationScript = {
     {
       id: "big",
       scene: true,
-      text: "Question one. What is Big-O notation, and why do interviewers care? It describes how time or memory grows with the input size, n, ignoring constant factors.",
+      text: "Question one. What is Big-O notation, and why do interviewers care? It says how time or memory grows with the input size, n, ignoring constants.",
       pauseAfter: 0.6,
     },
-    {
-      id: "big-count",
-      text: "A double loop that checks every pair of a hundred items checks under five thousand pairs. Instant.",
-      pauseAfter: 0.6,
-    },
+    { id: "big-count", text: "A double loop over a hundred items checks under five thousand pairs. Instant.", pauseAfter: 0.6 },
     { id: "big-million", text: "At a million items, it's half a trillion.", pauseAfter: 0.7 },
     {
       id: "big-model",
-      text: "Model it at a hundred million checks a second, an assumption, and that's about eighty-three minutes. One pass over the same million: a hundredth of a second.",
+      text: "Model it at a hundred million checks a second, an assumption: about eighty-three minutes. One pass over the million takes a hundredth of a second.",
       pauseAfter: 0.8,
     },
     {
       id: "big-why",
-      text: "That's why they care: Big-O predicts whether a solution survives the input it will get. The usual game is turning a brute-force n squared into n with the right structure.",
+      text: "That's why they care: Big-O predicts whether a solution survives its real input. The usual game is turning a brute-force n squared into n.",
       pauseAfter: 0.6,
     },
     {
       id: "big-next",
-      text: "And since constants are dropped, the brute force is often fine at a hundred items, and simpler. Say what it costs, and the n where it stops being fine.",
+      text: "But constants are dropped, so at a hundred items the brute force is often fine, and simpler. Say what it costs, and where it stops being fine.",
       pauseAfter: 0.8,
     },
 
-    // ── 2. Hash map ───────────────────────────────────────────────────────
+    // ── 2. Hash map, and the hash set's worst case ────────────────────────
     {
       id: "hash",
       scene: true,
-      text: "Question two. When do you reach for a hash map? When you need lookups and inserts by key in constant time on average: membership, counting, grouping, or have I seen this before?",
+      text: "Question two. When do you reach for a hash map? When you need lookups and inserts by key in constant time on average: counting, grouping, have I seen this before?",
       pauseAfter: 0.6,
     },
     {
       id: "hash-twosum",
-      text: "It turns Two Sum's double loop into one pass. At each number, ask the map whether target minus it is already there; if not, store it. Linear time, paid for in linear memory.",
+      text: "It turns Two Sum's double loop into one pass: at each number, ask the map for target minus it, then store the number. Linear time, paid for in linear memory.",
       pauseAfter: 0.7,
     },
     {
       id: "hash-collide",
-      text: "On average is doing real work there. With a thousand buckets, two keys more likely than not share one by the thirty-eighth key.",
+      text: "The words on average matter. With a thousand buckets, two keys more likely than not share one by the thirty-eighth key.",
       pauseAfter: 0.6,
     },
     {
       id: "hash-worst",
-      text: "So the follow-up is the worst case. Give a thousand keys the same hash, and putting them in a Python set takes nearly six hundred thousand comparisons. With distinct hashes, none.",
+      text: "So the follow-up is the worst case. Give a thousand keys one hash, and putting them in a Python set takes nearly six hundred thousand comparisons. With distinct hashes, none.",
       pauseAfter: 0.7,
     },
     {
       id: "hash-set",
-      text: "That's a hash set's answer: constant on average, linear space, linear per operation at worst. Python's set grows past about two thirds full to keep probes short.",
+      text: "That's a hash set: constant on average, linear space, and linear per operation at worst.",
       pauseAfter: 0.8,
     },
 
-    // ── 3. Amortized ──────────────────────────────────────────────────────
+    // ── 3. Amortized O(1) ─────────────────────────────────────────────────
     {
       id: "amort",
       scene: true,
-      text: "Question three. What is amortized O of one, and when does it apply? It spreads the cost of a rare expensive operation over the many cheap ones around it.",
+      text: "Question three. What is amortized O of one, and when does it apply? It spreads the cost of a rare expensive step over the cheap ones around it.",
       pauseAfter: 0.6,
     },
     {
       id: "amort-run",
-      text: "Append a million items to a Python list. It runs out of room eighty-six times, and each time it moves to a bigger block, which can copy every item so far.",
+      text: "Append a million items to a Python list. It runs out of room eighty-six times, and each move to a bigger block can copy every item so far.",
       pauseAfter: 0.6,
     },
     {
       id: "amort-total",
-      text: "Add up those copies: about eight copies per append, at any length. Constant, on average.",
+      text: "Add those copies up: about eight copies per append, at any length. Constant, on average.",
       pauseAfter: 0.7,
     },
     {
       id: "amort-factor",
-      text: "A textbook array doubles, for under two. Python grows by about an eighth each time, so it copies more often. Any fixed factor keeps the total in proportion to n, and a hash table's rehash works the same way.",
+      text: "A textbook array doubles, for under two copies an append. Python grows by about an eighth, so it copies more often. Any fixed factor keeps it constant, and a hash table's rehash works the same way.",
       pauseAfter: 0.6,
     },
     {
       id: "amort-spike",
-      text: "But amortized is an average, not a promise for each call. The append that triggers the last resize moves nine hundred thirty-nine thousand items. Where one slow call breaks a latency budget, size it up front.",
+      text: "But it's an average, not a promise for each call: the append that triggers the last resize moves nine hundred thirty-nine thousand items. Where one slow call breaks a latency budget, allocate up front.",
       pauseAfter: 0.8,
     },
 
@@ -276,78 +272,74 @@ export const script: NarrationScript = {
     {
       id: "stack",
       scene: true,
-      text: "Question four. When is a stack the right structure? When the problem is about the most recent thing still open: nesting, undo, backtracking. Last in, first out means close what you opened last.",
+      text: "Question four. When is a stack the right structure? When the problem is about the most recent thing still open: nesting, undo, backtracking. Last in, first out.",
       pauseAfter: 0.6,
     },
     {
       id: "stack-count",
-      text: "Here's why a counter can't do it. This string has one of each bracket opening and closing, so counting accepts it. But the round one closes while the square one inside it is still open.",
+      text: "A counter can't do it. This string opens and closes one round and one square bracket, so counting accepts it. But the round one closes while the square one inside it is still open.",
       pauseAfter: 0.6,
     },
     {
       id: "stack-run",
-      text: "A stack keeps the open brackets, newest on top, and each closer must match the top. A round closer meets a square opener: rejected.",
+      text: "A stack keeps the openers, newest on top, and each closer must match the top: rejected.",
       pauseAfter: 0.6,
     },
     {
       id: "stack-queue",
-      text: "A queue matches the oldest opener instead, so it gets both wrong: it accepts the broken string, and rejects a correctly nested one.",
+      text: "A queue matches the oldest opener instead, so it gets both wrong: it accepts this one, and rejects a correctly nested string.",
       pauseAfter: 0.7,
     },
-    {
-      id: "stack-next",
-      text: "Depth-first search is the same idea: the path you're on is the stack.",
-      pauseAfter: 0.8,
-    },
+    { id: "stack-next", text: "Depth-first search is the same idea: the path you're on is the stack.", pauseAfter: 0.8 },
 
-    // ── 5. BFS or DFS ─────────────────────────────────────────────────────
+    // ── 5. BFS or DFS, and the deque ──────────────────────────────────────
     {
       id: "bfs",
       scene: true,
-      text: "Question five. Walk me through BFS versus DFS: when do you choose each? Breadth-first search uses a queue and explores level by level. Depth-first search uses a stack, or recursion, and follows one path down first.",
+      text: "Question five. Walk me through BFS versus DFS: when do you choose each? Breadth-first search takes a queue, level by level. Depth-first takes a stack, or recursion, and follows one path down.",
       pauseAfter: 0.6,
     },
     {
       id: "bfs-graph",
-      text: "A branches to B and C, and both lead to D. Breadth-first visits A, B, C, D. Depth-first goes A, B, D, then back for C.",
+      text: "A leads to B and C, and both lead to D. Breadth-first visits A, B, C, D; depth-first, A, B, D, then C.",
       pauseAfter: 0.6,
     },
     {
       id: "bfs-short",
-      text: "Choose BFS for the shortest path in an unweighted graph: it reaches every node first by the fewest edges. Choose DFS for cycle detection, topological sort and backtracking.",
+      text: "Choose BFS for shortest paths in an unweighted graph: it reaches each node first by the fewest edges. Choose DFS for cycles, topological sort and backtracking.",
       pauseAfter: 0.6,
     },
     {
       id: "bfs-memory",
-      text: "Memory decides it too. On a full binary tree of a million nodes, BFS holds the widest level at once: five hundred twenty-four thousand. DFS holds one path: twenty.",
+      text: "Memory decides it too. On a full binary tree of a million nodes, BFS holds the widest level, five hundred twenty-four thousand nodes. DFS holds one path: twenty.",
       pauseAfter: 0.8,
     },
     {
       id: "bfs-deque",
-      text: "And make that queue a deque, a double-ended queue. Popping the front of a plain Python list shifts everything behind it: for this tree, two hundred seventy-five billion moves. A deque pops either end in constant time.",
+      text: "And make the queue a deque, a double-ended queue. Popping the front of a Python list shifts everything behind it: two hundred seventy-five billion moves here. A deque pops either end in constant time.",
       pauseAfter: 0.8,
     },
 
-    // ── 6. Priority queue and heap ────────────────────────────────────────
+    // ── 6. Priority queue, and the heap under it ──────────────────────────
     {
       id: "pq",
       scene: true,
-      text: "Question six. How does a priority queue differ from a regular queue? A queue hands items out in arrival order. A priority queue always hands out the most urgent: a task scheduler, Dijkstra's algorithm, merging sorted lists.",
+      text: "Question six. How does a priority queue differ from a regular queue? A queue serves in arrival order. A priority queue always serves the most urgent: a scheduler, Dijkstra's algorithm, merging sorted lists.",
       pauseAfter: 0.6,
     },
     {
       id: "heap-choose",
-      text: "What holds it? A sorted list pops instantly, but at a million items an insert shifts half a million on average. An unsorted list inserts instantly and scans everything to pop.",
+      text: "A sorted list pops instantly, but at a million items an insert shifts half a million on average. An unsorted list inserts instantly and scans to pop.",
       pauseAfter: 0.6,
     },
     {
       id: "heap-height",
-      text: "A heap does both in log n: each parent ahead of its children, the most urgent at the root. A million items make twenty levels, so a push or pop takes at most nineteen moves, and a peek is constant.",
+      text: "A heap does both in log n: every parent at least as urgent as its children, so the top sits at the root. A million items make twenty levels, so a push or pop moves at most nineteen. A peek is constant.",
       pauseAfter: 0.7,
     },
     {
       id: "heap-build",
-      text: "The follow-up: building a heap is linear, not n log n, because most nodes sit near the bottom. For a million items arriving largest first, heapify makes one and a half million comparisons. Pushing them one by one: eighteen million.",
+      text: "The follow-up: building a heap is linear, not n log n, since most nodes sit near the bottom. For a million items arriving least urgent first, heapify makes one and a half million comparisons. Pushing them one by one: eighteen million.",
       pauseAfter: 0.8,
     },
 
@@ -355,27 +347,23 @@ export const script: NarrationScript = {
     {
       id: "dijk",
       scene: true,
-      text: "Question seven. Explain Dijkstra's algorithm and its complexity. It finds the shortest path from one source to every node, when no weight is negative. A min-heap of distances hands out the closest unfinished node next.",
+      text: "Question seven. Explain Dijkstra's algorithm and its complexity. It finds shortest paths from one source when no weight is negative, with a min-heap that hands out the closest unfinished node next.",
       pauseAfter: 0.6,
     },
-    {
-      id: "dijk-run",
-      text: "From A, C costs four directly but three through B, and D costs four, through B and C.",
-      pauseAfter: 0.6,
-    },
+    { id: "dijk-run", text: "C costs four directly but three through B. D costs four, through B and C.", pauseAfter: 0.6 },
     {
       id: "dijk-cost",
-      text: "Each node is finished once, and each edge can push onto the heap at log V, so it's V plus E, times log V.",
+      text: "Each node is finished once, and each edge can cost a heap push of log V: V plus E, times log V.",
       pauseAfter: 0.7,
     },
     {
       id: "dijk-neg",
-      text: "Why no negative weights? Because a node is final the moment it leaves the heap. Here B leaves at two, and only later does the minus-two edge through C reach it at one. B is wrong, and so is D.",
+      text: "Why no negative weights? A node is final the moment it leaves the heap. Here B leaves at two, and only later does the minus-two edge from C reach it at one. B is wrong, and so is D.",
       pauseAfter: 0.7,
     },
     {
       id: "dijk-bf",
-      text: "Bellman-Ford handles negative weights by relaxing every edge V minus one times: V times E, slower, and right.",
+      text: "Bellman-Ford relaxes every edge V minus one times instead: V times E, slower, and right.",
       pauseAfter: 0.8,
     },
 
@@ -383,105 +371,96 @@ export const script: NarrationScript = {
     {
       id: "quick",
       scene: true,
-      text: "Question eight. How does quicksort work, and what is its worst case? Pick a pivot, split the rest into smaller and larger, and sort each side the same way. On average, n log n.",
+      text: "Question eight. How does quicksort work, and what is its worst case? Pick a pivot, split the rest into smaller and larger, and sort each side. On average, n log n.",
       pauseAfter: 0.6,
     },
     {
       id: "quick-sorted",
-      text: "The worst case is a pivot that's always the smallest or largest. Sort a thousand numbers already in order, pivoting on the last, and each split peels off one: about half a million comparisons, nearly a thousand levels deep.",
+      text: "The worst case is a pivot that's always the smallest or largest. Take a thousand numbers already in order and pivot on the last: each split peels off one. About half a million comparisons, nearly a thousand levels deep.",
       pauseAfter: 0.7,
     },
-    {
-      id: "quick-limit",
-      text: "Written recursively, it doesn't finish in Python: that's past the default limit.",
-      pauseAfter: 0.6,
-    },
+    { id: "quick-limit", text: "Written recursively, that's past Python's default limit.", pauseAfter: 0.6 },
     {
       id: "quick-random",
-      text: "Pick each pivot at random, and the same input takes eleven thousand comparisons, twenty-one levels deep.",
+      text: "Random pivots on the same input: eleven thousand comparisons, twenty-one levels.",
       pauseAfter: 0.7,
     },
     {
       id: "quick-next",
-      text: "And sorted input is common: rows by ID, events by time. So randomize the pivot. Quicksort sorts in place, with log n of stack, which is its edge over merge sort.",
+      text: "And sorted input is common, rows by ID or events by time, so randomize. Quicksort's edge over merge sort is sorting in place, with log n of stack.",
       pauseAfter: 0.9,
     },
 
-    // ── Quick round one: sorting and recursion ────────────────────────────
+    // ── Quick round one: sorting and recursion (12 to 22) ─────────────────
     {
       id: "rapid-in",
       scene: true,
-      text: "The other twenty-four, one line each, starting with sorting.",
+      text: "The other twenty-four, one line each. Sorting first.",
       pauseAfter: 0.6,
     },
     {
       id: "r-merge",
-      text: "Merge sort halves, sorts each half, and merges in linear time: n log n always, stable, with linear extra memory. Python's own sort builds on it.",
+      text: "Merge sort halves, sorts each half and merges in linear time: n log n always, stable, with linear extra memory. Python's sort builds on it.",
     },
     {
       id: "r-heapsort",
-      text: "Heapsort guarantees n log n in constant extra space, but is less cache-friendly than quicksort. It suits tight memory.",
+      text: "Heapsort guarantees n log n in constant extra space, but caches worse than quicksort. It suits tight memory.",
     },
     {
       id: "r-stable",
-      text: "A stable sort keeps equal items in their original order. Sort by first name, then stable-sort by last, and the two Hoppers stay in first-name order.",
+      text: "A stable sort keeps ties in their original order. Sort by first name, then stable-sort by last, and the two Hoppers stay in first-name order.",
     },
     {
       id: "r-inplace",
-      text: "In place means constant extra memory, or log n of stack: quicksort. Out of place allocates in proportion to the input: merge sort.",
+      text: "In place means constant extra memory, or log n of stack, like quicksort. Out of place grows with the input, like merge sort.",
     },
     {
       id: "r-master",
-      text: "The Master Theorem solves splits into a parts of size n over b, plus n to the d to combine, by comparing d with log base b of a. For merge sort they're equal: n log n.",
+      text: "The Master Theorem solves a split into a parts of size n over b, plus n to the d to combine: compare d with log base b of a. For merge sort they're equal, so n log n.",
       pauseAfter: 0.7,
     },
     {
       id: "r-recursion",
-      text: "Recursion fits trees, but every call takes a stack frame, and Python stops at a thousand. A loop with an explicit stack avoids that, and is usually a little faster.",
+      text: "Recursion fits trees, but every call takes a stack frame, and Python stops at a thousand. A loop with an explicit stack avoids that.",
     },
     {
       id: "r-dc",
-      text: "Divide and conquer splits into independent subproblems, like merge sort. Dynamic programming, DP, is for subproblems that overlap, so each answer is stored and reused.",
+      text: "Divide and conquer splits into independent subproblems, like merge sort. Dynamic programming is for overlapping ones, so each answer is stored and reused.",
     },
     {
       id: "r-memo",
-      text: "Memoization is top-down: recurse and cache. Tabulation fills a table bottom-up. Naive Fibonacci of thirty makes 2.7 million calls; memoized, fifty-nine.",
+      text: "Memoization is top-down: recurse and cache. Tabulation fills a table bottom-up. Naive Fibonacci of thirty makes two point seven million calls; memoized, fifty-nine.",
       pauseAfter: 0.7,
     },
     {
       id: "r-classic",
-      text: "Know coin change, longest common subsequence, knapsack, edit distance and word break: each teaches a different way to define the state.",
+      text: "Know coin change, longest common subsequence, knapsack, edit distance and word break: each teaches a way to define the state.",
     },
     {
       id: "r-greedy",
-      text: "Greedy takes the best-looking step each time, safe only when local choices provably add up. To make six from coins of one, three and four, it takes three coins. Two threes is best.",
+      text: "Greedy takes the best-looking step each time, safe only when local choices provably add up. Making six from coins of one, three and four, it takes three coins. Two threes do it.",
       pauseAfter: 0.7,
     },
     {
       id: "r-backtrack",
-      text: "Backtracking builds a candidate step by step and abandons a branch the moment it can't succeed: N-Queens, Sudoku, permutations. Pruning is what makes it practical.",
+      text: "Backtracking builds a candidate step by step and drops a branch the moment it can't succeed: N-Queens, Sudoku, permutations.",
       pauseAfter: 0.8,
     },
 
-    // ── Quick round two: structures, search and graphs ────────────────────
-    {
-      id: "rapid2-in",
-      scene: true,
-      text: "Now structures, search and graphs.",
-      pauseAfter: 0.6,
-    },
+    // ── Quick round two: structures, search and graphs (23 to 35) ─────────
+    { id: "rapid2-in", scene: true, text: "Now structures, search and graphs.", pauseAfter: 0.6 },
     {
       id: "r-array",
-      text: "An array indexes in constant time and caches well, but a middle insert shifts the rest. A linked list splices in constant time once you hold the node, and finding it is a walk.",
+      text: "An array indexes in constant time and caches well, but a middle insert shifts the rest. A linked list splices in constant time once you hold the node; finding it is a walk.",
     },
     {
       id: "r-bst",
-      text: "A binary search tree, BST, costs its height per operation. A thousand keys inserted in order make it a thousand levels tall; shuffled, twenty-one. AVL and red-black trees keep it at log n.",
+      text: "A binary search tree, or BST, costs its height per operation. A thousand keys inserted in order make it a thousand levels tall; shuffled, twenty-one. AVL and red-black trees stay at log n.",
       pauseAfter: 0.7,
     },
     {
       id: "r-traverse",
-      text: "In-order traversal visits a BST in sorted order. Pre-order, root first, serializes a tree. Post-order, children first, suits deleting it.",
+      text: "In-order traversal visits a BST in sorted order. Pre-order, root first, serializes a tree. Post-order, children first, deletes one.",
     },
     {
       id: "r-bst-heap",
@@ -489,52 +468,52 @@ export const script: NarrationScript = {
     },
     {
       id: "r-trie",
-      text: "A trie stores strings a character per level, so a lookup costs the key's length, however many keys it holds: autocomplete, IP routing. It takes more memory.",
+      text: "A trie stores strings a character per level, so a lookup costs the key's length, however many keys: autocomplete, IP routing, at a cost in memory.",
     },
     {
       id: "r-binary",
-      text: "Binary search needs sorted, indexable data: twenty probes at most for a million. Its bugs are off-by-one bounds, and a midpoint sum that overflows fixed-width integers.",
+      text: "Binary search needs sorted, indexable data: at most twenty probes for a million. Its bugs are off-by-one bounds, and a midpoint sum that overflows fixed-width integers.",
     },
     {
       id: "r-pointers",
-      text: "Two pointers walk in from both ends of a sorted array: sum too small, move left up; too big, move right down. Linear, not n squared.",
+      text: "Two pointers walk in from both ends of a sorted array: too small, move the left; too big, move the right. Linear, not n squared.",
     },
     {
       id: "r-window",
-      text: "A sliding window grows and shrinks one range instead of recomputing it, like the longest substring with no repeat, in one pass.",
+      text: "A sliding window grows and shrinks one range instead of recomputing it: the longest substring without a repeat, in one pass.",
     },
     {
       id: "r-adjacency",
-      text: "Adjacency list or matrix? Assume a million users with a hundred friends each: a list holds a hundred million entries, a matrix a trillion cells, nearly all empty. The matrix buys constant-time edge checks on dense graphs.",
+      text: "Adjacency list or matrix? Assume a million users with a hundred friends each: a list holds a hundred million entries, a matrix a trillion cells, nearly all empty. Matrices suit dense graphs.",
       pauseAfter: 0.7,
     },
     {
       id: "r-cycle",
-      text: "To find a cycle in a directed graph, run DFS marking nodes unvisited, on the current path, or done. An edge back to the path is a cycle.",
+      text: "To find a cycle in a directed graph, run DFS marking nodes unvisited, on the path, or done. An edge back to the path is a cycle.",
     },
     {
       id: "r-topo",
-      text: "Topological sort orders a graph with no cycles so every edge points forward: build steps, prerequisites. It's linear, V plus E.",
+      text: "Topological sort orders a graph with no cycles so every edge points forward, like build steps, in linear time.",
     },
     {
       id: "r-kahn",
-      text: "Kahn's algorithm keeps removing nodes with nothing left pointing in. If fewer than V come out, the rest sit on a cycle.",
+      text: "Kahn's algorithm keeps removing nodes with nothing pointing in. If fewer than V come out, the rest sit on a cycle.",
     },
     {
       id: "r-bits",
-      text: "And bit tricks are single instructions. XOR cancels pairs, so XOR everything and the one unpaired number is left, in constant space.",
+      text: "And bit tricks are single instructions: XOR every number together, the pairs cancel, and the unpaired one is left, in constant space.",
       pauseAfter: 1.0,
     },
 
     // ── Close ─────────────────────────────────────────────────────────────
     {
       id: "close",
-      text: "None of these answers needed a line of code: the structure and the count were the argument.",
+      text: "None of these answers needed a line of code. The structure and the count were the argument.",
       pauseAfter: 0.7,
     },
     {
       id: "next",
-      text: "Some rounds now hand the code to an assistant and grade that argument. Next: the AI-allowed round.",
+      text: "And when an assistant writes the code with you, working code isn't what's graded. Next: the AI-allowed round.",
     },
   ],
 };

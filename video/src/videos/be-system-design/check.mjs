@@ -96,7 +96,9 @@ const keyLengths = [5, 6, 7].map((len) => ({ len, keys: 62 ** len, years: 62 ** 
 const six = keyLengths.find((k) => k.len === 6);
 check(six.keys >= linksTotal, "six characters hold five years of links");
 // Three counted IDs in a row, encoded: consecutive IDs make consecutive keys.
-const counted = [123_456_789, 123_456_790, 123_456_791].map((id) => ({ id, key: base62(id) }));
+// IDs past 62^5 (916,132,832) take six characters, the length the video uses.
+const counted = [9_876_543_210, 9_876_543_211, 9_876_543_212].map((id) => ({ id, key: base62(id) }));
+check(counted.every((c) => c.key.length === 6), "the counted keys are six characters");
 R.key = { alphabet: ALPHABET, keyLengths, counted, idBlock: 1_000_000 };
 
 // ── 2. The latency ladder (charts/memory-latency-ladder.mjs, read) ──────────
