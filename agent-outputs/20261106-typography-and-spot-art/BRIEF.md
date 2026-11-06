@@ -100,8 +100,10 @@ they illustrate, never on top of anything.
   - `npm run check:cues -- <dir>`, `npx eslint src/videos/<dir>`, and
     `npx tsc --noEmit` (report only errors in your own folders; others may
     be mid-edit).
-- Disk is tight. Never run `rm` on anything outside `out/review/` and
-  `out/entries/` files you made; the scripts delete their own bundles. Run
+- Disk is tight. Never run `rm` on anything outside `out/review/`,
+  `out/entries/` files you made, and the WAVs `check:mix` leaves for your
+  composition (`out/<Id>-wet.wav`, `-dry.wav`, `-fx.wav`; delete those once
+  you have read its result); the scripts delete their own bundles. Run
   at most one render or check at a time.
 - **Do not commit.** The lead commits.
 
