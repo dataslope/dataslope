@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ORDER_COLUMNS, ORDER_ROWS, STATUS_COL, TYPE_HOLDS } from "./data";
 import { DbTable, Fig, FIG_GAP, HEAD_H, MARK, Mono, ROW_H, tableGeometry } from "./kit";
-import { Arrow, Drift, Headline, Kicker, Mark, RowType } from "./parts";
+import { Arrow, Drift, Headline, Kicker, Mark, RowType, Spot } from "./parts";
 
 const S = 1.2;
 const BOX_X = 150;
@@ -60,6 +60,9 @@ export const AttrScene: React.FC = () => {
       <Sfx name="el-tap" at={rowAt.placed_on} level={-30} />
       <Sfx name="el-pencil" at={columnAt - 6} level={-34} />
       <Sfx name="el-sprinkle" at={holdsAt.integer + 2} level={-35} />
+      {/* The small spots arrive the way the video's other spots do. */}
+      <Sfx name="el-pop" at={rowAt.total_cents} level={-31} />
+      <Sfx name="el-pop" at={holdsAt.date} level={-31} />
 
       <Drift from={valuesAt + 10} to={end + 70} scale={0.02} origin={[900, 560]}>
         <Kicker at={from - 10}>Attributes and domains</Kicker>
@@ -69,6 +72,10 @@ export const AttrScene: React.FC = () => {
           The entity, its attributes
         </Fig>
         <Entity layout={orders} at={orderAt - 4} rowAt={{ id: orderAt + 6, ...rowAt }} />
+        {/* "A total": a receipt and two coins, right of the table. */}
+        <Spot id="db-entities-receipt" at={rowAt.total_cents} left={1570} top={y(355)} width={220} height={189} />
+        {/* "Calendar dates": a desk calendar under the entity. */}
+        <Spot id="db-entities-calendar" at={holdsAt.date} left={255} top={y(637)} width={230} height={198} />
         {ORDER_COLUMNS.map((c, i) => (
           <RowType key={c.name} layout={orders} row={i} at={domainAt + 2 + i * 5}>
             {c.type}

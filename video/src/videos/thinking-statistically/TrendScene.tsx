@@ -145,9 +145,9 @@ export const TrendScene: React.FC = () => {
       <Spot id="thinking-statistically-calendar" at={yearsAt - 4} out={processAt - 18} left={960} top={y(104)} width={180} height={180} />
       <Spot id="thinking-statistically-machine" at={processAt - 6} dim={neverSeeAt} left={1480} top={y(104)} width={320} height={305} />
 
-      {/* The examples of a process, beside the machine, until "never see". */}
+      {/* The examples of a process, beside the machine (and 44px clear of it), until "never see". */}
       {["customers deciding,", "machines running,", "demand rising and falling"].map((t, i) => (
-        <Ink key={t} at={exampleAt[i] - 4} dur={14} out={neverSeeAt} style={{ right: 1920 - 1452, top: y(176 + i * 38), whiteSpace: "nowrap" }}>
+        <Ink key={t} at={exampleAt[i] - 4} dur={14} out={neverSeeAt} style={{ right: 1920 - 1436, top: y(176 + i * 38), whiteSpace: "nowrap" }}>
           <span style={{ ...body(27, true), color: INK_SOFT }}>{t}</span>
         </Ink>
       ))}

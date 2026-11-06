@@ -263,7 +263,7 @@ const claims = [
   ["cost-past", `${ONES[c.outputPerTokenRatio]} times`],
   ["cost-past", "a thousand dollars a day"],
   ["cost-past", "seven hundred and fifty"],
-  ["design-jitter", `a ${below100(results.retry.n / 1000) === "one" ? "thousand" : "?"}`],
+  ["design-jitter", results.retry.n === 1000 ? "a thousand requests" : `${results.retry.n} requests`],
   ["design-jitter", `more than ${below1000(jitterFirst)}`],
   ["daily-metr", "nineteen percent longer"],
   ["daily-metr", "about twenty percent faster"],

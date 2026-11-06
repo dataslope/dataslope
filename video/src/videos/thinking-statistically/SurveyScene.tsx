@@ -125,8 +125,8 @@ export const SurveyScene: React.FC = () => {
         Your question is about {fmtInt(SURVEY.customers)}.
       </Ink>
 
-      {/* "You survey": a clipboard at the end of "You asked", above the second line. */}
-      <Spot id="thinking-statistically-clipboard" at={surveyAt - 4} left={640} top={y(104) - 22} width={150} height={140} />
+      {/* "You survey": a clipboard at the end of the second line, short of the barrel. */}
+      <Spot id="thinking-statistically-clipboard" at={surveyAt - 4} left={1140} top={y(222)} width={150} height={150} />
       <Spot id="thinking-statistically-barrel" at={customersAt - 4} left={1470} top={y(104)} width={310} height={313} />
 
       <FigLabel

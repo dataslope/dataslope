@@ -183,7 +183,7 @@ export const script: NarrationScript = {
     },
     {
       id: "plan",
-      text: "Thirty-five questions, argued with counts, not code. Eight get a figure each, three more are answered inside them, and twenty-four go quickly at the end.",
+      text: "Thirty-five questions, argued with counts, not code: eight with a figure each, three inside those, and twenty-four quickly at the end.",
       pauseAfter: 0.8,
     },
 
@@ -216,22 +216,22 @@ export const script: NarrationScript = {
     {
       id: "hash",
       scene: true,
-      text: "Question two. When do you reach for a hash map? When you need lookups and inserts by key in constant time on average: counting, grouping, have I seen this before?",
+      text: "Question two. When do you reach for a hash map? When you need lookups and inserts by key in constant time on average: counting, grouping, have I seen this?",
       pauseAfter: 0.6,
     },
     {
       id: "hash-twosum",
-      text: "It turns Two Sum's double loop into one pass: at each number, ask the map for target minus it, then store the number. Linear time, paid for in linear memory.",
+      text: "It turns Two Sum's double loop into one pass: at each number, ask the map for target minus it, then store the number. Linear time, bought with linear memory.",
       pauseAfter: 0.7,
     },
     {
       id: "hash-collide",
-      text: "The words on average matter. With a thousand buckets, two keys more likely than not share one by the thirty-eighth key.",
+      text: "Average is the key word. With a thousand buckets, two keys more likely than not share one by the thirty-eighth key.",
       pauseAfter: 0.6,
     },
     {
       id: "hash-worst",
-      text: "So the follow-up is the worst case. Give a thousand keys one hash, and putting them in a Python set takes nearly six hundred thousand comparisons. With distinct hashes, none.",
+      text: "The follow-up is the worst case. Give a thousand keys one hash, and filling a Python set takes nearly six hundred thousand key comparisons. With distinct hashes, none.",
       pauseAfter: 0.7,
     },
     {
@@ -244,7 +244,7 @@ export const script: NarrationScript = {
     {
       id: "amort",
       scene: true,
-      text: "Question three. What is amortized O of one, and when does it apply? It spreads the cost of a rare expensive step over the cheap ones around it.",
+      text: "Question three. What is amortized O of one, and when does it apply? It spreads a rare expensive step's cost over the cheap ones around it.",
       pauseAfter: 0.6,
     },
     {
@@ -259,12 +259,12 @@ export const script: NarrationScript = {
     },
     {
       id: "amort-factor",
-      text: "A textbook array doubles, for under two copies an append. Python grows by about an eighth, so it copies more often. Any fixed factor keeps it constant, and a hash table's rehash works the same way.",
+      text: "A textbook array doubles, for under two copies an append. Python grows by about an eighth, so it copies more often. Any fixed factor keeps it constant, and a hash table's rehash too.",
       pauseAfter: 0.6,
     },
     {
       id: "amort-spike",
-      text: "But it's an average, not a promise for each call: the append that triggers the last resize moves nine hundred thirty-nine thousand items. Where one slow call breaks a latency budget, allocate up front.",
+      text: "But that's an average, not a promise per call: the append that triggers the last resize can copy nine hundred thirty-nine thousand items. On a latency budget, allocate up front.",
       pauseAfter: 0.8,
     },
 
@@ -277,7 +277,7 @@ export const script: NarrationScript = {
     },
     {
       id: "stack-count",
-      text: "A counter can't do it. This string opens and closes one round and one square bracket, so counting accepts it. But the round one closes while the square one inside it is still open.",
+      text: "A counter can't do it. This string opens and closes one round and one square bracket, so counting accepts it. But the round one closes while the square one inside is open.",
       pauseAfter: 0.6,
     },
     {
@@ -296,7 +296,7 @@ export const script: NarrationScript = {
     {
       id: "bfs",
       scene: true,
-      text: "Question five. Walk me through BFS versus DFS: when do you choose each? Breadth-first search takes a queue, level by level. Depth-first takes a stack, or recursion, and follows one path down.",
+      text: "Question five. Walk me through BFS versus DFS: when do you choose each? Breadth-first search takes a queue, level by level. Depth-first takes a stack and follows one path down.",
       pauseAfter: 0.6,
     },
     {
@@ -306,17 +306,17 @@ export const script: NarrationScript = {
     },
     {
       id: "bfs-short",
-      text: "Choose BFS for shortest paths in an unweighted graph: it reaches each node first by the fewest edges. Choose DFS for cycles, topological sort and backtracking.",
+      text: "Choose BFS for shortest paths in an unweighted graph, since it reaches each node first by the fewest edges. Choose DFS for cycle detection, topological sort and backtracking.",
       pauseAfter: 0.6,
     },
     {
       id: "bfs-memory",
-      text: "Memory decides it too. On a full binary tree of a million nodes, BFS holds the widest level, five hundred twenty-four thousand nodes. DFS holds one path: twenty.",
+      text: "Memory decides it too. On a full binary tree of a million nodes, BFS holds the widest level, five hundred twenty-four thousand nodes; DFS holds one path, twenty.",
       pauseAfter: 0.8,
     },
     {
       id: "bfs-deque",
-      text: "And make the queue a deque, a double-ended queue. Popping the front of a Python list shifts everything behind it: two hundred seventy-five billion moves here. A deque pops either end in constant time.",
+      text: "And make the queue a deque, a double-ended queue. Popping a Python list's front shifts everything behind it: two hundred seventy-five billion moves here. A deque pops either end in constant time.",
       pauseAfter: 0.8,
     },
 
@@ -324,7 +324,7 @@ export const script: NarrationScript = {
     {
       id: "pq",
       scene: true,
-      text: "Question six. How does a priority queue differ from a regular queue? A queue serves in arrival order. A priority queue always serves the most urgent: a scheduler, Dijkstra's algorithm, merging sorted lists.",
+      text: "Question six. How does a priority queue differ from a regular queue? A queue serves in arrival order. A priority queue serves the most urgent first, as in a scheduler or Dijkstra's algorithm.",
       pauseAfter: 0.6,
     },
     {
@@ -334,12 +334,12 @@ export const script: NarrationScript = {
     },
     {
       id: "heap-height",
-      text: "A heap does both in log n: every parent at least as urgent as its children, so the top sits at the root. A million items make twenty levels, so a push or pop moves at most nineteen. A peek is constant.",
+      text: "A heap does both in log n, each parent at least as urgent as its children. A million items make twenty levels, so a push or pop climbs at most nineteen; a peek is constant.",
       pauseAfter: 0.7,
     },
     {
       id: "heap-build",
-      text: "The follow-up: building a heap is linear, not n log n, since most nodes sit near the bottom. For a million items arriving least urgent first, heapify makes one and a half million comparisons. Pushing them one by one: eighteen million.",
+      text: "The follow-up: building a heap is linear, not n log n, since most nodes sit near the bottom. For a million items arriving least urgent first, heapify takes one and a half million comparisons; pushes, eighteen million.",
       pauseAfter: 0.8,
     },
 
@@ -347,7 +347,7 @@ export const script: NarrationScript = {
     {
       id: "dijk",
       scene: true,
-      text: "Question seven. Explain Dijkstra's algorithm and its complexity. It finds shortest paths from one source when no weight is negative, with a min-heap that hands out the closest unfinished node next.",
+      text: "Question seven. Explain Dijkstra's algorithm and its complexity. It finds shortest paths from one source when no weight is negative, a min-heap handing out the closest unfinished node next.",
       pauseAfter: 0.6,
     },
     { id: "dijk-run", text: "C costs four directly but three through B. D costs four, through B and C.", pauseAfter: 0.6 },
@@ -358,7 +358,7 @@ export const script: NarrationScript = {
     },
     {
       id: "dijk-neg",
-      text: "Why no negative weights? A node is final the moment it leaves the heap. Here B leaves at two, and only later does the minus-two edge from C reach it at one. B is wrong, and so is D.",
+      text: "Why no negative weights? A node is final when it leaves the heap. B leaves at two, and only later does the minus-two edge from C reach it at one. B is wrong, and so is D.",
       pauseAfter: 0.7,
     },
     {
@@ -376,7 +376,7 @@ export const script: NarrationScript = {
     },
     {
       id: "quick-sorted",
-      text: "The worst case is a pivot that's always the smallest or largest. Take a thousand numbers already in order and pivot on the last: each split peels off one. About half a million comparisons, nearly a thousand levels deep.",
+      text: "The worst case is a pivot that's always the smallest or largest. Pivot a thousand sorted numbers on the last, and each split peels off one: half a million comparisons, nearly a thousand levels.",
       pauseAfter: 0.7,
     },
     { id: "quick-limit", text: "Written recursively, that's past Python's default limit.", pauseAfter: 0.6 },
@@ -387,7 +387,7 @@ export const script: NarrationScript = {
     },
     {
       id: "quick-next",
-      text: "And sorted input is common, rows by ID or events by time, so randomize. Quicksort's edge over merge sort is sorting in place, with log n of stack.",
+      text: "And sorted input is common, rows by ID or events by time, so randomize. Quicksort's edge over merge sort is sorting in place.",
       pauseAfter: 0.9,
     },
 
@@ -404,19 +404,19 @@ export const script: NarrationScript = {
     },
     {
       id: "r-heapsort",
-      text: "Heapsort guarantees n log n in constant extra space, but caches worse than quicksort. It suits tight memory.",
+      text: "Heapsort guarantees n log n in constant extra space, but is less cache-friendly than quicksort. It suits tight memory.",
     },
     {
       id: "r-stable",
-      text: "A stable sort keeps ties in their original order. Sort by first name, then stable-sort by last, and the two Hoppers stay in first-name order.",
+      text: "A stable sort keeps ties in order. Sort by first name, then stable-sort by last, and the two Hoppers stay in first-name order.",
     },
     {
       id: "r-inplace",
-      text: "In place means constant extra memory, or log n of stack, like quicksort. Out of place grows with the input, like merge sort.",
+      text: "In place means constant extra memory, or log n of stack: quicksort. Out of place grows with the input: merge sort.",
     },
     {
       id: "r-master",
-      text: "The Master Theorem solves a split into a parts of size n over b, plus n to the d to combine: compare d with log base b of a. For merge sort they're equal, so n log n.",
+      text: "The Master Theorem solves divide-and-conquer recurrences by comparing the work of combining with the number of smallest pieces. For merge sort they tie, so n log n.",
       pauseAfter: 0.7,
     },
     {
@@ -425,11 +425,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-dc",
-      text: "Divide and conquer splits into independent subproblems, like merge sort. Dynamic programming is for overlapping ones, so each answer is stored and reused.",
+      text: "Divide and conquer splits into independent subproblems, like merge sort. Dynamic programming reuses the answers of overlapping ones.",
     },
     {
       id: "r-memo",
-      text: "Memoization is top-down: recurse and cache. Tabulation fills a table bottom-up. Naive Fibonacci of thirty makes two point seven million calls; memoized, fifty-nine.",
+      text: "Memoization recurses and caches, top-down. Tabulation fills a table bottom-up. Naive Fibonacci of thirty makes two point seven million calls; memoized, fifty-nine.",
       pauseAfter: 0.7,
     },
     {
@@ -438,7 +438,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-greedy",
-      text: "Greedy takes the best-looking step each time, safe only when local choices provably add up. Making six from coins of one, three and four, it takes three coins. Two threes do it.",
+      text: "Greedy takes the best-looking step, safe only when local choices provably add up. To make six from coins of one, three and four, it takes three coins. Two threes do it.",
       pauseAfter: 0.7,
     },
     {
@@ -451,16 +451,16 @@ export const script: NarrationScript = {
     { id: "rapid2-in", scene: true, text: "Now structures, search and graphs.", pauseAfter: 0.6 },
     {
       id: "r-array",
-      text: "An array indexes in constant time and caches well, but a middle insert shifts the rest. A linked list splices in constant time once you hold the node; finding it is a walk.",
+      text: "An array indexes in constant time and caches well, but a middle insert shifts the rest. A linked list splices in constant time given the node; finding it is a walk.",
     },
     {
       id: "r-bst",
-      text: "A binary search tree, or BST, costs its height per operation. A thousand keys inserted in order make it a thousand levels tall; shuffled, twenty-one. AVL and red-black trees stay at log n.",
+      text: "A binary search tree, or BST, costs its height per operation. A thousand keys inserted in order stand a thousand levels tall; shuffled, twenty-one. AVL and red-black trees stay at log n.",
       pauseAfter: 0.7,
     },
     {
       id: "r-traverse",
-      text: "In-order traversal visits a BST in sorted order. Pre-order, root first, serializes a tree. Post-order, children first, deletes one.",
+      text: "In-order traversal visits a BST in sorted order. Pre-order, root first, serializes a tree. Post-order, children first, suits deleting it.",
     },
     {
       id: "r-bst-heap",
@@ -472,7 +472,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-binary",
-      text: "Binary search needs sorted, indexable data: at most twenty probes for a million. Its bugs are off-by-one bounds, and a midpoint sum that overflows fixed-width integers.",
+      text: "Binary search needs sorted, indexable data: twenty probes at most for a million. Its bugs: off-by-one bounds, and a midpoint sum that overflows fixed-width integers.",
     },
     {
       id: "r-pointers",
@@ -484,7 +484,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-adjacency",
-      text: "Adjacency list or matrix? Assume a million users with a hundred friends each: a list holds a hundred million entries, a matrix a trillion cells, nearly all empty. Matrices suit dense graphs.",
+      text: "Adjacency list or matrix? Assume a million users with a hundred friends each: a list holds a hundred million entries, a matrix a trillion cells, nearly all empty. A matrix suits dense graphs and constant-time edge checks.",
       pauseAfter: 0.7,
     },
     {

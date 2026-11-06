@@ -85,6 +85,9 @@ export const NounsScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={lotsAt[0]} level={-34} />
       <Sfx name="el-whoosh" at={describesAt} level={-34} />
       <Sfx name="el-tap" at={landed} level={-29} />
+      {/* The small spots arrive the way the crates do. */}
+      <Sfx name="el-pop" at={words[0]} level={-31} />
+      <Sfx name="el-pop" at={anOrderAt} level={-31} />
 
       <Drift from={trackingAt} to={end + 50} scale={0.02} origin={[960, 560]}>
         <Kicker at={hookFrom - 10}>Entities</Kicker>
@@ -206,6 +209,10 @@ export const NounsScene: React.FC = () => {
           />
         </Svg>
         <Spot id="db-entities-crates" at={candidateAt} left={1240} top={y(660)} width={560} height={290} />
+        {/* "Customers": a shopper, top right, over the products box and clear of the sentence. */}
+        <Spot id="db-entities-shopper" at={words[0]} left={1490} top={y(252)} width={126} height={220} />
+        {/* "Describes an order": a parcel with its tag, bottom left, once the test has gone. */}
+        <Spot id="db-entities-parcel" at={anOrderAt} left={130} top={y(688)} width={250} height={204} />
       </Drift>
     </AbsoluteFill>
   );

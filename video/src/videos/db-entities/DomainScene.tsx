@@ -7,7 +7,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BANANA, CHECK_SQL, LOOSE, LOOSE_IN, LOOSE_OUT } from "./data";
 import { DbTable, ErrorBox, Fig, FIG_GAP, HEAD_H, Listing, Mono, ROW_H, tableGeometry } from "./kit";
-import { Bracket, Drift, Headline, OK_INK, OK_WASH, STAT_INK } from "./parts";
+import { Bracket, Drift, Headline, OK_INK, OK_WASH, Spot, STAT_INK } from "./parts";
 
 const S = 1.3;
 /** Where the loose table ends up, beside the CHECK listing. */
@@ -80,6 +80,9 @@ export const DomainScene: React.FC = () => {
       <Sfx name="el-scratch" at={getsAt} level={-32} />
       <Sfx name="el-pop" at={refusedAt - 2} level={-32} />
       <Sfx name="el-pencil" at={ruleAt} level={-35} />
+      {/* The small spots arrive the way the video's other spots do. */}
+      <Sfx name="el-pop" at={spellAt[1]} level={-31} />
+      <Sfx name="el-pop" at={bananaAt} level={-31} />
 
       <Drift from={ruleAt + 10} to={end + 70} scale={0.018} origin={[960, 560]}>
         <Headline lead="Text takes anything." leadAt={from - 6} turn="So narrow it." turnAt={narrowAt - 4} />
@@ -122,6 +125,11 @@ export const DomainScene: React.FC = () => {
             </Note>
           ))}
         </div>
+
+        {/* "Shipped": a delivery van in the empty right half, gone before the CHECKs arrive there. */}
+        <Spot id="db-entities-van" at={spellAt[1]} out={narrowAt - 6} left={1330} top={y(408)} width={260} height={182} />
+        {/* "The status banana": a banana under the table it never got into. */}
+        <Spot id="db-entities-banana" at={bananaAt} left={150} top={y(778)} width={220} height={164} />
 
         {/* ── The narrow domain: the lesson's two CHECKs ── */}
         <Fig n="7" at={listAt - 2} x={RIGHT_X} y={listTop - FIG_GAP}>

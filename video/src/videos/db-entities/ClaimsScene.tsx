@@ -76,6 +76,8 @@ export const ClaimsScene: React.FC = () => {
       <Sfx name="el-pop" at={claimingAt} level={-31} />
       <Sfx name="el-tap" at={statusesAt} level={-30} />
       <Sfx name="el-tap" at={namesAt} level={-30} />
+      {/* The small spot arrives the way the video's other spots do. */}
+      <Sfx name="el-pop" at={worldAt} level={-31} />
 
       <Drift from={namesAt + 6} to={end + 70} scale={0.018} origin={[800, 600]}>
         <Headline
@@ -207,6 +209,8 @@ export const ClaimsScene: React.FC = () => {
         })}
 
         <Spot id="db-entities-ribbon" at={capAt} left={1440} top={y(560)} width={340} height={340} />
+        {/* "What the world sends": a desk globe, top right, above the ribbon. */}
+        <Spot id="db-entities-globe" at={worldAt} left={1560} top={y(144)} width={165} height={220} />
       </Drift>
     </AbsoluteFill>
   );

@@ -119,7 +119,7 @@ export const TrapScene: React.FC = () => {
 
       {/* "Zip codes": a mailbox, top right; "a price": its tag, beside the doubled price. */}
       <Spot id="thinking-statistically-mailbox" at={zipAt - 4} left={1580} top={y(104)} width={180} height={180} />
-      <Spot id="thinking-statistically-tag" at={priceAt - 4} left={1500} top={y(DTYPE_Y + 30)} width={170} height={150} />
+      <Spot id="thinking-statistically-tag" at={priceAt - 4} left={1500} top={y(DTYPE_Y + 30) + 12} width={170} height={150} />
 
       {/* ── The table ── */}
       {columns.map((c, ci) => {
