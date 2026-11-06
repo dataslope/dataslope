@@ -37,7 +37,13 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
  */
 export async function bundleVideo(entryPoint) {
   const { bundle } = await import("@remotion/bundler");
-  const serveUrl = await bundle({ entryPoint: process.env.VIDEO_ENTRY ? path.resolve(process.env.VIDEO_ENTRY) : entryPoint });
+  // No webpack persistent cache: with a private entry per video it grew to
+  // 21 GB in node_modules/.cache/webpack in one evening and filled the disk
+  // three times. A cold bundle costs a few seconds more.
+  const serveUrl = await bundle({
+    entryPoint: process.env.VIDEO_ENTRY ? path.resolve(process.env.VIDEO_ENTRY) : entryPoint,
+    enableCaching: false,
+  });
   made.add(serveUrl);
   return serveUrl;
 }
