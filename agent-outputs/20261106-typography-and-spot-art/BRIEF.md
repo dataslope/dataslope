@@ -57,6 +57,12 @@ they illustrate, never on top of anything.
 - **Timing**: it pops in on the word that names it (`n.word(beat, phrase)`,
   a phrase the beat already says; `npm run check:cues` must pass), using the
   video's own `Spot` (or `Illustration`) component as its existing art does.
+- **Sound**: if the video's existing spots arrive with a sound effect (most
+  have an `<Sfx name="el-pop" …>` beside them), give each new spot the same
+  sound at the same level, cued to the same frame as its pop-in, so the new
+  art arrives the way the old does. Then run
+  `VIDEO_ENTRY=out/entries/<Id>.tsx npm run check:mix -- <dir>` and keep it
+  passing. A video whose spots are silent stays silent.
 - **Pipeline** (per `AGENTS.md`, "Images go through the illustration
   pipeline"): add prompts to the video's `src/videos/<dir>/illustrations.json`
   with `"category": "video-icon"` (1024x1024) and the file's own watercolor
