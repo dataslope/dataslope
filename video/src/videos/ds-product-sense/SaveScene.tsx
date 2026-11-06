@@ -152,7 +152,7 @@ export const SaveScene: React.FC = () => {
               </span>
             </span>
           </Note>
-          <Note at={whyAt} x={TREE_X + ROW_LABEL_W + 440} y={y(ROWS.secondary) + h(10)}>
+          <Note at={whyAt} x={TREE_X + ROW_LABEL_W + 374} y={y(ROWS.secondary) + h(10)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>explain why it moved</span>
           </Note>
 
@@ -165,7 +165,7 @@ export const SaveScene: React.FC = () => {
               </span>
             </span>
           </Note>
-          <Note at={guardsAt + 4} x={TREE_X + ROW_LABEL_W + 470} y={y(ROWS.guard) + h(10)}>
+          <Note at={guardsAt + 4} x={TREE_X + ROW_LABEL_W + 410} y={y(ROWS.guard) + h(10)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>catch it stealing from the main flow</span>
           </Note>
 
@@ -175,7 +175,7 @@ export const SaveScene: React.FC = () => {
               <Strike at={clicksAt + 6}>clicks on the button</Strike>
             </span>
           </Note>
-          <Note at={interactionAt} x={TREE_X + ROW_LABEL_W + 330} y={y(ROWS.not) + h(10)}>
+          <Note at={interactionAt} x={TREE_X + ROW_LABEL_W + 298} y={y(ROWS.not) + h(10)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <span style={{ color: ACCENT_INK, fontWeight: 650 }}>the interaction</span>
               <span style={{ opacity: ease(frame, valueAt, 10) }}>, not the value</span>

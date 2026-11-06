@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { QUOTED, usd } from "./data";
-import { A, A_INK, Arrow, Check, Drift, FAINT, Headline, Marked, OK, PANEL, pulse, Svg, Tag, track, TRAP, TRAP_INK, X0 } from "./parts";
+import { A, A_INK, Arrow, Check, Drift, FAINT, Headline, Marked, OK, pulse, Svg, track, TRAP, TRAP_INK, X0 } from "./parts";
 
 const BX0 = 440;
 const BX1 = 1440;
@@ -15,6 +15,10 @@ const ROW_Y = [560, 712];
 const ICON_X = X0;
 const ICON_W = 220;
 const ICON_H = 124;
+/** The launch post's line: its words' top under the old tag's top, so the
+ *  arrow between the two stays level with them, and where the picks start. */
+const PICKS_DY = 9;
+const PICKS_X = X0 + 244;
 
 /**
  * Pitfall three, selective reporting (Fig. 7): what a launch post picks, then
@@ -60,9 +64,9 @@ export const ReportingScene: React.FC = () => {
   ];
   const vendorDim = ease(frame, elseAt - 2, 14) * 0.55;
   const picks = [
-    { text: "its benchmarks", at: benchmarksAt - 2, x: X0 + 250 },
-    { text: "its rivals", at: rivalsAt - 2, x: X0 + 486 },
-    { text: "its settings", at: settingsAt - 2, x: X0 + 648 },
+    { text: "its benchmarks", at: benchmarksAt - 2 },
+    { text: "its rivals", at: rivalsAt - 2 },
+    { text: "its settings", at: settingsAt - 2 },
   ];
 
   return (
@@ -81,16 +85,20 @@ export const ReportingScene: React.FC = () => {
       <Headline at={from - 6} second={launchAt - 4} italic="What a launch post picks.">
         Three, selective reporting.
       </Headline>
-      {/* The launch post, and what it picks. */}
-      <Tag at={launchAt - 2} x={X0} y={y(300)} fill={PANEL}>
-        launch post
-      </Tag>
-      <Arrow from={[X0 + 172, y(300) + 24]} to={[X0 + 238, y(300) + 24]} at={picksAt - 4} dur={10} width={2} />
-      {picks.map((p, i) => (
-        <Tag key={p.text} at={p.at} x={p.x} y={y(300)} color={i === 2 ? TRAP : INK}>
-          <span style={{ color: i === 2 ? TRAP_INK : INK }}>{p.text}</span>
-        </Tag>
-      ))}
+      {/* The launch post, and what it picks: plain words on one line, the
+          picks set apart by middle dots, each inking in as it is said. */}
+      <Ink at={launchAt - 2} dur={12} style={{ left: X0, top: y(300) + PICKS_DY, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(24, INK), fontWeight: 700 }}>launch post</span>
+      </Ink>
+      <Arrow from={[X0 + 154, y(300) + 24]} to={[X0 + 220, y(300) + 24]} at={picksAt - 4} dur={10} width={2} />
+      <div style={{ position: "absolute", left: PICKS_X, top: y(300) + PICKS_DY, whiteSpace: "nowrap", ...label(24, INK), fontWeight: 600 }}>
+        {picks.map((p, i) => (
+          <span key={p.text} style={{ opacity: ease(frame, p.at, 12), color: i === 2 ? TRAP_INK : INK }}>
+            {i ? <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
+            {p.text}
+          </span>
+        ))}
+      </div>
       <FigLabel n="7" title="GPT-6 Astra on ARC-AGI-3, run by ARC Prize, September 2026" at={astraAt - 6} x={X0} y={y(420)} />
 
       <Drift from={from} to={end} amount={0.012} origin="50% 65%">

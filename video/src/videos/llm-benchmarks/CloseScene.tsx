@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { body, fmt, HAIRLINE, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SCORES } from "./data";
-import { A, A_INK, B_INK, Drift, FAINT, Headline, lerp, Marked, PANEL, Spot, Svg, TRAP, X0 } from "./parts";
+import { A, A_INK, B_INK, Drift, FAINT, Headline, lerp, Marked, Spot, Svg, TRAP, X0 } from "./parts";
 
 /** The launch table again, small, on its way out. */
 const MINI = { x: X0, y: 410, w: 600 };
@@ -64,9 +64,16 @@ export const CloseScene: React.FC = () => {
         {/* The harness's models come and go: the next launch, and its table, struck. */}
         <div style={{ position: "absolute", inset: 0, opacity: 1 - miniOut * 0.75 }}>
           <FigLabel n="2" title="A launch table" at={nextAt - 4} x={MINI.x} y={y(MINI.y - 66)} />
+          {/* Fig. 2's own look, small: a rule over the rows and a hairline
+              under each, drawn as its row inks in. */}
           <Svg opacity={ease(frame, launchesAt - 4, 12)}>
-            <rect x={MINI.x - 16} y={y(MINI.y) - 22} width={MINI.w + 32} height={196} rx={10} fill={PANEL} stroke={FAINT} strokeWidth={1.4} />
+            <line x1={MINI.x} x2={MINI.x + MINI.w} y1={y(MINI.y) - 12} y2={y(MINI.y) - 12} stroke={INK} strokeWidth={2} />
           </Svg>
+          {SCORES.map((s, i) => (
+            <Svg key={s.name} opacity={ease(frame, launchesAt + i * 3, 12)}>
+              <line x1={MINI.x} x2={MINI.x + MINI.w} y1={y(MINI.y) + i * 54 + 44} y2={y(MINI.y) + i * 54 + 44} stroke={HAIRLINE} strokeWidth={1} />
+            </Svg>
+          ))}
           {SCORES.map((s, i) => (
             <Ink key={s.name} at={launchesAt - 4 + i * 3} dur={10} style={{ left: MINI.x, top: y(MINI.y) + i * 54, width: MINI.w }}>
               <div style={{ position: "relative", height: 34 }}>

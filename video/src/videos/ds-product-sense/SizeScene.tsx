@@ -141,18 +141,18 @@ export const SizeScene: React.FC = () => {
         {factors.map((f, i) => (
           <React.Fragment key={f.text}>
             <Factor x={xOf(i)} top={y(CHAIN.top)} w={CHAIN.w} at={f.at - 2} out={out10} value={f.value} text={f.text} />
-            <Note at={f.at + 4} x={xOf(i) + CHAIN.w} y={y(CHAIN.top) + h(52)} out={out10}>
+            <Note at={f.at + 4} x={xOf(i) + CHAIN.w} y={y(CHAIN.top) + h(22)} out={out10}>
               <span style={{ ...note(40, INK_SOFT), whiteSpace: "nowrap" }}>{i < factors.length - 1 ? "×" : "="}</span>
             </Note>
           </React.Fragment>
         ))}
         <Factor x={xOf(4)} top={y(CHAIN.top)} w={1824 - xOf(4)} at={resultAt - 2} out={out10} value={`≈ ${num(MARKET.daily)}`} text="searches a day" result />
         {running.map((r, i) => (
-          <Note key={r.text} at={r.at} x={xOf(i + 1)} y={y(CHAIN.top) + h(CHAIN.h) + h(18)} out={out10}>
+          <Note key={r.text} at={r.at} x={xOf(i + 1)} y={y(CHAIN.top) + h(132)} out={out10}>
             <span style={{ ...label(21, BLUE_INK), ...TABULAR, whiteSpace: "nowrap" }}>= {r.text}</span>
           </Note>
         ))}
-        <Note at={mauAt} x={X0} y={y(CHAIN.top) + h(CHAIN.h) + h(18)} out={out10}>
+        <Note at={mauAt} x={X0} y={y(CHAIN.top) + h(132)} out={out10}>
           <span style={madeUp()}>assumptions for the made-up app</span>
         </Note>
 

@@ -144,7 +144,7 @@ export const SprtScene: React.FC = () => {
         <Note at={wrongAt} x={COL_X} y={y(514)}>
           <span style={{ ...note(27, INK), whiteSpace: "nowrap", ...TABULAR }}>
             false positives <b style={{ color: ACCENT_INK }}>{pct(SPRT.falsePositive, 1)}</b>
-            <span style={{ ...note(23, INK_SOFT), opacity: ease(frame, builtAt, 10) }}> · built for 2.5%</span>
+            <span style={{ ...note(25, INK_SOFT), opacity: ease(frame, builtAt, 10) }}> · built for 2.5%</span>
           </span>
         </Note>
         <Note at={realAt} x={COL_X} y={y(590)}>

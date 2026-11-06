@@ -112,8 +112,8 @@ export const SignifScene: React.FC = () => {
           </span>
         </Note>
         {/* Between the two definitions, centred in their gap: the first runs
-            about 430px at 26px. */}
-        <ColumnRule x={X0 + 495} top={y(TOP - 20)} height={34} at={pracAt - 2} out={out8} />
+            about 372px at 26px. */}
+        <ColumnRule x={X0 + 465} top={y(TOP - 20)} height={34} at={pracAt - 2} out={out8} />
         <Note at={pracAt - 2} x={X0 + 560} y={y(TOP - 20)} out={out8}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <b>practical</b>: big enough to matter

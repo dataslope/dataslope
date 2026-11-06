@@ -224,7 +224,7 @@ export const UnitScene: React.FC = () => {
                 ) : (
                   b.text
                 )}
-                <span style={{ ...label(21, b.ink), fontWeight: 650, opacity: ease(frame, b.seAt, 10) }}>
+                <span style={{ ...label(23, b.ink), fontWeight: 650, opacity: ease(frame, b.seAt, 10) }}>
                   {" · standard error "}
                   {b.se.toFixed(2)}
                   {b.v === UNIT.naive ? <span style={{ opacity: ease(frame, smallAt, 10) }}>, too small</span> : null}

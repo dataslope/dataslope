@@ -52,7 +52,7 @@ const Trade: React.FC<{ c: Ctx }> = ({ c }) => {
             <div style={{ position: "absolute", left: R_X + 244 + r.v * unit, top: top + c.h(4), ...note(26, r.ink), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap", opacity: p }}>
               +{r.v}%
             </div>
-            <Tag x={R_X + 340 + r.v * unit} y={top - c.h(2)} at={Math.max(r.tagAt, r.at) + 4} size={22} ink={r.ink}>
+            <Tag x={R_X + 340 + r.v * unit} y={top - c.h(2)} at={Math.max(r.tagAt, r.at) + 4} size={24} ink={r.ink}>
               {r.tag}
             </Tag>
           </React.Fragment>

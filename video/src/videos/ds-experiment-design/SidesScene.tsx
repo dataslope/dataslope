@@ -141,12 +141,12 @@ export const SidesScene: React.FC = () => {
               <Mark at={usuallyAt} color={MARK_OK}>
                 two-sided
               </Mark>
-              <span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, eachAt, 10) }}>: 2.5% in each tail</span>
+              <span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, eachAt, 10) }}>: 2.5% in each tail</span>
             </span>
           </Note>
           <Note at={oneAt} x={PANELS[1].left} y={y(320)}>
             <span style={{ ...note(28, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-              one-sided<span style={{ ...note(24, INK_SOFT), fontWeight: 500, opacity: ease(frame, allAt, 10) }}>: all 5% on the predicted side</span>
+              one-sided<span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, allAt, 10) }}>: all 5% on the predicted side</span>
             </span>
           </Note>
           {[

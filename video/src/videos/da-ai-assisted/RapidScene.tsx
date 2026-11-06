@@ -185,7 +185,7 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
         return (
           <Note key={s.text} at={s.at - 2} x={R_X} y={c.T + c.h(102) + i * c.h(54)}>
             <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(24, BLUE_INK), ...TABULAR, marginRight: 14 }}>{i + 1}</span>
+              <span style={{ ...label(26, BLUE_INK), ...TABULAR, marginRight: 14 }}>{i + 1}</span>
               {lead}
               {rest ? <span style={{ opacity: ease(frame, (s.restAt ?? 0) - 2, 10) }}>{rest}</span> : null}
             </span>

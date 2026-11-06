@@ -257,7 +257,10 @@ export const StoreErd: React.FC = () => {
             boxSizing: "border-box",
             border: `2px dashed ${INK_SOFT}`,
             borderRadius: 6,
-            background: `color-mix(in srgb, ${PAPER} 80%, transparent)`,
+            // Opaque, so the many-to-many line behind it stops at its edge
+            // rather than running through the words, which no longer sit on
+            // chips of their own.
+            background: PAPER,
             opacity: ownIn,
             display: "flex",
             flexDirection: "column",

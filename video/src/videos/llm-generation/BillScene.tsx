@@ -4,11 +4,10 @@ import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ANSWER_TOKENS, THINKING_TOKENS } from "./data";
-import { Drift, Headline, Kicker, lerp, Marked, pulse, Svg, Tag, THINK, THINK_INK, tint, X0 } from "./kit";
+import { Drift, Headline, Kicker, lerp, Marked, pulse, Svg, THINK, THINK_INK, tint, X0 } from "./kit";
 
 /** Fig. 20: tokens to pixels, so the bill's bar is the whole width. */
 const B0 = 460;
@@ -24,6 +23,15 @@ const DIAL = [560, 1360] as const;
 const DIAL_Y = 660;
 /** The closing row: every token the model touches, on the bill. */
 const CHIPS_Y = 772;
+
+/** A word of the closing line coming in the way a Note does (a short slide
+ *  and a fade over 14 frames), but in the line's flow, so its neighbours keep
+ *  their places while it waits. */
+const Rise: React.FC<{ at: number; dx?: number; dy?: number; children: React.ReactNode }> = ({ at, dx = 0, dy = 0, children }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 14);
+  return <span style={{ display: "inline-block", opacity: p, transform: `translate(${(1 - p) * dx}px, ${(1 - p) * dy}px)` }}>{children}</span>;
+};
 
 /**
  * Bill, effort, next: thinking tokens are output tokens. In the lesson's
@@ -142,24 +150,26 @@ export const BillScene: React.FC = () => {
         <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>set on purpose</span>
       </Note>
 
-      {/* Every token read, written or thought ends up here. */}
-      {[
-        { at: readsAt, text: "reads", color: ds("gray", 500), ink: INK_SOFT },
-        { at: writesAt, text: "writes", color: BAR, ink: BLUE_INK },
-        { at: thinksAt, text: "thinks", color: THINK, ink: THINK_INK },
-      ].map((c, k) => (
-        <Note key={c.text} at={c.at - 2} x={X0 + 260 + k * 150} y={y(CHIPS_Y)} from="up">
-          <Tag color={c.color} ink={c.ink} size={22}>
-            {c.text}
-          </Tag>
-        </Note>
-      ))}
-      <Ink at={readsAt - 6} dur={12} style={{ left: X0, top: y(CHIPS_Y) + 6, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, INK), fontWeight: 600 }}>Every token it</span>
-      </Ink>
-      <Note at={billAt - 2} x={X0 + 260 + 450} y={y(CHIPS_Y) + 4}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>all on the bill</span>
-      </Note>
+      {/* Every token read, written or thought ends up here: one line of
+          text, each verb in the ink of its bar above, middle dots between. */}
+      <div style={{ position: "absolute", left: X0, top: y(CHIPS_Y) + 6, display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
+        <Ink at={readsAt - 6} dur={12} style={{ position: "relative" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600 }}>Every token it</span>
+        </Ink>
+        {[
+          { at: readsAt, text: "reads", ink: INK_SOFT },
+          { at: writesAt, text: "writes", ink: BLUE_INK },
+          { at: thinksAt, text: "thinks", ink: THINK_INK },
+        ].map((c, k) => (
+          <Rise key={c.text} at={c.at - 2} dy={14}>
+            {k ? <span style={{ ...note(22, INK_SOFT), margin: "0 0.45em" }}>·</span> : null}
+            <span style={{ ...note(22, c.ink), fontWeight: 650, marginLeft: k ? 0 : "0.3em" }}>{c.text}</span>
+          </Rise>
+        ))}
+        <Rise at={billAt - 2} dx={-18}>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 650, marginLeft: 28 }}>all on the bill</span>
+        </Rise>
+      </div>
       <NextLine at={costAt - 4} x={X0} y={y(848)} width={1680}>
         what a token costs
       </NextLine>

@@ -166,7 +166,9 @@ export const DidScene: React.FC = () => {
               <span style={{ ...note(26, OK_INK), fontWeight: 650, ...TABULAR }}>
                 {fixed(DID.treatedChange, 1)} − {DID.controlChange < 0 ? `(${fixed(DID.controlChange, 1)})` : fixed(DID.controlChange, 1)} =
               </span>
-              <span style={{ ...note(40, OK_INK), fontWeight: 800, display: "inline-block", transform: `scale(${1 + 0.08 * big})`, transformOrigin: "right center" }}>
+              {/* The answer at the line's own size: weight, the highlight and
+                  the swell carry it, not a bigger face. */}
+              <span style={{ ...note(28, OK_INK), fontWeight: 800, display: "inline-block", transform: `scale(${1 + 0.08 * big})`, transformOrigin: "right center" }}>
                 <Mark at={sixFiveAt + 2}>{fixed(DID.did, 1, true)}</Mark>
               </span>
             </span>

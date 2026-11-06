@@ -189,7 +189,7 @@ export const SplitScene: React.FC = () => {
           rows={S.rows.map((cells, i) => ({ cells, at: seriesAt + i * 2 }))}
           marks={S.rows.map((_, row) => ({ row, col: 0, at: indexAt + row * 3 }))}
         />
-        <Note at={seriesAt + 4} x={oneX} y={og.rowTop(S.rows.length) + h(22)}>
+        <Note at={seriesAt + 4} x={oneX} y={og.rowTop(S.rows.length) + h(12)}>
           <span style={{ ...label(22, BLUE_INK), fontWeight: 700 }}>Series</span>
         </Note>
 
@@ -201,7 +201,7 @@ export const SplitScene: React.FC = () => {
           rows={N.rows.map((cells, i) => ({ cells, at: frameAt + i * 2 }))}
           marks={N.rows.map((_, row) => ({ row, col: 0, at: indexAt + 4 + row * 3 }))}
         />
-        <Note at={frameAt + 4} x={namedX} y={ng.rowTop(N.rows.length) + h(22)}>
+        <Note at={frameAt + 4} x={namedX} y={ng.rowTop(N.rows.length) + h(12)}>
           <span style={{ ...label(22, BLUE_INK), fontWeight: 700 }}>DataFrame</span>
         </Note>
         <Note at={resetAt} x={X0} y={y(744)}>

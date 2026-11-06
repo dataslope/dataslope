@@ -262,30 +262,15 @@ export const Spot: React.FC<{
   );
 };
 
-/** A small rounded tag in a hue, for a label that sits on a figure. */
-export const Tag: React.FC<{ color: string; ink: string; children: React.ReactNode; size?: number; style?: React.CSSProperties }> = ({
-  color,
+/** A label that sits on a figure: plain semibold text in its hue's ink. It
+ *  was a tinted, outlined pill; the house sets tags as text (README, "No
+ *  cards unless the layout needs one"), the color carrying what the pill did. */
+export const Tag: React.FC<{ ink: string; children: React.ReactNode; size?: number; style?: React.CSSProperties }> = ({
   ink,
   children,
   size = 21,
   style,
-}) => (
-  <span
-    style={{
-      display: "inline-block",
-      padding: "4px 12px 5px",
-      borderRadius: 8,
-      background: tint(color, 20),
-      border: `1.5px solid ${color}`,
-      ...note(size, ink),
-      fontWeight: 650,
-      whiteSpace: "nowrap",
-      ...style,
-    }}
-  >
-    {children}
-  </span>
-);
+}) => <span style={{ ...note(size, ink), fontWeight: 650, whiteSpace: "nowrap", ...style }}>{children}</span>;
 
 /** Soft ink for the notes that say a figure's numbers are the lesson's
  *  illustration rather than a measurement. */
