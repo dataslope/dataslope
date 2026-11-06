@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK_INK, QMono, RapidFire, type RapidItem } from "../../editorial/interview";
+import { OK_INK, RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink, NextLine, Note, Num } from "../../editorial/ui";
@@ -19,10 +19,11 @@ import {
   lineOf,
   Listing,
   listingHeight,
-  Mark,
   MARK,
+  Mark,
   MARK_BAD,
   MARK_OK,
+  QMono,
   rowsAt,
   Spot,
   TableName,

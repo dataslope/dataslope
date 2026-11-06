@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
@@ -15,11 +15,12 @@ import {
   lineOf,
   Listing,
   listingHeight,
-  Mark,
   MARK,
+  Mark,
   MARK_BAD,
   MARK_OK,
   OK_INK,
+  QMono,
   rowsAt,
   TableName,
   X0,

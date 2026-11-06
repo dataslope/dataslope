@@ -30,7 +30,6 @@ export {
   MARK,
   MARK_BAD,
   MARK_OK,
-  Mono,
   NoRows,
   OK,
   OK_INK,
@@ -44,6 +43,30 @@ export {
   type TableGeometry,
 } from "../da-sql/parts";
 export { colsOf, geoOf, RowBracket, rowsAt, type FrameStep } from "../da-advanced-sql/parts";
+
+/**
+ * Code inside a line of type, at 0.92em of the line (never under 19px), so it
+ * stays within the 12% a line's sizes may differ by (README, "One line, one
+ * size, one family"). `Mono` takes a color and weight; `QMono` is the
+ * interview kit's name for the same thing, kept so questions read as they
+ * do in the kit.
+ */
+export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
+  <span
+    style={{
+      fontFamily: MONO,
+      fontSize: "max(19px, 0.92em)",
+      fontStyle: "normal",
+      fontWeight: weight ?? 600,
+      color,
+      fontVariantLigatures: "none",
+      wordSpacing: "-0.3em",
+    }}
+  >
+    {children}
+  </span>
+);
+export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => <Mono>{children}</Mono>;
 
 /**
  * The index of the listing line that holds `text`. A highlight finds its line
