@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { SWITCH } from "./data";
-import { Box, DATA, DATA_TINT, Drift, head, LineArrow, Mark, MARK_OK, OK, OK_INK, say, X0 } from "./parts";
+import { Box, DATA, DATA_TINT, Drift, head, LineArrow, Mark, MARK_BAD, MARK_OK, OK, OK_INK, say, X0 } from "./parts";
 
 const T = { x: X0, top: 360, rowH: 52, cols: [150, 120, 100, 140, 160] };
 const BG = { x1: 1010, x2: 1430, w: 380, top: 470, h: 130 };
@@ -126,9 +126,9 @@ export const SwitchScene: React.FC = () => {
                   top: rowTop(i) + 4,
                   width: colX(5) - T.x + 12,
                   height: T.rowH - 8,
-                  borderRadius: 6,
-                  border: `2.4px solid color-mix(in srgb, ${ACCENT} ${100 * wrong}%, transparent)`,
-                  background: `color-mix(in srgb, ${ACCENT} ${10 * wrong}%, transparent)`,
+                  // The wrong nearest row: the trap's red laid behind it, no outline.
+                  borderRadius: 4,
+                  background: `color-mix(in srgb, ${MARK_BAD} ${100 * wrong}%, transparent)`,
                 }}
               />
               <div style={{ ...cellStyle(0), top: rowTop(i) + 10, color: INK, opacity: p }}>{w.word}</div>

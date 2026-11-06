@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -181,17 +181,16 @@ export const FreshScene: React.FC = () => {
             <span style={{ opacity: ease(frame, leakAt - 2, 10), color: INK }}>: wrong at best, a data leak at worst</span>
           </span>
         </Note>
-        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-          {/* The deleted row's warning: a red edge on it while the trap is said. */}
+        {/* The deleted row's warning: the trap's red laid behind it, like a
+            highlighter, while the trap is said. No outline. */}
+        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", mixBlendMode: "multiply" }}>
           <rect
             x={TABLE_X - 6}
             y={tableTop + 40 + 2 * ROW_H + 6}
             width={colX(4) - TABLE_X + 12}
             height={ROW_H - 12}
-            rx={6}
-            fill="none"
-            stroke={ACCENT}
-            strokeWidth={2.4}
+            rx={4}
+            fill={MARK_BAD}
             opacity={ease(frame, skipAt + 4, 10)}
           />
         </svg>

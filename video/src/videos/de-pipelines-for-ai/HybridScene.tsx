@@ -181,6 +181,24 @@ export const HybridScene: React.FC = () => {
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>1 to 3: tickets about errors in general</span>
         </Note>
 
+        {/* The three rankings side by side: a hairline centred in each gap,
+            from the heads to the notes under them, inking in with the
+            column to its right. */}
+        {[1, 2].map((c) => (
+          <div
+            key={c}
+            style={{
+              position: "absolute",
+              left: (COLS[c - 1] - 8 + COL_W + COLS[c] - 8) / 2,
+              top: y(LIST_TOP) - 44,
+              width: 1,
+              height: rowY(5) + 120 - (y(LIST_TOP) - 44),
+              background: HAIRLINE,
+              opacity: ease(frame, setupAt + 4 + 4 * c, 14),
+            }}
+          />
+        ))}
+
         {/* The keyword side. */}
         <Note at={setupAt + 8} x={COLS[1]} y={y(LIST_TOP) - 44}>
           <span style={head(22, headInk(INK, addsAt))}>

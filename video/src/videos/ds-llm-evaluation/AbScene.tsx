@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from 
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { BAD, Chip, DATA, DATA_LIGHT, Drift, Mark, MARK_BAD, OK, OK_INK, X0 } from "./parts";
+import { BAD, DATA, DATA_LIGHT, Drift, Mark, MARK_BAD, OK, OK_INK, X0 } from "./parts";
 
 const COL = [X0, 1000];
 const ROW = [330, 610];
@@ -220,7 +220,7 @@ export const AbScene: React.FC = () => {
         </Title>
         {/* The guardrails as words, two to a line, a middle dot between. */}
         {[0, 1].map((line) => (
-          <Note key={line} at={guards[line * 2].at - 2} x={COL[1]} y={y(ROW[1]) + 80 + line * 50} from="up">
+          <Note key={line} at={guards[line * 2].at - 2} x={COL[1]} y={y(ROW[1]) + 72 + line * 50} from="up">
             <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               {guards.slice(line * 2, line * 2 + 2).map((g, k) => (
                 <span key={g.text} style={{ opacity: ease(frame, g.at - 2, 12) }}>

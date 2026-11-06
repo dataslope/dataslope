@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BANK } from "./data";
-import { BAD, Chip, Clear, DATA, Drift, Headline, Kicker, Mark, MARK_BAD, OK_INK, Spot, Strike, X0 } from "./parts";
+import { BAD, Clear, DATA, Drift, Headline, Kicker, Mark, MARK_BAD, OK_INK, Spot, Strike, Tag, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 820;
@@ -58,9 +58,9 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>track what people do next:</span>
       </Note>
       {signs.map((s, i) => (
-        <Chip key={s.text} x={R_X + 30} y={c.y(626) + i * c.h(62)} at={s.at - 2} size={24} ink={OK_INK}>
+        <Tag key={s.text} x={R_X + 30} y={c.y(614) + i * c.h(54)} at={s.at - 2} size={24} ink={OK_INK}>
           {s.text}
-        </Chip>
+        </Tag>
       ))}
       <Note at={diagAt - 2} x={R_X} y={c.y(830)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
@@ -189,13 +189,13 @@ export const RapidScene: React.FC = () => {
         <Note at={roundAt} x={X0} y={y(330)}>
           <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>every round on this track came back to one question</span>
         </Note>
-        <Note at={practice[0].at - 6} x={X0} y={y(450)}>
+        <Note at={practice[0].at - 6} x={X0} y={y(470)}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
-          <Chip key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 2 ? workAt : undefined}>
+          <Tag key={p.text} x={X0} y={y(500) + i * h(60)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 2 ? workAt : undefined}>
             {p.text}
-          </Chip>
+          </Tag>
         ))}
         <Note at={workAt - 2} x={X0} y={y(740)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap", opacity: 0.4 + 0.6 * ease(frame, workAt, 12) }}>

@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
+import { ACCENT, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, headline, label, note } from "../../editorial/style";
 import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { BUBBLES, INK_WEEK, PARTS, SCATTER } from "./data";
-import { bandMid, BarSet, CATS, Drift, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
+import { bandMid, BarSet, CATS, ColumnRule, Drift, Headline, Kicker, LineSet, pulse, Spot, Svg, Verdict, X0 } from "./parts";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;
@@ -227,34 +227,34 @@ const Tools: React.FC<{ c: Ctx }> = ({ c }) => {
     { name: "Power BI", at: c.w("r-tools", "Power BI fits the Microsoft stack"), text: "fits the Microsoft stack" },
     { name: "Looker", at: c.w("r-tools", "Looker defines metrics as code"), text: "metrics defined as code" },
   ];
-  const cardW = 290;
-  const gap = 30;
+  // Three columns of plain text, a hairline centred in each gap: each name,
+  // and under it what it is for, wrapped to the column's width.
+  const colW = 250;
+  const pitch = colW + 80;
+  const colX = (k: number) => R_X + 40 + k * pitch;
+  const top = c.y(392);
   return (
     <>
       {cards.map((card, k) => {
         const p = ease(frame, at0 + k * 6, 14);
         if (p <= 0) return null;
         return (
-          <div
-            key={card.name}
-            style={{
-              position: "absolute",
-              left: R_X + 40 + k * (cardW + gap),
-              top: c.y(360),
-              width: cardW,
-              height: c.h(200),
-              boxSizing: "border-box",
-              border: `1.5px solid ${HAIRLINE}`,
-              borderRadius: 12,
-              padding: "24px 26px",
-              background: PAPER,
-              opacity: p,
-              transform: `translateY(${(1 - p) * 12}px)`,
-            }}
-          >
-            <div style={{ ...headline(38), color: INK, whiteSpace: "nowrap" }}>{card.name}</div>
-            <div style={{ ...note(24, INK_SOFT), marginTop: 18, opacity: ease(frame, card.at - 2, 12) }}>{card.text}</div>
-          </div>
+          <React.Fragment key={card.name}>
+            {k > 0 ? <ColumnRule x={colX(k) - 40} top={top} height={44 + 12 + 2 * 31} at={at0 + k * 6} /> : null}
+            <div
+              style={{
+                position: "absolute",
+                left: colX(k),
+                top,
+                width: colW,
+                opacity: p,
+                transform: `translateY(${(1 - p) * 12}px)`,
+              }}
+            >
+              <div style={{ ...headline(38), color: INK, lineHeight: "44px", whiteSpace: "nowrap" }}>{card.name}</div>
+              <div style={{ ...note(24, INK_SOFT), lineHeight: "31px", marginTop: 12, textWrap: "balance", opacity: ease(frame, card.at - 2, 12) }}>{card.text}</div>
+            </div>
+          </React.Fragment>
         );
       })}
       <Note at={biAt - 2} x={R_X + 40} y={c.y(600)}>
