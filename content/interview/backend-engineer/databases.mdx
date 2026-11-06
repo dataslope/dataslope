@@ -173,7 +173,8 @@ CREATE TABLE orders AS SELECT * FROM (VALUES
 FROM customers c
 LEFT JOIN orders o ON o.customer_id = c.id
 ORDER BY c.name, o.order_id;
--- Cy has no orders, so their row shows NULLs for order columns.`}
+-- Customers with no orders (Di, Hana and four more) still get a row,
+-- with NULLs in the order columns.`}
 />
 
 ### Why can a join inflate a SUM, and how do you fix it?
