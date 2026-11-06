@@ -26,7 +26,8 @@
  * is missing renders whatever the manifest says.
  *
  * The two review kits under "Assets" in Root.tsx (ErdKit, InterviewKit) are
- * not videos and are not rendered.
+ * not videos and are not rendered. Compositions in EXTRAS are rendered with
+ * the videos though they are not narrated: the unit opener sample.
  */
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
@@ -119,17 +120,24 @@ const GLOBAL = JSON.stringify({
   ]),
 });
 
+/**
+ * Rendered with the videos though they live outside src/videos/: each id
+ * with the source files (under src/) its fingerprint starts from.
+ */
+const EXTRAS = [{ id: "Columns-7-Unit-Sample", seeds: ["reveals/presets.ts", "reveals/LogoReveal.tsx"] }];
+
 const ASSET_DIRS = ["narration", "images", "patterns"].map((d) => path.join(PUBLIC, d));
 const assetNames = new Set(ASSET_DIRS.flatMap((d) => (existsSync(d) ? readdirSync(d) : [])));
 
-function fingerprint({ id, folder }) {
-  const dir = path.join(SRC, "videos", folder);
-  const seeds = ["Video.tsx", "script.ts"].map((f) => path.join(dir, f)).filter(existsSync);
+function fingerprint({ id, folder, seeds: extraSeeds }) {
+  const seeds = extraSeeds
+    ? extraSeeds.map((f) => path.join(SRC, f))
+    : ["Video.tsx", "script.ts"].map((f) => path.join(SRC, "videos", folder, f)).filter(existsSync);
   const sources = [...importGraph([...seeds, ...rootShared])].sort();
 
   // Asset folders this video reads: its own, those of any video folder its
   // sources come from, and any its sources name as a string ("c-pointers").
-  const names = new Set([folder]);
+  const names = new Set(folder ? [folder] : []);
   for (const file of sources) {
     const rel = path.relative(path.join(SRC, "videos"), file);
     if (!rel.startsWith("..")) names.add(rel.split(path.sep)[0]);
@@ -148,7 +156,7 @@ function fingerprint({ id, folder }) {
 
 // --- Plan ------------------------------------------------------------------
 
-let videos = registry();
+let videos = [...registry(), ...EXTRAS];
 if (only) {
   const wanted = new Set(only.map((n) => videoNames(n, videos).id));
   const unknown = [...wanted].filter((id) => !videos.some((v) => v.id === id));

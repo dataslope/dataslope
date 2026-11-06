@@ -28,6 +28,9 @@ export type Track = {
   title: string[];
   /** The watercolor animal: its folder under public/images/, and its id. */
   art: { video: string; id: string };
+  /** Drawn smaller than the box allows, for an animal whose body fills
+   *  more of its picture than the others' (the raccoon). */
+  artScale?: number;
 };
 
 export const TRACKS: Record<string, Track> = {
@@ -51,7 +54,10 @@ export const TRACKS: Record<string, Track> = {
     title: ["Natural Language", "Processing", "with Python"],
     art: { video: "thumbnails", id: "thumb-parrot" },
   },
-  DataAnalyst: { kind: "interview", title: ["Data Analyst"], art: { video: "thumbnails", id: "thumb-raccoon" } },
+  // The raccoon's body fills more of its picture than the otter's or the
+  // meerkat's, so at the same box it reads larger (the owner: "slightly
+  // smaller").
+  DataAnalyst: { kind: "interview", title: ["Data Analyst"], art: { video: "thumbnails", id: "thumb-raccoon" }, artScale: 0.86 },
   DataScientist: { kind: "interview", title: ["Data Scientist"], art: { video: "ds-interview", id: "ds-interview-otter" } },
   DataEngineer: { kind: "interview", title: ["Data Engineer"], art: { video: "de-interview", id: "de-interview-meerkat" } },
 };
@@ -61,9 +67,12 @@ export const TRACKS: Record<string, Track> = {
  *  Preparation", which is too wide for one line at SIZE and takes two.
  *  "Interview Questions" fits one line (about 730px) beside the animal
  *  hung top-right, not beside one standing bottom-right. */
-export type InterviewLabel = "questions" | "prep" | "preparation";
+export type InterviewLabel = "questions" | "questions-two" | "prep" | "preparation";
 const INTERVIEW: Record<InterviewLabel, string[]> = {
   questions: ["Interview Questions"],
+  // The same words on two lines (the owner: "a line break between
+  // Interview and Questions").
+  "questions-two": ["Interview", "Questions"],
   prep: ["Interview Prep"],
   preparation: ["Interview", "Preparation"],
 };
@@ -89,6 +98,9 @@ export type ThumbnailProps = {
   greenShade?: 500 | 550 | 600;
   /** A course's "Full Course": smaller than the title, or the title's size. */
   kicker?: "small" | "same";
+  /** Which of a course's lines is in the brand blue, the other in black:
+   *  "Full Course" (the kicker) or the course's name (the title). */
+  courseBlue?: "kicker" | "title";
   /** Where the animal stands: on the line the words end on, or hung from
    *  the top-right corner, level with the mark. */
   artAt?: "bottom" | "top";
@@ -143,6 +155,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
   role = "black",
   greenShade = 550,
   labelFirst = false,
+  courseBlue = "kicker",
 }) => {
   const t = TRACKS[track];
   const course = t.kind === "course";
@@ -174,7 +187,13 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
         <Illustration
           video={t.art.video}
           id={t.art.id}
-          style={{ maxWidth: "100%", maxHeight: "100%", width: "auto", height: "auto", objectFit: "contain" }}
+          style={{
+            maxWidth: `${100 * (t.artScale ?? 1)}%`,
+            maxHeight: `${100 * (t.artScale ?? 1)}%`,
+            width: "auto",
+            height: "auto",
+            objectFit: "contain",
+          }}
         />
       </div>
 
@@ -182,10 +201,16 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
         {course ? (
           // On the title's line pitch whatever its size, with nothing added:
           // every line of the block is one step apart.
-          <div style={{ ...type(kick, ds("blue", 500)), lineHeight: `${1.1 * SIZE}px` }}>Full Course</div>
+          <div style={{ ...type(kick, courseBlue === "kicker" ? ds("blue", 500) : INK), lineHeight: `${1.1 * SIZE}px` }}>Full Course</div>
         ) : null}
         {!course && labelFirst ? <Lines lines={INTERVIEW[label]} style={type(SIZE, labelInk)} /> : null}
-        <Lines lines={t.title} style={type(SIZE, course || role === "black" ? INK : role === "green" ? GREEN[greenShade] : ds("blue", 500))} />
+        <Lines
+          lines={t.title}
+          style={type(
+            SIZE,
+            course ? (courseBlue === "title" ? ds("blue", 500) : INK) : role === "black" ? INK : role === "green" ? GREEN[greenShade] : ds("blue", 500),
+          )}
+        />
         {!course && !labelFirst ? <Lines lines={INTERVIEW[label]} style={type(SIZE, labelInk)} /> : null}
       </div>
     </AbsoluteFill>
@@ -194,26 +219,26 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
 
 export const THUMBNAIL = { width: W, height: H } as const;
 
-const cap = (x: string) => x.replace(/(^|-)(\w)/g, (_, d: string, c: string) => c.toUpperCase());
-
-/** Every thumbnail the Studio shows: a course with "Full Course" smaller
- *  than its title or at its size, the animal low or high; and an interview
- *  track saying "Interview Questions" after its role in green (the series'
- *  color), blue or black, with the animal hung top-right. Other labels and
- *  greys are props (`label`, `tone`, `greenShade`). */
-export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entries(TRACKS).flatMap(([track, t]): { id: string; props: ThumbnailProps }[] =>
-  t.kind === "course"
-    ? (["bottom", "top"] as const).flatMap((artAt) =>
-        (["small", "same"] as const).map((kicker) => ({ id: `Thumb-${track}-${cap(kicker)}-${cap(artAt)}`, props: { track, kicker, artAt } })),
-      )
+/** Every thumbnail the Studio shows, the owner's 2026-11-06 round: the
+ *  animal hung top-right throughout and "Full Course" at the title's size.
+ *  A course comes two ways, "Full Course" in blue over its name in black
+ *  (V1) or the reverse (V2). An interview track says "Interview" and
+ *  "Questions" on two lines, four ways: the role first in black over the
+ *  label in green (V1), the role in green over the label in black (V2), the
+ *  label first in black over the role in green (V3), and the label first in
+ *  green over the role in black (V4). Earlier rounds' options stay props
+ *  (`kicker`, `artAt`, `label`, `tone`, `greenShade`). */
+export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entries(TRACKS).flatMap(([track, t]): { id: string; props: ThumbnailProps }[] => {
+  const base = { track, artAt: "top" as const };
+  return t.kind === "course"
+    ? [
+        { id: `Thumb-${track}-V1-BlueKicker`, props: { ...base, kicker: "same", courseBlue: "kicker" } },
+        { id: `Thumb-${track}-V2-BlueTitle`, props: { ...base, kicker: "same", courseBlue: "title" } },
+      ]
     : [
-        ...(["green", "blue", "black"] as const).map((role) => ({
-          id: `Thumb-${track}-Questions-${cap(role)}Role-Top`,
-          props: { track, label: "questions" as const, tone: "black" as const, role, artAt: "top" as const },
-        })),
-        // The role in black and the label in green, after the role or above
-        // it as "Full Course" sits above a course's title.
-        { id: `Thumb-${track}-Questions-GreenLabel-Top`, props: { track, label: "questions", tone: "green", role: "black", artAt: "top" } },
-        { id: `Thumb-${track}-Questions-GreenLabelFirst-Top`, props: { track, label: "questions", tone: "green", role: "black", artAt: "top", labelFirst: true } },
-      ],
-);
+        { id: `Thumb-${track}-V1-RoleBlack-QuestionsGreen`, props: { ...base, label: "questions-two", role: "black", tone: "green" } },
+        { id: `Thumb-${track}-V2-RoleGreen-QuestionsBlack`, props: { ...base, label: "questions-two", role: "green", tone: "black" } },
+        { id: `Thumb-${track}-V3-QuestionsBlackFirst-RoleGreen`, props: { ...base, label: "questions-two", role: "green", tone: "black", labelFirst: true } },
+        { id: `Thumb-${track}-V4-QuestionsGreenFirst-RoleBlack`, props: { ...base, label: "questions-two", role: "black", tone: "green", labelFirst: true } },
+      ];
+});

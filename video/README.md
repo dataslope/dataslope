@@ -100,6 +100,8 @@ npm run studio                               # preview and scrub in the browser
 npm run render -- CPointers                  # 4K → out/CPointers.mp4
 npm run render:fhd -- CPointers out/CPointers-fhd.mp4   # 1920x1080
 npm run render:preview -- CPointers out/c-pointers-preview.mp4   # half size, fast
+npm run render:all -- --fhd                  # every video changed since its last render, 1080p
+npm run render:all -- --dry-run              # list what would render (scripts/render-all.mjs)
 npm run still -- CPointers out/frame.png --frame=600
 npm run cues -- c-pointers                   # when each beat is spoken
 ```

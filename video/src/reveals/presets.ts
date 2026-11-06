@@ -137,6 +137,18 @@ const COLUMNS: { id: string; props: LogoRevealProps }[] = [
     unit: "Unit 4",
     title: "Keys and integrity",
   }),
+  // Columns-7 as the template for every unit opener (the owner: "Unit 1"
+  // and "Unit Title Goes Here"). render-all renders it with the videos.
+  opener("Columns-7-Unit-Sample", {
+    layout: "columns",
+    motion: "assemble",
+    text: "blur",
+    textInk: "black",
+    threeLines: true,
+    course: "Database Design with PostgreSQL",
+    unit: "Unit 1",
+    title: "Unit Title Goes Here",
+  }),
 ];
 
 export const REVEALS: { id: string; props: LogoRevealProps }[] = [
