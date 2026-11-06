@@ -158,7 +158,17 @@ export const FixScene: React.FC = () => {
           <React.Fragment key={k}>
             <Numeral n={k + 1} at={itemAt[k] - 4} x={RIGHT_X + 22} y={y(ITEM_Y(k))} />
             <Ink at={itemAt[k] - 2} dur={14} style={{ left: RIGHT_X + 64, top: y(ITEM_Y(k)), width: 800 }}>
-              <div style={{ ...body(34), color: INK, whiteSpace: "nowrap", transform: `scale(${1 + swell * 0.05})`, transformOrigin: "0 50%" }}>
+              {/* A highlighted item gives back the 0.18em its Marked band adds on the left, so all four start on one edge. */}
+              <div
+                style={{
+                  ...body(34),
+                  color: INK,
+                  whiteSpace: "nowrap",
+                  marginLeft: k === 0 || k === 3 ? "-0.18em" : 0,
+                  transform: `scale(${1 + swell * 0.05})`,
+                  transformOrigin: "0 50%",
+                }}
+              >
                 {k === 3 ? (
                   <Marked at={eitherAt - 2} out={pastingAt - 4}>
                     {it}
