@@ -6,6 +6,7 @@ import { BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/s
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { MONO } from "../../theme/fonts";
 import { SPLIT } from "./data";
 import {
   colsOf,
@@ -20,7 +21,6 @@ import {
   MARK_KEY,
   Mono,
   TableName,
-  Tag,
   X0,
 } from "./parts";
 
@@ -171,9 +171,9 @@ export const SplitScene: React.FC = () => {
         {/* ── What groupby returns ── */}
         <Listing lines={['df.groupby("region")']} x={X0} top={objTop} width={420} size={SIZE} at={aloneAt} />
         <Note at={objAt} x={X0} y={objTop + listingHeight(1, SIZE) + h(30)}>
-          <Tag size={24} mono>
+          <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: BLUE_INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}>
             {SPLIT.grouped}
-          </Tag>
+          </span>
         </Note>
         <Note at={nothingAt} x={X0} y={objTop + listingHeight(1, SIZE) + h(96)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -190,7 +190,7 @@ export const SplitScene: React.FC = () => {
           marks={S.rows.map((_, row) => ({ row, col: 0, at: indexAt + row * 3 }))}
         />
         <Note at={seriesAt + 4} x={oneX} y={og.rowTop(S.rows.length) + h(22)}>
-          <Tag size={22}>Series</Tag>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 700 }}>Series</span>
         </Note>
 
         <Listing lines={N.lines} x={namedX} top={y(TOP)} width={520} size={SIZE} at={nameAt - 4} />
@@ -202,7 +202,7 @@ export const SplitScene: React.FC = () => {
           marks={N.rows.map((_, row) => ({ row, col: 0, at: indexAt + 4 + row * 3 }))}
         />
         <Note at={frameAt + 4} x={namedX} y={ng.rowTop(N.rows.length) + h(22)}>
-          <Tag size={22}>DataFrame</Tag>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 700 }}>DataFrame</span>
         </Note>
         <Note at={resetAt} x={X0} y={y(744)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>

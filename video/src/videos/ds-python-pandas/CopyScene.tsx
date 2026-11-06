@@ -23,7 +23,6 @@ import {
   Mono,
   OK_INK,
   TableName,
-  Tag,
   X0,
 } from "./parts";
 
@@ -166,10 +165,9 @@ export const CopyScene: React.FC = () => {
 
         {/* ── pandas 3 ── */}
         <Note at={threeAt} x={RIGHT_X} y={y(FRAME_Y) - h(4)} out={outChain}>
-          <Tag size={22} mono>
-            pandas {COPY.version}
-          </Tag>
-          <span style={{ ...note(24, INK_SOFT), marginLeft: 14, whiteSpace: "nowrap" }}>copy-on-write: every selection acts as a copy</span>
+          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+            <Mono color={BLUE_INK}>pandas {COPY.version}</Mono> · copy-on-write: every selection acts as a copy
+          </span>
         </Note>
         <ErrorBox
           x={RIGHT_X}
