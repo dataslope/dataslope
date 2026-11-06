@@ -3,6 +3,7 @@
 Brief: BRIEF.md in this folder. Layout only, no re-voicing, no new images.
 
 ## Wave 1 (started)
+(DS 0-3 done: only ds-interview had cards; DE-0 done.)
 - DE 0-3: de-interview, de-sql-patterns, de-sql-performance, de-dimensional-modeling
 - DE 4-7: de-modeling-history, de-python, de-pipelines, de-distributed
 - DE 8-11: de-streaming, de-warehousing, de-orchestration, de-pipelines-for-ai
@@ -22,9 +23,9 @@ Brief: BRIEF.md in this folder. Layout only, no re-voicing, no new images.
 - LLM 1-3: llm-tokens, llm-meaning, llm-attention-score, llm-generation (started when Part 5 finished)
 - LLM 4-5: llm-cost, llm-conversation-cost, llm-benchmarks, llm-temperature (started when the Stats 1-2 trim finished)
 - NLP 1-3: nlp-why-text-is-hard, nlp-cleaning-text, nlp-lemmas-and-tags, nlp-counting-words (started when the DbD 1-2 trim finished)
+- NLP 3-5: nlp-zipfs-law, nlp-text-to-features, nlp-history, tf-idf (started when DS 0-3 finished)
 
 ## Later waves (start one as each agent finishes)
-- NLP 3-5: nlp-zipfs-law, nlp-text-to-features, nlp-history, tf-idf
 - Standalone A: base-rate, box-sizing, c-pointers, java-equality, left-join-trap, list-vs-set
 - Standalone B: overfitting, pandas-groupby, random-walks, recursion-fib, simpsons-paradox, sql-null-trap
 - Standalone C: type-erasure, why-normalization, window-functions
