@@ -3,7 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { Illustration } from "../components/Illustration";
 import { INK } from "../editorial/style";
 import { AnimatedMark } from "../reveals/Mark";
-import { ds, inkOf } from "../theme/brand";
+import { ds } from "../theme/brand";
 import { SANS } from "../theme/fonts";
 
 /**
@@ -76,6 +76,10 @@ export type ThumbnailProps = {
    *  title, or in a hue with the label after it in black. Green marks the
    *  interview series apart from the courses' blue, the mark included. */
   role?: "black" | "blue" | "green";
+  /** The green role's shade: the brand's green ink (600, about 3.2:1 on
+   *  white), the brand green itself (500, the mark's, about 2.3:1), or
+   *  halfway between (550, about 2.7:1). */
+  greenShade?: 500 | 550 | 600;
   /** A course's "Full Course": smaller than the title, or the title's size. */
   kicker?: "small" | "same";
   /** Where the animal stands: on the line the words end on, or hung from
@@ -117,7 +121,21 @@ const Lines: React.FC<{ lines: string[]; style: React.CSSProperties }> = ({ line
 
 const TONE: Record<LabelTone, string> = { black: INK, "gray-600": ds("gray", 600), "gray-500": ds("gray", 500) };
 
-export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", tone = "gray-600", kicker = "small", artAt = "bottom", role = "black" }) => {
+const GREEN: Record<500 | 550 | 600, string> = {
+  500: ds("green", 500),
+  550: `color-mix(in srgb, ${ds("green", 500)}, ${ds("green", 600)})`,
+  600: ds("green", 600),
+};
+
+export const Thumbnail: React.FC<ThumbnailProps> = ({
+  track,
+  label = "prep",
+  tone = "gray-600",
+  kicker = "small",
+  artAt = "bottom",
+  role = "black",
+  greenShade = 550,
+}) => {
   const t = TRACKS[track];
   const course = t.kind === "course";
   const kick = kicker === "same" ? SIZE : KICKER;
@@ -157,7 +175,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({ track, label = "prep", ton
           // every line of the block is one step apart.
           <div style={{ ...type(kick, ds("blue", 500)), lineHeight: `${1.1 * SIZE}px` }}>Full Course</div>
         ) : null}
-        <Lines lines={t.title} style={type(SIZE, course || role === "black" ? INK : role === "green" ? inkOf.green : ds("blue", 500))} />
+        <Lines lines={t.title} style={type(SIZE, course || role === "black" ? INK : role === "green" ? GREEN[greenShade] : ds("blue", 500))} />
         {course ? null : (
           <div>
             <Lines lines={INTERVIEW[label]} style={type(SIZE, TONE[tone])} />

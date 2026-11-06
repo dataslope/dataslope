@@ -656,7 +656,9 @@ size (`Same`); an interview track saying "Interview Prep" (`Prep`) or
 "Interview Preparation" (`Preparation`), in the title's black or one of two
 greys, or in black after the role set in blue (`BlueRole`) or in green with
 a green mark (`GreenRole`): green tells the interview series apart from the
-courses' blue. For example `Thumb-DatabaseDesign-Same-Top` or
+courses' blue. The mark is the brand green (500); the role is a shade
+brighter than the green ink, halfway to it (`greenShade`, 550 by default,
+or 600 or 500). For example `Thumb-DatabaseDesign-Same-Top` or
 `Thumb-DataEngineer-Preparation-GreenRole-Top`.
 
 Each track has its own watercolor animal, so the seven read apart at a
