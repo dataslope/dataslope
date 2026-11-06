@@ -238,6 +238,12 @@ Every video follows these rules.
   line of its own. Headlines, code in the mono face and super- and
   subscripts are exempt. `check:frames` fails neighbours on a line that
   differ in size by more than 12% or in family (`[mixed]`).
+- **No cards unless the layout needs one.** Group with spacing and
+  alignment, and separate with at most a very subtle hairline, not with
+  bordered, rounded or tinted boxes around text, and not with outlined
+  pills for tags (the owner, 2026-11-06: "Using spacing or very subtle
+  separators should be preferred"). Code listings and data tables keep the
+  house look, since there the frame is the listing or the table itself.
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative

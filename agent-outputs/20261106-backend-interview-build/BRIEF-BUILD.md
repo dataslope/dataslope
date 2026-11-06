@@ -88,6 +88,13 @@ Timing (`pauseAfter`) and cues are yours.
    bleed as margin (copy a `Mark` from `src/videos/da-pandas/parts.tsx`,
    which already does). A flex row with an `em` gap carries its own
    `fontSize`. Nothing under 19px; about 25px between rows of text.
+2a. **No cards unless the layout needs one** (the owner, 2026-11-06). Group
+   with spacing and alignment; separate rows with at most a very subtle
+   hairline (`HAIRLINE`, 1px). No bordered, rounded or tinted boxes around
+   text (question bands, layer boxes, company cards, notes), and no outlined
+   pills for tags: set tags as plain text, separated by spacing or a middle
+   dot. Code listings and data tables keep the house look. A highlight
+   behind a word is not a card and stays.
 3. **Art. The layout comes first:** an image goes in only where there is
    enough whitespace and it does not hurt the page's design; judge each
    against the page without it, and when in doubt, leave it out. Your hero
