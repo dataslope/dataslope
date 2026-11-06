@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RECALL } from "./data";
-import { Drift, GOOD_INK, Headline, Illustrative, Kicker, Svg, Tag, X0 } from "./kit";
+import { Drift, GOOD, GOOD_INK, Headline, Illustrative, Kicker, Svg, Tag, X0 } from "./kit";
 
 /** Fig. 15: recall against position, 0 to 100% of the context. */
 const CX0 = 300;
@@ -133,15 +133,14 @@ export const MiddleScene: React.FC = () => {
         <Ink at={lostAt - 2} dur={18} style={{ left: xAt(worst.at) - 220, width: 440, top: yAt(0.87), textAlign: "center" }}>
           <span style={{ ...headline(46, true), color: ACCENT_INK }}>Lost in the middle</span>
         </Ink>
-        {/* The lesson's rule: what matters goes where recall is strong. Each
-            note sits centred under the tick it names, on the axis title's baseline. */}
-        <Note at={firstLastAt - 2} x={CX0 - 100} y={y(C_BASE) + 43} width={200} style={{ textAlign: "center" }}>
-          <Tag ink={GOOD_INK} size={22}>
+        {/* The lesson's rule: what matters goes where recall is strong. */}
+        <Note at={firstLastAt - 2} x={CX0 - 40} y={y(C_BASE) + 40}>
+          <Tag color={GOOD} ink={GOOD_INK} size={22}>
             key facts here
           </Tag>
         </Note>
-        <Note at={firstLastAt + 6} x={CX1 - 100} y={y(C_BASE) + 43} width={200} style={{ textAlign: "center" }}>
-          <Tag ink={GOOD_INK} size={22}>
+        <Note at={firstLastAt + 6} x={CX1 + 40} y={y(C_BASE) + 40} align="right">
+          <Tag color={GOOD} ink={GOOD_INK} size={22}>
             or here
           </Tag>
         </Note>
