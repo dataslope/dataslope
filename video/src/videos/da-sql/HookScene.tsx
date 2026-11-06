@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { HIGHLIGHT, INK, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Headline, Kicker, pulse, Spot, X0 } from "./parts";
@@ -17,6 +17,13 @@ const ROW_PITCH = 86;
 /** The questions taken slowly; the rest are the rapid-fire round. */
 const SLOW = 10;
 const TOTAL = 24;
+/** A tile is the house badge as a tile (editorial/ui): gray tint, gray ink,
+ *  no border. A slow one deepens to a stronger gray in the page's ink as the
+ *  narration counts it; not all of them are traps, so not the trap's red. */
+const PLAIN = badgeStyle("gray", 30);
+const SLOW_TINT = "color-mix(in srgb, var(--ds-gray-400) 40%, transparent)";
+/** `a` over `b` by `t` (0..1). */
+const mixTo = (a: string, t: number, b: string) => `color-mix(in srgb, ${a} ${(t * 100).toFixed(1)}%, ${b})`;
 
 /**
  * The opening: the SQL screen, and its twenty-four questions as numbered
@@ -67,7 +74,8 @@ export const HookScene: React.FC = () => {
           const tone = slow ? ease(frame, tenAt + i, 10) : ease(frame, fourteenAt + (i - SLOW), 10);
           const lit = i === 0 ? ease(frame, startAt, 10) : 0;
           const dim = i === 0 ? 0 : ease(frame, startAt + 4, 14) * 0.55;
-          const border = slow ? `color-mix(in srgb, ${INK} ${30 + 70 * tone}%, ${INK_SOFT})` : INK_SOFT;
+          const tile = slow ? mixTo(SLOW_TINT, tone, String(PLAIN.background)) : String(PLAIN.background);
+          const ink = slow ? mixTo(INK, tone, String(PLAIN.color)) : String(PLAIN.color);
           return (
             <div
               key={i}
@@ -77,18 +85,16 @@ export const HookScene: React.FC = () => {
                 top: y(GRID_Y + row * ROW_PITCH),
                 width: TILE_W,
                 height: h(TILE_H),
-                boxSizing: "border-box",
-                border: `${slow ? 2 + tone : 2}px solid ${border}`,
                 borderRadius: 8,
-                background: lit > 0 ? HIGHLIGHT : slow ? `color-mix(in srgb, ${INK} ${6 * tone}%, ${PAPER})` : PAPER,
+                background: lit > 0 ? HIGHLIGHT : tile,
                 opacity: p * (slow ? 1 : 0.45 + 0.55 * tone) * (1 - dim),
                 transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.06 * pulse(frame, startAt, 16)})`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(30, INK),
+                ...label(30, ink),
                 ...TABULAR,
-                fontWeight: 700,
+                fontWeight: 600,
               }}
             >
               {i + 1}
