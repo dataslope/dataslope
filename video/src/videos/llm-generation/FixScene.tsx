@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, body, INK, INK_SOFT, note, PAPER, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, note, PAPER, svgText } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, GOOD, GOOD_INK, Headline, Kicker, Marked, Mono, pulse, Spot, Svg, X0 } from "./kit";
+import { Drift, GOOD, GOOD_INK, Headline, Kicker, Marked, Mono, pulse, Spot, Svg, tint, X0 } from "./kit";
 
 const LEFT_W = 740;
 const RIGHT_X = 960;
@@ -19,54 +19,31 @@ const GLOSS = [
   "a schema leaves no field to invent",
 ] as const;
 
-/** A round badge: a tick or a cross. */
-const Badge: React.FC<{ kind: "yes" | "no"; at: number; x: number; y: number }> = ({ kind, at, x, y }) => {
+/** A round badge: a tick, a cross, or a number. A number is set in the
+ *  item's own face at 31px, within the 12% of the 34px item beside it that one
+ *  line may differ by, so its disc is a little larger than the tick's. */
+const Badge: React.FC<{ kind: "yes" | "no" | number; at: number; x: number; y: number }> = ({ kind, at, x, y }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const s = pop(frame, at, fps, 14);
   if (s <= 0.001) return null;
-  const color = kind === "yes" ? GOOD : ACCENT;
-  const r = 22;
+  const color = kind === "yes" ? GOOD : kind === "no" ? ACCENT : BAR;
+  const r = typeof kind === "number" ? 27 : 22;
   return (
     <Svg opacity={Math.min(1, s)}>
       <g transform={`translate(${x}, ${y}) scale(${0.6 + 0.4 * Math.min(1.1, s)})`}>
-        <circle r={r} fill={color} />
+        <circle r={r} fill={typeof kind === "number" ? tint(BAR, 22) : color} stroke={typeof kind === "number" ? BAR : "none"} strokeWidth={2} />
         {kind === "yes" ? (
           <path d="M-9,1 L-3,8 L10,-7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
-        ) : (
+        ) : kind === "no" ? (
           <path d="M-7,-7 L7,7 M7,-7 L-7,7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" />
+        ) : (
+          <text y={11} textAnchor="middle" style={svgText({ ...body(31), color: BLUE_INK, fontWeight: 600 })}>
+            {kind}
+          </text>
         )}
       </g>
     </Svg>
-  );
-};
-
-/** A fix's number, in the item's own face and size so the two read as one
- *  line, in the blue the circle it replaces was drawn in. It pops in the way
- *  that circle did, centred where the circle was. */
-const Numeral: React.FC<{ n: number; at: number; x: number; y: number }> = ({ n, at, x, y }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const s = pop(frame, at, fps, 14);
-  if (s <= 0.001) return null;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: x - 22,
-        top: y,
-        width: 44,
-        textAlign: "center",
-        ...body(34),
-        color: BLUE_INK,
-        fontWeight: 600,
-        opacity: Math.min(1, s),
-        transform: `scale(${0.6 + 0.4 * Math.min(1.1, s)})`,
-        ...TABULAR,
-      }}
-    >
-      {n}
-    </div>
   );
 };
 
@@ -156,7 +133,7 @@ export const FixScene: React.FC = () => {
         const swell = k === 0 ? pulse(frame, pastingAt - 2, 22) : 0;
         return (
           <React.Fragment key={k}>
-            <Numeral n={k + 1} at={itemAt[k] - 4} x={RIGHT_X + 22} y={y(ITEM_Y(k))} />
+            <Badge kind={k + 1} at={itemAt[k] - 4} x={RIGHT_X + 22} y={y(ITEM_Y(k)) + 22} />
             <Ink at={itemAt[k] - 2} dur={14} style={{ left: RIGHT_X + 64, top: y(ITEM_Y(k)), width: 800 }}>
               {/* A highlighted item gives back the 0.18em its Marked band adds on the left, so all four start on one edge. */}
               <div

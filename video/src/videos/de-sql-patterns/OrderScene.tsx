@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -39,7 +39,7 @@ const stepOf = (line: string) => STEPS.findIndex((s) => line.startsWith(s.clause
 /**
  * Questions 4 and 5: da-sql's OrderScene, copied and re-cued, on da-sql's
  * results (the Data Analyst page's 24 orders). The query as it is written,
- * each line numbered with where it runs, and the run order as a list of steps,
+ * each line badged with where it runs, and the run order as a list of steps,
  * with window functions computed at SELECT and QUALIFY right after them. WHERE
  * comes before both, so it can't see a row number or a SELECT alias; ORDER BY
  * can. Then question 5 on the same steps: the 24 orders going through WHERE
@@ -120,7 +120,7 @@ export const OrderScene: React.FC = () => {
             What is the difference between <QMono>WHERE</QMono> and <QMono>HAVING</QMono>?
           </QuestionCard>
 
-          {/* ── The query as it is written, each line numbered with its step ── */}
+          {/* ── The query as it is written, each line badged with its step ── */}
           <Listing
             lines={lines}
             x={X0}
@@ -145,7 +145,7 @@ export const OrderScene: React.FC = () => {
                 at={stepAt[s] + 2}
                 dur={10}
                 out={tryAt - 2}
-                style={{ left: X0 + LIST_W - 52, top: y(LIST_Y) + g.padY + i * g.lineH + g.lineH / 2 - 15 }}
+                style={{ left: X0 + LIST_W - 52, top: y(LIST_Y) + g.padY + i * g.lineH + g.lineH / 2 - BADGE / 2 }}
               >
                 <StepBadge n={s + 1} />
               </Ink>
@@ -309,19 +309,28 @@ export const OrderScene: React.FC = () => {
   );
 };
 
-/** A step's number, a plain numeral centred in a slot of its own, so the
- *  clauses beside a column of them line up. */
+/** A step's number in a ring. The ring is its old 36px; the numeral is set
+ *  at 24px, within 12% of the 24px query and the 26px clauses beside it. */
+const BADGE = 36;
 const StepBadge: React.FC<{ n: number }> = ({ n }) => (
   <span
     style={{
-      display: "inline-block",
-      width: 32,
-      textAlign: "center",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flex: "none",
+      width: BADGE,
+      height: BADGE,
+      borderRadius: 999,
+      border: `2px solid ${INK}`,
+      boxSizing: "border-box",
+      background: PAPER,
       ...label(24, INK),
+      ...TABULAR,
       fontWeight: 700,
     }}
   >
-    <Num>{n}</Num>
+    {n}
   </span>
 );
 
