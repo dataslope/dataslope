@@ -181,3 +181,26 @@ beats that say them checked for re-voicing cost, before phase 3.
 
 - Part 7: ASCII ("ask-ee").
 - Part 9: OWASP ("oh-wasp"), METR ("meter").
+- Parts 5 and 6: GIL ("gil"), SOLID ("solid"), YAGNI ("yag-nee"). Read
+  letter by letter as intended: CPU, IO, HTTP, OOP, UI, CSV (confirm the
+  voice spells IO out in "IO-bound").
+
+### What the writers found on the pages
+
+For the owner; nothing in `content/` was edited.
+
+- **ai-assisted-coding, the cost block:** "Here input dominates", but input
+  is $2,000 of $3,500 (57%), and per token output costs five times as much.
+- **ai-assisted-coding, the better prompt:** asks for a test of "a request
+  exactly 60 seconds after the first" without saying whether it should be
+  allowed, which leaves the edge case to the assistant.
+- **object-oriented-design, encapsulation:** says `BankAccount` "rejects
+  invalid operations, so no caller can push it negative", but run,
+  `BankAccount(-50)` opens at -50 and `withdraw(-30)` takes 100 to 130. The
+  challenge version also accepts a negative opening balance.
+- **concurrency, concept check 2:** its explanation is right (`+=` is not
+  atomic), but on current CPython that exact loop came out at exactly
+  2,000,000 in 5 of 5 runs; one function call between the read and the
+  write gave 1.31 to 1.77 million. "Can be less than two million" would be
+  accurate. The page also never mentions free-threaded CPython (supported
+  in 3.14).
