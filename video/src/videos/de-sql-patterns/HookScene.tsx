@@ -2,10 +2,10 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, body, label, note } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, body, label, note } from "../../editorial/style";
+import { badgeStyle, type BadgeTone, Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LOGINS } from "./data";
@@ -22,14 +22,28 @@ const CHIP_GAP = 8;
 const WORKED = 11;
 const TOTAL = 22;
 
+/** A question's disc: the house badge's tint and ink, in a hue. */
+type Disc = { background: string; color: string };
+const disc = (tone: BadgeTone): Disc => {
+  const b = badgeStyle(tone);
+  return { background: String(b.background), color: String(b.color) };
+};
+const DISC = { blue: disc("blue"), gray: disc("gray"), yellow: disc("yellow") };
+/** `a` over `b` by `t`, tint and ink alike. */
+const discTone = (a: Disc, b: Disc, t: number): Disc => ({
+  background: `color-mix(in srgb, ${a.background} ${Math.round(t * 100)}%, ${b.background})`,
+  color: `color-mix(in srgb, ${a.color} ${Math.round(t * 100)}%, ${b.color})`,
+});
+
 /**
  * The opening: user 1's logins from the page's daily_logins, thirteen days
  * of January as a strip of cells. The four empty days are pointed at, the
  * three streaks bracketed with their lengths, then three questions the strip
  * raises (missing days, streak lengths, the latest login) light their part of
  * it. The same thirteen days come back for the moving average, the spine and
- * the islands. Then the promise, as numbered chips: eleven on real queries,
- * eleven quickly; the first lights on the bridge into question 1.
+ * the islands. Then the promise, as twenty-two numbered discs (the house's
+ * badge, round): eleven on real queries, eleven quickly; the first lights on
+ * the bridge into question 1.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -145,6 +159,10 @@ export const HookScene: React.FC = () => {
         >
           <span style={TABULAR}>{TOTAL}</span> questions
         </div>
+        {/* The twenty-two as the house's badges, round: the eleven worked
+            through turn the data blue as they are counted, the eleven quick
+            ones stay gray and come up as they are named, and the first
+            turns the highlighter's yellow on the bridge. */}
         {Array.from({ length: TOTAL }, (_, i) => {
           const p = ease(frame, twentyTwoAt - 2 + i * 1.2, 10);
           if (p <= 0) return null;
@@ -152,7 +170,8 @@ export const HookScene: React.FC = () => {
           const tone = worked ? ease(frame, elevenAt + i * 2, 10) : ease(frame, quickAt + (i - WORKED), 10);
           const first = i === 0 ? ease(frame, firstAt, 10) : 0;
           const fade = i === 0 ? 0 : ease(frame, firstAt + 4, 14) * 0.5;
-          const fill = first > 0 ? ds("yellow", 400) : worked ? `color-mix(in srgb, ${BAR} ${25 + 75 * tone}%, ${PAPER})` : PAPER;
+          const base = worked ? discTone(DISC.blue, DISC.gray, tone) : DISC.gray;
+          const { background, color } = first > 0 ? discTone(DISC.yellow, base, first) : base;
           return (
             <div
               key={i}
@@ -162,17 +181,17 @@ export const HookScene: React.FC = () => {
                 top: y(CHIPS_Y),
                 width: CHIP,
                 height: CHIP,
-                borderRadius: CHIP / 2,
-                background: fill,
-                border: `2px solid ${worked || first > 0 ? "transparent" : `color-mix(in srgb, ${BAR} ${40 + 60 * tone}%, ${PAPER})`}`,
-                boxSizing: "border-box",
+                borderRadius: "50%",
+                background,
+                color,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(19, worked && tone > 0.5 && first === 0 ? PAPER : INK),
+                fontFamily: SANS,
+                fontSize: 19,
                 fontWeight: 700,
                 ...TABULAR,
-                opacity: p * (1 - fade),
+                opacity: p * (1 - fade) * (worked ? 1 : 0.55 + 0.45 * tone),
                 transform: `scale(${p * (1 + 0.15 * pulse(frame, firstAt, 16) * (i === 0 ? 1 : 0))})`,
               }}
             >

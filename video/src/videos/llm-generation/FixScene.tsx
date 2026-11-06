@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, note, PAPER, svgText } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, GOOD, GOOD_INK, Headline, Kicker, Marked, Mono, pulse, Spot, Svg, tint, X0 } from "./kit";
@@ -19,9 +19,13 @@ const GLOSS = [
   "a schema leaves no field to invent",
 ] as const;
 
-/** A round badge: a tick, a cross, or a number. A number is set in the
- *  item's own face at 31px, within the 12% of the 34px item beside it that one
- *  line may differ by, so its disc is a little larger than the tick's. */
+/** The house badge's blue tint and ink, for the numbered discs. */
+const NUMBER_BADGE = badgeStyle("blue", 31);
+
+/** A round badge: a tick, a cross, or a number. A number is a house badge as
+ *  a disc (its hue's tint, no ring), set in the item's own face at 31px,
+ *  within the 12% of the 34px item beside it that one line may differ by, so
+ *  its disc is a little larger than the tick's. */
 const Badge: React.FC<{ kind: "yes" | "no" | number; at: number; x: number; y: number }> = ({ kind, at, x, y }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -32,13 +36,13 @@ const Badge: React.FC<{ kind: "yes" | "no" | number; at: number; x: number; y: n
   return (
     <Svg opacity={Math.min(1, s)}>
       <g transform={`translate(${x}, ${y}) scale(${0.6 + 0.4 * Math.min(1.1, s)})`}>
-        <circle r={r} fill={typeof kind === "number" ? tint(BAR, 22) : color} stroke={typeof kind === "number" ? BAR : "none"} strokeWidth={2} />
+        {typeof kind === "number" ? <circle r={r} style={{ fill: String(NUMBER_BADGE.background) }} /> : <circle r={r} fill={color} />}
         {kind === "yes" ? (
           <path d="M-9,1 L-3,8 L10,-7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
         ) : kind === "no" ? (
           <path d="M-7,-7 L7,7 M7,-7 L-7,7" fill="none" stroke={PAPER} strokeWidth={4} strokeLinecap="round" />
         ) : (
-          <text y={11} textAnchor="middle" style={svgText({ ...body(31), color: BLUE_INK, fontWeight: 600 })}>
+          <text y={11} textAnchor="middle" style={svgText({ ...body(31), color: String(NUMBER_BADGE.color), fontWeight: 600 })}>
             {kind}
           </text>
         )}

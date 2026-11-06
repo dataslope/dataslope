@@ -4,8 +4,8 @@ import { ease } from "../../components/motion";
 import { OK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Ink, Note, Num } from "../../editorial/ui";
-import { MONO } from "../../theme/fonts";
+import { badgeStyle, Ink, Note, Num } from "../../editorial/ui";
+import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { WHERE } from "./data";
@@ -309,25 +309,24 @@ export const OrderScene: React.FC = () => {
   );
 };
 
-/** A step's number in a ring. The ring is its old 36px; the numeral is set
- *  at 24px, within 12% of the 24px query and the 26px clauses beside it. */
+/** A step's number on a disc: the house badge, round, in gray, no ring.
+ *  36px across; the numeral at 24px, within 12% of the 24px query and the
+ *  26px clauses beside it. */
 const BADGE = 36;
 const StepBadge: React.FC<{ n: number }> = ({ n }) => (
   <span
     style={{
+      ...badgeStyle("gray", 24),
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
       flex: "none",
       width: BADGE,
       height: BADGE,
-      borderRadius: 999,
-      border: `2px solid ${INK}`,
-      boxSizing: "border-box",
-      background: PAPER,
-      ...label(24, INK),
+      padding: 0,
+      borderRadius: "50%",
+      fontFamily: SANS,
       ...TABULAR,
-      fontWeight: 700,
     }}
   >
     {n}
