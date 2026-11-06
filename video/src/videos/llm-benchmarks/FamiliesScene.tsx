@@ -3,19 +3,26 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { HAIRLINE, INK, INK_SOFT, label, note, PAPER, TABULAR, svgText } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { QUOTED } from "./data";
-import { A, A_INK, Arrow, B, Check, Count, Drift, FAINT, Headline, lerp, OK, PANEL, pulse, Svg, X0 } from "./parts";
+import { A, A_INK, Arrow, B, Check, Count, Drift, FAINT, Headline, lerp, OK, pulse, Svg, X0 } from "./parts";
 
-const CARD_X = [X0, 555, 990, 1425];
-const CARD_W = 380;
-const CARD_TOP = 352;
-/** The glyph's box inside a card, in layout units from the card's top. */
+/** The four benchmarks as four columns of plain text and pictures, no cards:
+ *  each column's left edge and the width its widest piece (GPQA's track)
+ *  takes, spread so the last ends at the page's right margin, with a
+ *  hairline centred in each gap. */
+const COL_X = [X0, 573, 1026, 1480];
+const COL_W = 320;
+const COL_TOP = 352;
+/** The picture under a column's name, in layout units from the column's top. */
 const GLYPH_TOP = 64;
 const TEXT_TOP = 318;
+/** The deepest column's text (ARC-AGI's four lines) ends this far under
+ *  TEXT_TOP, in px: where the hairlines stop. */
+const TEXT_DEPTH = 3 * 31 + 30;
 
 /** The ARC-style puzzles: a 3x3 input and the output its rule makes. Drawn,
  *  not real tasks: the cells only show what a grid puzzle looks like. */
@@ -23,7 +30,7 @@ const GRID_IN = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 const GRID_OUT = [0, 0, 1, 0, 1, 0, 1, 0, 0];
 
 /**
- * What the four families of benchmark ask (Fig. 3), one card per beat, each
+ * What the four families of benchmark ask (Fig. 3), one column per beat, each
  * with a small working picture: MMLU's four options and its fifty-seven
  * subjects, GPQA Diamond's 34% for PhDs outside the field, SWE-bench's issue,
  * patch and tests, and ARC-AGI's grid puzzle, then its game.
@@ -60,12 +67,15 @@ export const FamiliesScene: React.FC = () => {
   const end = n.beat("read").from;
 
   const cardAt = [mmluAt - 6, gpqaAt - 6, sweAt - 6, arcAt - 6];
-  const top = y(CARD_TOP);
+  const top = y(COL_TOP);
+  // The hairlines run from the names to the last line of text under them.
+  const ruleTop = top + h(22);
+  const ruleH = top + h(TEXT_TOP) + TEXT_DEPTH - ruleTop;
   const gy = (v: number) => top + h(GLYPH_TOP + v);
 
   return (
     <AbsoluteFill>
-      {/* ── Sound: each card, and the piece of each picture that lands ── */}
+      {/* ── Sound: each column, and the piece of each picture that lands ── */}
       {cardAt.map((at, i) => (
         <Sfx key={i} name="el-pop" at={at + 2} level={-31} />
       ))}
@@ -80,57 +90,55 @@ export const FamiliesScene: React.FC = () => {
       <FigLabel n="3" title="What four benchmarks ask" at={fixedAt - 2} x={X0} y={y(296)} />
 
       <Drift from={from} to={end} amount={0.012} origin="50% 60%">
-        {/* The cards' frames, so the four places are set out from the start. */}
-        {CARD_X.map((x, i) => (
-          <Svg key={i} opacity={ease(frame, fixedAt + i * 3, 14) * (0.5 + 0.5 * ease(frame, cardAt[i], 10))}>
-            <rect x={x} y={top} width={CARD_W} height={h(470)} rx={14} fill={PANEL} stroke={FAINT} strokeWidth={1.6} />
-          </Svg>
+        {/* A hairline in each gap, inking in with the column to its right. */}
+        {[1, 2, 3].map((i) => (
+          <ColumnRule key={i} x={(COL_X[i - 1] + COL_W + COL_X[i]) / 2} top={ruleTop} height={ruleH} at={cardAt[i]} />
         ))}
 
         {/* ── MMLU: one question, four options, fifty-seven subjects ── */}
-        <CardTitle x={CARD_X[0]} top={top} at={cardAt[0]} name="MMLU" />
+        <CardTitle x={COL_X[0]} top={top} at={cardAt[0]} name="MMLU" />
         <Svg opacity={ease(frame, cardAt[0] + 4, 12)}>
           {[0, 1, 2, 3].map((k) => {
             const oy = gy(40 + k * 44);
             const picked = k === 2 ? ease(frame, choiceAt + 4, 10) : 0;
             return (
               <g key={k} opacity={ease(frame, cardAt[0] + 6 + k * 3, 10)}>
-                <circle cx={CARD_X[0] + 46} cy={oy} r={11} fill={picked > 0 ? A : PAPER} stroke={picked > 0 ? A : INK_SOFT} strokeWidth={2.2} />
-                <rect x={CARD_X[0] + 72} y={oy - 5} width={[190, 150, 210, 130][k]} height={10} rx={5} fill={B} opacity={0.55} />
+                <circle cx={COL_X[0] + 16} cy={oy} r={11} fill={picked > 0 ? A : PAPER} stroke={picked > 0 ? A : INK_SOFT} strokeWidth={2.2} />
+                <rect x={COL_X[0] + 42} y={oy - 5} width={[190, 150, 210, 130][k]} height={10} rx={5} fill={B} opacity={0.55} />
               </g>
             );
           })}
         </Svg>
-        <Ink at={fiftyAt - 2} dur={12} style={{ left: CARD_X[0] + 30, top: gy(210) - 12, whiteSpace: "nowrap" }}>
+        <Ink at={fiftyAt - 2} dur={12} style={{ left: COL_X[0], top: gy(210) - 12, whiteSpace: "nowrap" }}>
           <span style={{ ...label(26, A_INK), fontWeight: 700 }}>
             <Count at={fiftyAt - 2} to={QUOTED.mmluSubjects} dur={18} />
           </span>
           <span style={{ ...label(24, INK), marginLeft: 10 }}>subjects</span>
         </Ink>
-        <CardText x={CARD_X[0]} top={top + h(TEXT_TOP)} lines={[[choiceAt, "Multiple choice,"], [mathAt, "elementary math"], [lawAt, "to professional law"]]} />
+        <CardText x={COL_X[0]} top={top + h(TEXT_TOP)} lines={[[choiceAt, "Multiple choice,"], [mathAt, "elementary math"], [lawAt, "to professional law"]]} />
 
         {/* ── GPQA Diamond: the bar PhDs from other fields reach ── */}
-        <CardTitle x={CARD_X[1]} top={top} at={cardAt[1]} name="GPQA Diamond" />
-        <GpqaBar x={CARD_X[1] + 30} y={gy(150)} w={CARD_W - 60} at={phdAt} fill={thirtyAt} value={QUOTED.gpqaNonExpertPhd} />
-        <Ink at={phdAt - 2} dur={12} style={{ left: CARD_X[1] + 30, top: gy(40) - 14, width: CARD_W - 60 }}>
+        <CardTitle x={COL_X[1]} top={top} at={cardAt[1]} name="GPQA Diamond" />
+        <GpqaBar x={COL_X[1]} y={gy(150)} w={COL_W} at={phdAt} fill={thirtyAt} value={QUOTED.gpqaNonExpertPhd} />
+        <Ink at={phdAt - 2} dur={12} style={{ left: COL_X[1], top: gy(40) - 14, width: COL_W }}>
           <span style={{ ...note(22, INK), lineHeight: 1.25 }}>PhDs from other fields,</span>
         </Ink>
-        <Ink at={webAt - 4} dur={12} style={{ left: CARD_X[1] + 30, top: gy(70) - 14, width: CARD_W - 60 }}>
+        <Ink at={webAt - 4} dur={12} style={{ left: COL_X[1], top: gy(70) - 14, width: COL_W }}>
           <span style={{ ...note(22, INK), lineHeight: 1.25 }}>with web access</span>
         </Ink>
-        <CardText x={CARD_X[1]} top={top + h(TEXT_TOP)} lines={[[scienceAt, "Graduate-level biology,"], [scienceAt + 6, "chemistry and physics"]]} />
+        <CardText x={COL_X[1]} top={top + h(TEXT_TOP)} lines={[[scienceAt, "Graduate-level biology,"], [scienceAt + 6, "chemistry and physics"]]} />
 
         {/* ── SWE-bench: issue, patch, the project's own tests ── */}
-        <CardTitle x={CARD_X[2]} top={top} at={cardAt[2]} name="SWE-bench Verified" />
-        <SweFlow x={CARD_X[2] + 30} y={gy(30)} issueAt={issueAt} patchAt={patchAt} testsAt={testsAt} />
-        <CardText x={CARD_X[2]} top={top + h(TEXT_TOP)} lines={[[issueAt, "A real GitHub issue;"], [patchAt, "the patch must pass"], [testsAt, "the project's own tests"]]} />
+        <CardTitle x={COL_X[2]} top={top} at={cardAt[2]} name="SWE-bench Verified" />
+        <SweFlow x={COL_X[2]} y={gy(30)} issueAt={issueAt} patchAt={patchAt} testsAt={testsAt} />
+        <CardText x={COL_X[2]} top={top + h(TEXT_TOP)} lines={[[issueAt, "A real GitHub issue;"], [patchAt, "the patch must pass"], [testsAt, "the project's own tests"]]} />
 
         {/* ── ARC-AGI: the rule behind a grid, then a game ── */}
-        <CardTitle x={CARD_X[3]} top={top} at={cardAt[3]} name="ARC-AGI" />
-        <ArcGrids x={CARD_X[3] + 30} y={gy(20)} gridAt={gridAt} ruleAt={ruleAt} />
-        <ArcGame x={CARD_X[3] + 30} y={gy(134)} at={versionAt} playAt={playingAt} />
+        <CardTitle x={COL_X[3]} top={top} at={cardAt[3]} name="ARC-AGI" />
+        <ArcGrids x={COL_X[3]} y={gy(20)} gridAt={gridAt} ruleAt={ruleAt} />
+        <ArcGame x={COL_X[3]} y={gy(134)} at={versionAt} playAt={playingAt} />
         <CardText
-          x={CARD_X[3]}
+          x={COL_X[3]}
           top={top + h(TEXT_TOP)}
           lines={[
             [gridAt, "Find the rule behind"],
@@ -144,12 +152,12 @@ export const FamiliesScene: React.FC = () => {
   );
 };
 
-/** A card's name, inked on its cue with a small swell as it lands. */
+/** A column's name, inked on its cue with a small swell as it lands. */
 const CardTitle: React.FC<{ x: number; top: number; at: number; name: string }> = ({ x, top, at, name }) => {
   const frame = useCurrentFrame();
   const { h } = useLayout();
   return (
-    <Ink at={at} dur={14} style={{ left: x + 30, top: top + h(22), whiteSpace: "nowrap" }}>
+    <Ink at={at} dur={14} style={{ left: x, top: top + h(22), whiteSpace: "nowrap" }}>
       <span style={{ ...label(28, INK), fontWeight: 700, transform: `scale(${1 + pulse(frame, at + 10, 18) * 0.04})`, display: "inline-block" }}>
         {name}
       </span>
@@ -157,11 +165,11 @@ const CardTitle: React.FC<{ x: number; top: number; at: number; name: string }> 
   );
 };
 
-/** Up to four lines of a card's description, each inked on its own cue. */
+/** Up to four lines of a column's description, each inked on its own cue. */
 const CardText: React.FC<{ x: number; top: number; lines: [number, string][] }> = ({ x, top, lines }) => (
   <>
     {lines.map(([at, text], i) => (
-      <Ink key={i} at={at - 2} dur={12} style={{ left: x + 30, top: top + i * 31, whiteSpace: "nowrap" }}>
+      <Ink key={i} at={at - 2} dur={12} style={{ left: x, top: top + i * 31, whiteSpace: "nowrap" }}>
         <span style={note(23, INK)}>{text}</span>
       </Ink>
     ))}

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -208,20 +208,10 @@ export const NullScene: React.FC = () => {
       />
 
       {/* "Could two of them share one?" */}
-      <Ink at={shareAt - 6} dur={16} style={{ left: TABLE_X, top: g.rowTop(1) + h(16), display: "flex", gap: 18, alignItems: "center" }}>
-        <span
-          style={{
-            display: "inline-block",
-            padding: "6px 16px",
-            border: `2px dashed ${HAIRLINE}`,
-            borderRadius: 6,
-            fontFamily: MONO,
-            fontSize: 26,
-            color: INK_SOFT,
-          }}
-        >
-          {stored[1]}
-        </span>
+      <Ink at={shareAt - 6} dur={16} style={{ left: TABLE_X + 20, top: g.rowTop(1) + h(16) + 7, display: "flex", gap: 18, alignItems: "baseline" }}>
+        {/* The would-be second email, in the soft ink of a value not yet
+            stored: plain code, set where the next row's first cell would start (the table pads its cells 20px). */}
+        <span style={{ fontFamily: MONO, fontSize: 26, color: INK_SOFT, whiteSpace: "nowrap" }}>{stored[1]}</span>
         <span style={{ ...note(26, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>twice?</span>
       </Ink>
       <Note at={leaveAt + 10} x={TABLE_X} y={g.top - h(40)} out={senseAt}>

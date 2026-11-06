@@ -16,12 +16,13 @@ const M_BASE = 600;
 const M_TALL = 220;
 /** The three designs: three plain columns, each a title and under it a
  *  sketch of the data it takes, with a hairline in each gap instead of a
- *  box round each. A column's left edge, then the gap's centre, in px; the
- *  columns' widths (the first's title, the other two's sketch or title,
- *  about 355, 415 and 410px) spread them across the page's 160 to 1760. */
+ *  box round each. A column's left edge, then each gap's centre, in px. The
+ *  columns run 334, 412 and 406px wide as drawn (the first and last their
+ *  titles, the middle its two strips), so equal 224px gaps spread them
+ *  across the page's 160 to 1760. */
 const DESIGN_Y = 690;
-const DESIGN_X = [160, 730, 1350];
-const RULE_X = [622, 1247];
+const DESIGN_X = [160, 718, 1354];
+const RULE_X = [606, 1242];
 /** A title's line, then its sketch 11px under it, in px. */
 const SKETCH_DY = 42;
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, RapidFire, type RapidItem } from "../../editorial/interview";
+import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK, INK_SOFT, TABULAR, fmt, label, note } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
@@ -22,6 +22,7 @@ import {
   listingHeight,
   MARK_BAD,
   MARK_OK,
+  Mono,
   OK,
   OK_INK,
   rowsAt,
@@ -126,7 +127,7 @@ const Conversion: React.FC<{ c: Ctx }> = ({ c }) => {
 
       <Note at={zeroAt - 2} x={LX} y={top2 + listingHeight(wrong.length, SIZE) + c.h(24)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          <QMono>* 1.0</QMono>: no whole-number division, where {firsts.length} / {users} would be 0
+          <Mono>* 1.0</Mono>: no whole-number division, where {firsts.length} / {users} would be 0
         </span>
       </Note>
     </>
