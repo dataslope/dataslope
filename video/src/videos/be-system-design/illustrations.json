@@ -48,6 +48,78 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a small desk globe on a curved metal stand, tilted on its axis, its oceans in soft blue washes and its land in green and yellow washes"
+    },
+    {
+      "id": "be-system-design-clipboard",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a wooden clipboard with a chunky metal clip at the top, holding one sheet of paper marked with two short side-by-side columns of plain ruled lines, each line starting with a small empty tick box"
+    },
+    {
+      "id": "be-system-design-drives",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a short stack of three chunky hard disk drives lying flat, each one a thick solid metal brick with a small round dial set into its top face"
+    },
+    {
+      "id": "be-system-design-memory",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single computer memory module lying at a slight diagonal: a long narrow circuit board in green washes with a row of small rectangular chips in deep blue along it and a strip of yellow gold contacts along its lower edge"
+    },
+    {
+      "id": "be-system-design-ssd",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small solid-state drive seen at a slight angle: a slim, flat rectangular case in soft blue washes with a short strip of yellow gold contacts along one narrow end"
+    },
+    {
+      "id": "be-system-design-rack",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a tall server rack cabinet in deep blue washes, its open front filled with a neat stack of flat server units, each unit carrying two or three tiny green and yellow indicator lights"
+    },
+    {
+      "id": "be-system-design-stopwatch",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a classic mechanical stopwatch with a round face, a single thin hand, a crown button on top and a small side button, its case in warm yellow washes and its face in pale blue"
+    },
+    {
+      "id": "be-system-design-key",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an old-fashioned door key lying at a slight diagonal, with a large round bow, a long shank and a few chunky teeth, painted in warm yellow and orange washes"
+    },
+    {
+      "id": "be-system-design-counter",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a handheld mechanical tally counter: a small round metal body in blue washes with a finger ring underneath and a chunky press button on top, its small window showing a row of plain blank wheels"
+    },
+    {
+      "id": "be-system-design-opera",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "the Sydney Opera House: its curved sail-shaped shells painted in pale blue and warm yellow washes, rising from a low base above a thin sliver of blue harbour water"
+    },
+    {
+      "id": "be-system-design-fiber",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a loose round coil of thin fiber-optic cable in blue washes, with one cut end lifted out of the coil and painted bright yellow"
+    },
+    {
+      "id": "be-system-design-reel",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a vintage film reel with round holes in its face, painted in blue washes, a short loop of film strip unwinding from it"
+    },
+    {
+      "id": "be-system-design-hourglass",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small hourglass in a wooden frame with turned posts, most of its yellow sand already run into the lower bulb"
     }
   ]
 }

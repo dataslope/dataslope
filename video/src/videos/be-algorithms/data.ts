@@ -36,6 +36,15 @@ export const BIG_O = {
   passSeconds: A.bigO.passSeconds,
 } as const;
 
+/** The chance that `keys` keys hashed uniformly into `buckets` buckets put
+ *  two in one bucket: 1 - (1 - 1/b)(1 - 2/b)...(1 - (k-1)/b), the formula
+ *  check.mjs evaluates for `collisions`. */
+export const sharedChance = (keys: number, buckets: number) => {
+  let none = 1;
+  for (let i = 1; i < keys; i++) none *= 1 - i / buckets;
+  return 1 - none;
+};
+
 /** 2. Two Sum on the challenge's example, the birthday bound, and the hash
  *  set's worst case (__eq__ calls). */
 export const HASH = {
@@ -51,8 +60,19 @@ export const HASH = {
 } as const;
 
 /** 3. A Python list's resizes over a million appends: [items before the
- *  resize, slots after]. And the doubling array's, as arithmetic. */
+ *  resize, slots after] in `steps`. And the doubling array's, as arithmetic. */
 export const AMORTIZED = C.amortized;
+
+/** Copies made by the first `k` appends to a Python list, if each resize
+ *  copied every item so far: the sum over the resizes `k` has reached. */
+export const listCopiesAt = (k: number) => AMORTIZED.steps.reduce((sum, [items]) => (items < k ? sum + items : sum), 0);
+
+/** The doubling array's capacities: 1, 2, 4, ... up to the last below a
+ *  million (check.mjs's dbl_caps), each copied in full when it fills. */
+export const DOUBLING_CAPS = Array.from({ length: AMORTIZED.doublingResizes }, (_, i) => 2 ** i);
+
+/** Copies a doubling array has made by its `k`th append. */
+export const doublingCopiesAt = (k: number) => DOUBLING_CAPS.reduce((sum, cap) => (cap < k ? sum + cap : sum), 0);
 
 /** 4. "([)]" and "{[]}" through a counter, a queue and a stack. */
 export const BRACKETS = C.brackets as readonly { s: string; count: boolean; queue: boolean; stack: boolean }[];
@@ -86,8 +106,23 @@ export const DIJKSTRA = {
   bfEdges: C.dijkstra.bfEdges,
 } as const;
 
-/** 8. Quicksort on a thousand sorted numbers, and on shuffled ones. */
+/** 8. Quicksort on a thousand sorted numbers, and on shuffled ones;
+ *  `randomPartitions` is every partition of the random-pivot run, [depth,
+ *  lo, hi]. The last-pivot run's partition at depth d is [0, n - d]. */
 export const QUICKSORT = C.quicksort;
+
+/** The inputs of the page's snippets whose outputs the quick rounds draw,
+ *  as check.mjs's PAGE runs them (the outputs are PAGE's, above). */
+export const PAGE_INPUTS = {
+  mergeSort: [38, 27, 43, 3, 9, 82, 10],
+  inorder: [5, 3, 7, 1, 4],
+  twoPointers: { nums: [1, 2, 3, 4, 6], target: 6 },
+  window: "abcabcbb",
+  bits: [4, 1, 2, 1, 2],
+  permutations: [1, 2, 3],
+  topo: { A: ["C"], B: ["C"], C: ["D"], D: [] } as Record<string, string[]>,
+  cyclic: { A: ["B"], B: ["C"], C: ["A"] } as Record<string, string[]>,
+} as const;
 
 /** The quick rounds' numbers, and the adjacency arithmetic. */
 export const RAPID = { ...C.rapid, adjacency: A.adjacency } as const;

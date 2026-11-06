@@ -9,12 +9,9 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "be-object-design";
 
-/**
- * Whether public/images/be-object-design/ holds the watercolors from
- * illustrations.json. They are generated in phase 2; every frame is laid out
- * with room for them either way.
- */
-export const ILLUSTRATIONS = false;
+/** Whether public/images/be-object-design/ holds the watercolors from
+ *  illustrations.json (generated on GPT Image 2.6 flare, 2026-11-06). */
+export const ILLUSTRATIONS = true;
 
 export const PYTHON = results.runtime;
 

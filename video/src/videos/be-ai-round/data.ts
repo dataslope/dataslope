@@ -11,10 +11,25 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "be-ai-round";
 
-/** Whether public/images/be-ai-round/ holds the watercolors from
- *  illustrations.json. Phase 2 generates them; every frame is laid out with
- *  room for them either way. */
-export const ILLUSTRATIONS = false;
+/** public/images/be-ai-round/ holds the watercolors from illustrations.json:
+ *  the lemur and eight small spots. */
+export const ILLUSTRATIONS = true;
+
+/** The series' ten videos for the close, each with the hero its own folder
+ *  draws (agent-outputs/20261106-backend-interview-video-plan.md), from the
+ *  overview's capybara to this video's lemur. */
+export const SERIES = [
+  { n: 0, title: "The interview", video: "be-interview", hero: "be-interview-capybara" },
+  { n: 1, title: "System design", video: "be-system-design", hero: "be-system-design-crow" },
+  { n: 2, title: "Scaling", video: "be-scaling", hero: "be-scaling-bison" },
+  { n: 3, title: "API design", video: "be-api-design", hero: "be-api-design-puffin" },
+  { n: 4, title: "Databases", video: "be-databases", hero: "be-databases-chipmunk" },
+  { n: 5, title: "Concurrency", video: "be-concurrency", hero: "be-concurrency-hummingbird" },
+  { n: 6, title: "Objects", video: "be-object-design", hero: "be-object-design-armadillo" },
+  { n: 7, title: "Code review", video: "be-code-review", hero: "be-code-review-lynx" },
+  { n: 8, title: "Algorithms", video: "be-algorithms", hero: "be-algorithms-pangolin" },
+  { n: 9, title: "The AI round", video: "be-ai-round", hero: "be-ai-round-lemur" },
+] as const;
 
 export const RUNTIME: string = results.runtime;
 
