@@ -649,17 +649,16 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
 
 ## YouTube thumbnails
 
-Stills in the Studio's `Thumbnails` folder, 1280x720, in variations for each
-merged course and interview track: the animal low (`Bottom`) or high
-(`Top`); a course's "Full Course" smaller than its title (`Small`) or at its
-size (`Same`); an interview track saying "Interview Prep" (`Prep`) or
-"Interview Preparation" (`Preparation`), in the title's black or one of two
-greys, or in black after the role set in blue (`BlueRole`) or in green with
-a green mark (`GreenRole`): green tells the interview series apart from the
-courses' blue. The mark is the brand green (500); the role is a shade
-brighter than the green ink, halfway to it (`greenShade`, 550 by default,
-or 600 or 500). For example `Thumb-DatabaseDesign-Same-Top` or
-`Thumb-DataEngineer-Preparation-GreenRole-Top`.
+Stills in the Studio's `Thumbnails` folder, 1280x720. A course has
+"Full Course" above its title, smaller (`Small`) or at its size (`Same`),
+with the animal low (`Bottom`) or high (`Top`). An interview track says
+"Interview Questions" with the animal hung top-right and a green mark,
+green being the interview series' color against the courses' blue: the
+role in green (`GreenRole`), or the role in black and the label in green
+after it (`GreenLabel`) or above it (`GreenLabelFirst`); `BlueRole` and
+`BlackRole` remain for comparison. Other labels ("Interview Prep"), greys
+and green shades are props. For example `Thumb-DatabaseDesign-Same-Top` or
+`Thumb-DataEngineer-Questions-GreenLabel-Top`.
 
 Each track has its own watercolor animal, so the seven read apart at a
 glance in a list of results: an owl on a die (Statistics), an elephant at a
@@ -672,16 +671,14 @@ wordmark), the words low on the left and the animal on the right: standing
 on the line the words end on, or hung from the top-right corner, level with
 the mark and as far in from the edge.
 
-- **One weight.** Every word is Inter 500. The title is 80px (`SIZE`) in
-  black; a course's "Full Course" sits above it in the brand blue, smaller
-  (52px) or at the title's size; an interview track's "Interview Prep"
-  follows the title at the title's size, in the title's black or a neutral
-  grey (`gray-600`, the soft ink, or `gray-500`). No pills or badges; the
-  words sit on the page.
+- **One weight, one pitch.** Every word is Inter 500 and every line sits on
+  the title's line pitch, blue or green lines included, with nothing added
+  between them. The title is 80px (`SIZE`); a course's "Full Course" is
+  52px or the title's size. No pills or badges; the words sit on the page.
 - **Seen small.** A thumbnail is about 168x94 on a phone, where 80px is about
-  10px, so the words are few. The widest line, "Natural Language", fits the
-  680px the words have; "Interview Preparation" does not, so it takes two
-  lines.
+  10px, so the words are few. "Interview Questions", the widest line at
+  about 730px, fits beside the animal hung top-right; "Interview
+  Preparation" does not fit at all, so it takes two lines.
 - **Nothing in the bottom-right corner**, where YouTube prints the running
   time. The animal's box stops well short of it.
 - **The art goes through the pipeline.** The five new animals are prompts in

@@ -56,22 +56,29 @@ export const TRACKS: Record<string, Track> = {
   DataEngineer: { kind: "interview", title: ["Data Engineer"], art: { video: "de-interview", id: "de-interview-meerkat" } },
 };
 
-/** How an interview track names itself. "Interview Preparation" is too wide
- *  for one line at SIZE, so it takes two. */
-export type InterviewLabel = "prep" | "preparation";
+/** How an interview track names itself: "Interview Questions" (the
+ *  series' name), or the earlier "Interview Prep" and "Interview
+ *  Preparation", which is too wide for one line at SIZE and takes two.
+ *  "Interview Questions" fits one line (about 730px) beside the animal
+ *  hung top-right, not beside one standing bottom-right. */
+export type InterviewLabel = "questions" | "prep" | "preparation";
 const INTERVIEW: Record<InterviewLabel, string[]> = {
+  questions: ["Interview Questions"],
   prep: ["Interview Prep"],
   preparation: ["Interview", "Preparation"],
 };
 
 /** The color an interview label is set in: the title's black, the brand's
  *  soft ink (gray 600), or a step lighter (gray 500). All clear AA on white. */
-export type LabelTone = "black" | "gray-600" | "gray-500";
+export type LabelTone = "black" | "gray-600" | "gray-500" | "green";
 
 export type ThumbnailProps = {
   track: keyof typeof TRACKS;
   label?: InterviewLabel;
   tone?: LabelTone;
+  /** An interview track's label above its role, as "Full Course" sits
+   *  above a course's title, rather than after it. */
+  labelFirst?: boolean;
   /** An interview track's role ("Data Analyst"): black like a course
    *  title, or in a hue with the label after it in black. Green marks the
    *  interview series apart from the courses' blue, the mark included. */
@@ -119,7 +126,7 @@ const Lines: React.FC<{ lines: string[]; style: React.CSSProperties }> = ({ line
   </>
 );
 
-const TONE: Record<LabelTone, string> = { black: INK, "gray-600": ds("gray", 600), "gray-500": ds("gray", 500) };
+const TONE: Record<Exclude<LabelTone, "green">, string> = { black: INK, "gray-600": ds("gray", 600), "gray-500": ds("gray", 500) };
 
 const GREEN: Record<500 | 550 | 600, string> = {
   500: ds("green", 500),
@@ -129,15 +136,17 @@ const GREEN: Record<500 | 550 | 600, string> = {
 
 export const Thumbnail: React.FC<ThumbnailProps> = ({
   track,
-  label = "prep",
+  label = "questions",
   tone = "gray-600",
   kicker = "small",
   artAt = "bottom",
   role = "black",
   greenShade = 550,
+  labelFirst = false,
 }) => {
   const t = TRACKS[track];
   const course = t.kind === "course";
+  const labelInk = tone === "green" ? GREEN[greenShade] : TONE[tone];
   const kick = kicker === "same" ? SIZE : KICKER;
   const top = artAt === "top";
   return (
@@ -145,7 +154,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
       {/* The mark alone, no wordmark. A motion that has long since landed
           draws the finished mark. */}
       <div style={{ position: "absolute", left: PAD, top: 52 }}>
-        <AnimatedMark motion="assemble" at={-120} height={56} color={!course && role === "green" ? ds("green", 500) : ds("blue", 500)} />
+        <AnimatedMark motion="assemble" at={-120} height={56} color={!course && (role === "green" || tone === "green") ? ds("green", 500) : ds("blue", 500)} />
       </div>
 
       {/* The animal, either standing on the same line as the last line of
@@ -175,12 +184,9 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
           // every line of the block is one step apart.
           <div style={{ ...type(kick, ds("blue", 500)), lineHeight: `${1.1 * SIZE}px` }}>Full Course</div>
         ) : null}
+        {!course && labelFirst ? <Lines lines={INTERVIEW[label]} style={type(SIZE, labelInk)} /> : null}
         <Lines lines={t.title} style={type(SIZE, course || role === "black" ? INK : role === "green" ? GREEN[greenShade] : ds("blue", 500))} />
-        {course ? null : (
-          <div>
-            <Lines lines={INTERVIEW[label]} style={type(SIZE, TONE[tone])} />
-          </div>
-        )}
+        {!course && !labelFirst ? <Lines lines={INTERVIEW[label]} style={type(SIZE, labelInk)} /> : null}
       </div>
     </AbsoluteFill>
   );
@@ -190,29 +196,24 @@ export const THUMBNAIL = { width: W, height: H } as const;
 
 const cap = (x: string) => x.replace(/(^|-)(\w)/g, (_, d: string, c: string) => c.toUpperCase());
 
-/** Every thumbnail the Studio shows, with the animal low or high: a course
- *  with "Full Course" smaller than its title or at its size, and an
- *  interview track saying "Interview Prep" or "Interview Preparation" in
- *  black or either grey, or in black after its role in blue. */
-export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entries(TRACKS).flatMap(([track, t]) =>
-  (["bottom", "top"] as const).flatMap((artAt): { id: string; props: ThumbnailProps }[] =>
-    t.kind === "course"
-      ? (["small", "same"] as const).map((kicker) => ({
-          id: `Thumb-${track}-${cap(kicker)}-${cap(artAt)}`,
-          props: { track, kicker, artAt },
-        }))
-      : (["prep", "preparation"] as InterviewLabel[]).flatMap((label) =>
-          [
-            ...(["black", "gray-600", "gray-500"] as LabelTone[]).map((tone) => ({
-              id: `Thumb-${track}-${cap(label)}-${cap(tone)}-${cap(artAt)}`,
-              props: { track, label, tone, artAt },
-            })),
-            // The role in blue, the label in black: the courses' scheme turned
-            // round, the line that names the video in blue.
-            { id: `Thumb-${track}-${cap(label)}-BlueRole-${cap(artAt)}`, props: { track, label, tone: "black", role: "blue", artAt } },
-            // The same in green, mark and role: the interview series' color.
-            { id: `Thumb-${track}-${cap(label)}-GreenRole-${cap(artAt)}`, props: { track, label, tone: "black", role: "green", artAt } },
-          ],
-        ),
-  ),
+/** Every thumbnail the Studio shows: a course with "Full Course" smaller
+ *  than its title or at its size, the animal low or high; and an interview
+ *  track saying "Interview Questions" after its role in green (the series'
+ *  color), blue or black, with the animal hung top-right. Other labels and
+ *  greys are props (`label`, `tone`, `greenShade`). */
+export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entries(TRACKS).flatMap(([track, t]): { id: string; props: ThumbnailProps }[] =>
+  t.kind === "course"
+    ? (["bottom", "top"] as const).flatMap((artAt) =>
+        (["small", "same"] as const).map((kicker) => ({ id: `Thumb-${track}-${cap(kicker)}-${cap(artAt)}`, props: { track, kicker, artAt } })),
+      )
+    : [
+        ...(["green", "blue", "black"] as const).map((role) => ({
+          id: `Thumb-${track}-Questions-${cap(role)}Role-Top`,
+          props: { track, label: "questions" as const, tone: "black" as const, role, artAt: "top" as const },
+        })),
+        // The role in black and the label in green, after the role or above
+        // it as "Full Course" sits above a course's title.
+        { id: `Thumb-${track}-Questions-GreenLabel-Top`, props: { track, label: "questions", tone: "green", role: "black", artAt: "top" } },
+        { id: `Thumb-${track}-Questions-GreenLabelFirst-Top`, props: { track, label: "questions", tone: "green", role: "black", artAt: "top", labelFirst: true } },
+      ],
 );
