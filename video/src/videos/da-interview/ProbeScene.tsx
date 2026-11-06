@@ -5,7 +5,8 @@ import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, TABULAR, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, Mono, X0 } from "./parts";
+import { Drift, Headline, Kicker, X0 } from "./parts";
+import { Mono } from "./mono";
 
 const ROW_Y = 330;
 const PITCH = 120;

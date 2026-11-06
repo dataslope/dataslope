@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { INK, body, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
@@ -15,11 +15,11 @@ import {
   listingHeight,
   Mark,
   MARK_BAD,
-  Mono,
   TableName,
   tableGeometry,
   X0,
 } from "./parts";
+import { Mono, QMono } from "./mono";
 
 const LIST_Y = 440;
 const LIST_W = 760;

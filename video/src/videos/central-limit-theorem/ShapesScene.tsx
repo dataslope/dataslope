@@ -182,11 +182,13 @@ export const ShapesScene: React.FC = () => {
         return (
           <React.Fragment key={c.letter}>
             <Ink at={at - 2} dur={16} style={{ left: colX(i), top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-                <span style={label(20, ACCENT_INK)}>{c.letter}</span>
+              {/* The panel's letter in the title's own face and size, set
+                  apart by the accent: one size to a line. */}
+              <div style={{ display: "flex", alignItems: "baseline", gap: "0.3em" }}>
+                <span style={{ ...headline(46), color: ACCENT_INK }}>{c.letter}</span>
                 <span style={headline(46)}>{c.title}</span>
               </div>
-              <div style={{ ...body(26, true), marginTop: 6, marginLeft: 30 }}>{c.sub}</div>
+              <div style={{ ...body(26, true), marginTop: 6 }}>{c.sub}</div>
             </Ink>
             <Bars
               counts={c.popCounts}

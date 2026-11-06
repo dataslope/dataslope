@@ -9,7 +9,8 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { WHERE } from "./data";
-import { Drift, ElbowArrow, Listing, Mark, MARK_OK, Mono, X0 } from "./parts";
+import { Drift, ElbowArrow, Listing, Mark, MARK_OK, X0 } from "./parts";
+import { Mono } from "./mono";
 
 const SIZE = 24;
 const LIST_Y = 300;

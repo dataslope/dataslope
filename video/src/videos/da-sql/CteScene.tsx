@@ -8,7 +8,8 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SUBQUERIES } from "./data";
-import { DataTable, Drift, Listing, listingHeight, Mark, MARK_OK, Mono, TableName, tableGeometry, X0 } from "./parts";
+import { DataTable, Drift, Listing, listingHeight, Mark, MARK_OK, TableName, tableGeometry, X0 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 340;
 const HEAD_H = 48;

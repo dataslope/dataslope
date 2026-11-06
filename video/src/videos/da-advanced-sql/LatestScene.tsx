@@ -24,6 +24,7 @@ import {
   Svg,
   X0,
 } from "./parts";
+import {  } from "./mono";
 
 const TOP = 330;
 const RESULT_X = 900;

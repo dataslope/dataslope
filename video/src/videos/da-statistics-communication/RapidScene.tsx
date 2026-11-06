@@ -10,7 +10,8 @@ import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
-import { at, Drift, Headline, Kicker, Mark, Mono, OK, OK_INK, type Scale, Spot, Svg, VLine, X0 } from "./parts";
+import { at, Drift, Headline, Kicker, Mark, OK, OK_INK, type Scale, Spot, Svg, VLine, X0 } from "./parts";
+import { Mono } from "./mono";
 
 /** Where the answers go: right of the list. */
 const R_X = 760;

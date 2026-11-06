@@ -1,13 +1,14 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { INK, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { NULLS } from "./data";
-import { DataTable, Drift, Listing, listingHeight, MARK_BAD, MARK_OK, Mono, NoRows, TableName, tableGeometry, X0 } from "./parts";
+import { DataTable, Drift, Listing, listingHeight, MARK_BAD, MARK_OK, NoRows, TableName, tableGeometry, X0 } from "./parts";
+import { Mono, QMono } from "./mono";
 
 const TOP = 340;
 const HEAD_H = 48;
