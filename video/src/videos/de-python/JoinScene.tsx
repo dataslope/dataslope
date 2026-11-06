@@ -22,11 +22,11 @@ import {
   MARK,
   MARK_BAD,
   MARK_OK,
-  Mono,
   OK_INK,
   TableName,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 330;
 const SIZE = 21;

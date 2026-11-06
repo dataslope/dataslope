@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -283,25 +283,30 @@ export const HomeScene: React.FC = () => {
 };
 
 /**
- * One normal form on the path. The first is lit as the narration reaches it,
- * a wash and an outline, with what it asks for set under it, so lighting it
- * moves nothing beside it.
+ * One normal form on the path. The first is lit as the narration reaches it:
+ * its name turns the key blue and the highlighter's yellow sweeps behind it,
+ * with what it asks for set under it, so lighting it moves nothing beside
+ * it. No outline: the arrows between the names make the path.
  */
 const Step: React.FC<{ name: string; litAt?: number }> = ({ name, litAt }) => {
   const frame = useCurrentFrame();
   const lit = litAt === undefined ? 0 : ease(frame, litAt - 2, 12);
   return (
-    <span
-      style={{
-        position: "relative",
-        display: "inline-block",
-        padding: "2px 12px",
-        borderRadius: 6,
-        border: `1.5px solid color-mix(in srgb, ${INK} ${Math.round(lit * 100)}%, transparent)`,
-        background: `color-mix(in srgb, ${BAR} ${Math.round(lit * 14)}%, transparent)`,
-      }}
-    >
-      <span style={{ ...label(26, lit > 0 ? BLUE_INK : INK), fontWeight: 700 }}>{name}</span>
+    <span style={{ position: "relative", display: "inline-block", padding: "2px 12px" }}>
+      {lit > 0 ? (
+        <span
+          style={{
+            position: "absolute",
+            left: 6,
+            top: 4,
+            bottom: 2,
+            width: `calc((100% - 12px) * ${lit})`,
+            borderRadius: 4,
+            background: HIGHLIGHT,
+          }}
+        />
+      ) : null}
+      <span style={{ position: "relative", ...label(26, lit > 0 ? BLUE_INK : INK), fontWeight: 700 }}>{name}</span>
       {litAt !== undefined ? (
         <span style={{ position: "absolute", left: 12, top: "100%", marginTop: 10, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: lit }}>
           one value per cell

@@ -4,7 +4,7 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, headline, HIGHLIGHT, INK, INK_SOFT, label } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { ColumnRule, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Bridge } from "../sampling/Bridge";
@@ -19,6 +19,9 @@ const ROWS = [
 const ROW_Y = (i: number) => 330 + i * 126;
 const HERE_X = 120;
 const GONE_X = 780;
+/** The hairline between the columns: centred between the longest row on the
+ *  left ("The planes that made it home") and the column on the right. */
+const RULE_X = 720;
 
 /**
  * The habit: every dataset of survivors, and the column it is missing. Ends
@@ -92,24 +95,18 @@ export const HabitScene: React.FC = () => {
               <Ink at={at - 4} dur={16} style={{ left: HERE_X, top: y(ROW_Y(i)) }}>
                 <span style={{ ...body(40), color: INK, whiteSpace: "nowrap" }}>{r.here}</span>
               </Ink>
-              <Ink at={missingAt + i * 5} dur={16} style={{ left: GONE_X - 16, top: y(ROW_Y(i)) - 8 }}>
-                <span
-                  style={{
-                    ...body(40, true),
-                    color: INK_SOFT,
-                    whiteSpace: "nowrap",
-                    display: "inline-block",
-                    padding: "4px 14px 8px",
-                    border: `1.6px dashed ${INK_SOFT}`,
-                    borderRadius: 4,
-                  }}
-                >
-                  {r.gone}
-                </span>
+              {/* What is missing, in the soft italic of something absent:
+                  set on the row's own line, with no box around it. */}
+              <Ink at={missingAt + i * 5} dur={16} style={{ left: GONE_X, top: y(ROW_Y(i)) }}>
+                <span style={{ ...body(40, true), color: INK_SOFT, whiteSpace: "nowrap" }}>{r.gone}</span>
               </Ink>
             </React.Fragment>
           );
         })}
+
+        {/* The two columns, side by side: a hairline in the gap, from the
+            heads to the last row, inking in with the column it introduces. */}
+        <ColumnRule x={RULE_X} top={y(224)} height={y(ROW_Y(ROWS.length - 1)) + 50 - y(224)} at={missingAt - 4} />
 
       </div>
 

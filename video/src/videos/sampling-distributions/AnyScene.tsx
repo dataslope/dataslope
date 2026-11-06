@@ -142,23 +142,9 @@ export const AnyScene: React.FC = () => {
         <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>Standard error</span>
       </div>
 
-      {/* The mean's row, as the bridge asks about its shape: lit, and ringed. */}
-      {meanRow > 0 ? (
-        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0 }}>
-          <rect
-            x={ROW_X - 22}
-            y={y(STAT_ROWS[0] - STAT_H - 22)}
-            width={COL_SPREAD + 150 - ROW_X}
-            height={y(STAT_ROWS[0] + 14) - y(STAT_ROWS[0] - STAT_H - 22)}
-            rx={6}
-            fill="none"
-            stroke={ACCENT}
-            strokeWidth={2.2}
-            pathLength={1}
-            strokeDasharray={`${meanRow} 1`}
-          />
-        </svg>
-      ) : null}
+      {/* The mean's row, as the bridge asks about its shape: lit, with its
+          name turning to the accent (below). A highlight, not a ring: no
+          outline is drawn around the row. */}
       <div
         style={{
           position: "absolute",

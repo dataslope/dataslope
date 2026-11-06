@@ -7,7 +7,8 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { IDEM } from "./data";
-import { Code, Console, Drift, FadeIn, lineOf, Mark, MARK_BAD, MARK_OK, Mono, OK_INK, Strike, Title, X0 } from "./parts";
+import { Code, Console, Drift, FadeIn, lineOf, Mark, MARK_BAD, MARK_OK, OK_INK, Strike, Title, X0 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 322;
 const CODE = 22;

@@ -65,7 +65,7 @@ export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /** Constraint tags: JetBrains Mono at 20px, 10px apart. */
 const TAG_SIZE = 20;
-const TAG_GAP = 10;
+const TAG_GAP = 14;
 
 /** 0 → 1 → 0 over `dur` frames from `at`: a swell for something named again. */
 export const pulse = (frame: number, at: number, dur = 18) => {
@@ -312,10 +312,27 @@ export const Mono: React.FC<{ children: string; color?: string; weight?: number 
   <span style={{ fontFamily: MONO, fontSize: "0.94em", fontWeight: weight ?? 600, color }}>{children}</span>
 );
 
+/** Room the swell's highlight reaches past the code on each side, given
+ *  back by a negative margin so the code itself sits where it is placed. */
+const SWELL_PAD = 8;
+
 /**
- * A rule written out as a small pill of SQL, on its own: what one writer has
- * to remember. It inks in on `at`, swells on `pulses`, and is struck through
- * on `strikeAt`.
+ * The highlight a rule's code swells into when the narration names it: the
+ * highlighter's yellow behind the words, gone at rest. It replaces the
+ * outlined chip each rule used to sit in.
+ */
+const swellMark = (swell: number): React.CSSProperties => ({
+  padding: `3px ${SWELL_PAD}px 4px`,
+  margin: `0 -${SWELL_PAD}px`,
+  borderRadius: 5,
+  background: swell > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(swell * 100)}%, transparent)` : undefined,
+});
+
+/**
+ * A rule written out as a short line of SQL, on its own: what one writer has
+ * to remember. Plain code, not a pill: it inks in on `at`, swells on
+ * `pulses` (the highlighter's yellow sweeping behind it as it does), and is
+ * struck through on `strikeAt`.
  */
 export const Pill: React.FC<{
   x: number;
@@ -335,16 +352,7 @@ export const Pill: React.FC<{
   if (p <= 0 || o >= 1) return null;
   const swell = Math.max(0, ...pulses.map((t) => pulse(frame, t, 22)));
   const pill = (
-    <div
-      style={{
-        padding: "5px 12px 6px",
-        borderRadius: 8,
-        border: `1.5px solid ${HAIRLINE}`,
-        background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(swell * 100)}%, ${PAPER})`,
-        whiteSpace: "nowrap",
-        lineHeight: 1.2,
-      }}
-    >
+    <div style={{ ...swellMark(swell), whiteSpace: "nowrap", lineHeight: 1.2 }}>
       <Code size={size}>{children}</Code>
     </div>
   );
@@ -392,12 +400,14 @@ export type Chip = {
 
 
 /**
- * A constraint's tags beside an entity's row: small pills of SQL that ink in
- * on their cues, one after another to the right of the box, level with the
- * row they guard. With `span`, the tags sit at the middle of two rows, and a
- * bracket from the box's edge joins them: a rule over two columns. A tag set
- * on two lines is taller than its row, so it hangs from the row's top instead
- * of centring on it, which would push it up into the row above.
+ * A constraint's tags beside an entity's row: plain SQL that inks in on its
+ * cues, one after another to the right of the box, level with the row it
+ * guards, two rules on one row parted by a middle dot. No pill around them:
+ * the row they sit level with is what groups them. With `span`, the tags sit
+ * at the middle of two rows, and a bracket from the box's edge joins them: a
+ * rule over two columns. A tag set on two lines is taller than its row, so it
+ * hangs from the row's top instead of centring on it, which would push it up
+ * into the row above.
  */
 export const RuleTags: React.FC<{
   layout: EntityLayout;
@@ -438,7 +448,7 @@ export const RuleTags: React.FC<{
       <div
         style={{
           position: "absolute",
-          left: layout.right + (bracket ? 30 : 14),
+          left: layout.right + (bracket ? 36 : 24),
           top: tall ? layout.rows[i0].top + 4 : mid,
           transform: tall ? undefined : "translateY(-50%)",
           display: "flex",
@@ -452,23 +462,24 @@ export const RuleTags: React.FC<{
           if (p <= 0 || o >= 1) return null;
           const swell = Math.max(0, ...(c.pulses ?? []).map((t) => pulse(frame, t, 22)));
           return (
-            <div
-              key={k}
-              style={{
-                position: "relative",
-                opacity: p * (1 - o),
-                transform: `translateX(${(1 - p) * -10}px) scale(${1 + swell * 0.08})`,
-                transformOrigin: "0 50%",
-                padding: "5px 12px 6px",
-                borderRadius: 8,
-                border: `1.5px solid ${HAIRLINE}`,
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(swell * 100)}%, ${PAPER})`,
-                whiteSpace: "nowrap",
-                lineHeight: 1.2,
-              }}
-            >
-              <Code size={TAG_SIZE}>{c.code}</Code>
-            </div>
+            <React.Fragment key={k}>
+              {k > 0 ? (
+                <span style={{ fontFamily: MONO, fontSize: TAG_SIZE, color: INK_SOFT, opacity: p * (1 - o) }}>·</span>
+              ) : null}
+              <div
+                style={{
+                  position: "relative",
+                  opacity: p * (1 - o),
+                  transform: `translateX(${(1 - p) * -10}px) scale(${1 + swell * 0.08})`,
+                  transformOrigin: "0 50%",
+                  ...swellMark(swell),
+                  whiteSpace: "nowrap",
+                  lineHeight: 1.2,
+                }}
+              >
+                <Code size={TAG_SIZE}>{c.code}</Code>
+              </div>
+            </React.Fragment>
           );
         })}
       </div>

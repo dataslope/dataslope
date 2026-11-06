@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, RapidFire, type RapidItem } from "../../editorial/interview";
+import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { NextLine, Note } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { Arrow, Chip, Dot, Drift, Headline, Kicker, Machine, OK, OK_INK, Spot, X0 } from "./parts";
+import { Arrow, Chip, Dot, Drift, Headline, Kicker, Machine, OK, OK_INK, QMono, Spot, X0 } from "./parts";
 
 const R_X = 780;
 const LIST_TOP = 352;
@@ -173,7 +173,7 @@ const Push: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Line at={predAt - 2} top={c.y(342)} size={25} weight={700}>
         Predicate pushdown:{" "}
-        <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600 }}>
+        <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600 }}>
           SELECT region, amount … WHERE amount &gt; {CUT}
         </span>
       </Line>

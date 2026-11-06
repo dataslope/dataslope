@@ -39,6 +39,17 @@ export {
   X0,
 } from "../da-pandas/parts";
 
+/**
+ * Code inside a line of type: the interview kit's QMono, but at 0.92em, so
+ * it stays within the 12% a line's sizes may differ by (README, "One line,
+ * one size, one family"); never under 19px.
+ */
+export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
+
 /** The index of the listing line that holds `text` (ds-sql's rule: find a
  *  highlight's line by what it says, never by a number). */
 export const lineOf = (lines: readonly string[], text: string): number => {
@@ -122,7 +133,7 @@ const numText: React.CSSProperties = { ...note(25, INK), fontWeight: 540, lineHe
 /** One row of the frame: its index, its department and its salary. */
 export const RowCard: React.FC<{ row: Row; pose: Pose; width: number; height: number }> = ({ row, pose, width, height }) => (
   <div style={cardBox(row.dept, pose, width, height)}>
-    <span style={{ fontFamily: MONO, fontSize: 20, color: INK_SOFT, width: 40, textAlign: "right", paddingRight: 4, boxSizing: "border-box" }}>
+    <span style={{ fontFamily: MONO, fontSize: 21, color: INK_SOFT, width: 40, textAlign: "right", paddingRight: 4, boxSizing: "border-box" }}>
       {row.index}
     </span>
     <span style={{ ...deptText(row.dept), width: 100, paddingLeft: 14, boxSizing: "border-box" }}>{row.dept}</span>

@@ -24,7 +24,6 @@ import {
   MARK,
   MARK_BAD,
   MARK_OK,
-  Mono,
   OK,
   OK_INK,
   Source,
@@ -34,6 +33,7 @@ import {
   TitleCode,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 322;
 const SIZE = 21;
@@ -219,7 +219,7 @@ export const FileScene: React.FC = () => {
         {/* Why read() holds about twice the file: measured, the bytes alone
             are half of it. */}
         <Note at={seventeenAt + 14} x={RIGHT_X - 100 + 220 + 520 * (FILE.read.peak / FILE.readlines.peak) + 140} y={rTop + h(10) + h(33) - h(14)} out={chainAt - 4}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the bytes and the text</span>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>the bytes and the text</span>
         </Note>
         <Note at={lazyAt} x={RIGHT_X - 100} y={rTop + h(230)} out={chainAt - 4}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>

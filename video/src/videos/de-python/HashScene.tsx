@@ -229,7 +229,7 @@ export const HashScene: React.FC = () => {
           >
             <span style={{ ...body(30, true), color: INK }}>bucket 999,999</span>
             <span style={{ ...body(30, true), color: INK_SOFT }}>of</span>
-            <span style={{ position: "relative", ...headline(34), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums", marginLeft: "0.15em" }}>
+            <span style={{ position: "relative", ...headline(33), color: SET_INK, fontVariantNumeric: "tabular-nums lining-nums", marginLeft: "0.15em" }}>
               {/* The highlight reaches 0.1em past the number, so the number
                   keeps 0.15em of margin: a full space between it and "of". */}
               <span
@@ -290,7 +290,7 @@ export const HashScene: React.FC = () => {
 
           {/* ── The times, ListVsSet's ── */}
           <Note at={timedAt} x={LEFT} y={y(TIME_Y)}>
-            <span style={{ display: "flex", gap: 34, alignItems: "baseline", whiteSpace: "nowrap" }}>
+            <span style={{ display: "flex", gap: 40, alignItems: "baseline", whiteSpace: "nowrap" }}>
               <span style={{ ...note(30, LIST_INK), fontWeight: 650, opacity: ease(frame, msAt - 2, 10) }}>
                 list <span style={{ fontVariantNumeric: "tabular-nums" }}>{HASH.listMs.toFixed(2)}</span> ms
               </span>
@@ -362,7 +362,7 @@ export const HashScene: React.FC = () => {
 
 /** A panel's letter and title, in one line. */
 const RowTitle: React.FC<{ at: number; y: number; letter: string; color: string; title: string }> = ({ at, y, letter, color, title }) => (
-  <Ink at={at} dur={16} style={{ left: LEFT, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
+  <Ink at={at} dur={16} style={{ left: LEFT, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 40 }}>
     <span style={label(22, color)}>{letter}</span>
     <span style={{ ...body(32, true), color: INK }}>{title}</span>
   </Ink>
@@ -371,7 +371,7 @@ const RowTitle: React.FC<{ at: number; y: number; letter: string; color: string;
 /** "comparisons 1,000,000", at the right end of a panel's title line. */
 const Counter: React.FC<{ at: number; y: number; value: number; color: string }> = ({ at, y, value, color }) => (
   <Note at={at} x={RIGHT} y={y - 8} align="right" from="right">
-    <div style={{ display: "flex", alignItems: "baseline", gap: 16, justifyContent: "flex-end" }}>
+    <div style={{ display: "flex", alignItems: "baseline", gap: 58, justifyContent: "flex-end" }}>
       <span style={label(21, INK_SOFT)}>comparisons</span>
       <span style={{ ...headline(46), color, fontVariantNumeric: "tabular-nums lining-nums", minWidth: "4.6em", textAlign: "right" }}>
         {commas(value)}

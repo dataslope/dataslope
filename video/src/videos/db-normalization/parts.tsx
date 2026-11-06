@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead, type Pt, roundedPolyline } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { ACCENT, BAR, BLUE_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
 import { H, Ink, W } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -113,7 +113,8 @@ export const Spot: React.FC<{
 
 /**
  * Postgres's command tag (`UPDATE 1`, `INSERT 0 1`), the way psql answers a
- * statement that worked: set in mono, in the key blue, as a reply.
+ * statement that worked: set in mono, in the key blue, as a reply. Plain
+ * text, the way a terminal prints it, with no tinted chip behind it.
  */
 export const Reply: React.FC<{
   at: number;
@@ -123,28 +124,13 @@ export const Reply: React.FC<{
   children: React.ReactNode;
   color?: string;
   size?: number;
-}> = ({ at, out, x, y, children, color = BLUE_INK, size = 24 }) => {
-  const frame = useCurrentFrame();
-  const swell = pulse(frame, at + 6, 20);
-  return (
-    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, whiteSpace: "nowrap" }}>
-      <span
-        style={{
-          display: "inline-block",
-          fontFamily: MONO,
-          fontSize: size,
-          fontWeight: 600,
-          color,
-          padding: "4px 12px",
-          borderRadius: 4,
-          background: `color-mix(in srgb, ${color === BLUE_INK ? BAR : color === INK ? INK_SOFT : ACCENT} ${10 + swell * 14}%, ${PAPER})`,
-        }}
-      >
-        {children}
-      </span>
-    </Ink>
-  );
-};
+}> = ({ at, out, x, y, children, color = BLUE_INK, size = 24 }) => (
+  // Set 4px down, where the chip's padding used to put the text, so each
+  // reply keeps its distance from the listing or table above it.
+  <Ink at={at} dur={12} out={out} style={{ left: x, top: y + 4, whiteSpace: "nowrap" }}>
+    <span style={{ display: "inline-block", fontFamily: MONO, fontSize: size, fontWeight: 600, color }}>{children}</span>
+  </Ink>
+);
 
 /** A tick, drawn as a stroke on `at`: a constraint that holds. */
 export const Tick: React.FC<{ x: number; y: number; at: number; size?: number; color?: string; out?: number }> = ({

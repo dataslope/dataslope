@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, headline, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, headline, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -183,9 +183,10 @@ export const HookScene: React.FC = () => {
 
         {/* The round. */}
         <Note at={planAt - 2} x={RES_X} y={y(680)}>
-          <span style={{ display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
-            <span style={{ ...headline(56), color: BLUE_INK }}>17</span>
-            <span style={body(30)}>questions</span>
+          {/* The count and its word at one size: a label beside a big
+              number matches it. */}
+          <span style={{ ...headline(56), color: INK, whiteSpace: "nowrap" }}>
+            <span style={{ color: BLUE_INK }}>17</span> questions
           </span>
         </Note>
         <Note at={workedAt - 2} x={RES_X} y={y(752)}>

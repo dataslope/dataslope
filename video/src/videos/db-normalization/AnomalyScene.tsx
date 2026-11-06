@@ -135,7 +135,7 @@ export const AnomalyScene: React.FC = () => {
         </div>
 
         {/* Grace's only order, deleted, and the question that now finds nothing. */}
-        <Reply at={deletingAt + 4} x={g.x + g.width + 20} y={g.rowMid(grace) - 20} out={deletingAt + 24}>
+        <Reply at={deletingAt + 4} x={g.x + g.width + 32} y={g.rowMid(grace) - 20} out={deletingAt + 24}>
           {DELETE.tag}
         </Reply>
         <Listing

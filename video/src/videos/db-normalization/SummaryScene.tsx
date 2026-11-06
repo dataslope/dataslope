@@ -120,7 +120,7 @@ export const SummaryScene: React.FC = () => {
           marks={[...m0.items, ...m1.items, { row: late, col: 2, at: fourAt + 8 }]}
           bands={[{ row: late, at: fourAt + 4, out: planAt, color: MARK_BAD }]}
         />
-        <Reply at={fourAt + 10} x={ig.x + ig.width + 20} y={ig.rowMid(late) - 20}>
+        <Reply at={fourAt + 10} x={ig.x + ig.width + 32} y={ig.rowMid(late) - 20}>
           {LATE.tag}
         </Reply>
 
@@ -146,7 +146,7 @@ export const SummaryScene: React.FC = () => {
             { row: 1, at: eleventhAt, out: denormAt, color: MARK },
           ]}
         />
-        <Reply at={tableAt + 8} x={ig.x + ig.width + 34} y={arrowY + 16}>
+        <Reply at={tableAt + 8} x={ig.x + ig.width + 46} y={arrowY + 16}>
           {SUM_BUILD_TAG}
         </Reply>
 
