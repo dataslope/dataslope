@@ -93,6 +93,12 @@ export const PostgresScene: React.FC = () => {
   const W = 520;
   const XS = [96, 700, 1304];
   const mid = TOP + H / 2;
+  /** How far each column's text runs right of its x, measured off the
+   *  render: POSTGRES's "with data types of your own", Postgres95's "1994,
+   *  two Berkeley grad students:". The arrows between the names run from
+   *  24px past one column's text to 24px short of the next; the columns
+   *  have no card round them now. */
+  const COL_RIGHT = [284, 342];
 
   // "After Ingres": the name opens, the missing letters show, and it closes
   // again on the catch.
@@ -179,10 +185,10 @@ export const PostgresScene: React.FC = () => {
           },
         ]}
       />
-      <Tag x={XS[0] + 28} y={TOP + H + 18} at={afterAt} out={catchAt} size={23} color={ACCENT_INK} weight={650}>
+      <Tag x={XS[0] + 2} y={TOP + H + 18} at={afterAt} out={catchAt} size={23} color={ACCENT_INK} weight={650}>
         post Ingres: after Ingres
       </Tag>
-      <Tag x={XS[0] + 28} y={TOP + H + 18} at={wonAt - 4} size={23} color={INK}>
+      <Tag x={XS[0] + 2} y={TOP + H + 18} at={wonAt - 4} size={23} color={INK}>
         and by the 1990s, <Mark at={wonAt}>SQL had won</Mark>
       </Tag>
 
@@ -227,7 +233,7 @@ export const PostgresScene: React.FC = () => {
       />
 
       {/* ── Postgres95 ── */}
-      <Wire points={[[XS[0] + W + 8, mid], [XS[1] - 8, mid]]} at={ninetyFourAt - 4} dur={12} />
+      <Wire points={[[XS[0] + COL_RIGHT[0] + 24, mid], [XS[1] - 24, mid]]} at={ninetyFourAt - 4} dur={12} />
       <Card
         x={XS[1]}
         top={TOP}
@@ -261,7 +267,7 @@ export const PostgresScene: React.FC = () => {
       />
 
       {/* ── PostgreSQL ── */}
-      <Wire points={[[XS[1] + W + 8, mid], [XS[2] - 8, mid]]} at={volunteersAt - 4} dur={12} />
+      <Wire points={[[XS[1] + COL_RIGHT[1] + 24, mid], [XS[2] - 24, mid]]} at={volunteersAt - 4} dur={12} />
       <Card
         x={XS[2]}
         top={TOP}
@@ -283,7 +289,7 @@ export const PostgresScene: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: XS[2] + 28,
+          left: XS[2],
           top: SYL_TOP,
           display: "flex",
           alignItems: "baseline",
@@ -312,7 +318,7 @@ export const PostgresScene: React.FC = () => {
           );
         })}
       </div>
-      <Tag x={XS[2] + 28} y={SYL_TOP + 92} at={mostAt - 2} size={23} color={INK}>
+      <Tag x={XS[2] + 2} y={SYL_TOP + 92} at={mostAt - 2} size={23} color={INK}>
         or, as most of us say it, <Mark at={nickAt - 2}>Postgres</Mark>
       </Tag>
       <Spot id="db-relational-history-elephant" at={mostAt - 6} left={XS[1] + W - 260} top={TOP + H + 30} width={260} height={230} />
