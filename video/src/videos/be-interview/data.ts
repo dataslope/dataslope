@@ -14,8 +14,9 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "be-interview";
 
-/** The capybara and the eight small spots from illustrations.json are
- *  generated and imported (public/images/be-interview/). */
+/** The capybara and the one small spot (the take-home's envelope) from
+ *  illustrations.json are generated and imported
+ *  (public/images/be-interview/). */
 export const ILLUSTRATIONS = true;
 
 export type Part = {

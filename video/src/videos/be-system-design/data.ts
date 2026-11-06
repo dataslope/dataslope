@@ -10,12 +10,9 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "be-system-design";
 
-/**
- * Whether public/images/be-system-design/ holds the watercolors from
- * illustrations.json. Not yet: phase 2 generates them. Every frame is laid
- * out with room for them either way.
- */
-export const ILLUSTRATIONS = false;
+/** Whether public/images/be-system-design/ holds the watercolors from
+ *  illustrations.json (the crow, and the few spots the scenes place). */
+export const ILLUSTRATIONS = true;
 
 /** The estimate (question two): assumptions, then what follows from them. */
 export const ESTIMATE = results.estimate as {

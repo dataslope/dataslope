@@ -567,17 +567,9 @@ export const Bar: React.FC<{
  *  on the 1080p layout (a 4K render doubles it). */
 export const ART = {
   chipmunk: { id: "be-databases-chipmunk", w: 1227, h: 1024 },
-  cabinet: { id: "be-databases-cabinet", w: 920, h: 1017 },
-  tree: { id: "be-databases-tree", w: 950, h: 1018 },
-  ledger: { id: "be-databases-ledger", w: 1011, h: 970 },
   phoneBook: { id: "be-databases-phone-book", w: 1024, h: 745 },
-  calendar: { id: "be-databases-calendar", w: 989, h: 1002 },
   coins: { id: "be-databases-coins", w: 896, h: 895 },
-  piggy: { id: "be-databases-piggy-bank", w: 950, h: 1016 },
-  ghost: { id: "be-databases-ghost", w: 916, h: 950 },
   padlock: { id: "be-databases-padlock", w: 1024, h: 828 },
-  stopwatch: { id: "be-databases-stopwatch", w: 828, h: 985 },
-  key: { id: "be-databases-key", w: 1024, h: 862 },
 } as const;
 export type ArtName = keyof typeof ART;
 
@@ -665,5 +657,89 @@ export const Cylinder: React.FC<{
         {swapTo ? <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", opacity: swap, position: "absolute" }}>{swapTo}</span> : null}
       </div>
     </div>
+  );
+};
+
+/**
+ * A table drawn as its pages, `cols` x `rows` small squares in page order,
+ * as two SVG patterns so seven thousand squares cost two rectangles. The
+ * squares fill in from `at`; each sweep tints them page by page from
+ * `from` to `to` (a scan reading them), and `lit` squares light on their
+ * own cue.
+ */
+export const PageGrid: React.FC<{
+  x: number;
+  top: number;
+  cols: number;
+  rows: number;
+  pitch?: number;
+  cell?: number;
+  at: number;
+  sweeps?: readonly { from: number; to: number; color: string; out?: number }[];
+  lit?: readonly { index: number; at: number; out?: number; color?: string }[];
+  dim?: number;
+  out?: number;
+  id: string;
+}> = ({ x, top, cols, rows, pitch = 5, cell = 4, at, sweeps = [], lit = [], dim, out, id }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 24);
+  const o = out === undefined ? 0 : ease(frame, out, 12);
+  const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
+  if (p <= 0 || o >= 1) return null;
+  const W = cols * pitch;
+  const H = rows * pitch;
+  const fillPattern = (key: string, color: string) => (
+    <pattern key={key} id={`${id}-${key}`} width={pitch} height={pitch} patternUnits="userSpaceOnUse">
+      <rect width={cell} height={cell} rx={0.8} fill={color} />
+    </pattern>
+  );
+  // A region read in page order: the whole rows done, and part of the next.
+  const swept = (share: number, fill: string, key: string) => {
+    const pages = share * cols * rows;
+    const full = Math.floor(pages / cols);
+    const part = pages - full * cols;
+    return (
+      <g key={key}>
+        {full > 0 ? <rect x={0} y={0} width={W} height={full * pitch} fill={fill} /> : null}
+        {part > 0 && full < rows ? <rect x={0} y={full * pitch} width={Math.ceil(part) * pitch} height={pitch} fill={fill} /> : null}
+      </g>
+    );
+  };
+  return (
+    <svg width={W} height={H} style={{ position: "absolute", left: x, top, overflow: "visible", opacity: (1 - o) * (1 - d) }}>
+      <defs>
+        {fillPattern("base", `color-mix(in srgb, ${BAR} 28%, ${PAPER})`)}
+        {sweeps.map((s, k) => fillPattern(`sweep${k}`, s.color))}
+      </defs>
+      {swept(p, `url(#${id}-base)`, "base")}
+      {sweeps.map((s, k) => {
+        const share = ease(frame, s.from, s.to - s.from);
+        const so = s.out === undefined ? 0 : ease(frame, s.out, 12);
+        if (share <= 0 || so >= 1) return null;
+        return (
+          <g key={k} opacity={1 - so}>
+            {swept(share, `url(#${id}-sweep${k})`, `s${k}`)}
+          </g>
+        );
+      })}
+      {sweeps.map((s, k) => {
+        const share = ease(frame, s.from, s.to - s.from);
+        if (share <= 0 || share >= 1) return null;
+        const row = Math.min(rows - 1, Math.floor(share * rows));
+        return <rect key={`front${k}`} x={-5} y={row * pitch - 3} width={W + 10} height={pitch + 6} rx={3} fill="none" stroke={inkOf.yellow} strokeWidth={2.5} />;
+      })}
+      {lit.map((l, k) => {
+        const lp = ease(frame, l.at, 10) * (l.out === undefined ? 1 : 1 - ease(frame, l.out, 10));
+        if (lp <= 0) return null;
+        const cx = (l.index % cols) * pitch;
+        const cy = Math.floor(l.index / cols) * pitch;
+        return (
+          <g key={`lit${k}`} opacity={lp}>
+            <rect x={cx - 1} y={cy - 1} width={cell + 2} height={cell + 2} fill={l.color ?? inkOf.yellow} />
+            <circle cx={cx + cell / 2} cy={cy + cell / 2} r={9 + 4 * (1 - lp)} fill="none" stroke={l.color ?? inkOf.yellow} strokeWidth={2.5} />
+          </g>
+        );
+      })}
+    </svg>
   );
 };

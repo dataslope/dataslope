@@ -41,8 +41,6 @@ export const WideScene: React.FC = () => {
   const fkAt = n.word("side", "foreign key");
   const profileSideAt = n.word("side", "on the profile");
   const aloneAt = n.word("side", "alone");
-  // The user pops in just after "one user", once the tables have gone; silent like the badge.
-  const userAt = n.word("split", "one user") + 2;
 
   // ── The wide table, drawn as its users half and its profile half ──
   const COLS = OTO.wideCols;
@@ -112,8 +110,7 @@ export const WideScene: React.FC = () => {
 
       <Kicker at={from - 10}>One to one</Kicker>
       <Head lead="One user," leadAt={from - 6} turn="at most one profile." turnAt={zeroAt - 4} />
-      <Spot id="db-relationship-patterns-badge" at={profileAt} left={1580} top={y(60)} width={240} height={260} />
-      <Spot id="db-relationship-patterns-user" at={userAt} left={220} top={y(600)} width={190} height={220} />
+      <Spot id="db-relationship-patterns-badge" at={profileAt} left={1590} top={y(114)} width={185} height={200} />
 
       {/* ── A users table that grew profile columns ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - ease(frame, tablesOut, 14) }}>

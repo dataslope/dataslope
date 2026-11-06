@@ -21,7 +21,6 @@ import {
   MARK_KEY,
   noteStyle,
   RIGHT,
-  Spot,
   tableGeometry,
 } from "./parts";
 
@@ -118,7 +117,6 @@ export const RosterScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the entities, the two lines, the rows, the refusal ── */}
       <Sfx name="el-whoosh" at={twoColsAt - 6} level={-34} />
-      <Sfx name="el-pop" at={sevenAt - 2} level={-30} />
       <Sfx name="el-pencil" at={takesAt} level={-34} />
       <Sfx name="el-pencil" at={studentsAt - 4} level={-34} />
       <Sfx name="el-tap" at={pairAt} level={-28} />
@@ -192,8 +190,6 @@ export const RosterScene: React.FC = () => {
             <div>neither alone is unique.</div>
           </div>
         </Note>
-        {/* Student seven, with the two courses' books. */}
-        <Spot id="db-keys-student" at={sevenAt - 4} dim={pointAt - 4} left={1520} top={602} width={108} height={205} />
         <ErrorBox
           x={ERR_X}
           top={g.rowTop(ghost) - 40}

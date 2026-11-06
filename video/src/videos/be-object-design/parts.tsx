@@ -184,10 +184,22 @@ export const toneInk = (t: Tone) => TONE[t].ink;
 export const toneLine = (t: Tone) => TONE[t].line;
 export const toneFill = (t: Tone) => TONE[t].fill;
 
+/** A tone that changes over time: `tone`, then each of `tones` blended in
+ *  over 12 frames from its frame. */
+export const toneAt = (frame: number, tone: Tone, tones: readonly (readonly [number, Tone])[] = []) => {
+  let c = { ...TONE[tone] };
+  for (const [at, t] of tones) {
+    const k = ease(frame, at, 12);
+    if (k <= 0) continue;
+    const mix = (u: string, v: string) => (k >= 1 ? v : `color-mix(in srgb, ${v} ${Math.round(k * 100)}%, ${u})`);
+    c = { line: mix(c.line, TONE[t].line), fill: mix(c.fill, TONE[t].fill), ink: mix(c.ink, TONE[t].ink) };
+  }
+  return c;
+};
+
 /**
  * A box: a class, a part or a stage. It pops in on `at`, with a title and an
- * optional line under it. `tone` may change while it is up: `toneAt` blends
- * from `tone` to `to` over 12 frames from that frame. `lit` swells its border
+ * optional line under it. `tone` may change while it is up (`tones`). `lit` swells its border
  * for a box the narration names again.
  */
 export const Box: React.FC<{
@@ -199,8 +211,8 @@ export const Box: React.FC<{
   title?: React.ReactNode;
   sub?: React.ReactNode;
   tone?: Tone;
-  to?: Tone;
-  toneAt?: number;
+  /** Later tones, each blended in over 12 frames from its frame. */
+  tones?: readonly (readonly [number, Tone])[];
   size?: number;
   subSize?: number;
   dim?: number;
@@ -211,17 +223,14 @@ export const Box: React.FC<{
   align?: "center" | "left";
   radius?: number;
   children?: React.ReactNode;
-}> = ({ x, y, w, h, at, title, sub, tone = "plain", to, toneAt, size = 25, subSize = 21, dim, undim, out, lit = 0, dashed, align = "center", radius = 12, children }) => {
+}> = ({ x, y, w, h, at, title, sub, tone = "plain", tones = [], size = 25, subSize = 21, dim, undim, out, lit = 0, dashed, align = "center", radius = 12, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.62 * (undim === undefined ? 1 : 1 - ease(frame, undim, 14));
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0.001 || o >= 1) return null;
-  const k = to && toneAt !== undefined ? ease(frame, toneAt, 12) : 0;
-  const a = TONE[tone];
-  const b = TONE[to ?? tone];
-  const mix = (u: string, v: string) => (k <= 0 ? u : k >= 1 ? v : `color-mix(in srgb, ${v} ${Math.round(k * 100)}%, ${u})`);
+  const c = toneAt(frame, tone, tones);
   return (
     <div
       style={{
@@ -231,9 +240,9 @@ export const Box: React.FC<{
         width: w,
         height: h,
         boxSizing: "border-box",
-        border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${mix(a.line, b.line)}`,
+        border: `${2.5 + 2 * lit}px ${dashed ? "dashed" : "solid"} ${c.line}`,
         borderRadius: radius,
-        background: mix(a.fill, b.fill),
+        background: c.fill,
         display: "flex",
         flexDirection: "column",
         alignItems: align === "center" ? "center" : "flex-start",
@@ -245,7 +254,7 @@ export const Box: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      {title ? <span style={{ ...label(size, mix(a.ink, b.ink)), fontWeight: 700, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
+      {title ? <span style={{ ...label(size, c.ink), fontWeight: 700, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: align }}>{sub}</span> : null}
       {children}
     </div>
@@ -502,18 +511,8 @@ export { ACCENT, ACCENT_INK, BLUE_INK, INK };
  *  spot is drawn at its own aspect and never past half its pixels at 4K. */
 export const ART = {
   armadillo: [1492, 1003],
-  car: [1024, 638],
-  engine: [1024, 1016],
-  envelope: [1012, 784],
-  factory: [904, 992],
-  invoice: [830, 884],
-  "loyalty-card": [1017, 618],
-  monitor: [911, 833],
-  mousetrap: [1024, 792],
   multitool: [1014, 871],
   parcel: [1024, 850],
-  phone: [803, 994],
-  pillars: [1020, 735],
   plug: [1011, 943],
   "shopping-cart": [969, 1024],
 } as const;

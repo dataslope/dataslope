@@ -47,8 +47,6 @@ export const SelfScene: React.FC = () => {
   const needsAt = n.word("deep", "needs");
   const fiveAt = n.word("deep", "five levels");
   const internAt = n.word("deep", "intern");
-  // The chair pops in just after "CEO", silent like the dolls.
-  const chairAt = ceoAt + 2;
 
   const table = useEntityLayout({
     x: 300,
@@ -96,8 +94,7 @@ export const SelfScene: React.FC = () => {
 
       <Kicker at={from - 10}>Self-reference</Kicker>
       <Head lead="One table," leadAt={from - 6} turn="pointing at itself." turnAt={pointsAt - 2} />
-      <Spot id="db-relationship-patterns-dolls" at={chainAt} left={1590} top={y(70)} width={250} height={170} />
-      <Spot id="db-relationship-patterns-chair" at={chairAt} left={360} top={y(720)} width={145} height={210} />
+      <Spot id="db-relationship-patterns-dolls" at={chainAt} left={1580} top={y(114)} width={200} height={136} />
 
       <Drift from={from} to={internAt + 60} scale={0.016} origin={[960, y(580)]}>
         <FigLabel n="17" title="Employees and their managers, in one table" at={employeeAt - 6} x={a[0] - LOOP} y={figY} />

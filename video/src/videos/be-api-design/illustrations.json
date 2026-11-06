@@ -26,42 +26,6 @@
       "subject": "a puffin standing upright on a low rounded sea rock, a small sealed envelope held crosswise in its large striped orange and yellow beak, head turned slightly as if about to deliver it"
     },
     {
-      "id": "be-api-design-newspaper",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a thick folded newspaper lying at a slight tilt, its front page washed in a pale blue block for a photograph and soft grey-blue bands for its columns"
-    },
-    {
-      "id": "be-api-design-scales",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "an old brass balance scale: a sturdy central post on a round base, a level beam across its top and two round pans hanging evenly from its ends"
-    },
-    {
-      "id": "be-api-design-wastebasket",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a round woven wicker wastepaper basket, a single crumpled ball of paper resting on top of it"
-    },
-    {
-      "id": "be-api-design-padlock",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a single large closed padlock, a thick rounded brass body with a keyhole and a heavy curved steel shackle"
-    },
-    {
-      "id": "be-api-design-alarm-clock",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a round twin-bell alarm clock standing on two short legs, two domed bells on top with a small hammer between them, its hands near twelve"
-    },
-    {
-      "id": "be-api-design-card",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a single plastic credit card lying at a slight tilt, a small gold chip on its face and soft blue and green washes across it"
-    },
-    {
       "id": "be-api-design-key",
       "category": "video-icon",
       "style": "watercolor illustration",
@@ -74,28 +38,10 @@
       "subject": "a closed thick hardback book lying at a slight tilt, a long red ribbon bookmark hanging out from between its pages near the middle, its cover plain with no title"
     },
     {
-      "id": "be-api-design-cookie",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a single thick round chocolate chip cookie seen from a three-quarter angle, golden and crumbly at the edges, a few large dark chocolate chunks pressed into its top"
-    },
-    {
       "id": "be-api-design-bucket",
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a small wooden bucket bound with two metal bands and a rope handle, a few thick round brass coins heaped inside it"
-    },
-    {
-      "id": "be-api-design-hourglass",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "an upright hourglass with a sturdy wooden frame of two round end caps and three turned posts, blue sand running from the upper glass bulb into a small heap in the lower one"
-    },
-    {
-      "id": "be-api-design-parcel",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a small square cardboard parcel tied with a red string bow, seen from a three-quarter angle"
     }
   ]
 }

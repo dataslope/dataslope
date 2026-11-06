@@ -96,6 +96,16 @@ const pagesTouched = (planLines: readonly string[], afterNode: string) => {
   return n("hit") + n("read");
 };
 
+/** A plan node's "Buffers:" line, split: pages found in the cache (hit)
+ *  and pages read in. */
+const buffersOf = (planLines: readonly string[], afterNode: string) => {
+  const at = planLines.findIndex((l) => l.includes(afterNode));
+  const line = planLines.slice(at).find((l) => l.trim().startsWith("Buffers:"));
+  if (at < 0 || !line) throw new Error(`no Buffers line under ${JSON.stringify(afterNode)}`);
+  const n = (k: string) => Number(line.match(new RegExp(`${k}=(\\d+)`))?.[1] ?? 0);
+  return { hit: n("hit"), read: n("read") };
+};
+
 /** "1,000,000". */
 export const thousands = (n: number) => n.toLocaleString("en-US");
 
@@ -126,6 +136,7 @@ export const INDEX = {
   seqPlan,
   /** Every page of the table, for one row. */
   seqPages: pagesTouched(seqPlan, "Seq Scan"),
+  seqBuffers: buffersOf(seqPlan, "Seq Scan"),
   removed: planNumber(seqPlan, "Rows Removed", "Filter"),
   create: lines("index", "create").slice(0, 1),
   /** The B-tree's height: bt_metap's root level plus one. */
@@ -134,6 +145,8 @@ export const INDEX = {
   btreePlan,
   /** Three index pages on the way down, one table page. */
   btreePages: pagesTouched(btreePlan, "Index Scan"),
+  /** The hash index on the same column (the B-tree is dropped beside it). */
+  hashCreate: lines("index", "hash").slice(0, 1),
   hashEqPlan: plan("index", "hashEq"),
   hashRangeQuery: lines("index", "hashRange").slice(1),
   hashRangePlan: plan("index", "hashRange"),

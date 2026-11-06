@@ -82,7 +82,6 @@ export const WalletScene: React.FC = () => {
       <Sfx name="el-tap" at={fiveAt - 4} level={-27} />
       <Sfx name="el-scratch" at={uniqueAt + 2} level={-30} />
       <Sfx name="el-scratch" at={permanentAt + 2} level={-30} />
-      <Sfx name="el-pop" at={cancelledAt - 2} level={-30} />
 
       <Drift from={from} to={end + 50} origin="40% 50%">
         <Headline lead="One number," turn="thousands of people." at={from - 6} turnAt={fiveAt - 4} />
@@ -164,7 +163,6 @@ export const WalletScene: React.FC = () => {
             <span style={{ opacity: ease(frame, cancelledAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> cancelled</span>
           </div>
         </Note>
-        <Spot id="db-keys-stamp" at={cancelledAt - 4} left={1450} top={y(PERMANENT_Y) - 32} width={194} height={190} />
         <Ink at={betsAt - 6} dur={20} style={{ left: 120, top: y(MORAL_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>
             A natural key bets on <Mark at={controlAt - 6}>promises you don&apos;t control.</Mark>

@@ -50,7 +50,6 @@ export const IdentityScene: React.FC = () => {
   const tablesAt = Math.max(hookFrom + 4, n.word("hook", "two tables") - 8);
   const endsAt = n.word("hook", "ends on a row");
   const whichRowAt = n.word("hook", "WHICH");
-  const twoAt = n.word("taylors", "Two customers");
   const taylorAt = n.word("taylors", "Taylor Kim", { nth: 1 });
   const portlandAt = n.word("taylors", "Portland");
   const beansAt = n.word("taylors", "coffee beans");
@@ -115,7 +114,6 @@ export const IdentityScene: React.FC = () => {
       <Sfx name="el-whoosh" at={tablesAt} level={-34} />
       <Sfx name="el-pencil" at={endsAt - 2} level={-35} />
       <Sfx name="el-pencil" at={whichRowAt - 2} level={-34} />
-      <Sfx name="el-pop" at={twoAt - 2} level={-30} />
       <Sfx name="el-pop" at={beansAt - 2} level={-30} />
       <Sfx name="el-tap" at={twiceAt - 2} level={-29} />
       <Sfx name="el-whoosh" at={pkAt + 2} level={-34} />
@@ -184,8 +182,6 @@ export const IdentityScene: React.FC = () => {
           marks={[{ row: 0, col: 1, at: oneOhOneAt, color: MARK_KEY }]}
         />
         <Spot id="db-keys-beans" at={beansAt - 4} left={X0 + 40} top={y(640) + 16} width={250} height={250} />
-        {/* Two customers, alike in every way, under their table. */}
-        <Spot id="db-keys-twins" at={twoAt - 4} left={1130} top={765} width={151} height={220} />
 
         {/* The hook's line lands on a row; on "WHICH" it forks to both, and
             on "Which one?" neither is the answer. */}

@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COUNTRIES, IDENTITY } from "./data";
-import { DataTable, Drift, FIG_Y, Headline, KEY_INK, Kicker, MARK, MARK_KEY, Mark, Mono, Spot, TableName, tableGeometry } from "./parts";
+import { DataTable, Drift, FIG_Y, Headline, KEY_INK, Kicker, MARK, MARK_KEY, Mark, Mono, TableName, tableGeometry } from "./parts";
 
 const LEFT_X = 120;
 const RIGHT_X = 1000;
@@ -38,7 +38,6 @@ export const KindsScene: React.FC = () => {
   const jpAt = n.word("kinds", "J P");
   const japanAt = n.word("kinds", "Japan");
   const surrogateAt = n.word("surrogate", "surrogate key");
-  const numberAt = n.word("surrogate", "number");
   const makesAt = n.word("surrogate", "makes up");
   const nameAt = n.word("surrogate", "name the row");
   const nothingAt = n.word("surrogate", "nothing");
@@ -60,9 +59,7 @@ export const KindsScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: each table, the marked code, the made-up ids ── */}
       <Sfx name="el-whoosh" at={naturalAt + 10} level={-34} />
-      <Sfx name="el-pop" at={codeAt - 2} level={-30} />
       <Sfx name="el-pencil" at={jpAt - 2} level={-35} />
-      <Sfx name="el-pop" at={numberAt - 2} level={-30} />
       <Sfx name="el-whoosh" at={makesAt - 8} level={-34} />
       <Sfx name="el-tap" at={nameAt} level={-28} />
       <Sfx name="el-pencil" at={purposeAt} level={-34} />
@@ -104,9 +101,6 @@ export const KindsScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* A country, beside the table keyed on its code. */}
-        <Spot id="db-keys-globe" at={codeAt - 4} left={650} top={y(PANEL_Y) + 190} width={170} height={220} />
-
         {/* The two panels' divider. */}
         <div
           style={{
@@ -130,8 +124,6 @@ export const KindsScene: React.FC = () => {
             made up by the database: <Mono>GENERATED ALWAYS AS IDENTITY</Mono>
           </span>
         </Note>
-        {/* Take a number: the database hands one out. */}
-        <Spot id="db-keys-ticket" at={numberAt - 4} left={1606} top={y(PANEL_Y) + 190} width={186} height={190} />
         <TableName g={customers} at={makesAt - 8}>
           customers
         </TableName>

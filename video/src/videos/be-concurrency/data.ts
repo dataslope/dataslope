@@ -11,10 +11,9 @@ export const VIDEO = "be-concurrency";
 
 /**
  * Whether public/images/be-concurrency/ holds the watercolors from
- * illustrations.json. They are generated in phase 2; every frame is laid out
- * with room for them either way.
+ * illustrations.json (generated and imported 2026-11-06).
  */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export const PYTHON = results.runtime.python;
 

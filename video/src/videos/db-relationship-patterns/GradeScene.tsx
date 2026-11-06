@@ -8,7 +8,7 @@ import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { courseId, JT, studentId } from "./data";
-import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_BAD, ROW_H, Spot, Tag, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_BAD, ROW_H, Tag, tableGeometry } from "./parts";
 
 const LEFT_X = 120;
 const RIGHT_X = 820;
@@ -47,8 +47,6 @@ export const GradeScene: React.FC = () => {
   const nextAt = n.word("one-in", "next shape");
   const splitsAt = n.word("one-in", "splits");
   const inTwoAt = n.word("one-in", "in two");
-  // The halved orange pops in just after "splits", silent like the video's other spot art.
-  const orangeAt = splitsAt + 2;
 
   // The junction's rows, joined to both parents (the lesson's own query).
   const COLS = JT.joinCols;
@@ -94,7 +92,6 @@ export const GradeScene: React.FC = () => {
 
       <Kicker at={from - 10}>Junction tables</Kicker>
       <Head lead="A fact about the pairing" leadAt={from - 6} turn="lives on its row." turnAt={ownRowAt - 6} />
-      <Spot id="db-relationship-patterns-orange" at={orangeAt} left={1540} top={y(110)} width={260} height={134} />
 
       <Drift from={from} to={nextAt + 30} scale={0.016} origin={[960, y(560)]}>
       <Drift from={nextAt} to={n.beat("wide").from} scale={0.03} origin={[960, y(560)]}>

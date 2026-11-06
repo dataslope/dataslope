@@ -10,8 +10,8 @@ import results from "./results.json" with { type: "json" };
 export const VIDEO = "be-algorithms";
 
 /** Whether public/images/be-algorithms/ holds the watercolors from
- *  illustrations.json. They are not generated yet (phase 2). */
-export const ILLUSTRATIONS = false;
+ *  illustrations.json: the pangolin and four spots. */
+export const ILLUSTRATIONS = true;
 
 export const RUNTIME: string = results.runtime;
 

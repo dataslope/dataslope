@@ -59,8 +59,7 @@ export const HookScene: React.FC = () => {
   const answer = ride(answersAt);
   const rideOn = (at: number) => (frame >= at && frame < at + 26 ? 1 : 0);
 
-  const blogTop = y(605);
-  const paper = artBox("newspaper", 200);
+  const blogTop = y(590);
   const puffin = artBox("puffin", 360);
   const planTop = y(800);
 
@@ -74,7 +73,6 @@ export const HookScene: React.FC = () => {
       <Sfx name="el-whoosh" at={asksAt} level={-36} />
       <Sfx name="el-whoosh" at={answersAt} level={-36} />
       <Sfx name="el-pop" at={backendAt + 20} level={-30} />
-      <Sfx name="el-pop" at={blogAt} level={-30} />
       <Sfx name="el-sprinkle" at={tenAt} level={-31} />
       <Sfx name="el-chime" at={sixteenAt} level={-32} />
 
@@ -129,10 +127,12 @@ export const HookScene: React.FC = () => {
         <Spot id="puffin" at={backendAt + 20} left={1450} top={y(232)} {...puffin} />
 
         {/* The page's example: a blog's two resources. */}
-        <Spot id="newspaper" at={blogAt} left={X0} top={blogTop + h(10)} {...paper} />
-        <Node x={400} y={blogTop} w={280} h={104} at={articlesAt} title="articles" sub="the blog's posts" size={28} />
-        <Flow points={[[688, blogTop + 52], [770, blogTop + 52]]} at={commentsAt - 2} color={BAR} />
-        <Node x={780} y={blogTop} w={300} h={104} at={commentsAt} title="comments" sub="on each article" size={28} />
+        <Note at={blogAt} x={X0} y={blogTop}>
+          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>The example: a blog</span>
+        </Note>
+        <Node x={X0} y={blogTop + h(44)} w={280} h={96} at={articlesAt} title="articles" sub="the blog's posts" size={28} />
+        <Flow points={[[X0 + 288, blogTop + h(44) + 48], [X0 + 372, blogTop + h(44) + 48]]} at={commentsAt - 2} color={BAR} />
+        <Node x={X0 + 380} y={blogTop + h(44)} w={300} h={96} at={commentsAt} title="comments" sub="on each article" size={28} />
 
         {/* The round: sixteen questions, ten big and six small. */}
         <div style={{ position: "absolute", left: X0, top: planTop, display: "flex", alignItems: "center", gap: 10, fontSize: 21 }}>

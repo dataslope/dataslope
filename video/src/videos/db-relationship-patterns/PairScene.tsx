@@ -103,7 +103,7 @@ export const PairScene: React.FC = () => {
 
       <Kicker at={from - 10}>Junction tables</Kicker>
       <Head lead="The pair is the key," leadAt={from - 6} turn="so it fits once." turnAt={existsAt - 4} />
-      <Spot id="db-relationship-patterns-keys" at={keyringAt} left={1580} top={y(66)} width={200} height={222} />
+      <Spot id="db-relationship-patterns-keys" at={keyringAt} left={1590} top={y(114)} width={180} height={200} />
 
       <Drift from={from} to={existsAt + 60} scale={0.016} origin={[960, y(600)]}>
         {/* ── The table, its two key columns braced as one key ── */}

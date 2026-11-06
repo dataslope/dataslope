@@ -294,11 +294,13 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-ladder",
+      scene: true,
       text: "Then keep one picture in your head: what each level of memory and network costs. Main memory, a hundred nanoseconds. An SSD read, a thousand times that. A round trip inside the data center, five times more again. So count the network hops in a request before anything else.",
       pauseAfter: 0.8,
     },
     {
       id: "q2-tail",
+      scene: true,
       text: "And quote latency as a percentile, never a mean. In a simulated sample of forty thousand requests, the median takes twenty-four milliseconds and the mean thirty-one, but one request in a hundred takes two hundred and eighty-six or more: the ninety-ninth percentile.",
       pauseAfter: 0.6,
     },
@@ -327,6 +329,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q3-diagram",
+      scene: true,
       text: "Store the mapping in a key-value store, since every lookup is by key. Put a cache in front of it, because reads outnumber writes a hundred to one. And keep the app servers stateless, behind a load balancer, so scaling out is just adding one.",
       pauseAfter: 0.8,
     },
@@ -365,6 +368,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q4-retry",
+      scene: true,
       text: "That's half the job. The other half is not burying a dependency that's already failing. Retries add load at the worst moment: in the page's simulation, they push it to three hundred requests a second, against a service that was failing at a hundred.",
       pauseAfter: 0.6,
     },
@@ -393,6 +397,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q5-use",
+      scene: true,
       text: "So it cuts latency, takes traffic off your origin, and absorbs spikes. Use it for anything static or cacheable: images, JavaScript, CSS and video. Dynamic, user-specific responses usually bypass it, or get a short time to live at the edge.",
       pauseAfter: 0.6,
     },
@@ -408,6 +413,7 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
+      scene: true,
       text: "That's a first design. It's sized for its estimate, and no single machine can take it down.",
       pauseAfter: 0.7,
     },

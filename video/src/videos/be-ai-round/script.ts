@@ -44,7 +44,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     activities appearing under it as it is read; on "hour-past" the Build
  *     segment is bracketed as half the bar, and the 50 to 55 total is marked
  *     against 60.
- *   - "prompt" to "prompt-past": a ticket stub (spot art) on "ticket"; the
+ *   - "prompt" to "prompt-past": the
  *     page's weak and better prompts, as the page prints them, side by side.
  *     The better one's spans are highlighted in four colors as the four
  *     ingredients are read: context (limiter.py, the sliding window),

@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { artBox, Cross, Drift, Flow, Mark, METHOD_INK, Msg, msgHeight, Node, OK_INK, Pill, Spot, Strike, X0 } from "./parts";
+import { Cross, Drift, Flow, Mark, METHOD_INK, Msg, msgHeight, Node, OK_INK, Pill, Strike, X0 } from "./parts";
 
 /** The resource and the four methods around it. */
 const CARD = { x: 300, w: 340, h: 100 };
@@ -60,7 +60,6 @@ export const RestScene: React.FC = () => {
   const guessTop = y(690);
   const lbTop = y(690);
   const srvTop = (i: number) => y(620) + i * h(124);
-  const scales = artBox("scales", 160);
 
   return (
     <AbsoluteFill>
@@ -72,7 +71,6 @@ export const RestScene: React.FC = () => {
       <Sfx name="el-pencil" at={carriesAt} level={-34} />
       <Sfx name="el-tap" at={sessionAt + 6} level={-31} />
       <Sfx name="el-pencil" at={guessAt + 8} level={-34} />
-      <Sfx name="el-pop" at={lbAt + 4} level={-30} />
       <Sfx name="el-whoosh" at={nextAt} level={-36} />
 
       <Drift from={from} to={end + 30}>
@@ -208,7 +206,6 @@ export const RestScene: React.FC = () => {
         <Note at={nextAt + 14} x={1320} y={srvTop(1) + h(92)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the next request, either one</span>
         </Note>
-        <Spot id="scales" at={lbAt + 4} left={780} top={y(668)} {...scales} />
       </Drift>
     </AbsoluteFill>
   );

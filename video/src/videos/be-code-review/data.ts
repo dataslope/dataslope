@@ -14,7 +14,7 @@ export const VIDEO = "be-code-review";
 /** Whether public/images/be-code-review/ holds the watercolors from
  *  illustrations.json. Phase 2 generates them; every frame is laid out with
  *  room for them either way. */
-export const ILLUSTRATIONS = false;
+export const ILLUSTRATIONS = true;
 
 export const RUNTIME: string = results.runtime;
 

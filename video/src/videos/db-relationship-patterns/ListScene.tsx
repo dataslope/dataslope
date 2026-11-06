@@ -23,7 +23,6 @@ import {
   MARK_KEY,
   Pulse,
   ROW_H,
-  Spot,
   Tag,
   tableGeometry,
 } from "./parts";
@@ -68,10 +67,6 @@ export const ListScene: React.FC = () => {
   const relAt = n.word("repeat", "relationship");
   const bothAt = n.word("cross-in", "both sides");
   const crossManyAt = n.word("cross-in", "many");
-  // The crammed box pops in just after "one cell", silent like the video's
-  // other spots, and goes before the table slides back for the orders.
-  const crammedAt = cellAt + 2;
-  const crammedOut = n.beat("cell").to - 4;
 
   const headH = h(HEAD_H);
   const rowH = h(ROW_H);
@@ -116,7 +111,6 @@ export const ListScene: React.FC = () => {
 
       <Kicker at={from - 10}>One to many</Kicker>
       <Head lead="Not a list in a cell." leadAt={from - 6} out={fkAt - 6} />
-      <Spot id="db-relationship-patterns-crammed" at={crammedAt} out={crammedOut} left={1120} top={y(400)} width={230} height={230} />
       <Head lead="One key per order." leadAt={fkAt} turn="The repeat is the link." turnAt={relAt - 4} />
 
       <Drift from={fkAt} to={dimAll + 40} scale={0.018} origin={[960, y(600)]}>

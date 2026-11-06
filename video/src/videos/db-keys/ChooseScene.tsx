@@ -29,6 +29,7 @@ export const ChooseScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("choose").from;
+  const childAt = n.word("choose", "child");
   const withoutAt = n.word("choose", "without its parent");
   const nothingAt = n.word("choose", "Nothing");
   const cascadeAt = n.word("choose", "Cascade");
@@ -39,7 +40,6 @@ export const ChooseScene: React.FC = () => {
   const changingAt = n.word("update", "Changing");
   const sameAt = n.word("update", "same question");
   const neverAt = n.word("update", "never changes");
-  const keysAt = n.word("next", "keys");
   const shapeAt = n.word("next", "every shape");
   const end = n.beat("next").to;
 
@@ -58,9 +58,8 @@ export const ChooseScene: React.FC = () => {
       <Sfx name="el-pencil" at={nothingAt} level={-34} />
       <Sfx name="el-pencil" at={aloneAt - 4} level={-34} />
       <Sfx name="el-pencil" at={recordAt - 6} level={-34} />
-      <Sfx name="el-pop" at={recordAt - 2} level={-30} />
       <Sfx name="el-tap" at={sameAt} level={-29} />
-      <Sfx name="el-pop" at={keysAt - 2} level={-30} />
+      <Sfx name="el-pop" at={childAt - 2} level={-30} />
       {/* The conclusion's bell, in the silence after the last word. */}
       <Sfx name="el-chime" at={end + 6} level={-32} />
 
@@ -131,8 +130,6 @@ export const ChooseScene: React.FC = () => {
             );
           })}
 
-          <Spot id="db-keys-cabinet" at={recordAt - 4} left={1340} top={y(BRANCH_Y[2]) - 150} width={166} height={190} />
-
           {/* ── ON UPDATE: the same question ── */}
           <div style={{ position: "absolute", left: ROOT_X, top: y(766) - 14, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
           <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(766), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
@@ -150,8 +147,8 @@ export const ChooseScene: React.FC = () => {
           </Ink>
         </div>
 
-        {/* Keys to point with: beside the question, as the video closes. */}
-        <Spot id="db-keys-keyring" at={keysAt - 4} left={1310} top={105} width={165} height={170} />
+        {/* A parent and the child holding its hand: the question the headline asks. */}
+        <Spot id="db-keys-family" at={childAt - 4} left={1460} top={400} width={171} height={220} />
 
         <NextLine at={shapeAt - 4} x={ROOT_X} y={y(842)} width={760}>
           the shapes relationships take.

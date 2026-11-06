@@ -38,40 +38,10 @@
       "subject": "a sturdy leather suitcase with a round handle on top, and a plain blank luggage tag tied to the handle by a looped string, hanging down against the suitcase's side"
     },
     {
-      "id": "db-keys-twins",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "two anonymous stylized people with no facial features standing side by side, identical in every way like a pair of twins: the same height, the same long blue coat, the same yellow scarf and the same short dark hair"
-    },
-    {
       "id": "db-keys-key",
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "one large old-fashioned door key lying at a slight diagonal, with a thick round bow, a long chunky shaft and a deep bit with two square teeth, painted in warm yellow brass washes"
-    },
-    {
-      "id": "db-keys-student",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "an anonymous stylized student with no facial features, walking, wearing a chunky blue backpack and hugging two thick textbooks against their chest, one red and one green"
-    },
-    {
-      "id": "db-keys-globe",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a small desk globe on a curved stand and a round base, its oceans in blue washes and its continents in green and yellow washes, with no lines and no labels"
-    },
-    {
-      "id": "db-keys-ticket",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a chunky red take-a-number ticket dispenser on a short round stand, with one long blank paper ticket curling out of the slot in its front"
-    },
-    {
-      "id": "db-keys-stamp",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a chunky rubber stamp with a round red wooden handle, standing upright beside a small open tin of red ink pad"
     },
     {
       "id": "db-keys-envelope",
@@ -92,28 +62,16 @@
       "subject": "a chunky closed cardboard shipping box, deep and solid, taped shut across the top with a strip of blue tape, with one blank pale yellow label on its side"
     },
     {
-      "id": "db-keys-leaving",
+      "id": "db-keys-globe",
       "category": "video-icon",
       "style": "watercolor illustration",
-      "subject": "an anonymous stylized office worker with no facial features, walking away to one side, carrying a cardboard box of belongings in both arms with a green potted plant poking out of the top"
+      "subject": "a small desk globe on a curved stand and a round base, its oceans in blue washes and its continents in green and yellow washes, with no lines and no labels"
     },
     {
-      "id": "db-keys-cabinet",
+      "id": "db-keys-ticket",
       "category": "video-icon",
       "style": "watercolor illustration",
-      "subject": "a sturdy two-drawer filing cabinet in blue washes, its top drawer pulled open with a row of yellow and red folders standing upright inside it"
-    },
-    {
-      "id": "db-keys-badge",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a plain blank plastic ID badge hanging from a looped red lanyard, the badge a chunky pale yellow card with an empty blue square where a photo would go"
-    },
-    {
-      "id": "db-keys-keyring",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a round metal key ring holding four chunky keys of different shapes and colors, one yellow, one blue, one red and one green, fanned out as they hang from the ring"
+      "subject": "a chunky red take-a-number ticket dispenser on a short round stand, with one long blank paper ticket curling out of the slot in its front"
     }
   ]
 }

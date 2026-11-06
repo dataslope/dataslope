@@ -38,12 +38,6 @@
       "subject": "a standing hourglass with two round wooden end caps and three turned wooden posts, its glass bulbs holding warm yellow sand, most of it still in the upper bulb"
     },
     {
-      "id": "be-ai-round-ticket",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a single thick paper ticket stub with notched corners and a perforated tear line across one end, lying at a slight angle, completely blank with no printing"
-    },
-    {
       "id": "be-ai-round-coins",
       "category": "video-icon",
       "style": "watercolor illustration",
@@ -60,18 +54,6 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a round car speedometer gauge in a thick chrome rim, a plain dial face with evenly spaced tick marks and no numbers, a single red needle pointing a little past the middle"
-    },
-    {
-      "id": "be-ai-round-dice",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "two chunky six-sided dice with softly rounded corners, one blue and one yellow, resting side by side at different angles, each face marked with round pips"
-    },
-    {
-      "id": "be-ai-round-lockbox",
-      "category": "video-icon",
-      "style": "watercolor illustration",
-      "subject": "a small closed steel lockbox with a sturdy hinged lid, a carrying handle on top and a plain round keyhole on its front, seen at a slight angle"
     }
   ]
 }

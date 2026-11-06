@@ -12,7 +12,8 @@ import results from "./results.json" with { type: "json" };
 export const VIDEO = "be-ai-round";
 
 /** public/images/be-ai-round/ holds the watercolors from illustrations.json:
- *  the lemur and eight small spots. */
+ *  the lemur and five small spots, one in each scene that has room for the
+ *  thing it is about. */
 export const ILLUSTRATIONS = true;
 
 /** The series' ten videos for the close, each with the hero its own folder

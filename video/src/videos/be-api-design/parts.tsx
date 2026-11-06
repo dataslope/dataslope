@@ -455,18 +455,9 @@ export const Spot: React.FC<{
  *  of them (a 4K render draws the 1080p layout at twice the size). */
 export const ART = {
   puffin: [872, 1024],
-  newspaper: [1015, 768],
-  scales: [1019, 994],
-  wastebasket: [716, 1005],
-  padlock: [744, 1024],
-  "alarm-clock": [811, 1005],
-  card: [991, 739],
   key: [1016, 1006],
   bookmark: [961, 941],
-  cookie: [1014, 779],
   bucket: [893, 1024],
-  hourglass: [609, 1024],
-  parcel: [935, 965],
 } as const;
 
 /** A box `width` wide for an image, at its own aspect ratio. */

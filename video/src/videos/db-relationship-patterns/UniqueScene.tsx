@@ -106,7 +106,7 @@ export const UniqueScene: React.FC = () => {
 
       <Kicker at={from - 10}>One to one</Kicker>
       <Head lead="A foreign key," leadAt={from - 6} turn="plus unique." turnAt={uniqueAt - 2} />
-      <Spot id="db-relationship-patterns-badges" at={badgesAt} dim={lastAt} left={1580} top={y(56)} width={200} height={214} />
+      <Spot id="db-relationship-patterns-badges" at={badgesAt} dim={lastAt} left={1590} top={y(114)} width={180} height={193} />
 
       <Drift from={from} to={lastAt + 30} scale={0.016} origin={[960, y(600)]}>
       <Drift from={lastAt} to={n.beat("self").from} scale={0.03} origin={[960, y(600)]}>

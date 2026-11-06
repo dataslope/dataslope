@@ -34,8 +34,7 @@ export const JunctionScene: React.FC = () => {
   const otmAt = n.word("two", "one-to-manys");
   const junctionAt = n.word("named", "junction table");
   const nameAt = n.word("named", "a name");
-  // The spots pop in just after the words that name them, silent like the video's other spot art.
-  const tangleAt = n.word("two", "tangle") + 2;
+  // The signpost pops in just after "junction table", silent like the video's other spot art.
   const signpostAt = junctionAt + 2;
 
   const students = useEntityLayout({
@@ -94,8 +93,7 @@ export const JunctionScene: React.FC = () => {
 
       <Kicker at={from - 10}>Many to many</Kicker>
       <Head lead="Every pairing gets a row:" leadAt={from - 6} turn="a junction table." turnAt={junctionAt - 2} />
-      <Spot id="db-relationship-patterns-tangle" at={tangleAt} left={170} top={y(560)} width={230} height={215} />
-      <Spot id="db-relationship-patterns-signpost" at={signpostAt} left={1560} top={y(560)} width={190} height={240} />
+      <Spot id="db-relationship-patterns-signpost" at={signpostAt} left={1575} top={y(574)} width={156} height={200} />
 
       <Drift from={pairingAt} to={nameAt + 50} scale={0.016} origin={[960, y(560)]}>
         {/* One figure: the diagram, and under its middle box the rows it holds. */}

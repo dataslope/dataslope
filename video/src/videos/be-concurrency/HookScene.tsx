@@ -6,7 +6,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, labe
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Band, Block, Drift, Headline, Kicker, OK_INK, SERIES, Spot, tint, X0 } from "./parts";
+import { Band, Block, Drift, Headline, Kicker, LockGlyph, Node, OK_INK, SERIES, tint, X0 } from "./parts";
 
 /** One second of the server's time, in px. */
 const SEC = 760;
@@ -74,6 +74,23 @@ const Chip: React.FC<{ at: number; x: number; y: number; w: number; h: number; n
   );
 };
 
+/** What the requests come to share, drawn small: a counter's window, a
+ *  padlock, two ends joined by a line. */
+const Glyph: React.FC<{ kind: string }> = ({ kind }) =>
+  kind === "lock" ? (
+    <LockGlyph size={46} color={BAR} />
+  ) : kind === "counter" ? (
+    <span style={{ ...label(30, BLUE_INK), fontWeight: 750, border: `2.5px solid ${BAR}`, borderRadius: 8, padding: "0 14px", background: PAPER, lineHeight: 1.3 }}>
+      <Num>5</Num>
+    </span>
+  ) : (
+    <svg width={90} height={40} viewBox="0 0 90 40" style={{ display: "block" }}>
+      <rect x={4} y={10} width={22} height={20} rx={4} fill={BAR} />
+      <rect x={64} y={10} width={22} height={20} rx={4} fill="none" stroke={BAR} strokeWidth={3} />
+      <line x1={26} y1={20} x2={64} y2={20} stroke={BAR} strokeWidth={3.5} />
+    </svg>
+  );
+
 /**
  * The opening: a thousand requests a second, each mostly waiting. Served one
  * after another, a server's second holds only a few of them and the queue
@@ -93,7 +110,6 @@ export const HookScene: React.FC = () => {
   const idleAt = n.word("hook", "sits idle");
   const queueAt = n.word("hook", "the queue grows");
   const onceAt = n.word("hook-share", "Serve them at once");
-  const sharingAt = n.word("hook-share", "they start sharing things");
   const counterAt = n.word("hook-share", "a counter");
   const lockAt = n.word("hook-share", "a lock");
   const connAt = n.word("hook-share", "a connection");
@@ -123,9 +139,9 @@ export const HookScene: React.FC = () => {
   const lineBottom = y(640);
 
   const shared = [
-    { id: "tally-counter", name: "a counter", at: counterAt, x: 1000 },
-    { id: "padlock", name: "a lock", at: lockAt, x: 1280 },
-    { id: "plug", name: "a connection", at: connAt, x: 1560 },
+    { id: "counter", name: "a counter", at: counterAt, x: 1000 },
+    { id: "lock", name: "a lock", at: lockAt, x: 1270 },
+    { id: "connection", name: "a connection", at: connAt, x: 1540 },
   ];
 
   return (
@@ -227,21 +243,14 @@ export const HookScene: React.FC = () => {
 
           {/* What they share. */}
           {shared.map((s) => (
-            <React.Fragment key={s.id}>
-              <Spot id={s.id} at={s.at} left={s.x} top={y(372)} width={170} height={h(150)} />
-              <Ink at={s.at + 2} dur={12} style={{ left: s.x, top: y(556), width: 170, textAlign: "center" }}>
-                <span style={{ ...label(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{s.name}</span>
-              </Ink>
-            </React.Fragment>
+            <Node key={s.id} x={s.x} y={y(380)} w={230} h={h(130)} at={s.at} tone="data" justify="center">
+              <Glyph kind={s.id} />
+              <span style={{ ...label(24, INK), fontWeight: 650, whiteSpace: "nowrap", marginTop: 6 }}>{s.name}</span>
+            </Node>
           ))}
-          <Note at={sharingAt} x={1000} y={y(318)} out={counterAt - 2}>
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>shared by all of them</span>
-          </Note>
-          <Note at={bugsAt} x={1000} y={y(626)}>
+          <Note at={bugsAt} x={1000} y={y(560)}>
             <span style={{ ...note(28, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>That&apos;s where the bugs live.</span>
           </Note>
-          <Spot id="beetle" at={bugsAt + 8} left={1640} top={y(640)} width={140} height={h(124)} />
-          <Spot id="database" at={dbAt} out={onceAt - 6} left={1600} top={y(300)} width={170} height={h(150)} />
         </div>
 
         {/* The round: nine with a figure, seven quickly. */}

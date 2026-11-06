@@ -7,7 +7,7 @@ import type { Cardinality } from "../../components/crowsfoot";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OTM } from "./data";
-import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, KeyArrow, Kicker, MARK_KEY, Pulse, ROW_H, Spot, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, KeyArrow, Kicker, MARK_KEY, Pulse, ROW_H, tableGeometry } from "./parts";
 
 /** The four panels: left edges, each panel PANEL wide. */
 const PANEL_X = [120, 560, 1000, 1440];
@@ -74,8 +74,6 @@ export const ShapesScene: React.FC = () => {
   const oddAt = n.word("names", "odd one");
   const selfAt = n.word("names", "a table");
   const itselfAt = n.word("names", "itself");
-  // The spot pops in just after "few shapes", silent like the video's other spot art.
-  const blocksAt = shapesAt + 2;
 
   // Unit 4's last picture, small: an order row naming a customer row.
   const ORDER = OTM.orderRows[2];
@@ -98,7 +96,6 @@ export const ShapesScene: React.FC = () => {
 
       <Kicker at={from - 10}>The shapes</Kicker>
       <Head lead="Links come in" leadAt={linksAt - 4} turn="a few shapes." turnAt={shapesAt - 4} />
-      <Spot id="db-relationship-patterns-blocks" at={blocksAt} left={1580} top={y(66)} width={240} height={220} />
 
       {/* ── With keys, one row can point at another ── */}
       <Drift from={rowAt} to={pairOut + 10} scale={0.035} origin={[960, y(520)]}>
