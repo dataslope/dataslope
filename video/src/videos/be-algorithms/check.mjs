@@ -442,6 +442,9 @@ R["amortized"] = {
     "doublingResizes": len(dbl_caps),
     "doublingCopies": sum(dbl_caps),
     "doublingLargest": dbl_caps[-1],
+    # Every resize, [items before it, slots after], for the staircase the
+    # video draws (scenes plot these; nothing is read off them by eye).
+    "steps": resizes,
 }
 
 # 4. Stack. Three checkers for brackets: per-type counts, a queue (matches
@@ -615,7 +618,7 @@ R["dijkstra"] = {
 #    Each counts element-to-pivot comparisons and the deepest level of
 #    partitions, run with an explicit stack so depth never meets Python's
 #    recursion limit.
-def quicksort_count(a, pick):
+def quicksort_count(a, pick, record=None):
     a = list(a); cmp = 0; deepest = 0
     st = [(0, len(a) - 1, 1)]
     while st:
@@ -623,6 +626,8 @@ def quicksort_count(a, pick):
         if lo >= hi:
             continue
         deepest = max(deepest, depth)
+        if record is not None:
+            record.append([depth, lo, hi])
         p = pick(lo, hi)
         a[p], a[hi] = a[hi], a[p]
         pivot = a[hi]; i = lo
@@ -638,7 +643,8 @@ n = 1000
 srt = list(range(n))
 rng = random.Random(1000)
 last_sorted = quicksort_count(srt, lambda lo, hi: hi)
-rand_sorted = quicksort_count(srt, lambda lo, hi: rng.randint(lo, hi))
+rand_parts = []
+rand_sorted = quicksort_count(srt, lambda lo, hi: rng.randint(lo, hi), rand_parts)
 shuf = list(range(n)); random.Random(7).shuffle(shuf)
 last_shuf = quicksort_count(shuf, lambda lo, hi: hi)
 # The page's own recursive quicksort shape with a "pick last" pivot, on the
@@ -659,6 +665,9 @@ R["quicksort"] = {
     "n": n,
     "lastPivotSorted": {"compares": last_sorted[0], "depth": last_sorted[1]},
     "randomPivotSorted": {"compares": rand_sorted[0], "depth": rand_sorted[1]},
+    # Every partition the random-pivot run made, [depth, lo, hi], for the
+    # tree the video draws: each row is one level of the recursion.
+    "randomPartitions": sorted(rand_parts),
     "lastPivotShuffled": {"compares": last_shuf[0], "depth": last_shuf[1]},
     "pairs": n * (n - 1) // 2,
     "recursiveLastPivot": recursion,

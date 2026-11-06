@@ -184,8 +184,8 @@ export const IdentityScene: React.FC = () => {
           marks={[{ row: 0, col: 1, at: oneOhOneAt, color: MARK_KEY }]}
         />
         <Spot id="db-keys-beans" at={beansAt - 4} left={X0 + 40} top={y(640) + 16} width={250} height={250} />
-        {/* Two customers, alike in every way, beside their two rows. */}
-        <Spot id="db-keys-twins" at={twoAt - 4} left={1640} top={y(CUSTOMERS_Y) - 10} width={151} height={220} />
+        {/* Two customers, alike in every way, under their table. */}
+        <Spot id="db-keys-twins" at={twoAt - 4} left={1130} top={765} width={151} height={220} />
 
         {/* The hook's line lands on a row; on "WHICH" it forks to both, and
             on "Which one?" neither is the answer. */}

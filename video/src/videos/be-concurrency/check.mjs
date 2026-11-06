@@ -59,6 +59,9 @@ R["amdahl"] = {
     str(s): {
         "ceiling": round(1 / s, 2),
         "at": {str(n): round(speedup(s, n), 2) for n in (1, 2, 4, 8, 16, 100, 1000)},
+        # The curve the figure draws: 61 core counts, evenly spaced on the
+        # chart's log axis from 1 to 1000.
+        "curve": [[round(10 ** (k / 20), 4), round(speedup(s, 10 ** (k / 20)), 4)] for k in range(61)],
     }
     for s in (0.01, 0.05, 0.25)
 }
@@ -92,11 +95,14 @@ def run(order, start):
     return shared
 
 def race(steps_each, start=5):
-    outcomes, example = {}, None
+    outcomes, example, every = {}, None, []
     orders = list(interleavings(steps_each, steps_each))
     for order in orders:
         v = run(order, start)
         outcomes[v] = outcomes.get(v, 0) + 1
+        # Each order as the threads that take its steps, in turn ("AABABB"),
+        # and what it leaves in the counter: the figure draws every one.
+        every.append({"threads": "".join(w for w, _ in order), "result": v})
         right = start + 2 * sum(1 for s in steps_each if s in ("write", "inc"))
         if v != right and example is None:
             example = [f"{w} {s}" for w, s in order]
@@ -108,6 +114,7 @@ def race(steps_each, start=5):
         "rightOrders": outcomes.get(right, 0),
         "outcomes": {str(k): v for k, v in sorted(outcomes.items(), reverse=True)},
         "lostExample": example,
+        "every": every if len(orders) <= 20 else None,
     }
 
 # A losing order with both reads first, the page's "both see 5", for the figure.
@@ -189,6 +196,14 @@ R["deadlock"] = {
     "opposite": schedules(A_THEN_B, B_THEN_A),
     "sameOrder": schedules(A_THEN_B, A_THEN_B),
 }
+
+# ── The thread pool's map, the page's example: results in input order ──────
+# The pool itself can't run here (no threads); map is what pool.map returns,
+# in the same order, which is the page's point.
+def square(n):
+    return n * n
+
+R["pool"] = {"workers": 4, "inputs": list(range(6)), "results": list(map(square, range(6)))}
 
 json.dumps(R)
 `);
@@ -303,6 +318,8 @@ R.async.serial = { total: both, rule: "the sum of the waits" };
 delete awaiting.elapsed;
 delete blocking.elapsed;
 if (R.semaphore.peak !== R.semaphore.limit) fail(`semaphore peak ${R.semaphore.peak}`);
+if (R.race.one.every.filter((o) => o.result === R.race.one.right).length !== R.race.one.rightOrders) fail("race: every order disagrees with the count");
+if (R.pool.results.join() !== "0,1,4,9,16,25") fail(`pool map: ${R.pool.results}`);
 
 const file = join(here, "results.json");
 writeFileSync(file, `${JSON.stringify(R, null, 2)}\n`);

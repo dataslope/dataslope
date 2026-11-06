@@ -53,6 +53,7 @@ export const RulesScene: React.FC = () => {
   const refusedAt = n.word("dup", "refused");
   const keyAt = n.word("dup", "Key one");
   const leaveAt = n.word("null", "Leave");
+  const idAt = n.word("null", "ID");
   const offAt = n.word("null", "off");
   const againAt = n.word("null", "Refused again");
   const pointerAt = n.word("null", "No pointer");
@@ -76,6 +77,7 @@ export const RulesScene: React.FC = () => {
       <Sfx name="el-tap" at={adaAt - 2} level={-28} />
       <Sfx name="el-pop" at={graceAt} level={-30} />
       <Sfx name="el-scratch" at={refusedAt + 2} level={-30} />
+      <Sfx name="el-pop" at={idAt - 2} level={-30} />
       <Sfx name="el-pop" at={offAt - 2} level={-30} />
       <Sfx name="el-scratch" at={againAt + 2} level={-30} />
       <Sfx name="el-pencil" at={pointerAt + 6} level={-34} />
@@ -127,6 +129,9 @@ export const RulesScene: React.FC = () => {
           message={DUPLICATE.none.message}
           detail={DUPLICATE.none.detail}
         />
+
+        {/* The ID a row can't leave off, under the table that refuses it. */}
+        <Spot id="db-keys-badge" at={idAt - 4} left={170} top={800} width={173} height={190} />
 
         {/* What the rules buy: customer 1 names exactly one row. */}
         <Note at={pointerAt + 8} x={X0} y={g.rowTop(1) + h(30)}>

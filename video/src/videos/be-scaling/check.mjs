@@ -121,7 +121,14 @@ const h32 = (s) => createHash("md5").update(s).digest().readUInt32BE(0);
   const movedRingToNew = hashes.filter((_, i) => ring3[i] !== ring4[i] && ring4[i] === 3).length;
   const loads = (assign, n) => Array.from({ length: n }, (_, s) => assign.filter((a) => a === s).length);
   check(movedRing === movedRingToNew, "on the ring, every key that moves goes to the new server");
+  // For the figure: every key's server under each scheme, one digit a key in
+  // key order (the scene draws all 10,000 as a 100 x 100 grid), and the ring's
+  // points, each as its place around the ring (0 to 1) and its server.
+  const digits = (assign) => assign.join("");
+  const round4 = (v) => Math.round(v * 10_000) / 10_000;
   R.hashing = {
+    grid: { mod3: digits(mod3), mod4: digits(mod4), ring3: digits(ring3), ring4: digits(ring4) },
+    ringPoints: r4.map(([h, s]) => [round4(h / 2 ** 32), s]),
     keys: KEYS,
     pointsPerServer: POINTS,
     sample: keys.slice(0, 12).map((k, i) => ({ key: k, mod3: mod3[i], mod4: mod4[i], ring3: ring3[i], ring4: ring4[i] })),

@@ -53,7 +53,61 @@
       "id": "be-object-design-plug",
       "category": "video-icon",
       "style": "watercolor illustration",
-      "subject": "an electrical plug with two thick round prongs on a short curling cord, held just in front of a round wall socket with two matching holes"
+      "subject": "a small table lamp with a round cloth shade, its cord curling down to a plug with two thick round prongs, the plug held just in front of a round wall socket with two matching holes"
+    },
+    {
+      "id": "be-object-design-phone",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky smartphone lying at a slight tilt, its screen a plain pale wash holding one large rounded speech bubble with no text inside it"
+    },
+    {
+      "id": "be-object-design-loyalty-card",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a plain rectangular loyalty stamp card lying at a slight tilt, a row of six round stamped stars across it, the first four stars filled in and the last two left empty, no writing"
+    },
+    {
+      "id": "be-object-design-mousetrap",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a wooden mousetrap seen from a three-quarter angle, its spring bar pulled back and set, a small wedge of yellow cheese resting on its trigger plate"
+    },
+    {
+      "id": "be-object-design-invoice",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single sheet of paper invoice with one corner gently curled, a solid blue band across its top and a few plain colored bars where the lines would be, no writing"
+    },
+    {
+      "id": "be-object-design-monitor",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small flat computer monitor on a chunky stand, its screen showing four plain colored bars of different heights side by side, no text"
+    },
+    {
+      "id": "be-object-design-factory",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small chunky factory building with a saw-tooth roof and one tall round chimney, a single wooden crate sitting on a short conveyor in front of its wide door"
+    },
+    {
+      "id": "be-object-design-pillars",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "four short classical stone columns standing side by side in a row, each with a plain capital and base, washed in blue, green, red and yellow"
+    },
+    {
+      "id": "be-object-design-car",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small rounded hatchback car in side view, its body a solid blue, four chunky wheels with deep blue tyres and yellow hubs, its windows pale washes"
+    },
+    {
+      "id": "be-object-design-engine",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small car engine seen from a three-quarter angle, a chunky red metal block with a row of round yellow caps on top, a round belt pulley on its front and two thick curved blue hoses"
     }
   ]
 }

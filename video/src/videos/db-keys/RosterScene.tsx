@@ -193,7 +193,7 @@ export const RosterScene: React.FC = () => {
           </div>
         </Note>
         {/* Student seven, with the two courses' books. */}
-        <Spot id="db-keys-student" at={sevenAt - 4} dim={pointAt - 4} left={1520} top={590} width={108} height={205} />
+        <Spot id="db-keys-student" at={sevenAt - 4} dim={pointAt - 4} left={1520} top={602} width={108} height={205} />
         <ErrorBox
           x={ERR_X}
           top={g.rowTop(ghost) - 40}

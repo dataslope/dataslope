@@ -50,8 +50,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     ingredients are read: context (limiter.py, the sliding window),
  *     interface (the allow signature), constraints (memory, keyed by user,
  *     Server.handle() unchanged), and the check (the pytest cases).
- *     "prompt-past": "a request exactly 60 seconds after the first" ringed,
- *     with "inside or out?" beside it.
+ *     "prompt-past": "a request exactly 60 seconds after the first" marked,
+ *     then its answer, "(allowed: the first has left the window)", in green;
+ *     without it, "inside or out?" is the assistant's to decide.
  *   - "design" to "design-jitter": the page's flowchart (client, app server,
  *     quota and rate limit, response cache, LLM provider, schema validation),
  *     built box by box as each concern is named: latency lights the streamed
@@ -102,9 +103,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "hour": the page's table. Its minutes add to 50 to 55 of the 60, and
  *     Build's 30 is half the hour (check.mjs).
  *   - "prompt": the page's weak and better prompts, word for word on screen.
- *     "prompt-past" is the video's step past the page: the better prompt asks
- *     for a test of "a request exactly 60 seconds after the first" without
- *     saying whether it should pass, so the assistant decides; argued, not
+ *     "prompt-past" reads the page's own answer to the sixty-second case
+ *     ("allowed: the first has left the window", added to the page on
+ *     2026-11-06 after this script first said the prompt left it out) and
+ *     argues why it is there: unstated, the assistant decides; argued, not
  *     run (a rate limiter does not run here).
  *   - "design": the page's six concerns and its flowchart, as worded.
  *     "design-jitter" is a seeded simulation (Python's random.Random, seed
@@ -116,9 +118,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "cost": the page's block, run as written: input 2,000 USD/day, output
  *     1,500, total 3,500, about 105,000 a month, at the page's illustrative
  *     prices (1.00 and 5.00 dollars per million tokens, which the page says
- *     to check against your provider's). "cost-past", on the same numbers: an
- *     output token costs 5 input tokens; halving the 2,000-token prompt saves
- *     1,000 dollars a day, halving the 300-token answer 750. Input is 57% of
+ *     to check against your provider's). "cost-lever" and "cost-past", as the
+ *     page now words them (corrected 2026-11-06): input is the larger share,
+ *     2,000 of the 3,500 a day, though an output token costs 5 input tokens;
+ *     halving the 2,000-token prompt saves 1,000 dollars a day, halving the
+ *     300-token answer 750 (both computed here too). Input is 57% of
  *     the cost and 87% of the tokens (results.json; not said).
  *   - "inj": OWASP's ranking ([^owasp]; "the security project OWASP" is the
  *     video's gloss), direct and indirect, the defenses, and the dangerous
@@ -243,7 +247,7 @@ export const script: NarrationScript = {
     },
     {
       id: "prompt-past",
-      text: "One step further: that prompt names the sixty-second edge, but not its answer. Is a request at exactly sixty seconds inside the window, or out? Say which. Otherwise the assistant decides, and writes a test that agrees with itself.",
+      text: "Notice that the sixty-second case carries its answer: allowed, because the first request has left the window. Name the answer, not just the edge. Otherwise the assistant decides, and writes a test that agrees with itself.",
       pauseAfter: 0.8,
     },
 

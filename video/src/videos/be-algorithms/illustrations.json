@@ -60,6 +60,24 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a hand of six blank playing cards fanned out in an arc, their plain fronts washed in different solid colors"
+    },
+    {
+      "id": "be-algorithms-boxes",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "three large cardboard moving boxes stacked loosely, the top one open with its flaps up, each box washed in a different solid color"
+    },
+    {
+      "id": "be-algorithms-tree",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small young tree with one straight trunk that forks into two branches, each branch ending in a round leafy crown, standing on its own"
+    },
+    {
+      "id": "be-algorithms-magnifier",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a large magnifying glass with a thick round frame and a wooden handle, lying at a slight tilt"
     }
   ]
 }

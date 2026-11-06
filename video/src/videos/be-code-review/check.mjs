@@ -99,7 +99,16 @@ def test_contained_interval_is_kept():
     assert merge_intervals([[1, 10], [2, 3]]) == [[1, 10]]
 `;
 
+/** The debugging round's reproduction, kept as a test (step 2, and the third
+ *  test the round leaves behind). */
+const REPRO_TEST = `
+
+def test_reproduction():
+    assert merge_intervals([[3, 4], [1, 2]]) == [[1, 2], [3, 4]]
+`;
+
 py.globals.set("PAGE_CODE", PAGE_CODE);
+py.globals.set("REPRO_TEST", REPRO_TEST);
 py.globals.set("ASSISTANT_TESTS", ASSISTANT_TESTS);
 py.globals.set("REVIEW_TESTS", REVIEW_TESTS);
 
@@ -189,6 +198,11 @@ r["listings"] = {
     "assistantTests": ASSISTANT_TESTS.splitlines(),
     "reviewTests": REVIEW_TESTS.splitlines(),
     "traced": TRACED.splitlines(),
+    # The debugging round's fix and the review's, whole, for the closing.
+    "sorted": SORTED.splitlines(),
+    "fixed": FIXED.splitlines(),
+    # The reproduction as a test function, as step 2 writes it.
+    "reproTest": REPRO_TEST.strip("\n").splitlines(),
 }
 r["lines"] = len(ASSISTANT.splitlines())
 r["diffs"] = {
@@ -199,6 +213,18 @@ r["diffs"] = {
     "cause": diff(ASSISTANT, SORTED, "intervals.py"),
     "fix": diff(ASSISTANT, FIXED, "intervals.py"),
     "tests": diff(ASSISTANT_TESTS, REVIEW_TESTS, "test_intervals.py"),
+}
+# The same changes with the whole file as context, which is how the screen
+# shows them: every line of the function, the changed ones marked. The ---,
+# +++ and @@ lines are dropped; each line keeps its " ", "+" or "-".
+def whole(a, b):
+    lines = list(difflib.unified_diff(a.splitlines(), b.splitlines(), lineterm="", n=10**6))
+    return [l for l in lines[2:] if not l.startswith("@@")]
+r["diffs"]["whole"] = {
+    "trace": whole(ASSISTANT, TRACED),
+    "symptom": whole(ASSISTANT, SYMPTOM),
+    "cause": whole(ASSISTANT, SORTED),
+    "fix": whole(ASSISTANT, FIXED),
 }
 
 PAGE_EXAMPLE = [[1, 3], [2, 6], [8, 10]]
@@ -222,6 +248,10 @@ r["debug"] = {
     "causeReport": call(SORTED, REPORT),
     "causeRepro": call(SORTED, REPRO),
     "causeTests": run_tests(SORTED, ASSISTANT_TESTS),
+    # The old tests with the reproduction kept as a third: before the fix
+    # and after it.
+    "keptBefore": run_tests(ASSISTANT, ASSISTANT_TESTS + REPRO_TEST),
+    "keptAfter": run_tests(SORTED, ASSISTANT_TESTS + REPRO_TEST),
 }
 # The reproduction is the smallest: every input of one or two intervals with
 # ends in 0..4, searched for an output that ends before it starts.
@@ -286,6 +316,7 @@ const expect = [
   ["the symptom patch returns nothing", d.symptomReport.repr === "[]" && d.symptomRepro.repr === "[]"],
   ["the sort fixes the report", d.causeReport.repr === "[[1, 6], [8, 10]]" && d.causeRepro.repr === "[[1, 2], [3, 4]]"],
   ["the old tests pass after the sort", d.causeTests.passed === 2],
+  ["the kept reproduction fails before the fix and passes after", d.keptBefore.passed === 2 && !d.keptBefore.tests[2].ok && d.keptBefore.tests[2].got === "[[3, 2]]" && d.keptAfter.passed === 3],
   ["touching intervals stay apart", rv.touching.repr === "[[1, 2], [2, 3]]"],
   ["a contained interval shrinks", rv.contained.repr === "[[1, 3]]"],
   ["empty and single are fine", rv.empty.repr === "[]" && rv.single.repr === "[[5, 5]]"],

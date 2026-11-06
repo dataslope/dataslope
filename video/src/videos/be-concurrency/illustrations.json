@@ -54,6 +54,66 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a single paper claim ticket with a scalloped tear-off edge and a round punched hole at one end, hanging from a short loop of string, blank with no printing"
+    },
+    {
+      "id": "be-concurrency-database",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a tall database cylinder built from three thick stacked round discs with rounded edges, like the classic database symbol, standing upright"
+    },
+    {
+      "id": "be-concurrency-plug",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky network cable plug with a clear rectangular connector head and a small clip on top, its thick cable curving away in one loose loop"
+    },
+    {
+      "id": "be-concurrency-beetle",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small round beetle seen from above at a slight tilt, its glossy domed shell split down the middle, six short legs and two short antennae"
+    },
+    {
+      "id": "be-concurrency-ram",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single computer memory stick lying at a slight tilt, a long thin circuit board with a row of eight small rectangular chips along it and a strip of gold contacts on its lower edge"
+    },
+    {
+      "id": "be-concurrency-key",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single large old-fashioned key lying at a slight tilt, a round looped bow, a long thick shaft and a simple toothed bit at its end"
+    },
+    {
+      "id": "be-concurrency-stopwatch",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a round stopwatch with a crown button on top and a thick round case, its plain blank face with a single hand and no numbers"
+    },
+    {
+      "id": "be-concurrency-alarm-clock",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a round twin-bell alarm clock on two short legs, a small hammer between its two bells, its plain blank face with two hands and no numbers"
+    },
+    {
+      "id": "be-concurrency-server",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single tall server rack cabinet seen from a three-quarter angle, a deep box with a stack of thick flat units on its front, each unit with two small round lights"
+    },
+    {
+      "id": "be-concurrency-bottle",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single empty glass bottle standing upright, a wide round body narrowing into a long thin neck, with a small cork in its mouth"
+    },
+    {
+      "id": "be-concurrency-turnstile",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single waist-high turnstile seen from a three-quarter angle, a sturdy round post with three thick metal arms fanning out from its top"
     }
   ]
 }

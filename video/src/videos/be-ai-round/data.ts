@@ -37,7 +37,7 @@ export const INGREDIENTS = [
   {
     role: "check",
     spans: [
-      "Add pytest cases for: the 100th and 101st request in one window, a request exactly 60 seconds after the first, and two users who do not affect each other.",
+      "Add pytest cases for: the 100th and 101st request in one window, a request exactly 60 seconds after the first (allowed: the first has left the window), and two users who do not affect each other.",
     ],
   },
 ] as const;

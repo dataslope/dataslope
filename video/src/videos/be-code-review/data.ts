@@ -47,6 +47,10 @@ export const LINES: number = results.lines;
  *  per line; "arrived" is the two new files, every line added. */
 export const DIFFS = results.diffs;
 
+/** The same changes with the whole function as context, the way the screen
+ *  shows a change: each line keeps difflib's " ", "+" or "-". */
+export const WHOLE = results.diffs.whole;
+
 /** The opening: the assistant's two tests on its own code (2 passed). */
 export const ARRIVED = run(results.arrived);
 
@@ -77,6 +81,10 @@ export const DEBUG = {
   causeRepro: call(results.debug.causeRepro),
   /** The two old tests, passing after the sort as before it. */
   causeTests: run(results.debug.causeTests),
+  /** The old tests with the reproduction kept as a third, on the code before
+   *  the fix (the third fails, getting [[3, 2]]) and after it (all pass). */
+  keptBefore: run(results.debug.keptBefore),
+  keptAfter: run(results.debug.keptAfter),
 };
 
 /** Question 3, the review. */

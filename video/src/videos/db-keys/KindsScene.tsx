@@ -131,7 +131,7 @@ export const KindsScene: React.FC = () => {
           </span>
         </Note>
         {/* Take a number: the database hands one out. */}
-        <Spot id="db-keys-ticket" at={numberAt - 4} left={1620} top={y(PANEL_Y) + 190} width={186} height={190} />
+        <Spot id="db-keys-ticket" at={numberAt - 4} left={1606} top={y(PANEL_Y) + 190} width={186} height={190} />
         <TableName g={customers} at={makesAt - 8}>
           customers
         </TableName>

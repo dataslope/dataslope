@@ -54,6 +54,30 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a small open wooden crate, completely empty inside, seen from a three-quarter angle so its bare floor and four plank walls show"
+    },
+    {
+      "id": "be-code-review-pages",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a tall neat stack of plain white printed paper sheets with a few sheets fanned out slightly at one corner, seen from a three-quarter angle, the pages blank with no writing"
+    },
+    {
+      "id": "be-code-review-magnifier",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one round magnifying glass with a thick brass rim and a chunky wooden handle, lying at a slight tilt, its clear glass lens catching a soft highlight"
+    },
+    {
+      "id": "be-code-review-clock",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one classic round wall clock with a thick wooden rim and a plain cream face with no numbers, its two hands pointing straight up together"
+    },
+    {
+      "id": "be-code-review-hourglass",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one wooden hourglass standing upright, golden sand running from the upper glass bulb into a small heap in the lower bulb"
     }
   ]
 }

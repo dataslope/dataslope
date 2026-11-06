@@ -54,6 +54,42 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "two short stacks of thick gold coins standing side by side, one stack twice the height of the other, a single coin lying flat in front of them"
+    },
+    {
+      "id": "be-databases-ledger",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a thick bound ledger book lying closed at a slight angle, its many pages visible along the edge, a ribbon bookmark trailing out from between them, with no printed text"
+    },
+    {
+      "id": "be-databases-calendar",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky desk calendar block on a small wooden stand, its top page curling halfway as it is torn off, every page blank with no printed text or numbers"
+    },
+    {
+      "id": "be-databases-piggy-bank",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a round ceramic piggy bank standing on four short legs, one thick gold coin halfway into the slot on its back"
+    },
+    {
+      "id": "be-databases-ghost",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small friendly cartoon ghost made from a draped sheet, floating with its rippled hem lifted, painted in pale blue washes with soft yellow blooms, two small dark blue oval eyes and no other features"
+    },
+    {
+      "id": "be-databases-stopwatch",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky mechanical stopwatch with a round face, a crown button on top and a single hand, its dial blank with no numbers or markings"
+    },
+    {
+      "id": "be-databases-key",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a single large old-fashioned brass key lying on its side, a round blank paper tag tied to its bow with a short loop of string"
     }
   ]
 }

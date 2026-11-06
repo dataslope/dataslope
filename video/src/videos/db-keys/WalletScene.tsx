@@ -164,7 +164,7 @@ export const WalletScene: React.FC = () => {
             <span style={{ opacity: ease(frame, cancelledAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> cancelled</span>
           </div>
         </Note>
-        <Spot id="db-keys-stamp" at={cancelledAt - 4} left={1450} top={y(PERMANENT_Y) - 40} width={194} height={190} />
+        <Spot id="db-keys-stamp" at={cancelledAt - 4} left={1450} top={y(PERMANENT_Y) - 32} width={194} height={190} />
         <Ink at={betsAt - 6} dur={20} style={{ left: 120, top: y(MORAL_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>
             A natural key bets on <Mark at={controlAt - 6}>promises you don&apos;t control.</Mark>

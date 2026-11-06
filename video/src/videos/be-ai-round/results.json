@@ -42,15 +42,16 @@
   },
   "prompt": {
     "weak": "write a rate limiter",
-    "better": "In limiter.py, implement allow(user_id: str, now: float) -> bool for a sliding-window limit of 100 requests per 60 seconds per user. Keep state in memory, keyed by user. Do not change the public interface of Server.handle(). Add pytest cases for: the 100th and 101st request in one window, a request exactly 60 seconds after the first, and two users who do not affect each other.",
+    "better": "In limiter.py, implement allow(user_id: str, now: float) -> bool for a sliding-window limit of 100 requests per 60 seconds per user. Keep state in memory, keyed by user. Do not change the public interface of Server.handle(). Add pytest cases for: the 100th and 101st request in one window, a request exactly 60 seconds after the first (allowed: the first has left the window), and two users who do not affect each other.",
     "fence": [
       "Weak:   write a rate limiter",
       "Better: In limiter.py, implement allow(user_id: str, now: float) -> bool for a",
       "        sliding-window limit of 100 requests per 60 seconds per user. Keep state",
       "        in memory, keyed by user. Do not change the public interface of",
       "        Server.handle(). Add pytest cases for: the 100th and 101st request in",
-      "        one window, a request exactly 60 seconds after the first, and two",
-      "        users who do not affect each other."
+      "        one window, a request exactly 60 seconds after the first (allowed:",
+      "        the first has left the window), and two users who do not affect",
+      "        each other."
     ]
   },
   "design": {
@@ -393,7 +394,10 @@
     "retries": "retries with exponential backoff and jitter on 429s and 5xx responses",
     "tokensUnit": "Tokens, not requests, are the unit",
     "illustrative": "The prices below are illustrative; check your provider's",
-    "levers": "trimming the prompt, caching the shared prefix, or retrieving fewer documents saves more than shortening the answer",
+    "larger": "Here input is the larger share, 2,000 of the 3,500 USD a day, even though each output token costs five times as much as an input token",
+    "levers": "halving the prompt (trimming it, caching the shared prefix, retrieving fewer documents) saves 1,000 USD a day, where halving the answer saves 750",
+    "nextLevers": "Routing easy requests to a smaller model and moving offline work to a provider's discounted batch API are the next levers",
+    "allowed": "a request exactly 60 seconds after the first (allowed: the first has left the window)",
     "owasp": "It is first on OWASP's 2025 Top 10 for LLM applications",
     "tokens": "both are just tokens",
     "trio": "An agent that can read private data, read untrusted content, and send data out can be made to exfiltrate; remove any one of the three",

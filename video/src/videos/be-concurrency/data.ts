@@ -20,7 +20,7 @@ export const PYTHON = results.runtime.python;
 
 // ── 1. Amdahl's law (the page's chart) ──────────────────────────────────────
 
-type Curve = { ceiling: number; at: Record<string, number> };
+type Curve = { ceiling: number; at: Record<string, number>; curve: [number, number][] };
 const AMDAHL = results.amdahl as Record<string, Curve>;
 
 /** Speedup on `cores` cores for a program `serial` of which can't be split. */
@@ -36,6 +36,13 @@ export const ceiling = (serial: number) => {
   return c.ceiling;
 };
 export const SERIAL_FRACTIONS = Object.keys(AMDAHL).map(Number);
+/** The curve the figure draws for `serial`: [cores, speedup], 1 to 1000
+ *  cores evenly spaced on a log axis. */
+export const curve = (serial: number) => {
+  const c = AMDAHL[String(serial)];
+  if (!c) throw new Error(`results.json has no curve for ${serial}`);
+  return c.curve;
+};
 /** The one the narration reads: five percent serial, a hundred cores. */
 export const AMDAHL_SAID = { serial: 0.05, cores: 100, ceiling: ceiling(0.05), speedup: speedup(0.05, 100) };
 
@@ -48,6 +55,9 @@ export type RaceCount = {
   rightOrders: number;
   outcomes: Record<string, number>;
   lostExample: string[] | null;
+  /** Every order, as the thread taking each step ("AABABB"), and the counter
+   *  it leaves; null for the 924 orders of two increments each. */
+  every: { threads: string; result: number }[] | null;
 };
 export const RACE = results.race as {
   steps: string[];
@@ -112,3 +122,6 @@ export const ms = (s: number) => `${Math.round(s * 1000)} ms`;
 
 /** Twelve downloads through a semaphore of five: never more than five at once. */
 export const SEMAPHORE = results.semaphore as { limit: number; downloads: number; peak: number };
+
+/** The page's pool example: square mapped over range(6), in input order. */
+export const POOL = results.pool as { workers: number; inputs: number[]; results: number[] };

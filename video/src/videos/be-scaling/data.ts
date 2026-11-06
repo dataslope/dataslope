@@ -29,8 +29,13 @@ export const HEADROOM = results.headroom as {
 };
 
 /** 10,000 keys on three servers, then four: by hash modulo the count, and on
- *  a hash ring. `sample` is the first twelve keys and where each lands. */
+ *  a hash ring. `sample` is the first twelve keys and where each lands;
+ *  `grid` every key's server under each scheme, one digit a key in key order;
+ *  `ringPoints` the ring's 400 points, each as its place around the ring
+ *  (0 to 1) and its server (3 is the fourth, the one added). */
 export const HASHING = results.hashing as {
+  grid: { mod3: string; mod4: string; ring3: string; ring4: string };
+  ringPoints: [number, number][];
   keys: number;
   pointsPerServer: number;
   sample: { key: string; mod3: number; mod4: number; ring3: number; ring4: number }[];

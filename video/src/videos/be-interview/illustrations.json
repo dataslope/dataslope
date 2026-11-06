@@ -23,7 +23,7 @@
       "id": "be-interview-capybara",
       "category": "video-hero",
       "style": "watercolor illustration",
-      "subject": "a capybara sitting calmly on its haunches on a low flat rock, front paws together, its barrel-shaped body relaxed and its head raised, looking ahead with a patient expression"
+      "subject": "a capybara sitting calmly on its haunches, front paws together, its big barrel-shaped body relaxed and its blunt head raised, looking ahead with a patient, contented expression; one large, bold, simple silhouette that reads at a small size"
     },
     {
       "id": "be-interview-envelope",
@@ -54,6 +54,24 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a pair of round reading glasses with thick frames, folded and resting on top of a short stack of three plain sheets of paper"
+    },
+    {
+      "id": "be-interview-server-rack",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a short, chunky server rack cabinet standing upright, three thick stacked server units in its front, each with a small row of round indicator lights"
+    },
+    {
+      "id": "be-interview-folders",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a short stack of three thick file folders in three different colors, slightly fanned out, the corners of a few plain sheets peeking from the top folder"
+    },
+    {
+      "id": "be-interview-checklist",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a wooden clipboard holding one plain sheet of paper with three square tick boxes down its left side, two of them ticked with bold strokes"
     }
   ]
 }
