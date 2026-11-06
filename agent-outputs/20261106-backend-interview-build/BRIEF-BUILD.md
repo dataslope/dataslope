@@ -96,7 +96,9 @@ Timing (`pauseAfter`) and cues are yours.
    only in clearly open space, at least 80px clear of every word, figure,
    arrow and other image and 80px from the page's edges for its whole time
    on screen, never squeezed into a leftover strip below or beside text or
-   a figure. About 140 to 220px on the 1080p layout. Each pops in on the
+   a figure. The one exception: a scene laid out as two or three panels or
+   columns compared side by side may give each panel its own small image,
+   matched in size and position. About 140 to 220px on the 1080p layout. Each pops in on the
    word that names it with `<Sfx name="el-pop" level={-30} />` on the same
    frame. Prompts go in your `illustrations.json` (`video-icon`, 1024x1024,
    the file's watercolor style; the hero `video-hero`); generate and import

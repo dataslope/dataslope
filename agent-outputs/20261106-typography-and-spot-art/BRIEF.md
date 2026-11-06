@@ -52,6 +52,11 @@ of the page, "leaves too little whitespace". The rule is now:
   at least 80px from the page's edges, for the whole time it is on screen.
   Never squeezed into a strip left over below or beside a block of text or
   a figure; if the only room is a leftover gap, the scene gets none.
+- **The one exception: side-by-side comparisons.** A scene laid out as
+  panels or columns compared side by side (two or three, like Stats-5's
+  "Wait times" beside "One die") may give each panel its own small image,
+  one per panel, the same size and in the same place in each, so the
+  comparison reads at a glance. The other rules still hold for each.
 - About 140 to 220px on the 1920x1080 page. Look at every frame it spans:
   scenes build up, and space that is empty early may fill later (give it an
   `out` before that).
