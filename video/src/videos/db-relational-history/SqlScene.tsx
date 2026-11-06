@@ -226,8 +226,9 @@ export const SqlScene: React.FC = () => {
           );
         })}
       </div>
-      <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 898, top: y(520) + 9, whiteSpace: "nowrap" }}>
-        {/* Plain words in the red of a trap, where a stamp's frame used to be. */}
+      <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 740, top: y(520) + 9, whiteSpace: "nowrap" }}>
+        {/* Plain words in the red of a trap, where a stamp's frame used to be,
+            50px past SEQUEL's last letter (it ends near 690). */}
         <span style={{ ...label(26, ACCENT_INK), fontWeight: 700 }}>That name is taken</span>
       </Ink>
       <Spot

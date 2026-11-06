@@ -26,8 +26,11 @@ import {
 
 /** Where the brackets and notes of the right-hand column start. */
 const RIGHT = 1340;
-const CHIP_W = 50;
-const CHIP_GAP = 8;
+/** The first flips, one value per slot: plain bold text in the walk's ink
+ *  (up) or the accent (down), with no chip around it. The slot keeps the
+ *  old chips' pitch, so the values sit about 34px apart. */
+const FLIP_W = 50;
+const FLIP_PITCH = 58;
 
 /**
  * Hook, coin, wander: one random walk draws itself and looks like it is
@@ -76,20 +79,17 @@ export const WalkScene: React.FC = () => {
             key={i}
             style={{
               position: "absolute",
-              left: 380 + i * (CHIP_W + CHIP_GAP),
+              left: 380 + i * FLIP_PITCH,
               top: y(258),
-              width: CHIP_W,
+              width: FLIP_W,
               height: 42,
-              boxSizing: "border-box",
-              border: `1.5px solid ${up ? COLOR.a : ACCENT}`,
-              borderRadius: 6,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               opacity: p,
               transform: `translateY(${(1 - p) * (up ? 10 : -10)}px)`,
               ...note(21, up ? COLOR_INK.a : ACCENT_INK),
-              fontWeight: 650,
+              fontWeight: 700,
             }}
           >
             {up ? "+1" : "−1"}

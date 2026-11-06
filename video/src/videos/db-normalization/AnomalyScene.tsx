@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, body, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, body, INK, INK_SOFT, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -157,7 +157,9 @@ export const AnomalyScene: React.FC = () => {
           <Ink key={a.name} at={anomalyAt[k] - 2} dur={16} style={{ left: X0 + k * STEP, top: y(LIST_Y), width: STEP - 60 }}>
             <div style={{ height: 2, width: 56, background: INK, marginBottom: 16 }} />
             <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-              <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>{k + 1}</span>
+              {/* The number in the name's own face and size, set apart by color:
+                  a 24px label beside the 36px name read as two sizes on one line. */}
+              <span style={{ ...body(36), color: ACCENT_INK, fontWeight: 600 }}>{k + 1}</span>
               <span style={{ ...body(36), color: INK }}>{a.name}</span>
             </div>
             <div style={{ ...note(22, INK_SOFT), marginTop: 10 }}>{a.gist}</div>
