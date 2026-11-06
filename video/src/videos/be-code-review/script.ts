@@ -34,54 +34,57 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * On screen, beat by beat (phase 2 builds these; every listing, diff and
  * result is read from results.json):
  *   - "hook": the lynx (the hero), and one listing arriving from three
- *     directions, labelled a colleague, a stranger, an assistant; three
- *     words under it, does / assumes / is wrong, each lit on its word.
+ *     directions, labelled a colleague, a stranger, an assistant; three words
+ *     under it, does / assumes / is wrong, each lit on its word.
  *   - "plan": the diff as it arrived, two new files (intervals.py, eight
  *     added lines; test_intervals.py, two tests), and a console under it
  *     reading "2 passed", in green, on "Both pass".
- *   - "bugs" to "bugs-past": two bars, 66% and 45%, with the survey named
- *     under them; then seven cards filling a grid, one per kind, each with a
- *     few tokens of code or an icon: `<` against `<=`; "sorted? unique? not
- *     null?"; a list's sort called with pandas' inplace=True and the
- *     TypeError it raises, then a parcel and an attacker's hand registering
- *     an invented package name ("bugs-api", the supply-chain risk);
- *     `except Exception: pass`; an f-string building SQL, a key, a missing
- *     check; a test ticking green over a red result; a diff with unrelated
- *     lines. On "bugs-past", the invented-API card's error lights (the one
- *     loud kind), the six quiet cards dim to gray, and three of them
- *     (boundaries, assumptions, tests that agree) lift out and move beside
- *     the diff.
+ *   - "bugs" to "bugs-past": a beetle (spot art) beside the question; two
+ *     bars, 66% and 45%, with the survey named under them; then seven cards
+ *     filling a grid, one per kind, each with a few tokens of code or an
+ *     icon: `<` against `<=`; "sorted? unique? not null?"; a list's sort
+ *     called with pandas' inplace=True and the TypeError it raises, then a
+ *     parcel and an attacker's hand registering an invented package name
+ *     ("bugs-api", the supply-chain risk); `except Exception: pass`; an
+ *     f-string building SQL, a key (spot art), a missing check; a test
+ *     ticking green over a red result; a diff with unrelated lines. On
+ *     "bugs-past", the invented-API card's error lights (the one loud kind),
+ *     the six quiet cards dim to gray, and three of them (boundaries,
+ *     assumptions, tests that agree) lift out and move beside the diff.
  *   - "debug" to "debug-past": the five steps as a numbered column on the
- *     left, each lit as it is named, the listing on the right. "debug-report":
- *     a report card, [[8, 10], [1, 3], [2, 6]] in, [[8, 6]] out, the 8 and
- *     the 6 in red. "debug-read": the loop's comparison with merged[-1]
- *     highlighted. "debug-repro": [[3, 4], [1, 2]] in, [[3, 2]] out, as a
- *     test. "debug-trace": the traced copy (one print line added, as a diff)
- *     and its two printed lines, the second in red. "debug-hypo": the call
- *     with sorted() around the input, [[1, 2], [3, 4]] in green.
+ *     left, each lit as it is named, the listing on the right.
+ *     "debug-report": a report card, [[8, 10], [1, 3], [2, 6]] in, [[8, 6]]
+ *     out, the 8 and the 6 in red. "debug-read": the loop's comparison with
+ *     merged[-1] highlighted. "debug-repro": [[3, 4], [1, 2]] in, [[3, 2]]
+ *     out, as a test. "debug-trace": the traced copy (one print line added,
+ *     as a diff) and its two printed lines, the second in red. "debug-hypo":
+ *     the call with sorted() around the input, [[1, 2], [3, 4]] in green.
  *     "debug-symptom": the symptom patch as a diff, and the report's result,
  *     [], with an empty box. "debug-cause": the one-line diff that sorts
  *     inside the function; the report, the reproduction and both old tests,
  *     all green. "debug-explain": step five lit, its three parts as three
  *     short lines, the first two answered from the listing. "debug-ai": an
  *     assistant panel beside the listing with the two questions it is good
- *     for, and step two ringed. "debug-past": the two old tests, green before the fix and
- *     green after, side by side, and the reproduction added as a third.
- *   - "review" to "review-past": the five checks of the page as a checklist
- *     beside the diff as it arrived, each ticked or flagged as the narration
- *     reaches it. "review-edges": `<` highlighted; [[1, 2], [2, 3]] in, the
- *     same out, on a number line where the two share the point 2.
- *     "review-contain": `merged[-1][1] = end` highlighted; [[1, 10], [2, 3]]
- *     in, [[1, 3]] out, the lost 3-to-10 drawn in red on the number line.
- *     "review-tests": the assistant's second test highlighted, flagged in
- *     red. "review-fix": the three-line fix as a diff, then the reviewer's
- *     tests as a grid: three rows, two columns (the assistant's code: three
- *     red; the fix: three green). "review-where": the three bugs, labelled
- *     boundary, boundary, assumption. "review-past": two number lines,
- *     closed [1, 2] [2, 3] touching at a filled point, and half-open
- *     slots 9 to 10 and 10 to 11 meeting at an open one.
- *   - "next": the fixed listing, sorted() highlighted, "one pass" becoming
- *     "n log n", and the NextLine.
+ *     for, and step two ringed. "debug-past": the two old tests, green before
+ *     the fix and green after, side by side, and the reproduction added as a
+ *     third.
+ *   - "review" to "review-past": a clipboard (spot art), and the page's five
+ *     checks as a checklist beside the diff as it arrived, each ticked or
+ *     flagged as the narration reaches it. "review-edges": `<` highlighted;
+ *     [[1, 2], [2, 3]] in, the same out, on a number line where the two share
+ *     the point 2. "review-contain": `merged[-1][1] = end` highlighted; [[1,
+ *     10], [2, 3]] in, [[1, 3]] out, the lost 3-to-10 drawn in red on the
+ *     number line. "review-tests": the assistant's two tests, each with two
+ *     marks (this code, the correct one): the first green on both, grayed as
+ *     "can't tell them apart"; the second green then red, flagged.
+ *     "review-fix": the three-line fix as a diff, then the reviewer's tests
+ *     as a grid: three rows, two columns (the assistant's code: three red;
+ *     the fix: three green). "review-where": the three bugs, labelled
+ *     boundary, boundary, assumption. "review-past": two number lines, closed
+ *     [1, 2] [2, 3] touching at a filled point, and half-open slots 9 to 10
+ *     and 10 to 11 meeting at an open one.
+ *   - "next": the fixed listing, sorted() highlighted, "one pass" becoming "n
+ *     log n", and the NextLine.
  *
  * Facts. check.mjs runs every listing in Pyodide 314.0.7 (Python 3.14), the
  * runtime the track's blocks run in, into results.json, which data.ts reads;
@@ -90,19 +93,19 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * says:
  *   - "plan": the function is 8 lines; the assistant's two tests pass on it.
  *   - "bugs-api", "bugs-past": the card's invented parameter, a list's
- *     sort(inplace=True), raises "TypeError: sort() got an unexpected
- *     keyword argument 'inplace'" as soon as it runs (the video's own call;
- *     no package name is invented on screen, since a real one could exist).
- *   - "debug-report": [[8, 10], [1, 3], [2, 6]] gives [[8, 6]]; in order,
- *     the page's [[1, 3], [2, 6], [8, 10]] gives [[1, 6], [8, 10]] (the
- *     page's own "handles … correctly").
+ *     sort(inplace=True), raises "TypeError: sort() got an unexpected keyword
+ *     argument 'inplace'" as soon as it runs (the video's own call; no
+ *     package name is invented on screen, since a real one could exist).
+ *   - "debug-report": [[8, 10], [1, 3], [2, 6]] gives [[8, 6]]; in order, the
+ *     page's [[1, 3], [2, 6], [8, 10]] gives [[1, 6], [8, 10]] (the page's
+ *     own "handles … correctly").
  *   - "debug-repro": [[3, 4], [1, 2]] gives [[3, 2]]. Of the 225 inputs of
  *     two intervals with ends in 0 to 4, 35 end before they start; of the 15
  *     single intervals, none ("Two intervals are enough").
  *   - "debug-trace": the traced copy prints "[3, 4] -> [[3, 4]]" and then
  *     "[1, 2] -> [[3, 2]]".
- *   - "debug-hypo": the same function on sorted([[3, 4], [1, 2]]) gives
- *     [[1, 2], [3, 4]].
+ *   - "debug-hypo": the same function on sorted([[3, 4], [1, 2]]) gives [[1,
+ *     2], [3, 4]].
  *   - "debug-symptom": the patch that drops any interval ending before it
  *     starts gives [] for the report and [] for the reproduction.
  *   - "debug-cause", "debug-past": with sorted() inside, the report gives
@@ -113,29 +116,31 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - "review-edges", "review-contain": [[1, 2], [2, 3]] gives the same back;
  *     [[1, 10], [2, 3]] gives [[1, 3]]. The empty list and a single interval
  *     come back as they went in (checked, not said).
- *   - "review-tests": on the fixed code, the assistant's second test fails
- *     (it gets [[1, 3]]); its first passes.
+ *   - "review-tests": the assistant's first test passes on its code, on the
+ *     sorted one and on the fix; its second passes on its code and fails on
+ *     the fix (it gets [[1, 3]]).
  *   - "review-fix": the reviewer's three tests (unsorted, touching,
  *     contained) fail on the assistant's code, all three, and pass on the
  *     fix, all three. With only the debugging round's sort, one of the three
  *     passes (results.json; not said).
  * From the page, as it words them (check.mjs fails if the page stops saying
  * them): the survey's 66% and 45% (Stack Overflow, 2025 Developer Survey, AI
- * section, the page's footnote); the seven kinds of bug, and the
- * supply-chain risk of an invented package; Google's pilot's "read, debug
- * and optimize" and the "few hundred lines"; the five steps of the method,
- * and that an assistant "is not a substitute for step 2"; "Like a pull
- * request from a capable stranger" and the five checks; the three bugs, and
- * "Each is a boundary or an unstated assumption, which is where to look
- * first".
- * Past the page, argued rather than measured: that none of the seven kinds
- * stops code from running; that the reproduction should stay as a test,
- * because the old tests passed before and after the fix; that whether
- * touching intervals merge is a question of whether the end is inclusive
- * (the page's intervals are closed, written [start, end], so they share the
- * point; half-open slots would not); and that the sort takes the merge from
- * one pass to n log n (algorithms.mdx: merge sort, the basis of Python's
- * Timsort, is O(n log n)).
+ * section, the page's footnote); the seven kinds of bug, and the supply-chain
+ * risk of an invented package; Google's pilot's "read, debug and optimize",
+ * and that it allows an approved assistant (the page's table), and the "few
+ * hundred lines"; the five steps of the method, and that an assistant "is not
+ * a substitute for step 2"; "Like a pull request from a capable stranger" and
+ * the five checks; the three bugs, and "Each is a boundary or an unstated
+ * assumption, which is where to look first". Past the page, argued rather
+ * than measured: that of the seven kinds only an invented API makes a noise
+ * (it fails when its line runs, unless the package has been registered), and
+ * the other six survive the happy path; that the reproduction should stay as
+ * a test, because the old tests passed before and after the fix; that whether
+ * touching intervals merge is a question of whether the end is inclusive (the
+ * page's intervals are closed, written [start, end], so they share the point;
+ * half-open slots would not); and that the sort takes the merge from one pass
+ * to n log n (algorithms.mdx: merge sort, the basis of Python's Timsort, is
+ * O(n log n)).
  *
  * Written for Drew's ear: initialisms as people write them (AI, SQL, API,
  * ASCII); SQL and ASCII are said as words (SQL through the lexicon, ASCII to
@@ -194,7 +199,7 @@ export const script: NarrationScript = {
     },
     {
       id: "bugs-tests",
-      text: "Two more live in the diff around the code. Tests that agree with the bug assert what the code does, not what it should do, so they pass and prove nothing. And scope creep slips renamed variables, reformatted files and unrelated edits in beside the change.",
+      text: "Two more live in the diff around the code. Tests that agree with the bug assert what the code does, not what it should do, so they pass and prove nothing. And scope creep: renamed variables, reformatted files and unrelated edits, slipped in beside the change.",
       pauseAfter: 0.6,
     },
     {
@@ -252,7 +257,7 @@ export const script: NarrationScript = {
     },
     {
       id: "debug-ai",
-      text: "If the round allows an assistant, it's a fine tool for asking what a function does, or what could make it return this. It's no substitute for step two.",
+      text: "If the round allows an assistant, it's a fine tool for asking what a function does, or what could make it return an interval that ends before it starts. It's no substitute for step two.",
       pauseAfter: 0.6,
     },
     {
@@ -290,12 +295,12 @@ export const script: NarrationScript = {
     },
     {
       id: "review-tests",
-      text: "Last check: would its tests fail without the change? Its second test asserts that one to two and two to three stay apart. That's the bug, written down as a requirement. On correct code, that test fails.",
+      text: "Last check: its tests. Would they fail if the code were wrong? The first passes on this code and on a correct version alike, so it can't tell them apart. The second asserts that one to two and two to three stay apart. That's the bug, written down as a requirement, and on correct code it fails.",
       pauseAfter: 0.8,
     },
     {
       id: "review-fix",
-      text: "Three changes fix it: sort the input, compare with less-than-or-equal, and keep the larger end. Then write the tests the review wanted: unsorted, touching and contained. On the assistant's code, all three fail. On the fix, all three pass.",
+      text: "Three changes fix it: sort the input, compare with less-than-or-equal, and keep the larger end. Then write the tests the review wanted: unsorted, touching and contained. On the assistant's code, all three fail, which is what failing without the change looks like. On the fix, all three pass.",
       pauseAfter: 0.7,
     },
     {

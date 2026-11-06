@@ -24,7 +24,7 @@
 // Then it reads script.ts and exits non-zero if a number the voice says in
 // words no longer matches what ran.
 /* global console, process, URL */
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -678,7 +678,17 @@ people = [("Ada", "Lovelace"), ("Alan", "Turing"), ("Grace", "Hopper"), ("Ada", 
 by_first = sorted(people, key=lambda p: p[0])
 then_last = sorted(by_first, key=lambda p: p[1])
 million = 1_000_000
+# Kahn's algorithm on a graph with a cycle (1 -> 2 -> 1), with the page's own
+# kahns and topo_sort: both return fewer nodes than the graph has.
+ns = {}
+exec(_page["kahn"].split("# 4 nodes")[0], ns)
+cyc_edges = [(0, 1), (1, 2), (2, 1), (2, 3)]
+kahn_cyclic = ns["kahns"](4, cyc_edges)
+ns = {}
+exec(_page["topo"].split("# Task dependencies")[0], ns)
+topo_cyclic = ns["topo_sort"]({"A": ["B"], "B": ["C"], "C": ["B", "D"], "D": []})
 R["rapid"] = {
+    "kahnCyclicEdges": cyc_edges, "kahnCyclic": kahn_cyclic, "topoCyclic": topo_cyclic,
     "bstSortedHeight": bst_height(keys),
     "bstShuffledHeight": bst_height(shuffled),
     "bstKeys": 1000,
@@ -752,15 +762,11 @@ writeFileSync(new URL("./results.json", import.meta.url), `${JSON.stringify(resu
 console.log(JSON.stringify({ ...results, page: undefined }, null, 1));
 
 // ── The narration says these in words ───────────────────────────────────────
-// Node strips the types from script.ts. A claim is a beat and a phrase it
-// must contain; the phrase is built from the value that ran, so a run that
-// moves a number fails here until the words move with it.
+// Node strips the types from script.ts. A claim is a beat, a phrase it must
+// contain, and the condition on what ran that makes the phrase true, so a run
+// that moves a number, or a beat that drops its words, fails here until the
+// other follows.
 const { script } = await import(new URL("./script.ts", import.meta.url).href);
-const ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
-const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
-const below100 = (n) => (n < 20 ? ONES[n] : TENS[Math.floor(n / 10)] + (n % 10 ? `-${ONES[n % 10]}` : ""));
-const below1000 = (n) =>
-  n < 100 ? below100(n) : `${ONES[Math.floor(n / 100)]} hundred${n % 100 ? ` ${below100(n % 100)}` : ""}`;
 const text = (id) => {
   const beat = script.beats.find((b) => b.id === id);
   if (!beat) throw new Error(`script.ts has no beat "${id}"`);
@@ -768,50 +774,99 @@ const text = (id) => {
 };
 const c = counts;
 const a = results.arithmetic;
+const near = (x, target, tol) => Math.abs(x - target) <= tol;
+const q = c.quicksort;
+const perAppend = Object.values(c.amortized.copiesPerAppendAt);
+const deepBeats = script.beats.filter((b) => /^Question \w+\./.test(b.text));
+const rapidBeats = script.beats.filter((b) => b.id.startsWith("r-"));
+const pageQuestions = (readFileSync(new URL("../../../../content/interview/backend-engineer/algorithms.mdx", import.meta.url), "utf8").match(/^### .+$/gm) ?? []).map((h) => h.slice(4));
 const claims = [
-  ["big-count", `${below1000(a.bigO.smallPairs / 1000 | 0)} thousand`], // "four thousand" (4,950: "under five thousand" is said below)
-  ["big-count", "under five thousand"],
-  ["big-million", "half a trillion"],
-  ["big-model", `${below100(Math.round(a.bigO.pairsMinutes))} minutes`],
-  ["big-model", "a hundredth of a second"],
-  ["hash-collide", `${below100(a.collisions.evenMoneyKeys)}th key`],
-  ["hash-worst", `${below1000(c.hashWorst.sameInsertEq / 1000 | 0)} thousand`],
-  ["amort-run", `${below100(c.amortized.resizes)} times`],
-  ["amort-total", `${ONES[Math.round(c.amortized.copiesPerAppend)]} copies per append`],
-  ["amort-spike", `${below1000(Math.round(c.amortized.largestResize / 1000))} thousand`],
-  ["bfs-memory", `${below1000(Math.round(c.traversal.bfsPeak / 1000))} thousand`],
-  ["bfs-memory", `${below100(c.traversal.dfsPeak)}`],
-  ["heap-height", `${below100(c.heap.maxMoves)} moves`],
-  ["quick-sorted", `${below1000(c.quicksort.lastPivotSorted.compares / 1000 | 0)} thousand`],
-  ["quick-random", `${below100(Math.round(c.quicksort.randomPivotSorted.compares / 1000))} thousand`],
-  ["r-bst", `${below100(c.rapid.bstShuffledHeight)}`],
-  ["r-memo", `${below100(c.rapid.fibMemoCalls)}`],
-  ["r-binary", `${below100(c.rapid.binaryProbesMillion)} probes`],
+  // The plan: 35 = 8 read aloud + 3 answered inside them + 24 quick.
+  ["plan", "thirty-five questions", pageQuestions.length === 35],
+  ["plan", "eight with a figure", deepBeats.length === 8],
+  ["plan", "three inside those", pageQuestions.length - deepBeats.length - rapidBeats.length === 3],
+  ["plan", "twenty-four quickly", rapidBeats.length === 24],
+  ["rapid-in", "the other twenty-four", rapidBeats.length === 24],
+  // 1
+  ["big-count", "under five thousand", a.bigO.smallPairs < 5000 && a.bigO.smallPairs > 4500],
+  ["big-million", "half a trillion", near(a.bigO.bigPairs, 5e11, 1e9)],
+  ["big-model", "a hundred million checks a second, an assumption", a.bigO.rate === 1e8],
+  ["big-model", "about eighty-three minutes", Math.round(a.bigO.pairsMinutes) === 83],
+  ["big-model", "a hundredth of a second", a.bigO.passSeconds === 0.01],
+  // 2
+  ["hash-twosum", "two sum", pageOut.twoSum[0] === "[0, 1]"],
+  ["hash-collide", "a thousand buckets", a.collisions.buckets === 1000],
+  ["hash-collide", "thirty-eighth key", a.collisions.evenMoneyKeys === 38],
+  ["hash-worst", "a thousand keys", c.hashWorst.keys === 1000],
+  ["hash-worst", "nearly six hundred thousand", c.hashWorst.sameInsertEq >= 550000 && c.hashWorst.sameInsertEq < 600000],
+  ["hash-worst", "with distinct hashes, none", c.hashWorst.spreadInsertEq === 0],
+  // 3
+  ["amort-run", "a million items", c.amortized.appends === 1e6],
+  ["amort-run", "eighty-six times", c.amortized.resizes === 86],
+  ["amort-total", "about eight copies per append, at any length", Math.round(c.amortized.copiesPerAppend) === 8 && perAppend.every((r) => r > 7 && r < 9)],
+  ["amort-factor", "under two copies", c.amortized.doublingCopies < 2 * c.amortized.appends],
+  ["amort-factor", "about an eighth", near(c.amortized.meanGrowthAbove1000, 1.125, 0.01)],
+  ["amort-spike", "nine hundred thirty-nine thousand", Math.round(c.amortized.largestResize / 1000) === 939],
+  // 4: the checkers the stack question turns on.
+  ["stack-count", "counting accepts it", c.brackets.find((b) => b.s === "([)]").count === true],
+  ["stack-run", "rejected", c.brackets.find((b) => b.s === "([)]").stack === false && c.brackets.find((b) => b.s === "{[]}").stack === true],
+  ["stack-queue", "it accepts this one, and rejects a correctly nested string", c.brackets.find((b) => b.s === "([)]").queue === true && c.brackets.find((b) => b.s === "{[]}").queue === false],
+  // 5
+  ["bfs-graph", "breadth-first visits a, b, c, d", pageOut.bfs[0] === "['A', 'B', 'C', 'D']"],
+  ["bfs-graph", "depth-first, a, b, d, then c", c.traversal.dfsOrder.join("") === "ABDC"],
+  ["bfs-memory", "a million nodes", near(c.traversal.nodes, 1e6, 5e4)],
+  ["bfs-memory", "five hundred twenty-four thousand", Math.round(c.traversal.bfsPeak / 1000) === 524],
+  ["bfs-memory", "one path, twenty", c.traversal.dfsPeak === 20],
+  ["bfs-deque", "two hundred seventy-five billion", Math.round(c.traversal.listShifts / 1e9) === 275],
+  // 6
+  ["heap-choose", "half a million on average", c.heap.sortedInsertMeanShift === 500000],
+  ["heap-height", "twenty levels", c.heap.levels === 20],
+  ["heap-height", "at most nineteen", c.heap.maxMoves === 19 && c.heap.pushNewMinCompares <= 19],
+  ["heap-build", "one and a half million", Math.round(c.heap.heapifyCompares / 1e5) === 15],
+  ["heap-build", "eighteen million", Math.round(c.heap.pushesCompares / 1e6) === 18],
+  ["heap-build", "linear", c.heap.heightsSum < c.heap.n],
+  // 7
+  ["dijk-run", "three through b. d costs four", pageOut.dijkstra[0] === "{'A': 0, 'B': 1, 'C': 3, 'D': 4}"],
+  ["dijk-neg", "b leaves at two", c.dijkstra.settled.B === 2 && c.dijkstra.settledOrder[1] === "B"],
+  ["dijk-neg", "reach it at one", c.dijkstra.bellmanFord.B === 1],
+  ["dijk-neg", "and so is d", c.dijkstra.settled.D !== c.dijkstra.bellmanFord.D],
+  // 8
+  ["quick-sorted", "a thousand sorted numbers", q.n === 1000],
+  ["quick-sorted", "half a million comparisons", Math.round(q.lastPivotSorted.compares / 1e5) === 5],
+  ["quick-sorted", "nearly a thousand levels", q.lastPivotSorted.depth >= 950 && q.lastPivotSorted.depth < 1000],
+  ["quick-limit", "past python's default limit", q.recursiveLastPivot.startsWith("RecursionError")],
+  ["quick-random", "eleven thousand comparisons, twenty-one levels", Math.round(q.randomPivotSorted.compares / 1000) === 11 && q.randomPivotSorted.depth === 21],
+  // Quick rounds
+  ["r-stable", "the two hoppers stay in first-name order", c.rapid.stable.thenLast.filter((p) => p[1] === "Hopper").map((p) => p[0]).join() === "Ada,Grace"],
+  ["r-recursion", "python stops at a thousand", c.rapid.recursionLimit === 1000],
+  ["r-memo", "two point seven million calls", Math.round(c.rapid.fibNaiveCalls / 1e5) === 27],
+  ["r-memo", "memoized, fifty-nine", c.rapid.fibMemoCalls === 59],
+  ["r-greedy", "it takes three coins. two threes do it", c.rapid.greedy.length === 3 && c.rapid.fewest.join() === "3,3"],
+  ["r-bst", "a thousand levels tall; shuffled, twenty-one", c.rapid.bstSortedHeight === 1000 && c.rapid.bstShuffledHeight === 21],
+  ["r-traverse", "in-order traversal visits a bst in sorted order", pageOut.inorder.join(" ") === "1 3 4 5 7"],
+  ["r-binary", "twenty probes", c.rapid.binaryProbesMillion === 20],
+  ["r-adjacency", "a hundred million entries", a.adjacency.listEntries === 1e8],
+  ["r-adjacency", "a trillion cells", a.adjacency.matrixCells === 1e12],
+  ["r-kahn", "fewer than v come out", c.rapid.kahnCyclic.length < 4 && c.rapid.topoCyclic.length < 4],
+  ["r-bits", "the unpaired one is left", pageOut.bits[0] === "4"],
 ];
-// The first claim is a guard on the rounding the beat says ("under five
-// thousand" for 4,950); it is checked through the second.
-const failed = claims.slice(1).filter(([id, phrase]) => !text(id).includes(phrase));
-// Outputs the page prints that the narration repeats.
-const pageClaims = [
-  [pageOut.dijkstra[0], "{'A': 0, 'B': 1, 'C': 3, 'D': 4}"],
-  [pageOut.bfs[0], "['A', 'B', 'C', 'D']"],
-  [pageOut.heap[0], "1"],
-  [pageOut.twoSum[0], "[0, 1]"],
-];
-const pageFailed = pageClaims.filter(([got, want]) => got !== want);
-// The checkers the stack question turns on.
-const bracket = (s) => c.brackets.find((b) => b.s === s);
-const logic = [
-  ["a counter accepts ([)]", bracket("([)]").count === true],
-  ["a queue accepts ([)]", bracket("([)]").queue === true],
-  ["a queue rejects {[]}", bracket("{[]}").queue === false],
-  ["a stack rejects ([)] and accepts {[]}", bracket("([)]").stack === false && bracket("{[]}").stack === true],
-  ["settling gets B wrong", c.dijkstra.settled.B !== c.dijkstra.bellmanFord.B],
-  ["greedy uses three coins, the best two", c.rapid.greedy.length === 3 && c.rapid.fewest.length === 2],
-  ["sorted keys make a tree as tall as its keys", c.rapid.bstSortedHeight === c.rapid.bstKeys],
-  ["the sorted thousand recurses past Python's limit", c.quicksort.recursiveLastPivot.startsWith("RecursionError")],
-].filter(([, ok]) => !ok);
-for (const [id, phrase] of failed) console.error(`script.ts "${id}" no longer says "${phrase}"`);
-for (const [got, want] of pageFailed) console.error(`the page printed ${got}, not ${want}`);
-for (const [what] of logic) console.error(`no longer true: ${what}`);
-if (failed.length || pageFailed.length || logic.length) process.exit(1);
+const failed = claims.filter(([id, phrase, ok]) => !ok || !text(id).includes(phrase));
+for (const [id, phrase, ok] of failed)
+  console.error(ok ? `script.ts "${id}" no longer says "${phrase}"` : `"${id}" says "${phrase}", which the run no longer supports`);
+
+// Each deep dive reads a page heading aloud, in the page's words (said as
+// they are spoken: "O of one" for $O(1)$, "versus" for "vs").
+const spoken = (s) =>
+  s
+    .replace(/\$O\(1\)\$/g, "O of one")
+    .replace(/\bvs\b/g, "versus")
+    .replace(/worst-case/g, "worst case")
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+const headings = new Set(pageQuestions.map(spoken));
+const unread = deepBeats.filter((b) => !headings.has(spoken(b.text.replace(/^Question \w+\. /, "").split("?")[0] + "?")) && !headings.has(spoken(b.text.replace(/^Question \w+\. /, "").split(".")[0])));
+for (const b of unread) console.error(`"${b.id}" does not read a page heading word for word`);
+if (failed.length || unread.length) process.exit(1);
+console.error(`ok: ${claims.length} claims, ${deepBeats.length} questions read as the page words them`);

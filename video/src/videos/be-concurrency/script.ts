@@ -181,7 +181,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "A thousand requests arrive in the same second. Each one spends most of its time waiting: on a database, on another service. Serve them one after another, and the server spends most of its time idle while the queue grows.",
+      text: "A thousand requests arrive in the same second. Each one spends most of its time waiting: on a database, on another service. Serve them one after another, and the server sits idle through every wait while the queue grows.",
       pauseAfter: 0.6,
     },
     {
@@ -273,7 +273,7 @@ export const script: NarrationScript = {
     {
       id: "gil",
       scene: true,
-      text: "Question four. What is the GIL, and why does it exist? In CPython, the standard Python interpreter, the global interpreter lock, or GIL, is one lock that lets only one thread run Python bytecode at a time.",
+      text: "Question four. What is the GIL, and why does it exist? In CPython, the standard Python interpreter, the global interpreter lock, or GIL, is a single lock that lets only one thread run Python bytecode at a time.",
       pauseAfter: 0.6,
     },
     {
@@ -356,7 +356,7 @@ export const script: NarrationScript = {
     },
     {
       id: "async-run",
-      text: "Two fetches: a waits twenty milliseconds, b waits ten. The waits overlap, so b finishes first, and the pair takes about twenty, not thirty. Gather still hands back the results in the order you asked: a, then b.",
+      text: "Two fetches: a waits twenty milliseconds, b waits ten. The waits overlap, so b finishes first, and the pair takes about twenty, not thirty. Gathered together, the results still come back in the order you asked: a, then b.",
       pauseAfter: 0.7,
     },
     {
@@ -446,7 +446,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-pool",
-      text: "A thread pool keeps a fixed set of reusable workers and a queue of tasks. You skip creating a thread per task, and you bound how many run at once. Its map even hands the results back in input order.",
+      text: "A thread pool keeps a fixed set of reusable workers and a queue of tasks. You skip creating a thread per task, and you bound how many run at once. Map a function over a list with it, and the results come back in input order.",
       pauseAfter: 0.6,
     },
     {

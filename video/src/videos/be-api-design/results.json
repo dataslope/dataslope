@@ -1,0 +1,623 @@
+{
+  "figures": {
+    "page": {
+      "setup": "SET default_statistics_target = 10000;\nCREATE TABLE articles AS\nSELECT g AS id, 'Article ' || g AS title,\n  TIMESTAMP '2020-01-01' + g * INTERVAL '25 minutes' AS created_at\nFROM generate_series(1, 100000) g;\nALTER TABLE articles ADD PRIMARY KEY (id);\nVACUUM ANALYZE articles",
+      "steps": {
+        "count": {
+          "sql": "SELECT COUNT(*) AS articles FROM articles;",
+          "ok": true,
+          "columns": [
+            "articles"
+          ],
+          "rows": [
+            [
+              "100000"
+            ]
+          ]
+        },
+        "offset1": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT id, title FROM articles\nORDER BY id DESC\nLIMIT 20 OFFSET 0;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Limit (actual rows=20.00 loops=1)"
+            ],
+            [
+              "  ->  Index Scan Backward using articles_pkey on articles (actual rows=20.00 loops=1)"
+            ],
+            [
+              "        Index Searches: 1"
+            ]
+          ]
+        },
+        "offset500": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT id, title FROM articles\nORDER BY id DESC\nLIMIT 20 OFFSET 9980;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Limit (actual rows=20.00 loops=1)"
+            ],
+            [
+              "  ->  Index Scan Backward using articles_pkey on articles (actual rows=10000.00 loops=1)"
+            ],
+            [
+              "        Index Searches: 1"
+            ]
+          ]
+        },
+        "offset5000": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT id, title FROM articles\nORDER BY id DESC\nLIMIT 20 OFFSET 99980;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Limit (actual rows=20.00 loops=1)"
+            ],
+            [
+              "  ->  Index Scan Backward using articles_pkey on articles (actual rows=100000.00 loops=1)"
+            ],
+            [
+              "        Index Searches: 1"
+            ]
+          ]
+        },
+        "cursor500": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT id, title FROM articles\nWHERE id < 90021\nORDER BY id DESC\nLIMIT 20;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Limit (actual rows=20.00 loops=1)"
+            ],
+            [
+              "  ->  Index Scan Backward using articles_pkey on articles (actual rows=20.00 loops=1)"
+            ],
+            [
+              "        Index Cond: (id < 90021)"
+            ],
+            [
+              "        Index Searches: 1"
+            ]
+          ]
+        },
+        "cursor5000": {
+          "sql": "EXPLAIN (ANALYZE, COSTS OFF, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT id, title FROM articles\nWHERE id < 21\nORDER BY id DESC\nLIMIT 20;",
+          "ok": true,
+          "columns": [
+            "QUERY PLAN"
+          ],
+          "rows": [
+            [
+              "Limit (actual rows=20.00 loops=1)"
+            ],
+            [
+              "  ->  Index Scan Backward using articles_pkey on articles (actual rows=20.00 loops=1)"
+            ],
+            [
+              "        Index Cond: (id < 21)"
+            ],
+            [
+              "        Index Searches: 1"
+            ]
+          ]
+        },
+        "sameRows": {
+          "sql": "SELECT COUNT(*) AS differ FROM (\n  (SELECT id, title FROM articles\nORDER BY id DESC\nLIMIT 20 OFFSET 9980)\n  EXCEPT\n  (SELECT id, title FROM articles\nWHERE id < 90021\nORDER BY id DESC\nLIMIT 20)\n) d;",
+          "ok": true,
+          "columns": [
+            "differ"
+          ],
+          "rows": [
+            [
+              "0"
+            ]
+          ]
+        },
+        "page1": {
+          "sql": "SELECT id, title FROM articles\nORDER BY id DESC\nLIMIT 20 OFFSET 0;",
+          "ok": true,
+          "columns": [
+            "id",
+            "title"
+          ],
+          "rows": [
+            [
+              "100000",
+              "Article 100000"
+            ],
+            [
+              "99999",
+              "Article 99999"
+            ],
+            [
+              "99998",
+              "Article 99998"
+            ],
+            [
+              "99997",
+              "Article 99997"
+            ],
+            [
+              "99996",
+              "Article 99996"
+            ],
+            [
+              "99995",
+              "Article 99995"
+            ],
+            [
+              "99994",
+              "Article 99994"
+            ],
+            [
+              "99993",
+              "Article 99993"
+            ],
+            [
+              "99992",
+              "Article 99992"
+            ],
+            [
+              "99991",
+              "Article 99991"
+            ],
+            [
+              "99990",
+              "Article 99990"
+            ],
+            [
+              "99989",
+              "Article 99989"
+            ],
+            [
+              "99988",
+              "Article 99988"
+            ],
+            [
+              "99987",
+              "Article 99987"
+            ],
+            [
+              "99986",
+              "Article 99986"
+            ],
+            [
+              "99985",
+              "Article 99985"
+            ],
+            [
+              "99984",
+              "Article 99984"
+            ],
+            [
+              "99983",
+              "Article 99983"
+            ],
+            [
+              "99982",
+              "Article 99982"
+            ],
+            [
+              "99981",
+              "Article 99981"
+            ]
+          ]
+        },
+        "publish": {
+          "sql": "INSERT INTO articles VALUES (100001, 'Article 100001', TIMESTAMP '2024-10-03');",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "page2Offset": {
+          "sql": "SELECT id, title FROM articles\nORDER BY id DESC\nLIMIT 20 OFFSET 20;",
+          "ok": true,
+          "columns": [
+            "id",
+            "title"
+          ],
+          "rows": [
+            [
+              "99981",
+              "Article 99981"
+            ],
+            [
+              "99980",
+              "Article 99980"
+            ],
+            [
+              "99979",
+              "Article 99979"
+            ],
+            [
+              "99978",
+              "Article 99978"
+            ],
+            [
+              "99977",
+              "Article 99977"
+            ],
+            [
+              "99976",
+              "Article 99976"
+            ],
+            [
+              "99975",
+              "Article 99975"
+            ],
+            [
+              "99974",
+              "Article 99974"
+            ],
+            [
+              "99973",
+              "Article 99973"
+            ],
+            [
+              "99972",
+              "Article 99972"
+            ],
+            [
+              "99971",
+              "Article 99971"
+            ],
+            [
+              "99970",
+              "Article 99970"
+            ],
+            [
+              "99969",
+              "Article 99969"
+            ],
+            [
+              "99968",
+              "Article 99968"
+            ],
+            [
+              "99967",
+              "Article 99967"
+            ],
+            [
+              "99966",
+              "Article 99966"
+            ],
+            [
+              "99965",
+              "Article 99965"
+            ],
+            [
+              "99964",
+              "Article 99964"
+            ],
+            [
+              "99963",
+              "Article 99963"
+            ],
+            [
+              "99962",
+              "Article 99962"
+            ]
+          ]
+        },
+        "page2Cursor": {
+          "sql": "SELECT id, title FROM articles\nWHERE id < 99981\nORDER BY id DESC\nLIMIT 20;",
+          "ok": true,
+          "columns": [
+            "id",
+            "title"
+          ],
+          "rows": [
+            [
+              "99980",
+              "Article 99980"
+            ],
+            [
+              "99979",
+              "Article 99979"
+            ],
+            [
+              "99978",
+              "Article 99978"
+            ],
+            [
+              "99977",
+              "Article 99977"
+            ],
+            [
+              "99976",
+              "Article 99976"
+            ],
+            [
+              "99975",
+              "Article 99975"
+            ],
+            [
+              "99974",
+              "Article 99974"
+            ],
+            [
+              "99973",
+              "Article 99973"
+            ],
+            [
+              "99972",
+              "Article 99972"
+            ],
+            [
+              "99971",
+              "Article 99971"
+            ],
+            [
+              "99970",
+              "Article 99970"
+            ],
+            [
+              "99969",
+              "Article 99969"
+            ],
+            [
+              "99968",
+              "Article 99968"
+            ],
+            [
+              "99967",
+              "Article 99967"
+            ],
+            [
+              "99966",
+              "Article 99966"
+            ],
+            [
+              "99965",
+              "Article 99965"
+            ],
+            [
+              "99964",
+              "Article 99964"
+            ],
+            [
+              "99963",
+              "Article 99963"
+            ],
+            [
+              "99962",
+              "Article 99962"
+            ],
+            [
+              "99961",
+              "Article 99961"
+            ]
+          ]
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    },
+    "idem": {
+      "setup": "CREATE TABLE payments (\n  id serial PRIMARY KEY,\n  idempotency_key text UNIQUE,\n  amount int NOT NULL,\n  currency text NOT NULL)",
+      "steps": {
+        "try1": {
+          "sql": "INSERT INTO payments (amount, currency)\nVALUES (5000, 'usd')\nRETURNING id;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              "1"
+            ]
+          ]
+        },
+        "try2": {
+          "sql": "INSERT INTO payments (amount, currency)\nVALUES (5000, 'usd')\nRETURNING id;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              "2"
+            ]
+          ]
+        },
+        "try3": {
+          "sql": "INSERT INTO payments (amount, currency)\nVALUES (5000, 'usd')\nRETURNING id;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              "3"
+            ]
+          ]
+        },
+        "unkeyed": {
+          "sql": "SELECT COUNT(*) AS charges, SUM(amount) AS cents FROM payments;",
+          "ok": true,
+          "columns": [
+            "charges",
+            "cents"
+          ],
+          "rows": [
+            [
+              "3",
+              "15000"
+            ]
+          ]
+        },
+        "reset": {
+          "sql": "TRUNCATE payments RESTART IDENTITY;",
+          "ok": true,
+          "columns": [],
+          "rows": []
+        },
+        "key1": {
+          "sql": "INSERT INTO payments (idempotency_key, amount, currency)\nVALUES ('9c1f2a7e-4b6d-4e8a-9f3c-2d7b1e5a60b3', 5000, 'usd')\nON CONFLICT (idempotency_key) DO NOTHING\nRETURNING id;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": [
+            [
+              "1"
+            ]
+          ]
+        },
+        "key2": {
+          "sql": "INSERT INTO payments (idempotency_key, amount, currency)\nVALUES ('9c1f2a7e-4b6d-4e8a-9f3c-2d7b1e5a60b3', 5000, 'usd')\nON CONFLICT (idempotency_key) DO NOTHING\nRETURNING id;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": []
+        },
+        "key3": {
+          "sql": "INSERT INTO payments (idempotency_key, amount, currency)\nVALUES ('9c1f2a7e-4b6d-4e8a-9f3c-2d7b1e5a60b3', 5000, 'usd')\nON CONFLICT (idempotency_key) DO NOTHING\nRETURNING id;",
+          "ok": true,
+          "columns": [
+            "id"
+          ],
+          "rows": []
+        },
+        "stored": {
+          "sql": "SELECT id, amount, currency FROM payments\nWHERE idempotency_key = '9c1f2a7e-4b6d-4e8a-9f3c-2d7b1e5a60b3';",
+          "ok": true,
+          "columns": [
+            "id",
+            "amount",
+            "currency"
+          ],
+          "rows": [
+            [
+              "1",
+              "5000",
+              "usd"
+            ]
+          ]
+        },
+        "keyed": {
+          "sql": "SELECT COUNT(*) AS charges, SUM(amount) AS cents FROM payments;",
+          "ok": true,
+          "columns": [
+            "charges",
+            "cents"
+          ],
+          "rows": [
+            [
+              "1",
+              "5000"
+            ]
+          ]
+        },
+        "duplicate": {
+          "sql": "INSERT INTO payments (idempotency_key, amount, currency)\nVALUES ('9c1f2a7e-4b6d-4e8a-9f3c-2d7b1e5a60b3', 5000, 'usd');",
+          "ok": false,
+          "error": "ERROR: duplicate key value violates unique constraint \"payments_idempotency_key_key\""
+        }
+      },
+      "version": "PostgreSQL 18.3"
+    }
+  },
+  "pageSize": 20,
+  "jwt": {
+    "header": {
+      "alg": "HS256",
+      "typ": "JWT"
+    },
+    "claims": {
+      "sub": "42",
+      "role": "editor",
+      "iat": 1793966400,
+      "exp": 1793967300
+    },
+    "lifetimeMinutes": 15,
+    "parts": {
+      "header": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+      "payload": "eyJzdWIiOiI0MiIsInJvbGUiOiJlZGl0b3IiLCJpYXQiOjE3OTM5NjY0MDAsImV4cCI6MTc5Mzk2NzMwMH0",
+      "signature": "FmCqeOBqw45lSf0cnJu2HdW0r9ZZr3QV0HVh86sBjtg"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MiIsInJvbGUiOiJlZGl0b3IiLCJpYXQiOjE3OTM5NjY0MDAsImV4cCI6MTc5Mzk2NzMwMH0.FmCqeOBqw45lSf0cnJu2HdW0r9ZZr3QV0HVh86sBjtg",
+    "chars": 164,
+    "decoded": {
+      "sub": "42",
+      "role": "editor",
+      "iat": 1793966400,
+      "exp": 1793967300
+    },
+    "verifies": true,
+    "forgedVerifies": false,
+    "forgedPayload": "eyJzdWIiOiI0MiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc5Mzk2NjQwMCwiZXhwIjoxNzkzOTY3MzAwfQ",
+    "sessionId": "JFlyAEuWquxTsBBMIBhejgITSXmARrQfaBheVp6YKqc",
+    "sessionChars": 43
+  },
+  "cursor": {
+    "last": 99981,
+    "cursor": "eyJpZCI6OTk5ODF9",
+    "decoded": {
+      "id": 99981
+    }
+  },
+  "gzip": {
+    "bytes": 3663,
+    "gzipped": 610
+  },
+  "retry": {
+    "clients": 1000,
+    "capacity": 200,
+    "retryAfter": 2,
+    "spreadSeconds": 5,
+    "seed": 429,
+    "exact": {
+      "sent": 3000,
+      "refused": 2000,
+      "medianServed": 6,
+      "lastServed": 10,
+      "peak": 1000,
+      "perSecond": [
+        0,
+        0,
+        1000,
+        0,
+        800,
+        0,
+        600,
+        0,
+        400,
+        0,
+        200
+      ]
+    },
+    "spread": {
+      "sent": 1024,
+      "refused": 24,
+      "medianServed": 4.6,
+      "lastServed": 13,
+      "peak": 212,
+      "perSecond": [
+        0,
+        0,
+        181,
+        195,
+        209,
+        212,
+        203,
+        2,
+        2,
+        3,
+        10,
+        3,
+        4
+      ]
+    }
+  }
+}

@@ -240,7 +240,7 @@ export const script: NarrationScript = {
     },
     {
       id: "comp-mix",
-      text: "It also combines freely. Notifications go by email, text or push, and now, in a daily digest, or after quiet hours. A subclass per pair is nine, and a fourth channel makes twelve. Composition gives each notifier one channel and one timing: six parts, then seven. A customer who switches to the digest swaps one part, at runtime.",
+      text: "It also combines freely. Notifications go by email, text or push, at one of three timings. A subclass per pair is nine, and a fourth channel makes twelve. Composition gives each notifier one channel and one timing: six parts, then seven. A customer who switches to the daily digest swaps one part, at runtime.",
       pauseAfter: 0.6,
     },
     {

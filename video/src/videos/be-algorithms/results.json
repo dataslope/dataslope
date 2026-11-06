@@ -85,6 +85,13 @@
       "resizes": 86,
       "copiesIfEveryResizeCopies": 8445096,
       "copiesPerAppend": 8.445096,
+      "copiesPerAppendAt": {
+        "1000": 7.556,
+        "10000": 8.3136,
+        "100000": 7.98128,
+        "1000000": 8.445096,
+        "2000000": 8.562198
+      },
       "largestResize": 938736,
       "finalCapacity": 1056084,
       "meanGrowthAbove1000": 1.125691244504265,
@@ -227,6 +234,30 @@
       "recursionLimit": 1000
     },
     "rapid": {
+      "kahnCyclicEdges": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "kahnCyclic": [
+        0
+      ],
+      "topoCyclic": [
+        "A"
+      ],
       "bstSortedHeight": 1000,
       "bstShuffledHeight": 21,
       "bstKeys": 1000,

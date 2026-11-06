@@ -136,7 +136,7 @@ export const TableScene: React.FC = () => {
         <BoxPulse x={PRODUCTS_X} y={top} width={gP.width * S} height={gP.headH * S} at={rememberAt + 3} />
 
         {/* "Products": the lesson's two, a notebook and a pen, top right above their table. */}
-        <Spot id="db-entities-notebook" at={productsAt} left={1620} top={y(202)} width={180} height={175} />
+        <Spot id="db-entities-notebook" at={productsAt} left={1620} top={y(184)} width={180} height={175} />
         {/* "A product has a price": a price tag under the price column. */}
         <Spot id="db-entities-price-tag" at={priceAt} left={1400} top={y(728)} width={220} height={176} />
 

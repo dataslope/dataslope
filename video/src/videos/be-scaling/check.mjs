@@ -148,7 +148,30 @@ const h32 = (s) => createHash("md5").update(s).digest().readUInt32BE(0);
   const sizes = [0.001, 0.01, 0.1].map((share) => {
     const u = rng(SEED); // the same redirects for every cache size
     const capacity = Math.round(LINKS * share);
-    const cache = new Map();
+    // LRU as a doubly linked list over the link ids, most recent at the head:
+    // a hit moves its link to the head, a miss inserts there and, when full,
+    // evicts the tail. (A Map used the same way slows to a crawl here: V8
+    // walks every deleted slot to find the oldest key.)
+    const prev = new Int32Array(LINKS).fill(-1);
+    const next = new Int32Array(LINKS).fill(-1);
+    const cached = new Uint8Array(LINKS);
+    let head = -1;
+    let tail = -1;
+    let size = 0;
+    const unlink = (k) => {
+      if (prev[k] >= 0) next[prev[k]] = next[k];
+      else head = next[k];
+      if (next[k] >= 0) prev[next[k]] = prev[k];
+      else tail = prev[k];
+      prev[k] = next[k] = -1;
+    };
+    const pushHead = (k) => {
+      prev[k] = -1;
+      next[k] = head;
+      if (head >= 0) prev[head] = k;
+      head = k;
+      if (tail < 0) tail = k;
+    };
     let hits = 0;
     for (let i = 0; i < REDIRECTS; i++) {
       const x = u() * total;
@@ -159,13 +182,20 @@ const h32 = (s) => createHash("md5").update(s).digest().readUInt32BE(0);
         if (cum[m] < x) lo = m + 1;
         else hi = m;
       }
-      if (cache.has(lo)) {
+      if (cached[lo]) {
         hits += 1;
-        cache.delete(lo);
-        cache.set(lo, true);
+        unlink(lo);
+        pushHead(lo);
       } else {
-        cache.set(lo, true);
-        if (cache.size > capacity) cache.delete(cache.keys().next().value);
+        cached[lo] = 1;
+        pushHead(lo);
+        size += 1;
+        if (size > capacity) {
+          const old = tail;
+          unlink(old);
+          cached[old] = 0;
+          size -= 1;
+        }
       }
     }
     const hitRate = hits / REDIRECTS;

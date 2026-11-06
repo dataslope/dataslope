@@ -315,58 +315,58 @@
           "rows": [
             [
               "974839",
-              "2024-12-22 18:19:37.560Z",
+              "2024-12-22 18:19:37",
               "75.43"
             ],
             [
               "924839",
-              "2024-12-04 11:09:37.560Z",
+              "2024-12-04 11:09:37",
               "5.43"
             ],
             [
               "874839",
-              "2024-11-16 03:59:37.560Z",
+              "2024-11-16 03:59:37",
               "30.43"
             ],
             [
               "824839",
-              "2024-10-28 20:49:37.560Z",
+              "2024-10-28 20:49:37",
               "55.43"
             ],
             [
               "774839",
-              "2024-10-10 13:39:37.560Z",
+              "2024-10-10 13:39:37",
               "80.43"
             ],
             [
               "724839",
-              "2024-09-22 06:29:37.560Z",
+              "2024-09-22 06:29:37",
               "10.43"
             ],
             [
               "674839",
-              "2024-09-03 23:19:37.560Z",
+              "2024-09-03 23:19:37",
               "35.43"
             ],
             [
               "624839",
-              "2024-08-16 16:09:37.560Z",
+              "2024-08-16 16:09:37",
               "60.43"
             ],
             [
               "574839",
-              "2024-07-29 08:59:37.560Z",
+              "2024-07-29 08:59:37",
               "85.43"
             ],
             [
               "524839",
-              "2024-07-11 01:49:37.560Z",
+              "2024-07-11 01:49:37",
               "15.43"
             ]
           ]
         },
         "latestPlan": {
-          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT id, created_at, amount FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 10;",
+          "sql": "EXPLAIN (ANALYZE, BUFFERS, TIMING OFF, SUMMARY OFF)\nSELECT id, created_at, amount FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 10;",
           "ok": true,
           "columns": [
             "QUERY PLAN"
@@ -376,6 +376,9 @@
               "Limit  (cost=0.42..42.60 rows=10 width=18) (actual rows=10.00 loops=1)"
             ],
             [
+              "  Buffers: shared hit=13"
+            ],
+            [
               "  ->  Index Scan Backward using orders_customer_created_idx on orders  (cost=0.42..84.77 rows=20 width=18) (actual rows=10.00 loops=1)"
             ],
             [
@@ -383,6 +386,9 @@
             ],
             [
               "        Index Searches: 1"
+            ],
+            [
+              "        Buffers: shared hit=13"
             ]
           ]
         },
@@ -426,7 +432,7 @@
           "rows": []
         },
         "reversePlan": {
-          "sql": "EXPLAIN (ANALYZE, TIMING OFF, BUFFERS OFF, SUMMARY OFF)\nSELECT id, created_at, amount FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 10;",
+          "sql": "EXPLAIN (ANALYZE, BUFFERS, TIMING OFF, SUMMARY OFF)\nSELECT id, created_at, amount FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 10;",
           "ok": true,
           "columns": [
             "QUERY PLAN"
@@ -436,6 +442,9 @@
               "Limit  (cost=0.42..11465.15 rows=10 width=18) (actual rows=10.00 loops=1)"
             ],
             [
+              "  Buffers: shared hit=13 read=1824"
+            ],
+            [
               "  ->  Index Scan Backward using orders_created_customer_idx on orders  (cost=0.42..22929.88 rows=20 width=18) (actual rows=10.00 loops=1)"
             ],
             [
@@ -443,6 +452,15 @@
             ],
             [
               "        Index Searches: 1"
+            ],
+            [
+              "        Buffers: shared hit=13 read=1824"
+            ],
+            [
+              "Planning:"
+            ],
+            [
+              "  Buffers: shared hit=53 read=1"
             ]
           ]
         },
