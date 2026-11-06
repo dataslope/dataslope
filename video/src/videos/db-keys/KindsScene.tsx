@@ -21,7 +21,7 @@ const SIZES = { headSize: 24, bodySize: 32, pad: 22 };
 /** Where the natural panel's longest line ends ("a real-world value the
  *  thing already has"): the hairline between the panels is centred in the
  *  gap from here to the surrogate panel. */
-const NATURAL_R = 640;
+const NATURAL_R = 604;
 
 /**
  * Part 2 opens: the two kinds of key. A natural key is a value the thing

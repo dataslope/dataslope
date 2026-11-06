@@ -289,10 +289,10 @@ export const AdditiveScene: React.FC = () => {
             <Who key={p} name={p} at={fourAt + i * 2} />
           ))}
           <span style={{ ...note(26, OK_INK), fontWeight: 800, marginLeft: COUNT_GAP - WHO_GAP }}>
-            <Num>{VISITS_BOTH}</Num> people,
-          </span>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, opacity: ease(frame, sixAt - 2, 10) }}>
-            not <Num>{sumOfDays}</Num>
+            <Num>{VISITS_BOTH}</Num> people,{" "}
+            <span style={{ color: ACCENT_INK, fontWeight: 700, opacity: ease(frame, sixAt - 2, 10) }}>
+              not <Num>{sumOfDays}</Num>
+            </span>
           </span>
         </div>
         {/* One remedy for each kind, beside the visitors they are about. */}

@@ -46,8 +46,8 @@ const STACK = 66;
  *  it, which run about this far). Each hairline runs from the headings to
  *  the foot of the RESTRICT column's error, the deepest of the three. */
 const CODE_ADVANCE = 0.6 * 19;
-const CASCADE_REPLY_W = 372;
-const RULE_DROP = 240;
+const CASCADE_REPLY_W = 390;
+const RULE_DROP = 265;
 
 const cols = (t: Table, keys: readonly string[]): Col[] =>
   t.cols.map((name) => ({ name, numeric: !/name|title/.test(name), ink: keys.includes(name) ? KEY_INK : undefined }));

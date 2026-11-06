@@ -20,9 +20,9 @@ Brief: BRIEF.md in this folder. Layout only, no re-voicing, no new images.
 - Stats 5: sampling, sampling-bias, survivorship-bias, sampling-distributions, central-limit-theorem, standard-error (started when Part 1 finished)
 - Stats 6-9: estimation, testing-hypotheses, interpreting-results, statistics-in-practice (started when Part 2 finished)
 - LLM 1-3: llm-tokens, llm-meaning, llm-attention-score, llm-generation (started when Part 5 finished)
+- LLM 4-5: llm-cost, llm-conversation-cost, llm-benchmarks, llm-temperature (started when the Stats 1-2 trim finished)
 
 ## Later waves (start one as each agent finishes)
-- LLM 4-5: llm-cost, llm-conversation-cost, llm-benchmarks, llm-temperature
 - NLP 1-3: nlp-why-text-is-hard, nlp-cleaning-text, nlp-lemmas-and-tags, nlp-counting-words
 - NLP 3-5: nlp-zipfs-law, nlp-text-to-features, nlp-history, tf-idf
 - Standalone A: base-rate, box-sizing, c-pointers, java-equality, left-join-trap, list-vs-set
