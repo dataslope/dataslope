@@ -2,12 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HERO, PRACTICE } from "./data";
-import { Chip, Drift, Headline, Kicker, OK_INK, Spot, X0 } from "./parts";
+import { Chip, Drift, Headline, Kicker, Spot, X0 } from "./parts";
 
 /**
  * The close of the series: the three habits every answer came back to, as
@@ -52,7 +52,7 @@ export const CloseScene: React.FC = () => {
         <Headline lead="Eleven questions," turn="the same habits." at={elevenAt - 2} turnAt={habitsAt - 2} size={68} />
 
         {habits.map((c, i) => (
-          <Chip key={c.text} x={X0} y={y(320) + i * h(74)} at={c.at - 2} size={30} ink={OK_INK}>
+          <Chip key={c.text} x={X0} y={y(320) + i * h(74)} at={c.at - 2} size={30} tone="green">
             {c.text}
           </Chip>
         ))}
@@ -64,7 +64,7 @@ export const CloseScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
-          <Chip key={p.text} x={X0} y={y(690) + i * h(74)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 1 ? workAt : undefined}>
+          <Chip key={p.text} x={X0} y={y(690) + i * h(74)} at={p.at - 2} size={28} tone="blue" lit={i === 1 ? workAt : undefined}>
             {p.text}
           </Chip>
         ))}

@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Clear, Drift, pulse, Strike, Svg, X0 } from "./parts";
-import { Tag } from "./plain";
+import { Tag } from "./badges";
 
 const STAR = { top: 330, w: 640, h: 180 };
 const CHECKS_X = 900;
@@ -65,7 +65,6 @@ export const NorthScene: React.FC = () => {
   const rail = ease(frame, healthAt, 18);
   // "unsubscribes" is written like the other guardrails, and turns red only
   // when the narration says what it catches.
-  const leaveInk = `color-mix(in srgb, ${ACCENT_INK} ${ease(frame, leaveAt, 12) * 100}%, ${INK})`;
 
   return (
     <AbsoluteFill>
@@ -189,7 +188,8 @@ export const NorthScene: React.FC = () => {
               y={y(RAIL.top) + h(52)}
               at={r.at - 2}
               lit={r.text === "unsubscribes" ? leaveAt + 4 : undefined}
-              ink={r.text === "unsubscribes" ? leaveInk : INK}
+              turn={r.text === "unsubscribes" ? "red" : undefined}
+              turnAt={leaveAt}
             >
               {r.text}
             </Tag>

@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { BLOCK, FRESH } from "./data";
-import { Console, Drift, lineOf, Listing, listingHeight, Mark, MARK_BAD, OK_INK, X0 } from "./parts";
+import { Console, Drift, lineOf, Listing, listingHeight, Mark, MARK_BAD, X0 } from "./parts";
 
 const LIST_SIZE = 20;
 const TABLE_X = 1230;
@@ -58,10 +58,10 @@ export const FreshScene: React.FC = () => {
   const cur = FRESH.current as Record<string, string>;
   const action = (id: string) =>
     FRESH.toEmbed.includes(id)
-      ? { text: "embed", ink: BLUE_INK, at: embedAt, lit: id === "doc1#1" ? changedAt : newAt, litOut: goneAt }
+      ? { text: "embed", tone: "blue" as const, at: embedAt, lit: id === "doc1#1" ? changedAt : newAt, litOut: goneAt }
       : FRESH.toDelete.includes(id)
-        ? { text: "delete", ink: INK, at: deleteAt, lit: goneAt, litOut: zeroAt }
-        : { text: "nothing to pay", ink: OK_INK, at: nothingAt, lit: zeroAt, litOut: skipAt };
+        ? { text: "delete", tone: "gray" as const, at: deleteAt, lit: goneAt, litOut: zeroAt }
+        : { text: "nothing to pay", tone: "green" as const, at: nothingAt, lit: zeroAt, litOut: skipAt };
   const tableTop = y(340);
   const colX = (j: number) => TABLE_X + COLS.slice(0, j).reduce((a, c) => a + c.w, 0);
 
@@ -127,6 +127,7 @@ export const FreshScene: React.FC = () => {
           const a = action(id);
           const top = tableTop + 40 + i * ROW_H;
           const lit = ease(frame, a.lit, 10) * (1 - ease(frame, a.litOut, 12));
+          const gone = id in idx && !(id in cur);
           return (
             <React.Fragment key={id}>
               <div
@@ -161,8 +162,16 @@ export const FreshScene: React.FC = () => {
                 </div>
               ))}
               <Note at={a.at} x={colX(3) + 16} y={top + 12}>
-                {/* The action as a word in its ink, no outline. */}
-                <span style={{ ...note(23, a.ink), fontWeight: 650, whiteSpace: "nowrap" }}>
+                {/* The action as a house badge; a chunk that is gone from the
+                    source takes a fainter tint and the soft ink. */}
+                <span
+                  style={{
+                    ...badgeStyle(a.tone, 23),
+                    fontFamily: SANS,
+                    fontWeight: 650,
+                    ...(gone ? { background: "color-mix(in srgb, var(--ds-gray-400) 10%, transparent)", color: INK_SOFT } : {}),
+                  }}
+                >
                   {a.text}
                 </span>
               </Note>

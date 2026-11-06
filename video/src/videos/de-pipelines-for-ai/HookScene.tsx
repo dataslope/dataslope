@@ -120,7 +120,7 @@ export const HookScene: React.FC = () => {
             y={STEP_Y}
             at={steps[i] - 2}
             size={26}
-            ink={i === 3 || i === 4 ? BLUE_INK : INK}
+            tone={i === 3 || i === 4 ? "blue" : "gray"}
             lit={i === 3 ? billAt - 2 : i === 4 ? storeAt - 2 : undefined}
           >
             {s.text}

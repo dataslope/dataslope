@@ -4,26 +4,26 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Mark, OK_INK, Step, X0 } from "./parts";
+import { Drift, Mark, Step, X0 } from "./parts";
 
 const CARD = { x: X0, top: 380, w: 640, row: 66 };
 const STEPS_X = 900;
 const STEPS_TOP = 400;
 const STEP_ROW = 96;
 
-/** "pass" or "fail" beside a rubric line, as a word in its meaning's ink. */
+/** "pass" or "fail" beside a rubric line: a house badge, green or red, at
+ *  26px, within 12% of the 28px line beside it. */
 const Verdict: React.FC<{ at: number; ok: boolean }> = ({ at: from, ok }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 10);
   return (
     <span
       style={{
-        display: "inline-block",
-        ...note(26, ok ? OK_INK : ACCENT_INK),
-        fontWeight: 700,
+        ...note(26),
+        ...badgeStyle(ok ? "green" : "red", 26),
         opacity: p,
         transform: `scale(${0.8 + 0.2 * p})`,
       }}

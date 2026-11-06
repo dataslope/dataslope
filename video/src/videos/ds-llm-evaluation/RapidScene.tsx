@@ -58,11 +58,11 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>track what people do next:</span>
       </Note>
       {signs.map((s, i) => (
-        <Tag key={s.text} x={R_X + 30} y={c.y(614) + i * c.h(54)} at={s.at - 2} size={24} ink={OK_INK}>
+        <Tag key={s.text} x={R_X + 30} y={c.y(626) + i * c.h(62)} at={s.at - 2} size={24} tone="green">
           {s.text}
         </Tag>
       ))}
-      <Note at={diagAt - 2} x={R_X} y={c.y(800)}>
+      <Note at={diagAt - 2} x={R_X} y={c.y(830)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
           keep the thumbs-up rate as{" "}
           <span style={{ opacity: ease(frame, targetAt - 2, 10) }}>
@@ -189,15 +189,15 @@ export const RapidScene: React.FC = () => {
         <Note at={roundAt} x={X0} y={y(330)}>
           <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>every round on this track came back to one question</span>
         </Note>
-        <Note at={practice[0].at - 6} x={X0} y={y(470)}>
+        <Note at={practice[0].at - 6} x={X0} y={y(450)}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
-          <Tag key={p.text} x={X0} y={y(500) + i * h(60)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 2 ? workAt : undefined}>
+          <Tag key={p.text} x={X0} y={y(500) + i * h(74)} at={p.at - 2} size={28} tone="blue" lit={i === 2 ? workAt : undefined}>
             {p.text}
           </Tag>
         ))}
-        <Note at={workAt - 2} x={X0} y={y(700)}>
+        <Note at={workAt - 2} x={X0} y={y(740)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap", opacity: 0.4 + 0.6 * ease(frame, workAt, 12) }}>
             so you can find the rounds that still need work
           </span>

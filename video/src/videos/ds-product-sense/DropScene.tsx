@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DROP, num, pct } from "./data";
-import { DATA, DATA_LIGHT, Drift, madeUp, Mark, OK_INK, Svg, VLine, X0 } from "./parts";
-import { Step, Tag } from "./plain";
+import { DATA, DATA_LIGHT, Drift, madeUp, Mark, Svg, VLine, X0 } from "./parts";
+import { Step, Tag } from "./badges";
 
 const STEPS_TOP = 350;
 const STEP_GAP = 84;
@@ -147,18 +147,12 @@ export const DropScene: React.FC = () => {
           }
         />
 
-        {/* Step 1: what can fake the shape, on one line, a middle dot
-            between each two. */}
-        <Note at={fakes[0].at - 2} x={CHART.x0} y={y(BARS.top) + h(10)} out={fakeOut} from="up">
-          <span style={{ ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-            {fakes.map((f, i) => (
-              <span key={f.text} style={{ opacity: ease(frame, f.at - 2, 12) }}>
-                {i ? <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
-                {f.text}
-              </span>
-            ))}
-          </span>
-        </Note>
+        {/* Step 1: what can fake the shape. */}
+        {fakes.map((f, i) => (
+          <Tag key={f.text} x={CHART.x0 + i * 300} y={y(BARS.top)} at={f.at - 2} out={fakeOut} size={25}>
+            {f.text}
+          </Tag>
+        ))}
         <Note at={shapeAt} x={CHART.x0} y={y(BARS.top) + h(74)} out={fakeOut}>
           <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap" }}>each can make that shape on its own</span>
         </Note>
@@ -206,28 +200,38 @@ export const DropScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* Step 5: size it, fix it, confirm it, on one line; the fix in the
-            right answer's green, under the highlighter once it is said. */}
-        <Note at={actAt + 4} x={CHART.x0} y={y(BARS.top) + 3 * h(BARS.gap) + h(70)}>
-          <span style={{ ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+        {/* Step 5: size it, fix it, confirm it, as house badges held apart by
+            their gap; the fix green, under the highlighter once it is said. */}
+        <Note at={actAt + 4} x={CHART.x0} y={y(BARS.top) + 3 * h(BARS.gap) + h(62)}>
+          <div style={{ display: "flex", gap: 16 }}>
             {[
-              { text: `size: Android −${pct(-DROP.byPlatform.Android.change)}`, at: fifthAt, ink: INK },
-              { text: `fix: roll back ${DROP.release}`, at: rollAt, ink: OK_INK },
-              { text: "confirm: Android climbs back", at: climbAt, ink: INK },
-            ].map((c, i) => (
-              <span key={c.text} style={{ color: c.ink, opacity: ease(frame, c.at - 2, 12) }}>
-                {i ? <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
-                {c.ink === OK_INK ? <Mark at={rollAt + 8}>{c.text}</Mark> : c.text}
-              </span>
-            ))}
-          </span>
+              { text: `size: Android −${pct(-DROP.byPlatform.Android.change)}`, at: fifthAt, fix: false },
+              { text: `fix: roll back ${DROP.release}`, at: rollAt, fix: true },
+              { text: "confirm: Android climbs back", at: climbAt, fix: false },
+            ].map((c) => {
+              const badge = badgeStyle(c.fix ? "green" : "gray", 24);
+              return (
+                <span
+                  key={c.text}
+                  style={{
+                    ...note(24),
+                    ...badge,
+                    background: c.fix ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(ease(frame, rollAt + 8, 12) * 100)}%, ${badge.background})` : badge.background,
+                    opacity: ease(frame, c.at - 2, 12),
+                  }}
+                >
+                  {c.text}
+                </span>
+              );
+            })}
+          </div>
         </Note>
 
-        {/* Step 4: internal or external, two plain lines under its step. */}
-        <Tag x={X0 + 58} y={y(STEPS_TOP) + 4 * h(STEP_GAP) - h(6)} at={competitorAt - 2} out={actAt - 10} size={24} ink={INK_SOFT}>
+        {/* Step 4: internal or external. */}
+        <Tag x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(10)} at={competitorAt - 2} out={actAt - 10} size={24}>
           external: a competitor&apos;s launch
         </Tag>
-        <Tag x={X0 + 58} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(46)} at={bugAt - 2} out={actAt - 10} size={24} ink={ACCENT_INK} lit={bugAt + 8}>
+        <Tag x={X0 + 40} y={y(STEPS_TOP) + 4 * h(STEP_GAP) + h(78)} at={bugAt - 2} out={actAt - 10} size={24} tone="red" lit={bugAt + 8}>
           internal: a bug of your own
         </Tag>
       </Drift>

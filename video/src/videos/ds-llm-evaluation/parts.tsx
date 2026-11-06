@@ -11,8 +11,8 @@ import { ILLUSTRATIONS, VIDEO } from "./data";
  * Pieces this video needs beyond the editorial kit and the interview kit
  * (editorial/interview.tsx). The page furniture and the plotting pieces come
  * from the Data Analyst statistics part, the bridge's clear and the fraction
- * from the probability part, and the tag, step and made-up label from the
- * product-sense part, so the series stays one family. What is new is this
+ * from the probability part, and the tag and step (house badges) and the
+ * made-up label from the product-sense part, so the series stays one family. What is new is this
  * round's own material: a model's reply, and a hundred graded items as a
  * grid.
  */
@@ -37,7 +37,7 @@ export {
 } from "../da-statistics-communication/parts";
 export { Clear, Frac, math } from "../ds-probability/parts";
 export { BAD, DATA, DATA_LIGHT, madeUp } from "../ds-product-sense/parts";
-export { Step, Tag } from "../ds-product-sense/plain";
+export { Step, Tag } from "../ds-product-sense/badges";
 
 /** The paper-grey of what the narration has moved past. */
 export const QUIET = ds("blue", 100);

@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Clear, DATA, Drift, madeUp, OK_INK, Strike, Svg, X0 } from "./parts";
-import { Tag } from "./plain";
+import { Tag } from "./badges";
 
 const TREE_X = 640;
 const ROW_LABEL_W = 210;
@@ -137,45 +137,37 @@ export const SaveScene: React.FC = () => {
           </Note>
 
           {rowLabel("Primary", primaryAt - 2, OK_INK, y(ROWS.primary))}
-          <Tag x={TREE_X + ROW_LABEL_W} y={y(ROWS.primary)} at={primaryAt + 4} ink={OK_INK} size={28} lit={loopAt}>
+          <Tag x={TREE_X + ROW_LABEL_W} y={y(ROWS.primary)} at={primaryAt + 4} tone="green" size={28} lit={loopAt}>
             share of saved recipes cooked within a week
           </Tag>
 
-          {/* Each row's metrics on one line, a middle dot between two, then
-              what they are for in the soft ink. */}
           {rowLabel("Secondary", secondaryAt - 2, INK_SOFT, y(ROWS.secondary))}
-          <Note at={secondaryAt} x={TREE_X + ROW_LABEL_W} y={y(ROWS.secondary) + h(10)} from="up">
-            <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-              save rate
-              <span style={{ opacity: ease(frame, secondaryAt + 6, 12) }}>
-                <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span>saves per user
-              </span>
-            </span>
-          </Note>
-          <Note at={whyAt} x={TREE_X + ROW_LABEL_W + 374} y={y(ROWS.secondary) + h(10)}>
+          <Tag x={TREE_X + ROW_LABEL_W} y={y(ROWS.secondary)} at={secondaryAt} size={26}>
+            save rate
+          </Tag>
+          <Tag x={TREE_X + ROW_LABEL_W + 190} y={y(ROWS.secondary)} at={secondaryAt + 6} size={26}>
+            saves per user
+          </Tag>
+          <Note at={whyAt} x={TREE_X + ROW_LABEL_W + 440} y={y(ROWS.secondary) + h(10)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>explain why it moved</span>
           </Note>
 
           {rowLabel("Guardrails", guardsAt - 2, INK_SOFT, y(ROWS.guard))}
-          <Note at={cookAt - 2} x={TREE_X + ROW_LABEL_W} y={y(ROWS.guard) + h(10)} from="up">
-            <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-              cooking sessions
-              <span style={{ opacity: ease(frame, loadAt - 2, 12) }}>
-                <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span>load time
-              </span>
-            </span>
-          </Note>
-          <Note at={guardsAt + 4} x={TREE_X + ROW_LABEL_W + 410} y={y(ROWS.guard) + h(10)}>
+          <Tag x={TREE_X + ROW_LABEL_W} y={y(ROWS.guard)} at={cookAt - 2} size={26}>
+            cooking sessions
+          </Tag>
+          <Tag x={TREE_X + ROW_LABEL_W + 270} y={y(ROWS.guard)} at={loadAt - 2} size={26}>
+            load time
+          </Tag>
+          <Note at={guardsAt + 4} x={TREE_X + ROW_LABEL_W + 470} y={y(ROWS.guard) + h(10)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>catch it stealing from the main flow</span>
           </Note>
 
           {rowLabel("Not this", dontAt, ACCENT_INK, y(ROWS.not))}
-          <Note at={clicksAt - 2} x={TREE_X + ROW_LABEL_W} y={y(ROWS.not) + h(10)} from="up">
-            <span style={{ ...note(26, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-              <Strike at={clicksAt + 6}>clicks on the button</Strike>
-            </span>
-          </Note>
-          <Note at={interactionAt} x={TREE_X + ROW_LABEL_W + 298} y={y(ROWS.not) + h(10)}>
+          <Tag x={TREE_X + ROW_LABEL_W} y={y(ROWS.not)} at={clicksAt - 2} size={26} tone="red">
+            <Strike at={clicksAt + 6}>clicks on the button</Strike>
+          </Tag>
+          <Note at={interactionAt} x={TREE_X + ROW_LABEL_W + 330} y={y(ROWS.not) + h(10)}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <span style={{ color: ACCENT_INK, fontWeight: 650 }}>the interaction</span>
               <span style={{ opacity: ease(frame, valueAt, 10) }}>, not the value</span>

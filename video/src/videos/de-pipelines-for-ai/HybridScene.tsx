@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -150,15 +150,15 @@ export const HybridScene: React.FC = () => {
         <Note at={setupAt} x={X0} y={y(312)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             search the tickets for{" "}
+            {/* The query as a house badge in the mono face; the highlighter's
+                yellow lays over its tint while the search is said. */}
             <span
               style={{
+                ...badgeStyle("gray", 25),
                 fontFamily: MONO,
-                fontWeight: 700,
-                padding: "2px 10px",
-                margin: "0 -10px",
-                borderRadius: 4,
+                fontSize: 23,
                 fontVariantLigatures: "none",
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * ease(frame, searchAt, 10) * (1 - ease(frame, fourthAt, 12))}%, transparent)`,
+                background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * ease(frame, searchAt, 10) * (1 - ease(frame, fourthAt, 12))}%, ${badgeStyle("gray").background})`,
               }}
             >
               {HYBRID.query}

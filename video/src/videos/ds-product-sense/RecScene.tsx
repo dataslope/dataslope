@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, SAMPLE } from "./data";
 import { Clear, DATA, Drift, lerp, Mark, OK, OK_INK, Strike, Svg, WARM, WARM_INK, X0 } from "./parts";
-import { Tag } from "./plain";
+import { Tag } from "./badges";
 
 const ARMS = { top: 470, w: 300, h: 190, gap: 60 };
 const RIGHT_X = 900;
@@ -267,20 +267,18 @@ export const RecScene: React.FC = () => {
           <Note at={switchAt - 2} x={ALT_X} y={y(340)}>
             <span style={{ ...note(29, INK), fontWeight: 650, whiteSpace: "nowrap" }}>instead:</span>
           </Note>
-          <Note at={switchAt} x={ALT_X} y={y(396) + h(10)} from="up">
-            <span style={{ ...note(25, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-              randomize whole regions
-              <span style={{ opacity: ease(frame, slotsAt, 12) }}>
-                <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span>or switch by time slot
-              </span>
-            </span>
-          </Note>
+          <Tag x={ALT_X} y={y(396)} at={switchAt} size={25} tone="blue">
+            randomize whole regions
+          </Tag>
+          <Tag x={ALT_X + 370} y={y(396)} at={slotsAt} size={25} tone="blue">
+            or switch by time slot
+          </Tag>
           <Note at={baselineAt} x={ALT_X} y={y(478)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>or compare against a baseline:</span>
           </Note>
           {methods.map((m, i) => (
             <React.Fragment key={m.text}>
-              <Tag x={ALT_X} y={y(526) + i * h(62)} at={m.at - 2} size={25} ink={BLUE_INK}>
+              <Tag x={ALT_X} y={y(526) + i * h(62)} at={m.at - 2} size={25} tone="blue">
                 {m.text}
               </Tag>
               <Note at={m.glossAt} x={ALT_X + 386} y={y(526) + i * h(62) + h(9)}>

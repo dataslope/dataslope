@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Clear, Drift, Headline, Kicker, madeUp, Mark, OK_INK, Reply, Spot, X0 } from "./parts";
+import { Clear, Drift, Headline, Kicker, madeUp, Mark, OK_INK, Reply, Spot, Tag, X0 } from "./parts";
 
 const CARD_W = 540;
 const CARD_GAP = 40;
@@ -24,7 +24,7 @@ const ROW_NEW = 520;
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
 
   const askAt = n.word("hook", "Ask a model");
   const twiceAt = n.word("hook", "the same question twice");
@@ -123,35 +123,23 @@ export const HookScene: React.FC = () => {
           <Spot id="ds-llm-evaluation-parrot" at={sureAt} left={1340} top={y(300)} width={460} height={420} />
         </Clear>
 
-        {/* The plan: what you know, what's new, and how the page splits.
-            Each group is a label close over a line of words, a middle dot
-            between each two, every word inking as it is said. */}
-        <Note at={knowAt + 4} x={X0} y={y(ROW_KNOW - 38)}>
+        {/* The plan: what you know, what's new, and how the page splits. */}
+        <Note at={knowAt + 4} x={X0} y={y(ROW_KNOW - 44)}>
           <span style={label(22, INK_SOFT)}>you already know</span>
         </Note>
-        <Note at={known[0].at - 2} x={X0} y={y(ROW_KNOW) + h(4)} from="up">
-          <span style={{ ...note(28, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-            {known.map((c, i) => (
-              <span key={c.text} style={{ opacity: ease(frame, c.at - 2, 12) }}>
-                {i ? <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
-                {c.text}
-              </span>
-            ))}
-          </span>
-        </Note>
-        <Note at={newAt} x={X0} y={y(ROW_NEW - 38)}>
+        {known.map((c, i) => (
+          <Tag key={c.text} x={X0 + [0, 260, 470, 618][i]} y={y(ROW_KNOW)} at={c.at - 2} size={28} tone="blue">
+            {c.text}
+          </Tag>
+        ))}
+        <Note at={newAt} x={X0} y={y(ROW_NEW - 44)}>
           <span style={{ ...label(22, INK), fontWeight: 700 }}>what&apos;s new</span>
         </Note>
-        <Note at={fresh[0].at - 2} x={X0} y={y(ROW_NEW) + h(4)} from="up">
-          <span style={{ ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-            {fresh.map((c, i) => (
-              <span key={c.text} style={{ opacity: ease(frame, c.at - 2, 12) }}>
-                {i ? <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
-                {c.text}
-              </span>
-            ))}
-          </span>
-        </Note>
+        {fresh.map((c, i) => (
+          <Tag key={c.text} x={X0 + [0, 290, 708][i]} y={y(ROW_NEW)} at={c.at - 2} size={28}>
+            {c.text}
+          </Tag>
+        ))}
         <Note at={nineAt} x={X0} y={y(680)}>
           <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
             9 questions:{" "}

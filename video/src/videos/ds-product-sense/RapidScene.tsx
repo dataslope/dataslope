@@ -4,12 +4,12 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
+import { Badge, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, RATIO, TRADE } from "./data";
-import { DATA, Drift, Headline, Kicker, madeUp, Mark, OK_INK, Spot, Strike, X0 } from "./parts";
-import { Tag } from "./plain";
+import { DATA, Drift, Headline, Kicker, madeUp, Mark, Spot, Strike, X0 } from "./parts";
+import { Tag } from "./badges";
 
 /** Where the answers go: right of the list. */
 const R_X = 800;
@@ -30,8 +30,8 @@ const Trade: React.FC<{ c: Ctx }> = ({ c }) => {
   const winAt = c.w("r-trade", "only a win if");
   const unit = 70;
   const rows = [
-    { text: "sessions", v: TRADE.sessions, at: sessionsAt, color: DATA, ink: BLUE_INK, tag: "the goal", tagAt: goalAt },
-    { text: "unsubscribes", v: TRADE.unsubscribes, at: unsubsAt, color: ACCENT, ink: ACCENT_INK, tag: "the limit", tagAt: limitAt },
+    { text: "sessions", v: TRADE.sessions, at: sessionsAt, color: DATA, ink: BLUE_INK, tone: "blue" as const, tag: "the goal", tagAt: goalAt },
+    { text: "unsubscribes", v: TRADE.unsubscribes, at: unsubsAt, color: ACCENT, ink: ACCENT_INK, tone: "red" as const, tag: "the limit", tagAt: limitAt },
   ];
   return (
     <>
@@ -52,7 +52,7 @@ const Trade: React.FC<{ c: Ctx }> = ({ c }) => {
             <div style={{ position: "absolute", left: R_X + 244 + r.v * unit, top: top + c.h(4), ...note(26, r.ink), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap", opacity: p }}>
               +{r.v}%
             </div>
-            <Tag x={R_X + 340 + r.v * unit} y={top - c.h(2)} at={Math.max(r.tagAt, r.at) + 4} size={24} ink={r.ink}>
+            <Tag x={R_X + 340 + r.v * unit} y={top - c.h(2)} at={Math.max(r.tagAt, r.at) + 4} size={24} tone={r.tone}>
               {r.tag}
             </Tag>
           </React.Fragment>
@@ -112,7 +112,9 @@ const Vanity: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={preferAt - 2} x={R_X + 40} y={c.y(640)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
           prefer rates and cohorts:{" "}
-          <span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, retentionAt - 2, 12) }}>week-four retention</span>
+          <Badge tone="green" size={27} style={{ opacity: ease(frame, retentionAt - 2, 12) }}>
+            week-four retention
+          </Badge>
         </span>
       </Note>
     </>
