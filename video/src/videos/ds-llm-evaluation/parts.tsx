@@ -36,8 +36,8 @@ export {
   X0,
 } from "../da-statistics-communication/parts";
 export { Clear, Frac, math } from "../ds-probability/parts";
-export { BAD, DATA, DATA_LIGHT, madeUp, Step } from "../ds-product-sense/parts";
-export { Tag } from "../ds-product-sense/tag";
+export { BAD, DATA, DATA_LIGHT, madeUp } from "../ds-product-sense/parts";
+export { Step, Tag } from "../ds-product-sense/plain";
 
 /** The paper-grey of what the narration has moved past. */
 export const QUIET = ds("blue", 100);

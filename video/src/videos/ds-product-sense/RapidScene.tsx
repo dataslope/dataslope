@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, RATIO, TRADE } from "./data";
 import { DATA, Drift, Headline, Kicker, madeUp, Mark, OK_INK, Spot, Strike, X0 } from "./parts";
-import { Tag } from "./tag";
+import { Tag } from "./plain";
 
 /** Where the answers go: right of the list. */
 const R_X = 800;

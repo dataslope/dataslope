@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, SAMPLE } from "./data";
 import { Clear, DATA, Drift, lerp, Mark, OK, OK_INK, Strike, Svg, WARM, WARM_INK, X0 } from "./parts";
-import { Tag } from "./tag";
+import { Tag } from "./plain";
 
 const ARMS = { top: 470, w: 300, h: 190, gap: 60 };
 const RIGHT_X = 900;
@@ -194,7 +194,7 @@ export const RecScene: React.FC = () => {
         {/* The size, before launch: DA Part 7's formula. */}
         <Note at={sizeAt} x={RIGHT_X} y={y(SIZE.top) - h(56)} out={out8}>
           <span style={{ ...note(27, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            users per group <span style={{ ...label(20, INK_SOFT), fontWeight: 500 }}>(80% power, 5% two-sided)</span>
+            users per group <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}>(80% power, 5% two-sided)</span>
           </span>
         </Note>
         {[

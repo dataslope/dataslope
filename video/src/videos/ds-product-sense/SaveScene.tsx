@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Clear, DATA, Drift, madeUp, OK_INK, Strike, Svg, X0 } from "./parts";
-import { Tag } from "./tag";
+import { Tag } from "./plain";
 
 const TREE_X = 640;
 const ROW_LABEL_W = 210;

@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Clear, Drift, pulse, Strike, Svg, X0 } from "./parts";
-import { Tag } from "./tag";
+import { Tag } from "./plain";
 
 const STAR = { top: 330, w: 640, h: 180 };
 const CHECKS_X = 900;
@@ -138,10 +138,10 @@ export const NorthScene: React.FC = () => {
           {/* The bigger number that says nothing. */}
           <Note at={signupsAt - 2} x={X0} y={y(STAR.top) + h(STAR.h) + h(80)} out={out1}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 22 }}>
-              <span style={{ ...note(34, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(29, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
                 <Strike at={nothingAt + 2}>total signups</Strike>
               </span>
-              <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, nothingAt, 12) }}>
+              <span style={{ ...note(27, ACCENT_INK), whiteSpace: "nowrap", opacity: ease(frame, nothingAt, 12) }}>
                 bigger, and says nothing about whether anyone cooks
               </span>
             </div>

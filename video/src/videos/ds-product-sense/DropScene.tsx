@@ -8,8 +8,8 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DROP, num, pct } from "./data";
-import { DATA, DATA_LIGHT, Drift, madeUp, Mark, OK_INK, Step, Svg, VLine, X0 } from "./parts";
-import { Tag } from "./tag";
+import { DATA, DATA_LIGHT, Drift, madeUp, Mark, OK_INK, Svg, VLine, X0 } from "./parts";
+import { Step, Tag } from "./plain";
 
 const STEPS_TOP = 350;
 const STEP_GAP = 84;
