@@ -51,7 +51,12 @@ const ArrayList: React.FC<{ c: Ctx }> = ({ c }) => {
   const shiftsAt = c.w("r-array", "a middle insert shifts the rest");
   const listAt = c.w("r-array", "A linked list splices in constant time");
   const walkAt = c.w("r-array", "finding it is a walk");
+  const jumpAt = c.w("r-array", "indexes in constant time") + 6;
+  const cachesAt = c.w("r-array", "caches well");
   const cw = 68;
+  // Indexing jumps straight to one cell; caching reads neighbours together,
+  // a sweep along the row.
+  const lit = (i: number) => (frame >= jumpAt && frame < cachesAt && i === 5) || (frame >= cachesAt + i * 3 && frame < cachesAt + i * 3 + 10);
   const shift = ease(frame, shiftsAt + 4, 14);
   const ins = ease(frame, shiftsAt + 16, 10);
   const lTop = c.T + c.h(240);
@@ -65,7 +70,7 @@ const ArrayList: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ opacity: ease(frame, shiftsAt, 10), color: ACCENT_INK }}>; a middle insert shifts the rest</span>
       </Line>
       {Array.from({ length: 7 }, (_, i) => (
-        <Cell key={i} x={R_X + i * cw} y={c.T + c.h(50)} at={indexAt + i * 2} value="" w={cw - 8} h={50} dx={i >= 3 ? cw * shift : 0} tone={i >= 3 && shift > 0 ? "bad" : "data"} />
+        <Cell key={i} x={R_X + i * cw} y={c.T + c.h(50)} at={indexAt + i * 2} value="" w={cw - 8} h={50} dx={i >= 3 ? cw * shift : 0} tone={i >= 3 && shift > 0 ? "bad" : lit(i) ? "look" : "data"} />
       ))}
       <Cell x={R_X + 3 * cw} y={c.T + c.h(50)} at={shiftsAt + 16} value="" w={cw - 8} h={50} tone="look" opacity={ins} />
       <Line at={listAt} x={R_X} y={lTop - c.h(52)} size={24} weight={650}>
@@ -98,12 +103,17 @@ const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
   const colH = c.h(400);
   const base = c.T + c.h(480);
   const scale = colH / RAPID.bstSortedHeight;
-  const tall = RAPID.bstSortedHeight * scale * ease(frame, orderAt + 4, 24);
+  const tall = RAPID.bstSortedHeight * scale * ease(frame, orderAt + 4, Math.max(24, shuffledAt - orderAt - 10));
   const short = RAPID.bstShuffledHeight * scale * ease(frame, shuffledAt, 10);
   return (
     <>
-      <Line at={heightAt} x={R_X} y={c.T} size={24} weight={650}>
-        A BST costs its height per operation. Height, <Num>{int(RAPID.bstKeys)}</Num> keys:
+      <Line at={c.w("r-bst", "A binary search tree")} x={R_X} y={c.T} size={24} weight={650}>
+        A BST
+        <span style={{ opacity: ease(frame, heightAt, 10) }}> costs its height per operation.</span>
+        <span style={{ opacity: ease(frame, orderAt, 10) }}>
+          {" "}
+          Height, <Num>{int(RAPID.bstKeys)}</Num> keys:
+        </span>
       </Line>
       <div style={{ position: "absolute", left: R_X + 40, top: base - tall, width: 70, height: tall, background: ACCENT, borderRadius: 3 }} />
       <div style={{ position: "absolute", left: R_X + 260, top: base - Math.max(3, short), width: 70, height: Math.max(3, short), background: OK, borderRadius: 3, opacity: short > 0 ? 1 : 0 }} />
@@ -111,7 +121,7 @@ const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
         <line x1={R_X} x2={R_X + 400} y1={base + 1} y2={base + 1} stroke={INK} strokeWidth={1.6} />
       </Svg>
       <Line at={orderAt + 10} x={R_X + 130} y={base - tall - 4} size={24} weight={700} color={ACCENT_INK}>
-        <Num>{int(RAPID.bstSortedHeight)}</Num> levels, in order
+        <span style={TABULAR}>{int(Math.round((tall / scale) || 0))}</span> levels, in order
       </Line>
       <Line at={shuffledAt} x={R_X + 350} y={base - 40} size={24} weight={700} color={OK_INK}>
         <Num>{RAPID.bstShuffledHeight}</Num>, shuffled
@@ -754,7 +764,7 @@ export const RapidTwoScene: React.FC = () => {
         <VRule x={730} top={y(LIST_TOP)} bottom={y(LIST_TOP) + items.length * h(ROW)} at={items[0].at - 6} />
 
         {/* The close. */}
-        <Art name="pangolin" at={closeAt} left={1380} top={y(300)} h={340} />
+        <Art name="pangolin" at={closeAt} left={1380} top={y(290)} h={330} />
         <Line at={closeAt} x={R_X} y={y(660)} size={30} weight={600}>
           None of these answers needed a line of code.
         </Line>
