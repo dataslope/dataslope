@@ -28,9 +28,16 @@ const METRICS = [
 ];
 const MOVER = METRICS.indexOf("Scroll depth");
 /** The ten as two lines of plain names with a middle dot between them, no
- *  chips; the lines 25px apart, as rows of text are. */
+ *  chips, 32px apart. Their first line sits level with the primary metric's
+ *  label row's next line, so "Conversion rate", 42px serif beside 21px
+ *  Inter, is centred between the two lines rather than on either: two
+ *  columns side by side never set two sizes on one line. In px from y(726). */
 const METRIC_ROWS = [METRICS.slice(0, 5), METRICS.slice(5)];
-const METRIC_ROW_GAP = 25;
+const METRIC_ROW_GAP = 32;
+const METRIC_Y = 726;
+const PRIMARY_DY = 17;
+const CHOSEN_DY = 80;
+const CHEER_Y = 852;
 
 /**
  * Part 2 opens: the A/B test's arc, nearly all of it decided before the first
@@ -167,10 +174,11 @@ export const DesignScene: React.FC = () => {
         <Ink at={metricAt - 4} dur={14} style={{ left: 160, top: y(690), whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>One primary metric</span>
         </Ink>
-        <Ink at={metricAt + 2} dur={18} style={{ left: 160, top: y(726), whiteSpace: "nowrap" }}>
+        <Ink at={metricAt + 2} dur={18} style={{ left: 160, top: y(METRIC_Y) + PRIMARY_DY, whiteSpace: "nowrap" }}>
           <span style={{ ...body(42), color: INK }}>Conversion rate</span>
         </Ink>
-        <Ink at={nowAt - 4} dur={14} style={{ left: 480, top: y(740), whiteSpace: "nowrap" }}>
+        {/* Under the metric it qualifies, 10px down, not on its line. */}
+        <Ink at={nowAt - 4} dur={14} style={{ left: 160, top: y(METRIC_Y) + CHOSEN_DY, whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>chosen now, before any data</span>
         </Ink>
 
@@ -178,7 +186,7 @@ export const DesignScene: React.FC = () => {
         <Ink at={tenAt - 6} dur={14} style={{ left: 1010, top: y(690), whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>Or track ten</span>
         </Ink>
-        <div style={{ position: "absolute", left: 1010, top: y(726), display: "flex", flexDirection: "column", gap: METRIC_ROW_GAP }}>
+        <div style={{ position: "absolute", left: 1010, top: y(METRIC_Y), display: "flex", flexDirection: "column", gap: METRIC_ROW_GAP }}>
           {METRIC_ROWS.map((row, r) => (
             <div key={r} style={{ display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
               {row.map((m, j) => {
@@ -214,7 +222,7 @@ export const DesignScene: React.FC = () => {
             </div>
           ))}
         </div>
-        <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(838), whiteSpace: "nowrap" }}>
+        <Ink at={movesAt - 2} dur={14} style={{ left: 1010, top: y(CHEER_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, STAT_INK), fontWeight: 650 }}>and cheer the one that moved</span>
         </Ink>
       </div>

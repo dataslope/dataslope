@@ -227,7 +227,8 @@ export const WallScene: React.FC = () => {
       <Lead x={card.x} y={card.y} />
       {/* Beside the lead's words (about 300px), as close as a label to what it names. */}
       <Ink at={advanceAt - 4} dur={14} style={{ left: CARD_TO.x + 332, top: y(CARD_TO.y) + 16, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>stated in advance</span>
+        {/* In the lead's own face and near its size: it shares the lead's line. */}
+        <span style={{ ...body(32, true), color: INK_SOFT }}>stated in advance</span>
       </Ink>
 
       {/* The data nobody has looked at: sealed. */}
