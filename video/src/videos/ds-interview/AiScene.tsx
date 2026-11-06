@@ -17,15 +17,16 @@ const ROW_Y = [290, 560];
 const FIG_X = 560;
 /** The figure's right edge, from the text's left edge. */
 const FIG_R = FIG_X + 220;
-/** How tall each row's hairline stands: the row's text, title to last line. */
-const RULE_H = [194, 176];
+/** How tall each row's hairline stands, in px (text does not stretch with
+ *  the layout): the row's text, title to last line. */
+const RULE_H = [192, 172];
 
 /** One of the four points: a title over its lines and its small figure, as a
  *  block of plain text that inks in on `at`. The second block on a row gets a
  *  hairline in the gap before it, inking in with it. */
 const Panel: React.FC<{ i: number; at: number; title: string; children: React.ReactNode }> = ({ i, at, title, children }) => {
   const frame = useCurrentFrame();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
   const p = ease(frame, at - 2, 14);
   if (p <= 0) return null;
   const row = Math.floor(i / 2);
@@ -39,7 +40,7 @@ const Panel: React.FC<{ i: number; at: number; title: string; children: React.Re
             left: (COL_X[0] + FIG_R + COL_X[1]) / 2,
             top: y(ROW_Y[row]),
             width: 1,
-            height: h(RULE_H[row]),
+            height: RULE_H[row],
             background: HAIRLINE,
             opacity: p,
           }}

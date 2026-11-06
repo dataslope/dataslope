@@ -140,10 +140,12 @@ export const DeadlockScene: React.FC = () => {
 
   // Ordered: both lock account 1 first.
   const ordIn = avoidAt;
+  // An S from the second lane up to the first: it leaves and arrives
+  // vertically, so the head sits on a straight end.
   const wait1: Cubic = [
     [tx(0.16), l2 - 12],
-    [tx(0.16), l1 + 80],
-    [tx(0.24), l1 + 60],
+    [tx(0.16), l2 - 90],
+    [tx(0.24), l1 + 100],
     [tx(0.24), l1 + 12],
   ];
 
@@ -297,5 +299,5 @@ export const DeadlockScene: React.FC = () => {
 
 /** A setting's name inside a line of type. */
 const SmallCode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.88em", fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
 );

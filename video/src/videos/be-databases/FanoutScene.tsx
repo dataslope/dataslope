@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { OK, OK_INK, QMono, QuestionCard } from "../../editorial/interview";
+import { OK, OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -118,7 +118,7 @@ export const FanoutScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <QuestionCard n={6} at={qAt - 4} textAt={textAt - 4} size={58}>
-          Why can a join inflate a <QMono>SUM</QMono>, and how do you fix it?
+          Why can a join inflate a SUM, and how do you fix it?
         </QuestionCard>
 
         {/* ── The orders ── */}
@@ -232,5 +232,5 @@ export const FanoutScene: React.FC = () => {
 
 /** A table or column name inside a label. */
 const SmallCode: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.9em", fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontWeight: 600, fontVariantLigatures: "none" }}>{children}</span>
 );

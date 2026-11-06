@@ -51,11 +51,12 @@ export { OK, OK_INK };
 export const RIGHT = 1824;
 
 /**
- * Code inside a line of small type: the interview kit's QMono, never under
- * 19px.
+ * Code inside a line of type: the interview kit's QMono, but at 0.92em
+ * rather than 0.84em, so it stays within the 12% a line's sizes may differ
+ * by (check:frames' "one line, one size"), and never under 19px.
  */
 export const SmallMono: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color }) => (
-  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.84em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em", color }}>
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em", color }}>
     {children}
   </span>
 );

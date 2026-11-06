@@ -103,7 +103,7 @@ export const ProbeScene: React.FC = () => {
                 <div style={{ width: COL_W, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
                   <div style={{ ...label(24, BLUE_INK), fontWeight: 700, lineHeight: 1, ...TABULAR }}>{i + 1}</div>
                   <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.15, marginTop: 12, minHeight: 74 }}>{c.name}</div>
-                  <div style={{ marginTop: 20 }}>
+                  <div style={{ marginTop: 22 }}>
                     {c.items.map((it, k) => {
                       const q = ease(frame, it.at - 2, 12);
                       return (
@@ -112,7 +112,7 @@ export const ProbeScene: React.FC = () => {
                           style={{
                             ...note(26, INK_SOFT),
                             lineHeight: 1.3,
-                            marginTop: k ? 14 : 0,
+                            marginTop: k ? 18 : 0,
                             opacity: q,
                             transform: `translateX(${(1 - q) * -10}px)`,
                           }}
