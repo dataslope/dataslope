@@ -192,7 +192,7 @@ export const HybridScene: React.FC = () => {
               left: (COLS[c - 1] - 8 + COL_W + COLS[c] - 8) / 2,
               top: y(LIST_TOP) - 44,
               width: 1,
-              height: rowY(5) + 120 - (y(LIST_TOP) - 44),
+              height: rowY(5) + 130 - (y(LIST_TOP) - 44),
               background: HAIRLINE,
               opacity: ease(frame, setupAt + 4 + 4 * c, 14),
             }}

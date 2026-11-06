@@ -2,13 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
 import { SLOW, thousands } from "./data";
-import { Drift, Headline, Kicker, pulse, RowGrid, Spot, X0 } from "./parts";
+import { Drift, Headline, Kicker, Mark, pulse, RowGrid, Spot, X0 } from "./parts";
 
 const GRID_TOP = 330;
 const CHIPS_Y = 800;
@@ -24,9 +23,9 @@ const DRAWN = 8;
  * The opening: the table every later scene runs against, a million orders
  * drawn as a thousand squares of a thousand rows each, filling in as the
  * narration names it. Then the promise, counted from what the video does:
- * ten questions as numbered chips, nine filled for the ones answered on the
- * real database and the ninth question outlined, since isolation is drawn.
- * The first chip lights on the bridge into question 1.
+ * ten questions as plain numerals, nine in the data blue for the ones
+ * answered on the real database and the ninth left gray, since isolation is
+ * drawn. The first takes the highlighter on the bridge into question 1.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -85,38 +84,38 @@ export const HookScene: React.FC = () => {
         </div>
 
         {/* ── Ten questions: nine on the database, one drawn ── */}
+        {/* The ten as plain numerals: the nine run on the database turn the
+            data blue as they are counted, the drawn one stays gray, and the
+            first takes the highlighter on the bridge. */}
         {Array.from({ length: TOTAL }, (_, i) => {
           const p = ease(frame, tenAt - 2 + i * 1.5, 10);
           if (p <= 0) return null;
           const real = i !== DRAWN;
           const tone = real ? ease(frame, nineAt + i * 2, 10) : 0;
-          const first = i === 0 ? ease(frame, startAt, 10) : 0;
           const fade = i === 0 ? 0 : ease(frame, startAt + 4, 14) * 0.5;
-          const fill = first > 0 ? ds("yellow", 400) : real ? `color-mix(in srgb, ${BAR} ${25 + 75 * tone}%, ${PAPER})` : PAPER;
+          const color = real ? `color-mix(in srgb, ${BLUE_INK} ${Math.round(tone * 100)}%, ${INK_SOFT})` : INK_SOFT;
           return (
             <div
               key={i}
               style={{
                 position: "absolute",
                 left: chipX(i),
-                top: y(CHIPS_Y),
+                top: y(CHIPS_Y) + 6,
                 width: CHIP,
-                height: CHIP,
-                borderRadius: CHIP / 2,
-                background: fill,
-                border: real || first > 0 ? "2px solid transparent" : `2px dashed ${INK_SOFT}`,
-                boxSizing: "border-box",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                ...label(21, real && tone > 0.5 && first === 0 ? PAPER : INK),
+                textAlign: "center",
+                ...label(28, color),
                 fontWeight: 700,
-                ...TABULAR,
                 opacity: p * (1 - fade),
-                transform: `scale(${p * (1 + 0.15 * pulse(frame, startAt, 16) * (i === 0 ? 1 : 0) + 0.12 * pulse(frame, oneAt, 16) * (i === DRAWN ? 1 : 0))})`,
+                transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.15 * pulse(frame, startAt, 16) * (i === 0 ? 1 : 0) + 0.12 * pulse(frame, oneAt, 16) * (i === DRAWN ? 1 : 0)})`,
               }}
             >
-              {i + 1}
+              {i === 0 ? (
+                <Mark at={startAt}>
+                  <Num>{i + 1}</Num>
+                </Mark>
+              ) : (
+                <Num>{i + 1}</Num>
+              )}
             </div>
           );
         })}

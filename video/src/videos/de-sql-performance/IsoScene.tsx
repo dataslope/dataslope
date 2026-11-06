@@ -49,15 +49,14 @@ const Event: React.FC<{ x: number; y: number; at: number; text: string; color?: 
   );
 };
 
-/** What a read returned: a value in a rounded tag under its dot. */
+/** What a read returned: the value, in its color, under its dot. */
 const Value: React.FC<{ x: number; y: number; at: number; value: string; color: string; out?: number }> = ({ x, y, at, value, color, out }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
   if (p <= 0) return null;
   return (
     <g opacity={p}>
-      <rect x={x - 34} y={y + 16} width={68} height={34} rx={17} fill={PAPER} stroke={color} strokeWidth={2} />
-      <text x={x} y={y + 40} textAnchor="middle" style={mono(20, color)}>
+      <text x={x} y={y + 40} textAnchor="middle" style={{ ...mono(24, color), fontWeight: 700 }}>
         {value}
       </text>
     </g>

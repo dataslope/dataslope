@@ -2,14 +2,14 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, body, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, body, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LOGINS } from "./data";
-import { daysBetween, DayStrip, Drift, Headline, Kicker, MARK, pulse, Spot, stripGeometry, X0 } from "./parts";
+import { daysBetween, DayStrip, Drift, Headline, Kicker, Mark, MARK, pulse, Spot, stripGeometry, X0 } from "./parts";
 
 const STRIP_Y = 330;
 const CELL = 84;
@@ -28,8 +28,9 @@ const TOTAL = 22;
  * three streaks bracketed with their lengths, then three questions the strip
  * raises (missing days, streak lengths, the latest login) light their part of
  * it. The same thirteen days come back for the moving average, the spine and
- * the islands. Then the promise, as numbered chips: eleven on real queries,
- * eleven quickly; the first lights on the bridge into question 1.
+ * the islands. Then the promise, as twenty-two plain numerals: eleven on
+ * real queries in the data blue, eleven quickly in gray; the first takes the
+ * highlighter on the bridge into question 1.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -145,14 +146,16 @@ export const HookScene: React.FC = () => {
         >
           <span style={TABULAR}>{TOTAL}</span> questions
         </div>
+        {/* The twenty-two as plain numerals: the eleven worked through turn
+            the data blue as they are counted, the eleven quick ones stay
+            gray, and the first takes the highlighter on the bridge. */}
         {Array.from({ length: TOTAL }, (_, i) => {
           const p = ease(frame, twentyTwoAt - 2 + i * 1.2, 10);
           if (p <= 0) return null;
           const worked = i < WORKED;
           const tone = worked ? ease(frame, elevenAt + i * 2, 10) : ease(frame, quickAt + (i - WORKED), 10);
-          const first = i === 0 ? ease(frame, firstAt, 10) : 0;
           const fade = i === 0 ? 0 : ease(frame, firstAt + 4, 14) * 0.5;
-          const fill = first > 0 ? ds("yellow", 400) : worked ? `color-mix(in srgb, ${BAR} ${25 + 75 * tone}%, ${PAPER})` : PAPER;
+          const color = worked ? `color-mix(in srgb, ${BLUE_INK} ${Math.round(tone * 100)}%, ${INK_SOFT})` : INK_SOFT;
           return (
             <div
               key={i}
@@ -161,22 +164,20 @@ export const HookScene: React.FC = () => {
                 left: chipX(i),
                 top: y(CHIPS_Y),
                 width: CHIP,
-                height: CHIP,
-                borderRadius: CHIP / 2,
-                background: fill,
-                border: `2px solid ${worked || first > 0 ? "transparent" : `color-mix(in srgb, ${BAR} ${40 + 60 * tone}%, ${PAPER})`}`,
-                boxSizing: "border-box",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                ...label(19, worked && tone > 0.5 && first === 0 ? PAPER : INK),
+                textAlign: "center",
+                ...label(26, color),
                 fontWeight: 700,
-                ...TABULAR,
-                opacity: p * (1 - fade),
-                transform: `scale(${p * (1 + 0.15 * pulse(frame, firstAt, 16) * (i === 0 ? 1 : 0))})`,
+                opacity: p * (1 - fade) * (worked ? 1 : 0.55 + 0.45 * tone),
+                transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.15 * pulse(frame, firstAt, 16) * (i === 0 ? 1 : 0)})`,
               }}
             >
-              {i + 1}
+              {i === 0 ? (
+                <Mark at={firstAt}>
+                  <span style={TABULAR}>{i + 1}</span>
+                </Mark>
+              ) : (
+                <span style={TABULAR}>{i + 1}</span>
+              )}
             </div>
           );
         })}
@@ -184,7 +185,7 @@ export const HookScene: React.FC = () => {
           style={{
             position: "absolute",
             left: chipX(0),
-            top: y(CHIPS_Y) + h(62),
+            top: y(CHIPS_Y) + h(50),
             ...note(26, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, elevenAt - 2, 12) * (1 - ease(frame, firstAt + 4, 14) * 0.5),
@@ -196,7 +197,7 @@ export const HookScene: React.FC = () => {
           style={{
             position: "absolute",
             left: chipX(WORKED),
-            top: y(CHIPS_Y) + h(62),
+            top: y(CHIPS_Y) + h(50),
             ...note(26, INK_SOFT),
             whiteSpace: "nowrap",
             opacity: ease(frame, quickAt - 2, 12) * (1 - ease(frame, firstAt + 4, 14) * 0.5),

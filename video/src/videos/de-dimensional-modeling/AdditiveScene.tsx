@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -14,44 +14,65 @@ const R_X = 680;
 /** The remedies' column, right of the visitors. */
 const FIX_X = 1360;
 const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
+/** The visitors as plain names, held apart by space: between two names,
+ *  and the wider gap before the day's count. */
+const WHO_GAP = 26;
+const COUNT_GAP = 40;
 /** Who visited on each day: the video's own rows, counted in DuckDB. */
 const WHO: Record<string, readonly string[]> = { Mon: ["Ada", "Ben", "Cy"], Tue: ["Ben", "Cy", "Di"] };
 
-/** A kind of measure, lit while the narration is on it. */
-const Kind: React.FC<{ at: number; litFrom: number; litTo: number; x: number; y: number; name: string; eg: string }> = ({
+/** The three kinds side by side, a hairline centred in each gap. */
+const KINDS_Y = 318;
+const KIND_GAP = 64;
+
+/** A kind of measure, lit while the narration is on it, with its note under
+ *  it when it has one. It holds its place before it inks, so the row never
+ *  reflows. */
+const Kind: React.FC<{ at: number; litFrom: number; litTo: number; name: string; eg: string; note?: React.ReactNode; noteAt?: number }> = ({
   at,
   litFrom,
   litTo,
-  x,
-  y,
   name,
   eg,
+  note: under,
+  noteAt = at,
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const lit = Math.min(ease(frame, litFrom, 10), 1 - ease(frame, litTo, 10));
-  if (p <= 0) return null;
+  const q = ease(frame, noteAt, 14);
   return (
-    <div style={{ position: "absolute", left: x, top: y, opacity: p, whiteSpace: "nowrap" }}>
-      <span
-        style={{
-          position: "absolute",
-          left: -12,
-          right: -12,
-          top: -4,
-          bottom: -6,
-          background: HIGHLIGHT,
-          borderRadius: 6,
-          opacity: lit * 0.8,
-        }}
-      />
-      <span style={{ position: "relative", ...label(25, INK), fontWeight: 700 }}>{name}</span>
-      <span style={{ position: "relative", ...note(23, INK_SOFT), marginLeft: 12 }}>{eg}</span>
+    <div style={{ whiteSpace: "nowrap" }}>
+      <div style={{ position: "relative", opacity: p }}>
+        <span
+          style={{
+            position: "absolute",
+            left: -12,
+            right: -12,
+            top: -4,
+            bottom: -6,
+            background: HIGHLIGHT,
+            borderRadius: 6,
+            opacity: lit * 0.8,
+          }}
+        />
+        <span style={{ position: "relative", ...label(25, INK), fontWeight: 700 }}>{name}</span>
+        <span style={{ position: "relative", ...note(23, INK_SOFT), marginLeft: 12 }}>{eg}</span>
+      </div>
+      {under ? <div style={{ marginTop: 12, opacity: q, transform: `translateX(${(1 - q) * -18}px)` }}>{under}</div> : null}
     </div>
   );
 };
 
-/** A visitor, as a small chip. */
+/** A vertical hairline between two kinds, as tall as their text, inking in
+ *  with the kind to its right. */
+const Divider: React.FC<{ at: number }> = ({ at }) => {
+  const frame = useCurrentFrame();
+  return <div style={{ width: 1, alignSelf: "stretch", background: HAIRLINE, opacity: ease(frame, at, 14) }} />;
+};
+
+/** A visitor, as a name in the data blue; one who came on both days takes
+ *  the highlighter on `both`, its width given back as margin. */
 const Who: React.FC<{ name: string; at: number; both?: number }> = ({ name, at, both }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -61,11 +82,11 @@ const Who: React.FC<{ name: string; at: number; both?: number }> = ({ name, at, 
     <span
       style={{
         display: "inline-block",
-        padding: "2px 14px 4px",
-        borderRadius: 999,
-        border: `2px solid ${BAR}`,
-        background: b > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${b * 100}%, ${PAPER})` : PAPER,
-        ...label(22, BLUE_INK),
+        padding: "1px 8px 3px",
+        margin: "0 -8px",
+        borderRadius: 6,
+        background: b > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${b * 100}%, transparent)` : "transparent",
+        ...label(24, BLUE_INK),
         fontWeight: 700,
         opacity: p,
         transform: `scale(${0.7 + 0.3 * p})`,
@@ -153,12 +174,31 @@ export const AdditiveScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── The three kinds, lit in turn ── */}
-        <Kind at={kindAt[0]} litFrom={amountAt} litTo={semiAt} x={X0} y={y(318)} name="additive" eg="an amount" />
-        <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} x={X0 + 440} y={y(318)} name="semi-additive" eg="a balance" />
-        <Kind at={kindAt[2]} litFrom={nonAt} litTo={end + 60} x={X0 + 960} y={y(318)} name="non-additive" eg="a ratio, a distinct count" />
-        <Note at={everyAt} x={X0} y={y(318) + h(44)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>sums across every dimension</span>
-        </Note>
+        <div style={{ position: "absolute", left: X0, top: y(KINDS_Y), display: "flex", alignItems: "stretch", gap: KIND_GAP }}>
+          <Kind
+            at={kindAt[0]}
+            litFrom={amountAt}
+            litTo={semiAt}
+            name="additive"
+            eg="an amount"
+            noteAt={everyAt}
+            note={<span style={{ ...note(22, OK_INK), fontWeight: 650 }}>sums across every dimension</span>}
+          />
+          <Divider at={kindAt[1]} />
+          <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} name="semi-additive" eg="a balance" />
+          <Divider at={kindAt[2]} />
+          {/* Its note under it, as "sums across every dimension" sits under
+              additive. */}
+          <Kind
+            at={kindAt[2]}
+            litFrom={nonAt}
+            litTo={end + 60}
+            name="non-additive"
+            eg="a ratio, a distinct count"
+            noteAt={ratiosAt}
+            note={<span style={{ ...note(22, INK), fontWeight: 650 }}>don&apos;t sum at all</span>}
+          />
+        </div>
 
         {/* ── A balance: month-end snapshots of two accounts ── */}
         <TableName g={bg} at={semiAt}>
@@ -219,33 +259,39 @@ export const AdditiveScene: React.FC = () => {
         {(["Mon", "Tue"] as const).map((d, k) => {
           const at = d === "Mon" ? monAt : tueAt;
           return (
-            <div key={d} style={{ position: "absolute", left: R_X, top: y(732) + k * h(54), display: "flex", alignItems: "center", gap: 10 }}>
+            <div key={d} style={{ position: "absolute", left: R_X, top: y(732) + k * h(54), display: "flex", alignItems: "baseline", gap: WHO_GAP }}>
               <span style={{ ...label(23, INK_SOFT), fontWeight: 700, width: 64, opacity: ease(frame, at - 2, 10) }}>{d}</span>
               {WHO[d].map((p, i) => (
                 <Who key={p} name={p} at={at + 2 + i * 3} both={both.has(p) ? fourAt : undefined} />
               ))}
-              <span style={{ ...note(24, INK), fontWeight: 700, marginLeft: 12, opacity: ease(frame, at + 10, 10) }}>
+              <span style={{ ...note(24, INK), fontWeight: 700, marginLeft: COUNT_GAP - WHO_GAP, opacity: ease(frame, at + 10, 10) }}>
                 <Num>{perDay[d]}</Num>
               </span>
             </div>
           );
         })}
-        <div style={{ position: "absolute", left: R_X, top: y(732) + 2 * h(54), display: "flex", alignItems: "center", gap: 10, opacity: ease(frame, fourAt - 2, 10) }}>
+        <div
+          style={{
+            position: "absolute",
+            left: R_X,
+            top: y(732) + 2 * h(54),
+            display: "flex",
+            alignItems: "baseline",
+            gap: WHO_GAP,
+            opacity: ease(frame, fourAt - 2, 10),
+          }}
+        >
           <span style={{ ...label(23, INK_SOFT), fontWeight: 700, width: 64 }}>both</span>
           {everyone.map((p, i) => (
             <Who key={p} name={p} at={fourAt + i * 2} />
           ))}
-          <span style={{ ...note(26, OK_INK), fontWeight: 800, marginLeft: 12 }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 800, marginLeft: COUNT_GAP - WHO_GAP }}>
             <Num>{VISITS_BOTH}</Num> people,
           </span>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, opacity: ease(frame, sixAt - 2, 10) }}>
             not <Num>{sumOfDays}</Num>
           </span>
         </div>
-        {/* Under its kind, as "sums across every dimension" sits under additive. */}
-        <Note at={ratiosAt} x={X0 + 960} y={y(318) + h(44)}>
-          <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>don&apos;t sum at all</span>
-        </Note>
         {/* One remedy for each kind, beside the visitors they are about. */}
         <Note at={recountAt} x={FIX_X} y={y(732) - h(6)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>

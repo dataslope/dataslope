@@ -57,18 +57,18 @@ export const CloseScene: React.FC = () => {
           </Tag>
         ))}
 
-        <Note at={seriesAt} x={X0} y={y(570)}>
+        <Note at={seriesAt} x={X0} y={y(530)}>
           <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>the end of the Data Engineer series</span>
         </Note>
-        <Note at={practice[0].at - 6} x={X0} y={y(640)}>
+        <Note at={practice[0].at - 6} x={X0} y={y(610)}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
-          <Tag key={p.text} x={X0} y={y(680) + i * h(58)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 1 ? workAt : undefined}>
+          <Tag key={p.text} x={X0} y={y(645) + i * h(58)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 1 ? workAt : undefined}>
             {p.text}
           </Tag>
         ))}
-        <Note at={workAt - 2} x={X0} y={y(860)}>
+        <Note at={workAt - 2} x={X0} y={y(760)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap", opacity: 0.4 + 0.6 * ease(frame, workAt, 12) }}>
             to see which rounds need work
           </span>

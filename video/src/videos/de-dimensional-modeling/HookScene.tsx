@@ -80,25 +80,29 @@ export const HookScene: React.FC = () => {
             <span style={{ ...note(30, INK) }}>small tables around it, that say</span>
           </span>
         </Note>
-        <div style={{ position: "absolute", left: X0 + 48, top: y(LIST_Y + 206), display: "flex", gap: 16 }}>
-          {words.map((w) => {
-            const p = pop(frame, w.at - 2, fps, 14);
+        {/* The four words, plain, joined by middle dots: each pops in as it
+            is said, the dot before it with it. The row sets its own size, so
+            its em gaps are measured in its words. */}
+        <div
+          style={{
+            position: "absolute",
+            left: X0 + 48,
+            top: y(LIST_Y + 206),
+            display: "flex",
+            alignItems: "baseline",
+            gap: "0.32em",
+            ...label(30, BLUE_INK),
+            fontWeight: 700,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {words.map((w, k) => {
+            const p = Math.min(1, pop(frame, w.at - 2, fps, 14));
             return (
-              <span
-                key={w.w}
-                style={{
-                  ...label(26, BLUE_INK),
-                  fontWeight: 700,
-                  padding: "4px 16px 6px",
-                  border: `2px solid ${BAR}`,
-                  borderRadius: 999,
-                  background: PAPER,
-                  opacity: Math.min(1, p),
-                  transform: `scale(${0.7 + 0.3 * Math.min(1, p)})`,
-                }}
-              >
-                {w.w}
-              </span>
+              <React.Fragment key={w.w}>
+                {k ? <span style={{ color: INK_SOFT, fontWeight: 500, opacity: p }}>·</span> : null}
+                <span style={{ display: "inline-block", opacity: p, transform: `scale(${0.7 + 0.3 * p})` }}>{w.w}</span>
+              </React.Fragment>
             );
           })}
         </div>

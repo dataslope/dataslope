@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK, QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -39,7 +39,7 @@ const stepOf = (line: string) => STEPS.findIndex((s) => line.startsWith(s.clause
 /**
  * Questions 4 and 5: da-sql's OrderScene, copied and re-cued, on da-sql's
  * results (the Data Analyst page's 24 orders). The query as it is written,
- * each line badged with where it runs, and the run order as a list of steps,
+ * each line numbered with where it runs, and the run order as a list of steps,
  * with window functions computed at SELECT and QUALIFY right after them. WHERE
  * comes before both, so it can't see a row number or a SELECT alias; ORDER BY
  * can. Then question 5 on the same steps: the 24 orders going through WHERE
@@ -120,7 +120,7 @@ export const OrderScene: React.FC = () => {
             What is the difference between <QMono>WHERE</QMono> and <QMono>HAVING</QMono>?
           </QuestionCard>
 
-          {/* ── The query as it is written, each line badged with its step ── */}
+          {/* ── The query as it is written, each line numbered with its step ── */}
           <Listing
             lines={lines}
             x={X0}
@@ -309,24 +309,19 @@ export const OrderScene: React.FC = () => {
   );
 };
 
-/** A step's number in a ring. */
+/** A step's number, a plain numeral centred in a slot of its own, so the
+ *  clauses beside a column of them line up. */
 const StepBadge: React.FC<{ n: number }> = ({ n }) => (
   <span
     style={{
-      display: "inline-flex",
-      alignItems: "center",
-      justifyContent: "center",
+      display: "inline-block",
       width: 32,
-      height: 32,
-      borderRadius: 999,
-      border: `2px solid ${INK}`,
-      background: PAPER,
-      ...label(19, INK),
-      ...TABULAR,
+      textAlign: "center",
+      ...label(24, INK),
       fontWeight: 700,
     }}
   >
-    {n}
+    <Num>{n}</Num>
   </span>
 );
 
