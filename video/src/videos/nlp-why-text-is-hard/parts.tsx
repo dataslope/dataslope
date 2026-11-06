@@ -412,7 +412,8 @@ export const Chip: React.FC<{
   );
 };
 
-/** A number that inks on its word, in tabular figures, with a unit after it. */
+/** A number that inks on its word, in tabular figures, with a unit after it
+ *  at the number's own size (one line, one size), in soft ink. */
 export const Count: React.FC<{
   value: number;
   unit?: string;
@@ -439,7 +440,7 @@ export const Count: React.FC<{
     }}
   >
     <span style={{ ...label(size, color), fontWeight: 700, ...TABULAR }}>{value}</span>
-    {unit ? <span style={{ ...label(Math.round(size * 0.8), INK_SOFT), fontWeight: 600 }}>{unit}</span> : null}
+    {unit ? <span style={{ ...label(size, INK_SOFT), fontWeight: 600 }}>{unit}</span> : null}
   </Ink>
 );
 

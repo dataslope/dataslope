@@ -12,9 +12,10 @@ const ROW_Y = [334, 438, 542, 646, 750];
 const EX_X = 480;
 const TAG_X = 1800;
 
-/** A small soft gloss after a word: "Apple, the company". */
+/** A soft gloss after a word: "Apple, the company". It shares the example's
+ *  line, so it takes the example's size; italic and soft ink set it apart. */
 const Gloss: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ ...body(28, true), color: INK_SOFT }}>{children}</span>
+  <span style={{ ...body(42, true), color: INK_SOFT }}>{children}</span>
 );
 /** A period, a comma or an apostrophe that carries the trouble, in red. */
 const Red: React.FC<{ children: React.ReactNode }> = ({ children }) => <span style={{ color: BAD_INK, fontWeight: 700 }}>{children}</span>;

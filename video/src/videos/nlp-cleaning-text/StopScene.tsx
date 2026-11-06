@@ -17,6 +17,10 @@ const ROW_Y = 604;
 const GHOST_Y = 694;
 const NOTE_Y = 800;
 const COUNT_X = 520;
+/** The list's size as a stat: the number on a line of its own, its words
+ *  12px under it, the whole block a little below the figure label so the
+ *  number never shares the label's line. Px under y(FIG9_Y). */
+const COUNT_DY = 50;
 
 /**
  * Part 3 opens: NLTK's English stopword list (198 words, the lesson's
@@ -78,11 +82,11 @@ export const StopScene: React.FC = () => {
       {["the", "is", "of"].map((w, i) => (
         <Chip key={w} text={w} x={sample[i].x} y={y(SAMPLE_Y)} at={sampleAt[i]} size={SIZE} marks={[{ at: stopwordsAt + i * 3, out: filterAt }]} />
       ))}
-      <Ink at={countAt - 2} dur={18} style={{ left: COUNT_X, top: y(FIG9_Y) + 30, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-        <span style={{ ...headline(104), ...TABULAR, color: INK }}>
+      <Ink at={countAt - 2} dur={18} style={{ left: COUNT_X, top: y(FIG9_Y) + COUNT_DY, whiteSpace: "nowrap" }}>
+        <div style={{ ...headline(104), ...TABULAR, color: INK }}>
           <Mark at={elseAt}>{STOPLIST.count}</Mark>
-        </span>
-        <span style={{ ...body(32), color: INK_SOFT }}>words on the list</span>
+        </div>
+        <div style={{ ...body(32), color: INK_SOFT, marginTop: 12 }}>words on the list</div>
       </Ink>
 
       {/* Fig. 10: the fox sentence, filtered. */}

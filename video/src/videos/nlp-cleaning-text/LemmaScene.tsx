@@ -84,8 +84,10 @@ export const LemmaScene: React.FC = () => {
   const wordAt = LEMMAS.map((_, i) => from + 8 + i * 4);
   const defAt = LEMMAS.map((_, i) => nounAt + 2 + i * 3);
   const wasRow: MarkSpan[] = [{ at: wasAt, out: soAt }];
-  /** The pos labels share one column, past the widest lemma. */
-  const posX = COL[2] + Math.max(...LEMMAS.map((l) => chipWidth(l.withPos, SIZE))) + 14;
+  /** The pos labels share one column, past the widest lemma, far enough
+   *  from it (more than a word's space at the chips' 32px) that the 22px
+   *  labels read as a column of their own, not as part of the chip's line. */
+  const posX = COL[2] + Math.max(...LEMMAS.map((l) => chipWidth(l.withPos, SIZE))) + 28;
 
   return (
     <AbsoluteFill>
@@ -134,7 +136,7 @@ export const LemmaScene: React.FC = () => {
               marks={l.word === "was" ? [{ at: beAt, out: soAt }] : []}
             />
             {l.word === "was" ? (
-              <Tag at={wrong} x={COL[1] + chipWidth(l.default, SIZE) + 12} y={top + chipH / 2 - 13} size={20}>
+              <Tag at={wrong} x={COL[1] + chipWidth(l.default, SIZE) + 27} y={top + chipH / 2 - 13} size={20}>
                 plural noun
               </Tag>
             ) : null}
