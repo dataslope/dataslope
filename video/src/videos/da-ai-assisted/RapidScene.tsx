@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, body, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, TABULAR, body, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -98,65 +98,51 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
     { at: tablesAt, text: "clean, documented tables" },
     { at: modelAt, text: "a semantic model: how tables join" },
   ];
-  const below = T + layers.length * c.h(76);
+  // The layers as three rows of text with a hairline between each, 64px
+  // apart: the rule sits in the middle of the gap under each row.
+  const rowP = c.h(64);
+  const rowH = 34;
+  const below = T + layers.length * rowP + c.h(12);
   const jobP = ease(frame, jobAt, 14);
-  const box = (x: number, y: number, at: number, text: React.ReactNode, w = 320, strong = false) => {
-    const p = ease(frame, at, 12);
-    return (
-      <div
-        style={{
-          position: "absolute",
-          left: x,
-          top: y,
-          width: w,
-          padding: "14px 18px",
-          boxSizing: "border-box",
-          border: `2px solid ${strong ? INK : BLUE_INK}`,
-          borderRadius: 10,
-          background: PAPER,
-          ...note(25, INK),
-          opacity: p,
-          transform: `translateY(${(1 - p) * 8}px)`,
-        }}
-      >
-        {text}
-      </div>
-    );
-  };
+  const askP = ease(frame, askAt - 2, 12);
   return (
     <>
-      {box(R_X, T, askAt - 2, <>&ldquo;Which region grew fastest?&rdquo;</>, 330)}
-      {/* The question wraps to two lines, so its label sits clear below the box. */}
-      <Note at={askAt + 2} x={R_X} y={T + c.h(108)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a question in plain words</span>
-      </Note>
+      {/* The question, as the words someone types, with its label 12px under it. */}
+      <div style={{ position: "absolute", left: R_X, top: T, width: 300, opacity: askP, transform: `translateY(${(1 - askP) * 8}px)` }}>
+        <div style={{ ...note(26, INK), fontWeight: 600, lineHeight: "34px", textWrap: "balance" }}>&ldquo;Which region grew fastest?&rdquo;</div>
+        <div style={{ ...label(20, INK_SOFT), lineHeight: "26px", marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, askAt + 2, 14) }}>a question in plain words</div>
+      </div>
       {/* Over the stack, so the layers read as what the tool stands on, not as
           what the question turns into. */}
       <Note at={metricsAt - 2} x={layerX} y={T - c.h(40)}>
         <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>what it has to stand on to answer correctly</span>
       </Note>
-      {layers.map((l, i) => (
-        <div
-          key={l.text}
-          style={{
-            position: "absolute",
-            left: layerX,
-            top: T + i * c.h(76),
-            // Wide enough that "a semantic model: how tables join" stays on one line.
-            width: 520,
-            padding: "14px 18px",
-            boxSizing: "border-box",
-            borderRadius: 8,
-            background: `color-mix(in srgb, ${HIGHLIGHT} ${jobP * 100}%, color-mix(in srgb, ${BLUE_INK} 12%, ${PAPER}))`,
-            ...note(26, INK),
-            fontWeight: 600,
-            opacity: ease(frame, l.at - 2, 12),
-            transform: `translateX(${(1 - ease(frame, l.at - 2, 12)) * 12}px)`,
-          }}
-        >
-          {l.text}
-        </div>
-      ))}
+      {layers.map((l, i) => {
+        const p = ease(frame, l.at - 2, 12);
+        return (
+          <React.Fragment key={l.text}>
+            {i > 0 ? (
+              <div style={{ position: "absolute", left: layerX, top: Math.round(T + i * rowP - (rowP - rowH) / 2), width: 480, height: 1, background: HAIRLINE, opacity: p }} />
+            ) : null}
+            <div
+              style={{
+                position: "absolute",
+                left: layerX,
+                top: T + i * rowP,
+                ...note(26, INK),
+                fontWeight: 600,
+                lineHeight: `${rowH}px`,
+                whiteSpace: "nowrap",
+                opacity: p,
+                transform: `translateX(${(1 - p) * 12}px)`,
+              }}
+            >
+              {/* Lit as the analyst's job, the highlight behind the words. */}
+              <span style={{ background: `color-mix(in srgb, ${HIGHLIGHT} ${jobP * 100}%, transparent)`, padding: "2px 6px", margin: "0 -6px" }}>{l.text}</span>
+            </div>
+          </React.Fragment>
+        );
+      })}
       <Note at={messyAt - 2} x={layerX} y={below + c.h(4)}>
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>on messy raw tables: confidently wrong, at scale</span>
       </Note>

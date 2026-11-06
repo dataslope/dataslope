@@ -161,7 +161,7 @@ export const EtlScene: React.FC = () => {
         <Pill x={WH.x + 200} y={WH.top - 47} at={computeAt} tone="ok" size={22} solid>
           cheap, elastic compute
         </Pill>
-        <Note at={fastAt} x={WH.x + 516} y={WH.top - 46}>
+        <Note at={fastAt} x={WH.x + 480} y={WH.top - 46}>
           <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>so transforming in place is fast</span>
         </Note>
         {/* New logic: back from the raw tables into the transform, with no new extract. */}

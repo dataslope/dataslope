@@ -228,7 +228,7 @@ export const SemanticsScene: React.FC = () => {
         <Note at={leastAt} x={VERDICT_X} y={cellsTop(1) - h(4)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             nothing lost, but <b style={{ color: ACCENT_INK, opacity: ease(frame, dupAt - 2, 8) }}>5 to 7 twice</b>
-            <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, defaultAt, 10) }}> · the usual default</span>
+            <span style={{ ...label(23, INK_SOFT), opacity: ease(frame, defaultAt, 10) }}> · the usual default</span>
           </span>
         </Note>
         <Note at={deletedAt} x={VERDICT_X} y={cellsTop(1) + h(36)}>

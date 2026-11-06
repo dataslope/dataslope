@@ -14,9 +14,9 @@ import { COLUMN_TINT, Drift, FileBar, OK, OK_INK, PARQUET_SEGMENTS, pulse, VRule
 const TOP = 300;
 const CARD_W = 520;
 const CARD_GAP = 60;
-const DIAGRAM_Y = 372;
+const DIAGRAM_Y = 396;
 const DIAGRAM_H = 84;
-const LINES_Y = 484;
+const LINES_Y = 508;
 const LINE_H = 38;
 const CSV_W = 820;
 
@@ -214,7 +214,7 @@ export const FormatsScene: React.FC = () => {
   ];
 
   const pqW = (CSV_W * FILES.parquet) / FILES.csv;
-  const lowY = y(690);
+  const lowY = y(720);
 
   return (
     <AbsoluteFill>
@@ -242,9 +242,13 @@ export const FormatsScene: React.FC = () => {
               {/* Columns, not cards: a hairline in each gap, as tall as the
                   columns' text, inking in with the column to its right. */}
               {i ? <VRule x={x - CARD_GAP / 2} top={y(TOP) + 12} height={y(LINES_Y) + 3 * h(LINE_H) + 28 - y(TOP) - 12} at={qEnd - 10 + i * 6} /> : null}
-              <div style={{ position: "absolute", left: x, top: y(TOP) + 12, display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap", opacity: p }}>
+              {/* The name, then its kind on a line of its own: one size and one
+                  face a line. */}
+              <div style={{ position: "absolute", left: x, top: y(TOP) + 12, whiteSpace: "nowrap", opacity: p }}>
                 <span style={{ ...headline(44), display: "inline-block", transform: `scale(${1 + 0.08 * named})`, transformOrigin: "left bottom" }}>{c.name}</span>
-                <span style={{ ...label(21, BLUE_INK), opacity: ease(frame, c.kindAt, 10) }}>{c.kind}</span>
+              </div>
+              <div style={{ position: "absolute", left: x, top: y(TOP) + 64, ...label(21, BLUE_INK), whiteSpace: "nowrap", opacity: p * ease(frame, c.kindAt, 10) }}>
+                {c.kind}
               </div>
               {c.diagram}
               {c.lines.map((l, k) => (

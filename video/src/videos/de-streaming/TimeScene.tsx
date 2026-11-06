@@ -352,7 +352,7 @@ export const TimeScene: React.FC = () => {
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             dee's click: happened at <Num>{dee.t}</Num> s, arrived at <Num>{dee.arrive}</Num> s
           </span>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, wrongAt, 10) }}>
+          <span style={{ ...label(23, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, wrongAt, 10) }}>
             {" "}
             · the click that sat after {aheadOfDee.user}'s from <Num>{aheadOfDee.t}</Num> s in partition <Num>{dee.partition}</Num>
           </span>
@@ -401,7 +401,7 @@ export const TimeScene: React.FC = () => {
         <Note at={ruleAt} x={X0} y={y(762)} out={q9Out}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             = latest event time seen <span style={{ opacity: ease(frame, delayAt, 10) }}>− an allowed delay</span>
-            <span style={{ ...label(20, INK_SOFT), opacity: ease(frame, proofAt, 10) }}> · progress, not proof</span>
+            <span style={{ ...label(23, INK_SOFT), opacity: ease(frame, proofAt, 10) }}> · progress, not proof</span>
           </span>
         </Note>
         <Note at={benAt} x={940} y={y(762)} out={q9Out}>

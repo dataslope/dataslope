@@ -157,7 +157,7 @@ export const IdemScene: React.FC = () => {
         <Pill x={COUNT_X + 140} y={aTop + h(120)} at={failAt} tone="bad" size={20}>
           ✕ failed after the write
         </Pill>
-        <Note at={retryAt} x={COUNT_X + 140} y={aTop + h(170)}>
+        <Note at={retryAt} x={COUNT_X + 140} y={aTop + h(160)}>
           <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             ↻ retried<span style={{ opacity: ease(frame, againAt, 10) }}>: the same insert, again</span>
           </span>

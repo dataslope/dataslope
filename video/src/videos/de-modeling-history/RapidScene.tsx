@@ -67,7 +67,7 @@ const Value: React.FC<{ children: React.ReactNode; at: number }> = ({ children, 
         opacity: p,
         transform: `translateY(${(1 - p) * 8}px)`,
         fontFamily: MONO,
-        fontSize: 22,
+        fontSize: 24,
         fontWeight: 600,
         lineHeight: 1.25,
         color: INK,
@@ -99,7 +99,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={flagsAt} x={R_X} y={top - c.h(56)}>
         <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>small flags, each a column on the fact</span>
       </Note>
-      <div style={{ position: "absolute", left: R_X, top, display: "flex", alignItems: "flex-start", gap: 26 }}>
+      <div style={{ position: "absolute", left: R_X, top, display: "flex", alignItems: "flex-start", gap: 40 }}>
         {groups.map((g, i) => (
           <React.Fragment key={g.name}>
             {i ? <div style={{ ...note(34, INK_SOFT), marginTop: 50, opacity: ease(frame, g.at, 10) }}>×</div> : null}
@@ -325,7 +325,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
     <Note at={at} x={R_X} y={top}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), width: 120 }}>{name}</span>
-        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK }}>{value}</span>
+        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, marginRight: 14 }}>{value}</span>
         <span style={{ ...note(23, BLUE_INK), fontWeight: 700, opacity: ease(frame, bytesAt, 10) }}>
           {kind ? `${kind}, ` : ""}
           <Num>{bytes}</Num> bytes

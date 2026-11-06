@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { column, COLUMNS, count, FILES, KB, MB, SORTED_REGION, TABLE } from "./data";
-import { COLUMN_TINT, Drift, FileBar, OK_INK, X0 } from "./parts";
+import { COLUMN_TINT, Drift, FileBar, OK_INK, QCode, X0 } from "./parts";
 
 /** Bars start here, at this many px a megabyte. */
 const BAR_X = 470;
@@ -203,8 +203,8 @@ export const CompressScene: React.FC = () => {
           <div style={{ ...note(20, INK_SOFT), marginTop: 2 }}>by codec</div>
         </div>
         <div style={{ position: "absolute", left: BAR_X - 10, top: C - h(18), width: 1340, height: 1, background: HAIRLINE, opacity: ease(frame, codecAt, 12) }} />
-        {bar(C, FILES.zstd, zstdAt - 4, <><QMono>zstd</QMono> (Zstandard)</>, { tint: COLUMN_TINT.units, sizeAt: zstdAt })}
-        {bar(C + h(STEP), FILES.parquet, snappyAt - 4, <><QMono>snappy</QMono>, the default</>, { tint: COLUMN_TINT.category, sizeAt: snappyAt })}
+        {bar(C, FILES.zstd, zstdAt - 4, <><QCode>zstd</QCode> (Zstandard)</>, { tint: COLUMN_TINT.units, sizeAt: zstdAt })}
+        {bar(C + h(STEP), FILES.parquet, snappyAt - 4, <><QCode>snappy</QCode>, the default</>, { tint: COLUMN_TINT.category, sizeAt: snappyAt })}
         <Note at={slowerAt} x={BAR_X + w(FILES.zstd) + 380} y={C + (h(BAR_H) - 30) / 2}>
           <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap" }}>but slower to decompress</span>
         </Note>
@@ -212,7 +212,7 @@ export const CompressScene: React.FC = () => {
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             Over a slow link, the smaller file wins
             <span style={{ opacity: ease(frame, fastAt, 10) }}>; on a fast disk, the faster codec.</span>
-            <span style={{ ...note(20, INK_SOFT), opacity: ease(frame, fastAt + 12, 10) }}> The trade-off is the page&apos;s chart of codec speeds.</span>
+            <span style={{ ...note(21, INK_SOFT), opacity: ease(frame, fastAt + 12, 10) }}> The trade-off is the page&apos;s chart of codec speeds.</span>
           </span>
         </Note>
       </Drift>

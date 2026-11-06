@@ -76,11 +76,11 @@ export const NarrowScene: React.FC = () => {
           <span style={{ display: "flex", alignItems: "center", gap: 40, whiteSpace: "nowrap" }}>
             <span style={{ ...label(28, INK), fontWeight: 700 }}>Narrow</span>
             <span style={{ opacity: ease(frame, opsAt, 10), display: "flex", gap: 10, alignItems: "baseline" }}>
-              <Chip mono size={21}>map</Chip>
-              <Dot size={21} />
-              <Chip mono size={21}>filter</Chip>
-              <Dot size={21} />
-              <Chip mono size={21}>union</Chip>
+              <Chip mono size={24}>map</Chip>
+              <Dot size={22} />
+              <Chip mono size={24}>filter</Chip>
+              <Dot size={22} />
+              <Chip mono size={24}>union</Chip>
             </span>
           </span>
         </Note>
@@ -127,11 +127,11 @@ export const NarrowScene: React.FC = () => {
           <span style={{ display: "flex", alignItems: "center", gap: 40, whiteSpace: "nowrap" }}>
             <span style={{ ...label(28, INK), fontWeight: 700 }}>Wide</span>
             <span style={{ opacity: ease(frame, opsWAt, 10), display: "flex", gap: 10, alignItems: "baseline" }}>
-              <Chip mono size={21}>groupByKey</Chip>
-              <Dot size={21} />
-              <Chip mono size={21}>join</Chip>
-              <Dot size={21} />
-              <Chip mono size={21}>distinct</Chip>
+              <Chip mono size={24}>groupByKey</Chip>
+              <Dot size={22} />
+              <Chip mono size={24}>join</Chip>
+              <Dot size={22} />
+              <Chip mono size={24}>distinct</Chip>
             </span>
           </span>
         </Note>

@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Note, Num } from "../../editorial/ui";
+import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ColumnRule, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ACROSS, BALANCE, CLOSING, CLOSING_TOTAL, money, MONTH_ENDS, OVER_TIME, VISITS_BOTH, VISITS_PER_DAY } from "./data";
@@ -64,12 +64,15 @@ const Kind: React.FC<{ at: number; litFrom: number; litTo: number; name: string;
   );
 };
 
-/** A vertical hairline between two kinds, as tall as their text, inking in
+/** The house's hairline between two kinds, set in the row's flow so it sits
+ *  centred in the gap: as tall as a kind and the note under it, inking in
  *  with the kind to its right. */
-const Divider: React.FC<{ at: number }> = ({ at }) => {
-  const frame = useCurrentFrame();
-  return <div style={{ width: 1, alignSelf: "stretch", background: HAIRLINE, opacity: ease(frame, at, 14) }} />;
-};
+const RULE_H = 72;
+const Gap: React.FC<{ at: number }> = ({ at }) => (
+  <div style={{ position: "relative", width: 1, flex: "none" }}>
+    <ColumnRule x={0} top={0} height={RULE_H} at={at + 2} />
+  </div>
+);
 
 /** A visitor, as a name in the data blue; one who came on both days takes
  *  the highlighter on `both`, its width given back as margin. */
@@ -174,7 +177,7 @@ export const AdditiveScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── The three kinds, lit in turn ── */}
-        <div style={{ position: "absolute", left: X0, top: y(KINDS_Y), display: "flex", alignItems: "stretch", gap: KIND_GAP }}>
+        <div style={{ position: "absolute", left: X0, top: y(KINDS_Y), display: "flex", alignItems: "flex-start", gap: KIND_GAP }}>
           <Kind
             at={kindAt[0]}
             litFrom={amountAt}
@@ -184,9 +187,9 @@ export const AdditiveScene: React.FC = () => {
             noteAt={everyAt}
             note={<span style={{ ...note(22, OK_INK), fontWeight: 650 }}>sums across every dimension</span>}
           />
-          <Divider at={kindAt[1]} />
+          <Gap at={kindAt[1]} />
           <Kind at={kindAt[1]} litFrom={semiAt} litTo={nonAt} name="semi-additive" eg="a balance" />
-          <Divider at={kindAt[2]} />
+          <Gap at={kindAt[2]} />
           {/* Its note under it, as "sums across every dimension" sits under
               additive. */}
           <Kind

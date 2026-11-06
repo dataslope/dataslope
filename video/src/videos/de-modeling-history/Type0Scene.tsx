@@ -180,7 +180,7 @@ export const Type0Scene: React.FC = () => {
         </Note>
 
         {/* Types are per column: one row, each column with its own. */}
-        <Note at={perAt} x={X0} y={stripY - h(54)}>
+        <Note at={perAt} x={X0} y={stripY - h(42)}>
           <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>one customer row, a type per column</span>
         </Note>
         {/* Three columns of plain text, a column's name over its type,

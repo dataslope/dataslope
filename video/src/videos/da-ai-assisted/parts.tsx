@@ -144,6 +144,27 @@ export const TextPanel: React.FC<{
   );
 };
 
+// ── Hairlines between columns ───────────────────────────────────────────────
+
+/** A vertical hairline between columns of text set side by side: centred in
+ *  their gap, as tall as their text, inking in with the column to its right
+ *  (`at`). */
+export const ColumnRule: React.FC<{ x: number; top: number; height: number; at: number; out?: number }> = ({ x, top, height, at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  if (p <= 0) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height, background: HAIRLINE, opacity: p }} />;
+};
+
+/** The same hairline as an item of the columns' flex row, as tall as the
+ *  row's text: spread the row with `space-between`, or give it an even
+ *  `gap`, to centre it in its gap. */
+export const FlexRule: React.FC<{ at: number; out?: number }> = ({ at, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  return <div style={{ width: 1, alignSelf: "stretch", flexShrink: 0, background: HAIRLINE, opacity: Math.max(0, p) }} />;
+};
+
 // ── Spot illustrations ───────────────────────────────────────────────────────
 
 /** A watercolor spot from illustrations.json: it pops in on `at`, bobs

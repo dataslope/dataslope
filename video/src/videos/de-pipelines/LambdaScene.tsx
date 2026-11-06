@@ -107,8 +107,8 @@ export const LambdaScene: React.FC = () => {
         {/* The logic, once in each layer: a word on the trap's red
             highlight, 10px off the pair's outer edges, above the batch
             layer and under the speed layer. */}
-        {[bY - 33, sY + LH + 10].map((ly, i) => (
-          <Pill key={i} x={LAYER_X + LAYER_W - 92} y={ly} at={twiceAt + i * 6} tone="bad" size={19} solid>
+        {[bY - 36, sY + LH + 10].map((ly, i) => (
+          <Pill key={i} x={LAYER_X + LAYER_W - 96} y={ly} at={twiceAt + i * 6} tone="bad" size={21} solid>
             logic
           </Pill>
         ))}

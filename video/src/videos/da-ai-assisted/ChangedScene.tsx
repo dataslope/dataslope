@@ -3,52 +3,37 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Mark, Svg } from "./parts";
 
-const CORE = { x: 610, y: 340, w: 700, h: 130 };
+/** The loop as plain text: the live SQL screen as a centred heading at the
+ *  top, and the four kinds of question around it as four centred columns,
+ *  each reached by its own curve. The curves separate the columns, so they
+ *  take no hairlines. Layout units for positions (through y()), px across. */
+const CORE = { y: 352, w: 700 };
+/** The heading's two lines, in px: a 32px title over a 22px line, 6 apart. */
+const CORE_H = 42 + 6 + 29;
 const RING_Y = 560;
-const BOX_W = 400;
-const BOX_GAP = 20;
-const RING_X = (1920 - (4 * BOX_W + 3 * BOX_GAP)) / 2;
+const COL_W = 400;
+const COL_GAP = 20;
+const RING_X = (1920 - (4 * COL_W + 3 * COL_GAP)) / 2;
+/** Where a curve stops above its column's title, in px. */
+const CURVE_GAP = 12;
 
-/** A box in the loop's diagram: a title, and an optional line under it. */
-const Box: React.FC<{ x: number; y: number; w: number; h: number; at: number; title: React.ReactNode; sub?: React.ReactNode; strong?: boolean }> = ({
-  x,
-  y,
-  w,
-  h,
-  at,
-  title,
-  sub,
-  strong = false,
-}) => {
+/** One kind of question: its title, and the line under it, centred in its
+ *  column. It holds its place before it inks, so nothing reflows. */
+const Kind: React.FC<{ x: number; y: number; at: number; title: React.ReactNode; sub: React.ReactNode; extra?: React.ReactNode }> = ({ x, y, at, title, sub, extra }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 14);
   if (p <= 0) return null;
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: x,
-        top: y,
-        width: w,
-        height: h,
-        boxSizing: "border-box",
-        border: `${strong ? 3 : 2}px solid ${strong ? INK : BLUE_INK}`,
-        borderRadius: 12,
-        background: PAPER,
-        padding: "16px 22px",
-        opacity: p,
-        transform: `translateY(${(1 - p) * 12}px)`,
-      }}
-    >
-      <div style={{ ...note(strong ? 32 : 26, INK), fontWeight: 650 }}>{title}</div>
-      {sub ? <div style={{ ...note(22, INK_SOFT), marginTop: 6 }}>{sub}</div> : null}
+    <div style={{ position: "absolute", left: x, top: y, width: COL_W, textAlign: "center", opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
+      <div style={{ ...note(26, INK), fontWeight: 650, lineHeight: "34px", whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...note(22, INK_SOFT), lineHeight: "29px", marginTop: 6, textWrap: "balance" }}>{sub}</div>
+      {extra}
     </div>
   );
 };
@@ -62,13 +47,13 @@ const Box: React.FC<{ x: number; y: number; w: number; h: number; at: number; ti
 export const ChangedScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
 
   const from = n.beat("changed").from;
   const qAt = n.word("changed", "Question");
   const textAt = n.word("changed", "How has the data analyst");
   const coreAt = n.word("changed-core", "The live SQL screen");
-  // The center box arrives as the question ends, so it never sits alone.
+  // The heading arrives as the question ends, so it never sits alone.
   const asked = n.beat("changed").to;
   const offAt = n.word("changed-core", "usually AI off");
   const fluencyAt = n.word("changed-core", "fluency still matters");
@@ -86,8 +71,11 @@ export const ChangedScene: React.FC = () => {
 
   const coreY = y(CORE.y);
   const ringY = y(RING_Y);
-  const coreMid = CORE.x + CORE.w / 2;
-  const links = ring.map((r, i) => ({ at: r.at, x: RING_X + i * (BOX_W + BOX_GAP) + BOX_W / 2 }));
+  const coreMid = 960;
+  // The curves leave from under the heading's second line.
+  const forkTop = coreY + CORE_H + CURVE_GAP;
+  const coreP = ease(frame, Math.min(coreAt, asked) - 6, 14);
+  const links = ring.map((r, i) => ({ at: r.at, x: RING_X + i * (COL_W + COL_GAP) + COL_W / 2 }));
 
   return (
     <AbsoluteFill>
@@ -102,31 +90,33 @@ export const ChangedScene: React.FC = () => {
           How has the Data Analyst interview changed with AI?
         </QuestionCard>
 
-        {/* ── At the center, still: the live SQL screen ── */}
-        <Box
-          x={CORE.x}
-          y={coreY}
-          w={CORE.w}
-          h={h(CORE.h)}
-          at={Math.min(coreAt, asked) - 6}
-          strong
-          title="The live SQL screen"
-          sub={
-            <>
-              usually <Mark at={offAt + 2}>AI off</Mark>
-              <span style={{ opacity: ease(frame, fluencyAt - 2, 10) }}>, so fluency still matters</span>
-            </>
-          }
-        />
+        {/* ── At the center, still: the live SQL screen, a centred heading ── */}
+        <div
+          style={{
+            position: "absolute",
+            left: 960 - CORE.w / 2,
+            top: coreY,
+            width: CORE.w,
+            textAlign: "center",
+            opacity: coreP,
+            transform: `translateY(${(1 - coreP) * 12}px)`,
+          }}
+        >
+          <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: "42px", whiteSpace: "nowrap" }}>The live SQL screen</div>
+          <div style={{ ...note(22, INK_SOFT), lineHeight: "29px", marginTop: 6, whiteSpace: "nowrap" }}>
+            usually <Mark at={offAt + 2}>AI off</Mark>
+            <span style={{ opacity: ease(frame, fluencyAt - 2, 10) }}>, so fluency still matters</span>
+          </div>
+        </div>
 
-        {/* ── Around it, four new kinds of question ── */}
+        {/* ── Around it, four new kinds of question, each on its own curve ── */}
         <Svg opacity={ease(frame, aroundAt - 2, 12)}>
           {links.map((l) => {
             const p = ease(frame, l.at - 4, 14);
             return (
               <path
                 key={l.x}
-                d={`M${coreMid},${coreY + h(CORE.h)} C${coreMid},${coreY + h(CORE.h) + 40} ${l.x},${ringY - 50} ${l.x},${ringY - 4}`}
+                d={`M${coreMid},${forkTop} C${coreMid},${forkTop + 40} ${l.x},${ringY - 50} ${l.x},${ringY - CURVE_GAP}`}
                 fill="none"
                 stroke={ds("blue", 300)}
                 strokeWidth={2}
@@ -137,17 +127,26 @@ export const ChangedScene: React.FC = () => {
           })}
         </Svg>
         {ring.map((r, i) => (
-          <Box key={r.title} x={RING_X + i * (BOX_W + BOX_GAP)} y={ringY} w={BOX_W} h={h(116)} at={r.at - 2} title={r.title} sub={r.sub} />
+          <Kind
+            key={r.title}
+            x={RING_X + i * (COL_W + COL_GAP)}
+            y={ringY}
+            at={r.at - 2}
+            title={r.title}
+            sub={r.sub}
+            extra={
+              i === 2 ? (
+                <div style={{ ...label(19, BLUE_INK), lineHeight: "25px", marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, biAt + 2, 14) }}>BI: business intelligence</div>
+              ) : undefined
+            }
+          />
         ))}
-        <Note at={biAt + 2} x={RING_X + 2 * (BOX_W + BOX_GAP)} y={ringY + h(126)}>
-          <span style={{ ...label(19, BLUE_INK), whiteSpace: "nowrap" }}>BI: business intelligence</span>
-        </Note>
 
         {/* ── Round by round ── */}
         <div
           style={{
             position: "absolute",
-            left: CORE.x - 80,
+            left: 960 - CORE.w / 2 - 80,
             top: y(790),
             width: CORE.w + 160,
             textAlign: "center",

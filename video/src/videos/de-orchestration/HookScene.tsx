@@ -118,7 +118,7 @@ export const HookScene: React.FC = () => {
                   opacity: p,
                 }}
               >
-                <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none" }}>{j.time}</span>
+                <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none" }}>{j.time}</span>
                 <span style={{ ...note(29, INK), fontWeight: 600, flex: 1 }}>{j.name}</span>
                 <span style={{ display: "flex", alignItems: "center", gap: 10, ...note(26, OK_INK), fontWeight: 700, opacity: ease(frame, ok, 8) }}>
                   success

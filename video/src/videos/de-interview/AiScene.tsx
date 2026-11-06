@@ -5,7 +5,7 @@ import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Num } from "../../editorial/ui";
+import { ColumnRule, Num } from "../../editorial/ui";
 import { PARTS, partOf } from "./data";
 import { Drift, Flow, Headline, Kicker, Mark, X0 } from "./parts";
 
@@ -16,8 +16,8 @@ const STEP_W = 210;
 const STEP_H = 78;
 const STEP_GAP = 84;
 /** The other three points under it, as three columns of plain text across
- *  the page's width (X0 to 1800) with a hairline centred in each gap: no
- *  cards. */
+ *  the page's width (X0 to 1800), each at most COL_W wide, with a hairline
+ *  centred in each gap: no cards. */
 const COLS_Y = 580;
 const COL_W = 516;
 const COLS_W = 1800 - X0;
@@ -30,7 +30,7 @@ const Column: React.FC<{ at: number; title: string; children: React.ReactNode }>
   const frame = useCurrentFrame();
   const p = ease(frame, at - 2, 14);
   return (
-    <div style={{ width: COL_W, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
+    <div style={{ width: "fit-content", maxWidth: COL_W, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
       <div style={{ ...note(29, INK), fontWeight: 650, marginBottom: 14, whiteSpace: "nowrap" }}>{title}</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>{children}</div>
     </div>
@@ -44,12 +44,15 @@ const Line: React.FC<{ at: number; children: React.ReactNode }> = ({ at, childre
   return <div style={{ ...note(24, INK_SOFT), lineHeight: 1.3, opacity: q, transform: `translateX(${(1 - q) * -10}px)` }}>{children}</div>;
 };
 
-/** A vertical hairline between two columns, as tall as their text, inking in
- *  with the column to its right. */
-const Divider: React.FC<{ at: number }> = ({ at }) => {
-  const frame = useCurrentFrame();
-  return <div style={{ width: 1, alignSelf: "stretch", background: HAIRLINE, opacity: ease(frame, at - 2, 14) }} />;
-};
+/** The house's hairline between two columns, set in the row's flow so it
+ *  sits centred in the gap whatever the columns' widths: as tall as their
+ *  text (a title and four lines), inking in with the column to its right. */
+const RULE_H = 212;
+const Gap: React.FC<{ at: number }> = ({ at }) => (
+  <div style={{ position: "relative", width: 1, flex: "none" }}>
+    <ColumnRule x={0} top={0} height={RULE_H} at={at} />
+  </div>
+);
 
 /**
  * What AI has changed, the page's four points. The first is a design prompt,
@@ -230,7 +233,7 @@ export const AiScene: React.FC = () => {
             width: COLS_W,
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "stretch",
+            alignItems: "flex-start",
           }}
         >
           <Column at={vecAt} title="Vector search trade-offs">
@@ -239,7 +242,7 @@ export const AiScene: React.FC = () => {
             <Line at={n.word("ai-vector", "metadata filters")}>metadata filters</Line>
             <Line at={n.word("ai-vector", "hybrid keyword search")}>hybrid keyword search</Line>
           </Column>
-          <Divider at={govAt} />
+          <Gap at={govAt} />
           <Column at={govAt} title="Governance for AI data">
             <Line at={n.word("ai-gov", "permissions checked at query time")}>permissions checked at query time</Line>
             <Line at={n.word("ai-gov", "deletions that reach the vectors")}>deletions that reach the vectors</Line>
@@ -247,7 +250,7 @@ export const AiScene: React.FC = () => {
                 ("kept from outside" read as a whole phrase). */}
             <Line at={n.word("ai-gov", "personal data kept from")}>personal data kept away from external embedding APIs</Line>
           </Column>
-          <Divider at={codeAt} />
+          <Gap at={codeAt} />
           <Column at={codeAt} title="AI-written pipeline code">
             <Line at={n.word("ai-code", "needs review for idempotency")}>reviewed for idempotency, time zones and schema drift</Line>
             <Line at={n.word("ai-code", "Some coding rounds now allow an assistant")}>some coding rounds allow an assistant</Line>

@@ -215,7 +215,7 @@ export const WindowsScene: React.FC = () => {
         {/* Sessions: a lane per user, closed by a gap of five seconds. */}
         <Note at={sessionAt} x={X0} y={y(SESSION_Y) - h(46)}>
           <span style={{ ...note(25, INK), fontWeight: 750, whiteSpace: "nowrap" }}>session</span>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, gapAt, 10) }}>
+          <span style={{ ...label(23, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, gapAt, 10) }}>
             {" "}
             · no fixed size; closed by a gap of inactivity
           </span>

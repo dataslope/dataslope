@@ -176,7 +176,7 @@ export const EvoScene: React.FC = () => {
         <QuestionCard n={5} at={qAt - 4} textAt={textAt - 4} size={60}>
           What is schema evolution, and how do Parquet and Avro handle it?
         </QuestionCard>
-        <Note at={defAt} x={X0} y={y(296)}>
+        <Note at={defAt} x={X0} y={y(282)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             Changing a schema without breaking readers or rewriting old data:{" "}
             {kinds.map((k, i) => (
@@ -327,13 +327,13 @@ export const EvoScene: React.FC = () => {
         ))}
 
         {/* The verdict on v2's coupon. */}
-        <Pill x={X0} y={AY + h(318)} at={passesAt} tone="ok" size={22}>
+        <Pill x={X0} y={AY + h(330)} at={passesAt} tone="ok" size={22}>
           coupon with a default: passes all three
         </Pill>
-        <Note at={failsBackAt} x={X0} y={AY + h(370)}>
+        <Note at={failsBackAt} x={X0} y={AY + h(382)}>
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>no default: fails backward, so fails full</span>
         </Note>
-        <Pill x={X0} y={AY + h(428)} at={suitsAt} tone="ok" size={23} solid>
+        <Pill x={X0} y={AY + h(438)} at={suitsAt} tone="ok" size={23} solid>
           many services that must agree on one schema
         </Pill>
       </Drift>

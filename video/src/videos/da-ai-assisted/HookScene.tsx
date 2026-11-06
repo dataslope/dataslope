@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
@@ -21,7 +21,7 @@ const BUG_LINE = 3;
  * an assistant's January query, with the BETWEEN filter the page describes,
  * arrives line by line as if typed into a chat, then the narration's turn ("whether it's right") puts a question
  * mark against the BETWEEN line that question 3 takes apart. The split of
- * the round is two plain pills under it.
+ * the round is one plain line under it, its two parts in the data's blue.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -46,9 +46,10 @@ export const HookScene: React.FC = () => {
   const pillsY = y(TOP) + h(34) + listH + h(36);
   const dim = ease(frame, firstAt, 14) * 0.5;
 
-  const pills = [
-    { at: sixAt, text: "6 in full", fill: BAR, ink: PAPER },
-    { at: threeAt, text: "3 short", fill: ds("blue", 100), ink: INK },
+  // The round's split, plain text after "9 questions:", in the data's blue.
+  const split = [
+    { at: sixAt, text: "6 in full" },
+    { at: threeAt, text: "3 short" },
   ];
 
   return (
@@ -83,33 +84,21 @@ export const HookScene: React.FC = () => {
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>right?</span>
         </Note>
 
-        {/* ── Nine questions: six in full, three short ── */}
+        {/* ── Nine questions: six in full, three short, as one line of text ── */}
         <Note at={nineAt - 2} x={X0} y={pillsY} dim={firstAt + 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>9 questions:</span>
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
+            9 questions:{" "}
+            {split.map((p, i) => {
+              const q = ease(frame, p.at - 2, 12);
+              return (
+                <React.Fragment key={p.text}>
+                  {i > 0 ? <span style={{ color: INK_SOFT, opacity: q }}> · </span> : null}
+                  <span style={{ display: "inline-block", color: BLUE_INK, fontWeight: 650, opacity: q, transform: `scale(${0.9 + 0.1 * q})` }}>{p.text}</span>
+                </React.Fragment>
+              );
+            })}
+          </span>
         </Note>
-        {pills.map((p, i) => {
-          const q = ease(frame, p.at - 2, 12);
-          return (
-            <div
-              key={p.text}
-              style={{
-                position: "absolute",
-                left: X0 + 190 + i * 180,
-                top: pillsY - 4,
-                padding: "6px 18px",
-                borderRadius: 999,
-                background: p.fill,
-                color: p.ink,
-                ...label(24, p.ink),
-                whiteSpace: "nowrap",
-                opacity: q * (1 - ease(frame, firstAt + 4, 14) * 0.5),
-                transform: `scale(${0.9 + 0.1 * q})`,
-              }}
-            >
-              {p.text}
-            </div>
-          );
-        })}
       </Drift>
     </AbsoluteFill>
   );

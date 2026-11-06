@@ -332,7 +332,7 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
       ))}
       <Note at={flowAt} x={lane.x} y={lane.y - c.h(76)}>
         <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-          the main stream keeps flowing<span style={{ ...label(20, INK_SOFT), opacity: ease(frame, stallAt, 10) }}>, never stalled by one poison message</span>
+          the main stream keeps flowing<span style={{ ...label(22, INK_SOFT), opacity: ease(frame, stallAt, 10) }}>, never stalled by one poison message</span>
         </span>
       </Note>
       <ElbowArrow

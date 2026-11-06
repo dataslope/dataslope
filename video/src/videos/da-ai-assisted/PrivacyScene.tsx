@@ -3,16 +3,19 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, OK, OK_INK, TextPanel, X0 } from "./parts";
+import { ColumnRule, Drift, FlexRule, OK_INK, TextPanel, X0 } from "./parts";
 
 const TOP = 340;
 const PITCH = 66;
 const INSTEAD_X = 1000;
 const COL_W = 540;
+/** The hairlines in question 6's two gaps, each centred between the longest
+ *  line on its left (a mark and about 300px of 27px text) and the next column. */
+const RULES_X = [570, 1175];
 
 /** A cross, drawn on `at`, in the trap's red. */
 const Cross: React.FC<{ at: number; size?: number }> = ({ at, size = 24 }) => {
@@ -156,6 +159,11 @@ export const PrivacyScene: React.FC = () => {
         <Note at={Math.min(ownAt, asked6) - 6} x={X0} y={top - h(54)}>
           <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>Be specific, and own the result:</span>
         </Note>
+        {/* A hairline centred in each gap, as tall as the taller of the two
+            columns beside it, inking in with the column to its right. */}
+        {cols.slice(1).map((c, k) => (
+          <ColumnRule key={c.head} x={RULES_X[k]} top={top} height={h(46) + (Math.max(cols[k].items.length, c.items.length) - 1) * pitch + 36} at={c.at} />
+        ))}
         {cols.map((c) => (
           <React.Fragment key={c.head}>
             {/* Every header in the same blue: keeping the definitions and the
@@ -168,6 +176,8 @@ export const PrivacyScene: React.FC = () => {
             ))}
           </React.Fragment>
         ))}
+        {/* The two ways it goes, side by side: red for the trap, green for the
+            right practice, a hairline between them. */}
         <div
           style={{
             position: "absolute",
@@ -178,19 +188,9 @@ export const PrivacyScene: React.FC = () => {
             opacity: ease(frame, hidingAt - 2, 12),
           }}
         >
-          <div style={{ padding: "14px 22px", borderLeft: `4px solid ${ACCENT}`, background: `color-mix(in srgb, ${ACCENT} 8%, ${PAPER})`, ...note(26, INK), whiteSpace: "nowrap" }}>
-            hid it, then couldn&apos;t explain a line
-          </div>
-          <div
-            style={{
-              padding: "14px 22px",
-              borderLeft: `4px solid ${OK}`,
-              background: `color-mix(in srgb, ${OK} 10%, ${PAPER})`,
-              ...note(26, INK),
-              whiteSpace: "nowrap",
-              opacity: ease(frame, openlyAt - 2, 12),
-            }}
-          >
+          <div style={{ ...note(28, ACCENT_INK), fontWeight: 650, lineHeight: "36px", whiteSpace: "nowrap" }}>hid it, then couldn&apos;t explain a line</div>
+          <FlexRule at={openlyAt - 2} />
+          <div style={{ ...note(28, OK_INK), fontWeight: 650, lineHeight: "36px", whiteSpace: "nowrap", opacity: ease(frame, openlyAt - 2, 12) }}>
             used it openly, and checked it
           </div>
         </div>

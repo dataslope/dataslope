@@ -4,11 +4,10 @@ import { arrowHead } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { Drift, OK_INK, X0 } from "./parts";
 
@@ -212,7 +211,7 @@ export const IsoScene: React.FC = () => {
                 ))}
                 {isDefault ? (
                   <g opacity={ease(frame, defaultAt, 10)}>
-                    <rect x={colX(2) + COL_W - 6} y={yy - 26} width={196} height={36} rx={18} fill={`color-mix(in srgb, ${ds("yellow", 400)} 70%, ${PAPER})`} />
+                    <rect x={colX(2) + COL_W + 14} y={yy - 26} width={156} height={34} rx={5} fill={HIGHLIGHT} />
                     <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText(label(20, INK))}>
                       Postgres default
                     </text>

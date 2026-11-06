@@ -25,7 +25,7 @@ const Defense: React.FC<{ at: number; n: number; y: number; children: React.Reac
   if (p <= 0) return null;
   return (
     <div style={{ position: "absolute", left: DEF_X, top: y, display: "flex", gap: 16, alignItems: "flex-start", opacity: p, transform: `translateX(${(1 - p) * -16}px)` }}>
-      <span style={{ flex: "none", width: 22, ...note(24, OK_INK), lineHeight: 1.35, fontWeight: 800, textAlign: "right" }}>{n}</span>
+      <span style={{ flex: "none", width: 22, ...note(24, OK_INK), lineHeight: 1.35, fontWeight: 800 }}>{n}</span>
       <span style={{ ...note(24, INK), lineHeight: 1.35, whiteSpace: "nowrap" }}>{children}</span>
     </div>
   );

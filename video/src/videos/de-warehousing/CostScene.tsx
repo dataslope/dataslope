@@ -104,7 +104,7 @@ export const CostScene: React.FC = () => {
 
         {/* ── Read less ── */}
         <div style={{ position: "absolute", left: X0, top: y(READ_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, lessAt, 12) }}>
-          Read less <span style={{ ...label(21, INK_SOFT), fontWeight: 500 }}>· the page&apos;s query on the made-up million sales, bytes DuckDB read</span>
+          Read less <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>· the page&apos;s query on the made-up million sales, bytes DuckDB read</span>
         </div>
         {reads.map((r, i) => (
           <React.Fragment key={r.what}>

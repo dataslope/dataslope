@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono } from "../../editorial/interview";
+
 import { useLayout } from "../../editorial/layout";
 import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { COLUMNS, count, FILES, MB, QUERY, TABLE } from "./data";
-import { COLUMN_TINT, Drift, FileBar, Headline, Kicker, PARQUET_SEGMENTS, pulse, ReadMark, segmentOf, Spot, X0 } from "./parts";
+import { COLUMN_TINT, Drift, FileBar, Headline, Kicker, PARQUET_SEGMENTS, pulse, QCode, ReadMark, segmentOf, Spot, X0 } from "./parts";
 
 const CSV_W = 1050;
 const ROW1 = 330;
@@ -72,7 +72,7 @@ export const HookScene: React.FC = () => {
         <Kicker at={from}>Data engineer interview questions · Warehousing &amp; storage</Kicker>
         <Headline lead="A million sales, written twice." turn="Only how they're stored differs." at={salesAt - 4} turnAt={storedAt} size={60} />
         <div style={{ position: "absolute", left: X0, top: y(238), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, salesAt + 10, 12) * (1 - ease(frame, dim, 14) * 0.55) }}>
-          <Num>{count(TABLE.rows)}</Num> rows made up for this video, in the page&apos;s six <QMono>sales</QMono> columns
+          <Num>{count(TABLE.rows)}</Num> rows made up for this video, in the page&apos;s six <QCode>sales</QCode> columns
         </div>
         <Spot id="de-warehousing-hamster" at={from + 10} left={1300} top={y(540)} width={520} height={397} />
 
@@ -84,7 +84,7 @@ export const HookScene: React.FC = () => {
             <span style={{ ...note(26, INK), fontWeight: 700, opacity: ease(frame, csvSizeAt, 10) }}>
               <Num>{MB(FILES.csv)}</Num>
             </span>
-            <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, csvSizeAt + 6, 10) }}>text, one row after another</span>
+            <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, csvSizeAt + 6, 10) }}>text, one row after another</span>
           </>,
           ROW1 - 46,
         )}
@@ -98,7 +98,7 @@ export const HookScene: React.FC = () => {
             <span style={{ ...note(26, INK), fontWeight: 700, opacity: ease(frame, pqSizeAt, 10) }}>
               <Num>{MB(FILES.parquet)}</Num>
             </span>
-            <span style={{ ...note(22, INK_SOFT), opacity: ease(frame, columnarAt, 10) }}>
+            <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, columnarAt, 10) }}>
               columnar: each column stored together
               {/* Not only columns: the gap to the CSV is binary types and compression too. */}
               <span style={{ opacity: ease(frame, storedAt, 10) }}>, binary, typed and compressed</span>
@@ -119,7 +119,7 @@ export const HookScene: React.FC = () => {
             opacity: ease(frame, askAt, 12) * (1 - ease(frame, dim, 14) * 0.55),
           }}
         >
-          the page&apos;s query: revenue and units by <QMono>category</QMono>
+          the page&apos;s query: revenue and units by <QCode>category</QCode>
           <span style={{ ...note(22, INK_SOFT) }}>, run in DuckDB, a columnar engine</span>
         </div>
         <ReadMark x={X0} y={y(ROW1)} width={CSV_W} height={h(BAR_H)} at={everyAt + 4} out={dim} />

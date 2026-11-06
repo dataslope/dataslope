@@ -2,7 +2,7 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { BAR } from "../../editorial/style";
+import { BAR, HAIRLINE } from "../../editorial/style";
 import { ds, inkOf } from "../../theme/brand";
 import { type Col, tableGeometry } from "../da-sql/parts";
 import { at, type Scale } from "../da-statistics-communication/parts";
@@ -68,6 +68,16 @@ export const curvePath = (x: Scale, base: number, height: number, mu: number, lo
   });
   const line = pts.map(([px, py], i) => `${i ? "L" : "M"}${px.toFixed(1)},${py.toFixed(1)}`).join(" ");
   return area ? `${line} L${at(x, hi).toFixed(1)},${base} L${at(x, lo).toFixed(1)},${base} Z` : line;
+};
+
+/** A vertical hairline between columns of text set side by side, as an item
+ *  of their flex row: as tall as the row's text, inking in with the column
+ *  to its right (`at`). Spread the row with `space-between` to centre it in
+ *  its gap. */
+export const FlexRule: React.FC<{ at: number; out?: number }> = ({ at: from, out }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, from, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  return <div style={{ width: 1, alignSelf: "stretch", flexShrink: 0, background: HAIRLINE, opacity: Math.max(0, p) }} />;
 };
 
 const NUMBER = /^-?\d[\d,_]*(\.\d+)?$/;

@@ -171,7 +171,7 @@ export const SwitchScene: React.FC = () => {
         <Note at={truckAt + 4} x={T.x} y={qTop + 112}>
           <span style={{ ...note(27, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             nearest: {nearest}
-            <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}> (the old model&apos;s own kitten lands nearest {SWITCH.nearestSame})</span>
+            <span style={{ ...note(25, INK_SOFT), fontWeight: 500 }}> (the old model&apos;s own kitten lands nearest {SWITCH.nearestSame})</span>
           </span>
         </Note>
 

@@ -326,7 +326,7 @@ export const TopicScene: React.FC = () => {
           <Note key={c.text} at={c.at - 2} x={RIGHT_X + 184} y={y(580) + i * h(44)} out={moveOut}>
             <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               + {c.text}
-              {c.text === "longer rebalances" ? <span style={{ ...label(20, INK_SOFT), fontWeight: 650 }}> (partitions reassigned)</span> : null}
+              {c.text === "longer rebalances" ? <span style={{ ...label(23, INK_SOFT), fontWeight: 650 }}> (partitions reassigned)</span> : null}
             </span>
           </Note>
         ))}

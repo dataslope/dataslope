@@ -222,7 +222,7 @@ export const KindsScene: React.FC = () => {
         <Note at={sameAt} x={X_START + 640} y={y(806)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             the same end state however often they run
-            <span style={{ ...label(21, INK_SOFT), opacity: ease(frame, partAt, 10) }}> · Part 6</span>
+            <span style={{ ...label(23, INK_SOFT), opacity: ease(frame, partAt, 10) }}> · Part 6</span>
           </span>
         </Note>
       </Drift>

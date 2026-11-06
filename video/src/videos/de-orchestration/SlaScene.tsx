@@ -195,9 +195,9 @@ export const SlaScene: React.FC = () => {
             <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
               <b style={{ color: OK_INK }}>{i + 1}</b> <b>{w.lead}</b> {w.text}
               {i === 1 ? (
-                <span style={{ ...label(22, INK_SOFT) }}>
+                <span style={{ ...label(24, INK_SOFT) }}>
                   {" "}
-                  · <CodeSpan size={20}>MAX(updated_at)</CodeSpan>
+                  · <CodeSpan size={24}>MAX(updated_at)</CodeSpan>
                 </span>
               ) : null}
             </span>

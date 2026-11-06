@@ -193,18 +193,18 @@ export const HadoopScene: React.FC = () => {
         {/* What else Spark adds. */}
         <Note at={addsAt} x={120} y={y(850)}>
           {/* What it adds, as a line of words with a middle dot between. */}
-          <span style={{ display: "flex", gap: 12, alignItems: "baseline", whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, INK_SOFT), marginRight: 2 }}>Spark also adds</span>
+          <span style={{ display: "flex", gap: 8, alignItems: "baseline", whiteSpace: "nowrap" }}>
+            <span style={{ ...label(22, INK_SOFT), marginRight: 4 }}>Spark also adds</span>
             <Chip>DataFrames</Chip>
-            <span style={{ display: "flex", gap: 12, opacity: ease(frame, sqlAt - 2, 10) }}>
+            <span style={{ display: "flex", gap: 8, opacity: ease(frame, sqlAt - 2, 10) }}>
               <Dot />
               <Chip>SQL</Chip>
             </span>
-            <span style={{ display: "flex", gap: 12, opacity: ease(frame, streamAt - 2, 10) }}>
+            <span style={{ display: "flex", gap: 8, opacity: ease(frame, streamAt - 2, 10) }}>
               <Dot />
               <Chip>streaming</Chip>
             </span>
-            <span style={{ display: "flex", gap: 12, opacity: ease(frame, optAt - 2, 10) }}>
+            <span style={{ display: "flex", gap: 8, opacity: ease(frame, optAt - 2, 10) }}>
               <Dot />
               <Chip ink={OK_INK}>whole-query optimization</Chip>
             </span>

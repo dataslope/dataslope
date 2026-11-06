@@ -163,8 +163,13 @@ export const HybridScene: React.FC = () => {
             >
               {HYBRID.query}
             </span>
-            <span style={{ ...madeUp(19), marginLeft: 22 }}>tickets and the vector ranking made up; BM25 run on them</span>
           </span>
+        </Note>
+
+        {/* Where the figure's data comes from, set apart at the right
+            margin rather than run on from the search in a smaller size. */}
+        <Note at={setupAt} x={COLS[2] - 8 + COL_W} y={y(312) + 4} align="right">
+          <span style={madeUp(19)}>tickets and the vector ranking made up; BM25 run on them</span>
         </Note>
 
         {/* The vector side. */}
@@ -211,7 +216,8 @@ export const HybridScene: React.FC = () => {
         <Note at={tfidfAt - 2} x={COLS[1]} y={rowY(5) + 24}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
             like TF-IDF&apos;s{" "}
-            <span style={{ ...math(24, INK), fontWeight: 500 }}>
+            {/* The formula in the line's own face and size: one line, one face. */}
+            <span style={{ ...note(22, INK), fontWeight: 500 }}>
               idf = ln(<i>N</i> / <i>df</i>)
             </span>
           </span>
@@ -255,8 +261,8 @@ export const HybridScene: React.FC = () => {
         <Note at={sixtyAt - 2} x={COLS[2]} y={rowY(3) + 6}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             each list gives{" "}
-            <span style={{ ...math(25, INK) }}>
-              1 / ({HYBRID.k} + rank)
+            <span style={{ ...note(23, INK), ...TABULAR }}>
+              1 / ({HYBRID.k} + <i>rank</i>)
             </span>
             <span style={{ opacity: ease(frame, summedAt - 2, 10) }}>, summed</span>
           </span>

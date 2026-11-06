@@ -217,7 +217,7 @@ export const GateScene: React.FC = () => {
                 <span style={{ position: "relative", ...note(23, r.pass ? INK : ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
                   <Num>{r.value}</Num>
                   {!r.pass ? (
-                    <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, opacity: ease(frame, limitAt, 10) }}>
+                    <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, opacity: ease(frame, limitAt, 10) }}>
                       {" "}
                       · limit <Num>{(GATE.limits.maxNullRate * 100).toFixed(0)}%</Num>
                     </span>
