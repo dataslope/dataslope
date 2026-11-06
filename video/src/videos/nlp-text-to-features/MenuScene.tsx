@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, label, note } from "../../editorial/style";
+import { body, HAIRLINE, label, note } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -40,7 +40,10 @@ const OPTIONAL_W = 220;
 const OPTIONAL_STEP = 260;
 const QUESTIONS = ["lowercase?", "drop stopwords?", "stem or lemmatize?", "add n-grams?"];
 const TEST_Y = 708;
-const PILL_Y = 788;
+/** The two answers under the test, as plain text: where the pills' text sat. */
+const PILL_Y = 798;
+/** Space either side of the hairline between the two answers. */
+const ANSWER_GAP = 44;
 
 const DOC = BOW.docs[0];
 const ROW = BOW.rows[0];
@@ -178,26 +181,24 @@ export const MenuScene: React.FC = () => {
       <Ink at={doesAt - 4} dur={22} style={{ left: X0, top: y(TEST_Y), ...body(40, true), color: INK, whiteSpace: "nowrap" }}>
         Does what this step throws away <Mark at={matterAt - 2}>matter to your task?</Mark>
       </Ink>
-      {[
-        { at: noiseAt - 2, x: X0, text: "If it’s noise: drop it." },
-        { at: signalAt - 2, x: X0 + 400, text: "If it’s signal: keep it." },
-      ].map((p) => (
-        <Note key={p.text} at={p.at} x={p.x} y={y(PILL_Y)}>
-          <span
-            style={{
-              ...note(24, INK),
-              display: "inline-block",
-              padding: "8px 18px 10px",
-              border: `1.5px solid ${CHIP_LINE}`,
-              borderRadius: 999,
-              whiteSpace: "nowrap",
-              opacity: 0.4 + 0.6 * ease(frame, p.at, 12),
-            }}
-          >
-            {p.text}
-          </span>
-        </Note>
-      ))}
+      {/* Its two answers, plain text on one line, a hairline between them
+          that inks in with the second. */}
+      <div style={{ position: "absolute", left: X0, top: y(PILL_Y), display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
+        {[
+          { at: noiseAt - 2, text: "If it’s noise: drop it." },
+          { at: signalAt - 2, text: "If it’s signal: keep it." },
+        ].map((p, k) => {
+          const e = ease(frame, p.at, 14);
+          return (
+            <React.Fragment key={p.text}>
+              {k > 0 ? (
+                <div style={{ width: 1, height: 31, margin: `0 ${ANSWER_GAP}px`, background: HAIRLINE, transform: `scaleY(${e})`, transformOrigin: "50% 0" }} />
+              ) : null}
+              <div style={{ ...note(24, INK), opacity: e, transform: `translateX(${(1 - e) * -18}px)` }}>{p.text}</div>
+            </React.Fragment>
+          );
+        })}
+      </div>
     </AbsoluteFill>
   );
 };
