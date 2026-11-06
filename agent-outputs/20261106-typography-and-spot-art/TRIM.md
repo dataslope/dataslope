@@ -42,6 +42,13 @@ where they earn it", is the rule you are trimming to.
   card cabinet "is placed tightly with no whitespace", and "there should also
   only be one image". Remove the cabinet; keep at most one image on that page.
 
+- **Database Design 1, "Even a type is a rule.":** the Mars Climate Orbiter
+  (the satellite and planet, older art) "should also be smaller and allow
+  more whitespace". Shrink it well into the small range and give it 80px or
+  more of white on every side.
+- **In general**, the owner reads older spots that run large beside a figure
+  the same way: shrink them so the page breathes.
+
 ## How to trim
 
 For each image you remove: delete its `<Spot>` (or `<Illustration>`), its
