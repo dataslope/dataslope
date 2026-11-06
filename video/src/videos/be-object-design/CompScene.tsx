@@ -245,7 +245,7 @@ export const CompScene: React.FC = () => {
         <Value x={COUNTER_X} y={childTop + 30} at={countsAt + 2} tone={counterTone} out={aOut} lit={pulse(frame, zeroAt + 4, 22) + pulse(frame, threeAt, 22)}>
           {counted}
         </Value>
-        <Pill x={COUNTER_X + 150} y={childTop + 38} at={nobodyAt} tone="plain" size={21} out={aOut}>
+        <Pill x={CHILD.x} y={y(CHILD.top + CHILD.h) + 12} at={nobodyAt} tone="plain" size={21} out={aOut}>
           loyalty code not edited
         </Pill>
 
