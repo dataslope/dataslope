@@ -297,7 +297,7 @@ const Trie: React.FC<{ c: Ctx }> = ({ c }) => {
         Autocomplete, IP routing
       </Line>
       <Line at={memAt} x={rx} y={c.T + c.h(242)} size={24} color={ACCENT_INK}>
-        The cost: more memory, a node per character
+        More memory: a node per character
       </Line>
     </>
   );

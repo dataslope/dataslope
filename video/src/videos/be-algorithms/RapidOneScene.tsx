@@ -309,18 +309,25 @@ const Recursion: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 15. Divide and conquer, or DP ────────────────────────────────────────────
 
-/** fib(n)'s call tree, as nodes with their argument, depth first. */
-const fibTree = (n: number, depth = 0, x = 0.5, span = 0.5) => {
+/** fib(n)'s call tree, as nodes with their argument, depth first. Leaves
+ *  take evenly spaced slots left to right; a parent sits over its children. */
+const fibTree = (n: number) => {
   const out: { n: number; depth: number; x: number; parent?: number }[] = [];
-  const walk = (m: number, d: number, px: number, sp: number, parent?: number) => {
+  let leaf = 0;
+  const walk = (m: number, d: number, parent?: number): number => {
     const me = out.length;
-    out.push({ n: m, depth: d, x: px, parent });
-    if (m < 2) return;
-    walk(m - 1, d + 1, px - sp / 2, sp / 2, me);
-    walk(m - 2, d + 1, px + sp / 2, sp / 2, me);
+    out.push({ n: m, depth: d, x: 0, parent });
+    if (m < 2) {
+      out[me].x = leaf++;
+      return out[me].x;
+    }
+    const a = walk(m - 1, d + 1, me);
+    const b = walk(m - 2, d + 1, me);
+    out[me].x = (a + b) / 2;
+    return out[me].x;
   };
-  walk(n, depth, x, span);
-  return out;
+  walk(n, 0);
+  return out.map((f) => ({ ...f, x: (f.x + 0.5) / leaf }));
 };
 
 const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
@@ -329,7 +336,7 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
   const mergeAt = c.w("r-dc", "like merge sort");
   const dpAt = c.w("r-dc", "Dynamic programming reuses the answers of overlapping ones");
   const fib = fibTree(5);
-  const W = 520;
+  const W = 480;
   const fx = R_X + 500;
   const ly = (d: number) => c.T + c.h(90) + d * c.h(66);
   const repeated = (m: number) => fib.filter((f) => f.n === m).length > 1 && m >= 2;

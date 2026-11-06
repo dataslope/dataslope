@@ -55,8 +55,8 @@ export const PqScene: React.FC = () => {
   const pushedAt = n.word("heap-build", "pushed one at a time");
   const end = n.beat("heap-build").to;
 
-  const laneY = [y(318), y(392)];
-  const tTop = y(496);
+  const laneY = [y(304), y(372)];
+  const tTop = y(508);
   const rowY = (i: number) => tTop + 44 + i * 54;
   const rows = [
     { name: "Sorted list", push: <>O(n): shifts <Num>{int(HEAP.sortedInsertMeanShift)}</Num> on average</>, pop: "O(1)", at: sortedAt, pushAt: shiftsAt, popAt: instantAt, pushBad: true, popBad: false },
@@ -144,7 +144,7 @@ export const PqScene: React.FC = () => {
             </div>
           </React.Fragment>
         ))}
-        <Line at={urgentAt + 10} x={LANE_X} y={laneY[1] + 66} size={21} color={INK_SOFT} weight={600}>
+        <Line at={urgentAt + 10} x={LANE_X} y={laneY[1] + 62} size={21} color={INK_SOFT} weight={600}>
           1 is the most urgent
           <span style={{ opacity: ease(frame, schedAt, 10) }}>: a scheduler, Dijkstra&apos;s algorithm</span>
         </Line>
@@ -171,7 +171,7 @@ export const PqScene: React.FC = () => {
           </React.Fragment>
         ))}
 
-        <VRule x={1060} top={laneY[0]} bottom={y(806) + 56} at={levelsAt} />
+        <VRule x={1060} top={laneY[0]} bottom={y(814) + 56} at={levelsAt} />
 
         {/* The heap: twenty levels for a million, one push climbing. */}
         <Line at={levelsAt} x={TREE.x0} y={apexY - 72} size={22} weight={650}>
@@ -221,12 +221,12 @@ export const PqScene: React.FC = () => {
         </Line>
 
         {/* Building one. */}
-        <Line at={linearAt} x={140} y={y(706)} size={22} weight={650}>
+        <Line at={linearAt} x={140} y={y(716)} size={22} weight={650}>
           Building a heap: O(n), not O(n log n). Comparisons, a million items:
         </Line>
         <HBar
           x={140}
-          y={y(742)}
+          y={y(752)}
           w={680}
           max={HEAP.pushesCompares}
           value={HEAP.heapifyCompares}
@@ -240,7 +240,7 @@ export const PqScene: React.FC = () => {
         />
         <HBar
           x={140}
-          y={y(806)}
+          y={y(814)}
           w={680}
           max={HEAP.pushesCompares}
           value={HEAP.pushesCompares}

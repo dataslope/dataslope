@@ -142,7 +142,7 @@ export const HookScene: React.FC = () => {
           ))}
         </div>
         <Line at={quickAt + 10} x={CHIP_X} y={top + 362} size={22} color={INK_SOFT} weight={600}>
-          Each answer: the structure, and what an operation costs, counted
+          Each answer: the structure, and its cost, counted
         </Line>
 
         <Art name="pangolin" at={from} left={1440} top={y(370)} h={440} />
