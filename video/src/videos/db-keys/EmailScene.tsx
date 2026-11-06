@@ -21,7 +21,6 @@ import {
   MARK_KEY,
   Reply,
   RIGHT,
-  Spot,
   TableName,
   tableGeometry,
   X0,
@@ -101,7 +100,6 @@ export const EmailScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the tables, the refusal, the swap, the update going through ── */}
       <Sfx name="el-whoosh" at={from} level={-34} />
-      <Sfx name="el-pop" at={keyAt - 2} level={-30} />
       <Sfx name="el-pencil" at={orderAt} level={-34} />
       <Sfx name="el-tap" at={refusesAt} level={-28} />
       <Sfx name="el-whoosh" at={swapAt + 4} level={-34} />
@@ -184,8 +182,6 @@ export const EmailScene: React.FC = () => {
         <ElbowArrow points={loop(surUsers, surOrders, surLoop)} at={tenAt + 4} />
         <Listing lines={SURROGATE.change.lines} x={SQL_X} top={y(SQL_Y)} width={RIGHT - SQL_X} size={SIZE} at={swapAt + 12} />
         <Reply x={SQL_X} top={y(SQL_Y) + listH + 18} at={throughAt} tag={SURROGATE.change.tag} />
-        {/* The email that is the key, from "email the key" to the scene's end. */}
-        <Spot id="db-keys-envelope" at={keyAt - 4} left={1250} top={812} width={210} height={157} />
         <Ink at={notKeyAt - 4} dur={16} style={{ left: SQL_X, top: y(SQL_Y) + listH + 96, whiteSpace: "nowrap" }}>
           <span style={{ ...label(24, INK_SOFT), fontWeight: 560 }}>
             The email is an attribute now: unique, but nothing points at it.

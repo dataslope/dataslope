@@ -347,30 +347,13 @@ export const Line: React.FC<{
 /** Each watercolor's natural size in pixels, after the import's trim. At 4K
  *  an image may be drawn at most half that on the 1080p layout. */
 export const SPOTS = {
-  bison: [1536, 1024],
-  ring: [1024, 1024],
-  shards: [1024, 1024],
-  conveyor: [1024, 1024],
-  bucket: [1024, 1024],
-  newspaper: [1024, 1024],
-  server: [1024, 1024],
-  hourglass: [1024, 1024],
-  cards: [1024, 1024],
-  stethoscope: [1024, 1024],
-  mouse: [1024, 1024],
-  timer: [1024, 1024],
-  bread: [1024, 1024],
-  copies: [1024, 1024],
-  calendar: [1024, 1024],
-  cable: [1024, 1024],
-  tickets: [1024, 1024],
-  envelope: [1024, 1024],
-  film: [1024, 1024],
-  clicker: [1024, 1024],
-  leaky: [1024, 1024],
-  piggy: [1024, 1024],
-  megaphone: [1024, 1024],
-  storm: [1024, 1024],
+  bison: [1268, 1021],
+  ring: [1017, 828],
+  shards: [1001, 920],
+  conveyor: [1024, 653],
+  bucket: [824, 1007],
+  newspaper: [1024, 791],
+  timer: [867, 1003],
 } as const satisfies Record<string, readonly [number, number]>;
 export type SpotId = keyof typeof SPOTS;
 

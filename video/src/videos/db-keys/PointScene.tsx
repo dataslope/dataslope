@@ -160,7 +160,7 @@ export const PointScene: React.FC = () => {
             <div style={{ color: INK_SOFT }}>The customer&apos;s details live in one place.</div>
           </div>
         </Note>
-        <Spot id="db-keys-tag" at={customerAt + 4} left={260} top={y(680)} width={250} height={250} />
+        <Spot id="db-keys-tag" at={customerAt + 4} left={285} top={y(680) + 25} width={200} height={200} />
       </Drift>
     </AbsoluteFill>
   );

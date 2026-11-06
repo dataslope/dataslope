@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, BAR, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, INK, INK_SOFT, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ArtSpot, Box, Drift, Flow, Gauge, Line, lerp, Mark, OK, OK_INK, pulse, toneAt, X0 } from "./parts";
@@ -246,10 +246,9 @@ export const CohScene: React.FC = () => {
             </Line>
           </React.Fragment>
         ))}
-        <Line x={CHECKOUT.x} y={y(270) + 2000} at={solidAt} size={20} color={BAR}>
-          {" "}
+        <Line x={(GAUGE.xs[0] + GAUGE.xs[1]) / 2} y={gaugeY + 92} at={solidAt} size={21} color={OK_INK} weight={650} align="center" width={420}>
+          most of SOLID pushes this way
         </Line>
-        <span style={{ display: "none", ...label(20, INK) }} />
       </Drift>
     </AbsoluteFill>
   );

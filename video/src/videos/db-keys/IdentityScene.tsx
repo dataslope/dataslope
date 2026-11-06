@@ -181,7 +181,7 @@ export const IdentityScene: React.FC = () => {
           rows={[{ cells: TAYLORS.orders.rows[0], at: swapOrders }]}
           marks={[{ row: 0, col: 1, at: oneOhOneAt, color: MARK_KEY }]}
         />
-        <Spot id="db-keys-beans" at={beansAt - 4} left={X0 + 40} top={y(640) + 16} width={250} height={250} />
+        <Spot id="db-keys-beans" at={beansAt - 4} left={X0 + 65} top={y(640) + 40} width={200} height={200} />
 
         {/* The hook's line lands on a row; on "WHICH" it forks to both, and
             on "Which one?" neither is the answer. */}

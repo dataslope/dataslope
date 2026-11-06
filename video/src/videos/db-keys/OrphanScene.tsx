@@ -21,7 +21,6 @@ import {
   MARK_BAD,
   MARK_KEY,
   Reply,
-  Spot,
   TableName,
   tableGeometry,
   Tag,
@@ -92,7 +91,6 @@ export const OrphanScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the accepted row, the dangling pointer, the refusal ── */}
-      <Sfx name="el-pop" at={orderAt - 2} level={-30} />
       <Sfx name="el-tap" at={inAt - 2} level={-28} />
       <Sfx name="el-pencil" at={inAt + 2} level={-34} />
       <Sfx name="el-pencil" at={existAt} level={-35} />
@@ -116,7 +114,6 @@ export const OrphanScene: React.FC = () => {
           marks={[{ line: 1, at: ninetyAt + 2, color: MARK_BAD }]}
         />
         <Reply x={X0 + listW + 24} top={lineMid(0) - 22} at={inAt} tag={ORPHAN.ok.tag} size={20} />
-        <Spot id="db-keys-parcel" at={orderAt - 4} left={1200} top={290} width={199} height={180} />
 
         {/* ── The two tables ── */}
         <TableName g={orders} at={from - 2}>

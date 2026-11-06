@@ -10,12 +10,9 @@ import results from "./results.json" with { type: "json" };
 
 export const VIDEO = "be-scaling";
 
-/**
- * Whether public/images/be-scaling/ holds the watercolors from
- * illustrations.json. Not yet: phase 2 generates them. Every frame is laid
- * out with room for them either way.
- */
-export const ILLUSTRATIONS = false;
+/** Whether public/images/be-scaling/ holds the watercolors from
+ *  illustrations.json: the bison and the few spots the scenes place. */
+export const ILLUSTRATIONS = true;
 
 /** Part 1's peak redirects a second, and the tenfold traffic this video
  *  scales to. */
