@@ -79,7 +79,7 @@ export const ShopScene: React.FC = () => {
   const nameAt = n.word("next", "name");
   const keyAt = n.word("next", "key");
   const nextTo = n.beat("next").to;
-  // The shelf pops in late in "products", once the products box has started to draw.
+  // The shelf pops in late in "products", once the products box has started to draw. Silent, like the bag.
   const shelfAt = productsAt + 4;
 
   // ── The diagram (reading-er-diagrams.mdx) ──
@@ -166,7 +166,6 @@ export const ShopScene: React.FC = () => {
       <Sfx name="el-whoosh" at={herOrderAt - 2} level={-34} />
       <Sfx name="el-tap" at={linesAt} level={-29} />
       <Sfx name="el-chime" at={nextTo + 8} level={-32} />
-      <Sfx name="el-pop" at={shelfAt} level={-30} />
 
       <Kicker at={shopFrom - 10}>Reading a diagram</Kicker>
       <Headline lead="Read each line" at={shopFrom - 4} turn="as a sentence." turnAt={sentenceAt - 4} out={followAt - 8} />

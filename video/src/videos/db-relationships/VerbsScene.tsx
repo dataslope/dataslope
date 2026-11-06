@@ -45,7 +45,7 @@ export const VerbsScene: React.FC = () => {
   const moreAt = n.word("verbs", "says more");
   const hasAt = n.word("verbs", "customer has order");
   const verbsTo = n.beat("verbs").to;
-  // The shopper pops in late in "Customers", after the customers box's own pop, so the two are heard apart.
+  // The shopper pops in late in "Customers", just after the customers box, so the two arrive apart. Silent, like the crates.
   const shopperAt = customersAt + 6;
 
   const boxes = [
@@ -89,7 +89,6 @@ export const VerbsScene: React.FC = () => {
         <Sfx key={i} name="el-pencil" at={l.at} level={-34} />
       ))}
       <Sfx name="el-tap" at={readsAt - 2} level={-29} />
-      <Sfx name="el-pop" at={shopperAt} level={-30} />
 
       <Kicker at={hookFrom - 10}>What a relationship is</Kicker>
       <Headline lead="Entities never live alone." at={hookFrom - 6} out={relAt - 8} />

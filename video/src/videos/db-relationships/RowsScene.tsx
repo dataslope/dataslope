@@ -69,7 +69,7 @@ export const RowsScene: React.FC = () => {
   const storingAt = n.word("one-to-many", "storing");
   const adaIdAt = n.word("one-to-many", "Ada's id");
   const otmTo = n.beat("one-to-many").to;
-  // Each spot pops in late in the word that names it, after that word's own sound.
+  // Each spot pops in late in the word that names it, once what that word draws has begun. Silent, like the crates.
   const magnifierAt = zoomAt + 6;
   const keySpotAt = keyAt + 6;
 
@@ -130,8 +130,6 @@ export const RowsScene: React.FC = () => {
       <Sfx name="el-pop" at={questionAt} level={-30} />
       <Sfx name="el-pencil" at={zeroAt - 2} level={-33} />
       <Sfx name="el-pencil" at={exactlyAt - 2} level={-33} />
-      <Sfx name="el-pop" at={magnifierAt} level={-30} />
-      <Sfx name="el-pop" at={keySpotAt} level={-30} />
 
       <Kicker at={rowsFrom - 40} out={bothFrom - 16}>
         What a relationship is

@@ -55,7 +55,7 @@ export const BadgeScene: React.FC = () => {
   const keysAt = n.word("translate", "keys");
   const constraintsAt = n.word("translate", "constraints");
   const translateTo = n.beat("translate").to;
-  // The spots pop in late in the words that name them, after those words' own sounds.
+  // The spots pop in late in the words that name them, once what those words draw has begun. Silent, like the video's crates and bag.
   const devicesSpotAt = devicesAt + 6;
   const pictureAt = n.word("translate", "picture") + 2;
 
@@ -111,8 +111,6 @@ export const BadgeScene: React.FC = () => {
       <Sfx name="el-pop" at={oneBadgeAt - 4} level={-30} />
       <Sfx name="el-tap" at={secondAt} level={-28} />
       <Sfx name="el-scratch" at={noAt} level={-30} />
-      <Sfx name="el-pop" at={devicesSpotAt} level={-30} />
-      <Sfx name="el-pop" at={pictureAt} level={-30} />
 
       <Kicker at={schemaFrom - 40}>Cardinality</Kicker>
       <Headline lead="The marks" at={schemaFrom - 4} turn="change the schema." turnAt={changeAt - 4} out={translateAt - 8} />

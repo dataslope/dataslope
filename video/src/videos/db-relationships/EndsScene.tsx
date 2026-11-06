@@ -289,7 +289,7 @@ export const EndsScene: React.FC = () => {
   const otherAt = n.word("one", "other box");
   const m2mTo = n.beat("m2m").to;
   const keyHits = KEY_HITS.map((k) => ({ glyph: k.glyph, at: n.word(k.beat, k.word) }));
-  // The spots pop in on the words that name them.
+  // The spots pop in on the words that name them, silent like the video's other spot art.
   const crowAt = n.word("ends", "Crow's-foot") + 2;
   const carAt = n.word("zero-or-one", "parking pass") + 2;
 
@@ -350,8 +350,6 @@ export const EndsScene: React.FC = () => {
       {rows.map((r) => (
         <Sfx key={r.beat} name="el-pop" at={r.marksAt} level={-30} />
       ))}
-      <Sfx name="el-pop" at={crowAt} level={-30} />
-      <Sfx name="el-pop" at={carAt} level={-30} />
 
       <Kicker at={endsFrom - 40}>Cardinality</Kicker>
       <Headline lead="Every end makes" at={endsFrom - 4} turn="two marks." turnAt={twoMarksAt - 4} out={oneFrom - 10} />
