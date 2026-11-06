@@ -10,6 +10,7 @@ import { JOIN } from "./data";
 import {
   colsOf,
   Console,
+  consoleHeight,
   DataTable,
   Drift,
   ErrorBox,
@@ -74,6 +75,8 @@ export const JoinScene: React.FC = () => {
   // is what the console beside it shows).
   const P = JOIN.probe.lines.slice(0, JOIN.probe.lines.findIndex((l) => l.trim() === "]") + 1);
   const low = y(LOW);
+  /** The cost notes: under the joined rows' console, right of the orders. */
+  const costTop = y(TOP) + consoleHeight(JOIN.probe.out.length, 20) + h(26);
   const probeTop = low + listingHeight(B.length, SIZE) + h(30);
   const userRow = (i: number) => U.rows.findIndex((r) => r[U.cols.indexOf("user_id")] === O.rows[i][uid]);
   const M = JOIN.missing.lines;
@@ -152,10 +155,12 @@ export const JoinScene: React.FC = () => {
           size={20}
           at={lookAt}
           lineAt={JOIN.probe.out.map((_, i) => lookAt + i * 14 + 6)}
+          dim={outBuild}
         />
 
-        {/* ── The cost ── */}
-        <Note at={hashAt} x={1340} y={probeTop + h(4)} out={outBuild}>
+        {/* ── The cost: it stays, under the joined rows, once the follow-up
+            takes the lower half. ── */}
+        <Note at={hashAt} x={OUT_X} y={costTop}>
           <span style={{ ...note(30, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             hash join{" "}
             <Mark at={plusAt} color={MARK_OK}>
@@ -163,12 +168,17 @@ export const JoinScene: React.FC = () => {
             </Mark>
           </span>
         </Note>
-        <Note at={everyAt} x={1340} y={probeTop + h(62)} out={outBuild}>
+        <Note at={everyAt} x={OUT_X} y={costTop + h(50)}>
           <span style={{ ...note(30, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             every pair{" "}
             <Mark at={timesAt} color={MARK_BAD}>
               <i>O</i>(<i>n</i> × <i>m</i>)
             </Mark>
+          </span>
+        </Note>
+        <Note at={timesAt + 12} x={OUT_X} y={costTop + h(100)}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            <i>n</i> orders, <i>m</i> users; only the smaller side is held in memory
           </span>
         </Note>
 

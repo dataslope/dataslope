@@ -78,7 +78,7 @@ export const HookScene: React.FC = () => {
             opacity: ease(frame, customersAt, 12),
           }}
         >
-          <Num>{thousands(SLOW.customers)}</Num> customers, <Num>{SLOW.orders / SLOW.customers}</Num> orders each, every day of 2024
+          <Num>{thousands(SLOW.customers)}</Num> customers, <Num>{SLOW.orders / SLOW.customers}</Num> orders each, spread over 2024
         </div>
         <div style={{ position: "absolute", left: X0, top: y(GRID_TOP) + 420, ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, runAt, 12) }}>
           generated, not random: every plan here reruns identically

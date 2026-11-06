@@ -41,6 +41,9 @@ export const IdemScene: React.FC = () => {
   const overwritesAt = n.word("idem-how", "overwrites its row");
   const storeAt = n.word("idem-how", "store each message's id");
   const skipAt = n.word("idem-how", "skip any you've already seen");
+  const sinkAt = n.word("idem-persist", "Keep those ids in the sink");
+  const sameTxnAt = n.word("idem-persist", "in the same transaction as the row");
+  const surviveAt = n.word("idem-persist", "so they survive a crash");
   const modelAt = n.word("idem-sim", "In the model");
   const blindRowsAt = n.word("idem-sim", "a thousand and ninety-six rows");
   const idemRowsAt = n.word("idem-sim", "leaves a thousand");
@@ -65,7 +68,11 @@ export const IdemScene: React.FC = () => {
   ];
   const notInAt = n.word("eos-edge", "isn't in the transaction");
   const joinAt = n.word("eos-edge", "join it, or accept idempotent writes");
-  const end = n.beat("eos-edge").to;
+  const dbJoinsAt = n.word("eos-join", "A database joins");
+  const keyAt = n.word("eos-join", "needs an idempotency key");
+  const readersAt = n.word("eos-join", "consumers downstream");
+  const committedAt = n.word("eos-join", "read only committed messages");
+  const end = n.beat("eos-join").to;
 
   const q6Out = q7At - 4;
   const arriveAt = (k: number) => harmlessAt + 6 + k * 5;
@@ -81,7 +88,8 @@ export const IdemScene: React.FC = () => {
   const outT = { x: 930, y: y(560), w: 300, h: h(56) };
   const offs = { x: 930, y: y(680), w: 300, h: h(56) };
   const txn = { x: 900, y: y(520), w: 360, h: y(770) - y(520) };
-  const OUT_X = 1400;
+  const OUT_X = 1380;
+  const OUT_W = 440;
   const seqs = [41, 42, 42];
   const sendAt = (k: number) => seqAt + 4 + k * 10;
 
@@ -223,9 +231,10 @@ export const IdemScene: React.FC = () => {
           <span style={{ ...note(26, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>or: skip ids already seen</span>
         </Note>
         <Box x={1300} y={y(TABLE.top) + h(10)} w={420} h={h(70)} at={storeAt + 4} out={q6Out} color={OK} size={21}>
-          <span style={{ fontFamily: MONO, fontSize: 21, fontVariantLigatures: "none" }}>
-            seen = {"{"}5, 6, 7{"}"}
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>
+            processed ids<span style={{ opacity: ease(frame, sinkAt, 10) }}>, a table in the sink</span>
           </span>
+          <span style={{ fontFamily: MONO, fontSize: 21, fontVariantLigatures: "none", marginTop: 2 }}>5, 6, 7</span>
         </Box>
         {[5, 6, 7].map((off, i) => (
           <Note key={off} at={skipAt + 2 + i * 4} x={1300} y={y(TABLE.top) + h(100) + i * h(40)} out={q6Out}>
@@ -234,6 +243,14 @@ export const IdemScene: React.FC = () => {
             </span>
           </Note>
         ))}
+
+        <Note at={sameTxnAt} x={1300} y={rowY(6) + h(16)} out={q6Out}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            written in <b style={{ color: OK_INK }}>one transaction with the row</b>,
+            <br />
+            <span style={{ opacity: ease(frame, surviveAt, 10) }}>so the ids survive a crash</span>
+          </span>
+        </Note>
 
         {/* The model's totals. */}
         <Note at={modelAt} x={BLIND_X} y={rowY(8) + h(16)} out={q6Out}>
@@ -266,10 +283,25 @@ export const IdemScene: React.FC = () => {
         <Note at={insideAt + 2} x={K.x + 18} y={K.bottom - h(40)}>
           <span style={{ ...label(22, INK), fontWeight: 750, whiteSpace: "nowrap" }}>inside Kafka</span>
         </Note>
+        <Note at={readersAt} x={K.x + 230} y={K.bottom - h(40)}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+            consumers downstream<span style={{ opacity: ease(frame, committedAt, 10) }}>: read committed messages only</span>
+          </span>
+        </Note>
         <Box x={prod.x} y={prod.y} w={prod.w} h={prod.h} at={producerAt}>
           <span>idempotent producer</span>
           <span style={{ ...label(20, BLUE_INK), marginTop: 4, opacity: ease(frame, pidAt, 10) }}>producer id 7</span>
         </Box>
+        <ElbowArrow
+          points={[
+            [prod.x + prod.w + 6, topicL.y + topicL.h / 2],
+            [topicL.x - 8, topicL.y + topicL.h / 2],
+          ]}
+          at={producerAt + 6}
+          color={BAR}
+          dur={10}
+          head={12}
+        />
         <Lane x={topicL.x} y={topicL.y} w={topicL.w} h={topicL.h} at={producerAt + 6} name="input topic, on the broker" />
         {seqs.map((s, k) => {
           const t0 = sendAt(k);
@@ -341,6 +373,9 @@ export const IdemScene: React.FC = () => {
         <Box x={outT.x} y={outT.y} w={outT.w} h={outT.h} at={outputAt} size={21}>
           output messages
         </Box>
+        <Note at={outputAt + 6} x={outT.x} y={outT.y + outT.h + h(6)}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>via an idempotent producer too</span>
+        </Note>
         <Box x={offs.x} y={offs.y} w={offs.w} h={offs.h} at={offsetsAt} size={21}>
           consumer offsets
         </Box>
@@ -385,15 +420,21 @@ export const IdemScene: React.FC = () => {
             opacity: pulse(frame, edgeAt + 2, 30) * 0.8,
           }}
         />
-        {outside.map((o, i) => (
-          <Box key={o.text} x={OUT_X} y={y(430) + i * h(90)} w={300} h={h(62)} at={o.at} color={ACCENT} size={21}>
-            {o.text}
-          </Box>
-        ))}
-        <Note at={notInAt} x={OUT_X} y={y(430) + 3 * h(90) + h(6)}>
+        {outside.map((o, i) => {
+          const db = i === 2;
+          return (
+            <Box key={o.text} x={OUT_X} y={y(430) + i * h(90)} w={OUT_W} h={h(70)} at={o.at} color={ACCENT} size={21}>
+              <span>{o.text}</span>
+              <span style={{ ...label(20, OK_INK), fontWeight: 700, marginTop: 2, opacity: ease(frame, db ? dbJoinsAt : keyAt, 10) }}>
+                {db ? "joins: offsets + output, one transaction" : "an idempotency key"}
+              </span>
+            </Box>
+          );
+        })}
+        <Note at={notInAt} x={OUT_X} y={y(430) + 3 * h(90) + h(10)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>not in the transaction</span>
         </Note>
-        <Note at={joinAt} x={OUT_X} y={y(430) + 3 * h(90) + h(56)}>
+        <Note at={joinAt} x={OUT_X} y={y(430) + 3 * h(90) + h(60)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             each must join it,
             <br />

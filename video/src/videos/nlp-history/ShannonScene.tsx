@@ -309,6 +309,8 @@ export const ShannonScene: React.FC = () => {
       <Spot id="book" at={handAt - 4} out={sampleOut} left={110} top={y(430)} width={440} height={347} />
       {/* Its contents, on the right until the sample takes the space. */}
       <ContentsPage x={SX} top={y(330)} width={820} height={500} at={from} markAt={theoryAt + 10} tuckAt={tuckedAt - 2} out={guessAt - 12} />
+      {/* Shannon himself, painted from photographs of him, beside his paper. */}
+      <Spot id="shannon" at={from + 4} out={guessAt - 12} left={1510} top={y(370)} width={320} height={360} />
 
       {/* ── Fig. 4, Shannon's sample, word by word ── */}
       <FigLabel n="4" title="Shannon's sample, one word at a time, 1948" at={guessAt - 6} x={SX} y={y(290)} out={sampleOut} />

@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER, 
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { count, type Dept, DEPT_INK, LADDER } from "./data";
+import { count, type Dept, DEPT_INK, LADDER, NET_LEVEL } from "./data";
 import { Arrow, Curve, Disk, Drift, Machine, OK_INK, Svg } from "./parts";
 
 const MAP_X = 120;
@@ -26,6 +26,8 @@ const HI = Math.log10(3e7);
 const LAD_TOP = 606;
 const LAD_PITCH = 37;
 const SCALED_X = 1580;
+/** How far left of the row names the highlight band starts. */
+const BAND_L = 262;
 
 const xOf = (ns: number) => BAR_X + ((Math.log10(ns) - LO) / (HI - LO)) * BAR_W;
 const nsText = (ns: number) => `${ns < 1 ? String(ns) : count(ns)} ns`;
@@ -33,9 +35,11 @@ const nsText = (ns: number) => `${ns < 1 ? String(ns) : count(ns)} ns`;
 /**
  * Question 7. A shuffle in small: three map tasks write to local disk, and
  * three reduce tasks, one per key, fetch from every one of them over the
- * network. Then the page's own latency chart, redrawn from its levels on the
- * same log scale with its own "if L1 took one second" column: an SSD read is
- * a thousand times memory, a network round trip a hundred thousand.
+ * network. Then the page's latency chart, redrawn from its levels on the same
+ * log scale with its own "if L1 took one second" column, except its last row:
+ * the chart's 10 ms "network round trip" is the disk seek of the table it
+ * cites, so this draws that table's data-center round trip (check.mjs). An
+ * SSD read is a thousand times memory, the round trip five thousand.
  */
 export const ShuffleScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -51,13 +55,14 @@ export const ShuffleScene: React.FC = () => {
   const diskAt = n.word("shuffle", "local disk");
   const fetchAt = n.word("shuffle", "reduce tasks fetch it");
   const netAt = n.word("shuffle", "over the network");
-  const chartAt = n.word("shuffle-ladder", "From the page's latency chart");
-  const ssdAt = n.word("shuffle-ladder", "an SSD read");
+  const ssdAt = n.word("shuffle-ladder", "An SSD read");
+  // The chart draws in over the pause before its first word.
+  const chartAt = ssdAt - 14;
   const thousandAt = n.word("shuffle-ladder", "a thousand times as long as memory");
-  const rtAt = n.word("shuffle-ladder", "a network round trip");
-  const hundredAt = n.word("shuffle-ladder", "a hundred thousand times");
+  const rtAt = n.word("shuffle-ladder", "a round trip inside the data center");
+  const fiveThousandAt = n.word("shuffle-ladder", "five thousand times");
   const secondAt = n.word("shuffle-ladder", "If the fastest cache took one second");
-  const daysAt = n.word("shuffle-ladder", "a hundred sixteen days");
+  const daysAt = n.word("shuffle-ladder", "almost six days");
   const fewerAt = n.word("shuffle-tune", "fewer shuffles");
   const lessAt = n.word("shuffle-tune", "less data in each");
   const end = n.beat("shuffle-tune").to;
@@ -69,8 +74,32 @@ export const ShuffleScene: React.FC = () => {
   const idx = (name: string) => LADDER.levels.findIndex((l) => l.name === name);
   const MEM = idx("Main memory");
   const SSD = idx("NVMe SSD read");
-  const NET = idx("Network round trip");
+  const NET = idx(NET_LEVEL);
   const L1 = idx("L1 cache");
+  const ratioOf = (i: number) => (i === SSD ? LADDER.ssdOverMemory : i === NET ? LADDER.networkOverMemory : null);
+  // A gridline stops for any row whose figure is printed across it, so no
+  // dotted rule runs through a label. Widths are estimated from the text at
+  // the label's 20px (about 10.5px a character, the ratio's bold included).
+  const gridRuns = (x: number): [number, number][] => {
+    const skips = LADDER.levels
+      .map((l, i) => {
+        const r = ratioOf(i);
+        const text = nsText(l.ns) + (r === null ? "" : ` · ${count(r)} × memory`);
+        const x0 = xOf(l.ns) + 14 - 6;
+        const x1 = xOf(l.ns) + 14 + text.length * 10.5 + 6;
+        return x >= x0 && x <= x1 ? [rowY(i) - 6, rowY(i) + rowH + 6] : null;
+      })
+      .filter((v): v is number[] => v !== null);
+    const runs: [number, number][] = [];
+    let from = rowY(0) - 6;
+    for (const [a, b] of skips) {
+      if (a > from) runs.push([from, a]);
+      from = Math.max(from, b);
+    }
+    const end = rowY(LADDER.levels.length - 1) + rowH + 4;
+    if (end > from) runs.push([from, end]);
+    return runs;
+  };
   const mark = (at: number, out?: number) => ease(frame, at, 10) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
 
   return (
@@ -80,7 +109,7 @@ export const ShuffleScene: React.FC = () => {
       <Sfx name="el-whoosh" at={netAt} level={-36} />
       <Sfx name="el-sprinkle" at={chartAt + 4} level={-37} />
       <Sfx name="el-tap" at={thousandAt} level={-35} />
-      <Sfx name="el-tap" at={hundredAt} level={-35} />
+      <Sfx name="el-tap" at={fiveThousandAt} level={-35} />
       <Sfx name="el-pop" at={daysAt} level={-35} />
       <Sfx name="el-chime" at={fewerAt} level={-36} />
 
@@ -126,9 +155,9 @@ export const ShuffleScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Note at={diskAt + 4} x={DISK_X - 30} y={y(ROW_TOPS[2]) + boxH + h(10)}>
-          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>local disk</span>
+          <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>serialized to local disk</span>
         </Note>
-        <Note at={netAt} x={530} y={y(ROW_TOPS[2]) + boxH + h(10)}>
+        <Note at={netAt} x={600} y={y(ROW_TOPS[2]) + boxH + h(10)}>
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the network</span>
         </Note>
         <Note at={fewerAt - 2} x={1080} y={y(ROW_TOPS[0]) + h(16)}>
@@ -142,7 +171,7 @@ export const ShuffleScene: React.FC = () => {
         {/* ── The page's latency chart ── */}
         <Note at={chartAt} x={MAP_X} y={y(LAD_TOP) - h(50)}>
           <span style={{ ...label(23, INK), whiteSpace: "nowrap" }}>
-            Latency, from the page&apos;s chart <span style={{ color: INK_SOFT, fontWeight: 500 }}>(nanoseconds, log scale)</span>
+            Latency, order of magnitude <span style={{ color: INK_SOFT, fontWeight: 500 }}>(nanoseconds, log scale)</span>
           </span>
         </Note>
         <Note at={secondAt - 2} x={SCALED_X} y={y(LAD_TOP) - h(64)}>
@@ -156,13 +185,15 @@ export const ShuffleScene: React.FC = () => {
           const at = i === MEM ? thousandAt : i === SSD ? ssdAt : rtAt;
           const o = mark(at - 2, i === MEM ? secondAt : undefined);
           return o > 0 ? (
-            <div key={i} style={{ position: "absolute", left: NAME_R - 230, top: rowY(i) - 4, width: 230 + (SCALED_X - NAME_R) + 160, height: rowH + 8, background: HIGHLIGHT, opacity: o * 0.45, borderRadius: 4 }} />
+            <div key={i} style={{ position: "absolute", left: NAME_R - BAND_L, top: rowY(i) - 4, width: BAND_L + (SCALED_X - NAME_R) + 160, height: rowH + 8, background: HIGHLIGHT, opacity: o * 0.45, borderRadius: 4 }} />
           ) : null;
         })}
         <Svg>
           {[1, 100, 1e4, 1e6].map((t) => (
             <g key={t} opacity={ease(frame, chartAt + 6, 12)}>
-              <line x1={xOf(t)} x2={xOf(t)} y1={rowY(0) - 6} y2={rowY(LADDER.levels.length - 1) + rowH + 4} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
+              {gridRuns(xOf(t)).map(([a, b]) => (
+                <line key={a} x1={xOf(t)} x2={xOf(t)} y1={a} y2={b} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
+              ))}
               <text x={xOf(t)} y={rowY(LADDER.levels.length - 1) + rowH + 28} textAnchor="middle" style={svgText({ ...label(19, INK_SOFT), fontWeight: 500 })}>
                 {t >= 1e6 ? `${t / 1e6}M` : t >= 1000 ? `${t / 1000}k` : String(t)}
               </text>
@@ -183,7 +214,7 @@ export const ShuffleScene: React.FC = () => {
         {LADDER.levels.map((l, i) => {
           const at = chartAt + 4 + i * 3;
           const hot = l.ns >= 1e5;
-          const ratio = i === SSD ? { at: thousandAt, n: LADDER.ssdOverMemory } : i === NET ? { at: hundredAt, n: LADDER.networkOverMemory } : null;
+          const ratio = i === SSD ? { at: thousandAt, n: LADDER.ssdOverMemory } : i === NET ? { at: fiveThousandAt, n: LADDER.networkOverMemory } : null;
           return (
             <React.Fragment key={l.name}>
               <Note at={at} x={NAME_R} y={rowY(i) + rowH / 2 - 14} align="right">

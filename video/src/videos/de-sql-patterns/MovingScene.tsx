@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { OK, OK_INK, QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { Ink, Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -18,6 +18,7 @@ import {
   geoOf,
   lineOf,
   Listing,
+  listingHeight,
   MARK,
   MARK_BAD,
   MARK_OK,
@@ -63,6 +64,8 @@ export const MovingScene: React.FC = () => {
   const thirteenthAt = n.word("moving-rows", "On the thirteenth");
   const reachAt = n.word("moving-rows", "reach back to the third");
   const elevenAt = n.word("moving-rows", "eleven days");
+  const shortAt = n.word("moving-short", "the first six rows have short windows");
+  const nullFirstAt = n.word("moving-short", "return null until the window holds seven");
   const rangeAt = n.word("moving-range", "Range with an interval");
   const calendarAt = n.word("moving-range", "counts the calendar instead");
   const fourAt = n.word("moving-range", "the four days that exist");
@@ -116,6 +119,11 @@ export const MovingScene: React.FC = () => {
   const P = MOVING.page;
   const F = SPINE.filled;
   const out7 = q8At - 4;
+  const underList = (lines: number) => y(LIST_Y) + listingHeight(lines, SIZE) + h(22);
+  // The spine's average: the same ROWS frame, as it ran over the filled days.
+  const spineAvg = SPINE.filledAvg.lines.flatMap((l, i, all) => (l.includes("AVG(daily_value) OVER") ? [l.trim(), all[i + 1].trim().replace(/,$/, "")] : []));
+  if (spineAvg.length !== 2 || !spineAvg[1].startsWith("ROWS BETWEEN 6 PRECEDING")) throw new Error("the spine's average is not the ROWS frame");
+  const code: React.CSSProperties = { fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, whiteSpace: "pre", fontVariantLigatures: "none" };
 
   return (
     <AbsoluteFill>
@@ -204,6 +212,19 @@ export const MovingScene: React.FC = () => {
             ]}
           />
 
+          {/* The ROWS frame's short windows, and the CASE that nulls them. */}
+          <Note at={shortAt} x={X0} y={underList(P.lines.length)} out={generateAt - 2}>
+            <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+              the first <Num>{MOVING.full.nulled}</Num> rows have short frames:{" "}
+              <span style={{ opacity: ease(frame, nullFirstAt - 2, 10) }}>null them</span>
+            </div>
+            <div style={{ ...code, marginTop: 6, opacity: ease(frame, nullFirstAt + 2, 12) }}>
+              {MOVING.full.lines[0]}
+              <span style={{ color: INK_SOFT, fontWeight: 500 }}>{"   -- w: the frame above"}</span>
+              {`\n${MOVING.full.lines[1]}`}
+            </div>
+          </Note>
+
           {/* ── The 13th, under each frame ── */}
           <TableName g={sg} at={thirteenthAt + 4}>
             the 13th&rsquo;s seven-day average
@@ -251,6 +272,11 @@ export const MovingScene: React.FC = () => {
               { line: lineOf(F.lines, "COALESCE"), at: zerosAt + 2, color: MARK_OK },
             ]}
           />
+          {/* The step the 95.0 comes from: the same frame, over the filled days. */}
+          <Note at={againAt + 4} x={X0} y={underList(F.lines.length)}>
+            <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>then the same frame, over these rows:</div>
+            <div style={{ ...code, marginTop: 6 }}>{`${spineAvg[0]}\n  ${spineAvg[1]}`}</div>
+          </Note>
           <Note at={calendarTableAt - 2} x={SUM_X} y={sg.rowTop(3) + h(110)}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
               no <QMono>generate_series</QMono>? join a calendar table

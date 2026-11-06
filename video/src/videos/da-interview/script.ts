@@ -41,7 +41,7 @@ export const script: NarrationScript = {
     {
       id: "ai",
       scene: true,
-      text: "AI, artificial intelligence, has changed some of it. Checking now matters more than writing, because a plausible query is cheap to produce. Expect to be handed one an assistant wrote, and asked: is it right?",
+      text: "AI has changed some of it. Checking now matters more than writing, because a plausible query is cheap to produce. Expect to be handed one an assistant wrote, and asked: is it right?",
       pauseAfter: 0.5,
     },
     {

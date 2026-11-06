@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK_SOFT, note } from "../../editorial/style";
+import { BLUE_INK, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -51,7 +51,8 @@ const Lag: React.FC<{ x0: number; x1: number; y: number; at: number; days: numbe
  * loan: Ada's transactions (one row per event), her month-end balances (one
  * row per account per month), and loan application 7 (one row per process,
  * its dates filled in as it moves: 7 days to approve, 9 more to fund). Then
- * which question each one answers.
+ * which question each one answers, each in green beside its own table (no
+ * shared label: one in this column headed the blue note, as if it were a pick).
  */
 export const TypesScene: React.FC = () => {
   const n = useNarration();
@@ -201,9 +202,6 @@ export const TypesScene: React.FC = () => {
         <Lag x0={ag.colMid(cApproved)} x1={ag.colMid(cFunded)} y={lagY} at={swapFund + 6} days={STAGES.fund} />
         <Note at={longAt} x={ag.right + 40} y={ag.rowTop(1) + h(6)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>how long each step took</span>
-        </Note>
-        <Note at={pickAt} x={ag.right + 40} y={ag.rowTop(0) - h(56)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>pick by the question:</span>
         </Note>
       </Drift>
     </AbsoluteFill>

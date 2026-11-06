@@ -242,6 +242,21 @@ for c in pd.read_csv("events.csv", names=["name", "qty"], nrows=250_000, chunksi
     s += c["qty"].sum()
     n += len(c)
 round(float(s / n), 4)`,
+  // Why the mean of means is off here: the chunks are not the same size.
+  meanSizes: '[len(c) for c in pd.read_csv("events.csv", names=["name", "qty"], nrows=250_000, chunksize=100_000)]',
+  // Why read() holds about twice the file: the bytes, then the text decoded
+  // from them. The bytes alone, read in binary mode:
+  readBytes: MEM(`with open("events.csv", "rb") as f:
+    data = f.read()
+len(data)`),
+  // The quick round's like-for-like: the same totals by name, streamed into
+  // a dict a line at a time, against read_csv and groupby ("whole").
+  streamGroup: MEM(`by_name = Counter()
+with open("events.csv") as f:
+    for line in f:
+        name, qty = line.split(",")
+        by_name[name] += int(qty)
+dict(by_name)`),
 });
 
 // ── 5: an iterable against an iterator ──────────────────────────────────────
@@ -331,7 +346,13 @@ df = pd.DataFrame({
     "id":    [1, 1, 2],
     "ts":    [10, 20, 5],
     "value": ["a", "b", "c"],
-})`,
+})
+# The same three rows as plain records, for the plain-Python answer.
+rows = [
+    {"id": 1, "ts": 10, "value": "a"},
+    {"id": 1, "ts": 20, "value": "b"},
+    {"id": 2, "ts": 5, "value": "c"},
+]`,
   {
     records: "pd.DataFrame(records)",
     first: `seen = set()
@@ -342,8 +363,9 @@ for r in records:
         deduped.append(r)
 print([r["user_id"] for r in deduped])`,
     frame: "df",
+    rowsTable: "pd.DataFrame(rows)",
     latestDict: `latest = {}
-for r in df.to_dict("records"):
+for r in rows:
     if r["id"] not in latest or r["ts"] > latest[r["id"]]["ts"]:
         latest[r["id"]] = r
 print({k: v["value"] for k, v in latest.items()})`,
@@ -401,6 +423,16 @@ def batched(iterable, n):
     page: "for batch in batched(range(7), 3):\n    print(batch)",
     builtin: "for batch in itertools.batched(range(7), 3):\n    print(batch)",
     calls: "sum(1 for _ in batched(range(1_000_000), 1_000))",
+    // Without it = iter(iterable), islice on a list starts at the front on
+    // every pull and never comes back empty: the first four batches.
+    noIter: `def batched_no_iter(iterable, n):
+    while True:
+        chunk = list(itertools.islice(iterable, n))
+        if not chunk:
+            return
+        yield chunk
+
+list(itertools.islice(batched_no_iter(list(range(7)), 3), 4))`,
   },
 );
 
@@ -434,7 +466,7 @@ def with_retries(fn, max_tries=5, base=0.01):
 calls = {"n": 0}
 def bad_request():
     calls["n"] += 1
-    raise ValueError("400 Bad Request: no such column")
+    raise ValueError("400 Bad Request: amount must be positive")
 
 def schedule(rng, tries=5, base=1.0, jitter=False):
     t, times = 0.0, []
@@ -529,6 +561,12 @@ print(rejects)`,
     numeric: `amounts = pd.Series(["12.5", "n/a", "1,200", "7"])
 pd.to_numeric(amounts, errors="coerce")`,
     badCount: 'int(pd.to_numeric(amounts, errors="coerce").isna().sum())',
+    // Normalize what can be saved first: strip the thousands comma, and
+    // "1,200" parses. Then count what is still NaN, and keep it aside.
+    normalized: `nums = pd.to_numeric(amounts.str.replace(",", ""), errors="coerce")
+nums`,
+    leftCount: "int(nums.isna().sum())",
+    rejected: "amounts[nums.isna()].tolist()",
     dates: `for s in ["2026-10-30", "30/10/2026", "2026-02-30"]:
     try:
         print(datetime.strptime(s, "%Y-%m-%d").date())

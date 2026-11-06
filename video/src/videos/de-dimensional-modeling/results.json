@@ -461,6 +461,18 @@
             ]
           ]
         },
+        "fiscalDiffers": {
+          "sql": "SELECT COUNT(*) AS differ FROM dim_date WHERE fiscal_quarter <> 'Q' || quarter(calendar_date);",
+          "ok": true,
+          "cols": [
+            "differ"
+          ],
+          "rows": [
+            [
+              "0"
+            ]
+          ]
+        },
         "aovAll": {
           "sql": "SELECT SUM(amount) AS revenue, COUNT(*) AS orders, ROUND(SUM(amount) / COUNT(*), 2) AS aov FROM fact_orders;",
           "ok": true,
@@ -1015,6 +1027,28 @@
           "rows": [
             [
               "4800.00"
+            ]
+          ]
+        },
+        "monthEnds": {
+          "sql": "SELECT month_end, SUM(balance) AS balance FROM fact_balance GROUP BY month_end ORDER BY month_end;",
+          "ok": true,
+          "cols": [
+            "month_end",
+            "balance"
+          ],
+          "rows": [
+            [
+              "2024-01-31",
+              "1500.00"
+            ],
+            [
+              "2024-02-29",
+              "1700.00"
+            ],
+            [
+              "2024-03-31",
+              "1600.00"
             ]
           ]
         },

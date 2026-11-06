@@ -109,7 +109,17 @@ export const script: NarrationScript = {
     },
     {
       id: "choose",
-      text: "So choose by the latency the business really needs. An hourly dashboard is batch. Fraud detection is streaming. Don't pay for streaming's complexity unless low latency is a real requirement.",
+      text: "So choose by the latency the business really needs. An hourly dashboard is batch. Fraud detection is streaming.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "choose-micro",
+      text: "In between sits micro-batch, a small batch every few seconds, and many systems run both.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "choose-rule",
+      text: "Don't pay for streaming's complexity unless low latency is a real requirement.",
       pauseAfter: 0.7,
     },
 
@@ -151,6 +161,11 @@ export const script: NarrationScript = {
     {
       id: "etl-when",
       text: "ETL still fits a target with little compute, or one with a strict schema.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "etl-pii",
+      text: "It also fits personal data that must be masked before it lands.",
       pauseAfter: 0.7,
     },
 
@@ -172,6 +187,11 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "cdc-debezium",
+      text: "The common tool for it is Debezium.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "cdc-when",
       text: "Use it for low-latency replication of transactional data without polling the source table, and whenever deletes must arrive.",
       pauseAfter: 0.7,
@@ -186,7 +206,22 @@ export const script: NarrationScript = {
     },
     {
       id: "evo-parquet",
-      text: "Parquet, the columnar file format, handles an added column. Day two's file gained a coupon. Read both files in DuckDB, and by default it takes the first file's columns, so coupon silently disappears. Read them by name, and coupon appears, empty for day one.",
+      text: "Parquet, the columnar file format, keeps a schema in each file, so an added column needs no rewrite, but the reader decides whether it survives.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "evo-read",
+      text: "Day two's file gained a coupon. Read both files in DuckDB, and by default it takes the first file's columns, so coupon silently disappears.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "evo-fails",
+      text: "Put day two first, and the read fails.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "evo-byname",
+      text: "Read them by name, and coupon appears, empty for day one.",
       pauseAfter: 0.6,
     },
     {
@@ -195,8 +230,33 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "evo-iceberg",
+      text: "Table formats like Iceberg track columns by ID, so a rename there is safe.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "evo-avro",
-      text: "Avro, a row format popular for messages, makes evolution a contract. A schema registry checks each new schema against the last: backward compatible if new readers can read old data, forward if old readers can read new data, full if both. So it suits many services that must agree.",
+      text: "Avro, a row format popular for messages, makes evolution a contract.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "evo-avro-read",
+      text: "Each reader resolves the writer's schema against its own: fields match by name, a field the data lacks takes the reader's default, and a rename needs an alias.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "evo-avro-registry",
+      text: "A schema registry checks each new schema against the last: backward compatible if new readers can read old data, forward if old readers can read new data, full if both.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "evo-avro-coupon",
+      text: "Add coupon with a default and it passes all three; without one, it fails backward.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "evo-avro-suits",
+      text: "So it suits many services that must agree.",
       pauseAfter: 0.7,
     },
 
@@ -214,7 +274,17 @@ export const script: NarrationScript = {
     },
     {
       id: "src-more",
-      text: "Then land raw data in a schema-on-read layer, so ingestion never breaks. Give streaming sources a schema registry with enforced compatibility. And validate the schema at ingestion: alert and halt on a breaking change, rather than pass it on.",
+      text: "Then land raw data in a schema-on-read layer, so ingestion never breaks.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "src-bronze",
+      text: "It stores what arrives as is, and applies a schema only when it's read, like bronze in the next question.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "src-registry",
+      text: "Give streaming sources a schema registry with enforced compatibility. And validate the schema at ingestion: alert and halt on a breaking change, rather than pass it on.",
       pauseAfter: 0.7,
     },
 
@@ -244,8 +314,23 @@ export const script: NarrationScript = {
       pauseAfter: 0.6,
     },
     {
+      id: "kappa-copy",
+      text: "Run the replay as a second copy of the job, writing a new table, and switch readers over once it catches up.",
+      pauseAfter: 0.6,
+    },
+    {
       id: "kappa-when",
-      text: "Kappa is simpler when the streaming engine can handle batch semantics, and the log reaches back far enough to replay. Lambda is the fallback when it can't.",
+      text: "Kappa is simpler when the streaming engine can handle batch semantics, and the log reaches back far enough to replay.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "kappa-batch",
+      text: "Batch semantics means the same answers a batch job gives, with event-time windows and exactly-once results.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "kappa-fallback",
+      text: "Lambda is the fallback when it can't.",
       pauseAfter: 0.7,
     },
 
@@ -263,7 +348,18 @@ export const script: NarrationScript = {
     },
     {
       id: "r-fan",
-      text: "The fan-out problem: one upstream change sets off many downstream recomputations. Correct a dimension table, and thousands of aggregates built on it go stale. Recompute only the affected partitions, let the dependency graph find the smallest scope, and use CDC so only the change travels.",
+      text: "The fan-out problem: one upstream change sets off many downstream recomputations. Correct a dimension table, and thousands of aggregates built on it go stale.",
+      // Held, so the stale grid is read before the fix replaces it.
+      pauseAfter: 1.0,
+    },
+    {
+      id: "r-fan-fix",
+      text: "Recompute only the affected partitions, let the dependency graph find the smallest scope, and use CDC so only the change travels.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "r-fan-join",
+      text: "Not to be confused with a join fan-out, where a one-to-many join repeats rows and inflates a sum.",
       pauseAfter: 0.6,
     },
     {
@@ -273,7 +369,12 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "Each answer here assumed one machine could hold the data. When a day of events outgrows it, the work has to split across many. Next: distributed processing.",
+      text: "Every example here ran on one machine.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "next-many",
+      text: "When a day of events outgrows it, the work has to split across many. Next: distributed processing.",
     },
   ],
 };

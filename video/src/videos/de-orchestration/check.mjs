@@ -19,6 +19,8 @@
 //     a 1,000-row batch and the freshness check the page describes
 //     (`MAX(updated_at)` against now) on the video's own `daily_orders`. Its
 //     `now()` is pinned to a fixed instant, so a rerun writes the same file.
+// One more value is quoted rather than measured: Airflow's default parse
+// interval ("parse" at the end), the one thing the parse-time answer needs.
 /* global console */
 import { writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -298,6 +300,10 @@ FROM (${pinned})`))[0];
     return { now: now.slice(0, 16), newest: row.newest, minutes: Number(row.minutes), age: row.age };
   };
   const rowsPerDay = (await one("SELECT count(*) AS n FROM daily_orders WHERE updated_at < TIMESTAMP '2025-06-02'"))[0].n;
+  // What June 3's load added: the row count a volume check on that load sees.
+  const missedDayRows = (
+    await one("SELECT count(*) AS n FROM daily_orders WHERE updated_at >= TIMESTAMP '2025-06-03' AND updated_at < TIMESTAMP '2025-06-04'")
+  )[0].n;
   const thresholdHours = 12;
   const fine = await at("2025-06-03 06:00:00");
   const stale = await at("2025-06-04 06:00:00");
@@ -307,11 +313,22 @@ FROM (${pinned})`))[0];
     thresholdHours,
     fine: { ...fine, alert: fine.minutes > thresholdHours * 60 },
     stale: { ...stale, alert: stale.minutes > thresholdHours * 60 },
+    missedDayRows: Number(missedDayRows),
   };
   R.runtime.duckdb = version;
   await conn.close();
   await db.terminate();
   await worker.terminate();
+}
+
+// ── Airflow's parse loop: a documented default, quoted, not measured ──────────
+// The DAG processor re-parses each DAG file every min_file_process_interval
+// seconds ([dag_processor] in Airflow 3, [scheduler] before it), 30 by default,
+// whether or not any run is due. Code at a DAG file's top level runs on every
+// parse, so an API call there runs this many times a day.
+{
+  const EVERY_S = 30;
+  R.parse = { everySeconds: EVERY_S, perDay: (24 * 60 * 60) / EVERY_S };
 }
 
 writeFileSync(join(here, "results.json"), JSON.stringify(R, null, 2) + "\n");

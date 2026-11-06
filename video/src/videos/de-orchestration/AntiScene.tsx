@@ -4,17 +4,21 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, INK_SOFT, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { count, PARSE } from "./data";
 import { Cross, Drift, Edge, lineOf, MARK, MARK_BAD, MARK_OK, OK_INK, PyListing, TaskBox, X0 } from "./parts";
 
-/** The page's XCom pair, word for word. */
+/** The page's XCom pair. The fix is the page's with one change: the page
+ *  writes `"{{ ds }}"` inside the function body, where Jinja never renders (only
+ *  an operator's templated fields are), so every date would write one key
+ *  literally named `{{ ds }}.parquet`. TaskFlow passes the date in by name. */
 const BAD = ["@task", "def extract():", "    return fetch_million_rows()      # avoid"];
 const GOOD = [
   "@task",
-  "def extract():",
-  '    path = "s3://bucket/staging/{{ ds }}.parquet"',
+  "def extract(ds=None):",
+  '    path = f"s3://bucket/staging/{ds}.parquet"',
   "    write_parquet(fetch_million_rows(), path)",
   "    return path",
 ];
@@ -22,9 +26,11 @@ const ROWS_X = 880;
 
 /**
  * Question 3. A DAG: tasks, the edges between them, and no cycles (an edge
- * back to the start is crossed out). Then the page's four anti-patterns, and
- * the fix for the last one as the page writes it: a million rows returned into
- * the XCom store against a path to storage.
+ * back to the start is crossed out). Then the page's four anti-patterns, with
+ * why parse-time work hurts (Airflow re-parses each file every 30 seconds by
+ * default, check.mjs) and what idempotent means at its first use, and the fix
+ * for the last one: a million rows returned into the XCom store against a path
+ * to storage, keyed by the date TaskFlow passes in.
  */
 export const AntiScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -38,30 +44,45 @@ export const AntiScene: React.FC = () => {
   const edgesAt = n.word("anti", "the edges between them");
   const cyclesAt = n.word("anti", "with no cycles");
   const fourAt = n.word("anti", "Four anti-patterns come up");
+  const everyAt = n.word("anti-parse", "about every thirty seconds");
+  const sameAt = n.word("anti-idem", "that don't end the same");
+  const corruptAt = n.word("anti-idem", "corrupt state when they rerun");
   const rows = [
     {
       title: "Expensive work at parse time",
-      detail: "an API call in the DAG file, run again on every parse",
-      at: n.word("anti-list", "Expensive work at parse time"),
-      detailAt: n.word("anti-list", "an API call in the DAG file"),
+      detail: (
+        <>
+          an API call in the DAG file, re-run on every parse
+          <span style={{ opacity: ease(frame, everyAt, 10) }}>
+            : every <Num>{PARSE.everySeconds}</Num> s, <Num>{count(PARSE.perDay)}</Num> times a day
+          </span>
+        </>
+      ),
+      at: n.word("anti-parse", "Expensive work at parse time"),
+      detailAt: n.word("anti-parse", "an API call in the DAG file"),
     },
     {
       title: "Monolithic tasks",
       detail: "one failure redoes everything",
-      at: n.word("anti-list", "Monolithic tasks"),
-      detailAt: n.word("anti-list", "one failure redoes everything"),
+      at: n.word("anti-mono", "Monolithic tasks"),
+      detailAt: n.word("anti-mono", "one failure redoes everything"),
     },
     {
       title: "Tasks that aren't idempotent",
-      detail: "a rerun corrupts state",
-      at: n.word("anti-list", "Tasks that aren't idempotent"),
-      detailAt: n.word("anti-list", "corrupt state when they rerun"),
+      detail: (
+        <>
+          <span style={{ opacity: ease(frame, sameAt, 10) }}>not the same end state however often they run, so </span>
+          <span style={{ opacity: ease(frame, corruptAt, 10) }}>a rerun corrupts state</span>
+        </>
+      ),
+      at: n.word("anti-idem", "Tasks that aren't idempotent"),
+      detailAt: n.word("anti-idem", "Tasks that aren't idempotent"),
     },
     {
       title: "Large data through XComs",
       detail: "XComs: Airflow's store for small messages between tasks",
-      at: n.word("anti-list", "large data passed through XComs"),
-      detailAt: n.word("anti-list", "Airflow's store for small messages"),
+      at: n.word("anti-xcom", "large data passed through XComs"),
+      detailAt: n.word("anti-xcom", "Airflow's store for small messages"),
     },
   ];
   const writeAt = n.word("anti-fix", "Write the data to storage");

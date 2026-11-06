@@ -25,8 +25,11 @@ const dollars = (v: string) => Number(v).toLocaleString("en-US", { minimumFracti
  * two rows (700.00 of 1,110.00) with no error. A placeholder row for 77
  * (key 2002, city Unknown, inferred) lets all three load; when the customer
  * arrives, an UPDATE fills the placeholder in place, and the report shows
- * Tulsa while the fact row still holds the same key. Then the alternative:
- * one shared unknown row, which leaves facts to re-key.
+ * Tulsa while the fact row still holds the same key. The placeholder is
+ * inserted the way a load job would, before the lookup: for every staged
+ * customer the dimension lacks, under a key from a sequence. Then the
+ * alternative: one shared unknown row, which leaves facts to re-key, and
+ * re-keying needs the customer's own ID kept with each fact.
  */
 export const LateScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -43,6 +46,7 @@ export const LateScene: React.FC = () => {
   const sevenAt = n.word("late-drop", "seven hundred dollars loaded");
   const errorAt = n.word("late-drop", "No error");
   const insteadAt = n.word("late-fix", "insert a placeholder row");
+  const forAt = n.word("late-fix", "for seventy-seven");
   const unknownAt = n.word("late-fix", "its city unknown");
   const inferredAt = n.word("late-fix", "flagged inferred");
   const againstAt = n.word("late-fix", "load the order against that key");
@@ -54,7 +58,9 @@ export const LateScene: React.FC = () => {
   const sharedAt = n.word("late-shared", "One shared unknown row");
   const minusAt = n.word("late-shared", "key minus one");
   const rekeyAt = n.word("late-shared", "re-keyed later");
-  const end = n.beat("late-shared").to;
+  const needsAt = n.word("late-rekey", "Re-keying needs each fact");
+  const ownAt = n.word("late-rekey", "the customer's own ID");
+  const end = n.beat("late-rekey").to;
 
   // ── Row 1: what arrived, and the dimension it needs ──
   const S = LATE.staged;
@@ -148,8 +154,11 @@ export const LateScene: React.FC = () => {
           size={SIDE_SIZE}
           at={insteadAt - 2}
           out={arrivesAt - 2}
-          title="placeholder"
-          marks={[{ line: lineOf(LATE.placeholder.lines, "'Unknown'"), at: unknownAt + 2 }]}
+          title="placeholder for each staged customer it lacks"
+          marks={[
+            { line: lineOf(LATE.placeholder.lines, "NOT EXISTS"), at: forAt + 4 },
+            { line: lineOf(LATE.placeholder.lines, "'Unknown'"), at: unknownAt + 2 },
+          ]}
         />
         <Listing
           lines={LATE.arrive.lines}
@@ -226,6 +235,11 @@ export const LateScene: React.FC = () => {
             </span>
             <br />
             <span style={{ opacity: ease(frame, rekeyAt - 4, 10) }}>every fact re-keyed later</span>
+            <span style={{ opacity: ease(frame, needsAt, 10) }}>,</span>
+            <br />
+            <span style={{ opacity: ease(frame, needsAt, 10) }}>
+              which needs <span style={{ color: INK, fontWeight: 650, opacity: 0.4 + 0.6 * ease(frame, ownAt, 10) }}>its customer_id kept</span>
+            </span>
           </span>
         </Note>
       </Drift>

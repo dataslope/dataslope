@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { HYBRID } from "./data";
-import { Drift, head, madeUp, Mark, MARK_OK, math, OK, OK_INK, X0 } from "./parts";
+import { Drift, head, madeUp, Mark, MARK_OK, math, OK, OK_INK, QUIET, X0 } from "./parts";
 
 const COLS = [X0, 700, 1290];
 const COL_W = 540;
@@ -64,12 +64,15 @@ const Row: React.FC<{ x: number; y: number; rank: number; id: string; at: number
 };
 
 /**
- * Question 9. What embeddings blur, then one search for an error code:
- * the vector side's five (by meaning) with the code's ticket fourth, the
- * keyword side's five (BM25) with it first, and why: TF-IDF's idf on the
- * eight made-up tickets, "error" in four of them (0.69) and E-4031 in one
- * (2.08). Then reciprocal rank fusion with the page's k = 60, worked for the
- * top three (check.mjs): the code's ticket wins by being high in both.
+ * Question 9. What embeddings blur, then one search, "E-4031 error", set up
+ * with its three empty column heads as the blur is named: the vector side's
+ * five (by meaning, made up) with the code's ticket fourth, the keyword
+ * side's five (BM25 over the eight made-up tickets, in check.mjs) with it
+ * first and the four that say "error" after it, and why: TF-IDF's idf,
+ * "error" in four tickets (0.69) and E-4031 in one (2.08). Then reciprocal
+ * rank fusion with the page's k = 60, worked for the top three (check.mjs),
+ * fusing ranks because the two kinds of score don't compare: the code's
+ * ticket wins by being high in both.
  */
 export const HybridScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -107,6 +110,9 @@ export const HybridScene: React.FC = () => {
   const end = n.beat("hybrid-cheap").to;
 
   const rowY = (i: number) => y(LIST_TOP) + i * ROW;
+  /** A column head, sketched in grey as the blur is named, inked on its cue. */
+  const headInk = (color: string, at: number) => `color-mix(in srgb, ${color} ${100 * ease(frame, at - 2, 10)}%, ${QUIET})`;
+  const setupAt = blurAt + 6;
   const fusedTop = HYBRID.fused.slice(0, 3);
   const idf = HYBRID.idf;
 
@@ -115,7 +121,7 @@ export const HybridScene: React.FC = () => {
       {kinds.map((k) => (
         <Sfx key={k.text} name="el-tap" at={k.at} level={-36} />
       ))}
-      <Sfx name="el-pencil" at={searchAt + 4} level={-36} />
+      <Sfx name="el-pencil" at={setupAt + 4} level={-36} />
       <Sfx name="el-tap" at={fourthAt + 2} level={-34} />
       <Sfx name="el-pop" at={bm25At + 2} level={-34} />
       <Sfx name="el-pencil" at={sixtyAt + 2} level={-36} />
@@ -140,19 +146,31 @@ export const HybridScene: React.FC = () => {
         </Note>
 
         {/* The search. */}
-        <Note at={searchAt} x={X0} y={y(312)}>
+        <Note at={setupAt} x={X0} y={y(312)}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             search the tickets for{" "}
-            <span style={{ fontFamily: MONO, fontWeight: 700, padding: "2px 10px", border: `2px solid ${INK}`, borderRadius: 8, fontVariantLigatures: "none" }}>
-              E-4031
+            <span
+              style={{
+                fontFamily: MONO,
+                fontWeight: 700,
+                padding: "2px 10px",
+                border: `2px solid ${INK}`,
+                borderRadius: 8,
+                fontVariantLigatures: "none",
+                background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * ease(frame, searchAt, 10) * (1 - ease(frame, fourthAt, 12))}%, ${PAPER})`,
+              }}
+            >
+              {HYBRID.query}
             </span>
-            <span style={{ ...madeUp(19), marginLeft: 22 }}>tickets and rankings made up for this video</span>
+            <span style={{ ...madeUp(19), marginLeft: 22 }}>tickets and the vector ranking made up; BM25 run on them</span>
           </span>
         </Note>
 
         {/* The vector side. */}
-        <Note at={vectorAt - 2} x={COLS[0]} y={y(LIST_TOP) - 44}>
-          <span style={head(22, BLUE_INK)}>vector search, by meaning</span>
+        <Note at={setupAt + 4} x={COLS[0]} y={y(LIST_TOP) - 44}>
+          <span style={head(22, headInk(BLUE_INK, vectorAt))}>
+            vector search<span style={{ opacity: ease(frame, vectorAt - 2, 10) }}>, by meaning</span>
+          </span>
         </Note>
         {HYBRID.vector.map((id, i) => (
           <Row key={id} x={COLS[0]} y={rowY(i)} rank={i + 1} id={id} at={vectorAt + 2 + i * 3} lit={id === CODE ? fourthAt : undefined} />
@@ -163,8 +181,8 @@ export const HybridScene: React.FC = () => {
         </Note>
 
         {/* The keyword side. */}
-        <Note at={addsAt - 2} x={COLS[1]} y={y(LIST_TOP) - 44}>
-          <span style={head(22, INK)}>
+        <Note at={setupAt + 8} x={COLS[1]} y={y(LIST_TOP) - 44}>
+          <span style={head(22, headInk(INK, addsAt))}>
             keyword search<span style={{ opacity: ease(frame, bm25At - 2, 10) }}>, BM25</span>
           </span>
         </Note>
@@ -193,9 +211,16 @@ export const HybridScene: React.FC = () => {
         </Note>
 
         {/* Fused. */}
-        <Note at={fuseAt - 2} x={COLS[2]} y={y(LIST_TOP) - 44}>
-          <span style={head(22, OK_INK)}>
+        <Note at={setupAt + 12} x={COLS[2]} y={y(LIST_TOP) - 44}>
+          <span style={head(22, headInk(OK_INK, fuseAt))}>
             fused<span style={{ opacity: ease(frame, rrfAt - 2, 10) }}>: reciprocal rank fusion</span>
+          </span>
+        </Note>
+        <Note at={fuseAt + 2} x={COLS[2]} y={rowY(5) + 24}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", lineHeight: 1.45 }}>
+            <b style={{ color: INK }}>ranks, not scores</b>: a BM25 score
+            <br />
+            and a similarity aren&apos;t on one scale
           </span>
         </Note>
         {fusedTop.map((f, i) => {

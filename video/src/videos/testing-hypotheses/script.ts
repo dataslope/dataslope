@@ -1,6 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
 import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
-import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
  * Narration for "Testing hypotheses" (16:9), Unit 7 of the Statistics course.
@@ -87,7 +86,6 @@ export const script: NarrationScript = {
   id: "testing-hypotheses",
   voice: "hope",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
-  leadIn: INTRO_LEAD_IN,
   minPause: COURSE_MIN_PAUSE,
   tail: 2.0,
   // A touch over the default 1.6, so each finished figure holds a moment longer.

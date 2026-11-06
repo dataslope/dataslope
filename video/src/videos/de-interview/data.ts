@@ -47,3 +47,31 @@ export const BANK: number = results.bank;
 export const TOPIC_PAGES: number = results.topicPages;
 export const CHECK_PAGES: number = results.conceptCheckPages;
 export const CHALLENGE_PAGES: number = results.challengePages;
+
+/** A topic page's name as the practice line says it, by its file stem. */
+const PAGE_NAMES: Record<string, string> = {
+  sql: "SQL",
+  "data-modeling": "modeling",
+  python: "Python",
+  pipelines: "pipelines",
+  "distributed-processing": "distributed",
+  streaming: "streaming",
+  "data-warehousing": "warehousing",
+  "orchestration-and-reliability": "orchestration",
+  "pipelines-for-ai": "AI pipelines",
+};
+
+/** The pages with runnable challenges, by name, in the track's order (counted
+ *  by check.mjs): "SQL, Python and warehousing". */
+export const CHALLENGE_PAGE_NAMES: string = (() => {
+  const names = results.pages.filter((p) => p.challenges > 0).map((p) => PAGE_NAMES[p.page] ?? p.page);
+  return names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : (names[0] ?? "");
+})();
+
+/** The part number of each topic video, by its folder, so a label that points
+ *  at a part ("Parts 1–2", "Part 11") follows PARTS if the order changes. */
+export const partOf = (video: string): number => {
+  const part = PARTS.find((p) => p.video === video);
+  if (!part) throw new Error(`no part is the video ${video}`);
+  return part.n;
+};

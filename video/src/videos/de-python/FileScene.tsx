@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FILE, GEN } from "./data";
@@ -15,13 +15,16 @@ import {
   Console,
   DataTable,
   Drift,
+  FadeIn,
   geoOf,
   lineOf,
   Listing,
   listingHeight,
   Mark,
+  MARK,
   MARK_BAD,
   MARK_OK,
+  Mono,
   OK,
   OK_INK,
   Source,
@@ -66,6 +69,8 @@ export const FileScene: React.FC = () => {
   const kbAt = n.word("file-loop", "about a hundred fifty kilobytes");
   const chainAt = n.word("file-loop", "Chain generators on it");
   const nothingAt = n.word("file-loop", "nothing is read until the last one asks");
+  const builtAt = n.word("file-lazy", "the pipeline is built");
+  const opensAt = n.word("file-lazy", "the file even opens");
   const q4At = n.word("csv", "Question four");
   const q4TextAt = n.word("csv", "How do you process a large CSV");
   const sizeAt = n.word("csv-chunks", "Pass chunk size to read CSV");
@@ -73,16 +78,22 @@ export const FileScene: React.FC = () => {
   const tenAt = n.word("csv-chunks", "ten chunks of a hundred thousand rows");
   const groupAt = n.word("csv-chunks", "Sum each chunk by group");
   const foldAt = n.word("csv-chunks", "fold it into a counter");
+  const addsAt = n.word("csv-counter", "A counter's update adds");
+  const lastChunkAt = n.word("csv-counter", "keep only the last chunk");
   const matchAt = n.word("csv-same", "The totals match the whole-file read exactly");
   const peaksAt = n.word("csv-same", "memory peaks at one chunk");
   const halfAt = n.word("csv-same", "seven and a half megabytes");
   const fiftyAt = n.word("csv-same", "not fifty-four");
   const sumsAt = n.word("csv-mean", "Sums add up across chunks");
-  const meanAt = n.word("csv-mean", "A mean doesn't");
-  const offAt = n.word("csv-mean", "is off");
-  const carryAt = n.word("csv-mean", "Carry the sum and the count");
+  const meanAt = n.word("csv-off", "A mean doesn't");
+  const shortAt = n.word("csv-off", "only fifty thousand rows");
+  const offAt = n.word("csv-off", "it's off");
+  const carryAt = n.word("csv-carry", "Carry the sum and the count");
   const end = n.beat("iter-in").to;
-  const out3 = q4At - 4;
+  // Question 3's card leaves on "Question four"; its figures stay until
+  // question 4's text writes in, so the page is never empty between them.
+  const card3Out = q4At - 4;
+  const out3 = q4TextAt - 4;
 
   // ── Question 3: three reads, stacked ──
   const R = FILE.read.lines;
@@ -108,7 +119,7 @@ export const FileScene: React.FC = () => {
   const T = { cols: ["name", "qty"], rows: FILE.totals };
   const tg = geoOf(T, TOTALS_X, chunkTop, h, { rowH: 46, bodySize: 24, headH: 44 });
   const totalsAt = foldAt + FILE.nChunks * 8;
-  const pBarsY = rTop + cH + h(112);
+  const pBarsY = rTop + cH + h(164);
   const wh = bytes(FILE.whole.peak);
   const ch = bytes(FILE.chunks.peak);
   const meanTop = chunkTop + FILE.nChunks * chunkH + h(70);
@@ -125,7 +136,7 @@ export const FileScene: React.FC = () => {
       <Sfx name="el-scratch" at={offAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} out={out3} size={60}>
+        <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} out={card3Out} size={60}>
           How do you process a file too big to fit in memory?
         </QuestionCard>
         <QuestionCard n={4} at={q4At} textAt={q4TextAt - 2} size={60}>
@@ -172,10 +183,18 @@ export const FileScene: React.FC = () => {
           marks={[{ line: lineOf(S, "for line in f"), at: loopAt + 4, color: MARK_OK }]}
         />
 
-        {/* The for loop's peak stays beside it once the bars give way. */}
-        <Note at={kbAt + 4} x={X0 + 766} y={sTop + listingHeight(S.length, SIZE) / 2 - h(18)} out={out3}>
+        {/* The for loop's peak stays under it once the bars give way. */}
+        <Note at={kbAt + 4} x={X0} y={sTop + listingHeight(S.length, SIZE) + h(14)} out={out3}>
           <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            <span style={{ fontVariantNumeric: "tabular-nums" }}>{st.num}</span> {st.unit}
+            peak <Num>{st.num}</Num> {st.unit}
+          </span>
+        </Note>
+        {/* read() is the trap only with no size: a file without line breaks
+            still streams, a fixed block at a time (the page's "fixed-size
+            chunks"). */}
+        <Note at={kbAt + 24} x={X0} y={sTop + listingHeight(S.length, SIZE) + h(58)} out={out3}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            no line breaks? <Mono>f.read(size)</Mono>, a fixed block at a time
           </span>
         </Note>
         <Note at={textHoldsAt} x={RIGHT_X + 120} y={rTop - h(40)} out={chainAt - 4}>
@@ -197,6 +216,11 @@ export const FileScene: React.FC = () => {
             { name: <TitleCode>for line in f</TitleCode>, value: FILE.stream.peak, ...st, color: OK, ink: OK_INK, at: kbAt - 6 },
           ]}
         />
+        {/* Why read() holds about twice the file: measured, the bytes alone
+            are half of it. */}
+        <Note at={seventeenAt + 14} x={RIGHT_X - 100 + 220 + 520 * (FILE.read.peak / FILE.readlines.peak) + 140} y={rTop + h(10) + h(33) - h(14)} out={chainAt - 4}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>the bytes and the text</span>
+        </Note>
         <Note at={lazyAt} x={RIGHT_X - 100} y={rTop + h(230)} out={chainAt - 4}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             a file object is <Mark at={lazyAt + 6}>a lazy iterator over its lines</Mark>
@@ -229,7 +253,10 @@ export const FileScene: React.FC = () => {
           at={nothingAt - 4}
           out={out3}
           lineAt={[nothingAt, nothingAt + 14, nothingAt + 20]}
-          marks={[{ line: 1, at: nothingAt + 18, color: MARK_OK }]}
+          marks={[
+            { line: 0, at: builtAt + 4, color: MARK },
+            { line: 1, at: opensAt + 4, color: MARK_OK },
+          ]}
         />
 
         {/* ── 4. pandas, a chunk at a time ── */}
@@ -248,6 +275,16 @@ export const FileScene: React.FC = () => {
         />
         <Note at={iterAt} x={X0} y={rTop + cH + h(14)}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>an iterator of data frames, one at a time</span>
+        </Note>
+        <Note at={addsAt} x={X0} y={rTop + cH + h(58)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            <Mark at={addsAt + 6} color={MARK_OK}>
+              <Mono>Counter.update</Mono> adds
+            </Mark>
+            <FadeIn at={lastChunkAt - 6}>
+              <span style={{ color: ACCENT_INK }}>; a dict&apos;s would keep only the last chunk</span>
+            </FadeIn>
+          </span>
         </Note>
 
         <Note at={tenAt - 4} x={CHUNK_X} y={chunkTop - h(46)}>
@@ -315,7 +352,21 @@ export const FileScene: React.FC = () => {
 
         {/* Why it folds: sums do, a mean does not. */}
         <Note at={sumsAt} x={CHUNK_X} y={meanTop}>
-          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>on the first 250,000 rows, chunks of 100,000:</span>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            first <Num>{FILE.meanSizes.reduce((a, b) => a + b, 0).toLocaleString("en-US")}</Num> rows: chunks of{" "}
+            {FILE.meanSizes.map((k, i) => (
+              <React.Fragment key={i}>
+                {i === 0 ? "" : i === FILE.meanSizes.length - 1 ? " and " : ", "}
+                {i === FILE.meanSizes.length - 1 ? (
+                  <Mark at={shortAt}>
+                    <Num>{k.toLocaleString("en-US")}</Num>
+                  </Mark>
+                ) : (
+                  <Num>{k.toLocaleString("en-US")}</Num>
+                )}
+              </React.Fragment>
+            ))}
+          </span>
         </Note>
         <Note at={meanAt} x={CHUNK_X} y={meanTop + h(44)}>
           <span style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap", display: "flex", gap: 16 }}>

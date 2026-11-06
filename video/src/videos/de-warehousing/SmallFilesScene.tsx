@@ -57,7 +57,11 @@ export const SmallFilesScene: React.FC = () => {
   const fixAt = n.word("sm-fix", "Fix them with compaction");
   const rewriteAt = n.word("sm-fix", "rewrites many small files into a few large ones");
   const formatAt = n.word("sm-fix", "let a table format");
-  const end = n.beat("sm-fix").to;
+  const preventAt = n.word("sm-prevent", "prevent them");
+  const keyAt = n.word("sm-prevent", "a coarser key");
+  const writersAt = n.word("sm-prevent", "fewer writers");
+  const batchesAt = n.word("sm-prevent", "bigger batches");
+  const end = n.beat("sm-prevent").to;
 
   const gridY = y(GRID_Y);
   const pitchY = h(PITCH);
@@ -110,8 +114,24 @@ export const SmallFilesScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── A year, one file a day ── */}
-        <div style={{ position: "absolute", left: X0, top: gridY - h(40), ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, dayAt, 12) }}>
+        <div
+          style={{
+            position: "absolute",
+            left: X0,
+            top: gridY - h(40),
+            ...label(22, INK),
+            whiteSpace: "nowrap",
+            opacity: ease(frame, dayAt, 12) * (1 - ease(frame, rewriteAt + 16, 8)),
+          }}
+        >
           by day <span style={{ color: INK_SOFT, fontWeight: 500 }}>· one Parquet file per day</span>
+        </div>
+        {/* The same place, once the day files have folded into months. */}
+        <div style={{ position: "absolute", left: X0, top: gridY - h(40), ...label(22, INK), whiteSpace: "nowrap", opacity: ease(frame, rewriteAt + 22, 12) }}>
+          after compaction{" "}
+          <span style={{ color: INK_SOFT, fontWeight: 500 }}>
+            · <Num>{SMALL.month.files}</Num> files of about <Num>{KB(SMALL.month.avg)}</Num>
+          </span>
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           {Array.from({ length: SMALL.day.files }, (_, d) => {
@@ -164,7 +184,10 @@ export const SmallFilesScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={openAt + 4} x={PANEL_X} y={gridY + h(106)} out={fixAt - 4}>
+        <Note at={footerAt + 12} x={PANEL_X + 20} y={gridY + h(90)} out={fixAt - 4}>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a footer: the file&apos;s schema and statistics, read before any data</span>
+        </Note>
+        <Note at={openAt + 4} x={PANEL_X} y={gridY + h(130)} out={fixAt - 4}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             a scan of the year opens <b style={{ color: ACCENT_INK }}>{SMALL.day.read} files</b>
             <span style={{ color: INK_SOFT }}>
@@ -173,7 +196,7 @@ export const SmallFilesScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={timeAt} x={PANEL_X} y={gridY + h(156)} out={fixAt - 4}>
+        <Note at={timeAt} x={PANEL_X} y={gridY + h(180)} out={fixAt - 4}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>time on files, not data</span>
         </Note>
 
@@ -186,9 +209,25 @@ export const SmallFilesScene: React.FC = () => {
             rewrites the <Num>{SMALL.day.files}</Num> day files as <Num>{SMALL.month.files}</Num> of about <Num>{KB(SMALL.month.avg)}</Num>
           </span>
         </Note>
+        {/* The format runs or schedules the rewrite and commits it atomically: readers never see it half done. */}
         <Note at={formatAt} x={PANEL_X} y={gridY + h(98)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            or a table format, like Delta Lake or Iceberg, <span style={{ color: OK_INK, fontWeight: 650 }}>compacts for you</span>
+            or a table format, like Delta Lake or Iceberg, <span style={{ color: OK_INK, fontWeight: 650 }}>commits it atomically</span>
+          </span>
+        </Note>
+        <Note at={formatAt + 12} x={PANEL_X + 20} y={gridY + h(132)}>
+          <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>a table format: a log of which files make up the table (Question 9)</span>
+        </Note>
+
+        {/* ── Prevention ── */}
+        <Note at={preventAt} x={PANEL_X} y={gridY + h(188)}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Better, prevent them</span>
+        </Note>
+        <Note at={keyAt} x={PANEL_X} y={gridY + h(232)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            a coarser key
+            <span style={{ opacity: ease(frame, writersAt, 10) }}> · fewer writers per partition</span>
+            <span style={{ opacity: ease(frame, batchesAt, 10) }}> · bigger batches</span>
           </span>
         </Note>
 

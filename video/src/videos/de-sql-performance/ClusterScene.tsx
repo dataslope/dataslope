@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QuestionCard } from "../../editorial/interview";
+import { QMono, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -26,7 +26,9 @@ const R_W = 660;
  * keeps no clustered index; CLUSTER rewrites the table once in an index's
  * order. Customer 42's twenty rows, on twenty pages before (their real page
  * numbers, from ctid), glide onto the one page they share after, and an
- * order inserted afterwards lands on the table's last page.
+ * order inserted afterwards lands on the table's last page. Where the term
+ * comes from is under the left figure (SQL Server, MySQL's InnoDB), and the
+ * warehouses' version, clustering keys, closes the right.
  */
 export const ClusterScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -42,6 +44,8 @@ export const ClusterScene: React.FC = () => {
   const indexAt = n.word("cluster-many", "A non-clustered index");
   const lookupAt = n.word("cluster-many", "separate lookup");
   const manyAt = n.word("cluster-many", "you can have many");
+  const enginesAt = n.word("cluster-engines", "Sequel Server and my sequel");
+  const innoAt = n.word("cluster-engines", "stores every table in primary key order");
   const pgAt = n.word("cluster-pg", "Postgres has no clustered index");
   const commandAt = n.word("cluster-pg", "Its cluster command");
   const twentyAt = n.word("cluster-pg", "sat on twenty pages");
@@ -49,7 +53,8 @@ export const ClusterScene: React.FC = () => {
   const shareAt = n.word("cluster-pg", "they share one");
   const keptAt = n.word("cluster-decay", "the order isn't kept");
   const lastAt = n.word("cluster-decay", "the table's last page");
-  const end = n.beat("cluster-decay").to;
+  const warehouseAt = n.word("cluster-warehouse", "Warehouses get the same effect");
+  const end = n.beat("cluster-warehouse").to;
 
   // ── Left: Data Analyst Part 1's figure ──
   const users = CLUSTER.users.rows;
@@ -112,6 +117,16 @@ export const ClusterScene: React.FC = () => {
           </div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", opacity: ease(frame, manyAt, 10) }}>(many per table)</div>
         </Note>
+        {/* Where the term comes from: the engines that keep one. */}
+        <Note at={enginesAt} x={X0} y={ug.rowTop(users.length) + h(118)}>
+          <div style={{ ...note(22, INK), width: 800 }}>
+            <span style={{ fontWeight: 650 }}>SQL Server and MySQL&rsquo;s InnoDB keep one.</span>
+            <span style={{ opacity: ease(frame, innoAt, 10) }}>
+              {" "}
+              InnoDB stores each table in primary-key order, and its other indexes point at that key.
+            </span>
+          </div>
+        </Note>
 
         {/* ── Right: Postgres keeps none; CLUSTER sorts once ── */}
         <Note at={pgAt} x={R_X} y={y(TOP) - h(6)}>
@@ -148,6 +163,11 @@ export const ClusterScene: React.FC = () => {
           </div>
           <div style={{ ...note(22, INK_SOFT), width: R_W, marginTop: h(10) }}>
             CLUSTER runs once; Postgres doesn&rsquo;t keep the order
+          </div>
+        </Note>
+        <Note at={warehouseAt} x={R_X} y={stripY + h(260)}>
+          <div style={{ ...note(24, INK), width: R_W }}>
+            Warehouses: a clustering key (<QMono>CLUSTER BY</QMono> in Snowflake and BigQuery) keeps rows with nearby keys together.
           </div>
         </Note>
       </Drift>

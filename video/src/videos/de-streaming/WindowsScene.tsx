@@ -49,11 +49,11 @@ export const WindowsScene: React.FC = () => {
   const tenAt = n.word("win-tumble", "Ten seconds each");
   const oneAt = n.word("win-tumble", "exactly one");
   const countWords = [n.word("win-tumble", "five,"), n.word("win-tumble", "four,"), n.word("win-tumble", "three.")];
-  const slideAt = n.word("win-slide", "Sliding windows");
-  const hopAt = n.word("win-slide", "also called hopping");
-  const longAt = n.word("win-slide", "Ten seconds long");
-  const everyAt = n.word("win-slide", "starting every five");
-  const twoAt = n.word("win-slide", "counts in two");
+  const slideAt = n.word("win-slide", "Hopping windows");
+  const hopAt = n.word("win-slide", "which Flink calls sliding");
+  const longAt = n.word("win-hop", "Ten seconds long");
+  const everyAt = n.word("win-hop", "starting every five");
+  const twoAt = n.word("win-hop", "counts in two");
   const sessionAt = n.word("win-session", "Session windows");
   const gapAt = n.word("win-session", "a gap of inactivity");
   const fiveGapAt = n.word("win-session", "With a five-second gap");
@@ -131,6 +131,7 @@ export const WindowsScene: React.FC = () => {
         {[0, 1, 2].map((w) => {
           const p = ease(frame, tenAt + w * 4, 12);
           const c = ease(frame, countWords[w] - 2, 8);
+          if (p <= 0) return null;
           return (
             <div
               key={w}
@@ -163,10 +164,10 @@ export const WindowsScene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>each click in one</span>
         </Note>
 
-        {/* Sliding: ten seconds long, a new one every five. */}
+        {/* Hopping (Flink's sliding): ten seconds long, a new one every five. */}
         <Note at={slideAt} x={X0} y={y(SLIDE_Y) + h(8)}>
-          <div style={{ ...note(25, INK), fontWeight: 750, whiteSpace: "nowrap" }}>sliding</div>
-          <div style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, hopAt, 10) }}>or hopping</div>
+          <div style={{ ...note(25, INK), fontWeight: 750, whiteSpace: "nowrap" }}>hopping</div>
+          <div style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, hopAt, 10) }}>"sliding" in Flink</div>
         </Note>
         {sliding.map((w, k) => {
           const row = k % 2;

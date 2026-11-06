@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { COVER, INDEX } from "./data";
-import { Bar, DataTable, Drift, Listing, listingHeight, MARK_OK, OK_INK, PageStrip, PlanBox, TableName, tableGeometry, X0 } from "./parts";
+import { Bar, DataTable, Drift, Listing, listingHeight, MARK_OK, OK_INK, PageStrip, PlanBox, planHeight, SmallMono, tableGeometry, TableName, X0 } from "./parts";
 
 const TOP = 300;
 const SIZE = 21;
@@ -21,11 +21,14 @@ const SHOWN = 4;
 
 /**
  * Question 4. Left: the query for two columns, then the plan Postgres
- * printed with only a customer_id index (Heap Blocks: exact=20), then the
- * index with INCLUDE (amount) and the plan it gets: an Index Only Scan,
- * Heap Fetches: 0. Right: the index's entries for customer 42, whose amount
- * column opens as INCLUDE adds it, over the table's pages, the twenty it
- * had to read going dark. Last, the price: the two indexes' sizes.
+ * printed with only a customer_id index (Heap Blocks: exact=20), marked as
+ * the narration says it still reads twenty pages of the table, its heap;
+ * then the index with INCLUDE (amount) and the plan it gets: an Index Only
+ * Scan, Heap Fetches: 0, with a note on why that 0 holds (the table was just
+ * vacuumed). Right: the index's entries for customer 42, whose amount column
+ * opens as INCLUDE adds it, over the table's pages, the twenty it had to
+ * read in red until INCLUDE. Last, the price: the two indexes' sizes, in one
+ * unit.
  */
 export const CoverScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -36,16 +39,17 @@ export const CoverScene: React.FC = () => {
   const qAt = n.word("cover", "Question four");
   const textAt = n.word("cover", "What is a covering index");
   const holdsAt = n.word("cover", "holds every column");
-  const neverAt = n.word("cover", "never read");
   const wantsAt = n.word("cover-include", "This query wants");
-  const includeAt = n.word("cover-include", "with include");
-  const onlyAt = n.word("cover-include", "an index only scan");
-  const zeroAt = n.word("cover-include", "zero heap fetches");
+  const aloneAt = n.word("cover-heap", "an index on customer ID alone");
+  const heapAt = n.word("cover-heap", "twenty pages of the table");
+  const includeAt = n.word("cover-add", "with include");
+  const onlyAt = n.word("cover-add", "an index only scan");
+  const zeroAt = n.word("cover-add", "zero heap fetches");
   const sizeAt = n.word("cover-cost", "The price is size");
   const fourAt = n.word("cover-cost", "four times the plain one");
-  const writesAt = n.word("cover-cost", "every insert writes all of it");
-  const fewAt = n.word("cover-cost", "Cover the few queries");
-  const end = n.beat("cover-cost").to;
+  const writesAt = n.word("cover-cost", "every insert writes the amount");
+  const fewAt = n.word("cover-few", "Cover the few queries");
+  const end = n.beat("cover-few").to;
 
   const queryTop = y(TOP);
   const planTop = queryTop + listingHeight(COVER.query.length, SIZE) + h(22);
@@ -96,8 +100,13 @@ export const CoverScene: React.FC = () => {
           step={2}
           at={holdsAt + 6}
           out={includeAt - 8}
-          marks={[{ line: "Heap Blocks", at: neverAt }]}
+          marks={[{ line: "Heap Blocks", at: heapAt }]}
         />
+        <Note at={aloneAt} x={X0 + 1150 - 12} y={planTop + h(4)} align="right" out={includeAt - 8}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            with an index on <SmallMono>customer_id</SmallMono> alone
+          </span>
+        </Note>
         <Listing
           lines={COVER.include}
           x={X0}
@@ -144,15 +153,15 @@ export const CoverScene: React.FC = () => {
           width={R_W}
           pages={INDEX.pages}
           at={holdsAt + 6}
-          ticks={[{ pages: INDEX.pages42, at: neverAt - 6, out: onlyAt + 6, color: inkOf.red }]}
+          ticks={[{ pages: INDEX.pages42, at: heapAt - 4, out: includeAt - 4, color: inkOf.red }]}
           out={sizeAt}
         />
         <div style={{ position: "absolute", left: R_X, top: stripY + h(64), ...note(22, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, holdsAt + 6, 12) * (1 - ease(frame, sizeAt, 10)) }}>
           the table&rsquo;s pages
         </div>
-        <Note at={neverAt + 4} x={R_X} y={stripY + h(100)} out={onlyAt}>
+        <Note at={heapAt + 4} x={R_X} y={stripY + h(100)} out={includeAt - 4}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
-            <Num>20</Num> pages read, to fetch 20 amounts
+            <Num>{COVER.heapBlocks}</Num> pages read, to fetch <Num>{COVER.rows.rows.length}</Num> amounts
           </span>
         </Note>
         <Note at={zeroAt + 2} x={R_X} y={stripY + h(100)} out={sizeAt}>
@@ -174,10 +183,10 @@ export const CoverScene: React.FC = () => {
           at={sizeAt + 4}
           label={
             <>
-              <QMono>(customer_id)</QMono>
+              <SmallMono>(customer_id)</SmallMono>
             </>
           }
-          shown={COVER.plain.pretty}
+          shown={COVER.plain.mb}
           color={BAR}
           ink={BLUE_INK}
         />
@@ -190,14 +199,19 @@ export const CoverScene: React.FC = () => {
           at={fourAt - 4}
           label={
             <>
-              <QMono>(customer_id) INCLUDE (amount)</QMono>
+              <SmallMono>(customer_id) INCLUDE (amount)</SmallMono>
             </>
           }
-          shown={COVER.covering.pretty}
+          shown={COVER.covering.mb}
           color={inkOf.red}
           ink={ACCENT_INK}
         />
-        <Note at={writesAt} x={X0} y={afterTop + h(200)}>
+        <Note at={zeroAt + 14} x={X0} y={afterTop + planHeight(COVER.after.length, PLAN) + h(14)}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            <Num>0</Num> heap fetches because the table was just vacuumed: pages changed since then are still fetched
+          </span>
+        </Note>
+        <Note at={writesAt} x={X0} y={afterTop + h(250)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             Every insert writes the wider index too.{" "}
             <span style={{ color: INK, fontWeight: 650, opacity: ease(frame, fewAt, 10) }}>Cover the few that run constantly.</span>

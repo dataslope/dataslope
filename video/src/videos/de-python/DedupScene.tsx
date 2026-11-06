@@ -66,9 +66,12 @@ export const DedupScene: React.FC = () => {
   const sqlAt = n.word("latest-sort", "the pandas version of row number equals one");
   const tieAt = n.word("latest-tie", "If two rows can share a timestamp");
   const breakAt = n.word("latest-tie", "add a tiebreaker to the sort");
-  const arrivalAt = n.word("latest-tie", "doesn't depend on arrival order");
+  const arbitraryAt = n.word("latest-tie", "the row you keep is arbitrary");
   const end = n.beat("join-in").to;
   const out7 = latestAt - 4;
+  // The dict answer stays until question 8's text writes in, and pandas'
+  // frame takes its place then, so the page is never empty between them.
+  const outDict = q8TextAt - 4;
 
   // ── 7. The page's records, walked once ──
   const R = DEDUP.records;
@@ -84,7 +87,10 @@ export const DedupScene: React.FC = () => {
   });
   const dupRow = R.rows.findIndex((r, i) => R.rows.slice(0, i).some((q) => q[uid] === r[uid]));
 
-  // ── The page's frame, for the dict and for pandas ──
+  // ── The latest: plain records for the dict, the page's frame for pandas ──
+  const RR = DEDUP.rows;
+  const rrg = geoOf(RR, X0, y(TOP), h, { rowH: 54 });
+  const rts = RR.cols.indexOf("ts");
   const D = DEDUP.frame;
   const dg = geoOf(D, X0, y(TOP), h, { rowH: 54 });
   const DL = DEDUP.dict.lines;
@@ -162,22 +168,37 @@ export const DedupScene: React.FC = () => {
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>the first of each, in order</span>
         </Note>
 
-        {/* ── The latest instead: the page's rows, and a dict ── */}
-        <TableName g={dg} at={latestAt}>
+        {/* ── The latest instead: plain records, and a dict ── */}
+        <TableName g={rrg} at={latestAt} out={outDict}>
+          <Mono>rows</Mono>
+        </TableName>
+        <DataTable
+          g={rrg}
+          cols={colsOf(RR, { id: { ink: BLUE_INK } })}
+          at={latestAt}
+          out={outDict}
+          rows={RR.rows.map((cells, i) => ({ cells, at: latestAt + 4 + i * 2 }))}
+          marks={[
+            { row: older, col: rts, at: replaceAt },
+            { row: newer, col: rts, at: replaceAt + 6, color: MARK_OK },
+          ]}
+        />
+
+        {/* ── 8. The page's frame, for pandas ── */}
+        <TableName g={dg} at={q8TextAt}>
           <Mono>df</Mono>
         </TableName>
         <DataTable
           g={dg}
           cols={colsOf(D, { id: { ink: BLUE_INK } })}
-          at={latestAt}
+          at={q8TextAt}
           rows={D.rows.map((cells, i) => ({
             cells,
-            at: latestAt + 4 + i * 2,
+            at: q8TextAt + 4 + i * 2,
             dimAt: i === older ? keepsAt + 4 : undefined,
           }))}
           marks={[
-            { row: older, col: ts, at: replaceAt, out: sortAt },
-            { row: newer, col: ts, at: replaceAt + 6, color: MARK_OK },
+            { row: newer, col: ts, at: lastAt, color: MARK_OK },
             { row: newer, col: D.cols.indexOf("value"), at: keepsAt, color: MARK_OK },
           ]}
         />
@@ -188,7 +209,7 @@ export const DedupScene: React.FC = () => {
           width={870}
           size={SIZE}
           at={mapAt - 4}
-          out={q8At - 4}
+          out={outDict}
           marks={[
             { line: lineOf(DL, "latest = {}"), at: mapAt + 4, out: replaceAt },
             { line: lineOf(DL, '> latest[r["id"]]["ts"]'), at: replaceAt, color: MARK_OK },
@@ -200,7 +221,7 @@ export const DedupScene: React.FC = () => {
           top={y(TOP) + listingHeight(DL.length, SIZE) + h(16)}
           width={360}
           at={replaceAt + 10}
-          out={q8At - 4}
+          out={outDict}
         />
 
         {/* ── 8. pandas ── */}
@@ -237,7 +258,7 @@ export const DedupScene: React.FC = () => {
         <Note at={breakAt} x={MID_X} y={y(TOP) + llH + h(134)}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             <Mark at={breakAt + 6} color={MARK_OK}>add a tiebreaker column to the sort</Mark>
-            <span style={{ color: INK_SOFT, opacity: ease(frame, arrivalAt, 10) }}>, or the row kept depends on arrival order</span>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, arbitraryAt - 4, 10) }}>, or the row kept is arbitrary</span>
           </span>
         </Note>
       </Drift>

@@ -10,17 +10,20 @@ import { Sfx } from "../../sound/Sfx";
 import { count, GATE } from "./data";
 import { Cross, Drift, Edge, MARK_BAD, OK_INK, TaskBox, X0 } from "./parts";
 
-const NODE_W = 210;
+const NODE_W = 226;
 const STEP = 296;
-const NODES = ["extract", "transform", "load", "quality gate", "publish", "dashboard"];
+const NODES = ["extract", "transform", "load to staging", "quality gate", "publish", "dashboard"];
+const LOAD_I = 2;
 const GATE_I = 3;
+const PUBLISH_I = 4;
 
 /**
  * Question 7. The checks the page lists, named as they are read; then where
- * they go: a gate task between load and publish, run here on the video's own
- * batch of 1,000 orders in DuckDB (check.mjs). Four percent of its customer
- * IDs are null against a limit of one percent, so the gate fails and publish
- * never runs.
+ * they go: a gate task between load and publish. Load writes to a staging
+ * table no consumer reads, and publish swaps it in only on a pass: write,
+ * audit, publish. Run here on the video's own batch of 1,000 orders in DuckDB
+ * (check.mjs): four percent of its customer IDs are null against a limit of
+ * one percent, so the gate fails and publish never runs.
  */
 export const GateScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -43,12 +46,16 @@ export const GateScene: React.FC = () => {
   const toolsAt = n.word("quality", "dbt tests");
   const gateAt = n.word("gate", "Put them in a gate task");
   const betweenAt = n.word("gate", "between load and publish");
-  const batchAt = n.word("gate", "In this batch of a thousand orders");
-  const fourAt = n.word("gate", "four percent have no customer ID");
-  const limitAt = n.word("gate", "against a limit of one percent");
-  const failsAt = n.word("gate", "The gate fails");
-  const neverAt = n.word("gate", "publish never runs");
-  const end = n.beat("gate").to;
+  const stagingAt = n.word("gate-wap", "Load writes to a staging table");
+  const swapAt = n.word("gate-wap", "publish swaps it in");
+  const passesAt = n.word("gate-wap", "only if the gate passes");
+  const wapAt = n.word("gate-wap", "write, audit, publish");
+  const batchAt = n.word("gate-run", "In this batch of a thousand orders");
+  const fourAt = n.word("gate-run", "four percent have no customer ID");
+  const limitAt = n.word("gate-run", "against a limit of one percent");
+  const failsAt = n.word("gate-run", "The gate fails");
+  const neverAt = n.word("gate-run", "publish never runs");
+  const end = n.beat("gate-run").to;
 
   const cx = (i: number) => 220 + i * STEP;
   const dagY = y(494);
@@ -123,14 +130,28 @@ export const GateScene: React.FC = () => {
             at={gateAt + i * 2}
             size={24}
             tones={
-              i < GATE_I
-                ? [{ at: passAt(i), tone: "ok" }]
-                : i === GATE_I
-                  ? [
-                      { at: betweenAt, tone: "lit" },
-                      { at: failsAt, tone: "bad" },
-                    ]
-                  : [{ at: neverAt, tone: "quiet" }]
+              i === LOAD_I
+                ? [
+                    { at: passAt(i), tone: "ok" },
+                    { at: stagingAt, tone: "lit" },
+                    { at: swapAt, tone: "ok" },
+                  ]
+                : i < GATE_I
+                  ? [{ at: passAt(i), tone: "ok" }]
+                  : i === GATE_I
+                    ? [
+                        { at: betweenAt, tone: "lit" },
+                        { at: stagingAt, tone: "plain" },
+                        { at: passesAt, tone: "lit" },
+                        { at: failsAt, tone: "bad" },
+                      ]
+                    : i === PUBLISH_I
+                      ? [
+                          { at: swapAt, tone: "lit" },
+                          { at: passesAt, tone: "plain" },
+                          { at: neverAt, tone: "quiet" },
+                        ]
+                      : [{ at: neverAt, tone: "quiet" }]
             }
           >
             {name}
@@ -151,6 +172,15 @@ export const GateScene: React.FC = () => {
         ))}
         <Note at={betweenAt + 4} x={cx(GATE_I) - NODE_W / 2 - 40} y={dagY - nodeH / 2 - h(44)}>
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>the checks run here</span>
+        </Note>
+        <Note at={stagingAt} x={X0} y={dagY + nodeH / 2 + h(40)}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            load writes where no one reads<span style={{ opacity: ease(frame, swapAt, 10) }}>; publish swaps it in</span>
+            <span style={{ opacity: ease(frame, passesAt, 10) }}> on a pass</span>
+          </span>
+        </Note>
+        <Note at={wapAt} x={X0} y={dagY + nodeH / 2 + h(80)}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>write, audit, publish</span>
         </Note>
         <Note at={neverAt + 2} x={cx(4) - NODE_W / 2} y={dagY + nodeH / 2 + h(16)}>
           <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>never runs</span>

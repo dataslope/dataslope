@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { INDEX, thousands } from "./data";
-import { Bar, Drift, Listing, listingHeight, MARK_RED, PageStrip, PlanBox, X0 } from "./parts";
+import { Bar, Drift, Listing, listingHeight, PageStrip, PlanBox, SmallMono, X0 } from "./parts";
 
 const TOP = 330;
 const SIZE = 21;
@@ -94,7 +94,9 @@ export const IndexScene: React.FC = () => {
   const tY = y(TREE_TOP);
   const leafX = R_X + 140;
   const leafY = tY + 200;
-  const hotX = leafX - 62 / 2 + 62 * 0.5; // the second of four slots
+  // The centre of the leaf's second slot (42): four slots of 62 centred on
+  // leafX, so slot 1's centre sits half a slot left of it.
+  const hotX = leafX - 62 / 2;
   const px = (page: number) => R_X + ((page + 0.5) / INDEX.pages) * R_W;
   const stripY = y(STRIP_Y);
   const fanP = ease(frame, twentyAt, 18) * (1 - ease(frame, lowAt, 10));
@@ -137,10 +139,12 @@ export const IndexScene: React.FC = () => {
           <text x={R_X} y={tY - 14} style={svgText({ ...label(21, INK_SOFT) })} opacity={ease(frame, treeAt, 12)}>
             B-tree on customer_id (drawn)
           </text>
+          {/* Each edge starts inside its parent (the node, drawn after, covers
+              the start) and ends on its child's top edge. */}
           {[
             [rootX, tY + 20, leafX + 60, leafY - 70],
             [rootX, tY + 20, R_X + R_W - 160, leafY - 70],
-            [leafX + 60, leafY - 26, leafX, leafY],
+            [leafX + 60, leafY - 70, leafX + 20, leafY],
           ].map(([x1, y1, x2, y2], i) => (
             <line key={i} x1={x1} y1={y1 + 24} x2={x2} y2={y2} stroke={INK_SOFT} strokeWidth={1.5} opacity={ease(frame, treeAt + 4 + i * 3, 10)} />
           ))}
@@ -160,7 +164,7 @@ export const IndexScene: React.FC = () => {
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
             {INDEX.pages42.map((page, i) => {
               const tx = px(page);
-              const sx = hotX + 31;
+              const sx = hotX;
               const sy = leafY + 44;
               const p = Math.min(1, Math.max(0, fanP * 1.6 - i * 0.03));
               return <line key={page} x1={sx} y1={sy} x2={sx + (tx - sx) * p} y2={sy + (stripY - 10 - sy) * p} stroke={inkOf.yellow} strokeWidth={1.6} opacity={0.9} />;
@@ -194,7 +198,7 @@ export const IndexScene: React.FC = () => {
         {/* ── An unselective filter: the index on status goes unused ── */}
         <Note at={nineAt} x={X0} y={y(TOP) - h(46)}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            An index on <QMono>status</QMono> exists; <Num>{thousands(INDEX.shipped)}</Num> rows are shipped
+            An index on <SmallMono>status</SmallMono> exists; <Num>{thousands(INDEX.shipped)}</Num> rows are shipped
           </span>
         </Note>
         <Listing lines={INDEX.shippedQuery} x={X0} top={y(TOP)} width={640} size={SIZE} at={lowAt} marks={[{ line: "WHERE", at: nineAt + 6 }]} />
@@ -205,7 +209,7 @@ export const IndexScene: React.FC = () => {
           width={940}
           size={PLAN}
           at={statusAt}
-          marks={[{ line: "Seq Scan", text: "Seq Scan", at: scansAt, color: MARK_RED }]}
+          marks={[{ line: "Seq Scan", text: "Seq Scan", at: scansAt }]}
         />
         <Note at={scansAt + 6} x={R_X} y={y(TREE_TOP) + h(20)}>
           <div style={{ ...note(26, INK), width: 560 }}>
@@ -218,10 +222,13 @@ export const IndexScene: React.FC = () => {
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
             Inserting <Num>10,000</Num> rows: write-ahead log records
           </span>
+          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8) }}>
+            every change is written to this log first, so its records count the writes
+          </div>
         </Note>
         <Bar
           x={X0}
-          y={barsTop + h(50)}
+          y={barsTop + h(84)}
           width={720}
           value={INDEX.walNone}
           max={INDEX.walThree}
@@ -233,7 +240,7 @@ export const IndexScene: React.FC = () => {
         />
         <Bar
           x={X0}
-          y={barsTop + h(140)}
+          y={barsTop + h(174)}
           width={720}
           value={INDEX.walThree}
           max={INDEX.walThree}

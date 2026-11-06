@@ -63,27 +63,42 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     exactly one version ("all twenty-four"); 15 current rows, one per
  *     customer. Type 4 split: 15 current rows, 24 history rows. Type 6: 101
  *     reports Boston with current_city Austin.
- *   - "type0", the video's own two loads: the second insert, ON CONFLICT DO
- *     NOTHING, inserts 0 rows and 2022-01-01 stands (the page: "a simple
- *     insert-once strategy suffices").
+ *   - "type0", the video's own two loads into a table keyed by customer_id:
+ *     the second insert, ON CONFLICT DO NOTHING, inserts 0 rows and
+ *     2022-01-01 stands (the page: "a simple insert-once strategy
+ *     suffices"). "type0-copy", the video's own Type 2 table ("type0mix"):
+ *     Austin's new version copies 2022-01-01 from Boston's row, and the
+ *     source's 2023-06-30 is ignored.
  *   - "late", the video's own three staged orders: order 203 for customer 77,
  *     who is not yet in the dimension; the inner-join load keeps 2 rows,
- *     700.00 of 1,110.00; with placeholder key 2002 it keeps all three; the
- *     UPDATE to Tulsa leaves the fact row as it was.
+ *     700.00 of 1,110.00; a placeholder for every staged customer the
+ *     dimension lacks (key 2002, from a sequence) lets it keep all three;
+ *     the UPDATE to Tulsa leaves the fact row as it was.
  *   - "snap", the video's own two orders: six events in the log; the latest
- *     row per order is 501 shipped and 502 cancelled; only the log answers
- *     "paid, then cancelled" (502).
+ *     row per order is 501 shipped and 502 cancelled; the periodic (daily)
+ *     snapshot has four rows and 502 is cancelled on both days; only the
+ *     log answers "paid, then cancelled" (502, by comparing timestamps).
  *   - "bridge"/"mtm", the video's own three orders (100, 60 and 40, 200 in
  *     all) and three promotions, with the page's bridge and weight: summed
  *     through the bridge they report 340; weighted, 110, 70 and 20, which is
  *     200.
  *   - quick round, the video's own small tables: invoice lines grouped by
- *     order number; 3 x 2 x 2 = 12 junk rows; order 301 ordered on a Friday
- *     and shipped on a Monday from one date table; 5 x 4 = 20 mini-dimension
- *     rows; three attendance rows. The UUID item, in Postgres: an integer
- *     is 4 bytes, a bigint 8, a UUID 16; primary-key indexes over 100,000
- *     rows are 2.26 MB for a sequence, 4.42 MB for random UUIDs ("almost
- *     twice": 1.96) and 3.18 MB for Postgres 18's time-ordered uuidv7.
+ *     invoice number; 3 x 2 x 2 = 12 junk rows; order 301 ordered on a
+ *     Friday and shipped on a Monday from one date table; 5 x 4 = 20
+ *     mini-dimension rows; three attendance rows, and enrollment minus
+ *     attendance is Ben's Statistics class. The UUID item, in Postgres: an
+ *     integer is 4 bytes, a bigint 8, a UUID 16; primary-key indexes over
+ *     100,000 rows are 2.26 MB for a sequence, 4.42 MB for random UUIDs
+ *     ("almost twice": 1.96) and 3.18 MB for Postgres 18's time-ordered
+ *     uuidv7. The two steps: 1.41x for the wider key (sequence to v7, both
+ *     in order), 1.39x for random order (v7 to random, same width); the
+ *     random keys indexed in one sorted build come out at v7's 3.18 MB, so
+ *     v7 "pays only for the width". The example UUID is one value
+ *     gen_random_uuid() returned, version 4.
+ *
+ * Kimball's own Type 4 is the mini-dimension ("add mini-dimension" in The
+ * Data Warehouse Toolkit); the history-table reading is the common one and
+ * the page gives both. "type4-kimball" points from one to the other.
  *
  * Written for Drew's ear: SCD and UUID are expanded once, where first said;
  * every other initialism is in plain caps; numbers as they are said ("one oh
@@ -146,11 +161,21 @@ export const script: NarrationScript = {
     {
       id: "type2-insert",
       text: "Then insert the new version, with a new surrogate key, valid from the day of the move to a far future date, flagged current.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type2-tx",
+      text: "Run both in one transaction, only for customers whose tracked columns changed.",
       pauseAfter: 0.6,
     },
     {
       id: "type2-join",
-      text: "A fact finds its version by date: the order date falls between valid from and valid to. All twenty-four of the page's orders match exactly one version, because the ranges never overlap and never leave a gap.",
+      text: "A fact finds its version by date: the order date falls between valid from and valid to.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type2-all",
+      text: "All twenty-four orders match exactly one version, because the ranges never overlap and never leave a gap.",
       pauseAfter: 0.6,
     },
     {
@@ -174,6 +199,11 @@ export const script: NarrationScript = {
     {
       id: "type0-mix",
       text: "Types are chosen per column, so one customer row can hold a Type zero sign-up date beside a Type two city.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type0-copy",
+      text: "Each new version then copies the sign-up date from the row it closes, not from the source.",
       pauseAfter: 0.8,
     },
 
@@ -182,11 +212,21 @@ export const script: NarrationScript = {
       id: "type46",
       scene: true,
       text: "Question four. What are slowly changing dimension types four and six? Type four splits the table. The main dimension keeps only current values, fifteen rows, one per customer, and the history moves to a table of its own: twenty-four rows. Use it when history is large and rarely read.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type4-kimball",
+      text: "Kimball's own Type four is a mini-dimension instead: question thirteen.",
       pauseAfter: 0.6,
     },
     {
       id: "type6",
       text: "Type six is one, plus two, plus three. It versions rows like Type two, and every row also carries the current value, so order one oh one reports Boston as it was, and Austin as it is now, without a second join.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "type6-parts",
+      text: "The current-value column is the Type three part, and overwriting it is the Type one part.",
       pauseAfter: 0.5,
     },
     {
@@ -220,6 +260,11 @@ export const script: NarrationScript = {
     {
       id: "late-shared",
       text: "One shared unknown row, key minus one, works too, but then every one of those facts has to be re-keyed later.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "late-rekey",
+      text: "Re-keying needs each fact to keep the customer's own ID.",
       pauseAfter: 0.8,
     },
 
@@ -232,7 +277,17 @@ export const script: NarrationScript = {
     },
     {
       id: "snap-one",
-      text: "A snapshot keeps one row per order, its state now. That's easy to query, but order five oh two just says cancelled. Nothing says it was paid first.",
+      text: "A snapshot keeps one row per order, its state now.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "snap-periodic",
+      text: "Or one row per order per day: a periodic snapshot.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "snap-easy",
+      text: "That's easy to query, but order five oh two just says cancelled. Nothing says it was paid first.",
       pauseAfter: 0.6,
     },
     {
@@ -293,7 +348,17 @@ export const script: NarrationScript = {
     },
     {
       id: "vault-when",
-      text: "Choose it for many changing sources and strict audit. Choose a star when the domain is stable and analysts query it directly. Often it's both: the vault stores the history, and stars built on top of it serve the reports.",
+      text: "Choose it for many changing sources and strict audit.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "vault-cost",
+      text: "The price: every question needs a stack of joins.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "vault-star",
+      text: "Choose a star when the domain is stable and analysts query it directly. Often it's both: the vault stores the history, and stars built on top of it serve the reports.",
       pauseAfter: 0.8,
     },
 
@@ -307,7 +372,7 @@ export const script: NarrationScript = {
     {
       id: "r-degen",
       text: "A degenerate dimension is a dimension with no table behind it, like an invoice number kept on the fact. You still group by it.",
-      pauseAfter: 0.9,
+      pauseAfter: 1.4,
     },
     {
       id: "r-junk",
@@ -322,11 +387,21 @@ export const script: NarrationScript = {
     {
       id: "r-mini",
       text: "A mini-dimension moves fast-changing attributes, like age band and income tier, out of a big customer dimension into a small one, twenty rows here, with its own key on the fact. The big one stops growing a new version every time a band changes.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-mini-t4",
+      text: "This is Kimball's Type four.",
       pauseAfter: 0.8,
     },
     {
       id: "r-factless",
       text: "A factless fact table has no measures at all: one row per event, like a student attending a class. Counting the rows is the measure.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-factless-gap",
+      text: "A coverage table of every student enrolled, minus this one, tells you who didn't come.",
       pauseAfter: 1.0,
     },
     {
@@ -336,7 +411,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-uuid-cost",
-      text: "The cost shows in the index. In Postgres, a hundred thousand random UUIDs built a primary key index almost twice the size of the sequence's. Time-ordered version seven UUIDs land in between.",
+      text: "The cost shows in the index. In Postgres, a hundred thousand random UUIDs built a primary key index almost twice the size of the sequence's.",
+      pauseAfter: 0.5,
+    },
+    {
+      id: "r-uuid-why",
+      text: "Part of that is width, sixteen bytes against eight. The rest is order: random keys split pages all over the index. Version seven UUIDs start with a timestamp, so they arrive in order and pay only for the width.",
       pauseAfter: 1.2,
     },
     {

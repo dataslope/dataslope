@@ -23,7 +23,8 @@ const day = (iso: string) => Date.parse(`${iso}T00:00:00Z`);
 const tx = (iso: string) => TL_X0 + ((day(iso) - T0) / (T1 - T0)) * (TL_X1 - TL_X0);
 
 /**
- * The opening, on the page's own customer 42: her Boston years drawn as a
+ * The opening, on the page's own customer 42 (named on screen as just
+ * "customer 42": the viewer has not seen the page): her Boston years drawn as a
  * band on a timeline, order 101 placed inside them, then the move to Austin
  * ten months later, and the question of which city the order belongs to
  * now. The chameleon, a slowly changing animal, stands beside it. Then the
@@ -83,7 +84,7 @@ export const HookScene: React.FC = () => {
           {/* Whose line this is. */}
           <Note at={bostonAt - 6} x={TL_X0} y={bandTop - h(40)}>
             <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
-              customer <Num>42</Num>, as the page&rsquo;s table has her
+              customer <Num>42</Num>
             </span>
           </Note>
 

@@ -72,12 +72,19 @@ export const TAIL = results.tail as {
   max: number;
 };
 
-/** charts/memory-latency-ladder.mjs: its seven levels and its "if L1 took one second" column. */
+/**
+ * charts/memory-latency-ladder.mjs: its levels and its "if L1 took one second"
+ * column, with the data-center round trip of the table it cites (500,000 ns)
+ * in place of its 10 ms "network round trip", which is that table's disk seek.
+ */
 export const LADDER = results.ladder as {
   levels: { name: string; ns: number; scaled: string }[];
   ssdOverMemory: number;
   networkOverMemory: number;
+  networkDays: number;
 };
+/** The ladder's network row, as check.mjs names it. */
+export const NET_LEVEL = "Data-center round trip";
 
 /** Sixteen gigabytes on sixteen cores, in 4, 64 and 100,000 partitions. */
 export const PARTS = results.partitions as {
@@ -99,6 +106,9 @@ export const BROADCAST = results.broadcast as {
   broadcastMB: number;
   shuffleMB: number;
   ratio: number;
+  /** Spark's default spark.sql.autoBroadcastJoinThreshold, in MB. */
+  autoThresholdMB: number;
+  dimOverThreshold: boolean;
 };
 
 /** The frame's rows, in index order. */

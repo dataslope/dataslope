@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { Box, Chip, DATA, DATA_TINT, Drift, head, LineArrow, Mark, MARK_OK, OK_INK, PathArrow, say, X0 } from "./parts";
+import { Box, Chip, DATA, DATA_TINT, Drift, head, LineArrow, Mark, MARK_OK, OK_INK, PathArrow, QUIET, say, X0 } from "./parts";
 
 const COL_W = 232;
 const STEP = 294;
@@ -25,7 +25,9 @@ const ONLINE = ["User query", "Embed query", "Search with metadata filter", "Rer
  * Question 2. The page's diagram built as it is read: the offline row
  * (sources to the vector index) and the online row (a question embedded,
  * searched with a filter, reranked, put in the prompt), joined by the
- * index. Then the offline steps are walked through, each box lit as it is
+ * index. Both rows are sketched as empty outlines while RAG is defined
+ * (finding, then answering), so the page has its shape before the halves are
+ * named. Then the offline steps are walked through, each box lit as it is
  * named with its detail below: extract incrementally, parse and clean, the
  * metadata every chunk carries and what it makes possible, and the upsert
  * keyed by a stable chunk id, so a retry overwrites rather than duplicates.
@@ -77,6 +79,11 @@ export const RagScene: React.FC = () => {
   const end = n.beat("rag-upsert").to;
 
   const offAts = OFFLINE.map((_, i) => offAt + 4 + i * 5);
+  // The two rows, sketched as outlines while RAG is defined, then inked.
+  const ghostRows = [
+    { n: OFFLINE.length, top: OFF_Y, at: findAt, inks: offAts },
+    { n: ONLINE.length, top: ON_Y, at: answerAt, inks: onSteps.map((t) => t - 2) },
+  ];
   const lits = [extractAt, parseAt, chunkAt, metaAt, embedAt, embedAt + 6];
   const litOuts = [parseAt, chunkAt, metaAt, embedAt, undefined, undefined];
   const colX = (i: number) => X0 + i * STEP;
@@ -107,6 +114,30 @@ export const RagScene: React.FC = () => {
             <span style={{ opacity: ease(frame, answerAt - 2, 10) }}>, then answer from them</span>
           </span>
         </Note>
+
+        {/* The pipeline's shape, before its halves are named. */}
+        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+          {ghostRows.map((r) =>
+            Array.from({ length: r.n }, (_, i) => {
+              const o = ease(frame, r.at + i * 2, 12) * (1 - ease(frame, r.inks[i] + 8, 8));
+              return o > 0 ? (
+                <rect
+                  key={`${r.top}-${i}`}
+                  x={colX(i) + 1}
+                  y={y(r.top) + 1}
+                  width={COL_W - 2}
+                  height={BOX_H - 2}
+                  rx={12}
+                  fill="none"
+                  stroke={QUIET}
+                  strokeWidth={2}
+                  strokeDasharray="7 7"
+                  opacity={o}
+                />
+              ) : null;
+            }),
+          )}
+        </svg>
 
         {/* The two halves. */}
         <Note at={offAt} x={X0} y={y(OFF_Y) - 40}>
@@ -146,6 +177,9 @@ export const RagScene: React.FC = () => {
         {ONLINE.slice(1).map((t, i) => (
           <LineArrow key={t} from={[colX(i) + COL_W + 8, onMid]} to={[colX(i + 1) - 8, onMid]} at={onSteps[i + 1] - 4} dur={8} dim={workAt} />
         ))}
+        <Note at={onSteps[3] + 2} x={colX(3)} y={y(ON_Y) + BOX_H + 14} dim={workAt}>
+          <span style={say(21, INK_SOFT)}>a slower, more precise model rescores the top hits</span>
+        </Note>
         {/* The index serves the search. */}
         <div style={{ opacity: 1 - ease(frame, workAt, 12) * 0.6 }}>
           <PathArrow

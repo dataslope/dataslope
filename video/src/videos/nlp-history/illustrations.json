@@ -9,11 +9,16 @@
     },
     "sizes": {
       "video-hero": "1536x1024",
-      "video-icon": "1024x1024"
+      "video-icon": "1024x1024",
+      "video-portrait": "1024x1024"
     },
     "styles": {
       "watercolor illustration": {
         "constraints": "Paint it in loose, transparent watercolor: soft washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, gentle blooms inside each shape, and the tooth of cold-press paper visible only inside the paint. Build the scene from a few large, simple shapes rather than many small pieces, and let the washes define the forms instead of hard outlines. Lay every wash in the brand colors below and let two overlapping washes mix into a third; never outline in black, never shade with grey or black, and never paint the whole subject in one hue. An animal keeps its own natural coloring, painted in warm earthy washes with soft fur texture. Draw any person as an anonymous stylized figure with no facial features and no resemblance to a real individual. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no floor, no ground shadow, no frame or border, no soft glow and no vignette, so the whole subject lifts off the page in one piece.",
+        "softAlphaWarn": 0.3
+      },
+      "watercolor portrait": {
+        "constraints": "Paint it as a refined, loose watercolor portrait in the manner of an editorial magazine illustration: head and shoulders in three-quarter view, the face drawn carefully enough that the likeness reads, everything else left loose. Use soft transparent washes that feather and bleed at their edges, darker pigment pooling where a wash has dried, and the tooth of cold-press paper visible only inside the paint. Paint the skin and hair in their natural colors with warm washes, and the clothes in the brand colors below: a jacket in blue washes, a shirt or collar in a pale warm wash. Never outline in black and never shade with grey. Leave the background fully empty and transparent behind, around and beneath the subject: no backdrop, no paper texture outside the paint, no frame or border, no soft glow and no vignette, so the bust lifts off the page in one piece.",
         "softAlphaWarn": 0.3
       }
     }
@@ -42,6 +47,18 @@
       "category": "video-icon",
       "style": "watercolor illustration",
       "subject": "a thick old hardcover book with a blue cloth cover lying open flat, its plain cream pages fanned slightly upward, a yellow pencil resting diagonally across the open pages and a small square stack of three blank white index cards beside it"
+    },
+    {
+      "id": "nlp-history-turing",
+      "category": "video-portrait",
+      "style": "watercolor portrait",
+      "subject": "Alan Turing (1912 to 1954), the British mathematician and computing pioneer, as he looked around 1950"
+    },
+    {
+      "id": "nlp-history-shannon",
+      "category": "video-portrait",
+      "style": "watercolor portrait",
+      "subject": "Claude Shannon (1916 to 2001), the American mathematician and engineer at Bell Labs who founded information theory, around 1950: dark hair slicked straight back from a high forehead, a lean angular face with a long straight nose, clean-shaven, no glasses, a calm, faintly amused look"
     }
   ]
 }

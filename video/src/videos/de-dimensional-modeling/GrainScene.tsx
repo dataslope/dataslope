@@ -10,7 +10,10 @@ import { Sfx } from "../../sound/Sfx";
 import { LINE_TOTALS, LINES, money, ORDER_GRAIN } from "./data";
 import { colsOf, DataTable, Drift, geoOf, KeyArrow, Mark, MARK_BAD, MARK_OK, Mono, OK, OK_INK, TableName, X0 } from "./parts";
 
-const TABLE_Y = 430;
+const TABLE_Y = 468;
+/** The grain's definition, then the grain declared under it. */
+const DEF_Y = 252;
+const GRAIN_Y = 300;
 const ORDERS_X = 1290;
 
 /** A red cross, drawn on `at`, for a column that fails the grain. */
@@ -28,7 +31,8 @@ const Cross: React.FC<{ at: number; size?: number }> = ({ at, size = 24 }) => {
  * Question 3. The grain declared first (one row per order line), every
  * column tested against it: quantity and amount pass, the order's shipping
  * fee fails, and on order 1001's three lines it sums to 15.00 for a 5.00
- * fee. It moves to a fact at order grain.
+ * fee. It moves to a fact at order grain, or is split across the lines so
+ * the shares add back to the fee.
  */
 export const GrainScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -38,7 +42,7 @@ export const GrainScene: React.FC = () => {
   const from = n.beat("grain").from;
   const qAt = n.word("grain", "Question three");
   const textAt = n.word("grain", "What is the grain of a table");
-  const meansAt = n.word("grain", "what one row means");
+  const meansAt = n.word("grain", "The grain is what one row means");
   const declareAt = n.word("grain", "Declare it before any column");
   const lineAt = n.word("grain", "one row per order line");
   const everyAt = n.word("grain-test", "every column has to make sense");
@@ -50,8 +54,10 @@ export const GrainScene: React.FC = () => {
   const fifteenAt = n.word("grain-test", "a sum says fifteen");
   const orderGrainAt = n.word("grain-fix", "a fact at order grain");
   const perOrderAt = n.word("grain-fix", "one row per order");
-  const catchesAt = n.word("grain-fix", "what catches that");
-  const end = n.beat("grain-fix").to;
+  const byProductAt = n.word("grain-split", "to report it by product");
+  const sharesAt = n.word("grain-split", "the shares add back to five");
+  const catchesAt = n.word("grain-first", "what catches that");
+  const end = n.beat("grain-first").to;
 
   const cols = colsOf(LINES);
   const g = geoOf(LINES, X0, y(TABLE_Y), h, { headH: 56, rowH: 68, bodySize: 31, headSize: 24 });
@@ -91,11 +97,16 @@ export const GrainScene: React.FC = () => {
           What is the grain of a table, and why define it first?
         </QuestionCard>
 
-        {/* The grain, declared before any column. */}
-        <Note at={meansAt} x={X0} y={y(270)}>
+        {/* What a grain is, said first, then this table's, declared before any column. */}
+        <Note at={meansAt} x={X0} y={y(DEF_Y)}>
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            <b>The grain</b> is what one row means.
+          </span>
+        </Note>
+        <Note at={declareAt} x={X0} y={y(GRAIN_Y)}>
           <span style={{ ...body(40), color: INK, whiteSpace: "nowrap" }}>
             Grain: <Mark at={lineAt}>one row per order line</Mark>
-            <span style={{ ...label(22, INK_SOFT), marginLeft: 22, opacity: ease(frame, declareAt, 10) }}>declared first</span>
+            <span style={{ ...label(22, INK_SOFT), marginLeft: 22 }}>declared first</span>
           </span>
         </Note>
 
@@ -141,7 +152,7 @@ export const GrainScene: React.FC = () => {
         </Note>
 
         {/* Where it belongs: a fact at order grain. */}
-        <Note at={orderGrainAt - 2} x={ORDERS_X} y={y(270) + 6}>
+        <Note at={orderGrainAt - 2} x={ORDERS_X} y={y(GRAIN_Y) + 6}>
           <span style={{ ...label(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             grain: <span style={{ opacity: ease(frame, perOrderAt, 10) }}>one row per order</span>
           </span>
@@ -158,7 +169,17 @@ export const GrainScene: React.FC = () => {
         />
         {/* The fee moves to the order's grain, where it is counted once. */}
         <KeyArrow from={[g.right + 14, g.rowMid(0)]} to={[og.x - 14, og.rowMid(0)]} at={orderGrainAt + 4} color={OK} />
-        <Note at={catchesAt} x={ORDERS_X} y={og.rowTop(1) + h(40)}>
+        {/* Or, to report it by product: split across the lines, adding back to the fee. */}
+        <Note at={byProductAt} x={ORDERS_X} y={og.rowTop(1) + h(30)}>
+          <span style={{ ...note(23, INK), lineHeight: 1.45, whiteSpace: "nowrap" }}>
+            Or, by product: split it across the lines,
+            <br />
+            <span style={{ opacity: ease(frame, sharesAt, 10) }}>
+              shares that add back to <b>{money(paid)}</b>
+            </span>
+          </span>
+        </Note>
+        <Note at={catchesAt} x={ORDERS_X} y={og.rowTop(1) + h(118)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Declared first,
             <br />

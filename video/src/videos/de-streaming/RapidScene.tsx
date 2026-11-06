@@ -27,7 +27,9 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
   const snapAt = c.w("r-compact", "a snapshot of current state");
   const profileAt = c.w("r-compact", "each user's latest profile");
   const rebuildAt = c.w("r-compact", "to rebuild state from");
-  const retentionAt = c.w("r-compact", "alongside time-based retention");
+  const noLimitAt = c.w("r-compact-age", "no age limit");
+  const addOneAt = c.w("r-compact-age", "a topic can add one");
+  const snapshotAt = c.w("r-compact-age", "a state snapshot usually doesn't");
   const STEP = 124;
   const W = 110;
   const logY = c.y(400);
@@ -86,8 +88,12 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
       <Box x={cx(4)} y={c.y(712)} w={2 * STEP + W} h={c.h(58)} at={rebuildAt + 6} size={21}>
         a state store, rebuilt from it
       </Box>
-      <Note at={retentionAt} x={R_X} y={c.y(820)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>alongside time-based retention, not instead of it</span>
+      <Note at={noLimitAt} x={R_X} y={c.y(820)}>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+          compact: no age limit
+          <span style={{ opacity: ease(frame, addOneAt, 10) }}> · compact + delete: both</span>
+          <span style={{ opacity: ease(frame, snapshotAt, 10) }}> · a state snapshot: compact only</span>
+        </span>
       </Note>
     </>
   );
@@ -129,6 +135,12 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           stream join: can't wait<span style={{ opacity: ease(frame, neverAt, 10) }}>; neither side ever ends</span>
         </span>
+      </Note>
+      <Note at={s2sAt} x={R_X} y={cy - c.h(30) - c.h(34)}>
+        <span style={{ ...label(21, INK), fontWeight: 750, whiteSpace: "nowrap" }}>stream to stream</span>
+      </Note>
+      <Note at={tableAt} x={R_X} y={c.y(690) - c.h(36)}>
+        <span style={{ ...label(21, INK), fontWeight: 750, whiteSpace: "nowrap" }}>stream to table</span>
       </Note>
       {[
         { name: "clicks", y: cy, ts: CLICKS },
@@ -234,7 +246,8 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
   const mid = lane.y + lane.h / 2;
   // The poison message sits at the front until it is caught, then drops into
   // the dead-letter queue; the rest stand still behind it, then flow.
-  const caught = ease(frame, startAt + 8, 16);
+  const intoConsumer = ease(frame, startAt + 6, 12);
+  const caught = ease(frame, startAt + 18, 14);
   const flowing = Math.max(0, frame - (startAt + 20));
   const STEP = 70;
   const cells = Array.from({ length: 8 }, (_, k) => {
@@ -259,7 +272,7 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
         />
       ))}
       <Cell
-        x={poisonX + (dlq.x + 40 - poisonX) * caught}
+        x={poisonX + (cons.x + (cons.w - 58) / 2 - poisonX) * intoConsumer + (dlq.x + 40 - (cons.x + (cons.w - 58) / 2)) * caught}
         y={lane.y + (lane.h - c.h(46)) / 2 + (dlq.y - lane.y) * caught}
         w={58}
         h={c.h(46)}
@@ -296,6 +309,16 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
       <Box x={sink.x} y={mid - c.h(36)} w={sink.w} h={c.h(72)} at={flowAt}>
         sink
       </Box>
+      <ElbowArrow
+        points={[
+          [cons.x + cons.w - 40, mid + c.h(36) + 6],
+          [cons.x + cons.w - 40, dlq.y - c.h(4) - 6],
+        ]}
+        at={startAt + 16}
+        color={ACCENT}
+        dur={8}
+        head={12}
+      />
       <Box x={dlq.x} y={dlq.y - c.h(4)} w={dlq.w} h={dlq.h + c.h(8)} at={startAt + 4} color={ACCENT} fill="transparent">
         {null}
       </Box>

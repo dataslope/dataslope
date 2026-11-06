@@ -19,8 +19,9 @@ const NOTE_X = 1300;
  * Question 8. Lambda on top: events split into a batch layer and a speed
  * layer, each carrying its own copy of the logic, merged by a serving layer.
  * Kappa underneath: one streaming job reading the event log, and history
- * reprocessed by replaying the log through the same code. Then when each
- * fits.
+ * reprocessed by replaying the log from its start through the same code, in
+ * a second copy of the job that writes a new table; readers switch to it once
+ * it catches up. Then when each fits, with "batch semantics" defined.
  */
 export const LambdaScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -43,11 +44,17 @@ export const LambdaScene: React.FC = () => {
   const replayAt = n.word("kappa", "replay the event log");
   const kafkaAt = n.word("kappa", "in Kafka say");
   const sameAt = n.word("kappa", "through the same code");
+  const copyAt = n.word("kappa-copy", "a second copy of the job");
+  const tableAt = n.word("kappa-copy", "writing a new table");
+  const switchAt = n.word("kappa-copy", "switch readers over");
+  const catchAt = n.word("kappa-copy", "once it catches up");
   const simplerAt = n.word("kappa-when", "Kappa is simpler");
   const semanticsAt = n.word("kappa-when", "handle batch semantics");
   const reachesAt = n.word("kappa-when", "the log reaches back far enough");
-  const fallbackAt = n.word("kappa-when", "Lambda is the fallback");
-  const end = n.beat("kappa-when").to;
+  const meansAt = n.word("kappa-batch", "Batch semantics means");
+  const windowsAt = n.word("kappa-batch", "event-time windows");
+  const fallbackAt = n.word("kappa-fallback", "Lambda is the fallback");
+  const end = n.beat("kappa-fallback").to;
 
   // Lambda.
   const bY = y(340);
@@ -56,12 +63,15 @@ export const LambdaScene: React.FC = () => {
   const eY = (bY + sY + LH) / 2 - 42;
   const serveY = (bY + sY + LH) / 2 - 46;
   const ev = { x: X0, w: 220 };
-  // Kappa.
-  const kY = y(730);
+  // Kappa: the live job on top, the reprocessing copy under it.
+  const kY = y(670);
   const KH = 92;
   const log = { x: X0, w: 260 };
   const job = { x: LAYER_X + 40, w: 330 };
-  const loopY = kY + KH + h(48);
+  const V2H = 76;
+  const v2Y = kY + KH + h(46);
+  const v2Mid = v2Y + V2H / 2;
+  const newTable = { x: SERVE_X, w: SERVE_W };
 
   return (
     <AbsoluteFill>
@@ -71,6 +81,9 @@ export const LambdaScene: React.FC = () => {
       <Sfx name="el-tap" at={twiceAt} level={-30} />
       <Sfx name="el-pop" at={kappaAt + 4} level={-31} />
       <Sfx name="el-whoosh" at={replayAt + 2} level={-32} />
+      <Sfx name="el-pop" at={copyAt} level={-32} />
+      <Sfx name="el-pop" at={tableAt} level={-32} />
+      <Sfx name="el-whoosh" at={switchAt + 2} level={-33} />
       <Sfx name="el-tap" at={simplerAt} level={-31} />
       <Sfx name="el-tap" at={fallbackAt} level={-31} />
 
@@ -113,15 +126,14 @@ export const LambdaScene: React.FC = () => {
         <Node x={log.x} y={kY} w={log.w} h={KH} at={kappaAt + 2} title="event log" sub={<span style={{ opacity: ease(frame, kafkaAt, 10) }}>in Kafka, say</span>} />
         <Flow points={[[log.x + log.w + 6, kY + KH / 2], [job.x - 8, kY + KH / 2]]} at={kappaAt + 6} color={BAR} />
         <Node x={job.x} y={kY} w={job.w} h={KH} at={kappaAt + 8} tone="plain" title="one streaming job" sub="one copy of the logic" lit={pulse(frame, sameAt + 4, 26)} />
-        <Flow points={[[job.x + job.w + 6, kY + KH / 2], [SERVE_X - 8, kY + KH / 2]]} at={kappaAt + 12} color={BAR} />
+        <Flow points={[[job.x + job.w + 6, kY + KH / 2], [SERVE_X - 8, kY + KH / 2]]} at={kappaAt + 12} color={BAR} dim={catchAt + 4} />
         <Node x={SERVE_X} y={kY} w={SERVE_W} h={KH} at={kappaAt + 14} tone="plain" title="serving" />
-        {/* Reprocessing: replay the log from its start through the same job. */}
+        {/* Reprocessing: replay the log from its start into a second copy of the job. */}
         <Flow
           points={[
             [log.x + 50, kY + KH + 6],
-            [log.x + 50, loopY],
-            [job.x + job.w / 2, loopY],
-            [job.x + job.w / 2, kY + KH + 8],
+            [log.x + 50, v2Mid],
+            [job.x - 8, v2Mid],
           ]}
           at={replayAt}
           dur={22}
@@ -130,9 +142,38 @@ export const LambdaScene: React.FC = () => {
           dash="9 7"
           tail
         />
-        <Note at={reprocessAt} x={log.x + 70} y={loopY + h(10)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            reprocess: replay from the start<span style={{ opacity: ease(frame, sameAt, 10) }}>, same code</span>
+        <Note at={reprocessAt} x={log.x + 70} y={v2Mid + h(10)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>replay from the start</span>
+        </Note>
+        <Node
+          x={job.x}
+          y={v2Y}
+          w={job.w}
+          h={V2H}
+          at={replayAt + 16}
+          tone="plain"
+          dashed
+          title="the same code"
+          size={24}
+          sub={<span style={{ opacity: ease(frame, copyAt, 10) }}>a second copy of the job</span>}
+        />
+        <Flow points={[[job.x + job.w + 6, v2Mid], [newTable.x - 8, v2Mid]]} at={tableAt - 4} color={BAR} />
+        <Node x={newTable.x} y={v2Y} w={newTable.w} h={V2H} at={tableAt} tone="data" dashed title="a new table" size={24} />
+        {/* Once it catches up, readers move to the new table. */}
+        <Flow
+          points={[
+            [newTable.x + newTable.w / 2, v2Y - 6],
+            [newTable.x + newTable.w / 2, kY + KH + 8],
+          ]}
+          at={switchAt}
+          dur={12}
+          color={OK}
+          width={3}
+          head={12}
+        />
+        <Note at={switchAt + 4} x={newTable.x} y={v2Y + V2H + h(8)}>
+          <span style={{ ...note(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            readers switch<span style={{ opacity: ease(frame, catchAt, 10) }}> once it catches up</span>
           </span>
         </Note>
 
@@ -142,7 +183,13 @@ export const LambdaScene: React.FC = () => {
           <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, semanticsAt, 10) }}>the engine handles batch semantics</div>
           <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, reachesAt, 10) }}>and the log reaches back far enough</div>
         </Note>
-        <Note at={fallbackAt} x={NOTE_X} y={kY + h(110)}>
+        <Note at={meansAt} x={NOTE_X} y={kY + h(84)}>
+          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            <b style={{ color: INK }}>batch semantics:</b> a batch job's answers,
+          </div>
+          <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, windowsAt, 10) }}>event-time windows, exactly-once results</div>
+        </Note>
+        <Note at={fallbackAt} x={NOTE_X} y={kY + h(152)}>
           <span style={{ ...note(24, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>Lambda: the fallback when it can't</span>
         </Note>
       </Drift>

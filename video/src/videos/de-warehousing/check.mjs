@@ -254,6 +254,8 @@ R.partition = {
   fn: await scanPlan(MONTH_QUERY("right(sale_month, 2) = '03'")),
   marchResult: await run(MONTH_QUERY("sale_month = '2024-03'")),
   regionResult: await run(MONTH_QUERY("region = 'North'")),
+  // A range on the raw key, the page's habit that prunes on every engine.
+  range: await scanPlan(MONTH_QUERY("sale_month BETWEEN '2024-03' AND '2024-05'")),
 };
 
 // ── 6. Clustering: row groups and their min/max, in date order and shuffled ─
@@ -349,7 +351,7 @@ for (const c of R.columns) console.log(`  ${c.name.padEnd(10)} csv ${mb(c.csv)} 
 console.log(`region sorted: ${R.sortedRegion.region} B`);
 console.log(`page query reads: csv ${mb(R.query.csv.read)} of ${mb(R.query.csv.total)}, parquet ${mb(R.query.parquet.read)} of ${mb(R.query.parquet.total)}`);
 console.log(`plans: ${JSON.stringify(R.query.csvPlan.projections)} ${JSON.stringify(R.query.parquetPlan.projections)}`);
-console.log(`partition: ${R.partition.files} files, march ${R.partition.march.scanning}/${R.partition.march.filesRead}, region ${R.partition.region.scanning}/${R.partition.region.filesRead}, fn ${R.partition.fn.scanning}`);
+console.log(`partition: ${R.partition.files} files, march ${R.partition.march.scanning}/${R.partition.march.filesRead}, region ${R.partition.region.scanning}/${R.partition.region.filesRead}, fn ${R.partition.fn.scanning}, range ${R.partition.range.scanning}`);
 console.log(`cluster: sorted ${R.cluster.sorted.overlapping}/${R.cluster.sorted.groups.length} read ${mb(R.cluster.sorted.read)}; shuffled ${R.cluster.shuffled.overlapping}/${R.cluster.shuffled.groups.length} read ${mb(R.cluster.shuffled.read)}`);
 console.log(`small: day ${R.small.day.files} files avg ${R.small.day.avg} B, footers ${R.small.day.footers}; one footer ${R.small.one.footers}`);
 console.log(`cost: csv ${mb(R.cost.csv.read)}, parquet ${mb(R.cost.parquet.read)}, march ${mb(R.cost.march.read)}`);

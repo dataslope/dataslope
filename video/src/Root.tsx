@@ -1,11 +1,14 @@
 import React from "react";
-import { Composition, Folder } from "remotion";
+import { Composition, Folder, Still } from "remotion";
 import "./theme/brand";
 import "./theme/fonts";
 import { narratedMetadata } from "./narration/metadata";
 import { EDITORIAL_DEFAULTS, type EditorialProps } from "./editorial/Page";
 import { ErdKit } from "./editorial/ErdKit";
 import { InterviewKit } from "./editorial/interview";
+import { LogoReveal, REVEAL_FRAMES } from "./reveals/LogoReveal";
+import { REVEALS } from "./reveals/presets";
+import { THUMBNAIL, THUMBNAILS, Thumbnail } from "./thumbnails/Thumbnail";
 // Database Design with PostgreSQL, one video per unit.
 import { DbWhyDesign } from "./videos/db-why-design/Video";
 import { script as dbWhyDesignScript } from "./videos/db-why-design/script";
@@ -1083,6 +1086,28 @@ export const RemotionRoot: React.FC = () => (
         defaultProps={{ ...EDITORIAL_DEFAULTS, sfx: true }}
         calculateMetadata={narratedMetadata<EditorialProps>(dePipelinesForAiScript)}
       />
+    </Folder>
+    <Folder name="Logo-Reveals">
+      {/* Short brand stings and course openers (src/reveals/, README "Logo reveals"). */}
+      {REVEALS.map(({ id, props }) => (
+        <Composition
+          key={id}
+          id={id}
+          component={LogoReveal}
+          width={1920}
+          height={1080}
+          fps={FPS}
+          durationInFrames={props.layout === "sting" ? REVEAL_FRAMES.sting : REVEAL_FRAMES.opener}
+          defaultProps={props}
+        />
+      ))}
+    </Folder>
+    <Folder name="Thumbnails">
+      {/* YouTube thumbnails for the merged course and interview videos
+          (src/thumbnails/): four designs, one still per track. */}
+      {THUMBNAILS.map(({ id, props }) => (
+        <Still key={id} id={id} component={Thumbnail} width={THUMBNAIL.width} height={THUMBNAIL.height} defaultProps={props} />
+      ))}
     </Folder>
     <Folder name="Assets">
       {/* The ERD kit (editorial/erd.tsx) on one page, for review. */}

@@ -1,6 +1,5 @@
 import type { NarrationScript } from "../../narration/types";
 import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
-import { INTRO_LEAD_IN } from "../../editorial/intro.ts";
 
 /**
  * Narration for "From ids to meaning" (16:9), Unit 2 of How Large Language
@@ -114,7 +113,6 @@ export const script: NarrationScript = {
   id: "llm-meaning",
   voice: "drew",
   // The series intro plays first; its lead-in lives in editorial/intro.ts.
-  leadIn: INTRO_LEAD_IN,
   minPause: COURSE_MIN_PAUSE,
   tail: 2.6,
   // The closing scene is two short beats; this keeps them in the third take

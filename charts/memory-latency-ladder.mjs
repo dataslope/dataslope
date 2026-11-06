@@ -1,6 +1,6 @@
 /**
  * The memory hierarchy on a log scale, which is the only scale that can hold
- * it: the span from a register to a disk seek is seven orders of magnitude, and
+ * it: the span from a register to a network round trip is six orders of magnitude, and
  * on a linear axis every level but the last is a flat line on the floor.
  *
  * The second column is the reason this figure exists. Nanoseconds are not a
@@ -17,7 +17,7 @@
 import { Plot, plot, ACCENT, GUIDE, HALO, MUTED, PRIMARY } from "./_theme.mjs";
 
 export const title =
-  "Memory access latency by level on a logarithmic scale, from under a nanosecond for a register to ten million nanoseconds for a network round trip, spanning seven orders of magnitude.";
+  "Memory access latency by level on a logarithmic scale, from under a nanosecond for a register to half a million nanoseconds for a network round trip inside a data center, spanning six orders of magnitude.";
 
 /** Nanoseconds, order of magnitude. */
 const LEVELS = [
@@ -27,7 +27,9 @@ const LEVELS = [
   { name: "L3 cache", ns: 30 },
   { name: "Main memory", ns: 100 },
   { name: "NVMe SSD read", ns: 100_000 },
-  { name: "Network round trip", ns: 10_000_000 },
+  // Inside one data center. 10 ms, the figure this row first carried, is a
+  // spinning disk's seek in the table it cites (the Data Engineer review).
+  { name: "Network round trip", ns: 500_000 },
 ];
 
 const L1 = LEVELS.find((l) => l.name === "L1 cache").ns;

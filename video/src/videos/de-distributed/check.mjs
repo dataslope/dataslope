@@ -18,7 +18,9 @@
 //     applies; the video calls each a model, never Spark's output.
 //   - The page's own charts, read from their source rather than retyped:
 //     charts/memory-latency-ladder.mjs (its LEVELS, and its "if L1 took one
-//     second" column, recomputed with the chart's own rule) and
+//     second" column, recomputed with the chart's own rule; its last row, a
+//     10 ms "network round trip", is the cited table's disk seek, so the
+//     video draws that table's data-center round trip, 500,000 ns, instead) and
 //     charts/tail-latency-fanout.mjs (1 - (1 - p)^n, the first n where a 1%
 //     tail passes even odds).
 //
@@ -47,6 +49,17 @@ const levels = [...ladderSrc.matchAll(/\{ name: "([^"]+)", ns: ([\d_.]+) \}/g)].
   ns: Number(ns.replace(/_/g, "")),
 }));
 if (levels.length !== 7) throw new Error(`expected seven levels in memory-latency-ladder.mjs, found ${levels.length}`);
+// The chart's last row, "Network round trip" at 10,000,000 ns (10 ms), is the
+// disk seek of the table it cites (Jeff Dean's "latency numbers"). A shuffle's
+// fetches cross one data center, and that table's round trip within the same
+// data center is 500,000 ns, so the video draws that row in its place and says
+// whose figure it is. The chart itself is left to the site.
+const DC_ROUND_TRIP = { name: "Data-center round trip", ns: 500_000 };
+const netRow = levels[levels.length - 1];
+if (netRow.ns !== DC_ROUND_TRIP.ns) {
+  console.log(`note: memory-latency-ladder.mjs has "${netRow.name}" at ${netRow.ns} ns; the video draws "${DC_ROUND_TRIP.name}" at ${DC_ROUND_TRIP.ns} ns`);
+}
+levels[levels.length - 1] = DC_ROUND_TRIP;
 const fanoutSrc = readFileSync(join(root, "charts/tail-latency-fanout.mjs"), "utf8");
 const rates = [...fanoutSrc.matchAll(/\{ p: ([\d.]+), key: "([^"]+)" \}/g)].map(([, p, key]) => ({ p: Number(p), key }));
 const maxCalls = Number(/const MAX_CALLS = (\d+);/.exec(fanoutSrc)?.[1]);
@@ -210,11 +223,14 @@ def human(ns):
     return f"{s / 86_400:.0f} days"
 mem = next(l["ns"] for l in levels if l["name"] == "Main memory")
 ssd = next(l["ns"] for l in levels if l["name"] == "NVMe SSD read")
-net = next(l["ns"] for l in levels if l["name"] == "Network round trip")
+net = next(l["ns"] for l in levels if l["name"] == "Data-center round trip")
 R["ladder"] = {
     "levels": [{"name": l["name"], "ns": l["ns"], "scaled": human(l["ns"])} for l in levels],
     "ssdOverMemory": round(ssd / mem),
     "networkOverMemory": round(net / mem),
+    # The round trip with an L1 hit stretched to one second, in days, unrounded
+    # (the chart's rule prints "6 days"; the narration says "almost six").
+    "networkDays": round(net / L1 / 86_400, 2),
     "ssdOrders": round(math.log10(ssd / mem)),
     "networkOrders": round(math.log10(net / mem)),
 }
@@ -229,6 +245,9 @@ R["partitions"] = {"gb": GB, "cores": CORES, "cases": cases}
 
 # ── Broadcast against sort-merge: the concept check's sizes ──────────────────
 FACT_TB, DIM_MB, EXECUTORS = 2, 20, 50
+# Spark's default spark.sql.autoBroadcastJoinThreshold, 10485760 bytes.
+AUTO_BROADCAST_BYTES = 10_485_760
+auto_mb = AUTO_BROADCAST_BYTES / 1024 / 1024
 R["broadcast"] = {
     "factTB": FACT_TB,
     "dimMB": DIM_MB,
@@ -236,6 +255,8 @@ R["broadcast"] = {
     "broadcastMB": DIM_MB * EXECUTORS,
     "shuffleMB": FACT_TB * 1_000_000 + DIM_MB,
     "ratio": round((FACT_TB * 1_000_000 + DIM_MB) / (DIM_MB * EXECUTORS)),
+    "autoThresholdMB": int(auto_mb) if auto_mb == int(auto_mb) else auto_mb,
+    "dimOverThreshold": DIM_MB > auto_mb,
 }
 
 json.dumps(R)
@@ -250,7 +271,7 @@ for (const a of groupby.agg) {
 }
 results.source = {
   frame: "src/videos/pandas-groupby/measurements.json (pandas 3.0.5)",
-  ladder: "charts/memory-latency-ladder.mjs",
+  ladder: "charts/memory-latency-ladder.mjs, its first six levels; the data-center round trip (500,000 ns) from the table it cites, Jeff Dean's latency numbers, in place of its 10 ms row",
   fanout: "charts/tail-latency-fanout.mjs",
 };
 

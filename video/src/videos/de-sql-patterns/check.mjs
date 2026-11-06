@@ -20,7 +20,8 @@
 // NTILE; ds-sql: the running total's tie, pivoting), so a table both videos
 // show is the same table. Where this video asks something new of one of their
 // tables (EXCEPT on the anti-join's customers and orders, LAG and LEAD on
-// the advanced SQL page's first days), the setup is copied here verbatim.
+// the advanced SQL page's first days, a SUM in WHERE at the written query's
+// own 400), the setup is copied here verbatim.
 /* global console, URL */
 import { writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -162,6 +163,20 @@ INSERT INTO orders VALUES
   (101, 1, 120.00), (102, 1, 40.00), (103, 2, 80.00),
   (104, 3, 55.00),  (105, 3, 45.00), (106, 2, 30.00), (107, NULL, 25.00);`;
 
+/** da-sql's WHERE and HAVING setup: the Data Analyst page's 24 orders, a
+ *  region and an amount each. Question 5's figure is da-sql's; only the
+ *  refusal is run here, with the written query's own threshold. */
+const DA_ORDERS = `CREATE TABLE orders (region TEXT, amount DECIMAL(8,2));
+INSERT INTO orders VALUES
+  ('North', 120.00), ('South', 80.50), ('East', 200.00),
+  ('West', 50.25),   ('North', 60.00), ('South', 90.00),
+  ('East', 140.00),  ('West', 110.00), ('North', 75.50),
+  ('South', 65.00),  ('North', 145.75), ('East', 95.00),
+  ('West', 40.00),   ('South', 130.25), ('North', 88.00),
+  ('East', 175.50),  ('West', 62.75),   ('South', 105.00),
+  ('North', 210.00), ('East', 45.25),   ('West', 155.00),
+  ('South', 70.75),  ('North', 99.50),  ('East', 185.00);`;
+
 // ── The video's own tables ──────────────────────────────────────────────────
 
 /** The video's own daily metric, for the moving average and the spine: its
@@ -233,6 +248,13 @@ results.figures.latestTie = await figure(
   },
 );
 
+// 5. The SUM put in WHERE: HAVING's own condition from the written query
+//    (da-sql's, > 400), moved into WHERE, on da-sql's orders. DuckDB refuses
+//    it as it refused da-sql's > 600.
+results.figures.where = await figure(DA_ORDERS, {
+  whereAggregate: "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE SUM(amount) > 400\nGROUP BY region;",
+});
+
 // 6. A seven-day moving average on the video's own days with gaps: the
 //    page's ROWS frame (rounded to one place, with where each frame starts
 //    and how many rows it holds), then a RANGE frame of six days.
@@ -244,6 +266,9 @@ results.figures.moving = await figure(METRICS, {
   page: "SELECT\n  event_date,\n  daily_value,\n  AVG(daily_value) OVER (\n    ORDER BY event_date\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW\n  ) AS moving_avg_7d\nFROM daily_metrics\nORDER BY event_date;",
   rows: `SELECT event_date, daily_value,\n  ${frameCols("ROWS BETWEEN 6 PRECEDING AND CURRENT ROW")}`,
   range: `SELECT event_date, daily_value,\n  ${frameCols("RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW")}`,
+  // The ROWS frame's first six rows hold fewer than seven: null until the
+  // frame is full.
+  full: "SELECT event_date, daily_value,\n  CASE WHEN COUNT(*) OVER w = 7\n    THEN AVG(daily_value) OVER w END AS avg_7\nFROM daily_metrics\nWINDOW w AS (ORDER BY event_date\n  ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)\nORDER BY event_date;",
 });
 
 // 7. Detecting and filling the gaps with a date spine. The page's block

@@ -30,8 +30,8 @@ const STEPS = [
 
 /**
  * The opening, on Part 10's bridge: a pipeline that used to end in a
- * dashboard now ends in an AI assistant, which can answer only from what is
- * in its index. Then the pipeline's steps as chips, the fundamentals that
+ * dashboard now ends in an AI assistant, which knows your documents only
+ * from what is in its index. Then the pipeline's steps as chips, the fundamentals that
  * carry over, and the two new parts lit (the vector store, the embedding
  * bill), and how the eleven questions run. The llama stands at the right.
  */
@@ -42,9 +42,9 @@ export const HookScene: React.FC = () => {
 
   const newestAt = n.word("hook", "The newest pipelines");
   const dashAt = n.word("hook", "end in a dashboard");
-  const feedAt = n.word("hook", "They feed an AI assistant");
-  const onlyAt = n.word("hook", "can only answer from");
-  const indexAt = n.word("hook", "what's in its index");
+  const feedAt = n.word("hook-feed", "They feed an AI assistant");
+  const onlyAt = n.word("hook-feed", "knows your documents only");
+  const indexAt = n.word("hook-feed", "what's in its index");
   const steps = [
     n.word("hook-steps", "Extract"),
     n.word("hook-steps", "clean"),
@@ -108,7 +108,7 @@ export const HookScene: React.FC = () => {
         </Box>
         <Note at={onlyAt} x={IDX.x} y={y(FIG_Y) + BOX_H + 22}>
           <span style={say(24, INK)}>
-            <Mark at={indexAt + 4}>it answers only from what&apos;s in here</Mark>
+            <Mark at={indexAt + 4}>it knows your documents only from what&apos;s in here</Mark>
           </span>
         </Note>
 

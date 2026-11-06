@@ -56,7 +56,8 @@ const RowName: React.FC<{ at: number; expandAt: number; x: number; y: number; na
  * rows: ETL transforms on its own servers and loads only the result; ELT
  * loads the raw data into the warehouse and transforms it there, in SQL. Then
  * why ELT won (cheap elastic compute; raw data kept, so new logic means a new
- * transform, not a new extract), and where ETL still fits.
+ * transform, not a new extract), and where ETL still fits, personal data
+ * that must be masked before it lands included.
  */
 export const EtlScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -86,7 +87,8 @@ export const EtlScene: React.FC = () => {
   const fitsAt = n.word("etl-when", "ETL still fits");
   const littleAt = n.word("etl-when", "little compute");
   const strictAt = n.word("etl-when", "a strict schema");
-  const end = n.beat("etl-when").to;
+  const piiAt = n.word("etl-pii", "personal data that must be masked");
+  const end = n.beat("etl-pii").to;
 
   const ey = y(ETL_Y);
   const ly = y(ELT_Y);
@@ -108,6 +110,7 @@ export const EtlScene: React.FC = () => {
       <Sfx name="el-tap" at={defaultAt} level={-30} />
       <Sfx name="el-pencil" at={againAt} level={-34} />
       <Sfx name="el-tap" at={fitsAt} level={-31} />
+      <Sfx name="el-tap" at={piiAt} level={-32} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={60}>
@@ -121,11 +124,15 @@ export const EtlScene: React.FC = () => {
         <Node x={760} y={ey} w={300} h={BOX_H} at={ownAt} tone="plain" title="transform" sub="on its own servers" />
         <Flow points={[[1066, emid], [1180 - 8, emid]]} at={loadingAt} color={BAR} />
         <Node x={1180} y={ey} w={330} h={BOX_H} at={loadingAt + 4} title="warehouse" sub="the result only" />
-        <Note at={fitsAt} x={1180} y={ey + BOX_H + h(20)}>
+        {/* Where ETL still fits, under its own transform step. */}
+        <Note at={fitsAt} x={760} y={ey + BOX_H + h(20)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             still fits: <b style={{ opacity: ease(frame, littleAt, 10) }}>little compute</b>
             <span style={{ opacity: ease(frame, strictAt, 10) }}>
-              , or <b>a strict schema</b>
+              , <b>a strict schema</b>
+            </span>
+            <span style={{ opacity: ease(frame, piiAt, 10) }}>
+              , or <b>masking personal data first</b>
             </span>
           </span>
         </Note>

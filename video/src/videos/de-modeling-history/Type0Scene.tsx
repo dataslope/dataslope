@@ -21,8 +21,12 @@ const ROWS = { headH: 40, rowH: 46, bodySize: 24, headSize: 20 } as const;
  * 42's sign-up date with ON CONFLICT DO NOTHING (the video's own), the first
  * writing a row and the second, carrying a different date, writing none. The
  * row keeps 2022-01-01, and the refused value sits beside it in a dashed
- * outline. Then the follow-up: types are chosen per column, shown as one
- * customer row's columns, each with its type.
+ * outline. The conflict fires because customer_id is that table's key, and
+ * the first listing's title says so. Then the follow-up: types are chosen
+ * per column, shown as one customer row's columns, each with its type; and
+ * where the city is Type 2, customer_id is no longer unique, so Type 0 means
+ * each new version copies signup_date from the row it closes (the video's
+ * own run, check.mjs "type0mix").
  */
 export const Type0Scene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -42,7 +46,11 @@ export const Type0Scene: React.FC = () => {
   const perAt = n.word("type0-mix", "Types are chosen per column");
   const zeroAt = n.word("type0-mix", "a Type zero sign-up date");
   const twoAt = n.word("type0-mix", "beside a Type two city");
-  const end = n.beat("type0-mix").to;
+  const versionAt = n.word("type0-copy", "Each new version");
+  const copiesAt = n.word("type0-copy", "copies the sign-up date");
+  const closesAt = n.word("type0-copy", "from the row it closes");
+  const sourceAt = n.word("type0-copy", "not from the source");
+  const end = n.beat("type0-copy").to;
 
   const F = TYPE0.first;
   const L = TYPE0.later;
@@ -54,6 +62,11 @@ export const Type0Scene: React.FC = () => {
   // The later load's value, refused, as a ghost row under the kept one.
   const laterDate = L.lines.join(" ").match(/DATE '([\d-]+)'/)?.[1] ?? "";
   const stripY = y(800);
+  // Beside a Type 2 city: two versions, one sign-up date.
+  const M = TYPE0.mixRows;
+  const gm = geoOf(M, TABLE_X, y(660), h, ROWS);
+  const mDate = M.cols.indexOf("signup_date");
+  const sent = TYPE0.mixStaged.rows[0][TYPE0.mixStaged.cols.indexOf("signup_date")];
 
   const columns = [
     { name: "customer_key", type: "surrogate key", at: perAt + 4, lit: undefined },
@@ -70,6 +83,8 @@ export const Type0Scene: React.FC = () => {
       <Sfx name="el-pop" at={standsAt} level={-35} />
       <Sfx name="el-tap" at={zeroAt} level={-36} />
       <Sfx name="el-tap" at={twoAt} level={-36} />
+      <Sfx name="el-tap" at={versionAt + 8} level={-36} />
+      <Sfx name="el-pop" at={copiesAt + 4} level={-36} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={60}>
@@ -90,7 +105,7 @@ export const Type0Scene: React.FC = () => {
           width={listW}
           size={SIZE}
           at={onceAt - 2}
-          title="first load"
+          title="first load (customer_id is the primary key)"
           marks={[{ line: lineOf(F.lines, "ON CONFLICT"), at: ignoreAt, out: secondAt }]}
         />
         <Note at={onceAt + 12} x={X0 + listW + 24} y={firstTop + h(44)}>
@@ -136,6 +151,29 @@ export const Type0Scene: React.FC = () => {
         </Note>
         <Note at={standsAt + 26} x={TABLE_X} y={g.rowTop(1) + h(20)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the first value stands</span>
+        </Note>
+
+        {/* In a Type 2 dimension: each new version copies the date. */}
+        <TableName g={gm} at={versionAt - 4}>
+          dim_customer, with a Type 2 city
+        </TableName>
+        <DataTable
+          g={gm}
+          cols={colsOf(M)}
+          at={versionAt - 4}
+          rows={[
+            { cells: M.rows[0], at: versionAt },
+            { cells: M.rows[1], at: versionAt + 8, grow: true },
+          ]}
+          marks={[
+            { row: 1, col: mDate, at: copiesAt + 4, color: MARK_OK },
+            { row: 0, col: mDate, at: closesAt + 2, color: MARK_OK },
+          ]}
+        />
+        <Note at={sourceAt} x={TABLE_X} y={gm.rowTop(M.rows.length) + h(16)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            the source sent {sent}: ignored
+          </span>
         </Note>
 
         {/* Types are per column: one row, each column with its own. */}

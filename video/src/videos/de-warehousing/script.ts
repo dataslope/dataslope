@@ -59,13 +59,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     39.19 MB of the CSV and 4,976,846 bytes of the Parquet file. Both plans
  *     project category, amount and units.
  *   - per column, CSV text against Parquet: region (4 values) 5.50 MB against
- *     379,876 bytes, 3.04 bits a row; amount (random to the cent) 6.80 MB
- *     against 4,205,471; sale_date in date order 11.0 MB against 3,087.
- *     Sorted by region, the region column is 554 bytes.
+ *     379,876 bytes, 3.04 bits a row (said "a few": four codes fit in two
+ *     bits, and DuckDB's writer spends three); amount (random to the cent,
+ *     49,501 values, written PLAIN, no dictionary) 6.80 MB against 4,205,471;
+ *     sale_date in date order 11.0 MB against 3,087. Sorted by region
+ *     instead, the region column is 554 bytes.
  *   - by month: 12 files of 79,235 to 84,700 rows. March: "Scanning Files:
  *     1/12"; region = 'North': 12 files read; right(sale_month, 2) = '03':
  *     1/12 (the page says a function on the key "usually defeats pruning";
- *     DuckDB prunes through it).
+ *     DuckDB prunes through it); sale_month BETWEEN '2024-03' AND '2024-05':
+ *     3/12, the range on the raw key that prunes on every engine.
  *   - row groups of 122,880 rows, 9 in all, each spanning about 45 days in
  *     date order; March overlaps 2. Shuffled, all 9 span the year. The March
  *     query read 1,133,966 bytes sorted and 5,741,446 shuffled (5.1 times).
@@ -99,7 +102,13 @@ export const script: NarrationScript = {
     },
     {
       id: "hook-read",
-      text: "Ask both for revenue by category. DuckDB reads every byte of the CSV, and five megabytes of the Parquet file. Same rows, same answer: only the layout differs.",
+      text: "Ask both for revenue by category. DuckDB reads every byte of the CSV, and five megabytes of the Parquet file.",
+    },
+    {
+      // The CSV is text and the Parquet file binary, typed and compressed, so
+      // the gap is not only the columns (Question 2 measures that part).
+      id: "hook-same",
+      text: "Same rows, same answer: only how they're stored differs.",
       pauseAfter: 0.6,
     },
     {
@@ -122,7 +131,8 @@ export const script: NarrationScript = {
     {
       id: "rows-olap",
       text: "OLAP, online analytical processing, runs the reports: a few columns across millions of rows. So it stores each column together: every sale ID, then every date, and so on.",
-      pauseAfter: 0.7,
+      // The finished column store holds with its question before Question 2.
+      pauseAfter: 1.4,
     },
     {
       id: "cols",
@@ -154,7 +164,17 @@ export const script: NarrationScript = {
     },
     {
       id: "fmt-avro",
-      text: "Avro, a row-based binary format, writes whole records, and its files carry the schema they were written with. It suits streaming, one record at a time, often on Kafka, a distributed log, and its compatibility rules let a schema evolve.",
+      text: "Avro, a row-based binary format, writes whole records, and its files carry the schema they were written with.",
+    },
+    {
+      id: "fmt-kafka",
+      text: "It suits streaming, one record at a time, often on Kafka, a distributed log, and its compatibility rules let a schema evolve.",
+    },
+    {
+      // A single record carries no schema (the page): a schema ID, resolved
+      // through a registry. One compatibility rule, said plainly.
+      id: "fmt-registry",
+      text: "On Kafka, a message usually carries just a schema ID, looked up in a registry, and a field added with a default keeps old records readable.",
       pauseAfter: 0.6,
     },
     {
@@ -171,17 +191,44 @@ export const script: NarrationScript = {
     },
     {
       id: "cmp-region",
-      text: "Region has four. Parquet writes each one once, in a dictionary, then about three bits a row: a million regions in three hundred eighty kilobytes, against five and a half megabytes of text.",
+      text: "Region has four.",
+    },
+    {
+      // "A few bits": DuckDB's writer spends 3.04 bits a row on four codes
+      // that would fit in two, which the figure's 0 to 3 would otherwise
+      // contradict.
+      id: "cmp-dict",
+      text: "Parquet's dictionary encoding writes each one once, then a code of a few bits a row:",
+    },
+    {
+      id: "cmp-million",
+      text: "a million regions in three hundred eighty kilobytes, against five and a half megabytes of text.",
       pauseAfter: 0.6,
     },
     {
       id: "cmp-amount",
       text: "Amount is random to the cent, so it only shrinks from six point eight megabytes to four point two.",
-      pauseAfter: 0.6,
+      // Time to read "too many for a dictionary" beside the bars.
+      pauseAfter: 0.9,
     },
     {
       id: "cmp-sort",
-      text: "Sorting before writing makes long runs. In date order, a million dates take three kilobytes. Sorted by region, the region column falls to five hundred fifty-four bytes.",
+      text: "Sorting makes long runs, and run-length encoding stores each run as one value and a count.",
+    },
+    {
+      id: "cmp-dates",
+      text: "In date order, a million dates take three kilobytes.",
+    },
+    {
+      id: "cmp-byregion",
+      text: "Sorted by region, the region column falls to five hundred fifty-four bytes.",
+      pauseAfter: 0.7,
+    },
+    {
+      // Why a row format loses (the page: interleaved types defeat these
+      // encodings), and the payoff: less to read, not only less to store.
+      id: "cmp-row",
+      text: "A row file interleaves every field, which defeats these encodings. And fewer bytes to read means faster scans, not just cheaper storage.",
       pauseAfter: 0.7,
     },
     {
@@ -203,12 +250,29 @@ export const script: NarrationScript = {
     },
     {
       id: "part-region",
-      text: "Filter on region instead, and it reads all twelve: pruning only works on the key. So a good key is the column queries filter on most, with partitions even and not too small.",
+      text: "Filter on region instead, and it reads all twelve: pruning only works on the key.",
+    },
+    {
+      id: "part-key",
+      text: "So a good key is the column queries filter on most, with partitions even and not too small.",
+    },
+    {
+      id: "part-bad",
+      text: "Not a customer ID: that makes millions of tiny folders.",
       pauseAfter: 0.6,
     },
     {
       id: "part-fn",
-      text: "On many engines, a function wrapped around the key defeats pruning. DuckDB applied it to each folder's name and still read one file, so check your engine's plan.",
+      text: "On many engines, a function wrapped around the key defeats pruning.",
+    },
+    {
+      id: "part-duck",
+      text: "DuckDB applied it to each folder's name and still read one file, so check your engine's plan.",
+    },
+    {
+      // The page's habit to keep: a filter, or a range, on the raw key.
+      id: "part-raw",
+      text: "Filtering on the key itself, or on a range of it, prunes on every engine.",
       pauseAfter: 0.8,
     },
     {
@@ -224,6 +288,11 @@ export const script: NarrationScript = {
     {
       id: "cl-shuffle",
       text: "Shuffle the same rows, and every group spans the whole year. Nothing can be skipped, and DuckDB read five times the bytes. The minimum and maximum do the skipping, no index needed.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "cl-pair",
+      text: "In practice, partition by date, then cluster by the next column queries filter on, like region.",
       pauseAfter: 0.8,
     },
 
@@ -247,6 +316,11 @@ export const script: NarrationScript = {
     {
       id: "sm-fix",
       text: "Fix them with compaction, a job that rewrites many small files into a few large ones, or let a table format like Delta Lake or Iceberg compact them for you.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "sm-prevent",
+      text: "Better still, prevent them: a coarser key, fewer writers, bigger batches.",
       pauseAfter: 0.8,
     },
 
@@ -255,6 +329,10 @@ export const script: NarrationScript = {
       id: "cost",
       scene: true,
       text: "Question eight. What drives cost in a cloud data warehouse, and how do you control it? Most bill for the data a query scans, like BigQuery, or for the compute time it uses, like Snowflake and Redshift.",
+    },
+    {
+      id: "cost-store",
+      text: "Storage is billed too, usually the smaller part.",
       pauseAfter: 0.5,
     },
     {

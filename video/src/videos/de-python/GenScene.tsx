@@ -113,6 +113,7 @@ export const GenScene: React.FC = () => {
   const mbAt = n.word("pipe-swap", "a hundred sixty megabytes");
   const roundAt = n.word("pipe-swap", "With round brackets");
   const passesAt = n.word("pipe-swap", "one row passes through all three");
+  const kb2At = n.word("pipe-peak", "about a hundred fifty kilobytes");
   const placeAt = n.word("pipe-trade", "Lists still earn their place");
   const printAt = n.word("pipe-trade", "print one to debug it");
   const spentAt = n.word("pipe-trade", "A generator is spent after one pass");
@@ -120,7 +121,10 @@ export const GenScene: React.FC = () => {
   const smallAt = n.word("pipe-trade", "Lists for small data you rescan");
   const largeAt = n.word("pipe-trade", "generators for large or endless data");
   const end = n.beat("file-in").to;
+  // Question 1's card leaves on "Question two"; its figures stay until
+  // question 2's text writes in, so the page is never empty between them.
   const out1 = q2At - 4;
+  const fig1Out = q2TextAt - 4;
 
   const P = GEN.parser;
   const L = GEN.list.lines;
@@ -181,7 +185,7 @@ export const GenScene: React.FC = () => {
         <Blocks x={RIGHT_X} top={lTop + h(168)} at={genAt + 4} out={millionAt - 6} one color={OK} />
 
         {/* ── The page's parser ── */}
-        <Note at={parserAt - 4} x={X0} y={lTop - h(40)} out={out1}>
+        <Note at={parserAt - 4} x={X0} y={lTop - h(40)} out={fig1Out}>
           <Title>the page&apos;s parser</Title>
         </Note>
         <Listing
@@ -191,7 +195,7 @@ export const GenScene: React.FC = () => {
           width={800}
           size={SIZE}
           at={parserAt - 2}
-          out={out1}
+          out={fig1Out}
           marks={[
             { line: lineOf(P, "for line in f"), at: readsAt, out: splitsAt },
             { line: lineOf(P, "split("), at: splitsAt, out: yieldsAt },
@@ -200,7 +204,7 @@ export const GenScene: React.FC = () => {
         />
 
         {/* ── The same file read both ways ── */}
-        <Note at={collectAt - 4} x={RIGHT_X} y={lTop - h(40)} out={out1}>
+        <Note at={collectAt - 4} x={RIGHT_X} y={lTop - h(40)} out={fig1Out}>
           <Title color={ACCENT_INK}>held in a list</Title>
         </Note>
         <Listing
@@ -210,10 +214,10 @@ export const GenScene: React.FC = () => {
           width={800}
           size={SIZE}
           at={collectAt - 2}
-          out={out1}
+          out={fig1Out}
           marks={[{ line: lineOf(L, "list(parse_rows"), at: collectAt + 6, color: MARK_BAD }]}
         />
-        <Note at={sumAt - 4} x={RIGHT_X} y={gTop - h(40)} out={out1}>
+        <Note at={sumAt - 4} x={RIGHT_X} y={gTop - h(40)} out={fig1Out}>
           <Title color={OK_INK}>streamed by the generator</Title>
         </Note>
         <Listing
@@ -223,11 +227,11 @@ export const GenScene: React.FC = () => {
           width={800}
           size={SIZE}
           at={sumAt - 2}
-          out={out1}
+          out={fig1Out}
           marks={[{ line: lineOf(G, "sum("), at: sumAt + 6, color: MARK_OK }]}
         />
 
-        <Note at={millionAt} x={X0} y={y(BARS_Y) - h(44)} out={out1}>
+        <Note at={millionAt} x={X0} y={y(BARS_Y) - h(44)} out={fig1Out}>
           <span style={{ display: "flex", gap: 28, alignItems: "baseline", whiteSpace: "nowrap" }}>
             <Title>peak memory</Title>
             <Source>tracemalloc, in Pyodide: Python in WebAssembly</Source>
@@ -239,7 +243,7 @@ export const GenScene: React.FC = () => {
           width={1000}
           rowH={h(54)}
           nameW={420}
-          out={out1}
+          out={fig1Out}
           bars={[
             { name: "list, 1,000,000 rows", value: GEN.list.m, ...m, color: ACCENT, ink: ACCENT_INK, at: sixtyAt - 8 },
             { name: "generator, 1,000,000 rows", value: GEN.gen.m, ...g1, color: OK, ink: OK_INK, at: kbAt - 6 },
@@ -247,12 +251,12 @@ export const GenScene: React.FC = () => {
             { name: "generator, 100,000 rows", value: GEN.gen.k, ...g2, color: OK, ink: OK_INK, at: moveAt - 4 },
           ]}
         />
-        <Note at={moveAt + 10} x={NOTE_X} y={y(BARS_Y) + 3 * h(54) + h(8)} out={out1}>
+        <Note at={moveAt + 10} x={NOTE_X} y={y(BARS_Y) + 3 * h(54) + h(8)} out={fig1Out}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             <Mark at={moveAt + 16}>the same, whatever the input&apos;s size</Mark>
           </span>
         </Note>
-        <Note at={soAt + 6} x={NOTE_X} y={y(BARS_Y) + 2 * h(54) + h(8)} out={out1}>
+        <Note at={soAt + 6} x={NOTE_X} y={y(BARS_Y) + 2 * h(54) + h(8)} out={fig1Out}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>a tenth of the rows, a tenth of the memory</span>
         </Note>
 
@@ -290,7 +294,7 @@ export const GenScene: React.FC = () => {
           out={placeAt - 4}
           bars={[
             { name: "lists, 1,000,000 rows", value: PIPE.lists.peak, ...lp, color: ACCENT, ink: ACCENT_INK, at: mbAt - 8 },
-            { name: "generators, 1,000,000 rows", value: PIPE.gens.peak, ...gp, color: OK, ink: OK_INK, at: passesAt },
+            { name: "generators, 1,000,000 rows", value: PIPE.gens.peak, ...gp, color: OK, ink: OK_INK, at: Math.min(passesAt + 10, kb2At - 16) },
           ]}
         />
 

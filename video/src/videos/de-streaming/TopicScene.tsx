@@ -3,7 +3,7 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -81,9 +81,18 @@ export const TopicScene: React.FC = () => {
   // One log first, then three lanes: the outer two open out of the middle one.
   const split = ease(frame, splitAt, 18);
   const laneY = (p: number) => laneTop(1) + (laneTop(p) - laneTop(1)) * split;
-  // The single log's grey messages, appended one by one, fade at the split.
-  const preCells = [0, 1, 2, 3, 4].map((k) => ({ k, at: k < 4 ? logAt + 4 + k * 5 : endAt + 6 }));
-  const preOut = 1 - ease(frame, splitAt - 2, 10);
+  // The single log's grey messages, appended one by one, are dealt into the
+  // three partitions at the split, numbered from zero in each as the offset
+  // is defined, and cleared as the producer's clicks arrive.
+  const DEAL = [
+    { p: 0, off: 0 },
+    { p: 1, off: 0 },
+    { p: 2, off: 0 },
+    { p: 0, off: 1 },
+    { p: 1, off: 1 },
+  ];
+  const preCells = DEAL.map((d, k) => ({ k, ...d, at: k < 4 ? logAt + 4 + k * 5 : endAt + 6 }));
+  const preOut = 1 - ease(frame, hashAt - 4, 8);
 
   // The clicks fly from the producer in arrival order, after the hash is named.
   const prodTop = laneTop(1) + laneH / 2 - h(70);
@@ -96,6 +105,17 @@ export const TopicScene: React.FC = () => {
 
   // The waffle: the first 74 of 100 squares turn red as the share is said.
   const moved100 = Math.round(MOVED.share * 100);
+  // At "then four" the producer hashes into four; at "a user's new clicks"
+  // one new click of ava's lands in partition 3, ahead of her unread clicks
+  // in partition 1.
+  const grown = ease(frame, fourAt, 10);
+  const newClick = ease(frame, readAt, 16);
+  const NEW_P = PARTITIONS.four.ava;
+  const oldAva = ease(frame, readAt + 12, 10);
+  // dee's click, and the one that arrived just before it in her partition:
+  // in arrival order, though it happened later.
+  const deeClick = ARRIVALS.find((c) => c.user === "dee")!;
+  const aheadOfDee = ARRIVALS.find((c) => c.partition === deeClick.partition && c.offset === deeClick.offset - 1)!;
 
   return (
     <AbsoluteFill>
@@ -121,7 +141,13 @@ export const TopicScene: React.FC = () => {
         {/* The producer, which hashes each key. */}
         <Box x={PROD.x} y={prodTop} w={PROD.w} h={h(140)} at={hashAt - 4}>
           <span>producer</span>
-          <span style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, marginTop: 6, fontVariantLigatures: "none" }}>hash(key) mod 3</span>
+          <span style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, marginTop: 6, fontVariantLigatures: "none" }}>
+            hash(key) mod{" "}
+            <span style={{ display: "inline-grid" }}>
+              <span style={{ gridArea: "1 / 1", opacity: 1 - grown }}>{PARTITIONS.count}</span>
+              <span style={{ gridArea: "1 / 1", opacity: grown, color: ACCENT_INK }}>{PARTITIONS.count + 1}</span>
+            </span>
+          </span>
         </Box>
         <Note at={noKeyAt} x={PROD.x} y={prodTop + h(160)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>no key: round-robin</span>
@@ -152,18 +178,25 @@ export const TopicScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        {preCells.map((c) => (
-          <Cell
-            key={c.k}
-            x={cellX(c.k)}
-            y={cellY(1)}
-            w={CELL_W}
-            h={CELL_H}
-            plain
-            opacity={ease(frame, c.at, 8) * preOut}
-            scale={0.9 + 0.1 * ease(frame, c.at, 8)}
-          />
-        ))}
+        {preCells.map((c) => {
+          const dealt = ease(frame, splitAt + 4 + c.k * 3, 14);
+          const x = interpolate(dealt, [0, 1], [cellX(c.k), cellX(c.off)]);
+          const yy = interpolate(dealt, [0, 1], [cellY(1), laneY(c.p) + (laneH - CELL_H) / 2]);
+          return (
+            <Cell
+              key={c.k}
+              x={x}
+              y={yy}
+              w={CELL_W}
+              h={CELL_H}
+              plain
+              opacity={ease(frame, c.at, 8) * preOut}
+              scale={0.9 + 0.1 * ease(frame, c.at, 8)}
+            >
+              <span style={{ opacity: ease(frame, zeroAt - 2 + c.k * 3, 8) }}>{c.off}</span>
+            </Cell>
+          );
+        })}
         <ElbowArrow
           points={[
             [LANE_X + LANE_W + 120, laneTop(1) + laneH / 2],
@@ -188,8 +221,19 @@ export const TopicScene: React.FC = () => {
           const x = interpolate(p, [0, 1], [prodMid[0] - CELL_W / 2, tx]);
           const yy = interpolate(p, [0, 1], [prodMid[1] - CELL_H / 2, ty]) - Math.sin(p * Math.PI) * 30;
           const ring = c.partition === avaLane ? pulse(frame, orderAt + c.offset * 4, 16) : 0;
+          const old = c.user === "ava" && c.offset >= 3 ? oldAva : 0;
           return (
-            <Cell key={c.i} x={x} y={yy} w={CELL_W} h={CELL_H} user={c.user} opacity={Math.min(1, p * 3)} ring={ring > 0 ? BAR : undefined} ringP={ring}>
+            <Cell
+              key={c.i}
+              x={x}
+              y={yy}
+              w={CELL_W}
+              h={CELL_H}
+              user={c.user}
+              opacity={Math.min(1, p * 3)}
+              ring={old > 0 ? HIGHLIGHT : ring > 0 ? BAR : undefined}
+              ringP={old > 0 ? old * 1.4 : ring}
+            >
               {c.offset}
             </Cell>
           );
@@ -210,7 +254,13 @@ export const TopicScene: React.FC = () => {
         <Note at={orderAt} x={LANE_X + LANE_W + 24} y={laneTop(avaLane) + laneH / 2 - h(16)} out={insideAt + 10}>
           <span style={{ ...label(21, USER_INK.ava), fontWeight: 700, whiteSpace: "nowrap" }}>← ava's clicks, offsets 0 to 4, in arrival order</span>
         </Note>
-        <Legend x={LANE_X} y={laneTop(2) + laneH + h(34)} at={flyAt(0) + 4} out={addAt - 4} note="· the video's own stream" />
+        <Legend x={LANE_X} y={laneTop(2) + laneH + h(58)} at={flyAt(0) + 4} out={addAt - 4} note="· the video's own stream" />
+        <Note at={acrossAt + 6} x={LANE_X} y={laneTop(2) + laneH + h(10)} out={partsOut}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+            in order of arrival: <b style={{ color: USER_INK.dee }}>dee</b>'s click from <Num>{deeClick.t}</Num> s sits after{" "}
+            <b style={{ color: USER_INK[aheadOfDee.user] }}>{aheadOfDee.user}</b>'s from <Num>{aheadOfDee.t}</Num> s
+          </span>
+        </Note>
 
         {/* Offsets named: each lane's slots count from zero. */}
         <Note at={logAt + 6} x={RIGHT_X} y={y(400)} out={partsOut}>
@@ -274,7 +324,10 @@ export const TopicScene: React.FC = () => {
         </Note>
         {costs.map((c, i) => (
           <Note key={c.text} at={c.at - 2} x={RIGHT_X + 184} y={y(580) + i * h(44)} out={moveOut}>
-            <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>+ {c.text}</span>
+            <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+              + {c.text}
+              {c.text === "longer rebalances" ? <span style={{ ...label(20, INK_SOFT), fontWeight: 650 }}> (partitions reassigned)</span> : null}
+            </span>
           </Note>
         ))}
 
@@ -292,7 +345,7 @@ export const TopicScene: React.FC = () => {
             </>
           }
         />
-        <Note at={neverAt} x={LANE_X + 40} y={y(730) + laneH / 2 - h(15)}>
+        <Note at={neverAt} x={cellX(1) + 20} y={y(730) + laneH / 2 - h(15)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>added later; never removed</span>
         </Note>
         <div style={{ position: "absolute", left: RIGHT_X - 100, top: y(330), opacity: ease(frame, movesAt, 12) }}>
@@ -353,9 +406,42 @@ export const TopicScene: React.FC = () => {
             );
           })}
         </svg>
+        <Note at={modelAt + 8} x={WAFFLE.x + 10 * (WAFFLE.cell + WAFFLE.gap) + 14} y={y(WAFFLE.top)}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap", lineHeight: 1.35 }}>
+            1 square:
+            <br />
+            <Num>{count(MOVED.keys / 100)}</Num> keys
+            <br />
+            <span style={{ opacity: ease(frame, pctAt, 10) }}>
+              <b style={{ color: ACCENT_INK }}>red</b>: moved
+              <br />
+              <b style={{ color: BLUE_INK }}>blue</b>: stayed
+            </span>
+          </span>
+        </Note>
         <Note at={pctAt} x={WAFFLE.x} y={y(WAFFLE.top) + 10 * (WAFFLE.cell + WAFFLE.gap) + h(10)}>
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Num>{count(MOVED.moved)}</Num> move: <Num>{Math.round(MOVED.share * 100)}</Num>%
+          </span>
+        </Note>
+        {newClick > 0 ? (
+          <Cell
+            x={interpolate(newClick, [0, 1], [prodMid[0] - CELL_W / 2, cellX(0)])}
+            y={interpolate(newClick, [0, 1], [prodMid[1] - CELL_H / 2, y(730) + (laneH - CELL_H) / 2]) - Math.sin(newClick * Math.PI) * 30}
+            w={CELL_W}
+            h={CELL_H}
+            user="ava"
+            opacity={Math.min(1, newClick * 3)}
+            ring={ACCENT}
+            ringP={ease(frame, readAt + 14, 8)}
+          >
+            0
+          </Cell>
+        ) : null}
+        <Note at={readAt + 14} x={LANE_X} y={y(730) + laneH + h(10)}>
+          <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <b style={{ color: USER_INK.ava }}>ava</b>'s new click: partition <Num>{NEW_P}</Num>, read before her old ones in partition{" "}
+            <Num>{PARTITIONS.of.ava}</Num>
           </span>
         </Note>
         <Note at={readAt} x={RIGHT_X - 100} y={y(650)}>

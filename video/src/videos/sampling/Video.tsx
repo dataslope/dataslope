@@ -1,9 +1,7 @@
 import React from "react";
 import { Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 import { during } from "../../components/motion";
-import { Scene } from "../../components/Scene";
 import { EditorialPage } from "../../editorial/Page";
-import { SeriesIntro } from "../../editorial/SeriesIntro";
 import { NarrationAudio } from "../../narration/NarrationAudio";
 import { NarrationProvider } from "../../narration/NarrationContext";
 import type { Timeline } from "../../narration/types";
@@ -73,9 +71,6 @@ const Parts: React.FC<{ parts: readonly Timeline[] }> = ({ parts }) => {
   const { spans } = planParts(parts, fps);
   return (
     <>
-      <Scene from={0} to={spans[0].from + CROSSFADE} fade={CROSSFADE}>
-        <SeriesIntro course="Statistics for Data Science with Python" unit="Unit 5" title="Sampling" />
-      </Scene>
       {parts.map((timeline, k) => (
         <Part key={PARTS[k].script.id} k={k} timeline={timeline} span={spans[k]} />
       ))}
@@ -84,8 +79,8 @@ const Parts: React.FC<{ parts: readonly Timeline[] }> = ({ parts }) => {
 };
 
 /**
- * Statistics Unit 5, "Sampling" (16:9), as one video: the series intro, then
- * the unit's five videos as its five parts, in order:
+ * Statistics Unit 5, "Sampling" (16:9), as one video: the unit's five videos
+ * as its five parts, in order:
  *
  *   5.1 SamplingBias, 5.2 SurvivorshipBias, 5.3 SamplingDistributions,
  *   5.4 CentralLimitTheorem, 5.5 StandardError.

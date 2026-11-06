@@ -96,8 +96,8 @@ by far the most costly operation in a Spark job. Minimizing shuffles
 (and the data volume shuffled) is the core of Spark tuning.
 
 Why it is expensive, in one figure: a shuffle turns memory access into
-disk and network access, and those are three and five orders of magnitude
-further away.
+disk and network access, about three and four orders of magnitude further
+away.
 
 <Chart slug="memory-latency-ladder" />
 
@@ -214,11 +214,14 @@ combines locally) whenever the aggregation is associative.
 
 ### How is Spark different from classic Hadoop MapReduce?
 
-Hadoop MapReduce writes intermediate results to disk (HDFS) **between
-every** map and reduce, which is slow for multi-step and iterative jobs.
-Spark keeps intermediates in **memory** across stages and only spills to
-disk under pressure, making multi-stage pipelines and iterative algorithms
-(ML, graph) much faster. Spark also offers a richer API (DataFrames, SQL,
+Hadoop MapReduce runs each step as a separate job: map output goes to local
+disk, is shuffled to the reducers, and the reducers write their result to
+**HDFS**, where the next job reads it back. A multi-step or iterative
+pipeline pays that HDFS round trip **at every step**. Spark plans the whole
+pipeline as one job: it chains narrow transformations in memory within a
+stage, still writes shuffle output to local disk between stages, and can
+cache a dataset in memory for reuse, making multi-stage pipelines and
+iterative algorithms (ML, graph) much faster. Spark also offers a richer API (DataFrames, SQL,
 streaming) and whole-query optimization, where MapReduce exposes only map
 and reduce.
 

@@ -261,6 +261,18 @@ export const StarScene: React.FC = () => {
         <Relation name="store" points={lines.store} from="exactly-one" to="zero-or-many" at={storeAt + 2} />
         <Relation name="product" points={lines.product} from="exactly-one" to="zero-or-many" at={productAt + 2} />
 
+        {/* Question 1's two definitions, written while they are said, where the star's notes go later. */}
+        <Note at={numbersAt} x={NOTE_X} y={y(310)} width={NOTE_W} out={q2At - 6}>
+          <span style={{ ...note(26, INK) }}>
+            <b>Fact table:</b> events, and the numbers you add up
+          </span>
+        </Note>
+        <Note at={contextAt} x={NOTE_X} y={y(420)} width={NOTE_W} out={q2At - 6}>
+          <span style={{ ...note(26, INK) }}>
+            <b>Dimensions:</b> the context you filter and group by
+          </span>
+        </Note>
+
         {/* "This is a star", named where the snowflake will grow. */}
         <Note at={starAt} x={NOTE_X} y={y(310)} width={NOTE_W} out={snowAt - 4}>
           <span style={{ ...note(26, INK) }}>

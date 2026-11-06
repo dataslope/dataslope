@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
-import { QMono, QuestionCard, Tick } from "../../editorial/interview";
+import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, headline, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { CORR, thousands } from "./data";
-import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK, OK_INK, PlanBox, X0 } from "./parts";
+import { Drift, Listing, listingHeight, MARK_OK, MARK_RED, OK, OK_INK, PlanBox, planHeight, SmallMono, X0 } from "./parts";
 
 const TOP = 330;
 const SIZE = 21;
@@ -22,9 +22,12 @@ const R_X = 1180;
  * printed runs SubPlan 1 with loops=10000, each a Seq Scan of the whole
  * table (1,000 kept, 9,000 removed), so the count on the right multiplies
  * out to a hundred million rows read. Then the page's CTE rewrite and its
- * plan, one Hash Join with the same 10,000 rows, and the window function
- * that also does it. Last, DuckDB's plan for the original: its optimizer
- * decorrelates it into a hash join over a group by on its own.
+ * plan, one Hash Join with the same 10,000 rows, which comes in as the
+ * correlated plan leaves, so the left of the frame is never empty; under it,
+ * what each form reads: 100,000,000 rows against the rewrite's two scans of
+ * 10,000. The window function also does it. Last, DuckDB's plan for the
+ * original: its optimizer decorrelates it into a hash join over a group by
+ * on its own.
  */
 export const CorrScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -45,15 +48,24 @@ export const CorrScene: React.FC = () => {
   const cteAt = n.word("corr-fix", "in a CTE");
   const hashAt = n.word("corr-fix", "one hash join");
   const sameAt = n.word("corr-fix", "the same ten thousand rows");
-  const windowAt = n.word("corr-fix", "A window function works too");
+  const twiceAt = n.word("corr-cost", "It reads the table twice");
+  const twentyAt = n.word("corr-cost", "twenty thousand rows");
+  const notAt = n.word("corr-cost", "not a hundred million");
+  const windowAt = n.word("corr-window", "A window function works too");
   const someAt = n.word("corr-duck", "Some optimizers");
-  const duckAt = n.word("corr-duck", "DuckDB, the page's engine");
-  const asHashAt = n.word("corr-duck", "as a hash join");
-  const readAt = n.word("corr-duck", "read the plan before you rewrite");
-  const end = n.beat("corr-duck").to;
+  const duckAt = n.word("corr-duck-plan", "DuckDB, another engine");
+  const asHashAt = n.word("corr-duck-plan", "as a hash join");
+  const readAt = n.word("corr-read", "read the plan before you rewrite");
+  const end = n.beat("corr-read").to;
 
   const planTop = y(TOP) + listingHeight(CORR.correlated.length, SIZE) + h(22);
-  const fixOut = onceAt - 2;
+  // The correlated query and plan leave as the rewrite's plan arrives in
+  // their place; the count on the right leaves for the rewrite's listing.
+  const fixOut = cteAt + 2;
+  const countOut = onceAt - 2;
+  const [scanRows] = CORR.rewriteRows;
+  if (CORR.rewriteRows.some((r) => r !== scanRows)) throw new Error("the rewrite's scans read different row counts");
+  const rewriteRead = CORR.rewriteRows.reduce((a, b) => a + b, 0);
   const total = CORR.loops * CORR.perLoop;
   const rewriteTop = y(TOP);
   const duckTop = rewriteTop + listingHeight(CORR.rewrite.length, 20) + h(150);
@@ -75,7 +87,7 @@ export const CorrScene: React.FC = () => {
         {/* ── The page's correlated subquery, and its plan in Postgres ── */}
         <Note at={avgAt - 4} x={X0} y={y(TOP) - h(46)} out={fixOut}>
           <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>
-            The page&rsquo;s query, on <Num>{thousands(CORR.employees)}</Num> employees in {CORR.departments} departments
+            A classic example, on <Num>{thousands(CORR.employees)}</Num> employees in {CORR.departments} departments
           </span>
         </Note>
         <Listing
@@ -104,7 +116,7 @@ export const CorrScene: React.FC = () => {
             { line: "Rows Removed", at: scanAt + 12 },
           ]}
         />
-        <Note at={perRowAt} x={R_X} y={y(TOP)} out={fixOut}>
+        <Note at={perRowAt} x={R_X} y={y(TOP)} out={countOut}>
           <div style={{ ...label(21, INK_SOFT) }}>rows read</div>
           <div style={{ ...note(30, INK), whiteSpace: "nowrap", marginTop: h(10) }}>
             <Num>{thousands(CORR.loops)}</Num> runs
@@ -130,11 +142,23 @@ export const CorrScene: React.FC = () => {
           marks={[
             { line: "Hash Join", text: "Hash Join", at: hashAt + 2, color: MARK_OK },
             { line: "Hash Join", text: "actual rows=10000.00", at: sameAt, color: MARK_OK },
-            { line: "HashAggregate", text: "HashAggregate", at: hashAt + 10 },
+            { line: "HashAggregate", text: "HashAggregate", at: hashAt + 10, out: twiceAt },
+            { line: "Seq Scan on employees e", text: "Seq Scan on employees e", at: twiceAt + 2 },
+            { line: "Seq Scan on employees (", text: "Seq Scan on employees", at: twiceAt + 8 },
           ]}
         />
+        {/* What each form reads: the count from before, and the rewrite's. */}
+        <Note at={twiceAt} x={X0} y={y(TOP) + planHeight(CORR.rewritePlan.length, PLAN) + h(36)}>
+          <div style={{ ...label(21, INK_SOFT) }}>rows read</div>
+          <div style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, twentyAt, 10) }}>
+            rewrite: {CORR.rewriteScans} scans × <Num>{thousands(scanRows)}</Num> = <Num>{thousands(rewriteRead)}</Num>
+          </div>
+          <div style={{ ...note(26, ACCENT_INK), whiteSpace: "nowrap", marginTop: h(6), opacity: ease(frame, notAt, 10) }}>
+            correlated: <Num>{thousands(CORR.loops)}</Num> × <Num>{thousands(CORR.perLoop)}</Num> = <Num>{thousands(total)}</Num>
+          </div>
+        </Note>
         <Note at={onceAt} x={R_X} y={rewriteTop - h(46)}>
-          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>The page&rsquo;s rewrite</span>
+          <span style={{ ...label(22, INK), whiteSpace: "nowrap" }}>The usual rewrite</span>
         </Note>
         <Listing lines={CORR.rewrite} x={R_X} top={rewriteTop} width={640} size={20} at={onceAt} marks={[{ line: "WITH dept_avgs", at: cteAt + 4, color: MARK_OK }]} />
         <Note at={sameAt + 4} x={R_X} y={rewriteTop + listingHeight(CORR.rewrite.length, 20) + h(18)}>
@@ -145,7 +169,7 @@ export const CorrScene: React.FC = () => {
         </Note>
         <Note at={windowAt} x={R_X} y={rewriteTop + listingHeight(CORR.rewrite.length, 20) + h(62)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            or <QMono>AVG(salary) OVER (PARTITION BY department)</QMono>
+            or <SmallMono>AVG(salary) OVER (PARTITION BY department)</SmallMono>
           </span>
         </Note>
 

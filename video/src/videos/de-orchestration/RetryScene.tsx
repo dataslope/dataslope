@@ -28,8 +28,9 @@ const LINE_W = 720;
  * Question 4, the settings. What to retry (transient failures) and what not
  * to (deterministic ones); the page's default_args, read as a doubling
  * schedule: four attempts with waits of 5, 10 and 20 minutes, never more than
- * 30 (Pyodide, check.mjs). Retry only idempotent tasks, and alert when the
- * retries run out.
+ * 30 (Pyodide, check.mjs). Those are floors: Airflow's exponential backoff
+ * adds a per-task spread of up to the same again, so its tasks don't retry in
+ * lockstep. Retry only idempotent tasks, and alert when the retries run out.
  */
 export const RetryScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -136,6 +137,8 @@ export const RetryScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
           {RETRY.waits.map((w, i) => {
             const p = ease(frame, waitAt[i] + 2, 16);
+            // A zero-length round-capped line still draws a dot: none until it grows.
+            if (p <= 0) return null;
             return <line key={i} x1={xs[i] + R} x2={xs[i] + R + (xs[i + 1] - xs[i] - 2 * R) * p} y1={lineY} y2={lineY} stroke={BAR} strokeWidth={5} strokeLinecap="round" />;
           })}
           {xs.map((x, i) => {
@@ -189,6 +192,18 @@ export const RetryScene: React.FC = () => {
         <Note at={capAt + 2} x={LINE_X0 - R} y={lineY + h(66)}>
           <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             each wait doubles, never more than <Num>{RETRY.max}</Num> min
+          </span>
+        </Note>
+        <Note at={capAt + 10} x={LINE_X0 - R} y={lineY + h(122)}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            at least{" "}
+            {RETRY.waits.map((w, i) => (
+              <React.Fragment key={w}>
+                {i ? ", " : null}
+                <Num>{w}</Num>
+              </React.Fragment>
+            ))}{" "}
+            min: Airflow spreads each wait up to twice that
           </span>
         </Note>
         <Note at={alertAt + 8} x={xs[3] + R} y={lineY + h(66)} align="right">

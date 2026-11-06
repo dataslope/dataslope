@@ -2,9 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, body, label, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, body, label, note } from "../../editorial/style";
+import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { partOf } from "./data";
 import { Chip, Drift, Flow, Headline, Kicker, Mono, Spot } from "./parts";
 
 /** The stack's left edge, its right edge, and the arrow beside it. */
@@ -17,8 +19,38 @@ const BAND_H = 128;
 const BAND_GAP = 18;
 /** The layer's name column. */
 const NAME_W = 300;
+/** The bracket that takes in all four layers, right of the stack, and the
+ *  design prompt set beside it, under the meerkat. */
+const BRACKET_X = 1470;
+const DESIGN_X = 1494;
 
-type Layer = { name: string; at: number; until: number; chips: { at: number; text: React.ReactNode }[] };
+type Layer = {
+  name: string;
+  at: number;
+  until: number;
+  /** The topic videos that answer this layer's questions, by folder. */
+  parts: string[];
+  chips: { at: number; text: React.ReactNode }[];
+};
+
+/** "Parts 1–2" or "Parts 6, 8, 10": a run of two is a range, anything else a
+ *  list. Each number in tabular figures, the dash and commas outside them. */
+const PartsLabel: React.FC<{ parts: number[] }> = ({ parts }) => {
+  const nums = parts.map((p) => <Num key={p}>{p}</Num>);
+  const run = parts.length === 2 && parts[1] === parts[0] + 1;
+  return (
+    <>
+      {parts.length > 1 ? "Parts " : "Part "}
+      {run ? (
+        <>
+          {nums[0]}–{nums[1]}
+        </>
+      ) : (
+        nums.flatMap((x, k) => (k ? [", ", x] : [x]))
+      )}
+    </>
+  );
+};
 
 /**
  * The opening. The page's prompt, "design a pipeline for X", is the
@@ -28,7 +60,10 @@ type Layer = { name: string; at: number; until: number; chips: { at: number; tex
  * advanced SQL (which inks in first, as "a level deeper than an analyst
  * screen"), data modeling, pipelines and orchestration, systems and formats.
  * Each layer fills with its topics as they are said, and the layer being read
- * carries the highlighter's yellow.
+ * carries the highlighter's yellow. Then the prompt comes back: a design
+ * question draws on all four layers at once, so all four light and a bracket
+ * takes them in, with the prompt beside it; each layer is labelled with the
+ * parts that build it, and Part 11 as the one that walks a design through.
  */
 export const PromptScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -38,18 +73,24 @@ export const PromptScene: React.FC = () => {
   const from = n.beat("prompt").from;
   const forAt = n.word("prompt", "for X");
   const expectAt = n.word("expect", "Expect it");
-  const sqlAt = n.word("expect", "next to sequel");
-  const deeperAt = n.word("expect", "a level deeper");
+  const sqlAt = n.word("expect-sql", "comes sequel");
+  const deeperAt = n.word("expect-sql", "a level deeper");
   const fourAt = n.word("probe", "probe four things");
   const downAt = n.word("probe", "from the query down");
   const filesAt = n.word("probe", "to the files");
-  const end = n.beat("probe-store").to;
+  const designFrom = n.beat("probe-design").from;
+  const designAt = n.word("probe-design", "Designing a pipeline for X");
+  const allAt = n.word("probe-design", "all four layers");
+  const buildsAt = n.word("probe-design", "builds each layer");
+  const elevenAt = n.word("probe-design", "Part eleven walks");
+  const end = n.beat("probe-design").to;
 
   const layers: Layer[] = [
     {
       name: "Advanced SQL",
       at: sqlAt,
       until: n.beat("probe-model").from,
+      parts: ["de-sql-patterns", "de-sql-performance"],
       chips: [
         { at: n.word("probe-sql", "window functions"), text: "window functions" },
         { at: n.word("probe-sql", "qualify"), text: <Mono>QUALIFY</Mono> },
@@ -62,6 +103,7 @@ export const PromptScene: React.FC = () => {
       name: "Data modeling",
       at: n.word("probe-model", "Data modeling"),
       until: n.beat("probe-pipe").from,
+      parts: ["de-dimensional-modeling", "de-modeling-history"],
       chips: [
         { at: n.word("probe-model", "star or snowflake schemas"), text: "star or snowflake schemas" },
         { at: n.word("probe-model", "facts and dimensions"), text: "facts and dimensions" },
@@ -73,6 +115,7 @@ export const PromptScene: React.FC = () => {
       name: "Pipelines & orchestration",
       at: n.word("probe-pipe", "Pipelines and orchestration"),
       until: n.beat("probe-store").from,
+      parts: ["de-pipelines", "de-streaming", "de-orchestration"],
       chips: [
         { at: n.word("probe-pipe", "batch or streaming"), text: "batch or streaming" },
         { at: n.word("probe-pipe", "idempotency"), text: "idempotency" },
@@ -83,7 +126,8 @@ export const PromptScene: React.FC = () => {
     {
       name: "Systems & formats",
       at: n.word("probe-store", "systems and formats"),
-      until: end + 20,
+      until: designFrom,
+      parts: ["de-distributed", "de-warehousing"],
       chips: [
         { at: n.word("probe-store", "columnar files like Parquet"), text: "columnar files (Parquet)" },
         { at: n.word("probe-store", "partitioning and file sizes"), text: "partitioning, file sizes" },
@@ -95,6 +139,16 @@ export const PromptScene: React.FC = () => {
 
   const bandY = (i: number) => y(BAND_TOP) + i * (h(BAND_H) + h(BAND_GAP));
   const firstChip = layers[0].chips[0].at;
+  // All four at once, on "all four layers", held to the cut.
+  const all = ease(frame, allAt - 4, 12);
+  const stackTop = bandY(0);
+  const stackBottom = bandY(3) + h(BAND_H);
+  // The prompt beside the bracket sits under the meerkat, and the bracket's
+  // nub points at it.
+  const designTop = bandY(2) + 20;
+  const nubY = designTop + 22;
+  const bracket = ease(frame, allAt - 2, 18);
+  const partsIn = (i: number) => ease(frame, buildsAt + i * 3, 14);
 
   return (
     <AbsoluteFill>
@@ -103,9 +157,12 @@ export const PromptScene: React.FC = () => {
         <Sfx key={l.name} name="el-tap" at={l.at} level={-31} />
       ))}
       <Sfx name="el-pencil" at={downAt} level={-35} />
+      <Sfx name="el-pencil" at={allAt} level={-35} />
 
       <Drift from={from} to={end + 40} scale={0.02}>
-        <Kicker at={from}>Data engineer interview prep</Kicker>
+        {/* Inked before frame 0, so the video's first frame (its poster) is
+            not a blank page. */}
+        <Kicker at={-14}>Data engineer interview prep</Kicker>
         <Headline lead="Design a pipeline" turn="for X." at={from + 2} turnAt={forAt - 2} out={fourAt - 10} size={80} />
         <Headline lead="Four things," turn="from the query down to the files." at={fourAt} turnAt={downAt} size={60} />
 
@@ -155,7 +212,7 @@ export const PromptScene: React.FC = () => {
         {layers.map((l, i) => {
           const p = ease(frame, l.at - 4, 14);
           if (p <= 0) return null;
-          const current = during(frame, l.at - 4, l.until, 10);
+          const current = Math.max(during(frame, l.at - 4, l.until, 10), all * 0.6);
           // The first layer speaks for SQL "a level deeper than an analyst
           // screen" until its own topics start.
           const deeper = i === 0 ? ease(frame, deeperAt - 2, 12) * (1 - ease(frame, firstChip - 12, 10)) : 0;
@@ -180,7 +237,25 @@ export const PromptScene: React.FC = () => {
                 transform: `translateY(${(1 - p) * -12}px)`,
               }}
             >
-              <div style={{ width: NAME_W, flex: "none", ...note(32, INK), fontWeight: 650, lineHeight: 1.12 }}>{l.name}</div>
+              <div style={{ width: NAME_W, flex: "none" }}>
+                <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.12 }}>{l.name}</div>
+                {/* The parts open a line under the name as they ink in, so
+                    the name rises to make room and the two stay centred in
+                    the band together. */}
+                <div
+                  style={{
+                    ...label(21, BLUE_INK),
+                    lineHeight: "26px",
+                    height: 26 * partsIn(i),
+                    marginTop: 6 * partsIn(i),
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    opacity: partsIn(i),
+                  }}
+                >
+                  <PartsLabel parts={l.parts.map(partOf)} />
+                </div>
+              </div>
               <div style={{ position: "relative", flex: 1, display: "flex", flexWrap: "wrap", gap: "10px 12px", alignContent: "center" }}>
                 {l.chips.map((c, k) => (frame >= c.at - 2 ? <Chip key={k} at={c.at} size={26}>{c.text}</Chip> : null))}
                 {deeper > 0 ? (
@@ -192,6 +267,29 @@ export const PromptScene: React.FC = () => {
             </div>
           );
         })}
+
+        {/* All four layers at once: a bracket down the stack's right, its
+            nub pointing at the prompt it answers. */}
+        {bracket > 0 ? (
+          <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+            <path
+              d={`M ${BRACKET_X - 12} ${stackTop} H ${BRACKET_X} V ${stackBottom} H ${BRACKET_X - 12} M ${BRACKET_X} ${nubY} H ${BRACKET_X + 12}`}
+              fill="none"
+              stroke={INK_SOFT}
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              pathLength={1}
+              strokeDasharray={`${bracket} 1`}
+            />
+          </svg>
+        ) : null}
+        <div style={{ position: "absolute", left: DESIGN_X + 6, top: designTop, width: 1900 - DESIGN_X }}>
+          <div style={{ ...body(32, true), color: INK, whiteSpace: "nowrap", opacity: ease(frame, designAt - 2, 12) }}>design a pipeline for X</div>
+          <div style={{ ...label(21, BLUE_INK), marginTop: 8, opacity: ease(frame, elevenAt - 2, 12) }}>
+            <PartsLabel parts={[partOf("de-pipelines-for-ai")]} /> walks one through
+          </div>
+        </div>
       </Drift>
     </AbsoluteFill>
   );

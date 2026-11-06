@@ -3,11 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { DATA, DATA_TINT, Drift, head, lineOf, madeUp, Mark, MARK_OK, OK_INK, SqlListing, sqlListingHeight, X0 } from "./parts";
+import { MONO } from "../../theme/fonts";
+import { Chip, DATA, DATA_TINT, Drift, head, lineOf, madeUp, Mark, MARK_BAD, MARK_OK, OK_INK, SqlListing, sqlListingHeight, X0 } from "./parts";
 
 /** pgvector's nearest-neighbour search with an access filter and a join, in
  *  its own syntax (`<=>` is its cosine distance). Shown, not run: no vector
@@ -25,13 +26,16 @@ const STRIP = { x0: X0, x1: 1800, top: 262 };
 const RIGHT_X = 1050;
 
 /**
- * Question 7. A strip from millions of vectors to billions, the left part
- * pgvector's and the right a dedicated database's. Left, pgvector, the
- * Postgres extension: its search as one SQL statement, with the join and the
- * access filter lit as the narration names them, and the four reasons
- * ticked. Right, what a dedicated vector database earns its cost with. Last,
- * the answer an interviewer wants: a lean, and the evidence that would move
- * it.
+ * Question 7. A strip from millions of vectors to billions, drawn empty as
+ * pgvector is introduced, its left part then labelled pgvector's and the
+ * right a dedicated database's. Left, pgvector, the Postgres extension: its
+ * search as one SQL statement (`<=>` glossed beside it), with the join and
+ * the access filter lit as the narration names them, and the four reasons
+ * ticked; then the caveat that with an approximate index the filter runs
+ * after the search, Question 8's trap, the filter's line turned red. Right,
+ * what a dedicated vector database earns its cost with. Last, the answer an
+ * interviewer wants: a lean (pgvector), and the evidence that would move
+ * it, three chips.
  */
 export const PgScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -59,13 +63,25 @@ export const PgScene: React.FC = () => {
     { text: "very high query rates", at: n.word("pg-dedicated", "very high query rates") },
     { text: "hybrid search and multi-tenancy built in", at: n.word("pg-dedicated", "hybrid search and multi-tenancy built in") },
   ];
+  const caveatAt = n.word("pg-caveat", "With an approximate index");
+  const afterAt = n.word("pg-caveat", "that filter runs after the search");
+  const trapAt = n.word("pg-caveat", "the trap in question eight");
   const leanAt = n.word("pg-lean", "Say which way you'd lean");
+  const herePgAt = n.word("pg-lean", "here pgvector");
   const evidenceAt = n.word("pg-lean", "what evidence would change your mind");
+  const evidence = [
+    { text: "the index outgrows memory", at: n.word("pg-lean", "the index outgrowing memory") },
+    { text: "latency misses its target at peak", at: n.word("pg-lean", "latency missing its target at peak load") },
+    { text: "filtered searches lose recall", at: n.word("pg-lean", "filtered searches losing recall") },
+  ];
   const end = n.beat("pg-lean").to;
 
   const stripY = y(STRIP.top);
   const split = STRIP.x0 + (STRIP.x1 - STRIP.x0) * 0.5;
-  const grow = ease(frame, millionsAt - 2, 16);
+  // The strip is drawn empty as pgvector is named; its labels wait for
+  // "millions" and "billions".
+  const grow = ease(frame, extAt, 16);
+  const growRight = ease(frame, extAt + 6, 16);
   const listTop = y(420);
 
   return (
@@ -106,14 +122,14 @@ export const PgScene: React.FC = () => {
             opacity: grow,
           }}
         >
-          millions of vectors: pgvector
+          <span style={{ opacity: ease(frame, millionsAt - 2, 10) }}>millions of vectors: pgvector</span>
         </div>
         <div
           style={{
             position: "absolute",
             left: split,
             top: stripY,
-            width: (STRIP.x1 - split) * ease(frame, billionsAt - 2, 16),
+            width: (STRIP.x1 - split) * growRight,
             height: 46,
             borderRadius: "0 10px 10px 0",
             background: PAPER,
@@ -126,10 +142,10 @@ export const PgScene: React.FC = () => {
             ...note(23, INK),
             fontWeight: 650,
             whiteSpace: "nowrap",
-            opacity: ease(frame, billionsAt - 2, 12),
+            opacity: growRight,
           }}
         >
-          billions: a dedicated vector database
+          <span style={{ opacity: ease(frame, billionsAt - 2, 10) }}>billions: a dedicated vector database</span>
         </div>
 
         {/* pgvector. */}
@@ -151,9 +167,17 @@ export const PgScene: React.FC = () => {
           at={inPgAt}
           marks={[
             { line: lineOf(QUERY, "JOIN documents"), at: reasons[2].at + 4 },
-            { line: lineOf(QUERY, "WHERE d.team"), at: reasons[3].at + 4 },
+            { line: lineOf(QUERY, "WHERE d.team"), at: reasons[3].at + 4, out: afterAt + 2 },
+            { line: lineOf(QUERY, "WHERE d.team"), at: afterAt + 4, color: MARK_BAD },
           ]}
         />
+        {/* What the search line does. */}
+        <Note at={inPgAt + 16} x={X0 + 790} y={listTop + 16 + lineOf(QUERY, "ORDER BY") * 43 + 6}>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            ← <span style={{ fontFamily: MONO, fontVariantLigatures: "none", color: INK }}>&lt;=&gt;</span> is cosine distance to{" "}
+            <span style={{ fontFamily: MONO, color: INK }}>$1</span>, the query&apos;s vector
+          </span>
+        </Note>
         {reasons.map((r, i) => (
           <Note key={r.text} at={r.at - 2} x={X0} y={listTop + sqlListingHeight(QUERY.length, 24) + 26 + i * 44}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -162,6 +186,17 @@ export const PgScene: React.FC = () => {
             </div>
           </Note>
         ))}
+
+        {/* The caveat: Question 8's trap. */}
+        <Note at={caveatAt - 2} x={X0} y={listTop + sqlListingHeight(QUERY.length, 24) + 26 + reasons.length * 44 + 8}>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+            with an approximate index,{" "}
+            <span style={{ opacity: ease(frame, afterAt - 2, 10) }}>
+              <span style={{ fontFamily: MONO, fontVariantLigatures: "none" }}>WHERE</span> runs after the search
+            </span>
+            <span style={{ opacity: ease(frame, trapAt - 2, 10), fontWeight: 500 }}> (question 8)</span>
+          </span>
+        </Note>
 
         {/* A dedicated vector database. */}
         <Note at={dedAt - 2} x={RIGHT_X} y={listTop - 64}>
@@ -180,22 +215,29 @@ export const PgScene: React.FC = () => {
         ))}
 
         {/* What an interviewer wants. */}
-        <Note at={leanAt - 2} x={RIGHT_X} y={y(700)}>
+        <Note at={leanAt - 2} x={RIGHT_X} y={y(630) + 18}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>the answer they want</span>
         </Note>
-        <Note at={leanAt} x={RIGHT_X} y={y(700) + 40}>
+        <Note at={leanAt} x={RIGHT_X} y={y(630) + 58}>
           <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap", lineHeight: 1.5 }}>
             <Mark at={leanAt + 4} color={MARK_OK}>
-              which way you&apos;d lean,
+              which way you&apos;d lean
             </Mark>
+            <span style={{ opacity: ease(frame, herePgAt - 2, 10) }}>: pgvector,</span>
             <br />
             <span style={{ opacity: ease(frame, evidenceAt - 2, 10) }}>
               <Mark at={evidenceAt + 4} color={MARK_OK}>
                 and what evidence would change it
               </Mark>
+              :
             </span>
           </span>
         </Note>
+        {evidence.map((e, i) => (
+          <Chip key={e.text} x={RIGHT_X} y={y(630) + 156 + i * 54} at={e.at - 2} size={22}>
+            {e.text}
+          </Chip>
+        ))}
       </Drift>
     </AbsoluteFill>
   );

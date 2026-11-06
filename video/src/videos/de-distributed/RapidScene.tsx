@@ -170,8 +170,8 @@ const Push: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Line at={predAt - 2} top={c.y(342)} size={25} weight={700}>
         Predicate pushdown:{" "}
-        <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600 }}>
-          WHERE amount &gt; {CUT}
+        <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600 }}>
+          SELECT region, amount … WHERE amount &gt; {CUT}
         </span>
       </Line>
       <Line at={parquetAt} top={c.y(392)} size={22} color={INK_SOFT}>
@@ -185,9 +185,9 @@ const Push: React.FC<{ c: Ctx }> = ({ c }) => {
             key={k}
             style={{
               position: "absolute",
-              left: R_X + k * 290,
+              left: R_X + k * 316,
               top: c.y(434),
-              width: 270,
+              width: 300,
               height: c.h(62),
               boxSizing: "border-box",
               borderRadius: 8,

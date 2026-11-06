@@ -87,8 +87,10 @@ export const RowsScene: React.FC = () => {
   const colY = y(COL_STRIP);
   const sh = h(STRIP_H);
 
-  // Each column block of the column store lands on its word.
-  const groupAt = (c: number) => (c === 0 ? idAt : c === 1 ? dateAt : soOnAt + (c - 2) * 4);
+  // Each column block of the column store lands on its word, and the last
+  // four follow the dates at once, so the store is whole about a second
+  // before Question 1 leaves (they used to start on "and so on").
+  const groupAt = (c: number) => (c === 0 ? idAt : dateAt + (c - 1) * 6);
 
   const cell = (x: number, top: number, c: number, at: number, key: string) => {
     const p = ease(frame, at, 10);
@@ -244,7 +246,10 @@ export const RowsScene: React.FC = () => {
         <Note at={typeAt} x={colX(0, 0)} y={colY + sh + h(46)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             one type, side by side: it compresses well
-            <span style={{ opacity: ease(frame, batchAt, 10) }}> and is processed in batches</span>
+            <span style={{ opacity: ease(frame, batchAt, 10) }}>
+              {" "}
+              and is processed in batches <span style={{ color: INK_SOFT }}>(vectorized execution)</span>
+            </span>
           </span>
         </Note>
 
@@ -284,6 +289,11 @@ export const RowsScene: React.FC = () => {
         </div>
         <FileBar x={BAR_X} y={y(TOP) + h(134)} width={BAR_W} height={h(40)} at={mixesAt} pattern={cols.map((c) => COLUMN_TINT[c])} />
         <ReadMark x={BAR_X} y={y(TOP) + h(134)} width={BAR_W} height={h(40)} at={wholeAt - 4} />
+        {/* The two gaps, apart: the file's size is its encoding, the read is its columns. */}
+        <div style={{ position: "absolute", left: BAR_X, top: y(TOP) + h(196), ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, wholeAt + 12, 12) }}>
+          <Num>{MB(FILES.csv)}</Num> to <Num>{MB(FILES.parquet)}</Num>: binary types and compression · <Num>{MB(FILES.parquet)}</Num> to{" "}
+          <Num>{MB(QUERY.parquet.read)}</Num>: three columns of six
+        </div>
       </Drift>
     </AbsoluteFill>
   );

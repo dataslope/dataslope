@@ -39,9 +39,15 @@ ids that sort in course order:
 | `How-LLMs-Work` | `Llm-1-Tokens` to `Llm-5-Benchmarks`, narrated by Drew, with two deep dives: `Llm-2-1-AttentionScore` (one attention score worked through) and `Llm-4-1-ConversationCost` (why a chat's bill grows faster than the chat) |
 | `NLP-Python` | `Nlp-1-WhyTextIsHard` to `Nlp-5-History`, narrated by Hope, with two deep dives: `Nlp-2-1-LemmasAndTags` (lemmatizing needs the part of speech) and `Nlp-3-1-ZipfsLaw` (Zipf's law read off a log-log plot) |
 
+The `Logo-Reveals` folder holds twenty short brand clips: five stings,
+eight course openers and seven variations of the columns opener (see
+[Logo reveals](#logo-reveals)). The `Thumbnails` folder holds a YouTube
+thumbnail for each merged course and interview track, in four designs (see
+[YouTube thumbnails](#youtube-thumbnails)).
+
 A deep dive (`Llm-2-1-…`) is a two-minute video on one idea its unit could
 only sketch, embedded at one lesson section beside the unit video. It has no
-series intro and no "Next" line, and sits after its unit in the Studio folder.
+"Next" line, and sits after its unit in the Studio folder.
 
 A course video's id is not its folder name (`Stats-2-DescribingData` lives in
 `src/videos/describing-data/`). The check scripts take either; `remotion
@@ -181,10 +187,11 @@ narration.
 
 Every video follows these rules.
 
-- **Content only.** No running head or masthead, and no branded end card. The
-  video stops on its last idea. The one brand moment is the series intro
-  below, at the very start of a course video, and nothing else carries the
-  logo.
+- **Content only.** No running head or masthead, no opener and no branded
+  end card. The video opens on its first idea and stops on its last. Each
+  course and interview track is uploaded to YouTube as one merged video, and
+  the opener goes on in that edit: one of the logo reveals, or the series
+  intro below, both kept for it. No lesson video carries the logo.
 - **No tracked capitals.** Kickers, figure numbers and axis titles are set in
   sentence case. All caps with wide letter spacing shouts, and it blurs at
   small sizes.
@@ -302,31 +309,32 @@ longer `pauseAfter` on the beat before it, which the gap never shortens.
 before a marked beat. Mark beats the same way when a scene opens on a beat
 some other way, such as a wipe or an eraser keyed to `beat("…").from`.
 
-### A course video opens on the series intro
+### The series intro (kept, not placed)
 
-A course's unit video opens with `<SeriesIntro>` (`src/editorial/SeriesIntro.tsx`):
-the Dataslope mark assembles from its two slopes, tilts the way the site's
-logo tilts on hover, and the wordmark writes itself beside it, set as the
-site header sets it (Inter 600, tracked tight, at 1.38 times the mark's
-height). The course and unit, then the unit's title, arrive under a hairline.
-ThinkingStatistically is the worked example.
+`<SeriesIntro>` (`src/editorial/SeriesIntro.tsx`) is the course opener the
+unit videos used to start on: the Dataslope mark assembles from its two
+slopes, tilts the way the site's logo tilts on hover, and the wordmark
+writes itself beside it, set as the site header sets it (Inter 600, tracked
+tight, at 1.38 times the mark's height). The course and unit, then the
+unit's title, arrive under a hairline. Its sound is `el-logo`, an airy rise
+into a bell, peaking at -21 dBFS with nothing under it, and a pencil stroke
+for the hairline.
 
-- **The mark is the site's own file.** Its two paths and radial gradients are
-  copied from `public/dataslope-logo-blue.svg` (the copy in
-  `public/brand/` is the same file), drawn inline so each half can move, with
-  the blue as a brand token.
+**No video opens on it any more** (removed 2026-11-05). The tracks are
+uploaded as merged videos, each with one opener added in the edit, so 28
+copies of the intro inside them would repeat. The component and its timing
+stay for a video that wants one:
+
 - **The intro is its own scene from frame 0**, ending where the first
   content scene's cut begins, and the script sets `leadIn: INTRO_LEAD_IN`
-  (4.6 s, just past the intro's 4.4) so the first word waits for it. Both
-  numbers live in `src/editorial/intro.ts`, so a change to the intro's length
-  is one edit that moves every course video, and `src/editorial/intro.test.ts`
-  fails any course script that types its own lead-in. Anything the first
-  scene used to show at fixed frames is re-cued to its first beat
-  (`n.beat(id).from`), or it plays under the logo. The first beat is
-  `scene: true`, since a cut is cued from it.
-- **It has its own sound**: `el-logo`, an airy rise into a bell, peaking at
-  -21 dBFS with nothing under it, and a pencil stroke for the
-  hairline.
+  (4.6 s, just past the intro's 4.4, both in `src/editorial/intro.ts`) so the
+  first word waits for it. Anything the first scene shows at fixed frames
+  is cued to its first beat (`n.beat(id).from`) instead, or it plays under
+  the logo.
+- **`src/editorial/intro.test.ts` holds the two together.** A video that
+  opens on the intro takes its lead-in from `intro.ts`, and a script that
+  waits `INTRO_LEAD_IN` without opening on the intro fails, because its
+  first word would follow 4.6 s of empty page.
 
 ### A video in a series leads into the next
 
@@ -518,9 +526,147 @@ by itself, and the scene gaps still hold.
 Words like "SQL" and "Postgres" are better pinned with an ElevenLabs
 pronunciation dictionary than respelled in the script: the captions show the
 script text exactly as written.
+`agent-outputs/20261105-1200-narration-acronym-redub-plan.md` (at the
+repository root) plans the general fix: one pronunciation table applied when
+the text is sent, which re-voices exactly the beats it changes (52 of them,
+in 19 videos, when it was written).
 
 Captions are off by default (`EDITORIAL_DEFAULTS`). Switch them on in the
 Studio's props panel, or with `--props='{"captions":true}'`.
+
+## Logo reveals
+
+Short brand clips, in the Studio's `Logo-Reveals` folder. A **sting** is the
+mark and the wordmark (3.5 s). A **course opener** adds a course and a unit
+(5 s). **Openers are set in Inter**, the site's face; three more repeat an
+Inter opener in another face, to compare against it. Each opens on a few frames of bare page, builds the mark, sets the
+words, and holds the finished lockup for at least a second.
+
+| Composition | The mark | The words | Layout |
+| --- | --- | --- | --- |
+| `Sting-1-Assemble` | `assemble` | `ink` | `sting` |
+| `Sting-2-Plot` | `plot` | `letters` | `sting` |
+| `Sting-3-Histogram` | `histogram` | `slide` | `sting` |
+| `Sting-4-Scatter` | `scatter` | `blur` | `sting` |
+| `Sting-5-UnfoldDark` | `unfold` | `type` | `sting`, on deep blue |
+| `Opener-1-Stack` | `rise` | `slide` | `stack`, every line one size |
+| `Opener-2-Block` | `plot` | `ink` | `block`, every line one size |
+| `Opener-3-Centered` | `unfold` | `letters` | `centered`, every line one size |
+| `Opener-4-Columns` | `assemble` | `blur` | `columns`, every line one size |
+| `Opener-5-Headline` | `histogram` | `ink` | `headline`, a hierarchy, for comparison |
+| `Opener-6-Stack-SourceSerif` | `rise` | `slide` | Opener-1 in Source Serif 4, the videos' headline face |
+| `Opener-7-Centered-Fraunces` | `unfold` | `letters` | Opener-3 in Fraunces |
+| `Opener-8-Columns-Mono` | `assemble` | `blur` | Opener-4 in JetBrains Mono, the site's code face |
+| `Columns-1-Black` | `assemble` | `blur` | Opener-4 with the course and unit in black |
+| `Columns-2-BlueBar` | `plot` | `slide` | black, the divider a brand-blue bar |
+| `Columns-3-ThreeLines` | `unfold` | `letters` | black, the unit on a line of its own |
+| `Columns-4-Large` | `assemble` | `ink` | black, blue bar, every line at 64 px |
+| `Columns-5-FullCourse` | `rise` | `slide` | black, a whole merged course: no unit |
+| `Columns-6-InterviewPrep` | `assemble` | `blur` | black, blue bar, a whole interview track |
+| `Columns-7-ThreeLines-Assemble` | `assemble` | `blur` | Columns-3's three lines with Columns-1's motion and sound |
+
+All of them are one component, `LogoReveal` (`src/reveals/`), with different
+props (`src/reveals/presets.ts`). Any mark motion goes with any text motion,
+layout and theme, and an opener names any unit, from the Studio's props panel
+or the command line:
+
+```bash
+npm run render -- Opener-1-Stack --props='{"course":"Database Design with PostgreSQL","unit":"Unit 4","title":"Keys and integrity"}'
+```
+
+- **The mark is the site's own file.** `src/components/mark.ts` holds its two
+  paths and gradients (the series intro draws from it too), and the slope's
+  centre line, `SPINE`, measured from the file: each slope is a band 272
+  units wide along it. That is what lets `plot` draw a slope as one
+  round-capped pen stroke and `scatter` settle points inside it. Every motion
+  ends on the file exactly.
+- **The motions** (`timing.ts`): `assemble` (the halves slide in and meet,
+  then the site's hover tilt), `plot` (drawn up one slope and down the other,
+  the round cap as the pen), `histogram` (bars rise inside the outline, then
+  close their gaps into the shape), `scatter` (points gather into the
+  slopes, then it fills), `rise` (up from behind a horizon, with an
+  overshoot) and `unfold` (the peak drops in folded and swings open like a
+  compass). Distances are in screen pixels, so a small mark beside a line of
+  text moves as much as a large one.
+- **Equal sizes.** The `stack`, `block`, `centered` and `columns` openers set
+  every line at one size, "Dataslope" included: weight and color tell the
+  lines apart (the wordmark in ink at 600, the course in the soft ink at 500,
+  the unit's title in the brand blue). `headline` keeps a size hierarchy, to
+  compare against: its large title is Inter Display, the optical size Inter
+  draws at that scale.
+- **Columns options.** `textInk: "black"` sets the course and unit lines in
+  the ink rather than the soft grey; the title stays in the brand blue, so
+  blue is the only color in the words. `divider: "blue"` turns the hairline
+  into a brand-blue bar, `threeLines` gives the unit a line of its own, and
+  `size` overrides the one size every line is set at. A merged course or
+  interview track has no unit: pass `"unit": ""` and the title stands alone,
+  with the course line saying what the video is ("The full course, nine
+  units").
+- **Inter first.** `face` (`OpenerFace` in `LogoReveal.tsx`) sets the course
+  and unit lines: `inter` by default, or `source-serif`, `fraunces` or
+  `jetbrains-mono` to compare. The wordmark is Inter 600 whatever it says,
+  because it is the logo. Another face is scaled to Inter's x-height (by the
+  scales `editorial/typefaces.ts` measured), since a serif set at Inter's
+  font size reads smaller, and keeps Inter's line pitch, so "one size" still
+  holds. `reveals.test.ts` fails an opener in another face that isn't an
+  Inter opener with only the face changed.
+- **One number per motion.** `MARK_LANDS` is the frame the mark is whole; the
+  words, the glide of a sting's mark and the landing sound are all cued from it.
+  `src/reveals/reveals.test.ts` checks each against the springs that make it,
+  that every sound cued exists and starts inside the video, and that every
+  reveal holds its finished lockup for a second.
+- **Every reveal lands on the same sound**, the sonic half of the logo:
+  `landing`, a marimba chord by default (`el-reveal-land-marimba`), or a felt
+  piano chord (`felt`) or a soft synth pluck (`pluck`). Never a bell: the
+  first landing was one, and its ringing upper partials read as metal. What
+  leads into it follows the motion: a whoosh as each half of `assemble`
+  sweeps in and a click as they meet, a pen stroke under `plot`, a rising
+  marimba run under `histogram`, a shimmer that swells into `scatter`'s
+  landing, a thud and a whoosh for `unfold`. Each is cued by its accent
+  (`<Sfx accentAt>`, below), and each opener line by the tap of a soft card
+  slide. A reveal measures about -27 LUFS and peaks at -11 dBFS, a little
+  under the narration's -25 LUFS, since it plays alone.
+
+## YouTube thumbnails
+
+Stills in the Studio's `Thumbnails` folder, one per merged course and
+interview track in each of four designs, 1280x720:
+`Thumb-<Design>-<Track>`, e.g. `Thumb-Clean-DatabaseDesign`. An interview
+track comes twice, saying "Interview Prep" (`…-DataEngineer-Prep`) or
+"Interview Preparation" (`…-DataEngineer-Preparation`). Each track has its
+own watercolor animal, so the seven read apart at a glance in a list of
+results: an owl on a die (Statistics), an elephant at a card catalog
+(Database Design), a llama with books (LLMs), a parrot (NLP), a raccoon (Data
+Analyst), and the otter and meerkat of the Data Scientist and Data Engineer
+overviews.
+
+| Design | Look |
+| --- | --- |
+| `clean` | white page, the title in black, "Full Course" or "Interview Prep" in blue under it, the animal on the right |
+| `spotlight` | the same, the animal on a pale brand-blue disc |
+| `panel` | the words in white on a brand-blue panel, the kind of video in yellow, the animal stepping over the panel's edge |
+| `columns` | the columns opener's scheme: a hairline down the left, the kind of video in black, the title in blue |
+
+- **One size, like the openers.** Every word is set at `SIZE` (80px), and no
+  weight is above 600: weight (400 or 600) and color tell the lines apart,
+  never size. The wordmark is the one exception, set as the site header sets
+  it. No pills or badges; the words sit on the page.
+- **Seen small.** A thumbnail is about 168x94 on a phone, where 80px is about
+  10px, so the words are few. The widest line, "Natural Language", fits the
+  680px the words have; "Interview Preparation" does not, so it takes two
+  lines.
+- **Nothing in the bottom-right corner**, where YouTube prints the running
+  time. The animal stands on the bottom of a box that stops short of it.
+- **The art goes through the pipeline.** The five new animals are prompts in
+  `src/thumbnails/illustrations.json` (watercolor, 1024x1024, transparent),
+  generated and imported like any video's art:
+  `npm run illustrations -- thumbnails`, which finds prompts under
+  `src/<name>/` as well as `src/videos/<name>/`. A track's words and animal
+  are one entry in `TRACKS` (`src/thumbnails/Thumbnail.tsx`).
+
+```bash
+npx remotion still src/index.ts Thumb-Clean-DatabaseDesign out/thumb.png
+```
 
 ## Sound effects (SamplingBias, ThinkingStatistically)
 
@@ -560,21 +706,50 @@ script rewrites the list from what is in the folder.
 - **Synthesized** (SamplingBias): `npm run sfx` (`scripts/sfx.mjs`) builds 21
   sounds from damped sines and filtered noise. They are free, unlicensed and
   byte-identical on every run.
-- **Generated by ElevenLabs** (ThinkingStatistically and the logo intro):
-  `npm run sfx:elevenlabs` (`scripts/sfx-elevenlabs.mjs`) sends each prompt in
-  `sfx/elevenlabs.json` to the sound-generation API and writes
-  `public/sfx/el-<name>.wav`. They sound recorded rather than built, which is
-  the point of having them.
+- **Generated by ElevenLabs** (ThinkingStatistically, the logo intro and the
+  logo reveals): `npm run sfx:elevenlabs` (`scripts/sfx-elevenlabs.mjs`)
+  sends each prompt in `sfx/elevenlabs.json` to the sound-generation API and
+  writes `public/sfx/el-<name>.wav`. They sound recorded rather than built,
+  which is the point of having them.
 
 ```bash
 npm run sfx:elevenlabs -- --dry-run        # what would be generated, no calls
 npm run sfx:elevenlabs                     # only the sounds not yet generated
 npm run sfx:elevenlabs -- --only tap,pop   # these again, even if present
+npm run sfx:elevenlabs -- --only x --reprocess   # re-trim the kept MP3, no API call
 ```
 
+**The model is SFX v3**, `eleven_text_to_sound_v3` (released 2026-10-29),
+for every sound that doesn't name another with `model`. The API still
+defaults to v2 when no model is sent, so the script always sends one, and the
+lock file records which model made each file. The first eight sounds
+(`logo` to `chime`) were made on v2 and say so. ElevenLabs removes v2 on
+2027-03-01; the files stay, but regenerating one then means moving it to v3.
+v3 takes a `duration_seconds` of 0.5 to 30 s, which the script checks before
+it spends anything.
+
+**One event per sound, cued by its accent.** v3 is said to follow a prompt
+that lists events in order, but the reveals' first prompts ("two whooshes,
+then a click, then a bell") came back as a single hit near the start, or as
+an even texture with no bell. So each sound is one event, and the animation
+places them. `scripts/lib/wav.mjs` measures each file's **accent**, the
+attack of its loudest moment, into `public/sfx/accents.json`, and
+`<Sfx name="el-reveal-land-marimba" accentAt={land}>` starts the sound early
+by that much, so the chord strikes on the frame the mark lands. The cue still holds
+when the sound is regenerated. A sound whose accent comes before the video
+starts has its head trimmed instead of being dropped.
+
+**`reverse: true`** plays a sound backwards, which turns one that peaks and
+decays into one that swells into its last instant: `el-reveal-shimmer` is a
+shimmer generated forwards and played backwards, building into `scatter`'s
+landing. `--reprocess` re-applies it, or a change to the trimming, from the
+raw MP3 kept in `.generated/sfx/`, for free.
+
 Generation costs credits from the same ElevenLabs pool as the narration,
-though very few: a 2.5 s sound measured 14, so the eight in the file (8.3 s
-asked for in all) come to roughly 50. So the script generates only what is missing, and a
+though very few: a 2.5 s sound measured 14 on v2. ElevenLabs lists 40
+credits a second when a duration is set; the reveals' 20 s of v3 sounds did
+not move the account's character count on 2026-11-05, so check the usage
+page if it matters. So the script generates only what is missing, and a
 prompt edited since its sound was generated is reported (from
 `sfx/elevenlabs.lock.json`) rather than silently regenerated: pass `--only`
 to pay for it. The raw MP3s stay in `.generated/sfx/` (gitignored), and the
@@ -590,7 +765,8 @@ voice. The ElevenLabs set is smaller and covers the same jobs: `el-tap` for a
 value landing, `el-pop` for an illustration or a bar, `el-sprinkle` for many
 dots at once, `el-pencil` for a line drawn, `el-scratch` for a strike-through,
 `el-whoosh` for something sliding or sweeping in, `el-chime` for a
-conclusion, and `el-logo` for the intro. `el-chime` is the one to watch: it
+conclusion, and `el-logo` for the intro. The `el-reveal-*` sounds belong to
+the logo reveals (see above). `el-chime` is the one to watch: it
 centres near 320 Hz, inside the voice, so it goes in a pause and stays at
 about -32.
 
@@ -689,6 +865,33 @@ prohibitive, because a noun named inside a "no …" clause still gets drawn.
 Always ask for an empty transparent background. Keep it to a few large
 objects. A monochrome style is fine in a video, since its background never
 changes, which the site's two themes can't promise.
+
+### Real people and real machines
+
+The house watercolor draws every person as an anonymous figure with no face.
+Two more styles, defined in the `meta.styles` of the videos that use them, are
+for the moments where the subject is a real one:
+
+- **`watercolor portrait`**: head and shoulders of a named person, the face
+  drawn carefully enough that the likeness reads, the clothes in brand washes.
+  Used for Ted Codd (DbDesign-9-RelationalHistory), Claude Shannon and Alan
+  Turing (Nlp-5-History), each in the scene that names them and gone before
+  the scene moves on.
+- **`detailed watercolor`**: accurate proportions and fine structure, for a
+  subject a viewer knows the real shape of. SurvivorshipBias's bomber is a
+  four-engine heavy bomber of 1943 with bullet holes across its wings and
+  fuselage, and none in its engines or cockpit, which is the point of the
+  story.
+
+**A portrait is checked against a photograph before it is used.** The model
+knows some faces and invents others. Turing came back recognisable from his
+name alone. Codd came back with a full head of brown hair until his subject
+described what his photo shows (balding, white at the sides, a grey
+moustache). Abraham Wald came back as someone else in round glasses, and was
+dropped rather than shown. So a portrait's subject names the person and
+describes the photograph, and it is compared with that photograph before it
+goes in. Only people who have died are painted; Chamberlin and Stonebraker,
+in the same history, are not.
 
 ```bash
 # needs the repo root's `npm install` (for sharp) and OPENAI_API_KEY

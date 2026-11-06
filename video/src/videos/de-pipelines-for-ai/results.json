@@ -369,6 +369,7 @@
   },
   "hybrid": {
     "k": 60,
+    "query": "E-4031 error",
     "tickets": {
       "#1182": "App crashes after the update",
       "#2071": "Error message when syncing",
@@ -388,11 +389,18 @@
     ],
     "keyword": [
       "#3310",
-      "#2650",
       "#0412",
+      "#1457",
       "#2071",
-      "#1890"
+      "#0934"
     ],
+    "bm25": {
+      "#3310": 1.693,
+      "#0412": 0.718,
+      "#1457": 0.718,
+      "#2071": 0.718,
+      "#0934": 0.655
+    },
     "fused": [
       {
         "ticket": "#3310",
@@ -407,40 +415,28 @@
         "keywordRank": 4
       },
       {
+        "ticket": "#0934",
+        "score": 0.0313,
+        "vectorRank": 3,
+        "keywordRank": 5
+      },
+      {
+        "ticket": "#1457",
+        "score": 0.0313,
+        "vectorRank": 5,
+        "keywordRank": 3
+      },
+      {
         "ticket": "#1182",
         "score": 0.0164,
         "vectorRank": 1,
         "keywordRank": null
       },
       {
-        "ticket": "#2650",
+        "ticket": "#0412",
         "score": 0.0161,
         "vectorRank": null,
         "keywordRank": 2
-      },
-      {
-        "ticket": "#0934",
-        "score": 0.0159,
-        "vectorRank": 3,
-        "keywordRank": null
-      },
-      {
-        "ticket": "#0412",
-        "score": 0.0159,
-        "vectorRank": null,
-        "keywordRank": 3
-      },
-      {
-        "ticket": "#1457",
-        "score": 0.0154,
-        "vectorRank": 5,
-        "keywordRank": null
-      },
-      {
-        "ticket": "#1890",
-        "score": 0.0154,
-        "vectorRank": null,
-        "keywordRank": 5
       }
     ],
     "idf": {
@@ -463,7 +459,11 @@
     "rate": 1000000,
     "minutes": 4000,
     "hours": 66.7,
-    "days": 2.78
+    "days": 2.78,
+    "priceLow": 0.02,
+    "priceHigh": 0.2,
+    "costLow": 80,
+    "costHigh": 800
   },
   "chunk": {
     "proseChars": 900,

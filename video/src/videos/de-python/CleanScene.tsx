@@ -3,7 +3,7 @@ import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CLEAN } from "./data";
@@ -13,6 +13,7 @@ import {
   consoleHeight,
   DataTable,
   Drift,
+  FadeIn,
   geoOf,
   lineOf,
   Listing,
@@ -52,8 +53,8 @@ export const CleanScene: React.FC = () => {
   const stripAt = n.word("clean-page", "Strip whitespace");
   const countAt = n.word("clean-page", "check the field count");
   const convertAt = n.word("clean-page", "convert types");
-  const bobAt = n.word("clean-page", "Bob's missing age becomes none");
-  const droppedAt = n.word("clean-page", "bad row is dropped");
+  const bobAt = n.word("clean-bob", "Bob's missing age becomes none");
+  const droppedAt = n.word("clean-bob", "bad row is dropped");
   const splitAt = n.word("clean-csv", "Split on commas yourself");
   const smithAt = n.word("clean-csv", "Smith comma Jo");
   const fourAt = n.word("clean-csv", "becomes four fields");
@@ -68,13 +69,19 @@ export const CleanScene: React.FC = () => {
   const nanAt = n.word("parse-num", "into not a number");
   const naAt = n.word("parse-num", "n slash a");
   const commaAt = n.word("parse-num", "twelve hundred with a comma");
-  const countNumAt = n.word("parse-num", "Count them");
+  const stripCommaAt = n.word("parse-fix", "Strip the thousands comma first");
+  const survivesAt = n.word("parse-fix", "twelve hundred survives");
+  const leftAt = n.word("parse-fix", "count what's left");
+  const rejectListAt = n.word("parse-fix", "send it to a reject list");
   const formatAt = n.word("parse-date", "parse with an explicit format");
   const catchAt = n.word("parse-date", "catch the value error");
   const dayAt = n.word("parse-date", "A day-first date fails");
   const febAt = n.word("parse-date", "February thirtieth");
   const end = n.beat("parse-date").to;
-  const out13 = q14At - 4;
+  // Question 13's card leaves on "Question fourteen"; its figures stay until
+  // question 14's text writes in, so the page is never empty between them.
+  const card13Out = q14At - 4;
+  const out13 = q14TextAt - 4;
 
   // ── 13 ──
   const FN = CLEAN.fn;
@@ -90,14 +97,21 @@ export const CleanScene: React.FC = () => {
 
   // ── 14 ──
   const NU = CLEAN.numeric;
+  const NN = CLEAN.normalized;
+  // The listing: the page-style coerce, then the same with the thousands
+  // comma stripped first.
+  const numLines = [...NU.lines, ...NN.lines];
   const table = {
-    cols: ["", "amounts", "to_numeric"],
-    rows: NU.rows.map((r, i) => [r[0], JSON.stringify(NU.inputs[i]), r[1]]),
+    cols: ["", "amounts", "to_numeric", "comma stripped"],
+    rows: NU.rows.map((r, i) => [r[0], JSON.stringify(NU.inputs[i]), r[1], NN.rows[i][1]]),
   };
   const tg = geoOf(table, RIGHT_X + 60, y(TOP), h, { rowH: 50, bodySize: 24 });
   const bad = table.rows.flatMap((r, i) => (r[2] === "NaN" ? [i] : []));
+  const saved = table.rows.findIndex((r) => r[2] === "NaN" && r[3] !== "NaN");
+  const left = table.rows.findIndex((r) => r[3] === "NaN");
+  const numH = listingHeight(numLines.length, 21);
   const DT = CLEAN.dates.lines;
-  const dtTop = y(TOP) + listingHeight(NU.lines.length, 21) + h(150);
+  const dtTop = y(TOP) + numH + h(130);
   const DO = CLEAN.dates.out;
 
   return (
@@ -114,7 +128,7 @@ export const CleanScene: React.FC = () => {
       <Sfx name="el-scratch" at={febAt + 6} level={-34} />
 
       <Drift from={from} to={end + 40}>
-        <QuestionCard n={13} at={qAt - 4} textAt={textAt - 4} out={out13} size={60}>
+        <QuestionCard n={13} at={qAt - 4} textAt={textAt - 4} out={card13Out} size={60}>
           How do you clean messy delimited records defensively?
         </QuestionCard>
         <QuestionCard n={14} at={q14At} textAt={q14TextAt - 2} size={60}>
@@ -225,38 +239,57 @@ export const CleanScene: React.FC = () => {
           out={out13}
           marks={[{ line: 0, at: countThemAt, color: MARK_OK }]}
         />
+        {/* The page's clean() above had no try: a non-number id would have
+            stopped it. Here the error is caught per row. */}
+        <Note at={rejectAt + 8} x={X0} y={fnTop + qrH + h(16) + consoleHeight(CLEAN.quarantine.out.length, 20) + h(22)} out={out13}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            caught per row, so one bad row can&apos;t crash the job
+          </span>
+        </Note>
 
         {/* ── 14. Numbers ── */}
         <Listing
-          lines={NU.lines}
+          lines={numLines}
           x={X0}
           top={y(TOP)}
-          width={860}
+          width={900}
           size={21}
           at={coerceAt - 4}
-          marks={[{ line: lineOf(NU.lines, 'errors="coerce"'), at: coerceAt + 4, color: MARK_OK }]}
+          lineAt={numLines.map((_, i) => (i < NU.lines.length ? coerceAt - 4 : stripCommaAt - 2))}
+          marks={[
+            { line: lineOf(numLines, 'pd.to_numeric(amounts, errors="coerce")'), at: coerceAt + 4, out: stripCommaAt },
+            { line: lineOf(numLines, ".str.replace("), at: stripCommaAt + 4, color: MARK_OK },
+          ]}
         />
         <TableName g={tg} at={coerceAt}>
           <Mono>amounts</Mono>, coerced
         </TableName>
         <DataTable
           g={tg}
-          cols={colsOf(table, { to_numeric: { ink: BLUE_INK, numeric: true } })}
+          cols={colsOf(table, {
+            to_numeric: { ink: BLUE_INK, numeric: true },
+            "comma stripped": { ink: BLUE_INK, numeric: true, at: stripCommaAt + 2 },
+          })}
           at={coerceAt}
           rows={table.rows.map((cells, i) => ({ cells, at: coerceAt + 4 + i * 2 }))}
           marks={[
             { row: bad[0], col: 2, at: naAt, color: MARK_BAD },
             { row: bad[1], col: 2, at: commaAt, color: MARK_BAD },
+            { row: saved, col: 3, at: survivesAt, color: MARK_OK },
+            { row: left, col: 3, at: leftAt, color: MARK_BAD },
           ]}
         />
-        <Note at={nanAt} x={X0} y={y(TOP) + listingHeight(NU.lines.length, 21) + h(24)}>
+        <Note at={nanAt} x={X0} y={y(TOP) + numH + h(24)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>what won&apos;t parse becomes NaN, not an error</span>
         </Note>
-        <Note at={countNumAt} x={X0} y={y(TOP) + listingHeight(NU.lines.length, 21) + h(70)}>
+        <Note at={leftAt} x={X0} y={y(TOP) + numH + h(70)}>
           <span style={{ ...note(26, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
-            <Mark at={countNumAt + 4} color={MARK_OK}>
-              count them: <span style={{ fontVariantNumeric: "tabular-nums" }}>{CLEAN.badCount}</span> didn&apos;t parse
+            <Mark at={leftAt + 4} color={MARK_OK}>
+              <Mono>nums.isna().sum()</Mono>: <Num>{CLEAN.leftCount}</Num> left
             </Mark>
+            <FadeIn at={rejectListAt - 2}>
+              , and <Mono>{CLEAN.rejected.map((v) => `'${v}'`).join(", ")}</Mono> goes to the rejects
+            </FadeIn>
           </span>
         </Note>
 

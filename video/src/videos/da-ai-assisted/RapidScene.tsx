@@ -172,7 +172,7 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
 const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const at = c.w("r-llm", "sort five thousand survey answers");
-  const llmAt = c.w("r-llm", "a large language model");
+  const llmAt = c.w("r-llm", "with an LLM");
   const steps = [
     { at: c.w("r-llm", "fix the categories first"), text: "Fix the categories first" },
     { at: c.w("r-llm", "hand-label a hundred or two"), text: "Hand-label 100 to 200, and measure its accuracy" },
@@ -190,7 +190,7 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>5,000 open-ended survey answers</span>
       </Note>
       <Note at={llmAt - 2} x={R_X} y={c.T + c.h(44)}>
-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>LLM: large language model, as a first-pass labeler you measure</span>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>An LLM as a first-pass labeler you measure</span>
       </Note>
       {steps.map((s, i) => {
         // A step said in two parts shows its second as it is said.

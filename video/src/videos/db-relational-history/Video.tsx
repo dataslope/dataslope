@@ -1,7 +1,6 @@
 import React from "react";
 import { Scene } from "../../components/Scene";
 import { EditorialPage, type EditorialProps } from "../../editorial/Page";
-import { SeriesIntro } from "../../editorial/SeriesIntro";
 import { useNarration } from "../../narration/NarrationContext";
 import { BeforeScene } from "./BeforeScene";
 import { CoddScene } from "./CoddScene";
@@ -36,10 +35,7 @@ const Scenes: React.FC = () => {
   const until = (frame: number) => frame + OVERLAP;
   return (
     <>
-      <Scene from={0} to={until(cut("hook"))} fade={8}>
-        <SeriesIntro course="Database Design with PostgreSQL" unit="Unit 9" title="Where it came from" />
-      </Scene>
-      <Scene from={cut("hook")} to={until(cut("trees"))} fade={6}>
+      <Scene from={0} to={until(cut("trees"))} fade={6}>
         <OpenScene />
       </Scene>
       <Scene from={cut("trees")} to={until(cut("codd"))} fade={6}>

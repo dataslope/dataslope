@@ -43,7 +43,7 @@ export const HookScene: React.FC = () => {
   const missingAt = n.word("hook-ask", "Which days are missing");
   const longAt = n.word("hook-ask", "How long is each streak");
   const latestAt = n.word("hook-ask", "Which login is the latest");
-  const roundAt = n.word("hook-ask", "the sequel round");
+  const roundAt = n.word("hook-ask", "Questions like these");
   const twentyTwoAt = n.word("plan", "twenty-two of them");
   const elevenAt = n.word("plan", "Eleven get worked through");
   const quickAt = n.word("plan", "The other eleven");
@@ -127,8 +127,9 @@ export const HookScene: React.FC = () => {
             <span style={{ ...body(36), color: INK }}>{q.text}</span>
           </Ink>
         ))}
-        <Ink at={roundAt} dur={14} out={askOut} style={{ left: X0 + 560, top: y(ASK_Y) + h(54), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(26, INK_SOFT) }}>the SQL round of a data engineering interview</span>
+        {/* What the three have in common, as a line under them. */}
+        <Ink at={roundAt - 2} dur={14} out={askOut} style={{ left: X0, top: y(ASK_Y) + 3 * h(54) + h(22), whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK_SOFT) }}>Questions like these fill the SQL round of a data engineering interview.</span>
         </Ink>
 
         {/* ── Twenty-two questions: eleven on real queries, eleven quickly ── */}

@@ -38,7 +38,9 @@ export const OK_INK = inkOf.green;
  * spacing brings it back to about a sans space.
  */
 export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.84em", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+  // 0.84em of a 21px label is 17.6px, under the house floor, so it never
+  // drops below 19px (the Data Engineer review's fixers found it twice).
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.84em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
     {children}
   </span>
 );

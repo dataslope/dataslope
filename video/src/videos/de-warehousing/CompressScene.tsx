@@ -24,10 +24,12 @@ const size = (bytes: number) => (bytes < 1000 ? `${bytes} bytes` : bytes < 1e6 ?
 /**
  * Question 4, measured column by column on the made-up million sales: each
  * column's share of the CSV (its values as text) against its chunks in the
- * Parquet file. Region, four values, is a dictionary and about three bits a
- * row; amount, random to the cent, barely shrinks; sorting makes runs, so
- * the dates in date order take 3 KB and region sorted by region 554 bytes.
- * Then the whole file under two codecs.
+ * Parquet file. Region, four values, is dictionary-encoded at a few bits a
+ * row (DuckDB's writer spends 3.04 on four codes); amount, random to the
+ * cent, has too many values for a dictionary and barely shrinks; sorting
+ * makes runs for run-length encoding, so the dates in date order take 3 KB,
+ * and region, sorted by region instead, 554 bytes. Then why a row file
+ * loses, what fewer bytes buy, and the whole file under two codecs.
  */
 export const CompressScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -40,18 +42,22 @@ export const CompressScene: React.FC = () => {
   const typeAt = n.word("cmp", "A column holds one type");
   const fewAt = n.word("cmp", "few distinct values");
   const regionAt = n.word("cmp-region", "Region has four");
-  const dictAt = n.word("cmp-region", "in a dictionary");
-  const bitsAt = n.word("cmp-region", "about three bits a row");
-  const kbAt = n.word("cmp-region", "three hundred eighty kilobytes");
-  const textAt = n.word("cmp-region", "five and a half megabytes of text");
+  const dictAt = n.word("cmp-dict", "dictionary encoding");
+  const bitsAt = n.word("cmp-dict", "a code of a few bits a row");
+  const kbAt = n.word("cmp-million", "three hundred eighty kilobytes");
+  const textAt = n.word("cmp-million", "five and a half megabytes of text");
   const amountAt = n.word("cmp-amount", "Amount is random");
+  const centAt = n.word("cmp-amount", "random to the cent");
   const fromAt = n.word("cmp-amount", "six point eight megabytes");
   const toAt = n.word("cmp-amount", "four point two");
-  const sortAt = n.word("cmp-sort", "Sorting before writing");
-  const datesAt = n.word("cmp-sort", "In date order");
-  const threeKbAt = n.word("cmp-sort", "three kilobytes");
-  const sortedRegionAt = n.word("cmp-sort", "Sorted by region");
-  const bytesAt = n.word("cmp-sort", "five hundred fifty-four bytes");
+  const sortAt = n.word("cmp-sort", "Sorting makes long runs");
+  const rleAt = n.word("cmp-sort", "run-length encoding");
+  const datesAt = n.word("cmp-dates", "In date order");
+  const threeKbAt = n.word("cmp-dates", "three kilobytes");
+  const sortedRegionAt = n.word("cmp-byregion", "Sorted by region");
+  const bytesAt = n.word("cmp-byregion", "five hundred fifty-four bytes");
+  const rowAt = n.word("cmp-row", "A row file interleaves every field");
+  const fasterAt = n.word("cmp-row", "faster scans");
   const codecAt = n.word("cmp-codec", "Codecs trade too");
   const zstdAt = n.word("cmp-codec", "six point three megabytes");
   const snappyAt = n.word("cmp-codec", "Snappy, the default");
@@ -63,11 +69,18 @@ export const CompressScene: React.FC = () => {
   const region = column("region");
   const amount = column("amount");
   const date = column("sale_date");
-  const bits = (region.parquet * 8) / TABLE.rows;
+  // Amount is written plain: too many values for the writer's dictionary.
+  if (amount.encodings.includes("DICTIONARY")) throw new Error("amount is dictionary-encoded now; reword its note");
   const w = (bytes: number) => Math.max(3, (bytes / 1e6) * PX_PER_MB);
 
   /** One bar and its label: the size, then what it is. */
-  const bar = (top: number, bytes: number, at: number, kind: React.ReactNode, opts: { csv?: boolean; tint: string; sizeAt?: number; ink?: string }) => (
+  const bar = (
+    top: number,
+    bytes: number,
+    at: number,
+    kind: React.ReactNode,
+    opts: { csv?: boolean; tint: string; sizeAt?: number; ink?: string; after?: React.ReactNode; afterAt?: number },
+  ) => (
     <>
       <FileBar x={BAR_X} y={top} width={w(bytes)} height={h(BAR_H)} at={at} pattern={opts.csv ? TINTS : undefined} fill={opts.tint} />
       <div
@@ -85,6 +98,7 @@ export const CompressScene: React.FC = () => {
         <b style={{ opacity: ease(frame, opts.sizeAt ?? at + 6, 10) }}>
           : <Num>{size(bytes)}</Num>
         </b>
+        {opts.after ? <span style={{ color: INK_SOFT, opacity: ease(frame, opts.afterAt ?? at + 6, 10) }}>{opts.after}</span> : null}
       </div>
     </>
   );
@@ -99,7 +113,8 @@ export const CompressScene: React.FC = () => {
   const R = y(340);
   const A = y(486);
   const D = y(596);
-  const C = y(742);
+  const C = y(780);
+  const ROW_Y = y(684);
   const sample = TABLE.sample;
   const regionCol = sample.cols.indexOf("region");
   const firstSeen = TABLE.regions;
@@ -128,8 +143,15 @@ export const CompressScene: React.FC = () => {
         {/* ── region: four values ── */}
         {name(R, regionAt, "region", <><Num>{count(region.distinct)}</Num> distinct values</>)}
         {bar(R, region.csv, regionAt + 4, "as CSV text", { csv: true, tint: TINTS[2], sizeAt: textAt })}
-        {bar(R + h(STEP), region.parquet, kbAt - 4, <>in Parquet, about <Num>{bits.toFixed(0)}</Num> bits a row</>, { tint: COLUMN_TINT.region, sizeAt: kbAt })}
-        {bar(R + 2 * h(STEP), SORTED_REGION.region, sortedRegionAt + 4, "sorted by region first", { tint: COLUMN_TINT.region, sizeAt: bytesAt, ink: OK_INK })}
+        {bar(R + h(STEP), region.parquet, kbAt - 4, "in Parquet, a few bits a row", { tint: COLUMN_TINT.region, sizeAt: kbAt })}
+        {/* One sort order per file: this one is instead of date order, not as well as it. */}
+        {bar(R + 2 * h(STEP), SORTED_REGION.region, sortedRegionAt + 4, "or, sorted by region instead", {
+          tint: COLUMN_TINT.region,
+          sizeAt: bytesAt,
+          ink: OK_INK,
+          after: " · only one column can lead the sort",
+          afterAt: bytesAt + 14,
+        })}
 
         {/* The dictionary: each value once, then a short code per row. */}
         <div style={{ position: "absolute", left: 1400, top: R - 6, opacity: ease(frame, dictAt, 12) }}>
@@ -155,6 +177,9 @@ export const CompressScene: React.FC = () => {
 
         {/* ── amount: random to the cent ── */}
         {name(A, amountAt, "amount", <><Num>{count(amount.distinct)}</Num> distinct values</>)}
+        <div style={{ position: "absolute", left: X0, top: A + h(50), ...note(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, centAt + 6, 12) }}>
+          too many for a dictionary
+        </div>
         {bar(A, amount.csv, amountAt + 4, "as CSV text", { csv: true, tint: TINTS[5], sizeAt: fromAt })}
         {bar(A + h(STEP), amount.parquet, toAt - 6, "in Parquet", { tint: COLUMN_TINT.amount, sizeAt: toAt })}
 
@@ -162,6 +187,15 @@ export const CompressScene: React.FC = () => {
         {name(D, sortAt, "sale_date", <><Num>{count(date.distinct)}</Num> days, in date order</>)}
         {bar(D, date.csv, datesAt + 2, "as CSV text", { csv: true, tint: TINTS[1] })}
         {bar(D + h(STEP), date.parquet, threeKbAt - 4, "in Parquet, in long runs of one date", { tint: COLUMN_TINT.sale_date, sizeAt: threeKbAt, ink: OK_INK })}
+
+        {/* ── Why a row file loses, and what fewer bytes buy ── */}
+        <div style={{ position: "absolute", left: X0, top: ROW_Y, ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, rleAt + 20, 12) }}>
+          Parquet&apos;s encodings: dictionary, run-length, delta, bit-packing.
+          <span style={{ opacity: ease(frame, rowAt, 10) }}> A row file interleaves every field, which defeats them.</span>
+        </div>
+        <div style={{ position: "absolute", left: X0, top: ROW_Y + h(34), ...note(23, OK_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, fasterAt - 4, 12) }}>
+          Fewer bytes to read: faster scans, not just cheaper storage.
+        </div>
 
         {/* ── The whole file, by codec ── */}
         <div style={{ position: "absolute", left: X0, top: C - 6, width: BAR_X - X0 - 20, opacity: ease(frame, codecAt, 12) }}>

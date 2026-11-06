@@ -108,6 +108,15 @@ export const BACKPRESSURE = results.backpressure as {
   atJoin: number;
   drainedAt: number;
   drainSeconds: number;
+  /** The same traffic on a topic of two partitions, one consumer reading
+   *  both until a second takes partition 1 at second sixty: the lag in each
+   *  at the minute, the lag summed over both second by second (the line the
+   *  video draws), and when both are clear. */
+  partitions: number;
+  atJoinByPartition: number[];
+  lagTwoPartitions: number[];
+  drainedAtByPartition: number;
+  drainSecondsByPartition: number;
 };
 
 export const COMPACTION = results.compaction as {

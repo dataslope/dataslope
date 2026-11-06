@@ -231,9 +231,10 @@ export const LakeScene: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: px(2) + 24,
+              // Wide enough for "v3 … · an upsert", still inside the bucket.
+              left: px(2) + 14,
               top: boxY + h(16),
-              width: PANEL_W - 88,
+              width: PANEL_W - 68,
               padding: "6px 12px",
               background: ds("gray", 50),
               borderTop: `2px solid ${INK}`,
@@ -269,22 +270,36 @@ export const LakeScene: React.FC = () => {
             </span>
           </Note>
 
-          {/* ── What the log gives ── */}
-          <div style={{ position: "absolute", left: X0, top: y(700), display: "flex", gap: 34, alignItems: "center", ...note(25, INK), whiteSpace: "nowrap" }}>
-            {[
-              { at: acidAt, text: "ACID transactions" },
-              { at: schemasAt, text: "enforced schemas" },
-              { at: upsertAt, text: "upserts" },
-              { at: travelAt, text: "time travel" },
-            ].map((g) => (
-              <span key={g.text} style={{ display: "inline-flex", alignItems: "center", gap: 10, opacity: ease(frame, g.at, 10) }}>
-                <Tick at={g.at + 4} size={24} color={OK} />
-                {g.text}
-              </span>
-            ))}
-          </div>
-          <Note at={acidAt + 8} x={X0} y={y(746)}>
-            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>atomic, consistent, isolated, durable</span>
+          {/* ── What the log gives: under the lakehouse, two by two ── */}
+          {[
+            { at: acidAt, text: "ACID transactions" },
+            { at: schemasAt, text: "enforced schemas" },
+            { at: upsertAt, text: "upserts" },
+            { at: travelAt, text: "time travel" },
+          ].map((g, k) => (
+            <div
+              key={g.text}
+              style={{
+                position: "absolute",
+                left: px(2) + (k % 2) * 262,
+                top: y(664) + Math.floor(k / 2) * h(38),
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                ...note(24, INK),
+                whiteSpace: "nowrap",
+                opacity: ease(frame, g.at, 10),
+              }}
+            >
+              <Tick at={g.at + 4} size={24} color={OK} />
+              {g.text}
+            </div>
+          ))}
+          <Note at={acidAt + 8} x={px(2)} y={y(744)}>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>ACID: atomic, consistent, isolated, durable</span>
+          </Note>
+          <Note at={upsertAt + 8} x={px(2)} y={y(770)}>
+            <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>upsert: update the row with that key, or insert it</span>
           </Note>
           <Note at={reliableAt} x={X0} y={y(790)}>
             <span style={{ ...note(27, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a warehouse&apos;s reliability, on the lake&apos;s open, cheaper storage</span>
@@ -292,10 +307,11 @@ export const LakeScene: React.FC = () => {
         </div>
 
         {/* ── The bridge into Part 10 ── */}
-        <Note at={landsAt} x={X0} y={y(852)}>
+        {/* Its baseline on the Next line's. */}
+        <Note at={landsAt} x={X0} y={y(852) + 15}>
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>All of it assumes the data lands on time, every day.</span>
         </Note>
-        <Spot id="de-warehousing-hamster" at={landsAt} left={1520} top={y(670)} width={280} height={214} />
+        <Spot id="de-warehousing-hamster" at={landsAt} left={1020} top={y(700)} width={183} height={140} />
         <NextLine at={nextAt} x={780} y={y(842)} width={640}>
           orchestration and reliability
         </NextLine>

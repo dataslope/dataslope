@@ -158,7 +158,8 @@ export const IslandsScene: React.FC = () => {
             size={SIZE}
             at={numberAt - 4}
             marks={[
-              { line: lineOf(Q.lines, "ROW_NUMBER() OVER ("), at: numberAt + 4 },
+              // One mark for the key's line, once it is typed: it holds the
+              // numbering and the subtraction both.
               { line: lineOf(Q.lines, "login_date - ROW_NUMBER"), at: subtractAt + 2 },
               { line: lineOf(Q.lines, "GROUP BY user_id, grp"), at: groupAt + 2, color: MARK_OK },
             ]}

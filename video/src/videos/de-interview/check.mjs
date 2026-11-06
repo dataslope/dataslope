@@ -17,8 +17,8 @@
 // table). That 157 is the sum of data.ts's PARTS, not a count made here.
 //
 // Then it reads script.ts and data.ts and exits non-zero if the narration no
-// longer says, in words, the number of videos, the total of PARTS, or the
-// practice it counted: a builder moving a question changes PARTS, and the
+// longer says, in words, the number of videos, the total of PARTS, the part
+// that is Pipelines for AI, or the practice it counted: a builder moving a question changes PARTS, and the
 // "a hundred and fifty-seven" the voice says has to move with it.
 /* global console, process, URL */
 import { readFileSync, writeFileSync } from "node:fs";
@@ -68,7 +68,12 @@ const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", 
 const below100 = (n) => (n < 20 ? ONES[n] : TENS[Math.floor(n / 10)] + (n % 10 ? `-${ONES[n % 10]}` : ""));
 const said = (n) => (n < 100 ? below100(n) : `a hundred${n % 100 ? ` and ${below100(n % 100)}` : ""}`);
 const text = (id) => script.beats.find((b) => b.id === id).text.toLowerCase();
+// "Part eleven" is said twice, as the part that walks a design through and
+// as the one that covers the AI questions: Pipelines for AI's place in PARTS.
+const aiPart = PARTS.find((p) => p.video === "de-pipelines-for-ai").n;
 const claims = [
+  ["probe-design", `part ${below100(aiPart)} walks one design through`],
+  ["ai-more", `part ${below100(aiPart)} covers`],
   ["series", `${below100(PARTS.length)} videos`],
   ["series", `${said(QUESTIONS)} questions`],
   ["practice", "every topic page has concept checks"],

@@ -75,6 +75,8 @@ export const PARTITION = {
   march: { ...(results.partition.march as Plan), lines: lines(results.partition.march.sql) },
   region: { ...(results.partition.region as Plan), lines: lines(results.partition.region.sql) },
   fn: { ...(results.partition.fn as Plan), lines: lines(results.partition.fn.sql) },
+  /** A range on the raw key: the habit that prunes on every engine. */
+  range: { ...(results.partition.range as Plan), lines: lines(results.partition.range.sql) },
 };
 
 // ── Clustering ──────────────────────────────────────────────────────────────

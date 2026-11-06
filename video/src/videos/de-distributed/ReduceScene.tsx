@@ -156,7 +156,7 @@ export const ReduceScene: React.FC = () => {
         </Note>
 
         {/* At scale. */}
-        <div style={{ position: "absolute", left: 1010, top: y(330), width: 1.5, height: y(860) - y(330), background: `color-mix(in srgb, ${INK_SOFT} 30%, transparent)`, opacity: ease(frame, modelAt - 6, 12) }} />
+        <div style={{ position: "absolute", left: 1030, top: y(330), width: 1.5, height: y(860) - y(330), background: `color-mix(in srgb, ${INK_SOFT} 30%, transparent)`, opacity: ease(frame, modelAt - 6, 12) }} />
         <Note at={modelAt - 2} x={R_X} y={y(316)}>
           <span style={{ ...label(23, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap" }}>
             A model: <Num>{count(REDUCE.events)}</Num> clicks,

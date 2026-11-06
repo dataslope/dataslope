@@ -149,6 +149,9 @@ export const TuringScene: React.FC = () => {
       />
       <Headline at={imitationAt - 2} lead="The imitation game," turn="now the Turing test." turnAt={turingTestAt - 4} />
 
+      {/* Turing himself, painted from photographs of him, while the question is
+          his; the judge takes his place when the game begins. */}
+      <Spot id="turing" at={from} out={judgeAt - 10} left={330} top={y(330)} width={380} height={451} />
       <FigLabel n="6" title="Turing's imitation game" at={testAt - 4} x={96} y={y(290)} />
       <div style={{ opacity: 1 - settle * 0.3 }}>
         <Spot id="booths" at={from + 2} left={BX} top={BTOP} width={BW} height={BH} />

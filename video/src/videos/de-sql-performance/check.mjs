@@ -110,6 +110,10 @@ results.figures.explain = await pgFigure(ORDERS, {
   insert:
     "INSERT INTO orders\nSELECT 1000000 + g, (1 + (g::bigint * 7919) % 50000)::int,\n  DATE '2025-01-01', 20.00, 'pending'\nFROM generate_series(1, 50000) g;",
   pending: "SELECT COUNT(*) AS pending FROM orders WHERE status = 'pending';",
+  // When autovacuum would analyze again: after threshold + scale factor x
+  // the table's rows have changed (Postgres docs, "The Autovacuum Daemon").
+  autovacuum:
+    "SELECT current_setting('autovacuum_analyze_threshold') AS threshold,\n  current_setting('autovacuum_analyze_scale_factor') AS scale_factor;",
   query: PENDING,
   stale: `${EXPLAIN}\n${PENDING}`,
   analyze: "ANALYZE orders;",
@@ -252,8 +256,10 @@ results.figures.mv = await pgFigure(ORDERS, {
   day: DAY,
   dayPlan: `${EXPLAIN_COSTS_OFF}\n${DAY}`,
   basePlan: `${EXPLAIN_COSTS_OFF}\nSELECT order_date, COUNT(*) AS orders, SUM(amount) AS revenue\nFROM orders\nWHERE order_date = DATE '2024-12-31'\nGROUP BY order_date;`,
+  // The column list is printed so the second g (the customer) and 50.00
+  // (the amount) can be read off the listing.
   insert:
-    "INSERT INTO orders\nSELECT 1000000 + g, g, DATE '2024-12-31', 50.00, 'shipped'\nFROM generate_series(1, 500) g;",
+    "INSERT INTO orders\n  (id, customer_id, order_date, amount, status)\nSELECT 1000000 + g, g, DATE '2024-12-31', 50.00, 'shipped'\nFROM generate_series(1, 500) g;",
   stale: DAY,
   truth: "SELECT order_date, COUNT(*) AS orders, SUM(amount) AS revenue\nFROM orders\nWHERE order_date = DATE '2024-12-31'\nGROUP BY order_date;",
   refresh: "REFRESH MATERIALIZED VIEW daily_revenue;",

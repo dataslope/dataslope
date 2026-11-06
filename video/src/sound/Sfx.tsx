@@ -1,5 +1,6 @@
 import React, { createContext, useContext } from "react";
 import { Html5Audio, Sequence, staticFile, useVideoConfig } from "remotion";
+import ACCENTS from "../../public/sfx/accents.json" with { type: "json" };
 import SOUNDS from "../../public/sfx/sounds.json" with { type: "json" };
 
 /** A sound in public/sfx/: synthesized by `npm run sfx` (scripts/sfx.mjs), or
@@ -16,14 +17,26 @@ export const SfxContext = createContext(false);
  * sits around -25 dBFS RMS with peaks near -4, so a level of -24 or below
  * stays under the voice. Place it in the scene, beside the animation it
  * belongs to, and cue it from the same frame, so the two cannot drift apart.
+ *
+ * `accentAt` instead of `at` cues the sound by its hit rather than its start:
+ * it starts early by the time its accent takes to arrive (accents.json,
+ * measured from the file by scripts/lib/wav.mjs), so a whoosh that swells
+ * into a chime chimes on the frame the animation lands, and still does after
+ * the sound is regenerated with a longer swell.
  */
-export const Sfx: React.FC<{ name: SoundName; at: number; level: number }> = ({ name, at, level }) => {
+export const Sfx: React.FC<{ name: SoundName; level: number } & ({ at: number } | { accentAt: number })> = (props) => {
+  const { name, level } = props;
   const on = useContext(SfxContext);
   const { fps } = useVideoConfig();
+  const cued = "at" in props ? props.at : props.accentAt - ACCENTS[name] * fps;
+  // A sound cued by its accent may need to start before the video does; it
+  // then starts on frame 0, its head trimmed, and still hits on time.
+  const trim = "accentAt" in props && cued < 0 ? Math.round(-cued) : 0;
+  const at = cued + trim;
   if (!on || !Number.isFinite(at) || at < 0) return null;
   return (
-    <Sequence from={Math.round(at)} durationInFrames={Math.ceil(SOUNDS[name] * fps) + 1} layout="none">
-      <Html5Audio src={staticFile(`sfx/${name}.wav`)} volume={10 ** (level / 20)} />
+    <Sequence from={Math.round(at)} durationInFrames={Math.ceil(SOUNDS[name] * fps) + 1 - trim} layout="none">
+      <Html5Audio src={staticFile(`sfx/${name}.wav`)} volume={10 ** (level / 20)} trimBefore={trim || undefined} />
     </Sequence>
   );
 };

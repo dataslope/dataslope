@@ -70,7 +70,16 @@ export type NarrationAlignmentFile = {
   meta?: { voice_id: string; model_id: string };
   beats: Record<
     string,
-    { text: string; audio: string; alignment: CharacterAlignment }
+    {
+      text: string;
+      /** What the voice was sent, when the lexicon (lexicon.ts) said the beat
+       *  differently from how it is written ("sequel" for "SQL"). The
+       *  alignment is laid back onto `text`. Absent: the beat was said as
+       *  written. */
+      spoken?: string;
+      audio: string;
+      alignment: CharacterAlignment;
+    }
   >;
 };
 

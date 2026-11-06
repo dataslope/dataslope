@@ -259,8 +259,10 @@ export const IsoScene: React.FC = () => {
             The SQL standard&rsquo;s table. Postgres goes further: its read uncommitted acts as read committed, and its repeatable read stops phantoms too.
           </div>
         </Note>
-        <div style={{ position: "absolute", left: R_X, top: laneB + h(74), ...note(24, OK_INK), width: 460, opacity: ease(frame, oneAtATime, 10) }}>
-          Serializable: as if A and B ran one at a time.
+        {/* Broken by hand, so "time." never sits alone on a second line. */}
+        <div style={{ position: "absolute", left: R_X, top: laneB + h(74), ...note(24, OK_INK), whiteSpace: "nowrap", opacity: ease(frame, oneAtATime, 10) }}>
+          <div>Serializable: as if A and B</div>
+          <div>ran one at a time.</div>
         </div>
       </Drift>
     </AbsoluteFill>

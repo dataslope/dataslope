@@ -313,6 +313,9 @@ WHERE d.is_holiday = false
 GROUP BY d.fiscal_quarter
 ORDER BY d.fiscal_quarter;`,
   holidays: "SELECT COUNT(*) AS holidays FROM dim_date WHERE is_holiday;",
+  // The page's fiscal quarters are its calendar quarters, so only the
+  // holiday flag is something no date function could compute here.
+  fiscalDiffers: "SELECT COUNT(*) AS differ FROM dim_date WHERE fiscal_quarter <> 'Q' || quarter(calendar_date);",
   aovAll: "SELECT SUM(amount) AS revenue, COUNT(*) AS orders, ROUND(SUM(amount) / COUNT(*), 2) AS aov FROM fact_orders;",
   aovWorking: `SELECT SUM(f.amount) AS revenue, COUNT(*) AS orders, ROUND(SUM(f.amount) / COUNT(*), 2) AS aov
 FROM fact_orders f JOIN dim_date d ON d.date_key = f.order_date_key
@@ -487,6 +490,8 @@ F.account = await figure(ACCOUNT_SETUP, {
   acrossAccounts: "SELECT SUM(balance) AS balance FROM fact_balance WHERE month_end = DATE '2024-03-31';",
   // ...across the quarter's month-ends is not...
   overTime: "SELECT SUM(balance) AS balance FROM fact_balance;",
+  // ...and what that sum is made of: each month-end's total across accounts.
+  monthEnds: "SELECT month_end, SUM(balance) AS balance FROM fact_balance GROUP BY month_end ORDER BY month_end;",
   // ...and the last value in the period is.
   closing: `SELECT account, arg_max(balance, month_end) AS closing
 FROM fact_balance
@@ -541,9 +546,15 @@ expect("Ada's two emails", one("norm", "emails"), [["2"]]);
 expect("balances", one("account", "balance").map((r) => r[2]), ["1000.00", "500.00", "1200.00", "500.00", "900.00", "700.00"]);
 expect("across accounts", one("account", "acrossAccounts"), [["1600.00"]]);
 expect("over time", one("account", "overTime"), [["4800.00"]]);
+expect(
+  "month-ends add to the quarter's sum",
+  one("account", "monthEnds").reduce((s, r) => s + Number(r[1]), 0).toFixed(2),
+  one("account", "overTime")[0][0],
+);
 expect("closing total", one("account", "closingTotal"), [["1600.00"]]);
 expect("stages", one("account", "stages"), [["7", "9"]]);
 expect("distinct", one("visits", "both"), [["4"]]);
+expect("fiscal quarters are calendar quarters", one("datePage", "fiscalDiffers"), [["0"]]);
 
 results.version = F.scd.version;
 const path = join(here, "results.json");

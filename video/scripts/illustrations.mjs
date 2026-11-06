@@ -47,7 +47,11 @@ if (!video) {
   process.exit(1);
 }
 
-const prompts = join(VIDEO_ROOT, "src", "videos", video, "illustrations.json");
+// A video's own art, or art that belongs to no one video (src/<name>/, such
+// as the YouTube thumbnails' in src/thumbnails/), imported the same way.
+const prompts = [join(VIDEO_ROOT, "src", "videos", video, "illustrations.json"), join(VIDEO_ROOT, "src", video, "illustrations.json")].find(
+  (p) => existsSync(p),
+) ?? join(VIDEO_ROOT, "src", "videos", video, "illustrations.json");
 if (!existsSync(prompts)) {
   console.error(`No ${prompts}`);
   process.exit(1);

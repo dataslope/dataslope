@@ -68,9 +68,8 @@ export const AiScene: React.FC = () => {
 
   const from = n.beat("ai").from;
   const broughtAt = n.word("ai", "has brought in new questions");
-  // Panel 1 inks in as "a large language model" is said, so "LLM" is never
-  // on screen before the narration has said what it stands for.
-  const llmAt = n.word("ai-eval", "a large language model");
+  // Panel 1 inks in as "an LLM" is said, so the panel names what was said.
+  const llmAt = n.word("ai-eval", "built on an LLM");
   const measureAt = n.word("ai-eval", "a measurement problem");
   const setAt = n.word("ai-eval", "an eval set");
   const ciAt = n.word("ai-eval", "a confidence interval");
@@ -102,7 +101,7 @@ export const AiScene: React.FC = () => {
 
       <Drift from={from} to={end + 40}>
         <Kicker at={from}>What AI has changed</Kicker>
-        <Headline lead="AI, artificial intelligence," turn="brought in new questions." at={from + 2} turnAt={broughtAt} size={62} />
+        <Headline lead="AI has" turn="brought in new questions." at={from + 2} turnAt={broughtAt} size={62} />
 
         <Panel i={0} at={llmAt} title="Evaluating an LLM feature">
           <div style={{ ...line(frame, measureAt), color: INK }}>

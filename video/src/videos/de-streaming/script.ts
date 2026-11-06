@@ -68,8 +68,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     clicks into two sessions.
  *   - "pressure": Poisson arrivals at a hundred a second (99 on average over
  *     the first minute) into a consumer handling eighty: lag 1,143 at sixty
- *     seconds ("over eleven hundred"); a second consumer from then clears it
- *     in 18 seconds.
+ *     seconds ("over eleven hundred"). The topic has two partitions, both
+ *     read by that one consumer; a second consumer takes partition 1 from
+ *     then, and the two clear in 20 seconds (the busier partition sets it;
+ *     one pooled queue at 160 a second would say 18). On one partition the
+ *     second consumer would sit idle, as question 3 shows.
  *   - "r-compact": eight profile updates to four users; compaction keeps four.
  *   Defaults and rules of thumb (no global order across partitions, add but
  *   never remove partitions, lag as the health signal) are the page's own.
@@ -139,7 +142,12 @@ export const script: NarrationScript = {
     },
     {
       id: "group-def",
-      text: "A consumer group is a set of consumers that read one topic together. Each partition goes to exactly one of them, so the work is split and nothing is read twice.",
+      text: "A consumer group is a set of consumers that read one topic together.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "group-split",
+      text: "Each partition goes to exactly one of them, so they split the work, instead of each reading everything.",
       pauseAfter: 0.6,
     },
     {
@@ -182,7 +190,11 @@ export const script: NarrationScript = {
     },
     {
       id: "sem-least",
-      text: "Process first, then commit, and after the crash, five to seven run again. That's at-least-once: nothing lost, but duplicates. It's the usual default, though it can't save a message deleted before anyone read it.",
+      text: "Process first, then commit, and after the crash, five to seven run again. That's at-least-once: nothing lost, but duplicates.",
+    },
+    {
+      id: "sem-retain",
+      text: "It's the usual default, though it can't save a message deleted by retention before anyone read it.",
       pauseAfter: 0.6,
     },
     {
@@ -206,6 +218,10 @@ export const script: NarrationScript = {
     {
       id: "idem-how",
       text: "Make a replay harmless. Upsert by key instead of a blind insert, so a second copy overwrites its row with the same values. Or store each message's id, and skip any you've already seen.",
+    },
+    {
+      id: "idem-persist",
+      text: "Keep those ids in the sink, in the same transaction as the row, so they survive a crash.",
       pauseAfter: 0.6,
     },
     {
@@ -231,6 +247,11 @@ export const script: NarrationScript = {
     {
       id: "eos-edge",
       text: "The guarantee stops at Kafka's edge. An email, an API call or an outside database isn't in the transaction, so each has to join it, or accept idempotent writes.",
+      pauseAfter: 0.6,
+    },
+    {
+      id: "eos-join",
+      text: "A database joins by storing the consumed offsets with its output, in one transaction. An email or an API call can't, so it needs an idempotency key. And consumers downstream must read only committed messages.",
       pauseAfter: 0.8,
     },
 
@@ -263,7 +284,17 @@ export const script: NarrationScript = {
     },
     {
       id: "wm-three",
-      text: "Allow three seconds, and the first window closes at thirteen and a half seconds, with four clicks. Then dee's click arrives behind a watermark at twelve: it's late.",
+      text: "Allow three seconds, and the first window closes at thirteen and a half seconds, with four clicks.",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "wm-ben",
+      text: "That's when ben's click from second thirteen arrives: thirteen minus three is ten, the window's end.",
+      pauseAfter: 0.8,
+    },
+    {
+      id: "wm-dee",
+      text: "Then dee's click arrives behind a watermark at twelve: it's late.",
       pauseAfter: 0.6,
     },
     {
@@ -278,7 +309,15 @@ export const script: NarrationScript = {
     },
     {
       id: "late-fix",
-      text: "Combine three things. Keep a window's state for an allowed lateness past the watermark, and update its result when a late event arrives: four becomes five. Send anything later to a side output, not into silence. And have the sink upsert, so the correction replaces the row instead of adding one.",
+      text: "Combine three things. Keep a window's state for an allowed lateness past the watermark, and update its result when a late event arrives: four becomes five.",
+    },
+    {
+      id: "late-side",
+      text: "Send anything later to a side output, a separate stream, not into silence.",
+    },
+    {
+      id: "late-upsert",
+      text: "And have the sink upsert, so the correction replaces the row instead of adding one.",
       pauseAfter: 0.6,
     },
     {
@@ -306,7 +345,11 @@ export const script: NarrationScript = {
     },
     {
       id: "win-slide",
-      text: "Sliding windows, also called hopping, are fixed but overlap. Ten seconds long, starting every five, so each click counts in two.",
+      text: "Hopping windows, which Flink calls sliding, are fixed but overlap.",
+    },
+    {
+      id: "win-hop",
+      text: "Ten seconds long, starting every five, so each click counts in two.",
       pauseAfter: 0.6,
     },
     {
@@ -324,7 +367,15 @@ export const script: NarrationScript = {
     },
     {
       id: "bp-def",
-      text: "Backpressure is a consumer that can't keep up. Kafka absorbs it: the log is durable, so a slow consumer falls behind and nothing is dropped. Push-based systems push back instead, and slow the producer.",
+      text: "Backpressure is a consumer that can't keep up. Kafka absorbs it: the log is durable, so a slow consumer falls behind and nothing is dropped.",
+    },
+    {
+      id: "bp-retain",
+      text: "As long as the lag stays inside the retention period.",
+    },
+    {
+      id: "bp-push",
+      text: "Push-based systems push back instead, and slow the producer.",
       pauseAfter: 0.6,
     },
     {
@@ -334,7 +385,11 @@ export const script: NarrationScript = {
     },
     {
       id: "bp-fix",
-      text: "A second consumer, on a partition of its own, clears it in eighteen seconds. Rising lag means more partitions and consumers, or faster processing.",
+      text: "A second consumer takes over one of the two partitions, and the lag clears in twenty seconds. With one partition, it would sit idle.",
+    },
+    {
+      id: "bp-rising",
+      text: "Rising lag means more partitions and consumers, or faster processing.",
       pauseAfter: 0.9,
     },
 
@@ -347,7 +402,11 @@ export const script: NarrationScript = {
     },
     {
       id: "r-compact",
-      text: "Log compaction keeps at least the latest value for each key and clears out older ones, instead of expiring by age. The topic becomes a snapshot of current state, like each user's latest profile, to rebuild state from. It runs alongside time-based retention.",
+      text: "Log compaction keeps at least the latest value for each key and clears out older ones, instead of expiring by age. The topic becomes a snapshot of current state, like each user's latest profile, to rebuild state from.",
+    },
+    {
+      id: "r-compact-age",
+      text: "Compaction alone has no age limit; a topic can add one, but a state snapshot usually doesn't.",
     },
     {
       id: "r-join",

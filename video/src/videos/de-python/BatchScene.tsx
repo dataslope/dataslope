@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { BATCH } from "./data";
-import { Bars, Console, consoleHeight, Drift, lineOf, Listing, listingHeight, MARK, MARK_OK, OK, OK_INK, Title, X0 } from "./parts";
+import { Bars, Console, consoleHeight, Drift, lineOf, Listing, listingHeight, MARK, MARK_OK, Mono, OK, OK_INK, Title, X0 } from "./parts";
 
 const TOP = 330;
 const SIZE = 21;
@@ -45,6 +45,9 @@ export const BatchScene: React.FC = () => {
     n.word("batch-slice", "three, and a last"),
     n.word("batch-slice", "a last batch of one"),
   ];
+  const whyAt = n.word("batch-iter", "Why call iter first");
+  const frontAt = n.word("batch-iter", "starts at the front every time");
+  const neverAt = n.word("batch-iter", "the loop never ends");
   const sinceAt = n.word("batch-builtin", "Since Python three twelve");
   const exactlyAt = n.word("batch-builtin", "does exactly this");
   const end = n.beat("retry-in").to;
@@ -63,6 +66,9 @@ export const BatchScene: React.FC = () => {
     return x;
   };
   const emptyX = blockX(6) + PITCH + GROUP_GAP;
+  // The first batches without iter(), as Python printed them: three is enough
+  // to show they never move on.
+  const noIter = (JSON.parse(BATCH.noIter) as number[][]).slice(0, 3).map((b) => `[${b.join(", ")}]`);
 
   return (
     <AbsoluteFill>
@@ -80,15 +86,15 @@ export const BatchScene: React.FC = () => {
         </QuestionCard>
 
         {/* ── Why: calls per million rows ── */}
-        <Note at={perRowAt} x={X0} y={y(TOP) - h(6)} out={pullAt - 4}>
+        <Note at={perRowAt} x={RIGHT_X - 40} y={y(TOP) - h(6)} out={pullAt - 4}>
           <Title>calls to write 1,000,000 rows</Title>
         </Note>
         <Bars
-          x={X0}
+          x={RIGHT_X - 40}
           top={y(TOP) + h(40)}
-          width={760}
-          rowH={h(64)}
-          nameW={340}
+          width={440}
+          rowH={h(80)}
+          nameW={260}
           out={pullAt - 4}
           bars={[
             { name: "an insert per row", value: 1_000_000, num: "1,000,000", color: ACCENT, ink: ACCENT_INK, at: tripAt },
@@ -103,20 +109,30 @@ export const BatchScene: React.FC = () => {
           ]}
         />
 
-        {/* ── The page's batched() ── */}
+        {/* ── The page's batched(), up from the start beside the bars ── */}
         <Listing
           lines={F}
           x={X0}
           top={y(TOP)}
           width={760}
           size={SIZE}
-          at={pullAt - 2}
+          at={perRowAt + 6}
           marks={[
             { line: lineOf(F, "it = iter(iterable)"), at: pullAt + 4, out: sliceAt },
             { line: lineOf(F, "islice(it, n)"), at: sliceAt, out: emptyAt },
-            { line: lineOf(F, "if not chunk"), at: emptyAt, color: MARK_OK },
+            { line: lineOf(F, "if not chunk"), at: emptyAt, out: whyAt },
+            { line: lineOf(F, "it = iter(iterable)"), at: whyAt + 4, color: MARK_OK },
           ]}
         />
+        {/* Without iter(): islice on the list starts at the front each time. */}
+        <Note at={frontAt} x={X0} y={builtinTop} out={sinceAt - 4}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            without <Mono>iter()</Mono>, on a list: <Mono>{`${noIter.join(", ")}, …`}</Mono>
+          </span>
+        </Note>
+        <Note at={neverAt} x={X0} y={builtinTop + h(44)} out={sinceAt - 4}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the same first three, forever</span>
+        </Note>
 
         {/* The stream, opening into batches of three. */}
         <Note at={sevenAt - 4} x={RIGHT_X} y={blocksTop - h(46)}>

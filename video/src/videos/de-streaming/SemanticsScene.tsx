@@ -52,8 +52,8 @@ export const SemanticsScene: React.FC = () => {
   const againAt = n.word("sem-least", "five to seven run again");
   const leastAt = n.word("sem-least", "That's at-least-once");
   const dupAt = n.word("sem-least", "but duplicates");
-  const defaultAt = n.word("sem-least", "the usual default");
-  const deletedAt = n.word("sem-least", "a message deleted before anyone read it");
+  const defaultAt = n.word("sem-retain", "the usual default");
+  const deletedAt = n.word("sem-retain", "a message deleted by retention");
   const exactAt = n.word("sem-exact", "Exactly-once means");
   const effectAt = n.word("sem-exact", "one effect on the result");
   const twiceAt = n.word("sem-exact", "it can run twice");
@@ -232,7 +232,7 @@ export const SemanticsScene: React.FC = () => {
           </span>
         </Note>
         <Note at={deletedAt} x={VERDICT_X} y={cellsTop(1) + h(36)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>can't save a message deleted before it was read</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>can't save a message retention deleted before it was read</span>
         </Note>
         <Note at={effectAt} x={VERDICT_X} y={cellsTop(2) - h(4)}>
           <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>one effect each on the result</span>

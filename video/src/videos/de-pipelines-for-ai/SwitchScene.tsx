@@ -15,7 +15,8 @@ const T = { x: X0, top: 360, rowH: 52, cols: [150, 120, 100, 140, 160] };
 const BG = { x1: 1010, x2: 1430, w: 380, top: 470, h: 130 };
 
 /**
- * Question 5. Left: llm-meaning's five-word space (the course lesson's
+ * Question 5. Left: drawn as the narration says each model has its own
+ * space, llm-meaning's five-word space (the course lesson's
  * vectors, read from that video's measurements.json), and a stand-in second
  * model that learned the same meanings with its axes rotated one place. Its
  * kitten (0.1, 0.9, 0.9) is searched against the first model's index by
@@ -78,7 +79,7 @@ export const SwitchScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-pencil" at={tinyAt + 4} level={-36} />
+      <Sfx name="el-pencil" at={spaceAt + 4} level={-36} />
       <Sfx name="el-tap" at={kittenAt + 2} level={-35} />
       <Sfx name="el-sprinkle" at={searchAt + 4} level={-36} />
       <Sfx name="el-scratch" at={truckAt + 6} level={-33} />
@@ -101,18 +102,18 @@ export const SwitchScene: React.FC = () => {
         <Note at={tinyAt - 2} x={T.x} y={y(T.top) - 34}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>a tiny space from the How LLMs Work course: five words, three numbers each</span>
         </Note>
-        {["word", ...SWITCH.axes, "distance"].map((t, j) => (
-          <Note key={t} at={(j === 4 ? searchAt : tinyAt) + j * 2} x={colX(j) + 12} y={y(T.top) + 8}>
+        {["word", ...SWITCH.axes, "from its kitten"].map((t, j) => (
+          <Note key={t} at={(j === 4 ? searchAt : spaceAt) + j * 2} x={colX(j) + 12} y={y(T.top) + 8}>
             <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{t}</span>
           </Note>
         ))}
-        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, tinyAt, 12) }}>
+        <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, spaceAt, 12) }}>
           <line x1={T.x} x2={colX(5)} y1={y(T.top)} y2={y(T.top)} stroke={INK} strokeWidth={2} />
           <line x1={T.x} x2={colX(5)} y1={y(T.top) + 42} y2={y(T.top) + 42} stroke={HAIRLINE} />
           <line x1={T.x} x2={colX(5)} y1={rowTop(5) + 4} y2={rowTop(5) + 4} stroke={HAIRLINE} />
         </svg>
         {SWITCH.words.map((w, i) => {
-          const p = ease(frame, tinyAt + 4 + i * 3, 10);
+          const p = ease(frame, spaceAt + 4 + i * 3, 10);
           const dShow = ease(frame, searchAt + 6 + i * 4, 10);
           const isNear = w.word === nearest;
           const wrong = isNear ? ease(frame, truckAt + 4, 10) : 0;

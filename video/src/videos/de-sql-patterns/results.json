@@ -771,6 +771,17 @@
       },
       "version": "v1.4.3"
     },
+    "where": {
+      "setup": "CREATE TABLE orders (region TEXT, amount DECIMAL(8,2));\nINSERT INTO orders VALUES\n  ('North', 120.00), ('South', 80.50), ('East', 200.00),\n  ('West', 50.25),   ('North', 60.00), ('South', 90.00),\n  ('East', 140.00),  ('West', 110.00), ('North', 75.50),\n  ('South', 65.00),  ('North', 145.75), ('East', 95.00),\n  ('West', 40.00),   ('South', 130.25), ('North', 88.00),\n  ('East', 175.50),  ('West', 62.75),   ('South', 105.00),\n  ('North', 210.00), ('East', 45.25),   ('West', 155.00),\n  ('South', 70.75),  ('North', 99.50),  ('East', 185.00);",
+      "steps": {
+        "whereAggregate": {
+          "sql": "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE SUM(amount) > 400\nGROUP BY region;",
+          "ok": false,
+          "error": "Binder Error: WHERE clause cannot contain aggregates!"
+        }
+      },
+      "version": "v1.4.3"
+    },
     "moving": {
       "setup": "CREATE TABLE daily_metrics (event_date DATE, daily_value INTEGER);\nINSERT INTO daily_metrics VALUES\n  (DATE '2024-01-01', 120), (DATE '2024-01-02', 135), (DATE '2024-01-03', 110),\n  (DATE '2024-01-05', 150), (DATE '2024-01-06', 140), (DATE '2024-01-10', 160),\n  (DATE '2024-01-11', 155), (DATE '2024-01-12', 170), (DATE '2024-01-13', 180);",
       "steps": {
@@ -1025,6 +1036,62 @@
               166.3,
               "2024-01-10",
               4
+            ]
+          ]
+        },
+        "full": {
+          "sql": "SELECT event_date, daily_value,\n  CASE WHEN COUNT(*) OVER w = 7\n    THEN AVG(daily_value) OVER w END AS avg_7\nFROM daily_metrics\nWINDOW w AS (ORDER BY event_date\n  ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)\nORDER BY event_date;",
+          "ok": true,
+          "columns": [
+            "event_date",
+            "daily_value",
+            "avg_7"
+          ],
+          "rows": [
+            [
+              "2024-01-01",
+              120,
+              null
+            ],
+            [
+              "2024-01-02",
+              135,
+              null
+            ],
+            [
+              "2024-01-03",
+              110,
+              null
+            ],
+            [
+              "2024-01-05",
+              150,
+              null
+            ],
+            [
+              "2024-01-06",
+              140,
+              null
+            ],
+            [
+              "2024-01-10",
+              160,
+              null
+            ],
+            [
+              "2024-01-11",
+              155,
+              138.57142857142858
+            ],
+            [
+              "2024-01-12",
+              170,
+              145.71428571428572
+            ],
+            [
+              "2024-01-13",
+              180,
+              152.14285714285714
             ]
           ]
         }

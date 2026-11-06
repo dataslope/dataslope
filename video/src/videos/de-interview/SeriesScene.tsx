@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, PAPER, headline, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, headline, label, note } from "../../editorial/style";
 import { Ink, Num, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { BANK, CHALLENGE_PAGES, PARTS, QUESTIONS } from "./data";
+import { BANK, CHALLENGE_PAGE_NAMES, PAGE_QUESTIONS, PARTS, QUESTIONS } from "./data";
 import { Drift, Kicker, Spot } from "./parts";
 
 const COL_W = 148;
@@ -27,12 +27,15 @@ const MOST = Math.max(...PARTS.map((p) => p.questions));
  * The series as a chart: the eleven topic videos in the track's order, each a
  * column with its hero, its part number and title under the baseline, and a
  * bar for the questions it answers. The names ink in along the baseline as
- * "follows the track" is said, the heroes on "eleven videos", and the heroes
- * ride up on their bars as the total is said.
- * SQL's two videos and data modeling's two are marked as pairs; then how each
- * video runs, the practice on the pages (concept checks on every one,
- * challenges on three, a bank of multiple-choice questions for the whole
- * track), and the bridge, which lights Part 1.
+ * "This series follows the track" is said, the heroes on "eleven videos", and
+ * the heroes ride up on their bars as the total is said. "Each answered once"
+ * is glossed under the headline: the pages ask more, and a question two pages
+ * share is answered in one video.
+ * SQL's two videos and data modeling's two are marked as pairs, each its own
+ * box; then how each video runs, the practice on the pages (concept checks on
+ * every one, challenges on three, named, a bank of multiple-choice questions
+ * for the whole track), and the bridge, which lights SQL's two parts on "hard
+ * sequel" and then Part 1 alone, where the series starts.
  */
 export const SeriesScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -40,24 +43,25 @@ export const SeriesScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("series").from;
-  const trackAt = n.word("series", "follows the track");
+  const trackAt = n.word("series", "This series");
   const elevenAt = n.word("series", "eleven videos");
   const totalAt = n.word("series", "a hundred and fifty-seven questions");
   const onceAt = n.word("series", "each answered once");
   const sqlAt = n.word("series", "Sequel and data modeling");
   const modelAt = n.word("series", "data modeling take two videos");
-  const figureAt = n.word("series-how", "the questions worth a figure");
+  const figureAt = n.word("series-how", "the harder questions");
   const quickAt = n.word("series-how", "a quick round");
   const everyAt = n.word("practice", "Every topic page has concept checks");
   const browserAt = n.word("practice", "three add challenges");
   const bankAt = n.word("practice", "a bank of a hundred and ten");
+  const hardAt = n.word("next", "hard sequel");
   const startsAt = n.word("next", "the series starts there");
   const nextAt = n.word("next", "Next");
   const end = n.beat("next").to;
 
   const colX = (i: number) => LEFT + i * (COL_W + GAP);
   const base = y(BASE);
-  // The parts' names ink in along the track as it is named, their heroes
+  // The parts' names ink in as the series is named, their heroes
   // as "eleven videos" is said, and their bars as the total is.
   const nameAt = (i: number) => trackAt + 2 + i * 3;
   const inAt = (i: number) => elevenAt + 3 + i * 3;
@@ -67,6 +71,9 @@ export const SeriesScene: React.FC = () => {
     { a: 2, b: 3, at: modelAt },
   ];
   const barH = (i: number) => h(BAR_MAX) * (PARTS[i].questions / MOST);
+  const lit = ease(frame, hardAt - 2, 12);
+  const narrow = ease(frame, startsAt, 14);
+  const litTop = base - Math.max(barH(0), barH(1)) - ART_H - 24;
 
   return (
     <AbsoluteFill>
@@ -91,6 +98,11 @@ export const SeriesScene: React.FC = () => {
             each answered once.
           </Ink>
         </div>
+        {/* Why "once": the pages ask more questions than the series answers,
+            because some are asked on two pages. */}
+        <div style={{ position: "absolute", left: 96, top: y(150) + h(84), ...note(24, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, onceAt + 8, 14) }}>
+          The topic pages ask <Num>{PAGE_QUESTIONS}</Num>; a question two pages share is answered once, in one video.
+        </div>
 
         {pairs.map((pr) => {
           const q = ease(frame, pr.at, 14) * (1 - ease(frame, figureAt - 6, 14));
@@ -101,9 +113,11 @@ export const SeriesScene: React.FC = () => {
               key={pr.a}
               style={{
                 position: "absolute",
-                left: colX(pr.a) - 4,
+                // Inset 4px inside the pair's columns, so the two pairs stand
+                // apart by a 16px gap instead of touching as one block of four.
+                left: colX(pr.a) + 4,
                 top,
-                width: colX(pr.b) + COL_W - colX(pr.a) + 8,
+                width: colX(pr.b) + COL_W - colX(pr.a) - 8,
                 height: base + h(118) - top,
                 borderRadius: 16,
                 background: HIGHLIGHT,
@@ -112,6 +126,23 @@ export const SeriesScene: React.FC = () => {
             />
           );
         })}
+
+        {/* The bridge: "hard sequel" lights SQL's two parts, and "the series
+            starts there" narrows the light to Part 1 as the rest dim. */}
+        {lit > 0 ? (
+          <div
+            style={{
+              position: "absolute",
+              left: colX(0) + 4,
+              top: litTop,
+              width: COL_W - 8 + (colX(1) - colX(0)) * (1 - narrow),
+              height: base + h(118) - litTop,
+              borderRadius: 16,
+              background: HIGHLIGHT,
+              opacity: lit,
+            }}
+          />
+        ) : null}
 
         <div
           style={{
@@ -130,25 +161,10 @@ export const SeriesScene: React.FC = () => {
           if (pIn <= 0) return null;
           const grow = ease(frame, growAt(i), 22);
           const bh = barH(i) * grow;
-          const lit = i === 0 ? ease(frame, startsAt - 2, 12) : 0;
           const dim = i === 0 ? 0 : ease(frame, startsAt, 16) * 0.5;
           const cx = colX(i) + COL_W / 2;
           return (
             <React.Fragment key={p.n}>
-              {lit > 0 ? (
-                <div
-                  style={{
-                    position: "absolute",
-                    left: colX(i) - 4,
-                    top: base - barH(i) - ART_H - 24,
-                    width: COL_W + 8,
-                    height: barH(i) + ART_H + 24 + h(118),
-                    borderRadius: 16,
-                    background: HIGHLIGHT,
-                    opacity: lit,
-                  }}
-                />
-              ) : null}
               <div
                 style={{
                   position: "absolute",
@@ -221,7 +237,7 @@ export const SeriesScene: React.FC = () => {
             opacity: ease(frame, figureAt - 2, 12) * (1 - ease(frame, everyAt - 12, 10)),
           }}
         >
-          Each video: the questions worth a figure,{" "}
+          Each video: the harder questions, in figures,{" "}
           <span style={{ opacity: ease(frame, quickAt - 2, 12) }}>then, in most, a quick round of one-line answers.</span>
         </div>
         <div
@@ -237,7 +253,7 @@ export const SeriesScene: React.FC = () => {
           Every topic page: concept checks
           <span style={{ opacity: ease(frame, browserAt - 2, 10) }}>
             {" "}
-            · <Num>{CHALLENGE_PAGES}</Num> pages: challenges that run in the browser
+            · {CHALLENGE_PAGE_NAMES} pages: challenges that run in the browser
           </span>
         </div>
         <div

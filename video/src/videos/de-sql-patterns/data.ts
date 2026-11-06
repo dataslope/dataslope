@@ -124,8 +124,14 @@ export const WHERE = {
   bigRows: Number(scalar("daSql", "where", "bigRows")),
   bigGroups: table("daSql", "where", "bigGroups"),
   both: query("daSql", "where", "both"),
-  aggregate: refused("daSql", "where", "whereAggregate"),
+  /** The written query's HAVING condition, SUM(amount) > 400, moved into
+   *  WHERE: run here on da-sql's orders (da-sql's own refusal is at 600). */
+  aggregate: refused("own", "where", "whereAggregate"),
 };
+if (figuresOf(own).where.setup !== figuresOf(daSql).where.setup) throw new Error("the refusal ran on other orders than da-sql's");
+if (!WHERE.both.lines.some((l) => WHERE.aggregate.lines.some((a) => a.startsWith("WHERE ") && l === a.replace("WHERE", "HAVING")))) {
+  throw new Error("the SUM in WHERE is not the written query's HAVING condition");
+}
 
 // ── 6. Window frames (da-advanced-sql's) ────────────────────────────────────
 
@@ -141,6 +147,7 @@ export const FRAME = {
 const rowsFrame = query("own", "moving", "rows");
 const rangeFrame = query("own", "moving", "range");
 const filledAvg = query("own", "spine", "filledAvg");
+const fullFrame = query("own", "moving", "full");
 /** One row of a result by its first cell. */
 const rowOf = (t: Table, first: string): Record<string, string> => {
   const r = t.rows.find((row) => row[0] === first);
@@ -164,7 +171,17 @@ export const MOVING = {
     range: rowOf(rangeFrame, LAST_DAY),
     spine: rowOf(filledAvg, LAST_DAY),
   },
+  /** The ROWS frame's short windows: the rows that hold fewer than seven,
+   *  nulled by the CASE that ran (its two lines, as written). */
+  full: {
+    lines: fullFrame.lines.filter((l) => /CASE WHEN|THEN /.test(l)).map((l) => l.slice(2)),
+    nulled: fullFrame.rows.filter((r) => r[fullFrame.cols.indexOf("avg_7")] === "null").length,
+  },
 };
+if (rowOf(fullFrame, LAST_DAY).avg_7 !== MOVING.last.rows.avg_7) throw new Error("the full-window average disagrees with the ROWS frame's");
+if (rowsFrame.rows.filter((r) => Number(r[rowsFrame.cols.indexOf("n")]) < 7).length !== MOVING.full.nulled) {
+  throw new Error("the nulled rows are not the ROWS frame's short ones");
+}
 
 export const SPINE = {
   /** The page's own spine query, which DuckDB refuses as written. */
@@ -232,6 +249,10 @@ export const RAPID = {
   // 13. A CTE against a subquery, on the page's orders.
   subquery: query("own", "cte", "subquery"),
   cte: query("own", "cte", "cte"),
+  /** The video's threshold, the page's, and how many users pass the page's. */
+  threshold: Number(/total > (\d+)/.exec(step("own", "cte", "cte").sql)![1]),
+  pageThreshold: Number(/total > (\d+)/.exec(step("own", "cte", "pageThreshold").sql)![1]),
+  pagePasses: Number(scalar("own", "cte", "pageThreshold")),
   // 14. UNION (da-sql's).
   storeA: table("daSql", "rapid", "storeA"),
   storeB: table("daSql", "rapid", "storeB"),

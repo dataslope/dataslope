@@ -100,6 +100,8 @@ export const FUNDED = table("account", "funded");
 export const STAGES = { approve: Number(value("account", "stages", 0)), fund: Number(value("account", "stages", 1)) };
 export const ACROSS = value("account", "acrossAccounts");
 export const OVER_TIME = value("account", "overTime");
+/** Each month-end's total across both accounts: what OVER_TIME adds up. */
+export const MONTH_ENDS = table("account", "monthEnds");
 export const CLOSING = table("account", "closing");
 export const CLOSING_TOTAL = value("account", "closingTotal");
 export const VISITS_PER_DAY = table("visits", "perDay");
@@ -111,6 +113,9 @@ export const BY_QUARTER = table("datePage", "page");
 export const AOV_ALL = table("datePage", "aovAll");
 export const AOV_WORKING = table("datePage", "aovWorking");
 export const HOLIDAYS = value("datePage", "holidays");
+/** How many of the page's dates have a fiscal quarter other than their
+ *  calendar quarter: 0, so only the holidays need the table here. */
+export const FISCAL_DIFFERS = Number(value("datePage", "fiscalDiffers"));
 
 /** "1,600.00" from "1600.00": dollars set the way the narration says them. */
 export const money = (v: string, digits = 2) =>

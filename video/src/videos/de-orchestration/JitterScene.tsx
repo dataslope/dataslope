@@ -19,8 +19,9 @@ const Y_MAX = 300;
 const TASK_DOTS = 14;
 
 /**
- * Question 4, the jitter. A shared source fails and every task reading it
- * fails with it; modelled, as charts/idempotency-retry-storm.mjs models it
+ * Question 4, the jitter, for code that calls a shared service (Airflow's
+ * own backoff already spreads its tasks' retries). A shared source fails and
+ * every task reading it fails with it; modelled, as charts/idempotency-retry-storm.mjs models it
  * (its code and seed, check.mjs), with a thousand of them retrying on one
  * doubling schedule. Without jitter all 1,000 land in one 100 ms window
  * against a service that takes 90; with jitter each lands somewhere in its
@@ -32,13 +33,15 @@ export const JitterScene: React.FC = () => {
   const { y, h } = useLayout();
 
   const from = n.beat("jitter").from;
-  const addAt = n.word("jitter", "Add jitter, too");
-  const sourceAt = n.word("jitter", "When a shared source fails");
-  const onceAt = n.word("jitter", "fails at once");
-  const modelAt = n.word("jitter", "Model a thousand");
-  const allAt = n.word("jitter", "all thousand retry");
-  const sameAt = n.word("jitter", "in the same tenth of a second");
-  const capAt = n.word("jitter", "a service that takes ninety");
+  const codeAt = n.word("jitter", "In code that calls a shared service");
+  const addAt = n.word("jitter", "add jitter too");
+  const partAt = n.word("jitter", "a random part of each wait");
+  const sourceAt = n.word("jitter-storm", "When a shared source fails");
+  const onceAt = n.word("jitter-storm", "fails at once");
+  const modelAt = n.word("jitter-storm", "Model a thousand");
+  const allAt = n.word("jitter-storm", "all thousand retry");
+  const sameAt = n.word("jitter-storm", "in the same tenth of a second");
+  const capAt = n.word("jitter-storm", "a service that takes ninety");
   const randAt = n.word("jitter-fix", "With random jitter");
   const landsAt = n.word("jitter-fix", "lands somewhere in its wait");
   const peakAt = n.word("jitter-fix", "The peak falls to two hundred sixty-one");
@@ -75,8 +78,14 @@ export const JitterScene: React.FC = () => {
       <Sfx name="el-chime" at={thirdAt + 8} level={-36} />
 
       <Drift from={from} to={end + 30}>
-        <Kicker at={addAt - 4}>Question 4 · retries</Kicker>
-        <Headline lead="Add jitter, too." at={addAt - 2} size={66} />
+        <Kicker at={from - 4}>Question 4 · retries</Kicker>
+        <Headline lead="Add jitter, too." at={Math.min(addAt - 2, from + 6)} size={66} />
+        {/* The kicker's left edge, the headline's column. */}
+        <Note at={codeAt + 4} x={96} y={y(250)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            in code that calls a shared service<span style={{ color: INK_SOFT, opacity: ease(frame, partAt, 10) }}>: a random part of each wait</span>
+          </span>
+        </Note>
 
         {/* One source, and every task that reads it. */}
         <TaskBox cx={1420} cy={srcY} w={190} h={h(50)} at={sourceAt} tones={[{ at: onceAt, tone: "bad" }]} size={24}>
@@ -123,7 +132,9 @@ export const JitterScene: React.FC = () => {
           );
         })}
         <Note at={modelAt + 4} x={PANELS[0].x} y={y(372)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>a model: 1,000 tasks, retries per 100 ms</span>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            a model: <Num>{count(STORM.clients)}</Num> tasks, a <Num>{STORM.base}</Num> ms base, retries per <Num>{STORM.bucket}</Num> ms
+          </span>
         </Note>
 
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>

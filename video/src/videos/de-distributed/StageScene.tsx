@@ -11,7 +11,7 @@ import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { at as atScale, Axes, type Scale } from "../da-statistics-communication/parts";
 import { TAIL } from "./data";
-import { Drift, Machine, Svg } from "./parts";
+import { Drift, Machine, OK_INK, Svg } from "./parts";
 
 const S1_X = 120;
 const S2_X = 1000;
@@ -22,18 +22,21 @@ const LANE0 = 402;
 const LANE_PITCH = 36;
 const LANE_H = 24;
 const TRACK_X = 140;
-const TRACK_W = 560;
+const TRACK_W = 530;
 const TASKS = 4;
 /** How far each task in stage 1 gets before it finishes: the third is the straggler. */
 const DONE = [0.58, 0.66, 1, 0.52];
 const SLOW = 2;
+/** Where the straggler's fix sits, right of the fan-out chart. */
+const SPEC_X = 1460;
 
 /**
  * Question 8. One action starts a job; the job is two stages, cut at its one
  * shuffle. Each stage is four tasks, one per partition, running the same
  * narrow steps side by side, and stage 1 ends only when its slowest task
  * does. Then the page's fan-out chart, 1 - 0.99^n: at a 1% chance per task,
- * sixty-nine tasks are slow half the time, two hundred 87% of it.
+ * sixty-nine tasks are slow half the time, two hundred 87% of it. Then the
+ * fix for a straggler: speculative execution, a copy of it elsewhere.
  */
 export const StageScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -44,9 +47,9 @@ export const StageScene: React.FC = () => {
   const qAt = n.word("stage", "Question eight");
   const textAt = n.word("stage", "What is a stage and a task");
   const actionAt = n.word("stage", "One action starts a job");
-  const cutsAt = n.word("stage", "cuts it into stages");
-  const wideAt = n.word("stage", "at every wide dependency");
-  const countAt = n.word("stage", "counting shuffles counts stages");
+  const cutsAt = n.word("stage-cut", "cuts it into stages");
+  const wideAt = n.word("stage-cut", "at every wide dependency");
+  const countAt = n.word("stage-cut", "each shuffle adds a stage");
   const tasksAt = n.word("stage-tasks", "Each stage is a set of tasks");
   const perAt = n.word("stage-tasks", "one per partition");
   const parallelAt = n.word("stage-tasks", "in parallel");
@@ -56,7 +59,10 @@ export const StageScene: React.FC = () => {
   const halfAt = n.word("stage-tail", "sixty-nine tasks is slow half the time");
   const twoAt = n.word("stage-tail", "one of two hundred");
   const pctAt = n.word("stage-tail", "eighty-seven percent");
-  const end = n.beat("stage-tail").to;
+  const specAt = n.word("stage-spec", "Speculative execution");
+  const copyAt = n.word("stage-spec", "starts a copy of a slow task");
+  const elseAt = n.word("stage-spec", "on another executor");
+  const end = n.beat("stage-spec").to;
 
   const laneY = (i: number) => y(LANE0 + i * LANE_PITCH);
   const laneH = h(LANE_H);
@@ -125,6 +131,7 @@ export const StageScene: React.FC = () => {
       <Sfx name="el-pencil" at={pAt} level={-37} />
       <Sfx name="el-tap" at={halfAt + 4} level={-35} />
       <Sfx name="el-tap" at={pctAt} level={-35} />
+      <Sfx name="el-chime" at={copyAt} level={-36} />
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={8} at={qAt - 4} textAt={textAt - 4} size={60}>
@@ -222,6 +229,19 @@ export const StageScene: React.FC = () => {
         <Note at={pctAt - 2} x={twoX - 20} y={twoY - h(46)} align="right">
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Num>{TAIL.tasks}</Num> tasks: <Num>{Math.round(TAIL.at200 * 100)}</Num>%
+          </span>
+        </Note>
+
+        {/* The fix for a straggler. */}
+        <Note at={specAt - 2} x={SPEC_X} y={y(712)}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 700, display: "block", whiteSpace: "nowrap" }}>speculative execution</span>
+          <span style={{ ...note(22, INK), display: "block", lineHeight: 1.35, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, copyAt, 10) }}>
+            a copy of a slow task
+            <br />
+            <span style={{ opacity: ease(frame, elseAt, 10) }}>on another executor</span>
+          </span>
+          <span style={{ display: "block", fontFamily: MONO, fontSize: 20, fontWeight: 600, color: INK_SOFT, fontVariantLigatures: "none", whiteSpace: "nowrap", marginTop: 8, opacity: ease(frame, elseAt + 6, 10) }}>
+            spark.speculation
           </span>
         </Note>
       </Drift>

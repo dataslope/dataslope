@@ -19,10 +19,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Data Scientist overview's four-stop route: the page's "design a pipeline
  * for X" as the headline, with the meerkat standing lookout, then the four
  * things interviewers probe as a stack of four layers, from the query at the
- * top down to the files it reads. The AI changes follow as a second pipeline
- * (RAG ingestion: parse, chunk, embed, index, kept fresh) over three cards,
- * and the eleven topic videos stand as a bar chart of their question counts,
- * each topped by its own watercolor hero.
+ * top down to the files it reads. The prompt comes back once the four are
+ * laid out ("probe-design"): a design question draws on all four at once,
+ * each layer is labelled with the parts that build it, and Part 11 walks one
+ * design through. The AI changes follow as a second pipeline (RAG ingestion:
+ * parse, chunk, embed, index, fed only new and changed documents) over three
+ * cards, ending on the page's pointer to Part 11 ("ai-more"), and the eleven
+ * topic videos stand as a bar chart of their question counts, each topped by
+ * its own watercolor hero.
  *
  * Facts, all from the page or counted:
  * - "a level deeper than analyst screens on SQL", "design a pipeline for X",
@@ -33,7 +37,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * - eleven videos and 157 questions, each answered once: the plan's table,
  *   held in data.ts (PARTS), one place for the counts. The pages ask 182
  *   (check.mjs counts their `###` headings); the plan answers a question two
- *   pages share once, which takes 182 to 157.
+ *   pages share once, which takes 182 to 157. The screen says so under the
+ *   headline, with the 182 from results.json.
+ * - "Part eleven walks one design through": Part 11's question 2, "Walk
+ *   through the ingestion pipeline for a RAG assistant", the series' one
+ *   design walked end to end; "Part eleven covers all four in depth" is the
+ *   page's "Pipelines for AI covers these questions in depth". check.mjs
+ *   fails if Pipelines for AI moves from Part 11 in PARTS.
  * - SQL and data modeling take two videos each: PARTS.
  * - "most end on a quick round": the plan gives a rapid round to 8 of the
  *   11 topic videos (not SQL II, Warehousing or Pipelines for AI), and the
@@ -50,7 +60,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * "sequel" (on screen it stays SQL), AI is said as it is, RAG is expanded
  * once, and no sentence opens with "A" before an initialism. No product name
  * needs a gloss here: Airflow and Dagster are named as what schedules a
- * pipeline, Parquet as a columnar file, and pgvector is said as "Postgres".
+ * pipeline, Parquet as a columnar file, and pgvector is said as "Postgres
+ * with its vector extension" (the card writes "Postgres (pgvector)", Part
+ * 11's word). What RAG does ("a model answers from documents it looks up")
+ * is on screen only, under its expansion.
  */
 export const script: NarrationScript = {
   id: "de-interview",
@@ -59,9 +72,10 @@ export const script: NarrationScript = {
   tail: 2.6,
   beats: [
     { id: "prompt", scene: true, text: "Design a pipeline for X.", pauseAfter: 0.8 },
+    { id: "expect", text: "Expect it in a data engineer interview.", pauseAfter: 0.5 },
     {
-      id: "expect",
-      text: "Expect it in a data engineer interview, next to sequel that goes a level deeper than an analyst screen.",
+      id: "expect-sql",
+      text: "Alongside it comes sequel, a level deeper than an analyst screen.",
       pauseAfter: 0.7,
     },
     {
@@ -84,6 +98,10 @@ export const script: NarrationScript = {
     {
       id: "probe-store",
       text: "And systems and formats: columnar files like Parquet, partitioning and file sizes, warehouse or lakehouse, and cost.",
+    },
+    {
+      id: "probe-design",
+      text: "Designing a pipeline for X draws on all four layers at once. The series builds each layer, and Part eleven walks one design through, end to end.",
       pauseAfter: 0.8,
     },
     { id: "ai", scene: true, text: "AI has changed this interview in four ways.", pauseAfter: 0.6 },
@@ -94,7 +112,7 @@ export const script: NarrationScript = {
     },
     {
       id: "ai-vector",
-      text: "Vector search trade-offs: exact or approximate, Postgres or a dedicated store, metadata filters, and hybrid keyword search.",
+      text: "Vector search trade-offs: exact or approximate, Postgres with its vector extension or a dedicated store, metadata filters, and hybrid keyword search.",
     },
     {
       id: "ai-gov",
@@ -103,8 +121,8 @@ export const script: NarrationScript = {
     {
       id: "ai-code",
       text: "And AI-written pipeline code needs review for idempotency, time zones and schema drift. Some coding rounds now allow an assistant, so ask the recruiter about each one.",
-      pauseAfter: 0.8,
     },
+    { id: "ai-more", text: "Part eleven covers all four in depth.", pauseAfter: 0.8 },
     {
       id: "series",
       scene: true,
@@ -113,7 +131,7 @@ export const script: NarrationScript = {
     },
     {
       id: "series-how",
-      text: "Each video works through the questions worth a figure, and most end on a quick round of one-line answers.",
+      text: "Each video works through the harder questions in figures, and most end on a quick round of one-line answers.",
       pauseAfter: 0.6,
     },
     {

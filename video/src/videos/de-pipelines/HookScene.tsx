@@ -6,7 +6,7 @@ import { BAR, BLUE_INK, INK, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Flow, Headline, HERO, Kicker, Node, OK_INK, Pill, Spot, X0 } from "./parts";
+import { Drift, Flow, Headline, HERO, Kicker, Node, Pill, Spot, X0 } from "./parts";
 
 /** The row the pipeline runs along, and its stages. */
 const ROW = 430;
@@ -159,7 +159,7 @@ export const HookScene: React.FC = () => {
         </Note>
         <Note at={threeAt - 2} x={X0 + 380} y={y(830)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
-            <b style={{ color: OK_INK }}>
+            <b style={{ color: BLUE_INK }}>
               <Num>3</Num>
             </b>{" "}
             quick ones at the end

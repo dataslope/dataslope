@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { LEFT, LEFT_GRADIENT, LEFT_STOPS, RIGHT, RIGHT_GRADIENT, RIGHT_STOPS, VIEW } from "../components/mark";
 import { ease } from "../components/motion";
 import { Sfx } from "../sound/Sfx";
 import { ds } from "../theme/brand";
@@ -7,32 +8,6 @@ import { SANS } from "../theme/fonts";
 import { useLayout } from "./layout";
 import { HAIRLINE, headline, INK, INK_SOFT, label } from "./style";
 import { Ink } from "./ui";
-
-/**
- * The Dataslope mark, from the site's own public/dataslope-logo-blue.svg
- * (copied as public/brand/dataslope-logo-blue.svg), drawn inline so its two
- * mirrored slopes can move on their own. Same paths, same radial gradients,
- * with the brand blue as a token instead of the file's hex.
- */
-const VIEW = { w: 1087.59, h: 682.55 };
-const LEFT =
-  "M679.63,139.57c.05-1.45.06-2.21.06-3.67C679.69,60.84,618.85,0,543.79,0s-132.49,57.51-135.75,129.67h0s-2.99,129.29-85.67,205.52c-73.47,67.75-167.89,74.85-188,75.59-1.2.01-2.39.04-3.58.09-.2,0-.3,0-.3,0h0C57.94,413.72,0,473.42,0,546.66s60.84,135.89,135.89,135.89c3.22,0,6.41-.12,9.57-.34h0s278.11,3.51,437.31-237.01c100.12-151.26,96.85-304.24,96.85-304.24v-1.4Z";
-const RIGHT =
-  "M407.96,139.57c-.05-1.45-.06-2.21-.06-3.67C407.91,60.84,468.75,0,543.8,0s132.49,57.51,135.75,129.67h0s2.99,129.29,85.67,205.52c73.47,67.75,167.89,74.85,188,75.59,1.2.01,2.39.04,3.58.09.2,0,.3,0,.3,0h0c72.55,2.85,130.49,62.55,130.49,135.79s-60.84,135.89-135.89,135.89c-3.22,0-6.41-.12-9.57-.34h0s-278.11,3.51-437.31-237.01c-100.12-151.26-96.85-304.24-96.85-304.24v-1.4Z";
-const LEFT_STOPS: [number, number][] = [
-  [0.19, 0.6],
-  [0.32, 0.62],
-  [0.51, 0.69],
-  [0.72, 0.81],
-  [0.96, 0.97],
-  [1, 1],
-];
-const RIGHT_STOPS: [number, number][] = [
-  [0.14, 1],
-  [0.34, 0.89],
-  [0.76, 0.68],
-  [0.96, 0.6],
-];
 
 /** The wordmark as the site header sets it: Inter 600, tracked tight
  *  (Tailwind's font-semibold tracking-tight), at the header's 1.38 times the
@@ -112,12 +87,12 @@ export const SeriesIntro: React.FC<{ course: string; unit: string; title: string
           style={{ overflow: "visible", rotate: `${tilt}deg`, translate: `${markShift}px 0`, transformOrigin: "50% 60%" }}
         >
           <defs>
-            <radialGradient id="ds-intro-left" cx="339.84" cy="341.28" r="340.56" gradientUnits="userSpaceOnUse">
+            <radialGradient id="ds-intro-left" {...LEFT_GRADIENT} gradientUnits="userSpaceOnUse">
               {LEFT_STOPS.map(([o, a]) => (
                 <stop key={o} offset={o} style={{ stopColor: ds("blue", 500), stopOpacity: a }} />
               ))}
             </radialGradient>
-            <radialGradient id="ds-intro-right" cx="798.17" cy="382.86" r="318.51" gradientUnits="userSpaceOnUse">
+            <radialGradient id="ds-intro-right" {...RIGHT_GRADIENT} gradientUnits="userSpaceOnUse">
               {RIGHT_STOPS.map(([o, a]) => (
                 <stop key={o} offset={o} style={{ stopColor: ds("blue", 500), stopOpacity: a }} />
               ))}

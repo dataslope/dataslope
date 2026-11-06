@@ -34,6 +34,8 @@ export const FrameScene: React.FC = () => {
   // The payments arrive on the question's second half.
   const asked = n.word("frame", "difference between rows and range") + 4;
   const setAt = n.word("frame-def", "the set of rows");
+  const runAt = n.word("frame-def-run", "For a running total");
+  const upToAt = n.word("frame-def-run", "every row up to the current one");
   const sameDayAt = n.word("frame-peers", "land on the same day");
   const rowsAt0 = n.word("frame-rows", "Rows counts physical rows");
   const hundredAt = n.word("frame-rows", "a hundred");
@@ -42,9 +44,11 @@ export const FrameScene: React.FC = () => {
   const rangeAt = n.word("frame-range", "Range goes by");
   const togetherAt = n.word("frame-range", "come in together");
   const bothAt = n.word("frame-range", "both get four twenty-five");
-  const predictableAt = n.word("frame-pick", "Rows is the predictable one");
-  const belongAt = n.word("frame-pick", "tied values belong together");
-  const spanAt = n.word("frame-pick", "a span of time");
+  const predictableAt = n.word("frame-pick", "Rows is predictable");
+  const tiesAt = n.word("frame-pick", "breaks ties");
+  const idAt = n.word("frame-pick", "like this ID");
+  const belongAt = n.word("frame-pick-range", "tied values belong together");
+  const spanAt = n.word("frame-pick-range", "a span of time");
   const bridgeAt = n.beat("moving-in").from;
   const end = n.beat("moving-in").to;
 
@@ -77,14 +81,17 @@ export const FrameScene: React.FC = () => {
             payments
           </TableName>
           <DataTable g={pg} cols={colsOf(P)} at={asked - 6} rows={rowsAt(P.rows, asked - 2)} bands={peers.map((row) => ({ row, at: sameDayAt, color: MARK }))} />
-          <Note at={setAt} x={TABLE_X} y={pg.rowTop(P.rows.length) + h(24)} width={420}>
-            <span style={{ ...note(24, INK_SOFT) }}>the frame: the rows the function sees for this one</span>
+          <Note at={setAt} x={TABLE_X} y={pg.rowTop(P.rows.length) + h(24)} width={440}>
+            <span style={{ ...note(25, INK), display: "block", textWrap: "balance" }}>the frame: the rows the function sees</span>
+          </Note>
+          <Note at={upToAt} x={TABLE_X} y={pg.rowTop(P.rows.length) + h(110)} width={440}>
+            <span style={{ ...note(23, INK_SOFT) }}>a running total: every row up to this one</span>
           </Note>
           <RowBracket
             g={pg}
             steps={[
               // The definition: the rows up to the current one, which gets the dot.
-              { at: setAt + 4, from: 0, to: 1 },
+              { at: upToAt + 2, from: 0, to: 1 },
               { at: hundredAt - 2, from: 0, to: 0 },
               { at: threeFiftyAt - 2, from: 0, to: 1 },
               { at: fourTwentyFiveAt - 2, from: 0, to: 2 },
@@ -93,16 +100,20 @@ export const FrameScene: React.FC = () => {
             ]}
           />
 
-          {/* ── ROWS, then RANGE ── */}
+          {/* ── ROWS, then RANGE ── The running total arrives with the
+              definition, so the frame has a function to belong to. */}
           <Listing
             lines={R.lines}
             x={LIST_X}
             top={y(TOP)}
             width={LIST_W}
             size={SIZE}
-            at={rowsAt0 - 4}
+            at={setAt - 2}
             out={rangeAt - 2}
-            marks={[{ line: lineOf(R.lines, "ROWS BETWEEN"), at: rowsAt0 + 6 }]}
+            marks={[
+              { line: lineOf(R.lines, "SUM(amount) OVER"), at: runAt + 2, out: upToAt },
+              { line: lineOf(R.lines, "ROWS BETWEEN"), at: upToAt + 2 },
+            ]}
           />
           <Listing
             lines={FRAME.range.lines}
@@ -135,7 +146,10 @@ export const FrameScene: React.FC = () => {
           {/* ── When to reach for each ── */}
           <Note at={predictableAt - 2} x={LIST_X} y={notesY}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-              <QMono>ROWS</QMono>: physical rows, predictable
+              <QMono>ROWS</QMono>: physical rows, predictable{" "}
+              <span style={{ opacity: ease(frame, tiesAt - 2, 10) }}>
+                once <QMono>ORDER BY day, <Mark at={idAt}>id</Mark></QMono> breaks ties
+              </span>
             </span>
           </Note>
           <Note at={belongAt - 6} x={LIST_X} y={notesY + h(46)}>

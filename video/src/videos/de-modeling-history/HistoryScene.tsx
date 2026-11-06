@@ -110,7 +110,7 @@ export const HistoryScene: React.FC = () => {
         <Note at={scdAt} x={X0} y={y(268)}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
             A slowly changing dimension, an <b style={{ color: INK }}>SCD</b>
-            <span style={{ opacity: ease(frame, threeAt, 10) }}>: three classic types, on the page&rsquo;s customer <Num>42</Num></span>
+            <span style={{ opacity: ease(frame, threeAt, 10) }}>: three classic types, on customer <Num>42</Num></span>
           </span>
         </Note>
 
@@ -180,7 +180,7 @@ export const HistoryScene: React.FC = () => {
 
         {/* ── Type 2 ── */}
         <TableName g={g2} at={t2At + 4}>
-          dim_customer, the page&rsquo;s rows
+          dim_customer
         </TableName>
         <DataTable
           g={g2}

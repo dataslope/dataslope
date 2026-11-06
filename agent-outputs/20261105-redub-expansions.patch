@@ -1,0 +1,133 @@
+diff --git a/video/src/videos/da-ai-assisted/RapidScene.tsx b/video/src/videos/da-ai-assisted/RapidScene.tsx
+index 1b26758..f3de769 100644
+--- a/video/src/videos/da-ai-assisted/RapidScene.tsx
++++ b/video/src/videos/da-ai-assisted/RapidScene.tsx
+@@ -172,7 +172,7 @@ const Bi: React.FC<{ c: Ctx }> = ({ c }) => {
+ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
+   const frame = useCurrentFrame();
+   const at = c.w("r-llm", "sort five thousand survey answers");
+-  const llmAt = c.w("r-llm", "a large language model");
++  const llmAt = c.w("r-llm", "with an LLM");
+   const steps = [
+     { at: c.w("r-llm", "fix the categories first"), text: "Fix the categories first" },
+     { at: c.w("r-llm", "hand-label a hundred or two"), text: "Hand-label 100 to 200, and measure its accuracy" },
+@@ -190,7 +190,7 @@ const Llm: React.FC<{ c: Ctx }> = ({ c }) => {
+         <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>5,000 open-ended survey answers</span>
+       </Note>
+       <Note at={llmAt - 2} x={R_X} y={c.T + c.h(44)}>
+-        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>LLM: large language model, as a first-pass labeler you measure</span>
++        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>An LLM as a first-pass labeler you measure</span>
+       </Note>
+       {steps.map((s, i) => {
+         // A step said in two parts shows its second as it is said.
+diff --git a/video/src/videos/da-ai-assisted/script.ts b/video/src/videos/da-ai-assisted/script.ts
+index 12b732c..cebbe8c 100644
+--- a/video/src/videos/da-ai-assisted/script.ts
++++ b/video/src/videos/da-ai-assisted/script.ts
+@@ -66,7 +66,7 @@ export const script: NarrationScript = {
+     {
+       id: "hook",
+       scene: true,
+-      text: "Most analysts now draft queries with an AI assistant, artificial intelligence that writes code from a plain request. Interviewers know it, and it has changed what they test: less can you write this query, more can you tell whether it's right.",
++      text: "Most analysts now draft queries with an AI assistant that writes code from a plain request. Interviewers know it, and it has changed what they test: less can you write this query, more can you tell whether it's right.",
+       pauseAfter: 0.6,
+     },
+     {
+@@ -262,7 +262,7 @@ export const script: NarrationScript = {
+     { id: "r-bi-job", text: "So the analyst's job moves to building and checking those." },
+     {
+       id: "r-llm",
+-      text: "And to sort five thousand survey answers with an LLM, a large language model: fix the categories first, hand-label a hundred or two to measure it, keep the settings the same for every batch, rerun a sample to confirm the labels repeat, and quote real answers, not its paraphrases.",
++      text: "And to sort five thousand survey answers with an LLM: fix the categories first, hand-label a hundred or two to measure it, keep the settings the same for every batch, rerun a sample to confirm the labels repeat, and quote real answers, not its paraphrases.",
+     },
+     {
+       id: "r-llm-report",
+diff --git a/video/src/videos/da-interview/script.ts b/video/src/videos/da-interview/script.ts
+index e14eb40..e2785bc 100644
+--- a/video/src/videos/da-interview/script.ts
++++ b/video/src/videos/da-interview/script.ts
+@@ -41,7 +41,7 @@ export const script: NarrationScript = {
+     {
+       id: "ai",
+       scene: true,
+-      text: "AI, artificial intelligence, has changed some of it. Checking now matters more than writing, because a plausible query is cheap to produce. Expect to be handed one an assistant wrote, and asked: is it right?",
++      text: "AI has changed some of it. Checking now matters more than writing, because a plausible query is cheap to produce. Expect to be handed one an assistant wrote, and asked: is it right?",
+       pauseAfter: 0.5,
+     },
+     {
+diff --git a/video/src/videos/ds-interview/AiScene.tsx b/video/src/videos/ds-interview/AiScene.tsx
+index 5c791cd..c38291c 100644
+--- a/video/src/videos/ds-interview/AiScene.tsx
++++ b/video/src/videos/ds-interview/AiScene.tsx
+@@ -68,9 +68,8 @@ export const AiScene: React.FC = () => {
+ 
+   const from = n.beat("ai").from;
+   const broughtAt = n.word("ai", "has brought in new questions");
+-  // Panel 1 inks in as "a large language model" is said, so "LLM" is never
+-  // on screen before the narration has said what it stands for.
+-  const llmAt = n.word("ai-eval", "a large language model");
++  // Panel 1 inks in as "an LLM" is said, so the panel names what was said.
++  const llmAt = n.word("ai-eval", "built on an LLM");
+   const measureAt = n.word("ai-eval", "a measurement problem");
+   const setAt = n.word("ai-eval", "an eval set");
+   const ciAt = n.word("ai-eval", "a confidence interval");
+@@ -102,7 +101,7 @@ export const AiScene: React.FC = () => {
+ 
+       <Drift from={from} to={end + 40}>
+         <Kicker at={from}>What AI has changed</Kicker>
+-        <Headline lead="AI, artificial intelligence," turn="brought in new questions." at={from + 2} turnAt={broughtAt} size={62} />
++        <Headline lead="AI has" turn="brought in new questions." at={from + 2} turnAt={broughtAt} size={62} />
+ 
+         <Panel i={0} at={llmAt} title="Evaluating an LLM feature">
+           <div style={{ ...line(frame, measureAt), color: INK }}>
+diff --git a/video/src/videos/ds-interview/script.ts b/video/src/videos/ds-interview/script.ts
+index e207546..553f193 100644
+--- a/video/src/videos/ds-interview/script.ts
++++ b/video/src/videos/ds-interview/script.ts
+@@ -48,12 +48,12 @@ export const script: NarrationScript = {
+     {
+       id: "ai",
+       scene: true,
+-      text: "AI, artificial intelligence, has brought in new questions.",
++      text: "AI has brought in new questions.",
+       pauseAfter: 0.6,
+     },
+     {
+       id: "ai-eval",
+-      text: "Evaluating a feature built on a large language model, an LLM, is now treated as a measurement problem: an eval set of test prompts, a confidence interval on the share of them it passes, and a check that an LLM judge, a model grading the answers, agrees with human experts.",
++      text: "Evaluating a feature built on an LLM is now treated as a measurement problem: an eval set of test prompts, a confidence interval on the share of them it passes, and a check that an LLM judge, a model grading the answers, agrees with human experts.",
+       pauseAfter: 0.6,
+     },
+     {
+diff --git a/video/src/videos/ds-llm-evaluation/script.ts b/video/src/videos/ds-llm-evaluation/script.ts
+index 4012f8e..e8489a0 100644
+--- a/video/src/videos/ds-llm-evaluation/script.ts
++++ b/video/src/videos/ds-llm-evaluation/script.ts
+@@ -87,12 +87,12 @@ export const script: NarrationScript = {
+     {
+       id: "changed",
+       scene: true,
+-      text: "Question one. How have data scientist interviews changed with AI, artificial intelligence? The core loop hasn't: statistics, experiments, SQL and product sense.",
++      text: "Question one. How have data scientist interviews changed with AI? The core loop hasn't: statistics, experiments, SQL and product sense.",
+       pauseAfter: 0.6,
+     },
+     {
+       id: "changed-layer",
+-      text: "What's layered on top, mostly at mid and senior levels, is evaluating features built on a large language model, an LLM. Experimenting on AI features, where the treatment is itself random. Checking code and analysis an assistant wrote. And rounds where AI is allowed, or banned. Ask the recruiter, round by round.",
++      text: "What's layered on top, mostly at mid and senior levels, is evaluating features built on an LLM. Experimenting on AI features, where the treatment is itself random. Checking code and analysis an assistant wrote. And rounds where AI is allowed, or banned. Ask the recruiter, round by round.",
+       pauseAfter: 0.7,
+     },
+     { id: "measure-in", text: "Most of what follows is about the first of those. Questions five and seven take the next two." },
+diff --git a/video/src/videos/ds-sql/script.ts b/video/src/videos/ds-sql/script.ts
+index 0b20e92..244c72b 100644
+--- a/video/src/videos/ds-sql/script.ts
++++ b/video/src/videos/ds-sql/script.ts
+@@ -248,7 +248,7 @@ export const script: NarrationScript = {
+     },
+     {
+       id: "next",
+-      text: "Every query here measured what users did. The newest round asks you to measure what a large language model, an LLM, writes. Next: LLM evaluation.",
++      text: "Every query here measured what users did. The newest round asks you to measure what an LLM writes. Next: LLM evaluation.",
+     },
+   ],
+ };

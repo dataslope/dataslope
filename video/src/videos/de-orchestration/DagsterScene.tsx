@@ -20,7 +20,9 @@ const ROW_Y = 474;
  * the call the Pipelines page shows; Dagster's assets (what data exists),
  * whose edges are worked out from what each one reads. Then what the asset
  * model makes first-class: lineage and freshness, and stronger typing and
- * testing primitives.
+ * testing primitives, each with an example. Dagster's own name for what is
+ * drawn, software-defined assets, is the subtitle; and a margin note answers
+ * the usual pushback, that Airflow can schedule on data too.
  */
 export const DagsterScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -115,7 +117,9 @@ export const DagsterScene: React.FC = () => {
           </span>
         </Note>
         <Note at={dagAt + 8} x={RIGHT_X} y={y(334)}>
-          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>what data exists, and how it was made</span>
+          <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>
+            <b style={{ color: INK }}>software-defined assets</b>: what data exists, and how it was made
+          </span>
         </Note>
         {ASSETS.map((a, i) => (
           <TaskBox
@@ -224,6 +228,20 @@ export const DagsterScene: React.FC = () => {
         <Pill x={RIGHT_X + 236} y={y(790)} at={testingAt - 4} ink={BLUE_INK} size={22}>
           testing primitives
         </Pill>
+        <Note at={typingAt + 8} x={RIGHT_X} y={y(846)}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
+            outputs type-checked at run time
+            <span style={{ opacity: ease(frame, testingAt + 6, 10) }}> · assets unit-tested with mock resources</span>
+          </span>
+        </Note>
+
+        {/* The usual pushback. */}
+        <Note at={whenAt + 6} x={LEFT} y={y(700)}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>Airflow can also run a DAG when a dataset updates</span>
+        </Note>
+        <Note at={whenAt + 12} x={LEFT} y={y(736)}>
+          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>(Airflow 3 calls them assets), but its unit is still the task</span>
+        </Note>
       </Drift>
     </AbsoluteFill>
   );

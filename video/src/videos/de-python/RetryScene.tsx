@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RETRY } from "./data";
-import { Code, Console, Drift, ErrorBox, lineOf, Listing, listingHeight, Mark, MARK, MARK_BAD, MARK_OK, OK, OK_INK, Source, Title, X0 } from "./parts";
+import { Code, Console, Drift, ErrorBox, FadeIn, lineOf, Listing, listingHeight, Mark, MARK, MARK_BAD, MARK_OK, OK, OK_INK, Source, Title, X0 } from "./parts";
 
 const TOP = 330;
 const SIZE = 19;
@@ -44,6 +44,7 @@ export const RetryScene: React.FC = () => {
   const modelAt = n.word("retry-herd", "Model six clients");
   const togetherAt = n.word("retry-herd", "they all come back together");
   const timesAt = ["at one", "three,", "seven", "fifteen seconds"].map((p) => n.word("retry-herd", p));
+  const herdAt = n.word("retry-herd-name", "a thundering herd");
   const randomAt = n.word("retry-jitter", "Wait a random time up to each delay");
   const spreadAt = n.word("retry-jitter", "their retries spread out");
   const notAt = n.word("retry-not", "Know what not to retry");
@@ -52,6 +53,8 @@ export const RetryScene: React.FC = () => {
   const capAt = n.word("retry-not", "Cap the attempts");
   const safeAt = n.word("retry-not", "retry only what's safe to repeat");
   const chargeAt = n.word("retry-not", "a retried payment can charge twice");
+  const keyAt = n.word("retry-key", "Give each request an idempotency key");
+  const chargesOnceAt = n.word("retry-key", "the server charges it once");
   const end = n.beat("idem-in").to;
 
   const F = RETRY.fn;
@@ -176,7 +179,12 @@ export const RetryScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>s</span>
         </Note>
         <Note at={togetherAt} x={RIGHT_X} y={axisY + h(40)} out={randomAt - 4}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>plain backoff: all six at once, every time</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            plain backoff, all six at once
+            <FadeIn at={herdAt - 4}>
+              : <Mark at={herdAt + 2}>a thundering herd</Mark>
+            </FadeIn>
+          </span>
         </Note>
         <Note at={randomAt} x={RIGHT_X} y={axisY + h(40)}>
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
@@ -188,20 +196,30 @@ export const RetryScene: React.FC = () => {
         <Note at={badAt} x={X0} y={badTop + h(36)}>
           <Code line={RETRY.permanent.lines[0]} size={22} />
         </Note>
-        <ErrorBox x={X0} top={badTop + h(80)} width={700} at={onceAt - 4} kind={RETRY.permanent.kind} message={RETRY.permanent.message} size={21} />
-        <Note at={onceAt + 6} x={X0 + 730} y={badTop + h(90)}>
+        <ErrorBox x={X0} top={badTop + h(80)} width={720} at={onceAt - 4} kind={RETRY.permanent.kind} message={RETRY.permanent.message} size={21} />
+        <Note at={onceAt + 6} x={X0 + 745} y={badTop + h(90)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             <Mark at={onceAt + 10} color={MARK_BAD}>{RETRY.permanentCalls} call</Mark>, no retry
           </span>
         </Note>
-        <Note at={safeAt} x={RIGHT_X} y={axisY + h(96)}>
-          <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>retry only what&apos;s safe to repeat</span>
+        {/* Under the permanent error: what is safe to retry, the payment that
+            is not, and what makes it safe. */}
+        <Note at={safeAt} x={X0} y={badTop + h(146)}>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            retry only what&apos;s safe to repeat:{" "}
+            <FadeIn at={chargeAt - 2}>
+              <span style={{ color: ACCENT_INK }}>a retried payment can charge twice</span>
+            </FadeIn>
+          </span>
         </Note>
-        <Note at={chargeAt} x={RIGHT_X} y={axisY + h(134)}>
-          <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>a retried payment can charge twice</span>
+        <Note at={keyAt} x={X0} y={badTop + h(184)}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+            <Mark at={keyAt + 6} color={MARK_OK}>send an idempotency key</Mark>
+            <FadeIn at={chargesOnceAt - 2}>, and the server charges once</FadeIn>
+          </span>
         </Note>
         <Note at={notAt} x={X0} y={badTop}>
-          <Title color={ACCENT_INK}>a permanent error</Title>
+          <Title color={ACCENT_INK}>what not to retry</Title>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -1,7 +1,6 @@
 import React from "react";
 import { Scene } from "../../components/Scene";
 import { EditorialPage, type EditorialProps } from "../../editorial/Page";
-import { SeriesIntro } from "../../editorial/SeriesIntro";
 import { useNarration } from "../../narration/NarrationContext";
 import { BayesScene } from "./BayesScene";
 import { CasesScene } from "./CasesScene";
@@ -60,13 +59,10 @@ const Scenes: React.FC = () => {
   ];
   return (
     <>
-      <Scene from={0} to={until(cut("hook"))} fade={8}>
-        <SeriesIntro course="Statistics for Data Science with Python" unit="Unit 3" title="Probability" />
-      </Scene>
       {scenes.map(([id, Body], i) => {
         const next = scenes[i + 1];
         return (
-          <Scene key={id} from={cut(id)} to={next ? until(cut(next[0])) : durationInFrames + OVERLAP} fade={6}>
+          <Scene key={id} from={i === 0 ? 0 : cut(id)} to={next ? until(cut(next[0])) : durationInFrames + OVERLAP} fade={6}>
             <Exit at={next ? cut(next[0]) - EXIT : null} dur={EXIT_DUR}>
               <Body />
             </Exit>
