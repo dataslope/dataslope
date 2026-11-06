@@ -98,7 +98,7 @@ export const OrderScene: React.FC = () => {
           In what order does a query run, logically?
         </QuestionCard>
 
-        {/* ── The query as it is written, each line badged with its step ── */}
+        {/* ── The query as it is written, each line numbered with its step ── */}
         <Listing
           lines={lines}
           x={X0}
@@ -116,7 +116,7 @@ export const OrderScene: React.FC = () => {
           if (s < 0) return null;
           return (
             <Ink key={i} at={stepAt[s] + 2} dur={10} style={{ left: X0 + LIST_W - 52, top: y(LIST_Y) + g.padY + i * g.lineH + g.lineH / 2 - 15 }}>
-              <StepBadge n={s + 1} />
+              <StepNum n={s + 1} />
             </Ink>
           );
         })}
@@ -130,7 +130,7 @@ export const OrderScene: React.FC = () => {
         {/* ── The run order ── */}
         {STEPS.map((s, i) => (
           <Ink key={s.clause} at={stepAt[i] - 4} dur={12} style={{ left: STEP_X, top: rowY(i), height: h(44), display: "flex", alignItems: "center", gap: 16 }}>
-            <StepBadge n={i + 1} />
+            <StepNum n={i + 1} />
             <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, whiteSpace: "nowrap", fontVariantLigatures: "none" }}>
               {s.clause}
             </span>
@@ -250,7 +250,7 @@ export const OrderScene: React.FC = () => {
 /** A step's number, plain, in a slot the size its ring used to be, so it
  *  sits centred on its line: the listing's lines and the run order share
  *  them. Soft ink and the sans face, so a number never reads as code. */
-const StepBadge: React.FC<{ n: number }> = ({ n }) => (
+const StepNum: React.FC<{ n: number }> = ({ n }) => (
   <span
     style={{
       display: "inline-flex",

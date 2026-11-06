@@ -39,6 +39,13 @@ const Tile: React.FC<{
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
   const draw = ease(frame, lineAt, 24);
   if (p <= 0) return null;
+  // The highlighter behind the value, given back as margin.
+  const lift: React.CSSProperties = {
+    padding: "0 10px",
+    margin: "0 -10px",
+    borderRadius: 6,
+    background: l > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${l * 100}%, transparent)` : undefined,
+  };
   const lo = Math.min(...line);
   const hi = Math.max(...line);
   const sh = COL.lineBottom - COL.lineTop;
@@ -57,16 +64,7 @@ const Tile: React.FC<{
     >
       <div style={{ position: "absolute", left: 0, top: COL.name, ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>{name}</div>
       <div style={{ position: "absolute", left: 0, top: COL.value, ...note(64, INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
-        <span
-          style={{
-            padding: "0 10px",
-            margin: "0 -10px",
-            borderRadius: 6,
-            background: l > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${l * 100}%, transparent)` : undefined,
-          }}
-        >
-          {value}
-        </span>
+        <span style={lift}>{value}</span>
       </div>
       <div style={{ position: "absolute", left: 0, top: COL.delta, opacity: ease(frame, deltaAt, 10), ...TABULAR, whiteSpace: "nowrap" }}>{delta}</div>
       <svg width={TILE.w} height={TILE.h} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
