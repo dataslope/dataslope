@@ -181,7 +181,7 @@ export const BugsScene: React.FC = () => {
         <QuestionCard n={1} at={qAt - 4} textAt={textAt - 4} size={60} width={1300}>
           What kinds of bugs do AI assistants characteristically introduce?
         </QuestionCard>
-        <Spot id="be-code-review-beetle" at={textAt + 6} left={1590} top={92} width={168} height={180} />
+        <Spot id="be-code-review-beetle" at={textAt + 6} left={1590} top={120} width={140} height={150} />
 
         {/* ── Code that is almost right: the survey ── */}
         <Ink at={almostAt - 2} dur={18} out={surveyOut} style={{ left: 96, top: y(318), ...body(38, true), color: INK, whiteSpace: "nowrap" }}>

@@ -201,7 +201,7 @@ export const ReviewScene: React.FC = () => {
         <Ink at={strangerAt} dur={18} style={{ left: 96, top: y(232), ...body(36, true), color: INK, whiteSpace: "nowrap" }}>
           Like a pull request from a capable stranger.
         </Ink>
-        <Spot id="be-code-review-clipboard" at={c1At} out={lastAt - 10} left={1640} top={86} width={132} height={187} />
+        <Spot id="be-code-review-clipboard" at={c1At} out={lastAt - 10} left={1690} top={122} width={116} height={165} />
 
         {/* ── The five checks ── */}
         <Checklist
