@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PIPE } from "./data";
-import { Chip, ChipRow, CHIP_LINE, FIG_Y, Headline, HIGHLIGHT, INK, INK_SOFT, Kicker, LOST, LOST_INK, Mark, pulse, SURFACE, X0 } from "./parts";
+import { Chip, ChipRow, FIG_Y, Headline, HIGHLIGHT, INK, INK_SOFT, Kicker, LOST, LOST_INK, Mark, pulse, X0 } from "./parts";
 
 const REVIEW_Y = 330;
 const TOPIC_Y = 436;
@@ -243,45 +243,31 @@ export const TwoPipelinesScene: React.FC = () => {
   );
 };
 
-/** Fig. 2's menu as one pipeline's recipe: every step starts as the menu's
- *  dashed option, a step the pipeline takes turns solid (with a brief
- *  highlight as it lights), and the steps it skips fade at `skipAt`. */
+/** Fig. 2's menu as one pipeline's recipe, a line of plain step names with a
+ *  middle dot between them: every step starts in the soft ink, a step the
+ *  pipeline takes turns to full ink (under a brief highlight as it lights),
+ *  and the steps it skips fade at `skipAt`. */
 const Recipe: React.FC<{ top: number; at: number; lit: Partial<Record<Step, number>>; skipAt: number }> = ({ top, at, lit, skipAt }) => {
   const frame = useCurrentFrame();
   return (
-    <div style={{ position: "absolute", left: RECIPE_X, top, display: "flex", gap: 6 }}>
+    <div style={{ position: "absolute", left: RECIPE_X, top, height: RECIPE_H, display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
       {STEPS.map((s, k) => {
         const p = ease(frame, at + k * 2, 12);
         const litAt = lit[s];
         const on = litAt === undefined ? 0 : ease(frame, litAt, 10);
         const glow = litAt === undefined ? 0 : pulse(frame, litAt, 24);
         const off = litAt === undefined ? ease(frame, skipAt, 14) : 0;
+        const shift = `translateY(${(1 - p) * 8}px)`;
         return (
-          <div
-            key={s}
-            style={{
-              position: "relative",
-              height: RECIPE_H,
-              padding: "0 10px",
-              display: "flex",
-              alignItems: "center",
-              opacity: p * (1 - 0.6 * off),
-              transform: `translateY(${(1 - p) * 8}px)`,
-            }}
-          >
-            <div style={{ position: "absolute", inset: 0, borderRadius: 10, border: `2px dashed ${CHIP_LINE}`, opacity: 1 - on }} />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: 10,
-                border: `2px solid ${INK}`,
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${(glow * 100).toFixed(0)}%, ${SURFACE})`,
-                opacity: on,
-              }}
-            />
-            <span style={{ position: "relative", ...label(20, on > 0.5 ? INK : INK_SOFT), whiteSpace: "nowrap" }}>{s}</span>
-          </div>
+          <React.Fragment key={s}>
+            {k > 0 ? <div style={{ ...label(20, INK_SOFT), margin: "0 0.5em", opacity: p, transform: shift }}>·</div> : null}
+            <div style={{ position: "relative", ...label(20, on > 0.5 ? INK : INK_SOFT), opacity: p * (1 - 0.6 * off), transform: shift }}>
+              {glow > 0 ? (
+                <div style={{ position: "absolute", left: "-0.14em", right: "-0.14em", top: "0.02em", bottom: "-0.02em", borderRadius: "0.12em", background: HIGHLIGHT, opacity: glow }} />
+              ) : null}
+              <span style={{ position: "relative" }}>{s}</span>
+            </div>
+          </React.Fragment>
         );
       })}
     </div>
