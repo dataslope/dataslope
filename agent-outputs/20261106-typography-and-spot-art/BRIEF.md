@@ -34,26 +34,33 @@ The check: `PageAudit` (`video/src/editorial/audit.tsx`) reports `[mixed]`
 for neighbours on one line that differ in size by more than 12% or in family
 (mono excepted), and `check:frames` fails one that holds for two samples.
 
-## 2. More small spot art, wherever the page has room
+## 2. A few small spot images, only where they earn it
 
-The owner wants **as many small watercolor images as the whitespace allows
-while the page stays calm**. The model they pointed at: Stats-5's "Fig. 3
-Three populations": a heading "Wait times / a long tail to the right" with a
-small coffee cup and a queue of three people beside it (about 170px tall),
-and "One die / flat: each face 1 in 6" with two dice. Small, beside the text
-they illustrate, never on top of anything.
+**Revised 2026-11-06 after the owner saw the first videos: it was more than
+they want.** Their words: "I don't want to flood the videos with watercolor
+images", and Stats-3's store, tucked under the warranty sums at the bottom
+of the page, "leaves too little whitespace". The rule is now:
 
-- **Subjects**: concrete nouns the scene's narration actually says (a
-  warranty, a coin, a server rack, a queue, a receipt, a thermometer…),
-  one idea per image. Not abstractions, not charts, no text in the image.
-- **Size and place**: about 120 to 240px on the 1920x1080 page, in genuine
-  empty space, at least 40px clear of every word, figure, chart, arrow and
-  other image, for the whole time it is on screen. Look at every frame it
-  spans, not just one: scenes build up, and space that is empty early may
-  fill later (give it an `out` before that). Do not crowd: a page with a
-  figure and a headline may take one or two; a page of prose and numbers
-  with an empty half may take more. Aim for every scene that has room to
-  get at least one.
+- **At most one new image per scene**, and many scenes get none. A scene
+  that already has art (a hero, an existing spot) gets no new one.
+- **Only where it shows the thing the scene is about**: the warranty in a
+  warranty scene, test tubes for samples, the crow for crow's-foot notation.
+  Not decoration for a passing word ("the world", "wait times", "a car"),
+  and not one per noun.
+- **Only in clearly open space, with generous whitespace around it**: at
+  least 80px clear of every word, figure, chart, arrow and other image, and
+  at least 80px from the page's edges, for the whole time it is on screen.
+  Never squeezed into a strip left over below or beside a block of text or
+  a figure; if the only room is a leftover gap, the scene gets none.
+- About 140 to 220px on the 1920x1080 page. Look at every frame it spans:
+  scenes build up, and space that is empty early may fill later (give it an
+  `out` before that).
+
+The model the owner pointed at is still Stats-5's "Fig. 3 Three
+populations": a small coffee cup and a queue beside "Wait times", and two
+dice beside "One die", each the subject of its own heading, with plenty of
+room around them.
+
 - **Timing**: it pops in on the word that names it (`n.word(beat, phrase)`,
   a phrase the beat already says; `npm run check:cues` must pass), using the
   video's own `Spot` (or `Illustration`) component as its existing art does.

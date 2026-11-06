@@ -88,26 +88,26 @@ Timing (`pauseAfter`) and cues are yours.
    bleed as margin (copy a `Mark` from `src/videos/da-pandas/parts.tsx`,
    which already does). A flex row with an `em` gap carries its own
    `fontSize`. Nothing under 19px; about 25px between rows of text.
-3. **Art.** Your hero (the plan's creature) and **as many small spot images
-   as the whitespace allows while the page stays calm**: the owner's
-   standing request. The model is Stats-5's "Fig. 3 Three populations",
-   small watercolor objects about 120 to 240px beside the text they
-   illustrate. Subjects are the concrete nouns the narration says; aim for
-   every scene that has room to get at least one. Each sits at least 40px
-   clear of every word, figure, arrow and other image for its whole time on
-   screen (give it an `out` before its space fills), and pops in on the word
-   that names it with `<Sfx name="el-pop" level={-30} />` on the same frame.
-   Prompts go in your `illustrations.json` (`video-icon`, 1024x1024, the
-   file's watercolor style; the hero `video-hero`); generate and import with
-   `node scripts/illustrations.mjs <folder> --only id1,id2` (GPT Image 2.6
-   flare, quality low, transparent background, about $0.02 each; never
+3. **Art.** Your hero (the plan's creature) and **a few small spot images,
+   only where they earn it** (revised 2026-11-06: the owner found the first
+   pass too much, "I don't want to flood the videos with watercolor
+   images"). At most one per scene, and many scenes get none; only where it
+   shows the thing the scene is about, never decoration for a passing word;
+   only in clearly open space, at least 80px clear of every word, figure,
+   arrow and other image and 80px from the page's edges for its whole time
+   on screen, never squeezed into a leftover strip below or beside text or
+   a figure. About 140 to 220px on the 1080p layout. Each pops in on the
+   word that names it with `<Sfx name="el-pop" level={-30} />` on the same
+   frame. Prompts go in your `illustrations.json` (`video-icon`, 1024x1024,
+   the file's watercolor style; the hero `video-hero`); generate and import
+   with `node scripts/illustrations.mjs <folder> --only id1,id2` (GPT Image
+   2.6 flare, quality low, transparent background, about $0.02 each; never
    change those). Look at each result composited on white; redraw a bad one
    (`--force --only <id>`) at most twice. Set `ILLUSTRATIONS = true` in
    `data.ts` once the art is in. At 4K an image may be drawn at most half
    its natural size on the 1080p layout (`check:frames` fails a stretched
-   one). Clearance probes from the typography pass
-   (`out/entries/measure-spots*.mjs` with the `*-measure.tsx` beside them)
-   measure each spot's distance to everything else; adapt one.
+   one). The clearance probes in `out/entries/measure-spots*.mjs` measure
+   each spot's distance to everything else; adapt one.
 4. **Sound effects:** the `el-*` palette, cued to the animation, at the
    levels the README gives.
 5. **Stills before voice.** On estimated timing, render stills of every scene
