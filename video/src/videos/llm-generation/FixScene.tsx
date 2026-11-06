@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, label, note, PAPER, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, body, INK, INK_SOFT, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, GOOD, GOOD_INK, Headline, Kicker, Marked, Mono, pulse, Spot, Svg, tint, X0 } from "./kit";
+import { Drift, GOOD, GOOD_INK, Headline, Kicker, Marked, Mono, pulse, Spot, Svg, X0 } from "./kit";
 
 const LEFT_W = 740;
 const RIGHT_X = 960;

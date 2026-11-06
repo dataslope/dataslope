@@ -16,7 +16,7 @@ import {
   note,
   PAPER,
 } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AGE_DOTS, AGES } from "./data";
@@ -39,6 +39,11 @@ const BELL_BASE = 398;
 const BELL_H = 50;
 
 const years = (v: number) => (v === 80 ? "80 years" : String(v));
+/** The heading's two columns: the names from 92, the spreads from 720.
+ *  "Standard deviation" ends near 604, so the gap is wider than the
+ *  checker's 1.2 x 66px, and the hairline sits at its centre. */
+const NAME_W = 720 - 92;
+const RULE_X = 662;
 
 /**
  * Act 1, hook to "sampling distribution": the two names, then two hundred
@@ -98,9 +103,11 @@ export const AgesScene: React.FC = () => {
       {/* Each name, then what it is the spread of: "the spread of" on both
           lines when the narration says they both measure one, and the
           object only when it is named. One flow per line, so the words
-          follow each other in any face. */}
-      <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", alignItems: "baseline", gap: "0.3em", ...headline(64), whiteSpace: "nowrap" }}>
-        <Ink at={deviationAt - 6} dur={18} style={{ position: "relative" }}>
+          follow each other in any face. The names take a column of their
+          own and the spreads a second one, NAME_W in: the big name and the
+          smaller gloss never share a line as neighbours. */}
+      <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", alignItems: "baseline", ...headline(64), whiteSpace: "nowrap" }}>
+        <Ink at={deviationAt - 6} dur={18} style={{ position: "relative", width: NAME_W, flexShrink: 0 }}>
           <span style={{ display: "inline-block", transformOrigin: "right 80%", transform: `scale(${swell(frame, mixedAt - 2, 0.06, 20)})` }}>
             <Marker at={mixedAt - 2} out={spreadAt - 6}>Standard</Marker>
           </span>{" "}
@@ -115,8 +122,8 @@ export const AgesScene: React.FC = () => {
           </Ink>
         </span>
       </div>
-      <div style={{ position: "absolute", left: 92, top: y(236), display: "flex", alignItems: "baseline", gap: "0.3em", ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
-        <Ink at={errorAt - 6} dur={18} style={{ position: "relative" }}>
+      <div style={{ position: "absolute", left: 92, top: y(236), display: "flex", alignItems: "baseline", ...headline(64, true), color: ACCENT_INK, whiteSpace: "nowrap" }}>
+        <Ink at={errorAt - 6} dur={18} style={{ position: "relative", width: NAME_W, flexShrink: 0 }}>
           <span style={{ display: "inline-block", transformOrigin: "right 80%", transform: `scale(${swell(frame, mixedAt + 4, 0.06, 20)})` }}>
             <Marker at={mixedAt + 4} out={spreadAt - 4}>Standard</Marker>
           </span>{" "}
@@ -131,6 +138,9 @@ export const AgesScene: React.FC = () => {
           </Ink>
         </span>
       </div>
+      {/* Names and what each is the spread of, as two columns: a hairline
+          between them, inking in with the first "the spread of". */}
+      <ColumnRule x={RULE_X} top={y(150) + 10} height={y(236) - y(150) + 52} at={spreadAt - 2} />
 
       {/* ── Fig. 1: the ages ── */}
       <FigLabel n={fig(1)} title={`Ages of ${AGES.n} customers, in years`} at={agesAt - 6} x={160} y={y(330)} />
