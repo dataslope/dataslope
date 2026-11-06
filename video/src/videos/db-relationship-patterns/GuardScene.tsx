@@ -26,6 +26,7 @@ import {
   Pulse,
   Reply,
   ROW_H,
+  Spot,
   Tag,
   tableGeometry,
 } from "./parts";
@@ -72,6 +73,8 @@ export const GuardScene: React.FC = () => {
   const linksAt = n.word("next", "links");
   const whatGoesAt = n.word("next", "what goes");
   const constraintsAt = n.word("next", "constraints");
+  // The padlock pops in just after "Keys guard", silent like the video's other spot art.
+  const padlockAt = n.word("next", "guard", { nth: 1 }) + 2;
 
   const headH = h(HEAD_H);
   const rowH = h(ROW_H);
@@ -108,6 +111,7 @@ export const GuardScene: React.FC = () => {
       <Kicker at={from - 10}>Self-reference</Kicker>
       <Head lead="One table, two roles." leadAt={from - 6} out={adaAgainAt - 10} />
       <Head lead="Ada manages Ada:" leadAt={adaAgainAt} turn="accepted." turnAt={takesAt} />
+      <Spot id="db-relationship-patterns-padlock" at={padlockAt} left={1560} top={y(80)} width={240} height={183} />
 
       <Drift from={from} to={constraintsAt + 40} scale={0.014} origin={[960, y(560)]}>
       <Drift from={constraintsAt - 12} to={n.durationInFrames} scale={0.03} origin={[960, y(560)]}>

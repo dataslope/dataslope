@@ -31,6 +31,7 @@ export const PointScene: React.FC = () => {
   const inIdAt = n.word("fk", "in customer id");
   const foreignAt = n.word("fk", "foreign key");
   const parentAt = n.word("parent", "parent");
+  const holdingAt = n.word("parent", "holding");
   const childAt = n.word("parent", "child");
   const manyAt = n.word("many", "many side");
   const copiesAt = n.word("many", "copies nothing");
@@ -76,6 +77,7 @@ export const PointScene: React.FC = () => {
       <Sfx name="el-tap" at={inIdAt - 2} level={-28} />
       <Sfx name="el-pencil" at={foreignAt - 4} level={-33} />
       <Sfx name="el-pop" at={parentAt - 2} level={-30} />
+      <Sfx name="el-pop" at={holdingAt - 2} level={-30} />
       <Sfx name="el-pop" at={childAt - 2} level={-30} />
       <Sfx name="el-scratch" at={copiesAt + 4} level={-30} />
 
@@ -161,6 +163,8 @@ export const PointScene: React.FC = () => {
           </div>
         </Note>
         <Spot id="db-keys-tag" at={customerAt + 4} left={260} top={y(680)} width={250} height={250} />
+        {/* The child holding on: under the line from parent to child. */}
+        <Spot id="db-keys-family" at={holdingAt - 4} left={760} top={700} width={171} height={220} />
       </Drift>
     </AbsoluteFill>
   );

@@ -26,6 +26,7 @@ import {
   MARK_OK,
   OK_INK,
   Reply,
+  Spot,
   Svg,
   tableGeometry,
 } from "./parts";
@@ -61,6 +62,8 @@ export const PairScene: React.FC = () => {
   const againAt = n.word("once", "Try it again");
   const noAt = n.word("once", "says no");
   const existsAt = n.word("once", "already exists");
+  // The key ring pops in just after "pair of keys", silent like the video's other spot art.
+  const keyringAt = pairAt + 2;
 
   const g = tableGeometry({
     x: 120,
@@ -100,6 +103,7 @@ export const PairScene: React.FC = () => {
 
       <Kicker at={from - 10}>Junction tables</Kicker>
       <Head lead="The pair is the key," leadAt={from - 6} turn="so it fits once." turnAt={existsAt - 4} />
+      <Spot id="db-relationship-patterns-keys" at={keyringAt} left={1580} top={y(50)} width={200} height={222} />
 
       <Drift from={from} to={existsAt + 60} scale={0.016} origin={[960, y(600)]}>
         {/* ── The table, its two key columns braced as one key ── */}

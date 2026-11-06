@@ -22,6 +22,7 @@ import {
   MARK,
   MARK_KEY,
   Reply,
+  Spot,
   TableName,
   type TableGeometry,
   tableGeometry,
@@ -145,6 +146,7 @@ export const DeleteScene: React.FC = () => {
       <Sfx name="el-whoosh" at={tablesAt[2]} level={-36} />
       <Sfx name="el-scratch" at={spamAt + 2} level={-30} />
       <Sfx name="el-scratch" at={bothAt + 2} level={-31} />
+      <Sfx name="el-pop" at={samAt - 2} level={-30} />
       <Sfx name="el-scratch" at={samAt + 2} level={-30} />
       <Sfx name="el-tap" at={noOneAt} level={-28} />
 
@@ -304,6 +306,8 @@ export const DeleteScene: React.FC = () => {
           <Code line={SETNULL.del.lines[0]} size={19} />
         </Ink>
         <Reply x={COL_X[2]} top={s.below + 40} at={ticketStaysAt} tag={SETNULL.del.tag} size={20} />
+        {/* Sam, walking out with his box: the ticket stays behind. */}
+        <Spot id="db-keys-leaving" at={samAt - 4} left={1600} top={875} width={88} height={165} />
         <Ink at={noOneAt + 6} dur={14} style={{ left: COL_X[2] + 150, top: s.below + 46, whiteSpace: "nowrap" }}>
           <span style={{ fontFamily: MONO, fontSize: 20, color: INK }}>ticket {SETNULL.ticketsAfter.rows[0][0]} stays</span>
         </Ink>

@@ -7,7 +7,7 @@ import { FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, ElbowArrow, FIG_Y, Headline, Mark, Tag } from "./parts";
+import { Drift, ElbowArrow, FIG_Y, Headline, Mark, Spot, Tag } from "./parts";
 
 const ROOT_X = 120;
 const ROOT_W = 300;
@@ -57,6 +57,7 @@ export const ChooseScene: React.FC = () => {
       <Sfx name="el-pencil" at={nothingAt} level={-34} />
       <Sfx name="el-pencil" at={aloneAt - 4} level={-34} />
       <Sfx name="el-pencil" at={recordAt - 6} level={-34} />
+      <Sfx name="el-pop" at={recordAt - 2} level={-30} />
       <Sfx name="el-tap" at={sameAt} level={-29} />
       {/* The conclusion's bell, in the silence after the last word. */}
       <Sfx name="el-chime" at={end + 6} level={-32} />
@@ -127,6 +128,8 @@ export const ChooseScene: React.FC = () => {
               </React.Fragment>
             );
           })}
+
+          <Spot id="db-keys-cabinet" at={recordAt - 4} left={1340} top={y(BRANCH_Y[2]) - 175} width={175} height={200} />
 
           {/* ── ON UPDATE: the same question ── */}
           <div style={{ position: "absolute", left: ROOT_X, top: y(766) - 14, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />

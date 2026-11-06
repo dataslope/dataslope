@@ -25,6 +25,7 @@ import {
   MARK_BAD,
   Reply,
   ROW_H,
+  Spot,
   tableGeometry,
 } from "./parts";
 
@@ -61,6 +62,9 @@ export const UniqueScene: React.FC = () => {
   const oneToOneAt = n.word("unique-fix", "one to one");
   const lastAt = n.word("self-in", "last shape");
   const oneTableAt = n.word("self-in", "one table");
+  // The two badges pop in just after "second profile", silent like the video's
+  // other spot art, and step back with the figures.
+  const badgesAt = secondAt + 2;
 
   const COLS = OTO.profileCols;
   const U = COLS.indexOf("user_id");
@@ -102,6 +106,7 @@ export const UniqueScene: React.FC = () => {
 
       <Kicker at={from - 10}>One to one</Kicker>
       <Head lead="A foreign key," leadAt={from - 6} turn="plus unique." turnAt={uniqueAt - 2} />
+      <Spot id="db-relationship-patterns-badges" at={badgesAt} dim={lastAt} left={1580} top={y(56)} width={200} height={214} />
 
       <Drift from={from} to={lastAt + 30} scale={0.016} origin={[960, y(600)]}>
       <Drift from={lastAt} to={n.beat("self").from} scale={0.03} origin={[960, y(600)]}>

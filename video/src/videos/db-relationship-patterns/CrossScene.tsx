@@ -80,6 +80,8 @@ export const CrossScene: React.FC = () => {
   const graceGoAt = n.word("flip", "Grace go");
   const forcesAt = n.word("one-side", "forces");
   const beOneAt = n.word("one-side", "be one");
+  // The palette pops in just after "Art", under the Art chip, silent like the books.
+  const paletteAt = artAt + 2;
 
   // ── The crossing links (many-to-many.mdx's first picture) ──
   const stud = (name: string): Pt => [STUDENT_X + STUDENT_W, y(STUDENT_Y[name])];
@@ -117,6 +119,7 @@ export const CrossScene: React.FC = () => {
       <Kicker at={from - 10}>Many to many</Kicker>
       <Head lead="Many on both sides," leadAt={from - 6} turn="so no parent." turnAt={neitherAt - 2} />
       <Spot id="db-relationship-patterns-books" at={coursesAt} left={1570} top={y(66)} width={250} height={250} />
+      <Spot id="db-relationship-patterns-palette" at={paletteAt} dim={leftDim} left={578} top={y(756)} width={200} height={160} />
 
       {/* ── Students and courses, linked as they are named. The label stays
           out of the drift, level with Fig. 7's, and steps back with its figure. ── */}
