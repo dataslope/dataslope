@@ -147,7 +147,7 @@ export const script: NarrationScript = {
     },
     {
       id: "ai-survey",
-      text: "Karat, which sells interviewing services, asked four hundred engineering leaders in its 2026 survey, so these are one vendor's numbers.",
+      text: "Karat, which sells interviewing services, asked four hundred engineering leaders in its 2026 survey, so read its figures as one vendor's.",
     },
     {
       id: "ai-survey-data",

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, body, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { BLUE_INK, body, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -105,8 +105,10 @@ export const ChooseScene: React.FC = () => {
                 <span style={{ ...body(38), color: INK }}>{r.q}</span>
               </Ink>
               <Arrow from={[ARROW_X0, rowY(i) + 26]} to={[ARROW_X1, rowY(i) + 26]} at={lerp(r.qAt, r.nameAt, 0.6) - 6} dur={10} color={INK_SOFT} width={2} />
-              <Ink at={r.nameAt - 6} dur={14} style={{ left: NAME_X, top: rowY(i) - 4, whiteSpace: "nowrap" }}>
-                <span style={{ ...headline(50, true), color: BLUE_INK }}>{r.name}</span>
+              {/* The model's name in the question's face and size (one line,
+                  one size): told apart by italic, weight and the data blue. */}
+              <Ink at={r.nameAt - 6} dur={14} style={{ left: NAME_X, top: rowY(i), whiteSpace: "nowrap" }}>
+                <span style={{ ...body(38, true), color: BLUE_INK, fontWeight: 600 }}>{r.name}</span>
               </Ink>
               <Svg>
                 <Mini kind={r.kind} x={MINI_X} top={rowY(i) - 6} w={MINI_W} h={h(MINI_H)} p={ease(frame, r.nameAt - 2, 16)} />

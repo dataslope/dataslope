@@ -893,7 +893,7 @@ const claims = [
   ["r-binary", "twenty probes", c.rapid.binaryProbesMillion === 20],
   ["r-adjacency", "a hundred million entries", a.adjacency.listEntries === 1e8],
   ["r-adjacency", "a trillion cells", a.adjacency.matrixCells === 1e12],
-  ["r-kahn", "fewer than v come out", c.rapid.kahnCyclic.length < 4 && c.rapid.topoCyclic.length < 4],
+  ["r-kahn", "if any are left", c.rapid.kahnCyclic.length < 4 && c.rapid.topoCyclic.length < 4],
   ["r-bits", "the unpaired one is left", pageOut.bits[0] === "4"],
 ];
 const failed = claims.filter(([id, phrase, ok]) => !ok || !text(id).includes(phrase));

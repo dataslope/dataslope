@@ -813,7 +813,7 @@ level, for listening.
 | Video | Effects under the narration | Effects' peak | Speech over effects (median, 50 ms) |
 | --- | --- | --- | --- |
 | SamplingBias | 17.5 LU (-42.3 against -24.8 LUFS) | -23 dBFS | 19.9 dB |
-| ThinkingStatistically | 18.9 LU (-43.6 against -24.7 LUFS) | -21 dBFS, the logo, with nothing under it | 22.5 dB |
+| ThinkingStatistically | 21.9 LU (-46.6 against -24.6 LUFS) | -27.1 dBFS at 0:05.6 | 22.0 dB |
 
 About 15 LU under or more reads as subtle. The "closest" moments are 50 ms
 readings, so a knock that lands in the gap between two words can briefly

@@ -219,7 +219,7 @@ export const script: NarrationScript = {
     },
     {
       id: "plan",
-      text: "Thirty-five questions, argued with counts, not code: eight with a figure each, three inside those, and twenty-four quickly at the end.",
+      text: "Thirty-five questions, argued with counts, not code: eight with a figure each, three inside those, and twenty-four quickly.",
       pauseAfter: 0.8,
     },
 
@@ -267,7 +267,7 @@ export const script: NarrationScript = {
     },
     {
       id: "hash-worst",
-      text: "The follow-up is the worst case. Give a thousand keys one hash, and filling a Python set takes nearly six hundred thousand key comparisons. With distinct hashes, none.",
+      text: "The follow-up is the worst case. Give a thousand keys the same hash, and filling a Python set takes nearly six hundred thousand key comparisons. With distinct hashes, none.",
       pauseAfter: 0.7,
     },
     {
@@ -389,7 +389,7 @@ export const script: NarrationScript = {
     { id: "dijk-run", text: "C costs four directly but three through B. D costs four, through B and C.", pauseAfter: 0.6 },
     {
       id: "dijk-cost",
-      text: "Each node is finished once, and each edge can cost a heap push of log V: V plus E, times log V.",
+      text: "With V nodes and E edges, each node is finished once, and each edge can cost a heap push of log V: V plus E, times log V.",
       pauseAfter: 0.7,
     },
     {
@@ -399,7 +399,7 @@ export const script: NarrationScript = {
     },
     {
       id: "dijk-bf",
-      text: "Bellman-Ford relaxes every edge V minus one times instead: V times E, slower, and right.",
+      text: "Bellman-Ford instead tries every edge V minus one times: V times E, slower, and right.",
       pauseAfter: 0.8,
     },
 
@@ -448,7 +448,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-inplace",
-      text: "In place means constant extra memory, or log n of stack: quicksort. Out of place grows with the input: merge sort.",
+      text: "In place means constant extra memory, or log n of stack: quicksort, with random pivots. Out of place grows with the input: merge sort.",
     },
     {
       id: "r-master",
@@ -533,7 +533,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-kahn",
-      text: "Kahn's algorithm keeps removing nodes with nothing pointing in. If fewer than V come out, the graph has a cycle.",
+      text: "Kahn's algorithm keeps removing nodes with nothing pointing in. If any are left, the graph has a cycle.",
     },
     {
       id: "r-bits",
