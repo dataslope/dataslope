@@ -226,12 +226,12 @@ export const script: NarrationScript = {
     },
     {
       id: "hook-run",
-      text: "The numbers here come from Postgres, the open-source relational database, on a million users and a million orders, generated so every plan can be run again.",
+      text: "The numbers come from Postgres, the open-source relational database, on a million users and a million orders, generated so every plan can be rerun.",
       pauseAfter: 0.6,
     },
     {
       id: "plan",
-      text: "Sixteen questions, and one from system design that asks the first of them at scale. Eleven are worked through, and five go quickly at the end.",
+      text: "Sixteen questions, plus one from system design. Eleven are worked through, and five go quickly at the end.",
       pauseAfter: 0.7,
     },
 
@@ -244,12 +244,12 @@ export const script: NarrationScript = {
     },
     {
       id: "nosql-sql",
-      text: "Pick relational when the data is structured and its relationships matter: you need joins, transactions across several rows, and strong consistency. It's the safe default for most applications.",
+      text: "Pick relational when the data is structured and its relationships matter: joins, transactions across several rows, strong consistency. It's the safe default for most applications.",
       pauseAfter: 0.6,
     },
     {
       id: "nosql-no",
-      text: "Pick NoSQL when writes must scale out across machines, when the schema keeps changing, as in a document store, or when one access pattern, known in advance, runs at massive volume: key-value or wide-column. The price is weaker consistency and few joins.",
+      text: "Pick NoSQL when writes must scale out across machines, when the schema keeps changing, as documents do, or when one access pattern, known in advance, runs at huge volume: key-value or wide-column. The price is weaker consistency and few joins.",
       pauseAfter: 0.6,
     },
     {
@@ -259,7 +259,7 @@ export const script: NarrationScript = {
     },
     {
       id: "nosql-next",
-      text: "So ask which queries you'll need next year. Relational answers a new one with a join; a store built around one access pattern was never designed for it.",
+      text: "So ask which queries you'll need next year. Relational answers a new one with a join; a store built for one access pattern wasn't designed for it.",
       pauseAfter: 0.8,
     },
 
@@ -272,22 +272,22 @@ export const script: NarrationScript = {
     },
     {
       id: "index-scan",
-      text: "Find one email among a million users with no index, and Postgres reads the whole table, all seven thousand three hundred sixty pages, to keep one row.",
+      text: "Find one email among a million users without an index, and Postgres reads all seven thousand three hundred sixty pages of the table to keep one row.",
       pauseAfter: 0.7,
     },
     {
       id: "index-tree",
-      text: "An index is a separate structure that maps values to their rows. The usual kind is a B-tree, balanced and sorted. This one is three levels deep, so the lookup reads three index pages and one page of the table: four pages, not seven thousand.",
+      text: "An index is a separate structure mapping values to their rows, usually a B-tree, balanced and sorted. This one is three levels deep, so the lookup reads three index pages and one table page: four pages, not seven thousand.",
       pauseAfter: 0.7,
     },
     {
       id: "index-log",
-      text: "That's log n for the tree against n for the scan, and because the tree is sorted, it answers ranges too.",
+      text: "That's log n against n, and because the tree is sorted, it answers ranges too.",
       pauseAfter: 0.6,
     },
     {
       id: "index-hash",
-      text: "The kind of index matters. A hash index finds one email just as fast, but ask it for a range, and Postgres reads the whole table again.",
+      text: "The kind matters. A hash index finds one email as fast, but ask it for a range, and Postgres reads the whole table again.",
       pauseAfter: 0.8,
     },
 
@@ -295,7 +295,7 @@ export const script: NarrationScript = {
     {
       id: "hurt",
       scene: true,
-      text: "Question three. When does an index help, and when does it hurt? It helps a selective read: an equality, a range, a join, or a sort on the column.",
+      text: "Question three. When does an index help, and when does it hurt? It helps selective reads: equality, ranges, joins, and sorts on the column.",
       pauseAfter: 0.5,
     },
     {
@@ -305,7 +305,7 @@ export const script: NarrationScript = {
     },
     {
       id: "hurt-writes",
-      text: "And every index costs writes. Ten thousand inserts wrote ten thousand records to the write-ahead log, Postgres's journal of changes, with no index, and forty thousand with three, because each insert updates every index too.",
+      text: "And every index costs writes. Ten thousand inserts wrote ten thousand log records with no index, and forty thousand with three, because each insert updates every index too.",
       pauseAfter: 0.6,
     },
     {
@@ -323,7 +323,7 @@ export const script: NarrationScript = {
     {
       id: "composite",
       scene: true,
-      text: "Question four. What is a composite index, and why does column order matter? It sorts by its first column, then by the second within each value of the first, like a phone book sorted by last name, then first name.",
+      text: "Question four. What is a composite index, and why does column order matter? It sorts by its first column, then by the second within each value of the first, like a phone book: last name, then first name.",
       pauseAfter: 0.5,
     },
     {
@@ -371,7 +371,7 @@ export const script: NarrationScript = {
     },
     {
       id: "plan-bad",
-      text: "This count of one day's orders scans the table, though order time has an index. It expected five thousand rows and found two thousand seven hundred thirty-two, after reading and discarding nearly a million.",
+      text: "This count of one day's orders scans the table, though order time has an index. It expected five thousand rows, found two thousand seven hundred thirty-two, and threw away nearly a million.",
       pauseAfter: 0.6,
     },
     {
@@ -386,7 +386,7 @@ export const script: NarrationScript = {
     },
     {
       id: "plan-sarg",
-      text: "That's called sargable: a filter the index can search. The other usual fixes are adding an index, and refreshing the table's statistics.",
+      text: "That's a sargable filter: one the index can search. The other usual fixes are a new index, and fresh statistics.",
       pauseAfter: 0.8,
     },
 
@@ -399,7 +399,7 @@ export const script: NarrationScript = {
     },
     {
       id: "fanout-run",
-      text: "Take the page's twenty-four orders, and join them to their line items to count those too. Each order now appears once per item, forty-eight rows, and the revenue total more than doubles. Sara's three hundred four dollars becomes nine hundred twelve, because both her orders have three items.",
+      text: "Join the page's twenty-four orders to their line items, to count those too, and each order repeats once per item: forty-eight rows, and the revenue more than doubles. Sara's three hundred four dollars becomes nine hundred twelve, since both her orders have three items.",
       pauseAfter: 0.7,
     },
     {
@@ -427,26 +427,16 @@ export const script: NarrationScript = {
     },
     {
       id: "txn-abort",
-      text: "Postgres now refuses every statement until the transaction ends. Roll back, and account one is at a hundred again, as if the debit never happened.",
+      text: "Postgres now refuses every statement until the transaction ends. Roll back, and account one is at a hundred again. The application's job is to catch the error, roll back, and retry or report it, never carry on.",
       pauseAfter: 0.6,
-    },
-    {
-      id: "txn-app",
-      text: "The application's job is to catch the error, roll back, and retry the whole transaction or report it, never to carry on.",
-      pauseAfter: 0.8,
     },
 
     // ── 8, 9. Isolation levels and anomalies ──────────────────────────────
     {
       id: "levels",
       scene: true,
-      text: "Question eight. What are the SQL isolation levels? The standard names four: read uncommitted, read committed, repeatable read, and serializable. Each is defined by the anomalies it still allows, not by how it's built.",
+      text: "Question eight. What are the SQL isolation levels? The standard names four: read uncommitted, read committed, repeatable read, and serializable. Each is defined by the anomalies it allows, not by how it's built, and defaults differ: Postgres uses read committed.",
       pauseAfter: 0.5,
-    },
-    {
-      id: "levels-pg",
-      text: "Defaults differ by database. Postgres uses read committed.",
-      pauseAfter: 0.6,
     },
     {
       id: "anomalies",
@@ -455,7 +445,7 @@ export const script: NarrationScript = {
     },
     {
       id: "anomalies-dirty",
-      text: "A dirty read sees another transaction's change before it commits. Here, another transaction has set the balance to fifty and not committed. Postgres never shows it: at all four levels, even read uncommitted, the read says a hundred.",
+      text: "A dirty read sees another transaction's change before it commits. Here another transaction set the balance to fifty, uncommitted. Postgres never shows it: at all four levels, even read uncommitted, the read says a hundred.",
       pauseAfter: 0.7,
     },
     {
@@ -465,12 +455,12 @@ export const script: NarrationScript = {
     },
     {
       id: "anomalies-phantom",
-      text: "A phantom: run the same query again, and new rows match, because another transaction inserted them. The standard stops phantoms only at serializable, though Postgres's repeatable read already does.",
+      text: "A phantom: rerun a query, and new rows match, because another transaction inserted them. The standard stops phantoms only at serializable; Postgres's repeatable read already does.",
       pauseAfter: 0.6,
     },
     {
       id: "anomalies-serial",
-      text: "Serializable promises an outcome some one-at-a-time order could give. In exchange, Postgres may abort a transaction with a serialization failure, and the application must retry it.",
+      text: "Serializable promises an outcome some one-at-a-time order could give. In exchange, Postgres may abort a transaction with a serialization failure, to be retried.",
       pauseAfter: 0.8,
     },
 
@@ -498,7 +488,7 @@ export const script: NarrationScript = {
     },
     {
       id: "lock-choose",
-      text: "Optimistic wins when conflicts are rare, since a conflict costs only a retry. Pessimistic wins when they're frequent, where retries would pile up.",
+      text: "Optimistic wins when conflicts are rare, since one costs only a retry. Pessimistic wins when they're frequent, and retries would pile up.",
       pauseAfter: 0.8,
     },
 
@@ -521,13 +511,8 @@ export const script: NarrationScript = {
     },
     {
       id: "deadlock-order",
-      text: "To avoid it, take locks in one global order, say the lowest account ID first. Then the second transfer simply waits, and no cycle can form. Keep transactions short, and use the lowest isolation level that's correct.",
+      text: "To avoid it, take locks in one global order, say the lowest account ID first: the second transfer then simply waits, and no cycle forms. Keep transactions short, and use the lowest isolation level that's correct.",
       pauseAfter: 0.6,
-    },
-    {
-      id: "deadlock-pool",
-      text: "From outside, a full connection pool can look the same: nothing is stuck, but every request is queued behind a fixed number of connections.",
-      pauseAfter: 0.8,
     },
 
     // ── Quick ─────────────────────────────────────────────────────────────
@@ -544,22 +529,22 @@ export const script: NarrationScript = {
     },
     {
       id: "r-norm",
-      text: "Normalization stores each fact once, so an update can't leave two copies disagreeing, which suits write-heavy systems. Denormalization repeats data to skip joins, buying read speed with storage and harder updates. Normalize first, and denormalize where profiling shows a join is the bottleneck.",
+      text: "Normalization stores each fact once, so an update can't leave copies disagreeing, which suits write-heavy systems. Denormalization repeats data to skip joins, trading storage and harder updates for read speed. Normalize first, and denormalize where profiling blames a join.",
       pauseAfter: 0.6,
     },
     {
       id: "r-joins",
-      text: "Joins differ in which unmatched rows survive. Inner keeps only matches: twenty-four rows. Left keeps every customer, with nulls where there's no order: thirty, for the six who never ordered. Right is the mirror, and full keeps both sides.",
+      text: "Joins differ in which unmatched rows survive. Inner keeps only matches: twenty-four rows. Left keeps every customer, with nulls where there's no order: thirty, for the six who never ordered. Right mirrors it, and full keeps both sides.",
       pauseAfter: 0.6,
     },
     {
       id: "r-keys",
-      text: "A primary key identifies each row: unique, never null, and indexed automatically. A foreign key points at another table's primary key, so no order can name a customer who doesn't exist. Postgres doesn't index the foreign key's column for you.",
+      text: "A primary key identifies each row: unique, never null, and indexed automatically. A foreign key points at another table's primary key, so no order can name a missing customer. Postgres doesn't index the foreign key's column for you.",
       pauseAfter: 0.6,
     },
     {
       id: "r-cover",
-      text: "A covering index holds every column a query needs, so Postgres answers from the index alone: an index only scan, with zero trips to the table. The price is a wider index to maintain.",
+      text: "A covering index holds every column a query needs, so Postgres answers from the index alone, with zero trips to the table, at the price of a wider index.",
       pauseAfter: 0.9,
     },
     {
