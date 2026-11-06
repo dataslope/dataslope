@@ -28,10 +28,10 @@ const METRICS = [
 ];
 const MOVER = METRICS.indexOf("Scroll depth");
 /** The ten as two lines of plain names with a middle dot between them, no
- *  chips, 32px apart. Their first line sits level with the primary metric's
- *  label row's next line, so "Conversion rate", 42px serif beside 21px
- *  Inter, is centred between the two lines rather than on either: two
- *  columns side by side never set two sizes on one line. In px from y(726). */
+ *  chips, 32px apart. "Conversion rate" (42px serif) in the column beside
+ *  them is centred between the two lines rather than set on either, so the
+ *  two columns never put two sizes on one line, and "chosen now" sits 10px
+ *  under it. Offsets in px from y(METRIC_Y). */
 const METRIC_ROWS = [METRICS.slice(0, 5), METRICS.slice(5)];
 const METRIC_ROW_GAP = 32;
 const METRIC_Y = 726;

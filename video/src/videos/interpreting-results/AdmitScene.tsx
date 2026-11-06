@@ -111,12 +111,15 @@ export const AdmitScene: React.FC = () => {
         ]}
       />
       <Note at={from - 4} x={92} y={y(176)}>
-        <span style={{ ...body(52, true), color: INK, whiteSpace: "nowrap", opacity: 1 - ease(frame, bothAt - 10, 8) }}>
+        {/* The question and its source as one line in one face, the source a
+            size down and in the soft ink: a 24px Inter note on the line of a
+            52px serif question read as two things. */}
+        <span style={{ ...body(46, true), color: INK, whiteSpace: "nowrap", opacity: 1 - ease(frame, bothAt - 10, 8) }}>
           Who gets in?
-          <span style={{ ...label(24, INK_SOFT), marginLeft: 24, opacity: ease(frame, yearAt - 2, 10) }}>
+          <span style={{ ...body(42, true), color: INK_SOFT, marginLeft: 24, opacity: ease(frame, yearAt - 2, 10) }}>
             The famous case: Berkeley, 1973.
           </span>
-          <span style={{ ...label(24, INK), marginLeft: 10, opacity: ease(frame, madeUpAt - 2, 10) }}>These numbers are made up.</span>
+          <span style={{ ...body(42, true), color: INK, marginLeft: 10, opacity: ease(frame, madeUpAt - 2, 10) }}>These numbers are made up.</span>
         </span>
       </Note>
 
