@@ -35,8 +35,6 @@ export const TrendScene: React.FC = () => {
   // ── Cues ──
   const trendFrom = n.beat("trend").from;
   const yearsAt = n.word("trend", "two years");
-  // The calendar pops on "years", clear of the sprinkle the months arrive with.
-  const calendarAt = yearsAt + 8;
   const lastAt = n.word("fell", "last six months");
   const fellAt = n.word("fell", "fell");
   const twelveAt = n.word("fell", "twelve");
@@ -120,7 +118,6 @@ export const TrendScene: React.FC = () => {
     <AbsoluteFill>
       {/* ── Sound: the months arriving, the story's arrow, the flat line ── */}
       <Sfx name="el-sprinkle" at={yearsAt - 4} level={-34} />
-      <Sfx name="el-pop" at={calendarAt} level={-29} />
       <Sfx name="el-pencil" at={fellAt - 6} level={-32} />
       <Sfx name="el-pop" at={processAt - 6} level={-29} />
       <Sfx name="el-pencil" at={hundredAt - 6} level={-34} />
@@ -144,13 +141,13 @@ export const TrendScene: React.FC = () => {
         </Ink>
       </div>
 
-      {/* "Two years": a calendar beside the headline, gone before the machine arrives. */}
-      <Spot id="thinking-statistically-calendar" at={calendarAt} out={processAt - 18} left={960} top={y(104)} width={180} height={180} />
-      <Spot id="thinking-statistically-machine" at={processAt - 6} dim={neverSeeAt} left={1480} top={y(104)} width={320} height={305} />
+      {/* The process, as a machine: small, top-aligned with the headline,
+          and level with the examples beside it. */}
+      <Spot id="thinking-statistically-machine" at={processAt - 6} dim={neverSeeAt} left={1580} top={y(150)} width={200} height={191} />
 
-      {/* The examples of a process, beside the machine (and 44px clear of it), until "never see". */}
+      {/* The examples of a process, beside the machine, until "never see". */}
       {["customers deciding,", "machines running,", "demand rising and falling"].map((t, i) => (
-        <Ink key={t} at={exampleAt[i] - 4} dur={14} out={neverSeeAt} style={{ right: 1920 - 1436, top: y(176 + i * 38), whiteSpace: "nowrap" }}>
+        <Ink key={t} at={exampleAt[i] - 4} dur={14} out={neverSeeAt} style={{ right: 1920 - 1452, top: y(176 + i * 38), whiteSpace: "nowrap" }}>
           <span style={{ ...body(27, true), color: INK_SOFT }}>{t}</span>
         </Ink>
       ))}

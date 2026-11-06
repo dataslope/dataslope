@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { ZIPS } from "./data";
-import { Mark, Spot, STAT_INK, Strike } from "./parts";
+import { Mark, STAT_INK, Strike } from "./parts";
 
 const COL = [160, 520];
 const COL_W = 300;
@@ -60,8 +60,6 @@ export const TrapScene: React.FC = () => {
   const numericalAt = n.word("trap", "numerical");
   const arentAt = n.word("trap", "aren't");
   const zipAt = n.word("trap", "zip codes");
-  // Inside "zip codes", clear of the whoosh the table arrives with.
-  const mailboxAt = zipAt + 4;
   const integersAt = n.word("pandas", "integers");
   const averagesAt = n.word("pandas", "averages");
   const fortyAt = n.word("pandas", "Forty-eight");
@@ -73,8 +71,6 @@ export const TrapScene: React.FC = () => {
   const testAt = n.word("double", "test");
   const doublingAt = n.word("double", "doubling");
   const priceAt = n.word("double", "price");
-  // Inside "price", after the pop its line arrives with.
-  const tagAt = priceAt + 6;
   const costsAt = n.word("double", "costs");
   const twiceAt = n.word("double", "twice");
   const zipCodeAt = n.word("double", "zip code");
@@ -108,8 +104,6 @@ export const TrapScene: React.FC = () => {
       <Sfx name="el-whoosh" at={slideAt} level={-37} />
       <Sfx name="el-pop" at={priceAt - 2} level={-30} />
       <Sfx name="el-pop" at={zipCodeAt - 6} level={-30} />
-      <Sfx name="el-pop" at={mailboxAt} level={-29} />
-      <Sfx name="el-pop" at={tagAt} level={-29} />
 
       <div style={{ position: "absolute", left: 92, top: y(150), display: "flex", gap: "0.26em", ...headline(80) }}>
         {/* "Numbers" inks on "numerical", so it never waits alone. */}
@@ -122,10 +116,6 @@ export const TrapScene: React.FC = () => {
       </div>
 
       <FigLabel n="7" title="Four zip codes and prices, as pandas stores them" at={columnsAt - 4} x={160 + shift} y={y(276)} />
-
-      {/* "Zip codes": a mailbox, top right; "a price": its tag, beside the doubled price. */}
-      <Spot id="thinking-statistically-mailbox" at={mailboxAt} left={1580} top={y(104)} width={180} height={180} />
-      <Spot id="thinking-statistically-tag" at={tagAt} left={1500} top={y(DTYPE_Y + 30) + 12} width={170} height={150} />
 
       {/* ── The table ── */}
       {columns.map((c, ci) => {

@@ -79,7 +79,6 @@ export const IndexScene: React.FC = () => {
   const keepAt = n.word("index-scan", "to keep one row");
   const structAt = n.word("index-tree", "a separate structure");
   const btreeAt = n.word("index-tree", "usually a B-tree");
-  const sortedAt = n.word("index-tree", "balanced and sorted");
   const levelsAt = n.word("index-tree", "three levels deep");
   const threeAt = n.word("index-tree", "three index pages");
   const tableAt = n.word("index-tree", "one table page");

@@ -109,7 +109,7 @@ export const HourScene: React.FC = () => {
 
       <Drift from={from} to={end + 30}>
         <QuestionCard n={2} at={qAt - 4} textAt={textAt - 4} size={58} width={1300}>
-          How should you spend 60 minutes in an AI-assisted round?
+          How should you spend 60{"\u00a0"}minutes in an AI-assisted round?
         </QuestionCard>
 
         {/* The sixty minutes: a frame, then each phase's slot, then its fill. */}
@@ -166,7 +166,7 @@ export const HourScene: React.FC = () => {
                     width: (p.x1 - p.flex - 6) * fill,
                     height: barH - 12,
                     borderRadius: "0 8px 8px 0",
-                    background: `color-mix(in srgb, ${HIGHLIGHT} ${lit * 60}%, ${ds("blue", 100)})`,
+                    background: `color-mix(in srgb, ${HIGHLIGHT} ${lit * 70}%, ${ds("blue", 100)})`,
                   }}
                 />
               ) : null}

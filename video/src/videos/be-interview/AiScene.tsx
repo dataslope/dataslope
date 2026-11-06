@@ -16,7 +16,7 @@ import { Chip, Drift, Flow, Headline, Kicker, Mark, Spot } from "./parts";
 const ROOT_Y = 262;
 const ROOT_W = 340;
 const ROOT_H = 56;
-const FORK_Y = 372;
+const FORK_Y = 350;
 const HEAD_Y = 392;
 const CAPTION_Y = 434;
 const COL_L = 120;
@@ -38,8 +38,8 @@ const TAKE_X = COL_L + ENVELOPE_W + 90;
 const SURVEY_X = 1080;
 const TRACK_W = 560;
 /** Where the time went: three columns under the fork. */
-const MOVED_W = 520;
-const MOVED_GAP = 60;
+const MOVED_W = 540;
+const MOVED_GAP = 30;
 const movedX = (c: number) => COL_L + c * (MOVED_W + MOVED_GAP);
 
 type Company = { name: string; when: string; what: React.ReactNode; at: number };
@@ -112,14 +112,8 @@ const SurveyBar: React.FC<{ top: number; pct: number; at: number; children: Reac
 };
 
 /** One of the three places the time went: a card with its name and the
- *  part that answers it, and anything that hangs under it. */
-const Moved: React.FC<{ c: number; at: number; title: string; part: React.ReactNode; children?: React.ReactNode }> = ({
-  c,
-  at,
-  title,
-  part,
-  children,
-}) => {
+ *  part that answers it. */
+const Moved: React.FC<{ c: number; at: number; title: string; part: React.ReactNode }> = ({ c, at, title, part }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const p = ease(frame, at - 2, 14);
@@ -136,10 +130,9 @@ const Moved: React.FC<{ c: number; at: number; title: string; part: React.ReactN
           padding: "20px 24px 0",
         }}
       >
-        <div style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{title}</div>
-        <div style={{ ...label(22, BLUE_INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, at + 12, 12) }}>{part}</div>
+        <div style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{title}</div>
+        <div style={{ ...label(22, BLUE_INK), marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, at + 12, 12) }}>{part}</div>
       </div>
-      {children}
     </div>
   );
 };
@@ -185,7 +178,7 @@ export const AiScene: React.FC = () => {
   const extendAt = n.word("ai-moved", "extending a multi-file project");
   const readAt = n.word("ai-moved", "reading and debugging unfamiliar code");
   const designAt = n.word("ai-moved", "design discussions with follow-ups");
-  const llmAt = n.word("ai-llm", "features that call a large language model");
+  const llmAt = n.word("ai-llm", "system design now takes in");
   const llmChips = [
     { text: "streaming", at: n.word("ai-llm", "streaming") },
     { text: "retries", at: n.word("ai-llm", "retries") },
@@ -253,7 +246,7 @@ export const AiScene: React.FC = () => {
       {llmChips.map((c) => (
         <Sfx key={c.text} name="el-tap" at={c.at} level={-35} />
       ))}
-      <Sfx name="el-pencil" at={askAt + 4} level={-35} />
+      <Sfx name="el-pencil" at={roundByRoundAt} level={-35} />
 
       <Drift from={from} to={end + 40} scale={0.015}>
         <Kicker at={from}>How AI has changed the interview</Kicker>
@@ -357,15 +350,15 @@ export const AiScene: React.FC = () => {
           at={takeAt}
           out={movedFrom - 18}
           dim={unseenAt}
-          dimBy={0.55}
+          dimBy={0.5}
           left={COL_L}
-          top={surveyTop + 46}
+          top={surveyTop + 76}
           width={ENVELOPE_W}
           height={ENVELOPE_H}
           phase={20}
           amp={3}
         />
-        <div style={{ position: "absolute", left: TAKE_X, top: surveyTop + 72, opacity: panel }}>
+        <div style={{ position: "absolute", left: TAKE_X, top: surveyTop + 102, opacity: panel }}>
           <div style={{ ...note(26, INK), whiteSpace: "nowrap", opacity: ease(frame, finishAt - 2, 12) }}>An assistant can finish a take-home,</div>
           <div style={{ ...note(26, INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, unseenAt - 2, 12) }}>
             and <Mark at={unseenAt + 2}>nobody sees how.</Mark>
@@ -412,14 +405,28 @@ export const AiScene: React.FC = () => {
               Parts {partOf("be-system-design")} and {partOf("be-scaling")}
             </>
           }
+        />
+        {/* What system design now takes in: one row under the three cards,
+            its words, its chips and its part all at one size. */}
+        <div
+          style={{
+            position: "absolute",
+            left: COL_L,
+            top: y(PANEL_Y) + 70 + h(108) + 44,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            fontSize: 24,
+            whiteSpace: "nowrap",
+            opacity: ease(frame, llmAt - 2, 12),
+          }}
         >
-          <div style={{ ...label(22, BLUE_INK), marginTop: 26, whiteSpace: "nowrap", opacity: ease(frame, llmAt - 2, 12) }}>
-            Part {partOf("be-ai-round")}: features that call an LLM
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 10px", marginTop: 12, width: MOVED_W, fontSize: 22 }}>
-            {llmChips.map((c) => (frame >= c.at - 2 ? <Chip key={c.text} at={c.at} size={22}>{c.text}</Chip> : null))}
-          </div>
-        </Moved>
+          <span style={{ ...note(24, INK), marginRight: 6 }}>System design now takes in features that call an LLM:</span>
+          {llmChips.map((c) => (frame >= c.at - 2 ? <Chip key={c.text} at={c.at} size={24}>{c.text}</Chip> : null))}
+          <span style={{ ...label(24, BLUE_INK), marginLeft: 10, opacity: ease(frame, llmChips[3].at + 12, 12) }}>
+            Part {partOf("be-ai-round")}
+          </span>
+        </div>
 
         {/* The advice, across the fork, between its two heads. */}
         <div
@@ -434,9 +441,7 @@ export const AiScene: React.FC = () => {
             opacity: ease(frame, askAt - 2, 12),
           }}
         >
-          <Mark at={askAt + 4}>
-            Ask the recruiter, <span style={{ opacity: ease(frame, roundByRoundAt - 2, 10) }}>for every round</span>
-          </Mark>
+          <Mark at={roundByRoundAt}>Ask the recruiter, for every round</Mark>
         </div>
       </Drift>
     </AbsoluteFill>

@@ -23,16 +23,12 @@ const NAME_W = 300;
  *  design prompt set beside it, under the meerkat. */
 const BRACKET_X = 1470;
 const DESIGN_X = 1494;
-/** The meerkat's box, and the column under it where the two small spots
- *  stand: centred on the meerkat, clear of the bracket's right edge (1482). */
-const MEERKAT_H = 403;
-const SPOT_CX = 1655;
-/** Each spot's box, at its image's aspect: the snowflake 948 by 1009, the
- *  warehouse 1024 by 684. */
-const SNOW_W = 160;
-const SNOW_H = 170;
-const HOUSE_W = 225;
-const HOUSE_H = 150;
+/** The meerkat's box, at its image's aspect (833 by 1017): small, so the
+ *  column right of the bracket keeps its white, and centred in that column,
+ *  over 80px clear of the bracket's nub (1482) and the page's right edge. */
+const MEERKAT_CX = 1655;
+const MEERKAT_W = 180;
+const MEERKAT_H = 220;
 
 type Layer = {
   name: string;
@@ -94,8 +90,6 @@ export const PromptScene: React.FC = () => {
   const buildsAt = n.word("probe-design", "builds each layer");
   const elevenAt = n.word("probe-design", "Part eleven walks");
   const end = n.beat("probe-design").to;
-  const snowAt = n.word("probe-model", "snowflake");
-  const houseAt = n.word("probe-store", "warehouse or lakehouse");
 
   const layers: Layer[] = [
     {
@@ -165,9 +159,6 @@ export const PromptScene: React.FC = () => {
   return (
     <AbsoluteFill>
       <Sfx name="el-pop" at={expectAt} level={-31} />
-      {/* The small spots arrive the way the meerkat does. */}
-      <Sfx name="el-pop" at={snowAt} level={-31} />
-      <Sfx name="el-pop" at={houseAt} level={-31} />
       {layers.map((l) => (
         <Sfx key={l.name} name="el-tap" at={l.at} level={-31} />
       ))}
@@ -181,18 +172,10 @@ export const PromptScene: React.FC = () => {
         <Headline lead="Design a pipeline" turn="for X." at={from + 2} turnAt={forAt - 2} out={fourAt - 10} size={80} />
         <Headline lead="Four things," turn="from the query down to the files." at={fourAt} turnAt={downAt} size={60} />
 
-        {/* The meerkat, standing lookout over the page as "Expect it" is said:
-            330 by 403, under half its 833 by 1017 pixels, so it stays sharp
-            at 4K. */}
-        <Spot id="de-interview-meerkat" at={expectAt} left={1490} top={y(150)} width={330} height={MEERKAT_H} amp={4} />
-
-        {/* Two small spots in the column under the meerkat, one at a time,
-            each beside the layer it names: a snowflake as "snowflake
-            schemas" is said, gone before the design prompt takes its place
-            on the right; then a warehouse as "warehouse or lakehouse" is,
-            standing under that prompt to the cut. */}
-        <Spot id="de-interview-snowflake" at={snowAt} out={houseAt - 4} left={SPOT_CX - SNOW_W / 2} top={y(150) + MEERKAT_H + 52} width={SNOW_W} height={SNOW_H} phase={40} amp={3} />
-        <Spot id="de-interview-warehouse" at={houseAt} left={SPOT_CX - HOUSE_W / 2} top={designTop + 150} width={HOUSE_W} height={HOUSE_H} phase={70} amp={3} />
+        {/* The meerkat, standing lookout over the page as "Expect it" is said,
+            level with the headline and well above the design prompt that
+            later stands in the same column. The page's one image. */}
+        <Spot id="de-interview-meerkat" at={expectAt} left={MEERKAT_CX - MEERKAT_W / 2} top={y(150)} width={MEERKAT_W} height={MEERKAT_H} amp={3} />
 
         {/* From the query down to the files: an arrow down the stack's left. */}
         <div

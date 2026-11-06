@@ -20,7 +20,7 @@ export const PYTHON = results.runtime.python;
 // ── 1. Amdahl's law (the page's chart) ──────────────────────────────────────
 
 type Curve = { ceiling: number; at: Record<string, number>; curve: [number, number][] };
-const AMDAHL = results.amdahl as Record<string, Curve>;
+const AMDAHL = results.amdahl as unknown as Record<string, Curve>;
 
 /** Speedup on `cores` cores for a program `serial` of which can't be split. */
 export const speedup = (serial: number, cores: number) => {

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -10,12 +10,12 @@ import { inkOf } from "../../theme/brand";
 import { OPENING, thousands } from "./data";
 import { Bar, Cylinder, Drift, Flow, Headline, Kicker, Node, pulse, Spot, X0 } from "./parts";
 
-const FIG_TOP = 300;
+const FIG_TOP = 290;
 const API = { x: X0, w: 210 };
 const DB = { x: 660, w: 250 };
-const BARS_TOP = 566;
-const CHIPS_Y = 728;
-const SQUARES_Y = 826;
+const BARS_TOP = 582;
+const CHIPS_Y = 734;
+const SQUARES_Y = 818;
 const SQ = 48;
 const SQ_GAP = 10;
 const SMALL = 36;
@@ -59,13 +59,13 @@ export const HookScene: React.FC = () => {
   const end = n.beat("plan").to;
 
   const top = y(FIG_TOP);
-  const apiH = h(170);
+  const apiH = h(150);
   const dbTop = top - h(6);
-  const dbH = h(190);
-  const readY = top + h(48);
-  const writeY = top + h(118);
-  const otherTop = top + h(206);
-  const otherH = h(62);
+  const dbH = h(170);
+  const readY = top + h(44);
+  const writeY = top + h(104);
+  const otherTop = top + h(178);
+  const otherH = h(56);
   const otherY = otherTop + otherH / 2;
   const sqTop = y(SQUARES_Y);
   const sqX = (i: number) => (i < DEEP ? X0 + i * (SQ + SQ_GAP) : X0 + DEEP * (SQ + SQ_GAP) + 22 + (i - DEEP) * (SMALL + 8));
@@ -233,10 +233,10 @@ export const HookScene: React.FC = () => {
             position: "absolute",
             left: sqX(0) + SQ - 14,
             top: sqTop - 16,
-            ...label(19, ACCENT_INK),
+            ...label(19, INK),
             fontWeight: 700,
-            background: PAPER,
-            border: `2px solid ${ACCENT_INK}`,
+            background: HIGHLIGHT,
+            border: `2px solid ${PAPER}`,
             borderRadius: 999,
             padding: "0 7px",
             lineHeight: 1.3,
@@ -246,18 +246,20 @@ export const HookScene: React.FC = () => {
         >
           +1
         </div>
-        <Note at={elevenAt} x={squaresEnd + 34} y={sqTop - h(22)}>
+        <Note at={elevenAt} x={squaresEnd + 34} y={sqTop - h(30)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <b>11</b> worked through
           </span>
         </Note>
-        <Note at={fiveAt} x={squaresEnd + 34} y={sqTop + h(18)}>
+        <Note at={fiveAt} x={squaresEnd + 34} y={sqTop + h(4)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
             <b>5</b> quickly, at the end
           </span>
         </Note>
-        <Note at={plusAt + 4} x={X0} y={sqTop + SQ + h(18)}>
-          <span style={{ ...note(21, ACCENT_INK), whiteSpace: "nowrap" }}>+1 from system design, with question 1</span>
+        <Note at={plusAt + 4} x={squaresEnd + 34} y={sqTop + h(38)}>
+          <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
+            <b style={{ color: INK }}>+1</b> from system design, with question 1
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

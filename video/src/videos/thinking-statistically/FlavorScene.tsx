@@ -62,8 +62,6 @@ export const FlavorScene: React.FC = () => {
   const commonAt = n.word("mode", "most common");
   const vanillaAt = n.word("mode", "Vanilla");
   const computerAt = n.word("kinds-in", "computer");
-  // Inside "computer", after the pop its label arrives with.
-  const computerSpotAt = computerAt + 4;
   const labelAt = n.word("kinds-in", "label");
   const quantityAt = n.word("kinds-in", "quantity");
   const upToYouAt = n.word("kinds-in", "up to you");
@@ -85,7 +83,6 @@ export const FlavorScene: React.FC = () => {
       <Sfx name="el-scratch" at={noAt} level={-30} />
       <Sfx name="el-whoosh" at={commonAt - 10} level={-32} />
       <Sfx name="el-pop" at={computerAt - 4} level={-30} />
-      <Sfx name="el-pop" at={computerSpotAt} level={-29} />
 
       <Kicker at={flavorsFrom - 4}>What kind of data</Kicker>
 
@@ -113,7 +110,7 @@ export const FlavorScene: React.FC = () => {
         ))}
       </div>
 
-      <Spot id="thinking-statistically-cones" at={creamAt - 6} left={1380} top={y(104)} width={400} height={260} />
+      <Spot id="thinking-statistically-cones" at={creamAt - 6} left={1580} top={y(150)} width={200} height={130} />
 
       <FigLabel n="6" title="Ten answers, as the survey stores them" at={tenAt - 6} x={160} y={y(380)} />
 
@@ -194,9 +191,6 @@ export const FlavorScene: React.FC = () => {
           {FLAVORS.dtype}
         </div>
       </Ink>
-
-      {/* "The computer": under its view of the column, right of the tally. */}
-      <Spot id="thinking-statistically-computer" at={computerSpotAt} left={1590} top={y(560)} width={180} height={180} />
 
       {/* ── The mean of the codes ── */}
       <div style={{ position: "absolute", inset: 0, opacity: meanOp }}>

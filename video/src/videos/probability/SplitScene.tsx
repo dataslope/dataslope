@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, STREAK, TABLE } from "./data";
-import { Coin, DATA_INK, Headline, Held, lerp, Pulse, SOFT, Spot, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
+import { Coin, DATA_INK, Headline, Held, lerp, Pulse, SOFT, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 /** Two bars, one per plan, equally wide because both plans have 500 users. */
 const BARS = { x: [200, 600], w: 280, top: 384, base: 812 } as const;
@@ -27,12 +27,11 @@ const STEP_X = 980;
 export const SplitScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
 
   // ── Cues ──
   const splitFrom = n.beat("split").from;
   const barAt = n.word("split", "a bar");
-  const planAt = n.word("split", "each plan");
   const splitAt = n.word("split", "split");
   const sameAt = n.word("flat", "same height");
   const knowingAt = n.word("flat", "knowing the plan");
@@ -101,8 +100,6 @@ export const SplitScene: React.FC = () => {
       <Sfx name="el-pop" at={tenAt - 2} level={-31} />
       <Sfx name="el-pencil" at={revAllAt - 4} level={-34} />
       <Sfx name="el-tap" at={revEightyAt - 4} level={-28} />
-      {/* The plans spot arrives with the pop the video's other spots have. */}
-      <Sfx name="el-pop" at={planAt - 2} level={-30} />
 
       <Headline top={y(150)} first="Does the plan" second="change the chance?" firstAt={splitFrom - 6} secondAt={barAt + 2} out={jumpsAt - 8} />
       <Headline top={y(150)} first="Plan and churn" second="are dependent." firstAt={jumpsAt - 2} secondAt={dependentAt - 4} out={indepWordAt - 8} />
@@ -235,10 +232,6 @@ export const SplitScene: React.FC = () => {
         </span>
       </Note>
       </div>
-
-      {/* The two plans, paid and free, in the right column until the ten
-          coins need it. */}
-      <Spot id="probability-cards" at={planAt - 2} out={tenAt - 16} left={1340} top={y(523)} width={300} height={h(195)} />
 
       {/* ── Independence, in symbols ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - multiDim * 0.7 }}>

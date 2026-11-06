@@ -11,12 +11,12 @@ import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { Cylinder, Drift, Flow, Node, Svg, X0 } from "./parts";
 
-const COL_HEAD = 304;
+const COL_HEAD = 316;
 const R_X = 980;
 const SHAPE_W = 240;
 const SHAPE_GAP = 50;
-const SHAPES_TOP = 404;
-const SHAPE_H = 160;
+const SHAPES_TOP = 436;
+const SHAPE_H = 186;
 
 /** A small table drawn as a header strip and row stripes. */
 const MiniTable: React.FC<{
@@ -138,13 +138,13 @@ export const NosqlScene: React.FC = () => {
   const out1 = 1 - ease(frame, phase1Out, 10);
 
   // ── Phase 1, left: two tables and a transaction ──
-  const tTop = y(COL_HEAD) + h(60);
-  const rowH = h(32);
+  const tTop = y(COL_HEAD) + h(70);
+  const rowH = h(40);
   const cust = { x: X0, w: 200 };
   const ord = { x: X0 + 270, w: 290 };
   const rowMid = (i: number) => tTop + 34 + i * rowH + rowH / 2;
   const txnRows = [1, 2, 3];
-  const bracketX = ord.x + ord.w + 14;
+  const bracketX = ord.x + ord.w + 52;
 
   // ── Phase 2: one system, both stores ──
   const app = { x: 760, w: 400, y: y(300), h: h(72) };
@@ -198,7 +198,7 @@ export const NosqlScene: React.FC = () => {
               />
             ))}
             {txnRows.map((r, k) => (
-              <TickMark key={r} x={ord.x - 30} y={rowMid(r) - 2} at={txnAt + 4 + k * 3} />
+              <TickMark key={r} x={ord.x + ord.w + 14} y={rowMid(r) - 2} at={txnAt + 4 + k * 3} />
             ))}
             {/* The bracket: three rows, one transaction. */}
             <path
@@ -212,19 +212,19 @@ export const NosqlScene: React.FC = () => {
           <Note at={txnAt + 8} x={bracketX + 26} y={rowMid(2) - h(15)}>
             <span style={{ ...note(22, OK_INK), whiteSpace: "nowrap", fontWeight: 650 }}>one transaction</span>
           </Note>
-          <div style={{ position: "absolute", left: X0, top: tTop + 34 + 5 * rowH + h(30), display: "flex", gap: "0.7em", fontSize: 23, whiteSpace: "nowrap" }}>
+          <div style={{ position: "absolute", left: X0, top: tTop + 34 + 5 * rowH + h(40), display: "flex", gap: "0.7em", fontSize: 24, whiteSpace: "nowrap" }}>
             {[
               { at: joinsAt, text: "joins" },
               { at: txnAt, text: "transactions across rows" },
               { at: strongAt, text: "strong consistency" },
             ].map((r, i) => (
-              <span key={r.text} style={{ ...note(23, INK), opacity: ease(frame, r.at, 10) }}>
+              <span key={r.text} style={{ ...note(24, INK), opacity: ease(frame, r.at, 10) }}>
                 {r.text}
                 {i < 2 ? "," : ""}
               </span>
             ))}
           </div>
-          <Note at={safeAt} x={X0} y={tTop + 34 + 5 * rowH + h(80)}>
+          <Note at={safeAt} x={X0} y={tTop + 34 + 5 * rowH + h(96)}>
             <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the safe default for most applications</span>
           </Note>
         </div>
@@ -254,7 +254,7 @@ export const NosqlScene: React.FC = () => {
             </span>
           </Note>
           <Shape x={R_X} y={y(SHAPES_TOP)} at={schemaAt} name="document" pattern="any shape, and it changes">
-            <div style={{ position: "absolute", left: 16, top: 14 }}>
+            <div style={{ position: "absolute", left: 16, top: 26 }}>
               {['{', '  "name": "Ava",', '  "tags": ["vip"],', '  "address": {…}', '}'].map((l, i) => (
                 <div key={i} style={mono(i === 0 || i === 4 ? INK_SOFT : INK)}>
                   {l}
@@ -263,7 +263,7 @@ export const NosqlScene: React.FC = () => {
             </div>
           </Shape>
           <Shape x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP)} at={kvAt} name="key-value" pattern="get one value by its key">
-            <div style={{ position: "absolute", left: 14, top: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ position: "absolute", left: 14, top: 22, display: "flex", flexDirection: "column", gap: 14 }}>
               {["user:41", "user:42", "user:43", "user:44"].map((k, i) => (
                 <div key={k} style={{ display: "flex", gap: 10, alignItems: "center", opacity: ease(frame, kvAt + 2 + i * 2, 8) }}>
                   <span style={{ ...mono(BLUE_INK), fontWeight: 600, padding: "0 6px", borderRadius: 4, background: `color-mix(in srgb, ${BAR} 14%, ${PAPER})`, lineHeight: "24px" }}>{k}</span>
@@ -274,7 +274,7 @@ export const NosqlScene: React.FC = () => {
             </div>
           </Shape>
           <Shape x={R_X + 2 * (SHAPE_W + SHAPE_GAP)} y={y(SHAPES_TOP)} at={wideAt} name="wide-column" pattern="rows by key, at volume">
-            <div style={{ position: "absolute", left: 14, top: 18, display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ position: "absolute", left: 14, top: 26, display: "flex", flexDirection: "column", gap: 18 }}>
               {[5, 2, 4, 3].map((cells, i) => (
                 <div key={i} style={{ display: "flex", gap: 6, alignItems: "center", opacity: ease(frame, wideAt + 2 + i * 2, 8) }}>
                   <span style={{ display: "inline-block", width: 40, height: 20, borderRadius: 4, background: `color-mix(in srgb, ${BAR} 55%, ${PAPER})` }} />
@@ -288,7 +288,7 @@ export const NosqlScene: React.FC = () => {
           <Note at={patternAt} x={R_X + SHAPE_W + SHAPE_GAP} y={y(SHAPES_TOP) - h(40)}>
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>one access pattern, known in advance, at huge volume</span>
           </Note>
-          <Note at={priceAt} x={R_X} y={y(SHAPES_TOP) + SHAPE_H + h(112)}>
+          <Note at={priceAt} x={R_X} y={y(SHAPES_TOP) + SHAPE_H + h(122)}>
             <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>The price: weaker consistency, limited joins</span>
           </Note>
         </div>

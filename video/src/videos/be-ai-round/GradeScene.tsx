@@ -162,8 +162,8 @@ export const GradeScene: React.FC = () => {
           <Spot id="be-ai-round-steering-wheel" at={droveAt} left={1590} top={y(150)} width={190} height={181} />
 
           {/* Canva's write-up, as a pull quote with its source. */}
-          <Ink at={canvaAt} dur={18} style={{ left: X0, top: y(398), width: 1330, borderLeft: `4px solid ${INK}`, paddingLeft: 28 }}>
-            <div style={{ ...body(38, true), color: INK, lineHeight: 1.22 }}>
+          <Ink at={canvaAt} dur={18} style={{ left: X0, top: y(398), width: 1330 }}>
+            <div style={{ ...body(38, true), color: INK, lineHeight: 1.22, borderLeft: `4px solid ${INK}`, paddingLeft: 28 }}>
               The strong candidates{" "}
               <span style={{ opacity: ease(frame, quoteAt - 2, 12) }}>&ldquo;didn&rsquo;t just prompt AI and accept whatever it generated.&rdquo;</span>
             </div>

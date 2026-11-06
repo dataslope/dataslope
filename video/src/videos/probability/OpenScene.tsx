@@ -193,7 +193,9 @@ export const OpenScene: React.FC = () => {
           </span>
         </Note>
       </div>
-      <Spot id="probability-coin" at={coinAt - 4} left={1480} top={y(232)} width={280} height={420} />
+      {/* The coin, small, in the open space right of the one-flip row and
+          well clear of the sentence under it. */}
+      <Spot id="probability-coin" at={coinAt - 4} left={1555} top={y(270)} width={130} height={200} />
 
       {/* ── The long run ── */}
       <Ink at={longRunAt - 6} dur={20} style={{ left: 160, top: y(560), whiteSpace: "nowrap" }}>

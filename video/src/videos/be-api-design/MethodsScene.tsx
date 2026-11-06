@@ -11,9 +11,9 @@ import { Sfx } from "../../sound/Sfx";
 import { Drift, Flow, Mark, METHOD_INK, Msg, msgHeight, OK_INK, pulse, X0 } from "./parts";
 
 /** The grid's columns: the method, what it does, then the two properties. */
-const COL = { what: 290, safe: 790, idem: 960 };
+const COL = { what: 250, safe: 610, idem: 770 };
 const PROP_W = 150;
-const R_X = 1100;
+const R_X = 1080;
 
 type Cell = "yes" | "no" | "maybe";
 

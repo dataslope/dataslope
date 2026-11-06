@@ -17,6 +17,10 @@ const FILE_Y = 484;
 const B_Y = 604;
 /** A column that says what its numbers mean: the unit in its name. */
 const COLUMN = { name: "impulse_", unit: "n_s", type: "numeric" };
+/** The orbiter and Mars: small, with the right half's white all round it. */
+const ORBITER_W = 180;
+const ORBITER_H = 91;
+const ORBITER_X = 1240;
 
 /**
  * Even a type is a rule: the Mars Climate Orbiter, after
@@ -88,24 +92,31 @@ export const OrbiterScene: React.FC = () => {
     </Ink>
   );
 
-  // The tags pop in inside "naming", after the stroke of the Next line's hairline.
-  const tagsAt = namingAt + 4;
-
   return (
     <AbsoluteFill>
-      {/* ── Sound: the spacecraft, the two programs, the file between them, the tags ── */}
+      {/* ── Sound: the spacecraft, the two programs, the file between them ── */}
       <Sfx name="el-pop" at={marsAt - 4} level={-30} />
       <Sfx name="el-tap" at={wroteAt - 4} level={-30} />
       <Sfx name="el-tap" at={readAt - 4} level={-30} />
       <Sfx name="el-pencil" at={numbersAt - 4} level={-34} />
       <Sfx name="el-tap" at={columnAt - 2} level={-31} />
       <Sfx name="el-pencil" at={namingAt - 6} level={-34} />
-      <Sfx name="el-pop" at={tagsAt} level={-30} />
       <Sfx name="el-chime" at={n.beat("next").to + 8} level={-33} />
 
       <Headline lead="Even a type" turn="is a rule." at={orbFrom - 6} turnAt={ruleAt - 4} size={72} />
 
-      <Spot id="db-why-design-orbiter" at={marsAt - 6} dim={whereAt} left={1030} top={y(380)} width={740} height={374} drift={-40} driftDur={end - marsAt} />
+      {/* The orbiter, small, level with the file that lost it, in the open right half. */}
+      <Spot
+        id="db-why-design-orbiter"
+        at={marsAt - 6}
+        dim={whereAt}
+        left={ORBITER_X}
+        top={fileTop + fileH / 2 - ORBITER_H / 2}
+        width={ORBITER_W}
+        height={ORBITER_H}
+        drift={-12}
+        driftDur={end - marsAt}
+      />
 
       <Drift from={orbFrom} to={end} amount={0.018} origin="20% 55%">
         <div style={{ position: "absolute", inset: 0, opacity: 1 - settle }}>
@@ -187,9 +198,6 @@ export const OrbiterScene: React.FC = () => {
           </Note>
         </div>
       </Drift>
-
-      {/* "naming the things your data is about": things with blank tags, under the dimmed orbiter. */}
-      <Spot id="db-why-design-tags" at={tagsAt} left={1500} top={y(758)} width={262} height={170} />
 
       <NextLine at={namingAt - 2} x={X0} y={y(820)} width={760}>
         <Mark at={thingsAt + 4} dur={16}>

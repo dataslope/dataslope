@@ -352,7 +352,7 @@ export const SPOTS = {
   shards: [1001, 920],
   conveyor: [1024, 653],
   bucket: [824, 1007],
-  newspaper: [1024, 791],
+  newspaper: [1024, 830],
   timer: [867, 1003],
 } as const satisfies Record<string, readonly [number, number]>;
 export type SpotId = keyof typeof SPOTS;

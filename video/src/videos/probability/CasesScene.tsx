@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { MONTY } from "./data";
-import { DATA, DATA_INK, FAINT, GOLD, GOLD_INK, Headline, lerp, ROOM, Spot, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, FAINT, GOLD, GOLD_INK, Headline, lerp, ROOM, STAT, STAT_INK, Svg } from "./parts";
 
 /** The three cases, one row each: where the car is, given you picked door 1. */
 const ROWS = [350, 530, 710];
@@ -40,7 +40,6 @@ export const CasesScene: React.FC = () => {
   // ── Cues ──
   const casesFrom = n.beat("cases").from;
   const pickAt = n.word("cases", "first pick");
-  const carAt = n.word("cases", "car");
   const oneInAt = n.word("cases", "one time in three");
   const otherAt = n.word("goat", "other two times");
   const goatAt = n.word("goat", "picked a goat");
@@ -95,8 +94,6 @@ export const CasesScene: React.FC = () => {
       <Sfx name="el-pop" at={hasCarAt - 4} level={-30} />
       <Sfx name="el-pencil" at={playAt - 4} level={-34} />
       <Sfx name="el-tap" at={sixtyAt - 2} level={-28} />
-      {/* The car spot arrives with the pop the video's other spots have. */}
-      <Sfx name="el-pop" at={carAt - 2} level={-30} />
 
       <Headline top={y(150)} first="She was right:" second="switching wins two in three." firstAt={casesFrom - 6} secondAt={hasCarAt - 2} out={rvInFrom - 6} />
       <Headline top={y(150)} first="Outcomes so far:" second="labels, not numbers." firstAt={rvInFrom - 2} secondAt={numbersAt - 6} />
@@ -183,10 +180,6 @@ export const CasesScene: React.FC = () => {
           <span style={{ opacity: ease(frame, infoAt - 4, 10), color: STAT_INK, fontWeight: 650 }}>, so it carries information.</span>
         </span>
       </Note>
-
-      {/* The car, right of the cases while they are drawn large; it leaves
-          before the chart of games takes that side. */}
-      <Spot id="probability-car" at={carAt - 2} out={randomAt - 30} left={1530} top={y(400)} width={262} height={h(185)} />
 
       {/* ── A hundred thousand games ── */}
       <FigLabel n="7" title={`Win rate so far, over ${MONTY.trials.toLocaleString("en-US")} games`} at={randomAt - 6} x={CH.x0} y={y(268)} />

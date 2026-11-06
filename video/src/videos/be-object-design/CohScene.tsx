@@ -44,7 +44,6 @@ export const CohScene: React.FC = () => {
   const purposeAt = n.word("coh", "one clear purpose");
   const coupAt = n.word("coh", "Coupling is how much modules depend");
   const lowAt = n.word("coh", "Low coupling means");
-  const antiAt = n.word("coh-god", "Here's the anti-pattern");
   const managerAt = n.word("coh-god", "One order manager");
   const jobAt = [
     n.word("coh-god", "prices the cart"),

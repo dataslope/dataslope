@@ -19,7 +19,6 @@ import {
   Mark,
   MARK_BAD,
   RowBracket,
-  Spot,
   tableGeometry,
   X0,
 } from "./parts";
@@ -79,13 +78,9 @@ export const FlatScene: React.FC = () => {
   const replyTop = y(TABLE_Y) + listingHeight(FLAT.update.length, SQL_SIZE) + 26;
   const adaRows = FLAT.rows.flatMap((row, i) => (row[F.name] === ADA ? [i] : []));
 
-  // The spots pop in on the words that name them, each with the spots' own pop.
-  const laptopAt = worksAt - 4;
-  const envelopesAt = emailAt - 4;
-
   return (
     <AbsoluteFill>
-      {/* ── Sound: the rows, the update's listing and its one changed cell, the answer, the two spots ── */}
+      {/* ── Sound: the rows, the update's listing and its one changed cell, the answer ── */}
       {rowAts.map((t, i) => (
         <Sfx key={i} name="el-tap" at={t} level={-29} />
       ))}
@@ -93,17 +88,10 @@ export const FlatScene: React.FC = () => {
       <Sfx name="el-pencil" at={changesAt - 4} level={-34} />
       <Sfx name="el-pop" at={swapAt} level={-29} />
       <Sfx name="el-scratch" at={twoAt + 4} level={-31} />
-      <Sfx name="el-pop" at={laptopAt} level={-30} />
-      <Sfx name="el-pop" at={envelopesAt} level={-30} />
 
       <Kicker at={hookFrom - 10}>What a shortcut costs</Kicker>
       <Headline lead={<Mark at={dayAt - 2} dur={14}>Day one:</Mark>} turn="it works." at={rarelyAt - 4} turnAt={worksAt - 4} out={twoAt - 8} />
       <Headline lead="One person," turn="two emails." at={twoAt - 2} turnAt={twoAt + 8} />
-
-      {/* Spots, outside the push: the first screen that works, top right, for as long as
-          "Day one: it works." holds; then her email twice, in the empty corner under the update. */}
-      <Spot id="db-why-design-laptop" at={laptopAt} out={twoAt - 8} left={1530} top={y(92)} width={250} height={190} />
-      <Spot id="db-why-design-envelopes" at={envelopesAt} left={1540} top={y(609)} width={230} height={210} />
 
       <Drift from={hookFrom} to={end} amount={0.016} origin="40% 60%">
         {/* The table and its columns from the first mention of a database; its rows with "a few orders". */}

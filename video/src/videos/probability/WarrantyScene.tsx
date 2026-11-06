@@ -103,15 +103,13 @@ export const WarrantyScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={millionAt - 2} level={-34} />
       <Sfx name="el-pencil" at={surviveAt - 4} level={-34} />
       <Sfx name="el-pencil" at={shapesAt - 4} level={-34} />
-      {/* The store spot arrives with the pop the video's other spots have. */}
-      <Sfx name="el-pop" at={storeAt - 2} level={-30} />
 
       <div style={{ opacity: 1 - dim }}>
         <Headline top={y(150)} first="An $80 warranty." second="Who comes out ahead?" firstAt={warrantyFrom - 6} secondAt={paysAt - 4} />
-        {/* The warranty itself, in the right half while the outcomes are
-            worked out on the left; it leaves before the million sales take
-            that half. */}
-        <Spot id="probability-warranty" at={eightyAt - 2} out={millionAt - 14} left={1290} top={y(300)} width={460} height={431} />
+        {/* The warranty itself, small, in the middle of the empty right half
+            while the outcomes are worked out on the left; it leaves before the
+            million sales take that half. */}
+        <Spot id="probability-warranty" at={eightyAt - 2} out={millionAt - 14} left={1395} top={y(434)} width={200} height={187} />
         {/* A list of outcomes rather than a chart, so a plain label, not a
             numbered figure. */}
         <Ink at={eightyAt - 6} dur={14} style={{ left: 160, top: y(268), whiteSpace: "nowrap" }}>
@@ -163,10 +161,6 @@ export const WarrantyScene: React.FC = () => {
         </Ink>
 
         </div>
-
-        {/* The store, under its own side of the sums, until the bridge
-            takes that space. */}
-        <Spot id="probability-store" at={storeAt - 2} out={evAt - 16} left={220} top={y(729)} width={280} height={h(205)} />
 
         {/* ── A million in code ── */}
         <Ink at={millionAt - 4} dur={14} style={{ left: RIGHT, top: y(330), whiteSpace: "nowrap" }}>

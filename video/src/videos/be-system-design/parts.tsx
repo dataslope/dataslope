@@ -30,6 +30,13 @@ export const MARK = HIGHLIGHT;
 /** "10,000,000": a count as it is set on screen. */
 export const int = (x: number) => Math.round(x).toLocaleString("en-US");
 
+/** A rough figure to two significant digits, as an estimate is said:
+ *  115.7 → 120, 34,722 → 35,000. */
+export const sig = (x: number) => {
+  const p = 10 ** (Math.floor(Math.log10(Math.abs(x))) - 1);
+  return Math.round(x / p) * p;
+};
+
 // ── Spot illustrations ───────────────────────────────────────────────────────
 
 /**

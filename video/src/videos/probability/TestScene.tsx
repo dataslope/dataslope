@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { mulberry32, num, pct, TEST } from "./data";
-import { Big, Count, DATA, DATA_INK, Headline, Kicker, lerp, Pulse, SOFT, Spot, STAT, STAT_INK, Strike, Svg, Sweep, VBracket } from "./parts";
+import { Big, Count, DATA, DATA_INK, Headline, Kicker, lerp, Pulse, SOFT, STAT, STAT_INK, Strike, Svg, Sweep, VBracket } from "./parts";
 
 /** The tree: where each node's label is centred. */
 const NODE = {
@@ -121,8 +121,6 @@ export const TestScene: React.FC = () => {
       <Sfx name="el-pencil" at={hundredAt - 4} level={-34} />
       <Sfx name="el-sprinkle" at={lineupAt} level={-32} />
       <Sfx name="el-tap" at={percentAt - 4} level={-28} />
-      {/* The test-tube spot arrives with the pop the video's other spots have. */}
-      <Sfx name="el-pop" at={aTestAt - 2} level={-30} />
 
       <Kicker at={testFrom - 10}>Bayes and the 99% test</Kicker>
       <Headline top={y(150)} first="A 99% accurate test" second="says positive." firstAt={testFrom - 6} secondAt={positiveAt - 4} out={lineupAt - 8} />
@@ -165,8 +163,6 @@ export const TestScene: React.FC = () => {
           </span>
           <span style={{ ...note(30, INK), fontWeight: 600 }}>You test positive.</span>
         </Ink>
-        {/* The test, between the facts and the thousand people. */}
-        <Spot id="probability-test-tubes" at={aTestAt - 2} out={walkFrom - 12} left={760} top={y(380)} width={250} height={h(230)} />
         {/* A thousand people, one of whom has it. */}
         <Ink at={thousandAt - 4} dur={12} style={{ left: FIELD.x0, top: y(FIELD.top) - 40, whiteSpace: "nowrap" }}>
           <span style={label(22, INK_SOFT)}>

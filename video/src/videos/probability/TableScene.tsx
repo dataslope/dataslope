@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, TABLE } from "./data";
-import { Headline, Kicker, lerp, Spot, STAT, STAT_INK, Svg, Sweep } from "./parts";
+import { Headline, Kicker, lerp, STAT, STAT_INK, Svg, Sweep } from "./parts";
 
 /** Column centres: row label, churned, stayed, total. */
 const COL = { label: 160, churned: 530, stayed: 750, total: 970 } as const;
@@ -64,7 +64,7 @@ const Cell: React.FC<{ x: number; y: number; at: number; lit?: number; dim?: num
 export const TableScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
 
   // ── Cues ──
   const tableFrom = n.beat("table").from;
@@ -128,16 +128,12 @@ export const TableScene: React.FC = () => {
       <Sfx name="el-tap" at={sixAt - 4} level={-28} />
       <Sfx name="el-tap" at={twentyFourAt - 4} level={-28} />
       <Sfx name="el-pencil" at={keepAt - 4} level={-34} />
-      {/* The users spot arrives with the pop the video's other spots have. */}
-      <Sfx name="el-pop" at={usersAt - 2} level={-30} />
 
       <Kicker at={tableFrom - 10}>Conditioning and independence</Kicker>
       <Headline top={y(150)} first="A thousand users," second="by plan and churn." firstAt={tableFrom - 6} secondAt={usersAt + 6} out={allAt - 8} />
       <Headline top={y(150)} first="Conditioning" second="zooms into the rows." firstAt={allAt - 4} secondAt={keepAt - 2} out={splitInFrom - 6} />
       <Headline top={y(150)} first={`${pct(TABLE.pPaid)} against ${pct(TABLE.pFree)}:`} second="linked?" firstAt={splitInFrom - 2} secondAt={linkedAt - 4} />
       <FigLabel n="2" title="Users by plan, and whether they churned this quarter" at={tableFrom} x={COL.label} y={y(268)} />
-      {/* The users themselves, top right, above where the rates arrive. */}
-      <Spot id="probability-users" at={usersAt - 2} left={1520} top={y(140)} width={240} height={h(215)} />
 
       {/* ── The table ── */}
       <div style={{ position: "absolute", inset: 0, opacity: 1 - tableBack }}>

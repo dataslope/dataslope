@@ -456,7 +456,6 @@ export const Spot: React.FC<{
 export const ART = {
   puffin: [872, 1024],
   key: [1016, 1006],
-  bookmark: [961, 941],
   bucket: [893, 1024],
 } as const;
 

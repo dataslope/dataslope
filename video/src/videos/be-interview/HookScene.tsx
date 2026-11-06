@@ -21,10 +21,14 @@ const BAND_STEP = 88;
 const CAPTION_Y = 630;
 const BACKEND_TOP = 680;
 const BACKEND_H = 150;
+/** The hook's two questions, set level with the capybara's middle, so the
+ *  opening page is one centred composition rather than a headline over an
+ *  empty half. */
+const HOOK_Y = 350;
 /** The capybara, right of everything: 360 by 471, under half its 781 by
  *  1022 pixels, so it stays sharp at 4K. */
 const CAPY_X = 1370;
-const CAPY_TOP = 132;
+const CAPY_TOP = 276;
 const CAPY_W = 360;
 const CAPY_H = 471;
 
@@ -115,7 +119,6 @@ export const HookScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-pop" at={backendAt} level={-30} />
       <Sfx name="el-pencil" at={moreAt} level={-35} />
       {bands.map((b) => (
         <Sfx key={b.name} name="el-tap" at={b.at} level={-31} />
@@ -131,29 +134,29 @@ export const HookScene: React.FC = () => {
         <Kicker at={-14}>Backend engineer interview questions</Kicker>
 
         {/* The two follow-ups, one line each, the second in the accent. */}
-        <Ink at={whyAt} dur={20} out={hookOut} style={{ left: 92, top: y(150), whiteSpace: "nowrap", ...headline(80) }}>
+        <Ink at={whyAt} dur={20} out={hookOut} style={{ left: 92, top: y(HOOK_Y), whiteSpace: "nowrap", ...headline(92) }}>
           Why this approach?
         </Ink>
         <Ink
           at={breaksAt}
           dur={20}
           out={hookOut}
-          style={{ left: 92, top: y(150) + 96, whiteSpace: "nowrap", ...headline(80, true), color: ACCENT_INK }}
+          style={{ left: 92, top: y(HOOK_Y) + 108, whiteSpace: "nowrap", ...headline(92, true), color: ACCENT_INK }}
         >
           What breaks under load?
         </Ink>
-        <Ink at={backendAt} dur={16} out={hookOut} style={{ left: 96, top: y(360), whiteSpace: "nowrap", ...note(30, INK) }}>
+        <Ink at={backendAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 252, whiteSpace: "nowrap", ...note(30, INK) }}>
           Backend interviews ask them <Mark at={moreAt + 2}>more than they used to.</Mark>
         </Ink>
-        <Ink at={seriesAt} dur={16} out={hookOut} style={{ left: 96, top: y(404), whiteSpace: "nowrap", ...note(30, INK) }}>
+        <Ink at={seriesAt} dur={16} out={hookOut} style={{ left: 96, top: y(HOOK_Y) + 302, whiteSpace: "nowrap", ...note(30, INK) }}>
           This series is about answering them.
         </Ink>
 
         <Headline lead="The ground," turn="and what backend adds." at={groundAt} turnAt={addAt} size={62} />
 
-        {/* The capybara sits beside the questions from "Backend interviews"
-            on, and stays to the cut. */}
-        <Spot id="be-interview-capybara" at={backendAt} left={CAPY_X} top={y(CAPY_TOP)} width={CAPY_W} height={CAPY_H} amp={4} />
+        {/* The capybara is there from the first frame (the video's poster),
+            beside the questions, and stays to the cut. */}
+        <Spot id="be-interview-capybara" at={-24} left={CAPY_X} top={y(CAPY_TOP)} width={CAPY_W} height={CAPY_H} amp={4} />
 
         {bands.map((b, i) => (
           <Band

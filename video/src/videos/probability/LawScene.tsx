@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { LLN, llnAt, llnRange, pct } from "./data";
-import { Coin, DATA, DATA_INK, Headline, lerp, Pulse, Spot, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
+import { Coin, DATA, DATA_INK, Headline, lerp, Pulse, STAT, STAT_INK, Svg, Sweep, VBracket } from "./parts";
 
 /** The chart: flips on a log axis, 1 to 5,000; the share of heads, 0 to 1. */
 const CH = { x0: 210, x1: 1380, top: 352, base: 812 } as const;
@@ -133,8 +133,6 @@ export const LawScene: React.FC = () => {
       <Sfx name="el-tap" at={pointAt - 4} level={-29} />
       <Sfx name="el-pop" at={rowAt - 4} level={-30} />
       <Sfx name="el-whoosh" at={paidAt - 4} level={-33} />
-      {/* The swamp spot arrives with the pop the video's other spots have. */}
-      <Sfx name="el-pop" at={swampedAt - 2} level={-30} />
 
       <Headline top={y(150)} first="The share of heads," second="flip by flip." firstAt={llnFrom - 6} secondAt={shareAt + 4} out={lawAt - 8} />
       <Headline top={y(150)} first="The law of" second="large numbers." firstAt={lawAt - 4} secondAt={lawAt + 6} out={tableInFrom - 6} />
@@ -309,8 +307,6 @@ export const LawScene: React.FC = () => {
       <Note at={swampedAt} x={MEM.x0 - MEM.r} y={y(MEM.y + 262)} width={320}>
         <span style={{ ...note(22, INK), lineHeight: 1.35 }}>A streak is never paid back, only swamped.</span>
       </Note>
-      {/* The streak, swamped: a coin going under in a pond, below the panel. */}
-      <Spot id="probability-swamp" at={swampedAt - 2} left={MEM.x0 - MEM.r} top={y(MEM.y + 356)} width={250} height={h(150)} />
       <Note at={afterEnd - 6} x={fx(30)} y={y(CH.base) - h(60)}>
         <span style={{ ...note(21, DATA), fontWeight: 650, whiteSpace: "nowrap" }}>everything after the streak</span>
       </Note>

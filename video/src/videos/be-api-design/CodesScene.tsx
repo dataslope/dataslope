@@ -118,8 +118,8 @@ export const CodesScene: React.FC = () => {
               <div style={{ position: "absolute", left: x, top: colTop - h(8), width: c.w - 30, height: 2, background: INK, opacity: ease(frame, classAt[ci] - 4, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10)) }} />
               <Note at={classAt[ci] - 2} x={x} y={colTop} out={out}>
                 <span style={{ fontFamily: MONO, fontSize: 44, fontWeight: 700, color: INK, whiteSpace: "nowrap" }}>
-                  <span style={{ position: "relative", display: "inline-block", margin: "0 0.08em" }}>
-                    <span style={{ position: "absolute", inset: "0.08em -0.08em 0 -0.08em", background: HIGHLIGHT, borderRadius: 4, opacity: ease(frame, Math.max(digitAt, classAt[ci] - 2), 10) * (1 - ease(frame, fourAt + 30, 12)) }} />
+                  <span style={{ position: "relative", display: "inline-block" }}>
+                    <span style={{ position: "absolute", inset: "0.08em -0.04em 0 -0.04em", background: HIGHLIGHT, borderRadius: 4, opacity: ease(frame, Math.max(digitAt, classAt[ci] - 2), 10) * (1 - ease(frame, fourAt + 30, 12)) }} />
                     <span style={{ position: "relative" }}>{c.cls[0]}</span>
                   </span>
                   xx
@@ -132,13 +132,11 @@ export const CodesScene: React.FC = () => {
                 return (
                   <Note key={code} at={codeAt(ci, i)} x={x + (lifted ? 18 * pair : 0)} y={codeTop + i * codeStep} out={out} style={{ opacity: 1 - dimmed }}>
                     <span style={{ fontSize: CODE_SIZE, whiteSpace: "nowrap" }}>
-                      {lifted ? (
-                        <Mark at={q4TextAt + (code.startsWith("403") ? 8 : 0)}>
-                          <Http line={code} size={CODE_SIZE} statusInk={INK} />
-                        </Mark>
-                      ) : (
+                      {/* Every code sits in a highlighter, lit or not, so the
+                          two lit ones keep the column's left edge. */}
+                      <Mark at={lifted ? q4TextAt + (code.startsWith("403") ? 8 : 0) : 1e9}>
                         <Http line={code} size={CODE_SIZE} statusInk={INK} />
-                      )}
+                      </Mark>
                     </span>
                   </Note>
                 );
@@ -154,7 +152,7 @@ export const CodesScene: React.FC = () => {
         <Note at={inCodeAt} x={X0} y={whyTop + h(50)} out={leave}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 22 }}>
             <Tick at={inCodeAt + 6} size={24} />
-            <span style={{ fontFamily: MONO, fontSize: 22, color: INK, whiteSpace: "pre" }}>
+            <span style={{ fontFamily: MONO, fontSize: 22, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               if status == <b style={{ color: OK_INK }}>404</b>: show_not_found()
             </span>
           </div>
@@ -162,7 +160,7 @@ export const CodesScene: React.FC = () => {
         <Note at={parseAt} x={X0} y={whyTop + h(100)} out={leave}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 22 }}>
             <Cross at={parseAt + 8} size={22} />
-            <span style={{ fontFamily: MONO, fontSize: 22, color: ACCENT_INK, whiteSpace: "pre" }}>
+            <span style={{ fontFamily: MONO, fontSize: 22, color: ACCENT_INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
               <Strike at={parseAt + 10}>if "not found" in message: …</Strike>
             </span>
           </div>
@@ -200,8 +198,8 @@ export const CodesScene: React.FC = () => {
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>valid credentials, not enough permission</span>
         </Note>
         <Note at={againAt} x={RESP_X} y={rowTop(1) + twoH + h(12)}>
-          <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>
-            <Strike at={againAt + 10}>log in again</Strike>
+          <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+            <Strike at={againAt + 10}>log in again</Strike> <span style={{ color: INK_SOFT }}>won't necessarily help</span>
           </span>
         </Note>
 

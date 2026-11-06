@@ -153,7 +153,8 @@ export const DoorsScene: React.FC = () => {
       </Note>
 
       {/* ── The column, and the letters ── */}
-      <Spot id="probability-goat" at={goatAt - 2} left={1420} top={y(226)} width={260} height={420} />
+      {/* The goat, small, over the column, with room above "Parade". */}
+      <Spot id="probability-goat" at={goatAt - 2} left={1440} top={y(340)} width={118} height={200} />
       <Ink at={ninetyAt - 4} dur={16} style={{ left: 1250, top: y(618), whiteSpace: "nowrap" }}>
         <span style={label(23, INK_SOFT)}>Parade magazine, 1990</span>
       </Ink>

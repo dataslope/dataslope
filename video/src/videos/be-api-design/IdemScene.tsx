@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { IDEM } from "./data";
-import { artBox, type Col, DataTable, dollars, Drift, Flow, Mark, Msg, msgHeight, Node, OK, OK_INK, Pill, pulse, Spot, tableGeometry, type TableRow, X0 } from "./parts";
+import { artBox, type Col, DataTable, dollars, Drift, Flow, Mark, Msg, Node, OK, OK_INK, Pill, pulse, Spot, tableGeometry, type TableRow, X0 } from "./parts";
 
 const L_TABLE_X = 330;
 const R_X = 1000;
@@ -62,7 +62,7 @@ export const IdemScene: React.FC = () => {
 
   // Why it matters: the retry, up for its own beat, gone as the run starts.
   const gone = runAt - 8;
-  const rTop = y(400);
+  const rTop = y(440);
   const boxH = h(84);
   const mid = rTop + boxH / 2;
   const CLIENT = { x: X0, w: 220 };
@@ -85,7 +85,7 @@ export const IdemScene: React.FC = () => {
   // What each keyed attempt got back: the first inserted payment 1; the
   // retries found the key, inserted nothing, and got payment 1.
   const keyedBack = IDEM.keyedIds.map((ids) => (ids.length ? `payment ${ids[0]}, inserted` : `key found: payment ${storedId}`));
-  const key = artBox("key", 160);
+  const key = artBox("key", 140);
   const raceTop = y(760);
 
   return (
@@ -165,20 +165,17 @@ export const IdemScene: React.FC = () => {
           tone="ok"
           lines={[{ t: "POST /payments" }, { t: `Idempotency-Key: ${SHORT_KEY}`, at: everyAt, mark: { at: everyAt + 6, out: storesAt } }]}
         />
-        <Spot id="key" at={keyAt} left={1560} top={msgTop - h(20)} {...key} />
+        <Spot id="key" at={keyAt} left={1620} top={y(318)} {...key} />
         <DataTable g={keyedG} cols={keyedCols} rows={keyedRows} at={storesAt} />
         {keyedBack.map((back, i) => (
           <Note key={i} at={i === 0 ? storesAt + 8 : findsAt + (i - 1) * 8} x={R_X} y={attemptsTop + i * h(40)}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
               <span style={{ color: INK_SOFT }}>{i === 0 ? "attempt" : "retry"} →</span>{" "}
-              {i === 0 ? back : <span style={{ color: OK_INK, fontWeight: 650 }}>{back}</span>}
+              {i === 0 ? back : <Mark at={originalAt + (i - 1) * 6}><span style={{ color: OK_INK, fontWeight: 650 }}>{back}</span></Mark>}
             </span>
           </Note>
         ))}
-        <Note at={originalAt + 4} x={R_X + 420} y={attemptsTop + 2 * h(40)}>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>the original, back</span>
-        </Note>
-        <Note at={requestsAt} x={1460} y={keyedG.top + h(6)}>
+        <Note at={requestsAt} x={1500} y={attemptsTop}>
           <div style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             <Num>3</Num> requests
           </div>

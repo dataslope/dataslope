@@ -6,7 +6,7 @@ import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label } from "../../editoria
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Badge, Code, Drift, Headline, Kicker, Mark, Spot, X0 } from "./parts";
+import { Badge, Code, Drift, Headline, Kicker, Mark, X0 } from "./parts";
 
 const ROW_Y0 = 372;
 const ROW_STEP = 90;
@@ -72,17 +72,13 @@ export const QuestionsScene: React.FC = () => {
   // The heading turns with the first answer, not before it.
   const sqlHead = ease(frame, writeAt - 2, 12);
 
-  // The clipboard pops in at the end of "write", after the stroke that turns the answers into SQL.
-  const clipboardAt = writeAt + 4;
-
   return (
     <AbsoluteFill>
-      {/* ── Sound: one tap per question, a stroke as the answers turn into SQL, the clipboard ── */}
+      {/* ── Sound: one tap per question, a stroke as the answers turn into SQL ── */}
       {ROWS.map((r) => (
         <Sfx key={r.at} name="el-tap" at={r.at - 4} level={-30} />
       ))}
       <Sfx name="el-pencil" at={writeAt - 2} level={-34} />
-      <Sfx name="el-pop" at={clipboardAt} level={-30} />
 
       <Kicker at={whatFrom - 10}>What design is</Kicker>
       <Headline lead="Design is answering" turn="the hard questions." at={whatFrom - 6} turnAt={hardAt - 4} size={72} />
@@ -95,9 +91,6 @@ export const QuestionsScene: React.FC = () => {
           .
         </span>
       </Ink>
-
-      {/* "how you write the answers down": a clipboard and pencil, top right, over the column that writes them. */}
-      <Spot id="db-why-design-clipboard" at={clipboardAt} left={1610} top={y(78)} width={163} height={190} />
 
       <Drift from={whatFrom} to={end} amount={0.018} origin="40% 60%">
         {/* Column heads, and a rule under them. */}

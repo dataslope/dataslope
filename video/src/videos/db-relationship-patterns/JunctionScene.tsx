@@ -6,7 +6,7 @@ import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MTM } from "./data";
-import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_KEY, Pulse, Spot, Tag, tableGeometry } from "./parts";
+import { Caption, DbTable, Drift, FIG_ABOVE, HEAD_H, Head, KEY_INK, Kicker, MARK, MARK_KEY, Pulse, Tag, tableGeometry } from "./parts";
 
 const ERD_Y = 330;
 const ROWS_Y = 572;
@@ -34,8 +34,6 @@ export const JunctionScene: React.FC = () => {
   const otmAt = n.word("two", "one-to-manys");
   const junctionAt = n.word("named", "junction table");
   const nameAt = n.word("named", "a name");
-  // The signpost pops in just after "junction table", silent like the video's other spot art.
-  const signpostAt = junctionAt + 2;
 
   const students = useEntityLayout({
     x: 120,
@@ -93,7 +91,6 @@ export const JunctionScene: React.FC = () => {
 
       <Kicker at={from - 10}>Many to many</Kicker>
       <Head lead="Every pairing gets a row:" leadAt={from - 6} turn="a junction table." turnAt={junctionAt - 2} />
-      <Spot id="db-relationship-patterns-signpost" at={signpostAt} left={1575} top={y(574)} width={156} height={200} />
 
       <Drift from={pairingAt} to={nameAt + 50} scale={0.016} origin={[960, y(560)]}>
         {/* One figure: the diagram, and under its middle box the rows it holds. */}
