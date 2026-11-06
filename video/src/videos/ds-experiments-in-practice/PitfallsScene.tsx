@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, INK, TABULAR, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { badgeStyle } from "../../editorial/ui";
 import { Sfx } from "../../sound/Sfx";
