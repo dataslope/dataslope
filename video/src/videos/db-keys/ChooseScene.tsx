@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { badgeStyle, FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
@@ -126,9 +126,9 @@ export const ChooseScene: React.FC = () => {
             );
           })}
 
-          {/* ── ON UPDATE: the same question ── */}
-          <div style={{ position: "absolute", left: ROOT_X, top: y(774) - 29, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
-          <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(774), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
+          {/* ── ON UPDATE: the same question, set apart by space alone (the
+              owner: no rule above it, more room instead) ── */}
+          <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(766), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
             {/* At the sentence's own size, less the 12% a line may vary. */}
             <Tag color={INK} size={29} mono>
               ON UPDATE
