@@ -78,9 +78,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q2-health: one server turns red, its arrow is withdrawn, the others take
  *     its share.
  *   q2-mod, q2-ring: a grid of 10,000 small squares (one per key), colored
- *     by server. Under modulo, three colors become four and 75% of the
- *     squares change color (red outline on each moved square), "75% moved"
- *     on "seventy-five"; then the same grid on the ring: only the squares
+ *     by server. Under modulo, three colors become four and 74% of the
+ *     squares change color (red outline on each moved square), "74% moved"
+ *     on "seventy-four"; then the same grid on the ring: only the squares
  *     that turn the new server's color change, "23% moved, all to the new
  *     server" in green. A small hash ring beside it, 100 points a server.
  *     A "simulation" note.
@@ -192,7 +192,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     points cost more than all the rest" is the page's.
  *   - q2: round-robin, least-connections, consistent hashing for sticky
  *     caches, health checks: the page. The simulation: 10,000 keys, MD5,
- *     three servers to four: 75% move under modulo (7,5xx of 10,000;
+ *     three servers to four: 74% move under modulo (7,446 of 10,000;
  *     results.json movedMod), 23% on a ring with 100 points a server, every
  *     one of them to the new server (check.mjs asserts it).
  *   - q3: the read and write paths, "only requested data hot", "tolerates
@@ -322,7 +322,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-mod",
-      text: "Why consistent hashing? Simulate ten thousand short keys spread over three servers by their hash, modulo three. Add a fourth server, switch to modulo four, and seventy-five percent of the keys move, each one to a cold cache.",
+      text: "Why consistent hashing? Simulate ten thousand short keys spread over three servers by their hash, modulo three. Add a fourth server, switch to modulo four, and seventy-four percent of the keys move, each one to a cold cache.",
       pauseAfter: 0.7,
     },
     {

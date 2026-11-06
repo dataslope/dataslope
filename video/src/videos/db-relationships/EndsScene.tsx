@@ -225,10 +225,11 @@ const EndKey: React.FC<{ top: number; at: number; hits: readonly { glyph: Glyph;
           key={r.lead}
           at={at + 4 + i * 3}
           dur={14}
-          style={{ left: KEY_X, top: top + 46 + i * 48, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 10 }}
+          style={{ left: KEY_X, top: top + 46 + i * 48, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 8 }}
         >
+          {/* One line, one size: the rule's value is set in its lead's Inter, in the accent. */}
           <span style={note(22, INK)}>{r.lead}</span>
-          <span style={{ ...body(28, true), color: ACCENT_INK }}>{r.value}</span>
+          <span style={label(22, ACCENT_INK)}>{r.value}</span>
         </Ink>
       ))}
       <Svg>

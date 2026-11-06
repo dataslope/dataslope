@@ -21,6 +21,7 @@ const CAPTION_Y = 474;
 const TABLE_Y = 508;
 const ERROR_Y = 706;
 const RULE_Y = 744;
+const RULE_SIZE = 30;
 
 /**
  * The marks change the schema (cardinality.mdx): many devices per employee is
@@ -147,15 +148,16 @@ export const BadgeScene: React.FC = () => {
         {/* ── What each end becomes ── */}
         {/* Each arrives as its end is turned into a rule, and is named again
             on "keys and constraints". */}
+        {/* One line, one size and face: the end in italic, what it becomes in roman. */}
         <Ink at={shareAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: INK }}>Zero or many:</span>
-          <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>
+          <span style={{ ...body(RULE_SIZE, true), color: INK }}>Zero or many:</span>
+          <span style={{ ...body(RULE_SIZE), color: INK_SOFT, marginLeft: "0.25em" }}>
             <Mark at={keysAt}>a foreign key</Mark>
           </span>
         </Ink>
         <Ink at={twiceAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y + 50), whiteSpace: "nowrap" }}>
-          <span style={{ ...body(32, true), color: INK }}>Zero or one:</span>
-          <span style={{ ...note(24, INK_SOFT), marginLeft: 14 }}>
+          <span style={{ ...body(RULE_SIZE, true), color: INK }}>Zero or one:</span>
+          <span style={{ ...body(RULE_SIZE), color: INK_SOFT, marginLeft: "0.25em" }}>
             a foreign key, and <Mark at={constraintsAt + 8}>unique</Mark>
           </span>
         </Ink>

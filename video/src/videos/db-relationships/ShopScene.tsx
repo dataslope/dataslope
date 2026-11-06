@@ -261,7 +261,8 @@ export const ShopScene: React.FC = () => {
               dur={16}
               style={{ left: TEXT_X, top: y(SENT_Y + i * SENT_STEP), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}
             >
-              <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>{i + 1}</span>
+              {/* The number in its sentence's own face and size, set apart by color and weight. */}
+              <span style={{ ...body(33), color: ACCENT_INK, fontWeight: 650 }}>{i + 1}</span>
               <span style={{ ...body(33), color: INK }}>
                 {t.lead} <Mark at={t.countAt}>{t.count}</Mark> {t.tail}
               </span>

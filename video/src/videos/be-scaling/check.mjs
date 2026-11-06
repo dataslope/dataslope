@@ -378,7 +378,7 @@ const said = [
   ["q1-headroom", "it waits nine", 9, wait(0.9)],
   ["q1-headroom", "ninety-nine percent, ninety-nine", 99, wait(0.99)],
   ["q2-mod", "ten thousand short keys", 10_000, R.hashing.keys],
-  ["q2-mod", "seventy-five percent of the keys move", 75, pct(R.hashing.shareMod)],
+  ["q2-mod", "seventy-four percent of the keys move", 74, pct(R.hashing.shareMod)],
   ["q2-ring", "a hundred points each", 100, R.hashing.pointsPerServer],
   ["q2-ring", "only twenty-three percent move", 23, pct(R.hashing.shareRing)],
   ["q3-sim", "two million redirects over a million links", 2e6, R.cache.redirects],
