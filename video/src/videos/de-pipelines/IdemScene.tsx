@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { ColumnRule, Note, Num } from "../../editorial/ui";
+import { ACCENT_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, ColumnRule, Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BLIND, DELETE_DAY, IDEM } from "./data";
-import { Drift, lineOf, Listing, listingHeight, Mark, MARK_OK, Mono, OK, OK_INK, Pill, pulse, X0 } from "./parts";
+import { Drift, lineOf, Listing, listingHeight, Mark, MARK_OK, Mono, OK_INK, Pill, pulse, X0 } from "./parts";
 
 const SIZE = 23;
 const LIST_W = 560;
@@ -37,28 +37,27 @@ const RunCount: React.FC<{ at: number; x: number; y: number; run: string; value:
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
-  const line = tone === "bad" ? ACCENT : tone === "ok" ? OK : BAR;
-  const ink = tone === "bad" ? ACCENT_INK : tone === "ok" ? OK_INK : BLUE_INK;
+  const badge = tone === "bad" ? "red" : tone === "ok" ? "green" : "blue";
   return (
     <div style={{ position: "absolute", left: x, top: y, width: 170, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
       <div style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>{run}</div>
+      {/* The number as a house badge, at the box's old size; a second look
+          swells it a little (`lit`). */}
       <div
         style={{
+          ...badgeStyle(badge, 40),
           marginTop: 8,
           width: 120,
           height: 64,
+          padding: 0,
           boxSizing: "border-box",
-          border: `${2.5 + 2 * lit}px solid ${line}`,
-          borderRadius: 10,
-          background: `color-mix(in srgb, ${line} 12%, ${PAPER})`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontFamily: MONO,
-          fontSize: 40,
-          fontWeight: 700,
-          color: ink,
           fontVariantNumeric: "tabular-nums",
+          transform: `scale(${1 + 0.1 * lit})`,
+          transformOrigin: "0 50%",
         }}
       >
         {value}

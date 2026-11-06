@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, INK_SOFT, note } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { ACCENT_INK, note } from "../../editorial/style";
+import { badgeStyle, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -301,16 +301,8 @@ export const PairScene: React.FC = () => {
         ] as const
       ).map(([v, at], i) => (
         <Ink key={String(v)} at={at - 2} dur={12} style={{ left: RECAP_X + i * 250, top: y(560), whiteSpace: "nowrap" }}>
-          <span
-            style={{
-              ...note(34, ACCENT_INK),
-              display: "inline-block",
-              padding: "4px 14px",
-              borderRadius: 8,
-              border: `2px dashed ${INK_SOFT}`,
-              fontWeight: 600,
-            }}
-          >
+          {/* A wrong value as a red house badge. */}
+          <span style={{ ...note(34, ACCENT_INK), ...badgeStyle("red", 34), fontWeight: 600 }}>
             <span style={{ fontFamily: MONO }}>{v}</span>
           </span>
         </Ink>

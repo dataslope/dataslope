@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { OVERFIT } from "./data";
@@ -181,17 +181,14 @@ export const OverfitScene: React.FC = () => {
               <div
                 key={f.text}
                 style={{
+                  ...label(23),
+                  ...badgeStyle(isStop ? "green" : "gray", 23),
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
-                  padding: "6px 14px 6px 10px",
-                  borderRadius: 22,
-                  border: `2px solid ${isStop ? OK : INK_SOFT}`,
+                  paddingLeft: 9,
                   opacity: p,
                   transform: `translateY(${(1 - p) * 8}px)`,
-                  ...label(23, isStop ? OK_INK : INK),
-                  fontWeight: 600,
-                  whiteSpace: "nowrap",
                 }}
               >
                 {p > 0 ? <Tick at={f.at + 2} size={20} /> : null}

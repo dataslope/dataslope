@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -21,7 +21,8 @@ const BUG_LINE = 3;
  * an assistant's January query, with the BETWEEN filter the page describes,
  * arrives line by line as if typed into a chat, then the narration's turn ("whether it's right") puts a question
  * mark against the BETWEEN line that question 3 takes apart. The split of
- * the round is one plain line under it, its two parts in the data's blue.
+ * the round is two badges under it, in the data's blue: the six in full on
+ * the house tint, the three short on a lighter one.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -46,10 +47,11 @@ export const HookScene: React.FC = () => {
   const pillsY = y(TOP) + h(34) + listH + h(36);
   const dim = ease(frame, firstAt, 14) * 0.5;
 
-  // The round's split, plain text after "9 questions:", in the data's blue.
+  // The round's split, two badges after "9 questions:": the short ones on a
+  // lighter tint, where the original pills set them on a paler fill.
   const split = [
-    { at: sixAt, text: "6 in full" },
-    { at: threeAt, text: "3 short" },
+    { at: sixAt, text: "6 in full", tint: undefined },
+    { at: threeAt, text: "3 short", tint: `color-mix(in srgb, ${ds("blue", 400)} 11%, transparent)` },
   ];
 
   return (
@@ -84,17 +86,24 @@ export const HookScene: React.FC = () => {
           <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>right?</span>
         </Note>
 
-        {/* ── Nine questions: six in full, three short, as one line of text ── */}
+        {/* ── Nine questions: six in full, three short, as two badges ── */}
         <Note at={nineAt - 2} x={X0} y={pillsY} dim={firstAt + 4}>
-          <span style={{ ...note(28, INK), whiteSpace: "nowrap", ...TABULAR }}>
-            9 questions:{" "}
-            {split.map((p, i) => {
+          <span style={{ ...note(28, INK), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16, ...TABULAR }}>
+            9 questions:
+            {split.map((p) => {
               const q = ease(frame, p.at - 2, 12);
               return (
-                <React.Fragment key={p.text}>
-                  {i > 0 ? <span style={{ color: INK_SOFT, opacity: q }}> · </span> : null}
-                  <span style={{ display: "inline-block", color: BLUE_INK, fontWeight: 650, opacity: q, transform: `scale(${0.9 + 0.1 * q})` }}>{p.text}</span>
-                </React.Fragment>
+                <span
+                  key={p.text}
+                  style={{
+                    ...badgeStyle("blue", 28),
+                    ...(p.tint ? { background: p.tint } : {}),
+                    opacity: q,
+                    transform: `scale(${0.9 + 0.1 * q})`,
+                  }}
+                >
+                  {p.text}
+                </span>
               );
             })}
           </span>

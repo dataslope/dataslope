@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { pct, UNIT, UNIT_SE } from "./data";
@@ -134,34 +134,20 @@ export const UnitScene: React.FC = () => {
           </Mark>
         </QuestionCard>
 
-        {/* What gets assigned: one line of plain text, the usual unit in the
-            right answer's green and weight, the others after a middle dot.
-            Each word holds its place before it inks, so the line never
-            reflows. */}
-        <div style={{ position: "absolute", left: X0, top: y(300), display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
+        {/* What gets assigned: one line, the units as house badges held
+            apart by their gap, the usual one green. Each badge holds its
+            place before it inks, so the line never reflows. */}
+        <div style={{ position: "absolute", left: X0, top: y(300), display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
           <span style={{ ...note(25, INK_SOFT), opacity: ease(frame, assignedAt, 14) }}>assigned to a group:</span>
           {[
             { text: "usually a user", at: userAt, main: true },
             { text: "session", at: sessionAt, main: false },
             { text: "device", at: sessionAt + 6, main: false },
-          ].map((c, i) => {
-            const p = ease(frame, c.at - 2, 10);
-            return (
-              <React.Fragment key={c.text}>
-                {i > 0 ? <span style={{ ...note(25, INK_SOFT), margin: "0 14px", opacity: p }}>·</span> : null}
-                <span
-                  style={{
-                    ...note(25, c.main ? OK_INK : INK),
-                    fontWeight: c.main ? 700 : 500,
-                    marginLeft: i === 0 ? 10 : 0,
-                    opacity: p,
-                  }}
-                >
-                  {c.text}
-                </span>
-              </React.Fragment>
-            );
-          })}
+          ].map((c) => (
+            <span key={c.text} style={{ ...note(25), ...badgeStyle(c.main ? "green" : "gray", 25), opacity: ease(frame, c.at - 2, 10) }}>
+              {c.text}
+            </span>
+          ))}
         </div>
 
         <Requests top={y(410)} at={userAt + 6} mixed={false} label="by user" />

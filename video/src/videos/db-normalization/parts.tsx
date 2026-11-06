@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { arrowHead, type Pt, roundedPolyline } from "../../components/arrow";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { ACCENT, BAR, BLUE_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
-import { H, Ink, W } from "../../editorial/ui";
+import { BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
+import { badgeStyle, H, Ink, W } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -123,28 +123,15 @@ export const Reply: React.FC<{
   children: React.ReactNode;
   color?: string;
   size?: number;
-}> = ({ at, out, x, y, children, color = BLUE_INK, size = 24 }) => {
-  const frame = useCurrentFrame();
-  const swell = pulse(frame, at + 6, 20);
-  return (
-    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, whiteSpace: "nowrap" }}>
-      <span
-        style={{
-          display: "inline-block",
-          fontFamily: MONO,
-          fontSize: size,
-          fontWeight: 600,
-          color,
-          padding: "4px 12px",
-          borderRadius: 4,
-          background: `color-mix(in srgb, ${color === BLUE_INK ? BAR : color === INK ? INK_SOFT : ACCENT} ${10 + swell * 14}%, ${PAPER})`,
-        }}
-      >
-        {children}
-      </span>
-    </Ink>
-  );
-};
+}> = ({ at, out, x, y, children, color = BLUE_INK, size = 24 }) => (
+  // The house badge (editorial/ui): blue for the key blue, gray for the
+  // plain ink, red otherwise.
+  <Ink at={at} dur={12} out={out} style={{ left: x, top: y, whiteSpace: "nowrap" }}>
+    <span style={{ ...badgeStyle(color === BLUE_INK ? "blue" : color === INK ? "gray" : "red", size), fontFamily: MONO, fontWeight: 600 }}>
+      {children}
+    </span>
+  </Ink>
+);
 
 /** A tick, drawn as a stroke on `at`: a constraint that holds. */
 export const Tick: React.FC<{ x: number; y: number; at: number; size?: number; color?: string; out?: number }> = ({

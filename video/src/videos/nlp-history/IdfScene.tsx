@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, fmt, headline, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { Badge, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -218,11 +218,17 @@ export const IdfScene: React.FC = () => {
         </Ink>
 
         <Ink at={searchAt - 2} dur={16} style={{ left: RX, top: QUERY_Y, whiteSpace: "nowrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, ...label(23, INK_SOFT) }}>
+          {/* The two words as house badges, in the gray and the blue the
+              rows and the grid below give them. */}
+          <div style={{ display: "flex", alignItems: "baseline", gap: 14, ...label(23, INK_SOFT) }}>
             a search for
-            <span style={{ padding: "4px 14px", borderRadius: 18, border: `2px solid ${COMMON_INK}`, color: COMMON_INK, fontWeight: 650 }}>a common word</span>
+            <Badge tone="gray" size={23}>
+              a common word
+            </Badge>
             and
-            <span style={{ padding: "4px 14px", borderRadius: 18, border: `2px solid ${DATA}`, color: DATA_INK, fontWeight: 650 }}>a rare word</span>
+            <Badge tone="blue" size={23}>
+              a rare word
+            </Badge>
           </div>
         </Ink>
         {row(

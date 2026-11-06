@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Num } from "../../editorial/ui";
+import { INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, type BadgeTone, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
+import { SANS } from "../../theme/fonts";
 import { SLOW, thousands } from "./data";
 import { Drift, Headline, Kicker, pulse, RowGrid, Spot, X0 } from "./parts";
 
@@ -20,13 +20,33 @@ const TOTAL = 10;
 /** Which question is drawn: isolation levels, the ninth. */
 const DRAWN = 8;
 
+/** A question's disc: the house badge's tint and ink, in a hue. */
+type Disc = { background: string; color: string };
+const disc = (tone: BadgeTone): Disc => {
+  const b = badgeStyle(tone);
+  return { background: String(b.background), color: String(b.color) };
+};
+const DISC = {
+  blue: disc("blue"),
+  gray: disc("gray"),
+  yellow: disc("yellow"),
+  /** The drawn question: half the gray's tint, in soft ink. */
+  drawn: { background: `color-mix(in srgb, ${String(badgeStyle("gray").background)} 50%, transparent)`, color: INK_SOFT },
+};
+/** `a` over `b` by `t`, tint and ink alike. */
+const discTone = (a: Disc, b: Disc, t: number): Disc => ({
+  background: `color-mix(in srgb, ${a.background} ${Math.round(t * 100)}%, ${b.background})`,
+  color: `color-mix(in srgb, ${a.color} ${Math.round(t * 100)}%, ${b.color})`,
+});
+
 /**
  * The opening: the table every later scene runs against, a million orders
  * drawn as a thousand squares of a thousand rows each, filling in as the
  * narration names it. Then the promise, counted from what the video does:
- * ten questions as numbered chips, nine filled for the ones answered on the
- * real database and the ninth question outlined, since isolation is drawn.
- * The first chip lights on the bridge into question 1.
+ * ten questions as numbered discs (the house's badge, round), nine in the
+ * data blue for the ones answered on the real database and the ninth a
+ * lighter gray, since isolation is drawn. The first disc lights on the
+ * bridge into question 1.
  */
 export const HookScene: React.FC = () => {
   const frame = useCurrentFrame();
@@ -85,6 +105,10 @@ export const HookScene: React.FC = () => {
         </div>
 
         {/* ── Ten questions: nine on the database, one drawn ── */}
+        {/* The ten as the house's badges, round: the nine run on the
+            database turn the data blue as they are counted; the drawn one,
+            dashed before, is the lighter gray with soft ink; the first turns
+            the highlighter's yellow on the bridge. */}
         {Array.from({ length: TOTAL }, (_, i) => {
           const p = ease(frame, tenAt - 2 + i * 1.5, 10);
           if (p <= 0) return null;
@@ -92,7 +116,8 @@ export const HookScene: React.FC = () => {
           const tone = real ? ease(frame, nineAt + i * 2, 10) : 0;
           const first = i === 0 ? ease(frame, startAt, 10) : 0;
           const fade = i === 0 ? 0 : ease(frame, startAt + 4, 14) * 0.5;
-          const fill = first > 0 ? ds("yellow", 400) : real ? `color-mix(in srgb, ${BAR} ${25 + 75 * tone}%, ${PAPER})` : PAPER;
+          const base = real ? discTone(DISC.blue, DISC.gray, tone) : DISC.drawn;
+          const { background, color } = first > 0 ? discTone(DISC.yellow, base, first) : base;
           return (
             <div
               key={i}
@@ -102,14 +127,14 @@ export const HookScene: React.FC = () => {
                 top: y(CHIPS_Y),
                 width: CHIP,
                 height: CHIP,
-                borderRadius: CHIP / 2,
-                background: fill,
-                border: real || first > 0 ? "2px solid transparent" : `2px dashed ${INK_SOFT}`,
-                boxSizing: "border-box",
+                borderRadius: "50%",
+                background,
+                color,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                ...label(22, real && tone > 0.5 && first === 0 ? PAPER : INK),
+                fontFamily: SANS,
+                fontSize: 22,
                 fontWeight: 700,
                 ...TABULAR,
                 opacity: p * (1 - fade),

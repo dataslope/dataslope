@@ -4,7 +4,6 @@ import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, NextLine, Note } from "../../editorial/ui";
-import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ANSWER_TOKENS, THINKING_TOKENS } from "./data";

@@ -10,7 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { Chip, Drift, lineOf, Listing, listingHeight, OK, OK_INK, Svg } from "./parts";
+import { Chip, Drift, lineOf, Listing, listingHeight, OK_INK, Svg } from "./parts";
 
 /** The page's own PySpark block, without its comments. */
 const LINES = [

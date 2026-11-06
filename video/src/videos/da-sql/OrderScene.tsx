@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { OK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Ink, Note } from "../../editorial/ui";
+import { badgeStyle, Ink, Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -250,12 +250,15 @@ export const OrderScene: React.FC = () => {
   );
 };
 
-/** A step's number in a ring. 24px, within 12% of the run order's 26px
- *  clauses and level with the listing's 24px lines, so each line keeps one
- *  size; the ring is 36 to hold it, inside the listing's 43px line. */
+/** A step's number on a tinted disc, the house badge with no ring. 24px,
+ *  within 12% of the run order's 26px clauses and level with the listing's
+ *  24px lines, so each line keeps one size; the disc is 36 to hold it,
+ *  inside the listing's 43px line. */
 const StepBadge: React.FC<{ n: number }> = ({ n }) => (
   <span
     style={{
+      ...label(24, INK),
+      ...badgeStyle("gray", 24),
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
@@ -263,12 +266,9 @@ const StepBadge: React.FC<{ n: number }> = ({ n }) => (
       height: BADGE,
       flex: "none",
       boxSizing: "border-box",
+      padding: 0,
       borderRadius: 999,
-      border: `2px solid ${INK}`,
-      background: PAPER,
-      ...label(24, INK),
       ...TABULAR,
-      fontWeight: 700,
     }}
   >
     {n}

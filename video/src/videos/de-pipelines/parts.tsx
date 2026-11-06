@@ -5,9 +5,9 @@ import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { badgeStyle, type BadgeTone, Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
-import { MONO } from "../../theme/fonts";
+import { MONO, SANS } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -347,7 +347,18 @@ export const Flow: React.FC<{
   );
 };
 
-/** A small rounded label on the page, in its tone's ink, that inks in. */
+/** A tone's hue as a house badge. */
+const BADGE_TONE: Record<Tone, BadgeTone> = { data: "blue", ok: "green", bad: "red", plain: "gray" };
+
+/** The emphatic badge's tint: its hue, about twice the house badge's. */
+export const strongTint = (tone: BadgeTone) =>
+  tone === "gray" ? "color-mix(in srgb, var(--ds-gray-400) 40%, transparent)" : `color-mix(in srgb, var(--ds-${tone}-400) 46%, transparent)`;
+
+/**
+ * A small label on the page that inks in: the house badge (`badgeStyle`), a
+ * light tint of its tone's hue in that hue's ink, no border. `solid`, the
+ * emphatic form, deepens the tint.
+ */
 export const Pill: React.FC<{
   x: number;
   y: number;
@@ -361,23 +372,10 @@ export const Pill: React.FC<{
 }> = ({ x, y, at, tone = "data", size = 22, out, dim, solid, children }) => {
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
-  const t = TONE[tone];
+  const t = BADGE_TONE[tone];
   return (
     <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d }}>
-      <span
-        style={{
-          display: "inline-block",
-          padding: "5px 14px 6px",
-          borderRadius: 8,
-          border: `2px solid ${t.line}`,
-          background: solid ? t.line : t.fill,
-          ...label(size, solid ? PAPER : t.ink),
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {children}
-      </span>
+      <span style={{ ...badgeStyle(t, size), fontFamily: SANS, ...(solid ? { background: strongTint(t) } : {}) }}>{children}</span>
     </Ink>
   );
 };

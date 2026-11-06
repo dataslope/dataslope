@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -171,18 +171,8 @@ export const HookScene: React.FC = () => {
 
       {/* ── A product saved at -3.00 ── */}
       <Ink at={minusAt - 2} dur={12} out={chipOut} style={{ left: 120, top: products.rows[2].mid - 26, whiteSpace: "nowrap" }}>
-        <span
-          style={{
-            display: "inline-block",
-            padding: "4px 14px",
-            borderRadius: 8,
-            border: `2px solid ${frame >= mistakeAt - 2 ? ACCENT : INK_SOFT}`,
-            fontFamily: MONO,
-            fontSize: 30,
-            fontWeight: 600,
-            color: ACCENT_INK,
-          }}
-        >
+        {/* The bad value as a red house badge. */}
+        <span style={{ ...badgeStyle("red", 30), fontFamily: MONO, fontWeight: 600 }}>
           price {BAD}
         </span>
       </Ink>

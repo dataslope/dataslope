@@ -18,7 +18,7 @@ import {
   label,
   note,
 } from "../../editorial/style";
-import { Ink, type Pt } from "../../editorial/ui";
+import { badgeStyle, Ink, type Pt } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -206,7 +206,11 @@ export const Strike: React.FC<{ at: number; color?: string; top?: string; childr
   );
 };
 
-/** A small rounded tag ("PK", "FK", "UNIQUE", "parent"), in its own ink. */
+/**
+ * A tag ("PK", "FK", "UNIQUE", "parent"): the house badge (editorial/ui), a
+ * light tint of its hue in that hue's ink, no border. `color` picks the hue:
+ * the key blue, the accent red, or gray for anything in the plain ink.
+ */
 export const Tag: React.FC<{ children: React.ReactNode; color?: string; size?: number; mono?: boolean }> = ({
   children,
   color = KEY_INK,
@@ -215,16 +219,9 @@ export const Tag: React.FC<{ children: React.ReactNode; color?: string; size?: n
 }) => (
   <span
     style={{
-      display: "inline-block",
-      padding: "1px 9px 2px",
-      borderRadius: 999,
-      border: `1.5px solid ${color}`,
-      color,
-      fontFamily: mono ? MONO : undefined,
-      ...(mono ? { fontSize: size, fontWeight: 600 } : label(size, color)),
-      lineHeight: 1.25,
-      whiteSpace: "nowrap",
-      background: PAPER,
+      ...label(size),
+      ...badgeStyle(color === KEY_INK ? "blue" : color === ACCENT_INK ? "red" : "gray", size),
+      fontFamily: mono ? MONO : label(size).fontFamily,
     }}
   >
     {children}

@@ -3,11 +3,12 @@ import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { Badge, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { IDEM } from "./data";
-import { Code, Console, Drift, FadeIn, lineOf, Mark, MARK_BAD, MARK_OK, OK_INK, Strike, Tag, Title, X0 } from "./parts";
+import { Code, Console, Drift, FadeIn, lineOf, Mark, MARK_BAD, MARK_OK, OK_INK, Strike, Title, X0 } from "./parts";
 import { Mono } from "./mono";
 
 const TOP = 322;
@@ -30,13 +31,13 @@ const Way: React.FC<{
 }> = ({ top, at, title, color, line, out, outAt, mark, h }) => (
   <>
     <Note at={at} x={X0} y={top}>
-      {/* The title and its condition as a tag, at 21px: within 12% of the
-          23px title it shares the line with. */}
+      {/* The title and its condition as the house's badge, at 21px: within
+          12% of the 23px title it shares the line with. */}
       <span style={{ display: "flex", gap: 16, alignItems: "baseline", whiteSpace: "nowrap" }}>
         <Title color={color}>{title}</Title>
-        <Tag color={INK_SOFT} size={21}>
+        <Badge tone="gray" size={21} style={{ fontFamily: SANS }}>
           run twice
-        </Tag>
+        </Badge>
       </span>
     </Note>
     <Note at={at + 4} x={X0} y={top + h(44)}>

@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { RapidFire, type RapidItem, Tick } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { NextLine, Note } from "../../editorial/ui";
+import { badgeStyle, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AA, CAP, pct, STRATA } from "./data";
@@ -15,6 +15,8 @@ const R_X = 800;
 const LIST_TOP = 320;
 const ROW = 56;
 const DOT_GAP = 44;
+/** The A/A test's two arms, blue house badges in the 27px line they sit in. */
+const AA_BADGE = badgeStyle("blue", 27);
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
 
@@ -171,7 +173,7 @@ const AaTest: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       <Note at={sameAt - 2} x={R_X + 40} y={c.y(330)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
-          <b style={{ color: BLUE_INK }}>A/A</b>: the same experience in both groups
+          <span style={AA_BADGE}>A</span> <span style={AA_BADGE}>A</span> the same experience in both groups
         </span>
       </Note>
       <Note at={platformAt} x={R_X + 40} y={c.y(390)}>

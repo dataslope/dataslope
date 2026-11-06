@@ -7,7 +7,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RECALL } from "./data";
-import { Drift, GOOD, GOOD_INK, Headline, Illustrative, Kicker, Svg, Tag, X0 } from "./kit";
+import { Drift, Headline, Illustrative, Kicker, Svg, Tag, X0 } from "./kit";
 
 /** Fig. 15: recall against position, 0 to 100% of the context. */
 const CX0 = 300;

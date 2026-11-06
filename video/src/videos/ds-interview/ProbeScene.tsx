@@ -2,9 +2,10 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { HAIRLINE, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { badgeStyle } from "../../editorial/ui";
 import { Drift, Headline, Kicker, Mono, X0 } from "./parts";
 
 /** Five columns of plain text across the page from X0 to 1800, a hairline
@@ -101,18 +102,19 @@ export const ProbeScene: React.FC = () => {
                   </div>
                 ) : null}
                 <div style={{ width: COL_W, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
-                  {/* The column's number, ringed. */}
+                  {/* The column's number, a house badge as a disc: blue tint, no ring. */}
                   <div
                     style={{
+                      ...label(22),
+                      ...badgeStyle("blue", 22),
+                      ...TABULAR,
                       width: 48,
                       height: 48,
+                      padding: 0,
                       borderRadius: 24,
-                      border: `2px solid ${BLUE_INK}`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      ...label(22, BLUE_INK),
-                      ...TABULAR,
                     }}
                   >
                     {i + 1}

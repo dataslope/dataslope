@@ -3,12 +3,11 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { Badge, badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { int, THINKING } from "./data";
 import {
-  Chip,
   FIG_Y,
   HBar,
   Headline,
@@ -37,6 +36,10 @@ const BAR_X = 430;
 const PX_PER_TOKEN = 0.33;
 const BAR_H = 54;
 const ASK_X = 1590;
+/** The `$ ?` on each row: a gray house badge whose tint deepens as
+ *  "actually" passes over its row. */
+const ASK = badgeStyle("gray", 24);
+const askTint = (glow: number) => `color-mix(in srgb, ${ASK.background} ${100 - Math.round(glow * 45)}%, var(--ds-gray-400))`;
 
 /**
  * Part 1 opens on the idea Unit 3 closed on: every token the model reads,
@@ -111,7 +114,9 @@ export const HookScene: React.FC = () => {
             </Note>
             {/* What each one costs: the question the part answers. */}
             <Note at={costAt - 4 + i * 4} x={ASK_X} y={ry + 6 + h(BAR_H) / 2 - 22}>
-              <Chip piece="$ ?" color={INK_SOFT} size={24} glow={pulse(frame, actuallyAt + i * 5, 20)} />
+              <Badge tone="gray" size={24} style={{ ...note(24), background: askTint(pulse(frame, actuallyAt + i * 5, 20)) }}>
+                $ ?
+              </Badge>
             </Note>
           </React.Fragment>
         );

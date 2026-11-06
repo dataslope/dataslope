@@ -19,7 +19,7 @@ import {
   label,
   PAPER,
 } from "../../editorial/style";
-import { Ink } from "../../editorial/ui";
+import { badgeStyle, Ink } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { MONO, SANS } from "../../theme/fonts";
 import { type Cell, ILLUSTRATIONS, VIDEO } from "./data";
@@ -747,16 +747,12 @@ export const DbTable: React.FC<{
             <div style={inner}>
             <span style={{ fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: isGhost(j) ? ACCENT_INK : INK_SOFT }}>{c}</span>
             {badge && bIn > 0 ? (
-              // The filled key badge, at 20px: within 12% of the 22px name.
+              // The key badge, a blue house badge at 20px: within 12% of the
+              // 22px name.
               <span
                 style={{
+                  ...badgeStyle("blue", 20),
                   fontFamily: SANS,
-                  fontWeight: 700,
-                  fontSize: 20,
-                  color: PAPER,
-                  background: KEY,
-                  borderRadius: 4,
-                  padding: "1px 7px",
                   opacity: bIn,
                   transform: `scale(${0.8 + 0.2 * bIn})`,
                   whiteSpace: "nowrap",
@@ -875,43 +871,33 @@ export const Aside: React.FC<{ size?: number; color?: string; children: React.Re
   <span style={{ ...body(size, true), color, whiteSpace: "nowrap" }}>{children}</span>
 );
 
-/** A chip: a few words of Inter in a soft rounded box. */
+/**
+ * A chip: a few words of Inter as the house badge (editorial/ui), a light
+ * tint of its hue in that hue's ink, no border. "soft" is gray on a lighter
+ * tint, in the soft ink.
+ */
 export const Chip: React.FC<{ tone?: "ink" | "key" | "warn" | "soft"; size?: number; width?: number; children: React.ReactNode }> = ({
   tone = "ink",
   size = 22,
   width,
   children,
-}) => {
-  const bg =
-    tone === "key"
-      ? MARK_KEY
-      : tone === "warn"
-        ? MARK_BAD
-        : tone === "soft"
-          ? `color-mix(in srgb, ${INK} 5%, ${PAPER})`
-          : PAPER;
-  const border = tone === "key" ? KEY : tone === "warn" ? ACCENT : tone === "soft" ? HAIRLINE : INK;
-  return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width,
-        boxSizing: "border-box",
-        padding: "6px 14px",
-        borderRadius: 8,
-        border: `2px solid ${border}`,
-        background: bg,
-        ...label(size, INK),
-        fontWeight: 600,
-        whiteSpace: "nowrap",
-      }}
-    >
-      {children}
-    </span>
-  );
-};
+}) => (
+  <span
+    style={{
+      ...label(size),
+      ...badgeStyle(tone === "key" ? "blue" : tone === "warn" ? "red" : "gray", size),
+      ...(tone === "soft" ? { color: INK_SOFT, background: "color-mix(in srgb, var(--ds-gray-400) 13%, transparent)" } : null),
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width,
+      boxSizing: "border-box",
+      fontWeight: 600,
+    }}
+  >
+    {children}
+  </span>
+);
 
 /** Code inside running text, at the text's own size. */
 export const Mono: React.FC<{ children: string; color?: string; weight?: number }> = ({ children, color, weight }) => (

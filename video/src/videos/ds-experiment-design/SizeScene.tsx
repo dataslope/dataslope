@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { BAR, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SIZE } from "./data";
@@ -12,8 +12,6 @@ import { at, Axes, Curve, Drift, Mark, pulse, type Scale, Svg, WARM, WARM_INK, X
 
 const BOX = { left: 170, right: 1060, top: 512, bottom: 820 };
 const COL_X = 1180;
-/** The gap between two of the four inputs, a hairline in its middle. */
-const INPUT_GAP = 60;
 const N_MAX = 30000;
 /** A subscript in the formula and its key: set low, and at 0.8em, which
  *  keeps the key's (24px) at the 19px floor. */
@@ -74,10 +72,8 @@ export const SizeScene: React.FC = () => {
     { name: "alpha", value: "0.05", valueAt: formulaAt, data: false },
     { name: "power", value: "0.8", valueAt: formulaAt + 3, data: false },
   ];
-  // Four columns of text, each as wide as its longest line, with a 60px gap
-  // and a hairline centred in it.
-  const widths = [190, 420, 100, 100];
-  const lefts = widths.map((_, i) => X0 + widths.slice(0, i).reduce((a, b) => a + b + INPUT_GAP, 0));
+  const widths = [230, 420, 130, 130];
+  const lefts = widths.map((_, i) => X0 + widths.slice(0, i).reduce((a, b) => a + b + 24, 0));
 
   const points = [
     { m: 2, v: SIZE.two, at: twoAt, color: BAR },
@@ -108,37 +104,25 @@ export const SizeScene: React.FC = () => {
           const tagAt = c.data ? dataAt : choicesAt + i * 3;
           return (
             <React.Fragment key={c.name}>
-              {/* The input's name, in the data blue when it comes from data;
-                  14px over its value. */}
+              {/* The input's name as a house badge, blue when it comes from
+                  data, gray when it is a choice. */}
               <div
                 style={{
+                  ...note(23),
+                  ...badgeStyle(c.data ? "blue" : "gray", 23),
                   position: "absolute",
                   left: lefts[i],
-                  top: y(328),
+                  top: y(318),
                   width: widths[i],
+                  boxSizing: "border-box",
+                  padding: "6px 0",
                   textAlign: "center",
-                  ...note(23, c.data ? BLUE_INK : INK),
-                  fontWeight: 650,
-                  whiteSpace: "nowrap",
                   opacity: p,
                   transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * pulse(frame, inputAts[i], 14)})`,
                 }}
               >
                 {c.name}
               </div>
-              {i > 0 ? (
-                <div
-                  style={{
-                    position: "absolute",
-                    left: lefts[i] - INPUT_GAP / 2,
-                    top: y(330),
-                    width: 1,
-                    height: y(444) - y(330),
-                    background: HAIRLINE,
-                    opacity: ease(frame, inputAts[i] - 2, 14),
-                  }}
-                />
-              ) : null}
               <Note at={c.valueAt} x={lefts[i]} y={y(372)} width={widths[i]} style={{ textAlign: "center" }}>
                 <span style={{ ...note(30, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{c.value}</span>
               </Note>

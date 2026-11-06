@@ -3,10 +3,11 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { ColumnRule, Note, Num } from "../../editorial/ui";
+import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, ColumnRule, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
+import { SANS } from "../../theme/fonts";
 import { ACROSS, BALANCE, CLOSING, CLOSING_TOTAL, money, MONTH_ENDS, OVER_TIME, VISITS_BOTH, VISITS_PER_DAY } from "./data";
 import { colsOf, DataTable, Drift, geoOf, MARK_BAD, MARK_OK, Mono, OK_INK, TableName, Verdict, X0 } from "./parts";
 
@@ -70,24 +71,24 @@ const Gap: React.FC<{ at: number }> = ({ at }) => (
   </div>
 );
 
-/** A visitor, as a small chip, at 24px: within 12% of the day's 24px count
- *  and the 26px "people" beside the row. One who came on both days fills
- *  with the highlighter on `both`. */
+/** A visitor, as the house's badge in the data blue, at 24px: within 12%
+ *  of the day's 24px count and the 26px "people" beside the row. One who
+ *  came on both days turns the highlighter's yellow on `both`. */
+const BLUE_BADGE = badgeStyle("blue", 24);
+const YELLOW_BADGE = badgeStyle("yellow", 24);
 const Who: React.FC<{ name: string; at: number; both?: number }> = ({ name, at, both }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = Math.min(1, pop(frame, at, fps, 14));
   const b = both === undefined ? 0 : ease(frame, both, 10);
+  const mix = (a: unknown, c: unknown) => (b > 0 ? `color-mix(in srgb, ${String(a)} ${Math.round(b * 100)}%, ${String(c)})` : String(c));
   return (
     <span
       style={{
-        display: "inline-block",
-        padding: "2px 14px 4px",
-        borderRadius: 999,
-        border: `2px solid ${BAR}`,
-        background: b > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${b * 100}%, ${PAPER})` : PAPER,
-        ...label(24, BLUE_INK),
-        fontWeight: 700,
+        ...BLUE_BADGE,
+        fontFamily: SANS,
+        background: mix(YELLOW_BADGE.background, BLUE_BADGE.background),
+        color: mix(YELLOW_BADGE.color, BLUE_BADGE.color),
         opacity: p,
         transform: `scale(${0.7 + 0.3 * p})`,
       }}

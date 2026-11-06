@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CONTAMINATION } from "./data";
-import { A_INK, Arrow, Drift, Headline, Marked, OK, OK_INK, pulse, Spot, Strike, Svg, Tag, TRAP, TRAP_INK, X0 } from "./parts";
+import { A_INK, Arrow, Drift, Headline, Marked, pulse, Spot, Strike, Svg, Tag, X0 } from "./parts";
 
 const PIPE_Y = 356;
 const PIPE = [
@@ -76,8 +76,8 @@ export const ContaminationScene: React.FC = () => {
         {/* How a test leaks: published, crawled, trained on. */}
         {PIPE.map((c, i) => (
           <React.Fragment key={c.text}>
-            <Tag at={chipAt[i]} x={c.x} y={y(PIPE_Y) - 4} width={c.w} color={i === 3 ? TRAP : INK}>
-              <span style={{ color: i === 3 ? TRAP_INK : INK }}>{c.text}</span>
+            <Tag at={chipAt[i]} x={c.x} y={y(PIPE_Y) - 4} width={c.w} tone={i === 3 ? "red" : "gray"}>
+              {c.text}
             </Tag>
             {i > 0 ? (
               <Arrow from={[PIPE[i - 1].x + PIPE[i - 1].w + 8, y(PIPE_Y) + 22]} to={[c.x - 10, y(PIPE_Y) + 22]} at={chipAt[i] - 6} dur={8} width={2} />
@@ -149,11 +149,11 @@ export const ContaminationScene: React.FC = () => {
             The defense: a test it <Marked at={seenAt - 2}>can&apos;t have seen</Marked>
           </span>
         </Ink>
-        <Tag at={privateAt - 2} x={X0 + 640} y={y(808) - 8} color={OK}>
-          <span style={{ color: OK_INK }}>kept private</span>
+        <Tag at={privateAt - 2} x={X0 + 640} y={y(808) - 8} tone="green">
+          kept private
         </Tag>
-        <Tag at={newerAt - 2} x={X0 + 840} y={y(808) - 8} color={OK}>
-          <span style={{ color: OK_INK }}>newer than its training</span>
+        <Tag at={newerAt - 2} x={X0 + 840} y={y(808) - 8} tone="green">
+          newer than its training
         </Tag>
       </Drift>
 

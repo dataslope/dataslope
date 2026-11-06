@@ -3,11 +3,11 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
-import { ColumnRule, FigLabel, Ink } from "../../editorial/ui";
+import { badgeStyle, ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TWIN_POSTQUEL, TWIN_SQL } from "./data";
-import { Card, Headline, KEY, KEY_INK, KEY_WASH, Listing, Mark, pulse, Spot, Tag, Wire } from "./parts";
+import { Card, Headline, KEY_INK, Listing, Mark, pulse, Spot, Tag, Wire } from "./parts";
 
 const SYLLABLES = ["post", "gres", "cue", "ell"];
 
@@ -16,7 +16,7 @@ const SYLLABLES = ["post", "gres", "cue", "ell"];
 const BUILT_IN = ["integer", "floating point", "character string"];
 const YOUR_OWN = ["polygon", "latitude and longitude"];
 
-/** A type, as a chip: ink for the built-ins, the data blue for one added. */
+/** A type, as a house badge: gray for the built-ins, blue for one added. */
 const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }> = ({ at, added = false, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -25,15 +25,11 @@ const Chip: React.FC<{ at: number; added?: boolean; children: React.ReactNode }>
   return (
     <div
       style={{
-        border: `2px solid ${added ? KEY : INK}`,
-        borderRadius: 8,
-        background: added ? KEY_WASH : "transparent",
-        padding: "5px 16px",
+        ...note(22),
+        ...badgeStyle(added ? "blue" : "gray", 22),
+        display: "block",
         opacity: p,
         transform: `translateY(${(1 - p) * 12}px)`,
-        whiteSpace: "nowrap",
-        ...note(22, added ? KEY_INK : INK),
-        fontWeight: added ? 650 : 500,
       }}
     >
       {children}

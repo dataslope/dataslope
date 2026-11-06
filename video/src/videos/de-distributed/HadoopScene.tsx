@@ -7,7 +7,6 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note, PAPER } 
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
 import { Arrow, Chip, Disk, Drift, Elbow, Machine, OK, OK_INK } from "./parts";
 
 const BOX_X = [300, 610, 920, 1230];

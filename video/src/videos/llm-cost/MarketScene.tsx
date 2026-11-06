@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FIVES, int, OVERSIZED, RATES, SPREAD, THRESHOLDS, usd } from "./data";
@@ -33,6 +33,9 @@ const ROW_DY = 48;
 const IN_R = 640;
 const OUT_R = 790;
 const RATIO_R = 890;
+/** The house badge (orange, the output hue) on the ratios over five, and its side padding. */
+const RATIO_BADGE = badgeStyle("orange", 24);
+const RATIO_PAD = Math.round(24 * 0.55);
 const BAR_X = 930;
 const PX_PER_DOLLAR = 30;
 const TABLE_R = 1236;
@@ -185,15 +188,14 @@ export const MarketScene: React.FC = () => {
                   {isFive >= 0 ? (
                     <Marked at={Math.round(fiveAt + ((tenRowsAt - fiveAt) * isFive) / Math.max(1, fivesIdx.length - 1))}>{r.ratioPrinted}</Marked>
                   ) : (
-                    // More than five: outlined on "never less", the pill sized to its text
-                    // ("8.3x" is wider than "6x"), the digits still on the column's right edge.
+                    // More than five: a house badge on "never less", its tint fading in, sized
+                    // to its text ("8.3x" is wider than "6x"), the digits still on the column's
+                    // right edge.
                     <span
                       style={{
-                        display: "inline-block",
-                        padding: "0 0.4em",
-                        marginRight: "-0.4em",
-                        borderRadius: 18,
-                        boxShadow: `inset 0 0 0 2px color-mix(in srgb, ${OUTPUT_INK} ${Math.round(ease(frame, neverAt, 10) * 100)}%, transparent)`,
+                        ...RATIO_BADGE,
+                        marginRight: -RATIO_PAD,
+                        background: `color-mix(in srgb, ${RATIO_BADGE.background} ${Math.round(ease(frame, neverAt, 10) * 100)}%, transparent)`,
                       }}
                     >
                       {r.ratioPrinted}

@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
-import { FigLabel, Ink, Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
@@ -209,15 +209,15 @@ export const NullScene: React.FC = () => {
 
       {/* "Could two of them share one?" */}
       <Ink at={shareAt - 6} dur={16} style={{ left: TABLE_X, top: g.rowTop(1) + h(16), display: "flex", gap: 18, alignItems: "center" }}>
+        {/* The would-be second email: a gray house badge on a lighter tint,
+            in the soft ink, for a value not stored (it was dashed). */}
         <span
           style={{
-            display: "inline-block",
-            padding: "6px 16px",
-            border: `2px dashed ${HAIRLINE}`,
-            borderRadius: 6,
+            ...badgeStyle("gray", 26),
             fontFamily: MONO,
-            fontSize: 26,
+            fontWeight: 500,
             color: INK_SOFT,
+            background: "color-mix(in srgb, var(--ds-gray-400) 13%, transparent)",
           }}
         >
           {stored[1]}

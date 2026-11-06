@@ -3,11 +3,11 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { body, label, note } from "../../editorial/style";
-import { ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
+import { badgeStyle, ColumnRule, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PIPE } from "./data";
-import { Chip, ChipRow, CHIP_LINE, FIG_Y, Headline, HIGHLIGHT, INK, INK_SOFT, Kicker, LOST, LOST_INK, Mark, pulse, SURFACE, X0 } from "./parts";
+import { Chip, ChipRow, FIG_Y, Headline, HIGHLIGHT, INK, INK_SOFT, Kicker, LOST, LOST_INK, Mark, pulse, X0 } from "./parts";
 
 const REVIEW_Y = 330;
 const TOPIC_Y = 436;
@@ -246,13 +246,19 @@ export const TwoPipelinesScene: React.FC = () => {
   );
 };
 
-/** Fig. 2's menu as one pipeline's recipe: every step starts as the menu's
- *  dashed option, a step the pipeline takes turns solid (with a brief
- *  highlight as it lights), and the steps it skips fade at `skipAt`. */
+/** A recipe step's badge: on offer, a faint gray tint in the soft ink (where
+ *  the menu's dashed option was); taken, the full house tint in the ink. */
+const OFFER_TINT = "color-mix(in srgb, var(--ds-gray-400) 9%, transparent)";
+const TAKEN = badgeStyle("gray", 20);
+
+/** Fig. 2's menu as one pipeline's recipe, a row of house badges: every step
+ *  starts as one of the menu's options, a step the pipeline takes fills in
+ *  (with a brief highlight as it lights), and the steps it skips fade at
+ *  `skipAt`. */
 const Recipe: React.FC<{ top: number; at: number; lit: Partial<Record<Step, number>>; skipAt: number }> = ({ top, at, lit, skipAt }) => {
   const frame = useCurrentFrame();
   return (
-    <div style={{ position: "absolute", left: RECIPE_X, top, display: "flex", gap: 6 }}>
+    <div style={{ position: "absolute", left: RECIPE_X, top, height: RECIPE_H, display: "flex", alignItems: "center", gap: 8 }}>
       {STEPS.map((s, k) => {
         const p = ease(frame, at + k * 2, 12);
         const litAt = lit[s];
@@ -263,27 +269,19 @@ const Recipe: React.FC<{ top: number; at: number; lit: Partial<Record<Step, numb
           <div
             key={s}
             style={{
+              ...label(20, on > 0.5 ? INK : INK_SOFT),
+              ...TAKEN,
               position: "relative",
-              height: RECIPE_H,
-              padding: "0 10px",
-              display: "flex",
-              alignItems: "center",
+              background: "none",
+              color: on > 0.5 ? INK : INK_SOFT,
               opacity: p * (1 - 0.6 * off),
               transform: `translateY(${(1 - p) * 8}px)`,
             }}
           >
-            <div style={{ position: "absolute", inset: 0, borderRadius: 10, border: `2px dashed ${CHIP_LINE}`, opacity: 1 - on }} />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: 10,
-                border: `2px solid ${INK}`,
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${(glow * 100).toFixed(0)}%, ${SURFACE})`,
-                opacity: on,
-              }}
-            />
-            <span style={{ position: "relative", ...label(20, on > 0.5 ? INK : INK_SOFT), whiteSpace: "nowrap" }}>{s}</span>
+            <div style={{ position: "absolute", inset: 0, borderRadius: TAKEN.borderRadius, background: OFFER_TINT, opacity: 1 - on }} />
+            <div style={{ position: "absolute", inset: 0, borderRadius: TAKEN.borderRadius, background: TAKEN.background, opacity: on }} />
+            {glow > 0 ? <div style={{ position: "absolute", inset: 0, borderRadius: TAKEN.borderRadius, background: HIGHLIGHT, opacity: glow }} /> : null}
+            <span style={{ position: "relative" }}>{s}</span>
           </div>
         );
       })}

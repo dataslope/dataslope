@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, type BadgeTone, Note } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -111,19 +111,20 @@ export const MetricScene: React.FC = () => {
   const drawAt = (i: number) => threeAt + i * 10;
 
   // ── Kinds ──
-  const cols = [
-    { title: "Primary", at: primaryAt, ink: OK_INK, items: [{ text: "checkout conversion", at: primaryAt + 10 }] },
+  const cols: { title: string; at: number; ink: string; tone: BadgeTone; items: Box[] }[] = [
+    { title: "Primary", at: primaryAt, ink: OK_INK, tone: "green", items: [{ text: "checkout conversion", at: primaryAt + 10 }] },
     {
       title: "Guardrail",
       at: guardAt,
       ink: BLUE_INK,
+      tone: "blue",
       items: [
         { text: "page speed", at: guardItems[0] },
         { text: "refunds", at: guardItems[1] },
         { text: "unsubscribes", at: guardItems[2] },
       ],
     },
-    { title: "Vanity", at: vanityAt, ink: ACCENT_INK, items: [{ text: "total registered users", at: vanityAt + 12 }] },
+    { title: "Vanity", at: vanityAt, ink: ACCENT_INK, tone: "red", items: [{ text: "total registered users", at: vanityAt + 12 }] },
   ];
 
   // ── North star ──
@@ -217,8 +218,9 @@ export const MetricScene: React.FC = () => {
           <span style={{ ...note(30, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>×{DRIFT.spread}</span>
         </Note>
 
-        {/* ── Question 2: three kinds of metric, as three columns of text
-            spread across the page with a hairline centred in each gap ── */}
+        {/* ── Question 2: three kinds of metric, as three columns spread
+            across the page with a hairline centred in each gap: each kind's
+            name, and under it its metrics as badges in the kind's hue ── */}
         <div
           style={{
             position: "absolute",
@@ -252,15 +254,13 @@ export const MetricScene: React.FC = () => {
                     <div
                       key={it.text}
                       style={{
-                        ...note(28, INK),
-                        lineHeight: "36px",
-                        marginTop: i === 0 ? 14 : 22,
-                        whiteSpace: "nowrap",
+                        display: "flex",
+                        marginTop: i === 0 ? 14 : 12,
                         opacity: p,
                         transform: `translateY(${(1 - p) * 10}px)`,
                       }}
                     >
-                      {it.text}
+                      <span style={{ ...note(26, INK), ...badgeStyle(c.tone, 26) }}>{it.text}</span>
                     </div>
                   );
                 })}

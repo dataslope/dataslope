@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { FigLabel, Ink, NextLine } from "../../editorial/ui";
+import { body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { badgeStyle, FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -109,14 +109,10 @@ export const ChooseScene: React.FC = () => {
                   <span style={{ opacity: ease(frame, a.actAt - 4, 10), transform: `translateY(${(1 - ease(frame, a.actAt - 4, 10)) * 8}px)`, display: "inline-block" }}>
                     <span
                       style={{
+                        // A red house badge, within 12% of the question it
+                        // answers: one line, one size.
+                        ...badgeStyle("red", 35),
                         fontFamily: MONO,
-                        // Within 12% of the question it answers: one line, one size.
-                        fontSize: 35,
-                        fontWeight: 700,
-                        color: ACCENT_INK,
-                        padding: "2px 14px",
-                        border: `2px solid ${ACCENT_INK}`,
-                        borderRadius: 8,
                       }}
                     >
                       {a.action}

@@ -2,11 +2,12 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, Mark, OK, OK_INK, X0 } from "./parts";
+import { badgeStyle } from "../../editorial/ui";
+import { Drift, Headline, Kicker, Mark, OK_INK, X0 } from "./parts";
 
 /** Two columns of text, each at its left edge, the second 880px in, so a
  *  column's figure (FIG_X in, 220 wide) ends 50px short of the hairline in
@@ -198,19 +199,16 @@ export const AiScene: React.FC = () => {
         <Panel i={3} at={allowAt} title="Assistant allowed, or banned">
           <div style={{ display: "flex", gap: 18, marginTop: 6 }}>
             {[
-              { at: allowAt + 6, text: "allowed", color: OK, ink: OK_INK },
-              { at: banAt, text: "banned", color: ACCENT, ink: ACCENT_INK },
+              { at: allowAt + 6, text: "allowed", tone: "green" as const },
+              { at: banAt, text: "banned", tone: "red" as const },
             ].map((pill) => {
               const q = ease(frame, pill.at - 2, 12);
               return (
                 <div
                   key={pill.text}
                   style={{
-                    padding: "8px 22px",
-                    borderRadius: 28,
-                    border: `2px solid ${pill.color}`,
-                    background: `color-mix(in srgb, ${pill.color} 16%, ${PAPER})`,
-                    ...label(24, pill.ink),
+                    ...label(24),
+                    ...badgeStyle(pill.tone, 24),
                     opacity: q,
                     transform: `scale(${0.8 + 0.2 * q})`,
                   }}

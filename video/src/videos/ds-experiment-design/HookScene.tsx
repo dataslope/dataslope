@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -11,15 +11,16 @@ import { Drift, Headline, Kicker, Mark, OK, OK_INK, pulse, Spot, X0 } from "./pa
 import { mulberry32 } from "../da-statistics-communication/parts";
 
 const LINE_Y = 600;
-/** The five decisions, at 26px with 44px between them, end near 1000,
- *  clear of the launch tick. */
+/** The five decisions, gray house badges at 22px with 10px between them,
+ *  end near 980, clear of the launch tick. */
 const LAUNCH_X = 1110;
 const LINE_END = 1800;
 const CHIP_Y = 460;
-const WORD_GAP = 44;
-/** How far above the line the settled words' tops sit: their 34px line
- *  plus 14px of air over the rule. */
-const WORD_DROP = 48;
+const BADGE_GAP = 10;
+/** How far above the line the settled badges' tops sit: their 34px box
+ *  plus 12px of air over the rule. */
+const BADGE_DROP = 46;
+const DECISION_BADGE = badgeStyle("gray", 22);
 const DOTS_X = 1170;
 const DOTS_Y = 480;
 
@@ -119,11 +120,10 @@ export const HookScene: React.FC = () => {
         </Note>
 
         {/* Live: two versions, and users split between them at random. */}
-        {/* The two versions named in their own inks over the dots, a label
-            12px above the group it names. */}
+        {/* The two versions as house badges in their own hues over the dots. */}
         {[
-          { text: "A · old", ink: BLUE_INK, x: DOTS_X },
-          { text: "B · new", ink: OK_INK, x: DOTS_X + 150 },
+          { text: "A · old", tone: "blue" as const, x: DOTS_X },
+          { text: "B · new", tone: "green" as const, x: DOTS_X + 150 },
         ].map((c, i) => {
           const p = ease(frame, versionsAt + i * 4, 10);
           return (
@@ -132,10 +132,9 @@ export const HookScene: React.FC = () => {
               style={{
                 position: "absolute",
                 left: c.x,
-                top: y(DOTS_Y) - h(46),
-                ...label(24, c.ink),
-                fontWeight: 700,
-                whiteSpace: "nowrap",
+                top: y(DOTS_Y) - h(60),
+                ...label(21),
+                ...badgeStyle(c.tone, 21),
                 opacity: p,
                 transform: `translateY(${(1 - p) * 10}px)`,
               }}
@@ -162,17 +161,17 @@ export const HookScene: React.FC = () => {
           })}
         </svg>
 
-        {/* Before launch: the five decisions, plain words in a row held apart
-            by space, settling onto the line. Each holds its place before it
-            inks, so the row never reflows; the two the plan starts from take
-            the highlighter on their words. */}
+        {/* Before launch: the five decisions, gray house badges in a row,
+            settling onto the line. Each holds its place before it inks, so the
+            row never reflows; the two the plan starts from take the
+            highlighter's yellow. */}
         <div
           style={{
             position: "absolute",
             left: X0,
-            top: y(CHIP_Y) + (y(LINE_Y) - h(WORD_DROP) - y(CHIP_Y)) * drop,
+            top: y(CHIP_Y) + (y(LINE_Y) - h(BADGE_DROP) - y(CHIP_Y)) * drop,
             display: "flex",
-            gap: WORD_GAP,
+            gap: BADGE_GAP,
             whiteSpace: "nowrap",
           }}
         >
@@ -185,23 +184,14 @@ export const HookScene: React.FC = () => {
               <span
                 key={d.text}
                 style={{
-                  display: "inline-block",
-                  ...note(26, INK),
-                  fontWeight: 650,
+                  ...note(22),
+                  ...DECISION_BADGE,
+                  background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, ${DECISION_BADGE.background})` : DECISION_BADGE.background,
                   opacity: p,
                   transform: `translateY(${(1 - p) * -14}px) scale(${1 + 0.06 * bump})`,
                 }}
               >
-                <span
-                  style={{
-                    padding: "2px 10px 3px",
-                    margin: "0 -10px",
-                    borderRadius: 6,
-                    background: lit > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(lit * 100)}%, transparent)` : undefined,
-                  }}
-                >
-                  {d.text}
-                </span>
+                {d.text}
               </span>
             );
           })}

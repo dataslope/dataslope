@@ -7,7 +7,7 @@ import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { QUOTED, usd } from "./data";
-import { A, A_INK, Arrow, Check, Drift, FAINT, Headline, Marked, OK, PANEL, pulse, Svg, Tag, track, TRAP, TRAP_INK, X0 } from "./parts";
+import { A, A_INK, Arrow, Check, Drift, FAINT, Headline, Marked, OK, pulse, Svg, Tag, track, TRAP, TRAP_INK, X0 } from "./parts";
 
 const BX0 = 440;
 const BX1 = 1440;
@@ -82,13 +82,13 @@ export const ReportingScene: React.FC = () => {
         Three, selective reporting.
       </Headline>
       {/* The launch post, and what it picks. */}
-      <Tag at={launchAt - 2} x={X0} y={y(300)} fill={PANEL}>
+      <Tag at={launchAt - 2} x={X0} y={y(300)}>
         launch post
       </Tag>
       <Arrow from={[X0 + 172, y(300) + 24]} to={[X0 + 238, y(300) + 24]} at={picksAt - 4} dur={10} width={2} />
       {picks.map((p, i) => (
-        <Tag key={p.text} at={p.at} x={p.x} y={y(300)} color={i === 2 ? TRAP : INK}>
-          <span style={{ color: i === 2 ? TRAP_INK : INK }}>{p.text}</span>
+        <Tag key={p.text} at={p.at} x={p.x} y={y(300)} tone={i === 2 ? "red" : "gray"}>
+          {p.text}
         </Tag>
       ))}
       <FigLabel n="7" title="GPT-6 Astra on ARC-AGI-3, run by ARC Prize, September 2026" at={astraAt - 6} x={X0} y={y(420)} />

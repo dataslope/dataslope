@@ -2,8 +2,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, PAPER } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { body, INK, INK_SOFT, label } from "../../editorial/style";
+import { badgeStyle, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ART } from "./data";
@@ -34,39 +34,40 @@ const PILLS_RIGHT = PILL_XS[STEPS.length - 1] + pillW(STEPS[STEPS.length - 1]);
 const BR_LEFT = PILL_XS[1];
 const BR_MID = (BR_LEFT + PILLS_RIGHT) / 2;
 
-/** A named step or use, as a rounded pill; `dashed` from `dashAt` marks it
- *  optional. */
-const Pill: React.FC<{ text: string; x: number; y: number; at: number; dashAt?: number; size?: number; width?: number }> = ({
+/** A named step or use, as a gray house badge (a light tint, no border) on a
+ *  fixed box; from `lightAt` its tint halves and its ink softens, which marks
+ *  the step optional. */
+const Pill: React.FC<{ text: string; x: number; y: number; at: number; lightAt?: number; size?: number; width?: number }> = ({
   text,
   x,
   y,
   at,
-  dashAt,
+  lightAt,
   size = STEP_SIZE,
   width,
 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
-  const dashed = dashAt !== undefined && frame >= dashAt;
+  const light = lightAt === undefined ? 0 : ease(frame, lightAt, 10);
+  const badge = badgeStyle("gray", size);
   return (
     <div
       style={{
+        ...label(size),
+        ...badge,
         position: "absolute",
         left: x,
         top: y,
         width: width ?? pillW(text),
         height: Math.round(size * 1.9),
         boxSizing: "border-box",
-        border: `2px ${dashed ? "dashed" : "solid"} ${INK}`,
-        borderRadius: 999,
-        background: PAPER,
+        padding: 0,
+        background: `color-mix(in srgb, ${badge.background} ${Math.round(100 - light * 55)}%, transparent)`,
+        color: `color-mix(in srgb, ${INK_SOFT} ${Math.round(light * 100)}%, ${badge.color})`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...label(size, INK),
-        fontWeight: 600,
-        whiteSpace: "nowrap",
         opacity: p,
         transform: `translateY(${(1 - p) * 10}px)`,
       }}
@@ -137,14 +138,14 @@ export const HalvesScene: React.FC = () => {
       <Spot id={ART.conveyor} at={cleaningAt} left={LEFT_X + 20} top={y(TITLE_Y) + 66} width={700} height={300} />
       {STEPS.map((s, i) => (
         <div key={s} style={{ position: "absolute", inset: 0, transform: `translateY(${lift(i)}px)` }}>
-          <Pill text={s} x={xOf(i)} y={pillY} at={cleaningAt + 4 + i * 3} dashAt={i === 0 ? undefined : optionalAt + i * 2} />
+          <Pill text={s} x={xOf(i)} y={pillY} at={cleaningAt + 4 + i * 3} lightAt={i === 0 ? undefined : optionalAt + i * 2} />
         </div>
       ))}
       <Ink at={sameAt - 2} dur={16} style={{ left: LEFT_X, top: pillY + 64, whiteSpace: "nowrap", opacity: clear }}>
         <span style={{ ...body(28, true), color: INK_SOFT }}>the same toolbox in every project</span>
       </Ink>
       <Ink at={optionalAt} dur={14} style={{ right: 1920 - PILLS_RIGHT, top: pillY + 66, whiteSpace: "nowrap", opacity: clear }}>
-        <span style={{ ...label(22, INK_SOFT) }}>dashed: optional</span>
+        <span style={{ ...label(22, INK_SOFT) }}>lighter: optional</span>
       </Ink>
       {/* The optional steps, bracketed: what the goal decides. */}
       {bracket > 0 ? (

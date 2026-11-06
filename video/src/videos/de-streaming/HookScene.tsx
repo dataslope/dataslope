@@ -3,7 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { badgeStyle, Note } from "../../editorial/ui";
+import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { STREAM } from "./data";
@@ -118,21 +119,21 @@ export const HookScene: React.FC = () => {
         </Note>
         {tests.map((t, i) => (
           <Note key={t.cue} at={t.at - 2} x={X0} y={y(466) + i * h(58)}>
-            {/* The number in a ring, at 26px: within 12% of the line's 29,
-                so the line keeps one size. */}
+            {/* The number on a tinted disc, no ring, at 26px: within 12% of
+                the line's 29, so the line keeps one size. */}
             <span style={{ display: "inline-flex", alignItems: "center", gap: 16, whiteSpace: "nowrap" }}>
               <span
                 style={{
+                  ...badgeStyle("gray", 26),
                   width: 42,
                   height: 42,
+                  padding: 0,
                   flex: "none",
-                  boxSizing: "border-box",
                   borderRadius: 21,
-                  border: `2.5px solid ${INK}`,
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  ...label(26, INK),
+                  fontFamily: SANS,
                   fontWeight: 800,
                   ...TABULAR,
                 }}

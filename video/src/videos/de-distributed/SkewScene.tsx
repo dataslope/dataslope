@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, label, note, PAPER } from "../.
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds, inkOf } from "../../theme/brand";
+import { ds } from "../../theme/brand";
 import { at as atScale, Axes, type Scale } from "../da-statistics-communication/parts";
 import { count, SKEW } from "./data";
 import { Chip, Drift, OK, OK_INK, Svg } from "./parts";
@@ -17,7 +17,6 @@ const BAR_W = 74;
 const GAP = 24;
 const R_X = 1090;
 const HOT = ds("orange", 500);
-const HOT_INK = inkOf.orange;
 
 /** Rows per partition that are not the guest's: the same before and after salting. */
 const NORMAL = SKEW.before.map((v, i) => v - (i === SKEW.guestPartition ? SKEW.guestRows : 0));

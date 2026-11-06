@@ -6,7 +6,7 @@ import { body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { A, A_INK, Arrow, B, Check, Cross, Drift, Headline, Marked, OK, OK_INK, Spot, Svg, Tag, TRAP, TRAP_INK, X0 } from "./parts";
+import { A, A_INK, Arrow, B, Check, Cross, Drift, Headline, Marked, OK, Spot, Svg, Tag, TRAP, TRAP_INK, X0 } from "./parts";
 
 const SRC = { x: X0, y: 420, w: 470 };
 const DST_X = 760;
@@ -87,7 +87,7 @@ export const MismatchScene: React.FC = () => {
           <Marked at={performanceAt - 2}>repo-patch tasks, like SWE-bench</Marked>
         </Tag>
         {/* "...if your task looks like it": a place for your task, filled at "invoices". */}
-        <Tag at={yourTaskAt - 2} out={invoicesAt - 4} x={DST_X} y={y(DST.invoices) - 24} color={INK_SOFT} dashed>
+        <Tag at={yourTaskAt - 2} out={invoicesAt - 4} x={DST_X} y={y(DST.invoices) - 24} light>
           <span style={{ color: INK_SOFT }}>your task?</span>
         </Tag>
         <Arrow
@@ -98,11 +98,11 @@ export const MismatchScene: React.FC = () => {
           color={INK_SOFT}
           dash="7 6"
         />
-        <Tag at={codingAt - 2} out={out8} x={DST_X} y={y(DST.coding) - 24} color={OK}>
-          <span style={{ color: OK_INK }}>agentic coding</span>
+        <Tag at={codingAt - 2} out={out8} x={DST_X} y={y(DST.coding) - 24} tone="green">
+          agentic coding
         </Tag>
-        <Tag at={invoicesAt - 4} out={out8} x={DST_X} y={y(DST.invoices) - 24} color={TRAP} dashed>
-          <span style={{ color: TRAP_INK }}>reading your invoices</span>
+        <Tag at={invoicesAt - 4} out={out8} x={DST_X} y={y(DST.invoices) - 24} tone="red" light>
+          reading your invoices
         </Tag>
         <Arrow from={[SRC.x + SRC.w + 10, y(SRC.y) - 6]} to={[DST_X - 12, y(DST.coding)]} at={codingAt - 6} out={out8} color={OK} />
         <Arrow from={[SRC.x + SRC.w + 10, y(SRC.y) + 6]} to={[DST_X - 12, y(DST.invoices)]} at={nothingAt - 4} out={out8} color={TRAP} dash="7 6" />
@@ -129,8 +129,8 @@ export const MismatchScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Tag at={bestAt - 2} out={out8} x={X0 + 500} y={y(BOARD_Y) + 2 * BOARD_STEP - 6} color={OK}>
-          <span style={{ color: OK_INK }}>can still be the best for your task</span>
+        <Tag at={bestAt - 2} out={out8} x={X0 + 500} y={y(BOARD_Y) + 2 * BOARD_STEP - 6} tone="green">
+          can still be the best for your task
         </Tag>
       </Drift>
 

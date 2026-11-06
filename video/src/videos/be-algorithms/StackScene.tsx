@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { HIGHLIGHT, note } from "../../editorial/style";
+import { HAIRLINE, HIGHLIGHT, note } from "../../editorial/style";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -200,7 +200,7 @@ export const StackScene: React.FC = () => {
                 return (
                   <React.Fragment key={`c${i}`}>
                     <Svg opacity={ease(frame, q.at + 10 + i * 4, 8)}>
-                      <line x1={q.x + i * 76 + 32} x2={q.x + i * 76 + 32} y1={qTop + 62} y2={qTop + 82} stroke={ok ? INK : ACCENT} strokeWidth={2.4} strokeDasharray={ok ? undefined : "4 3"} />
+                      <line x1={q.x + i * 76 + 32} x2={q.x + i * 76 + 32} y1={qTop + 62} y2={qTop + 82} stroke={ok ? HAIRLINE : `color-mix(in srgb, ${ACCENT} 45%, transparent)`} strokeWidth={1.5} strokeLinecap="round" />
                     </Svg>
                     <Cell x={q.x + i * 76} y={qTop + 86} at={q.at + 10 + i * 4} value={c} size={28} w={64} h={58} tone={ok ? "plain" : "bad"} />
                   </React.Fragment>

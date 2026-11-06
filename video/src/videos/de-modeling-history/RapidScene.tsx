@@ -4,8 +4,8 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { NextLine, Note, Num } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
@@ -57,26 +57,20 @@ const Degenerate: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 11. Junk dimension ──────────────────────────────────────────────────────
 
-/** One value a flag can take, as a small outlined chip, stacked under the
- *  flag's name. */
+/** One value a flag can take, as the house's badge (gray, in the mono
+ *  face), stacked under the flag's name. */
 const Chip: React.FC<{ children: React.ReactNode; at: number }> = ({ children, at }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   return (
     <div
       style={{
+        ...badgeStyle("gray", 22),
+        display: "block",
+        fontFamily: MONO,
+        textAlign: "center",
         opacity: p,
         transform: `translateY(${(1 - p) * 8}px)`,
-        fontFamily: MONO,
-        fontSize: 22,
-        fontWeight: 600,
-        color: INK,
-        border: `1.5px solid ${INK}`,
-        borderRadius: 6,
-        padding: "4px 12px",
-        background: PAPER,
-        whiteSpace: "nowrap",
-        textAlign: "center",
       }}
     >
       {children}
@@ -334,9 +328,9 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
     <Note at={at} x={R_X} y={top}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), width: 120 }}>{name}</span>
-        {/* The key's value in an outlined tag, at 24px: within 12% of the
-            22px name and the 24px bytes on its line. */}
-        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK, border: `1.5px solid ${INK}`, borderRadius: 6, padding: "4px 12px" }}>{value}</span>
+        {/* The key's value as the house's badge, at 24px: within 12% of
+            the 22px name and the 24px bytes on its line. */}
+        <span style={{ ...badgeStyle("gray", 24), fontFamily: MONO }}>{value}</span>
         <span style={{ ...note(24, BLUE_INK), fontWeight: 700, opacity: ease(frame, bytesAt, 10) }}>
           {kind ? `${kind}, ` : ""}
           <Num>{bytes}</Num> bytes

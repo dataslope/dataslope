@@ -3,8 +3,8 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { badgeStyle, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Mark, MARK_OK, OK_INK, pulse, Strike, X0 } from "./parts";
@@ -186,13 +186,8 @@ export const DesignScene: React.FC = () => {
             <div
               key={c.text}
               style={{
-                padding: "6px 14px",
-                borderRadius: 6,
-                border: `2px solid ${INK}`,
-                background: PAPER,
-                ...note(22, INK),
-                fontWeight: 650,
-                whiteSpace: "nowrap",
+                ...note(22),
+                ...badgeStyle("gray", 22),
                 opacity: p * q2,
                 transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * Math.max(pulse(frame, c.at, 14), ...c.again.map((t) => pulse(frame, t, 14)))})`,
               }}
