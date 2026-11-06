@@ -33,7 +33,6 @@ export {
   MARK,
   MARK_BAD,
   MARK_OK,
-  Mono,
   pulse,
   Strike,
   Svg,
@@ -45,6 +44,17 @@ export {
 } from "../da-sql/parts";
 export { colsOf, geoOf, rowsAt } from "../da-advanced-sql/parts";
 export { OK, OK_INK };
+
+/**
+ * Code inside a line of type, as da-sql's Mono, but at 0.92em so it stays
+ * within the 12% a line's sizes may differ by (README, "One line, one size,
+ * one family"); never under 19px.
+ */
+export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
 
 /** The page's right margin. */
 export const RIGHT = 1824;
@@ -374,21 +384,6 @@ export const Pill: React.FC<{
       )}
     </Ink>
   );
-};
-
-/**
- * The separator between two columns of text set side by side: a vertical
- * 1px hairline in the gap, the height of the columns' text, drawn down on
- * `at` (the cue of the column to its right). Never before the first column
- * or after the last, and never where an arrow already separates them.
- */
-export const VRule: React.FC<{ x: number; top: number; bottom: number; at: number; out?: number; dim?: number }> = ({ x, top, bottom, at, out, dim }) => {
-  const frame = useCurrentFrame();
-  const p = ease(frame, at, 14);
-  const o = out === undefined ? 0 : ease(frame, out, 10);
-  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
-  if (p <= 0 || o >= 1) return null;
-  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height: (bottom - top) * p, background: HAIRLINE, opacity: (1 - o) * (1 - d) }} />;
 };
 
 // ── The hero ─────────────────────────────────────────────────────────────────

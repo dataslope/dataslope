@@ -318,7 +318,7 @@ export const EvoScene: React.FC = () => {
             <div style={{ ...note(23, INK), whiteSpace: "nowrap", marginTop: 2 }}>
               {r.text}
               {r.reader ? (
-                <span style={{ ...label(20, INK_SOFT), marginLeft: 14 }}>
+                <span style={{ ...label(21, INK_SOFT), marginLeft: 14 }}>
                   ({r.reader} reader, {r.data} data)
                 </span>
               ) : null}

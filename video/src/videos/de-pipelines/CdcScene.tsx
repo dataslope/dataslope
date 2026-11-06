@@ -48,7 +48,7 @@ const Entry: React.FC<{ at: number; x: number; y: number; op: string; text: stri
         transform: `translateX(${(1 - p) * -14}px)`,
       }}
     >
-      <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 700, color: BLUE_INK }}>{op}</span>
+      <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: BLUE_INK }}>{op}</span>
       <span style={{ ...note(20, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{text}</span>
     </div>
   );
