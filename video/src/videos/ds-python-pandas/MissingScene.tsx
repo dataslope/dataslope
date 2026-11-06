@@ -18,11 +18,11 @@ import {
   Mark,
   MARK_BAD,
   MARK_OK,
-  Mono,
   OK_INK,
   TableName,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 380;
 const SIZE = 20;

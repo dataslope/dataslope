@@ -22,12 +22,12 @@ import {
   MARK_BAD,
   MARK_KEY,
   MARK_OK,
-  Mono,
   OK,
   OK_INK,
   Spot,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 /** Where the answers go: right of the list. */
 const R_X = 800;

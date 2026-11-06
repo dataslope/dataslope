@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { QMono, QuestionCard } from "../../editorial/interview";
+import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
@@ -19,10 +19,10 @@ import {
   Mark,
   MARK,
   MARK_KEY,
-  Mono,
   TableName,
   X0,
 } from "./parts";
+import { Mono, QMono } from "./mono";
 
 const TOP = 340;
 const SPLIT_X = 560;

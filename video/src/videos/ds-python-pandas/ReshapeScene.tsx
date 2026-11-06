@@ -16,10 +16,10 @@ import {
   Listing,
   Mark,
   MARK_KEY,
-  Mono,
   TableName,
   X0,
 } from "./parts";
+import { Mono } from "./mono";
 
 const TOP = 420;
 const LONG_X = 700;
