@@ -9,7 +9,7 @@ import { ds } from "../../theme/brand";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DEADLOCK } from "./data";
-import { Drift, Flow, LockGlyph, OK, OK_INK, pulse, THREAD, ThreadName, X0 } from "./parts";
+import { Drift, Flow, LockGlyph, OK, OK_INK, pulse, THREAD, ThreadName, tint, X0 } from "./parts";
 
 /** The wait-for picture, in layout units: two locks between two threads. */
 const A = { x: 410, y: 350, w: 140, h: 64 };

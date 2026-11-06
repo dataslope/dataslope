@@ -23,8 +23,8 @@ const REQUESTS = [
 const REQ_TOP = 424;
 const REQ_PITCH = 104;
 const CARD = { w: 620, h: 64 };
-const NEW = { x: 890, w: 180 };
-const EDIT = { x: 1090, w: 320 };
+const NEW = { x: 870, w: 180 };
+const EDIT = { x: 1070, w: 320 };
 const OPT_H = 46;
 
 /**
@@ -126,7 +126,7 @@ export const HookScene: React.FC = () => {
           );
         })}
 
-        <ArtSpot id="armadillo" at={shopAt + 14} left={1500} top={y(468)} h={220} />
+        <ArtSpot id="armadillo" at={shopAt + 14} left={1494} top={y(468)} h={210} />
 
         {/* The round. */}
         <Line x={X0} y={chipsTop + 8} at={fifteenAt - 2} size={30} weight={700}>

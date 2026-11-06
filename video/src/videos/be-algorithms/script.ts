@@ -20,12 +20,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * blue data.
  *
  * The watercolors (illustrations.json): the pangolin on the opening ("hook"
- * and "plan"), then one spot per figure, in the whitespace beside it: the
- * hourglass by question one's modeled 83 minutes, the key ring by question
- * two's map, the stack of plates by question four's column of openers, the
- * three oranges (one on top, a heap's root) by question six's tree, the
- * road map by question seven's graph, and the fanned cards by question
- * eight's bars and the first quick round's sorting rows.
+ * and "plan") and again at the close, and four spots, each only where a
+ * scene has open space for it: the hourglass by question one's modeled 83
+ * minutes, the stack of plates under question four's verdicts, the road map
+ * beside question seven's graph (gone before the second graph arrives), and
+ * the fanned cards in question eight's empty right panel (gone before the
+ * random pivots fill it).
  *
  *   1. "What is Big-O notation, and why do interviewers care?" ("big").
  *      A grid of n by n dots (every pair) beside one row of n dots (one
@@ -537,7 +537,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-bits",
-      text: "And bit tricks are single instructions: XOR every number together, the pairs cancel, and the unpaired one is left, in constant space.",
+      text: "And bit tricks are single instructions: take the XOR of every number, the pairs cancel, and the unpaired one is left, in constant space.",
       pauseAfter: 1.0,
     },
 

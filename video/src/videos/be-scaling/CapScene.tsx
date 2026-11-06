@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, lab
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Line, Mark, MiniMap, Node, Pill, Q_SIZE, Q_W, Svg, X0 } from "./parts";
+import { Drift, Line, Mark, MiniMap, Node, Q_SIZE, Q_W, Svg, X0 } from "./parts";
 
 /** The page's grid: two rows (the network's state), two columns (the choice). */
 const G = { head: X0, col: [420, 800], colW: 360, top: 400, rowH: 104, gap: 12 };
@@ -164,29 +164,29 @@ export const CapScene: React.FC = () => {
           not a label for the database
         </Line>
         {/* Available: the redirect and the new key. */}
-        <Pill x={apX} y={opsTop} at={redirectAt} tone="data">
+        <Line at={redirectAt} x={apX} y={opsTop} size={22} weight={700} color={BLUE_INK}>
           redirect
-        </Pill>
-        <Line at={notFoundAt} x={apX + 140} y={opsTop + 4} size={20} color={INK_SOFT}>
+        </Line>
+        <Line at={notFoundAt} x={apX + 140} y={opsTop + 4} size={21} color={INK_SOFT}>
           at worst: a new link not found yet,
         </Line>
-        <Line at={takenAt} x={apX + 140} y={opsTop + 4 + h(32)} size={20} color={INK_SOFT}>
+        <Line at={takenAt} x={apX + 140} y={opsTop + 4 + h(32)} size={21} color={INK_SOFT}>
           a link just taken down still works
         </Line>
-        <Pill x={apX} y={opsTop + h(92)} at={mintAt} tone="data">
+        <Line at={mintAt} x={apX} y={opsTop + h(92)} size={22} weight={700} color={BLUE_INK}>
           new key
-        </Pill>
-        <Line at={blockAt} x={apX + 140} y={opsTop + h(96)} size={20} color={INK_SOFT}>
+        </Line>
+        <Line at={blockAt} x={apX + 140} y={opsTop + h(96)} size={21} color={INK_SOFT}>
           each server mints from its own block of IDs
         </Line>
         {/* Consistent: the custom alias. */}
-        <Pill x={cpX} y={opsTop + h(92)} at={aliasAt} tone="data">
+        <Line at={aliasAt} x={cpX} y={opsTop + h(92)} size={22} weight={700} color={BLUE_INK}>
           custom alias
-        </Pill>
-        <Line at={aliasAt + 6} x={cpX} y={opsTop + h(146)} size={20} color={INK_SOFT}>
+        </Line>
+        <Line at={aliasAt + 6} x={cpX} y={opsTop + h(146)} size={21} color={INK_SOFT}>
           must be unique, so
         </Line>
-        <Line at={majorityAt} x={cpX} y={opsTop + h(176)} size={20} color={ACCENT_INK} weight={650}>
+        <Line at={majorityAt} x={cpX} y={opsTop + h(176)} size={21} color={ACCENT_INK} weight={650}>
           the minority side refuses it
         </Line>
 

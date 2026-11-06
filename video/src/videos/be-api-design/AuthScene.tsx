@@ -10,7 +10,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AUTH } from "./data";
-import { Cross, Drift, Flow, Mark, Msg, msgHeight, Node, OK, OK_INK, Pill, pulse, Strike, X0 } from "./parts";
+import { Cross, Drift, Flow, Mark, Msg, msgHeight, Node, OK, OK_INK, Pill, pulse, Strike, X0, LISTING_PAPER } from "./parts";
 
 /** The three panels of Question 7. */
 const PANELS = [
@@ -218,7 +218,7 @@ export const AuthScene: React.FC = () => {
           </span>
         </Note>
         <Note at={idAt} x={S.x} y={cookieTop} out={leave}>
-          <div style={{ border: `2px dashed ${INK_SOFT}`, borderRadius: 10, padding: "10px 16px", background: PAPER }}>
+          <div style={{ borderTop: `2px solid ${INK}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "10px 16px", background: LISTING_PAPER }}>
             {sidLines.map((l, i) => (
               <div key={i} style={{ fontFamily: MONO, fontSize: 24, lineHeight: "36px", color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>
                 {l}
@@ -259,7 +259,7 @@ export const AuthScene: React.FC = () => {
           <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap" }}>the payload, decoded without the key</span>
         </Note>
         <Note at={decodeAt + 8} x={J.x} y={claimsTop} out={leave}>
-          <div style={{ borderLeft: `4px solid ${BAR}`, paddingLeft: 16 }}>
+          <div style={{ borderTop: `2px solid ${BAR}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "8px 16px", background: LISTING_PAPER, width: 440 }}>
             {[
               { k: "sub", v: AUTH.claims.sub, at: userAt },
               { k: "role", v: AUTH.claims.role, at: roleAt },

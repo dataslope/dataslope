@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GZIP, thousands } from "./data";
-import { artBox, Cross, Drift, Flow, Headline, Http, Kicker, Mark, METHOD_INK, Msg, msgHeight, OK, OK_INK, Spot, Strike, X0 } from "./parts";
+import { artBox, Cross, Drift, Flow, Headline, Http, Kicker, Mark, METHOD_INK, Msg, msgHeight, OK, OK_INK, Spot, Strike, X0, LISTING_PAPER } from "./parts";
 
 const R_X = 800;
 const LIST_TOP = 380;
@@ -151,7 +151,7 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>An order, as v1 clients read it</span>
       </Note>
       <Note at={protectAt} x={R_X} y={body}>
-        <div style={{ borderLeft: `4px solid ${BAR}`, paddingLeft: 18, fontFamily: MONO, fontSize: 24, lineHeight: "38px" }}>
+        <div style={{ borderTop: `2px solid ${INK}`, borderBottom: `1px solid ${HAIRLINE}`, background: LISTING_PAPER, padding: "6px 22px", width: 820, fontFamily: MONO, fontSize: 24, lineHeight: "38px" }}>
           <div style={{ color: INK_SOFT }}>{"{"}</div>
           {fields.map((f) => (
             <div key={f.t} style={{ paddingLeft: 28, whiteSpace: "pre", opacity: ease(frame, f.at, 8), display: "flex", gap: 16, alignItems: "baseline" }}>

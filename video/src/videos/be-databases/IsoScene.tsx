@@ -4,7 +4,7 @@ import { arrowHead, type Pt, sampleCubic } from "../../components/arrow";
 import { during, ease } from "../../components/motion";
 import { OK, OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -50,14 +50,13 @@ const Event: React.FC<{ x: number; y: number; at: number; out: number; text: str
 };
 
 /** What a read returned: a value in a rounded tag under its dot. */
-const Value: React.FC<{ x: number; y: number; at: number; out: number; value: string; color: string; w?: number }> = ({ x, y, at, out, value, color, w = 70 }) => {
+const Value: React.FC<{ x: number; y: number; at: number; out: number; value: string; color: string; w?: number }> = ({ x, y, at, out, value, color }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10) * (1 - ease(frame, out, 8));
   if (p <= 0) return null;
   return (
     <g opacity={p}>
-      <rect x={x - w / 2} y={y + 16} width={w} height={34} rx={17} fill={PAPER} stroke={color} strokeWidth={2} />
-      <text x={x} y={y + 40} textAnchor="middle" style={mono(20, color)}>
+      <text x={x} y={y + 38} textAnchor="middle" style={mono(22, color)}>
         {value}
       </text>
     </g>
@@ -201,6 +200,16 @@ export const IsoScene: React.FC = () => {
             ))}
           </g>
           <line x1={X0} y1={gridTop + headH} x2={X0 + (LEVEL_W + 120 + (3 * COL_W - 120) * move) * ease(frame, fourAt, 14)} y2={gridTop + headH} stroke={INK} strokeWidth={2} opacity={ease(frame, fourAt, 8)} />
+          {/* The cell the narration is on, banded behind its word. */}
+          {[
+            { i: 1, j: 1, from: rcAllowsAt, to: rrPreventsAt, color: ACCENT },
+            { i: 2, j: 1, from: rrPreventsAt, to: phantomAt, color: OK },
+            { i: 3, j: 2, from: stdAt, to: pgRrAt, color: OK },
+          ].map((r, k) => {
+            const p = during(frame, r.from, r.to, 8);
+            if (p <= 0) return null;
+            return <rect key={k} x={colX(r.j) - 8} y={rowY(r.i) + 10} width={COL_W - 90} height={rowH - 20} rx={3} fill={`color-mix(in srgb, ${r.color} 22%, transparent)`} opacity={p} />;
+          })}
           {LEVELS.map((lv, i) => {
             const p = ease(frame, levelAt[i], 12);
             if (p <= 0) return null;
@@ -244,16 +253,6 @@ export const IsoScene: React.FC = () => {
                 })}
               </g>
             );
-          })}
-          {/* The cell the narration is on, ringed. */}
-          {[
-            { i: 1, j: 1, from: rcAllowsAt, to: rrPreventsAt, color: ACCENT },
-            { i: 2, j: 1, from: rrPreventsAt, to: phantomAt, color: OK },
-            { i: 3, j: 2, from: stdAt, to: pgRrAt, color: OK },
-          ].map((r, k) => {
-            const p = during(frame, r.from, r.to, 8);
-            if (p <= 0) return null;
-            return <rect key={k} x={colX(r.j) - 12} y={rowY(r.i) + 6} width={COL_W - 20} height={rowH - 12} rx={6} fill="none" stroke={r.color} strokeWidth={2.5} opacity={p} />;
           })}
         </Svg>
 

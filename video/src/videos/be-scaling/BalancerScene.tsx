@@ -278,7 +278,7 @@ export const BalancerScene: React.FC = () => {
           <React.Fragment key={r}>
             <Ink at={at} dur={12} out={phaseOut} style={{ left: PANEL_X[2], top: y(476) + r * h(84), whiteSpace: "nowrap" }}>
               <span style={{ ...note(22, INK), display: "inline-flex", alignItems: "center", gap: 14 }}>
-                <span style={{ fontFamily: MONO, padding: "2px 10px", borderRadius: 7, border: `2px solid ${BAR}`, color: BLUE_INK, fontWeight: 700 }}>
+                <span style={{ fontFamily: MONO, color: BLUE_INK, fontWeight: 700 }}>
                   {key.key}
                 </span>
                 <span style={{ color: INK_SOFT }}>→</span>

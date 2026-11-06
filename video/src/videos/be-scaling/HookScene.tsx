@@ -16,8 +16,8 @@ const APP = { x: 700, w: 240 };
 const STORE = { x: 1040, w: 250 };
 /** Box centres, in the layout's coordinates. */
 const ROW = { mid: 470, upper: 400, lower: 540 };
-const CHIP = 54;
-const CHIP_GAP = 16;
+const CHIP = 50;
+const CHIP_GAP = 14;
 
 /** A small red question mark on a box's corner: "every box has to answer". */
 const Query: React.FC<{ x: number; y: number; at: number; dim: number }> = ({ x, y, at, dim }) => {
@@ -85,10 +85,9 @@ export const HookScene: React.FC = () => {
   const tenfold = roundTo(TRAFFIC.peak, 2);
 
   // The twelve chips: nine worked through, two quick, the news feed apart.
-  const chipX = (i: number) => X0 + i * (CHIP + CHIP_GAP) + (i === 11 ? 44 : 0);
-  const chipsTop = y(800);
+  const chipX = (i: number) => X0 - 12 + i * (CHIP + CHIP_GAP) + (i === 11 ? 50 : 0);
+  const chipsTop = y(812);
   const chipAt = (i: number) => (i < 9 ? nineAt + i * 2 : i < 11 ? quickAt + (i - 9) * 3 : feedAt);
-  const feedLit = ease(frame, feedAt + 4, 10);
 
   return (
     <AbsoluteFill>
@@ -167,13 +166,14 @@ export const HookScene: React.FC = () => {
         <Ink at={twelveAt} dur={14} style={{ left: X0, top: y(770), whiteSpace: "nowrap" }}>
           <span style={{ ...label(24, INK), fontWeight: 700 }}>Twelve questions</span>
         </Ink>
+        {/* The twelve as plain numerals: nine in the data blue, two quick ones
+            in gray, and the news feed set apart, lit on its name. */}
         {Array.from({ length: 12 }, (_, i) => {
-          const at = chipAt(i);
-          const p = ease(frame, at, 10);
+          const p = ease(frame, chipAt(i), 10);
+          if (p <= 0) return null;
           const quick = i === 9 || i === 10;
           const feed = i === 11;
-          const line = feed ? INK : quick ? INK_SOFT : BAR;
-          return p > 0 ? (
+          return (
             <div
               key={i}
               style={{
@@ -181,31 +181,30 @@ export const HookScene: React.FC = () => {
                 left: chipX(i),
                 top: chipsTop,
                 width: CHIP,
-                height: CHIP,
-                boxSizing: "border-box",
-                borderRadius: 10,
-                border: `${feed ? 3 : 2.5}px ${feed ? "dashed" : "solid"} ${line}`,
-                background: feed ? `color-mix(in srgb, var(--ds-yellow-400) ${feedLit * 80}%, ${PAPER})` : quick ? PAPER : `color-mix(in srgb, ${BAR} 12%, ${PAPER})`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                ...label(22, quick ? INK_SOFT : feed ? INK : BLUE_INK),
+                textAlign: "center",
+                ...label(30, quick ? INK_SOFT : feed ? INK : BLUE_INK),
                 fontWeight: 700,
                 opacity: p,
                 transform: `translateY(${(1 - p) * 10}px)`,
               }}
             >
-              <Num>{i + 1}</Num>
+              {feed ? (
+                <Mark at={feedAt + 4}>
+                  <Num>12</Num>
+                </Mark>
+              ) : (
+                <Num>{i + 1}</Num>
+              )}
             </div>
-          ) : null;
+          );
         })}
-        <Ink at={nineAt + 8} dur={14} style={{ left: X0, top: chipsTop + CHIP + 14, whiteSpace: "nowrap" }}>
+        <Ink at={nineAt + 8} dur={14} style={{ left: X0, top: chipsTop + 50, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK_SOFT) }}>worked through on this diagram</span>
         </Ink>
-        <Ink at={quickAt + 6} dur={14} style={{ left: chipX(9), top: chipsTop + CHIP + 14, whiteSpace: "nowrap" }}>
+        <Ink at={quickAt + 6} dur={14} style={{ left: chipX(9) + 6, top: chipsTop + 50, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK_SOFT) }}>quick</span>
         </Ink>
-        <Ink at={feedAt + 4} dur={14} style={{ left: chipX(11) - 20, top: chipsTop + CHIP + 14, whiteSpace: "nowrap" }}>
+        <Ink at={feedAt + 4} dur={14} style={{ left: chipX(11) - 30, top: chipsTop + 50, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK), fontWeight: 650 }}>a news feed</span>
         </Ink>
       </Drift>

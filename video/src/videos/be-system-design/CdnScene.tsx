@@ -25,6 +25,14 @@ const project = (lon: number, lat: number): [number, number] => {
   return [WORLD.w / 2 + d * PX_PER_DEG, (WORLD.latTop - lat) * PX_PER_DEG];
 };
 
+/** The angle of (x, y) from the x axis, in radians, in all four quadrants
+ *  (a longitude from a unit vector). */
+const bearing = (y: number, x: number) => {
+  if (x === 0) return y >= 0 ? Math.PI / 2 : -Math.PI / 2;
+  const a = Math.atan(y / x);
+  return x > 0 ? a : y >= 0 ? a + Math.PI : a - Math.PI;
+};
+
 /** The great circle from a to b, as points along it. */
 const greatCircle = (a: { lat: number; lon: number }, b: { lat: number; lon: number }, steps = 96) => {
   const rad = Math.PI / 180;
@@ -36,7 +44,7 @@ const greatCircle = (a: { lat: number; lon: number }, b: { lat: number; lon: num
     const s0 = Math.sin((1 - t) * omega) / Math.sin(omega);
     const s1 = Math.sin(t * omega) / Math.sin(omega);
     const [x, yv, z] = [0, 1, 2].map((k) => s0 * p[k] + s1 * q[k]);
-    return project(Math.atan2(yv, x) / rad, Math.atan2(z, Math.hypot(x, yv)) / rad);
+    return project(bearing(yv, x) / rad, Math.asin(Math.max(-1, Math.min(1, z))) / rad);
   });
 };
 
@@ -153,7 +161,7 @@ export const CdnScene: React.FC = () => {
         <Line x={RX} y={top} at={cdnAt} size={27} weight={700}>
           Content delivery network
         </Line>
-        <Line x={RX} y={top + 46} at={edgesAt} size={23} color={INK_SOFT} width={440}>
+        <Line x={RX} y={top + 58} at={edgesAt} size={23} color={INK_SOFT} width={440}>
           <span style={{ color: OK_INK, fontWeight: 650 }}>edge servers</span> close to your users, caching what your{" "}
           <span style={{ color: BLUE_INK, fontWeight: 650, opacity: ease(frame, originAt, 10) }}>origin</span>
           <span style={{ opacity: ease(frame, originAt, 10) }}> serves</span>

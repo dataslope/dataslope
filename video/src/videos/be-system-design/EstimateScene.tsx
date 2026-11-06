@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -129,7 +129,7 @@ export const EstimateScene: React.FC = () => {
             </>,
           )}
         </Line>
-        <Line x={X0} y={pair(0) + 40} at={writesAt} size={28} weight={700} color={BLUE_INK}>
+        <Line x={X0} y={pair(0) + 48} at={writesAt} size={28} weight={700} color={BLUE_INK}>
           ≈ <Num>{int(sig(E.writeQps))}</Num> writes a second
         </Line>
         <Line x={X0} y={pair(1)} at={ratioAt} size={25}>
@@ -143,7 +143,7 @@ export const EstimateScene: React.FC = () => {
             )}
           </span>
         </Line>
-        <Line x={X0} y={pair(1) + 40} at={billionAt} size={28} weight={700} color={BLUE_INK}>
+        <Line x={X0} y={pair(1) + 48} at={billionAt} size={28} weight={700} color={BLUE_INK}>
           <Num>{int(E.readsPerDay)}</Num> a day
           <span style={{ opacity: ease(frame, readsAt, 10) }}>
             {" "}
@@ -161,12 +161,12 @@ export const EstimateScene: React.FC = () => {
             )}
           </span>
         </Line>
-        <Line x={X0} y={pair(2) + 40} at={peakQpsAt} size={28} weight={700} color={BLUE_INK} style={{ transform: `scale(${1 + 0.06 * lit})`, transformOrigin: "0 50%" }}>
+        <Line x={X0} y={pair(2) + 48} at={peakQpsAt} size={28} weight={700} color={BLUE_INK} style={{ transform: `scale(${1 + 0.06 * lit})`, transformOrigin: "0 50%" }}>
           <Mark at={peakQpsAt + 6} color={HIGHLIGHT}>
             ≈ <Num>{int(sig(E.peakReadQps))}</Num> redirects a second
           </Mark>
         </Line>
-        <Line x={X0 + 450} y={pair(2) + 40} at={cacheAt} size={28} weight={700} color={OK_INK}>
+        <Line x={X0 + 450} y={pair(2) + 48} at={cacheAt} size={28} weight={700} color={OK_INK}>
           and a cache
         </Line>
 

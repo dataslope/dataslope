@@ -95,6 +95,7 @@ export const RaceScene: React.FC = () => {
   const textAt = n.word("race", "What is a race condition");
   const timingAt = n.word("race", "depends on the timing");
   const classicAt = n.word("race", "The classic case is a counter");
+  const counterWordAt = n.word("race", "a counter");
   const twoAt = n.word("race", "two threads each add one to");
   const readAt = n.word("race-steps", "read the value");
   const addAt = n.word("race-steps", "add one");
@@ -139,7 +140,6 @@ export const RaceScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Sfx name="el-tap" at={classicAt + 4} level={-30} />
       <Sfx name="el-tap" at={bothWriteAt + 6} level={-29} />
       <Sfx name="el-scratch" at={lostAt} level={-31} />
       <Sfx name="el-sprinkle" at={countAt + 4} level={-31} />
@@ -176,7 +176,7 @@ export const RaceScene: React.FC = () => {
             <Num>{counter}</Num>
           </span>
         </div>
-        <Spot id="tally-counter" at={classicAt + 4} out={countAt - 10} left={1330} top={y(400)} width={210} height={h(190)} />
+        <Spot id="tally-counter" at={counterWordAt} out={countAt - 10} left={1330} top={y(400)} width={210} height={h(190)} />
 
         {/* Two threads, three steps each. */}
         {[0, 1].map((t) => (

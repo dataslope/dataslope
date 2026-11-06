@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { TXN } from "./data";
-import { DataTable, Drift, Listing, listingHeight, MARK_GREEN, MARK_OK, Node, PgError, Strike, TableName, tableGeometry, X0 } from "./parts";
+import { DataTable, Drift, Listing, listingHeight, MARK_GREEN, MARK_OK, PgError, Strike, TableName, tableGeometry, X0 } from "./parts";
 
 const TOP = 300;
 const SIZE = 20;
@@ -96,18 +96,26 @@ export const TxnScene: React.FC = () => {
 
         {/* ── A transaction, as a bracket ── */}
         <div style={{ opacity: 1 - ease(frame, schemOut, 10) }}>
-          <Node x={X0 + 40} y={sTop} w={260} h={h(52)} at={beginAt - 2} tone="plain" title={<span style={{ fontFamily: MONO }}>BEGIN</span>} size={22} />
-          <Node x={X0 + 40} y={sTop + step} w={260} h={h(52)} at={runAt} tone="data" title="a statement" size={22} />
-          <Node x={X0 + 40} y={sTop + 2 * step} w={260} h={h(52)} at={runAt + 4} tone="data" title="another" size={22} />
-          <Node x={X0 + 40} y={sTop + 3 * step} w={260} h={h(52)} at={commitAt} tone="ok" title={<span style={{ fontFamily: MONO }}>COMMIT</span>} size={22} />
-          <Note at={rollAt - 2} x={X0 + 330} y={sTop + 3 * step + h(10)}>
-            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>or</span>
+          {[
+            { at: beginAt - 2, i: 0, body: <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 700, color: INK }}>BEGIN</span> },
+            { at: runAt, i: 1, body: <span style={{ ...note(26, BLUE_INK) }}>a statement</span> },
+            { at: runAt + 4, i: 2, body: <span style={{ ...note(26, BLUE_INK) }}>another statement</span> },
+          ].map((r) => (
+            <Note key={r.i} at={r.at} x={X0 + 50} y={sTop + r.i * step + h(8)}>
+              <span style={{ whiteSpace: "nowrap" }}>{r.body}</span>
+            </Note>
+          ))}
+          <Note at={commitAt} x={X0 + 50} y={sTop + 3 * step + h(8)}>
+            <span style={{ whiteSpace: "nowrap", fontFamily: MONO, fontSize: 26, fontWeight: 700, color: OK_INK }}>
+              COMMIT
+              <span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, rollAt - 2, 10) }}> or </span>
+              <span style={{ color: ACCENT_INK, opacity: ease(frame, rollAt, 10) }}>ROLLBACK</span>
+            </span>
           </Note>
-          <Node x={X0 + 390} y={sTop + 3 * step} w={260} h={h(52)} at={rollAt} tone="bad" title={<span style={{ fontFamily: MONO }}>ROLLBACK</span>} size={22} />
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, oneAt, 12) }}>
-            <path d={`M${X0 + 24},${sTop + 4} h-14 V${sTop + 3 * step + h(48)} h14`} fill="none" stroke={INK} strokeWidth={2.5} />
+            <path d={`M${X0 + 24},${sTop + h(10)} h-14 V${sTop + 3 * step + h(46)} h14`} fill="none" stroke={INK} strokeWidth={2.5} />
           </svg>
-          <Note at={oneAt + 4} x={X0 + 700} y={sTop + step + h(30)}>
+          <Note at={oneAt + 4} x={X0 + 560} y={sTop + step + h(40)}>
             <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
               succeed or fail <b>as one</b>
             </span>

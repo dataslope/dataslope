@@ -121,7 +121,7 @@ export const HookScene: React.FC = () => {
               >
                 <span style={{ ...note(31, c.ink), fontWeight: 650, whiteSpace: "nowrap" }}>{c.text}</span>
               </div>
-              <Ink at={c.at + 2} dur={12} style={{ left: c.x + 64, top: cardsTop + CARD_H / 2 + 12 }}>
+              <Ink at={c.at + 2} dur={12} style={{ left: c.x + 64, top: cardsTop + CARD_H / 2 + 22 }}>
                 <span style={{ ...label(22, c.trendInk), whiteSpace: "nowrap", opacity: 1 - dimCards }}>{c.trend}</span>
               </Ink>
               <div style={{ position: "absolute", inset: 0, opacity: 1 - dimCards }}>

@@ -648,7 +648,7 @@ const Kahn: React.FC<{ c: Ctx }> = ({ c }) => {
 const Bits: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
   const singleAt = c.w("r-bits", "bit tricks are single instructions");
-  const xorAt = c.w("r-bits", "XOR every number together");
+  const xorAt = c.w("r-bits", "take the XOR of every number");
   const cancelAt = c.w("r-bits", "the pairs cancel");
   const leftAt = c.w("r-bits", "the unpaired one is left");
   const spaceAt = c.w("r-bits", "in constant space");
@@ -661,7 +661,7 @@ const Bits: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Line at={singleAt} x={R_X} y={c.T} size={24} weight={650}>
-        Single instructions: XOR every number together
+        Single instructions: take the XOR of every number
       </Line>
       {nums.map((v, i) => {
         const fade = paired(v) ? ease(frame, cancelAt + 4, 12) : 0;

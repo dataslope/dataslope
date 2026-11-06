@@ -48,8 +48,8 @@ export const TailScene: React.FC = () => {
   const sx = (ms: number) => HX0 + ((ms - lo) / (hi - lo)) * (HX1 - HX0);
   const peak = Math.max(...P.counts);
   const hy = (c: number) => base - (c / peak) * (base - top);
-  const rowA = top - 92;
-  const rowB = top - 50;
+  const rowA = top - 104;
+  const rowB = top - 52;
 
   const rule = (ms: number, at: number, from: number, color: string, dash?: string) => {
     const p = ease(frame, at, 14);

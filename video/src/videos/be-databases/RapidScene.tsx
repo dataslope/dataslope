@@ -219,7 +219,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
   const cg = tableGeometry({
     x: 1330,
     top,
-    cols: [{ name: "id", tag: { text: "PK", at: pkAt } }, { name: "name" }],
+    cols: [{ name: "id" }, { name: "name" }],
     rows: [["1", "Ava"], ["2", "Ben"]],
     headH: c.h(44),
     rowH: c.h(46),
@@ -229,7 +229,7 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
   const og = tableGeometry({
     x: R_X,
     top,
-    cols: [{ name: "order_id", tag: { text: "PK", at: pkAt + 6 } }, { name: "customer_id", tag: { text: "FK", at: fkAt } }],
+    cols: [{ name: "order_id" }, { name: "customer_id" }],
     rows: [["101", "1"], ["103", "2"]],
     headH: c.h(44),
     rowH: c.h(46),
@@ -241,20 +241,20 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <TableName g={cg} at={pkAt}>
-        customers
+        customers <span style={{ color: INK_SOFT, fontWeight: 500 }}>· primary key</span> <SmallMono color={BLUE_INK}>id</SmallMono>
       </TableName>
-      <DataTable g={cg} cols={[{ name: "id", ink: BLUE_INK, tag: { text: "PK", at: pkAt + 4 } }, { name: "name" }]} rows={[["1", "Ava"], ["2", "Ben"]].map((cells, i) => ({ cells, at: pkAt + 4 + i * 3 }))} at={pkAt} />
+      <DataTable g={cg} cols={[{ name: "id", ink: BLUE_INK }, { name: "name" }]} rows={[["1", "Ava"], ["2", "Ben"]].map((cells, i) => ({ cells, at: pkAt + 4 + i * 3 }))} at={pkAt} />
       <Note at={uniqueAt} x={cg.x} y={cg.rowTop(2) + c.h(14)}>
         <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           unique, never null<span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, autoAt, 10) }}>, indexed for you</span>
         </span>
       </Note>
       <TableName g={og} at={fkAt - 4}>
-        orders
+        orders <span style={{ color: INK_SOFT, fontWeight: 500 }}>· foreign key</span> <SmallMono color={BLUE_INK}>customer_id</SmallMono>
       </TableName>
       <DataTable
         g={og}
-        cols={[{ name: "order_id", tag: { text: "PK", at: fkAt } }, { name: "customer_id", ink: BLUE_INK, tag: { text: "FK", at: fkAt + 4, color: BLUE_INK } }]}
+        cols={[{ name: "order_id" }, { name: "customer_id", ink: BLUE_INK }]}
         rows={[
           { cells: ["101", "1"], at: fkAt },
           { cells: ["103", "2"], at: fkAt + 3 },

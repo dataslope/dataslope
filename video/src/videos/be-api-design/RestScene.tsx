@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -79,14 +79,17 @@ export const RestScene: React.FC = () => {
         </QuestionCard>
 
         {/* A resource with a URL, and the methods that act on it. */}
-        <Node x={CARD.x} y={cardTop} w={CARD.w} h={CARD.h} at={resAt} title="/articles/42" mono size={32} sub="a resource" lit={0} />
-        <Note at={urlAt} x={CARD.x} y={cardTop + CARD.h + h(12)}>
+        <Note at={resAt} x={CARD.x} y={cardTop + 4} width={CARD.w} style={{ textAlign: "center" }}>
+          <div style={{ ...label(23, BLUE_INK), whiteSpace: "nowrap" }}>a resource</div>
+          <div style={{ fontFamily: MONO, fontSize: 36, fontWeight: 600, color: INK, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, urlAt, 10) }}>/articles/42</div>
+        </Note>
+        <Note at={urlAt + 6} x={CARD.x} y={cardTop + CARD.h + h(12)} width={CARD.w} style={{ textAlign: "center" }}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>its URL names it</span>
         </Note>
         {METHODS.map((m, i) => {
           const at = methodsAt + 4 + i * 4;
-          const py = pillTop(m.row) + 21;
-          const pillW = m.m.length * 13.2 + 32;
+          const py = pillTop(m.row) + 15;
+          const pillW = m.m.length * 13.2;
           return (
             <React.Fragment key={m.m}>
               <Pill x={m.x} y={pillTop(m.row)} at={at} tone="plain" mono>
@@ -135,24 +138,7 @@ export const RestScene: React.FC = () => {
         />
         <Flow points={[[R_X + REQ_W + 8, reqTop + reqH / 2], [SRV.x - 8, reqTop + reqH / 2]]} at={carriesAt + 20} color={BAR} head={13} />
         <Node x={SRV.x} y={reqTop} w={SRV.w} h={reqH + h(70)} at={carriesAt + 10} tone="plain" title="server" size={24}>
-          <div
-            style={{
-              marginTop: 8,
-              width: 150,
-              height: 46,
-              boxSizing: "border-box",
-              border: `2px dashed ${INK_SOFT}`,
-              borderRadius: 8,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              ...note(20, INK_SOFT),
-              background: PAPER,
-              opacity: ease(frame, sessionAt + 4, 12),
-            }}
-          >
-            no session
-          </div>
+          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap", opacity: ease(frame, sessionAt + 4, 12) }}>keeps no session</span>
         </Node>
         <Note at={meanAt} x={R_X} y={reqTop + reqH + h(26)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>

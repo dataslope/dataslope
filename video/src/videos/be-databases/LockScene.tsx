@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { OK, OK_INK, QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -36,7 +36,9 @@ const AccountRow: React.FC<{ x: number; y: number; h: number; id: number; balanc
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
-  const line = tone === "ok" ? OK : tone === "held" ? inkOf.yellow : BAR;
+  // A row of the table, set as text over a hairline; held or granted, a
+  // highlight band behind it.
+  const band = tone === "ok" ? `color-mix(in srgb, ${OK} 22%, ${PAPER})` : tone === "held" ? HIGHLIGHT : "transparent";
   return (
     <div
       style={{
@@ -46,9 +48,8 @@ const AccountRow: React.FC<{ x: number; y: number; h: number; id: number; balanc
         width: ROW_W,
         height: h,
         boxSizing: "border-box",
-        border: `2px solid ${line}`,
-        borderRadius: 8,
-        background: `color-mix(in srgb, ${line} ${tone === "data" ? 8 : 18}%, ${PAPER})`,
+        borderBottom: `1px solid ${HAIRLINE}`,
+        background: band,
         display: "flex",
         alignItems: "center",
         gap: 18,
@@ -113,7 +114,7 @@ export const LockScene: React.FC = () => {
   const row2 = rowsTop + rowH + h(16);
   const lockTop = row2 + rowH + h(32);
   const holder = LOCK.holder.filter((l) => l.includes("FOR UPDATE"));
-  const waiter = { x: X0 + ROW_W + 110, w: 300, y: rowsTop - h(4), h: h(58) };
+  const waiter = { x: X0 + ROW_W + 110, w: 220, y: rowsTop - h(4), h: h(58) };
 
   // ── Right: optimistic ──
   const writeTop = y(HEAD_Y) + h(104);
@@ -164,7 +165,8 @@ export const LockScene: React.FC = () => {
           What is an optimistic vs pessimistic locking strategy?
         </QuestionCard>
 
-        {/* ── Left: pessimistic ── */}
+        {/* ── Left: pessimistic, centred until the optimistic side arrives ── */}
+        <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - ease(frame, optAt - 12, 24)) * 460}px)` }}>
         <Note at={pessAt} x={X0} y={y(HEAD_Y)}>
           <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Pessimistic: lock first</span>
         </Note>
@@ -172,7 +174,7 @@ export const LockScene: React.FC = () => {
         <AccountRow x={X0} y={row2} h={rowH} id={2} balance={LOCK.otherRow?.balance ?? 0} at={forUpdateAt + 4} tone={ease(frame, freeAt + 4, 8) > 0.5 ? "ok" : "data"} />
         <Padlock x={X0 + ROW_W - 56} y={rowsTop + rowH / 2 - 22} at={untilAt} />
         <Listing lines={holder} x={X0} top={lockTop} width={740} size={20} at={forUpdateAt - 4} out={holdsAt - 2} marks={[{ line: "FOR UPDATE", text: "FOR UPDATE", at: forUpdateAt + 8 }]} />
-        <Node x={waiter.x} y={waiter.y} w={waiter.w} h={waiter.h} at={otherAt} tone="plain" dashed title="another transaction" size={21} out={holdsAt - 2} />
+        <Node x={waiter.x} y={waiter.y} w={waiter.w} h={waiter.h} at={otherAt} tone="plain" bare title="another transaction" size={22} out={holdsAt - 2} />
         <Flow points={[[waiter.x - 10, waiter.y + waiter.h / 2], [X0 + ROW_W + 14, waiter.y + waiter.h / 2]]} at={otherAt + 4} color={INK_SOFT} width={2.4} dash="7 6" out={holdsAt - 2} />
         <Note at={waitsAt} x={waiter.x} y={waiter.y + waiter.h + h(10)} out={holdsAt - 2}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
@@ -188,6 +190,8 @@ export const LockScene: React.FC = () => {
         <Note at={freeAt + 4} x={X0 + ROW_W + 40} y={row2 + h(8)}>
           <span style={{ ...note(22, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>granted at once</span>
         </Note>
+
+        </div>
 
         {/* ── Right: optimistic ── */}
         <Note at={optAt} x={R_X} y={y(HEAD_Y)}>

@@ -52,6 +52,7 @@ export const DiagramScene: React.FC = () => {
   const tripsAt = n.word("q3-path", "two round trips inside the data center");
   const msAt = n.word("q3-path", "about a millisecond by the ladder");
   const missAt = n.word("q3-path", "A miss adds a third");
+  const storeTripAt = n.word("q3-path", "to the store");
   const ssdAt = n.word("q3-path", "and an SSD read");
   const sixAt = n.word("q3-path", "about one point six milliseconds");
   const counterAt = n.word("q3-counter", "The follow-up is the counter");
@@ -84,8 +85,10 @@ export const DiagramScene: React.FC = () => {
 
   // One redirect: a hit, then a miss.
   const hit = [hitAt, hitAt + 26] as const;
-  const miss = [missAt, missAt + 22, missAt + 46] as const;
-  const missMark = ease(frame, miss[1] + 6, 8) * (1 - ease(frame, sixAt + 30, 12));
+  // LB to app and back, app to cache and back (the miss lands as the dot
+  // reaches the cache), then the third trip, to the store, on its words.
+  const miss = [missAt, missAt + 18, Math.max(storeTripAt - 6, missAt + 38)] as const;
+  const missMark = ease(frame, miss[1] + 9, 8) * (1 - ease(frame, sixAt + 30, 12));
   const pathOut = counterAt - 4;
 
   // The app servers' second line: stateless, then their own block of IDs.
@@ -111,7 +114,7 @@ export const DiagramScene: React.FC = () => {
       <Sfx name="el-whoosh" at={hit[0]} level={-38} />
       <Sfx name="el-tap" at={msAt} level={-34} />
       <Sfx name="el-whoosh" at={miss[0]} level={-38} />
-      <Sfx name="el-scratch" at={miss[1] + 6} level={-36} />
+      <Sfx name="el-scratch" at={miss[1] + 9} level={-36} />
       <Sfx name="el-tap" at={sixAt} level={-34} />
       <Sfx name="el-pop" at={askAt + 4} level={-34} />
       <Sfx name="el-pencil" at={bottleAt} level={-36} />
@@ -130,7 +133,7 @@ export const DiagramScene: React.FC = () => {
         <Line x={B.store.cx} y={B.store.cy + B.store.h / 2 + 22} at={byKeyAt} size={22} color={INK_SOFT} align="center" width={360}>
           every lookup is by key
         </Line>
-        <Box r={B.cache} at={cacheAt + 4} title="Cache" tone="data" tones={[{ at: miss[1] + 6, tone: "bad" }, { at: sixAt + 30, tone: "data" }]} />
+        <Box r={B.cache} at={cacheAt + 4} title="Cache" tone="data" tones={[{ at: miss[1] + 9, tone: "bad" }, { at: sixAt + 30, tone: "data" }]} />
         <Line x={B.cache.cx + B.cache.w / 2 + 30} y={B.cache.cy - 15} at={ratioAt} size={22} color={BLUE_INK} weight={650}>
           <Num>{ESTIMATE.assumptions.readsPerWrite}</Num> reads : <Num>1</Num> write
         </Line>
@@ -168,12 +171,12 @@ export const DiagramScene: React.FC = () => {
         <Line x={B.app1.cx + 56} y={B.cache.cy - 4} at={hit[1] + 14} out={pathOut} size={22} weight={650} color={BLUE_INK} align="right">
           <Num>{HOP_MS}</Num> ms
         </Line>
-        <RoundTrip pts={e.lbApp1} from={miss[0]} dur={20} />
-        <RoundTrip pts={e.app1Cache} from={miss[0] + 22} dur={20} />
+        <RoundTrip pts={e.lbApp1} from={miss[0]} dur={18} />
+        <RoundTrip pts={e.app1Cache} from={miss[1]} dur={18} />
         <RoundTrip pts={e.app1Store} from={miss[2]} dur={40} />
         {missMark > 0 ? (
           <div style={{ position: "absolute", left: B.cache.cx + B.cache.w / 2 - 16, top: B.cache.cy - B.cache.h / 2 - 16, opacity: missMark }}>
-            <Cross at={miss[1] + 6} size={28} />
+            <Cross at={miss[1] + 9} size={28} />
           </div>
         ) : null}
         <Line x={SIDE_A - 18} y={(B.app1.cy + B.store.cy) / 2 - 16} at={miss[2] + 18} out={pathOut} size={22} weight={650} color={BLUE_INK} align="right">
@@ -187,20 +190,20 @@ export const DiagramScene: React.FC = () => {
         <Line x={RX} y={y(296)} at={hitAt} out={pathOut} size={26} weight={700}>
           Cache hit
         </Line>
-        <Line x={RX} y={y(296) + 42} at={tripsAt} out={pathOut} size={26} weight={700} color={OK_INK}>
+        <Line x={RX} y={y(296) + 56} at={tripsAt} out={pathOut} size={26} weight={700} color={OK_INK}>
           <Num>2</Num> round trips
           <span style={{ opacity: ease(frame, msAt, 10) }}>
             {" "}
             ≈ <Num>{LADDER.path.hitMs}</Num> ms
           </span>
         </Line>
-        <Line x={RX} y={y(296) + 104} at={missAt} out={pathOut} size={26} weight={700}>
+        <Line x={RX} y={y(296) + 128} at={missAt} out={pathOut} size={26} weight={700}>
           Cache miss
         </Line>
-        <Line x={RX} y={y(296) + 146} at={sixAt} out={pathOut} size={26} weight={700} color={INK}>
+        <Line x={RX} y={y(296) + 184} at={sixAt} out={pathOut} size={26} weight={700} color={INK}>
           <Num>3</Num> trips + SSD ≈ <Num>{LADDER.path.missMs}</Num> ms
         </Line>
-        <Line x={RX} y={y(296) + 196} at={sixAt + 8} out={pathOut} size={21} color={INK_SOFT}>
+        <Line x={RX} y={y(296) + 240} at={sixAt + 8} out={pathOut} size={21} color={INK_SOFT}>
           network time only, from the ladder
         </Line>
 
@@ -217,16 +220,16 @@ export const DiagramScene: React.FC = () => {
         <Line x={RX} y={y(296)} at={askAt} size={26} weight={700}>
           One shared counter
         </Line>
-        <Line x={RX} y={y(296) + 42} at={bottleAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
+        <Line x={RX} y={y(296) + 56} at={bottleAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
           a bottleneck
         </Line>
-        <Line x={RX} y={y(296) + 84} at={failAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
+        <Line x={RX} y={y(296) + 112} at={failAt} size={26} weight={650} color={ACCENT_INK} dim={blockAt}>
           and one more thing to fail
         </Line>
-        <Line x={RX} y={y(296) + 146} at={blockAt} size={26} weight={700} color={OK_INK}>
+        <Line x={RX} y={y(296) + 184} at={blockAt} size={26} weight={700} color={OK_INK}>
           A block of IDs per server
         </Line>
-        <Line x={RX} y={y(296) + 188} at={millionAt} size={26} weight={650} color={OK_INK}>
+        <Line x={RX} y={y(296) + 240} at={millionAt} size={26} weight={650} color={OK_INK}>
           <Num>{int(KEY.idBlock)}</Num> at a time
         </Line>
 
@@ -235,7 +238,7 @@ export const DiagramScene: React.FC = () => {
           Counted IDs, consecutive keys
         </Line>
         {KEY.counted.map((c, i) => (
-          <Line key={c.id} x={X0} y={keysY + 50 + i * 44} at={consecAt + 6 + i * 4} size={24}>
+          <Line key={c.id} x={X0} y={keysY + 56 + i * 52} at={consecAt + 6 + i * 4} size={24}>
             <Num>{int(c.id)}</Num>
             <span style={{ color: INK_SOFT }}> → </span>
             <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 24 }}>
@@ -244,10 +247,10 @@ export const DiagramScene: React.FC = () => {
             </span>
           </Line>
         ))}
-        <Line x={X0} y={keysY + 196} at={walkAt + 6} size={23} weight={650} color={ACCENT_INK} width={360}>
+        <Line x={X0} y={keysY + 228} at={walkAt + 6} size={23} weight={650} color={ACCENT_INK} width={360}>
           anyone can walk through them
         </Line>
-        <Line x={X0} y={keysY + 254} at={scrambleAt} size={23} weight={650} color={OK_INK}>
+        <Line x={X0} y={keysY + 290} at={scrambleAt} size={23} weight={650} color={OK_INK} width={330}>
           Scramble the ID first
           <span style={{ opacity: ease(frame, useHashAt, 10) }}>, or use the hash</span>
         </Line>

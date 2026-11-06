@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
-import { Note } from "../../editorial/ui";
+import { BAR, BLUE_INK, INK, INK_SOFT, label, note, HAIRLINE } from "../../editorial/style";
+import { Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Flow, Mark, METHOD_INK, Node, OK, Pill, X0 } from "./parts";
+import { Drift, Flow, Mark, METHOD_INK, Node, OK, Pill, X0, LISTING_PAPER } from "./parts";
 
 const COLS = [X0, 710, 1300];
 const COL_W = 500;
@@ -145,21 +145,8 @@ export const StylesScene: React.FC = () => {
           return (
             <Note key={t} at={at} x={COLS[0]} y={figTop + h(44) + i * h(46)}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 21 }}>
-                <span
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 15,
-                    border: `2px solid ${BAR}`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    ...label(19, BLUE_INK),
-                    fontWeight: 700,
-                    background: tripsAt <= frame ? `color-mix(in srgb, ${BAR} 14%, ${PAPER})` : PAPER,
-                  }}
-                >
-                  {i + 1}
+                <span style={{ ...label(23, BLUE_INK), fontWeight: 750, width: 22, textAlign: "right" }}>
+                  <Num>{i + 1}</Num>
                 </span>
                 <span style={{ fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "pre" }}>
                   <span style={{ color: METHOD_INK, fontWeight: 700 }}>GET</span>
@@ -173,7 +160,7 @@ export const StylesScene: React.FC = () => {
 
         {/* GraphQL: one query, naming its fields. */}
         <Note at={exactlyAt - 2} x={COLS[1]} y={figTop}>
-          <div style={{ background: `color-mix(in srgb, ${INK} 4%, ${PAPER})`, borderTop: `2px solid ${INK}`, padding: "10px 18px 12px", width: 360 }}>
+          <div style={{ background: LISTING_PAPER, borderTop: `2px solid ${INK}`, borderBottom: `1px solid ${HAIRLINE}`, padding: "10px 18px 12px", width: 360 }}>
             {QUERY.map((l, i) => {
               const field = /title|name|text/.test(l);
               return (

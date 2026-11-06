@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { RapidFire, Tick, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -149,14 +149,10 @@ const Consist: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       {/* What each end suits. */}
       <Ink at={feedAt} dur={12} style={{ left: x0 - 10, top: lineY + c.h(150), whiteSpace: "nowrap" }}>
-        <span style={{ display: "inline-block", padding: "6px 16px", borderRadius: 8, border: `2px solid ${BAR}`, ...label(22, BLUE_INK), fontWeight: 700, background: `color-mix(in srgb, ${HIGHLIGHT} 0%, ${PAPER})` }}>
-          a feed
-        </span>
+        <span style={{ ...note(23, INK), fontWeight: 700 }}>a feed can be eventual</span>
       </Ink>
-      <Ink at={bankAt} dur={12} style={{ left: x1 - 190, top: lineY + c.h(150), whiteSpace: "nowrap" }}>
-        <span style={{ display: "inline-block", padding: "6px 16px", borderRadius: 8, border: `2px solid ${INK}`, ...label(22, INK), fontWeight: 700 }}>
-          a bank balance
-        </span>
+      <Ink at={bankAt} dur={12} style={{ left: x1 - 380, top: lineY + c.h(150), whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, INK), fontWeight: 700 }}>a bank balance usually needs strong</span>
       </Ink>
     </>
   );

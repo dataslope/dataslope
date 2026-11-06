@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HASH, sharedChance } from "./data";
-import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, Cell, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, Mark, Mono, OK_INK, Svg, int } from "./parts";
+import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, Mark, Mono, OK_INK, Svg, int } from "./parts";
 
 const AX = 140;
 const PITCH_X = 84;

@@ -130,7 +130,7 @@ export const EdgeScene: React.FC = () => {
           dynamic, user-specific responses
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, bypassAt, 10) }}> usually bypass it</span>
         </Line>
-        <Line x={COL_B} y={itemY + 52} at={ttlAt} size={24} color={INK_SOFT}>
+        <Line x={COL_B} y={itemY + 64} at={ttlAt} size={24} color={INK_SOFT}>
           or get a short time to live at the edge
         </Line>
 

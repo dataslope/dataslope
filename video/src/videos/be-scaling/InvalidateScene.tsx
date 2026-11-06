@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { TTL } from "./data";
-import { Drift, Line, Mark, MiniMap, pct, Q_SIZE, Q_W, Spot, StepRow, Svg, X0 } from "./parts";
+import { Drift, Line, Mark, MiniMap, OK_INK, pct, Q_SIZE, Q_W, Spot, StepRow, Svg, X0 } from "./parts";
 
 /** The TTL chart: shares of reads against the TTL on a log axis. */
 const C = { x0: 960, x1: 1760, top: 410, base: 790, max: 0.5, lo: 1, hi: 600 };

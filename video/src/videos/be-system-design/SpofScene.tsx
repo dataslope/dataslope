@@ -167,7 +167,7 @@ export const SpofScene: React.FC = () => {
         <Line x={X0} y={y(300)} at={anyAt} size={26} weight={700}>
           Single point of failure
         </Line>
-        <Line x={X0} y={y(300) + 44} at={anyAt + 6} size={24} color={INK_SOFT} width={LEFT_W}>
+        <Line x={X0} y={y(300) + 56} at={anyAt + 6} size={24} color={INK_SOFT} width={LEFT_W}>
           any component whose failure takes the system down
         </Line>
         <Line x={X0} y={y(300) + 160} at={threeAt} size={26} weight={700} color={ACCENT_INK}>
@@ -182,12 +182,12 @@ export const SpofScene: React.FC = () => {
           Remove each with redundancy
         </Line>
         {fixes.map((f, i) => (
-          <div key={f.text} style={{ position: "absolute", left: RX, top: y(300) + 110 + i * 48, display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, f.at, 10) }}>
+          <div key={f.text} style={{ position: "absolute", left: RX, top: y(300) + 112 + i * 54, display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, f.at, 10) }}>
             {frame >= f.at ? <Tick at={f.at + 4} size={22} /> : <span style={{ width: 22 }} />}
             <span style={{ ...label(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{f.text}</span>
           </div>
         ))}
-        <Line x={RX} y={y(300) + 110 + 4 * 48 + 6} at={dcAt} size={21} color={INK_SOFT} width={330}>
+        <Line x={RX} y={y(300) + 112 + 4 * 54 + 4} at={dcAt} size={21} color={INK_SOFT} width={330}>
           separate data centers in one region
         </Line>
         <Line x={RX} y={y(700)} at={noneAt} size={28} weight={700} color={OK_INK} width={330}>

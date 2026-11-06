@@ -3,7 +3,7 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
@@ -207,25 +207,9 @@ export const CodesScene: React.FC = () => {
         <Msg x={REQ_X} y={rowTop(2)} w={REQ_W} at={a404} lines={[{ t: "DELETE /articles/42" }, { t: "(from a stranger)", color: INK_SOFT }]} />
         <Flow points={[[REQ_X + REQ_W + 8, rowTop(2) + twoH / 2], [RESP_X - 8, rowTop(2) + twoH / 2]]} at={a404 + 8} color={INK_SOFT} width={2.2} head={11} />
         <Msg x={RESP_X} y={rowTop(2)} w={RESP_W} at={a404 + 10} tone="data" lines={[{ t: "404 Not Found" }, { t: "on purpose", at: purposeAt, color: INK_SOFT }]} />
-        <div
-          style={{
-            position: "absolute",
-            left: 1630,
-            top: rowTop(2),
-            width: 160,
-            height: twoH,
-            boxSizing: "border-box",
-            border: `2px dashed ${HAIRLINE}`,
-            borderRadius: 10,
-            background: PAPER,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: 0.45 * ease(frame, strangerAt, 14),
-          }}
-        >
-          <span style={{ fontFamily: MONO, fontSize: 21, color: INK_SOFT }}>article 42</span>
-        </div>
+        <Note at={strangerAt} x={1640} y={rowTop(2) + h(26)}>
+          <span style={{ fontFamily: MONO, fontSize: 22, color: INK_SOFT, opacity: 0.5, whiteSpace: "nowrap" }}>article 42</span>
+        </Note>
         <Note at={strangerAt + 6} x={RESP_X} y={rowTop(2) + twoH + h(12)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>hides that it exists</span>
         </Note>

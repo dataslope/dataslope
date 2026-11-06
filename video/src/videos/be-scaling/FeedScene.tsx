@@ -251,9 +251,9 @@ export const FeedScene: React.FC = () => {
         </Line>
         <Node x={X0} y={hyTop + h(40)} w={250} h={56} at={ordinaryAt + 4} tone="ok" title="precomputed list" size={21} out={feedOut} />
         {Array.from({ length: FEED.celebritiesFollowed }, (_, i) => (
-          <Node key={i} x={X0 + 290 + i * 120} y={hyTop + h(40)} w={104} h={56} at={fiveAt + 4 + i * 3} tone="ok" title={`celeb ${i + 1}`} size={19} out={feedOut} />
+          <Node key={i} x={X0 + 290 + i * 120} y={hyTop + h(40)} w={104} h={56} at={fiveAt + 4 + i * 3} tone="ok" title={`celeb ${i + 1}`} size={21} out={feedOut} />
         ))}
-        <Line at={sixAt} x={X0 + 290 + 5 * 120 + 30} y={hyTop + h(40) + 12} size={24} weight={700} color={OK_INK} out={feedOut}>
+        <Line at={sixAt} x={X0 + 290 + 5 * 120 + 30} y={hyTop + h(40) + 12} size={22} weight={700} color={OK_INK} out={feedOut}>
           1 + <Num>{FEED.celebritiesFollowed}</Num> = <Num>{FEED.hybridReads}</Num> reads, not <Num>{FEED.pullReads}</Num>
         </Line>
         <Line at={noPostAt} x={X0} y={hyTop + h(40) + 80} size={21} color={INK_SOFT} out={feedOut}>
@@ -316,7 +316,7 @@ export const FeedScene: React.FC = () => {
           head={12}
         />
         <Ink at={apiAt + 4} dur={14} style={{ left: G.cache.x + G.cache.w + 50, top: y(G.cache.mid) - 18, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(26, INK), fontWeight: 700 }}>
+          <span style={{ ...note(22, INK), fontWeight: 700 }}>
             every arrow: <Mark at={apiAt + 6}>an API</Mark>
           </span>
         </Ink>

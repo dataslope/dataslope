@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, INK, INK_SOFT, label, note, HAIRLINE } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { IDEM } from "./data";
-import { artBox, type Col, DataTable, dollars, Drift, Flow, Mark, Msg, Node, OK, OK_INK, Pill, pulse, Spot, tableGeometry, type TableRow, X0 } from "./parts";
+import { artBox, type Col, DataTable, dollars, Drift, Flow, Mark, Msg, Node, OK, OK_INK, Pill, pulse, Spot, tableGeometry, type TableRow, X0, LISTING_PAPER } from "./parts";
 
 const L_TABLE_X = 330;
 const R_X = 1000;
@@ -198,8 +198,9 @@ export const IdemScene: React.FC = () => {
         <Note at={refusesAt} x={X0} y={raceTop + h(92)}>
           <div
             style={{
-              borderLeft: `4px solid ${OK}`,
-              background: `color-mix(in srgb, ${OK} 8%, ${PAPER})`,
+              borderTop: `2px solid ${OK}`,
+              borderBottom: `1px solid ${HAIRLINE}`,
+              background: LISTING_PAPER,
               padding: "10px 20px 12px",
               fontFamily: MONO,
               fontSize: 21,
