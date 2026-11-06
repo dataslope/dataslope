@@ -187,7 +187,8 @@ beats that say them checked for re-voicing cost, before phase 3.
 
 ### What the writers found on the pages
 
-For the owner; nothing in `content/` was edited.
+All four fixed in `content/` on 2026-11-06, at the owner's request ("fix any
+content issues you identify in the site while creating the videos").
 
 - **ai-assisted-coding, the cost block:** "Here input dominates", but input
   is $2,000 of $3,500 (57%), and per token output costs five times as much.

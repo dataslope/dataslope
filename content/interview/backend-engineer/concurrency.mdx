@@ -52,7 +52,7 @@ while waiting on the network or disk.
 
 A race condition is when the result depends on the **timing** of concurrent
 operations on shared state. The classic case: two threads read a counter,
-both see `5`, both increment to `6`, and one update is lost, `+= 1` is not
+both see `5`, both increment to `6`, and one update is lost: `+= 1` is not
 atomic (read, add, write). The fix is to make the critical section mutually
 exclusive with a lock. Below, joining the threads makes the run deterministic,
 and the lock guarantees the total is exactly 200000:
@@ -251,7 +251,7 @@ around the whole operation so it appears atomic to other threads.
 />
 
 <MultipleChoice
-  markdown={`Two threads run \`counter += 1\` a million times each without any lock, and the final value is less than two million. Why?
+  markdown={`Two threads run \`counter += 1\` a million times each without any lock, and the final value can come out less than two million. Why?
 
 - Python integers overflow at one million.
   > Python ints are arbitrary precision; there is no overflow. The loss is a concurrency bug.
