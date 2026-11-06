@@ -60,7 +60,8 @@ export const LADDER = results.ladder as {
 };
 
 /** charts/latency-percentiles.mjs's seeded sample: its marks in ms, its
- *  histogram (counts over `domain`, equal bins), and the hundred-call page. */
+ *  histogram (counts over `domain`, equal bins), the share at or past the
+ *  p99, and the hundred-call page. */
 export const PERCENTILES = results.percentiles as {
   n: number;
   seed: number;
@@ -69,6 +70,7 @@ export const PERCENTILES = results.percentiles as {
   counts: number[];
   calls: number;
   hitsTail: number;
+  tailShare: number;
 };
 
 export type BreakerBand = { state: "open" | "half-open"; t0: number; t1: number };

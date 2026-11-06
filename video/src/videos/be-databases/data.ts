@@ -108,7 +108,7 @@ export const VERSION = FIGURES.index.version;
 
 export const OPENING = {
   users: scalar("index", "rows"),
-  orders: 1_000_000,
+  orders: scalar("composite", "customers", "orders"),
   customers: scalar("composite", "customers", "customers"),
   perCustomer: scalar("composite", "customers", "each"),
   version: VERSION,
@@ -312,3 +312,28 @@ export const RAPID = {
   },
 };
 if (RAPID.joins.left - RAPID.joins.inner !== RAPID.joins.none.length) throw new Error("left minus inner must be the customers with no orders");
+
+// ── What the narration says aloud ───────────────────────────────────────────
+// Every number spoken in script.ts, against the run it comes from, so a
+// rerun of check.mjs that moves one fails here before a scene shows it.
+{
+  const said: [string, boolean][] = [
+    ["a million users, a million orders", OPENING.users === 1_000_000 && OPENING.orders === 1_000_000],
+    ["seven thousand three hundred sixty pages, to keep one row", INDEX.seqPages === 7360 && INDEX.pages === 7360 && INDEX.removed === 999_999],
+    ["three levels deep, four pages", INDEX.levels === 3 && INDEX.btreePages === 4],
+    ["half the users are active", HURT.active === OPENING.users / 2],
+    ["ten thousand log records, and forty thousand with three", Math.round(HURT.walNone / 1000) === 10 && Math.round(HURT.walThree / 1000) === 40],
+    ["thirteen pages", COMPOSITE.latestPages === 13],
+    ["over eighteen hundred pages", COMPOSITE.reversePages > 1800 && COMPOSITE.reversePages < 1900],
+    ["five index searches, never touched the table", COMPOSITE.skipSearches === 5 && COMPOSITE.skipHeapFetches === 0],
+    ["expected five thousand, found two thousand seven hundred thirty-two, nearly a million thrown away", PLAN.fnEstimate === 5000 && PLAN.fnActual === 2732 && PLAN.fnRemoved > 990_000],
+    ["twenty-four orders, forty-eight rows, the revenue more than doubles", FANOUT.orders === 24 && FANOUT.joinedRows === 48 && Number(FANOUT.inflatedTotal) > 2 * Number(FANOUT.total)],
+    ["three hundred four dollars becomes nine hundred twelve, both orders three items", FANOUT.sara.right === "304.00" && FANOUT.sara.wrong === "912.00" && FANOUT.sara.items === 6],
+    ["account one to seventy, then a hundred again", TXN.debited.rows[0][1] === "70" && TXN.after.rows[0][1] === "100"],
+    ["version three, then four", LOCK.readA?.version === 3 && LOCK.writeB?.version === 4],
+    ["one second, its deadlock timeout", DEADLOCK.timeout === "1s"],
+    ["inner twenty-four, left thirty, six who never ordered", RAPID.joins.inner === 24 && RAPID.joins.left === 30 && RAPID.joins.none.length === 6],
+  ];
+  const wrong = said.filter(([, ok]) => !ok).map(([what]) => what);
+  if (wrong.length) throw new Error(`the narration no longer matches the run: ${wrong.join("; ")}`);
+}

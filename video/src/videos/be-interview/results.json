@@ -3,6 +3,11 @@
   "topicPages": 8,
   "conceptCheckPages": 8,
   "challengePages": 3,
+  "challengePageNames": [
+    "algorithms",
+    "object-oriented-design",
+    "databases"
+  ],
   "challenges": 6,
   "keptPages": 7,
   "keptQuestions": 127,

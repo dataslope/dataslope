@@ -151,6 +151,9 @@ R.key = { alphabet: ALPHABET, keyLengths, counted, idBlock: 1_000_000 };
   // not". Each call independently in the slowest 1%: 1 - 0.99^100.
   const calls = 100;
   const hitsTail = 1 - 0.99 ** calls;
+  // "One request in a hundred takes 286 or more": the sample's own share at
+  // or past the p99 mark.
+  const tailShare = sample.filter((ms) => ms >= marks.p99).length / N;
   R.percentiles = {
     n: N,
     seed: 4242,
@@ -159,6 +162,7 @@ R.key = { alphabet: ALPHABET, keyLengths, counted, idBlock: 1_000_000 };
     counts,
     calls,
     hitsTail,
+    tailShare,
   };
 }
 
@@ -305,10 +309,12 @@ const said = [
   ["q2-tail", "two hundred and eighty-six", 286, Math.round(R.percentiles.marks.p99)],
   ["q2-fanout", "sixty-three percent", 63, Math.round(R.percentiles.hitsTail * 100)],
   ["q2-fanout", "a hundred calls", 100, R.percentiles.calls],
+  ["q2-tail", "one request in a hundred", 1, Math.round(R.percentiles.tailShare * 100)],
+  ["q2-fanout", "one-in-a-hundred chance", 1, Math.round(R.percentiles.tailShare * 100)],
   ["q3-path", "about a millisecond", 1, R.ladder.path.hitMs],
   ["q3-path", "about one point six", 1.6, R.ladder.path.missMs],
   ["q3-key", "fifty-seven billion", 57e9, sig2(six.keys)],
-  ["q3-key", "about fifteen years", 15, Math.floor(six.years)],
+  ["q3-key", "over fifteen years", 15, Math.floor(six.years)],
   ["q3-counter", "a million at a time", 1e6, R.key.idBlock],
   ["q4-retry", "three hundred requests a second", 300, R.breaker.retryPeak],
   ["q4-retry", "a hundred", 100, R.breaker.offered],

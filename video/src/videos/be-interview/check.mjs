@@ -50,6 +50,7 @@ const results = {
   topicPages: pages.length,
   conceptCheckPages: pages.filter((p) => p.conceptChecks > 0).length,
   challengePages: pages.filter((p) => p.challenges > 0).length,
+  challengePageNames: pages.filter((p) => p.challenges > 0).map((p) => p.page),
   challenges: pages.reduce((a, p) => a + p.challenges, 0),
   keptPages: kept.length,
   keptQuestions: kept.reduce((a, p) => a + p.questions, 0),
@@ -62,8 +63,11 @@ console.log(JSON.stringify({ ...results, pages: undefined }));
 
 // Node strips the types from script.ts and data.ts.
 const { script } = await import(new URL("./script.ts", import.meta.url).href);
-const { PARTS, QUESTIONS, ANSWERED_HERE, ANSWERED_TOGETHER } = await import(new URL("./data.ts", import.meta.url).href);
+const { PARTS, QUESTIONS, ANSWERED_HERE, ANSWERED_TOGETHER, CHALLENGE_LABELS } = await import(new URL("./data.ts", import.meta.url).href);
 const problems = [];
+// The practice line names the challenge pages on screen: every one, and no other.
+const named = Object.keys(CHALLENGE_LABELS);
+if (named.join() !== results.challengePageNames.join()) problems.push(`challenge pages are ${results.challengePageNames.join(", ")}; the screen names ${named.join(", ")}`);
 
 // Every kept page's questions are answered once, by the parts that take it.
 for (const p of kept) {
@@ -84,13 +88,21 @@ const quotes = [
   ["ai-assisted-coding.mdx", "At least one round is back in person"],
   ["ai-assisted-coding.mdx", "because an assistant can complete them and the reviewer\ncannot see how"],
   ["ai-assisted-coding.mdx", "Karat's 2026 survey of 400 engineering leaders, 71% said AI\nmakes technical skills harder to assess, and 62% of organizations still\nprohibited AI in technical interviews"],
-  ["ai-assisted-coding.mdx", "so read the figures as one vendor's survey"],
+  ["ai-assisted-coding.mdx", "sells interviewing services, so read the figures as one vendor's survey"],
   ["ai-assisted-coding.mdx", "Ask the recruiter, for every round, whether AI is allowed."],
   ["index.mdx", "multi-file projects to extend"],
   ["index.mdx", "streaming, retries, cost measured in tokens, and prompt injection"],
   ["index.mdx", "**Fewer take-homes**"],
   ["index.mdx", 'more live design discussion with "why?" follow-ups'],
   ["index.mdx", "usually in a live coding setting. Backend roles add API/system design and\ndatabase questions on top."],
+  // "series-python": the left-out page's design questions, and the
+  // concurrency page's questions that cover them.
+  ["python.mdx", "### What is the GIL, and when does it bite?"],
+  ["python.mdx", "### How does threading differ from multiprocessing in Python?"],
+  ["python.mdx", "### What is `asyncio` and when should you use it?"],
+  ["concurrency.mdx", "### What is the GIL and why does it exist?"],
+  ["concurrency.mdx", "### Processes vs threads, how do they differ?"],
+  ["concurrency.mdx", "### When do you choose threads vs multiprocessing vs async?"],
 ];
 for (const [file, phrase] of quotes) if (!read(file).includes(phrase)) problems.push(`${file} no longer says: ${phrase}`);
 // The two follow-ups the hook asks, in the AI page's words.
@@ -107,15 +119,16 @@ const text = (id) => {
   return b.text.toLowerCase();
 };
 const claims = [
-  ["series", `${below100(PARTS.length)} videos`],
-  ["series", `${said(QUESTIONS)} of them`],
+  ["series-parts", `${below100(PARTS.length)} videos`],
+  ["series-parts", `${said(QUESTIONS)} of the track's questions`],
   ["practice", results.conceptCheckPages === results.topicPages ? "every topic page has concept checks" : "(not every page has concept checks)"],
   ["practice", `${below100(results.challengePages)} add challenges`],
   ["practice", `${said(bank)} multiple-choice questions`],
   ["ai-survey", "four hundred engineering leaders"],
-  ["ai-survey", "seventy-one percent"],
-  ["ai-survey", "sixty-two percent"],
-  ["ai-allowed", "sixty-minute"],
+  ["ai-survey", "which sells interviewing services"],
+  ["ai-survey-data", "seventy-one percent"],
+  ["ai-survey-data", "sixty-two percent"],
+  ["ai-allowed-who", "sixty-minute"],
   ["ai", "since 2025"],
 ];
 for (const [id, phrase] of claims) if (!text(id).includes(phrase)) problems.push(`script.ts "${id}" no longer says "${phrase}"`);

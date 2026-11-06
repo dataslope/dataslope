@@ -70,7 +70,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (green). idem-race: the duplicate insert refused, Postgres's error
  *     ("violates unique constraint …") in the soft ink.
  *   page: QuestionCard 6; "?limit=20&offset=40" as the page's
- *     SyntaxBreakdown. page-cost: three bars on a log scale, rows read for
+ *     SyntaxBreakdown. page-cost: "PostgreSQL 18, 100,000 articles" as the
+ *     figure's source line; three bars on a log scale, rows read for
  *     pages 1, 500 and 5,000: 20, 10,000, 100,000 (each from the plan's
  *     Index Scan "actual rows"). page-drift: page one ending on article
  *     99,981; article 100,001 arrives at the top; page two by offset starting
@@ -86,8 +87,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     signature check failing (red). auth-oauth: a user, an app and a
  *     service; the app reaching the service with a token, no password
  *     crossing.
- *   revoke: QuestionCard 8. revoke-session: the session deleted from the
- *     store, the next request refused at once (green). revoke-jwt: the same
+ *   revoke: QuestionCard 8. revoke-session: two servers reading one shared
+ *     session store; the session deleted from it, the next request refused
+ *     at once (green). revoke-jwt: the same
  *     token still accepted until "exp" on a clock (red). revoke-hybrid: a
  *     15-minute access token beside a long refresh token with a revoke
  *     switch; the 15 minutes marked as the window a banned user keeps.
@@ -95,9 +97,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     counts". limit-contract: an example 429 response, the video's own
  *     values (X-RateLimit-Limit: 100, X-RateLimit-Remaining: 0,
  *     X-RateLimit-Reset, Retry-After: 30), each header lit as it is named.
- *     limit-client: a client gauge reading Remaining and slowing; then the
- *     wait drawn as Retry-After plus a spread of jitter, with the doubling
- *     backoff after it. limit-safe: the same backoff under a timeout and a
+ *     limit-client: a client gauge reading Remaining and slowing; then a
+ *     timeline of waits: Retry-After first, then each refusal doubling the
+ *     wait, each wait with a spread of jitter. limit-safe: the same backoff under a timeout and a
  *     5xx, where the outcome is unknown; GET, PUT and a keyed POST ticked as
  *     safe to repeat there, a bare POST not.
  *   styles: QuestionCard 10; three columns. styles-rest: REST's screen
@@ -110,7 +112,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     page's verb and path table, then "201 Created, Location:
  *     /articles/43". r-version: "/v1/orders"; a removed field (red), an
  *     added optional one (green). r-errors: the page's 422 body.
- *     r-hateoas: a response with "next" and "comments" links. r-content:
+ *     r-hateoas: a response with "next" and "comments" links; "REST as
+ *     defined: required" beside "in practice: often skipped". r-content:
  *     Accept and Content-Type on two arrows; 3,663 bytes against 610.
  *   next: the RapidFire list complete; NextLine "Next: databases".
  *
@@ -125,7 +128,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     one ends on article 99,981; after article 100,001 is inserted, page
  *     two by offset starts on 99,981, by cursor on 99,980.
  *   - "idem", on the same Postgres: three plain POSTs of 5000 cents (the
- *     page's example body, "fifty dollars") make three payments, 15,000
+ *     page's example body, {"amount": 5000, "currency": "usd"}, read as
+ *     cents, the smallest unit of the currency: "fifty dollars"; the body on
+ *     screen keeps the page's 5000) make three payments, 15,000
  *     cents; with the page's Idempotency-Key and a unique constraint, the
  *     first insert returns payment 1 and the next two insert nothing, so one
  *     payment, 5,000 cents. A plain insert with the same key: "duplicate key
@@ -142,22 +147,38 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   - The methods' properties, the status classes and codes, 401 and 403,
  *     the rate-limit headers, the three API styles, versioning, errors,
  *     HATEOAS and content negotiation are the page's own answers, drawn,
- *     with no numbers. Two points go past the page and are standard HTTP
- *     (RFC 9110): a 401 response carries a WWW-Authenticate challenge (the
- *     page says "normally"; the RFC says a server must send one), and
- *     idempotency is a property of the server's state, not of the response,
- *     so a repeated DELETE may answer 404 and still be idempotent. The
- *     example 429's header values (100, 0, 30) are the video's own, shown as
- *     an example, never as a measured response.
- *   - No API product is named: the page names none.
+ *     with no numbers. Points that go past the page, each from its
+ *     standard rather than from a run:
+ *       - RFC 9110 (HTTP Semantics), 15.5.2: a server sending 401 must
+ *         send a WWW-Authenticate challenge (the page says "normally").
+ *       - RFC 9110, 9.2.2: idempotency is about the intended effect on the
+ *         server, not the response, so a repeated DELETE may answer 404 and
+ *         still be idempotent.
+ *       - RFC 9110, 15.5.4: a server that wants to hide that a forbidden
+ *         resource exists may answer 404 instead of 403 ("authn-404").
+ *       - Fielding's dissertation (2000), 5.1.5, lists hypermedia as the
+ *         engine of application state among REST's four interface
+ *         constraints, so strictly REST requires it; the page's "aspirational
+ *         rather than required" describes practice, which "r-hateoas" says
+ *         as practice (reported to the coordinator).
+ *       - Backing off with jitter after a 429 or a 5xx, and repeating only
+ *         safe or keyed requests after one ("limit-client", "limit-safe"):
+ *         the page's "so a well-behaved client can back off", carried to its
+ *         follow-up with question five's idempotency.
+ *     The example 429's header values (100, 0, 30) are the video's own,
+ *     shown as an example, never as a measured response.
+ *   - No API product is named: the page names none. Postgres is named once,
+ *     glossed, for the runs ("page-cost").
  *
  * Written for Drew's ear: status codes as they are said ("four oh one",
  * "two oh one", "four twenty-nine"); initialisms in plain caps (API, HTTP,
- * URL, ID, JWT, JSON), with the ones said as words (REST, RESTful, JSON,
- * HATEOAS, gRPC) reported for the lexicon; the HTTP methods in caps, as
- * they are written (GET, PUT, POST, PATCH, DELETE), to be confirmed as said
- * as words; no sentence opening on "A" before an initialism; JWT and
- * HATEOAS expanded once; header names said as words, except Retry-After.
+ * URL, ID, JWT), with the ones said as words (REST, RESTful, JSON, OAuth,
+ * HATEOAS) reported for the lexicon, and gRPC, spelled out but in mixed
+ * case, reported to be confirmed; the HTTP methods in caps, as they are
+ * written (GET, PUT, POST, PATCH, DELETE), to be confirmed as said as words,
+ * as SELECT and JOIN are; no sentence opening on "A" before an initialism;
+ * JWT and HATEOAS expanded once; the rate-limit headers described in words
+ * ("the limit, what's remaining"), Retry-After alone said by name.
  */
 export const script: NarrationScript = {
   id: "be-api-design",
@@ -281,7 +302,7 @@ export const script: NarrationScript = {
     },
     {
       id: "idem-race",
-      text: "Put a unique constraint on the key, and even two retries racing each other can't both get in: the database refuses the second.",
+      text: "What makes it safe is a unique constraint on the key: even two retries racing each other can't both get in, because the database refuses the second.",
       pauseAfter: 0.8,
     },
 
@@ -294,7 +315,7 @@ export const script: NarrationScript = {
     },
     {
       id: "page-cost",
-      text: "On a hundred thousand articles, newest first, page one reads twenty rows. Page five hundred reads ten thousand to return twenty, and page five thousand reads all hundred thousand.",
+      text: "Run it in Postgres, the open-source relational database, on a hundred thousand articles, newest first. Page one reads twenty rows. Page five hundred reads ten thousand to return twenty, and page five thousand reads all hundred thousand.",
       pauseAfter: 0.7,
     },
     {
@@ -342,13 +363,13 @@ export const script: NarrationScript = {
     },
     {
       id: "revoke-session",
-      text: "When you need instant revocation, to log a user out or ban them now. Delete the session, and the next request fails. Checked locally, a JWT stays valid until it expires, unless every check does a lookup again.",
+      text: "When you need instant revocation, to log a user out or ban them now, and can afford a session store every server shares. Delete the session, and the next request fails. Checked locally, a JWT stays valid until it expires, unless every check does a lookup again.",
       pauseAfter: 0.6,
     },
     {
       id: "revoke-jwt",
       text: "JWTs fit many services verifying requests without asking a session store each time.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.6,
     },
     {
       id: "revoke-hybrid",
@@ -360,7 +381,7 @@ export const script: NarrationScript = {
     {
       id: "limit",
       scene: true,
-      text: "Question nine. How do you rate-limit an API, and how should clients learn their limits? The server caps requests per client per window, commonly with a token bucket, which allows short bursts. Part two covers how it counts.",
+      text: "Question nine. How do you rate-limit an API, and how should clients learn their limits? The server caps requests per client per window, commonly with a token bucket, which allows short bursts. Part two, on scaling, covers how it counts.",
       pauseAfter: 0.5,
     },
     {
@@ -370,7 +391,7 @@ export const script: NarrationScript = {
     },
     {
       id: "limit-client",
-      text: "A well-behaved client watches what's remaining, and slows down before it's refused. On a four twenty-nine, it waits at least Retry-After, then backs off exponentially, with random jitter, so a crowd of clients doesn't return at once.",
+      text: "A well-behaved client watches what's remaining, and slows down before it's refused. On a four twenty-nine, it waits at least Retry-After. Refused again, it doubles the wait each time, plus random jitter, so a crowd of clients doesn't return at once.",
       pauseAfter: 0.6,
     },
     {
@@ -436,7 +457,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-hateoas",
-      text: "HATEOAS, hypermedia as the engine of application state, means responses carry links to what the client can do next. It's REST's strictest level, and most APIs skip it, though a link to the next page is common.",
+      text: "HATEOAS, hypermedia as the engine of application state, means responses carry links to what the client can do next. REST as first defined requires it; in practice most APIs skip it, though a link to the next page is common.",
       pauseAfter: 0.6,
     },
     {

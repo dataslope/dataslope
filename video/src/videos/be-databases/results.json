@@ -285,14 +285,16 @@
       "setup": "SET default_statistics_target = 10000;\nCREATE TABLE orders AS\nSELECT g AS id,\n  (1 + (g::bigint * 7919) % 50000)::int AS customer_id,\n  TIMESTAMP '2024-01-01' + (g - 1) * INTERVAL '31.62 seconds' AS created_at,\n  (ARRAY['pending', 'paid', 'shipped', 'returned'])[1 + g % 4] AS status,\n  round(5 + ((g * 37) % 9500) / 100.0, 2) AS amount\nFROM generate_series(1, 1000000) g;\nALTER TABLE orders ADD PRIMARY KEY (id);\nVACUUM ANALYZE orders",
       "steps": {
         "customers": {
-          "sql": "SELECT COUNT(DISTINCT customer_id) AS customers, COUNT(*) / COUNT(DISTINCT customer_id) AS each FROM orders;",
+          "sql": "SELECT COUNT(*) AS orders, COUNT(DISTINCT customer_id) AS customers,\n  COUNT(*) / COUNT(DISTINCT customer_id) AS each\nFROM orders;",
           "ok": true,
           "columns": [
+            "orders",
             "customers",
             "each"
           ],
           "rows": [
             [
+              "1000000",
               "50000",
               "20"
             ]

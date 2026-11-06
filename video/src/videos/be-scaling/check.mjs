@@ -373,7 +373,9 @@ const [thousandth, hundredth, tenth] = R.cache.sizes;
 const wait = (rho) => Math.round(R.headroom.marks.find((m) => m.rho === rho).wait);
 const said = [
   ["hook", "about thirty-five thousand redirects a second", 35_000, sig2(R.traffic.part1Peak)],
+  ["hook-10x", "ten times the traffic", 10, R.traffic.factor],
   ["hook-10x", "three hundred and fifty thousand a second", 350_000, sig2(R.traffic.peak)],
+  ["next", "ten times the traffic", 10, R.traffic.factor],
   ["q1-headroom", "one service time on average at fifty percent load", 1, wait(0.5)],
   ["q1-headroom", "nine at ninety percent", 9, wait(0.9)],
   ["q1-headroom", "ninety-nine at ninety-nine", 99, wait(0.99)],
@@ -400,6 +402,7 @@ const said = [
   ["q9-fixed", "twice the limit", 2, R.rate.fixed.accepted / R.rate.limit],
   ["q9-sliding", "refuses the second ten", 0, R.rate.sliding.second],
   ["q9-token", "one every six seconds", 6, R.rate.refillSeconds],
+  ["q9-token", "burst ten at once", 10, R.rate.token.accepted - R.rate.token.second],
   ["q9-token", "the second is refused", 0, R.rate.token.second],
   ["q9-leaky", "one every six seconds", 6, R.rate.refillSeconds],
   ["q9-shared", "four app servers", 4, R.rate.servers],

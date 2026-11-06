@@ -143,3 +143,22 @@ export const GZIP = {
   fraction: results.gzip.gzipped / results.gzip.bytes,
 };
 if (Math.round(1 / GZIP.fraction) !== 6) throw new Error("the narration says about a sixth");
+
+// ── What the narration says aloud ───────────────────────────────────────────
+// Every number spoken in script.ts, against the run it comes from, so a
+// rerun of check.mjs that moves one fails here before a scene shows it.
+{
+  const read = (method: "offset" | "cursor", page: number) => PAGE[method].find((p) => p.page === page)?.read;
+  const said: [string, boolean][] = [
+    ["fifty dollars; three charges, a hundred and fifty dollars", IDEM.unkeyed.cents === 15_000 && Number(IDEM.stored[1]) === 5000],
+    ["three requests, one charge", IDEM.keyedTotal.charges === 1 && IDEM.keyedTotal.cents === 5000],
+    ["a hundred thousand articles", PAGE.articles === 100_000],
+    ["page one reads twenty, page five hundred ten thousand, page five thousand all hundred thousand", read("offset", 1) === 20 && read("offset", 500) === 10_000 && read("offset", 5000) === 100_000],
+    ["twenty rows read at any depth", PAGE.cursor.every((p) => p.read === PAGE_SIZE)],
+    ["forty-three random characters", AUTH.sessionChars === 43],
+    ["a hundred sixty-four characters", AUTH.chars === 164],
+    ["say fifteen minutes", AUTH.lifetimeMinutes === 15],
+  ];
+  const wrong = said.filter(([, ok]) => !ok).map(([what]) => what);
+  if (wrong.length) throw new Error(`the narration no longer matches the run: ${wrong.join("; ")}`);
+}

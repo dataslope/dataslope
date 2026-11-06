@@ -70,6 +70,15 @@ export const TOPIC_PAGES: number = results.topicPages;
 export const CHECK_PAGES: number = results.conceptCheckPages;
 export const CHALLENGE_PAGES: number = results.challengePages;
 
+/** The pages with runnable challenges, by file stem in track order, and how
+ *  the practice line names them on screen ("practice"). */
+export const CHALLENGE_PAGE_NAMES: readonly string[] = results.challengePageNames;
+export const CHALLENGE_LABELS: Readonly<Record<string, string>> = {
+  algorithms: "Algorithms",
+  "object-oriented-design": "Object design",
+  databases: "Databases",
+};
+
 /** Karat, Engineering Interview Trends 2026, as the AI page reports it. The
  *  page's footnote calls it one vendor's survey, and so does the screen. */
 export const KARAT = { leaders: 400, harderToAssess: 71, stillProhibit: 62, year: 2026 } as const;

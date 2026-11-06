@@ -64,7 +64,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q1-horiz: beside it, the box multiplies into a row behind a load
  *     balancer (horizontal), green; a small "session" token leaves an app
  *     server for a shared store on "session state".
- *   q1-ours: the shortener's two app servers become six, green.
+ *   q1-ours: the shortener's two app servers multiply into a longer row,
+ *     green, with no count on it (question nine's follow-up draws four).
  *   q1-headroom, q1-buy: the page's queue chart (queue-utilization-latency),
  *     redrawn from results.json: mean wait against load, with dots at 50%
  *     ("1×"), 90% ("9×") and 99% ("99×", off the top, an arrow) lit as said;
@@ -128,8 +129,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     available"; the top row lit first, then the bottom row on "refuses"
  *     and "answers", "refuse" and "answer, maybe stale".
  *   q7-ours: the shortener split by a red partition line. Three operations,
- *     each placed in a column as said: "redirect" (available), "new random
- *     key" (available, each side drawing on its own ID block), "custom alias"
+ *     each placed in a column as said: "redirect" (available, with two small
+ *     gray notes, "not found yet" and "taken down, still works"), "new key"
+ *     (available, each side drawing on its own ID block), "custom alias"
  *     (consistent: refused on the minority side).
  *   q7-pacelc: the healthy row returns with "latency or consistency" in it,
  *     and the letters P-A-C-E-L-C set out under the grid, "else" marked.
@@ -139,16 +141,18 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     redirect returns at once, green; a burst lengthens the queue, workers
  *     drain it at a steady rate.
  *   q8-once: a worker crashes before its "ack"; the click comes round again;
- *     a "seen IDs" box counts it once, green; a small "totals run behind"
- *     note.
+ *     the count and a "seen IDs" table sit in one box marked "one
+ *     transaction", and the repeat bounces off it, green; a small "totals
+ *     run behind" note.
  *   q9: question card; a timeline from 0 to 70 s with the minute boundary at
  *     60, ten requests at 59 and ten at 61 (results.json trace). The bucket
  *     spot.
  *   q9-fixed, q9-sliding, q9-token, q9-leaky: four rows under the same
  *     timeline, one per algorithm, each request a cell, accepted green and
  *     refused red (results.json cells): fixed 20 of 20 (with "2× the limit"
- *     in red), sliding 10, token bucket 10 with its level drawn, leaky bucket
- *     with its queue and a steady drip out, one every 6 s.
+ *     in red), sliding 10, token bucket 10 with its level drawn (full at the
+ *     start, "burst of 10" on "burst ten"), leaky bucket with its queue and a
+ *     steady drip out, one every 6 s, on "smooth stream".
  *   q9-shared: four server boxes, each with its own bucket, a burst of forty
  *     dealt round-robin, all forty green: "4× the limit" in red; then one
  *     shared bucket, ten pass.
@@ -168,9 +172,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q12-hybrid: one feed built from the precomputed list plus five
  *     celebrity timelines, "1 + 5 = 6 reads", green; the celebrity's post is
  *     no longer pushed.
- *   next: the whole grown diagram small: load balancer, cache with replicas,
- *     leader and followers, eight shards, a queue, a limiter, each named as
- *     said; every arrow between them lit on "API"; <NextLine> "Next: API
+ *   next: the whole grown diagram small, "350,000/s" beside it: more app
+ *     servers behind the load balancer, the cache with replicas, leader and
+ *     followers, eight shards, a queue, a limiter, each lit as named.
+ *   next-api: every arrow between them lit on "API"; <NextLine> "Next: API
  *     design".
  *
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
@@ -226,9 +231,13 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     transcoding), at-least-once delivery and idempotent consumers, and
  *     totals that lag (the page's "trades immediate consistency for
  *     throughput and resilience"): the page. Counting clicks and the click ID
- *     are the video's own example.
- *   - q9: the page's four algorithms, 429, "allows short bursts", "trade
- *     accuracy for cheapness". The trace is the video's own: a limit of ten
+ *     are the video's own example. Recording the ID in the same transaction
+ *     as the count is what makes the skip safe: a seen-ID set written apart
+ *     from the count can lose a crash between the two writes, the gap the
+ *     Data Engineer review found in its streaming video.
+ *   - q9: the page's four algorithms, 429, "allows short bursts" (the burst
+ *     of ten a full bucket passes, results.json), the leaky bucket's
+ *     "smoothing output", "trade accuracy for cheapness". The trace is the video's own: a limit of ten
  *     a minute; fixed window passes all 20 (2 times the limit), the sliding
  *     window counter none of the second ten, the token bucket (ten tokens, one
  *     every 6 s, full at the start) none of the second ten, the leaky bucket
@@ -356,7 +365,7 @@ export const script: NarrationScript = {
     {
       id: "q4",
       scene: true,
-      text: "Question four. Why is cache invalidation hard? Because there are two copies of the truth, and they drift. Set the TTL, the time to live, too long and users see stale data; too short and you lose the cache.",
+      text: "Question four. Why is cache invalidation hard? Because there are two copies of the truth, and they drift. Set the TTL, the time to live, too long and users see stale data; too short and you lose the cache's benefit.",
       pauseAfter: 0.6,
     },
     {
@@ -420,7 +429,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q7-ours",
-      text: "It's a choice per operation, not a label for the database. A redirect answers from whatever copy it reaches; at worst, a brand-new link isn't found yet. New keys can be minted on both sides, if each server draws from its own block of IDs. But a custom alias must be unique, so the side without a majority refuses it.",
+      text: "It's a choice per operation, not a label for the database. A redirect answers from whatever copy it reaches; at worst, a brand-new link isn't found yet, or one just taken down still works. New keys can be minted on both sides, if each server draws from its own block of IDs. But a custom alias must be unique, so the side without a majority refuses it.",
       pauseAfter: 0.8,
     },
     {
@@ -443,7 +452,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q8-once",
-      text: "The price is at-least-once delivery: a worker that crashes before acknowledging gets the click again. So make the consumer idempotent: give each click an ID, and count each ID once. The totals now run a little behind.",
+      text: "The price is at-least-once delivery: a worker that crashes before acknowledging gets the click again. So make the consumer idempotent: give each click an ID, and record the ID in the same transaction that adds to the count, so a repeat changes nothing. The totals now run a little behind.",
       pauseAfter: 0.8,
     },
 
@@ -466,12 +475,12 @@ export const script: NarrationScript = {
     },
     {
       id: "q9-token",
-      text: "A token bucket holds ten tokens and refills one every six seconds. Each request spends one, and an empty bucket answers HTTP four twenty-nine, too many requests. The first burst empties it, and the second is refused.",
+      text: "A token bucket holds ten tokens and refills one every six seconds. Each request spends one, so a client that's been quiet can burst ten at once, and an empty bucket answers HTTP four twenty-nine, too many requests. Here the first burst empties it, and the second is refused.",
       pauseAfter: 0.6,
     },
     {
       id: "q9-leaky",
-      text: "A leaky bucket queues requests and lets them out at a constant rate, one every six seconds.",
+      text: "A leaky bucket queues requests and lets them out at a constant rate, one every six seconds, so the servers behind it see a smooth stream, and a burst waits its turn.",
       pauseAfter: 0.6,
     },
     {
@@ -489,12 +498,12 @@ export const script: NarrationScript = {
     },
     {
       id: "r-evict",
-      text: "Which eviction policy, when the cache fills? LRU, least recently used, drops the entry untouched longest: a good default. LFU, least frequently used, keeps popular keys through a quiet spell. First in, first out evicts in insertion order, used or not. Expiry by TTL bounds staleness whatever the memory pressure. Most systems pair LRU with a TTL.",
+      text: "When a cache fills, LRU, least recently used, drops the entry untouched longest: a good default. LFU, least frequently used, keeps popular keys through a quiet spell. First in, first out evicts in insertion order, used or not. And a TTL expires entries on a timer, bounding staleness whatever the memory pressure. Most systems pair LRU with a TTL.",
       pauseAfter: 0.7,
     },
     {
       id: "r-consist",
-      text: "And the consistency models to know. Strong: every read reflects the latest write. Eventual: replicas converge once writes stop, and a read can be stale meanwhile. Between them, read-your-writes, the fix from question five, and monotonic reads, where time never runs backwards. A feed can be eventual; a bank balance usually needs strong.",
+      text: "And the consistency models to know. Strong: every read reflects the latest write. Eventual: replicas converge once writes stop, and a read can be stale meanwhile. Between them, read-your-writes, the fix from question five, and monotonic reads, where you never see time go backwards. A feed can be eventual; a bank balance usually needs strong.",
       pauseAfter: 0.9,
     },
 
@@ -527,7 +536,12 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "A load balancer, a cache, replicas, shards, a queue and a limiter: every box now talks to the others through an API. Next: API design.",
+      text: "That's the design, grown for ten times the traffic.",
+      pauseAfter: 0.7,
+    },
+    {
+      id: "next-api",
+      text: "Every box in it talks to the others through an API. Next: API design.",
     },
   ],
 };

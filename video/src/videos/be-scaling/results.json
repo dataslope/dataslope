@@ -1294,8 +1294,18 @@
     },
     {
       "beat": "hook-10x",
+      "words": "ten times the traffic",
+      "means": 10
+    },
+    {
+      "beat": "hook-10x",
       "words": "three hundred and fifty thousand a second",
       "means": 350000
+    },
+    {
+      "beat": "next",
+      "words": "ten times the traffic",
+      "means": 10
     },
     {
       "beat": "q1-headroom",
@@ -1426,6 +1436,11 @@
       "beat": "q9-token",
       "words": "one every six seconds",
       "means": 6
+    },
+    {
+      "beat": "q9-token",
+      "words": "burst ten at once",
+      "means": 10
     },
     {
       "beat": "q9-token",

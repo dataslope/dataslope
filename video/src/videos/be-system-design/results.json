@@ -179,7 +179,8 @@
       15
     ],
     "calls": 100,
-    "hitsTail": 0.6339676587267709
+    "hitsTail": 0.6339676587267709,
+    "tailShare": 0.010025
   },
   "breaker": {
     "seconds": 120,
@@ -804,6 +805,16 @@
       "means": 100
     },
     {
+      "beat": "q2-tail",
+      "words": "one request in a hundred",
+      "means": 1
+    },
+    {
+      "beat": "q2-fanout",
+      "words": "one-in-a-hundred chance",
+      "means": 1
+    },
+    {
       "beat": "q3-path",
       "words": "about a millisecond",
       "means": 1
@@ -820,7 +831,7 @@
     },
     {
       "beat": "q3-key",
-      "words": "about fifteen years",
+      "words": "over fifteen years",
       "means": 15
     },
     {

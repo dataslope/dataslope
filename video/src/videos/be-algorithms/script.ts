@@ -19,6 +19,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * wrong result, green the right one, yellow what the narration points at,
  * blue data.
  *
+ * The watercolors (illustrations.json): the pangolin on the opening ("hook"
+ * and "plan"), then one spot per figure, in the whitespace beside it: the
+ * hourglass by question one's modeled 83 minutes, the key ring by question
+ * two's map, the stack of plates by question four's column of openers, the
+ * three oranges (one on top, a heap's root) by question six's tree, the
+ * road map by question seven's graph, and the fanned cards by question
+ * eight's bars and the first quick round's sorting rows.
+ *
  *   1. "What is Big-O notation, and why do interviewers care?" ("big").
  *      A grid of n by n dots (every pair) beside one row of n dots (one
  *      pass); then a table of n, pairs and one pass at 100, 1,000 (counted,
@@ -68,9 +76,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *      Bellman-Ford's B = 1, D = 2 in green, three rounds over four edges.
  *   8. "How does quicksort work, and what is its worst-case?" ("quick"). A
  *      thousand bars already in order, partitioned on the last: a staircase
- *      of splits 999 levels deep, 499,500 comparisons, and Python's
- *      RecursionError for the recursive form, in red; then the same bars on
- *      random pivots, a bushy tree 21 levels deep, 10,962 comparisons.
+ *      of splits 999 levels deep, 499,500 comparisons labelled "n squared
+ *      over two" on "n squared", and Python's RecursionError for the
+ *      recursive form, in red; then the same bars on random pivots, a bushy
+ *      tree 21 levels deep, 10,962 comparisons, in green; "quick-next" sets
+ *      "in place" against merge sort's buffer.
  *   Quick round one ("rapid-in", 9 to 19): "Explain merge sort and its
  *   complexity."; "When is heapsort preferable?"; "What makes a sort
  *   'stable,' and why does it matter?"; "Explain the difference between
@@ -107,7 +117,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * (Python 3.14.2), the runtime of the page's <CodeBlock>s; counts operations
  * on the video's own inputs (seeded, or built from fixed expressions); and
  * does the arithmetic from stated assumptions, into results.json, which
- * data.ts reads. It then fails if a beat stops saying what ran (58 claims)
+ * data.ts reads. It then fails if a beat stops saying what ran (59 claims)
  * or a deep dive stops reading its heading word for word. Nothing is timed.
  *   - "big-count", "big-million": a double loop over n items checks
  *     n(n - 1)/2 pairs: 4,950 at 100 ("under five thousand"),
@@ -160,7 +170,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     narration's "a node is final when it leaves the heap" is the textbook
  *     algorithm the complexity is for, and the screen says which version.
  *   - "quick-sorted": a thousand sorted numbers, last-element pivot: 499,500
- *     comparisons ("half a million"), 999 levels ("nearly a thousand").
+ *     comparisons ("half a million"), exactly n(n - 1)/2, the "n squared"
+ *     the beat names; 999 levels ("nearly a thousand").
  *     "quick-limit": the page's recursive shape with a last pivot raises
  *     RecursionError at Python's default limit, 1,000. "quick-random": a
  *     seeded random pivot on the same input, 10,962 ("eleven thousand"), 21
@@ -176,6 +187,15 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     permutations outputs (results.json, "page"). The adjacency figures are
  *     arithmetic from the assumption said aloud: a million users with a
  *     hundred friends each, 10^8 list entries against 10^12 matrix cells.
+ *     "r-bst-heap" says a range costs log n plus its length, where the page
+ *     says "O(log n) for ... range queries": finding where a range starts is
+ *     log n, and reading it out is one step per key in it.
+ *
+ * Where the page and a run disagree (reported, not followed; nothing in
+ * content/ is edited): the list "doubling" above; two_sum_sorted's second
+ * call, commented "None", returns (3, 4) (results.json, pageDisagrees); and
+ * a Python set grows at three fifths full, not the page's "~2/3", which is
+ * a dict's (counts.setLoad: 5 of 8, 19 of 32, 77 of 128 slots).
  *
  * Written for Drew's ear: complexity as people say it ("n squared", "log n",
  * "n log n", "O of one", "V plus E"); BFS, DFS, BST, AVL, IP and ID in plain
@@ -237,12 +257,12 @@ export const script: NarrationScript = {
     },
     {
       id: "hash-twosum",
-      text: "It turns Two Sum's double loop into one pass: at each number, ask the map for target minus it, then store the number. Linear time, at a cost of linear memory.",
+      text: "It turns Two Sum's double loop into one pass: at each number, ask the map for target minus it, then store the number. Linear time, at the cost of linear memory.",
       pauseAfter: 0.7,
     },
     {
       id: "hash-collide",
-      text: "Average is the key word. With a thousand buckets, two keys more likely than not share one by the thirty-eighth key.",
+      text: "Average is the key word. With a thousand buckets, a shared bucket is more likely than not by the thirty-eighth key.",
       pauseAfter: 0.6,
     },
     {
@@ -355,7 +375,7 @@ export const script: NarrationScript = {
     },
     {
       id: "heap-build",
-      text: "The follow-up: building a heap is linear, not n log n, since most nodes sit near the bottom. For a million items arriving least urgent first, heapify takes one and a half million comparisons; one at a time, eighteen million.",
+      text: "The follow-up: building a heap is linear, not n log n, since most nodes sit near the bottom. For a million items arriving least urgent first, heapify takes one and a half million comparisons; pushed one at a time, eighteen million.",
       pauseAfter: 0.8,
     },
 
@@ -392,7 +412,7 @@ export const script: NarrationScript = {
     },
     {
       id: "quick-sorted",
-      text: "The worst case is a pivot that's always the smallest or largest. Pivot a thousand sorted numbers on the last, and each split peels off one: half a million comparisons, nearly a thousand levels.",
+      text: "The worst case is n squared, when the pivot is always the smallest or largest. Pivot a thousand sorted numbers on the last, and each split peels off one: half a million comparisons, nearly a thousand levels.",
       pauseAfter: 0.7,
     },
     { id: "quick-limit", text: "Written recursively, that's past Python's default limit.", pauseAfter: 0.6 },
@@ -407,7 +427,7 @@ export const script: NarrationScript = {
       pauseAfter: 0.9,
     },
 
-    // ── Quick round one: sorting and recursion (12 to 22) ─────────────────
+    // ── Quick round one: sorting and recursion (9 to 19) ──────────────────
     {
       id: "rapid-in",
       scene: true,
@@ -463,7 +483,7 @@ export const script: NarrationScript = {
       pauseAfter: 0.8,
     },
 
-    // ── Quick round two: structures, search and graphs (23 to 35) ─────────
+    // ── Quick round two: structures, search and graphs (20 to 32) ─────────
     { id: "rapid2-in", scene: true, text: "Now structures, search and graphs.", pauseAfter: 0.6 },
     {
       id: "r-array",
@@ -480,7 +500,7 @@ export const script: NarrationScript = {
     },
     {
       id: "r-bst-heap",
-      text: "A heap only knows its top. A balanced BST knows the whole order, so it answers ranges in log n.",
+      text: "A heap only knows its top. A balanced BST keeps the whole order: the next key in log n, a range in log n plus its length.",
     },
     {
       id: "r-trie",

@@ -296,6 +296,28 @@ json.dumps(_printed)
 `),
 );
 
+/** What the page's comments say each print shows, where a comment names a
+ *  value. A snippet whose run disagrees is recorded in results.json
+ *  (pageDisagrees) and reported, never followed: two_sum_sorted's second
+ *  call, target 10, is commented "None" on the page and returns (3, 4),
+ *  since 4 + 6 = 10. The narration uses neither line. */
+const PAGE_SAYS = {
+  heap: ["1"],
+  bfs: ["['A', 'B', 'C', 'D']"],
+  cycle: ["False", "True"],
+  dijkstra: ["{'A': 0, 'B': 1, 'C': 3, 'D': 4}"],
+  inorder: ["1", "3", "4", "5", "7"],
+  binarySearch: ["3", "-1"],
+  twoPointers: ["(1, 3)", "None"],
+  window: ["3", "1", "3"],
+  mergeSort: ["[3, 9, 10, 27, 38, 43, 82]"],
+  memo: ["55", "55"],
+  bits: ["4", "1"],
+};
+const pageDisagrees = Object.entries(PAGE_SAYS).flatMap(([k, says]) =>
+  says.flatMap((v, i) => (pageOut[k][i] === v ? [] : [{ snippet: k, print: i + 1, pageSays: v, printed: pageOut[k][i] }])),
+);
+
 // ── Counts, on the video's own inputs ───────────────────────────────────────
 const counts = JSON.parse(
   py.runPython(`
@@ -356,6 +378,28 @@ def eq_calls(keys, probe):
 spread = eq_calls([Key(i, i) for i in range(1000)], Key(-1, -1))
 same = eq_calls([Key(i, 7) for i in range(1000)], Key(-1, 7))
 R["hashWorst"] = {"keys": 1000, "spreadInsertEq": spread[0], "spreadMissEq": spread[1], "sameInsertEq": same[0], "sameMissEq": same[1]}
+# The hash set's resize point, for the page's "resizes when the load factor
+# exceeds ~2/3": how full a set's table is (items over slots) when it grows,
+# read off sys.getsizeof. A set entry is a key pointer and a hash, two words;
+# its first eight slots are inline, so they add nothing to the size. A dict
+# is shown beside it as the items at which it grows. Not said aloud;
+# recorded for the report.
+W = struct.calcsize("P")
+s = set(); s_base = sys.getsizeof(s); last = s_base; s_grow = []
+for i in range(200_000):
+    s.add(i)
+    z = sys.getsizeof(s)
+    if z != last:
+        slots = 8 if last == s_base else (last - s_base) // (2 * W)
+        s_grow.append([len(s), slots, len(s) / slots])
+        last = z
+d = {}; last = sys.getsizeof(d); d_grow = []
+for i in range(200_000):
+    d[i] = 1
+    z = sys.getsizeof(d)
+    if z != last:
+        d_grow.append(len(d)); last = z
+R["setLoad"] = {"setGrows": s_grow[:6], "dictGrowsAtItem": d_grow[:8]}
 
 # 3. Amortized O(1). A Python list's allocated slots, read off sys.getsizeof
 #    after every append, for a million appends; and the doubling array the
@@ -730,6 +774,7 @@ const FRIENDS = 100;
 const results = {
   runtime: counts.runtime,
   page: pageOut,
+  pageDisagrees,
   counts,
   arithmetic: {
     bigO: {
@@ -831,6 +876,7 @@ const claims = [
   ["dijk-neg", "reach it at one", c.dijkstra.bellmanFord.B === 1],
   ["dijk-neg", "and so is d", c.dijkstra.settled.D !== c.dijkstra.bellmanFord.D],
   // 8
+  ["quick-sorted", "n squared", q.lastPivotSorted.compares === q.pairs],
   ["quick-sorted", "a thousand sorted numbers", q.n === 1000],
   ["quick-sorted", "half a million comparisons", Math.round(q.lastPivotSorted.compares / 1e5) === 5],
   ["quick-sorted", "nearly a thousand levels", q.lastPivotSorted.depth >= 950 && q.lastPivotSorted.depth < 1000],

@@ -174,7 +174,7 @@ results.figures.hurt = await pgFigure(USERS, {
 const LATEST = "SELECT id, created_at, amount FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 10;";
 const ONE_DAY = "SELECT COUNT(*) FROM orders\nWHERE created_at >= '2024-12-31';";
 results.figures.composite = await pgFigure(ORDERS, {
-  customers: "SELECT COUNT(DISTINCT customer_id) AS customers, COUNT(*) / COUNT(DISTINCT customer_id) AS each FROM orders;",
+  customers: "SELECT COUNT(*) AS orders, COUNT(DISTINCT customer_id) AS customers,\n  COUNT(*) / COUNT(DISTINCT customer_id) AS each\nFROM orders;",
   create: "CREATE INDEX orders_customer_created_idx\n  ON orders (customer_id, created_at);\nANALYZE orders;",
   latest: LATEST,
   latestPlan: `${EXPLAIN_BUFFERS}\n${LATEST}`,

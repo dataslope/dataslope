@@ -56,6 +56,7 @@ export const DivisorScene: React.FC = () => {
   const numberAt = n.word("small", "number of values");
   const measuredFrom = n.beat("measured").from;
   const fourAt = n.word("measured", "four thousand");
+  const samplesAt = n.word("measured", "samples");
   const byNAt = n.word("measured", "dividing by n", { nth: 1 });
   const lowAt = n.word("measured", "low");
   const byN1At = n.word("measured", "Dividing by n minus one");
@@ -275,6 +276,11 @@ export const DivisorScene: React.FC = () => {
       {phaseB > 0 ? (
         <div style={{ position: "absolute", inset: 0, opacity: phaseB }}>
           <FigLabel n="5" title={`Average variance over ${DIVISOR.trials.toLocaleString("en-US")} samples of five`} at={fourAt - 6} x={160} y={y(330)} />
+          {/* "samples of five": a rack of five test tubes, top right where the crowd stood,
+              dimming with the figure as the next scene's question comes in. */}
+          <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, wildAt - 2, 14) }}>
+            <Spot id="describing-data-samples" at={samplesAt - 4} left={1570} top={y(96)} width={230} height={187} />
+          </div>
           <Drift from={measuredFrom} to={swampAt + 30} scale={0.018} origin={[V.x0, y(BAR_N1)]}>
             <div style={{ position: "absolute", inset: 0, opacity: 1 - 0.55 * ease(frame, wildAt - 2, 14) }}>
             <Svg>

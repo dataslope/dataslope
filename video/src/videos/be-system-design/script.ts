@@ -56,8 +56,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *   q1-why: the "Non-functional" column takes the yellow highlight on "shapes
  *     the design"; two small figures side by side, "1,000 users" and "1
  *     billion redirects a day", over the same two feature chips.
- *   q2: question card; three empty slots, "Requests per second", "Storage",
- *     "Bandwidth", each filled by the beats below. The envelope-and-pencil
+ *   q2: question card; three empty slots, "Requests per second (QPS)",
+ *     "Storage", "Bandwidth", each filled by the beats below, "QPS" inked on
+ *     its word. The envelope-and-pencil
  *     spot.
  *   q2-trick: "1,000,000 a day ÷ 86,400 s ≈ 12 a second", the rule the rest
  *     uses, boxed.
@@ -77,12 +78,12 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     redrawn from results.json's bins, with the median, mean and p99 rules
  *     placed as said (labelled 24 ms, 31 ms, 286 ms; a "simulated sample"
  *     note). Then a row of 100 small squares, one call each, and "1 − 0.99¹⁰⁰
- *     ≈ 63% of page loads" on "sixty-three percent".
+ *     ≈ 63% of page loads hit at least one" on "sixty-three percent".
  *   q3: question card; the API as two plain cards, "create: long URL → key"
  *     and "redirect: key → long URL". No code, no HTTP syntax.
  *   q3-key: the 62 characters in three groups (a–z, A–Z, 0–9), then an ID
- *     encoded to its six-character key; "62⁶ ≈ 57 billion keys ≈ 15 years at
- *     10 million a day" (results.json keyLengths).
+ *     encoded to its six-character key; "62⁶ ≈ 57 billion keys, over 15
+ *     years at 10 million a day" (results.json keyLengths).
  *   q3-hash: the alternative beside it: a long URL through a hash to a key,
  *     with a small "already taken?" check before the store.
  *   q3-diagram: the page's diagram, drawn box by box as named: client, load
@@ -99,8 +100,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     (counted), stacked so the keys visibly differ in one last character;
  *     red on "walk through".
  *   q4: question card; the q3 diagram returns, and the load balancer, the
- *     cache and the store are ringed in red on their words. On "Lose that",
- *     the cache fades and every arrow it carried reroutes to the store.
+ *     cache and the store are ringed in red on their words. On "Lose the
+ *     cache", the cache fades and every arrow it carried reroutes to the store.
  *   q4-fix: each ring is answered: a second load balancer drawn dashed
  *     (standby), a replica beside the store with a failover arrow, a replica
  *     beside the cache; then the whole diagram is copied into two zone
@@ -123,8 +124,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     two columns: "at the edge" (images, JavaScript, CSS, video) and "to the
  *     origin" (user-specific responses, or a short time to live).
  *   q5-redirect: a short-link redirect moves into the edge column; two red
- *     notes under it, "not counted" and "a taken-down link still works", and
- *     a short timer that answers both, on "keep that time short".
+ *     notes under it, "not counted by you" and "a taken-down link still
+ *     works", and a short timer that answers both, on "keep that time short".
  *   q5-win: the line "the cheapest large win for a read-heavy, global
  *     product", the page's words.
  *   next, next-10x: the whole design small and green; "35,000/s" beside it
@@ -159,11 +160,14 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     Engineer review; the chart now carries the data-center figure.
  *   - percentiles (q2): charts/latency-percentiles.mjs's sample, copied with
  *     its seed (40,000 draws, rng(4242)): median 24 ms, mean 31 ms, p99 286
- *     ms, checked against the chart's caption. "A hundred calls ... sixty-
- *     three percent": 1 − 0.99^100 = 0.634, the chart caption's "more often
- *     than not", with each call independently in the slowest 1%.
+ *     ms, checked against the chart's caption; "one request in a hundred":
+ *     1.0% of the sample sits at or past the p99 (tailShare). "A hundred
+ *     calls, each with that one-in-a-hundred chance ... at least one on
+ *     sixty-three percent": 1 − 0.99^100 = 0.634, the chart caption's "more
+ *     often than not", with each call independently in the slowest 1% (said
+ *     aloud as that assumption).
  *   - the key (q3): 62^6 = 56.8 billion keys, 15.6 years at 3.65 billion
- *     links a year ("about fifteen"); five years is 18.25 billion. Base 62 of
+ *     links a year ("over fifteen"); five years is 18.25 billion. Base 62 of
  *     an auto-increment ID, or a hash: the page's two options. The cache, the
  *     key-value store and the stateless tier behind a load balancer: the
  *     page's answer and its diagram. One redirect, on the ladder: a cache
@@ -191,10 +195,11 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     "the cheapest large win": the page. That an edge-answered redirect is
  *     not counted and outlives a takedown until its time to live runs out
  *     follows from the page's "offloads traffic from your origin" and "short
- *     edge TTLs"; no vendor feature is named.
+ *     edge TTLs" (the edge may keep its own logs, so the narration says only
+ *     that your servers can't count it); no vendor feature is named.
  *
- * Written for Drew's ear: initialisms in plain caps (URL, API, ID, SSD, CDN),
- * none said as a word, so nothing here needs the lexicon; "time to live" is
+ * Written for Drew's ear: initialisms in plain caps (URL, API, QPS, ID, SSD,
+ * CDN, CSS), none said as a word, so nothing here needs the lexicon; "time to live" is
  * said in words, since TTL is new to a beginner and Part 2 expands it; no
  * sentence opens with "A" before an initialism; numbers as they are said.
  */
@@ -249,7 +254,7 @@ export const script: NarrationScript = {
     {
       id: "q2",
       scene: true,
-      text: "Question two. What back-of-the-envelope numbers should you estimate? The ones that turn product scale into load: requests per second, storage and bandwidth.",
+      text: "Question two. What back-of-the-envelope numbers should you estimate? The ones that turn product scale into load: requests per second, or QPS, then storage and bandwidth.",
       pauseAfter: 0.6,
     },
     {
@@ -299,7 +304,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q2-fanout",
-      text: "A page that makes a hundred calls hits one of those on sixty-three percent of loads.",
+      text: "A page that makes a hundred calls, each with that one-in-a-hundred chance, hits at least one on sixty-three percent of loads.",
       pauseAfter: 0.9,
     },
 
@@ -312,7 +317,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q3-key",
-      text: "The key is base sixty-two: lowercase, uppercase and digits. Encode an auto-incrementing ID, and six characters hold fifty-seven billion links, about fifteen years at ten million a day.",
+      text: "The key is base sixty-two: lowercase, uppercase and digits. Encode an auto-incrementing ID, and six characters hold fifty-seven billion links, over fifteen years at ten million a day.",
       pauseAfter: 0.7,
     },
     {
@@ -345,7 +350,7 @@ export const script: NarrationScript = {
     {
       id: "q4",
       scene: true,
-      text: "Question four. What is a single point of failure, and how do you remove one? It's any component whose failure takes the system down. This diagram has three: one load balancer, one store, and one cache. Lose that, and every read lands on the store at once.",
+      text: "Question four. What is a single point of failure, and how do you remove one? It's any component whose failure takes the system down. This diagram has three: one load balancer, one store, and one cache. Lose the cache, and every read lands on the store at once.",
       pauseAfter: 0.7,
     },
     {
@@ -393,7 +398,7 @@ export const script: NarrationScript = {
     },
     {
       id: "q5-redirect",
-      text: "A popular short link is the same redirect for everyone, so the edge can answer it too. The price: a click the edge answers never reaches your servers, so it isn't counted, and a link you take down keeps working there until its time runs out. So keep that time short.",
+      text: "A popular short link is the same redirect for everyone, so the edge can answer it too. The price: a click the edge answers never reaches your servers, so they can't count it, and a link you take down keeps working there until its time to live runs out. So keep that time short.",
       pauseAfter: 0.7,
     },
     {
@@ -403,7 +408,7 @@ export const script: NarrationScript = {
     },
     {
       id: "next",
-      text: "That's a first design. It meets its estimate, and no single machine can take it down.",
+      text: "That's a first design. It's sized for its estimate, and no single machine can take it down.",
       pauseAfter: 0.7,
     },
     {

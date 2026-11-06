@@ -40,18 +40,20 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * answer, yellow what the narration points at, blue data):
  *   hook: an API box on the left, an arrow into a database cylinder; the
  *     arrow forks into "read: fast" and "write: right", a second write
- *     arriving beside the first. hook-run: the two tables as row counts
- *     (users 1,000,000; orders 1,000,000, 50,000 customers), "PostgreSQL 18".
+ *     arriving beside the first. hook-run: the two big tables as row counts
+ *     (users 1,000,000; orders 1,000,000, 50,000 customers), the small ones
+ *     smaller beside them (two accounts, one item, the page's 24 customers
+ *     and 24 orders), "PostgreSQL 18".
  *     plan: eleven numbered squares and five smaller ones.
  *   nosql: QuestionCard 1, the system-design question set under it as a
  *     second line. nosql-sql: two tables joined by a line, three rows of one
  *     ticked into a single transaction. nosql-no: three NoSQL shapes in a
  *     row, labelled key-value, document, wide-column, each with its one
- *     access pattern; "weaker consistency, few joins" under them in the soft
+ *     access pattern; "weaker consistency, limited joins" under them in the soft
  *     ink. nosql-both: one diagram, SQL box ("orders, payments") beside a
  *     NoSQL box ("logs, sessions, feeds"). nosql-next: a new query arrives as
- *     a dashed arrow; the relational side draws a join, the other side shows
- *     the arrow with nowhere to land.
+ *     a dashed arrow; the relational side draws a join, the other side
+ *     copies its data into a second arrangement for it.
  *   index: QuestionCard 2. index-scan: the users table as 7,360 small page
  *     squares, a sweep across all of them, one square lit; "Rows removed by
  *     filter: 999,999" from the plan. index-tree: a three-level B-tree drawn
@@ -196,7 +198,10 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     connection pool, which the page adds as a look-alike failure, is left
  *     out for length: an aside to the question, not part of its answer.
  *   - "r-joins": the page's tables: inner join 24 rows, left join 30; Di,
- *     Hana, Leo, Pia, Theo and Yara have no orders. "r-keys": pg_indexes on
+ *     Hana, Leo, Pia, Theo and Yara have no orders. (The page's LEFT JOIN
+ *     block comments "Cy has no orders"; run, Cy has two, 104 and 124, so
+ *     the video names no one and says "the six who never ordered".
+ *     Reported.) "r-keys": pg_indexes on
  *     accounts and transfers lists only the two primary keys
  *     (accounts_pkey, transfers_pkey), none on from_id or to_id. "r-cover":
  *     SUM(amount) for customer 42 on an index on customer_id is a Bitmap Heap
@@ -204,11 +209,16 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     Only Scan with "Heap Fetches: 0".
  *   - SQL vs NoSQL, ACID and normalization are the pages' own words, drawn,
  *     with no numbers; no NoSQL product is named, since the pages name none.
+ *     "nosql-next" goes one step past them: a store laid out for one access
+ *     pattern answers a new one by copying the data into a second layout,
+ *     the denormalization "r-norm" describes, where relational adds a join.
  *
- * Written for Drew's ear: initialisms in plain caps (SQL and NoSQL through
- * the lexicon, ACID, ID, API), no sentence opening on "A" before an
- * initialism, numbers as they are said, Postgres glossed once, Postgres
- * keywords said as words ("explain analyze", "select for update").
+ * Written for Drew's ear: initialisms in plain caps (API, ID; SQL through
+ * the lexicon; NoSQL, "no sequel", and ACID, "acid", reported for it, since
+ * the lexicon's SQL entry does not match inside NoSQL), no sentence opening
+ * on "A" before an initialism, numbers as they are said, Postgres glossed
+ * once, Postgres keywords said as words ("explain analyze", "select for
+ * update").
  */
 export const script: NarrationScript = {
   id: "be-databases",
@@ -220,12 +230,12 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Every request an API answers ends at a database. Its reads have to be fast, and its writes have to be right, even when another write lands at the same moment.",
+      text: "Behind an API, the data has to live somewhere, and usually that's a database. Its reads have to be fast, and its writes have to be right, even when another write lands at the same moment.",
       pauseAfter: 0.6,
     },
     {
       id: "hook-run",
-      text: "The numbers come from Postgres, the open-source relational database, on a million users and a million orders, generated so every plan can be rerun.",
+      text: "Every number here comes from a run in Postgres, the open-source relational database, on a million users, a million orders, and a few small tables.",
       pauseAfter: 0.6,
     },
     {
@@ -248,7 +258,7 @@ export const script: NarrationScript = {
     },
     {
       id: "nosql-no",
-      text: "Pick NoSQL when writes must scale out across machines, when the schema keeps changing, as documents do, or when one access pattern, known in advance, runs at huge volume: key-value or wide-column. The price: weaker consistency and few joins.",
+      text: "Pick NoSQL when writes must scale out across machines, when the schema keeps changing, which suits a document store, or when one access pattern, known in advance, runs at huge volume, which suits key-value or wide-column. The price: weaker consistency and limited joins.",
       pauseAfter: 0.6,
     },
     {
@@ -258,7 +268,7 @@ export const script: NarrationScript = {
     },
     {
       id: "nosql-next",
-      text: "So ask which queries you'll need next year. Relational answers a new one with a join; a store built for one access pattern wasn't designed for it.",
+      text: "So ask which queries you'll need next year. Relational answers a new one with a join; a store built around one access pattern may need the data copied again, arranged for the new one.",
       pauseAfter: 0.8,
     },
 
@@ -309,7 +319,7 @@ export const script: NarrationScript = {
     },
     {
       id: "hurt-space",
-      text: "They take space as well: these users' three indexes are bigger than the table.",
+      text: "They take space as well: together, the users table's three indexes are bigger than the table itself.",
       pauseAfter: 0.6,
     },
     {
@@ -333,7 +343,7 @@ export const script: NarrationScript = {
     {
       id: "composite-run",
       text: "An index on customer, then order time, finds customer forty-two's ten latest orders in thirteen pages, already newest first, with no sort.",
-      pauseAfter: 0.5,
+      pauseAfter: 0.6,
     },
     {
       id: "composite-day",
@@ -342,7 +352,7 @@ export const script: NarrationScript = {
     },
     {
       id: "composite-swap",
-      text: "Swap the two columns, and the same ten orders cost eighteen hundred pages.",
+      text: "Swap the two columns, and the same ten orders cost over eighteen hundred pages.",
       pauseAfter: 0.6,
     },
     {
@@ -380,7 +390,7 @@ export const script: NarrationScript = {
     },
     {
       id: "plan-fix",
-      text: "Write it as a range on the column itself, and the plan becomes an index scan, with an estimate that's exactly right.",
+      text: "Write it as a range on the column itself, and the plan becomes an index-only scan, with an estimate that's exactly right.",
       pauseAfter: 0.6,
     },
     {
@@ -403,7 +413,7 @@ export const script: NarrationScript = {
     },
     {
       id: "fanout-fix",
-      text: "Fix it by aggregating the many side to the right grain first: count the items per order, then join, one row per order.",
+      text: "Fix it by aggregating the many side to the right grain first: count the items per order, then join. One row per order, and the revenue is right again.",
       pauseAfter: 0.6,
     },
     {
@@ -478,7 +488,7 @@ export const script: NarrationScript = {
     {
       id: "lock-opt",
       text: "Optimistic takes no lock. Read a version number with the row, and write only if it hasn't changed.",
-      pauseAfter: 0.4,
+      pauseAfter: 0.6,
     },
     {
       id: "lock-opt-run",
