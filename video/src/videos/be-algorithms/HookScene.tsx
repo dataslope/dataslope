@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { label, note } from "../../editorial/style";
+import { note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -47,7 +47,7 @@ export const HookScene: React.FC = () => {
   const top = y(325);
   // The zoom out: the hundred's grid shrinks to its true size in the million.
   const zoom = ease(frame, millionAt, 28);
-  const scale = 1 + (SQ / 1000 / (DOTS * PITCH / DOTS) - 1) * zoom;
+  const scale = 1 + (SQ / 1000 / PITCH - 1) * zoom;
   const square = ease(frame, millionAt + 6, 18);
   const ring = ease(frame, millionAt + 26, 10);
 
@@ -101,9 +101,9 @@ export const HookScene: React.FC = () => {
           <Tick at={fastAt} size={28} />
           <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>fast</span>
         </div>
-        <Line at={millionAt + 28} x={SQ_X + 30} y={top + 22} size={22} color={INK_SOFT} weight={600}>
+        <Pill at={millionAt + 28} x={SQ_X + 26} y={top + 14} tone="plain" size={21}>
           ← the hundred
-        </Line>
+        </Pill>
 
         {/* Which structure keeps it cheap. */}
         <Line at={structureAt - 2} x={CHIP_X[0]} y={top} size={26} weight={650}>
@@ -137,7 +137,7 @@ export const HookScene: React.FC = () => {
           ))}
         </div>
         <Line at={quickAt + 10} x={CHIP_X[0]} y={top + 286} size={22} color={INK_SOFT} weight={600}>
-          <span style={label(22, INK_SOFT)}>Each answer: the structure, and what an operation costs, counted</span>
+          Each answer: the structure, and what an operation costs, counted
         </Line>
 
         <Art name="pangolin" at={from} left={1420} top={y(300)} h={380} />
