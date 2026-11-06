@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -57,8 +57,9 @@ const Degenerate: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 11. Junk dimension ──────────────────────────────────────────────────────
 
-/** One value a flag can take: plain code, stacked under the flag's name. */
-const Value: React.FC<{ children: React.ReactNode; at: number }> = ({ children, at }) => {
+/** One value a flag can take, as a small outlined chip, stacked under the
+ *  flag's name. */
+const Chip: React.FC<{ children: React.ReactNode; at: number }> = ({ children, at }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   return (
@@ -67,11 +68,15 @@ const Value: React.FC<{ children: React.ReactNode; at: number }> = ({ children, 
         opacity: p,
         transform: `translateY(${(1 - p) * 8}px)`,
         fontFamily: MONO,
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: 600,
-        lineHeight: 1.25,
         color: INK,
+        border: `1.5px solid ${INK}`,
+        borderRadius: 6,
+        padding: "4px 12px",
+        background: PAPER,
         whiteSpace: "nowrap",
+        textAlign: "center",
       }}
     >
       {children}
@@ -99,20 +104,20 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={flagsAt} x={R_X} y={top - c.h(56)}>
         <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>small flags, each a column on the fact</span>
       </Note>
-      {/* Three columns of values, a "×" between them, then "=" and the
-          count on a line of its own with its label under it. Every gap is
-          wide enough that the operators, the values and the count, set at
-          different sizes, never read as one line of type. */}
+      {/* Three columns of value chips, a "×" between them, then "=" and
+          the count on a line of its own with its label under it. Every gap
+          is wide enough that the operators, the values and the count, set
+          at different sizes, never read as one line of type. */}
       <div style={{ position: "absolute", left: R_X, top, display: "flex", alignItems: "flex-start" }}>
         {groups.map((g, i) => (
           <React.Fragment key={g.name}>
             {i ? <div style={{ ...note(34, INK_SOFT), margin: "50px 44px 0", opacity: ease(frame, g.at, 10) }}>×</div> : null}
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-start" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "stretch" }}>
               <div style={{ ...label(21, INK_SOFT), fontWeight: 700, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
               {g.values.map((v, j) => (
-                <Value key={v} at={g.at + 2 + j * 3}>
+                <Chip key={v} at={g.at + 2 + j * 3}>
                   {v}
-                </Value>
+                </Chip>
               ))}
             </div>
           </React.Fragment>
@@ -329,7 +334,9 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
     <Note at={at} x={R_X} y={top}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), width: 120 }}>{name}</span>
-        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, marginRight: 14 }}>{value}</span>
+        {/* The key's value in an outlined tag, at 24px: within 12% of the
+            22px name and the 24px bytes on its line. */}
+        <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK, border: `1.5px solid ${INK}`, borderRadius: 6, padding: "4px 12px" }}>{value}</span>
         <span style={{ ...note(24, BLUE_INK), fontWeight: 700, opacity: ease(frame, bytesAt, 10) }}>
           {kind ? `${kind}, ` : ""}
           <Num>{bytes}</Num> bytes

@@ -9,9 +9,11 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { COLUMNS, FILES, MB } from "./data";
-import { COLUMN_TINT, Drift, FileBar, OK, OK_INK, PARQUET_SEGMENTS, pulse, VRule, X0 } from "./parts";
+import { COLUMN_TINT, Drift, FileBar, OK, OK_INK, PARQUET_SEGMENTS, pulse, X0 } from "./parts";
 
 const TOP = 300;
+/** Room between a column's top rule and its name (set 12px under TOP). */
+const RULE_GAP = 32;
 const CARD_W = 520;
 const CARD_GAP = 60;
 const DIAGRAM_Y = 396;
@@ -239,9 +241,9 @@ export const FormatsScene: React.FC = () => {
           const named = pulse(frame, c.at, 18);
           return (
             <React.Fragment key={c.name}>
-              {/* Columns, not cards: a hairline in each gap, as tall as the
-                  columns' text, inking in with the column to its right. */}
-              {i ? <VRule x={x - CARD_GAP / 2} top={y(TOP) + 12} height={y(LINES_Y) + 3 * h(LINE_H) + 28 - y(TOP) - 12} at={qEnd - 10 + i * 6} /> : null}
+              {/* Each column's own rule above its name, so no hairline runs
+                  between them; 32px of room under it. */}
+              <div style={{ position: "absolute", left: x, top: y(TOP) + 12 - RULE_GAP - 2, width: CARD_W, height: 2, background: INK, transform: `scaleX(${p})`, transformOrigin: "left" }} />
               {/* The name, then its kind on a line of its own: one size and one
                   face a line. */}
               <div style={{ position: "absolute", left: x, top: y(TOP) + 12, whiteSpace: "nowrap", opacity: p }}>

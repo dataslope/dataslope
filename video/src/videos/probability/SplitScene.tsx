@@ -287,7 +287,7 @@ export const SplitScene: React.FC = () => {
 
       {/* ── The turn: which way round. The same 120 free churners, over two
            different wholes: the 500 free users, then the 150 who churned. ── */}
-      <div style={{ position: "absolute", left: RIGHT, top: y(766), height: 1, width: 660 * ease(frame, roundAt - 6, 14), background: INK, opacity: 0.5 }} />
+      <div style={{ position: "absolute", left: RIGHT, top: y(784) - 29, height: 1, width: 660 * ease(frame, roundAt - 6, 14), background: INK, opacity: 0.5 }} />
       <div
         style={{
           position: "absolute",

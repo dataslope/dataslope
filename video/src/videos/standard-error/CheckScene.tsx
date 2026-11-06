@@ -223,7 +223,7 @@ export const CheckScene: React.FC = () => {
           smaller word. The pair sits higher than it did, in the space under
           the count, so the extra line costs the page's foot nothing. */}
       <Ink at={spreadAt - 4} dur={14} style={{ left: COL, top: y(500), width: 384 }}>
-        <div style={{ height: 1, background: INK, marginBottom: 16 }} />
+        <div style={{ height: 1, background: INK, marginBottom: 28 }} />
         <div style={label(20, INK_SOFT)}>Spread of the {CHECK.samples.toLocaleString("en-US")} averages</div>
       </Ink>
       <Ink at={fiveAt - 2} dur={14} style={{ left: COL, top: y(564) }}>
@@ -235,7 +235,7 @@ export const CheckScene: React.FC = () => {
         <div style={{ ...body(28, true), marginTop: 2 }}>measured</div>
       </Ink>
       <Ink at={oneAt - 4} dur={14} style={{ left: COL, top: y(690), width: 384 }}>
-        <div style={{ height: 1, background: HAIRLINE, marginBottom: 16 }} />
+        <div style={{ height: 1, background: HAIRLINE, marginBottom: 28 }} />
         {/* The sample's own s, which stands in for σ: where 3.67 comes from. */}
         <div style={label(20, INK_SOFT)}>
           One sample: s = {fmt(CHECK.oneSampleSd)}, ÷ √{CHECK.n}

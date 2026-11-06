@@ -202,8 +202,10 @@ export const ShapesScene: React.FC = () => {
             <Axis scale={c.popScale} base={y(POP_BASE)} ticks={c.popTicks} format={c.popFmt} at={at} size={20} />
 
             {/* The step between the rows: "average thirty". */}
-            <Ink at={mAt - 6} dur={14} style={{ left: colX(i), top: y(STEP_Y), width: COL_W }}>
-              <div style={{ height: 1, background: HAIRLINE, marginBottom: 12 }} />
+            {/* The rule 8px up into the gap under the axis, its label 28px
+                under it: room under a rule. */}
+            <Ink at={mAt - 6} dur={14} style={{ left: colX(i), top: y(STEP_Y) - 8, width: COL_W }}>
+              <div style={{ height: 1, background: HAIRLINE, marginBottom: 28 }} />
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                 <span style={label(19, INK_SOFT)}>↓ Averages of 30</span>
                 <span style={note(20, INK_SOFT)}>

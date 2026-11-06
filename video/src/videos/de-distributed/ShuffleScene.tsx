@@ -8,7 +8,7 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, type Dept, DEPT_INK, LADDER, NET_LEVEL } from "./data";
-import { Arrow, Curve, Disk, Drift, Machine, Mark, MARK_BAD, OK_INK, Svg } from "./parts";
+import { Arrow, Curve, Disk, Drift, Machine, OK_INK, Svg } from "./parts";
 
 const MAP_X = 120;
 const BOX_W = 170;
@@ -233,22 +233,15 @@ export const ShuffleScene: React.FC = () => {
               </Note>
               <Note at={secondAt + 2 + i * 2} x={SCALED_X} y={rowY(i) + rowH / 2 - 14}>
                 <span style={{ ...note(21, i === NET ? ACCENT_INK : i === L1 ? INK : INK_SOFT), fontWeight: i === NET || i === L1 ? 700 : 500, whiteSpace: "nowrap" }}>
-                  {/* The network's "almost six days" takes the trap's red
-                      highlight, where a ring once sat round it. */}
-                  {i === NET ? (
-                    <span style={{ display: "inline-block", marginLeft: "-0.14em" }}>
-                      <Mark at={daysAt} color={MARK_BAD}>
-                        <Num>{l.scaled}</Num>
-                      </Mark>
-                    </span>
-                  ) : (
-                    <Num>{l.scaled}</Num>
-                  )}
+                  <Num>{l.scaled}</Num>
                 </span>
               </Note>
             </React.Fragment>
           );
         })}
+        {mark(daysAt) > 0 ? (
+          <div style={{ position: "absolute", left: SCALED_X - 10, top: rowY(NET) - 6, width: 150, height: rowH + 12, border: `2.4px solid ${ACCENT}`, borderRadius: 6, opacity: mark(daysAt) }} />
+        ) : null}
       </Drift>
     </AbsoluteFill>
   );

@@ -129,10 +129,9 @@ export const MismatchScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        {/* Third, and still the right pick: said in green beside its bar. */}
-        <Ink at={bestAt - 2} dur={12} out={out8} style={{ left: X0 + 500, top: y(BOARD_Y) + 2 * BOARD_STEP + 1, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 650 }}>can still be the best for your task</span>
-        </Ink>
+        <Tag at={bestAt - 2} out={out8} x={X0 + 500} y={y(BOARD_Y) + 2 * BOARD_STEP - 6} color={OK}>
+          <span style={{ color: OK_INK }}>can still be the best for your task</span>
+        </Tag>
       </Drift>
 
       {/* ── Fig. 9: the four questions for any row ── */}

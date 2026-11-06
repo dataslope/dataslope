@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -27,7 +27,7 @@ const DIVIDER_X = 936;
  * duration, analysis, as plain rows with a hairline between them, centered
  * on the page until Question 2 needs the right half. Then the primary
  * metric chosen against three tests: raw clicks fail the first, ninety-day
- * retention the last (each verdict names its test, and that test swells),
+ * retention the last (each verdict names its test, and that chip pulses),
  * and seven-day activation passes all three and is agreed before launch.
  */
 export const DesignScene: React.FC = () => {
@@ -74,7 +74,7 @@ export const DesignScene: React.FC = () => {
   const clear = 1 - ease(frame, clearAt, 10);
   const q2 = ease(frame, q2At, 14);
 
-  // Each test swells as it is named, again when a candidate fails it, and
+  // Each chip pulses as it is named, again when a candidate fails it, and
   // all three when seven-day activation passes.
   const criteria = [
     { text: "tied to the goal", at: tiedAt, again: [inflateAt, passesAt] },
@@ -176,38 +176,29 @@ export const DesignScene: React.FC = () => {
           }}
         />
 
-        {/* Question 2: three tests a primary metric has to pass, one line of
-            plain text with a middle dot between them. Each swells, and takes
-            the highlighter for a moment, as it is named and again when a
-            candidate is judged against it. */}
-        <div style={{ position: "absolute", left: RIGHT_X, top: y(310), display: "flex", alignItems: "baseline", whiteSpace: "nowrap" }}>
+        {/* Question 2: three tests a primary metric has to pass, each in its
+            chip; each chip pulses as it is named, again when a candidate fails
+            it, and all three when seven-day activation passes. */}
+        <div style={{ position: "absolute", left: RIGHT_X, top: y(310), display: "flex", gap: 14 }}>
         {criteria.map((c, i) => {
           const p = ease(frame, c.at - 2, 10);
-          const swell = Math.max(pulse(frame, c.at, 14), ...c.again.map((t) => pulse(frame, t, 14)));
           return (
-            <React.Fragment key={c.text}>
-              {i > 0 ? <span style={{ ...note(24, INK_SOFT), margin: "0 16px", opacity: p * q2 }}>·</span> : null}
-              <span
-                style={{
-                  display: "inline-block",
-                  ...note(24, INK),
-                  fontWeight: 650,
-                  opacity: p * q2,
-                  transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * swell})`,
-                }}
-              >
-                <span
-                  style={{
-                    padding: "2px 8px 3px",
-                    margin: "0 -8px",
-                    borderRadius: 6,
-                    background: swell > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${Math.round(swell * 100)}%, transparent)` : undefined,
-                  }}
-                >
-                  {i + 1}. {c.text}
-                </span>
-              </span>
-            </React.Fragment>
+            <div
+              key={c.text}
+              style={{
+                padding: "6px 14px",
+                borderRadius: 6,
+                border: `2px solid ${INK}`,
+                background: PAPER,
+                ...note(22, INK),
+                fontWeight: 650,
+                whiteSpace: "nowrap",
+                opacity: p * q2,
+                transform: `translateY(${(1 - p) * 10}px) scale(${1 + 0.05 * Math.max(pulse(frame, c.at, 14), ...c.again.map((t) => pulse(frame, t, 14)))})`,
+              }}
+            >
+              {i + 1}. {c.text}
+            </div>
           );
         })}
         </div>

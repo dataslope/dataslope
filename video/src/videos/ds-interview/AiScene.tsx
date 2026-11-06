@@ -2,11 +2,11 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, Mark, OK_INK, X0 } from "./parts";
+import { Drift, Headline, Kicker, Mark, OK, OK_INK, X0 } from "./parts";
 
 /** Two columns of text, each at its left edge, the second 880px in, so a
  *  column's figure (FIG_X in, 220 wide) ends 50px short of the hairline in
@@ -196,30 +196,27 @@ export const AiScene: React.FC = () => {
         </Panel>
 
         <Panel i={3} at={allowAt} title="Assistant allowed, or banned">
-          {/* The two kinds of round as words, in the colors they mean:
-              green allowed, red banned, a middle dot between. */}
-          <div style={{ display: "flex", alignItems: "baseline", fontSize: 26, marginTop: 4, whiteSpace: "nowrap" }}>
+          <div style={{ display: "flex", gap: 18, marginTop: 6 }}>
             {[
-              { at: allowAt + 6, text: "allowed", ink: OK_INK },
-              { at: banAt, text: "banned", ink: ACCENT_INK },
-            ].map((tag, k) => {
-              const q = ease(frame, tag.at - 2, 12);
+              { at: allowAt + 6, text: "allowed", color: OK, ink: OK_INK },
+              { at: banAt, text: "banned", color: ACCENT, ink: ACCENT_INK },
+            ].map((pill) => {
+              const q = ease(frame, pill.at - 2, 12);
               return (
-                <React.Fragment key={tag.text}>
-                  {k ? <span style={{ ...note(26, INK_SOFT), opacity: q }}>&nbsp;·&nbsp;</span> : null}
-                  <span
-                    style={{
-                      ...note(26, tag.ink),
-                      fontWeight: 700,
-                      display: "inline-block",
-                      opacity: q,
-                      transform: `scale(${0.8 + 0.2 * q})`,
-                      transformOrigin: "left center",
-                    }}
-                  >
-                    {tag.text}
-                  </span>
-                </React.Fragment>
+                <div
+                  key={pill.text}
+                  style={{
+                    padding: "8px 22px",
+                    borderRadius: 28,
+                    border: `2px solid ${pill.color}`,
+                    background: `color-mix(in srgb, ${pill.color} 16%, ${PAPER})`,
+                    ...label(24, pill.ink),
+                    opacity: q,
+                    transform: `scale(${0.8 + 0.2 * q})`,
+                  }}
+                >
+                  {pill.text}
+                </div>
               );
             })}
           </div>

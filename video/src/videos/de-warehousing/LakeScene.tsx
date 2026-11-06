@@ -9,11 +9,13 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { COLUMN_TINT, Drift, OK, OK_INK, READ, Spot, VRule, X0 } from "./parts";
+import { COLUMN_TINT, Drift, OK, OK_INK, READ, Spot, X0 } from "./parts";
 
 const TOP = 296;
 const PANEL_W = 520;
 const PANEL_GAP = 60;
+/** Room between a column's top rule and its title (set 12px under TOP). */
+const RULE_GAP = 32;
 const BOX_Y = 396;
 const BOX_H = 196;
 const NOTES_Y = 614;
@@ -114,6 +116,9 @@ export const LakeScene: React.FC = () => {
 
   const title = (i: number, at: number, text: string, sub: React.ReactNode, subAt: number) => (
     <div style={{ position: "absolute", left: px(i), top: y(TOP), opacity: ease(frame, at, 12) }}>
+      {/* The column's own rule, with 32px of room under it: it groups the
+          column, so no hairline runs between them. */}
+      <div style={{ position: "absolute", left: 0, top: 12 - RULE_GAP - 2, width: PANEL_W, height: 2, background: INK }} />
       <div style={{ position: "absolute", left: 0, top: 12, ...headline(42), whiteSpace: "nowrap" }}>{text}</div>
       <div style={{ position: "absolute", left: 0, top: 64, ...label(20, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, subAt, 10) }}>{sub}</div>
     </div>
@@ -197,11 +202,6 @@ export const LakeScene: React.FC = () => {
           <Note at={sqlAt} x={px(0)} y={y(NOTES_Y)}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>tuned for SQL</span>
           </Note>
-
-          {/* The three side by side, a hairline in each gap from the titles
-              to the notes, inking in with the panel to its right. */}
-          <VRule x={px(1) - (PANEL_GAP + 40) / 2} top={y(TOP) + 12} height={y(NOTES_Y) + h(40) + 30 - y(TOP) - 12} at={lakeAt} />
-          <VRule x={px(2) - (PANEL_GAP + 40) / 2} top={y(TOP) + 12} height={y(NOTES_Y) + h(40) + 30 - y(TOP) - 12} at={houseAt} />
 
           {/* ── The lake ── */}
           {title(1, lakeAt, "Data lake", "raw files, open formats", filesAt)}

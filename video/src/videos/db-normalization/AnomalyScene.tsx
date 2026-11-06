@@ -135,7 +135,7 @@ export const AnomalyScene: React.FC = () => {
         </div>
 
         {/* Grace's only order, deleted, and the question that now finds nothing. */}
-        <Reply at={deletingAt + 4} x={g.x + g.width + 32} y={g.rowMid(grace) - 20} out={deletingAt + 24}>
+        <Reply at={deletingAt + 4} x={g.x + g.width + 20} y={g.rowMid(grace) - 20} out={deletingAt + 24}>
           {DELETE.tag}
         </Reply>
         <Listing
@@ -155,7 +155,8 @@ export const AnomalyScene: React.FC = () => {
         {/* The three anomalies, each as it is named. */}
         {ANOMALIES.map((a, k) => (
           <Ink key={a.name} at={anomalyAt[k] - 2} dur={16} style={{ left: X0 + k * STEP, top: y(LIST_Y), width: STEP - 60 }}>
-            <div style={{ height: 2, width: 56, background: INK, marginBottom: 16 }} />
+            {/* 32px under the short rule: room under a rule, as the owner asked. */}
+            <div style={{ height: 2, width: 56, background: INK, marginBottom: 32 }} />
             <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
               {/* The number in the name's own face and size, set apart by color:
                   a 24px label beside the 36px name read as two sizes on one line. */}

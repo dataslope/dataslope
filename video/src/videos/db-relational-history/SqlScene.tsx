@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -226,11 +226,13 @@ export const SqlScene: React.FC = () => {
           );
         })}
       </div>
-      <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 920, top: y(520) + 9, whiteSpace: "nowrap" }}>
-        {/* Plain words in the red of a trap, where the stamp used to be: well
-            over 1.2 times SEQUEL's 175px clear of its last letter (near 690),
-            so they read as a note beside the word, not as part of its line. */}
-        <span style={{ ...label(26, ACCENT_INK), fontWeight: 700 }}>That name is taken</span>
+      {/* The stamp, its words well over 1.2 times SEQUEL's 175px clear of its
+          last letter (near 690), so they read as a note beside the word, not
+          as part of its line. */}
+      <Ink at={ownedAt - 2} dur={14} out={sqlAt - 6} style={{ left: 904, top: y(520), whiteSpace: "nowrap" }}>
+        <div style={{ transform: "rotate(-5deg)", border: `3px solid ${ACCENT}`, borderRadius: 6, padding: "6px 16px" }}>
+          <span style={{ ...label(26, ACCENT_INK) }}>That name is taken</span>
+        </div>
       </Ink>
       <Spot
         id="db-relational-history-plane"

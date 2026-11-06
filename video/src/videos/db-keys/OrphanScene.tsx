@@ -182,7 +182,7 @@ export const OrphanScene: React.FC = () => {
           <Tag color={ACCENT_INK} size={21}>
             orphan
           </Tag>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "pre", opacity: ease(frame, parentAt - 2, 10) }}> · no parent</span>
+          <span style={{ ...note(21, INK_SOFT), marginLeft: 10, opacity: ease(frame, parentAt - 2, 10) }}>no parent</span>
         </Note>
 
         <ErrorBox

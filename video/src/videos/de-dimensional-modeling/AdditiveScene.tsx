@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { ColumnRule, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -14,10 +14,6 @@ const R_X = 680;
 /** The remedies' column, right of the visitors. */
 const FIX_X = 1360;
 const OPTS = { headH: 46, rowH: 50, bodySize: 24, headSize: 21 } as const;
-/** The visitors as plain names, held apart by space: between two names,
- *  and the wider gap before the day's count. */
-const WHO_GAP = 26;
-const COUNT_GAP = 40;
 /** Who visited on each day: the video's own rows, counted in DuckDB. */
 const WHO: Record<string, readonly string[]> = { Mon: ["Ada", "Ben", "Cy"], Tue: ["Ben", "Cy", "Di"] };
 
@@ -74,8 +70,9 @@ const Gap: React.FC<{ at: number }> = ({ at }) => (
   </div>
 );
 
-/** A visitor, as a name in the data blue; one who came on both days takes
- *  the highlighter on `both`, its width given back as margin. */
+/** A visitor, as a small chip, at 24px: within 12% of the day's 24px count
+ *  and the 26px "people" beside the row. One who came on both days fills
+ *  with the highlighter on `both`. */
 const Who: React.FC<{ name: string; at: number; both?: number }> = ({ name, at, both }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -85,10 +82,10 @@ const Who: React.FC<{ name: string; at: number; both?: number }> = ({ name, at, 
     <span
       style={{
         display: "inline-block",
-        padding: "1px 8px 3px",
-        margin: "0 -8px",
-        borderRadius: 6,
-        background: b > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${b * 100}%, transparent)` : "transparent",
+        padding: "2px 14px 4px",
+        borderRadius: 999,
+        border: `2px solid ${BAR}`,
+        background: b > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${b * 100}%, ${PAPER})` : PAPER,
         ...label(24, BLUE_INK),
         fontWeight: 700,
         opacity: p,
@@ -261,12 +258,12 @@ export const AdditiveScene: React.FC = () => {
         {(["Mon", "Tue"] as const).map((d, k) => {
           const at = d === "Mon" ? monAt : tueAt;
           return (
-            <div key={d} style={{ position: "absolute", left: R_X, top: y(732) + k * h(54), display: "flex", alignItems: "baseline", gap: WHO_GAP }}>
+            <div key={d} style={{ position: "absolute", left: R_X, top: y(732) + k * h(54), display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ ...label(23, INK_SOFT), fontWeight: 700, width: 64, opacity: ease(frame, at - 2, 10) }}>{d}</span>
               {WHO[d].map((p, i) => (
                 <Who key={p} name={p} at={at + 2 + i * 3} both={both.has(p) ? fourAt : undefined} />
               ))}
-              <span style={{ ...note(24, INK), fontWeight: 700, marginLeft: COUNT_GAP - WHO_GAP, opacity: ease(frame, at + 10, 10) }}>
+              <span style={{ ...note(24, INK), fontWeight: 700, marginLeft: 12, opacity: ease(frame, at + 10, 10) }}>
                 <Num>{perDay[d]}</Num>
               </span>
             </div>
@@ -278,8 +275,8 @@ export const AdditiveScene: React.FC = () => {
             left: R_X,
             top: y(732) + 2 * h(54),
             display: "flex",
-            alignItems: "baseline",
-            gap: WHO_GAP,
+            alignItems: "center",
+            gap: 10,
             opacity: ease(frame, fourAt - 2, 10),
           }}
         >
@@ -287,7 +284,7 @@ export const AdditiveScene: React.FC = () => {
           {everyone.map((p, i) => (
             <Who key={p} name={p} at={fourAt + i * 2} />
           ))}
-          <span style={{ ...note(26, OK_INK), fontWeight: 800, marginLeft: COUNT_GAP - WHO_GAP }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 800, marginLeft: 12 }}>
             <Num>{VISITS_BOTH}</Num> people,{" "}
             <span style={{ color: ACCENT_INK, fontWeight: 700, opacity: ease(frame, sixAt - 2, 10) }}>
               not <Num>{sumOfDays}</Num>

@@ -4,12 +4,12 @@ import type { Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, INK_SOFT, label, note, PAPER } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { STORE } from "./data";
-import { GhostRow, KEY, PathArrow, Ping, rowBox, RowStrike, RowWash } from "./parts";
+import { Chip, GhostRow, KEY, PathArrow, Ping, rowBox, RowStrike, RowWash } from "./parts";
 
 /** The store's diagram on the page: two rows of three boxes, in layout units. */
 export const STORE_TOP = 320;
@@ -257,10 +257,7 @@ export const StoreErd: React.FC = () => {
             boxSizing: "border-box",
             border: `2px dashed ${INK_SOFT}`,
             borderRadius: 6,
-            // Opaque, so the many-to-many line behind it stops at its edge
-            // rather than running through the words, which no longer sit on
-            // chips of their own.
-            background: PAPER,
+            background: `color-mix(in srgb, ${PAPER} 80%, transparent)`,
             opacity: ownIn,
             display: "flex",
             flexDirection: "column",
@@ -271,10 +268,10 @@ export const StoreErd: React.FC = () => {
         >
           <span style={{ ...label(22, INK_SOFT) }}>facts of the link</span>
           <span style={{ opacity: ease(frame, howManyAt - 2, 10), transform: `translateY(${(1 - ease(frame, howManyAt - 2, 10)) * 8}px)` }}>
-            <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>how many</span>
+            <Chip>how many</Chip>
           </span>
           <span style={{ opacity: ease(frame, whatPriceAt - 2, 10), transform: `translateY(${(1 - ease(frame, whatPriceAt - 2, 10)) * 8}px)` }}>
-            <span style={{ ...label(22, INK), fontWeight: 650, whiteSpace: "nowrap" }}>at what price</span>
+            <Chip>at what price</Chip>
           </span>
         </div>
       ) : null}

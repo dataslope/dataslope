@@ -279,7 +279,7 @@ export const RulerScene: React.FC = () => {
         <span style={{ ...note(22, ACCENT_INK), fontWeight: 700 }}>{fmt(TIMES.gapInSe)} standard errors away</span>
       </Note>
 
-      <div style={{ position: "absolute", left: R.x0, right: 1920 - R.x1, top: y(838), height: 1, background: HAIRLINE, opacity: ease(frame, nextAt - 6, 12) }} />
+      <div style={{ position: "absolute", left: R.x0, right: 1920 - R.x1, top: y(856) - 29, height: 1, background: HAIRLINE, opacity: ease(frame, nextAt - 6, 12) }} />
       <Ink at={nextAt - 2} dur={18} style={{ left: R.x0, top: y(856), ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
         Next: that interval, <span style={{ opacity: ease(frame, properlyAt - 2, 12) }}>built properly.</span>
       </Ink>

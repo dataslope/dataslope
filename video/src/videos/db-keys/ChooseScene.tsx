@@ -104,10 +104,8 @@ export const ChooseScene: React.FC = () => {
             return (
               <React.Fragment key={a.action}>
                 <ElbowArrow points={i === 1 ? [pts[0], [ANSWER_X - 14, by]] : pts} at={a.at - 2} color={INK} width={2.2} dur={14} />
-                <Ink at={a.at} dur={14} style={{ left: ANSWER_X, top: by - 28, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 24 }}>
+                <Ink at={a.at} dur={14} style={{ left: ANSWER_X, top: by - 28, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
                   <span style={{ ...body(38, true), color: INK }}>{a.q}</span>
-                  {/* The answer as a word in the mono face, bold and in the
-                      accent, with no outline: the color and face carry it. */}
                   <span style={{ opacity: ease(frame, a.actAt - 4, 10), transform: `translateY(${(1 - ease(frame, a.actAt - 4, 10)) * 8}px)`, display: "inline-block" }}>
                     <span
                       style={{
@@ -116,6 +114,9 @@ export const ChooseScene: React.FC = () => {
                         fontSize: 35,
                         fontWeight: 700,
                         color: ACCENT_INK,
+                        padding: "2px 14px",
+                        border: `2px solid ${ACCENT_INK}`,
+                        borderRadius: 8,
                       }}
                     >
                       {a.action}
@@ -130,7 +131,7 @@ export const ChooseScene: React.FC = () => {
           })}
 
           {/* ── ON UPDATE: the same question ── */}
-          <div style={{ position: "absolute", left: ROOT_X, top: y(766) - 14, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
+          <div style={{ position: "absolute", left: ROOT_X, top: y(766) - 29, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
           <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(766), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
             {/* At the sentence's own size, less the 12% a line may vary. */}
             <Tag color={INK} size={29} mono>

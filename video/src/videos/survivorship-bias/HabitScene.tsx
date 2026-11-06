@@ -20,8 +20,9 @@ const ROW_Y = (i: number) => 330 + i * 126;
 const HERE_X = 120;
 const GONE_X = 780;
 /** The hairline between the columns: centred between the end of the longest
- *  row on the left ("The planes that made it home", ~626) and GONE_X. */
-const RULE_X = 703;
+ *  row on the left ("The planes that made it home", ~626) and the dashed
+ *  outline of the missing column's tags (GONE_X - 16). */
+const RULE_X = 695;
 
 /**
  * The habit: every dataset of survivors, and the column it is missing. Ends
@@ -95,10 +96,20 @@ export const HabitScene: React.FC = () => {
               <Ink at={at - 4} dur={16} style={{ left: HERE_X, top: y(ROW_Y(i)) }}>
                 <span style={{ ...body(40), color: INK, whiteSpace: "nowrap" }}>{r.here}</span>
               </Ink>
-              {/* What is missing, in the soft italic of something absent:
-                  set on the row's own line, with no box around it. */}
-              <Ink at={missingAt + i * 5} dur={16} style={{ left: GONE_X, top: y(ROW_Y(i)) }}>
-                <span style={{ ...body(40, true), color: INK_SOFT, whiteSpace: "nowrap" }}>{r.gone}</span>
+              <Ink at={missingAt + i * 5} dur={16} style={{ left: GONE_X - 16, top: y(ROW_Y(i)) - 8 }}>
+                <span
+                  style={{
+                    ...body(40, true),
+                    color: INK_SOFT,
+                    whiteSpace: "nowrap",
+                    display: "inline-block",
+                    padding: "4px 14px 8px",
+                    border: `1.6px dashed ${INK_SOFT}`,
+                    borderRadius: 4,
+                  }}
+                >
+                  {r.gone}
+                </span>
               </Ink>
             </React.Fragment>
           );

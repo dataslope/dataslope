@@ -101,8 +101,23 @@ export const ProbeScene: React.FC = () => {
                   </div>
                 ) : null}
                 <div style={{ width: COL_W, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
-                  <div style={{ ...label(24, BLUE_INK), fontWeight: 700, lineHeight: 1, ...TABULAR }}>{i + 1}</div>
-                  <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.15, marginTop: 12, minHeight: 74 }}>{c.name}</div>
+                  {/* The column's number, ringed. */}
+                  <div
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      border: `2px solid ${BLUE_INK}`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      ...label(22, BLUE_INK),
+                      ...TABULAR,
+                    }}
+                  >
+                    {i + 1}
+                  </div>
+                  <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.15, marginTop: 18, minHeight: 74 }}>{c.name}</div>
                   <div style={{ marginTop: 22 }}>
                     {c.items.map((it, k) => {
                       const q = ease(frame, it.at - 2, 12);

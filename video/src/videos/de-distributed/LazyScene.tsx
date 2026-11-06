@@ -10,7 +10,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { Chip, Dot, Drift, lineOf, Listing, listingHeight, OK, OK_INK, Svg } from "./parts";
+import { Chip, Drift, lineOf, Listing, listingHeight, OK, OK_INK, Svg } from "./parts";
 
 /** The page's own PySpark block, without its comments. */
 const LINES = [
@@ -153,9 +153,8 @@ export const LazyScene: React.FC = () => {
               { t: "collect()", at: tooAt },
               { t: "write", at: tooAt + 6 },
               { t: "df.count()", at: wholeDfAt },
-            ].map((c, i) => (
-              <span key={c.t} style={{ display: "flex", gap: 10, alignItems: "baseline", opacity: ease(frame, c.at - 2, 10) }}>
-                {i ? <Dot size={23} /> : null}
+            ].map((c) => (
+              <span key={c.t} style={{ opacity: ease(frame, c.at - 2, 10) }}>
                 <Chip mono size={23}>
                   {c.t}
                 </Chip>

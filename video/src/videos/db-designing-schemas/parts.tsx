@@ -747,14 +747,16 @@ export const DbTable: React.FC<{
             <div style={inner}>
             <span style={{ fontFamily: MONO, fontSize: HEAD_SIZE, fontWeight: 600, color: isGhost(j) ? ACCENT_INK : INK_SOFT }}>{c}</span>
             {badge && bIn > 0 ? (
-              // Plain words in the key blue beside the column's name, not a
-              // filled badge; 20px, within 12% of the 22px name.
+              // The filled key badge, at 20px: within 12% of the 22px name.
               <span
                 style={{
                   fontFamily: SANS,
                   fontWeight: 700,
                   fontSize: 20,
-                  color: KEY_INK,
+                  color: PAPER,
+                  background: KEY,
+                  borderRadius: 4,
+                  padding: "1px 7px",
                   opacity: bIn,
                   transform: `scale(${0.8 + 0.2 * bIn})`,
                   whiteSpace: "nowrap",

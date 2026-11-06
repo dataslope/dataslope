@@ -8,7 +8,6 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, 
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { Mark, MARK_BAD, MARK_KEY, MARK_OK } from "../da-sql/parts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -348,15 +347,7 @@ export const Flow: React.FC<{
   );
 };
 
-/** The highlight a solid label sits on: its tone's wash. */
-const TONE_MARK: Record<Tone, string> = { data: MARK_KEY, ok: MARK_OK, bad: MARK_BAD, plain: HIGHLIGHT };
-
-/**
- * A short label on the page, in its tone's ink, that inks in: plain bold
- * text, never an outlined pill (the house's no-cards rule). `solid`, the
- * emphatic form, puts a highlight of its tone behind the words, which is a
- * highlight, not a card.
- */
+/** A small rounded label on the page, in its tone's ink, that inks in. */
 export const Pill: React.FC<{
   x: number;
   y: number;
@@ -370,18 +361,23 @@ export const Pill: React.FC<{
 }> = ({ x, y, at, tone = "data", size = 22, out, dim, solid, children }) => {
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
-  const text = <span style={{ ...label(size, TONE[tone].ink), fontWeight: 700, whiteSpace: "nowrap" }}>{children}</span>;
+  const t = TONE[tone];
   return (
-    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d, fontSize: size }}>
-      {solid ? (
-        <span style={{ display: "inline-block", marginLeft: "-0.14em" }}>
-          <Mark at={at + 4} color={TONE_MARK[tone]}>
-            {text}
-          </Mark>
-        </span>
-      ) : (
-        text
-      )}
+    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d }}>
+      <span
+        style={{
+          display: "inline-block",
+          padding: "5px 14px 6px",
+          borderRadius: 8,
+          border: `2px solid ${t.line}`,
+          background: solid ? t.line : t.fill,
+          ...label(size, solid ? PAPER : t.ink),
+          fontWeight: 700,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {children}
+      </span>
     </Ink>
   );
 };

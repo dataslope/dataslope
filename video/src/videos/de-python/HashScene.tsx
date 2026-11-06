@@ -68,9 +68,11 @@ const TARGET_BUCKET = BUCKET_CELLS.find((c) => c.index === LAST)!;
 /** Layout rows, before `y()`. */
 const A_TITLE = 318;
 const A_CELLS = 372;
-const RULE = 472;
-const B_TITLE = 490;
-const PIPE = 548;
+/** The rule between the panels, and panel b's title line 28px of white
+ *  under it at the least (the counter on that line rides 8px high). */
+const RULE = 466;
+const B_TITLE = 500;
+const PIPE = 554;
 const B_CELLS = 676;
 const TIME_Y = 790;
 /** Where the average-case note starts: past "bucket 999,999 of 2,097,152"

@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { type Dept, DEPT_COLOR, MR, ROWS } from "./data";
-import { Arrow, Chip, Curve, Dot, Drift, Machine, PairCard } from "./parts";
+import { Arrow, Chip, Curve, Drift, Machine, PairCard } from "./parts";
 
 const CARD_W = 170;
 const CARD_H = 36;
@@ -75,11 +75,9 @@ export const NarrowScene: React.FC = () => {
         <Note at={narrowAt - 2} x={P_X} y={y(318)}>
           <span style={{ display: "flex", alignItems: "center", gap: 40, whiteSpace: "nowrap" }}>
             <span style={{ ...label(28, INK), fontWeight: 700 }}>Narrow</span>
-            <span style={{ opacity: ease(frame, opsAt, 10), display: "flex", gap: 10, alignItems: "baseline" }}>
+            <span style={{ opacity: ease(frame, opsAt, 10), display: "flex", gap: 8 }}>
               <Chip mono size={24}>map</Chip>
-              <Dot size={22} />
               <Chip mono size={24}>filter</Chip>
-              <Dot size={22} />
               <Chip mono size={24}>union</Chip>
             </span>
           </span>
@@ -126,11 +124,9 @@ export const NarrowScene: React.FC = () => {
         <Note at={wideAt - 2} x={WP_X} y={y(318)}>
           <span style={{ display: "flex", alignItems: "center", gap: 40, whiteSpace: "nowrap" }}>
             <span style={{ ...label(28, INK), fontWeight: 700 }}>Wide</span>
-            <span style={{ opacity: ease(frame, opsWAt, 10), display: "flex", gap: 10, alignItems: "baseline" }}>
+            <span style={{ opacity: ease(frame, opsWAt, 10), display: "flex", gap: 8 }}>
               <Chip mono size={24}>groupByKey</Chip>
-              <Dot size={22} />
               <Chip mono size={24}>join</Chip>
-              <Dot size={22} />
               <Chip mono size={24}>distinct</Chip>
             </span>
           </span>

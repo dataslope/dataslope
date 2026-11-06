@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
 import { at as atScale, Axes, type Scale } from "../da-statistics-communication/parts";
 import { count, SKEW } from "./data";
-import { Chip, Dot, Drift, OK, OK_INK, Svg } from "./parts";
+import { Chip, Drift, OK, OK_INK, Svg } from "./parts";
 
 const X0 = 210;
 const BAR_W = 74;
@@ -172,9 +172,8 @@ export const SkewScene: React.FC = () => {
         <Note at={keyAt - 2} x={R_X} y={y(334)}>
           <span style={{ display: "flex", gap: 10, alignItems: "center", whiteSpace: "nowrap" }}>
             <span style={{ ...note(23, INK_SOFT) }}>one common key:</span>
-            {causes.map((c, i) => (
-              <span key={c.text} style={{ display: "flex", gap: 10, alignItems: "baseline", opacity: ease(frame, c.at - 2, 10) }}>
-                {i ? <Dot size={23} /> : null}
+            {causes.map((c) => (
+              <span key={c.text} style={{ opacity: ease(frame, c.at - 2, 10) }}>
                 <Chip color={HOT} ink={HOT_INK} size={23}>
                   {c.text}
                 </Chip>

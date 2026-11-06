@@ -80,7 +80,6 @@ export const OutlierScene: React.FC = () => {
   const tailBand = ease(frame, longTailAt - 4, 16);
   const cardsOut = ease(frame, flagFrom - 6, 14) * (1 - ease(frame, decideAt - 8, 14));
   const acts = ease(frame, decideAt - 6, 16);
-  const kindShown = (i: number) => Math.max(ease(frame, kindAt[i] - 6, 14) * (1 - cardsOut), acts);
   /** The two planted earners arrive with the rest: the definition needs its far points. */
   const plantedIn = ease(frame, outlierFrom + 28, 10);
 
@@ -219,7 +218,8 @@ export const OutlierScene: React.FC = () => {
       {/* ── The three kinds, then what each one calls for: three columns,
            each under its own rule, so no hairline runs between them ── */}
       {KINDS.map((k, i) => {
-        const shown = kindShown(i);
+        const p = ease(frame, kindAt[i] - 6, 14);
+        const shown = Math.max(p * (1 - cardsOut), acts);
         if (shown <= 0) return null;
         const left = 160 + i * 560;
         return (

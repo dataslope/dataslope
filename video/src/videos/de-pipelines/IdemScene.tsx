@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
 import { ColumnRule, Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BLIND, DELETE_DAY, IDEM } from "./data";
-import { Drift, lineOf, Listing, listingHeight, Mark, MARK_OK, Mono, OK_INK, Pill, pulse, X0 } from "./parts";
+import { Drift, lineOf, Listing, listingHeight, Mark, MARK_OK, Mono, OK, OK_INK, Pill, pulse, X0 } from "./parts";
 
 const SIZE = 23;
 const LIST_W = 560;
@@ -17,16 +17,14 @@ const A_TOP = 390;
 const B_TOP = 620;
 const COUNT_X = 800;
 const COUNT_GAP = 220;
-/** A count's label and number, top to bottom, in px (20px label, 10px gap,
- *  the 44px number's line), and the hairline between a pair's two counts,
- *  centred in the gap between their text. */
-const COUNT_H = 82;
+/** A count's label and its box, top to bottom, in px (20px label, 8px gap,
+ *  the 64px box), and the hairline between a pair's two counts, centred in
+ *  the gap between the first box and the second label. */
+const COUNT_H = 96;
 const COUNT_RULE = 160;
 const NOTE_X = 1310;
 
-/** The day's count after one run: a label over the number COUNT(*) printed,
- *  plain text, the number in its tone's ink. A second look swells the number
- *  a little (`lit`), where the box it once sat in swelled its border. */
+/** The day's count after one run: a label over the number COUNT(*) printed. */
 const RunCount: React.FC<{ at: number; x: number; y: number; run: string; value: number; tone: "data" | "bad" | "ok"; lit?: number }> = ({
   at,
   x,
@@ -39,21 +37,28 @@ const RunCount: React.FC<{ at: number; x: number; y: number; run: string; value:
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
+  const line = tone === "bad" ? ACCENT : tone === "ok" ? OK : BAR;
   const ink = tone === "bad" ? ACCENT_INK : tone === "ok" ? OK_INK : BLUE_INK;
   return (
     <div style={{ position: "absolute", left: x, top: y, width: 170, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
       <div style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>{run}</div>
       <div
         style={{
-          marginTop: 10,
+          marginTop: 8,
+          width: 120,
+          height: 64,
+          boxSizing: "border-box",
+          border: `${2.5 + 2 * lit}px solid ${line}`,
+          borderRadius: 10,
+          background: `color-mix(in srgb, ${line} 12%, ${PAPER})`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           fontFamily: MONO,
-          fontSize: 44,
+          fontSize: 40,
           fontWeight: 700,
-          lineHeight: 1.1,
           color: ink,
           fontVariantNumeric: "tabular-nums",
-          transform: `scale(${1 + 0.12 * lit})`,
-          transformOrigin: "0 60%",
         }}
       >
         {value}
@@ -157,7 +162,7 @@ export const IdemScene: React.FC = () => {
         <Pill x={COUNT_X + 140} y={aTop + h(120)} at={failAt} tone="bad" size={20}>
           ✕ failed after the write
         </Pill>
-        <Note at={retryAt} x={COUNT_X + 140} y={aTop + h(160)}>
+        <Note at={retryAt} x={COUNT_X + 140} y={aTop + h(170)}>
           <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             ↻ retried<span style={{ opacity: ease(frame, againAt, 10) }}>: the same insert, again</span>
           </span>

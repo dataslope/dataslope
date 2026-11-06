@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Node, OK_INK, pulse, X0 } from "./parts";
+import { Drift, Node, OK_INK, Pill, pulse, X0 } from "./parts";
 
 /** One hour of events, drawn left to right. */
 const AX0 = 360;
@@ -179,19 +179,11 @@ export const BatchScene: React.FC = () => {
         <Note at={priceAt} x={AX0} y={sy + h(104)}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>The price, all yours to run:</span>
         </Note>
-        {/* The four costs as one line of words, each inked as it is said,
-            a middle dot between them. */}
-        <div style={{ position: "absolute", left: AX0, top: sy + h(140), ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-          {costs.map((c, i) => {
-            const p = ease(frame, c.at, 12);
-            return (
-              <span key={c.text} style={{ opacity: p }}>
-                {i ? <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
-                {c.text}
-              </span>
-            );
-          })}
-        </div>
+        {costs.map((c, i) => (
+          <Pill key={c.text} x={AX0 + [0, 196, 340, 488][i]} y={sy + h(146)} at={c.at} tone="plain" size={21}>
+            {c.text}
+          </Pill>
+        ))}
 
         {/* The choice, by latency. */}
         <Note at={chooseAt} x={RIGHT_X + 160} y={y(300)}>

@@ -130,7 +130,7 @@ export const HookScene: React.FC = () => {
         <Pill x={SRC.x} y={top + BOX_H + h(26)} at={columnsAt} tone="bad" dim={dim}>
           new columns
         </Pill>
-        <Pill x={SRC.x} y={top + BOX_H + h(78)} at={arrivingAt} tone="bad" dim={dim}>
+        <Pill x={SRC.x} y={top + BOX_H + h(84)} at={arrivingAt} tone="bad" dim={dim}>
           data that never stops
         </Pill>
         {/* The arrivals: a stream of dots falling into the source from above. */}

@@ -161,6 +161,12 @@ export const Chip: React.FC<{ layout: EntityLayout; at: number; dim?: number; ou
   <Entity layout={layout} at={at} dim={dim} out={out} />
 );
 
+/** The white between a panel's rule and its name (README: at least 28px
+ *  under a rule), and how far the rule is lifted above the panel's `y` to
+ *  make it: the name stays where it was, 14px under `y`. */
+const RULE_ROOM = 28;
+const RULE_LIFT = RULE_ROOM - 12;
+
 /** A small rule-and-label heading over a panel. */
 export const PanelHead: React.FC<{
   at: number;
@@ -179,8 +185,10 @@ export const PanelHead: React.FC<{
   if (p <= 0 || o >= 1) return null;
   return (
     <div style={{ position: "absolute", left: x, top: y, width, opacity: 1 - o }}>
-      <div style={{ height: 2, width: width * p, background: color === INK ? INK : color }} />
-      <div style={{ ...label(26, color), fontWeight: 700, marginTop: 12, opacity: p, whiteSpace: "nowrap" }}>{children}</div>
+      {/* The rule sits RULE_LIFT above `y`, so the name keeps its place and
+          has RULE_ROOM of white under the rule. */}
+      <div style={{ height: 2, width: width * p, marginTop: -RULE_LIFT, background: color === INK ? INK : color }} />
+      <div style={{ ...label(26, color), fontWeight: 700, marginTop: RULE_ROOM, opacity: p, whiteSpace: "nowrap" }}>{children}</div>
       {sub ? (
         <div style={{ ...note(22, INK_SOFT), marginTop: 6, opacity: ease(frame, subAt ?? at + 8, 12), whiteSpace: "nowrap" }}>{sub}</div>
       ) : null}

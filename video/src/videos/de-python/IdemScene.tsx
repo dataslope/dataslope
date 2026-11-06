@@ -7,7 +7,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { IDEM } from "./data";
-import { Code, Console, Drift, FadeIn, lineOf, Mark, MARK_BAD, MARK_OK, OK_INK, Strike, Title, X0 } from "./parts";
+import { Code, Console, Drift, FadeIn, lineOf, Mark, MARK_BAD, MARK_OK, OK_INK, Strike, Tag, Title, X0 } from "./parts";
 import { Mono } from "./mono";
 
 const TOP = 322;
@@ -30,11 +30,13 @@ const Way: React.FC<{
 }> = ({ top, at, title, color, line, out, outAt, mark, h }) => (
   <>
     <Note at={at} x={X0} y={top}>
-      {/* The title and its condition on one line, the condition plain text
-          after a middle dot, at the title's size. */}
-      <span style={{ whiteSpace: "nowrap" }}>
+      {/* The title and its condition as a tag, at 21px: within 12% of the
+          23px title it shares the line with. */}
+      <span style={{ display: "flex", gap: 16, alignItems: "baseline", whiteSpace: "nowrap" }}>
         <Title color={color}>{title}</Title>
-        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}> · run twice</span>
+        <Tag color={INK_SOFT} size={21}>
+          run twice
+        </Tag>
       </span>
     </Note>
     <Note at={at + 4} x={X0} y={top + h(44)}>

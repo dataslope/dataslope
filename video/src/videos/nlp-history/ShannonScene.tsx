@@ -49,13 +49,14 @@ const PaperPage: React.FC<{ x: number; top: number; width: number; height: numbe
         <span>{SHANNON_PAPER.journal}</span>
         <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, at + 10, 10) }}>{SHANNON_PAPER.date}</span>
       </div>
+      {/* The masthead rule; what follows it starts 28px below. */}
       <div style={{ position: "absolute", left: pad, right: pad, top: 52, height: 1.5, background: INK }} />
-      <Ink at={at + 4} dur={20} style={{ left: pad, top: 70, width: width - 2 * pad }}>
+      <Ink at={at + 4} dur={20} style={{ left: pad, top: 82, width: width - 2 * pad }}>
         <div style={{ ...headline(32), lineHeight: 1.12 }}>
           <Mark at={markAt}>{SHANNON_PAPER.title}</Mark>
         </div>
       </Ink>
-      <Ink at={at + 14} dur={14} style={{ left: pad, top: 168, whiteSpace: "nowrap" }}>
+      <Ink at={at + 14} dur={14} style={{ left: pad, top: 180, whiteSpace: "nowrap" }}>
         <div style={label(21, INK)}>{SHANNON_PAPER.author}</div>
       </Ink>
       {Array.from({ length: lines }, (_, i) => {
@@ -66,9 +67,9 @@ const PaperPage: React.FC<{ x: number; top: number; width: number; height: numbe
         return (
           <React.Fragment key={i}>
             {lit > 0 ? (
-              <div style={{ position: "absolute", left: pad - 6, top: 222 + i * 30 - 8, width: ((width - 2 * pad) * full + 12) * lit, height: 22, borderRadius: 4, background: HIGHLIGHT }} />
+              <div style={{ position: "absolute", left: pad - 6, top: 234 + i * 30 - 8, width: ((width - 2 * pad) * full + 12) * lit, height: 22, borderRadius: 4, background: HIGHLIGHT }} />
             ) : null}
-            <div style={{ position: "absolute", left: pad, top: 222 + i * 30, width: (width - 2 * pad) * full * w, height: 6, borderRadius: 3, background: SOFT }} />
+            <div style={{ position: "absolute", left: pad, top: 234 + i * 30, width: (width - 2 * pad) * full * w, height: 6, borderRadius: 3, background: SOFT }} />
           </React.Fragment>
         );
       })}
@@ -128,10 +129,11 @@ const ContentsPage: React.FC<{ x: number; top: number; width: number; height: nu
         <span>Contents</span>
         <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, at + 8, 10) }}>Part I: Discrete Noiseless Systems</span>
       </div>
+      {/* The masthead rule; what follows it starts 28px below. */}
       <div style={{ position: "absolute", left: pad, right: pad, top: 52, height: 1.5, background: INK }} />
       {PART_ONE.map((t, i) => {
         const isTucked = i === TUCKED;
-        const lineTop = 78 + i * 56;
+        const lineTop = 82 + i * 56;
         return (
           <React.Fragment key={t}>
             {isTucked && tuck > 0 ? (

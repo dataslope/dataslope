@@ -113,7 +113,7 @@ export const CompressScene: React.FC = () => {
   const R = y(340);
   const A = y(486);
   const D = y(596);
-  const C = y(780);
+  const C = y(794);
   const ROW_Y = y(684);
   const sample = TABLE.sample;
   const regionCol = sample.cols.indexOf("region");
@@ -202,7 +202,9 @@ export const CompressScene: React.FC = () => {
           <div style={{ ...label(23, INK) }}>the whole file</div>
           <div style={{ ...note(20, INK_SOFT), marginTop: 2 }}>by codec</div>
         </div>
-        <div style={{ position: "absolute", left: BAR_X - 10, top: C - h(18), width: 1340, height: 1, background: HAIRLINE, opacity: ease(frame, codecAt, 12) }} />
+        {/* The section's hairline, where it was, with 30px of room under it
+            to the first bar's words. */}
+        <div style={{ position: "absolute", left: BAR_X - 10, top: C - h(32), width: 1340, height: 1, background: HAIRLINE, opacity: ease(frame, codecAt, 12) }} />
         {bar(C, FILES.zstd, zstdAt - 4, <><QCode>zstd</QCode> (Zstandard)</>, { tint: COLUMN_TINT.units, sizeAt: zstdAt })}
         {bar(C + h(STEP), FILES.parquet, snappyAt - 4, <><QCode>snappy</QCode>, the default</>, { tint: COLUMN_TINT.category, sizeAt: snappyAt })}
         <Note at={slowerAt} x={BAR_X + w(FILES.zstd) + 380} y={C + (h(BAR_H) - 30) / 2}>

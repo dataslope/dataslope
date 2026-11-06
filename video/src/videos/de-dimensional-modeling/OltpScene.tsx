@@ -259,8 +259,10 @@ export const OltpScene: React.FC = () => {
         <Note at={moveAt + 8} x={orders.right + 56} y={y(CHIP_TOP) + h(100) - 52}>
           <span style={{ ...note(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>reshape</span>
         </Note>
+        {/* Under the arrow, a hairline and 28px of white before the words
+            (README: room under a rule). */}
         <Note at={jobAt} x={orders.right + 56} y={y(CHIP_TOP) + h(100) + 18}>
-          <div style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap", background: PAPER, borderTop: `1px solid ${HAIRLINE}`, paddingTop: 6 }}>
+          <div style={{ ...note(21, INK), fontWeight: 650, whiteSpace: "nowrap", background: PAPER, borderTop: `1px solid ${HAIRLINE}`, paddingTop: 28 }}>
             the data
             <br />
             engineer&apos;s job

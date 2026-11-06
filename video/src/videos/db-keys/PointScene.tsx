@@ -93,19 +93,18 @@ export const PointScene: React.FC = () => {
         <Entity layout={customers} at={customerAt - 4} marks={{ customer_id: { at: foreignAt + 6, tone: "key" } }} />
         <Relation name="customers to orders" points={points} from="exactly-one" to="zero-or-many" at={foreignAt - 4} color={BAR} dur={22} />
 
-        {/* Parent and child, over each box: the role in its own ink and
-            weight, a middle dot, then what it means. */}
+        {/* Parent and child, over each box. */}
         <Note at={parentAt - 2} x={customers.x} y={customers.y - 50} from="up">
           <Tag color={INK} size={21}>
             parent
           </Tag>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "pre" }}> · the table pointed at</span>
+          <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>the table pointed at</span>
         </Note>
         <Note at={childAt - 2} x={orders.x} y={orders.y - 50} from="up">
           <Tag color={KEY_INK} size={21}>
             child
           </Tag>
-          <span style={{ ...note(21, INK_SOFT), whiteSpace: "pre" }}> · holds the pointer</span>
+          <span style={{ ...note(21, INK_SOFT), marginLeft: 12 }}>holds the pointer</span>
         </Note>
 
         {/* The many side: the crow's foot swells as it is named. */}

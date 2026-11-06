@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, note } from "../../editorial/style";
+import { ACCENT_INK, INK_SOFT, note } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -291,9 +291,8 @@ export const PairScene: React.FC = () => {
       <Pill x={RECAP_X + 250} y={y(480)} at={repeatedAt - 2} size={26}>
         UNIQUE
       </Pill>
-      {/* Each tick 24px past its rule's code (26px mono, 0.6em a glyph). */}
-      <Tick x={RECAP_X + 8 * 26 * 0.6 + 24} y={y(480)} at={missingAt + 6} size={22} />
-      <Tick x={RECAP_X + 250 + 6 * 26 * 0.6 + 24} y={y(480)} at={repeatedAt + 6} size={22} />
+      <Tick x={RECAP_X + 170} y={y(480)} at={missingAt + 6} size={22} />
+      <Tick x={RECAP_X + 386} y={y(480)} at={repeatedAt + 6} size={22} />
       {/* ── What about values that are just wrong? ── */}
       {(
         [
@@ -302,8 +301,16 @@ export const PairScene: React.FC = () => {
         ] as const
       ).map(([v, at], i) => (
         <Ink key={String(v)} at={at - 2} dur={12} style={{ left: RECAP_X + i * 250, top: y(560), whiteSpace: "nowrap" }}>
-          {/* A wrong value as plain code in the red of a trap, no box. */}
-          <span style={{ ...note(34, ACCENT_INK), fontWeight: 600 }}>
+          <span
+            style={{
+              ...note(34, ACCENT_INK),
+              display: "inline-block",
+              padding: "4px 14px",
+              borderRadius: 8,
+              border: `2px dashed ${INK_SOFT}`,
+              fontWeight: 600,
+            }}
+          >
             <span style={{ fontFamily: MONO }}>{v}</span>
           </span>
         </Ink>

@@ -30,9 +30,6 @@ const FIG2_Y = 354;
 
 /** The bad value, as Postgres prints the failing row's price. */
 const BAD = PRICE.failing[2] as string;
-/** Where the arrow from the bad value starts: 24px past "price -3.00", set
- *  at 120 in 30px JetBrains Mono (0.6em a glyph). */
-const BAD_ARROW_X = 120 + ("price ".length + BAD.length) * 30 * 0.6 + 24;
 
 /**
  * Part 1 opens on Unit 5's bridge: two tables and the key between them, then
@@ -174,12 +171,22 @@ export const HookScene: React.FC = () => {
 
       {/* ── A product saved at -3.00 ── */}
       <Ink at={minusAt - 2} dur={12} out={chipOut} style={{ left: 120, top: products.rows[2].mid - 26, whiteSpace: "nowrap" }}>
-        {/* The value as plain code in the red of a trap: no chip around it. */}
-        <span style={{ display: "inline-block", fontFamily: MONO, fontSize: 30, fontWeight: 600, lineHeight: "52px", color: ACCENT_INK }}>
+        <span
+          style={{
+            display: "inline-block",
+            padding: "4px 14px",
+            borderRadius: 8,
+            border: `2px solid ${frame >= mistakeAt - 2 ? ACCENT : INK_SOFT}`,
+            fontFamily: MONO,
+            fontSize: 30,
+            fontWeight: 600,
+            color: ACCENT_INK,
+          }}
+        >
           price {BAD}
         </span>
       </Ink>
-      <Arrow from={[BAD_ARROW_X, products.rows[2].mid]} to={[products.left - 10, products.rows[2].mid]} at={dollarsAt - 2} out={chipOut} />
+      <Arrow from={[372, products.rows[2].mid]} to={[products.left - 10, products.rows[2].mid]} at={dollarsAt - 2} out={chipOut} />
       <Note at={saleAt - 4} x={122} y={products.rows[2].mid + 40} out={chipOut}>
         <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
           Not a sale,{" "}
