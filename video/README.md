@@ -251,6 +251,14 @@ Every video follows these rules.
   the gap and at least 24px from the text on either side. Not before the
   first column or after the last, and not between words on one line (a
   middle dot does that). It inks in with the column to its right.
+  **A card that comes off leaves its padding behind as space** (the owner:
+  "ensure that there are enough spacing between items after removing a
+  card design"). The box was doing the grouping; without it, space has to.
+  Space between groups is clearly larger than space inside one: at least
+  40px between groups (a source block and its first figure, one stat and
+  the next), 10 to 14px inside a group (a label and its bar, a title and
+  its note), and about 25px between rows of text. A label sits closer to
+  the thing it names than to the thing above it.
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative

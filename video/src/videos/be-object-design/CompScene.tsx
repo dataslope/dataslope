@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { LOYALTY, NOTIFIERS } from "./data";
-import { ArtSpot, Box, Drift, Flow, Line, Mark, MARK_BAD, OK, OK_INK, Pill, pulse, Svg, Value, X0 } from "./parts";
+import { ArtSpot, Box, Drift, Flow, Line, Mark, MARK_BAD, OK, OK_INK, Pill, pulse, Svg, Value, VRule, X0 } from "./parts";
 
 type P = readonly [number, number];
 const along = (pts: readonly P[], t: number): P => {
@@ -251,6 +251,8 @@ export const CompScene: React.FC = () => {
 
         <ArtSpot id="shopping-cart" at={cartAt} out={holdsAt - 12} left={1330} top={y(470)} h={190} />
 
+        <VRule x={(CART.x + CART.w + RIGHT_X) / 2} top={cartTop - 44} bottom={y(CHILD.top + CHILD.h)} at={holdsAt} out={aOut} />
+
         {/* Part A, right: a counter that holds a cart. */}
         <Line x={RIGHT_X} y={cartTop - 44} at={holdsAt} size={21} color={OK_INK} weight={650} out={aOut}>
           Composition: the counter has a cart
@@ -326,6 +328,9 @@ export const CompScene: React.FC = () => {
         <Line x={PARTS_X[0]} y={rowY(4) + 10} at={sixAt} size={26} weight={700}>
           <span style={{ color: parts > NOTIFIERS.composition[0] ? OK_INK : INK, fontVariantNumeric: "tabular-nums" }}>{parts}</span> parts
         </Line>
+
+        <VRule x={(cellX(2) + CELL.w + PARTS_X[0]) / 2} top={y(GRID_TOP - 96)} bottom={rowY(4) + 46} at={partsAt} />
+        <VRule x={(PARTS_X[1] + PART_W[1] + 1520) / 2} top={rowY(0) - 4} bottom={rowY(2) + 66} at={customerAt} />
 
         {/* One customer's notifier swaps its timing part. */}
         <Line x={1520} y={rowY(0) - 4} at={customerAt} size={20} color={INK_SOFT} weight={650}>

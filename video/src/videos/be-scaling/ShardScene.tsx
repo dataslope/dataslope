@@ -8,7 +8,7 @@ import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SHARDS } from "./data";
-import { commas, Drift, lerp, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Spot, Svg, X0 } from "./parts";
+import { commas, Drift, lerp, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
 
 const TABLE = { x: X0, w: 260, top: 382, h: 176 };
 const SERVER = { x0: 600, step: 180, w: 150, h: 120 };
@@ -74,7 +74,6 @@ export const ShardScene: React.FC = () => {
     <AbsoluteFill>
       <Sfx name="el-scratch" at={piecesAt} level={-33} />
       <Sfx name="el-whoosh" at={serversAt} level={-35} />
-      <Sfx name="el-pop" at={shardAt} level={-30} />
       <Sfx name="el-sprinkle" at={todayAt} level={-32} />
       <Sfx name="el-tap" at={hotAt} level={-30} />
       <Sfx name="el-sprinkle" at={millionAt} level={-32} />
@@ -150,7 +149,6 @@ export const ShardScene: React.FC = () => {
         <Line at={scaleAt} x={SERVER.x0} y={srvTop + SERVER.h + h(22)} size={22} color={OK_INK} weight={650}>
           scales writes and storage past one machine
         </Line>
-        <Spot id="shards" at={shardAt} x={1560} y={y(392)} w={170} />
 
         {/* ── By creation date: today's shard takes every new link. ── */}
         <Line at={dateAt} x={DATE_X} y={y(640)} size={22} weight={700}>
@@ -174,6 +172,8 @@ export const ShardScene: React.FC = () => {
         <Ink at={todayAt + 10} dur={12} style={{ left: colX(DATE_X, 7) - 30, top: base + 10, whiteSpace: "nowrap" }}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>today</span>
         </Ink>
+
+        <VRule x={779} top={y(640)} bottom={y(BASE) + 36} at={hashAt} />
 
         {/* ── By a hash of the key: the simulation's million keys, even. ── */}
         <Line at={hashAt} x={HASH_X} y={y(640)} size={22} weight={700}>
@@ -213,8 +213,8 @@ export const ShardScene: React.FC = () => {
             <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, priceAt, 10) }}>, the price of a cross-shard query</span>
           </span>
         </Ink>
-        <Node x={1560} y={y(720)} w={220} h={92} at={copyAt + 4} tone="ok" title="links by user" sub="a second copy" size={22} />
-        <Line at={copyAt + 10} x={1560} y={y(720) + 92 + h(18)} size={20} color={OK_INK} weight={650}>
+        <Node x={1500} y={y(392)} w={240} h={92} at={copyAt + 4} tone="ok" title="links by user" sub="a second copy" size={22} />
+        <Line at={copyAt + 10} x={1500} y={y(392) + 92 + h(18)} size={20} color={OK_INK} weight={650}>
           one shard for that page
         </Line>
       </Drift>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
+import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -66,7 +66,6 @@ export const EstimateScene: React.FC = () => {
   const headY = y(296);
   const ruleY = y(360);
   const pair = (i: number) => y(456) + i * 140;
-  const small = ease(frame, neitherAt, 14) * 0.55;
   const lit = pulse(frame, decidedAt, 30);
 
   return (

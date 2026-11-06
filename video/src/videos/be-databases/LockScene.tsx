@@ -10,7 +10,7 @@ import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { LOCK } from "./data";
-import { DataTable, Drift, Flow, Listing, listingHeight, MARK_BAD, MARK_OK, Mark, Node, PgError, tableGeometry, X0 } from "./parts";
+import { ColumnRule, DataTable, Drift, Flow, Listing, listingHeight, MARK_BAD, MARK_OK, Mark, Node, PgError, tableGeometry, X0 } from "./parts";
 
 const HEAD_Y = 302;
 const R_X = 980;
@@ -192,6 +192,8 @@ export const LockScene: React.FC = () => {
         </Note>
 
         </div>
+
+        <ColumnRule x={920} top={y(HEAD_Y)} bottom={Math.max(sg.rowTop(6), sy + h(66) + 32)} at={optAt + 10} />
 
         {/* ── Right: optimistic ── */}
         <Note at={optAt} x={R_X} y={y(HEAD_Y)}>

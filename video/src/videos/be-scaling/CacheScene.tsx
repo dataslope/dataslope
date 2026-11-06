@@ -8,7 +8,7 @@ import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { CACHE } from "./data";
-import { commas, Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, StepRow, X0 } from "./parts";
+import { commas, Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, StepRow, VRule, X0 } from "./parts";
 
 const BAR_X = 570;
 const BAR_W = 560;
@@ -150,9 +150,12 @@ export const CacheScene: React.FC = () => {
           );
         })}
         <Line at={sizeAt[0] + 10} x={BAR_X} y={rowY(3) - h(4)} size={20} color={INK_SOFT}>
-          share of redirects the cache answers
-          <span style={{ color: ACCENT_INK, opacity: ease(frame, lossAt[1], 10) }}>, and the database&apos;s reads if it dies</span>
+          answered by the cache
+          <span style={{ color: ACCENT_INK, opacity: ease(frame, lossAt[1], 10) }}> · ×: database reads if it dies</span>
         </Line>
+
+        <VRule x={1250} top={y(338)} bottom={y(420)} at={onlyAt} out={dimA} />
+        <VRule x={1265} top={y(640)} bottom={y(900)} at={betterAt} />
 
         {/* ── A dead cache sends every read to the store. ── */}
         <Node x={D.app.x} y={appMid - 30} w={D.app.w} h={60} at={betterAt} tone="plain" title="app" size={22} />

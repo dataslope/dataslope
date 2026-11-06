@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, lab
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Line, Mark, MiniMap, Node, Q_SIZE, Q_W, Svg, X0 } from "./parts";
+import { Drift, Line, Mark, MiniMap, Node, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
 
 /** The page's grid: two rows (the network's state), two columns (the choice). */
 const G = { head: X0, col: [420, 800], colW: 360, top: 400, rowH: 104, gap: 12 };
@@ -163,35 +163,36 @@ export const CapScene: React.FC = () => {
         <Line at={labelAt} x={G.head} y={opsTop + h(36)} size={20} color={INK_SOFT}>
           not a label for the database
         </Line>
-        {/* Available: the redirect and the new key. */}
+        {/* Available: the redirect and the new key, each with its notes under it. */}
         <Line at={redirectAt} x={apX} y={opsTop} size={22} weight={700} color={BLUE_INK}>
           redirect
         </Line>
-        <Line at={notFoundAt} x={apX + 140} y={opsTop + 4} size={21} color={INK_SOFT}>
-          at worst: a new link not found yet,
+        <Line at={notFoundAt} x={apX} y={opsTop + h(34)} size={20} color={INK_SOFT}>
+          at worst, a new link not found yet,
         </Line>
-        <Line at={takenAt} x={apX + 140} y={opsTop + 4 + h(32)} size={21} color={INK_SOFT}>
-          a link just taken down still works
+        <Line at={takenAt} x={apX} y={opsTop + h(62)} size={20} color={INK_SOFT}>
+          a taken-down link still working
         </Line>
-        <Line at={mintAt} x={apX} y={opsTop + h(92)} size={22} weight={700} color={BLUE_INK}>
+        <Line at={mintAt} x={apX} y={opsTop + h(104)} size={22} weight={700} color={BLUE_INK}>
           new key
         </Line>
-        <Line at={blockAt} x={apX + 140} y={opsTop + h(96)} size={21} color={INK_SOFT}>
+        <Line at={blockAt} x={apX} y={opsTop + h(138)} size={20} color={INK_SOFT}>
           each server mints from
         </Line>
-        <Line at={blockAt + 4} x={apX + 140} y={opsTop + h(96) + h(32)} size={21} color={INK_SOFT}>
+        <Line at={blockAt + 4} x={apX} y={opsTop + h(166)} size={20} color={INK_SOFT}>
           its own block of IDs
         </Line>
         {/* Consistent: the custom alias. */}
-        <Line at={aliasAt} x={cpX} y={opsTop + h(92)} size={22} weight={700} color={BLUE_INK}>
+        <Line at={aliasAt} x={cpX} y={opsTop + h(104)} size={22} weight={700} color={BLUE_INK}>
           custom alias
         </Line>
-        <Line at={aliasAt + 6} x={cpX} y={opsTop + h(146)} size={21} color={INK_SOFT}>
+        <Line at={aliasAt + 6} x={cpX} y={opsTop + h(138)} size={20} color={INK_SOFT}>
           must be unique, so
         </Line>
-        <Line at={majorityAt} x={cpX} y={opsTop + h(176)} size={21} color={ACCENT_INK} weight={650}>
+        <Line at={majorityAt} x={cpX} y={opsTop + h(166)} size={20} color={ACCENT_INK} weight={650}>
           the minority side refuses it
         </Line>
+        <VRule x={1225} top={y(316)} bottom={y(900)} at={choiceAt + 2} />
 
         {/* ── The design, split by a partition ── */}
         <Line at={choiceAt + 2} x={P.left} y={pTop - h(60)} size={21} weight={650} color={INK_SOFT}>

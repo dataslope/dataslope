@@ -10,7 +10,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AUTH } from "./data";
-import { Cross, Drift, Flow, Mark, Msg, msgHeight, Node, OK, OK_INK, Pill, pulse, Strike, X0, LISTING_PAPER } from "./parts";
+import { Cross, Drift, Flow, Mark, Msg, msgHeight, Node, OK, OK_INK, Pill, pulse, Strike, X0, LISTING_PAPER, VRule } from "./parts";
 
 /** The three panels of Question 7. */
 const PANELS = [
@@ -202,7 +202,6 @@ export const AuthScene: React.FC = () => {
               </div>
               <div style={{ ...note(22, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{p.asks}</div>
             </Note>
-            <div style={{ position: "absolute", left: p.x, top: headTop - h(14), width: p.w, height: 2, background: INK, opacity: ease(frame, diffAt + i * 6, 12) * (1 - ease(frame, leave, 10)) }} />
           </React.Fragment>
         ))}
 
@@ -239,7 +238,7 @@ export const AuthScene: React.FC = () => {
         {/* JWT: 164 characters anyone can read, signed. */}
         <Note at={thisAt} x={J.x} y={bodyTop} out={leave}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            a signed token, <span style={{ color: INK }}><Num>{AUTH.chars}</Num> characters</span>:{" "}
+            <span style={{ color: INK }}><Num>{AUTH.chars}</Num> characters</span>:{" "}
             <span style={{ color: PART_INK.header }}>header</span>.<span style={{ color: PART_INK.payload }}>payload</span>.
             <span style={{ color: PART_INK.signature }}>signature</span>
           </span>
@@ -441,6 +440,12 @@ export const AuthScene: React.FC = () => {
           </span>
         </Note>
         <div style={{ position: "absolute", left: tl.x0, top: tl.top + h(50) + 40, width: tl.x1 - tl.x0, height: 1, background: HAIRLINE, opacity: ease(frame, refreshAt, 10) }} />
+
+        {/* Hairlines between the panels, and between Question 8's two sides. */}
+        {[610, 1247].map((x, i) => (
+          <VRule key={x} x={x} top={headTop} bottom={claimsTop + h(184) + 30} at={diffAt + (i + 1) * 6} out={leave} />
+        ))}
+        <VRule x={890} top={bTop} bottom={Math.max(storeB.y + storeB.h + h(28) + twoH, svcRow + h(80) + 30)} at={locallyAt} />
       </Drift>
     </AbsoluteFill>
   );

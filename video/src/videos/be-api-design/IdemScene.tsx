@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { IDEM } from "./data";
-import { artBox, type Col, DataTable, dollars, Drift, Flow, Mark, Msg, Node, OK, OK_INK, Pill, pulse, Spot, tableGeometry, type TableRow, X0, LISTING_PAPER } from "./parts";
+import { artBox, type Col, DataTable, dollars, Drift, Flow, Mark, Msg, Node, OK, OK_INK, Pill, pulse, Spot, tableGeometry, type TableRow, X0, LISTING_PAPER, VRule } from "./parts";
 
 const L_TABLE_X = 330;
 const R_X = 1000;
@@ -214,6 +214,9 @@ export const IdemScene: React.FC = () => {
             {IDEM.duplicate}
           </div>
         </Note>
+
+        {/* A hairline between the two runs. */}
+        <VRule x={911} top={labelTop} bottom={attemptsTop + 2 * h(40) + 30} at={fixAt} />
       </Drift>
     </AbsoluteFill>
   );

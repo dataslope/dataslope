@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HEAP } from "./data";
-import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, OK_INK, PAPER, Svg, int } from "./parts";
+import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, OK_INK, PAPER, Svg, int, VRule } from "./parts";
 
 /** Five jobs, by urgency (1 the most urgent), in the order they arrive.
  *  A drawing of the two disciplines, not data. */
@@ -170,6 +170,8 @@ export const PqScene: React.FC = () => {
             <div style={{ position: "absolute", left: T.pop, top: rowY(i) + 10, ...note(24, i === 2 ? OK_INK : r.popBad ? ACCENT_INK : INK), fontWeight: 650, opacity: ease(frame, r.popAt, 10), whiteSpace: "nowrap" }}>{r.pop}</div>
           </React.Fragment>
         ))}
+
+        <VRule x={1060} top={laneY[0]} bottom={y(806) + 56} at={levelsAt} />
 
         {/* The heap: twenty levels for a million, one push climbing. */}
         <Line at={levelsAt} x={TREE.x0} y={apexY - 72} size={22} weight={650}>

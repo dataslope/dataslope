@@ -8,7 +8,7 @@ import { Ink, NextLine, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FEED, TRAFFIC } from "./data";
-import { commas, Drift, Flow, Line, Mark, Node, OK, OK_INK, Q_SIZE, Q_W, roundTo, Spot, X0 } from "./parts";
+import { commas, Drift, Flow, Line, Mark, Node, OK, OK_INK, Q_SIZE, Q_W, roundTo, Spot, VRule, X0 } from "./parts";
 
 const PUSH = { poster: { x: X0, w: 150, h: 64 }, feed: { x: 470, w: 250, h: 52 }, mids: [392, 456, 520, 584] };
 const PULL = { x: 1000, grid: { cols: 20, rows: 15, cell: 12, gap: 3 }, feed: { x: 1520, w: 250, h: 64, mid: 488 } };
@@ -192,6 +192,8 @@ export const FeedScene: React.FC = () => {
           </b>
           <b style={{ opacity: ease(frame, stormAt, 10) }}>, a write storm</b>
         </Line>
+
+        <VRule x={910} top={y(330)} bottom={y(716)} at={pullAt} out={hybridIn} />
 
         {/* ── Pull: the feed built on request from everyone followed. ── */}
         <Line at={pullAt} x={PULL.x} y={y(330)} size={24} weight={700} out={feedOut}>

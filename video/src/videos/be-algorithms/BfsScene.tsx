@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { TRAVERSAL } from "./data";
-import { ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, Edge, GraphNode, HIGHLIGHT, INK_SOFT, Line, OK_INK, Svg, int } from "./parts";
+import { ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, Edge, GraphNode, HIGHLIGHT, INK_SOFT, Line, OK_INK, Svg, int, VRule } from "./parts";
 
 type P = readonly [number, number];
 /** The page's graph, a diamond: A over B and C, both over D. */
@@ -146,6 +146,9 @@ export const BfsScene: React.FC = () => {
         <Line at={dfsForAt} x={140} y={y(692)} size={24}>
           <b style={{ color: BLUE_INK }}>DFS</b>: cycle detection, topological sort, backtracking
         </Line>
+
+        <VRule x={510} top={gTop - 76} bottom={gTop + 250} at={nodeAt.A} />
+        <VRule x={985} top={apexY - 72} bottom={baseY + 96} at={memoryAt} />
 
         {/* Memory: a million-node tree. */}
         <Line at={memoryAt} x={TREE.x0} y={apexY - 72} size={22} weight={650}>

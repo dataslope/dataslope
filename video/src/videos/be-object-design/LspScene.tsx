@@ -7,7 +7,7 @@ import { ACCENT, BAR, INK, INK_SOFT, PAPER } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LISKOV } from "./data";
-import { ACCENT_INK, Box, Drift, Flow, lerp, Line, Mark, Mark2, OK, OK_INK, pulse, X0 } from "./parts";
+import { ACCENT_INK, Box, Drift, Flow, lerp, Line, Mark, Mark2, OK, OK_INK, pulse, VRule, X0 } from "./parts";
 
 const NODE = { w: 210, h: 64 };
 const CALLER_X = 650;
@@ -150,6 +150,9 @@ export const LspScene: React.FC = () => {
         <Line x={X0} y={lowRow + NODE.h + 18} at={resizedAt} size={22} weight={600} color={OK_INK}>
           Or: shapes that can&apos;t be resized
         </Line>
+
+        <VRule x={(X0 + 250 + NODE.w + CALLER_X) / 2} top={topRow - 60} bottom={lowRow + NODE.h + 50} at={codeAt} />
+        <VRule x={(RECT_X + LISKOV.width * UNIT + SQ_X) / 2} top={base - LISKOV.width * UNIT} bottom={base + 112} at={squareAt + 4} />
 
         {/* The caller written for rectangles. */}
         <Line x={CALLER_X} y={topRow - 60} at={codeAt} size={21} color={INK_SOFT} weight={700}>

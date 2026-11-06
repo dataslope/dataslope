@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { HURT, OPENING, thousands } from "./data";
-import { Bar, Drift, Listing, listingHeight, Node, PlanBox, SmallMono, X0 } from "./parts";
+import { Bar, ColumnRule, Drift, Listing, listingHeight, Node, PlanBox, SmallMono, X0 } from "./parts";
 
 const HELPS_Y = 300;
 const L_TOP = 392;
@@ -151,6 +151,7 @@ export const HurtScene: React.FC = () => {
         </Note>
 
         {/* ── Right: what every index costs ── */}
+        <ColumnRule x={950} top={lTop} bottom={lTop + h(440)} at={costsAt} />
         <Note at={costsAt} x={R_X} y={lTop}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             <Num>10,000</Num> inserts: write-ahead log records

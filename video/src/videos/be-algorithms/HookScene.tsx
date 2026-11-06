@@ -7,7 +7,7 @@ import { halo, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Art, BAR, BLUE_FILL, BLUE_INK, Drift, HIGHLIGHT, Headline, INK, INK_SOFT, Kicker, Line, OK_INK, Svg } from "./parts";
+import { Art, BAR, BLUE_FILL, BLUE_INK, Drift, HIGHLIGHT, Headline, INK, INK_SOFT, Kicker, Line, OK_INK, Svg, VRule } from "./parts";
 
 /** The million drawn as a square, a thousand items a side. */
 const SQ = 440;
@@ -104,6 +104,8 @@ export const HookScene: React.FC = () => {
         <Line at={millionAt + 28} x={SQ_X + 26} y={top + 10} size={22} weight={700}>
           <span style={halo}>← the hundred</span>
         </Line>
+
+        <VRule x={(SQ_X + SQ + CHIP_X) / 2} top={top} bottom={top + SQ} at={structureAt - 2} />
 
         {/* Which structure keeps it cheap. */}
         <Line at={structureAt - 2} x={CHIP_X} y={top + 20} size={26} weight={650}>

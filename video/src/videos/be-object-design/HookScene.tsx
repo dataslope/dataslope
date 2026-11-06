@@ -6,7 +6,7 @@ import { BAR, BLUE_INK, HIGHLIGHT, INK, PAPER, label } from "../../editorial/sty
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
-import { ACCENT_INK, ArtSpot, Box, Drift, Flow, Headline, Kicker, Line, OK_INK, Pill, pulse, X0 } from "./parts";
+import { ACCENT_INK, ArtSpot, Box, Drift, Flow, Headline, Kicker, Line, OK_INK, Pill, pulse, VRule, X0 } from "./parts";
 
 /** The checkout, as the shop's five steps. */
 const STEPS = ["cart", "pay", "invoice", "email", "stock"];
@@ -23,7 +23,7 @@ const REQUESTS = [
 const REQ_TOP = 424;
 const REQ_PITCH = 104;
 const CARD = { w: 620, h: 64 };
-const NEW = { x: 870, w: 180 };
+const NEW = { x: 870, w: 160 };
 const EDIT = { x: 1070, w: 320 };
 const OPT_H = 46;
 
@@ -125,6 +125,10 @@ export const HookScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+
+        {/* Hairlines between the three columns: the requests, then each answer. */}
+        <VRule x={735} top={y(REQ_TOP) + 12} bottom={y(REQ_TOP + 2 * REQ_PITCH) + CARD.h / 2 + 20} at={landsAt} dim={dim} />
+        <VRule x={(NEW.x + NEW.w + EDIT.x) / 2} top={y(REQ_TOP) + 12} bottom={y(REQ_TOP + 2 * REQ_PITCH) + CARD.h / 2 + 20} at={editAt} dim={dim} />
 
         <ArtSpot id="armadillo" at={shopAt + 14} left={1494} top={y(468)} h={210} />
 

@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { HASHING } from "./data";
-import { commas, Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, SERVER, Svg, X0 } from "./parts";
+import { commas, Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, SERVER, Svg, VRule, X0 } from "./parts";
 
 const LB = { x: X0, w: 190, h: 76, mid: 560 };
 const SRV = { x: 440, w: 180, h: 60 };
@@ -206,6 +206,9 @@ export const BalancerScene: React.FC = () => {
           </React.Fragment>
         ))}
 
+        <VRule x={1070} top={panelTop} bottom={y(770)} at={lcAt - 2} out={phaseOut} />
+        <VRule x={1410} top={panelTop} bottom={y(770)} at={chAt - 2} out={phaseOut} />
+
         {/* Round-robin: requests 1 to 8, dealt across the four in turn. */}
         {[0, 1, 2, 3].map((c) => (
           <Node key={c} x={rrCol(c)} y={rrBase} w={60} h={40} at={rrAt} tone="plain" title={String(c + 1)} size={20} out={phaseOut} />
@@ -267,7 +270,7 @@ export const BalancerScene: React.FC = () => {
           );
         })}
         <Line at={fewestAt + 10} x={PANEL_X[1]} y={lcRow(3) + h(60)} size={20} color={OK_INK} weight={650} out={phaseOut}>
-          the new request goes to server {lcPick + 1}
+          new request: server {lcPick + 1}
         </Line>
         <Line at={slowAt} x={PANEL_X[1]} y={lcRow(3) + h(104)} size={20} color={INK_SOFT} out={phaseOut}>
           copes with slow requests
@@ -299,7 +302,7 @@ export const BalancerScene: React.FC = () => {
           Simulation: <Num>{commas(HASHING.keys)}</Num> short keys, one square each, colored by the server it lands on
         </Line>
         <Line at={simAt + 6} x={MOD_X} y={y(392)} size={22} weight={700}>
-          Hash modulo the server count: 3, then 4
+          Modulo: 3 servers, then 4
         </Line>
         <KeyGrid x={MOD_X} top={y(GRID_TOP)} from={HASHING.grid.mod3} to={HASHING.grid.mod4} at={simAt + 6} sweepAt={switchAt} dimAt={sevAt} />
         <Line at={sevAt + 4} x={MOD_X} y={y(GRID_TOP) + 416} size={23} weight={700} color={ACCENT_INK}>
@@ -313,6 +316,9 @@ export const BalancerScene: React.FC = () => {
         <Line at={newAt} x={RING_X} y={y(GRID_TOP) + 416} size={23} weight={700} color={OK_INK}>
           {pct(HASHING.shareRing)} moved, all to the new server
         </Line>
+
+        <VRule x={585} top={y(392)} bottom={y(GRID_TOP) + 446} at={ringAt} />
+        <VRule x={1112} top={y(392)} bottom={y(GRID_TOP) + 446} at={simAt + 8} />
 
         {/* The ring itself: each server's points around it. */}
         <Svg opacity={ringOn}>

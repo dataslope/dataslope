@@ -6,7 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { BLUE_INK, INK, INK_SOFT, PAPER, headline, label } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ACCENT_INK, Box, Drift, Flow, Line, Mark, Mark2, OK_INK, Strike, X0 } from "./parts";
+import { ACCENT_INK, Box, Drift, Flow, Line, Mark, Mark2, OK_INK, Strike, VRule, X0 } from "./parts";
 
 const ROW_TOP = 290;
 const PITCH = 100;
@@ -105,6 +105,8 @@ export const SolidScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+
+        <VRule x={(NAME_X + 500 + EX_X) / 2} top={top(0) - 4} bottom={top(4) + 66} at={invoiceAt} dim={dim} />
 
         {/* S: the invoice. */}
         <Box x={EX_X} y={exTop(0)} w={170} h={BOX_H} at={invoiceAt} title="Invoice" size={23} tone="ok" dim={dim} />

@@ -29,6 +29,7 @@ import {
   OK_INK,
   PAPER,
   Svg,
+  VRule,
   X0,
   int,
 } from "./parts";
@@ -187,6 +188,7 @@ const Stable: React.FC<{ c: Ctx }> = ({ c }) => {
           {hop(r) ? <Mark at={hoppersAt + 4}>{r.join(" ")}</Mark> : r.join(" ")}
         </Line>
       ))}
+      <VRule x={1085} top={c.T + c.h(60)} bottom={c.T + c.h(104) + 5 * rowH} at={lastAt} />
       <Line at={hoppersAt + 8} x={R_X} y={c.T + c.h(104) + 5 * rowH + c.h(20)} size={24} weight={650} color={OK_INK}>
         The two Hoppers stay Ada, then Grace
       </Line>
@@ -328,7 +330,7 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
   const dpAt = c.w("r-dc", "Dynamic programming reuses the answers of overlapping ones");
   const fib = fibTree(5);
   const W = 520;
-  const fx = R_X + 480;
+  const fx = R_X + 500;
   const ly = (d: number) => c.T + c.h(90) + d * c.h(66);
   const repeated = (m: number) => fib.filter((f) => f.n === m).length > 1 && m >= 2;
   const tint: Record<number, string> = { 3: HIGHLIGHT, 2: `color-mix(in srgb, ${ds("teal", 300)} 70%, ${PAPER})` };
@@ -345,6 +347,7 @@ const DivideDp: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={mergeAt} x={R_X} y={ly(3) + c.h(4)} size={23} color={INK_SOFT}>
         merge sort: no piece is solved twice
       </Line>
+      <VRule x={1237} top={c.T} bottom={ly(5) + c.h(4) + 30} at={dpAt} />
       <Line at={dpAt} x={fx} y={c.T} size={24} weight={650}>
         Dynamic programming: overlapping
       </Line>
@@ -439,6 +442,7 @@ const Classic: React.FC<{ c: Ctx }> = ({ c }) => {
           </Line>
         </React.Fragment>
       ))}
+      <VRule x={1185} top={c.T} bottom={c.T + 4 * c.h(76) + 40} at={stateAt} />
       <Line at={stateAt} x={R_X} y={c.T + 5 * c.h(76) + c.h(12)} size={25} weight={700}>
         Each teaches a way to <Mark at={stateAt + 6}>define the state</Mark>
       </Line>
@@ -638,6 +642,7 @@ export const RapidOneScene: React.FC = () => {
         <Kicker at={from - 8}>Questions 9 to 19 · Sorting and recursion</Kicker>
         <Headline lead="The other twenty-four," turn="one line each." at={otherAt - 4} turnAt={eachAt - 2} />
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={eachAt} end={end} />
+        <VRule x={730} top={y(LIST_TOP)} bottom={y(LIST_TOP) + items.length * h(ROW)} at={items[0].at - 6} />
       </Drift>
     </AbsoluteFill>
   );

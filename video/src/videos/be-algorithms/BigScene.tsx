@@ -8,7 +8,7 @@ import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BIG_O } from "./data";
-import { ACCENT, ACCENT_INK, Art, BAR, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, OK_INK, PAPER, Svg, int } from "./parts";
+import { ACCENT, ACCENT_INK, Art, BAR, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, OK_INK, PAPER, Svg, int, VRule } from "./parts";
 
 /** The schematic grid: n items down and across; a cell above the diagonal
  *  is one pair the double loop checks. Drawn, not counted (the table is). */
@@ -126,6 +126,8 @@ export const BigScene: React.FC = () => {
             <rect key={j} x={GX + j * PITCH + 2} y={passTop + 2} width={PITCH - 4} height={PITCH - 4} rx={4} fill={OK} opacity={ease(frame, loopAt + 32 + j, 8)} />
           ))}
         </Svg>
+
+        <VRule x={480} top={tTop} bottom={y(690) + 62} at={loopAt} />
 
         {/* The table: n, pairs, one pass. */}
         <div style={{ position: "absolute", left: 0, top: tTop, opacity: ease(frame, loopAt, 12) }}>

@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HASH, sharedChance } from "./data";
-import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, Mark, Mono, OK_INK, Svg, int } from "./parts";
+import { ACCENT, ACCENT_INK, BAR, BLUE_FILL, BLUE_INK, Cell, Drift, HBar, HIGHLIGHT, INK, INK_SOFT, Line, Mark, Mono, OK_INK, Svg, int, VRule } from "./parts";
 
 const AX = 140;
 const PITCH_X = 84;
@@ -157,6 +157,8 @@ export const HashScene: React.FC = () => {
         <Line at={linearAt} x={AX} y={aTop + 214} size={24} weight={650}>
           O(n) time, at the cost of O(n) memory
         </Line>
+
+        <VRule x={945} top={aTop - 50} bottom={y(800) + 60} at={averageAt} />
 
         {/* Average: a thousand buckets, filling key by key. */}
         <Line at={averageAt} x={BX} y={bTop - 50} size={22} weight={650}>

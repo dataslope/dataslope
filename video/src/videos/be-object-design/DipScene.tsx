@@ -7,7 +7,7 @@ import { ACCENT, BLUE_INK, INK, INK_SOFT, label } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FAKE_SENT } from "./data";
-import { ArtSpot, Box, Drift, Flow, lerp, Line, Mark2, OK, OK_INK, pulse, X0 } from "./parts";
+import { ArtSpot, Box, Drift, Flow, lerp, Line, Mark2, OK, OK_INK, pulse, VRule, X0 } from "./parts";
 
 const CONF = { x: X0, w: 400, top: 420, h: 110 };
 const SOCKET = { w: 116, h: 76 };
@@ -157,6 +157,7 @@ export const DipScene: React.FC = () => {
         <Flow points={[[B.conf.x + B.conf.w + 6, rowMid], [B.email.x - 8, rowMid]]} at={inversionAt + 8} color={frame >= noLongerAt + 10 ? ACCENT : INK} />
         <Mark2 at={noLongerAt + 12} kind="cross" size={30} style={{ left: (B.conf.x + B.conf.w + B.email.x) / 2 - 15, top: rowMid - 50 }} />
 
+        <VRule x={(B.email.x + B.email.w + A.conf.x - 14) / 2} top={rowTop - 48} bottom={rowTop + rowH + 50} at={noLongerAt} />
         <Line x={A.conf.x} y={rowTop - 48} at={noLongerAt} size={21} color={OK_INK} weight={700}>
           after
         </Line>

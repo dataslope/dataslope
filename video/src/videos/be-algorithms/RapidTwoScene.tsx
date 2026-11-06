@@ -31,6 +31,7 @@ import {
   OK_INK,
   PAPER,
   Svg,
+  VRule,
   X0,
   int,
 } from "./parts";
@@ -163,6 +164,7 @@ const Traverse: React.FC<{ c: Ctx }> = ({ c }) => {
   const rx = R_X + 480;
   return (
     <>
+      <VRule x={1212} top={c.T + c.h(30)} bottom={c.T + c.h(72) + 2 * c.h(120) + 30} at={inAt} />
       <Svg opacity={ease(frame, inAt - 6, 10)}>
         {all.flatMap((t) =>
           [t.left, t.right]
@@ -273,6 +275,7 @@ const Trie: React.FC<{ c: Ctx }> = ({ c }) => {
   const rx = R_X + 560;
   return (
     <>
+      <VRule x={1287} top={c.T + c.h(36)} bottom={c.T + c.h(60) + 4 * c.h(84) + 24} at={storesAt} />
       {TRIE.map((t, i) =>
         t.parent === undefined ? null : (
           <Edge key={`e${i}`} from={pos(t.parent)} to={pos(i)} at={storesAt + t.d * 4} r={24} color={lit(i) ? INK : INK_SOFT} width={lit(i) ? 3 : 2} />
@@ -489,22 +492,23 @@ const Adjacency: React.FC<{ c: Ctx }> = ({ c }) => {
       <Svg opacity={ease(frame, listAt + 6, 10)}>
         <circle cx={R_X + 4} cy={top + 4} r={14} fill="none" stroke={HIGHLIGHT} strokeWidth={5} />
       </Svg>
-      <Line at={listAt} x={R_X + side + 40} y={top} size={24} weight={700} color={BLUE_INK}>
+      <VRule x={R_X + side + 35} top={top} bottom={top + side} at={listAt} />
+      <Line at={listAt} x={R_X + side + 70} y={top} size={24} weight={700} color={BLUE_INK}>
         List: <Num>{int(A.listEntries)}</Num> entries
       </Line>
-      <Line at={listAt + 8} x={R_X + side + 40} y={top + c.h(40)} size={22} color={INK_SOFT}>
+      <Line at={listAt + 8} x={R_X + side + 70} y={top + c.h(40)} size={22} color={INK_SOFT}>
         the dot in the corner, to scale
       </Line>
-      <Line at={matrixAt} x={R_X + side + 40} y={top + c.h(110)} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={matrixAt} x={R_X + side + 70} y={top + c.h(110)} size={24} weight={700} color={ACCENT_INK}>
         Matrix: <Num>{int(A.matrixCells)}</Num> cells
       </Line>
-      <Line at={emptyAt} x={R_X + side + 40} y={top + c.h(150)} size={22} color={INK_SOFT}>
+      <Line at={emptyAt} x={R_X + side + 70} y={top + c.h(150)} size={22} color={INK_SOFT}>
         nearly all of them empty
       </Line>
-      <Line at={denseAt} x={R_X + side + 40} y={top + c.h(230)} size={24} weight={650}>
+      <Line at={denseAt} x={R_X + side + 70} y={top + c.h(230)} size={24} weight={650}>
         A matrix suits dense graphs
       </Line>
-      <Line at={denseAt + 12} x={R_X + side + 40} y={top + c.h(270)} size={24} weight={650}>
+      <Line at={denseAt + 12} x={R_X + side + 70} y={top + c.h(270)} size={24} weight={650}>
         and O(1) edge checks
       </Line>
     </>
@@ -533,6 +537,7 @@ const Cycle: React.FC<{ c: Ctx }> = ({ c }) => {
       {Object.keys(pos).map((k) => (
         <GraphNode key={k} x={pos[k][0]} y={pos[k][1]} at={runAt} name={k} r={32} tone={frame >= visitAt[k] ? "look" : "plain"} />
       ))}
+      <VRule x={1276} top={c.T + c.h(40)} bottom={c.T + c.h(292) + 30} at={runAt} />
       <Line at={runAt} x={rx} y={c.T + c.h(40)} size={24} weight={650}>
         DFS, each node marked:
       </Line>
@@ -679,6 +684,7 @@ const Bits: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ fontFamily: MONO, fontWeight: 700, color: OK_INK, width: 40, textAlign: "right" }}>{result}</span>
         <span style={{ fontFamily: MONO, fontWeight: 700, letterSpacing: "0.2em", color: OK_INK }}>{bin(result)}</span>
       </div>
+      <VRule x={1095} top={c.T + c.h(64)} bottom={c.T + c.h(64) + (nums.length + 1) * rowH + 30} at={cancelAt} />
       <Line at={cancelAt} x={R_X + 400} y={c.T + c.h(110)} size={24}>
         Each pair cancels: <span style={{ fontFamily: MONO }}>x ^ x = 0</span>
       </Line>
@@ -745,6 +751,7 @@ export const RapidTwoScene: React.FC = () => {
         <Kicker at={from - 8}>Questions 20 to 32 · Structures, search and graphs</Kicker>
         <Headline lead="Now structures," turn="search and graphs." at={nowAt - 4} turnAt={graphsAt - 2} />
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={nowAt + 6} end={end} />
+        <VRule x={730} top={y(LIST_TOP)} bottom={y(LIST_TOP) + items.length * h(ROW)} at={items[0].at - 6} />
 
         {/* The close. */}
         <Art name="pangolin" at={closeAt} left={1380} top={y(300)} h={340} />

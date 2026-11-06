@@ -8,7 +8,7 @@ import { Ink, Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Flow, Mark, METHOD_INK, Msg, msgHeight, OK_INK, pulse, X0 } from "./parts";
+import { Drift, Flow, Mark, METHOD_INK, Msg, msgHeight, OK_INK, pulse, X0, VRule } from "./parts";
 
 /** The grid's columns: the method, what it does, then the two properties. */
 const COL = { what: 250, safe: 610, idem: 770 };
@@ -197,6 +197,9 @@ export const MethodsScene: React.FC = () => {
           </span>
           <div style={{ ...note(21, INK_SOFT), marginTop: 2, whiteSpace: "nowrap" }}>climbs every time</div>
         </Note>
+
+        {/* A hairline between the grid and the follow-ups. */}
+        <VRule x={1015} top={delTop(0) - h(46)} bottom={patchTop(1) + msgHeight(2, 22)} at={secondAt} />
       </Drift>
     </AbsoluteFill>
   );

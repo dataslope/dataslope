@@ -8,7 +8,7 @@ import { Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Flow, Mark, METHOD_INK, Node, OK, Pill, X0, LISTING_PAPER } from "./parts";
+import { Drift, Flow, Mark, METHOD_INK, Node, OK, Pill, X0, LISTING_PAPER, VRule } from "./parts";
 
 const COLS = [X0, 710, 1300];
 const COL_W = 500;
@@ -114,7 +114,6 @@ export const StylesScene: React.FC = () => {
 
         {heads.map((hd, i) => (
           <React.Fragment key={hd.name}>
-            <div style={{ position: "absolute", left: COLS[i], top: headTop - h(14), width: COL_W, height: 2, background: INK, opacity: ease(frame, hd.at - 4, 12) }} />
             <Note at={hd.at} x={COLS[i]} y={headTop}>
               <div style={{ ...label(32, INK), fontWeight: 750, whiteSpace: "nowrap" }}>{hd.name}</div>
               <div style={{ ...note(22, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{hd.what}</div>
@@ -219,6 +218,11 @@ export const StylesScene: React.FC = () => {
         </Pill>
         {["orders", "search", "billing"].map((s, i) => (
           <Node key={s} x={1180 + i * 205} y={mixTop} w={185} h={h(72)} at={betweenAt + 6 + i * 4} tone="data" title={s} size={23} />
+        ))}
+
+        {/* Hairlines between the three columns, each with the column to its right. */}
+        {[650, 1250].map((x, i) => (
+          <VRule key={x} x={x} top={headTop} bottom={plusTop + 3 * h(36) + 30} at={heads[i + 1].at} />
         ))}
       </Drift>
     </AbsoluteFill>

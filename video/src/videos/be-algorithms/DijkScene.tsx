@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { DIJKSTRA } from "./data";
-import { ACCENT, ACCENT_INK, Art, Cross, Drift, Edge, GraphNode, HIGHLIGHT, INK, INK_SOFT, Line, NODE_R, OK_INK, Strike, Svg } from "./parts";
+import { ACCENT, ACCENT_INK, Art, Cross, Drift, Edge, GraphNode, HIGHLIGHT, INK, INK_SOFT, Line, NODE_R, OK_INK, Strike, Svg, VRule } from "./parts";
 
 type P = readonly [number, number];
 
@@ -164,6 +164,8 @@ export const DijkScene: React.FC = () => {
         <Line at={timesAt} x={140} y={y(838)} size={30} weight={700} color={OK_INK}>
           O((V + E) log V)
         </Line>
+
+        <VRule x={915} top={y(320)} bottom={y(838) + 36} at={whyAt - 6} />
 
         {/* Why no negative weights: the video's own graph. */}
         <div style={{ opacity: negOn }}>

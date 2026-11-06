@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Cross, Drift, Flow, Http, Mark, Msg, msgHeight, OK_INK, Strike, X0 } from "./parts";
+import { Cross, Drift, Flow, Http, Mark, Msg, msgHeight, OK_INK, Strike, X0, VRule } from "./parts";
 
 const CODE_SIZE = 23;
 
@@ -115,7 +115,6 @@ export const CodesScene: React.FC = () => {
           const x = c.x + (four ? slide : 0);
           return (
             <React.Fragment key={c.cls}>
-              <div style={{ position: "absolute", left: x, top: colTop - h(8), width: c.w - 30, height: 2, background: INK, opacity: ease(frame, classAt[ci] - 4, 12) * (out === undefined ? 1 : 1 - ease(frame, out, 10)) }} />
               <Note at={classAt[ci] - 2} x={x} y={colTop} out={out}>
                 <span style={{ fontFamily: MONO, fontSize: 44, fontWeight: 700, color: INK, whiteSpace: "nowrap" }}>
                   <span style={{ position: "relative", display: "inline-block" }}>
@@ -213,6 +212,12 @@ export const CodesScene: React.FC = () => {
         <Note at={strangerAt + 6} x={RESP_X} y={rowTop(2) + twoH + h(12)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>hides that it exists</span>
         </Note>
+
+        {/* Hairlines between the four classes, each with the column to its right. */}
+        {[410, 803, 1289].map((x, i) => (
+          <VRule key={x} x={x} top={colTop} bottom={codeTop + (Math.max(COLUMNS[i].codes.length, COLUMNS[i + 1].codes.length) - 1) * codeStep + 32} at={classAt[i + 1] - 2} out={leave} />
+        ))}
+        <VRule x={552} top={colTop} bottom={Math.max(codeTop + 6 * codeStep + 32, rowTop(2) + twoH + h(12) + 30)} at={a401} />
       </Drift>
     </AbsoluteFill>
   );

@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { ACCOUNT, FACTORY, SINGLETON, TOTAL_AREA } from "./data";
-import { ACCENT_INK, ArtSpot, Box, Drift, Flow, Headline, Kicker, Line, Mark, Mark2, OK, OK_INK, pulse, Strike, Svg, X0 } from "./parts";
+import { ACCENT_INK, ArtSpot, Box, Drift, Flow, Headline, Kicker, Line, Mark, Mark2, OK, OK_INK, pulse, Strike, Svg, VRule, X0 } from "./parts";
 
 const R_X = 820;
 const LIST_TOP = 330;
@@ -293,13 +293,14 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
           </React.Fragment>
         );
       })}
-      <Line x={1400} y={testTop} at={passesAt} size={21} color={INK_SOFT} weight={700}>
+      <VRule x={1395} top={testTop} bottom={testTop + 114} at={passesAt} />
+      <Line x={1430} y={testTop} at={passesAt} size={21} color={INK_SOFT} weight={700}>
         alone
       </Line>
       {alone.map(([name, result]) => (
         <React.Fragment key={name}>
-          <Mark2 at={passesAt + 8} kind={result === "pass" ? "tick" : "cross"} size={26} style={{ left: 1400, top: testTop + 84 }} />
-          <Line x={1440} y={testTop + 80} at={passesAt + 2} size={23} weight={600}>
+          <Mark2 at={passesAt + 8} kind={result === "pass" ? "tick" : "cross"} size={26} style={{ left: 1430, top: testTop + 84 }} />
+          <Line x={1470} y={testTop + 80} at={passesAt + 2} size={23} weight={600}>
             {name}: {result}
           </Line>
         </React.Fragment>
@@ -362,6 +363,7 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line x={A} y={top + h + 22} at={noImplAt} size={22} color={INK_SOFT} weight={600}>
         methods named, none written
       </Line>
+      <VRule x={(A + w + B) / 2} top={top} bottom={top + h + 104} at={abstractAt} />
       <Box x={B} y={top} w={w} h={h} at={abstractAt} tone="plain" />
       <Line x={B + 24} y={top + 18} at={abstractAt} size={25} weight={700}>
         Abstract class
@@ -427,6 +429,9 @@ const IsA: React.FC<{ c: Ctx }> = ({ c }) => {
           </React.Fragment>
         );
       })}
+      {[1, 2].map((i) => (
+        <VRule key={i} x={(cols[i - 1] + W + cols[i]) / 2} top={top} bottom={low + H + 52} at={kinds[i].at} />
+      ))}
       <Line x={cols[2]} y={low + H + 64} at={wholeAt + 8} size={21} color={INK_SOFT} weight={600}>
         ignite, idle, rev…
       </Line>

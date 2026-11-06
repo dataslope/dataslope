@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { TTL } from "./data";
-import { Drift, Line, Mark, MiniMap, OK_INK, pct, Q_SIZE, Q_W, Spot, StepRow, Svg, X0 } from "./parts";
+import { Drift, Line, Mark, MiniMap, OK_INK, pct, Q_SIZE, Q_W, Spot, StepRow, Svg, VRule, X0 } from "./parts";
 
 /** The TTL chart: shares of reads against the TTL on a log axis. */
 const C = { x0: 960, x1: 1760, top: 410, base: 790, max: 0.5, lo: 1, hi: 600 };
@@ -135,6 +135,8 @@ export const InvalidateScene: React.FC = () => {
         <Line at={shortAt} x={X0} y={y(700)} size={23} out={phaseOut}>
           <b style={{ color: ACCENT_INK }}>too short</b>, and you lose the cache&apos;s benefit
         </Line>
+
+        <VRule x={800} top={y(352)} bottom={y(730)} at={modelsAt} out={phaseOut} />
 
         {/* ── The page's model: misses and stale reads against the TTL. ── */}
         <Line at={modelsAt} x={C.x0 - 60} y={y(352)} size={21} weight={650} color={INK_SOFT} out={phaseOut}>

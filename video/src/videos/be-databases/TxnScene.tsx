@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { TXN } from "./data";
-import { DataTable, Drift, Listing, listingHeight, MARK_GREEN, MARK_OK, PgError, Strike, TableName, tableGeometry, X0 } from "./parts";
+import { ColumnRule, DataTable, Drift, Listing, listingHeight, MARK_GREEN, MARK_OK, PgError, Strike, TableName, tableGeometry, X0 } from "./parts";
 
 const TOP = 300;
 const SIZE = 20;
@@ -131,6 +131,7 @@ export const TxnScene: React.FC = () => {
         <Listing lines={["ROLLBACK;"]} x={X0} top={top4} width={LIST_W} size={SIZE} at={rollbackAt - 2} marks={[{ line: "ROLLBACK", at: rollbackAt + 6, color: MARK_GREEN }]} />
 
         {/* ── The accounts ── */}
+        <ColumnRule x={(X0 + LIST_W + R_X) / 2} top={y(TOP)} bottom={Math.max(top4 + listingHeight(1, SIZE), y(640) + h(230))} at={transferAt} />
         <TableName g={g} at={transferAt} out={rollbackAt}>
           accounts
         </TableName>

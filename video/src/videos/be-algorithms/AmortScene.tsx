@@ -9,7 +9,7 @@ import { SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { AMORTIZED, DOUBLING_CAPS, doublingCopiesAt, listCopiesAt } from "./data";
-import { BAR, BLUE_INK, Drift, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, Svg, int } from "./parts";
+import { BAR, BLUE_INK, Drift, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, Svg, int, VRule } from "./parts";
 
 /** The chart: items appended across, slots allocated up. */
 const CX0 = 210;
@@ -152,6 +152,8 @@ export const AmortScene: React.FC = () => {
           <span style={{ width: 30, marginLeft: 12, borderTop: `3px dashed ${INK_SOFT}` }} />
           <span style={label(21, INK_SOFT)}>doubling</span>
         </div>
+
+        <VRule x={1130} top={top - 64} bottom={base + 80} at={roomAt} />
 
         {/* The counts, on the right. */}
         <Line at={roomAt} x={RX} y={y(372)} size={28} weight={700}>

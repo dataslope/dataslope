@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { PAGE, PAGE_SIZE, thousands, VERSION } from "./data";
-import { Drift, Mark, MARK_BAD, MARK_OK, METHOD_INK, OK, OK_INK, Strike, X0 } from "./parts";
+import { Drift, Mark, MARK_BAD, MARK_OK, METHOD_INK, OK, OK_INK, Strike, X0, VRule } from "./parts";
 
 /** The chart: rows read for one page of twenty, on a log scale. */
 const BAR_X0 = 300;
@@ -313,6 +313,12 @@ export const PageScene: React.FC = () => {
             </span>
           </span>
         </Note>
+
+        {/* Hairlines: the chart against the right column, and between the three lists. */}
+        <VRule x={953} top={qTop} bottom={y(770) + h(88) + 30} at={p500At} />
+        {[1238, 1520].map((x, i) => (
+          <VRule key={x} x={x} top={listTop} bottom={rowTop(4) + 30} at={i === 0 ? startsAt : afterAt + 6} />
+        ))}
       </Drift>
     </AbsoluteFill>
   );

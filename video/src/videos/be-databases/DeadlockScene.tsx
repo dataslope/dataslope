@@ -11,7 +11,7 @@ import { Sfx } from "../../sound/Sfx";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { DEADLOCK } from "./data";
-import { Drift, PgError, Svg, X0 } from "./parts";
+import { ColumnRule, Drift, PgError, Svg, X0 } from "./parts";
 
 const LANE_1 = 352;
 const LANE_2 = 512;
@@ -264,6 +264,7 @@ export const DeadlockScene: React.FC = () => {
             then looks for a cycle<span style={{ opacity: ease(frame, findsAt, 10) }}>: <b>found</b></span>
           </div>
         </Note>
+        <ColumnRule x={770} top={below} bottom={below + h(176)} at={errorAt} out={cycOut} />
         <PgError x={980} top={below + h(4)} width={420} at={errorAt} message="ERROR: deadlock detected" size={21} out={cycOut} />
         <Note at={abortsAt + 4} x={980} y={below + h(80)} out={cycOut}>
           <div style={{ ...note(23, INK), whiteSpace: "nowrap" }}>

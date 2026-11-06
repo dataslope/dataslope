@@ -8,7 +8,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { QUICKSORT } from "./data";
-import { ACCENT, ACCENT_INK, Art, BAR, Drift, OK, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, PAPER, Svg, int } from "./parts";
+import { ACCENT, ACCENT_INK, Art, BAR, Drift, OK, HIGHLIGHT, INK, INK_SOFT, Line, Mark, OK_INK, PAPER, Svg, int, VRule } from "./parts";
 
 /** Two panels on one horizontal scale: a thousand items across 720px. */
 const W = 720;
@@ -124,13 +124,13 @@ export const QuickScene: React.FC = () => {
         <Line at={halfAt + 10} x={600} y={y(666)} size={22} color={INK_SOFT}>
           n(n − 1)/2, about n²/2
         </Line>
-        <Line at={limitAt} x={540} y={y(712)} size={22} weight={600}>
+        <Line at={limitAt} x={520} y={y(712)} size={22} weight={600}>
           Recursive: past Python&apos;s limit of <Num>{int(QUICKSORT.recursionLimit)}</Num>
         </Line>
         <div
           style={{
             position: "absolute",
-            left: 540,
+            left: 520,
             top: y(752),
             fontFamily: MONO,
             fontSize: 20,
@@ -143,6 +143,8 @@ export const QuickScene: React.FC = () => {
         >
           {QUICKSORT.recursiveLastPivot.replace(": ", ":\n")}
         </div>
+
+        <VRule x={1004} top={rampTop - 50} bottom={insetBottom + 262} at={randomAt} />
 
         {/* Random pivots, the same input, the same scale. */}
         <Line at={randomAt} x={RXP} y={rampTop - 50} size={22} weight={650}>

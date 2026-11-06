@@ -9,7 +9,7 @@ import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HEADROOM } from "./data";
-import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, X0 } from "./parts";
+import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
 
 const V = { x: X0 + 20, w: 140 };
 const H_X = 600;
@@ -217,6 +217,10 @@ export const ScaleScene: React.FC = () => {
         <Line at={anyAt} x={H_X} y={y(856)} size={22} color={INK}>
           <Mark at={anyAt + 2}>only if any server can handle any request</Mark>
         </Line>
+
+        {/* The three columns' separators. */}
+        <VRule x={560} top={y(340)} bottom={y(890)} at={horizAt} />
+        <VRule x={1257} top={y(338)} bottom={y(890)} at={theseAt} />
 
         {/* ── Ours: the redirect servers are stateless already. ── */}
         <Line at={theseAt} x={1300} y={y(338)} size={22} weight={700} color={OK_INK}>

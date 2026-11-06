@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GZIP, thousands } from "./data";
-import { artBox, Cross, Drift, Flow, Headline, Http, Kicker, Mark, METHOD_INK, Msg, msgHeight, OK, OK_INK, Spot, Strike, X0, LISTING_PAPER } from "./parts";
+import { artBox, Cross, Drift, Flow, Headline, Http, Kicker, Mark, METHOD_INK, Msg, msgHeight, OK, OK_INK, Spot, Strike, X0, LISTING_PAPER, VRule } from "./parts";
 
 const R_X = 800;
 const LIST_TOP = 380;
@@ -384,6 +384,9 @@ export const RapidScene: React.FC = () => {
         <NextLine at={nextAt} x={R_X} y={y(640)} width={500}>
           databases
         </NextLine>
+
+        {/* A hairline between the list and the answers. */}
+        <VRule x={740} top={y(340)} bottom={y(LIST_TOP) + items.length * h(ROW)} at={items[0].at} />
       </Drift>
     </AbsoluteFill>
   );

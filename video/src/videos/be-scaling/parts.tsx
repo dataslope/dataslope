@@ -351,10 +351,7 @@ export const Line: React.FC<{
  *  an image may be drawn at most half that on the 1080p layout. */
 export const SPOTS = {
   bison: [1268, 1021],
-  ring: [1017, 828],
-  shards: [1001, 920],
   conveyor: [1024, 653],
-  bucket: [824, 1007],
   newspaper: [1024, 830],
   timer: [867, 1003],
 } as const satisfies Record<string, readonly [number, number]>;

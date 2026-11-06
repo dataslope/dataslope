@@ -8,7 +8,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { BRACKETS } from "./data";
-import { ACCENT, ACCENT_INK, Art, Cell, Cross, Drift, INK, INK_SOFT, Line, MARK_BAD, OK_INK, Svg } from "./parts";
+import { ACCENT, ACCENT_INK, Art, Cell, Cross, Drift, INK, INK_SOFT, Line, MARK_BAD, OK_INK, Svg, VRule } from "./parts";
 
 const SX = 140;
 const CH = 74;
@@ -153,6 +153,9 @@ export const StackScene: React.FC = () => {
         <Line at={insideAt} x={SX} y={sTop + 240} size={24} weight={500}>
           but <b style={{ color: ACCENT_INK }}>)</b> closes while <b>[</b> is open
         </Line>
+
+        <VRule x={566} top={sTop - 4} bottom={colBase + 8} at={keepsAt - 2} />
+        <VRule x={1020} top={sTop - 4} bottom={row(3) + 50} at={counterAt} />
 
         {/* The stack: openers in a column, newest on top. */}
         <Line at={keepsAt - 2} x={COL_X - 8} y={sTop - 4} size={22} weight={650}>

@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Cross, Drift, Flow, Mark, METHOD_INK, Msg, msgHeight, Node, OK_INK, Pill, Strike, X0 } from "./parts";
+import { Cross, Drift, Flow, Mark, METHOD_INK, Msg, msgHeight, Node, OK_INK, Pill, Strike, X0, VRule } from "./parts";
 
 /** The resource and the four methods around it. */
 const CARD = { x: 300, w: 340, h: 100 };
@@ -192,6 +192,9 @@ export const RestScene: React.FC = () => {
         <Note at={nextAt + 14} x={1320} y={srvTop(1) + h(92)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>the next request, either one</span>
         </Note>
+
+        {/* A hairline between the resource and the request. */}
+        <VRule x={897} top={reqTop - h(44)} bottom={srvTop(1) + h(92) + 30} at={carriesAt} />
       </Drift>
     </AbsoluteFill>
   );

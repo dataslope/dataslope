@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } 
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Headline, Kicker, Mark, OK_INK, Spot, X0 } from "./parts";
+import { Drift, Headline, Kicker, Mark, OK_INK, Spot, VRule, X0 } from "./parts";
 
 const R_X = 780;
 const LIST_TOP = 380;
@@ -25,7 +25,7 @@ const POLICIES = [
   { name: "First in, first out", rule: "drops in insertion order, used or not", tags: ["1st in", "2nd", "3rd", "4th", "5th"], drop: 0 },
   { name: "TTL", rule: "expires on a timer, whatever the memory", tags: ["5 s left", "0 s", "12 s", "30 s", "8 s"], drop: 1 },
 ];
-const PANEL = { w: 500, h: 210, gapX: 40, gapY: 30 };
+const PANEL = { w: 482, h: 210, gapX: 78, gapY: 30 };
 
 const Evict: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
@@ -85,6 +85,7 @@ const Evict: React.FC<{ c: Ctx }> = ({ c }) => {
           </div>
         );
       })}
+      <VRule x={R_X + 482 + 39} top={c.y(360)} bottom={c.y(360) + 2 * c.h(PANEL.h) + PANEL.gapY - 20} at={at[1] - 4} />
       <Ink at={defaultAt} dur={12} style={{ left: px(0), top: py(0) + 150, whiteSpace: "nowrap" }}>
         <span style={{ ...note(20, OK_INK), fontWeight: 650 }}>a good default</span>
       </Ink>

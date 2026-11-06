@@ -98,7 +98,11 @@ Timing (`pauseAfter`) and cues are yours.
    vertical hairline in each gap** (1px `HAIRLINE`, the height of the
    columns' text, centred in the gap, at least 24px from the text either
    side; none before the first or after the last; it inks in with the
-   column to its right).
+   column to its right). **A card that comes off leaves its padding as
+   space:** at least 40px between groups (a source block and its first
+   figure, one stat and the next), 10 to 14px inside a group (a label and
+   its bar), about 25px between rows of text; a label sits closer to what
+   it names than to what is above it.
 3. **Art. The layout comes first:** an image goes in only where there is
    enough whitespace and it does not hurt the page's design; judge each
    against the page without it, and when in doubt, leave it out. Your hero

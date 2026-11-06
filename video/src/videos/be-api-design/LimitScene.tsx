@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { LIMIT_EXAMPLE } from "./data";
-import { artBox, Cross, Drift, Msg, METHOD_INK, OK, OK_INK, Spot, X0 } from "./parts";
+import { artBox, Cross, Drift, Msg, METHOD_INK, OK, OK_INK, Spot, X0, VRule } from "./parts";
 
 const CARD_SIZE = 24;
 const R_X = 1010;
@@ -274,6 +274,9 @@ export const LimitScene: React.FC = () => {
           );
         })}
         <div style={{ position: "absolute", left: X0, top: safeTop - h(20), width: 1680, height: 1, background: HAIRLINE, opacity: ease(frame, sameAt, 10) }} />
+
+        {/* A hairline between the contract and the client that reads it. */}
+        <VRule x={955} top={cardTop - h(44)} bottom={wTop + h(150) + 30} at={watchesAt} />
       </Drift>
     </AbsoluteFill>
   );

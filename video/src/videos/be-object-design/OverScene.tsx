@@ -6,7 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, INK_SOFT, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ACCENT_INK, Box, Drift, Flow, lerp, Line, Mark, OK_INK, toneAt, X0 } from "./parts";
+import { ACCENT_INK, Box, Drift, Flow, lerp, Line, Mark, OK_INK, toneAt, VRule, X0 } from "./parts";
 
 const COL_X = [X0, 700, 1280];
 const COL_W = 440;
@@ -121,6 +121,10 @@ export const OverScene: React.FC = () => {
             </React.Fragment>
           );
         })}
+
+        {[1, 2].map((i) => (
+          <VRule key={i} x={(COL_X[i - 1] + COL_W + COL_X[i]) / 2} top={layerTop} bottom={thingTop + THING.h} at={whenAt + 6 + i * 5} />
+        ))}
 
         {/* The cost, and the rule. */}
         <Line x={X0} y={y(660)} at={eachAt} size={26} out={notesOut}>

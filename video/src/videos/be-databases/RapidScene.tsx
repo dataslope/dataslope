@@ -9,6 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RAPID } from "./data";
 import {
+  ColumnRule,
   Cylinder,
   DataTable,
   Drift,
@@ -47,14 +48,17 @@ const Acid: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       {parts.map((p, i) => {
-        const x = R_X + 40 + i * 245;
+        const x = R_X + 40 + i * 250;
         const a = ease(frame, p.at - 4, 12);
         return (
-          <div key={p.letter} style={{ position: "absolute", left: x, top, width: 220, opacity: Math.max(0.25, a) }}>
+          <React.Fragment key={p.letter}>
+          {i > 0 ? <ColumnRule x={x - 27} top={top + c.h(14)} bottom={top + c.h(300)} at={p.at - 4} /> : null}
+          <div style={{ position: "absolute", left: x, top, width: 196, opacity: Math.max(0.25, a) }}>
             <div style={{ ...headline(110), color: a > 0.5 ? BLUE_INK : INK_SOFT, lineHeight: 1 }}>{p.letter}</div>
             <div style={{ ...label(26, INK), fontWeight: 700, marginTop: c.h(20), opacity: a }}>{p.word}</div>
-            <div style={{ ...note(23, INK_SOFT), marginTop: c.h(10), opacity: ease(frame, p.at + 8, 10), width: 220 }}>{p.gist}</div>
+            <div style={{ ...note(23, INK_SOFT), marginTop: c.h(10), opacity: ease(frame, p.at + 8, 10), width: 196 }}>{p.gist}</div>
           </div>
+          </React.Fragment>
         );
       })}
     </>

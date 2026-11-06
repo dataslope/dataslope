@@ -8,7 +8,7 @@ import { Ink, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { RATE, type RateCell } from "./data";
-import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, X0 } from "./parts";
+import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
 
 /** The timeline: seconds 0 to 70, with the minute boundary at 60. */
 const AX = { x0: 440, k: 11, y: 420 };
@@ -276,6 +276,7 @@ export const RateScene: React.FC = () => {
         <Line at={fourTimesAt} x={X0} y={y(390) + 196} size={23} weight={700} color={ACCENT_INK}>
           all <Num>{RATE.localOk}</Num> pass: 4× the limit
         </Line>
+        <VRule x={930} top={y(330)} bottom={y(880)} at={shareAt} />
         <Line at={shareAt} x={1010} y={y(330)} size={23} weight={700} color={OK_INK}>
           The count in a store they all share
         </Line>

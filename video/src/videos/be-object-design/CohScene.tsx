@@ -6,7 +6,7 @@ import { useLayout } from "../../editorial/layout";
 import { ACCENT, INK, INK_SOFT, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ArtSpot, Box, Drift, Flow, Gauge, Line, lerp, Mark, OK, OK_INK, pulse, toneAt, X0 } from "./parts";
+import { ArtSpot, Box, Drift, Flow, Gauge, Line, lerp, Mark, OK, OK_INK, pulse, toneAt, VRule, X0 } from "./parts";
 
 /** The god class's five jobs, and what makes each one change. */
 const JOBS = [
@@ -111,6 +111,7 @@ export const CohScene: React.FC = () => {
           <b>Coupling</b>: how much modules depend on each other
           <span style={{ color: INK_SOFT, opacity: ease(frame, lowAt, 10) }}>; low, and a change rarely spreads</span>
         </Line>
+        <VRule x={(gx(0) + gx(1)) / 2} top={gy - gr} bottom={gy + 74} at={coupAt + 6} />
         {(["cohesion", "coupling"] as const).map((name, i) => {
           const cx = gx(i);
           const good = name === "cohesion" ? 1 : 0;

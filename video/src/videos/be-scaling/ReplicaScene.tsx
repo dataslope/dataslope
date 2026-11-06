@@ -8,7 +8,7 @@ import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, X0 } from "./parts";
+import { Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, Q_SIZE, Q_W, Svg, VRule, X0 } from "./parts";
 
 const LEADER = { x: 330, w: 230, h: 80, mid: 490 };
 const FOLLOW = { x: 760, w: 240, h: 68, mids: [400, 580] };
@@ -180,6 +180,8 @@ export const ReplicaScene: React.FC = () => {
         <Line at={whileAt} x={tx(T.window) - 300} y={lRow - 56} size={21} color={OK_INK} weight={650}>
           for a short while after a write
         </Line>
+
+        <VRule x={1257} top={y(340)} bottom={y(640)} at={asyncAt} />
 
         {/* ── A lagging follower, promoted. ── */}
         <Line at={asyncAt} x={LOG.x} y={y(352)} size={22} weight={700} color={INK}>
