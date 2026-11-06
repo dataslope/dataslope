@@ -173,7 +173,7 @@ export const HookScene: React.FC = () => {
           >
             <span style={{ ...note(28, ACCENT_INK), fontWeight: 700 }}>which city?</span>
             <span style={{ ...note(28, BOSTON_INK), fontWeight: 700 }}>Boston</span>
-            <span style={{ ...note(24, INK_SOFT) }}>or</span>
+            <span style={{ ...note(26, INK_SOFT) }}>or</span>
             <span style={{ ...note(28, AUSTIN_INK), fontWeight: 700 }}>Austin</span>
           </div>
           <Note at={dependsAt} x={orderX + 170} y={y(CARD_Y) + h(58)}>

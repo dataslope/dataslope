@@ -15,10 +15,10 @@ Brief: BRIEF.md in this folder. Layout only, no re-voicing, no new images.
 - DS 8-11: ds-product-sense, ds-python-pandas, ds-sql, ds-llm-evaluation (started when Parts 0 and 7 finished)
 - DA 0-4: da-interview, da-sql, da-pandas, da-statistics-communication, da-advanced-sql (same)
 - DA 5-8: da-spreadsheets, da-visualization, da-ab-testing, da-ai-assisted (started when Part 9 finished)
+- DbD 3-5: db-relationships, db-keys, db-relationship-patterns (started when Part 6 finished)
+- DbD 6-9: db-constraints, db-normalization, db-designing-schemas, db-relational-history (started when Part 8 finished)
 
 ## Later waves (start one as each agent finishes)
-- DbD 3-5: db-relationships, db-keys, db-relationship-patterns
-- DbD 6-9: db-constraints, db-normalization, db-designing-schemas, db-relational-history
 - Stats 5: sampling, sampling-bias, survivorship-bias, sampling-distributions, central-limit-theorem, standard-error
 - Stats 6-9: estimation, testing-hypotheses, interpreting-results, statistics-in-practice
 - LLM 1-3: llm-tokens, llm-meaning, llm-attention-score, llm-generation

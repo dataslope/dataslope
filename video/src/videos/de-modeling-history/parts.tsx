@@ -49,6 +49,17 @@ export {
 } from "../da-sql/parts";
 export { colsOf, geoOf, rowsAt } from "../da-advanced-sql/parts";
 
+/**
+ * Code inside a line of type: the interview kit's QMono, but at 0.92em, so
+ * it stays within the 12% a line's sizes may differ by (README, "One line,
+ * one size, one family"); never under 19px.
+ */
+export const QMono: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span style={{ fontFamily: MONO, fontSize: "max(19px, 0.92em)", fontStyle: "normal", fontWeight: 600, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>
+    {children}
+  </span>
+);
+
 /** Two versions of one customer are both data: Boston in the brand blue,
  *  Austin in teal, a category hue with no meaning of its own. */
 export const BOSTON = ds("blue", 500);

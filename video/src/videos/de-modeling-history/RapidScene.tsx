@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
-import { QMono, RapidFire, type RapidItem } from "../../editorial/interview";
+import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { NextLine, Note, Num } from "../../editorial/ui";
@@ -11,7 +11,7 @@ import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { HERO, mb, RAPID, UUID_STEPS } from "./data";
-import { colsOf, DataTable, Drift, geoOf, Headline, Kicker, MARK, MARK_KEY, OK_INK, Spot, TableName, X0 } from "./parts";
+import { colsOf, DataTable, Drift, geoOf, Headline, Kicker, MARK, MARK_KEY, OK_INK, QMono, Spot, TableName, X0 } from "./parts";
 
 const R_X = 820;
 const LIST_TOP = 340;
@@ -278,7 +278,7 @@ const Factless: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={noneAt + 6} x={ga.x} y={ga.rowTop(A.rows.length) + c.h(16)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>names stand in for keys; no measure column</span>
       </Note>
-      {/* The code at 23px, so QMono's 0.84em stays above 19px. */}
+      {/* The code at 23px, so QMono's 0.92em stays well above 19px. */}
       <TableName g={gx} at={coverAt}>
         <span style={{ fontSize: 23 }}>
           <QMono>enrollment</QMono>
@@ -326,7 +326,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
       <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), width: 120 }}>{name}</span>
         <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, marginRight: 14 }}>{value}</span>
-        <span style={{ ...note(23, BLUE_INK), fontWeight: 700, opacity: ease(frame, bytesAt, 10) }}>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 700, opacity: ease(frame, bytesAt, 10) }}>
           {kind ? `${kind}, ` : ""}
           <Num>{bytes}</Num> bytes
         </span>
