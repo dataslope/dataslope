@@ -32,7 +32,7 @@ import {
 const TOP = 330;
 const SIZE = 20;
 /** The listing is drawn larger, centred, while the hook reads it. */
-const HOOK_X = 640;
+const HOOK_X = 600;
 const HOOK_SCALE = 1.2;
 const GAP = 48;
 
@@ -154,7 +154,7 @@ export const HookScene: React.FC = () => {
           </span>
         </Note>
 
-        <Spot id={HERO.id} at={mostAt + 16} out={hookOut} left={1380} top={330} width={440} height={Math.round((440 * HERO.h) / HERO.w)} />
+        <Spot id={HERO.id} at={mostAt + 16} out={hookOut} left={1400} top={330} width={395} height={Math.round((395 * HERO.h) / HERO.w)} />
 
         {/* ── Its tests, and they pass ── */}
         <FileTab x={testsX} top={top - 44} at={testsAt} name="test_intervals.py">

@@ -100,7 +100,25 @@ export const ChooseScene: React.FC = () => {
           const named = ease(frame, leafAt[i], 10);
           return (
             <React.Fragment key={l.title}>
-              <Flow points={[[b.cx + (l.branch === 0 ? (i === 0 ? -40 : 40) : 0), splitY + h(50) + 4], [b.cx + (l.branch === 0 ? (i === 0 ? -40 : 40) : 0), leafY - h(26)], [cx, leafY - h(26)], [cx, leafY - 8]]} at={whenAt[i]} color={INK_SOFT} width={2.4} head={13} />
+              <Flow
+                points={
+                  l.branch === 0
+                    ? [
+                        [b.cx + (i === 0 ? -40 : 40), splitY + h(50) + 4],
+                        [b.cx + (i === 0 ? -40 : 40), leafY - h(26)],
+                        [cx, leafY - h(26)],
+                        [cx, leafY - 8],
+                      ]
+                    : [
+                        [cx, splitY + h(50) + 4],
+                        [cx, leafY - 8],
+                      ]
+                }
+                at={whenAt[i]}
+                color={INK_SOFT}
+                width={2.4}
+                head={13}
+              />
               <Note at={whenAt[i] + 6} x={l.x} y={leafY + h(6)} width={LEAF_W} from="up" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
                 <span style={{ ...label(30, OK_INK), fontWeight: 750, whiteSpace: "nowrap", opacity: named }}>
                   {i === 1 ? (

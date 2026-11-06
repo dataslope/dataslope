@@ -168,18 +168,18 @@ export const TxnScene: React.FC = () => {
           { at: catchAt + 10, text: "roll back" },
           { at: retryAt, text: "retry, or report it" },
         ].map((s, i) => (
-          <Note key={s.text} at={s.at} x={R_X} y={y(640) + h(44) + i * h(40)}>
+          <Note key={s.text} at={s.at} x={R_X} y={y(640) + h(44) + i * h(48)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
               <span style={{ color: OK_INK, fontWeight: 700 }}>{i + 1}</span>&nbsp;&nbsp;{s.text}
             </span>
           </Note>
         ))}
-        <Note at={neverAt} x={R_X} y={y(640) + h(170)}>
+        <Note at={neverAt} x={R_X} y={y(640) + h(196)}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
             <Strike at={neverAt + 6}>carry on</Strike>
           </span>
         </Note>
-        <div style={{ position: "absolute", left: R_X - 24, top: y(640) + h(44), width: 3, height: h(120), background: OK, opacity: ease(frame, catchAt, 10) * 0.6 }} />
+        <div style={{ position: "absolute", left: R_X - 24, top: y(640) + h(44), width: 3, height: h(134), background: OK, opacity: ease(frame, catchAt, 10) * 0.6 }} />
       </Drift>
     </AbsoluteFill>
   );

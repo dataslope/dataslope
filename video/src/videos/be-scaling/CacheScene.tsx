@@ -10,8 +10,8 @@ import { Sfx } from "../../sound/Sfx";
 import { CACHE } from "./data";
 import { commas, Drift, Flow, Line, Mark, MiniMap, Node, OK, OK_INK, pct, Q_SIZE, Q_W, StepRow, X0 } from "./parts";
 
-const BAR_X = 450;
-const BAR_W = 620;
+const BAR_X = 570;
+const BAR_W = 560;
 const SIZE_NAME = ["a thousandth of the links", "a hundredth", "a tenth"];
 /** The dead-cache diagram, at the right. */
 const D = { app: { x: 1380, w: 140 }, box: { x: 1640, w: 180 } };
@@ -174,9 +174,6 @@ export const CacheScene: React.FC = () => {
         <Ink at={replicaAt + 8} dur={12} style={{ left: D.app.x, top: storeMid + 44, whiteSpace: "nowrap" }}>
           <span style={{ ...label(21, OK_INK), fontWeight: 700 }}>so the cache needs replicas too</span>
         </Ink>
-        <Line at={betterAt} x={D.app.x} y={y(640)} size={21} weight={650} color={INK_SOFT}>
-          the better it works, the harder losing it lands
-        </Line>
       </Drift>
     </AbsoluteFill>
   );

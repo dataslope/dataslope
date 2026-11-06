@@ -67,7 +67,7 @@ export const InvalidateScene: React.FC = () => {
 
   // ── The chart. ──
   const lx = (t: number) => C.x0 + ((Math.log(t) - Math.log(C.lo)) / (Math.log(C.hi) - Math.log(C.lo))) * (C.x1 - C.x0);
-  const ly = (v: number) => y(C.base) - (Math.min(v, C.max) / C.max) * (y(C.base) - y(C.top));
+  const ly = (v: number) => y(C.base) - (v / C.max) * (y(C.base) - y(C.top));
   const chartIn = ease(frame, modelsAt, 14);
   const missP = ease(frame, modelsAt + 10, 36);
   const staleP = ease(frame, modelsAt + 30, 36);
@@ -166,20 +166,23 @@ export const InvalidateScene: React.FC = () => {
             <path d={line("miss")} fill="none" stroke={BAR} strokeWidth={3} pathLength={1} strokeDasharray={`${missP} 1`} />
             <path d={line("stale")} fill="none" stroke={ACCENT} strokeWidth={3} pathLength={1} strokeDasharray={`${staleP} 1`} />
           </g>
-          <text x={lx(1.4)} y={ly(0.44)} style={svgText({ ...label(21, BLUE_INK), fontWeight: 700, opacity: missP })}>
+          <text x={lx(580)} y={ly(0.07)} textAnchor="end" style={svgText({ ...label(21, BLUE_INK), fontWeight: 700, opacity: missP })}>
             reads that miss
           </text>
-          <text x={lx(560)} y={ly(0.47)} textAnchor="end" style={svgText({ ...label(21, ACCENT_INK), fontWeight: 700, opacity: staleP })}>
-            reads that are stale
+          <text x={lx(580)} y={ly(0.33)} textAnchor="end" style={svgText({ ...label(21, ACCENT_INK), fontWeight: 700, opacity: staleP })}>
+            <tspan x={lx(580)}>reads that</tspan>
+            <tspan x={lx(580)} dy={26}>
+              are stale
+            </tspan>
           </text>
           {crossP > 0 ? (
             <g opacity={crossP}>
-              <line x1={lx(cross.ttl)} x2={lx(cross.ttl)} y1={y(C.base)} y2={ly(0.2)} stroke={INK} strokeWidth={1.4} strokeDasharray="5 4" />
+              <line x1={lx(cross.ttl)} x2={lx(cross.ttl)} y1={y(C.base)} y2={ly(0.4)} stroke={INK} strokeWidth={1.4} strokeDasharray="5 4" />
               <circle cx={lx(cross.ttl)} cy={ly(cross.miss)} r={7} fill={INK} />
             </g>
           ) : null}
         </Svg>
-        <Ink at={fifteenAt} dur={14} out={phaseOut} style={{ left: lx(cross.ttl) - 140, top: ly(0.2) - 40, whiteSpace: "nowrap" }}>
+        <Ink at={fifteenAt} dur={14} out={phaseOut} style={{ left: lx(cross.ttl) - 150, top: ly(0.4) - 40, width: 300, textAlign: "center", whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, INK), fontWeight: 700 }}>
             <Mark at={leastAt}>about {Math.round(cross.ttl)} s</Mark>
             <span style={{ color: BLUE_INK, opacity: ease(frame, missAt, 10) }}> {pct(cross.miss)} miss</span>
@@ -228,8 +231,8 @@ export const InvalidateScene: React.FC = () => {
             <b style={{ width: 190 }}>Write-through</b>
             <span>
               <b style={{ color: BLUE_INK }}>cache</b> and <b style={{ color: BLUE_INK }}>database</b> written together
+              <span style={{ color: INK_SOFT, opacity: ease(frame, costAt, 10) }}>: consistent, at a cost on every write</span>
             </span>
-            <span style={{ color: INK_SOFT, opacity: ease(frame, costAt, 10) }}>: consistent, at a cost on every write</span>
           </span>
         </Ink>
         <Ink at={behindAt} dur={14} style={{ left: X0, top: wbY, whiteSpace: "nowrap" }}>
@@ -244,8 +247,10 @@ export const InvalidateScene: React.FC = () => {
                 <line x1={4} y1={36} x2={126} y2={4} stroke={ACCENT} strokeWidth={4} strokeLinecap="round" />
               </svg>
             </span>
-            <span>batched, for speed</span>
-            <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, crashAt, 10) }}>: a crash loses what it hadn&apos;t written</span>
+            <span>
+              batched, for speed
+              <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, crashAt, 10) }}>: a crash loses what it hadn&apos;t written</span>
+            </span>
           </span>
         </Ink>
       </Drift>

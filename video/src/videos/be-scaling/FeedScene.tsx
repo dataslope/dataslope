@@ -96,8 +96,8 @@ export const FeedScene: React.FC = () => {
   const appMid = (k: number) => y(G.app.first) + k * h(G.app.step);
   const lit = (k: number) => Math.min(ease(frame, designAt + k * 5, 8), 1 - ease(frame, designAt + k * 5 + 22, 10));
   const api = ease(frame, apiAt, 12);
-  const edge = api > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${api * 100}%, ${BAR})` : BAR;
-  const edgeW = 2.2 + api * 1.6;
+  const edge = BAR;
+  const edgeW = 2.4;
   const tenfold = roundTo(TRAFFIC.peak, 2);
 
   return (
@@ -282,8 +282,8 @@ export const FeedScene: React.FC = () => {
           <span style={{ ...label(20, BLUE_INK), fontWeight: 700 }}>8 shards, each with followers</span>
         </Ink>
         {/* Every arrow between them. */}
-        <Flow points={[[G.client.x + G.client.w + 6, gm], [G.limit.x - 8, gm]]} at={designAt + 4} color={edge} width={edgeW} head={12} />
-        <Flow points={[[G.limit.x + G.limit.w + 6, gm], [G.lb.x - 8, gm]]} at={designAt + 6} color={edge} width={edgeW} head={12} />
+        <Flow points={[[G.client.x + G.client.w + 6, gm], [G.limit.x - 8, gm]]} at={designAt + 4} color={edge} width={edgeW} glow={api} head={12} />
+        <Flow points={[[G.limit.x + G.limit.w + 6, gm], [G.lb.x - 8, gm]]} at={designAt + 6} color={edge} width={edgeW} glow={api} head={12} />
         {Array.from({ length: G.app.n }, (_, k) => (
           <Flow
             key={k}
@@ -295,13 +295,13 @@ export const FeedScene: React.FC = () => {
             ]}
             at={designAt + 8 + k}
             color={edge}
-            width={edgeW - 0.4}
+            width={edgeW - 0.4} glow={api}
             head={10}
           />
         ))}
-        <Flow points={[[G.app.x + G.app.w + 6, appMid(0)], [G.app.x + G.app.w + 40, appMid(0)], [G.app.x + G.app.w + 40, y(G.cache.mid)], [G.cache.x - 8, y(G.cache.mid)]]} at={designAt + 14} color={edge} width={edgeW} head={12} />
-        <Flow points={[[G.app.x + G.app.w + 6, appMid(2) + 14], [G.queue.x - 8, appMid(2) + 14]]} at={designAt + 16} color={edge} width={edgeW} head={12} />
-        <Flow points={[[G.app.x + G.app.w + 6, appMid(5)], [G.store.x - 8, appMid(5)]]} at={designAt + 18} color={edge} width={edgeW} head={12} />
+        <Flow points={[[G.app.x + G.app.w + 6, appMid(0)], [G.app.x + G.app.w + 40, appMid(0)], [G.app.x + G.app.w + 40, y(G.cache.mid)], [G.cache.x - 8, y(G.cache.mid)]]} at={designAt + 14} color={edge} width={edgeW} glow={api} head={12} />
+        <Flow points={[[G.app.x + G.app.w + 6, appMid(2) + 14], [G.queue.x - 8, appMid(2) + 14]]} at={designAt + 16} color={edge} width={edgeW} glow={api} head={12} />
+        <Flow points={[[G.app.x + G.app.w + 6, appMid(5)], [G.store.x - 8, appMid(5)]]} at={designAt + 18} color={edge} width={edgeW} glow={api} head={12} />
         <Flow
           points={[
             [G.queue.x + G.queue.w + 6, y(G.queue.mid)],
@@ -312,7 +312,7 @@ export const FeedScene: React.FC = () => {
           ]}
           at={designAt + 20}
           color={edge}
-          width={edgeW}
+          width={edgeW} glow={api}
           head={12}
         />
         <Ink at={apiAt + 4} dur={14} style={{ left: G.cache.x + G.cache.w + 50, top: y(G.cache.mid) - 18, whiteSpace: "nowrap" }}>

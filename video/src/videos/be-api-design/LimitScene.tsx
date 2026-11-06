@@ -238,7 +238,7 @@ export const LimitScene: React.FC = () => {
           {SPREAD.map((s, i) => {
             const x = waitX[2] + WAITS[2] * scale * (1 + JITTER * s);
             const p = ease(frame, crowdAt + 4 + i * 3, 8);
-            return <circle key={i} cx={x} cy={wTop + h(56) - 22 - (i % 3) * 14} r={6} fill={OK} opacity={p} />;
+            return <circle key={i} cx={x} cy={wTop + h(56) + 26 + 12 + (i % 3) * 11} r={6} fill={OK} opacity={p} />;
           })}
         </svg>
         <Note at={crowdAt + 10} x={waitX[2] + 60} y={wTop + h(150)}>

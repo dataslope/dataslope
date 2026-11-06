@@ -198,8 +198,8 @@ export const QueueScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Line at={drainAt + 8} x={WORKER.x} y={y(WORKER.mids[1]) + WORKER.h / 2 + h(16)} size={20} color={INK_SOFT}>
-          at their own pace
+        <Line at={drainAt + 8} x={WORKER.x} y={y(WORKER.mids[0]) - WORKER.h / 2 - 38} size={20} color={INK_SOFT}>
+          workers, at their own pace
         </Line>
         <Flow points={[[REDIRECT.x + REDIRECT.w / 2, mid + REDIRECT.h / 2 + 6], [REDIRECT.x + REDIRECT.w / 2, mid + 110], [CLIENT.x + CLIENT.w / 2, mid + 110], [CLIENT.x + CLIENT.w / 2, mid + CLIENT.h / 2 + 8]]} at={returnsAt} color={OK} width={2.6} />
         <Ink at={returnsAt + 8} dur={12} style={{ left: CLIENT.x + CLIENT.w / 2 + 16, top: mid + 122, whiteSpace: "nowrap" }}>
@@ -214,7 +214,7 @@ export const QueueScene: React.FC = () => {
           slow work goes the same way
           <span style={{ color: INK, fontWeight: 650, opacity: ease(frame, emailAt, 10) }}>: email, video transcoding</span>
         </Line>
-        <Spot id="conveyor" at={queueAt} x={1590} y={y(730)} w={180} />
+        <Spot id="conveyor" at={queueAt} x={1620} y={y(730)} w={180} />
 
         {/* ── The price: at-least-once, and the idempotent consumer. ── */}
         {/* Click 47: into worker 1, which dies; round again to worker 2. */}

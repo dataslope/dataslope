@@ -162,6 +162,14 @@ export const CostScene: React.FC = () => {
     { line: lineOf(code, "# Illustrative prices"), at: illusAt },
     { line: lineOf(code, "price_in, price_out ="), at: dollarAt },
   ];
+  const after = (text: string) => lineOf(code, text);
+  const lineAt = code.map((_, i) => {
+    if (i === after("requests_per_day =")) return dailyAt;
+    if (i === after("input_tokens, output_tokens =")) return inOutAt;
+    if (i === after("# Illustrative prices")) return pricesAt;
+    if (i === after("price_in, price_out =")) return differAt;
+    return exampleAt + 2 + Math.max(0, i - after("input_cost =")) * 3;
+  });
   // The bill moves from beside the listing to across the page.
   const move = ease(frame, leverAt, 26);
   const bx = interpolate(move, [0, 1], [BAR_A.x, BAR_B.x]);
@@ -206,7 +214,9 @@ export const CostScene: React.FC = () => {
           </Note>
 
           {/* The page's block, and what it printed. */}
-          <Listing lines={code} x={X0} top={y(LIST_Y)} width={930} size={LIST_SIZE} at={exampleAt} marks={marks} />
+          {/* The block builds as the formula is said: each quantity's line
+              on its word, the arithmetic and the prints with the example. */}
+          <Listing lines={code} x={X0} top={y(LIST_Y)} width={930} size={LIST_SIZE} at={dailyAt - 4} lineAt={lineAt} marks={marks} />
           <Note at={inputAt - 4} x={RIGHT_X} y={y(LIST_Y)}>
             <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>What it prints</span>
           </Note>

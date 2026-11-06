@@ -161,7 +161,7 @@ export const GilScene: React.FC = () => {
         </Note>
         {cpuY.map((ly, i) => (
           <React.Fragment key={i}>
-            <Note at={gilAt + i * 3} x={X0} y={ly + laneH / 2 - 14} out={page1Out}>
+            <Note at={singleAt + i * 3} x={X0} y={ly + laneH / 2 - 14} out={page1Out}>
               <span style={{ ...label(21, THREAD[i].ink), fontWeight: 700, whiteSpace: "nowrap" }}>thread {i + 1}</span>
             </Note>
             {CPU_TURNS.map((t, k) => (
@@ -190,7 +190,7 @@ export const GilScene: React.FC = () => {
         </Note>
 
         {/* Why one lock: every object's reference count. */}
-        <Spot id="key" at={singleAt} out={memAt - 8} left={1360} top={y(400)} width={210} height={h(190)} />
+        <Spot id="key" at={gilAt} out={memAt - 8} left={1360} top={y(400)} width={210} height={h(190)} />
         <Node x={BOX.x} y={y(BOX.top)} w={BOX.w} h={h(BOX.h)} at={memAt} tone="plain" fill="transparent" out={page1Out} stroke={frame >= oneLockAt + 4 ? 2.5 : 1.5} line={frame >= oneLockAt + 4 ? OK : HAIRLINE} />
         <Note at={memAt + 4} x={BOX.x + 24} y={y(BOX.top) + h(14)} out={page1Out}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>the interpreter: memory management</span>

@@ -96,7 +96,8 @@ export const PlanScene: React.FC = () => {
   const seqY = planLineMid(planTop, lineOf(PLAN.fnPlan, "Seq Scan"), PSIZE);
   const arrowX = X0 + 900;
 
-  const rows = (i: number) => planLineMid(planTop, i, PSIZE) - h(16);
+  // The notes beside the plan, one per row at a reading pitch.
+  const rows = (i: number) => planTop + h(4) + i * h(46);
 
   return (
     <AbsoluteFill>

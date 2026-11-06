@@ -94,7 +94,11 @@ Timing (`pauseAfter`) and cues are yours.
    text (question bands, layer boxes, company cards, notes), and no outlined
    pills for tags: set tags as plain text, separated by spacing or a middle
    dot. Code listings and data tables keep the house look. A highlight
-   behind a word is not a card and stays.
+   behind a word is not a card and stays. **Columns set side by side take a
+   vertical hairline in each gap** (1px `HAIRLINE`, the height of the
+   columns' text, centred in the gap, at least 24px from the text either
+   side; none before the first or after the last; it inks in with the
+   column to its right).
 3. **Art. The layout comes first:** an image goes in only where there is
    enough whitespace and it does not hurt the page's design; judge each
    against the page without it, and when in doubt, leave it out. Your hero

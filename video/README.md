@@ -244,6 +244,13 @@ Every video follows these rules.
   pills for tags (the owner, 2026-11-06: "Using spacing or very subtle
   separators should be preferred"). Code listings and data tables keep the
   house look, since there the frame is the listing or the table itself.
+  **Items set side by side take a vertical hairline between them** (the
+  owner: "When there are items laid out horizontally, I think subtle
+  separators will help"): two, three or four columns of text get a 1px
+  `HAIRLINE` rule in each gap, the height of the column's text, centred in
+  the gap and at least 24px from the text on either side. Not before the
+  first column or after the last, and not between words on one line (a
+  middle dot does that). It inks in with the column to its right.
 - **Reveals keep their descenders.** A mask paints only inside its element's
   box, and a line box set near `line-height: 1` cuts off g, p and y until the
   mask comes off. Give a masked wrapper some padding with a matching negative

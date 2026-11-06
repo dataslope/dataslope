@@ -171,7 +171,8 @@ export const RateScene: React.FC = () => {
             </g>
           ))}
           {/* The minute boundary, down through the rows. */}
-          <line x1={MINUTE_X} x2={MINUTE_X} y1={axY - 120} y2={rowY(3) + 50} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="6 6" />
+          <line x1={MINUTE_X} x2={MINUTE_X} y1={axY - 120} y2={axY + 6} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="6 6" />
+          <line x1={MINUTE_X} x2={MINUTE_X} y1={axY + 46} y2={rowY(3) + 50} stroke={INK_SOFT} strokeWidth={1.6} strokeDasharray="6 6" />
           {/* Two stacks of ten requests. */}
           {Array.from({ length: 20 }, (_, i) => {
             const at = i < 10 ? fiftyNineAt + i * 1.5 : sixtyOneAt + (i - 10) * 1.5;

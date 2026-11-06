@@ -136,7 +136,7 @@ const Consist: React.FC<{ c: Ctx }> = ({ c }) => {
             <div style={{ position: "absolute", left, top: lineY - 64, width: 300, textAlign: align, opacity: p, ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
               {m.t}
             </div>
-            <div style={{ position: "absolute", left, top: lineY + 28, width: 300, textAlign: align, opacity: p, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", left, top: lineY + (i === 1 || i === 2 ? 92 : 28), width: 300, textAlign: align, opacity: p, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
               {m.sub}
             </div>
             {m.sub2 ? (
@@ -188,7 +188,7 @@ export const RapidScene: React.FC = () => {
         <Kicker at={moreAt}>Quick round</Kicker>
         <Headline lead="Two more," turn="quickly." at={moreAt} turnAt={moreAt + 8} size={64} />
         <RapidFire items={items} x={X0} top={y(LIST_TOP)} rowH={h(ROW)} width={560} at={moreAt + 6} end={end} />
-        <Spot id="bison" at={moreAt + 8} x={X0 + 30} y={y(640)} w={380} />
+        <Spot id="bison" at={moreAt + 8} x={X0 + 40} y={y(640)} w={320} />
       </Drift>
     </AbsoluteFill>
   );

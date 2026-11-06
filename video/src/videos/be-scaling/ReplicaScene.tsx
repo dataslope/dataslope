@@ -177,7 +177,7 @@ export const ReplicaScene: React.FC = () => {
         <Ink at={leaderAt + 10} dur={12} style={{ left: tx(T.open) + 140, top: fRow + 40, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, OK_INK), fontWeight: 650 }}>this user&apos;s reads go to the leader: found</span>
         </Ink>
-        <Line at={whileAt} x={tx(T.window) + 30} y={lRow - 15} size={21} color={OK_INK} weight={650}>
+        <Line at={whileAt} x={tx(T.window) - 300} y={lRow - 56} size={21} color={OK_INK} weight={650}>
           for a short while after a write
         </Line>
 

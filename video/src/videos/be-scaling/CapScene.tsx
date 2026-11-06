@@ -12,7 +12,7 @@ import { Drift, Line, Mark, MiniMap, Node, Q_SIZE, Q_W, Svg, X0 } from "./parts"
 /** The page's grid: two rows (the network's state), two columns (the choice). */
 const G = { head: X0, col: [420, 800], colW: 360, top: 400, rowH: 104, gap: 12 };
 /** The shortener, split by a partition, at the right. */
-const P = { left: 1290, cut: 1560, right: 1640, top: 420 };
+const P = { left: 1290, cut: 1560, right: 1640, top: 420, pacelc: 1420 };
 
 /** A cell of the grid: a tinted box that inks its text in. */
 const Cell: React.FC<{ x: number; y: number; w: number; h: number; at: number; fill: string; lit?: number; children: React.ReactNode }> = ({
@@ -177,7 +177,10 @@ export const CapScene: React.FC = () => {
           new key
         </Line>
         <Line at={blockAt} x={apX + 140} y={opsTop + h(96)} size={21} color={INK_SOFT}>
-          each server mints from its own block of IDs
+          each server mints from
+        </Line>
+        <Line at={blockAt + 4} x={apX + 140} y={opsTop + h(96) + h(32)} size={21} color={INK_SOFT}>
+          its own block of IDs
         </Line>
         {/* Consistent: the custom alias. */}
         <Line at={aliasAt} x={cpX} y={opsTop + h(92)} size={22} weight={700} color={BLUE_INK}>
@@ -222,19 +225,19 @@ export const CapScene: React.FC = () => {
         </Line>
 
         {/* ── PACELC ── */}
-        <Ink at={healthyAt} dur={14} style={{ left: P.left, top: y(700), whiteSpace: "nowrap" }}>
+        <Ink at={healthyAt} dur={14} style={{ left: P.pacelc, top: y(700), whiteSpace: "nowrap" }}>
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>and on a healthy network</span>
         </Ink>
-        <Ink at={pacelcAt} dur={16} style={{ left: P.left, top: y(744), whiteSpace: "nowrap" }}>
+        <Ink at={pacelcAt} dur={16} style={{ left: P.pacelc, top: y(744), whiteSpace: "nowrap" }}>
           <span style={{ ...label(40, INK), fontWeight: 750, letterSpacing: "0.02em" }}>
             PAC
             <span style={{ color: BLUE_INK }}>ELC</span>
           </span>
         </Ink>
-        <Line at={pacelcAt + 6} x={P.left} y={y(744) + h(62)} size={20} color={INK_SOFT}>
+        <Line at={pacelcAt + 6} x={P.pacelc} y={y(744) + h(62)} size={20} color={INK_SOFT}>
           partition: availability or consistency
         </Line>
-        <Line at={pacelcAt + 10} x={P.left} y={y(744) + h(96)} size={20} color={INK}>
+        <Line at={pacelcAt + 10} x={P.pacelc} y={y(744) + h(96)} size={20} color={INK}>
           <Mark at={pacelcAt + 14}>else:</Mark> latency or consistency
         </Line>
       </Drift>

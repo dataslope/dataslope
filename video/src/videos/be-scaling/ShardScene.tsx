@@ -187,7 +187,8 @@ export const ShardScene: React.FC = () => {
           {SHARDS.counts.map((c, i) => {
             const x = colX(HASH_X, i);
             const top = base - h(COL_H) * (c / maxCount) * hashFill(i);
-            const fill = allLit > 0 ? `color-mix(in srgb, ${ACCENT} ${allLit * 100}%, ${OK})` : i === one && redirectLit > 0 ? HIGHLIGHT : OK;
+            const solid = allLit > 0 ? `color-mix(in srgb, ${ACCENT} ${allLit * 100}%, ${OK})` : i === one && redirectLit > 0 ? HIGHLIGHT : OK;
+            const fill = i === one && redirectLit > 0 && allLit <= 0 ? solid : `color-mix(in srgb, ${solid} 70%, ${PAPER})`;
             return <rect key={i} x={x} y={top} width={COL.w} height={base - top} fill={fill} rx={3} opacity={i === one || allLit > 0 ? 1 : 1 - 0.5 * redirectLit} />;
           })}
           <line x1={HASH_X} x2={colX(HASH_X, 7) + COL.w} y1={base + 1} y2={base + 1} stroke={INK_SOFT} strokeWidth={1.4} />
@@ -212,8 +213,8 @@ export const ShardScene: React.FC = () => {
             <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, priceAt, 10) }}>, the price of a cross-shard query</span>
           </span>
         </Ink>
-        <Node x={1600} y={y(720)} w={220} h={92} at={copyAt + 4} tone="ok" title="links by user" sub="a second copy" size={22} />
-        <Line at={copyAt + 10} x={1600} y={y(720) + 92 + h(18)} size={20} color={OK_INK} weight={650}>
+        <Node x={1560} y={y(720)} w={220} h={92} at={copyAt + 4} tone="ok" title="links by user" sub="a second copy" size={22} />
+        <Line at={copyAt + 10} x={1560} y={y(720) + 92 + h(18)} size={20} color={OK_INK} weight={650}>
           one shard for that page
         </Line>
       </Drift>

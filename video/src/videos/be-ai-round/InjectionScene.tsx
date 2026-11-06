@@ -174,12 +174,14 @@ export const InjectionScene: React.FC = () => {
               <Mark at={inputAt + 8}>Input that the model follows as instructions.</Mark>
             </span>
           </Note>
-          <Note at={owaspAt} x={1080} y={y(256)}>
-            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-              First on OWASP&apos;s 2025 Top 10 for LLM applications
-            </span>
+          {/* Its rank, as a number on a line of its own. */}
+          <Note at={owaspAt} x={1120} y={y(292)}>
+            <div style={{ ...note(54, ACCENT_INK), fontWeight: 750, lineHeight: 1.05 }}>1st</div>
+            <div style={{ ...label(21, INK_SOFT), marginTop: 8, whiteSpace: "nowrap" }}>
+              on OWASP&apos;s 2025 Top 10 for LLM applications
+            </div>
           </Note>
-          <Node x={MODEL.x} y={modelTop} w={MODEL.w} h={modelH} at={directAt - 6} title="Model" tone="plain" size={26} />
+          <Node x={MODEL.x} y={modelTop} w={MODEL.w} h={modelH} at={inputAt + 6} title="Model" tone="plain" size={26} />
           <Node x={USER.x} y={userTop} w={USER.w} h={userH} at={directAt} title="the user" tone="plain" size={23} />
           <Flow points={[[USER.x + USER.w + 8, userTop + userH / 2], [MODEL.x - 10, modelTop + modelH * 0.3]]} at={directAt + 6} color={ACCENT} />
           <Note at={directAt + 12} x={440} y={userTop - 6}>

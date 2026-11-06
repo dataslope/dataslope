@@ -161,7 +161,7 @@ export const AsyncScene: React.FC = () => {
                 transform: `scale(${0.6 + 0.4 * p})`,
               }}
             >
-              <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 700, color: run ? PAPER : BLUE_INK }}>{name}</span>
+              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: run ? PAPER : BLUE_INK }}>{name}</span>
             </div>
           );
         })}

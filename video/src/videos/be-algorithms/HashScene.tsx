@@ -139,7 +139,7 @@ export const HashScene: React.FC = () => {
         ))}
         {ask.map((a, i) => (
           <Line key={i} at={a.at} x={AX} y={aTop + 124 + i * 40} size={24} color={a.ok ? OK_INK : INK} weight={a.ok ? 700 : 500}>
-            <span style={TABULAR}>{a.text}</span>
+            {a.text}
           </Line>
         ))}
         {/* The map, filling as the pass moves. */}

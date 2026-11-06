@@ -130,9 +130,16 @@ export const HookScene: React.FC = () => {
         <Note at={blogAt} x={X0} y={blogTop}>
           <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>The example: a blog</span>
         </Note>
-        <Node x={X0} y={blogTop + h(44)} w={280} h={96} at={articlesAt} title="articles" sub="the blog's posts" size={28} />
-        <Flow points={[[X0 + 288, blogTop + h(44) + 48], [X0 + 372, blogTop + h(44) + 48]]} at={commentsAt - 2} color={BAR} />
-        <Node x={X0 + 380} y={blogTop + h(44)} w={300} h={96} at={commentsAt} title="comments" sub="on each article" size={28} />
+        {[
+          { name: "articles", sub: "the blog's posts", at: articlesAt, x: X0 },
+          { name: "comments", sub: "on each article", at: commentsAt, x: X0 + 330 },
+        ].map((r) => (
+          <Note key={r.name} at={r.at} x={r.x} y={blogTop + h(50)}>
+            <div style={{ ...label(32, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{r.name}</div>
+            <div style={{ ...note(22, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>{r.sub}</div>
+          </Note>
+        ))}
+        <Flow points={[[X0 + 190, blogTop + h(50) + 22], [X0 + 300, blogTop + h(50) + 22]]} at={commentsAt - 2} color={BAR} />
 
         {/* The round: sixteen questions, ten big and six small. */}
         <div style={{ position: "absolute", left: X0, top: planTop, display: "flex", alignItems: "center", gap: 10, fontSize: 21 }}>

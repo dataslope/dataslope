@@ -122,7 +122,7 @@ export const IndexScene: React.FC = () => {
   ];
 
   // The hash index: hash(email) and eight buckets.
-  const hashTop = y(TOP) - h(4) + listingHeight(1, 20) + h(24);
+  const hashTop = y(TOP) - h(4) + listingHeight(1, 19) + h(24);
   const bucketY = hashTop + h(50) + h(44);
   const bucketW = 64;
   const bucketX = (i: number) => R_X + 40 + i * ((R_W - 80 - bucketW) / (BUCKETS - 1));
@@ -246,7 +246,7 @@ export const IndexScene: React.FC = () => {
         </Note>
 
         {/* ── The B-tree ── */}
-        <Listing lines={INDEX.create} x={R_X} top={y(TOP) - h(4)} width={R_W} size={20} at={structAt + 2} out={treeOut} />
+        <Listing lines={INDEX.create} x={R_X} top={y(TOP) - h(4)} width={R_W} size={19} at={structAt + 2} out={treeOut} />
         <Svg opacity={1 - tOut}>
           {edges.map((e, i) => {
             const p = ease(frame, e.at, 10);
@@ -313,7 +313,7 @@ export const IndexScene: React.FC = () => {
         </Note>
 
         {/* ── A hash index ── */}
-        <Listing lines={INDEX.hashCreate} x={R_X} top={y(TOP) - h(4)} width={R_W} size={20} at={hashAt} />
+        <Listing lines={INDEX.hashCreate} x={R_X} top={y(TOP) - h(4)} width={R_W} size={19} at={hashAt} />
         <Svg opacity={ease(frame, hashAt, 12)}>
           <text x={hashBox.x + hashBox.w / 2} y={hashBox.y + hashBox.h / 2 + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: INK })}>
             hash(email)

@@ -246,7 +246,7 @@ export const ScaleScene: React.FC = () => {
         })}
 
         {/* ── The chart: the simplest queue's mean wait against load. ── */}
-        <Line at={chartAt} x={C.x0 - 70} y={y(486)} size={21} weight={650} color={INK_SOFT}>
+        <Line at={chartAt} x={C.x0 - 70} y={y(496)} size={21} weight={650} color={INK_SOFT}>
           The simplest queue: mean wait, in service times
         </Line>
         <Svg opacity={ease(frame, chartAt, 12)}>
@@ -272,7 +272,7 @@ export const ScaleScene: React.FC = () => {
               {Math.round(r * 100)}%
             </text>
           ))}
-          <text x={cx(0.25)} y={y(C.base) + 30} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
+          <text x={(C.x0 + C.x1) / 2} y={y(C.base) + 60} textAnchor="middle" style={svgText({ ...label(20, INK_SOFT), fontWeight: 650 })}>
             load
           </text>
           <g clipPath="url(#be-scaling-wait)">
@@ -305,7 +305,7 @@ export const ScaleScene: React.FC = () => {
             </g>
           ) : null}
         </Svg>
-        <Ink at={roomAt + 6} dur={14} style={{ left: C.x0 - 70, top: y(C.base) + h(48), whiteSpace: "nowrap" }}>
+        <Ink at={roomAt + 6} dur={14} style={{ left: C.x0 - 70, top: y(C.base) + h(76), whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, INK), fontWeight: 650 }}>
             <Mark at={roomAt + 8}>Headroom:</Mark> run where the wait is still flat
           </span>

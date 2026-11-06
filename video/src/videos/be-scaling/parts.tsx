@@ -244,7 +244,9 @@ export const Flow: React.FC<{
   dim?: number;
   out?: number;
   opacity?: number;
-}> = ({ points, at, dur = 14, color = INK, width = 2.6, head = 15, dash, dim, out, opacity = 1 }) => {
+  /** A highlighter band laid under the line, 0 to 1: the narration points at it. */
+  glow?: number;
+}> = ({ points, at, dur = 14, color = INK, width = 2.6, head = 15, dash, dim, out, opacity = 1, glow = 0 }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, dur);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -271,6 +273,7 @@ export const Flow: React.FC<{
       : `inset(${hide} -40px -40px -40px)`;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: (1 - o) * (1 - d) * opacity }}>
+      {glow > 0 ? <path d={path} fill="none" stroke={HIGHLIGHT} strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" opacity={glow} /> : null}
       {dash ? (
         <g style={{ clipPath: clip }}>
           <path d={path} fill="none" stroke={color} strokeWidth={width} strokeDasharray={dash} />

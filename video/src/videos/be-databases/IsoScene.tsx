@@ -15,8 +15,8 @@ import { DataTable, Drift, Listing, Svg, tableGeometry, X0 } from "./parts";
 const GRID_HIGH = 318;
 const GRID_LOW = 566;
 const LEVEL_W = 300;
-const COL_W = 250;
-const R_X = 1250;
+const COL_W = 270;
+const R_X = 1290;
 const LANE_A = 326;
 const LANE_B = 446;
 const T0 = 470;
@@ -219,13 +219,13 @@ export const IsoScene: React.FC = () => {
             return (
               <g key={lv} opacity={p}>
                 {serial > 0 ? <rect x={X0 - 10} y={yy + 6} width={gridW + 10} height={rowH - 12} rx={5} fill={`color-mix(in srgb, ${OK} ${20 * serial}%, transparent)`} /> : null}
-                {isDefault > 0 ? <rect x={X0 - 10} y={yy + 8} width={196 + 10} height={rowH - 16} rx={5} fill={HIGHLIGHT} opacity={isDefault} /> : null}
+                {isDefault > 0 ? <rect x={X0 - 8} y={yy + 8} width={182} height={rowH - 16} rx={4} fill={HIGHLIGHT} opacity={isDefault} /> : null}
                 <line x1={X0} y1={yy + rowH} x2={X0 + LEVEL_W + 120 + (3 * COL_W - 120) * move} y2={yy + rowH} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
                 <text x={X0} y={yy + rowH / 2 + 8} style={svgText({ ...note(23, INK), fontWeight: 650 })}>
                   {lv}
                 </text>
                 {i === 1 ? (
-                  <text x={X0 + 210} y={yy + rowH / 2 + 7} style={svgText(label(19, INK_SOFT))} opacity={isDefault}>
+                  <text x={X0 + 192} y={yy + rowH / 2 + 8} style={svgText(note(22, INK_SOFT))} opacity={isDefault}>
                     default
                   </text>
                 ) : null}
@@ -243,7 +243,7 @@ export const IsoScene: React.FC = () => {
                       {struck > 0 ? (
                         <>
                           <line x1={colX(j) - 4} x2={colX(j) - 4 + (w + 8) * struck} y1={yy + rowH / 2 + 1} y2={yy + rowH / 2 - 1} stroke={ACCENT} strokeWidth={3} />
-                          <text x={colX(j) + w + 16} y={yy + rowH / 2 + 8} style={svgText({ ...label(19, OK_INK), fontWeight: 700 })} opacity={struck}>
+                          <text x={colX(j) + w + 14} y={yy + rowH / 2 + 8} style={svgText({ ...note(22, OK_INK), fontWeight: 700 })} opacity={struck}>
                             Postgres: no
                           </text>
                         </>
