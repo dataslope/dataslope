@@ -133,6 +133,8 @@ export const LawScene: React.FC = () => {
       <Sfx name="el-tap" at={pointAt - 4} level={-29} />
       <Sfx name="el-pop" at={rowAt - 4} level={-30} />
       <Sfx name="el-whoosh" at={paidAt - 4} level={-33} />
+      {/* The swamp spot arrives with the pop the video's other spots have. */}
+      <Sfx name="el-pop" at={swampedAt - 2} level={-30} />
 
       <Headline top={y(150)} first="The share of heads," second="flip by flip." firstAt={llnFrom - 6} secondAt={shareAt + 4} out={lawAt - 8} />
       <Headline top={y(150)} first="The law of" second="large numbers." firstAt={lawAt - 4} secondAt={lawAt + 6} out={tableInFrom - 6} />

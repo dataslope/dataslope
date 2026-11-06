@@ -101,7 +101,10 @@ export const AiScene: React.FC = () => {
   const govAt = n.word("ai-gov", "Governance for AI data");
   const codeAt = n.word("ai-code", "AI-written pipeline code");
   const end = n.beat("ai-more").to;
-  const searchAt = n.word("ai-vector", "Vector search trade-offs");
+  // On "search" itself, a word after the card's title and its tap, so the
+  // spot's pop does not land on the same frame (stacked, the two sat 7 dB
+  // under the voice).
+  const searchAt = n.word("ai-vector", "search trade-offs");
   const lockAt = n.word("ai-gov", "permissions checked at query time");
   const aiPart = PARTS.find((p) => p.video === "de-pipelines-for-ai");
 

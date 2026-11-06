@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, KNOWN, mulberry32 } from "./data";
-import { Bell, Bracket, DOT, lerp, Mark, Mu, pulse, RAW, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
+import { Bell, Bracket, DOT, lerp, Mark, Mu, pulse, RAW, Spot, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
 import { ROW_ONE } from "./TwentyScene";
 
 const X: XScale = { lo: 50, hi: 150, x0: 160, x1: 1760 };
@@ -237,6 +237,10 @@ export const ParameterScene: React.FC = () => {
         out={codeAt - 2}
       />
 
+      {/* "In code": a laptop at the right end of Fig. 4, once the echo of
+          Fig. 3 has cleared that corner; it goes on the turn to Fig. 5. */}
+      <Spot id="thinking-statistically-laptop" at={codeAt + 12} out={turnAt} left={1550} top={y(600)} width={210} height={160} />
+
       {/* ── Fig. 4: a population we know, and one sample from it ── */}
       <FigLabel
         n="4"
@@ -276,7 +280,7 @@ export const ParameterScene: React.FC = () => {
           ...halo,
         }}
       >
-        <Mu /> = {KNOWN.mu}
+        <Mu inline /> = {KNOWN.mu}
       </div>
 
       <Svg>
@@ -325,7 +329,7 @@ export const ParameterScene: React.FC = () => {
             transformOrigin: "0 100%",
           }}
         >
-          <XBar /> ={" "}
+          <XBar inline /> ={" "}
           <Mark at={pointFourAt - 2} out={closeAt + 6}>
             {fmt(KNOWN.xBar)}
           </Mark>

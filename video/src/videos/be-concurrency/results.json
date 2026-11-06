@@ -1,0 +1,218 @@
+{
+  "runtime": {
+    "python": "3.14.2"
+  },
+  "amdahl": {
+    "0.01": {
+      "ceiling": 100,
+      "at": {
+        "1": 1,
+        "2": 1.98,
+        "4": 3.88,
+        "8": 7.48,
+        "16": 13.91,
+        "100": 50.25,
+        "1000": 90.99
+      }
+    },
+    "0.05": {
+      "ceiling": 20,
+      "at": {
+        "1": 1,
+        "2": 1.9,
+        "4": 3.48,
+        "8": 5.93,
+        "16": 9.14,
+        "100": 16.81,
+        "1000": 19.63
+      }
+    },
+    "0.25": {
+      "ceiling": 4,
+      "at": {
+        "1": 1,
+        "2": 1.6,
+        "4": 2.29,
+        "8": 2.91,
+        "16": 3.37,
+        "100": 3.88,
+        "1000": 3.99
+      }
+    }
+  },
+  "race": {
+    "steps": [
+      "read",
+      "add",
+      "write"
+    ],
+    "one": {
+      "start": 5,
+      "right": 7,
+      "orders": 20,
+      "rightOrders": 2,
+      "outcomes": {
+        "6": 18,
+        "7": 2
+      },
+      "lostExample": [
+        "A read",
+        "A add",
+        "B read",
+        "A write",
+        "B add",
+        "B write"
+      ]
+    },
+    "two": {
+      "start": 5,
+      "right": 9,
+      "orders": 924,
+      "rightOrders": 6,
+      "outcomes": {
+        "7": 702,
+        "8": 216,
+        "9": 6
+      },
+      "lostExample": [
+        "A read",
+        "A add",
+        "A write",
+        "A read",
+        "A add",
+        "B read",
+        "A write",
+        "B add",
+        "B write",
+        "B read",
+        "B add",
+        "B write"
+      ]
+    },
+    "locked": {
+      "start": 5,
+      "right": 7,
+      "orders": 2,
+      "rightOrders": 2,
+      "outcomes": {
+        "7": 2
+      },
+      "lostExample": null
+    },
+    "bothRead": {
+      "order": [
+        "A read",
+        "B read",
+        "A add",
+        "B add",
+        "A write",
+        "B write"
+      ],
+      "result": 6
+    }
+  },
+  "bytecode": {
+    "source": "counter += 1",
+    "instructions": [
+      "LOAD_GLOBAL counter",
+      "LOAD_SMALL_INT 1",
+      "BINARY_OP +=",
+      "STORE_GLOBAL counter"
+    ],
+    "count": 4,
+    "loopJump": [
+      "JUMP_BACKWARD"
+    ]
+  },
+  "deadlock": {
+    "opposite": {
+      "schedules": 6,
+      "finish": 4,
+      "deadlock": 2,
+      "examples": [
+        {
+          "trace": [
+            "T1 takes A",
+            "T2 takes B"
+          ],
+          "holds": {
+            "T1": [
+              "A"
+            ],
+            "T2": [
+              "B"
+            ]
+          },
+          "waitsFor": {
+            "T1": "B",
+            "T2": "A"
+          }
+        },
+        {
+          "trace": [
+            "T2 takes B",
+            "T1 takes A"
+          ],
+          "holds": {
+            "T1": [
+              "A"
+            ],
+            "T2": [
+              "B"
+            ]
+          },
+          "waitsFor": {
+            "T1": "B",
+            "T2": "A"
+          }
+        }
+      ]
+    },
+    "sameOrder": {
+      "schedules": 2,
+      "finish": 2,
+      "deadlock": 0,
+      "examples": []
+    }
+  },
+  "async": {
+    "delays": {
+      "a": 0.02,
+      "b": 0.01
+    },
+    "pagePrinted": "['a done', 'b done']",
+    "awaiting": {
+      "results": [
+        "a done",
+        "b done"
+      ],
+      "finished": [
+        "b",
+        "a"
+      ]
+    },
+    "blocking": {
+      "results": [
+        "a done",
+        "b done"
+      ],
+      "finished": [
+        "a",
+        "b"
+      ]
+    },
+    "overlapped": {
+      "total": 0.02,
+      "rule": "the longer wait"
+    },
+    "serial": {
+      "total": 0.03,
+      "rule": "the sum of the waits"
+    }
+  },
+  "semaphore": {
+    "limit": 5,
+    "downloads": 12,
+    "peak": 5
+  }
+}

@@ -35,6 +35,8 @@ export const RvScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: the four outcomes, then each number as it is said ── */}
+      {/* Also the two-coins spot's pop: it arrives on this same frame, so a
+          second copy would only make the one pop louder. */}
       <Sfx name="el-pop" at={flipAt - 2} level={-30} />
       {cues.map((c, i) => (
         <Sfx key={i} name="el-tap" at={c - 4} level={-29} />

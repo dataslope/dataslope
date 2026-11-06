@@ -92,6 +92,8 @@ export const BayesScene: React.FC = () => {
       <Sfx name="el-whoosh" at={tenAt - 4} level={-33} />
       <Sfx name="el-tap" at={ninetyOneAt - 4} level={-28} />
       <Sfx name="el-pencil" at={rareAt - 2} level={-34} />
+      {/* The alarm-bell spot arrives with the pop the video's other spots have. */}
+      <Sfx name="el-pop" at={falseAt - 2} level={-30} />
 
       <Headline top={y(150)} first="The gut reads it" second="backwards." firstAt={inverseFrom - 6} secondAt={backwardsAt - 4} out={retestFrom - 8} />
       <Headline top={y(150)} first="Test the positives again," second="and it flips." firstAt={retestFrom - 2} secondAt={nineInTenAt - 4} out={doorsInFrom - 6} />

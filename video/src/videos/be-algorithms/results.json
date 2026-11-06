@@ -1,0 +1,343 @@
+{
+  "runtime": "Pyodide / Python 3.14.2",
+  "page": {
+    "heap": [
+      "1"
+    ],
+    "bfs": [
+      "['A', 'B', 'C', 'D']"
+    ],
+    "cycle": [
+      "False",
+      "True"
+    ],
+    "topo": [
+      "['A', 'B', 'C', 'D']"
+    ],
+    "dijkstra": [
+      "{'A': 0, 'B': 1, 'C': 3, 'D': 4}"
+    ],
+    "inorder": [
+      "1",
+      "3",
+      "4",
+      "5",
+      "7"
+    ],
+    "binarySearch": [
+      "3",
+      "-1"
+    ],
+    "twoPointers": [
+      "(1, 3)",
+      "(3, 4)"
+    ],
+    "window": [
+      "3",
+      "1",
+      "3"
+    ],
+    "mergeSort": [
+      "[3, 9, 10, 27, 38, 43, 82]"
+    ],
+    "memo": [
+      "55",
+      "55"
+    ],
+    "permutations": [
+      "[[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]"
+    ],
+    "bits": [
+      "4",
+      "1"
+    ],
+    "kahn": [
+      "[0, 1, 2, 3]",
+      "cycle? False"
+    ],
+    "twoSum": [
+      "[0, 1]"
+    ]
+  },
+  "counts": {
+    "bigO": {
+      "n": 1000,
+      "pairsChecked": 499500,
+      "found": [
+        998,
+        999
+      ],
+      "hashLookups": 1000,
+      "hashFound": [
+        998,
+        999
+      ]
+    },
+    "hashWorst": {
+      "keys": 1000,
+      "spreadInsertEq": 0,
+      "spreadMissEq": 0,
+      "sameInsertEq": 595679,
+      "sameMissEq": 1296
+    },
+    "amortized": {
+      "appends": 1000000,
+      "resizes": 86,
+      "copiesIfEveryResizeCopies": 8445096,
+      "copiesPerAppend": 8.445096,
+      "largestResize": 938736,
+      "finalCapacity": 1056084,
+      "meanGrowthAbove1000": 1.125691244504265,
+      "doublingResizes": 20,
+      "doublingCopies": 1048575,
+      "doublingLargest": 524288
+    },
+    "brackets": [
+      {
+        "s": "([)]",
+        "count": true,
+        "queue": true,
+        "stack": false
+      },
+      {
+        "s": "{[]}",
+        "count": true,
+        "queue": false,
+        "stack": true
+      },
+      {
+        "s": "()[]{}",
+        "count": true,
+        "queue": true,
+        "stack": true
+      },
+      {
+        "s": "(]",
+        "count": false,
+        "queue": false,
+        "stack": false
+      }
+    ],
+    "traversal": {
+      "nodes": 1048575,
+      "levels": 20,
+      "widestLevel": 524288,
+      "bfsPeak": 524288,
+      "dfsPeak": 20,
+      "listShifts": 274876858369,
+      "dfsOrder": [
+        "A",
+        "B",
+        "D",
+        "C"
+      ]
+    },
+    "heap": {
+      "n": 1000000,
+      "levels": 20,
+      "maxMoves": 19,
+      "heightsSum": 999993,
+      "pushNewMinCompares": 19,
+      "popCompares": 20,
+      "heapifyCompares": 1499986,
+      "pushesCompares": 17951445,
+      "sortedInsertMeanShift": 500000
+    },
+    "dijkstra": {
+      "neg": {
+        "A": [
+          [
+            "B",
+            2
+          ],
+          [
+            "C",
+            3
+          ]
+        ],
+        "B": [
+          [
+            "D",
+            1
+          ]
+        ],
+        "C": [
+          [
+            "B",
+            -2
+          ]
+        ],
+        "D": []
+      },
+      "settled": {
+        "A": 0,
+        "B": 2,
+        "C": 3,
+        "D": 3
+      },
+      "settledOrder": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "bellmanFord": {
+        "A": 0,
+        "B": 1,
+        "C": 3,
+        "D": 2
+      },
+      "bfRounds": 3,
+      "bfEdges": 4,
+      "pageOnNeg": {
+        "A": 0,
+        "B": 1,
+        "C": 3,
+        "D": 2
+      },
+      "pageProcessedOnNeg": {
+        "A": 1,
+        "B": 2,
+        "C": 1,
+        "D": 1
+      },
+      "pageProcessedOnPage": {
+        "A": 1,
+        "B": 1,
+        "C": 1,
+        "D": 1
+      }
+    },
+    "quicksort": {
+      "n": 1000,
+      "lastPivotSorted": {
+        "compares": 499500,
+        "depth": 999
+      },
+      "randomPivotSorted": {
+        "compares": 10962,
+        "depth": 21
+      },
+      "lastPivotShuffled": {
+        "compares": 11065,
+        "depth": 23
+      },
+      "pairs": 499500,
+      "recursiveLastPivot": "RecursionError: maximum recursion depth exceeded",
+      "recursionLimit": 1000
+    },
+    "rapid": {
+      "bstSortedHeight": 1000,
+      "bstShuffledHeight": 21,
+      "bstKeys": 1000,
+      "fib30": 832040,
+      "fibNaiveCalls": 2692537,
+      "fibMemoCalls": 59,
+      "greedy": [
+        4,
+        1,
+        1
+      ],
+      "fewest": [
+        3,
+        3
+      ],
+      "stable": {
+        "input": [
+          [
+            "Ada",
+            "Lovelace"
+          ],
+          [
+            "Alan",
+            "Turing"
+          ],
+          [
+            "Grace",
+            "Hopper"
+          ],
+          [
+            "Ada",
+            "Hopper"
+          ],
+          [
+            "Alan",
+            "Kay"
+          ]
+        ],
+        "byFirst": [
+          [
+            "Ada",
+            "Lovelace"
+          ],
+          [
+            "Ada",
+            "Hopper"
+          ],
+          [
+            "Alan",
+            "Turing"
+          ],
+          [
+            "Alan",
+            "Kay"
+          ],
+          [
+            "Grace",
+            "Hopper"
+          ]
+        ],
+        "thenLast": [
+          [
+            "Ada",
+            "Hopper"
+          ],
+          [
+            "Grace",
+            "Hopper"
+          ],
+          [
+            "Alan",
+            "Kay"
+          ],
+          [
+            "Ada",
+            "Lovelace"
+          ],
+          [
+            "Alan",
+            "Turing"
+          ]
+        ]
+      },
+      "binaryProbesMillion": 20,
+      "recursionLimit": 1000
+    },
+    "runtime": "Pyodide / Python 3.14.2"
+  },
+  "arithmetic": {
+    "bigO": {
+      "small": 100,
+      "smallPairs": 4950,
+      "big": 1000000,
+      "bigPairs": 499999500000,
+      "rate": 100000000,
+      "pairsSeconds": 4999.995,
+      "pairsMinutes": 83.33324999999999,
+      "passSeconds": 0.01
+    },
+    "collisions": {
+      "buckets": 1000,
+      "evenMoneyKeys": 38,
+      "at40": 0.5463719707129396,
+      "atEvenMoney": 0.5093165369503566,
+      "loadAtEvenMoney": 0.038
+    },
+    "adjacency": {
+      "users": 1000000,
+      "friends": 100,
+      "matrixCells": 1000000000000,
+      "listEntries": 100000000
+    }
+  }
+}

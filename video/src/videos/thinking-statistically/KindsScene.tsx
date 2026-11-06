@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { ZIPS } from "./data";
-import { lerp, Mark, pulse, RAW, STAT_INK, Svg } from "./parts";
+import { lerp, Mark, pulse, RAW, Spot, STAT_INK, Svg } from "./parts";
 
 const PARENT_Y = 310;
 const RULE_Y = 446;
@@ -295,6 +295,11 @@ export const KindsScene: React.FC = () => {
         />
       </Svg>
 
+      {/* Under two of the leaves, on the examples that name them: shirt sizes
+          and a price. The zip code below keeps the middle to itself. */}
+      <Spot id="thinking-statistically-shirts" at={sizesAt - 2} left={LEAVES[1].x + 10} top={y(PICTURE_Y + 112)} width={180} height={160} />
+      <Spot id="thinking-statistically-tag" at={likeAt[3] - 2} left={LEAVES[3].x + 50} top={y(PICTURE_Y + 112)} width={170} height={160} />
+
       {/* "A few don't": a zip code, between the two kinds. */}
       {zipIn > 0 ? (
         <div
@@ -323,7 +328,8 @@ export const KindsScene: React.FC = () => {
           >
             {ZIPS.zip}
           </span>
-          <span style={{ ...body(52, true), color: STAT_INK, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
+          {/* The size of the code beside it: emphasis is the color and the weight. */}
+          <span style={{ ...label(30, STAT_INK), fontWeight: 700, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
         </div>
       ) : null}
     </AbsoluteFill>

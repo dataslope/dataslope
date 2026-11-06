@@ -38,6 +38,7 @@ export const SurveyScene: React.FC = () => {
 
   // ── Cues ──
   const surveyFrom = n.beat("survey").from;
+  const surveyAt = n.word("survey", "survey");
   const fiveAt = n.word("survey", "five hundred");
   const threeAt = n.word("survey", "three hundred thousand");
   const customersAt = n.word("survey", "customers");
@@ -124,6 +125,8 @@ export const SurveyScene: React.FC = () => {
         Your question is about {fmtInt(SURVEY.customers)}.
       </Ink>
 
+      {/* "You survey": a clipboard at the end of "You asked", above the second line. */}
+      <Spot id="thinking-statistically-clipboard" at={surveyAt - 4} left={640} top={y(104) - 22} width={150} height={140} />
       <Spot id="thinking-statistically-barrel" at={customersAt - 4} left={1470} top={y(104)} width={310} height={313} />
 
       <FigLabel

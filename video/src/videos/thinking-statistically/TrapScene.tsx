@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { ZIPS } from "./data";
-import { Mark, STAT_INK, Strike } from "./parts";
+import { Mark, Spot, STAT_INK, Strike } from "./parts";
 
 const COL = [160, 520];
 const COL_W = 300;
@@ -116,6 +116,10 @@ export const TrapScene: React.FC = () => {
       </div>
 
       <FigLabel n="7" title="Four zip codes and prices, as pandas stores them" at={columnsAt - 4} x={160 + shift} y={y(276)} />
+
+      {/* "Zip codes": a mailbox, top right; "a price": its tag, beside the doubled price. */}
+      <Spot id="thinking-statistically-mailbox" at={zipAt - 4} left={1580} top={y(104)} width={180} height={180} />
+      <Spot id="thinking-statistically-tag" at={priceAt - 4} left={1500} top={y(DTYPE_Y + 30)} width={170} height={150} />
 
       {/* ── The table ── */}
       {columns.map((c, ci) => {

@@ -121,6 +121,8 @@ export const TestScene: React.FC = () => {
       <Sfx name="el-pencil" at={hundredAt - 4} level={-34} />
       <Sfx name="el-sprinkle" at={lineupAt} level={-32} />
       <Sfx name="el-tap" at={percentAt - 4} level={-28} />
+      {/* The test-tube spot arrives with the pop the video's other spots have. */}
+      <Sfx name="el-pop" at={aTestAt - 2} level={-30} />
 
       <Kicker at={testFrom - 10}>Bayes and the 99% test</Kicker>
       <Headline top={y(150)} first="A 99% accurate test" second="says positive." firstAt={testFrom - 6} secondAt={positiveAt - 4} out={lineupAt - 8} />

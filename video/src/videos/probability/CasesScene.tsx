@@ -95,6 +95,8 @@ export const CasesScene: React.FC = () => {
       <Sfx name="el-pop" at={hasCarAt - 4} level={-30} />
       <Sfx name="el-pencil" at={playAt - 4} level={-34} />
       <Sfx name="el-tap" at={sixtyAt - 2} level={-28} />
+      {/* The car spot arrives with the pop the video's other spots have. */}
+      <Sfx name="el-pop" at={carAt - 2} level={-30} />
 
       <Headline top={y(150)} first="She was right:" second="switching wins two in three." firstAt={casesFrom - 6} secondAt={hasCarAt - 2} out={rvInFrom - 6} />
       <Headline top={y(150)} first="Outcomes so far:" second="labels, not numbers." firstAt={rvInFrom - 2} secondAt={numbersAt - 6} />

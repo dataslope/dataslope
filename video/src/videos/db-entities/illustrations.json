@@ -36,6 +36,84 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "a large sheet of paper pinned to a wooden easel, painted with three plain rectangles joined by two straight lines, and beside the easel a half-built wooden cabinet that is only an open frame with one shelf"
+    },
+    {
+      "id": "db-entities-shopper",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an anonymous stylized shopper with no facial features, wearing a long blue coat and walking, carrying a chunky woven shopping basket over one arm with a red apple and a yellow box inside it"
+    },
+    {
+      "id": "db-entities-parcel",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a plain sealed cardboard parcel, chunky and deep, tied with red string, with one blank pale yellow paper tag hanging from the knot"
+    },
+    {
+      "id": "db-entities-notebook",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a closed thick notebook with a deep green cover lying flat at a slight angle, with one chunky blue pen lying diagonally across it"
+    },
+    {
+      "id": "db-entities-price-tag",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one blank paper price tag cut from thick pale yellow card, with a rounded end, a punched hole and a short loop of red string through the hole"
+    },
+    {
+      "id": "db-entities-receipt",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a short curling paper till receipt, blank, with a few short plain blue bars across it in place of any writing, its end curling up, beside two chunky yellow coins"
+    },
+    {
+      "id": "db-entities-calendar",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky desk calendar standing on a small easel stand, its page a plain grid of pale squares with one square circled in red, a blue spiral binding along its top"
+    },
+    {
+      "id": "db-entities-banana",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one ripe yellow banana lying on its side, plump and curved, with a small green stem end and a brown tip"
+    },
+    {
+      "id": "db-entities-van",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small chunky delivery van seen from a slight angle, with a blue body, a yellow roof and deep blue wheels, its back doors open with one cardboard parcel inside"
+    },
+    {
+      "id": "db-entities-globe",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small desk globe on a curved wooden stand, its oceans painted blue and its continents green and yellow"
+    },
+    {
+      "id": "db-entities-phone",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky old-fashioned desk telephone with a red body and a round dial, its handset resting on top and a coiled cord looping from it"
+    },
+    {
+      "id": "db-entities-house",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a small cottage with a red roof, pale yellow walls and a blue front door, with a chunky blue mailbox on a short post beside it"
+    },
+    {
+      "id": "db-entities-key",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "one large old-fashioned brass key lying at a slight angle, with a round looped bow and a chunky toothed bit, a short blue ribbon tied through its bow"
+    },
+    {
+      "id": "db-entities-crow",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a crow standing upright, side on, painted in deep indigo-blue and purple washes the way its glossy feathers catch the light, one three-toed foot spread wide in front of it"
     }
   ]
 }

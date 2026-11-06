@@ -8,7 +8,7 @@ import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { jitter, KNOWN, ROWS } from "./data";
-import { Bracket, DOT, lerp, Mark, Mu, pulse, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
+import { Bracket, DOT, lerp, Mark, Mu, pulse, Spot, STAT, STAT_INK, Svg, TruthLine, XBar } from "./parts";
 
 /** The rows: every value of every sample, 50 to 150. */
 const X: XScale = { lo: 50, hi: 150, x0: 160, x1: 1240 };
@@ -168,6 +168,10 @@ export const TwentyScene: React.FC = () => {
         But what kind of number is it?
       </Ink>
 
+      {/* "Twenty samples": baskets of apples, the sample of the barrel three
+          scenes back, top right above the averages' panel. */}
+      <Spot id="thinking-statistically-baskets" at={samplesAt - 4} out={flavorsFrom - 20} left={1450} top={y(104) - 10} width={330} height={140} />
+
       <AbsoluteFill style={{ opacity: figureOp }}>
 
       <FigLabel n="5" title={`Twenty samples of ${KNOWN.n} from the same population`} at={twentyFrom - 4} x={160} y={y(270)} />
@@ -176,7 +180,7 @@ export const TwentyScene: React.FC = () => {
       {/* Already up at the cut, where ParameterScene's mu ends its ride. */}
       <Note at={twentyFrom - 30} x={muX + 12} y={y(ROW0 - 50)}>
         <span style={{ ...note(23, INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
-          <Mu /> = {KNOWN.mu}
+          <Mu inline /> = {KNOWN.mu}
           <span style={{ ...note(21, INK_SOFT), marginLeft: 12, opacity: ease(frame, parameterAt + 4, 10) }}>never moves</span>
         </span>
       </Note>
@@ -234,7 +238,7 @@ export const TwentyScene: React.FC = () => {
       </Svg>
       <Note at={statisticAt} x={muX - 14} y={y(ROW0 - 50)} align="right" out={summarizeAt - 2}>
         <span style={{ ...note(23, STAT_INK), fontWeight: 650, whiteSpace: "nowrap", ...halo }}>
-          <XBar />: different every time
+          <XBar inline />: different every time
         </span>
       </Note>
 

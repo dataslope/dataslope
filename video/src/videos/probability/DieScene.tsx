@@ -83,6 +83,8 @@ export const DieScene: React.FC = () => {
       <Sfx name="el-whoosh" at={balancesAt - 8} level={-34} />
       <Sfx name="el-pencil" at={squaredAt - 4} level={-34} />
       <Sfx name="el-tap" at={sdAt - 4} level={-29} />
+      {/* The die spot arrives with the pop the video's other spots have. */}
+      <Sfx name="el-pop" at={loadedAt - 2} level={-30} />
 
       {/* The part's kicker carries on from the scene before, so "its" still
           has the random variable to refer to. */}
@@ -223,8 +225,9 @@ export const DieScene: React.FC = () => {
           <span style={{ opacity: ease(frame, faceAt - 2, 10), fontWeight: 500, color: INK }}>, not a face</span>
         </span>
       </Note>
-      {/* The loaded die, in the empty air over the five short bars. */}
-      <Spot id="probability-die" at={loadedAt - 2} left={430} top={y(332)} width={200} height={h(160)} />
+      {/* The loaded die, in the empty air over the short bars: right of "X is
+          the face rolled", left of "the likeliest roll", above the bars' labels. */}
+      <Spot id="probability-die" at={loadedAt - 2} left={520} top={y(343)} width={220} height={h(195)} />
       <Spot id="probability-seesaw" at={pictureAt - 2} out={spreadWordAt - 10} left={1280} top={y(650)} width={540} height={220} />
 
       {/* ── The sum ── */}

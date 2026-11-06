@@ -103,6 +103,8 @@ export const WarrantyScene: React.FC = () => {
       <Sfx name="el-sprinkle" at={millionAt - 2} level={-34} />
       <Sfx name="el-pencil" at={surviveAt - 4} level={-34} />
       <Sfx name="el-pencil" at={shapesAt - 4} level={-34} />
+      {/* The store spot arrives with the pop the video's other spots have. */}
+      <Sfx name="el-pop" at={storeAt - 2} level={-30} />
 
       <div style={{ opacity: 1 - dim }}>
         <Headline top={y(150)} first="An $80 warranty." second="Who comes out ahead?" firstAt={warrantyFrom - 6} secondAt={paysAt - 4} />

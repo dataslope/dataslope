@@ -36,6 +36,72 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "three ice cream cones standing upright side by side, each holding one large round scoop: a pale yellow vanilla scoop, a deep brown chocolate scoop and a pink strawberry scoop"
+    },
+    {
+      "id": "thinking-statistically-crowd",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "two small groups of anonymous standing people side by side with a gap between them, three chunky rounded figures in each group, simple solid bodies with no facial features, their clothes in blue, green, red and yellow washes"
+    },
+    {
+      "id": "thinking-statistically-dice",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "two chunky six-sided dice tumbling, one resting flat and one tipped up on its edge, each a solid rounded cube with deep round pips on its faces, one die in blue washes and one in red washes"
+    },
+    {
+      "id": "thinking-statistically-calendar",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a thick paper wall calendar hanging from a nail, with a chunky spiral binding along its top edge and a grid of blank square day cells on its page, a few of the cells washed in color, no numbers and no letters"
+    },
+    {
+      "id": "thinking-statistically-clipboard",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a chunky wooden clipboard with a big metal clip holding a survey form of blank ruled lines and a column of empty tick boxes, a yellow pencil lying across it"
+    },
+    {
+      "id": "thinking-statistically-laptop",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an open laptop seen from the front at a slight angle, a thick solid body with a chunky keyboard, its screen showing a few short colored horizontal strokes like lines of code, no letters"
+    },
+    {
+      "id": "thinking-statistically-baskets",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "three small round woven baskets in a row, each holding a few red and yellow apples, a different number of apples in each basket"
+    },
+    {
+      "id": "thinking-statistically-computer",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "an old desktop computer: a deep boxy monitor with a blank glowing screen, standing on a thick flat computer case, with a chunky keyboard in front of it"
+    },
+    {
+      "id": "thinking-statistically-shirts",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "three folded T-shirts stacked in a neat pile, the largest at the bottom and the smallest on top, each shirt a different color"
+    },
+    {
+      "id": "thinking-statistically-tag",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a thick paper price tag with a round punched hole and a loop of string through it, tilted at an angle, blank with no writing"
+    },
+    {
+      "id": "thinking-statistically-mailbox",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a rounded-top metal mailbox on a sturdy wooden post, its little flag raised, its door open with two envelopes poking out"
+    },
+    {
+      "id": "thinking-statistically-podium",
+      "category": "video-icon",
+      "style": "watercolor illustration",
+      "subject": "a three-step winners' podium made of three solid blocks, the middle block tallest, the left block a little lower and the right block lowest, plain blocks with no numbers"
     }
   ]
 }

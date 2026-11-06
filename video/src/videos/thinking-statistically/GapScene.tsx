@@ -8,7 +8,7 @@ import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { GAPS, jitter } from "./data";
-import { Arrow, Bell, DOT, Kicker, lerp, Mark, pulse, STAT, STAT_INK, Svg, TruthLine } from "./parts";
+import { Arrow, Bell, DOT, Kicker, lerp, Mark, pulse, Spot, STAT, STAT_INK, Svg, TruthLine } from "./parts";
 
 /** The raw values: every score in every draw lies inside 10 to 90. */
 const X: XScale = { lo: 10, hi: 90, x0: 300, x1: 1180 };
@@ -42,6 +42,7 @@ export const GapScene: React.FC = () => {
 
   // ── Cues ──
   const groupsAt = n.word("hook", "two groups");
+  const peopleAt = n.word("hook", "people");
   const scoresAt = n.word("hook", "scores");
   const higherAt = n.word("hook", "higher");
   const halfAt = n.word("hook", "three");
@@ -49,6 +50,7 @@ export const GapScene: React.FC = () => {
   const sameAt = n.word("same", "same");
   const bothAt = n.word("same", "both groups");
   const fiftyAt = n.word("same", "fifty");
+  const luckAt = n.word("same", "pure luck");
   const noRealAt = n.word("same", "no real");
   const againAt = n.word("again", "again");
   const aheadAt = n.word("again", "A comes");
@@ -154,6 +156,12 @@ export const GapScene: React.FC = () => {
           The gap is never zero.
         </Ink>
       </div>
+      {/* Spot art, top right, clear of the headline and the gap panel: the
+          two groups of people, then (as the headline turns) the luck every
+          score is made of. */}
+      <Spot id="thinking-statistically-crowd" at={peopleAt - 4} out={sameAt - 14} left={1480} top={y(104) + 10} width={290} height={168} />
+      <Spot id="thinking-statistically-dice" at={luckAt - 4} out={exitAt} left={1570} top={y(104)} width={200} height={170} />
+
       <Ink at={couldAt - 4} dur={18} style={{ left: 96, top: y(258), whiteSpace: "nowrap" }}>
         <span style={{ ...body(38, true), color: INK }}>Could this just be luck?</span>
       </Ink>

@@ -101,6 +101,8 @@ export const SplitScene: React.FC = () => {
       <Sfx name="el-pop" at={tenAt - 2} level={-31} />
       <Sfx name="el-pencil" at={revAllAt - 4} level={-34} />
       <Sfx name="el-tap" at={revEightyAt - 4} level={-28} />
+      {/* The plans spot arrives with the pop the video's other spots have. */}
+      <Sfx name="el-pop" at={planAt - 2} level={-30} />
 
       <Headline top={y(150)} first="Does the plan" second="change the chance?" firstAt={splitFrom - 6} secondAt={barAt + 2} out={jumpsAt - 8} />
       <Headline top={y(150)} first="Plan and churn" second="are dependent." firstAt={jumpsAt - 2} secondAt={dependentAt - 4} out={indepWordAt - 8} />

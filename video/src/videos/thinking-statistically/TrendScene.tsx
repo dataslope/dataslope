@@ -141,6 +141,8 @@ export const TrendScene: React.FC = () => {
         </Ink>
       </div>
 
+      {/* "Two years": a calendar beside the headline, gone before the machine arrives. */}
+      <Spot id="thinking-statistically-calendar" at={yearsAt - 4} out={processAt - 18} left={960} top={y(104)} width={180} height={180} />
       <Spot id="thinking-statistically-machine" at={processAt - 6} dim={neverSeeAt} left={1480} top={y(104)} width={320} height={305} />
 
       {/* The examples of a process, beside the machine, until "never see". */}

@@ -20,6 +20,10 @@ const STACK_W = 170;
 const BLOCK = 34;
 const STACK_BASE = 860;
 
+/** The computer's view of the column, past the last chip by more than a
+ *  word's width, so the chip's code and the label never read as one line. */
+const DTYPE_X = 1504;
+
 const NAMES = ["1", "2", "3"].map((c) => FLAVORS.codes[c]);
 const chipX = (i: number) => CHIP_X + i * CHIP_PITCH;
 
@@ -169,7 +173,7 @@ export const FlavorScene: React.FC = () => {
       })}
 
       {/* The computer's view of the column: integers, as pandas stores them. */}
-      <Ink at={computerAt - 4} dur={14} style={{ left: 1478, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
+      <Ink at={computerAt - 4} dur={14} style={{ left: DTYPE_X, top: y(CHIP_Y) + 4, whiteSpace: "nowrap" }}>
         <div style={label(20, INK_SOFT)}>stored as whole numbers</div>
         <div
           style={{
@@ -188,23 +192,29 @@ export const FlavorScene: React.FC = () => {
         </div>
       </Ink>
 
+      {/* "The computer": under its view of the column, right of the tally. */}
+      <Spot id="thinking-statistically-computer" at={computerAt - 4} left={1590} top={y(560)} width={180} height={180} />
+
       {/* ── The mean of the codes ── */}
       <div style={{ position: "absolute", inset: 0, opacity: meanOp }}>
-      <Ink at={avgAt - 4} dur={14} style={{ left: 160, top: y(624), whiteSpace: "nowrap" }}>
-        <span style={label(22, INK_SOFT)}>Mean of the column</span>
-      </Ink>
+      {/* The label, and on "The math ran fine" the sum it did, in full: one
+          line at one size, above the mean it gives. */}
+      <div style={{ position: "absolute", left: 160, top: y(624), display: "flex", alignItems: "baseline", gap: 28, whiteSpace: "nowrap" }}>
+        <Ink at={avgAt - 4} dur={14} style={{ position: "relative" }}>
+          <span style={label(22, INK_SOFT)}>Mean of the column</span>
+        </Ink>
+        <Ink at={mathAt - 2} dur={26} out={honestAt - 2} style={{ position: "relative" }}>
+          <span style={{ fontFamily: MONO, fontSize: 22, color: INK }}>
+            ({FLAVORS.answers.join(" + ")}) ÷ {FLAVORS.answers.length}
+          </span>
+        </Ink>
+      </div>
       <Ink at={eightAt - 6} dur={16} style={{ left: 156, top: y(660), ...headline(140), color: STAT_INK, whiteSpace: "nowrap" }}>
         <Strike at={noAt}>{mean}</Strike>
       </Ink>
       <Note at={noAt + 6} x={160} y={y(826)}>
         <span style={{ ...body(32, true), color: INK, whiteSpace: "nowrap" }}>names no flavor at all</span>
       </Note>
-      {/* "The math ran fine": the sum it did, in full. */}
-      <Ink at={mathAt - 2} dur={26} out={honestAt - 2} style={{ left: 384, top: y(706), whiteSpace: "nowrap" }}>
-        <span style={{ fontFamily: MONO, fontSize: 25, color: INK }}>
-          ({FLAVORS.answers.join(" + ")}) ÷ {FLAVORS.answers.length}
-        </span>
-      </Ink>
       </div>
 
       {/* ── The tally ── */}

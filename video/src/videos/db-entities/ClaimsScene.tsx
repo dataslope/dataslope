@@ -16,6 +16,8 @@ const SLOT = 44;
 const SLOTS_Y = 470;
 /** Low enough that Fig. 9's label has its own line under the headline. */
 const LISTING_Y = 330;
+/** The running count beside the slots, and its unit: the slots' own letter size. */
+const COUNT_SIZE = 30;
 
 /** The two sides of the lesson's callout, "When in doubt, constrain what you control". */
 const SIDES = [
@@ -90,7 +92,8 @@ export const ClaimsScene: React.FC = () => {
         </Fig>
         <Listing lines={[NAME.sql]} x={X} top={y(LISTING_Y)} width={660} size={28} at={capAt - 6} lineAt={[capAt - 2]} />
         <Note at={claimingAt - 2} x={X + 700} y={y(LISTING_Y + 6)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+          {/* Within a step of the listing's 28px code, which it reads along. */}
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             claims <span style={{ color: STAT_INK, fontWeight: 650 }}>no name is longer than {NAME.limit} characters</span>
           </span>
         </Note>
@@ -173,12 +176,13 @@ export const ClaimsScene: React.FC = () => {
             top: slotsY + slotH / 2 - 22,
             opacity: ease(frame, nameAt[0] - 2, 8),
             whiteSpace: "nowrap",
-            ...note(32, landed > NAME.limit ? STAT_INK : INK),
+            ...note(COUNT_SIZE, landed > NAME.limit ? STAT_INK : INK),
             fontWeight: 700,
           }}
         >
+          {/* One line at one size: the count stands out by its ink and weight. */}
           {Math.min(landed, NAME.length)}
-          <span style={{ ...note(22, INK_SOFT), marginLeft: 10 }}>characters</span>
+          <span style={{ ...note(COUNT_SIZE, INK_SOFT), marginLeft: "0.3em" }}>characters</span>
         </div>
         <ErrorBox x={X} top={y(600)} width={1100} at={oneAt + 6} message={NAME.error.message} detail={NAME.error.detail} />
 

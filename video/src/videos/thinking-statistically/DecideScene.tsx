@@ -7,12 +7,13 @@ import { Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FLAVORS, PLANS, ZIPS } from "./data";
-import { Mark, STAT_INK } from "./parts";
+import { Mark, Spot, STAT_INK } from "./parts";
 
 const COLS = [160, 640, 1180];
 const HEAD_Y = 292;
 const ROW_Y0 = 340;
-const ROW_STEP = 104;
+/** A row holds the kind and, under it, its scale. */
+const ROW_STEP = 112;
 const TEST_Y = 690;
 
 /**
@@ -111,6 +112,9 @@ export const DecideScene: React.FC = () => {
         </Ink>
       </div>
 
+      {/* "Ranks": a winners' podium, top right beside the headline. */}
+      <Spot id="thinking-statistically-podium" at={ranksAt - 4} left={1510} top={y(104)} width={260} height={152} />
+
       {/* ── Summaries ── */}
       {["The column holds", "Its honest summary", "For example"].map((t, i) => (
         <div key={t} style={{ position: "absolute", left: COLS[i], top: y(HEAD_Y), opacity: heads * close, ...label(21, INK_SOFT) }}>
@@ -135,7 +139,8 @@ export const DecideScene: React.FC = () => {
                 </Mark>
               )}
             </span>
-            <span style={{ ...note(22, INK_SOFT), marginLeft: 14 }}>{r.scale}</span>
+            {/* Under the kind, not beside it: one line, one size. */}
+            <div style={{ ...note(22, INK_SOFT), marginTop: 4 }}>{r.scale}</div>
           </Ink>
           <Ink at={r.sumAt} dur={14} style={{ left: COLS[1], top: rowY(i) + 14, whiteSpace: "nowrap" }}>
             <span style={{ ...note(28, INK), fontWeight: 600 }}>
@@ -165,7 +170,7 @@ export const DecideScene: React.FC = () => {
             style={{
               position: "absolute",
               left: COLS[0],
-              top: rowY(i) + 84,
+              top: rowY(i) + 100,
               width: 1600,
               height: 1,
               background: HAIRLINE,
@@ -188,8 +193,9 @@ export const DecideScene: React.FC = () => {
             <Ink at={t.whenAt - 4} dur={14} style={{ position: "relative" }}>
               <span style={{ ...note(28, INK) }}>{t.when}:&nbsp;</span>
             </Ink>
+            {/* The test in the line's own face and size, set apart by weight. */}
             <Ink at={t.at - 6} dur={14} style={{ position: "relative" }}>
-              <span style={{ ...body(32, true), color: INK }}>{t.test}</span>
+              <span style={{ ...note(28, INK), fontWeight: 650 }}>{t.test}</span>
             </Ink>
           </div>
         ))}

@@ -128,6 +128,8 @@ export const TableScene: React.FC = () => {
       <Sfx name="el-tap" at={sixAt - 4} level={-28} />
       <Sfx name="el-tap" at={twentyFourAt - 4} level={-28} />
       <Sfx name="el-pencil" at={keepAt - 4} level={-34} />
+      {/* The users spot arrives with the pop the video's other spots have. */}
+      <Sfx name="el-pop" at={usersAt - 2} level={-30} />
 
       <Kicker at={tableFrom - 10}>Conditioning and independence</Kicker>
       <Headline top={y(150)} first="A thousand users," second="by plan and churn." firstAt={tableFrom - 6} secondAt={usersAt + 6} out={allAt - 8} />

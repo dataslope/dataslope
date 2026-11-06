@@ -19,6 +19,8 @@ const BOXES = [
   { name: "products", x: 1380 },
 ] as const;
 const CHIP_Y = 800;
+/** The test's label; the question sits on the line under it. */
+const TEST_Y = 690;
 
 /**
  * Part 1 opens on Unit 1's bridge: a design starts by naming the things the
@@ -150,11 +152,11 @@ export const NounsScene: React.FC = () => {
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>Candidate entities: kinds of things worth tracking</span>
         </Note>
 
-        {/* ── The test ── */}
-        <Note at={testAt - 6} out={statusAt - 4} x={122} y={y(708)}>
+        {/* ── The test: its label on a line of its own above it, as "One sentence" is ── */}
+        <Note at={testAt - 6} out={statusAt - 4} x={122} y={y(TEST_Y)}>
           <span style={label(22, INK_SOFT)}>A test</span>
         </Note>
-        <Ink at={canAt - 4} dur={16} out={statusAt - 4} style={{ left: 232, top: y(696), whiteSpace: "nowrap" }}>
+        <Ink at={canAt - 4} dur={16} out={statusAt - 4} style={{ left: 120, top: y(TEST_Y + 32), whiteSpace: "nowrap" }}>
           <span style={{ ...body(40, true), color: INK }}>Can there be many of these?</span>
         </Ink>
 
