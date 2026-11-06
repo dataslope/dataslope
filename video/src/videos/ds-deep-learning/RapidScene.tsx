@@ -91,27 +91,42 @@ const Init: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Axes x={xs} y={ys} xTicks={[0, 2, 4, 6, 8, 10]} xTitle={`ReLU layers, ${INIT.width} wide`} yTitle="the signal's spread" at={scaleAt - 4} />
-      {/* The y ticks are powers of ten, drawn here so the exponent can be a
-          real superscript: the Unicode ones (10¹⁰) came out about 10 px. */}
+      {/* The y ticks are powers of ten, set in HTML so the exponent is a
+          real <sup>: the Unicode ones (10¹⁰) came out about 10 px, and an SVG
+          tspan at 15 px sat under the 19 px floor. */}
       <Svg opacity={ease(frame, scaleAt + 2, 12)}>
         {[-10, -5, 0, 5, 10].map((v) => (
-          <g key={v}>
-            <line x1={xs.a} x2={xs.b} y1={at(ys, v)} y2={at(ys, v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
-            <text x={xs.a - 14} y={at(ys, v) + 7} textAnchor="end" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 500, fill: INK_SOFT, fontVariantNumeric: "tabular-nums" }}>
-              {v === 0 ? (
-                "1"
-              ) : (
-                <>
-                  10
-                  <tspan dy={-9} style={{ fontSize: 15 }}>
-                    {v < 0 ? `−${-v}` : v}
-                  </tspan>
-                </>
-              )}
-            </text>
-          </g>
+          <line key={v} x1={xs.a} x2={xs.b} y1={at(ys, v)} y2={at(ys, v)} stroke={INK_SOFT} strokeWidth={1} strokeDasharray="2 6" opacity={0.5} />
         ))}
       </Svg>
+      {[-10, -5, 0, 5, 10].map((v) => (
+        <div
+          key={v}
+          style={{
+            position: "absolute",
+            left: xs.a - 14 - 120,
+            width: 120,
+            top: at(ys, v) - 14,
+            lineHeight: "28px",
+            textAlign: "right",
+            fontFamily: SANS,
+            fontSize: 21,
+            fontWeight: 500,
+            color: INK_SOFT,
+            whiteSpace: "nowrap",
+            opacity: ease(frame, scaleAt + 2, 12),
+            ...TABULAR,
+          }}
+        >
+          {v === 0 ? (
+            "1"
+          ) : (
+            <>
+              10<sup style={{ fontSize: 19, lineHeight: 0 }}>{v < 0 ? `−${-v}` : v}</sup>
+            </>
+          )}
+        </div>
+      ))}
       <Svg>
         {series.map((s) =>
           INIT.sd[s.key].map((v, k) => {
