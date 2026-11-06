@@ -13,7 +13,7 @@ const ROOT_X = 120;
 const ROOT_W = 300;
 const ROOT_H = 92;
 /** The three answers, the top one clear of Fig. 12's label at FIG_Y. */
-const BRANCH_Y = [376, 510, 644];
+const BRANCH_Y = [376, 502, 628];
 const ANSWER_X = 660;
 
 /**
@@ -127,8 +127,8 @@ export const ChooseScene: React.FC = () => {
           })}
 
           {/* ── ON UPDATE: the same question ── */}
-          <div style={{ position: "absolute", left: ROOT_X, top: y(766) - 29, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
-          <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(766), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ position: "absolute", left: ROOT_X, top: y(774) - 29, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
+          <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(774), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
             {/* At the sentence's own size, less the 12% a line may vary. */}
             <Tag color={INK} size={29} mono>
               ON UPDATE
@@ -146,7 +146,7 @@ export const ChooseScene: React.FC = () => {
         {/* A parent and the child holding its hand: the question the headline asks. */}
         <Spot id="db-keys-family" at={childAt - 4} left={1500} top={400} width={171} height={220} />
 
-        <NextLine at={shapeAt - 4} x={ROOT_X} y={y(842)} width={760}>
+        <NextLine at={shapeAt - 4} x={ROOT_X} y={y(850)} width={760}>
           the shapes relationships take.
         </NextLine>
       </Drift>
