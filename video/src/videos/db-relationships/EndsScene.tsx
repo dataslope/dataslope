@@ -6,7 +6,7 @@ import { ease } from "../../components/motion";
 import { Entity, entityLayout, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, body, HAIRLINE, INK, INK_SOFT, label, note, PAPER } from "../../editorial/style";
-import { Ink, Leader } from "../../editorial/ui";
+import { ColumnRule, Ink, Leader } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Fig } from "./kit";
@@ -36,6 +36,11 @@ const TEXT_X = 950;
 const KEY_X = 1530;
 const KEY_SIZE = 26;
 const KEY_EDGE = 64;
+/** The key and the readings beside it are two columns of text: a hairline
+ *  in the gap, centred between the longest example (which ends near 1446)
+ *  and the key, as tall as the key. */
+const KEY_RULE_X = KEY_X - 42;
+const KEY_RULE_H = 300;
 
 type EndRow = {
   beat: string;
@@ -420,7 +425,9 @@ export const EndsScene: React.FC = () => {
         <Fig n="4" at={oneFrom} x={LEFT_X} y={y(268)}>
           The four ends, and feet at both
         </Fig>
-        {/* Fig. 3's key stays on as the legend, from the moment Fig. 3 lifts. */}
+        {/* Fig. 3's key stays on as the legend, from the moment Fig. 3 lifts,
+            set off from the readings beside it by a hairline that inks in with it. */}
+        <ColumnRule x={KEY_RULE_X} top={y(ROW_Y)} height={KEY_RULE_H} at={oneFrom - 10} />
         <EndKey top={y(ROW_Y) - 6} at={oneFrom - 12} hits={keyHits} />
         {rows.map((r) => {
           const a = r.left.anchor("right");
