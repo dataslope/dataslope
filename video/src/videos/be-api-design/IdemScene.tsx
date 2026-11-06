@@ -190,15 +190,20 @@ export const IdemScene: React.FC = () => {
         {/* A racing duplicate, refused by the unique constraint. */}
         <Note at={safeAt} x={X0} y={raceTop}>
           <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-            Two retries racing: <span style={{ color: OK_INK }}>the database refuses the second</span>
+            What makes it safe: <span style={{ fontFamily: MONO, fontWeight: 600 }}>idempotency_key</span> is <span style={{ color: OK_INK }}>UNIQUE</span>
           </span>
         </Note>
-        <Note at={refusesAt} x={X0} y={raceTop + h(50)}>
+        <Note at={racingAt} x={X0} y={raceTop + h(44)}>
+          <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
+            Two retries racing, one key: <b style={{ color: OK_INK }}>the database refuses the second</b>
+          </span>
+        </Note>
+        <Note at={refusesAt} x={X0} y={raceTop + h(92)}>
           <div
             style={{
               borderLeft: `4px solid ${OK}`,
               background: `color-mix(in srgb, ${OK} 8%, ${PAPER})`,
-              padding: "12px 20px 14px",
+              padding: "10px 20px 12px",
               fontFamily: MONO,
               fontSize: 21,
               lineHeight: 1.4,
@@ -210,11 +215,6 @@ export const IdemScene: React.FC = () => {
           >
             {IDEM.duplicate}
           </div>
-        </Note>
-        <Note at={racingAt} x={X0} y={raceTop + h(122)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 600 }}>idempotency_key</span> is <b style={{ color: OK_INK }}>UNIQUE</b>: two inserts of one key can't both get in
-          </span>
         </Note>
       </Drift>
     </AbsoluteFill>
