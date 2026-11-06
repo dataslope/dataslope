@@ -42,13 +42,11 @@ export const ApproachScene: React.FC = () => {
   const boxesEnd = n.word("q1", "Not by drawing boxes", { edge: "end" });
   const firstAt = n.word("q1", "First, clarify the requirements");
   const listsAt = n.word("q1", "in two lists");
-  const funcAt = n.word("q1-func", "Functional");
   const mustAt = n.word("q1-func", "what the system must do");
   const shortenAt = n.word("q1-func", "Shorten a long URL");
   const sendAt = n.word("q1-func", "send anyone who opens the short one");
   const aliasAt = n.word("q1-func", "custom aliases");
   const expireAt = n.word("q1-func", "Links that expire");
-  const nfAt = n.word("q1-nonfunc", "Non-functional");
   const nfWords = ["scale", "latency", "availability", "consistency"].map((w) => n.word("q1-nonfunc", w));
   const fastAt = n.word("q1-nonfunc", "Redirects must be fast");
   const failAt = n.word("q1-nonfunc", "almost never fail");

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, INK, INK_SOFT, PAPER, label, svgText } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -35,7 +35,6 @@ export const TailScene: React.FC = () => {
   const meanAt = n.word("q2-tail", "the mean thirty-one");
   const oneAt = n.word("q2-tail", "one request in a hundred");
   const p99At = n.word("q2-tail", "two hundred and eighty-six or more");
-  const pctAt = n.word("q2-tail", "the ninety-ninth percentile");
   const pageAt = n.word("q2-fanout", "A page that makes a hundred calls");
   const chanceAt = n.word("q2-fanout", "each with that one-in-a-hundred chance");
   const hitsAt = n.word("q2-fanout", "hits at least one");

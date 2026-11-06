@@ -89,7 +89,7 @@ export const BreakerScene: React.FC = () => {
   const chartIn = ease(frame, retriesAt - 10, 14);
   const green = ease(frame, aloneAt, 14);
   const errInk = green > 0 ? `color-mix(in srgb, ${OK} ${Math.round(green * 100)}%, ${BAR})` : BAR;
-  const bandAt = [nothingAt, probeAt, againAt, passesAt];
+  const bandAt = [opensAt, probeAt, againAt, passesAt];
   const probeY1 = reqBot + h(56);
   const probeY2 = reqBot + h(92);
 
