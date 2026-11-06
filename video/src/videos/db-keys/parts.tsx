@@ -131,9 +131,11 @@ export const Headline: React.FC<{
   );
 };
 
-/** Code set inside running text or a label, at the text's own size. */
+/** Code set inside running text or a label, at the text's own size: 0.92em
+ *  matches JetBrains Mono's x-height to the line's and stays inside the one
+ *  size a line may hold (PageAudit's 12%). */
 export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?: number }> = ({ children, color, weight }) => (
-  <span style={{ fontFamily: MONO, fontSize: "0.88em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none" }}>
+  <span style={{ fontFamily: MONO, fontSize: "0.92em", fontStyle: "normal", fontWeight: weight ?? 600, color, fontVariantLigatures: "none" }}>
     {children}
   </span>
 );
@@ -487,8 +489,10 @@ export const Reply: React.FC<{
 
 /** JetBrains Mono's advance, in em: every glyph is this wide. */
 const ADVANCE = 0.6;
-/** A header tag ("PK", "UNIQUE"): the 19px floor, the smallest type on screen. */
-const TAG_SIZE = 19;
+/** A header tag ("PK", "UNIQUE") beside its column title: a little smaller
+ *  than the title, but within the 12% a line may vary (PageAudit), and
+ *  never under the 19px floor. */
+const tagSize = (headSize: number) => Math.max(19, Math.round(headSize * 0.9));
 
 export type Col = {
   name: string;
@@ -529,7 +533,7 @@ export const tableGeometry = ({ x, top, cols, rows, extra = [], headH, rowH, hea
   const widths = cols.map((c, i) =>
     Math.ceil(
       Math.max(
-        c.name.length * ADVANCE * headSize + (c.tag ? c.tag.text.length * TAG_SIZE * 0.66 + 36 : 0),
+        c.name.length * ADVANCE * headSize + (c.tag ? c.tag.text.length * tagSize(headSize) * 0.66 + 36 : 0),
         ...all.map((r) => (r[i] ?? "").length * ADVANCE * bodySize),
       ) +
         2 * pad,
@@ -707,7 +711,7 @@ export const DataTable: React.FC<{
             {c.name}
             {c.tag ? (
               <span style={{ opacity: ease(frame, c.tag.at, 10), transform: `scale(${0.8 + 0.2 * ease(frame, c.tag.at, 10)})` }}>
-                <Tag color={c.tag.color ?? KEY_INK} size={TAG_SIZE}>
+                <Tag color={c.tag.color ?? KEY_INK} size={tagSize(g.headSize)}>
                   {c.tag.text}
                 </Tag>
               </span>

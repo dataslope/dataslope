@@ -108,7 +108,8 @@ export const ChooseScene: React.FC = () => {
                     <span
                       style={{
                         fontFamily: MONO,
-                        fontSize: 28,
+                        // Within 12% of the question it answers: one line, one size.
+                        fontSize: 35,
                         fontWeight: 700,
                         color: ACCENT_INK,
                         padding: "2px 14px",
@@ -130,7 +131,8 @@ export const ChooseScene: React.FC = () => {
           {/* ── ON UPDATE: the same question ── */}
           <div style={{ position: "absolute", left: ROOT_X, top: y(766) - 14, width: 1700, height: 1, background: HAIRLINE, opacity: ease(frame, changingAt - 4, 12) * 0.6 }} />
           <Ink at={changingAt - 2} dur={16} style={{ left: ROOT_X, top: y(766), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 16 }}>
-            <Tag color={INK} size={22} mono>
+            {/* At the sentence's own size, less the 12% a line may vary. */}
+            <Tag color={INK} size={29} mono>
               ON UPDATE
             </Tag>
             <span style={{ ...body(32, true), color: INK }}>

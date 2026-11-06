@@ -20,6 +20,7 @@ import {
   Mark,
   Mono,
   RIGHT,
+  Spot,
   TableName,
   tableGeometry,
   X0,
@@ -44,6 +45,7 @@ export const RulesScene: React.FC = () => {
 
   // ── Cues ──
   const from = n.beat("rules").from;
+  const keyWordAt = n.word("rules", "a key");
   const uniqueAt = n.word("rules", "unique");
   const neverAt = n.word("rules", "never null");
   const adaAt = n.word("dup", "Ada");
@@ -70,6 +72,7 @@ export const RulesScene: React.FC = () => {
   return (
     <AbsoluteFill>
       {/* ── Sound: Ada, each refused row and its error, the struck rows ── */}
+      <Sfx name="el-pop" at={keyWordAt - 2} level={-30} />
       <Sfx name="el-tap" at={adaAt - 2} level={-28} />
       <Sfx name="el-pop" at={graceAt} level={-30} />
       <Sfx name="el-scratch" at={refusedAt + 2} level={-30} />
@@ -79,6 +82,7 @@ export const RulesScene: React.FC = () => {
 
       <Drift from={from} to={end + 50}>
         <Headline lead="Unique," turn="and never null." at={uniqueAt - 6} turnAt={neverAt - 4} />
+        <Spot id="db-keys-key" at={keyWordAt - 4} left={950} top={y(104)} width={185} height={170} />
 
         {/* The table, the two statements and Postgres's answers: one figure. */}
         <FigLabel n="2" title="Two inserts the primary key refuses" at={from - 4} x={X0} y={y(FIG_Y)} />
