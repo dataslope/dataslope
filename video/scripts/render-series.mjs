@@ -33,7 +33,7 @@
  * chapters are not written into the file itself.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { openerId, SERIES, unitLabel } from "../src/series.ts";
@@ -196,6 +196,7 @@ for (const name of names) {
     output,
   ]);
 
+  rmSync(list);
   const chaptersTxt = path.join(SERIES_OUT, `${stem}.chapters.txt`);
   writeFileSync(chaptersTxt, chapters.map((c) => `${clock(c.start)} ${chapterTitle(c.unit)}`).join("\n") + "\n");
   console.log(`→ ${path.relative(VIDEO_ROOT, output)} (${clock(probe(output).duration)}, ${Math.round((Date.now() - started) / 1000)}s)`);
