@@ -440,7 +440,8 @@ export const ThreeScene: React.FC = () => {
         <StripSample key={i} index={i + 1} step={st} popBase={y(popBase)} px={PX} />
       ))}
       {fastSample >= 1 ? <FastDots index={fastSample} /> : null}
-      <Note at={thousandAt} x={RX} y={y(752)} from="up" out={piledAt + 10}>
+      {/* Under the counter, which it follows. */}
+      <Note at={thousandAt} x={RX} y={y(592)} from="up" out={piledAt + 10}>
         <span style={note(22, INK_SOFT)}>each a different {N} of the million</span>
       </Note>
       <Rule

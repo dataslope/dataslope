@@ -150,7 +150,7 @@ export const DrawScene: React.FC = () => {
             })}
             {/* The count, and under it what it is out of: two lines, so each
                 is one size and one face. */}
-            <Note at={tileAt(k, DRAWS - 1) + 4} x={COUNT_X} y={top + h(TILE_H) / 2 - 37}>
+            <Note at={tileAt(k, DRAWS - 1) + 4} x={COUNT_X} y={top + h(TILE_H) / 2 - 41}>
               <span style={{ display: "block", whiteSpace: "nowrap" }}>
                 <span
                   style={{ display: "block", ...headline(44), color: TEXT[0], fontVariantNumeric: "tabular-nums lining-nums" }}
@@ -169,7 +169,8 @@ export const DrawScene: React.FC = () => {
                     r.counts[0]
                   )}
                 </span>
-                <span style={{ display: "block", marginTop: 2, ...note(20, INK_SOFT) }}>of {DRAWS}</span>
+                {/* Clear of the highlighter, which reaches below the number's line. */}
+                <span style={{ display: "block", marginTop: 10, ...note(20, INK_SOFT) }}>of {DRAWS}</span>
               </span>
             </Note>
           </React.Fragment>
