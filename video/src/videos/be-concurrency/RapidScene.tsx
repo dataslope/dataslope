@@ -188,8 +188,8 @@ const Safe: React.FC<{ c: Ctx }> = ({ c }) => {
     { at: oneAt, text: "keep it in one thread, fed by a queue" },
   ];
   const qX = R_X + 230;
-  const ownerX = qX + 300;
-  const stateX = ownerX + 270;
+  const ownerX = qX + 310;
+  const stateX = ownerX + 330;
   const dY = c.y(626);
   return (
     <>
@@ -221,12 +221,12 @@ const Safe: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={queueAt + 4} x={qX} y={dY + c.h(44)}>
         <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>a thread-safe queue</span>
       </Note>
-      <Flow points={[[qX + 228, dY], [ownerX - 10, dY]]} at={queueAt + 10} color={BAR} width={2.6} head={13} />
-      <Note at={oneAt + 4} x={ownerX} y={dY - 15} width={190} from="up" style={{ textAlign: "center" }}>
+      <Flow points={[[qX + 232, dY], [ownerX - 14, dY]]} at={queueAt + 10} color={BAR} width={2.6} head={13} />
+      <Note at={oneAt + 4} x={ownerX} y={dY - 15} width={226} from="up" style={{ textAlign: "center" }}>
         <span style={{ ...label(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>one owner thread</span>
       </Note>
-      <Flow points={[[ownerX + 198, dY], [stateX - 10, dY]]} at={oneAt + 10} color={OK} width={2.6} head={13} />
-      <Note at={oneAt + 10} x={stateX} y={dY - 15} width={150} from="up" style={{ textAlign: "center" }}>
+      <Flow points={[[ownerX + 240, dY], [stateX - 14, dY]]} at={oneAt + 10} color={OK} width={2.6} head={13} />
+      <Note at={oneAt + 10} x={stateX} y={dY - 15} width={120} from="up" style={{ textAlign: "center" }}>
         <span style={{ ...label(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the state</span>
       </Note>
       <Note at={shareAt} x={R_X} y={c.y(780)}>
