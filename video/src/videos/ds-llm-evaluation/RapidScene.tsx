@@ -62,7 +62,7 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
           {s.text}
         </Tag>
       ))}
-      <Note at={diagAt - 2} x={R_X} y={c.y(830)}>
+      <Note at={diagAt - 2} x={R_X} y={c.y(800)}>
         <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
           keep the thumbs-up rate as{" "}
           <span style={{ opacity: ease(frame, targetAt - 2, 10) }}>
@@ -197,7 +197,7 @@ export const RapidScene: React.FC = () => {
             {p.text}
           </Tag>
         ))}
-        <Note at={workAt - 2} x={X0} y={y(740)}>
+        <Note at={workAt - 2} x={X0} y={y(700)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap", opacity: 0.4 + 0.6 * ease(frame, workAt, 12) }}>
             so you can find the rounds that still need work
           </span>
