@@ -23,7 +23,7 @@ const CARD = { x: 380, w: 480 };
 const BOT = { x: 940, w: 230 };
 const GATE = { x: 1250, w: 200 };
 const TOOL = { x: 1530, w: 250 };
-const OUT_V = 640;
+const OUT_V = 652;
 // Part three: the three circles.
 const R = 150;
 
@@ -294,12 +294,12 @@ export const InjectionScene: React.FC = () => {
           <Clear at={noFixAt - 6}>
             {weak.map((w, i) => (
               <React.Fragment key={w.text}>
-                <Ink at={w.at - 2} dur={12} style={{ left: X0, top: y(500 + i * 66) }}>
+                <Ink at={w.at - 2} dur={12} style={{ left: X0, top: y(512 + i * 66) }}>
                   <span style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
                     <Strike at={w.at + 12}>{w.text}</Strike>
                   </span>
                 </Ink>
-                <Note at={w.whyAt - 2} x={560} y={y(500 + i * 66) + 2}>
+                <Note at={w.whyAt - 2} x={560} y={y(512 + i * 66) + 2}>
                   <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>{w.why}</span>
                 </Note>
               </React.Fragment>
@@ -307,7 +307,7 @@ export const InjectionScene: React.FC = () => {
           </Clear>
 
           {/* What does: limit what a successful injection can do. */}
-          <Note at={noFixAt} x={X0} y={y(500)}>
+          <Note at={noFixAt} x={X0} y={y(512)}>
             <span style={line(27, INK)}>
               No complete fix,{" "}
               <span style={{ opacity: ease(frame, limitAt - 2, 10) }}>
@@ -315,13 +315,13 @@ export const InjectionScene: React.FC = () => {
               </span>
             </span>
           </Note>
-          <Note at={leastAt} x={X0} y={y(560)}>
+          <Note at={leastAt} x={X0} y={y(572)}>
             <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>least privilege</span>
           </Note>
-          <Note at={humanAt} x={X0 + 230} y={y(560)}>
+          <Note at={humanAt} x={X0 + 230} y={y(572)}>
             <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>human confirmation</span>
           </Note>
-          <Note at={untrustedAt} x={X0 + 500} y={y(560)}>
+          <Note at={untrustedAt} x={X0 + 500} y={y(572)}>
             <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>output as untrusted input</span>
           </Note>
           <Node x={X0} y={outTop} w={240} h={h(76)} at={untrustedAt + 4} title="model output" tone="plain" size={22} />
@@ -341,13 +341,13 @@ export const InjectionScene: React.FC = () => {
           </Note>
 
           {/* Secrets, and a log. */}
-          <Pill x={X0} y={y(770)} at={secretsAt} tone="ok" size={21}>
+          <Pill x={X0} y={y(782)} at={secretsAt} tone="ok" size={21}>
             secrets kept out of prompts
           </Pill>
-          <Pill x={X0 + 360} y={y(770)} at={logAt} tone="ok" size={21}>
+          <Pill x={X0 + 360} y={y(782)} at={logAt} tone="ok" size={21}>
             every tool call logged
           </Pill>
-          <Note at={tracedAt} x={X0 + 680} y={y(774)}>
+          <Note at={tracedAt} x={X0 + 680} y={y(786)}>
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>so an incident can be traced</span>
           </Note>
         </Clear>

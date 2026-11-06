@@ -28,11 +28,11 @@ const along = (pts: readonly P[], t: number): P => {
 /** The three items, in the cart's colors. */
 const ITEM_FILL = [ds("yellow", 500), ds("red", 400), ds("blue", 300)];
 
-const CART = { x: X0, w: 760, top: 432, h: 182 };
+const CART = { x: X0, w: 800, top: 432, h: 182 };
 const CHIP_H = 52;
 const ADD_ALL = { x: 150, w: 170 };
 const ADD = { x: 400, w: 120 };
-const ITEMS = { x: 600, w: 250 };
+const ITEMS = { x: 600, w: 290 };
 const CHILD = { x: X0, w: 400, top: 668, h: 86 };
 const COUNTER_X = 580;
 

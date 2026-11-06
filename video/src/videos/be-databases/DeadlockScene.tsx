@@ -173,6 +173,10 @@ export const DeadlockScene: React.FC = () => {
           </span>
         </Note>
 
+        <Note at={twoAt} x={1800} y={y(250) + h(8)} align="right">
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>drawn: it needs two sessions at once</span>
+        </Note>
+
         {/* ── The lanes ── */}
         <Svg opacity={lanesIn}>
           {[

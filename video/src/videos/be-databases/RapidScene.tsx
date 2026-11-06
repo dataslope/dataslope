@@ -286,7 +286,6 @@ const Keys: React.FC<{ c: Ctx }> = ({ c }) => {
 // ── 16. Covering index ──────────────────────────────────────────────────────
 
 const Cover: React.FC<{ c: Ctx }> = ({ c }) => {
-  const frame = useCurrentFrame();
   const holdsAt = c.w("r-cover", "holds every column a query needs");
   const aloneAt = c.w("r-cover", "answers from the index alone");
   const zeroAt = c.w("r-cover", "zero trips to the table");

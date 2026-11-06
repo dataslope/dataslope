@@ -2,20 +2,21 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { during, ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { KARAT, partOf } from "./data";
-import { Chip, Drift, Flow, Headline, Kicker, Mark, Spot } from "./parts";
+import { Drift, Flow, Headline, Kicker, Mark, Spot } from "./parts";
 
-/** The fork: the coding round's band at the top centre, and the two
+/** The fork: the coding round's heading at the top centre, and the two
  *  columns it splits into, each centred under its head. Layout units for
- *  positions (through y()), px across. */
+ *  positions (through y()), px across. Every group on this page is plain
+ *  text held together by spacing: no cards, boxes or pills. */
 const ROOT_Y = 262;
-const ROOT_W = 340;
-const ROOT_H = 56;
+/** The heading's line, in px: the fork starts under it. */
+const ROOT_LINE = 42;
 const FORK_Y = 350;
 const HEAD_Y = 392;
 const CAPTION_Y = 434;
@@ -24,9 +25,8 @@ const COL_W = 760;
 const COL_GAP = 160;
 const colX = (c: number) => COL_L + c * (COL_W + COL_GAP);
 const colCx = (c: number) => colX(c) + COL_W / 2;
-/** The company cards under each head. */
+/** The companies under each head, one centred block each. */
 const CARD_Y = 500;
-const CARD_H = 92;
 const CARD_STEP = 106;
 /** The take-home and the survey, under the fork once the cards go. The
  *  envelope (1024 by 868) is the scene's one spot, 180 by 153, with the
@@ -41,13 +41,18 @@ const TRACK_W = 560;
 const MOVED_W = 540;
 const MOVED_GAP = 30;
 const movedX = (c: number) => COL_L + c * (MOVED_W + MOVED_GAP);
+/** How far the three blocks, and the LLM row under them, sit below the
+ *  sentence that introduces them, in px. */
+const MOVED_DROP = 76;
+const LLM_DROP = 196;
 
 type Company = { name: string; when: string; what: React.ReactNode; at: number };
 
-/** One company's policy: its name and when on the first row, what changed
- *  under it. Neutral ink in both columns: neither kind of round is the right
- *  answer, so neither is green or red. */
-const Card: React.FC<{ c: number; i: number; company: Company; out: number }> = ({ c, i, company, out }) => {
+/** One company's policy, as a centred block of text under its column's
+ *  head: its name and when on the first line, what changed under it.
+ *  Neutral ink in both columns: neither kind of round is the right answer,
+ *  so neither is green or red. */
+const CompanyBlock: React.FC<{ c: number; i: number; company: Company; out: number }> = ({ c, i, company, out }) => {
   const frame = useCurrentFrame();
   const { y, h } = useLayout();
   const p = ease(frame, company.at - 2, 14) * (1 - ease(frame, out, 12));
@@ -59,21 +64,16 @@ const Card: React.FC<{ c: number; i: number; company: Company; out: number }> = 
         left: colX(c),
         top: y(CARD_Y) + i * h(CARD_STEP),
         width: COL_W,
-        height: h(CARD_H),
-        boxSizing: "border-box",
-        border: `1.5px solid ${HAIRLINE}`,
-        borderRadius: 12,
-        background: PAPER,
-        padding: "12px 22px 0",
+        textAlign: "center",
         opacity: p,
         transform: `translateY(${(1 - p) * 12}px)`,
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <span style={{ ...note(28, INK), fontWeight: 650 }}>{company.name}</span>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{company.when}</span>
+      <div style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+        <span style={{ fontWeight: 650 }}>{company.name}</span>
+        <span style={{ color: INK_SOFT }}> · {company.when}</span>
       </div>
-      <div style={{ ...note(23, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>{company.what}</div>
+      <div style={{ ...note(23, INK_SOFT), marginTop: 6, whiteSpace: "nowrap" }}>{company.what}</div>
     </div>
   );
 };
@@ -111,28 +111,17 @@ const SurveyBar: React.FC<{ top: number; pct: number; at: number; children: Reac
   );
 };
 
-/** One of the three places the time went: a card with its name and the
- *  part that answers it. */
+/** One of the three places the time went: its name and the part that
+ *  answers it, as a block of text in its column. */
 const Moved: React.FC<{ c: number; at: number; title: string; part: React.ReactNode }> = ({ c, at, title, part }) => {
   const frame = useCurrentFrame();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
   const p = ease(frame, at - 2, 14);
   if (p <= 0) return null;
   return (
-    <div style={{ position: "absolute", left: movedX(c), top: y(PANEL_Y) + 70, width: MOVED_W, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
-      <div
-        style={{
-          boxSizing: "border-box",
-          height: h(108),
-          border: `1.5px solid ${HAIRLINE}`,
-          borderRadius: 12,
-          background: PAPER,
-          padding: "20px 24px 0",
-        }}
-      >
-        <div style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{title}</div>
-        <div style={{ ...label(22, BLUE_INK), marginTop: 12, whiteSpace: "nowrap", opacity: ease(frame, at + 12, 12) }}>{part}</div>
-      </div>
+    <div style={{ position: "absolute", left: movedX(c), top: y(PANEL_Y) + MOVED_DROP, width: MOVED_W, opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
+      <div style={{ ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap" }}>{title}</div>
+      <div style={{ ...label(22, BLUE_INK), marginTop: 10, whiteSpace: "nowrap", opacity: ease(frame, at + 12, 12) }}>{part}</div>
     </div>
   );
 };
@@ -140,7 +129,7 @@ const Moved: React.FC<{ c: number; at: number; title: string; part: React.ReactN
 /**
  * What AI has changed, answering the AI page's "How have coding interviews
  * changed since AI assistants became standard?". The coding round as one
- * band that forks into two columns, AI allowed and AI banned, each filling
+ * heading that forks into two columns, AI allowed and AI banned, each filling
  * with the companies the page names as they are said, and Part 9 under the
  * allowed column. Then, under the fork, why: a take-home an assistant
  * finishes unseen, its envelope (the scene's one spot) fading, beside
@@ -179,7 +168,7 @@ export const AiScene: React.FC = () => {
   const readAt = n.word("ai-moved", "reading and debugging unfamiliar code");
   const designAt = n.word("ai-moved", "design discussions with follow-ups");
   const llmAt = n.word("ai-llm", "system design now takes in");
-  const llmChips = [
+  const llmTopics = [
     { text: "streaming", at: n.word("ai-llm", "streaming") },
     { text: "retries", at: n.word("ai-llm", "retries") },
     { text: "cost in tokens", at: n.word("ai-llm", "cost measured in tokens") },
@@ -210,17 +199,17 @@ export const AiScene: React.FC = () => {
     { name: "Google", when: "2025", what: "a round brought back in person", at: n.word("ai-banned", "Google has brought back") },
   ];
 
-  // The cards give way to the take-home and the survey, and those to where
+  // The companies give way to the take-home and the survey, and those to where
   // the time went, each in the pause before its beat.
   const cardsOut = whyFrom - 10;
   const panel = during(frame, finishAt - 4, movedFrom - 6, 10);
 
   const rootTop = y(ROOT_Y);
-  const rootBottom = rootTop + h(ROOT_H);
+  const rootBottom = rootTop + ROOT_LINE;
   const forkY = y(FORK_Y);
   const headTop = y(HEAD_Y);
   const fork = (c: number): [number, number][] => [
-    [960, rootBottom + 4],
+    [960, rootBottom + 8],
     [960, forkY],
     [colCx(c), forkY],
     [colCx(c), headTop - 4],
@@ -243,7 +232,7 @@ export const AiScene: React.FC = () => {
       {[extendAt, readAt, designAt].map((at) => (
         <Sfx key={at} name="el-tap" at={at} level={-32} />
       ))}
-      {llmChips.map((c) => (
+      {llmTopics.map((c) => (
         <Sfx key={c.text} name="el-tap" at={c.at} level={-35} />
       ))}
       <Sfx name="el-pencil" at={roundByRoundAt} level={-35} />
@@ -252,23 +241,19 @@ export const AiScene: React.FC = () => {
         <Kicker at={from}>How AI has changed the interview</Kicker>
         <Headline lead="Since 2025," turn="it has split in two." at={sinceAt} turnAt={splitAt} size={62} />
 
-        {/* The coding round, then the fork into its two kinds. */}
+        {/* The coding round, a plain heading, then the fork into its two
+            kinds. */}
         <div
           style={{
             position: "absolute",
-            left: 960 - ROOT_W / 2,
+            left: 960 - 300,
+            width: 600,
             top: rootTop,
-            width: ROOT_W,
-            height: h(ROOT_H),
-            boxSizing: "border-box",
-            border: `1.5px solid ${HAIRLINE}`,
-            borderRadius: 12,
-            background: PAPER,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            ...note(30, INK),
+            height: ROOT_LINE,
+            textAlign: "center",
+            ...note(32, INK),
             fontWeight: 650,
+            lineHeight: `${ROOT_LINE}px`,
             opacity: ease(frame, roundAt - 2, 12),
           }}
         >
@@ -338,15 +323,17 @@ export const AiScene: React.FC = () => {
           algorithm practice still matters: <span style={label(22, BLUE_INK)}>Part {partOf("be-algorithms")}</span>
         </div>
         {allowed.map((c, i) => (
-          <Card key={c.name} c={0} i={i} company={c} out={cardsOut} />
+          <CompanyBlock key={c.name} c={0} i={i} company={c} out={cardsOut} />
         ))}
         {banned.map((c, i) => (
-          <Card key={c.name} c={1} i={i} company={c} out={cardsOut} />
+          <CompanyBlock key={c.name} c={1} i={i} company={c} out={cardsOut} />
         ))}
         <div
           style={{
             position: "absolute",
-            left: colX(0) + 22,
+            left: colX(0),
+            width: COL_W,
+            textAlign: "center",
             top: y(CARD_Y) + 3 * h(CARD_STEP) + 4,
             ...label(22, BLUE_INK),
             whiteSpace: "nowrap",
@@ -420,24 +407,26 @@ export const AiScene: React.FC = () => {
             </>
           }
         />
-        {/* What system design now takes in: one row under the three cards,
-            its words, its chips and its part all at one size. */}
+        {/* What system design now takes in: one line of words under the
+            three blocks, its topics joined by middle dots, all at one size. */}
         <div
           style={{
             position: "absolute",
             left: COL_L,
-            top: y(PANEL_Y) + 70 + h(108) + 44,
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            fontSize: 24,
+            top: y(PANEL_Y) + LLM_DROP,
+            ...note(24, INK),
             whiteSpace: "nowrap",
             opacity: ease(frame, llmAt - 2, 12),
           }}
         >
-          <span style={{ ...note(24, INK), marginRight: 6 }}>System design now takes in features that call an LLM:</span>
-          {llmChips.map((c) => (frame >= c.at - 2 ? <Chip key={c.text} at={c.at} size={24}>{c.text}</Chip> : null))}
-          <span style={{ ...label(24, BLUE_INK), marginLeft: 10, opacity: ease(frame, llmChips[3].at + 12, 12) }}>
+          System design now takes in features that call an LLM:{" "}
+          {llmTopics.map((t, k) => (
+            <span key={t.text} style={{ fontWeight: 650, opacity: ease(frame, t.at - 2, 10) }}>
+              {k ? <span style={{ fontWeight: 500, color: INK_SOFT }}> · </span> : null}
+              {t.text}
+            </span>
+          ))}
+          <span style={{ ...label(24, BLUE_INK), marginLeft: 22, opacity: ease(frame, llmTopics[3].at + 12, 12) }}>
             Part {partOf("be-ai-round")}
           </span>
         </div>

@@ -18,9 +18,10 @@ const BAR_MAX = 230;
 const BAR_W = 100;
 /** The count over each bar, and the hero standing on it, in px. */
 const COUNT_H = 36;
-const ART_W = 150;
-const ART_H = 110;
-/** The Python page's outline, top left, over the short bars of Parts 1 to 3. */
+const ART_W = 100;
+const ART_H = 74;
+/** The Python page's two grey lines, top left, over the short bars of
+ *  Parts 1 to 3; the arrow leaves from their right, at their middle. */
 const GHOST_Y = 300;
 const GHOST_W = 640;
 const GHOST_H = 80;
@@ -223,20 +224,15 @@ export const SeriesScene: React.FC = () => {
           );
         })}
 
-        {/* The page the series leaves out, as an outline, and the arrow that
-            takes its design questions into Part 5. */}
+        {/* The page the series leaves out, as two lines of grey text (no
+            box), and the arrow that takes its design questions into Part 5. */}
         {python > 0 ? (
           <div
             style={{
               position: "absolute",
               left: LEFT,
-              top: ghostTop,
+              top: ghostTop + 8,
               width: GHOST_W,
-              height: h(GHOST_H),
-              boxSizing: "border-box",
-              border: `2px dashed ${HAIRLINE}`,
-              borderRadius: 12,
-              padding: "12px 20px 0",
               opacity: python * (1 - dimmed(2)),
             }}
           >
