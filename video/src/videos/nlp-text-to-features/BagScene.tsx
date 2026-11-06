@@ -142,7 +142,7 @@ export const BagScene: React.FC = () => {
       {/* ── Fig. 7: three documents, counted ── */}
       <FigLabel n="7" title="Three tiny documents, counted" at={docsAt - 6} x={FIG7_X} y={y(FIG_Y)} />
       {BOW.corpus.map((d, i) => (
-        <Ink key={i} at={docsAt - 2 + i * 5} dur={16} style={{ left: FIG7_X, top: y(DOC_Y0 + i * DOC_STEP), display: "flex", alignItems: "baseline", gap: 30, whiteSpace: "nowrap" }}>
+        <Ink key={i} at={docsAt - 2 + i * 5} dur={16} style={{ left: FIG7_X, top: y(DOC_Y0 + i * DOC_STEP), display: "flex", alignItems: "baseline", gap: 40, whiteSpace: "nowrap" }}>
           {/* The name stands more than 1.2em clear of its sentence, so it
               reads as a column of names, not as part of the line. */}
           <span style={{ ...label(21, INK_SOFT), width: 60 }}>doc{i + 1}</span>
