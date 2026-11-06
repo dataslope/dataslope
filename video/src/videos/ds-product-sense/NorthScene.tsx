@@ -3,21 +3,22 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Chip, Clear, DATA, Drift, pulse, Strike, Svg, X0 } from "./parts";
+import { Clear, Drift, pulse, Strike, Svg, X0 } from "./parts";
+import { Tag } from "./tag";
 
 const STAR = { top: 330, w: 640, h: 180 };
 const CHECKS_X = 900;
 const RAIL = { top: 600, x1: 1700 };
 
 /**
- * Questions 1 and 2. The north star as one card: weekly cooks, people who
+ * Questions 1 and 2. The north star as one group of plain text: weekly cooks, people who
  * open a recipe in cooking mode, ticked against the three things a good one
  * does, with total signups struck beside it. Then the guardrails as a rail
- * of chips under it: the health checks you refuse to harm, and the one that
+ * with their names under it: the health checks you refuse to harm, and the one that
  * catches more notifications buying sessions while people quietly leave.
  */
 export const NorthScene: React.FC = () => {
@@ -86,7 +87,9 @@ export const NorthScene: React.FC = () => {
         </QuestionCard>
 
         <Clear at={lieAt}>
-          {/* The north star: one card, named once the narration names it. */}
+          {/* The north star: a label, the metric large, and what it counts,
+              set as one group of plain text; the bridge's pulse lights the
+              metric's words. */}
           <div
             style={{
               position: "absolute",
@@ -94,19 +97,24 @@ export const NorthScene: React.FC = () => {
               top: y(STAR.top),
               width: STAR.w,
               height: h(STAR.h),
-              boxSizing: "border-box",
-              border: `3px solid ${DATA}`,
-              borderRadius: 16,
-              background: `color-mix(in srgb, ${HIGHLIGHT} ${glow * 60}%, color-mix(in srgb, ${DATA} 8%, ${PAPER}))`,
               opacity: card,
               transform: `translateY(${(1 - card) * 20}px)`,
             }}
           >
-            <div style={{ position: "absolute", left: 30, top: 22, ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>★ north star</div>
-            <div style={{ position: "absolute", left: 28, top: 58, ...note(52, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: named }}>
-              weekly cooks
+            <div style={{ position: "absolute", left: 0, top: 22, ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>★ north star</div>
+            <div style={{ position: "absolute", left: 0, top: 58, ...note(52, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: named }}>
+              <span
+                style={{
+                  padding: "0 10px",
+                  margin: "0 -10px",
+                  borderRadius: 6,
+                  background: glow > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${glow * 100}%, transparent)` : undefined,
+                }}
+              >
+                weekly cooks
+              </span>
             </div>
-            <div style={{ position: "absolute", left: 30, top: 128, ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, modeAt, 12) }}>
+            <div style={{ position: "absolute", left: 0, top: 128, ...note(23, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, modeAt, 12) }}>
               people who open a recipe in cooking mode
             </div>
           </div>
@@ -175,7 +183,7 @@ export const NorthScene: React.FC = () => {
             ))}
           </Svg>
           {rails.map((r, i) => (
-            <Chip
+            <Tag
               key={r.text}
               x={X0 + i * 300}
               y={y(RAIL.top) + h(52)}
@@ -184,7 +192,7 @@ export const NorthScene: React.FC = () => {
               ink={r.text === "unsubscribes" ? leaveInk : INK}
             >
               {r.text}
-            </Chip>
+            </Tag>
           ))}
           <Note at={gamedAt - 2} x={X0} y={y(RAIL.top) + h(150)}>
             <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>almost any single number can be gamed:</span>
@@ -196,11 +204,11 @@ export const NorthScene: React.FC = () => {
               <span style={{ color: ACCENT_INK, fontWeight: 650, opacity: ease(frame, leaveAt, 10) }}>, people quietly leave ▼</span>
             </span>
           </Note>
-          {/* The guardrail catches the harm, so its line runs from the chip to
+          {/* The guardrail catches the harm, so its line runs from its name to
               "people quietly leave", not to the sessions it was gamed for. */}
           <Svg opacity={ease(frame, leaveAt + 4, 12)}>
             <path
-              d={`M ${X0 + 800} ${y(RAIL.top) + h(104)} Q ${X0 + 1100} ${y(RAIL.top) + h(112)} ${X0 + 1230} ${y(RAIL.top) + h(150) - 4}`}
+              d={`M ${X0 + 700} ${y(RAIL.top) + h(102)} Q ${X0 + 1100} ${y(RAIL.top) + h(112)} ${X0 + 1230} ${y(RAIL.top) + h(150) - 4}`}
               fill="none"
               stroke={ACCENT}
               strokeWidth={2.4}

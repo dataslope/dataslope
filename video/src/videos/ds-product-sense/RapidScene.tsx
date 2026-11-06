@@ -8,7 +8,8 @@ import { NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, RATIO, TRADE } from "./data";
-import { Chip, DATA, Drift, Headline, Kicker, madeUp, Mark, OK_INK, Spot, Strike, X0 } from "./parts";
+import { DATA, Drift, Headline, Kicker, madeUp, Mark, OK_INK, Spot, Strike, X0 } from "./parts";
+import { Tag } from "./tag";
 
 /** Where the answers go: right of the list. */
 const R_X = 800;
@@ -51,9 +52,9 @@ const Trade: React.FC<{ c: Ctx }> = ({ c }) => {
             <div style={{ position: "absolute", left: R_X + 244 + r.v * unit, top: top + c.h(4), ...note(26, r.ink), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap", opacity: p }}>
               +{r.v}%
             </div>
-            <Chip x={R_X + 340 + r.v * unit} y={top - c.h(2)} at={Math.max(r.tagAt, r.at) + 4} size={22} ink={r.ink}>
+            <Tag x={R_X + 340 + r.v * unit} y={top - c.h(2)} at={Math.max(r.tagAt, r.at) + 4} size={22} ink={r.ink}>
               {r.tag}
-            </Chip>
+            </Tag>
           </React.Fragment>
         );
       })}
@@ -109,11 +110,11 @@ const Vanity: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={preferAt - 2} x={R_X + 40} y={c.y(640)}>
-        <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>prefer rates and cohorts:</span>
+        <span style={{ ...note(27, INK), whiteSpace: "nowrap" }}>
+          prefer rates and cohorts:{" "}
+          <span style={{ color: OK_INK, fontWeight: 650, opacity: ease(frame, retentionAt - 2, 12) }}>week-four retention</span>
+        </span>
       </Note>
-      <Chip x={R_X + 380} y={c.y(632)} at={retentionAt - 2} ink={OK_INK} size={25}>
-        week-four retention
-      </Chip>
     </>
   );
 };

@@ -3,17 +3,19 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, PAPER, TABULAR, label, note, svgText } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note, svgText } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { IMPACT, MARKET, num, pct } from "./data";
-import { at, Bracket, DATA, DATA_LIGHT, Drift, madeUp, Mark, OK, OK_INK, type Scale, Strike, Svg, X0 } from "./parts";
+import { at, Bracket, DATA, DATA_LIGHT, Drift, madeUp, Mark, MARK_OK, OK_INK, type Scale, Strike, Svg, X0 } from "./parts";
 
 const CHAIN = { top: 380, w: 270, h: 150, gap: 76 };
 const AXIS = { x1: 1700, y: 640 };
 
-/** One factor of the estimate: its value large, what it assumes under it. */
+/** One factor of the estimate as plain text: its value large, what it
+ *  assumes close under it. The result's value is in the right answer's
+ *  green, under the green highlighter. */
 const Factor: React.FC<{ x: number; top: number; w: number; at: number; out: number; value: string; text: string; result?: boolean }> = ({
   x,
   top,
@@ -33,19 +35,15 @@ const Factor: React.FC<{ x: number; top: number; w: number; at: number; out: num
       style={{
         position: "absolute",
         left: x,
-        top,
+        top: top + 18,
         width: w,
-        height: CHAIN.h,
-        boxSizing: "border-box",
-        border: `2.4px solid ${result ? OK_INK : INK}`,
-        borderRadius: 14,
-        background: result ? `color-mix(in srgb, ${OK} 10%, ${PAPER})` : PAPER,
         opacity: p * (1 - o),
         transform: `translateY(${(1 - p) * 16}px)`,
-        padding: "18px 20px",
       }}
     >
-      <div style={{ ...note(40, result ? OK_INK : INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>{value}</div>
+      <div style={{ ...note(40, result ? OK_INK : INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+        {result ? <Mark at={from + 6} color={MARK_OK}>{value}</Mark> : value}
+      </div>
       <div style={{ ...label(21, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>{text}</div>
     </div>
   );
@@ -143,7 +141,7 @@ export const SizeScene: React.FC = () => {
         {factors.map((f, i) => (
           <React.Fragment key={f.text}>
             <Factor x={xOf(i)} top={y(CHAIN.top)} w={CHAIN.w} at={f.at - 2} out={out10} value={f.value} text={f.text} />
-            <Note at={f.at + 4} x={xOf(i) + CHAIN.w + 14} y={y(CHAIN.top) + h(52)} out={out10}>
+            <Note at={f.at + 4} x={xOf(i) + CHAIN.w} y={y(CHAIN.top) + h(52)} out={out10}>
               <span style={{ ...note(40, INK_SOFT), whiteSpace: "nowrap" }}>{i < factors.length - 1 ? "×" : "="}</span>
             </Note>
           </React.Fragment>

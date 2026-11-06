@@ -38,7 +38,7 @@ const stepOf = (line: string) => STEPS.findIndex((s) => line.startsWith(s.clause
 
 /**
  * Question 2, the order a query runs in, logically. The page's query as it is
- * written, each line badged with where it runs; the run order as a list of
+ * written, each line numbered with where it runs; the run order as a list of
  * steps, and the note that the engine may do the work in another order so
  * long as the answer matches; and the page's 24 orders going through the
  * first four steps (24 rows, 11, 4 groups, 2). Then why WHERE can't see a
@@ -247,7 +247,9 @@ export const OrderScene: React.FC = () => {
   );
 };
 
-/** A step's number in a ring. */
+/** A step's number, plain, in a slot the size its ring used to be, so it
+ *  sits centred on its line: the listing's lines and the run order share
+ *  them. Soft ink and the sans face, so a number never reads as code. */
 const StepBadge: React.FC<{ n: number }> = ({ n }) => (
   <span
     style={{
@@ -256,10 +258,7 @@ const StepBadge: React.FC<{ n: number }> = ({ n }) => (
       justifyContent: "center",
       width: 32,
       height: 32,
-      borderRadius: 999,
-      border: `2px solid ${INK}`,
-      background: PAPER,
-      ...label(19, INK),
+      ...label(24, INK_SOFT),
       ...TABULAR,
       fontWeight: 700,
     }}

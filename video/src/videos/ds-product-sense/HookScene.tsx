@@ -2,17 +2,24 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HOOK, num } from "./data";
 import { Clear, DATA, Drift, Headline, Kicker, madeUp, Mark, pulse, Spot, X0 } from "./parts";
 
+/** The two numbers' columns: the first column's left edge is X0, the second's
+ *  starts `gap` after the first's `w`, with a hairline centred in the gap. */
 const TILE = { top: 300, w: 520, h: 270, gap: 40 };
 const SQUARES = { top: 700, size: 54, gap: 14, small: 40 };
+/** Where a column's pieces sit under its top (the name's line box sits 22
+ *  down, where the tile's border used to hold it), and its small line's width. */
+const COL = { name: 22, value: 54, delta: 136, lineTop: 184, lineBottom: 244, lineW: 460 };
 
-/** A dashboard tile: its name, its number, the change, and a small line. */
+/** One number off the dashboard, set as a column of plain text: its name,
+ *  its value, the change, and a small line. `lit` lays the highlighter behind
+ *  the value; `dim` fades the column back. */
 const Tile: React.FC<{
   x: number;
   top: number;
@@ -32,11 +39,10 @@ const Tile: React.FC<{
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
   const draw = ease(frame, lineAt, 24);
   if (p <= 0) return null;
-  const sw = TILE.w - 60;
-  const sh = 60;
   const lo = Math.min(...line);
   const hi = Math.max(...line);
-  const pts = line.map((v, i) => [30 + (i / (line.length - 1)) * sw, TILE.h - 26 - ((v - lo) / (hi - lo || 1)) * sh] as const);
+  const sh = COL.lineBottom - COL.lineTop;
+  const pts = line.map((v, i) => [(i / (line.length - 1)) * COL.lineW, COL.lineBottom - ((v - lo) / (hi - lo || 1)) * sh] as const);
   return (
     <div
       style={{
@@ -45,17 +51,24 @@ const Tile: React.FC<{
         top,
         width: TILE.w,
         height: TILE.h,
-        boxSizing: "border-box",
-        border: `2px solid ${INK}`,
-        borderRadius: 14,
-        background: `color-mix(in srgb, ${HIGHLIGHT} ${l * 45}%, ${PAPER})`,
         opacity: p * (1 - d),
         transform: `translateY(${(1 - p) * 20}px)`,
       }}
     >
-      <div style={{ position: "absolute", left: 30, top: 22, ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>{name}</div>
-      <div style={{ position: "absolute", left: 28, top: 54, ...note(64, INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>{value}</div>
-      <div style={{ position: "absolute", left: 30, top: 136, opacity: ease(frame, deltaAt, 10), ...TABULAR, whiteSpace: "nowrap" }}>{delta}</div>
+      <div style={{ position: "absolute", left: 0, top: COL.name, ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>{name}</div>
+      <div style={{ position: "absolute", left: 0, top: COL.value, ...note(64, INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+        <span
+          style={{
+            padding: "0 10px",
+            margin: "0 -10px",
+            borderRadius: 6,
+            background: l > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${l * 100}%, transparent)` : undefined,
+          }}
+        >
+          {value}
+        </span>
+      </div>
+      <div style={{ position: "absolute", left: 0, top: COL.delta, opacity: ease(frame, deltaAt, 10), ...TABULAR, whiteSpace: "nowrap" }}>{delta}</div>
       <svg width={TILE.w} height={TILE.h} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         <path
           d={pts.map(([px, py], i) => `${i ? "L" : "M"}${px},${py}`).join(" ")}
@@ -106,6 +119,7 @@ export const HookScene: React.FC = () => {
   // Cumulative signups only climb; the cohort line holds, then slips.
   const signups = Array.from({ length: 24 }, (_, i) => 1 + i * 0.9 + (i % 3) * 0.12);
   const cooking = [31, 31.2, 30.9, 31.1, 31, 31.2, 30.8, 31, 31.1, 30.9, 31, 31.1, 30.9, 31, 30.8, 30.6, 30.2, 29.9, 29.6, 29.3, 29.1, 29, 29.1, 29];
+  const col2 = X0 + TILE.w + TILE.gap;
   const sqIn = (i: number) => (i < 11 ? elevenAt + i * 1.5 : threeAt + (i - 11) * 3);
 
   return (
@@ -136,8 +150,21 @@ export const HookScene: React.FC = () => {
             lineAt={everyAt - 4}
             dim={onlyAt + 6}
           />
+          {/* The hairline between the two columns, as tall as their text,
+              inking in with the second. */}
+          <div
+            style={{
+              position: "absolute",
+              left: (X0 + COL.lineW + col2) / 2,
+              top: y(TILE.top) + COL.name,
+              width: 1,
+              height: COL.lineBottom - COL.name,
+              background: HAIRLINE,
+              opacity: ease(frame, cookingAt - 4, 14),
+            }}
+          />
           <Tile
-            x={X0 + TILE.w + TILE.gap}
+            x={col2}
             top={y(TILE.top)}
             at={cookingAt - 4}
             name="Still cooking 4 weeks after joining"
@@ -152,7 +179,7 @@ export const HookScene: React.FC = () => {
             lineAt={downAt - 2}
             lit={onlyAt + 6}
           />
-          <Note at={wrongAt} x={X0 + TILE.w + TILE.gap} y={y(TILE.top) + h(TILE.h) + h(22)}>
+          <Note at={wrongAt} x={col2} y={y(TILE.top) + h(TILE.h) + h(22)}>
             <span style={{ ...note(28, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
               <Mark at={wrongAt + 4}>the one that can say something is wrong</Mark>
             </span>
@@ -160,7 +187,7 @@ export const HookScene: React.FC = () => {
           <Note at={madeUpAt} x={X0} y={y(TILE.top) - h(44)}>
             <span style={{ ...madeUp(21), opacity: 1 }}>one made-up recipe app: all its numbers are invented</span>
           </Note>
-          <Note at={codeAt} x={X0 + 2 * TILE.w + TILE.gap} align="right" y={y(TILE.top) - h(44) - 5}>
+          <Note at={codeAt} x={col2 + COL.lineW} align="right" y={y(TILE.top) - h(44) - 5}>
             <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>no code in this round</span>
           </Note>
 

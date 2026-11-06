@@ -8,7 +8,8 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { num, pct, SAMPLE } from "./data";
-import { Chip, Clear, DATA, Drift, lerp, Mark, OK, OK_INK, Strike, Svg, WARM, WARM_INK, X0 } from "./parts";
+import { Clear, DATA, Drift, lerp, Mark, OK, OK_INK, Strike, Svg, WARM, WARM_INK, X0 } from "./parts";
+import { Tag } from "./tag";
 
 const ARMS = { top: 470, w: 300, h: 190, gap: 60 };
 const RIGHT_X = 900;
@@ -266,20 +267,22 @@ export const RecScene: React.FC = () => {
           <Note at={switchAt - 2} x={ALT_X} y={y(340)}>
             <span style={{ ...note(29, INK), fontWeight: 650, whiteSpace: "nowrap" }}>instead:</span>
           </Note>
-          <Chip x={ALT_X} y={y(396)} at={switchAt} size={25} ink={BLUE_INK}>
-            randomize whole regions
-          </Chip>
-          <Chip x={ALT_X + 370} y={y(396)} at={slotsAt} size={25} ink={BLUE_INK}>
-            or switch by time slot
-          </Chip>
+          <Note at={switchAt} x={ALT_X} y={y(396) + h(10)} from="up">
+            <span style={{ ...note(25, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+              randomize whole regions
+              <span style={{ opacity: ease(frame, slotsAt, 12) }}>
+                <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span>or switch by time slot
+              </span>
+            </span>
+          </Note>
           <Note at={baselineAt} x={ALT_X} y={y(478)}>
             <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>or compare against a baseline:</span>
           </Note>
           {methods.map((m, i) => (
             <React.Fragment key={m.text}>
-              <Chip x={ALT_X} y={y(526) + i * h(62)} at={m.at - 2} size={25} ink={BLUE_INK}>
+              <Tag x={ALT_X} y={y(526) + i * h(62)} at={m.at - 2} size={25} ink={BLUE_INK}>
                 {m.text}
-              </Chip>
+              </Tag>
               <Note at={m.glossAt} x={ALT_X + 386} y={y(526) + i * h(62) + h(9)}>
                 <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>{m.gloss}</span>
               </Note>
