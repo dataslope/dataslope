@@ -83,8 +83,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     verify, the time it was wrong) filling as they are read; then METR's
  *     two bars, 19% longer measured and about 20% faster felt, on opposite
  *     sides of zero, and a speedometer (spot art) between them.
- *   - "close", "close-practice": the seven heroes of the series' videos in a
- *     row with the lemur; then the track's practice, counted: concept checks
+ *   - "close", "close-practice": the series' ten heroes in a row, from the
+ *     overview's capybara to the lemur; then the track's practice, counted: concept checks
  *     on every topic page, code that runs on most, and the bank of 110.
  *
  * Facts. check.mjs reads the page's tables and listings out of the page,
@@ -147,7 +147,7 @@ export const script: NarrationScript = {
     {
       id: "hook",
       scene: true,
-      text: "Some coding rounds now come with an assistant built in. The code will get written; that was never the hard part. What's graded is everything around it: what you ask for, what you accept, and what you check.",
+      text: "Some coding rounds now come with an assistant built in, so the code will get written either way. What's graded is everything around it: what you ask for, what you accept, and what you check.",
       pauseAfter: 0.7,
     },
     {
@@ -180,7 +180,7 @@ export const script: NarrationScript = {
     },
     {
       id: "grade-past",
-      text: "So when time runs short, take one prep guide's advice: solve part of the problem by hand, rather than present a whole solution you can't explain.",
+      text: "One prep guide's advice is worth keeping: better to solve part of the problem by hand than to present a solution you can't explain.",
       pauseAfter: 0.8,
     },
 
@@ -228,7 +228,7 @@ export const script: NarrationScript = {
     },
     {
       id: "prompt-check",
-      text: "It says what must not change, the server's public handler, and asks for tests at the edges: the hundredth and hundred and first request in one window, a request exactly sixty seconds after the first, and two users who don't affect each other.",
+      text: "It says what must not change, the public interface of the server's handler, and asks for tests at the edges: the hundredth and hundred and first request in one window, a request exactly sixty seconds after the first, and two users who don't affect each other.",
       pauseAfter: 0.6,
     },
     {
@@ -309,7 +309,7 @@ export const script: NarrationScript = {
     {
       id: "inj",
       scene: true,
-      text: "Question six. What is prompt injection, and how do you defend against it? It's input that the model follows as instructions, and it's first on OWASP's twenty twenty-five top ten for LLM applications.",
+      text: "Question six. What is prompt injection, and how do you defend against it? It's input that the model follows as instructions. It's first on the twenty twenty-five top ten risks for LLM applications, from the security project OWASP.",
       pauseAfter: 0.6,
     },
     {
@@ -370,7 +370,7 @@ export const script: NarrationScript = {
     {
       id: "close",
       scene: true,
-      text: "Every round in this series asks one thing, from a different side: can you tell good code from plausible code, and say why? An assistant can write either. Telling them apart is still the job.",
+      text: "Every round in this series comes back to the same test: telling a good answer from a plausible one, and saying why. An assistant can produce either. Telling them apart is still your job.",
       pauseAfter: 0.8,
     },
     {

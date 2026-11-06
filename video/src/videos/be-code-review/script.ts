@@ -199,7 +199,7 @@ export const script: NarrationScript = {
     },
     {
       id: "bugs-past",
-      text: "Notice which of them make a noise. An invented API fails as soon as its line runs, unless someone has registered the package. The other six run quietly and survive the happy path, so running the example proves very little. Three of them are in our eight lines.",
+      text: "Notice which of them make a noise. An invented API fails as soon as its line runs, unless someone has registered the package. The other six run quietly and survive the happy path, so running the example proves very little. Three of them are in our diff.",
       pauseAfter: 0.8,
     },
 
@@ -247,7 +247,7 @@ export const script: NarrationScript = {
     },
     {
       id: "debug-explain",
-      text: "Step five: explain what was wrong, why the fix is right, and what else might share the flaw. Here, the loop relied on sorted input and nothing guaranteed it, so the fix supplies the order it relies on.",
+      text: "Step five: explain what was wrong, why the fix is right, and what else might share the flaw. Here, the loop relied on sorted input that nothing guaranteed, and the fix guarantees it.",
       pauseAfter: 0.6,
     },
     {

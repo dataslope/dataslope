@@ -365,12 +365,18 @@ l = []
 base = sys.getsizeof(l)
 last = 0
 resizes = []
-for i in range(1_000_000):
+running = 0
+per_append = {}
+for i in range(2_000_000):
     l.append(i)
     c = (sys.getsizeof(l) - base) // P
     if c != last:
-        resizes.append([len(l) - 1, c])
+        if len(l) <= 1_000_000:
+            resizes.append([len(l) - 1, c])
+        running += len(l) - 1
         last = c
+    if len(l) in (1_000, 10_000, 100_000, 1_000_000, 2_000_000):
+        per_append[str(len(l))] = running / len(l)
 moved = sum(r[0] for r in resizes)
 largest = max(resizes, key=lambda r: r[0])
 growth = [r[1] / resizes[i - 1][1] for i, r in enumerate(resizes) if i > 0 and resizes[i - 1][1] >= 1000]
@@ -384,6 +390,8 @@ R["amortized"] = {
     "resizes": len(resizes),
     "copiesIfEveryResizeCopies": moved,
     "copiesPerAppend": moved / 1_000_000,
+    # The same ratio at other lengths ("at any length"), on into 2,000,000.
+    "copiesPerAppendAt": per_append,
     "largestResize": largest[0],
     "finalCapacity": resizes[-1][1],
     "meanGrowthAbove1000": sum(growth) / len(growth),

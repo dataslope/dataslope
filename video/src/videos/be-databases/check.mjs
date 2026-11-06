@@ -44,8 +44,15 @@ const { createEngine } = await import(lib("scripts/lib/sql-engines.mjs"));
 const { PGlite } = await import(lib("node_modules/@electric-sql/pglite/dist/index.js"));
 const { pageinspect } = await import(lib("node_modules/@electric-sql/pglite/dist/contrib/pageinspect.js"));
 
+/** A timestamp without time zone, as psql prints it to the second. PGlite
+ *  parses one as local time, so the local getters give back the wall clock
+ *  on any machine. */
+const two = (n) => String(n).padStart(2, "0");
+const wallClock = (d) =>
+  `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())} ${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())}`;
+
 /** A value as psql prints it. */
-const shown = (v) => (v === null || v === undefined ? null : v instanceof Date ? v.toISOString().replace("T", " ").replace(/\.000Z$/, "") : String(v));
+const shown = (v) => (v === null || v === undefined ? null : v instanceof Date ? wallClock(v) : String(v));
 
 /** sql-engines' engine interface over a PGlite opened with options. */
 async function pgliteWith(options) {
@@ -170,12 +177,12 @@ results.figures.composite = await pgFigure(ORDERS, {
   customers: "SELECT COUNT(DISTINCT customer_id) AS customers, COUNT(*) / COUNT(DISTINCT customer_id) AS each FROM orders;",
   create: "CREATE INDEX orders_customer_created_idx\n  ON orders (customer_id, created_at);\nANALYZE orders;",
   latest: LATEST,
-  latestPlan: `${EXPLAIN}\n${LATEST}`,
+  latestPlan: `${EXPLAIN_BUFFERS}\n${LATEST}`,
   dayCount: ONE_DAY,
   dayPlan: `${EXPLAIN}\n${ONE_DAY}`,
   // The same two columns, the other way round.
   reverse: "DROP INDEX orders_customer_created_idx;\nCREATE INDEX orders_created_customer_idx\n  ON orders (created_at, customer_id);\nANALYZE orders;",
-  reversePlan: `${EXPLAIN}\n${LATEST}`,
+  reversePlan: `${EXPLAIN_BUFFERS}\n${LATEST}`,
   // A leading column with four values: Postgres 18's skip scan searches the
   // index once per status instead of reading the table.
   skip: "DROP INDEX orders_created_customer_idx;\nCREATE INDEX orders_status_created_idx\n  ON orders (status, created_at);\nANALYZE orders;",
