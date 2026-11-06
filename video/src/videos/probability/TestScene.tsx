@@ -193,7 +193,7 @@ export const TestScene: React.FC = () => {
         {/* The two answers side by side, each named on its own line above
             it, and set at one size, so the eye compares the numbers. */}
         <Ink at={gutAt - 2} dur={14} style={{ left: 1100, top: y(654), whiteSpace: "nowrap" }}>
-          <div style={note(26, INK_SOFT)}>Your gut</div>
+          <div style={{ ...note(26, INK_SOFT), marginBottom: 16 }}>Your gut</div>
           <Big size={100} color={INK_SOFT}>
             <Strike at={answerAt - 2} top="0.5em">
               {pct(TEST.sensitivity)}
@@ -201,7 +201,7 @@ export const TestScene: React.FC = () => {
           </Big>
         </Ink>
         <Ink at={answerAt + 2} dur={14} style={{ left: 1390, top: y(654), whiteSpace: "nowrap" }}>
-          <div style={note(26, INK)}>The answer</div>
+          <div style={{ ...note(26, INK), marginBottom: 16 }}>The answer</div>
           <span style={{ opacity: ease(frame, nineAt - 4, 12) }}>
             <Big size={100} color={STAT_INK} italic>
               about {pct(TEST.treePpv)}

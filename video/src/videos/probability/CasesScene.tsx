@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { SANS } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
 import { MONTY } from "./data";
-import { DATA, DATA_INK, FAINT, GOLD, GOLD_INK, Headline, lerp, ROOM, STAT, STAT_INK, Svg } from "./parts";
+import { DATA, DATA_INK, FAINT, GOLD, GOLD_INK, Headline, lerp, ROOM, Spot, STAT, STAT_INK, Svg } from "./parts";
 
 /** The three cases, one row each: where the car is, given you picked door 1. */
 const ROWS = [350, 530, 710];
@@ -40,6 +40,7 @@ export const CasesScene: React.FC = () => {
   // ── Cues ──
   const casesFrom = n.beat("cases").from;
   const pickAt = n.word("cases", "first pick");
+  const carAt = n.word("cases", "car");
   const oneInAt = n.word("cases", "one time in three");
   const otherAt = n.word("goat", "other two times");
   const goatAt = n.word("goat", "picked a goat");
@@ -181,6 +182,10 @@ export const CasesScene: React.FC = () => {
         </span>
       </Note>
 
+      {/* The car, right of the cases while they are drawn large; it leaves
+          before the chart of games takes that side. */}
+      <Spot id="probability-car" at={carAt - 2} out={randomAt - 30} left={1530} top={y(400)} width={262} height={h(185)} />
+
       {/* ── A hundred thousand games ── */}
       <FigLabel n="7" title={`Win rate so far, over ${MONTY.trials.toLocaleString("en-US")} games`} at={randomAt - 6} x={CH.x0} y={y(268)} />
       <Svg opacity={axis}>
@@ -232,9 +237,9 @@ export const CasesScene: React.FC = () => {
         </span>
       </Note>
       {/* How many games have been played, counting up as the lines run. */}
-      <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 6, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(22, INK_SOFT) }}>games </span>
-        <span style={{ ...note(34, INK), fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
+      {/* One line, one size: the count stands out by weight and color. */}
+      <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 2, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap", ...note(30, INK_SOFT) }}>
+        games <span style={{ color: INK, fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
       </div>
 
       </div>

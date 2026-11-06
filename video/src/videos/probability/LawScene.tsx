@@ -265,7 +265,8 @@ export const LawScene: React.FC = () => {
       </Ink>
       {Array.from({ length: 5 }, (_, i) => {
         const x0 = MEM.x0 + i * MEM.pitch;
-        const y0 = y(MEM.y);
+        // A little above MEM.y, so the coins keep a clear row above "The next flip".
+        const y0 = y(MEM.y - 10);
         // On "paid back" a copy of the streak flies to where this run really
         // had five heads in a row, flips 21 to 25, and lands in a row over
         // them; the panel keeps its own, set back.
