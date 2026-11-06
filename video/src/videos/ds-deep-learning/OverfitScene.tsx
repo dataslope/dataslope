@@ -173,8 +173,8 @@ export const OverfitScene: React.FC = () => {
           </span>
         </Note>
 
-        {/* ── The fixes: plain ticked words, held apart by space ── */}
-        <div style={{ position: "absolute", left: FIT.left, top: y(FIX_Y), width: 650, display: "flex", flexWrap: "wrap", columnGap: 40, rowGap: 14 }}>
+        {/* ── The fixes: a plain ticked list, one fix to a line ── */}
+        <div style={{ position: "absolute", left: FIT.left, top: y(FIX_Y), display: "flex", flexDirection: "column", rowGap: 12 }}>
           {fixes.map((f) => {
             const p = ease(frame, f.at - 2, 10);
             const isStop = f.at === stopAt;

@@ -173,6 +173,9 @@ export const OpenScene: React.FC = () => {
         <span style={{ ...note(24, INK_SOFT), display: "block", marginBottom: 8 }}>Probability of heads</span>
         <span style={{ ...headline(128), color: INK }}>½</span>
       </Ink>
+      {/* A hairline between the half and the single flip, inking in with
+          the flip: the height of the two columns, centred in their gap. */}
+      <div style={{ position: "absolute", left: 515, top: y(300), width: 1, height: 172, background: HAIRLINE, opacity: ease(frame, singleAt - 4, 14) * (1 - defDim * 0.4) }} />
       <Ink at={singleAt - 4} dur={14} style={{ left: 640, top: y(300), whiteSpace: "nowrap", opacity: 1 - defDim * 0.4 }}>
         <span style={note(24, INK_SOFT)}>One flip</span>
       </Ink>
@@ -238,15 +241,19 @@ export const OpenScene: React.FC = () => {
       {/* ── The count: a hundred thousand flips in code. Each label sits on
            its own line above its value, so the values share one line at one
            size and the share stands out by its color alone. ── */}
-      <div style={{ position: "absolute", left: 160, top: y(790), display: "flex", alignItems: "flex-start", gap: 64 }}>
+      {/* The three counts side by side, a hairline in each gap inking in
+          with the count to its right. */}
+      <div style={{ position: "absolute", left: 160, top: y(790), display: "flex", alignItems: "stretch", gap: 32 }}>
         <Ink at={hundredAt - 4} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
           <div style={note(24, INK_SOFT)}>Flips</div>
           <Count at={hundredAt - 2} dur={28} to={COIN.flips} format={num} style={{ ...note(40, INK), fontWeight: 650, display: "block" }} />
         </Ink>
+        <div style={{ width: 1, background: HAIRLINE, opacity: ease(frame, fiftyAt - 6, 14) }} />
         <Ink at={fiftyAt - 6} dur={14} style={{ position: "relative", whiteSpace: "nowrap" }}>
           <div style={{ ...note(24, DATA), fontWeight: 650 }}>Heads</div>
           <Count at={fiftyAt - 4} dur={30} to={COIN.heads} format={num} style={{ ...note(40, INK), fontWeight: 650, display: "block" }} />
         </Ink>
+        <div style={{ width: 1, background: HAIRLINE, opacity: ease(frame, pointAt - 4, 16) }} />
         <Ink at={pointAt - 4} dur={16} style={{ position: "relative", whiteSpace: "nowrap" }}>
           <div style={note(24, INK_SOFT)}>
             Share

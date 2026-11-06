@@ -127,10 +127,11 @@ export const UnitScene: React.FC = () => {
       <Drift from={from} to={nextAt}>
         <QuestionCard n={3} at={qAt - 4} textAt={textAt - 4} size={60}>
           What is the randomization unit, and{" "}
+          {/* The question mark inside the highlight: after it, the
+              highlighter's 0.14em margin set it apart as "matter ?". */}
           <Mark at={whyAt} out={requestAt}>
-            why does it matter
+            why does it matter?
           </Mark>
-          ?
         </QuestionCard>
 
         {/* What gets assigned: one line of plain text, the usual unit in the

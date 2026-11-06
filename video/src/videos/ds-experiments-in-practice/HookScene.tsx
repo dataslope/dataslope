@@ -14,6 +14,8 @@ const CARD_W = 760;
 const ROW_H = 74;
 const HEAD_H = 64;
 const FLAG_X = X0 + CARD_W + 36;
+/** The readout's cells: its text sits this far in from the ends of its rules. */
+const CELL_PAD = 14;
 
 /**
  * The opening: an experiment readout that says ship it, taken apart. Its
@@ -94,7 +96,7 @@ export const HookScene: React.FC = () => {
             transformOrigin: "left center",
           }}
         >
-          <div style={{ height: HEAD_H, display: "flex", alignItems: "center", borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ height: HEAD_H, display: "flex", alignItems: "center", padding: `0 ${CELL_PAD}px`, borderBottom: `1px solid ${HAIRLINE}` }}>
             <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>New checkout · A/B test readout</span>
             <span style={{ marginLeft: 18, display: "inline-flex", alignItems: "center", gap: 8, ...label(20, OK_INK), fontWeight: 700 }}>
               <span style={{ width: 10, height: 10, borderRadius: 5, background: OK, opacity: live }} />
@@ -146,19 +148,18 @@ export const HookScene: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
+                  padding: `0 ${CELL_PAD}px`,
                   borderTop: i ? `1px solid ${HAIRLINE}` : undefined,
                   opacity: p,
                 }}
               >
+                {/* A flagged row fills between its rules, as a table row is
+                    highlighted. */}
                 {flag > 0 ? (
                   <div
                     style={{
                       position: "absolute",
-                      left: -12,
-                      right: -12,
-                      top: 8,
-                      bottom: 8,
-                      borderRadius: 4,
+                      inset: 0,
                       background: `color-mix(in srgb, ${MARK_BAD} ${flag * 100}%, transparent)`,
                     }}
                   />

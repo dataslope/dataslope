@@ -9,14 +9,16 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Mark, MARK_OK, OK_INK, pulse, Strike, X0 } from "./parts";
 
-const PLAN_W = 800;
+/** The plan's rows: as wide as its longest line (the sample size, about
+ *  720), so their rules stop well short of the divider. */
+const PLAN_W = 740;
 const PLAN_TOP = 290;
 const ROW_TOP = 344;
 const ROW = 74;
 const KEY_W = 210;
 const RIGHT_X = 1010;
 /** The hairline between the plan, once it has moved left, and Question 2:
- *  centred between the plan's widest line (about 860) and RIGHT_X. */
+ *  centred between the end of the plan's rows (860) and RIGHT_X. */
 const DIVIDER_X = 936;
 
 /**

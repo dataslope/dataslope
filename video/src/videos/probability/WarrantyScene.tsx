@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { normalPdf } from "../../editorial/charts";
 import { useLayout } from "../../editorial/layout";
-import { body, fmt, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, fmt, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, NextLine, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -161,6 +161,10 @@ export const WarrantyScene: React.FC = () => {
         </Ink>
 
         </div>
+
+        {/* A hairline between the two columns, from their first line to the
+            last of the sums, inking in with the column on the right. */}
+        <div style={{ position: "absolute", left: 964, top: y(330), width: 1, height: y(652) - y(330) + 36, background: HAIRLINE, opacity: ease(frame, millionAt - 4, 14) }} />
 
         {/* ── A million in code ── */}
         <Ink at={millionAt - 4} dur={14} style={{ left: RIGHT, top: y(330), whiteSpace: "nowrap" }}>

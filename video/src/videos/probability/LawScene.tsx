@@ -292,7 +292,7 @@ export const LawScene: React.FC = () => {
       })}
       <Leader points={[[landX, landY + LANDED.r + 8], [landX, fy(llnAt(STREAK[2])) - 12]]} at={paidAt + 14} dur={10} color={STAT} />
       <Note at={paidAt + 16} x={landX + 2 * LANDED.pitch + LANDED.r + 14} y={landY - 15}>
-        <span style={{ ...note(22, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, STAT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
           flips {STREAK[0]} to {STREAK_END}
         </span>
       </Note>

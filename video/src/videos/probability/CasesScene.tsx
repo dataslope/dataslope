@@ -240,27 +240,24 @@ export const CasesScene: React.FC = () => {
       </div>
 
       {/* ── The turn: outcomes so far were labels ── */}
-      {(
-        [
-          ["heads", headsAt],
-          ["a goat", aGoatAt],
-          ["a positive", positiveAt],
-        ] as const
-      ).map(([t, at], i) => (
-        <Ink key={t} at={at - 4} dur={12} style={{ left: CH.x0 + i * 200, top: y(872), whiteSpace: "nowrap" }}>
-          <span
-            style={{
-              ...note(24, INK),
-              padding: "4px 14px",
-              borderRadius: 20,
-              border: `1.5px solid ${INK_SOFT}`,
-              opacity: 1 - ease(frame, numbersAt - 2, 12) * 0.5,
-            }}
-          >
-            {t}
-          </span>
-        </Ink>
-      ))}
+      {/* Plain words on one line, a middle dot between them, each arriving
+          on its own word (no outlined pills). */}
+      <div style={{ position: "absolute", left: CH.x0, top: y(872), display: "flex", alignItems: "baseline", whiteSpace: "nowrap", opacity: 1 - ease(frame, numbersAt - 2, 12) * 0.5 }}>
+        {(
+          [
+            ["heads", headsAt],
+            ["a goat", aGoatAt],
+            ["a positive", positiveAt],
+          ] as const
+        ).map(([t, at], i) => (
+          <Ink key={t} at={at - 4} dur={12} style={{ position: "relative", whiteSpace: "nowrap" }}>
+            <span style={note(24, INK)}>
+              {i > 0 ? <span style={{ color: INK_SOFT }}>&nbsp;·&nbsp;</span> : null}
+              {t}
+            </span>
+          </Ink>
+        ))}
+      </div>
       <Ink at={labelsAt - 4} dur={12} style={{ left: CH.x0, top: y(826), whiteSpace: "nowrap" }}>
         <span style={label(22, INK_SOFT)}>
           Outcomes so far

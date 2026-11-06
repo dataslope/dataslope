@@ -12,8 +12,10 @@ import { Drift, ElbowArrow, Mark, OK, OK_INK, pulse, Svg, Tagline } from "./part
 const PANELS = [130, 710, 1290];
 const PANEL_W = 500;
 const TOP = 352;
-/** How far left of a panel its separating hairline stands. */
-const SEP = 42;
+/** The two hairlines between the panels, each centred in its gap: between
+ *  the CNN's widest line (about 568) and the RNN panel (710), and between
+ *  the RNN's widest line (about 1202) and the transformer's title (1298). */
+const SEP_X = [636, 1250];
 
 // ── The CNN: a 7x7 picture and a 3x3 filter sliding over it ──
 const GRID = 7;
@@ -265,8 +267,8 @@ export const ArchScene: React.FC = () => {
         {/* A hairline in each gap between the three panels, centred between
             one panel's widest line and the next panel's edge, inking in with
             the panel to its right. */}
-        <div style={{ position: "absolute", left: PANELS[1] - SEP, top: y(TOP) + 10, width: 1, height: h(520), background: HAIRLINE, opacity: ease(frame, rnnAt - 2, 14) }} />
-        <div style={{ position: "absolute", left: PANELS[2] - SEP, top: y(TOP) + 10, width: 1, height: h(520), background: HAIRLINE, opacity: ease(frame, tfAt - 2, 14) }} />
+        <div style={{ position: "absolute", left: SEP_X[0], top: y(TOP) + 10, width: 1, height: h(520), background: HAIRLINE, opacity: ease(frame, rnnAt - 2, 14) }} />
+        <div style={{ position: "absolute", left: SEP_X[1], top: y(TOP) + 10, width: 1, height: h(520), background: HAIRLINE, opacity: ease(frame, tfAt - 2, 14) }} />
         <ElbowArrow points={[[GX + GRID * CELL + 8, y(GY) + CELL + (OUT * OCELL) / 2], [OX - 8, y(GY) + CELL + (OUT * OCELL) / 2]]} at={slidesAt + 2} color={INK_SOFT} width={2} head={10} />
       </Drift>
     </AbsoluteFill>

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { fmt, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { fmt, HAIRLINE, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { ds } from "../../theme/brand";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
@@ -198,6 +198,9 @@ export const TestScene: React.FC = () => {
             </Strike>
           </Big>
         </Ink>
+        {/* A hairline in the gap between the two answers, inking in with
+            the answer. */}
+        <div style={{ position: "absolute", left: 1340, top: y(654) + 4, width: 1, height: 150, background: HAIRLINE, opacity: ease(frame, answerAt + 2, 14) }} />
         <Ink at={answerAt + 2} dur={14} style={{ left: 1390, top: y(654), whiteSpace: "nowrap" }}>
           <div style={{ ...note(26, INK), marginBottom: 16 }}>The answer</div>
           <span style={{ opacity: ease(frame, nineAt - 4, 12) }}>
