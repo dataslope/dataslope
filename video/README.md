@@ -42,7 +42,7 @@ ids that sort in course order:
 The `Logo-Reveals` folder holds twenty short brand clips: five stings,
 eight course openers and seven variations of the columns opener (see
 [Logo reveals](#logo-reveals)). The `Thumbnails` folder holds a YouTube
-thumbnail for each merged course and interview track, in four designs (see
+thumbnail for each merged course and interview track (see
 [YouTube thumbnails](#youtube-thumbnails)).
 
 A deep dive (`Llm-2-1-…`) is a two-minute video on one idea its unit could
@@ -630,33 +630,30 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
 ## YouTube thumbnails
 
 Stills in the Studio's `Thumbnails` folder, one per merged course and
-interview track in each of four designs, 1280x720:
-`Thumb-<Design>-<Track>`, e.g. `Thumb-Clean-DatabaseDesign`. An interview
-track comes twice, saying "Interview Prep" (`…-DataEngineer-Prep`) or
-"Interview Preparation" (`…-DataEngineer-Preparation`). Each track has its
-own watercolor animal, so the seven read apart at a glance in a list of
-results: an owl on a die (Statistics), an elephant at a card catalog
-(Database Design), a llama with books (LLMs), a parrot (NLP), a raccoon (Data
-Analyst), and the otter and meerkat of the Data Scientist and Data Engineer
-overviews.
+interview track, 1280x720: `Thumb-<Track>`, e.g. `Thumb-DatabaseDesign`. An
+interview track comes four times: saying "Interview Prep" or "Interview
+Preparation", in either of two greys (`Thumb-DataEngineer-Prep-Gray600`).
+Each track has its own watercolor animal, so the seven read apart at a
+glance in a list of results: an owl on a die (Statistics), an elephant at a
+card catalog (Database Design), a llama with books (LLMs), a parrot (NLP), a
+raccoon (Data Analyst), and the otter and meerkat of the Data Scientist and
+Data Engineer overviews.
 
-| Design | Look |
-| --- | --- |
-| `clean` | white page, the title in black, "Full Course" or "Interview Prep" in blue under it, the animal on the right |
-| `spotlight` | the same, the animal on a pale brand-blue disc |
-| `panel` | the words in white on a brand-blue panel, the kind of video in yellow, the animal stepping over the panel's edge |
-| `columns` | the columns opener's scheme: a hairline down the left, the kind of video in black, the title in blue |
+A white page, the Dataslope mark alone in the top-left corner (no
+wordmark), the words low on the left and the animal on the right, standing on
+the line the words end on.
 
-- **One size, like the openers.** Every word is set at `SIZE` (80px), and no
-  weight is above 600: weight (400 or 600) and color tell the lines apart,
-  never size. The wordmark is the one exception, set as the site header sets
-  it. No pills or badges; the words sit on the page.
+- **One weight.** Every word is Inter 500. The title is 80px (`SIZE`) in
+  black; a course's "Full Course" sits above it, smaller (52px) and in the
+  brand blue; an interview track's "Interview Prep" follows the title at the
+  title's size, in a neutral grey (`gray-600`, the soft ink, or `gray-500`).
+  No pills or badges; the words sit on the page.
 - **Seen small.** A thumbnail is about 168x94 on a phone, where 80px is about
   10px, so the words are few. The widest line, "Natural Language", fits the
   680px the words have; "Interview Preparation" does not, so it takes two
   lines.
 - **Nothing in the bottom-right corner**, where YouTube prints the running
-  time. The animal stands on the bottom of a box that stops short of it.
+  time. The animal's box stops well short of it.
 - **The art goes through the pipeline.** The five new animals are prompts in
   `src/thumbnails/illustrations.json` (watercolor, 1024x1024, transparent),
   generated and imported like any video's art:
@@ -665,7 +662,7 @@ overviews.
   are one entry in `TRACKS` (`src/thumbnails/Thumbnail.tsx`).
 
 ```bash
-npx remotion still src/index.ts Thumb-Clean-DatabaseDesign out/thumb.png
+npx remotion still src/index.ts Thumb-DatabaseDesign out/thumb.png
 ```
 
 ## Sound effects (SamplingBias, ThinkingStatistically)

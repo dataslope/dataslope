@@ -1104,7 +1104,7 @@ export const RemotionRoot: React.FC = () => (
     </Folder>
     <Folder name="Thumbnails">
       {/* YouTube thumbnails for the merged course and interview videos
-          (src/thumbnails/): four designs, one still per track. */}
+          (src/thumbnails/): one still per track. */}
       {THUMBNAILS.map(({ id, props }) => (
         <Still key={id} id={id} component={Thumbnail} width={THUMBNAIL.width} height={THUMBNAIL.height} defaultProps={props} />
       ))}
