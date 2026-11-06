@@ -181,6 +181,7 @@ beats that say them checked for re-voicing cost, before phase 3.
 
 - Part 7: ASCII ("ask-ee").
 - Part 9: OWASP ("oh-wasp"), METR ("meter").
+- Part 2: CAP ("cap"), PACELC ("pass-elk"). Part 1 says none as a word.
 - Parts 5 and 6: GIL ("gil"), SOLID ("solid"), YAGNI ("yag-nee"). Read
   letter by letter as intended: CPU, IO, HTTP, OOP, UI, CSV (confirm the
   voice spells IO out in "IO-bound").
