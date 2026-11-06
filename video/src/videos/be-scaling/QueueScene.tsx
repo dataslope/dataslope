@@ -56,7 +56,7 @@ export const QueueScene: React.FC = () => {
 
   const mid = y(ROW);
   const queueIn = ease(frame, queueAt, 14);
-  const oldOut = queueAt;
+  const oldOut = queueAt - 12;
 
   // ── The stream: clicks arrive, a burst among them, and drain at a steady
   // rate; each click's arrival and departure are fixed frames. ──

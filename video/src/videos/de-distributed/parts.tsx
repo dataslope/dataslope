@@ -408,25 +408,41 @@ export const Elbow: React.FC<{
   );
 };
 
-/** A small rounded tag: a word set in its own ink on a wash of it. */
-export const Chip: React.FC<{ children: React.ReactNode; color?: string; ink?: string; size?: number; mono?: boolean }> = ({
+/**
+ * A word set in its own ink: plain text, never an outlined or tinted chip
+ * (the house's no-cards rule); a list of them takes a middle dot between
+ * words (`Dot`). `boxed` keeps the old tile for a chip that is part of a
+ * figure, a node the arrows run into (Hadoop's `cache()` in the loop).
+ */
+export const Chip: React.FC<{ children: React.ReactNode; color?: string; ink?: string; size?: number; mono?: boolean; boxed?: boolean }> = ({
   children,
   color = BAR,
   ink = INK,
   size = 22,
   mono = false,
+  boxed = false,
 }) => (
   <span
     style={{
       display: "inline-block",
-      padding: "4px 12px",
-      borderRadius: 6,
-      background: `color-mix(in srgb, ${color} 14%, ${PAPER})`,
-      border: `1.5px solid color-mix(in srgb, ${color} 60%, ${PAPER})`,
-      ...(mono ? { fontFamily: MONO, fontSize: size * 0.92, fontWeight: 600, color: ink, fontVariantLigatures: "none" } : { ...label(size, ink), fontWeight: 600 }),
+      ...(boxed
+        ? {
+            padding: "4px 12px",
+            borderRadius: 6,
+            background: `color-mix(in srgb, ${color} 14%, ${PAPER})`,
+            border: `1.5px solid color-mix(in srgb, ${color} 60%, ${PAPER})`,
+          }
+        : {}),
+      ...(mono
+        ? { fontFamily: MONO, fontSize: Math.max(19, size * 0.92), fontWeight: 600, color: ink, fontVariantLigatures: "none" }
+        : { ...label(size, ink), fontWeight: boxed ? 600 : 650 }),
       whiteSpace: "nowrap",
     }}
   >
     {children}
   </span>
 );
+
+/** The middle dot between two words of a list set on one line, at the
+ *  words' size. */
+export const Dot: React.FC<{ size?: number }> = ({ size = 22 }) => <span style={{ ...label(size, INK_SOFT), fontWeight: 500 }}>·</span>;

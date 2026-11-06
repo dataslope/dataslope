@@ -340,16 +340,13 @@ export const RaceScene: React.FC = () => {
 
         {/* The same test, two days. */}
         <Note at={pauseAt} x={X0} y={y(846)}>
-          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Which order runs is timing:</span>
-        </Note>
-        <Note at={passAt} x={470} y={y(846)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>✓ today: pass</span>
-        </Note>
-        <Note at={failAt} x={680} y={y(846)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>✕ tomorrow: fail</span>
-        </Note>
-        <Note at={sameAt} x={960} y={y(846)}>
-          <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>same code, no change</span>
+          <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
+            Which order runs is timing:
+            <b style={{ color: OK_INK, opacity: ease(frame, passAt, 10) }}> ✓ today: pass</b>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, failAt, 10) }}> · </span>
+            <b style={{ color: ACCENT_INK, opacity: ease(frame, failAt, 10) }}>✕ tomorrow: fail</b>
+            <span style={{ color: INK_SOFT, opacity: ease(frame, sameAt, 10) }}> · same code, no change</span>
+          </span>
         </Note>
       </Drift>
     </AbsoluteFill>

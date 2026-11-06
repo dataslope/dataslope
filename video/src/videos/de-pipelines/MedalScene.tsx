@@ -141,7 +141,7 @@ export const MedalScene: React.FC = () => {
         {/* Sources feed bronze; gold feeds what the business reads. */}
         <Node x={TIER_X + 250} y={srcTop + h(30)} w={320} h={h(64)} at={bronzeAt - 4} tone="plain" title="source systems" size={24} />
         <Flow points={[[TIER_X + 410, srcTop + h(30) - 6], [TIER_X + 410, tierTop(2) + th + 8]]} at={bronzeAt} color={BAR} />
-        <Pill x={TIER_X + TIER_W + 40} y={tierTop(0) + th / 2 - 22} at={shapedAt} tone="data" size={22}>
+        <Pill x={TIER_X + TIER_W + 40} y={tierTop(0) + th / 2 - 16} at={shapedAt} tone="data" size={22}>
           dashboards, models
         </Pill>
 

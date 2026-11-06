@@ -4,7 +4,7 @@ import { arrowHead, lineLength, type Pt, roundedPolyline } from "../../component
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
 import { OK, OK_INK } from "../../editorial/interview";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, note } from "../../editorial/style";
 import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
@@ -255,18 +255,19 @@ export const CodeSpan: React.FC<{ size?: number; color?: string; children: React
   <span style={{ fontFamily: MONO, fontSize: Math.max(19, size), fontWeight: 600, color, fontVariantLigatures: "none", wordSpacing: "-0.3em" }}>{children}</span>
 );
 
-/** A small rounded tag on the page: a check's name, a setting, a state. */
+/** A short tag on the page (a check's name, a setting, a state) as plain
+ *  text in its meaning's ink: no outline, no pill. It inks in on `at`. */
 export const Pill: React.FC<{
   x: number;
   y: number;
   at: number;
   ink?: string;
-  fill?: string;
   size?: number;
+  weight?: number;
   out?: number;
   dim?: number;
   children: React.ReactNode;
-}> = ({ x, y, at: from, ink = INK, fill = PAPER, size = 22, out, dim, children }) => {
+}> = ({ x, y, at: from, ink = INK, size = 22, weight = 650, out, dim, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
@@ -278,20 +279,59 @@ export const Pill: React.FC<{
         position: "absolute",
         left: x,
         top: y,
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        padding: `${Math.round(size * 0.28)}px ${Math.round(size * 0.62)}px`,
-        border: `2px solid ${ink}`,
-        borderRadius: 999,
-        background: fill,
-        ...label(size, ink),
+        ...note(size, ink),
+        fontWeight: weight,
         whiteSpace: "nowrap",
         opacity: p * (1 - o) * (1 - d),
         transform: `translateY(${(1 - p) * 10}px)`,
       }}
     >
       {children}
+    </div>
+  );
+};
+
+/**
+ * A vertical hairline between two columns of text set side by side, at page
+ * position x (the middle of the gap), as tall as the columns' text. It inks
+ * in with the column to its right, on `at`.
+ */
+export const VRule: React.FC<{ x: number; top: number; height: number; at: number; out?: number; dim?: number }> = ({ x, top, height, at: from, out, dim }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, from - 2, 14) * (out === undefined ? 1 : 1 - ease(frame, out, 10));
+  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
+  if (p <= 0) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height, background: HAIRLINE, opacity: p * (1 - d) }} />;
+};
+
+/**
+ * Tags as one line of plain words joined by middle dots, each rising in as
+ * it is said (as the outlined pills they replace did). The dot goes in with
+ * the word after it. `style` places and sets the line.
+ */
+export const Words: React.FC<{
+  items: readonly { text: React.ReactNode; at: number; color?: string; key?: string }[];
+  style: React.CSSProperties;
+  rise?: number;
+  /** After the last word, set apart by a space rather than a dot. */
+  tail?: React.ReactNode;
+}> = ({ items, style, rise = 10, tail }) => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{ position: "absolute", whiteSpace: "nowrap", ...style }}>
+      {items.map((it, k) => {
+        const p = ease(frame, it.at, 12);
+        return (
+          <span
+            key={it.key ?? (typeof it.text === "string" ? it.text : k)}
+            style={{ display: "inline-block", opacity: p, transform: `translateY(${(1 - p) * rise}px)`, color: it.color }}
+          >
+            {k ? <span style={{ whiteSpace: "pre", color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
+            {it.text}
+          </span>
+        );
+      })}
+      {tail}
     </div>
   );
 };

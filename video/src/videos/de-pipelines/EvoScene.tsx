@@ -35,20 +35,7 @@ const FileRow: React.FC<{
   if (p <= 0 || o >= 1) return null;
   return (
     <div style={{ position: "absolute", left: X0, top: y, display: "flex", alignItems: "center", gap: 18, opacity: p * (1 - o), transform: `translateX(${(1 - p) * -14}px)` }}>
-      <span
-        style={{
-          fontFamily: MONO,
-          fontSize: 22,
-          fontWeight: 700,
-          color: INK,
-          padding: "6px 12px",
-          border: `2px solid ${INK}`,
-          borderRadius: 6,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {name}
-      </span>
+      <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: INK, whiteSpace: "nowrap", marginRight: 10 }}>{name}</span>
       <span style={{ position: "relative", display: "flex", gap: 14, fontFamily: MONO, fontSize: 21, whiteSpace: "nowrap" }}>
         <span style={{ position: "absolute", inset: "-4px -8px", background: HIGHLIGHT, borderRadius: 4, opacity: m, clipPath: `inset(0 ${(1 - m) * 100}% 0 0)` }} />
         {cols.map((c) => (
@@ -190,11 +177,12 @@ export const EvoScene: React.FC = () => {
           What is schema evolution, and how do Parquet and Avro handle it?
         </QuestionCard>
         <Note at={defAt} x={X0} y={y(296)}>
-          <span style={{ ...note(26, INK), whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 12 }}>
-            Changing a schema without breaking readers or rewriting old data:
-            {kinds.map((k) => (
-              <span key={k.text} style={{ ...label(22, BLUE_INK), fontWeight: 700, padding: "2px 10px", border: `2px solid ${BAR}`, borderRadius: 8, opacity: ease(frame, k.at, 8) }}>
-                {k.text}
+          <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+            Changing a schema without breaking readers or rewriting old data:{" "}
+            {kinds.map((k, i) => (
+              <span key={k.text} style={{ opacity: ease(frame, k.at, 8) }}>
+                {i ? <span style={{ color: INK_SOFT }}> · </span> : null}
+                <b style={{ color: BLUE_INK }}>{k.text}</b>
               </span>
             ))}
           </span>
@@ -278,11 +266,12 @@ export const EvoScene: React.FC = () => {
           </span>
         </Note>
         <Note at={resolveAt} x={X0} y={AY + h(16)}>
-          <span style={{ display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 650 }}>A reader resolves the writer's schema:</span>
-            {resolve.map((r) => (
-              <span key={r.text} style={{ ...label(21, INK), fontWeight: 650, padding: "4px 12px 5px", border: `2px solid ${INK}`, borderRadius: 8, opacity: ease(frame, r.at, 10) }}>
-                {r.text}
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
+            A reader resolves the writer's schema:{" "}
+            {resolve.map((r, i) => (
+              <span key={r.text} style={{ opacity: ease(frame, r.at, 10) }}>
+                {i ? " · " : null}
+                <span style={{ color: INK }}>{r.text}</span>
               </span>
             ))}
           </span>

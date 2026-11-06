@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { COLUMNS, FILES, MB } from "./data";
-import { COLUMN_TINT, Drift, FileBar, OK, OK_INK, PARQUET_SEGMENTS, pulse, X0 } from "./parts";
+import { COLUMN_TINT, Drift, FileBar, OK, OK_INK, PARQUET_SEGMENTS, pulse, VRule, X0 } from "./parts";
 
 const TOP = 300;
 const CARD_W = 520;
@@ -121,7 +121,7 @@ const Rows: React.FC<{ x: number; y: number; h: number; at: number; schemaAt: nu
 
 /**
  * Question 3, which also answers the Pipelines page's Parquet-over-CSV, Avro
- * and ORC questions. Three cards, each with its layout: Parquet and ORC as
+ * and ORC questions. Three columns, each with its layout: Parquet and ORC as
  * column chunks inside row groups (stripes, in ORC) with a footer of min/max
  * statistics; Avro as a schema in the header and whole records after it.
  * Then Parquet against CSV, measured on the made-up table (types, a schema,
@@ -239,7 +239,9 @@ export const FormatsScene: React.FC = () => {
           const named = pulse(frame, c.at, 18);
           return (
             <React.Fragment key={c.name}>
-              <div style={{ position: "absolute", left: x, top: y(TOP), width: CARD_W, height: 2, background: INK, transform: `scaleX(${p})`, transformOrigin: "left" }} />
+              {/* Columns, not cards: a hairline in each gap, as tall as the
+                  columns' text, inking in with the column to its right. */}
+              {i ? <VRule x={x - CARD_GAP / 2} top={y(TOP) + 12} height={y(LINES_Y) + 3 * h(LINE_H) + 28 - y(TOP) - 12} at={qEnd - 10 + i * 6} /> : null}
               <div style={{ position: "absolute", left: x, top: y(TOP) + 12, display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap", opacity: p }}>
                 <span style={{ ...headline(44), display: "inline-block", transform: `scale(${1 + 0.08 * named})`, transformOrigin: "left bottom" }}>{c.name}</span>
                 <span style={{ ...label(21, BLUE_INK), opacity: ease(frame, c.kindAt, 10) }}>{c.kind}</span>

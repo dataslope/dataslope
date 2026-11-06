@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -174,22 +174,8 @@ export const AntiScene: React.FC = () => {
         {rows.map((r, i) => (
           <Note key={r.title} at={r.at - 2} x={ROWS_X} y={y(ROW_TOP) + i * h(ROW_H)}>
             <div style={{ display: "flex", alignItems: "flex-start", gap: 18 }}>
-              <span
-                style={{
-                  width: 34,
-                  height: 34,
-                  flex: "0 0 34px",
-                  borderRadius: 17,
-                  border: `2.2px solid ${ACCENT}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  ...label(20, ACCENT_INK),
-                  fontWeight: 700,
-                }}
-              >
-                {i + 1}
-              </span>
+              {/* A plain numeral at the title's size, not a ringed badge. */}
+              <span style={{ width: 34, flex: "0 0 34px", ...note(27, ACCENT_INK), fontWeight: 700, ...TABULAR }}>{i + 1}</span>
               <div>
                 <div style={{ ...note(27, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{r.title}</div>
                 <div style={{ ...label(21, INK_SOFT), fontWeight: 500, whiteSpace: "nowrap", opacity: ease(frame, r.detailAt, 10) }}>{r.detail}</div>

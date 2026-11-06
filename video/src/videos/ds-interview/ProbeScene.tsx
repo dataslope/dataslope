@@ -2,28 +2,30 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { Drift, Headline, Kicker, Mono, X0 } from "./parts";
 
-const COL_W = 316;
-const GAP = 20;
+/** Five columns of plain text across the page from X0 to 1800, a hairline
+ *  in each gap: 56px, so every rule sits 27px from the text either side. */
+const COL_W = 291;
+const GAP = 56;
 const TOP = 290;
-const COL_H = 460;
 
 type Item = { at: number; text: React.ReactNode };
 
 /**
  * The five things interviewers probe across the loop, as the role page lists
- * them ("What interviewers probe"), standing as five columns that rise in
- * turn, each filling with its details as they are said. No one round scores
+ * them ("What interviewers probe"), as five columns of plain text ruled
+ * apart by hairlines, inking in turn, each filling with its details as they
+ * are said. No one round scores
  * all five: a SQL screen does not grade experiment design.
  */
 export const ProbeScene: React.FC = () => {
   const frame = useCurrentFrame();
   const n = useNarration();
-  const { y, h } = useLayout();
+  const { y } = useLayout();
 
   const from = n.beat("probe").from;
   const fiveAt = n.word("probe", "probe five things");
@@ -85,59 +87,46 @@ export const ProbeScene: React.FC = () => {
         <Kicker at={from}>What interviewers probe</Kicker>
         <Headline lead="Five things," turn="probed across the loop." at={from + 2} turnAt={fiveAt} size={70} />
 
-        {cols.map((c, i) => {
-          const p = ease(frame, c.at - 4, 16);
-          if (p <= 0) return null;
-          const x = X0 + i * (COL_W + GAP);
-          return (
-            <div
-              key={c.name}
-              style={{
-                position: "absolute",
-                left: x,
-                top: y(TOP),
-                width: COL_W,
-                height: h(COL_H) * p,
-                boxSizing: "border-box",
-                border: `1.5px solid ${HAIRLINE}`,
-                borderRadius: 12,
-                background: PAPER,
-                overflow: "hidden",
-                padding: "24px 24px 0",
-              }}
-            >
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 24,
-                  border: `2px solid ${BLUE_INK}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  ...label(22, BLUE_INK),
-                  ...TABULAR,
-                }}
-              >
-                {i + 1}
-              </div>
-              <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.15, marginTop: 18, minHeight: 74 }}>{c.name}</div>
-              <div style={{ marginTop: 18 }}>
-                {c.items.map((it, k) => {
-                  const q = ease(frame, it.at - 2, 12);
-                  return (
-                    <div
-                      key={k}
-                      style={{ ...note(26, INK_SOFT), lineHeight: 1.3, marginBottom: 14, opacity: q, transform: `translateX(${(1 - q) * -10}px)` }}
-                    >
-                      {it.text}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+        {/* The five as a row of columns, held in place before they ink so
+            the row never reflows; each rule is as tall as the tallest column
+            beside it and inks in with the column to its right. */}
+        <div style={{ position: "absolute", left: X0, top: y(TOP), display: "flex", alignItems: "stretch" }}>
+          {cols.map((c, i) => {
+            const p = ease(frame, c.at - 4, 16);
+            return (
+              <React.Fragment key={c.name}>
+                {i > 0 ? (
+                  <div style={{ width: GAP, display: "flex", justifyContent: "center" }}>
+                    <div style={{ width: 1, background: HAIRLINE, opacity: p }} />
+                  </div>
+                ) : null}
+                <div style={{ width: COL_W, opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>
+                  <div style={{ ...label(24, BLUE_INK), fontWeight: 700, lineHeight: 1, ...TABULAR }}>{i + 1}</div>
+                  <div style={{ ...note(32, INK), fontWeight: 650, lineHeight: 1.15, marginTop: 12, minHeight: 74 }}>{c.name}</div>
+                  <div style={{ marginTop: 20 }}>
+                    {c.items.map((it, k) => {
+                      const q = ease(frame, it.at - 2, 12);
+                      return (
+                        <div
+                          key={k}
+                          style={{
+                            ...note(26, INK_SOFT),
+                            lineHeight: 1.3,
+                            marginTop: k ? 14 : 0,
+                            opacity: q,
+                            transform: `translateX(${(1 - q) * -10}px)`,
+                          }}
+                        >
+                          {it.text}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </React.Fragment>
+            );
+          })}
+        </div>
       </Drift>
     </AbsoluteFill>
   );

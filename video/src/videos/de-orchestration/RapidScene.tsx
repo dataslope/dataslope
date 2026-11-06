@@ -9,11 +9,17 @@ import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FRESH } from "./data";
-import { Cross, Drift, Edge, Headline, Kicker, OK, OK_INK, Pill, Spot, TaskBox, X0 } from "./parts";
+import { Cross, Drift, Edge, Headline, Kicker, OK, OK_INK, Pill, Spot, TaskBox, Words, X0 } from "./parts";
 
 const R_X = 820;
 const LIST_TOP = 340;
 const ROW = 64;
+/** Question 13: the step between the two lines of what to watch, the
+ *  alert's height (its line and three fields), and how far right of it the
+ *  healed retry starts, with the hairline 50px before that. */
+const TILE_ROW = 52;
+const ALERT_H = 170;
+const HEALED_DX = 400;
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
 
@@ -106,84 +112,52 @@ const Alerts: React.FC<{ c: Ctx }> = ({ c }) => {
   const pageAt = c.w("r-alerts", "don't page on retries");
   const healAt = c.w("r-alerts", "heal themselves");
   const cardX = R_X;
-  const cardTop = c.y(560);
+  const cardTop = c.y(470);
   return (
     <>
-      {tiles.map((t, i) => {
-        const p = ease(frame, t.at - 2, 10);
-        const col = i % 3;
-        const row = Math.floor(i / 3);
-        return (
-          <div
-            key={t.text}
-            style={{
-              position: "absolute",
-              left: R_X + col * 310,
-              top: c.y(350) + row * c.h(78),
-              width: 290,
-              height: c.h(62),
-              boxSizing: "border-box",
-              border: `2px solid ${t.base ? INK_SOFT : BAR}`,
-              borderRadius: 10,
-              background: t.base ? PAPER : `color-mix(in srgb, ${BAR} 10%, ${PAPER})`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              ...note(24, t.base ? INK_SOFT : BLUE_INK),
-              fontWeight: 650,
-              whiteSpace: "nowrap",
-              opacity: p,
-              transform: `translateY(${(1 - p) * 10}px)`,
-            }}
-          >
-            {t.base ? "success / failure" : t.text}
-          </div>
-        );
-      })}
-      {/* One alert, actionable. */}
-      <div
-        style={{
-          position: "absolute",
-          left: cardX,
-          top: cardTop,
-          width: 600,
-          boxSizing: "border-box",
-          border: `2.4px solid ${ACCENT}`,
-          borderRadius: 10,
-          background: PAPER,
-          padding: "10px 20px 12px",
-          opacity: ease(frame, alertAt, 12),
-        }}
-      >
-        <div style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 8 }}>
+      {/* What to watch, as two lines of words in the order of the old grid,
+          each inking in as it is said: the usual success in the soft ink,
+          what it misses in blue. */}
+      {[tiles.slice(0, 3), tiles.slice(3)].map((line, r) => (
+        <Words
+          key={r}
+          style={{ left: R_X, top: c.y(350) + r * c.h(TILE_ROW), ...note(25, BLUE_INK), fontWeight: 650 }}
+          items={line.map((t) => ({ text: t.base ? "success / failure" : t.text, at: t.at - 2, color: t.base ? INK_SOFT : BLUE_INK }))}
+        />
+      ))}
+      {/* One alert, actionable: its line in the trap's red over a hairline,
+          then its fields. No frame. */}
+      <div style={{ position: "absolute", left: cardX, top: cardTop, opacity: ease(frame, alertAt, 12) }}>
+        <div style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", borderBottom: `1px solid ${HAIRLINE}`, paddingBottom: 10 }}>
           one alert<span style={{ color: INK, opacity: ease(frame, teamAt, 10) }}> → orders team</span>
         </div>
         {fields.map((f) => {
           const p = ease(frame, f.at - 2, 10);
           return (
-            <div key={f.k} style={{ display: "flex", gap: 14, marginTop: 8, opacity: p, alignItems: "baseline" }}>
+            <div key={f.k} style={{ display: "flex", gap: 14, marginTop: 10, opacity: p, alignItems: "baseline" }}>
               <span style={{ ...label(21, INK_SOFT), width: 110 }}>{f.k}</span>
               <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, fontVariantLigatures: "none", background: p > 0.5 ? HIGHLIGHT : undefined, padding: "0 6px", borderRadius: 3 }}>{f.v}</span>
             </div>
           );
         })}
       </div>
-      {/* A retry that healed: no page. */}
+      {/* The alert and the healed retry side by side: a hairline in the gap,
+          inking in with the retry on its right. */}
       <div
         style={{
           position: "absolute",
-          left: cardX + 640,
+          left: cardX + HEALED_DX - 50,
           top: cardTop,
-          width: 330,
-          boxSizing: "border-box",
-          border: `2px dashed ${INK_SOFT}`,
-          borderRadius: 10,
-          padding: "10px 16px",
-          opacity: ease(frame, pageAt, 12),
+          width: 1,
+          height: c.h(ALERT_H),
+          background: HAIRLINE,
+          opacity: ease(frame, pageAt - 2, 14),
         }}
-      >
+      />
+      {/* A retry that healed: no page. */}
+      <div style={{ position: "absolute", left: cardX + HEALED_DX, top: cardTop, opacity: ease(frame, pageAt, 12) }}>
         <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>try 1 failed, try 2 ran</div>
-        <div style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, healAt, 10) }}>healed itself: no page</div>
+        <div style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", marginTop: 10, opacity: ease(frame, healAt, 10) }}>healed itself: no page</div>
       </div>
     </>
   );
@@ -272,20 +246,12 @@ const Observe: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={metaAt} x={R_X} y={c.y(616)}>
         <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>run metadata</span>
       </Note>
-      <div style={{ position: "absolute", left: R_X + 160, top: c.y(606), display: "flex", alignItems: "center", gap: 14 }}>
-        {metas.map((m) => {
-          const p = ease(frame, m.at - 2, 10);
-          return (
-            <span
-              key={m.text}
-              style={{ padding: "4px 14px", border: `2px solid ${BLUE_INK}`, borderRadius: 999, ...label(22, BLUE_INK), whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}
-            >
-              {m.text}
-            </span>
-          );
-        })}
-        <span style={{ ...label(21, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, dataAt, 10) }}>kept as data</span>
-      </div>
+      {/* What the metadata holds, as a line of words each inking in as it is said. */}
+      <Words
+        style={{ left: R_X + 160, top: c.y(616), ...label(22, BLUE_INK) }}
+        items={metas.map((m) => ({ text: m.text, at: m.at - 2 }))}
+        tail={<span style={{ color: INK_SOFT, marginLeft: 22, opacity: ease(frame, dataAt, 10) }}>kept as data</span>}
+      />
       {/* One failed slice, rerun alone. */}
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         {Array.from({ length: 7 }, (_, i) => {

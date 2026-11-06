@@ -109,7 +109,7 @@ export const BreakerScene: React.FC = () => {
       <Drift from={from} to={end + 30}>
         <Kicker at={from}>Question 4 · Single points of failure</Kicker>
         <Headline lead="Don't bury a dependency" turn="that's already failing." at={halfAt} turnAt={halfAt + 20} size={60} />
-        <Spot id="breaker" at={breakerAt} left={1600} top={92} width={160} height={artH("breaker", 160)} />
+        <Spot id="breaker" at={breakerAt} left={1600} top={118} width={160} height={artH("breaker", 160)} />
 
         {/* Panel titles. */}
         <div style={{ position: "absolute", left: TX0, top: errTop - h(48), ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: chartIn }}>

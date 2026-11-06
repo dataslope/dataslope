@@ -109,7 +109,7 @@ export const BlockScene: React.FC = () => {
             <WaitBar axis={AXIS} y={y(GHOST[i])} h={h(GHOST_H)} start={0} stop={f.wait} at={oneThreadAt + 6 + i * 4} color={ds("gray", 400)} dur={16} />
           </React.Fragment>
         ))}
-        <Note at={oneThreadAt + 12} x={RIGHT_X} y={y(GHOST[0]) + h(6)}>
+        <Note at={oneThreadAt + 12} x={msX(AXIS, msA) + 20} y={y(GHOST[0]) + h(6)}>
           <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
             awaiting: about <Num>{overlapped}</Num> ms
           </span>

@@ -104,9 +104,11 @@ export const LambdaScene: React.FC = () => {
         <Flow points={[[LAYER_X + LAYER_W + 6, bY + LH / 2], [SERVE_X - 50, bY + LH / 2], [SERVE_X - 50, serveY + 30], [SERVE_X - 8, serveY + 30]]} at={servingAt - 2} color={BAR} />
         <Flow points={[[LAYER_X + LAYER_W + 6, sY + LH / 2], [SERVE_X - 50, sY + LH / 2], [SERVE_X - 50, serveY + 62], [SERVE_X - 8, serveY + 62]]} at={servingAt} color={BAR} />
         <Node x={SERVE_X} y={serveY} w={SERVE_W} h={92} at={servingAt + 2} tone="plain" title="serving layer" sub="merges both" />
-        {/* The logic, once in each layer. */}
-        {[bY, sY].map((ly, i) => (
-          <Pill key={i} x={LAYER_X + LAYER_W - 108} y={ly - 18} at={twiceAt + i * 6} tone="bad" size={19} solid>
+        {/* The logic, once in each layer: a word on the trap's red
+            highlight, 10px off the pair's outer edges, above the batch
+            layer and under the speed layer. */}
+        {[bY - 33, sY + LH + 10].map((ly, i) => (
+          <Pill key={i} x={LAYER_X + LAYER_W - 92} y={ly} at={twiceAt + i * 6} tone="bad" size={19} solid>
             logic
           </Pill>
         ))}

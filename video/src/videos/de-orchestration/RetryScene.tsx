@@ -207,16 +207,15 @@ export const RetryScene: React.FC = () => {
           </span>
         </Note>
         <Note at={alertAt + 8} x={xs[3] + R} y={lineY + h(66)} align="right">
+          {/* The alert as words in the trap's red, no box: it swells as it fires. */}
           <span
             style={{
               display: "inline-block",
-              padding: "4px 14px",
-              border: `2.4px solid ${ACCENT}`,
-              borderRadius: 8,
-              ...note(24, ACCENT_INK),
-              fontWeight: 700,
+              ...note(26, ACCENT_INK),
+              fontWeight: 800,
               whiteSpace: "nowrap",
               transform: `scale(${1 + 0.06 * ping})`,
+              transformOrigin: "right center",
             }}
           >
             out of retries: alert

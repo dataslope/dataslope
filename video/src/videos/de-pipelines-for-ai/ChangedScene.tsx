@@ -3,59 +3,48 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { DATA, Drift, Mark, X0 } from "./parts";
+import { Drift, Mark, X0 } from "./parts";
 
 const BASE_Y = 720;
 const BLOCK_W = 384;
 const BLOCK_GAP = 24;
-const LAYER_H = 62;
-const LAYER_GAP = 14;
+/** A layer's row, and the space between the lowest layer and the loop. */
+const LAYER_H = 64;
+const LAYER_GAP = 24;
 const WIDTH = 3 * BLOCK_W + 2 * BLOCK_GAP;
 const SIDE = X0 + WIDTH + 44;
 
-/** One block of the core loop, set into the base of the figure. */
-const Block: React.FC<{ x: number; y: number; at: number; children: React.ReactNode }> = ({ x, y, at: from, children }) => {
+/** One part of the core loop: a word in the data blue, one of three spread
+ *  along the base of the page with a hairline between each pair. */
+const Block: React.FC<{ at: number; children: React.ReactNode }> = ({ at: from, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, from, 14);
-  if (p <= 0) return null;
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: x,
-        top: y,
-        width: BLOCK_W,
-        height: 92,
-        borderRadius: 10,
-        background: `color-mix(in srgb, ${DATA} ${18 * p}%, ${PAPER})`,
-        border: `2px solid ${BLUE_INK}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        padding: "0 16px",
-        boxSizing: "border-box",
-        ...note(29, BLUE_INK),
-        fontWeight: 650,
-        opacity: p,
-        transform: `translateY(${(1 - p) * 16}px)`,
-      }}
-    >
+    <div style={{ ...note(29, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap", opacity: p, transform: `translateY(${(1 - p) * 16}px)` }}>
       {children}
     </div>
   );
 };
 
-/** One layer laid across the top of the loop: what is new. Outlined in the
- *  soft ink, since nothing here is a trap; yellow lights the one the
- *  narration points at. */
-const Layer: React.FC<{ y: number; at: number; lit?: number; dim?: number; children: React.ReactNode }> = ({
+/** A vertical hairline between two of the core loop's parts, as tall as
+ *  their text, inking in with the part to its right. */
+const Divider: React.FC<{ at: number }> = ({ at: from }) => {
+  const frame = useCurrentFrame();
+  return <div style={{ width: 1, alignSelf: "stretch", background: HAIRLINE, opacity: ease(frame, from, 14) }} />;
+};
+
+/** One layer laid across the top of the loop: what is new, as a row of
+ *  plain text set down from above, with a hairline under it drawing in
+ *  (the lowest has none: space parts it from the loop). Yellow lights the
+ *  one the narration points at, behind its words. */
+const Layer: React.FC<{ y: number; at: number; rule: boolean; lit?: number; dim?: number; children: React.ReactNode }> = ({
   y,
   at: from,
+  rule,
   lit,
   dim,
   children,
@@ -66,36 +55,45 @@ const Layer: React.FC<{ y: number; at: number; lit?: number; dim?: number; child
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
   if (p <= 0) return null;
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: X0,
-        top: y,
-        width: WIDTH * (0.6 + 0.4 * p),
-        height: LAYER_H,
-        boxSizing: "border-box",
-        padding: "0 24px",
-        borderRadius: 10,
-        border: `2px solid ${INK_SOFT}`,
-        background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * l}%, ${PAPER})`,
-        display: "flex",
-        alignItems: "center",
-        ...note(28, INK),
-        fontWeight: 600,
-        whiteSpace: "nowrap",
-        opacity: p * (1 - d),
-      }}
-    >
-      {children}
-    </div>
+    <>
+      <div
+        style={{
+          position: "absolute",
+          left: X0,
+          top: y,
+          height: LAYER_H,
+          display: "flex",
+          alignItems: "center",
+          ...note(28, INK),
+          fontWeight: 600,
+          whiteSpace: "nowrap",
+          opacity: p * (1 - d),
+          transform: `translateY(${(1 - p) * -12}px)`,
+        }}
+      >
+        <span
+          style={{
+            padding: "2px 10px 3px",
+            margin: "0 -10px",
+            borderRadius: 4,
+            background: l > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${100 * l}%, transparent)` : undefined,
+          }}
+        >
+          {children}
+        </span>
+      </div>
+      {rule ? (
+        <div style={{ position: "absolute", left: X0, top: y + LAYER_H, width: WIDTH * ease(frame, from + 2, 18), height: 1, background: HAIRLINE, opacity: 1 - d }} />
+      ) : null}
+    </>
   );
 };
 
 /**
  * Question 1, after ds-llm-evaluation's ChangedScene (the same question on
  * the Data Scientist page), copied and re-cued. The core loop as three
- * blocks along the bottom (SQL, modeling, batch and streaming design), and
- * four layers set down on top as they are named: system design for AI data,
+ * words along the bottom (SQL, modeling, batch and streaming design), and
+ * four layers, ruled rows of text, set down on top as they are named: system design for AI data,
  * unstructured data, vector search trade-offs, and AI in your own workflow.
  * Beside the last, what a round that allows an assistant grades: the four
  * things to check in pipeline code. The bridge lights the first layer, the
@@ -131,7 +129,7 @@ export const ChangedScene: React.FC = () => {
   const pipeAt = n.word("rag-in", "the pipeline itself");
   const end = n.beat("rag-in").to;
 
-  const layerTop = (i: number) => y(BASE_Y) - (i + 1) * (LAYER_H + LAYER_GAP) - 6;
+  const layerTop = (i: number) => y(BASE_Y) - LAYER_GAP - (i + 1) * LAYER_H;
 
   return (
     <AbsoluteFill>
@@ -149,17 +147,22 @@ export const ChangedScene: React.FC = () => {
           How have Data Engineer interviews changed with AI?
         </QuestionCard>
 
-        <Note at={coreAt} x={X0} y={y(BASE_Y + 110)}>
+        {/* The core loop: three parts spread along the base, a hairline
+            centred in each gap, and its name close under them. */}
+        <div style={{ position: "absolute", left: X0, top: y(BASE_Y) + 24, width: WIDTH, display: "flex", justifyContent: "space-between", alignItems: "stretch" }}>
+          {blocks.map((b, i) => (
+            <React.Fragment key={b.text}>
+              {i ? <Divider at={b.at - 2} /> : null}
+              <Block at={b.at - 2}>{b.text}</Block>
+            </React.Fragment>
+          ))}
+        </div>
+        <Note at={coreAt} x={X0} y={y(BASE_Y) + 24 + 36 + 12}>
           <span style={{ ...label(22, BLUE_INK), fontWeight: 700 }}>the core loop, the same as ever</span>
         </Note>
-        {blocks.map((b, i) => (
-          <Block key={b.text} x={X0 + i * (BLOCK_W + BLOCK_GAP)} y={y(BASE_Y)} at={b.at - 2}>
-            {b.text}
-          </Block>
-        ))}
 
         {layers.map((l, i) => (
-          <Layer key={l.text} y={layerTop(i)} at={l.at - 2} lit={i === 0 ? pipeAt - 2 : undefined} dim={i === 0 ? undefined : pipeAt}>
+          <Layer key={l.text} y={layerTop(i)} at={l.at - 2} rule={i > 0} lit={i === 0 ? pipeAt - 2 : undefined} dim={i === 0 ? undefined : pipeAt}>
             {l.text}
           </Layer>
         ))}

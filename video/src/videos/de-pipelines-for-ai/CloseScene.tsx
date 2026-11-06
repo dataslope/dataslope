@@ -7,11 +7,11 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { HERO, PRACTICE } from "./data";
-import { Chip, Drift, Headline, Kicker, OK_INK, Spot, X0 } from "./parts";
+import { Drift, Headline, Kicker, OK_INK, Spot, Tag, X0 } from "./parts";
 
 /**
  * The close of the series: the three habits every answer came back to, as
- * chips, then the practice the track holds (a concept check on every topic
+ * plain lines, then the practice the track holds (a concept check on every topic
  * page and the 110-question bank, both counted by check.mjs), with the
  * llama back on the page. No "Next": this is the last part.
  */
@@ -52,9 +52,9 @@ export const CloseScene: React.FC = () => {
         <Headline lead="Eleven questions," turn="the same habits." at={elevenAt - 2} turnAt={habitsAt - 2} size={68} />
 
         {habits.map((c, i) => (
-          <Chip key={c.text} x={X0} y={y(320) + i * h(74)} at={c.at - 2} size={30} ink={OK_INK}>
+          <Tag key={c.text} x={X0} y={y(320) + i * h(62)} at={c.at - 2} size={30} ink={OK_INK}>
             {c.text}
-          </Chip>
+          </Tag>
         ))}
 
         <Note at={seriesAt} x={X0} y={y(570)}>
@@ -64,9 +64,9 @@ export const CloseScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
-          <Chip key={p.text} x={X0} y={y(690) + i * h(74)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 1 ? workAt : undefined}>
+          <Tag key={p.text} x={X0} y={y(680) + i * h(58)} at={p.at - 2} size={28} ink={BLUE_INK} lit={i === 1 ? workAt : undefined}>
             {p.text}
-          </Chip>
+          </Tag>
         ))}
         <Note at={workAt - 2} x={X0} y={y(860)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap", opacity: 0.4 + 0.6 * ease(frame, workAt, 12) }}>

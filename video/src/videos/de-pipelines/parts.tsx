@@ -8,6 +8,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, 
 import { Ink } from "../../editorial/ui";
 import { ds, inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
+import { Mark, MARK_BAD, MARK_KEY, MARK_OK } from "../da-sql/parts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
@@ -337,7 +338,15 @@ export const Flow: React.FC<{
   );
 };
 
-/** A small rounded label on the page, in its tone's ink, that inks in. */
+/** The highlight a solid label sits on: its tone's wash. */
+const TONE_MARK: Record<Tone, string> = { data: MARK_KEY, ok: MARK_OK, bad: MARK_BAD, plain: HIGHLIGHT };
+
+/**
+ * A short label on the page, in its tone's ink, that inks in: plain bold
+ * text, never an outlined pill (the house's no-cards rule). `solid`, the
+ * emphatic form, puts a highlight of its tone behind the words, which is a
+ * highlight, not a card.
+ */
 export const Pill: React.FC<{
   x: number;
   y: number;
@@ -351,25 +360,35 @@ export const Pill: React.FC<{
 }> = ({ x, y, at, tone = "data", size = 22, out, dim, solid, children }) => {
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
-  const t = TONE[tone];
+  const text = <span style={{ ...label(size, TONE[tone].ink), fontWeight: 700, whiteSpace: "nowrap" }}>{children}</span>;
   return (
-    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d }}>
-      <span
-        style={{
-          display: "inline-block",
-          padding: "5px 14px 6px",
-          borderRadius: 8,
-          border: `2px solid ${t.line}`,
-          background: solid ? t.line : t.fill,
-          ...label(size, solid ? PAPER : t.ink),
-          fontWeight: 700,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {children}
-      </span>
+    <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d, fontSize: size }}>
+      {solid ? (
+        <span style={{ display: "inline-block", marginLeft: "-0.14em" }}>
+          <Mark at={at + 4} color={TONE_MARK[tone]}>
+            {text}
+          </Mark>
+        </span>
+      ) : (
+        text
+      )}
     </Ink>
   );
+};
+
+/**
+ * The separator between two columns of text set side by side: a vertical
+ * 1px hairline in the gap, the height of the columns' text, drawn down on
+ * `at` (the cue of the column to its right). Never before the first column
+ * or after the last, and never where an arrow already separates them.
+ */
+export const VRule: React.FC<{ x: number; top: number; bottom: number; at: number; out?: number; dim?: number }> = ({ x, top, bottom, at, out, dim }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, at, 14);
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
+  if (p <= 0 || o >= 1) return null;
+  return <div style={{ position: "absolute", left: Math.round(x), top, width: 1, height: (bottom - top) * p, background: HAIRLINE, opacity: (1 - o) * (1 - d) }} />;
 };
 
 // ── The hero ─────────────────────────────────────────────────────────────────

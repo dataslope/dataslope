@@ -3,20 +3,23 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FRESH } from "./data";
-import { Drift, Headline, Kicker, OK_INK, Pill, Spot, X0 } from "./parts";
+import { Drift, Headline, Kicker, OK_INK, Spot, Words, X0 } from "./parts";
 
 const CARD_TOP = 320;
 const CARD_W = 720;
 const HEAD_H = 62;
 const ROW_H = 72;
-const DASH_X = 900;
-const DASH_W = 470;
+const DASH_X = 930;
+/** The chart's bars, from the dashboard's left edge: the first bar's
+ *  offset and the step between bars. */
+const BAR_X = 20;
+const BAR_STEP = 126;
 
 /**
  * The opening: last night's three jobs, each reporting success, and the
@@ -80,7 +83,8 @@ export const HookScene: React.FC = () => {
         <Headline lead="Nothing failed." turn="Nothing was ready." at={failedAt - 2} turnAt={readyAt - 2} size={72} />
         <Spot id="de-orchestration-collie" at={startAt + 10} left={1424} top={y(330)} width={400} height={242} />
 
-        {/* Last night's runs, each reporting success. */}
+        {/* Last night's runs, each reporting success: a ruled list of plain
+            text, its name over a hairline and a hairline between rows. */}
         <div
           style={{
             position: "absolute",
@@ -88,15 +92,11 @@ export const HookScene: React.FC = () => {
             top,
             width: CARD_W,
             height: cardH,
-            boxSizing: "border-box",
-            border: `2px solid ${INK}`,
-            borderRadius: 10,
-            background: PAPER,
             opacity: cardP * (1 - dim),
             transform: `translateY(${(1 - cardP) * 16}px)`,
           }}
         >
-          <div style={{ height: HEAD_H, display: "flex", alignItems: "center", padding: "0 24px", borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ height: HEAD_H, display: "flex", alignItems: "center", borderBottom: `1px solid ${HAIRLINE}` }}>
             <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>Last night&apos;s runs</span>
           </div>
           {JOBS.map((j, i) => {
@@ -114,8 +114,7 @@ export const HookScene: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: 26,
-                  padding: "0 24px",
-                  borderTop: i ? `1px solid color-mix(in srgb, ${INK} 18%, transparent)` : undefined,
+                  borderTop: i ? `1px solid ${HAIRLINE}` : undefined,
                   opacity: p,
                 }}
               >
@@ -130,29 +129,38 @@ export const HookScene: React.FC = () => {
           })}
         </div>
 
-        {/* The dashboard at six. */}
+        {/* The runs and the dashboard side by side: a hairline in the gap,
+            inking in with the dashboard on its right. */}
+        <div
+          style={{
+            position: "absolute",
+            left: (X0 + CARD_W + DASH_X) / 2,
+            top,
+            width: 1,
+            height: cardH,
+            background: HAIRLINE,
+            opacity: ease(frame, sixAt - 2, 14) * (1 - dim),
+          }}
+        />
+
+        {/* The dashboard at six: its name over its chart. */}
         <div
           style={{
             position: "absolute",
             left: DASH_X,
             top,
-            width: DASH_W,
-            height: cardH,
-            boxSizing: "border-box",
-            border: `2px solid ${INK}`,
-            borderRadius: 10,
-            background: PAPER,
+            height: HEAD_H,
+            display: "flex",
+            alignItems: "center",
             opacity: dashP * (1 - dim),
             transform: `translateY(${(1 - dashP) * 16}px)`,
           }}
         >
-          <div style={{ height: HEAD_H, display: "flex", alignItems: "center", padding: "0 24px", borderBottom: `1px solid ${HAIRLINE}` }}>
-            <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>Orders dashboard · 06:00</span>
-          </div>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>Orders dashboard · 06:00</span>
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: dashP * (1 - dim) }}>
           {DAYS.map((d, i) => {
-            const x = DASH_X + 60 + i * (BAR_W + 50);
+            const x = DASH_X + BAR_X + i * BAR_STEP;
             const p = ease(frame, sixAt + 6 + i * 4, 12);
             if (d.v === 0) {
               return (
@@ -173,14 +181,14 @@ export const HookScene: React.FC = () => {
             }
             return <rect key={d.name} x={x} y={base - barH * p} width={BAR_W} height={barH * p} rx={3} fill={BAR} opacity={0.85} />;
           })}
-          <line x1={DASH_X + 40} x2={DASH_X + DASH_W - 40} y1={base} y2={base} stroke={INK} strokeWidth={1.6} />
+          <line x1={DASH_X} x2={DASH_X + 2 * BAR_X + 2 * BAR_STEP + BAR_W} y1={base} y2={base} stroke={INK} strokeWidth={1.6} />
         </svg>
         {DAYS.map((d, i) => (
           <div
             key={d.name}
             style={{
               position: "absolute",
-              left: DASH_X + 60 + i * (BAR_W + 50) - 20,
+              left: DASH_X + BAR_X + i * BAR_STEP - 20,
               width: BAR_W + 40,
               top: base + h(10),
               textAlign: "center",
@@ -195,16 +203,16 @@ export const HookScene: React.FC = () => {
           <span style={{ ...note(27, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>June 3 never loaded: still yesterday&apos;s numbers</span>
         </Note>
 
-        {/* The round. */}
-        {[
-          { text: "tasks in order", at: orderAt },
-          { text: "recovery from failure", at: recoverAt },
-          { text: "bad data caught early", at: badAt },
-        ].map((c, i) => (
-          <Pill key={c.text} x={X0 + [0, 270, 620][i]} y={y(650)} at={c.at - 2} ink={BLUE_INK} size={25}>
-            {c.text}
-          </Pill>
-        ))}
+        {/* The round: what it covers, as one line of words, each inking in as
+            it is said. */}
+        <Words
+          style={{ left: X0, top: y(650), ...note(25, BLUE_INK), fontWeight: 650 }}
+          items={[
+            { text: "tasks in order", at: orderAt - 2 },
+            { text: "recovery from failure", at: recoverAt - 2 },
+            { text: "bad data caught early", at: badAt - 2 },
+          ]}
+        />
         <Note at={fourteenAt - 4} x={X0} y={y(740)}>
           <span style={{ ...note(32, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
             Orchestration and reliability:{" "}

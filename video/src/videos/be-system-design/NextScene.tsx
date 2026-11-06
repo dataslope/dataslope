@@ -124,7 +124,7 @@ export const NextScene: React.FC = () => {
   const peak = sig(ESTIMATE.peakReadQps);
   const ten = ease(frame, tenAt, 12);
   const textX = 800;
-  const crowW = 440;
+  const crowW = 420;
   const crowH = Math.round((crowW * ART.crow[1]) / ART.crow[0]);
 
   return (
@@ -161,7 +161,7 @@ export const NextScene: React.FC = () => {
           <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>no single point of failure</span>
         </div>
 
-        <Spot id="crow" at={firstAt + 10} left={1340} top={y(330)} width={crowW} height={crowH} />
+        <Spot id="crow" at={firstAt + 10} left={1372} top={y(330)} width={crowW} height={crowH} />
         <NextLine at={nextAt} x={X0} y={y(790)} width={1100}>
           scaling a design
         </NextLine>

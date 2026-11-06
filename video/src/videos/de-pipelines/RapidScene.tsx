@@ -9,7 +9,7 @@ import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Flow, Headline, HERO, Kicker, lineOf, Listing, Node, OK, OK_INK, Pill, Spot, X0 } from "./parts";
+import { Drift, Flow, Headline, HERO, Kicker, lineOf, Listing, Node, OK, OK_INK, Spot, X0 } from "./parts";
 
 const R_X = 800;
 const LIST_TOP = 380;
@@ -68,12 +68,13 @@ const Dbt: React.FC<{ c: Ctx }> = ({ c }) => {
         </React.Fragment>
       ))}
       <Node x={fct.x} y={fTop} w={fct.w} h={c.h(62)} at={orderAt + 14} tone="ok" title={<span style={{ fontFamily: MONO, fontSize: 22 }}>fct_orders</span>} />
-      <Pill x={fct.x + fct.w + 30} y={fTop + 4} at={testsAt} tone="plain" size={20}>
-        tests
-      </Pill>
-      <Pill x={fct.x + fct.w + 130} y={fTop + 4} at={testsAt + 6} tone="plain" size={20}>
-        docs
-      </Pill>
+      {/* What dbt adds to the model: two words, a middle dot between. */}
+      <div style={{ position: "absolute", left: fct.x + fct.w + 30, top: fTop + 2, ...note(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ opacity: ease(frame, testsAt, 12) }}>tests</span>
+        <span style={{ opacity: ease(frame, testsAt + 6, 12) }}>
+          <span style={{ color: INK_SOFT, fontWeight: 500 }}> · </span>docs
+        </span>
+      </div>
       <Note at={tAt} x={fct.x + fct.w + 260} y={fTop + 2}>
         <span style={{ ...note(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
           the T in EL<span style={{ color: OK_INK, background: HIGHLIGHT, padding: "0 4px", borderRadius: 4 }}>T</span>

@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { QMono, RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { NextLine, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -57,7 +57,8 @@ const Degenerate: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 11. Junk dimension ──────────────────────────────────────────────────────
 
-const Chip: React.FC<{ children: React.ReactNode; at: number }> = ({ children, at }) => {
+/** One value a flag can take: plain code, stacked under the flag's name. */
+const Value: React.FC<{ children: React.ReactNode; at: number }> = ({ children, at }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   return (
@@ -68,13 +69,9 @@ const Chip: React.FC<{ children: React.ReactNode; at: number }> = ({ children, a
         fontFamily: MONO,
         fontSize: 22,
         fontWeight: 600,
+        lineHeight: 1.25,
         color: INK,
-        border: `1.5px solid ${INK}`,
-        borderRadius: 6,
-        padding: "4px 12px",
-        background: PAPER,
         whiteSpace: "nowrap",
-        textAlign: "center",
       }}
     >
       {children}
@@ -106,12 +103,12 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
         {groups.map((g, i) => (
           <React.Fragment key={g.name}>
             {i ? <div style={{ ...note(34, INK_SOFT), marginTop: 50, opacity: ease(frame, g.at, 10) }}>×</div> : null}
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "stretch" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-start" }}>
               <div style={{ ...label(21, INK_SOFT), fontWeight: 700, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
               {g.values.map((v, j) => (
-                <Chip key={v} at={g.at + 2 + j * 3}>
+                <Value key={v} at={g.at + 2 + j * 3}>
                   {v}
-                </Chip>
+                </Value>
               ))}
             </div>
           </React.Fragment>
@@ -328,7 +325,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
     <Note at={at} x={R_X} y={top}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), width: 120 }}>{name}</span>
-        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK, border: `1.5px solid ${INK}`, borderRadius: 6, padding: "4px 12px" }}>{value}</span>
+        <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK }}>{value}</span>
         <span style={{ ...note(23, BLUE_INK), fontWeight: 700, opacity: ease(frame, bytesAt, 10) }}>
           {kind ? `${kind}, ` : ""}
           <Num>{bytes}</Num> bytes

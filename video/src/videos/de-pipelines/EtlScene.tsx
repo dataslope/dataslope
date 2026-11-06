@@ -7,7 +7,7 @@ import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editoria
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Drift, Flow, Node, OK, OK_INK, Pill, pulse, X0 } from "./parts";
+import { Drift, Flow, Mark, MARK_OK, Node, OK, OK_INK, Pill, pulse, X0 } from "./parts";
 
 const ETL_Y = 360;
 const ELT_Y = 610;
@@ -30,21 +30,13 @@ const RowName: React.FC<{ at: number; expandAt: number; x: number; y: number; na
     <Note at={at} x={x} y={y}>
       <div style={{ ...label(44, INK), fontWeight: 800, whiteSpace: "nowrap" }}>{name}</div>
       <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, expandAt, 12) }}>{words}</div>
+      {/* The verdict, plain text in the right answer's green on a
+          highlight of it. */}
       {tag ? (
-        <div
-          style={{
-            marginTop: 10,
-            display: "inline-block",
-            padding: "3px 12px 4px",
-            borderRadius: 8,
-            background: OK,
-            ...label(20, PAPER),
-            fontWeight: 750,
-            whiteSpace: "nowrap",
-            opacity: ease(frame, tag.at, 10),
-          }}
-        >
-          {tag.text}
+        <div style={{ marginTop: 12, marginLeft: "-0.14em", ...label(21, OK_INK), fontWeight: 750, whiteSpace: "nowrap", opacity: ease(frame, tag.at, 10) }}>
+          <Mark at={tag.at + 2} color={MARK_OK}>
+            {tag.text}
+          </Mark>
         </div>
       ) : null}
     </Note>
@@ -166,7 +158,7 @@ export const EtlScene: React.FC = () => {
         <Node x={clean.x} y={ly + h(8)} w={clean.w} h={BOX_H} at={sequelAt + 8} title="clean tables" />
 
         {/* Why it won. */}
-        <Pill x={WH.x + 200} y={WH.top - 52} at={computeAt} tone="ok" size={21} solid>
+        <Pill x={WH.x + 200} y={WH.top - 47} at={computeAt} tone="ok" size={22} solid>
           cheap, elastic compute
         </Pill>
         <Note at={fastAt} x={WH.x + 516} y={WH.top - 46}>

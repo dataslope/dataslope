@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, GATE } from "./data";
-import { Cross, Drift, Edge, MARK_BAD, OK_INK, TaskBox, X0 } from "./parts";
+import { Cross, Drift, Edge, MARK_BAD, OK_INK, TaskBox, Words, X0 } from "./parts";
 
 const NODE_W = 226;
 const STEP = 296;
@@ -62,7 +62,7 @@ export const GateScene: React.FC = () => {
   const nodeH = h(60);
   const passAt = (i: number) => gateAt + 6 + i * 6;
 
-  // The batch card under the gate.
+  // The batch's checks under the gate: a ruled table, no frame.
   const cardX = cx(GATE_I) - 260;
   const cardW = 520;
   const cardTop = y(600);
@@ -94,26 +94,9 @@ export const GateScene: React.FC = () => {
         <Note at={testAt} x={X0} y={y(284)}>
           <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>tested before the data moves on</span>
         </Note>
-        <div style={{ position: "absolute", left: X0, top: y(326), display: "flex", gap: 14, opacity: 1 - 0.35 * ease(frame, gateAt, 14) }}>
-          {CHECKS.map((c) => {
-            const p = ease(frame, c.at - 2, 10);
-            return (
-              <span
-                key={c.text}
-                style={{
-                  padding: "5px 14px",
-                  border: `2px solid ${BLUE_INK}`,
-                  borderRadius: 999,
-                  ...label(22, BLUE_INK),
-                  whiteSpace: "nowrap",
-                  opacity: p,
-                  transform: `translateY(${(1 - p) * 10}px)`,
-                }}
-              >
-                {c.text}
-              </span>
-            );
-          })}
+        {/* The checks, as one line of words, each inking in as it is said. */}
+        <div style={{ opacity: 1 - 0.35 * ease(frame, gateAt, 14) }}>
+          <Words style={{ left: X0, top: y(326), ...note(24, BLUE_INK), fontWeight: 650 }} items={CHECKS.map((c) => ({ text: c.text, at: c.at - 2 }))} />
         </div>
         <Note at={toolsAt} x={X0} y={y(386)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>run by dbt tests · Great Expectations · Soda</span>
@@ -197,15 +180,11 @@ export const GateScene: React.FC = () => {
             top: cardTop,
             width: cardW,
             height: HEAD + rows.length * ROW,
-            boxSizing: "border-box",
-            border: `2px solid ${INK}`,
-            borderRadius: 10,
-            background: PAPER,
             opacity: ease(frame, batchAt, 12),
             transform: `translateY(${(1 - ease(frame, batchAt, 12)) * 12}px)`,
           }}
         >
-          <div style={{ height: HEAD, display: "flex", alignItems: "center", padding: "0 20px", borderBottom: `1px solid ${HAIRLINE}` }}>
+          <div style={{ height: HEAD, display: "flex", alignItems: "center", borderBottom: `1px solid ${HAIRLINE}` }}>
             <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
               this batch: <Num>{count(GATE.rows)}</Num> orders
             </span>
@@ -219,14 +198,16 @@ export const GateScene: React.FC = () => {
                 key={r.name}
                 style={{
                   position: "absolute",
-                  left: 0,
-                  right: 0,
+                  // The failing row's red runs a little past the text either side.
+                  left: -10,
+                  right: -10,
                   top: HEAD + i * ROW,
                   height: ROW,
                   display: "flex",
                   alignItems: "center",
                   gap: 14,
-                  padding: "0 20px",
+                  padding: "0 10px",
+                  borderTop: i ? `1px solid ${HAIRLINE}` : undefined,
                   background: bad > 0 ? `color-mix(in srgb, ${MARK_BAD} ${bad * 100}%, transparent)` : undefined,
                   opacity: p,
                 }}
@@ -249,19 +230,7 @@ export const GateScene: React.FC = () => {
           })}
         </div>
         <Note at={failsAt + 4} x={cardX + cardW + 30} y={cardTop + h(10)}>
-          <span
-            style={{
-              display: "inline-block",
-              padding: "6px 16px",
-              border: `3px solid ${ACCENT}`,
-              borderRadius: 8,
-              ...note(26, ACCENT_INK),
-              fontWeight: 800,
-              whiteSpace: "nowrap",
-            }}
-          >
-            gate fails: halt
-          </span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 800, whiteSpace: "nowrap" }}>gate fails: halt</span>
         </Note>
         <Note at={failsAt + 10} x={cardX + cardW + 30} y={cardTop + h(74)}>
           <span style={{ ...label(21, OK_INK), whiteSpace: "nowrap" }}>bad data stops before anyone sees it</span>

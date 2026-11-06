@@ -3,12 +3,12 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard, Tick } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BAR, BLUE_INK, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { COST, KB, MB } from "./data";
-import { Drift, FileBar, OK, OK_INK, X0 } from "./parts";
+import { Drift, FileBar, OK, OK_INK, VRule, X0 } from "./parts";
 
 const BILL_Y = 296;
 const READ_Y = 474;
@@ -16,6 +16,8 @@ const BAR_W = 1180;
 const STEP = 80;
 const COMPUTE_Y = 790;
 const STORE_X = 920;
+/** The space either side of a hairline between the bill's three columns. */
+const BILL_GAP = 48;
 
 /**
  * Question 8 (and the Pipelines page's cost question). What a warehouse
@@ -86,22 +88,17 @@ export const CostScene: React.FC = () => {
           What drives cost in a cloud data warehouse, and how do you control it?
         </QuestionCard>
 
-        {/* ── What the bill counts ── */}
-        <div style={{ position: "absolute", left: X0, top: y(BILL_Y), display: "flex", gap: 44, whiteSpace: "nowrap" }}>
-          {bills.map((b) => (
-            <div
-              key={b.title}
-              style={{
-                padding: "12px 20px",
-                borderRadius: 8,
-                border: `2px solid ${BAR}`,
-                background: PAPER,
-                opacity: ease(frame, b.at, 12),
-              }}
-            >
-              <div style={{ ...note(24, INK), fontWeight: 650 }}>{b.title}</div>
-              <div style={{ ...note(21, BLUE_INK), opacity: ease(frame, b.sub, 10) }}>{b.who}</div>
-            </div>
+        {/* ── What the bill counts: three columns of text, a hairline in
+            each gap, inking in with the column to its right. ── */}
+        <div style={{ position: "absolute", left: X0, top: y(BILL_Y), display: "flex", alignItems: "stretch", gap: BILL_GAP, whiteSpace: "nowrap" }}>
+          {bills.map((b, i) => (
+            <React.Fragment key={b.title}>
+              {i ? <div style={{ width: 1, background: HAIRLINE, opacity: ease(frame, b.at - 2, 14) }} /> : null}
+              <div style={{ opacity: ease(frame, b.at, 12) }}>
+                <div style={{ ...note(24, INK), fontWeight: 650 }}>{b.title}</div>
+                <div style={{ ...note(21, BLUE_INK), marginTop: 10, opacity: ease(frame, b.sub, 10) }}>{b.who}</div>
+              </div>
+            </React.Fragment>
           ))}
         </div>
 
@@ -158,6 +155,10 @@ export const CostScene: React.FC = () => {
             {l.text}
           </div>
         ))}
+
+        {/* Compute and storage side by side: a hairline in the gap, as tall
+            as the levers, inking in with storage on its right. */}
+        <VRule x={(X0 + 560 + STORE_X) / 2} top={y(COMPUTE_Y) - h(44)} height={h(44) + 3 * h(44) - h(10)} at={coldAt} />
 
         {/* ── Store cheaper ── */}
         <div style={{ position: "absolute", left: STORE_X, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, coldAt, 12) }}>

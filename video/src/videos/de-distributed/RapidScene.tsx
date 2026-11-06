@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { Arrow, Chip, Drift, Headline, Kicker, Machine, OK, OK_INK, Spot, X0 } from "./parts";
+import { Arrow, Chip, Dot, Drift, Headline, Kicker, Machine, OK, OK_INK, Spot, X0 } from "./parts";
 
 const R_X = 780;
 const LIST_TOP = 352;
@@ -82,11 +82,14 @@ const Rdd: React.FC<{ c: Ctx }> = ({ c }) => {
         DataFrame
       </Line>
       <Note at={dfAt + 4} x={R_X + 180} y={c.y(434)}>
-        <span style={{ display: "flex", gap: 8 }}>
-          {cols.map(([name, type]) => (
-            <Chip key={name} mono size={20}>
-              {name}: <span style={{ color: INK_SOFT }}>{type}</span>
-            </Chip>
+        <span style={{ display: "flex", gap: 10, alignItems: "baseline" }}>
+          {cols.map(([name, type], i) => (
+            <React.Fragment key={name}>
+              {i ? <Dot size={20} /> : null}
+              <Chip mono size={20}>
+                {name}: <span style={{ color: INK_SOFT }}>{type}</span>
+              </Chip>
+            </React.Fragment>
           ))}
         </span>
       </Note>
@@ -213,13 +216,16 @@ const Push: React.FC<{ c: Ctx }> = ({ c }) => {
         Projection pushdown: <span style={{ fontWeight: 500 }}>only the columns named</span>
       </Line>
       <Note at={projAt + 4} x={R_X} y={c.y(586)}>
-        <span style={{ display: "flex", gap: 8 }}>
-          {COLUMNS.map((col) => (
-            <span key={col} style={{ opacity: NAMED.has(col) ? 1 : 1 - 0.72 * prune }}>
-              <Chip mono size={20} color={NAMED.has(col) && prune > 0.5 ? OK : ds("gray", 400)} ink={NAMED.has(col) ? OK_INK : INK_SOFT}>
-                {col}
-              </Chip>
-            </span>
+        <span style={{ display: "flex", gap: 10, alignItems: "baseline" }}>
+          {COLUMNS.map((col, i) => (
+            <React.Fragment key={col}>
+              {i ? <Dot size={20} /> : null}
+              <span style={{ opacity: NAMED.has(col) ? 1 : 1 - 0.72 * prune }}>
+                <Chip mono size={20} ink={NAMED.has(col) ? OK_INK : INK_SOFT}>
+                  {col}
+                </Chip>
+              </span>
+            </React.Fragment>
           ))}
         </span>
       </Note>

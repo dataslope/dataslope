@@ -329,7 +329,32 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
   // High-priority threads keep arriving and going straight to the lock.
   const GAP = 20;
   const passes = Math.max(0, Math.floor((Math.min(frame, fairAt) - priorityAt) / GAP));
-  const lowServed = ease(frame, fairAt + 22, 18);
+  // The fair lock: three in arrival order, served front first.
+  const fairIn = ease(frame, fairAt + 4, 16);
+  const serve1 = ease(frame, fairAt + 24, 16);
+  const lowServed = ease(frame, fairAt + 44, 14);
+  const slot = (k: number) => LOCK_X - 170 - k * 150;
+  const Token: React.FC<{ x: number; y: number; text: string; high: boolean; green?: number; opacity?: number }> = ({ x, y: ty, text, high, green = 0, opacity = 1 }) => (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: ty,
+        width: 130,
+        height: rowH,
+        borderRadius: 8,
+        boxSizing: "border-box",
+        border: `2.5px solid ${green > 0.5 ? OK : high ? THREAD[2].fill : ds("gray", 400)}`,
+        background: green > 0.5 ? tint(OK, 16) : high ? tint(THREAD[2].fill, 20) : ds("gray", 100),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        opacity,
+      }}
+    >
+      <span style={{ ...label(21, green > 0.5 ? OK_INK : high ? THREAD[2].ink : INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{text}</span>
+    </div>
+  );
   return (
     <>
       <Lead at={isAt} c={c} term="Starvation">
@@ -338,54 +363,29 @@ const Starve: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={isAt + 6} x={LOCK_X} y={rowY + 6}>
         <LockGlyph size={40} color={INK} />
       </Note>
-      {/* The low-priority thread, waiting by the lock. */}
-      <div
-        style={{
-          position: "absolute",
-          left: lerp(1260, LOCK_X - 150, lowServed),
-          top: rowY + c.h(76) * (1 - lowServed),
-          width: 130,
-          height: rowH,
-          borderRadius: 8,
-          boxSizing: "border-box",
-          border: `2.5px solid ${lowServed > 0.5 ? OK : ds("gray", 400)}`,
-          background: lowServed > 0.5 ? tint(OK, 16) : ds("gray", 100),
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: ease(frame, isAt + 4, 10),
-        }}
-      >
-        <span style={{ ...label(21, lowServed > 0.5 ? OK_INK : INK_SOFT), fontWeight: 700 }}>low</span>
-      </div>
+      {/* The low-priority thread: waiting below, then in the fair queue, then served. */}
+      <Token
+        x={lerp(lerp(1260, slot(1), fairIn), slot(0), serve1)}
+        y={rowY + c.h(76) * (1 - fairIn)}
+        text={fairIn > 0.5 ? "2 low" : "low"}
+        high={false}
+        green={lowServed}
+        opacity={ease(frame, isAt + 4, 10)}
+      />
+      {/* Under the fair lock, the ones that arrived before and after it. */}
+      {fairIn > 0 ? (
+        <>
+          <Token x={lerp(slot(0), LOCK_X - 40, serve1)} y={rowY} text="1 high" high opacity={fairIn * (1 - serve1)} />
+          <Token x={lerp(slot(2), slot(1), serve1)} y={rowY} text="3 high" high opacity={fairIn} />
+        </>
+      ) : null}
       {Array.from({ length: 8 }, (_, k) => {
         const at = priorityAt + k * GAP;
         if (at >= fairAt) return null;
         const p = ease(frame, at, 18);
         if (p <= 0) return null;
         const gone = ease(frame, at + 18, 8);
-        return (
-          <div
-            key={k}
-            style={{
-              position: "absolute",
-              left: lerp(R_X, LOCK_X - 150, p),
-              top: rowY,
-              width: 130,
-              height: rowH,
-              borderRadius: 8,
-              boxSizing: "border-box",
-              border: `2.5px solid ${THREAD[2].fill}`,
-              background: tint(THREAD[2].fill, 20),
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              opacity: (1 - gone) * (1 - fair),
-            }}
-          >
-            <span style={{ ...label(21, THREAD[2].ink), fontWeight: 700 }}>high</span>
-          </div>
-        );
+        return <Token key={k} x={lerp(R_X, LOCK_X - 150, p)} y={rowY} text="high" high opacity={(1 - gone) * (1 - fair)} />;
       })}
       <Note at={lowAt} x={R_X} y={rowY + c.h(82)} out={fairAt}>
         <span style={{ ...note(23, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>

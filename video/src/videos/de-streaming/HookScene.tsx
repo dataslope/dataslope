@@ -118,23 +118,10 @@ export const HookScene: React.FC = () => {
         </Note>
         {tests.map((t, i) => (
           <Note key={t.cue} at={t.at - 2} x={X0} y={y(466) + i * h(58)}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 16, whiteSpace: "nowrap" }}>
-              <span
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  border: `2.5px solid ${INK}`,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  ...label(20, INK),
-                  fontWeight: 800,
-                  ...TABULAR,
-                }}
-              >
-                {i + 1}
-              </span>
+            {/* A plain numeral at the line's own size, not a ringed badge:
+                the list is held together by its alignment. */}
+            <span style={{ display: "inline-flex", alignItems: "baseline", gap: 16, whiteSpace: "nowrap" }}>
+              <span style={{ width: 36, ...note(29, INK_SOFT), fontWeight: 750, ...TABULAR }}>{i + 1}</span>
               <span style={{ ...note(29, INK), fontWeight: 560 }}>
                 {i === 2 ? (
                   <>

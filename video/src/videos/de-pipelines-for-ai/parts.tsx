@@ -333,3 +333,54 @@ export const QueryMark: React.FC<{ x: number; y: number; at: number; size?: numb
 
 /** The trap's red, for a cell or a mark that shows what goes wrong. */
 export const TRAP = ACCENT;
+
+/**
+ * A short tag (a step, a habit, a fix) as plain text in its meaning's ink:
+ * no outline, no box. `lit` lays the highlighter behind the words, given back
+ * as margin so the line does not shift. Same props as the outlined `Chip` it
+ * replaces, which other videos still use.
+ */
+export const Tag: React.FC<{
+  x: number;
+  y: number;
+  at: number;
+  ink?: string;
+  size?: number;
+  lit?: number;
+  dim?: number;
+  out?: number;
+  weight?: number;
+  children: React.ReactNode;
+}> = ({ x, y, at: from, ink = INK, size = 26, lit, dim, out, weight = 600, children }) => {
+  const frame = useCurrentFrame();
+  const p = ease(frame, from, 12);
+  const l = lit === undefined ? 0 : ease(frame, lit, 12);
+  const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.65;
+  const o = out === undefined ? 0 : ease(frame, out, 10);
+  if (p <= 0 || o >= 1) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        ...note(size, ink),
+        fontWeight: weight,
+        whiteSpace: "nowrap",
+        opacity: p * (1 - d) * (1 - o),
+        transform: `translateY(${(1 - p) * 12}px)`,
+      }}
+    >
+      <span
+        style={{
+          padding: "1px 8px 2px",
+          margin: "0 -8px",
+          borderRadius: 4,
+          background: l > 0 ? `color-mix(in srgb, ${HIGHLIGHT} ${l * 100}%, transparent)` : undefined,
+        }}
+      >
+        {children}
+      </span>
+    </div>
+  );
+};

@@ -8,7 +8,7 @@ import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
-import { Box, Chip, DATA, DATA_TINT, Drift, head, LineArrow, Mark, MARK_OK, OK_INK, PathArrow, QUIET, say, X0 } from "./parts";
+import { Box, DATA, DATA_TINT, Drift, head, LineArrow, Mark, MARK_OK, OK_INK, PathArrow, QUIET, say, X0 } from "./parts";
 
 const COL_W = 232;
 const STEP = 294;
@@ -221,11 +221,21 @@ export const RagScene: React.FC = () => {
             <b>Chunk</b>, then <b>attach metadata</b>:
           </span>
         </Note>
-        {fields.map((f, i) => (
-          <Chip key={f.text} x={X0 + 400 + [0, 128, 270, 452][i]} y={noteY(2) - 8} at={f.at - 2} size={22} ink={BLUE_INK}>
-            <span style={{ fontFamily: MONO, fontVariantLigatures: "none" }}>{f.text}</span>
-          </Chip>
-        ))}
+        {/* The fields as one line of plain words joined by middle dots, each
+            rising in as it is said. */}
+        <div
+          style={{ position: "absolute", left: X0 + 400, top: noteY(2) + 2, fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, fontVariantLigatures: "none", whiteSpace: "nowrap" }}
+        >
+          {fields.map((f, i) => {
+            const p = ease(frame, f.at - 2, 12);
+            return (
+              <span key={f.text} style={{ display: "inline-block", opacity: p, transform: `translateY(${(1 - p) * 12}px)` }}>
+                {i ? <span style={{ whiteSpace: "pre", color: INK_SOFT, fontWeight: 400 }}> · </span> : null}
+                {f.text}
+              </span>
+            );
+          })}
+        </div>
         <Note at={makesAt - 2} x={X0 + 1180} y={noteY(2)}>
           <span style={say(24, INK)}>
             → <Mark at={makesAt + 6}>filters, citations, deletes</Mark>

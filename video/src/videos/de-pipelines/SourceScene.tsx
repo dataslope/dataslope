@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { SRC, splitError } from "./data";
-import { type Col, colsOf, DataTable, Drift, ErrorBox, geoOf, Listing, MARK, MARK_OK, OK, OK_INK, TableName, X0 } from "./parts";
+import { type Col, colsOf, DataTable, Drift, ErrorBox, geoOf, Listing, MARK, MARK_OK, OK_INK, TableName, X0 } from "./parts";
 
 const TOP = 340;
 const CLEAN_X = 800;
@@ -17,29 +17,15 @@ const LIST_Y = 610;
 const LIST_X = 120;
 const DEF_X = 1260;
 
-/** One defense, numbered in the right answer's green. */
+/** One defense, numbered in the right answer's green: a plain bold
+ *  numeral, the same size as its line. */
 const Defense: React.FC<{ at: number; n: number; y: number; children: React.ReactNode }> = ({ at, n, y, children }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   if (p <= 0) return null;
   return (
     <div style={{ position: "absolute", left: DEF_X, top: y, display: "flex", gap: 16, alignItems: "flex-start", opacity: p, transform: `translateX(${(1 - p) * -16}px)` }}>
-      <span
-        style={{
-          flex: "none",
-          width: 38,
-          height: 38,
-          borderRadius: 19,
-          background: OK,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          ...label(21, PAPER),
-          fontWeight: 800,
-        }}
-      >
-        {n}
-      </span>
+      <span style={{ flex: "none", width: 22, ...note(24, OK_INK), lineHeight: 1.35, fontWeight: 800, textAlign: "right" }}>{n}</span>
       <span style={{ ...note(24, INK), lineHeight: 1.35, whiteSpace: "nowrap" }}>{children}</span>
     </div>
   );

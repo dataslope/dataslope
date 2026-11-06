@@ -169,18 +169,17 @@ export const SlaScene: React.FC = () => {
             <Cross at={missAt + 2} size={20} />
           </div>
         ) : null}
-        <Note at={missAt + 6} x={tx(DEADLINE) - 30} y={rowY(1) - 19} align="right">
+        <Note at={missAt + 6} x={tx(7) + 14} y={rowY(1) - 17}>
+          {/* The alert as words in the trap's red, no box, clear of the run
+              that goes on past the deadline: it swells as it fires. */}
           <span
             style={{
               display: "inline-block",
-              padding: "2px 12px",
-              border: `2.4px solid ${ACCENT}`,
-              borderRadius: 8,
-              background: PAPER,
-              ...note(22, ACCENT_INK),
-              fontWeight: 700,
+              ...note(24, ACCENT_INK),
+              fontWeight: 800,
               whiteSpace: "nowrap",
               transform: `scale(${1 + 0.06 * ring})`,
+              transformOrigin: "left center",
             }}
           >
             missed: alert

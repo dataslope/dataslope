@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { COLUMN_TINT, Drift, OK, OK_INK, READ, Spot, X0 } from "./parts";
+import { COLUMN_TINT, Drift, OK, OK_INK, READ, Spot, VRule, X0 } from "./parts";
 
 const TOP = 296;
 const PANEL_W = 520;
@@ -54,7 +54,7 @@ const FileChip: React.FC<{ x: number; y: number; name: string; at: number; lit?:
 };
 
 /**
- * Question 9 (and the Pipelines page's lakehouse question). Three panels: a
+ * Question 9 (and the Pipelines page's lakehouse question). Three columns: a
  * warehouse (its own managed storage, tuned for SQL), a lake (open files in
  * a bucket, with no transactions or schema enforcement), and a lakehouse:
  * the same kind of bucket under a transaction log, whose commits say which
@@ -114,7 +114,6 @@ export const LakeScene: React.FC = () => {
 
   const title = (i: number, at: number, text: string, sub: React.ReactNode, subAt: number) => (
     <div style={{ position: "absolute", left: px(i), top: y(TOP), opacity: ease(frame, at, 12) }}>
-      <div style={{ position: "absolute", left: 0, top: 0, width: PANEL_W, height: 2, background: INK }} />
       <div style={{ position: "absolute", left: 0, top: 12, ...headline(42), whiteSpace: "nowrap" }}>{text}</div>
       <div style={{ position: "absolute", left: 0, top: 64, ...label(20, BLUE_INK), whiteSpace: "nowrap", opacity: ease(frame, subAt, 10) }}>{sub}</div>
     </div>
@@ -198,6 +197,11 @@ export const LakeScene: React.FC = () => {
           <Note at={sqlAt} x={px(0)} y={y(NOTES_Y)}>
             <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>tuned for SQL</span>
           </Note>
+
+          {/* The three side by side, a hairline in each gap from the titles
+              to the notes, inking in with the panel to its right. */}
+          <VRule x={px(1) - (PANEL_GAP + 40) / 2} top={y(TOP) + 12} height={y(NOTES_Y) + h(40) + 30 - y(TOP) - 12} at={lakeAt} />
+          <VRule x={px(2) - (PANEL_GAP + 40) / 2} top={y(TOP) + 12} height={y(NOTES_Y) + h(40) + 30 - y(TOP) - 12} at={houseAt} />
 
           {/* ── The lake ── */}
           {title(1, lakeAt, "Data lake", "raw files, open formats", filesAt)}

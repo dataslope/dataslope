@@ -9,7 +9,7 @@ import { MONO, SANS } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { FRESH, hm } from "./data";
-import { Cross, Drift, lineOf, MARK, OK, OK_INK, Pill, SqlListing, X0 } from "./parts";
+import { Cross, Drift, lineOf, MARK, OK, OK_INK, Pill, SqlListing, VRule, X0 } from "./parts";
 
 const LINES = FRESH.sql.split("\n");
 /** The clock from June 1, 00:00 to June 4, 08:00. */
@@ -216,21 +216,31 @@ export const FreshScene: React.FC = () => {
           <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{hm(FRESH.stale.minutes)}: stale, alert</span>
         </Note>
 
-        {/* The run that night, all green, and the two checks that are not. */}
-        {[
-          { text: "extract", at: greenAt },
-          { text: "transform", at: greenAt + 3 },
-          { text: "load", at: loadAt },
-        ].map((t, i) => (
-          <Pill key={t.text} x={X0 + i * 230} y={y(770)} at={t.at} ink={OK_INK} size={24}>
-            {t.text} ✓
-          </Pill>
-        ))}
-        <Note at={noRowsAt} x={X0 + 460} y={y(826)}>
-          <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            <Num>{FRESH.missedDayRows}</Num> new rows
-          </span>
-        </Note>
+        {/* The run that night, all green, and the two checks that are not:
+            three columns of plain text, a hairline in each gap inking in with
+            the column to its right. */}
+        <div style={{ position: "absolute", left: X0, top: y(770), ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
+          {[
+            { text: "extract", at: greenAt },
+            { text: "transform", at: greenAt + 3 },
+            { text: "load", at: loadAt },
+          ].map((t, i) => (
+            <span
+              key={t.text}
+              style={{ position: "relative", display: "inline-block", opacity: ease(frame, t.at, 12), transform: `translateY(${(1 - ease(frame, t.at, 12)) * 10}px)` }}
+            >
+              {i ? <span style={{ whiteSpace: "pre", color: INK_SOFT, fontWeight: 500 }}> · </span> : null}
+              {t.text} ✓
+              {/* What the load brought, under its name. */}
+              {i === 2 ? (
+                <span style={{ position: "absolute", right: 0, top: h(56), ...label(21, INK_SOFT), fontWeight: 500, opacity: ease(frame, noRowsAt, 14) }}>
+                  <Num>{FRESH.missedDayRows}</Num> new rows
+                </span>
+              ) : null}
+            </span>
+          ))}
+        </div>
+        <VRule x={X0 + 540} top={y(762)} height={y(870) - y(762)} at={onlyAt + 2} />
         <Pill x={X0 + 720} y={y(770)} at={onlyAt + 2} ink={ACCENT_INK} size={24}>
           freshness check ✗
         </Pill>
@@ -239,6 +249,7 @@ export const FreshScene: React.FC = () => {
             row count: <Num>{FRESH.missedDayRows}</Num> ✗
           </span>
         </Pill>
+        <VRule x={X0 + 965} top={y(762)} height={y(870) - y(762)} at={catchAt} />
         <Note at={catchAt} x={X0 + 1010} y={y(762)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>catches data that never arrived</span>
         </Note>

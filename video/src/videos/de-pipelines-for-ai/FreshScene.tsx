@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -127,7 +127,6 @@ export const FreshScene: React.FC = () => {
           const a = action(id);
           const top = tableTop + 40 + i * ROW_H;
           const lit = ease(frame, a.lit, 10) * (1 - ease(frame, a.litOut, 12));
-          const gone = id in idx && !(id in cur);
           return (
             <React.Fragment key={id}>
               <div
@@ -162,18 +161,8 @@ export const FreshScene: React.FC = () => {
                 </div>
               ))}
               <Note at={a.at} x={colX(3) + 16} y={top + 12}>
-                <span
-                  style={{
-                    display: "inline-block",
-                    padding: "2px 12px 3px",
-                    borderRadius: 8,
-                    border: `2px ${gone ? "dashed" : "solid"} ${a.ink}`,
-                    background: PAPER,
-                    ...note(23, a.ink),
-                    fontWeight: 650,
-                    whiteSpace: "nowrap",
-                  }}
-                >
+                {/* The action as a word in its ink, no outline. */}
+                <span style={{ ...note(23, a.ink), fontWeight: 650, whiteSpace: "nowrap" }}>
                   {a.text}
                 </span>
               </Note>

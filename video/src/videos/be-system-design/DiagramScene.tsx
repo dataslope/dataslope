@@ -250,9 +250,11 @@ export const DiagramScene: React.FC = () => {
         <Line x={X0} y={keysY + 228} at={walkAt + 6} size={23} weight={650} color={ACCENT_INK} width={360}>
           anyone can walk through them
         </Line>
-        <Line x={X0} y={keysY + 290} at={scrambleAt} size={23} weight={650} color={OK_INK} width={330}>
-          Scramble the ID first
-          <span style={{ opacity: ease(frame, useHashAt, 10) }}>, or use the hash</span>
+        <Line x={X0} y={keysY + 290} at={scrambleAt} size={23} weight={650} color={OK_INK}>
+          Scramble the ID first,
+        </Line>
+        <Line x={X0} y={keysY + 330} at={useHashAt} size={23} weight={650} color={OK_INK}>
+          or use the hash
         </Line>
       </Drift>
     </AbsoluteFill>

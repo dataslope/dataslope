@@ -7,8 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note, PAPER } 
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { ds } from "../../theme/brand";
-import { Arrow, Chip, Disk, Drift, Elbow, Machine, OK, OK_INK } from "./parts";
+import { Arrow, Chip, Disk, Dot, Drift, Elbow, Machine, OK, OK_INK } from "./parts";
 
 const BOX_X = [300, 610, 920, 1230];
 const BOX_W = 170;
@@ -167,7 +166,9 @@ export const HadoopScene: React.FC = () => {
 
         {/* Iterative work: every pass comes back to the cached dataset. */}
         <Note at={cacheAt - 2} x={chipX} y={loopY - h(18)} width={CHIP_W} style={{ textAlign: "center" }}>
-          <Chip mono size={22} color={OK} ink={OK_INK}>
+          {/* Boxed: the loop's arrows run into it, so it is a node of the
+              figure, not a tag. */}
+          <Chip mono boxed size={22} color={OK} ink={OK_INK}>
             cache()
           </Chip>
         </Note>
@@ -191,19 +192,21 @@ export const HadoopScene: React.FC = () => {
 
         {/* What else Spark adds. */}
         <Note at={addsAt} x={120} y={y(850)}>
-          <span style={{ display: "flex", gap: 14, alignItems: "center", whiteSpace: "nowrap" }}>
-            <span style={{ ...label(22, INK_SOFT) }}>Spark also adds</span>
+          {/* What it adds, as a line of words with a middle dot between. */}
+          <span style={{ display: "flex", gap: 12, alignItems: "baseline", whiteSpace: "nowrap" }}>
+            <span style={{ ...label(22, INK_SOFT), marginRight: 2 }}>Spark also adds</span>
             <Chip>DataFrames</Chip>
-            <span style={{ opacity: ease(frame, sqlAt - 2, 10) }}>
+            <span style={{ display: "flex", gap: 12, opacity: ease(frame, sqlAt - 2, 10) }}>
+              <Dot />
               <Chip>SQL</Chip>
             </span>
-            <span style={{ opacity: ease(frame, streamAt - 2, 10) }}>
+            <span style={{ display: "flex", gap: 12, opacity: ease(frame, streamAt - 2, 10) }}>
+              <Dot />
               <Chip>streaming</Chip>
             </span>
-            <span style={{ opacity: ease(frame, optAt - 2, 10) }}>
-              <Chip color={ds("green", 600)} ink={OK_INK}>
-                whole-query optimization
-              </Chip>
+            <span style={{ display: "flex", gap: 12, opacity: ease(frame, optAt - 2, 10) }}>
+              <Dot />
+              <Chip ink={OK_INK}>whole-query optimization</Chip>
             </span>
           </span>
         </Note>

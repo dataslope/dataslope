@@ -3,13 +3,13 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, PAPER, TABULAR, label, note } from "../../editorial/style";
+import { BLUE_INK, HAIRLINE, HIGHLIGHT, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { HYBRID } from "./data";
-import { Drift, head, madeUp, Mark, MARK_OK, math, OK, OK_INK, QUIET, X0 } from "./parts";
+import { Drift, head, madeUp, Mark, MARK_OK, math, OK_INK, QUIET, X0 } from "./parts";
 
 const COLS = [X0, 700, 1290];
 const COL_W = 540;
@@ -50,8 +50,9 @@ const Row: React.FC<{ x: number; y: number; rank: number; id: string; at: number
         display: "flex",
         alignItems: "center",
         gap: 12,
-        background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * l * (1 - g)}%, color-mix(in srgb, ${OK} ${16 * g}%, ${PAPER}))`,
-        border: `2px solid color-mix(in srgb, ${OK} ${100 * g}%, transparent)`,
+        // A highlight behind the row, never an outline: yellow while the
+        // narration is on it, green once it is the right answer.
+        background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * l * (1 - g)}%, color-mix(in srgb, ${MARK_OK} ${100 * g}%, transparent))`,
         opacity: p,
         transform: `translateX(${(1 - p) * -10}px)`,
       }}
@@ -154,10 +155,10 @@ export const HybridScene: React.FC = () => {
                 fontFamily: MONO,
                 fontWeight: 700,
                 padding: "2px 10px",
-                border: `2px solid ${INK}`,
-                borderRadius: 8,
+                margin: "0 -10px",
+                borderRadius: 4,
                 fontVariantLigatures: "none",
-                background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * ease(frame, searchAt, 10) * (1 - ease(frame, fourthAt, 12))}%, ${PAPER})`,
+                background: `color-mix(in srgb, ${HIGHLIGHT} ${100 * ease(frame, searchAt, 10) * (1 - ease(frame, fourthAt, 12))}%, transparent)`,
               }}
             >
               {HYBRID.query}
