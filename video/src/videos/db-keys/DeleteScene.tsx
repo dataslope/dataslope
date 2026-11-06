@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
 import { ACCENT_INK, INK, INK_SOFT } from "../../editorial/style";
-import { FigLabel, Ink } from "../../editorial/ui";
+import { ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { MONO } from "../../theme/fonts";
 import { Sfx } from "../../sound/Sfx";
@@ -38,6 +38,16 @@ const ROW_H = 48;
 const SIZES = { headSize: 20, bodySize: 24, pad: 14 };
 /** Room between a parent table's bottom rule and its child's top rule. */
 const STACK = 66;
+/** The three columns sit side by side, so a hairline stands in each gap
+ *  (README, "No cards unless the layout needs one"). Each column's right
+ *  edge is its widest line: the elbow out of its tables, the DELETE (the
+ *  mono face, 0.6em a glyph at 19px), and what Postgres answered (the
+ *  error, COL_W - 30 wide; CASCADE's command tag and the two lines beside
+ *  it, which run about this far). Each hairline runs from the headings to
+ *  the foot of the RESTRICT column's error, the deepest of the three. */
+const CODE_ADVANCE = 0.6 * 19;
+const CASCADE_REPLY_W = 372;
+const RULE_DROP = 240;
 
 const cols = (t: Table, keys: readonly string[]): Col[] =>
   t.cols.map((name) => ({ name, numeric: !/name|title/.test(name), ink: keys.includes(name) ? KEY_INK : undefined }));
@@ -114,6 +124,15 @@ export const DeleteScene: React.FC = () => {
   const k = stack(COL_X[1], CASCADE.posts, CASCADE.comments);
   const s = stack(COL_X[2], SETNULL.employees, SETNULL.tickets, SETNULL.ticketsAfter.rows);
 
+  // The hairlines between the columns: each centred in its gap.
+  const elbowX = (t: { p: TableGeometry; c: TableGeometry }) => Math.max(t.p.right, t.c.right) + 44 + 2;
+  const colRight = [
+    Math.max(elbowX(r), COL_X[0] + RESTRICT.del.lines[0].length * CODE_ADVANCE, COL_X[0] + COL_W - 30),
+    Math.max(elbowX(k), COL_X[1] + CASCADE.del.lines[0].length * CODE_ADVANCE, COL_X[1] + CASCADE_REPLY_W),
+  ];
+  const ruleTop = y(TAG_Y) + 2;
+  const ruleH = r.below + RULE_DROP - ruleTop;
+
   // One column per rule, each drawn as it is named, so the eye is never
   // asked to find its column among six tables at once.
   const tablesAt = [from + 2, cascadeAt - 12, setNullAt - 12];
@@ -178,6 +197,12 @@ export const DeleteScene: React.FC = () => {
               </span>
             </span>
           </Ink>
+        ))}
+
+        {/* A hairline in each gap between the columns, inking in with the
+            heading of the column to its right. */}
+        {[1, 2].map((i) => (
+          <ColumnRule key={i} x={(colRight[i - 1] + COL_X[i]) / 2} top={ruleTop} height={ruleH} at={deletingAt - 2 + i * 4} />
         ))}
 
         {/* ── RESTRICT: accounts and invoices ── */}

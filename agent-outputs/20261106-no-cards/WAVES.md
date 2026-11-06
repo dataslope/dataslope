@@ -17,9 +17,9 @@ Brief: BRIEF.md in this folder. Layout only, no re-voicing, no new images.
 - DA 5-8: da-spreadsheets, da-visualization, da-ab-testing, da-ai-assisted (started when Part 9 finished)
 - DbD 3-5: db-relationships, db-keys, db-relationship-patterns (started when Part 6 finished)
 - DbD 6-9: db-constraints, db-normalization, db-designing-schemas, db-relational-history (started when Part 8 finished)
+- Stats 5: sampling, sampling-bias, survivorship-bias, sampling-distributions, central-limit-theorem, standard-error (started when Part 1 finished)
 
 ## Later waves (start one as each agent finishes)
-- Stats 5: sampling, sampling-bias, survivorship-bias, sampling-distributions, central-limit-theorem, standard-error
 - Stats 6-9: estimation, testing-hypotheses, interpreting-results, statistics-in-practice
 - LLM 1-3: llm-tokens, llm-meaning, llm-attention-score, llm-generation
 - LLM 4-5: llm-cost, llm-conversation-cost, llm-benchmarks, llm-temperature

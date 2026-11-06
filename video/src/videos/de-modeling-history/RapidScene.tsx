@@ -99,10 +99,14 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={flagsAt} x={R_X} y={top - c.h(56)}>
         <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>small flags, each a column on the fact</span>
       </Note>
-      <div style={{ position: "absolute", left: R_X, top, display: "flex", alignItems: "flex-start", gap: 40 }}>
+      {/* Three columns of values, a "×" between them, then "=" and the
+          count on a line of its own with its label under it. Every gap is
+          wide enough that the operators, the values and the count, set at
+          different sizes, never read as one line of type. */}
+      <div style={{ position: "absolute", left: R_X, top, display: "flex", alignItems: "flex-start" }}>
         {groups.map((g, i) => (
           <React.Fragment key={g.name}>
-            {i ? <div style={{ ...note(34, INK_SOFT), marginTop: 50, opacity: ease(frame, g.at, 10) }}>×</div> : null}
+            {i ? <div style={{ ...note(34, INK_SOFT), margin: "50px 44px 0", opacity: ease(frame, g.at, 10) }}>×</div> : null}
             <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-start" }}>
               <div style={{ ...label(21, INK_SOFT), fontWeight: 700, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
               {g.values.map((v, j) => (
@@ -113,12 +117,12 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
             </div>
           </React.Fragment>
         ))}
-        <div style={{ ...note(34, INK_SOFT), marginTop: 50, opacity: ease(frame, everyAt, 10) }}>=</div>
-        <div style={{ marginTop: 36, opacity: ease(frame, twelveAt - 2, 10), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(46, BLUE_INK), fontWeight: 750 }}>
+        <div style={{ ...note(42, INK_SOFT), margin: "34px 18px 0 54px", opacity: ease(frame, everyAt, 10) }}>=</div>
+        <div style={{ marginTop: 30, opacity: ease(frame, twelveAt - 2, 10), whiteSpace: "nowrap" }}>
+          <div style={{ ...note(46, BLUE_INK), fontWeight: 750 }}>
             <Num>{RAPID.junk}</Num>
-          </span>
-          <span style={{ ...note(26, INK), marginLeft: 10 }}>rows in dim_junk</span>
+          </div>
+          <div style={{ ...note(26, INK), marginTop: 2 }}>rows in dim_junk</div>
         </div>
       </div>
       <Note at={oneAt} x={R_X} y={c.y(660)}>
