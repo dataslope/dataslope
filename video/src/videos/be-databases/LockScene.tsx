@@ -17,16 +17,27 @@ const R_X = 980;
 const ROW_W = 330;
 const SLIDER_Y = 790;
 
-/** A padlock, drawn: a shackle over a body. */
+/** The padlock: Lucide's `lock` icon (ISC licence), drawn inline at about
+ *  the row's text size (the owner: the old filled padlock was too big). */
+const PADLOCK = 26;
 const Padlock: React.FC<{ x: number; y: number; at: number; color?: string }> = ({ x, y, at, color = INK }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   if (p <= 0) return null;
   return (
-    <svg width={40} height={44} style={{ position: "absolute", left: x, top: y - (1 - p) * 14, opacity: p, overflow: "visible" }}>
-      <path d="M11,20 V13 a9,9 0 0 1 18,0 V20" fill="none" stroke={color} strokeWidth={3.5} />
-      <rect x={5} y={19} width={30} height={22} rx={4} fill={color} />
-      <circle cx={20} cy={29} r={3} fill={PAPER} />
+    <svg
+      width={PADLOCK}
+      height={PADLOCK}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ position: "absolute", left: x, top: y - (1 - p) * 10, opacity: p, overflow: "visible" }}
+    >
+      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
   );
 };
@@ -172,7 +183,7 @@ export const LockScene: React.FC = () => {
         </Note>
         <AccountRow x={X0} y={rowsTop} h={rowH} id={1} balance={100} at={forUpdateAt} tone={ease(frame, untilAt, 8) > 0.5 ? "held" : "data"} />
         <AccountRow x={X0} y={row2} h={rowH} id={2} balance={LOCK.otherRow?.balance ?? 0} at={forUpdateAt + 4} tone={ease(frame, freeAt + 4, 8) > 0.5 ? "ok" : "data"} />
-        <Padlock x={X0 + ROW_W - 56} y={rowsTop + rowH / 2 - 22} at={untilAt} />
+        <Padlock x={X0 + ROW_W - 48} y={rowsTop + rowH / 2 - PADLOCK / 2} at={untilAt} />
         <Listing lines={holder} x={X0} top={lockTop} width={740} size={20} at={forUpdateAt - 4} out={holdsAt - 2} marks={[{ line: "FOR UPDATE", text: "FOR UPDATE", at: forUpdateAt + 8 }]} />
         <Node x={waiter.x} y={waiter.y} w={waiter.w} h={waiter.h} at={otherAt} tone="plain" bare title="another transaction" size={22} out={holdsAt - 2} />
         <Flow points={[[waiter.x - 10, waiter.y + waiter.h / 2], [X0 + ROW_W + 14, waiter.y + waiter.h / 2]]} at={otherAt + 4} color={INK_SOFT} width={2.4} dash="7 6" out={holdsAt - 2} />

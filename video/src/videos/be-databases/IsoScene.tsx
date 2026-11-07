@@ -23,6 +23,9 @@ const T0 = 470;
 const T1 = 1760;
 
 const LEVELS = ["read uncommitted", "read committed", "repeatable read", "serializable"];
+/** The highlight behind "read committed" (23px, weight 650, about 177px
+ *  wide): 8px of yellow on either side of the words, not cut off at the d. */
+const DEFAULT_MARK_W = 194;
 const ANOMALIES = ["dirty read", "non-repeatable", "phantom"];
 /** The SQL standard's table: which anomaly each level allows. */
 const ALLOWS = [
@@ -219,13 +222,13 @@ export const IsoScene: React.FC = () => {
             return (
               <g key={lv} opacity={p}>
                 {serial > 0 ? <rect x={X0 - 10} y={yy + 6} width={gridW + 10} height={rowH - 12} rx={5} fill={`color-mix(in srgb, ${OK} ${20 * serial}%, transparent)`} /> : null}
-                {isDefault > 0 ? <rect x={X0 - 8} y={yy + 8} width={182} height={rowH - 16} rx={4} fill={HIGHLIGHT} opacity={isDefault} /> : null}
+                {isDefault > 0 ? <rect x={X0 - 8} y={yy + 8} width={DEFAULT_MARK_W} height={rowH - 16} rx={4} fill={HIGHLIGHT} opacity={isDefault} /> : null}
                 <line x1={X0} y1={yy + rowH} x2={X0 + LEVEL_W + 120 + (3 * COL_W - 120) * move} y2={yy + rowH} stroke={HAIRLINE} strokeWidth={1} opacity={0.5} />
                 <text x={X0} y={yy + rowH / 2 + 8} style={svgText({ ...note(23, INK), fontWeight: 650 })}>
                   {lv}
                 </text>
                 {i === 1 ? (
-                  <text x={X0 + 192} y={yy + rowH / 2 + 8} style={svgText(note(22, INK_SOFT))} opacity={isDefault}>
+                  <text x={X0 + DEFAULT_MARK_W + 6} y={yy + rowH / 2 + 8} style={svgText(note(22, INK_SOFT))} opacity={isDefault}>
                     default
                   </text>
                 ) : null}

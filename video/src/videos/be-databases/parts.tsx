@@ -157,10 +157,12 @@ const Band: React.FC<{ lines: readonly string[]; mark: LineMark; size: number; p
     <div
       style={{
         position: "absolute",
-        left: padX - size * 0.2 + start * 0.6 * size,
+        // A third of an em of yellow either side of the characters, so the
+        // band does not stop on the last letter's edge.
+        left: padX - size * 0.32 + start * 0.6 * size,
         top: padY + i * lineH + lineH * 0.12,
         height: lineH * 0.76,
-        width: (chars * 0.6 + 0.4) * size * w,
+        width: (chars * 0.6 + 0.64) * size * w,
         background: mark.color ?? HIGHLIGHT,
         opacity: 1 - o,
       }}
