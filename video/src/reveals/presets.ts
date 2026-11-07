@@ -1,4 +1,5 @@
 import type { LogoRevealProps } from "./LogoReveal";
+import { openerId, SERIES, type SeriesDef, unitLabel } from "../series.ts";
 
 /**
  * The logo reveals in the Studio's Logo-Reveals folder. Every one is the same
@@ -137,7 +138,41 @@ const COLUMNS: { id: string; props: LogoRevealProps }[] = [
     unit: "Unit 4",
     title: "Keys and integrity",
   }),
+  // Columns-7 as the template for every unit opener (the owner: "Unit 1"
+  // and "Unit Title Goes Here"). render-all renders it with the videos.
+  opener("Columns-7-Unit-Sample", {
+    layout: "columns",
+    motion: "assemble",
+    text: "blur",
+    textInk: "black",
+    threeLines: true,
+    course: "Database Design with PostgreSQL",
+    unit: "Unit 1",
+    title: "Unit Title Goes Here",
+  }),
 ];
+
+/**
+ * The opener before each unit of a stitched series (src/series.ts,
+ * `npm run render:series`): Columns-7-Unit-Sample's three lines, the
+ * series' name, "Unit n" or "Part n", and the unit's title. A course's are
+ * blue, an interview track's green (mark and title), as their thumbnails.
+ */
+export const SERIES_OPENERS: { id: string; props: LogoRevealProps }[] = Object.entries(SERIES as Record<string, SeriesDef>).flatMap(([key, s]) =>
+  s.units.map((u) =>
+    opener(openerId(key, u), {
+      layout: "columns",
+      motion: "assemble",
+      text: "blur",
+      textInk: "black",
+      threeLines: true,
+      course: s.name,
+      unit: unitLabel(s, u),
+      title: u.title,
+      hue: s.kind === "interview" ? "green" : "blue",
+    }),
+  ),
+);
 
 export const REVEALS: { id: string; props: LogoRevealProps }[] = [
   ...INTER,

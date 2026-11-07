@@ -7,7 +7,7 @@ import { EDITORIAL_DEFAULTS, type EditorialProps } from "./editorial/Page";
 import { ErdKit } from "./editorial/ErdKit";
 import { InterviewKit } from "./editorial/interview";
 import { LogoReveal, REVEAL_FRAMES } from "./reveals/LogoReveal";
-import { REVEALS } from "./reveals/presets";
+import { REVEALS, SERIES_OPENERS } from "./reveals/presets";
 import { THUMBNAIL, THUMBNAILS, Thumbnail } from "./thumbnails/Thumbnail";
 // Database Design with PostgreSQL, one video per unit.
 import { DbWhyDesign } from "./videos/db-why-design/Video";
@@ -1223,6 +1223,13 @@ export const RemotionRoot: React.FC = () => (
           durationInFrames={props.layout === "sting" ? REVEAL_FRAMES.sting : REVEAL_FRAMES.opener}
           defaultProps={props}
         />
+      ))}
+    </Folder>
+    <Folder name="Series-Openers">
+      {/* The opener before each unit of a stitched series (src/series.ts,
+          npm run render:series). */}
+      {SERIES_OPENERS.map(({ id, props }) => (
+        <Composition key={id} id={id} component={LogoReveal} width={1920} height={1080} fps={FPS} durationInFrames={REVEAL_FRAMES.opener} defaultProps={props} />
       ))}
     </Folder>
     <Folder name="Thumbnails">

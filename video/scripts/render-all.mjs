@@ -26,12 +26,16 @@
  * is missing renders whatever the manifest says.
  *
  * The two review kits under "Assets" in Root.tsx (ErdKit, InterviewKit) are
- * not videos and are not rendered.
+ * not videos and are not rendered. Compositions in EXTRAS are rendered with
+ * the videos though they are not narrated: the unit opener sample, and the
+ * opener before each unit of a series (src/series.ts), which
+ * `npm run render:series` stitches between the videos.
  */
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { openerId, SERIES, unitLabel } from "../src/series.ts";
 import { registry, videoNames } from "./lib/audio.mjs";
 
 const VIDEO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -119,17 +123,38 @@ const GLOBAL = JSON.stringify({
   ]),
 });
 
+/**
+ * Rendered with the videos though they live outside src/videos/: each id
+ * with the source files (under src/) its fingerprint starts from. A series
+ * opener leaves src/series.ts out of its sources and hashes its own lines
+ * instead, so renaming one unit re-renders that unit's opener alone.
+ */
+const OPENER_SOURCES = ["reveals/presets.ts", "reveals/LogoReveal.tsx"];
+const EXTRAS = [
+  { id: "Columns-7-Unit-Sample", seeds: OPENER_SOURCES },
+  ...Object.entries(SERIES).flatMap(([key, s]) =>
+    s.units.map((u) => ({
+      id: openerId(key, u),
+      seeds: OPENER_SOURCES,
+      ignore: ["series.ts"],
+      data: { kind: s.kind, name: s.name, unit: unitLabel(s, u), title: u.title },
+    })),
+  ),
+];
+
 const ASSET_DIRS = ["narration", "images", "patterns"].map((d) => path.join(PUBLIC, d));
 const assetNames = new Set(ASSET_DIRS.flatMap((d) => (existsSync(d) ? readdirSync(d) : [])));
 
-function fingerprint({ id, folder }) {
-  const dir = path.join(SRC, "videos", folder);
-  const seeds = ["Video.tsx", "script.ts"].map((f) => path.join(dir, f)).filter(existsSync);
-  const sources = [...importGraph([...seeds, ...rootShared])].sort();
+function fingerprint({ id, folder, seeds: extraSeeds, ignore = [], data }) {
+  const seeds = extraSeeds
+    ? extraSeeds.map((f) => path.join(SRC, f))
+    : ["Video.tsx", "script.ts"].map((f) => path.join(SRC, "videos", folder, f)).filter(existsSync);
+  const skip = new Set(ignore.map((f) => path.join(SRC, f)));
+  const sources = [...importGraph([...seeds, ...rootShared])].filter((f) => !skip.has(f)).sort();
 
   // Asset folders this video reads: its own, those of any video folder its
   // sources come from, and any its sources name as a string ("c-pointers").
-  const names = new Set([folder]);
+  const names = new Set(folder ? [folder] : []);
   for (const file of sources) {
     const rel = path.relative(path.join(SRC, "videos"), file);
     if (!rel.startsWith("..")) names.add(rel.split(path.sep)[0]);
@@ -141,14 +166,14 @@ function fingerprint({ id, folder }) {
   }
   const assets = [...names].flatMap((n) => ASSET_DIRS.flatMap((d) => filesUnder(path.join(d, n)))).sort();
 
-  const h = createHash("sha256").update(GLOBAL).update(compositionBlock(id));
+  const h = createHash("sha256").update(GLOBAL).update(compositionBlock(id)).update(JSON.stringify(data ?? null));
   for (const file of [...sources, ...assets]) h.update(`${path.relative(VIDEO_ROOT, file)}\0${hashFile(file)}\n`);
   return h.digest("hex");
 }
 
 // --- Plan ------------------------------------------------------------------
 
-let videos = registry();
+let videos = [...registry(), ...EXTRAS];
 if (only) {
   const wanted = new Set(only.map((n) => videoNames(n, videos).id));
   const unknown = [...wanted].filter((id) => !videos.some((v) => v.id === id));
