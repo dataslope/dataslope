@@ -152,17 +152,26 @@ const Band: React.FC<{ lines: readonly string[]; mark: LineMark; size: number; p
   const line = lines[i];
   const start = mark.text === undefined ? line.length - line.trimStart().length : line.indexOf(mark.text);
   if (start < 0) throw new Error(`line ${JSON.stringify(line)} has no ${JSON.stringify(mark.text)}`);
-  const chars = mark.text === undefined ? line.length - start : mark.text.length;
+  // A ";" or "," right after the marked text goes inside the band, as it
+  // does when a whole line is marked: a band that stops between ")" and ";"
+  // reads as cut short.
+  const marked = mark.text === undefined ? line.length - start : mark.text.length;
+  const chars = /[;,]/.test(line[start + marked] ?? "") ? marked + 1 : marked;
+  // A third of an em of yellow either side of the characters, so the band
+  // does not stop on the last letter's edge; but only into a space or past
+  // the line's end. Where another character touches the band it stops at
+  // the cell's edge, or it would half cover that character.
+  const open = (c: string | undefined) => c === undefined || c === " ";
+  const padL = open(line[start - 1]) ? 0.32 : 0.04;
+  const padR = open(line[start + chars]) ? 0.32 : 0.04;
   return (
     <div
       style={{
         position: "absolute",
-        // A third of an em of yellow either side of the characters, so the
-        // band does not stop on the last letter's edge.
-        left: padX - size * 0.32 + start * 0.6 * size,
+        left: padX + (start * 0.6 - padL) * size,
         top: padY + i * lineH + lineH * 0.12,
         height: lineH * 0.76,
-        width: (chars * 0.6 + 0.64) * size * w,
+        width: (chars * 0.6 + padL + padR) * size * w,
         background: mark.color ?? HIGHLIGHT,
         opacity: 1 - o,
       }}
