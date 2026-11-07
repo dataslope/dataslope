@@ -120,14 +120,16 @@ size to upload, since YouTube streams a 4K upload at a higher bitrate even
 to a 1080p viewer, which keeps small type sharp.
 
 **`npm run render:all`** (`scripts/render-all.mjs`) renders every video,
-plus the series openers and the unit opener sample, and skips each one whose
-output is in `out/` and whose inputs have not changed since it was rendered.
-A video's fingerprint is a hash of everything its render reads: the source
-files reachable from its folder, the shared kit, its `<Composition>` in
+plus the series openers and the unit opener sample. It skips a video whose
+output is in `out/` and whose content has not changed since it was
+rendered, and re-renders one whose content has, even though the old file is
+there. Its content is everything its render reads: the source files
+reachable from its folder, the shared kit, its `<Composition>` in
 `Root.tsx`, its narration, images and patterns, the sound effects and brand
-files, the dependency versions and the render settings. Fingerprints are
-kept in `out/.render-manifest.json`, written after each render, so a run
-that stops resumes where it stopped.
+files, the dependency versions and the render settings. After each render
+`out/.render-manifest.json` records a hash of every one of those files, so a
+run that stops resumes where it stopped, and `--dry-run` says which files
+changed (`Llm-1-Tokens (changed: src/videos/llm-tokens/BpeScene.tsx)`).
 
 ```bash
 npm run render:all                           # 4K, every video that changed
@@ -139,7 +141,19 @@ npm run render:all -- --force                # render even if unchanged
 
 An edit to one scene re-renders that video alone; an edit to the shared kit
 (`src/editorial/`, `src/theme/`) or the sound effects re-renders every video,
-as it should. The first run after a change like that takes hours at 4K.
+as it should. The first run after a change like that takes hours at 4K. An
+edit to a thumbnail, an opener or a review kit re-renders no video: those
+are imported by `Root.tsx` but read by no video, so they are not part of a
+video's content (until 2026-11-07 they were, and a thumbnail edit
+re-rendered everything). Saving a file without changing it re-renders
+nothing, since the hashes compare content, not dates.
+
+An output with no record (rendered by hand with `npm run render`, or by the
+first version of the script, which kept one hash per video) is judged by
+date: it is up to date if it is newer than every file it reads. Git rewrites
+only the files a pull changes, so a pull that changes a video leaves its
+output older than its inputs, and it renders again. Its record is written
+on the next run, and from then on the hashes decide.
 
 **`npm run render:series`** (`scripts/render-series.mjs`) puts a whole
 course or interview track in one video: before each unit or part, its
@@ -782,15 +796,19 @@ npm run thumbnails -- DataEngineer,Statistics # just these
 npm run thumbnails -- --list                  # the tracks it knows
 ```
 
-`scripts/render-thumbnails.mjs` renders whatever `Thumb-` stills Root.tsx
-registers, so a new track is one entry in `TRACKS`. A PNG is about 200 to
+`scripts/render-thumbnails.mjs` renders one `Thumb-<Track>` still per
+entry in `TRACKS` (`src/thumbnails/tracks.ts`), so a new track is one entry
+there. It loads only those stills; asking Remotion for every composition
+would also time every video, and log a 404 for each one with no recorded
+narration. A PNG is about 200 to
 300 kB, well inside YouTube's 2 MB limit.
 
-Each track has its own watercolor animal, so the seven read apart at a
+Each track has its own watercolor animal, so the eight read apart at a
 glance in a list of results: an owl on a die (Statistics), an elephant at a
 card catalog (Database Design), a llama with books (LLMs), a parrot (NLP), a
-raccoon (Data Analyst), and the otter and meerkat of the Data Scientist and
-Data Engineer overviews.
+raccoon (Data Analyst), the otter and meerkat of the Data Scientist and
+Data Engineer overviews, and a beaver with a log beside a stack of servers
+(Backend Engineer).
 
 A white page, the Dataslope mark alone in the top-left corner (no
 wordmark), the words low on the left and the animal on the right: standing
@@ -810,12 +828,12 @@ the mark and as far in from the edge.
   Preparation" does not fit at all, so it takes two lines.
 - **Nothing in the bottom-right corner**, where YouTube prints the running
   time. The animal's box stops well short of it.
-- **The art goes through the pipeline.** The five new animals are prompts in
+- **The art goes through the pipeline.** The six new animals are prompts in
   `src/thumbnails/illustrations.json` (watercolor, 1024x1024, transparent),
   generated and imported like any video's art:
   `npm run illustrations -- thumbnails`, which finds prompts under
   `src/<name>/` as well as `src/videos/<name>/`. A track's words and animal
-  are one entry in `TRACKS` (`src/thumbnails/Thumbnail.tsx`).
+  are one entry in `TRACKS` (`src/thumbnails/tracks.ts`).
 
 
 ## Sound effects (SamplingBias, ThinkingStatistically)

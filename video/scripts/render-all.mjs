@@ -8,12 +8,16 @@
  *   npm run render:all -- --dry-run            # list what would render
  *   npm run render:all -- --force              # render even if unchanged
  *
- * A video's fingerprint is a hash of everything its render reads:
+ * A video is up to date when its output is in out/ and nothing its render
+ * reads has changed since it was rendered. What it reads:
  *
  * - every source file reachable by relative import from its Video.tsx and
  *   script.ts, plus Root.tsx's shared imports (theme, fonts, narration
  *   metadata), so an edit to the editorial kit re-renders the videos that use
- *   it and no others;
+ *   it and no others. Root.tsx's imports that only its other folders use
+ *   (the logo reveals and series openers, the thumbnails, the review kits)
+ *   are left out: once they were in, a thumbnail edit re-rendered every
+ *   video;
  * - its own <Composition> block in Root.tsx;
  * - public/narration, public/images and public/patterns for its folder and
  *   for any other one its sources name (a merged video times several
@@ -21,9 +25,19 @@
  * - the dependency versions in package.json, remotion.config.ts, and the
  *   render settings.
  *
- * Fingerprints live in out/.render-manifest.json, written after each render,
- * so an interrupted run resumes where it stopped. A video whose output file
- * is missing renders whatever the manifest says.
+ * After each render, out/.render-manifest.json records a hash of every file
+ * the output was made from (and of its settings), so an interrupted run
+ * resumes where it stopped, and `--dry-run` names the files that changed. A
+ * file that stops being read changes nothing, so narrowing these rules never
+ * re-renders a video. A video whose output file is missing renders whatever
+ * the manifest says.
+ *
+ * An output with no such record (rendered by hand, or by an older version of
+ * this script, which kept one hash per video) is judged by dates: it is up
+ * to date if it is newer than every file it reads. Git rewrites only the
+ * files a pull changes, so a pull that changes a video makes it older than
+ * its inputs. Such an output's record is written on the next run that is not
+ * a dry run, and from then on the hashes decide.
  *
  * The two review kits under "Assets" in Root.tsx (ErdKit, InterviewKit) are
  * not videos and are not rendered. Compositions in EXTRAS are rendered with
@@ -102,7 +116,10 @@ const hashFile = (file) => {
 };
 
 const rootSrc = readFileSync(path.join(SRC, "Root.tsx"), "utf8");
+/** Root.tsx's imports that no video reads: its other folders' components. */
+const ROOT_ONLY = /^\.\/(reveals|thumbnails)\/|^\.\/editorial\/(ErdKit|interview)$/;
 const rootShared = [...rootSrc.matchAll(/^import [^;]*?["'](\.\/(?!videos\/)[^"']+)["'];/gm)]
+  .filter((m) => !ROOT_ONLY.test(m[1]))
   .map((m) => resolveImport(path.join(SRC, "Root.tsx"), m[1]))
   .filter(Boolean);
 
@@ -113,15 +130,17 @@ const compositionBlock = (id) => {
 };
 
 const pkg = JSON.parse(readFileSync(path.join(VIDEO_ROOT, "package.json"), "utf8"));
-const GLOBAL = JSON.stringify({
+/** What every render reads that is not a file of its own: the settings,
+ *  the dependency versions and the Remotion config. */
+const SETTINGS_KEY = JSON.stringify({
   settings: SETTINGS,
   dependencies: pkg.dependencies,
   config: readFileSync(path.join(VIDEO_ROOT, "remotion.config.ts"), "utf8"),
-  shared: [...filesUnder(path.join(PUBLIC, "sfx")), ...filesUnder(path.join(PUBLIC, "brand"))].map((f) => [
-    path.relative(VIDEO_ROOT, f),
-    hashFile(f),
-  ]),
 });
+/** Files every render reads: the sound effects and the brand assets. */
+const SHARED_FILES = [...filesUnder(path.join(PUBLIC, "sfx")), ...filesUnder(path.join(PUBLIC, "brand"))];
+/** A path in the manifest: relative to video/, with forward slashes. */
+const rel = (file) => path.relative(VIDEO_ROOT, file).replaceAll(path.sep, "/");
 
 /**
  * Rendered with the videos though they live outside src/videos/: each id
@@ -166,10 +185,16 @@ function fingerprint({ id, folder, seeds: extraSeeds, ignore = [], data }) {
   }
   const assets = [...names].flatMap((n) => ASSET_DIRS.flatMap((d) => filesUnder(path.join(d, n)))).sort();
 
-  const h = createHash("sha256").update(GLOBAL).update(compositionBlock(id)).update(JSON.stringify(data ?? null));
-  for (const file of [...sources, ...assets]) h.update(`${path.relative(VIDEO_ROOT, file)}\0${hashFile(file)}\n`);
-  return h.digest("hex");
+  // The settings and its own entry (its Root.tsx block, an opener's lines),
+  // then a hash of each file it reads.
+  const meta = createHash("sha256").update(SETTINGS_KEY).update(compositionBlock(id)).update(JSON.stringify(data ?? null)).digest("hex").slice(0, 16);
+  const paths = [...new Set([...sources, ...assets, ...SHARED_FILES])];
+  const files = Object.fromEntries(paths.map((f) => [rel(f), hashFile(f).slice(0, 16)]).sort(([a], [b]) => (a < b ? -1 : 1)));
+  return { record: { meta, files }, paths };
 }
+
+/** A few names from a list, and how many more. */
+const some = (names) => names.slice(0, 2).join(", ") + (names.length > 2 ? ` (+${names.length - 2} more)` : "");
 
 // --- Plan ------------------------------------------------------------------
 
@@ -193,23 +218,43 @@ try {
 const key = (id) => path.relative(OUT, outputOf(id)).replaceAll(path.sep, "/");
 
 const todo = [];
+/** Outputs judged up to date whose record is missing or out of form: written
+ *  before rendering, so the hashes decide from then on. */
+const recorded = {};
 for (const v of videos) {
-  const hash = fingerprint(v);
+  const { record, paths } = fingerprint(v);
   const output = outputOf(v.id);
-  const reason = force
-    ? "forced"
-    : !existsSync(output)
-      ? "not rendered"
-      : manifest[key(v.id)] !== hash
-        ? manifest[key(v.id)]
-          ? "changed"
-          : "no fingerprint"
-        : null;
-  if (reason) todo.push({ ...v, hash, output, reason });
+  const before = manifest[key(v.id)];
+  let reason = null;
+  if (force) reason = "forced";
+  else if (!existsSync(output)) reason = "not rendered";
+  else if (before && typeof before === "object") {
+    // What it was rendered from: any file it reads now that differs.
+    const changed = Object.keys(record.files).filter((f) => before.files?.[f] !== record.files[f]);
+    if (before.meta !== record.meta) reason = "changed: its render settings or its entry in Root.tsx";
+    else if (changed.length) reason = `changed: ${some(changed)}`;
+    // Up to date; if it read files it no longer reads, keep the record tidy.
+    else if (Object.keys(before.files).length !== Object.keys(record.files).length) recorded[key(v.id)] = record;
+  } else {
+    // No record of what it was made from: compare dates.
+    const made = statSync(output).mtimeMs;
+    const newer = paths.filter((f) => statSync(f).mtimeMs > made);
+    if (newer.length) reason = `edited since it was rendered: ${some(newer.map(rel))}`;
+    else recorded[key(v.id)] = record;
+  }
+  if (reason) todo.push({ ...v, record, output, reason });
+}
+
+const nRecorded = Object.keys(recorded).length;
+if (nRecorded && !dryRun) {
+  Object.assign(manifest, recorded);
+  mkdirSync(OUT, { recursive: true });
+  writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + "\n");
 }
 
 console.log(`${videos.length - todo.length} up to date, ${todo.length} to render.`);
 for (const v of todo) console.log(`  ${v.id}  (${v.reason})`);
+if (nRecorded) console.log(`${nRecorded} of the up-to-date ones had no record and were judged by date; ${dryRun ? "recorded on the next real run" : "recorded now"}.`);
 if (dryRun || todo.length === 0) process.exit(0);
 
 // --- Render ----------------------------------------------------------------
@@ -244,7 +289,7 @@ for (const [i, v] of todo.entries()) {
     });
     const secs = Math.round((Date.now() - started) / 1000);
     process.stdout.write(`\r${label}  → ${path.relative(VIDEO_ROOT, v.output)} (${secs}s)\n`);
-    manifest[key(v.id)] = v.hash;
+    manifest[key(v.id)] = v.record;
     writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + "\n");
   } catch (err) {
     process.stdout.write(`\r${label}  FAILED\n`);

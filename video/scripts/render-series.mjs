@@ -79,13 +79,17 @@ const unitRange = (() => {
 
 const outputOf = (id) => path.join(OUT, fhd ? `${id}-fhd.mp4` : `${id}.mp4`);
 
-// Remotion's own ffmpeg and ffprobe, through its CLI.
+// Remotion's own ffmpeg and ffprobe, through its CLI. On Windows npx is a
+// .cmd, which only runs through a shell, and cmd splits an argument at its
+// spaces (and at , ; =) unless it is quoted.
+const WIN = process.platform === "win32";
+const shellArg = (a) => (WIN && /[\s"&|<>^(),;=]/.test(a) ? `"${a.replaceAll('"', '\\"')}"` : a);
 const tool = (name, toolArgs, opts = {}) => {
-  const r = spawnSync("npx", ["remotion", name, ...toolArgs], {
+  const r = spawnSync("npx", ["remotion", name, ...toolArgs].map(shellArg), {
     cwd: VIDEO_ROOT,
     encoding: "utf8",
     maxBuffer: 1 << 26,
-    shell: process.platform === "win32",
+    shell: WIN,
     ...opts,
   });
   if (r.status !== 0) throw new Error(`${name} failed:\n${r.stderr || r.stdout}`);
@@ -168,7 +172,9 @@ for (const name of names) {
 
   mkdirSync(SERIES_OUT, { recursive: true });
   const list = path.join(SERIES_OUT, `${stem}.concat.txt`);
-  writeFileSync(list, probed.map((p) => `file '${outputOf(p.id).replaceAll("'", "'\\''")}'`).join("\n") + "\n");
+  // Forward slashes on Windows too, which ffmpeg reads there as well.
+  const listPath = (f) => f.replaceAll("\\", "/").replaceAll("'", "'\\''");
+  writeFileSync(list, probed.map((p) => `file '${listPath(outputOf(p.id))}'`).join("\n") + "\n");
   console.log(`\nStitching ${probed.length} pieces (${clock(total)})…`);
   const started = Date.now();
   tool("ffmpeg", [
