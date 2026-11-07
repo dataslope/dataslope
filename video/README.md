@@ -102,6 +102,7 @@ npm run render:fhd -- CPointers out/CPointers-fhd.mp4   # 1920x1080
 npm run render:preview -- CPointers out/c-pointers-preview.mp4   # half size, fast
 npm run render:all -- --fhd                  # every video changed since its last render, 1080p
 npm run render:series -- Statistics --fhd    # a whole course in one video, openers between units
+npm run thumbnails                           # every YouTube thumbnail → out/thumbnails/<Track>.png
 npm run still -- CPointers out/frame.png --frame=600
 npm run cues -- c-pointers                   # when each beat is spoken
 ```
@@ -762,19 +763,28 @@ npm run render -- Opener-1-Stack --props='{"course":"Database Design with Postgr
 
 ## YouTube thumbnails
 
-Stills in the Studio's `Thumbnails` folder, 1280x720, the animal hung
-top-right throughout. A course's "Full Course" is at its title's size, in
-four variations: "Full Course" in blue over the name in black (`V1`), the
-reverse (`V2`), and the same two with "Full Course" under the name (`V3`,
-`V4`). An interview track says "Interview" and "Questions" on two lines,
-with a green mark, green being the interview series' color against the
-courses' blue, in four variations: the role first in black and the label
-in green (`V1`), the role in green and the label in black (`V2`), the label
-first in black and the role in green (`V3`), the label first in green and
-the role in black (`V4`). Earlier rounds' options (a smaller "Full Course",
-the animal low, "Interview Prep", other greys and greens) are props. For
-example `Thumb-DatabaseDesign-V1-BlueKicker` or
-`Thumb-DataEngineer-V4-QuestionsGreenFirst-RoleBlack`.
+One still per track in the Studio's `Thumbnails` folder, `Thumb-<Track>`,
+1280x720, with the animal hung top-right (the owner's choice, 2026-11-07):
+
+- **A course:** its name in black, then "Full Course" in the brand blue
+  under it, at the name's size, and a blue mark.
+- **An interview track:** its role in green, then "Interview" and
+  "Questions" in black on two lines, and a green mark, green being the
+  interview series' color against the courses' blue.
+
+The earlier rounds' options (a smaller "Full Course" or one above the name,
+the animal low, the role in black or blue, "Interview Prep", other greys
+and greens) remain props of `Thumbnail`.
+
+```bash
+npm run thumbnails                            # every track → out/thumbnails/<Track>.png
+npm run thumbnails -- DataEngineer,Statistics # just these
+npm run thumbnails -- --list                  # the tracks it knows
+```
+
+`scripts/render-thumbnails.mjs` renders whatever `Thumb-` stills Root.tsx
+registers, so a new track is one entry in `TRACKS`. A PNG is about 200 to
+300 kB, well inside YouTube's 2 MB limit.
 
 Each track has its own watercolor animal, so the seven read apart at a
 glance in a list of results: an owl on a die (Statistics), an elephant at a
@@ -789,8 +799,8 @@ the mark and as far in from the edge.
 
 - **One weight, one pitch.** Every word is Inter 500 and every line sits on
   the title's line pitch, blue or green lines included, with nothing added
-  between them. The title is 80px (`SIZE`), and so is "Full Course" in this
-  round's variations. No pills or badges; the words sit on the page.
+  between them. The title is 80px (`SIZE`), and so is "Full Course". No
+  pills or badges; the words sit on the page.
 - **One size of animal.** The raccoon is drawn at 86% of its box
   (`artScale` in `TRACKS`): its body fills more of its picture than the
   otter's or the meerkat's, and at full size it read larger than them.
@@ -807,9 +817,6 @@ the mark and as far in from the edge.
   `src/<name>/` as well as `src/videos/<name>/`. A track's words and animal
   are one entry in `TRACKS` (`src/thumbnails/Thumbnail.tsx`).
 
-```bash
-npx remotion still src/index.ts Thumb-DatabaseDesign-V1-BlueKicker out/thumb.png
-```
 
 ## Sound effects (SamplingBias, ThinkingStatistically)
 

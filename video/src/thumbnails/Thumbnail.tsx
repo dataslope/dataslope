@@ -222,29 +222,17 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
 
 export const THUMBNAIL = { width: W, height: H } as const;
 
-/** Every thumbnail the Studio shows, the owner's 2026-11-06 round: the
- *  animal hung top-right throughout and "Full Course" at the title's size.
- *  A course comes four ways: "Full Course" in blue over its name in black
- *  (V1) or the reverse (V2), and the same two with "Full Course" under the
- *  name (V3, V4). An interview track says "Interview" and
- *  "Questions" on two lines, four ways: the role first in black over the
- *  label in green (V1), the role in green over the label in black (V2), the
- *  label first in black over the role in green (V3), and the label first in
- *  green over the role in black (V4). Earlier rounds' options stay props
- *  (`kicker`, `artAt`, `label`, `tone`, `greenShade`). */
-export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entries(TRACKS).flatMap(([track, t]): { id: string; props: ThumbnailProps }[] => {
-  const base = { track, artAt: "top" as const };
-  return t.kind === "course"
-    ? [
-        { id: `Thumb-${track}-V1-BlueKicker`, props: { ...base, kicker: "same", courseBlue: "kicker" } },
-        { id: `Thumb-${track}-V2-BlueTitle`, props: { ...base, kicker: "same", courseBlue: "title" } },
-        { id: `Thumb-${track}-V3-BlueKickerBelow`, props: { ...base, kicker: "same", courseBlue: "kicker", kickerAt: "bottom" } },
-        { id: `Thumb-${track}-V4-BlueTitleKickerBelow`, props: { ...base, kicker: "same", courseBlue: "title", kickerAt: "bottom" } },
-      ]
-    : [
-        { id: `Thumb-${track}-V1-RoleBlack-QuestionsGreen`, props: { ...base, label: "questions-two", role: "black", tone: "green" } },
-        { id: `Thumb-${track}-V2-RoleGreen-QuestionsBlack`, props: { ...base, label: "questions-two", role: "green", tone: "black" } },
-        { id: `Thumb-${track}-V3-QuestionsBlackFirst-RoleGreen`, props: { ...base, label: "questions-two", role: "green", tone: "black", labelFirst: true } },
-        { id: `Thumb-${track}-V4-QuestionsGreenFirst-RoleBlack`, props: { ...base, label: "questions-two", role: "black", tone: "green", labelFirst: true } },
-      ];
-});
+/** One thumbnail per track, the owner's choice of 2026-11-07, the animal
+ *  hung top-right. A course: its name in black, "Full Course" under it in
+ *  blue, at the name's size. An interview track: its role in green, then
+ *  "Interview" and "Questions" in black on two lines. The earlier rounds'
+ *  options (a smaller "Full Course" or one above the name, the animal low,
+ *  other labels, greys and greens) remain props. `npm run thumbnails`
+ *  renders them to out/thumbnails/. */
+export const THUMBNAILS: { id: string; props: ThumbnailProps }[] = Object.entries(TRACKS).map(([track, t]) => ({
+  id: `Thumb-${track}`,
+  props:
+    t.kind === "course"
+      ? { track, artAt: "top", kicker: "same", courseBlue: "kicker", kickerAt: "bottom" }
+      : { track, artAt: "top", label: "questions-two", role: "green", tone: "black" },
+}));

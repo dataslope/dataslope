@@ -19,6 +19,7 @@
     "render:fhd": "remotion render --scale=1",
     "render:all": "node scripts/render-all.mjs",
     "render:series": "node scripts/render-series.mjs",
+    "thumbnails": "node scripts/render-thumbnails.mjs",
     "check:frames": "node scripts/check-frames.mjs",
     "check:sync": "node scripts/check-sync.mjs",
     "check:mix": "node scripts/check-mix.mjs",
