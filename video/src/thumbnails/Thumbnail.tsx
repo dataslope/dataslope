@@ -5,63 +5,25 @@ import { INK } from "../editorial/style";
 import { AnimatedMark } from "../reveals/Mark";
 import { ds } from "../theme/brand";
 import { SANS } from "../theme/fonts";
+import { TRACKS } from "./tracks";
 
 /**
  * YouTube thumbnails for the merged videos: one per course and interview
- * track, each with its own watercolor animal (src/thumbnails/illustrations.json,
- * and the otter and meerkat of the interview overviews), so the seven read
- * apart at a glance in a list of results.
+ * track (tracks.ts), each with its own watercolor animal
+ * (src/thumbnails/illustrations.json, and the otter and meerkat of the
+ * interview overviews), so the eight read apart at a glance in a list of
+ * results.
  *
  * A white page, the Dataslope mark alone in the top-left corner, the words
- * low on the left and the animal on the right. Every word is Inter 500: the
- * title at SIZE, in black; a course's "Full Course" smaller, above the title,
- * in the brand blue; an interview track's "Interview Prep" after the title,
- * in a neutral grey. No pills, no badges.
+ * low on the left and the animal on the right. Every word is Inter 500 at
+ * one size. A course: its name in black, "Full Course" under it in the brand
+ * blue. An interview track: its role in green, "Interview" and "Questions"
+ * under it in black, and the mark in green. No pills, no badges.
  *
  * Thumbnails are seen small (about 168x94 on a phone, where SIZE is about
  * 10px), so the words are few, and nothing that matters sits in the
  * bottom-right corner, where YouTube prints the running time.
  */
-export type Track = {
-  kind: "course" | "interview";
-  /** The title, one array entry per line. */
-  title: string[];
-  /** The watercolor animal: its folder under public/images/, and its id. */
-  art: { video: string; id: string };
-  /** Drawn smaller than the box allows, for an animal whose body fills
-   *  more of its picture than the others' (the raccoon). */
-  artScale?: number;
-};
-
-export const TRACKS: Record<string, Track> = {
-  Statistics: {
-    kind: "course",
-    title: ["Statistics for", "Data Science", "with Python"],
-    art: { video: "thumbnails", id: "thumb-owl" },
-  },
-  DatabaseDesign: {
-    kind: "course",
-    title: ["Database Design", "with PostgreSQL"],
-    art: { video: "thumbnails", id: "thumb-elephant" },
-  },
-  LargeLanguageModels: {
-    kind: "course",
-    title: ["How Large", "Language", "Models Work"],
-    art: { video: "thumbnails", id: "thumb-llama" },
-  },
-  NaturalLanguageProcessing: {
-    kind: "course",
-    title: ["Natural Language", "Processing", "with Python"],
-    art: { video: "thumbnails", id: "thumb-parrot" },
-  },
-  // The raccoon's body fills more of its picture than the otter's or the
-  // meerkat's, so at the same box it reads larger (the owner: "slightly
-  // smaller").
-  DataAnalyst: { kind: "interview", title: ["Data Analyst"], art: { video: "thumbnails", id: "thumb-raccoon" }, artScale: 0.86 },
-  DataScientist: { kind: "interview", title: ["Data Scientist"], art: { video: "ds-interview", id: "ds-interview-otter" } },
-  DataEngineer: { kind: "interview", title: ["Data Engineer"], art: { video: "de-interview", id: "de-interview-meerkat" } },
-};
-
 /** How an interview track names itself: "Interview Questions" (the
  *  series' name), or the earlier "Interview Prep" and "Interview
  *  Preparation", which is too wide for one line at SIZE and takes two.
@@ -184,7 +146,7 @@ export const Thumbnail: React.FC<ThumbnailProps> = ({
       <div
         style={{
           position: "absolute",
-          ...(top ? { right: PAD, width: 400, top: 52, height: 510 } : { left: 790, right: 90, top: 150, bottom: 60 }),
+          ...(top ? { right: PAD, width: t.artWidth ?? 400, top: 52, height: 510 } : { left: 790, right: 90, top: 150, bottom: 60 }),
           display: "flex",
           alignItems: top ? "flex-start" : "flex-end",
           justifyContent: top ? "flex-end" : "center",

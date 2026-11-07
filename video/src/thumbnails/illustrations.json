@@ -49,6 +49,12 @@
       "category": "thumbnail-hero",
       "style": "watercolor illustration",
       "subject": "a raccoon standing upright and holding a large round magnifying glass up in both front paws, peering through it with one eye; a bold, simple silhouette that reads at a small size"
+    },
+    {
+      "id": "thumb-beaver",
+      "category": "thumbnail-hero",
+      "style": "watercolor illustration",
+      "subject": "a sturdy beaver standing upright in three-quarter view, holding one short wooden log across its front paws, beside a short stack of three chunky rack-server boxes with slotted fronts, its flat tail resting on the ground behind it; a bold, simple silhouette that reads at a small size"
     }
   ]
 }
