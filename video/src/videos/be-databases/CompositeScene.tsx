@@ -377,7 +377,7 @@ export const CompositeScene: React.FC = () => {
           { line: "Heap Fetches", at: neverAt, color: MARK_GREEN },
         ]} />
         <Note at={skipAt + 2} x={NOTE_X} y={planTop + h(4)}>
-          <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Postgres 18: skip scan</div>
+          <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Postgres: skip scan</div>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: h(8), opacity: ease(frame, fewAt, 10) }}>
             when <SmallMono>status</SmallMono> has few values
           </div>
