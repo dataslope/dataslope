@@ -8,7 +8,7 @@ import { Note, Num } from "../../editorial/ui";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { PAGE, PAGE_SIZE, thousands, VERSION } from "./data";
+import { PAGE, PAGE_SIZE, thousands } from "./data";
 import { Drift, Mark, MARK_BAD, MARK_OK, METHOD_INK, OK, OK_INK, Strike, X0, VRule } from "./parts";
 
 /** The chart: rows read for one page of twenty, on a log scale. */
@@ -171,7 +171,7 @@ export const PageScene: React.FC = () => {
           <span style={{ ...label(21, INK), whiteSpace: "nowrap" }}>
             Rows read for one page of <Num>{PAGE_SIZE}</Num>
             <span style={{ color: INK_SOFT, opacity: ease(frame, articlesAt, 10) }}>
-              {" "}· {VERSION}, <Num>{thousands(PAGE.articles)}</Num> articles, newest first
+              {" "}· PostgreSQL, <Num>{thousands(PAGE.articles)}</Num> articles, newest first
             </span>
           </span>
         </Note>

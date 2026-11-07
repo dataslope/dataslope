@@ -100,7 +100,7 @@ export const HookScene: React.FC = () => {
 
         {/* ── An API, a database, and the requests between them ── */}
         <Node x={API.x} y={top} w={API.w} h={apiH} at={apiAt - 2} tone="plain" title="API" sub="requests" size={30} bare />
-        <Cylinder x={DB.x} y={dbTop} w={DB.w} h={dbH + h(30)} at={dbAt - 2} title="database" swapTo={OPENING.version} swapAt={postgresAt + 2} size={24} />
+        <Cylinder x={DB.x} y={dbTop} w={DB.w} h={dbH + h(30)} at={dbAt - 2} title="database" swapTo="PostgreSQL" swapAt={postgresAt + 2} size={24} />
         <Flow points={[[API.x + API.w + 8, readY], [DB.x - 12, readY]]} at={readsAt} color={BAR} width={3} />
         <Note at={fastAt - 4} x={API.x + API.w + 40} y={readY - h(44)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
@@ -126,7 +126,8 @@ export const HookScene: React.FC = () => {
           color={inkOf.yellow}
           width={3}
         />
-        <Note at={momentAt - 2} x={API.x + API.w + 176} y={otherY - h(16)}>
+        {/* Clear of the cylinder's foot (top + 194): it ran under the curve. */}
+        <Note at={momentAt - 2} x={API.x + API.w + 176} y={top + h(218)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>another write, at the same moment</span>
         </Note>
 
