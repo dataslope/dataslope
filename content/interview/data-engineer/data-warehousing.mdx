@@ -5,8 +5,9 @@ description: Data Engineer interview questions on OLTP vs OLAP, columnar storage
 
 Warehousing questions probe how analytical storage is **physically laid
 out** and why that layout makes scans fast and cheap. The runnable queries
-below execute in your browser on **DuckDB**, a columnar engine, so you can
-see columnar-friendly patterns directly.
+below execute in your browser on **PostgreSQL**. Postgres stores rows, not
+columns, so it reads whole rows where a columnar warehouse would not; the SQL
+is the same on both, and the comments point out what a columnar engine skips.
 
 <Figure
   slug="interview-data-engineer-data-warehousing-cutout"
@@ -36,7 +37,7 @@ for a two-column aggregate. The query below sums two columns of a wider
 table, only `amount` and `units` need to be scanned.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE sales (
   sale_id   INTEGER,
   sale_date DATE,
@@ -71,7 +72,8 @@ INSERT INTO sales VALUES
   (23, DATE '2024-01-08', 'North', 'Home', 3, 478.00),
   (24, DATE '2024-01-08', 'South', 'Garden', 4, 59.00);`}
   starterCode={`-- A columnar engine reads only the columns referenced here
--- (category, amount, units), not the whole row.
+-- (category, amount, units), not the whole row. Postgres, a row
+-- store, reads every column of every row to answer the same query.
 SELECT category,
        SUM(amount) AS revenue,
        SUM(units)  AS units_sold
@@ -108,7 +110,7 @@ computes per-region stats; on a date-clustered table only the matching row
 groups are read.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE sales (
   sale_id   INTEGER,
   sale_date DATE,
@@ -140,13 +142,14 @@ INSERT INTO sales VALUES
   (22, DATE '2024-01-08', 'South', 437.00),
   (23, DATE '2024-01-08', 'North', 478.00),
   (24, DATE '2024-01-08', 'South', 59.00);`}
-  starterCode={`-- Range filter on a clustered/sorted column: min-max stats let the
--- engine skip row groups outside the range before reading them.
+  starterCode={`-- Range filter on a clustered/sorted column: in a columnar warehouse,
+-- min-max stats let the engine skip row groups outside the range before
+-- reading them. Postgres gets the same skipping from a BRIN index.
 SELECT region,
-       COUNT(*)    AS n_sales,
-       MIN(amount) AS min_amt,
-       MAX(amount) AS max_amt,
-       AVG(amount) AS avg_amt
+       COUNT(*)              AS n_sales,
+       MIN(amount)           AS min_amt,
+       MAX(amount)           AS max_amt,
+       ROUND(AVG(amount), 2) AS avg_amt
 FROM sales
 WHERE sale_date >= DATE '2024-01-02'
 GROUP BY region
@@ -292,7 +295,7 @@ warehouse reliability on lake-cost open storage.
 - Partition pruning only works on integer columns.
   > Date partition keys prune fine; the problem is how the filter is written.
 - \`YEAR()\` is not a valid SQL function.
-  > It's valid; the issue is that applying it to the partition key blocks pruning.
+  > Most warehouses have it (Postgres spells it \`EXTRACT(YEAR FROM ...)\`); either way, applying a function to the partition key is what blocks pruning.
 - [o] Wrapping the partition column in a function (\`YEAR(...)\`) prevents the engine from matching the filter to partitions.
   > This engine's optimizer can't map \`YEAR(event_date)\` back to partition boundaries, so it can't prune. Postgres behaves this way; DuckDB evaluates the function per partition and still prunes. A range on the raw column prunes on every engine.`}
 />
@@ -300,7 +303,7 @@ warehouse reliability on lake-cost open storage.
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Revenue per category"
   instructions={`The table \`sales\` has columns \`id\`, \`category\`, and \`amount\`. Return one row per \`category\` with its total revenue as a column named \`revenue\`. Sort by \`revenue\` descending. This is the kind of columnar-friendly aggregate a warehouse serves cheaply, only \`category\` and \`amount\` are scanned.`}
   initSql={`CREATE TABLE sales AS SELECT * FROM (VALUES

@@ -13,7 +13,7 @@ Q&A with a runnable trap demo and concept-check MCQs.
   alt="A single raised metric block on a platform feeding three identical dashboard panels below it through branching rails"
 />
 
-> **Context:** the semantic layer generates warehouse SQL from metric definitions at query time. The runnable block uses **DuckDB** to make one classic join trap concrete.
+> **Context:** the semantic layer generates warehouse SQL from metric definitions at query time. The runnable block uses **PostgreSQL** to make one classic join trap concrete.
 
 ## Q&A
 
@@ -76,7 +76,7 @@ once per child, so summing inflates the total. Joining `orders` to
 item. The block below shows real revenue of 150 balloon to 350:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE orders AS SELECT * FROM (VALUES
   (1, 100.00), (2, 50.00), (3, 275.00), (4, 130.00),
   (5, 62.50), (6, 410.00), (7, 95.00), (8, 220.00),

@@ -12,7 +12,7 @@ correct. Review the Q&A, run the examples, then take the concept checks.
   alt="A warehouse block on a platform whose contents are stored as upright colored columns rather than rows, one column being lifted out through a slot in the roof"
 />
 
-> **SQL dialect:** the runnable blocks execute in your browser on **DuckDB**, a columnar engine that mirrors how cloud warehouses behave. Warehouse-specific syntax (Snowflake `MERGE`, BigQuery partitioning) is shown as illustrative fenced code.
+> **SQL dialect:** the runnable blocks execute in your browser on **PostgreSQL**. Postgres stores rows rather than columns, but the patterns the blocks show (watermark filters, idempotent rebuilds) are written the same way on a cloud warehouse. Warehouse-specific syntax (Snowflake `CREATE OR REPLACE TABLE`, BigQuery partitioning) is shown as illustrative fenced code.
 
 ## Q&A
 
@@ -58,7 +58,7 @@ aggregates one column out of several, exactly the access pattern columnar
 storage optimizes for:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
   (1, DATE '2024-01-01', 'click', 120),    (2, DATE '2024-01-01', 'view', 45),
   (3, DATE '2024-01-02', 'click', 90),     (4, DATE '2024-01-02', 'purchase', 300),
@@ -135,7 +135,7 @@ source rows beyond it. The block below loads only `raw_events` newer than what
 the target already holds:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`-- fct_events is the table as it stood after the last successful run;
 -- raw_events has since gained ten more rows.
 CREATE TABLE fct_events AS SELECT * FROM (VALUES
@@ -174,12 +174,15 @@ ORDER BY event_id;`}
 Idempotent means **running the build again produces the same result**, no
 duplicates, no drift. It matters because pipelines retry: a job that crashes and
 reruns must not double-load. You get idempotency by rebuilding from source
-(`CREATE OR REPLACE TABLE ... AS SELECT`) or by upserting on a unique key
-(`MERGE`) rather than blind `INSERT`. The block below rebuilds a dimension from
-its event log; rerun it any number of times and the output is identical:
+(`CREATE OR REPLACE TABLE ... AS SELECT` on Snowflake or BigQuery) or by
+upserting on a unique key (`MERGE`) rather than blind `INSERT`. Postgres has no
+`CREATE OR REPLACE TABLE`, but its DDL is transactional, so a drop and a
+re-create inside one transaction swap the table atomically. The block below
+rebuilds a dimension from its event log; rerun it any number of times and the
+output is identical:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE customer_events AS SELECT * FROM (VALUES
   (1, TIMESTAMP '2024-01-01 00:00:00'), (1, TIMESTAMP '2024-02-01 00:00:00'),
   (1, TIMESTAMP '2024-03-05 00:00:00'), (2, TIMESTAMP '2024-01-15 00:00:00'),
@@ -195,10 +198,13 @@ its event log; rerun it any number of times and the output is identical:
   (11, TIMESTAMP '2024-01-17 00:00:00'), (12, TIMESTAMP '2024-03-08 00:00:00')
 ) AS t(customer_id, updated_at);`}
   starterCode={`-- Deterministic rebuild: same input always yields the same table
-CREATE OR REPLACE TABLE dim_customer AS
+BEGIN;
+DROP TABLE IF EXISTS dim_customer;
+CREATE TABLE dim_customer AS
 SELECT customer_id, MAX(updated_at) AS updated_at
 FROM customer_events
 GROUP BY customer_id;
+COMMIT;
 
 SELECT * FROM dim_customer ORDER BY customer_id;`}
 />
@@ -211,7 +217,7 @@ batch overwrites in place instead of duplicating, which is what makes it
 idempotent. This is how dbt handles incremental models with a `unique_key`.
 
 ```sql
--- Snowflake / BigQuery style upsert
+-- Upsert: Snowflake, BigQuery and Postgres all accept this form
 MERGE INTO dim_customer t
 USING staged_customers s
   ON t.customer_id = s.customer_id
@@ -331,7 +337,7 @@ models upstream as the maintainable source.
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Idempotent dimension rebuild"
   instructions={`Table \`customer_events\` (\`customer_id\`, \`updated_at\`) is an append-only log with **multiple rows per customer**. Build a \`SELECT\` for an idempotent dimension: exactly **one row per** \`customer_id\` holding that customer's **latest** \`updated_at\`. Rerunning it must always give the same result. Columns: \`customer_id\`, \`last_seen\`. Sort by \`customer_id\`.`}
   initSql={`CREATE TABLE customer_events AS SELECT * FROM (VALUES

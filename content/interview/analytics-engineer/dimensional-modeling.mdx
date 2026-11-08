@@ -11,7 +11,7 @@ well-grained dimensional models. Review the Q&A, then build a mart.
   alt="A central fact block on a platform with four dimension blocks radiating from it like a star, each joined by a short rail"
 />
 
-> **SQL dialect:** the runnable challenge on this page executes in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted.
+> **SQL dialect:** the runnable blocks and challenge on this page execute in your browser on **PostgreSQL**, so the SQL below targets Postgres. It is standard SQL except where noted.
 
 ## Q&A
 
@@ -61,7 +61,7 @@ one flat table, there are no extra hops, exactly the simplicity that makes
 the star the default shape.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE dim_date AS SELECT * FROM (VALUES
   (1, DATE '2024-01-15'), (2, DATE '2024-01-16'), (3, DATE '2024-01-17'),
   (4, DATE '2024-01-18'), (5, DATE '2024-01-19'), (6, DATE '2024-01-20')
@@ -108,7 +108,7 @@ facts can join on the stable `customer_sk` while you can still trace back
 to the source identifier:
 
 ```sql
--- Hash-based surrogate key (DuckDB: md5 returns a hex string)
+-- Hash-based surrogate key (Postgres: md5 returns a 32-character hex string)
 SELECT
     md5(customer_id::TEXT)  AS customer_sk,  -- surrogate
     customer_id,                              -- natural key
@@ -160,7 +160,7 @@ attributes the 2022 order to `East` and the 2024 order to `West`: that
 Type 2 history queryable point-in-time.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`-- SCD Type 2 row layout: customer moved from East to West
 -- customer_sk  customer_id  region  valid_from    valid_to      is_current
 --  1001         42           East    2020-01-01    2023-06-14    FALSE
@@ -272,7 +272,7 @@ A role-playing dimension is a single physical dimension table used **multiple ti
 In the query below, `dim_date` is joined to `fact_orders` three separate times under three aliases (`od`, `sd`, `dd`), each turning a different date key into a readable date. One physical table plays three roles in a single result:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE dim_date AS SELECT * FROM (VALUES
   (1, DATE '2024-03-01'), (2, DATE '2024-03-03'), (3, DATE '2024-03-07'),
   (4, DATE '2024-03-10'), (5, DATE '2024-03-12'), (6, DATE '2024-03-15'),
@@ -343,7 +343,7 @@ look wrong. A join that matches each order several times inflates every
 The query below joins `fact_orders` to `dim_promotion` *through* the `bridge_order_promotion` table and multiplies each order's amount by the bridge's `weight_factor`. That weighting splits one order's value across its promotions (0.6 / 0.4 for order 201) instead of double-counting the full amount once per promotion:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE dim_promotion AS SELECT * FROM (VALUES
   (1, 'Summer Sale'), (2, 'Loyalty 10%'), (3, 'Flash Deal'),
   (4, 'Free Shipping'), (5, 'Bundle Discount'), (6, 'Referral Credit')
@@ -426,11 +426,11 @@ Measures in fact tables are generally fixed at event time and should not change.
 The two queries below contrast the approaches: the first hashes the natural key (computable anywhere, no central counter), while the second assigns a sequential integer with `row_number()` (compact and human-readable, but dependent on a single ordering pass):
 
 ```sql
--- Hash surrogate (DuckDB): deterministic, no sequence needed
+-- Hash surrogate: deterministic, no sequence needed
 SELECT md5(customer_id::TEXT) AS customer_sk, customer_id, customer_name
 FROM stg_customers;
 
--- Integer surrogate (DuckDB): compact, human-readable
+-- Integer surrogate: compact, human-readable
 SELECT row_number() OVER (ORDER BY customer_id) AS customer_sk,
        customer_id, customer_name
 FROM stg_customers;
@@ -466,7 +466,7 @@ This is a vocabulary check: the correct term is **conformed** dimension (consist
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Revenue by category"
   instructions={`Two tables are loaded: \`fact_orders\` (\`order_id\`, \`product_id\`, \`amount\`) and \`dim_product\` (\`product_id\`, \`category\`). Build a mart of **total revenue per category**: join the fact to the dimension and sum \`amount\`. Columns: \`category\`, \`revenue\`. Sort by \`revenue\` descending.`}
   initSql={`CREATE TABLE dim_product AS SELECT * FROM (VALUES

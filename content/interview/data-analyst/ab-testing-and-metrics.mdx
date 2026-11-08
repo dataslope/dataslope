@@ -299,9 +299,9 @@ averaged once.
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Funnel conversion rate by stage"
-  instructions={`The table \`funnel\` has columns \`stage\`, \`stage_order\` (1 = top of funnel), and \`users\` (distinct users reaching that stage). Return one row per stage with columns \`stage\`, \`users\`, and \`conversion_rate\`: the fraction of **top-of-funnel** users who reached this stage (this stage's \`users\` divided by the first stage's \`users\`). Sort by \`stage_order\`. Remember to multiply by \`1.0\` to avoid integer division, and \`FIRST_VALUE(users) OVER (ORDER BY stage_order)\` gives the top-of-funnel count on every row.`}
+  instructions={`The table \`funnel\` has columns \`stage\`, \`stage_order\` (1 = top of funnel), and \`users\` (distinct users reaching that stage). Return one row per stage with columns \`stage\`, \`users\`, and \`conversion_rate\`: the fraction of **top-of-funnel** users who reached this stage (this stage's \`users\` divided by the first stage's \`users\`, rounded to 4 decimal places). Sort by \`stage_order\`. Remember to multiply by \`1.0\` to avoid integer division, and \`FIRST_VALUE(users) OVER (ORDER BY stage_order)\` gives the top-of-funnel count on every row.`}
   initSql={`CREATE TABLE funnel AS
 SELECT * FROM (VALUES
   ('Landing page',     1, 42000),
@@ -339,7 +339,7 @@ FROM funnel
   solutionSql={`SELECT
   stage,
   users,
-  users * 1.0 / FIRST_VALUE(users) OVER (ORDER BY stage_order) AS conversion_rate
+  ROUND(users * 1.0 / FIRST_VALUE(users) OVER (ORDER BY stage_order), 4) AS conversion_rate
 FROM funnel
 ORDER BY stage_order;`}
   tests={[

@@ -5,7 +5,7 @@ description: Backend interview questions on SQL vs NoSQL, indexing, query plans,
 
 Backend roles expect more than writing a `SELECT`, you should reason about
 indexes, transactions, isolation, and why a query is slow. This page is a
-question bank with **runnable SQL** (DuckDB in your browser) and graded
+question bank with **runnable SQL** (PostgreSQL in your browser) and graded
 **challenges**.
 
 <Figure
@@ -13,8 +13,8 @@ question bank with **runnable SQL** (DuckDB in your browser) and graded
   alt="A stack of table slabs on a platform with a tabbed index card standing beside it, a thin beam running from the index straight to one row"
 />
 
-> **SQL dialect:** the runnable blocks execute on **DuckDB**. The syntax here
-> is standard SQL; most of it runs unchanged on Postgres or MySQL.
+> **SQL dialect:** the runnable blocks execute on **PostgreSQL**. The syntax
+> here is standard SQL; most of it runs unchanged on MySQL or SQL Server.
 
 ## Q&A
 
@@ -152,7 +152,7 @@ tables inline and shows a `LEFT JOIN` keeping a customer who never ordered:
 <Chart slug="join-types-venn" />
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
   (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di'),
   (5, 'Eve'), (6, 'Finn'), (7, 'Gus'), (8, 'Hana'),
@@ -185,7 +185,7 @@ right grain **first** (in a subquery or CTE), then join. The runnable block
 demonstrates the correct pattern:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
   (1, 'Ava'), (2, 'Ben'), (3, 'Cy'), (4, 'Di'),
   (5, 'Eve'), (6, 'Finn'), (7, 'Gus'), (8, 'Hana'),
@@ -301,7 +301,7 @@ optimization for hot read paths, at the cost of a wider index to maintain.
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Customers with no orders (anti-join)"
   instructions={`Two tables are loaded: \`customers\` (\`id\`, \`name\`) and \`orders\` (\`order_id\`, \`customer_id\`, \`amount\`). Return the \`id\` and \`name\` of every customer who has placed **no** orders. Use a \`LEFT JOIN\` with an \`IS NULL\` filter (or \`NOT EXISTS\`).`}
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
@@ -341,7 +341,7 @@ The second challenge looks like a simple aggregate and hides a fan-out
 trap. Read the join carefully before you write the `SUM`.
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Revenue per customer without double-counting"
   instructions={`Tables \`customers\` (\`id\`, \`name\`) and \`orders\` (\`order_id\`, \`customer_id\`, \`amount\`) are loaded. Return one row per customer who has ordered, with columns \`name\` and \`revenue\` (their total \`amount\`), sorted by \`revenue\` descending. Aggregate so no customer is double-counted.`}
   initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES

@@ -5,7 +5,7 @@ description: Data Analyst interview questions on window functions, frame clauses
 
 Once you clear the basic SQL screen, the follow-ups get analytical:
 **window functions**, **frames**, **recursive CTEs**, and reshaping data.
-This page is a question bank with **runnable** DuckDB challenges so you can
+This page is a question bank with **runnable** SQL challenges so you can
 try the patterns interviewers actually ask for.
 
 <Figure
@@ -13,7 +13,7 @@ try the patterns interviewers actually ask for.
   alt="A long rail of evenly spaced blocks on a platform with a transparent sliding frame hovering over three consecutive blocks and a rising staircase of totals beside it"
 />
 
-> **SQL dialect:** the runnable blocks execute in your browser on **DuckDB**. The syntax is standard SQL; most of it runs unchanged on Postgres, BigQuery, or Snowflake.
+> **SQL dialect:** the runnable blocks execute in your browser on **PostgreSQL**. The syntax is standard SQL; most of it runs unchanged on BigQuery, Snowflake, or DuckDB.
 
 ## Q&A
 
@@ -47,7 +47,7 @@ differently:
 - `DENSE_RANK`, ties share a rank with **no gap** (1, 2, 2, 3).
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE results (name TEXT, score INTEGER);
 INSERT INTO results VALUES
   ('Alice', 90), ('Bob', 85), ('Carol', 85), ('Dave', 80),
@@ -132,7 +132,7 @@ An ordered `SUM` with no explicit frame already means "everything up to this row
 running frame:
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE txns (day DATE, amount DECIMAL(8,2));
 INSERT INTO txns VALUES
   ('2024-01-01', 100.00),
@@ -161,7 +161,7 @@ INSERT INTO txns VALUES
   ('2024-01-24', 280.00);`}
   starterCode={`SELECT day, amount,
   SUM(amount) OVER (ORDER BY day) AS running_total,
-  AVG(amount) OVER (ORDER BY day ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg_3
+  ROUND(AVG(amount) OVER (ORDER BY day ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg_3
 FROM txns
 ORDER BY day;`}
 />
@@ -198,7 +198,7 @@ quartiles, deciles, or percentile bands. If rows don't divide evenly, the
 earlier buckets get one extra row.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE customers (name TEXT, spend DECIMAL(8,2));
 INSERT INTO customers VALUES
   ('Ava', 900), ('Ben', 720), ('Cy', 540), ('Di', 480),
@@ -231,10 +231,12 @@ the query in a CTE/subquery and filter in the outer query, or use
 ### What is QUALIFY?
 
 `QUALIFY` filters on a window function the way `HAVING` filters on an
-aggregate, no wrapping subquery needed. It's supported in DuckDB,
-Snowflake, and BigQuery.
+aggregate, no wrapping subquery needed. It's supported in Snowflake,
+BigQuery, Databricks, and DuckDB. Postgres and MySQL don't have it, so there
+you filter in an outer query, as in the top-N example above.
 
 ```sql
+-- Snowflake, BigQuery (not Postgres)
 SELECT *,
   ROW_NUMBER() OVER (PARTITION BY category ORDER BY revenue DESC) AS rn
 FROM products
@@ -256,7 +258,7 @@ It has an **anchor** member (the starting rows) `UNION ALL` a
 **recursive** member that joins back to the CTE until no new rows appear.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE emp (id INT, name TEXT, manager_id INT);
 INSERT INTO emp VALUES
   (1,'CEO',NULL),
@@ -302,11 +304,12 @@ ORDER BY 1;
 ### How do you fill gaps in a date series (a date spine)?
 
 Generate a complete calendar and `LEFT JOIN` your data onto it so missing
-days show up as zero instead of vanishing. DuckDB and Postgres have
-`generate_series`; other engines use a numbers/calendar table.
+days show up as zero instead of vanishing. Postgres has `generate_series`,
+which returns one row per step (as timestamps, hence the cast back to `DATE`);
+other engines use a numbers/calendar table.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE sales (day DATE, amount INTEGER);
 INSERT INTO sales VALUES
   ('2024-03-01', 100), ('2024-03-03', 250), ('2024-03-04', 75),
@@ -318,7 +321,7 @@ INSERT INTO sales VALUES
   ('2024-03-31', 160), ('2024-04-02', 195), ('2024-04-03', 70),
   ('2024-04-05', 250), ('2024-04-06', 140), ('2024-04-08', 300);`}
   starterCode={`WITH spine AS (
-  SELECT unnest(generate_series(DATE '2024-03-01', DATE '2024-03-05', INTERVAL 1 DAY)) AS day
+  SELECT generate_series(DATE '2024-03-01', DATE '2024-03-05', INTERVAL '1 day')::date AS day
 )
 SELECT s.day, COALESCE(x.amount, 0) AS amount
 FROM spine s
@@ -333,7 +336,7 @@ wrap a `CASE` inside `SUM` (or `MAX`) per target column. It's explicit and
 runs everywhere.
 
 <SqlCodeBlock
-  dialect="duckdb"
+  dialect="postgres"
   initSql={`CREATE TABLE sales (region TEXT, quarter TEXT, amount INTEGER);
 INSERT INTO sales VALUES
   ('North','Q1',100), ('North','Q2',140), ('South','Q1',80),
@@ -430,9 +433,9 @@ SELECT * FROM ranked WHERE rn = 1;
 ## Challenges
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="3-month moving average"
-  instructions={`The table \`monthly_sales\` has columns \`month\` (a \`DATE\`, the first of each month) and \`revenue\`. Return every row with a trailing **3-month moving average** of \`revenue\`: columns \`month\`, \`revenue\`, and \`moving_avg_3m\` (the average of the current month and the two months before it). Sort by \`month\` ascending. Hint: use \`AVG(...) OVER (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)\`.`}
+  instructions={`The table \`monthly_sales\` has columns \`month\` (a \`DATE\`, the first of each month) and \`revenue\`. Return every row with a trailing **3-month moving average** of \`revenue\`: columns \`month\`, \`revenue\`, and \`moving_avg_3m\` (the average of the current month and the two months before it, rounded to 2 decimals). Sort by \`month\` ascending. Hint: use \`AVG(...) OVER (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)\`.`}
   initSql={`CREATE TABLE monthly_sales AS
 SELECT * FROM (VALUES
   (DATE '2022-07-01', 180.0), (DATE '2022-08-01', 155.0),
@@ -458,7 +461,7 @@ FROM monthly_sales
   solutionSql={`SELECT
   month,
   revenue,
-  AVG(revenue) OVER (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg_3m
+  ROUND(AVG(revenue) OVER (ORDER BY month ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS moving_avg_3m
 FROM monthly_sales
 ORDER BY month;`}
   tests={[
@@ -471,7 +474,7 @@ The second challenge combines the two ideas from this page: aggregate
 first, then rank the aggregates within a partition.
 
 <SqlChallengeCard
-  dialect="duckdb"
+  dialect="postgres"
   title="Rank customers by spend within region"
   instructions={`The table \`orders\` has columns \`customer\`, \`region\`, and \`amount\` (one row per order). For each customer, total their \`amount\`, then **rank customers within their region** by that total, highest first. Return columns \`customer\`, \`region\`, \`total_spend\`, and \`region_rank\` (1 = top spender in the region). Use \`RANK() OVER (PARTITION BY region ORDER BY SUM(amount) DESC)\`, window functions run after \`GROUP BY\`, so aggregates are allowed inside \`OVER\`.`}
   initSql={`CREATE TABLE orders AS
@@ -514,5 +517,5 @@ ORDER BY region, region_rank;`}
 
 ## Go deeper
 
-- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
 - [Intro to SQL with Postgres](/courses/intro-sql-postgres)
+- [SQL Analytics with DuckDB](/courses/sql-analytics-duckdb)
