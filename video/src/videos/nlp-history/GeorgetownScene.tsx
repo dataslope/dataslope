@@ -157,10 +157,11 @@ export const GeorgetownScene: React.FC = () => {
             {t}
           </div>
         ))}
-        <Tag x={sx(X, demoYear)} y={AXIS - 62} at={papersAt} align="center" size={23} color={INK} weight={650}>
+        {/* Set well clear of the dot under them, which pulses on "twelve". */}
+        <Tag x={sx(X, demoYear)} y={AXIS - 92} at={papersAt} align="center" size={23} color={INK} weight={650}>
           the demo
         </Tag>
-        <Tag x={sx(X, demoYear)} y={AXIS - 36} at={papersAt + 6} align="center" size={20} color={INK_SOFT}>
+        <Tag x={sx(X, demoYear)} y={AXIS - 66} at={papersAt + 6} align="center" size={20} color={INK_SOFT}>
           front-page news
         </Tag>
         {/* Dostert's forecast, over the years it named. */}
@@ -175,7 +176,7 @@ export const GeorgetownScene: React.FC = () => {
           <div style={{ ...label(21, INK_SOFT) }}>ALPAC report, {ALPAC_YEAR}</div>
           <div style={{ ...headline(30, true), color: INK, marginTop: 4, lineHeight: 1.15 }}>&ldquo;{ALPAC}&rdquo;</div>
         </Ink>
-        <Tag x={sx(X, ALPAC_YEAR)} y={AXIS - 62} at={fundingAt - 2} align="center" size={23} color={ACCENT_INK} weight={700}>
+        <Tag x={sx(X, ALPAC_YEAR)} y={AXIS - 72} at={fundingAt - 2} align="center" size={23} color={ACCENT_INK} weight={700}>
           funding dried up
         </Tag>
       </div>
