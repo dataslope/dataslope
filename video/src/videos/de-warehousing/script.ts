@@ -46,8 +46,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * questions and seven measured on the same rows: 2 to 8 are; 1 and 9 are
  * drawn.
  *
- * Facts. Every number ran in DuckDB v1.4.3 (DuckDB-Wasm 1.32.0, the engine
- * the page's blocks run), by check.mjs into results.json, which data.ts
+ * Facts. Every number ran in DuckDB v1.4.3 (DuckDB-Wasm 1.32.0; the page's
+ * own blocks run on Postgres, which cannot read the Parquet files and folders
+ * measured here), by check.mjs into results.json, which data.ts
  * reads. The table is the video's own, said aloud as "made up for this
  * video": a million rows with the page's six `sales` columns, 2024 in date
  * order, region, category, units and amount drawn with setseed(0.42). Sizes

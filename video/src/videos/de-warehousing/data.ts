@@ -1,8 +1,9 @@
 import results from "./results.json" with { type: "json" };
 
 // Every number, listing and plan line the video shows, read from
-// results.json: what DuckDB v1.4.3 (DuckDB-Wasm 1.32.0, the engine the
-// page's blocks run) wrote, read and printed for the statements in check.mjs,
+// results.json: what DuckDB v1.4.3 (DuckDB-Wasm 1.32.0, the columnar engine
+// that reads the files measured here) wrote, read and printed for the
+// statements in check.mjs,
 // which wrote it. Sizes are the lengths of files DuckDB wrote; "read" is what
 // its file statistics counted while the query ran. Pure (no Remotion, no DOM).
 

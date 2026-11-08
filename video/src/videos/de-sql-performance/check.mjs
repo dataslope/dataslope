@@ -1,7 +1,8 @@
 // Runs every statement the de-sql-performance video shows on the site's
 // Postgres engine (PGlite, PostgreSQL 18, through scripts/lib/sql-engines.mjs,
-// the engine the Postgres lessons grade with), plus one plan in DuckDB-Wasm,
-// the engine the Data Engineer SQL page's own blocks run in, and writes what
+// the engine the Postgres lessons and the Data Engineer SQL page's blocks run
+// on), plus one plan in DuckDB-Wasm, shown as another engine's optimizer,
+// and writes what
 // came back to results.json, which data.ts reads. From the repo root:
 //
 //   node video/src/videos/de-sql-performance/check.mjs
