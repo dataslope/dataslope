@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { BLUE_INK, body, halo, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { BLUE_INK, body, halo, INK, INK_SOFT, label, note, PAPER, SERIF_ITALIC, TABULAR } from "../../editorial/style";
 import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -472,7 +472,7 @@ export const SpaceScene: React.FC = () => {
           <span>
             the <Mark at={catSatAt}>cat</Mark> sat on the mat
           </span>
-          <span style={{ fontStyle: "italic", color: INK_SOFT }}>seen in training</span>
+          <span style={{ fontStyle: SERIF_ITALIC, color: INK_SOFT }}>seen in training</span>
         </div>
       </Fade>
       <Fade at={dogSatAt - 4} out={notesOut} style={{ left: X0, top: y(860) }}>
@@ -480,7 +480,7 @@ export const SpaceScene: React.FC = () => {
           <span>
             the <Mark at={dogSatAt}>dog</Mark> sat on the mat
           </span>
-          <span style={{ fontStyle: "italic", color: POINT_INK, opacity: ease(frame, halfAt - 2, 10) }}>half handled already</span>
+          <span style={{ fontStyle: SERIF_ITALIC, color: POINT_INK, opacity: ease(frame, halfAt - 2, 10) }}>half handled already</span>
         </div>
       </Fade>
       <Fade at={dimensionAt - 4} style={{ left: X0, top: y(800) }}>

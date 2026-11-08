@@ -39,7 +39,7 @@ const Thumbs: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={whyAt - 2} x={R_X} y={c.y(330)}>
-        <span style={{ ...note(28, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>a weak primary metric, because:</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>a weak primary metric, because:</span>
       </Note>
       {reasons.map((r, i) => (
         <Note key={r.text} at={r.at - 2} x={R_X + 30} y={c.y(390) + i * c.h(50)}>

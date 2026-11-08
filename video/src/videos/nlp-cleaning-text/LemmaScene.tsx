@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { body, HAIRLINE, INK, INK_SOFT, label } from "../../editorial/style";
+import { body, HAIRLINE, INK, INK_SOFT, label, SERIF_ITALIC } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -164,7 +164,7 @@ export const LemmaScene: React.FC = () => {
       <Answer at={lemmatizeAt} y={y(ANSWER_Y[1])} title="Lemmatize">
         <Fade at={rootAt - 6}>when the root has to be a</Fade>{" "}
         <Mark at={realAt - 2}>
-          <span style={{ fontStyle: "italic" }}>real word</span>
+          <span style={{ fontStyle: SERIF_ITALIC }}>real word</span>
         </Mark>
         <div style={{ marginTop: 10 }}>
           <Fade at={realAt + 14}>

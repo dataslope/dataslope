@@ -190,7 +190,7 @@ export const MoneyScene: React.FC = () => {
         {verdict(String(MONEY.floatEquals), falseAt, MONEY.floatEquals)}
       </div>
       <Note at={approxAt - 4} x={COL.result} y={rowA + h(34)} dim={trueAt}>
-        <span style={{ ...note(23, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>approximate: a binary fraction</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>approximate: a binary fraction</span>
       </Note>
 
       {/* ── As numeric ── */}
@@ -203,7 +203,7 @@ export const MoneyScene: React.FC = () => {
         {verdict(String(MONEY.exactEquals), trueAt, MONEY.exactEquals)}
       </div>
       <Note at={priceAt - 6} x={COL.result} y={rowB + h(34)}>
-        <span style={{ ...note(23, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>exact: the type for a price</span>
+        <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>exact: the type for a price</span>
       </Note>
 
       {/* "Does it have to be there at all?": an empty cell, held open. */}
@@ -217,7 +217,7 @@ export const MoneyScene: React.FC = () => {
             borderRadius: 6,
           }}
         />
-        <span style={{ ...note(26, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>And if there's no value at all?</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>And if there's no value at all?</span>
       </Ink>
 
       <Spot id="db-constraints-coins" at={open - 6} left={1470} top={y(748)} width={270} height={230} dim={kindAt} />

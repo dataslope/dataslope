@@ -218,7 +218,7 @@ export const HarnessScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={queueEndAt - 2} dur={14} style={{ left: TOTAL_X, top: y(800) + 36, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontStyle: "italic" }}>who reads that queue?</span>
+          <span style={{ ...note(22, INK) }}>who reads that queue?</span>
         </Ink>
       </Drift>
     </AbsoluteFill>

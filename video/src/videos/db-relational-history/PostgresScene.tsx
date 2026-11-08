@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, headline, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, headline, INK, INK_SOFT, label, note, SERIF_ITALIC } from "../../editorial/style";
 import { badgeStyle, ColumnRule, FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -148,7 +148,7 @@ export const PostgresScene: React.FC = () => {
                 overflow: "hidden",
                 opacity: open,
                 color: ACCENT_INK,
-                fontStyle: "italic",
+                fontStyle: SERIF_ITALIC,
               }}
             >
               IN

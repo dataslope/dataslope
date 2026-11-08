@@ -20,20 +20,7 @@ import {
   WAITS,
 } from "./data";
 import { useLayout } from "../../editorial/layout";
-import {
-  ACCENT,
-  ACCENT_INK,
-  BLUE_INK,
-  body,
-  fmt,
-  headline,
-  INK,
-  INK_SOFT,
-  note,
-  PAPER,
-  label,
-  TABULAR,
-} from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, body, fmt, headline, INK, INK_SOFT, label, note, PAPER, SERIF_ITALIC, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Leader, Note } from "../../editorial/ui";
 import { ds } from "../../theme/brand";
 import { useFigNumber } from "../sampling/merged";
@@ -177,7 +164,7 @@ export const BuildScene: React.FC = () => {
       </Ink>
       <Ink at={10} dur={20} out={p1Out} style={{ left: 92, top: y(246), ...headline(92), whiteSpace: "nowrap" }}>
         is{" "}
-        <span style={{ position: "relative", fontStyle: "italic", fontWeight: "var(--clt-head-italic-wght)" }}>
+        <span style={{ position: "relative", fontStyle: SERIF_ITALIC, fontWeight: "var(--clt-head-italic-wght)" }}>
           lopsided.
           {/* Sized in em and to the word, so it underlines it in any face. */}
           <svg

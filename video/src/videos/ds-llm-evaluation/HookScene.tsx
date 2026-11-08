@@ -104,7 +104,7 @@ export const HookScene: React.FC = () => {
             Sorry, returns close 30 days after purchase.
           </Reply>
           <Note at={sureAt} x={X0} y={y(CARD_Y + 150)}>
-            <span style={{ ...note(26, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>both sound sure of themselves</span>
+            <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>both sound sure of themselves</span>
           </Note>
           <Note at={policyAt} x={X0 + CARD_W + CARD_GAP} y={y(CARD_Y + 150)}>
             <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the refund policy: 30 days</span>

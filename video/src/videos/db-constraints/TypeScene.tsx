@@ -114,7 +114,7 @@ export const TypeScene: React.FC = () => {
         const row = card.rows[card.columns.findIndex((c) => c.name === r)];
         return (
           <Note key={r} at={pickAt + i * 6} x={card.right + 18} y={row.mid - 16} dim={moneyAt}>
-            <span style={{ ...note(22, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>{what}</span>
+            <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>{what}</span>
           </Note>
         );
       })}
@@ -212,7 +212,7 @@ export const TypeScene: React.FC = () => {
 
       {/* The coins wait for the money scene, so they never jump sides at the cut. */}
       <Note at={thinkAt - 6} x={X0} y={y(760)}>
-        <span style={{ ...note(28, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>And for money?</span>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>And for money?</span>
       </Note>
     </AbsoluteFill>
   );

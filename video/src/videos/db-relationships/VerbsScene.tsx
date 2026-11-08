@@ -127,7 +127,6 @@ export const VerbsScene: React.FC = () => {
                 opacity: ease(frame, l.at + 8, 12),
                 whiteSpace: "nowrap",
                 ...note(23, INK_SOFT),
-                fontStyle: "italic",
                 ...halo,
               }}
             >
@@ -146,7 +145,6 @@ export const VerbsScene: React.FC = () => {
               transform: "translateX(-50%)",
               opacity: ease(frame, nounsAt + i * 5, 12),
               ...note(21, INK_SOFT),
-              fontStyle: "italic",
             }}
           >
             a noun
@@ -162,7 +160,6 @@ export const VerbsScene: React.FC = () => {
               transform: "translateX(-50%)",
               opacity: ease(frame, verbsAt + i * 6, 12),
               ...note(21, INK_SOFT),
-              fontStyle: "italic",
             }}
           >
             a verb

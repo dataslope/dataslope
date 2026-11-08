@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, INK, INK_SOFT, label } from "../../editorial/style";
+import { ACCENT_INK, body, INK, INK_SOFT, label, SERIF_ITALIC } from "../../editorial/style";
 import { ColumnRule, FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -103,7 +103,7 @@ export const CloseScene: React.FC = () => {
 
       <Ink at={cleaningAt - 4} dur={18} style={{ left: X0, top: y(NOTE_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...body(38), color: INK }}>
-          Know what you threw away, and whether your task <span style={{ fontStyle: "italic" }}>needed</span> it.
+          Know what you threw away, and whether your task <span style={{ fontStyle: SERIF_ITALIC }}>needed</span> it.
         </span>
       </Ink>
       <Sfx name="el-pencil" at={neededAt - 6} level={-36} />

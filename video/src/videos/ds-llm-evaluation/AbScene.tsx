@@ -236,7 +236,7 @@ export const AbScene: React.FC = () => {
         </Note>
 
         <Note at={nextAt - 4} x={COL[1]} y={y(ROW[1]) + 266}>
-          <span style={{ ...note(22, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap", maxWidth: PANEL_W }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", maxWidth: PANEL_W }}>
             next: the model as the measuring tool
           </span>
         </Note>

@@ -3,7 +3,7 @@ import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { arrowHead, type Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, halo, INK, INK_SOFT, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { body, halo, INK, INK_SOFT, label, note, PAPER, SERIF_ITALIC, TABULAR } from "../../editorial/style";
 import { FigLabel, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -420,7 +420,7 @@ export const SearchScene: React.FC = () => {
       {/* The question, as the lesson's query vector. */}
       <Fade at={askAt - 4} style={{ left: 0, top: QY, width: 1920 }}>
         <span style={{ position: "absolute", left: X0, top: -40, ...label(21, INK_SOFT) }}>Query</span>
-        <span style={{ position: "absolute", left: DOC_X, top: 4, ...body(32), fontStyle: "italic", color: INK, whiteSpace: "nowrap" }}>
+        <span style={{ position: "absolute", left: DOC_X, top: 4, ...body(32), fontStyle: SERIF_ITALIC, color: INK, whiteSpace: "nowrap" }}>
           How did the company perform <Mark at={financiallyAt}>financially?</Mark>
         </span>
         {SEARCH.query.map((v, j) => (

@@ -237,7 +237,7 @@ export const JudgeScene: React.FC = () => {
             </div>
           </Note>
           <Note at={moderateAt} x={R_X + 760} y={y(GRID.top + 216)}>
-            <span style={{ ...note(28, BLUE_INK), fontWeight: 600, fontStyle: "italic", whiteSpace: "nowrap" }}>moderate</span>
+            <span style={{ ...note(28, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>moderate</span>
           </Note>
           <Note at={alwaysAt - 6} x={R_X} y={y(GRID.top + 330)}>
             <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>
@@ -308,7 +308,7 @@ export const JudgeScene: React.FC = () => {
           </span>
         </Note>
         <Note at={offlineAt} x={R_X} y={y(GRID.top + 450)}>
-          <span style={{ ...note(26, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>
             offline scores decide what&apos;s worth trying{" "}
             <span style={{ opacity: ease(frame, usersAt - 2, 10), color: BLUE_INK, fontWeight: 650 }}>on real users</span>
           </span>

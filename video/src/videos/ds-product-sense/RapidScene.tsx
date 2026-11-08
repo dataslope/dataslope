@@ -105,7 +105,7 @@ const Vanity: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(26, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>total signups</span>
       </Note>
       <Note at={doubledAt - 2} x={R_X + 40} y={c.y(560)}>
-        <span style={{ ...note(28, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
           If it doubled, <span style={{ opacity: ease(frame, differentlyAt - 2, 10) }}>would you know what to do differently?</span>
         </span>
       </Note>

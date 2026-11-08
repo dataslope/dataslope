@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT } from "../../editorial/style";
+import { body, INK, INK_SOFT, SERIF_ITALIC } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -162,7 +162,7 @@ export const TweetScene: React.FC = () => {
         <Ink at={keepAt - 2} dur={16} style={{ position: "relative" }}>
           Keep the{" "}
           <Mark at={unitsAt}>
-            <span style={{ fontStyle: "italic" }}>units</span>
+            <span style={{ fontStyle: SERIF_ITALIC }}>units</span>
           </Mark>
         </Ink>
         <Ink at={caresAt - 4} dur={16} style={{ position: "relative" }}>

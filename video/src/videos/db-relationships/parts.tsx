@@ -272,7 +272,6 @@ export const Link: React.FC<{
             opacity: labelIn * (1 - gone) * (1 - dimmed),
             whiteSpace: "nowrap",
             ...note(21, INK_SOFT),
-            fontStyle: "italic",
             ...halo,
           }}
         >

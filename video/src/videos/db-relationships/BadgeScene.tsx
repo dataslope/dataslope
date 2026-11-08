@@ -4,7 +4,7 @@ import type { Pt } from "../../components/arrow";
 import { ease } from "../../components/motion";
 import { Entity, Relation, useEntityLayout } from "../../editorial/erd";
 import { useLayout } from "../../editorial/layout";
-import { body, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { body, INK, INK_SOFT, label, note, SERIF_ITALIC } from "../../editorial/style";
 import { Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -153,12 +153,12 @@ export const BadgeScene: React.FC = () => {
         {/* One line, one size and face: the end in italic, what it becomes in roman. */}
         <Ink at={shareAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y), whiteSpace: "nowrap" }}>
           <span style={{ ...body(RULE_SIZE), color: INK_SOFT }}>
-            <span style={{ fontStyle: "italic", color: INK }}>Zero or many:</span> <Mark at={keysAt}>a foreign key</Mark>
+            <span style={{ fontStyle: SERIF_ITALIC, color: INK }}>Zero or many:</span> <Mark at={keysAt}>a foreign key</Mark>
           </span>
         </Ink>
         <Ink at={twiceAt - 2} dur={14} style={{ left: EMP_X, top: y(RULE_Y + 50), whiteSpace: "nowrap" }}>
           <span style={{ ...body(RULE_SIZE), color: INK_SOFT }}>
-            <span style={{ fontStyle: "italic", color: INK }}>Zero or one:</span> a foreign key, and <Mark at={constraintsAt + 8}>unique</Mark>
+            <span style={{ fontStyle: SERIF_ITALIC, color: INK }}>Zero or one:</span> a foreign key, and <Mark at={constraintsAt + 8}>unique</Mark>
           </span>
         </Ink>
 

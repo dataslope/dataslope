@@ -313,7 +313,7 @@ export const PriceScene: React.FC = () => {
         <span style={{ ...note(30, INK), ...TABULAR, fontWeight: 600, ...lands(fortyFourAt) }}>
           <Mark at={paidAt - 2}>{fmt(Number(TOTAL_CHARGED), 2)}</Mark>
         </span>
-        <span style={{ ...note(28, INK_SOFT), fontStyle: "italic", opacity: ease(frame, paidAt - 2, 12) }}>what she paid</span>
+        <span style={{ ...note(28, INK_SOFT), opacity: ease(frame, paidAt - 2, 12) }}>what she paid</span>
       </Ink>
       <Ink at={todayAt - 4} dur={16} style={{ left: STORE_X[0], top: y(856), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), width: 250, display: "grid" }}>
@@ -326,7 +326,7 @@ export const PriceScene: React.FC = () => {
             <Strike at={rewriteAt + 4}>{fmt(Number(TOTAL_CATALOG), 2)}</Strike>
           </Mark>
         </span>
-        <span style={{ ...note(28, ACCENT_INK), fontStyle: "italic", opacity: ease(frame, rewriteAt - 2, 12) }}>would rewrite history</span>
+        <span style={{ ...note(28, ACCENT_INK), opacity: ease(frame, rewriteAt - 2, 12) }}>would rewrite history</span>
       </Ink>
     </AbsoluteFill>
   );

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BAR, body, INK, INK_SOFT, note, PAPER, svgText } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BAR, body, INK, INK_SOFT, note, PAPER, SERIF_ITALIC, svgText } from "../../editorial/style";
 import { badgeStyle, FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -111,7 +111,7 @@ export const FixScene: React.FC = () => {
         <Badge kind="yes" at={hedgesAt - 2} x={X0 + 22} y={y(ROW_Y(0)) + 22} />
         <Ink at={hedgesAt - 2} dur={14} style={{ left: X0 + 64, top: y(ROW_Y(0)), width: LEFT_W - 64 }}>
           <div style={{ ...body(34), color: INK }}>
-            More hedges, like <span style={{ fontStyle: "italic" }}>“I’m not certain.”</span>
+            More hedges, like <span style={{ fontStyle: SERIF_ITALIC }}>“I’m not certain.”</span>
           </div>
         </Ink>
         <Badge kind="no" at={wrongAt - 2} x={X0 + 22} y={y(ROW_Y(1)) + 22} />

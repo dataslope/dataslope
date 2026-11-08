@@ -135,7 +135,7 @@ export const ScoringScene: React.FC = () => {
 
         {/* 2. Properties of the text, each a yes or no: here, of a summary. */}
         <Ink at={summaryAt - 2} dur={12} style={{ left: COL_X[1], top: y(TITLE_Y) + 46, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(23, INK_SOFT), fontStyle: "italic" }}>of a summary</span>
+          <span style={{ ...note(23, INK_SOFT) }}>of a summary</span>
         </Ink>
         {[
           { text: "names the three facts", at: factsAt },

@@ -174,14 +174,14 @@ export const ErdScene: React.FC = () => {
 
         {/* The three pieces, tagged as they are named. */}
         <Note at={boxesAt + 2} out={tagsOut} x={CUSTOMERS_X} y={customers.top - 52}>
-          <span style={{ ...note(22, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>an entity</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>an entity</span>
         </Note>
         <Leader points={[[CUSTOMERS_X - 20, customers.rows[1].mid], [CUSTOMERS_X - 4, customers.rows[1].mid]]} at={factsAt + 6} out={tagsOut} dot={false} />
         <Note at={factsAt + 6} out={tagsOut} x={CUSTOMERS_X - 30} y={customers.rows[1].mid - 15} align="right">
-          <span style={{ ...note(22, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>an attribute</span>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>an attribute</span>
         </Note>
         <Note at={relAt} out={tagsOut} x={midX} y={lineY + 26} from="up">
-          <span style={{ ...note(22, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
             a relationship
           </span>
         </Note>

@@ -15,10 +15,10 @@ const BW_X = 1520;
 const E = ESTIMATE;
 const A = E.assumptions;
 
-/** An assumption, as said: gray italics, "assume" first. */
+/** An assumption, as said: in gray, "assume" first. */
 const assume = (text: React.ReactNode) => (
-  <span style={{ fontStyle: "italic", color: INK_SOFT }}>
-    assume <span style={{ fontStyle: "italic" }}>{text}</span>
+  <span style={{ color: INK_SOFT }}>
+    assume {text}
   </span>
 );
 
@@ -139,7 +139,7 @@ export const EstimateScene: React.FC = () => {
           ≈ <Num>{int(sig(E.writeQps))}</Num> writes a second
         </Line>
         <Line x={X0} y={pair(1)} at={ratioAt} size={25}>
-          <span style={{ fontStyle: "italic", color: INK_SOFT }}>read-heavy, 100 : 1 or more, so</span>
+          <span style={{ color: INK_SOFT }}>read-heavy, 100 : 1 or more, so</span>
           <span style={{ opacity: ease(frame, perLinkAt, 10) }}>
             {" "}
             {assume(
@@ -157,7 +157,7 @@ export const EstimateScene: React.FC = () => {
           </span>
         </Line>
         <Line x={X0} y={pair(2)} at={peakAt} size={25}>
-          <span style={{ fontStyle: "italic", color: INK_SOFT }}>peaks run 2 to 3 times the average, so</span>
+          <span style={{ color: INK_SOFT }}>peaks run 2 to 3 times the average, so</span>
           <span style={{ opacity: ease(frame, threeAt, 10) }}>
             {" "}
             {assume(

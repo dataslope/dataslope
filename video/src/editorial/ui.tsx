@@ -198,7 +198,7 @@ export const NextLine: React.FC<{
       <div
         style={{ position: "absolute", left: x, top: y, width, height: 1, background: HAIRLINE, opacity: ease(frame, at - 4, 12) }}
       />
-      <Ink at={at} dur={18} style={{ left: x, top: y + 28, ...body(34, true), color: INK, whiteSpace: "nowrap" }}>
+      <Ink at={at} dur={18} style={{ left: x, top: y + 28, ...body(34), color: INK, whiteSpace: "nowrap" }}>
         Next: {children}
       </Ink>
     </>

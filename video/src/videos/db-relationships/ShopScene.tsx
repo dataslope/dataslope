@@ -239,7 +239,6 @@ export const ShopScene: React.FC = () => {
                 opacity: ease(frame, readAt + i * 6 + 10, 12),
                 whiteSpace: "nowrap",
                 ...note(21, INK_SOFT),
-                fontStyle: "italic",
                 ...halo,
               }}
             >

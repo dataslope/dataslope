@@ -222,7 +222,7 @@ export const NullScene: React.FC = () => {
         >
           {stored[1]}
         </span>
-        <span style={{ ...note(26, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>twice?</span>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>twice?</span>
       </Ink>
       <Note at={leaveAt + 10} x={TABLE_X} y={g.top - h(40)} out={senseAt}>
         <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>status left out</span>

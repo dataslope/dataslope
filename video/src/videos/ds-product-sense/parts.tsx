@@ -46,7 +46,7 @@ export const DATA_LIGHT = ds("blue", 200);
 export const BAD = ds("red", 500);
 
 /** The small print every made-up number carries. */
-export const madeUp = (size = 19): React.CSSProperties => ({ ...label(size, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" });
+export const madeUp = (size = 19): React.CSSProperties => ({ ...label(size, INK_SOFT), whiteSpace: "nowrap" });
 
 /**
  * A metric written as a chip: its name in a rounded box that inks in on `at`.

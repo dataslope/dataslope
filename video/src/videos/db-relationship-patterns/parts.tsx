@@ -882,7 +882,7 @@ export const DbTable: React.FC<{
               }}
             >
               {r.note !== undefined ? (
-                <div style={{ padding: `0 ${PAD}px`, ...note(21, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>{r.note}</div>
+                <div style={{ padding: `0 ${PAD}px`, ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>{r.note}</div>
               ) : (
                 r.cells.map((v, j) => (
                   <div key={j} style={cellBox(j)}>

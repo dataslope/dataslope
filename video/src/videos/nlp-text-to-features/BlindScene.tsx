@@ -256,7 +256,7 @@ export const BlindScene: React.FC = () => {
         <Chip text="the" size={30} at={commonAt - 2} mark={biggestAt - 2} />
         <span style={{ ...note(26, INK) }}>
           <Reveal at={biggestAt - 4}>{`${THE_COUNTS.join(" or ")} in every row, the biggest count,`}</Reveal>{" "}
-          <Reveal at={leastAt - 2} style={{ color: LOST_INK, fontStyle: "italic" }}>
+          <Reveal at={leastAt - 2} style={{ color: LOST_INK }}>
             and the least telling.
           </Reveal>
         </span>

@@ -157,7 +157,7 @@ export const ZipfScene: React.FC = () => {
           </Ink>
         ))}
         <Ink at={tenthAt + 6} dur={14} style={{ left: colX[2] + COLS[2].w + LAW_GAP, top: TTOP + 52 + 8 * ROW + 3, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>
+          <span style={{ ...note(21, INK_SOFT) }}>
             law: ≈ <span style={TABULAR}>{fmt(ZIPF.tenthByLaw, 0)}</span>
           </span>
         </Ink>
@@ -166,7 +166,7 @@ export const ZipfScene: React.FC = () => {
         </Svg>
         {/* What one over the rank expects of the second word, beside what it got. */}
         <Ink at={halfAt - 2} dur={14} style={{ left: colX[2] + COLS[2].w + LAW_GAP, top: TTOP + 52 + ROW + 3, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic" }}>
+          <span style={{ ...note(21, INK_SOFT) }}>
             law: ≈ <span style={TABULAR}>{fmt(ZIPF.secondByLaw, 0)}</span>
           </span>
         </Ink>

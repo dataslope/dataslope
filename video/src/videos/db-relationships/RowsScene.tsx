@@ -169,7 +169,6 @@ export const RowsScene: React.FC = () => {
             transform: "translateX(-50%)",
             opacity: ease(frame, rowsFrom + 14, 12),
             ...note(23, INK_SOFT),
-            fontStyle: "italic",
             ...halo,
           }}
         >

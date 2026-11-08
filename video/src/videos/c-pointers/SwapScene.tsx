@@ -425,7 +425,7 @@ export const SwapScene: React.FC<{ variant: Variant }> = ({ variant }) => {
                   alignItems: "center",
                 }}
               >
-                <span style={{ ...note(20, INK_SOFT), fontStyle: "italic" }}>copy</span>
+                <span style={{ ...note(20, INK_SOFT) }}>copy</span>
               </Ink>
             </React.Fragment>
           ))}

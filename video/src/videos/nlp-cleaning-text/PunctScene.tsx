@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT_INK, BAR, BLUE_INK, body, INK, INK_SOFT, note, SERIF_ITALIC } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -234,7 +234,7 @@ export const PunctScene: React.FC = () => {
         <Ink at={afterAt - 6} dur={16} style={{ position: "relative" }}>
           Strip punctuation after you tokenize,
         </Ink>
-        <Ink at={neverAt - 4} dur={16} style={{ position: "relative", fontStyle: "italic" }}>
+        <Ink at={neverAt - 4} dur={16} style={{ position: "relative", fontStyle: SERIF_ITALIC }}>
           never before.
         </Ink>
       </div>

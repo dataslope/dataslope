@@ -82,7 +82,6 @@ const ChipRow: React.FC<{ words: readonly string[]; at: number; top: number; tag
                   top: top + 46,
                   textAlign: "center",
                   ...note(19, INK_SOFT),
-                  fontStyle: "italic",
                   opacity: ease(frame, tagAt + i * 3, 10),
                 }}
               >

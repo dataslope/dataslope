@@ -469,7 +469,7 @@ export const NoRows: React.FC<{ x: number; top: number; at: number; col: string;
         <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK_SOFT, padding: "10px 20px", borderBottom: `1px solid ${HAIRLINE}` }}>
           {col}
         </div>
-        <div style={{ ...note(22, INK_SOFT), fontStyle: "italic", padding: "12px 20px" }}>0 rows</div>
+        <div style={{ ...note(22, INK_SOFT), padding: "12px 20px" }}>0 rows</div>
       </div>
     </Ink>
   );

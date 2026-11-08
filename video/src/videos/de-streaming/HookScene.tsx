@@ -110,7 +110,7 @@ export const HookScene: React.FC = () => {
           </div>
         ))}
         <Note at={lastAt} x={BELT_RIGHT - 40} y={y(BELT_Y) + CHIP_H + h(16)} align="right">
-          <span style={{ ...note(25, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>no last row to wait for</span>
+          <span style={{ ...note(25, INK_SOFT), whiteSpace: "nowrap" }}>no last row to wait for</span>
         </Note>
 
         {/* What the round tests. */}

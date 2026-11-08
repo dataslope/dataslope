@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT_INK, body, INK, INK_SOFT, note, SERIF_ITALIC } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -165,12 +165,12 @@ export const CaseScene: React.FC = () => {
       {/* The lesson's verdict, one under each figure. */}
       <Ink at={noiseAt - 6} dur={16} style={{ left: X0, top: y(NOTE_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...body(34), color: INK }}>
-          For counting, case is <span style={{ fontStyle: "italic" }}>noise.</span>
+          For counting, case is <span style={{ fontStyle: SERIF_ITALIC }}>noise.</span>
         </span>
       </Ink>
       <Ink at={signalAt - 6} dur={16} style={{ left: FIG7_X, top: y(NOTE_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...body(34), color: INK }}>
-          For a name, it&apos;s the <span style={{ fontStyle: "italic", color: ACCENT_INK }}>signal.</span>
+          For a name, it&apos;s the <span style={{ fontStyle: SERIF_ITALIC, color: ACCENT_INK }}>signal.</span>
         </span>
       </Ink>
     </AbsoluteFill>

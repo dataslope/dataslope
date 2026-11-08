@@ -4,7 +4,7 @@ import { ease } from "../../components/motion";
 import { SERIF } from "../../editorial/fonts";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, TABULAR, label, note } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note, SERIF_ITALIC, TABULAR } from "../../editorial/style";
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -223,7 +223,7 @@ export const LeadScene: React.FC = () => {
             What is Goodhart&apos;s law?
           </QuestionCard>
           <Note at={lawAt - 2} x={X0} y={y(300)}>
-            <span style={{ fontFamily: SERIF, fontSize: 40, fontStyle: "italic", color: INK, whiteSpace: "nowrap" }}>
+            <span style={{ fontFamily: SERIF, fontSize: 40, fontStyle: SERIF_ITALIC, color: INK, whiteSpace: "nowrap" }}>
               When a measure becomes a target,{" "}
               <span style={{ opacity: ease(frame, stopsAt - 2, 12) }}>it stops being a good measure.</span>
             </span>

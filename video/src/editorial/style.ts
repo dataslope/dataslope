@@ -22,13 +22,23 @@ export const ACCENT_INK = inkOf.red;
 export const BLUE_INK = inkOf.blue;
 export const HIGHLIGHT = `color-mix(in srgb, ${ds("yellow", 400)} 80%, transparent)`;
 
+/**
+ * Italic in the variant's face, for a stressed word, a term or a quotation:
+ * a serif's italic, and upright in Inter, which the house never slants
+ * (typefaces.ts). headline() and body() take theirs from it, so an italic
+ * deck or headline turn stands upright in the Inter variant with no edit to
+ * the scene. Text that is Inter in every variant (label(), note()) is never
+ * italic, except where the slant is notation: a math variable, a null.
+ */
+export const SERIF_ITALIC = "var(--ed-italic, italic)";
+
 /** Display headlines, in the variant's face (typefaces.ts). Sizes are
  *  written for Fraunces; the face's own scale brings it to the same x-height. */
 export const headline = (size: number, italic = false): React.CSSProperties => ({
   fontFamily: SERIF,
   fontSize: `calc(${size}px * var(--ed-head-scale))`,
   fontWeight: italic ? "var(--ed-head-italic-wght)" : "var(--ed-head-wght)",
-  fontStyle: italic ? "italic" : "normal",
+  fontStyle: italic ? SERIF_ITALIC : "normal",
   fontVariationSettings: "var(--ed-head-axes)",
   lineHeight: 1.02,
   letterSpacing: "var(--ed-head-tracking)",
@@ -42,7 +52,7 @@ export const body = (size: number, italic = false): React.CSSProperties => ({
   fontFamily: SERIF,
   fontSize: `calc(${size}px * var(--ed-body-scale))`,
   fontWeight: 400,
-  fontStyle: italic ? "italic" : "normal",
+  fontStyle: italic ? SERIF_ITALIC : "normal",
   fontVariationSettings: "var(--ed-body-axes)",
   fontVariantNumeric: "lining-nums",
   lineHeight: 1.25,

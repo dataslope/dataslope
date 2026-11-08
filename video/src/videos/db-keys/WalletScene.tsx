@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, headline, INK, INK_SOFT, label, note, TABULAR } from "../../editorial/style";
+import { ACCENT_INK, body, headline, INK, INK_SOFT, label, note, SERIF_ITALIC, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -154,13 +154,13 @@ export const WalletScene: React.FC = () => {
         <Note at={uniqueAt - 4} x={T0} y={y(UNIQUE_Y)}>
           <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={uniqueAt + 2}>Unique</Strike>
-            <span style={{ opacity: ease(frame, sharedAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> shared by thousands</span>
+            <span style={{ opacity: ease(frame, sharedAt - 2, 10), color: ACCENT_INK, fontStyle: SERIF_ITALIC }}> shared by thousands</span>
           </div>
         </Note>
         <Note at={permanentAt - 4} x={T0} y={y(PERMANENT_Y)}>
           <div style={{ ...body(36), color: INK, whiteSpace: "nowrap" }}>
             <Strike at={permanentAt + 2}>Permanent</Strike>
-            <span style={{ opacity: ease(frame, cancelledAt - 2, 10), color: ACCENT_INK, fontStyle: "italic" }}> cancelled</span>
+            <span style={{ opacity: ease(frame, cancelledAt - 2, 10), color: ACCENT_INK, fontStyle: SERIF_ITALIC }}> cancelled</span>
           </div>
         </Note>
         <Ink at={betsAt - 6} dur={20} style={{ left: 120, top: y(MORAL_Y), whiteSpace: "nowrap" }}>

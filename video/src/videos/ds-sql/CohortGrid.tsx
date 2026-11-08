@@ -147,7 +147,6 @@ export const CohortGrid: React.FC<{
             alignItems: "center",
             justifyContent: "center",
             ...note(22, INK_SOFT),
-            fontStyle: "italic",
             whiteSpace: "nowrap",
             opacity: ease(frame, blankNote.at, 12),
           }}

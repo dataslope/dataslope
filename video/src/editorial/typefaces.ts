@@ -24,6 +24,9 @@ export type Typeface = {
   headAxes: string;
   bodyAxes: string;
   captionWeight: number;
+  /** What an italic flag sets: the face's italic, or "normal" for a face
+   *  that is never slanted. */
+  italic: "italic" | "normal";
 };
 
 /** σ: of these faces only Inter and Source Serif ship a Greek subset. */
@@ -40,17 +43,19 @@ export const TYPEFACES: Record<TypefaceId, Typeface> = {
     headAxes: `"opsz" 144, "SOFT" 40, "WONK" 0`,
     bodyAxes: `"SOFT" 50`,
     captionWeight: 430,
+    italic: "italic",
   },
   inter: {
     family: `"${INTER_OPTICAL}", "Inter Variable", system-ui, sans-serif`,
     headScale: 0.9,
     bodyScale: 0.9,
     headWeight: 680,
-    headItalicWeight: 640,
+    headItalicWeight: 680,
     headTracking: "-0.02em",
     headAxes: "normal",
     bodyAxes: "normal",
     captionWeight: 470,
+    italic: "normal",
   },
   newsreader: {
     family: `"Newsreader Variable", ${GREEK}, Georgia, serif`,
@@ -62,6 +67,7 @@ export const TYPEFACES: Record<TypefaceId, Typeface> = {
     headAxes: "normal",
     bodyAxes: "normal",
     captionWeight: 440,
+    italic: "italic",
   },
   "source-serif": {
     family: `"Source Serif 4 Variable", Georgia, serif`,
@@ -73,6 +79,7 @@ export const TYPEFACES: Record<TypefaceId, Typeface> = {
     headAxes: "normal",
     bodyAxes: "normal",
     captionWeight: 430,
+    italic: "italic",
   },
   playfair: {
     family: `"Playfair Variable", ${GREEK}, Georgia, serif`,
@@ -84,6 +91,7 @@ export const TYPEFACES: Record<TypefaceId, Typeface> = {
     headAxes: "normal",
     bodyAxes: "normal",
     captionWeight: 450,
+    italic: "italic",
   },
 };
 
@@ -98,4 +106,5 @@ export const typefaceVars = (t: Typeface) =>
     "--ed-head-tracking": t.headTracking,
     "--ed-head-axes": t.headAxes,
     "--ed-body-axes": t.bodyAxes,
+    "--ed-italic": t.italic,
   }) as React.CSSProperties;

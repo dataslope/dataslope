@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, label } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, headline, INK, INK_SOFT, label, SERIF_ITALIC } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -134,7 +134,7 @@ export const WindowScene: React.FC = () => {
       {/* What an n-gram is. */}
       <Ink at={ngramAt - 4} dur={16} style={{ left: X0, top: y(280), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36), color: INK }}>
-          An <span style={{ fontStyle: "italic" }}>n-gram</span>: <Slot at={rowAt - 2}>n words in a row.</Slot>
+          An <span style={{ fontStyle: SERIF_ITALIC }}>n-gram</span>: <Slot at={rowAt - 2}>n words in a row.</Slot>
         </span>
       </Ink>
       <Note at={bigramAt - 2} x={X0 + 640} y={y(280) + 4}>

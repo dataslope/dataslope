@@ -127,7 +127,7 @@ export const AiScene: React.FC = () => {
           </div>
           <div style={{ ...note(24, INK_SOFT), marginTop: 4, opacity: ease(frame, expandAt - 2, 12) }}>retrieval-augmented generation</div>
           {/* What RAG does, once, for a viewer who has not built one. */}
-          <div style={{ ...note(22, INK_SOFT), fontStyle: "italic", marginTop: 2, textWrap: "balance", opacity: ease(frame, expandAt + 10, 12) }}>
+          <div style={{ ...note(22, INK_SOFT), marginTop: 2, textWrap: "balance", opacity: ease(frame, expandAt + 10, 12) }}>
             a model answers from documents it looks up
           </div>
           <div style={{ ...note(24, INK), marginTop: 10, opacity: ease(frame, promptAt - 2, 12) }}>

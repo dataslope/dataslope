@@ -123,7 +123,7 @@ export const PlausibleScene: React.FC = () => {
       })}
       <Note at={knowAt - 6} x={LAMP_X + 44} y={(y(ROW_Y[0]) + y(ROW_Y[1])) / 2 + 12}>
         <div style={{ ...note(24, INK), width: 520 }}>
-          No mark for <span style={{ fontStyle: "italic" }}>“I actually know this one.”</span>
+          No mark for “I actually know this one.”
           <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>Same fluency either way.</div>
         </div>
       </Note>

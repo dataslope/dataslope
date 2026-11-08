@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { ease, pop } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT, ACCENT_INK, body, HIGHLIGHT, INK, label, note, PAPER, TABULAR } from "../../editorial/style";
+import { ACCENT, ACCENT_INK, body, HIGHLIGHT, INK, label, note, PAPER, SERIF_ITALIC, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink, Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -181,7 +181,7 @@ export const ThinkScene: React.FC = () => {
       </Ink>
       <Ink at={trainingAt - 6} dur={14} style={{ left: RIGHT_X, top: y(476), width: 560 }}>
         <div style={{ ...body(34), color: INK }}>
-          What changed: <span style={{ color: ACCENT_INK, fontStyle: "italic" }}>training.</span>
+          What changed: <span style={{ color: ACCENT_INK, fontStyle: SERIF_ITALIC }}>training.</span>
         </div>
       </Ink>
       <Ink at={rewardedAt - 2} dur={14} style={{ left: RIGHT_X, top: y(552), width: 600 }}>

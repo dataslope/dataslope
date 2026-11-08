@@ -166,7 +166,7 @@ export const GroupbyScene: React.FC = () => {
         {/* ── Split, apply, combine: each stage named on its word ── */}
         {stages.map((s) => (
           <Ink key={s.text} at={s.at} dur={12} out={returnsAt - 4} style={{ left: s.x, top: y(STAGE_Y) }}>
-            <span style={{ ...label(22, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>{s.text}</span>
+            <span style={{ ...label(22, INK_SOFT), whiteSpace: "nowrap" }}>{s.text}</span>
           </Ink>
         ))}
 

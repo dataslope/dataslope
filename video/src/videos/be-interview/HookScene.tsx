@@ -191,7 +191,6 @@ export const HookScene: React.FC = () => {
             left: STACK_X,
             top: y(CAPTION_Y),
             ...note(24, INK_SOFT),
-            fontStyle: "italic",
             whiteSpace: "nowrap",
             opacity: ease(frame, liveAt - 2, 12),
           }}

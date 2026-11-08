@@ -180,7 +180,7 @@ export const BigScene: React.FC = () => {
                 </div>
               ))}
               {r.counted ? (
-                <div style={{ position: "absolute", left: COLS[2].right + 44, top: rowTop(i) + 14, ...note(22, INK_SOFT), fontStyle: "italic", opacity: p, whiteSpace: "nowrap" }}>
+                <div style={{ position: "absolute", left: COLS[2].right + 44, top: rowTop(i) + 14, ...note(22, INK_SOFT), opacity: p, whiteSpace: "nowrap" }}>
                   counted as it ran
                 </div>
               ) : null}

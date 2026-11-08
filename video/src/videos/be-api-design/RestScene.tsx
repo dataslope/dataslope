@@ -138,7 +138,7 @@ export const RestScene: React.FC = () => {
         />
         <Flow points={[[R_X + REQ_W + 8, reqTop + reqH / 2], [SRV.x - 8, reqTop + reqH / 2]]} at={carriesAt + 20} color={BAR} head={13} />
         <Node x={SRV.x} y={reqTop} w={SRV.w} h={reqH + h(70)} at={carriesAt + 10} tone="plain" title="server" size={24}>
-          <span style={{ ...note(21, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap", opacity: ease(frame, sessionAt + 4, 12) }}>keeps no session</span>
+          <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, sessionAt + 4, 12) }}>keeps no session</span>
         </Node>
         <Note at={meanAt} x={R_X} y={reqTop + reqH + h(26)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>

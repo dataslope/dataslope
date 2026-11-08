@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { ease } from "../../components/motion";
 import { useLayout } from "../../editorial/layout";
-import { body, headline, INK, INK_SOFT, TABULAR } from "../../editorial/style";
+import { body, headline, INK, INK_SOFT, SERIF_ITALIC, TABULAR } from "../../editorial/style";
 import { FigLabel, Ink } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -124,7 +124,7 @@ export const StopScene: React.FC = () => {
 
       <Ink at={searchAt - 4} dur={16} style={{ left: X0, top: y(NOTE_Y), whiteSpace: "nowrap" }}>
         <span style={{ ...body(36), color: INK }}>
-          For search and topics, a <span style={{ fontStyle: "italic" }}>clear win.</span>
+          For search and topics, a <span style={{ fontStyle: SERIF_ITALIC }}>clear win.</span>
         </span>
       </Ink>
       <Sfx name="el-pencil" at={winAt - 6} level={-36} />
