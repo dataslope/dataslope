@@ -560,7 +560,9 @@ CROSS JOIN regions r;
 ### How do you calculate a running total in SQL?
 
 Use `SUM` as a window function with `ORDER BY` inside `OVER`. By default
-the frame is `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`.
+the frame is `RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`, so rows tied
+on the `ORDER BY` value share one total. Write `ROWS BETWEEN UNBOUNDED
+PRECEDING AND CURRENT ROW` when the total must move strictly row by row.
 
 <SqlCodeBlock
   dialect="postgres"
