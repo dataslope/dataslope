@@ -7,10 +7,17 @@ import { ACCENT, ACCENT_INK, BAR, HAIRLINE, INK, INK_SOFT, note, PAPER } from ".
 import { FigLabel } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Headline, KEY_INK, Mark, pulse, Svg, Tag, Wire } from "./parts";
+import { Headline, KEY_INK, Mark, pulse, Spot, Svg, Tag, Wire } from "./parts";
 
 const X: XScale = { lo: 1972, hi: 1986, x0: 330, x1: 1740 };
 const TICKS = [1972, 1974, 1976, 1978, 1980, 1982, 1984, 1986];
+
+/** System R's papers, painted (db-relational-history-papers, 771x1011): a
+ *  short clipped stack standing over 1976 on IBM's lane, well clear of the
+ *  System R band under it. */
+const PAPERS_H = 96;
+const PAPERS_W = Math.round((PAPERS_H * 771) / 1011);
+const PAPERS_GAP = 34;
 
 /** A year's dot on a lane, popping in on `at`. */
 const Dot: React.FC<{ x: number; y: number; at: number; color: string; r?: number; swell?: number; dim?: number }> = ({
@@ -149,15 +156,17 @@ export const RaceScene: React.FC = () => {
       <Dot x={sx(X, 1973)} y={LANE_UCB} at={readingAt - 2} color={BAR} swell={pulse(frame, readingAt + 8, 20)} />
 
       {/* System R's work, published, and read across the way. */}
-      <Svg opacity={1 - dimIbm}>
-        <g transform={`translate(${paperX} ${LANE_IBM - 46})`} opacity={ease(frame, publishedAt - 2, 10)}>
-          <rect x={-15} y={-20} width={30} height={40} rx={2} fill={PAPER} stroke={INK} strokeWidth={2} />
-          {[-10, -3, 4, 11].map((ly) => (
-            <line key={ly} x1={-9} x2={9} y1={ly} y2={ly} stroke={INK_SOFT} strokeWidth={1.6} />
-          ))}
-        </g>
-      </Svg>
-      <Tag x={paperX + 26} y={LANE_IBM - 74} at={publishedAt} dim={onlyAt - 4} size={21}>
+      <Spot
+        id="db-relational-history-papers"
+        at={publishedAt - 2}
+        dim={onlyAt - 4}
+        from={[0, 14]}
+        left={paperX - PAPERS_W / 2}
+        top={LANE_IBM - PAPERS_GAP - PAPERS_H}
+        width={PAPERS_W}
+        height={PAPERS_H}
+      />
+      <Tag x={paperX + PAPERS_W / 2 + 28} y={LANE_IBM - PAPERS_GAP - PAPERS_H / 2 - 13} at={publishedAt} dim={onlyAt - 4} size={21}>
         its papers, published
       </Tag>
       <Wire
