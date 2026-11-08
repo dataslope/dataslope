@@ -350,31 +350,55 @@ export const Arrow: React.FC<{
   );
 };
 
-/** A disk: a small cylinder, in grey ink, with a word under it. */
-export const Disk: React.FC<{ x: number; top: number; at: number; w?: number; h?: number; color?: string; out?: number; dash?: boolean }> = ({
-  x,
-  top,
-  at,
-  w = 56,
-  h = 46,
-  color = INK_SOFT,
-  out,
-  dash,
-}) => {
+/** The painted disk (de-distributed-disk): its own pixels, for its proportions. */
+const DISK = { id: "de-distributed-disk", w: 987, h: 804 } as const;
+
+/** A disk's height at width `w`: the painting's own proportions. */
+export const diskHeight = (w = 56) => Math.round((w * DISK.h) / DISK.w);
+
+/**
+ * A disk: the painted storage drum, `w` wide, its top at `top`. It grows in
+ * on `at` (no bob: arrows run into and out of it). `hot` (0 to 1) lays a
+ * soft wash of the trap's red behind it, for a write the narration counts
+ * against the job (Hadoop's HDFS after every reduce).
+ */
+export const Disk: React.FC<{ x: number; top: number; at: number; w?: number; hot?: number; out?: number }> = ({ x, top, at, w = 56, hot = 0, out }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 12);
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (p <= 0 || o >= 1) return null;
-  const rx = w / 2;
-  const ry = 8;
-  const fill = `color-mix(in srgb, ${color} 14%, ${PAPER})`;
+  const h = diskHeight(w);
+  const halo = 10;
   return (
-    <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p * (1 - o) }}>
-      <g transform={`translate(${x + rx}, ${top + ry}) scale(${0.7 + 0.3 * p})`} strokeDasharray={dash ? "4 4" : undefined}>
-        <path d={`M${-rx},0 L${-rx},${h - 2 * ry} A${rx},${ry} 0 0 0 ${rx},${h - 2 * ry} L${rx},0`} fill={fill} stroke={color} strokeWidth={1.8} />
-        <ellipse cx={0} cy={0} rx={rx} ry={ry} fill={fill} stroke={color} strokeWidth={1.8} />
-      </g>
-    </svg>
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top,
+        width: w,
+        height: h,
+        opacity: p * (1 - o),
+        transform: `scale(${0.7 + 0.3 * p})`,
+      }}
+    >
+      {hot > 0 ? (
+        <div
+          style={{
+            position: "absolute",
+            left: -halo,
+            top: -halo,
+            width: w + 2 * halo,
+            height: h + 2 * halo,
+            borderRadius: "50%",
+            background: `radial-gradient(closest-side, color-mix(in srgb, ${ACCENT} 42%, transparent) 64%, transparent)`,
+            opacity: hot,
+          }}
+        />
+      ) : null}
+      {ILLUSTRATIONS ? (
+        <Illustration video={VIDEO} id={DISK.id} style={{ position: "absolute", left: 0, top: 0, width: w, height: h }} />
+      ) : null}
+    </div>
   );
 };
 

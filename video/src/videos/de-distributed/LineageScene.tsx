@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { Arrow, Chip, Disk, Drift, Elbow, OK, OK_INK, Svg } from "./parts";
+import { Arrow, Chip, Disk, diskHeight, Drift, Elbow, OK, OK_INK, Svg } from "./parts";
 
 const COLS = [
   { x: 150, name: "read" },
@@ -236,10 +236,11 @@ export const LineageScene: React.FC = () => {
             <span style={{ opacity: ease(frame, parentAt, 10) }}>needs every parent&apos;s output</span>
           </span>
         </Note>
-        {/* A checkpoint under filter: the chain before it is no longer needed. */}
+        {/* A checkpoint under filter: the chain before it is no longer needed.
+            Its words sit well clear of the painted disk, level with its middle. */}
         <Disk x={COLS[1].x + BW / 2 - 28} top={y(ROWS[2]) + bh + h(30)} at={ckptAt + 2} out={q14At - 6} />
         <Arrow from={[COLS[1].x + BW / 2, y(ROWS[2]) + bh + 4]} to={[COLS[1].x + BW / 2, y(ROWS[2]) + bh + h(28)]} at={savingAt} dur={8} width={1.8} head={9} out={q14At - 6} />
-        <Note at={savingAt - 2} x={COLS[1].x + BW / 2 + 40} y={y(ROWS[2]) + bh + h(34)} out={q14At - 6}>
+        <Note at={savingAt - 2} x={COLS[1].x + BW / 2 + 56} y={y(ROWS[2]) + bh + h(30) + diskHeight() / 2 - 15} out={q14At - 6}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>checkpoint: a copy in reliable storage</span>
         </Note>
 

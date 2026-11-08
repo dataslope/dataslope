@@ -7,7 +7,7 @@ import { ACCENT, ACCENT_INK, BAR, BLUE_INK, INK, INK_SOFT, label, note, PAPER } 
 import { Note } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { Arrow, Chip, Disk, Drift, Elbow, Machine, OK, OK_INK } from "./parts";
+import { Arrow, Chip, Disk, diskHeight, Drift, Elbow, Machine, OK, OK_INK } from "./parts";
 
 const BOX_X = [300, 610, 920, 1230];
 const BOX_W = 170;
@@ -16,6 +16,9 @@ const STEPS = ["map", "reduce", "map", "reduce"];
 const H_TOP = 360;
 const S_TOP = 616;
 const DISK_W = 56;
+const DISK_H = diskHeight(DISK_W);
+/** How far under a lane's middle a disk's word sits: well clear of the painting. */
+const DISK_NOTE = 46;
 const NOTE_X = 1560;
 /** How far above the Spark lane the iteration loop runs, and the cache() chip on it. */
 const LOOP_RISE = 58;
@@ -102,11 +105,11 @@ export const HadoopScene: React.FC = () => {
                 <span style={{ ...label(23, INK), fontWeight: 650 }}>{s}</span>
               </Note>
               <Arrow from={[BOX_X[i] + BOX_W + 4, hMid]} to={[dx - 6, hMid]} at={dAt - 4} dur={8} color={ink} width={1.8} head={10} />
-              <Disk x={dx} top={hMid - 23} at={dAt} color={ink} />
+              <Disk x={dx} top={hMid - DISK_H / 2} at={dAt} hot={isHdfs(i) ? red : 0} />
               {nextX ? (
                 <Arrow from={[dx + DISK_W + 4, hMid]} to={[nextX - 6, hMid]} at={dAt + 4} dur={8} color={ink} width={1.8} head={10} />
               ) : null}
-              <Note at={dAt + 2} x={gap(i) - 100} y={hMid + h(34)} width={200} style={{ textAlign: "center" }}>
+              <Note at={dAt + 2} x={gap(i) - 100} y={hMid + h(DISK_NOTE)} width={200} style={{ textAlign: "center" }}>
                 <span style={{ ...label(20, isHdfs(i) ? (hot ? ACCENT_INK : INK_SOFT) : INK_SOFT), fontWeight: isHdfs(i) ? 650 : 500, whiteSpace: "nowrap" }}>
                   {isHdfs(i) ? (last ? "HDFS" : "HDFS, replicated") : "local disk"}
                 </span>
@@ -143,9 +146,9 @@ export const HadoopScene: React.FC = () => {
               ) : (
                 <>
                   <Arrow from={[BOX_X[i] + BOX_W + 4, sMid]} to={[dx - 6, sMid]} at={shuffleAt + 2 + i * 3} dur={8} color={INK_SOFT} width={1.8} head={10} />
-                  <Disk x={dx} top={sMid - 23} at={shuffleAt + 6 + i * 3} />
+                  <Disk x={dx} top={sMid - DISK_H / 2} at={shuffleAt + 6 + i * 3} />
                   <Arrow from={[dx + DISK_W + 4, sMid]} to={[BOX_X[i + 1] - 6, sMid]} at={shuffleAt + 10 + i * 3} dur={8} color={INK_SOFT} width={1.8} head={10} />
-                  <Note at={shuffleAt + 8 + i * 3} x={gap(i) - 100} y={sMid + h(34)} width={200} style={{ textAlign: "center" }}>
+                  <Note at={shuffleAt + 8 + i * 3} x={gap(i) - 100} y={sMid + h(DISK_NOTE)} width={200} style={{ textAlign: "center" }}>
                     <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>local disk</span>
                   </Note>
                 </>

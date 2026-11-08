@@ -8,13 +8,15 @@ import { Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { count, type Dept, DEPT_INK, LADDER, NET_LEVEL } from "./data";
-import { Arrow, Curve, Disk, Drift, Machine, Mark, MARK_BAD, OK_INK, Svg } from "./parts";
+import { Arrow, Curve, Disk, diskHeight, Drift, Machine, Mark, MARK_BAD, OK_INK, Svg } from "./parts";
 
 const MAP_X = 120;
 const BOX_W = 170;
 const BOX_H = 44;
 const ROW_TOPS = [322, 378, 434];
 const DISK_X = 330;
+const DISK_W = 48;
+const DISK_H = diskHeight(DISK_W);
 const RED_X = 780;
 const KEYS: Dept[] = ["Eng", "Ops", "Sales"];
 
@@ -139,11 +141,11 @@ export const ShuffleScene: React.FC = () => {
               <span style={{ ...label(22, INK), fontWeight: 650 }}>map task {m + 1}</span>
             </Note>
             <Arrow from={[MAP_X + BOX_W + 6, mid(m)]} to={[DISK_X - 8, mid(m)]} at={diskAt + m * 3} dur={8} width={1.8} head={10} />
-            <Disk x={DISK_X} top={mid(m) - 20} at={diskAt + 4 + m * 3} w={48} h={40} />
+            <Disk x={DISK_X} top={mid(m) - DISK_H / 2} at={diskAt + 4 + m * 3} w={DISK_W} />
             {KEYS.map((_, r) => (
               <Curve
                 key={r}
-                from={[DISK_X + 56, mid(m)]}
+                from={[DISK_X + DISK_W + 8, mid(m)]}
                 to={[RED_X - 10, mid(r)]}
                 at={fetchAt + 2 + m * 3 + r}
                 dur={16}
@@ -154,10 +156,10 @@ export const ShuffleScene: React.FC = () => {
             ))}
           </React.Fragment>
         ))}
-        <Note at={diskAt + 4} x={DISK_X - 30} y={y(ROW_TOPS[2]) + boxH + h(10)}>
+        <Note at={diskAt + 4} x={DISK_X - 30} y={y(ROW_TOPS[2]) + boxH + h(20)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>serialized to local disk</span>
         </Note>
-        <Note at={netAt} x={600} y={y(ROW_TOPS[2]) + boxH + h(10)}>
+        <Note at={netAt} x={600} y={y(ROW_TOPS[2]) + boxH + h(20)}>
           <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the network</span>
         </Note>
         <Note at={fewerAt - 2} x={1080} y={y(ROW_TOPS[0]) + h(16)}>
