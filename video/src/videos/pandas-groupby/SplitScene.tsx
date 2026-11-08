@@ -92,10 +92,10 @@ export const SplitScene: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      <Ink at={open} dur={14} style={{ left: 124, top: y(112) }}>
+      <Ink at={open} dur={14} style={{ left: 124, top: y(112), whiteSpace: "nowrap" }}>
         <span style={label(24, ACCENT_INK)}>pandas groupby</span>
       </Ink>
-      <Ink at={open + 2} dur={22} style={{ left: 118, top: y(150), ...headline(66), whiteSpace: "nowrap" }}>
+      <Ink at={open + 2} dur={22} style={{ left: 118, top: y(146), ...headline(66), whiteSpace: "nowrap" }}>
         What does each department{" "}
         <span style={{ position: "relative" }}>
           pay in all?
