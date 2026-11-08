@@ -12,7 +12,8 @@ import { Bar, Cylinder, Drift, Flow, Headline, Kicker, Node, pulse, Spot, X0 } f
 
 const FIG_TOP = 290;
 const API = { x: X0, w: 170 };
-const DB = { x: 660, w: 250 };
+/** The database, painted, centred where the drawn one stood. */
+const DB = { x: 680, w: 210 };
 const BARS_TOP = 562;
 const CHIPS_Y = 733;
 const SQUARES_Y = 794;
@@ -60,8 +61,8 @@ export const HookScene: React.FC = () => {
 
   const top = y(FIG_TOP);
   const apiH = h(150);
-  const dbTop = top - h(6);
-  const dbH = h(170);
+  // Raised so its foot stands well clear of the note under it.
+  const dbTop = top - h(32);
   const readY = top + h(44);
   const writeY = top + h(104);
   const otherTop = top + h(178);
@@ -100,7 +101,7 @@ export const HookScene: React.FC = () => {
 
         {/* ── An API, a database, and the requests between them ── */}
         <Node x={API.x} y={top} w={API.w} h={apiH} at={apiAt - 2} tone="plain" title="API" sub="requests" size={30} bare />
-        <Cylinder x={DB.x} y={dbTop} w={DB.w} h={dbH + h(30)} at={dbAt - 2} title="database" swapTo="PostgreSQL" swapAt={postgresAt + 2} size={24} />
+        <Cylinder x={DB.x} y={dbTop} w={DB.w} at={dbAt - 2} title="database" swapTo="PostgreSQL" swapAt={postgresAt + 2} size={24} />
         <Flow points={[[API.x + API.w + 8, readY], [DB.x - 12, readY]]} at={readsAt} color={BAR} width={3} />
         <Note at={fastAt - 4} x={API.x + API.w + 40} y={readY - h(44)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
@@ -126,7 +127,7 @@ export const HookScene: React.FC = () => {
           color={inkOf.yellow}
           width={3}
         />
-        {/* Clear of the cylinder's foot (top + 194): it ran under the curve. */}
+        {/* Well clear of the painted cylinder's foot, which stands above it. */}
         <Note at={momentAt - 2} x={API.x + API.w + 176} y={top + h(218)}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>another write, at the same moment</span>
         </Note>

@@ -11,6 +11,7 @@ import { RAPID } from "./data";
 import {
   ColumnRule,
   Cylinder,
+  cylinderH,
   DataTable,
   Drift,
   Flow,
@@ -31,6 +32,8 @@ import {
 const R_X = 800;
 const LIST_TOP = 380;
 const ROW = 62;
+/** The bridge's database, painted. */
+const DB_W = 140;
 
 type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Layout["h"] };
 
@@ -391,7 +394,8 @@ export const RapidScene: React.FC = () => {
         {Array.from({ length: 5 }, (_, i) => (
           <Flow key={i} points={[[800, dbTop + h(20) + i * h(30)], [1040, dbTop + h(80)]]} at={manyAt + i * 2} color={BAR} width={2.4} head={12} out={end + 400} />
         ))}
-        <Cylinder x={1060} y={dbTop + h(10)} w={120} h={h(140)} at={manyAt - 2} title="" />
+        {/* The painted store, its front centred where the requests meet. */}
+        <Cylinder x={1060} y={dbTop + h(80) - cylinderH(DB_W) * 0.58} w={DB_W} at={manyAt - 2} />
         <NextLine at={nextAt} x={X0} y={y(820)} width={900}>
           concurrency
         </NextLine>

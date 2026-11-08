@@ -9,7 +9,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { inkOf } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
-import { ColumnRule, Cylinder, Drift, Flow, Node, Svg, X0 } from "./parts";
+import { ColumnRule, Cylinder, cylinderH, Drift, Flow, Node, Svg, X0 } from "./parts";
 
 const COL_HEAD = 316;
 const R_X = 980;
@@ -146,11 +146,20 @@ export const NosqlScene: React.FC = () => {
 
   // ── Phase 2: one system, both stores ──
   const app = { x: 860, w: 200, y: y(300), h: h(72) };
-  const store = { w: 260, y: y(426), h: h(170) };
-  const sqlX = 300;
-  const noX = 1150;
-  const copyX = 1540;
-  const underY = store.y + store.h + h(16);
+  // The stores, painted: SQL and NoSQL under the application's two arms,
+  // and the copy to NoSQL's right, standing on the same line.
+  const store = { w: 210, y: y(426) };
+  const storeH = cylinderH(store.w);
+  const sqlC = 430;
+  const sqlX = sqlC - store.w / 2;
+  const noX = 1280 - store.w / 2;
+  const copy = { w: 176, c: 1650 };
+  const copyH = cylinderH(copy.w, "look");
+  const copyX = copy.c - copy.w / 2;
+  const copyY = store.y + storeH - copyH;
+  // The copy's arrow, across the middle of both painted fronts.
+  const copyMid = store.y + storeH * 0.62;
+  const underY = store.y + storeH + h(40);
   const newQ = { x: 860, w: 200, y: y(704), h: h(76) };
   const newMid = newQ.y + newQ.h / 2;
 
@@ -299,8 +308,8 @@ export const NosqlScene: React.FC = () => {
         <Node x={app.x} y={app.y} w={app.w} h={app.h} at={bothAt} tone="plain" title="application" size={26} bare />
         <Flow points={[[app.x + 30, app.y + app.h + 2], [app.x + 30, app.y + app.h + h(20)], [sqlX + store.w / 2, app.y + app.h + h(20)], [sqlX + store.w / 2, store.y - 10]]} at={coreAt} color={BAR} width={2.6} />
         <Flow points={[[app.x + app.w - 30, app.y + app.h + 2], [app.x + app.w - 30, app.y + app.h + h(20)], [noX + store.w / 2, app.y + app.h + h(20)], [noX + store.w / 2, store.y - 10]]} at={logsAt} color={BAR} width={2.6} />
-        <Cylinder x={sqlX} y={store.y} w={store.w} h={store.h} at={coreAt - 2} title="SQL" size={26} />
-        <Cylinder x={noX} y={store.y} w={store.w} h={store.h} at={logsAt - 2} title="NoSQL" size={26} />
+        <Cylinder x={sqlX} y={store.y} w={store.w} at={coreAt - 2} title="SQL" size={26} />
+        <Cylinder x={noX} y={store.y} w={store.w} at={logsAt - 2} title="NoSQL" size={26} />
         <Note at={coreAt + 6} x={sqlX + store.w / 2} y={underY} style={{ transform: "translateX(-50%)" }}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             core transactions: <b>orders, payments</b>
@@ -314,33 +323,34 @@ export const NosqlScene: React.FC = () => {
 
         {/* A query nobody planned for. */}
         <Node x={newQ.x} y={newQ.y} w={newQ.w} h={newQ.h} at={askAt} tone="look" title="a new query" sub="next year's" size={24} bare />
-        <Flow points={[[newQ.x - 8, newMid], [sqlX + store.w + 70, newMid]]} at={relNewAt} color={inkOf.yellow} width={2.6} dash="9 7" />
+        <Flow points={[[newQ.x - 8, newMid], [sqlC + 200, newMid]]} at={relNewAt} color={inkOf.yellow} width={2.6} dash="9 7" />
         <Svg opacity={ease(frame, joinAt - 4, 12)}>
-          <line x1={sqlX + 100} y1={newMid} x2={sqlX + 170} y2={newMid} stroke={OK} strokeWidth={3} pathLength={1} strokeDasharray={`${ease(frame, joinAt, 12)} 1`} />
-          <text x={sqlX + 45} y={newMid + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 19, fontWeight: 600, color: INK })}>
+          <line x1={sqlC - 30} y1={newMid} x2={sqlC + 40} y2={newMid} stroke={OK} strokeWidth={3} pathLength={1} strokeDasharray={`${ease(frame, joinAt, 12)} 1`} />
+          <text x={sqlC - 85} y={newMid + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 19, fontWeight: 600, color: INK })}>
             orders
           </text>
-          <text x={sqlX + 225} y={newMid + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 19, fontWeight: 600, color: INK })}>
+          <text x={sqlC + 95} y={newMid + 7} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 19, fontWeight: 600, color: INK })}>
             users
           </text>
         </Svg>
-        <Note at={joinAt + 4} x={sqlX - 10} y={newMid + h(40)}>
+        <Note at={joinAt + 4} x={sqlC - 140} y={newMid + h(40)}>
           <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a join</span>
         </Note>
-        <Cylinder x={copyX} y={store.y + h(20)} w={store.w - 40} h={store.h - h(20)} at={copiedAt} tone="look" title="a copy" size={22} />
-        <Flow points={[[noX + store.w + 8, store.y + store.h / 2 + h(10)], [copyX - 12, store.y + store.h / 2 + h(10)]]} at={copiedAt + 2} color={INK} width={2.6} />
+        <Cylinder x={copyX} y={copyY} w={copy.w} at={copiedAt} tone="look" title="a copy" size={22} />
+        {/* From NoSQL's painted right edge to the copy's left one (each art keeps a 2.5% margin). */}
+        <Flow points={[[noX + store.w * 0.975 + 10, copyMid], [copyX + copy.w * 0.025 - 14, copyMid]]} at={copiedAt + 2} color={INK} width={2.6} />
         <Flow
           points={[
             [newQ.x + newQ.w + 8, newMid],
-            [copyX + (store.w - 40) / 2, newMid],
-            [copyX + (store.w - 40) / 2, store.y + store.h + 12],
+            [copy.c, newMid],
+            [copy.c, store.y + storeH + 14],
           ]}
           at={storeAt}
           color={inkOf.yellow}
           width={2.6}
           dash="9 7"
         />
-        <Note at={copiedAt + 6} x={copyX - 30} y={store.y - h(40)}>
+        <Note at={copiedAt + 6} x={copyX - 30} y={copyY - h(60)}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>arranged for the new one</span>
         </Note>
       </Drift>

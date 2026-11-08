@@ -585,6 +585,8 @@ export const ART = {
   chipmunk: { id: "be-databases-chipmunk", w: 1227, h: 1024 },
   phoneBook: { id: "be-databases-phone-book", w: 1024, h: 745 },
   coins: { id: "be-databases-coins", w: 896, h: 895 },
+  cylinder: { id: "be-databases-cylinder", w: 853, h: 884 },
+  cylinderCopy: { id: "be-databases-cylinder-yellow", w: 867, h: 935 },
 } as const;
 export type ArtName = keyof typeof ART;
 
@@ -629,48 +631,57 @@ export const Spot: React.FC<{
 /** The height a spot `width` wide takes. */
 export const spotH = (art: ArtName, width: number) => (width * ART[art].h) / ART[art].w;
 
+/** The database cylinders' paintings: blue for a store, yellow for the copy
+ *  the narration points at. `mid` is the middle of the painted front, as a
+ *  fraction of the painting's height, where the name is set, in ink on
+ *  either: the blue type a drawn store used is too faint on a blue wash. */
+const CYLINDER = {
+  data: { art: "cylinder", mid: 0.6 },
+  look: { art: "cylinderCopy", mid: 0.63 },
+} as const satisfies Record<string, { art: ArtName; mid: number }>;
+export type CylinderTone = keyof typeof CYLINDER;
+
+/** The height a cylinder `w` wide takes. */
+export const cylinderH = (w: number, tone: CylinderTone = "data") => spotH(CYLINDER[tone].art, w);
+
 /**
- * A database drawn as the usual cylinder, popping in on `at`, its name in
- * the middle (a swap to `swapTo` on `swapAt`).
+ * A database, painted as the usual cylinder (be-databases-cylinder), `w`
+ * wide at the painting's own aspect, popping in on `at`. Its name sits on
+ * the middle of its front (a swap to `swapTo` on `swapAt`); a cylinder
+ * with no title is just the store.
  */
 export const Cylinder: React.FC<{
   x: number;
   y: number;
   w: number;
-  h: number;
   at: number;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   swapTo?: React.ReactNode;
   swapAt?: number;
-  tone?: Tone;
+  tone?: CylinderTone;
   size?: number;
   dim?: number;
   out?: number;
-}> = ({ x, y, w, h, at, title, swapTo, swapAt, tone = "data", size = 24, dim, out }) => {
+}> = ({ x, y, w, at, title, swapTo, swapAt, tone = "data", size = 24, dim, out }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
   const d = dim === undefined ? 0 : ease(frame, dim, 14) * 0.6;
   const o = out === undefined ? 0 : ease(frame, out, 10);
   if (frame < at || p <= 0.001 || o >= 1) return null;
-  const t = TONE[tone];
-  const ry = Math.min(26, h * 0.13);
+  const { art, mid } = CYLINDER[tone];
+  const h = cylinderH(w, tone);
   const swap = swapAt === undefined ? 0 : ease(frame, swapAt, 12);
+  const name: React.CSSProperties = { ...label(size, INK), fontWeight: 700, whiteSpace: "nowrap", position: "absolute" };
   return (
     <div style={{ position: "absolute", left: x, top: y, width: w, height: h, opacity: Math.min(1, p) * (1 - d) * (1 - o), transform: `scale(${0.9 + 0.1 * Math.min(1, p)})` }}>
-      <svg width={w} height={h} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-        <path
-          d={`M1.5,${ry} L1.5,${h - ry} A${w / 2 - 1.5},${ry} 0 0 0 ${w - 1.5},${h - ry} L${w - 1.5},${ry}`}
-          fill={t.fill}
-          stroke={t.line}
-          strokeWidth={2.5}
-        />
-        <ellipse cx={w / 2} cy={ry} rx={w / 2 - 1.5} ry={ry - 1} fill={`color-mix(in srgb, ${t.line} 22%, ${PAPER})`} stroke={t.line} strokeWidth={2.5} />
-      </svg>
-      <div style={{ position: "absolute", left: 0, right: 0, top: ry * 2, bottom: ry, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", opacity: 1 - swap, position: "absolute" }}>{title}</span>
-        {swapTo ? <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", opacity: swap, position: "absolute" }}>{swapTo}</span> : null}
-      </div>
+      {ILLUSTRATIONS ? <Illustration video={VIDEO} id={ART[art].id} style={{ position: "absolute", left: 0, top: 0, width: w, height: h }} /> : null}
+      {title ? (
+        <div style={{ position: "absolute", left: 0, right: 0, top: h * mid, height: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ ...name, opacity: 1 - swap }}>{title}</span>
+          {swapTo ? <span style={{ ...name, opacity: swap }}>{swapTo}</span> : null}
+        </div>
+      ) : null}
     </div>
   );
 };
