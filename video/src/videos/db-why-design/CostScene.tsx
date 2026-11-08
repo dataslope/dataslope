@@ -105,7 +105,7 @@ export const CostScene: React.FC = () => {
           {/* One line at one size, the notes' own: the reply stands out by its ink, weight and highlight. */}
           <Ink at={legalFrom - 4} dur={16} style={{ left: X0, top: y(300), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14, fontSize: 24 }}>
             <span style={label(24, INK_SOFT)}>Postgres replied</span>
-            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 700, color: INK }}>
+            <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>
               <Mark at={toldAt - 2}>UPDATE {FLAT.updated}</Mark>
             </span>
             <span style={note(24, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>

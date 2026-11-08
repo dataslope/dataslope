@@ -139,7 +139,7 @@ export const MixScene: React.FC = () => {
                       textAlign: roomy ? "center" : "left",
                       opacity: ease(frame, whereAt + gi * 6 + i * 3 + 8, 10),
                       ...label(roomy ? 26 : 20, roomy ? (onLight(d) ? INK : PAPER) : INK_SOFT),
-                      fontWeight: 700,
+                      fontWeight: 600,
                     }}
                   >
                     {d.dept}

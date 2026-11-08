@@ -37,8 +37,8 @@ export const RuleScene: React.FC = () => {
       <Ink at={seenAt + 8} dur={20} style={{ left: 120, top: y(600), width: 1100 }}>
         <div style={{ ...note(24, INK_SOFT), lineHeight: 1.45 }}>
           Degree {last.degree}: an error of{" "}
-          <span style={{ color: FIT_INK[11], fontWeight: 700 }}>{fmt(last.train, 3)}</span> on its training points,
-          and of <span style={{ color: NEW_INK, fontWeight: 700 }}>{fmt(last.test, 1)}</span> on{" "}
+          <span style={{ color: FIT_INK[11], fontWeight: 600 }}>{fmt(last.train, 3)}</span> on its training points,
+          and of <span style={{ color: NEW_INK, fontWeight: 600 }}>{fmt(last.test, 1)}</span> on{" "}
           {N_TEST.toLocaleString("en-US")} new ones.
         </div>
       </Ink>

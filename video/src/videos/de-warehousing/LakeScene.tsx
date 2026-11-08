@@ -306,7 +306,7 @@ export const LakeScene: React.FC = () => {
             <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>upsert: update the row with that key, or insert it</span>
           </Note>
           <Note at={reliableAt} x={X0} y={y(790)}>
-            <span style={{ ...note(27, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a warehouse&apos;s reliability, on the lake&apos;s open, cheaper storage</span>
+            <span style={{ ...note(27, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a warehouse&apos;s reliability, on the lake&apos;s open, cheaper storage</span>
           </Note>
         </div>
 

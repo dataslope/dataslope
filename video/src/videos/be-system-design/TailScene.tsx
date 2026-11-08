@@ -117,13 +117,13 @@ export const TailScene: React.FC = () => {
           {rule(P.marks.p99, p99At, rowA - 4, ACCENT)}
         </svg>
 
-        <Line x={sx(P.marks.median) + 14} y={rowA} at={medianAt + 4} size={24} weight={700}>
+        <Line x={sx(P.marks.median) + 14} y={rowA} at={medianAt + 4} size={24} weight={600}>
           median <Num>{Math.round(P.marks.median)}</Num> ms
         </Line>
         <Line x={sx(P.marks.mean) + 14} y={rowB} at={meanAt + 4} size={24} weight={600} color={INK_SOFT}>
           mean <Num>{Math.round(P.marks.mean)}</Num> ms
         </Line>
-        <Line x={sx(P.marks.p99) - 14} y={rowA} at={p99At + 4} size={24} weight={700} color={ACCENT_INK} align="right">
+        <Line x={sx(P.marks.p99) - 14} y={rowA} at={p99At + 4} size={24} weight={600} color={ACCENT_INK} align="right">
           99th percentile <Num>{Math.round(P.marks.p99)}</Num> ms
         </Line>
         <Line x={sx(P.marks.p99) - 14} y={rowB} at={oneAt + 4} size={24} weight={600} color={ACCENT_INK} align="right">
@@ -134,7 +134,7 @@ export const TailScene: React.FC = () => {
         </Line>
 
         {/* A hundred calls, one page load. */}
-        <Line x={X0} y={sqY - 52} at={pageAt} size={25} weight={700}>
+        <Line x={X0} y={sqY - 52} at={pageAt} size={25} weight={600}>
           One page load: <Num>{P.calls}</Num> calls
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, chanceAt, 10) }}>, each 1 in 100 to be that slow</span>
         </Line>
@@ -157,7 +157,7 @@ export const TailScene: React.FC = () => {
             );
           })}
         </svg>
-        <Line x={X0} y={sqY + 46} at={sixtyAt} size={28} weight={700}>
+        <Line x={X0} y={sqY + 46} at={sixtyAt} size={28} weight={600}>
           1 − 0.99<sup style={{ fontSize: "0.62em" }}>100</sup> ≈{" "}
           <span style={{ color: ACCENT_INK }}>
             <Num>{Math.round(P.hitsTail * 100)}</Num>% of page loads

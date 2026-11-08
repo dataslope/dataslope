@@ -206,7 +206,7 @@ export const DropScene: React.FC = () => {
           <Note at={sameAt + 4} x={790} y={(y(ROW_A) + y(ROW_B)) / 2 + h(10)}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <Tick at={sameAt + 8} size={26} />
-              <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>identical</span>
+              <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>identical</span>
             </div>
           </Note>
           {/* Why Adam breaks the equivalence, then the fix. */}

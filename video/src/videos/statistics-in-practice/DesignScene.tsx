@@ -102,7 +102,7 @@ export const DesignScene: React.FC = () => {
         return (
           <React.Fragment key={s}>
             <Ink at={at} dur={12} style={{ left: STEP_X[i], top: y(STEP_Y), whiteSpace: "nowrap", display: "flex", gap: 10 }}>
-              <span style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>{i + 1}</span>
+              <span style={{ ...label(22, ACCENT_INK), fontWeight: 600 }}>{i + 1}</span>
               <span style={{ ...label(22, INK), fontWeight: 600 }}>
                 {i === 1 ? (
                   <Marker at={experimentInAt - 6} color={HIGHLIGHT}>

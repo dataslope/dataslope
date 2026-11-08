@@ -96,7 +96,7 @@ export const HookScene: React.FC = () => {
 
         {/* The round. */}
         <Note at={fifteenAt - 2} x={X0} y={y(LIST_Y + 330)}>
-          <span style={{ ...note(32, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(32, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <span style={{ color: BLUE_INK }}>
               <Num>15</Num> questions
             </span>

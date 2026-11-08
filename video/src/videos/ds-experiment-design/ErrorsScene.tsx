@@ -133,10 +133,10 @@ export const ErrorsScene: React.FC = () => {
           ))}
         </Svg>
         <Note at={t1At} x={xs(0) - 110} y={y(BASE) - h(PEAK) - h(44)} width={220} style={{ textAlign: "center" }}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>no effect</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>no effect</span>
         </Note>
         <Note at={t2At} x={xs(ERRORS.shift) - 110} y={y(BASE) - h(PEAK) - h(44)} width={220} style={{ textAlign: "center" }} out={doubleAt}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a real effect</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a real effect</span>
         </Note>
         <Note at={fpAt + 4} x={xs(crit) + 10} y={y(BASE) + h(14)}>
           <span style={{ ...label(20, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
@@ -150,7 +150,7 @@ export const ErrorsScene: React.FC = () => {
 
         {/* The two errors, named. */}
         <Note at={fpAt - 2} x={COL_X} y={y(390)}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Type I · a false positive</span>
+          <span style={{ ...note(27, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Type I · a false positive</span>
         </Note>
         <Note at={alphaAt} x={COL_X} y={y(430)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
@@ -158,7 +158,7 @@ export const ErrorsScene: React.FC = () => {
           </span>
         </Note>
         <Note at={missAt - 2} x={COL_X} y={y(490)}>
-          <span style={{ ...note(27, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Type II · a false negative</span>
+          <span style={{ ...note(27, WARM_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Type II · a false negative</span>
         </Note>
         <Note at={betaAt} x={COL_X} y={y(530)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", ...TABULAR }}>
@@ -168,7 +168,7 @@ export const ErrorsScene: React.FC = () => {
 
         {/* Power, and what moves it. */}
         <Note at={oneMinusAt} x={COL_X} y={y(596)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
             power = 1 − β<span style={{ opacity: stale }}> = {pct(POWER.base)}</span>
           </span>
         </Note>
@@ -186,11 +186,11 @@ export const ErrorsScene: React.FC = () => {
           </Note>
         ))}
         <Note at={ninetyEightAt} x={xs(ERRORS.shift * Math.SQRT2) - 110} y={y(BASE) - h(PEAK) - h(44)} width={220} style={{ textAlign: "center" }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>twice the users</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>twice the users</span>
         </Note>
         {/* The shifted curve's own power, inside its green area, where the old 80% no longer applies. */}
         <Note at={ninetyEightAt + 4} x={xs(ERRORS.shift * Math.SQRT2) - 110} y={y(BASE) - h(PEAK) * 0.42} width={220} style={{ textAlign: "center" }}>
-          <span style={{ ...note(34, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{pct(POWER.levers[0].power)}</span>
+          <span style={{ ...note(34, OK_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>{pct(POWER.levers[0].power)}</span>
           <div style={{ ...label(20, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>power</div>
         </Note>
       </Drift>

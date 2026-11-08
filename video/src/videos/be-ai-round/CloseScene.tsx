@@ -87,7 +87,7 @@ export const CloseScene: React.FC = () => {
                 />
               )}
               <Ink at={at + 4} dur={12} style={{ left: x, top: y(ROW_V) + h(ART_H) + h(14), width: COL_W, textAlign: "center" }}>
-                <div style={{ ...label(20, i === ours ? ACCENT_INK : INK_SOFT), fontWeight: 700 }}>
+                <div style={{ ...label(20, i === ours ? ACCENT_INK : INK_SOFT), fontWeight: 600 }}>
                   <Num>{s.n}</Num>
                 </div>
                 <div style={{ ...note(20, INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 2 }}>

@@ -49,7 +49,7 @@ const Trade: React.FC<{ c: Ctx }> = ({ c }) => {
           <React.Fragment key={r.text}>
             <div style={{ position: "absolute", left: R_X + 40, top: top + c.h(4), ...note(26, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: p }}>{r.text}</div>
             <div style={{ position: "absolute", left: R_X + 230, top, width: r.v * unit * p, height: c.h(40), background: r.color, opacity: 0.85, borderRadius: 3 }} />
-            <div style={{ position: "absolute", left: R_X + 244 + r.v * unit, top: top + c.h(4), ...note(26, r.ink), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap", opacity: p }}>
+            <div style={{ position: "absolute", left: R_X + 244 + r.v * unit, top: top + c.h(4), ...note(26, r.ink), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap", opacity: p }}>
               +{r.v}%
             </div>
             <Tag x={R_X + 340 + r.v * unit} y={top - c.h(2)} at={Math.max(r.tagAt, r.at) + 4} size={24} tone={r.tone}>
@@ -102,7 +102,7 @@ const Vanity: React.FC<{ c: Ctx }> = ({ c }) => {
         />
       </svg>
       <Note at={signupsAt} x={x0 + W + 18} y={base - H}>
-        <span style={{ ...note(26, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>total signups</span>
+        <span style={{ ...note(26, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>total signups</span>
       </Note>
       <Note at={doubledAt - 2} x={R_X + 40} y={c.y(560)}>
         <span style={{ ...note(28, INK), fontStyle: "italic", whiteSpace: "nowrap" }}>
@@ -150,7 +150,7 @@ const Ratio: React.FC<{ c: Ctx }> = ({ c }) => {
           <span style={{ alignSelf: "stretch", height: 2, background: INK }} />
           <span style={{ paddingTop: 6 }}>{num(bottom)} users</span>
         </div>
-        <span style={{ ...note(40, ink), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>= {value}</span>
+        <span style={{ ...note(40, ink), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>= {value}</span>
       </div>
     </Note>
   );
@@ -178,7 +178,7 @@ const Ratio: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       {frac(RATIO.savesAfter, RATIO.usersAfter, RATIO.perUserAfter.toFixed(1), roseAt + 8, R_X + 480, BLUE_INK)}
       <Note at={fellAt} x={R_X + 480} y={c.y(560)}>
-        <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           saves {minus(pct(RATIO.savesChange))}
           <span style={{ opacity: ease(frame, leftAt, 10) }}>, users {minus(pct(RATIO.usersChange))}</span>
         </span>

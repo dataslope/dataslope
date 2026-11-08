@@ -118,7 +118,7 @@ export const RouteScene: React.FC = () => {
                 />
               </Svg>
               <Ink at={whatAt - 2 + i * 3} dur={10} style={{ left: GATE_X + 9, top: ry - 19, whiteSpace: "nowrap" }}>
-                <span style={{ ...label(28, TRAP_INK), fontWeight: 700 }}>?</span>
+                <span style={{ ...label(28, TRAP_INK), fontWeight: 600 }}>?</span>
               </Ink>
             </React.Fragment>
           );
@@ -169,7 +169,7 @@ export const RouteScene: React.FC = () => {
                   <span style={{ ...label(26, INK), fontWeight: 600, position: "absolute", left: 0, whiteSpace: "nowrap" }}>
                     <Marked at={markAt}>{s.name}</Marked>
                   </span>
-                  <span style={{ ...note(26, A_INK), fontWeight: 700, position: "absolute", left: COLS[1] - TABLE_X, ...TABULAR }}>
+                  <span style={{ ...note(26, A_INK), fontWeight: 600, position: "absolute", left: COLS[1] - TABLE_X, ...TABULAR }}>
                     {fmt(s.a, 1)}
                   </span>
                   <span style={{ ...note(26, B_INK), position: "absolute", left: COLS[2] - TABLE_X, ...TABULAR }}>{fmt(s.b, 1)}</span>

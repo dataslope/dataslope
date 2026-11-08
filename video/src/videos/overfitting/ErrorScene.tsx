@@ -174,7 +174,7 @@ export const ErrorScene: React.FC = () => {
         </span>
       </Note>
       <Note at={worseAt - 4} x={px(EXIT_DEGREE) + 24} y={box.top + 4}>
-        <div style={{ ...note(24, NEW_INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
+        <div style={{ ...note(24, NEW_INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
           {fmt(last.test, 1)} at degree {last.degree}, off the chart
         </div>
         <div style={{ ...note(21, INK_SOFT), marginTop: 6, whiteSpace: "nowrap", ...halo }}>

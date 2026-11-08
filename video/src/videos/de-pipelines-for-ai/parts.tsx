@@ -200,7 +200,7 @@ export const say = (size = 24, color: string = INK, weight = 500): React.CSSProp
 /** A small heading over a part of a figure ("Offline ingestion"). */
 export const head = (size = 22, color: string = INK_SOFT): React.CSSProperties => ({
   ...label(size, color),
-  fontWeight: 700,
+  fontWeight: 600,
   whiteSpace: "nowrap",
 });
 

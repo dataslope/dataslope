@@ -200,13 +200,13 @@ export const LateScene: React.FC = () => {
           ]}
         />
         <Note at={sevenAt} x={gf.x} y={gf.rowTop(2) + h(14)} out={againstAt}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             $<Num>{dollars(LATE.loaded)}</Num> of $<Num>{dollars(LATE.stagedSum)}</Num>
             <span style={{ opacity: ease(frame, errorAt, 10) }}>, and no error</span>
           </span>
         </Note>
         <Note at={againstAt + 10} x={gf.x} y={gf.rowTop(3) + h(14)} out={touchedAt - 2}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>all three loaded</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>all three loaded</span>
         </Note>
 
         {/* The report, once the customer is real. */}
@@ -221,7 +221,7 @@ export const LateScene: React.FC = () => {
           marks={[{ row: 2, col: rCity, at: tulsaAt + 2, color: MARK_OK }]}
         />
         <Note at={touchedAt + 4} x={gf.x} y={gf.rowTop(3) + h(14)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             the fact still holds <Num>{F.rows[2][fKey]}</Num>: never touched
           </span>
         </Note>

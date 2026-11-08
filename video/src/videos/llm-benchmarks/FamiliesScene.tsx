@@ -110,7 +110,7 @@ export const FamiliesScene: React.FC = () => {
           })}
         </Svg>
         <Ink at={fiftyAt - 2} dur={12} style={{ left: COL_X[0], top: gy(210) - 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, A_INK), fontWeight: 700 }}>
+          <span style={{ ...label(26, A_INK), fontWeight: 600 }}>
             <Count at={fiftyAt - 2} to={QUOTED.mmluSubjects} dur={18} />
           </span>
           <span style={{ ...label(24, INK), marginLeft: 10 }}>subjects</span>
@@ -158,7 +158,7 @@ const CardTitle: React.FC<{ x: number; top: number; at: number; name: string }> 
   const { h } = useLayout();
   return (
     <Ink at={at} dur={14} style={{ left: x, top: top + h(22), whiteSpace: "nowrap" }}>
-      <span style={{ ...label(28, INK), fontWeight: 700, transform: `scale(${1 + pulse(frame, at + 10, 18) * 0.04})`, display: "inline-block" }}>
+      <span style={{ ...label(28, INK), fontWeight: 600, transform: `scale(${1 + pulse(frame, at + 10, 18) * 0.04})`, display: "inline-block" }}>
         {name}
       </span>
     </Ink>
@@ -195,7 +195,7 @@ const GpqaBar: React.FC<{ x: number; y: number; w: number; at: number; fill: num
         </text>
       </Svg>
       <Ink at={fill - 2} dur={12} style={{ left: x + (w * value) / 100 - 30, top: y - 46, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(28, INK), fontWeight: 700 }}>
+        <span style={{ ...label(28, INK), fontWeight: 600 }}>
           <Count at={fill - 6} to={value} dur={18} suffix="%" />
         </span>
       </Ink>

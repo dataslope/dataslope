@@ -196,7 +196,7 @@ export const OrphanScene: React.FC = () => {
           dim={leavesAt - 10}
         />
         <Note at={leavesAt - 2} x={CUSTOMERS_X + customers.width + 20} y={customers.rowMid(owner) - 16}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 700 }}>?</span>
+          <span style={{ ...note(30, ACCENT_INK), fontWeight: 600 }}>?</span>
         </Note>
       </Drift>
     </AbsoluteFill>

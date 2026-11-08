@@ -317,7 +317,7 @@ export const TrendScene: React.FC = () => {
       </Note>
 
       <Note at={twelveAt - 4} x={bandX1 - 18} y={py(TOP_VALUE) + 22} align="right" dim={dimStory} out={neverAt + 2}>
-        <span style={{ ...note(23, STAT_INK), fontWeight: 700, ...halo }}>
+        <span style={{ ...note(23, STAT_INK), fontWeight: 600, ...halo }}>
           The last six months: down {fmt(Math.abs(TREND.change), 1)}
         </span>
       </Note>

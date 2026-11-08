@@ -81,7 +81,7 @@ export const HookScene: React.FC = () => {
           csvAt,
           <>
             <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK }}>sales.csv</span>
-            <span style={{ ...note(26, INK), fontWeight: 700, opacity: ease(frame, csvSizeAt, 10) }}>
+            <span style={{ ...note(26, INK), fontWeight: 600, opacity: ease(frame, csvSizeAt, 10) }}>
               <Num>{MB(FILES.csv)}</Num>
             </span>
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, csvSizeAt + 6, 10) }}>text, one row after another</span>
@@ -95,7 +95,7 @@ export const HookScene: React.FC = () => {
           pqAt,
           <>
             <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK }}>sales.parquet</span>
-            <span style={{ ...note(26, INK), fontWeight: 700, opacity: ease(frame, pqSizeAt, 10) }}>
+            <span style={{ ...note(26, INK), fontWeight: 600, opacity: ease(frame, pqSizeAt, 10) }}>
               <Num>{MB(FILES.parquet)}</Num>
             </span>
             <span style={{ ...note(24, INK_SOFT), opacity: ease(frame, columnarAt, 10) }}>
@@ -181,7 +181,7 @@ export const HookScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 ...label(21, tone > 0.5 ? PAPER : INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 opacity: p,
                 transform: `scale(${p * (1 + 0.12 * pulse(frame, sevenAt + 4 + (q - 2) * 2, 14))})`,
               }}

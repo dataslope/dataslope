@@ -113,7 +113,7 @@ export const PeekScene: React.FC = () => {
           </span>
         </Ink>
         <Ink at={threeAt - 6} dur={12} style={{ left: 680, top: y(300), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(64, STAT_INK), ...TABULAR, fontWeight: 700 }}>
+          <span style={{ ...note(64, STAT_INK), ...TABULAR, fontWeight: 600 }}>
             <Count to={DESIGN.perArm} at={threeAt - 4} dur={30} format={num} />
           </span>
         </Ink>
@@ -264,7 +264,7 @@ export const PeekScene: React.FC = () => {
         <span style={{ ...note(22, STAT_INK), whiteSpace: "nowrap", ...halo }}>and you ship noise</span>
       </Note>
       <Note at={nineteenAt - 4} x={pts[last][0] - 16} y={pts[last][1] + 14} align="right">
-        <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>p = {fmt(PEEKING.final)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>p = {fmt(PEEKING.final)}</span>
       </Note>
       <Ring x={pts[last][0]} y={pts[last][1]} at={numberAt - 2} color={INK} />
     </AbsoluteFill>

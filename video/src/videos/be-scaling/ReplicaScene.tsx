@@ -87,7 +87,7 @@ export const ReplicaScene: React.FC = () => {
           copies of the data on several nodes
         </Line>
         <Ink at={writesAt - 2} dur={12} style={{ left: X0, top: lMid - 44, whiteSpace: "nowrap", opacity: 1 - ease(frame, dimTop, 12) * 0.65 }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 700 }}>writes</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 600 }}>writes</span>
         </Ink>
         <Flow points={[[X0, lMid], [LEADER.x - 8, lMid]]} at={writesAt} color={BAR} dim={dimTop} />
         <Node
@@ -130,17 +130,17 @@ export const ReplicaScene: React.FC = () => {
           </React.Fragment>
         ))}
         <Ink at={scalesAt + 2} dur={12} style={{ left: READS_X - 70, top: fMid[0] - 50, whiteSpace: "nowrap", opacity: 1 - ease(frame, dimTop, 12) * 0.65 }}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 700 }}>reads</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 600 }}>reads</span>
         </Ink>
         <Line at={scalesAt + 8} x={FOLLOW.x + FOLLOW.w + 30} y={fMid[1] + 44} size={22} color={INK} weight={650} dim={dimTop}>
           scales reads
         </Line>
-        <Line at={promotedAt + 6} x={FOLLOW.x} y={fMid[0] - FOLLOW.h / 2 - h(44)} size={21} color={OK_INK} weight={700} dim={dimTop}>
+        <Line at={promotedAt + 6} x={FOLLOW.x} y={fMid[0] - FOLLOW.h / 2 - h(44)} size={21} color={OK_INK} weight={600} dim={dimTop}>
           promoted when the leader dies
         </Line>
 
         {/* ── The catch: replication lag, on a timeline. ── */}
-        <Line at={lagAt} x={X0} y={y(668)} size={23} weight={700} color={INK}>
+        <Line at={lagAt} x={X0} y={y(668)} size={23} weight={600} color={INK}>
           <Mark at={lagAt + 2}>Replication lag</Mark>
         </Line>
         <Svg opacity={ease(frame, lagAt, 12)}>
@@ -184,7 +184,7 @@ export const ReplicaScene: React.FC = () => {
         <VRule x={1257} top={y(340)} bottom={y(640)} at={asyncAt} />
 
         {/* ── A lagging follower, promoted. ── */}
-        <Line at={asyncAt} x={LOG.x} y={y(352)} size={22} weight={700} color={INK}>
+        <Line at={asyncAt} x={LOG.x} y={y(352)} size={22} weight={600} color={INK}>
           Asynchronous: promote a lagging follower
         </Line>
         {["leader", "follower"].map((t, r) => (
@@ -212,7 +212,7 @@ export const ReplicaScene: React.FC = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     ...label(19, missing ? ACCENT_INK : BLUE_INK),
-                    fontWeight: 700,
+                    fontWeight: 600,
                     opacity: p,
                   }}
                 >
@@ -222,7 +222,7 @@ export const ReplicaScene: React.FC = () => {
             })}
           </React.Fragment>
         ))}
-        <Line at={losesAt} x={LOG.x} y={y(402) + h(148)} size={21} color={ACCENT_INK} weight={700}>
+        <Line at={losesAt} x={LOG.x} y={y(402) + h(148)} size={21} color={ACCENT_INK} weight={600}>
           promoted: w5 and w6 are lost
         </Line>
       </Drift>

@@ -60,7 +60,7 @@ const Value: React.FC<{ x: number; y: number; at: number; value: string; tone: B
   return (
     <g opacity={p}>
       <rect x={x - 32} y={y + 17} width={64} height={32} rx={b.borderRadius as number} style={{ fill: String(b.background) }} />
-      <text x={x} y={y + 40} textAnchor="middle" style={{ ...mono(20, String(b.color)), fontWeight: 700 }}>
+      <text x={x} y={y + 40} textAnchor="middle" style={{ ...mono(20, String(b.color)), fontWeight: 600 }}>
         {value}
       </text>
     </g>
@@ -218,7 +218,7 @@ export const IsoScene: React.FC = () => {
                   <g opacity={ease(frame, defaultAt, 10)}>
                     {/* The house's badge, in the highlighter's yellow. */}
                     <rect x={colX(2) + COL_W} y={yy - 25} width={184} height={32} rx={DEFAULT_BADGE.borderRadius as number} style={{ fill: String(DEFAULT_BADGE.background) }} />
-                    <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText({ ...label(20, String(DEFAULT_BADGE.color)), fontWeight: 700 })}>
+                    <text x={colX(2) + COL_W + 92} y={yy - 2} textAnchor="middle" style={svgText({ ...label(20, String(DEFAULT_BADGE.color)), fontWeight: 600 })}>
                       Postgres default
                     </text>
                   </g>

@@ -366,7 +366,7 @@ export const StairsScene: React.FC = () => {
         </span>
       </Note>
       <Note at={fiveAt - 2} out={zLabelsOut} x={ZX} y={zoomed.ty(TURNS[1].resent + TURNS[1].newSlice / 2) + 4}>
-        <span style={{ ...note(28, NEW_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{int(TURNS[1].newSlice)} new tokens</span>
+        <span style={{ ...note(28, NEW_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>{int(TURNS[1].newSlice)} new tokens</span>
       </Note>
 
       {/* Turn forty. */}
@@ -444,7 +444,7 @@ export const StairsScene: React.FC = () => {
       </Note>
       <Leader points={[[700, L - 330], [930, L - 150]]} at={chatAt - 2} out={doubleAt - 4} color={TRI_INK} />
       <Note at={chatAt} out={doubleAt - 4} x={440} y={L - 376}>
-        <span style={{ ...note(28, TRI_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the chat itself, resent</span>
+        <span style={{ ...note(28, TRI_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the chat itself, resent</span>
       </Note>
 
       {/* The ledger: what each part does when the turns double. */}

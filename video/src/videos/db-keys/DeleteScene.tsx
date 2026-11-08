@@ -178,7 +178,7 @@ export const DeleteScene: React.FC = () => {
         {/* ── The three columns' headings: ON DELETE, then which ── */}
         {kinds.map((kind, i) => (
           <Ink key={kind.name} at={deletingAt - 4 + i * 4} dur={14} style={{ left: COL_X[i], top: y(TAG_Y), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 700, color: INK_SOFT }}>
+            <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 600, color: INK_SOFT }}>
               ON DELETE{" "}
               {/* "?" until the narration names this one, then its name in the same place. */}
               <span style={{ position: "relative", display: "inline-block" }}>

@@ -114,7 +114,7 @@ export const WhichScene: React.FC = () => {
   // A panel's name and what it is for: one line at one size, the name in weight.
   const panel = (x: number, top: number, title: string, use: string, at: number) => (
     <Ink at={at - 6} dur={14} style={{ left: x, top, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}>
-      <span style={{ ...label(23, INK), fontWeight: 700 }}>{title}</span>
+      <span style={{ ...label(23, INK), fontWeight: 600 }}>{title}</span>
       <span style={{ ...note(23, INK_SOFT) }}>{use}</span>
     </Ink>
   );

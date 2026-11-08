@@ -215,7 +215,7 @@ export const MetricScene: React.FC = () => {
           y1={at(ys, DRIFT.definitions[2].values[last])}
         />
         <Note at={factorAt + 4} x={at(xs, last) + 104} y={(at(ys, DRIFT.definitions[0].values[last]) + at(ys, DRIFT.definitions[2].values[last])) / 2 - 18} out={out1}>
-          <span style={{ ...note(30, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>×{DRIFT.spread}</span>
+          <span style={{ ...note(30, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>×{DRIFT.spread}</span>
         </Note>
 
         {/* ── Question 2: three kinds of metric, as three columns spread

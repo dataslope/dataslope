@@ -257,7 +257,7 @@ export const OltpScene: React.FC = () => {
         {/* ── Between them: the job ── */}
         <KeyArrow from={[orders.right + 56, y(CHIP_TOP) + h(100)]} to={[R_X - 30, y(CHIP_TOP) + h(100)]} at={moveAt + 2} color={OK} />
         <Note at={moveAt + 8} x={orders.right + 56} y={y(CHIP_TOP) + h(100) - 52}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>reshape</span>
+          <span style={{ ...note(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>reshape</span>
         </Note>
         {/* Under the arrow, a hairline and 28px of white before the words
             (README: room under a rule). */}

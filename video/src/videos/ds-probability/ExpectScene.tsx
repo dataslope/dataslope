@@ -262,7 +262,7 @@ export const ExpectScene: React.FC = () => {
                     <ellipse cx={x} cy={(top + bottom) / 2} rx={RING.rx} ry={(bottom - top) / 2} fill="none" stroke={OK} strokeWidth={4} opacity={ring} />
                   ) : null}
                   {/* Clear of the match's ring, which reaches foot + 11. */}
-                  <text x={x} y={foot + 40} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 700, fill: INK_SOFT }}>
+                  <text x={x} y={foot + 40} textAnchor="middle" style={{ ...label(20, INK_SOFT), fontWeight: 600, fill: INK_SOFT }}>
                     {i + 1}
                   </text>
                 </g>
@@ -314,7 +314,7 @@ export const ExpectScene: React.FC = () => {
                     strokeWidth={6}
                     strokeLinejoin="round"
                     paintOrder="stroke"
-                    style={{ ...label(21, INK), fontWeight: 700, fill: INK, ...TABULAR }}
+                    style={{ ...label(21, INK), fontWeight: 600, fill: INK, ...TABULAR }}
                   >
                     {hat + 1}
                   </text>

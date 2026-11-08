@@ -147,13 +147,13 @@ export const ResultScene: React.FC = () => {
           <Ink at={a.at - 4} dur={12} style={{ left: a.x, top: top + gridH + 50, whiteSpace: "nowrap" }}>
             {/* The count, its gloss and the rate share one line, so they are
                 set within a size of each other. */}
-            <span style={{ ...note(26, INK), ...TABULAR, fontWeight: 700 }}>
+            <span style={{ ...note(26, INK), ...TABULAR, fontWeight: 600 }}>
               <Count to={a.k} at={a.at - 4} dur={26} format={num} />
             </span>
             <span style={{ ...note(24, INK_SOFT), marginLeft: 10 }}>of {num(EXPERIMENT.n)} bought</span>
           </Ink>
           <Ink at={a.rateAt - 4} dur={12} style={{ left: a.x + 300, top: top + gridH + 50, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(26, INK), fontWeight: 700 }}>{fmt(pp(a.rate))}%</span>
+            <span style={{ ...note(26, INK), fontWeight: 600 }}>{fmt(pp(a.rate))}%</span>
           </Ink>
         </React.Fragment>
       ))}
@@ -234,7 +234,7 @@ export const ResultScene: React.FC = () => {
         </Svg>
       ) : null}
       <Note at={liftAt + 2} x={sx(LIFT, lift)} y={rowY - 52} from="up">
-        <span style={{ ...note(24, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
+        <span style={{ ...note(24, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}>
           +{fmt(lift)}
         </span>
       </Note>
@@ -280,7 +280,7 @@ export const ResultScene: React.FC = () => {
             <span style={{ ...label(21, INK_SOFT) }}>{c.name}</span>
           </Ink>
           <Ink at={c.at + 4} dur={14} style={{ left: CARD_X, top: y(CARD_Y[i]) + 32, whiteSpace: "nowrap" }}>
-            <span style={{ ...note(28, i === 2 ? INK : STAT_INK), fontWeight: 700 }}>{c.value}</span>
+            <span style={{ ...note(28, i === 2 ? INK : STAT_INK), fontWeight: 600 }}>{c.value}</span>
           </Ink>
           {c.extra ? (
             <Ink at={c.extraAt} dur={14} style={{ left: CARD_X, top: y(CARD_Y[i]) + 72, whiteSpace: "nowrap" }}>
@@ -299,7 +299,7 @@ export const ResultScene: React.FC = () => {
         <span style={{ ...note(26, INK), fontWeight: 600 }}>Report all four together.</span>
       </Ink>
       <Ink at={aloneAt - 4} dur={14} style={{ left: CARD_X, top: y(CARD_END + 14), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(26, STAT_INK), fontWeight: 700 }}>Never the p-value alone.</span>
+        <span style={{ ...note(26, STAT_INK), fontWeight: 600 }}>Never the p-value alone.</span>
       </Ink>
     </AbsoluteFill>
   );

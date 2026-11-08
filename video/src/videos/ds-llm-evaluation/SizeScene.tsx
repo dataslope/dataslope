@@ -159,7 +159,7 @@ export const SizeScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>items in the eval set · 95% interval around an 80% pass rate</span>
         </Note>
         <Note at={rangeAt - 2} x={CHART.x0 - 40} y={y(CHART.top) - h(110)}>
-          <span style={{ ...note(28, BLUE_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, BLUE_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
             at 100 items:{" "}
             <Mark at={rangeAt + 6} out={habitsAt}>
               {pct(SIZE.at100.lo)} to {pct(SIZE.at100.hi)}
@@ -167,7 +167,7 @@ export const SizeScene: React.FC = () => {
           </span>
         </Note>
         <Note at={threeAt + 6} x={CHART.x0 - 40} y={y(CHART.top) - h(66)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <span style={{ display: "inline-block", width: 14, height: 22, background: BAD, verticalAlign: "-3px", marginRight: 10 }} />a 3-point change can&apos;t show
           </span>
         </Note>
@@ -204,7 +204,7 @@ export const SizeScene: React.FC = () => {
         <Note at={itemsAt + 2} x={TABLE.x + TABLE.head} y={y(TABLE.top) + h(30)}>
           <div style={{ display: "flex" }}>
             {["B passes", "B fails"].map((t) => (
-              <span key={t} style={{ width: TABLE.cw - 10, textAlign: "center", ...label(20, INK_SOFT), fontWeight: 700 }}>
+              <span key={t} style={{ width: TABLE.cw - 10, textAlign: "center", ...label(20, INK_SOFT), fontWeight: 600 }}>
                 {t}
               </span>
             ))}
@@ -212,7 +212,7 @@ export const SizeScene: React.FC = () => {
         </Note>
         {["A passes", "A fails"].map((t, r) => (
           <Note key={t} at={itemsAt + 2} x={TABLE.x} y={y(TABLE.top) + h(TABLE.rh) * (r + 1) + h(22)}>
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 700 }}>{t}</span>
+            <span style={{ ...label(20, INK_SOFT), fontWeight: 600 }}>{t}</span>
           </Note>
         ))}
         {cell(0, 0, PAIR.bothPass, sameAt, undefined)}
@@ -220,7 +220,7 @@ export const SizeScene: React.FC = () => {
         {cell(1, 0, PAIR.bOnly, toBAt, POINT)}
         {cell(1, 1, PAIR.bothFail, sameAt, undefined)}
         <Note at={disagreeAt + 2} x={TABLE.x + TABLE.head + 2 * TABLE.cw + 4} y={y(TABLE.top) + h(TABLE.rh) + h(40)}>
-          <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             {PAIR.discordant} disagree:
             <br />
             only these count
@@ -238,7 +238,7 @@ export const SizeScene: React.FC = () => {
         <Note at={separateAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 20)}>
           <span style={{ ...note(26, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>
             as two separate samples:{" "}
-            <span style={{ opacity: ease(frame, p23At - 2, 10), color: ACCENT_INK, fontWeight: 700 }}>
+            <span style={{ opacity: ease(frame, p23At - 2, 10), color: ACCENT_INK, fontWeight: 600 }}>
               <Strike at={sameAt} color={ACCENT}>
                 p = {PAIR.pUnpaired.toFixed(2)}
               </Strike>
@@ -248,7 +248,7 @@ export const SizeScene: React.FC = () => {
         <Note at={mcAt} x={TABLE.x} y={y(TABLE.top) + h(3 * TABLE.rh + 70)}>
           <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>
             paired, McNemar&apos;s test:{" "}
-            <span style={{ opacity: ease(frame, p02At - 2, 10), color: OK_INK, fontWeight: 700 }}>
+            <span style={{ opacity: ease(frame, p02At - 2, 10), color: OK_INK, fontWeight: 600 }}>
               <Mark at={p02At + 6} color={MARK_OK}>
                 p = {PAIR.pMcNemar.toFixed(2)}
               </Mark>

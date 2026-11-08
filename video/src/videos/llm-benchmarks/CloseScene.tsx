@@ -80,7 +80,7 @@ export const CloseScene: React.FC = () => {
                 <span style={{ ...label(24, INK), fontWeight: 600, position: "absolute", left: MINI_COLS[0] }}>
                   {s.name}
                 </span>
-                <span style={{ ...note(24, A_INK), fontWeight: 700, position: "absolute", left: MINI_COLS[1], ...TABULAR }}>{fmt(s.a, 1)}</span>
+                <span style={{ ...note(24, A_INK), fontWeight: 600, position: "absolute", left: MINI_COLS[1], ...TABULAR }}>{fmt(s.a, 1)}</span>
                 <span style={{ ...note(24, B_INK), position: "absolute", left: MINI_COLS[2], ...TABULAR }}>{fmt(s.b, 1)}</span>
               </div>
             </Ink>

@@ -68,7 +68,7 @@ const Compaction: React.FC<{ c: Ctx }> = ({ c }) => {
           </Cell>
         ))}
       <Note at={snapAt} x={R_X} y={keptY + c.h(4)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           compacted: <Num>{COMPACTION.kept}</Num> of <Num>{COMPACTION.log.length}</Num>
         </span>
       </Note>
@@ -148,7 +148,7 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
       ].map((s) => (
         <React.Fragment key={s.name}>
           <Note at={s2sAt} x={R_X} y={s.y - c.h(15)}>
-            <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>{s.name}</span>
+            <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{s.name}</span>
           </Note>
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
             <line x1={tx(0)} x2={tx(0) + (tx(12) - tx(0)) * ease(frame, s2sAt, 14)} y1={s.y} y2={s.y} stroke={INK} strokeWidth={1.6} />
@@ -172,7 +172,7 @@ const Join: React.FC<{ c: Ctx }> = ({ c }) => {
         }}
       />
       <Note at={bufAt + 6} x={tx(winFrom) + 8} y={cy - c.h(30) - c.h(34)}>
-        <span style={{ ...label(20, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>buffered: the last few seconds of each side</span>
+        <span style={{ ...label(20, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>buffered: the last few seconds of each side</span>
       </Note>
       <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         {MATCH.map(([ci, bi], k) => {
@@ -331,7 +331,7 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
         </Note>
       ))}
       <Note at={flowAt} x={lane.x} y={lane.y - c.h(76)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           the main stream keeps flowing<span style={{ ...label(22, INK_SOFT), opacity: ease(frame, stallAt, 10) }}>, never stalled by one poison message</span>
         </span>
       </Note>
@@ -357,7 +357,7 @@ const DeadLetter: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={vanishAt - 6} x={R_X} y={c.y(764)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a few don't stop everything, and none vanish</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a few don't stop everything, and none vanish</span>
       </Note>
     </>
   );
@@ -413,7 +413,7 @@ export const RapidScene: React.FC = () => {
           </span>
         </Note>
         <Note at={costsAt} x={X0} y={y(LIST_TOP) + 3 * h(ROW) + h(100)}>
-          <span style={{ ...note(27, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>decides what reading it costs.</span>
+          <span style={{ ...note(27, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>decides what reading it costs.</span>
         </Note>
         <NextLine at={nextAt} x={X0} y={y(760)} width={900}>
           data warehousing and storage

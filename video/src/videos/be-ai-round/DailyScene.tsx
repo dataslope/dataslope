@@ -127,13 +127,13 @@ export const DailyScene: React.FC = () => {
               <span style={{ opacity: ease(frame, copilotAt - 2, 10) }}>
                 <Strike at={poorlyAt}>&ldquo;I use Copilot a lot.&rdquo;</Strike>
               </span>
-              <span style={{ color: ACCENT_INK, fontWeight: 700, opacity: ease(frame, poorlyAt, 10) }}> A vague answer scores poorly.</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 600, opacity: ease(frame, poorlyAt, 10) }}> A vague answer scores poorly.</span>
             </span>
           </Note>
 
           {/* A concrete workflow, in four bins. */}
           <Note at={concreteAt} x={X0} y={binTop - 46}>
-            <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>A concrete workflow</span>
+            <span style={{ ...label(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>A concrete workflow</span>
           </Note>
           {bins.slice(1).map((b, i) => (
             <ColumnRule key={b.title} x={X0 + (i + 1) * (BIN_W + BIN_GAP) - BIN_GAP / 2} top={binTop} height={h(212)} at={b.at} />
@@ -229,7 +229,7 @@ export const DailyScene: React.FC = () => {
           />
         </svg>
         <Note at={gapAt + 6} x={ZERO - 260} y={gapY + 12} width={520}>
-          <div style={{ ...note(24, INK), fontWeight: 700, textAlign: "center", whiteSpace: "nowrap" }}>
+          <div style={{ ...note(24, INK), fontWeight: 600, textAlign: "center", whiteSpace: "nowrap" }}>
             <Mark at={gapAt + 12}>the gap: felt faster, measured slower</Mark>
           </div>
         </Note>

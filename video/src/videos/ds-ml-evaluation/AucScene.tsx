@@ -309,7 +309,7 @@ export const AucScene: React.FC = () => {
                         left: BAR_X + BAR_W * b.v + 14,
                         top: rowTop + k * h(46),
                         ...note(26, b.ink),
-                        fontWeight: 700,
+                        fontWeight: 600,
                         ...TABULAR,
                         opacity: b.p,
                         whiteSpace: "nowrap",

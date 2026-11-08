@@ -286,7 +286,7 @@ export const AuthScene: React.FC = () => {
                 {c.k === "role" ? (
                   <>
                     <span style={{ fontWeight: 600 }}>&quot;role&quot;</span>: <Strike at={adminAt + 10}>&quot;{AUTH.claims.role}&quot;</Strike>
-                    <span style={{ color: ACCENT_INK, fontWeight: 700, opacity: ease(frame, adminAt + 16, 10) }}> &quot;admin&quot;</span>
+                    <span style={{ color: ACCENT_INK, fontWeight: 600, opacity: ease(frame, adminAt + 16, 10) }}> &quot;admin&quot;</span>
                   </>
                 ) : (
                   <Mark at={c.at + 2}>{claimLine(c.k, c.v)}</Mark>
@@ -303,7 +303,7 @@ export const AuthScene: React.FC = () => {
         <Note at={verifiesAt} x={J.x} y={claimsTop + h(194)} out={leave}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 23 }}>
             <Cross at={verifiesAt + 2} size={22} />
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>role changed: it no longer verifies</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>role changed: it no longer verifies</span>
           </div>
         </Note>
 
@@ -335,7 +335,7 @@ export const AuthScene: React.FC = () => {
 
         {/* Question 8, sessions: one shared store, and a deleted session. */}
         <Note at={instantAt} x={X0} y={bTop}>
-          <span style={{ ...label(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Sessions: revoke at once</span>
+          <span style={{ ...label(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Sessions: revoke at once</span>
         </Note>
         {[0, 1].map((i) => (
           <React.Fragment key={i}>
@@ -354,7 +354,7 @@ export const AuthScene: React.FC = () => {
 
         {/* JWTs: checked locally, valid until they expire. */}
         <Note at={locallyAt} x={jx} y={bTop}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>A JWT, checked locally</span>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>A JWT, checked locally</span>
         </Note>
         <Msg x={jx} y={srvTop} w={jReqW} at={locallyAt + 2} size={21} lines={[{ t: "GET /articles/42" }, { t: "Authorization: Bearer eyJhbGciOi…" }]} />
         <Flow points={[[jx + jReqW + 8, srvTop + twoH / 2], [1560, srvTop + twoH / 2]]} at={locallyAt + 8} color={INK_SOFT} width={2.2} head={11} />
@@ -385,7 +385,7 @@ export const AuthScene: React.FC = () => {
 
         {/* The hybrid: short access tokens, a revocable refresh token. */}
         <Note at={hybridAt} x={X0} y={tl.top - h(46)}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>The common hybrid</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>The common hybrid</span>
         </Note>
         <Note at={accessAt} x={X0} y={tl.top}>
           <span style={{ ...note(22, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>

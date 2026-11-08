@@ -145,7 +145,7 @@ export const ThinkScene: React.FC = () => {
               <Note at={timesAt[i]} x={ansX1 + px(thinkCost(r.thinking)) * g + 18} y={ry + bh / 2 - 18}>
                 <span style={{ display: "flex", alignItems: "baseline", gap: 14, whiteSpace: "nowrap" }}>
                   <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{usd(r.cost, 5)}</span>
-                  <span style={{ ...note(26, markAt[i] > 0 ? POINT_INK : INK), fontWeight: 700, ...TABULAR }}>
+                  <span style={{ ...note(26, markAt[i] > 0 ? POINT_INK : INK), fontWeight: 600, ...TABULAR }}>
                     {markAt[i] > 0 ? <Marked at={markAt[i]}>{`${r.times.toFixed(1)}x`}</Marked> : `${r.times.toFixed(1)}x`}
                   </span>
                 </span>

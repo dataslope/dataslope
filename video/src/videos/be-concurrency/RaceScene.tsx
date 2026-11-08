@@ -181,7 +181,7 @@ export const RaceScene: React.FC = () => {
         {/* Two threads, three steps each. */}
         {[0, 1].map((t) => (
           <Note key={t} at={twoAt + t * 4} x={X0} y={rowY[t] + chipH / 2 - 14}>
-            <span style={{ ...label(21, THREAD[t].ink), fontWeight: 700, whiteSpace: "nowrap" }}>thread {t + 1}</span>
+            <span style={{ ...label(21, THREAD[t].ink), fontWeight: 600, whiteSpace: "nowrap" }}>thread {t + 1}</span>
           </Note>
         ))}
         {[0, 1].map((t) =>
@@ -219,7 +219,7 @@ export const RaceScene: React.FC = () => {
                   opacity: p * (1 - fused),
                 }}
               >
-                <span style={{ ...label(21, th.ink), fontWeight: 700 }}>{step}</span>
+                <span style={{ ...label(21, th.ink), fontWeight: 600 }}>{step}</span>
                 {valued > 0 ? (
                   <span style={{ ...label(21, lost > 0 ? ACCENT_INK : BLUE_INK), fontWeight: 750, opacity: valued }}>
                     <Num>{seen.value}</Num>
@@ -251,7 +251,7 @@ export const RaceScene: React.FC = () => {
             }}
           >
             <LockGlyph size={24} color={INK} />
-            <span style={{ ...label(21, THREAD[t].ink), fontWeight: 700, whiteSpace: "nowrap" }}>read, add, write</span>
+            <span style={{ ...label(21, THREAD[t].ink), fontWeight: 600, whiteSpace: "nowrap" }}>read, add, write</span>
           </div>
         ))}
         <Flow points={[[STEP_X, y(736)], [STEP_X + 6 * SLOT - 10, y(736)]]} at={bothReadAt} color={INK_SOFT} width={2} head={13} out={fixAt} />
@@ -259,12 +259,12 @@ export const RaceScene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650 }}>time</span>
         </Note>
         <Note at={lostAt} x={STEP_X} y={y(762)} out={fixAt}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Two increments, and the counter reads <Num>{LOST.result}</Num>: one is lost
           </span>
         </Note>
         <Note at={sectionAt + 4} x={STEP_X} y={y(736)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>One critical section: a lock around all three</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>One critical section: a lock around all three</span>
         </Note>
 
         {/* Every order the six steps can run in. */}
@@ -325,7 +325,7 @@ export const RaceScene: React.FC = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     ...label(21, THREAD[who(c)].ink),
-                    fontWeight: 700,
+                    fontWeight: 600,
                   }}
                 >
                   thread {who(c) + 1}

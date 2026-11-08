@@ -117,7 +117,7 @@ export const SessionScene: React.FC = () => {
             return (
               <g key={s} opacity={p}>
                 <path d={`M${a},${ay + 48} L${a},${ay + 56} L${b},${ay + 56} L${b},${ay + 48}`} fill="none" stroke={OK} strokeWidth={3} />
-                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" fill={OK_INK} style={{ ...label(19, OK_INK), fontWeight: 700 }}>
+                <text x={(a + b) / 2} y={ay + 82} textAnchor="middle" fill={OK_INK} style={{ ...label(19, OK_INK), fontWeight: 600 }}>
                   session {s}
                 </text>
               </g>

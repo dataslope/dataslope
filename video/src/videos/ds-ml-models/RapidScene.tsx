@@ -75,7 +75,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "A discriminative model")}
         top={c.y(360)}
         size={28}
-        weight={700}
+        weight={600}
       >
         Discriminative
       </Line>
@@ -97,7 +97,7 @@ const Gen: React.FC<{ c: Ctx }> = ({ c }) => {
         at={c.w("r-gen", "A generative model")}
         top={c.y(520)}
         size={28}
-        weight={700}
+        weight={600}
       >
         Generative
       </Line>
@@ -215,7 +215,7 @@ const Scale13: React.FC<{ c: Ctx }> = ({ c }) => {
                 top: top + c.h(6),
                 opacity: p,
                 ...note(23, b.color),
-                fontWeight: 700,
+                fontWeight: 600,
                 ...TABULAR,
               }}
             >

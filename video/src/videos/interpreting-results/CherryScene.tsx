@@ -145,7 +145,7 @@ export const CherryScene: React.FC = () => {
           </span>
         </Note>
         <Note at={pctAt - 2} x={px(WANDER.end) + 18} y={py(S[WANDER.end]) - 70}>
-          <span style={{ ...note(24, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
             <Marker at={pctAt}>up {WANDER.windowPct}%</Marker> in {WANDER.length} months
           </span>
         </Note>

@@ -161,7 +161,7 @@ export const RecScene: React.FC = () => {
                 borderRadius: 12,
                 padding: "14px 18px",
                 ...note(26, arm ? WARM_INK : BLUE_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 whiteSpace: "nowrap",
               }}
             >
@@ -212,7 +212,7 @@ export const RecScene: React.FC = () => {
                 <rect x={RIGHT_X + 170} y={top} width={(SIZE.w * b.n * p) / longest} height={h(SIZE.h)} fill={b.fill} opacity={0.85} rx={3} />
               </Svg>
               <Note at={(i === 0 ? fifteenAt : fourAt) + 8} x={RIGHT_X + 170 + (SIZE.w * b.n) / longest + 14} y={top + h(4)} out={out8}>
-                <span style={{ ...label(22, b.ink), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+                <span style={{ ...label(22, b.ink), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
                   {num(b.n)}
                   {i === 1 ? (
                     <>
@@ -259,7 +259,7 @@ export const RecScene: React.FC = () => {
           {reasons.map((r, i) => (
             <Note key={r.text} at={r.at - 2} x={X0} y={y(340) + i * h(70)}>
               <span style={{ ...note(29, INK), whiteSpace: "nowrap" }}>
-                <span style={{ color: ACCENT_INK, fontWeight: 700 }}>✕</span> {r.text}
+                <span style={{ color: ACCENT_INK, fontWeight: 600 }}>✕</span> {r.text}
                 {r.eg ? <span style={{ color: INK_SOFT, opacity: ease(frame, r.egAt, 10) }}> ({r.eg})</span> : null}
               </span>
             </Note>

@@ -193,7 +193,7 @@ export const FundsScene: React.FC = () => {
       </svg>
       <Note at={averagingAt + 2} x={allX - 16} y={y(LINE_TOP + 4)} align="right">
         <div style={label(20, INK_SOFT)}>All {FUNDS.n.toLocaleString("en-US")} funds</div>
-        <div style={{ ...note(30, INK), fontWeight: 700 }}>{fmt(FUNDS.trueAvg)}%</div>
+        <div style={{ ...note(30, INK), fontWeight: 600 }}>{fmt(FUNDS.trueAvg)}%</div>
       </Note>
       {/* Named from the moment it appears, and riding along with it as the
           sweep moves it: red is the biased number, never "still open". */}
@@ -218,7 +218,7 @@ export const FundsScene: React.FC = () => {
         <div
           style={{
             ...note(30, ACCENT_INK),
-            fontWeight: 700,
+            fontWeight: 600,
             opacity: ease(frame, sevenAt - 2, 10),
           }}
         >

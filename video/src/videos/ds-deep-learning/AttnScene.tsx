@@ -105,7 +105,7 @@ export const AttnScene: React.FC = () => {
               {QKV.map((c, k) => (
                 <g key={c.name}>
                   <rect x={TOK_X + 110 + k * 46} y={rowY(i) + h(14)} width={38} height={h(38)} rx={5} fill={`color-mix(in srgb, ${c.color} 30%, ${PAPER})`} stroke={c.color} strokeWidth={2} />
-                  <text x={TOK_X + 110 + k * 46 + 19} y={rowY(i) + h(14) + h(38) / 2 + 7} textAnchor="middle" style={{ fontFamily: MONO, fontSize: 20, fontWeight: 700, fill: INK }}>
+                  <text x={TOK_X + 110 + k * 46 + 19} y={rowY(i) + h(14) + h(38) / 2 + 7} textAnchor="middle" style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, fill: INK }}>
                     {c.name}
                   </text>
                 </g>
@@ -145,7 +145,7 @@ export const AttnScene: React.FC = () => {
           weights: how much each token takes from each
         </Tagline>
         {A.roundedSums.map((s, i) => (
-          <Tagline key={i} x={SUM_X} y={rowY(i) + h(20)} at={rowAt + i * 3} size={24} color={OK_INK} weight={700}>
+          <Tagline key={i} x={SUM_X} y={rowY(i) + h(20)} at={rowAt + i * 3} size={24} color={OK_INK} weight={600}>
             = {s.toFixed(2)}
           </Tagline>
         ))}

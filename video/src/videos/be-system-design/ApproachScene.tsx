@@ -153,7 +153,7 @@ export const ApproachScene: React.FC = () => {
         </div>
 
         {/* The two lists. */}
-        <Line x={X0} y={headY} at={listsAt} size={30} weight={700} color={BLUE_INK}>
+        <Line x={X0} y={headY} at={listsAt} size={30} weight={600} color={BLUE_INK}>
           Functional
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, mustAt, 10) }}>: what the system must do</span>
         </Line>
@@ -162,7 +162,7 @@ export const ApproachScene: React.FC = () => {
             {it.text}
           </Line>
         ))}
-        <Line x={NF_X} y={headY} at={listsAt + 6} size={30} weight={700} color={BLUE_INK}>
+        <Line x={NF_X} y={headY} at={listsAt + 6} size={30} weight={600} color={BLUE_INK}>
           <Mark at={shapesAt} color={HIGHLIGHT}>
             Non-functional
           </Mark>
@@ -214,7 +214,7 @@ export const ApproachScene: React.FC = () => {
           { x: X0 + 620, at: billionAt, n: ESTIMATE.readsPerDay, unit: "redirects a day", servers: 12 },
         ].map((f) => (
           <React.Fragment key={f.unit}>
-            <Line x={f.x} y={figY} at={f.at} size={27} weight={700} color={BLUE_INK}>
+            <Line x={f.x} y={figY} at={f.at} size={27} weight={600} color={BLUE_INK}>
               <Num>{int(f.n)}</Num> {f.unit}
             </Line>
             <Line x={f.x} y={figY + 48} at={Math.max(f.at, sameAt)} size={22} weight={600} color={INK}>
@@ -255,7 +255,7 @@ export const ApproachScene: React.FC = () => {
         ))}
         <VRule x={583} top={figY} bottom={figY + 92} at={billionAt} />
         <VRule x={1308} top={figY} bottom={figY + 92} at={sayAt} />
-        <Line x={1400} y={figY} at={sayAt} size={27} weight={700} width={420}>
+        <Line x={1400} y={figY} at={sayAt} size={27} weight={600} width={420}>
           Say each assumption out loud
         </Line>
         <Line x={1400} y={figY + 50} at={correctAt} size={25} color={INK_SOFT} width={420}>

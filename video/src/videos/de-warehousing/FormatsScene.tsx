@@ -292,7 +292,7 @@ export const FormatsScene: React.FC = () => {
         <div style={{ position: "absolute", left: X0 + 210 + pqW + 18, top: lowY + h(52), ...note(23, INK), whiteSpace: "nowrap", opacity: ease(frame, csvAt + 14, 12) }}>
           <Num>{MB(FILES.parquet)}</Num>
           <span style={{ color: INK_SOFT, opacity: ease(frame, typesAt + 4, 10) }}> · typed, with a schema</span>
-          <span style={{ fontWeight: 700, color: OK_INK, opacity: ease(frame, quarterAt + 4, 10) }}>
+          <span style={{ fontWeight: 600, color: OK_INK, opacity: ease(frame, quarterAt + 4, 10) }}>
             {" "}
             · under a quarter of the size
           </span>

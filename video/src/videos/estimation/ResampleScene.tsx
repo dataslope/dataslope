@@ -241,7 +241,7 @@ export const ResampleScene: React.FC = () => {
       <Rule x={sx(XZ, BOOT.hi)} y0={y(HIST_BASE)} y1={y(HIST_BASE) - h(HIST_H) - 56} at={eightOhAt - 4} color={INK} width={2.2} />
       <IntervalBar x0={sx(XZ, BOOT.lo)} x1={sx(XZ, BOOT.hi)} y={y(HIST_BASE) - h(HIST_H) - 50} at={sixOneAt} dur={18} color={INK} width={4} tick={10} />
       <Note at={eightOhAt} x={sx(XZ, BOOT.hi) + 14} y={y(HIST_BASE) - h(HIST_H) - 66}>
-        <span style={{ ...note(22, INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
           middle 95%: {fmt(BOOT.lo)} to {fmt(BOOT.hi)}
         </span>
       </Note>

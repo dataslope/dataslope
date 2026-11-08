@@ -202,7 +202,7 @@ export const ScoreScene: React.FC = () => {
         />
       </Svg>
       <Note at={threeAt - 2} x={ratioX + 14} y={(rowMid(0) + rowMid(1)) / 2 - 16}>
-        <span style={{ ...note(23, INK), fontWeight: 700 }}>{CAT_OVER_DOG.toFixed(1)}×</span>
+        <span style={{ ...note(23, INK), fontWeight: 600 }}>{CAT_OVER_DOG.toFixed(1)}×</span>
       </Note>
 
       {/* Softmax: from the scores to the probabilities. */}

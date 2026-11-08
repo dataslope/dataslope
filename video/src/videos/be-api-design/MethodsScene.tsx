@@ -121,7 +121,7 @@ export const MethodsScene: React.FC = () => {
         {ROWS.map((r, i) => (
           <React.Fragment key={r.m}>
             <Ink at={r.at} dur={12} style={{ left: X0, top: rowY(i), whiteSpace: "nowrap" }}>
-              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 700, color: METHOD_INK }}>{r.m}</span>
+              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: METHOD_INK }}>{r.m}</span>
             </Ink>
             <Ink at={r.at + 4} dur={14} style={{ left: COL.what, top: rowY(i) + 1, whiteSpace: "nowrap" }}>
               <span style={{ ...note(24, INK) }}>{r.what}</span>
@@ -133,7 +133,7 @@ export const MethodsScene: React.FC = () => {
 
         {/* Follow-up one: DELETE twice. */}
         <Note at={secondAt} x={R_X} y={delTop(0) - h(46)}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>The same DELETE, twice</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>The same DELETE, twice</span>
         </Note>
         {[0, 1].map((i) => {
           const at = secondAt + 4 + i * 10;
@@ -167,7 +167,7 @@ export const MethodsScene: React.FC = () => {
 
         {/* Follow-up two: two PATCHes, one idempotent and one not. */}
         <Note at={pubAt - 6} x={R_X} y={patchTop(0) - h(46)}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Two PATCH requests, each sent three times</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Two PATCH requests, each sent three times</span>
         </Note>
         <Msg
           x={R_X}

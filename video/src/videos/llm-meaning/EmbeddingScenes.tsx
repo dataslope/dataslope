@@ -446,7 +446,7 @@ export const SpaceScene: React.FC = () => {
                 top: 14,
                 opacity: ease(frame, dAt - 2, 10),
                 fontFamily: MONO,
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 26,
                 color: w.word === "cat" ? INK_SOFT : near === 0 ? POINT_INK : INK,
                 ...TABULAR,
@@ -536,7 +536,7 @@ export const SpaceScene: React.FC = () => {
               <text x={tx} y={ty + 7} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 21, fontWeight: 650, fill: INK_SOFT, opacity: 1 - unnamed }}>
                 {ax}
               </text>
-              <text x={tx} y={ty + 8} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 26, fontWeight: 700, fill: POINT_INK, opacity: unnamed }}>
+              <text x={tx} y={ty + 8} textAnchor="middle" style={{ fontFamily: SANS, fontSize: 26, fontWeight: 600, fill: POINT_INK, opacity: unnamed }}>
                 ?
               </text>
             </g>

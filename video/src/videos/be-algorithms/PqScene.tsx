@@ -130,7 +130,7 @@ export const PqScene: React.FC = () => {
                     justifyContent: "center",
                     ...label(24, u === 1 ? INK : BLUE_INK),
                     ...TABULAR,
-                    fontWeight: 700,
+                    fontWeight: 600,
                     opacity: p,
                     transform: `translateX(${(1 - p) * -20}px)`,
                   }}

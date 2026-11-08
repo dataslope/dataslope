@@ -190,7 +190,7 @@ export const IdentityScene: React.FC = () => {
         ))}
         {/* Above both curves, clear of the upper one. */}
         <Note at={whichAt + 8} x={(fromNoKey[0] + CUSTOMERS_X) / 2 - 14} y={customers.rowMid(0) + h(ROW_H) / 2 - 60} from="up" out={clearAt}>
-          <span style={{ ...note(40, ACCENT_INK), fontWeight: 700 }}>?</span>
+          <span style={{ ...note(40, ACCENT_INK), fontWeight: 600 }}>?</span>
         </Note>
         <Note at={tellAt - 2} x={CUSTOMERS_X} y={customers.rowTop(2) + 22} out={clearAt}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>

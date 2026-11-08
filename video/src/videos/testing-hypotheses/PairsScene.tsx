@@ -217,12 +217,12 @@ export const PairsScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={tenAt - 4} x={sx(D, PAIRED.meanChange) + 14} y={y(D_STRIP) - h(60) - 40}>
-          <span style={{ ...note(24, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, STAT_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
             average drop {fmt(PAIRED.meanChange, 1)}
           </span>
         </Note>
         <div style={{ position: "absolute", left: D.x0, top: y(720), opacity: ease(frame, tenAt - 4, 12), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(40, STAT_INK), fontWeight: 700 }}>
+          <span style={{ ...note(40, STAT_INK), fontWeight: 600 }}>
             <span style={{ fontStyle: "italic" }}>t</span> = {fmt(PAIRED.pairedT, 1)}
           </span>
           <span

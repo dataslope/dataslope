@@ -51,7 +51,7 @@ const Cell: React.FC<{ y: number; at: number; code: string; rows?: string; rowsA
     >
       <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, whiteSpace: "pre", fontVariantLigatures: "none" }}>{code}</span>
       {rows ? (
-        <span style={{ ...label(20, b > 0.5 ? ACCENT_INK : BLUE_INK), fontWeight: 700, ...TABULAR, opacity: r, whiteSpace: "nowrap" }}>{rows}</span>
+        <span style={{ ...label(20, b > 0.5 ? ACCENT_INK : BLUE_INK), fontWeight: 600, ...TABULAR, opacity: r, whiteSpace: "nowrap" }}>{rows}</span>
       ) : null}
     </div>
   );
@@ -125,7 +125,7 @@ export const CheckScene: React.FC = () => {
         />
         <Cell y={cellY(2)} at={juniorAt + 12} code={'df.groupby("segment")["revenue"].mean()'} />
         <Note at={dropsAt + 8} x={NB.x} y={cellY(3) + h(4)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
             a third of the rows, gone without a word (−{pct(NOTEBOOK.lost)})
           </span>
         </Note>
@@ -155,7 +155,7 @@ export const CheckScene: React.FC = () => {
         <Note at={reproAt - 2} x={LIST_X} y={y(LIST_TOP) + 5 * h(LIST_ROW) + h(60)}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <Tick at={reproAt + 6} size={30} />
-            <span style={{ ...note(30, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(30, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               <Mark at={reproAt + 8} color={MARK_OK}>
                 reproduce the headline number another way
               </Mark>

@@ -526,7 +526,7 @@ export const StepList: React.FC<{ named: readonly number[]; railFrom: number; ac
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: SANS,
-                fontWeight: 700,
+                fontWeight: 600,
                 // 20px, within 12% of the 22px step beside it.
                 fontSize: 20,
                 color: fill > 0.5 ? PAPER : INK,
@@ -851,7 +851,7 @@ export const ErrorBox: React.FC<{
       }}
     >
       <div>
-        <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 600 }}>ERROR:</span>
         {"  "}
         {message}
       </div>

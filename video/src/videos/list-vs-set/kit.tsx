@@ -224,7 +224,7 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; out?: 
   children,
 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
     <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
   </Ink>
 );

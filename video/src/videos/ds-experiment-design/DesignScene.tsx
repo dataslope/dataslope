@@ -108,7 +108,7 @@ export const DesignScene: React.FC = () => {
         {/* The plan, written before anything runs. */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${centered}px)` }}>
         <Note at={writeAt} x={X0} y={y(PLAN_TOP) + h(14)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap", letterSpacing: "0.04em" }}>TEST PLAN · written before launch</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", letterSpacing: "0.04em" }}>TEST PLAN · written before launch</span>
         </Note>
         {rows.map((r, i) => {
           const p = ease(frame, r.at - 2, 12);
@@ -153,7 +153,7 @@ export const DesignScene: React.FC = () => {
               {isMetric ? (
                 <span style={{ marginLeft: 16, display: "inline-flex", alignItems: "center", gap: 6, opacity: ease(frame, agreeAt + 4, 10) }}>
                   <Tick at={agreeAt + 4} size={24} />
-                  <span style={{ ...label(20, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>agreed</span>
+                  <span style={{ ...label(20, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>agreed</span>
                 </span>
               ) : null}
             </div>
@@ -204,7 +204,7 @@ export const DesignScene: React.FC = () => {
           return (
             <React.Fragment key={c.text}>
               <div style={{ position: "absolute", left: RIGHT_X, top, opacity: p, transform: `translateX(${(1 - p) * 14}px)` }}>
-                <span style={{ ...note(34, c.ok ? OK_INK : INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(34, c.ok ? OK_INK : INK), fontWeight: 600, whiteSpace: "nowrap" }}>
                   {c.ok ? <Mark at={c.verdictAt} color={MARK_OK}>{c.text}</Mark> : <Strike at={c.verdictAt + 2} color={ACCENT}>{c.text}</Strike>}
                 </span>
               </div>

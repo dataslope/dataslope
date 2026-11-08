@@ -112,10 +112,10 @@ export const BreakerScene: React.FC = () => {
         <Spot id="breaker" at={breakerAt} left={1600} top={118} width={160} height={artH("breaker", 160)} />
 
         {/* Panel titles. */}
-        <div style={{ position: "absolute", left: TX0, top: errTop - h(48), ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: chartIn }}>
+        <div style={{ position: "absolute", left: TX0, top: errTop - h(48), ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: chartIn }}>
           error rate at the dependency
         </div>
-        <div style={{ position: "absolute", left: TX0, top: reqTop - h(48), ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: chartIn }}>
+        <div style={{ position: "absolute", left: TX0, top: reqTop - h(48), ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: chartIn }}>
           requests per second reaching it
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, simAt, 10) }}> · the page&apos;s simulation</span>
         </div>
@@ -201,7 +201,7 @@ export const BreakerScene: React.FC = () => {
         <Line x={LX} y={ey(BREAKER.trip) - 15} at={tripAt + 12} size={21} weight={650} color={ACCENT_INK}>
           trips at <Num>{BREAKER.trip * 100}</Num>%
         </Line>
-        <Line x={tx(open1.t0) + 8} y={ry(yMax) - 4} at={nothingAt + 8} size={21} weight={700} style={halo}>
+        <Line x={tx(open1.t0) + 8} y={ry(yMax) - 4} at={nothingAt + 8} size={21} weight={600} style={halo}>
           open: nothing for <Num>{BREAKER.openFor}</Num> s
         </Line>
         <Line x={tx(probe1.t0 + 0.5) - 10} y={probeY1 - 14} at={probeAt + 6} size={21} weight={650} color={INK} align="right">
@@ -214,10 +214,10 @@ export const BreakerScene: React.FC = () => {
         <Line x={LX} y={ry(BREAKER.allowed[N - 1]) + 8} at={closesAt + 8} size={21} weight={650} color={BLUE_INK}>
           with a breaker
         </Line>
-        <Line x={LX} y={ey(BREAKER.endErrorRate) - 26} at={aloneAt + 4} size={21} weight={700} color={OK_INK}>
+        <Line x={LX} y={ey(BREAKER.endErrorRate) - 26} at={aloneAt + 4} size={21} weight={600} color={OK_INK}>
           recovers
         </Line>
-        <Line x={LX} y={ey(BREAKER.retryEndErrorRate) - 14} at={neverAt + 4} size={21} weight={700} color={ACCENT_INK}>
+        <Line x={LX} y={ey(BREAKER.retryEndErrorRate) - 14} at={neverAt + 4} size={21} weight={600} color={ACCENT_INK}>
           never recovers
         </Line>
       </Drift>

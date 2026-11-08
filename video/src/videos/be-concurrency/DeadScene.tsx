@@ -191,7 +191,7 @@ export const DeadScene: React.FC = () => {
             <span style={{ transform: `scale(${1 + 0.2 * pulse(frame, twoAt + 10, 18)})` }}>
               <LockGlyph size={30} color={l.holder < 0 ? INK : THREAD[l.holder].fill} />
             </span>
-            <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>{l.name}</span>
+            <span style={{ ...label(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{l.name}</span>
           </Note>
         ))}
         {[t1, t2].map((t, i) => (
@@ -215,7 +215,7 @@ export const DeadScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>{STUCK.trace.map(named).join(", then ")}:</span>
         </Note>
         <Note at={eachAt} x={X0} y={y(766)} out={getsAt - 2}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>each waits on the other, for good</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>each waits on the other, for good</span>
         </Note>
         <Note at={eachAt + 16} x={X0} y={y(806)} out={getsAt - 2}>
           <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -226,7 +226,7 @@ export const DeadScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>Both take A first: the loser waits holding nothing</span>
         </Note>
         <Note at={noSchedAt} x={X0} y={y(766)} out={shortAt - 4}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{DEADLOCK.sameOrder.deadlock}</Num> of <Num>{DEADLOCK.sameOrder.schedules}</Num> schedules deadlock
           </span>
         </Note>
@@ -272,18 +272,18 @@ export const DeadScene: React.FC = () => {
             <React.Fragment key={c.name}>
               <Link cx={LINK_CX} cy={cy} height={linkH} at={condAt[i] - 2} open={broken[i]} />
               <Note at={condAt[i]} x={ROW_X} y={rowY(i)}>
-                <div style={{ ...note(25, broken[i] > 0.5 ? OK_INK : INK), fontWeight: 700, whiteSpace: "nowrap" }}>{c.name}</div>
+                <div style={{ ...note(25, broken[i] > 0.5 ? OK_INK : INK), fontWeight: 600, whiteSpace: "nowrap" }}>{c.name}</div>
                 <div style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", marginTop: 4 }}>{c.gloss}</div>
               </Note>
               <Note at={fixAt[i]} x={FIX_X} y={rowY(i) + h(14)}>
-                <span style={{ ...note(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{c.fix}</span>
+                <span style={{ ...note(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{c.fix}</span>
               </Note>
             </React.Fragment>
           );
         })}
         <VRule x={FIX_X - 32} top={rowY(0)} height={rowY(3) + h(70) - rowY(0)} at={globalAt} />
         <Note at={breakAt} x={ROW_X} y={rowY(4) + h(6)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Break any one, and it can&apos;t happen</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Break any one, and it can&apos;t happen</span>
         </Note>
         <Note at={queueAt} x={FIX_X} y={rowY(0) + h(48)}>
           <span style={{ ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>no other thread needs the lock</span>

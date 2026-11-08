@@ -163,7 +163,7 @@ export const PromptScene: React.FC = () => {
           </div>
         </Note>
         <Note at={nameAt - 2} x={X0} y={y(650)} width={LEFT_W}>
-          <div style={{ ...note(25, INK), fontWeight: 700, lineHeight: 1.35 }}>
+          <div style={{ ...note(25, INK), fontWeight: 600, lineHeight: 1.35 }}>
             Name the answer,
             <br />
             not just the edge.

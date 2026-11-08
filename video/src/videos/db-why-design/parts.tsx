@@ -728,13 +728,13 @@ export const ErrorBox: React.FC<{
         }}
       >
         <div>
-          <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+          <span style={{ color: ACCENT_INK, fontWeight: 600 }}>ERROR:</span>
           {"  "}
           {parts.length === 2 && nameAt !== undefined ? (
             <>
               {parts[0]}
               <Mark at={nameAt}>
-                <span style={{ fontWeight: 700 }}>&quot;{constraint}&quot;</span>
+                <span style={{ fontWeight: 600 }}>&quot;{constraint}&quot;</span>
               </Mark>
               {parts[1]}
             </>
@@ -790,7 +790,7 @@ export const RowBracket: React.FC<{ x: number; y0: number; y1: number; at: numbe
 /** A column badge as an entity box sets it (editorial/erd.tsx): bold, in the
  *  key blue. */
 export const Badge: React.FC<{ children: React.ReactNode; size?: number }> = ({ children, size = 20 }) => (
-  <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: size, color: BLUE_INK, whiteSpace: "nowrap" }}>{children}</span>
+  <span style={{ fontFamily: SANS, fontWeight: 600, fontSize: size, color: BLUE_INK, whiteSpace: "nowrap" }}>{children}</span>
 );
 
 /** A relationship end as the diagrams draw it (crowsfoot.ts), on a short

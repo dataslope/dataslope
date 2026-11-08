@@ -157,7 +157,7 @@ export const GroupsScene: React.FC = () => {
           <span
             style={{
               ...note(26, STAT_INK),
-              fontWeight: 700,
+              fontWeight: 600,
               whiteSpace: "nowrap",
               display: "inline-block",
               transform: `scale(${1 + 0.06 * pulse(frame, trialsAt, 24)})`,
@@ -274,7 +274,7 @@ export const GroupsScene: React.FC = () => {
         </Label>
       </Note>
       <Note at={twelveAt - 4} x={W.x1} y={y(ROW_Y[0]) - h(52) - 52} align="right">
-        <span style={{ ...note(34, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>F = {fmt(ANOVA.F, 1)}</span>
+        <span style={{ ...note(34, STAT_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>F = {fmt(ANOVA.F, 1)}</span>
       </Note>
       <Spot id="testing-hypotheses-alarm" at={whichAt - 6} left={240} top={y(470)} width={260} height={260} />
       <Note at={whichAt - 2} x={170} y={y(470) + 290}>

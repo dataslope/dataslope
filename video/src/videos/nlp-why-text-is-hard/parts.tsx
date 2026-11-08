@@ -439,7 +439,7 @@ export const Count: React.FC<{
       gap: "0.3em",
     }}
   >
-    <span style={{ ...label(size, color), fontWeight: 700, ...TABULAR }}>{value}</span>
+    <span style={{ ...label(size, color), fontWeight: 600, ...TABULAR }}>{value}</span>
     {unit ? <span style={{ ...label(size, INK_SOFT), fontWeight: 600 }}>{unit}</span> : null}
   </Ink>
 );

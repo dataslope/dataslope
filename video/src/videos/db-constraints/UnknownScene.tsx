@@ -144,7 +144,7 @@ export const UnknownScene: React.FC = () => {
       </Ink>
       <Arrow from={[TABLE_X + 420, below + 22]} to={[TABLE_X + 490, below + 22]} at={unknownAt - 6} dur={10} color={INK_SOFT} out={testOut} />
       <Ink at={unknownAt - 2} dur={14} out={testOut} style={{ left: TABLE_X + 510, top: below, whiteSpace: "nowrap" }}>
-        <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 700, color: ACCENT_INK }}>{String(CHECK_ONLY.test)}</span>
+        <span style={{ fontFamily: MONO, fontSize: 25, fontWeight: 600, color: ACCENT_INK }}>{String(CHECK_ONLY.test)}</span>
         <span style={{ ...note(23, INK), marginLeft: 16 }}>unknown, not false</span>
       </Ink>
 

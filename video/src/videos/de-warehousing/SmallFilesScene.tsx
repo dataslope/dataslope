@@ -202,7 +202,7 @@ export const SmallFilesScene: React.FC = () => {
 
         {/* ── Compaction ── */}
         <Note at={fixAt} x={PANEL_X} y={gridY}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Compaction</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Compaction</span>
         </Note>
         <Note at={rewriteAt + 20} x={PANEL_X} y={gridY + h(48)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -221,7 +221,7 @@ export const SmallFilesScene: React.FC = () => {
 
         {/* ── Prevention ── */}
         <Note at={preventAt} x={PANEL_X} y={gridY + h(188)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Better, prevent them</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Better, prevent them</span>
         </Note>
         <Note at={keyAt} x={PANEL_X} y={gridY + h(232)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -280,7 +280,7 @@ export const SmallFilesScene: React.FC = () => {
             top: y(RULER_Y) - h(46),
             textAlign: "center",
             ...note(21, OK_INK),
-            fontWeight: 700,
+            fontWeight: 600,
             whiteSpace: "nowrap",
             opacity: ease(frame, targetAt + 4, 10),
           }}
@@ -293,7 +293,7 @@ export const SmallFilesScene: React.FC = () => {
             left: rx(SMALL.target.hi) + 8,
             top: y(RULER_Y) - h(46),
             ...note(21, ACCENT_INK),
-            fontWeight: 700,
+            fontWeight: 600,
             whiteSpace: "nowrap",
             opacity: ease(frame, largeAt + 4, 10),
           }}

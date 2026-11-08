@@ -185,7 +185,7 @@ export const Step: React.FC<{
           alignItems: "center",
           justifyContent: "center",
           ...label(21, INK),
-          fontWeight: 700,
+          fontWeight: 600,
         }}
       >
         {n}

@@ -185,7 +185,7 @@ export const RaceScene: React.FC = () => {
 
       {/* ── The launches ── */}
       <Dot x={sx(X, 1979)} y={LANE_CO} at={seventyNineAt - 2} color={ACCENT} r={13} swell={pulse(frame, buyAt - 2, 20)} dim={onlyAt - 4} />
-      <Tag x={sx(X, 1979) + 24} y={LANE_CO - 52} at={oracleAt - 2} dim={onlyAt - 4} size={26} color={ACCENT_INK} weight={700}>
+      <Tag x={sx(X, 1979) + 24} y={LANE_CO - 52} at={oracleAt - 2} dim={onlyAt - 4} size={26} color={ACCENT_INK} weight={600}>
         Oracle, 1979
       </Tag>
       <Tag x={sx(X, 1979) + 24} y={LANE_CO + 20} at={firstAt - 2} dim={onlyAt - 4} size={21} color={INK}>

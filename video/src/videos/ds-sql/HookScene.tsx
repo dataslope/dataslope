@@ -130,7 +130,7 @@ export const HookScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 ...label(21, worked && tone > 0.5 && first === 0 ? PAPER : INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 ...TABULAR,
                 opacity: p * (1 - fade),
                 transform: `scale(${p * (1 + 0.15 * pulse(frame, firstAt, 16) * (i === 0 ? 1 : 0))})`,

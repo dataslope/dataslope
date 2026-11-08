@@ -226,7 +226,7 @@ export const PredictScene: React.FC = () => {
             </React.Fragment>
           );
         })}
-        <Tag x={tenthEmmaX + 18} y={rowY(9) + 8} at={itsPredictionAt} size={22} color={POINT_INK} weight={700}>
+        <Tag x={tenthEmmaX + 18} y={rowY(9) + 8} at={itsPredictionAt} size={22} color={POINT_INK} weight={600}>
           {(Math.round(EMMA.tenthOverLaw * 10) / 10).toFixed(1)}× the prediction
         </Tag>
       </div>

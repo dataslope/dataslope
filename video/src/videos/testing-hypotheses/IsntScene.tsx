@@ -232,7 +232,7 @@ export const IsntScene: React.FC = () => {
                   top: ry,
                   opacity: a * (loud ? 1 : 0.7),
                   ...note(30, r.p < 0.05 ? STAT_INK : INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   transform:
                     i === 0 ? `scale(${1 + 0.12 * firstGlow})` : i === 2 ? `scale(${1 + 0.12 * thirdGlow})` : i >= 3 ? `scale(${1 + 0.12 * zeroGlow})` : undefined,
                   transformOrigin: "0 50%",

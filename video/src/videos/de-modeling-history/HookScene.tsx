@@ -96,10 +96,10 @@ export const HookScene: React.FC = () => {
             {/* The two cities she lived in, drawn as she lived in them. */}
             <rect x={bostonX0} y={bandTop} width={(moveX - bostonX0) * bostonGrow} height={bandH} fill={BOSTON_WASH} stroke={BOSTON} strokeWidth={2} rx={6} />
             <rect x={moveX + 4} y={bandTop} width={(TL_X1 - moveX - 4) * austinGrow} height={bandH} fill={AUSTIN_WASH} stroke={AUSTIN} strokeWidth={2} rx={6} />
-            <text x={bostonX0 + 22} y={bandTop + bandH / 2 + 9} style={svgText({ ...label(26, BOSTON_INK), fontWeight: 700 })} opacity={ease(frame, bostonAt + 4, 12)}>
+            <text x={bostonX0 + 22} y={bandTop + bandH / 2 + 9} style={svgText({ ...label(26, BOSTON_INK), fontWeight: 600 })} opacity={ease(frame, bostonAt + 4, 12)}>
               Boston
             </text>
-            <text x={moveX + 24} y={bandTop + bandH / 2 + 9} style={svgText({ ...label(26, AUSTIN_INK), fontWeight: 700 })} opacity={ease(frame, movedAt + 10, 12)}>
+            <text x={moveX + 24} y={bandTop + bandH / 2 + 9} style={svgText({ ...label(26, AUSTIN_INK), fontWeight: 600 })} opacity={ease(frame, movedAt + 10, 12)}>
               Austin
             </text>
 
@@ -137,7 +137,7 @@ export const HookScene: React.FC = () => {
               centred on the pin that ties it to the timeline. The question
               puts the highlighter's yellow behind its name. */}
           <Note at={startAt + 2} x={orderX - 150} y={y(CARD_Y) + h(PIN_LABEL)} width={300} style={{ textAlign: "center" }}>
-            <div style={{ ...note(27, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <div style={{ ...note(27, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               <Mark at={whichAt + 4} out={changeAt + 10}>
                 Order <Num>{orderId}</Num>
               </Mark>
@@ -154,7 +154,7 @@ export const HookScene: React.FC = () => {
             </span>
           </Note>
           <Note at={askAt + 4} x={todayX - 8} y={bandTop - h(64)} align="right" from="right">
-            <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>today</span>
+            <span style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>today</span>
           </Note>
 
           {/* The question. */}
@@ -171,10 +171,10 @@ export const HookScene: React.FC = () => {
               whiteSpace: "nowrap",
             }}
           >
-            <span style={{ ...note(28, ACCENT_INK), fontWeight: 700 }}>which city?</span>
-            <span style={{ ...note(28, BOSTON_INK), fontWeight: 700 }}>Boston</span>
+            <span style={{ ...note(28, ACCENT_INK), fontWeight: 600 }}>which city?</span>
+            <span style={{ ...note(28, BOSTON_INK), fontWeight: 600 }}>Boston</span>
             <span style={{ ...note(26, INK_SOFT) }}>or</span>
-            <span style={{ ...note(28, AUSTIN_INK), fontWeight: 700 }}>Austin</span>
+            <span style={{ ...note(28, AUSTIN_INK), fontWeight: 600 }}>Austin</span>
           </div>
           <Note at={dependsAt} x={orderX + 170} y={y(CARD_Y) + h(58)}>
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -185,7 +185,7 @@ export const HookScene: React.FC = () => {
 
         {/* The round. */}
         <Note at={changeAt - 2} x={X0} y={y(700)}>
-          <span style={{ ...note(32, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(32, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Dimensions change.{" "}
             <span style={{ color: OK_INK, opacity: ease(frame, historyAt, 12) }}>The model has to keep their history.</span>
           </span>

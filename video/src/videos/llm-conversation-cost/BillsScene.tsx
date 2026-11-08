@@ -139,7 +139,7 @@ export const BillsScene: React.FC = () => {
               </>
             ) : null}
             <Note at={valueAt[k] - 4} x={BX + lineW + triW + 18} y={rowTop(k) + rowH / 2 - 19}>
-              <span style={{ ...note(30, INK), fontWeight: 700, ...TABULAR }}>{usd(b.plain)}</span>
+              <span style={{ ...note(30, INK), fontWeight: 600, ...TABULAR }}>{usd(b.plain)}</span>
             </Note>
           </React.Fragment>
         );
@@ -189,7 +189,7 @@ export const BillsScene: React.FC = () => {
               <span style={{ display: "block", ...note(21, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>
                 {d.from} to {d.to} turns
               </span>
-              <span style={{ display: "block", ...note(28, POINT_INK), fontWeight: 700, ...TABULAR }}>{times(d.times)}</span>
+              <span style={{ display: "block", ...note(28, POINT_INK), fontWeight: 600, ...TABULAR }}>{times(d.times)}</span>
             </Note>
           </React.Fragment>
         );

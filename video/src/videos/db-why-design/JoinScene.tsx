@@ -235,7 +235,7 @@ export const JoinScene: React.FC = () => {
             style={{ left: CARD_X + (i % 2) * CHORE_COL, top: y(LOW_Y) + 104 + Math.floor(i / 2) * 48, whiteSpace: "nowrap" }}
           >
             <span style={{ ...label(22, INK), fontWeight: 560 }}>
-              <span style={{ color: ACCENT_INK, fontWeight: 700, marginRight: 10 }}>{i + 1}</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 600, marginRight: 10 }}>{i + 1}</span>
               {t}
             </span>
           </Ink>

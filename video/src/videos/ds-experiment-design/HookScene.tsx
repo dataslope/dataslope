@@ -114,7 +114,7 @@ export const HookScene: React.FC = () => {
           <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>before launch</span>
         </Note>
         <Note at={startAt + 16} x={LAUNCH_X - 60} y={y(LINE_Y) + h(22)} width={120} style={{ textAlign: "center" }}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>launch</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>launch</span>
         </Note>
         <Note at={startAt + 18} x={LINE_END} y={y(LINE_Y) + h(22)} width={200} align="right">
           <span style={{ ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>live</span>
@@ -203,7 +203,7 @@ export const HookScene: React.FC = () => {
 
         {/* The round. */}
         <Note at={fourteenAt - 2} x={X0} y={y(720)}>
-          <span style={{ ...note(34, INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(34, INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
             <Mark at={roundAt}>The design round</Mark>: 14 questions
           </span>
         </Note>

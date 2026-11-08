@@ -189,7 +189,7 @@ export const HookScene: React.FC = () => {
                 justifyContent: "center",
                 fontFamily: SANS,
                 fontSize: 19,
-                fontWeight: 700,
+                fontWeight: 600,
                 ...TABULAR,
                 opacity: p * (1 - fade) * (worked ? 1 : 0.55 + 0.45 * tone),
                 transform: `scale(${p * (1 + 0.15 * pulse(frame, firstAt, 16) * (i === 0 ? 1 : 0))})`,

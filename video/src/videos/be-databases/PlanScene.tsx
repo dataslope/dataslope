@@ -235,7 +235,7 @@ export const PlanScene: React.FC = () => {
           <div style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
             estimated <b><Num>{thousands(PLAN.rangeEstimate)}</Num></b>
           </div>
-          <div style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", marginTop: h(8) }}>
+          <div style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: h(8) }}>
             actual <Num>{thousands(PLAN.rangeActual)}</Num>
           </div>
         </Note>

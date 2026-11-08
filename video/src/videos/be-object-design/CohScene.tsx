@@ -139,7 +139,7 @@ export const CohScene: React.FC = () => {
                   { at: highAt, value: good ? 0.86 : 0.14, tone: "ok" },
                 ]}
               />
-              <Line x={cx} y={labelY} at={i === 0 ? cohAt + 8 : coupAt + 8} size={22} weight={700} align="center" width={220}>
+              <Line x={cx} y={labelY} at={i === 0 ? cohAt + 8 : coupAt + 8} size={22} weight={600} align="center" width={220}>
                 {name}
               </Line>
               <Line x={cx} y={labelY + NOTE_DY} at={i === 0 ? purposeAt : lowAt} size={20} color={INK_SOFT} weight={600} align="center" width={220}>
@@ -250,7 +250,7 @@ export const CohScene: React.FC = () => {
         <ArtSpot id="multitool" at={knifeAt} out={splitAt - 10} left={1590} top={ckMid - 75} h={150} />
 
         {/* How to spot one. */}
-        <Line x={CHECKOUT.x} y={y(752)} at={spotAt} size={22} weight={700}>
+        <Line x={CHECKOUT.x} y={y(752)} at={spotAt} size={22} weight={600}>
           In a review, count
         </Line>
         {[

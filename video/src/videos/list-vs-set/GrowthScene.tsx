@@ -135,7 +135,7 @@ export const GrowthScene: React.FC = () => {
         <div style={{ ...note(20, INK_SOFT), ...halo }}>at 1,000,000</div>
       </Note>
       <Note at={tooAt + 6} x={mx + 52} y={(hy + my) / 2 - 30}>
-        <div style={{ ...note(24, INK), fontWeight: 700 }}>×{fmt(MILLION.listMs / HALF_MILLION.listMs, 1)} the time</div>
+        <div style={{ ...note(24, INK), fontWeight: 600 }}>×{fmt(MILLION.listMs / HALF_MILLION.listMs, 1)} the time</div>
         <div style={{ ...note(20, INK_SOFT) }}>for ×2 the items</div>
       </Note>
       <Note at={flatAt} x={sx(A, 560_000)} y={y(A_BASE) - 48} from="up">
@@ -165,7 +165,7 @@ export const GrowthScene: React.FC = () => {
         ))}
       </svg>
       <Ink at={nearAt - 2} dur={16} style={{ left: B.x0 - 84, top: y(B_BASE) + 62, width: B.x1 - B.x0 + 84 }}>
-        <div style={{ ...note(24, SET_INK), fontWeight: 700 }}>
+        <div style={{ ...note(24, SET_INK), fontWeight: 600 }}>
           {fmt(SET_NS_RANGE[0], 1)} to {fmt(SET_NS_RANGE[1], 1)} ns
         </div>
         <div style={{ ...note(21, INK_SOFT), marginTop: 4 }}>at every size, 100k to 1M</div>

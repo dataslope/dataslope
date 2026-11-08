@@ -142,7 +142,7 @@ export const Lane: React.FC<{
           opacity: 1 - o,
         }}
       />
-      <div style={{ position: "absolute", left: x + 2, top: y - 32, ...label(20, nameInk), fontWeight: 700, whiteSpace: "nowrap", opacity: p * (1 - o) }}>
+      <div style={{ position: "absolute", left: x + 2, top: y - 32, ...label(20, nameInk), fontWeight: 600, whiteSpace: "nowrap", opacity: p * (1 - o) }}>
         {name}
       </div>
     </>
@@ -189,7 +189,7 @@ export const Box: React.FC<{
         justifyContent: "center",
         textAlign: "center",
         ...label(size, ink),
-        fontWeight: 700,
+        fontWeight: 600,
         lineHeight: 1.2,
         opacity: Math.min(1, p) * (1 - o) * (1 - d),
         transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`,
@@ -248,7 +248,7 @@ export const Marker: React.FC<{
             top: labelAt === "below" ? bottom + 8 : top - 34,
             textAlign: "center",
             ...label(20, ink),
-            fontWeight: 700,
+            fontWeight: 600,
             whiteSpace: "nowrap",
             opacity: ease(frame, at + 6, 10) * (1 - o),
           }}
@@ -276,7 +276,7 @@ export const Legend: React.FC<{ x: number; y: number; at: number; out?: number; 
   return (
     <div style={{ position: "absolute", left: x, top: y, display: "flex", alignItems: "center", gap: 18, opacity: p * (1 - o), whiteSpace: "nowrap" }}>
       {users.map((u) => (
-        <span key={u} style={{ display: "inline-flex", alignItems: "center", gap: 7, ...label(20, USER_INK[u]), fontWeight: 700 }}>
+        <span key={u} style={{ display: "inline-flex", alignItems: "center", gap: 7, ...label(20, USER_INK[u]), fontWeight: 600 }}>
           <span style={{ width: 16, height: 16, borderRadius: 4, background: userFill(u, 40), border: `2px solid ${USER_COLOR[u]}` }} />
           {u}
         </span>

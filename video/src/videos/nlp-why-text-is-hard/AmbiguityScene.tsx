@@ -48,7 +48,7 @@ const RowName: React.FC<{ name: string; gist: string; nameAt: number; gistAt: nu
 }) => (
   <>
     <Ink at={nameAt - 2} dur={14} style={{ left: X0, top, whiteSpace: "nowrap" }}>
-      <span style={{ ...label(30, INK), fontWeight: 700 }}>{name}</span>
+      <span style={{ ...label(30, INK), fontWeight: 600 }}>{name}</span>
     </Ink>
     <Ink at={gistAt} dur={16} style={{ left: X0, top: top + 48, whiteSpace: "nowrap" }}>
       <span style={{ ...note(23, INK_SOFT) }}>{gist}</span>

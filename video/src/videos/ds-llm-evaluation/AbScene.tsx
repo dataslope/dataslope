@@ -16,8 +16,8 @@ const PANEL_W = 800;
 /** A panel's numbered title. */
 const Title: React.FC<{ n: number; x: number; y: number; at: number; children: React.ReactNode }> = ({ n, x, y, at, children }) => (
   <Note at={at} x={x} y={y}>
-    <span style={{ ...note(29, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
-      <span style={{ ...note(29, ACCENT_INK), fontWeight: 700, marginRight: 14 }}>{n}</span>
+    <span style={{ ...note(29, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
+      <span style={{ ...note(29, ACCENT_INK), fontWeight: 600, marginRight: 14 }}>{n}</span>
       {children}
     </span>
   </Note>
@@ -199,7 +199,7 @@ export const AbScene: React.FC = () => {
           <span style={{ ...label(19, INK_SOFT), whiteSpace: "nowrap" }}>the test, start to finish, one model name</span>
         </Note>
         <Note at={updateAt + 6} x={mid + 12} y={TL.y - 54} from="right">
-          <span style={{ ...label(19, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>updated under the same name</span>
+          <span style={{ ...label(19, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>updated under the same name</span>
         </Note>
         <Note at={halfAt} x={TL.x0} y={TL.y + 50}>
           <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>the treatment changes halfway through</span>

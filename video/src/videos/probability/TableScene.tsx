@@ -249,7 +249,7 @@ export const TableScene: React.FC = () => {
               num(c.bottom)
             )}{" "}
             ={" "}
-            <span style={{ color: STAT_INK, fontWeight: 700 }}>{c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}</span>
+            <span style={{ color: STAT_INK, fontWeight: 600 }}>{c.key === "all" ? pct(c.p) : <Sweep at={c.mark}>{pct(c.p)}</Sweep>}</span>
           </span>
         </Ink>
       ))}

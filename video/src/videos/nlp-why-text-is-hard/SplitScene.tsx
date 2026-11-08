@@ -183,7 +183,7 @@ export const SplitScene: React.FC = () => {
             }}
           >
             <span>
-              butter<span style={{ color: BAD_INK, fontWeight: 700 }}>,</span>
+              butter<span style={{ color: BAD_INK, fontWeight: 600 }}>,</span>
             </span>
             <span style={{ ...label(22, INK_SOFT) }}>and</span>
             <span>butter</span>

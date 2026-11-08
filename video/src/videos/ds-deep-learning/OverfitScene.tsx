@@ -131,7 +131,7 @@ export const OverfitScene: React.FC = () => {
           color={OK}
           dash="6 6"
           width={2.4}
-          label={<span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>stop here</span>}
+          label={<span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>stop here</span>}
           labelY={at(ys, 0.285)}
         />
         <div

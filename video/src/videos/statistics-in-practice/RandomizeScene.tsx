@@ -240,7 +240,7 @@ export const RandomizeScene: React.FC = () => {
           dur={12}
           style={{ left: STEP_X[i], top: y(STEP_Y), whiteSpace: "nowrap", display: "flex", gap: 10, opacity: NEXT.includes(i) || i < NEXT[0] ? 1 : 0.55 }}
         >
-          <span style={{ ...label(22, STAT_INK), fontWeight: 700 }}>{i + 1}</span>
+          <span style={{ ...label(22, STAT_INK), fontWeight: 600 }}>{i + 1}</span>
           <span style={{ ...label(22, INK), fontWeight: 600 }}>
             {NEXT.includes(i) ? <Marker at={decisionsAt - 4 + (i - NEXT[0]) * 6}>{step}</Marker> : step}
           </span>

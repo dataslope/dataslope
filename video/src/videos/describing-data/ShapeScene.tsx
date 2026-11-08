@@ -68,7 +68,7 @@ const Panel: React.FC<{
         <Arrow from={[tailFrom, base - h(150)]} to={[tailTo, base - h(150)]} at={tailAt} dur={18} color={INK_SOFT} width={2.2} />
       ) : null}
       <Tag x={x + w / 2} y={base + h(16)} opacity={ease(frame, gapAt - 4, 12)} size={22}>
-        mean − median <span style={{ color: STAT_INK, fontWeight: 700 }}>{signed(shape.gap)}</span>
+        mean − median <span style={{ color: STAT_INK, fontWeight: 600 }}>{signed(shape.gap)}</span>
       </Tag>
     </>
   );

@@ -86,7 +86,7 @@ export const Types46Scene: React.FC = () => {
     const p = ease(frame, at, 12);
     return (
       <div style={{ position: "absolute", left, top: gr.top - h(40), width: right - left, opacity: p, textAlign: "center" }}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{text}</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{text}</span>
         <div style={{ height: 0, borderTop: `2px solid ${HAIRLINE}`, marginTop: 2, transform: `scaleX(${p})` }} />
       </div>
     );
@@ -198,7 +198,7 @@ export const Types46Scene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>no second join</span>
         </Note>
         <Note at={part1At} x={gr.right + 30} y={gr.rowTop(0) - h(34)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>Type 1: overwriting it</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>Type 1: overwriting it</span>
         </Note>
         <Note at={priceAt} x={gr.right + 30} y={gr.rowTop(0) + h(2)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>

@@ -129,11 +129,11 @@ export const AsyncScene: React.FC = () => {
           })}
         </svg>
         <Note at={loopAt} x={cx - 110} y={cy - 32} width={220} style={{ textAlign: "center" }}>
-          <div style={{ ...label(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>event loop</div>
+          <div style={{ ...label(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>event loop</div>
           <div style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap", marginTop: 2 }}>one thread</div>
         </Note>
         <Note at={loopAt + 10} x={cx - 60} y={cy - RING.r - 92} width={120} style={{ textAlign: "center" }} out={thousandsAt - 4}>
-          <span style={{ ...label(20, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>running</span>
+          <span style={{ ...label(20, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>running</span>
         </Note>
         {NAMES.map((name, k) => {
           const d = disc(k);
@@ -161,7 +161,7 @@ export const AsyncScene: React.FC = () => {
                 transform: `scale(${0.6 + 0.4 * p})`,
               }}
             >
-              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: run ? PAPER : BLUE_INK }}>{name}</span>
+              <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: run ? PAPER : BLUE_INK }}>{name}</span>
             </div>
           );
         })}
@@ -214,13 +214,13 @@ export const AsyncScene: React.FC = () => {
         ].map((f) => (
           <React.Fragment key={f.name}>
             <Note at={fetchesAt + 4} x={AXIS.x - 46} y={y(f.row) + h(ROW_H) / 2 - 17}>
-              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 700, color: BLUE_INK }}>{f.name}</span>
+              <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: BLUE_INK }}>{f.name}</span>
             </Note>
             <WaitBar axis={AXIS} y={y(f.row)} h={h(ROW_H)} start={0} stop={f.wait} at={f.at} color={BAR}>
               <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>await, {ms(f.wait / 1000)}</span>
             </WaitBar>
             <Note at={f.name === firstDone ? bFirstAt : twentyAt - 6} x={msX(AXIS, f.wait) + 14} y={y(f.row) + h(ROW_H) / 2 - 15}>
-              <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
                 ✓ {f.name} done{f.name === firstDone ? ", first" : ""}
               </span>
             </Note>
@@ -235,7 +235,7 @@ export const AsyncScene: React.FC = () => {
           <line x1={msX(AXIS, 0)} x2={msX(AXIS, 0) + (msX(AXIS, total) - msX(AXIS, 0)) * ease(frame, overlapAt, 18)} y1={y(626) + 8} y2={y(626) + 8} stroke={OK} strokeWidth={2.4} />
         </svg>
         <Note at={twentyAt - 2} x={AXIS.x} y={y(652)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             The pair takes about <Num>{total}</Num> ms, not <Num>{sum}</Num>
           </span>
         </Note>

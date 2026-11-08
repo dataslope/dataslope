@@ -120,16 +120,16 @@ const Bst: React.FC<{ c: Ctx }> = ({ c }) => {
       <Svg opacity={ease(frame, orderAt, 10)}>
         <line x1={R_X} x2={R_X + 400} y1={base + 1} y2={base + 1} stroke={INK} strokeWidth={1.6} />
       </Svg>
-      <Line at={orderAt + 10} x={R_X + 130} y={base - tall - 4} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={orderAt + 10} x={R_X + 130} y={base - tall - 4} size={24} weight={600} color={ACCENT_INK}>
         <span style={TABULAR}>{int(Math.round((tall / scale) || 0))}</span> levels, in order
       </Line>
-      <Line at={shuffledAt} x={R_X + 350} y={base - 40} size={24} weight={700} color={OK_INK}>
+      <Line at={shuffledAt} x={R_X + 350} y={base - 40} size={24} weight={600} color={OK_INK}>
         <Num>{RAPID.bstShuffledHeight}</Num>, shuffled
       </Line>
       <Line at={avlAt} x={R_X + 620} y={c.T + c.h(160)} size={24} weight={650}>
         AVL, red-black:
       </Line>
-      <Line at={avlAt + 6} x={R_X + 620} y={c.T + c.h(204)} size={24} weight={700} color={OK_INK}>
+      <Line at={avlAt + 6} x={R_X + 620} y={c.T + c.h(204)} size={24} weight={600} color={OK_INK}>
         stay at O(log n)
       </Line>
     </>
@@ -192,7 +192,7 @@ const Traverse: React.FC<{ c: Ctx }> = ({ c }) => {
           </Line>
           <div style={{ position: "absolute", left: rx, top: c.T + c.h(72) + i * c.h(120), display: "flex", gap: 18, fontSize: 26 }}>
             {r.order.map((v, k) => (
-              <span key={k} style={{ ...label(26, BLUE_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, r.at + 4 + k * 3, 8) }}>
+              <span key={k} style={{ ...label(26, BLUE_INK), ...TABULAR, fontWeight: 600, opacity: ease(frame, r.at + 4 + k * 3, 8) }}>
                 {v}
               </span>
             ))}
@@ -346,7 +346,7 @@ const Binary: React.FC<{ c: Ctx }> = ({ c }) => {
       {steps.slice(0, shown).map(([a, b], k) => (
         <div key={k} style={{ position: "absolute", left: R_X + a * W, top: barY + 44 + k * 7, width: Math.max(2, (b - a) * W), height: 4, background: k === shown - 1 ? INK : BAR, borderRadius: 2 }} />
       ))}
-      <Line at={probesAt} x={R_X} y={barY + c.h(190)} size={26} weight={700}>
+      <Line at={probesAt} x={R_X} y={barY + c.h(190)} size={26} weight={600}>
         Probes: <span style={{ ...TABULAR, color: OK_INK }}>{shown}</span> at most
       </Line>
       <Line at={offAt} x={R_X} y={barY + c.h(250)} size={24} color={ACCENT_INK} weight={600}>
@@ -415,7 +415,7 @@ const Pointers: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={bigAt} x={R_X} y={rowY + c.h(172)} size={24}>
         Too big: move the right
       </Line>
-      <Line at={linearAt} x={R_X} y={rowY + c.h(230)} size={25} weight={700} color={OK_INK}>
+      <Line at={linearAt} x={R_X} y={rowY + c.h(230)} size={25} weight={600} color={OK_INK}>
         Returns <span style={{ fontFamily: MONO }}>{PAGE.twoPointers[0]}</span>: O(n), not O(n²)
       </Line>
     </>
@@ -503,13 +503,13 @@ const Adjacency: React.FC<{ c: Ctx }> = ({ c }) => {
         <circle cx={R_X + 4} cy={top + 4} r={14} fill="none" stroke={HIGHLIGHT} strokeWidth={5} />
       </Svg>
       <VRule x={R_X + side + 35} top={top} bottom={top + side} at={listAt} />
-      <Line at={listAt} x={R_X + side + 70} y={top} size={24} weight={700} color={BLUE_INK}>
+      <Line at={listAt} x={R_X + side + 70} y={top} size={24} weight={600} color={BLUE_INK}>
         List: <Num>{int(A.listEntries)}</Num> entries
       </Line>
       <Line at={listAt + 8} x={R_X + side + 70} y={top + c.h(40)} size={22} color={INK_SOFT}>
         the dot in the corner, to scale
       </Line>
-      <Line at={matrixAt} x={R_X + side + 70} y={top + c.h(110)} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={matrixAt} x={R_X + side + 70} y={top + c.h(110)} size={24} weight={600} color={ACCENT_INK}>
         Matrix: <Num>{int(A.matrixCells)}</Num> cells
       </Line>
       <Line at={emptyAt} x={R_X + side + 70} y={top + c.h(150)} size={22} color={INK_SOFT}>
@@ -561,10 +561,10 @@ const Cycle: React.FC<{ c: Ctx }> = ({ c }) => {
           <span style={{ ...label(23, INK), fontWeight: 500 }}>{m.t}</span>
         </div>
       ))}
-      <Line at={backAt} x={rx} y={c.T + c.h(250)} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={backAt} x={rx} y={c.T + c.h(250)} size={24} weight={600} color={ACCENT_INK}>
         C → A reaches a node on the path:
       </Line>
-      <Line at={backAt + 8} x={rx} y={c.T + c.h(292)} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={backAt + 8} x={rx} y={c.T + c.h(292)} size={24} weight={600} color={ACCENT_INK}>
         a cycle. The page prints {PAGE.cycle[1]}
       </Line>
     </>
@@ -651,7 +651,7 @@ const Kahn: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={removesAt + 16} x={R_X} y={c.T + c.h(380)} size={24}>
         Removed: <span style={{ fontFamily: MONO, fontWeight: 600, color: OK_INK }}>[{out.join(", ")}]</span>, then nothing has in-degree 0
       </Line>
-      <Line at={leftAt} x={R_X} y={c.T + c.h(424)} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={leftAt} x={R_X} y={c.T + c.h(424)} size={24} weight={600} color={ACCENT_INK}>
         <Num>{nodes.length - out.length}</Num> of <Num>{nodes.length}</Num> left<span style={{ opacity: ease(frame, cycleAt, 10) }}>: the graph has a cycle</span>
       </Line>
     </>
@@ -691,14 +691,14 @@ const Bits: React.FC<{ c: Ctx }> = ({ c }) => {
         <line x1={R_X + 30} x2={R_X + 230} y1={c.T + c.h(64) + nums.length * rowH + 6} y2={c.T + c.h(64) + nums.length * rowH + 6} stroke={INK} strokeWidth={1.8} />
       </Svg>
       <div style={{ position: "absolute", left: R_X + 40, top: c.T + c.h(64) + nums.length * rowH + 16, display: "flex", gap: 30, fontSize: 26, opacity: ease(frame, leftAt, 10) }}>
-        <span style={{ fontFamily: MONO, fontWeight: 700, color: OK_INK, width: 40, textAlign: "right" }}>{result}</span>
-        <span style={{ fontFamily: MONO, fontWeight: 700, letterSpacing: "0.2em", color: OK_INK }}>{bin(result)}</span>
+        <span style={{ fontFamily: MONO, fontWeight: 600, color: OK_INK, width: 40, textAlign: "right" }}>{result}</span>
+        <span style={{ fontFamily: MONO, fontWeight: 600, letterSpacing: "0.2em", color: OK_INK }}>{bin(result)}</span>
       </div>
       <VRule x={1095} top={c.T + c.h(64)} bottom={c.T + c.h(64) + (nums.length + 1) * rowH + 30} at={cancelAt} />
       <Line at={cancelAt} x={R_X + 400} y={c.T + c.h(110)} size={24}>
         Each pair cancels: <span style={{ fontFamily: MONO }}>x ^ x = 0</span>
       </Line>
-      <Line at={leftAt} x={R_X + 400} y={c.T + c.h(160)} size={24} weight={700} color={OK_INK}>
+      <Line at={leftAt} x={R_X + 400} y={c.T + c.h(160)} size={24} weight={600} color={OK_INK}>
         The unpaired one is left: <Num>{result}</Num>
       </Line>
       <Line at={spaceAt} x={R_X + 400} y={c.T + c.h(210)} size={24}>
@@ -768,7 +768,7 @@ export const RapidTwoScene: React.FC = () => {
         <Line at={closeAt} x={R_X} y={y(660)} size={30} weight={600}>
           None of these answers needed a line of code.
         </Line>
-        <Line at={argumentAt} x={R_X} y={y(708)} size={30} weight={700} color={BLUE_INK}>
+        <Line at={argumentAt} x={R_X} y={y(708)} size={30} weight={600} color={BLUE_INK}>
           The structure and the count were the argument.
         </Line>
         <Line at={assistantAt} x={R_X} y={y(766)} size={26} color={INK_SOFT}>

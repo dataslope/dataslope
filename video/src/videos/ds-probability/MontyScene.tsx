@@ -149,7 +149,7 @@ export const MontyScene: React.FC = () => {
                   justifyContent: "center",
                   opacity: p * (1 - isOpen),
                   ...label(24, INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   ...TABULAR,
                 }}
               >

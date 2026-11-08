@@ -223,7 +223,7 @@ const PlanText: React.FC<{ line: string; size: number }> = ({ line, size }) => {
     return (
       <span style={base}>
         {node[1]}
-        <span style={{ color: INK, fontWeight: 700 }}>{node[2]}</span>
+        <span style={{ color: INK, fontWeight: 600 }}>{node[2]}</span>
         {line.slice(node[0].length)}
       </span>
     );

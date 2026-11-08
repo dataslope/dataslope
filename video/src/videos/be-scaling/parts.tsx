@@ -221,7 +221,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      {title ? <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span> : null}
+      {title ? <span style={{ ...label(size, t.ink), fontWeight: 600, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span> : null}
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: "center" }}>{sub}</span> : null}
       {children}
     </div>
@@ -311,7 +311,7 @@ export const Pill: React.FC<{
           border: `2px solid ${t.line}`,
           background: solid ? t.line : t.fill,
           ...label(size, solid ? PAPER : t.ink),
-          fontWeight: 700,
+          fontWeight: 600,
           whiteSpace: "nowrap",
         }}
       >

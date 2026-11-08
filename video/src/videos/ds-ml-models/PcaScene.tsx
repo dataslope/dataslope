@@ -355,7 +355,7 @@ export const PcaScene: React.FC = () => {
                     top: top - h(36),
                     opacity: p,
                     ...note(24, BLUE_INK),
-                    fontWeight: 700,
+                    fontWeight: 600,
                     ...TABULAR,
                   }}
                 >
@@ -398,7 +398,7 @@ export const PcaScene: React.FC = () => {
             <span
               style={{
                 ...note(25, OK_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}

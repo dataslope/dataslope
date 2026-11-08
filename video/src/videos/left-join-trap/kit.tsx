@@ -278,7 +278,7 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; childr
   children,
 }) => (
   <Ink at={at} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
     <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
   </Ink>
 );
@@ -300,7 +300,7 @@ export const Mono: React.FC<{ children: React.ReactNode; color?: string; weight?
  *  its own ink, the way a client marks it; booleans print as words. */
 export const SqlValue: React.FC<{ value: Value }> = ({ value }) =>
   value === null ? (
-    <span style={{ color: NULL_INK, fontWeight: 700 }}>NULL</span>
+    <span style={{ color: NULL_INK, fontWeight: 600 }}>NULL</span>
   ) : typeof value === "boolean" ? (
     <span style={{ color: value ? KEPT_INK : INK_SOFT, fontWeight: value ? 600 : 400 }}>{String(value)}</span>
   ) : (

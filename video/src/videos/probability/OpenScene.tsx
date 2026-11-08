@@ -259,7 +259,7 @@ export const OpenScene: React.FC = () => {
             Share
             <span style={{ opacity: ease(frame, closeAt - 2, 12) }}>, close to the true 0.5 but not on it</span>
           </div>
-          <div style={{ ...note(40, STAT_INK), fontWeight: 700 }}>{fmt(COIN.pHeads, 4)}</div>
+          <div style={{ ...note(40, STAT_INK), fontWeight: 600 }}>{fmt(COIN.pHeads, 4)}</div>
         </Ink>
       </div>
       {/* A hairline under the count, drawn as the share lands. */}

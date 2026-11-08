@@ -97,7 +97,7 @@ export const TxnScene: React.FC = () => {
         {/* ── A transaction, as a bracket ── */}
         <div style={{ opacity: 1 - ease(frame, schemOut, 10) }}>
           {[
-            { at: beginAt - 2, i: 0, body: <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 700, color: INK }}>BEGIN</span> },
+            { at: beginAt - 2, i: 0, body: <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK }}>BEGIN</span> },
             { at: runAt, i: 1, body: <span style={{ ...note(26, BLUE_INK) }}>a statement</span> },
             { at: runAt + 4, i: 2, body: <span style={{ ...note(26, BLUE_INK) }}>another statement</span> },
           ].map((r) => (
@@ -106,7 +106,7 @@ export const TxnScene: React.FC = () => {
             </Note>
           ))}
           <Note at={commitAt} x={X0 + 50} y={sTop + 3 * step + h(8)}>
-            <span style={{ whiteSpace: "nowrap", fontFamily: MONO, fontSize: 26, fontWeight: 700, color: OK_INK }}>
+            <span style={{ whiteSpace: "nowrap", fontFamily: MONO, fontSize: 26, fontWeight: 600, color: OK_INK }}>
               COMMIT
               <span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, rollAt - 2, 10) }}> or </span>
               <span style={{ color: ACCENT_INK, opacity: ease(frame, rollAt, 10) }}>ROLLBACK</span>
@@ -171,7 +171,7 @@ export const TxnScene: React.FC = () => {
         ].map((s, i) => (
           <Note key={s.text} at={s.at} x={R_X} y={y(640) + h(44) + i * h(48)}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              <span style={{ color: OK_INK, fontWeight: 700 }}>{i + 1}</span>&nbsp;&nbsp;{s.text}
+              <span style={{ color: OK_INK, fontWeight: 600 }}>{i + 1}</span>&nbsp;&nbsp;{s.text}
             </span>
           </Note>
         ))}

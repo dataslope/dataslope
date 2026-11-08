@@ -98,7 +98,7 @@ export const SplitScene: React.FC = () => {
   const ng = geoOf(N, namedX, y(TOP) + listingHeight(N.lines.length, SIZE) + h(54), h, { rowH: 52 });
   const header = (text: string, x: number, at: number) => (
     <Note at={at} x={x} y={y(HEAD_Y)} out={out1}>
-      <span style={{ ...label(22, INK_SOFT), fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>{text}</span>
+      <span style={{ ...label(22, INK_SOFT), fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>{text}</span>
     </Note>
   );
 

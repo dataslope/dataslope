@@ -303,7 +303,7 @@ const Steps: React.FC<{ steps: readonly { at: number; value: number; digits: num
     <span
       style={{
         fontFamily: MONO,
-        fontWeight: 700,
+        fontWeight: 600,
         fontSize: size,
         color,
         opacity: p,
@@ -562,7 +562,7 @@ export const BlendScene: React.FC = () => {
       </Svg>
       <Fade at={oneAt - 2} style={{ left: T_X.weight - 134, top: rowTop(3) + 2, display: "flex", gap: 14, alignItems: "baseline" }}>
         <span style={{ ...label(26, INK_SOFT), width: 120, textAlign: "right" }}>Total</span>
-        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 26, color: INK, ...TABULAR }}>
+        <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 26, color: INK, ...TABULAR }}>
           {A.weightSum.toFixed(3)}
         </span>
       </Fade>
@@ -601,7 +601,7 @@ export const BlendScene: React.FC = () => {
           <span style={{ ...label(24, POINT_INK) }}>
             New vector for <span style={{ fontFamily: MONO, fontWeight: 600 }}>it</span>
           </span>
-          <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 24, color: POINT_INK, ...TABULAR }}>
+          <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 24, color: POINT_INK, ...TABULAR }}>
             {(move < 0.5 ? A.output : B.output).map((v) => v.toFixed(3)).join(", ")}
           </span>
         </div>

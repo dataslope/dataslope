@@ -95,7 +95,7 @@ export const CoinScene: React.FC = () => {
                 at={simulateAt - 2}
                 to={COIN.runs}
                 dur={64}
-                style={{ ...note(24, INK), fontWeight: 700, display: "inline-block", transform: `scale(${1 + 0.12 * runsGlow})` }}
+                style={{ ...note(24, INK), fontWeight: 600, display: "inline-block", transform: `scale(${1 + 0.12 * runsGlow})` }}
               />
             </Label>
           </Ink>
@@ -191,7 +191,7 @@ export const CoinScene: React.FC = () => {
             <span
               style={{
                 ...note(40, STAT_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 ...halo,
                 whiteSpace: "nowrap",
                 display: "inline-block",

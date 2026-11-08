@@ -170,7 +170,7 @@ export const ExpandScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: SANS,
-                fontWeight: 700,
+                fontWeight: 600,
                 // Level with the phase's name, not centred on the two lines,
                 // and within 12% of its 26px, so the number and the name read
                 // as one line and the serif note under them as another.

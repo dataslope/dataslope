@@ -134,7 +134,7 @@ export const RepeatScene: React.FC = () => {
         }}
       >
         <span style={note(21, INK_SOFT)}>true average </span>
-        <span style={{ ...note(22, INK), fontWeight: 700 }}>{fmt(TRUE_MEAN)}</span>
+        <span style={{ ...note(22, INK), fontWeight: 600 }}>{fmt(TRUE_MEAN)}</span>
       </div>
 
       <Pile means={REPEAT_RANDOM} bins={RANDOM_BINS} land={land} color={RANDOM} first={againFrom} />
@@ -142,10 +142,10 @@ export const RepeatScene: React.FC = () => {
 
       {/* "Both sides of seventy, about half above and half below." */}
       <Note at={sidesAt} x={truthX - 14} y={y(RANDOM_TOP - 50)} align="right" from="right" out={nameFrom}>
-        <span style={{ ...note(24, RANDOM_INK), fontWeight: 700, ...halo }}>{RANDOM_BELOW} below</span>
+        <span style={{ ...note(24, RANDOM_INK), fontWeight: 600, ...halo }}>{RANDOM_BELOW} below</span>
       </Note>
       <Note at={halfAt} x={truthX + 14} y={y(RANDOM_TOP - 50)} out={nameFrom}>
-        <span style={{ ...note(24, RANDOM_INK), fontWeight: 700, ...halo }}>{RANDOM_ABOVE} above</span>
+        <span style={{ ...note(24, RANDOM_INK), fontWeight: 600, ...halo }}>{RANDOM_ABOVE} above</span>
       </Note>
       <Note at={bothFrom} x={160} y={y(700)}>
         <div style={{ ...label(21, RANDOM_INK) }}>At random</div>
@@ -155,10 +155,10 @@ export const RepeatScene: React.FC = () => {
       {/* "Near eighty, every single time." */}
       <Bracket x0={sx(X, EASY_MIN)} x1={sx(X, EASY_MAX)} y={y(EASY_TOP - 30)} at={timeAt - 4} color={EASY} />
       <Note at={timeAt} x={sx(X, EASY_MAX) + 22} y={y(EASY_TOP - 52)}>
-        <div style={{ ...note(24, EASY_INK), fontWeight: 700, ...halo }}>
+        <div style={{ ...note(24, EASY_INK), fontWeight: 600, ...halo }}>
           all {REPEAT_COUNT} from {fmt(EASY_MIN)}
         </div>
-        <div style={{ ...note(24, EASY_INK), fontWeight: 700, ...halo }}>to {fmt(EASY_MAX)}</div>
+        <div style={{ ...note(24, EASY_INK), fontWeight: 600, ...halo }}>to {fmt(EASY_MAX)}</div>
       </Note>
       <Note at={everyFrom} x={860} y={y(700)}>
         <div style={{ ...label(21, EASY_INK) }}>The easy way</div>
@@ -182,7 +182,7 @@ export const RepeatScene: React.FC = () => {
           and 10.03 here against 9.94 in the closing figure read as if it
           shrank with more data. */}
       <Ink at={biasAt - 6} dur={16} style={{ left: (truthX + easyX) / 2 - 200, top: y(500) + 12, width: 400, textAlign: "center" }}>
-        <span style={{ ...note(24, EASY_INK), fontWeight: 700, ...halo }}>+{fmt(EASY_CENTER - TRUE_MEAN, 0)} points</span>
+        <span style={{ ...note(24, EASY_INK), fontWeight: 600, ...halo }}>+{fmt(EASY_CENTER - TRUE_MEAN, 0)} points</span>
       </Ink>
     </AbsoluteFill>
   );

@@ -120,7 +120,7 @@ export const WhyScene: React.FC = () => {
 
       {/* Reading: every prompt token goes in together. */}
       <Ink at={promptAt - 6} dur={12} style={{ left: X0, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(25, INPUT_INK), fontWeight: 700 }}>Reading the prompt</span>
+        <span style={{ ...label(25, INPUT_INK), fontWeight: 600 }}>Reading the prompt</span>
       </Ink>
       {rows.map((row, r) => (
         <div key={r} style={{ position: "absolute", left: X0, top: y(LEFT_ROWS[r]), display: "flex", gap: 6 }}>
@@ -145,7 +145,7 @@ export const WhyScene: React.FC = () => {
 
       {/* Writing: one token out per pass. */}
       <Ink at={answerAt - 4} dur={12} style={{ left: RIGHT_X, top: y(HEAD_Y), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(25, OUTPUT_INK), fontWeight: 700 }}>Writing the answer</span>
+        <span style={{ ...label(25, OUTPUT_INK), fontWeight: 600 }}>Writing the answer</span>
       </Ink>
       <Arrow from={[BOX.x + BOX.w + 12, midY]} to={[RIGHT_X - 12, midY]} at={oneAt - 10} dur={10} color={OUTPUT} width={3} />
       <div style={{ position: "absolute", left: RIGHT_X, top: y(RIGHT_ROW), display: "flex", gap: 6 }}>

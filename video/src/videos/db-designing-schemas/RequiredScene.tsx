@@ -166,7 +166,7 @@ export const RequiredScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: SANS,
-                fontWeight: 700,
+                fontWeight: 600,
                 // The number, the step and its note share a line, so their
                 // sizes stay within 12% of each other: 22, 24 and 22.
                 fontSize: 22,

@@ -121,7 +121,7 @@ export const RobustScene: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, opacity: 1 - dimAll }}>
         {/* ── The two readouts, and the center each one goes with ── */}
         <Ink at={nineAt - 2} dur={14} style={{ left: SD_X, top: statsY, whiteSpace: "nowrap" }}>
-          <div style={{ ...note(32, STAT_INK), fontWeight: 700 }}>
+          <div style={{ ...note(32, STAT_INK), fontWeight: 600 }}>
             SD <span style={TABULAR}>{fmt(sd, 1)}</span>
           </div>
           <div style={{ ...label(22, STAT_INK), opacity: ease(frame, meanGoesAt - 4, 12), marginTop: 12 }}>
@@ -143,7 +143,7 @@ export const RobustScene: React.FC = () => {
           }}
         />
         <Ink at={fourteenAt - 2} dur={14} style={{ left: IQR_X, top: statsY, whiteSpace: "nowrap" }}>
-          <div style={{ ...note(32, INK), fontWeight: 700, display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ ...note(32, INK), fontWeight: 600, display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ display: "inline-block", width: 22, height: 22, background: HIGHLIGHT, opacity: 0.8, border: `2px solid ${INK}` }} />
             <span>
               IQR <span style={TABULAR}>{fmt(ROBUST.iqr, 1)}</span>

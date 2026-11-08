@@ -125,7 +125,7 @@ export const ConcScene: React.FC = () => {
               <React.Fragment key={i}>
                 {/* The core's lane: a hairline under it. */}
                 <div style={{ position: "absolute", left: LANE_X, top: ly + laneH + 6, width: ROUNDS * 3 * STEP, height: 1, background: HAIRLINE, opacity: o }} />
-                <div style={{ position: "absolute", left: X0, top: ly + laneH / 2 - 14, opacity: o, ...label(21, i === 0 || frame < moreAt ? INK : BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <div style={{ position: "absolute", left: X0, top: ly + laneH / 2 - 14, opacity: o, ...label(21, i === 0 || frame < moreAt ? INK : BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
                   core {i + 1}
                 </div>
               </React.Fragment>
@@ -243,13 +243,13 @@ export const ConcScene: React.FC = () => {
           </span>
         </Note>
         <Note at={fiveAt + 10} x={cx1 + 14} y={cy(s.ceiling) - 30}>
-          <div style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>5% serial</div>
-          <div style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", marginTop: 4, opacity: ceil }}>
+          <div style={{ ...label(21, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>5% serial</div>
+          <div style={{ ...label(21, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 4, opacity: ceil }}>
             caps at <Num>{s.ceiling}</Num>x
           </div>
         </Note>
         <Note at={seventeenAt - 4} x={cx(s.cores) + 16} y={cy(s.speedup) + 14}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{fmt1(s.speedup)}</Num>x on <Num>{s.cores}</Num> cores
           </span>
         </Note>

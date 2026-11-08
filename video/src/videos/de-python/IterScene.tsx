@@ -127,7 +127,7 @@ const Raised: React.FC<{ x: number; top: number; at: number; out: number; call: 
       }}
     >
       <span>{call}</span>
-      <span style={{ color: ACCENT_INK, fontWeight: 700 }}>{kind}</span>
+      <span style={{ color: ACCENT_INK, fontWeight: 600 }}>{kind}</span>
     </div>
   </Note>
 );

@@ -18,7 +18,7 @@ const VAR_MAX = 9;
 /** The shared Axes' title face (its `tickText(19)`, set bold), drawn here so
  *  the titles can name X and Y in the formula's mono and switch to Y_adj. */
 const AXIS_TITLE: React.CSSProperties = { fontFamily: SANS, fontSize: 19, fontWeight: 650, fill: INK_SOFT };
-const AXIS_LETTER: React.CSSProperties = { fontFamily: MONO, fontWeight: 700, fill: INK };
+const AXIS_LETTER: React.CSSProperties = { fontFamily: MONO, fontWeight: 600, fill: INK };
 
 /** The name, with each of its initials marked as it is read. */
 const WORDS = [
@@ -144,12 +144,12 @@ export const CupedScene: React.FC = () => {
           <line x1={BOX.left} x2={BOX.right} y1={at(ys, CUPED.meanY)} y2={at(ys, CUPED.meanY)} stroke={OK} strokeWidth={2.4} strokeDasharray="8 6" />
         </Svg>
         <Note at={predictsAt + 4} x={at(xs, -1)} y={at(ys, 15)} dim={thetaAt + 6}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>slope θ = {CUPED.theta}</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>slope θ = {CUPED.theta}</span>
         </Note>
 
         {/* The adjustment, then what it buys. */}
         <Note at={subtractAt} x={COL_X} y={y(380)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>subtract what the pre-period predicts</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>subtract what the pre-period predicts</span>
           <div style={{ fontFamily: MONO, fontSize: 25, fontWeight: 600, color: INK, marginTop: 10, whiteSpace: "pre", fontVariantLigatures: "none" }}>
             {"Y_adj = Y − "}
             <Mark at={thetaAt}>{"θ(X − X̄)"}</Mark>
@@ -169,7 +169,7 @@ export const CupedScene: React.FC = () => {
                 style={{ position: "absolute", left: COL_X, top: top + h(34), width: (xb(b.v) - COL_X) * p, height: h(34), background: b.color, opacity: 0.85, borderRadius: 3 }}
               />
               <Note at={b.at} x={xb(b.v) + 12} y={top + h(34)}>
-                <span style={{ ...note(27, b.ink), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{b.v.toFixed(2)}</span>
+                <span style={{ ...note(27, b.ink), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>{b.v.toFixed(2)}</span>
               </Note>
             </React.Fragment>
           );

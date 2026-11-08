@@ -94,9 +94,9 @@ export const SolidScene: React.FC = () => {
                   opacity: ease(frame, textAt + i * 3, 10) * (1 - d),
                 }}
               >
-                <span style={{ ...headline(60), color: `color-mix(in srgb, ${BLUE_INK} ${Math.round(35 + fill * 65)}%, ${PAPER})`, fontWeight: 700 }}>{r.letter}</span>
+                <span style={{ ...headline(60), color: `color-mix(in srgb, ${BLUE_INK} ${Math.round(35 + fill * 65)}%, ${PAPER})`, fontWeight: 600 }}>{r.letter}</span>
               </div>
-              <Line x={NAME_X} y={top(i) - 2} at={r.at} size={26} weight={700} dim={dim}>
+              <Line x={NAME_X} y={top(i) - 2} at={r.at} size={26} weight={600} dim={dim}>
                 {r.name}
               </Line>
               <Line x={NAME_X} y={top(i) + 36} at={r.at + 8} size={22} color={INK_SOFT} weight={500} dim={dim}>
@@ -137,13 +137,13 @@ export const SolidScene: React.FC = () => {
         <Flow points={[[EX_X + 196, mid(3)], [EX_X + 272, mid(3)]]} at={stockAt + 8} dur={8} width={2.2} head={12} dim={dim} />
         <Box x={EX_X + 280} y={exTop(3)} w={180} h={BOX_H} at={stockAt + 10} title="reads stock" size={22} tone="ok" dim={dim} />
         <Box x={EX_X + 520} y={exTop(3)} w={300} h={BOX_H} at={refundsAt} size={22} tone="bad" dashed dim={dim}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Strike at={refundsAt + 10}>stock and refunds</Strike>
           </span>
         </Box>
 
         {/* D: on to question 5. */}
-        <Line x={EX_X} y={mid(4) - 16} at={nextAt} size={24} weight={700} color={BLUE_INK} dim={dim}>
+        <Line x={EX_X} y={mid(4) - 16} at={nextAt} size={24} weight={600} color={BLUE_INK} dim={dim}>
           → the next question
         </Line>
 

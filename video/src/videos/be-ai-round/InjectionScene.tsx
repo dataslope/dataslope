@@ -185,7 +185,7 @@ export const InjectionScene: React.FC = () => {
           <Node x={USER.x} y={userTop} w={USER.w} h={userH} at={directAt} title="the user" tone="plain" size={23} />
           <Flow points={[[USER.x + USER.w + 8, userTop + userH / 2], [MODEL.x - 10, modelTop + modelH * 0.3]]} at={directAt + 6} color={ACCENT} />
           <Note at={directAt + 12} x={440} y={userTop - 6}>
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>direct</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>direct</span>
           </Note>
           {sources.map((s, i) => (
             <Ink key={s.text} at={s.at} dur={12} style={{ left: USER.x, top: y(SOURCES_V[i]) }}>
@@ -197,14 +197,14 @@ export const InjectionScene: React.FC = () => {
           </Note>
           <Flow points={[[400, y(600)], [MODEL.x - 10, modelTop + modelH * 0.75]]} at={indirectAt + 8} color={ACCENT} />
           <Note at={indirectAt + 14} x={560} y={y(596)}>
-            <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>indirect</span>
+            <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>indirect</span>
           </Note>
 
           {/* The prompt as the model sees it. */}
           <Note at={hardAt} x={1120} y={modelTop + 6} width={640}>
             <div style={{ ...note(26, INK), lineHeight: 1.35 }}>
-              No reliable boundary between <span style={{ color: inkOf.purple, fontWeight: 700 }}>instructions</span> and{" "}
-              <span style={{ color: BAR, fontWeight: 700 }}>data</span>
+              No reliable boundary between <span style={{ color: inkOf.purple, fontWeight: 600 }}>instructions</span> and{" "}
+              <span style={{ color: BAR, fontWeight: 600 }}>data</span>
               <span style={{ opacity: ease(frame, tokensAt - 2, 10) }}>: both are just tokens.</span>
             </div>
           </Note>
@@ -319,7 +319,7 @@ export const InjectionScene: React.FC = () => {
               return (
                 <React.Fragment key={d.text}>
                   {i > 0 ? <span style={{ ...note(23, INK_SOFT), opacity: p }}>·</span> : null}
-                  <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: p }}>{d.text}</span>
+                  <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: p }}>{d.text}</span>
                 </React.Fragment>
               );
             })}
@@ -342,9 +342,9 @@ export const InjectionScene: React.FC = () => {
 
           {/* Secrets, and a log. */}
           <div style={{ position: "absolute", left: X0, top: y(782), display: "flex", alignItems: "baseline", gap: 14, fontSize: 23 }}>
-            <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, secretsAt - 2, 12) }}>secrets kept out of prompts</span>
+            <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, secretsAt - 2, 12) }}>secrets kept out of prompts</span>
             <span style={{ ...note(23, INK_SOFT), opacity: ease(frame, logAt - 2, 12) }}>·</span>
-            <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, logAt - 2, 12) }}>every tool call logged</span>
+            <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, logAt - 2, 12) }}>every tool call logged</span>
           </div>
           <Note at={tracedAt} x={X0 + 640} y={y(782)}>
             <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>so an incident can be traced</span>
@@ -374,13 +374,13 @@ export const InjectionScene: React.FC = () => {
           </text>
         </svg>
         <Note at={circles[0].at + 4} x={960 + R + 40} y={cy - 92 - 18}>
-          <span style={{ ...note(25, inkOf.blue), fontWeight: 700, whiteSpace: "nowrap" }}>{circles[0].text}</span>
+          <span style={{ ...note(25, inkOf.blue), fontWeight: 600, whiteSpace: "nowrap" }}>{circles[0].text}</span>
         </Note>
         <Note at={circles[1].at + 4} x={880 - R - 40} y={cy + 46 - 18} align="right">
-          <span style={{ ...note(25, inkOf.purple), fontWeight: 700, whiteSpace: "nowrap" }}>{circles[1].text}</span>
+          <span style={{ ...note(25, inkOf.purple), fontWeight: 600, whiteSpace: "nowrap" }}>{circles[1].text}</span>
         </Note>
         <Note at={circles[2].at + 4} x={1040 + R + 40} y={cy + 46 - 18}>
-          <span style={{ ...note(25, inkOf.orange), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, inkOf.orange), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Strike at={removeAt + 4}>{circles[2].text}</Strike>
           </span>
         </Note>

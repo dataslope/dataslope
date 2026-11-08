@@ -55,13 +55,13 @@ const Ate: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={matchAt} x={R_X + 520} y={c.y(560)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>randomized, all treated: they match</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>randomized, all treated: they match</span>
       </Note>
       <Note at={apartAt} x={R_X + 520} y={c.y(610)}>
-        <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>opt-in or observational: they can differ</span>
+        <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>opt-in or observational: they can differ</span>
       </Note>
       <Note at={reportAt} x={R_X + 520} y={c.y(690)}>
-        <span style={{ ...note(25, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           report <b>ATT</b> for the people who use it
         </span>
       </Note>
@@ -106,13 +106,13 @@ const Long: React.FC<{ c: Ctx }> = ({ c }) => {
         </g>
       </svg>
       <Note at={seasonsAt} x={x0 + 2 * wk} y={top - c.h(44)}>
-        <span style={{ ...label(22, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>seasons turn</span>
+        <span style={{ ...label(22, WARM_INK), fontWeight: 600, whiteSpace: "nowrap" }}>seasons turn</span>
       </Note>
       <Note at={launchesAt} x={x0 + 4 * wk} y={top - c.h(44)}>
-        <span style={{ ...label(22, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>other launches land</span>
+        <span style={{ ...label(22, WARM_INK), fontWeight: 600, whiteSpace: "nowrap" }}>other launches land</span>
       </Note>
       <Note at={freezeAt} x={x0} y={top - c.h(118)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>freeze the scope for the whole run</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>freeze the scope for the whole run</span>
       </Note>
       <Note at={cycleAt + 4} x={x0} y={top + c.h(84)}>
         <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>
@@ -122,7 +122,7 @@ const Long: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={endAt + 4} x={flagX - 12} y={top + c.h(84)} align="right">
-        <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>end date, set in advance</span>
+        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>end date, set in advance</span>
       </Note>
     </>
   );
@@ -144,13 +144,13 @@ const Holdback: React.FC<{ c: Ctx }> = ({ c }) => {
       <div style={{ position: "absolute", left: R_X, top, width: W * (1 - hold) * p, height: c.h(70), background: TREAT, borderRadius: "6px 0 0 6px" }} />
       <div style={{ position: "absolute", left: R_X + W * (1 - hold) * p + 4, top, width: W * hold * ease(frame, holdAt + 10, 10), height: c.h(70), background: CONTROL, borderRadius: "0 6px 6px 0" }} />
       <Note at={afterAt - 2} x={R_X} y={top - c.h(48)}>
-        <span style={{ ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>after launch: almost everyone on the new version</span>
+        <span style={{ ...label(22, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>after launch: almost everyone on the new version</span>
       </Note>
       <Note at={holdAt + 12} x={R_X + W - 260} y={top + c.h(84)}>
-        <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>a few percent on the old ↑</span>
+        <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>a few percent on the old ↑</span>
       </Note>
       <Note at={monthsAt} x={R_X} y={top + c.h(150)}>
-        <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>months later: did the win last?</span>
+        <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>months later: did the win last?</span>
       </Note>
     </>
   );
@@ -248,7 +248,7 @@ const Meta: React.FC<{ c: Ctx }> = ({ c }) => {
         pooled: {fixed(META.pooled, 1)}
       </div>
       <Note at={allAt} x={R_X} y={c.y(822)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>so pool every experiment you ran, not just the winners</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>so pool every experiment you ran, not just the winners</span>
       </Note>
       <Note at={curseAt + 2} x={BAR.x - 20} y={c.y(380)}>
         <span style={{ ...note(26, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>the winner's curse, at 20% power</span>
@@ -258,7 +258,7 @@ const Meta: React.FC<{ c: Ctx }> = ({ c }) => {
         { text: "significant results", at: overAt, x: BAR.x + 180, ink: ACCENT_INK, v: `${low.ratio.toFixed(2)}×`, ratio: low.ratio },
       ].map((b) => (
         <React.Fragment key={b.text}>
-          <div style={{ position: "absolute", left: b.x - 40, width: 200, top: BAR.base + c.h(10), textAlign: "center", ...label(20, INK_SOFT), fontWeight: 700, opacity: ease(frame, b.at - 4, 10) }}>
+          <div style={{ position: "absolute", left: b.x - 40, width: 200, top: BAR.base + c.h(10), textAlign: "center", ...label(20, INK_SOFT), fontWeight: 600, opacity: ease(frame, b.at - 4, 10) }}>
             {b.text}
           </div>
           <div style={{ position: "absolute", left: b.x, width: 120, top: BAR.base - BAR.unit * b.ratio - c.h(44), textAlign: "center", ...note(27, b.ink), fontWeight: 800, ...TABULAR, opacity: ease(frame, b.at, 14) }}>
@@ -324,7 +324,7 @@ export const RapidScene: React.FC = () => {
           </span>
         </Note>
         <Note at={roundAt} x={X0} y={y(LIST_TOP) + 4 * h(ROW) + h(90)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>That choice is the product-sense round.</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>That choice is the product-sense round.</span>
         </Note>
         <NextLine at={nextAt} x={X0} y={y(760)} width={900}>
           product sense and metrics

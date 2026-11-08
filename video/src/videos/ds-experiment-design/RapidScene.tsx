@@ -63,7 +63,7 @@ const Sensitive: React.FC<{ c: Ctx }> = ({ c }) => {
             <div style={{ position: "absolute", left: R_X + 40, top, ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: p }}>{r.text}</div>
             <div style={{ position: "absolute", left: R_X + 40, top: top + c.h(36), width: W * r.v * p, height: c.h(34), background: r.color, opacity: 0.85, borderRadius: 3 }} />
             <Note at={i === 0 ? r.at + 6 : cutAt} x={R_X + 40 + W * r.v + 14} y={top + c.h(36)}>
-              <span style={{ ...note(26, r.ink), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{r.label}</span>
+              <span style={{ ...note(26, r.ink), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>{r.label}</span>
             </Note>
           </React.Fragment>
         );
@@ -184,7 +184,7 @@ const AaTest: React.FC<{ c: Ctx }> = ({ c }) => {
       </Note>
       <Note at={fiveAt} x={R_X + 40} y={c.y(520)}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span style={{ ...note(40, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(40, OK_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
             <Mark at={shouldAt} color={MARK_OK}>
               {pct(AA.rate, 1)} significant
             </Mark>

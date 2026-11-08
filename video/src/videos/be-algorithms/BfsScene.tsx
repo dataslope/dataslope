@@ -228,7 +228,7 @@ export const BfsScene: React.FC = () => {
             />
           );
         })}
-        <Line at={eitherAt + 6} x={cx0 + CELLS * 76 + 20} y={rowY2 + 12} size={23} color={OK_INK} weight={700}>
+        <Line at={eitherAt + 6} x={cx0 + CELLS * 76 + 20} y={rowY2 + 12} size={23} color={OK_INK} weight={600}>
           pops either end in O(1)
         </Line>
       </Drift>

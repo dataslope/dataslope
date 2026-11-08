@@ -129,10 +129,10 @@ export const TestScene: React.FC = () => {
         <circle cx={sx(X, clear.estimate)} cy={y(ROW1)} r={6.5 * ease(frame, differenceAt + 4, 10)} fill={EST} stroke={PAPER} strokeWidth={1.4} />
       </Svg>
       <Note at={differenceAt + 6} x={sx(X, clear.lo) - 14} y={y(ROW1) - 16} align="right" from="right">
-        <span style={{ ...note(24, INK), fontWeight: 700, ...halo }}>{signed(clear.lo)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 600, ...halo }}>{signed(clear.lo)}</span>
       </Note>
       <Note at={differenceAt + 8} x={sx(X, clear.hi) + 14} y={y(ROW1) - 16}>
-        <span style={{ ...note(24, INK), fontWeight: 700, ...halo }}>{signed(clear.hi)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 600, ...halo }}>{signed(clear.hi)}</span>
       </Note>
       <Note at={significantAt - 4} x={sx(X, clear.lo)} y={y(ROW1) + 26}>
         <span style={{ ...note(23, INK), ...halo, whiteSpace: "nowrap" }}>
@@ -187,10 +187,10 @@ export const TestScene: React.FC = () => {
         />
       </Svg>
       <Note at={minusAt - 2} x={sx(X, straddle.lo) - 22} y={y(ROW2) - 16} align="right" from="right">
-        <span style={{ ...note(24, INK), fontWeight: 700, ...halo }}>{signed(straddle.lo)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 600, ...halo }}>{signed(straddle.lo)}</span>
       </Note>
       <Note at={eightAt - 4} x={sx(X, straddle.hi) + 26} y={y(ROW2) - 16}>
-        <span style={{ ...note(24, INK), fontWeight: 700, ...halo }}>{signed(straddle.hi)}</span>
+        <span style={{ ...note(24, INK), fontWeight: 600, ...halo }}>{signed(straddle.hi)}</span>
       </Note>
       <Note at={noEffectAt - 6} x={zeroX + 26} y={y(ROW2) + 30}>
         <span style={{ ...note(23, EST_INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>includes zero: can’t rule out no effect</span>

@@ -142,11 +142,11 @@ export const EdgeScene: React.FC = () => {
           ])}
           at={dynAt}
         />
-        <Line x={X0} y={headY} at={useAt} size={29} weight={700} color={OK_INK}>
+        <Line x={X0} y={headY} at={useAt} size={29} weight={600} color={OK_INK}>
           At the edge: <span style={{ color: INK_SOFT, fontWeight: 500 }}>static or cacheable</span>
         </Line>
         <WordRow x={X0} y={itemY} size={27} items={kinds.map((k) => ({ ...k, ink: INK }))} />
-        <Line x={COL_B} y={headY} at={dynAt} size={29} weight={700} color={BLUE_INK}>
+        <Line x={COL_B} y={headY} at={dynAt} size={29} weight={600} color={BLUE_INK}>
           To the origin
         </Line>
         <Line x={COL_B} y={itemY + 4} at={dynAt + 4} size={26} weight={600}>
@@ -163,10 +163,10 @@ export const EdgeScene: React.FC = () => {
         </Line>
         {/* The timer at the line's own size, centred on it, 10px before it. */}
         <Timer x={X0 + 72 - 10 - TIMER_TEXT / 2} y={y(616) + (TIMER_TEXT * 1.3) / 2} size={TIMER_TEXT} at={shortAt} />
-        <Line x={X0 + 72} y={y(616)} at={shortAt + 4} size={TIMER_TEXT} weight={700} color={OK_INK}>
+        <Line x={X0 + 72} y={y(616)} at={shortAt + 4} size={TIMER_TEXT} weight={600} color={OK_INK}>
           so keep that time to live short
         </Line>
-        <Line x={COL_B} y={noteY} at={priceAt} size={25} weight={700}>
+        <Line x={COL_B} y={noteY} at={priceAt} size={25} weight={600}>
           The price
         </Line>
         <Line x={COL_B} y={noteY + 48} at={countAt - 6} size={24} weight={600} color={ACCENT_INK} width={740}>

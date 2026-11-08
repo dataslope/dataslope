@@ -82,7 +82,7 @@ export const QuestionCard: React.FC<{
   return (
     <>
       <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(112), whiteSpace: "nowrap" }}>
-        <span style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>{kicker ?? `Question ${n}`}</span>
+        <span style={{ ...label(22, ACCENT_INK), fontWeight: 600 }}>{kicker ?? `Question ${n}`}</span>
       </Ink>
       {/* Balanced, so a question that wraps breaks into even lines rather than
           leaving one word on the last; the line count is the same either way. */}
@@ -172,7 +172,7 @@ export const RapidFire: React.FC<{
                   ...TABULAR,
                   width: 30,
                   textAlign: "right",
-                  fontWeight: 700,
+                  fontWeight: 600,
                 }}
               >
                 {item.n}

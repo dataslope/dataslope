@@ -179,7 +179,7 @@ export const LockScene: React.FC = () => {
         {/* ── Left: pessimistic, centred until the optimistic side arrives ── */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - ease(frame, optAt - 12, 24)) * 460}px)` }}>
         <Note at={pessAt} x={X0} y={y(HEAD_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Pessimistic: lock first</span>
+          <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Pessimistic: lock first</span>
         </Note>
         <AccountRow x={X0} y={rowsTop} h={rowH} id={1} balance={100} at={forUpdateAt} tone={ease(frame, untilAt, 8) > 0.5 ? "held" : "data"} />
         <AccountRow x={X0} y={row2} h={rowH} id={2} balance={LOCK.otherRow?.balance ?? 0} at={forUpdateAt + 4} tone={ease(frame, freeAt + 4, 8) > 0.5 ? "ok" : "data"} />
@@ -208,7 +208,7 @@ export const LockScene: React.FC = () => {
 
         {/* ── Right: optimistic ── */}
         <Note at={optAt} x={R_X} y={y(HEAD_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Optimistic: no lock, a version</span>
+          <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Optimistic: no lock, a version</span>
         </Note>
         <Note at={versionAt} x={R_X} y={y(HEAD_Y) + h(52)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap", fontSize: 23 }}>

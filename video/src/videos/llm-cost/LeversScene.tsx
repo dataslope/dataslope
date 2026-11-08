@@ -172,10 +172,10 @@ export const LeversScene: React.FC = () => {
             {/* The numerals are set in the list's own face, so each line is one
                 size and one family. */}
             <div style={{ position: "absolute", left: X0, top: ry, opacity: slot * 0.25 * (1 - ease(frame, at - 6, 8)) }}>
-              <span style={{ ...body(32), color: INK_SOFT, fontWeight: 700 }}>{i + 1}</span>
+              <span style={{ ...body(32), color: INK_SOFT, fontWeight: 600 }}>{i + 1}</span>
             </div>
             <Ink at={at - 6} dur={14} style={{ left: X0, top: ry, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 24 }}>
-              <span style={{ ...body(32), color: POINT_INK, fontWeight: 700, width: 34 }}>{i + 1}</span>
+              <span style={{ ...body(32), color: POINT_INK, fontWeight: 600, width: 34 }}>{i + 1}</span>
               <span style={{ ...body(32), color: INK }}>{text}</span>
             </Ink>
           </React.Fragment>
@@ -246,7 +246,7 @@ export const LeversScene: React.FC = () => {
               <Note at={at + 12} x={RX + px(inC + ansC + thinkC) + 14} y={ry + h(20) - 19}>
                 <span style={{ display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
                   <span style={{ ...note(24, INK_SOFT), ...TABULAR }}>{usd(row.cost, 5)}</span>
-                  <span style={{ ...note(26, INK), fontWeight: 700, ...TABULAR }}>{row.times.toFixed(1)}x</span>
+                  <span style={{ ...note(26, INK), fontWeight: 600, ...TABULAR }}>{row.times.toFixed(1)}x</span>
                 </span>
               </Note>
             </div>

@@ -27,7 +27,7 @@ const Requests: React.FC<{ top: number; at: number; mixed: boolean; label: strin
   if (p <= 0) return null;
   return (
     <div style={{ position: "absolute", left: X0, top, display: "flex", alignItems: "center", gap: 14, opacity: p }}>
-      <span style={{ width: 150, ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{text}</span>
+      <span style={{ width: 150, ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{text}</span>
       <svg width={52} height={52} style={{ overflow: "visible" }}>
         <circle cx={26} cy={16} r={11} fill={INK} />
         <path d="M6,50 Q26,20 46,50 Z" fill={INK} />
@@ -48,7 +48,7 @@ const Requests: React.FC<{ top: number; at: number; mixed: boolean; label: strin
               alignItems: "center",
               justifyContent: "center",
               ...label(21, PAPER),
-              fontWeight: 700,
+              fontWeight: 600,
               opacity: q,
               transform: `scale(${0.6 + 0.4 * q})`,
             }}
@@ -233,13 +233,13 @@ export const UnitScene: React.FC = () => {
                 <line x1={xOf(0.05)} x2={xOf(0.05)} y1={y(b.top) + h(32)} y2={y(b.top) + h(88)} stroke={INK} strokeWidth={2} strokeDasharray="4 5" />
               </Svg>
               <Note at={b.valAt} x={Math.max(xOf(b.v), xOf(0.05) + 6) + 14} y={y(b.top) + h(42)}>
-                <span style={{ ...note(30, b.ink), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>{pct(b.v, 1)} significant</span>
+                <span style={{ ...note(30, b.ink), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>{pct(b.v, 1)} significant</span>
               </Note>
             </React.Fragment>
           );
         })}
         <Note at={promiseAt + 2} x={xOf(0.05) - 100} y={y(774)} width={200} style={{ textAlign: "center" }}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>5% promised</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>5% promised</span>
         </Note>
         <Note at={orderAt} x={RIGHT_X} y={y(830)}>
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap", ...TABULAR }}>{UNIT.sims.toLocaleString("en-US")} simulated A/A tests</span>

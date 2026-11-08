@@ -62,7 +62,7 @@ const Chip: React.FC<{ at: number; x: number; y: number; w: number; h: number; n
         transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`,
       }}
     >
-      <span style={{ ...label(big ? 24 : 20, big ? ACCENT_INK : INK_SOFT), fontWeight: 700 }}>
+      <span style={{ ...label(big ? 24 : 20, big ? ACCENT_INK : INK_SOFT), fontWeight: 600 }}>
         <Num>{n}</Num>
       </span>
       <span style={{ ...label(big ? 21 : 20, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{name}</span>
@@ -177,7 +177,7 @@ export const HookScene: React.FC = () => {
 
           {/* What a request is made of, over the first bar. */}
           <Note at={waitingAt} x={X0} y={lane - h(38)}>
-            <span style={{ ...label(20, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(20, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               work, then <span style={{ fontWeight: 500, color: INK_SOFT }}>waiting</span>
               <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, dbAt, 10) }}> on a database</span>
               <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, serviceAt, 10) }}>, or another service</span>
@@ -216,7 +216,7 @@ export const HookScene: React.FC = () => {
             }}
           />
           <Note at={serialAt + 2 + (N - 1) * 6} x={serialEnd + 18} y={lane + 2} out={onceAt}>
-            <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>past the second</span>
+            <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>past the second</span>
           </Note>
           <Note at={idleAt - 2} x={X0} y={y(420)} out={onceAt - 2}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
@@ -250,7 +250,7 @@ export const HookScene: React.FC = () => {
             <VRule key={s.id} x={s.x - 20} top={y(392)} height={h(86)} at={s.at} />
           ))}
           <Note at={bugsAt} x={1000} y={y(560)}>
-            <span style={{ ...note(28, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>That&apos;s where the bugs live.</span>
+            <span style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>That&apos;s where the bugs live.</span>
           </Note>
         </div>
 
@@ -275,7 +275,7 @@ export const HookScene: React.FC = () => {
               <React.Fragment key={name}>
                 {i > 0 ? <span style={{ ...label(20, INK_SOFT), opacity: p }}>·</span> : null}
                 <span style={{ ...label(20, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: p }}>
-                  <span style={{ color: INK_SOFT, fontWeight: 700 }}>
+                  <span style={{ color: INK_SOFT, fontWeight: 600 }}>
                     <Num>{10 + i}</Num>
                   </span>{" "}
                   {name}

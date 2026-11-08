@@ -192,7 +192,7 @@ export const AiScene: React.FC = () => {
           >
             <span style={{ color: BLUE_INK, fontWeight: 600 }}>SELECT</span> …
             <span style={{ display: "inline-block", width: 34 }} />
-            <span style={{ color: OK_INK, fontWeight: 700, opacity: checkP, display: "inline-block", transform: `scale(${0.6 + 0.4 * checkP})` }}>✓</span>
+            <span style={{ color: OK_INK, fontWeight: 600, opacity: checkP, display: "inline-block", transform: `scale(${0.6 + 0.4 * checkP})` }}>✓</span>
           </div>
         </Panel>
 

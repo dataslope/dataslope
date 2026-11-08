@@ -100,7 +100,7 @@ export const CronScene: React.FC = () => {
 
         {/* Cron: two lines, two times, nothing between them. */}
         <Note at={cronAt} x={X0} y={y(266)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
             cron: <span style={{ opacity: ease(frame, setAt, 10) }}>a command at a set time</span>
           </span>
         </Note>
@@ -174,18 +174,18 @@ export const CronScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>02:00: cron fires</span>
         </Note>
         <Note at={longAt + 16} x={tx(2.58) + 14} y={rowY.extract - 14}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>runs long</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>runs long</span>
         </Note>
         <Note at={halfAt - 2} x={tx(2.55) + 14} y={rowY.transform - 14}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>on half the data</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>on half the data</span>
         </Note>
         <Note at={neitherAt} x={X0} y={y(680)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>cron: no graph, no run history</span>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>cron: no graph, no run history</span>
         </Note>
 
         {/* The orchestrator: the page's DAG. */}
         <Note at={dagAt} x={DAG_X - NODE_W / 2} y={y(236)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
             an orchestrator runs a DAG<span style={{ opacity: ease(frame, expandAt, 10) }}>: directed acyclic graph</span>
           </span>
         </Note>

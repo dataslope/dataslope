@@ -262,7 +262,7 @@ export const Fig: React.FC<{
       gap: 12,
     }}
   >
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
     <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
   </Ink>
 );
@@ -324,7 +324,7 @@ export const TruthWord: React.FC<{
  *  the unknown's ink, the way a client marks it. */
 export const SqlValue: React.FC<{ value: string | number | null }> = ({ value }) =>
   value === null ? (
-    <span style={{ color: UNKNOWN_INK, fontWeight: 700 }}>NULL</span>
+    <span style={{ color: UNKNOWN_INK, fontWeight: 600 }}>NULL</span>
   ) : (
     <span style={{ color: INK }}>{value}</span>
   );

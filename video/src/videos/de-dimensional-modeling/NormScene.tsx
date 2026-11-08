@@ -138,7 +138,7 @@ export const NormScene: React.FC = () => {
           swaps={[{ row: 0, col: fEmail, at: rushedAt + 8, value: newEmail }]}
         />
         <Note at={fasterAt} x={RIGHT_X} y={below + h(20)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>no join: faster reads</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>no join: faster reads</span>
         </Note>
         <Note at={priceAt} x={RIGHT_X} y={below + h(62)}>
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>
@@ -161,10 +161,10 @@ export const NormScene: React.FC = () => {
 
         {/* ── Where each belongs, one line each, so the warehouse's reason fits under them ── */}
         <Note at={writesAt} x={X0} y={og.rowTop(NORM_ORDERS.rows.length) + h(36)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Normalize: frequent writes that must stay consistent</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Normalize: frequent writes that must stay consistent</span>
         </Note>
         <Note at={readsAt} x={RIGHT_X} y={og.rowTop(NORM_ORDERS.rows.length) + h(36)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Denormalize: reads dominate,
             <span style={{ color: INK, opacity: ease(frame, warehouseAt - 2, 10) }}> like a warehouse</span>
           </span>

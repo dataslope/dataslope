@@ -245,7 +245,7 @@ export const AnyScene: React.FC = () => {
               <span
                 style={{
                   ...note(26, ACCENT_INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   display: "inline-block",
                   transformOrigin: "left center",
                   transform: `scale(${swell(frame, movesAt - 2 + r * 5, 0.16, 20)})`,

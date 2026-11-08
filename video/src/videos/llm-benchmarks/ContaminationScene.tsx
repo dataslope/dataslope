@@ -104,7 +104,7 @@ export const ContaminationScene: React.FC = () => {
               <span
                 style={{
                   ...note(26, A_INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   display: "inline-block",
                   transform: `scale(${1 + pulse(frame, sameAt + i * 4, 18) * 0.06})`,
                   transformOrigin: "0 50%",
@@ -132,7 +132,7 @@ export const ContaminationScene: React.FC = () => {
 
         {/* The case that proved it. */}
         <Ink at={sweAt - 4} dur={12} style={{ left: X0, top: y(690), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(26, INK), fontWeight: 700 }}>
+          <span style={{ ...label(26, INK), fontWeight: 600 }}>
             <Strike at={sweAt + 10}>SWE-bench Verified</Strike>
           </span>
         </Ink>

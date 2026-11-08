@@ -572,7 +572,7 @@ export const ErrorBox: React.FC<{
       }}
     >
       <div>
-        <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+        <span style={{ color: ACCENT_INK, fontWeight: 600 }}>ERROR:</span>
         {"  "}
         {message}
       </div>
@@ -597,7 +597,7 @@ export const Reply: React.FC<{ x: number; y: number; at: number; text: string; c
   children,
 }) => (
   <Ink at={at} dur={14} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18 }}>
-    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 700, color }}>{text}</span>
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color }}>{text}</span>
     {children ? <span style={{ ...note(22, INK_SOFT) }}>{children}</span> : null}
   </Ink>
 );
@@ -927,7 +927,7 @@ export const ColTag: React.FC<{ g: TableGeometry; col: number; at: number; color
   children,
 }) => (
   <Ink at={at} dur={12} out={out} style={{ left: g.xs[col] + PAD, top: g.top - 36, whiteSpace: "nowrap" }}>
-    <span style={{ ...label(20, color), fontWeight: 700 }}>{children}</span>
+    <span style={{ ...label(20, color), fontWeight: 600 }}>{children}</span>
   </Ink>
 );
 

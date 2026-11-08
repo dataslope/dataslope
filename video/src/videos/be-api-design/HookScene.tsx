@@ -128,14 +128,14 @@ export const HookScene: React.FC = () => {
 
         {/* The page's example: a blog's two resources. */}
         <Note at={blogAt} x={X0} y={blogTop}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>The example: a blog</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>The example: a blog</span>
         </Note>
         {[
           { name: "articles", sub: "the blog's posts", at: articlesAt, x: X0 },
           { name: "comments", sub: "on each article", at: commentsAt, x: X0 + 330 },
         ].map((r) => (
           <Note key={r.name} at={r.at} x={r.x} y={blogTop + h(50)}>
-            <div style={{ ...label(32, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{r.name}</div>
+            <div style={{ ...label(32, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{r.name}</div>
             <div style={{ ...note(22, INK_SOFT), marginTop: 4, whiteSpace: "nowrap" }}>{r.sub}</div>
           </Note>
         ))}
@@ -163,7 +163,7 @@ export const HookScene: React.FC = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     ...label(big ? 21 : 19, BLUE_INK),
-                    fontWeight: 700,
+                    fontWeight: 600,
                     opacity: p,
                     transform: `scale(${0.6 + 0.4 * p})`,
                   }}

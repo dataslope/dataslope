@@ -315,7 +315,7 @@ export const KindsScene: React.FC = () => {
             {ZIPS.zip}
           </span>
           {/* The size of the code beside it: emphasis is the color and the weight. */}
-          <span style={{ ...label(30, STAT_INK), fontWeight: 700, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
+          <span style={{ ...label(30, STAT_INK), fontWeight: 600, opacity: ease(frame, dontAt - 2, 10) }}>?</span>
         </div>
       ) : null}
     </AbsoluteFill>

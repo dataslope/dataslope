@@ -204,7 +204,7 @@ export const ShapScene: React.FC = () => {
                           ? `color-mix(in srgb, ${ACCENT} ${14 * idLit}%, transparent)`
                           : undefined,
                       ...(r === null
-                        ? { ...label(19, INK), fontWeight: 700 }
+                        ? { ...label(19, INK), fontWeight: 600 }
                         : r === "distinct"
                           ? { ...label(19, INK_SOFT), ...TABULAR }
                           : { ...note(21, INK), ...TABULAR }),
@@ -314,7 +314,7 @@ export const ShapScene: React.FC = () => {
                   top: top - h(3),
                   opacity: p,
                   ...label(19, isId ? ACCENT_INK : BLUE_INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   ...TABULAR,
                 }}
               >
@@ -339,7 +339,7 @@ export const ShapScene: React.FC = () => {
                   top: top + h(23),
                   opacity: q,
                   ...label(19, OK_INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   ...TABULAR,
                 }}
               >
@@ -477,7 +477,7 @@ export const ShapScene: React.FC = () => {
                         ? BLUE_INK
                         : INK,
                   ),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   ...TABULAR,
                   whiteSpace: "nowrap",
                 }}

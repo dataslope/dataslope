@@ -56,7 +56,7 @@ const Bill: React.FC<{
         overflow: "hidden",
       }}
     >
-      <span style={{ ...label(22, ink), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, at + 16, 10) }}>{text}</span>
+      <span style={{ ...label(22, ink), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, at + 16, 10) }}>{text}</span>
     </div>
   );
   return (
@@ -234,7 +234,7 @@ export const CostScene: React.FC = () => {
         {/* The day's bill: beside the listing, then across the page. */}
         <Bill x={bx} top={btop} px={bpx} input={COST.input} output={COST.output} at={inputAt + 4} height={barH} litInput={largerAt} />
         <Note at={leverAt + 20} x={X0} y={y(BAR_B.v) - 44}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             As written: <Num>{thousands(COST.daily)}</Num> USD a day
           </span>
         </Note>
@@ -250,7 +250,7 @@ export const CostScene: React.FC = () => {
               return (
                 <React.Fragment key={l.text}>
                   {i > 0 ? <span style={{ ...note(23, INK_SOFT), opacity: p }}>·</span> : null}
-                  <span style={{ ...note(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: p }}>{l.text}</span>
+                  <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: p }}>{l.text}</span>
                 </React.Fragment>
               );
             })}
@@ -279,7 +279,7 @@ export const CostScene: React.FC = () => {
 
         {/* Halve each side, against the original bill. */}
         <Note at={halvePAt - 2} x={X0} y={y(HALF_P) - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Halve the prompt</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Halve the prompt</span>
         </Note>
         <Bill
           x={X0}
@@ -297,7 +297,7 @@ export const CostScene: React.FC = () => {
           </span>
         </Note>
         <Note at={halveAAt - 2} x={X0} y={y(HALF_A) - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Halve the answer</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Halve the answer</span>
         </Note>
         <Bill
           x={X0}

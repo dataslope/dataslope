@@ -288,12 +288,12 @@ export const BuildScene: React.FC = () => {
       <Note at={avgAt} x={sx(X, WAIT_MU) + 14} y={y(428)} out={p1Out}>
         {/* One face and size on the line; the value carries weight and the accent. */}
         <span style={{ ...note(28, INK) }}>Average </span>
-        <span style={{ ...note(28, ACCENT_INK), fontWeight: 700 }}>{fmt(WAIT_MU)} min</span>
+        <span style={{ ...note(28, ACCENT_INK), fontWeight: 600 }}>{fmt(WAIT_MU)} min</span>
       </Note>
       <SpreadArrow from={sx(X, WAIT_MU)} to={sx(X, WAIT_MU + WAIT_SD)} y={y(546)} at={spreadAt - 2} out={p1Out} />
       <Note at={spreadAt + 2} x={sx(X, WAIT_MU) + 14} y={y(560)} out={p1Out}>
         <div style={{ ...note(25, INK) }}>
-          Spread <span style={{ fontWeight: 700, color: ACCENT_INK }}>{fmt(WAIT_SD)} min</span>
+          Spread <span style={{ fontWeight: 600, color: ACCENT_INK }}>{fmt(WAIT_SD)} min</span>
         </div>
         {/* What the spread is, under it: one size to a line. */}
         <div style={{ ...note(21, INK_SOFT), marginTop: 2 }}>one standard deviation</div>

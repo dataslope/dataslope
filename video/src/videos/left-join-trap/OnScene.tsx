@@ -110,7 +110,7 @@ export const OnScene: React.FC = () => {
         </Ink>
         <Ink at={backAt + 6} dur={14} style={{ position: "relative" }}>
           <span style={noteText(24)}>
-            {VANISHED.join(" and ")} match none, so their order columns are <Mono color={NULL_INK} weight={700}>NULL</Mono>.
+            {VANISHED.join(" and ")} match none, so their order columns are <Mono color={NULL_INK} weight={600}>NULL</Mono>.
           </span>
         </Ink>
       </div>

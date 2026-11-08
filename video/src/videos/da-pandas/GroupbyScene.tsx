@@ -227,7 +227,7 @@ export const GroupbyScene: React.FC = () => {
                   opacity: ease(frame, sumAt + 2 + p * 5, 10),
                 }}
               >
-                sum <span style={{ fontWeight: 700 }}>{GROUPBY.sum.rows[p][1]}</span>
+                sum <span style={{ fontWeight: 600 }}>{GROUPBY.sum.rows[p][1]}</span>
               </div>
               <KeyArrow
                 from={[PIECES_X + 470, pieceTops[p] + h(PIECE_LABEL) + (pieceRows[p].length * h(PIECE_ROW)) / 2]}

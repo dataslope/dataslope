@@ -225,8 +225,8 @@ export const LawScene: React.FC = () => {
           }}
         >
           {/* One line, one size: the numbers stand out by weight and color. */}
-          after <span style={{ color: INK, fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span> flips:{" "}
-          <span style={{ color: DATA_INK, fontWeight: 700, ...TABULAR }}>{head ? pct(head[1]) : ""}</span>
+          after <span style={{ color: INK, fontWeight: 600, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span> flips:{" "}
+          <span style={{ color: DATA_INK, fontWeight: 600, ...TABULAR }}>{head ? pct(head[1]) : ""}</span>
         </div>
       ) : null}
       <Note at={fiveAt} x={CH.x1 + 12} y={fy(0.5) - 15}>

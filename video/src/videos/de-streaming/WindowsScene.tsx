@@ -112,7 +112,7 @@ export const WindowsScene: React.FC = () => {
           ))}
         </svg>
         <Note at={figAt + 6} x={X0} y={axisY - h(16)}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>event time</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>event time</span>
         </Note>
         <Note at={endlessAt + 6} x={ex(37.5)} y={axisY - h(16)}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>… and on</span>
@@ -255,7 +255,7 @@ export const WindowsScene: React.FC = () => {
         </svg>
         {USERS.map((u, r) => (
           <Note key={u} at={sessionAt + r * 3} x={X0 + 170} y={y(SESSION_Y) + h(20) + r * h(48) - h(15)}>
-            <span style={{ ...label(21, USER_INK[u]), fontWeight: 700, whiteSpace: "nowrap" }}>{u}</span>
+            <span style={{ ...label(21, USER_INK[u]), fontWeight: 600, whiteSpace: "nowrap" }}>{u}</span>
           </Note>
         ))}
         <Note at={fiveGapAt + 6} x={NOTE_X} y={y(SESSION_Y) + h(6)}>
@@ -275,7 +275,7 @@ export const WindowsScene: React.FC = () => {
           </span>
         </Note>
         <Note at={sessionizeAt} x={NOTE_X} y={y(SESSION_Y) + h(150)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>how to sessionize users</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>how to sessionize users</span>
         </Note>
       </Drift>
     </AbsoluteFill>

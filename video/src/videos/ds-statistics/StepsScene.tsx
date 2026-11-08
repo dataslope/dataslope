@@ -149,7 +149,7 @@ export const StepsScene: React.FC = () => {
                   ...label(24),
                   // After label(), which sets its own color.
                   color: i < 2 && frame > beforeAt + 8 ? PAPER : BLUE_INK,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   ...TABULAR,
                 }}
               >

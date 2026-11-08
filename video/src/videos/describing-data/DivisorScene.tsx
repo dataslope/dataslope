@@ -121,7 +121,7 @@ export const DivisorScene: React.FC = () => {
 
       {/* The two divisors the headline asks about: one size, the right one in weight and color. */}
       <div style={{ position: "absolute", left: 1330, top: y(330), opacity: (1 - phaseB) * (1 - ease(frame, fiveAt - 4, 12)), whiteSpace: "nowrap", display: "flex", gap: 22, alignItems: "baseline" }}>
-        <span style={{ ...note(28, STAT_INK), fontWeight: 700, opacity: ease(frame, nineAt - 4, 12) }}>12 ÷ 9</span>
+        <span style={{ ...note(28, STAT_INK), fontWeight: 600, opacity: ease(frame, nineAt - 4, 12) }}>12 ÷ 9</span>
         <span style={{ ...note(28, INK_SOFT), opacity: ease(frame, tenAt - 4, 12) }}>not 12 ÷ 10</span>
       </div>
 
@@ -230,7 +230,7 @@ export const DivisorScene: React.FC = () => {
             style={{
               ...note(64, `color-mix(in srgb, ${INK} ${(away * 100).toFixed(1)}%, ${STAT_INK})`),
               ...TABULAR,
-              fontWeight: 700,
+              fontWeight: 600,
               marginTop: 6,
             }}
           >
@@ -355,7 +355,7 @@ export const DivisorScene: React.FC = () => {
               >
                 {/* One size across the line: the code in mono, the value in weight and color. */}
                 <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: INK }}>{c.code}</span>
-                <span style={{ ...note(26, STAT_INK), fontWeight: 700 }}>{fmt(c.value, 2)}</span>
+                <span style={{ ...note(26, STAT_INK), fontWeight: 600 }}>{fmt(c.value, 2)}</span>
                 <span style={{ ...note(26, INK_SOFT), opacity: ease(frame, c.noteAt - 4, 12) }}>
                   {i === 1 ? <Mark at={minusOneAt - 2}>{c.note}</Mark> : c.note}
                 </span>

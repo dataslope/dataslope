@@ -131,7 +131,7 @@ export const StrawScene: React.FC = () => {
         })}
         <Note at={wholeAt} x={VOC.x} y={rowY(VOCAB_ROWS.length) + 4}>
           <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 700 }}>·</span> marks a leading space
+            <span style={{ fontFamily: MONO, fontWeight: 600 }}>·</span> marks a leading space
           </span>
         </Note>
 
@@ -208,7 +208,7 @@ export const StrawScene: React.FC = () => {
         {/* The dot is the space: said, and labelled under it. */}
         <Note at={spaceAt + 8} x={WORD.x + 6} y={y(SPACED_Y) + 54}>
           <span style={{ ...note(22, FOCUS_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 700 }}>·</span> is the space
+            <span style={{ fontFamily: MONO, fontWeight: 600 }}>·</span> is the space
           </span>
         </Note>
 

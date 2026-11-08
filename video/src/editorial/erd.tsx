@@ -211,7 +211,7 @@ export const Entity: React.FC<{
                 display: badge ? undefined : "none",
                 flex: "none",
                 fontFamily: SANS,
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 19,
                 color: BLUE_INK,
                 whiteSpace: "nowrap",

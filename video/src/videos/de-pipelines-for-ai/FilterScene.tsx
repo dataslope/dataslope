@@ -171,7 +171,7 @@ export const FilterScene: React.FC = () => {
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <b>post-filter</b>: the ten nearest
             <span style={{ opacity: ease(frame, dropsAt - 2, 10) }}>, then drop the rest</span>
-            <span style={{ opacity: ease(frame, fewerAt - 2, 10), color: ACCENT_INK, fontWeight: 700 }}>: 0 of 10 left</span>
+            <span style={{ opacity: ease(frame, fewerAt - 2, 10), color: ACCENT_INK, fontWeight: 600 }}>: 0 of 10 left</span>
           </span>
         </Note>
         <Note at={preAt} x={SC.x} y={top + SC.h + 100}>
@@ -219,7 +219,7 @@ export const FilterScene: React.FC = () => {
           })}
         </svg>
         <Note at={emptyAt - 2} x={GRID.x} y={gridTop + 10 * (GRID.cell + GRID.gap) + 18}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Mark at={emptyAt + 4} color={MARK_BAD}>
               {num(empty)} of {num(total)} come back empty: {pct(FILTER.emptyShare)}
             </Mark>

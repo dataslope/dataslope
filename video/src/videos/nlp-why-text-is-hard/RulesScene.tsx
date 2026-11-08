@@ -75,7 +75,7 @@ export const RulesScene: React.FC = () => {
           }}
         />
         <Ink at={countsAt} dur={14} style={{ left: COL_X[0], top: y(ROW_Y[2] + 92), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK), fontWeight: 700 }}>This course: rules and counts</span>
+          <span style={{ ...label(24, INK), fontWeight: 600 }}>This course: rules and counts</span>
         </Ink>
 
         {/* Column heads */}

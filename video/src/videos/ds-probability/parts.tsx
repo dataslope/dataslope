@@ -2,7 +2,7 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { Illustration } from "../../components/Illustration";
 import { bob, ease, pop } from "../../components/motion";
-import { SERIF } from "../../editorial/fonts";
+import { TYPEFACES } from "../../editorial/typefaces";
 import { INK, INK_SOFT, PAPER, TABULAR, label } from "../../editorial/style";
 import { ds } from "../../theme/brand";
 import { ILLUSTRATIONS, VIDEO } from "./data";
@@ -45,9 +45,11 @@ export const DATA_LIGHT = ds("blue", 200);
 
 // ── Notation ─────────────────────────────────────────────────────────────────
 
-/** Notation in the page's serif, upright: P, E, Var, brackets, numbers. */
+/** Notation in Source Serif, upright: P, E, Var, brackets, numbers. Fixed to
+ *  Source Serif whatever face the page's titles use (typefaces.ts), since a
+ *  formula reads best in a serif. */
 export const math = (size: number, color: string = INK): React.CSSProperties => ({
-  fontFamily: SERIF,
+  fontFamily: TYPEFACES["source-serif"].family,
   fontSize: size,
   fontWeight: 450,
   color,
@@ -216,7 +218,7 @@ export const Card: React.FC<{
       }}
     >
       {face ? (
-        <span style={{ ...label(Math.round(w * 0.36), ink), ...TABULAR, fontWeight: 700 }}>{n}</span>
+        <span style={{ ...label(Math.round(w * 0.36), ink), ...TABULAR, fontWeight: 600 }}>{n}</span>
       ) : (
         <div
           style={{

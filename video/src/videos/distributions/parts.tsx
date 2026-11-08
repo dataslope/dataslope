@@ -485,4 +485,4 @@ export const Spot: React.FC<{
 };
 
 /** Shorthand for the house annotation in the ask color, bold. */
-export const askNote = (size = 23): React.CSSProperties => ({ ...note(size, ASK_INK), fontWeight: 700 });
+export const askNote = (size = 23): React.CSSProperties => ({ ...note(size, ASK_INK), fontWeight: 600 });

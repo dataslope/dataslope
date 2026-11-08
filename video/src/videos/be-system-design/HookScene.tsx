@@ -135,7 +135,7 @@ export const HookScene: React.FC = () => {
 
         {/* The plan: five questions on one design. */}
         <Ink at={fiveAt} dur={14} style={{ left: X0, top: chipY - 76 }}>
-          <span style={{ ...note(28, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Five questions,{" "}
             <span style={{ color: BLUE_INK, opacity: ease(frame, oneAt, 10) }}>one design</span>
           </span>
@@ -177,7 +177,7 @@ export const HookScene: React.FC = () => {
                     opacity: lit,
                   }}
                 />
-                <span style={{ position: "relative", ...note(30, ACCENT_INK), fontWeight: 700 }}>{c.n}</span>
+                <span style={{ position: "relative", ...note(30, ACCENT_INK), fontWeight: 600 }}>{c.n}</span>
                 <span style={{ position: "relative", ...note(30, INK), fontWeight: 650 }}> {c.word}</span>
               </span>
             </div>

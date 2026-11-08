@@ -107,7 +107,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
           <React.Fragment key={g.name}>
             {i ? <div style={{ ...note(34, INK_SOFT), margin: "50px 44px 0", opacity: ease(frame, g.at, 10) }}>×</div> : null}
             <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "stretch" }}>
-              <div style={{ ...label(21, INK_SOFT), fontWeight: 700, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
+              <div style={{ ...label(21, INK_SOFT), fontWeight: 600, opacity: ease(frame, g.at - 2, 10), whiteSpace: "nowrap" }}>{g.name}</div>
               {g.values.map((v, j) => (
                 <Chip key={v} at={g.at + 2 + j * 3}>
                   {v}
@@ -125,7 +125,7 @@ const Junk: React.FC<{ c: Ctx }> = ({ c }) => {
         </div>
       </div>
       <Note at={oneAt} x={R_X} y={c.y(660)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           the fact carries one <QMono>junk_key</QMono> instead of three columns
         </span>
       </Note>
@@ -238,15 +238,15 @@ const Mini: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>age band, income tier: change often</span>
       </Note>
       <Note at={twentyAt} x={dimD.x} y={dimD.bottom + c.h(14)}>
-        <span style={{ ...note(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           <Num>5</Num> bands × <Num>4</Num> tiers = <Num>{RAPID.mini}</Num> rows
         </span>
       </Note>
       <Note at={t4At} x={dimD.x} y={dimD.bottom + c.h(56)}>
-        <span style={{ ...note(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Kimball&rsquo;s SCD Type 4</span>
+        <span style={{ ...note(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Kimball&rsquo;s SCD Type 4</span>
       </Note>
       <Note at={stopsAt} x={R_X} y={fact.bottom + c.h(30)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           no new customer version
           <br />
           when a band changes
@@ -331,7 +331,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
         {/* The key's value as the house's badge, at 24px: within 12% of
             the 22px name and the 24px bytes on its line. */}
         <span style={{ ...badgeStyle("gray", 24), fontFamily: MONO }}>{value}</span>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 700, opacity: ease(frame, bytesAt, 10) }}>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 600, opacity: ease(frame, bytesAt, 10) }}>
           {kind ? `${kind}, ` : ""}
           <Num>{bytes}</Num> bytes
         </span>
@@ -396,7 +396,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
                 display: "flex",
                 alignItems: "center",
                 ...note(23, b.ink),
-                fontWeight: 700,
+                fontWeight: 600,
                 whiteSpace: "nowrap",
                 opacity: ease(frame, b.at + 10, 10),
               }}
@@ -421,7 +421,7 @@ const Uuid: React.FC<{ c: Ctx }> = ({ c }) => {
             {/* A bracket under the stretch of bar it explains. */}
             <div style={{ height: 8, borderLeft: `2px solid ${sp.ink}`, borderRight: `2px solid ${sp.ink}`, borderBottom: `2px solid ${sp.ink}` }} />
             <div style={{ position: "absolute", left: "50%", top: 14, transform: "translateX(-50%)", textAlign: "center", whiteSpace: "nowrap" }}>
-              <div style={{ ...label(20, sp.ink), fontWeight: 700 }}>{sp.head}</div>
+              <div style={{ ...label(20, sp.ink), fontWeight: 600 }}>{sp.head}</div>
               <div style={{ ...label(20, sp.ink), fontWeight: 600, opacity: ease(frame, sp.lit, 10) }}>
                 <Num>{sp.ratio.toFixed(2)}</Num>×
               </div>
@@ -509,7 +509,7 @@ export const RapidScene: React.FC = () => {
           </Note>
         ))}
         <Note at={codeAt} x={R_X} y={y(600)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Loading the model takes code.</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Loading the model takes code.</span>
         </Note>
         <NextLine at={nextAt} x={R_X} y={y(690)} width={520}>
           Python for data engineering

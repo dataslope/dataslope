@@ -161,7 +161,7 @@ export const DijkScene: React.FC = () => {
         <Line at={edgeAt} x={140} y={y(790)} size={24}>
           <Num>E</Num> edges, each a heap push of log V
         </Line>
-        <Line at={timesAt} x={140} y={y(838)} size={30} weight={700} color={OK_INK}>
+        <Line at={timesAt} x={140} y={y(838)} size={30} weight={600} color={OK_INK}>
           O((V + E) log V)
         </Line>
 
@@ -207,7 +207,7 @@ export const DijkScene: React.FC = () => {
           </span>
           <span style={{ ...note(24, INK), fontWeight: 650, whiteSpace: "nowrap" }}>
             Finalize a node when it leaves the heap:
-            <span style={{ color: ACCENT_INK, fontWeight: 700, opacity: ease(frame, wrongAt, 10) }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 600, opacity: ease(frame, wrongAt, 10) }}>
               {" "}
               B = <Num>{st.B}</Num>
               <span style={{ opacity: ease(frame, soDAt, 10) }}>
@@ -218,7 +218,7 @@ export const DijkScene: React.FC = () => {
         </div>
         <div style={{ position: "absolute", left: 1060, top: y(748), display: "flex", alignItems: "center", gap: 12, fontSize: 24, opacity: ease(frame, bfAt, 10) }}>
           <Tick at={bfAt} size={24} />
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Bellman-Ford: B = <Num>{bf.B}</Num>, D = <Num>{bf.D}</Num>
           </span>
         </div>

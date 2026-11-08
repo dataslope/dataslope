@@ -164,13 +164,13 @@ export const SpofScene: React.FC = () => {
         <Arrow points={between(B.app2, cacheB)} at={cacheReplAt + 16} />
 
         {/* What a single point of failure is. */}
-        <Line x={X0} y={y(300)} at={anyAt} size={26} weight={700}>
+        <Line x={X0} y={y(300)} at={anyAt} size={26} weight={600}>
           Single point of failure
         </Line>
         <Line x={X0} y={y(300) + 56} at={anyAt + 6} size={24} color={INK_SOFT} width={LEFT_W}>
           any component whose failure takes the system down
         </Line>
-        <Line x={X0} y={y(300) + 160} at={threeAt} size={26} weight={700} color={ACCENT_INK}>
+        <Line x={X0} y={y(300) + 160} at={threeAt} size={26} weight={600} color={ACCENT_INK}>
           <Num>3</Num> in this diagram
         </Line>
         <Line x={X0} y={y(716)} at={everyAt} size={24} weight={650} color={ACCENT_INK} width={340} out={redundAt}>
@@ -178,7 +178,7 @@ export const SpofScene: React.FC = () => {
         </Line>
 
         {/* The fixes, ticked as they are said. */}
-        <Line x={RX} y={y(300)} at={redundAt} size={26} weight={700} width={330}>
+        <Line x={RX} y={y(300)} at={redundAt} size={26} weight={600} width={330}>
           Remove each with redundancy
         </Line>
         {fixes.map((f, i) => (
@@ -190,7 +190,7 @@ export const SpofScene: React.FC = () => {
         <Line x={RX} y={y(300) + 112 + 4 * 54 + 4} at={dcAt} size={21} color={INK_SOFT} width={330}>
           separate data centers in one region
         </Line>
-        <Line x={RX} y={y(700)} at={noneAt} size={28} weight={700} color={OK_INK} width={330}>
+        <Line x={RX} y={y(700)} at={noneAt} size={28} weight={600} color={OK_INK} width={330}>
           No single machine&apos;s death causes an outage.
         </Line>
         <Line x={RX} y={y(700) - 44} at={goalAt} size={24} weight={650} color={INK_SOFT}>

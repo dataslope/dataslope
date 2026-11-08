@@ -145,7 +145,7 @@ export const EtlScene: React.FC = () => {
           }}
         />
         <Note at={rawAt} x={WH.x + 18} y={WH.top + 8}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>warehouse</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>warehouse</span>
         </Note>
         <Flow points={[[SRC_X + SRC_W + 6, lmid], [raw.x - 8, lmid]]} at={rawAt} color={BAR} />
         <Node x={raw.x} y={ly + h(8)} w={raw.w} h={BOX_H} at={rawAt + 4} title="raw tables" sub="as loaded" lit={rawLit} />
@@ -175,7 +175,7 @@ export const EtlScene: React.FC = () => {
           width={3}
         />
         <Note at={logicAt} x={raw.x} y={WH.top + WH.hgt + h(52)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             logic changed: transform again
             <span style={{ opacity: ease(frame, noExtractAt, 10) }}>, no new extract</span>
           </span>

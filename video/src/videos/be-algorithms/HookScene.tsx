@@ -99,9 +99,9 @@ export const HookScene: React.FC = () => {
         {/* Fast, while the hundred fills the box. */}
         <div style={{ position: "absolute", left: SQ_X + DOTS * PITCH + 24, top: top + 90, display: "flex", alignItems: "center", gap: 10, fontSize: 26, opacity: ease(frame, fastAt, 10) * (1 - ease(frame, millionAt, 10)) }}>
           <Tick at={fastAt} size={28} />
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>fast</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>fast</span>
         </div>
-        <Line at={millionAt + 28} x={SQ_X + 26} y={top + 10} size={22} weight={700}>
+        <Line at={millionAt + 28} x={SQ_X + 26} y={top + 10} size={22} weight={600}>
           <span style={halo}>← the hundred</span>
         </Line>
 
@@ -113,7 +113,7 @@ export const HookScene: React.FC = () => {
         </Line>
         <div style={{ position: "absolute", left: CHIP_X, top: top + 76, display: "flex", gap: 14, fontSize: 26, whiteSpace: "nowrap" }}>
           {STRUCTS.map((st, i) => (
-            <span key={st} style={{ ...note(26, BLUE_INK), fontWeight: 700, opacity: ease(frame, structureAt + 6 + i * 5, 10) }}>
+            <span key={st} style={{ ...note(26, BLUE_INK), fontWeight: 600, opacity: ease(frame, structureAt + 6 + i * 5, 10) }}>
               {i ? <span style={{ color: INK_SOFT, fontWeight: 500, marginRight: 14 }}>·</span> : null}
               {st}
             </span>
@@ -121,7 +121,7 @@ export const HookScene: React.FC = () => {
         </div>
 
         {/* The round. */}
-        <Line at={thirtyAt - 2} x={CHIP_X} y={top + 236} size={30} weight={700}>
+        <Line at={thirtyAt - 2} x={CHIP_X} y={top + 236} size={30} weight={600}>
           <span style={{ color: BLUE_INK }}>
             <Num>35</Num> questions
           </span>

@@ -327,7 +327,7 @@ export const MarketScene: React.FC = () => {
           <span style={{ ...note(21, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>line at {int(OVERSIZED.threshold)}</span>
         </Note>
         <Note at={dollarAt - 4} x={F6_X} y={y(AXIS_Y + 50)}>
-          <span style={{ ...note(27, POINT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, POINT_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
             <Marked at={sheetAt - 2}>{usd(OVERSIZED.above)}</Marked>
             <span style={{ ...note(25, INK), fontWeight: 500 }}>
               : all {int(OVERSIZED.tokens)} tokens at {gpt6.inMult}x

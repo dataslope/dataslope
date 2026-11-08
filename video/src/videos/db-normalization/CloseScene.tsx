@@ -87,7 +87,7 @@ export const CloseScene: React.FC = () => {
             <Ink key={f.name} at={rulesAt + k * 6} dur={14} style={{ left: X0 + k * 420, top: y(560), whiteSpace: "nowrap" }}>
               <span style={{ display: "inline-flex", alignItems: "baseline", gap: 12 }}>
                 {/* 24px, within 12% of the 22px gist on its line. */}
-                <span style={{ ...label(24, BLUE_INK), fontWeight: 700 }}>{f.name}</span>
+                <span style={{ ...label(24, BLUE_INK), fontWeight: 600 }}>{f.name}</span>
                 <span style={{ ...note(22, INK) }}>{f.gist}</span>
               </span>
             </Ink>

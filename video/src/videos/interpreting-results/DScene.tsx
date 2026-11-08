@@ -182,7 +182,7 @@ export const DScene: React.FC = () => {
             transform: "translateX(-50%)",
             opacity: ease(frame, oneAt - 4, 10),
             ...note(26, STAT_INK),
-            fontWeight: 700,
+            fontWeight: 600,
             whiteSpace: "nowrap",
             ...halo,
           }}
@@ -262,7 +262,7 @@ export const DScene: React.FC = () => {
               }}
             />
             <Ink at={at[i] - 4} dur={12} style={{ left: TABLE_X + COLS[0], top: rowY + 6, whiteSpace: "nowrap" }}>
-              <span style={{ ...note(30, INK), fontWeight: 700 }}>{fmt(o.d, 1)}</span>
+              <span style={{ ...note(30, INK), fontWeight: 600 }}>{fmt(o.d, 1)}</span>
             </Ink>
             <Ink at={at[i] + 2} dur={12} style={{ left: TABLE_X + COLS[1], top: rowY + 2, whiteSpace: "nowrap", opacity: 1 - startDim }}>
               <span style={{ ...body(34, true), color: INK }}>{o.label}</span>
@@ -272,7 +272,7 @@ export const DScene: React.FC = () => {
               dur={12}
               style={{ left: TABLE_X + COLS[2], top: rowY + 6, whiteSpace: "nowrap" }}
             >
-              <span style={{ ...note(30, i === 2 ? STAT_INK : INK), fontWeight: 700 }}>
+              <span style={{ ...note(30, i === 2 ? STAT_INK : INK), fontWeight: 600 }}>
                 {i === 2 ? <Marker at={thirdsAt - 2}>{Math.round(o.shared * 100)}%</Marker> : `${Math.round(o.shared * 100)}%`}
               </span>
             </Ink>

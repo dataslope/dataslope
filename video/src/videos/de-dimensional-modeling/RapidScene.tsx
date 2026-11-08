@@ -79,10 +79,10 @@ const Conformed: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={sameAt} x={R_X} y={c.y(780)}>
-        <span style={{ ...note(25, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>same keys, same values</span>
+        <span style={{ ...note(25, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>same keys, same values</span>
       </Note>
       <Note at={drillAt} x={R_X} y={c.y(830)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           drill across:
           <span style={{ opacity: ease(frame, lineAt, 10) }}> the days line up</span>
         </span>
@@ -147,7 +147,7 @@ const Wide: React.FC<{ c: Ctx }> = ({ c }) => {
       <Relation name="narrow-city" points={[customers.anchor("right", "customer_id"), cityT.anchor("left", "customer_id")]} from="exactly-one" to="zero-or-one" at={joinsAt + 2} />
       <Relation name="narrow-plan" points={toPlan} from="exactly-one" to="zero-or-one" at={joinsAt + 8} />
       <Note at={colAt} x={R_X} y={c.y(896)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Columnar warehouses handle wide tables well.</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Columnar warehouses handle wide tables well.</span>
       </Note>
     </>
   );
@@ -188,7 +188,7 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={planAt} x={R_X} y={c.y(352)}>
-        <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           Bus matrix <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>· the plan</span>
         </span>
       </Note>
@@ -207,7 +207,7 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
             alignItems: "center",
             justifyContent: "center",
             ...label(22, BLUE_INK),
-            fontWeight: 700,
+            fontWeight: 600,
             opacity: ease(frame, acrossAt + j * 3, 10),
           }}
         >
@@ -246,7 +246,7 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
               display: "flex",
               alignItems: "center",
               ...label(23, INK),
-              fontWeight: 700,
+              fontWeight: 600,
               opacity: ease(frame, downAt + i * 3, 10),
             }}
           >
@@ -278,7 +278,7 @@ const Bus: React.FC<{ c: Ctx }> = ({ c }) => {
         }}
       />
       <Note at={martAt} x={R_X} y={rowTop(PROCESSES.length) + c.h(28)}>
-        <span style={{ ...label(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           Data mart <span style={{ ...note(24, INK_SOFT), fontWeight: 500 }}>· what gets built</span>
         </span>
       </Note>
@@ -336,7 +336,7 @@ const DateDim: React.FC<{ c: Ctx }> = ({ c }) => {
         marks={[]}
       />
       <Note at={oneJoinAt + 4} x={g.right + 40} y={g.top + c.h(30)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           one join,
           <br />
           no date math
@@ -414,10 +414,10 @@ const Metric: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* The two teams side by side, a hairline between them. */}
       <ColumnRule x={R_X + TEAM_RULE} top={c.y(680)} height={TEAM_H} at={teams[1].at} />
       <Note at={teamsAt} x={R_X} y={c.y(800)}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>one name, two numbers</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>one name, two numbers</span>
       </Note>
       <Note at={onceAt} x={R_X} y={c.y(850)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER }}>Define each metric once, in the semantic layer.</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap", background: PAPER }}>Define each metric once, in the semantic layer.</span>
       </Note>
     </>
   );
@@ -483,7 +483,7 @@ export const RapidScene: React.FC = () => {
           </span>
         </Note>
         <Note at={historyAt} x={X0} y={listBottom + h(128)}>
-          <span style={{ ...note(26, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>The model has to keep history.</span>
+          <span style={{ ...note(26, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>The model has to keep history.</span>
         </Note>
         <NextLine at={nextAt} x={X0} y={listBottom + h(184)} width={900}>
           modeling history

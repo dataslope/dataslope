@@ -150,7 +150,7 @@ export const LimitScene: React.FC = () => {
 
         {/* The contract: an example 429 and its headers. */}
         <Note at={halfAt} x={X0} y={cardTop - h(44)}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             The client's half: a contract <span style={{ color: INK_SOFT, fontWeight: 600 }}>· an example response</span>
           </span>
         </Note>
@@ -168,7 +168,7 @@ export const LimitScene: React.FC = () => {
 
         {/* A well-behaved client: watching what's remaining, slowing down. */}
         <Note at={watchesAt} x={R_X} y={gTop}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Requests, as <span style={{ fontFamily: MONO, fontWeight: 600 }}>Remaining</span> runs low:{" "}
             <span style={{ color: BLUE_INK }}>
               <Num>{remaining}</Num> left
@@ -188,7 +188,7 @@ export const LimitScene: React.FC = () => {
 
         {/* After a refusal: Retry-After, then doubling, each with jitter. */}
         <Note at={on429At} x={R_X} y={wTop}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             After a 429, it waits <span style={{ fontFamily: MONO, fontWeight: 600 }}>Retry-After</span>
             <span style={{ opacity: ease(frame, doublesAt, 10) }}>, then doubles the wait</span>
           </span>
@@ -206,7 +206,7 @@ export const LimitScene: React.FC = () => {
                 <line x1={x} y1={top - 8} x2={x} y2={top + 34} stroke={ACCENT} strokeWidth={2.6} />
               </svg>
               <Note at={at - 2} x={x - 18} y={top - h(34)}>
-                <span style={{ fontFamily: MONO, fontSize: 19, fontWeight: 700, color: ACCENT_INK }}>429</span>
+                <span style={{ fontFamily: MONO, fontSize: 19, fontWeight: 600, color: ACCENT_INK }}>429</span>
               </Note>
               <div style={{ position: "absolute", left: x + 4, top, width: Math.max(0, len - 4) * grow, height: 26, background: BAR, borderRadius: 4 }} />
               <div
@@ -247,7 +247,7 @@ export const LimitScene: React.FC = () => {
 
         {/* Timeouts and 5xx: repeat only what is safe. */}
         <Note at={sameAt} x={X0} y={safeTop}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             The same backoff after a timeout or a 5xx
             <span style={{ color: INK_SOFT, fontWeight: 600, opacity: ease(frame, cantAt, 10) }}>, where the outcome is unknown</span>
           </span>
@@ -260,7 +260,7 @@ export const LimitScene: React.FC = () => {
           return (
             <div key={c.t} style={{ position: "absolute", left: x, top: safeTop + h(46), display: "flex", alignItems: "center", gap: 10, fontSize: 23, opacity: ease(frame, c.at, 10) }}>
               {c.ok ? <Tick at={c.at + 2} size={24} /> : <Cross at={c.at + 2} size={22} />}
-              <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 700, color: c.ok ? METHOD_INK : ACCENT_INK, whiteSpace: "nowrap" }}>
+              <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: c.ok ? METHOD_INK : ACCENT_INK, whiteSpace: "nowrap" }}>
                 {c.t.startsWith("POST +") ? (
                   <>
                     POST<span style={{ color: OK_INK }}> + Idempotency-Key</span>

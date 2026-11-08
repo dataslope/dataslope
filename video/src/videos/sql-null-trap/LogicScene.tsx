@@ -233,7 +233,7 @@ export const LogicScene: React.FC = () => {
       <Note at={isUnknownAt} x={colLeft(2)} y={y(NOTE_Y)} from="up" width={COL_W}>
         <span style={note(20, INK_SOFT)}>
           Postgres returns{" "}
-          <Mono color={UNKNOWN_INK} weight={700}>
+          <Mono color={UNKNOWN_INK} weight={600}>
             NULL
           </Mono>
         </span>

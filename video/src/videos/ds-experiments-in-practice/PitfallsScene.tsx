@@ -51,7 +51,7 @@ export const PitfallsScene: React.FC = () => {
           What are the common A/B testing pitfalls?
         </QuestionCard>
         <div style={{ position: "absolute", left: X0, top: y(TOP) - h(46), opacity: ease(frame, fiveAt - 2, 12) }}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Five that come up again and again</span>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Five that come up again and again</span>
         </div>
 
         {PITFALLS.map((p, i) => {

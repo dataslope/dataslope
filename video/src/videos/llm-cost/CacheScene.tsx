@@ -209,7 +209,7 @@ export const CacheScene: React.FC = () => {
         return (
           <React.Fragment key={r.name}>
             <Ink at={r.at} dur={12} style={{ left: X0, top: ry - 2, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(25, r.ink), fontWeight: 700 }}>{r.name}</span>
+              <span style={{ ...label(25, r.ink), fontWeight: 600 }}>{r.name}</span>
             </Ink>
             <HBar x={PRICE_X} y={ry} w={r.w} h={h(32)} at={r.at + 2} dur={16} fill={r.fill} />
             <Note at={r.valueAt - 4} x={PRICE_X + r.w + 16} y={ry + h(16) - 18}>

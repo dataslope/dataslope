@@ -332,7 +332,7 @@ export const TreeScene: React.FC = () => {
           <span
             style={{
               ...note(24, OK_INK),
-              fontWeight: 700,
+              fontWeight: 600,
               whiteSpace: "nowrap",
               ...TABULAR,
             }}

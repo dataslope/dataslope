@@ -189,7 +189,7 @@ export const SplitScene: React.FC = () => {
               top: top + (splitY(i) - top) * split - 38,
               opacity: ease(frame, splitAt + 6, 10) * (1 - whatIf * 0.6),
               ...note(28, STAT_INK),
-              fontWeight: 700,
+              fontWeight: 600,
               whiteSpace: "nowrap",
             }}
           >
@@ -278,7 +278,7 @@ export const SplitScene: React.FC = () => {
             the answer is the line's own Inter, in the accent and bold. */}
         <span style={{ ...note(30, INK) }}>
           ≈ {STREAK.ten.toFixed(4).replace(/0+$/, "")}, about{" "}
-          <span style={{ color: STAT_INK, fontWeight: 700 }}>
+          <span style={{ color: STAT_INK, fontWeight: 600 }}>
             <Sweep at={oneInAt}>1 in 1,000</Sweep>
           </span>
         </span>

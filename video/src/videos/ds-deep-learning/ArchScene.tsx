@@ -120,7 +120,7 @@ export const ArchScene: React.FC = () => {
           <Note key={t.head} at={t.at - 2} x={PANELS[i]} y={y(TOP)}>
             {/* One line, one size: the name in weight, what it stands for in
                 the softer ink. */}
-            <span style={{ ...note(28, INK), fontWeight: 700, whiteSpace: "nowrap" }}>{t.head}</span>
+            <span style={{ ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{t.head}</span>
             {t.what ? <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>{`  ${t.what}`}</span> : null}
           </Note>
         ))}

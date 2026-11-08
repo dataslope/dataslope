@@ -108,7 +108,7 @@ export const JitterScene: React.FC = () => {
           const shown = ease(frame, pnl.key === "plain" ? modelAt : randAt - 4, 12);
           return (
             <React.Fragment key={pnl.key}>
-              <div style={{ position: "absolute", left: pnl.x, top: y(328), ...note(28, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: shown }}>{pnl.title}</div>
+              <div style={{ position: "absolute", left: pnl.x, top: y(328), ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: shown }}>{pnl.title}</div>
               <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: shown }}>
                 {[0, 100, 200, 300].map((v) => (
                   <g key={v}>
@@ -208,7 +208,7 @@ export const JitterScene: React.FC = () => {
 
         {/* The numbers. */}
         <Note at={sameAt} x={msX(PANELS[0].x, plainSpikes[0]) - 6} y={vy(Y_MAX) - h(46)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{count(STORM.peakPlain)}</Num> in one 100 ms
           </span>
         </Note>
@@ -218,12 +218,12 @@ export const JitterScene: React.FC = () => {
           </span>
         </Note>
         <Note at={peakAt + 6} x={bx(PANELS[1].x, peakIdx) - 8} y={vy(STORM.peakJitter) - h(34)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             peak <Num>{STORM.peakJitter}</Num>
           </span>
         </Note>
         <Note at={thirdAt + 4} x={msX(PANELS[1].x, round3.to) + 12} y={vy(STORM.capacity) + h(14)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{round3.jitterPeak}</Num>: under <Num>{STORM.capacity}</Num>
           </span>
         </Note>

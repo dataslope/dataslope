@@ -126,7 +126,7 @@ export const HookScene: React.FC = () => {
       </Note>
       <Bracket x0={BILL_X + ghostW + 2} x1={BILL_X + realW} y={rowY(1) - 20} at={doubleAt + 6} color={POINT} tick={10} />
       <Note at={doubleAt + 10} x={(BILL_X + ghostW + BILL_X + realW) / 2 - 8} y={rowY(1) - 62} from="up">
-        <span style={{ ...note(30, POINT_INK), fontWeight: 700 }}>?</span>
+        <span style={{ ...note(30, POINT_INK), fontWeight: 600 }}>?</span>
       </Note>
     </AbsoluteFill>
   );

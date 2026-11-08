@@ -132,7 +132,7 @@ export const IdemScene: React.FC = () => {
 
         {/* Without a key: three POSTs, three rows. */}
         <Note at={runAt} x={X0} y={labelTop}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Without a key <span style={{ color: INK_SOFT, fontWeight: 600 }}>· the amount in cents: 5000 is $50.00</span>
           </span>
         </Note>
@@ -147,15 +147,15 @@ export const IdemScene: React.FC = () => {
           <span style={{ ...note(22, ACCENT_INK), whiteSpace: "nowrap" }}>its reply lost</span>
         </Note>
         <Note at={threeAt} x={plainG.right + 30} y={plainG.rowTop(1) + h(4)}>
-          <div style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(26, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{IDEM.unkeyed.charges}</Num> charges
           </div>
-          <div style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, hundredAt, 10) }}>{dollars(IDEM.unkeyed.cents)}</div>
+          <div style={{ ...note(26, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, hundredAt, 10) }}>{dollars(IDEM.unkeyed.cents)}</div>
         </Note>
 
         {/* With a key: one row, and the retries get payment 1 back. */}
         <Note at={fixAt} x={R_X} y={labelTop}>
-          <span style={{ ...label(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>With an idempotency key</span>
+          <span style={{ ...label(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>With an idempotency key</span>
         </Note>
         <Msg
           x={R_X}
@@ -176,17 +176,17 @@ export const IdemScene: React.FC = () => {
           </Note>
         ))}
         <Note at={requestsAt} x={1500} y={attemptsTop}>
-          <div style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <div style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>3</Num> requests
           </div>
-          <div style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, oneAt, 10) }}>
+          <div style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, oneAt, 10) }}>
             <Num>{IDEM.keyedTotal.charges}</Num> charge, {dollars(IDEM.keyedTotal.cents)}
           </div>
         </Note>
 
         {/* A racing duplicate, refused by the unique constraint. */}
         <Note at={safeAt} x={X0} y={raceTop}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             What makes it safe: <span style={{ fontFamily: MONO, fontWeight: 600 }}>idempotency_key</span> is <span style={{ color: OK_INK }}>UNIQUE</span>
           </span>
         </Note>

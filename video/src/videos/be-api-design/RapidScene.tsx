@@ -56,7 +56,7 @@ const Naming: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>no verbs in paths: the method is the verb</span>
       </Note>
       <Note at={actionAt} x={R_X} y={top + c.h(266)}>
-        <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>An action becomes a state change</span>
+        <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>An action becomes a state change</span>
       </Note>
       <Msg x={R_X} y={top + c.h(310)} w={460} at={patchAt} tone="ok" lines={[{ t: "PATCH /articles/42" }, { t: '{"status": "published"}' }]} />
     </>
@@ -95,7 +95,7 @@ const Blog: React.FC<{ c: Ctx }> = ({ c }) => {
       {BLOG.map(([m, p, what], i) => (
         <Note key={i} at={rowAt(i)} x={R_X} y={top + 6 + i * rowH}>
           <div style={{ position: "relative", width: 900, height: rowH, fontSize: TABLE_SIZE }}>
-            <span style={{ position: "absolute", left: cols[0] - R_X, fontFamily: MONO, fontSize: TABLE_SIZE, fontWeight: 700, color: METHOD_INK }}>{m}</span>
+            <span style={{ position: "absolute", left: cols[0] - R_X, fontFamily: MONO, fontSize: TABLE_SIZE, fontWeight: 600, color: METHOD_INK }}>{m}</span>
             <span style={{ position: "absolute", left: cols[1] - R_X, fontFamily: MONO, fontSize: TABLE_SIZE, color: INK, whiteSpace: "pre" }}>{p}</span>
             <span style={{ position: "absolute", left: cols[2] - R_X, ...note(TABLE_SIZE, INK_SOFT), whiteSpace: "nowrap" }}>{what}</span>
           </div>
@@ -140,7 +140,7 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={pathAt} x={R_X} y={top}>
-        <span style={{ fontFamily: MONO, fontSize: 40, fontWeight: 700, color: INK, whiteSpace: "nowrap" }}>
+        <span style={{ fontFamily: MONO, fontSize: 40, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>
           <span style={{ color: METHOD_INK }}>GET</span> /<Mark at={pathAt + 6}>v1</Mark>/orders
         </span>
       </Note>
@@ -148,7 +148,7 @@ const Version: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>the most visible, the default</span>
       </Note>
       <Note at={protectAt} x={R_X} y={body - c.h(44)}>
-        <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>An order, as v1 clients read it</span>
+        <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>An order, as v1 clients read it</span>
       </Note>
       <Note at={protectAt} x={R_X} y={body}>
         <div style={{ borderTop: `2px solid ${INK}`, borderBottom: `1px solid ${HAIRLINE}`, background: LISTING_PAPER, padding: "6px 22px", width: 820, fontFamily: MONO, fontSize: 24, lineHeight: "38px" }}>
@@ -310,7 +310,7 @@ const Content: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <Note at={encodingAt} x={R_X} y={barTop - c.h(48)}>
-        <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>This page of 20 articles, as JSON</span>
+        <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>This page of 20 articles, as JSON</span>
       </Note>
       <div style={{ position: "absolute", left: R_X, top: barTop, width: fullW * ease(frame, encodingAt + 4, 18), height: 30, background: BAR, borderRadius: 4 }} />
       <Note at={encodingAt + 14} x={R_X} y={barTop + 40}>

@@ -189,7 +189,7 @@ export const BlendScene: React.FC = () => {
       {TOKENS.map((t, i) => {
         const hotA = i === 0 ? 1 - ease(frame, runAt, 10) : 0;
         const hotB = i === 1 ? ease(frame, fourSevenAt - 2, 10) : 0;
-        const numStyle: React.CSSProperties = { fontFamily: MONO, fontWeight: 700, fontSize: NUM, color: INK, ...TABULAR };
+        const numStyle: React.CSSProperties = { fontFamily: MONO, fontWeight: 600, fontSize: NUM, color: INK, ...TABULAR };
         return (
           <Fade key={t} at={from + 4 + i * 3} style={{ left: 0, top: rowY(i), width: 1300, height: 60 }}>
             <div style={{ position: "absolute", left: M.chip, top: 4 }}>
@@ -243,7 +243,7 @@ export const BlendScene: React.FC = () => {
           {line ? (
             <>
               <Swap a={blendLines(A)[1].split("=")[0]} b={blendLines(B)[1].split("=")[0]} swapAt={swingsAt - 4} />
-              <span style={{ opacity: ease(frame, addedAt - 2, 10), color: POINT_INK, fontWeight: 700 }}>
+              <span style={{ opacity: ease(frame, addedAt - 2, 10), color: POINT_INK, fontWeight: 600 }}>
                 = <Swap a={pair(A.output2, (x) => x.toFixed(2))} b={pair(B.output2, (x) => x.toFixed(2))} swapAt={swingsAt + 20} />
               </span>
             </>

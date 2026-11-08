@@ -142,7 +142,7 @@ const SignBadge: React.FC<{ at: number; color: string; children: React.ReactNode
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
   return (
-    <span style={{ ...note(22, color), ...TABULAR, fontWeight: 700, opacity: p, transform: `translateY(${(1 - p) * 6}px)`, display: "inline-block" }}>
+    <span style={{ ...note(22, color), ...TABULAR, fontWeight: 600, opacity: p, transform: `translateY(${(1 - p) * 6}px)`, display: "inline-block" }}>
       {children}
     </span>
   );
@@ -185,7 +185,7 @@ const ReviewRow: React.FC<{
               }
               below={
                 scored ? (
-                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, at + k * 2 + 8, 10) }}>
+                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 600, opacity: ease(frame, at + k * 2 + 8, 10) }}>
                     {signed(s.polarity)}
                   </span>
                 ) : isNot ? (
@@ -196,7 +196,7 @@ const ReviewRow: React.FC<{
           );
         })}
       </TokenRow>
-      <div style={{ position: "absolute", left: SUM_X, top: top + 4, ...note(30, INK), ...TABULAR, fontWeight: 700, opacity: sum }}>
+      <div style={{ position: "absolute", left: SUM_X, top: top + 4, ...note(30, INK), ...TABULAR, fontWeight: 600, opacity: sum }}>
         {signed(trace.score)}
       </div>
       <div style={{ position: "absolute", left: VERDICT_X, top: top + 4, ...note(30, inkFor(trace.label)), fontWeight: 650, opacity: v }}>

@@ -201,7 +201,7 @@ export const LineageScene: React.FC = () => {
 
         {/* What RDD stands for, and what lineage keeps. */}
         <Note at={rddAt - 2} x={RDD_X} y={y(370)}>
-          <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap" }}>RDD</span>
+          <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>RDD</span>
         </Note>
         <Note at={expandAt - 2} x={RDD_X} y={y(414)}>
           <span style={{ ...note(24, INK), display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
@@ -387,7 +387,7 @@ const CacheRow: React.FC<{
           ))}
         </>
       )}
-      <div style={{ position: "absolute", left: 960, top: top + h(4), ...note(24, color), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, countAt, 10) }}>
+      <div style={{ position: "absolute", left: 960, top: top + h(4), ...note(24, color), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, countAt, 10) }}>
         source read {reads === 2 ? "twice" : "once"}
       </div>
     </div>

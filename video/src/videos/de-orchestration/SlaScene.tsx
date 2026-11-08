@@ -144,7 +144,7 @@ export const SlaScene: React.FC = () => {
           </div>
         ) : null}
         <Note at={ordersAt} x={tx(DEADLINE) + 14} y={y(334)}>
-          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <CodeSpan size={22}>daily_orders</CodeSpan> fresh by 06:00 UTC
           </span>
         </Note>
@@ -187,7 +187,7 @@ export const SlaScene: React.FC = () => {
 
         {/* Three ways to enforce it. */}
         <Note at={threeAt} x={X0} y={y(608)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>enforce it three ways</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>enforce it three ways</span>
         </Note>
         {ways.map((w, i) => (
           <Note key={i} at={w.at - 2} x={X0} y={y(650) + i * h(48)}>

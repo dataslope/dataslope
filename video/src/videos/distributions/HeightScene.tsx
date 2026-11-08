@@ -200,7 +200,7 @@ export const HeightScene: React.FC = () => {
             <span style={{ ...askNote(32), opacity: 1 - areaFlash * 0.3 }}>= area 1</span>
           </Ink>
           <Note at={twoAt - 2} x={sx(X, UNIFORM.narrowScale) + 22} y={py(UNIFORM.narrowPdf) - 16}>
-            <span style={{ ...note(26, INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
+            <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
               height {fmt(UNIFORM.narrowPdf, 0)}
             </span>
           </Note>

@@ -144,7 +144,7 @@ export const DiversityScene: React.FC = () => {
             over <span style={numStyle(24, INK)}>{rep.total}</span> words
           </span>
           <span style={{ opacity: ease(frame, scoreAt - 2, 10) }}>
-            = <span style={{ ...numStyle(28, ACCENT_INK), fontWeight: 700 }}>{fmt(rep.value, 2)}</span>
+            = <span style={{ ...numStyle(28, ACCENT_INK), fontWeight: 600 }}>{fmt(rep.value, 2)}</span>
           </span>
         </div>
       </Note>
@@ -156,7 +156,7 @@ export const DiversityScene: React.FC = () => {
       <Note at={perfectAt - 4} x={LEFT_X} y={y(660) + h(54) + 4}>
         <div style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
           <span style={numStyle(24, INK)}>{vary.distinct}</span> different over <span style={numStyle(24, INK)}>{vary.total}</span> words ={" "}
-          <span style={{ ...numStyle(28, ACCENT_INK), fontWeight: 700 }}>{fmt(vary.value, 1)}</span>
+          <span style={{ ...numStyle(28, ACCENT_INK), fontWeight: 600 }}>{fmt(vary.value, 1)}</span>
         </div>
       </Note>
 

@@ -215,7 +215,7 @@ export const WaldScene: React.FC = () => {
                 column does not read as a third set of shares. The number
                 and its "in 100" stack, one size to a line. */}
             <Note at={estAt} x={EST_X} y={c - 31} align="right" from="right">
-              <div style={{ ...note(spoken ? 34 : 30, spoken ? ACCENT_INK : INK_SOFT), fontWeight: 700, lineHeight: 1, whiteSpace: "nowrap" }}>
+              <div style={{ ...note(spoken ? 34 : 30, spoken ? ACCENT_INK : INK_SOFT), fontWeight: 600, lineHeight: 1, whiteSpace: "nowrap" }}>
                 {Math.round(p.downedByOneHit * 100)}
               </div>
               <div style={{ ...note(20, INK_SOFT), lineHeight: 1.2, marginTop: 4, whiteSpace: "nowrap" }}>in 100</div>

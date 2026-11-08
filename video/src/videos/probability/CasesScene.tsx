@@ -250,7 +250,7 @@ export const CasesScene: React.FC = () => {
       {/* How many games have been played, counting up as the lines run. */}
       {/* One line, one size: the count stands out by weight and color. */}
       <div style={{ position: "absolute", right: 1920 - CH.x1, top: y(CH.top) - 2, opacity: ease(frame, playAt - 4, 10), whiteSpace: "nowrap", ...note(30, INK_SOFT) }}>
-        games <span style={{ color: INK, fontWeight: 700, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
+        games <span style={{ color: INK, fontWeight: 600, ...TABULAR }}>{Math.round(K).toLocaleString("en-US")}</span>
       </div>
 
       </div>

@@ -98,7 +98,7 @@ export const RuleScene: React.FC = () => {
               style={{
                 fontFamily: MONO,
                 fontSize: 104,
-                fontWeight: 700,
+                fontWeight: 600,
                 color: ADDR_INK,
                 fontVariantLigatures: "none",
                 lineHeight: 1.1,

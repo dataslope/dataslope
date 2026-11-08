@@ -91,7 +91,7 @@ export const MedalScene: React.FC = () => {
           }}
         />
         <Note at={lakeAt} x={TIER_X + TIER_W + 40} y={tierTop(1) + th / 2 - 16}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>a lake or lakehouse</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>a lake or lakehouse</span>
         </Note>
 
         {TIERS.map((t, i) => (
@@ -154,13 +154,13 @@ export const MedalScene: React.FC = () => {
           <span style={{ ...label(22, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>the layer below</span>
         </Note>
         <Note at={wrongAt + 4} x={120} y={tierTop(1) + h(26)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>a wrong rule</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>a wrong rule</span>
         </Note>
         <Note at={fixAt + 4} x={120} y={tierTop(1) + h(62)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: fixP }}>fixed, rebuilt</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: fixP }}>fixed, rebuilt</span>
         </Note>
         <Note at={holdsAt} x={120} y={tierTop(2) + h(26)}>
-          <span style={{ ...note(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             still the
             <br />
             original

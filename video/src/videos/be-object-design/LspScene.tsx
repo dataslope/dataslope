@@ -117,10 +117,10 @@ export const LspScene: React.FC = () => {
         </Line>
 
         {/* The hierarchy. */}
-        <Line x={X0} y={topRow - 60} at={trapAt} size={21} color={ACCENT_INK} weight={700} out={fixAt}>
+        <Line x={X0} y={topRow - 60} at={trapAt} size={21} color={ACCENT_INK} weight={600} out={fixAt}>
           The classic trap
         </Line>
-        <Line x={X0} y={topRow - 60} at={fixAt + 10} size={21} color={OK_INK} weight={700}>
+        <Line x={X0} y={topRow - 60} at={fixAt + 10} size={21} color={OK_INK} weight={600}>
           The fix
         </Line>
         <Box x={rectBox.x} y={rectBox.y} w={NODE.w} h={NODE.h} at={usableAt + 4} title={frame < rectAt ? "Parent" : "Rectangle"} lit={pulse(frame, rectAt, 20)} />
@@ -155,7 +155,7 @@ export const LspScene: React.FC = () => {
         <VRule x={(RECT_X + LISKOV.width * UNIT + SQ_X) / 2} top={base - LISKOV.width * UNIT} bottom={base + 112} at={squareAt + 4} />
 
         {/* The caller written for rectangles. */}
-        <Line x={CALLER_X} y={topRow - 60} at={codeAt} size={21} color={INK_SOFT} weight={700}>
+        <Line x={CALLER_X} y={topRow - 60} at={codeAt} size={21} color={INK_SOFT} weight={600}>
           Code written for rectangles
         </Line>
         {[
@@ -164,7 +164,7 @@ export const LspScene: React.FC = () => {
           { at: expectsAt, text: `expects an area of ${LISKOV.width * LISKOV.height}` },
         ].map((s, i) => (
           <Line key={s.text} x={CALLER_X} y={topRow + i * 48} at={s.at} size={25} weight={i === 2 ? 700 : 500}>
-            <span style={{ color: INK_SOFT, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
+            <span style={{ color: INK_SOFT, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{i + 1}</span>
             {"  "}
             {s.text}
           </Line>
@@ -180,10 +180,10 @@ export const LspScene: React.FC = () => {
 
         {/* The two shapes, to scale, each named under its base. */}
         <Shape x={RECT_X} base={base} w={rw} h={rh} at={rectAt} tone={rectDone ? "ok" : "data"} />
-        <Line x={RECT_X} y={base + 14} at={rectAt} size={21} color={INK_SOFT} weight={700}>
+        <Line x={RECT_X} y={base + 14} at={rectAt} size={21} color={INK_SOFT} weight={600}>
           rectangle
         </Line>
-        <Line x={RECT_X} y={base + 46} at={widthAt + 4} size={25} weight={700} color={rectDone ? OK_INK : INK}>
+        <Line x={RECT_X} y={base + 46} at={widthAt + 4} size={25} weight={600} color={rectDone ? OK_INK : INK}>
           <span style={{ fontVariantNumeric: "tabular-nums" }}>
             {Math.round(rw)} × {Math.round(rh)}
             {rectDone ? ` = ${LISKOV.rectangle}` : ""}
@@ -192,10 +192,10 @@ export const LspScene: React.FC = () => {
         <Mark2 at={expectsAt + 8} kind="tick" size={30} style={{ left: RECT_X + 160, top: base + 48 }} />
 
         <Shape x={SQ_X} base={base} w={sq} h={sq} at={squareAt + 4} tone={sqDone ? "bad" : "data"} />
-        <Line x={SQ_X} y={base + 14} at={squareAt + 4} size={21} color={INK_SOFT} weight={700}>
+        <Line x={SQ_X} y={base + 14} at={squareAt + 4} size={21} color={INK_SOFT} weight={600}>
           square
         </Line>
-        <Line x={SQ_X} y={base + 46} at={handAt + 8} size={25} weight={700} color={sqDone ? ACCENT_INK : INK}>
+        <Line x={SQ_X} y={base + 46} at={handAt + 8} size={25} weight={600} color={sqDone ? ACCENT_INK : INK}>
           <span style={{ fontVariantNumeric: "tabular-nums" }}>
             {Math.round(sq)} × {Math.round(sq)}
             {sqDone ? ` = ${LISKOV.square}` : ""}

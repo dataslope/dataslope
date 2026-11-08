@@ -123,7 +123,7 @@ export const MisreadScene: React.FC = () => {
         <span style={{ ...note(22, INK_SOFT), ...halo, whiteSpace: "nowrap" }}>nothing random left</span>
       </Note>
       <Note at={inAt - 2} x={muX + 12} y={y(ROWS[0] + 84)}>
-        <span style={{ ...note(22, INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>in</span>
+        <span style={{ ...note(22, INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>in</span>
       </Note>
 
       <div style={{ position: "absolute", left: LEFT, right: 160, top: y(ROWS[1] - 50), height: 1, background: HAIRLINE, opacity: 0.6 * ease(frame, dataFrom - 6, 12) }} />
@@ -189,7 +189,7 @@ export const MisreadScene: React.FC = () => {
         tick={10}
       />
       <Note at={elevenAt} x={sx(WIDE, USERS.hi) + 16} y={y(ROWS[1] + 20)}>
-        <span style={{ ...note(22, INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
           the interval: {USERS.insideCi} of {USERS.n} inside
         </span>
       </Note>

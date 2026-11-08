@@ -64,7 +64,7 @@ const Form: React.FC<{
   const frame = useCurrentFrame();
   return (
     <div style={{ position: "absolute", left: X0, top, width: 450 }}>
-      <div style={{ ...label(23, color), fontWeight: 700, opacity: ease(frame, at - 4, 10), whiteSpace: "nowrap" }}>{name}</div>
+      <div style={{ ...label(23, color), fontWeight: 600, opacity: ease(frame, at - 4, 10), whiteSpace: "nowrap" }}>{name}</div>
       {/* flow-root, or the Ink's negative bleed margin collapses through this box and lifts it 34px. */}
       <div style={{ position: "relative", display: "flow-root", height: 62, marginTop: 6 }}>
         <Phrase at={at} underlineAt={underlineAt} color={color}>

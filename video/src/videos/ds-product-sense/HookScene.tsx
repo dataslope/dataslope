@@ -63,7 +63,7 @@ const Tile: React.FC<{
       }}
     >
       <div style={{ position: "absolute", left: 0, top: COL.name, ...label(22, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>{name}</div>
-      <div style={{ position: "absolute", left: 0, top: COL.value, ...note(64, INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: 0, top: COL.value, ...note(64, INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
         <span style={lift}>{value}</span>
       </div>
       <div style={{ position: "absolute", left: 0, top: COL.delta, opacity: ease(frame, deltaAt, 10), ...TABULAR, whiteSpace: "nowrap" }}>{delta}</div>

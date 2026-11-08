@@ -140,7 +140,7 @@ export const JitterScene: React.FC = () => {
 
         {/* The single wave: every request in one tenth. */}
         <Note at={sameAt} x={LEFT_X + ((plainBin * RETRY.bin) / SPAN) * PLOT_W - 24} y={y(PLOT_TOP) + 44} align="right">
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             all <Num>{thousands(plain.busiest)}</Num> in the same tenth
           </span>
         </Note>

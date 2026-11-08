@@ -69,7 +69,7 @@ const Mini: React.FC<{ x: number; y: number; w: number; h?: number; color?: stri
         alignItems: "center",
         justifyContent: "center",
         ...label(18, INK),
-        fontWeight: 700,
+        fontWeight: 600,
       }}
     >
       {children}
@@ -176,11 +176,11 @@ export const JudgeScene: React.FC = () => {
               <Swatch color={BLUE_INK} />
               both fail
             </span>
-            <span style={{ color: ACCENT_INK, fontWeight: 700 }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 600 }}>
               <Swatch color={BAD} />
               only the judge passes
             </span>
-            <span style={{ color: ACCENT_INK, fontWeight: 700 }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 600 }}>
               <Swatch color={BAD} slash />
               only the expert passes
             </span>
@@ -233,16 +233,16 @@ export const JudgeScene: React.FC = () => {
                 />
               </span>
               <span style={{ opacity: ease(frame, isAt, 10) }}>=</span>
-              <span style={{ opacity: ease(frame, isAt, 10), fontWeight: 700, color: BLUE_INK }}>{JUDGE.kappa.toFixed(2)}</span>
+              <span style={{ opacity: ease(frame, isAt, 10), fontWeight: 600, color: BLUE_INK }}>{JUDGE.kappa.toFixed(2)}</span>
             </div>
           </Note>
           <Note at={moderateAt} x={R_X + 760} y={y(GRID.top + 216)}>
-            <span style={{ ...note(28, BLUE_INK), fontWeight: 700, fontStyle: "italic", whiteSpace: "nowrap" }}>moderate</span>
+            <span style={{ ...note(28, BLUE_INK), fontWeight: 600, fontStyle: "italic", whiteSpace: "nowrap" }}>moderate</span>
           </Note>
           <Note at={alwaysAt - 6} x={R_X} y={y(GRID.top + 330)}>
             <span style={{ ...note(28, INK), ...TABULAR, whiteSpace: "nowrap" }}>
               a judge that always says pass: agrees {Math.round(JUDGE.alwaysPass.po * 100)}%,{" "}
-              <span style={{ opacity: ease(frame, zeroAt, 10), color: ACCENT_INK, fontWeight: 700 }}>
+              <span style={{ opacity: ease(frame, zeroAt, 10), color: ACCENT_INK, fontWeight: 600 }}>
                 <Mark at={zeroAt + 6} color={MARK_BAD}>
                   κ = {JUDGE.alwaysPass.kappa}
                 </Mark>

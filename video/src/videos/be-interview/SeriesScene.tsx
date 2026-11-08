@@ -185,7 +185,7 @@ export const SeriesScene: React.FC = () => {
                   top: base - bh - COUNT_H,
                   textAlign: "center",
                   ...note(26, BLUE_INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   lineHeight: `${COUNT_H}px`,
                   opacity: ease(frame, riseAt[i] + 10, 10) * keep,
                 }}

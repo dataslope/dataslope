@@ -86,7 +86,7 @@ export const Kicker: React.FC<{ at: number; out?: number; children: React.ReactN
   const { y } = useLayout();
   return (
     <Ink at={at} dur={14} out={out} style={{ left: 96, top: y(KICKER_Y), whiteSpace: "nowrap" }}>
-      <span style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>{children}</span>
+      <span style={{ ...label(22, ACCENT_INK), fontWeight: 600 }}>{children}</span>
     </Ink>
   );
 };
@@ -306,7 +306,7 @@ export const Node: React.FC<{
         transform: `scale(${0.9 + 0.1 * Math.min(1, p)})`,
       }}
     >
-      <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO } : {}) }}>{title}</span>
+      <span style={{ ...label(size, t.ink), fontWeight: 600, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO } : {}) }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap" }}>{sub}</span> : null}
     </div>
   );
@@ -390,7 +390,7 @@ export const HBar: React.FC<{
             top: barH / 2,
             transform: "translateY(-50%)",
             ...note(size, ink),
-            fontWeight: 700,
+            fontWeight: 600,
             whiteSpace: "nowrap",
             opacity: ease(frame, at + dur * 0.6, 8),
           }}
@@ -504,7 +504,7 @@ export const GraphNode: React.FC<{
           alignItems: "center",
           justifyContent: "center",
           ...label(26, t.ink),
-          fontWeight: 700,
+          fontWeight: 600,
           opacity: Math.min(1, p),
           transform: `scale(${0.85 + 0.15 * Math.min(1, p)})`,
         }}
@@ -577,7 +577,7 @@ export const Edge: React.FC<{
             transform: "translate(-50%, -50%)",
             ...label(23, weightInk),
             ...TABULAR,
-            fontWeight: 700,
+            fontWeight: 600,
             opacity: w * (1 - d) * opacity,
             whiteSpace: "nowrap",
           }}

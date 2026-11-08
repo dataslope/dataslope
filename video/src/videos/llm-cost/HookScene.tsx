@@ -94,7 +94,7 @@ export const HookScene: React.FC = () => {
         return (
           <React.Fragment key={r.verb}>
             <Ink at={grow[i] - 6} dur={12} style={{ left: X0, top: ry - 6, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(32, r.ink), fontWeight: 700 }}>{r.verb}</span>
+              <span style={{ ...label(32, r.ink), fontWeight: 600 }}>{r.verb}</span>
             </Ink>
             <Ink at={named[i] - 4} dur={14} style={{ left: X0, top: ry + 38, whiteSpace: "nowrap" }}>
               <span style={{ ...note(23, INK_SOFT) }}>{r.what}</span>

@@ -432,7 +432,7 @@ export const TagChip: React.FC<{
           alignItems: "center",
           justifyContent: "center",
           fontFamily: MONO,
-          fontWeight: 700,
+          fontWeight: 600,
           fontSize: size,
           color: f.ink,
           opacity: p,

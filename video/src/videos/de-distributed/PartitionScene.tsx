@@ -173,7 +173,7 @@ export const PartitionScene: React.FC = () => {
         ))}
         <Machine x={DRIVER_X} top={driverTop} width={DRIVER_W} height={h(DRIVER_H)} at={driverAt - 2} out={fewAt - 6} />
         <Note at={driverAt} x={DRIVER_X + 16} y={driverTop + h(10)} out={fewAt - 6}>
-          <span style={{ display: "block", ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>driver</span>
+          <span style={{ display: "block", ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>driver</span>
           <span style={{ display: "block", ...label(20, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, driverAt + 8, 10) }}>plans the job</span>
         </Note>
         {[0, 1, 2, 3].map((r) => (
@@ -269,7 +269,7 @@ export const PartitionScene: React.FC = () => {
           ) : null;
         })}
         <Note at={fewAt - 2} x={R_X} y={caseRow(0)}>
-          <span style={{ ...note(29, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(29, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{FEW.partitions}</Num> partitions of <Num>{mb(FEW.mb)}</Num>
           </span>
           <span style={{ display: "block", ...note(23, ACCENT_INK), whiteSpace: "nowrap", marginTop: 4 }}>
@@ -280,7 +280,7 @@ export const PartitionScene: React.FC = () => {
           </span>
         </Note>
         <Note at={manyAt - 2} x={R_X} y={caseRow(1)}>
-          <span style={{ ...note(29, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(29, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{count(MANY.partitions)}</Num> of <Num>{mb(MANY.mb)}</Num>
           </span>
           <span style={{ display: "block", ...note(23, ACCENT_INK), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, schedAt, 10) }}>
@@ -292,7 +292,7 @@ export const PartitionScene: React.FC = () => {
             target: a few hundred MB a partition
             <span style={{ opacity: ease(frame, twoFourAt, 10) }}>, 2 to 4 × the cores</span>
           </span>
-          <span style={{ display: "block", ...note(29, INK), fontWeight: 700, whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, sixtyAt - 2, 10) }}>
+          <span style={{ display: "block", ...note(29, INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, sixtyAt - 2, 10) }}>
             <Num>{RIGHT.partitions}</Num> of <Num>{mb(RIGHT.mb)}</Num>, <Num>{RIGHT.perCore}</Num> per core
             <span style={{ color: OK_INK, opacity: ease(frame, bothAt, 10) }}> ✓</span>
           </span>

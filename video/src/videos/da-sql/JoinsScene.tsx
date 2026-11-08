@@ -165,7 +165,7 @@ export const JoinsScene: React.FC = () => {
             out={k.kind === "FULL" ? leftJoinAt - 4 : k.until === undefined ? undefined : k.until - 4}
             style={{ left: rg.x, top: rg.top - 40, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14 }}
           >
-            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: INK }}>{k.kind} JOIN</span>
+            <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK }}>{k.kind} JOIN</span>
             <span style={{ ...note(22, INK_SOFT), ...TABULAR }}>{k.rows} rows</span>
           </Ink>
         ))}
@@ -201,7 +201,7 @@ export const JoinsScene: React.FC = () => {
                 />
                 <Venn kind={k.kind} />
                 <div style={{ position: "relative" }}>
-                  <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: INK, whiteSpace: "nowrap" }}>{k.kind}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK, whiteSpace: "nowrap" }}>{k.kind}</div>
                   <div style={{ ...note(21, INK_SOFT), ...TABULAR, whiteSpace: "nowrap" }}>{k.rows} rows</div>
                 </div>
               </div>

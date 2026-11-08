@@ -398,7 +398,7 @@ export const ThreeScene: React.FC = () => {
         <div style={{ ...body(28, true), marginTop: 4 }}>of {N} customers each</div>
       </div>
       <Note at={fiftyAt} x={RX} y={y(790)} width={RW} out={p3Out}>
-        <div style={{ ...note(24, ACCENT_INK), fontWeight: 700 }}>Centered on ${fmt(PILE.mean)}</div>
+        <div style={{ ...note(24, ACCENT_INK), fontWeight: 600 }}>Centered on ${fmt(PILE.mean)}</div>
         <div style={{ ...note(21, INK_SOFT), marginTop: 6 }}>The population&apos;s average is ${fmt(POPULATION.mean)}.</div>
       </Note>
 
@@ -462,7 +462,7 @@ export const ThreeScene: React.FC = () => {
         width={2.6 + emphasis}
       />
       <Note at={underAt + 2} x={sx(PX, PILE.mean + PILE.sd) + 14} y={y(MEANS_BASE - MEANS_H * AT_SD) - 15}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, ...halo }}>± ${fmt(PILE.sd)}</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, ...halo }}>± ${fmt(PILE.sd)}</span>
       </Note>
 
       {/* ══ Phase 4: one axis, three widths ══ */}
@@ -664,7 +664,7 @@ const Averaging: React.FC<{
           whiteSpace: "nowrap",
           ...note(26, ACCENT_INK),
           ...TABULAR,
-          fontWeight: 700,
+          fontWeight: 600,
           ...halo,
           transformOrigin: "left center",
           transform: `scale(${named})`,
@@ -893,7 +893,7 @@ const WidthTable: React.FC<{ rawAt: number; statAt: number; middleAt: number; te
             {name}
           </span>
         </span>
-        <span style={{ ...note(28, color), fontWeight: 700, display: "inline-block", transformOrigin: "right center", transform: `scale(${grow})` }}>
+        <span style={{ ...note(28, color), fontWeight: 600, display: "inline-block", transformOrigin: "right center", transform: `scale(${grow})` }}>
           {value}
         </span>
       </div>

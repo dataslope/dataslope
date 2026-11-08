@@ -193,7 +193,7 @@ export const PctScene: React.FC = () => {
             stroke={ACCENT}
             strokeWidth={2.6}
           />
-          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={svgText({ ...label(19, ACCENT_INK), fontWeight: 700 })}>
+          <text x={(px(p90) + px(HI)) / 2} y={sy - 122} textAnchor="middle" style={svgText({ ...label(19, ACCENT_INK), fontWeight: 600 })}>
             the slow tail
           </text>
         </svg>

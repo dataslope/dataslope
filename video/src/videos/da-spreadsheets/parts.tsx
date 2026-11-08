@@ -455,7 +455,7 @@ export const FormulaBar: React.FC<{
                   opacity: r.on,
                   fontFamily: SANS,
                   fontSize: size * 1.05,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   color: ink(r.tone),
                   ...(NUMERIC.test(String(r.text)) ? TABULAR : {}),
                 }}

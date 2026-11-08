@@ -138,7 +138,7 @@ export const FlatScene: React.FC = () => {
         {/* One line at one size: the reply stands out by its ink and weight. */}
         <Ink at={swapAt + 4} dur={14} style={{ left: RIGHT_X, top: replyTop, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 14, fontSize: 22 }}>
           <span style={label(22, INK_SOFT)}>Postgres replied</span>
-          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: INK }}>UPDATE {FLAT.updated}</span>
+          <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: INK }}>UPDATE {FLAT.updated}</span>
           <span style={note(22, INK_SOFT)}>{rowsChanged(FLAT.updated)}</span>
         </Ink>
         <Note at={missesAt + 2} x={RIGHT_X} y={replyTop + 52}>

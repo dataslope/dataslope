@@ -302,7 +302,7 @@ export const HookScene: React.FC = () => {
           return (
             <React.Fragment key={g.title}>
               <Ink at={at - 2} dur={12} style={{ left: x0, top: y(GROUP_Y) }}>
-                <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{g.title}</span>
+                <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{g.title}</span>
               </Ink>
               {gi > 0 ? <ColumnRule x={x0 - COL_GAP / 2} top={y(GROUP_Y)} height={y(ROW_Y + 2 * ROW_H) + 30 - y(GROUP_Y)} at={at} /> : null}
               {g.cards.map((title, i) => {
@@ -323,7 +323,7 @@ export const HookScene: React.FC = () => {
                       transform: `translateX(${(1 - p) * -10}px)`,
                     }}
                   >
-                    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700, width: 18 }}>{first + i + 1}</span>
+                    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600, width: 18 }}>{first + i + 1}</span>
                     <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{title}</span>
                   </div>
                 );

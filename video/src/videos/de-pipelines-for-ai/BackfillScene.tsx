@@ -106,7 +106,7 @@ export const BackfillScene: React.FC = () => {
 
         {/* Count tokens. */}
         <Note at={countAt - 2} x={X0} y={eqY - 46}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>count tokens</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>count tokens</span>
         </Note>
         <Note at={tenAt - 2} x={X0} y={eqY}>
           <span style={{ ...note(36, INK), whiteSpace: "nowrap" }}>
@@ -114,7 +114,7 @@ export const BackfillScene: React.FC = () => {
             <span style={{ opacity: ease(frame, fourHAt - 2, 10) }}>
               {" "}× <Num>{BACKFILL.tokensPerChunk}</Num> tokens
             </span>
-            <span style={{ opacity: ease(frame, billionAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>
+            <span style={{ opacity: ease(frame, billionAt - 2, 10), color: BLUE_INK, fontWeight: 600 }}>
               {" "}= <Mark at={billionAt + 4}><Num>{num(BACKFILL.tokens)}</Num> tokens</Mark>
             </span>
           </span>
@@ -128,7 +128,7 @@ export const BackfillScene: React.FC = () => {
             <span style={{ opacity: ease(frame, pricesAt - 2, 10), color: INK_SOFT }}>
               ; at <Num>{cents(BACKFILL.priceLow)}</Num> to <Num>{cents(BACKFILL.priceHigh)}</Num> cents,
             </span>
-            <span style={{ opacity: ease(frame, billAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>
+            <span style={{ opacity: ease(frame, billAt - 2, 10), color: BLUE_INK, fontWeight: 600 }}>
               {" "}$<Num>{num(BACKFILL.costLow)}</Num> to $<Num>{num(BACKFILL.costHigh)}</Num>
             </span>
           </span>
@@ -142,7 +142,7 @@ export const BackfillScene: React.FC = () => {
             <span style={{ opacity: ease(frame, minutesAt - 2, 10) }}>
               {" "}<Num>{num(BACKFILL.minutes)}</Num> minutes
             </span>
-            <span style={{ opacity: ease(frame, daysAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>
+            <span style={{ opacity: ease(frame, daysAt - 2, 10), color: BLUE_INK, fontWeight: 600 }}>
               {" "}
               <Mark at={realAt + 4}>
                 ≈ <Num>{BACKFILL.days.toFixed(1)}</Num> days
@@ -217,13 +217,13 @@ export const BackfillScene: React.FC = () => {
           })}
         </svg>
         <Note at={retryAt} x={cellX(FAIL) - 60} y={barTop - 52} dim={checkAt}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>rate-limited: retry, wait longer</span>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>rate-limited: retry, wait longer</span>
         </Note>
         <Note at={crashAt} x={cellX(CRASH) + 4} y={barTop - 52}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: crash }}>the run dies</span>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: crash }}>the run dies</span>
         </Note>
         <Note at={checkAt + 2} x={cellX(CHECKPOINTS[0]) - 4} y={barTop + CELL + 14}>
-          <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap" }}>checkpoints</span>
+          <span style={{ ...label(20, INK), fontWeight: 600, whiteSpace: "nowrap" }}>checkpoints</span>
         </Note>
         {/* The restart: a second row, from the last checkpoint, not from zero. */}
         <div style={{ opacity: restart }}>

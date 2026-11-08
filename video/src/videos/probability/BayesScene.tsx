@@ -262,10 +262,10 @@ export const BayesScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{ ...note(24, DATA_INK), fontWeight: 700 }}>
+              <span style={{ ...note(24, DATA_INK), fontWeight: 600 }}>
                 {i === 0 ? num(TEST.tp) : num(TEST.retestTp)} sick
               </span>
-              <span style={{ ...note(24, STAT_INK), fontWeight: 700, opacity: i === 0 ? 1 : ease(frame, tenAt + 4, 12) }}>
+              <span style={{ ...note(24, STAT_INK), fontWeight: 600, opacity: i === 0 ? 1 : ease(frame, tenAt + 4, 12) }}>
                 {i === 0 ? num(TEST.fp) : num(TEST.retestFp)} false alarms
               </span>
             </div>
@@ -276,7 +276,7 @@ export const BayesScene: React.FC = () => {
                 top: top + h(SHARE.h) / 2 - 22,
                 opacity: ease(frame, i === 0 ? retestFrom + 16 : nineInTenAt, 12),
                 ...note(30, "var(--ds-white)"),
-                fontWeight: 700,
+                fontWeight: 600,
                 whiteSpace: "nowrap",
               }}
             >
@@ -286,7 +286,7 @@ export const BayesScene: React.FC = () => {
         );
       })}
       <Note at={retestFrom + 16} x={SHARE.x0 + 14} y={y(SHARE.y[0]) + h(SHARE.h) / 2 - 18}>
-        <span style={{ ...note(26, "var(--ds-white)"), fontWeight: 700, whiteSpace: "nowrap" }}>{pct(TEST.treePpv)} real</span>
+        <span style={{ ...note(26, "var(--ds-white)"), fontWeight: 600, whiteSpace: "nowrap" }}>{pct(TEST.treePpv)} real</span>
       </Note>
       <Ink at={ninetyOneAt - 4} dur={16} style={{ left: SHARE.x0, top: y(770), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 22 }}>
         <Big size={96} color={DATA_INK} italic>

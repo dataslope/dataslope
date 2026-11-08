@@ -188,7 +188,7 @@ export const SeriesScene: React.FC = () => {
                     top: 8,
                     textAlign: "center",
                     ...label(24, PAPER),
-                    fontWeight: 700,
+                    fontWeight: 600,
                     opacity: ease(frame, growAt(i) + 14, 10),
                   }}
                 >

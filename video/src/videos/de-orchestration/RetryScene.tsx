@@ -96,7 +96,7 @@ export const RetryScene: React.FC = () => {
 
         {/* What to retry, and what never to. */}
         <Note at={transAt} x={X0} y={y(286)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>retry: transient failures</span>
+          <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>retry: transient failures</span>
         </Note>
         {okItems.map((it, i) => (
           <Note key={it.text} at={it.at - 2} x={X0 + 20} y={y(336) + i * h(44)}>
@@ -104,7 +104,7 @@ export const RetryScene: React.FC = () => {
           </Note>
         ))}
         <Note at={dontAt} x={X0} y={y(500)}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>don&apos;t retry: deterministic failures</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>don&apos;t retry: deterministic failures</span>
         </Note>
         {badItems.map((it, i) => (
           <Note key={it.text} at={it.at - 2} x={X0 + 20} y={y(550) + i * h(44)}>
@@ -159,7 +159,7 @@ export const RetryScene: React.FC = () => {
                   stroke={`color-mix(in srgb, ${ACCENT} ${bad * 100}%, ${INK})`}
                   strokeWidth={2.6}
                 />
-                <text x={x} y={lineY + 7} textAnchor="middle" style={svgText({ ...label(20, INK), fontWeight: 700 })}>
+                <text x={x} y={lineY + 7} textAnchor="middle" style={svgText({ ...label(20, INK), fontWeight: 600 })}>
                   {i + 1}
                 </text>
               </g>
@@ -186,7 +186,7 @@ export const RetryScene: React.FC = () => {
               top: lineY - h(50),
               textAlign: "center",
               ...note(23, BLUE_INK),
-              fontWeight: 700,
+              fontWeight: 600,
               whiteSpace: "nowrap",
               opacity: ease(frame, waitAt[i] + 4, 10),
             }}

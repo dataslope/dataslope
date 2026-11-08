@@ -184,10 +184,10 @@ export const RtmScene: React.FC = () => {
                   {b > 0 ? <line x1={COLS[1] - HALF - 18} x2={lerp(COLS[1] - HALF - 18, COLS[1] + HALF + 18, b)} y1={py(g.after)} y2={py(g.after)} stroke={g.color} strokeWidth={5} strokeLinecap="round" /> : null}
                 </Svg>
                 <Note at={g.beforeAt + 2} x={COLS[0] - HALF - 30} y={py(g.before) - 17} align="right">
-                  <span style={{ ...note(26, g.ink), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>{fmt(g.before, 1)}</span>
+                  <span style={{ ...note(26, g.ink), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>{fmt(g.before, 1)}</span>
                 </Note>
                 <Note at={g.afterAt + 2} x={COLS[1] + HALF + 30} y={py(g.after) - 17}>
-                  <span style={{ ...note(26, g.ink), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
+                  <span style={{ ...note(26, g.ink), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
                     {fmt(g.after, 1)}
                     <span style={{ ...note(24, INK_SOFT), marginLeft: 12 }}>
                       {g.after > g.before ? "+" : "−"}

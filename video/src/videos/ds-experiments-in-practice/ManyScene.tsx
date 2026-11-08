@@ -130,7 +130,7 @@ export const ManyScene: React.FC = () => {
             <circle cx={at(kx, 20)} cy={at(ky, FAMILY.at20)} r={9 * ease(frame, sixtyAt, 8)} fill={ACCENT} />
           </svg>
           <Note at={twentyAt + 2} x={at(kx, 1) + 16} y={at(ky, FAMILY.p[0]) - 6}>
-            <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, ...TABULAR }}>5%</span>
+            <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, ...TABULAR }}>5%</span>
           </Note>
           <Note at={sixtyAt} x={at(kx, 20) - 90} y={at(ky, FAMILY.at20) - 48}>
             <span style={{ ...note(28, ACCENT_INK), fontWeight: 800, ...TABULAR }}>{Math.round(FAMILY.at20 * 100)}%</span>
@@ -191,7 +191,7 @@ export const ManyScene: React.FC = () => {
             <span style={{ ...label(21, OK_INK), fontWeight: 750, whiteSpace: "nowrap" }}>← keeps ranks 1–{lastKept}</span>
           </Note>
           <Note at={realAt + 2} x={RIGHT.x0 + 10} y={y(RIGHT.top) + 4}>
-            <span style={{ ...label(20, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(20, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 7, background: TREAT, marginRight: 8 }} />
               really moved
               <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 7, background: CONTROL, margin: "0 8px 0 22px" }} />
@@ -208,7 +208,7 @@ export const ManyScene: React.FC = () => {
                 <line x1={0} x2={44} y1={5} y2={5} stroke={l.color} strokeWidth={l.dash ? 2 : 3} strokeDasharray={l.dash} />
               </svg>
               {/* No TABULAR: it spaces out the hyphen in "Benjamini-Hochberg". */}
-              <span style={{ ...note(22, l.ink), fontWeight: 700, whiteSpace: "nowrap" }}>
+              <span style={{ ...note(22, l.ink), fontWeight: 600, whiteSpace: "nowrap" }}>
                 {l.text}
                 {"tail" in l ? <span style={{ opacity: ease(frame, l.tailAt ?? l.at, 10) }}>{l.tail}</span> : null}
               </span>
@@ -216,10 +216,10 @@ export const ManyScene: React.FC = () => {
           </Note>
         ))}
         <Note at={dropsAt + 2} x={LEGEND_X + 56} y={y(440) + 76 + 34}>
-          <span style={{ ...label(19, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>safe, but it drops a real one</span>
+          <span style={{ ...label(19, WARM_INK), fontWeight: 600, whiteSpace: "nowrap" }}>safe, but it drops a real one</span>
         </Note>
         <Note at={fdrAt + 2} x={LEGEND_X + 56} y={y(440) + 152 + 34} width={370}>
-          <span style={{ ...label(19, OK_INK), fontWeight: 700 }}>controls the false discovery rate: the expected share of false hits</span>
+          <span style={{ ...label(19, OK_INK), fontWeight: 600 }}>controls the false discovery rate: the expected share of false hits</span>
         </Note>
 
         {/* The rule, and the three ranks that decide it. */}

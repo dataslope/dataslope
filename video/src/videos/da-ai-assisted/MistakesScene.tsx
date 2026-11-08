@@ -291,7 +291,7 @@ export const MistakesScene: React.FC = () => {
           }}
         />
         <Note at={silentAt - 2} x={REST_X} y={labelY}>
-          <span style={{ ...note(28, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the silent ones are the danger</span>
+          <span style={{ ...note(28, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the silent ones are the danger</span>
         </Note>
         <Note at={inventedAt - 2} x={REST_X} y={loudY}>
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>

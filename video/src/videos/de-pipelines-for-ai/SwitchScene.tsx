@@ -104,7 +104,7 @@ export const SwitchScene: React.FC = () => {
         </Note>
         {["word", ...SWITCH.axes, "from its kitten"].map((t, j) => (
           <Note key={t} at={(j === 4 ? searchAt : spaceAt) + j * 2} x={colX(j) + 12} y={y(T.top) + 8}>
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{t}</span>
+            <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{t}</span>
           </Note>
         ))}
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, spaceAt, 12) }}>
@@ -145,7 +145,7 @@ export const SwitchScene: React.FC = () => {
         })}
         {/* The second model's kitten. */}
         <Note at={pretendAt} x={T.x} y={qTop}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
             a second model, same meanings
             <span style={{ opacity: ease(frame, axesAt - 2, 10) }}>, axes in another order: {SWITCH.newAxes.join(", ")}</span>
           </span>

@@ -108,7 +108,7 @@ export const RestScene: React.FC = () => {
 
         {/* Paths are nouns, never verbs. */}
         <Note at={nounsAt} x={X0} y={nounTop}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Paths are nouns</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Paths are nouns</span>
         </Note>
         <div style={{ position: "absolute", left: X0, top: nounTop + h(46), display: "flex", alignItems: "center", gap: 14, fontSize: 30, opacity: ease(frame, fortyTwoAt, 10) }}>
           <Tick at={fortyTwoAt + 4} size={28} />
@@ -123,7 +123,7 @@ export const RestScene: React.FC = () => {
 
         {/* A request that carries everything, to a server that keeps nothing. */}
         <Note at={carriesAt} x={R_X} y={reqTop - h(44)}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Each request carries everything</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Each request carries everything</span>
         </Note>
         <Msg
           x={R_X}
@@ -142,8 +142,8 @@ export const RestScene: React.FC = () => {
         </Node>
         <Note at={meanAt} x={R_X} y={reqTop + reqH + h(26)}>
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 700, color: METHOD_INK }}>GET</span> means read;{" "}
-            <span style={{ fontFamily: MONO, fontWeight: 700 }}>404</span> means not found.
+            <span style={{ fontFamily: MONO, fontWeight: 600, color: METHOD_INK }}>GET</span> means read;{" "}
+            <span style={{ fontFamily: MONO, fontWeight: 600 }}>404</span> means not found.
           </span>
         </Note>
 
@@ -184,7 +184,7 @@ export const RestScene: React.FC = () => {
                 head={12}
               />
               <Note at={at + 10} x={1560} y={srvTop(i) + h(18)}>
-                <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: BLUE_INK, whiteSpace: "nowrap" }}>200 OK</span>
+                <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK, whiteSpace: "nowrap" }}>200 OK</span>
               </Note>
             </React.Fragment>
           );

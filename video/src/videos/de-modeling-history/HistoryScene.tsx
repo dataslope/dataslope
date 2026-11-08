@@ -140,7 +140,7 @@ export const HistoryScene: React.FC = () => {
         {/* The verdict: Type 2 marked in the right answer's green as the
             standard, Type 1 kept for typos. */}
         <Note at={standardAt + 6} x={X0} y={top(1) + h(VERDICT)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the standard</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the standard</span>
         </Note>
         <Note at={typoAt - 2} x={X0} y={top(0) + h(VERDICT)}>
           <span style={{ ...label(21, INK), fontWeight: 650, whiteSpace: "nowrap" }}>right for a typo</span>
@@ -239,7 +239,7 @@ export const HistoryScene: React.FC = () => {
             one step back
             <span style={{ opacity: ease(frame, goneAt, 10) }}>
               :{" "}
-              <span style={{ color: ACCENT_INK, fontWeight: 700 }}>Boston is gone</span>
+              <span style={{ color: ACCENT_INK, fontWeight: 600 }}>Boston is gone</span>
             </span>
           </span>
         </Note>

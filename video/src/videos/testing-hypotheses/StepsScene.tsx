@@ -156,7 +156,7 @@ export const StepsScene: React.FC = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              <span style={{ ...note(30, on ? STAT_INK : INK_SOFT), fontWeight: 700 }}>{i + 1}</span>
+              <span style={{ ...note(30, on ? STAT_INK : INK_SOFT), fontWeight: 600 }}>{i + 1}</span>
               <Label size={28} color={on ? INK : INK_SOFT} weight={on ? 650 : 520}>
                 {s.text}
               </Label>
@@ -225,7 +225,7 @@ export const StepsScene: React.FC = () => {
         </div>
       </Note>
       <Note at={sevenAt - 2} x={meanX - 14} y={y(STRIP) - h(70) - 8} align="right">
-        <span style={{ ...note(23, STAT_INK), fontWeight: 700, ...halo }}>
+        <span style={{ ...note(23, STAT_INK), fontWeight: 600, ...halo }}>
           average <Count at={sevenAt - 2} to={STEPS.mean} from={STEPS.claimed} dur={26} format={steps} />
         </span>
       </Note>
@@ -285,7 +285,7 @@ export const StepsScene: React.FC = () => {
           top: y(628),
           opacity: tCount,
           ...note(40, STAT_INK),
-          fontWeight: 700,
+          fontWeight: 600,
           whiteSpace: "nowrap",
         }}
       >
@@ -335,7 +335,7 @@ export const StepsScene: React.FC = () => {
         </Label>
       </Note>
       <Note at={threeAt - 2} x={zMirror + 16} y={y(Z_BASE) - h(110)}>
-        <span style={{ ...note(30, STAT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>p = {fmt(STEPS.p, 3)}</span>
+        <span style={{ ...note(30, STAT_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>p = {fmt(STEPS.p, 3)}</span>
       </Note>
       {/* The p-value as the narration says it. */}
       <Note at={threeAt + 6} x={zMirror + 16} y={y(Z_BASE) - h(110) + 42}>

@@ -101,7 +101,7 @@ export const TailScene: React.FC = () => {
           </Tag>
         ) : null}
         <div style={{ position: "absolute", left: 1570, top: base - h(120), opacity: ease(frame, dotsAt - 2, 10), whiteSpace: "nowrap" }}>
-          <div style={{ ...note(56, STAT_INK), ...TABULAR, fontWeight: 700, lineHeight: 1 }}>{shown}</div>
+          <div style={{ ...note(56, STAT_INK), ...TABULAR, fontWeight: 600, lineHeight: 1 }}>{shown}</div>
           <div style={{ ...note(21, INK_SOFT), marginTop: 8 }}>of {t.n.toLocaleString("en-US")} beyond 4 SD</div>
         </div>
       </React.Fragment>

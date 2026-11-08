@@ -321,7 +321,7 @@ export const LogitScene: React.FC = () => {
             <span
               style={{
                 ...note(26, ACCENT_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}

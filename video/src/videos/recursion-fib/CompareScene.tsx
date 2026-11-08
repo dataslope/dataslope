@@ -94,7 +94,7 @@ export const CompareScene: React.FC = () => {
         ] as const
       ).map(([key, title, color, ink, at]) => (
         <Ink key={key} at={at} dur={14} style={{ left: GROUP[key][0], top: y(GROUP_Y), width: GROUP[key][1] - GROUP[key][0] }}>
-          <div style={{ ...label(24, ink), fontWeight: 700, paddingBottom: 8, borderBottom: `2px solid ${color}` }}>{title}</div>
+          <div style={{ ...label(24, ink), fontWeight: 600, paddingBottom: 8, borderBottom: `2px solid ${color}` }}>{title}</div>
         </Ink>
       ))}
       {(

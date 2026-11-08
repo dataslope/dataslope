@@ -145,7 +145,7 @@ export const ReportingScene: React.FC = () => {
                   x={ICON_X + ICON_W / 2}
                   y={ry - 21}
                   textAnchor="middle"
-                  style={{ ...label(21, PAPER), fontWeight: 700, fill: PAPER }}
+                  style={{ ...label(21, PAPER), fontWeight: 600, fill: PAPER }}
                   opacity={ease(frame, modelAt + 2 + i * 3, 10)}
                 >
                   model
@@ -164,7 +164,7 @@ export const ReportingScene: React.FC = () => {
                 <rect x={BX0} y={ry - 16} width={(X(r.v) - BX0) * grow} height={32} rx={3} fill={i === 1 ? TRAP : A} />
               </Svg>
               <Ink at={r.at + 6} dur={10} style={{ left: X(100) + 16, top: ry - 18, whiteSpace: "nowrap", opacity: 1 - dim }}>
-                <span style={{ ...note(30, i === 1 ? TRAP_INK : A_INK), fontWeight: 700, ...TABULAR }}>
+                <span style={{ ...note(30, i === 1 ? TRAP_INK : A_INK), fontWeight: 600, ...TABULAR }}>
                   {i === 0 ? <Marked at={firstAt - 2}>{fmt(r.v, 1)}%</Marked> : `${fmt(r.v, 1)}%`}
                 </span>
               </Ink>

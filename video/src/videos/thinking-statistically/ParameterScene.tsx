@@ -321,7 +321,7 @@ export const ParameterScene: React.FC = () => {
         <span
           style={{
             ...note(25, STAT_INK),
-            fontWeight: 700,
+            fontWeight: 600,
             whiteSpace: "nowrap",
             display: "inline-block",
             transform: `scale(${1 + pulse(frame, missAgainAt - 4, 20) * 0.16})`,

@@ -129,7 +129,7 @@ export const WarrantyScene: React.FC = () => {
             {/* One line, one size: the chance stands out by color and weight. */}
             <Ink at={r.at} dur={14} style={{ left: 220, top: y(400 + i * 90), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 18, ...note(28, INK) }}>
               <span style={{ width: 210, display: "inline-block" }}>{r.name}</span>
-              <span style={{ color: i === 0 ? STAT_INK : INK_SOFT, fontWeight: 700, opacity: ease(frame, r.pAt, 10), width: 90, display: "inline-block" }}>
+              <span style={{ color: i === 0 ? STAT_INK : INK_SOFT, fontWeight: 600, opacity: ease(frame, r.pAt, 10), width: 90, display: "inline-block" }}>
                 {pct(r.p)}
               </span>
               <span style={{ color: INK_SOFT }}>
@@ -154,7 +154,7 @@ export const WarrantyScene: React.FC = () => {
               the green it has on the right too, and bold. */}
           <span style={note(28, INK)}>
             Expected profit = ${WARRANTY.price} − ${fmt(WARRANTY.ePayout, 0)} ={" "}
-            <span style={{ color: OK_INK, fontWeight: 700 }}>
+            <span style={{ color: OK_INK, fontWeight: 600 }}>
               <Sweep at={keepAt + 4}>${fmt(WARRANTY.eProfit, 0)}</Sweep>
             </span>
           </span>
@@ -180,12 +180,12 @@ export const WarrantyScene: React.FC = () => {
             color and bold. */}
         <Ink at={storeAt - 4} dur={14} style={{ left: RIGHT, top: y(392), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16, ...note(28, INK) }}>
           <span style={{ width: 140, display: "inline-block" }}>The store</span>
-          <span style={{ color: OK_INK, fontWeight: 700, width: 76, display: "inline-block" }}>+${fmt(WARRANTY.eProfit, 0)}</span>
+          <span style={{ color: OK_INK, fontWeight: 600, width: 76, display: "inline-block" }}>+${fmt(WARRANTY.eProfit, 0)}</span>
           <span style={{ color: INK_SOFT }}>a warranty, on average</span>
         </Ink>
         <Ink at={onAverageAt - 4} dur={14} style={{ left: RIGHT, top: y(448), whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16, ...note(28, INK) }}>
           <span style={{ width: 140, display: "inline-block" }}>The buyer</span>
-          <span style={{ color: STAT_INK, fontWeight: 700, width: 76, display: "inline-block" }}>
+          <span style={{ color: STAT_INK, fontWeight: 600, width: 76, display: "inline-block" }}>
             <Sweep at={buyerAt - 2}>−${fmt(WARRANTY.eProfit, 0)}</Sweep>
           </span>
           <span style={{ color: INK_SOFT, opacity: ease(frame, buyerAt - 2, 10) }}>a losing bet</span>

@@ -46,7 +46,7 @@ const geo = (c: Ctx, x: number, top: number, cols: readonly string[], rows: read
 /** A query's name over a result table, set as code. */
 const CodeName: React.FC<{ g: TableGeometry; at: number; children: React.ReactNode }> = ({ g, at, children }) => (
   <Ink at={at} dur={12} style={{ left: g.x, top: g.top - 38, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 700, color: INK, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 

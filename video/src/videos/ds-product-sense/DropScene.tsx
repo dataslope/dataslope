@@ -120,13 +120,13 @@ export const DropScene: React.FC = () => {
           />
         </Svg>
         <Note at={usersAt} x={CHART.x0} y={y(CHART.top) - h(44)}>
-          <span style={{ ...label(21, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>daily active users</span>
+          <span style={{ ...label(21, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>daily active users</span>
         </Note>
         <Note at={dauAt + 10} x={CHART.x0 - 16} align="right" y={vOf(DROP.totalBefore) - h(14)}>
           <span style={{ ...label(20, INK), ...TABULAR, whiteSpace: "nowrap" }}>{num(DROP.totalBefore)}</span>
         </Note>
         <Note at={dauAt + 18} x={CHART.x1 + 14} y={vOf(DROP.totalAfter) - h(14)}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
             {num(DROP.totalAfter)} ({pct(DROP.change)})
           </span>
         </Note>
@@ -141,7 +141,7 @@ export const DropScene: React.FC = () => {
           side="left"
           labelY={y(CHART.bottom) - h(30)}
           label={
-            <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               <Mark at={morningAt}>Android 5.2 released</Mark>
             </span>
           }
@@ -195,7 +195,7 @@ export const DropScene: React.FC = () => {
           );
         })}
         <Note at={eightAt} x={BARS.x0} y={y(BARS.top) + 3 * h(BARS.gap) - h(6)}>
-          <span style={{ ...note(27, ACCENT_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, ACCENT_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
             Android: {num(DROP.byPlatform.Android.lost)} of the {num(DROP.lost)} lost
           </span>
         </Note>

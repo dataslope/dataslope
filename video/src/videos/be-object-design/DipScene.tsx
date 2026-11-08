@@ -117,7 +117,7 @@ export const DipScene: React.FC = () => {
           lit={socketLit + pulse(frame, sendAt, 20)}
           radius={8}
         >
-          <span style={{ ...label(20, OK_INK), fontWeight: 700, textAlign: "center", lineHeight: 1.15 }}>
+          <span style={{ ...label(20, OK_INK), fontWeight: 600, textAlign: "center", lineHeight: 1.15 }}>
             sends a
             <br />
             message
@@ -136,7 +136,7 @@ export const DipScene: React.FC = () => {
         <Line x={CONF.x} y={top + CONF.h + 44} at={recordsAt + 4} size={21} color={INK_SOFT} weight={650}>
           the fake recorded one message
         </Line>
-        <Line x={CONF.x} y={top + CONF.h + 78} at={recordsAt + 10} size={26} color={BLUE_INK} weight={700}>
+        <Line x={CONF.x} y={top + CONF.h + 78} at={recordsAt + 10} size={26} color={BLUE_INK} weight={600}>
           “{sent}”
         </Line>
         <div style={{ position: "absolute", left: CONF.x + 590, top: top + CONF.h + 80, width: 32, height: 32 }}>
@@ -149,7 +149,7 @@ export const DipScene: React.FC = () => {
         <ArtSpot id="plug" at={lampAt} left={1360} top={y(380)} h={190} />
 
         {/* The arrows, before and after. */}
-        <Line x={B.conf.x} y={rowTop - 48} at={inversionAt} size={21} color={INK_SOFT} weight={700}>
+        <Line x={B.conf.x} y={rowTop - 48} at={inversionAt} size={21} color={INK_SOFT} weight={600}>
           before
         </Line>
         <Box x={B.conf.x} y={rowTop} w={B.conf.w} h={rowH} at={inversionAt} title="Confirmation" size={23} tones={[[noLongerAt + 10, "bad"]]} />
@@ -158,7 +158,7 @@ export const DipScene: React.FC = () => {
         <Mark2 at={noLongerAt + 12} kind="cross" size={30} style={{ left: (B.conf.x + B.conf.w + B.email.x) / 2 - 15, top: rowMid - 50 }} />
 
         <VRule x={(B.email.x + B.email.w + A.conf.x - 14) / 2} top={rowTop - 48} bottom={rowTop + rowH + 50} at={noLongerAt} />
-        <Line x={A.conf.x} y={rowTop - 48} at={noLongerAt} size={21} color={OK_INK} weight={700}>
+        <Line x={A.conf.x} y={rowTop - 48} at={noLongerAt} size={21} color={OK_INK} weight={600}>
           after
         </Line>
         <Box x={A.conf.x} y={rowTop} w={A.conf.w} h={rowH} at={noLongerAt + 4} title="Confirmation" size={23} tone="ok" />

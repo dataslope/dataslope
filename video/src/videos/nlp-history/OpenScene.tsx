@@ -49,7 +49,7 @@ const IdeaLabel: React.FC<{
           whiteSpace: "nowrap",
         }}
       >
-        <div style={{ ...label(21, DATA_INK), fontWeight: 700, ...TABULAR }}>{year}</div>
+        <div style={{ ...label(21, DATA_INK), fontWeight: 600, ...TABULAR }}>{year}</div>
         <div style={{ ...label(25, INK), fontWeight: 600, marginTop: 2 }}>{text}</div>
       </div>
     </>

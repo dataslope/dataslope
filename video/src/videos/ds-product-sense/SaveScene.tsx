@@ -57,7 +57,7 @@ export const SaveScene: React.FC = () => {
   const tree = ease(frame, jobAt, 20);
   const rowLabel = (text: string, at: number, color: string, top: number) => (
     <Note at={at} x={TREE_X} y={top + h(10)}>
-      <span style={{ ...label(22, color), fontWeight: 700, whiteSpace: "nowrap" }}>{text}</span>
+      <span style={{ ...label(22, color), fontWeight: 600, whiteSpace: "nowrap" }}>{text}</span>
     </Note>
   );
 
@@ -99,7 +99,7 @@ export const SaveScene: React.FC = () => {
             <svg width={26} height={34} style={{ overflow: "visible" }}>
               <Bookmark x={0} y={0} size={32} color={PAPER} />
             </svg>
-            <span style={{ ...note(30, PAPER), fontWeight: 700, whiteSpace: "nowrap" }}>Save for later</span>
+            <span style={{ ...note(30, PAPER), fontWeight: 600, whiteSpace: "nowrap" }}>Save for later</span>
           </div>
           {RECIPES.map((r, i) => {
             const top = y(ROWS.job) + h(110) + i * h(64);

@@ -125,7 +125,7 @@ export const ShuffleScene: React.FC = () => {
           <React.Fragment key={k}>
             <Machine x={RED_X} top={y(ROW_TOPS[i])} width={BOX_W} height={boxH} at={keyAt + i * 3} />
             <Note at={keyAt + 2 + i * 3} x={RED_X} y={mid(i) - 14} width={BOX_W} style={{ textAlign: "center" }}>
-              <span style={{ ...label(22, DEPT_INK[k]), fontWeight: 700 }}>{k}</span>
+              <span style={{ ...label(22, DEPT_INK[k]), fontWeight: 600 }}>{k}</span>
             </Note>
           </React.Fragment>
         ))}
@@ -160,10 +160,10 @@ export const ShuffleScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>serialized to local disk</span>
         </Note>
         <Note at={netAt} x={600} y={y(ROW_TOPS[2]) + boxH + h(20)}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the network</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the network</span>
         </Note>
         <Note at={fewerAt - 2} x={1080} y={y(ROW_TOPS[0]) + h(16)}>
-          <span style={{ ...note(27, OK_INK), fontWeight: 700, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, OK_INK), fontWeight: 600, display: "block", lineHeight: 1.3, whiteSpace: "nowrap" }}>
             Tuning Spark:
             <br />
             fewer shuffles<span style={{ opacity: ease(frame, lessAt, 10) }}>, less data in each</span>
@@ -226,7 +226,7 @@ export const ShuffleScene: React.FC = () => {
                 <span style={{ ...note(20, hot ? ACCENT_INK : INK_SOFT), whiteSpace: "nowrap" }}>
                   <Num>{nsText(l.ns)}</Num>
                   {ratio ? (
-                    <span style={{ opacity: ease(frame, ratio.at, 10), fontWeight: 700 }}>
+                    <span style={{ opacity: ease(frame, ratio.at, 10), fontWeight: 600 }}>
                       {" · "}
                       <Num>{count(ratio.n)}</Num> × memory
                     </span>

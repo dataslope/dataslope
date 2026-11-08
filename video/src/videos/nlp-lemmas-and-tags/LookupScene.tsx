@@ -33,7 +33,7 @@ const Head: React.FC<{ x: number; y: number; n?: string; nAt?: number; at: numbe
   <>
     {n ? (
       <Ink at={nAt ?? at} dur={10} style={{ left: x, top: y, whiteSpace: "nowrap" }}>
-        <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>{n}</span>
+        <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>{n}</span>
       </Ink>
     ) : null}
     <Ink at={at} dur={14} style={{ left: x + (n ? 26 : 0), top: y, whiteSpace: "nowrap" }}>

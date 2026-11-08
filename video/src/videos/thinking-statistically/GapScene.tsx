@@ -248,7 +248,7 @@ export const GapScene: React.FC = () => {
                   borderRadius: 4,
                   ...note(23, STAT_INK),
                   ...TABULAR,
-                  fontWeight: 700,
+                  fontWeight: 600,
                 }}
               >
                 {fmt(mean)}
@@ -348,7 +348,7 @@ export const GapScene: React.FC = () => {
                 opacity: ease(frame, draws[k].bar + 6, 8),
                 whiteSpace: "nowrap",
                 ...note(23, STAT_INK),
-                fontWeight: 700,
+                fontWeight: 600,
               }}
             >
               {/* "Randomness makes differences": each gap lit as the word lands. */}

@@ -72,7 +72,7 @@ export const MoneyScene: React.FC = () => {
           display: "inline-block",
           fontFamily: MONO,
           fontSize: SIZE,
-          fontWeight: 700,
+          fontWeight: 600,
           color: ok ? OK_INK : ACCENT_INK,
           opacity: p,
           transform: `scale(${0.8 + 0.2 * p + swell * 0.12})`,
@@ -178,7 +178,7 @@ export const MoneyScene: React.FC = () => {
             <span style={{ position: "relative" }}>{digits.slice(3, Math.min(typed, digits.length - 1))}</span>
           </span>
           {typed >= digits.length ? (
-            <span style={{ color: ACCENT_INK, fontWeight: 700 }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 600 }}>
               <Mark at={fourAt} color={MARK_BAD}>
                 {digits.slice(-1)}
               </Mark>

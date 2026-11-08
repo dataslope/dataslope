@@ -219,7 +219,7 @@ export const TestScene: React.FC = () => {
           </span>
         </Note>
         <Note at={sixAt} x={GRID.x} y={gridBottom + 68}>
-          <span style={{ ...note(36, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(36, OK_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
             {TEST.truePos} of {TEST.positives}: <span style={{ background: HIGHLIGHT, padding: "0 6px", borderRadius: 4 }}>one in six</span>, about{" "}
             {pct(TEST.posteriorFloat)}
           </span>

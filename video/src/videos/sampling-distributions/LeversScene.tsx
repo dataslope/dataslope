@@ -177,7 +177,7 @@ const Panel: React.FC<{ spec: PanelSpec; hold: number; axisAt: number }> = ({ sp
         width={2.6}
       />
       <Note at={times[0] + 8} x={sx(scale, center + sd) + 14} y={bracketY - 15}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>± ${fmt(rows[i].sd)}</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>± ${fmt(rows[i].sd)}</span>
       </Note>
 
       {/* The printout, a row per state. */}

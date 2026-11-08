@@ -76,7 +76,7 @@ const Metrics: React.FC<{ c: Ctx }> = ({ c }) => {
                     alignItems: "center",
                     justifyContent: "center",
                     ...label(20, PAPER),
-                    fontWeight: 700,
+                    fontWeight: 600,
                     ...TABULAR,
                   }}
                 >
@@ -178,7 +178,7 @@ const Xent: React.FC<{ c: Ctx }> = ({ c }) => {
       {/* The answer, and why: how hard each loss still pushes on the logit
           behind a sigmoid when the model is this wrong. */}
       <Note at={useAt - 2} x={box.right + 30} y={c.y(box.top) + c.h(250)}>
-        <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           <Mark at={useAt + 4}>so use cross-entropy</Mark>
         </span>
       </Note>

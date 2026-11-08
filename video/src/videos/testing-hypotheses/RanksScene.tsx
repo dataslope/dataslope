@@ -255,7 +255,7 @@ export const RanksScene: React.FC = () => {
           </Label>
         </Note>
         <Note at={p033At - 4} x={rankX(MEAN_RANK[1]) + 16} y={y(RANK_Y) - 128}>
-          <span style={{ ...note(26, DATA_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, DATA_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
             Mann-Whitney, p = {fmt(MWU.mwuP, 3)}
           </span>
         </Note>

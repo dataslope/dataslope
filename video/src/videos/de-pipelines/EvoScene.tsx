@@ -190,7 +190,7 @@ export const EvoScene: React.FC = () => {
 
         {/* Parquet: three daily files. */}
         <Note at={parqAt} x={X0} y={tTop - 40} out={gone}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Parquet, one file a day<span style={{ opacity: ease(frame, schemaAt, 10) }}>: each file keeps its own schema</span>
           </span>
         </Note>
@@ -232,7 +232,7 @@ export const EvoScene: React.FC = () => {
           ]}
         />
         <Note at={goneAt} x={TABLE_X} y={tableBottom + h(24)} out={nameAt + 4}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>by default: coupon dropped, and no error</span>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>by default: coupon dropped, and no error</span>
         </Note>
         <Note at={failsAt} x={TABLE_X} y={tableBottom + h(70)} out={nameAt + 4}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
@@ -240,10 +240,10 @@ export const EvoScene: React.FC = () => {
           </span>
         </Note>
         <Note at={appearsAt + 4} x={TABLE_X} y={tableBottom + h(24)} out={breakAt}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>by name: coupon kept, null for day 1</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>by name: coupon kept, null for day 1</span>
         </Note>
         <Note at={breakAt} x={TABLE_X} y={tableBottom + h(76)} out={gone}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>renames and type changes break readers</span>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>renames and type changes break readers</span>
         </Note>
         <Note at={endAt + 4} x={TABLE_X} y={tableBottom + h(120)} out={gone}>
           <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>
@@ -261,7 +261,7 @@ export const EvoScene: React.FC = () => {
 
         {/* Avro: a reader resolves each record against its own schema. */}
         <Note at={avroAt + 4} x={X0} y={AY - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Avro, a row format for messages<span style={{ color: OK_INK, opacity: ease(frame, contractAt, 10) }}>: evolution as a contract</span>
           </span>
         </Note>
@@ -330,7 +330,7 @@ export const EvoScene: React.FC = () => {
           coupon with a default: passes all three
         </Pill>
         <Note at={failsBackAt} x={X0} y={AY + h(382)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>no default: fails backward, so fails full</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>no default: fails backward, so fails full</span>
         </Note>
         <Pill x={X0} y={AY + h(438)} at={suitsAt} tone="ok" size={23} solid>
           many services that must agree on one schema

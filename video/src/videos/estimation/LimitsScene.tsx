@@ -181,7 +181,7 @@ export const LimitsScene: React.FC = () => {
         </span>
       </Note>
       <Note at={maximumAt - 4} x={sx(XR, top.v) - 14} y={y(R_BASE) - h(R_H) - 4} align="right" from="right">
-        <span style={{ ...note(21, EST_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(21, EST_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
           {Math.round(MAXIMUM.atTop * 100)}% of resamples: exactly {fmt(MAXIMUM.sampleMax)}
         </span>
       </Note>

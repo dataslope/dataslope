@@ -213,7 +213,7 @@ export const TabScene: React.FC = () => {
       <Ink at={tellsAt - 2} dur={16} style={{ left: FX + 30, top: FTOP + BAR_H + 22 + 96, width: FW - 70, opacity: 1 - frameDim }}>
         <div style={{ fontFamily: MONO, fontSize: 22, lineHeight: 1.55, color: INK }}>
           <Mark at={eighteenAt - 4}>
-            <span style={{ fontWeight: 700 }}>{VERSION_SHORT}</span>
+            <span style={{ fontWeight: 600 }}>{VERSION_SHORT}</span>
           </Mark>{" "}
           <span style={{ color: INK_SOFT }}>{VERSION_REST}, …</span>
         </div>

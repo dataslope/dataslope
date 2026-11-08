@@ -77,19 +77,19 @@ export const ConcurrentScene: React.FC = () => {
         {/* The grid: two experiments on one set of users. */}
         <div style={{ opacity: gridIn }}>
           {["old", "new"].map((t, c) => (
-            <div key={`c${t}`} style={{ position: "absolute", left: GRID.x + c * GRID.cw, width: GRID.cw, top: y(GRID.top) - h(44), textAlign: "center", ...label(21, INK_SOFT), fontWeight: 700 }}>
+            <div key={`c${t}`} style={{ position: "absolute", left: GRID.x + c * GRID.cw, width: GRID.cw, top: y(GRID.top) - h(44), textAlign: "center", ...label(21, INK_SOFT), fontWeight: 600 }}>
               {t}
             </div>
           ))}
-          <div style={{ position: "absolute", left: GRID.x, width: 2 * GRID.cw, top: y(GRID.top) - h(84), textAlign: "center", ...note(24, INK), fontWeight: 700 }}>
+          <div style={{ position: "absolute", left: GRID.x, width: 2 * GRID.cw, top: y(GRID.top) - h(84), textAlign: "center", ...note(24, INK), fontWeight: 600 }}>
             recommendations
           </div>
           {["old", "new"].map((t, r) => (
-            <div key={`r${t}`} style={{ position: "absolute", left: GRID.x - 110, width: 90, top: y(GRID.top) + r * h(GRID.ch) + h(GRID.ch) / 2 - 14, textAlign: "right", ...label(21, INK_SOFT), fontWeight: 700 }}>
+            <div key={`r${t}`} style={{ position: "absolute", left: GRID.x - 110, width: 90, top: y(GRID.top) + r * h(GRID.ch) + h(GRID.ch) / 2 - 14, textAlign: "right", ...label(21, INK_SOFT), fontWeight: 600 }}>
               {t}
             </div>
           ))}
-          <div style={{ position: "absolute", left: GRID.x - 270, top: y(GRID.top) + h(GRID.ch) - 16, ...note(24, INK), fontWeight: 700 }}>pricing</div>
+          <div style={{ position: "absolute", left: GRID.x - 270, top: y(GRID.top) + h(GRID.ch) - 16, ...note(24, INK), fontWeight: 600 }}>pricing</div>
           {cells.map((cl) => {
             const { left, top } = cell(cl.r, cl.c);
             const bg = cl.r === 1 && cl.c === 1 ? HIGHLIGHT : `color-mix(in srgb, ${CONTROL} 35%, ${PAPER})`;
@@ -148,7 +148,7 @@ export const ConcurrentScene: React.FC = () => {
 
         {/* What a factorial design does. */}
         <Note at={indepAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) + h(92)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>factorial: randomize each test independently</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>factorial: randomize each test independently</span>
         </Note>
         <Note at={fillAt} x={GRID.x + 2 * GRID.cw + 40} y={y(GRID.top) + h(GRID.ch) + h(130)}>
           <span style={{ ...note(24, OK_INK), whiteSpace: "nowrap" }}>

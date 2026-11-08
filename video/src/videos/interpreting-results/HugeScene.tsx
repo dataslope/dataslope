@@ -198,7 +198,7 @@ export const HugeScene: React.FC = () => {
         <Bracket x0={sx(LX, mx[0])} x1={sx(LX, mx[1])} y={loupeTop + 70} at={seventhAt + 6} up={false} tick={10} />
         <Note at={seventhAt + 8} x={(sx(LX, mx[0]) + sx(LX, mx[1])) / 2} y={loupeTop + 82} from="up">
           <span
-            style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}
+            style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)", ...halo }}
           >
             {fmt(HUGE.gap, 2)}
           </span>
@@ -225,7 +225,7 @@ export const HugeScene: React.FC = () => {
           opacity: ease(frame, pAtWord - 2, 12) * (1 - pDim),
           ...note(52, INK),
           ...TABULAR,
-          fontWeight: 700,
+          fontWeight: 600,
           whiteSpace: "nowrap",
         }}
       >
@@ -256,7 +256,7 @@ export const HugeScene: React.FC = () => {
           opacity: ease(frame, percentAt - 6, 12),
           ...note(52, INK),
           ...TABULAR,
-          fontWeight: 700,
+          fontWeight: 600,
           whiteSpace: "nowrap",
         }}
       >

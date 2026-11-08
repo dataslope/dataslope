@@ -137,7 +137,7 @@ export const IdemScene: React.FC = () => {
           </Cell>
         ))}
         <Note at={arriveAt(3) + 4} x={IN.x + 3 * IN.step} y={y(IN.top) + IN.h + h(8)} out={q6Out}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the replay: 5 to 7 again</span>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the replay: 5 to 7 again</span>
         </Note>
 
         {/* Two sinks: a blind insert, and an idempotent one. */}
@@ -160,7 +160,7 @@ export const IdemScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 ...label(20, INK_SOFT),
-                fontWeight: 700,
+                fontWeight: 600,
                 opacity: 1 - ease(frame, q6Out, 10),
               }}
             >
@@ -191,7 +191,7 @@ export const IdemScene: React.FC = () => {
             >
               <span style={{ width: 140, paddingLeft: 10, ...TABULAR, fontWeight: 650 }}>{off}</span>
               <span style={{ color: INK_SOFT }}>click</span>
-              {dup ? <span style={{ marginLeft: "auto", paddingRight: 10, ...label(20, ACCENT_INK), fontWeight: 700 }}>duplicate</span> : null}
+              {dup ? <span style={{ marginLeft: "auto", paddingRight: 10, ...label(20, ACCENT_INK), fontWeight: 600 }}>duplicate</span> : null}
             </div>
           );
         })}
@@ -269,7 +269,7 @@ export const IdemScene: React.FC = () => {
           </span>
         </Note>
         <Note at={effAt} x={1300} y={rowY(8) + h(16)} out={q6Out}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             effectively-once,
             <br />
             without a distributed transaction
@@ -330,10 +330,10 @@ export const IdemScene: React.FC = () => {
           );
         })}
         <Note at={sendAt(2) + 6} x={topicL.x + topicL.w + 16} y={topicL.y + topicL.h / 2 - h(30)}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>← a retried copy</span>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>← a retried copy</span>
         </Note>
         <Note at={dropsAt + 6} x={topicL.x + topicL.w + 16} y={topicL.y + topicL.h / 2 + h(2)}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Strike at={dropsAt + 10}>seq 42 again</Strike>: dropped
           </span>
         </Note>
@@ -425,17 +425,17 @@ export const IdemScene: React.FC = () => {
           return (
             <Box key={o.text} x={OUT_X} y={y(430) + i * h(90)} w={OUT_W} h={h(70)} at={o.at} color={ACCENT} size={21}>
               <span>{o.text}</span>
-              <span style={{ ...label(20, OK_INK), fontWeight: 700, marginTop: 2, opacity: ease(frame, db ? dbJoinsAt : keyAt, 10) }}>
+              <span style={{ ...label(20, OK_INK), fontWeight: 600, marginTop: 2, opacity: ease(frame, db ? dbJoinsAt : keyAt, 10) }}>
                 {db ? "joins: offsets + output, one transaction" : "an idempotency key"}
               </span>
             </Box>
           );
         })}
         <Note at={notInAt} x={OUT_X} y={y(430) + 3 * h(90) + h(10)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>not in the transaction</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>not in the transaction</span>
         </Note>
         <Note at={joinAt} x={OUT_X} y={y(430) + 3 * h(90) + h(60)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             each must join it,
             <br />
             or accept idempotent writes

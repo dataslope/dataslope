@@ -143,7 +143,7 @@ export const VaultScene: React.FC = () => {
         {/* What `_hk` is: the business key, hashed. */}
         <Note at={hubsAt + 18} x={X0} y={hubC.y - h(44)}>
           <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>
-            <span style={{ fontWeight: 700, color: INK }}>customer_hk</span>: a hash of customer_id
+            <span style={{ fontWeight: 600, color: INK }}>customer_hk</span>: a hash of customer_id
           </span>
         </Note>
 
@@ -186,7 +186,7 @@ export const VaultScene: React.FC = () => {
               </div>
             ))}
             {i === 0 ? (
-              <div style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, priceAt, 10) }}>
+              <div style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, priceAt, 10) }}>
                 price: <span style={{ opacity: 0.4 + 0.6 * ease(frame, joinsAt, 10) }}>a stack of joins</span>
               </div>
             ) : null}

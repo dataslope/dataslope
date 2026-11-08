@@ -163,7 +163,7 @@ export const CostScene: React.FC = () => {
               <span style={TABULAR}>{toSonnet.avoided.toLocaleString("en-US")}</span> fewer errors a month for{" "}
               <span style={TABULAR}>{usd(toSonnet.extra, 2)}</span>,
             </span>{" "}
-            <span style={{ color: A_INK, fontWeight: 700, opacity: ease(frame, fiveAt - 2, 10) }}>
+            <span style={{ color: A_INK, fontWeight: 600, opacity: ease(frame, fiveAt - 2, 10) }}>
               <Marked at={fiveAt}>about {cents(toSonnet.perError ?? 0)} each</Marked>
             </span>
           </span>
@@ -203,7 +203,7 @@ const Gain: React.FC<{ at: number; x: number; y: number; pulseAt: number; align?
       <span
         style={{
           ...note(22, INK),
-          fontWeight: 700,
+          fontWeight: 600,
           display: "inline-block",
           transform: `${align === "right" ? "translateX(-100%) " : ""}scale(${1 + pulse(frame, pulseAt + 4, 16) * 0.05})`,
           transformOrigin: align === "right" ? "100% 50%" : "0 50%",

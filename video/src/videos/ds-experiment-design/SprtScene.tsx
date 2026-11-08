@@ -108,12 +108,12 @@ export const SprtScene: React.FC = () => {
           <line x1={BOX.left} x2={BOX.left + (BOX.right - BOX.left) * bounds} y1={at(ys, SPRT.lower)} y2={at(ys, SPRT.lower)} stroke={INK} strokeWidth={2.6} strokeDasharray="8 6" />
         </Svg>
         <Note at={boundsAt + 6} x={BOX.right - 6} y={at(ys, SPRT.upper) - h(40)} width={620} align="right">
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             stop: an effect · {upperLog} = {SPRT.upper.toFixed(2)}
           </span>
         </Note>
         <Note at={boundsAt + 10} x={BOX.right - 6} y={at(ys, SPRT.lower) + h(18)} width={620} align="right">
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             stop: favors no effect · {lowerLog} = −{(-SPRT.lower).toFixed(2)}
           </span>
         </Note>
@@ -164,7 +164,7 @@ export const SprtScene: React.FC = () => {
                 style={{ position: "absolute", left: COL_X, top: top + h(30), width: (xb(b.v) - COL_X) * p, height: h(34), background: b.color, opacity: 0.85, borderRadius: 3 }}
               />
               <Note at={b.at} x={xb(b.v) + 12} y={top + h(30)}>
-                <span style={{ ...note(26, b.ink), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
+                <span style={{ ...note(26, b.ink), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
                   {i === 0 ? <Mark at={cheaperAt - 4}>{String(b.v)}</Mark> : b.v}
                 </span>
               </Note>

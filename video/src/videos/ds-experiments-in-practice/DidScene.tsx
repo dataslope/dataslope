@@ -120,14 +120,14 @@ export const DidScene: React.FC = () => {
         <Curve points={line(DID.control)} x={x} y={yS} at={notAt} dur={22} color={CONTROL} dots={5} />
         <Curve points={line(DID.treated)} x={x} y={yS} at={policyAt + 2} dur={22} color={TREAT} dots={5} />
         <Note at={policyAt + 10} x={at(x, split) + 12} y={y(PLOT.top) - h(12)}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>the policy starts</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>the policy starts</span>
         </Note>
         <Note at={policyAt + 8} x={at(x, 12.4) + 12} y={at(yS, DID.treated[11]) - 16}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 750, whiteSpace: "nowrap" }}>treated city</span>
         </Note>
         {/* The evidence for parallel trends: the weeks before the policy. */}
         <Note at={beforeAt - 2} x={at(x, 0.6) + 12} y={y(PLOT.top) + h(58)}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>before the policy, the two rose together</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>before the policy, the two rose together</span>
         </Note>
         <Note at={beforeAt + 8} x={at(x, 0.6) + 12} y={y(PLOT.top) + h(88)}>
           <span style={{ ...label(19, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>
@@ -147,7 +147,7 @@ export const DidScene: React.FC = () => {
           { text: "comparison city", v: DID.controlChange, at: compAt + 6, ink: INK_SOFT },
         ].map((r, i) => (
           <Note key={r.text} at={r.at} x={SUM_X} y={y(500) + i * h(60)}>
-            <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", ...note(27, r.ink), fontWeight: 700, ...TABULAR }}>
+            <span style={{ display: "inline-flex", width: SUM_W, justifyContent: "space-between", ...note(27, r.ink), fontWeight: 600, ...TABULAR }}>
               <span>{r.text}</span>
               <span>{fixed(r.v, 1, true)}</span>
             </span>
@@ -178,7 +178,7 @@ export const DidScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap", ...TABULAR }}>true effect in the simulation: +{DID.truth}</span>
         </Note>
         <Note at={parallelAt} x={SUM_X} y={y(780)} width={SUM_W}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 700 }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600 }}>
             It rests on parallel trends<span style={{ fontWeight: 500, opacity: ease(frame, togetherAt - 6, 10) }}>: without the policy, the lines move together</span>
           </span>
         </Note>

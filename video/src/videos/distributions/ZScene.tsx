@@ -101,7 +101,7 @@ export const ZScene: React.FC = () => {
         <span style={{ ...note(34, INK) }}>
           z = (score − mean) / SD{" "}
           <span style={{ color: ASK_INK, opacity: ease(frame, isTwoAt - 6, 14) }}>
-            = ({x} − {mu}) / {sigma} = <b style={{ fontWeight: 700 }}>{fmt(Z.z, 0)}</b>
+            = ({x} − {mu}) / {sigma} = <b style={{ fontWeight: 600 }}>{fmt(Z.z, 0)}</b>
           </span>
         </span>
       </Ink>

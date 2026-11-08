@@ -170,7 +170,7 @@ export const AgesScene: React.FC = () => {
       {/* The standard deviation: a bracket one SD either side of the average. */}
       <Span x0={sx(X, AGES.mean - AGES.sd)} x1={sx(X, AGES.mean + AGES.sd)} y={y(SD_Y)} at={dataAt} dur={18} color={BLUE_INK} />
       <Note at={halfAt - 2} x={sx(X, AGES.mean + AGES.sd) + 18} y={y(SD_Y - 15)}>
-        <div style={{ ...note(24, BLUE_INK), fontWeight: 700 }}>± {fmt(AGES.sd)} years</div>
+        <div style={{ ...note(24, BLUE_INK), fontWeight: 600 }}>± {fmt(AGES.sd)} years</div>
         <div style={note(20, INK_SOFT)}>one standard deviation</div>
       </Note>
 
@@ -206,7 +206,7 @@ export const AgesScene: React.FC = () => {
       {/* The standard error: how far the average moves. */}
       <Span x0={sx(X, AGES.mean - AGES.se)} x1={sx(X, AGES.mean + AGES.se)} y={y(SE_Y)} at={howFarAt} dur={12} color={ACCENT} width={3} tick={10} />
       <Note at={seAt} x={sx(X, AGES.mean + AGES.se) + 16} y={y(SE_Y) - 16}>
-        <div style={{ ...note(24, ACCENT_INK), fontWeight: 700 }}>± {fmt(AGES.se)} years</div>
+        <div style={{ ...note(24, ACCENT_INK), fontWeight: 600 }}>± {fmt(AGES.se)} years</div>
         <div style={note(20, INK_SOFT)}>one standard error</div>
       </Note>
       <Bell at={widthAt - 4} mx={mx} />

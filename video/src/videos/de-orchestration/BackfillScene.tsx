@@ -150,7 +150,7 @@ export const BackfillScene: React.FC = () => {
 
         {/* A year of partitions. */}
         <Note at={yearAt} x={GRID_X - 44} y={y(290)}>
-          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             2025: <span style={{ color: BLUE_INK, opacity: ease(frame, runsAt, 10) }}>{BACKFILL.partitions} daily partitions</span>
           </span>
         </Note>
@@ -208,7 +208,7 @@ export const BackfillScene: React.FC = () => {
 
         {/* Why the loop: the cost of one run, a model. */}
         <Note at={loopAt} x={X0} y={y(656)}>
-          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             rows one run processes
             <span style={{ ...label(22, INK_SOFT), fontWeight: 500, opacity: ease(frame, modelAt, 10) }}>
               {" "}
@@ -246,12 +246,12 @@ export const BackfillScene: React.FC = () => {
           </g>
         </svg>
         <Note at={eightAt + 10} x={CH_X1 + 40} y={ly(REFRESH.daily) - 15}>
-          <span style={{ ...note(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             one day&apos;s partition: <Num>{count(REFRESH.daily)}</Num>
           </span>
         </Note>
         <Note at={sixAt} x={CH_X1 + 40} y={ly(REFRESH.fullAtEnd) - 15}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             rebuild everything: <Num>{count(REFRESH.fullAtEnd)}</Num>
           </span>
         </Note>

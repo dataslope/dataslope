@@ -119,7 +119,7 @@ export const SrmScene: React.FC = () => {
                 top: sy(b.v) + (i === 0 ? h(14) : -h(40)),
                 textAlign: "center",
                 ...note(25, i === 0 ? PAPER : BLUE_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 ...TABULAR,
                 opacity: ease(frame, b.at + 8, 10),
               }}
@@ -134,7 +134,7 @@ export const SrmScene: React.FC = () => {
                 top: y(BASE) + h(12),
                 textAlign: "center",
                 ...label(22, INK_SOFT),
-                fontWeight: 700,
+                fontWeight: 600,
                 opacity: ease(frame, askedAt, 10),
               }}
             >
@@ -161,7 +161,7 @@ export const SrmScene: React.FC = () => {
           </span>
         </Note>
         <Note at={pAt - 2} x={RIGHT_X} y={y(580)} out={formulaOut}>
-          <span style={{ ...note(32, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>
+          <span style={{ ...note(32, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>
             p ≈ {bad.p.toFixed(5)}, about 1 in {count(Math.round(1 / bad.p / 1000) * 1000)}
           </span>
         </Note>
@@ -208,7 +208,7 @@ export const SrmScene: React.FC = () => {
               top: y(MINI_BASE) + h(10),
               textAlign: "center",
               ...label(20, INK_SOFT),
-              fontWeight: 700,
+              fontWeight: 600,
               ...TABULAR,
               opacity: ease(frame, fineAt + 8 + i * 4, 10),
             }}
@@ -219,12 +219,12 @@ export const SrmScene: React.FC = () => {
         {/* The verdict on the split the question is about outlasts the
             formula, as the contrast split's does. */}
         <Note at={formulaOut + 4} x={BARS_X - 40} y={sy(bad.observed[1]) - h(96)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             p ≈ <span style={TABULAR}>{bad.p.toFixed(5)}</span>: an SRM
           </span>
         </Note>
         <Note at={fineP - 2} x={MINI_X - 20} y={y(MINI_TOP) - h(62)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>p = {fine.p.toFixed(2)}: chance</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>p = {fine.p.toFixed(2)}: chance</span>
         </Note>
 
         {/* What usually causes it. */}
@@ -237,7 +237,7 @@ export const SrmScene: React.FC = () => {
           </Note>
         ))}
         <Note at={findAt - 2} x={RIGHT_X} y={y(640)}>
-          <span style={{ ...note(30, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Find it before you read a single result.</span>
+          <span style={{ ...note(30, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Find it before you read a single result.</span>
         </Note>
       </Drift>
     </AbsoluteFill>

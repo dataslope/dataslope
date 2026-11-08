@@ -304,7 +304,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      <span style={{ ...label(size, titleInk ?? t.ink), fontWeight: 700, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO, fontWeight: 600 } : {}) }}>{title}</span>
+      <span style={{ ...label(size, titleInk ?? t.ink), fontWeight: 600, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO, fontWeight: 600 } : {}) }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap" }}>{sub}</span> : null}
       {children}
     </div>
@@ -386,7 +386,7 @@ export const Pill: React.FC<{
   const frame = useCurrentFrame();
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.6;
   const text = (
-    <span style={{ ...label(size, TONE[tone].ink), fontWeight: 700, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO, fontWeight: 700 } : {}) }}>{children}</span>
+    <span style={{ ...label(size, TONE[tone].ink), fontWeight: 600, whiteSpace: "nowrap", ...(mono ? { fontFamily: MONO, fontWeight: 600 } : {}) }}>{children}</span>
   );
   return (
     <Ink at={at} dur={12} out={out} style={{ left: x, top: y, opacity: 1 - d, fontSize: size }}>

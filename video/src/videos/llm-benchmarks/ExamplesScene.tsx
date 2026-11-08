@@ -117,7 +117,7 @@ export const ExamplesScene: React.FC = () => {
         {STEPS.map((s, i) => (
           <React.Fragment key={s.text}>
             <Tag at={stepAt[i]} x={stepX[i]} y={y(340)} width={s.w}>
-              <span style={{ ...label(22, A_INK), fontWeight: 700, marginRight: 10 }}>{i + 1}</span>
+              <span style={{ ...label(22, A_INK), fontWeight: 600, marginRight: 10 }}>{i + 1}</span>
               {i === 0 ? <Marked at={howAt - 2}>{s.text}</Marked> : s.text}
             </Tag>
             {i > 0 ? (
@@ -152,10 +152,10 @@ export const ExamplesScene: React.FC = () => {
           ))}
         </Svg>
         <Ink at={eightyAt - 2} dur={12} style={{ left: HX0 - 80, top: y(BASE_A) - h(MAX_H) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, A_INK), fontWeight: 700 }}>right {SIZES.trueA}% of the time</span>
+          <span style={{ ...note(22, A_INK), fontWeight: 600 }}>right {SIZES.trueA}% of the time</span>
         </Ink>
         <Ink at={sixtyFiveAt - 2} dur={12} style={{ left: HX0 - 80, top: y(BASE_B) - h(MAX_H) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, B_INK), fontWeight: 700 }}>right {SIZES.trueB}%</span>
+          <span style={{ ...note(22, B_INK), fontWeight: 600 }}>right {SIZES.trueB}%</span>
         </Ink>
         {/* The axis: correct answers out of 20. */}
         <Svg opacity={ease(frame, sixtyFiveAt, 12)}>

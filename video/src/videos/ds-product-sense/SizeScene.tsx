@@ -41,7 +41,7 @@ const Factor: React.FC<{ x: number; top: number; w: number; at: number; out: num
         transform: `translateY(${(1 - p) * 16}px)`,
       }}
     >
-      <div style={{ ...note(40, result ? OK_INK : INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+      <div style={{ ...note(40, result ? OK_INK : INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
         {result ? <Mark at={from + 6} color={MARK_OK}>{value}</Mark> : value}
       </div>
       <div style={{ ...label(21, INK_SOFT), marginTop: 10, whiteSpace: "nowrap" }}>{text}</div>
@@ -193,7 +193,7 @@ export const SizeScene: React.FC = () => {
           How do you size a feature&apos;s impact before building it?
         </QuestionCard>
         <Note at={boundAt} x={X0} y={y(330)}>
-          <span style={{ ...note(32, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Bound it.</span>
+          <span style={{ ...note(32, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Bound it.</span>
         </Note>
         <Note at={reachAt} x={X0} y={y(400)}>
           <span style={{ ...note(30, INK), ...TABULAR, whiteSpace: "nowrap" }}>
@@ -208,7 +208,7 @@ export const SizeScene: React.FC = () => {
           </span>
         </Note>
         <Note at={rangeAt} x={X0} y={y(460)}>
-          <span style={{ ...note(30, BLUE_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, BLUE_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
             = {num(IMPACT.extraLo)} to {num(IMPACT.extraHi)} extra weekly cooks
           </span>
         </Note>
@@ -235,10 +235,10 @@ export const SizeScene: React.FC = () => {
           />
         </Svg>
         <Note at={goalAt + 4} x={at(xs, IMPACT.goal)} align="right" y={y(AXIS.y) - h(100)}>
-          <span style={{ ...label(22, INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>goal: {num(IMPACT.goal)} ▾</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>goal: {num(IMPACT.goal)} ▾</span>
         </Note>
         <Bracket x0={at(xs, 0)} x1={at(xs, IMPACT.extraHi)} y={y(AXIS.y) + h(70)} at={fifthAt} color={ACCENT_INK}>
-          <span style={{ ...label(23, ACCENT_INK), fontWeight: 700, ...TABULAR }}>best case: {pct(IMPACT.shareOfGoal)} of the goal</span>
+          <span style={{ ...label(23, ACCENT_INK), fontWeight: 600, ...TABULAR }}>best case: {pct(IMPACT.shareOfGoal)} of the goal</span>
         </Bracket>
         <Note at={deprioritizeAt} x={980} y={y(AXIS.y) + h(84)}>
           <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap" }}>→ deprioritize it before anyone builds it</span>

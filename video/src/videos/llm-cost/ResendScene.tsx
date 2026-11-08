@@ -197,7 +197,7 @@ export const ResendScene: React.FC = () => {
               <span
                 style={{
                   ...note(28, POINT_INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   ...TABULAR,
                   whiteSpace: "nowrap",
                   display: "inline-block",

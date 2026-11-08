@@ -48,7 +48,7 @@ const Entry: React.FC<{ at: number; x: number; y: number; op: string; text: stri
         transform: `translateX(${(1 - p) * -14}px)`,
       }}
     >
-      <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: BLUE_INK }}>{op}</span>
+      <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: BLUE_INK }}>{op}</span>
       <span style={{ ...note(20, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{text}</span>
     </div>
   );
@@ -164,7 +164,7 @@ export const CdcScene: React.FC = () => {
 
         {/* The poll. */}
         <Note at={pollingAt} x={POLL_X} y={pollTop - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Polling, since the last run</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Polling, since the last run</span>
         </Note>
         <Listing lines={pollLines} x={POLL_X} top={pollTop} width={580} size={21} at={pollingAt + 2} lineAt={pollLines.map((_, i) => (i === 1 ? updatedAt : pollingAt + 4 + i * 4))} marks={[{ line: 1, at: lastRunAt, out: sinceAt }]} />
         <TableName g={rg} at={findsAt}>
@@ -172,9 +172,9 @@ export const CdcScene: React.FC = () => {
         </TableName>
         <DataTable g={rg} cols={colsOf(CDC.poll)} at={findsAt} rows={CDC.poll.rows.map((cells, i) => ({ cells, at: findsAt + 4 + i * 4 }))} />
         <Note at={notThereAt} x={rg.right + 28} y={resultTop + h(6)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", background: MARK_BAD, padding: "2px 6px" }}>order 3's delete:</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", background: MARK_BAD, padding: "2px 6px" }}>order 3's delete:</span>
           <br />
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>no row left to select</span>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>no row left to select</span>
         </Note>
         <Note at={neverAt} x={rg.right + 28} y={resultTop + h(92)}>
           <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>
@@ -186,7 +186,7 @@ export const CdcScene: React.FC = () => {
 
         {/* The write-ahead log, streamed downstream. */}
         <Note at={logAt} x={X0} y={logTop - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             The database's write-ahead log<span style={{ color: INK_SOFT, fontWeight: 600, opacity: ease(frame, orderAt, 10) }}>, in order</span>
           </span>
         </Note>
@@ -200,7 +200,7 @@ export const CdcScene: React.FC = () => {
             {OPS.map(([op, word], i) => (
               <React.Fragment key={op}>
                 {i ? ", " : null}
-                <span style={{ fontFamily: MONO, fontWeight: 700, color: BLUE_INK }}>{op}</span> {word}
+                <span style={{ fontFamily: MONO, fontWeight: 600, color: BLUE_INK }}>{op}</span> {word}
               </React.Fragment>
             ))}
           </span>
@@ -210,7 +210,7 @@ export const CdcScene: React.FC = () => {
         <Flow points={[[kafkaX + 216, midY], [whX - 8, midY]]} at={kafkaAt + 10} color={BAR} />
         <Node x={whX} y={logTop} w={210} h={76} at={kafkaAt + 16} title="warehouse" size={24} />
         <Note at={kafkaAt + 22} x={whX + 230} y={logTop + 6}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             all three changes,
             <br />
             the delete included
@@ -222,7 +222,7 @@ export const CdcScene: React.FC = () => {
           <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
             <b style={{ color: OK_INK }}>Use it for</b> low-latency replication of transactional data
             <span style={{ opacity: ease(frame, noPollAt, 10) }}>, with no polling of the source</span>
-            <span style={{ opacity: ease(frame, deletesAt, 10), color: OK_INK, fontWeight: 700 }}>, and whenever deletes must arrive</span>
+            <span style={{ opacity: ease(frame, deletesAt, 10), color: OK_INK, fontWeight: 600 }}>, and whenever deletes must arrive</span>
           </span>
         </Note>
       </Drift>

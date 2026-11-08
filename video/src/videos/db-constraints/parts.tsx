@@ -868,7 +868,7 @@ export const ErrorBox: React.FC<{
         }}
       >
         <div>
-          <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span>
+          <span style={{ color: ACCENT_INK, fontWeight: 600 }}>ERROR:</span>
           {"  "}
           {msg}
         </div>
@@ -894,7 +894,7 @@ export const Tag: React.FC<{ x: number; top: number; at: number; children: strin
   out,
 }) => (
   <Ink at={at} dur={12} out={out} style={{ left: x, top, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color }}>{children}</span>
   </Ink>
 );
 

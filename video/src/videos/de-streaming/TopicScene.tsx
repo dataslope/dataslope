@@ -252,7 +252,7 @@ export const TopicScene: React.FC = () => {
           }}
         />
         <Note at={orderAt} x={LANE_X + LANE_W + 24} y={laneTop(avaLane) + laneH / 2 - h(16)} out={insideAt + 10}>
-          <span style={{ ...label(21, USER_INK.ava), fontWeight: 700, whiteSpace: "nowrap" }}>← ava's clicks, offsets 0 to 4, in arrival order</span>
+          <span style={{ ...label(21, USER_INK.ava), fontWeight: 600, whiteSpace: "nowrap" }}>← ava's clicks, offsets 0 to 4, in arrival order</span>
         </Note>
         <Legend x={LANE_X} y={laneTop(2) + laneH + h(58)} at={flyAt(0) + 4} out={addAt - 4} note="· the video's own stream" />
         <Note at={acrossAt + 6} x={LANE_X} y={laneTop(2) + laneH + h(10)} out={partsOut}>
@@ -285,7 +285,7 @@ export const TopicScene: React.FC = () => {
         {/* Order: inside each partition, never across. */}
         {[0, 1, 2].map((p) => (
           <Note key={p} at={insideAt + p * 3} x={LANE_X + LANE_W + 18} y={laneTop(p) + laneH / 2 - h(15)} out={partsOut}>
-            <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>✓ in order</span>
+            <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>✓ in order</span>
           </Note>
         ))}
         <Note at={acrossAt} x={RIGHT_X} y={y(600)} out={partsOut}>
@@ -349,7 +349,7 @@ export const TopicScene: React.FC = () => {
           <span style={{ ...label(21, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>added later; never removed</span>
         </Note>
         <div style={{ position: "absolute", left: RIGHT_X - 100, top: y(330), opacity: ease(frame, movesAt, 12) }}>
-          <div style={{ display: "flex", gap: 0, ...label(20, INK_SOFT), fontWeight: 700, borderBottom: `1.5px solid ${HAIRLINE}`, paddingBottom: 6 }}>
+          <div style={{ display: "flex", gap: 0, ...label(20, INK_SOFT), fontWeight: 600, borderBottom: `1.5px solid ${HAIRLINE}`, paddingBottom: 6 }}>
             <span style={{ width: 90 }}>key</span>
             <span style={{ width: 110, textAlign: "center" }}>of 3</span>
             <span style={{ width: 110, textAlign: "center" }}>of 4</span>
@@ -369,9 +369,9 @@ export const TopicScene: React.FC = () => {
                   borderRadius: 4,
                 }}
               >
-                <span style={{ width: 90, color: USER_INK[u], fontWeight: 700, paddingLeft: 4 }}>{u}</span>
+                <span style={{ width: 90, color: USER_INK[u], fontWeight: 600, paddingLeft: 4 }}>{u}</span>
                 <span style={{ width: 110, textAlign: "center", ...TABULAR }}>{PARTITIONS.of[u]}</span>
-                <span style={{ width: 110, textAlign: "center", ...TABULAR, fontWeight: 700, color: moved ? ACCENT_INK : INK, opacity: p }}>
+                <span style={{ width: 110, textAlign: "center", ...TABULAR, fontWeight: 600, color: moved ? ACCENT_INK : INK, opacity: p }}>
                   {PARTITIONS.four[u]}
                 </span>
               </div>
@@ -420,7 +420,7 @@ export const TopicScene: React.FC = () => {
           </span>
         </Note>
         <Note at={pctAt} x={WAFFLE.x} y={y(WAFFLE.top) + 10 * (WAFFLE.cell + WAFFLE.gap) + h(10)}>
-          <span style={{ ...note(26, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{count(MOVED.moved)}</Num> move: <Num>{Math.round(MOVED.share * 100)}</Num>%
           </span>
         </Note>
@@ -448,7 +448,7 @@ export const TopicScene: React.FC = () => {
           <span style={{ ...note(25, ACCENT_INK), fontWeight: 650, whiteSpace: "nowrap" }}>a user's new clicks can be read before the old ones</span>
         </Note>
         <Note at={peakAt} x={RIGHT_X - 100} y={y(706)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>size for peak throughput, with headroom</span>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>size for peak throughput, with headroom</span>
         </Note>
       </Drift>
     </AbsoluteFill>

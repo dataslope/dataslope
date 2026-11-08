@@ -51,7 +51,7 @@ const pieceMid = (k: number) => (pieceTop(k, 0) + pieceBottom(k)) / 2;
 /** "1  Split": a step's number in the accent and its name in ink. */
 const Step: React.FC<{ n: number; text: string; at: number; x: number; top: number }> = ({ n, text, at, x, top }) => (
   <Ink at={at} dur={14} style={{ left: x, top, display: "flex", alignItems: "baseline", gap: 12, whiteSpace: "nowrap" }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>{n}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>{n}</span>
     <span style={{ ...label(24, INK), fontWeight: 600 }}>{text}</span>
   </Ink>
 );

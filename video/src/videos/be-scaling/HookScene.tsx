@@ -164,7 +164,7 @@ export const HookScene: React.FC = () => {
 
         {/* The round: twelve questions. */}
         <Ink at={twelveAt} dur={14} style={{ left: X0, top: y(776), whiteSpace: "nowrap" }}>
-          <span style={{ ...label(24, INK), fontWeight: 700 }}>Twelve questions</span>
+          <span style={{ ...label(24, INK), fontWeight: 600 }}>Twelve questions</span>
         </Ink>
         {/* The twelve as plain numerals: nine in the data blue, two quick ones
             in gray, and the news feed set apart, lit on its name. */}
@@ -183,7 +183,7 @@ export const HookScene: React.FC = () => {
                 width: CHIP,
                 textAlign: "center",
                 ...label(30, quick ? INK_SOFT : feed ? INK : BLUE_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 opacity: p,
                 transform: `translateY(${(1 - p) * 10}px)`,
               }}

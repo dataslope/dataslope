@@ -112,7 +112,7 @@ export const SimpsonScene: React.FC = () => {
           const lit = i === 0 ? gotLight : 0;
           return (
             <React.Fragment key={m.arm}>
-              <div style={{ position: "absolute", left: X0, top: top - h(4), ...note(25, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: p }}>
+              <div style={{ position: "absolute", left: X0, top: top - h(4), ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: p }}>
                 <span style={{ display: "inline-block", width: 16, height: 16, borderRadius: 8, background: m.color, marginRight: 10 }} />
                 {m.arm}
               </div>
@@ -139,7 +139,7 @@ export const SimpsonScene: React.FC = () => {
                 s.w > 150 ? (
                   <div
                     key={s.text}
-                    style={{ position: "absolute", left: s.left, top: top + h(30) + h(MIX_H) / 2 - 13, ...label(20, s.ink), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR, opacity: ease(frame, m.at + 10, 10) }}
+                    style={{ position: "absolute", left: s.left, top: top + h(30) + h(MIX_H) / 2 - 13, ...label(20, s.ink), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR, opacity: ease(frame, m.at + 10, 10) }}
                   >
                     {s.text}
                   </div>
@@ -200,7 +200,7 @@ export const SimpsonScene: React.FC = () => {
           return (
             <React.Fragment key={r.key}>
               <div
-                style={{ position: "absolute", left: PLOT_X0 - 20, top: y(ROW_Y[r.key]) - h(64), ...note(25, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, r.at - 2, 10) }}
+                style={{ position: "absolute", left: PLOT_X0 - 20, top: y(ROW_Y[r.key]) - h(64), ...note(25, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, r.at - 2, 10) }}
               >
                 {r.key}
               </div>
@@ -243,7 +243,7 @@ export const SimpsonScene: React.FC = () => {
           </span>
         </Note>
         <Note at={matchAt} x={X0} y={y(790)} width={760}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700 }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600 }}>
             Randomized arms should match<span style={{ opacity: ease(frame, bugAt - 2, 10) }}>: a gap is a bug, like an SRM.</span>
             <span style={{ opacity: ease(frame, fairAt - 2, 10) }}> Compare within each segment.</span>
           </span>

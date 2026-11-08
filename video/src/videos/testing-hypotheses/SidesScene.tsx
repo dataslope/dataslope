@@ -146,7 +146,7 @@ export const SidesScene: React.FC = () => {
               y={py(phi(2.4)) - 70}
               out={s < 0 ? oneSidedAt : allAt - 4}
             >
-              <span style={{ ...note(30, STAT_INK), fontWeight: 700, ...halo, display: "inline-block", transform: "translateX(-50%)" }}>2.5%</span>
+              <span style={{ ...note(30, STAT_INK), fontWeight: 600, ...halo, display: "inline-block", transform: "translateX(-50%)" }}>2.5%</span>
             </Note>
           ))}
           {[-1, 1].map((s) => (
@@ -159,7 +159,7 @@ export const SidesScene: React.FC = () => {
                 transform: "translateX(-50%)",
                 opacity: ease(frame, Math.max(beyondAt + 2, nineAt - 4), 12) * (s < 0 ? 1 - lowerGone : 1 - slide),
                 ...note(24, STAT_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 whiteSpace: "nowrap",
                 ...halo,
               }}
@@ -178,7 +178,7 @@ export const SidesScene: React.FC = () => {
               transform: "translateX(-50%)",
               opacity: ourT * (1 - lowerGone),
               ...note(21, STAT_INK),
-              fontWeight: 700,
+              fontWeight: 600,
               whiteSpace: "nowrap",
               ...halo,
             }}
@@ -188,7 +188,7 @@ export const SidesScene: React.FC = () => {
 
           {/* The one-sided reading. */}
           <Note at={oneTailAt - 2} x={sx(X, 3.05)} y={py(phi(2.4)) - 70}>
-            <span style={{ ...note(30, STAT_INK), fontWeight: 700, ...halo, display: "inline-block", transform: "translateX(-50%)" }}>5%</span>
+            <span style={{ ...note(30, STAT_INK), fontWeight: 600, ...halo, display: "inline-block", transform: "translateX(-50%)" }}>5%</span>
           </Note>
           <div
             style={{
@@ -198,7 +198,7 @@ export const SidesScene: React.FC = () => {
               transform: `translateX(-50%) scale(${1 + 0.2 * glowUp})`,
               opacity: ease(frame, sixAt - 4, 12),
               ...note(24, STAT_INK),
-              fontWeight: 700,
+              fontWeight: 600,
               whiteSpace: "nowrap",
               ...halo,
             }}

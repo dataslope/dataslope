@@ -310,7 +310,7 @@ export const PriceScene: React.FC = () => {
       <Ink at={linesAt - 4} dur={16} style={{ left: STORE_X[0], top: y(800), display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
         <span style={{ ...label(22, INK_SOFT), width: 250 }}>From its lines</span>
         <span style={{ ...note(28, INK) }}>{charged} =</span>
-        <span style={{ ...note(30, INK), ...TABULAR, fontWeight: 700, ...lands(fortyFourAt) }}>
+        <span style={{ ...note(30, INK), ...TABULAR, fontWeight: 600, ...lands(fortyFourAt) }}>
           <Mark at={paidAt - 2}>{fmt(Number(TOTAL_CHARGED), 2)}</Mark>
         </span>
         <span style={{ ...note(28, INK_SOFT), fontStyle: "italic", opacity: ease(frame, paidAt - 2, 12) }}>what she paid</span>
@@ -321,7 +321,7 @@ export const PriceScene: React.FC = () => {
           <span style={{ gridArea: "1 / 1", opacity: swap, color: ACCENT_INK, fontWeight: 650 }}>Without the copy</span>
         </span>
         <span style={{ ...note(28, INK) }}>{catalog} =</span>
-        <span style={{ ...note(30, ACCENT_INK), ...TABULAR, fontWeight: 700, ...lands(fortyEightAt) }}>
+        <span style={{ ...note(30, ACCENT_INK), ...TABULAR, fontWeight: 600, ...lands(fortyEightAt) }}>
           <Mark at={n.word("without", "all it could say") - 2} color={MARK_BAD}>
             <Strike at={rewriteAt + 4}>{fmt(Number(TOTAL_CATALOG), 2)}</Strike>
           </Mark>

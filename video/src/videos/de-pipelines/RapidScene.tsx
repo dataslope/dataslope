@@ -47,7 +47,7 @@ const Dbt: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Note at={toolAt} x={R_X} y={top - 42}>
-        <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           <span style={{ fontFamily: MONO, fontWeight: 600 }}>models/marts/fct_orders.sql</span>
           <span style={{ color: INK_SOFT, opacity: ease(frame, savesAt, 10) }}> → saved as a table or a view</span>
         </span>
@@ -75,7 +75,7 @@ const Dbt: React.FC<{ c: Ctx }> = ({ c }) => {
         docs
       </Pill>
       <Note at={tAt} x={fct.x + fct.w + 260} y={fTop + 2}>
-        <span style={{ ...note(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           the T in EL<span style={{ color: OK_INK, background: HIGHLIGHT, padding: "0 4px", borderRadius: 4 }}>T</span>
         </span>
       </Note>
@@ -169,13 +169,13 @@ const FanOut: React.FC<{ c: Ctx }> = ({ c }) => {
         ) : null}
       </svg>
       <Note at={manyAt + 6} x={gx} y={gy - c.h(46)}>
-        <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>thousands of aggregates built on it</span>
+        <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>thousands of aggregates built on it</span>
       </Note>
       <Note at={staleAt} x={gx} y={gy + GRID.rows * (GRID.size + GRID.gap) + c.h(10)} out={onlyAt}>
-        <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>all of them stale</span>
+        <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>all of them stale</span>
       </Note>
       <Note at={onlyAt + 6} x={gx} y={gy + GRID.rows * (GRID.size + GRID.gap) + c.h(10)}>
-        <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>recompute only the affected ones</span>
+        <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>recompute only the affected ones</span>
       </Note>
       <Note at={graphAt + 4} x={R_X} y={c.y(720)}>
         <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>the dependency graph finds the smallest scope</span>

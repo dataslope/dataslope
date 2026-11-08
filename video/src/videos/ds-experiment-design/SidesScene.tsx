@@ -137,7 +137,7 @@ export const SidesScene: React.FC = () => {
             <NullPanel key={pl.left} left={pl.left} two={pl.two} at={pl.two ? twoAt : oneAt} tailAt={pl.two ? eachAt : allAt} />
           ))}
           <Note at={twoAt} x={PANELS[0].left} y={y(320)}>
-            <span style={{ ...note(28, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               <Mark at={usuallyAt} color={MARK_OK}>
                 two-sided
               </Mark>
@@ -145,7 +145,7 @@ export const SidesScene: React.FC = () => {
             </span>
           </Note>
           <Note at={oneAt} x={PANELS[1].left} y={y(320)}>
-            <span style={{ ...note(28, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ ...note(28, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               one-sided<span style={{ ...note(26, INK_SOFT), fontWeight: 500, opacity: ease(frame, allAt, 10) }}>: all 5% on the predicted side</span>
             </span>
           </Note>
@@ -207,7 +207,7 @@ export const SidesScene: React.FC = () => {
           <line x1={at(xs, -NONINF.margin)} x2={at(xs, -NONINF.margin)} y1={y(400)} y2={y(760)} stroke={ACCENT} strokeWidth={2.6} strokeDasharray="7 6" />
         </Svg>
         <Note at={halfAt + 4} x={at(xs, -NONINF.margin) - 12} y={y(404)} width={290} align="right">
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", ...TABULAR }}>margin −{NONINF.margin}: worse than this</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", ...TABULAR }}>margin −{NONINF.margin}: worse than this</span>
         </Note>
         {intervals.map((r) => {
           const s = ease(frame, r.drawAt - 2, 18);
@@ -235,7 +235,7 @@ export const SidesScene: React.FC = () => {
           );
         })}
         <Note at={notWorseAt - 2} x={330} y={y(820)}>
-          <span style={{ ...note(32, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(32, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Mark at={liveAt - 6}>not significant ≠ not worse</Mark>
           </span>
         </Note>

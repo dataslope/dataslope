@@ -243,7 +243,7 @@ export const DiffListing: React.FC<{
                 left: g.padX,
                 fontFamily: MONO,
                 fontSize: size,
-                fontWeight: 700,
+                fontWeight: 600,
                 color: r.sign === "+" ? OK_INK : ACCENT_INK,
                 opacity: r.sign === "+" || r.sign === "-" ? signs : 0,
               }}

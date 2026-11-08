@@ -105,7 +105,7 @@ export const BillScene: React.FC = () => {
       </Note>
       <Ink at={total119At - 2} dur={14} style={{ left: B0, top: payY + bh + 18, width: B1 - B0 + 2, textAlign: "right" }}>
         <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
-          <span style={{ color: ACCENT_INK, fontWeight: 700, ...TABULAR }}>{TOTAL}</span> tokens at the output rate
+          <span style={{ color: ACCENT_INK, fontWeight: 600, ...TABULAR }}>{TOTAL}</span> tokens at the output rate
         </span>
       </Ink>
 

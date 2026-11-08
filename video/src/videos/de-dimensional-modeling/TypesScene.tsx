@@ -37,7 +37,7 @@ const Lag: React.FC<{ x0: number; x1: number; y: number; at: number; days: numbe
           top: y + 8,
           textAlign: "center",
           ...note(23, OK_INK),
-          fontWeight: 700,
+          fontWeight: 600,
           opacity: ease(frame, at + 8, 10),
           whiteSpace: "nowrap",
         }}
@@ -134,7 +134,7 @@ export const TypesScene: React.FC = () => {
           marks={TRANSACTIONS.rows.map((_, i) => ({ row: i, col: amount, at: happenedAt + i * 2, color: MARK_OK }))}
         />
         <Note at={happenedAt} x={tg.right + 34} y={tg.rowTop(TRANSACTIONS.rows.length - 1) + h(8)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>what happened</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>what happened</span>
         </Note>
 
         {/* ── Periodic snapshot ── */}
@@ -163,7 +163,7 @@ export const TypesScene: React.FC = () => {
           ]}
         />
         <Note at={stoodAt} x={R_X} y={sg.rowTop(SNAPSHOT_ADA.rows.length) + h(16)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>where things stood</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>where things stood</span>
         </Note>
 
         {/* ── Accumulating snapshot ── */}
@@ -203,7 +203,7 @@ export const TypesScene: React.FC = () => {
         <Lag x0={ag.colMid(cApplied)} x1={ag.colMid(cApproved)} y={lagY} at={swapApprove + 6} days={STAGES.approve} />
         <Lag x0={ag.colMid(cApproved)} x1={ag.colMid(cFunded)} y={lagY} at={swapFund + 6} days={STAGES.fund} />
         <Note at={longAt} x={ag.right + 40} y={ag.rowTop(1) + h(6)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>how long each step took</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>how long each step took</span>
         </Note>
       </Drift>
     </AbsoluteFill>

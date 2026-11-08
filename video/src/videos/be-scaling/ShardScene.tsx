@@ -89,7 +89,7 @@ export const ShardScene: React.FC = () => {
         <MiniMap at={qAt} stage={5} lit="store" grow={{ shards: serversAt }} />
 
         {/* ── Partitioning, then sharding ── */}
-        <Line at={partAt} x={X0} y={y(334)} size={22} weight={700} dim={serversAt + 26}>
+        <Line at={partAt} x={X0} y={y(334)} size={22} weight={600} dim={serversAt + 26}>
           Partitioning: one table, in pieces
         </Line>
         {[0, 1, 2, 3].map((i) => {
@@ -118,7 +118,7 @@ export const ShardScene: React.FC = () => {
                 alignItems: "center",
                 paddingLeft: 10,
                 ...label(19, BLUE_INK),
-                fontWeight: 700,
+                fontWeight: 600,
               }}
             >
               {i === 0 && move < 0.5 ? "links" : ""}
@@ -140,7 +140,7 @@ export const ShardScene: React.FC = () => {
             <span style={{ ...label(20, INK_SOFT), fontWeight: 650, marginTop: 64 }}>server {i + 1}</span>
           </Node>
         ))}
-        <Line at={shardAt} x={SERVER.x0} y={y(334)} size={22} weight={700}>
+        <Line at={shardAt} x={SERVER.x0} y={y(334)} size={22} weight={600}>
           Sharding: the pieces on separate servers
           <span style={{ opacity: ease(frame, keyAt, 10) }}>
             , by a <Mark at={keyAt + 2}>shard key</Mark>
@@ -151,7 +151,7 @@ export const ShardScene: React.FC = () => {
         </Line>
 
         {/* ── By creation date: today's shard takes every new link. ── */}
-        <Line at={dateAt} x={DATE_X} y={y(640)} size={22} weight={700}>
+        <Line at={dateAt} x={DATE_X} y={y(640)} size={22} weight={600}>
           Shard by creation date
         </Line>
         <Line at={todayAt + 6} x={DATE_X} y={y(640) + h(34)} size={20} color={INK_SOFT}>
@@ -167,7 +167,7 @@ export const ShardScene: React.FC = () => {
           <line x1={DATE_X} x2={colX(DATE_X, 7) + COL.w} y1={base + 1} y2={base + 1} stroke={INK_SOFT} strokeWidth={1.4} />
         </Svg>
         <Ink at={hotAt} dur={12} style={{ left: colX(DATE_X, 7) - 140, top: base - h(COL_H) - 6, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 700 }}>a hot spot</span>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 600 }}>a hot spot</span>
         </Ink>
         <Ink at={todayAt + 10} dur={12} style={{ left: colX(DATE_X, 7) - 30, top: base + 10, whiteSpace: "nowrap" }}>
           <span style={{ ...label(20, INK_SOFT), fontWeight: 650 }}>today</span>
@@ -176,7 +176,7 @@ export const ShardScene: React.FC = () => {
         <VRule x={779} top={y(640)} bottom={y(BASE) + 36} at={hashAt} />
 
         {/* ── By a hash of the key: the simulation's million keys, even. ── */}
-        <Line at={hashAt} x={HASH_X} y={y(640)} size={22} weight={700}>
+        <Line at={hashAt} x={HASH_X} y={y(640)} size={22} weight={600}>
           Shard by a hash of the short key
         </Line>
         <Line at={simAt} x={HASH_X} y={y(640) + h(34)} size={20} color={INK_SOFT}>
@@ -205,10 +205,10 @@ export const ShardScene: React.FC = () => {
         </Svg>
         {/* One redirect lights one shard; one user's links light all eight. */}
         <Ink at={redirectAt} dur={10} out={listAt} style={{ left: colX(HASH_X, one) - 40, top: base + 10, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, INK), fontWeight: 700 }}>a redirect</span>
+          <span style={{ ...label(21, INK), fontWeight: 600 }}>a redirect</span>
         </Ink>
         <Ink at={allAt} dur={12} style={{ left: HASH_X, top: base + 10, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700 }}>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600 }}>
             one user&apos;s <Num>{SHARDS.userLinks}</Num> links: all <Num>{SHARDS.userShards}</Num> shards
             <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, priceAt, 10) }}>, the price of a cross-shard query</span>
           </span>

@@ -185,7 +185,7 @@ export const ClaimsScene: React.FC = () => {
             opacity: ease(frame, nameAt[0] - 2, 8),
             whiteSpace: "nowrap",
             ...note(COUNT_SIZE, landed > NAME.limit ? STAT_INK : INK),
-            fontWeight: 700,
+            fontWeight: 600,
           }}
         >
           {/* One line at one size: the count stands out by its ink and weight. */}

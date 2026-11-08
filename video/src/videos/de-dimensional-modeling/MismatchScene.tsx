@@ -189,7 +189,7 @@ export const MismatchScene: React.FC = () => {
           const yMid = (sg.rowTop(rows[0]) + sg.rowTop(rows[rows.length - 1] + 1)) / 2;
           return (
             <Note key={d} at={rollAt + 6 + k * 8} x={sg.right + 34} y={yMid - 16}>
-              <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{money(FIXED.rows[k][fSales])}</span>
+              <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{money(FIXED.rows[k][fSales])}</span>
             </Note>
           );
         })}

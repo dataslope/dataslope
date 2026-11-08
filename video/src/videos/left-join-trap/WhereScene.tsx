@@ -167,9 +167,9 @@ export const WhereScene: React.FC = () => {
         <Ink at={notTrueAt - 2} dur={14} style={{ position: "relative" }}>
           <span style={noteText(24, INK)}>
             <Mono>
-              <span style={{ color: NULL_INK, fontWeight: 700 }}>NULL</span> &gt; 50
+              <span style={{ color: NULL_INK, fontWeight: 600 }}>NULL</span> &gt; 50
             </Mono>{" "}
-            is <Mono color={NULL_INK} weight={700}>NULL</Mono>: unknown, not true.
+            is <Mono color={NULL_INK} weight={600}>NULL</Mono>: unknown, not true.
           </span>
         </Ink>
         <Ink at={whereKeepsAt - 2} dur={14} style={{ position: "relative" }}>

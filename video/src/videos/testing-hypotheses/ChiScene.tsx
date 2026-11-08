@@ -195,7 +195,7 @@ export const ChiScene: React.FC = () => {
                     left: x0 + Math.max(obs, exp) * PER + 14,
                     top: top + 2,
                     ...note(28, DATA_INK),
-                    fontWeight: 700,
+                    fontWeight: 600,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -225,7 +225,7 @@ export const ChiScene: React.FC = () => {
 
         {/* The statistic: every cell's share, added up. */}
         <div style={{ position: "absolute", left: LABEL_X, top: y(830), opacity: total, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(38, STAT_INK), fontWeight: 700 }}>
+          <span style={{ ...note(38, STAT_INK), fontWeight: 600 }}>
             <Greek>χ</Greek>² = <Count at={twelveAt - 8} to={CHI.chi2} dur={20} format={(v) => fmt(v, 1)} />
           </span>
           <span style={{ ...note(36, STAT_INK), fontWeight: 650, marginLeft: 30, opacity: ease(frame, pAt - 4, 12) }}>p = {fmt(CHI.p, 3)}</span>

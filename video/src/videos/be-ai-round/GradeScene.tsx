@@ -158,7 +158,7 @@ export const GradeScene: React.FC = () => {
             </span>
           </Ink>
           <Ink at={droveAt - 2} dur={14} style={{ left: X0 + 660, top: y(306) }}>
-            <span style={{ ...line(30, INK), fontWeight: 700 }}>
+            <span style={{ ...line(30, INK), fontWeight: 600 }}>
               Whether <Mark at={droveAt + 6}>you drove.</Mark>
             </span>
           </Ink>
@@ -181,7 +181,7 @@ export const GradeScene: React.FC = () => {
             </span>
           </Note>
           <Note at={googleAt} x={X0} y={y(636)}>
-            <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               Google pilot rubric, 2026: <span style={{ fontWeight: 600 }}>the same three skills</span>
             </span>
           </Note>
@@ -222,7 +222,7 @@ export const GradeScene: React.FC = () => {
         {/* One prep guide's advice: part of it by hand, explained, beats a
             whole solution you can't explain. */}
         <Note at={guideAt} x={X0} y={pastY - h(56)}>
-          <span style={{ ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             One prep guide&apos;s advice <span style={{ color: INK_SOFT, fontWeight: 600 }}>(interviewing.io)</span>
           </span>
         </Note>

@@ -218,7 +218,7 @@ export const DieScene: React.FC = () => {
         </span>
       </Note>
       <Note at={balancesAt + 8} x={eX} y={base + h(60) + 26} from="up">
-        <span style={{ ...note(22, STAT_INK), fontWeight: 700, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, STAT_INK), fontWeight: 600, display: "inline-block", transform: "translateX(-50%)", whiteSpace: "nowrap" }}>
           {fmt(DIE.expected, 1)}
           <span style={{ opacity: ease(frame, faceAt - 2, 10), fontWeight: 500, color: INK }}>, not a face</span>
         </span>
@@ -247,7 +247,7 @@ export const DieScene: React.FC = () => {
       </Ink>
       <Ink at={rollAt - 4} dur={14} style={{ left: RIGHT, top: y(524), whiteSpace: "nowrap" }}>
         <span style={note(26, INK)}>
-          <Count at={rollAt - 2} dur={30} to={DIE.draws} format={num} style={{ fontWeight: 700 }} /> rolls:{" "}
+          <Count at={rollAt - 2} dur={30} to={DIE.draws} format={num} style={{ fontWeight: 600 }} /> rolls:{" "}
           <span style={{ opacity: ease(frame, comesAt - 2, 10) }}>
             mean{" "}
             <b>

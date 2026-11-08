@@ -253,7 +253,7 @@ const PlanText: React.FC<{ line: string; size: number }> = ({ line, size }) => {
     return (
       <span style={base}>
         {node[1]}
-        <span style={{ color: INK, fontWeight: 700 }}>{node[2]}</span>
+        <span style={{ color: INK, fontWeight: 600 }}>{node[2]}</span>
         {line.slice(node[0].length)}
       </span>
     );
@@ -355,7 +355,7 @@ export const PgError: React.FC<{
           fontVariantLigatures: "none",
         }}
       >
-        <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span> {text}
+        <span style={{ color: ACCENT_INK, fontWeight: 600 }}>ERROR:</span> {text}
       </div>
     </Ink>
   );
@@ -433,7 +433,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      <span style={{ ...label(size, t.ink), fontWeight: 700, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span>
+      <span style={{ ...label(size, t.ink), fontWeight: 600, whiteSpace: "nowrap", textAlign: "center" }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: "center" }}>{sub}</span> : null}
       {children}
     </div>
@@ -518,7 +518,7 @@ export const Pill: React.FC<{
           border: `2px solid ${t.line}`,
           background: t.fill,
           ...label(size, t.ink),
-          fontWeight: 700,
+          fontWeight: 600,
           whiteSpace: "nowrap",
         }}
       >
@@ -672,7 +672,7 @@ export const Cylinder: React.FC<{
   const { art, mid } = CYLINDER[tone];
   const h = cylinderH(w, tone);
   const swap = swapAt === undefined ? 0 : ease(frame, swapAt, 12);
-  const name: React.CSSProperties = { ...label(size, INK), fontWeight: 700, whiteSpace: "nowrap", position: "absolute" };
+  const name: React.CSSProperties = { ...label(size, INK), fontWeight: 600, whiteSpace: "nowrap", position: "absolute" };
   return (
     <div style={{ position: "absolute", left: x, top: y, width: w, height: h, opacity: Math.min(1, p) * (1 - d) * (1 - o), transform: `scale(${0.9 + 0.1 * Math.min(1, p)})` }}>
       {ILLUSTRATIONS ? <Illustration video={VIDEO} id={ART[art].id} style={{ position: "absolute", left: 0, top: 0, width: w, height: h }} /> : null}

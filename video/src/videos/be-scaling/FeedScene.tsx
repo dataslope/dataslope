@@ -124,7 +124,7 @@ export const FeedScene: React.FC = () => {
         <Spot id="newspaper" at={textAt + 6} x={1610} y={y(130)} w={170} out={feedOut} />
 
         {/* ── Push: each post's ID into every follower's feed. ── */}
-        <Line at={pushAt} x={X0} y={y(330)} size={24} weight={700} out={feedOut}>
+        <Line at={pushAt} x={X0} y={y(330)} size={24} weight={600} out={feedOut}>
           <Mark at={winsAt} out={hybridIn} color={`color-mix(in srgb, ${OK} 30%, transparent)`}>
             Fan-out on write: push
           </Mark>
@@ -166,7 +166,7 @@ export const FeedScene: React.FC = () => {
                   borderRadius: 7,
                   background: BAR,
                   ...label(19, PAPER),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   opacity: drop(i) * (1 - ease(frame, feedOut, 10)),
                 }}
               >
@@ -196,7 +196,7 @@ export const FeedScene: React.FC = () => {
         <VRule x={910} top={y(330)} bottom={y(716)} at={pullAt} out={hybridIn} />
 
         {/* ── Pull: the feed built on request from everyone followed. ── */}
-        <Line at={pullAt} x={PULL.x} y={y(330)} size={24} weight={700} out={feedOut}>
+        <Line at={pullAt} x={PULL.x} y={y(330)} size={24} weight={600} out={feedOut}>
           Fan-out on read: pull
         </Line>
         {Array.from({ length: g.cols * g.rows }, (_, k) => {
@@ -228,7 +228,7 @@ export const FeedScene: React.FC = () => {
         <Line at={cheapAt} x={PULL.feed.x} y={y(PULL.feed.mid) + PULL.feed.h / 2 + h(20)} size={20} color={INK_SOFT} out={feedOut}>
           posting is cheap
         </Line>
-        <Line at={loadAt + 6} x={PULL.x} y={y(690)} size={22} weight={700} color={ACCENT_INK} out={hybridIn}>
+        <Line at={loadAt + 6} x={PULL.x} y={y(690)} size={22} weight={600} color={ACCENT_INK} out={hybridIn}>
           every load: <Num>{FEED.pullReads}</Num> reads
         </Line>
 
@@ -245,7 +245,7 @@ export const FeedScene: React.FC = () => {
         ) : null}
 
         {/* ── The hybrid: push for most, pull for celebrities, merged. ── */}
-        <Line at={mixAt} x={X0} y={hyTop - h(14)} size={23} weight={700} color={OK_INK} out={feedOut}>
+        <Line at={mixAt} x={X0} y={hyTop - h(14)} size={23} weight={600} color={OK_INK} out={feedOut}>
           Real systems mix them
           <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, ordinaryAt, 10) }}>: push for ordinary accounts,</span>
           <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, celebsAt, 10) }}> pull for celebrities,</span>
@@ -255,7 +255,7 @@ export const FeedScene: React.FC = () => {
         {Array.from({ length: FEED.celebritiesFollowed }, (_, i) => (
           <Node key={i} x={X0 + 290 + i * 120} y={hyTop + h(40)} w={104} h={56} at={fiveAt + 4 + i * 3} tone="ok" title={`celeb ${i + 1}`} size={21} out={feedOut} />
         ))}
-        <Line at={sixAt} x={X0 + 290 + 5 * 120 + 30} y={hyTop + h(40) + 12} size={22} weight={700} color={OK_INK} out={feedOut}>
+        <Line at={sixAt} x={X0 + 290 + 5 * 120 + 30} y={hyTop + h(40) + 12} size={22} weight={600} color={OK_INK} out={feedOut}>
           1 + <Num>{FEED.celebritiesFollowed}</Num> = <Num>{FEED.hybridReads}</Num> reads, not <Num>{FEED.pullReads}</Num>
         </Line>
         <Line at={noPostAt} x={X0} y={hyTop + h(40) + 80} size={21} color={INK_SOFT} out={feedOut}>
@@ -264,7 +264,7 @@ export const FeedScene: React.FC = () => {
 
         {/* ── The close: the shortener, grown for ten times the traffic. ── */}
         <Ink at={grownAt - 6} dur={16} style={{ left: X0, top: y(300), whiteSpace: "nowrap" }}>
-          <span style={{ ...note(34, INK), fontWeight: 700 }}>
+          <span style={{ ...note(34, INK), fontWeight: 600 }}>
             The design, grown: <span style={{ color: BLUE_INK }}><Num>{commas(tenfold)}</Num> redirects a second</span>
           </span>
         </Ink>
@@ -281,7 +281,7 @@ export const FeedScene: React.FC = () => {
           <Node key={k} x={G.store.x + k * (G.store.w + G.store.gap)} y={y(G.store.mid) - G.store.h / 2} w={G.store.w} h={G.store.h} at={designAt + 16 + k} tone="data" lit={lit(6)} />
         ))}
         <Ink at={designAt + 20} dur={12} style={{ left: G.store.x, top: y(G.store.mid) + G.store.h / 2 + 12, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(20, BLUE_INK), fontWeight: 700 }}>8 shards, each with followers</span>
+          <span style={{ ...label(20, BLUE_INK), fontWeight: 600 }}>8 shards, each with followers</span>
         </Ink>
         {/* Every arrow between them. */}
         <Flow points={[[G.client.x + G.client.w + 6, gm], [G.limit.x - 8, gm]]} at={designAt + 4} color={edge} width={edgeW} glow={api} head={12} />
@@ -318,7 +318,7 @@ export const FeedScene: React.FC = () => {
           head={12}
         />
         <Ink at={apiAt + 4} dur={14} style={{ left: G.cache.x + G.cache.w + 50, top: y(G.cache.mid) - 18, whiteSpace: "nowrap" }}>
-          <span style={{ ...note(22, INK), fontWeight: 700 }}>
+          <span style={{ ...note(22, INK), fontWeight: 600 }}>
             every arrow: <Mark at={apiAt + 6}>an API</Mark>
           </span>
         </Ink>

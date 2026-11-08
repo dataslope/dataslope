@@ -121,7 +121,7 @@ export const StratScene: React.FC = () => {
             opacity: ease(frame, behindAt + 6, 12) * (1 - ease(frame, plainAt + 10, 14) * 0.7),
           }}
         />
-        <Line x={CARD.x - 22} y={brTop - 40} at={behindAt + 6} size={21} weight={700} color={frame >= indirectionAt ? ACCENT_INK : INK_SOFT}>
+        <Line x={CARD.x - 22} y={brTop - 40} at={behindAt + 6} size={21} weight={600} color={frame >= indirectionAt ? ACCENT_INK : INK_SOFT}>
           <Strike at={indirectionAt + 6}>one interface: a cost for a weight</Strike>
         </Line>
         {cards.map((c, i) => (

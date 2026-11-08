@@ -31,7 +31,7 @@ const Hold: React.FC<{ x0: number; x1: number; y: number; account: 1 | 2; at: nu
   return (
     <g opacity={1 - o}>
       <rect x={x0} y={y - 7} width={(x1 - x0) * p} height={14} rx={7} fill={fail > 0 ? `color-mix(in srgb, ${ACCENT} ${fail * 100}%, ${ACC[account]})` : ACC[account]} opacity={0.85} />
-      <text x={x0} y={labelAbove ? y - 20 : y + 38} style={svgText({ ...label(20, ACC_INK[account]), fontWeight: 700 })} opacity={ease(frame, at + 4, 10)}>
+      <text x={x0} y={labelAbove ? y - 20 : y + 38} style={svgText({ ...label(20, ACC_INK[account]), fontWeight: 600 })} opacity={ease(frame, at + 4, 10)}>
         locks account {account}
       </text>
     </g>
@@ -62,7 +62,7 @@ const Mark: React.FC<{ x: number; y: number; at: number; out: number; text: stri
   return (
     <g opacity={p}>
       <circle cx={x} cy={y} r={8} fill={color} />
-      <text x={x} y={below ? y + 36 : y - 20} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 20, fontWeight: 700, color })}>
+      <text x={x} y={below ? y + 36 : y - 20} textAnchor="middle" style={svgText({ fontFamily: MONO, fontSize: 20, fontWeight: 600, color })}>
         {text}
       </text>
     </g>
@@ -226,7 +226,7 @@ export const DeadlockScene: React.FC = () => {
           </span>
         </Note>
         <Note at={neitherAt} x={cx + 150} y={(l1 + l2) / 2 + h(8)} out={findsAt}>
-          <span style={{ ...note(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>neither can go on</span>
+          <span style={{ ...note(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>neither can go on</span>
         </Note>
         <Note at={simplyAt + 2} x={tx(0.26)} y={(l1 + l2) / 2 - h(16)}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>

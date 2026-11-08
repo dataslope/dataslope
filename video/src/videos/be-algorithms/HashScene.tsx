@@ -118,7 +118,7 @@ export const HashScene: React.FC = () => {
         </Line>
         <div style={{ position: "absolute", left: 670, top: y(262), display: "flex", gap: 14, fontSize: 24, whiteSpace: "nowrap" }}>
           {uses.map((u, i) => (
-            <span key={u.text} style={{ ...note(24, BLUE_INK), fontWeight: 700, opacity: ease(frame, u.at - 2, 10) }}>
+            <span key={u.text} style={{ ...note(24, BLUE_INK), fontWeight: 600, opacity: ease(frame, u.at - 2, 10) }}>
               {i ? <span style={{ color: INK_SOFT, fontWeight: 500, marginRight: 14 }}>·</span> : null}
               {u.text}
             </span>
@@ -152,7 +152,7 @@ export const HashScene: React.FC = () => {
         </div>
         <div style={{ position: "absolute", left: MAP_X, top: aTop + 92, opacity: ease(frame, linearAt - 6, 10), display: "flex", alignItems: "center", gap: 12, fontSize: 26 }}>
           <span style={{ ...note(26, INK_SOFT), whiteSpace: "nowrap" }}>returns</span>
-          <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 700, color: OK_INK }}>{HASH.twoSum.answer}</span>
+          <span style={{ fontFamily: MONO, fontSize: 26, fontWeight: 600, color: OK_INK }}>{HASH.twoSum.answer}</span>
         </div>
         <Line at={linearAt} x={AX} y={aTop + 214} size={24} weight={650}>
           O(n) time, at the cost of O(n) memory
@@ -225,7 +225,7 @@ export const HashScene: React.FC = () => {
             { at: atWorstAt, k: "time per operation, at worst", v: "O(n)", c: ACCENT_INK },
           ].map((r) => (
             <div key={r.k} style={{ display: "flex", gap: 16, marginTop: 12, fontSize: 24, opacity: ease(frame, r.at - 2, 10), whiteSpace: "nowrap" }}>
-              <span style={{ ...note(24, r.c), fontWeight: 700, width: 70 }}>{r.v}</span>
+              <span style={{ ...note(24, r.c), fontWeight: 600, width: 70 }}>{r.v}</span>
               <span style={note(24, INK)}>{r.k}</span>
             </div>
           ))}

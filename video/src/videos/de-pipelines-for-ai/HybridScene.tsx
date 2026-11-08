@@ -57,7 +57,7 @@ const Row: React.FC<{ x: number; y: number; rank: number; id: string; at: number
         transform: `translateX(${(1 - p) * -10}px)`,
       }}
     >
-      <span style={{ ...label(21, INK_SOFT), ...TABULAR, fontWeight: 700, width: 22, textAlign: "right" }}>{rank}</span>
+      <span style={{ ...label(21, INK_SOFT), ...TABULAR, fontWeight: 600, width: 22, textAlign: "right" }}>{rank}</span>
       <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{id}</span>
       <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>{children ?? tickets[id]}</span>
     </div>
@@ -214,7 +214,7 @@ export const HybridScene: React.FC = () => {
           <Row key={id} x={COLS[1]} y={rowY(i)} rank={i + 1} id={id} at={bm25At + 2 + i * 3} lit={id === CODE ? oneAt : undefined} />
         ))}
         <Note at={tfidfAt - 2} x={COLS[1]} y={rowY(5) + 24}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
             like TF-IDF&apos;s{" "}
             {/* The formula in the line's own face and size: one line, one face. */}
             <span style={{ ...note(22, INK), fontWeight: 500 }}>

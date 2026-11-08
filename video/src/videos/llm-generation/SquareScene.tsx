@@ -140,11 +140,11 @@ export const SquareScene: React.FC = () => {
         <span style={label(20)}>Context length, in tokens (log scale)</span>
       </Ink>
       <Note at={textAt - 2} x={LX1 + 14} y={ly(ATTENTION.lengthRatio) - 16}>
-        <span style={{ ...note(24, BLUE_INK), fontWeight: 700, ...TABULAR, ...halo }}>{count(ATTENTION.lengthRatio)}×</span>
+        <span style={{ ...note(24, BLUE_INK), fontWeight: 600, ...TABULAR, ...halo }}>{count(ATTENTION.lengthRatio)}×</span>
         <div style={note(20, INK_SOFT)}>the text</div>
       </Note>
       <Note at={fifteenAt - 2} x={LX1 + 14} y={ly(ATTENTION.workRatio) - 16}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, ...TABULAR, ...halo }}>{count(ATTENTION.workRatio)}×</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, ...TABULAR, ...halo }}>{count(ATTENTION.workRatio)}×</span>
         <div style={note(20, INK_SOFT)}>the work</div>
       </Note>
       {/* Why the square is a straight line here. */}

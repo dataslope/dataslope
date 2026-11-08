@@ -196,13 +196,13 @@ export const BreakerScene: React.FC = () => {
           <circle cx={badX} cy={midY} r={106 + 8 * ring} fill="none" stroke={ACCENT} strokeWidth={2.4} opacity={ease(frame, oneAt, 10) * (0.5 + 0.5 * ring)} strokeDasharray="6 5" />
         </svg>
         <Note at={oneAt + 6} x={badX - 100} y={midY + h(116)}>
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>stays one bad table</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>stays one bad table</span>
         </Note>
         <Note at={spreadAt + 4} x={downX - 92} y={downY(DOWN.length - 1) + h(40)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>downstream untouched</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>downstream untouched</span>
         </Note>
         <Note at={fastAt + 4} x={X0} y={y(262)}>
-          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             in a pipeline: fail fast<span style={{ opacity: ease(frame, alertAt, 8) }}>, alert</span>
             <span style={{ opacity: ease(frame, haltAt, 8) }}>, halt</span>
           </span>
@@ -215,11 +215,11 @@ export const BreakerScene: React.FC = () => {
         </Note>
 
         {/* The name's home: a failing dependency, a model. */}
-        <div style={{ position: "absolute", left: TX0, top: errTop - h(44), ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: chartIn }}>
+        <div style={{ position: "absolute", left: TX0, top: errTop - h(44), ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: chartIn }}>
           error rate at the dependency
           <span style={{ color: INK_SOFT, fontWeight: 500, opacity: ease(frame, modelAt, 10) }}> · a service&apos;s breaker, a model</span>
         </div>
-        <div style={{ position: "absolute", left: TX0, top: reqTop - h(44), ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: chartIn }}>
+        <div style={{ position: "absolute", left: TX0, top: reqTop - h(44), ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: chartIn }}>
           requests per second reaching it
         </div>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: chartIn }}>
@@ -276,7 +276,7 @@ export const BreakerScene: React.FC = () => {
           </span>
         </Note>
         <Note at={nothingAt + 8} x={tx(firstOpen.t0)} y={ry(yMax) - h(4)} from="up">
-          <span style={{ ...label(20, INK), ...halo, fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK), ...halo, fontWeight: 600, whiteSpace: "nowrap" }}>
             open <Num>{BREAKER.openFor}</Num> s at a time: nothing gets through
           </span>
         </Note>

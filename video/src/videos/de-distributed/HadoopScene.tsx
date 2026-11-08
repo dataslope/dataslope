@@ -84,7 +84,7 @@ export const HadoopScene: React.FC = () => {
 
         {/* ── Hadoop: local disk for the shuffle, HDFS after every reduce ── */}
         <Note at={hadoopAt - 2} x={120} y={hMid - h(30)}>
-          <span style={{ ...label(24, INK), fontWeight: 700, display: "block", lineHeight: 1.25 }}>
+          <span style={{ ...label(24, INK), fontWeight: 600, display: "block", lineHeight: 1.25 }}>
             Hadoop
             <br />
             MapReduce
@@ -129,7 +129,7 @@ export const HadoopScene: React.FC = () => {
 
         {/* ── Spark: the shuffle still on local disk, reduce to map in memory ── */}
         <Note at={sparkAt - 2} x={120} y={sMid - 16}>
-          <span style={{ ...label(24, INK), fontWeight: 700 }}>Spark</span>
+          <span style={{ ...label(24, INK), fontWeight: 600 }}>Spark</span>
         </Note>
         {STEPS.map((s, i) => {
           const boxAt = sparkAt + 2 + i * 3;

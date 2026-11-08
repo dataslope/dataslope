@@ -860,7 +860,7 @@ export const ErrorBox: React.FC<{
         }}
       >
         <div>
-          <span style={{ color: ACCENT_INK, fontWeight: 700 }}>ERROR:</span> {message}
+          <span style={{ color: ACCENT_INK, fontWeight: 600 }}>ERROR:</span> {message}
         </div>
         <div style={{ color: INK_SOFT, opacity: detailAt === undefined ? 1 : ease(frame, detailAt, 12) }}>
           <span style={{ fontWeight: 600 }}>DETAIL:</span> {detail}

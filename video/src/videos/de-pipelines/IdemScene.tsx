@@ -147,7 +147,7 @@ export const IdemScene: React.FC = () => {
 
         {/* A: the blind insert, run twice. */}
         <Note at={blindAt - 2} x={X0} y={aTop - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             A blind insert, from <Mono>events_stage</Mono> <span style={{ color: INK_SOFT, fontWeight: 600 }}>(the page's 24 events)</span>
           </span>
         </Note>
@@ -162,14 +162,14 @@ export const IdemScene: React.FC = () => {
           ✕ failed after the write
         </Pill>
         <Note at={retryAt} x={COUNT_X + 140} y={aTop + h(170)}>
-          <span style={{ ...label(20, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             ↻ retried<span style={{ opacity: ease(frame, againAt, 10) }}>: the same insert, again</span>
           </span>
         </Note>
 
         {/* B: overwrite the partition, run twice; BEGIN and COMMIT come later. */}
         <Note at={overAt - 2} x={X0} y={bTop - 40}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Overwrite the partition: delete, then insert</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Overwrite the partition: delete, then insert</span>
         </Note>
         <Listing
           lines={B_LINES}
@@ -221,7 +221,7 @@ export const IdemScene: React.FC = () => {
           </span>
         </Note>
         <Note at={autoAt} x={NOTE_X} y={aTop + h(100)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>so recovery can be automated</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>so recovery can be automated</span>
         </Note>
       </Drift>
     </AbsoluteFill>

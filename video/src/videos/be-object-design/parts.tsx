@@ -254,7 +254,7 @@ export const Box: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      {title ? <span style={{ ...label(size, c.ink), fontWeight: 700, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
+      {title ? <span style={{ ...label(size, c.ink), fontWeight: 600, whiteSpace: "nowrap", textAlign: align }}>{title}</span> : null}
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: align }}>{sub}</span> : null}
       {children}
     </div>
@@ -332,7 +332,7 @@ export const Pill: React.FC<{
   const d = dim === undefined ? 0 : ease(frame, dim, 12) * 0.62;
   return (
     <Ink at={at} dur={12} out={out} style={{ left: x, top: y + 6, opacity: 1 - d }}>
-      <span style={{ ...label(size, tone === "plain" ? INK_SOFT : TONE[tone].ink), fontWeight: 700, whiteSpace: "nowrap" }}>{children}</span>
+      <span style={{ ...label(size, tone === "plain" ? INK_SOFT : TONE[tone].ink), fontWeight: 600, whiteSpace: "nowrap" }}>{children}</span>
     </Ink>
   );
 };

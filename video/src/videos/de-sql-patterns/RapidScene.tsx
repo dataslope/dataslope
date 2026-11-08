@@ -49,7 +49,7 @@ const under = (c: Ctx, lines: number, top = c.T) => top + listingHeight(lines, S
 /** A query's name over a result, set as code. */
 const CodeName: React.FC<{ x: number; top: number; at: number; children: React.ReactNode }> = ({ x, top, at, children }) => (
   <Ink at={at} dur={12} style={{ left: x, top: top - 36, whiteSpace: "nowrap" }}>
-    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 700, color: INK, fontVariantLigatures: "none" }}>{children}</span>
+    <span style={{ fontFamily: MONO, fontSize: 21, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{children}</span>
   </Ink>
 );
 
@@ -435,7 +435,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         return (
           <React.Fragment key={k.name}>
             <Ink at={k.at - 2} dur={12} style={{ left: R_X, top: rowY(i) + c.h(8), whiteSpace: "nowrap" }}>
-              <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 700, color: INK, fontVariantLigatures: "none" }}>{k.name}</span>
+              <span style={{ fontFamily: MONO, fontSize: 23, fontWeight: 600, color: INK, fontVariantLigatures: "none" }}>{k.name}</span>
             </Ink>
             {chips.map((ch, j) => {
               const p = ease(frame, k.at + 2 + j * 2, 8);

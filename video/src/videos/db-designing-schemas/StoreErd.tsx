@@ -356,7 +356,7 @@ const QuantityMark: React.FC<{ e: ReturnType<typeof useStoreLayout>["orderItems"
           left: e.right - 74,
           top: r.mid - 15,
           ...note(22, ACCENT_INK),
-          fontWeight: 700,
+          fontWeight: 600,
           opacity: p * (1 - o),
           whiteSpace: "nowrap",
         }}

@@ -251,7 +251,7 @@ export const PressureScene: React.FC = () => {
           </span>
         </Note>
         <Note at={absorbsAt} x={cons.x + cons.w + 24} y={both - h(66)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Kafka absorbs it<span style={{ opacity: ease(frame, durableAt, 10) }}>: the log is durable,</span>
           </span>
         </Note>
@@ -259,7 +259,7 @@ export const PressureScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>so the consumer falls behind</span>
         </Note>
         <Note at={droppedAt} x={cons.x + cons.w + 24} y={both + h(14)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             and nothing is dropped
             <span style={{ ...label(22, INK_SOFT), fontWeight: 650, opacity: ease(frame, retentionAt, 10) }}>, within retention</span>
           </span>
@@ -278,7 +278,7 @@ export const PressureScene: React.FC = () => {
           head={13}
         />
         <Note at={slowAt - 2} x={LANE.x + 40} y={loopY - h(38)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>push-based: "slow down" goes back to the producer</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>push-based: "slow down" goes back to the producer</span>
         </Note>
 
         {/* The model: lag, second by second. */}
@@ -315,7 +315,7 @@ export const PressureScene: React.FC = () => {
           </span>
         </Note>
         <Note at={takesAt + 4} x={joinX + 16} y={sy.b - h(26)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             a second consumer takes partition <Num>1</Num>
           </span>
         </Note>

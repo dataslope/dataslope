@@ -58,7 +58,7 @@ const Acid: React.FC<{ c: Ctx }> = ({ c }) => {
           {i > 0 ? <ColumnRule x={x - 27} top={top + c.h(14)} bottom={top + c.h(256)} at={p.at - 4} /> : null}
           <div style={{ position: "absolute", left: x, top, width: 196, opacity: Math.max(0.25, a) }}>
             <div style={{ ...headline(110), color: a > 0.5 ? BLUE_INK : INK_SOFT, lineHeight: 1 }}>{p.letter}</div>
-            <div style={{ ...label(26, INK), fontWeight: 700, marginTop: c.h(20), opacity: a }}>{p.word}</div>
+            <div style={{ ...label(26, INK), fontWeight: 600, marginTop: c.h(20), opacity: a }}>{p.word}</div>
             <div style={{ ...note(23, INK_SOFT), marginTop: c.h(10), opacity: ease(frame, p.at + 8, 10), width: 196 }}>{p.gist}</div>
           </div>
           </React.Fragment>
@@ -128,7 +128,7 @@ const Norm: React.FC<{ c: Ctx }> = ({ c }) => {
         </span>
       </Note>
       <Note at={firstAt} x={R_X} y={notesTop + c.h(100)}>
-        <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
           Normalize first<span style={{ opacity: ease(frame, profAt, 10) }}>; denormalize where profiling blames a join</span>
         </span>
       </Note>
@@ -176,7 +176,7 @@ const Joins: React.FC<{ c: Ctx }> = ({ c }) => {
         <text x={rx + r * 0.5} y={cy - r - 18} textAnchor="middle" style={svgText(label(22, INK))}>
           orders
         </text>
-        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(22, OK_INK), fontWeight: 700 })} opacity={ease(frame, innerRowsAt, 10)}>
+        <text x={(lx + rx) / 2} y={cy + 8} textAnchor="middle" style={svgText({ ...label(22, OK_INK), fontWeight: 600 })} opacity={ease(frame, innerRowsAt, 10)}>
           matches
         </text>
       </Svg>

@@ -99,7 +99,7 @@ export const OpenScene: React.FC = () => {
           >
             <Strike at={guessAt} top="0.5em">
               <span>
-                <span style={{ color: inkOf.purple, fontWeight: 700 }}>{shown.slice(0, 12)}</span>
+                <span style={{ color: inkOf.purple, fontWeight: 600 }}>{shown.slice(0, 12)}</span>
                 <span style={{ color: INK }}>{shown.slice(12)}</span>
               </span>
             </Strike>

@@ -157,7 +157,7 @@ export const GroupScene: React.FC = () => {
           {null}
         </Box>
         <Note at={setAt + 2} x={GA.x + 4} y={y(GA_TOP) - h(36)}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>consumer group A</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>consumer group A</span>
         </Note>
         {[0, 1, 2, 3].map((c) => {
           const at = c < 2 ? setAt + 6 + c * 4 : c === 2 ? thirdAt : fourthAt;
@@ -206,7 +206,7 @@ export const GroupScene: React.FC = () => {
           }}
         />
         <Note at={rebalanceAt} x={GA.x + 210} y={y(GA_TOP) - h(36)} out={q4At - 4}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap", background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>rebalance</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap", background: HIGHLIGHT, borderRadius: 4, padding: "0 6px" }}>rebalance</span>
         </Note>
         <Crash x={GA.cx + GA.cw - 6} y={cTop(1) + 4} at={crashAt + 2} />
 
@@ -215,7 +215,7 @@ export const GroupScene: React.FC = () => {
           {null}
         </Box>
         <Note at={secondAt + 2} x={GB.x + 4} y={mid(1) - h(70) - h(36)} out={fanOut}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>consumer group B</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>consumer group B</span>
         </Note>
         <Box x={GB.cx} y={mid(1) - cH / 2} w={GB.cw} h={cH} at={secondAt + 4} out={fanOut} size={21}>
           consumer

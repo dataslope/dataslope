@@ -393,7 +393,7 @@ export const FileTab: React.FC<{ at: number; x: number; y: number; name: string;
   children,
 }) => (
   <Ink at={at} dur={14} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 16 }}>
-    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 700, color: INK }}>{name}</span>
+    <span style={{ fontFamily: MONO, fontSize: 24, fontWeight: 600, color: INK }}>{name}</span>
     {children ? <span style={note(21, INK_SOFT)}>{children}</span> : null}
   </Ink>
 );
@@ -408,7 +408,7 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; out?: 
   children,
 }) => (
   <Ink at={at} out={out} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
     <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
   </Ink>
 );

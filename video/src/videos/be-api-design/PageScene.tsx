@@ -195,13 +195,13 @@ export const PageScene: React.FC = () => {
               </Note>
               <div style={{ position: "absolute", left: BAR_X0, top: top + 4, width: barW(o.read) * grow, height: BAR_H, background: BAR, borderRadius: 3, opacity: grow > 0 ? 1 : 0 }} />
               <Note at={offsetAt[i] + 14} x={BAR_X0 + barW(o.read) + 12} y={top}>
-                <span style={{ ...note(23, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(23, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
                   <Num>{thousands(o.read)}</Num>
                 </span>
               </Note>
               <div style={{ position: "absolute", left: BAR_X0, top: top + 4 + BAR_H + 10, width: barW(cur.read) * curGrow, height: BAR_H, background: OK, borderRadius: 3, opacity: curGrow > 0 ? 1 : 0 }} />
               <Note at={depthAt + 10 + i * 4} x={BAR_X0 + barW(cur.read) + 12} y={top + BAR_H + 10}>
-                <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
                   <Num>{thousands(cur.read)}</Num>
                 </span>
               </Note>
@@ -223,7 +223,7 @@ export const PageScene: React.FC = () => {
 
         {/* Page 500 as Postgres ran it: the scan reads what OFFSET skips. */}
         <Note at={p500At} x={LIST_X[0]} y={listTop} out={repeatAt - 6}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Page 500, as Postgres ran it</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Page 500, as Postgres ran it</span>
         </Note>
         {page500.query.map((l, i) => (
           <Note key={l} at={p500At + 4 + i * 4} x={LIST_X[0]} y={listTop + h(46) + i * h(38)} out={repeatAt - 6}>
@@ -242,7 +242,7 @@ export const PageScene: React.FC = () => {
         {lists.map((l, li) => (
           <React.Fragment key={l.title}>
             <Note at={li === 0 ? repeatAt : l.at} x={LIST_X[li]} y={listTop}>
-              <span style={{ ...label(21, li === 0 ? INK : l.tone === "bad" ? ACCENT_INK : OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{l.title}</span>
+              <span style={{ ...label(21, li === 0 ? INK : l.tone === "bad" ? ACCENT_INK : OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{l.title}</span>
             </Note>
             {l.ids.map((id, i) => {
               const first = i === 0 && li > 0;
@@ -292,13 +292,13 @@ export const PageScene: React.FC = () => {
         </Note>
         <Note at={afterAt} x={LIST_X[0]} y={cursorTop + h(92)}>
           <span style={{ fontFamily: MONO, fontSize: 22, color: INK, whiteSpace: "nowrap" }}>
-            <span style={{ color: METHOD_INK, fontWeight: 700 }}>GET</span> /articles?limit={PAGE_SIZE}&after={PAGE.cursorToken}
+            <span style={{ color: METHOD_INK, fontWeight: 600 }}>GET</span> /articles?limit={PAGE_SIZE}&after={PAGE.cursorToken}
           </span>
         </Note>
 
         {/* What a cursor costs. */}
         <Note at={costsAt} x={LIST_X[0]} y={y(770)}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>What a cursor costs</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>What a cursor costs</span>
         </Note>
         <Note at={noJumpAt} x={LIST_X[0]} y={y(770) + h(44)}>
           <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>

@@ -119,7 +119,7 @@ export const RuleScene: React.FC = () => {
         </div>
       ))}
       <Ink at={sevenAt + 14} dur={14} style={{ left: BAR_X + BAR_W + 18, top: y(BUILD_Y), whiteSpace: "nowrap" }}>
-        <div style={{ ...note(22, SET_INK), fontWeight: 700 }}>{fmt(BUILD_MS, 1)} ms</div>
+        <div style={{ ...note(22, SET_INK), fontWeight: 600 }}>{fmt(BUILD_MS, 1)} ms</div>
         <div style={{ ...note(20, INK_SOFT), marginTop: 4 }}>{fmt(BUILD_SCANS, 1)} scans</div>
       </Ink>
 
@@ -133,7 +133,7 @@ export const RuleScene: React.FC = () => {
         <span style={{ ...note(21, LIST_INK), fontWeight: 650 }}>list {fmt(MB(LIST_BYTES), 1)} MB</span>
       </Ink>
       <Ink at={memoryAt + 16} dur={14} style={{ left: BAR_X + BAR_W + 18, top: y(MEM_Y) + 30, whiteSpace: "nowrap" }}>
-        <div style={{ ...note(22, SET_INK), fontWeight: 700 }}>{fmt(MB(SET_BYTES), 1)} MB</div>
+        <div style={{ ...note(22, SET_INK), fontWeight: 600 }}>{fmt(MB(SET_BYTES), 1)} MB</div>
         <div style={{ ...note(20, INK_SOFT), marginTop: 4 }}>{fmt(SET_BYTES / LIST_BYTES, 1)}× the list</div>
       </Ink>
 

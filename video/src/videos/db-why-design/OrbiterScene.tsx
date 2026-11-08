@@ -164,7 +164,7 @@ export const OrbiterScene: React.FC = () => {
               }}
             >
               <span style={{ ...label(24, INK_SOFT) }}>unit</span>
-              <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>none</span>
+              <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>none</span>
             </div>
           </Note>
           {/* ...and what a column would have said in its place: the unit, in its name. */}
@@ -192,7 +192,7 @@ export const OrbiterScene: React.FC = () => {
           </Note>
           <Note at={fourAt - 4} x={X0} y={bTop + h(96) + 26}>
             <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>
-              1 lbf·s = <span style={{ fontWeight: 700, color: ACCENT_INK }}>{fmt(LBF_S)}</span> N·s, so every value read about{" "}
+              1 lbf·s = <span style={{ fontWeight: 600, color: ACCENT_INK }}>{fmt(LBF_S)}</span> N·s, so every value read about{" "}
               {fmt(LBF_S)} times too small
             </span>
           </Note>

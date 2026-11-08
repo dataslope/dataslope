@@ -284,7 +284,7 @@ export const CompScene: React.FC = () => {
         ))}
 
         {/* Part B: a subclass per pair, or one part per choice. */}
-        <Line x={X0} y={y(GRID_TOP - 96)} at={channelsAt} size={22} weight={700}>
+        <Line x={X0} y={y(GRID_TOP - 96)} at={channelsAt} size={22} weight={600}>
           A subclass per pair
         </Line>
         {timings.map((t, j) => (
@@ -294,7 +294,7 @@ export const CompScene: React.FC = () => {
         ))}
         {channels.map((c, i) => (
           <React.Fragment key={c}>
-            <Line x={X0} y={rowY(i) + 12} at={i < 3 ? channelsAt + i * 5 : fourthAt} size={21} weight={700}>
+            <Line x={X0} y={rowY(i) + 12} at={i < 3 ? channelsAt + i * 5 : fourthAt} size={21} weight={600}>
               {c}
             </Line>
             {timings.map((t, j) => (
@@ -312,11 +312,11 @@ export const CompScene: React.FC = () => {
             ))}
           </React.Fragment>
         ))}
-        <Line x={X0} y={rowY(4) + 10} at={nineAt + 10} size={26} weight={700}>
+        <Line x={X0} y={rowY(4) + 10} at={nineAt + 10} size={26} weight={600}>
           <span style={{ color: subclasses > NOTIFIERS.inheritance[0] ? ACCENT : INK, fontVariantNumeric: "tabular-nums" }}>{subclasses}</span> subclasses
         </Line>
 
-        <Line x={PARTS_X[0]} y={y(GRID_TOP - 96)} at={partsAt} size={22} weight={700}>
+        <Line x={PARTS_X[0]} y={y(GRID_TOP - 96)} at={partsAt} size={22} weight={600}>
           <span style={{ color: OK_INK }}>Composition:</span> one part per choice
         </Line>
         {channels.map((c, i) => (
@@ -325,7 +325,7 @@ export const CompScene: React.FC = () => {
         {timings.map((t, j) => (
           <Box key={t} x={PARTS_X[1]} y={rowY(j)} w={PART_W[1]} h={CELL.h} at={partsAt + 14 + j * 3} title={t} size={21} lit={j === digest ? pulse(frame, digestAt, 24) : 0} />
         ))}
-        <Line x={PARTS_X[0]} y={rowY(4) + 10} at={sixAt} size={26} weight={700}>
+        <Line x={PARTS_X[0]} y={rowY(4) + 10} at={sixAt} size={26} weight={600}>
           <span style={{ color: parts > NOTIFIERS.composition[0] ? OK_INK : INK, fontVariantNumeric: "tabular-nums" }}>{parts}</span> parts
         </Line>
 
@@ -350,7 +350,7 @@ export const CompScene: React.FC = () => {
                   inset: 0,
                   textAlign: "center",
                   ...label(21, OK_INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   whiteSpace: "nowrap",
                   opacity: s.k,
                   transform: `translateY(${(s.text === "now" ? -1 : 1) * (1 - s.k) * 18}px)`,

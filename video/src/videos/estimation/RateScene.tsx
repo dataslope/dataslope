@@ -137,7 +137,7 @@ export const RateScene: React.FC = () => {
         <Ink at={itselfAt - 6} dur={18} style={{ position: "relative", fontFamily: SERIF, fontSize: 42, color: INK }}>
           √(<PHat /> (1 − <PHat />) ÷ <i>n</i>)
         </Ink>
-        <Ink at={tenthsAt - 4} dur={14} style={{ position: "relative", ...note(34, INK), fontWeight: 700 }}>
+        <Ink at={tenthsAt - 4} dur={14} style={{ position: "relative", ...note(34, INK), fontWeight: 600 }}>
           = <Count at={tenthsAt - 4} to={RATE.se * 100} dur={14} digits={2} /> points
         </Ink>
       </div>
@@ -158,7 +158,7 @@ export const RateScene: React.FC = () => {
       <Axis scale={X} base={y(AXIS)} ticks={[15, 16, 17, 18, 19, 20, 21]} format={(v) => `${v}%`} at={eighteenAt - 8} />
       <Rule x={px(RATE.pHat)} y0={y(AXIS)} y1={y(BAR_Y) - 30} at={eighteenAt - 2} color={EST} width={3.4} />
       <Note at={eighteenAt} x={px(RATE.pHat) + 12} y={y(BAR_Y) - 70}>
-        <span style={{ ...note(22, EST_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, EST_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
           <PHat /> = {pct(RATE.pHat)}
         </span>
       </Note>
@@ -189,7 +189,7 @@ export const RateScene: React.FC = () => {
         <circle cx={px(RATE.pHat)} cy={y(BAR_Y)} r={6.5 * ease(frame, eitherAt - 4, 10)} fill={EST} stroke={PAPER} strokeWidth={1.4} />
       </Svg>
       <Note at={sixteenAt - 2} x={px(RATE.lo) - 14} y={y(BAR_Y) - 16} align="right" from="right">
-        <span style={{ ...note(26, INK), fontWeight: 700, ...halo }}>{pct(RATE.lo)}</span>
+        <span style={{ ...note(26, INK), fontWeight: 600, ...halo }}>{pct(RATE.lo)}</span>
       </Note>
       <Note at={percentAt - 2} x={(COL + 1760) / 2} y={y(AXIS) + 84} from="up">
         <span style={{ ...note(22, INK), fontWeight: 650, whiteSpace: "nowrap", display: "inline-block", transform: "translateX(-50%)" }}>
@@ -197,7 +197,7 @@ export const RateScene: React.FC = () => {
         </span>
       </Note>
       <Note at={nineteenAt - 2} x={px(RATE.hi) + 14} y={y(BAR_Y) - 16}>
-        <span style={{ ...note(26, INK), fontWeight: 700, ...halo }}>{pct(RATE.hi)}</span>
+        <span style={{ ...note(26, INK), fontWeight: 600, ...halo }}>{pct(RATE.hi)}</span>
       </Note>
     </AbsoluteFill>
   );

@@ -400,7 +400,7 @@ export const KmeansScene: React.FC = () => {
             <span
               style={{
                 ...note(22, OK_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}
@@ -495,7 +495,7 @@ export const KmeansScene: React.FC = () => {
             <span
               style={{
                 ...note(22, OK_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 whiteSpace: "nowrap",
                 ...TABULAR,
               }}

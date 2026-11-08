@@ -119,7 +119,7 @@ export const ScaleScene: React.FC = () => {
         <MiniMap at={qAt} stage={0} lit="app" grow={{ apps: moreAt }} />
 
         {/* ── Vertical ── */}
-        <Line at={vertAt} x={X0} y={y(340)} size={24} weight={700} dim={vDim}>
+        <Line at={vertAt} x={X0} y={y(340)} size={24} weight={600} dim={vDim}>
           Vertical: a bigger machine
         </Line>
         <Line at={simpleAt} x={X0} y={y(388)} size={22} color={INK_SOFT} dim={vDim}>
@@ -128,7 +128,7 @@ export const ScaleScene: React.FC = () => {
         </Line>
         <Svg opacity={(ease(frame, vertAt, 12)) * (1 - ease(frame, vDim, 12) * 0.65)}>
           <line x1={X0} x2={X0 + 400} y1={ceiling} y2={ceiling} stroke={ceilRed > 0.5 ? ACCENT : INK_SOFT} strokeWidth={2.4} strokeDasharray="10 8" />
-          <text x={X0 + 400} y={ceiling + 32} textAnchor="end" style={svgText({ ...label(21, ceilRed > 0.5 ? ACCENT_INK : INK_SOFT), fontWeight: 700 })}>
+          <text x={X0 + 400} y={ceiling + 32} textAnchor="end" style={svgText({ ...label(21, ceilRed > 0.5 ? ACCENT_INK : INK_SOFT), fontWeight: 600 })}>
             ceiling
           </text>
         </Svg>
@@ -151,7 +151,7 @@ export const ScaleScene: React.FC = () => {
         </Svg>
 
         {/* ── Horizontal ── */}
-        <Line at={horizAt} x={H_X} y={y(340)} size={24} weight={700}>
+        <Line at={horizAt} x={H_X} y={y(340)} size={24} weight={600}>
           Horizontal: more machines behind the load balancer
         </Line>
         <Line at={unlimitedAt} x={H_X} y={y(388)} size={22} color={INK_SOFT}>
@@ -208,7 +208,7 @@ export const ScaleScene: React.FC = () => {
               borderRadius: 8,
               background: OK,
               ...label(19, PAPER),
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           >
             session
@@ -223,7 +223,7 @@ export const ScaleScene: React.FC = () => {
         <VRule x={1257} top={y(338)} bottom={y(890)} at={theseAt} />
 
         {/* ── Ours: the redirect servers are stateless already. ── */}
-        <Line at={theseAt} x={1300} y={y(338)} size={22} weight={700} color={OK_INK}>
+        <Line at={theseAt} x={1300} y={y(338)} size={22} weight={600} color={OK_INK}>
           Our redirect servers: stateless already
         </Line>
         {Array.from({ length: 8 }, (_, i) => {
@@ -290,7 +290,7 @@ export const ScaleScene: React.FC = () => {
               <g key={String(t)} opacity={p}>
                 <line x1={cx(mm.rho)} x2={cx(mm.rho)} y1={y(C.base)} y2={cy(mm.wait)} stroke={INK_SOFT} strokeWidth={1.2} strokeDasharray="4 4" />
                 <circle cx={cx(mm.rho)} cy={cy(mm.wait)} r={7} fill={ACCENT} />
-                <text x={cx(mm.rho) - 14} y={cy(mm.wait) - 14} textAnchor="end" style={svgText({ ...note(24, ACCENT_INK), fontWeight: 700 })}>
+                <text x={cx(mm.rho) - 14} y={cy(mm.wait) - 14} textAnchor="end" style={svgText({ ...note(24, ACCENT_INK), fontWeight: 600 })}>
                   {t as string}
                 </text>
               </g>
@@ -300,7 +300,7 @@ export const ScaleScene: React.FC = () => {
             <g opacity={ease(frame, nn99At, 10)}>
               <line x1={cx(m99.rho)} x2={cx(m99.rho)} y1={y(C.base)} y2={y(C.top) - 6} stroke={ACCENT} strokeWidth={2.4} />
               <path d={arrowHead(up99, 14, 8, { filled: true })} fill={ACCENT} />
-              <text x={cx(m99.rho) - 18} y={y(C.top) - 8} textAnchor="end" style={svgText({ ...note(23, ACCENT_INK), fontWeight: 700 })}>
+              <text x={cx(m99.rho) - 18} y={y(C.top) - 8} textAnchor="end" style={svgText({ ...note(23, ACCENT_INK), fontWeight: 600 })}>
                 99× at 99%, off the top
               </text>
             </g>

@@ -211,7 +211,7 @@ export const ConfoundScene: React.FC = () => {
           ) : null}
         </Svg>
         <Note at={nineAt - 2} x={px(CONFOUND.pooled.x1) - 10} y={py(CONFOUND.pooled.intercept + CONFOUND.pooled.slope * CONFOUND.pooled.x1) - 80} align="right" dim={fallsAt}>
-          <span style={{ ...note(23, STAT_INK), fontWeight: 700, whiteSpace: "nowrap", ...halo }}>
+          <span style={{ ...note(23, STAT_INK), fontWeight: 600, whiteSpace: "nowrap", ...halo }}>
             everyone: +{fmt(CONFOUND.pooledPerHour, 1)} mmHg <Marker at={hourAt - 2}>per weekly hour</Marker>
           </span>
         </Note>

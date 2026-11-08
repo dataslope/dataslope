@@ -351,7 +351,7 @@ const Table: React.FC<{ at: number; enetAt: number; ageAt: number; swell: number
                   left: COL[k + 1],
                   top: 0,
                   ...note(30, v === 0 ? (k === 2 ? INK : ACCENT_INK) : enet ? OK_INK : WARM_INK),
-                  fontWeight: 700,
+                  fontWeight: 600,
                   ...TABULAR,
                   whiteSpace: "nowrap",
                   opacity: k === 2 ? ease(frame, ageAt, 10) : 1,
@@ -419,7 +419,7 @@ const Resamples: React.FC<{
           left: cellsLeft + n * (CELL + GAP) + 14,
           top,
           ...note(24, ink),
-          fontWeight: 700,
+          fontWeight: 600,
           whiteSpace: "nowrap",
           opacity: lit,
         }}

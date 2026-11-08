@@ -274,7 +274,7 @@ export const Fig: React.FC<{
       gap: 12,
     }}
   >
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
     <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
   </Ink>
 );
@@ -340,7 +340,7 @@ export const Out: React.FC<{ value: boolean; size: number }> = ({ value, size })
     style={{
       fontFamily: MONO,
       fontSize: size,
-      fontWeight: 700,
+      fontWeight: 600,
       color: boolInk(value),
       fontVariantLigatures: "none",
       whiteSpace: "pre",
@@ -483,7 +483,7 @@ export const VarCell: React.FC<{
           opacity: ease(frame, at + 4, 10),
           fontFamily: MONO,
           fontSize: 32,
-          fontWeight: 700,
+          fontWeight: 600,
           color: INK,
         }}
       >

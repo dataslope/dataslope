@@ -216,7 +216,7 @@ export const PgScene: React.FC = () => {
 
         {/* What an interviewer wants. */}
         <Note at={leanAt - 2} x={RIGHT_X} y={y(630) + 18}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>the answer they want</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>the answer they want</span>
         </Note>
         <Note at={leanAt} x={RIGHT_X} y={y(630) + 58}>
           <span style={{ ...note(28, OK_INK), fontWeight: 650, whiteSpace: "nowrap", lineHeight: 1.5 }}>

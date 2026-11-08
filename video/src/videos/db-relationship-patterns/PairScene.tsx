@@ -121,7 +121,7 @@ export const PairScene: React.FC = () => {
           </Svg>
         ) : null}
         <Ink at={pkAt} dur={14} style={{ left: mid, top: by - 44, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, KEY_INK), fontWeight: 700, display: "inline-block", transform: "translateX(-50%)" }}>
+          <span style={{ ...label(22, KEY_INK), fontWeight: 600, display: "inline-block", transform: "translateX(-50%)" }}>
             primary key
           </span>
         </Ink>

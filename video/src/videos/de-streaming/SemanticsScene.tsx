@@ -140,7 +140,7 @@ export const SemanticsScene: React.FC = () => {
           }}
         />
         <Note at={batchAt + 2} x={cx(5)} y={rowTop(0) - h(40)}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             one batch: offsets <Num>5</Num> to <Num>9</Num>
           </span>
         </Note>
@@ -205,7 +205,7 @@ export const SemanticsScene: React.FC = () => {
           <line x1={after(9)} x2={after(9)} y1={cellsTop(1) - 8} y2={cellsTop(1) + CELL_H + 8} stroke={BAR} strokeWidth={3} strokeDasharray="5 5" />
         </svg>
         <Note at={figAt + 14} x={after(4) - 60} y={cellsTop(2) + CELL_H + h(14)} out={twiceAt + 30}>
-          <span style={{ ...label(20, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Bar color={BAR} />
             commit
           </span>
@@ -235,7 +235,7 @@ export const SemanticsScene: React.FC = () => {
           <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>can't save a message retention deleted before it was read</span>
         </Note>
         <Note at={effectAt} x={VERDICT_X} y={cellsTop(2) - h(4)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>one effect each on the result</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>one effect each on the result</span>
         </Note>
         <Note at={nothingAt} x={VERDICT_X} y={cellsTop(2) + h(36)}>
           <span style={{ ...label(20, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>may run twice; the second run changes nothing</span>
@@ -256,7 +256,7 @@ export const SemanticsScene: React.FC = () => {
         {strips.map((st, si) => (
           <React.Fragment key={st.name}>
             <Note at={modelAt + 4 + si * 4} x={X0} y={st.y - h(2)}>
-              <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>{st.name}</span>
+              <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>{st.name}</span>
             </Note>
             <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
               <rect

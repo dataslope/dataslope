@@ -232,7 +232,7 @@ export const LazyScene: React.FC = () => {
                 ) : null}
               </span>
               {isShow ? (
-                <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), fontWeight: 700 }}>action</span>
+                <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), fontWeight: 600 }}>action</span>
               ) : run > 0 ? (
                 <span style={{ marginLeft: "auto", ...label(20, BLUE_INK), opacity: run }}>ran</span>
               ) : null}

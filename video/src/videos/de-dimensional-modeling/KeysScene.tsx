@@ -127,7 +127,7 @@ export const KeysScene: React.FC = () => {
           {problems.map((p, i) => (
             <Note key={p.what} at={p.at - 2} x={X0} y={y(412) + i * h(50)}>
               <span style={{ display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
-                <span style={{ ...label(25, ACCENT_INK), fontWeight: 700, width: 170 }}>{p.what}</span>
+                <span style={{ ...label(25, ACCENT_INK), fontWeight: 600, width: 170 }}>{p.what}</span>
                 <span style={{ ...note(24, INK) }}>
                   {p.code ? <Mono>{p.code}</Mono> : null}
                   {p.text}
@@ -203,7 +203,7 @@ export const KeysScene: React.FC = () => {
 
         {/* ── Where it leads ── */}
         <Note at={scdAt} x={X0} y={dg.rowTop(dim.rows.length) + h(106)}>
-          <span style={{ ...note(27, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(27, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Versions like these: a slowly changing dimension
             <span style={{ color: INK, fontWeight: 560, opacity: ease(frame, historyAt, 10) }}> · where modeling history begins</span>
           </span>

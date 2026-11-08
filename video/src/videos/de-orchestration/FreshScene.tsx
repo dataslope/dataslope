@@ -127,7 +127,7 @@ export const FreshScene: React.FC = () => {
         {/* Its answers, one each morning at six. */}
         <div style={{ position: "absolute", left: RES_X, top: resTop, display: "flex", opacity: ease(frame, sixHAt - 6, 10) }}>
           {COLS.map((c) => (
-            <div key={c.key} style={{ width: c.w, ...label(20, INK_SOFT), fontWeight: 700, fontFamily: c.key === "newest" ? MONO : SANS }}>
+            <div key={c.key} style={{ width: c.w, ...label(20, INK_SOFT), fontWeight: 600, fontFamily: c.key === "newest" ? MONO : SANS }}>
               {c.label}
             </div>
           ))}
@@ -139,7 +139,7 @@ export const FreshScene: React.FC = () => {
             <div key={i} style={{ position: "absolute", left: RES_X, top: resTop + (i + 1) * RH, display: "flex", alignItems: "center", opacity: p }}>
               <div style={{ width: COLS[0].w, ...note(22, INK), fontWeight: 600 }}>06:00 Jun {Number(row.r.now.slice(8, 10))}</div>
               <div style={{ width: COLS[1].w, fontFamily: MONO, fontSize: 21, color: INK, fontVariantLigatures: "none" }}>{row.r.newest}</div>
-              <div style={{ width: COLS[2].w, ...note(22, row.ok ? OK_INK : ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              <div style={{ width: COLS[2].w, ...note(22, row.ok ? OK_INK : ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
                 <Num>{hm(row.r.minutes)}</Num>
               </div>
               <div style={{ width: 40 }}>{frame >= row.at + 6 ? row.ok ? <Tick at={row.at + 6} size={24} /> : <Cross at={row.at + 6} size={24} /> : null}</div>
@@ -181,7 +181,7 @@ export const FreshScene: React.FC = () => {
           ].map((m) => (
             <g key={m.t} opacity={ease(frame, m.at, 10)}>
               <line x1={hx(m.t)} x2={hx(m.t)} y1={bandY - bandH / 2 - h(10)} y2={m.to + h(12)} stroke={INK} strokeWidth={2.2} />
-              <text x={hx(m.t)} y={bandY - bandH / 2 - h(16)} textAnchor="middle" style={svgText({ ...label(19, INK), fontWeight: 700 })}>
+              <text x={hx(m.t)} y={bandY - bandH / 2 - h(16)} textAnchor="middle" style={svgText({ ...label(19, INK), fontWeight: 600 })}>
                 06:00
               </text>
             </g>
@@ -214,10 +214,10 @@ export const FreshScene: React.FC = () => {
           <span style={{ ...label(20, ACCENT_INK), whiteSpace: "nowrap" }}>the source sent nothing</span>
         </Note>
         <Note at={sixHAt + 6} x={hx(now1) + 12} y={b1Y - 16}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{hm(FRESH.fine.minutes)}: fresh</span>
+          <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{hm(FRESH.fine.minutes)}: fresh</span>
         </Note>
         <Note at={thirtyAt + 6} x={hx(now2) - 12} y={b2Y + h(4)} align="right">
-          <span style={{ ...note(23, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{hm(FRESH.stale.minutes)}: stale, alert</span>
+          <span style={{ ...note(23, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>{hm(FRESH.stale.minutes)}: stale, alert</span>
         </Note>
 
         {/* The run that night, all green, and the two checks that are not:

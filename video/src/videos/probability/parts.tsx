@@ -338,7 +338,7 @@ export const Coin: React.FC<{
         alignItems: "center",
         justifyContent: "center",
         ...note(Math.round(r * 0.95), heads ? PAPER : INK),
-        fontWeight: 700,
+        fontWeight: 600,
         lineHeight: 1,
       }}
     >

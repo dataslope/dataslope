@@ -162,7 +162,7 @@ export const GrowthScene: React.FC = () => {
                 top: (y0 + y1) / 2 - 16,
                 opacity: p,
                 ...note(26, NAIVE_INK),
-                fontWeight: 700,
+                fontWeight: 600,
               }}
             >
               ×{Math.round(ratio)}

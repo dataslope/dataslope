@@ -48,7 +48,7 @@ const Evict: React.FC<{ c: Ctx }> = ({ c }) => {
         const drop = ease(frame, at[i] + 14, 10);
         return (
           <div key={i} style={{ position: "absolute", left: px(i), top: py(i), width: PANEL.w, opacity: shown }}>
-            <div style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <div style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               <Mark at={at[i]} out={until}>
                 {p.name}
               </Mark>
@@ -90,7 +90,7 @@ const Evict: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...note(20, OK_INK), fontWeight: 650 }}>a good default</span>
       </Ink>
       <Ink at={pairAt} dur={14} style={{ left: R_X, top: c.y(360) + 2 * (c.h(PANEL.h) + PANEL.gapY) + 4, whiteSpace: "nowrap" }}>
-        <span style={{ ...note(24, INK), fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 12 }}>
+        <span style={{ ...note(24, INK), fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 12 }}>
           <Tick at={pairAt + 6} size={26} />
           Most systems pair them: <span style={{ color: OK_INK }}>LRU + TTL</span>
         </span>
@@ -134,7 +134,7 @@ const Consist: React.FC<{ c: Ctx }> = ({ c }) => {
         return (
           <React.Fragment key={i}>
             <div style={{ position: "absolute", left: m.x - 11, top: lineY - 11, width: 22, height: 22, borderRadius: 11, background: i === 0 || i === 3 ? INK : BAR, opacity: p, border: `3px solid ${PAPER}`, boxSizing: "border-box" }} />
-            <div style={{ position: "absolute", left, top: lineY - 64, width: 300, textAlign: align, opacity: p, ...label(23, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", left, top: lineY - 64, width: 300, textAlign: align, opacity: p, ...label(23, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               {m.t}
             </div>
             <div style={{ position: "absolute", left, top: lineY + (i === 1 || i === 2 ? 92 : 28), width: 300, textAlign: align, opacity: p, ...note(20, INK_SOFT), whiteSpace: "nowrap" }}>
@@ -150,10 +150,10 @@ const Consist: React.FC<{ c: Ctx }> = ({ c }) => {
       })}
       {/* What each end suits. */}
       <Ink at={feedAt} dur={12} style={{ left: x0 - 10, top: lineY + c.h(150), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(23, INK), fontWeight: 700 }}>a feed can be eventual</span>
+        <span style={{ ...note(23, INK), fontWeight: 600 }}>a feed can be eventual</span>
       </Ink>
       <Ink at={bankAt} dur={12} style={{ left: x1 - 380, top: lineY + c.h(150), whiteSpace: "nowrap" }}>
-        <span style={{ ...note(23, INK), fontWeight: 700 }}>a bank balance usually needs strong</span>
+        <span style={{ ...note(23, INK), fontWeight: 600 }}>a bank balance usually needs strong</span>
       </Ink>
     </>
   );

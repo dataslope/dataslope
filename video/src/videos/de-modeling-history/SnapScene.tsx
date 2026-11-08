@@ -171,7 +171,7 @@ export const SnapScene: React.FC = () => {
           ]}
         />
         <Note at={thenAt} x={X0 + qW + 24} y={qTop + h(8)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             → <Num>502</Num>
           </span>
         </Note>
@@ -202,7 +202,7 @@ export const SnapScene: React.FC = () => {
           <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
             history must be auditable?
             <br />
-            <span style={{ color: OK_INK, fontWeight: 700, opacity: ease(frame, keepAt, 10) }}>keep the log</span>
+            <span style={{ color: OK_INK, fontWeight: 600, opacity: ease(frame, keepAt, 10) }}>keep the log</span>
             <span style={{ opacity: ease(frame, serveAt, 10) }}>, serve the snapshot from it</span>
           </span>
         </Note>

@@ -220,8 +220,8 @@ export const IdfScene: React.FC = () => {
         </svg>
         <Ink at={twoHundredAt - 2} style={{ left: GX, top: GY + 10 * (DH + GAP_Y) + 10, whiteSpace: "nowrap" }}>
           <div style={{ ...label(23, INK_SOFT) }}>
-            <span style={{ color: COMMON_INK, fontWeight: 700 }}>{IDF.common.docs}</span> hold the common word,{" "}
-            <span style={{ color: DATA_INK, fontWeight: 700 }}>{IDF.rare.docs}</span> hold the rare one
+            <span style={{ color: COMMON_INK, fontWeight: 600 }}>{IDF.common.docs}</span> hold the common word,{" "}
+            <span style={{ color: DATA_INK, fontWeight: 600 }}>{IDF.rare.docs}</span> hold the rare one
           </div>
         </Ink>
 

@@ -111,7 +111,7 @@ export const LambdaScene: React.FC = () => {
           </Pill>
         ))}
         <Note at={costAt} x={NOTE_X} y={bY + h(10)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             The cost: every piece of logic
             <br />
             <span style={{ opacity: ease(frame, twiceAt, 10) }}>written twice</span>
@@ -143,7 +143,7 @@ export const LambdaScene: React.FC = () => {
           tail
         />
         <Note at={reprocessAt} x={log.x + 70} y={v2Mid + h(10)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>replay from the start</span>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>replay from the start</span>
         </Note>
         <Node
           x={job.x}
@@ -172,7 +172,7 @@ export const LambdaScene: React.FC = () => {
           head={12}
         />
         <Note at={switchAt + 4} x={newTable.x} y={v2Y + V2H + h(8)}>
-          <span style={{ ...note(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             readers switch<span style={{ opacity: ease(frame, catchAt, 10) }}> once it catches up</span>
           </span>
         </Note>

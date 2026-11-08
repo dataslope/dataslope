@@ -61,7 +61,7 @@ export const CloseScene: React.FC = () => {
           <span style={{ ...note(30, INK_SOFT), whiteSpace: "nowrap" }}>the end of the Data Engineer series</span>
         </Note>
         <Note at={practice[0].at - 6} x={X0} y={y(640)}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 700 }}>to practice</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 600 }}>to practice</span>
         </Note>
         {practice.map((p, i) => (
           <Chip key={p.text} x={X0} y={y(690) + i * h(74)} at={p.at - 2} size={28} tone="blue" lit={i === 1 ? workAt : undefined}>

@@ -254,7 +254,7 @@ export const NetworkScene: React.FC = () => {
           {["sharing", "control"].map((t, i) => (
             <div
               key={t}
-              style={{ position: "absolute", left: BARS.x + i * (BARS.w + BARS.gap) - 20, width: BARS.w + 40, top: y(BARS.base) + h(10), textAlign: "center", ...label(21, INK_SOFT), fontWeight: 700, opacity: barsIn }}
+              style={{ position: "absolute", left: BARS.x + i * (BARS.w + BARS.gap) - 20, width: BARS.w + 40, top: y(BARS.base) + h(10), textAlign: "center", ...label(21, INK_SOFT), fontWeight: 600, opacity: barsIn }}
             >
               {t}
             </div>
@@ -263,14 +263,14 @@ export const NetworkScene: React.FC = () => {
             <span style={{ ...label(19, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>outcome, a sketch with no scale</span>
           </Note>
           <Note at={treatedAt + 2} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.5) - h(20)} out={groupsAt + 4}>
-            <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>control gets treated too</span>
+            <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>control gets treated too</span>
           </Note>
           <Note at={shrinkAt + 2} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.5) + h(20)} out={groupsAt + 4}>
             <span style={{ ...note(24, ACCENT_INK), whiteSpace: "nowrap" }}>so the difference shrinks</span>
           </Note>
           {/* Balanced, so neither note leaves a word on a line alone. */}
           <Note at={groupsAt + 4} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.62)} width={380}>
-            <span style={{ ...note(25, OK_INK), fontWeight: 700, display: "block", textWrap: "balance" }}>randomize groups that rarely touch</span>
+            <span style={{ ...note(25, OK_INK), fontWeight: 600, display: "block", textWrap: "balance" }}>randomize groups that rarely touch</span>
           </Note>
           <Note at={friendsAt} x={BARS.x + 2 * BARS.w + BARS.gap + 40} y={y(BARS.base) - bh(0.62) + h(80)} width={380}>
             <span style={{ ...note(24, OK_INK), display: "block", textWrap: "balance" }}>
@@ -302,7 +302,7 @@ export const NetworkScene: React.FC = () => {
             </span>
           </Note>
           <Note at={cantAt} x={250} y={y(570) - h(214)}>
-            <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>can't split users</span>
+            <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>can't split users</span>
           </Note>
           {/* The sketch beside it: the gap a user split would report. */}
           {skIn > 0 ? (
@@ -329,12 +329,12 @@ export const NetworkScene: React.FC = () => {
                 <span style={{ ...label(20, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>← drivers taken</span>
               </Note>
               <Note at={overAt} x={SK.x} y={y(SK.top) + 2 * h(SK.row) + h(4)}>
-                <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the gap comes out bigger than the real effect</span>
+                <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the gap comes out bigger than the real effect</span>
               </Note>
             </div>
           ) : null}
           <Note at={takesAt} x={150} y={y(570) + h(232)}>
-            <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+            <span style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
               a treated rider takes a control rider's driver,
               <br />
               <span style={{ opacity: ease(frame, overAt - 2, 10) }}>so a user split overstates the effect</span>
@@ -410,16 +410,16 @@ export const NetworkScene: React.FC = () => {
           </span>
         </Note>
         <Note at={spillAt + 4} x={TL.x0} y={y(TL.y) + h(TL.hgt) + h(60)}>
-          <span style={{ ...note(25, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             carryover<span style={{ fontWeight: 500 }}>: one hour spills into the next</span>
           </span>
         </Note>
         {/* The first dropped strip, named. */}
         <Note at={washAt} x={TL.x0 + (TL.w + TL.gap) - 6} y={y(TL.y) - h(40)}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>↓ washout, dropped</span>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>↓ washout, dropped</span>
         </Note>
         <Note at={dropAt + 2} x={TL.x0} y={y(TL.y) + h(TL.hgt) + h(108)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             drop each hour's first minutes<span style={{ opacity: ease(frame, hoursAt - 2, 10) }}>; count hours, not users</span>
           </span>
         </Note>

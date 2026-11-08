@@ -17,7 +17,7 @@ const WORKER = { x: 1110, w: 170, h: 58, mids: [400, 500] };
 const STORE = { x: 1380, w: 320 };
 const TOKEN = { w: 40, h: 34, step: 46 };
 /** A click's ID, as a small solid chip. */
-const chip = (fill: string): React.CSSProperties => ({ ...label(20, PAPER), fontWeight: 700, padding: "4px 8px", borderRadius: 7, background: fill });
+const chip = (fill: string): React.CSSProperties => ({ ...label(20, PAPER), fontWeight: 600, padding: "4px 8px", borderRadius: 7, background: fill });
 
 /**
  * Question 8: a click counted in the database inside the redirect, and a
@@ -115,7 +115,7 @@ export const QueueScene: React.FC = () => {
         {/* Before: the count is written inside the request. */}
         <Flow points={[[REDIRECT.x + REDIRECT.w + 6, mid], [STORE.x - 8, mid]]} at={countingAt + 6} color={ACCENT} dur={20} out={oldOut} />
         <Ink at={waitAt} dur={12} out={oldOut} style={{ left: REDIRECT.x + REDIRECT.w + 60, top: mid - 46, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700 }}>count +1, and the redirect waits for it</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600 }}>count +1, and the redirect waits for it</span>
         </Ink>
         <Node
           x={STORE.x}
@@ -127,7 +127,7 @@ export const QueueScene: React.FC = () => {
           dashed={ease(frame, txAt, 10) > 0.5}
           fill={PAPER}
         >
-          <div style={{ position: "absolute", top: 14, left: 0, right: 0, textAlign: "center", ...label(22, ease(frame, txAt, 10) > 0.5 ? OK_INK : BLUE_INK), fontWeight: 700 }}>
+          <div style={{ position: "absolute", top: 14, left: 0, right: 0, textAlign: "center", ...label(22, ease(frame, txAt, 10) > 0.5 ? OK_INK : BLUE_INK), fontWeight: 600 }}>
             {ease(frame, txAt, 10) > 0.5 ? "one transaction" : "database"}
           </div>
           <div style={{ position: "absolute", top: 58, left: 22, ...note(22, INK), whiteSpace: "nowrap" }}>
@@ -135,7 +135,7 @@ export const QueueScene: React.FC = () => {
           </div>
           <div style={{ position: "absolute", top: 104, left: 22, ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, idAt, 10) }}>
             seen IDs: <Num>45 46</Num>
-            <span style={{ color: OK_INK, fontWeight: 700, opacity: recorded }}> 47</span>
+            <span style={{ color: OK_INK, fontWeight: 600, opacity: recorded }}> 47</span>
           </div>
         </Node>
         {/* A viral link's spike, arriving at the database. */}
@@ -159,7 +159,7 @@ export const QueueScene: React.FC = () => {
           <rect x={QUEUE.x} y={mid - QUEUE.h / 2} width={QUEUE.w} height={QUEUE.h} rx={12} fill={`color-mix(in srgb, ${BAR} 6%, ${PAPER})`} stroke={BAR} strokeWidth={2.5} />
         </Svg>
         <Ink at={queueAt + 4} dur={12} style={{ left: QUEUE.x, top: mid - QUEUE.h / 2 - 40, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(22, BLUE_INK), fontWeight: 700 }}>queue</span>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 600 }}>queue</span>
         </Ink>
         <Flow points={[[REDIRECT.x + REDIRECT.w + 6, mid], [QUEUE.x - 8, mid]]} at={queueAt + 4} color={BAR} />
         {tokens.map((t) =>
@@ -203,7 +203,7 @@ export const QueueScene: React.FC = () => {
         </Line>
         <Flow points={[[REDIRECT.x + REDIRECT.w / 2, mid + REDIRECT.h / 2 + 6], [REDIRECT.x + REDIRECT.w / 2, mid + 110], [CLIENT.x + CLIENT.w / 2, mid + 110], [CLIENT.x + CLIENT.w / 2, mid + CLIENT.h / 2 + 8]]} at={returnsAt} color={OK} width={2.6} />
         <Ink at={returnsAt + 8} dur={12} style={{ left: CLIENT.x + CLIENT.w / 2 + 16, top: mid + 122, whiteSpace: "nowrap" }}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700 }}>returns at once</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 600 }}>returns at once</span>
         </Ink>
         <Ink at={burstAt} dur={12} style={{ left: QUEUE.x, top: mid + QUEUE.h / 2 + 18, whiteSpace: "nowrap" }}>
           <span style={{ ...note(21, INK), fontWeight: 600 }}>
@@ -236,12 +236,12 @@ export const QueueScene: React.FC = () => {
             <Num>47</Num>
           </div>
         ) : null}
-        <Line at={priceAt} x={X0} y={y(712)} size={22} weight={700}>
+        <Line at={priceAt} x={X0} y={y(712)} size={22} weight={600}>
           At-least-once delivery
           <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, crashAt, 10) }}>: a worker that crashes before its ack</span>
           <span style={{ fontWeight: 500, color: ACCENT_INK, opacity: ease(frame, againAt, 10) }}> gets the click again</span>
         </Line>
-        <Line at={idemAt} x={X0} y={y(712) + h(46)} size={22} weight={700} color={OK_INK}>
+        <Line at={idemAt} x={X0} y={y(712) + h(46)} size={22} weight={600} color={OK_INK}>
           An idempotent consumer
           <span style={{ fontWeight: 500, color: INK, opacity: ease(frame, idAt, 10) }}>: each click has an ID,</span>
           <span style={{ fontWeight: 500, color: INK, opacity: ease(frame, txAt, 10) }}> recorded in the same transaction as the count</span>
@@ -259,7 +259,7 @@ export const QueueScene: React.FC = () => {
               left: STORE.x + 30,
               top: storeTop + storeH - 52,
               ...label(20, OK_INK),
-              fontWeight: 700,
+              fontWeight: 600,
               whiteSpace: "nowrap",
               opacity: repeat,
             }}

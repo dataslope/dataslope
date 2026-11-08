@@ -121,7 +121,7 @@ const Heapsort: React.FC<{ c: Ctx }> = ({ c }) => {
   const arcP = ease(frame, cacheAt, 20);
   return (
     <>
-      <Line at={guaranteesAt} x={R_X} y={c.T} size={26} weight={700}>
+      <Line at={guaranteesAt} x={R_X} y={c.T} size={26} weight={600}>
         Heapsort: O(n log n) guaranteed
         <span style={{ opacity: ease(frame, spaceAt, 10) }}>, O(1) extra space</span>
       </Line>
@@ -149,7 +149,7 @@ const Heapsort: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={cacheAt + 6} x={R_X} y={rowY + c.h(70)} size={24} color={ACCENT_INK} weight={600}>
         Parent to child is a jump across the array: less cache-friendly than quicksort
       </Line>
-      <Line at={suitsAt} x={R_X} y={rowY + c.h(118)} size={25} weight={700} color={OK_INK}>
+      <Line at={suitsAt} x={R_X} y={rowY + c.h(118)} size={25} weight={600} color={OK_INK}>
         It suits tight memory
       </Line>
     </>
@@ -209,14 +209,14 @@ const InPlace: React.FC<{ c: Ctx }> = ({ c }) => {
   const b2 = c.T + c.h(250);
   return (
     <>
-      <Line at={inAt} x={R_X} y={c.T} size={25} weight={700}>
+      <Line at={inAt} x={R_X} y={c.T} size={25} weight={600}>
         In place: O(1) extra<span style={{ opacity: ease(frame, stackAt, 10) }}>, or O(log n) of stack</span>
       </Line>
       <Row values={values} x={R_X} y={c.T + c.h(52)} at={inAt + 4} />
       <Line at={quickAt} x={R_X} y={c.T + c.h(122)} size={24} color={BLUE_INK} weight={650}>
         quicksort, with random pivots
       </Line>
-      <Line at={outAt} x={R_X} y={b2} size={25} weight={700}>
+      <Line at={outAt} x={R_X} y={b2} size={25} weight={600}>
         Out of place: extra memory grows with the input
       </Line>
       <Row values={values} x={R_X} y={b2 + c.h(52)} at={outAt + 4} />
@@ -265,7 +265,7 @@ const Master: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={piecesAt} x={R_X} y={rowY(levels) + c.h(4)} size={24}>
         Combining costs n a level; the smallest pieces number n
       </Line>
-      <Line at={tieAt} x={R_X} y={rowY(levels) + c.h(48)} size={25} weight={700} color={OK_INK}>
+      <Line at={tieAt} x={R_X} y={rowY(levels) + c.h(48)} size={25} weight={600} color={OK_INK}>
         They tie: n a level, log n levels<span style={{ opacity: ease(frame, nlognAt, 10) }}>, so O(n log n)</span>
       </Line>
     </>
@@ -294,10 +294,10 @@ const Recursion: React.FC<{ c: Ctx }> = ({ c }) => {
       <Line at={frameAt} x={R_X + 150} y={colTop + colH - 34} size={24} weight={650}>
         <span style={TABULAR}>{int(shown)}</span> frames
       </Line>
-      <Line at={stopsAt} x={R_X + 150} y={colTop} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={stopsAt} x={R_X + 150} y={colTop} size={24} weight={600} color={ACCENT_INK}>
         <Num>{int(limit)}</Num>: Python stops, RecursionError
       </Line>
-      <Line at={loopAt} x={R_X + 150} y={colTop + c.h(150)} size={24} weight={700} color={OK_INK}>
+      <Line at={loopAt} x={R_X + 150} y={colTop + c.h(150)} size={24} weight={600} color={OK_INK}>
         A loop with an explicit stack
       </Line>
       <Line at={loopAt + 8} x={R_X + 150} y={colTop + c.h(192)} size={23} color={INK_SOFT}>
@@ -441,7 +441,7 @@ const Classic: React.FC<{ c: Ctx }> = ({ c }) => {
     <>
       {problems.map((p, i) => (
         <React.Fragment key={p.name}>
-          <Line at={p.at - 2} x={R_X} y={c.T + i * c.h(76) + 8} size={24} weight={700} color={BLUE_INK}>
+          <Line at={p.at - 2} x={R_X} y={c.T + i * c.h(76) + 8} size={24} weight={600} color={BLUE_INK}>
             {p.name}
           </Line>
           <Line at={stateAt + i * 4} x={R_X + 470} y={c.T + i * c.h(76) + 8} size={23} color={INK_SOFT}>
@@ -450,7 +450,7 @@ const Classic: React.FC<{ c: Ctx }> = ({ c }) => {
         </React.Fragment>
       ))}
       <VRule x={1185} top={c.T} bottom={c.T + 4 * c.h(76) + 40} at={stateAt} />
-      <Line at={stateAt} x={R_X} y={c.T + 5 * c.h(76) + c.h(12)} size={25} weight={700}>
+      <Line at={stateAt} x={R_X} y={c.T + 5 * c.h(76) + c.h(12)} size={25} weight={600}>
         Each teaches a way to <Mark at={stateAt + 6}>define the state</Mark>
       </Line>
     </>
@@ -517,7 +517,7 @@ const Greedy: React.FC<{ c: Ctx }> = ({ c }) => {
       {g.map((v, i) => (
         <Coin key={`g${i}`} v={v} x={coinX(g, i)} y={y1} at={sixAt + 12 + i * 6} tone="bad" />
       ))}
-      <Line at={threeAt} x={coinX(g, g.length) + 20} y={y1 - 16} size={24} weight={700} color={ACCENT_INK}>
+      <Line at={threeAt} x={coinX(g, g.length) + 20} y={y1 - 16} size={24} weight={600} color={ACCENT_INK}>
         <Num>{g.length}</Num> coins
       </Line>
       <Line at={twoAt} x={R_X} y={y2 - 16} size={24} weight={650} color={OK_INK}>
@@ -526,7 +526,7 @@ const Greedy: React.FC<{ c: Ctx }> = ({ c }) => {
       {f.map((v, i) => (
         <Coin key={`f${i}`} v={v} x={coinX(f, i)} y={y2} at={twoAt + 4 + i * 6} tone="ok" />
       ))}
-      <Line at={twoAt + 10} x={coinX(f, f.length) + 20} y={y2 - 16} size={24} weight={700} color={OK_INK}>
+      <Line at={twoAt + 10} x={coinX(f, f.length) + 20} y={y2 - 16} size={24} weight={600} color={OK_INK}>
         <Num>{f.length}</Num> coins
       </Line>
     </>

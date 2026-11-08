@@ -37,7 +37,7 @@ const Defense: React.FC<{ at: number; n: number; y: number; children: React.Reac
           alignItems: "center",
           justifyContent: "center",
           fontFamily: SANS,
-          fontWeight: 700,
+          fontWeight: 600,
         }}
       >
         {n}
@@ -134,7 +134,7 @@ export const SourceScene: React.FC = () => {
         <ErrorBox x={LIST_X} top={listTop + h(118)} width={errW} at={stopsAt} kind={kind} message={message} markAt={countAt} out={nameAt - 2} />
         <Listing lines={named} x={LIST_X} top={listTop} width={600} size={23} at={nameAt} marks={[{ line: 1, at: nameAt + 6, color: MARK_OK }]} />
         <Note at={ignoredAt} x={LIST_X + 640} y={listTop + h(40)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             loads; <span style={{ fontFamily: MONO }}>coupon</span> is ignored
           </span>
         </Note>

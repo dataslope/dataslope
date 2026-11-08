@@ -253,7 +253,7 @@ const BridgeChip: React.FC<{ text: string; id: number; glow: number }> = ({ text
       style={{
         fontFamily: MONO,
         fontSize: 48,
-        fontWeight: 700,
+        fontWeight: 600,
         color: glow > 0.4 ? FOCUS_INK : INK,
         fontVariantNumeric: "tabular-nums",
       }}

@@ -190,7 +190,7 @@ export const PennScene: React.FC = () => {
                 border: `2px solid ${FAMILY[fam].fill}`,
                 background: FAMILY[fam].tint,
                 fontFamily: MONO,
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 22,
                 color: FAMILY[fam].ink,
               }}
@@ -241,7 +241,7 @@ export const PennScene: React.FC = () => {
       {ROW_ORDER.map((r, k) => (
         <Note key={r.fam} at={rowLabelAt[k]} x={X0} y={sortedY(k)}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, height: tileH(ESIZE), whiteSpace: "nowrap" }}>
-            <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 22, color: FAMILY[r.fam].ink }}>{r.prefix}</span>
+            <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 22, color: FAMILY[r.fam].ink }}>{r.prefix}</span>
             <span style={{ ...label(24, INK), fontWeight: 600 }}>
               {k === 0 ? <Marked at={nounsAt - 2}>{r.name}</Marked> : r.name}
             </span>

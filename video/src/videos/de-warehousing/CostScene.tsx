@@ -103,7 +103,7 @@ export const CostScene: React.FC = () => {
         </div>
 
         {/* ── Read less ── */}
-        <div style={{ position: "absolute", left: X0, top: y(READ_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, lessAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(READ_Y) - h(44), ...label(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, lessAt, 12) }}>
           Read less <span style={{ ...label(22, INK_SOFT), fontWeight: 500 }}>· the page&apos;s query on the made-up million sales, bytes DuckDB read</span>
         </div>
         {reads.map((r, i) => (
@@ -133,7 +133,7 @@ export const CostScene: React.FC = () => {
         </div>
 
         {/* ── Compute less often ── */}
-        <div style={{ position: "absolute", left: X0, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, oftenAt, 12) }}>
+        <div style={{ position: "absolute", left: X0, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, oftenAt, 12) }}>
           Compute less often
         </div>
         {levers.map((l, i) => (
@@ -161,7 +161,7 @@ export const CostScene: React.FC = () => {
         <VRule x={(X0 + 528 + STORE_X) / 2} top={y(COMPUTE_Y) - h(44)} height={h(44) + 3 * h(44) - h(10)} at={coldAt} />
 
         {/* ── Store cheaper ── */}
-        <div style={{ position: "absolute", left: STORE_X, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: ease(frame, coldAt, 12) }}>
+        <div style={{ position: "absolute", left: STORE_X, top: y(COMPUTE_Y) - h(44), ...label(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: ease(frame, coldAt, 12) }}>
           Store cheaper
         </div>
         <div

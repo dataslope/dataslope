@@ -218,7 +218,7 @@ const OneAverage: React.FC<{ from: number; at: number; out: number }> = ({ from,
         <circle cx={mx} cy={y(mid)} r={13 * ease(frame, at + 8, 10)} fill={ACCENT} />
       </svg>
       <Note at={at + 12} x={mx + 26} y={y(mid) - 16} out={out}>
-        <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, ...halo }}>one average, {fmt(AGES.mean)}</span>
+        <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, ...halo }}>one average, {fmt(AGES.mean)}</span>
       </Note>
     </>
   );

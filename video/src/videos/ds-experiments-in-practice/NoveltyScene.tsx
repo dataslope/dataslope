@@ -116,10 +116,10 @@ export const NoveltyScene: React.FC = () => {
         {/* Each band carries its own label: week one while it is the one
             read, then the first weeks once they are what to run past. */}
         <Note at={readAt + 2} x={at(x, 1.5)} y={y(PLOT.top) - h(6)} out={pastAt}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>read in week one</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>read in week one</span>
         </Note>
         <Note at={pastAt + 4} x={at(x, 0.6) + 10} y={y(PLOT.top) - h(6)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>run past these weeks</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>run past these weeks</span>
         </Note>
         <Note at={wrongAt} x={at(x, 2.2)} y={at(yS, 11)}>
           <span style={{ ...note(27, ACCENT_INK), fontWeight: 750, whiteSpace: "nowrap" }}>→ you'd ship the wrong one</span>
@@ -127,7 +127,7 @@ export const NoveltyScene: React.FC = () => {
 
         {/* Primacy: the mirror, as a sketch. */}
         <Note at={primacyAt} x={SKETCH.x0} y={y(SKETCH.mid) - h(190)}>
-          <span style={{ ...note(27, INK), fontWeight: 700, whiteSpace: "nowrap" }}>Primacy, the other way</span>
+          <span style={{ ...note(27, INK), fontWeight: 600, whiteSpace: "nowrap" }}>Primacy, the other way</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, primacyAt + 2, 10) }}>
           <line x1={SKETCH.x0} x2={SKETCH.x1} y1={y(SKETCH.mid)} y2={y(SKETCH.mid)} stroke={INK} strokeWidth={1.4} />
@@ -145,18 +145,18 @@ export const NoveltyScene: React.FC = () => {
           <span style={{ ...label(19, INK_SOFT), fontWeight: 650, whiteSpace: "nowrap" }}>a sketch, no data</span>
         </Note>
         <Note at={resistAt + 4} x={SKETCH.x0 + 20} y={y(SKETCH.mid) + h(118)}>
-          <span style={{ ...label(21, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>resist at first</span>
+          <span style={{ ...label(21, WARM_INK), fontWeight: 600, whiteSpace: "nowrap" }}>resist at first</span>
         </Note>
         <Note at={learnAt} x={SKETCH.x1 - 200} y={y(SKETCH.mid) - h(150)}>
-          <span style={{ ...label(21, WARM_INK), fontWeight: 700, whiteSpace: "nowrap" }}>until they learn it</span>
+          <span style={{ ...label(21, WARM_INK), fontWeight: 600, whiteSpace: "nowrap" }}>until they learn it</span>
         </Note>
 
         {/* The defences, for both. */}
         <Note at={pastAt} x={SKETCH.x0} y={y(752)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>run past the first weeks</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>run past the first weeks</span>
         </Note>
         <Note at={compareAt} x={SKETCH.x0} y={y(794)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             compare new users
             <br />
             <span style={{ opacity: ease(frame, returningAt - 2, 10) }}>with returning ones</span>

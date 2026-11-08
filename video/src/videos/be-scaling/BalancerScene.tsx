@@ -194,7 +194,7 @@ export const BalancerScene: React.FC = () => {
         ].map(([name, at, sub], i) => (
           <React.Fragment key={i}>
             <Ink at={(at as number) - 2} dur={14} out={phaseOut} style={{ left: PANEL_X[i], top: panelTop, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(23, INK), fontWeight: 700 }}>
+              <span style={{ ...label(23, INK), fontWeight: 600 }}>
                 <Mark at={at as number} out={i < 2 ? ([lcAt, chAt][i] as number) : phaseOut - 10}>
                   {name as string}
                 </Mark>
@@ -238,7 +238,7 @@ export const BalancerScene: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 ...label(20, BLUE_INK),
-                fontWeight: 700,
+                fontWeight: 600,
                 opacity: p * (1 - o),
               }}
             >
@@ -281,11 +281,11 @@ export const BalancerScene: React.FC = () => {
           <React.Fragment key={r}>
             <Ink at={at} dur={12} out={phaseOut} style={{ left: PANEL_X[2], top: y(476) + r * h(84), whiteSpace: "nowrap" }}>
               <span style={{ ...note(22, INK), display: "inline-flex", alignItems: "center", gap: 14 }}>
-                <span style={{ fontFamily: MONO, color: BLUE_INK, fontWeight: 700 }}>
+                <span style={{ fontFamily: MONO, color: BLUE_INK, fontWeight: 600 }}>
                   {key.key}
                 </span>
                 <span style={{ color: INK_SOFT }}>→</span>
-                <span style={{ fontWeight: 700, color: INK }}>server {key.ring4 + 1}</span>
+                <span style={{ fontWeight: 600, color: INK }}>server {key.ring4 + 1}</span>
               </span>
             </Ink>
           </React.Fragment>
@@ -301,19 +301,19 @@ export const BalancerScene: React.FC = () => {
         <Line at={simAt} x={X0} y={y(340)} size={22} weight={650} color={INK}>
           Simulation: <Num>{commas(HASHING.keys)}</Num> short keys, one square each, colored by the server it lands on
         </Line>
-        <Line at={simAt + 6} x={MOD_X} y={y(392)} size={22} weight={700}>
+        <Line at={simAt + 6} x={MOD_X} y={y(392)} size={22} weight={600}>
           Modulo: 3 servers, then 4
         </Line>
         <KeyGrid x={MOD_X} top={y(GRID_TOP)} from={HASHING.grid.mod3} to={HASHING.grid.mod4} at={simAt + 6} sweepAt={switchAt} dimAt={sevAt} />
-        <Line at={sevAt + 4} x={MOD_X} y={y(GRID_TOP) + 416} size={23} weight={700} color={ACCENT_INK}>
+        <Line at={sevAt + 4} x={MOD_X} y={y(GRID_TOP) + 416} size={23} weight={600} color={ACCENT_INK}>
           {pct(HASHING.shareMod)} moved
           <span style={{ color: INK, fontWeight: 500, opacity: ease(frame, coldAt, 10) }}>, each to a cold cache</span>
         </Line>
-        <Line at={ringAt} x={RING_X} y={y(392)} size={22} weight={700}>
+        <Line at={ringAt} x={RING_X} y={y(392)} size={22} weight={600}>
           Hash ring, {HASHING.pointsPerServer} points a server
         </Line>
         <KeyGrid x={RING_X} top={y(GRID_TOP)} from={HASHING.grid.ring3} to={HASHING.grid.ring4} at={ringAt + 2} sweepAt={twentyAt} dimAt={newAt} />
-        <Line at={newAt} x={RING_X} y={y(GRID_TOP) + 416} size={23} weight={700} color={OK_INK}>
+        <Line at={newAt} x={RING_X} y={y(GRID_TOP) + 416} size={23} weight={600} color={OK_INK}>
           {pct(HASHING.shareRing)} moved, all to the new server
         </Line>
 

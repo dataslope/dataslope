@@ -91,7 +91,7 @@ export const OverScene: React.FC = () => {
           return (
             <React.Fragment key={c.layer}>
               <Box x={x} y={layerTop} w={COL_W} h={LAYER.h} at={c.at} dashed tone="plain" tones={[[eachAt + 6 + i * 6, "bad"], ...(i === 1 ? ([[earnsAt, "ok"]] as const) : [])]} dim={dim}>
-                <span style={{ position: "relative", ...label(25, c2.ink), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <span style={{ position: "relative", ...label(25, c2.ink), fontWeight: 600, whiteSpace: "nowrap" }}>
                   {c.layer}
                   <span
                     style={{
@@ -137,7 +137,7 @@ export const OverScene: React.FC = () => {
           Patterns solve variation you expect
           <span style={{ color: INK_SOFT, opacity: ease(frame, specAt, 10) }}>; added speculatively, they break</span>
         </Line>
-        <Line x={X0} y={y(660) + 116} at={yagniAt} size={30} weight={700} out={notesOut}>
+        <Line x={X0} y={y(660) + 116} at={yagniAt} size={30} weight={600} out={notesOut}>
           YAGNI: <Mark at={gonnaAt}>you aren&apos;t gonna need it</Mark>
         </Line>
 

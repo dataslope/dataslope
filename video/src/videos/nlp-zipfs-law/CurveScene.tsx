@@ -438,7 +438,7 @@ export const CurveScene: React.FC = () => {
 
       {/* ── The law, on log axes ── */}
       {/* In the grid row between 1,000 and 100, clear of both gridlines. */}
-      <Tag x={logX(900)} y={zipfY} at={zipfAt - 2} size={24} color={INK} weight={700} style={HALO}>
+      <Tag x={logX(900)} y={zipfY} at={zipfAt - 2} size={24} color={INK} weight={600} style={HALO}>
         Zipf&apos;s law
       </Tag>
       <Tag x={logX(900)} y={zipfY + 34} at={overAt - 2} size={21} color={INK_SOFT} weight={600} style={HALO}>

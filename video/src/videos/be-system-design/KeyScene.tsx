@@ -95,7 +95,7 @@ export const KeyScene: React.FC = () => {
                 transform: `translateY(${(1 - p) * 12}px)`,
               }}
             >
-              <span style={{ ...label(23, INK_SOFT), fontWeight: 700 }}>{c.name}</span>
+              <span style={{ ...label(23, INK_SOFT), fontWeight: 600 }}>{c.name}</span>
               <span style={{ ...note(30, INK), fontWeight: 650, whiteSpace: "nowrap", opacity: ease(frame, c.sub - 4, 10) }}>{c.body}</span>
             </div>
           );
@@ -106,7 +106,7 @@ export const KeyScene: React.FC = () => {
         </Line>
 
         {/* Base 62 of a counted ID. */}
-        <Line x={X0} y={secY} at={keyAt} size={28} weight={700}>
+        <Line x={X0} y={secY} at={keyAt} size={28} weight={600}>
           Base <Num>{KEY.alphabet.length}</Num> of a counted ID
         </Line>
         <div style={{ position: "absolute", left: X0, top: secY + 64, display: "flex", alignItems: "center", gap: "0.6em", fontSize: 26 }}>
@@ -152,7 +152,7 @@ export const KeyScene: React.FC = () => {
         <Line x={cellsX} y={cellsY + cell + 30} at={sixAt} size={22} color={INK_SOFT}>
           <Num>{six.len}</Num> characters
         </Line>
-        <Line x={X0} y={y(732)} at={billionAt} size={30} weight={700} color={BLUE_INK}>
+        <Line x={X0} y={y(732)} at={billionAt} size={30} weight={600} color={BLUE_INK}>
           <Num>{KEY.alphabet.length}</Num>
           <sup style={{ fontSize: "0.6em" }}>{six.len}</sup> ≈ <Num>{Math.round(six.keys / 1e9)}</Num> billion keys
         </Line>
@@ -162,7 +162,7 @@ export const KeyScene: React.FC = () => {
 
         {/* Or a hash. */}
         <VRule x={905} top={secY} bottom={y(732) + 84} at={hashAt} />
-        <Line x={RX} y={secY} at={hashAt} size={28} weight={700}>
+        <Line x={RX} y={secY} at={hashAt} size={28} weight={600}>
           Or a hash of the long URL
         </Line>
         <div style={{ position: "absolute", left: RX, top: secY + 60, display: "flex", alignItems: "center", gap: 16, fontSize: 27 }}>

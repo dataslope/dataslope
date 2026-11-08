@@ -148,7 +148,7 @@ export const StylesScene: React.FC = () => {
                   <Num>{i + 1}</Num>
                 </span>
                 <span style={{ fontFamily: MONO, fontSize: 21, color: INK, whiteSpace: "pre" }}>
-                  <span style={{ color: METHOD_INK, fontWeight: 700 }}>GET</span>
+                  <span style={{ color: METHOD_INK, fontWeight: 600 }}>GET</span>
                   {t.slice(3)}
                 </span>
                 <span style={{ ...note(21, INK_SOFT), whiteSpace: "nowrap", opacity: ease(frame, tripsAt + i * 4, 8) }}>↻</span>

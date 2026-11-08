@@ -165,7 +165,7 @@ export const ChangedScene: React.FC = () => {
           ))}
         </div>
         <Note at={coreAt} x={X0} y={y(BASE_Y) + 24 + 36 + 12}>
-          <span style={{ ...label(22, BLUE_INK), fontWeight: 700 }}>the core loop, the same as ever</span>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 600 }}>the core loop, the same as ever</span>
         </Note>
 
         {layers.map((l, i) => (
@@ -174,7 +174,7 @@ export const ChangedScene: React.FC = () => {
           </Layer>
         ))}
         <Note at={layers[0].at - 2} x={X0} y={layerTop(3) + LAYER_TEXT - 64}>
-          <span style={{ ...label(22, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>what&apos;s been added on top</span>
+          <span style={{ ...label(22, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>what&apos;s been added on top</span>
         </Note>
 
         {/* Beside "AI in your own workflow": what a round with an assistant grades. */}
@@ -191,7 +191,7 @@ export const ChangedScene: React.FC = () => {
           </Note>
         ))}
         <Note at={pipeAt} x={SIDE} y={layerTop(0) + LAYER_TEXT} from="right">
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>now: the pipeline itself</span>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>now: the pipeline itself</span>
         </Note>
       </Drift>
     </AbsoluteFill>

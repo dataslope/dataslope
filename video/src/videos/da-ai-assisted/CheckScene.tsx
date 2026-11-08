@@ -36,7 +36,7 @@ const Count: React.FC<{ x: number; y: number; at: number; name: string; rows: st
       }}
     >
       <div style={{ ...label(20, INK_SOFT) }}>{name}</div>
-      <div style={{ ...note(34, bad ? ACCENT_INK : INK), fontWeight: 700, ...TABULAR }}>{rows}</div>
+      <div style={{ ...note(34, bad ? ACCENT_INK : INK), fontWeight: 600, ...TABULAR }}>{rows}</div>
     </div>
   );
 };

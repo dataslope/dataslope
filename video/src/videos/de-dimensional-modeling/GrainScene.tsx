@@ -154,7 +154,7 @@ export const GrainScene: React.FC = () => {
 
         {/* Where it belongs: a fact at order grain. */}
         <Note at={orderGrainAt - 2} x={ORDERS_X} y={y(GRAIN_Y) + 6}>
-          <span style={{ ...label(22, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             grain: <span style={{ opacity: ease(frame, perOrderAt, 10) }}>one row per order</span>
           </span>
         </Note>
@@ -181,7 +181,7 @@ export const GrainScene: React.FC = () => {
           </span>
         </Note>
         <Note at={catchesAt} x={ORDERS_X} y={og.rowTop(1) + h(118)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Declared first,
             <br />
             the grain catches it.

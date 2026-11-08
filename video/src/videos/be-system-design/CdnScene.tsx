@@ -143,22 +143,22 @@ export const CdnScene: React.FC = () => {
           {/* The edge server across town. */}
           <circle cx={ux + 16} cy={uy - 14} r={8 * ease(frame, edgeAt + 4, 10)} fill={OK} stroke={PAPER} strokeWidth={2} />
         </svg>
-        <Line x={MAP_X + ox + 18} y={top + oy - 14} at={originAt + 2} size={21} weight={700} color={BLUE_INK} style={halo}>
+        <Line x={MAP_X + ox + 18} y={top + oy - 14} at={originAt + 2} size={21} weight={600} color={BLUE_INK} style={halo}>
           origin
           <span style={{ opacity: ease(frame, virginiaAt, 10) }}>, Virginia</span>
         </Line>
-        <Line x={MAP_X + ux - 34} y={top + uy + 22} at={sydneyAt + 2} size={21} weight={700} style={halo} align="right">
+        <Line x={MAP_X + ux - 34} y={top + uy + 22} at={sydneyAt + 2} size={21} weight={600} style={halo} align="right">
           user, Sydney
         </Line>
-        <Line x={MAP_X + mid[0]} y={top + mid[1] + 18} at={msAt + 4} size={24} weight={700} color={BLUE_INK} style={halo}>
+        <Line x={MAP_X + mid[0]} y={top + mid[1] + 18} at={msAt + 4} size={24} weight={600} color={BLUE_INK} style={halo}>
           ≥ <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms round trip
         </Line>
-        <Line x={MAP_X + ux + 30} y={top + uy - 54} at={underAt} size={21} weight={700} color={OK_INK} style={halo}>
+        <Line x={MAP_X + ux + 30} y={top + uy - 54} at={underAt} size={21} weight={600} color={OK_INK} style={halo}>
           edge
         </Line>
 
         {/* What it is, and the arithmetic. */}
-        <Line x={RX} y={top} at={cdnAt} size={27} weight={700}>
+        <Line x={RX} y={top} at={cdnAt} size={27} weight={600}>
           Content delivery network
         </Line>
         <Line x={RX} y={top + 58} at={edgesAt} size={23} color={INK_SOFT} width={440}>
@@ -169,7 +169,7 @@ export const CdnScene: React.FC = () => {
         <Line x={RX} y={top + 190} at={lightAt} size={24} weight={600}>
           light in fiber: about <Num>{DISTANCE.kmPerMs}</Num> km per ms
         </Line>
-        <Line x={RX} y={top + 236} at={msAt} size={24} weight={700} color={BLUE_INK}>
+        <Line x={RX} y={top + 236} at={msAt} size={24} weight={600} color={BLUE_INK}>
           <Num>{int(kmShown)}</Num> km ÷ <Num>{DISTANCE.kmPerMs}</Num> km/ms × <Num>2</Num> ≈ <Num>{Math.round(DISTANCE.roundTripMs)}</Num> ms
         </Line>
         <Line x={RX} y={top + 282} at={floorAt} size={21} color={INK_SOFT}>
@@ -186,7 +186,7 @@ export const CdnScene: React.FC = () => {
                 {r.text}
               </Line>
               <div style={{ position: "absolute", left: BAR_X, top: rowY(i) - 13, width: w, height: 26, background: r.color, borderRadius: 2, opacity: p > 0 ? 0.9 : 0 }} />
-              <Line x={BAR_X + Math.max(2, r.ms * pxPerMs) + 16} y={rowY(i) - 15} at={r.at + 14} size={22} weight={700} color={i === 2 ? OK_INK : BLUE_INK}>
+              <Line x={BAR_X + Math.max(2, r.ms * pxPerMs) + 16} y={rowY(i) - 15} at={r.at + 14} size={22} weight={600} color={i === 2 ? OK_INK : BLUE_INK}>
                 {r.value}
               </Line>
             </React.Fragment>

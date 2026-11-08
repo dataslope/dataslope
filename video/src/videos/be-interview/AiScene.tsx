@@ -103,7 +103,7 @@ const SurveyBar: React.FC<{ top: number; pct: number; at: number; children: Reac
             left: w * grow + 14,
             top: -1,
             ...note(30, BLUE_INK),
-            fontWeight: 700,
+            fontWeight: 600,
             lineHeight: "38px",
             whiteSpace: "nowrap",
             opacity: ease(frame, at + 16, 10),

@@ -79,7 +79,7 @@ export const ChooseScene: React.FC = () => {
 
         {/* The deciding question. */}
         <Note at={decidingAt} x={ROOT.cx - ROOT.w / 2} y={rootTop + rootH / 2 - 20} width={ROOT.w} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...note(30, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(30, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Band at={decidingAt + 6}>Waiting on I/O, or burning CPU?</Band>
           </span>
         </Note>
@@ -141,14 +141,14 @@ export const ChooseScene: React.FC = () => {
           <span style={{ ...note(25, INK), fontWeight: 650, whiteSpace: "nowrap" }}>Real services mix them:</span>
         </Note>
         <Note at={serverAt} x={480} y={mixY + h(32) - 16} width={300} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...label(25, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>async server</span>
+          <span style={{ ...label(25, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>async server</span>
         </Note>
         <Flow points={[[792, mixY + h(32)], [1092, mixY + h(32)]]} at={heavyAt} color={BAR} width={2.8} />
         <Note at={heavyAt + 4} x={820} y={mixY - h(30)}>
           <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>heavy computation</span>
         </Note>
         <Note at={poolAt} x={1104} y={mixY + h(32) - 16} width={300} from="up" style={{ textAlign: "center" }}>
-          <span style={{ ...label(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>process pool</span>
+          <span style={{ ...label(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>process pool</span>
         </Note>
       </Drift>
     </AbsoluteFill>

@@ -137,7 +137,7 @@ export const NeuronScene: React.FC = () => {
         <Tagline x={NX} y={y(NY) - h(22)} width={140} align="center" at={inputsAt + 2} out={zAt - 2} size={40} color={INK} weight={500}>
           Σ
         </Tagline>
-        <Tagline x={NX} y={y(NY) - h(20)} width={140} align="center" at={zAt} out={q1Out} size={34} color={INK} weight={700}>
+        <Tagline x={NX} y={y(NY) - h(20)} width={140} align="center" at={zAt} out={q1Out} size={34} color={INK} weight={600}>
           {NEURON.z}
         </Tagline>
         <Tagline x={NX} y={y(NY) + NR + h(74)} width={160} align="center" at={plusAt - 2} out={q1Out} size={22} color={INK}>

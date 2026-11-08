@@ -267,7 +267,7 @@ export const DotScene: React.FC = () => {
                 style={{
                   fontFamily: MONO,
                   fontSize: 32,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   color: INK,
                   borderRadius: 6,
                   boxShadow: i === 2 ? `0 0 0 ${6 * pulse(frame, elevenAgainAt, 30)}px color-mix(in srgb, ${POINT} 35%, transparent)` : undefined,

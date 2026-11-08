@@ -284,7 +284,7 @@ export const ZipfScene: React.FC = () => {
       <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 66} at={lineAt + 6} size={21} color={INK_SOFT} weight={600} style={{ background: PAPER }}>
         one over the rank
       </Tag>
-      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 98} at={lawAt - 2} size={22} color={INK} weight={700} style={{ background: PAPER }}>
+      <Tag x={lx(1500)} y={ly(ZIPF.lineC / 1500) - 98} at={lawAt - 2} size={22} color={INK} weight={600} style={{ background: PAPER }}>
         Zipf's law
       </Tag>
       <Tag x={lx(1) + 18} y={ly(14)} at={sixtyAt - 4} size={22} color={DATA_INK} weight={650}>

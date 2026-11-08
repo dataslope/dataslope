@@ -154,7 +154,7 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={guestsAt} x={sx(1) - 4} y={yOf(SKEW.maxBefore) - h(8)} out={spreadAt + 6}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{count(SKEW.maxBefore)}</Num>
             <span style={{ opacity: ease(frame, timesAt, 10) }}>
               , <Num>{SKEW.ratioBefore}</Num> × the average
@@ -162,7 +162,7 @@ export const SkewScene: React.FC = () => {
           </span>
         </Note>
         <Note at={largestAt + 4} x={sx(MAX_AFTER) + BAR_W / 2 - 110} y={meanY - h(78)}>
-          <span style={{ ...note(23, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(23, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             largest <Num>{count(SKEW.maxAfter)}</Num>
           </span>
         </Note>
@@ -216,7 +216,7 @@ export const SkewScene: React.FC = () => {
           <span style={{ ...note(24, OK_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the stage waits for the largest</span>
         </Note>
         <Note at={twoAt - 2} x={R_X} y={y(604)}>
-          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             aggregate in two steps
             <span style={{ ...note(22, INK_SOFT), fontWeight: 500 }}>, if it can&apos;t combine locally</span>
           </span>

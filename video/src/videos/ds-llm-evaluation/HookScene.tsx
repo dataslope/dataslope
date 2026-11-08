@@ -107,7 +107,7 @@ export const HookScene: React.FC = () => {
             <span style={{ ...note(26, INK_SOFT), fontStyle: "italic", whiteSpace: "nowrap" }}>both sound sure of themselves</span>
           </Note>
           <Note at={policyAt} x={X0 + CARD_W + CARD_GAP} y={y(CARD_Y + 150)}>
-            <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the refund policy: 30 days</span>
+            <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the refund policy: 30 days</span>
           </Note>
           <Note at={decideAt} x={X0} y={y(700)}>
             <span style={{ ...note(32, INK), whiteSpace: "nowrap" }}>
@@ -133,7 +133,7 @@ export const HookScene: React.FC = () => {
           </Tag>
         ))}
         <Note at={newAt} x={X0} y={y(ROW_NEW - 44)}>
-          <span style={{ ...label(22, INK), fontWeight: 700 }}>what&apos;s new</span>
+          <span style={{ ...label(22, INK), fontWeight: 600 }}>what&apos;s new</span>
         </Note>
         {fresh.map((c, i) => (
           <Tag key={c.text} x={X0 + [0, 290, 708][i]} y={y(ROW_NEW)} at={c.at - 2} size={28}>

@@ -228,7 +228,7 @@ export const Fig: React.FC<{ n: string; at: number; x: number; y: number; childr
   children,
 }) => (
   <Ink at={at} style={{ left: x, top: y, whiteSpace: "nowrap", display: "flex", alignItems: "baseline", gap: 12 }}>
-    <span style={{ ...label(24, ACCENT_INK), fontWeight: 700 }}>Fig. {n}</span>
+    <span style={{ ...label(24, ACCENT_INK), fontWeight: 600 }}>Fig. {n}</span>
     <span style={{ ...label(24, INK), fontWeight: 560 }}>{children}</span>
   </Ink>
 );
@@ -381,7 +381,7 @@ export const AddrLabel: React.FC<{
 }> = ({ x, y, name, addr, at, nameAt = at, mark = 0, tag }) => {
   const frame = useCurrentFrame();
   const tagP = tag ? markP(frame, tag.at, tag.out) : 0;
-  const nameStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 28, fontWeight: 700, color: INK };
+  const nameStyle: React.CSSProperties = { fontFamily: MONO, fontSize: 28, fontWeight: 600, color: INK };
   return (
     <div
       style={{
@@ -421,7 +421,7 @@ export const AddrLabel: React.FC<{
                 transform: `translate(-50%, ${(1 - tagP) * 8}px)`,
               }}
             >
-              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 700, color: ADDR_INK, lineHeight: 1.1 }}>
+              <span style={{ fontFamily: MONO, fontSize: 28, fontWeight: 600, color: ADDR_INK, lineHeight: 1.1 }}>
                 {tag?.text}
               </span>
               <span style={{ width: 2, height: 10, marginTop: 3, background: ADDR }} />

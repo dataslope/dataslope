@@ -118,7 +118,7 @@ export const ReduceScene: React.FC = () => {
           }),
         )}
         <Note at={afterAt - 2} x={A_X} y={y(856)}>
-          <span style={{ ...note(24, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{MR.shuffled}</Num> pairs cross
           </span>
         </Note>
@@ -150,7 +150,7 @@ export const ReduceScene: React.FC = () => {
           }),
         )}
         <Note at={sixAt - 2} x={B_X} y={y(856)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{MR.combinedShuffled}</Num> sums cross
           </span>
         </Note>
@@ -187,7 +187,7 @@ export const ReduceScene: React.FC = () => {
           }}
         />
         <Note at={fewerAt - 2} x={BAR_X + 30} y={y(574)}>
-          <span style={{ ...note(26, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(26, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Num>{REDUCE.ratio}</Num> × fewer
           </span>
         </Note>

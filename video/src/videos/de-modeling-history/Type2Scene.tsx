@@ -148,7 +148,7 @@ export const Type2Scene: React.FC = () => {
           />
         ) : null}
         <Note at={txAt + 8} x={X0} y={txBottom + h(14)} out={stmtOut}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             one transaction
             <span style={{ fontWeight: 500, color: INK, opacity: ease(frame, changedAt, 10) }}>, only for a customer whose tracked columns changed</span>
           </span>

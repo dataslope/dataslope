@@ -102,7 +102,7 @@ export const MedianScene: React.FC = () => {
       </Note>
       <Rule x={sx(X, K(MEDIAN.median))} y0={y(STRIP) + h(26)} y1={y(STRIP) - h(30)} at={medianAt - 2} color={EST} width={4} />
       <Note at={honestAt - 4} x={sx(X, K(MEDIAN.median)) - 12} y={y(STRIP) - 52} align="right" from="right">
-        <span style={{ ...note(22, EST_INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>median {dollars(MEDIAN.median)}</span>
+        <span style={{ ...note(22, EST_INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>median {dollars(MEDIAN.median)}</span>
       </Note>
 
       {/* ── The one word ── */}
@@ -113,7 +113,7 @@ export const MedianScene: React.FC = () => {
             <span style={{ fontWeight: 650 }}>mean</span>
           </Strike>
         </Slot>
-        <Slot at={medianWordAt - 4} style={{ color: EST_INK, fontWeight: 700 }}>
+        <Slot at={medianWordAt - 4} style={{ color: EST_INK, fontWeight: 600 }}>
           <Marked at={meanWordAt - 2} color={HIGHLIGHT}>
             median
           </Marked>

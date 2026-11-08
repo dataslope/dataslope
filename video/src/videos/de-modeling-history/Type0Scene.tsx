@@ -150,10 +150,10 @@ export const Type0Scene: React.FC = () => {
           marks={[{ row: 0, col: T.cols.indexOf("signup_date"), at: standsAt + 2, color: MARK_OK }]}
         />
         <Note at={nothingAt + 8} x={g.right + 24} y={g.rowTop(1) + h(8)} out={standsAt + 18}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>ignored</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>ignored</span>
         </Note>
         <Note at={standsAt + 26} x={TABLE_X} y={g.rowTop(1) + h(20)}>
-          <span style={{ ...note(25, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>the first value stands</span>
+          <span style={{ ...note(25, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>the first value stands</span>
         </Note>
 
         {/* In a Type 2 dimension: each new version copies the date. */}
@@ -199,7 +199,7 @@ export const Type0Scene: React.FC = () => {
                     <span
                       style={{
                         ...label(21, INK),
-                        fontWeight: 700,
+                        fontWeight: 600,
                         whiteSpace: "nowrap",
                         padding: "1px 6px",
                         margin: "0 -6px",

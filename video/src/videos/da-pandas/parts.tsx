@@ -445,7 +445,7 @@ export const ErrorBox: React.FC<{
           fontVariantLigatures: "none",
         }}
       >
-        <span style={{ color: ACCENT_INK, fontWeight: 700 }}>{kind}:</span>{" "}
+        <span style={{ color: ACCENT_INK, fontWeight: 600 }}>{kind}:</span>{" "}
         {markAt === undefined ? message : <Mark at={markAt}>{message}</Mark>}
       </div>
     </Ink>

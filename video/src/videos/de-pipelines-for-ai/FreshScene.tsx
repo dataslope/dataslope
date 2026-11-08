@@ -83,7 +83,7 @@ export const FreshScene: React.FC = () => {
 
         {/* The page's block and what it printed. */}
         <Note at={loadAt - 2} x={X0} y={listTop - 40}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
             an incremental load, keyed by content: the page&apos;s block, run in Pyodide
           </span>
         </Note>
@@ -120,7 +120,7 @@ export const FreshScene: React.FC = () => {
         </svg>
         {COLS.slice(0, 3).map((c, j) => (
           <Note key={c.t} at={compareAt + j * 3} x={colX(j) + 10} y={tableTop + 8}>
-            <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>{c.t}</span>
+            <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>{c.t}</span>
           </Note>
         ))}
         {ids.map((id, i) => {

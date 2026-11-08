@@ -32,7 +32,7 @@ const head: React.CSSProperties = { fontFamily: MONO, fontSize: 21, fontWeight: 
  *  text. */
 const Answer: React.FC<{ at: number; y: number; title: string; children: React.ReactNode }> = ({ at, y, title, children }) => (
   <Note at={at} x={RIGHT_X} y={y} width={ANSWER_W} from="right">
-    <div style={{ ...label(28, INK), fontWeight: 700 }}>{title}</div>
+    <div style={{ ...label(28, INK), fontWeight: 600 }}>{title}</div>
     <div style={{ ...body(32), color: INK, marginTop: 12 }}>{children}</div>
   </Note>
 );

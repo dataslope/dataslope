@@ -221,7 +221,7 @@ export const CoverageScene: React.FC = () => {
         <span style={{ ...note(22, INK), fontWeight: 650, ...halo, whiteSpace: "nowrap" }}>true mean</span>
       </Note>
       <Note at={yourAt} x={sx(XI, COVERAGE.intervals[YOURS].hi) + 16} y={rowY(YOURS) - 15}>
-        <span style={{ ...note(22, INK), fontWeight: 700, ...halo, whiteSpace: "nowrap" }}>
+        <span style={{ ...note(22, INK), fontWeight: 600, ...halo, whiteSpace: "nowrap" }}>
           yours
           <span style={{ fontWeight: 500, color: INK_SOFT, opacity: ease(frame, seeAt, 12) }}>: in, or out?</span>
         </span>

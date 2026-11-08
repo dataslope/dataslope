@@ -156,13 +156,13 @@ export const AmortScene: React.FC = () => {
         <VRule x={1130} top={top - 64} bottom={base + 80} at={roomAt} />
 
         {/* The counts, on the right. */}
-        <Line at={roomAt} x={RX} y={y(372)} size={28} weight={700}>
+        <Line at={roomAt} x={RX} y={y(372)} size={28} weight={600}>
           Resizes: <span style={{ ...TABULAR, color: BLUE_INK }}>{resizes}</span>
         </Line>
         <Line at={copyAt} x={RX} y={y(418)} size={24} color={INK_SOFT}>
           each one can copy every item so far
         </Line>
-        <Line at={addAt} x={RX} y={y(488)} size={28} weight={700}>
+        <Line at={addAt} x={RX} y={y(488)} size={28} weight={600}>
           Copies per append: <span style={{ ...TABULAR, color: BLUE_INK }}>{perAppend.toFixed(1)}</span>
           <span style={{ color: OK_INK, opacity: ease(frame, constAt, 10) }}> constant</span>
         </Line>
@@ -196,7 +196,7 @@ export const AmortScene: React.FC = () => {
             one append copies <Num>{int(lastItems)}</Num>
           </Mark>
         </Line>
-        <Line at={budgetAt} x={RX} y={y(850)} size={24} weight={700} color={OK_INK}>
+        <Line at={budgetAt} x={RX} y={y(850)} size={24} weight={600} color={OK_INK}>
           On a latency budget, allocate up front
         </Line>
         <Line at={appendAt + 30} x={CX0} y={base + 56} size={20} color={INK_SOFT} weight={500}>

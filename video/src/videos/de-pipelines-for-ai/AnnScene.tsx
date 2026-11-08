@@ -237,13 +237,13 @@ export const AnnScene: React.FC = () => {
           ))}
         </svg>
         <Note at={seventyAt + 4} x={px(missBox.x) + 18} y={py(missBox.y) - 16}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", background: PAPER, padding: "0 6px" }}>
             missed: across the border
           </span>
         </Note>
         <QueryMark x={qx} y={qy} at={everyAt - 4} />
         <Note at={everyAt + 2} x={qx + 26} y={qy - 15} dim={hnswAt}>
-          <span style={{ ...label(20, INK), fontWeight: 700, whiteSpace: "nowrap", background: PAPER, padding: "0 4px" }}>query</span>
+          <span style={{ ...label(20, INK), fontWeight: 600, whiteSpace: "nowrap", background: PAPER, padding: "0 4px" }}>query</span>
         </Note>
 
         {/* Approximate, under exact; the two indexes under the space. */}
@@ -283,7 +283,7 @@ export const AnnScene: React.FC = () => {
         </Note>
         {/* The chart's frame, up from "Beyond that", so the right half is never bare. */}
         <Note at={tradeAt + 4} x={CH.x0 - 70} y={y(CH.top) - 62}>
-          <span style={{ ...label(22, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(22, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             recall<span style={{ fontWeight: 500, color: INK_SOFT }}>: the share of the true top ten found</span>
           </span>
         </Note>
@@ -330,7 +330,7 @@ export const AnnScene: React.FC = () => {
           })}
         </svg>
         <Note at={nearestAt + 4} x={CH.x1 - 520} y={y(CH.bottom) + 84}>
-          <span style={{ ...label(20, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...label(20, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>
             <Mark at={knobAt + 2}>clusters probed: the knob</Mark>
             <span style={{ opacity: ease(frame, breadthAt - 2, 10), fontWeight: 500 }}> (in HNSW, search breadth)</span>
           </span>
@@ -339,14 +339,14 @@ export const AnnScene: React.FC = () => {
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             compares {pct(one.work)} of the vectors
             <br />
-            <span style={{ opacity: ease(frame, seventyAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>finds {pct(one.recall)}</span>
+            <span style={{ opacity: ease(frame, seventyAt - 2, 10), color: BLUE_INK, fontWeight: 600 }}>finds {pct(one.recall)}</span>
           </span>
         </Note>
         <Note at={sixteenAt + 2} x={xOf(16) + 18} y={at(ys, sixteen.recall) + 18}>
           <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
             compares {pct(sixteen.work)}
             <br />
-            <span style={{ opacity: ease(frame, ninetySixAt - 2, 10), color: BLUE_INK, fontWeight: 700 }}>finds {pct(sixteen.recall)}</span>
+            <span style={{ opacity: ease(frame, ninetySixAt - 2, 10), color: BLUE_INK, fontWeight: 600 }}>finds {pct(sixteen.recall)}</span>
           </span>
         </Note>
         <Note at={measureAt - 2} x={CH.x0 - 70} y={y(CH.bottom) + 132}>

@@ -200,7 +200,7 @@ export const AccessScene: React.FC = () => {
           <span style={{ color: BLUE_INK }}>embedding model</span>
         </Box>
         <Note at={apiAt - 2} x={RIGHT_X + 600} y={y(CARD.top) + 86}>
-          <span style={{ ...label(21, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap", opacity: 0.4 + 0.6 * red }}>an outside API</span>
+          <span style={{ ...label(21, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap", opacity: 0.4 + 0.6 * red }}>an outside API</span>
         </Note>
 
         {/* Deletion, made real. */}

@@ -282,7 +282,7 @@ export const Node: React.FC<{
         transformOrigin: "50% 50%",
       }}
     >
-      <span style={{ ...label(size, titleInk ?? t.ink), fontWeight: 700, whiteSpace: "nowrap", textAlign: align }}>{title}</span>
+      <span style={{ ...label(size, titleInk ?? t.ink), fontWeight: 600, whiteSpace: "nowrap", textAlign: align }}>{title}</span>
       {sub ? <span style={{ ...note(subSize, INK_SOFT), whiteSpace: "nowrap", textAlign: align }}>{sub}</span> : null}
       {children}
     </div>

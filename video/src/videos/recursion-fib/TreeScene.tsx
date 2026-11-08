@@ -144,7 +144,7 @@ export const TreeScene: React.FC = () => {
         );
       })}
       <Note at={deepAt} x={SIDE_X} y={y(STACK_BASE) + h(16)} from="up">
-        <span style={{ ...note(24, INK), fontWeight: 700, opacity: 1 - stackDim * 0.6 }}>{TREE_DEPTH} calls deep</span>
+        <span style={{ ...note(24, INK), fontWeight: 600, opacity: 1 - stackDim * 0.6 }}>{TREE_DEPTH} calls deep</span>
       </Note>
     </AbsoluteFill>
   );

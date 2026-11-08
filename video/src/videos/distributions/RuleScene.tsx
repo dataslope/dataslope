@@ -133,7 +133,7 @@ export const RuleScene: React.FC = () => {
               <Svg>
                 <path d={`M${x0},${yy + 10} L${x0},${yy} L${x1},${yy} L${x1},${yy + 10}`} fill="none" stroke={INK} strokeWidth={1.8} />
               </Svg>
-              <div style={{ position: "absolute", left: x1 + 14, top: yy - 16, opacity: ease(frame, b.at + 8, 6), ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+              <div style={{ position: "absolute", left: x1 + 14, top: yy - 16, opacity: ease(frame, b.at + 8, 6), ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>
                 <span style={TABULAR}>{fmt(share, 2)}</span>%
               </div>
             </React.Fragment>

@@ -176,7 +176,7 @@ export const GeorgetownScene: React.FC = () => {
           <div style={{ ...label(21, INK_SOFT) }}>ALPAC report, {ALPAC_YEAR}</div>
           <div style={{ ...headline(30, true), color: INK, marginTop: 4, lineHeight: 1.15 }}>&ldquo;{ALPAC}&rdquo;</div>
         </Ink>
-        <Tag x={sx(X, ALPAC_YEAR)} y={AXIS - 72} at={fundingAt - 2} align="center" size={23} color={ACCENT_INK} weight={700}>
+        <Tag x={sx(X, ALPAC_YEAR)} y={AXIS - 72} at={fundingAt - 2} align="center" size={23} color={ACCENT_INK} weight={600}>
           funding dried up
         </Tag>
       </div>

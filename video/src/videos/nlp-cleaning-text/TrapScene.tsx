@@ -246,7 +246,7 @@ export const TrapScene: React.FC = () => {
           <Op at={startAt}>
             <span style={{ ...label(SMALL, INK), fontWeight: 600 }}>NLTK&apos;s list</span>
           </Op>
-          <Op at={takeAt} style={{ ...label(SMALL, INK), fontWeight: 700, margin: "0 6px" }}>
+          <Op at={takeAt} style={{ ...label(SMALL, INK), fontWeight: 600, margin: "0 6px" }}>
             −
           </Op>
           {CUSTOM.keep.map((w, i) => (
@@ -258,7 +258,7 @@ export const TrapScene: React.FC = () => {
               ghost={!CUSTOM.keepRemoved.includes(w)}
             />
           ))}
-          <Op at={addAt} style={{ ...label(SMALL, INK), fontWeight: 700, margin: "0 6px" }}>
+          <Op at={addAt} style={{ ...label(SMALL, INK), fontWeight: 600, margin: "0 6px" }}>
             +
           </Op>
           {CUSTOM.add.map((w, i) => (

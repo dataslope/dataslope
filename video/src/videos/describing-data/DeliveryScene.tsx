@@ -334,7 +334,7 @@ export const DeliveryScene: React.FC = () => {
             opacity: ease(frame, zeroAt - 4, 10),
           }}
         />
-        <div style={{ position: "absolute", left: COL_X - 60, top: rowY(9) + h(30), width: 120, textAlign: "center", whiteSpace: "nowrap", ...note(28, STAT_INK), fontWeight: 700 }}>
+        <div style={{ position: "absolute", left: COL_X - 60, top: rowY(9) + h(30), width: 120, textAlign: "center", whiteSpace: "nowrap", ...note(28, STAT_INK), fontWeight: 600 }}>
           <span style={{ opacity: ease(frame, zeroAt - 2, 10) * (1 - sq), position: "absolute", left: 0, right: 0 }}>sum 0</span>
           <span style={{ opacity: ease(frame, twelveAt - 2, 10), position: "absolute", left: 0, right: 0 }}>sum {fmt(DELIVERY.sumSquares, 0)}</span>
         </div>

@@ -96,7 +96,7 @@ export const HookScene: React.FC = () => {
           dim={giveAt + 20}
         />
         <Note at={fitsAt + 6} x={BOX_X + BOX_W + 14} y={y(BOX_BOTTOM) + h(20)} out={cutAt + 10}>
-          <span style={{ ...label(22, ACCENT_INK), fontWeight: 700, whiteSpace: "nowrap" }}>doesn&apos;t fit</span>
+          <span style={{ ...label(22, ACCENT_INK), fontWeight: 600, whiteSpace: "nowrap" }}>doesn&apos;t fit</span>
         </Note>
 
         {/* Six machines, a piece each. */}
@@ -161,7 +161,7 @@ export const HookScene: React.FC = () => {
         {/* One result. */}
         <Machine x={RES_X} top={y(RES_TOP)} width={RES_W} height={h(RES_H)} at={bringAt + 10} tone="ok" fill={`color-mix(in srgb, ${ds("green", 100)} 60%, ${PAPER})`} />
         <Note at={bringAt + 14} x={RES_X} y={resMid - 16} width={RES_W} align="left" style={{ textAlign: "center" }}>
-          <span style={{ ...label(23, OK_INK), fontWeight: 700 }}>one result</span>
+          <span style={{ ...label(23, OK_INK), fontWeight: 600 }}>one result</span>
         </Note>
 
         {/* What every answer turns on, where it happens. */}

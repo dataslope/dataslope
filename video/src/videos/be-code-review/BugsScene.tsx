@@ -60,7 +60,7 @@ const Line: React.FC<{ at: number; children: React.ReactNode; color?: string; si
 
 /** An operator in the mono face, in its verdict's ink. */
 const Op: React.FC<{ color: string; children: React.ReactNode }> = ({ color, children }) => (
-  <span style={{ fontFamily: MONO, fontWeight: 700, color, fontVariantLigatures: "none" }}>{children}</span>
+  <span style={{ fontFamily: MONO, fontWeight: 600, color, fontVariantLigatures: "none" }}>{children}</span>
 );
 
 /** The rule between two columns of text: 1px, centred in the gap, drawn
@@ -90,7 +90,7 @@ const DiffRow: React.FC<{ at: number; add: boolean; children: React.ReactNode }>
   const frame = useCurrentFrame();
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, opacity: ease(frame, at, 10), whiteSpace: "nowrap", fontSize: 22 }}>
-      <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: add ? OK_INK : ACCENT_INK }}>+</span>
+      <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 600, color: add ? OK_INK : ACCENT_INK }}>+</span>
       <span style={note(22, add ? INK : ACCENT_INK)}>{children}</span>
     </div>
   );
@@ -222,7 +222,7 @@ export const BugsScene: React.FC = () => {
                 }}
               />
               <Note at={at + 14} x={X0 + w + 22} y={top + 44} out={surveyOut}>
-                <span style={{ ...note(38, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+                <span style={{ ...note(38, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
                   <span style={TABULAR}>{s.pct}</span>%
                 </span>
               </Note>
@@ -290,7 +290,7 @@ export const BugsScene: React.FC = () => {
               opacity: ease(frame, sigAt + 4, 10),
             }}
           >
-            <span style={{ color: ACCENT_INK, fontWeight: 700 }}>{kind}:</span> {message}
+            <span style={{ color: ACCENT_INK, fontWeight: 600 }}>{kind}:</span> {message}
           </div>
           <Line at={packageAt} color={ACCENT_INK}>
             an invented package name:{" "}

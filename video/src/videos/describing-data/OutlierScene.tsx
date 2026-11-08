@@ -236,7 +236,7 @@ export const OutlierScene: React.FC = () => {
               paddingTop: RULE_GAP,
             }}
           >
-            <div style={{ ...label(26, INK), fontWeight: 700 }}>{k.title}</div>
+            <div style={{ ...label(26, INK), fontWeight: 600 }}>{k.title}</div>
             <div style={{ ...body(28), color: INK_SOFT, marginTop: 8, whiteSpace: "nowrap", opacity: Math.max(ease(frame, egAt[i] - 4, 12), acts) }}>
               {i === 2 ? (
                 <>

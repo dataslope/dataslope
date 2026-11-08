@@ -102,7 +102,7 @@ export const HookScene: React.FC = () => {
               alignItems: "center",
               justifyContent: "center",
               ...label(21, BLUE_INK),
-              fontWeight: 700,
+              fontWeight: 600,
               opacity: c.o,
             }}
           >
@@ -134,7 +134,7 @@ export const HookScene: React.FC = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   fontFamily: SANS,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   ...TABULAR,
                 }}
               >

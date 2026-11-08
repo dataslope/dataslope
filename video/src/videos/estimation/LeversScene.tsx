@@ -125,7 +125,7 @@ export const LeversScene: React.FC = () => {
         return (
           <React.Fragment key={p.title}>
             <Ink at={p.at} dur={14} style={{ left: x0, top: y(300), whiteSpace: "nowrap" }}>
-              <span style={{ ...label(26, EST_INK), fontWeight: 700 }}>{k + 1}</span>
+              <span style={{ ...label(26, EST_INK), fontWeight: 600 }}>{k + 1}</span>
               <span style={{ ...label(26, INK), fontWeight: 600, marginLeft: 12 }}>{p.title}</span>
             </Ink>
             <Ink at={k === 0 ? twoHundredAt - 4 : k === 1 ? holdAt - 4 : p.at + 6} dur={14} style={{ left: x0, top: y(344), whiteSpace: "nowrap" }}>
@@ -174,7 +174,7 @@ export const LeversScene: React.FC = () => {
           after "doubles too" and the turn into the rate. */}
       <Ink at={noiseEnd + 4} dur={18} style={{ left: PANELS[0], top: y(852), whiteSpace: "nowrap" }}>
         <span style={{ ...note(26, INK) }}>
-          The same recipe: <span style={{ fontWeight: 700 }}>estimate ± critical value × standard error</span>
+          The same recipe: <span style={{ fontWeight: 600 }}>estimate ± critical value × standard error</span>
         </span>
       </Ink>
     </AbsoluteFill>

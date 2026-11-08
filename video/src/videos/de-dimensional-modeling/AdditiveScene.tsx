@@ -53,7 +53,7 @@ const Kind: React.FC<{ at: number; litFrom: number; litTo: number; name: string;
             opacity: lit * 0.8,
           }}
         />
-        <span style={{ position: "relative", ...label(25, INK), fontWeight: 700 }}>{name}</span>
+        <span style={{ position: "relative", ...label(25, INK), fontWeight: 600 }}>{name}</span>
         <span style={{ position: "relative", ...note(23, INK_SOFT), marginLeft: 12 }}>{eg}</span>
       </div>
       {under ? <div style={{ marginTop: 12, opacity: q, transform: `translateX(${(1 - q) * -18}px)` }}>{under}</div> : null}
@@ -260,11 +260,11 @@ export const AdditiveScene: React.FC = () => {
           const at = d === "Mon" ? monAt : tueAt;
           return (
             <div key={d} style={{ position: "absolute", left: R_X, top: y(732) + k * h(54), display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ ...label(23, INK_SOFT), fontWeight: 700, width: 64, opacity: ease(frame, at - 2, 10) }}>{d}</span>
+              <span style={{ ...label(23, INK_SOFT), fontWeight: 600, width: 64, opacity: ease(frame, at - 2, 10) }}>{d}</span>
               {WHO[d].map((p, i) => (
                 <Who key={p} name={p} at={at + 2 + i * 3} both={both.has(p) ? fourAt : undefined} />
               ))}
-              <span style={{ ...note(24, INK), fontWeight: 700, marginLeft: 12, opacity: ease(frame, at + 10, 10) }}>
+              <span style={{ ...note(24, INK), fontWeight: 600, marginLeft: 12, opacity: ease(frame, at + 10, 10) }}>
                 <Num>{perDay[d]}</Num>
               </span>
             </div>
@@ -281,27 +281,27 @@ export const AdditiveScene: React.FC = () => {
             opacity: ease(frame, fourAt - 2, 10),
           }}
         >
-          <span style={{ ...label(23, INK_SOFT), fontWeight: 700, width: 64 }}>both</span>
+          <span style={{ ...label(23, INK_SOFT), fontWeight: 600, width: 64 }}>both</span>
           {everyone.map((p, i) => (
             <Who key={p} name={p} at={fourAt + i * 2} />
           ))}
           <span style={{ ...note(26, OK_INK), fontWeight: 800, marginLeft: 12 }}>
             <Num>{VISITS_BOTH}</Num> people,{" "}
-            <span style={{ color: ACCENT_INK, fontWeight: 700, opacity: ease(frame, sixAt - 2, 10) }}>
+            <span style={{ color: ACCENT_INK, fontWeight: 600, opacity: ease(frame, sixAt - 2, 10) }}>
               not <Num>{sumOfDays}</Num>
             </span>
           </span>
         </div>
         {/* One remedy for each kind, beside the visitors they are about. */}
         <Note at={recountAt} x={FIX_X} y={y(732) - h(6)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             distinct counts: recount
             <br />
             <span style={{ opacity: ease(frame, detailAt, 10) }}>from the detail rows</span>
           </span>
         </Note>
         <Note at={ratioAt} x={FIX_X} y={y(732) + h(102)}>
-          <span style={{ ...note(24, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(24, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             ratios: store both parts,
             <br />
             <span style={{ opacity: ease(frame, divideAt - 2, 10) }}>divide in the query</span>

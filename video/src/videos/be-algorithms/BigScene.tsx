@@ -224,7 +224,7 @@ export const BigScene: React.FC = () => {
           It predicts whether a solution survives its real input.
           <span style={{ opacity: ease(frame, gameAt, 10) }}>
             {" "}
-            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 700 }}>O(n²)</span> → <span style={{ color: OK_INK, fontWeight: 700 }}>O(n)</span>
+            The usual game: <span style={{ color: ACCENT_INK, fontWeight: 600 }}>O(n²)</span> → <span style={{ color: OK_INK, fontWeight: 600 }}>O(n)</span>
           </span>
         </Line>
         <Line at={dropAt} x={GX} y={y(836)} size={26} weight={600}>

@@ -134,7 +134,7 @@ export const PrevScene: React.FC = () => {
 
         {/* What the classifier reports. */}
         <Note at={twentyAt - 2} x={X0} y={y(ROW_LABEL) - h(36)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700 }}>what the LLM labels complaints, out of {num(PREV.tickets)}</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600 }}>what the LLM labels complaints, out of {num(PREV.tickets)}</span>
         </Note>
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: labelBar }}>
           <rect x={BAR.x0} y={y(ROW_LABEL)} width={W} height={BAR.h} fill="none" stroke={INK_SOFT} strokeWidth={1.4} strokeDasharray="3 6" />
@@ -149,7 +149,7 @@ export const PrevScene: React.FC = () => {
         </svg>
         <Note at={twentyAt + 4} x={BAR.x0} y={y(ROW_LABEL) + h(BAR.h + 10)}>
           {/* One size along the line: the share large only by weight. */}
-          <span style={{ ...note(28, BLUE_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, BLUE_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
             labeled complaints: {pct(PREV.obs)}
             <span style={{ ...note(26, INK_SOFT), fontWeight: 500 }}> {num(PREV.flagged)}</span>
             <span style={{ ...note(26, BLUE_INK), fontWeight: 600, opacity: counted, marginLeft: 22 }}>
@@ -169,7 +169,7 @@ export const PrevScene: React.FC = () => {
 
         {/* The truth, revealed by the correction. */}
         <Note at={correctAt} x={X0} y={y(ROW_TRUTH) - h(36)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700 }}>corrected: what the tickets really are</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600 }}>corrected: what the tickets really are</span>
         </Note>
         {truth > 0 ? (
           <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: truth }}>
@@ -184,7 +184,7 @@ export const PrevScene: React.FC = () => {
           </svg>
         ) : null}
         <Note at={shareAt} x={BAR.x0} y={y(ROW_TRUTH) + h(BAR.h + 10)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 700, ...TABULAR, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 600, ...TABULAR, whiteSpace: "nowrap" }}>
             <Mark at={shareAt + 6} color={MARK_OK}>
               complaints: about {pct(PREV.prev, 1)}
             </Mark>
@@ -250,7 +250,7 @@ export const PrevScene: React.FC = () => {
           </div>
         </Note>
         <Note at={rgAt - 4} x={1370} y={y(ROW_FORMULA) + h(30)}>
-          <div style={{ ...label(21, INK_SOFT), fontWeight: 700 }}>the Rogan-Gladen estimator</div>
+          <div style={{ ...label(21, INK_SOFT), fontWeight: 600 }}>the Rogan-Gladen estimator</div>
           <div style={{ ...note(24, INK), whiteSpace: "nowrap", marginTop: 12, opacity: ease(frame, intervalAt, 12) }}>
             <Mark at={intervalAt + 6} out={lastAt}>
               + its interval: both rates

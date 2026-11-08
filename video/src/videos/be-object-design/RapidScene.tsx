@@ -63,7 +63,7 @@ const Pillars: React.FC<{ c: Ctx }> = ({ c }) => {
         return (
           <React.Fragment key={r.word}>
             <ArtSpot id="pillar" at={r.at - 4} left={R_X + 18 - pw / 2} top={top + TEXT_MID - PILLAR_H / 2} h={PILLAR_H} filter={`url(#be-object-design-glaze-${i})`} />
-            <Line x={R_X + 90} y={top - 4} at={r.at} size={27} weight={700}>
+            <Line x={R_X + 90} y={top - 4} at={r.at} size={27} weight={600}>
               {r.word}
             </Line>
             <Line x={R_X + 90} y={top + 34} at={r.at + 6} size={23} color={INK_SOFT}>
@@ -119,30 +119,30 @@ const Encap: React.FC<{ c: Ctx }> = ({ c }) => {
 
       {/* The withdraw door checks. */}
       <Box x={shell.x + shell.w - 10} y={mid - 30} w={26} h={60} at={checkAt} tone="ok" radius={6} />
-      <Line x={shell.x + shell.w + 40} y={mid - 112} at={checkAt + 4} size={22} color={OK_INK} weight={700}>
+      <Line x={shell.x + shell.w + 40} y={mid - 112} at={checkAt + 4} size={22} color={OK_INK} weight={600}>
         withdraw: checks
       </Line>
       <Flow points={[[1740, mid], [shell.x + shell.w + 26 + 24 * bounce, mid]]} at={overdrawAt} dur={10} color={ACCENT} />
       <Line x={shell.x + shell.w + 50} y={mid - 46} at={overdrawAt} size={22} weight={650}>
         withdraw 200
       </Line>
-      <Line x={shell.x + shell.w + 50} y={mid + 22} at={overdrawAt + 12} size={22} color={ACCENT_INK} weight={700}>
+      <Line x={shell.x + shell.w + 50} y={mid + 22} at={overdrawAt + 12} size={22} color={ACCENT_INK} weight={600}>
         refused: {overdraw}
       </Line>
 
       {/* The constructor's door, unguarded, then guarded. */}
       <Box x={shell.x - 16} y={mid - 30} w={26} h={60} at={guardAt} tone="bad" tones={[[alreadyAt + 16, "ok"]]} dashed radius={6} />
-      <Line x={R_X} y={mid - 112} at={ctorAt} size={22} weight={700} color={ACCENT_INK}>
+      <Line x={R_X} y={mid - 112} at={ctorAt} size={22} weight={600} color={ACCENT_INK}>
         <span style={{ opacity: 1 - ease(frame, alreadyAt + 16, 10) }}>opening: no check</span>
       </Line>
-      <Line x={R_X} y={mid - 112} at={alreadyAt + 16} size={22} weight={700} color={OK_INK}>
+      <Line x={R_X} y={mid - 112} at={alreadyAt + 16} size={22} weight={600} color={OK_INK}>
         opening: checked too
       </Line>
       <Flow points={[[R_X, mid], [shell.x - 26, mid]]} at={opensAt} dur={10} color={ACCENT} />
       <Line x={R_X} y={mid - 46} at={opensAt} size={22} weight={650}>
         open at −50
       </Line>
-      <Line x={shell.x} y={shell.top + shell.h + 26} at={alreadyAt} size={24} color={ACCENT_INK} weight={700}>
+      <Line x={shell.x} y={shell.top + shell.h + 26} at={alreadyAt} size={24} color={ACCENT_INK} weight={600}>
         overdrawn already
       </Line>
       <Line x={shell.x} y={shell.top + shell.h + 76} at={guardAt} size={24} weight={600}>
@@ -182,13 +182,13 @@ const Poly: React.FC<{ c: Ctx }> = ({ c }) => {
       <Svg opacity={ease(frame, squareAt + 6, 10)}>
         <rect x={1360 - 54} y={shapes + 16} width={108} height={108} fill={`color-mix(in srgb, ${BAR} 16%, ${PAPER})`} stroke={BAR} strokeWidth={3} />
       </Svg>
-      <Line x={960} y={shapes + 150} at={circleAt + 10} size={26} weight={700} color={BLUE_INK} align="center" width={200}>
+      <Line x={960} y={shapes + 150} at={circleAt + 10} size={26} weight={600} color={BLUE_INK} align="center" width={200}>
         {circle.toFixed(2)}
       </Line>
-      <Line x={1360} y={shapes + 150} at={squareAt + 10} size={26} weight={700} color={BLUE_INK} align="center" width={200}>
+      <Line x={1360} y={shapes + 150} at={squareAt + 10} size={26} weight={600} color={BLUE_INK} align="center" width={200}>
         4
       </Line>
-      <Line x={1336} y={top + 18} at={squareAt + 16} size={26} weight={700} color={BLUE_INK}>
+      <Line x={1336} y={top + 18} at={squareAt + 16} size={26} weight={600} color={BLUE_INK}>
         = {TOTAL_AREA.toFixed(2)}
       </Line>
       <Line x={R_X} y={c.y(800)} at={noAt} size={24} color={INK_SOFT}>
@@ -220,17 +220,17 @@ const Factory: React.FC<{ c: Ctx }> = ({ c }) => {
       <Box x={fx.x} y={row1 - 10} w={fx.w} h={row2 - row1 + H + 20} at={centralAt} title="Factory" sub={<span style={{ opacity: ease(frame, howAt, 10) }}>knows how to build</span>} tone="plain" />
       <Box x={R_X} y={row1} w={180} h={H} at={askAt} title="caller" />
       <Flow points={[[R_X + 186, row1 + H / 2], [fx.x - 8, row1 + H / 2]]} at={csvAt} dur={10} width={2.4} head={12} />
-      <Line x={R_X + 214} y={row1 - 6} at={csvAt} size={21} weight={700} color={BLUE_INK}>
+      <Line x={R_X + 214} y={row1 - 6} at={csvAt} size={21} weight={600} color={BLUE_INK}>
         “csv”
       </Line>
       <Flow points={[[fx.x + fx.w + 6, row1 + H / 2], [1490 - 8, row1 + H / 2]]} at={csvAt + 10} dur={10} width={2.4} head={12} color={OK} />
       <Box x={1490} y={row1} w={230} h={H} at={csvAt + 16} title="a CSV parser" tone="ok" size={23} />
       <Box x={R_X} y={row2} w={180} h={H} at={howAt + 4} title="caller" />
       <Flow points={[[R_X + 186, row2 + H / 2], [fx.x - 8, row2 + H / 2]]} at={howAt + 8} dur={10} width={2.4} head={12} />
-      <Line x={R_X + 214} y={row2 + H + 4} at={howAt + 8} size={21} weight={700} color={BLUE_INK}>
+      <Line x={R_X + 214} y={row2 + H + 4} at={howAt + 8} size={21} weight={600} color={BLUE_INK}>
         “xml”
       </Line>
-      <Line x={fx.x + fx.w + 30} y={row2 + H / 2 - 15} at={howAt + 18} size={22} weight={700} color={ACCENT_INK}>
+      <Line x={fx.x + fx.w + 30} y={row2 + H / 2 - 15} at={howAt + 18} size={22} weight={600} color={ACCENT_INK}>
         {xml}
       </Line>
       <Line x={R_X} y={c.y(690)} at={paysAt} size={24} weight={650}>
@@ -296,7 +296,7 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
 
       {/* Two tests, in order, then the second alone. */}
-      <Line x={R_X} y={testTop} at={passesAt - 4} size={21} color={INK_SOFT} weight={700}>
+      <Line x={R_X} y={testTop} at={passesAt - 4} size={21} color={INK_SOFT} weight={600}>
         in order
       </Line>
       {inOrder.map(([name, result], i) => {
@@ -312,7 +312,7 @@ const Single: React.FC<{ c: Ctx }> = ({ c }) => {
         );
       })}
       <VRule x={1395} top={testTop} bottom={testTop + 114} at={passesAt} />
-      <Line x={1430} y={testTop} at={passesAt} size={21} color={INK_SOFT} weight={700}>
+      <Line x={1430} y={testTop} at={passesAt} size={21} color={INK_SOFT} weight={600}>
         alone
       </Line>
       {alone.map(([name, result]) => (
@@ -374,7 +374,7 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
   return (
     <>
       <Box x={A} y={top} w={w} h={h} at={declaresAt} dashed tone="plain" />
-      <Line x={A + 24} y={top + 18} at={declaresAt} size={25} weight={700}>
+      <Line x={A + 24} y={top + 18} at={declaresAt} size={25} weight={600}>
         Interface
       </Line>
       <Slots x={A} top={top} w={w} at={declaresAt + 6} filled={[false, false, false]} tone="plain" />
@@ -383,7 +383,7 @@ const Abstract: React.FC<{ c: Ctx }> = ({ c }) => {
       </Line>
       <VRule x={(A + w + B) / 2} top={top} bottom={top + h + 104} at={abstractAt} />
       <Box x={B} y={top} w={w} h={h} at={abstractAt} tone="plain" />
-      <Line x={B + 24} y={top + 18} at={abstractAt} size={25} weight={700}>
+      <Line x={B + 24} y={top + 18} at={abstractAt} size={25} weight={600}>
         Abstract class
       </Line>
       <Slots x={B} top={top} w={w} at={abstractAt + 6} filled={[true, true, false]} tone="data" />

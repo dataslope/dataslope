@@ -120,7 +120,7 @@ export const SheetScene: React.FC = () => {
                 <span
                   style={{
                     ...label(30, colors[i]),
-                    fontWeight: 700,
+                    fontWeight: 600,
                     display: "inline-block",
                     transformOrigin: "0 60%",
                     transform: `scale(${1 + pulse(frame, at - 4, 20) * 0.08})`,
@@ -163,7 +163,7 @@ export const SheetScene: React.FC = () => {
         {/* Cache write: input's length, and a little more. */}
         <HBar x={BAR_X} y={barY(3)} w={unit} h={bh} at={rowAt[3] + 2} fill={CACHED_SOFT} outline={CACHED} />
         <Note at={rowAt[3] + 10} x={BAR_X + unit + 8} y={barY(3) + bh / 2 - 19}>
-          <span style={{ ...label(28, CACHED_INK), fontWeight: 700 }}>+</span>
+          <span style={{ ...label(28, CACHED_INK), fontWeight: 600 }}>+</span>
         </Note>
         {/* Batch: about half of the rate it is applied to. */}
         <Outline x={BAR_X} y={barY(4)} w={unit} h={bh} at={rowAt[4]} />

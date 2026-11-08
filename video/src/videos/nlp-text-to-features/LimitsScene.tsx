@@ -194,7 +194,7 @@ const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: num
               }
               below={
                 polar ? (
-                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, toneAt + 2, 10) }}>
+                  <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 600, opacity: ease(frame, toneAt + 2, 10) }}>
                     {signed(s.polarity)}
                   </span>
                 ) : null
@@ -203,7 +203,7 @@ const TraceRow: React.FC<{ trace: Trace; top: number; at: number; verdictAt: num
           );
         })}
       </TokenRow>
-      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(30, INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, verdictAt - 6, 10) }}>
+      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(30, INK), ...TABULAR, fontWeight: 600, opacity: ease(frame, verdictAt - 6, 10) }}>
         {signed(trace.score)}
       </div>
       <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(30, inkFor(trace.label)), fontWeight: 650, opacity: ease(frame, verdictAt - 2, 10) }}>

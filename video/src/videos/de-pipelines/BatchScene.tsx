@@ -166,18 +166,18 @@ export const BatchScene: React.FC = () => {
           <span style={{ ...note(24, INK), whiteSpace: "nowrap" }}>simple, cheap, easy to rerun</span>
         </Note>
         <Note at={oldAt - 2} x={ax(0)} y={by + h(100)}>
-          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>results minutes to hours old</span>
+          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>results minutes to hours old</span>
         </Note>
 
         {/* Streaming's results, each seconds after its event. */}
         <Note at={arrivesAt + 6} x={AX1 + 30} y={sy + h(50)}>
-          <span style={{ ...label(21, INK), fontWeight: 700, whiteSpace: "nowrap" }}>a result per event</span>
+          <span style={{ ...label(21, INK), fontWeight: 600, whiteSpace: "nowrap" }}>a result per event</span>
         </Note>
         <Note at={secondsAt - 2} x={AX1 + 30} y={sy - h(44)}>
-          <span style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>results seconds old</span>
+          <span style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>results seconds old</span>
         </Note>
         <Note at={priceAt} x={AX0} y={sy + h(104)}>
-          <span style={{ ...label(21, INK_SOFT), fontWeight: 700, whiteSpace: "nowrap" }}>The price, all yours to run:</span>
+          <span style={{ ...label(21, INK_SOFT), fontWeight: 600, whiteSpace: "nowrap" }}>The price, all yours to run:</span>
         </Note>
         {costs.map((c, i) => (
           <Pill key={c.text} x={AX0 + [0, 196, 340, 488][i]} y={sy + h(146)} at={c.at} tone="plain" size={21}>
@@ -187,18 +187,18 @@ export const BatchScene: React.FC = () => {
 
         {/* The choice, by latency. */}
         <Note at={chooseAt} x={RIGHT_X + 160} y={y(300)}>
-          <span style={{ ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>Choose by the latency needed</span>
+          <span style={{ ...label(22, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>Choose by the latency needed</span>
         </Note>
         <ChoiceCard at={dashAt} x={RIGHT_X + 160} y={by - h(40)} need="An hourly dashboard" pick="batch" lit={pulse(frame, dashAt + 10, 22)} />
         <ChoiceCard at={fraudAt} x={RIGHT_X + 160} y={sy - h(40)} need="Fraud detection" pick="streaming" lit={pulse(frame, fraudAt + 10, 22)} />
         {/* Between the two: micro-batch, and systems that run both. */}
         <Note at={microAt} x={RIGHT_X + 160} y={(by + sy) / 2 - h(36)}>
-          <div style={{ ...note(24, INK), fontWeight: 700, whiteSpace: "nowrap" }}>In between: micro-batch</div>
+          <div style={{ ...note(24, INK), fontWeight: 600, whiteSpace: "nowrap" }}>In between: micro-batch</div>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 4, opacity: ease(frame, fewAt, 10) }}>a batch every few seconds</div>
           <div style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap", marginTop: 2, opacity: ease(frame, bothAt, 10) }}>and many systems run both</div>
         </Note>
         <Note at={dontAt} x={X0} y={y(885)}>
-          <span style={{ ...note(28, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>
+          <span style={{ ...note(28, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>
             Streaming only when low latency is <span style={{ background: ease(frame, realAt, 10) > 0 ? HIGHLIGHT : undefined }}>a real requirement</span>
           </span>
         </Note>

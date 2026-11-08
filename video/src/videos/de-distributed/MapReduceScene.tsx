@@ -107,13 +107,13 @@ export const MapReduceScene: React.FC = () => {
           <span style={{ ...label(25, INK_SOFT), whiteSpace: "nowrap" }}>Input splits</span>
         </Note>
         <Note at={phasesAt} x={PAIR_X} y={y(LABEL_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>1 Map</span>
+          <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>1 Map</span>
         </Note>
         <Note at={shuffleWordAt} x={760} y={y(LABEL_Y)}>
-          <span style={{ ...label(26, red > 0.5 ? ACCENT_INK : INK), fontWeight: 700, whiteSpace: "nowrap" }}>Shuffle</span>
+          <span style={{ ...label(26, red > 0.5 ? ACCENT_INK : INK), fontWeight: 600, whiteSpace: "nowrap" }}>Shuffle</span>
         </Note>
         <Note at={phasesAt + 6} x={RED_X} y={y(LABEL_Y)}>
-          <span style={{ ...label(26, INK), fontWeight: 700, whiteSpace: "nowrap" }}>2 Reduce</span>
+          <span style={{ ...label(26, INK), fontWeight: 600, whiteSpace: "nowrap" }}>2 Reduce</span>
         </Note>
 
         {/* Three machines, each with its split of the frame. */}

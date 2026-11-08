@@ -156,7 +156,7 @@ export const PathScene: React.FC = () => {
             <Strip cells={8} at={embeddingAt + i * 2} frame={frame} />
             {/* + its slot's position vector, drawn as a vector rather than a count. */}
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6, opacity: ease(frame, positionAt + i * 2, 8) }}>
-              <span style={{ ...note(22, POINT_INK), fontWeight: 700 }}>+</span>
+              <span style={{ ...note(22, POINT_INK), fontWeight: 600 }}>+</span>
               {[0, 1, 2].map((c) => (
                 <span key={c} style={{ width: 14, height: 30, borderRadius: 3, border: `1.5px solid ${POINT}`, background: PAPER }} />
               ))}
@@ -271,7 +271,7 @@ export const PathScene: React.FC = () => {
         </div>
       </Fade>
       <Fade at={thirtyAt - 2} style={{ left: X.stack, top: blockBot + 14, display: "flex", alignItems: "baseline", gap: 12 }}>
-        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 24, color: INK, ...TABULAR }}>×{PARAMS.layers}</div>
+        <div style={{ fontFamily: MONO, fontWeight: 600, fontSize: 24, color: INK, ...TABULAR }}>×{PARAMS.layers}</div>
         <div style={{ opacity: ease(frame, modelAt - 4, 10) }}>
           <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>in the lesson&apos;s</div>
           <div style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>mid-sized model</div>
@@ -411,7 +411,7 @@ export const ParamsScene: React.FC = () => {
         );
       })}
       <Fade at={fiftyAt - 2} style={{ left: segs[2].x0 + 28, top: BY + BH / 2 - 26 }}>
-        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 36, color: PAPER, ...TABULAR }}>{PARAMS.ffShare}%</span>
+        <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 36, color: PAPER, ...TABULAR }}>{PARAMS.ffShare}%</span>
       </Fade>
       <Note at={knowsAt - 4} x={X0} y={y(615)}>
         <div style={{ ...body(34), color: INK, whiteSpace: "nowrap" }}>
@@ -567,7 +567,7 @@ export const ExpertsScene: React.FC = () => {
               <rect x={BX} y={top + 44} width={Math.max(4, (v / ds3.total) * BW * p)} height={46} rx={3} fill={i ? POINT : DATA} />
             </Svg>
             <Fade at={at} style={{ left: BX + (v / ds3.total) * BW + 16, top: top + 50 }}>
-              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 28, color: i ? POINT_INK : INK, whiteSpace: "nowrap", ...TABULAR }}>
+              <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 28, color: i ? POINT_INK : INK, whiteSpace: "nowrap", ...TABULAR }}>
                 {v} billion
               </span>
             </Fade>
@@ -653,7 +653,7 @@ export const TopScene: React.FC = () => {
                 top: top + 10,
                 opacity: p,
                 fontFamily: MONO,
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 24,
                 color: INK,
                 ...TABULAR,

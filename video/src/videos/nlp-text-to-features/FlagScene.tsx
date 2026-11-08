@@ -184,7 +184,7 @@ const TraceRow: React.FC<{
           const badge = polar ? (badgeAt ? badgeAt[scored++] - 2 : tokenAt + 10) : 0;
           const flipped = s.role === "flipped";
           const sign = polar ? (
-            <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, badge, 10) }}>
+            <span style={{ ...note(22, s.polarity > 0 ? POS_INK : NEG_INK), ...TABULAR, fontWeight: 600, opacity: ease(frame, badge, 10) }}>
               {flipped ? (
                 <>
                   <span style={{ color: s.polarity > 0 ? NEG_INK : POS_INK }}>
@@ -230,7 +230,7 @@ const TraceRow: React.FC<{
           );
         })}
       </TokenRow>
-      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(30, INK), ...TABULAR, fontWeight: 700, opacity: ease(frame, verdictAt - 6, 10) }}>
+      <div style={{ position: "absolute", left: SUM_X, top: top + 2, ...note(30, INK), ...TABULAR, fontWeight: 600, opacity: ease(frame, verdictAt - 6, 10) }}>
         {signed(trace.score)}
       </div>
       <div style={{ position: "absolute", left: VERDICT_X, top: top + 2, ...note(30, inkFor(trace.label)), fontWeight: 650, opacity: ease(frame, verdictAt - 2, 10) }}>

@@ -100,8 +100,8 @@ export const NorthScene: React.FC = () => {
               transform: `translateY(${(1 - card) * 20}px)`,
             }}
           >
-            <div style={{ position: "absolute", left: 0, top: 22, ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>★ north star</div>
-            <div style={{ position: "absolute", left: 0, top: 58, ...note(52, INK), fontWeight: 700, whiteSpace: "nowrap", opacity: named }}>
+            <div style={{ position: "absolute", left: 0, top: 22, ...label(22, BLUE_INK), fontWeight: 600, whiteSpace: "nowrap" }}>★ north star</div>
+            <div style={{ position: "absolute", left: 0, top: 58, ...note(52, INK), fontWeight: 600, whiteSpace: "nowrap", opacity: named }}>
               <span
                 style={{
                   padding: "0 10px",

@@ -110,8 +110,8 @@ export const ScoringScene: React.FC = () => {
               />
             ) : null}
             <Ink at={t.at} dur={14} style={{ left: COL_X[i], top: y(TITLE_Y) - 4, whiteSpace: "nowrap" }}>
-              <span style={{ ...label(28, A_INK), fontWeight: 700, marginRight: 14 }}>{i + 1}</span>
-              <span style={{ ...label(28, INK), fontWeight: 700 }}>{t.text}</span>
+              <span style={{ ...label(28, A_INK), fontWeight: 600, marginRight: 14 }}>{i + 1}</span>
+              <span style={{ ...label(28, INK), fontWeight: 600 }}>{t.text}</span>
             </Ink>
           </React.Fragment>
         ))}

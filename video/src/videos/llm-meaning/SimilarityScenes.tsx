@@ -75,7 +75,7 @@ const Reading: React.FC<{ x: number; y: number; at: number; valueAt: number; nam
   return (
     <Fade at={at} style={{ left: x, top: y, display: "flex", alignItems: "baseline", gap: 18, whiteSpace: "nowrap" }}>
       <span style={{ ...label(24, INK_SOFT), width: 190 }}>{name}</span>
-      <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 40, color, opacity: ease(frame, valueAt, 10), ...TABULAR }}>{value}</span>
+      <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: 40, color, opacity: ease(frame, valueAt, 10), ...TABULAR }}>{value}</span>
     </Fade>
   );
 };
@@ -404,7 +404,7 @@ export const SearchScene: React.FC = () => {
                 top: 12,
                 transform: "translateX(-50%)",
                 fontFamily: MONO,
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 27,
                 color: isTop ? POINT_INK : INK,
                 opacity: ease(frame, topAt - 2 + rank(d.text) * 3, 10),
@@ -432,7 +432,7 @@ export const SearchScene: React.FC = () => {
               top: 10,
               transform: "translateX(-50%)",
               fontFamily: MONO,
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: 25,
               color: v === 0 ? FAINT : POINT_INK,
               opacity: ease(frame, askAt + 6 + j * 3, 10),

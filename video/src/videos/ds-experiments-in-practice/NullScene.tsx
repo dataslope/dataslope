@@ -99,7 +99,7 @@ export const NullScene: React.FC = () => {
           </g>
         </svg>
         <Note at={halfAt + 6} x={at(x, -NOSIG.worth)} y={y(470) - h(36)}>
-          <span style={{ ...label(21, OK_INK), fontWeight: 700, whiteSpace: "nowrap" }}>± half a point: the smallest lift worth having</span>
+          <span style={{ ...label(21, OK_INK), fontWeight: 600, whiteSpace: "nowrap" }}>± half a point: the smallest lift worth having</span>
         </Note>
 
         {tests.map(({ t, row, at: start, ends, verdictAt, ok }) => {
@@ -146,7 +146,7 @@ export const NullScene: React.FC = () => {
                     top: ok ? y(row) - 14 : y(row) - h(52),
                     textAlign: ok ? (j === 0 ? "right" : "left") : "center",
                     ...label(21, INK),
-                    fontWeight: 700,
+                    fontWeight: 600,
                     ...TABULAR,
                     opacity: ease(frame, ends + j * 8, 10),
                   }}
