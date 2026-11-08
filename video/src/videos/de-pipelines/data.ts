@@ -1,11 +1,13 @@
 import results from "./results.json" with { type: "json" };
 
 // Every table, count and error the video shows, read from results.json: what
-// DuckDB-Wasm 1.32.0 (DuckDB v1.4.3, the engine of the page's one
-// <SqlCodeBlock dialect="duckdb">) returned for check.mjs, which wrote it.
-// The idempotency figure loads the page's own events table; the orders in the
-// upsert, CDC and schema figures are the video's own. Pure (no Remotion, no
-// DOM).
+// Postgres (PGlite, the engine of the page's one <SqlCodeBlock
+// dialect="postgres">) returned for check.mjs, which wrote it. The one
+// exception is the schema-evolution figure ("parquet", EVO below): it reads
+// three Parquet files together, which Postgres cannot do, so it ran in
+// DuckDB-Wasm, the reader the page's answer cites. The idempotency figure
+// loads the page's own events table; the orders in the upsert, CDC and schema
+// figures are the video's own. Pure (no Remotion, no DOM).
 
 export const VIDEO = "de-pipelines";
 
@@ -18,7 +20,7 @@ type Step = Ok | Err;
 type Figure = { setup: string; version: string; steps: Record<string, Step> };
 
 type FigKey = "idempotency" | "upsert" | "cdc" | "parquet" | "source";
-const R = results as unknown as Record<FigKey, Figure> & { duckdb: string[] };
+const R = results as unknown as Record<FigKey, Figure> & { postgres: string[]; duckdb: string[] };
 
 const ok = (fig: FigKey, id: string): Ok => {
   const s = R[fig].steps[id];
@@ -37,6 +39,8 @@ const one = (fig: FigKey, id: string) => Number(ok(fig, id).rows[0][0]);
 export type Result = { cols: string[]; rows: string[][] };
 const asResult = (s: Ok): Result => ({ cols: s.columns, rows: s.rows.map((r) => r.map((v) => (v === null ? "null" : String(v)))) });
 
+/** The DuckDB that read the Parquet files (EVO), the one figure not run in
+ *  Postgres. Not shown on screen. */
 export const DUCKDB = R.duckdb[0];
 
 /** The statements the idempotency figure prints, as the page writes them. */
@@ -51,6 +55,7 @@ export const IDEM = {
   blind: [one("idempotency", "blindCount1"), one("idempotency", "blindCount2")],
   over: [one("idempotency", "overCount1"), one("idempotency", "overCount2")],
   rolledBack: one("idempotency", "txCount"),
+  /** Postgres's error for the insert that fails inside the transaction. */
   txError: err("idempotency", "txInsertFails").error,
   /** The page's ON CONFLICT upsert, run twice, then a MERGE: orders in the table. */
   upsert: [one("upsert", "count1"), one("upsert", "count2"), one("upsert", "count3")],
@@ -67,7 +72,8 @@ export const CDC = {
   delete: ok("cdc", "delete3").sql,
 };
 
-/** Three daily Parquet files and what reading them together gives. */
+/** Three daily Parquet files and what reading them together gives: the
+ *  video's one DuckDB figure, since Postgres reads no Parquet. */
 export const EVO = {
   /** Each file's columns, from DESCRIBE. */
   files: (["day1", "day2", "day3"] as const).map((d) => ok("parquet", d).rows.map((r) => String(r[0]))),
@@ -80,7 +86,7 @@ export const EVO = {
   renamedSql: ok("parquet", "renamed").sql,
 };
 
-/** A source gains a column: SELECT * fails, named columns load. */
+/** A source gains a column: SELECT * fails in Postgres, named columns load. */
 export const SRC = {
   starSql: err("source", "star").sql,
   starError: err("source", "star").error,
@@ -90,8 +96,9 @@ export const SRC = {
   clean: asResult(ok("source", "clean")),
 };
 
-/** "Binder Error: table …" split into its kind and its message, as the
- *  error box prints them. */
+/** An error split into its kind and its message, as the error box prints
+ *  them: Postgres's "ERROR: INSERT has …" (kind "ERROR"), or DuckDB's
+ *  "Invalid Input Error: …" for the Parquet read. */
 export const splitError = (e: string) => {
   const i = e.indexOf(": ");
   return { kind: e.slice(0, i), message: e.slice(i + 2) };

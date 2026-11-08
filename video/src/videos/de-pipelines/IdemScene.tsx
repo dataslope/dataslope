@@ -71,7 +71,7 @@ const RunCount: React.FC<{ at: number; x: number; y: number; run: string; value:
  * page's events table loads June 1 twice: a blind INSERT goes 8 then 16; the
  * page's delete-then-insert goes 8 then 8. Then why it matters, and the
  * transaction that keeps a failure between the two statements from leaving
- * the day empty (rolled back in DuckDB: still 8). The listing grows to wrap
+ * the day empty (rolled back in Postgres: still 8). The listing grows to wrap
  * the two statements only when the transaction is named. The keyed upsert
  * shows its count too: the page's ON CONFLICT run twice leaves 3 orders, then 3.
  */

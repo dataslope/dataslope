@@ -57,7 +57,7 @@ const Entry: React.FC<{ at: number; x: number; y: number; op: string; text: stri
 /**
  * Question 4. The source table changes three ways between two polls (order 2
  * ships, order 4 is placed, order 3 is deleted). The poll on updated_at,
- * run in DuckDB, returns 2 and 4: the delete leaves nothing to select. Then
+ * run in Postgres, returns 2 and 4: the delete leaves nothing to select. Then
  * the write-ahead log, which already holds all three in order, streamed
  * through Kafka to the warehouse, deletes included, with Debezium's op codes
  * (c, u, d) keyed beside it.

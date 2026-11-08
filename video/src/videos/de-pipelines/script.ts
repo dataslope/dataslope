@@ -42,20 +42,24 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  * Every animation in the scenes is cued to a word below, so edit freely: a cue
  * whose word disappears throws in the Studio rather than silently drifting.
  *
- * Facts. check.mjs runs every statement in DuckDB-Wasm 1.32.0 (DuckDB
- * v1.4.3), the engine of the page's one <SqlCodeBlock dialect="duckdb">, into
- * results.json, which data.ts reads:
+ * Facts. check.mjs runs every statement in Postgres (PGlite, PostgreSQL 18),
+ * the engine of the page's one <SqlCodeBlock dialect="postgres">, into
+ * results.json, which data.ts reads; every error is Postgres's own text. The
+ * one exception is "evo", which reads Parquet files and so ran in DuckDB-Wasm
+ * (DuckDB v1.4.3), the reader the page's answer cites (union_by_name):
  *   - "idem": the page's own events table (its block's 24 rows) as the
  *     staging table, loaded through the page's statements. June 1 holds 8 of
  *     the 24. A blind INSERT of June 1, run twice: 8, then 16. The page's
  *     delete-then-insert, run twice: 8, then 8. The delete and an insert that
- *     fails, in one transaction, rolled back: still 8. The page's ON CONFLICT
- *     upsert run twice, then a MERGE, on the video's own three staged
- *     orders: 3 rows each time.
+ *     fails, in one transaction, rolled back: still 8 (Postgres aborts the
+ *     transaction on the error, and ROLLBACK restores the day). The page's
+ *     ON CONFLICT upsert run twice, then a MERGE, on the video's own three
+ *     staged orders: 3 rows each time.
  *   - "cdc": the video's own orders 1 to 3. Between two polls order 2 ships,
  *     order 4 is placed and order 3 is deleted; the poll on updated_at finds
  *     2 and 4, and nothing of 3.
- *   - "evo": three daily Parquet files (the video's own rows), written by DuckDB
+ *   - "evo", the one DuckDB figure, because Postgres cannot read Parquet:
+ *     three daily Parquet files (the video's own rows), written by DuckDB
  *     and read back (in Node, DuckDB-Wasm writes them to disk, so check.mjs
  *     uses a throwaway directory). A plain read of days 1 and 2 keeps
  *     day 1's three columns (coupon is dropped; the other order of files
@@ -63,8 +67,9 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     amount renamed total reads as two columns, each null where the other
  *     is set.
  *   - "src": INSERT INTO a three-column table SELECT * from a source that
- *     gained a fourth column: "Binder Error: table orders_clean has 3 columns
- *     but 4 values were supplied". Naming the columns loads all 3 rows.
+ *     gained a fourth column: "ERROR: INSERT has more expressions than target
+ *     columns" ("three columns, four values", as said). Naming the columns
+ *     loads all 3 rows.
  *   Batch and streaming, ETL and ELT, the write-ahead log, the schema
  *   registry, the medallion layers, Lambda and Kappa, dbt, fan-out and
  *   lineage are drawn as mechanisms from the page's own answers, with no

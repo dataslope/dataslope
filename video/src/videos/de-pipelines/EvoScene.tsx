@@ -49,7 +49,8 @@ const FileRow: React.FC<{
 };
 
 /**
- * Question 5. Three daily Parquet files read together in DuckDB. Each file
+ * Question 5. Three daily Parquet files read together in DuckDB, the video's
+ * one figure not run in Postgres, which reads no Parquet (check.mjs). Each file
  * keeps its own schema, so the reader decides: by default the first file's
  * columns win and day 2's coupon is dropped without an error (with day 2
  * first, the read fails); union_by_name keeps it, null for day 1; day 3's
