@@ -8,7 +8,7 @@ import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
 import { MONO } from "../../theme/fonts";
 import { TICKETS } from "./data";
-import { A_INK, B, Check, Drift, FAINT, Headline, Marked, OK, pulse, Svg, TRAP_INK, X0 } from "./parts";
+import { A_INK, B, Check, Drift, FAINT, Headline, Marked, OK, pulse, Spot, Svg, TRAP_INK, X0 } from "./parts";
 
 /** The three approaches as three columns of plain text and pictures, no
  *  cards: each column's left edge and the width its widest piece (the JSON
@@ -18,9 +18,29 @@ const COL_X = [X0, 730, 1340];
 const COL_W = 460;
 const TITLE_Y = 360;
 const GLYPH_Y = 440;
+
+/** The judge's rubric, painted (llm-benchmarks-rubric, 760x1008): a
+ *  clipboard whose sheet is left blank for the rubric's four lines, which
+ *  ink in over it on "rubric". The lines are placed as fractions of the
+ *  painting, inside the sheet (x 0.11 to 0.90, y 0.20 under the clip to
+ *  0.92). */
+const RUBRIC_H = 168;
+const RUBRIC_W = Math.round((RUBRIC_H * 760) / 1008);
+const RUBRIC_TOP = 6;
+const RUBRIC_LINES = [
+  { y: 0.35, w: 0.56 },
+  { y: 0.49, w: 0.47 },
+  { y: 0.63, w: 0.58 },
+  { y: 0.77, w: 0.38 },
+] as const;
+const RUBRIC_LINE_X = 0.22;
+/** The two answers the judge grades, well clear of the rubric above them,
+ *  and the note under them. */
+const ANSWERS_Y = RUBRIC_TOP + RUBRIC_H + 54;
+const LONGER_Y = ANSWERS_Y + 130;
 /** Where the deepest column's text ("favors longer answers") ends, in px
  *  under GLYPH_Y: where the hairlines stop. */
-const TEXT_END = 346;
+const TEXT_END = LONGER_Y + 30;
 
 /**
  * Scoring answers with no exact match (Fig. 14): the lesson's three
@@ -133,20 +153,30 @@ export const ScoringScene: React.FC = () => {
         ))}
 
         {/* 3. A judge with a rubric, and its taste for length. */}
-        <Svg opacity={ease(frame, strongAt - 2, 12)}>
-          <rect x={COL_X[2]} y={y(GLYPH_Y) + 6} width={180} height={128} rx={10} fill={PAPER} stroke={INK} strokeWidth={2} />
-          {[0, 1, 2, 3].map((k) => (
-            <rect key={k} x={COL_X[2] + 22} y={y(GLYPH_Y) + 30 + k * 26} width={[130, 110, 136, 90][k]} height={9} rx={4} fill={B} opacity={ease(frame, rubricAt - 4 + k * 2, 8) * 0.8} />
-          ))}
-        </Svg>
-        <Ink at={rubricAt - 2} dur={12} style={{ left: COL_X[2] + 200, top: y(GLYPH_Y) + 54, whiteSpace: "nowrap" }}>
+        <Spot id="llm-benchmarks-rubric" at={strongAt - 4} left={COL_X[2]} top={y(GLYPH_Y) + RUBRIC_TOP} width={RUBRIC_W} height={RUBRIC_H}>
+          <svg width={RUBRIC_W} height={RUBRIC_H} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
+            {RUBRIC_LINES.map((l, k) => (
+              <rect
+                key={k}
+                x={RUBRIC_LINE_X * RUBRIC_W}
+                y={l.y * RUBRIC_H - 4}
+                width={l.w * RUBRIC_W}
+                height={8}
+                rx={4}
+                fill={B}
+                opacity={ease(frame, rubricAt - 4 + k * 2, 8) * 0.85}
+              />
+            ))}
+          </svg>
+        </Spot>
+        <Ink at={rubricAt - 2} dur={12} style={{ left: COL_X[2] + RUBRIC_W + 40, top: y(GLYPH_Y) + RUBRIC_TOP + RUBRIC_H / 2 - 14, whiteSpace: "nowrap" }}>
           <span style={note(22, INK_SOFT)}>a rubric</span>
         </Ink>
         {[
           { w: 160, size: 22 },
           { w: 360, size: 34 },
         ].map((a, i) => {
-          const ry = y(GLYPH_Y) + 186 + i * 56;
+          const ry = y(GLYPH_Y) + ANSWERS_Y + i * 56;
           const swell = i === 1 ? pulse(frame, longerAt + 6, 20) : 0;
           return (
             <Svg key={i} opacity={ease(frame, favorAt - 6 + i * 3, 12)}>
@@ -155,7 +185,7 @@ export const ScoringScene: React.FC = () => {
             </Svg>
           );
         })}
-        <Ink at={longerAt - 2} dur={14} style={{ left: COL_X[2], top: y(GLYPH_Y) + 316, whiteSpace: "nowrap" }}>
+        <Ink at={longerAt - 2} dur={14} style={{ left: COL_X[2], top: y(GLYPH_Y) + LONGER_Y, whiteSpace: "nowrap" }}>
           <span style={{ ...note(23, TRAP_INK), fontWeight: 600 }}>favors longer answers</span>
         </Ink>
       </Drift>

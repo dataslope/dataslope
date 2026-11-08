@@ -275,7 +275,9 @@ export const Bracket: React.FC<{
 
 /**
  * A watercolor spot from illustrations.json: it pops in on `at`, bobs gently,
- * and fades on `out`. Nothing is drawn while the art is not in.
+ * and fades on `out`. Nothing is drawn while the art is not in. Any children
+ * are drawn over the painting in a box of the same size that moves with it,
+ * so marks laid on the art (the rubric's lines) stay on it as it bobs.
  */
 export const Spot: React.FC<{
   id: string;
@@ -286,27 +288,28 @@ export const Spot: React.FC<{
   top: number;
   width: number;
   height: number;
-}> = ({ id, at, out, dim, left, top, width, height }) => {
+  children?: React.ReactNode;
+}> = ({ id, at, out, dim, left, top, width, height, children }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const p = pop(frame, at, fps, 16);
   const o = out === undefined ? 0 : ease(frame, out, 12);
   const d = dim === undefined ? 0 : ease(frame, dim, 20) * 0.6;
   if (!ILLUSTRATIONS || p <= 0.001 || o >= 1) return null;
+  const box: React.CSSProperties = {
+    position: "absolute",
+    left,
+    top,
+    width,
+    height,
+    opacity: Math.min(1, p) * (1 - o) * (1 - d),
+    transform: `translateY(${bob(frame, 5, 110) + (1 - p) * 30}px)`,
+  };
   return (
-    <Illustration
-      video={VIDEO}
-      id={id}
-      style={{
-        position: "absolute",
-        left,
-        top,
-        width,
-        height,
-        opacity: Math.min(1, p) * (1 - o) * (1 - d),
-        transform: `translateY(${bob(frame, 5, 110) + (1 - p) * 30}px)`,
-      }}
-    />
+    <>
+      <Illustration video={VIDEO} id={id} style={box} />
+      {children ? <div style={box}>{children}</div> : null}
+    </>
   );
 };
 
