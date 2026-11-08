@@ -9,7 +9,8 @@
     },
     "sizes": {
       "video-hero": "1536x1024",
-      "video-icon": "1024x1024"
+      "video-icon": "1024x1024",
+      "video-page": "1024x1536"
     },
     "styles": {
       "watercolor illustration": {
@@ -42,6 +43,18 @@
       "category": "video-hero",
       "style": "watercolor illustration",
       "subject": "one wide paper claim ticket seen straight on and lying perfectly level, a long rectangle of thick card about three times as wide as it is tall with small rounded notches cut into its four corners, a round hole punched clean through it near its left end, and a narrow stub at that left end washed in blue; the rest of its broad face is washed in very pale warm yellow, smooth and even and left empty"
+    },
+    {
+      "id": "be-concurrency-link",
+      "category": "video-page",
+      "style": "watercolor illustration",
+      "subject": "one single heavy chain link standing upright and seen straight on, a tall rounded oval loop bent from one thick round steel bar and closed all the way round, about twice as tall as it is wide, with a large empty opening in its middle; the round bar has solid volume and is washed all over in blue alone: deep cobalt blue in its shadows, clear mid blue across its body and pale sky blue where the light catches its curves, with the white of the paper left showing as small bright highlights"
+    },
+    {
+      "id": "be-concurrency-link-open",
+      "category": "video-page",
+      "style": "watercolor illustration",
+      "subject": "one single heavy chain link standing upright and seen straight on, a tall rounded oval loop bent from one thick round steel bar, about twice as tall as it is wide, with a large empty opening in its middle, broken open: a clean wide gap cut through the middle of its right side, so the loop no longer closes and its two cut ends face each other across the empty gap; the bar is washed in fresh green with soft pale yellow highlights catching along its curves"
     }
   ]
 }
