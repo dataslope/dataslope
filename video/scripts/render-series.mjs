@@ -2,7 +2,7 @@
  * Stitches a series into one video: before each unit or part, its opener,
  * then the unit's videos, in the order src/series.ts gives.
  *
- *   npm run render:series -- Statistics               # 4K → out/series/Statistics.mp4
+ *   npm run render:series -- Statistics               # 4K → out/series/Statistics-4k.mp4
  *   npm run render:series -- Statistics --fhd         # 1080p → out/series/Statistics-fhd.mp4
  *   npm run render:series -- --all --fhd              # every series
  *   npm run render:series -- DataEngineer --units 0-2 # a stretch of one, to preview
@@ -82,7 +82,8 @@ const unitRange = (() => {
   return (n) => n >= lo && n <= hi;
 })();
 
-const outputOf = (id) => path.join(OUT, fhd ? `${id}-fhd.mp4` : `${id}.mp4`);
+// render-all's names: <id>-fhd.mp4 at 1080p, <id>-4k.mp4 at 4K.
+const outputOf = (id) => path.join(OUT, `${id}${fhd ? "-fhd" : "-4k"}.mp4`);
 
 // Remotion's own ffmpeg and ffprobe, through its CLI. On Windows npx is a
 // .cmd, which only runs through a shell, and cmd splits an argument at its
@@ -131,7 +132,7 @@ for (const name of names) {
     { id: openerId(name, u), unit: u },
     ...u.videos.map((id) => ({ id, unit: u })),
   ]);
-  const stem = `${name}${unitsArg ? `-units-${unitsArg}` : ""}${fhd ? "-fhd" : ""}`;
+  const stem = `${name}${unitsArg ? `-units-${unitsArg}` : ""}${fhd ? "-fhd" : "-4k"}`;
   const output = path.join(SERIES_OUT, `${stem}.mp4`);
 
   console.log(`\n${name}: ${units.length} ${series.kind === "course" ? "units" : "parts"}, ${pieces.length} pieces → ${path.relative(VIDEO_ROOT, output)}`);

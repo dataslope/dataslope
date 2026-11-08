@@ -97,10 +97,11 @@ on gray-50.
 cd video
 npm install
 npm run studio                               # preview and scrub in the browser
-npm run render -- CPointers                  # 4K → out/CPointers.mp4
+npm run render -- CPointers out/CPointers-4k.mp4   # 3840x2160
 npm run render:fhd -- CPointers out/CPointers-fhd.mp4   # 1920x1080
 npm run render:preview -- CPointers out/c-pointers-preview.mp4   # half size, fast
 npm run render:all -- --fhd                  # every video changed since its last render, 1080p
+npm run render:all -- --hd                   # the same at 720p (1280x720)
 npm run render:series -- Statistics --fhd    # a whole course in one video, openers between units
 npm run thumbnails                           # every YouTube thumbnail → out/thumbnails/<Track>.png
 npm run still -- CPointers out/frame.png --frame=600
@@ -115,9 +116,10 @@ one under `/opt/pw-browsers/chromium_headless_shell-*/chrome-linux/`).
 ### Rendering what changed, and whole series
 
 Two scripts sit on top of `remotion render`. Both take `--fhd` for 1080p
-(`out/<id>-fhd.mp4`); without it they render at 4K (`out/<id>.mp4`), the
+(`out/<id>-fhd.mp4`); without it they render at 4K (`out/<id>-4k.mp4`), the
 size to upload, since YouTube streams a 4K upload at a higher bitrate even
-to a 1080p viewer, which keeps small type sharp.
+to a 1080p viewer, which keeps small type sharp. `render:all` also takes `--hd` for
+720p (`out/<id>-hd.mp4`, 1280x720), for a quick local copy to watch.
 
 **`npm run render:all`** (`scripts/render-all.mjs`) renders every video,
 plus the series openers and the unit opener sample. It skips a video whose
@@ -134,6 +136,7 @@ changed (`Llm-1-Tokens (changed: src/videos/llm-tokens/BpeScene.tsx)`).
 ```bash
 npm run render:all                           # 4K, every video that changed
 npm run render:all -- --fhd                  # the same at 1080p
+npm run render:all -- --hd                   # the same at 720p → out/<id>-hd.mp4
 npm run render:all -- --dry-run              # list what would render, and why
 npm run render:all -- BaseRate,TfIdf         # only these (ids or folders)
 npm run render:all -- --force                # render even if unchanged
@@ -181,7 +184,7 @@ course or interview track in one video: before each unit or part, its
 opener, then its videos, in the order `src/series.ts` lists them.
 
 ```bash
-npm run render:series -- Statistics          # 4K → out/series/Statistics.mp4
+npm run render:series -- Statistics          # 4K → out/series/Statistics-4k.mp4
 npm run render:series -- Statistics --fhd    # 1080p → out/series/Statistics-fhd.mp4
 npm run render:series -- --all --fhd         # every series
 npm run render:series -- DataEngineer --units 0-2 --fhd   # a stretch, to preview
