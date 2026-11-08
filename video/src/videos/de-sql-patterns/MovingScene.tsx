@@ -108,7 +108,7 @@ export const MovingScene: React.FC = () => {
     cols: ["frame", "covers", "rows", "avg_7"],
     rows: [
       ["ROWS 6 PRECEDING", covers(rowsStart), L.rows.n, L.rows.avg_7],
-      ["RANGE 6 DAY", covers(rangeStart), L.range.n, L.range.avg_7],
+      ["RANGE 6 days", covers(rangeStart), L.range.n, L.range.avg_7],
       ["spine, then ROWS", covers(spineStart), String(daysAcross(spineStart, lastDay)), L.spine.avg_7],
     ],
   };
@@ -120,7 +120,8 @@ export const MovingScene: React.FC = () => {
   const P = MOVING.page;
   const F = SPINE.filled;
   const out7 = q8At - 4;
-  const underList = (lines: number) => y(LIST_Y) + listingHeight(lines, SIZE) + h(22);
+  // A note under a listing keeps 40px of air below its box.
+  const underList = (lines: number) => y(LIST_Y) + listingHeight(lines, SIZE) + h(40);
   // The spine's average: the same ROWS frame, as it ran over the filled days.
   const spineAvg = SPINE.filledAvg.lines.flatMap((l, i, all) => (l.includes("AVG(daily_value) OVER") ? [l.trim(), all[i + 1].trim().replace(/,$/, "")] : []));
   if (spineAvg.length !== 2 || !spineAvg[1].startsWith("ROWS BETWEEN 6 PRECEDING")) throw new Error("the spine's average is not the ROWS frame");
@@ -259,7 +260,9 @@ export const MovingScene: React.FC = () => {
             </span>
           </Note>
 
-          {/* ── Question 8: a spine of every date, the data left-joined on ── */}
+          {/* ── Question 8: a spine of every date, the data left-joined on.
+              The spine is the page's own, generate_series in SELECT cast back
+              to date, over the thirteen days. ── */}
           <Listing
             lines={F.lines}
             x={X0}
@@ -268,7 +271,8 @@ export const MovingScene: React.FC = () => {
             size={SIZE}
             at={generateAt - 2}
             marks={[
-              { line: lineOf(F.lines, "FROM generate_series"), at: generateAt + 6 },
+              { line: lineOf(F.lines, "generate_series("), at: generateAt + 6 },
+              { line: lineOf(F.lines, "INTERVAL '1 day'"), at: generateAt + 10 },
               { line: lineOf(F.lines, "LEFT JOIN"), at: joinAt + 2 },
               { line: lineOf(F.lines, "COALESCE"), at: zerosAt + 2, color: MARK_OK },
             ]}

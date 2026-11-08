@@ -4,12 +4,12 @@ import daAdv from "../da-advanced-sql/results.json" with { type: "json" };
 import dsSql from "../ds-sql/results.json" with { type: "json" };
 
 // Every table, statement and message the video shows, read from results.json
-// files: what DuckDB v1.4.3 (DuckDB-Wasm 1.32.0, the engine the page's blocks
-// run) returned for the statements in this video's check.mjs, and, for the
-// figures it reuses, in da-sql's, da-advanced-sql's and ds-sql's, so a table
-// two videos show is the same table. Each figure ran in a fresh database
-// built by its own setup, and the SQL printed on screen is the SQL in that
-// file, so a listing cannot drift from what ran. Pure (no Remotion, no DOM).
+// files: what Postgres (PGlite, the engine the page's blocks run) returned
+// for the statements in this video's check.mjs, and, for the figures it
+// reuses, in da-sql's, da-advanced-sql's and ds-sql's, so a table two videos
+// show is the same table. Each figure ran in a fresh database built by its
+// own setup, and the SQL printed on screen is the SQL in that file, so a
+// listing cannot drift from what ran. Pure (no Remotion, no DOM).
 
 export const VIDEO = "de-sql-patterns";
 
@@ -49,8 +49,8 @@ const table = (from: From, figure: string, id: string): Table => {
 /** A statement as it is printed: its SQL, one string per line, and its result. */
 const query = (from: From, figure: string, id: string): Query => ({ lines: step(from, figure, id).sql.split("\n"), ...table(from, figure, id) });
 
-/** A statement the engine refused: its SQL and its error, split into the
- *  kind ("Binder Error") and the message. */
+/** A statement Postgres refused: its SQL and its error, split into the kind
+ *  ("ERROR") and the message. */
 const refused = (from: From, figure: string, id: string) => {
   const s = step(from, figure, id);
   if (s.ok || !s.error) throw new Error(`${from} ${figure}.${id} did not fail: ${s.sql}`);
@@ -92,20 +92,20 @@ export const RANK = {
   /** The page's query, as the page prints it. */
   lines: step("own", "rank", "page").sql.split("\n"),
   rows: ranks.rows.length,
-  /** Rows 11 to 17 by row number: Sara's 85, the four 80s, Frank's 78. */
+  /** Rows 11 to 17 by row number: Sara's 85, Ulla's 82, the four 80s (in
+   *  whatever order the engine broke their tie), Frank's 78. */
   ties: slice(ranks, "rn", 11, 17),
 };
 
 const subquery = query("own", "latest", "subquery");
-const qualify = query("own", "latest", "qualify");
-same(subquery, qualify, "the subquery and QUALIFY");
 export const LATEST = {
   events: Number(scalar("own", "latest", "rows", "events")),
   users: Number(scalar("own", "latest", "rows", "users")),
   /** The first three users' events, numbered from the newest. */
   numbered: table("own", "latest", "numbered"),
   subquery,
-  qualify,
+  /** QUALIFY, which Postgres does not have: its listing alone. */
+  qualify: { lines: refused("own", "latest", "qualify").lines },
   /** The video's own tie: user 3's events with a second one at their latest
    *  moment, and how many rows RANK and ROW_NUMBER then keep. */
   userThree: table("own", "latestTie", "userThreeRanks"),
@@ -153,7 +153,8 @@ const rowOf = (t: Table, first: string): Record<string, string> => {
   const r = t.rows.find((row) => row[0] === first);
   if (!r) throw new Error(`no row ${first}`);
   const row: Record<string, string> = Object.fromEntries(t.cols.map((c, j) => [c, r[j]]));
-  // ROUND(x, 1) on a DOUBLE: a client prints 95.0, where JSON kept 95.
+  // To one place: the CASE's average ran unrounded, and is compared with
+  // the ROWS frame's ROUND(x, 1).
   return { ...row, avg_7: Number(row.avg_7).toFixed(1) };
 };
 const LAST_DAY = "2024-01-13";
@@ -184,13 +185,15 @@ if (rowsFrame.rows.filter((r) => Number(r[rowsFrame.cols.indexOf("n")]) < 7).len
 }
 
 export const SPINE = {
-  /** The page's own spine query, which DuckDB refuses as written. */
-  page: refused("own", "spine", "pageSpine"),
+  /** The page's own spine query, as written (January 1 to 31). */
+  page: query("own", "spine", "pageSpine"),
   joined: query("own", "spine", "joined"),
   gaps: table("own", "spine", "gaps").rows.map((r) => r[0]),
+  /** The page's spine over the video's thirteen days, filled. */
   filled: query("own", "spine", "filled"),
   filledAvg,
 };
+same({ cols: SPINE.filled.cols, rows: SPINE.page.rows.slice(0, SPINE.filled.rows.length) }, SPINE.filled, "the page's spine and the video's");
 
 // ── 9. Gaps and islands ─────────────────────────────────────────────────────
 
@@ -263,9 +266,8 @@ export const RAPID = {
   // 16. The page's running total, and ds-sql's tie under the default frame.
   running: query("own", "cte", "runningOne"),
   tied: query("dsSql", "ties", "running"),
-  // 17. Pivoting (ds-sql's), and DuckDB's PIVOT clause on the same table.
+  // 17. Pivoting (ds-sql's).
   pivot: query("dsSql", "pivot", "pivot"),
-  pivotClause: step("own", "pivot", "pivot").sql.replace(/ GROUP BY.*/, ""),
   // 18. The four joins (da-sql's).
   joins: {
     inner: table("daSql", "joins", "inner"),
@@ -289,4 +291,6 @@ export const RAPID = {
   cross: Number(scalar("daSql", "rapid", "crossJoin")),
 };
 
-export const RUNTIME = `DuckDB ${figuresOf(own).rank.version}`;
+// 17. The round says Postgres has no PIVOT clause: check.mjs ran DuckDB's on
+// ds-sql's traffic, and Postgres refused it.
+refused("own", "pivot", "pivot");

@@ -9,7 +9,7 @@ import { MONO } from "../../theme/fonts";
 import { ILLUSTRATIONS, VIDEO } from "./data";
 
 /**
- * The SQL listing, DuckDB's error box and the result tables are the Data
+ * The SQL listing, the engine's error box and the result tables are the Data
  * Analyst SQL videos' (da-sql/parts.tsx, and the column, geometry and frame
  * helpers from da-advanced-sql/parts.tsx), re-exported the way
  * ds-sql/parts.tsx does, so the three series' SQL videos look like one

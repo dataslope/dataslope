@@ -1,15 +1,15 @@
-// Runs every statement the de-sql-patterns video shows in DuckDB, the engine
-// the Data Engineer SQL page's blocks run in the reader's browser, and writes
-// what came back to results.json, which data.ts reads. From the repo root,
-// where @duckdb/duckdb-wasm (pinned to the version runtime/duckdb.ts loads)
-// is installed:
+// Runs every statement the de-sql-patterns video shows on the site's Postgres
+// engine (PGlite, PostgreSQL 18), the engine the Data Engineer SQL page's
+// blocks run in the reader's browser, and writes what came back to
+// results.json, which data.ts reads. From the repo root:
 //
 //   node video/src/videos/de-sql-patterns/check.mjs
 //
 // Each figure runs in a fresh database built by its own setup, as the page
-// gives every block its own engine. Values are printed the way a SQL client
-// prints them: a DECIMAL at its scale, a DATE as "2024-01-01", a NULL as
-// null. Tables are the page's own (content/interview/data-engineer/sql.mdx:
+// gives every block its own engine (video/scripts/lib/pg-figure.mjs). Values
+// are printed the way psql prints them: a numeric at its scale, a DATE as
+// "2024-01-01", a NULL as null, and an error as Postgres's own "ERROR: ..."
+// line. Tables are the page's own (content/interview/data-engineer/sql.mdx:
 // its players, events, orders and daily_logins blocks) wherever the page has
 // one; the rest are marked "the video's own" below and in script.ts.
 //
@@ -24,63 +24,9 @@
 // own 400), the setup is copied here verbatim.
 /* global console, URL */
 import { writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
-const require = createRequire(join(dirname(fileURLToPath(import.meta.url)), "../../../../package.json"));
-const duckdb = require("@duckdb/duckdb-wasm");
-const { default: Worker } = await import(pathToFileURL(require.resolve("web-worker")).href);
-const dist = join(dirname(require.resolve("@duckdb/duckdb-wasm")), "..", "dist");
-const bundle = await duckdb.selectBundle({
-  mvp: { mainModule: join(dist, "duckdb-mvp.wasm"), mainWorker: join(dist, "duckdb-node-mvp.worker.cjs") },
-  eh: { mainModule: join(dist, "duckdb-eh.wasm"), mainWorker: join(dist, "duckdb-node-eh.worker.cjs") },
-});
-
-/** One value as a SQL client prints it, from its Arrow column type. */
-function shown(value, type) {
-  if (value === null || value === undefined) return null;
-  const t = String(type);
-  if (t.startsWith("Decimal")) {
-    const scale = type.scale ?? 0;
-    const digits = String(value).replace("-", "").padStart(scale + 1, "0");
-    const sign = String(value).startsWith("-") ? "-" : "";
-    return scale ? `${sign}${digits.slice(0, -scale)}.${digits.slice(-scale)}` : `${sign}${digits}`;
-  }
-  if (t.startsWith("Date")) return new Date(Number(value)).toISOString().slice(0, 10);
-  if (t.startsWith("Timestamp")) return new Date(Number(value)).toISOString().slice(0, 19).replace("T", " ");
-  if (typeof value === "bigint") return Number(value);
-  return value?.valueOf?.() ?? value;
-}
-
-async function figure(setup, steps) {
-  const worker = new Worker(pathToFileURL(bundle.mainWorker).href, { type: "module" });
-  const db = new duckdb.AsyncDuckDB({ log: () => {} }, worker);
-  await db.instantiate(bundle.mainModule);
-  const conn = await db.connect();
-  for (const stmt of setup.split(/;\s*\n/).map((s) => s.trim()).filter(Boolean)) await conn.query(stmt);
-  const out = {};
-  for (const [id, sql] of Object.entries(steps)) {
-    try {
-      const table = await conn.query(sql);
-      const fields = table.schema.fields;
-      const rows = table.toArray().map((r) => {
-        const obj = r.toJSON();
-        return fields.map((f) => shown(obj[f.name], f.type));
-      });
-      out[id] = { sql, ok: true, columns: fields.map((f) => f.name), rows };
-    } catch (e) {
-      // DuckDB's message is "<Kind> Error: <text>", then a LINE excerpt.
-      const message = String(e.message).split("\n")[0];
-      out[id] = { sql, ok: false, error: message };
-    }
-  }
-  const version = (await conn.query("SELECT version() AS v")).toArray()[0].toJSON().v;
-  await conn.close();
-  await db.terminate();
-  await worker.terminate();
-  return { setup, steps: out, version };
-}
+import { figure } from "../../../scripts/lib/pg-figure.mjs";
 
 // ── The page's tables ───────────────────────────────────────────────────────
 
@@ -222,10 +168,13 @@ results.figures.rank = await figure(PAGE_PLAYERS, {
   ordered: `${RANKS}\nORDER BY rn;`,
 });
 
-// 2, 3. The latest row per key: numbered from the newest, kept in a
-//    subquery (the Postgres way), then with QUALIFY (the page's block, with
-//    an ORDER BY so the rows print in user order). The tie is the video's
-//    own: a second event for user 3 at the same moment as their last.
+// 2, 3. The latest row per key: numbered from the newest and kept in a
+//    subquery, as the page's block now does it. Then the same filter with
+//    QUALIFY (the page's earlier block, with an ORDER BY so the rows would
+//    print in user order), which Postgres does not have: the video shows the
+//    listing and says which engines have it, and data.ts checks that this one
+//    refused it. The tie is the video's own: a second event for user 3 at the
+//    same moment as their last.
 const NUMBERED = "ROW_NUMBER() OVER (\n    PARTITION BY user_id ORDER BY event_time DESC) AS rn";
 const SUBQUERY = (fn) =>
   `SELECT user_id, event_time, status\nFROM (\n  SELECT *, ${fn}() OVER (\n    PARTITION BY user_id ORDER BY event_time DESC) AS rn\n  FROM events\n) t\nWHERE rn = 1\nORDER BY user_id;`;
@@ -249,15 +198,18 @@ results.figures.latestTie = await figure(
 );
 
 // 5. The SUM put in WHERE: HAVING's own condition from the written query
-//    (da-sql's, > 400), moved into WHERE, on da-sql's orders. DuckDB refuses
-//    it as it refused da-sql's > 600.
+//    (da-sql's, > 400), moved into WHERE, on da-sql's orders. Postgres
+//    refuses it as it refused da-sql's > 600.
 results.figures.where = await figure(DA_ORDERS, {
   whereAggregate: "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE SUM(amount) > 400\nGROUP BY region;",
 });
 
 // 6. A seven-day moving average on the video's own days with gaps: the
 //    page's ROWS frame (rounded to one place, with where each frame starts
-//    and how many rows it holds), then a RANGE frame of six days.
+//    and how many rows it holds), then a RANGE frame of six days. The page's
+//    query and the CASE that nulls the short frames are left unrounded, as
+//    written: only their listings are shown (and the CASE's nulls counted),
+//    so Postgres's sixteen-place averages never reach the screen.
 const frameCols = (frame) =>
   `ROUND(AVG(daily_value) OVER w, 1) AS avg_7,\n  MIN(event_date) OVER w AS frame_start,\n  COUNT(*) OVER w AS n\nFROM daily_metrics\nWINDOW w AS (ORDER BY event_date\n  ${frame})\nORDER BY event_date;`;
 results.figures.moving = await figure(METRICS, {
@@ -265,19 +217,19 @@ results.figures.moving = await figure(METRICS, {
   // The page's query as it prints, ordered.
   page: "SELECT\n  event_date,\n  daily_value,\n  AVG(daily_value) OVER (\n    ORDER BY event_date\n    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW\n  ) AS moving_avg_7d\nFROM daily_metrics\nORDER BY event_date;",
   rows: `SELECT event_date, daily_value,\n  ${frameCols("ROWS BETWEEN 6 PRECEDING AND CURRENT ROW")}`,
-  range: `SELECT event_date, daily_value,\n  ${frameCols("RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW")}`,
+  range: `SELECT event_date, daily_value,\n  ${frameCols("RANGE BETWEEN INTERVAL '6 days' PRECEDING AND CURRENT ROW")}`,
   // The ROWS frame's first six rows hold fewer than seven: null until the
   // frame is full.
   full: "SELECT event_date, daily_value,\n  CASE WHEN COUNT(*) OVER w = 7\n    THEN AVG(daily_value) OVER w END AS avg_7\nFROM daily_metrics\nWINDOW w AS (ORDER BY event_date\n  ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)\nORDER BY event_date;",
 });
 
-// 7. Detecting and filling the gaps with a date spine. The page's block
-//    calls generate_series in SELECT, which DuckDB returns as one list, so
-//    the cast fails ("pageSpine"); the spine here is generate_series as a
-//    table, which is what the page's DuckDB needs. Then the same moving
-//    average over the filled days.
+// 7. Detecting and filling the gaps with a date spine: the page's own spine,
+//    generate_series in SELECT cast back to date, over the video's thirteen
+//    days. "pageSpine" is the page's block exactly as written (January 1 to
+//    31), which Postgres runs as it stands; data.ts checks its first thirteen
+//    days are the spine's. Then the same moving average over the filled days.
 const SPINE =
-  "WITH spine AS (\n  SELECT CAST(day AS DATE) AS day\n  FROM generate_series(DATE '2024-01-01',\n    DATE '2024-01-13', INTERVAL 1 DAY) AS t(day)\n)";
+  "WITH spine AS (\n  SELECT generate_series(\n    DATE '2024-01-01', DATE '2024-01-13', INTERVAL '1 day'\n  )::date AS day\n)";
 results.figures.spine = await figure(METRICS, {
   pageSpine:
     "WITH spine AS (\n  SELECT generate_series(\n    DATE '2024-01-01', DATE '2024-01-31', INTERVAL '1 day'\n  )::date AS day\n)\nSELECT\n  s.day,\n  COALESCE(m.daily_value, 0) AS daily_value\nFROM spine s\nLEFT JOIN daily_metrics m ON m.event_date = s.day\nORDER BY s.day;",
@@ -350,7 +302,9 @@ results.figures.lag = await figure(REVENUE, {
 });
 // PERCENT_RANK and CUME_DIST on the page's own example values.
 results.figures.percent = await figure("CREATE TABLE scores AS SELECT * FROM (VALUES (10), (20), (20), (30)) AS t(v);", {
-  both: "SELECT v,\n  ROUND(PERCENT_RANK() OVER (ORDER BY v), 2) AS pct_rank,\n  ROUND(CUME_DIST()    OVER (ORDER BY v), 2) AS cume_dist\nFROM scores\nORDER BY v;",
+  // Both return double precision, which Postgres's two-argument ROUND does
+  // not take: cast to numeric first.
+  both: "SELECT v,\n  ROUND(PERCENT_RANK() OVER (ORDER BY v)::numeric, 2) AS pct_rank,\n  ROUND(CUME_DIST()    OVER (ORDER BY v)::numeric, 2) AS cume_dist\nFROM scores\nORDER BY v;",
 });
 // COALESCE: the page's query on the video's own three users.
 results.figures.coalesce = await figure(CONTACTS, {
@@ -358,8 +312,10 @@ results.figures.coalesce = await figure(CONTACTS, {
   page: "SELECT COALESCE(phone, email, 'no contact') AS contact\nFROM users;",
   nullif: "SELECT 500 / NULLIF(0, 0) AS per_unit;",
 });
-// Pivoting: DuckDB's PIVOT clause on ds-sql's traffic table, which the round
-// names beside the conditional aggregation (ds-sql's result, imported).
+// Pivoting: the round shows ds-sql's conditional aggregation (imported) and
+// names the engines with a PIVOT clause. Postgres has none: this runs
+// DuckDB's PIVOT on ds-sql's traffic table only so that data.ts can check
+// Postgres refused it. Nothing of it is shown.
 results.figures.pivot = await figure(
   `CREATE TABLE traffic AS SELECT * FROM (VALUES
   ('North', 'mobile', 120), ('North', 'desktop', 80),

@@ -2,7 +2,7 @@ import React from "react";
 import { AbsoluteFill } from "remotion";
 import { QuestionCard } from "../../editorial/interview";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, note } from "../../editorial/style";
+import { ACCENT_INK, BLUE_INK, INK, INK_SOFT, label, note } from "../../editorial/style";
 import { Ink, Note, Num } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -32,7 +32,8 @@ const RESULT_X = 1000;
 const SUB_X = 800;
 const SUB_W = 740;
 const SUB_SIZE = 20;
-const Q3_RESULT_X = 900;
+/** Question 3's side column, where question 2's subquery stood. */
+const Q3_SIDE_X = 900;
 
 /**
  * Questions 1, 2 and 3, laid out after da-advanced-sql's RankScene on the
@@ -42,8 +43,10 @@ const Q3_RESULT_X = 900;
  * users' rows numbered from the newest, every row after the first struck, and
  * the subquery that keeps number one (the Postgres way): ten rows. A second
  * event for user 3 at the same moment (the video's own) shows why it is
- * ROW_NUMBER: RANK numbers both 1 and keeps eleven. Then the page's QUALIFY,
- * the same ten rows with no subquery, and the engines that have it.
+ * ROW_NUMBER: RANK numbers both 1 and keeps eleven. Then QUALIFY, the same
+ * filter with no subquery: Postgres, which ran the rest, has no QUALIFY, so
+ * it is a listing with no result, and the column the result would take says
+ * which engines have it and which don't.
  */
 export const RankScene: React.FC = () => {
   const n = useNarration();
@@ -80,10 +83,11 @@ export const RankScene: React.FC = () => {
   const q3TextAt = n.word("qualify", "What is qualify");
   const filtersAt = n.word("qualify", "filters on a window function");
   const havingAt = n.word("qualify", "the way having filters");
-  const goesAt = n.word("qualify", "The subquery goes");
-  const sameTenAt = n.word("qualify", "the same ten rows");
+  const goesAt = n.word("qualify-goes", "The subquery goes");
+  const inQueryAt = n.word("qualify-goes", "sits in the query itself");
   const enginesAt = n.word("qualify-where", "DuckDB, BigQuery");
   const notAt = n.word("qualify-where", "Postgres and my sequel don't");
+  const keepSubAt = n.word("qualify-where", "keep the subquery");
   const bridgeAt = n.beat("order-in").from;
   // The finished page holds through the bridge and fades into the cut.
   const end = n.beat("order-in").to;
@@ -121,8 +125,7 @@ export const RankScene: React.FC = () => {
 
   // ── Question 3 ──
   const Q = LATEST.qualify;
-  const qg = geoOf(Q, Q3_RESULT_X, y(TOP) - h(10), h, { rowH: 42, bodySize: 22, headSize: 20 });
-  const qNotesY = y(TOP) + listingHeight(Q.lines.length, SIZE) + h(30);
+  const qNotesY = y(TOP) + listingHeight(Q.lines.length, SIZE) + h(40);
 
   return (
     <AbsoluteFill>
@@ -132,7 +135,7 @@ export const RankScene: React.FC = () => {
       <Sfx name="el-scratch" at={keepAt + 4} level={-34} />
       <Sfx name="el-pop" at={tenAt} level={-34} />
       <Sfx name="el-scratch" at={twiceAt} level={-34} />
-      <Sfx name="el-pop" at={sameTenAt} level={-34} />
+      <Sfx name="el-pop" at={inQueryAt} level={-34} />
 
       <Drift from={from} to={end + 40}>
         <>
@@ -263,17 +266,20 @@ export const RankScene: React.FC = () => {
             </span>
           </Note>
 
-          {/* ── Question 3: the same filter, no subquery ── */}
+          {/* ── Question 3: the same filter, no subquery. Postgres refuses
+              QUALIFY (data.ts checks that it did), so there is no result to
+              show: the listing, what it does, and where it runs. ── */}
+          {/* Narrow enough to leave air before question 2's subquery, which
+              stays beside it until "The subquery goes". */}
           <Listing
             lines={Q.lines}
             x={X0}
             top={y(TOP)}
-            width={660}
+            width={630}
             size={SIZE}
             at={filtersAt - 4}
             marks={[{ line: lineOf(Q.lines, "QUALIFY"), at: havingAt, color: MARK_OK }]}
           />
-          <DataTable g={qg} cols={colsOf(Q)} at={goesAt - 2} rows={rowsAt(Q.rows, goesAt + 2)} bands={Q.rows.map((_, row) => ({ row, at: sameTenAt + row, color: MARK_OK }))} />
           <Note at={havingAt + 4} x={X0} y={qNotesY}>
             <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
               <Mark at={bridgeAt}>
@@ -281,16 +287,26 @@ export const RankScene: React.FC = () => {
               </Mark>
             </span>
           </Note>
-          <Note at={sameTenAt} x={X0} y={qNotesY + h(46)}>
-            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>
-              the subquery&apos;s <Num>{S.rows.length}</Num> rows, with no subquery
-            </span>
+          <Note at={inQueryAt - 2} x={X0} y={qNotesY + h(56)}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>no subquery: the filter sits in the query itself</span>
           </Note>
-          <Note at={enginesAt - 2} x={X0} y={qNotesY + h(100)}>
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>DuckDB, BigQuery, Snowflake, Databricks</span>
+          {/* Where it runs, in the column question 2's subquery leaves:
+              Postgres, which ran every other listing here, is one of the
+              engines without it. */}
+          <Note at={enginesAt - 4} x={Q3_SIDE_X} y={y(TOP) + h(4)}>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>runs in</span>
           </Note>
-          <Note at={notAt - 2} x={X0} y={qNotesY + h(140)}>
-            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>not Postgres or MySQL: keep the subquery there</span>
+          <Note at={enginesAt - 2} x={Q3_SIDE_X} y={y(TOP) + h(42)}>
+            <span style={{ ...note(25, INK), whiteSpace: "nowrap" }}>DuckDB, BigQuery, Snowflake, Databricks</span>
+          </Note>
+          <Note at={notAt - 4} x={Q3_SIDE_X} y={y(TOP) + h(126)}>
+            <span style={{ ...label(21, INK_SOFT), whiteSpace: "nowrap" }}>not in</span>
+          </Note>
+          <Note at={notAt - 2} x={Q3_SIDE_X} y={y(TOP) + h(164)}>
+            <span style={{ ...note(25, ACCENT_INK), whiteSpace: "nowrap" }}>Postgres or MySQL</span>
+          </Note>
+          <Note at={keepSubAt - 2} x={Q3_SIDE_X} y={y(TOP) + h(234)}>
+            <span style={{ ...note(23, INK_SOFT), whiteSpace: "nowrap" }}>there, keep the subquery from question 2</span>
           </Note>
         </>
       </Drift>

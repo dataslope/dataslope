@@ -344,16 +344,21 @@ const Running: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 17. Pivoting (ds-sql's traffic) ─────────────────────────────────────────
 
+/**
+ * The conditional aggregation as ds-sql ran it, then where a PIVOT clause
+ * exists: Postgres, which ran it, has none (data.ts checks it refused one),
+ * so the clause is named, not run, in the column beside the result.
+ */
 const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
-  const frame = useCurrentFrame();
   const at = c.w("r-pivot", "To pivot");
   const caseAt = c.w("r-pivot", "sum a case expression");
   const groupedAt = c.w("r-pivot", "grouped by the row");
-  const clauseAt = c.w("r-pivot", "DuckDB also has a pivot clause");
+  const clauseAt = c.w("r-pivot-clause", "also have a pivot clause");
+  const notAt = c.w("r-pivot-clause", "Postgres doesn't");
   const dynamicAt = c.w("r-pivot-dyn", "the case version takes dynamic sequel");
-  const findsAt = c.w("r-pivot-dyn", "DuckDB's pivot finds them itself");
   const P = RAPID.pivot;
   const g = geo(c, P, R_X, under(c, P.lines.length));
+  const sideX = g.right + 70;
   return (
     <>
       <Listing
@@ -370,19 +375,21 @@ const Pivot: React.FC<{ c: Ctx }> = ({ c }) => {
         ]}
       />
       <DataTable g={g} cols={colsOf(P, { mobile: { ink: BLUE_INK }, desktop: { ink: BLUE_INK } })} at={groupedAt - 2} rows={rowsAt(P.rows, groupedAt + 2)} />
-      <Note at={clauseAt} x={g.right + 50} y={g.rowTop(0) - c.h(30)}>
-        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>in DuckDB, also:</span>
-        <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: BLUE_INK, marginTop: 6, whiteSpace: "pre", fontVariantLigatures: "none" }}>
-          {RAPID.pivotClause.replace(" USING", "\nUSING")}
-        </div>
+      <Note at={clauseAt - 4} x={sideX} y={g.rowTop(0) - c.h(34)}>
+        <span style={{ ...label(20, INK_SOFT), whiteSpace: "nowrap" }}>
+          a <QMono>PIVOT</QMono> clause
+        </span>
       </Note>
-      <Note at={dynamicAt - 2} x={g.right + 50} y={g.rowTop(2) + c.h(10)}>
-        <div style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
+      <Note at={clauseAt - 2} x={sideX} y={g.rowTop(0) + c.h(4)}>
+        <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>Snowflake, SQL Server, DuckDB</span>
+      </Note>
+      <Note at={notAt - 2} x={sideX} y={g.rowTop(0) + c.h(50)}>
+        <span style={{ ...note(23, ACCENT_INK), whiteSpace: "nowrap" }}>not Postgres</span>
+      </Note>
+      <Note at={dynamicAt - 2} x={R_X} y={g.rowTop(P.rows.length) + c.h(34)}>
+        <span style={{ ...note(22, INK), whiteSpace: "nowrap" }}>
           unknown values: the <QMono>CASE</QMono> version needs dynamic SQL
-        </div>
-        <div style={{ ...note(22, INK), whiteSpace: "nowrap", marginTop: 6, opacity: ease(frame, findsAt - 2, 10) }}>
-          <QMono>PIVOT</QMono> with no <QMono>IN</QMono> list finds them itself
-        </div>
+        </span>
       </Note>
     </>
   );
@@ -525,7 +532,8 @@ const Percent: React.FC<{ c: Ctx }> = ({ c }) => {
   const ties = S.rows.flatMap((r, i) => (S.rows.filter((s) => s[v] === r[v]).length > 1 ? [i] : []));
   return (
     <>
-      <Listing lines={S.lines} x={R_X} top={c.T} width={720} size={SIZE} at={at - 6} marks={[
+      {/* Wide enough for Postgres's ::numeric casts (ROUND takes no double). */}
+      <Listing lines={S.lines} x={R_X} top={c.T} width={820} size={SIZE} at={at - 6} marks={[
         { line: lineOf(S.lines, "PERCENT_RANK"), at: at + 4, out: cumeAt },
         { line: lineOf(S.lines, "CUME_DIST"), at: cumeAt + 2 },
       ]} />
@@ -673,7 +681,7 @@ const Cross: React.FC<{ c: Ctx }> = ({ c }) => {
 
 /**
  * The quick round, questions 12 to 22, numbered on screen only, in this
- * video's own words ("one-liners"). Every answer ran in DuckDB: on the
+ * video's own words ("one-liners"). Every answer ran in Postgres: on the
  * page's tables where the page has one, and on da-sql's, da-advanced-sql's
  * and ds-sql's where this round reuses their figures. The cross join stays up
  * through the bridge into Part 2.

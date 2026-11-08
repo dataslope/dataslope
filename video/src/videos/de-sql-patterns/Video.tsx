@@ -22,7 +22,7 @@ const OVERLAP = 6;
  * Engineer interview prep videos, on the editorial page. Twenty-two of the
  * page's questions: eleven worked through on real queries, a scene or a part
  * of one each, then eleven at speed. Every statement, result and error ran in
- * DuckDB: check.mjs, results.json, data.ts, and the reused videos' own.
+ * Postgres: check.mjs, results.json, data.ts, and the reused videos' own.
  *
  * No series intro, as in the other interview series.
  *

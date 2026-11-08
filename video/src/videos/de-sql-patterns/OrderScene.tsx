@@ -44,7 +44,7 @@ const stepOf = (line: string) => STEPS.findIndex((s) => line.startsWith(s.clause
  * comes before both, so it can't see a row number or a SELECT alias; ORDER BY
  * can. Then question 5 on the same steps: the 24 orders going through WHERE
  * (11 over 100), GROUP BY (4 regions) and HAVING (2 over 400); a SUM put in
- * WHERE, and DuckDB's refusal (da-sql's WhereScene); and why row filters
+ * WHERE, and Postgres's refusal (da-sql's WhereScene); and why row filters
  * still belong in WHERE.
  */
 export const OrderScene: React.FC = () => {
@@ -70,7 +70,7 @@ export const OrderScene: React.FC = () => {
   const fourAt = n.word("where", "four regions");
   const twoAt = n.word("where", "keeps the two");
   const tryAt = n.word("where-try", "Put a sum in WHERE");
-  const refusesAt = n.word("where-try", "DuckDB refuses");
+  const refusesAt = n.word("where-try", "Postgres refuses");
   const yetAt = n.word("where-try", "doesn't exist yet");
   const earlyAt = n.word("where-early", "filter rows in WHERE");
   const fewerAt = n.word("where-early", "fewer rows to group");
@@ -99,7 +99,8 @@ export const OrderScene: React.FC = () => {
   // Question 5's refusal: the sum in WHERE, in the written query's place.
   const A = WHERE.aggregate;
   const aggH = listingHeight(A.lines.length, SIZE);
-  const notesY = y(LIST_Y) + aggH + h(150);
+  // Clear of the two-line error box above, with room to breathe.
+  const notesY = y(LIST_Y) + aggH + h(166);
 
   return (
     <AbsoluteFill>
@@ -278,7 +279,7 @@ export const OrderScene: React.FC = () => {
             <Num>{keptGroups.size}</Num> over <Num>400</Num>
           </Count>
 
-          {/* ── The sum in WHERE, and DuckDB's refusal ── */}
+          {/* ── The sum in WHERE, and Postgres's refusal ── */}
           <Listing
             lines={A.lines}
             x={X0}

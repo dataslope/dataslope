@@ -59,8 +59,8 @@ export const HookScene: React.FC = () => {
   const latestAt = n.word("hook-ask", "Which login is the latest");
   const roundAt = n.word("hook-ask", "Questions like these");
   const twentyTwoAt = n.word("plan", "twenty-two of them");
-  const elevenAt = n.word("plan", "Eleven get worked through");
-  const quickAt = n.word("plan", "The other eleven");
+  const elevenAt = n.word("plan-worked", "Eleven get worked through");
+  const quickAt = n.word("plan-quick", "The other eleven");
   const firstAt = n.word("rank-in", "numbering rows");
   const end = n.beat("rank-in").to;
 
@@ -209,7 +209,7 @@ export const HookScene: React.FC = () => {
             opacity: ease(frame, elevenAt - 2, 12) * (1 - ease(frame, firstAt + 4, 14) * 0.5),
           }}
         >
-          <b style={TABULAR}>{WORKED}</b> on real queries, in DuckDB
+          <b style={TABULAR}>{WORKED}</b> on real queries, in Postgres
         </div>
         <div
           style={{
