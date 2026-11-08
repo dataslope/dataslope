@@ -19,14 +19,18 @@ const ART_H = 150;
 /** Air between a spot's box and its step's name. At 18px the art sat on the
  *  name (the sieve's drips nearly touched "Remove stopwords"). */
 const ART_GAP = 44;
+/** A column's three lines (the step, "threw away", what it lost), all 28px
+ *  Inter at one line height, set on one even pitch. */
+const LINE_H = 28 * 1.2;
+const LINE_PITCH = 46;
 /** A column's text, from its name's top to the bottom of what it lost, in
  *  px under COL_Y: the hairlines span this. */
 const TEXT_TOP = 22 + ART_H + ART_GAP;
-const TEXT_H = 46 + 34 + 4 + 34;
+const TEXT_H = 2 * LINE_PITCH + LINE_H;
 /** "threw away" and what was lost, under the name. */
-const LOST_TOP = TEXT_TOP + 46;
-const NOTE_Y = 690;
-const NEXT_Y = 786;
+const LOST_TOP = TEXT_TOP + LINE_PITCH;
+const NOTE_Y = 746;
+const NEXT_Y = 842;
 
 /** Each step of the unit, its spot, and what it threw away, with the art's
  *  own proportions so every spot is drawn at its true shape. */
@@ -86,12 +90,12 @@ export const CloseScene: React.FC = () => {
             {i > 0 ? <ColumnRule x={x - COL_GAP / 2} top={top + TEXT_TOP} height={TEXT_H} at={colAt[i] + 4} /> : null}
             <Spot id={s.art} at={colAt[i] + 2} left={x + (COL_W - w) / 2} top={top + 22 + (h - hh) / 2} width={w} height={hh} />
             <Ink at={colAt[i] + 4} dur={14} style={{ left: x, top: top + TEXT_TOP, ...line }}>
-              <span style={{ ...label(28, INK), fontWeight: 700 }}>{s.name}</span>
+              <div style={{ ...label(28, INK), fontWeight: 700, lineHeight: 1.2 }}>{s.name}</div>
             </Ink>
             <Ink at={lostAt[i] - 2} dur={16} style={{ left: x, top: top + LOST_TOP, ...line }}>
               {/* The name's own face and size, a step lighter. */}
               <div style={{ ...label(28, INK_SOFT), fontWeight: 500, lineHeight: 1.2 }}>threw away</div>
-              <div style={{ ...label(28, ACCENT_INK), fontWeight: 500, lineHeight: 1.2, marginTop: 4 }}>{s.lost}</div>
+              <div style={{ ...label(28, ACCENT_INK), fontWeight: 500, lineHeight: 1.2, marginTop: LINE_PITCH - LINE_H }}>{s.lost}</div>
             </Ink>
           </React.Fragment>
         );
