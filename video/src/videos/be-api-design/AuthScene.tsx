@@ -52,16 +52,32 @@ const tokenLines = () => {
   return lines;
 };
 
-/** A clock face whose hand sweeps while `on`. */
+/**
+ * A clock: Lucide's `clock` icon (ISC licence) on its 24-unit grid, centred
+ * on (x, y) with its circle `r` across, and the second hand sweeping round
+ * from `at`. The stroke is held at 3px whatever the size (Lucide's absolute
+ * stroke width), so a 58px icon keeps the weight of the ink around it.
+ */
 const Clock: React.FC<{ x: number; y: number; at: number; r?: number; color?: string }> = ({ x, y, at, r = 24, color = INK }) => {
   const frame = useCurrentFrame();
   const p = ease(frame, at, 10);
-  const a = ((frame - at) / 90) * Math.PI * 2;
+  const s = r / 10; // Lucide's clock circle is r = 10 on the 24 grid
+  const turn = ((frame - at) / 90) * 360;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: p }}>
-      <circle cx={x} cy={y} r={r} fill={PAPER} stroke={color} strokeWidth={2.4} />
-      <line x1={x} y1={y} x2={x} y2={y - r * 0.6} stroke={color} strokeWidth={2.4} strokeLinecap="round" />
-      <line x1={x} y1={y} x2={x + Math.sin(a) * r * 0.78} y2={y - Math.cos(a) * r * 0.78} stroke={color} strokeWidth={2} strokeLinecap="round" />
+      <g
+        transform={`translate(${x - 12 * s} ${y - 12 * s}) scale(${s})`}
+        fill="none"
+        stroke={color}
+        strokeWidth={3 / s}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx={12} cy={12} r={10} fill={PAPER} />
+        <path d="M12 6v6" />
+        {/* Lucide's second hand (12,12 to 16,14), sweeping round its centre. */}
+        <path d="M12 12l4 2" transform={`rotate(${turn - 116.57} 12 12)`} />
+      </g>
     </svg>
   );
 };
