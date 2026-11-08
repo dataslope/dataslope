@@ -2,7 +2,7 @@
  * Renders every registered video, skipping the ones whose output is already
  * in out/ and whose inputs have not changed since it was rendered.
  *
- *   npm run render:all                         # every video, 4K → out/<id>.mp4
+ *   npm run render:all                         # every video, 4K → out/<id>-4k.mp4
  *   npm run render:all -- --fhd                # 1080p → out/<id>-fhd.mp4
  *   npm run render:all -- --hd                 # 720p → out/<id>-hd.mp4
  *   npm run render:all -- BaseRate,TfIdf       # just these (id or folder)
@@ -105,7 +105,7 @@ if (!X264_PRESETS.includes(x264Preset)) {
 // (1280x720 exactly). Each size has its own file, and its own record in the
 // manifest, so rendering one never marks another up to date.
 const SCALE = hd ? 2 / 3 : fhd ? 1 : 2;
-const SUFFIX = hd ? "-hd" : fhd ? "-fhd" : "";
+const SUFFIX = hd ? "-hd" : fhd ? "-fhd" : "-4k";
 const SETTINGS = { scale: SCALE, codec: "h264", imageFormat: "jpeg", jpegQuality: 92 };
 const outputOf = (id) => path.join(OUT, `${id}${SUFFIX}.mp4`);
 
