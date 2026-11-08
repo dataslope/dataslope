@@ -175,16 +175,15 @@ export const ChunkScene: React.FC = () => {
         ))}
         <Caption i={2} at={sizeAt - 2}>
           {CHUNK.low} to {CHUNK.high} tokens
-          <span style={{ opacity: ease(frame, overlapAt - 2, 10) }}>
-            , {pct(CHUNK.overlapLow)} to {pct(CHUNK.overlapHigh)} shared
-          </span>
           <br />
-          <span style={{ color: INK_SOFT, fontSize: 24 }}>
-            400 tokens ≈ {num(Math.round(CHUNK.chars400 / 100) * 100)} characters of prose
+          <span style={{ color: INK_SOFT }}>(400 ≈ {num(Math.round(CHUNK.chars400 / 100) * 100)} characters)</span>
+          <br />
+          <span style={{ opacity: ease(frame, overlapAt - 2, 10) }}>
+            {pct(CHUNK.overlapLow)} to {pct(CHUNK.overlapHigh)} shared
           </span>
           <br />
           <span style={{ opacity: ease(frame, wholeAt - 2, 10) }}>
-            <Mark at={wholeAt + 4}>a cut sentence stays whole</Mark>
+            <Mark at={wholeAt + 4}>cut sentences stay whole</Mark>
           </span>
         </Caption>
 
@@ -228,7 +227,7 @@ export const ChunkScene: React.FC = () => {
         </Caption>
 
         {/* No universal best. */}
-        <Note at={bestAt} x={X0} y={y(820)}>
+        <Note at={bestAt} x={X0} y={y(845)}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             no universal best:{" "}
             <span style={{ opacity: ease(frame, recallAt - 2, 10), color: OK_INK, fontWeight: 500 }}>
@@ -238,10 +237,10 @@ export const ChunkScene: React.FC = () => {
             </span>
           </span>
         </Note>
-        <Note at={recallAt + 14} x={X0 + 880} y={y(820) + 5}>
+        <Note at={recallAt + 14} x={X0 + 900} y={y(845) + 5}>
           <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>recall: the share of the right passages it finds</span>
         </Note>
-        <Note at={storeAt - 2} x={X0} y={y(820) + 46}>
+        <Note at={storeAt - 2} x={X0} y={y(845) + 50}>
           <span style={{ ...note(28, INK), whiteSpace: "nowrap" }}>
             and store the chunk settings with the index version
             <span style={{ opacity: ease(frame, rebuildAt - 2, 10), color: INK_SOFT }}>: a change means a rebuild</span>

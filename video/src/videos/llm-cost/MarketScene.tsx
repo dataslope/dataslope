@@ -30,20 +30,21 @@ import {
 const HEAD_Y = 346;
 const ROW_Y0 = 392;
 const ROW_DY = 48;
-const IN_R = 640;
-const OUT_R = 790;
-const RATIO_R = 890;
+const IN_R = 580;
+const OUT_R = 730;
+const RATIO_R = 830;
 /** The house badge (orange, the output hue) on the ratios over five, and its side padding. */
 const RATIO_BADGE = badgeStyle("orange", 24);
 const RATIO_PAD = Math.round(24 * 0.55);
-const BAR_X = 930;
+const BAR_X = 870;
 const PX_PER_DOLLAR = 30;
-const TABLE_R = 1236;
-// The sidebar, then Fig. 6.
-const SIDE_X = 1310;
-const F6_X = 1300;
+const TABLE_R = 1176;
+// The sidebar, then Fig. 6. Fig. 5's numbers sit close enough to its names
+// that Fig. 6 has room for "Gemini 3.1 Pro (preview)" beside its thresholds.
+const SIDE_X = 1250;
+const F6_X = 1240;
 const F6_R = 1800;
-const F6_THRESH_R = 1644;
+const F6_THRESH_R = 1656;
 const F6_IN_R = 1726;
 const AXIS_Y = 672;
 

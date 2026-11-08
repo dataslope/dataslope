@@ -61,7 +61,7 @@ export const ShareScene: React.FC = () => {
       <Ink at={start - 2} dur={14} style={{ left: 124, top: y(112) }}>
         <span style={label(24, ACCENT_INK)}>Transform, then divide</span>
       </Ink>
-      <div style={{ position: "absolute", left: 118, top: y(146), display: "flex", gap: "0.26em", ...headline(66) }}>
+      <div style={{ position: "absolute", left: 118, top: y(150), display: "flex", gap: "0.26em", ...headline(66) }}>
         <Ink at={start + 2} dur={20} style={{ position: "relative", whiteSpace: "nowrap" }}>
           Salary over group total
         </Ink>

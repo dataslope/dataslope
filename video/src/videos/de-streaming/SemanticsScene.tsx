@@ -204,7 +204,7 @@ export const SemanticsScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, thenCommitAt, 10) * (1 - ease(frame, againAt + 30, 8)) }}>
           <line x1={after(9)} x2={after(9)} y1={cellsTop(1) - 8} y2={cellsTop(1) + CELL_H + 8} stroke={BAR} strokeWidth={3} strokeDasharray="5 5" />
         </svg>
-        <Note at={figAt + 14} x={after(4) - 60} y={cellsTop(2) + CELL_H + h(14)} out={twiceAt + 30}>
+        <Note at={figAt + 14} x={after(4) - 60} y={cellsTop(2) + CELL_H + h(20)} out={twiceAt + 30}>
           <span style={{ ...label(24, BLUE_INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             <Bar color={BAR} />
             commit
@@ -215,7 +215,8 @@ export const SemanticsScene: React.FC = () => {
         <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, overflow: "visible", opacity: ease(frame, crashAt, 10) }}>
           <line x1={crashX} x2={crashX} y1={rowTop(0) + h(4)} y2={cellsTop(2) + CELL_H + h(4)} stroke={ACCENT} strokeWidth={3} strokeDasharray="7 6" />
         </svg>
-        <Note at={crashAt + 2} x={crashX + 10} y={rowTop(0) - h(40)}>
+        {/* At the foot of the line, clear of the batch's label above. */}
+        <Note at={crashAt + 2} x={crashX + 10} y={cellsTop(2) + CELL_H + h(20)} out={modelAt - 4}>
           <span style={{ ...label(24, ACCENT_INK), fontWeight: 500, whiteSpace: "nowrap" }}>✕ crash after 7</span>
         </Note>
 

@@ -70,7 +70,7 @@ export const ScoreScene: React.FC = () => {
   // "A gap of one point one": between the ends of dog's and cat's score bars.
   const gapX = [ZERO + LOGITS[1] * UNIT, ZERO + LOGITS[0] * UNIT] as const;
   const gapY = rowMid(0) - h(BAR_H) / 2 - 12;
-  const drawY = y(806);
+  const drawY = y(824);
 
   return (
     <AbsoluteFill>
@@ -136,7 +136,8 @@ export const ScoreScene: React.FC = () => {
       <Note at={scoreAt + 6} x={ZERO} y={bottom + 8} from="up" style={{ transform: "translateX(-50%)" }}>
         <span style={note(24, INK_SOFT)}>0</span>
       </Note>
-      <Note at={scoreAt + 18} x={160} y={bottom + 24}>
+      {/* Below the zero line's own label, not beside it. */}
+      <Note at={scoreAt + 18} x={160} y={bottom + 46}>
         <span style={note(24, INK_SOFT)}>…and every other token in the vocabulary</span>
       </Note>
 

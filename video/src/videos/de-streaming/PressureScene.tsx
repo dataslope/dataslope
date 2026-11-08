@@ -88,7 +88,8 @@ export const PressureScene: React.FC = () => {
   const bottom = lane(last);
 
   // The chart: lag, second by second, summed over the two partitions.
-  const sx: Scale = { lo: 0, hi: 100, a: 400, b: 1400 };
+  /** Starts well right of the lanes, so the model notes keep clear of the y ticks. */
+  const sx: Scale = { lo: 0, hi: 100, a: 500, b: 1400 };
   const sy: Scale = { lo: 0, hi: 1200, a: y(830), b: y(610) };
   const lag = BACKPRESSURE.lagTwoPartitions;
   const drawn = (until: number) =>

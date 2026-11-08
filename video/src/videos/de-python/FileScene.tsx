@@ -112,7 +112,7 @@ export const FileScene: React.FC = () => {
   // ── Question 4 ──
   const C = FILE.chunks.lines;
   const cH = listingHeight(C.length, SIZE);
-  const chunkH = h(30);
+  const chunkH = h(34);
   const chunkTop = rTop + h(6);
   // Each chunk in turn is grouped and folded, one every 8 frames.
   const foldK = frame < foldAt ? -1 : Math.min(FILE.nChunks - 1, Math.floor((frame - foldAt) / 8));
@@ -302,8 +302,8 @@ export const FileScene: React.FC = () => {
                 position: "absolute",
                 left: CHUNK_X,
                 top: chunkTop + i * chunkH,
-                width: 150,
-                height: chunkH - 5,
+                width: 184,
+                height: chunkH - 6,
                 borderRadius: 3,
                 background: lit ? OK : done ? `color-mix(in srgb, ${BAR} 30%, ${PAPER})` : BAR,
                 opacity: p,
@@ -312,6 +312,8 @@ export const FileScene: React.FC = () => {
                 justifyContent: "center",
                 ...note(24, lit ? PAPER : done ? BLUE_INK : PAPER),
                 fontWeight: 500,
+                lineHeight: 1,
+                whiteSpace: "nowrap",
               }}
             >
               100,000 rows
