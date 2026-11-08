@@ -88,9 +88,17 @@ export const IdfScene: React.FC = () => {
   const RX = 1010;
   const BAR_X = 1010;
   const UNIT = 88;
-  const QUERY_Y = y(332);
-  const ROW_A = y(398);
-  const ROW_B = ROW_A + 206;
+  // Level with the figure's title on the left, so the column has room below.
+  const QUERY_Y = y(292);
+  // Each row's lines, from its name's top: the documents line, the flat
+  // 1-point bar, her weight's bar (and its number), and the formula under it,
+  // with air between each, and more between the two rows.
+  const R = { docs: 40, flat: 82, weight: 122, weightNum: 114, formula: 170 } as const;
+  const ROW_A = y(364);
+  const ROW_B = ROW_A + 234;
+  // The closing lines, clear of the second row's formula.
+  const CLOSE_Y = y(838);
+  const CLOSE2_Y = y(890);
   const commonW = IDF.common.weight * ease(frame, weighsTwoAt - 2, 18);
   const rareW = IDF.rare.weight * ease(frame, sevenAt - 2, 24);
   // The flat score, one point a match, steps back once her weights arrive.
@@ -119,20 +127,20 @@ export const IdfScene: React.FC = () => {
             a match on <span style={{ color: inkColor }}>{name}</span>
           </div>
         </Ink>
-        <Ink at={docsAt} style={{ left: RX, top: top + 38, whiteSpace: "nowrap" }}>
+        <Ink at={docsAt} style={{ left: RX, top: top + R.docs, whiteSpace: "nowrap" }}>
           <div style={{ ...label(22, INK_SOFT), fontWeight: 560 }}>{docs}</div>
         </Ink>
         {/* One point a match: the flat score, before her weights. */}
-        <div style={{ position: "absolute", left: BAR_X, top: top + 74, width: UNIT * bar, height: 26, borderRadius: 4, background: color, opacity: bar > 0 ? before : 0 }} />
-        <Ink at={at + 6} style={{ left: BAR_X + UNIT + 16, top: top + 70, whiteSpace: "nowrap", opacity: before }}>
+        <div style={{ position: "absolute", left: BAR_X, top: top + R.flat, width: UNIT * bar, height: 26, borderRadius: 4, background: color, opacity: bar > 0 ? before : 0 }} />
+        <Ink at={at + 6} style={{ left: BAR_X + UNIT + 16, top: top + R.flat - 4, whiteSpace: "nowrap", opacity: before }}>
           <span style={{ ...note(24, INK), ...TABULAR, fontWeight: 600 }}>1 point</span>
         </Ink>
         {/* Her weight, as a bar of its own under it. */}
-        <div style={{ position: "absolute", left: BAR_X, top: top + 110, width: UNIT * w, height: 34, borderRadius: 5, background: color, opacity: w > 0 ? 1 : 0 }} />
-        <Ink at={weightAt} style={{ left: BAR_X + UNIT * ex.weight + 18, top: top + 102, whiteSpace: "nowrap" }}>
+        <div style={{ position: "absolute", left: BAR_X, top: top + R.weight, width: UNIT * w, height: 34, borderRadius: 5, background: color, opacity: w > 0 ? 1 : 0 }} />
+        <Ink at={weightAt} style={{ left: BAR_X + UNIT * ex.weight + 18, top: top + R.weightNum, whiteSpace: "nowrap" }}>
           <span style={{ ...headline(44), ...TABULAR, color: INK }}>{ex.weight}</span>
         </Ink>
-        <Ink at={weightAt + 12} style={{ left: BAR_X, top: top + 152, whiteSpace: "nowrap" }}>
+        <Ink at={weightAt + 12} style={{ left: BAR_X, top: top + R.formula, whiteSpace: "nowrap" }}>
           <span style={{ ...note(22, INK_SOFT) }}>
             her weight, about log<sub style={{ fontSize: "0.7em" }}>2</sub>({IDF.N} ÷ {ex.docs}) + 1 ={" "}
             <span style={TABULAR}>{fmt(ex.log2, 2)}</span>
@@ -259,11 +267,11 @@ export const IdfScene: React.FC = () => {
           </>,
           threeAt - 2,
         )}
-        <Ink at={muchAt} out={fewerAt - 6} style={{ left: RX, top: y(800), whiteSpace: "nowrap" }}>
+        <Ink at={muchAt} out={fewerAt - 6} style={{ left: RX, top: CLOSE_Y, whiteSpace: "nowrap" }}>
           <div style={{ ...headline(36, true), color: ACCENT_INK }}>one match, one point, either way</div>
         </Ink>
       </div>
-      <div style={{ position: "absolute", left: RX, top: y(800), display: "flex", gap: "0.3em", ...headline(36, true), whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", left: RX, top: CLOSE_Y, display: "flex", gap: "0.3em", ...headline(36, true), whiteSpace: "nowrap" }}>
         <Ink at={inverseAt - 2} style={{ position: "relative", color: INK }}>
           <Mark at={inverseAt + 4}>inverse document frequency</Mark>,
         </Ink>
@@ -271,7 +279,7 @@ export const IdfScene: React.FC = () => {
           the IDF in TF-IDF
         </Ink>
       </div>
-      <Ink at={searchEnginesAt} style={{ left: RX, top: y(860), whiteSpace: "nowrap" }}>
+      <Ink at={searchEnginesAt} style={{ left: RX, top: CLOSE2_Y, whiteSpace: "nowrap" }}>
         <div style={{ ...label(23, INK_SOFT) }}>
           still weighting search results, <Mark at={todayAt}>half a century on</Mark>
         </div>
