@@ -6,7 +6,7 @@ import results from "./results.json" with { type: "json" };
 // charts/circuit-breaker-states.mjs), rerun with their seeds and checked
 // against the captions they export; the retry schedule and the backfill's
 // partitions ran in Pyodide 314.0.7, and the quality gate and the freshness
-// check in DuckDB-Wasm. Pure (no Remotion, no DOM).
+// check in Postgres (PGlite). Pure (no Remotion, no DOM).
 
 export const VIDEO = "de-orchestration";
 

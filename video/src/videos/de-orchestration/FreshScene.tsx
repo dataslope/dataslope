@@ -26,7 +26,7 @@ const hoursOf = (t: string) => (Number(t.slice(8, 10)) - 1) * 24 + Number(t.slic
 /**
  * Question 10. Freshness, and the check the page describes: the newest
  * updated_at against now, with an alert past a threshold (here 12 hours, the
- * video's own). Run in DuckDB on the video's own daily_orders (check.mjs): at
+ * video's own). Run in Postgres on the video's own daily_orders (check.mjs): at
  * 06:00 on June 3 the newest order is 23:58 the night before, 6 h 2 min old;
  * June 3's source sent nothing, so at 06:00 on June 4 it is 30 h 2 min old,
  * though every task succeeded. Then what catches it: the freshness check, and

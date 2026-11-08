@@ -22,9 +22,9 @@ const PUBLISH_I = 4;
  * Question 7. The checks the page lists, named as they are read; then where
  * they go: a gate task between load and publish. Load writes to a staging
  * table no consumer reads, and publish swaps it in only on a pass: write,
- * audit, publish. Run here on the video's own batch of 1,000 orders in DuckDB
- * (check.mjs): four percent of its customer IDs are null against a limit of
- * one percent, so the gate fails and publish never runs.
+ * audit, publish. Run here on the video's own batch of 1,000 orders in
+ * Postgres (check.mjs): four percent of its customer IDs are null against a
+ * limit of one percent, so the gate fails and publish never runs.
  */
 export const GateScene: React.FC = () => {
   const frame = useCurrentFrame();
