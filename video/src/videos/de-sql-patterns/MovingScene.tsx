@@ -167,7 +167,7 @@ export const MovingScene: React.FC = () => {
               ...missing.map((index, k) => ({ index, at: missingAt + 2 + k * 2, out: thirteenthAt, color: MARK })),
               { index: last, at: thirteenthAt + 2, out: q8At, color: MARK },
               ...missing.map((index, k) => ({ index, at: gapsAt + k * 2, out: zerosAt + 4, color: MARK })),
-              ...missing.map((index, k) => ({ index, at: zerosAt + 4 + k * 3, out: bridgeAt, color: MARK_OK })),
+              ...missing.map((index, k) => ({ index, at: zerosAt + 4 + k * 3, out: bridgeAt, color: MARK_OK, edge: OK })),
             ]}
             spans={[
               {

@@ -131,7 +131,9 @@ export type StripDay = {
 /** Text that replaces a cell's own on a cue: a missing day's null, then 0. */
 export type StripFill = { index: number; at: number; text: string; color: string; italic?: boolean };
 /** A tint over a cell, on a cue (MARK, MARK_BAD, MARK_OK). */
-export type StripMark = { index: number; at: number; out?: number; color: string };
+/** A tint on one cell. `edge` turns the cell's border to that color while
+ *  the tint is on (a green fill takes a green border, not the strip's blue). */
+export type StripMark = { index: number; at: number; out?: number; color: string; edge?: string };
 /** A span of days, drawn as a bracket under the strip with its label below. */
 export type StripSpan = { from: number; to: number; at: number; out?: number; color: string; ink?: string; label: React.ReactNode };
 
@@ -188,7 +190,12 @@ export const DayStrip: React.FC<{
         const fill = [...fills].filter((f) => f.index === i && frame >= f.at).pop();
         const fillP = fill ? ease(frame, fill.at, 10) : 0;
         const filled = d.present ? 1 : solid;
-        const tints = marks.filter((m) => m.index === i);
+        const tints = marks
+          .filter((m) => m.index === i)
+          .map((m) => ({ m, w: ease(frame, m.at, 12) * (m.out === undefined ? 1 : 1 - ease(frame, m.out, 10)) }));
+        const baseEdge = d.present || solid > 0.5 ? BAR : INK_SOFT;
+        const edged = tints.filter((t) => t.m.edge && t.w > 0).pop();
+        const edge = edged ? `color-mix(in srgb, ${edged.m.edge} ${Math.round(edged.w * 100)}%, ${baseEdge})` : baseEdge;
         return (
           <React.Fragment key={d.date}>
             <div
@@ -200,17 +207,16 @@ export const DayStrip: React.FC<{
                 height: g.cellH,
                 boxSizing: "border-box",
                 borderRadius: 8,
-                border: `2.5px ${d.present || solid > 0.5 ? "solid" : "dashed"} ${d.present || solid > 0.5 ? BAR : INK_SOFT}`,
+                border: `2.5px ${d.present || solid > 0.5 ? "solid" : "dashed"} ${edge}`,
                 background: `color-mix(in srgb, ${BAR} ${18 * filled}%, ${PAPER})`,
                 opacity: p,
                 transform: `scale(${0.85 + 0.15 * p})`,
                 overflow: "hidden",
               }}
             >
-              {tints.map((m, k) => {
-                const w = ease(frame, m.at, 12) * (m.out === undefined ? 1 : 1 - ease(frame, m.out, 10));
-                return w > 0 ? <div key={k} style={{ position: "absolute", inset: 0, background: m.color, opacity: w }} /> : null;
-              })}
+              {tints.map(({ m, w }, k) =>
+                w > 0 ? <div key={k} style={{ position: "absolute", inset: 0, background: m.color, opacity: w }} /> : null,
+              )}
               {d.value !== undefined && !fill ? <CellText text={d.value} size={valueSize} color={INK} /> : null}
               {fill ? (
                 <div style={{ position: "absolute", inset: 0, opacity: fillP }}>
