@@ -34,13 +34,13 @@ const head = (t: { cols: string[]; rows: string[][] }, k: number) => ({ cols: t.
 /**
  * The item ends on both: the HAVING query and its four groups stay up, and
  * the COUNT-in-WHERE version is printed under them, its WHERE marked red as
- * DuckDB refuses it.
+ * Postgres refuses it, with Postgres's own error.
  */
 const Having: React.FC<{ c: Ctx }> = ({ c }) => {
   const at = c.w("r-having", "Where filters rows");
   const groupsAt = c.w("r-having", "having filters groups after");
-  const countAt = c.w("r-having", "Put count in where");
-  const noAt = c.w("r-having", "DuckDB refuses");
+  const countAt = c.w("r-having-refused", "Put count in where");
+  const noAt = c.w("r-having-refused", "Postgres refuses");
   const H = RAPID.having;
   const e = RAPID.inWhere;
   const g = geo(c, H, R_X + 764, c.T);
@@ -374,7 +374,7 @@ const Count: React.FC<{ c: Ctx }> = ({ c }) => {
 
 /**
  * The quick round, questions 7 to 15, numbered on screen only, in this
- * video's own words ("back to back"); every answer ran in DuckDB, on the
+ * video's own words ("back to back"); every answer ran in Postgres, on the
  * page's tables where the page has one.
  */
 export const RapidScene: React.FC = () => {

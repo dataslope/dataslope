@@ -27,30 +27,32 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *
  * No series intro yet: the first scene opens at frame 0.
  *
- * Facts. Every statement on screen ran in DuckDB v1.4.3 (DuckDB-Wasm 1.32.0,
- * the engine the page's blocks run), by check.mjs into results.json, which
- * data.ts reads; the one Postgres figure ran on the site's Postgres 18 engine
- * (scripts/lib/sql-engines.mjs):
+ * Facts. Every statement on screen ran in Postgres (PGlite, PostgreSQL 18,
+ * the engine the page's blocks run), from a fresh database per figure, by
+ * check.mjs into results.json, which data.ts reads; every error is
+ * Postgres's own text:
  *   - "join", the video's own months: six users active in January, three of
  *     them (2, 3, 5) back in February plus a new 7. INNER JOIN keeps three
- *     rows and counts retention 1.0; LEFT JOIN keeps six and counts 0.5. The
+ *     rows and counts retention 1.00; LEFT JOIN keeps six and counts 0.50. The
  *     page's churn query returns 1, 4 and 6, and NOT EXISTS the same three.
  *   - "rate", the page's funnel: four of 24 variants have no sessions. In
- *     Postgres the bare division fails ("division by zero") and 120 / 1000
- *     is 0; with * 1.0 and NULLIF, A is 0.1200 and C and F null, shown where
- *     the error was. DuckDB's bare division already returns null for C and F
- *     (and 0.12 for 120 / 1000), which the narration says, so NULLIF is the
- *     portable habit rather than DuckDB's need.
+ *     Postgres the bare division fails ("ERROR: division by zero") and
+ *     120 / 1000 is 0; with * 1.0 and NULLIF, A is 0.1200 and C and F null,
+ *     shown where the error was.
  *   - "cohort", the video's own activity log, labelled as such: 46 events
- *     from 23 users. The page's query gives January's cohort 8, 6, 4 and 3
- *     users; as shares of month zero, 100, 75, 50 and 38 percent.
+ *     from 23 users. The page's query (its month offset built from the year
+ *     and month parts, since Postgres has no month-difference function)
+ *     gives January's cohort 8, 6, 4 and 3 users; as shares of month zero,
+ *     100, 75, 50 and 38 percent.
  *   - "session", the page's hits: user 1's six hits have gaps of 10, 15, 95,
  *     15 and 205 minutes, so three sessions; the five users' 24 hits make 12.
  *   - "pct", the video's own twelve latencies, labelled as such: mean 407.1
- *     ms, faster than it are 10 of 12; PERCENTILE_CONT(0.5) 165 and
- *     PERCENTILE_DISC(0.5) 150; the p90 836 (CONT) and 900 (DISC).
- *   - at speed: the page's HAVING query's four region groups, and DuckDB's
- *     own error for COUNT(*) in WHERE; the page's 24 sales in four region
+ *     ms, faster than it are 10 of 12; PERCENTILE_CONT(0.5) 165.0 and
+ *     PERCENTILE_DISC(0.5) 150; the p90 836.0 (CONT) and 900 (DISC). CONT
+ *     is cast to numeric to round it, as Postgres's ROUND(x, 1) wants.
+ *   - at speed: the page's HAVING query's four region groups, and
+ *     Postgres's own error for COUNT(*) in WHERE ("aggregate functions are
+ *     not allowed in WHERE"); the page's 24 sales in four region
  *     totals; the video's own four scores for the tie (1, 2, 2, 4 and 1, 2,
  *     2, 3, the page's own example numbers); the page's transactions (change
  *     150 on January 2; running total 100, 350, 425, 605), and the same
@@ -124,9 +126,19 @@ export const script: NarrationScript = {
       text: "Question three. How do you compute a rate without dividing by zero? Four variants in the page's funnel had no sessions at all. In Postgres, dividing by that zero is an error, and the whole query fails.",
       pauseAfter: 0.6,
     },
+    // Split at its sentence breaks when the video moved to Postgres: the
+    // sentence between these two said DuckDB returns null without NULLIF,
+    // which the page, now on Postgres, no longer shows. Both are cut from
+    // the kept take.
     {
       id: "rate-nullif",
-      text: "Wrap the denominator in null if. It turns a zero into a null, so variant C gets a null rate: an honest blank. DuckDB returns null there anyway, but the habit keeps the query safe on every engine. And don't patch it with coalesce to zero. No sessions means no rate, not a rate of zero.",
+      text: "Wrap the denominator in null if. It turns a zero into a null, so variant C gets a null rate: an honest blank.",
+      // Time for C's and F's nulls to be marked before the COALESCE note.
+      pauseAfter: 0.6,
+    },
+    {
+      id: "rate-coalesce",
+      text: "And don't patch it with coalesce to zero. No sessions means no rate, not a rate of zero.",
       pauseAfter: 0.7,
     },
     {
@@ -207,10 +219,8 @@ export const script: NarrationScript = {
       text: "The remaining nine are everyday patterns. Here they are, back to back.",
       pauseAfter: 0.6,
     },
-    {
-      id: "r-having",
-      text: "Where filters rows before grouping, and having filters groups after. Put count in where, and DuckDB refuses: the aggregate doesn't exist yet.",
-    },
+    { id: "r-having", text: "Where filters rows before grouping, and having filters groups after." },
+    { id: "r-having-refused", text: "Put count in where, and Postgres refuses: the aggregate doesn't exist yet." },
     {
       id: "r-window",
       text: "Group by turns twenty-four sales into four region totals. A window function keeps all twenty-four rows and writes the total beside each one.",

@@ -17,7 +17,10 @@ const AX_X1 = 1700;
 const STRIP_Y = 440;
 const SQL_TOP = 590;
 const SIZE = 19;
-const RES_X = 1080;
+/** The listings are as wide as their longest line: PERCENTILE_CONT cast to
+ *  numeric so Postgres's ROUND(x, 1) takes it, 84 characters at 19px. */
+const SQL_W = 1000;
+const RES_X = 1230;
 
 const px = (ms: number) => AX_X0 + ((Math.log(ms) - Math.log(LO)) / (Math.log(HI) - Math.log(LO))) * (AX_X1 - AX_X0);
 
@@ -196,7 +199,7 @@ export const PctScene: React.FC = () => {
         </svg>
 
         {/* ── The two medians, then the two p90s ── */}
-        <Listing lines={M.lines} x={X0} top={resTop} width={900} size={SIZE} at={contAt - 4} out={whyAt} marks={[{ line: 1, at: contAt + 6 }, { line: 2, at: discAt + 4, color: MARK_OK }]} />
+        <Listing lines={M.lines} x={X0} top={resTop} width={SQL_W} size={SIZE} at={contAt - 4} out={whyAt} marks={[{ line: 1, at: contAt + 6 }, { line: 2, at: discAt + 4, color: MARK_OK }]} />
         <DataTable
           g={mg}
           cols={colsOf(M, { median_cont: { ink: BLUE_INK }, median_disc: { ink: BLUE_INK, at: discAt + 2 } })}
@@ -205,7 +208,7 @@ export const PctScene: React.FC = () => {
           rows={rowsAt(M.rows, medAt)}
           marks={[{ row: 0, col: 1, at: fiftyAt, color: MARK_OK }]}
         />
-        <Listing lines={P.lines} x={X0} top={resTop} width={900} size={SIZE} at={whyAt + 4} marks={[{ line: 1, at: p90At }]} />
+        <Listing lines={P.lines} x={X0} top={resTop} width={SQL_W} size={SIZE} at={whyAt + 4} marks={[{ line: 1, at: p90At }]} />
         <DataTable g={pg} cols={colsOf(P, { p90_cont: { ink: BLUE_INK }, p90_disc: { ink: BLUE_INK } })} at={p90At - 2} rows={rowsAt(P.rows, p90At + 2)} />
         <div
           style={{
