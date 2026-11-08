@@ -1,10 +1,10 @@
 import results from "./results.json" with { type: "json" };
 
 // Every table, statement and number the video shows, read from results.json:
-// what DuckDB v1.4.3 (DuckDB-Wasm 1.32.0, the engine the page's blocks run)
-// returned for the statements in check.mjs, which wrote it. The SQL printed
-// on screen is the SQL in that file, so a listing cannot drift from what ran.
-// Pure (no Remotion, no DOM).
+// what Postgres (PGlite, the engine the page's blocks run) returned for the
+// statements in check.mjs, which wrote it. The SQL printed on screen is the
+// SQL in that file, so a listing cannot drift from what ran. Pure (no
+// Remotion, no DOM).
 
 export const VIDEO = "da-ai-assisted";
 
@@ -81,4 +81,6 @@ export const NULLS = {
 /** The track's question bank, counted by check.mjs. */
 export const BANK = results.bank as number;
 
-export const RUNTIME = `DuckDB ${FIGURES.boundary.version}`;
+/** The engine and version the figures ran on ("PostgreSQL 18.3 (PGlite
+ *  0.5.8)"), for reference: no version goes on screen. */
+export const RUNTIME = FIGURES.boundary.version;

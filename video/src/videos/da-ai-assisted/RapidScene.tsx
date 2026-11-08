@@ -20,7 +20,7 @@ type Ctx = { w: (beat: string, phrase: string) => number; y: Layout["y"]; h: Lay
 
 /** The page's own prompt, line for line. */
 const PROMPT = [
-  "Dialect: DuckDB.",
+  "Dialect: PostgreSQL.",
   "Tables: orders(order_id, customer_id, order_ts TIMESTAMP, amount, status)",
   "        customers(customer_id, signup_date, is_test BOOLEAN)",
   "Grain: one row per order in orders.",

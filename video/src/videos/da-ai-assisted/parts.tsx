@@ -10,7 +10,7 @@ import { ILLUSTRATIONS, VIDEO } from "./data";
 /**
  * Pieces this video needs beyond the shared editorial kit and the interview
  * kit (editorial/interview.tsx), as in Part 4 (da-advanced-sql/parts.tsx):
- * the SQL listing, DuckDB's tables and the page furniture are Part 1's
+ * the SQL listing, the result tables and the page furniture are Part 1's
  * (da-sql/parts.tsx), so the series stays one family. What is local is the
  * columns and geometry helpers for a result, a plain-text panel (a prompt, a
  * report sentence), and the spot illustration bound to this video.

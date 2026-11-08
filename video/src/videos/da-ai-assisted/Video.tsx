@@ -20,7 +20,7 @@ const OVERLAP = 6;
  * interview prep videos, on the editorial page. Nine questions of the track's
  * AI-assisted analysis page: six in full, a scene or a part of one each, then
  * three short ones and the series' closing line. Every query and result ran
- * in DuckDB (check.mjs, results.json, data.ts).
+ * in Postgres (check.mjs, results.json, data.ts).
  *
  * No series intro yet, as in Parts 1 to 7 (see da-sql/Video.tsx for how it
  * goes in).
