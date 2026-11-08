@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { useLayout } from "../../editorial/layout";
-import { ACCENT_INK, body, INK, INK_SOFT, label, note } from "../../editorial/style";
+import { ACCENT_INK, body, INK, INK_SOFT, label } from "../../editorial/style";
 import { ColumnRule, FigLabel, Ink, NextLine } from "../../editorial/ui";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
@@ -10,8 +10,8 @@ import { Headline, Kicker, Spot, X0 } from "./parts";
 const FIG_Y = 300;
 /** Four columns across the page, each centred under its spot, with a
  *  hairline centred in each 40px gap: the widest line ("the capitals and
- *  punctuation", 372px) keeps 29px from it. The rules that capped each
- *  column are gone. */
+ *  punctuation", about 380px in 28px Inter) keeps about 25px from it. The
+ *  rules that capped each column are gone. */
 const COL_Y = 346;
 const COL_W = 390;
 const COL_GAP = 40;
@@ -22,7 +22,7 @@ const ART_GAP = 44;
 /** A column's text, from its name's top to the bottom of what it lost, in
  *  px under COL_Y: the hairlines span this. */
 const TEXT_TOP = 22 + ART_H + ART_GAP;
-const TEXT_H = 46 + 27 + 4 + 38;
+const TEXT_H = 46 + 34 + 4 + 34;
 /** "threw away" and what was lost, under the name. */
 const LOST_TOP = TEXT_TOP + 46;
 const NOTE_Y = 690;
@@ -89,8 +89,9 @@ export const CloseScene: React.FC = () => {
               <span style={{ ...label(28, INK), fontWeight: 700 }}>{s.name}</span>
             </Ink>
             <Ink at={lostAt[i] - 2} dur={16} style={{ left: x, top: top + LOST_TOP, ...line }}>
-              <div style={note(21, INK_SOFT)}>threw away</div>
-              <div style={{ ...body(26), color: ACCENT_INK, marginTop: 4 }}>{s.lost}</div>
+              {/* The name's own face and size, a step lighter. */}
+              <div style={{ ...label(28, INK_SOFT), fontWeight: 500, lineHeight: 1.2 }}>threw away</div>
+              <div style={{ ...label(28, ACCENT_INK), fontWeight: 500, lineHeight: 1.2, marginTop: 4 }}>{s.lost}</div>
             </Ink>
           </React.Fragment>
         );
