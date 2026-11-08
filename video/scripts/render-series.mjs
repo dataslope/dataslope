@@ -8,6 +8,7 @@
  *   npm run render:series -- DataEngineer --units 0-2 # a stretch of one, to preview
  *   npm run render:series -- Statistics --dry-run     # list the pieces, render nothing
  *   npm run render:series -- Statistics --no-render   # stitch what is in out/ as it is
+ *   npm run render:series -- Statistics --concurrency 12   # passed on to render-all, as is --x264-preset
  *
  * It first runs render-all on exactly the pieces it needs, so a piece is
  * rendered only when it is missing or its inputs changed since its last
@@ -49,10 +50,14 @@ const value = (name) => {
   return i >= 0 ? args[i + 1] : undefined;
 };
 const fhd = flag("--fhd");
+/** Passed on to render-all for the pieces it renders. */
+const passOn = ["--concurrency", "--x264-preset"].flatMap((f) => (value(f) === undefined ? [] : [f, value(f)]));
 const dryRun = flag("--dry-run");
 const noRender = flag("--no-render");
 const unitsArg = value("--units");
-const names = flag("--all") ? Object.keys(SERIES) : args.filter((a, i) => !a.startsWith("--") && args[i - 1] !== "--units");
+const names = flag("--all")
+  ? Object.keys(SERIES)
+  : args.filter((a, i) => !a.startsWith("--") && !["--units", "--concurrency", "--x264-preset"].includes(args[i - 1]));
 
 if (names.length === 0) {
   console.error(`Name a series, or pass --all. Series: ${Object.keys(SERIES).join(", ")}`);
@@ -135,7 +140,7 @@ for (const name of names) {
 
   // Render whatever is missing or stale, and nothing else.
   if (!noRender) {
-    const r = spawnSync(process.execPath, [path.join(VIDEO_ROOT, "scripts", "render-all.mjs"), ...(fhd ? ["--fhd"] : []), pieces.map((p) => p.id).join(",")], {
+    const r = spawnSync(process.execPath, [path.join(VIDEO_ROOT, "scripts", "render-all.mjs"), ...(fhd ? ["--fhd"] : []), ...passOn, pieces.map((p) => p.id).join(",")], {
       cwd: VIDEO_ROOT,
       stdio: "inherit",
     });

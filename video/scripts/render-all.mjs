@@ -7,6 +7,15 @@
  *   npm run render:all -- BaseRate,TfIdf       # just these (id or folder)
  *   npm run render:all -- --dry-run            # list what would render
  *   npm run render:all -- --force              # render even if unchanged
+ *   npm run render:all -- --concurrency 12     # frames rendered at once
+ *   npm run render:all -- --x264-preset medium # the encoder's speed/size trade
+ *
+ * Speed. Remotion renders `--concurrency` frames at once (default: half the
+ * CPU's threads); try more with `npx remotion benchmark`. The H.264 encoder
+ * runs at the x264 preset `fast` by default rather than x264's `medium`: at
+ * 4K the encoder is a large share of the time, and `fast` costs a slightly
+ * bigger file, not visible quality, at the same CRF. Neither is part of a
+ * video's fingerprint, so changing them re-renders nothing.
  *
  * A video is up to date when its output is in out/ and nothing its render
  * reads has changed since it was rendered. What it reads:
@@ -63,7 +72,27 @@ const flag = (name) => args.includes(name);
 const fhd = flag("--fhd");
 const dryRun = flag("--dry-run");
 const force = flag("--force");
-const only = args.find((a) => !a.startsWith("--"))?.split(",");
+/** A flag's value: `--concurrency 12`. */
+const VALUED = ["--concurrency", "--x264-preset"];
+const value = (name) => {
+  const i = args.indexOf(name);
+  return i >= 0 ? args[i + 1] : undefined;
+};
+const only = args.find((a, i) => !a.startsWith("--") && !VALUED.includes(args[i - 1]))?.split(",");
+
+/** How many frames Remotion renders at once: a number, or Remotion's
+ *  default (half the CPU's threads) when not given. */
+const concurrency = value("--concurrency") === undefined ? null : Number(value("--concurrency"));
+if (concurrency !== null && !(Number.isInteger(concurrency) && concurrency > 0)) {
+  console.error(`--concurrency takes a whole number of frames, like 12, not "${value("--concurrency")}"`);
+  process.exit(1);
+}
+const X264_PRESETS = ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"];
+const x264Preset = value("--x264-preset") ?? "fast";
+if (!X264_PRESETS.includes(x264Preset)) {
+  console.error(`--x264-preset takes one of ${X264_PRESETS.join(", ")}, not "${x264Preset}"`);
+  process.exit(1);
+}
 
 // The same settings `npm run render` gets from the CLI and remotion.config.ts.
 const SETTINGS = { scale: fhd ? 1 : 2, codec: "h264", imageFormat: "jpeg", jpegQuality: 92 };
@@ -282,6 +311,9 @@ for (const [i, v] of todo.entries()) {
       overwrite: true,
       browserExecutable,
       ...SETTINGS,
+      // How fast, not what: neither is in the fingerprint.
+      x264Preset,
+      concurrency,
       onProgress: ({ progress }) => {
         const pct = Math.floor(progress * 100);
         if (pct !== shown) process.stdout.write(`\r${label}  ${(shown = pct)}%`);

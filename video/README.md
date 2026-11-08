@@ -137,7 +137,28 @@ npm run render:all -- --fhd                  # the same at 1080p
 npm run render:all -- --dry-run              # list what would render, and why
 npm run render:all -- BaseRate,TfIdf         # only these (ids or folders)
 npm run render:all -- --force                # render even if unchanged
+npm run render:all -- --concurrency 12       # frames rendered at once (default: half the CPU's threads)
+npm run render:all -- --x264-preset medium   # the encoder's preset (default: fast)
 ```
+
+**Speed.** At 4K a frame is a 3840x2160 screenshot from headless Chrome,
+saved as a JPEG and encoded to H.264, all on the CPU: an 8-core desktop
+renders about 15 frames a second, so a 10-minute video takes about 20
+minutes and a whole interview series a few hours on its first run. Remotion
+renders half the CPU's threads' worth of frames at once; find a better
+number for a machine with
+
+```bash
+npx remotion benchmark DataAnalyst-6-Visualization --scale=2 --frames=0-299 --concurrencies=8,12,16 --runs=1
+```
+
+and pass it as `--concurrency` (`render:series` passes it on). The encoder
+runs at x264's `fast` preset rather than its `medium`: a slightly larger
+file, not visible quality, at the same CRF, and less encoding time
+(measured on a 5-second opener at 4K, 7% less, where the screenshots are
+most of the work). Neither setting is part of a video's fingerprint, so
+changing either re-renders nothing. Remotion has no NVIDIA encoder; its
+hardware encoding is macOS only.
 
 An edit to one scene re-renders that video alone; an edit to the shared kit
 (`src/editorial/`, `src/theme/`) or the sound effects re-renders every video,
@@ -166,6 +187,7 @@ npm run render:series -- --all --fhd         # every series
 npm run render:series -- DataEngineer --units 0-2 --fhd   # a stretch, to preview
 npm run render:series -- Statistics --dry-run   # list the pieces
 npm run render:series -- Statistics --no-render # stitch what is in out/ as it is
+npm run render:series -- DataAnalyst --concurrency 12   # passed on to render:all
 ```
 
 It runs `render:all` on exactly the pieces it needs first, so only a missing
