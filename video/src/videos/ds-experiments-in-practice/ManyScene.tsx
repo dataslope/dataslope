@@ -223,7 +223,7 @@ export const ManyScene: React.FC = () => {
         </Note>
 
         {/* The rule, and the three ranks that decide it. */}
-        <Note at={ruleAt + 4} x={LEGEND_X + 56} y={y(440) + 152 + 104}>
+        <Note at={ruleAt + 4} x={LEGEND_X + 56} y={y(440) + 152 + 148}>
           <span style={{ ...label(24, INK), fontWeight: 500, whiteSpace: "nowrap" }}>
             rank <i>k</i>'s bar: <i>k</i>/{m} × {cut}
           </span>
@@ -231,8 +231,8 @@ export const ManyScene: React.FC = () => {
         {deciding.map((r, i) => {
           const under = r.p <= r.bar;
           return (
-            <Note key={r.rank} at={keepAt - 6 + i * 4} x={LEGEND_X + 56} y={y(440) + 152 + 138 + i * 30}>
-              <span style={{ display: "grid", gridTemplateColumns: "80px 84px 28px 74px auto", alignItems: "baseline", ...label(24, under ? OK_INK : INK_SOFT), fontWeight: under ? 500 : 500, whiteSpace: "nowrap" }}>
+            <Note key={r.rank} at={keepAt - 6 + i * 4} x={LEGEND_X + 56} y={y(440) + 152 + 186 + i * 34}>
+              <span style={{ display: "grid", gridTemplateColumns: "92px 92px 32px 84px auto", alignItems: "baseline", ...label(24, under ? OK_INK : INK_SOFT), fontWeight: under ? 500 : 500, whiteSpace: "nowrap" }}>
                 <span>rank {r.rank}</span>
                 <span style={TABULAR}>{r.p.toFixed(4)}</span>
                 <span style={{ textAlign: "center" }}>{under ? "≤" : ">"}</span>
@@ -242,7 +242,7 @@ export const ManyScene: React.FC = () => {
             </Note>
           );
         })}
-        <Note at={primaryAt - 2} x={LEGEND_X} y={y(788)} width={380}>
+        <Note at={primaryAt - 2} x={LEGEND_X} y={y(440) + 152 + 304} width={380}>
           <span style={{ ...note(28, OK_INK), fontWeight: 500 }}>Better still: name one primary metric before the test starts.</span>
         </Note>
       </Drift>

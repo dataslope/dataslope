@@ -11,7 +11,7 @@ import { MONO } from "../../theme/fonts";
 import { NOTEBOOK, num, pct } from "./data";
 import { Drift, madeUp, Mark, MARK_OK, OK_INK, X0 } from "./parts";
 
-const NB = { x: X0, top: 360, w: 720, cellH: 76, gap: 16 };
+const NB = { x: X0, top: 360, w: 780, cellH: 76, gap: 16 };
 const LIST_X = 960;
 const LIST_TOP = 330;
 const LIST_ROW = 82;
@@ -135,24 +135,25 @@ export const CheckScene: React.FC = () => {
 
         {/* The checks. */}
         {items.map((it, i) => (
-          <Note key={it.text} at={it.at - 2} x={LIST_X} y={y(LIST_TOP) + i * h(LIST_ROW) + (i > 2 ? h(36) : 0)}>
+          <Note key={it.text} at={it.at - 2} x={LIST_X} y={y(LIST_TOP) + i * h(LIST_ROW) + (i > 2 ? h(84) : 0)}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <Tick at={it.at + 6} size={26} />
               <span style={{ ...note(28, INK), fontWeight: 500, whiteSpace: "nowrap" }}>{it.text}</span>
             </div>
           </Note>
         ))}
-        <Note at={skewAt} x={LIST_X + 40} y={y(LIST_TOP) + 2 * h(LIST_ROW) + h(38)}>
+        <Note at={skewAt} x={LIST_X + 40} y={y(LIST_TOP) + 2 * h(LIST_ROW) + h(44)}>
           <span style={{ ...label(24, INK_SOFT), whiteSpace: "nowrap" }}>
             a t-test on skewed revenue
             <br />
             <span style={{ opacity: ease(frame, twentyAt - 2, 10) }}>
-              {NOTEBOOK.segments} segments at {pct(NOTEBOOK.alpha)} each, no correction:{" "}
+              {NOTEBOOK.segments} segments at {pct(NOTEBOOK.alpha)} each, no correction:
+              <br />
               <b style={{ color: ACCENT_INK, opacity: ease(frame, sixtyAt - 2, 10) }}>{pct(NOTEBOOK.anyFalse)} chance of at least one false alarm</b>
             </span>
           </span>
         </Note>
-        <Note at={reproAt - 2} x={LIST_X} y={y(LIST_TOP) + 5 * h(LIST_ROW) + h(60)}>
+        <Note at={reproAt - 2} x={LIST_X} y={y(LIST_TOP) + 5 * h(LIST_ROW) + h(108)}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <Tick at={reproAt + 6} size={30} />
             <span style={{ ...note(28, OK_INK), fontWeight: 500, whiteSpace: "nowrap" }}>

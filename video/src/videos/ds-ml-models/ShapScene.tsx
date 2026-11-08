@@ -470,7 +470,7 @@ export const ShapScene: React.FC = () => {
                   top: top + h(16),
                   opacity: p,
                   ...label(
-                    20,
+                    24,
                     r.color === WARM
                       ? WARM_INK
                       : r.color === C0
@@ -495,8 +495,9 @@ export const ShapScene: React.FC = () => {
               background: PAPER,
             }}
           >
-            exact Shapley values: every subset of the 4 features, computed in
-            NumPy
+            exact Shapley values: every subset of the 4 features,
+            <br />
+            computed in NumPy
           </span>
         </Note>
         {/* The follow-up: does a feature help on new rows? Shuffle it on

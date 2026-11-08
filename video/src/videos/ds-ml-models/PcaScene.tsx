@@ -300,7 +300,9 @@ export const PcaScene: React.FC = () => {
               ={" "}
               {loadings.map((l, i) => (
                 <React.Fragment key={l.name}>
-                  {i ? (l.v < 0 ? " − " : " + ") : l.v < 0 ? "−" : ""}
+                  {/* Two terms a line: the full sum runs past the page. */}
+                  {i === 2 ? <br /> : null}
+                  {i === 2 ? (l.v < 0 ? "− " : "+ ") : i ? (l.v < 0 ? " − " : " + ") : l.v < 0 ? "−" : ""}
                   <span style={TABULAR}>{fmt(Math.abs(l.v), 2)}</span> {l.name}
                 </React.Fragment>
               ))}
