@@ -30,7 +30,7 @@ const TABLE_Y = 470;
 /**
  * Question 1, WHERE against HAVING, on the page's 24 orders: the two
  * definitions, the region totals as the groups HAVING filters, the sum put
- * in WHERE and DuckDB's refusal, then the same filter in HAVING and the two
+ * in WHERE and Postgres's refusal, then the same filter in HAVING and the two
  * regions it keeps, and why row filters still belong in WHERE.
  */
 export const WhereScene: React.FC = () => {
@@ -44,8 +44,8 @@ export const WhereScene: React.FC = () => {
   const havingAt = n.word("where-rows", "HAVING filters");
   const askAt = n.word("where-try", "regions");
   const sumAt = n.word("where-try", "put the sum");
-  const refusesAt = n.word("where-try", "refuses");
-  const errAt = n.word("where-try", "WHERE clause");
+  const refusesAt = n.word("where-refused", "refuses");
+  const errAt = n.word("where-refused", "Aggregate functions");
   const whyAt = n.word("where-why", "doesn't exist");
   const moveAt = n.word("where-fix", "Move");
   const twoAt = n.word("where-fix", "two regions");
@@ -105,7 +105,7 @@ export const WhereScene: React.FC = () => {
           <span style={{ ...note(26, INK), whiteSpace: "nowrap", fontWeight: 650 }}>&gt; 600?</span>
         </Note>
 
-        {/* ── The sum in WHERE, and DuckDB's refusal ── */}
+        {/* ── The sum in WHERE, and Postgres's refusal ── */}
         <Listing
           lines={WHERE.aggregate.lines}
           x={X0}

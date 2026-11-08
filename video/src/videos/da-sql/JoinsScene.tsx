@@ -76,7 +76,7 @@ export const JoinsScene: React.FC = () => {
   });
 
   // The result rows: the six matches, Di (left, full), and the stray order
-  // (right, full), in the order DuckDB returns the full join.
+  // (right, full), in the order Postgres returns the full join.
   const matched = JOINS.inner.rows;
   const di = JOINS.left.rows.find((r) => r[0] === "Di")!;
   const stray = JOINS.right.rows.find((r) => r[0] === "null")!;

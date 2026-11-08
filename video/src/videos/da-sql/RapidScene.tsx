@@ -26,7 +26,7 @@ import {
   type TableGeometry,
   X0,
 } from "./parts";
-import { QMono } from "./mono";
+import { Mono, QMono } from "./mono";
 
 /** Where the answers go: right of the list. */
 const R_X = 720;
@@ -230,8 +230,6 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
   const coalesceLine = lines.findIndex((l) => l.includes("COALESCE"));
   const nullifLine = lines.findIndex((l) => l.includes("NULLIF"));
   const day1 = 0;
-  // DuckDB without NULLIF: the zero-session day comes back null, not an error.
-  const duckNull = RAPID.divideByZero.rows[day1][0] === "null";
   return (
     <>
       <Listing
@@ -264,13 +262,16 @@ const Coalesce: React.FC<{ c: Ctx }> = ({ c }) => {
       <Note at={byNullAt - 2} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(76)}>
         <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>Dividing by null: just null.</span>
       </Note>
-      {/* The engine these ran in is one of the lenient ones: said, so a viewer
-          who tries it on the page is not surprised. */}
-      {duckNull ? (
-        <Note at={byNullAt + 12} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(122)}>
-          <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>DuckDB, which ran these, gives null for both.</span>
-        </Note>
-      ) : null}
+      {/* The engine these ran in is one of the strict ones: its own words for
+          the same division without NULLIF. */}
+      <Note at={byNullAt + 12} x={R_X} y={rg.rowTop(RAPID.coalesce.rows.length) + c.h(122)}>
+        <span style={{ ...note(22, INK_SOFT), whiteSpace: "nowrap" }}>
+          Postgres, which ran these:{" "}
+          <Mono color={ACCENT_INK}>
+            {RAPID.divideByZero.kind}: {RAPID.divideByZero.message}
+          </Mono>
+        </span>
+      </Note>
     </>
   );
 };
@@ -462,7 +463,6 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
   });
   const sub = firstRegion.length - 1;
   const allH = listingHeight(RAPID.groupByAll.lines.length, 22);
-  const ag = geo(c, R_X, c.T + allH + c.h(70), RAPID.groupByAll.cols, RAPID.groupByAll.rows);
   const allLine = RAPID.groupByAll.lines.findIndex((l) => l.startsWith("GROUP BY ALL"));
   return (
     <>
@@ -498,13 +498,19 @@ const Rollup: React.FC<{ c: Ctx }> = ({ c }) => {
           </Term>
         </span>
       </Note>
+      {/* Postgres, which runs the page's blocks, refuses GROUP BY ALL, so
+          there is no result to show: the listing, what it means, and where
+          it runs. */}
       <Listing lines={RAPID.groupByAll.lines} x={R_X} top={c.T} width={760} size={22} at={allAt - 2} marks={[{ line: allLine, at: allAt + 8 }]} />
-      <DataTable g={ag} cols={numeric(RAPID.groupByAll.cols, ["revenue"])} at={allAt} rows={RAPID.groupByAll.rows.map((cells, i) => ({ cells, at: allAt + 4 + i * 2 }))} />
-      <Note at={everyAt - 2} x={ag.right + 40} y={ag.top + c.h(10)}>
-        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>every selected column you didn&apos;t aggregate</span>
+      <Note at={everyAt - 2} x={R_X} y={c.T + allH + c.h(50)}>
+        <span style={{ ...note(26, INK), whiteSpace: "nowrap" }}>
+          = <Mono>GROUP BY region</Mono>: every selected column you didn&apos;t aggregate
+        </span>
       </Note>
-      <Note at={everyAt + 16} x={ag.right + 40} y={ag.top + c.h(52)}>
-        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>Not standard SQL: where it&apos;s supported.</span>
+      <Note at={everyAt + 16} x={R_X} y={c.T + allH + c.h(100)}>
+        <span style={{ ...note(24, INK_SOFT), whiteSpace: "nowrap" }}>
+          Not standard SQL: Snowflake, Databricks and DuckDB have it. Postgres doesn&apos;t.
+        </span>
       </Note>
     </>
   );
@@ -675,7 +681,7 @@ const Cross: React.FC<{ c: Ctx }> = ({ c }) => {
 /**
  * The rapid-fire round, questions 11 to 24: the numbered list on the left,
  * ticked as the round goes, and each answer on the right, every table and
- * listing as DuckDB ran it. The cross join stays up through the bridge to the
+ * listing as Postgres ran it. The cross join stays up through the bridge to the
  * next video.
  */
 export const RapidScene: React.FC = () => {

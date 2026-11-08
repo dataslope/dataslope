@@ -1,76 +1,22 @@
-// Runs every statement the da-sql video shows in DuckDB, the engine the Data
-// Analyst SQL page's blocks run in the reader's browser, and writes what came
-// back to results.json, which data.ts reads. From the repo root, where
-// @duckdb/duckdb-wasm (pinned to the version runtime/duckdb.ts loads) is
-// installed:
+// Runs every statement the da-sql video shows on the site's Postgres engine
+// (PGlite, PostgreSQL 18), the engine the Data Analyst SQL page's blocks run
+// in the reader's browser, and writes what came back to results.json, which
+// data.ts reads. From the repo root:
 //
 //   node video/src/videos/da-sql/check.mjs
 //
 // Each figure runs in a fresh database built by its own setup, as the page
-// gives every block its own engine. Values are printed the way a SQL client
-// prints them: a DECIMAL at its scale ("798.75"), a DATE as "2024-01-01", a
-// NULL as null. Tables are the page's own (content/interview/data-analyst/
-// sql.mdx) wherever the page has one; the few rows the page doesn't give are
-// marked "the video's own" below and in script.ts.
+// gives every block its own engine (video/scripts/lib/pg-figure.mjs). Values
+// are printed the way psql prints them: a numeric at its scale ("798.75"), a
+// DATE as "2024-01-01", a NULL as null, and an error as Postgres's own
+// "ERROR: ..." line. Tables are the page's own (content/interview/
+// data-analyst/sql.mdx) wherever the page has one; the few rows the page
+// doesn't give are marked "the video's own" below and in script.ts.
 /* global console, URL */
 import { writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
-const require = createRequire(join(dirname(fileURLToPath(import.meta.url)), "../../../../package.json"));
-const duckdb = require("@duckdb/duckdb-wasm");
-const { default: Worker } = await import(pathToFileURL(require.resolve("web-worker")).href);
-const dist = join(dirname(require.resolve("@duckdb/duckdb-wasm")), "..", "dist");
-const bundle = await duckdb.selectBundle({
-  mvp: { mainModule: join(dist, "duckdb-mvp.wasm"), mainWorker: join(dist, "duckdb-node-mvp.worker.cjs") },
-  eh: { mainModule: join(dist, "duckdb-eh.wasm"), mainWorker: join(dist, "duckdb-node-eh.worker.cjs") },
-});
-
-/** One value as a SQL client prints it, from its Arrow column type. */
-function shown(value, type) {
-  if (value === null || value === undefined) return null;
-  const t = String(type);
-  if (t.startsWith("Decimal")) {
-    const scale = type.scale ?? 0;
-    const digits = String(value).replace("-", "").padStart(scale + 1, "0");
-    const sign = String(value).startsWith("-") ? "-" : "";
-    return scale ? `${sign}${digits.slice(0, -scale)}.${digits.slice(-scale)}` : `${sign}${digits}`;
-  }
-  if (t.startsWith("Date")) return new Date(Number(value)).toISOString().slice(0, 10);
-  if (t.startsWith("Timestamp")) return new Date(Number(value)).toISOString().slice(0, 19).replace("T", " ");
-  if (typeof value === "bigint") return Number(value);
-  return value?.valueOf?.() ?? value;
-}
-
-async function figure(setup, steps) {
-  const worker = new Worker(pathToFileURL(bundle.mainWorker).href, { type: "module" });
-  const db = new duckdb.AsyncDuckDB({ log: () => {} }, worker);
-  await db.instantiate(bundle.mainModule);
-  const conn = await db.connect();
-  for (const stmt of setup.split(/;\s*\n/).map((s) => s.trim()).filter(Boolean)) await conn.query(stmt);
-  const out = {};
-  for (const [id, sql] of Object.entries(steps)) {
-    try {
-      const table = await conn.query(sql);
-      const fields = table.schema.fields;
-      const rows = table.toArray().map((r) => {
-        const obj = r.toJSON();
-        return fields.map((f) => shown(obj[f.name], f.type));
-      });
-      out[id] = { sql, ok: true, columns: fields.map((f) => f.name), rows };
-    } catch (e) {
-      // DuckDB's message is "<Kind> Error: <text>", then a LINE excerpt.
-      const message = String(e.message).split("\n")[0];
-      out[id] = { sql, ok: false, error: message };
-    }
-  }
-  const version = (await conn.query("SELECT version() AS v")).toArray()[0].toJSON().v;
-  await conn.close();
-  await db.terminate();
-  await worker.terminate();
-  return { setup, steps: out, version };
-}
+import { figure } from "../../../scripts/lib/pg-figure.mjs";
 
 // ── The page's tables ───────────────────────────────────────────────────────
 
@@ -103,7 +49,7 @@ const results = { figures: {} };
 results.figures.where = await figure(PAGE_ORDERS, {
   rows: "SELECT COUNT(*) AS n FROM orders;",
   // The 24 rows in the page's order, for the figure that runs them through.
-  table: "SELECT region, amount FROM orders ORDER BY rowid;",
+  table: "SELECT region, amount FROM orders ORDER BY ctid;",
   totals: "SELECT region, SUM(amount) AS revenue FROM orders GROUP BY region ORDER BY revenue DESC;",
   whereAggregate: "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE SUM(amount) > 600\nGROUP BY region;",
   having: "SELECT region, SUM(amount) AS revenue\nFROM orders\nGROUP BY region\nHAVING SUM(amount) > 600\nORDER BY revenue DESC;",
@@ -112,8 +58,8 @@ results.figures.where = await figure(PAGE_ORDERS, {
     "SELECT region, COUNT(*) AS orders, SUM(amount) AS revenue FROM orders WHERE amount > 100 GROUP BY region ORDER BY revenue DESC;",
   both:
     "SELECT region, SUM(amount) AS revenue\nFROM orders\nWHERE amount > 100\nGROUP BY region\nHAVING SUM(amount) > 400\nORDER BY revenue DESC\nLIMIT 10;",
-  // Not shown: DuckDB lets WHERE see a plain SELECT alias, which standard
-  // SQL and Postgres refuse. An aggregate's alias still fails (as above).
+  // Not shown: Postgres, like standard SQL, refuses a plain SELECT alias in
+  // WHERE too ("column does not exist"), not only an aggregate.
   plainAlias: "SELECT region, amount * 2 AS doubled FROM orders WHERE doubled > 400 ORDER BY doubled DESC;",
 });
 
@@ -165,12 +111,13 @@ results.figures.nulls = await figure(NULLS_SETUP, {
   isNull: "SELECT COUNT(*) FROM orders\nWHERE discount IS NULL;",
   nullEqualsNull: "SELECT NULL = NULL AS same;",
   counts:
-    "SELECT COUNT(*), COUNT(1), COUNT(discount),\n       AVG(discount),\n       AVG(COALESCE(discount, 0))\nFROM orders;",
+    "SELECT COUNT(*), COUNT(1), COUNT(discount),\n       ROUND(AVG(discount), 1),\n       ROUND(AVG(COALESCE(discount, 0)), 1)\nFROM orders;",
   // What the video shows: the rows each test finds (Question 5), the two
   // averages (Question 5's aggregates), then the three COUNTs (Question 6).
   equalsRows: "SELECT id FROM orders\nWHERE discount = NULL;",
   isNullRows: "SELECT id FROM orders\nWHERE discount IS NULL;",
-  averages: "SELECT AVG(discount),\n       AVG(COALESCE(discount, 0))\nFROM orders;",
+  // Rounded: Postgres prints an unrounded AVG with sixteen decimal places.
+  averages: "SELECT ROUND(AVG(discount), 1),\n       ROUND(AVG(COALESCE(discount, 0)), 1)\nFROM orders;",
   countRows: "SELECT COUNT(*), COUNT(1), COUNT(discount)\nFROM orders;",
   // Not shown, said: COUNT(DISTINCT col) counts the different values, nulls
   // left out (10, 5, 0, 15: 4).
@@ -213,9 +160,9 @@ results.figures.distinct = await figure(DISTINCT_SETUP, {
 results.figures.subqueries = await figure(`${PAGE_CUSTOMERS}\n${PAGE_CUSTOMER_ORDERS}`, {
   ordersTable: "SELECT id, customer_id, amount FROM orders ORDER BY id;",
   averagesNamed:
-    "SELECT c.name, AVG(o.amount) AS avg_amount FROM orders o JOIN customers c ON c.id = o.customer_id GROUP BY c.id, c.name ORDER BY c.id;",
-  averages: "SELECT customer_id, AVG(amount) AS avg_amount FROM orders GROUP BY customer_id ORDER BY customer_id;",
-  overall: "SELECT AVG(amount) AS avg_amount FROM orders;",
+    "SELECT c.name, ROUND(AVG(o.amount), 2) AS avg_amount FROM orders o JOIN customers c ON c.id = o.customer_id GROUP BY c.id, c.name ORDER BY c.id;",
+  averages: "SELECT customer_id, ROUND(AVG(amount), 2) AS avg_amount FROM orders GROUP BY customer_id ORDER BY customer_id;",
+  overall: "SELECT ROUND(AVG(amount), 2) AS avg_amount FROM orders;",
   uncorrelated: "SELECT id, amount FROM orders\nWHERE amount > (\n  SELECT AVG(amount) FROM orders\n)\nORDER BY id;",
   correlated:
     "SELECT id, customer_id, amount\nFROM orders o\nWHERE amount > (\n  SELECT AVG(amount) FROM orders\n  WHERE customer_id = o.customer_id\n)\nORDER BY id;",
@@ -282,7 +229,7 @@ INSERT INTO products VALUES ('Mug'), ('Tee'), ('Cap');`,
       "WITH dupes AS (\n  SELECT id, ROW_NUMBER() OVER (\n    PARTITION BY email ORDER BY id) AS rn\n  FROM users)\nDELETE FROM users\nWHERE id IN (SELECT id FROM dupes WHERE rn > 1);",
     afterDedupe: "SELECT id, email FROM users ORDER BY id;",
     crossJoin: "SELECT COUNT(*) FROM products CROSS JOIN regions;",
-    crossJoinThousand: "SELECT COUNT(*) FROM range(1000) a CROSS JOIN range(1000) b;",
+    crossJoinThousand: "SELECT COUNT(*) FROM generate_series(1, 1000) a CROSS JOIN generate_series(1, 1000) b;",
   },
 );
 
@@ -305,6 +252,8 @@ results.figures.rollup = await figure(
   {
     rollup:
       "SELECT region, category, SUM(amount) AS revenue\nFROM orders\nGROUP BY ROLLUP (region, category)\nORDER BY region NULLS LAST, category NULLS LAST;",
+    // Postgres has no GROUP BY ALL: the video shows the listing and says
+    // which engines have it, and data.ts checks that this one refused it.
     groupByAll: "SELECT region, SUM(amount) AS revenue\nFROM orders\nGROUP BY ALL\nORDER BY revenue DESC;",
   },
 );

@@ -27,8 +27,8 @@ import { ILLUSTRATIONS, VIDEO } from "./data";
  * Pieces this video needs beyond the shared editorial kit and the interview
  * kit (editorial/interview.tsx), after DbDesign-4's parts.tsx: a SQL listing
  * set the way a magazine prints one, a table drawn as real rows and cells
- * (with columns that can open, rows that grow, strike and collapse), DuckDB's
- * error box, the arrow a match draws from one row to another, and the
+ * (with columns that can open, rows that grow, strike and collapse), the
+ * engine's error box, the arrow a match draws from one row to another, and the
  * highlighter and strike.
  */
 
@@ -409,9 +409,11 @@ export const Listing: React.FC<{
   );
 };
 
-// ── DuckDB's answers ─────────────────────────────────────────────────────────
+// ── The engine's answers ─────────────────────────────────────────────────────
 
-/** An error as DuckDB prints it: its kind ("Binder Error"), then the message. */
+/** An error as the engine prints it: its kind (Postgres's "ERROR", or
+ *  DuckDB's "Binder Error" where a video still shows DuckDB), then the
+ *  message. */
 export const ErrorBox: React.FC<{
   x: number;
   top: number;
