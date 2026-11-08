@@ -1,8 +1,8 @@
 import results from "./results.json" with { type: "json" };
 
 // Every number and every figure the video shows, read from results.json:
-// what DuckDB, Pyodide with SciPy, and the page's own chart generators gave
-// check.mjs, which wrote it. Pure (no Remotion, no DOM).
+// what Postgres (PGlite), Pyodide with SciPy, and the page's own chart
+// generators gave check.mjs, which wrote it. Pure (no Remotion, no DOM).
 
 export const VIDEO = "da-ab-testing";
 
@@ -168,9 +168,14 @@ export const RAPID = {
   events: query("conversion", "table"),
   right: query("conversion", "right"),
   repeats: query("conversion", "repeats"),
+  /** The same counts divided without the * 1.0: Postgres divides two
+   *  whole numbers as whole numbers, so 2 / 5 is 0. */
+  whole: scalar("conversion", "whole"),
   novelty: R.charts.novelty,
   cohorts: R.charts.cohorts,
   retention: R.charts.retention,
 };
 
+/** The engines and versions the numbers came from, for reference: no
+ *  version goes on screen. */
 export const RUNTIME = `${R.runtime.sql}; ${R.runtime.py}`;

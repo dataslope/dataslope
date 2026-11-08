@@ -40,7 +40,7 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     active user; December 664, 351 and 214, a factor of 3.1.
  *   - "funnel": the page's funnel chart, 42,000 landing to 3,900 purchases,
  *     9.3% overall; the first step loses the most (14,500); the weakest step
- *     is product view to cart, 51.6%, from the page's LAG query in DuckDB.
+ *     is product view to cart, 51.6%, from the page's LAG query in Postgres.
  *   - "abtest": charts/randomisation-balances-confounders.mjs, all ten traits
  *     over the 0.1 line when users choose, only age (0.102) when a coin does;
  *     the course's experiment (seed 42), 579 of 6,000 against 702 of 6,000,
@@ -62,7 +62,8 @@ import { COURSE_MIN_PAUSE } from "../../editorial/course.ts";
  *     charts/average-of-averages.mjs, 68 against 51.8 per customer, the
  *     Islands' 40 customers; summed first, 610,590 / 11,790 = 51.8.
  *   - short ones: the video's own events, where a repeat purchase makes 0.6
- *     of 0.4; charts/novelty-effect-fades.mjs, week one 14.1% against 3.75%;
+ *     of 0.4, and without the * 1.0 Postgres divides 2 by 5 as whole numbers,
+ *     to 0; charts/novelty-effect-fades.mjs, week one 14.1% against 3.75%;
  *     charts/cohort-retention.mjs, week eight 26.4% (January) to 51.7% (May);
  *     charts/retention-curve-plateau.mjs, 51.0% and 50.7% at week two, 31.0%
  *     and 1.7% at week twelve.

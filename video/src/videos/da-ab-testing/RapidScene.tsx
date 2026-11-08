@@ -127,7 +127,7 @@ const Conversion: React.FC<{ c: Ctx }> = ({ c }) => {
 
       <Note at={zeroAt - 2} x={LX} y={top2 + listingHeight(wrong.length, SIZE) + c.h(24)}>
         <span style={{ ...note(23, INK), whiteSpace: "nowrap" }}>
-          <Mono>* 1.0</Mono>: no whole-number division, where {firsts.length} / {users} would be 0
+          <Mono>* 1.0</Mono>: no whole-number division, where {firsts.length} / {users} would be {RAPID.whole}
         </span>
       </Note>
     </>
@@ -344,7 +344,7 @@ const Retention: React.FC<{ c: Ctx }> = ({ c }) => {
 /**
  * The rapid-fire round, questions 16 to 19, as in the earlier parts: the
  * numbered list on the left, ticked as the round goes, each answer on the
- * right. The SQL ran in DuckDB; the three curves are the page's own charts.
+ * right. The SQL ran in Postgres; the three curves are the page's own charts.
  */
 export const RapidScene: React.FC = () => {
   const n = useNarration();

@@ -4,7 +4,8 @@
 //   node video/src/videos/da-ab-testing/check.mjs
 //
 // Three engines, each the one its numbers come from:
-//   - DuckDB (the engine the page's SQL blocks run), for the funnel, the
+//   - Postgres (PGlite, PostgreSQL 18, the engine the page's SQL blocks run,
+//     through video/scripts/lib/pg-figure.mjs), for the funnel, the
 //     conversion-rate query, the kidney-stone rates and the regional averages;
 //   - Pyodide with NumPy and SciPy (the runtime the Statistics course's blocks
 //     run), for the experiment, its p-value and interval, and the sample
@@ -21,60 +22,9 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { figure as sqlFigure } from "../../../scripts/lib/pg-figure.mjs";
+
 const require = createRequire(join(dirname(fileURLToPath(import.meta.url)), "../../../../package.json"));
-const duckdb = require("@duckdb/duckdb-wasm");
-const { default: Worker } = await import(pathToFileURL(require.resolve("web-worker")).href);
-const dist = join(dirname(require.resolve("@duckdb/duckdb-wasm")), "..", "dist");
-const bundle = await duckdb.selectBundle({
-  mvp: { mainModule: join(dist, "duckdb-mvp.wasm"), mainWorker: join(dist, "duckdb-node-mvp.worker.cjs") },
-  eh: { mainModule: join(dist, "duckdb-eh.wasm"), mainWorker: join(dist, "duckdb-node-eh.worker.cjs") },
-});
-
-/** One value as a SQL client prints it, from its Arrow column type. */
-function shown(value, type) {
-  if (value === null || value === undefined) return null;
-  const t = String(type);
-  if (t.startsWith("Decimal")) {
-    const scale = type.scale ?? 0;
-    const digits = String(value).replace("-", "").padStart(scale + 1, "0");
-    const sign = String(value).startsWith("-") ? "-" : "";
-    return scale ? `${sign}${digits.slice(0, -scale)}.${digits.slice(-scale)}` : `${sign}${digits}`;
-  }
-  if (t.startsWith("Date")) return new Date(Number(value)).toISOString().slice(0, 10);
-  if (t.startsWith("Timestamp")) return new Date(Number(value)).toISOString().slice(0, 19).replace("T", " ");
-  if (typeof value === "bigint") return Number(value);
-  return value?.valueOf?.() ?? value;
-}
-
-async function sqlFigure(setup, steps) {
-  const worker = new Worker(pathToFileURL(bundle.mainWorker).href, { type: "module" });
-  const db = new duckdb.AsyncDuckDB({ log: () => {} }, worker);
-  await db.instantiate(bundle.mainModule);
-  const conn = await db.connect();
-  for (const stmt of setup.split(/;\s*\n/).map((s) => s.trim()).filter(Boolean)) await conn.query(stmt);
-  const out = {};
-  for (const [id, sql] of Object.entries(steps)) {
-    try {
-      const table = await conn.query(sql);
-      const fields = table.schema.fields;
-      const rows = table.toArray().map((r) => {
-        const obj = r.toJSON();
-        return fields.map((f) => shown(obj[f.name], f.type));
-      });
-      out[id] = { sql, ok: true, columns: fields.map((f) => f.name), rows };
-    } catch (e) {
-      // DuckDB's message is "<Kind> Error: <text>", then a LINE excerpt.
-      const message = String(e.message).split("\n")[0];
-      out[id] = { sql, ok: false, error: message };
-    }
-  }
-  const version = (await conn.query("SELECT version() AS v")).toArray()[0].toJSON().v;
-  await conn.close();
-  await db.terminate();
-  await worker.terminate();
-  return { setup, steps: out, version };
-}
-
 
 // ── Pyodide ──────────────────────────────────────────────────────────────────
 
@@ -165,7 +115,7 @@ const { normalSamples, mean } = await import(pathToFileURL(join(dirname(fileURLT
 
 const results = { runtime: {}, sql: {}, py: {}, charts: {} };
 
-// ── DuckDB ───────────────────────────────────────────────────────────────────
+// ── Postgres ─────────────────────────────────────────────────────────────────
 
 /** 4, 5. The funnel the page draws (charts/funnel-step-dropoff.mjs), as the
  *  table its step-to-step query reads. */
@@ -176,9 +126,13 @@ INSERT INTO funnel VALUES
   ('Checkout started', 4, 8900), ('Payment entered', 5, 5100), ('Purchase', 6, 3900);`,
   {
     // The page's query, with an ORDER BY so the rows come back in funnel order.
+    // Not rounded, so the listing on screen stays the page's own: Postgres
+    // prints each ratio with twenty places, but the video shows only the
+    // listing and each ratio as a percentage, never the raw cell.
     step: "SELECT stage, users,\n  users * 1.0 / LAG(users) OVER (ORDER BY stage_order) AS step_conversion\nFROM funnel\nORDER BY stage_order;",
     lost: "SELECT stage, LAG(users) OVER (ORDER BY stage_order) - users AS lost FROM funnel ORDER BY stage_order;",
-    overall: "SELECT MIN(users) * 1.0 / MAX(users) AS overall FROM funnel;",
+    // Not on screen as SQL: rounded, since Postgres prints twenty places.
+    overall: "SELECT ROUND(MIN(users) * 1.0 / MAX(users), 4) AS overall FROM funnel;",
   },
 );
 
@@ -190,12 +144,18 @@ INSERT INTO events VALUES
   (1, 'visit'), (1, 'purchase'), (1, 'purchase'), (2, 'visit'),
   (3, 'visit'), (3, 'purchase'), (4, 'visit'), (5, 'visit');`,
   {
-    table: "SELECT user_id, stage FROM events ORDER BY rowid;",
+    table: "SELECT user_id, stage FROM events ORDER BY ctid;",
     right:
       "SELECT\n  COUNT(DISTINCT CASE WHEN stage = 'purchase' THEN user_id END) * 1.0\n  / COUNT(DISTINCT user_id) AS overall_conversion\nFROM events;",
     // Without DISTINCT in the numerator, the repeat purchase counts twice.
+    // Both unrounded, as the page writes them: Postgres prints 0.4 with twenty
+    // places, and the video shows it to one.
     repeats:
       "SELECT\n  COUNT(CASE WHEN stage = 'purchase' THEN user_id END) * 1.0\n  / COUNT(DISTINCT user_id) AS overall_conversion\nFROM events;",
+    // Not shown as SQL: without the * 1.0, Postgres divides the two counts
+    // as whole numbers ("where 2 / 5 would be 0").
+    whole:
+      "SELECT\n  COUNT(DISTINCT CASE WHEN stage = 'purchase' THEN user_id END)\n  / COUNT(DISTINCT user_id) AS overall_conversion\nFROM events;",
   },
 );
 
@@ -221,15 +181,17 @@ results.sql.ratio = await sqlFigure(
 INSERT INTO regions VALUES
   ('North', 52, 4200), ('South', 49, 3100), ('East', 61, 1850), ('West', 47, 2600), ('Islands', 131, 40);`,
   {
-    table: "SELECT region, avg_order, customers FROM regions ORDER BY rowid;",
-    averaged: "SELECT AVG(avg_order) AS average_of_averages FROM regions;",
-    weighted: "SELECT SUM(avg_order * customers) * 1.0 / SUM(customers) AS per_customer FROM regions;",
+    table: "SELECT region, avg_order, customers FROM regions ORDER BY ctid;",
+    // Neither is on screen as SQL; rounded, since Postgres prints an
+    // unrounded AVG or ratio with sixteen places.
+    averaged: "SELECT ROUND(AVG(avg_order), 2) AS average_of_averages FROM regions;",
+    weighted: "SELECT ROUND(SUM(avg_order * customers) * 1.0 / SUM(customers), 2) AS per_customer FROM regions;",
     // The fix the video gives: the numerator and the denominator summed
     // first, the division they feed done once.
     totals: "SELECT SUM(avg_order * customers) AS revenue, SUM(customers) AS customers FROM regions;",
   },
 );
-results.runtime.sql = `DuckDB ${results.sql.funnel.version}`;
+results.runtime.sql = results.sql.funnel.version;
 
 // ── Pyodide ──────────────────────────────────────────────────────────────────
 
