@@ -16,12 +16,17 @@ const COL_Y = 346;
 const COL_W = 390;
 const COL_GAP = 40;
 const ART_H = 150;
+/** Air between a spot's box and its step's name. At 18px the art sat on the
+ *  name (the sieve's drips nearly touched "Remove stopwords"). */
+const ART_GAP = 44;
 /** A column's text, from its name's top to the bottom of what it lost, in
  *  px under COL_Y: the hairlines span this. */
-const TEXT_TOP = 22 + ART_H + 18;
+const TEXT_TOP = 22 + ART_H + ART_GAP;
 const TEXT_H = 46 + 27 + 4 + 38;
-const NOTE_Y = 664;
-const NEXT_Y = 760;
+/** "threw away" and what was lost, under the name. */
+const LOST_TOP = TEXT_TOP + 46;
+const NOTE_Y = 690;
+const NEXT_Y = 786;
 
 /** Each step of the unit, its spot, and what it threw away, with the art's
  *  own proportions so every spot is drawn at its true shape. */
@@ -83,7 +88,7 @@ export const CloseScene: React.FC = () => {
             <Ink at={colAt[i] + 4} dur={14} style={{ left: x, top: top + TEXT_TOP, ...line }}>
               <span style={{ ...label(28, INK), fontWeight: 700 }}>{s.name}</span>
             </Ink>
-            <Ink at={lostAt[i] - 2} dur={16} style={{ left: x, top: top + 22 + h + 64, ...line }}>
+            <Ink at={lostAt[i] - 2} dur={16} style={{ left: x, top: top + LOST_TOP, ...line }}>
               <div style={note(21, INK_SOFT)}>threw away</div>
               <div style={{ ...body(26), color: ACCENT_INK, marginTop: 4 }}>{s.lost}</div>
             </Ink>
