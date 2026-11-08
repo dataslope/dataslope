@@ -1,6 +1,7 @@
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { ease } from "../../components/motion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
+import { Illustration } from "../../components/Illustration";
+import { ease, pop } from "../../components/motion";
 import { RapidFire, type RapidItem } from "../../editorial/interview";
 import { type Layout, useLayout } from "../../editorial/layout";
 import { ACCENT, ACCENT_INK, BAR, BLUE_INK, HAIRLINE, INK, INK_SOFT, PAPER, label, note } from "../../editorial/style";
@@ -9,7 +10,7 @@ import { ds } from "../../theme/brand";
 import { MONO } from "../../theme/fonts";
 import { useNarration } from "../../narration/NarrationContext";
 import { Sfx } from "../../sound/Sfx";
-import { POOL, SEMAPHORE } from "./data";
+import { ILLUSTRATIONS, POOL, SEMAPHORE, VIDEO } from "./data";
 import { Band, Drift, Flow, Headline, Kicker, lerp, LockGlyph, Node, OK, OK_INK, SERIES, Spot, THREAD, ThreadName, tint, VRule, X0 } from "./parts";
 
 const R_X = 780;
@@ -493,22 +494,29 @@ const Pool: React.FC<{ c: Ctx }> = ({ c }) => {
 
 // ── 16. Futures ─────────────────────────────────────────────────────────────
 
-/** A claim ticket: a stub with a punched hole, pending (dashed) or redeemed. */
-const Ticket: React.FC<{ x: number; y: number; w: number; h: number; ready: number; children: React.ReactNode }> = ({ x, y, w, h, ready, children }) => (
-  <div style={{ position: "absolute", left: x, top: y, width: w, height: h }}>
-    <svg width={w} height={h} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
-      <path
-        d={`M10,0 H${w - 10} a10,10 0 0 0 10,10 V${h / 2 - 10} a10,10 0 0 0 0,20 V${h - 10} a10,10 0 0 0 -10,10 H10 a10,10 0 0 0 -10,-10 V${h / 2 + 10} a10,10 0 0 0 0,-20 V10 a10,10 0 0 0 10,-10 Z`}
-        fill={ready > 0.5 ? tint(OK, 16) : PAPER}
-        stroke={ready > 0.5 ? OK : BAR}
-        strokeWidth={2.6}
-        strokeDasharray={ready > 0.5 ? undefined : "8 5"}
-      />
-      <circle cx={30} cy={h / 2} r={7} fill="none" stroke={ready > 0.5 ? OK : BAR} strokeWidth={2.4} />
-    </svg>
-    <div style={{ position: "absolute", inset: 0, paddingLeft: 52, display: "flex", alignItems: "center" }}>{children}</div>
-  </div>
-);
+/** The claim ticket, painted (be-concurrency-ticket, 1491x653): a blue stub
+ *  with the punched hole, then a pale face from about 0.28 to 0.97 of its
+ *  width, which carries what the ticket holds. */
+const TICKET = { id: `${VIDEO}-ticket`, w: 1491, h: 653, face: [0.28, 0.97] } as const;
+const ticketH = (w: number) => (w * TICKET.h) / TICKET.w;
+
+/** The ticket, `w` wide, popping in on `at`, its state on its face. */
+const Ticket: React.FC<{ x: number; y: number; w: number; at: number; children: React.ReactNode }> = ({ x, y, w, at, children }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const p = Math.min(1, pop(frame, at, fps, 16));
+  if (frame < at || p <= 0.001) return null;
+  const h = ticketH(w);
+  const [f0, f1] = TICKET.face;
+  return (
+    <div style={{ position: "absolute", left: x, top: y, width: w, height: h, opacity: p, transform: `translateY(${(1 - p) * 16}px)` }}>
+      {ILLUSTRATIONS ? <Illustration video={VIDEO} id={TICKET.id} style={{ position: "absolute", left: 0, top: 0, width: w, height: h }} /> : null}
+      <div style={{ position: "absolute", left: f0 * w, width: (f1 - f0) * w, top: 0, bottom: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {children}
+      </div>
+    </div>
+  );
+};
 
 const Future: React.FC<{ c: Ctx }> = ({ c }) => {
   const frame = useCurrentFrame();
@@ -524,6 +532,10 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
   const work = ease(frame, startAt + 4, 60);
   const ready = ease(frame, laterAt, 10);
   const tX = lerp(t0, 1380, ease(frame, laterAt - 10, 20));
+  // The ticket, centred in the band between the running work and the axis.
+  const tW = 320;
+  const tTop = (c.y(456) + c.h(40) + axisY) / 2 - ticketH(tW) / 2;
+  const state: React.CSSProperties = { ...label(22, BLUE_INK), fontWeight: 700, whiteSpace: "nowrap", position: "absolute" };
   return (
     <>
       <Lead at={ticketAt} c={c} term="Future">
@@ -558,11 +570,11 @@ const Future: React.FC<{ c: Ctx }> = ({ c }) => {
         <span style={{ ...label(20, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the work, running</span>
       </div>
       {/* The ticket: handed over at once, redeemed later. */}
-      {frame >= onceAt ? (
-        <Ticket x={tX} y={c.y(548)} w={260} h={c.h(84)} ready={ready}>
-          <span style={{ ...label(22, ready > 0.5 ? OK_INK : BLUE_INK), fontWeight: 700, whiteSpace: "nowrap" }}>{ready > 0.5 ? "future: the value" : "future: pending"}</span>
-        </Ticket>
-      ) : null}
+      <Ticket x={tX} y={tTop} w={tW} at={onceAt}>
+        {/* One goes before the other comes, so the two never overprint. */}
+        <span style={{ ...state, opacity: Math.max(0, 1 - 2 * ready) }}>future: pending</span>
+        <span style={{ ...state, color: OK_INK, opacity: Math.max(0, 2 * ready - 1) }}>future: the value</span>
+      </Ticket>
       <Note at={onceAt + 4} x={t0} y={axisY + c.h(18)}>
         <span style={{ ...label(21, BLUE_INK), fontWeight: 650, whiteSpace: "nowrap" }}>the ticket, at once</span>
       </Note>
